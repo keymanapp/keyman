@@ -24,6 +24,7 @@ if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
     '-fvisibility=hidden',
     '-fvisibility-inlines-hidden'
   ]
+  defns = []
   links = []
 
   if compiler.get_id() == 'clang'

@@ -16,9 +16,9 @@
 #include "kmx_u16.h"
 #include <kmcompx.h>
 
-#include "../../../common/windows/cpp/include/registry.h"
-#include "../../../common/windows/cpp/include/unicode.h"
-#include "../../../common/windows/cpp/include/crc32.h"
+#include "../../../../common/windows/cpp/include/registry.h"
+#include "../../../../common/windows/cpp/include/unicode.h"
+#include "../../../../common/windows/cpp/include/crc32.h"
 
 #include <ctype.h>
 #include <stdio.h>

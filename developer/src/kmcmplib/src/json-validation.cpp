@@ -24,8 +24,8 @@ static void loader(const json_uri &uri, json &schema)
   }
 }
 
-extern "C" BOOL __declspec(dllexport) ValidateJsonFile(PWSTR pwszSchemaFile, PWSTR pwszJsonFile, ValidateJsonMessageProc MessageProc) {
-  std::fstream f(pwszSchemaFile);
+extern "C" BOOL __declspec(dllexport) ValidateJsonFile(PWSTR schemaStream, PWSTR jsonStream , ValidateJsonMessageProc MessageProc) {
+  std::fstream f(schemaStream);
   if (!f.good()) {
     MessageProc(-1, "Schema file could not be loaded.");
     return FALSE;
@@ -57,7 +57,7 @@ extern "C" BOOL __declspec(dllexport) ValidateJsonFile(PWSTR pwszSchemaFile, PWS
   // 3) do the actual validation of the document
   json document;
 
-  std::fstream fd(pwszJsonFile);
+  std::fstream fd(jsonStream );
   if (!fd.good()) {
     MessageProc(-3, "Json file could not be loaded.");
     return FALSE;

@@ -34,7 +34,7 @@ std::string string_from_u16string(std::u16string const str) {
 
 // often used with c_str() e.g. u16fmt( DEBUGSTORE_MATCH).c_str()
 // UTF16 (= const char16_t*) -> UTF8 (= std::string)  -> UTF16 ( = std::wstring 16 bit)
-std::wstring u16fmt(const km_kbp_cp* str) {
+std::wstring u16fmt(const KMX_WCHAR * str) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> convert_wstring;
 	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
 
@@ -44,7 +44,7 @@ std::wstring u16fmt(const km_kbp_cp* str) {
 	return wstr;
 }
 
-void u16sprintf(km_kbp_cp* dst, const size_t sz, const wchar_t* fmt, ...) {
+void u16sprintf(KMX_WCHAR * dst, const size_t sz, const wchar_t* fmt, ...) {
  // UTF16 (=const wchar_t*) -> -> std::string  -> std::u16string -> UTF16 ( = char16_t*)
 	wchar_t* wbuf = new wchar_t[sz];
 	va_list args;
@@ -191,7 +191,7 @@ KMX_WCHAR * u16tok(KMX_WCHAR *p,  KMX_WCHAR ch,  KMX_WCHAR **ctx) {
     if (!p) return NULL;
   }
 
-  km_kbp_cp *q = p;
+  KMX_WCHAR *q = p;
   while (*q && *q != ch) {
     q++;
   }
@@ -207,20 +207,20 @@ KMX_WCHAR * u16tok(KMX_WCHAR *p,  KMX_WCHAR ch,  KMX_WCHAR **ctx) {
   return p;
 }
 
-km_kbp_cp * u16tok(km_kbp_cp* p,  km_kbp_cp* ch, km_kbp_cp** ctx) {
+KMX_WCHAR * u16tok(KMX_WCHAR* p,  KMX_WCHAR* delim, KMX_WCHAR** ctx) {
 	if (!p) {
 		p = *ctx;
 		if (!p) return NULL;
 	}
 
-	km_kbp_cp* q = p;
-	while (*q && !u16chr(ch, *q)) {
+	KMX_WCHAR * q = p;
+	while (*q && !u16chr(delim, *q)) {
 		q++;
 	}
 	if (*q) {
 		*q = 0;
 		q++;
-		while (u16chr(ch, *q)) q++;
+		while (u16chr(delim, *q)) q++;
 		*ctx = q;
 	}
 	else {
@@ -245,7 +245,7 @@ double u16tof( KMX_WCHAR* str)
 	{
 		digit = static_cast<char>(towupper(*str));		
 
-		if ((i > pos_dot - 1) )
+		if (i > pos_dot - 1)
 			offsetdot = 1;
 
 		if (digit != '.') 			
