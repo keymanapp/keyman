@@ -199,17 +199,19 @@ void NamedCodeConstants::reindex()
     qsort(entries, nEntries, sizeof(NCCENTRY), sort_entries);
   }
 
-  wchar_t c = L'.', d;
+  wchar_t c = L'.', d, c_new;
   int i;
 
   for(i = 0; i < 128; i++) chrindexes[i] = -1;
 
-  if (entries != NULL) {
+  if ((entries && nEntries > 0) || !entries) {
     for (i = 0; i < nEntries; i++)
     {
       d = towupper(entries[i].name[0]);
-      if (d != c && d >= 32 && d <= 127)
-        chrindexes[c = d] = i;
+      if (d != c && d >= 32 && d <= 127) {
+        c_new = d;
+        chrindexes[c_new] = i;
+      }
     }
   }
 }

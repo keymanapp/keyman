@@ -16,12 +16,7 @@ static void loader(const json_uri &uri, json &schema)
   if (!lf.good())
     throw std::invalid_argument("could not open " + uri.url() + " tried with " + uri.path());
 
-  try {
     lf >> schema;
-  }
-  catch (std::exception &e) {
-    throw e;
-  }
 }
 
 extern "C" BOOL __declspec(dllexport) ValidateJsonFile(PWSTR schemaStream, PWSTR jsonStream , ValidateJsonMessageProc MessageProc) {

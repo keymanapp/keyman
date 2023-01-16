@@ -1,2 +1,2 @@
 @echo off
-dir /s/b ..\..\..\..\keyboards\release\*.kmn
+dir /s/b %KEYMAN_ROOT%\..\keyboards\release\*.kmn
