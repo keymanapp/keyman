@@ -9,7 +9,7 @@ _km-package-list-installed_completions()
 
     if [[ ${cur} == -* ]] ; then
         # shellcheck disable=SC2207
-        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
         return 0
     fi
 }
