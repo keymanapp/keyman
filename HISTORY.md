@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.29 alpha 2023-01-16
+
+* fix(linux): Fix crash (un-)installing shared keyboard (#8020)
+* chore(linux): Don't report KeyboardInterrupt to Sentry (#8021)
+* chore(linux): Update sample settings (#8018)
+* feat(linux): Enhance tab completion in km-package-install (#8005)
+
 ## 17.0.28 alpha 2023-01-12
 
 * feat(linux): Display error messages in the UI (#8006)
