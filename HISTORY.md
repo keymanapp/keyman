@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.131 beta 2023-01-16
+
+* chore(linux): Don't report KeyboardInterrupt to Sentry (#8022)
+* fix(linux): Fix crash (un-)installing shared keyboard (#8019)
+
 ## 16.0.130 beta 2023-01-09
 
 * fix(windows): kmshell -ikl install language and enable keyboard (#7856)
