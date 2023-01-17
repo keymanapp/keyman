@@ -339,10 +339,17 @@ There are `listCount` total lists.
 | ∆ | Bits | Name             | Description                                |
 |---|------|------------------|--------------------------------------------|
 | 0+|  32  | flags            | int: per-layers options                    |
-| 4+|  32  | hardware         | str: layout (`us`,`iso`,`jis`,`abnt2`)     |
+| 4+|  32  | hardware         | int: enumeration for hardware layout       |
 | 8+|  32  | layer            | int: index to first layer element          |
 |12+|  32  | count            | int: number of layer elements in this list |
 |16+|  32  | minDeviceWidth   | int: min device width in millimeters, or 0 |
+
+- `hardware`: an enumeration with the following values:
+  - 0: `none` (not valid for use with hardware)
+  - 1: `abnt2`
+  - 2: `iso`
+  - 3: `jis`
+  - 4: `us`
 
 - `flags`: a 32-bit bitfield defined as below:
 
