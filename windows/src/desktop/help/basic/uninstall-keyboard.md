@@ -23,13 +23,13 @@ To uninstall a Keyman keyboard:
 
     ![](../desktop_images/tab-layout.png)
 
-5.  Click on the keyboard name for the keyboard you want to uninstall to 
+5.  Click on the keyboard name for the keyboard you want to uninstall to
     expand options associated with it.
-    
+
 6.  Click the Uninstall button.
 
 7.  A message box is displayed asking you to confirm this is the package
-    or keyboard layout that you wish to uninstall. Click OK.
+    or keyboard layout that you wish to uninstall.
 
 8.  Click OK.
 

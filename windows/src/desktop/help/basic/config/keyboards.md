@@ -62,7 +62,7 @@ appear beside the language in the keyboards details list.
     **Note:** Be aware that you can set the hotkey to replace common Windows hotkeys (
     <kbd>Ctrl</kbd> + <kbd>C</kbd>, <kbd>Ctrl</kbd> + <kbd>V</kbd>, etc). This is not
     recommended.
-    
+
 3.  Click OK to save your selection.
 
 The new hotkey will now be available.
@@ -86,22 +86,22 @@ Keyman Configuration:
 
 1.  Find a keyboard in the keyboard list.
 
-2.  Select the keyboard name from the keyboard list to expand options associated with it. 
+2.  Select the keyboard name from the keyboard list to expand options associated with it.
     The keyboard information window will expand.
     ![](../../desktop_images/tab-layout-detail1.png)
-    The initial drop down has the following information if available: 
-    
-      -   Languages associated with the keyboard 
+    The initial drop down has the following information if available:
+
+      -   Languages associated with the keyboard
       -   Keyboard package name
       -   Keyboard package version number
       -   Copyright details
-        
 
-  
+
+
 3. Click on the down arrow
-    ![](../../desktop_images/keyboards-downarrow.png) at the end of the list will reveal
-    further details including: 
-    
+    ![](../../desktop_images/keyboards-downarrow.png), at the end of the list will reveal
+    further details including:
+
     -   Keyboard version number
     -   Keyboard filename.
     -   Keyboard included fonts
@@ -110,7 +110,7 @@ Keyman Configuration:
     -   On Screen Keyboard status
     -   Documentation status
     -   Keyboard Message
-    
+
   ![](../../desktop_images/tab-layout-detail2.png)
 
 ## Sharing a keyboard with other users and devices
