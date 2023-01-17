@@ -88,7 +88,7 @@ Keyman Configuration:
 
 2.  Select the keyboard name from the keyboard list to expand options associated with it. 
     The keyboard information window will expand.
-    (![](../../desktop_images/tab-layout-detail1.png)) 
+    ![](../../desktop_images/tab-layout-detail1.png)
     The initial drop down has the following information if available: 
     
       -   Languages associated with the keyboard 
@@ -99,7 +99,7 @@ Keyman Configuration:
 
   
 3. Click on the down arrow
-    (![](../../desktop_images/keyboards-downarrow.png)) at the end of the list will reveal
+    ![](../../desktop_images/keyboards-downarrow.png) at the end of the list will reveal
     further details including: 
     
     -   Keyboard version number
