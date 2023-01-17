@@ -41,7 +41,7 @@ To disable a Keyman keyboard:
 
 7.  Click OK.
 
-When a keyboard layout is disabled, its name and details appears and in grey and the disable
+When a keyboard layout is disabled, its name and details appear in grey and the disable
 button now says enable. The Add/remove language... button is also disabled as this option is 
 not available while the keyboard is disabled.
 

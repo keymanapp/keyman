@@ -40,7 +40,7 @@ Keyman Configuration, see: [Keyboard Task - Enable or Disable a Keyboard](../ena
 
 ## Setting a Hotkey
 
-The Hotkey for selecting a keyboard will appear to hte right of the keyboard name.
+The Hotkey for selecting a keyboard will appear to the right of the keyboard name.
 If the keyboard has more than one language associated with it then the hotkey will
 appear beside the language in the keyboards details list.
 
