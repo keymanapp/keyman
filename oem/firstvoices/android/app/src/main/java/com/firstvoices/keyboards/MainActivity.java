@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
         context = this;
 
         SentryAndroid.init(context, options -> {
-            options.setRelease("release-"+com.firstvoices.keyboards.BuildConfig.VERSION_NAME);
+            options.setRelease("release@"+com.firstvoices.keyboards.BuildConfig.VERSION_NAME);
             options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
         });
 
