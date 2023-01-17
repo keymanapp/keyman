@@ -27,7 +27,6 @@ Draft spec PR: <https://github.com/unicode-org/cldr/pull/1847>
 
 - Data is divided into several sections. The very first section is the `'sect'`
   section which is the table of contents.
-- All sections, including the first, are padded to a 32-bit boundary.
 - All sections begin with a 32-bit (four character) section identifier, and a
   32-bit section size.
 - Other than the `sect` table itself, the rest of the sections follow in binary
