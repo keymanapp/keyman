@@ -37,6 +37,15 @@ def secure_lookup(data, key1, key2 = None):
     return None
 
 
+def before_send(event, hint):
+    if 'exc_info' in hint:
+        exc_type, exc_value, tb = hint['exc_info']
+        if isinstance(exc_value, KeyboardInterrupt):
+            # Ignore KeyboardInterrupt exception
+            return None
+    return event
+
+
 gettext.bindtextdomain('keyman-config', '/usr/share/locale')
 gettext.textdomain('keyman-config')
 
@@ -77,6 +86,7 @@ else:
             environment=__environment__,
             release='release-' + __versionwithtag__,
             integrations=[sentry_logging],
+            before_send=before_send
         )
         set_user({'id': hash(getpass.getuser())})
         with configure_scope() as scope:

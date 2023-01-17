@@ -1,5 +1,34 @@
 # Keyman Version History
 
+## 17.0.29 alpha 2023-01-16
+
+* fix(linux): Fix crash (un-)installing shared keyboard (#8020)
+* chore(linux): Don't report KeyboardInterrupt to Sentry (#8021)
+* chore(linux): Update sample settings (#8018)
+* feat(linux): Enhance tab completion in km-package-install (#8005)
+
+## 17.0.28 alpha 2023-01-12
+
+* feat(linux): Display error messages in the UI (#8006)
+* bug(linux): Empty keyboard after failed installation (#8008)
+
+## 17.0.27 alpha 2023-01-11
+
+* chore(linux): Refactor completion script (#8002)
+
+## 17.0.26 alpha 2023-01-10
+
+* feat(linux): Add Back button to "Download Keyman Keyboards" dialog (#7994)
+* feat(linux): List fonts in the uninstall confirmation dialog (#7995)
+
+## 17.0.25 alpha 2023-01-09
+
+* chore(linux): Remove unnecessary variable (#7988)
+
+## 17.0.24 alpha 2023-01-06
+
+* chore(common/resources): Add Docker readme (#7980)
+
 ## 17.0.23 alpha 2023-01-03
 
 * fix(linux): add IBUS_HAS_PREFILTER ifdef to linux/ibus-keyman/tests (#7958)

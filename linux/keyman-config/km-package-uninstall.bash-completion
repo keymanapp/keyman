@@ -1,4 +1,4 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 
 _km-package-uninstall_completions()
 {
@@ -9,7 +9,8 @@ _km-package-uninstall_completions()
     opts="-h --help -s --shared -v --verbose -vv --veryverbose --version"
 
     if [[ ${cur} == -* ]] ; then
-        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        # shellcheck disable=SC2207
+        COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
         return 0
     fi
 
@@ -23,12 +24,15 @@ _km-package-uninstall_completions()
     shared=""
     case "${prev}" in
         "-s"|"--shared")
-            for file in $(ls -1 /usr/local/share/keyman); do kbid="`basename ${file}`"; shared="${shared} ${kbid}"; done
-            COMPREPLY=($(compgen -W "${shared}" -- ${cur}))
+            for file in /usr/local/share/keyman/*; do kbid="$(basename "${file}")"; shared="${shared} ${kbid}"; done
+            # shellcheck disable=SC2207
+            COMPREPLY=($(compgen -W "${shared}" -- "${cur}"))
             ;;
         *)
-            for file in $(ls -1 ${XDG_DATA_HOME:-~/.local/share}/keyman); do kbid="`basename ${file}`"; words="${words} ${kbid}"; done
-            COMPREPLY=($(compgen -W "${words}" -- ${cur}))
+            # shellcheck disable=SC2231 # doesn't work with quotes
+            for file in ${XDG_DATA_HOME:-~/.local/share}/keyman/*; do kbid="$(basename "${file}")"; words="${words} ${kbid}"; done
+            # shellcheck disable=SC2207
+            COMPREPLY=($(compgen -W "${words}" -- "${cur}"))
         ;;
     esac
 }
