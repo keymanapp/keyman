@@ -36,7 +36,7 @@ display_usage ( ) {
 }
 
 function makeLocalSentryRelease() {
-  local SENTRY_RELEASE_VERSION="release-$VERSION_WITH_TAG"
+  local SENTRY_RELEASE_VERSION="release@$VERSION_WITH_TAG"
   echo "Making a Sentry release for tag $SENTRY_RELEASE_VERSION"
   sentry-cli upload-dif -p keyman-android --include-sources
   sentry-cli releases -p keyman-android files $SENTRY_RELEASE_VERSION upload-sourcemaps ./
