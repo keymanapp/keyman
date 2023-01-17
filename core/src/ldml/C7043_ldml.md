@@ -27,10 +27,6 @@ Draft spec PR: <https://github.com/unicode-org/cldr/pull/1847>
 
 - Data is divided into several sections. The very first section is the `'sect'`
   section which is the table of contents.
-- All sections, including the first, begin on a 128-bit boundary with zero
-  padding as needed.
-- All variable length sections have the variable part begin on a 128-bit
-  boundary, with zero padding as needed.
 - All sections begin with a 32-bit (four character) section identifier, and a
   32-bit section size.
 - Other than the `sect` table itself, the rest of the sections follow in binary
@@ -73,7 +69,6 @@ See [C7043.2.11](#c7043211-tran-finl-and-bksptransforms).
 | 0 |  32  | ident    | `elem`                                   |
 | 4 |  32  | size     | int: Length of section                   |
 | 8 |  32  | count    | int: Number of element string entries    |
-|12 |  32  | reserved | padding                                  |
 
 Then for each element string:
 
@@ -119,7 +114,6 @@ See [C7043.2.11](#c7043211-tran-finl-and-bksptransforms).
 | 0 |  32  | ident     | `keys`                                   |
 | 4 |  32  | size      | int: Length of section                   |
 | 8 |  32  | count     | int: Number of keys                      |
-|12 |  32  | reserved  | reserved                                 |
 
 The keys are sorted in binary order based on the `vkey` and `mod` fields.
 
@@ -136,7 +130,7 @@ For each key:
   etc.). It is resolved because the `vkeyMap` from LDML has already been
   applied.  If this is 256 or above, it is a custom touch layout vkey generated
   by the compiler.
-- `mod`: TODO define this.  0 for no modifiers.
+- `mod`: TODO-LDML define this.  0 for no modifiers. #7533
 - `flags`: Flags is a 32-bit bitfield defined as below:
 
 | Bit position | Meaning  |  Description                                |
@@ -153,7 +147,6 @@ For each key:
 | 0 |  32  | ident   | `loca`                                   |
 | 4 |  32  | size    | int: Length of section                   |
 | 8 |  32  | count   | int: Number of locales                   |
-|12 |  32  | reserved| padding                                  |
 
 `count` is always ≥1, because a keyboard always has a primary locale identifier.
 
@@ -198,7 +191,6 @@ be present, as the source format requires at least one name.
 | 0 |  32  | ident   | `name`                                   |
 | 4 |  32  | size    | int: Length of section                   |
 | 8 |  32  | count   | int: Number of names                     |
-|12 |  32  | reserved| padding                                  |
 
 Note that `count` is always ≥1, as the source format requires at least one name.
 
@@ -218,7 +210,6 @@ not defined here.
 | 0 |  32  | ident    | `ordr`                                   |
 | 4 |  32  | size     | int: Length of section                   |
 | 8 |  32  | count    | int: Number of reorders                  |
-|12 |  32  | reserved | padding                                  |
 
 For each reorder item:
 
@@ -240,7 +231,6 @@ All strings are stored in the Strings section.
 | 0 |  32  | ident         | `strs`                              |
 | 4 |  32  | size          | int: Length of section              |
 | 8 |  32  | count         | int: Number of strings              |
-|12 |  32  | reserved      | Padding                             |
 
 Then for each string:
 
@@ -278,7 +268,6 @@ table has the ident `finl`, and the backspaces table has the ident `bksp`.
 | 0 |  32  | ident    | `tran` / `finl` / `bksp`                 |
 | 4 |  32  | size     | int: Length of section                   |
 | 8 |  32  | count    | int: Number of transforms                |
-|12 |  32  | reserved | padding                                  |
 
 
 The transforms are sorted in binary order based on the `from` field.
@@ -310,7 +299,6 @@ For each transform:
 | 0 |  32  | ident   | `vkey`                                   |
 | 4 |  32  | size    | int: Length of section                   |
 | 8 |  32  | count   | int: Number of vkeys                     |
-|12 |  32  | reserved| padding                                  |
 
 The keys are sorted in binary order based on the `vkey` field.
 
@@ -337,8 +325,7 @@ Represents layers on the keyboard.
 |12 |  32  | layerCount | int: number of layer entries             |
 |16 |  32  | rowCount   | int: number of row entries               |
 |20 |  32  | keyCount   | int: number of key entries               |
-|24 |  64  | reserved   | padding                                  |
-|32 | var  | lists      | layer list sub-table                     |
+|24 | var  | lists      | layer list sub-table                     |
 | - | var  | layers     | layers sub-table                         |
 | - | var  | rows       | rows sub-table                           |
 | - | var  | keys       | keys sub-table                           |
@@ -404,7 +391,6 @@ There are `keyCount` total key entries.
 | 4 |  32  | size          | int: Length of section                   |
 | 8 |  32  | count         | int: Total number of disp elements       |
 |12 |  32  | baseCharacter | str: If non-null, default base.          |
-|16 | 128  | reserved      | padding (future displayOptions)          |
 
 The default `baseCharacter` is U+25CC, if `baseCharacter` is null.
 
@@ -426,8 +412,7 @@ Entries are sorted in a binary codepoint sort on the `to` field.
 | 8 |  32  | keyCount    | int: Number of keys                      |
 |12 |  32  | flicksCount | int: Number of flick lists               |
 |16 |  32  | flickCount  | int: Number of flick elements            |
-|20 |  96  | reserved    | padding                                  |
-|32 | var  | keys        | keys sub-table                           |
+|20 | var  | keys        | keys sub-table                           |
 | - | var  | flicks      | flick lists sub-table                    |
 | - | var  | flick       | flick elements sub-table                 |
 
@@ -540,6 +525,5 @@ The strings order are significant.  There is not a 'null' string at the end of e
 ## TODO-LDML: various things that need to be completed here or fixed in-spec
 
 > * UnicodeSets
-> * spec: reference to `after` in reorders; various other @after refs
 > * spec: ABNT2 key has hex value 0xC1 (even if kbdus.dll doesn't produce that)
-> * `keys.key.mod`: TODO define this.  0 for no modifiers.
+> * `keys.key.mod`: TODO define this.  0 for no modifiers. #7533

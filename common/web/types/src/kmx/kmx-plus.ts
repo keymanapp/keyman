@@ -452,10 +452,6 @@ export class KMXPlusFile extends KMXFile {
       size: r.uint32le,
       count: r.uint32le,
       baseCharacter: r.uint32le,
-      reserved0: new r.Reserved(r.uint32le), // padding
-      reserved1: new r.Reserved(r.uint32le), // padding
-      reserved2: new r.Reserved(r.uint32le), // padding
-      reserved3: new r.Reserved(r.uint32le), // padding
       items: new r.Array(this.COMP_PLUS_DISP_ITEM, 'count'),
     });
 
@@ -475,7 +471,6 @@ export class KMXPlusFile extends KMXFile {
       ident: r.uint32le,
       size: r.uint32le,
       count: r.uint32le,
-      reserved: new r.Reserved(r.uint32le), // padding
       strings: new r.Array(this.COMP_PLUS_ELEM_STRING, 'count')
       // + variable subtable: Element data (see KMXPlusBuilder.emitElements())
     });
@@ -495,7 +490,6 @@ export class KMXPlusFile extends KMXFile {
       ident: r.uint32le,
       size: r.uint32le,
       count: r.uint32le,
-      reserved: new r.Reserved(r.uint32le), // padding
       items: new r.Array(this.COMP_PLUS_KEYS_ITEM, 'count')
     });
 
@@ -532,8 +526,6 @@ export class KMXPlusFile extends KMXFile {
       layerCount: r.uint32le,
       rowCount: r.uint32le,
       keyCount: r.uint32le,
-      reserved0: new r.Reserved(r.uint32le),
-      reserved1: new r.Reserved(r.uint32le),
       lists: new r.Array(this.COMP_PLUS_LAYR_LIST, 'listCount'),
       layers: new r.Array(this.COMP_PLUS_LAYR_ENTRY, 'layerCount'),
       rows: new r.Array(this.COMP_PLUS_LAYR_ROW, 'rowCount'),
@@ -571,9 +563,6 @@ export class KMXPlusFile extends KMXFile {
       keyCount: r.uint32le,
       flicksCount: r.uint32le,
       flickCount: r.uint32le,
-      reserved0: new r.Reserved(r.uint32le),
-      reserved1: new r.Reserved(r.uint32le),
-      reserved2: new r.Reserved(r.uint32le),
       keys: new r.Array(this.COMP_PLUS_KEY2_KEY, 'keyCount'),
       flicks: new r.Array(this.COMP_PLUS_KEY2_FLICKS, 'flicksCount'),
       flick: new r.Array(this.COMP_PLUS_KEY2_FLICK, 'flickCount'),
@@ -607,7 +596,6 @@ export class KMXPlusFile extends KMXFile {
       ident: r.uint32le,
       size: r.uint32le,
       count: r.uint32le,
-      reserved: new r.Reserved(r.uint32le), // padding
       items: new r.Array(this.COMP_PLUS_LOCA_ITEM, 'count')
     });
 
@@ -633,7 +621,6 @@ export class KMXPlusFile extends KMXFile {
       ident: r.uint32le,
       size: r.uint32le,
       count: r.uint32le,
-      reserved: new r.Reserved(r.uint32le), // padding
       items: new r.Array(this.COMP_PLUS_NAME_ITEM, 'count')
     });
 
@@ -648,7 +635,6 @@ export class KMXPlusFile extends KMXFile {
       ident: r.uint32le,
       size: r.uint32le,
       count: r.uint32le,
-      reserved: new r.Reserved(r.uint32le), // padding
       items: new r.Array(this.COMP_PLUS_ORDR_ITEM, 'count')
     });
 
@@ -665,7 +651,6 @@ export class KMXPlusFile extends KMXFile {
       ident: r.uint32le,
       size: r.uint32le,
       count: r.uint32le,
-      reserved: new r.Reserved(r.uint32le), // padding
       items: new r.Array(this.COMP_PLUS_STRS_ITEM, 'count')
       // + variable subtable: String data (see KMXPlusBuilder.emitStrings())
     });
@@ -683,7 +668,6 @@ export class KMXPlusFile extends KMXFile {
       ident: r.uint32le,
       size: r.uint32le,
       count: r.uint32le,
-      reserved: new r.Reserved(r.uint32le), // padding
       items: new r.Array(this.COMP_PLUS_TRAN_ITEM, 'count')
     });
 
@@ -698,7 +682,6 @@ export class KMXPlusFile extends KMXFile {
       ident: r.uint32le,
       size: r.uint32le,
       count: r.uint32le,
-      reserved: new r.Reserved(r.uint32le), // padding
       items: new r.Array(this.COMP_PLUS_VKEY_ITEM, 'count')
     });
 

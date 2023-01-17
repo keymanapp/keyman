@@ -13,7 +13,6 @@ import { BUILDER_SECTION } from "./builder-section.js";
  */
 export interface BUILDER_LOCA extends BUILDER_SECTION {
   count: number;
-  reserved: number;
   items: number[]; //str[]
 };
 
@@ -23,7 +22,6 @@ export function build_loca(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILD
     size: constants.length_loca + constants.length_loca_item * kmxplus.loca.locales.length,
     _offset: 0,
     count: kmxplus.loca.locales.length,
-    reserved: 0,
     items: []
   };
 

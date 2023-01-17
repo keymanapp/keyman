@@ -18,7 +18,6 @@ interface BUILDER_TRAN_ITEM {
 
 export interface BUILDER_TRAN extends BUILDER_SECTION {
  count: number;
- reserved: number;
  items: BUILDER_TRAN_ITEM[];
 };
 
@@ -35,7 +34,6 @@ export function build_tran(source_tran: Tran|Finl|Bksp, sect_strs: BUILDER_STRS,
    size: constants.length_tran + constants.length_tran_item * source_tran.items.length,
    _offset: 0,
    count: source_tran.items.length,
-   reserved: 0,
    items: []
  };
 

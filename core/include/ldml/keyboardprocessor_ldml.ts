@@ -84,7 +84,7 @@ class Constants {
   /**
    * Minimum length of the 'bksp' section, not including entries
    */
-  readonly length_bksp = 16;
+  readonly length_bksp = 12;
   /**
    *  Length of each item in the 'bksp' section variable part
    */
@@ -101,7 +101,7 @@ class Constants {
   /**
    * Minimum length of the 'disp' section, not including entries
    */
-   readonly length_disp = 32;
+   readonly length_disp = 16;
    /**
     *  Length of each entry in the 'disp' variable part
     */
@@ -114,7 +114,7 @@ class Constants {
   /**
    * Minimum length of the 'elem' section, not including entries
    */
-  readonly length_elem = 16;
+  readonly length_elem = 12;
   /**
    *  Length of each elem string in the 'elem' section variable part
    */
@@ -198,7 +198,7 @@ class Constants {
   /**
    * Minimum length of the 'finl' section, not including entries
    */
-  readonly length_finl = 16;
+  readonly length_finl = 8;
   /**
    *  Length of each item in the 'finl' section variable part
    */
@@ -215,7 +215,7 @@ class Constants {
   /**
    * Minimum length of the 'keys' section not including variable parts
    */
-  readonly length_keys = 16;
+  readonly length_keys = 12;
   /**
    *  Length of each item in the 'keys' section variable part
    */
@@ -236,7 +236,7 @@ class Constants {
   /**
    * Minimum length of the 'key2' section not including variable parts
    */
-  readonly length_key2 = 32;
+  readonly length_key2 = 20;
   /**
    *  Length of each item in the 'key2' keys sub-table
    */
@@ -277,7 +277,7 @@ class Constants {
   /**
    * Minimum length of the 'layr' section not including variable parts
    */
-  readonly length_layr = 32;
+  readonly length_layr = 24;
   /**
    *  Length of each layer list in the 'layr' section variable part
    */
@@ -331,7 +331,7 @@ class Constants {
   /**
    * Minimum length of the 'loca' section not including variable parts
    */
-  readonly length_loca = 16;
+  readonly length_loca = 12;
   /**
    *  Length of each item in the 'loca' section variable part
    */
@@ -365,7 +365,7 @@ class Constants {
   /**
    * Minimum length of the 'name' section not including variable parts
    */
-  readonly length_name = 16;
+  readonly length_name = 12;
   /**
    *  Length of each item in the 'name' section variable part
    */
@@ -378,7 +378,7 @@ class Constants {
   /**
    * Minimum length of the 'ordr' section, not including entries
    */
-  readonly length_ordr = 16;
+  readonly length_ordr = 12;
   /**
    *  Length of each item in the 'ordr' section variable part
    */
@@ -391,7 +391,7 @@ class Constants {
   /**
    * Minimum length of the 'strs' section not including variable parts
    */
-  readonly length_strs = 16;
+  readonly length_strs = 12;
   /**
    * Length of each item in the 'strs' section variable part
    */
@@ -404,7 +404,7 @@ class Constants {
   /**
    * Minimum length of the 'tran' section, not including entries
    */
-  readonly length_tran = 16;
+  readonly length_tran = 12;
   /**
    *  Length of each item in the 'tran' section variable part
    */
@@ -421,7 +421,7 @@ class Constants {
   /**
    * Minimum length of the 'vkey' section not including variable parts
    */
-  readonly length_vkey = 16;
+  readonly length_vkey = 12;
   /**
    *  Length of each item in the 'vkey' section variable part
    */
@@ -465,6 +465,20 @@ class Constants {
       }
       return r;
   };
+
+  /**
+   * Use to convert hex into 4-char string
+   * @param hex section ID such as 0x74636573
+   * @returns string such as 'sect'
+   */
+  str_section_id(hex:number) : string {
+    let chars : string[] = [];
+    for (let i = 3; i>=0; i--) {
+      chars.push(String.fromCharCode(hex & 0xFF));
+      hex >>= 8;
+    }
+    return chars.join('');
+  }
 };
 
 export const constants = new Constants();

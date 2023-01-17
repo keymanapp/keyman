@@ -18,10 +18,6 @@ interface BUILDER_DISP_ITEM {
 export interface BUILDER_DISP extends BUILDER_SECTION {
   count: number;
   baseCharacter: number;
-  reserved0: number;
-  reserved1: number;
-  reserved2: number;
-  reserved3: number;
   items: BUILDER_DISP_ITEM[];
 };
 
@@ -36,10 +32,6 @@ export function build_disp(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILD
     _offset: 0,
     count: kmxplus.vkey.vkeys.length,
     baseCharacter: build_strs_index(sect_strs, kmxplus.disp.baseCharacter),
-    reserved0: 0,
-    reserved1: 0,
-    reserved2: 0,
-    reserved3: 0,
     items: []
   };
 
