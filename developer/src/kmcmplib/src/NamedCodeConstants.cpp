@@ -204,7 +204,7 @@ void NamedCodeConstants::reindex()
 
   for(i = 0; i < 128; i++) chrindexes[i] = -1;
 
-  if ((entries && nEntries > 0) || !entries) {
+  if (entries != NULL) {
     for (i = 0; i < nEntries; i++)
     {
       d = towupper(entries[i].name[0]);
