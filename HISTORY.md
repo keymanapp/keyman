@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.30 alpha 2023-01-17
+
+* chore(linux): Fix vertical alignment of label (#8016)
+* fix(common): update sentry release identifiers to support semver (#8031)
+
 ## 17.0.29 alpha 2023-01-16
 
 * fix(linux): Fix crash (un-)installing shared keyboard (#8020)
