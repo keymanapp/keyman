@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.132 beta 2023-01-18
+
+* docs(windows): update screenshots and documentation for Keyman for Windows config (#8014)
+
 ## 16.0.131 beta 2023-01-16
 
 * chore(linux): Don't report KeyboardInterrupt to Sentry (#8022)
