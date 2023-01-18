@@ -318,7 +318,7 @@ linux/scripts/upload-to-debian.sh -k $DEBSIGN_KEYID --push
 
 ## Reference
 
-See the [Linux readme](https://github.com/keymanapp/keyman/blob/master/linux/README.md)
+See the [Linux readme](https://github.com/keymanapp/keyman/blob/master/docs/linux/README.md)
 for how to build Keyman on Linux etc.
 
 ### References for Debian packaging

@@ -131,7 +131,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     checkSendCrashReport();
     if (KMManager.getMaySendCrashReport()) {
       SentryAndroid.init(context, options -> {
-        options.setRelease("release-" + com.tavultesoft.kmapro.BuildConfig.VERSION_NAME);
+        options.setRelease("release@" + com.tavultesoft.kmapro.BuildConfig.VERSION_NAME);
         options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.VERSION_ENVIRONMENT);
       });
     }
@@ -353,6 +353,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   @SuppressLint("RestrictedApi")
   @Override
   public boolean onPrepareOptionsMenu(final Menu menu) {
+    this.menu = menu;
     final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
     if (_overflowMenuItem != null) {
       MenuItem updateKeyboards = this.menu.findItem(R.id.action_update_keyboards);
@@ -372,8 +373,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     }
 
     final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
-    if (_keyboardupdate != null) {
-      updateUpdateCountIndicator(_keyboardupdate, anUpdateCount, true);
+    if (_keyboardupdate != null && anUpdateCount > 0) {
+      _keyboardupdate.setVisible(true);
     }
   }
 
@@ -452,6 +453,11 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         KMManager.getUpdateTool().executeOpenUpdates();
         // Dismiss icon
         updateUpdateCountIndicator(0);
+        final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
+        if (_keyboardupdate != null && _keyboardupdate.isVisible()) {
+          _keyboardupdate.setVisible(false);
+        }
+
         return true;
       default:
         return super.onOptionsItemSelected(item);

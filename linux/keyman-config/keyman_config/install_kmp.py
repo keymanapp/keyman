@@ -106,13 +106,13 @@ class InstallKmp():
         self.kmpdocdir = get_keyman_doc_dir(area, self.packageID)
         self.kmpfontdir = get_keyman_font_dir(area, self.packageID)
 
-        if not self._safeMakeDirs(self.packageDir):
-            return
-
         if not os.path.isfile(inputfile):
             message = _("File {kmpfile} doesn't exist").format(kmpfile=inputfile)
             logging.error("install_kmp.py: %s", message)
             raise InstallError(InstallStatus.Abort, message)
+
+        if not self._safeMakeDirs(self.packageDir):
+            return
 
         extract_kmp(inputfile, self.packageDir)
 

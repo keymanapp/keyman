@@ -426,7 +426,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
     stackBuilder.addNextIntentWithParentStack(intent);
     // Get the PendingIntent containing the entire back stack
     PendingIntent startUpdateIntent =
-      stackBuilder.getPendingIntent(notification_id, PendingIntent.FLAG_UPDATE_CURRENT);
+      stackBuilder.getPendingIntent(notification_id, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
     Builder builder = new Builder(currentContext, getClass().getName())
       .setSmallIcon(R.drawable.ic_keyboard)
