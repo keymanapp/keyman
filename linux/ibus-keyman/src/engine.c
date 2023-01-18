@@ -277,12 +277,16 @@ reset_context(IBusEngine *engine) {
       if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
         km_kbp_context_set(context, context_items);
         km_kbp_context_items_dispose(context_items);
+      } else {
+        km_kbp_context_clear(context);
+        g_message("%s: setting context failed", __FUNCTION__);
       }
     }
     g_free(surrounding_text);
     g_free(current_context_utf8);
   } else {
     km_kbp_context_clear(context);
+    g_message("%s: client does not support surrounding text", __FUNCTION__);
   }
 }
 
