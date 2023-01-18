@@ -438,6 +438,11 @@ private:
 
     if ((msg == WM_KEYMAN_KEY_EVENT || msg == WM_KEYMAN_MODIFIER_EVENT) && flag_ShouldSerializeInput  /*&& _td->lpActiveKeyboard*/) {
 
+        SendDebugMessageFormat(0, sdmAIDefault, 0, "SerialKeyEventServer::WndProc hwnd=%x msg=%x wParam=%x lParam=%x m_ModifierKeyboardState=[LS:%x LC:%x LA:%x RS:%x RC:%x RA:%x]",
+        hwnd, msg, wParam, lParam,
+        m_ModifierKeyboardState[VK_LSHIFT], m_ModifierKeyboardState[VK_LCONTROL], m_ModifierKeyboardState[VK_LMENU],
+        m_ModifierKeyboardState[VK_RSHIFT], m_ModifierKeyboardState[VK_RCONTROL], m_ModifierKeyboardState[VK_RMENU]);
+
       if (wParam == VK_RMENU && (lParam & (KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP)) == (KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP) && GetKeyState(VK_LCONTROL) < 0) {
         /*
           When Windows has a European layout that uses AltGr installed, it can emit an additional LCtrl down via software
@@ -487,7 +492,7 @@ private:
 
         if (msg == WM_KEYMAN_KEY_EVENT) {
           // We track changes to modifiers with WM_KEYMAN_MODIFIER_EVENT, but only ever
-          // pass them on to the app when we receive them with the WM_KEYMAN_KEY_EVENT 
+          // pass them on to the app when we receive them with the WM_KEYMAN_KEY_EVENT
           // message.
           if (!SendInput(2, input, sizeof(INPUT))) {
             DebugLastError("SendInput");
