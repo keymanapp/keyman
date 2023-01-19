@@ -28,6 +28,45 @@ def delete_dir(dir: str) -> bool:
     return True
 
 
+def _uninstall_kbdir(packageID, kbdir):
+    if not os.path.isdir(kbdir):
+        msg = _('Keyboard directory for %s does not exist.') % packageID
+        logging.error(msg)
+        return msg
+
+    if not os.access(kbdir, os.X_OK | os.W_OK):  # Check for write access of keyman dir
+        msg = _('You do not have permissions to uninstall the keyboard files in %s. You need to run this with `sudo`') % kbdir
+        logging.error(msg)
+        return (True, msg)
+
+    delete_dir(kbdir)
+    return (False, 'Removed keyman directory: %s' % kbdir)
+
+
+def _uninstall_docdir(kbdocdir):
+    if os.path.isdir(kbdocdir):
+        if not os.access(kbdocdir, os.X_OK | os.W_OK):  # Check for write access of keyman doc dir
+            msg = _('You do not have permissions to uninstall the documentation in %s. You need to run this with `sudo`') % kbdocdir
+            logging.error(msg)
+            return (True, msg)
+        delete_dir(kbdocdir)
+        return (False, 'Removed documentation directory: %s' % kbdocdir)
+    else:
+        return (False, 'No documentation directory')
+
+
+def _uninstall_fontdir(kbfontdir):
+    if os.path.isdir(kbfontdir):
+        if not os.access(kbfontdir, os.X_OK | os.W_OK):  # Check for write access of keyman fonts
+            msg = _('You do not have permissions to uninstall the font files in %s. You need to run this with `sudo`') % kbfontdir
+            logging.error(msg)
+            return (True, msg)
+        delete_dir(kbfontdir)
+        return (False, 'Removed font directory: %s' % kbfontdir)
+    else:
+        return (False, 'No font directory')
+
+
 def uninstall_kmp_shared(packageID):
     """
     Uninstall a kmp from /usr/local/share/keyman
@@ -51,36 +90,28 @@ def uninstall_kmp_shared(packageID):
     else:
         logging.warning("could not uninstall keyboards")
 
-    if not os.path.isdir(kbdir):
-        msg = _("Keyboard directory for %s does not exist." % packageID)
-        logging.error(msg)
-        return msg
-
-    if not os.access(kbdir, os.X_OK | os.W_OK):  # Check for write access of keyman dir
-        msg = _("You do not have permissions to uninstall the keyboard files. You need to run this with `sudo`")
-        logging.error(msg)
-        return msg
-    if os.path.isdir(kbdocdir):
-        if not os.access(kbdocdir, os.X_OK | os.W_OK):  # Check for write access of keyman doc dir
-            msg = _("You do not have permissions to uninstall the documentation. You need to run this with `sudo`")
-            logging.error(msg)
-            return msg
-        delete_dir(kbdocdir)
-        logging.info("Removed documentation directory: %s", kbdocdir)
+    errormsg = ''
+    (error, msg) = _uninstall_docdir(kbdocdir)
+    if error:
+        errormsg += '\n' + msg
     else:
-        logging.info("No documentation directory")
-    if os.path.isdir(kbfontdir):
-        if not os.access(kbfontdir, os.X_OK | os.W_OK):  # Check for write access of keyman fonts
-            msg = _("You do not have permissions to uninstall the font files. You need to run this with `sudo`")
-            logging.error(msg)
-            return msg
-        delete_dir(kbfontdir)
-        logging.info("Removed font directory: %s", kbfontdir)
-    else:
-        logging.info("No font directory")
+        logging.info(msg)
 
-    delete_dir(kbdir)
-    logging.info("Removed keyman directory: %s", kbdir)
+    (error, msg) = _uninstall_fontdir(kbfontdir)
+    if error:
+        errormsg += '\n' + msg
+    else:
+        logging.info(msg)
+
+    (error, msg) = _uninstall_kbdir(packageID, kbdir)
+    if error:
+        errormsg += '\n' + msg
+    else:
+        logging.info(msg)
+
+    if errormsg:
+        return errormsg
+
     logging.info("Finished uninstalling shared keyboard: %s", packageID)
     return ''
 
@@ -143,15 +174,25 @@ def uninstall_kmp_user(packageID):
             uninstall_keyboards_from_ibus(keyboards, kbdir)
     else:
         logging.warning("could not uninstall keyboards")
-    if not os.path.isdir(kbdir):
-        logging.error("Keyboard directory for %s does not exist." % packageID)
+
+    errormsg = ''
+    (error, msg) = _uninstall_fontdir(get_keyman_font_dir(InstallLocation.User, packageID))
+    if error:
+        errormsg += '\n' + msg
     else:
-        delete_dir(kbdir)
-        logging.info("Removed user keyman directory: %s", kbdir)
-    fontdir = get_keyman_font_dir(InstallLocation.User, packageID)
-    if os.path.isdir(fontdir):
-        delete_dir(fontdir)
-        logging.info("Removed user keyman font directory: %s", fontdir)
+        logging.info(msg)
+
+    # in the User area, docdir is the same as kbdir, so we skip that here
+
+    (error, msg) = _uninstall_kbdir(packageID, kbdir)
+    if error:
+        errormsg += '\n' + msg
+    else:
+        logging.info(msg)
+
+    if errormsg:
+        return errormsg
+
     logging.info("Finished uninstalling local keyboard: %s", packageID)
     return ''
 
