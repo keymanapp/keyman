@@ -338,27 +338,21 @@ There are `listCount` total lists.
 
 | ∆ | Bits | Name             | Description                                |
 |---|------|------------------|--------------------------------------------|
-| 0+|  32  | flags            | int: per-layers options                    |
-| 4+|  32  | hardware         | int: enumeration for hardware layout       |
-| 8+|  32  | layer            | int: index to first layer element          |
-|12+|  32  | count            | int: number of layer elements in this list |
-|16+|  32  | minDeviceWidth   | int: min device width in millimeters, or 0 |
+| 0+|  32  | hardware         | int: enumeration for hardware layout       |
+| 4+|  32  | layer            | int: index to first layer element          |
+| 8+|  32  | count            | int: number of layer elements in this list |
+|12+|  32  | minDeviceWidth   | int: min device width in millimeters, or 0 |
 
 - `hardware`: an enumeration with the following values:
-  - 0: `none` (not valid for use with hardware)
+  - 0: `touch` (non-hardware)
   - 1: `abnt2`
   - 2: `iso`
   - 3: `jis`
   - 4: `us`
 
-- `flags`: a 32-bit bitfield defined as below:
+See UTS #35 section 7 for details about these values.
 
-  | Bit position | Meaning  |  Description         |
-  |--------------|----------|----------------------|
-  |       0      | form     | 0: hardware          |
-  |       0      | form     | 1: touch             |
-
-Layers are sorted hardware-first, then by minimum width ascending.
+Layer lists are sorted by `hardware` enum, then minDeviceWidth ascending.
 
 ### `layr.layers` subtable
 
