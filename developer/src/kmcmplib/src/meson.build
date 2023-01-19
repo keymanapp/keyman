@@ -45,12 +45,16 @@ if compiler.get_id() == 'msvc'
   flags = []
   defns += [
     '-D_SCL_SECURE_NO_WARNINGS',
-    '-D_CRT_SECURE_NO_WARNINGS'
+    '-D_CRT_SECURE_NO_WARNINGS',
     #'-DUNICODE'
   ]
   links = []
 
+  # /n = append null
+  # /c65001 = utf-8 file format
+  version_res += import('windows').compile_resources('version.rc', args:['/n','/c65001'])
 endif
+
 
 if compiler.get_id() == 'emscripten'
   warns = []
@@ -90,6 +94,7 @@ lib = library('kmcmplib',
   '../../ext/json-schema-validator/json-schema-draft4.json.cpp',
   '../../ext/json-schema-validator/json-uri.cpp',
   '../../ext/json-schema-validator/json-validator.cpp',
+  version_res,
   cpp_args: defns + warns + flags,
   link_args: links,
   dependencies: [version_lib],
