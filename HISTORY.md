@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 17.0.31 alpha 2023-01-19
+
+* chore: git tag with release@semver (#8035)
+* fix(linux): Properly set context after changing IP (#8026)
+* chore(linux): use faster zero-length string check (#8037)
+* chore(linux): log failures to `km_kbp_context_clear(context)` (#8036)
+* chore(linux): Update recommended extension (#8038)
+
 ## 17.0.30 alpha 2023-01-17
 
 * chore(linux): Fix vertical alignment of label (#8016)
