@@ -272,7 +272,7 @@ reset_context(IBusEngine *engine) {
       surrounding_text, context_end - context_start, cursor_pos, anchor_pos);
 
     current_context_utf8 = get_current_context_text(context);
-    if (!g_str_has_suffix(surrounding_text, current_context_utf8) || !g_utf8_strlen(current_context_utf8, -1)) {
+    if (!(*current_context_utf8) || !g_str_has_suffix(surrounding_text, current_context_utf8)) {
       g_message("%s: setting context because it has changed from expected", __FUNCTION__);
       if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
         km_kbp_context_set(context, context_items);
