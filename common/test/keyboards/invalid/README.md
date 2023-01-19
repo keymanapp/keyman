@@ -1,9 +1,9 @@
 # **Tests for kmcompxtest()**
 <br/>
 
-This folder contains several kmn-files that are used for testing resulting Errorcodes.
+This folder contains several kmn-files that are used for testing resulting error codes.
 
-Most of these tests are copied from balochi_phonetic and contain alterations of the data to produce (at least) 1 Error.
+Most of these tests are copied from balochi_phonetic and contain alterations of the data to produce (at least) 1 error.
 <br/>
 <br/>
 
@@ -20,24 +20,27 @@ The naming convention of the files is as follows:
 
 * After the second underscore all combination of char can be used.
 
-* The 4 characters following CERR_ correspond to the last 4 digits of the Error-Code which is expected to be produced by this file.
+* The 4 characters following CERR_ correspond to the last 4 digits of the error-Code which is expected to be produced by this file.
 
-    ( e.g. CERR_404D_balochi_phonetic.kmn should produce Error 0x0000404D).
+    ( e.g. CERR_404D_balochi_phonetic.kmn should produce error 0x0000404D).
 
 <br/>
 
 ---
 <br/>
 
-While running kmcompxtest extracts the 4 chars from the Filename and compares them to the actual Error found.
+While running, kmcompxtest extracts those 4 characters from the Filename (e.g. 404D for CERR_404D_balochi_phonetic) and compares those to the actual error found.
 
-* If they correspond the test will be marked as OK. (Code 0)
+* If these 4 characters correspond to the actual error given, the test will be marked as OK. (Code 0)
+<br/>
+* If these 4 characters signifiy an error but **no error** does occur, the test will be marked as FAILED  (Code 1)
+<br/>
+* If these 4 characters signifiy an error but this **specific error** does not occur, the test will be marked as FAILED  (Code 4)
+<br/>
+* If these 4 characters signifiy an error number that is **not correct**, the test will be marked as FAILED  (Code 5)
+<br/>
+* If more than 1 error is produced, only the error coded in the Filename will be detected
 
-* If the file is supposed to produce an Error and does not the test will be marked as FAILED  (Code 1)
-
-* If the filename is not correct the test will be marked as FAILED  (Code 1)
-
-* If more than 1 Error is produced only the Error coded in the Filename will be detected
 
 
 ### Tests are available for the following CERR_:
