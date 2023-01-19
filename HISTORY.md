@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.133 beta 2023-01-19
+
+* fix(linux): Properly set context after changing IP (#8025)
+
 ## 16.0.132 beta 2023-01-18
 
 * docs(windows): update screenshots and documentation for Keyman for Windows config (#8014)
