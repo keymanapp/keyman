@@ -79,7 +79,11 @@ export class CompilerMessages {
 
   static Error_KeyMissingToGapOrSwitch = (o:{keyId: string}) =>
   m(this.ERROR_KeyMissingToGapOrSwitch, `key id='${o.keyId}' must have either to=, gap=, or switch=.`);
-static ERROR_KeyMissingToGapOrSwitch = SevError | 0x0011;
+  static ERROR_KeyMissingToGapOrSwitch = SevError | 0x0011;
+
+  static Error_MustHaveAtMostOneLayersElementPerForm = (o:{form: string}) => m(this.ERROR_MustHaveAtMostOneLayersElementPerForm,
+      `Must have at most one layers element with form=${o.form}`);
+  static ERROR_MustHaveAtMostOneLayersElementPerForm = SevError | 0x0012;
 
   static severityName(code: number): string {
     let severity = code & CompilerErrorSeverity.Severity_Mask;

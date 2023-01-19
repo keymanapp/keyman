@@ -29,8 +29,7 @@ describe('layr', function () {
     const list0 = layr.lists[0];
     assert.ok(list0);
     assert.equal(list0.layers.length, 1);
-    assert.equal(list0.flags & constants.layr_list_flags_mask_form, constants.layr_list_flags_hardware);
-    assert.equal(list0.hardware?.value, '');
+    assert.equal(list0.hardware, constants.layr_list_hardware_us);
     const layer0 = list0.layers[0];
     assert.ok(layer0);
     assert.equal(layer0.rows.length, 1);
@@ -51,12 +50,10 @@ describe('layr', function () {
 
     assert.equal(layr.lists?.length, 2);
 
-    const listHardware = layr.lists.find(v => v.hardware.value === 'abnt2');
+    const listHardware = layr.lists.find(v => v.hardware === constants.layr_list_hardware_abnt2);
     assert.ok(listHardware);
     assert.equal(listHardware.minDeviceWidth, 0);
     assert.equal(listHardware.layers.length, 2);
-    assert.equal(listHardware.flags & constants.layr_list_flags_mask_form, constants.layr_list_flags_hardware);
-    assert.equal(listHardware.hardware?.value, 'abnt2');
     const hardware0 = listHardware.layers[0];
     assert.ok(hardware0);
     assert.equal(hardware0.id.value, 'base');
@@ -75,11 +72,10 @@ describe('layr', function () {
     assert.equal(hardware1row0.keys.length, 2);
     allKeysOk(hardware1row0,'q w', 'hardware1row0');
 
-    const listTouch = layr.lists.find(v => v.hardware.value !== 'abnt2'); // TODO-LDML: need to add some more fields!!!
+    const listTouch = layr.lists.find(v => v.hardware === constants.layr_list_hardware_touch);
     assert.ok(listTouch);
     assert.equal(listTouch.minDeviceWidth, 300);
     assert.equal(listTouch.layers.length, 1);
-    assert.equal(listTouch.flags & constants.layr_list_flags_mask_form, constants.layr_list_flags_touch);
     const touch0 = listTouch.layers[0];
     assert.ok(touch0);
     assert.equal(touch0.rows.length, 1);

@@ -8,7 +8,6 @@ import Layr = KMXPlus.Layr;
 import LayrEntry = KMXPlus.LayrEntry;
 import LayrList = KMXPlus.LayrList;
 import LayrRow = KMXPlus.LayrRow;
-// import USVirtualKeyMap = Constants.USVirtualKeyMap;
 
 export class LayrCompiler extends SectionCompiler {
 
@@ -18,11 +17,48 @@ export class LayrCompiler extends SectionCompiler {
 
   public validate() {
     let valid = true;
-    if(!this.keyboard.layers?.[0]?.layer?.length) {
+    if (!this.keyboard.layers?.[0]?.layer?.length) {
       valid = false;
       this.callbacks.reportMessage(CompilerMessages.Error_MustBeAtLeastOneLayerElement());
     }
-    // TODO-LDML
+    let hardwareLayers = 0;
+    let touchLayers = 0;
+    this.keyboard.layers.forEach(({ hardware, form }) => {
+      // TODO-LDML: in the future >1 hardware layer may be allowed, check for duplicates
+      if (form === 'touch') {
+        touchLayers++;
+        if (hardware) {
+          valid = false;
+          this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({
+            errorText: `Not allowed: hardware="${hardware}" with layers form="touch"`
+          }));
+        } else if (touchLayers > 1) { // TODO-LDML: revisit if spec changes
+          valid = false;
+          this.callbacks.reportMessage(CompilerMessages.Error_MustHaveAtMostOneLayersElementPerForm({ form }));
+        }
+      } else if (form === 'hardware') {
+        hardwareLayers++;
+        if (!hardware) {
+          valid = false;
+          this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({
+            errorText: `on layers form="hardware", missing required hardware= attribute.`
+          }));
+        } else if (!constants.layr_list_hardware_map.get(hardware)) {
+          valid = false;
+          this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({
+            errorText: `Unknown hardware layout id: hardware="${hardware}"`
+          }));
+        } else if (hardwareLayers > 1) { // TODO-LDML: revisit if spec changes
+          valid = false;
+          this.callbacks.reportMessage(CompilerMessages.Error_MustHaveAtMostOneLayersElementPerForm({ form }));
+        }
+      } else {
+        valid = false;
+        this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({
+          errorText: `Invalid form="${form}" on layers element`
+        }));
+      }
+    });
     return valid;
   }
 
@@ -30,16 +66,17 @@ export class LayrCompiler extends SectionCompiler {
     const sect = new Layr();
 
     sect.lists = this.keyboard.layers.map((layers) => {
-      const list : LayrList = {
-        flags: 0,
-        hardware: sections.strs.allocString(layers.hardware),
+      const hardware = constants.layr_list_hardware_map.get(layers.hardware || 'touch');
+      // Don't need to check 'form' because it is checked in validate
+      const list: LayrList = {
+        hardware,
         minDeviceWidth: layers.minDeviceWidth || 0,
         layers: layers.layer.map((layer) => {
-          const entry : LayrEntry = {
+          const entry: LayrEntry = {
             id: sections.strs.allocString(layer.id),
             modifier: sections.strs.allocString(layer.modifier),
             rows: layer.row.map((row) => {
-              const erow : LayrRow = {
+              const erow: LayrRow = {
                 keys: row.keys.split(' ').map((id) => sections.strs.allocString(id)),
               };
               return erow;
@@ -49,9 +86,6 @@ export class LayrCompiler extends SectionCompiler {
           return entry;
         }),
       };
-      if (layers.form === 'touch') {
-        list.flags |= constants.layr_list_flags_touch;
-      }
       return list;
     });
     return sect;
