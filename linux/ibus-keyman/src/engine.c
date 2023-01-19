@@ -577,8 +577,10 @@ ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
 void ibus_keyman_set_text(IBusEngine *engine, const gchar *text)
 {
     IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
-    if (!keyman)
+    if (!keyman) {
+        g_error("%s: parameter `engine` is not an `IBusKeymanEngine` (%p)", __FUNCTION__, engine);
         return;
+    }
     commit_string(keyman, text);
 }
 
