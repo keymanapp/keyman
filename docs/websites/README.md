@@ -39,16 +39,17 @@ This stops the Docker container for the site.
 
 This downloads and builds the Docker images needed for the site.
 
+#### Configure
+1. Run `./build.sh configure`.
+
+This step is currently not needed
+
 #### Start the Docker container
 1. Run `./build.sh start`.
 
 This maps the local directory to the the Docker image.
-
-#### Configure
-Create a link of the PHP dependencies in Docker image from /var/www/vendor/ to /var/www/html/vendor.
+Then, it creates a link of the PHP dependencies in Docker image from /var/www/vendor/ to /var/www/html/vendor.
 The link file also appears locally.
-
-1. Run `./build.sh configure`.
 
 After this, you can access the website at the following ports:
 
