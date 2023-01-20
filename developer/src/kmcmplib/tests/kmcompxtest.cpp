@@ -51,14 +51,14 @@ int main(int argc, char *argv[])
     if (strncmp(testname, pfirst5, 5) == 0) return 1;  // exit code 1: CERR_ in Name + no Error found
 
        // TODO: compare argv[2] to ../build/argv[2]
-    FILE* fp1 = fopen(argv[2], "rb");
+    FILE* fp1 = fopen(kmx_file, "rb");
     char fname[260];
-    strcpy(fname, argv[2]);
+    strcpy(fname, kmx_file);
     char* p = strrchr(fname, '\\');
     if (!p) p = fname;
    strcpy(p, "\\..\\build\\");
-    char* q = strrchr(argv[2], '\\');
-    if (!q) q = argv[2]; else q++;
+    char* q = strrchr(kmx_file, '\\');
+    if (!q) q = kmx_file; else q++;
     strcat(p, q);
 
     FILE* fp2 = fopen(fname, "rb");

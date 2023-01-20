@@ -3,7 +3,7 @@
 #include <windows.h>
 #include "compfile.h"
 
-BOOL AddCompileString(LPSTR buf);
+BOOL AddCompileWarning(LPSTR buf);
 BOOL AddCompileMessage(DWORD msg);
 
 // TODO: These macros can return FALSE in functions that expect a DWORD CERR_x

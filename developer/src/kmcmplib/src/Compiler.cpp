@@ -276,14 +276,14 @@ PKMX_STR wstrtostr(PKMX_WCHAR in)
   return result;
 }
 
-KMX_BOOL kmcmp::AddCompileString(LPSTR buf)
+KMX_BOOL kmcmp::AddCompileWarning(LPSTR buf)
 {
   SetLastError(0);
   (*msgproc)(kmcmp::currentLine + 1, CWARN_Info, buf);
   return FALSE;
 }
 
-KMX_BOOL AddCompileMessage(KMX_DWORD msg)
+KMX_BOOL AddCompileError(KMX_DWORD msg)
 {
   KMX_CHAR szText[SZMAX_ERRORTEXT + 1 + 280];
   KMX_CHAR* szTextp = NULL;
@@ -414,10 +414,10 @@ extern "C" BOOL __declspec(dllexport) kmcmp_CompileKeyboardFile(PKMX_STR pszInfi
   if (err)
   {
     if ((msg = WriteCompiledKeyboard(&fk, fp_out)) != CERR_None)
-      AddCompileMessage(msg);
+      AddCompileError(msg);
   }
   else
-    AddCompileMessage(CERR_InvalidValue);
+    AddCompileError(CERR_InvalidValue);
 
   fclose(fp_in);
   fclose(fp_out);
@@ -3425,12 +3425,9 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
 
   if (cur == fsize)
 
-    // Always a "\r\n" to the EOF, avoids funny bugs
-#if defined(_WIN32) || defined(_WIN64)
-  u16ncat(str, u"\r\n", _countof(str));  // I3481
-#else
+  // Always a "\r\n" to the EOF, avoids funny bugs
+  //u16ncat(str, u"\r\n", _countof(str));  // I3481  // S: do we need changes at other places as well when we skip \r?
   u16ncat(str, u"\n", _countof(str));  // I3481
-#endif
 
   if (len == 0) return CERR_EndOfFile;
 
@@ -3821,7 +3818,7 @@ FILE* UTF16TempFromUTF8(FILE* fp_in , KMX_BOOL hasPreamble)
       ConversionResult cr = ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], strictConversion);
       if (cr == sourceIllegal) {
         // Not a valid UTF-8 file, so fall back to ANSI
-        // AddCompileMessage(CHINT_NonUnicodeFile);
+        // AddCompileError(CHINT_NonUnicodeFile);
         // note, while this message is defined, for now we will not emit it
         // because we don't support HINT/INFO messages yet and we don't want
         // this to cause a blocking compile at this stage
@@ -3832,7 +3829,7 @@ FILE* UTF16TempFromUTF8(FILE* fp_in , KMX_BOOL hasPreamble)
           delete[] poutbuf;
         }
         else
-          AddCompileMessage(CERR_InvalidCharacter);
+          AddCompileError(CERR_InvalidCharacter);
       }
 
       else {
