@@ -22,7 +22,8 @@ cd "$(dirname "$THIS_SCRIPT")"
 builder_describe "Builds the predictive-text wordbreaker implementation module" \
   "clean" \
   "configure" \
-  "build"
+  "build" \
+  "test"
 
 builder_describe_outputs \
   configure          /node_modules \
@@ -51,4 +52,10 @@ if builder_start_action build; then
   node build-bundler.js
 
   builder_finish_action success build
+fi
+
+if builder_start_action test; then
+  npm run mocha
+
+  builder_finish_action success test
 fi
