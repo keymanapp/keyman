@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.32 alpha 2023-01-20
+
+* fix(ios): use mobile mode for keyboard download pages (#8042)
+* docs(common/resources): Update configure step in Docker readme (#8034)
+* fix(linux): JSON File missing after installation (#8040)
+
 ## 17.0.31 alpha 2023-01-19
 
 * chore: git tag with release@semver (#8035)
