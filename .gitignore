@@ -179,6 +179,9 @@ Thumbs.db
 # Code coverage tools for JS/TS - nyc and c8
 #
 .nyc_output/
+lcov-report/
+lcov.info
+
 # Linux packaging related
 /debian/
 /results/
