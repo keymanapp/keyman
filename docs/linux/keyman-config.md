@@ -10,7 +10,7 @@ then you will need to:
 ```bash
 sudo apt install python3-lxml python3-magic python3-numpy python3-qrcode python3-pil \
     python3-requests python3-requests-cache python3 python3-gi gir1.2-webkit2-4.0 dconf-cli \
-    python3-setuptools python3-pip python3-dbus ibus libglib2.0-bin liblocale-gettext-perl
+    python3-setuptools python3-pip python3-dbus ibus libglib2.0-bin liblocale-gettext-perl python3-bs4
 ```
 
 Either `python3-raven` or `python3-sentry-sdk` (>= 1.4) is required as well. On Ubuntu 22.04 and later run:

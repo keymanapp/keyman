@@ -14,6 +14,7 @@ Build-Depends:
  liblocale-gettext-perl,
  perl,
  python3-all (>= 3.5),
+ python3-bs4,
  python3-dbus,
  python3-gi,
  python3-lxml,
