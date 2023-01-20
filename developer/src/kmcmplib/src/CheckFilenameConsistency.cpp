@@ -107,7 +107,7 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   }
 
 #if defined(_WIN32) || defined(_WIN64)
-  const KMX_WCHAR* cptr1 = u16chr(Name, '\\');   // _S2 const wchar_t* cptr1 = wcsrchr(Name, '\\');
+  const KMX_WCHAR* cptr1 = u16rchr(Name, '\\');   // _S2 const wchar_t* cptr1 = wcsrchr(Name, '\\');
 #else
   const KMX_WCHAR* cptr1 = u16rchr(Name, '/');
 #endif

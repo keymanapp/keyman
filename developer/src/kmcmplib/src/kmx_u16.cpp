@@ -104,6 +104,16 @@ const KMX_WCHAR *  u16ncat(KMX_WCHAR *dst, const KMX_WCHAR *src, size_t max) {
   return o;
 }
 
+const KMX_WCHAR *  u16rchr(const KMX_WCHAR *p, KMX_WCHAR ch) {
+size_t end_p = u16len(p);
+p= p + end_p-1;
+  while (*p) {
+    if (*p == ch) return p;
+    p--;
+  }
+  return ch == 0 ? p : NULL;
+}
+
 const KMX_WCHAR *  u16chr(const KMX_WCHAR *p, KMX_WCHAR ch) {
   while (*p) {
     if (*p == ch) return p;

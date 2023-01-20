@@ -20,7 +20,7 @@ The naming convention of the files is as follows:
 
 * After the second underscore all combination of char can be used.
 
-* The 4 characters following CERR_ correspond to the last 4 digits of the error-Code which is expected to be produced by this file.
+* The 4 characters following CERR_ correspond to the last 4 digits of the error code which is expected to be produced by this file.
 
     ( e.g. CERR_404D_balochi_phonetic.kmn should produce error 0x0000404D).
 
@@ -33,11 +33,11 @@ While running, kmcompxtest extracts those 4 characters from the Filename (e.g. 4
 
 * If these 4 characters correspond to the actual error given, the test will be marked as OK. (Code 0)
 <br/>
-* If these 4 characters signifiy an error but **no error** does occur, the test will be marked as FAILED  (Code 1)
+* If these 4 characters signify an error but **no error** does occur, the test will be marked as FAILED  (Code 1)
 <br/>
-* If these 4 characters signifiy an error but this **specific error** does not occur, the test will be marked as FAILED  (Code 4)
+* If these 4 characters signify an error but this **specific error** does not occur, the test will be marked as FAILED  (Code 4)
 <br/>
-* If these 4 characters signifiy an error number that is **not correct**, the test will be marked as FAILED  (Code 5)
+* If these 4 characters signify an error number that is **not correct**, the test will be marked as FAILED  (Code 5)
 <br/>
 * If more than 1 error is produced, only the error coded in the Filename will be detected
 
