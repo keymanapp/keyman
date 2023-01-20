@@ -6,7 +6,10 @@ import { LMLayerWorkerCode, LMLayerWorkerSourcemapComment } from "@keymanapp/lm-
 export default class DefaultWorker {
   static constructInstance(): Worker {
     let scriptStr = unwrap(LMLayerWorkerCode);
-    if(true) { // If this is definitively set to either true or false, tree-shaking can take effect.
+
+    // If this is definitively set to either true or false, tree-shaking can take effect.
+    // An imported const variable doesn't seem to do it, though.
+    if(false) {
       scriptStr += '\n' + LMLayerWorkerSourcemapComment;
     }
     let worker = new VirtualizedWorker(scriptStr);

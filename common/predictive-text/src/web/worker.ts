@@ -23,7 +23,10 @@ export default class DefaultWorker {
    */
   static asBlobURI(encodedSrc: string): string {
     let code = unwrap(encodedSrc);
-    if(true) { // If this is definitively set to either true or false, tree-shaking can take effect.
+
+    // If this is definitively set to either true or false, tree-shaking can take effect.
+    // An imported const variable doesn't seem to do it, though.
+    if(false) {
       code += '\n' + LMLayerWorkerSourcemapComment;
     }
     let blob = new Blob([code], { type: 'text/javascript' });
