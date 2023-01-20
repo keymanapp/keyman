@@ -2,6 +2,7 @@
 
 # Keyboard details window
 
+from bs4 import BeautifulSoup
 import json
 import logging
 import tempfile
@@ -120,7 +121,9 @@ class KeyboardDetailsView(Gtk.Dialog):
             grid.attach_next_to(lbl_pkg_desc, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
             prevlabel = lbl_pkg_desc
             label = Gtk.Label()
-            label.set_text(kbdata['description'])
+            description = BeautifulSoup(kbdata['description'])
+            label.set_text(description.get_text('\n'))
+            label.set_alignment(0,0)
             label.set_halign(Gtk.Align.START)
             label.set_selectable(True)
             label.set_line_wrap(80)
@@ -263,7 +266,9 @@ class KeyboardDetailsView(Gtk.Dialog):
                     prevlabel = lbl_kbd_desc
                     label = Gtk.Label()
                     if secure_lookup(kbdata, 'description'):
-                        label.set_text(kbdata['description'])
+                        description = BeautifulSoup(kbdata['description'])
+                        label.set_text(description.get_text('\n'))
+                    label.set_alignment(0,0)
                     label.set_halign(Gtk.Align.START)
                     label.set_selectable(True)
                     label.set_line_wrap(80)
