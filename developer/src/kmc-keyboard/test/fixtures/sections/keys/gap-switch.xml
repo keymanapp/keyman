@@ -13,7 +13,7 @@
     <key id="w" to="w" />
   </keys>
 
-  <layers form="hardware">
+  <layers form="hardware" hardware="us">
     <layer id="base">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="Q W" />
