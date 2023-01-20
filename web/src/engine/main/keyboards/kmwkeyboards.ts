@@ -521,6 +521,7 @@ namespace com.keyman.keyboards {
       let keyman = com.keyman.singleton;
 
       var util = keyman.util;
+      var domManager = keyman.domManager;
       var osk = keyman.osk;
 
       let activeKeyboard = keyman.core.activeKeyboard;
@@ -573,6 +574,7 @@ namespace com.keyman.keyboards {
               activeKeyboard.refreshLayouts();
               if(osk) {
                 osk._Load();
+                util.addStyleSheet(domManager.setAttachmentFontStyle(this.activeStub.KF));
               }
             }
             return Promise.resolve();
@@ -699,6 +701,7 @@ namespace com.keyman.keyboards {
       // Initialize the OSK (provided that the base code has been loaded)
       if(osk) {
         osk._Load();
+        util.addStyleSheet(domManager.setAttachmentFontStyle(this.activeStub.KF));
       }
       return Promise.resolve();
     }
@@ -731,6 +734,7 @@ namespace com.keyman.keyboards {
 
       var manager = this;
       let core = com.keyman.singleton.core;
+      let domManager = com.keyman.singleton.domManager;
 
       // Add a handler for cases where the new <script> block fails to load.
       Lscript.addEventListener('error', function() {
@@ -777,6 +781,7 @@ namespace com.keyman.keyboards {
             // Prepare and show the OSK for this keyboard
             if(osk) {
               osk._Load();
+              util.addStyleSheet(domManager.setAttachmentFontStyle(kbdStub.KF));
             }
 
             if(manager.keymanweb.domManager.lastActiveElement != null) {

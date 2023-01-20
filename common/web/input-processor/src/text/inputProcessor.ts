@@ -4,6 +4,7 @@
 
 import ContextWindow from "./contextWindow.js";
 import LanguageProcessor, { type ModelSpec } from "./prediction/languageProcessor.js";
+import PredictionContext from "./prediction/predictionContext.js";
 import { globalObject, DeviceSpec } from "@keymanapp/web-utils/build/obj/index.js";
 
 import KeyboardProcessor, { type ProcessorInitOptions } from "@keymanapp/keyboard-processor/build/obj/text/keyboardProcessor.js";
@@ -42,6 +43,21 @@ export default class InputProcessor {
     this.contextDevice = device;
     this.kbdProcessor = new KeyboardProcessor(device, options);
     this.lngProcessor = new LanguageProcessor(predictiveTextWorker);
+
+    this.lngProcessor.on('suggestionapplied', this.onSuggestionApplied);
+  }
+
+  private onSuggestionApplied = (outputTarget: OutputTarget) => {
+    // Tell the keyboard that the current layer has not changed
+    this.keyboardProcessor.newLayerStore.set('');
+    this.keyboardProcessor.oldLayerStore.set('');
+    // Call the keyboard's entry point.
+    this.keyboardProcessor.processPostKeystroke(this.contextDevice, outputTarget)
+      // If we have a RuleBehavior as a result, run it on the target. This should
+      // only change system store and variable store values.
+      ?.finalize(this.keyboardProcessor, outputTarget, true);
+
+    return true;
   }
 
   public get languageProcessor(): LanguageProcessor {
@@ -268,7 +284,7 @@ export default class InputProcessor {
       let windowedMock = contextWindow.toMock();
 
       // Note - we don't yet do fat-fingering with longpress keys.
-      if(keyDistribution && keyEvent.kbdLayer) {
+      if(this.languageProcessor.isActive && keyDistribution && keyEvent.kbdLayer) {
         // Tracks a 'deadline' for fat-finger ops, just in case both context is long enough
         // and device is slow enough that the calculation takes too long.
         //
@@ -329,7 +345,7 @@ export default class InputProcessor {
             continue;
           }
 
-          let altEvent = altKey.constructKeyEvent(this.keyboardProcessor, keyEvent.device);
+          let altEvent = this.keyboardProcessor.activeKeyboard.constructKeyEvent(altKey, keyEvent.device, this.keyboardProcessor.stateKeys);
           let alternateBehavior = this.keyboardProcessor.processKeystroke(altEvent, mock);
 
           // If alternateBehavior.beep == true, ignore it.  It's a disallowed key sequence,

@@ -1,3 +1,8 @@
+// TODO:  Move to separate folder:  'codes'
+// We should start splitting off code needed by keyboards even without a KeyboardProcessor active.
+// There's an upcoming `/common/web/types` package that 'codes' and 'keyboards' may fit well within.
+// In fact, there's a file there (on its branch) that should be merged with this one!
+
 let Codes = {
   // Define Keyman Developer modifier bit-flags (exposed for use by other modules)
   // Compare against /common/include/kmx_file.h.  CTRL+F "#define LCTRLFLAG" to find the secton.
@@ -97,6 +102,67 @@ let Codes = {
     }
 
     return false;
+  },
+
+
+  /**
+   * Get modifier key state from layer id
+   *
+   * @param       {string}      layerId       layer id (e.g. ctrlshift)
+   * @return      {number}                    modifier key state (desktop keyboards)
+   */
+   getModifierState(layerId: string): number {
+    var modifier=0;
+    if(layerId.indexOf('shift') >= 0) {
+      modifier |= Codes.modifierCodes['SHIFT'];
+    }
+
+    // The chiral checks must not be directly exclusive due each other to visual OSK feedback.
+    var ctrlMatched=false;
+    if(layerId.indexOf('leftctrl') >= 0) {
+      modifier |= Codes.modifierCodes['LCTRL'];
+      ctrlMatched=true;
+    }
+    if(layerId.indexOf('rightctrl') >= 0) {
+      modifier |= Codes.modifierCodes['RCTRL'];
+      ctrlMatched=true;
+    }
+    if(layerId.indexOf('ctrl')  >= 0 && !ctrlMatched) {
+      modifier |= Codes.modifierCodes['CTRL'];
+    }
+
+    var altMatched=false;
+    if(layerId.indexOf('leftalt') >= 0) {
+      modifier |= Codes.modifierCodes['LALT'];
+      altMatched=true;
+    }
+    if(layerId.indexOf('rightalt') >= 0) {
+      modifier |= Codes.modifierCodes['RALT'];
+      altMatched=true;
+    }
+    if(layerId.indexOf('alt')  >= 0 && !altMatched) {
+      modifier |= Codes.modifierCodes['ALT'];
+    }
+
+    return modifier;
+  },
+
+  /**
+   * Get state key state from layer id
+   *
+   * @param       {string}      layerId       layer id (e.g. caps)
+   * @return      {number}                    modifier key state (desktop keyboards)
+   */
+  getStateFromLayer(layerId: string): number {
+    var modifier=0;
+
+    if(layerId.indexOf('caps') >= 0) {
+      modifier |= Codes.modifierCodes['CAPS'];
+    } else {
+      modifier |= Codes.modifierCodes['NO_CAPS'];
+    }
+
+    return modifier;
   }
 }
 

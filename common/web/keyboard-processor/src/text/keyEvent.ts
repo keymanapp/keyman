@@ -1,5 +1,16 @@
+// TODO:  Move to separate folder:  'codes'
+// We should start splitting off code needed by keyboards even without a KeyboardProcessor active.
+// There's an upcoming `/common/web/types` package that 'codes' and 'keyboards' may fit well within.
+
+// KeyEvent may be a _little_ bit of pollution, but this IS what the Web OSK currently generates to signal
+// a key event.  The most straightforward way to integrate Web OSK events on other platforms is to have
+// other platforms recognize and utilize this type.
+
 import type Keyboard from "../keyboards/keyboard.js";
 import type DeviceSpec from "@keymanapp/web-utils/build/obj/deviceSpec.js";
+
+import Codes from './codes.js';
+import DefaultOutput from './defaultOutput.js';
 
 // Represents a probability distribution over a keyboard's keys.
 // Defined here to avoid compilation issues.
@@ -52,5 +63,68 @@ export default class KeyEvent {
     keyEvent.kName = '';
     keyEvent.device = device;
     return keyEvent;
+  }
+
+  get isModifier(): boolean {
+    switch(this.Lcode) {
+      case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
+      case 17:
+      case 18:
+      case 20: //"K_CAPS":20, "K_NUMLOCK":144,"K_SCROLL":145
+      case 144:
+      case 145:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  // FIXME:  makes some bad assumptions.
+  setMnemonicCode(shifted: boolean, capsActive: boolean) {
+    // K_SPACE is not handled by defaultKeyOutput for physical keystrokes unless using touch-aliased elements.
+    // It's also a "exception required, March 2013" for clickKey, so at least they both have this requirement.
+    if(this.Lcode != Codes.keyCodes['K_SPACE']) {
+      // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
+      // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
+      let mappingEvent: KeyEvent = new KeyEvent();
+      for(let key in (this as KeyEvent)) {
+        mappingEvent[key] = this[key];
+      }
+
+      // To facilitate storing relevant commands, we should probably reverse-lookup
+      // the actual keyname instead.
+      mappingEvent.kName = 'K_xxxx';
+      mappingEvent.Lmodifiers = (shifted ? 0x10 : 0);  // mnemonic lookups only exist for default & shift layers.
+      var mappedChar: string = DefaultOutput.forAny(mappingEvent, true);
+
+      /* First, save a backup of the original code.  This one won't needlessly trigger keyboard
+        * rules, but allows us to replicate/emulate commands after rule processing if needed.
+        * (Like backspaces)
+        */
+      this.vkCode = this.Lcode;
+      if(mappedChar) {
+        // Will return 96 for 'a', which is a keycode corresponding to Codes.keyCodes('K_NP1') - a numpad key.
+        // That stated, we're in mnemonic mode - this keyboard's rules are based on the char codes.
+        this.Lcode = mappedChar.charCodeAt(0);
+      } else {
+        // Don't let command-type keys (like K_DEL, which will output '.' otherwise!)
+        // trigger keyboard rules.
+        //
+        // However, DO make sure modifier keys pass through safely.
+        // (https://github.com/keymanapp/keyman/issues/3744)
+        if(!this.isModifier) {
+          delete this.Lcode;
+        }
+      }
+    }
+
+    if(capsActive) {
+      // TODO:  Needs fixing - does not properly mirror physical keystrokes, as Lcode range 96-111 corresponds
+      // to numpad keys!  (Physical keyboard section has its own issues here.)
+      if((this.Lcode >= 65 && this.Lcode <= 90) /* 'A' - 'Z' */ || (this.Lcode >= 97 && this.Lcode <= 122) /* 'a' - 'z' */) {
+        this.Lmodifiers ^= 0x10;  // Flip the 'shifted' bit, so it'll act as the opposite key.
+        this.Lcode ^= 0x20; // Flips the 'upper' vs 'lower' bit for the base 'a'-'z' ASCII alphabetics.
+      }
+    }
   }
 };

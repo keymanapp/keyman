@@ -1,5 +1,5 @@
 import Codes from "../text/codes.js";
-import type KeyEvent from "../text/keyEvent.js";
+import KeyEvent from "../text/keyEvent.js";
 import KeyMapping from "../text/keyMapping.js";
 import type { KeyDistribution } from "../text/keyEvent.js";
 import type { LayoutKey, LayoutRow, LayoutLayer, LayoutFormFactor, ButtonClass } from "./defaultLayouts.js";
@@ -47,7 +47,7 @@ export class ActiveKey implements LayoutKey {
   nextlayer: string;
   sp?: ButtonClass;
 
-  private baseKeyEvent: KeyEvent;
+  _baseKeyEvent: KeyEvent;
   isMnemonic: boolean = false;
 
   proportionalPad: number;
@@ -149,6 +149,45 @@ export class ActiveKey implements LayoutKey {
     return this.displayLayer + '-' + this.coreID;
   }
 
+  @Enumerable
+  public get baseKeyEvent(): KeyEvent {
+    return deepCopy(this._baseKeyEvent);
+  }
+
+  // Since I'll forget to note this otherwise... https://github.com/keymanapp/keyman/pull/7741/files#diff-9c3f288e2f41bf7a787f1aaff8802aee29c239f98d2efcb96d3a42a2ccfae0dd
+  // This implementation was apparently lost in a merge or something?  The question is... exactly where and when?  It's visible in
+  // the repo, but was missing from this branch... UNLIKE certain references to it!
+  /**
+   * Converts key IDs of the U_* form to their corresponding UTF-16 text.
+   * If an ID not matching the pattern is received, returns null.
+   * @param id
+   * @returns
+   */
+    static unicodeIDToText(id: string, errorCallback?: (codeAsString: string) => void) {
+    if(!id || id.substring(0,2) != 'U_') {
+      return null;
+    }
+
+    let result = '';
+    const codePoints = id.substring(2).split('_');
+    for(let codePoint of codePoints) {
+      const codePointValue = parseInt(codePoint, 16);
+      if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) ||
+          ((0x80 <= codePointValue) && (codePointValue <= 0x9F)) ||
+          isNaN(codePointValue)) {
+        if(errorCallback) {
+          errorCallback(codePoint);
+        }
+        continue;
+      } else {
+        // String.fromCharCode() is inadequate to handle the entire range of Unicode
+        // Someday after upgrading to ES2015, can use String.fromCodePoint()
+        result += String.kmwFromCharCode(codePointValue);
+      }
+    }
+    return result ? result : null;
+  }
+
   static sanitize(rawKey: LayoutKey) {
     if(typeof rawKey.width == 'string') {
       rawKey.width = parseInt(rawKey.width, 10);
@@ -167,7 +206,7 @@ export class ActiveKey implements LayoutKey {
     rawKey.sp ||= 0; // The default button class.
   }
 
-  static polyfill(key: LayoutKey, layout: ActiveLayout, displayLayer: string) {
+  static polyfill(key: LayoutKey, keyboard: Keyboard, layout: ActiveLayout, displayLayer: string) {
     // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
     let dummy = new ActiveKey();
     let proto = Object.getPrototypeOf(dummy);
@@ -187,7 +226,7 @@ export class ActiveKey implements LayoutKey {
     // Ensure subkeys are also properly extended.
     if(key.sk) {
       for(let subkey of key.sk) {
-        ActiveKey.polyfill(subkey, layout, displayLayer);
+        ActiveKey.polyfill(subkey, keyboard, layout, displayLayer);
       }
     }
 
@@ -196,10 +235,10 @@ export class ActiveKey implements LayoutKey {
     aKey.layer = aKey.layer || displayLayer;
 
     // Compute the key's base KeyEvent properties for use in future event generation
-    aKey.constructBaseKeyEvent(layout, displayLayer);
+    aKey.constructBaseKeyEvent(keyboard, layout, displayLayer);
   }
 
-  private constructBaseKeyEvent(layout: ActiveLayout, displayLayer: string) {
+  private constructBaseKeyEvent(keyboard: Keyboard, layout: ActiveLayout, displayLayer: string) {
     // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
     // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
     let layer = this.layer || displayLayer || '';
@@ -207,12 +246,12 @@ export class ActiveKey implements LayoutKey {
 
     // Start:  mirrors _GetKeyEventProperties
 
-
     // First check the virtual key, and process shift, control, alt or function keys
-    var Lkc: KeyEvent = {
+    let Lkc: KeyEvent = new KeyEvent();
+    let props = {
       // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
-      Lmodifiers: KeyboardProcessor.getModifierState(layer),
-      Lstates: KeyboardProcessor.getStateFromLayer(layer),
+      Lmodifiers: Codes.getModifierState(layer),
+      Lstates: Codes.getStateFromLayer(layer),
       Lcode: keyName ? Codes.keyCodes[keyName] : 0,
       LisVirtualKey: true,
       vkCode: 0,
@@ -223,6 +262,10 @@ export class ActiveKey implements LayoutKey {
       device: null,
       isSynthetic: true
     };
+
+    for(let key in props) {
+      Lkc[key] = props[key];
+    }
 
     if(layout.keyboard) {
       let keyboard = layout.keyboard;
@@ -243,44 +286,16 @@ export class ActiveKey implements LayoutKey {
       if(!keyboard.definesPositionalOrMnemonic) {
         // Not the best pattern, but currently safe - we don't look up any properties of any of the
         // arguments in this use case, and the object's scope is extremely limited.
-        Lkc.Lcode = KeyMapping._USKeyCodeToCharCode(this.constructKeyEvent(null, null));
+        Lkc.Lcode = KeyMapping._USKeyCodeToCharCode(keyboard.constructKeyEvent(null, null, {
+          K_CAPS: false,
+          K_NUMLOCK: false,
+          K_SCROLL: false
+        }));
         Lkc.LisVirtualKey=false;
       }
     }
 
-    this.baseKeyEvent = Lkc;
-  }
-
-  constructKeyEvent(keyboardProcessor: KeyboardProcessor, device: DeviceSpec): KeyEvent {
-    // Make a deep copy of our preconstructed key event, filling it out from there.
-    let Lkc = deepCopy(this.baseKeyEvent);
-    Lkc.device = device;
-
-    if(this.isMnemonic) {
-      KeyboardProcessor.setMnemonicCode(Lkc, this.layer.indexOf('shift') != -1, keyboardProcessor ? keyboardProcessor.stateKeys['K_CAPS'] : false);
-    }
-
-    // Performs common pre-analysis for both 'native' and 'embedded' OSK key & subkey input events.
-    // This part depends on the keyboard processor's active state.
-    if(keyboardProcessor) {
-      keyboardProcessor.setSyntheticEventDefaults(Lkc);
-
-      // If it's a state key modifier, trigger its effects as part of the
-      // keystroke.
-      const bitmap = {
-        'K_CAPS': Codes.stateBitmasks.CAPS,
-        'K_NUMLOCK': Codes.stateBitmasks.NUM_LOCK,
-        'K_SCROLL': Codes.stateBitmasks.SCROLL_LOCK
-      };
-      const bitmask = bitmap[Lkc.kName];
-
-      if(bitmask) {
-        Lkc.Lstates ^= bitmask;
-        Lkc.LmodifierChange = true;
-      }
-    }
-
-    return Lkc;
+    this._baseKeyEvent = Lkc;
   }
 
   public getSubkey(coreID: string): ActiveKey {
@@ -328,7 +343,7 @@ export class ActiveRow implements LayoutRow {
     }
   }
 
-  static polyfill(row: LayoutRow, layout: ActiveLayout, displayLayer: string, totalWidth: number, proportionalY: number) {
+  static polyfill(row: LayoutRow, keyboard: Keyboard, layout: ActiveLayout, displayLayer: string, totalWidth: number, proportionalY: number) {
     // Apply defaults, setting the width and other undefined properties for each key
     let keys=row['key'];
     for(let j=0; j<keys.length; j++) {
@@ -355,7 +370,7 @@ export class ActiveRow implements LayoutRow {
           break;
       }
 
-      ActiveKey.polyfill(key, layout, displayLayer);
+      ActiveKey.polyfill(key, keyboard, layout, displayLayer);
     }
 
     /* The calculations here are effectively 'virtualized'.  When used with the OSK, the VisualKeyboard
@@ -458,7 +473,7 @@ export class ActiveLayer implements LayoutLayer {
     }
   }
 
-  static polyfill(layer: LayoutLayer, layout: ActiveLayout) {
+  static polyfill(layer: LayoutLayer, keyboard: Keyboard, layout: ActiveLayout) {
     layer.aligned=false;
 
     // Create a DIV for each row of the group
@@ -491,7 +506,7 @@ export class ActiveLayer implements LayoutLayer {
     for(let i=0; i<rowCount; i++) {
       // Calculate proportional y-coord of row.  0 is at top with highest y-coord.
       let rowProportionalY = (i + 0.5) / rowCount;
-      ActiveRow.polyfill(layer.row[i], layout, layer.id, totalWidth, rowProportionalY);
+      ActiveRow.polyfill(layer.row[i], keyboard, layout, layer.id, totalWidth, rowProportionalY);
     }
 
     // Add class functions and properties to the existing layout object, allowing it to act as an ActiveLayout.
@@ -747,7 +762,7 @@ export class ActiveLayout implements LayoutFormFactor{
     aLayout.formFactor = formFactor;
 
     for(n=0; n<layers.length; n++) {
-      ActiveLayer.polyfill(layers[n], aLayout);
+      ActiveLayer.polyfill(layers[n], keyboard, aLayout);
       layerMap[layers[n].id] = layers[n] as ActiveLayer;
     }
 

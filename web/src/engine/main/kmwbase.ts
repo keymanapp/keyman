@@ -502,10 +502,35 @@ namespace com.keyman {
       if(!elem) {
         elem = this.domManager.activeElement;
       }
+
       let outputTarget = dom.Utils.getOutputTarget(elem);
       if(outputTarget) {
         outputTarget.resetContext();
       }
+
+      // Reset the predictive-text context while we're at it.
+
+      let bannerController = this.osk.bannerController;
+      this.core.languageProcessor.on('statechange',
+                                        (state: StateChangeEnum) => { // import is available from languageProcessor.js
+      let currentType = bannerController.activeType;
+      bannerController.selectBanner(state);
+
+      if(this.osk.banner instanceof SuggestionBanner) {
+        // Similar instruction will be needed on resetContext() calls!
+        this.osk.banner.predictionContext = new PredictionContext(this.core.languageProcessor, this.core.keyboardProcessor, outputTarget);
+      }
+
+      // Register a listener for model change events so that we can hot-swap the banner as needed.
+      // Handled here b/c banner changes may trigger a need to re-layout the OSK.
+
+      if(currentType != bannerController.activeType) {
+        this.refreshLayout();
+      }
+
+      return true;
+    });
+
       this.core.resetContext(outputTarget);
     };
 
