@@ -13,7 +13,7 @@ The tests get run as part of building `ibus-keyman`, more specifically when runn
 All tests can be run with the test script:
 
 ```bash
-./run-tests.sh
+scripts/run-tests.sh
 ```
 
 ### Run specific tests
@@ -22,5 +22,5 @@ To run a single test you pass the testname (as found in
 `core/build/arch/*/tests/unit/kmx`). Multiple tests should be separated by space.
 
 ```bash
-./run-tests.sh -- k_000___null_keyboard k_005___nul_with_initial_context
+scripts/run-tests.sh -- k_000___null_keyboard k_005___nul_with_initial_context
 ```
