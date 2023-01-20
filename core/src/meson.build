@@ -58,18 +58,7 @@ if compiler.get_id() == 'emscripten'
   links = []
 endif
 
-lib = library('kmnkbp0',
-  'option.cpp',
-  'keyboard.cpp',
-  'state.cpp',
-  'km_kbp_context_api.cpp',
-  'km_kbp_keyboard_api.cpp',
-  'km_kbp_options_api.cpp',
-  'km_kbp_state_api.cpp',
-  'km_kbp_debug_api.cpp',
-  'km_kbp_processevent_api.cpp',
-  'jsonpp.cpp',
-  'mock/mock_processor.cpp',
+kmxfiles = files(
   'kmx/kmx_consts.cpp',
   'kmx/kmx_processevent.cpp',
   'kmx/kmx_actions.cpp',
@@ -84,7 +73,30 @@ lib = library('kmnkbp0',
   'kmx/kmx_options.cpp',
   'kmx/kmx_processor.cpp',
   'kmx/kmx_xstring.cpp',
+)
+
+apifiles = files(
+  'km_kbp_context_api.cpp',
+  'km_kbp_keyboard_api.cpp',
+  'km_kbp_options_api.cpp',
+  'km_kbp_state_api.cpp',
+  'km_kbp_debug_api.cpp',
+  'km_kbp_processevent_api.cpp',
+)
+
+corefiles = files(
+  'option.cpp',
+  'keyboard.cpp',
+  'state.cpp',
+  'jsonpp.cpp',
   'utfcodec.cpp',
+)
+
+lib = library('kmnkbp0',
+  apifiles,
+  corefiles,
+  kmxfiles,
+  'mock/mock_processor.cpp',
   version_res,
   cpp_args: defns + warns + flags,
   link_args: links,

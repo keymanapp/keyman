@@ -127,54 +127,49 @@
     },
     {
       "type": "shell",
-      "label": "ibus-keyman: autogen.sh",
-      "command": "./autogen.sh",
+      "label": "ibus-keyman: clean",
+      "command": "./build.sh",
+      "args": ["clean", "--debug"],
       "options": {
         "cwd": "${workspaceFolder}/linux/ibus-keyman"
       },
       "group": "build",
-      "detail": "autogen ibus-keyman"
+      "detail": "clean ibus-keyman"
     },
     {
       "type": "shell",
       "label": "ibus-keyman: configure",
-      "command": "./configure",
-      "args": [
-        "CPPFLAGS=\"-DG_MESSAGES_DEBUG -I${workspaceFolder}/core/build/arch/debug/include/ -I${workspaceFolder}/common/include/ -I${workspaceFolder}/core/include/\"",
-        "CFLAGS=\"-g -O0\"",
-        "CXXFLAGS=\"-g -O0\"",
-        "KEYMAN_PROC_LIBS=\"-L${workspaceFolder}/core/build/arch/debug/src -lkmnkbp0\"",
-        "KEYMAN_PROC_CFLAGS=\"-I${workspaceFolder}/core/build/arch/debug/include -I${workspaceFolder}/core/include -I${workspaceFolder}/common/include\"",
-        "PKG_CONFIG_PATH=${workspaceFolder}/core/build/arch/debug/meson-private"
-      ],
+      "command": "./build.sh",
+      "args": ["configure", "--debug"],
       "options": {
-        "cwd": "${workspaceFolder}/linux/ibus-keyman"
+        "cwd": "${workspaceFolder}/linux/ibus-keyman",
+        "env": {
+          "CPPFLAGS": "-DG_MESSAGES_DEBUG -I${workspaceFolder}/core/build/arch/debug/include/ -I${workspaceFolder}/core/include/ -I/home/eberhard/Develop/keyman/ibus/ibus/src -I${workspaceFolder}/common/include",
+          "CFLAGS": "-g -O0",
+          "CXXFLAGS": "-g -O0",
+          "KEYMAN_PROC_LIBS": "-L${workspaceFolder}/core/build/arch/debug/src -lkmnkbp0",
+          "KEYMAN_PROC_CFLAGS": "-I${workspaceFolder}/core/build/arch/debug/include -I${workspaceFolder}/core/include -I${workspaceFolder}/common/include",
+          "PKG_CONFIG_PATH": "${workspaceFolder}/core/build/arch/debug/meson-private"
+        },
       },
-      "problemMatcher": [
-        {
-          "base": "$gcc",
-          "fileLocation": [
-            "relative",
-            "${workspaceFolder}/linux/ibus-keyman/src/"
-          ],
-        }
-      ],
+      "dependsOn":["ibus-keyman: clean"],
       "group": "build",
       "detail": "configure ibus-keyman"
     },
     {
       "type": "shell",
       "label": "ibus-keyman: build",
-      "command": "make",
+      "command": "./build.sh",
+      "args": [ "build", "--debug" ],
       "options": {
-        "cwd": "${workspaceFolder}/linux/ibus-keyman",
+        "cwd": "${workspaceFolder}/linux/ibus-keyman/",
       },
       "problemMatcher": [
         {
           "base": "$gcc",
           "fileLocation": [
             "relative",
-            "${workspaceFolder}/linux/ibus-keyman/src/"
+            "${workspaceFolder}/linux/build/x86_64/release"
           ],
         }
       ],
@@ -183,24 +178,14 @@
     },
     {
       "type": "shell",
-      "label": "ibus-keyman: build tests",
-      "command": "make",
-      "options": {
-        "cwd": "${workspaceFolder}/linux/ibus-keyman/tests",
-      },
-      "group": "build",
-      "detail": "build ibus-keyman"
-    },
-    {
-      "type": "shell",
-      "label": "ibus-keyman: check",
-      "command": "make",
-      "args": ["check"],
+      "label": "ibus-keyman: test",
+      "command": "./build.sh",
+      "args": ["test", "--debug"],
       "options": {
         "cwd": "${workspaceFolder}/linux/ibus-keyman/",
       },
       "group": "build",
-      "detail": "build check ibus-keyman"
+      "detail": "run tests of ibus-keyman"
     },
     {
       "type": "shell",
