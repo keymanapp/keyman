@@ -86,4 +86,17 @@ describe('layr', function () {
     assert.equal(touch0row0.keys.length, 4);
     allKeysOk(touch0row0,'Q q W w', 'touch0row0');
   });
+  for (let badcase of ['invalid-hardware', 'missing-hardware', 'multi-hardware', 'touch-hardware']) {
+    it(`should reject invalid: ${badcase}`, function () {
+      let layr = loadSectionFixture(LayrCompiler, `sections/layr/invalid-${badcase}.xml`, compilerTestCallbacks) as Layr;
+      assert.isNull(layr);
+      assert.isAtLeast(compilerTestCallbacks.messages.length, 1);
+      // TODO-LDML: assert specific err cases
+    });
+  }
+  for (let badcase of ['invalid-form']) {
+    it(`should throw on invalid invalid: ${badcase}`, function () {
+      assert.throws(() => loadSectionFixture(LayrCompiler, `sections/layr/invalid-${badcase}.xml`, compilerTestCallbacks));
+    });
+  }
 });

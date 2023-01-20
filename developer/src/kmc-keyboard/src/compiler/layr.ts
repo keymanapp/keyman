@@ -22,19 +22,14 @@ export class LayrCompiler extends SectionCompiler {
       this.callbacks.reportMessage(CompilerMessages.Error_MustBeAtLeastOneLayerElement());
     }
     let hardwareLayers = 0;
-    let touchLayers = 0;
     this.keyboard.layers.forEach(({ hardware, form }) => {
       // TODO-LDML: in the future >1 hardware layer may be allowed, check for duplicates
       if (form === 'touch') {
-        touchLayers++;
         if (hardware) {
           valid = false;
           this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({
             errorText: `Not allowed: hardware="${hardware}" with layers form="touch"`
           }));
-        } else if (touchLayers > 1) { // TODO-LDML: revisit if spec changes
-          valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_MustHaveAtMostOneLayersElementPerForm({ form }));
         }
       } else if (form === 'hardware') {
         hardwareLayers++;
@@ -53,6 +48,7 @@ export class LayrCompiler extends SectionCompiler {
           this.callbacks.reportMessage(CompilerMessages.Error_MustHaveAtMostOneLayersElementPerForm({ form }));
         }
       } else {
+        // Should not be reached due to XML validation.
         valid = false;
         this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({
           errorText: `Invalid form="${form}" on layers element`
