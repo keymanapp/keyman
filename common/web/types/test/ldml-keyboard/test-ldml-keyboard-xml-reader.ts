@@ -14,7 +14,7 @@ describe('ldml keyboard xml reader tests', function() {
     assert.isNotNull(source);
     assert.throws(() => {
       reader.validate(source, loadLdmlKeyboardSchema());
-    }, "data/keyboard must have required property 'names'");
+    }, `/keyboard: required: must have required property 'names' {"missingProperty":"names"}`);
   });
 
   it("should fail to load files with an invalid conformsTo", function() {
@@ -25,7 +25,7 @@ describe('ldml keyboard xml reader tests', function() {
     assert.isNotNull(source);
     assert.throws(() => {
       reader.validate(source, loadLdmlKeyboardSchema());
-    }, "data/keyboard/conformsTo must be equal to one of the allowed values");
+    }, `/keyboard/conformsTo: enum: must be equal to one of the allowed values {"allowedValues":["techpreview"]}`);
   });
 
 });
