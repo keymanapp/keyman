@@ -1,5 +1,5 @@
 import unwrap from '../unwrap.js';
-import LMLayerWorkerCode from "@keymanapp/lm-worker/build/lib/worker-main.wrapped-for-bundle.js";
+import { LMLayerWorkerCode } from "@keymanapp/lm-worker/build/lib/worker-main.wrapped-for-bundle.js";
 
 
 export default class DefaultWorker {
@@ -21,8 +21,8 @@ export default class DefaultWorker {
    *      }
    *    }));
    */
-  static asBlobURI(fn: Function): string {
-    let code = unwrap(fn);
+  static asBlobURI(fnCode: string): string {
+    let code = unwrap(fnCode);
     let blob = new Blob([code], { type: 'text/javascript' });
     return URL.createObjectURL(blob);
   }
