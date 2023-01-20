@@ -104,6 +104,18 @@ const KMX_WCHAR *  u16ncat(KMX_WCHAR *dst, const KMX_WCHAR *src, size_t max) {
   return o;
 }
 
+// u16rchr returns last occurence of ch in p; It returns p_end + 1 if ch = '\0' and NULL if ch is not found
+const KMX_WCHAR* u16rchr(const KMX_WCHAR* p, KMX_WCHAR ch) {
+  const KMX_WCHAR* p_end = p + u16len(p) - 1;
+
+	if (ch == '\0')	return p_end + 1;
+	while (p_end >= p) {
+		if (*p_end == ch) return p_end;
+		p_end--;
+	}
+	return NULL;
+}
+
 const KMX_WCHAR *  u16chr(const KMX_WCHAR *p, KMX_WCHAR ch) {
   while (*p) {
     if (*p == ch) return p;
