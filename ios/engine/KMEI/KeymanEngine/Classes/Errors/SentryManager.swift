@@ -35,13 +35,13 @@ public class SentryManager {
     let infoDict = Bundle(for: SentryManager.self).infoDictionary
     let versionWithTag = infoDict?["KeymanVersionWithTag"] as? String ?? ""
     let environment = infoDict?["KeymanVersionEnvironment"] as? String ?? ""
-    let release = "release@\(versionWithTag)"
+    let versionGitTag = "release@\(versionWithTag)"
 
     let options = Sentry.Options()
     options.dsn = "https://d14d2efb594e4345b8367dbb61ebceaf@o1005580.ingest.sentry.io/5983521"
     options.enabled = allowEnabled && sendingEnabled
     options.environment = environment
-    options.releaseName = release
+    options.releaseName = versionGitTag
     options.beforeSend = { event in
       // This function is called on _every_ event and crash that may occur, giving us a place to
       // capture and filter them.

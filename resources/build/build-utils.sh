@@ -10,6 +10,7 @@
 #   TIER:             Current tier, one of "alpha", "beta" or "stable"
 #   VERSION_TAG:      Tier + Pull Request + Location of build [-alpha|-beta][-test[-1234]][-local]
 #   VERSION_WITH_TAG: e.g. "14.0.1-alpha-test-1234" or "14.0.5-beta-local" or "14.0.1-alpha-test"
+#   VERSION_GIT_TAG:  Git tag for the release, "release@$VERSION_WITH_TAG", e.g. "release@14.0.1-alpha-test-1234"
 #   KEYMAN_ROOT:      fully resolved root path of Keyman repository
 #   VERSION_ENVIRONMENT: One of: local, test, alpha, beta, stable
 #   UPLOAD_SENTRY:    true - if VERSION_ENVIRONMENT is one of alpha, beta, stable
@@ -95,6 +96,7 @@ function findVersion() {
     fi
 
     VERSION_WITH_TAG="$VERSION$VERSION_TAG"
+    VERSION_GIT_TAG="release@$VERSION_WITH_TAG"
 
     readonly VERSION
     readonly VERSION_MAJOR
@@ -105,6 +107,7 @@ function findVersion() {
     readonly VERSION_TAG
     readonly VERSION_WITH_TAG
     readonly VERSION_ENVIRONMENT
+    readonly VERSION_GIT_TAG
 
     # Export version strings so places like version.gradle can access them
     export VERSION
@@ -116,6 +119,7 @@ function findVersion() {
     export VERSION_TAG
     export VERSION_WITH_TAG
     export VERSION_ENVIRONMENT
+    export VERSION_GIT_TAG
 }
 
 function findTier() {
