@@ -16,7 +16,7 @@
     "bundle-kmlmc": "esbuild build/src/kmlmc.js --bundle --platform=node > build/cjs-src/kmlmc.cjs",
     "bundle-kmlmi": "esbuild build/src/kmlmi.js --bundle --platform=node > build/cjs-src/kmlmi.cjs",
     "bundle-kmlmp": "esbuild build/src/kmlmp.js --bundle --platform=node > build/cjs-src/kmlmp.cjs",
-    "test": "cd test && tsc -b && cd .. && c8 mocha",
+    "test": "cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha",
     "prepublishOnly": "npm run build"
   },
   "type": "module",
