@@ -57,15 +57,12 @@
 		CEBD34232654D76B00EB2EA8 /* Sentry.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBD34252654D76C00EB2EA8 /* XCGLogger.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340A2654D5AA00EB2EA8 /* XCGLogger.xcframework */; };
 		CEBD34262654D76C00EB2EA8 /* XCGLogger.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340A2654D5AA00EB2EA8 /* XCGLogger.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEBD34272654D76E00EB2EA8 /* Zip.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340B2654D5AA00EB2EA8 /* Zip.xcframework */; };
-		CEBD34282654D76E00EB2EA8 /* Zip.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340B2654D5AA00EB2EA8 /* Zip.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBD34472654FF3300EB2EA8 /* KeymanEngine.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */; };
 		CEDB327F265C9C58000A2009 /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */; };
 		CEDB3280265C9C58000A2009 /* ObjcExceptionBridging.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34082654D5AA00EB2EA8 /* ObjcExceptionBridging.xcframework */; };
 		CEDB3281265C9C58000A2009 /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */; };
 		CEDB3282265C9C58000A2009 /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */; };
 		CEDB3283265C9C58000A2009 /* XCGLogger.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340A2654D5AA00EB2EA8 /* XCGLogger.xcframework */; };
-		CEDB3284265C9C58000A2009 /* Zip.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340B2654D5AA00EB2EA8 /* Zip.xcframework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -81,7 +78,6 @@
 				CEBD34232654D76B00EB2EA8 /* Sentry.xcframework in Embed Frameworks */,
 				CEBD34262654D76C00EB2EA8 /* XCGLogger.xcframework in Embed Frameworks */,
 				CEBD34032654D41200EB2EA8 /* KeymanEngine.xcframework in Embed Frameworks */,
-				CEBD34282654D76E00EB2EA8 /* Zip.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -147,7 +143,6 @@
 		CEBD34082654D5AA00EB2EA8 /* ObjcExceptionBridging.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ObjcExceptionBridging.xcframework; path = Carthage/Build/ObjcExceptionBridging.xcframework; sourceTree = "<group>"; };
 		CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Sentry.xcframework; path = Carthage/Build/Sentry.xcframework; sourceTree = "<group>"; };
 		CEBD340A2654D5AA00EB2EA8 /* XCGLogger.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = XCGLogger.xcframework; path = Carthage/Build/XCGLogger.xcframework; sourceTree = "<group>"; };
-		CEBD340B2654D5AA00EB2EA8 /* Zip.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Zip.xcframework; path = Carthage/Build/Zip.xcframework; sourceTree = "<group>"; };
 		CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Reachability.xcframework; path = Carthage/Build/Reachability.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -162,7 +157,6 @@
 				CEBD341A2654D76600EB2EA8 /* DeviceKit.xcframework in Frameworks */,
 				CEBD34022654D41200EB2EA8 /* KeymanEngine.xcframework in Frameworks */,
 				CEBD34252654D76C00EB2EA8 /* XCGLogger.xcframework in Frameworks */,
-				CEBD34272654D76E00EB2EA8 /* Zip.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -175,7 +169,6 @@
 				CEDB3281265C9C58000A2009 /* Reachability.xcframework in Frameworks */,
 				CEDB3282265C9C58000A2009 /* Sentry.xcframework in Frameworks */,
 				CEDB3283265C9C58000A2009 /* XCGLogger.xcframework in Frameworks */,
-				CEDB3284265C9C58000A2009 /* Zip.xcframework in Frameworks */,
 				CEBD34472654FF3300EB2EA8 /* KeymanEngine.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -295,7 +288,6 @@
 				CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */,
 				CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */,
 				CEBD340A2654D5AA00EB2EA8 /* XCGLogger.xcframework */,
-				CEBD340B2654D5AA00EB2EA8 /* Zip.xcframework */,
 				CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */,
 				CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */,
 			);
