@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications.
-# Designed for optimal compatibility with the Keyman Suite.
+# Compiles the JS sourcemap remapper tool used by some of our TS projects when complications
+# arise with sourcemap handling.
 #
 
 # Exit on command failure and when using unset variables:
@@ -27,11 +27,8 @@ WORKER_WRAPPED_BUNDLE_TARGET_FILENAME=build/lib/worker-main.wrapped-for-bundle.j
 ################################ Main script ################################
 
 builder_describe \
-  "Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications." \
-  "@../keyman-version" \
-  "@../../tools/sourcemap-path-remapper" \
-  configure clean build test \
-  "--ci     Runs unit tests with CI reporting"
+  "Compiles the sourcemap-remapping compilation tool used by our predictive text and Web engine builds." \
+  configure clean build
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -54,25 +51,7 @@ fi
 
 if builder_start_action build; then
   # Build worker with tsc first
-  npm run build -- $builder_verbose || fail "Could not build worker."
-
-  echo "Bundling worker modules"
-  node build-bundler.js
-
-  echo "Preparing the polyfills + worker for script-embedding"
-  node worker-wrapper-bundler.js
+  npm run tsc
 
   builder_finish_action success build
-fi
-
-if builder_start_action test; then
-  MOCHA_FLAGS=
-
-  if builder_has_option --ci; then
-    MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
-  fi
-
-  npm run mocha -- --recursive $MOCHA_FLAGS ./src/test/helpers.js ./src/test/cases/
-
-  builder_finish_action success test
 fi
