@@ -29,6 +29,7 @@ WORKER_WRAPPED_BUNDLE_TARGET_FILENAME=build/lib/worker-main.wrapped-for-bundle.j
 builder_describe \
   "Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications." \
   "@../keyman-version" \
+  "@../../tools/sourcemap-path-remapper" \
   configure clean build test \
   "--ci     Runs unit tests with CI reporting"
 
