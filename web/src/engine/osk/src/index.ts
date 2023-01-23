@@ -1,3 +1,7 @@
+export { DeviceSpec } from '@keymanapp/web-utils/build/obj/deviceSpec.js';
+export { default as Keyboard } from '@keymanapp/keyboard-processor/build/obj/keyboards/keyboard.js';
+export { default as Codes } from '@keymanapp/keyboard-processor/build/obj/text/codes.js';
+
 export { default as FloatingOSKView } from './views/floatingOskView.js';
 export { default as FloatingOSKViewCookie } from './views/floatingOskCookie.js';
 export { default as AnchoredOSKView } from './views/anchoredOskView.js';
@@ -9,6 +13,7 @@ export type { default as ViewConfiguration } from './config/viewConfiguration.js
 export { default as Activator } from './views/activator.js';
 export { default as SimpleActivator } from './views/simpleActivator.js';
 export { default as TwoStateActivator } from './views/twoStateActivator.js';
+export { ParsedLengthStyle } from './lengthStyle.js';
 
 // PredictionContext is exported from input-processor, not the OSK.
 

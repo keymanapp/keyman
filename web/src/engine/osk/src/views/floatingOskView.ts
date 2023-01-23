@@ -63,6 +63,8 @@ export default class FloatingOSKView extends OSKView {
 
     super(config);
 
+    this.typedActivationModel.on('triggerChange', () => this.setDisplayPositioning());
+
     document.body.appendChild(this._Box);
 
     this.loadCookie();
@@ -142,7 +144,7 @@ export default class FloatingOSKView extends OSKView {
     let isVisible = this._Visible;
 
     let dragPromise = new ManagedPromise<void>();
-    this.emit('dragMove', dragPromise);
+    this.emit('dragMove', dragPromise.corePromise);
 
     this.loadCookie();
     this.userPositioned=false;
@@ -638,7 +640,7 @@ export default class FloatingOSKView extends OSKView {
         }
 
         this.dragPromise = new ManagedPromise<void>();
-        _this.emit('dragMove', this.dragPromise);
+        _this.emit('dragMove', this.dragPromise.corePromise);
       }
 
       onDragMove(cumulativeX: number, cumulativeY: number) {
@@ -701,7 +703,7 @@ export default class FloatingOSKView extends OSKView {
         }
 
         this.dragPromise = new ManagedPromise<void>();
-        _this.emit('resizeMove', this.dragPromise);
+        _this.emit('resizeMove', this.dragPromise.corePromise);
       }
 
       onDragMove(cumulativeX: number, cumulativeY: number) {

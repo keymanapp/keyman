@@ -5,6 +5,7 @@ import OSKView, { OSKPos, OSKRect } from './oskView.js';
 import VisualKeyboard from '../visualKeyboard.js';
 import Configuration from '../config/viewConfiguration.js';
 import { SimpleActivator } from './activator.js';
+import { ParsedLengthStyle } from '../lengthStyle.js';
 
 /*
  * Keyman is copyright (c) SIL International.  MIT License.

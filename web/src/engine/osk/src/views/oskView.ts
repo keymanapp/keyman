@@ -283,11 +283,6 @@ export default abstract class OSKView extends EventEmitter<EventMap> {
 
   private needsLayout: boolean = true;
 
-  /**
-   * The "model" to use for controlling the OSK's activation / visibility state.
-   */
-  private _activationModel: Activator;
-
   private _animatedHideTimeout: number;
 
   private mouseEnterPromise?: ManagedPromise<void>;
@@ -303,6 +298,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> {
     this.config.device = configuration.device || configuration.hostDevice;
 
     this.config.isEmbedded = configuration.isEmbedded || false;
+    this.config.activator.on('activate', this.activationListener);
 
     // OSK initialization - create DIV and set default styles
     this._Box = createUnselectableElement('div');   // Container for OSK (Help DIV, displayed when user clicks Help icon)
@@ -316,12 +312,6 @@ export default abstract class OSKView extends EventEmitter<EventMap> {
     this._bannerController = new BannerController(this.bannerView, this.hostDevice);
 
     this.keyboardView = null;
-
-    // Install the default OSK stylesheet - but don't have it managed by the stylesheet manager.
-    // We wish to maintain kmwosk.css whenever keyboard-specific styles are reset/removed.
-    for(let sheetHref of configuration.commonStyleSheetRefs) {
-      this.uiStyleSheetManager.linkExternalSheet(sheetHref);
-    }
 
     this.setBaseMouseEventListeners();
     if(this.hostDevice.touchable) {
@@ -373,7 +363,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> {
       }
 
       this.mouseEnterPromise = new ManagedPromise<void>();
-      this.emit('pointerInteraction', this.mouseEnterPromise);
+      this.emit('pointerInteraction', this.mouseEnterPromise.corePromise);
     };
 
     this._Box.onmouseleave = this._VKbdMouseLeave = (e) => {
@@ -406,7 +396,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> {
     this._boxBaseTouchStart = (e) => {
       for(let i = 0; i < e.changedTouches.length; i++) {
         let promise = this.touchEventPromiseManager.promiseForTouchpoint(e.changedTouches[i].identifier);
-        this.emit('pointerInteraction', promise);
+        this.emit('pointerInteraction', promise.corePromise);
       }
 
       this.touchEventPromiseManager.maintainTouches(e.touches);
@@ -459,7 +449,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> {
    * Gets and sets the activation state model used to control presentation of the OSK.
    */
   get activationModel(): Activator {
-    return this._activationModel;
+    return this.config.activator;
   }
 
   set activationModel(model: Activator) {
@@ -467,10 +457,10 @@ export default abstract class OSKView extends EventEmitter<EventMap> {
       throw new Error("The activation model may not be set to null or undefined!");
     }
 
-    this._activationModel.off('activate', this.activationListener);
+    this.config.activator.off('activate', this.activationListener);
     model.on('activate', this.activationListener);
 
-    this._activationModel = model;
+    this.config.activator = model;
 
     this.commonCheckAndDisplay();
   }
@@ -687,8 +677,12 @@ export default abstract class OSKView extends EventEmitter<EventMap> {
       const parent = this._Box.offsetParent as HTMLElement;
       this._computedWidth  = this.width.val  * (this.width.absolute  ? 1 : parent.offsetWidth);
       this._computedHeight = this.height.val * (this.height.absolute ? 1 : parent.offsetHeight);
-    } else {
+    } else if(!hasDimensions) {
       // Cannot perform layout operations!
+      console.warn("Unable to properly perform layout - size specifications have not yet been set.");
+      return;
+    } else {
+      console.warn("Unable to properly perform layout - specification uses a relative spec, thus relies upon insertion into the DOM for layout.");
       return;
     }
 
@@ -777,6 +771,12 @@ export default abstract class OSKView extends EventEmitter<EventMap> {
 
     // Instantly resets the OSK container, erasing / delinking the previously-loaded keyboard.
     this._Box.innerHTML = '';
+
+    // Install the default OSK stylesheet - but don't have it managed by the stylesheet manager.
+    // We wish to maintain kmwosk.css whenever keyboard-specific styles are reset/removed.
+    for(let sheetHref of this.configuration.commonStyleSheetRefs) {
+      this.uiStyleSheetManager.linkExternalSheet(sheetHref);
+    }
 
     // Any event-cancelers would go here, after the innerHTML reset.
 

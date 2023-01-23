@@ -32,6 +32,9 @@ export default class OSKLayerGroup {
       ls.fontSize=layout['fontsize'];
     }
 
+    ls.width = '100%';
+    ls.height = '100%';
+
     // Create a separate OSK div for each OSK layer, only one of which will ever be visible
     var n: number, i: number, j: number;
     var layers: LayoutLayer[];

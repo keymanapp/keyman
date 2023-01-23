@@ -26,5 +26,5 @@ export default interface Configuration extends CommonConfiguration {
    * (conditioned on an HTMLElement instance) while using "simple" (one-state) activation
    * for the "inlined" style.
    */
-  activator?: Activator;
+  activator?: Activator<any>;
 }

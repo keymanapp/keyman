@@ -84,7 +84,7 @@ export default class AnchoredOSKView extends OSKView {
   }
 
   protected doResize() {
-    if(this.vkbd && this.targetDevice.touchable) {
+    if(this.vkbd) {
       let targetOSKHeight = this.getDefaultKeyboardHeight();
       this.setSize(this.getDefaultWidth(), targetOSKHeight + this.banner.height);
     }

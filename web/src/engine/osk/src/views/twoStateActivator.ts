@@ -1,6 +1,10 @@
 import Activator from './activator.js';
 
-export default class TwoStateActivator<Type> extends Activator {
+interface TriggerEventMap<Type> {
+  triggerChange: (trigger: Type) => void;
+}
+
+export default class TwoStateActivator<Type> extends Activator<TriggerEventMap<Type>> {
   private _enabled: boolean = true;
   private actValue: Type = null;
 
@@ -31,9 +35,13 @@ export default class TwoStateActivator<Type> extends Activator {
 
   set activationTrigger(value: Type) {
     const oldState = this.activate;
+    const oldValue = this.actValue;
     this.actValue = value; // may change this.value!
 
     this.checkState(oldState);
+    if(oldValue != value) {
+      this.emit('triggerChange', value);
+    }
   }
 
   get conditionsMet(): boolean {

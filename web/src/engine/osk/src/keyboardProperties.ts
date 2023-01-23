@@ -6,27 +6,57 @@ export interface KeyboardFont {
   'path': string;
 }
 
+// Corresponds to Keyman Engine for Web's internal "keyboard stub" format.
+export type KeyboardInternalPropertySpec = {
+  'KFont': KeyboardFont,
+  'KOskFont': KeyboardFont,
+  displayName?: string,
+  'KN'?: string,
+  'KL'?: string,
+  'KLC'?: string
+};
+
+// Corresponds to the documented API for the Web engine's `addKeyboards` function
+// when a single language object is specified - not an array.
+export type KeyboardAPIPropertySpec = {
+  id: string,
+  name: string,
+  languages: {
+    id: string,
+    name: string,
+    font: KeyboardFont,
+    oskFont: KeyboardFont
+  }
+}
+
+type MetadataObj = KeyboardInternalPropertySpec | KeyboardAPIPropertySpec;
+
 export default class KeyboardProperties {
   /**
    * Designed to match, hold, and correspond to an instance of KeyboardStub, a class external to this module.
    */
-  private readonly wrappedStub: {
-    'KFont': KeyboardFont,
-    'KOskFont': KeyboardFont,
-    displayName?: string,
-    'KN'?: string,
-    'KL'?: string,
-    'KLC'?: string
-  }
+  private readonly wrappedStub: KeyboardInternalPropertySpec;
 
   public spacebarTextMode: SpacebarText;
 
-  public constructor(metadataObj: typeof KeyboardProperties.prototype.wrappedStub, spacebarTextMode?: SpacebarText);
+  public constructor(metadataObj: MetadataObj, spacebarTextMode?: SpacebarText);
   public constructor(displayName: string, languageCode: string, textFont: KeyboardFont, oskFont?: KeyboardFont);
-  public constructor(arg1: (typeof KeyboardProperties.prototype.wrappedStub) | string, arg2?: string | SpacebarText, arg3?: KeyboardFont, arg4?: KeyboardFont) {
+  public constructor(arg1: (MetadataObj) | string, arg2?: string | SpacebarText, arg3?: KeyboardFont, arg4?: KeyboardFont) {
     if(!(typeof arg1 == 'string')) {
-      this.wrappedStub = arg1;
-      this.spacebarTextMode = arg2 as SpacebarText;
+      if(arg1['KLC'] || arg1['KFont'] || arg1['KOskFont']) {
+        this.wrappedStub = arg1 as KeyboardInternalPropertySpec;
+        this.spacebarTextMode = arg2 as SpacebarText;
+      } else {
+        let apiStub = arg1 as KeyboardAPIPropertySpec;
+        this.wrappedStub = {
+          KN: apiStub.name,
+          KL: apiStub.languages.name,
+          KLC: apiStub.languages.id,
+          KFont: apiStub.languages.font,
+          KOskFont: apiStub.languages.oskFont
+        };
+        this.spacebarTextMode = arg2 as SpacebarText;
+      }
     } else {
       this.wrappedStub = {
         displayName: arg1,
