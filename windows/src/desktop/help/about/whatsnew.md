@@ -2,10 +2,7 @@
 title: What's New
 ---
 
-Here are some of the new features and major bug fixes we have added to Keyman 16.0 for Windows:
-
--   Revamp Configuration UI (\#7206)
-
+Here are some of the new features we have added to Keyman 17.0 for Windows:
 
 ## Related Topics
 

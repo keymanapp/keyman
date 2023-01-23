@@ -126,7 +126,7 @@ if [ "$action" == "commit" ]; then
   pushd "$KEYMAN_ROOT" > /dev/null
   message="auto: increment $base version to $NEWVERSION"
   branch="auto/version-$base-$NEWVERSION"
-  git tag -a "release-$VERSION_WITH_TAG" -m "Keyman release $VERSION_WITH_TAG"
+  git tag -a "release@$VERSION_WITH_TAG" -m "Keyman release $VERSION_WITH_TAG"
   git checkout -b "$branch"
   git add VERSION.md HISTORY.md
 

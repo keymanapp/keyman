@@ -19,6 +19,8 @@ import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.util.DependencyUtil;
+import com.tavultesoft.kmea.util.DependencyUtil.LibraryType;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMString;
@@ -638,7 +640,7 @@ final class KMKeyboard extends WebView {
       BaseActivity.makeToast(context, R.string.fatal_keyboard_error_short, Toast.LENGTH_LONG, packageID, keyboardID, languageID);
     }
 
-    if(this.currentKeyboardErrorReports < 5 && reportToSentry) {
+    if(this.currentKeyboardErrorReports < 5 && DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled() && reportToSentry) {
       // We'll only report up to 5 errors in a given keyboard to avoid spamming
       // errors and using unnecessary bandwidth doing so
       // Don't use localized string R.string.fatal_keyboard_error msg for Sentry
@@ -674,7 +676,7 @@ final class KMKeyboard extends WebView {
   }
 
   private void sendKMWError(int lineNumber, String sourceId, String message) {
-    if (Sentry.isEnabled()) {
+    if (DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
       Breadcrumb breadcrumb = new Breadcrumb();
       breadcrumb.setMessage("KMKeyboard.sendKMWError");
       breadcrumb.setCategory("KMWError");
