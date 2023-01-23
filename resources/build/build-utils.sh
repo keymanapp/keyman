@@ -156,6 +156,7 @@ function printVersionUtilsDebug() {
     echo "TIER:                $TIER"
     echo "VERSION_TAG:         $VERSION_TAG"
     echo "VERSION_WITH_TAG:    $VERSION_WITH_TAG"
+    echo "VERSION_GIT_TAG:     $VERSION_GIT_TAG"
     echo "VERSION_ENVIRONMENT: $VERSION_ENVIRONMENT"
 }
 
