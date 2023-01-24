@@ -158,7 +158,7 @@ NSString* _keymanDataPath = nil;
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{ @"NSApplicationCrashOnExceptions": @YES }];
 
     KeymanVersionInfo keymanVersionInfo = [self versionInfo];
-    NSString *releaseName = [NSString stringWithFormat:@"release-%@", keymanVersionInfo.versionWithTag];
+    NSString *releaseName = [NSString stringWithFormat:@"release@%@", keymanVersionInfo.versionWithTag];
 
     [SentrySDK startWithConfigureOptions:^(SentryOptions *options) {
         options.dsn = @"https://960f8b8e574c46e3be385d60ce8e1fea@o1005580.ingest.sentry.io/5983522";
