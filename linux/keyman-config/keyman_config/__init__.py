@@ -37,6 +37,15 @@ def secure_lookup(data, key1, key2 = None):
     return None
 
 
+def before_send(event, hint):
+    if 'exc_info' in hint:
+        exc_type, exc_value, tb = hint['exc_info']
+        if isinstance(exc_value, KeyboardInterrupt):
+            # Ignore KeyboardInterrupt exception
+            return None
+    return event
+
+
 gettext.bindtextdomain('keyman-config', '/usr/share/locale')
 gettext.textdomain('keyman-config')
 
@@ -75,8 +84,9 @@ else:
         sentry_sdk.init(
             dsn=SentryUrl,
             environment=__environment__,
-            release='release-' + __versionwithtag__,
+            release='release@' + __versionwithtag__,
             integrations=[sentry_logging],
+            before_send=before_send
         )
         set_user({'id': hash(getpass.getuser())})
         with configure_scope() as scope:
@@ -94,7 +104,7 @@ else:
 
             # Note, legacy raven API requires secret (https://github.com/keymanapp/keyman/pull/5787#discussion_r721457909)
             SentryUrl = "https://1d0edbf2d0dc411b87119b6e92e2c357:e6d5a81ee6944fc79bd9f0cbb1f2c2a4@o1005580.ingest.sentry.io/5983525"
-            client = Client(SentryUrl, environment=__environment__, release='release-' + __versionwithtag__)
+            client = Client(SentryUrl, environment=__environment__, release='release@' + __versionwithtag__)
             client.user_context({'id': hash(getpass.getuser())})
             client.tags_context({
                 'app': os.path.basename(sys.argv[0]),

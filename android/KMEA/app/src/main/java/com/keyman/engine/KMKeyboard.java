@@ -1289,7 +1289,7 @@ final class KMKeyboard extends WebView {
     }
 
     try {
-      String hintText = context.getString(R.string.help_bubble_text);
+      String hintText = BaseActivity.getString(this.context, R.string.help_bubble_text);
 
       // To ensure that the localized text is properly escaped, we'll use JSON utilities.  Since
       // there's no direct string encoder, we'll just wrap it in an object and unwrap it in JS.
