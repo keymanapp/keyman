@@ -489,7 +489,10 @@ export default class FloatingOSKView extends OSKView {
     var Ls = this._Box.style;
 
     Ls.position='absolute';
-    Ls.display='block'; //Ls.visibility='visible';
+    // Keep it hidden if not currently displayed.
+    if(this.activationModel.activate) {
+      Ls.display='block'; //Ls.visibility='visible';
+    }
     Ls.left='0px';
     if(this.specifiedPosition || this.userPositioned) {
       Ls.left = this.x+'px';

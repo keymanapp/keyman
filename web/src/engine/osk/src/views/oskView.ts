@@ -1067,7 +1067,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> {
    * @returns `false` if the OSK is in an invalid state for being hidden from the user.
    */
   protected mayHide(hiddenByUser: boolean): boolean {
-    if(!this.mayDisable) {
+    if(this.activationModel.conditionsMet && !this.mayDisable) {
       return false;
     }
 
