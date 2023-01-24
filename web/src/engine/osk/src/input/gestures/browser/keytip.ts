@@ -68,7 +68,7 @@ export default class KeyTip implements KeyTipInterface {
       let kts = this.element.style;
 
       // Roughly matches how the subkey positioning is set.
-      const _Box = vkbd.element.parentNode as HTMLDivElement;
+      const _Box = vkbd.topContainer as HTMLDivElement;
       const _BoxRect = _Box.getBoundingClientRect();
       const keyRect = key.getBoundingClientRect();
       let y = (keyRect.bottom - _BoxRect.top + 1);
@@ -80,13 +80,13 @@ export default class KeyTip implements KeyTipInterface {
       let canvasHeight = Math.ceil(2.3 * xHeight) + (ySubPixelPadding); //
 
       kts.top = 'auto';
-      kts.bottom = Math.floor(vkbd.height - y) + 'px';
+      kts.bottom = Math.floor(_BoxRect.height - y) + 'px';
       kts.textAlign = 'center';
       kts.overflow = 'visible';
       kts.width = canvasWidth+'px';
       kts.height = canvasHeight+'px';
 
-      const ckts = getComputedStyle(this.element);
+      const ckts = getComputedStyle(vkbd.element);
       kts.fontFamily = ckts.fontFamily;
 
       var px=parseInt(ckts.fontSize,10);
@@ -122,7 +122,7 @@ export default class KeyTip implements KeyTipInterface {
       kts.left=(xLeft - xOverflow) + 'px';
 
       let cs = getComputedStyle(this.element);
-      let oskHeight = vkbd.height;
+      let oskHeight = _BoxRect.height;
       let bottomY = parseFloat(cs.bottom);
       let tipHeight = parseFloat(cs.height);
       let halfHeight = Math.ceil(canvasHeight / 2);
