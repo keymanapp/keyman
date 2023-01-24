@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.34 alpha 2023-01-24
+
+* chore: merge beta to alpha, end of A17S4 (#8065)
+
 ## 17.0.33 alpha 2023-01-23
 
 * chore: Xcode 14.2 update (#8015)
