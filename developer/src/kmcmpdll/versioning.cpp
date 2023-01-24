@@ -12,7 +12,7 @@ BOOL CheckKeyboardFinalVersion(PFILE_KEYBOARD fk) {
     }
 
     wsprintf(buf, "The compiler has assigned a minimum engine version of %d.%d based on features used in this keyboard", (int)((fk->version & 0xFF00) >> 8), (int)(fk->version & 0xFF));
-    AddCompileWarning(buf);
+    AddCompileString(buf);
   }
 
   return TRUE;
