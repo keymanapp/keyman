@@ -48,7 +48,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
         if (DependencyUtil.libraryExists(LibraryType.SENTRY) && !Sentry.isEnabled()) {
             Log.d(TAG, "Initializing Sentry");
-            SentryAndroid.init(context, options -> {
+            SentryAndroid.init(getApplicationContext(), options -> {
                 options.setRelease(com.firstvoices.keyboards.BuildConfig.VERSION_GIT_TAG);
                 options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
             });
