@@ -1,5 +1,63 @@
 # Keyman Version History
 
+## 17.0.32 alpha 2023-01-20
+
+* fix(ios): use mobile mode for keyboard download pages (#8042)
+* docs(common/resources): Update configure step in Docker readme (#8034)
+* fix(linux): JSON File missing after installation (#8040)
+
+## 17.0.31 alpha 2023-01-19
+
+* chore: git tag with release@semver (#8035)
+* fix(linux): Properly set context after changing IP (#8026)
+* chore(linux): use faster zero-length string check (#8037)
+* chore(linux): log failures to `km_kbp_context_clear(context)` (#8036)
+* chore(linux): Update recommended extension (#8038)
+
+## 17.0.30 alpha 2023-01-17
+
+* chore(linux): Fix vertical alignment of label (#8016)
+* fix(common): update sentry release identifiers to support semver (#8031)
+
+## 17.0.29 alpha 2023-01-16
+
+* fix(linux): Fix crash (un-)installing shared keyboard (#8020)
+* chore(linux): Don't report KeyboardInterrupt to Sentry (#8021)
+* chore(linux): Update sample settings (#8018)
+* feat(linux): Enhance tab completion in km-package-install (#8005)
+
+## 17.0.28 alpha 2023-01-12
+
+* feat(linux): Display error messages in the UI (#8006)
+* bug(linux): Empty keyboard after failed installation (#8008)
+
+## 17.0.27 alpha 2023-01-11
+
+* chore(linux): Refactor completion script (#8002)
+
+## 17.0.26 alpha 2023-01-10
+
+* feat(linux): Add Back button to "Download Keyman Keyboards" dialog (#7994)
+* feat(linux): List fonts in the uninstall confirmation dialog (#7995)
+
+## 17.0.25 alpha 2023-01-09
+
+* chore(linux): Remove unnecessary variable (#7988)
+
+## 17.0.24 alpha 2023-01-06
+
+* chore(common/resources): Add Docker readme (#7980)
+
+## 17.0.23 alpha 2023-01-03
+
+* fix(linux): add IBUS_HAS_PREFILTER ifdef to linux/ibus-keyman/tests (#7958)
+* docs(linux): document fullbuild using docker (#7960)
+
+## 17.0.22 alpha 2023-01-02
+
+* chore: merge beta to master (A17S2) (#7948)
+* chore(linux): Remove unused JENKINS parameter (#7920)
+
 ## 17.0.21 alpha 2022-12-21
 
 * fix(windows): shutdown fix masked modal result (#7933)
@@ -95,6 +153,41 @@
 * feat(windows): configuration UI polish (#7206)
 * chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
+
+## 16.0.128 beta 2022-12-22
+
+* fix(developer): force ES3 code generation for LMs (#7927)
+
+## 16.0.127 beta 2022-12-21
+
+* fix(oem/fv/android): Fix keyboard version title (again) (#7941)
+* fix(oem/fv/android): Add view permission of online help (#7909)
+* fix(windows): modifer event is always serialized (#7935)
+
+## 16.0.126 beta 2022-12-21
+
+* fix(windows): shutdown fix masked modal result (#7932)
+
+## 16.0.125 beta 2022-12-19
+
+* fix(windows): no languages warning source changed (#7900)
+
+## 16.0.124 beta 2022-12-18
+
+* fix(oem/fv/android): Cleanup version title (#7908)
+
+## 16.0.123 beta 2022-12-17
+
+* fix(linux): Fix dependency of ibus-keyman (#7917)
+
+## 16.0.122 beta 2022-12-14
+
+* fix(windows): modify disable keyboard display (#7898)
+* fix(developer): invalid charmap cell selection when updating to empty search result (#7887)
+
+## 16.0.121 beta 2022-12-11
+
+* chore(linux): Fix `make install` (#7886)
 
 ## 16.0.120 beta 2022-12-07
 

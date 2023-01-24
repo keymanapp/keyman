@@ -59,7 +59,7 @@ if builder_start_action build; then
         static readonly VERSION_TAG = \"$VERSION_TAG\";
         static readonly VERSION_WITH_TAG = \"$VERSION_WITH_TAG\";
         static readonly VERSION_ENVIRONMENT = \"$VERSION_ENVIRONMENT\";
-        static readonly SENTRY_RELEASE = \"release-$VERSION_WITH_TAG\";
+        static readonly SENTRY_RELEASE = \"release@$VERSION_WITH_TAG\";
       }
     }
   " > ./version.inc.ts

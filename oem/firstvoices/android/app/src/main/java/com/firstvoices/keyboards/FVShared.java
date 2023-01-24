@@ -43,7 +43,7 @@ final class FVShared {
     private FVRegionList regionList;
     private FVLoadedKeyboardList loadedKeyboards;
 
-    private static final String FVKeyboardHelpLink = "http://help.keyman.com/keyboard/";
+    private static final String FVKeyboardHelpLink = "https://help.keyman.com/keyboard/";
 
     public static final String FVDefault_PackageID = "fv_all";
     public static final String TAG = "FVShared";

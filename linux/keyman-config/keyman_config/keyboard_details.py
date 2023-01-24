@@ -116,6 +116,7 @@ class KeyboardDetailsView(Gtk.Dialog):
             lbl_pkg_desc = Gtk.Label()
             lbl_pkg_desc.set_text(_("Package description:   "))
             lbl_pkg_desc.set_halign(Gtk.Align.END)
+            lbl_pkg_desc.set_valign(Gtk.Align.START)
             grid.attach_next_to(lbl_pkg_desc, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
             prevlabel = lbl_pkg_desc
             label = Gtk.Label()
@@ -125,28 +126,26 @@ class KeyboardDetailsView(Gtk.Dialog):
             label.set_line_wrap(80)
             grid.attach_next_to(label, lbl_pkg_desc, Gtk.PositionType.RIGHT, 1, 1)
 
-        if secure_lookup(info, "author"):
+        if secure_lookup(info, 'author', 'description'):
             lbl_pkg_auth = Gtk.Label()
             lbl_pkg_auth.set_text(_("Package author:   "))
             lbl_pkg_auth.set_halign(Gtk.Align.END)
             grid.attach_next_to(lbl_pkg_auth, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
             prevlabel = lbl_pkg_auth
             label = Gtk.Label()
-            if secure_lookup(info, 'author', 'description'):
-                label.set_text(secure_lookup(info, 'author', 'description'))
+            label.set_text(secure_lookup(info, 'author', 'description'))
             label.set_halign(Gtk.Align.START)
             label.set_selectable(True)
             grid.attach_next_to(label, lbl_pkg_auth, Gtk.PositionType.RIGHT, 1, 1)
 
-        if secure_lookup(info, "copyright"):
+        if secure_lookup(info, 'copyright', 'description'):
             lbl_pkg_cpy = Gtk.Label()
             lbl_pkg_cpy.set_text(_("Package copyright:   "))
             lbl_pkg_cpy.set_halign(Gtk.Align.END)
             grid.attach_next_to(lbl_pkg_cpy, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
             prevlabel = lbl_pkg_cpy
             label = Gtk.Label()
-            if secure_lookup(info, 'copyright', 'description'):
-                label.set_text(secure_lookup(info, 'copyright', 'description'))
+            label.set_text(secure_lookup(info, 'copyright', 'description'))
             label.set_halign(Gtk.Align.START)
             label.set_selectable(True)
             grid.attach_next_to(label, lbl_pkg_cpy, Gtk.PositionType.RIGHT, 1, 1)

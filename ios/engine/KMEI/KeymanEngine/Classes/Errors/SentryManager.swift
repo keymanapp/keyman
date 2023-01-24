@@ -35,7 +35,7 @@ public class SentryManager {
     let infoDict = Bundle(for: SentryManager.self).infoDictionary
     let versionWithTag = infoDict?["KeymanVersionWithTag"] as? String ?? ""
     let environment = infoDict?["KeymanVersionEnvironment"] as? String ?? ""
-    let release = "release-\(versionWithTag)"
+    let release = "release@\(versionWithTag)"
 
     let options = Sentry.Options()
     options.dsn = "https://d14d2efb594e4345b8367dbb61ebceaf@o1005580.ingest.sentry.io/5983521"
