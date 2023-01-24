@@ -973,6 +973,10 @@ export default abstract class OSKView extends EventEmitter<EventMap> {
     }
 
     this.setDisplayPositioning();
+
+    // Do this once all properties are set; that way, consumers can safely poll
+    // for position, size, etc.
+    this.emit('onshow');
   }
 
   /**
@@ -1282,7 +1286,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> {
    *
    */
   doShow(p) {
-    this.emit('onshow');
+    // Newer style 'doShow' emitted from .present by default.
     this.emit('legacyevent', 'osk.show', p);
   }
 
