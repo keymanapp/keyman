@@ -563,8 +563,12 @@ export default class FloatingOSKView extends OSKView {
     }
   }
 
-  ['show'](bShow: boolean) {
-    super['show'](bShow);
+  ['show'](bShow?: boolean) {
+    if(bShow !== undefined) {
+      super['show'](bShow);
+    } else {
+      super['show']();
+    }
     this.saveCookie();
   }
 

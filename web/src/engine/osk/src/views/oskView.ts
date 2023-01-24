@@ -470,7 +470,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> {
       return false;
     }
 
-    if(this.activeKeyboard.keyboard.isCJK) {
+    if(this.activeKeyboard?.keyboard.isCJK) {
       return false;
     }
 
@@ -674,7 +674,12 @@ export default abstract class OSKView extends EventEmitter<EventMap> {
       this._computedWidth  = this.width.val;
       this._computedHeight = this.height.val;
     } else if(isInDOM && hasDimensions) {
-      const parent = this._Box.offsetParent as HTMLElement;
+      // Note:  %-based auto-detect for dimensions currently has some issues; the stylesheets load
+      // asynchronously, causing the format to be VERY off before the stylesheets fully load.
+      //
+      // Depending on initial effects, changes to the OSK size could cause changes to the _parent_ size,
+      // too... so this potential bit likely needs something of a redesign.
+      const parent = this._Box.parentElement as HTMLElement;
       this._computedWidth  = this.width.val  * (this.width.absolute  ? 1 : parent.offsetWidth);
       this._computedHeight = this.height.val * (this.height.absolute ? 1 : parent.offsetHeight);
     } else if(!hasDimensions) {
