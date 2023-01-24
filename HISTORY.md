@@ -158,6 +158,27 @@
 * chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
 
+## 16.0.133 beta 2023-01-19
+
+* fix(linux): Properly set context after changing IP (#8025)
+
+## 16.0.132 beta 2023-01-18
+
+* docs(windows): update screenshots and documentation for Keyman for Windows config (#8014)
+
+## 16.0.131 beta 2023-01-16
+
+* chore(linux): Don't report KeyboardInterrupt to Sentry (#8022)
+* fix(linux): Fix crash (un-)installing shared keyboard (#8019)
+
+## 16.0.130 beta 2023-01-09
+
+* fix(windows): kmshell -ikl install language and enable keyboard (#7856)
+
+## 16.0.129 beta 2023-01-06
+
+* fix(android/engine): Add utility for localized strings (#7976)
+
 ## 16.0.128 beta 2022-12-22
 
 * fix(developer): force ES3 code generation for LMs (#7927)
