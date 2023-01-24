@@ -4,7 +4,7 @@ import { DeviceSpec } from '@keymanapp/web-utils/build/obj/index.js';
 import OSKView, { OSKPos, OSKRect } from './oskView.js';
 import VisualKeyboard from '../visualKeyboard.js';
 import Configuration from '../config/viewConfiguration.js';
-import { SimpleActivator } from './activator.js';
+import SimpleActivator from './simpleActivator.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 
 /*

@@ -29,7 +29,7 @@ export default abstract class Activator<ExtraEvents = void> extends EventEmitter
   abstract get conditionsMet(): boolean;
 }
 
-export class SimpleActivator extends Activator {
+export class StaticActivator extends Activator {
   get enabled(): boolean {
     return true;
   }

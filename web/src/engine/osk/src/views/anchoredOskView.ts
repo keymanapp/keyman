@@ -5,7 +5,7 @@ import OSKView, { OSKPos, OSKRect } from './oskView.js';
 import { getViewportScale } from '../screenUtils.js';
 import landscapeView from 'keyman/build/engine/dom-utils/obj/landscapeView.js';
 import Configuration from '../config/viewConfiguration.js';
-import { SimpleActivator } from './activator.js';
+import { StaticActivator } from './activator.js';
 import TwoStateActivator from './twoStateActivator.js';
 
 /***
@@ -29,7 +29,7 @@ export default class AnchoredOSKView extends OSKView {
 
   public constructor(config: Configuration) {
     if(config.isEmbedded) {
-      config.activator = config.activator || new SimpleActivator();
+      config.activator = config.activator || new StaticActivator();
     } else {
       config.activator = config.activator || new TwoStateActivator<HTMLElement>();
     }
