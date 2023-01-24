@@ -1750,7 +1750,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // First-level object/Promise:  will produce a subkey popup when the longpress gesture completes.
     // 'Returns' a second-level object/Promise:  resolves when a subkey is selected or is cancelled.
     let pendingLongpress = new InternalPendingLongpress(this, key);
-    pendingLongpress.promise.then(function (subkeyPopup) {
+    pendingLongpress.promise.then((subkeyPopup) => {
       // In-browser-specific handling.
       if (subkeyPopup) {
         // Append the touch-hold (subkey) array to the OSK
@@ -1820,7 +1820,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             // Allow active cancellation, even if the source should allow passive.
             // It's an easy and cheap null guard.
             if (keyEvent) {
-              this.raiseKeyEvent(keyEvent);
+              _this.raiseKeyEvent(keyEvent, null);
             }
             _this.clearPopup();
           });
