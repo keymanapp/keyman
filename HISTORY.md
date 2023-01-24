@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.33 alpha 2023-01-23
+
+* chore: Xcode 14.2 update (#8015)
+
 ## 17.0.32 alpha 2023-01-20
 
 * fix(ios): use mobile mode for keyboard download pages (#8042)
