@@ -1,5 +1,5 @@
 import Codes from "../text/codes.js";
-import KeyEvent from "../text/keyEvent.js";
+import KeyEvent, { KeyEventSpec } from "../text/keyEvent.js";
 import KeyMapping from "../text/keyMapping.js";
 import type { KeyDistribution } from "../text/keyEvent.js";
 import type { LayoutKey, LayoutRow, LayoutLayer, LayoutFormFactor, ButtonClass } from "./defaultLayouts.js";
@@ -247,8 +247,7 @@ export class ActiveKey implements LayoutKey {
     // Start:  mirrors _GetKeyEventProperties
 
     // First check the virtual key, and process shift, control, alt or function keys
-    let Lkc: KeyEvent = new KeyEvent();
-    let props = {
+    let props: KeyEventSpec = {
       // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
       Lmodifiers: Codes.getModifierState(layer),
       Lstates: Codes.getStateFromLayer(layer),
@@ -263,9 +262,7 @@ export class ActiveKey implements LayoutKey {
       isSynthetic: true
     };
 
-    for(let key in props) {
-      Lkc[key] = props[key];
-    }
+    let Lkc: KeyEvent = new KeyEvent(props);
 
     if(layout.keyboard) {
       let keyboard = layout.keyboard;

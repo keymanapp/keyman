@@ -9,7 +9,7 @@ import {
 } from "./index.js";
 
 import Keyboard from "@keymanapp/keyboard-processor/build/obj/keyboards/keyboard.js";
-import type KeyEvent from "@keymanapp/keyboard-processor/build/obj/text/keyEvent.js";
+import KeyEvent, { KeyEventSpec } from "@keymanapp/keyboard-processor/build/obj/text/keyEvent.js";
 import KeyboardProcessor from "@keymanapp/keyboard-processor/build/obj/text/keyboardProcessor.js";
 import type OutputTarget from "@keymanapp/keyboard-processor/build/obj/text/outputTarget.js";
 import { Mock } from "@keymanapp/keyboard-processor/build/obj/text/outputTarget.js";
@@ -64,7 +64,7 @@ export default class NodeProctor extends Proctor {
 
     if(sequence instanceof RecordedKeystrokeSequence) {
       for(let keystroke of sequence.inputs) {
-        let keyEvent: KeyEvent;
+        let keyEvent: KeyEventSpec;
         if(keystroke instanceof RecordedPhysicalKeystroke) {
           // Use the keystroke's stored data to reconstruct the KeyEvent.
           keyEvent = {
@@ -80,7 +80,7 @@ export default class NodeProctor extends Proctor {
           }
         } else if(keystroke instanceof RecordedSyntheticKeystroke) {
           let key = this.keyboard.layout(this.device.formFactor).getLayer(keystroke.layer).getKey(keystroke.keyName);
-          keyEvent = key.constructKeyEvent(processor, this.device);
+          keyEvent = this.keyboard.constructKeyEvent(key, this.device, processor.stateKeys);
         }
 
         // Fill in the final details of the KeyEvent...
@@ -90,7 +90,7 @@ export default class NodeProctor extends Proctor {
         // We don't care too much about particularities of per-keystroke behavior yet.
         // ... we _could_ if we wanted to, though.  The framework is mostly in place;
         // it's a matter of actually adding the feature.
-        let ruleBehavior = processor.processKeystroke(keyEvent, target);
+        let ruleBehavior = processor.processKeystroke(new KeyEvent(keyEvent), target);
 
         if(this.debugMode) {
           console.log(JSON.stringify(target, null, '  '));
