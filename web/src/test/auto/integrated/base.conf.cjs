@@ -6,7 +6,7 @@
 module.exports = {
   // base path that will be used to resolve all patterns (eg. files, exclude)
   // set to Keyman repo base.
-  basePath: '../../../..',
+  basePath: '../../../../..',
 
   // Safeguards against disconnecting after starting tests.
   browserNoActivityTimeout: 60000,
@@ -37,16 +37,16 @@ module.exports = {
 
   // list of files / patterns to load in the browser
   files: [
-    'web/src/test/auto/modernizr.js',               // A dependency-managed utility script that helps with browser feature detection.
+    'web/src/test/auto/integrated/modernizr.js',               // A dependency-managed utility script that helps with browser feature detection.
     // 'web/build/engine/element-wrappers/obj/index.bundled.js', // Defines com.keyman.dom objects separate from KMW for unit testing.
     // 'web/build/engine/device-detect/obj/index.bundled.js',    // Defines com.keyman.utils.Device, separated from KMW for use in unit test setup.
     // 'web/build/tools/testing/recorder/obj/index.js',         // The object definitions used to generate/replicate key events for engine tests.
                                                  // Includes KMW's Device class, which is used by test_utils below.
-    {pattern: 'web/src/test/auto/test_init_check.js', type: 'module'},         // Ensures that tests will initialize properly
+    {pattern: 'web/src/test/auto/integrated/test_init_check.js', type: 'module'},         // Ensures that tests will initialize properly
     'common/test/resources/timeout-adapter.js',  // Handles configuration timeout setup at runtime.
-    {pattern: 'web/src/test/auto/test_utils.js', type: 'module'},              // A basic utility script useful for constructing tests
+    {pattern: 'web/src/test/auto/integrated/test_utils.js', type: 'module'},              // A basic utility script useful for constructing tests
 
-    {pattern: 'web/src/test/auto/cases/**/*.js', type: 'module'},              // Where the tests actually reside.
+    {pattern: 'web/src/test/auto/integrated/cases/**/*.js', type: 'module'},              // Where the tests actually reside.
     'common/test/resources/json/**/*.json',      // Where pre-loaded JSON resides.
 
     {pattern: 'web/build/**/*.js',      watched: true, served: true, included: false}, // Includes all top-level KMW products
