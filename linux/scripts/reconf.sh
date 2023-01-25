@@ -86,6 +86,7 @@ for proj in ${extra_projects}; do
         sed \
             -e "s/_VERSION_/${VERSION}/g" \
             -e "s/_VERSIONWITHTAG_/${VERSION_WITH_TAG}/g" \
+            -e "s/_VERSIONGITTAG_/${VERSION_GIT_TAG}/g" \
             -e "s/_MAJORVERSION_/${VERSION_MAJOR}/g" \
             -e "s/_RELEASEVERSION_/${VERSION_RELEASE}/g" \
             -e "s/_TIER_/${TIER}/g" \

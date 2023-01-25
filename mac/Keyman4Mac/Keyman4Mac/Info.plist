@@ -42,6 +42,8 @@
 		<string>-alpha-local</string>
 		<key>VersionWithTag</key>
 		<string>$(PRODUCT_VERSION)-alpha-local</string>
+		<key>VersionGitTag</key>
+		<string>release@$(PRODUCT_VERSION)-alpha-local</string>
 		<key>VersionRelease</key>
 		<string>x.y</string>
 	</dict>
