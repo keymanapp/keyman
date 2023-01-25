@@ -16,10 +16,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 import com.tavultesoft.kmea.util.ContextUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import java.util.Locale;
 
 public class BaseActivity extends AppCompatActivity {
+  private static final String TAG = "BaseActivity";
   static ContextWrapper localeUpdatedContext;
 
   /**
@@ -47,6 +49,23 @@ public class BaseActivity extends AppCompatActivity {
     if (context != null) {
       Toast.makeText(context, msg, duration).show();
     }
+  }
+
+  /**
+   * Some classes aren't an AppCompatActivity and need this helper to retrieve localized Strings
+   * in the updated locale.
+   * @param defaultContext - the context to fallback if localUpdatedContext is null
+   * @param resID - the resource ID of the string
+   * @return String - localized string
+   */
+  public static String getString(Context defaultContext, int resID) {
+    Context context = (localeUpdatedContext != null) ? localeUpdatedContext : defaultContext;
+    if (context != null) {
+      return context.getString(resID);
+    };
+    // Shouldn't be here
+    KMLog.LogError(TAG, "context null for getString()");
+    return "";
   }
 
   @Override
