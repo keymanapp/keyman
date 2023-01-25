@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.35 alpha 2023-01-25
+
+* chore(common): revise tag variable name to VERSION_GIT_TAG (#8063)
+* chore(common): Add crowdin strings for Czech (#8070)
+* feat(linux): Improve uninstallation (#8011)
+
 ## 17.0.34 alpha 2023-01-24
 
 * chore: merge beta to alpha, end of A17S4 (#8065)
