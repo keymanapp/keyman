@@ -6,8 +6,15 @@ export interface KeyboardFont {
   'path': string;
 }
 
+// Filename properties are deliberately omitted here; we can add that at higher-levels where it matters
+// via 'mix-in'.
+//
+// For example, the OSK module doesn't care about the filename of a loaded keyboard.  It doesn't do
+// keyboard loading on its own whatsoever.
+
 // Corresponds to Keyman Engine for Web's internal "keyboard stub" format.
 export type KeyboardInternalPropertySpec = {
+  KI: string,
   'KFont': KeyboardFont,
   'KOskFont': KeyboardFont,
   displayName?: string,
@@ -16,17 +23,37 @@ export type KeyboardInternalPropertySpec = {
   'KLC'?: string
 };
 
-// Corresponds to the documented API for the Web engine's `addKeyboards` function
-// when a single language object is specified - not an array.
+export type LanguageAPIPropertySpec = {
+  id: string,
+  name: string,
+  font: KeyboardFont,
+  oskFont: KeyboardFont
+}
+
+/**
+ * Corresponds to the documented API for the Web engine's `addKeyboards` function
+ * when a single language object is specified - not an array.
+ *
+ * See https://help.keyman.com/DEVELOPER/ENGINE/WEB/15.0/reference/core/addKeyboards,
+ * "Using an `object`".
+ */
 export type KeyboardAPIPropertySpec = {
   id: string,
   name: string,
-  languages: {
-    id: string,
-    name: string,
-    font: KeyboardFont,
-    oskFont: KeyboardFont
-  }
+  languages: LanguageAPIPropertySpec;
+}
+
+/**
+ * Corresponds to the documented API for the Web engine's `addKeyboards` function
+ * when a language array is specified for the object.
+ *
+ * See https://help.keyman.com/DEVELOPER/ENGINE/WEB/15.0/reference/core/addKeyboards,
+ * "Using an `object`".
+ */
+export type KeyboardAPIPropertyMultilangSpec = {
+  id: string,
+  name: string,
+  languages: LanguageAPIPropertySpec[];
 }
 
 type MetadataObj = KeyboardInternalPropertySpec | KeyboardAPIPropertySpec;
@@ -50,6 +77,7 @@ export default class KeyboardProperties {
       } else {
         let apiStub = arg1 as KeyboardAPIPropertySpec;
         this.wrappedStub = {
+          KI: apiStub.id,
           KN: apiStub.name,
           KL: apiStub.languages.name,
           KLC: apiStub.languages.id,
@@ -60,12 +88,45 @@ export default class KeyboardProperties {
       }
     } else {
       this.wrappedStub = {
+        KI: null,
         displayName: arg1,
         'KLC': arg2,
         'KFont': arg3,
         'KOskFont': arg4 || arg3
       }
     }
+  }
+
+  public static fromMultilanguageAPIStub(apiStub: KeyboardAPIPropertyMultilangSpec, spacebarTextMode?: SpacebarText): KeyboardProperties[] {
+    let stubs: KeyboardProperties[] = [];
+
+    for(let langSpec of apiStub.languages) {
+      let stub: KeyboardAPIPropertySpec = {
+        id: apiStub.id,
+        name: apiStub.name,
+        languages: langSpec
+      };
+
+      stubs.push(new KeyboardProperties(stub, spacebarTextMode));
+    }
+
+    return stubs;
+  }
+
+  public get id(): string {
+    return this.wrappedStub.KI;
+  }
+
+  public get name(): string {
+    return this.wrappedStub.KN;
+  }
+
+  public get langId(): string {
+    return this.wrappedStub.KLC;
+  }
+
+  public get langName(): string {
+    return this.wrappedStub.KL;
   }
 
   public get displayName(): string {
