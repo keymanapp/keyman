@@ -2,7 +2,7 @@
 import unittest
 from unittest.mock import patch
 
-from keyman_config.uninstall_kmp import uninstall_keyboards_from_gnome
+from keyman_config.uninstall_kmp import _uninstall_keyboards_from_gnome
 
 
 class UninstallKmpTests(unittest.TestCase):
@@ -17,7 +17,7 @@ class UninstallKmpTests(unittest.TestCase):
         mockGnomeKeyboardsUtilInstance = self.mockGnomeKeyboardsUtilClass.return_value
         mockGnomeKeyboardsUtilInstance.read_input_sources.return_value = []
         # Execute
-        uninstall_keyboards_from_gnome([{'id': 'foo1'}], 'fooDir')
+        _uninstall_keyboards_from_gnome([{'id': 'foo1'}], 'fooDir')
         # Verify
         mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with([])
 
@@ -27,7 +27,7 @@ class UninstallKmpTests(unittest.TestCase):
         mockGnomeKeyboardsUtilInstance.read_input_sources.return_value = [
           ('ibus', 'fooDir/foo2.kmx')]
         # Execute
-        uninstall_keyboards_from_gnome([{'id': 'foo1'}], 'fooDir')
+        _uninstall_keyboards_from_gnome([{'id': 'foo1'}], 'fooDir')
         # Verify
         mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with([
           ('ibus', 'fooDir/foo2.kmx')])
@@ -38,7 +38,7 @@ class UninstallKmpTests(unittest.TestCase):
         mockGnomeKeyboardsUtilInstance.read_input_sources.return_value = [
           ('xkb', 'en'), ('ibus', 'fooDir/foo1.kmx')]
         # Execute
-        uninstall_keyboards_from_gnome([{'id': 'foo1'}], 'fooDir')
+        _uninstall_keyboards_from_gnome([{'id': 'foo1'}], 'fooDir')
         # Verify
         mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with(
           [('xkb', 'en')])
@@ -49,7 +49,7 @@ class UninstallKmpTests(unittest.TestCase):
         mockGnomeKeyboardsUtilInstance.read_input_sources.return_value = [
           ('xkb', 'en'), ('ibus', 'fooDir/foo1.kmx'), ('ibus', 'fooDir/foo2.kmx')]
         # Execute
-        uninstall_keyboards_from_gnome([{'id': 'foo1'}, {'id': 'foo2'}], 'fooDir')
+        _uninstall_keyboards_from_gnome([{'id': 'foo1'}, {'id': 'foo2'}], 'fooDir')
         # Verify
         mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with(
           [('xkb', 'en')])
@@ -60,7 +60,7 @@ class UninstallKmpTests(unittest.TestCase):
         mockGnomeKeyboardsUtilInstance.read_input_sources.return_value = [
           ('ibus', 'fooDir/foo1.kmx'), ('ibus', 'fooDir/foo2.kmx')]
         # Execute
-        uninstall_keyboards_from_gnome([{'id': 'foo1'}, {'id': 'foo2'}], 'fooDir')
+        _uninstall_keyboards_from_gnome([{'id': 'foo1'}, {'id': 'foo2'}], 'fooDir')
         # Verify
         mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with([])
 
@@ -70,7 +70,7 @@ class UninstallKmpTests(unittest.TestCase):
         mockGnomeKeyboardsUtilInstance.read_input_sources.return_value = [
           ('xkb', 'en'), ('ibus', 'en:fooDir/foo1.kmx')]
         # Execute
-        uninstall_keyboards_from_gnome([{'id': 'foo1', 'languages': [{'id': 'en'}]}], 'fooDir')
+        _uninstall_keyboards_from_gnome([{'id': 'foo1', 'languages': [{'id': 'en'}]}], 'fooDir')
         # Verify
         mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with(
           [('xkb', 'en')])
@@ -81,7 +81,7 @@ class UninstallKmpTests(unittest.TestCase):
         mockGnomeKeyboardsUtilInstance.read_input_sources.return_value = [
           ('xkb', 'en'), ('ibus', 'fr:fooDir/foo1.kmx')]
         # Execute
-        uninstall_keyboards_from_gnome(
+        _uninstall_keyboards_from_gnome(
           [{'id': 'foo1', 'languages': [{'id': 'en'}, {'id': 'fr'}]}], 'fooDir')
         # Verify
         mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with(
@@ -93,7 +93,7 @@ class UninstallKmpTests(unittest.TestCase):
         mockGnomeKeyboardsUtilInstance.read_input_sources.return_value = [
           ('xkb', 'en'), ('ibus', 'en:fooDir/foo1.kmx')]
         # Execute
-        uninstall_keyboards_from_gnome(
+        _uninstall_keyboards_from_gnome(
           [{'id': 'foo1', 'languages': [{'id': 'fr'}]}], 'fooDir')
         # Verify
         mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with(
@@ -105,7 +105,7 @@ class UninstallKmpTests(unittest.TestCase):
         mockGnomeKeyboardsUtilInstance.read_input_sources.return_value = [
           ('xkb', 'en'), ('ibus', 'en:fooDir/foo1.kmx'), ('ibus', 'fr:fooDir/foo1.kmx')]
         # Execute
-        uninstall_keyboards_from_gnome(
+        _uninstall_keyboards_from_gnome(
           [{'id': 'foo1', 'languages': [{'id': 'fr'}]}], 'fooDir')
         # Verify
         mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with(
