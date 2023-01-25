@@ -50,6 +50,7 @@ public class DisplayLanguages {
       new DisplayLanguageType("in-ID", "Indonesian"),
       new DisplayLanguageType("it-IT", "Italiana"),
       new DisplayLanguageType("de-DE", "German"),
+      new DisplayLanguageType("kn-IN", "ಕನ್ನಡ (Kannada)"),
       new DisplayLanguageType("kr-NG", "Kanuri"),
       new DisplayLanguageType("km-KH", "Khmer"),
       new DisplayLanguageType("ckl-NG", "Kibaku"),
