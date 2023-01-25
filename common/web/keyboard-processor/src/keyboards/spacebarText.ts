@@ -1,4 +1,4 @@
-enum SpacebarText {
+const enum SpacebarText {
   KEYBOARD = 'keyboard',
   LANGUAGE = 'language',
   LANGUAGE_KEYBOARD = 'languageKeyboard',

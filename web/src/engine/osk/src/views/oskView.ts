@@ -11,6 +11,7 @@ import { LengthStyle, ParsedLengthStyle } from '../lengthStyle.js';
 
 import DeviceSpec from '@keymanapp/web-utils/build/obj/deviceSpec.js';
 import Keyboard from '@keymanapp/keyboard-processor/build/obj/keyboards/keyboard.js';
+import KeyboardProperties from '@keymanapp/keyboard-processor/build/obj/keyboards/keyboardProperties.js';
 
 import { getAbsoluteX, getAbsoluteY } from 'keyman/build/engine/dom-utils/obj/getAbsolute.js';
 import createUnselectableElement from 'keyman/build/engine/dom-utils/obj/createUnselectableElement.js';
@@ -18,7 +19,6 @@ import KeyEvent from '@keymanapp/keyboard-processor/build/obj/text/keyEvent.js';
 import TitleBar from '../components/titleBar.js';
 import { StylesheetManager } from 'keyman/build/engine/dom-utils/obj/stylesheets.js';
 import Configuration from '../config/viewConfiguration.js';
-import KeyboardProperties from '../keyboardProperties.js';
 import Activator from './activator.js';
 import ManagedPromise from '../managedPromise.js';
 import TouchEventPromiseMap from './touchEventPromiseMap.js';

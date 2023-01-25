@@ -24,15 +24,14 @@ import OSKLayerGroup from './keyboard-layout/oskLayerGroup.js';
 import { LengthStyle, ParsedLengthStyle } from './lengthStyle.js';
 import PendingGesture from './input/gestures/pendingGesture.interface.js';
 import RealizedGesture from './input/gestures/realizedGesture.interface.js';
-import SpacebarText from './spacebarText.js';
 import { getAbsoluteX, getAbsoluteY } from 'keyman/build/engine/dom-utils/obj/getAbsolute.js';
 import { defaultFontSize, getFontSizeStyle } from './fontSizeUtils.js';
 import PendingMultiTap, { PendingMultiTapState } from './input/gestures/browser/pendingMultiTap.js';
 import InternalSubkeyPopup from './input/gestures/browser/subkeyPopup.js';
 import InternalPendingLongpress from './input/gestures/browser/pendingLongpress.js';
 import InternalKeyTip from './input/gestures/browser/keytip.js';
-import KeyboardProperties from './keyboardProperties.js';
 import CommonConfiguration from './config/commonConfiguration.js';
+import KeyboardProperties from '@keymanapp/keyboard-processor/build/obj/keyboards/keyboardProperties.js';
 import StateKeyMap from '@keymanapp/keyboard-processor/build/obj/keyboards/stateKeyMap.js';
 
 import { getViewportScale } from './screenUtils.js';

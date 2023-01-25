@@ -2,12 +2,12 @@ import EventEmitter from 'eventemitter3';
 
 import DeviceSpec from '@keymanapp/web-utils/build/obj/deviceSpec.js';
 import Keyboard from '@keymanapp/keyboard-processor/build/obj/keyboards/keyboard.js';
+import KeyboardProperties from '@keymanapp/keyboard-processor/build/obj/keyboards/keyboardProperties.js';
 import type PredictionContext from '@keymanapp/input-processor/build/obj/text/prediction/predictionContext.js';
 import InputEventEngine, { InputEventEngineConfig } from '../input/event-interpreter/inputEventEngine.js';
 import MouseEventEngine from '../input/event-interpreter/mouseEventEngine.js';
 import TouchEventEngine from '../input/event-interpreter/touchEventEngine.js';
 import UITouchHandlerBase from '../input/event-interpreter/uiTouchHandlerBase.js';
-import KeyboardProperties from '../keyboardProperties.js';
 
 import createUnselectableElement from 'keyman/build/engine/dom-utils/obj/createUnselectableElement.js';
 
