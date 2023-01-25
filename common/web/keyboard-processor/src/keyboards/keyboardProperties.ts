@@ -33,7 +33,8 @@ type MetadataObj = KeyboardInternalPropertySpec | KeyboardAPIPropertySpec;
 
 export default class KeyboardProperties {
   /**
-   * Designed to match, hold, and correspond to an instance of KeyboardStub, a class external to this module.
+   * Designed to match, hold, and correspond to an instance of KeyboardStub, a class external to this module
+   * - it's defined within the main Keyman Engine for Web top-level project.
    */
   private readonly wrappedStub: KeyboardInternalPropertySpec;
 
