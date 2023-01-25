@@ -21,6 +21,17 @@ export default class LDMLKeyboardXMLSourceFileReader {
     boxXmlArray(source?.keyboard?.displays, 'display');
     boxXmlArray(source?.keyboard?.names, 'name');
     boxXmlArray(source?.keyboard?.vkeys, 'vkey');
+    // for implied we need keyboard.keys.import to exist.
+    if (!source?.keyboard?.keys) {
+      source.keyboard.keys = {
+        import:[],
+        key:[],
+        flicks:[],
+      };
+    }
+    if (!source?.keyboard?.keys?.import) {
+      source.keyboard.keys.import = [];
+    }
     boxXmlArray(source?.keyboard?.keys, 'key');
     boxXmlArray(source?.keyboard?.keys, 'flicks');
     boxXmlArray(source?.keyboard?.locales, 'locale');
@@ -82,42 +93,52 @@ export default class LDMLKeyboardXMLSourceFileReader {
   }
 
   private resolveImports(obj: any, subtag: string) {
+    // first, the implied imports
+    if (subtag === 'keys') {
+      // <import base="cldr" path="techpreview/keys-Latn-implied.xml"/>
+      this.resolveOneImport(obj, subtag, {
+        base: 'cldr',
+        path: 'techpreview/keys-Latn-implied.xml'
+      });
+    }
+
+    // now, the explicit imports
     for (const anImport /* : LKImport */ of obj['import']) {
       const asImport: LKImport = anImport;
-      if (asImport.base !== 'cldr') {
-        throw new Error(`import element with base ${asImport.base} is unsupported.`);
-      }
-      const paths = asImport.path.split('/');
-      if (!paths[0] || !paths[1] || paths.length !== 2) {
-        throw new Error(`import element with invalid path ${asImport.path}: expect the form 'techpreview/*.xml'`);
-      }
-      const importData : Uint8Array = this.readImportFile(paths[0], paths[1]);
-      if (!importData || !importData.length) {
-        throw new Error(`could not read data with path ${asImport.path}: expect the form 'techpreview/*.xml'`);
-      }
-      const importXml : any = this.loadUnboxed(importData); // TODO-LDML: have to load as any because it is an arbitrary part
-      const importRootNode = importXml[subtag]; // e.g. keys
+      this.resolveOneImport(obj, subtag, asImport);
+    }
+  }
 
-      // importXml will have one property: the root element.
-      if (!importRootNode) {
-        throw new Error(`Invalid import file ${asImport.path}: expected ${subtag} as root element`);
+  private resolveOneImport(obj: any, subtag: string, asImport: LKImport) {
+    if (asImport.base !== 'cldr') {
+      throw new Error(`import element with base ${asImport.base} is unsupported.`);
+    }
+    const paths = asImport.path.split('/');
+    if (!paths[0] || !paths[1] || paths.length !== 2) {
+      throw new Error(`import element with invalid path ${asImport.path}: expect the form 'techpreview/*.xml'`);
+    }
+    const importData: Uint8Array = this.readImportFile(paths[0], paths[1]);
+    if (!importData || !importData.length) {
+      throw new Error(`could not read data with path ${asImport.path}: expect the form 'techpreview/*.xml'`);
+    }
+    const importXml: any = this.loadUnboxed(importData); // TODO-LDML: have to load as any because it is an arbitrary part
+    const importRootNode = importXml[subtag]; // e.g. keys
+
+    // importXml will have one property: the root element.
+    if (!importRootNode) {
+      throw new Error(`Invalid import file ${asImport.path}: expected ${subtag} as root element`);
+    }
+    // pull all children of importXml[subtag] into obj
+    for (const subsubtag of Object.keys(importRootNode)) { // e.g. key
+      const subsubval = importRootNode[subsubtag];
+      if (!Array.isArray(subsubval)) {
+        throw new Error(`Problem importing ${asImport.path}: not sure how to handle non-array ${subtag}.${subsubtag}`);
       }
-      // pull all children of importXml[subtag] into obj
-      for (const subsubtag of Object.keys(importRootNode)) { // e.g. key
-        const subsubval = importRootNode[subsubtag];
-        if (!Array.isArray(subsubval)) {
-          throw new Error(`Problem importing ${asImport.path}: not sure how to handle non-array ${subtag}.${subsubtag}`);
-        }
-        if (!obj[subsubtag]) {
-          // TODO-LDML: this probably should be an error if this doesn't exist
-          obj[subsubtag] = []; // start with empty array
-        }
-        for (const child of subsubval) {
-          // TODO-LDML: given xml2js parsing, can we even preserve the ordering?
-          // Should *replace* duplicate elements here and not just append.
-          obj[subsubtag].push(child);
-        }
+      if (!obj[subsubtag]) {
+        // TODO-LDML: this probably should be an error if this doesn't exist
+        obj[subsubtag] = []; // start with empty array
       }
+      obj[subsubtag] = [...subsubval, ...obj[subsubtag]];
     }
   }
 

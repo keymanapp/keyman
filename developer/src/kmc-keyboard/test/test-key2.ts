@@ -30,7 +30,7 @@ describe('key2', function () {
     const [q] = key2.keys.filter(({ id }) => id.value === 'q');
     assert.ok(q);
     assert.isFalse(!!(q.flags & constants.key2_key_flags_gap));
-    assert.equal(q.width, 32); // ceil(3.1 * 10)
+    assert.equal(q.width, 32, 'q’s width'); // ceil(3.14159 * 10.0)
     assert.equal(q.flicks, 'flick0'); // note this is a string, not a StrsItem
 
     const [flick0] = key2.flicks.filter(({ id }) => id.value === 'flick0');
@@ -54,7 +54,7 @@ describe('key2', function () {
 
     const [Qgap] = key2.keys.filter(({ id }) => id.value === 'Q');
     assert.ok(Qgap);
-    assert.isTrue(!!(Qgap.flags & constants.key2_key_flags_gap));
+    assert.isTrue(!!(Qgap.flags & constants.key2_key_flags_gap), 'Q’s gap=');
 
     const [Wshift] = key2.keys.filter(({ id }) => id.value === 'W');
     assert.isNotNull(Wshift);

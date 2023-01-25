@@ -14,6 +14,19 @@ export class KeysCompiler extends SectionCompiler {
   }
 
   private validateHardwareLayer(layer: LDMLKeyboard.LKLayer) {
+    // TODO-LDML factor common code
+    // Need 'newer' (later) keys to override older ones.
+    const reverseKeys = [...this.keyboard.keys?.key].reverse(); // newest to oldest
+    const alreadySeen = new Set<string>();
+    // filter out only the keys that haven't already been seen
+    const uniqueKeys = reverseKeys.filter(({id}) => {
+      if (!alreadySeen.has(id)) {
+        alreadySeen.add(id);
+        return true;
+      }
+      return false;
+    });
+
     let valid = true;
     if(layer.row.length > USVirtualKeyMap.length) {
       this.callbacks.reportMessage(CompilerMessages.Error_HardwareLayerHasTooManyRows());
@@ -32,7 +45,7 @@ export class KeysCompiler extends SectionCompiler {
       for(let key of keys) {
         x++;
 
-        let keydef = this.keyboard.keys?.key?.find(x => x.id == key);
+        let keydef = uniqueKeys.find(x => x.id == key);
         if(!keydef) {
           this.callbacks.reportMessage(CompilerMessages.Error_KeyNotFoundInKeyBag({keyId: key, col: x+1, row: y+1, layer: layer.id, form: 'hardware'}));
           valid = false;

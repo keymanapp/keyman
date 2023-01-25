@@ -21,9 +21,30 @@ export class Key2Compiler extends SectionCompiler {
     return valid;
   }
 
+  /**
+   * Return a set of all used keys
+   * public for test
+   */
+  public allUsedKeyIds(): Set<string> {
+    const s = new Set<string>();
+    if (this.keyboard?.layers) {
+      for (const layers of this.keyboard.layers || []) {
+        for (const layer of layers.layer || []) {
+          for (const row of layer.row || []) {
+            if (row.keys) {
+              for (const k of row.keys.split(" ")) {
+                s.add(k);
+              }
+            }
+          }
+        }
+      }
+    }
+    return s;
+  }
 
   public compile(sections: GlobalSections): Key2 {
-    if (!this.keyboard.keys.key && !this.keyboard.keys.flicks) {
+    if (!this.keyboard?.keys?.key && !this.keyboard?.keys?.flicks) {
       // short-circuit if no keys or flicks
       return null;
     }
@@ -60,7 +81,25 @@ export class Key2Compiler extends SectionCompiler {
   }
 
   public loadKeys(sections: GlobalSections, sect: Key2) {
-    for (let key of this.keyboard.keys.key) {
+    const usedKeys = this.allUsedKeyIds();
+
+    // TODO-LDML factor common code
+    // Need 'newer' (later) keys to override older ones.
+    const reverseKeys = [...this.keyboard.keys.key].reverse(); // newest to oldest
+    const alreadySeen = new Set<string>();
+    // filter out only the keys that haven't already been seen
+    const uniqueKeys = reverseKeys.filter(({id}) => {
+      if (!alreadySeen.has(id)) {
+        alreadySeen.add(id);
+        return true;
+      }
+      return false;
+    });
+
+    for (let key of uniqueKeys) {
+      if (!usedKeys.has(key.id)) {
+        continue; // unused key, skip
+      }
       let flags = 0;
       const flicks = key.flicks;
       // TODO-LDML: verify that this flick id exists
