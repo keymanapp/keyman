@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="ssLanguageName" comment="User interface language name in the UI language">Russian</string>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Pyccĸий</string>
   <string name="ssApplicationTitle">Настройки $APPNAME $VERSION</string>
   <string name="ssTitle">Установить $APPNAME $VERSION</string>
   <string name="ssInstallSuccess">$APPNAME $VERSION успешно установлен.</string>
@@ -74,7 +74,5 @@
   <string name="ssDownloadingText">Загрузка %0:s</string>
   <string name="ssOffline">$APPNAME Не удалось подключиться к keyman.com для загрузки дополнительных ресурсов.
 
-Пожалуйста, проверьте, что вы онлайн, и предоставьте $APPNAME установить разрешение на доступ к Интернету в настройках брандмауэра.
-
-Нажмите кнопку \"Прервать\" для выхода из настройки. Повторите попытку и загрузите ресурсы снова, или \"Игнорируйте\", чтобы продолжить в автономном режиме.</string>
+Пожалуйста, проверьте, что вы онлайн, и предоставьте $APPNAME установить разрешение на доступ к Интернету в настройках брандмауэра.</string>
 </resources>
