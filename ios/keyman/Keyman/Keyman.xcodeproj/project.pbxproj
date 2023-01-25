@@ -205,6 +205,7 @@
 		16A9229D20325253003CC98E /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Keyman/Info.plist; sourceTree = SOURCE_ROOT; };
 		293EA3E027059C6900545EED /* ha */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ha; path = ha.lproj/Localizable.strings; sourceTree = "<group>"; };
 		294914742738DF7700400732 /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		298566C42980C493004ACA95 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29B27FEE29062BBC0036917E /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29BFA75D282931F8009FCCC3 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29BFA769282946EC009FCCC3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -794,6 +795,7 @@
 				it,
 				pl,
 				nl,
+				sv,
 			);
 			mainGroup = 98ABADA7176935E400B62590;
 			productRefGroup = 98ABADB1176935E400B62590 /* Products */;
@@ -1101,6 +1103,7 @@
 				29BFA75D282931F8009FCCC3 /* it */,
 				29BFA769282946EC009FCCC3 /* pl */,
 				29B27FEE29062BBC0036917E /* nl */,
+				298566C42980C493004ACA95 /* sv */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
