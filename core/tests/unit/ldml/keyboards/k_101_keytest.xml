@@ -14,11 +14,7 @@
   </names>
 
   <keys>
-    <!-- TODO-LDML: this next import is implied and should not need to be explicitly here. #7534 -->
-    <import base="cldr" path="techpreview/keys-Latn-implied.xml" />
-    <!-- This import has the following contents of interest:
-       <key id="a" to="a" />
-    -->
+    <!-- no keys listed -- keys-Latn-implied.xml will be implicitly imported -->
   </keys>
 
   <layers form="hardware">
