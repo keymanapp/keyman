@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.134 beta 2023-01-25
+
+* chore(common): Add crowdin strings for Kannada (#7970)
+
 ## 16.0.133 beta 2023-01-19
 
 * fix(linux): Properly set context after changing IP (#8025)
