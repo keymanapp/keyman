@@ -160,6 +160,12 @@
 		297A501428DF4D360074EB1B /* PrivacyConsent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrivacyConsent.h; sourceTree = "<group>"; };
 		297A501528DF4D360074EB1B /* PrivacyWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrivacyWindowController.h; sourceTree = "<group>"; };
 		297A501628DF4D360074EB1B /* PrivacyConsent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrivacyConsent.m; sourceTree = "<group>"; };
+		298566BC29802962004ACA95 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/KMAboutWindowController.strings; sourceTree = "<group>"; };
+		298566BD29802963004ACA95 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/preferences.strings; sourceTree = "<group>"; };
+		298566BE29802963004ACA95 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/KMInfoWindowController.strings; sourceTree = "<group>"; };
+		298566BF29802963004ACA95 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/KMKeyboardHelpWindowController.strings; sourceTree = "<group>"; };
+		298566C029802963004ACA95 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		298566C129802970004ACA95 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Localizable.strings; sourceTree = "<group>"; };
 		299B5E1E29126CA20070841D /* keyman-icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyman-icon@2x.png"; sourceTree = "<group>"; };
 		299B5E1F29126CA20070841D /* keyman-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyman-icon.png"; sourceTree = "<group>"; };
 		29A4730527E9D6D500DE07C7 /* ha */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ha; path = ha.lproj/KMAboutWindowController.strings; sourceTree = "<group>"; };
@@ -754,6 +760,7 @@
 				nl,
 				"zh-Hans",
 				"ff-NG",
+				cs,
 				kn,
 			);
 			mainGroup = 989C9BFF1A7876DE00A20425;
@@ -1002,6 +1009,7 @@
 				29B27FF229062FF50036917E /* nl */,
 				29B6BB5B292239B4008F04BD /* zh-Hans */,
 				2901BA8A292332B3009903EC /* ff-NG */,
+				298566BC29802962004ACA95 /* cs */,
 				29781101297FB262007C886D /* kn */,
 			);
 			name = KMAboutWindowController.xib;
@@ -1023,6 +1031,7 @@
 				29B27FF329062FF50036917E /* nl */,
 				29B6BB5C292239B4008F04BD /* zh-Hans */,
 				2901BA8B292332B3009903EC /* ff-NG */,
+				298566BD29802963004ACA95 /* cs */,
 				29781102297FB262007C886D /* kn */,
 			);
 			name = preferences.xib;
@@ -1044,6 +1053,7 @@
 				29B27FF7290630170036917E /* nl */,
 				29B6BB60292239DC008F04BD /* zh-Hans */,
 				2901BA8F292332CF009903EC /* ff-NG */,
+				298566C129802970004ACA95 /* cs */,
 				29781106297FB27E007C886D /* kn */,
 			);
 			name = Localizable.strings;
@@ -1065,6 +1075,7 @@
 				29B27FF429062FF50036917E /* nl */,
 				29B6BB5D292239B4008F04BD /* zh-Hans */,
 				2901BA8C292332B3009903EC /* ff-NG */,
+				298566BE29802963004ACA95 /* cs */,
 				29781103297FB263007C886D /* kn */,
 			);
 			name = KMInfoWindowController.xib;
@@ -1087,6 +1098,7 @@
 				29B27FF529062FF60036917E /* nl */,
 				29B6BB5E292239B4008F04BD /* zh-Hans */,
 				2901BA8D292332B3009903EC /* ff-NG */,
+				298566BF29802963004ACA95 /* cs */,
 				29781104297FB263007C886D /* kn */,
 			);
 			name = KMKeyboardHelpWindowController.xib;
@@ -1109,6 +1121,7 @@
 				29B27FF629062FF60036917E /* nl */,
 				29B6BB5F292239B4008F04BD /* zh-Hans */,
 				2901BA8E292332B4009903EC /* ff-NG */,
+				298566C029802963004ACA95 /* cs */,
 				29781105297FB263007C886D /* kn */,
 			);
 			name = MainMenu.xib;
