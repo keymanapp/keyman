@@ -22,7 +22,7 @@ from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-ke
     <key id="a" to="a" />
   </keys>
 
-  <layers form="hardware">
+  <layers form="hardware" hardware="us">
     <layer id="base">
       <row keys="a gap"/>
     </layer>

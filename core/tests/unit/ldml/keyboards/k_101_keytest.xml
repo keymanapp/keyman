@@ -14,10 +14,10 @@
   </names>
 
   <keys>
-    <!-- no keys listed -- keys-Latn-implied.xml will be implicitly imported -->
+    <!-- no keys listed, keys-Latn-implied.xml will be implicitly imported -->
   </keys>
 
-  <layers form="hardware">
+  <layers form="hardware" hardware="us">
     <layer id="base">
       <row keys="a" /> <!-- number row -->
     </layer>
