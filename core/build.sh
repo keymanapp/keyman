@@ -160,7 +160,7 @@ displayInfo "" \
     ""
 
 clean() {
-  rm -rf "$TARGET_PATH/"
+  rm -rf "${TARGET_PATH:?}/"
 }
 
 path_remove() {
