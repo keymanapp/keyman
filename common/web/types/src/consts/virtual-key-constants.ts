@@ -136,8 +136,27 @@ export const USVirtualKeyMap: number[][] = [
   [ k.K_Q, k.K_W, k.K_E, k.K_R, k.K_T, k.K_Y, k.K_U, k.K_I, k.K_O, k.K_P, k.K_LBRKT, k.K_RBRKT, k.K_BKSLASH ],
   // [caps] A S D F G H J K L ; ' [enter]
   [ k.K_A, k.K_S, k.K_D, k.K_F, k.K_G, k.K_H, k.K_J, k.K_K, k.K_L, k.K_COLON, k.K_QUOTE ],
+  // [shift] Z X C V B N M , . / [shift] *=oE2
+  [ k.K_Z, k.K_X, k.K_C, k.K_V, k.K_B, k.K_N, k.K_M, k.K_COMMA, k.K_PERIOD, k.K_SLASH ],
+  // space
+  [ k.K_SPACE ],
+];
+
+/**
+ * TODO-LDML: WIP ISO layout for #7965
+ * May not be correct to use US codes?
+ */
+export const ISOVirtualKeyMap: number[][] = [
+  // ` 1 2 3 4 5 6 7 8 9 0 - = [bksp]
+  [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL ],
+  // [tab] Q W E R T Y U I O P [ ]
+  [ k.K_Q, k.K_W, k.K_E, k.K_R, k.K_T, k.K_Y, k.K_U, k.K_I, k.K_O, k.K_P, k.K_LBRKT, k.K_RBRKT  ],
+  // [caps] A S D F G H J K L ; ' \ [enter]
+  [ k.K_A, k.K_S, k.K_D, k.K_F, k.K_G, k.K_H, k.K_J, k.K_K, k.K_L, k.K_COLON, k.K_QUOTE, k.K_BKSLASH ],
   // [shift] * Z X C V B N M , . / [shift] *=oE2
-  [ k.K_oE2, k.K_Z, k.K_X, k.K_C, k.K_V, k.K_B, k.K_N, k.K_M, k.K_COMMA, k.K_PERIOD, k.K_SLASH ]
+  [ k.K_oE2, k.K_Z, k.K_X, k.K_C, k.K_V, k.K_B, k.K_N, k.K_M, k.K_COMMA, k.K_PERIOD, k.K_SLASH ],
+  // space
+  [ k.K_SPACE ],
 ];
 
 /**

@@ -10,6 +10,8 @@ tests = [
   'k_001_tiny',
   'k_002_tinyu32',
   'k_003_transform',
+# TODO-LDML: depends on implied keys
+#  'k_010_mt',
 ]
 
 # Setup kmc
