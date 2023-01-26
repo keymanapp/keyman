@@ -3,10 +3,17 @@
 <!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
 <keyboard locale="mt" conformsTo="techpreview">
   <names>
-    <name value="disp-typical" />
+    <name value="keys-minimal" />
   </names>
 
-  <displays>
-    <display to="\u{0300}" display="`" />
-  </displays>
+  <keys>
+    <key id="grave" to="\u{1faa6}" />
+  </keys>
+
+  <layers form="hardware">
+    <layer id="base">
+      <row keys="grave" />
+    </layer>
+  </layers>
+
 </keyboard>

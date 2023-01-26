@@ -43,7 +43,7 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran, 
   private compileTransform(sections: GlobalSections, transform: LKTransform): TranItemBase {
     let result = this.newTranItem();
     result.from = sections.elem.allocElementString(sections.strs, transform.from);
-    result.to = sections.strs.allocString(transform.to);
+    result.to = sections.strs.allocAndUnescapeString(transform.to);
     result.before = sections.elem.allocElementString(sections.strs, transform.before);
     result.flags = transform.error == 'fail' ? TranItemFlags.error : TranItemFlags.none;
     return result;

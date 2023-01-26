@@ -100,7 +100,7 @@ export class KeysCompiler extends SectionCompiler {
         result.keys.push({
           vkey: USVirtualKeyMap[y][x],
           mod: mod,
-          to: sections.strs.allocString(keydef.to),
+          to: sections.strs.allocAndUnescapeString(keydef.to),
           flags: 0 // Note: 'expand' is never set here, only by the .kmx builder
         });
       }

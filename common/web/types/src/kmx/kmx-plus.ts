@@ -2,7 +2,7 @@ import { constants } from '@keymanapp/ldml-keyboard-constants';
 import * as r from 'restructure';
 import { ElementString } from './element-string.js';
 import { ListItem } from './string-list.js';
-
+import { unescapeString } from '../util/util.js';
 import { KMXFile } from './kmx.js';
 
 // Implementation of file structures from /core/src/ldml/C7043_ldml.md
@@ -136,7 +136,19 @@ export class StrsItem {
 
 export class Strs extends Section {
   strings: StrsItem[] = [ new StrsItem('') ]; // C7043: The null string is always requierd
-
+  /**
+   * Allocate a StrsItem given the string, unescaping if necessary.
+   * @param s escaped string
+   * @returns
+   */
+  allocAndUnescapeString(s?: string): StrsItem {
+    return this.allocString(unescapeString(s));
+  }
+  /**
+   * Allocate a StrsItem given the string.
+   * @param s string
+   * @returns
+   */
   allocString(s?: string): StrsItem {
     if(s === undefined || s === null) {
       // undefined or null are always equivalent to empty string, see C7043
@@ -301,8 +313,13 @@ export class List extends Section {
    */
   allocListFromSpaces(strs: Strs, s?: string): ListItem {
     s = s ?? '';
-    // TODO-LDML: support unicode escaping etc
     return this.allocList(strs, s.split(' '));
+  }
+  allocListFromEscapedSpaces(strs: Strs, s?: string): ListItem {
+    if(s === undefined || s === null) {
+      s = '';
+    }
+    return this.allocList(strs, s.split(' ').map(unescapeString));
   }
   /**
    * Return a List object referring to the string list.

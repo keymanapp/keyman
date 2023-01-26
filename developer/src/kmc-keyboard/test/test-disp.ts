@@ -23,11 +23,22 @@ describe('disp', function () {
 
     assert.ok(disp?.disps);
     assert.equal(disp.disps.length, 1);
-    assert.equal(disp.disps[0].to?.value, 'e');
-    assert.equal(disp.disps[0].display?.value, '(e)');
+    assert.equal(disp.disps[0].to?.value, '\u0300');
+    assert.equal(disp.disps[0].display?.value, '`');
   });
   it('should compile maximal disp', function() {
     let disp = loadSectionFixture(DispCompiler, 'sections/disp/maximal.xml', compilerTestCallbacks) as Disp;
+    assert.equal(compilerTestCallbacks.messages.length, 0);
+    assert.equal(disp?.baseCharacter?.value, 'x');
+    assert.ok(disp?.disps);
+    assert.equal(disp.disps.length, 2);
+    assert.equal(disp.disps[0].to?.value, 'e');
+    assert.equal(disp.disps[0].display?.value, '(e)');
+    assert.equal(disp.disps[1].to?.value, 'f');
+    assert.equal(disp.disps[1].display?.value, '(f)');
+  });
+  it('should compile escaped disp', function() {
+    let disp = loadSectionFixture(DispCompiler, 'sections/disp/escaped.xml', compilerTestCallbacks) as Disp;
     assert.equal(compilerTestCallbacks.messages.length, 0);
     assert.equal(disp?.baseCharacter?.value, 'x');
     assert.ok(disp?.disps);
