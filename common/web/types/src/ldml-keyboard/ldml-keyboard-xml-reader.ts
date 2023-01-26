@@ -104,8 +104,7 @@ export default class LDMLKeyboardXMLSourceFileReader {
     }
 
     // now, the explicit imports
-    for (const anImport /* : LKImport */ of obj['import']) {
-      const asImport: LKImport = anImport;
+    for (const asImport of (obj['import'] as LKImport[])) {
       this.resolveOneImport(obj, subtag, asImport);
     }
   }
