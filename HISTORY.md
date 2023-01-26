@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.36 alpha 2023-01-26
+
+* chore(common): Add crowdin strings for Kannada (#8074)
+
 ## 17.0.35 alpha 2023-01-25
 
 * chore(common): revise tag variable name to VERSION_GIT_TAG (#8063)
