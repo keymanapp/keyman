@@ -10,7 +10,7 @@
     <key id="grave" to="🪦" />
   </keys>
 
-  <layers form="hardware">
+  <layers form="hardware" hardware="us">
     <layer id="base">
       <row keys="grave" />
     </layer>

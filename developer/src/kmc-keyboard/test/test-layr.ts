@@ -1,7 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
 import { LayrCompiler } from '../src/compiler/layr.js';
-import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
+import { CompilerMessages } from '../src/compiler/messages.js';
+import { compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 
@@ -29,8 +30,7 @@ describe('layr', function () {
     const list0 = layr.lists[0];
     assert.ok(list0);
     assert.equal(list0.layers.length, 1);
-    assert.equal(list0.flags & constants.layr_list_flags_mask_form, constants.layr_list_flags_hardware);
-    assert.equal(list0.hardware?.value, '');
+    assert.equal(list0.hardware, constants.layr_list_hardware_us);
     const layer0 = list0.layers[0];
     assert.ok(layer0);
     assert.equal(layer0.rows.length, 1);
@@ -51,12 +51,10 @@ describe('layr', function () {
 
     assert.equal(layr.lists?.length, 2);
 
-    const listHardware = layr.lists.find(v => v.hardware.value === 'abnt2');
+    const listHardware = layr.lists.find(v => v.hardware === constants.layr_list_hardware_abnt2);
     assert.ok(listHardware);
     assert.equal(listHardware.minDeviceWidth, 0);
     assert.equal(listHardware.layers.length, 2);
-    assert.equal(listHardware.flags & constants.layr_list_flags_mask_form, constants.layr_list_flags_hardware);
-    assert.equal(listHardware.hardware?.value, 'abnt2');
     const hardware0 = listHardware.layers[0];
     assert.ok(hardware0);
     assert.equal(hardware0.id.value, 'base');
@@ -75,11 +73,10 @@ describe('layr', function () {
     assert.equal(hardware1row0.keys.length, 2);
     allKeysOk(hardware1row0,'q w', 'hardware1row0');
 
-    const listTouch = layr.lists.find(v => v.hardware.value !== 'abnt2'); // TODO-LDML: need to add some more fields!!!
+    const listTouch = layr.lists.find(v => v.hardware === constants.layr_list_hardware_touch);
     assert.ok(listTouch);
     assert.equal(listTouch.minDeviceWidth, 300);
     assert.equal(listTouch.layers.length, 1);
-    assert.equal(listTouch.flags & constants.layr_list_flags_mask_form, constants.layr_list_flags_touch);
     const touch0 = listTouch.layers[0];
     assert.ok(touch0);
     assert.equal(touch0.rows.length, 1);
@@ -90,4 +87,30 @@ describe('layr', function () {
     assert.equal(touch0row0.keys.length, 4);
     allKeysOk(touch0row0,'Q q W w', 'touch0row0');
   });
+  testCompilationCases(LayrCompiler, compilerTestCallbacks, [
+    {
+      subpath: 'sections/layr/invalid-invalid-hardware.xml',
+      errors: [CompilerMessages.Error_InvalidHardware({hardware: 'stenography'})],
+    },
+    {
+      subpath: 'sections/layr/invalid-missing-hardware.xml',
+      errors: [CompilerMessages.Error_MissingHardware()],
+    },
+    {
+      subpath: 'sections/layr/invalid-multi-hardware.xml',
+      errors: [CompilerMessages.Error_MustHaveAtMostOneLayersElementPerForm({ form: 'hardware' })],
+    },
+    {
+      subpath: 'sections/layr/invalid-touch-hardware.xml',
+      errors: [CompilerMessages.Error_NoHardwareOnTouch({ hardware: 'iso' })],
+    },
+    {
+      subpath: 'sections/layr/invalid-invalid-form.xml',
+      throws: /allowed values/,
+    },
+    {
+      subpath: 'sections/layr/invalid-missing-layer.xml',
+      errors: [CompilerMessages.Error_MustBeAtLeastOneLayerElement()],
+    },
+  ]);
 });

@@ -369,8 +369,7 @@ static_assert(sizeof(struct COMP_KMXPLUS_DISP) == LDML_LENGTH_DISP, "mismatched 
    ------------------------------------------------------------------ */
 
 struct COMP_KMXPLUS_LAYR_LIST {
-    KMX_DWORD flags;
-    KMXPLUS_STR hardware;
+    KMX_DWORD hardware;
     KMX_DWORD layer;
     KMX_DWORD count;
     KMX_DWORD minDeviceWidth;

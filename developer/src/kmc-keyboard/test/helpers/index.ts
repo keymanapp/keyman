@@ -1,6 +1,7 @@
 /**
  * Helpers and utilities for the Mocha tests.
  */
+import 'mocha';
 import * as path from 'path';
 import * as fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -135,4 +136,70 @@ export function checkMessages() {
     console.log(compilerTestCallbacks.messages);
   }
   assert.isEmpty(compilerTestCallbacks.messages);
+}
+
+export interface CompilationCase {
+  /**
+   * path to xml, such as 'sections/layr/invalid-case.xml'
+   */
+  subpath: string;
+  /**
+   * expected error messages. If falsy, expected to succeed. All must be present to pass.
+   */
+  errors?: CompilerEvent[];
+  /**
+   * expected warning messages. All must be present to pass.
+   */
+  warnings?: CompilerEvent[];
+  /**
+   * optional callback with the section
+   */
+  callback?: (sect: KMXPlus.Section, subpath: string ) => void;
+  /**
+   * if present, expect compiler to throw (use .* to match all)
+   */
+  throws?: RegExp;
+}
+
+/**
+ * Run a bunch of cases
+ * @param cases cases to run
+ * @param compiler argument to loadSectionFixture()
+ * @param callbacks argument to loadSectionFixture()
+ */
+export function testCompilationCases(compiler: typeof SectionCompiler, callbacks: CompilerCallbacks, cases : CompilationCase[]) {
+  for (let testcase of cases) {
+    const expectFailure = testcase.throws || !!(testcase.errors); // if true, we expect this to fail
+    const testHeading = expectFailure ? `should fail to compile: ${testcase.subpath}`:
+                                        `should compile: ${testcase.subpath}`;
+    it(testHeading, function () {
+      // special case for an expected exception
+      if (testcase.throws) {
+        assert.throws(() => loadSectionFixture(compiler, testcase.subpath, callbacks), testcase.throws, 'expected exception from compilation');
+        return;
+      }
+      let section = loadSectionFixture(compiler, testcase.subpath, callbacks);
+      if (expectFailure) {
+        assert.isNull(section, 'expected compilation result to be null, but got something');
+      } else {
+        assert.isNotNull(section, `expected successful compilation, but got null and ${JSON.stringify(compilerTestCallbacks.messages)}`);
+      }
+
+      // if we expected errors or warnings, show them
+      if (testcase.errors) {
+        assert.includeDeepMembers(compilerTestCallbacks.messages, testcase.errors, 'expected errors to be included');
+      }
+      if (testcase.warnings) {
+        assert.includeDeepMembers(compilerTestCallbacks.messages, testcase.warnings, 'expected warnings to be included');
+      } else if (!expectFailure) {
+        // no warnings, so expect zero messages
+        assert.strictEqual(compilerTestCallbacks.messages.length, 0, 'expected zero messages');
+      }
+
+      // run the user-supplied callback if any
+      if (testcase.callback) {
+        testcase.callback(section, testcase.subpath);
+      }
+    });
+  }
 }

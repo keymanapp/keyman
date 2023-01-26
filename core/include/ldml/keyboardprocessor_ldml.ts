@@ -281,19 +281,39 @@ class Constants {
   /**
    *  Length of each layer list in the 'layr' section variable part
    */
-  readonly length_layr_list = 20;
+  readonly length_layr_list = 16;
   /**
-   * bitmask for the 'form' field of the layr.list[].flags bitfield
+   * for the 'hardware' field indicating a touch keyboard, non-hardware
    */
-  readonly layr_list_flags_mask_form = 1;
+  readonly layr_list_hardware_touch = 0;
   /**
-   * hardware layout: value for the 'form' field of the layr.list[].flags
+   * for the 'hardware' field indicating an abnt2 layout
    */
-  readonly layr_list_flags_hardware = 0;
+  readonly layr_list_hardware_abnt2 = 1;
   /**
-   * touch layout: value for the 'form' field of the layr.list[].flags
+   * for the 'hardware' field indicating an iso layout
    */
-  readonly layr_list_flags_touch = 1;
+  readonly layr_list_hardware_iso = 2;
+  /**
+   * for the 'hardware' field indicating a jis layout
+   */
+  readonly layr_list_hardware_jis = 3;
+  /**
+   * for the 'hardware' field indicating a us layout
+   */
+  readonly layr_list_hardware_us = 4;
+  /**
+   * Convenience map of layr_list_hardware field values
+   */
+  readonly layr_list_hardware_map: Map<String, number> = new Map(
+    [
+      ["touch", this.layr_list_hardware_touch],
+      ["abnt2", this.layr_list_hardware_abnt2],
+      ["iso", this.layr_list_hardware_iso],
+      ["jis", this.layr_list_hardware_jis],
+      ["us", this.layr_list_hardware_us],
+    ]
+  );
   /**
    * Length of each layer entry in the 'layr' section variable part
    */
