@@ -90,11 +90,11 @@ describe('layr', function () {
   testCompilationCases(LayrCompiler, compilerTestCallbacks, [
     {
       subpath: 'sections/layr/invalid-invalid-hardware.xml',
-      errors: [CompilerMessages.Error_InvalidFile({errorText: `Unknown hardware layout id: hardware="stenography"`})],
+      errors: [CompilerMessages.Error_InvalidHardware({hardware: 'stenography'})],
     },
     {
       subpath: 'sections/layr/invalid-missing-hardware.xml',
-      errors: [CompilerMessages.Error_InvalidFile({errorText: `on layers form=\"hardware\", missing required hardware= attribute.`})],
+      errors: [CompilerMessages.Error_MissingHardware()],
     },
     {
       subpath: 'sections/layr/invalid-multi-hardware.xml',
@@ -102,7 +102,7 @@ describe('layr', function () {
     },
     {
       subpath: 'sections/layr/invalid-touch-hardware.xml',
-      errors: [CompilerMessages.Error_InvalidFile({errorText: `Not allowed: hardware=\"iso\" with layers form=\"touch\"`})],
+      errors: [CompilerMessages.Error_NoHardwareOnTouch({ hardware: 'iso' })],
     },
     {
       subpath: 'sections/layr/invalid-invalid-form.xml',

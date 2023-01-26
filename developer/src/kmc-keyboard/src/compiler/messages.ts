@@ -85,6 +85,18 @@ export class CompilerMessages {
       `Must have at most one layers element with form=${o.form}`);
   static ERROR_MustHaveAtMostOneLayersElementPerForm = SevError | 0x0012;
 
+  static Error_NoHardwareOnTouch = (o:{hardware: string}) => m(this.ERROR_NoHardwareOnTouch,
+    `Not allowed: form=touch with hardware=${o.hardware}`);
+  static ERROR_NoHardwareOnTouch = SevError | 0x0013;
+
+  static Error_MissingHardware = () => m(this.ERROR_MissingHardware,
+    `layers form=hardware missing hardware= attribute`);
+  static ERROR_MissingHardware = SevError | 0x0014;
+
+  static Error_InvalidHardware = (o:{hardware: string}) => m(this.ERROR_InvalidHardware,
+    `layers has invalid value hardware=${o.hardware}`);
+  static ERROR_InvalidHardware = SevError | 0x0015;
+
   static severityName(code: number): string {
     let severity = code & CompilerErrorSeverity.Severity_Mask;
     switch(severity) {

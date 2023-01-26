@@ -27,22 +27,16 @@ export class LayrCompiler extends SectionCompiler {
       if (form === 'touch') {
         if (hardware) {
           valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({
-            errorText: `Not allowed: hardware="${hardware}" with layers form="touch"`
-          }));
+          this.callbacks.reportMessage(CompilerMessages.Error_NoHardwareOnTouch({hardware}));
         }
       } else if (form === 'hardware') {
         hardwareLayers++;
         if (!hardware) {
           valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({
-            errorText: `on layers form="hardware", missing required hardware= attribute.`
-          }));
+          this.callbacks.reportMessage(CompilerMessages.Error_MissingHardware());
         } else if (!constants.layr_list_hardware_map.get(hardware)) {
           valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({
-            errorText: `Unknown hardware layout id: hardware="${hardware}"`
-          }));
+          this.callbacks.reportMessage(CompilerMessages.Error_InvalidHardware({hardware}));
         } else if (hardwareLayers > 1) { // TODO-LDML: revisit if spec changes
           valid = false;
           this.callbacks.reportMessage(CompilerMessages.Error_MustHaveAtMostOneLayersElementPerForm({ form }));
