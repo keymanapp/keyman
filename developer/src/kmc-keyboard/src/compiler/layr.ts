@@ -48,10 +48,11 @@ export class LayrCompiler extends SectionCompiler {
           this.callbacks.reportMessage(CompilerMessages.Error_MustHaveAtMostOneLayersElementPerForm({ form }));
         }
       } else {
+        /* c8 ignore next 7 */
         // Should not be reached due to XML validation.
         valid = false;
         this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({
-          errorText: `Invalid form="${form}" on layers element`
+          errorText: `INTERNAL ERROR: Invalid XML: Invalid form="${form}" on layers element`
         }));
       }
     });

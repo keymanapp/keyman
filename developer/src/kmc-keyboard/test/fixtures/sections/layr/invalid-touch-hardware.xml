@@ -17,7 +17,8 @@
       <row keys="grave one" />
     </layer>
   </layers>
-  <layers form="touch" hardware="iso"> <!-- not allowed: hardware on touch -->
+  <!-- INVALID: Can't have 'hardware=' when 'form=touch' -->
+  <layers form="touch" hardware="iso">
     <layer id="base">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="one grave" />

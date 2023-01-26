@@ -17,7 +17,9 @@
       <row keys="grave one" />
     </layer>
   </layers>
-  <layers form="hardware" hardware="iso"> <!-- TODO-LDML: not allowed currently -->
+  <!-- INVALID: can't have multiple 'hardware' layers, but
+       TODO-LDML: https://github.com/unicode-org/cldr/pull/2652 would make this file valid. -->
+  <layers form="hardware" hardware="iso">
     <layer id="base">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="one grave" />

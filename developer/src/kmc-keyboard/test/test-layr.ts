@@ -1,7 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
 import { LayrCompiler } from '../src/compiler/layr.js';
-import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
+import { CompilerMessages } from '../src/compiler/messages.js';
+import { compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 
@@ -86,17 +87,30 @@ describe('layr', function () {
     assert.equal(touch0row0.keys.length, 4);
     allKeysOk(touch0row0,'Q q W w', 'touch0row0');
   });
-  for (let badcase of ['invalid-hardware', 'missing-hardware', 'multi-hardware', 'touch-hardware']) {
-    it(`should reject invalid: ${badcase}`, function () {
-      let layr = loadSectionFixture(LayrCompiler, `sections/layr/invalid-${badcase}.xml`, compilerTestCallbacks) as Layr;
-      assert.isNull(layr);
-      assert.isAtLeast(compilerTestCallbacks.messages.length, 1);
-      // TODO-LDML: assert specific err cases
-    });
-  }
-  for (let badcase of ['invalid-form']) {
-    it(`should throw on invalid invalid: ${badcase}`, function () {
-      assert.throws(() => loadSectionFixture(LayrCompiler, `sections/layr/invalid-${badcase}.xml`, compilerTestCallbacks));
-    });
-  }
+  testCompilationCases(LayrCompiler, compilerTestCallbacks, [
+    {
+      subpath: 'sections/layr/invalid-invalid-hardware.xml',
+      errors: [CompilerMessages.Error_InvalidFile({errorText: `Unknown hardware layout id: hardware="stenography"`})],
+    },
+    {
+      subpath: 'sections/layr/invalid-missing-hardware.xml',
+      errors: [CompilerMessages.Error_InvalidFile({errorText: `on layers form=\"hardware\", missing required hardware= attribute.`})],
+    },
+    {
+      subpath: 'sections/layr/invalid-multi-hardware.xml',
+      errors: [CompilerMessages.Error_MustHaveAtMostOneLayersElementPerForm({ form: 'hardware' })],
+    },
+    {
+      subpath: 'sections/layr/invalid-touch-hardware.xml',
+      errors: [CompilerMessages.Error_InvalidFile({errorText: `Not allowed: hardware=\"iso\" with layers form=\"touch\"`})],
+    },
+    {
+      subpath: 'sections/layr/invalid-invalid-form.xml',
+      throws: /allowed values/,
+    },
+    {
+      subpath: 'sections/layr/invalid-missing-layer.xml',
+      errors: [CompilerMessages.Error_MustBeAtLeastOneLayerElement()],
+    },
+  ]);
 });
