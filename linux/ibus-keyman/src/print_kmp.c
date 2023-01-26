@@ -131,7 +131,6 @@ main (gint argc, gchar **argv)
     struct stat filestat;
     JsonParser *parser;
     JsonNode *root;
-    JsonReader *reader;
     JsonObject *object;
     JsonArray *array;
     JsonNode *kmp_system, *kmp_info, *kmp_options, *kmp_files, *kmp_keyboards;
