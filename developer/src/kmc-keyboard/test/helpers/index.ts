@@ -6,8 +6,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { fileURLToPath } from 'url';
 import { SectionCompiler } from '../../src/compiler/section-compiler.js';
-import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard } from '@keymanapp/common-types';
-import { CompilerEvent } from '../../src/compiler/callbacks.js';
+import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, CompilerCallbacks } from '@keymanapp/common-types';
 import Compiler from '../../src/compiler/compiler.js';
 import { assert } from 'chai';
 import KMXPlusMetadataCompiler from '../../src/compiler/metadata-compiler.js';
@@ -32,9 +31,12 @@ export function makePathToFixture(...components: string[]): string {
   return fileURLToPath(new URL(path.join('..', '..', '..', 'test', 'fixtures', ...components), import.meta.url));
 }
 
-class CompilerCallbacks {
+/**
+ * A CompilerCallbacks implementation for testing
+ */
+class TestCompilerCallbacks implements CompilerCallbacks {
   messages: CompilerEvent[] = [];
-  loadFile(baseFilename: string, filename:string): Buffer {
+  loadFile(baseFilename: string, filename: string | URL): Buffer {
     // TODO: translate filename based on the baseFilename
     return fs.readFileSync(filename);
   }
@@ -50,7 +52,7 @@ class CompilerCallbacks {
   }
 };
 
-export const compilerTestCallbacks = new CompilerCallbacks();
+export const compilerTestCallbacks = new TestCompilerCallbacks();
 
 beforeEach(function() {
   compilerTestCallbacks.messages = [];
@@ -63,7 +65,7 @@ afterEach(function() {
 });
 
 
-export function loadSectionFixture(compilerClass: typeof SectionCompiler, filename: string, callbacks: CompilerCallbacks): Section {
+export function loadSectionFixture(compilerClass: typeof SectionCompiler, filename: string, callbacks: TestCompilerCallbacks): Section {
   callbacks.messages = [];
   const inputFilename = makePathToFixture(filename);
   const data = callbacks.loadFile(inputFilename, inputFilename);
@@ -167,7 +169,7 @@ export interface CompilationCase {
  * @param compiler argument to loadSectionFixture()
  * @param callbacks argument to loadSectionFixture()
  */
-export function testCompilationCases(compiler: typeof SectionCompiler, callbacks: CompilerCallbacks, cases : CompilationCase[]) {
+export function testCompilationCases(compiler: typeof SectionCompiler, callbacks: TestCompilerCallbacks, cases : CompilationCase[]) {
   for (let testcase of cases) {
     const expectFailure = testcase.throws || !!(testcase.errors); // if true, we expect this to fail
     const testHeading = expectFailure ? `should fail to compile: ${testcase.subpath}`:

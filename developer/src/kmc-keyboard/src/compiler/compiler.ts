@@ -1,5 +1,4 @@
-import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus } from '@keymanapp/common-types';
-import CompilerCallbacks from './callbacks.js';
+import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus, CompilerCallbacks } from '@keymanapp/common-types';
 import CompilerOptions from './compiler-options.js';
 import { CompilerMessages } from './messages.js';
 import { BkspCompiler, FinlCompiler, TranCompiler } from './tran.js';

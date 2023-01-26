@@ -1,5 +1,4 @@
-import { LDMLKeyboard, KMXPlus } from "@keymanapp/common-types";
-import CompilerCallbacks from "./callbacks.js";
+import { LDMLKeyboard, KMXPlus, CompilerCallbacks } from "@keymanapp/common-types";
 import { SectionIdent } from '@keymanapp/ldml-keyboard-constants';
 
 /* istanbul ignore next */
