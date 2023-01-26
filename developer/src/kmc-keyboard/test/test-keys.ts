@@ -22,7 +22,7 @@ describe('keys', function () {
     assert.isNotNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 0);
     assert.equal(keys.keys.length, 1);
-    assert.equal(keys.keys[0].to.value, '🪦');
+    assert.equal(keys.keys[0].to.value, String.fromCodePoint(0x1faa6));
   });
 
   it('should compile a hardware layer', function() {
