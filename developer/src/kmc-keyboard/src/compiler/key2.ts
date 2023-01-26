@@ -98,6 +98,7 @@ export class Key2Compiler extends SectionCompiler {
 
     for (let key of uniqueKeys) {
       if (!usedKeys.has(key.id)) {
+        // TODO-LDML: linting for unused keys
         continue; // unused key, skip
       }
       let flags = 0;

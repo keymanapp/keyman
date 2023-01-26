@@ -14,7 +14,7 @@
   </names>
 
   <keys>
-    <!-- no keys listed -->
+    <!-- no keys listed -- keys-Latn-implied.xml will be implicitly imported -->
   </keys>
 
   <layers form="hardware">
