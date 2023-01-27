@@ -118,10 +118,11 @@ export default class LDMLKeyboardXMLSourceFileReader {
 
   private resolveOneImport(obj: any, subtag: string, asImport: LKImport) {
     if (asImport.base !== constants.cldr_import_base) {
+      // TODO-LDML: use custom error class CompilerImportResolveError
       throw new Error(`import element with base ${asImport.base} is unsupported, only ${constants.cldr_import_base} is supported.`);
     }
     const paths = asImport.path.split('/');
-    if (!paths[0] || !paths[1] || paths.length !== 2) {
+    if (paths[0] == '' || paths[1] == '' || paths.length !== 2) {
       throw new Error(`import element with invalid path ${asImport.path}: expect the form '${constants.cldr_version_latest}./*.xml'`);
     }
     const importData: Uint8Array = this.readImportFile(paths[0], paths[1]);
