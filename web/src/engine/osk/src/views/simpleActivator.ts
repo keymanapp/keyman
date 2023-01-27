@@ -8,7 +8,8 @@ export default class SimpleActivator extends Activator {
   }
 
   set enabled(value: boolean) {
-    this.flag = value;
+    // Enabled + activated are the same thing for this class.
+    this.activate = value;
   }
 
   get activate(): boolean {
