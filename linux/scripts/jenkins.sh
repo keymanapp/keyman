@@ -13,8 +13,6 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-keyman_projects="keyman"
-
 tier="stable"
 
 if [[ "$1" =~ "-alpha" ]]; then
@@ -70,12 +68,12 @@ rm -rf "$sourcedir/../${1}"_*.{dsc,build,buildinfo,changes,tar.?z,log}
 
 echo_heading "Make source package for $fullsourcename"
 echo_heading "reconfigure"
-TIER="$tier" ./scripts/reconf.sh $sourcename
+TIER="$tier" ./scripts/reconf.sh
 
 echo_heading "Make origdist"
-./scripts/dist.sh origdist $sourcename
+./scripts/dist.sh origdist
 echo_heading "Make deb source"
-./scripts/deb.sh sourcepackage "$proj"
+./scripts/deb.sh sourcepackage
 
 #sign source package
 for file in builddebs/*.dsc; do
@@ -83,9 +81,4 @@ for file in builddebs/*.dsc; do
 	debsign -k"$2" "$file"
 done
 
-if [ "$proj" == "keyman" ]; then
-    mv builddebs/* ..
-else
-    mkdir -p "$sourcedir"
-    mv builddebs/* "$sourcedir"
-fi
+mv builddebs/* ..

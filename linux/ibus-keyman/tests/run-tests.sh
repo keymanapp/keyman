@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-TOP_SRCDIR=${top_srcdir:-$(realpath $(dirname $0)/..)}
-BASEDIR=$(realpath $(dirname $0))
+TOP_SRCDIR=${top_srcdir:-$(realpath "$(dirname "$0")/..")}
 TESTDIR=${XDG_DATA_HOME:-$HOME/.local/share}/keyman/test_kmx
 PID_FILE=/tmp/ibus-keyman-test-pids
 
@@ -69,22 +68,22 @@ function run_tests() {
   echo "rm -rf ${TEMP_DATA_DIR}" >> $PID_FILE
 
   COMMON_ARCH_DIR=
-  [ -d ${TOP_SRCDIR}/../../core/build/arch ] && COMMON_ARCH_DIR=${TOP_SRCDIR}/../../core/build/arch
-  [ -d ${TOP_SRCDIR}/../keyboardprocessor/arch ] && COMMON_ARCH_DIR=${TOP_SRCDIR}/../keyboardprocessor/arch
+  [ -d "${TOP_SRCDIR}"/../../core/build/arch ] && COMMON_ARCH_DIR=${TOP_SRCDIR}/../../core/build/arch
+  [ -d "${TOP_SRCDIR}"/../keyboardprocessor/arch ] && COMMON_ARCH_DIR=${TOP_SRCDIR}/../keyboardprocessor/arch
 
-  if [ -d ${COMMON_ARCH_DIR}/release ]; then
+  if [ -d "${COMMON_ARCH_DIR}"/release ]; then
     COMMON_ARCH_DIR=${COMMON_ARCH_DIR}/release
-  elif [ -d ${COMMON_ARCH_DIR}/debug ]; then
+  elif [ -d "${COMMON_ARCH_DIR}"/debug ]; then
     COMMON_ARCH_DIR=${COMMON_ARCH_DIR}/debug
   else
     echo "Can't find neither ${COMMON_ARCH_DIR}/release nor ${COMMON_ARCH_DIR}/debug"
     exit 2
   fi
 
-  if [ ! -d $TESTDIR ] || ! [[ $(ls -x ${TESTDIR}/*.kmx 2>/dev/null | wc -l) > 0 ]]; then
-    if [[ $(ls -x ${COMMON_ARCH_DIR}/tests/unit/kmx/*.kmx 2>/dev/null | wc -l) > 0 ]]; then
-      mkdir -p $(realpath --canonicalize-missing $TESTDIR/..)
-      ln -sf $(realpath ${COMMON_ARCH_DIR}/tests/unit/kmx) $TESTDIR
+  if [ ! -d "$TESTDIR" ] || ! (( $(find "${TESTDIR}" -maxdepth 1 -name \*.kmx | wc -l) > 0 )); then
+    if (( $(find "${COMMON_ARCH_DIR}/tests/unit/kmx" -maxdepth 1 -name \*.kmx | wc -l) > 0 )); then
+      mkdir -p "$(realpath --canonicalize-missing "$TESTDIR"/..)"
+      ln -sf "$(realpath "${COMMON_ARCH_DIR}"/tests/unit/kmx)" "$TESTDIR"
     else
       echo "Can't find kmx files in ${COMMON_ARCH_DIR}/tests/unit/kmx"
       exit 3
@@ -103,11 +102,12 @@ function run_tests() {
     echo "Running on Wayland..."
     TMPFILE=$(mktemp)
     # mutter-Message: 18:56:15.422: Using Wayland display name 'wayland-1'
-    mutter --wayland --headless --no-x11 --virtual-monitor 1024x768 &> $TMPFILE &
+    mutter --wayland --headless --no-x11 --virtual-monitor 1024x768 &> "$TMPFILE" &
     echo "kill -9 $!" >> $PID_FILE
     sleep 1s
-    export WAYLAND_DISPLAY=$(cat $TMPFILE | grep "Using Wayland display" | cut -d"'" -f2)
-    rm $TMPFILE
+    WAYLAND_DISPLAY=$(cat "$TMPFILE" | grep "Using Wayland display" | cut -d"'" -f2)
+    export WAYLAND_DISPLAY
+    rm "$TMPFILE"
   else
     echo "Starting Xvfb..."
     Xvfb -screen 0 1024x768x24 :33 &> /dev/null &
@@ -128,16 +128,16 @@ function run_tests() {
   SCHEMA_DIR=$TEMP_DATA_DIR/glib-2.0/schemas
   export XDG_DATA_DIRS=$TEMP_DATA_DIR:$XDG_DATA_DIRS
 
-  mkdir -p $SCHEMA_DIR
-  cp ${TOP_SRCDIR}/../keyman-config/com.keyman.gschema.xml $SCHEMA_DIR/
-  glib-compile-schemas $SCHEMA_DIR
+  mkdir -p "$SCHEMA_DIR"
+  cp "${TOP_SRCDIR}/../keyman-config/com.keyman.gschema.xml" "$SCHEMA_DIR"/
+  glib-compile-schemas "$SCHEMA_DIR"
 
   if [ $# -gt 0 ]; then
     TESTFILES=($@)
   else
-    pushd $TESTDIR > /dev/null
+    pushd "$TESTDIR" > /dev/null || exit
     TESTFILES=(*.kmx)
-    popd > /dev/null
+    popd > /dev/null || exit
   fi
 
   export LD_LIBRARY_PATH=${COMMON_ARCH_DIR}/src:$LD_LIBRARY_PATH
@@ -150,16 +150,19 @@ function run_tests() {
     IBUS_CONFIG=--config=/usr/libexec/ibus-memconf
   fi
 
+  # shellcheck disable=SC2086
   ibus-daemon ${ARG_VERBOSE-} --panel=disable ${IBUS_CONFIG-} &> /tmp/ibus-daemon.log &
   echo "kill -9 $!" >> $PID_FILE
   sleep 1s
 
+  # shellcheck disable=SC2086
   ../src/ibus-engine-keyman ${ARG_VERBOSE-} &> /tmp/ibus-engine-keyman.log &
   echo "kill -9 $!" >> $PID_FILE
   sleep 1s
 
   echo "Starting tests..."
   # Note: -k and --tap are consumed by the GLib testing framework
+  # shellcheck disable=SC2086
   ./ibus-keyman-tests ${ARG_K-} ${ARG_TAP-} ${ARG_VERBOSE-} ${ARG_DEBUG-} \
     ${ARG_SURROUNDING_TEXT-} ${ARG_NO_SURROUNDING_TEXT-} \
     --directory $TESTDIR --${DISPLAY_SERVER} "${TESTFILES[@]}"
@@ -198,7 +201,7 @@ if ! can_run_wayland; then
   fi
 fi
 
-if [ "$USE_WAYLAND" == "0" -a "$USE_X11" == "0" ]; then
+if [ "$USE_WAYLAND" == "0" ] && [ "$USE_X11" == "0" ]; then
   echo "ERROR: I'll have to run somewhere. Specifying both --no-wayland and --no-x11 is not allowed."
   exit 6
 fi
