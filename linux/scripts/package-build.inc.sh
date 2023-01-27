@@ -54,3 +54,26 @@ function downloadSource() {
     wget -N https://downloads.keyman.com/linux/${TIER}/${dirversion}/SHA256SUMS
     sha256sum -c --ignore-missing SHA256SUMS |grep "${proj}"
 }
+
+checkAndInstallRequirements()
+{
+	local TOINSTALL=""
+
+	for p in devscripts equivs
+	do
+		if ! dpkg -s $p >/dev/null 2>&1; then
+			TOINSTALL="$TOINSTALL $p"
+		fi
+	done
+
+	export DEBIAN_FRONTEND=noninteractive
+
+	if [ -n "$TOINSTALL" ]; then
+		sudo apt-get update
+		sudo apt-get -qy install "$TOINSTALL"
+	fi
+
+	sudo mk-build-deps debian/control
+	sudo apt-get -qy --allow-downgrades install ./keyman-build-deps_*.deb
+	sudo rm -f keyman-buid-deps_*
+}
