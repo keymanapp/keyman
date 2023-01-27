@@ -1,5 +1,3 @@
-/// <reference types="@keymanapp/models-types" />
-
 import {
   SENTINEL_CODE_UNIT, applyTransform, buildMergedTransform, isHighSurrogate, isLowSurrogate, isSentinel,
   transformToSuggestion, defaultApplyCasing
