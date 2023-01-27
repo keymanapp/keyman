@@ -1,5 +1,5 @@
 #!/bin/bash
-# $1 - project name with appended tier, e.g. ibus-kmfl-alpha
+# $1 - project name with appended tier, e.g. keyman-alpha
 # $2 - GPG key used for signing the source package
 
 set -e
@@ -51,7 +51,7 @@ checkAndInstallRequirements()
 
 	if [ -n "$TOINSTALL" ]; then
 		sudo apt-get update
-		sudo apt-get -qy install $TOINSTALL
+		sudo apt-get -qy install "$TOINSTALL"
 	fi
 
 	sudo mk-build-deps debian/control
@@ -65,8 +65,8 @@ checkAndInstallRequirements
 echo_heading "cleaning previous builds of $1"
 
 rm -rf builddebs
-rm -rf $sourcedir/${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
-rm -rf $sourcedir/../${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
+rm -rf "$sourcedir/${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}"
+rm -rf "$sourcedir/../${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}"
 
 echo_heading "Make source package for $fullsourcename"
 echo_heading "reconfigure"
@@ -75,17 +75,17 @@ TIER="$tier" ./scripts/reconf.sh $sourcename
 echo_heading "Make origdist"
 ./scripts/dist.sh origdist $sourcename
 echo_heading "Make deb source"
-./scripts/deb.sh sourcepackage $proj
+./scripts/deb.sh sourcepackage "$proj"
 
 #sign source package
-for file in $(ls builddebs/*.dsc); do
+for file in builddebs/*.dsc; do
 	echo_heading "Signing source package $file"
-	debsign -k$2 $file
+	debsign -k"$2" "$file"
 done
 
 if [ "$proj" == "keyman" ]; then
     mv builddebs/* ..
 else
-    mkdir -p $sourcedir
-    mv builddebs/* $sourcedir
+    mkdir -p "$sourcedir"
+    mv builddebs/* "$sourcedir"
 fi

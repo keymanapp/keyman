@@ -13,15 +13,13 @@ function checkPrerequisites() {
         exit 1
     fi
 
-    if [ ! $(which xmllint) ]; then
+    if ! which xmllint > /dev/null; then
         echo "you must install xmllint (libxml2-utils package) to use this script"
         exit 1
     fi
 
     if [ "${PROJECT}" != "" ]; then
         projects="${PROJECT}"
-    elif [ -n "${BUILD_LEGACY}" ]; then
-        projects="keyman kmflcomp libkmfl ibus-kmfl"
     else
         projects="keyman"
     fi
@@ -32,9 +30,7 @@ function downloadSource() {
     packageDir=$1
 
     if [ "${proj}" == "keyman" ]; then
-       cd ${BASEDIR}
-    else
-       cd legacy/${proj}
+       cd "${BASEDIR}" || exit
     fi
 
     if [ "${proj}" == "keyman" ]; then
@@ -42,19 +38,19 @@ function downloadSource() {
     fi
 
     # Update tier in Debian watch files (replacing any previously set tier) and remove comment
-    sed -e "s/\$tier\|alpha\|beta\|stable/${TIER}/g" -e "s/^# .*$//" $BASEDIR/scripts/watch.in > debian/watch
+    sed -e "s/\$tier\|alpha\|beta\|stable/${TIER}/g" -e "s/^# .*$//" "$BASEDIR"/scripts/watch.in > debian/watch
 
     version=$(uscan --report --dehs|xmllint --xpath "//dehs/upstream-version/text()" -)
     dirversion=$(uscan --report --dehs|xmllint --xpath "//dehs/upstream-url/text()" - | cut -d/ -f6)
     echo "${proj} version is ${version}"
     uscan || (echo "ERROR: No new version available for ${proj}" >&2 && exit 1)
     cd ..
-    mv ${proj}-${version} ${BASEDIR}/${packageDir}
-    mv ${proj}_${version}.orig.tar.gz ${BASEDIR}/${packageDir}
-    mv ${proj}-${version}.tar.gz ${BASEDIR}/${packageDir}
-    mv ${proj}*.asc ${BASEDIR}/${packageDir}
-    rm ${proj}*.debian.tar.xz
-    cd ${BASEDIR}/${packageDir}
+    mv "${proj}-${version}" "${BASEDIR}/${packageDir}"
+    mv "${proj}_${version}.orig.tar.gz" "${BASEDIR}/${packageDir}"
+    mv "${proj}-${version}.tar.gz" "${BASEDIR}/${packageDir}"
+    mv "${proj}*.asc" "${BASEDIR}/${packageDir}"
+    rm "${proj}*.debian.tar.xz"
+    cd "${BASEDIR}/${packageDir}" || exit
     wget -N https://downloads.keyman.com/linux/${TIER}/${dirversion}/SHA256SUMS
-    sha256sum -c --ignore-missing SHA256SUMS |grep ${proj}
+    sha256sum -c --ignore-missing SHA256SUMS |grep "${proj}"
 }

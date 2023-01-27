@@ -173,7 +173,7 @@ class InstallKmp():
                                  f['name'])
                     checkandsaveico(fpath)
                 elif ftype == KMFileTypes.KM_SOURCE:
-                    # TODO for the moment just leave it for ibus-kmfl to ignore if it doesn't load
+                    # TODO for the moment just leave it for ibus-keyman to ignore if it doesn't load
                     pass
                 elif ftype == KMFileTypes.KM_KMX:
                     # Sanitize keyboard filename if not lower case
