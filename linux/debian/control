@@ -37,8 +37,8 @@ Build-Depends:
  metacity,
  gawk,
 Standards-Version: 4.6.1
-Vcs-Git: https://github.com/keymanapp/keyman.git
-Vcs-Browser: https://github.com/keymanapp/keyman
+Vcs-Git: https://github.com/keymanapp/keyman.git [linux/debian]
+Vcs-Browser: https://github.com/keymanapp/keyman/tree/master/linux/debian
 Homepage: https://www.keyman.com
 Rules-Requires-Root: binary-targets
 
