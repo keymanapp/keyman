@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.37 alpha 2023-01-27
+
+* chore(linux): Fix warnings (#8103)
+* chore(linux): Remove legacy projects (#8102)
+* Specify the path to the Debian package in the Vcs-Git header (#8104)
+
 ## 17.0.36 alpha 2023-01-26
 
 * chore(common): Add crowdin strings for Kannada (#8074)
