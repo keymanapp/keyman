@@ -1,8 +1,6 @@
-/// <reference path="correction/context-tracker.ts" />
-
 import * as models from '@keymanapp/models-templates/build/obj/index.js';
-import * as correction from './correction/index.js'
 import * as wordBreakers from '@keymanapp/models-wordbreakers/build/obj/index.js';
+import * as correction from './correction/index.js'
 
 import TransformUtils from './transformUtils.js';
 

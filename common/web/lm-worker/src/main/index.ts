@@ -30,7 +30,7 @@
  */
 
 /// <reference types="@keymanapp/lm-message-types" />
-import type * as types from "@keymanapp/web-utils/build/obj/kmwstring.js";
+import { extendString } from "@keymanapp/web-utils/build/obj/index.js";
 
 import * as models from './models/index.js';
 import * as correction from './correction/index.js';
@@ -38,8 +38,6 @@ import * as wordBreakers from '@keymanapp/models-wordbreakers/build/obj/index.js
 
 import ModelCompositor from './model-compositor.js';
 import { ImportScripts, IncomingMessage, LMLayerWorkerState, LoadMessage, ModelEval, ModelFile, ModelSourceSpec, PostMessage } from './worker-interfaces.js';
-
-// import type * as WorkerInterfaces from './worker-interfaces.js';
 
 /**
  * Encapsulates all the state required for the LMLayer's worker thread.

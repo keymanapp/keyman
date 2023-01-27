@@ -1,3 +1,5 @@
+/// <reference types="@keymanapp/lm-message-types" />
+
 /*
  * Copyright (c) 2018 National Research Council Canada (author: Eddie A. Santos)
  * Copyright (c) 2018 SIL International
