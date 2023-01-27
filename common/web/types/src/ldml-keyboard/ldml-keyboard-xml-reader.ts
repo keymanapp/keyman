@@ -3,6 +3,7 @@ import { LDMLKeyboardXMLSourceFile, LKImport } from './ldml-keyboard-xml.js';
 import Ajv from 'ajv';
 import { boxXmlArray } from '../util/util.js';
 import { CompilerCallbacks } from 'src/util/compiler.js';
+import { constants } from '@keymanapp/ldml-keyboard-constants';
 
 export default class LDMLKeyboardXMLSourceFileReader {
   callbacks: CompilerCallbacks;
@@ -106,7 +107,7 @@ export default class LDMLKeyboardXMLSourceFileReader {
       // <import base="cldr" path="techpreview/keys-Latn-implied.xml"/>
       this.resolveOneImport(obj, subtag, {
         base: 'cldr',
-        path: 'techpreview/keys-Latn-implied.xml'
+        path: constants.cldr_implied_keys_import
       });
     }
 
