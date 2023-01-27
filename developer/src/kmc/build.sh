@@ -46,16 +46,6 @@ else
   # We need the schema file at runtime and bundled, so always copy it for all actions except `clean`
   mkdir -p "$THIS_SCRIPT_PATH/build/src/"
   cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json" "$THIS_SCRIPT_PATH/build/src/"
-  # Store imports
-  # load all versions that have a cldr_info.json
-  for CLDR_INFO_PATH in "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/"*/cldr_info.json
-  do
-    CLDR_PATH=$(dirname "$CLDR_INFO_PATH")
-    CLDR_VER=$(basename "$CLDR_PATH")
-    mkdir -p "$THIS_SCRIPT_PATH/build/src/import/$CLDR_VER"
-    # TODO-LDML: When these are copied, the DOCTYPE will break due to the wrong path.
-    cp "$CLDR_INFO_PATH" "$CLDR_PATH/import/"*.xml "$THIS_SCRIPT_PATH/build/src/import/$CLDR_VER/"
-  done
 fi
 
 
