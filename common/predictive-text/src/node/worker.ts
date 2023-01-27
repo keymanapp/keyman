@@ -9,9 +9,9 @@ export default class DefaultWorker {
 
     // If this is definitively set to either true or false, tree-shaking can take effect.
     // An imported const variable doesn't seem to do it, though.
-    if(false) {
+    // if(false) {
       scriptStr += '\n' + LMLayerWorkerSourcemapComment;
-    }
+    // }
     let worker = new VirtualizedWorker(scriptStr);
 
     return worker as any as Worker;

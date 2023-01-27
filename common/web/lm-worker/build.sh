@@ -31,11 +31,13 @@ builder_describe \
   "@../keyman-version" \
   "@../../tools/sourcemap-path-remapper" \
   configure clean build test \
-  "--ci     Runs unit tests with CI reporting"
+  "--ci      Runs unit tests with CI reporting" \
+  "--minify  Minifies the resulting build product" \
+  "--debug   Includes full sources in the worker's sourcemap"
 
 builder_describe_outputs \
   configure     /node_modules \
-  build         build/index.js
+  build         build/lib/worker-main.bundled.js
 
 builder_parse "$@"
 
@@ -56,11 +58,20 @@ if builder_start_action build; then
   # Build worker with tsc first
   npm run build -- $builder_verbose || fail "Could not build worker."
 
+
   echo "Bundling worker modules"
   node build-bundler.js
 
+  OPTIONS=
+  if builder_has_option --debug; then
+    OPTIONS="$OPTIONS --debug"
+  fi
+  if builder_has_option --minify; then
+    OPTIONS="$OPTIONS --minify"
+  fi
+
   echo "Preparing the polyfills + worker for script-embedding"
-  node worker-wrapper-bundler.js
+  node worker-wrapper-bundler.js $OPTIONS
 
   builder_finish_action success build
 fi

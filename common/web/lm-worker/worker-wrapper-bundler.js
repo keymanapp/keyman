@@ -1,10 +1,34 @@
 import fs from 'fs';
+import path from 'path';
+import esbuild from 'esbuild';
 
 import SourcemapRemapper from '@keymanapp/sourcemap-path-remapper';
 
 import SourcemapCombiner from 'combine-source-map';
 import convertSourcemap from 'convert-source-map'; // Transforms sourcemaps among various common formats.
                                                    // Base64, stringified-JSON, end-of-file comment...
+
+let DEBUG = false;
+let MINIFY = false;
+
+if(process.argv.length > 2) {
+  for(let i = 2; i < process.argv.length; i++) {
+    const arg = process.argv[i];
+
+    switch(arg) {
+      case '--debug':
+        DEBUG = true;
+        break;
+      case '--minify':
+        MINIFY = true;
+        break;
+      // May add other options if desired in the future.
+      default:
+        console.error("Invalid command-line option set for script; only --debug and --minify are permitted.");
+        process.exit(1);
+    }
+  }
+}
 
 let loadPolyfill = function(file, mapFilename) {
   // May want to retool the pathing somewhat!
@@ -31,31 +55,6 @@ let loadCompiledModuleFilePair = function(file, mapFilename) {
     }
   };
 }
-
-let separatorFile = {
-  source: `
-
-  `,
-  sourceFile: '<inline>'
-}
-
-let sourceFileSet = [
-  // Needed for Android / Chromium browser pre-45.
-  loadPolyfill('src/polyfills/array.fill.js', 'polyfills/array.fill.js'),
-  // Needed for Android / Chromium browser pre-45.
-  loadPolyfill('src/polyfills/array.findIndex.js', 'polyfills/array.findIndex.js'),
-  // Needed for Android / Chromium browser pre-45.
-  loadPolyfill('src/polyfills/array.from.js', 'polyfills/array.from.js'),
-  // Needed for Android / Chromium browser pre-47.
-  loadPolyfill('src/polyfills/array.includes.js', 'polyfills/array.includes.js'),
-  // For Object.values, for iteration over object-based associate arrays.
-  // Needed for Android / Chromium browser pre-54.
-  loadPolyfill('src/polyfills/object.values.js', 'polyfills/object.values.js'),
-  // Needed to support Symbol.iterator, as used by the correction algorithm.
-  // Needed for Android / Chromium browser pre-43.
-  loadPolyfill('src/polyfills/symbol-es6.min.js', 'polyfills/symbol-es6.min.js'),
-  loadCompiledModuleFilePair('build/lib/worker-main.mjs', 'worker-main.mjs'),
-];
 
 function concatScriptsAndSourcemaps(files, finalName, separatorFile) {
   let combiner = SourcemapCombiner.create(finalName);
@@ -93,10 +92,35 @@ function concatScriptsAndSourcemaps(files, finalName, separatorFile) {
 // Centralized?
 
 console.log("Pass 1:  worker + polyfill concatenation");
+
+let separatorFile = {
+  source: `
+
+  `,
+  sourceFile: '<inline>'
+}
+
+let sourceFileSet = [
+  // Needed for Android / Chromium browser pre-45.
+  loadPolyfill('build/polyfills/array.fill.js', 'polyfills/array.fill.js'),
+  // Needed for Android / Chromium browser pre-45.
+  loadPolyfill('build/polyfills/array.findIndex.js', 'polyfills/array.findIndex.js'),
+  // Needed for Android / Chromium browser pre-45.
+  loadPolyfill('build/polyfills/array.from.js', 'polyfills/array.from.js'),
+  // Needed for Android / Chromium browser pre-47.
+  loadPolyfill('build/polyfills/array.includes.js', 'polyfills/array.includes.js'),
+  // For Object.values, for iteration over object-based associate arrays.
+  // Needed for Android / Chromium browser pre-54.
+  loadPolyfill('build/polyfills/object.values.js', 'polyfills/object.values.js'),
+  // Needed to support Symbol.iterator, as used by the correction algorithm.
+  // Needed for Android / Chromium browser pre-43.
+  loadPolyfill('build/polyfills/symbol-es6.min.js', 'polyfills/symbol-es6.min.js'),
+  loadCompiledModuleFilePair('build/lib/worker-main.mjs', 'worker-main.mjs'),
+];
+
 let fullWorkerConcatenation = concatScriptsAndSourcemaps(sourceFileSet, "worker-main.polyfilled.js", separatorFile);
 
 // New stage:  cleaning the sourcemaps
-
 console.log();
 
 // Because we're compiling the main project based on its TS build outputs, and our cross-module references
@@ -114,7 +138,9 @@ let remappingState = SourcemapRemapper
     {from: 'obj/models/models/', to: 'common/web/lm-worker/src/models/'},
     {from: 'obj/correction/correction/', to: 'common/web/lm-worker/src/correction/'},
     {from: 'obj/', to: 'common/web/lm-worker/src/'},
-    {from: /^\/utils\/src\//, to: 'common/web/utils/src/'}
+    {from: /^\/utils\/src\//, to: '/common/web/utils/src/'},
+    {from: '/keyman-version/', to: '/common/web/keyman-version/'},
+    // {from: /^\//, to: ''} // To avoid the later minification pass mangling the paths.
   ], (from, to) => console.log(`- ${from} => ${to}`));
 
 if(remappingState.unchangedSourcepaths.length > 0) {
@@ -137,56 +163,64 @@ fullWorkerConcatenation.sourcemapJSON = remappingState.sourcemap;
 // NOTE:  At this stage, if desired, the JSON form of the sourcemap may be cleaned, source paths altered, etc
 // before proceeding!
 
+if(!DEBUG) {
+  // Nuke the source text entries entirely if not in DEBUG mode; that's a LOT of extra text to track,
+  // which means filesize bloat.
+  //
+  // We should still get stack traces in any related Sentry logs; we're just keeping the source itself out.
+  delete fullWorkerConcatenation.sourcemapJSON.sourcesContent;
+}
+
+console.log();
+console.log("Pass 3:  Output intermediate state and perform minification");
+
+// IMPORTANT: Remove file-end sourcemap ref comment and replace it!
+fullWorkerConcatenation.script = fullWorkerConcatenation.script.substring(0, fullWorkerConcatenation.script.lastIndexOf('//# sourceMappingURL'));
+fullWorkerConcatenation.script += `//# sourceMappingURL=${fullWorkerConcatenation.scriptFilename}.map`;
+
+fs.writeFileSync(`build/lib/${fullWorkerConcatenation.scriptFilename}`, fullWorkerConcatenation.script);
+fs.writeFileSync(`build/lib/${fullWorkerConcatenation.scriptFilename}.map`, convertSourcemap.fromObject(fullWorkerConcatenation.sourcemapJSON).toJSON());
+
+await esbuild.build({
+  entryPoints: [`build/lib/${fullWorkerConcatenation.scriptFilename}`],
+  sourcemap: 'external',
+  sourcesContent: DEBUG,
+  minify: MINIFY,
+  keepNames: true,
+  outfile: "build/lib/worker-main.polyfilled.min.js"
+});
+
+const minifiedWorkerConcatenation = {
+  script: fs.readFileSync('build/lib/worker-main.polyfilled.min.js'),
+  sourcemapJSON: convertSourcemap.fromJSON(fs.readFileSync('build/lib/worker-main.polyfilled.min.js.map')).toObject(),
+}
+
+console.log();
+console.log("Pass 4:  Wrapping + generating final output");
+
 // Now, to build the wrapper...
 let wrapper = `
 // Autogenerated code.  Do not modify!
 // --START:LMLayerWorkerCode--
 
-export var LMLayerWorkerCode = "${encodeURIComponent(fullWorkerConcatenation.script)}"
+export var LMLayerWorkerCode = "${encodeURIComponent(minifiedWorkerConcatenation.script)}"
 
-export var LMLayerWorkerSourcemapComment = "//# sourceMappingURL=data:application/json;charset=utf-8;base64,${convertSourcemap.fromJSON(JSON.stringify(fullWorkerConcatenation.sourcemapJSON, null, 2)).toBase64()}";
+export var LMLayerWorkerSourcemapComment = "//# sourceMappingURL=data:application/json;charset=utf-8;base64,${convertSourcemap.fromJSON(JSON.stringify(minifiedWorkerConcatenation.sourcemapJSON, null, 2)).toBase64()}";
 
 // --END:LMLayerWorkerCode
 `;
 
-console.log();
-console.log("Pass 3:  Wrapping + generating final output");
 fs.writeFileSync('build/lib/worker-main.wrapped-for-bundle.js', wrapper);
 
-// For debugging, or if permanently loading from a file...
+// // For debugging, or if permanently loading from a file...
 
-// First one may need work - old link needs to be killed in favor of the second, most likely.
-// Then again, old link exists in the encoded version... and it's bypassed in favor of the true sourcemaps!
-fs.writeFileSync('build/lib/worker-main.bundled.js', fullWorkerConcatenation.script + '\n' + "//# sourceMappingURL=worker-main.bundled.js.map");
-fs.writeFileSync('build/lib/worker-main.bundled.js.map', JSON.stringify(fullWorkerConcatenation.sourcemapJSON, null, 2));
+// // First one may need work - old link needs to be killed in favor of the second, most likely.
+// // Then again, old link exists in the encoded version... and it's bypassed in favor of the true sourcemaps!
+// fs.writeFileSync('build/lib/worker-main.bundled.js', fullWorkerConcatenation.script + '\n' + "//# sourceMappingURL=worker-main.bundled.js.map");
+// fs.writeFileSync('build/lib/worker-main.bundled.js.map', JSON.stringify(fullWorkerConcatenation.sourcemapJSON, null, 2));
 
-// TS compilation will generally look for attached typing, and it's easy enough to provide.
-fs.writeFileSync('build/lib/worker-main.bundled.d.ts', `
-export var LMLayerWorkerCode: string;
-export var LMLayerWorkerSourcemapComment: string;
-`);
-
-// Will have sourcemap link for original file... then the loaded form that we build earlier on that gets concat'd.
-// THEN the actual, final one.
-
-// But, a problem:  the sourcemap is, by default, a comment... and comments don't pass through Function.toString().
-// SOLVED!  (Separate var for the sourcemap, appended to the 'unwrapped' worker.)  And sourcemaps are showing up!
-
-
-
-
-
-
-
-// -------------- Development notes of struggles I ran into & related solutions ---------------
-
-// Once I got sourcemaps to show up, they were misaligned.
-// Sourcemaps for the wrapped worker don't get processed during es-bundling or TSC re-compilation after content prepending.
-// At the LM-Layer unit-testing level, it's mostly due to whitespaces & comments in the polyfills as of this point;
-// those don't really pass through a Function.toString(), after all.
-//
-// Could _easily_ get worse with es-bundling optimizations for the 'final' level, which may further manipulate the source.
-//
-// Temp-solved!  ("Wrapped" via encodeURIComponent as a pure, encoded string - not as minifiable JS.)
-
-// After that... there was a "fudge factor" to discern... but WE'RE OPERATIONAL, BABY!  A WORKING WORKER SOURCEMAP!
+// // TS compilation will generally look for attached typing, and it's easy enough to provide.
+// fs.writeFileSync('build/lib/worker-main.bundled.d.ts', `
+// export var LMLayerWorkerCode: string;
+// export var LMLayerWorkerSourcemapComment: string;
+// `);
