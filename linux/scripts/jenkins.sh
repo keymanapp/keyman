@@ -13,6 +13,10 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
+. "$THIS_SCRIPT_PATH/package-build.inc.sh"
+
+keyman_projects="keyman"
+
 tier="stable"
 
 if [[ "$1" =~ "-alpha" ]]; then
@@ -33,29 +37,6 @@ sourcename=${sourcename%"-beta"}
 # set Debian/changelog environment
 export DEBFULLNAME="${fullsourcename} Package Signing Key"
 export DEBEMAIL='jenkins@sil.org'
-
-checkAndInstallRequirements()
-{
-	local TOINSTALL=""
-
-	for p in devscripts equivs
-	do
-		if ! dpkg -s $p >/dev/null 2>&1; then
-			TOINSTALL="$TOINSTALL $p"
-		fi
-	done
-
-	export DEBIAN_FRONTEND=noninteractive
-
-	if [ -n "$TOINSTALL" ]; then
-		sudo apt-get update
-		sudo apt-get -qy install "$TOINSTALL"
-	fi
-
-	sudo mk-build-deps debian/control
-	sudo apt-get -qy --allow-downgrades install ./keyman-build-deps_*.deb
-	sudo rm -f keyman-buid-deps_*
-}
 
 checkAndInstallRequirements
 
