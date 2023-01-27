@@ -1,14 +1,21 @@
 import * as xml2js from 'xml2js';
 import { LDMLKeyboardXMLSourceFile, LKImport } from './ldml-keyboard-xml.js';
 import Ajv from 'ajv';
-import * as fs from 'fs';
 import { boxXmlArray } from '../util/util.js';
+import { CompilerCallbacks } from 'src/util/compiler.js';
 
 export default class LDMLKeyboardXMLSourceFileReader {
+  callbacks: CompilerCallbacks;
+
+  constructor(callbacks : CompilerCallbacks) {
+    this.callbacks = callbacks;
+  }
+
   readImportFile(version: string, subpath: string): Buffer {
     // TODO-LDML: sanitize input string
     let importPath = new URL(`../import/${version}/${subpath}`, import.meta.url);
-    return fs.readFileSync(importPath);
+    // TODO-LDML: support baseFileName?
+    return this.callbacks.loadFile(importPath.pathname, importPath);
   }
 
   /**
