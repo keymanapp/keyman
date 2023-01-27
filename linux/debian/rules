@@ -27,19 +27,14 @@ override_dh_auto_configure:
 			--libexecdir=lib/$(DEB_TARGET_MULTIARCH)
 	# ibus-keyman
 	cd linux/ibus-keyman && \
-		cp -f ../../VERSION.md VERSION && \
-		export KEYMAN_PROC_CFLAGS="-I$(CURDIR)/core/build/arch/release/include -I$(CURDIR)/common/include -I$(CURDIR)/core/include" && \
-		export KEYMAN_PROC_LIBS="-L$(CURDIR)/core/build/arch/release/src -lkmnkbp0" && \
-		export PKG_CONFIG_PATH=$(CURDIR)/core/build/arch/release/meson-private && \
-		./autogen.sh && \
-		./configure --prefix=/usr
+		./build.sh configure -- --prefix=/usr
 	# keyman-config
 
 override_dh_auto_build:
 	# keymankeyboardprocessor
 	cd core && ./build.sh build
 	# ibus-keyman
-	cd linux/ibus-keyman && make
+	cd linux/ibus-keyman && ./build.sh build
 	# keyman-config
 	cd linux/keyman-config && \
 		make man && \
@@ -52,7 +47,7 @@ ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 	# keymankeyboardprocessor
 	cd core && ./build.sh tests
 	# ibus-keyman
-	cd linux/ibus-keyman && make check VERBOSE=1
+	cd linux/ibus-keyman && ./build.sh test
 	# keyman-config
 	dh_auto_test --sourcedir=linux/keyman-config --buildsystem=pybuild $@
 endif
@@ -62,7 +57,7 @@ override_dh_auto_install:
 	install -d $(CURDIR)/debian/tmp
 	cd core && DESTDIR=$(CURDIR)/debian/tmp ./build.sh install
 	# ibus-keyman
-	cd linux/ibus-keyman && make install DESTDIR=$(CURDIR)/debian/tmp
+	cd linux/ibus-keyman && DESTDIR=$(CURDIR)/debian/tmp ./build.sh install
 	# keyman-config
 	install -d $(CURDIR)/debian/keyman/usr/share/
 	cp -r linux/keyman-config/locale/ $(CURDIR)/debian/keyman/usr/share/

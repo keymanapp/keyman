@@ -36,7 +36,7 @@ fi
 rm -rf dist
 mkdir -p dist
 
-# configure and make dist for autotool projects
+# configure and make dist
 for proj in ${extra_projects}; do
     # dist for keyman
     cp -a debian ../

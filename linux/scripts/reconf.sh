@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# autoreconf autotool projects
-
 # parameters: ./reconf.sh [proj]
 # proj = only reconf this project
 
@@ -15,26 +13,18 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 BASEDIR="$KEYMAN_ROOT/linux"
 echo "basedir is $BASEDIR"
-autotool_projects="ibus-keyman"
 extra_projects="keyboardprocessor keyman-config"
 
 if [ "$1" != "" ]; then
     if [ "$1" == "keyman" ]; then
         echo "reconfiguring only keyman"
         extra_projects="keyman"
-        autotool_projects=""
     elif [ "$1" == "keyboardprocessor" ]; then
         echo "reconfiguring only keyboardprocessor"
         extra_projects="keyboardprocessor"
-        autotool_projects=""
     elif [ "$1" == "keyman-config" ]; then
         echo "reconfiguring only keyman-config"
         extra_projects="keyman-config"
-        autotool_projects=""
-    elif [ -d "$1" ]; then
-        echo "reconfiguring only $1"
-        extra_projects=""
-        autotool_projects="$1"
     else
         echo "project $1 does not exist"
         exit 1
@@ -43,20 +33,15 @@ fi
 
 echo "Found tier ${TIER}, version ${VERSION}"
 
-# autoreconf the projects
-for proj in ${autotool_projects}; do
-    cd "$proj"
-    echo "Reconfiguring $proj to version ${VERSION}"
-    autoreconf -if
-    rm -rf autom4te.cache
-    cd "$BASEDIR"
-done
-
 for proj in ${extra_projects}; do
     if [ "${proj}" == "keyboardprocessor" ] || [ "${proj}" == "keyman" ]; then
         rm -rf keyboardprocessor
         cp ../VERSION.md ../core/
         ../core/build.sh -t keyboardprocessor configure
+    fi
+    if [ "${proj}" == "keyman" ]; then
+        cd ibus-keyman
+        ./build.sh configure
     fi
     if [ "${proj}" == "keyman-config" ] || [ "${proj}" == "keyman" ]; then
         cd keyman-config
