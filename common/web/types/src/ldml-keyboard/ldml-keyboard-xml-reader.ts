@@ -1,14 +1,22 @@
 import * as xml2js from 'xml2js';
 import { LDMLKeyboardXMLSourceFile, LKImport } from './ldml-keyboard-xml.js';
 import Ajv from 'ajv';
-import * as fs from 'fs';
 import { boxXmlArray } from '../util/util.js';
+import { CompilerCallbacks } from 'src/util/compiler.js';
+import { constants } from '@keymanapp/ldml-keyboard-constants';
 
 export default class LDMLKeyboardXMLSourceFileReader {
+  callbacks: CompilerCallbacks;
+
+  constructor(callbacks : CompilerCallbacks) {
+    this.callbacks = callbacks;
+  }
+
   readImportFile(version: string, subpath: string): Buffer {
     // TODO-LDML: sanitize input string
     let importPath = new URL(`../import/${version}/${subpath}`, import.meta.url);
-    return fs.readFileSync(importPath);
+    // TODO-LDML: support baseFileName?
+    return this.callbacks.loadFile(importPath.pathname, importPath);
   }
 
   /**
@@ -17,22 +25,21 @@ export default class LDMLKeyboardXMLSourceFileReader {
    * @param source any
    */
   private boxArrays(source: any) {
+    if (source?.keyboard) {
+      if (!source.keyboard.keys) {
+        source.keyboard.keys = {
+          key: [],
+          flicks: [],
+        };
+      }
+      if (!source.keyboard.keys?.import) {
+        source.keyboard.keys.import = [];
+      }
+    }
     boxXmlArray(source?.keyboard, 'layers');
     boxXmlArray(source?.keyboard?.displays, 'display');
     boxXmlArray(source?.keyboard?.names, 'name');
     boxXmlArray(source?.keyboard?.vkeys, 'vkey');
-    // for implied we need keyboard.keys.import to exist.
-    // TODO-LDML: will fail if source or source.keyboard is nullish
-    if (!source?.keyboard?.keys) {
-      source.keyboard.keys = {
-        import:[],
-        key:[],
-        flicks:[],
-      };
-    }
-    if (!source?.keyboard?.keys?.import) {
-      source.keyboard.keys.import = [];
-    }
     boxXmlArray(source?.keyboard?.keys, 'key');
     boxXmlArray(source?.keyboard?.keys, 'flicks');
     boxXmlArray(source?.keyboard?.locales, 'locale');
@@ -98,8 +105,8 @@ export default class LDMLKeyboardXMLSourceFileReader {
     if (subtag === 'keys') {
       // <import base="cldr" path="techpreview/keys-Latn-implied.xml"/>
       this.resolveOneImport(obj, subtag, {
-        base: 'cldr',
-        path: 'techpreview/keys-Latn-implied.xml'
+        base: constants.cldr_import_base,
+        path: constants.cldr_implied_keys_import
       });
     }
 
@@ -110,32 +117,31 @@ export default class LDMLKeyboardXMLSourceFileReader {
   }
 
   private resolveOneImport(obj: any, subtag: string, asImport: LKImport) {
-    if (asImport.base !== 'cldr') {
-      throw new Error(`import element with base ${asImport.base} is unsupported.`);
+    if (asImport.base !== constants.cldr_import_base) {
+      throw new Error(`import element with base ${asImport.base} is unsupported, only ${constants.cldr_import_base} is supported.`);
     }
     const paths = asImport.path.split('/');
     if (!paths[0] || !paths[1] || paths.length !== 2) {
-      throw new Error(`import element with invalid path ${asImport.path}: expect the form 'techpreview/*.xml'`);
+      throw new Error(`import element with invalid path ${asImport.path}: expect the form '${constants.cldr_version_latest}./*.xml'`);
     }
     const importData: Uint8Array = this.readImportFile(paths[0], paths[1]);
     if (!importData || !importData.length) {
-      throw new Error(`could not read data with path ${asImport.path}: expect the form 'techpreview/*.xml'`);
+      throw new Error(`could not read data with path ${asImport.path}: expect the form '${constants.cldr_version_latest}./*.xml'`);
     }
     const importXml: any = this.loadUnboxed(importData); // TODO-LDML: have to load as any because it is an arbitrary part
-    const importRootNode = importXml[subtag]; // e.g. keys
+    const importRootNode = importXml[subtag]; // e.g. <keys/>
 
     // importXml will have one property: the root element.
     if (!importRootNode) {
       throw new Error(`Invalid import file ${asImport.path}: expected ${subtag} as root element`);
     }
     // pull all children of importXml[subtag] into obj
-    for (const subsubtag of Object.keys(importRootNode)) { // e.g. key
+    for (const subsubtag of Object.keys(importRootNode)) { // e.g. <key/>
       const subsubval = importRootNode[subsubtag];
       if (!Array.isArray(subsubval)) {
         throw new Error(`Problem importing ${asImport.path}: not sure how to handle non-array ${subtag}.${subsubtag}`);
       }
       if (!obj[subsubtag]) {
-        // TODO-LDML: this probably should be an error if this doesn't exist
         obj[subsubtag] = []; // start with empty array
       }
       obj[subsubtag] = [...subsubval, ...obj[subsubtag]];

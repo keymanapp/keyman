@@ -71,7 +71,7 @@ export function loadSectionFixture(compilerClass: typeof SectionCompiler, filena
   const data = callbacks.loadFile(inputFilename, inputFilename);
   assert.isNotNull(data);
 
-  const reader = new LDMLKeyboardXMLSourceFileReader();
+  const reader = new LDMLKeyboardXMLSourceFileReader(callbacks);
   const source = reader.load(data);
   assert.isNotNull(source);
   assert.doesNotThrow(() => {
