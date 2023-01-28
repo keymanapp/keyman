@@ -10,7 +10,7 @@ const keys = Object.keys(constants);
 keys.sort();
 console.log(`
 /*
-  Copyright:        Copyright (C) 2022 SIL International.
+  Copyright:        Copyright (C) 2022-2023 SIL International.
   Authors:          srl295
   This file provides constants for the KMX Plus (LDML support) binary format,
   to be shared between TypeScript and C++ via the generator (below)
@@ -29,35 +29,37 @@ console.log(`
 let errs = 0;
 
 for (const key of keys) {
-    const value : any = constants[key as keyof typeof constants];
-    const upkey = key.toUpperCase();
-    const type = typeof value;
-    if (type === 'number') {
-        console.log(`#define LDML_${upkey} 0x${value.toString(16).toUpperCase()}`);
-    } else if (type === 'string') {
-        console.log(`#define LDML_${upkey} "${value}"`);
-    } else if (key === 'section') {
-        // handle section table
-        const subkeys = Object.keys(value);
-        subkeys.sort();
-        for (const subkey of subkeys) {
-            const upsubkey = subkey.toUpperCase();
-            const subvalue = value[subkey];
-            if (subvalue !== subkey) {
-                // "can't happen" because tsc would complain
-                console.error(`In the SectionMap:  ${subkey}: '${subvalue}' - expected key and value to match.`);
-                errs++;
-            }
-            const asnum = constants.hex_section_id(subkey);
-            console.log(`#define LDML_${upkey}ID_${upsubkey} 0x${asnum.toString(16).toUpperCase()} /* "${subkey}" */`);
-            console.log(`#define LDML_${upkey}NAME_${upsubkey}             "${subkey}"`);
-        }
-    } else if (type !== 'function') {
-        console.error(`Don’t know what to do with constants[${key}] of type ${type}`);
+  const value: any = constants[key as keyof typeof constants];
+  const upkey = key.toUpperCase();
+  const type = typeof value;
+  if (type === 'number') {
+    console.log(`#define LDML_${upkey} 0x${value.toString(16).toUpperCase()}`);
+  } else if (type === 'string') {
+    console.log(`#define LDML_${upkey} "${value}"`);
+  } else if (key === 'section') {
+    // handle section table
+    const subkeys = Object.keys(value);
+    subkeys.sort();
+    for (const subkey of subkeys) {
+      const upsubkey = subkey.toUpperCase();
+      const subvalue = value[subkey];
+      if (subvalue !== subkey) {
+        // "can't happen" because tsc would complain
+        console.error(`In the SectionMap:  ${subkey}: '${subvalue}' - expected key and value to match.`);
         errs++;
+      }
+      const asnum = constants.hex_section_id(subkey);
+      console.log(`#define LDML_${upkey}ID_${upsubkey} 0x${asnum.toString(16).toUpperCase()} /* "${subkey}" */`);
+      console.log(`#define LDML_${upkey}NAME_${upsubkey}             "${subkey}"`);
     }
+  } else if (key === 'layr_list_hardware_map' || type === 'function') {
+    // ignored
+  } else {
+    console.error(`Don’t know what to do with constants[${key}] of type ${type}`);
+    errs++;
+  }
 }
 
 if (errs != 0) {
-    throw Error(`Fail: ${errs} error(s), see above.`);
+  throw Error(`Fail: ${errs} error(s), see above.`);
 }

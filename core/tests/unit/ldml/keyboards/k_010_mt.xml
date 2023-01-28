@@ -25,12 +25,9 @@ Gets part of the way,
 
     <keys>
         <!-- imports -->
-        <!-- TODO-LDML: Added next: see #7964 -->
-        <import base="cldr" path="techpreview/keys-Latn-implied.xml"/>
         <import base="cldr" path="techpreview/keys-Zyyy-punctuation.xml"/>
-        <!-- TODO-LDML: Added next: see #7964 -->
-        <key id="space" to=" " width="5" />
-        <!-- TODO-LDML: added next -->
+
+        <!-- TODO-LDML: added next (but it is in a pending CLDR PR) #2652 -->
         <key id="asterisk" to="*" />
         <!-- accent grave -->
         <key id="a-grave" to="à" />
@@ -56,9 +53,6 @@ Gets part of the way,
 
         <!-- Cedilla -->
         <key id="c-cedilla" to="ç" />
-
-        <!-- gaps -->
-        <key id="gap" gap="true" width="1" />
     </keys>
 
 

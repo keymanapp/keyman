@@ -1,6 +1,6 @@
 
 /*
-  Copyright:        Copyright (C) 2022 SIL International.
+  Copyright:        Copyright (C) 2022-2023 SIL International.
   Authors:          srl295
   This file provides constants for the KMX Plus (LDML support) binary format,
   to be shared between TypeScript and C++ via the generator (below)
@@ -16,6 +16,10 @@
 #pragma once
 
 #define LDML_BKSP_FLAGS_ERROR 0x1
+#define LDML_CLDR_IMPLIED_KEYS_IMPORT "techpreview/keys-Latn-implied.xml"
+#define LDML_CLDR_IMPORT_BASE "cldr"
+#define LDML_CLDR_VERSION_LATEST "techpreview"
+#define LDML_CLDR_VERSION_TECHPREVIEW "techpreview"
 #define LDML_ELEM_FLAGS_ORDER_BITSHIFT 0x10
 #define LDML_ELEM_FLAGS_ORDER_MASK 0xFF0000
 #define LDML_ELEM_FLAGS_PREBASE 0x4

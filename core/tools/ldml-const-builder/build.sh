@@ -42,7 +42,7 @@ if builder_start_action build; then
 fi
 
 if builder_start_action run; then
-  node ../../include/ldml/ldml-const-builder/ldml-const-builder.js > ${KBP_LDML_H_FILE}
+  node --enable-source-maps ../../include/ldml/ldml-const-builder/ldml-const-builder.js > ${KBP_LDML_H_FILE}
   echo "Updated ${KBP_LDML_H_FILE}"
 
   builder_finish_action success run

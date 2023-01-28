@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright © 1991-2022 Unicode, Inc.
+  Copyright © 1991-2023 Unicode, Inc.
   For terms of use, see http://www.unicode.org/copyright.html
   SPDX-License-Identifier: Unicode-DFS-2016
   CLDR data files are interpreted according to the LDML specification (http://unicode.org/reports/tr35/)
@@ -226,6 +226,13 @@
       <xs:attribute name="longPress"/>
       <xs:attribute name="longPressDefault"/>
       <xs:attribute name="multiTap"/>
+      <xs:attribute name="stretch">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
       <xs:attribute name="switch" type="xs:NMTOKEN"/>
       <xs:attribute name="transform">
         <xs:simpleType>
@@ -245,6 +252,7 @@
   <!-- @MATCH:any -->
   <!-- @VALUE -->
   <!-- @MATCH:any -->
+  <!-- @VALUE -->
   <!-- @VALUE -->
   <!-- @VALUE -->
   <!-- @MATCH:regex/[A-Za-z0-9][A-Za-z0-9-]* -->

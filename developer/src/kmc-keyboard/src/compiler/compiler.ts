@@ -56,7 +56,7 @@ export default class Compiler {
    * @returns
    */
   public load(filename: string): LDMLKeyboardXMLSourceFile {
-    const reader = new LDMLKeyboardXMLSourceFileReader();
+    const reader = new LDMLKeyboardXMLSourceFileReader(this.callbacks);
     const data = this.callbacks.loadFile(filename, filename);
     const source = reader.load(data);
     if(!source) {
