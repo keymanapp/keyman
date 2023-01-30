@@ -1,7 +1,7 @@
 import unwrap from '../unwrap.js';
 import { LMLayerWorkerCode, LMLayerWorkerSourcemapComment } from "@keymanapp/lm-worker/build/lib/worker-main.wrapped.js";
 
-export default class DefaultWorker {
+export default class SourcemappedWorker {
   static constructInstance(): Worker {
     return new Worker(this.asBlobURI(LMLayerWorkerCode));
   }
