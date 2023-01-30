@@ -2,7 +2,7 @@ import 'mocha';
 import {assert} from 'chai';
 import {loadLdmlKeyboardSchema, loadFile, makePathToFixture} from '../helpers/index.js';
 import LDMLKeyboardXMLSourceFileReader from '../../src/ldml-keyboard/ldml-keyboard-xml-reader.js';
-import { CompilerCallbacks, CompilerEvent } from '../../src/util/compiler.js';
+import { CompilerCallbacks, CompilerEvent } from '../../src/util/compiler-interfaces.js';
 
 describe('ldml keyboard xml reader tests', function() {
   this.slow(500); // 0.5 sec -- json schema validation takes a while

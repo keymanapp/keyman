@@ -43,7 +43,7 @@ export interface LKImport {
    * path to imported resource, of the form `techpreview/*.xml`
    */
   path: string;
-}
+};
 
 export interface LKLocales {
   locale: LKLocale[];

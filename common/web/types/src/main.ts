@@ -14,4 +14,4 @@ export { default as LDMLKeyboardXMLSourceFileReader } from './ldml-keyboard/ldml
 
 export * as Constants from './consts/virtual-key-constants.js';
 
-export { CompilerCallbacks, CompilerEvent } from './util/compiler.js';
+export { CompilerCallbacks, CompilerEvent } from './util/compiler-interfaces.js';

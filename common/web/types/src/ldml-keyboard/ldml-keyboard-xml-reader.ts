@@ -2,7 +2,7 @@ import * as xml2js from 'xml2js';
 import { LDMLKeyboardXMLSourceFile, LKImport } from './ldml-keyboard-xml.js';
 import Ajv from 'ajv';
 import { boxXmlArray } from '../util/util.js';
-import { CompilerCallbacks } from 'src/util/compiler.js';
+import { CompilerCallbacks } from '../util/compiler-interfaces.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 
 export default class LDMLKeyboardXMLSourceFileReader {
@@ -32,7 +32,7 @@ export default class LDMLKeyboardXMLSourceFileReader {
           flicks: [],
         };
       }
-      if (!source.keyboard.keys?.import) {
+      if (!source.keyboard.keys.import) {
         source.keyboard.keys.import = [];
       }
     }
