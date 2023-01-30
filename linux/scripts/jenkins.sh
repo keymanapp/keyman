@@ -65,8 +65,8 @@ checkAndInstallRequirements
 echo_heading "cleaning previous builds of $1"
 
 rm -rf builddebs
-rm -rf "$sourcedir/${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}"
-rm -rf "$sourcedir/../${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}"
+rm -rf "$sourcedir/${1}"_*.{dsc,build,buildinfo,changes,tar.?z,log}
+rm -rf "$sourcedir/../${1}"_*.{dsc,build,buildinfo,changes,tar.?z,log}
 
 echo_heading "Make source package for $fullsourcename"
 echo_heading "reconfigure"
