@@ -1,7 +1,7 @@
 var assert = chai.assert;
 
 import { Worker as WorkerBuilder }   from "../../../build/lib/web/index.mjs";
-import { LMLayerWorkerCode } from "/base/common/web/lm-worker/build/lib/worker-main.wrapped-for-bundle.js";
+import { LMLayerWorkerCode } from "/base/common/web/lm-worker/build/lib/worker-main.wrapped.min.js";
 import * as helpers from "../helpers.mjs";
 
 describe('LMLayerWorker', function () {

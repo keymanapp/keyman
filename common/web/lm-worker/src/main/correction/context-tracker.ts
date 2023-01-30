@@ -1,5 +1,3 @@
-/// <reference path="distance-modeler.ts" />
-
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { SearchSpace } from './distance-modeler.js';
 import { tokenize } from '@keymanapp/models-templates/build/obj/index.js';

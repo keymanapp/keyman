@@ -1,9 +1,9 @@
 import VirtualizedWorker from "./virtualizedWorker.js";
 import unwrap from '../unwrap.js';
 
-import { LMLayerWorkerCode, LMLayerWorkerSourcemapComment } from "@keymanapp/lm-worker/build/lib/worker-main.wrapped.min.js";
+import { LMLayerWorkerCode, LMLayerWorkerSourcemapComment } from "@keymanapp/lm-worker/build/lib/worker-main.wrapped.js";
 
-export default class Worker {
+export default class SourcemappedWorker {
   static constructInstance(): Worker {
     let scriptStr = unwrap(LMLayerWorkerCode);
 

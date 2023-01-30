@@ -11,10 +11,15 @@ import { spawn } from 'child_process';
 await esbuild.build({
   bundle: true,
   sourcemap: true,
-  //sourceRoot: "../../..",
+  /*
+   * https://esbuild.github.io/api/#sources-content would theoretically allow us to strip the source
+   * while still keeping info useful for stack-tracing... but it doesn't pass through the sourcemap
+   * concatenation setup.
+   *
+   * That said, we know how to 'nix it ourselves in post now, so... yeah.
+   */
+  sourcesContent: true,
   sourceRoot: "/",
-  // https://esbuild.github.io/api/#sources-content may be worth considering when making
-  // a release build; erase source, but maintain stack trace mapping.
   format: "esm",
   nodePaths: ['..', '../../models'],
   entryPoints: {
@@ -23,36 +28,6 @@ await esbuild.build({
   },
   outdir: 'build/lib',
   outExtension: { '.js': '.mjs' },
-  tsconfig: 'tsconfig.json',
-  target: "es5"
-});
-
-// Bundled CommonJS (classic Node) module version
-esbuild.buildSync({
-  bundle: true,
-  sourcemap: true,
-  format: "cjs",
-  nodePaths: ['..'],
-  entryPoints: {
-    'index': 'build/obj/index.js',
-    'worker-main': 'build/obj/worker-main.js'
-  },
-  outdir: 'build/lib',
-  outExtension: { '.js': '.cjs' },
-  tsconfig: 'tsconfig.json',
-  target: "es5"
-});
-
-// Direct-use version
-esbuild.buildSync({
-  bundle: true,
-  sourcemap: true,
-  format: "iife",
-  nodePaths: ['..'],
-  entryPoints: {
-    'worker-main': 'build/obj/worker-main.js'
-  },
-  outdir: 'build/lib',
   tsconfig: 'tsconfig.json',
   target: "es5"
 });

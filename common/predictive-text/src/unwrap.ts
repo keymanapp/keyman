@@ -7,6 +7,5 @@
  */
 export default function unwrap(encodedSrc: string): string {
   let wrapper = decodeURIComponent(encodedSrc);
-  //let match = wrapper.match(/function[^{]+{((?:.|\r|\n)+)}[^}]*$/);
   return wrapper;
 }
