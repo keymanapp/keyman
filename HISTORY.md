@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.135 beta 2023-01-30
+
+* chore(linux): Include packaging path in Vcs-Git header (#8110)
+
 ## 16.0.134 beta 2023-01-25
 
 * chore(common): Add crowdin strings for Kannada (#7970)
