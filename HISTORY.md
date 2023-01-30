@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.38 alpha 2023-01-30
+
+* chore(deps): bump ua-parser-js from 0.7.31 to 0.7.33 (#8109)
+* fix(linux): Fix CI build 🩹 (#8121)
+
 ## 17.0.37 alpha 2023-01-27
 
 * chore(linux): Fix warnings (#8103)
