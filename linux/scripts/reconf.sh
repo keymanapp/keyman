@@ -2,9 +2,8 @@
 
 # autoreconf autotool projects
 
-# parameters: [BUILD_LEGACY=1] [JENKINS="yes"] ./reconf.sh [proj]
+# parameters: [BUILD_LEGACY=1] ./reconf.sh [proj]
 # BUILD_LEGACY=1 to also build legacy KMFL projects
-# JENKINS="yes" to set version for jenkins builds
 # proj = only reconf this project
 
 set -e
@@ -87,6 +86,7 @@ for proj in ${extra_projects}; do
         sed \
             -e "s/_VERSION_/${VERSION}/g" \
             -e "s/_VERSIONWITHTAG_/${VERSION_WITH_TAG}/g" \
+            -e "s/_VERSIONGITTAG_/${VERSION_GIT_TAG}/g" \
             -e "s/_MAJORVERSION_/${VERSION_MAJOR}/g" \
             -e "s/_RELEASEVERSION_/${VERSION_RELEASE}/g" \
             -e "s/_TIER_/${TIER}/g" \

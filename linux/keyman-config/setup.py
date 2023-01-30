@@ -14,6 +14,8 @@ setup(
              'km-package-uninstall',
              'km-package-list-installed'],
 
+    zip_safe=False,  # don't install a zip
+
     install_requires=[
         'lxml', 'numpy', 'Pillow', 'requests', 'requests-cache',
         'python-magic', 'qrcode', 'sentry-sdk'

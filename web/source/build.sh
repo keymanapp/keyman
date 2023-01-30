@@ -212,8 +212,6 @@ INTERMEDIATE="../intermediate"
 SOURCE="."
 NODE_SOURCE="source"
 
-SENTRY_RELEASE_VERSION="release-$VERSION_WITH_TAG"
-
 readonly WEB_OUTPUT
 readonly EMBED_OUTPUT
 readonly SOURCE
@@ -451,7 +449,7 @@ if [ $BUILD_EMBED = true ]; then
             pushd $EMBED_OUTPUT
         fi
         echo "Uploading to Sentry..."
-        npm run sentry-cli -- releases files "$SENTRY_RELEASE_VERSION" upload-sourcemaps --strip-common-prefix $ARTIFACT_FOLDER --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
+        npm run sentry-cli -- releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix $ARTIFACT_FOLDER --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
         echo "Upload successful."
         popd
     fi
@@ -571,7 +569,7 @@ fi
 if [ $UPLOAD_WEB_SENTRY = true ]; then
     pushd $WEB_OUTPUT
     echo "Uploading to Sentry..."
-    npm run sentry-cli -- releases files "$SENTRY_RELEASE_VERSION" upload-sourcemaps --strip-common-prefix release/web/ --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
+    npm run sentry-cli -- releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix release/web/ --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
     echo "Upload successful."
     popd
 fi

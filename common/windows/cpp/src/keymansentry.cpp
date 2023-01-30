@@ -49,7 +49,7 @@ int keyman_sentry_init(bool is_keyman_developer, const char *logger) {
     ILFree(pidl);
   }
 
-  sentry_options_set_release(options, "release-" KEYMAN_VersionWithTag); // matches git tag
+  sentry_options_set_release(options, KEYMAN_VersionGitTag); // matches git tag
   sentry_options_set_environment(options, KEYMAN_Environment); // stable, beta, alpha, test, local
 
   // We don't currently need to set this, because it will be same path
