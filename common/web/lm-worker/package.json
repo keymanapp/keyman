@@ -8,7 +8,8 @@
     "mocha": "mocha",
     "test": "gosh ./test/test.sh",
     "build": "tsc -b",
-    "clean": "tsc -b --clean"
+    "clean": "tsc -b --clean",
+    "tsc": "tsc"
   },
   "license": "MIT",
   "devDependencies": {

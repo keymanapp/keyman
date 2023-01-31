@@ -108,6 +108,10 @@ if builder_start_action build; then
   echo "Bundling worker modules"
   node build-bundler.js
 
+  # Declaration bundling.
+  npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/worker-main.d.ts
+
   # Wrap the worker code and create embeddable source file. Must be run after the worker is built
   # The outer shell (lm-layer) compiles against ${WORKER_WRAPPED_BUNDLE_TARGET_FILENAME}.
   echo "Wrapping worker in function LMLayerWorkerCode ${WORKER_WRAPPED_BUNDLE_TARGET_FILENAME}"
