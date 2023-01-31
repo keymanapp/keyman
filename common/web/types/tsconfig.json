@@ -12,6 +12,6 @@
   ],
   "references": [
     { "path": "../keyman-version/tsconfig.esm.json" },
-    { "path": "../../../core/include/ldml/"},
+    { "path": "../../../core/include/ldml/tsconfig.json"},
   ]
 }

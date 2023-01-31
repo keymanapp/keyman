@@ -31,6 +31,20 @@ export interface LKKeyboard {
   reorders?: LKReorders;
 };
 
+/**
+ * This is defined as an interface, but actually is resolved during the reading phase
+ */
+export interface LKImport {
+  /**
+   * import base, currently `cldr` is supported
+   */
+  base: string;
+  /**
+   * path to imported resource, of the form `techpreview/*.xml`
+   */
+  path: string;
+};
+
 export interface LKLocales {
   locale: LKLocale[];
 };

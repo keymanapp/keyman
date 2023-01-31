@@ -159,6 +159,12 @@
         "multiTap": {
           "type": "string"
         },
+        "stretch": {
+          "enum": [
+            "true"
+          ],
+          "type": "string"
+        },
         "switch": {
           "type": "string"
         },

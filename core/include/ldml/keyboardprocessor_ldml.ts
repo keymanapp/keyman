@@ -60,6 +60,22 @@ class Constants {
    */
   readonly version = '1.0';
   /**
+   * The techpreview CLDR version
+   */
+  readonly cldr_version_techpreview = 'techpreview';
+  /**
+   * The latest CLDR version
+   */
+  readonly cldr_version_latest = this.cldr_version_techpreview;
+  /**
+   * import base
+   */
+  readonly cldr_import_base = 'cldr';
+  /**
+   * implied keys file
+   */
+  readonly cldr_implied_keys_import = `${this.cldr_version_techpreview}/keys-Latn-implied.xml`;
+  /**
    * Length of a raw section header, in bytes
    */
   readonly length_header = 8;

@@ -9,7 +9,7 @@ import * as path from 'path';
 import { Command } from 'commander';
 import * as kmc from '@keymanapp/kmc-keyboard';
 import KEYMAN_VERSION from "@keymanapp/keyman-version/keyman-version.mjs";
-import { KvkFileWriter } from '@keymanapp/common-types';
+import { KvkFileWriter, CompilerCallbacks, CompilerEvent } from '@keymanapp/common-types';
 
 let inputFilename: string;
 
@@ -38,12 +38,15 @@ function exitDueToUsageError(message: string): never  {
   return process.exit(64); // TODO: SysExits.EX_USAGE
 }
 
-class CompilerCallbacks {
-  loadFile(baseFilename: string, filename:string): Buffer {
+/**
+ * Concrete implementation for CLI use
+ */
+class NodeCompilerCallbacks implements CompilerCallbacks {
+  loadFile(baseFilename: string, filename: string | URL): Buffer {
     // TODO: translate filename based on the baseFilename
     return fs.readFileSync(filename);
   }
-  reportMessage(event: kmc.CompilerEvent): void {
+  reportMessage(event: CompilerEvent): void {
     console.log(kmc.CompilerMessages.severityName(event.code) + ' ' + event.code.toString(16) + ': ' + event.message);
   }
   loadLdmlKeyboardSchema(): Buffer {
@@ -57,7 +60,7 @@ class CompilerCallbacks {
 }
 
 function compileKeyboard(inputFilename: string, options: kmc.CompilerOptions): [Uint8Array,Uint8Array] {
-  const c = new CompilerCallbacks();
+  const c : CompilerCallbacks = new NodeCompilerCallbacks();
   const k = new kmc.Compiler(c, options);
   let source = k.load(inputFilename);
   if(!source) {

@@ -1,5 +1,4 @@
-import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus } from '@keymanapp/common-types';
-import CompilerCallbacks from './callbacks.js';
+import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus, CompilerCallbacks } from '@keymanapp/common-types';
 import CompilerOptions from './compiler-options.js';
 import { CompilerMessages } from './messages.js';
 import { BkspCompiler, FinlCompiler, TranCompiler } from './tran.js';
@@ -57,7 +56,7 @@ export default class Compiler {
    * @returns
    */
   public load(filename: string): LDMLKeyboardXMLSourceFile {
-    const reader = new LDMLKeyboardXMLSourceFileReader();
+    const reader = new LDMLKeyboardXMLSourceFileReader(this.callbacks);
     const data = this.callbacks.loadFile(filename, filename);
     const source = reader.load(data);
     if(!source) {
