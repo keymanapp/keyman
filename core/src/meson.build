@@ -51,11 +51,14 @@ if compiler.get_id() == 'msvc'
   version_res += import('windows').compile_resources('version.rc', args:['/n','/c65001'])
 endif
 
+build_static_lib = true
+
 if compiler.get_id() == 'emscripten'
   warns = []
   flags = []
   defns = ['-DKMN_KBP']
   links = []
+  build_static_lib = disabler()
 endif
 
 kmx_files = files(
@@ -96,7 +99,7 @@ mock_files = files(
   'mock/mock_processor.cpp',
 )
 
-lib = both_libraries('kmnkbp0',
+lib = library('kmnkbp0',
   api_files,
   core_files,
   kmx_files,
@@ -108,6 +111,21 @@ lib = both_libraries('kmnkbp0',
   include_directories: inc,
   pic: true,
   install: true)
+
+if build_static_lib
+  static_library('kmnkbp0-static',
+    api_files,
+    core_files,
+    kmx_files,
+    mock_files,
+    version_res,
+    cpp_args: defns + warns + flags,
+    link_args: links,
+    include_directories: inc,
+    pic: true,
+    install: false
+  )
+endif
 
 headerdirs = [ '.', 'keyman' ] # subdirectories of ${prefix}/include to add to header path
 
