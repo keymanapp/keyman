@@ -12,7 +12,7 @@ import landscapeView from 'keyman/build/engine/dom-utils/obj/landscapeView.js';
 import Configuration from '../config/viewConfiguration.js';
 import TwoStateActivator from './twoStateActivator.js';
 import FloatingOSKCookie from './floatingOskCookie.js';
-import ManagedPromise from '../managedPromise.js';
+import { ManagedPromise } from '@keymanapp/web-utils/build/lib/index.mjs';
 
 /***
    KeymanWeb 10.0

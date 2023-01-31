@@ -1,4 +1,4 @@
-import DeviceSpec from '@keymanapp/web-utils/build/obj/deviceSpec.js';
+import { DeviceSpec } from '@keymanapp/web-utils/build/lib/index.mjs';
 
 export interface KeyboardFont {
   'family': string;

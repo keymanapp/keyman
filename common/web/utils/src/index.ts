@@ -23,6 +23,8 @@ export { globalObject };
 import extendString from "./kmwstring.js";
 export { extendString };
 
+export { default as ManagedPromise } from "./managedPromise.js";
+
 // // Uncomment the following line and run the bundled output to verify successful
 // // esbuild bundling of this submodule:
 // console.log(Version.CURRENT.toString());
