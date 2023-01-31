@@ -58,7 +58,7 @@ if compiler.get_id() == 'emscripten'
   links = []
 endif
 
-kmxfiles = files(
+kmx_files = files(
   'kmx/kmx_consts.cpp',
   'kmx/kmx_processevent.cpp',
   'kmx/kmx_actions.cpp',
@@ -75,7 +75,7 @@ kmxfiles = files(
   'kmx/kmx_xstring.cpp',
 )
 
-apifiles = files(
+api_files = files(
   'km_kbp_context_api.cpp',
   'km_kbp_keyboard_api.cpp',
   'km_kbp_options_api.cpp',
@@ -84,7 +84,7 @@ apifiles = files(
   'km_kbp_processevent_api.cpp',
 )
 
-corefiles = files(
+core_files = files(
   'option.cpp',
   'keyboard.cpp',
   'state.cpp',
@@ -92,16 +92,21 @@ corefiles = files(
   'utfcodec.cpp',
 )
 
-lib = library('kmnkbp0',
-  apifiles,
-  corefiles,
-  kmxfiles,
+mock_files = files(
   'mock/mock_processor.cpp',
+)
+
+lib = both_libraries('kmnkbp0',
+  api_files,
+  core_files,
+  kmx_files,
+  mock_files,
   version_res,
   cpp_args: defns + warns + flags,
   link_args: links,
   version: lib_version,
   include_directories: inc,
+  pic: true,
   install: true)
 
 headerdirs = [ '.', 'keyman' ] # subdirectories of ${prefix}/include to add to header path

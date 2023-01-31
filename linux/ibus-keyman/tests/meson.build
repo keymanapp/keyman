@@ -1,16 +1,20 @@
-sources = [
+test_files = [
   'ibusimcontext.c',
   'ibusimcontext.h',
   'testfixture.cpp',
   'testmodule.c',
   'testmodule.h',
-  kmxfiles,
-  corefiles,
-  utilfiles,
-  coretestfiles,
 ]
 
-deps = [ibus, gtk, x11, json_glib, kmnkbp]
+kmnkbp_tests_lib = cc.find_library(
+  'libkmnkbp-tests',
+  dirs: [
+    '@0@/../../../core/build/arch/debug/tests/unit/kmx'.format(meson.current_source_dir()),
+    '@0@/../../../core/build/arch/release/tests/unit/kmx'.format(meson.current_source_dir())
+  ]
+)
+
+deps = [ibus, gtk, x11, json_glib, kmnkbp_lib, kmnkbp_tests_lib]
 
 include_dirs = [
   include_directories('../../../core/src'),
@@ -23,9 +27,9 @@ include_dirs = [
 
 test_exe = executable(
   'ibus-keyman-tests',
-  sources: sources,
+  test_files, util_files,
   dependencies: deps,
-  include_directories: include_dirs
+  include_directories: include_dirs,
 )
 
 env_file = '/tmp/env.txt'
@@ -81,22 +85,23 @@ test(
 )
 
 kmx_dir = join_paths(meson.current_source_dir(), '../../../core/build/arch/debug/tests/unit/kmx')
-kmx_files = run_command(
+kmxtest_files = run_command(
   find_tests,
   kmx_dir,
   check: true,
 ).stdout().split('\n')
 
-foreach kmx: kmx_files
+foreach kmx: kmxtest_files
   filename = kmx.split('\t')
   if filename[0] == ''
     continue
   endif
   testname = filename[1].split('.kmx')[0]
+  test_args = [ '--tap', '-k', '--env', env_file, '--', filename]
   test(
     'X11-' + testname + '__surrounding-text',
     run_test,
-    args: [ '--tap', '-k', '--x11', '--env', env_file, '--surrounding-text', '--', filename],
+    args: [ '--x11', '--surrounding-text', test_args],
     env: [
       'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
       'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),
@@ -110,7 +115,7 @@ foreach kmx: kmx_files
   test(
     'X11-' + testname + '__no-surrounding-text',
     run_test,
-    args: [ '--tap', '-k', '--x11', '--env', env_file, '--no-surrounding-text', '--', filename],
+    args: [ '--x11', '--no-surrounding-text', test_args],
     env: [
       'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
       'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),
@@ -124,7 +129,7 @@ foreach kmx: kmx_files
   test(
     'Wayland-' + testname + '__surrounding-text',
     run_test,
-    args: [ '--tap', '-k', '--wayland', '--env', env_file, '--surrounding-text', '--', filename],
+    args: [ '--wayland', '--surrounding-text', test_args],
     env: [
       'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
       'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),
@@ -138,7 +143,7 @@ foreach kmx: kmx_files
   test(
     'Wayland-' + testname + '__no-surrounding-text',
     run_test,
-    args: [ '--tap', '-k', '--wayland', '--env', env_file, '--no-surrounding-text', '--', filename],
+    args: [ '--wayland', '--no-surrounding-text', test_args],
     env: [
       'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
       'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),

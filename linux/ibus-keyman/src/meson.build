@@ -1,11 +1,11 @@
-utilfiles = files(
+util_files = files(
   'keymanutil.c',
   'keymanutil.h',
   'kmpdetails.c',
   'kmpdetails.h',
 )
 
-engine_sources = files(
+engine_files = files(
   'main.c',
   'engine.c',
   'engine.h',
@@ -14,7 +14,7 @@ engine_sources = files(
   'keyman-service.h',
 )
 
-deps = [ibus, gtk, x11, json_glib, kmnkbp]
+deps = [ibus, gtk, x11, json_glib, kmnkbp_lib]
 
 prefix = get_option('prefix')
 cfg = configuration_data()
@@ -35,7 +35,7 @@ configure_file(
 
 exe = executable(
   'ibus-engine-keyman',
-  sources: [engine_sources, utilfiles],
+  sources: [engine_files, util_files],
   dependencies: deps,
   include_directories: include_directories('@0@/..'.format(meson.current_build_dir())),
 )

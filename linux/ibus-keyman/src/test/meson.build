@@ -1,9 +1,9 @@
 keymanutil_sources = [
   'keymanutil_tests.c',
-  utilfiles,
+  util_files,
 ]
 
-keymanutil_deps = [ibus, gtk, x11, json_glib, kmnkbp]
+keymanutil_deps = [ibus, gtk, x11, json_glib, kmnkbp_lib]
 
 include_dirs = [
   include_directories('@0@/..'.format(meson.current_build_dir())),
