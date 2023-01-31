@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.39 alpha 2023-01-31
+
+* feat(windows): add additional registry keys to report (#8126)
+
 ## 17.0.38 alpha 2023-01-30
 
 * chore(deps): bump ua-parser-js from 0.7.31 to 0.7.33 (#8109)
