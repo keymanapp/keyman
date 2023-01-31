@@ -308,6 +308,9 @@
 		2949146F2738DA6700400732 /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/ResourceInfoView.strings"; sourceTree = "<group>"; };
 		294914702738DD7400400732 /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		294914712738DD9700400732 /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "ff-NG"; path = "ff-NG.lproj/Localizable.stringsdict"; sourceTree = "<group>"; };
+		298566B929802892004ACA95 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
+		298566BA298028A8004ACA95 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Localizable.strings; sourceTree = "<group>"; };
+		298566BB298028AC004ACA95 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = cs; path = cs.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		298566C52980C5BB004ACA95 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
 		298566C62980C5C7004ACA95 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Localizable.strings; sourceTree = "<group>"; };
 		298566C72980C5CC004ACA95 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = sv; path = sv.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
@@ -1207,6 +1210,7 @@
 				it,
 				pl,
 				nl,
+				cs,
 				sv,
 				uk,
 				ru,
@@ -1604,6 +1608,8 @@
 				29BFA760282934BB009FCCC3 /* it */,
 				29BFA76C28294833009FCCC3 /* pl */,
 				29B27FF129062D190036917E /* nl */,
+				298566BB298028AC004ACA95 /* cs */,
+				29781100297FAF06007C886D /* kn */,				
 				298566C72980C5CC004ACA95 /* sv */,
 				298566D32980D39F004ACA95 /* uk */,
 				298566DF2980E48C004ACA95 /* ru */,
@@ -1630,6 +1636,8 @@
 				29BFA75F282934B4009FCCC3 /* it */,
 				29BFA76B28294813009FCCC3 /* pl */,
 				29B27FF029062D100036917E /* nl */,
+				298566BA298028A8004ACA95 /* cs */,
+				297810FF297FAEF8007C886D /* kn */,				
 				298566C62980C5C7004ACA95 /* sv */,
 				298566D22980D39A004ACA95 /* uk */,
 				298566DE2980E486004ACA95 /* ru */,
@@ -1657,6 +1665,7 @@
 				29BFA75E28293287009FCCC3 /* it */,
 				29BFA76A28294746009FCCC3 /* pl */,
 				29B27FEF29062CF50036917E /* nl */,
+				298566B929802892004ACA95 /* cs */,
 				298566C52980C5BB004ACA95 /* sv */,
 				298566D12980D390004ACA95 /* uk */,
 				298566DD2980E477004ACA95 /* ru */,

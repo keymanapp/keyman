@@ -42,6 +42,7 @@ public class DisplayLanguages {
       new DisplayLanguageType("am-ET", "አማርኛ (Amharic)"),
       new DisplayLanguageType("az-AZ", "Azərbaycanca (Azəricə)"),
       new DisplayLanguageType("bwr-NG", "Bura-Pabir"),
+      new DisplayLanguageType("cs-CZ", "čeština (Czech)"),
       new DisplayLanguageType("ff-NG", "Ɗemngal Fulfulde"),
       new DisplayLanguageType("en", "English"),
       new DisplayLanguageType("es-419", "Español (Spanish - Latin America)"),
