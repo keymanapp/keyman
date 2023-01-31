@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 16.0.136 beta 2023-01-31
+
+* chore(common): Update crowdin strings for Shuwa (Latin) (#8097)
+* chore(common): Check in crowdin for Russian (#8072)
+* chore(common): Check in crowdin for Ukrainian (#8073)
+* chore(common): Add crowdin for Swedish (#8071)
+* chore(common): Add crowdin strings for Czech (#8095)
+
 ## 16.0.135 beta 2023-01-30
 
 * chore(linux): Include packaging path in Vcs-Git header (#8110)
