@@ -7,7 +7,7 @@
 import { BUILDER_KVK_SHIFT_STATE, BUILDER_KVK_HEADER_FLAGS, BUILDER_KVK_KEY_FLAGS } from "./kvk-file";
 
 export class VisualKeyboard {
-  header: VisualKeyboardHeader = {flags: 0, ansiFont:{}, unicodeFont:{}};
+  header: VisualKeyboardHeader = {flags: 0, ansiFont:{}, unicodeFont:{}, underlyingLayout: undefined};
   keys: VisualKeyboardKey[] = [];
 };
 

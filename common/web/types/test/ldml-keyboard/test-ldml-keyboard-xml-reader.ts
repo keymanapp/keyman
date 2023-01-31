@@ -8,17 +8,15 @@ describe('ldml keyboard xml reader tests', function() {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
   const callbacks : CompilerCallbacks = {
-    loadFile: function (baseFilename: string, filename: string | URL): Buffer {
-      throw new Error('Function not implemented.');
-    },
+    loadFile,
     loadLdmlKeyboardSchema: function (): Buffer {
-      throw new Error('Function not implemented.');
+      throw new Error('loadLdmlKeyboardSchema not implemented.');
     },
     reportMessage: function (event: CompilerEvent): void {
-      throw new Error('Function not implemented.');
+      throw new Error('reportMessage not implemented.');
     },
     loadKvksJsonSchema: function (): Buffer {
-      throw new Error('Function not implemented.');
+      throw new Error('loadKvksJsonSchema` not implemented.');
     }
   };
 
