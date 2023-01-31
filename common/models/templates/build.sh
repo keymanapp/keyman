@@ -52,5 +52,8 @@ if builder_start_action build; then
   npm run tsc -- -b
   node build-bundler.js
 
+  # Declaration bundling.
+  npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+
   builder_finish_action success build
 fi
