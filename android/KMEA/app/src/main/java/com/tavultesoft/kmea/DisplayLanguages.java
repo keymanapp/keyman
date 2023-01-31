@@ -62,7 +62,10 @@ public class DisplayLanguages {
       new DisplayLanguageType("pl-PL", "Polski (Polish)"),
       new DisplayLanguageType("pt-PT", "Português do Portugal"),
       new DisplayLanguageType("ff-ZA", "Pulaar-Fulfulde"), // or Fulah
+      new DisplayLanguageType("ru-RU", "Pyccĸий (Russian)"),
       new DisplayLanguageType("shu-latn", "Shuwa (Latin)"),
+      new DisplayLanguageType("sv-SE", "svenska (Swedish)"),
+      new DisplayLanguageType("uk-UA", "Українська (Ukrainian)"),
       new DisplayLanguageType("hia-NG", "Waha"),
       new DisplayLanguageType("zh-CN", "中文(简体) (Simplified Chinese)")
     };

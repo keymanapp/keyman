@@ -1,0 +1,38 @@
+/* Checkbox text to always show on-screen keyboard */
+"4UX-80-0Vo.title" = "Visa alltid skärmtangentbord";
+
+/* Checkbox text to enable verbose Console logging */
+"7J6-zy-R20.title" = "Använd verbose Console-loggning";
+
+/* Support button text  */
+"93O-x6-RLF.label" = "Stöd";
+
+/* Download Keyboard button text */
+"CTw-kf-WNS.title" = "Ladda ner tangentbord...";
+
+/* Keyman Configuration window title */
+"F0z-JX-Cv5.title" = "Keyman konfiguration";
+
+/* button text to go back to previous page */
+"JOK-JV-n8w.title" = "Tillbaka";
+
+/* Keyboards button text */
+"MPN-9N-wWc.label" = "Keyboards";
+
+/* text to explain verbose Console logging option */
+"MrI-GM-7d6.title" = "När verbose loggning alternativet är på, kommer Keyman logga åtgärder som kan hjälpa Keyman Support diagnostisera ett problem. Programmet Konsol kan användas för att se en logg av meddelanden från Keyman. I Console, filter för att visa alla meddelanden från \"Keyman\" processen. Denna logg kan exporteras och skickas till Keyman support om det behövs.";
+
+/* button text to move forward to the next page */
+"eXr-8V-h1g.title" = "Framåt";
+
+/* button text to return to the home help page */
+"fXS-aC-CMH.title" = "Hem";
+
+/* Options button text */
+"frd-No-seV.label" = "Alternativ";
+
+/* Installed Keyboard column heading */
+"jex-Nd-Qzg.headerCell.title" = "Installerat tangentbord";
+
+/* Verbose logging tooltip text */
+"uWx-3J-U0D.ibShadowedToolTip" = "Aktivera detta om du har problem med ett specifikt tangentbord eller med Keyman i allmänhet.";

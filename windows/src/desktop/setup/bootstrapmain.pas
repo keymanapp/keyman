@@ -397,7 +397,9 @@ begin
         end
         else
         begin
-          case MessageDlgW(FInstallInfo.Text(ssOffline), mtError, mbAbortRetryIgnore, 0) of
+          case MessageDlgW(
+              Trim(FInstallInfo.Text(ssOffline)+#13#10#13#10+FInstallInfo.Text(ssOffline2)+#13#10#13#10+FInstallInfo.Text(ssOffline3)),
+              mtError, mbAbortRetryIgnore, 0) of
             mrAbort: Exit(False);
             mrRetry: Continue;
             mrIgnore: FForceOffline := True;
