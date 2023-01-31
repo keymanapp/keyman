@@ -215,6 +215,8 @@ BOOL FShouldAddCompilerVersion = TRUE;
 BOOL FOldCharPosMatching = FALSE, FMnemonicLayout = FALSE;
 NamedCodeConstants *CodeConstants = NULL;
 
+int BeginLine[4];
+
 /* Compile target */
 
 int CompileTarget;
@@ -286,15 +288,8 @@ BOOL AddCompileMessage(DWORD msg)
 
   return FALSE;
 }
-/*  moved to legacy_kmx_file.cpp
-typedef struct _COMPILER_OPTIONS {
-  DWORD dwSize;
-  BOOL ShouldAddCompilerVersion;
-} COMPILER_OPTIONS;
 
-typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
-*/
-bool flag_use_new_kmcomp  = false;   // flag to switch to kmcompx
+bool flag_use_new_kmcomp  = true;   // flag to switch to kmcompx
 
 extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options) {
 
@@ -320,7 +315,7 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
   DWORD len;
   char str[260];
 
-  printf("---> started in CompileKeyboardFile() of kmcmpdll\n");
+  printf("\n---> started in CompileKeyboardFile() of kmcmpdll\n");
 
   if ( flag_use_new_kmcomp )
   {
@@ -521,6 +516,11 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
   fk->dwBitmapSize = 0;
   fk->dwHotKey = 0;
 
+  BeginLine[BEGIN_ANSI] = -1;
+  BeginLine[BEGIN_UNICODE] = -1;
+  BeginLine[BEGIN_NEWCONTEXT] = -1;
+  BeginLine[BEGIN_POSTKEYSTROKE] = -1;
+
   /* Add a store for the Keyman 6.0 copyright information string */
 
   if(FShouldAddCompilerVersion) {
@@ -631,6 +631,11 @@ DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PWSTR p)
   else if (_wcsnicmp(p, L"postKeystroke", 13) == 0) BeginMode = BEGIN_POSTKEYSTROKE;
   else if (*p != '>') return CERR_InvalidToken;
   else BeginMode = BEGIN_ANSI;
+
+  if(BeginLine[BeginMode] != -1) {
+    return CERR_RepeatedBegin;
+  }
+  BeginLine[BeginMode] = currentLine;
 
   if ((msg = GetRHS(fk, p, tstr, 80, (int)(INT_PTR)(p - pp), FALSE)) != CERR_None) return msg;
 

@@ -110,6 +110,7 @@ namespace kmcmp{
   KMX_BOOL FOldCharPosMatching = FALSE;
   int CompileTarget;
   KMX_CHAR CompileDir[MAX_PATH];
+  int BeginLine[4];
 
   KMX_BOOL WINAPI DllMain(HINSTANCE hinst, KMX_DWORD fdwReason, LPVOID lpvReserved)
   {
@@ -243,16 +244,10 @@ int kmcmp::currentLine = 0;
 
 kmcmp::NamedCodeConstants *CodeConstants = NULL;
 
-int BeginLine[4];
-
 /* Compile target */
-
 
 #define CKF_KEYMAN    0
 #define CKF_KEYMANWEB 1
-
-namespace kmcmp {
-}
 
 PKMX_WCHAR strtowstr(PKMX_STR in)
 {
@@ -478,8 +473,7 @@ extern "C" BOOL __declspec(dllexport)  kmcmp_CompileKeyboardFileToBuffer(PKMX_ST
   // What about really large files?  Transfer to a temp file...
 
   KMX_DWORD sz = ftell(fp_in);
-  len2 = fread(str,1,sz,fp_in);
-  if( !len2)
+  if( !fread(str,1,3,fp_in))
   {
     fclose(fp_in);
     return CERR_CannotReadInfile;
@@ -559,10 +553,10 @@ KMX_BOOL CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
   fk->dwBitmapSize = 0;
   fk->dwHotKey = 0;
   
-  BeginLine[BEGIN_ANSI] = -1;
-  BeginLine[BEGIN_UNICODE] = -1;
-  BeginLine[BEGIN_NEWCONTEXT] = -1;
-  BeginLine[BEGIN_POSTKEYSTROKE] = -1;
+  kmcmp::BeginLine[BEGIN_ANSI] = -1;
+  kmcmp::BeginLine[BEGIN_UNICODE] = -1;
+  kmcmp::BeginLine[BEGIN_NEWCONTEXT] = -1;
+  kmcmp::BeginLine[BEGIN_POSTKEYSTROKE] = -1;
 
 
   /* Add a store for the Keyman 6.0 copyright information string */
@@ -673,11 +667,11 @@ KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   else if (*p != '>') return CERR_InvalidToken;
   else BeginMode = BEGIN_ANSI;
 
-  if(BeginLine[BeginMode] != -1) {
+  if(kmcmp::BeginLine[BeginMode] != -1) {
     return CERR_RepeatedBegin;
   }
 
-  BeginLine[BeginMode] = kmcmp::currentLine;
+  kmcmp::BeginLine[BeginMode] = kmcmp::currentLine;
 
   if ((msg = GetRHS(fk, p, tstr, 80, (int)(INT_PTR)(p - pp), FALSE)) != CERR_None) return msg;
 
