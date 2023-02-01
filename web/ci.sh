@@ -27,10 +27,9 @@ builder_describe "Defines and implements the CI build steps for Keyman Engine fo
   "test                 Runs all unit tests."  \
   "post-test            Runs post-test cleanup.  Should be run even if a prior step fails." \
   "validate-size        Runs the build-size comparison check" \
-  "publish-s.keyman     Prepares an s.keyman.com PR (intended for release builds)" \
-  "publish-downloads    Prepares the upload to downloads.keyman.com (intended for release builds)" \
-  "--debug              Runs this script in local-development mode; reports and tests will be locally logged" \
-  "--password=PASSWORD  Used to supply passwords needed by certain actions"
+  "prepare-s.keyman     Prepares an s.keyman.com PR (intended for release builds)" \
+  "prepare-downloads    Prepares the upload to downloads.keyman.com (intended for release builds)" \
+  "--debug              Runs this script in local-development mode; reports and tests will be locally logged"
 
 builder_parse "$@"
 
@@ -92,16 +91,13 @@ if builder_start_action validate-size; then
   builder_finish_action success validate-size
 fi
 
-if builder_start_action publish-s.keyman; then
+if builder_start_action prepare-s.keyman; then
   # First phase: make sure the s.keyman.com repo is locally-available and up to date.
   pushd "$S_KEYMAN_COM"
-  if builder_has_option --password; then
-    git pull https://keyman-server:$PASSWORD@github.com/keymanapp/s.keyman.com.git master
-  else
-    # For testing on a local development machine / a machine with the repo already loaded.
-    git checkout master
-    git pull
-  fi
+
+  # For testing on a local development machine / a machine with the repo already loaded.
+  git checkout master
+  git pull
   popd
 
   # Second phase:  copy the artifacts over
@@ -119,24 +115,14 @@ if builder_start_action publish-s.keyman; then
     node build/tools/building/sourcemap-root/index.mjs null "$sourcemap" --sourceRoot "https://s.keyman.com/kmw/engine/$BUILD_NUMBER/src"
   done
 
-  # Final phase:  build the PR and push it.
-  cd "$S_KEYMAN_COM"
-  if builder_has_option --password; then
-    git config user.name "Keyman Build Server"
-    git config user.email "keyman-server@users.noreply.github.com"
-  fi
-  git add "kmw/engine/$BUILD_NUMBER"
-  if builder_has_option --password; then
-    git commit -m "KeymanWeb release $BUILD_NUMBER (automatic)"
-    git push https://keyman-server:$PASSWORD@github.com/keymanapp/s.keyman.com.git master
-  fi
+  # Actual construction of the PR will be left to CI-config scripting for now.
 
-  builder_finish_action success publish-s.keyman
+  builder_finish_action success prepare-s.keyman
 fi
 
 # Note:  for now, this command is used to prepare the artifacts used by the download site, but
 #        NOT to actually UPLOAD them via rsync or to produce related .download_info files.
-if builder_start_action publish-downloads; then
+if builder_start_action prepare-downloads; then
   UPLOAD_PATH="build/upload/$BUILD_NUMBER"
 
   # --- First action artifact - the KMW zip file ---
@@ -169,7 +155,7 @@ if builder_start_action publish-downloads; then
       COMPRESS_ADD="-r"
     else
       echo "${COLOR_RED}Fallback approach failed: zip command unavailable${COLOR_RESET}" >&2
-      builder_finish_action failure publish-downloads
+      builder_finish_action failure prepare-downloads
       exit 1
     fi
   fi
@@ -206,5 +192,5 @@ if builder_start_action publish-downloads; then
   cp -rf src/test          "$STATIC/src/test"
   cp -rf src/samples       "$STATIC/src/samples"
 
-  builder_finish_action success publish-downloads
+  builder_finish_action success prepare-downloads
 fi
