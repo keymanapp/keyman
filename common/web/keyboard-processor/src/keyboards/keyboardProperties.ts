@@ -2,7 +2,9 @@ import SpacebarText from './spacebarText.js';
 
 export interface KeyboardFont {
   'family': string;
-  'files': string;
+  'files'?: string;
+  'filename'?: string[];
+  'source'?: string | string[];
   'path': string;
 }
 

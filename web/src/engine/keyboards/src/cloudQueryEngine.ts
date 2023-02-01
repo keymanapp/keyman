@@ -16,6 +16,11 @@ export const MISSING_KEYBOARD = function(kbdid: string) {
   return kbdid + ' keyboard not found.';
 }
 
+type CloudAPIFont = {
+  family: string,
+  source: string | string[]
+}
+
 type CloudQueryOptions = {
   context: 'keyboard' | 'language';
   keyboardid?: string,
@@ -257,8 +262,8 @@ export default class CloudQueryEngine {
             id='english';
           }
 
-          let langArray: LanguageAPIPropertySpec[];
           if(Array.isArray(kp[i].languages)) {
+            let langArray = kp[i].languages as LanguageAPIPropertySpec[];
             for(let j=0; j < langArray.length; j++) {
               if(id == langArray[j].name.toLowerCase()) {
                 nDflt = i;
@@ -364,22 +369,22 @@ export default class CloudQueryEngine {
     //   this.keymanweb.options.fonts=fontPath;
     // }
 
-    function convertToStubFont(fontObj: KeyboardFont, path: string): KeyboardFont {
+    function convertToStubFont(fontObj: CloudAPIFont, path: string): KeyboardFont {
       return {
         family: fontObj.family,
-        files: fontObj.files,
+        files: typeof fontObj.source == 'string' ? fontObj.source : fontObj.source[0],
         path: path
       }
     }
 
     // Add font specifiers where necessary and not overridden by user
     if(typeof(lp['font']) != 'undefined') {
-      sp['KFont'] = (typeof sp['KFont'] === 'undefined') ? convertToStubFont(lp['font'], fontPath) : sp['KFont'];
+      sp['KFont'] = (typeof sp['KFont'] === 'undefined') ? convertToStubFont(lp['font'] as CloudAPIFont, fontPath) : sp['KFont'];
     }
 
     // Fixed OSK font issue Github #7 (9/1/2015)
     if(typeof(lp['oskFont']) != 'undefined') {
-      sp['KOskFont'] = (typeof sp['KOskFont'] === 'undefined') ? convertToStubFont(lp['oskFont'], fontPath) : sp['KOskFont'];
+      sp['KOskFont'] = (typeof sp['KOskFont'] === 'undefined') ? convertToStubFont(lp['oskFont'] as CloudAPIFont, fontPath) : sp['KOskFont'];
     }
 
     return sp;

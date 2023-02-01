@@ -8,7 +8,7 @@ requester.link(queryEngine);
 
 // We may now query.
 
-let promise = queryEngine.fetchCloudStubs(["sil_euro_latin@fr"]);
+let promise = queryEngine.fetchCloudStubs(["sil_cameroon_azerty@fr", "khmer_angkor"]);
 let ret = await promise;
 
 console.log(ret);
