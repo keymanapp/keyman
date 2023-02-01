@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.137 stable 2023-02-01
+
+* chore(common): Release 16.0
+
 ## 16.0.136 beta 2023-01-31
 
 * chore(common): Update crowdin strings for Shuwa (Latin) (#8097)
