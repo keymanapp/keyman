@@ -1,0 +1,71 @@
+/* Message displayed to confirm delete of the Keyman keyboard selected by the user from the keyboard list  */
+"message-confirm-delete-keyboard" = "Är du säker på att du vill ta bort tangentbordet%@'?";
+
+/* Delete keyboard confirmation info indicating that the delete action cannot be undone  */
+"info-cannot-undo-delete-keyboard" = "Du kan inte ångra denna åtgärd.";
+
+/* Button text to cancel delete of the specified installed Keyman keyboard  */
+"button-cancel-delete-keyboard" = "Avbryt";
+
+/* Button text to confirm delete of the specified installed Keyman keyboard  */
+"button-delete-keyboard" = "Radera";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"message-confirm-install-keyboard" = "Installera Keyman-tangentbordet?";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"info-install-keyboard-filename" = "Vill du att Keyman ska installera tangentbordet från filen '%@'?";
+
+/* Button text to cancel installation of the double-clicked Keyman file  */
+"button-cancel-install-keyboard" = "Avbryt";
+
+/* Button text to confirm installation of the double-clicked Keyman file  */
+"button-install-keyboard" = "Installera";
+
+/* Message displayed to inform user that .kmp file could not be read/unzipped  */
+"message-keyboard-file-unreadable" = "Kunde inte läsa Nyckelmansfilen '%@'.";
+
+/* Message displayed in Configuration window when keyboard cannot be loaded */
+"message-error-loading-keyboard" = "(error loading keyboard)";
+
+/* Message displayed in Configuration window when keyboard metadata cannot be loaded */
+"message-error-unknown-metadata" = "unknown";
+
+/* Button text to acknowledge that .kmp file could not be read  */
+"button-keyboard-file-unreadable" = "Ok";
+
+/* label text to identify Keyman version */
+"version-label-text" = "Version %@";
+
+/* Status text for keyboard downloading  */
+"message-keyboard-downloading" = "Hämtar...";
+
+/* Status text for keyboard download complete  */
+"message-keyboard-download-complete" = "Nedladdning slutförd.";
+
+/* Button text to cancel downloading keyboard  */
+"button-cancel-downloading" = "Avbryt";
+
+/* Button text keyboard download complete  */
+"button-download-complete" = "Klar";
+
+/* keyboards label in the Package Information window */
+"keyboards-label" = "Keyboards:";
+
+/* fonts label in the Package Information window */
+"fonts-label" = "Fonts:";
+
+/* package version label in the Package Information window */
+"package-version-label" = "Package Version:";
+
+/* author label in the Package Information window */
+"author-label" = "Author:";
+
+/* website label in the Package Information window */
+"website-label" = "Website:";
+
+/* copyright label in the Package Information window */
+"copyright-label" = "Copyright:";
+
+/* message displayed to alert user to need grant accessibility permission */
+"privacy-alert-text" = "To function properly, Keyman requires accessibility features:\n\nGrant access in System Preferences, Security & Privacy.\nRestart your system.";

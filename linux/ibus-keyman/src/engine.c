@@ -449,8 +449,6 @@ ibus_keyman_engine_constructor(
     IBusEngine *engine;
     const gchar *engine_name;
     gchar *p, *abs_kmx_path;
-    guint cursor_pos, anchor_pos;
-    km_kbp_context_item *context_items;
 
     g_debug("DAR: %s", __FUNCTION__);
 
@@ -958,7 +956,7 @@ ibus_keyman_engine_process_key_event(
   km_kbp_context *context = km_kbp_state_context(keyman->state);
   g_free(get_current_context_text(context));
   g_message("DAR: %s - km_mod_state=0x%x", __FUNCTION__, km_mod_state);
-  km_kbp_status event_status = km_kbp_process_event(keyman->state, keycode_to_vk[keycode], km_mod_state, isKeyDown);
+  km_kbp_process_event(keyman->state, keycode_to_vk[keycode], km_mod_state, isKeyDown);
   context                    = km_kbp_state_context(keyman->state);
   g_message("%s: after process key event", __FUNCTION__);
   g_free(get_current_context_text(context));
