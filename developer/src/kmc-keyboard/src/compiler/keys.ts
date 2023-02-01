@@ -6,7 +6,7 @@ import { SectionCompiler } from "./section-compiler.js";
 import GlobalSections = KMXPlus.GlobalSections;
 import Keys = KMXPlus.Keys;
 import USVirtualKeyMap = Constants.USVirtualKeyMap;
-import { calculateUniqueKeys } from 'src/util/util.js';
+import { calculateUniqueKeys } from '../util/util.js';
 
 export class KeysCompiler extends SectionCompiler {
 

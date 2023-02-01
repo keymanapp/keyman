@@ -6,7 +6,7 @@ import GlobalSections = KMXPlus.GlobalSections;
 import Key2 = KMXPlus.Key2;
 import ListItem = KMXPlus.ListItem;
 import Key2Flicks = KMXPlus.Key2Flicks;
-import { allUsedKeyIdsInLayers, calculateUniqueKeys } from 'src/util/util.js';
+import { allUsedKeyIdsInLayers, calculateUniqueKeys } from '../util/util.js';
 
 
 export class Key2Compiler extends SectionCompiler {
