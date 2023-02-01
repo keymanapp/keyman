@@ -243,10 +243,11 @@ final class KMKeyboard extends WebView {
     keyboardSet = false;
     this.javascriptAfterLoad.clear();
 
-    if(keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP)
+    if(keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       KMManager.InAppKeyboardWebViewClient.setKeyboardLoaded(false);
-    else
-      KMManager.SystemKeyboardLoaded = false;
+    } else {
+      KMManager.SystemKeyboardWebViewClient.setKeyboardLoaded(false);
+    }
 
     String htmlPath = "file://" + getContext().getDir("data", Context.MODE_PRIVATE) + "/" + KMManager.KMFilename_KeyboardHtml;
     loadUrl(htmlPath);
@@ -257,7 +258,7 @@ final class KMKeyboard extends WebView {
     this.javascriptAfterLoad.add(func);
 
     if((keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && KMManager.InAppKeyboardWebViewClient.getKeyboardLoaded()) ||
-      (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && KMManager.SystemKeyboardLoaded)) {
+      (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && KMManager.SystemKeyboardWebViewClient.getKeyboardLoaded())) {
 
       // If !this.keyboardSet, then pageLoaded hasn't fired yet.
       // When pageLoaded fires, it'll call `callJavascriptAfterLoad` safely.
