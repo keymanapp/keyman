@@ -13,7 +13,7 @@ export interface KeyboardFont {
 // keyboard loading on its own whatsoever.
 
 // Corresponds to Keyman Engine for Web's internal "keyboard stub" format.
-export type KeyboardInternalPropertySpec = {
+export interface KeyboardInternalPropertySpec {
   KI: string,
   'KFont': KeyboardFont,
   'KOskFont': KeyboardFont,
@@ -27,7 +27,8 @@ export type LanguageAPIPropertySpec = {
   id: string,
   name: string,
   font: KeyboardFont,
-  oskFont: KeyboardFont
+  oskFont: KeyboardFont,
+  region?: number|string
 }
 
 /**

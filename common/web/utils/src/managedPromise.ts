@@ -5,17 +5,39 @@ export default class ManagedPromise<Type> {
   public resolve: ResolveSignature<Type>;
   public reject: RejectSignature;
 
+  private _hasResolved: boolean = false;
+  private _hasRejected: boolean = false;
+
+  public get hasResolved(): boolean {
+    return this._hasResolved;
+  }
+
+  public get hasRejected(): boolean {
+    return this._hasRejected;
+  }
+
+  public get hasFinalized(): boolean {
+    return this.hasResolved || this.hasRejected;
+  }
+
   private _promise: Promise<Type>;
 
   constructor();
   constructor(executor: (resolve: ResolveSignature<Type>, reject: RejectSignature) => Type);
   constructor(executor?: (resolve: ResolveSignature<Type>, reject: RejectSignature) => Type) {
     this._promise = new Promise<Type>((resolve, reject) => {
-      this.resolve = resolve;
-      this.reject = reject;
+      this.resolve = (value) => {
+        this._hasResolved = true;
+        resolve(value);
+      };
+
+      this.reject = (reason) => {
+        this._hasRejected = true;
+        reject(reason);
+      };
 
       if(executor) {
-        executor(resolve, reject);
+        executor(this.resolve, this.reject);
       }
     });
   }
