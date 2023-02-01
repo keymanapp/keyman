@@ -199,7 +199,7 @@ void NamedCodeConstants::reindex()
     qsort(entries, nEntries, sizeof(NCCENTRY), sort_entries);
   }
 
-  wchar_t c = L'.', d, c_new;
+  KMX_WCHAR c = u'.', d;
   int i;
 
   for(i = 0; i < 128; i++) chrindexes[i] = -1;
@@ -208,10 +208,8 @@ void NamedCodeConstants::reindex()
     for (i = 0; i < nEntries; i++)
     {
       d = towupper(entries[i].name[0]);
-      if (d != c && d >= 32 && d <= 127) {
-        c_new = d;
-        chrindexes[c_new] = i;
-      }
+      if (d != c && d >= 32 && d <= 127)
+        chrindexes[c = d] = i;
     }
   }
 }
@@ -285,7 +283,7 @@ const KMX_WCHAR *
 
 int IsHangulSyllable(const KMX_WCHAR *codename, int *code)
 {
-  if(u16ncmp(codename, u"HANGUL_SYLLABLE_", 16)) return 0;
+  if(u16nicmp(codename, u"HANGUL_SYLLABLE_", 16)) return 0;
   codename += 16;
   if(!*codename) return 0;
 
@@ -301,9 +299,7 @@ int IsHangulSyllable(const KMX_WCHAR *codename, int *code)
 
     LIndex = -1;
     for(i = 0; i < HangulLCount; i++) {
-      if(Hangul_JAMO_L_TABLE[i][0] == ch && 
-        (!isDoubled || (Hangul_JAMO_L_TABLE[i][1] == ch && isDoubled)))
-      {
+      if(Hangul_JAMO_L_TABLE[i][0] == ch && (!isDoubled || (Hangul_JAMO_L_TABLE[i][1] == ch && isDoubled))) {
         LIndex = i;
         break;
       }
@@ -325,7 +321,8 @@ int IsHangulSyllable(const KMX_WCHAR *codename, int *code)
   for(i = 0; i < HangulVCount; i++) {
     if(!u16icmp(Hangul_JAMO_V_TABLE[i], V)) {
       VIndex = i;
-      break; }
+      break;
+    }
   }
 
   if(VIndex == -1) return 0;
@@ -340,7 +337,7 @@ int IsHangulSyllable(const KMX_WCHAR *codename, int *code)
     if(!u16icmp(Hangul_JAMO_T_TABLE[i], codename)) {
       TIndex = i;
       break;
-      }
+    }
   }
 
   if(TIndex == -1) return 0;

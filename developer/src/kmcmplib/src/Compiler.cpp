@@ -3420,8 +3420,8 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
   if (cur == fsize)
 
   // S: Is replacing "\r\n" with "\n" here sufficient or do we need changes at other places as well when we skip "\r"?
-  // u16ncat(str, u"\r\n", _countof(str));  // I3481     // Always a "\r\n" to the EOF, avoids funny bugs
-  u16ncat(str, u"\n", _countof(str));  // I3481
+  //u16ncat(str, u"\r\n", _countof(str));  // I3481     // Always a "\r\n" to the EOF, avoids funny bugs
+   u16ncat(str, u"\n", _countof(str));  // I3481
 
   if (len == 0) return CERR_EndOfFile;
 

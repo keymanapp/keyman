@@ -6,11 +6,11 @@ rem excluded files from tests:
 rem no *bmp file included in Folder
 rem		- eKwTamil99UniUpdt
 
-rem use of other folders than /source
+rem use of other folders than \source
 rem		- vietnamese_telex_legacy\extras\vn_kmn_compiler\vn_telex\raw
 rem		- vietnamese_vni\extras\vn_kmn_compiler\keyboard\vn_vni\raw
 
-rem need more time to prevent TIMEOUT ( run while debugging in VS)
+rem need more time to prevent TIMEOUT (runs while debugging in VS)
 rem		- vietnamese_telex
 rem		- vietnamese_telex_legacy
 rem		- vietnamese_vni
