@@ -103,5 +103,6 @@ bc_stable_16_0_linux=(KeymanLinux_Master pipeline-keyman-packaging_Jenkins)
 bc_stable_16_0_mac=(KeymanMac_Master)
 bc_stable_16_0_windows=(Keyman_Build)
 bc_stable_16_0_web=(Keymanweb_Build)
+bc_stable_16_0_developer=(Keyman_Developer_Release)
 
 vcs_stable_16_0=HttpsGithubComKeymanappKeyman
