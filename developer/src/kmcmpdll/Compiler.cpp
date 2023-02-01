@@ -289,7 +289,7 @@ BOOL AddCompileMessage(DWORD msg)
   return FALSE;
 }
 
-bool flag_use_new_kmcomp  = true;   // flag to switch to kmcompx
+bool flag_use_new_kmcomp  = false;   // flag to switch to kmcompx
 
 extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options) {
 
