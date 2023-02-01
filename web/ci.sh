@@ -22,21 +22,22 @@ cd "$THIS_SCRIPT_PATH"
 
 # ################################ Main script ################################
 
+S_KEYMAN_COM=
+
 builder_describe "Defines and implements the CI build steps for Keyman Engine for Web (KMW)." \
   "build" \
-  "test                 Runs all unit tests."  \
-  "post-test            Runs post-test cleanup.  Should be run even if a prior step fails." \
-  "validate-size        Runs the build-size comparison check" \
-  "prepare-s.keyman     Prepares an s.keyman.com PR (intended for release builds)" \
-  "prepare-downloads    Prepares the upload to downloads.keyman.com (intended for release builds)" \
-  "--debug              Runs this script in local-development mode; reports and tests will be locally logged"
+  "test                         Runs all unit tests."  \
+  "post-test                    Runs post-test cleanup.  Should be run even if a prior step fails." \
+  "validate-size                Runs the build-size comparison check" \
+  "prepare                      Prepare upload artifacts for specified target(s)" \
+  ":s.keyman.com                Target:  builds artifacts for s.keyman.com " \
+  ":downloads.keyman.com        Target:  builds artifacts for downloads.keyman.com" \
+  "--debug                      Runs this script in local-development mode; reports and tests will be locally logged" \
+  "--s.keyman.com=S_KEYMAN_COM  Sets the root location of a checked-out s.keyman.com repo"
 
 builder_parse "$@"
 
 ####
-
-TIER=`cat ../TIER.md`
-S_KEYMAN_COM=../../s.keyman.com
 
 if builder_start_action build; then
   # Build step:  since CI builds start (and should start) from scratch, run the following
@@ -90,20 +91,26 @@ if builder_start_action validate-size; then
   builder_finish_action success validate-size
 fi
 
-if builder_start_action prepare-s.keyman; then
-  # First phase: make sure the s.keyman.com repo is locally-available and up to date.
-  pushd "$S_KEYMAN_COM"
+if builder_start_action prepare:s.keyman.com; then
+  if ! builder_has_option --s.keyman.com; then
+    builder_die "--s.keyman.com is unset!"
+  fi
 
-  # For testing on a local development machine / a machine with the repo already loaded.
-  git checkout master
-  git pull
-  popd
+  if builder_has_option --debug; then
+    # First phase: make sure the s.keyman.com repo is locally-available and up to date.
+    pushd "$S_KEYMAN_COM"
+
+    # For testing on a local development machine / a machine with the repo already loaded.
+    git checkout master
+    git pull
+    popd
+  fi
 
   # Second phase:  copy the artifacts over
 
   # The main build products are expected to reside at the root of this folder.
   BASE_PUBLISH_FOLDER="$S_KEYMAN_COM/kmw/engine/$VERSION"
-  mkdir "$BASE_PUBLISH_FOLDER"
+  mkdir -p "$BASE_PUBLISH_FOLDER"
 
   cp -Rf build/app/web/release/* "$BASE_PUBLISH_FOLDER"
   cp -Rf build/app/ui/release/* "$BASE_PUBLISH_FOLDER"
@@ -116,12 +123,12 @@ if builder_start_action prepare-s.keyman; then
 
   # Actual construction of the PR will be left to CI-config scripting for now.
 
-  builder_finish_action success prepare-s.keyman
+  builder_finish_action success prepare:s.keyman.com
 fi
 
 # Note:  for now, this command is used to prepare the artifacts used by the download site, but
 #        NOT to actually UPLOAD them via rsync or to produce related .download_info files.
-if builder_start_action prepare-downloads; then
+if builder_start_action prepare:downloads.keyman.com; then
   UPLOAD_PATH="build/upload/$VERSION"
 
   # --- First action artifact - the KMW zip file ---
@@ -146,9 +153,7 @@ if builder_start_action prepare-downloads; then
       COMPRESS_CMD=zip
       COMPRESS_ADD="-r"
     else
-      echo "${COLOR_RED}Fallback approach failed: zip command unavailable${COLOR_RESET}" >&2
-      builder_finish_action failure prepare-downloads
-      exit 1
+      builder_die "7z and zip commands are both unavailable"
     fi
   fi
 
@@ -184,5 +189,5 @@ if builder_start_action prepare-downloads; then
   cp -rf src/test          "$STATIC/src/test"
   cp -rf src/samples       "$STATIC/src/samples"
 
-  builder_finish_action success prepare-downloads
+  builder_finish_action success prepare:downloads.keyman.com
 fi
