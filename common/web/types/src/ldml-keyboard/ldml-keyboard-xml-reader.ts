@@ -118,30 +118,30 @@ export default class LDMLKeyboardXMLSourceFileReader {
   }
 
   private resolveOneImport(obj: any, subtag: string, asImport: LKImport) {
-    if (asImport.base !== constants.cldr_import_base) {
-      // TODO-LDML: use custom error class CompilerImportResolveError
-      throw new Error(`import element with base ${asImport.base} is unsupported, only ${constants.cldr_import_base} is supported.`);
+    const { base, path } = asImport;
+    if (base !== constants.cldr_import_base) {
+      this.callbacks.reportMessage(CommonTypesMessages.Error_ImportInvalidBase({base, path, subtag}));
     }
-    const paths = asImport.path.split('/');
+    const paths = path.split('/');
     if (paths[0] == '' || paths[1] == '' || paths.length !== 2) {
-      throw new Error(`import element with invalid path ${asImport.path}: expect the form '${constants.cldr_version_latest}./*.xml'`);
+      this.callbacks.reportMessage(CommonTypesMessages.Error_ImportInvalidPath({base, path, subtag}));
     }
     const importData: Uint8Array = this.readImportFile(paths[0], paths[1]);
     if (!importData || !importData.length) {
-      throw new Error(`could not read data with path ${asImport.path}: expect the form '${constants.cldr_version_latest}./*.xml'`);
+      this.callbacks.reportMessage(CommonTypesMessages.Error_ImportReadFail({base, path, subtag}));
     }
     const importXml: any = this.loadUnboxed(importData); // TODO-LDML: have to load as any because it is an arbitrary part
     const importRootNode = importXml[subtag]; // e.g. <keys/>
 
     // importXml will have one property: the root element.
     if (!importRootNode) {
-      throw new Error(`Invalid import file ${asImport.path}: expected ${subtag} as root element`);
+      this.callbacks.reportMessage(CommonTypesMessages.Error_ImportWrongRoot({base, path, subtag}));
     }
     // pull all children of importXml[subtag] into obj
     for (const subsubtag of Object.keys(importRootNode)) { // e.g. <key/>
       const subsubval = importRootNode[subsubtag];
       if (!Array.isArray(subsubval)) {
-        throw new Error(`Problem importing ${asImport.path}: not sure how to handle non-array ${subtag}.${subsubtag}`);
+        this.callbacks.reportMessage(CommonTypesMessages.Error_ImportMergeFail({base, path, subtag, subsubtag}));
       }
       if (!obj[subsubtag]) {
         obj[subsubtag] = []; // start with empty array
