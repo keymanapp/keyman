@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.138 stable 2023-02-01
+
+* chore: add new developer build trigger (#8139)
+
 ## 16.0.137 stable 2023-02-01
 
 * chore(common): Release 16.0
