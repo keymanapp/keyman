@@ -36,7 +36,6 @@ builder_parse "$@"
 ####
 
 TIER=`cat ../TIER.md`
-BUILD_NUMBER=`cat ../VERSION.md`
 S_KEYMAN_COM=../../s.keyman.com
 
 if builder_start_action build; then
@@ -103,7 +102,7 @@ if builder_start_action prepare-s.keyman; then
   # Second phase:  copy the artifacts over
 
   # The main build products are expected to reside at the root of this folder.
-  BASE_PUBLISH_FOLDER="$S_KEYMAN_COM/kmw/engine/$BUILD_NUMBER"
+  BASE_PUBLISH_FOLDER="$S_KEYMAN_COM/kmw/engine/$VERSION"
   mkdir "$BASE_PUBLISH_FOLDER"
 
   cp -Rf build/app/web/release/* "$BASE_PUBLISH_FOLDER"
@@ -112,7 +111,7 @@ if builder_start_action prepare-s.keyman; then
   # Third phase: tweak the sourcemaps
   # We can use an alt-mode of Web's sourcemap-root tool for this.
   for sourcemap in "$BASE_PUBLISH_FOLDER/"*.map; do
-    node build/tools/building/sourcemap-root/index.mjs null "$sourcemap" --sourceRoot "https://s.keyman.com/kmw/engine/$BUILD_NUMBER/src"
+    node build/tools/building/sourcemap-root/index.mjs null "$sourcemap" --sourceRoot "https://s.keyman.com/kmw/engine/$VERSION/src"
   done
 
   # Actual construction of the PR will be left to CI-config scripting for now.
@@ -123,33 +122,26 @@ fi
 # Note:  for now, this command is used to prepare the artifacts used by the download site, but
 #        NOT to actually UPLOAD them via rsync or to produce related .download_info files.
 if builder_start_action prepare-downloads; then
-  UPLOAD_PATH="build/upload/$BUILD_NUMBER"
+  UPLOAD_PATH="build/upload/$VERSION"
 
   # --- First action artifact - the KMW zip file ---
-  ZIP="$UPLOAD_PATH/keymanweb-$BUILD_NUMBER.zip"
+  ZIP="$UPLOAD_PATH/keymanweb-$VERSION.zip"
 
-  # RSYNC_HOME should be pre-set environment variables.
-  # (7Z_HOME is illegal as a variable name in BASH b/c leading digit.)
   mkdir -p "$UPLOAD_PATH"
 
-  # Nifty tidbit:  https://stackoverflow.com/questions/592620/how-can-i-check-if-a-program-exists-from-a-bash-script
-  # If we're fine with ensuring that the program is available via path, we can just use that on
-  # Win machines.  The decision was made to continue relying on an environment variable for 7-zip, though.
+  # On Windows, we use 7-zip (SEVEN_Z_HOME env var).  On other platforms, we use zip.
 
   COMPRESS_CMD=
   COMPRESS_ADD=
 
   # Marc's preference; use $SEVEN_Z_HOME and have the BAs set up with THAT as an env var.
-  if [ -n "${SEVEN_Z_HOME+x}" ] &> /dev/null; then
-    echo "7z command available"
+  if [ ! -z "${SEVEN_Z_HOME+x}" ]; then
     COMPRESS_CMD="$SEVEN_Z_HOME/7z"
     COMPRESS_ADD="a -bd -bb0 -r" # add, hide progress, log level 0, recursive
-    COMPRESS_RENAME="rn"
   fi
 
   if [[ -z "${COMPRESS_CMD}" ]] ; then
     if command -v zip &> /dev/null; then
-      echo "zip command available"
       # Note:  does not support within-archive renames!
       COMPRESS_CMD=zip
       COMPRESS_ADD="-r"
