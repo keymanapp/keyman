@@ -35,6 +35,9 @@ export function makePathToFixture(...components: string[]): string {
  * A CompilerCallbacks implementation for testing
  */
 class TestCompilerCallbacks implements CompilerCallbacks {
+  clear() {
+    this.messages = [];
+  }
   messages: CompilerEvent[] = [];
   loadFile(baseFilename: string, filename: string | URL): Buffer {
     // TODO: translate filename based on the baseFilename
@@ -55,7 +58,7 @@ class TestCompilerCallbacks implements CompilerCallbacks {
 export const compilerTestCallbacks = new TestCompilerCallbacks();
 
 beforeEach(function() {
-  compilerTestCallbacks.messages = [];
+  compilerTestCallbacks.clear();
 });
 
 afterEach(function() {
@@ -156,7 +159,7 @@ export interface CompilationCase {
   /**
    * optional callback with the section
    */
-  callback?: (sect: KMXPlus.Section, subpath: string ) => void;
+  callback?: (sect: KMXPlus.Section, subpath: string, callbacks: TestCompilerCallbacks ) => void;
   /**
    * if present, expect compiler to throw (use .* to match all)
    */
@@ -169,12 +172,15 @@ export interface CompilationCase {
  * @param compiler argument to loadSectionFixture()
  * @param callbacks argument to loadSectionFixture()
  */
-export function testCompilationCases(compiler: typeof SectionCompiler, callbacks: TestCompilerCallbacks, cases : CompilationCase[]) {
+export function testCompilationCases(compiler: typeof SectionCompiler, cases : CompilationCase[]) {
+  // we need our own callbacks rather than using the global so messages don't get mixed
+  const callbacks = new TestCompilerCallbacks();
   for (let testcase of cases) {
     const expectFailure = testcase.throws || !!(testcase.errors); // if true, we expect this to fail
     const testHeading = expectFailure ? `should fail to compile: ${testcase.subpath}`:
                                         `should compile: ${testcase.subpath}`;
     it(testHeading, function () {
+      callbacks.clear();
       // special case for an expected exception
       if (testcase.throws) {
         assert.throws(() => loadSectionFixture(compiler, testcase.subpath, callbacks), testcase.throws, 'expected exception from compilation');
@@ -184,23 +190,23 @@ export function testCompilationCases(compiler: typeof SectionCompiler, callbacks
       if (expectFailure) {
         assert.isNull(section, 'expected compilation result to be null, but got something');
       } else {
-        assert.isNotNull(section, `expected successful compilation, but got null and ${JSON.stringify(compilerTestCallbacks.messages)}`);
+        assert.isNotNull(section, `expected successful compilation, but got null and ${JSON.stringify(callbacks.messages)}`);
       }
 
       // if we expected errors or warnings, show them
       if (testcase.errors) {
-        assert.includeDeepMembers(compilerTestCallbacks.messages, testcase.errors, 'expected errors to be included');
+        assert.includeDeepMembers(callbacks.messages, testcase.errors, 'expected errors to be included');
       }
       if (testcase.warnings) {
-        assert.includeDeepMembers(compilerTestCallbacks.messages, testcase.warnings, 'expected warnings to be included');
+        assert.includeDeepMembers(callbacks.messages, testcase.warnings, 'expected warnings to be included');
       } else if (!expectFailure) {
         // no warnings, so expect zero messages
-        assert.strictEqual(compilerTestCallbacks.messages.length, 0, 'expected zero messages');
+        assert.strictEqual(callbacks.messages.length, 0, 'expected zero messages');
       }
 
       // run the user-supplied callback if any
       if (testcase.callback) {
-        testcase.callback(section, testcase.subpath);
+        testcase.callback(section, testcase.subpath, callbacks);
       }
     });
   }

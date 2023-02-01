@@ -1,6 +1,7 @@
 import 'mocha';
 import {assert, expect} from 'chai';
-import { CompilerErrorSeverity, CompilerMessages } from '../src/compiler/messages.js';
+import { CompilerMessages } from '../src/compiler/messages.js';
+import { CompilerErrorSeverity } from '@keymanapp/common-types';
 
 const toTitleCase = (s: string) => s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
 

@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { LayrCompiler } from '../src/compiler/layr.js';
 import { CompilerMessages } from '../src/compiler/messages.js';
 import { compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
-import { KMXPlus } from '@keymanapp/common-types';
+import { KMXPlus, CommonTypesMessages } from '@keymanapp/common-types';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 
 import Layr = KMXPlus.Layr;
@@ -87,7 +87,7 @@ describe('layr', function () {
     assert.equal(touch0row0.keys.length, 4);
     allKeysOk(touch0row0,'Q q W w', 'touch0row0');
   });
-  testCompilationCases(LayrCompiler, compilerTestCallbacks, [
+  testCompilationCases(LayrCompiler, [
     {
       subpath: 'sections/layr/invalid-invalid-hardware.xml',
       errors: [CompilerMessages.Error_InvalidHardware({hardware: 'stenography'})],
@@ -106,7 +106,11 @@ describe('layr', function () {
     },
     {
       subpath: 'sections/layr/invalid-invalid-form.xml',
-      throws: /allowed values/,
+      errors: [CommonTypesMessages.Fatal_AJVError({
+        instancePath: '/keyboard/layers/0/form',
+        keyword: 'enum',
+        message: 'must be equal to one of the allowed values',
+        params: {allowedValues:["hardware","touch"]}} as any)],
     },
     {
       subpath: 'sections/layr/invalid-missing-layer.xml',

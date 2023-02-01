@@ -4,6 +4,7 @@ import Ajv from 'ajv';
 import { boxXmlArray } from '../util/util.js';
 import { CompilerCallbacks } from '../util/compiler-interfaces.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
+import { CommonTypesMessages } from '../util/common-events.js';
 
 export default class LDMLKeyboardXMLSourceFileReader {
   callbacks: CompilerCallbacks;
@@ -154,14 +155,16 @@ export default class LDMLKeyboardXMLSourceFileReader {
     const ajv = new Ajv();
     if(!ajv.validate(schema, source)) {
       // Try to improve the message
-      if (ajv.errors?.length === 1) {
-        // Only one error. Try to improve the message.
-        const err = ajv.errors[0];
-        const { instancePath, keyword, params, message } = err;
-        throw new Error(`${instancePath}: ${keyword}: ${message} ${JSON.stringify(params||{})}`);
+      if (ajv.errors?.length > 0) {
+        for (let err of ajv.errors) {
+          // report each err
+          this.callbacks.reportMessage(CommonTypesMessages.Fatal_AJVError(err))
+        }
       } else {
         // Not a single error, so fall through to errorsText()
-        throw new Error(ajv.errorsText());
+        this.callbacks.reportMessage(CommonTypesMessages.Fatal_UnknownXMLValidationError({
+          errorsText: ajv.errorsText() || 'Unknown AJV Error'
+        }));
       }
     }
   }

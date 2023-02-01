@@ -1,20 +1,14 @@
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent } from "@keymanapp/common-types";
 
-export enum CompilerErrorSeverity {
-  Info =          0x000000,
-  Hint =          0x100000,
-  Warn =          0x200000,
-  Error =         0x300000,
-  Fatal =         0x400000,
-  Severity_Mask = 0xF00000, // includes reserved bits
-  Error_Mask =    0x0FFFFF,
-};
 
-const m = (code: number, message: string) => { return { code, message } };
-const SevInfo = CompilerErrorSeverity.Info;
-const SevHint = CompilerErrorSeverity.Hint;
-// const SevWarn = CompilerErrorSeverity.Warn;
-const SevError = CompilerErrorSeverity.Error;
-const SevFatal = CompilerErrorSeverity.Fatal;
+const m = (code: number, message: string) : CompilerEvent => { return { code, message } };
+
+const KmcErrMask   = CompilerErrorNamespace.Kmc;
+const SevInfo = CompilerErrorSeverity.Info | KmcErrMask;
+const SevHint = CompilerErrorSeverity.Hint | KmcErrMask;
+// const SevWarn = CompilerErrorSeverity.Warn | KmcErrMask;
+const SevError = CompilerErrorSeverity.Error | KmcErrMask;
+const SevFatal = CompilerErrorSeverity.Fatal | KmcErrMask;
 
 export class CompilerMessages {
   static Error_InvalidNormalization = (o:{form: string}) => m(this.ERROR_InvalidNormalization, `Invalid normalization form '${o.form}`);
