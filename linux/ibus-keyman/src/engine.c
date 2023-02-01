@@ -123,11 +123,11 @@ static void ibus_keyman_engine_focus_out  (IBusEngine             *engine);
 static void ibus_keyman_engine_reset      (IBusEngine             *engine);
 static void ibus_keyman_engine_enable     (IBusEngine             *engine);
 static void ibus_keyman_engine_disable    (IBusEngine             *engine);
-// static void ibus_keyman_engine_set_surrounding_text
-//                                           (IBusEngine             *engine,
-//                                            IBusText               *text,
-//                                            guint                   cursor_pos,
-//                                            guint                   anchor_pos);
+static void ibus_keyman_engine_set_surrounding_text
+                                          (IBusEngine             *engine,
+                                           IBusText               *text,
+                                           guint                   cursor_pos,
+                                           guint                   anchor_pos);
 // static void ibus_keyman_engine_set_cursor_location
 //                                           (IBusEngine             *engine,
 //                                            guint                   x,
@@ -201,7 +201,7 @@ ibus_keyman_engine_class_init (IBusKeymanEngineClass *klass)
     engine_class->enable = ibus_keyman_engine_enable;
     engine_class->disable = ibus_keyman_engine_disable;
 
-    // engine_class->set_surrounding_text = ibus_keyman_engine_set_surrounding_text;
+    engine_class->set_surrounding_text = ibus_keyman_engine_set_surrounding_text;
     // engine_class->set_cursor_location = ibus_keyman_engine_set_cursor_location;
 
 
@@ -272,17 +272,22 @@ reset_context(IBusEngine *engine) {
       surrounding_text, context_end - context_start, cursor_pos, anchor_pos);
 
     current_context_utf8 = get_current_context_text(context);
-    if (!g_str_has_suffix(surrounding_text, current_context_utf8) || !g_utf8_strlen(current_context_utf8, -1)) {
+    if (!(*current_context_utf8) || !g_str_has_suffix(surrounding_text, current_context_utf8)) {
       g_message("%s: setting context because it has changed from expected", __FUNCTION__);
-      if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
+      enum km_kbp_status_codes status = km_kbp_context_items_from_utf8(surrounding_text, &context_items);
+      if (status == KM_KBP_STATUS_OK) {
         km_kbp_context_set(context, context_items);
         km_kbp_context_items_dispose(context_items);
+      } else {
+        km_kbp_context_clear(context);
+        g_message("%s: setting context failed with status code %d", __FUNCTION__, status);
       }
     }
     g_free(surrounding_text);
     g_free(current_context_utf8);
   } else {
     km_kbp_context_clear(context);
+    g_message("%s: client does not support surrounding text", __FUNCTION__);
   }
 }
 
@@ -978,23 +983,23 @@ ibus_keyman_engine_process_key_event(
   return TRUE;
 }
 
-// static void
-// ibus_keyman_engine_set_surrounding_text (IBusEngine *engine,
-//                                             IBusText    *text,
-//                                             guint       cursor_pos,
-//                                             guint       anchor_pos)
-// {
-//     gchar *surrounding_text;
-//     guint context_start = cursor_pos > MAXCONTEXT_ITEMS ? cursor_pos - MAXCONTEXT_ITEMS : 0;
-//     if (cursor_pos != anchor_pos){
-//         g_message("%s: There is a selection", __FUNCTION__);
-//     }
-//     parent_class->set_surrounding_text (engine, text, cursor_pos, anchor_pos);
-//     surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, cursor_pos);
-//     g_message("%s: surrounding context is:%u:%s:", __FUNCTION__, cursor_pos - context_start, surrounding_text);
-//     g_free(surrounding_text);
-//     reset_context(engine);
-// }
+static void
+ibus_keyman_engine_set_surrounding_text (IBusEngine *engine,
+                                            IBusText    *text,
+                                            guint       cursor_pos,
+                                            guint       anchor_pos)
+{
+    // gchar *surrounding_text;
+    // guint context_start = cursor_pos > MAXCONTEXT_ITEMS ? cursor_pos - MAXCONTEXT_ITEMS : 0;
+    // if (cursor_pos != anchor_pos){
+    //     g_message("%s: There is a selection", __FUNCTION__);
+    // }
+    parent_class->set_surrounding_text (engine, text, cursor_pos, anchor_pos);
+    // surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, cursor_pos);
+    // g_message("%s: surrounding context is:%u:%s:", __FUNCTION__, cursor_pos - context_start, surrounding_text);
+    // g_free(surrounding_text);
+    reset_context(engine);
+}
 
 // static void ibus_keyman_engine_set_cursor_location (IBusEngine             *engine,
 //                                              guint                    x,
