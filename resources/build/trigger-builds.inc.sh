@@ -97,6 +97,7 @@ function triggerJenkinsBuild() {
   if echo "$OUTPUT" | grep -q "\"triggered\":true"; then
     echo -n "     job triggered: "
   else
+    echo "##teamcity[buildProblem description='Triggering Jenkins build failed']"
     echo -n "     triggering failed: "
   fi
 
