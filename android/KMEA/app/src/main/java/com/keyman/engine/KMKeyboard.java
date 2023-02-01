@@ -244,7 +244,7 @@ final class KMKeyboard extends WebView {
     this.javascriptAfterLoad.clear();
 
     if(keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP)
-      KMManager.InAppKeyboardLoaded = false;
+      KMManager.InAppKeyboardWebViewClient.setKeyboardLoaded(false);
     else
       KMManager.SystemKeyboardLoaded = false;
 
@@ -256,7 +256,7 @@ final class KMKeyboard extends WebView {
   public void loadJavascript(String func) {
     this.javascriptAfterLoad.add(func);
 
-    if((keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && KMManager.InAppKeyboardLoaded) ||
+    if((keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && KMManager.InAppKeyboardWebViewClient.getKeyboardLoaded()) ||
       (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && KMManager.SystemKeyboardLoaded)) {
 
       // If !this.keyboardSet, then pageLoaded hasn't fired yet.
