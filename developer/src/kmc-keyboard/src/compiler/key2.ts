@@ -6,6 +6,7 @@ import GlobalSections = KMXPlus.GlobalSections;
 import Key2 = KMXPlus.Key2;
 import ListItem = KMXPlus.ListItem;
 import Key2Flicks = KMXPlus.Key2Flicks;
+import { allUsedKeyIdsInLayers, calculateUniqueKeys } from '../util/util.js';
 
 
 export class Key2Compiler extends SectionCompiler {
@@ -18,28 +19,6 @@ export class Key2Compiler extends SectionCompiler {
     let valid = true;
     // TODO-LDML: some validation needed here?
     return valid;
-  }
-
-  /**
-   * Return a set of all used keys
-   * public for test
-   */
-  public allUsedKeyIds(): Set<string> {
-    const s = new Set<string>();
-    if (this.keyboard?.layers) {
-      for (const layers of this.keyboard.layers || []) {
-        for (const layer of layers.layer || []) {
-          for (const row of layer.row || []) {
-            if (row.keys) {
-              for (const k of row.keys.split(" ")) {
-                s.add(k);
-              }
-            }
-          }
-        }
-      }
-    }
-    return s;
   }
 
   public compile(sections: GlobalSections): Key2 {
@@ -81,20 +60,8 @@ export class Key2Compiler extends SectionCompiler {
   }
 
   public loadKeys(sections: GlobalSections, sect: Key2) {
-    const usedKeys = this.allUsedKeyIds();
-
-    // TODO-LDML factor common code
-    // Need 'newer' (later) keys to override older ones.
-    const reverseKeys = [...this.keyboard.keys.key].reverse(); // newest to oldest
-    const alreadySeen = new Set<string>();
-    // filter out only the keys that haven't already been seen
-    const uniqueKeys = reverseKeys.filter(({id}) => {
-      if (!alreadySeen.has(id)) {
-        alreadySeen.add(id);
-        return true;
-      }
-      return false;
-    });
+    const usedKeys = allUsedKeyIdsInLayers(this.keyboard?.layers);
+    const uniqueKeys = calculateUniqueKeys([...this.keyboard.keys?.key]);
 
     for (let key of uniqueKeys) {
       if (!usedKeys.has(key.id)) {

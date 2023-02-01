@@ -6,6 +6,7 @@ import { SectionCompiler } from "./section-compiler.js";
 import GlobalSections = KMXPlus.GlobalSections;
 import Keys = KMXPlus.Keys;
 import USVirtualKeyMap = Constants.USVirtualKeyMap;
+import { calculateUniqueKeys } from '../util/util.js';
 
 export class KeysCompiler extends SectionCompiler {
 
@@ -14,19 +15,7 @@ export class KeysCompiler extends SectionCompiler {
   }
 
   private validateHardwareLayer(layer: LDMLKeyboard.LKLayer) {
-    // TODO-LDML factor common code
-    // Need 'newer' (later) keys to override older ones.
-    const reverseKeys = [...this.keyboard.keys?.key].reverse(); // newest to oldest
-    const alreadySeen = new Set<string>();
-    // filter out only the keys that haven't already been seen
-    const uniqueKeys = reverseKeys.filter(({id}) => {
-      if (!alreadySeen.has(id)) {
-        alreadySeen.add(id);
-        return true;
-      }
-      return false;
-    });
-
+    const uniqueKeys = calculateUniqueKeys([...this.keyboard.keys?.key]);
     let valid = true;
     if(layer.row.length > USVirtualKeyMap.length) {
       this.callbacks.reportMessage(CompilerMessages.Error_HardwareLayerHasTooManyRows());
