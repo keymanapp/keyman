@@ -51,14 +51,11 @@ if compiler.get_id() == 'msvc'
   version_res += import('windows').compile_resources('version.rc', args:['/n','/c65001'])
 endif
 
-build_static_lib = true
-
 if compiler.get_id() == 'emscripten'
   warns = []
   flags = []
   defns = ['-DKMN_KBP']
   links = []
-  build_static_lib = disabler()
 endif
 
 kmx_files = files(
@@ -112,7 +109,8 @@ lib = library('kmnkbp0',
   pic: true,
   install: true)
 
-if build_static_lib
+if host_machine.system() == 'linux'
+  # on Linux we need the static lib for ibus-keyman tests
   static_library('kmnkbp0-static',
     api_files,
     core_files,
