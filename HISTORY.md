@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 17.0.40 alpha 2023-02-01
+
+* chore(developer): kmcmpdll debug src path (#8127)
+* chore(common): Merge end of beta from Sprint A17S5 (#8135)
+* refactor(android): Change com.tavultesoft.kmea package to com.keyman.engine (#7981)
+* refactor(android/engine): Split KMInAppKeyboardWebViewClient to new class (#7983)
+* refactor(android/engine): Refactor KMSystemKeyboardWebViewClient (#7993)
+
 ## 17.0.39 alpha 2023-01-31
 
 * feat(windows): add additional registry keys to report (#8126)
