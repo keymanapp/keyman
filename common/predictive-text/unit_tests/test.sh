@@ -71,6 +71,12 @@ if builder_start_action test:libraries; then
   npm run test
   popd
 
+  pushd "$KEYMAN_ROOT/common/web/lm-worker"
+  echo
+  echo "### Running ${BUILDER_TERM_START}common/web/lm-worker${BUILDER_TERM_END} tests"
+  ./build.sh test
+  popd
+
   builder_finish_action success test:libraries
 fi
 

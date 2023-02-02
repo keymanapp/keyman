@@ -2,12 +2,14 @@
   "name": "@keymanapp/lm-worker",
   "description": "Keyman/Predictive Text worker",
   "main": "build/index.js",
+  "type": "module",
   "scripts": {
     "karma": "karma",
     "mocha": "mocha",
     "test": "gosh ./test/test.sh",
     "build": "tsc -b",
-    "clean": "tsc -b --clean"
+    "clean": "tsc -b --clean",
+    "tsc": "tsc"
   },
   "license": "MIT",
   "devDependencies": {

@@ -1,6 +1,5 @@
-var assert = require('chai').assert;
-const LMLayerWorker = require('../../../../web/lm-worker/build/intermediate.js');
-var ClassicalDistanceCalculation = LMLayerWorker.correction.ClassicalDistanceCalculation;
+import { assert } from 'chai';
+import { ClassicalDistanceCalculation } from '../../../../build/obj/correction/classical-calculation.js';
 
 function prettyPrintMatrix(matrix) {
   for(let r = 0; r < matrix.length; r++) {
@@ -261,7 +260,7 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
 
       // Two transpositions:  da <- abcd, wxyz -> zw and one deletion ('g')
       it("'daefghiwxyz' -> 'abcdefhizw' (width 2) = 7", function() {
-        buffer = compute("daefghiwxyz", "abcdefhizw", "InputThenMatch", 2);
+        let buffer = compute("daefghiwxyz", "abcdefhizw", "InputThenMatch", 2);
         assert.equal(buffer.getHeuristicFinalCost(), 7);
       });
     });

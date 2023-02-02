@@ -2,15 +2,20 @@
  * Integration tests for the model compositor with the trie model.
  */
 
-const { models, wordBreakers, ModelCompositor } = require('../../../web/lm-worker/build/intermediate.js');
+import ModelCompositor from '../../../build/obj/model-compositor.js';
+import * as models from '../../../build/obj/models/index.js';
+import * as wordBreakers from '@keymanapp/models-wordbreakers/build/lib/index.mjs';
 
-var assert = require('chai').assert;
+import { assert } from 'chai';
+
+import { jsonFixture } from '../../../../../test/resources/model-helpers.mjs';
+
 var TrieModel = models.TrieModel;
 
 describe('ModelCompositor', function() {
   describe('Prediction with 14.0+ models', function() {
     describe('Basic suggestion generation', function() {
-      var plainModel = new TrieModel(jsonFixture('tries/english-1000'),
+      var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
         {wordBreaker: wordBreakers.default}
       );
 
@@ -169,7 +174,7 @@ describe('ModelCompositor', function() {
       };
 
       var plainCasedModel = new TrieModel(
-        jsonFixture('tries/english-1000'), {
+        jsonFixture('models/tries/english-1000'), {
           languageUsesCasing: true,
           applyCasing: plainApplyCasing,
           wordBreaker: wordBreakers.default,
@@ -304,7 +309,7 @@ describe('ModelCompositor', function() {
 
     describe('Model uses default-style keying, no casing', function () {
       var uncasedModel = new TrieModel(
-        jsonFixture('tries/english-1000'), {
+        jsonFixture('models/tries/english-1000'), {
           languageUsesCasing: false,
           wordBreaker: wordBreakers.default,
           searchTermToKey: function(text) {
@@ -379,7 +384,7 @@ describe('ModelCompositor', function() {
       };
 
       var casedModel = new TrieModel(
-        jsonFixture('tries/english-1000'), {
+        jsonFixture('models/tries/english-1000'), {
           languageUsesCasing: true,
           applyCasing: applyCasing,
           wordBreaker: wordBreakers.default,
@@ -505,7 +510,7 @@ describe('ModelCompositor', function() {
   describe('Prediction with legacy Models (12.0 / 13.0)', function() {
     it('should compose suggestions from a fat-fingered keypress (no keying needed)', function () {
       var model = new TrieModel(
-        jsonFixture('tries/english-1000')
+        jsonFixture('models/tries/english-1000')
       );
       var composite = new ModelCompositor(model);
 
@@ -535,7 +540,7 @@ describe('ModelCompositor', function() {
 
     it('should compose suggestions from a fat-fingered keypress (keying needed)', function () {
       var model = new TrieModel(
-        jsonFixture('tries/english-1000')
+        jsonFixture('models/tries/english-1000')
       );
       var composite = new ModelCompositor(model);
 
@@ -903,7 +908,7 @@ describe('ModelCompositor', function() {
         id: 13
       }
 
-      let model = new models.TrieModel(jsonFixture('tries/english-1000'), {punctuation: englishPunctuation});
+      let model = new models.TrieModel(jsonFixture('models/tries/english-1000'), {punctuation: englishPunctuation});
       let compositor = new ModelCompositor(model);
 
       let initialSuggestions = compositor.predict(postTransform, baseContext);
@@ -938,7 +943,7 @@ describe('ModelCompositor', function() {
         id: 13
       }
 
-      let model = new models.TrieModel(jsonFixture('tries/english-1000'), {punctuation: englishPunctuation});
+      let model = new models.TrieModel(jsonFixture('models/tries/english-1000'), {punctuation: englishPunctuation});
       let compositor = new ModelCompositor(model);
 
       let initialSuggestions = compositor.predict(postTransform, baseContext);

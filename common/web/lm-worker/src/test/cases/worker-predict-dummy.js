@@ -2,9 +2,10 @@
  * Unit tests for the Dummy prediction model.
  */
 
-var assert = require('chai').assert;
-const LMLayerWorker = require('../../../web/lm-worker/build/intermediate.js');
-var DummyModel = LMLayerWorker.models.DummyModel;
+import { assert } from 'chai';
+import DummyModel from '../../../build/obj/models/dummy-model.js';
+
+import { emptyContext, iGotDistractedByHazel, zeroTransform } from '../../../../../test/resources/model-helpers.mjs';
 
 describe('LMLayerWorker dummy model', function() {
   describe('instantiation', function () {

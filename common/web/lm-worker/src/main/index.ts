@@ -30,9 +30,14 @@
  */
 
 /// <reference types="@keymanapp/lm-message-types" />
-/// <reference path="./models/dummy-model.ts" />
-/// <reference path="./model-compositor.ts" />
-/// <reference path="./transformUtils.ts" />
+import { extendString } from "@keymanapp/web-utils/build/obj/index.js";
+
+import * as models from './models/index.js';
+import * as correction from './correction/index.js';
+import * as wordBreakers from '@keymanapp/models-wordbreakers/build/obj/index.js';
+
+import ModelCompositor from './model-compositor.js';
+import { ImportScripts, IncomingMessage, LMLayerWorkerState, LoadMessage, ModelEval, ModelFile, ModelSourceSpec, PostMessage } from './worker-interfaces.js';
 
 /**
  * Encapsulates all the state required for the LMLayer's worker thread.
@@ -57,7 +62,7 @@
  * The model and the configuration are ONLY relevant in the `ready` state;
  * as such, they are NOT direct properties of the LMLayerWorker.
  */
-class LMLayerWorker {
+export default class LMLayerWorker {
   /**
    * State pattern. This object handles onMessage().
    * handleMessage() can transition to a different state, if
@@ -288,16 +293,16 @@ class LMLayerWorker {
         if(payload.source.type == 'file') {
           _this.loadModelFile(payload.source.file);
         } else {
-          // Creates a closure capturing all top-level names that the model must be able to reference.
-          // `eval` runs by scope rules; our virtualized worker needs a special scope for this to work.
-          //
-          // Reference: https://stackoverflow.com/a/40108685
-          // Note that we don't need `this`, but we do need the namespaces seen below.
           let code = payload.source.code;
-          let evalInContext = function(LMLayerWorker, models, correction, wordBreakers) {
-            eval(code);
-          }
-          evalInContext(_this, models, correction, wordBreakers);
+
+          // Limits the scope accessible by the code we're about to evaluate; the code may only access
+          // global scope and the arguments specified in the constructor below.
+          //
+          // This is far more encapsulated and likely more secure... and the former point means this is
+          // easier to bundle and more optimizable when bundling than direct eval.
+          // Reference: https://esbuild.github.io/link/direct-eval
+          const modelLoader = new Function('LMLayerWorker', 'models', 'correction', 'wordBreakers', code);
+          modelLoader(_this, models, correction, wordBreakers);
         }
       }
     };
@@ -401,21 +406,4 @@ class LMLayerWorker {
 
     return worker;
   }
-}
-
-// Let LMLayerWorker be available both in the browser and in Node.
-if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-  module.exports = LMLayerWorker;
-  module.exports['correction'] = correction;
-  module.exports['models'] = models;
-  module.exports['wordBreakers'] = wordBreakers;
-  /// XXX: export the ModelCompositor for testing.
-  module.exports['ModelCompositor'] = ModelCompositor;
-  module.exports['TransformUtils'] = TransformUtils;
-} else if (typeof self !== 'undefined' && 'postMessage' in self && 'importScripts' in self) {
-  // Automatically install if we're in a Web Worker.
-  LMLayerWorker.install(self as any); // really, 'as typeof globalThis', but we're currently getting TS errors from use of that.
-} else {
-  //@ts-ignore
-  window.LMLayerWorker = LMLayerWorker;
 }

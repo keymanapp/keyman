@@ -2,10 +2,10 @@
  * Unit tests for the Dummy prediction model.
  */
 
-var assert = require('chai').assert;
-const LMLayerWorker = require('../../../web/lm-worker/build/intermediate.js');
-var DummyModel = LMLayerWorker.models.DummyModel;
-var ModelCompositor = LMLayerWorker.ModelCompositor;
+import { assert } from 'chai';
+
+import DummyModel from '../../../build/obj/models/dummy-model.js';
+import ModelCompositor from '../../../build/obj/model-compositor.js';
 
 describe('Custom Punctuation', function () {
   it('appears in the keep suggestion', function () {

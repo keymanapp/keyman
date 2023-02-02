@@ -1,6 +1,10 @@
-/// <reference path="correction/context-tracker.ts" />
+import * as models from '@keymanapp/models-templates/build/obj/index.js';
+import * as wordBreakers from '@keymanapp/models-wordbreakers/build/obj/index.js';
+import * as correction from './correction/index.js'
 
-class ModelCompositor {
+import TransformUtils from './transformUtils.js';
+
+export default class ModelCompositor {
   private lexicalModel: LexicalModel;
   private contextTracker?: correction.ContextTracker;
   private static readonly MAX_SUGGESTIONS = 12;

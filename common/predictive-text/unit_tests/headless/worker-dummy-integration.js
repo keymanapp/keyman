@@ -1,9 +1,9 @@
 var assert = require('chai').assert;
 var fs = require('fs');
-let LMLayer = require('../../build/headless');
 
-// Load the LMLayerWorkerCode function into this context
-require('node:vm').runInThisContext(fs.readFileSync(__dirname + '/../../../web/lm-worker/build/index.js', 'utf-8'));
+// // Load the LMLayerWorkerCode function into this context
+// let LMLayerWorkerCode = require('@keymanapp/lm-worker/build/lib/index.cjs');
+let LMLayer = require('../../build/headless');
 
 /*
  * Shows off the LMLayer API, using the full prediction interface.

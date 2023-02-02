@@ -1,8 +1,10 @@
-var assert = require('chai').assert;
-const LMLayerWorker = require('../../../../web/lm-worker/build/intermediate.js');
-var ContextTracker = LMLayerWorker.correction.ContextTracker;
-var ModelCompositor = LMLayerWorker.ModelCompositor;
-var models = LMLayerWorker.models;
+import { assert } from 'chai';
+
+import { ContextTracker } from '../../../../build/obj/correction/context-tracker.js';
+import ModelCompositor from '../../../../build/obj/model-compositor.js';
+import * as models from '../../../../build/obj/models/index.js';
+
+import { jsonFixture } from '../../../../../../test/resources/model-helpers.mjs';
 
 describe('ContextTracker', function() {
   function toWrapperDistribution(transform) {
@@ -158,7 +160,7 @@ describe('ContextTracker', function() {
         punctuation: englishPunctuation
       };
 
-      let model = new models.TrieModel(jsonFixture('tries/english-1000'), options);
+      let model = new models.TrieModel(jsonFixture('models/tries/english-1000'), options);
       let compositor = new ModelCompositor(model);
       let baseContextState = compositor.contextTracker.analyzeState(model, baseContext);
 

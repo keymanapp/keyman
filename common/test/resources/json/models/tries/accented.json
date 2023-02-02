@@ -1,0 +1,4 @@
+{
+  "totalWeight": 2,
+  "root": {"type":"internal","weight":1,"values":["p","n"],"children":{"p":{"type":"leaf","weight":1,"entries":[{"key":"pho","weight":1,"content":"phở"}]},"n":{"type":"leaf","weight":1,"entries":[{"key":"naive","weight":1,"content":"naïve"}]}}}
+}

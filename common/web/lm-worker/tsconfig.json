@@ -4,24 +4,30 @@
   "compilerOptions": {
     "allowJs": false,
     "declaration": true,
-    "module": "none",
-    "outFile": "./build/index.js",
+    "module": "es6",
+    "moduleResolution": "node",
     "sourceMap": true,
+    "sourceRoot": "keyman/",
     "lib": ["webworker", "es6"],
     "target": "es5",
+    "types": ["node"],
     "downlevelIteration": true,
+    "baseUrl": "./",
+    "outDir": "build/obj",
+    "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src/main"
   },
   "references": [
     // types
     { "path": "../../models/types" },
     { "path": "../lm-message-types" },
     // modules
-    { "path": "../keyman-version", "prepend": true },
-    { "path": "../utils", "prepend": true },
-    { "path": "../../models/templates", "prepend": true },
-    { "path": "../../models/wordbreakers", "prepend": true },
+    { "path": "../keyman-version" },
+    { "path": "../utils" },
+    { "path": "../../models/templates" },
+    { "path": "../../models/wordbreakers" },
   ],
   "include": [
-    "src/**/*.ts"
+    "src/main/**/*.ts"
   ]
 }
