@@ -21,7 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.preference.PreferenceManager;
 
-import com.tavultesoft.kmea.DisplayLanguages;
+import com.keyman.engine.DisplayLanguages;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,7 +48,7 @@ public class KeymanSettingsLocalizeActivity extends AppCompatActivity {
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-    final ListView listView = findViewById(com.tavultesoft.kmea.R.id.listView);
+    final ListView listView = findViewById(com.keyman.engine.R.id.listView);
 
     Bundle bundle = getIntent().getExtras();
 
@@ -69,9 +69,9 @@ public class KeymanSettingsLocalizeActivity extends AppCompatActivity {
     }
 
     String[] from = new String[]{titleKey, subtitleKey, iconKey};
-    int[] to = new int[]{com.tavultesoft.kmea.R.id.text1, com.tavultesoft.kmea.R.id.image1};
+    int[] to = new int[]{com.keyman.engine.R.id.text1, com.keyman.engine.R.id.image1};
 
-    ListAdapter adapter = new SimpleAdapter(context, localizeOptionList, com.tavultesoft.kmea.R.layout.list_row_layout1, from, to) {
+    ListAdapter adapter = new SimpleAdapter(context, localizeOptionList, com.keyman.engine.R.layout.list_row_layout1, from, to) {
     };
     listView.setAdapter(adapter);
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

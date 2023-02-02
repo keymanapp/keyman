@@ -92,8 +92,7 @@ are scattered over several source repos:
       gets called from `lsdev-pipeline-library` to create a source package.
 
   - [linux/debian](https://github.com/keymanapp/keyman/tree/master/linux/debian) - this is the `debian`
-    subdirectory for Keyman for Linux with the meta data for the Linux package. The legacy
-    kmfl-related packages have separate debian subdirectories under `linux/*/debian`.
+    subdirectory for Keyman for Linux with the meta data for the Linux package.
     See [Debian New Maintainers' Guide](https://www.debian.org/doc/manuals/maint-guide/) for
     details to the various files.
 
@@ -178,14 +177,13 @@ cd linux
 ./scripts/jenkins.sh ${packageName} ${DEBSIGNKEY}
 ```
 
-This creates a source package (`<packageName>_<version>-1.dsc`) and some `*.tar.?z` files in the
-`linux/legacy/<packageName>` subdirectory, respective in the source root directory for `keyman`.
+This creates a source package (`<packageName>_<version>-1.dsc`) and some `*.tar.?z` files in the source root directory for `keyman`.
 
 ci-builder-script's [`build-package`](https://github.com/sillsdev/ci-builder-scripts/blob/master/bash/build-package)
 script creates the binary packages:
 
 ```bash
-cd linux/legacy/${packageName}
+cd linux/${packageName}
 ~/ci-builder-scripts/bash/build-package \
     --dists "focal bionic" --arches "amd64 i386" \
     --debkeyid ${DEBSIGNKEY} --build-in-place --no-upload

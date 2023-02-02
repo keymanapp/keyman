@@ -20,12 +20,14 @@ import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.widget.FrameLayout;
 
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KMManager.KeyboardType;
-import com.tavultesoft.kmea.KMHardwareKeyboardInterpreter;
-import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
-import com.tavultesoft.kmea.R;
-import com.tavultesoft.kmea.data.Keyboard;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.KMManager.KeyboardType;
+import com.keyman.engine.KMHardwareKeyboardInterpreter;
+import com.keyman.engine.KeyboardEventHandler.OnKeyboardEventListener;
+import com.keyman.engine.R;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.util.DependencyUtil;
+import com.keyman.engine.util.DependencyUtil.LibraryType;
 
 import io.sentry.android.core.SentryAndroid;
 import io.sentry.Sentry;
@@ -44,9 +46,12 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     public void onCreate() {
         super.onCreate();
 
-        if (!Sentry.isEnabled()) {
+        if (DependencyUtil.libraryExists(LibraryType.SENTRY) && !Sentry.isEnabled()) {
             Log.d(TAG, "Initializing Sentry");
-            SentryAndroid.init(getApplicationContext());
+            SentryAndroid.init(getApplicationContext(), options -> {
+                options.setRelease(com.firstvoices.keyboards.BuildConfig.VERSION_GIT_TAG);
+                options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
+            });
         }
 
         KMManager.setDebugMode(false); // *** TO DO: Disable/delete before publishing a new release ***
