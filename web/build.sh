@@ -306,7 +306,7 @@ copy_sources ( ) {
     do
       echo "- $SOURCE/$SOURCE_FOLDER/ => $CONFIG_OUT_PATH/src/$SOURCE_FOLDER/"
       mkdir -p "$CONFIG_OUT_PATH/src/$SOURCE_FOLDER"
-      cp -Rf  "$SOURCE/$SOURCE_FOLDER/"    "$CONFIG_OUT_PATH/src/$SOURCE_FOLDER"
+      cp -Rf  "$SOURCE/$SOURCE_FOLDER/"*    "$CONFIG_OUT_PATH/src/$SOURCE_FOLDER/"
     done
 
     echo
