@@ -12,6 +12,7 @@ tests = [
   'k_003_transform',
   'k_004_tinyshift',
   'k_010_mt',
+  'k_011_mt_iso',
   'k_100_keytest',
   'k_101_keytest',
   'k_102_keytest',

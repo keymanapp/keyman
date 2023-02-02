@@ -5,8 +5,7 @@ import { SectionCompiler } from "./section-compiler.js";
 
 import GlobalSections = KMXPlus.GlobalSections;
 import Keys = KMXPlus.Keys;
-import USVirtualKeyMap = Constants.USVirtualKeyMap;
-import { calculateUniqueKeys, translateLayerAttrToModifier } from '../util/util.js';
+import { calculateUniqueKeys, translateLayerAttrToModifier, validModifier } from '../util/util.js';
 
 export class KeysCompiler extends SectionCompiler {
 
@@ -14,19 +13,33 @@ export class KeysCompiler extends SectionCompiler {
     return constants.section.keys;
   }
 
-  private validateHardwareLayer(layer: LDMLKeyboard.LKLayer) {
-    const uniqueKeys = calculateUniqueKeys([...this.keyboard.keys?.key]);
+  private validateHardwareLayer(hardware: string, layer: LDMLKeyboard.LKLayer) {
     let valid = true;
-    if(layer.row.length > USVirtualKeyMap.length) {
+
+    const {modifier} = layer;
+    if (!validModifier(modifier)) {
+      this.callbacks.reportMessage(CompilerMessages.Error_InvalidModifier({modifier, layer: layer.id}));
+      valid = false;
+    }
+
+    const keymap = Constants.HardwareToKeymap.get(hardware);
+    if (!keymap) {
+      this.callbacks.reportMessage(CompilerMessages.Error_InvalidHardware({hardware}));
+      valid = false;
+      return valid; // can't do anything else here
+    }
+
+    const uniqueKeys = calculateUniqueKeys([...this.keyboard.keys?.key]);
+    if(layer.row.length > keymap.length) {
       this.callbacks.reportMessage(CompilerMessages.Error_HardwareLayerHasTooManyRows());
       valid = false;
     }
 
-    for(let y = 0; y < layer.row.length && y < USVirtualKeyMap.length; y++) {
+    for(let y = 0; y < layer.row.length && y < keymap.length; y++) {
       const keys = layer.row[y].keys.split(' ');
 
-      if(keys.length > USVirtualKeyMap[y].length) {
-        this.callbacks.reportMessage(CompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({row: y+1}));
+      if(keys.length > keymap[y].length) {
+        this.callbacks.reportMessage(CompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({row: y+1, hardware}));
         valid = false;
       }
 
@@ -53,15 +66,17 @@ export class KeysCompiler extends SectionCompiler {
 
   public validate() {
     let valid = true;
-    if(!this.keyboard.layers?.[0]?.layer?.length) {
+
+    const theLayers = this.keyboard.layers?.[0]; // TODO-LDML: handle >1 layers. #8160
+
+    if(!theLayers?.layer?.length) {
       valid = false;
       this.callbacks.reportMessage(CompilerMessages.Error_MustBeAtLeastOneLayerElement());
     }
 
-    // TODO-LDML: handle >1 layers!
-    if(this.keyboard.layers?.[0]?.form == 'hardware') {
-      for(let layer of this.keyboard.layers[0].layer) {
-        valid = this.validateHardwareLayer(layer) && valid; // note: always validate even if previously invalid results found
+    if(theLayers?.form == 'hardware') {
+      for(let layer of theLayers?.layer) {
+        valid = this.validateHardwareLayer(theLayers?.hardware, layer) && valid; // note: always validate even if previously invalid results found
       }
     }
     return valid;
@@ -69,17 +84,16 @@ export class KeysCompiler extends SectionCompiler {
 
   public compile(sections: GlobalSections): Keys {
     // Use LayerMap + keys to generate compiled keys for hardware
+    const theLayers = this.keyboard.layers?.[0]; // TODO-LDML: handle >1 layers. #8160
 
-    if(this.keyboard.layers?.[0]?.form == 'hardware') {
+    if(theLayers?.form == 'hardware') {
       let sect = new Keys();
-      for(let layer of this.keyboard.layers[0].layer) {
-        this.compileHardwareLayer(sections, layer, sect);
+      for(let layer of theLayers.layer) {
+        this.compileHardwareLayer(sections, layer, sect, theLayers.hardware);
       }
       return sect;
     }
-
     // TODO-LDML: generate vkey mapping for touch-only keys
-
     return null;
   }
 
@@ -87,8 +101,10 @@ export class KeysCompiler extends SectionCompiler {
     sections: GlobalSections,
     layer: LDMLKeyboard.LKLayer,
     sect: Keys,
+    hardware: string,
   ): Keys {
     const mod = translateLayerAttrToModifier(layer);
+    const keymap = Constants.HardwareToKeymap.get(hardware);
 
     let y = -1;
     for(let row of layer.row) {
@@ -102,7 +118,7 @@ export class KeysCompiler extends SectionCompiler {
         let keydef = this.keyboard.keys?.key?.find(x => x.id == key);
 
         sect.keys.push({
-          vkey: USVirtualKeyMap[y][x],
+          vkey: keymap[y][x],
           mod: mod,
           to: sections.strs.allocAndUnescapeString(keydef.to),
           flags: 0 // Note: 'expand' is never set here, only by the .kmx builder

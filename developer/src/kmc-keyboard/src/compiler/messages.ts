@@ -16,7 +16,7 @@ export class CompilerMessages {
   static Error_HardwareLayerHasTooManyRows = () => m(this.ERROR_HardwareLayerHasTooManyRows, `'hardware' layer has too many rows`);
   static ERROR_HardwareLayerHasTooManyRows = SevError | 0x0003;
 
-  static Error_RowOnHardwareLayerHasTooManyKeys = (o:{row: number}) =>  m(this.ERROR_RowOnHardwareLayerHasTooManyKeys, `Row #${o.row} on 'hardware' layer has too many keys`);
+  static Error_RowOnHardwareLayerHasTooManyKeys = (o:{row: number, hardware: string}) =>  m(this.ERROR_RowOnHardwareLayerHasTooManyKeys, `Row #${o.row} on 'hardware' ${o.hardware} layer has too many keys`);
   static ERROR_RowOnHardwareLayerHasTooManyKeys = SevError | 0x0004;
 
   static Error_KeyNotFoundInKeyBag = (o:{keyId: string, col: number, row: number, layer: string, form: string}) =>
@@ -86,6 +86,10 @@ export class CompilerMessages {
   static Error_InvalidHardware = (o:{hardware: string}) => m(this.ERROR_InvalidHardware,
     `layers has invalid value hardware=${o.hardware}`);
   static ERROR_InvalidHardware = SevError | 0x0015;
+
+  static Error_InvalidModifier = (o:{layer: string, modifier: string}) => m(this.ERROR_InvalidModifier,
+    `layer has invalid modifier='${o.modifier}' on layer id=${o.layer}`);
+  static ERROR_InvalidModifier = SevError | 0x0016;
 
   static severityName(code: number): string {
     let severity = code & CompilerErrorSeverity.Severity_Mask;

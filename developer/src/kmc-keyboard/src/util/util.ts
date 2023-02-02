@@ -76,3 +76,19 @@ export function translateLayerAttrToModifier(layer: LDMLKeyboard.LKLayer) : numb
   // TODO-LDML: other modifiers, other ids?
   return constants.keys_mod_none;
 }
+
+/**
+ * @param modifier modifier sequence such as undefined, "none", "shift altR" etc
+ * @returns true if valid
+ */
+export function validModifier(modifier?: string) : boolean {
+  if (!modifier) return true;  // valid to have no modifier, == none
+  for (let str of modifier.split(' ')) {
+    if (!constants.keys_mod_map.has(str)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+

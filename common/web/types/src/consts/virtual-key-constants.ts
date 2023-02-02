@@ -1,6 +1,10 @@
 
 // Define standard keycode numbers (exposed for use by other modules)
-// TODO: merge with common\web\keyboard-processor\src\text\codes.ts
+// TODO-LDML: merge with common\web\keyboard-processor\src\text\codes.ts
+
+/**
+ * May include non-US virtual key codes
+ */
 export const USVirtualKeyCodes = {
   K_BKSP:8,
   K_TAB:9,
@@ -129,7 +133,9 @@ export const USVirtualKeyCodes = {
 
 const k = USVirtualKeyCodes;
 
-export const USVirtualKeyMap: number[][] = [
+export type KeyMap = number[][];
+
+export const USVirtualKeyMap: KeyMap = [
   // ` 1 2 3 4 5 6 7 8 9 0 - = [bksp]
   [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL ],
   // [tab] Q W E R T Y U I O P [ ] \
@@ -142,11 +148,7 @@ export const USVirtualKeyMap: number[][] = [
   [ k.K_SPACE ],
 ];
 
-/**
- * TODO-LDML: WIP ISO layout for #7965
- * May not be correct to use US codes?
- */
-export const ISOVirtualKeyMap: number[][] = [
+export const ISOVirtualKeyMap: KeyMap = [
   // ` 1 2 3 4 5 6 7 8 9 0 - = [bksp]
   [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL ],
   // [tab] Q W E R T Y U I O P [ ]
@@ -158,6 +160,19 @@ export const ISOVirtualKeyMap: number[][] = [
   // space
   [ k.K_SPACE ],
 ];
+
+/**
+ * Map from a hardware constnat to a keymap
+ * For the 'key' see constants.layr_list_hardware_map
+ */
+export const HardwareToKeymap: Map<string, KeyMap> = new Map(
+  [
+    ["us", USVirtualKeyMap],
+    ["iso", ISOVirtualKeyMap],
+    //TODO-LDML: jis #8161
+    //TODO-LDML: abnt2 #8161
+  ]
+);
 
 /**
  * Maps LDML VKey Names from CLDR VKey Enum in TR35 to Keyman virtual key codes
