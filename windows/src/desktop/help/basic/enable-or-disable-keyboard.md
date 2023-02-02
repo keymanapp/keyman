@@ -33,12 +33,17 @@ To disable a Keyman keyboard:
 
 4.  Select the Keyboard Layouts tab.
 
-5.  Untick the checkbox beside the Keyman keyboard.
+5.  Select the keyboard name you want to disable to expand options associated with it.
 
-6.  Click OK.
+6.  Click on the Disable button.
 
-When a keyboard layout is disabled, its name appears in grey and its
-checkbox is unticked.
+    ![](../desktop_images/tab-layout-disable.png)
+
+7.  Click OK.
+
+When a keyboard layout is disabled, its name and details appear in grey and the disable
+button now says enable. The Add/remove language... button is also disabled as this option is 
+not available while the keyboard is disabled.
 
 ## Enabling a Keyman keyboard
 
@@ -57,9 +62,13 @@ To enable a Keyman keyboard:
 
 4.  Select the Keyboard Layouts tab.
 
-5.  Tick the checkbox beside the Keyman keyboard.
+5.  Select the keyboard name you want to enable to expand options associated with it.
 
-6.  Click OK.
+6.  Click on the Enable button.
+
+    ![](../desktop_images/tab-layout-enable.png)
+
+7.  Click OK.
 
 ## Related Topics
 

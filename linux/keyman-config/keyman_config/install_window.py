@@ -47,10 +47,9 @@ def find_keyman_image(image_file):
 
 class InstallKmpWindow(Gtk.Dialog):
 
-    def __init__(self, kmpfile, online=False, viewkmp=None, language=None):
+    def __init__(self, kmpfile, viewkmp=None, language=None):
         logging.debug("InstallKmpWindow: kmpfile: %s", kmpfile)
         self.kmpfile = kmpfile
-        self.online = online
         self.viewwindow = viewkmp
         self.accelerators = None
         self.language = language
@@ -327,7 +326,7 @@ class InstallKmpWindow(Gtk.Dialog):
     def on_install_clicked(self, button):
         logging.info("Installing keyboard")
         try:
-            result = install_kmp(self.kmpfile, self.online, language=self.language)
+            result = install_kmp(self.kmpfile, language=self.language)
             if result:
                 # If install_kmp returns a string, it is an instruction for the end user,
                 # because for fcitx they will need to take extra steps to complete

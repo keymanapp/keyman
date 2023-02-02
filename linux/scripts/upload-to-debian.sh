@@ -81,6 +81,12 @@ stable_branch=${stable_branch##* }
 git checkout "${stable_branch#origin/}"
 git pull origin "${stable_branch#origin/}"
 
+if git branch -r | grep origin/beta; then
+    ISBETA=true
+else
+    ISBETA=false
+fi
+
 cd "$KEYMAN_ROOT/linux"
 echo_heading "Building source package"
 DIST=unstable DEBREVISION=$REVISION scripts/debian.sh
@@ -101,11 +107,21 @@ if [ -n "$PUSH" ]; then
     $NOOP git push origin chore/linux/changelog
 fi
 
-git checkout -B chore/linux/cherry-pick/changelog origin/master
+if $ISBETA; then
+    CLBRANCH=origin/beta
+else
+    CLBRANCH=origin/master
+fi
+
+git checkout -B chore/linux/cherry-pick/changelog ${CLBRANCH}
 git cherry-pick -x chore/linux/changelog
 if [ -n "$PUSH" ]; then
     $NOOP git push origin chore/linux/cherry-pick/changelog
 fi
 
 echo_heading "Finishing"
-git checkout master
+if $ISBETA; then
+    git checkout beta
+else
+    git checkout master
+fi

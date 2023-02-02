@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
-    "allowJs": true,
+    "allowJs": false,
     "outDir": "../../../../build/tools/building/sourcemap-root",
+    "module": "es6",
+    "moduleResolution": "node",
     "types": ["node"],
     "lib": ["es6", "dom"]
   }

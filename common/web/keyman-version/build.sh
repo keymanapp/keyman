@@ -61,7 +61,7 @@ export class KEYMAN_VERSION {
   static readonly VERSION_TAG = \"$VERSION_TAG\";
   static readonly VERSION_WITH_TAG = \"$VERSION_WITH_TAG\";
   static readonly VERSION_ENVIRONMENT = \"$VERSION_ENVIRONMENT\";
-  static readonly SENTRY_RELEASE = \"release-$VERSION_WITH_TAG\";
+  static readonly VERSION_GIT_TAG = \"$VERSION_GIT_TAG\";
 }
 
 // Also provides it as a 'default' export.

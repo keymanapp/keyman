@@ -129,9 +129,11 @@ implementation
 uses
   System.Types,
   Vcl.Themes,
+  Sentry.Client,
 
   Keyman.Configuration.UI.MitigationForWin10_1803,
   Keyman.System.LanguageCodeUtils,
+  Keyman.System.KeymanSentryClient,
   Keyman.Configuration.System.TIPMaintenance,
   Keyman.UI.UfrmProgress,
   MessageIdentifierConsts,
@@ -147,6 +149,9 @@ uses
 { TfrmInstallKeyboardLanguage }
 
 function InstallKeyboardLanguage(Owner: TForm; const KeyboardID, ISOCode: string; Silent: Boolean): Boolean;
+var
+  n: Integer;
+  kbd: IKeymanKeyboardInstalled;
 begin
   Result := TTIPMaintenance.DoInstall(KeyboardID, ISOCode);
   if not Result then
@@ -157,7 +162,18 @@ begin
   end
   else
     CheckForMitigationWarningFor_Win10_1803(Silent, '');
-
+  // Enable the keyboard
+  n := kmcom.Keyboards.IndexOf(KeyboardID);
+  if n < 0 then
+  begin
+    // The Keyboard was successully installed for the BCP47Code
+    // for some reason the index look up has failed. Still pass through
+    // the DoInstall reasult, however the keyboard will not be enabled.
+    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'InstallKeyboardLanguage: KeyboardID "'+KeyboardID+'" not found, attempting to install for language "'+ISOCode+'".');
+    Exit;
+  end;
+  kbd := kmcom.Keyboards[n];
+  kbd.Loaded := True;
   kmcom.Apply;
   Result := True;
 end;

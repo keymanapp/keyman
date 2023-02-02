@@ -73,7 +73,7 @@ output_path ( ) {
 
 SOURCE="src"
 
-SENTRY_RELEASE_VERSION="release-$VERSION_WITH_TAG"
+SENTRY_RELEASE_VERSION="release@$VERSION_WITH_TAG"
 
 # Ensures that we rely first upon the local npm-based install of Typescript.
 # (Facilitates automated setup for build agents.)
@@ -166,7 +166,7 @@ minifycmd="$JAVA -jar $minifier --compilation_level WHITESPACE_ONLY $minifier_wa
 readonly minifier
 readonly minifycmd
 
-minified_sourcemap_cleaner="build/tools/building/sourcemap-root"
+minified_sourcemap_cleaner="build/tools/building/sourcemap-root/index.mjs"
 
 # Fails the build if a specified file does not exist.
 assert_exists ( ) {
@@ -183,9 +183,9 @@ assert_exists ( ) {
 # $5 - additional output wrapper
 minify ( ) {
     if [ $# -ge 4 ]; then
-        cleanerOptions="--suffix $4"
+        cleanerOptions="--clean --sourceRoot $4"
     else
-        cleanerOptions=
+        cleanerOptions="--clean"
     fi
 
     if [ $# -ge 5 ]; then
@@ -209,7 +209,7 @@ minify ( ) {
         --source_map_location_mapping "$INPUT_DIR|../../.." \
         --js "$INPUT" --compilation_level $3 \
         --js_output_file "$OUTPUT" --warning_level VERBOSE --output_wrapper "$wrapper
-//# sourceMappingURL=$1.map"
+//# sourceMappingURL=$INPUT_FILE.map"
 
     # Now to clean the source map.
     assert_exists "$OUTPUT"
@@ -306,7 +306,7 @@ copy_sources ( ) {
     do
       echo "- $SOURCE/$SOURCE_FOLDER/ => $CONFIG_OUT_PATH/src/$SOURCE_FOLDER/"
       mkdir -p "$CONFIG_OUT_PATH/src/$SOURCE_FOLDER"
-      cp -Rf  "$SOURCE/$SOURCE_FOLDER/"    "$CONFIG_OUT_PATH/src/$SOURCE_FOLDER"
+      cp -Rf  "$SOURCE/$SOURCE_FOLDER/"*    "$CONFIG_OUT_PATH/src/$SOURCE_FOLDER/"
     done
 
     echo
