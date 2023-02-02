@@ -116,7 +116,7 @@ done
 # Extended path definitions
 KMEI_RESOURCES=engine/KMEI/KeymanEngine/resources
 BUNDLE_PATH=$KMEI_RESOURCES/Keyman.bundle/contents/resources
-KMW_SOURCE=../web/source
+KMW_ROOT=../web
 
 DEFAULT_KBD_ID="sil_euro_latin"
 DEFAULT_LM_ID="nrc.en.mtnt"
@@ -137,7 +137,7 @@ if [ $CLEAN_ONLY = true ]; then
 fi
 
 echo
-echo "KMW_SOURCE: $KMW_SOURCE"
+echo "KMW_ROOT: $KMW_ROOT"
 echo "DO_KMW_BUILD: $DO_KMW_BUILD"
 echo "DO_KMP_DOWNLOADS: $DO_KMP_DOWNLOADS"
 echo "CONFIGURATION: $CONFIG"
@@ -151,20 +151,21 @@ update_bundle ( ) {
     base_dir="$(pwd)"
 
     if [ $DO_KMW_BUILD = true ]; then
-        echo Building KeymanWeb from $KMW_SOURCE
+        echo Building KeymanWeb from $KMW_ROOT
 
-        cd $KMW_SOURCE
+        cd $KMW_ROOT
 
         if [ "$CONFIG" == "Debug" ]; then
-          KMWFLAGS="-debug_embedded"
+          KMWFLAGS="configure:embed build:embed --debug"
         else
-          KMWFLAGS="-embed"
+          KMWFLAGS="configure:embed build:embed"
         fi
 
         # Local development optimization - cross-target Sentry uploading when requested
         # by developer.  As it's not CI, the Web artifacts won't exist otherwise...
         # unless the developer manually runs the correct build configuration accordingly.
         if [[ $VERSION_ENVIRONMENT == "local" ]] && [[ $UPLOAD_SENTRY == true ]]; then
+          # TODO:  handle the -upload-sentry in its eventual new form
           KMWFLAGS="$KMWFLAGS -upload-sentry"
         fi
 
@@ -174,7 +175,7 @@ update_bundle ( ) {
         fi
 
         #Copy over the relevant resources!  It's easiest to do if we navigate to the resulting folder.
-        cd ../release/embedded
+        cd release/embedded
         cp resources/osk/kmwosk.css        "$base_dir/$BUNDLE_PATH/kmwosk.css"
         cp resources/osk/keymanweb-osk.ttf "$base_dir/$BUNDLE_PATH/keymanweb-osk.ttf"
         cp keyman.js                       "$base_dir/$BUNDLE_PATH/keymanios.js"

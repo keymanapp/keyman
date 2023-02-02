@@ -123,8 +123,8 @@ fi
 # ----------------------------------------
 
 if (( build_keymanweb )); then
-  pushd "$KEYMAN_ROOT/web/source"
-  ./build.sh -no_minify
+  pushd "$KEYMAN_ROOT/web/"
+  ./build.sh --no-minify
   popd
 fi
 
