@@ -105,3 +105,16 @@ export interface ErrorStub {
 
   error: Error;
 }
+
+export function mergeAndResolveStubPromises(keyboardStubs: (KeyboardStub|ErrorStub)[], errorStubs: ErrorStub[]) :
+  Promise<(KeyboardStub|ErrorStub)[]> {
+  if (errorStubs.length == 0) {
+    return Promise.resolve(keyboardStubs);
+  } if (keyboardStubs.length == 0) {
+    return Promise.reject(errorStubs);
+  } else {
+    // Merge this with errorStubs
+    let result: (KeyboardStub|ErrorStub)[] = keyboardStubs;
+    return Promise.resolve(result.concat(errorStubs));
+  }
+}

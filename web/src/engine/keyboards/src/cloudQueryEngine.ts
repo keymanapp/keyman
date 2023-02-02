@@ -1,4 +1,4 @@
-import { default as KeyboardStub, ErrorStub, KeyboardAPISpec } from './keyboardStub.js';
+import { default as KeyboardStub, ErrorStub, KeyboardAPISpec, mergeAndResolveStubPromises } from './keyboardStub.js';
 import { KeyboardFont, LanguageAPIPropertySpec } from '@keymanapp/keyboard-processor/build/obj/keyboards/keyboardProperties.js';
 import { Version, ManagedPromise } from '@keymanapp/web-utils/build/obj/index.js';
 import CloudRequesterInterface from './cloudRequesterInterface.js';
@@ -450,7 +450,7 @@ export default class CloudQueryEngine {
     // Return if all keyboards being registered are local and fully specified
     try {
       if(cloudList.length == 0) {
-        return CloudQueryEngine.mergeAndResolveStubPromises([], []);
+        return mergeAndResolveStubPromises([], []);
       }
     } catch (error) {
       console.error(error);
@@ -469,26 +469,13 @@ export default class CloudQueryEngine {
     // Request keyboard metadata from the Keyman Cloud keyboard metadata server
     try {
       let result: (KeyboardStub|ErrorStub)[]|Error = await this.keymanCloudRequest(cmd,false);
-      return CloudQueryEngine.mergeAndResolveStubPromises(result, errorStubs);
+      return mergeAndResolveStubPromises(result, errorStubs);
     } catch(err) {
       // We don't have keyboard info for this ErrorStub
       console.error(err);
       let stub: ErrorStub = {error: err};
       errorStubs.push(stub);
       return Promise.reject(errorStubs);
-    }
-  }
-
-  private static mergeAndResolveStubPromises(keyboardStubs: (KeyboardStub|ErrorStub)[], errorStubs: ErrorStub[]) :
-      Promise<(KeyboardStub|ErrorStub)[]> {
-    if (errorStubs.length == 0) {
-      return Promise.resolve(keyboardStubs);
-    } if (keyboardStubs.length == 0) {
-      return Promise.reject(errorStubs);
-    } else {
-      // Merge this with errorStubs
-      let result: (KeyboardStub|ErrorStub)[] = keyboardStubs;
-      return Promise.resolve(result.concat(errorStubs));
     }
   }
 
