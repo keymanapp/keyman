@@ -43,6 +43,10 @@ if builder_start_action build; then
     echo "[$THIS_SCRIPT_IDENTIFIER] skipping tsc -b; will be completed by $builder_dep_parent"
   else
     npm run tsc -- --build "$THIS_SCRIPT_PATH/tsconfig.json"
+    node build-bundler.js
+
+    # So... tsc does declaration-bundling on its own pretty well, at least for local development.
+    npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/index.d.ts
   fi
   builder_finish_action success build
 fi
