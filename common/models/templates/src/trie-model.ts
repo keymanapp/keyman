@@ -1,5 +1,3 @@
-/// <reference types="@keymanapp/models-types" />
-
 /*
  * Copyright (c) 2019 National Research Council Canada (author: Eddie A. Santos)
  * Copyright (c) 2019 SIL International
