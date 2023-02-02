@@ -1,6 +1,12 @@
+import { LKKey } from './../../src/ldml-keyboard/ldml-keyboard-xml';
 import 'mocha';
+import {assert} from 'chai';
 import { CommonTypesMessages } from '../../src/util/common-events.js';
 import { testReaderCases } from '../helpers/reader-callback-test.js';
+
+function pluckKeysFromKeybag(keys: LKKey[], ids: string[]) {
+  return keys.filter(({id}) => ids.indexOf(id) !== -1);
+}
 
 describe('ldml keyboard xml reader tests', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
@@ -28,19 +34,56 @@ describe('ldml keyboard xml reader tests', function () {
     },
     {
       subpath: 'import-minimal.xml',
-      // TODO-LDML: validate content
+      callback: (data, source, subpath, callbacks) => {
+        assert.ok(source?.keyboard?.keys);
+        const k = pluckKeysFromKeybag(source?.keyboard?.keys.key, ['a', 'b', 'c']);
+        assert.sameDeepOrderedMembers(k, [
+          {id: 'a', to: 'a'},
+          {id: 'b', to: 'b'},
+          {id: 'c', to: 'c'},
+        ]);
+      },
     },
     {
       subpath: 'import-minimal1.xml',
-      // TODO-LDML: validate content
+      callback: (data, source, subpath, callbacks) => {
+        assert.ok(source?.keyboard?.keys);
+        const k = pluckKeysFromKeybag(source?.keyboard?.keys.key, ['a', 'b', 'c']);
+        assert.sameDeepOrderedMembers(k, [
+          {id: 'a', to: 'a'},
+          {id: 'b', to: 'b'},
+          {id: 'c', to: 'c'},
+        ]);
+      },
     },
     {
       subpath: 'import-minimal2.xml',
-      // TODO-LDML: validate content
+      callback: (data, source, subpath, callbacks) => {
+        assert.ok(source?.keyboard?.keys);
+        const k = pluckKeysFromKeybag(source?.keyboard?.keys.key, ['a', 'b', 'c']);
+        assert.sameDeepOrderedMembers(k, [
+          {id: 'a', to: 'a'},
+          {id: 'b', to: 'b'},
+          {id: 'c', to: 'c'},
+          {id: 'a', to: 'å'}, // overridden
+        ]);
+      },
     },
     {
       subpath: 'import-symbols.xml',
-      // TODO-LDML: validate content
+      callback: (data, source, subpath, callbacks) => {
+        assert.ok(source?.keyboard?.keys);
+        const k = pluckKeysFromKeybag(source?.keyboard?.keys.key, ['a', 'b', 'c', 'zz', 'hash', 'hyphen']);
+        assert.sameDeepOrderedMembers(k, [
+          {id: 'a', to: 'a'},       // implied
+          {id: 'b', to: 'b'},
+          {id: 'c', to: 'c'},
+          {id: 'hash', to: '#'},    // imported symbols
+          {id: 'hyphen', to: '-'},
+          {id: 'zz', to: 'zz'},     // new key
+          {id: 'hash', to: '##'},   // override
+        ]);
+      },
     },
     {
       subpath: 'invalid-import-base.xml',

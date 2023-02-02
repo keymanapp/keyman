@@ -102,18 +102,18 @@ export default class LDMLKeyboardXMLSourceFileReader {
   }
 
   private resolveImports(obj: any, subtag: string) {
-    // first, the implied imports
+    // These are in reverse order, because the imports insert at the beginning of the array.
+    // first, the explicit imports
+    for (const asImport of ([...obj['import'] as LKImport[]].reverse())) {
+      this.resolveOneImport(obj, subtag, asImport);
+    }
+    // then, the implied imports
     if (subtag === 'keys') {
       // <import base="cldr" path="techpreview/keys-Latn-implied.xml"/>
       this.resolveOneImport(obj, subtag, {
         base: constants.cldr_import_base,
         path: constants.cldr_implied_keys_import
       });
-    }
-
-    // now, the explicit imports
-    for (const asImport of (obj['import'] as LKImport[])) {
-      this.resolveOneImport(obj, subtag, asImport);
     }
   }
 
@@ -142,7 +142,7 @@ export default class LDMLKeyboardXMLSourceFileReader {
       return;
     }
     // pull all children of importXml[subtag] into obj
-    for (const subsubtag of Object.keys(importRootNode)) { // e.g. <key/>
+    for (const subsubtag of Object.keys(importRootNode).reverse()) { // e.g. <key/>
       const subsubval = importRootNode[subsubtag];
       if (!Array.isArray(subsubval)) {
         // This is somewhat of an internal error, indicating that a non-mergeable XML file was imported
