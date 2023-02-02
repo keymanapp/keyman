@@ -112,8 +112,9 @@ public final class KMTextView extends AppCompatEditText {
       keyboardLayout.setEnabled(false);
     }
 
-    if (KMManager.InAppKeyboard != null && KMManager.InAppKeyboard.getParent() == null) {
-      keyboardLayout.addView(KMManager.InAppKeyboard);
+    KMKeyboard InAppKeyboard = KMManager.getKMKeyboard(KMManager.KeyboardType.KEYBOARD_TYPE_INAPP);
+    if (InAppKeyboard != null && InAppKeyboard.getParent() == null) {
+      keyboardLayout.addView(InAppKeyboard);
     }
 
     setOnFocusChangeListener(new OnFocusChangeListener() {

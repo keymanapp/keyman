@@ -267,11 +267,11 @@ public final class KeyboardPickerActivity extends BaseActivity {
   protected void onPause() {
     super.onPause();
 
-    if (KMManager.InAppKeyboard != null) {
-      KMManager.InAppKeyboard.loadKeyboard();
+    if (KMManager.getKMKeyboard(KMManager.KeyboardType.KEYBOARD_TYPE_INAPP) != null) {
+      KMManager.getKMKeyboard(KMManager.KeyboardType.KEYBOARD_TYPE_INAPP).loadKeyboard();
     }
-    if (KMManager.SystemKeyboard != null) {
-      KMManager.SystemKeyboard.loadKeyboard();
+    if (KMManager.getKMKeyboard(KMManager.KeyboardType.KEYBOARD_TYPE_SYSTEM) != null) {
+      KMManager.getKMKeyboard(KMManager.KeyboardType.KEYBOARD_TYPE_SYSTEM).loadKeyboard();
     }
   }
 
