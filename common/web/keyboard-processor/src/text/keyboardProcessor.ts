@@ -85,14 +85,12 @@ export default class KeyboardProcessor {
 
     // Maintains debug definitions - debug keyboard compilations refer to these code definitions.
     //
-    // Note:  this is targeted for deprecation and is only included for legacy precompiled keyboards.
-    const com = globalThis['com'] = globalThis['com'] || {};
-    let keyman = com['keyman'] = com['keyman'] || {};
-    const text = keyman['text'] = keyman['text'] || {};
-    text['Codes'] = Codes;
-
-    keyman = globalThis['keyman'] = globalThis['keyman'] || {};
-    const osk = keyman['osk'] || keyman['osk'] || {};
+    // Note:  these are targeted for deprecation and is only included for legacy precompiled keyboards.
+    //
+    // Refer to C:\keymanapp\keyman\developer\src\tike\compile\CompileKeymanWeb.pas,
+    // TCompileKeymanWeb.JavaScript_SetupDebug.
+    const keyman = globalThis['keyman'] = globalThis['keyman'] || {};
+    const osk = keyman['osk'] || keyman['osk'] || {};  // does not otherwise exist when headless or detached from OSKs.
     osk['modifierCodes'] = Codes.modifierCodes;
     osk['keyCodes'] = Codes.keyCodes;
 
