@@ -6,8 +6,8 @@ KeymanWeb.KR(new Keyboard_web_context_tests());
 }
 function Keyboard_web_context_tests()
 {
-  var modCodes = KeymanWeb.Codes.modifierCodes;
-  var keyCodes = KeymanWeb.Codes.keyCodes;
+  var modCodes = com.keyman.text.Codes.modifierCodes;
+  var keyCodes = com.keyman.text.Codes.keyCodes;
 
   this._v=(typeof keyman!="undefined"&&typeof keyman.version=="string")?parseInt(keyman.version,10):9;
   this.KI="Keyboard_web_context_tests";

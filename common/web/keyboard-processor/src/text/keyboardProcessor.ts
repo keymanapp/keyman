@@ -83,6 +83,14 @@ export default class KeyboardProcessor {
     let globalThis = getGlobalObject();
     globalThis[KeyboardInterface.GLOBAL_NAME] = this.keyboardInterface;
 
+    // Maintains debug definitions - debug keyboard compilations refer to these code definitions.
+    //
+    // Note:  this is targeted for deprecation and is only included for legacy precompiled keyboards.
+    const com = globalThis['com'] = globalThis['com'] || {};
+    const keyman = com['keyman'] = com['keyman'] || {};
+    const text = keyman['text'] = keyman['text'] || {};
+    text['Codes'] = Codes;
+
     // Ensure that the active keyboard is set on the keyboard interface object.
     if(this.activeKeyboard) {
       this.keyboardInterface.activeKeyboard = this.activeKeyboard;
