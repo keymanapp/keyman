@@ -15,7 +15,7 @@ cd "$THIS_SCRIPT_PATH"
 ################################ Main script ################################
 
 # Defaults
-FLAGS="--require ./unit_tests/helpers"
+FLAGS=""
 
 builder_describe "Runs all tests for the language-modeling / predictive-text layer module" \
   "configure" \
@@ -125,17 +125,17 @@ if builder_start_action test:browser; then
 
   if builder_has_option --ci; then
     KARMA_FLAGS="$KARMA_FLAGS --reporters teamcity,BrowserStack"
-    KARMA_CONFIG="CI.conf.js"
+    KARMA_CONFIG="CI.conf.cjs"
     KARMA_INFO_LEVEL="--log-level=debug"
 
     if builder_has_option --debug; then
       echo "${BUILDER_TERM_START}--ci${BUILDER_TERM_END} option set; ignoring ${BUILDER_TERM_START}--debug${BUILDER_TERM_END} option"
     fi
   else
-    KARMA_CONFIG="manual.conf.js"
+    KARMA_CONFIG="manual.conf.cjs"
     if builder_has_option --debug; then
       KARMA_FLAGS="$KARMA_FLAGS --no-single-run"
-      KARMA_CONFIG="manual.conf.js"
+      KARMA_CONFIG="manual.conf.cjs"
       KARMA_INFO_LEVEL="--log-level=debug"
 
       echo
@@ -144,7 +144,7 @@ if builder_start_action test:browser; then
     fi
   fi
 
-  if [[ KARMA_CONFIG == "manual.conf.js" ]]; then
+  if [[ KARMA_CONFIG == "manual.conf.cjs" ]]; then
     get_builder_OS  # return:  os_id="linux"|"mac"|"win"
     get_browser_set_for_OS
   else

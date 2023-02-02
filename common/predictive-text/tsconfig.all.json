@@ -1,0 +1,34 @@
+{
+  // Due to the heterogenous target mix supported by the LMLayer, the two different "worker" types
+  // require separate sub-tsconfigs, both of which require common references.  The multi-config
+  // setup in this project and its subfolders ensure all modules can compile cleanly and in the
+  // necessary compilation order.
+  "extends": "../../tsconfig-base.json",
+
+  "compilerOptions": {
+    "allowJs": false,
+    "declaration": true,
+    "module": "es6",
+    "moduleResolution": "Node",
+    "inlineSources": true,
+    "sourceMap": true,
+    "sourceRoot": "keyman",
+    "target": "es5",
+    "lib": ["es6"],
+    "types": ["node"],
+    "baseUrl": "./",
+    "outDir": "build/obj",
+    "tsBuildInfoFile": "build/obj/tsconfig.all.tsbuildinfo",
+    "rootDir": "./src"
+  },
+  "files": [],
+  "references": [
+    { "path": "../web/utils" },
+    { "path": "../models/types"},
+    { "path": "../models/wordbreakers"},
+    { "path": "../web/lm-message-types"},
+    { "path": "../models/templates"},
+    { "path": "src/node" },
+    { "path": "src/web" }
+  ],
+}
