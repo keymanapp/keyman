@@ -245,6 +245,80 @@ class Constants {
    */
   readonly keys_flags_extend = 1;
 
+  /**
+   * Constant for no modifiers
+   */
+  readonly keys_mod_none = 0;
+  /**
+   * bitmask for modifier key
+   */
+  readonly keys_mod_altL = 1 << 2;
+  /**
+   * bitmask for modifier key
+   */
+  readonly keys_mod_altR = 1 << 3;
+  /**
+   * bitmask for either alt
+   */
+  readonly keys_mod_alt  = this.keys_mod_altL | this.keys_mod_altR;
+  /**
+   * bitmask for modifier key
+   */
+  readonly keys_mod_caps = 1 << 7;
+  /**
+   * bitmask for modifier key
+   */
+  readonly keys_mod_cmd =  1 << 15;
+  /**
+   * bitmask for modifier key
+   */
+  readonly keys_mod_ctrlL = 1 << 0;
+  /**
+   * bitmask for modifier key
+   */
+  readonly keys_mod_ctrlR = 1 << 1;
+  /**
+   * bitmask for either ctrl
+   */
+  readonly keys_mod_ctrl = this.keys_mod_ctrlL | this.keys_mod_ctrlR;
+  /**
+   * bitmask for modifier key
+   */
+  readonly keys_mod_opt = 1 << 14;
+  /**
+   * bitmask for either shift
+   */
+  readonly keys_mod_shift = 1 << 4;
+  /**
+   * bitmask for modifier key
+   */
+  readonly keys_mod_shiftL = this.keys_mod_shift;
+  /**
+   * bitmask for modifier key
+   */
+  readonly keys_mod_shiftR =  this.keys_mod_shift;
+
+  /**
+   * Convenience map for modifiers
+   */
+  readonly keys_mod_map: Map<string, number> = new Map(
+    [
+      ["none", this.keys_mod_none],
+      ["alt", this.keys_mod_alt],
+      ["altL", this.keys_mod_altL],
+      ["altR", this.keys_mod_altR],
+      ["caps", this.keys_mod_caps],
+      ["cmd", this.keys_mod_cmd],
+      ["ctrl", this.keys_mod_ctrl],
+      ["ctrlL", this.keys_mod_ctrlL],
+      ["ctrlR", this.keys_mod_ctrlR],
+      ["opt", this.keys_mod_opt],
+      ["shift", this.keys_mod_shift],
+      ["shiftL", this.keys_mod_shiftL],
+      ["shiftR", this.keys_mod_shiftR],
+    ]
+  );
+
   /* ------------------------------------------------------------------
    * key2 section
     ------------------------------------------------------------------ */

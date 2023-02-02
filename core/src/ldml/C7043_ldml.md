@@ -130,7 +130,25 @@ For each key:
   etc.). It is resolved because the `vkeyMap` from LDML has already been
   applied.  If this is 256 or above, it is a custom touch layout vkey generated
   by the compiler.
-- `mod`: TODO-LDML define this.  0 for no modifiers. #7533
+- `mod`: 32-bit bitfield defined as below. Little endian values.
+Note that conforming to other keyman values, left versus right shift
+cannot be distinguished. Also note that `cmd` and `opt` do not match
+other keyman values.
+
+| Bit position | Meaning  | Comment                                     |
+|--------------|----------|---------------------------------------------|
+| `0x00000000` | `none`   | All zeros = no modifiers                    |
+|      0       | `ctrlL`  | `ctrl = ctrlL + ctrlR`                      |
+|      1       | `ctrlR`  |                                             |
+|      2       | `altL`   |                                             |
+|      3       | `altR`   | `alt` (both) = `altL + altR`                |
+|      4       | `shift`  | Either shift                                |
+|      7       | `caps`   |                                             |
+|     15       | `cmd`    | Nonstandard for keyman                      |
+|     14       | `opt`    | Nonstandard for keyman                      |
+|      4       | `shiftL` | alias for `shift`                           |
+|      4       | `shiftR` | alais for `shift`                           |
+
 - `flags`: Flags is a 32-bit bitfield defined as below:
 
 | Bit position | Meaning  |  Description                                |

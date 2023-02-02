@@ -52,7 +52,7 @@ for (const key of keys) {
       console.log(`#define LDML_${upkey}ID_${upsubkey} 0x${asnum.toString(16).toUpperCase()} /* "${subkey}" */`);
       console.log(`#define LDML_${upkey}NAME_${upsubkey}             "${subkey}"`);
     }
-  } else if (key === 'layr_list_hardware_map' || type === 'function') {
+  } else if (key.endsWith('_map') || type === 'function') {
     // ignored
   } else {
     console.error(`Don’t know what to do with constants[${key}] of type ${type}`);

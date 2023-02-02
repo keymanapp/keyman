@@ -24,7 +24,6 @@ export interface BUILDER_KEYS extends BUILDER_SECTION {
   items: BUILDER_KEYS_ITEM[];
 };
 
-
 export function build_keys(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILDER_KEYS {
   if(!kmxplus.keys.keys.length) {
     return null;
@@ -42,7 +41,6 @@ export function build_keys(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILD
     keys.items.push({
       vkey: item.vkey,
       mod: item.mod,
-      // todo: support 'extend'
       to: build_strs_index(sect_strs, item.to),
       flags: KeyFlags.extend // todo: support non-extended
     });

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-@@keys: [K_B][K_O][K_N][K_LBRKT][K_U][K_SPACE][K_S][K_A][K_RBRKT][K_RBRKT][K_A]
-@@expected: \u0062\u006f\u006e\u0121\u0075\u0020\u0073\u0061\u0127\u0127\u0061
+@@keys: [SHIFT K_B][K_O][K_N][K_LBRKT][K_U][K_SPACE][K_S][K_A][K_RBRKT][K_RBRKT][K_A]
+@@expected: \u0042\u006f\u006e\u0121\u0075\u0020\u0073\u0061\u0127\u0127\u0061
 
 Note:
-    "bonġu saħħa".split('').map(s=>`\\u${s.codePointAt(0).toString(16)}`).join('')
+    "Bonġu saħħa".split('').map(s=>`\\u${s.codePointAt(0).toString(16)}`).join('')
 Gets part of the way,
 
     Based on mt.xml from CLDR.  'TODO-LDML' denotes modifications.
@@ -84,7 +84,7 @@ Gets part of the way,
             <row keys="space" />
         </layer>
 
-        <layer modifier="altR-shift">
+        <layer modifier="altR shift"> <!-- TODO-LDML: disallowed by current DTD but see CLDR https://github.com/unicode-org/cldr/pull/2661 -->
             <row keys="tilde gap gap gap gap gap gap gap gap gap gap gap gap" />
             <row keys="gap gap E-grave gap gap gap U-grave I-grave O-grave gap open-curly close-curly pipe" />
             <row keys="A-grave gap gap gap gap gap gap gap gap gap gap" />
