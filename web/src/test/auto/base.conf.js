@@ -38,9 +38,9 @@ module.exports = {
   // list of files / patterns to load in the browser
   files: [
     'web/src/test/auto/modernizr.js',               // A dependency-managed utility script that helps with browser feature detection.
-    'web/tools/element-wrappers/build/index.js', // Defines com.keyman.dom objects separate from KMW for unit testing.
-    'web/tools/device-detect/build/index.js',    // Defines com.keyman.utils.Device, separated from KMW for use in unit test setup.
-    'web/tools/recorder/build/index.js',         // The object definitions used to generate/replicate key events for engine tests.
+    'web/build/engine/element-wrappers/obj/index.bundled.js', // Defines com.keyman.dom objects separate from KMW for unit testing.
+    'web/build/engine/device-detect/obj/index.bundled.js',    // Defines com.keyman.utils.Device, separated from KMW for use in unit test setup.
+    'web/build/tools/testing/recorder/obj/index.js',         // The object definitions used to generate/replicate key events for engine tests.
                                                  // Includes KMW's Device class, which is used by test_utils below.
     'web/src/test/auto/test_init_check.js',         // Ensures that tests will initialize properly
     'common/test/resources/timeout-adapter.js',  // Handles configuration timeout setup at runtime.
@@ -57,9 +57,9 @@ module.exports = {
     {pattern: 'web/build/app/web/debug/*.map', watched: true, served: true, included: false}, // + sourcemaps.
     {pattern: 'web/build/app/ui/debug/*.js', watched: true, served: true, included: false},  // The actual KMW UI code.
     {pattern: 'web/build/app/ui/debug/*.map', watched: true, served: true, included: false}, // + sourcemaps.
-    {pattern: 'web/tools/recorder/build/index.js.map', watched: true, served: true, included: false},
-    {pattern: 'web/tools/element-wrappers/build/index.js.map', watched: true, served: true, included: false},
-    {pattern: 'web/tools/device-detect/build/index.js.map', watched: true, served: true, included: false}
+    {pattern: 'web/build/tools/testing/recorder/obj/index.js.map', watched: true, served: true, included: false},
+    {pattern: 'web/build/engine/element-wrappers/obj/index.bundled.js.map', watched: true, served: true, included: false},
+    {pattern: 'web/build/engine/device-detect/obj/index.bundled.js.map', watched: true, served: true, included: false}
   ],
 
   proxies: {

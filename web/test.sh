@@ -19,8 +19,8 @@ cd "$THIS_SCRIPT_PATH"
 builder_check_color "$@"
 
 builder_describe "Runs the Keyman Engine for Web unit-testing suites" \
-  "@tools" \
-  "@./ build:engine" \
+  "@./src/tools/testing/recorder test:engine" \
+  "@./src/engine" \
   "test+" \
   ":engine               Runs the top-level Keyman Engine for Web unit tests" \
   ":libraries            Runs all unit tests for KMW's submodules.  Currently excludes predictive-text tests" \

@@ -20,14 +20,14 @@
       h3 {font-size: 1em;font-weight:normal;color: darkred; margin-bottom: 4px}
       h1 { font-size: 12px; font-weight: bold; color: darkred; }
       h2 { font-size: 10px; background: blue; color: white; margin:  0; }
-      p { font-size: 10px; margin: 0; }
+      p { font-size: 12px; margin: 0; }
 
     </style>
 
     <!-- Insert unminified KeymanWeb source scripts -->
     <!--<script src="https://s.keyman.com/kmw/engine/14.0.227/keymanweb.js" type="application/javascript"></script>-->
-    <script src="../build/app/web/debug/keymanweb.js" type="application/javascript"></script>
-    <script src="../release/renderer/bulk_render.js" type="application/javascript"></script>
+    <script src="../../../../build/app/web/debug/keymanweb.js" type="application/javascript"></script>
+    <script src="../../../../build/tools/testing/bulk_rendering/bulk_render.js" type="application/javascript"></script>
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
@@ -58,6 +58,14 @@
 
   <body>
     <h1>KeymanWeb - Bulk On-Screen Keyboard Rendering</h1>
+    <p>See this tool's README.md for details.</p>
+    <p><a href="compare.html">Saved render comparison tool here.</a></p>
+    <p>
+    </p>
+    <p>
+      <a href="../">Return to tools index page.</a>
+    </p>
+    <hr>
     <input type='checkbox' id='allLayers' checked> <label for='allLayers'>All Layers</label>
     <input type='text' id='filter' class='kmw-disabled' placeholder='Filter by ID'>
     <input type='button' value='Start Render' onclick='runRenderer()'>

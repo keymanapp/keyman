@@ -24,8 +24,7 @@ cd "$THIS_SCRIPT_PATH"
 UI="app/ui"
 WEB="app/web"
 EMBEDDED="app/embed"
-ENGINE="engine" # For now, a catch-all for all engine code.  This should be subdivided
-                # once we have multiple engine modules within this project
+
 BUILD_BASE="build"
 
 DEBUG="debug"
@@ -72,15 +71,6 @@ output_path ( ) {
   fi
 }
 
-WEB_OUTPUT_NO_MINI="$(output_path $WEB $DEBUG)"
-WEB_OUTPUT="$(output_path $WEB $RELEASE)"
-
-EMBED_OUTPUT_NO_MINI="$(output_path $EMBEDDED $DEBUG)"
-EMBED_OUTPUT="$(output_path $EMBEDDED $RELEASE)"
-
-UI_OUTPUT_NO_MINI="$(output_path $UI $DEBUG)"
-UI_OUTPUT="$(output_path $UI $RELEASE)"
-
 SOURCE="src"
 
 SENTRY_RELEASE_VERSION="release@$VERSION_WITH_TAG"
@@ -100,21 +90,21 @@ builder_check_color "$@"
 DOC_WEB_PRODUCT="${BUILDER_TERM_START}:web${BUILDER_TERM_END} build product"
 DOC_TEST_WEB="${BUILDER_TERM_START}test:web${BUILDER_TERM_END}"
 DOC_BUILD_EMBED_WEB="${BUILDER_TERM_START}build:embed${BUILDER_TERM_END} and ${BUILDER_TERM_START}build:web${BUILDER_TERM_END}"
-DOC_TEST_SYMBOL="actions -${BUILDER_TERM_START}test${BUILDER_TERM_END}, ${BUILDER_TERM_START}upload-symbols${BUILDER_TERM_END}"
+DOC_TEST_SYMBOL="actions - ${BUILDER_TERM_START}test${BUILDER_TERM_END}"
 
-builder_describe "Builds Keyman Engine for Web." \
+builder_describe "Builds Keyman Engine for Web (KMW)." \
   "@../common/web/keyman-version build" \
   "@../common/web/input-processor build" \
-  "@tools/sourcemap-root build" \
+  "@src/tools/building/sourcemap-root build" \
   "clean" \
   "configure" \
   "build" \
   "test             Runs unit tests.  Only ${DOC_TEST_WEB} is currently defined"  \
-  ":embed           Builds the configuration of Keyman Engine for Web used within the Keyman mobile apps" \
-  ":engine          Builds common code used by other targets" \
+  ":embed           Builds the configuration of KMW used within the Keyman mobile apps" \
+  ":engine          Builds all common code used by other targets" \
   ":web             Builds the website-oriented configuration of Keyman Engine for Web" \
   ":ui              Builds the desktop UI modules used by the ${DOC_WEB_PRODUCT}" \
-  ":samples         Builds sample & test pages found under /samples and /testing, but not the ${DOC_WEB_PRODUCT}" \
+  ":samples         Builds only sample & test pages found under src/samples and src/test" \
   ":tools           Builds related development + unit-test resources" \
   "--no-minify    Skips any minification steps in the build" \
   "--all            Sets action to run on KMW's submodules as well if appropriate ($DOC_TEST_SYMBOL)"
@@ -125,12 +115,12 @@ builder_describe "Builds Keyman Engine for Web." \
 builder_describe_outputs \
   configure         ../node_modules \
   configure:embed   ../node_modules \
+  configure:engine  ../node_modules \
   configure:web     ../node_modules \
   configure:ui      ../node_modules \
   configure:samples ../node_modules \
   configure:tools   ../node_modules \
   build:embed       $(output_path $EMBEDDED $RELEASE)/keyman.js \
-  build:engine      $(output_path $ENGINE $INTERMEDIATE)/keymanweb.js \
   build:web         $(output_path $WEB $RELEASE)/keymanweb.js \
   build:ui          $(output_path $UI $RELEASE)/kmwuibutton.js \
   build:samples     $PREDICTIVE_TEXT_OUTPUT
@@ -176,7 +166,7 @@ minifycmd="$JAVA -jar $minifier --compilation_level WHITESPACE_ONLY $minifier_wa
 readonly minifier
 readonly minifycmd
 
-minified_sourcemap_cleaner="tools/sourcemap-root"
+minified_sourcemap_cleaner="build/tools/building/sourcemap-root"
 
 # Fails the build if a specified file does not exist.
 assert_exists ( ) {
@@ -373,8 +363,6 @@ compile ( ) {
   local COMPILE_TARGET=$1
   local COMPILED_INTERMEDIATE_PATH="$(output_path $COMPILE_TARGET $INTERMEDIATE)"
 
-  shift
-
   $compilecmd -b src/$COMPILE_TARGET -v
 
   echo $COMPILE_TARGET TypeScript compiled under $COMPILED_INTERMEDIATE_PATH
@@ -455,7 +443,7 @@ fi
 # be perfect for that, I think.
 
 if builder_start_action clean:engine; then
-  rm -rf "$(output_path $ENGINE)"
+  src/engine/build.sh clean
   builder_finish_action success clean:engine
 fi
 
@@ -481,7 +469,7 @@ if builder_start_action clean:samples; then
 fi
 
 if builder_start_action clean:tools; then
-  tools/build.sh clean
+  src/tools/build.sh clean
 
   builder_finish_action success clean:tools
 fi
@@ -499,8 +487,9 @@ fi
 
 echo ""
 
+
 if builder_start_action build:engine; then
-  compile $ENGINE
+  src/engine/build.sh build
 
   builder_finish_action success build:engine
 fi
@@ -556,7 +545,7 @@ if builder_start_action build:ui; then
 fi
 
 if builder_start_action build:tools; then
-  tools/build.sh
+  src/tools/build.sh
   builder_finish_action success build:tools
 fi
 
