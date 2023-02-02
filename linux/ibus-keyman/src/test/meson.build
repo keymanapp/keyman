@@ -5,16 +5,17 @@ keymanutil_sources = [
 
 keymanutil_deps = [ibus, gtk, x11, json_glib, kmnkbp_lib]
 
-include_dirs = [
+test_include_dirs = [
+  include_dirs,
+  include_directories('..'),
   include_directories('@0@/..'.format(meson.current_build_dir())),
-  '..'
 ]
 
 executable(
   'keymanutil-tests',
   sources: keymanutil_sources,
   dependencies: keymanutil_deps,
-  include_directories : include_dirs
+  include_directories : test_include_dirs
 )
 
 test(
@@ -36,7 +37,7 @@ test(
       '../kmpdetails.c'
     ],
     dependencies: [ json_glib ],
-    include_directories: include_dirs
+    include_directories: test_include_dirs
   ),
   args: [ '@0@'.format(meson.current_source_dir()) ],
   env: [
@@ -54,7 +55,7 @@ test(
       'print_kmp.c',
     ],
     dependencies: [ json_glib ],
-    include_directories: include_dirs
+    include_directories: test_include_dirs
   ),
   args: [ join_paths('@0@'.format(meson.current_source_dir()), 'kmp.json') ],
   env: [

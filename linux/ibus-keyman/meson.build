@@ -33,6 +33,12 @@ conf.set('HAVE_CONFIG_H', 1)
 configure_file(output : 'config.h',
                configuration : conf)
 
+core_include_dirs = [
+  include_directories('../../core/src'),
+  include_directories('../../core/src/kmx'),
+  include_directories('../../common/include'),
+]
+
 subdir('icons')
 subdir('src')
 subdir('tests')

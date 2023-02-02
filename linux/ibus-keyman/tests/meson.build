@@ -16,11 +16,9 @@ kmnkbp_tests_lib = cc.find_library(
 
 deps = [ibus, gtk, x11, json_glib, kmnkbp_lib, kmnkbp_tests_lib]
 
-include_dirs = [
-  include_directories('../../../core/src'),
-  include_directories('../../../core/src/kmx'),
+test_include_dirs = [
+  core_include_dirs,
   include_directories('../../../core/tests/unit/kmx'),
-  include_directories('../../../common/include'),
   include_directories('../src'),
   include_directories('..'),
 ]
@@ -29,7 +27,7 @@ test_exe = executable(
   'ibus-keyman-tests',
   test_files, util_files,
   dependencies: deps,
-  include_directories: include_dirs,
+  include_directories: test_include_dirs,
 )
 
 env_file = '/tmp/env.txt'
@@ -84,10 +82,13 @@ test(
   protocol: 'exitcode'
 )
 
-kmx_dir = join_paths(meson.current_source_dir(), '../../../core/build/arch/debug/tests/unit/kmx')
+kmx_dirs = [
+  join_paths(meson.current_source_dir(), '../../../core/build/arch/debug/tests/unit/kmx'),
+  join_paths(meson.current_source_dir(), '../../../core/build/arch/release/tests/unit/kmx')
+]
 kmxtest_files = run_command(
   find_tests,
-  kmx_dir,
+  kmx_dirs,
   check: true,
 ).stdout().split('\n')
 
