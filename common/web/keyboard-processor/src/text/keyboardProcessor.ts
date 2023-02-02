@@ -87,9 +87,14 @@ export default class KeyboardProcessor {
     //
     // Note:  this is targeted for deprecation and is only included for legacy precompiled keyboards.
     const com = globalThis['com'] = globalThis['com'] || {};
-    const keyman = com['keyman'] = com['keyman'] || {};
+    let keyman = com['keyman'] = com['keyman'] || {};
     const text = keyman['text'] = keyman['text'] || {};
     text['Codes'] = Codes;
+
+    keyman = globalThis['keyman'] = globalThis['keyman'] || {};
+    const osk = keyman['osk'] || keyman['osk'] || {};
+    osk['modifierCodes'] = Codes.modifierCodes;
+    osk['keyCodes'] = Codes.keyCodes;
 
     // Ensure that the active keyboard is set on the keyboard interface object.
     if(this.activeKeyboard) {
