@@ -10,9 +10,6 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 THIS_DIR="$(dirname "$THIS_SCRIPT")"
 
-# TODO:  Convert this into the start of a test/manual/embed section when reworking the Web test
-#        page organization.
-
 mkdir -p "$THIS_DIR/host"
 cp -R "$KEYMAN_ROOT/android/KMEA/app/src/main/assets/"* "$THIS_DIR/host/"
 cp "$KEYMAN_ROOT/web/build/app/embed/debug/keyman.js" "$THIS_DIR/host/keymanandroid.js"
@@ -20,6 +17,10 @@ cp "$KEYMAN_ROOT/web/build/app/embed/debug/keyman.js.map" "$THIS_DIR/host/keyman
 cp "$KEYMAN_ROOT/web/build/app/embed/debug/osk/kmwosk.css" "$THIS_DIR/host/kmwosk.css"
 cp "$KEYMAN_ROOT/web/build/app/embed/debug/osk/globe-hint.css" "$THIS_DIR/host/globe-hint.css"
 cp "$KEYMAN_ROOT/web/build/app/embed/debug/osk/keymanweb-osk.ttf" "$THIS_DIR/host/keymanweb-osk.ttf"
+
+# We shouldn't rely on a prior Android build for these files!  We can retrieve them separately.
+cp "$KEYMAN_ROOT/common/web/sentry-manager/build/index.js" "$THIS_DIR/host/keyman-sentry.js"
+cp "$KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js" "$THIS_DIR/host/es6-shim.min.js"
 
 # Test keyboards
 

@@ -1,6 +1,3 @@
-// Based on establishing an alias on localhost.
-var UNIT_TEST_FOLDER_RELATIVE_PATH = "";
-
 var ta_inputJSON;
 var in_output;
 var recorderScribe;
@@ -216,7 +213,7 @@ function loadExistingTest(files) {
 
         // Make sure we've loaded the keyboard!  Problem - we're not running from the unit_tests folder!
         var kbdStub = new KMWRecorder.KeyboardStub(kbdTest.keyboard);
-        kbdStub.filename = UNIT_TEST_FOLDER_RELATIVE_PATH + "/" + kbdStub.filename;
+        kbdStub.filename = RESOURCE_PATH_PREFIX + "/" + kbdStub.filename;
 
         keyman.addKeyboards(kbdStub);
       } catch (e) {
@@ -372,7 +369,7 @@ function loadExistingStubs(files) {
     try {
       // Load the stub
       var kbdStub = new KMWRecorder.KeyboardStub(JSON.parse(json));
-      kbdStub.filename = UNIT_TEST_FOLDER_RELATIVE_PATH + "/" + kbdStub.filename;
+      kbdStub.filename = RESOURCE_PATH_PREFIX + "/" + kbdStub.filename;
 
       keyman.addKeyboards(kbdStub);
 

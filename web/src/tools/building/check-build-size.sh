@@ -14,7 +14,7 @@ SIZE_THRESHOLD=1024
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+. "$(dirname "$THIS_SCRIPT")/../../../../resources/build/build-utils.sh"
 . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
 . "$KEYMAN_ROOT/resources/build/github.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
@@ -95,8 +95,21 @@ DOWNLOADS_VERSION_API=https://downloads.keyman.com/api/version/web
 REMOTE_KEYMANWEB_VERSIONS=`curl -s $DOWNLOADS_VERSION_API`
 REMOTE_VERSION=`echo $REMOTE_KEYMANWEB_VERSIONS | $JQ -r ".web.$TIER"`
 
-REMOTE_FILE=https://downloads.keyman.com/web/$TIER/$REMOTE_VERSION/static/release/web/keymanweb.js
-REMOTE_FILE_SIZE=`curl "$REMOTE_FILE" --location --silent --write-out '%{size_download}' --output /dev/null`
+REMOTE_FILE_NEW=https://downloads.keyman.com/web/$TIER/$REMOTE_VERSION/static/build/app/web/release/keymanweb.js
+REMOTE_FILE_OLD=https://downloads.keyman.com/web/$TIER/$REMOTE_VERSION/static/release/web/keymanweb.js
+
+# If the remote file does not exist at the 'new' location, try the 'old' one instead.
+# Allows reorganization 'fallback' for the file-size check.
+REMOTE_NEW_EXISTS=`curl "$REMOTE_FILE_NEW" --location --silent --write-out '%{http_code}' --output /dev/null`
+
+if [ $REMOTE_NEW_EXISTS == "404" ]; then
+  # Fallback to "old" URL!
+  echo "⚠️ Falling back to prior previous-version URL structure."
+  REMOTE_FILE_SIZE=`curl "$REMOTE_FILE_OLD" --location --silent --write-out '%{size_download}' --output /dev/null`
+else
+  REMOTE_FILE_SIZE=`curl "$REMOTE_FILE_NEW" --location --silent --write-out '%{size_download}' --output /dev/null`
+
+fi
 
 #
 # Report statistics

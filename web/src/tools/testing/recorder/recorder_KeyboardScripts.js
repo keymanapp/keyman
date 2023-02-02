@@ -1,5 +1,7 @@
+var RESOURCE_PATH_PREFIX;
+
 function loadKeyboards() {
-  var commonPrefix = "/resources";
+  RESOURCE_PATH_PREFIX = "";
 
   if(location.protocol == "file:") {
     // Note:  won't actually work, as it'll be blocked by CORS / same-origin policy when
@@ -7,10 +9,24 @@ function loadKeyboards() {
     //
     // Both Firefox and Chrome don't like that it's not data: or http:/https:
     // and will consider the local files to be "remote resource[s]".
-    commonPrefix = "../../../../../common/test/resources";
+    RESOURCE_PATH_PREFIX = "../../../../../common/test";
+  } else if(location.href.indexOf("build.palaso.org") > -1) {
+    // URL format:  https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/<build id>:id/ is the test-site root.
+    // <build id> is an integer.
+    //
+    // `/resources` should be rooted on that.
+
+    let testSiteRootSuffixMatcher = /Keymanweb_TestPullRequests\/\d{1,10}:id/;
+    let match = testSiteRootSuffixMatcher.exec(location.href);
+    if(match && match.length > 0) {
+      let totalLength = match.index + match[0].length;
+      RESOURCE_PATH_PREFIX = location.href.substring(0, totalLength);
+    } else {
+      console.error("Failed to properly detect recorder-resource path for TC build artifact");
+    }
   }
 
-  var filePrefix = commonPrefix + "/json/keyboards/";
+  var filePrefix = RESOURCE_PATH_PREFIX + "/resources/json/keyboards/";
 
   // Existing unit_test stubs at the time of writing:
   var preloadFiles = [
@@ -45,7 +61,7 @@ function addKeyboard(n) {
     case 4:
       sKbd=document.getElementById('kbd_stub_add').value;
       var stub = new KMWRecorder.KeyboardStub(JSON.parse(sKbd));
-      stub.setBasePath(commonPrefix + "/keyboards", false);
+      stub.setBasePath(RESOURCE_PATH_PREFIX + "/keyboards", false);
       keyman.addKeyboards(stub);
 
       // We actually know the exact details for this one easily, so set it as active!
