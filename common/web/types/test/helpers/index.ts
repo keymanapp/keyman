@@ -21,7 +21,7 @@ export function loadKeymanTouchLayoutCleanJsonSchema(): Buffer {
   return fs.readFileSync(new URL(path.join('..', '..', 'src', 'keyman-touch-layout.clean.spec.json'), import.meta.url));
 }
 
-export function loadFile(baseFilename: string, filename:string): Buffer {
+export function loadFile(baseFilename: string, filename: string | URL): Buffer {
   // TODO: translate filename based on the baseFilename
   return fs.readFileSync(filename);
 }

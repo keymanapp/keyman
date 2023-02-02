@@ -1,45 +1,84 @@
 import 'mocha';
-import {assert} from 'chai';
-import {loadLdmlKeyboardSchema, loadFile, makePathToFixture} from '../helpers/index.js';
-import LDMLKeyboardXMLSourceFileReader from '../../src/ldml-keyboard/ldml-keyboard-xml-reader.js';
-import { CompilerCallbacks, CompilerEvent } from '../../src/util/compiler-interfaces.js';
+import { CommonTypesMessages } from '../../src/util/common-events.js';
+import { testReaderCases } from '../helpers/reader-callback-test.js';
 
-describe('ldml keyboard xml reader tests', function() {
+describe('ldml keyboard xml reader tests', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
-  const callbacks : CompilerCallbacks = {
-    loadFile,
-    loadLdmlKeyboardSchema: function (): Buffer {
-      throw new Error('loadLdmlKeyboardSchema not implemented.');
+  testReaderCases([
+    {
+      subpath: 'invalid-structure-per-dtd.xml',
+      errors: [CommonTypesMessages.Error_SchemaValidationError({
+        instancePath: '/keyboard',
+        keyword: 'required',
+        message: `must have required property 'names'`,
+        params: 'missingProperty="names"',
+      })],
     },
-    reportMessage: function (event: CompilerEvent): void {
-      throw new Error('Message#' + Number(event.code).toString(16));
+    {
+      subpath: 'invalid-conforms-to.xml',
+      errors: [CommonTypesMessages.Error_SchemaValidationError({
+        instancePath: '/keyboard/conformsTo',
+        keyword: 'enum',
+        message: `must be equal to one of the allowed values`,
+        params: 'allowedValues="techPreview"',
+      })],
     },
-    loadKvksJsonSchema: function (): Buffer {
-      throw new Error('loadKvksJsonSchema` not implemented.');
-    }
-  };
-
-  it("should fail to load files that don't conform to DTD", function() {
-    const inputFilename = makePathToFixture('invalid-structure-per-dtd.xml');
-    let reader = new LDMLKeyboardXMLSourceFileReader(callbacks);
-    const data = loadFile(inputFilename, inputFilename);
-    const source = reader.load(data);
-    assert.isNotNull(source);
-    assert.throws(() => {
-      reader.validate(source, loadLdmlKeyboardSchema());
-    }, `Message#301001`);
-  });
-
-  it("should fail to load files with an invalid conformsTo", function() {
-    const inputFilename = makePathToFixture('invalid-conforms-to.xml');
-    let reader = new LDMLKeyboardXMLSourceFileReader(callbacks);
-    const data = loadFile(inputFilename, inputFilename);
-    const source = reader.load(data);
-    assert.isNotNull(source);
-    assert.throws(() => {
-      reader.validate(source, loadLdmlKeyboardSchema());
-    }, `Message#301001`);
-  });
-
+    {
+      subpath: 'import-minimal.xml',
+      // TODO-LDML: validate content
+    },
+    {
+      subpath: 'import-minimal1.xml',
+      // TODO-LDML: validate content
+    },
+    {
+      subpath: 'import-minimal2.xml',
+      // TODO-LDML: validate content
+    },
+    {
+      subpath: 'import-symbols.xml',
+      // TODO-LDML: validate content
+    },
+    {
+      subpath: 'invalid-import-base.xml',
+      errors: [
+        CommonTypesMessages.Error_ImportInvalidBase({
+          base: 'SOME_INVALID_BASE',
+          path: 'B',
+          subtag: 'C'
+        }),
+      ],
+    },
+    {
+      subpath: 'invalid-import-path.xml',
+      errors: [
+        CommonTypesMessages.Error_ImportInvalidPath({
+          base: null,
+          path: 'techpreview/too/many/slashes/leading/to/nothing-Zxxx-does-not-exist.xml',
+          subtag: null,
+        }),
+      ],
+    },
+    {
+      subpath: 'invalid-import-readfail.xml',
+      errors: [
+        CommonTypesMessages.Error_ImportReadFail({
+          base: null,
+          path: 'techpreview/none-Zxxx-does-not-exist.xml',
+          subtag: null,
+        }),
+      ],
+    },
+    {
+      subpath: 'invalid-import-wrongroot.xml',
+      errors: [
+        CommonTypesMessages.Error_ImportWrongRoot({
+          base: null,
+          path: 'techpreview/keys-Zyyy-punctuation.xml',
+          subtag: 'names',
+        }),
+      ],
+    },
+  ]);
 });
