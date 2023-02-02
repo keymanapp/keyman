@@ -301,7 +301,7 @@ export default class LMLayerWorker {
           // This is far more encapsulated and likely more secure... and the former point means this is
           // easier to bundle and more optimizable when bundling than direct eval.
           // Reference: https://esbuild.github.io/link/direct-eval
-          let modelLoader = new Function('LMLayerWorker', 'models', 'correction', 'wordBreakers', code);
+          const modelLoader = new Function('LMLayerWorker', 'models', 'correction', 'wordBreakers', code);
           modelLoader(_this, models, correction, wordBreakers);
         }
       }

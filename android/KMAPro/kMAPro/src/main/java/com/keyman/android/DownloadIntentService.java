@@ -5,9 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 
-import com.tavultesoft.kmea.KmpInstallMode;
-import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.KMLog;
+import com.keyman.engine.KmpInstallMode;
+import com.keyman.engine.util.FileUtils;
+import com.keyman.engine.util.KMLog;
 
 public class DownloadIntentService extends IntentService {
   private static final String TAG = "DownloadIntentSvc";

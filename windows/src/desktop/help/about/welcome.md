@@ -10,7 +10,7 @@ latest version of Keyman.
 
 Keyman is a keyboard application that makes it easy for you to type in
 your language in all your favourite Windows programs and across the Web.
-Keyman is used by more than a million people to type in over 1000
+Keyman is used by more than a million people to type in over 2000
 languages and counting.
 
 Keyman remaps your hardware keyboard to any one of hundreds of virtual

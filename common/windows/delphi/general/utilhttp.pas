@@ -1,18 +1,18 @@
 (*
   Name:             utilhttp
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    28 Aug 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Refactor util functions into multiple units
                     23 Aug 2006 - mcdurdin - Use Unicode strings
                     06 Oct 2006 - mcdurdin - Add GetParamsFromURL function
@@ -43,14 +43,63 @@ function ConvertPathToFileURL(s: WideString): WideString;
 
 implementation
 
+// Source:
+//   https://marc.durdin.net/2015/08/an-update-for-encodeuricomponent/
+// Stack Overflow:
+//   https://stackoverflow.com/questions/776302/standard-url-encode-function
 function URLEncode(ASrc: string): string;
+const
+  HexMap: string = '0123456789ABCDEF';
+
+  function IsSafeChar(ch: Byte): Boolean;
+  begin
+    if (ch >= 48) and (ch <= 57) then Result := True    // 0-9
+    else if (ch >= 65) and (ch <= 90) then Result := True  // A-Z
+    else if (ch >= 97) and (ch <= 122) then Result := True  // a-z
+    else if (ch = 33) then Result := True // !
+    else if (ch >= 39) and (ch <= 42) then Result := True // '()*
+    else if (ch >= 45) and (ch <= 46) then Result := True // -.
+    else if (ch = 95) then Result := True // _
+    else if (ch = 126) then Result := True // ~
+    else Result := False;
+  end;
+
+var
+  I, J: Integer;
+  Bytes: TBytes;
 begin
-  Result := TNetEncoding.URL.Encode(ASrc);
+  Result := '';
+
+  Bytes := TEncoding.UTF8.GetBytes(ASrc);
+
+  I := 0;
+  J := Low(Result);
+
+  SetLength(Result, Length(Bytes) * 3); // space to %xx encode every byte
+
+  while I < Length(Bytes) do
+  begin
+    if IsSafeChar(Bytes[I]) then
+    begin
+      Result[J] := Char(Bytes[I]);
+      Inc(J);
+    end
+    else
+    begin
+      Result[J] := '%';
+      Result[J+1] := HexMap[(Bytes[I] shr 4) + Low(HexMap)];
+      Result[J+2] := HexMap[(Bytes[I] and 15) + Low(HexMap)];
+      Inc(J,3);
+    end;
+    Inc(I);
+  end;
+
+  SetLength(Result, J-Low(Result));
 end;
 
 function URLDecode(ASrc: AnsiString): string;
 begin
-  Result := TNetEncoding.URL.Decode(ASrc);
+  Result := TNetEncoding.URL.Decode(string(ASrc));
 end;
 
 procedure DecodeAndSetParams(const AValue: WideString; Params: TStringList);

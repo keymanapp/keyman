@@ -32,39 +32,32 @@ await esbuild.build({
   target: "es5"
 });
 
-const dtsBundleCommand1 = spawn('npx dts-bundle-generator --project tsconfig.json -o build/lib/index.d.ts src/main/index.ts', {
-  shell: true
+// Bundled CommonJS (classic Node) module version
+esbuild.buildSync({
+  bundle: true,
+  sourcemap: true,
+  format: "cjs",
+  nodePaths: ['..'],
+  entryPoints: {
+    'index': 'build/obj/index.js',
+    'worker-main': 'build/obj/worker-main.js'
+  },
+  outdir: 'build/lib',
+  outExtension: { '.js': '.cjs' },
+  tsconfig: 'tsconfig.json',
+  target: "es5"
 });
 
-dtsBundleCommand1.stdout.on('data', data =>   console.log(data.toString()));
-dtsBundleCommand1.stderr.on('data', data => console.error(data.toString()));
-
-// Forces synchronicity; done mostly so that the logs don't get jumbled up.
-await new Promise((resolve, reject) => {
-  dtsBundleCommand1.on('exit', () => {
-    if(dtsBundleCommand1.exitCode != 0) {
-      reject();
-      process.exit(dtsBundleCommand1.exitCode);
-    }
-    resolve();
-  });
+// Direct-use version
+esbuild.buildSync({
+  bundle: true,
+  sourcemap: true,
+  format: "iife",
+  nodePaths: ['..'],
+  entryPoints: {
+    'worker-main': 'build/obj/worker-main.js'
+  },
+  outdir: 'build/lib',
+  tsconfig: 'tsconfig.json',
+  target: "es5"
 });
-
-const dtsBundleCommand2 = spawn('npx dts-bundle-generator --project tsconfig.json -o build/lib/worker-main.d.ts src/main/worker-main.ts', {
-  shell: true
-});
-
-dtsBundleCommand2.stdout.on('data', data =>   console.log(data.toString()));
-dtsBundleCommand2.stderr.on('data', data => console.error(data.toString()));
-
-// Forces synchronicity; done mostly so that the logs don't get jumbled up.
-await new Promise((resolve, reject) => {
-  dtsBundleCommand2.on('exit', () => {
-    if(dtsBundleCommand2.exitCode != 0) {
-      reject();
-      process.exit(dtsBundleCommand2.exitCode);
-    }
-    resolve();
-  });
-});
-

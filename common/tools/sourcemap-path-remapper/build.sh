@@ -18,39 +18,38 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # This script runs from its own folder
-cd "$(dirname "$THIS_SCRIPT")"
-
-WORKER_OUTPUT=build/obj
-WORKER_OUTPUT_FILENAME=build/lib/worker-main.js
-WORKER_WRAPPED_BUNDLE_TARGET_FILENAME=build/lib/worker-main.wrapped-for-bundle.js
+cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
-builder_describe \
-  "Compiles the sourcemap-remapping compilation tool used by our predictive text and Web engine builds." \
-  configure clean build
+builder_describe "Builds a sourcemap manipulation ES module for use in Web-related builds" \
+  "clean" \
+  "configure" \
+  "build"
 
 builder_describe_outputs \
-  configure     /node_modules \
-  build         build/index.js
+  configure          /node_modules \
+  build              build/index.js
 
 builder_parse "$@"
 
-# TODO: build if out-of-date if test is specified
-# TODO: configure if npm has not been run, and build is specified
+### CLEAN ACTIONS
+
+if builder_start_action clean; then
+  rm -rf build/
+  builder_finish_action success clean
+fi
+
+### CONFIGURE ACTIONS
 
 if builder_start_action configure; then
   verify_npm_setup
   builder_finish_action success configure
 fi
 
-if builder_start_action clean; then
-  npm run clean
-  builder_finish_action success clean
-fi
+### BUILD ACTIONS
 
 if builder_start_action build; then
-  # Build worker with tsc first
   npm run tsc
 
   builder_finish_action success build

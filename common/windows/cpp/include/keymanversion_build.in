@@ -35,6 +35,9 @@
 #define KEYMAN_Environment        "$Environment"
 #define KEYMAN_Environment_W      L"$Environment"
 
+#define KEYMAN_VersionGitTag      "$VersionGitTag"
+#define KEYMAN_VersionGitTag_W    L"$VersionGitTag"
+
 //
 // Version macros for .rc files
 ///

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>menu-langsettings-lexical-model-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u словарь установлен</string>
+        <key>few</key>
+        <string>Установлено %u словарей</string>
+        <key>many</key>
+        <string>Установлено %u словарей</string>
+        <key>other</key>
+        <string>Установлено %u словарей</string>
+      </dict>
+    </dict>
+    <key>notification-update-failed</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>Сбой обновления %u</string>
+        <key>few</key>
+        <string>%u обновлений не удалось</string>
+        <key>many</key>
+        <string>%u обновлений не удалось</string>
+        <key>other</key>
+        <string>%u обновлений не удалось</string>
+      </dict>
+    </dict>
+    <key>notification-update-success</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u успешно обновлено</string>
+        <key>few</key>
+        <string>%u обновлений успешно</string>
+        <key>many</key>
+        <string>%u обновлений успешно</string>
+        <key>other</key>
+        <string>%u обновлений успешно</string>
+      </dict>
+    </dict>
+    <key>settings-keyboards-installed-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>Установлена %u клавиатура</string>
+        <key>few</key>
+        <string>%u клавиатуры установлены</string>
+        <key>many</key>
+        <string>%u клавиатуры установлены</string>
+        <key>other</key>
+        <string>%u клавиатуры установлены</string>
+      </dict>
+    </dict>
+    <key>settings-languages-installed-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>Установлен %u язык</string>
+        <key>few</key>
+        <string>Установлено %u языков</string>
+        <key>many</key>
+        <string>Установлено %u языков</string>
+        <key>other</key>
+        <string>Установлено %u языков</string>
+      </dict>
+    </dict>
+    <key>package-default-found-keyboards</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u клавиатура найдена:</string>
+        <key>few</key>
+        <string>Найдено %u клавиатур в пакете:</string>
+        <key>many</key>
+        <string>Найдено %u клавиатур в пакете:</string>
+        <key>other</key>
+        <string>Найдено %u клавиатур в пакете:</string>
+      </dict>
+    </dict>
+    <key>package-default-found-lexical-models</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>Найден %u словарь в пакете:</string>
+        <key>few</key>
+        <string>Найдено %u словарей в пакете:</string>
+        <key>many</key>
+        <string>Найдено %u словарей в пакете:</string>
+        <key>other</key>
+        <string>Найдено %u словарей в пакете:</string>
+      </dict>
+    </dict>
+  </dict>
+</plist>
