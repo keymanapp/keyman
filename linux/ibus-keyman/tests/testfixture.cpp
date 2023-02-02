@@ -184,7 +184,7 @@ string_format(const std::string &format, Args... args) {
 }
 
 static unsigned short vk_to_keycode(unsigned short vk) {
-  for (int i = 0; i < sizeof(keycode_to_vk); i++) {
+  for (int i = 0; i < (int)sizeof(keycode_to_vk); i++) {
     if (keycode_to_vk[i] == vk)
       return i;
   }

@@ -1,10 +1,10 @@
 package com.keyman.kmsample2;
 
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KMManager.KeyboardType;
-import com.tavultesoft.kmea.KMHardwareKeyboardInterpreter;
-import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.KMManager.KeyboardType;
+import com.keyman.engine.KMHardwareKeyboardInterpreter;
+import com.keyman.engine.KeyboardEventHandler.OnKeyboardEventListener;
 
 import android.content.Context;
 import android.content.res.Configuration;
