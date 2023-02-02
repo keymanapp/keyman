@@ -5,8 +5,8 @@ import { LMLayerWorkerCode } from "@keymanapp/lm-worker/build/lib/worker-main.wr
 
 export default class DefaultWorker {
   static constructInstance(): Worker {
-    let scriptStr = unwrap(LMLayerWorkerCode);
-    let worker = new VirtualizedWorker(scriptStr);
+    const scriptStr = unwrap(LMLayerWorkerCode);
+    const worker = new VirtualizedWorker(scriptStr);
 
     return worker as any as Worker;
   }
