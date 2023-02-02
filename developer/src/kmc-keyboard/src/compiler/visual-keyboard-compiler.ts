@@ -48,7 +48,7 @@ export default class VisualKeyboardCompiler {
           flags: VisualKeyboard.VisualKeyboardKeyFlags.kvkkUnicode,
           shift: shift,
           text: keydef.to, // TODO-LDML: displays
-          vkey: Constants.USVirtualKeyMap[y][x]
+          vkey: Constants.USVirtualKeyMap[y][x] // TODO-LDML: #7965  US-only
         });
       }
     }
