@@ -6,17 +6,8 @@ KeymanWeb.KR(new Keyboard_web_context_tests());
 }
 function Keyboard_web_context_tests()
 {
-  var Codes, modCodes, keyCodes;
-
-  if(KeymanWeb.Codes) {
-    // ES Module attachment point
-    Codes = KeymanWeb.Codes;
-  } else if (typeof com != 'undefined' && com.keyman && com.keyman.text && com.keyman.text.Codes) {
-    // Pre-modularized attachment point
-    Codes = com.keyman.text.Codes;
-  }
-  var modCodes = Codes.modifierCodes;
-  var keyCodes = Codes.keyCodes;
+  var modCodes = KeymanWeb.Codes.modifierCodes;
+  var keyCodes = KeymanWeb.Codes.keyCodes;
 
   this._v=(typeof keyman!="undefined"&&typeof keyman.version=="string")?parseInt(keyman.version,10):9;
   this.KI="Keyboard_web_context_tests";

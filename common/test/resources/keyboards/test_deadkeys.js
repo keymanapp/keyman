@@ -6,17 +6,8 @@ KeymanWeb.KR(new Keyboard_test_deadkeys());
 }
 function Keyboard_test_deadkeys()
 {
-  var Codes, modCodes, keyCodes;
-
-  if(KeymanWeb.Codes) {
-    // ES Module attachment point
-    Codes = KeymanWeb.Codes;
-  } else if (typeof com != 'undefined' && com.keyman && com.keyman.text && com.keyman.text.Codes) {
-    // Pre-modularized attachment point
-    Codes = com.keyman.text.Codes;
-  }
-  var modCodes = Codes.modifierCodes;
-  var keyCodes = Codes.keyCodes;
+  var modCodes = KeymanWeb.Codes.modifierCodes;
+  var keyCodes = KeymanWeb.Codes.keyCodes;
 
   this.KI="Keyboard_test_deadkeys";
   this.KN="Keyman Deadkey Stress-Tester";
