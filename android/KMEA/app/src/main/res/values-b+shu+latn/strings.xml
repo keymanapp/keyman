@@ -11,10 +11,10 @@
     </plurals>
     <!-- Context: Title for list -->
     <plurals name="title_other_input_methods">
-        <item quantity="one">Other Input Method</item>
-        <item quantity="two">Other Input Methods</item>
-        <item quantity="few">Other Input Methods</item>
-        <item quantity="other">Other Input Methods</item>
+        <item quantity="one">Darb gadey hana dassasan</item>
+        <item quantity="two">Durub gadey hana dassasan</item>
+        <item quantity="few">Durub gadey hana dassasan</item>
+        <item quantity="other">Durub gadey hana dassasan</item>
     </plurals>
     <!-- Context: Title for list -->
     <string name="title_add_keyboard" comment="Add a new keyboard">Zyd Keyboard jadid</string>

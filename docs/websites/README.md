@@ -27,32 +27,36 @@ Docker tends to throttle Docker image downloads, so some developer offices may w
   ]
 ```
 
-
-### These pre-reqs are still needed but will be removed in keymanapp/help.keyman.com#674
-* PHP 7.4
-* Composer
-
 ## Builder BASH Script Actions
-
-#### Configure
-Installs PHP dependencies in vendor/ folder. This step will be removed in keymanapp/help.keyman.com#674
-1. Run `./build.sh configure`.
 
 #### Stop the Docker container
 1. Run `./build.sh stop`
 
+This stops the Docker container for the site.
+
 #### Build the Docker image
 1. Run `./build.sh build`.
+
+This downloads and builds the Docker images needed for the site.
+
+#### Configure
+1. Run `./build.sh configure`.
+
+This step is currently not needed
 
 #### Start the Docker container
 1. Run `./build.sh start`.
 
+This maps the local directory to the the Docker image.
+Then, it creates a link of the PHP dependencies in Docker image from /var/www/vendor/ to /var/www/html/vendor.
+The link file also appears locally.
+
 After this, you can access the website at the following ports:
 
-| Website    | URL |
-|------------|-----|
-|help.keyman | http://localhost:8055 |
-
+| Website      |          URL          |
+|--------------|-----------------------|
+|help.keyman   | http://localhost:8055 |
+|keymanweb.com | http://localhost:8057 |
 
 #### Remove the Docker container and image
 1. Run `./build.sh clean`.

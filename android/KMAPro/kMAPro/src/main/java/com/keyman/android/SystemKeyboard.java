@@ -6,14 +6,14 @@ package com.keyman.android;
 
 import com.tavultesoft.kmapro.BuildConfig;
 import com.tavultesoft.kmapro.KeymanSettingsActivity;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KMManager.KeyboardType;
-import com.tavultesoft.kmea.KMHardwareKeyboardInterpreter;
-import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
-import com.tavultesoft.kmea.R;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.util.DependencyUtil;
-import com.tavultesoft.kmea.util.DependencyUtil.LibraryType;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.KMManager.KeyboardType;
+import com.keyman.engine.KMHardwareKeyboardInterpreter;
+import com.keyman.engine.KeyboardEventHandler.OnKeyboardEventListener;
+import com.keyman.engine.R;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.util.DependencyUtil;
+import com.keyman.engine.util.DependencyUtil.LibraryType;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -55,7 +55,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     if (DependencyUtil.libraryExists(LibraryType.SENTRY) && !Sentry.isEnabled()) {
       Log.d(TAG, "Initializing Sentry");
       SentryAndroid.init(getApplicationContext(), options -> {
-        options.setRelease("release@"+com.tavultesoft.kmapro.BuildConfig.VERSION_NAME);
+        options.setRelease(com.tavultesoft.kmapro.BuildConfig.VERSION_GIT_TAG);
         options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.VERSION_ENVIRONMENT);
       });
     }

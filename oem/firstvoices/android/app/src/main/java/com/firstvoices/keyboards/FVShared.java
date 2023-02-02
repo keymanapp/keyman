@@ -7,10 +7,10 @@ import android.content.res.AssetManager;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.packages.PackageProcessor;
-import com.tavultesoft.kmea.util.KMLog;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.packages.PackageProcessor;
+import com.keyman.engine.util.KMLog;
 
 import java.io.BufferedReader;
 import java.io.File;

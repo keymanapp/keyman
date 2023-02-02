@@ -36,13 +36,12 @@ display_usage ( ) {
 }
 
 function makeLocalSentryRelease() {
-  local SENTRY_RELEASE_VERSION="release@$VERSION_WITH_TAG"
-  echo "Making a Sentry release for tag $SENTRY_RELEASE_VERSION"
+  echo "Making a Sentry release for tag $VERSION_GIT_TAG"
   sentry-cli upload-dif -p keyman-android --include-sources
-  sentry-cli releases -p keyman-android files $SENTRY_RELEASE_VERSION upload-sourcemaps ./
+  sentry-cli releases -p keyman-android files $VERSION_GIT_TAG upload-sourcemaps ./
 
-  echo "Finalizing release tag $SENTRY_RELEASE_VERSION"
-  sentry-cli releases finalize "$SENTRY_RELEASE_VERSION"
+  echo "Finalizing release tag $VERSION_GIT_TAG"
+  sentry-cli releases finalize "$VERSION_GIT_TAG"
 }
 
 NO_DAEMON=false
