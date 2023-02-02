@@ -17,11 +17,12 @@ cd "$(dirname "$THIS_SCRIPT")"
 
 ################################ Main script ################################
 
-builder_describe "Builds the predictive-text wordbreaker implementation module" \
+builder_describe "Builds the predictive-text model template implementation module" \
+  "@../../web/keyman-version" \
+  "@../wordbreakers" \
   "clean" \
   "configure" \
-  "build" \
-  "test"
+  "build"
 
 builder_describe_outputs \
   configure          /node_modules \
@@ -53,10 +54,4 @@ if builder_start_action build; then
   npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/index.d.ts
 
   builder_finish_action success build
-fi
-
-if builder_start_action test; then
-  npm run mocha
-
-  builder_finish_action success test
 fi

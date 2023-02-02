@@ -24,13 +24,12 @@ cd "$(dirname "$THIS_SCRIPT")"
 
 builder_check_color "$@"
 
-# TODO: once these modules are builder-based, reference here too:
-#  "@../models/templates" \
-#  "@../models/types" \
+#  "@../models/types" \ # is just a .d.ts, so there's nothing to actually BUILD.
 
 builder_describe "Builds the lm-layer module" \
-  "@../models/wordbreakers" \
   "@../web/keyman-version" \
+  "@../models/templates" \
+  "@../models/wordbreakers" \
   "@../web/lm-worker" \
   "clean" \
   "configure" \
