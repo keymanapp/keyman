@@ -8,7 +8,7 @@ import { Mock } from '@keymanapp/keyboard-processor/build/obj/text/outputTarget.
 import { RecordedKeystrokeSequence } from '@keymanapp/recorder-core/build/obj/index.js';
 import NodeProctor from '@keymanapp/recorder-core/build/obj/nodeProctor.js';
 
-import extendString from '@keymanapp/web-utils/build/obj/kmwstring.js'
+import { extendString } from '@keymanapp/web-utils';
 
 extendString();  // Ensure KMW's string-extension functionality is available.
 

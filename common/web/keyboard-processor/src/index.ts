@@ -20,7 +20,7 @@ export * from "./text/outputTarget.js";
 export { default as RuleBehavior } from "./text/ruleBehavior.js";
 export * from "./text/systemStores.js";
 
-export * from "@keymanapp/web-utils/build/obj/index.js";
+export * from "@keymanapp/web-utils";
 
 // At the top level, there should be no default export.
 

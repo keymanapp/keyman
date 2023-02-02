@@ -1,4 +1,4 @@
-import KEYMAN_VERSION from "@keymanapp/keyman-version/build/version.inc.js";
+import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 // Dotted-decimal version
 export default class Version {

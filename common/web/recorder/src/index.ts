@@ -5,7 +5,7 @@ import { KeyDistribution, KeyEvent, Mock } from "@keymanapp/keyboard-processor/b
 
 import Proctor from "./proctor.js";
 
-import * as utils from "@keymanapp/web-utils/build/obj/index.js";
+import * as utils from "@keymanapp/web-utils";
 
 //#region Defines the InputEventSpec set, used to reconstruct DOM-based events for browser-based simulation
 export abstract class InputEventSpec {

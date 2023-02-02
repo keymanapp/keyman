@@ -13,7 +13,7 @@ import { Mock } from "./outputTarget.js";
 import KeyboardInterface, { SystemStoreIDs, VariableStore } from "./kbdInterface.js";
 import RuleBehavior from "./ruleBehavior.js";
 
-import { DeviceSpec, globalObject as getGlobalObject } from "@keymanapp/web-utils/build/obj/index.js";
+import { DeviceSpec, globalObject as getGlobalObject } from "@keymanapp/web-utils";
 
 // #endregion
 
