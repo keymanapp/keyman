@@ -224,17 +224,3 @@ export default class LMLayer {
     this._worker.terminate();
   }
 }
-
-// (function () {
-//   let ns = com.keyman.text.prediction;
-
-//   // Let LMLayer be available both in the browser and in Node.
-//   if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-//     module.exports = ns.LMLayer;
-//     //@ts-ignore
-//     ns.LMLayer.PromiseStore = ns.PromiseStore;
-//   } else {
-//     //@ts-ignore
-//     window.LMLayer = ns.LMLayer;
-//   }
-// }());
