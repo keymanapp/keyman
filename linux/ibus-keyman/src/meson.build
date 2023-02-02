@@ -14,6 +14,12 @@ engine_files = files(
   'keyman-service.h',
 )
 
+include_dirs = [
+  core_include_dirs,
+  include_directories('..'),
+  include_directories('@0@/..'.format(meson.current_build_dir())),
+]
+
 deps = [ibus, gtk, x11, json_glib, kmnkbp_lib]
 
 prefix = get_option('prefix')
@@ -37,7 +43,7 @@ exe = executable(
   'ibus-engine-keyman',
   sources: [engine_files, util_files],
   dependencies: deps,
-  include_directories: include_directories('@0@/..'.format(meson.current_build_dir())),
+  include_directories: include_dirs,
 )
 
 subdir('test')
