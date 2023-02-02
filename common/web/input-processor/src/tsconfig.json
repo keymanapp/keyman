@@ -16,7 +16,7 @@
   "references": [
     { "path": "../../keyman-version" },
     { "path": "../../utils" },
-    { "path": "../../keyboard-processor/src" },
+    { "path": "../../keyboard-processor" },
     { "path": "../../../predictive-text/browser.tsconfig.json" },
   ],
   "include": ["./**/*.ts"],

@@ -325,7 +325,7 @@ function Keyboard_test_deadkeys()
       k.KDO(-1,t,17);
     }
     if(m) {
-    
+
       k.KDC(-1,t);
       r=this.g_dead_reorder(t,e);
     }

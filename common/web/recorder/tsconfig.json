@@ -1,0 +1,30 @@
+{
+  "extends": "../../../tsconfig-base.json",
+
+  "compilerOptions": {
+    "allowJs": true,
+    "module": "es6",
+    "moduleResolution": "Node",
+    "declaration": true,
+    "inlineSources": true,
+    "inlineSourceMap": true,
+    "target": "es5",
+    "types": ["node"],
+    "lib": ["es6"],
+    "baseUrl": "./",
+    "outDir": "build/obj/",
+    "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
+  },
+
+  "include": [
+    "src/**/*.ts"
+  ],
+
+  "references": [
+    { "path": "../keyman-version" },
+    { "path": "../utils/" },
+    { "path": "../keyboard-processor/" },
+    { "path": "../lm-message-types" }
+  ],
+}

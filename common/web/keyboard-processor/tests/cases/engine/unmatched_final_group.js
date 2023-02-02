@@ -1,18 +1,16 @@
-var assert = require('chai').assert;
-let fs = require('fs');
-let vm = require('vm');
+import { assert } from 'chai';
+import fs from 'fs';
+import vm from 'vm';
 
-let KeyboardProcessor = require('../../../build/index.bundled.js');
+import KeyboardProcessor from '@keymanapp/keyboard-processor/build/obj/text/keyboardProcessor.js';
 
-// Required initialization setup.
-global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
-
-let KMWRecorder = require('../../../../recorder/build/nodeProctor');
+import { KeyboardTest } from '@keymanapp/recorder-core/build/obj/index.js';
+import NodeProctor from '@keymanapp/recorder-core/build/obj/nodeProctor.js';
 
 describe('Engine - Unmatched Final Groups', function() {
   let testJSONtext = fs.readFileSync('../../test/resources/json/engine_tests/ghp_enter.json');
   // Common test suite setup.
-  let testSuite = new KMWRecorder.KeyboardTest(JSON.parse(testJSONtext));
+  let testSuite = new KeyboardTest(JSON.parse(testJSONtext));
 
   var keyboard;
   let device = {
@@ -40,7 +38,7 @@ describe('Engine - Unmatched Final Groups', function() {
   });
 
   it('Emits default enter AND matches rule from early group', function() {
-    let proctor = new KMWRecorder.NodeProctor(keyboard, device, assert.equal);
+    let proctor = new NodeProctor(keyboard, device, assert.equal);
     testSuite.test(proctor);
   });
 });

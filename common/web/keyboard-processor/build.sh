@@ -49,13 +49,16 @@ if builder_start_action clean; then
 fi
 
 if builder_start_action build; then
-  npm run tsc -- --build "$THIS_SCRIPT_PATH/src/tsconfig.json"
+  npm run tsc -- --build "$THIS_SCRIPT_PATH/tsconfig.json"
+  node ./build-bundler.js
+
+  # Declaration bundling.
+  npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+
   builder_finish_action success build
 fi
 
 if builder_start_action test; then
-  npm run tsc -- --build "$THIS_SCRIPT_PATH/src/tsconfig.bundled.json"
-
   echo_heading "Running Keyboard Processor test suite"
 
   FLAGS=

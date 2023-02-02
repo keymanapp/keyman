@@ -1,13 +1,12 @@
-var assert = require('chai').assert;
-let fs = require('fs');
-let vm = require('vm');
+import { assert } from 'chai';
+import fs from 'fs';
+import vm from 'vm';
 
-let KeyboardProcessor = require('../../../build/index.bundled.js');
+import KeyboardProcessor from '@keymanapp/keyboard-processor/build/obj/text/keyboardProcessor.js';
+import { Mock } from '@keymanapp/keyboard-processor/build/obj/text/outputTarget.js';
 
-// Required initialization setup.
-global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
-
-let KMWRecorder = require('../../../../recorder/build/nodeProctor');
+import { RecordedKeystrokeSequence } from '@keymanapp/recorder-core/build/obj/index.js';
+import NodeProctor from '@keymanapp/recorder-core/build/obj/nodeProctor.js';
 
 /*
  * ABOUT THIS TEST SUITE
@@ -60,11 +59,11 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
     for(var j = 0; j < matchDefs.length; j++) {
       // Prepare the context!
       var matchTest = matchDefs[j];
-      var ruleSeq = new KMWRecorder.RecordedKeystrokeSequence(matchTest.sequence);
-      let proctor = new KMWRecorder.NodeProctor(keyboard, device, assert.equal);
+      var ruleSeq = new RecordedKeystrokeSequence(matchTest.sequence);
+      let proctor = new NodeProctor(keyboard, device, assert.equal);
 
       // We want to specify the OutputTarget for this test; our actual concern is the resulting context.
-      var target = new com.keyman.text.Mock();
+      var target = new Mock();
       ruleSeq.test(proctor, target);
 
       // Now for the real test!
@@ -999,11 +998,11 @@ describe('Engine - Context Matching', function() {
     for(var j = 0; j < matchDefs.length; j++) {
       // Prepare the context!
       var ruleDef = matchDefs[j];
-      var ruleSeq = new KMWRecorder.RecordedKeystrokeSequence(ruleDef.baseSequence);
-      let proctor = new KMWRecorder.NodeProctor(keyboard, device, assert.equal);
+      var ruleSeq = new RecordedKeystrokeSequence(ruleDef.baseSequence);
+      let proctor = new NodeProctor(keyboard, device, assert.equal);
 
       // We want to specify the OutputTarget for this test; our actual concern is the resulting context.
-      var target = new com.keyman.text.Mock();
+      var target = new Mock();
       ruleSeq.test(proctor, target);
 
       // Now for the real test!
