@@ -70,7 +70,6 @@ function triggerJenkinsBuild() {
   local JENKINS_BRANCH="${2:-master}"
 
   local JENKINS_SERVER=https://jenkins.lsdev.sil.org
-  local GIT_TAG="release-$VERSION_WITH_TAG"
 
   local FORCE=""
   if [ "${3:-false}" == "true" ]; then
@@ -80,7 +79,7 @@ function triggerJenkinsBuild() {
   local TAG=""
   # This will only be true if we created and pushed a tag
   if [ "${action:-""}" == "commit" ]; then
-    TAG=", \"tag\": \"$GIT_TAG\", \"tag2\": \"$GIT_TAG\""
+    TAG=", \"tag\": \"$VERSION_GIT_TAG\", \"tag2\": \"$VERSION_GIT_TAG\""
   fi
 
   if [[ $JENKINS_BRANCH != stable-* ]] && [[ $JENKINS_BRANCH =~ [0-9]+ ]]; then

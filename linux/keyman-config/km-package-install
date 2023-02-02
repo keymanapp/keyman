@@ -10,6 +10,8 @@ from pkg_resources import parse_version
 from zipfile import is_zipfile
 
 from keyman_config import KeymanApiUrl, __version__, secure_lookup
+from keyman_config.install_kmp import extract_kmp
+from keyman_config.kmpmetadata import get_metadata
 from keyman_config.uninstall_kmp import uninstall_kmp
 
 
@@ -84,6 +86,33 @@ def list_keyboards():
             write_kmpdirlist(kmpdirfile)
 
 
+def _list_languages_for_keyboard_impl(packageId, packageDir):
+    from keyman_config.get_kmp import keyman_cache_dir
+    kmpfile = os.path.join(keyman_cache_dir(), packageId)
+    if not os.path.exists(kmpfile):
+        kmpfile = kmpfile + '.kmp'
+        if not os.path.exists(kmpfile):
+            return ''
+    extract_kmp(kmpfile, packageDir)
+    info, system, options, keyboards, files = get_metadata(packageDir)
+    if not keyboards:
+        return ''
+    firstKeyboard = keyboards[0]
+    if not secure_lookup(firstKeyboard, 'languages') or len(firstKeyboard['languages']) <= 0:
+        return ''
+    result = ''
+    for lang in firstKeyboard['languages']:
+        if result:
+            result += '\n'
+        result += lang['id']
+    return result
+
+
+def list_languages_for_keyboard(packageId, packageDir):
+    result = _list_languages_for_keyboard_impl(packageId, packageDir)
+    print(result)
+
+
 def main():
     parser = argparse.ArgumentParser(
       description='Install a Keyman keyboard package, either a local .kmp file or specify a ' +
@@ -122,9 +151,9 @@ def main():
     if os.path.exists(os.path.join(keyman_cache_dir(), 'kmpdirlist')):
         os.remove(os.path.join(keyman_cache_dir(), 'kmpdirlist'))
 
-    def try_install_kmp(inputfile, arg, language=None, online=False, sharedarea=False):
+    def try_install_kmp(inputfile, arg, language=None, sharedarea=False):
         try:
-            install_kmp(inputfile, online, sharedarea, language)
+            install_kmp(inputfile, sharedarea, language)
         except InstallError as e:
             if e.status == InstallStatus.Abort:
                 logging.error("km-package-install: error: Failed to install %s", arg)
@@ -144,7 +173,7 @@ def main():
             logging.error("km-package-install: Keyman kmp file %s not found.", args.file)
             logging.error("km-package-install -f <kmpfile>")
             sys.exit(2)
-        try_install_kmp(args.file, "file " + args.file, args.bcp47, False, args.shared)
+        try_install_kmp(args.file, "file " + args.file, args.bcp47, args.shared)
     elif args.package:
         if args.shared:
             if get_kmp_version_user(args.package):
@@ -176,7 +205,7 @@ def main():
 
         kmpfile = get_kmp(args.package)
         if kmpfile:
-            try_install_kmp(kmpfile, "keyboard package " + args.package, args.bcp47, True, args.shared)
+            try_install_kmp(kmpfile, "keyboard package " + args.package, args.bcp47, args.shared)
         else:
             logging.error("km-package-install: error: Could not download keyboard package %s", args.package)
             sys.exit(2)
