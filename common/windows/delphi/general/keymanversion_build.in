@@ -16,6 +16,7 @@
     Tier: '$Tier';
     Tag: '$Tag';
     VersionWithTag: '$VersionWithTag';
+    VersionGitTag: '$VersionGitTag';
     Environment: '$Environment';
 
     // These fields are useful only for Windows apps

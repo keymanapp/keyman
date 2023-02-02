@@ -1,9 +1,9 @@
 /* vim:set et sts=4: */
 
 /*
- * KMFL Input Method for IBUS (The Input Bus)
+ * Keyman Input Method for IBUS (The Input Bus)
  *
- * Copyright (C) 2018 SIL International
+ * Copyright (C) 2018-2023 SIL International
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
