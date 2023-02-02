@@ -41,8 +41,11 @@ export function loadFromFilename(filename: string): LexicalModelSource {
   // NOTE: transpile module does a very simple TS to JS compilation.
   // It DOES NOT check for types!
   let compilationOutput = ts.transpile(sourceCode, {
-    // Our runtime should support ES6 with Node/CommonJS modules.
-    target: ts.ScriptTarget.ES2015,
+    // Our runtime only supports ES3 with Node/CommonJS modules on Android 5.0.
+    // When we drop Android 5.0 support, we can update this to a `ScriptTarget` 
+    // matrix against target version of Keyman, here and in 
+    // lexical-model-compiler.ts.
+    target: ts.ScriptTarget.ES3,
     module: ts.ModuleKind.CommonJS,
   });
   // Turn the module into a function in which we can inject a global.

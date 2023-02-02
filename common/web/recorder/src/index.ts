@@ -1,8 +1,7 @@
 /// <reference path="proctor.ts" />
 
-import KeyEvent, { KeyDistribution } from "@keymanapp/keyboard-processor/build/obj/text/keyEvent.js";
-import type OutputTarget from "@keymanapp/keyboard-processor/build/obj/text/outputTarget.js";
-import { Mock } from "@keymanapp/keyboard-processor/build/obj/text/outputTarget.js";
+import { type OutputTarget } from "@keymanapp/keyboard-processor/build/obj/index.js";
+import { KeyDistribution, KeyEvent, Mock } from "@keymanapp/keyboard-processor/build/obj/index.js";
 
 import Proctor from "./proctor.js";
 

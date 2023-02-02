@@ -8,7 +8,8 @@
     "mocha": "mocha",
     "test": "gosh ./test/test.sh",
     "build": "tsc -b",
-    "clean": "tsc -b --clean"
+    "clean": "tsc -b --clean",
+    "tsc": "tsc"
   },
   "license": "MIT",
   "devDependencies": {
@@ -16,6 +17,7 @@
     "@keymanapp/resources-gosh": "*",
     "@types/node": "^10.17.21",
     "chai": "^4.3.4",
+    "combine-source-map": "^0.8.0",
     "karma": "^6.4.1",
     "karma-browserstack-launcher": "^1.6.0",
     "karma-chai": "^0.1.0",

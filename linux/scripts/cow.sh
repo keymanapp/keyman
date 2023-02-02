@@ -3,9 +3,9 @@
 # If needed set cowbuilder up for building Keyman Debian packages
 # Then cowbuilder update
 
-distributions='bionic focal jammy kinetic'
+distributions='focal jammy kinetic'
 
-dpkgcheck=`dpkg-query -l cowbuilder`
+dpkgcheck=$(dpkg-query -l cowbuilder)
 if [ $? != 0 ]; then
 
     echo "installing pbuilder and cowbuilder"
@@ -19,7 +19,7 @@ set -e
 
 if [ ! -e ~/.pbuilderrc ]; then
     echo "linking .pbuilderrc to your ~/.pbuilderrc"
-    ln -s `pwd`/.pbuilderrc ~/.pbuilderrc
+    ln -s "$(pwd)/.pbuilderrc" ~/.pbuilderrc
 else
     echo "assuming you already have ~/.pbuilderrc set up as you want it"
     echo "though you may like to look at this .pbuilderrc in case it is useful"
