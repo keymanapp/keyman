@@ -41,7 +41,15 @@ class TestCompilerCallbacks implements CompilerCallbacks {
   messages: CompilerEvent[] = [];
   loadFile(baseFilename: string, filename: string | URL): Buffer {
     // TODO: translate filename based on the baseFilename
-    return fs.readFileSync(filename);
+    try {
+      return fs.readFileSync(filename);
+    } catch(e) {
+      if (e.code === 'ENOENT') {
+        return null;
+      } else {
+        throw e;
+      }
+    }
   }
   reportMessage(event: CompilerEvent): void {
     // console.log(event.message);

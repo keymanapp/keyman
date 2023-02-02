@@ -31,6 +31,11 @@ export enum CompilerErrorNamespace {
  * Abstract interface for callbacks, to abstract out file i/o
  */
 export interface CompilerCallbacks {
+  /**
+   * Attempt to load a file. Return falsy if not found.
+   * @param baseFilename
+   * @param filename
+   */
   loadFile(baseFilename: string, filename: string | URL): Buffer;
   loadLdmlKeyboardSchema(): Buffer;
   reportMessage(event: CompilerEvent): void;

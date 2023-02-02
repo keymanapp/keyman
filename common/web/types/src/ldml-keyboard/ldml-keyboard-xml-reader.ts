@@ -121,14 +121,17 @@ export default class LDMLKeyboardXMLSourceFileReader {
     const { base, path } = asImport;
     if (base !== constants.cldr_import_base) {
       this.callbacks.reportMessage(CommonTypesMessages.Error_ImportInvalidBase({base, path, subtag}));
+      return;
     }
     const paths = path.split('/');
     if (paths[0] == '' || paths[1] == '' || paths.length !== 2) {
       this.callbacks.reportMessage(CommonTypesMessages.Error_ImportInvalidPath({base, path, subtag}));
+      return;
     }
     const importData: Uint8Array = this.readImportFile(paths[0], paths[1]);
     if (!importData || !importData.length) {
       this.callbacks.reportMessage(CommonTypesMessages.Error_ImportReadFail({base, path, subtag}));
+      return;
     }
     const importXml: any = this.loadUnboxed(importData); // TODO-LDML: have to load as any because it is an arbitrary part
     const importRootNode = importXml[subtag]; // e.g. <keys/>
@@ -136,12 +139,16 @@ export default class LDMLKeyboardXMLSourceFileReader {
     // importXml will have one property: the root element.
     if (!importRootNode) {
       this.callbacks.reportMessage(CommonTypesMessages.Error_ImportWrongRoot({base, path, subtag}));
+      return;
     }
     // pull all children of importXml[subtag] into obj
     for (const subsubtag of Object.keys(importRootNode)) { // e.g. <key/>
       const subsubval = importRootNode[subsubtag];
       if (!Array.isArray(subsubval)) {
+        // This is somewhat of an internal error, indicating that a non-mergeable XML file was imported
+        // Not exercisable with the standard LDML imports.
         this.callbacks.reportMessage(CommonTypesMessages.Error_ImportMergeFail({base, path, subtag, subsubtag}));
+        return;
       }
       if (!obj[subsubtag]) {
         obj[subsubtag] = []; // start with empty array
