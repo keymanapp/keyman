@@ -38,5 +38,6 @@
     "@keymanapp/keyman-version": "*",
     "@keymanapp/web-utils": "*",
     "eventemitter3": "^4.0.0"
-  }
+  },
+  "type": "module"
 }

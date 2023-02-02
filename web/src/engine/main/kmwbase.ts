@@ -740,6 +740,6 @@ if(!window['keyman'] || !window['keyman']['loaded']) {
     window['keyman'] = com.keyman['singleton'] = com.keyman.singleton = new KeymanBase();
 
     // TODO:  Eliminate the need for this.  Will require more refactoring & redesign to drop.
-    window['keyman'].core.languageProcessor.init();
+    window['keyman'].core.languageProcessor.init(); // is shifting to the constructor
   })();
 }

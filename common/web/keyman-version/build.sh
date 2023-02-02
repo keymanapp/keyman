@@ -68,14 +68,12 @@ export class KEYMAN_VERSION {
 export default KEYMAN_VERSION;
   " > ./version.inc.ts
 
-  # Note: in a dependency build, we'll expect keyman-version to be built by tsc -b
-  if builder_is_dep_build; then
-    echo "[$THIS_SCRIPT_IDENTIFIER] skipping tsc -b; will be completed by $builder_dep_parent"
-  else
-    npm run build -- $builder_verbose
-    # Generates a CommonJS variant (in case other modules still need it).
-    node ./build-bundler.js
-  fi
+  npm run tsc -- -b $builder_verbose
+  # kmlmc (the lexical model compiler) relies on a Node-based import, but after some of the earlier
+  # ES-modularization work, our main output's an ES module.  Fortunately, esbuild can provide an easy stopgap.
+
+  # Generates a CommonJS variant (in case other modules still need it).
+  node ./build-bundler.js
 
   builder_finish_action success build
 fi

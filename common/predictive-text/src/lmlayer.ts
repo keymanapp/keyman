@@ -23,7 +23,7 @@
 import PromiseStore from "./promise-store.js";
 
 /// <reference types="@keymanapp/lm-message-types" />
-/// <reference path="worker-interface.d.ts" />
+/// <reference types="worker-interface.d.ts" />
 
 /**
  * Top-level interface to the Language Modelling layer, or "LMLayer" for short.
