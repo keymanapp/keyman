@@ -1,16 +1,16 @@
 import fs from 'fs';
 
-import SourcemapRemapper from '@keymanapp/sourcemap-path-remapper';
+import SourceMapRemapper from '@keymanapp/sourcemap-path-remapper';
 
-import SourcemapCombiner from 'combine-source-map';
-import convertSourcemap from 'convert-source-map'; // Transforms sourcemaps among various common formats.
+import SourceMapCombiner from 'combine-source-map';
+import convertSourceMap from 'convert-source-map'; // Transforms sourcemaps among various common formats.
                                                    // Base64, stringified-JSON, end-of-file comment...
 
-let loadPolyfill = function(file, mapFilename) {
+let loadPolyfill = function(scriptFile, sourceMapFile) {
   // May want to retool the pathing somewhat!
   return {
-    source: fs.readFileSync(file).toString(),
-    sourceFile: mapFilename || file
+    source: fs.readFileSync(scriptFile).toString(),
+    sourceFile: sourceMapFile || scriptFile
   };
 }
 
@@ -27,13 +27,13 @@ let loadCompiledModuleFilePair = function(file, mapFilename) {
     /**The source + inlined sourcemap-as-comment used by `combine-source-map`. */
     get source() {
       let jsonAsBuffer = Buffer.from(JSON.stringify(this.sourceMapAsJSON));
-      return `${this.plainSource}\n${convertSourcemap.fromJSON(jsonAsBuffer).toComment()}`;
+      return `${this.plainSource}\n${convertSourceMap.fromJSON(jsonAsBuffer).toComment()}`;
     }
   };
 }
 
 function concatScriptsAndSourcemaps(files, finalName, separatorFile) {
-  let combiner = SourcemapCombiner.create(finalName);
+  let combiner = SourceMapCombiner.create(finalName);
 
   let finalConcatenationArray = [];
   let lineCountThusFar = 0;
@@ -60,7 +60,7 @@ function concatScriptsAndSourcemaps(files, finalName, separatorFile) {
 
   return {
     script: bundledSource,
-    sourcemapJSON: JSON.parse(convertSourcemap.fromBase64(combiner.base64()).toJSON()),
+    sourcemapJSON: JSON.parse(convertSourceMap.fromBase64(combiner.base64()).toJSON()),
     scriptFilename: finalName
   }
 }
@@ -104,7 +104,7 @@ console.log();
 // paths result in unwanted extra pathing that needs to be cleaned up (models/models, correction/correction, etc)
 console.log("Pass 2:  cleaning sourcemap source paths");
 
-let remappingState = SourcemapRemapper
+let remappingState = SourceMapRemapper
   .fromObject(fullWorkerConcatenation.sourcemapJSON)
   .remapPaths([
     {from: /^polyfills\//, to: '/common/web/lm-worker/src/polyfills/'},
@@ -144,4 +144,4 @@ fullWorkerConcatenation.script = fullWorkerConcatenation.script.substring(0, ful
 fullWorkerConcatenation.script += `//# sourceMappingURL=${fullWorkerConcatenation.scriptFilename}.map`;
 
 fs.writeFileSync(`build/lib/${fullWorkerConcatenation.scriptFilename}`, fullWorkerConcatenation.script);
-fs.writeFileSync(`build/lib/${fullWorkerConcatenation.scriptFilename}.map`, convertSourcemap.fromObject(fullWorkerConcatenation.sourcemapJSON).toJSON());
+fs.writeFileSync(`build/lib/${fullWorkerConcatenation.scriptFilename}.map`, convertSourceMap.fromObject(fullWorkerConcatenation.sourcemapJSON).toJSON());
