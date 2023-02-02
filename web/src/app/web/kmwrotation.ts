@@ -1,6 +1,3 @@
-// References the base KMW object.
-/// <reference path="kmwbase.ts" />
-
 namespace com.keyman {
   class RotationState {
     innerWidth: number;

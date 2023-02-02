@@ -51,7 +51,7 @@ var setupKMW = function(kmwOptions, timeout) {
 
   let uiPromise;
   if(ui) {
-    uiPromise = setupScript('source/kmwui' + ui + '.js', timeout, (scriptEle) => {
+    uiPromise = setupScript('ui-source/kmwui' + ui + '.js', timeout, (scriptEle) => {
       fixture.el.appendChild(scriptEle);
     });
 

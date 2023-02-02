@@ -12,8 +12,8 @@
 
   "files": [
     "renderer_core.ts",
-		"../source/kmwdevice.ts",
-		"../source/utils/styleConstants.ts",
+		"../src/engine/kmwdevice.ts",
+		"../src/engine/utils/styleConstants.ts",
   ],
 
 	"references": [

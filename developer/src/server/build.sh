@@ -129,15 +129,17 @@ if (( build_keymanweb )); then
 fi
 
 if (( copy_keymanweb )); then
-  SRC="$KEYMAN_ROOT/web/release/unminified"
+  WEB_SRC="$KEYMAN_ROOT/web/build/app/web/debug"
+  UI_SRC="$KEYMAN_ROOT/web/build/app/ui/debug"
   DST="$(dirname "$THIS_SCRIPT")/src/site/resource"
 
   rm -rf "$DST"
   mkdir -p "$DST/osk"
   mkdir -p "$DST/ui"
-  cp "$SRC/web/"*.js "$SRC/web/"*.js.map "$DST/"
-  cp -R "$SRC/web/osk/"* "$DST/osk/"
-  cp -R "$SRC/web/ui/"* "$DST/ui/"
+  cp "$WEB_SRC/"*.js "$WEB_SRC/"*.js.map "$DST/"
+  cp "$UI_SRC/"*.js "$UI_SRC/"*.js.map "$DST/"
+  cp -R "$WEB_SRC/osk/"* "$DST/osk/"
+  cp -R "$WEB_SRC/ui/"* "$DST/ui/"
   cp "$KEYMAN_ROOT/web/LICENSE" "$DST/"
   cp "$KEYMAN_ROOT/web/README.md" "$DST/"
 fi

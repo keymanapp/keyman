@@ -1,16 +1,14 @@
-/// <reference path="../realizedGesture.interface.ts" />
-
 namespace com.keyman.osk.embedded {
   /**
    * As the subkey popup view is handled by the host app when in embedded mode
    * within our Android app, this class represents the fact that KMW has
    * "delegated" subkey UI and selection to the host app.  Hence, "Delegator",
    * rather than "Popup".
-   * 
+   *
    * The `resolve` method should be triggered, in some fashion, by the host app
    * whenever the user has completed their longpress, potentially selecting
    * a subkey.
-   * 
+   *
    * This class will also track the ongoing touch event in case the base key is
    * reselected, which _is_ managed by this class, not the host app.
    */
@@ -38,10 +36,10 @@ namespace com.keyman.osk.embedded {
     /**
      * Resolves the ongoing longpress -> subkey gesture, fulfilling this
      * `SubkeyDelegator`'s `promise` of a `KeyEvent`.
-     * 
+     *
      * If no subkey is selected but the original base key is, `resolve(null)`
      * will return a key event corresponding to the base key.
-     * 
+     *
      * @param keyCoreID   {string}  The 'core ID' (id + modifier layer) of
      *                              a selected subkey.  May be `null`.
      */
@@ -94,7 +92,7 @@ namespace com.keyman.osk.embedded {
     /**
      * Allows this class to detect if the user may have changed their mind and
      * re-selected the base key.
-     * @param touch 
+     * @param touch
      */
     updateTouch(input: InputEventCoordinate) {
       this.baseKeySelected = this.baseKey.key.isUnderTouch(input);

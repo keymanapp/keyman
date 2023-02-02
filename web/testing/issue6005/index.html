@@ -23,7 +23,7 @@
     </style>
 
     <!-- Insert uncompiled KeymanWeb source scripts -->
-    <script src="../../release/unminified/web/keymanweb.js" type="application/javascript"></script>
+    <script src="../../build/app/web/debug/keymanweb.js" type="application/javascript"></script>
 
     <!--
       For desktop browsers, a script for the user interface must be inserted here.
@@ -32,7 +32,7 @@
       The toolbar UI is best for any page designed to support keyboards for
       a large number of languages.
     -->
-    <script src="../../release/unminified/web/kmwuitoggle.js"></script>
+    <script src="../../build/app/ui/debug/kmwuitoggle.js"></script>
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
@@ -48,7 +48,7 @@
         // if mobile device, activate pred text.
         if(kmw.util.device.touchable) {
           //keyman.osk.banner.setOptions({'mayPredict': true});
-          
+
           var pageRef = (window.location.protocol == 'file:')
             ? window.location.href.substr(0, window.location.href.lastIndexOf('/')+1)
             : window.location.href;
@@ -74,7 +74,7 @@
       kmw.addKeyboards('sil_euro_latin@en',
                        'galaxie_hebrew_positional@he',
                        'sil_cameroon_qwerty@pny-latn');
-      
+
       kmw.addKeyboards({
           id:'unmatched_final_group_model_interactions_6005',
           name:'"Unmatched Vowel Rule"',

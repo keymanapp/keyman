@@ -11,15 +11,15 @@
   },
 
   "files": [
-    "../../source/dom/targets/wrapElement.ts",
-    "../../source/dom/targets/input.ts",
-    "../../source/dom/targets/textarea.ts",
-    "../../source/dom/targets/contentEditable.ts",
-    "../../source/dom/targets/designIFrame.ts",
-    "../../source/dom/targets/outputTarget.ts",
-    "../../source/kmwexthtml.ts",
-    "../../source/dom/utils.ts",
-    "../../source/kmwtypedefs.ts",
+    "../../src/engine/dom/targets/wrapElement.ts",
+    "../../src/engine/dom/targets/input.ts",
+    "../../src/engine/dom/targets/textarea.ts",
+    "../../src/engine/dom/targets/contentEditable.ts",
+    "../../src/engine/dom/targets/designIFrame.ts",
+    "../../src/engine/dom/targets/outputTarget.ts",
+    "../../src/engine/kmwexthtml.ts",
+    "../../src/engine/dom/utils.ts",
+    "../../src/engine/kmwtypedefs.ts",
     "../../../node_modules/eventemitter3/index.js"
   ],
 

@@ -65,7 +65,7 @@ DO_TEST=true
 NO_DAEMON=false
 DEBUG_BUILD=false
 KMWFLAGS="build:embed"
-KMW_PATH=
+KMW_CONFIG=release
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
@@ -89,7 +89,7 @@ while [[ $# -gt 0 ]] ; do
         -debug)
             DEBUG_BUILD=true
             KMWFLAGS="$KMWFLAGS --debug"
-            KMW_PATH=unminified
+            KMW_CONFIG=debug
             ;;
         -h|-\?)
             display_usage
@@ -116,7 +116,7 @@ echo "DO_TEST: $DO_TEST"
 echo "NO_DAEMON: $NO_DAEMON"
 echo "DEBUG_BUILD: $DEBUG_BUILD"
 echo "KMWFLAGS: $KMWFLAGS"
-echo "KMW_PATH: $KMW_PATH"
+echo "KMW_CONFIG: $KMW_CONFIG"
 echo
 
 if [ "$NO_DAEMON" = true ]; then
@@ -140,12 +140,12 @@ if [ "$DO_BUILD" = true ]; then
 fi
 if [ "$DO_COPY" = true ]; then
     echo "Copying KMW artifacts"
-    cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/ajax-loader.gif $KMEA_ASSETS/ajax-loader.gif
-    cp $KMW_ROOT/release/$KMW_PATH/embedded/keyman.js $KMEA_ASSETS/keymanandroid.js
-    cp $KMW_ROOT/release/$KMW_PATH/embedded/keyman.js.map $KMEA_ASSETS/keyman.js.map
-    cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/kmwosk.css $KMEA_ASSETS/kmwosk.css
-    cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/globe-hint.css $KMEA_ASSETS/globe-hint.css
-    cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/keymanweb-osk.ttf $KMEA_ASSETS/keymanweb-osk.ttf
+    cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/osk/ajax-loader.gif $KMEA_ASSETS/ajax-loader.gif
+    cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/keyman.js $KMEA_ASSETS/keymanandroid.js
+    cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/keyman.js.map $KMEA_ASSETS/keyman.js.map
+    cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/osk/kmwosk.css $KMEA_ASSETS/kmwosk.css
+    cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/osk/globe-hint.css $KMEA_ASSETS/globe-hint.css
+    cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/osk/keymanweb-osk.ttf $KMEA_ASSETS/keymanweb-osk.ttf
 
     cp $KEYMAN_ROOT/common/web/sentry-manager/build/index.js $KMEA_ASSETS/keyman-sentry.js
 

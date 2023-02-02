@@ -10,13 +10,16 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 THIS_DIR="$(dirname "$THIS_SCRIPT")"
 
+# TODO:  Convert this into the start of a test/manual/embed section when reworking the Web test
+#        page organization.
+
 mkdir -p "$THIS_DIR/host"
 cp -R "$KEYMAN_ROOT/android/KMEA/app/src/main/assets/"* "$THIS_DIR/host/"
-cp "$KEYMAN_ROOT/web/release/unminified/embedded/keyman.js" "$THIS_DIR/host/keymanandroid.js"
-cp "$KEYMAN_ROOT/web/release/unminified/embedded/keyman.js.map" "$THIS_DIR/host/keyman.js.map"
-cp "$KEYMAN_ROOT/web/release/unminified/embedded/resources/osk/kmwosk.css" "$THIS_DIR/host/kmwosk.css"
-cp "$KEYMAN_ROOT/web/release/unminified/embedded/resources/osk/globe-hint.css" "$THIS_DIR/host/globe-hint.css"
-cp "$KEYMAN_ROOT/web/release/unminified/embedded/resources/osk/keymanweb-osk.ttf" "$THIS_DIR/host/keymanweb-osk.ttf"
+cp "$KEYMAN_ROOT/web/build/app/embed/debug/keyman.js" "$THIS_DIR/host/keymanandroid.js"
+cp "$KEYMAN_ROOT/web/build/app/embed/debug/keyman.js.map" "$THIS_DIR/host/keyman.js.map"
+cp "$KEYMAN_ROOT/web/build/app/embed/debug/osk/kmwosk.css" "$THIS_DIR/host/kmwosk.css"
+cp "$KEYMAN_ROOT/web/build/app/embed/debug/osk/globe-hint.css" "$THIS_DIR/host/globe-hint.css"
+cp "$KEYMAN_ROOT/web/build/app/embed/debug/osk/keymanweb-osk.ttf" "$THIS_DIR/host/keymanweb-osk.ttf"
 
 # Test keyboards
 
