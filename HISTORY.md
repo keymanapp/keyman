@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 17.0.41 alpha 2023-02-02
+
+* chore(web): main web build & test script rework to our common script format + nomenclature (#7474)
+* change(web): conversion to standard filesystem layout:  source -> src, intermediate + release -> build (#7513)
+* change(web): conversion to standard filesystem layout:  testing -> src/test/manual, unit_tests -> src/test/auto (#7515)
+* change(web): conversion to standard filesystem layout:  tools -> src/tools (#7556)
+* chore(web): updates build product references, extracts CI test-build scripts (#7831)
+* feat(common): TS-based sourcemap remapping tool (#7894)
+* feat(web): implements shell scripting for CI release-build configurations (#8001)
+
 ## 17.0.40 alpha 2023-02-01
 
 * chore(developer): kmcmpdll debug src path (#8127)
