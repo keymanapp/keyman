@@ -11,6 +11,15 @@ import { spawn } from 'child_process';
 await esbuild.build({
   bundle: true,
   sourcemap: true,
+  /*
+   * https://esbuild.github.io/api/#sources-content would theoretically allow us to strip the source
+   * while still keeping info useful for stack-tracing... but it doesn't pass through the sourcemap
+   * concatenation setup.
+   *
+   * That said, we know how to 'nix it ourselves in post now, so... yeah.
+   */
+  sourcesContent: true,
+  sourceRoot: "/",
   format: "esm",
   nodePaths: ['..', '../../models'],
   entryPoints: {

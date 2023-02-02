@@ -2,7 +2,6 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 
 import { LMLayer } from '../../build/obj/node/index.js';
-import unwrap from '../../build/obj/unwrap.js';
 import { capabilities } from '../../../../common/test/resources/model-helpers.mjs';
 
 // Test the top-level LMLayer interface.
@@ -109,20 +108,6 @@ describe('LMLayer', function() {
       // This SHOULD be called by loadModel().
       assert.deepEqual(actualConfiguration, expectedConfiguration);
     })
-  });
-
-  // Since the Blob API is limited to browsers, look for those
-  // tests for .asBlobURI() in the in_browser tests.
-  describe('unwrap', function () {
-    it('should return the inner code of a function', function () {
-      // Create a multi-line function body we can match in a RegExp.
-      let text = unwrap(function hello() {
-        var hello;
-        var world;
-      });
-      // Unwrap should give us back ONLY the body. Whitespace isn't really important.
-      assert.match(text, /^\s*var\s+hello;\s*var\s+world;\s*$/);
-    });
   });
 
   /**

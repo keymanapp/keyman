@@ -5,7 +5,7 @@
  *
  * @param fn The function whose body will be returned.
  */
-export default function unwrap(fnCode: string): string {
-  let match = fnCode.match(/function[^{]+{((?:.|\r|\n)+)}[^}]*$/);
-  return match[1];
+export default function unwrap(encodedSrc: string): string {
+  let wrapper = decodeURIComponent(encodedSrc);
+  return wrapper;
 }

@@ -32,6 +32,8 @@
 /// <reference types="@keymanapp/lm-message-types" />
 import { extendString } from "@keymanapp/web-utils/build/obj/index.js";
 
+extendString();
+
 import * as models from './models/index.js';
 import * as correction from './correction/index.js';
 import * as wordBreakers from '@keymanapp/models-wordbreakers/build/obj/index.js';
