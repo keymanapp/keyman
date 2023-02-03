@@ -7,24 +7,25 @@ export interface CompilerEvent {
 };
 
 export enum CompilerErrorSeverity {
-  Info =          0x000000,
-  Hint =          0x100000,
-  Warn =          0x200000,
-  Error =         0x300000,
-  Fatal =         0x400000,
+  Info =          0x000000, // Informational, not necessarily a problem
+  Hint =          0x100000, // Something the user might want to be aware of
+  Warn =          0x200000, // Warning: Not great, but we can keep going.
+  Error =         0x300000, // Severe error where we can't continue
+  Fatal =         0x400000, // OOM or should-not-happen internal problem
+
   Severity_Mask = 0xF00000, // includes reserved bits
   Error_Mask =    0x0FFFFF,
 };
 
 export enum CompilerErrorNamespace {
   /**
-   * KMC errors between 0x0000…0x0FFF
+   * kmc-keyboard errors between 0x0000…0x0FFF
    */
-  Kmc = 0x0000,
+  KeyboardCompiler = 0x0000,
   /**
    * common/web/types errors between 0x1000…0x1FFF
    */
-  Types = 0x1000,
+  CommonTypes = 0x1000,
 };
 
 /**
@@ -36,3 +37,11 @@ export interface CompilerCallbacks {
   reportMessage(event: CompilerEvent): void;
   loadKvksJsonSchema(): Buffer;
 };
+
+/**
+ * Convenience function for constructing CompilerEvents
+ * @param code
+ * @param message
+ * @returns
+ */
+export const CompilerMessageSpec = (code: number, message: string) : CompilerEvent => { return { code, message } };

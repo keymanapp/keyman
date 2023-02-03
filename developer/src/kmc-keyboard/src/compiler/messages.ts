@@ -1,14 +1,10 @@
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent } from "@keymanapp/common-types";
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m } from "@keymanapp/common-types";
 
-
-const m = (code: number, message: string) : CompilerEvent => { return { code, message } };
-
-const KmcErrMask   = CompilerErrorNamespace.Kmc;
-const SevInfo = CompilerErrorSeverity.Info | KmcErrMask;
-const SevHint = CompilerErrorSeverity.Hint | KmcErrMask;
-// const SevWarn = CompilerErrorSeverity.Warn | KmcErrMask;
-const SevError = CompilerErrorSeverity.Error | KmcErrMask;
-const SevFatal = CompilerErrorSeverity.Fatal | KmcErrMask;
+const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.KeyboardCompiler;
+const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.KeyboardCompiler;
+// const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.KeyboardCompiler;
+const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.KeyboardCompiler;
+const SevFatal = CompilerErrorSeverity.Fatal | CompilerErrorNamespace.KeyboardCompiler;
 
 export class CompilerMessages {
   static Error_InvalidNormalization = (o:{form: string}) => m(this.ERROR_InvalidNormalization, `Invalid normalization form '${o.form}`);

@@ -150,23 +150,24 @@ export default class LDMLKeyboardXMLSourceFileReader {
     }
   }
 
-  public validate(source: LDMLKeyboardXMLSourceFile, schemaSource: Buffer): void {
+  /**
+   * @returns true if valid, false if invalid
+   */
+  public validate(source: LDMLKeyboardXMLSourceFile, schemaSource: Buffer): boolean {
     const schema = JSON.parse(schemaSource.toString('utf8'));
     const ajv = new Ajv();
     if(!ajv.validate(schema, source)) {
-      // Try to improve the message
-      if (ajv.errors?.length > 0) {
-        for (let err of ajv.errors) {
-          // report each err
-          this.callbacks.reportMessage(CommonTypesMessages.Fatal_AJVError(err))
-        }
-      } else {
-        // Not a single error, so fall through to errorsText()
-        this.callbacks.reportMessage(CommonTypesMessages.Fatal_UnknownXMLValidationError({
-          errorsText: ajv.errorsText() || 'Unknown AJV Error'
+      for (let err of ajv.errors) {
+        this.callbacks.reportMessage(CommonTypesMessages.Error_SchemaValidationError({
+          instancePath: err.instancePath,
+          keyword: err.keyword,
+          message: err.message || 'Unknown AJV Error', // docs say 'message' is optional if 'messages:false' in options
+          params: Object.entries(err.params || {}).sort().map(([k,v])=>`${k}="${v}"`).join(' '),
         }));
       }
+      return false;
     }
+    return true;
   }
 
   loadUnboxed(file: Uint8Array): LDMLKeyboardXMLSourceFile {
@@ -193,6 +194,9 @@ export default class LDMLKeyboardXMLSourceFileReader {
   }
 
   public load(file: Uint8Array): LDMLKeyboardXMLSourceFile {
+    if (!file) {
+      return null;
+    }
     const source = this.loadUnboxed(file);
     return this.boxArrays(source);
   }

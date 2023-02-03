@@ -106,11 +106,11 @@ describe('layr', function () {
     },
     {
       subpath: 'sections/layr/invalid-invalid-form.xml',
-      errors: [CommonTypesMessages.Fatal_AJVError({
+      errors: [CommonTypesMessages.Error_SchemaValidationError({
         instancePath: '/keyboard/layers/0/form',
         keyword: 'enum',
         message: 'must be equal to one of the allowed values',
-        params: {allowedValues:["hardware","touch"]}} as any)],
+        params: `allowedValues="hardware,touch"`}),],
     },
     {
       subpath: 'sections/layr/invalid-missing-layer.xml',

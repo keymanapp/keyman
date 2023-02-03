@@ -53,9 +53,9 @@ export default class Compiler {
    * Loads a LDML Keyboard xml file and compiles into in-memory xml
    * structures.
    * @param filename  input filename, will use callback to load from disk
-   * @returns
+   * @returns the source file, or null if invalid
    */
-  public load(filename: string): LDMLKeyboardXMLSourceFile {
+  public load(filename: string): LDMLKeyboardXMLSourceFile | null {
     const reader = new LDMLKeyboardXMLSourceFileReader(this.callbacks);
     const data = this.callbacks.loadFile(filename, filename);
     const source = reader.load(data);
@@ -64,7 +64,9 @@ export default class Compiler {
       return null;
     }
     try {
-      reader.validate(source, this.callbacks.loadLdmlKeyboardSchema());
+      if (!reader.validate(source, this.callbacks.loadLdmlKeyboardSchema())) {
+        return null;
+      }
     } catch(e) {
       this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: e.toString()}));
       return null;
