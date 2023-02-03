@@ -455,7 +455,7 @@ div.android div.kmw-keytip-cap {
 #kmw-language-menu-background{position:fixed;left:0;top:0;width:100%;height:100%;background-color:transparent;z-index:10003;}
 
 #kmw-menu-scroll-container{position:absolute;left:0;top:0px;width:200px;max-width:200px;overflow:auto;z-index:10005;}
-#kmw-menu-scroller{position:absolute;left:0;top:0;width:200px;max-width:200px;background-color:#e0e0e0;overflow:auto;overflow-x:hidden;}
+#kmw-menu-scroller{position:absolute;left:0;top:0;width:200px;max-width:200px;background-color:#e0e0e0;overflow-x:hidden;}
 
 #kmw-menu-index {position:absolute;right:0;width:32px;font-size:14px;}
 #kmw-menu-index p {text-align:center;border:none;padding:0px 2px;margin:0;color:white;}

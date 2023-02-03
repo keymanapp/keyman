@@ -904,7 +904,7 @@ end;
 
 procedure TfrmCharacterMapNew.gridSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
 begin
-  CanSelect := ARow > 0;
+  CanSelect := (ARow > 0) or (grid.RowCount = 1);
 end;
 
 function TfrmCharacterMapNew.GetDragObject: TCharacterDragObject;

@@ -73,7 +73,7 @@ output_path ( ) {
 
 SOURCE="src"
 
-SENTRY_RELEASE_VERSION="release-$VERSION_WITH_TAG"
+SENTRY_RELEASE_VERSION="release@$VERSION_WITH_TAG"
 
 # Ensures that we rely first upon the local npm-based install of Typescript.
 # (Facilitates automated setup for build agents.)

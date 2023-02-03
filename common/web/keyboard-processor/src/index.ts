@@ -15,6 +15,7 @@ export * from "./text/kbdInterface.js";
 export { default as KeyboardProcessor } from "./text/keyboardProcessor.js";
 export * from "./text/keyboardProcessor.js";
 export { default as KeyEvent } from "./text/keyEvent.js";
+export * from "./text/keyEvent.js";
 export { default as KeyMapping } from "./text/keyMapping.js";
 export { default as OutputTarget } from "./text/outputTarget.js";
 export * from "./text/outputTarget.js";
@@ -22,3 +23,9 @@ export { default as RuleBehavior } from "./text/ruleBehavior.js";
 export * from "./text/systemStores.js";
 
 export * from "@keymanapp/web-utils/build/obj/index.js";
+
+// At the top level, there should be no default export.
+
+// Without the line below... OutputTarget would likely be aliased there, as it's
+// the last `export { default as _ }` => `export * from` pairing seen above.
+export default undefined;

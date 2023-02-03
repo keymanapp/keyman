@@ -3,7 +3,7 @@
 // There's an upcoming `/common/web/types` package that 'codes' and 'keyboards' may fit well within.
 // In fact, there's a file there (on its branch) that should be merged with this one!
 
-let Codes = {
+const Codes = {
   // Define Keyman Developer modifier bit-flags (exposed for use by other modules)
   // Compare against /common/include/kmx_file.h.  CTRL+F "#define LCTRLFLAG" to find the secton.
   modifierCodes: {
@@ -95,7 +95,7 @@ let Codes = {
         // Refer to text/codes.ts - these are Keyman-custom "keycodes" used for
         // layer shifting keys.  To be safe, we currently let K_TABBACK and
         // K_TABFWD through, though we might be able to drop them too.
-        let code = Codes[keyID];
+        const code = Codes[keyID];
         if(code > 50000 && code < 50011) {
           return true;
         }

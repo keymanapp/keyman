@@ -1,5 +1,3 @@
-/// <reference types="@keymanapp/models-types" />
-
 /*
  * Copyright (c) 2019 National Research Council Canada (author: Eddie A. Santos)
  * Copyright (c) 2019 SIL International
@@ -28,14 +26,12 @@
 // Should probably make a 'lm-utils' submodule.
 
 // Allows the kmwstring bindings to resolve.
-import type * as types from "@keymanapp/web-utils/build/obj/kmwstring.js";
+import { extendString } from "@keymanapp/web-utils/build/obj/index.js";
+import { default as defaultWordBreaker } from "@keymanapp/models-wordbreakers/build/obj/index.js";
 
 import { applyTransform, isHighSurrogate, isSentinel, SENTINEL_CODE_UNIT, transformToSuggestion } from "./common.js";
 import { getLastPreCaretToken } from "./tokenization.js";
 import PriorityQueue from "./priority-queue.js";
-import { default as defaultWordBreaker } from "@keymanapp/models-wordbreakers/build/obj/default/index.js";
-
-/// <reference types="@keymanapp/models-types" />
 
 /**
  * @file trie-model.ts

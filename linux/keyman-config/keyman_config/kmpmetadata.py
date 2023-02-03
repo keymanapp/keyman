@@ -506,7 +506,6 @@ def get_metadata(tmpdirname):
     If it does not exist then will return get_and_convert_infdata
 
     Args:
-        inputfile (str): path to kmp file
         tmpdirname(str): temp directory to extract kmp
 
     Returns:

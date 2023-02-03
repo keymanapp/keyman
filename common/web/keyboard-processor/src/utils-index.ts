@@ -1,1 +1,0 @@
-export { deepCopy, DeviceSpec, extendString, globalObject as getGlobalObject, Version } from "@keymanapp/web-utils/build/obj/index.js";
