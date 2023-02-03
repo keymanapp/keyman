@@ -5,6 +5,7 @@
     "asabil.meson",
     "EditorConfig.editorconfig",
     "ms-python.python",
-    "timonwong.shellcheck"
+    "timonwong.shellcheck",
+    "dawidd6.debian-vscode",
   ]
 }
