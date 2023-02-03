@@ -4,17 +4,22 @@
 
 import ContextWindow from "./contextWindow.js";
 import LanguageProcessor, { type ModelSpec } from "./prediction/languageProcessor.js";
-import { globalObject, DeviceSpec } from "@keymanapp/web-utils/build/obj/index.js";
+import { globalObject, DeviceSpec } from "@keymanapp/web-utils";
 
-import KeyboardProcessor, { type ProcessorInitOptions } from "@keymanapp/keyboard-processor/build/obj/text/keyboardProcessor.js";
-import type KeyboardInterface from "@keymanapp/keyboard-processor/build/obj/text/kbdInterface.js";
-import { SystemStoreIDs } from "@keymanapp/keyboard-processor/build/obj/text/kbdInterface.js";
-import type Keyboard from "@keymanapp/keyboard-processor/build/obj/keyboards/keyboard.js";
-import type OutputTarget from "@keymanapp/keyboard-processor/build/obj/text/outputTarget.js";
-import { Mock, type TextTransform, type Alternate } from "@keymanapp/keyboard-processor/build/obj/text/outputTarget.js";
-import RuleBehavior from "@keymanapp/keyboard-processor/build/obj/text/ruleBehavior.js";
-import type KeyEvent from "@keymanapp/keyboard-processor/build/obj/text/keyEvent.js";
-import Codes from "@keymanapp/keyboard-processor/build/obj/text/codes.js";
+import {
+  type Alternate,
+  Codes,
+  type Keyboard,
+  KeyboardInterface,
+  KeyboardProcessor,
+  type KeyEvent,
+  Mock,
+  type OutputTarget,
+  type ProcessorInitOptions,
+  RuleBehavior,
+  SystemStoreIDs,
+  type TextTransform
+} from "@keymanapp/keyboard-processor";
 
 export default class InputProcessor {
   public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {

@@ -39,5 +39,8 @@
     "@keymanapp/web-utils": "*",
     "eventemitter3": "^4.0.0"
   },
-  "type": "module"
+  "type": "module",
+  "imports": {
+    "#./*.js": "./build/obj/*.js"
+  }
 }

@@ -1,6 +1,6 @@
 import EventEmitter from "eventemitter3";
-import LMLayer from "@keymanapp/lexical-model-layer/build/obj/lmlayer.js";
-import OutputTarget, { Transcription, Mock } from "@keymanapp/keyboard-processor/build/obj/text/outputTarget.js";
+import { LMLayer } from "@keymanapp/lexical-model-layer/build/obj/web/index.js";
+import { OutputTarget, Transcription, Mock } from "@keymanapp/keyboard-processor";
 import ContextWindow from "../contextWindow.js";
 
 export interface ModelSpec {

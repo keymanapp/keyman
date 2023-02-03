@@ -6,7 +6,8 @@
     ".": {
       "import": "./build/version.inc.js",
       "require": "./build/version.inc.cjs"
-    }
+    },
+    "./build/version.inc.cjs": "./build/version.inc.cjs"
   },
   "scripts": {
     "build": "echo 'Building @keymanapp/keyman-version' && tsc -b",
