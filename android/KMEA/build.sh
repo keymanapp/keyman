@@ -2,23 +2,44 @@
 # Build Keyman Engine Android using Keyman Web artifacts
 #
 # Abbreviations:
-# KMA  - Keyman Android
-# KMEA - Keyman Engine Android
+# KMA  - Keyman for Android
+# KMEA - Keyman Engine for Android
 # KMW  - Keyman Web
 
-# Set sensible script defaults:
-# set -e: Terminate script if a command returns an error
-set -e
-# set -u: Terminate script if an unset variable is used
-set -u
-# set -x: Debugging use, print each statement
 # set -x
+set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
+
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+
+# This script runs from its own folder
+cd "$THIS_SCRIPT_PATH"
+
+# ################################ Main script ################################
+
+# Definition of global compile constants
+
+
+builder_describe "Builds Keyman Engine for Android (KMEA)." \
+  "@../../web/build/app/embed/$KMW_CONFIG/keyman.js" \
+  "clean" \
+  "confiugre" \
+  "build" \
+  "test             Runs unit tests." \
+  ":app             Builds KMEA" \
+
+builder_describe_outputs \
+  build:app     ./app/build/outputs/aar/keyman-android.aar
+
+builder_parse "$@"
+
+#### Build
+
 
 display_usage ( ) {
     echo "build.sh [-no-kmw-build] | [-no-kmw] [-no-daemon] | [-no-test] | [-upload-sentry] | [-debug]"
@@ -47,16 +68,6 @@ KMA_ROOT="$KEYMAN_ROOT/android"
 KMW_ROOT="$KEYMAN_ROOT/web"
 KMEA_ASSETS="$KMA_ROOT/KMEA/app/src/main/assets"
 
-warn ( ) {
-    echo "$*"
-}
-
-die ( ) {
-    echo
-    echo "$*"
-    echo
-    exit 1
-}
 
 # Default is building KMW and copying artifacts
 DO_BUILD=true
