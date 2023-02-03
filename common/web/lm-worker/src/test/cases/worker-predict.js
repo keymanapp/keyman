@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import LMLayerWorker from '../../../build/obj/index.js';
+import LMLayerWorker from '#./index.js';
 
 import { configWorker, createMessageEventWithData, emptyContext, iGotDistractedByHazel,
          importScriptsWith, randomToken, zeroTransform } from '../../../../../test/resources/model-helpers.mjs';

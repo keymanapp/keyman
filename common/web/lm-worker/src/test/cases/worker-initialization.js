@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 import fs from 'fs';
 
-import LMLayerWorker from '../../../build/obj/index.js';
+import LMLayerWorker from '#./index.js';
 
 import { configWorker, createMessageEventWithData, importScriptsWith } from '../../../../../test/resources/model-helpers.mjs';
 

@@ -15,7 +15,7 @@ import vm from 'vm';
 
 // // Verify that the KMW string extensions are loaded via side-effect.
 
-import extendString from '@keymanapp/web-utils/build/obj/kmwstring.js';
+import { extendString } from '@keymanapp/web-utils';
 
 import { createRequire } from "module";
 import { fileURLToPath } from 'url';

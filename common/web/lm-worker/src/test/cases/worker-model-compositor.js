@@ -2,9 +2,9 @@
  * Integration tests for the model compositor with the trie model.
  */
 
-import ModelCompositor from '../../../build/obj/model-compositor.js';
-import * as models from '../../../build/obj/models/index.js';
-import * as wordBreakers from '@keymanapp/models-wordbreakers/build/lib/index.mjs';
+import ModelCompositor from '#./model-compositor.js';
+import * as models from '#./models/index.js';
+import * as wordBreakers from '@keymanapp/models-wordbreakers/lib';
 
 import { assert } from 'chai';
 

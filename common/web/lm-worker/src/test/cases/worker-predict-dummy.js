@@ -3,7 +3,7 @@
  */
 
 import { assert } from 'chai';
-import DummyModel from '../../../build/obj/models/dummy-model.js';
+import DummyModel from '#./models/dummy-model.js';
 
 import { emptyContext, iGotDistractedByHazel, zeroTransform } from '../../../../../test/resources/model-helpers.mjs';
 

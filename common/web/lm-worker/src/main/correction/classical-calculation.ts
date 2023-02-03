@@ -1,4 +1,4 @@
-import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates/build/obj/index.js';
+import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
 
 type EditOperation = 'insert' | 'delete' | 'match' | 'substitute' | 'transpose-start' | 'transpose-end' | 'transpose-insert' | 'transpose-delete';
 

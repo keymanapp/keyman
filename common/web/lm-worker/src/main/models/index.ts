@@ -1,2 +1,2 @@
-export * from '@keymanapp/models-templates/build/obj/index.js';
+export * from '@keymanapp/models-templates';
 export { default as DummyModel } from './dummy-model.js';

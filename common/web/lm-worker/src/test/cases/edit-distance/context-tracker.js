@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 
-import { ContextTracker } from '../../../../build/obj/correction/context-tracker.js';
-import ModelCompositor from '../../../../build/obj/model-compositor.js';
-import * as models from '../../../../build/obj/models/index.js';
+import { ContextTracker } from '#./correction/context-tracker.js';
+import ModelCompositor from '#./model-compositor.js';
+import * as models from '#./models/index.js';
 
 import { jsonFixture } from '../../../../../../test/resources/model-helpers.mjs';
 

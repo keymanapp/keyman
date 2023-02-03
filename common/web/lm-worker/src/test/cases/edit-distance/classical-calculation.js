@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { ClassicalDistanceCalculation } from '../../../../build/obj/correction/classical-calculation.js';
+import { ClassicalDistanceCalculation } from '#./correction/classical-calculation.js';
 
 function prettyPrintMatrix(matrix) {
   for(let r = 0; r < matrix.length; r++) {

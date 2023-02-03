@@ -4,8 +4,8 @@
 
 import { assert } from 'chai';
 
-import DummyModel from '../../../build/obj/models/dummy-model.js';
-import ModelCompositor from '../../../build/obj/model-compositor.js';
+import DummyModel from '#./models/dummy-model.js';
+import ModelCompositor from '#./model-compositor.js';
 
 describe('Custom Punctuation', function () {
   it('appears in the keep suggestion', function () {
