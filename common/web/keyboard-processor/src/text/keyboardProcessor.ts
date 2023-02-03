@@ -83,6 +83,17 @@ export default class KeyboardProcessor {
     let globalThis = getGlobalObject();
     globalThis[KeyboardInterface.GLOBAL_NAME] = this.keyboardInterface;
 
+    // Maintains debug definitions - debug keyboard compilations refer to these code definitions.
+    //
+    // Note:  these are targeted for deprecation and is only included for legacy precompiled keyboards.
+    //
+    // Refer to C:\keymanapp\keyman\developer\src\tike\compile\CompileKeymanWeb.pas,
+    // TCompileKeymanWeb.JavaScript_SetupDebug.
+    const keyman = globalThis['keyman'] = globalThis['keyman'] || {};
+    const osk = keyman['osk'] || keyman['osk'] || {};  // does not otherwise exist when headless or detached from OSKs.
+    osk['modifierCodes'] = Codes.modifierCodes;
+    osk['keyCodes'] = Codes.keyCodes;
+
     // Ensure that the active keyboard is set on the keyboard interface object.
     if(this.activeKeyboard) {
       this.keyboardInterface.activeKeyboard = this.activeKeyboard;

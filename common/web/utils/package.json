@@ -34,6 +34,6 @@
   },
   "type": "module",
   "paths": {
-    "@keymanapp/keyman-version": "../../../node_modules/@keymanapp/keyman-version/build"
+    "@keymanapp/keyman-version": "*"
   }
 }

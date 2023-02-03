@@ -17,6 +17,7 @@
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "license": "MIT",
   "main": "index.js",
+  "type": "module",
   "types": "index.d.ts",
   "directories": {
     "test": "test"
@@ -32,8 +33,8 @@
     "url": "git+https://github.com/keymanapp/keyman.git"
   },
   "scripts": {
-    "build": "tsc",
-    "pretest": "tsc -b tsconfig.bundled.json",
+    "build": "gosh ./build.sh",
+    "tsc": "tsc",
     "test": "mocha -r test/helpers.js"
   },
   "bugs": {
@@ -50,6 +51,9 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
-    "@keymanapp/models-wordbreakers": "*"
+    "@keymanapp/keyman-version": "*",
+    "@keymanapp/models-types": "*",
+    "@keymanapp/models-wordbreakers": "*",
+    "@keymanapp/resources-gosh": "*"
   }
 }

@@ -2,8 +2,8 @@
  * Unit tests for the priority queue.
  */
 
-var assert = require('chai').assert;
-var PriorityQueue = require('../build/index.bundled.js').models.PriorityQueue;
+import { assert } from 'chai';
+import PriorityQueue from '../build/obj/priority-queue.js';
 
 describe('Priority queue', function() {
   it('can act as a min-heap', function () {

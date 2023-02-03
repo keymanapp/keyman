@@ -1,0 +1,38 @@
+/* Checkbox text to always show on-screen keyboard */
+"4UX-80-0Vo.title" = "ಯಾವಾಗಲೂ ತೆರೆಯ ಮೇಲೆ ಕೀಲಿಮಣೆ ತೋರಿಸು";
+
+/* Checkbox text to enable verbose Console logging */
+"7J6-zy-R20.title" = "ಹೆಚ್ಚಿನ ವಿವರಗಳನ್ನು ಕನ್ಸೋಲ್‌ನಲ್ಲಿ ದಾಖಲಿಸು";
+
+/* Support button text  */
+"93O-x6-RLF.label" = "ಸಹಾಯ";
+
+/* Download Keyboard button text */
+"CTw-kf-WNS.title" = "ಕೀಲಿಮಣೆ ಡೌನ್ಲೋಡ್ ಮಾಡಿ...";
+
+/* Keyman Configuration window title */
+"F0z-JX-Cv5.title" = "ಕೀಮ್ಯಾನ್ ಸಂರಚನೆ (ಕಾನ್ಫಿಗರೇಷನ್)";
+
+/* button text to go back to previous page */
+"JOK-JV-n8w.title" = "ಹಿಂದೆ";
+
+/* Keyboards button text */
+"MPN-9N-wWc.label" = "ಕೀಲಿಮಣೆಗಳು";
+
+/* text to explain verbose Console logging option */
+"MrI-GM-7d6.title" = "ವರ್ಬೋಸ್ ಲಾಗಿಂಗ್ ಆಯ್ಕೆಯು ಆನ್ ಆಗಿರುವಾಗ, ಕೀಮ್ಯಾನ್ (support) ಬೆಂಬಲವು ಸಮಸ್ಯೆಯನ್ನು ಪತ್ತೆಹಚ್ಚಲು ಸಹಾಯ ಮಾಡುವ ಕ್ರಿಯೆಗಳನ್ನು ಕೀಮ್ಯಾನ್ ಲಾಗ್ ಮಾಡುತ್ತದೆ. ಕೀಮ್ಯಾನ್‌ನಿಂದ ಸಂದೇಶಗಳ ಲಾಗ್ ಅನ್ನು ನೋಡಲು ಕನ್ಸೋಲ್ ಪ್ರೋಗ್ರಾಂ ಅನ್ನು ಬಳಸಬಹುದು. ಕನ್ಸೋಲ್‌ನಲ್ಲಿ, \"ಕೀಮ್ಯಾನ್\" ಪ್ರಕ್ರಿಯೆಯಿಂದ ಎಲ್ಲಾ ಸಂದೇಶಗಳನ್ನು ತೋರಿಸಲು ಫಿಲ್ಟರ್ ಮಾಡಿ. ಅಗತ್ಯವಿದ್ದರೆ ಈ ಲಾಗ್ ಅನ್ನು ರಫ್ತು ಮಾಡಬಹುದು ಮತ್ತು ಕೀಮ್ಯಾನ್ (support) ಬೆಂಬಲಕ್ಕೆ ಕಳುಹಿಸಬಹುದು.";
+
+/* button text to move forward to the next page */
+"eXr-8V-h1g.title" = "ಮುಂದಕ್ಕೆ";
+
+/* button text to return to the home help page */
+"fXS-aC-CMH.title" = "ಹೋಮ್";
+
+/* Options button text */
+"frd-No-seV.label" = "ಆಯ್ಕೆಗಳು";
+
+/* Installed Keyboard column heading */
+"jex-Nd-Qzg.headerCell.title" = "ಅನುಸ್ಥಾಪಿಸಲಾದ ಕೀಲಿಮಣೆಯನ್ನು";
+
+/* Verbose logging tooltip text */
+"uWx-3J-U0D.ibShadowedToolTip" = "ನಿರ್ದಿಷ್ಟ ಕೀಲಿಮಣೆ ಅಥವಾ ಸಾಮಾನ್ಯವಾಗಿ ಕೀಮ್ಯಾನ್‌ನೊಂದಿಗೆ ನೀವು ಸಮಸ್ಯೆಗಳನ್ನು ಹೊಂದಿದ್ದರೆ, ಇದನ್ನು ಆನ್ ಮಾಡಿ.";

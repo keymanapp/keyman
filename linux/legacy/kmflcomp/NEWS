@@ -1,6 +1,0 @@
-10.99
------
-
-kmflcomp now supports special stores added since Keyman version 6.0.
-However it does not support the newer syntax.
-Keyboards for Keyman > 6.0 which only use older syntax should compile

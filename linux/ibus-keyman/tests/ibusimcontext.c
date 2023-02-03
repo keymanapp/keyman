@@ -2,8 +2,8 @@
 /* vim:set et sts=4: */
 /* ibus - The Input Bus
  * Copyright (C) 2008-2013 Peng Huang <shawn.p.huang@gmail.com>
- * Copyright (C) 2015-2021 Takao Fujiwara <takao.fujiwara1@gmail.com>
- * Copyright (C) 2008-2021 Red Hat, Inc.
+ * Copyright (C) 2015-2022 Takao Fujiwara <takao.fujiwara1@gmail.com>
+ * Copyright (C) 2008-2022 Red Hat, Inc.
  * Copyright (C) 2021-2022 SIL International
  *
  * This library is free software; you can redistribute it and/or
@@ -23,9 +23,18 @@
  */
 
 // This file is based on https://github.com/ibus/ibus/blob/master/client/gtk2/ibusimcontext.c
+// commit 506ac9993d5166196b7c4e9bfa9fb0f9d3792ffa plus our two prefilter commits.
+// It simulates the GTK2 client, leaving out code for GTK3 and GTK4 and
+// simplyfying the code a bit by replacing async calls with direct synchronous
+// method calls.
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
+#endif
+
+#ifndef IBUS_HAS_PREFILTER
+#warning Compiling against ibus version that does not include prefilter mask patch (https://github.com/ibus/ibus/pull/2440). Output ordering guarantees will be disabled.
+#define IBUS_PREFILTER_MASK (1 << 23)
 #endif
 
 #include "ibusimcontext.h"
@@ -53,6 +62,7 @@ struct _IBusIMContext {
   GdkWindow *client_window;
 
   IBusInputContext *ibuscontext;
+  IBusInputContext *ibuscontext_needs_surrounding;
 
   GdkRectangle cursor_area;
   gboolean has_focus;
@@ -87,7 +97,6 @@ typedef struct _timeout_data {
 static GtkIMContext *_focus_im_context = NULL;
 static IBusInputContext *_fake_context = NULL;
 static GdkWindow *_input_window        = NULL;
-static GtkWidget *_input_widget        = NULL;
 
 /* functions prototype */
 static void ibus_im_context_class_init(IBusIMContextClass *class);
@@ -176,22 +185,6 @@ ibus_im_context_new(void) {
 }
 
 static gboolean
-_focus_in_cb(GtkWidget *widget, GdkEventFocus *event, gpointer user_data) {
-  if (_focus_im_context == NULL && _fake_context != NULL) {
-    ibus_input_context_focus_in(_fake_context);
-  }
-  return FALSE;
-}
-
-static gboolean
-_focus_out_cb(GtkWidget *widget, GdkEventFocus *event, gpointer user_data) {
-  if (_focus_im_context == NULL && _fake_context != NULL) {
-    ibus_input_context_focus_out(_fake_context);
-  }
-  return FALSE;
-}
-
-static gboolean
 ibus_im_context_commit_event(IBusIMContext *ibusimcontext, GdkEventKey *event) {
   IDEBUG("%s", __FUNCTION__);
   guint keyval          = 0;
@@ -220,17 +213,17 @@ ibus_im_context_commit_event(IBusIMContext *ibusimcontext, GdkEventKey *event) {
     IDEBUG("%s: text=%p", __FUNCTION__, text);
     _request_surrounding_text(ibusimcontext);
     _commit_text(ibusimcontext, text->text);
+    /* Avoid a loop with _ibus_context_forward_key_event_cb() */
+    event->state |= IBUS_HANDLED_MASK;
     return TRUE;
   }
   return FALSE;
 }
 
-struct _ProcessKeyEventData {
+typedef struct {
   GdkEvent *event;
   IBusIMContext *ibusimcontext;
-};
-
-typedef struct _ProcessKeyEventData ProcessKeyEventData;
+} ProcessKeyEventData;
 
 static void
 _process_key_event_done(GObject *object, GAsyncResult *res, gpointer user_data) {
@@ -250,6 +243,7 @@ _process_key_event_done(GObject *object, GAsyncResult *res, gpointer user_data) 
 
   if (retval == FALSE) {
     ((GdkEventKey *)event)->state |= IBUS_IGNORED_MASK;
+    ((GdkEventKey *)event)->state &= ~IBUS_PREFILTER_MASK;
     gdk_event_put(event);
   }
   gdk_event_free(event);
@@ -293,9 +287,19 @@ static void
 _request_surrounding_text(IBusIMContext *context) {
   if (context && (context->caps & IBUS_CAP_SURROUNDING_TEXT) != 0 && context->ibuscontext != NULL &&
       ibus_input_context_needs_surrounding_text(context->ibuscontext)) {
-    _retrieve_surrounding(context);
-  } else {
-    // g_debug("%s has no capability of surrounding-text feature", g_get_prgname());
+    gboolean return_value;
+    IDEBUG("requesting surrounding text");
+    return_value = _retrieve_surrounding(context);
+    if (!return_value) {
+      /* Engines can disable the surrounding text feature with
+       * the updated capabilities.
+       */
+      if (context->caps & IBUS_CAP_SURROUNDING_TEXT) {
+        context->caps &= ~IBUS_CAP_SURROUNDING_TEXT;
+        ibus_input_context_set_capabilities(context->ibuscontext, context->caps);
+      }
+      // g_debug("%s has no capability of surrounding-text feature", g_get_prgname());
+    }
   }
 }
 
@@ -309,20 +313,6 @@ _set_content_type(IBusIMContext *context) {
 
     ibus_input_context_set_content_type(context->ibuscontext, purpose, hints);
   }
-  return TRUE;
-}
-
-static gboolean
-_get_boolean_env(const gchar *name, gboolean defval) {
-  const gchar *value = g_getenv(name);
-
-  if (value == NULL)
-    return defval;
-
-  if (g_strcmp0(value, "") == 0 || g_strcmp0(value, "0") == 0 || g_strcmp0(value, "false") == 0 ||
-      g_strcmp0(value, "False") == 0 || g_strcmp0(value, "FALSE") == 0)
-    return FALSE;
-
   return TRUE;
 }
 
@@ -397,12 +387,17 @@ ibus_im_context_init(GObject *obj) {
   ibusimcontext->cursor_area.height = 0;
 
   ibusimcontext->ibuscontext = NULL;
+  ibusimcontext->ibuscontext_needs_surrounding = NULL;
   ibusimcontext->has_focus   = FALSE;
   ibusimcontext->time        = GDK_CURRENT_TIME;
   ibusimcontext->caps        = IBUS_CAP_FOCUS | IBUS_CAP_AUXILIARY_TEXT | IBUS_CAP_PROPERTY;
   if (surrounding_text_supported) {
     ibusimcontext->caps |= IBUS_CAP_SURROUNDING_TEXT;
   }
+
+#ifdef IBUS_HAS_PREFILTER
+  ibusimcontext->caps |= IBUS_CAP_PREFILTER;
+#endif
 
   ibusimcontext->events_queue = g_queue_new();
 
@@ -462,7 +457,7 @@ ibus_im_context_filter_keypress(GtkIMContext *context, GdkEventKey *event) {
   /* Do not call gtk_im_context_filter_keypress() because
    * gtk_im_context_simple_filter_keypress() binds Ctrl-Shift-u
    */
-  if (event->state & IBUS_IGNORED_MASK)
+  if (event->state & IBUS_IGNORED_MASK && !(event->state & IBUS_PREFILTER_MASK))
     return ibus_im_context_commit_event(ibusimcontext, event);
 
   /* XXX it is a workaround for some applications do not set client
@@ -952,9 +947,16 @@ _ibus_context_forward_key_event_cb(
       keycode = keys->keycode;
     else
       g_warning("Failed to parse keycode from keyval %x", keyval);
+    /* _create_gdk_event() will add 8 to keycode. */
+    if (keycode != 0)
+      keycode -= 8;
+  } else if (state & IBUS_PREFILTER_MASK) {
+    // _create_gdk_event() will add 8 to keycode
+    if (keycode != 0)
+      keycode -= 8;
   }
+
   GdkEventKey *event = _create_gdk_event(ibusimcontext, keyval, keycode, state);
-  gdk_event_put((GdkEvent *)event);
 
   if (!surrounding_text_supported && keyval == IBUS_KEY_BackSpace && ibusimcontext->text->len > 0) {
     int index = ibusimcontext->text->len - 1;
@@ -975,6 +977,10 @@ _ibus_context_forward_key_event_cb(
       }
     } while (index >= 0);
     g_string_erase(ibusimcontext->text, index, len);
+  } else if (state & IBUS_PREFILTER_MASK) {
+    gtk_im_context_filter_keypress((GtkIMContext *)ibusimcontext, event);
+  } else {
+    gdk_event_put((GdkEvent *)event);
   }
 
   gdk_event_free((GdkEvent *)event);
@@ -990,8 +996,16 @@ _ibus_context_delete_surrounding_text_cb(
   _delete_surrounding(ibusimcontext, offset_from_cursor, nchars);
 }
 
-static void
-_ibus_context_destroy_cb(IBusInputContext *ibuscontext, IBusIMContext *ibusimcontext) {
+static void _ibus_context_require_surrounding_text_cb(IBusInputContext * ibuscontext, IBusIMContext * ibusimcontext) {
+  IDEBUG("%s", __FUNCTION__);
+  g_assert(ibusimcontext->ibuscontext == ibuscontext);
+  if (ibusimcontext->ibuscontext_needs_surrounding == ibuscontext) {
+    _request_surrounding_text(ibusimcontext);
+    ibusimcontext->ibuscontext_needs_surrounding = NULL;
+  }
+}
+
+static void _ibus_context_destroy_cb(IBusInputContext * ibuscontext, IBusIMContext * ibusimcontext) {
   IDEBUG("%s", __FUNCTION__);
   g_assert(ibusimcontext->ibuscontext == ibuscontext);
 
@@ -1021,11 +1035,18 @@ _run_main_loop_with_timeout(IBusIMContext *ibusimcontext) {
 
 static void
 _create_input_context(IBusIMContext *ibusimcontext) {
+  gchar *prgname = g_strdup(g_get_prgname());
+  gchar *client_name;
   IDEBUG("%s", __FUNCTION__);
 
   g_assert(ibusimcontext->ibuscontext == NULL);
 
-  IBusInputContext *context = ibus_bus_create_input_context(_bus, "gtk-im");
+  if (!prgname)
+    prgname = g_strdup_printf("(%d)", getpid());
+  client_name = g_strdup_printf("%s:%s", "gtk-im", prgname);
+  g_free(prgname);
+  IBusInputContext *context = ibus_bus_create_input_context(_bus, client_name);
+  g_free(client_name);
   if (context == NULL) {
     g_warning("Create input context failed.");
   } else {
@@ -1036,6 +1057,9 @@ _create_input_context(IBusIMContext *ibusimcontext) {
         ibusimcontext->ibuscontext, "forward-key-event", G_CALLBACK(_ibus_context_forward_key_event_cb), ibusimcontext);
     g_signal_connect(
         ibusimcontext->ibuscontext, "delete-surrounding-text", G_CALLBACK(_ibus_context_delete_surrounding_text_cb),
+        ibusimcontext);
+    g_signal_connect(
+        ibusimcontext->ibuscontext, "require-surrounding-text", G_CALLBACK(_ibus_context_require_surrounding_text_cb),
         ibusimcontext);
     g_signal_connect(ibusimcontext->ibuscontext, "destroy", G_CALLBACK(_ibus_context_destroy_cb), ibusimcontext);
 
@@ -1051,6 +1075,11 @@ _create_input_context(IBusIMContext *ibusimcontext) {
 
       ibus_input_context_focus_in(ibusimcontext->ibuscontext);
       _set_cursor_location_internal(ibusimcontext);
+      if (ibus_input_context_needs_surrounding_text(ibusimcontext->ibuscontext)) {
+        _request_surrounding_text(ibusimcontext);
+      } else {
+        ibusimcontext->ibuscontext_needs_surrounding = ibusimcontext->ibuscontext;
+      }
     }
 
     if (!g_queue_is_empty(ibusimcontext->events_queue)) {
