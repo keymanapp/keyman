@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"outDir": "../../../build/app/ui/obj",
+		"rootDir": ""
+  },
+  "extends": "../../tsconfig.base.json",
+  "files": [
+		"kmwuibutton.ts",
+		"kmwuifloat.ts",
+		"kmwuitoggle.ts",
+		"kmwuitoolbar.ts"
+  ]
+}

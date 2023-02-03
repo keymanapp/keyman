@@ -314,8 +314,7 @@ type
     procedure EnableLexicalModelTabControls;
     procedure ShowEditLanguageForm(grid: TStringGrid;
       langs: TPackageKeyboardLanguageList; lang: TPackageKeyboardLanguage);
-    function ShowAddLanguageForm(grid: TStringGrid;
-      langs: TPackageKeyboardLanguageList): Boolean;
+    procedure ShowAddLanguageForm(grid: TStringGrid; langs: TPackageKeyboardLanguageList);
     procedure RefreshLexicalModelList;
     procedure UpdateQRCode;
 
@@ -1624,6 +1623,8 @@ procedure TfrmPackageEditor.EnableControls;
 begin
   EnableStartMenuControls;
   EnableDetailsTabControls;
+  EnableKeyboardTabControls;
+  EnableLexicalModelTabControls;
   EnableCompileTabControls;
 end;
 
@@ -1686,35 +1687,16 @@ end;
 procedure TfrmPackageEditor.cmdKeyboardAddLanguageClick(Sender: TObject);
 var
   k: TPackageKeyboard;
-  lang: TPackageKeyboardLanguage;
-  frm: TfrmSelectBCP47Language;
 begin
   k := SelectedKeyboard;
   Assert(Assigned(k));
-
-  frm := TfrmSelectBCP47Language.Create(Application.MainForm);
-  try
-    if frm.ShowModal = mrOk then
-    begin
-      lang := TPackageKeyboardLanguage.Create(pack);
-      lang.ID := frm.LanguageID;
-      lang.Name := frm.LanguageName;
-      k.Languages.Add(lang);
-      RefreshKeyboardLanguageList(k);
-      gridKeyboardLanguages.Row := gridKeyboardLanguages.RowCount - 1;
-      gridKeyboardLanguagesClick(gridKeyboardLanguages);
-      Modified := True;
-    end;
-  finally
-    frm.Free;
-  end;
+  ShowAddLanguageForm(gridKeyboardLanguages, k.Languages);
 end;
 
 procedure TfrmPackageEditor.cmdKeyboardEditLanguageClick(Sender: TObject);
 var
   k: TPackageKeyboard;
   lang: TPackageKeyboardLanguage;
-  frm: TfrmSelectBCP47Language;
 begin
   k := SelectedKeyboard;
   Assert(Assigned(k));
@@ -1722,20 +1704,7 @@ begin
   lang := SelectedKeyboardLanguage;
   Assert(Assigned(lang));
 
-  frm := TfrmSelectBCP47Language.Create(Application.MainForm);
-  try
-    frm.LanguageID := lang.ID;
-    frm.LanguageName := lang.Name;
-    if frm.ShowModal = mrOk then
-    begin
-      lang.ID := frm.LanguageID;
-      lang.Name := frm.LanguageName;
-      RefreshKeyboardLanguageList(k);
-      Modified := True;
-    end;
-  finally
-    frm.Free;
-  end;
+  ShowEditLanguageForm(gridKeyboardLanguages, k.Languages, lang);
 end;
 
 procedure TfrmPackageEditor.cmdKeyboardRemoveLanguageClick(Sender: TObject);
@@ -1819,16 +1788,25 @@ begin
   end;
 end;
 
-function TfrmPackageEditor.ShowAddLanguageForm(grid: TStringGrid; langs: TPackageKeyboardLanguageList): Boolean;
+procedure TfrmPackageEditor.ShowAddLanguageForm(grid: TStringGrid; langs: TPackageKeyboardLanguageList);
 var
   lang: TPackageKeyboardLanguage;
   frm: TfrmSelectBCP47Language;
+  n: Integer;
 begin
-  Result := False;
   frm := TfrmSelectBCP47Language.Create(Application.MainForm);
   try
     if frm.ShowModal = mrOk then
     begin
+      n := langs.IndexOfID(frm.LanguageID);
+      if n >= 0 then
+      begin
+        // Duplicate - we won't re-add the item, just select the existing item
+        grid.Row := n + 1;
+        EnableControls;
+        Exit;
+      end;
+
       lang := TPackageKeyboardLanguage.Create(pack);
       lang.ID := frm.LanguageID;
       lang.Name := frm.LanguageName;
@@ -1836,7 +1814,7 @@ begin
       RefreshLanguageList(grid, langs);
       grid.Row := grid.RowCount - 1;
       Modified := True;
-      Result := True;
+      EnableControls;
     end;
   finally
     frm.Free;
@@ -1846,6 +1824,7 @@ end;
 procedure TfrmPackageEditor.ShowEditLanguageForm(grid: TStringGrid; langs: TPackageKeyboardLanguageList; lang: TPackageKeyboardLanguage);
 var
   frm: TfrmSelectBCP47Language;
+  n: Integer;
 begin
   frm := TfrmSelectBCP47Language.Create(Application.MainForm);
   try
@@ -1853,9 +1832,30 @@ begin
     frm.LanguageName := lang.Name;
     if frm.ShowModal = mrOk then
     begin
+      if not SameText(frm.LanguageID, lang.ID) then
+      begin
+        // If the id has changed, check for duplicates
+        n := langs.IndexOfID(frm.LanguageID);
+        if n >= 0 then
+        begin
+          // Duplicate - we will delete the edited one and select the existing
+          // one
+          langs.Remove(lang);
+          RefreshLanguageList(grid, langs);
+
+          // The index may have changed, search again
+          n := langs.IndexOfID(frm.LanguageID);
+          grid.Row := n + 1;
+          EnableControls;
+          Modified := True;
+          Exit;
+        end;
+      end;
+
       lang.ID := frm.LanguageID;
       lang.Name := frm.LanguageName;
       RefreshLanguageList(grid, langs);
+      EnableControls;
       Modified := True;
     end;
   finally
@@ -2005,10 +2005,7 @@ var
 begin
   lm := SelectedLexicalModel;
   Assert(Assigned(lm));
-
-  if ShowAddLanguageForm(gridLexicalModelLanguages, lm.Languages) then
-    gridLexicalModelLanguagesClick(gridLexicalModelLanguages);
-  EnableLexicalModelTabControls;
+  ShowAddLanguageForm(gridLexicalModelLanguages, lm.Languages);
 end;
 
 procedure TfrmPackageEditor.cmdLexicalModelLanguageEditClick(Sender: TObject);

@@ -98,10 +98,7 @@ Restart now?</string>
   <!-- Parameters: %0:s: filename -->
   <string name="ssDownloadingText">Downloading %0:s</string>
 
-  <string name="ssOffline">$APPNAME Setup could not connect to keyman.com to download additional resources.
-
-Please check that you are online, and give $APPNAME Setup permission to access the Internet in your firewall settings.
-
-Click Abort to exit Setup, Retry to try and download resources again, or Ignore to continue offline.</string>
-
+  <string name="ssOffline">$APPNAME Setup could not connect to keyman.com to download additional resources.</string>
+  <string name="ssOffline2">Please check that you are online, and give $APPNAME Setup permission to access the Internet in your firewall settings.</string>
+  <string name="ssOffline3">Click Abort to exit Setup, Retry to try and download resources again, or Ignore to continue offline.</string>
 </resources>

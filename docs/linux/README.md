@@ -6,9 +6,6 @@
   and view information about Keyman keyboard packages.
 - [ibus-keyman](../../linux/ibus-keyman) - IBUS integration to use .kmp Keyman keyboards
 - [core](../../core) - common keyboardprocessor library
-- [legacy/kmflcomp](../../linux/legacy/kmflcomp) - KMFL keyboard compiler
-- [legacy/libkmfl](../../linux/legacy/libkmfl) - older KMFL core library
-- [legacy/ibus-kmfl](../../linux/legacy/ibus-kmfl) - IBUS integration to use KMFL
 
 See [license information](../../linux/LICENSE.md) about licensing.
 

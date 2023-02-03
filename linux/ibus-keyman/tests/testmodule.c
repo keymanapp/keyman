@@ -5,6 +5,10 @@
 #include <ibus.h>
 #include "testmodule.h"
 
+static GType test_module_get_type(void);
+
+#define TEST_TYPE_MODULE (test_module_get_type())
+
 static gboolean
 test_module_load(GTypeModule *module) {
   TestModule *test_module = TEST_MODULE(module);

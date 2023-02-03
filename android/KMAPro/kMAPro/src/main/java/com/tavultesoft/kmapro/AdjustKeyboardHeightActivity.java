@@ -19,8 +19,8 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
-import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.KMManager;
+import com.keyman.engine.BaseActivity;
+import com.keyman.engine.KMManager;
 
 /**
  * Settings menu for adjusting the keyboard height. The value for the current device orientation

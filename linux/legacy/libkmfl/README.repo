@@ -1,3 +1,0 @@
-You need autoconf, automake and libtool to generate the build system
-
-Run ./autogen.sh to run them

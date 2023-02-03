@@ -12,19 +12,14 @@ project('keyboardprocessor', 'cpp', 'c',
                            'cpp_std=c++14',
                            'b_vscrt=static_from_buildtype',
                            'warning_level=2'],
-        meson_version: '>=0.45.0')
+        meson_version: '>=0.53.0')
 
 compiler = meson.get_compiler('cpp')
 
 lib_version = '0.0.0'
 
-if meson.version().version_compare('>=0.46')
-  py = import('python')
-  python = py.find_installation()
-else
-  py = import('python3')
-  python = py.find_python()
-endif
+py = import('python')
+python = py.find_installation()
 
 # Once we can assume meson 0.60 we can delete this
 # (https://mesonbuild.com/Release-notes-for-0-60-0.html#msvc-compiler-now-assumes-utf8-source-code-by-default)
