@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <!-- app_name removed in 16.0 beta. Set in build.gradle -->
   <!-- Context: Menu Action -->
   <string name="action_share" comment="Menu action to send text content to another app">Gassuma</string>
   <!-- Context: Menu Action -->

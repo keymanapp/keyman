@@ -1,5 +1,87 @@
 # Keyman Version History
 
+## 17.0.41 alpha 2023-02-02
+
+* chore(web): main web build & test script rework to our common script format + nomenclature (#7474)
+* change(web): conversion to standard filesystem layout:  source -> src, intermediate + release -> build (#7513)
+* change(web): conversion to standard filesystem layout:  testing -> src/test/manual, unit_tests -> src/test/auto (#7515)
+* change(web): conversion to standard filesystem layout:  tools -> src/tools (#7556)
+* chore(web): updates build product references, extracts CI test-build scripts (#7831)
+* feat(common): TS-based sourcemap remapping tool (#7894)
+* feat(web): implements shell scripting for CI release-build configurations (#8001)
+
+## 17.0.40 alpha 2023-02-01
+
+* chore(developer): kmcmpdll debug src path (#8127)
+* chore(common): Merge end of beta from Sprint A17S5 (#8135)
+* refactor(android): Change com.tavultesoft.kmea package to com.keyman.engine (#7981)
+* refactor(android/engine): Split KMInAppKeyboardWebViewClient to new class (#7983)
+* refactor(android/engine): Refactor KMSystemKeyboardWebViewClient (#7993)
+
+## 17.0.39 alpha 2023-01-31
+
+* feat(windows): add additional registry keys to report (#8126)
+
+## 17.0.38 alpha 2023-01-30
+
+* chore(deps): bump ua-parser-js from 0.7.31 to 0.7.33 (#8109)
+* fix(linux): Fix CI build (#8121)
+
+## 17.0.37 alpha 2023-01-27
+
+* chore(linux): Fix warnings (#8103)
+* chore(linux): Remove legacy projects (#8102)
+* Specify the path to the Debian package in the Vcs-Git header (#8104)
+
+## 17.0.36 alpha 2023-01-26
+
+* chore(common): Add crowdin strings for Kannada (#8074)
+
+## 17.0.35 alpha 2023-01-25
+
+* chore(common): revise tag variable name to VERSION_GIT_TAG (#8063)
+* chore(common): Add crowdin strings for Czech (#8070)
+* feat(linux): Improve uninstallation (#8011)
+
+## 17.0.34 alpha 2023-01-24
+
+* chore: merge beta to alpha, end of A17S4 (#8065)
+
+## 17.0.33 alpha 2023-01-23
+
+* chore: Xcode 14.2 update (#8015)
+
+## 17.0.32 alpha 2023-01-20
+
+* fix(ios): use mobile mode for keyboard download pages (#8042)
+* docs(common/resources): Update configure step in Docker readme (#8034)
+* fix(linux): JSON File missing after installation (#8040)
+
+## 17.0.31 alpha 2023-01-19
+
+* chore: git tag with release@semver (#8035)
+* fix(linux): Properly set context after changing IP (#8026)
+* chore(linux): use faster zero-length string check (#8037)
+* chore(linux): log failures to `km_kbp_context_clear(context)` (#8036)
+* chore(linux): Update recommended extension (#8038)
+
+## 17.0.30 alpha 2023-01-17
+
+* chore(linux): Fix vertical alignment of label (#8016)
+* fix(common): update sentry release identifiers to support semver (#8031)
+
+## 17.0.29 alpha 2023-01-16
+
+* fix(linux): Fix crash (un-)installing shared keyboard (#8020)
+* chore(linux): Don't report KeyboardInterrupt to Sentry (#8021)
+* chore(linux): Update sample settings (#8018)
+* feat(linux): Enhance tab completion in km-package-install (#8005)
+
+## 17.0.28 alpha 2023-01-12
+
+* feat(linux): Display error messages in the UI (#8006)
+* bug(linux): Empty keyboard after failed installation (#8008)
+
 ## 17.0.27 alpha 2023-01-11
 
 * chore(linux): Refactor completion script (#8002)
@@ -66,7 +148,7 @@
 ## 17.0.13 alpha 2022-11-29
 
 * fix(windows): lower case filenames for projects (#7837)
-* refactor(linux): Refactor setting keyboard options  ️ (#7804)
+* refactor(linux): Refactor setting keyboard options (#7804)
 
 ## 17.0.12 alpha 2022-11-25
 
@@ -74,7 +156,7 @@
 
 ## 17.0.11 alpha 2022-11-24
 
-* refactor(linux): Use consts instead of strings  ️ (#7803)
+* refactor(linux): Use consts instead of strings (#7803)
 
 ## 17.0.10 alpha 2022-11-21
 
@@ -95,14 +177,14 @@
 
 * chore: fix TIER.md for master (#7704)
 
-## 17.0.6 beta 2022-11-12
+## 17.0.6 alpha 2022-11-12
 
 * chore: merge beta to master B16S1 (#7693)
 * chore(deps): bump minimatch from 3.0.4 to 3.1.2 (#7675)
 
 ## 17.0.5 alpha 2022-11-11
 
-* chore(linux): Update debian changelog :cherries: (#7681)
+* chore(linux): Update debian changelog (#7681)
 
 ## 17.0.4 alpha 2022-11-10
 
@@ -122,6 +204,43 @@
 * feat(windows): configuration UI polish (#7206)
 * chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
+
+## 16.0.136 beta 2023-01-31
+
+* chore(common): Update crowdin strings for Shuwa (Latin) (#8097)
+* chore(common): Check in crowdin for Russian (#8072)
+* chore(common): Check in crowdin for Ukrainian (#8073)
+* chore(common): Add crowdin for Swedish (#8071)
+* chore(common): Add crowdin strings for Czech (#8095)
+
+## 16.0.135 beta 2023-01-30
+
+* chore(linux): Include packaging path in Vcs-Git header (#8110)
+
+## 16.0.134 beta 2023-01-25
+
+* chore(common): Add crowdin strings for Kannada (#7970)
+
+## 16.0.133 beta 2023-01-19
+
+* fix(linux): Properly set context after changing IP (#8025)
+
+## 16.0.132 beta 2023-01-18
+
+* docs(windows): update screenshots and documentation for Keyman for Windows config (#8014)
+
+## 16.0.131 beta 2023-01-16
+
+* chore(linux): Don't report KeyboardInterrupt to Sentry (#8022)
+* fix(linux): Fix crash (un-)installing shared keyboard (#8019)
+
+## 16.0.130 beta 2023-01-09
+
+* fix(windows): kmshell -ikl install language and enable keyboard (#7856)
+
+## 16.0.129 beta 2023-01-06
+
+* fix(android/engine): Add utility for localized strings (#7976)
 
 ## 16.0.128 beta 2022-12-22
 

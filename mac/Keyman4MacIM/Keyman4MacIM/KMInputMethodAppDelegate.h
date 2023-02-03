@@ -31,6 +31,7 @@ typedef struct {
     NSString *sentryEnvironment;
     NSString *versionRelease;
     NSString *versionWithTag;
+    NSString *versionGitTag;
     NSString *tier;
     NSString *keymanCom;
     NSString *helpKeymanCom;

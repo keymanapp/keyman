@@ -74,6 +74,12 @@ class DownloadKmpWindow(Gtk.Dialog):
             self.response(Gtk.ResponseType.OK)
             self.close()
             return True
+        logging.error(_("Downloading kmp file failed"))
+        dialog = Gtk.MessageDialog(
+                  self, 0, Gtk.MessageType.ERROR,
+                  Gtk.ButtonsType.OK, _("Downloading keyboard file failed"))
+        dialog.run()
+        dialog.destroy()
         return False
 
     def _keyman_policy(self, web_view, decision, decision_type):

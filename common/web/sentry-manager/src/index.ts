@@ -232,7 +232,7 @@ namespace com.keyman {
         // Not using beforeBreadcrumb because that caused breadcrumbs to get lost in Sentry
         debug: DEBUG,
         dsn: 'https://cf96f32d107c4286ab2fd82af49c4d3b@o1005580.ingest.sentry.io/5983524', // keyman-web DSN
-        release: com.keyman.KEYMAN_VERSION.SENTRY_RELEASE,
+        release: com.keyman.KEYMAN_VERSION.VERSION_GIT_TAG,
         environment: com.keyman.KEYMAN_VERSION.VERSION_ENVIRONMENT,
       });
 

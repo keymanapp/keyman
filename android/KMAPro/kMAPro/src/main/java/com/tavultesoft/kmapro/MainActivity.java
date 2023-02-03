@@ -18,29 +18,29 @@ import java.util.List;
 import java.util.Map;
 
 import com.keyman.android.CheckInstallReferrer;
-import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.KMHelpFileActivity;
-import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KMManager.KeyboardType;
-import com.tavultesoft.kmea.KmpInstallMode;
-import com.tavultesoft.kmea.KMTextView;
-import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
-import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
-import com.tavultesoft.kmea.cloud.CloudApiTypes;
-import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
-import com.tavultesoft.kmea.cloud.impl.CloudLexicalModelMetaDataDownloadCallback;
-import com.tavultesoft.kmea.data.CloudRepository;
-import com.tavultesoft.kmea.data.Dataset;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.data.LexicalModel;
-import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.DownloadFileUtils;
+import com.keyman.engine.BaseActivity;
+import com.keyman.engine.KMHelpFileActivity;
+import com.keyman.engine.KMKeyboardDownloaderActivity;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.KMManager.KeyboardType;
+import com.keyman.engine.KmpInstallMode;
+import com.keyman.engine.KMTextView;
+import com.keyman.engine.KeyboardEventHandler.OnKeyboardDownloadEventListener;
+import com.keyman.engine.KeyboardEventHandler.OnKeyboardEventListener;
+import com.keyman.engine.cloud.CloudApiTypes;
+import com.keyman.engine.cloud.CloudDownloadMgr;
+import com.keyman.engine.cloud.impl.CloudLexicalModelMetaDataDownloadCallback;
+import com.keyman.engine.data.CloudRepository;
+import com.keyman.engine.data.Dataset;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.data.LexicalModel;
+import com.keyman.engine.util.FileUtils;
+import com.keyman.engine.util.DownloadFileUtils;
 import com.keyman.android.DownloadIntentService;
-import com.tavultesoft.kmea.util.KMLog;
-import com.tavultesoft.kmea.util.KMPLink;
-import com.tavultesoft.kmea.util.KMString;
-import com.tavultesoft.kmea.util.WebViewUtils.EngineWebViewVersionStatus;
+import com.keyman.engine.util.KMLog;
+import com.keyman.engine.util.KMPLink;
+import com.keyman.engine.util.KMString;
+import com.keyman.engine.util.WebViewUtils.EngineWebViewVersionStatus;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -131,7 +131,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     checkSendCrashReport();
     if (KMManager.getMaySendCrashReport()) {
       SentryAndroid.init(context, options -> {
-        options.setRelease("release-" + com.tavultesoft.kmapro.BuildConfig.VERSION_NAME);
+        options.setRelease(com.tavultesoft.kmapro.BuildConfig.VERSION_GIT_TAG);
         options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.VERSION_ENVIRONMENT);
       });
     }
