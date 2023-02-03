@@ -1,6 +1,6 @@
 #pragma once
 
-#include <compfile.h>
+#include "compfile.h"
 
 namespace kmcmp {
   KMX_BOOL AddCompileWarning(LPSTR buf);

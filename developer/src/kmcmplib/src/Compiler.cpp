@@ -66,12 +66,12 @@
 */
 #include "pch.h"
 
-#include <compfile.h>
+#include "compfile.h"
 #include <comperr.h>
 #include "../../../../common/windows/cpp/include/vkeys.h"
 #include <cuchar>
 #include <versioning.h>
-#include <kmcmpdll.h>
+#include "kmcmpdll.h"
 #include <DeprecationChecks.h>
 
 #include "virtualcharkeys.h"

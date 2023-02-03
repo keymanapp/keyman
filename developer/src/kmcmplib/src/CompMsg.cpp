@@ -110,7 +110,8 @@ const struct CompilerError CompilerErrors[] = {
     { CERR_DuplicateGroup                                , "A group with this name has already been defined."},
     { CERR_DuplicateStore                                , "A store with this name has already been defined."},
     { CERR_RepeatedBegin                                 , "Begin has already been set"},
-    { CHINT_FilenameHasDifferingCase                     , "HINT: Casing differences may fail on some platforms."},
+    { CHINT_FilenameHasDifferingCase                     , "Casing differences may fail on some platforms."},
+    { CHINT_UnreachableRule                              , "This rule will never be matched as another rule takes precedence"},
 
     { 0, nullptr }
   };

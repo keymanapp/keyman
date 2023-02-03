@@ -81,8 +81,8 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   }
 
 #if defined(_WIN32) || defined(_WIN64)
-  // convert char16_t to wchar_t*
-  //  char16_t -> std::u16string
+  //  convert char16_t*  -> std::u16string -> std::string -> std::wstring -> wchar_t*
+  //  char16_t* -> std::u16string
   std::u16string u16str(Name);
   //  std::u16string -> std::string
   std::string stri = string_from_u16string(u16str);
