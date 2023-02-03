@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import PromiseStore from '../../build/obj/promise-store.js';
-import { randomToken } from '../../../../common/test/resources/model-helpers.mjs';
+import PromiseStore from '#./promise-store.js';
+import { randomToken } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
 describe('PromiseStore', function () {
   describe('.make()', function () {

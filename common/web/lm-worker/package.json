@@ -4,7 +4,9 @@
   "main": "./build/lib/worker-main.wrapped.js",
   "exports": {
     "./worker-main.wrapped.js": "./build/lib/worker-main.wrapped.js",
-    "./worker-main.wrapped.min.js": "./build/lib/worker-main.wrapped.min.js"
+    "./build/lib/worker-main.wrapped.js": "./build/lib/worker-main.wrapped.js",
+    "./worker-main.wrapped.min.js": "./build/lib/worker-main.wrapped.min.js",
+    "./build/lib/worker-main.wrapped.min.js": "./build/lib/worker-main.wrapped.min.js"
   },
   "imports": {
     "#./*.js": "./build/obj/*.js",
