@@ -7,8 +7,6 @@
 # Exit on command failure and when using unset variables:
 set -eu
 
-# Include some helper functions from resources
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
