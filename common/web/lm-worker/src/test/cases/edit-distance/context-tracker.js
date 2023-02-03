@@ -4,7 +4,7 @@ import { ContextTracker } from '#./correction/context-tracker.js';
 import ModelCompositor from '#./model-compositor.js';
 import * as models from '#./models/index.js';
 
-import { jsonFixture } from '../../../../../../test/resources/model-helpers.mjs';
+import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
 describe('ContextTracker', function() {
   function toWrapperDistribution(transform) {

@@ -8,7 +8,7 @@ import * as wordBreakers from '@keymanapp/models-wordbreakers/lib';
 
 import { assert } from 'chai';
 
-import { jsonFixture } from '../../../../../test/resources/model-helpers.mjs';
+import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
 var TrieModel = models.TrieModel;
 

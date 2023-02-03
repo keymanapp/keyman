@@ -1,10 +1,13 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
 import LMLayerWorker from '#./index.js';
 
 import { configWorker, createMessageEventWithData, emptyContext, iGotDistractedByHazel,
-         importScriptsWith, randomToken, zeroTransform } from '../../../../../test/resources/model-helpers.mjs';
+         importScriptsWith, randomToken, zeroTransform } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
 describe('LMLayerWorker', function () {
   describe('#predict()', function () {
@@ -43,7 +46,7 @@ describe('LMLayerWorker', function () {
         message: 'load',
         source: {
           type: 'file',
-          file: "../../test/resources/models/simple-dummy.js"
+          file: require.resolve("@keymanapp/common-test-resources/models/simple-dummy.js")
         }
       }));
       sinon.assert.calledWithMatch(fakePostMessage.lastCall, {
