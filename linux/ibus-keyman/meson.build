@@ -14,12 +14,12 @@ gtk =         dependency('gtk+-3.0',             version: '>= 2.4')
 x11 =         dependency('x11',                  version: '>= 1.6')
 json_glib =   dependency('json-glib-1.0',        version: '>= 1.0')
 
+core_dir = meson.current_source_dir() / '../../core'
+common_dir = meson.current_source_dir() / '../../common'
+
 kmnkbp_lib = cc.find_library(
   'libkmnkbp0',
-  dirs: [
-    '@0@/../../core/build/arch/debug/src'.format(meson.current_source_dir()),
-    '@0@/../../core/build/arch/release/src'.format(meson.current_source_dir())
-  ]
+  dirs: [ core_dir / 'build/arch' / get_option('buildtype') / 'src' ]
 )
 
 env = find_program('env')

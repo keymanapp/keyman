@@ -5,10 +5,15 @@ keymanutil_sources = [
 
 keymanutil_deps = [ibus, gtk, x11, json_glib, kmnkbp_lib]
 
+test_env = [
+  'G_TEST_SRCDIR=' + meson.current_source_dir(),
+  'G_TEST_BUILDDIR=' + meson.current_build_dir(),
+]
+
 test_include_dirs = [
   include_dirs,
   include_directories('..'),
-  include_directories('@0@/..'.format(meson.current_build_dir())),
+  include_directories(meson.current_build_dir() / '..'),
 ]
 
 executable(
@@ -21,10 +26,7 @@ executable(
 test(
   'keymanutil-tests',
   find_program('run-tests.sh'),
-  env: [
-    'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
-    'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),
-  ],
+  env: test_env,
   protocol: 'tap',
 )
 
@@ -39,11 +41,8 @@ test(
     dependencies: [ json_glib ],
     include_directories: test_include_dirs
   ),
-  args: [ '@0@'.format(meson.current_source_dir()) ],
-  env: [
-    'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
-    'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),
-  ],
+  args: [ meson.current_source_dir() ],
+  env: test_env,
   protocol: 'exitcode',
 )
 
@@ -57,10 +56,7 @@ test(
     dependencies: [ json_glib ],
     include_directories: test_include_dirs
   ),
-  args: [ join_paths('@0@'.format(meson.current_source_dir()), 'kmp.json') ],
-  env: [
-    'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
-    'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),
-  ],
+  args: [ meson.current_source_dir() / 'kmp.json' ],
+  env: test_env,
   protocol: 'exitcode',
 )

@@ -6,15 +6,21 @@ test_files = [
   'testmodule.h',
 ]
 
+kmx_dir = [
+  core_dir / 'build/arch' / get_option('buildtype') / 'tests/unit/kmx'
+]
+
 kmnkbp_tests_lib = cc.find_library(
   'libkmnkbp-tests',
-  dirs: [
-    '@0@/../../../core/build/arch/debug/tests/unit/kmx'.format(meson.current_source_dir()),
-    '@0@/../../../core/build/arch/release/tests/unit/kmx'.format(meson.current_source_dir())
-  ]
+  dirs: kmx_dir
 )
 
 deps = [ibus, gtk, x11, json_glib, kmnkbp_lib, kmnkbp_tests_lib]
+
+test_env = [
+  'G_TEST_SRCDIR=' + meson.current_source_dir(),
+  'G_TEST_BUILDDIR=' + meson.current_build_dir(),
+]
 
 test_include_dirs = [
   core_include_dirs,
@@ -33,19 +39,16 @@ test_exe = executable(
 env_file = '/tmp/env.txt'
 pid_file = '/tmp/ibus-keyman-test-pids'
 
-setup_tests = find_program('setup-tests.sh', dirs: [join_paths(meson.current_source_dir(), 'scripts')])
-teardown_tests = find_program('teardown-tests.sh', dirs: [join_paths(meson.current_source_dir(), 'scripts')])
-run_test = find_program('run-single-test.sh', dirs: [join_paths(meson.current_source_dir(), 'scripts')])
-find_tests = find_program('find-tests.sh', dirs: [join_paths(meson.current_source_dir(), 'scripts')])
+setup_tests = find_program('setup-tests.sh', dirs: [meson.current_source_dir() / 'scripts'])
+teardown_tests = find_program('teardown-tests.sh', dirs: [meson.current_source_dir() / 'scripts'])
+run_test = find_program('run-single-test.sh', dirs: [meson.current_source_dir() / 'scripts'])
+find_tests = find_program('find-tests.sh', dirs: [meson.current_source_dir() / 'scripts'])
 
 test(
   'setup-x11',
   setup_tests,
   args: ['--x11', env_file, pid_file],
-  env: [
-    'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
-    'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),
-  ],
+  env: test_env,
   priority: -10,
   is_parallel: false,
   protocol: 'exitcode'
@@ -55,10 +58,7 @@ test(
   'setup-wayland',
   setup_tests,
   args: ['--wayland', env_file, pid_file],
-  env: [
-    'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
-    'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),
-  ],
+  env: test_env,
   priority: -20,
   is_parallel: false,
   protocol: 'exitcode'
@@ -82,13 +82,9 @@ test(
   protocol: 'exitcode'
 )
 
-kmx_dirs = [
-  join_paths(meson.current_source_dir(), '../../../core/build/arch/debug/tests/unit/kmx'),
-  join_paths(meson.current_source_dir(), '../../../core/build/arch/release/tests/unit/kmx')
-]
 kmxtest_files = run_command(
   find_tests,
-  kmx_dirs,
+  kmx_dir,
   check: true,
 ).stdout().split('\n')
 
@@ -103,10 +99,7 @@ foreach kmx: kmxtest_files
     'X11-' + testname + '__surrounding-text',
     run_test,
     args: [ '--x11', '--surrounding-text', test_args],
-    env: [
-      'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
-      'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),
-    ],
+    env: test_env,
     depends: [test_exe],
     priority: -11,
     is_parallel: false,
@@ -117,10 +110,7 @@ foreach kmx: kmxtest_files
     'X11-' + testname + '__no-surrounding-text',
     run_test,
     args: [ '--x11', '--no-surrounding-text', test_args],
-    env: [
-      'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
-      'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),
-    ],
+    env: test_env,
     depends: [test_exe],
     priority: -12,
     is_parallel: false,
@@ -131,10 +121,7 @@ foreach kmx: kmxtest_files
     'Wayland-' + testname + '__surrounding-text',
     run_test,
     args: [ '--wayland', '--surrounding-text', test_args],
-    env: [
-      'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
-      'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),
-    ],
+    env: test_env,
     depends: [test_exe],
     priority: -21,
     is_parallel: false,
@@ -145,10 +132,7 @@ foreach kmx: kmxtest_files
     'Wayland-' + testname + '__no-surrounding-text',
     run_test,
     args: [ '--wayland', '--no-surrounding-text', test_args],
-    env: [
-      'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
-      'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),
-    ],
+    env: test_env,
     depends: [test_exe],
     priority: -22,
     is_parallel: false,

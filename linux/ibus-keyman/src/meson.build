@@ -17,7 +17,7 @@ engine_files = files(
 include_dirs = [
   core_include_dirs,
   include_directories('..'),
-  include_directories('@0@/..'.format(meson.current_build_dir())),
+  include_directories(meson.current_build_dir() / '..'),
 ]
 
 deps = [ibus, gtk, x11, json_glib, kmnkbp_lib]
@@ -25,7 +25,7 @@ deps = [ibus, gtk, x11, json_glib, kmnkbp_lib]
 prefix = get_option('prefix')
 cfg = configuration_data()
 cfg.set('VERSION', meson.project_version())
-cfg.set('libexecdir', join_paths(prefix, get_option('libexecdir')))
+cfg.set('libexecdir', prefix / get_option('libexecdir'))
 
 configure_file(
   configuration: cfg,
