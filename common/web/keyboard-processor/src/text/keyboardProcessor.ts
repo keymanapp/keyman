@@ -90,7 +90,7 @@ export default class KeyboardProcessor {
     // Refer to C:\keymanapp\keyman\developer\src\tike\compile\CompileKeymanWeb.pas,
     // TCompileKeymanWeb.JavaScript_SetupDebug.
     const keyman = globalThis['keyman'] = globalThis['keyman'] || {};
-    const osk = keyman['osk'] || keyman['osk'] || {};  // does not otherwise exist when headless or detached from OSKs.
+    const osk = keyman['osk'] = keyman['osk'] || {};  // does not otherwise exist when headless or detached from OSKs.
     osk['modifierCodes'] = Codes.modifierCodes;
     osk['keyCodes'] = Codes.keyCodes;
 
