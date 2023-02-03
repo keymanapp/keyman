@@ -42,6 +42,10 @@ if builder_has_option --output; then
   OUTPUT_OPTION=("--output" "$OUTPUT_PATH")
 fi
 
+if builder_has_action configure:engine; then
+  _builder_chosen_action_targets=("${_builder_chosen_action_targets[@]}" "build:core")
+fi
+
 declare -a EXTRA_PARAMS
 # shellcheck disable=SC2154 # assigned in builder.inc.sh
 if (( ${#builder_extra_params[@]} > 0 )); then
