@@ -1,6 +1,6 @@
 
 import { assert } from 'chai';
-import { placeholder as breakWords } from '../build/obj/index.js';
+import { placeholder as breakWords } from '@keymanapp/models-wordbreakers';
 
 describe('The placeholder word breaker', function () {
   it('should break simple English sentences', function () {

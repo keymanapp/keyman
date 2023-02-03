@@ -3,7 +3,7 @@
  */
 
 import { assert } from 'chai';
-import { default as breakWords } from '../build/obj/index.js';
+import { default as breakWords } from '@keymanapp/models-wordbreakers';
 
 const SHY = '\u00AD'; // Other, Format.  The "Soft HYphen" - usually invisible unless needed for word-wrapping.
 
