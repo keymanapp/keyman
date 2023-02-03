@@ -2,9 +2,6 @@
 // WebWorker type definitions would require us to implement more methods than we do.
 /// <reference path="../worker-interface.d.ts" />
 
-// Unfortunately, importing like this loses all type information for the modules.
-// It's that, or massively overhaul lm-layer to be module-based instead of
-// namespace-based.
 import * as fs from 'fs';
 import * as vm from 'vm';
 

@@ -1,6 +1,5 @@
 import unwrap from '../unwrap.js';
-import { LMLayerWorkerCode, LMLayerWorkerSourcemapComment } from "@keymanapp/lm-worker/build/lib/worker-main.wrapped-for-bundle.js";
-
+import { LMLayerWorkerCode, LMLayerWorkerSourcemapComment } from "@keymanapp/lm-worker/build/lib/worker-main.wrapped.js";
 
 export default class DefaultWorker {
   static constructInstance(): Worker {
@@ -26,9 +25,9 @@ export default class DefaultWorker {
 
     // If this is definitively set to either true or false, tree-shaking can take effect.
     // An imported const variable doesn't seem to do it, though.
-    if(false) {
+    // if(false) {
       code += '\n' + LMLayerWorkerSourcemapComment;
-    }
+    // }
     let blob = new Blob([code], { type: 'text/javascript' });
     return URL.createObjectURL(blob);
   }

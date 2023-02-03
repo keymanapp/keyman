@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.data.Keyboard;
+import com.keyman.engine.BaseActivity;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.data.Keyboard;
 
 import android.os.Bundle;
 import android.provider.Settings;

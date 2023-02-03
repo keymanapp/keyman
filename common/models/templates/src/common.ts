@@ -1,7 +1,7 @@
-/// <reference types="@keymanapp/models-types" />
-
 // Allows the kmwstring bindings to resolve.
-import type * as types from "@keymanapp/web-utils/build/obj/kmwstring.js";
+import { extendString } from "@keymanapp/web-utils/build/obj/index.js";
+
+extendString();
 
 export const SENTINEL_CODE_UNIT = '\uFDD0';
 

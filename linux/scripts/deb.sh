@@ -5,20 +5,16 @@
 
 # It must be run from the keyman/linux directory
 
-# parameters: [BUILD_LEGACY=1] ./deb.sh [sourcepackage] [proj] [dist]
+# parameters: ./deb.sh [sourcepackage] [proj] [dist]
 # sourcepackage = only create Debian source package
 # proj = only build for this project
 # dist = only build for this distribution
-# BUILD_LEGACY = also build legacy KMFL packages
 
 set -e
 
 all_distributions="focal"
 distributions=""
 all_projects="keyman"
-if [ -n "$BUILD_LEGACY" ]; then
-    all_projects="keyman kmflcomp libkmfl ibus-kmfl"
-fi
 projects=""
 echo "all_distributions: ${all_distributions}"
 echo "all_projects: ${all_projects}"
@@ -87,27 +83,25 @@ mkdir -p builddebs
 # make the source packages
 cd builddebs
 for proj in ${projects}; do
-	vers=`ls ../dist/${proj}_*.orig.tar.gz`
+	vers=$(ls ../dist/${proj}_*.orig.tar.gz)
 	#echo "vers1:${vers}"
 	vers=${vers##*_}
 	#echo "vers2:${vers}"
 	vers=${vers%*.orig.tar.gz}
 	#echo "vers3:${vers}"
-	cp -a ../dist/${proj}_${vers}.orig.tar.gz .
-	tar xfz ${proj}_${vers}.orig.tar.gz
+	cp -a "../dist/${proj}_${vers}.orig.tar.gz" .
+	tar xfz "${proj}_${vers}.orig.tar.gz"
 	if [ "keyman" == "$proj" ]; then
-		cp -a ../../debian ${proj}-${vers}
-	else
-		cp -a ../legacy/${proj}/debian ${proj}-${vers}
+		cp -a ../../debian "${proj}-${vers}"
 	fi
-	cd ${proj}-${vers}
-	dch -v ${vers}-1 "local build"
+	cd "${proj}-${vers}"
+	dch -v "${vers}-1" "local build"
 	echo "${proj}-${vers}"
 	debuild -d -S -sa -Zxz -us -uc
-	cd $BASEDIR/builddebs
-	rm -rf ${proj}-${vers}
+	cd "$BASEDIR/builddebs"
+	rm -rf "${proj}-${vers}"
 done
-cd $BASEDIR
+cd "$BASEDIR"
 
 if [ "$1" == "sourcepackage" ]; then
 	exit 0
@@ -117,13 +111,13 @@ fi
 for proj in ${projects}; do
 	cd builddebs
 	echo "$proj version ${vers}"
-	rm -rf ${proj}-${vers}
-	dpkg-source -x ${proj}_${vers}-1.dsc
-	cd ${proj}-${vers}
+	rm -rf "${proj}-${vers}"
+	dpkg-source -x "${proj}_${vers}-1.dsc"
+	cd "${proj}-${vers}"
 	for dist in ${distributions}; do
-		dch -v ${vers}-1+${dist} "local build for ${dist}"
+		dch -v "${vers}-1+${dist}" "local build for ${dist}"
 		echo "dist: $dist"
 		DIST=${dist} pdebuild --pbuilder cowbuilder --buildresult /var/cache/pbuilder/result/${dist} -- --basepath /var/cache/pbuilder/base-${dist}.cow --distribution ${dist} --override-config --othermirror="deb [trusted=yes] file:/var/cache/pbuilder/result/${dist} ./" --bindmounts /var/cache/pbuilder/result/${dist}  --hookdir /var/cache/pbuilder/hook.d/${dist}
 	done
-	cd ${BASEDIR}
+	cd "${BASEDIR}"
 done

@@ -7,10 +7,10 @@ import android.content.res.AssetManager;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.packages.PackageProcessor;
-import com.tavultesoft.kmea.util.KMLog;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.packages.PackageProcessor;
+import com.keyman.engine.util.KMLog;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,7 +43,7 @@ final class FVShared {
     private FVRegionList regionList;
     private FVLoadedKeyboardList loadedKeyboards;
 
-    private static final String FVKeyboardHelpLink = "http://help.keyman.com/keyboard/";
+    private static final String FVKeyboardHelpLink = "https://help.keyman.com/keyboard/";
 
     public static final String FVDefault_PackageID = "fv_all";
     public static final String TAG = "FVShared";

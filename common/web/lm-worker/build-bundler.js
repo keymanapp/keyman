@@ -11,10 +11,15 @@ import { spawn } from 'child_process';
 await esbuild.build({
   bundle: true,
   sourcemap: true,
-  //sourceRoot: "../../..",
+  /*
+   * https://esbuild.github.io/api/#sources-content would theoretically allow us to strip the source
+   * while still keeping info useful for stack-tracing... but it doesn't pass through the sourcemap
+   * concatenation setup.
+   *
+   * That said, we know how to 'nix it ourselves in post now, so... yeah.
+   */
+  sourcesContent: true,
   sourceRoot: "/",
-  // https://esbuild.github.io/api/#sources-content may be worth considering when making
-  // a release build; erase source, but maintain stack trace mapping.
   format: "esm",
   nodePaths: ['..', '../../models'],
   entryPoints: {
@@ -56,40 +61,3 @@ esbuild.buildSync({
   tsconfig: 'tsconfig.json',
   target: "es5"
 });
-
-const dtsBundleCommand1 = spawn('npx dts-bundle-generator --project tsconfig.json -o build/lib/index.d.ts src/main/index.ts', {
-  shell: true
-});
-
-dtsBundleCommand1.stdout.on('data', data =>   console.log(data.toString()));
-dtsBundleCommand1.stderr.on('data', data => console.error(data.toString()));
-
-// Forces synchronicity; done mostly so that the logs don't get jumbled up.
-await new Promise((resolve, reject) => {
-  dtsBundleCommand1.on('exit', () => {
-    if(dtsBundleCommand1.exitCode != 0) {
-      reject();
-      process.exit(dtsBundleCommand1.exitCode);
-    }
-    resolve();
-  });
-});
-
-const dtsBundleCommand2 = spawn('npx dts-bundle-generator --project tsconfig.json -o build/lib/worker-main.d.ts src/main/worker-main.ts', {
-  shell: true
-});
-
-dtsBundleCommand2.stdout.on('data', data =>   console.log(data.toString()));
-dtsBundleCommand2.stderr.on('data', data => console.error(data.toString()));
-
-// Forces synchronicity; done mostly so that the logs don't get jumbled up.
-await new Promise((resolve, reject) => {
-  dtsBundleCommand2.on('exit', () => {
-    if(dtsBundleCommand2.exitCode != 0) {
-      reject();
-      process.exit(dtsBundleCommand2.exitCode);
-    }
-    resolve();
-  });
-});
-

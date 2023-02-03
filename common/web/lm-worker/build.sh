@@ -18,24 +18,24 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # This script runs from its own folder
-cd "$(dirname "$THIS_SCRIPT")"
+cd "$THIS_SCRIPT_PATH"
 
 WORKER_OUTPUT=build/obj
 WORKER_OUTPUT_FILENAME=build/lib/worker-main.js
-WORKER_WRAPPED_BUNDLE_TARGET_FILENAME=build/lib/worker-main.wrapped-for-bundle.js
 
 ################################ Main script ################################
 
 builder_describe \
-  "Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications." \
+  "Compiles the WebWorker module of Keyman's predictive-text engine as used for predictive text and autocorrective applications." \
   "@../keyman-version" \
   "@../../tools/sourcemap-path-remapper" \
   configure clean build test \
-  "--ci     Runs unit tests with CI reporting"
+  "--ci      Runs unit tests with CI reporting" \
+  "--debug   Includes full sources in the worker's sourcemap"
 
 builder_describe_outputs \
   configure     /node_modules \
-  build         build/index.js
+  build         build/lib/worker-main.wrapped.min.js
 
 builder_parse "$@"
 
@@ -56,11 +56,19 @@ if builder_start_action build; then
   # Build worker with tsc first
   npm run build -- $builder_verbose || fail "Could not build worker."
 
+
   echo "Bundling worker modules"
   node build-bundler.js
 
+  # Declaration bundling.
+  npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/worker-main.d.ts
+
   echo "Preparing the polyfills + worker for script-embedding"
-  node worker-wrapper-bundler.js
+  node build-polyfill-concatenator.js
+
+  node build-wrap-and-minify.js --debug
+  node build-wrap-and-minify.js --minify
 
   builder_finish_action success build
 fi

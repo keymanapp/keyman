@@ -22,15 +22,18 @@ cd "$THIS_SCRIPT_PATH"
 
 # ################################ Main script ################################
 
+S_KEYMAN_COM=
+
 builder_describe "Defines and implements the CI build steps for Keyman Engine for Web (KMW)." \
   "build" \
-  "test                 Runs all unit tests."  \
-  "post-test            Runs post-test cleanup.  Should be run even if a prior step fails." \
-  "validate-size        Runs the build-size comparison check" \
-  "publish-s.keyman     Prepares an s.keyman.com PR (intended for release builds)" \
-  "publish-downloads    Prepares the upload to downloads.keyman.com (intended for release builds)" \
-  "--debug              Runs this script in local-development mode; reports and tests will be locally logged" \
-  "--password=PASSWORD  Used to supply passwords needed by certain actions"
+  "test                         Runs all unit tests."  \
+  "post-test                    Runs post-test cleanup.  Should be run even if a prior step fails." \
+  "validate-size                Runs the build-size comparison check" \
+  "prepare                      Prepare upload artifacts for specified target(s)" \
+  ":s.keyman.com                Target:  builds artifacts for s.keyman.com " \
+  ":downloads.keyman.com        Target:  builds artifacts for downloads.keyman.com" \
+  "--debug                      Runs this script in local-development mode; reports and tests will be locally logged" \
+  "--s.keyman.com=S_KEYMAN_COM  Sets the root location of a checked-out s.keyman.com repo"
 
 builder_parse "$@"
 
@@ -92,23 +95,26 @@ if builder_start_action validate-size; then
   builder_finish_action success validate-size
 fi
 
-if builder_start_action publish-s.keyman; then
-  # First phase: make sure the s.keyman.com repo is locally-available and up to date.
-  pushd "$S_KEYMAN_COM"
-  if builder_has_option --password; then
-    git pull https://keyman-server:$PASSWORD@github.com/keymanapp/s.keyman.com.git master
-  else
+if builder_start_action prepare:s.keyman.com; then
+  if ! builder_has_option --s.keyman.com; then
+    builder_die "--s.keyman.com is unset!"
+  fi
+
+  if builder_has_option --debug; then
+    # First phase: make sure the s.keyman.com repo is locally-available and up to date.
+    pushd "$S_KEYMAN_COM"
+
     # For testing on a local development machine / a machine with the repo already loaded.
     git checkout master
     git pull
+    popd
   fi
-  popd
 
   # Second phase:  copy the artifacts over
 
   # The main build products are expected to reside at the root of this folder.
-  BASE_PUBLISH_FOLDER="$S_KEYMAN_COM/kmw/engine/$BUILD_NUMBER"
-  mkdir "$BASE_PUBLISH_FOLDER"
+  BASE_PUBLISH_FOLDER="$S_KEYMAN_COM/kmw/engine/$VERSION"
+  mkdir -p "$BASE_PUBLISH_FOLDER"
 
   cp -Rf build/app/web/release/* "$BASE_PUBLISH_FOLDER"
   cp -Rf build/app/ui/release/* "$BASE_PUBLISH_FOLDER"
@@ -116,61 +122,42 @@ if builder_start_action publish-s.keyman; then
   # Third phase: tweak the sourcemaps
   # We can use an alt-mode of Web's sourcemap-root tool for this.
   for sourcemap in "$BASE_PUBLISH_FOLDER/"*.map; do
-    node build/tools/building/sourcemap-root/index.mjs null "$sourcemap" --sourceRoot "https://s.keyman.com/kmw/engine/$BUILD_NUMBER/src"
+    node build/tools/building/sourcemap-root/index.mjs null "$sourcemap" --sourceRoot "https://s.keyman.com/kmw/engine/$VERSION/src"
   done
 
-  # Final phase:  build the PR and push it.
-  cd "$S_KEYMAN_COM"
-  if builder_has_option --password; then
-    git config user.name "Keyman Build Server"
-    git config user.email "keyman-server@users.noreply.github.com"
-  fi
-  git add "kmw/engine/$BUILD_NUMBER"
-  if builder_has_option --password; then
-    git commit -m "KeymanWeb release $BUILD_NUMBER (automatic)"
-    git push https://keyman-server:$PASSWORD@github.com/keymanapp/s.keyman.com.git master
-  fi
+  # Actual construction of the PR will be left to CI-config scripting for now.
 
-  builder_finish_action success publish-s.keyman
+  builder_finish_action success prepare:s.keyman.com
 fi
 
 # Note:  for now, this command is used to prepare the artifacts used by the download site, but
 #        NOT to actually UPLOAD them via rsync or to produce related .download_info files.
-if builder_start_action publish-downloads; then
-  UPLOAD_PATH="build/upload/$BUILD_NUMBER"
+if builder_start_action prepare:downloads.keyman.com; then
+  UPLOAD_PATH="build/upload/$VERSION"
 
   # --- First action artifact - the KMW zip file ---
-  ZIP="$UPLOAD_PATH/keymanweb-$BUILD_NUMBER.zip"
+  ZIP="$UPLOAD_PATH/keymanweb-$VERSION.zip"
 
-  # RSYNC_HOME should be pre-set environment variables.
-  # (7Z_HOME is illegal as a variable name in BASH b/c leading digit.)
   mkdir -p "$UPLOAD_PATH"
 
-  # Nifty tidbit:  https://stackoverflow.com/questions/592620/how-can-i-check-if-a-program-exists-from-a-bash-script
-  # If we're fine with ensuring that the program is available via path, we can just use that on
-  # Win machines.  The decision was made to continue relying on an environment variable for 7-zip, though.
+  # On Windows, we use 7-zip (SEVEN_Z_HOME env var).  On other platforms, we use zip.
 
   COMPRESS_CMD=
   COMPRESS_ADD=
 
   # Marc's preference; use $SEVEN_Z_HOME and have the BAs set up with THAT as an env var.
-  if [ -n "${SEVEN_Z_HOME+x}" ] &> /dev/null; then
-    echo "7z command available"
+  if [ ! -z "${SEVEN_Z_HOME+x}" ]; then
     COMPRESS_CMD="$SEVEN_Z_HOME/7z"
     COMPRESS_ADD="a -bd -bb0 -r" # add, hide progress, log level 0, recursive
-    COMPRESS_RENAME="rn"
   fi
 
   if [[ -z "${COMPRESS_CMD}" ]] ; then
     if command -v zip &> /dev/null; then
-      echo "zip command available"
       # Note:  does not support within-archive renames!
       COMPRESS_CMD=zip
       COMPRESS_ADD="-r"
     else
-      echo "${COLOR_RED}Fallback approach failed: zip command unavailable${COLOR_RESET}" >&2
-      builder_finish_action failure publish-downloads
-      exit 1
+      builder_die "7z and zip commands are both unavailable"
     fi
   fi
 
@@ -206,5 +193,5 @@ if builder_start_action publish-downloads; then
   cp -rf src/test          "$STATIC/src/test"
   cp -rf src/samples       "$STATIC/src/samples"
 
-  builder_finish_action success publish-downloads
+  builder_finish_action success prepare:downloads.keyman.com
 fi
