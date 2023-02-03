@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Context: Title for list -->
+    <plurals name="title_keyboards">
+        <item quantity="one">Keyboard</item>
+        <item quantity="few">Klávesnice</item>
+        <item quantity="many">Klávesnice</item>
+        <item quantity="other">Klávesnice</item>
+    </plurals>
+    <!-- Context: Title for list -->
+    <plurals name="title_other_input_methods">
+        <item quantity="one">Jiná vstupní metoda</item>
+        <item quantity="few">Jiné vstupní metody</item>
+        <item quantity="many">Jiné vstupní metody</item>
+        <item quantity="other">Jiné vstupní metody</item>
+    </plurals>
+    <!-- Context: Title for list -->
+    <string name="title_add_keyboard" comment="Add a new keyboard">Přidat novou klávesnici</string>
+    <!-- Context: Title for list -->
+    <string name="title_languages_settings" comment="List of installed languages">Nainstalované jazyky</string>
+    <!-- Context: Title for list -->
+    <string name="title_language_settings" comment="Keyman Settings for a language">Nastavení %1$s</string>
+    <!-- Context: Button label -->
+    <string name="label_add" comment="Button to add an item">Přidat</string>
+    <!-- Context: Button label -->
+    <string name="label_back" comment="Button to go back">Zpět</string>
+    <!-- Context: Button label -->
+    <string name="label_cancel" comment="Button to cancel an action">Zrušit</string>
+    <!-- Context: Button label -->
+    <string name="label_close" comment="Close a dialog">Zavřít</string>
+    <!-- Context: Button label. Removed in Keyman 15 -->
+    <string name="label_close_keyman" comment="Close the Keyman application">Zavřít klíč</string>
+    <!-- Context: Button label -->
+    <string name="label_forward" comment="Button to go forward">Přeposlat</string>
+    <!-- Context: Button label -->
+    <string name="label_next_input_method" comment="Switch to next input method (replaces label_close_keyman)">Další vstupní metoda</string>
+    <!-- Context: Button label -->
+    <string name="label_download" comment="Button to confirm downloading an item">Stáhnout</string>
+    <!-- Context: Button label -->
+    <string name="label_install" comment="Confirmation to install a package">Instalovat</string>
+    <!-- Context: Button label -->
+    <string name="label_later" comment="Do an action at a later time">Později</string>
+    <!-- Context: Button label -->
+    <string name="label_next" comment="Go to the next screen">Další</string>
+    <!-- Context: Button label -->
+    <string name="label_ok" comment="Button to acknowledge a dialog">OK</string>
+    <!-- Context: Button label -->
+    <string name="label_update" comment="Dialog button to update a resource">Aktualizovat</string>
+    <!-- Context: No internet for updates -->
+    <string name="no_internet_connection" comment="Internet connection missing">No internet connection</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="cannot_connect" comment="Error message when network connection fails">Nelze se připojit k Keyman serveru!</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_delete_keyboard" comment="Confirmation to delete a keyboard">Chcete odstranit tuto klávesnici?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_download_keyboard" comment="Confirmation to download a keyboard update">Chcete stáhnout nejnovější verzi této klávesnice?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_update" comment="Confirmation to update several resources">Chcete nyní aktualizovat klávesnice a slovníky?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_updates_channel">Aktualizace zdrojů</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_updates_available" comment="Notification when resource updates are available">Dostupné aktualizace zdrojů</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="update_available" comment="Currently installed version of a resource with an available update">%1$s (Aktualizace k dispozici)</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_update_message" comment="language name: keyboard name">      Dostupné aktualizace pro klávesnici %1$s: %2$s </string>
+    <!-- Context: Keyboard Updates -->
+    <string name="dictionary_update_message">Dostupné aktualizace pro slovník %1$s: %2$s </string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version" comment="Label for keyboard version">Verze klávesnice</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="help_link" comment="Label for help link">Odkaz na pomoc</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="uninstall_keyboard" comment="Label for uninstalling keyboard">Odinstalovat klávesnici</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_picker_new_keyboard" comment="Mark a language name that's newly installed in keyboard list">[new] %1$s</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_qr_code" comment="QR Code description">      Naskenujte tento kód pro načtení této\nklávesnice na jiném zařízení</string>
+    <!-- Context: Keyboard Help welcome.htm title -->
+    <string name="welcome_package" comment="Title to welcome.htm page (name and version)">Vítejte v %1$s</string>
+    <!-- Context: Keyboard app doesn't include FileProvider library needed to view help file -->
+    <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">      Knihovna FileProvider potřebná k zobrazení nápovědy: %1$s</string>
+    <!-- Context: Fatal keyboard error. Will load default keyboard -->
+    <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">      Fatální chyba klávesnice s %1$s:%2$s pro jazyk %3$s . Načítání výchozí klávesnice.</string>
+    <!-- Context: Fatal keyboard error.  -->
+    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      Chyba v klávesnici %1$s:%2$s pro jazyk %3$s.</string>
+    <!-- Context: Query for associated dictionary -->
+    <string name="query_associated_model" comment="Check if there's an available dictionary to download">Kontroluji související slovník ke stažení</string>
+    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Cannot connect to Keyman server to check for associated dictionary to download</string>
+    <!-- Context: Model Updates -->
+    <string name="confirm_download_model" comment="Confirmation to download a dictionary update">Chcete stáhnout nejnovější verzi tohoto slovníku?</string>
+    <!-- Context: No associated dictionary found -->
+    <string name="no_associated_model" comment="Confirmation there's no available dictionary to download">Žádný slovník ke stažení</string>
+    <!-- Context: Model Updates -->
+    <string name="catalog_unavailable" comment="Notification that the cloud resource catalog can't be updated">Katalog zdrojů není k dispozici</string>
+    <!-- Context: Background download messages-->
+    <string name="catalog_download_start_in_background" comment="Notification that the resource catalog update will begin">Aktualizace katalogu byla spuštěna na pozadí</string>
+    <!-- Context: Background download messages-->
+    <string name="catalog_download_is_running_in_background" comment="Notification that the resource catalog update is still downloading">      Katalog se stále stahuje; zkuste to prosím za chvíli znovu!</string>
+    <!-- Context: Background download messages-->
+    <string name="progress_message_checking_resource_is_running" comment="Progress notification that the check for a resource is still running ">Kontrola zdroje</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_start_in_background" comment="Notification that a keyboard download has started">Stahování klávesnice spuštěno na pozadí</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_is_running_in_background" comment="Notification that a keyboard download is still running">Vybraná klávesnice se již stahuje; zkuste to prosím za chvíli znovu!</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_finished" comment="Notification that a keyboard download has finished">Stahování klávesnice je dokončeno!</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_start_in_background" comment="Notification that a dictionary download has started">Stahování slovníku začalo na pozadí</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">Vybraný slovník se již stahuje; zkuste to prosím za chvíli znovu!</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">Stahování slovníku je dokončeno.</string>
+    <!-- Context: Background download messages -->
+    <string name="download_failed" comment="Notification that a download failed">Stahování se nezdařilo</string>
+    <!-- Context: Background download messages -->
+    <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">Nepodařilo se načíst stažený soubor</string>
+    <!-- Context: General Updates -->
+    <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">Přístup k serveru se nezdařil!</string>
+    <!-- Context: General Updates -->
+    <string name="update_check_current" comment="Notification that all resources are up to date">"Všechny zdroje jsou aktuální!"</string>
+    <!-- Context: General Updates -->
+    <string name="update_failed" comment="Notification that a resource update failed">Aktualizace jednoho nebo více zdrojů selhala!</string>
+    <!-- Context: General Updates -->
+    <string name="update_success" comment="Notification that a resource update successfully updated">Zdroje byly úspěšně aktualizovány!</string>
+    <!-- Context: Model Info -->
+    <string name="model_version" comment="Title for a dictionary version">Verze slovníku</string>
+    <!-- Context: Model Info -->
+    <string name="uninstall_model" comment="Label to uninstall a dictionary">Odinstalovat slovník</string>
+    <!-- Context: Model Info -->
+    <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">Chcete odstranit tento slovník?</string>
+    <!-- Context: Model Deleted -->
+    <string name="model_deleted" comment="Notification when a dictionary is deleted">Dictionary deleted</string>
+    <!-- Context: Language Settings Keyboard install strings -->
+    <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">Klávesnice %1$s nainstalována</string>
+    <!-- Context: Language Settings Keyboard uninstall strings -->
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Keyboard deleted</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Povolit opravy</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="enable_predictions" comment="Enable predictions from the suggestion banner">Povolit predikce</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_label">Slovník</string>
+    <plurals name="model_count">
+        <item quantity="one">Dictionary</item>
+        <item quantity="few">Dictionaries</item>
+        <item quantity="many">Dictionaries</item>
+        <item quantity="other">Dictionaries</item>
+    </plurals>
+    <!-- Context: Language Settings menu substring - Check for available dictionary -->
+    <string name="check_available_model" comment="Check for available dictionary">Zkontrolovat dostupný slovník</string>
+    <string name="check_model_online" comment="Check for dictionaries online">Check for dictionaries online</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_info_header" comment="Dictionary name">Slovník: %1$s</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_picker_header" comment="Dictionaries for a specified language">%1$s slovníků</string>
+    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_install_toast" comment="Notification when a dictionary is installed">Slovník nainstalován</string>
+    <!-- Context: Language Settings menu strings -->
+    <plurals name="keyboard_count">
+        <item quantity="one">(%1$d klávesnice)</item>
+        <item quantity="few">(%1$d klávesnice)</item>
+        <item quantity="many">(%1$d klávesnice)</item>
+        <item quantity="other">(%1$d klávesnice)</item>
+    </plurals>
+    <!-- Context: "Change Display Language" menu -->
+    <string name="default_locale" comment="Use the device's current locale">Výchozí lokalizace</string>
+    <!-- Context: Content descriptions -->
+    <!-- Context: Content descriptions -->
+    <!-- Context: Popup menu labels -->
+    <string name="label_delete" comment="Confirmation to delete an item">Vymazat</string>
+    <!-- Context: Shared preferences name -->
+    <!-- Context: Other strings -->
+    <string name="help_bubble_text">Klepnutím sem změníte klávesnici</string>
+    <!-- Context: anywhere -->
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+</resources>

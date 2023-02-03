@@ -20,6 +20,7 @@
     "developer/src/kmc",
     "developer/src/server",
     "common/models/*",
+    "common/tools/*",
     "common/web/*",
     "common/predictive-text",
     "common/tools/hextobin",

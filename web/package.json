@@ -43,7 +43,7 @@
   },
   "scripts": {
     "tsc": "tsc",
-    "test": "gosh ./unit_tests/test.sh",
+    "test": "gosh ./test.sh",
     "karma": "karma",
     "mocha": "mocha",
     "modernizr": "modernizr",
