@@ -5,20 +5,19 @@
 
 //#region Imports
 
+import { type DeviceSpec } from "@keymanapp/web-utils/build/obj/index.js";
+
 import Codes from "./codes.js";
 import type KeyEvent from "./keyEvent.js";
 import type { Deadkey } from "./deadkeys.js";
 import KeyMapping from "./keyMapping.js";
 import { SystemStore, MutableSystemStore, PlatformSystemStore } from "./systemStores.js";
 import type { VariableStoreSerializer } from "./keyboardProcessor.js";
-
 import type OutputTarget from "./outputTarget.js";
 import { Mock } from "./outputTarget.js";
-
 import RuleBehavior from "./ruleBehavior.js";
 import Keyboard, { VariableStoreDictionary } from "../keyboards/keyboard.js";
 
-import { type DeviceSpec } from "@keymanapp/web-utils/build/obj/index.js";
 
 //#endregion
 

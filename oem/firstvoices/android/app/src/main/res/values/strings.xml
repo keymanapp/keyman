@@ -7,7 +7,7 @@
     <string name="dictionaries">Dictionaries</string>
     <string name="keyboard_settings">%1$s Settings</string>
     <string name="enable_keyboard">Enable keyboard</string>
-    <string name="keyboard_version">Version %1$s</string>
+    <string name="fv_keyboard_version">Version %1$s</string>
 
     <!-- Context: KMP Package strings -->
     <string name="title_package_failed_to_install" comment="Error dialog title when package failed to install">Package %1$s failed to install</string>

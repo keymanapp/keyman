@@ -74,7 +74,10 @@ def get_keyboard_data(keyboardID, weekCache=False):
     os.chdir(cache_dir)
     requests_cache.install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
     now = time.ctime(int(time.time()))
-    response = requests.get(api_url)
+    try:
+        response = requests.get(api_url)
+    except requests.exceptions.RequestException as e:  # This is the correct syntax
+        return None
     logging.debug('Time: {0} / Used Cache: {1}'.format(now, response.from_cache))
     os.chdir(current_dir)
     requests_cache.uninstall_cache()

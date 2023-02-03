@@ -8,16 +8,14 @@ set -eu
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
+
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
 
 ################################ Main script ################################
-
-# TODO: for predictive-text, we only need :headless, perhaps we should be splitting modules?
-# TODO: remove :tools once kmlmc is a dependency for test:module
 
 builder_describe "Builds the predictive-text wordbreaker implementation module" \
   "clean" \
@@ -50,6 +48,9 @@ fi
 if builder_start_action build; then
   npm run tsc -- -b
   node build-bundler.js
+
+  # Declaration bundling.
+  npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/index.d.ts
 
   builder_finish_action success build
 fi

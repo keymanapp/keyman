@@ -7,7 +7,7 @@ function displayHelp() {
   console.log("");
   console.log("Usage:  node sourcemap-root <source.map> <dest.map> [-c|--clean] [-s|--sourceRoot <path>]");
   console.log("        -c|--clean Runs source-filepath cleaning operations.");
-  console.log("        -s|--suffix <path> Sets the input sourcemap's 'sourceRoot' to <path>.");
+  console.log("        -s|--sourceRoot <path> Sets the input sourcemap's 'sourceRoot' to <path>.");
 }
 
 // By default, any node-based process has two command-line args:
@@ -88,7 +88,7 @@ if(shouldClean) {
 }
 
 if(sourceRoot) {
-  srcMap.sourceRoot = srcMap.sourceRoot ?? "" + sourceRoot;
+  srcMap.sourceRoot = sourceRoot;
 }
 
 srcMap.toFile(destFile);

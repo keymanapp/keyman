@@ -30,7 +30,9 @@
  */
 
 /// <reference types="@keymanapp/lm-message-types" />
-import type * as types from "@keymanapp/web-utils/build/obj/kmwstring.js";
+import { extendString } from "@keymanapp/web-utils/build/obj/index.js";
+
+extendString();
 
 import * as models from './models/index.js';
 import * as correction from './correction/index.js';
@@ -38,8 +40,6 @@ import * as wordBreakers from '@keymanapp/models-wordbreakers/build/obj/index.js
 
 import ModelCompositor from './model-compositor.js';
 import { ImportScripts, IncomingMessage, LMLayerWorkerState, LoadMessage, ModelEval, ModelFile, ModelSourceSpec, PostMessage } from './worker-interfaces.js';
-
-// import type * as WorkerInterfaces from './worker-interfaces.js';
 
 /**
  * Encapsulates all the state required for the LMLayer's worker thread.
@@ -303,7 +303,7 @@ export default class LMLayerWorker {
           // This is far more encapsulated and likely more secure... and the former point means this is
           // easier to bundle and more optimizable when bundling than direct eval.
           // Reference: https://esbuild.github.io/link/direct-eval
-          let modelLoader = new Function('LMLayerWorker', 'models', 'correction', 'wordBreakers', code);
+          const modelLoader = new Function('LMLayerWorker', 'models', 'correction', 'wordBreakers', code);
           modelLoader(_this, models, correction, wordBreakers);
         }
       }

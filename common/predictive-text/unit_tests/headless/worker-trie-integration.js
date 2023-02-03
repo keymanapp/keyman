@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { LMLayer, Worker } from '../../build/obj/node/index.js';
+import { LMLayer, SourcemappedWorker as Worker } from '../../build/obj/node/index.js';
 import { capabilities } from '../../../../common/test/resources/model-helpers.mjs';
 
 /*

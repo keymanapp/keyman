@@ -1,5 +1,3 @@
-/// <reference types="@keymanapp/models-types" />
-
 export enum QuoteBehavior {
   noQuotes  = "no-quotes",
   useQuotes = "use-quotes",

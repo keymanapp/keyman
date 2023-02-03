@@ -6,17 +6,8 @@ KeymanWeb.KR(new Keyboard_khmer_angkor());
 }
 function Keyboard_khmer_angkor()
 {
-  var Codes, modCodes, keyCodes;
-
-  if(KeymanWeb.Codes) {
-    // ES Module attachment point
-    Codes = KeymanWeb.Codes;
-  } else if (typeof com != 'undefined' && com.keyman && com.keyman.text && com.keyman.text.Codes) {
-    // Pre-modularized attachment point
-    Codes = com.keyman.text.Codes;
-  }
-  var modCodes = Codes.modifierCodes;
-  var keyCodes = Codes.keyCodes;
+  var modCodes = com.keyman.text.Codes.modifierCodes;
+  var keyCodes = com.keyman.text.Codes.keyCodes;
 
   this.KI="Keyboard_khmer_angkor";
   this.KN="Khmer Angkor";

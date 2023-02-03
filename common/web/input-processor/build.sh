@@ -72,6 +72,9 @@ if builder_start_action build:module; then
   npm run tsc -- -b ./tsconfig.json
   node build-bundler.js
 
+  # Declaration bundling.
+  npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+
   builder_finish_action success build:module
 fi
 
