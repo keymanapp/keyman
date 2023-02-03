@@ -3,7 +3,7 @@
  */
 
 import { assert } from 'chai';
-import PriorityQueue from '../build/obj/priority-queue.js';
+import { PriorityQueue } from '@keymanapp/models-templates';
 
 describe('Priority queue', function() {
   it('can act as a min-heap', function () {

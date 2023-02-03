@@ -3,7 +3,7 @@
  */
 
 import { assert } from 'chai';
-import QuoteBehavior from '../build/obj/quote-behavior.js';
+import { QuoteBehavior } from '@keymanapp/models-templates';
 
 describe('Quote behaviors', function() {
   describe('Script directionality', function() {

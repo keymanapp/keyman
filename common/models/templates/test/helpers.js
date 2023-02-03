@@ -11,7 +11,7 @@ var _ = global;
 // needed for some of the unit tests.
 
 // Verify that the KMW string extensions are loaded via side-effect.
-import * as models from '../build/lib/index.mjs';
+import * as models from '@keymanapp/models-templates/lib';
 
 import { createRequire } from "module";
 import { fileURLToPath } from 'url';

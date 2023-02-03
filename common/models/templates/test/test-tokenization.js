@@ -3,8 +3,8 @@
  */
 
 import { assert } from 'chai';
-import * as models from "../build/obj/index.js";
-import * as wordBreakers from "@keymanapp/models-wordbreakers/build/obj/index.js";
+import * as models from "@keymanapp/models-templates";
+import * as wordBreakers from "@keymanapp/models-wordbreakers";
 
 describe('Tokenization functions', function() {
   describe('tokenize', function() {

@@ -3,7 +3,7 @@
  */
 
 import { assert } from 'chai';
-import TrieModel from '../build/obj/trie-model.js';
+import { TrieModel } from '@keymanapp/models-templates';
 
 describe('LMLayerWorker trie model for word lists', function() {
   describe('instantiation', function () {

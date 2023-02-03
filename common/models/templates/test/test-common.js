@@ -3,7 +3,7 @@
  */
 
 import { assert } from 'chai';
-import * as models from '../build/obj/index.js';
+import * as models from '@keymanapp/models-templates';
 
 describe('Common utility functions', function() {
   // TODO:  unit tests for other common utility functions

@@ -22,7 +22,8 @@ builder_describe "Builds the predictive-text model template implementation modul
   "@../wordbreakers" \
   "clean" \
   "configure" \
-  "build"
+  "build" \
+  "test"
 
 builder_describe_outputs \
   configure          /node_modules \
@@ -54,4 +55,10 @@ if builder_start_action build; then
   npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/index.d.ts
 
   builder_finish_action success build
+fi
+
+if builder_start_action test; then
+  npm run mocha -- --require test/helpers.js --recursive test
+
+  builder_finish_action success test
 fi
