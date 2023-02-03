@@ -1,10 +1,8 @@
 // References all utility includes from a single file, making import/export simple.
 
-import deepCopy from "./deepCopy.js";
-export { deepCopy };
+export { default as deepCopy } from "./deepCopy.js";
 
-import DeviceSpec from "./deviceSpec.js";
-export { DeviceSpec };
+export { default as DeviceSpec } from "./deviceSpec.js";
 
 /*
   // An example valid use, post-import:
@@ -14,14 +12,13 @@ export { DeviceSpec };
                                 true);
  */
 
-import Version from "./version.js";
-export { Version };
+export { default as Version } from "./version.js";
 
-import globalObject from "./globalObject.js";
-export { globalObject };
+export { default as globalObject } from "./globalObject.js";
 
-import extendString from "./kmwstring.js";
-export { extendString };
+export { default as extendString } from "./kmwstring.js";
+
+
 
 // // Uncomment the following line and run the bundled output to verify successful
 // // esbuild bundling of this submodule:

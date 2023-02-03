@@ -14,7 +14,16 @@
   ],
   "homepage": "https://github.com/keymanapp/keyman",
   "license": "MIT",
-  "main": "build/index.js",
+  "main": "build/lib/index.cjs",
+  "types": "build/lib/index.d.ts",
+  "exports": {
+    ".": "./build/obj/index.js",
+    "./lib": {
+      "import": "./build/lib/index.mjs",
+      "require": "./build/lib/index.cjs"
+    },
+    "./obj/*.js": "./build/obj/*.js"
+  },
   "directories": {
     "lib": "lib",
     "test": "test"

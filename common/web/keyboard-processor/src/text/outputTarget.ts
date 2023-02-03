@@ -1,5 +1,9 @@
 ///<reference types="@keymanapp/models-types" />
 
+import { extendString } from "@keymanapp/web-utils";
+
+extendString();
+
 // Defines deadkey management in a manner attachable to each element interface.
 import type KeyEvent from "./keyEvent.js";
 import { Deadkey, DeadkeyTracker } from "./deadkeys.js";

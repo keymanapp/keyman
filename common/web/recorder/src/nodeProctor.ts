@@ -8,8 +8,7 @@ import {
   RecordedSyntheticKeystroke
 } from "./index.js";
 
-import { Keyboard, type KeyEvent, KeyboardProcessor, Mock, type OutputTarget } from "@keymanapp/keyboard-processor/build/obj/index.js";
-
+import { Keyboard, type KeyEvent, KeyboardProcessor, Mock, type OutputTarget } from "@keymanapp/keyboard-processor";
 import { DeviceSpec } from "@keymanapp/web-utils";
 
 export default class NodeProctor extends Proctor {

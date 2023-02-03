@@ -2,14 +2,20 @@
   "name": "@keymanapp/web-utils",
   "description": "Common utility functions used throughout other Keyman packages",
   "main": "./build/obj/index.js",
-  "types": "./build/obj/index.d.ts",
   "exports": {
-    ".": "./build/obj/index.js",
-    "./lib": {
-      "import": "./build/obj/index.mjs",
-      "require": "./build/obj/index.cjs"
+    ".": {
+      "types": "./build/obj/index.d.ts",
+      "import": "./build/obj/index.js"
     },
-    "./obj/*.js": "./build/obj/*.js"
+    "./lib": {
+      "types": "./build/lib/index.d.ts",
+      "import": "./build/lib/index.mjs",
+      "require": "./build/lib/index.cjs"
+    },
+    "./obj/*.js": {
+      "types": "./build/obj/*.js.map",
+      "import": "./build/obj/*.js"
+    }
   },
   "scripts": {
     "build": "gosh ./build.sh",
