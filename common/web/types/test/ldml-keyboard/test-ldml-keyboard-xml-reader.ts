@@ -85,6 +85,7 @@ describe('ldml keyboard xml reader tests', function () {
     },
     {
       subpath: 'invalid-import-base.xml',
+      loadfail: true,
       errors: [
         CommonTypesMessages.Error_ImportInvalidBase({
           base: 'SOME_INVALID_BASE',
@@ -95,6 +96,7 @@ describe('ldml keyboard xml reader tests', function () {
     },
     {
       subpath: 'invalid-import-path.xml',
+      loadfail: true,
       errors: [
         CommonTypesMessages.Error_ImportInvalidPath({
           base: null,
@@ -105,6 +107,7 @@ describe('ldml keyboard xml reader tests', function () {
     },
     {
       subpath: 'invalid-import-readfail.xml',
+      loadfail: true,
       errors: [
         CommonTypesMessages.Error_ImportReadFail({
           base: null,
@@ -115,6 +118,7 @@ describe('ldml keyboard xml reader tests', function () {
     },
     {
       subpath: 'invalid-import-wrongroot.xml',
+      loadfail: true,
       errors: [
         CommonTypesMessages.Error_ImportWrongRoot({
           base: null,

@@ -41,6 +41,10 @@ class TestCompilerCallbacks implements CompilerCallbacks {
 
 export interface CompilationCase {
   /**
+   * If true, loading (validation) should fail
+   */
+  loadfail?: boolean;
+  /**
    * path to xml, such as 'sections/layr/invalid-case.xml'
    */
   subpath: string;
@@ -82,7 +86,11 @@ export function testReaderCases(cases : CompilationCase[]) {
       const data = loadFile(testcase.subpath, makePathToFixture(testcase.subpath));
       assert.ok(data, `reading ${testcase.subpath}`);
       const source = reader.load(data);
-      assert.ok(source, `loading ${testcase.subpath}`);
+      if (!testcase.loadfail) {
+        assert.ok(source, `loading ${testcase.subpath}`);
+      } else {
+        assert.notOk(source, `loading ${testcase.subpath} (expected failure)`);
+      }
       // special case for an expected exception
       if (testcase.throws) {
         assert.throws(() => reader.validate(source, loadLdmlKeyboardSchema()), testcase.throws);
