@@ -16,8 +16,8 @@ fullbuild: # configure and build
 	./scripts/build.sh
 
 tmpinstall: reconf
-	INSTALLDIR="/tmp/kmfl" ./scripts/build.sh
-	INSTALLDIR="/tmp/kmfl" ./scripts/install.sh
+	INSTALLDIR="/tmp/keyman" ./scripts/build.sh
+	INSTALLDIR="/tmp/keyman" ./scripts/install.sh
 
 install: # run as sudo
 	SUDOINSTALL="yes" ./scripts/install.sh

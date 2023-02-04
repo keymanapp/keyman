@@ -2,12 +2,13 @@
   // See http://go.microsoft.com/fwlink/?LinkId=827846
   // for the documentation about the extensions.json format
   "recommendations": [
-    "asabil.meson",
+    "mesonbuild.mesonbuild",
     "editorconfig.editorconfig",
     "ms-python.python",
     "mads-hartmann.bash-ide-vscode",
     "timonwong.shellcheck",
     "maelvalais.autoconf",
     "webfreak.debug",
+    "dawidd6.debian-vscode",
   ]
 }
