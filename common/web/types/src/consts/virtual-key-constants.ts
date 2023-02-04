@@ -162,7 +162,7 @@ export const ISOVirtualKeyMap: KeyMap = [
 ];
 
 /**
- * Map from a hardware constnat to a keymap
+ * Map from a hardware constant to a keymap
  * For the 'key' see constants.layr_list_hardware_map
  */
 export const HardwareToKeymap: Map<string, KeyMap> = new Map(
