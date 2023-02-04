@@ -28,7 +28,7 @@ describe('ldml keyboard xml reader tests', function() {
     assert.isNotNull(source);
     assert.throws(() => {
       reader.validate(source, loadLdmlKeyboardSchema());
-    }, `Message#401001`);
+    }, `Message#301001`);
   });
 
   it("should fail to load files with an invalid conformsTo", function() {
@@ -39,7 +39,7 @@ describe('ldml keyboard xml reader tests', function() {
     assert.isNotNull(source);
     assert.throws(() => {
       reader.validate(source, loadLdmlKeyboardSchema());
-    }, `Message#401001`);
+    }, `Message#301001`);
   });
 
 });
