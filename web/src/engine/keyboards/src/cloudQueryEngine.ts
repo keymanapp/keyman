@@ -1,6 +1,5 @@
 import { default as KeyboardStub, ErrorStub, KeyboardAPISpec, mergeAndResolveStubPromises } from './keyboardStub.js';
-import { KeyboardFont, LanguageAPIPropertySpec } from '@keymanapp/keyboard-processor/build/obj/keyboards/keyboardProperties.js';
-import { Version, ManagedPromise } from '@keymanapp/web-utils/build/obj/index.js';
+import { KeyboardFont, LanguageAPIPropertySpec, ManagedPromise, Version } from '@keymanapp/keyboard-processor';
 import CloudRequesterInterface from './cloudRequesterInterface.js';
 
 // For when the API call straight-up times out.

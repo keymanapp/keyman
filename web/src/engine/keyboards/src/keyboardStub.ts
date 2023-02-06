@@ -3,7 +3,7 @@ import {
   type KeyboardFont,
   type KeyboardAPIPropertySpec,
   type KeyboardAPIPropertyMultilangSpec
-} from '@keymanapp/keyboard-processor/build/obj/index.js';
+} from '@keymanapp/keyboard-processor';
 
 export type KeyboardAPISpec = (KeyboardAPIPropertySpec | KeyboardAPIPropertyMultilangSpec) & {
   filename: string,
