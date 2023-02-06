@@ -44,7 +44,15 @@ function exitDueToUsageError(message: string): never  {
 class NodeCompilerCallbacks implements CompilerCallbacks {
   loadFile(baseFilename: string, filename: string | URL): Buffer {
     // TODO: translate filename based on the baseFilename
-    return fs.readFileSync(filename);
+    try {
+      return fs.readFileSync(filename);
+    } catch(e) {
+      if (e.code === 'ENOENT') {
+        return null;
+      } else {
+        throw e;
+      }
+    }
   }
   reportMessage(event: CompilerEvent): void {
     console.log(kmc.CompilerMessages.severityName(event.code) + ' ' + event.code.toString(16) + ': ' + event.message);
