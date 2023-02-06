@@ -58,18 +58,7 @@ if compiler.get_id() == 'emscripten'
   links = []
 endif
 
-lib = library('kmnkbp0',
-  'option.cpp',
-  'keyboard.cpp',
-  'state.cpp',
-  'km_kbp_context_api.cpp',
-  'km_kbp_keyboard_api.cpp',
-  'km_kbp_options_api.cpp',
-  'km_kbp_state_api.cpp',
-  'km_kbp_debug_api.cpp',
-  'km_kbp_processevent_api.cpp',
-  'jsonpp.cpp',
-  'mock/mock_processor.cpp',
+kmx_files = files(
   'kmx/kmx_consts.cpp',
   'kmx/kmx_processevent.cpp',
   'kmx/kmx_actions.cpp',
@@ -84,13 +73,57 @@ lib = library('kmnkbp0',
   'kmx/kmx_options.cpp',
   'kmx/kmx_processor.cpp',
   'kmx/kmx_xstring.cpp',
+)
+
+api_files = files(
+  'km_kbp_context_api.cpp',
+  'km_kbp_keyboard_api.cpp',
+  'km_kbp_options_api.cpp',
+  'km_kbp_state_api.cpp',
+  'km_kbp_debug_api.cpp',
+  'km_kbp_processevent_api.cpp',
+)
+
+core_files = files(
+  'option.cpp',
+  'keyboard.cpp',
+  'state.cpp',
+  'jsonpp.cpp',
   'utfcodec.cpp',
+)
+
+mock_files = files(
+  'mock/mock_processor.cpp',
+)
+
+lib = library('kmnkbp0',
+  api_files,
+  core_files,
+  kmx_files,
+  mock_files,
   version_res,
   cpp_args: defns + warns + flags,
   link_args: links,
   version: lib_version,
   include_directories: inc,
+  pic: true,
   install: true)
+
+if host_machine.system() == 'linux'
+  # on Linux we need the static lib for ibus-keyman tests
+  static_library('kmnkbp0-static',
+    api_files,
+    core_files,
+    kmx_files,
+    mock_files,
+    version_res,
+    cpp_args: defns + warns + flags,
+    link_args: links,
+    include_directories: inc,
+    pic: true,
+    install: false
+  )
+endif
 
 headerdirs = [ '.', 'keyman' ] # subdirectories of ${prefix}/include to add to header path
 

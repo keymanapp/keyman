@@ -50,11 +50,11 @@ TESTS = \
 	$(NULL)
 
 print_kmp_SOURCES = \
-	print_kmp.c
+	test/print_kmp.c
 
 print_kmpdetails_SOURCES = \
 	kmpdetails.c \
-	print_kmpdetails.c \
+	test/print_kmpdetails.c \
 	$(NULL)
 print_kmpdetails_CFLAGS = \
 	$(AM_CFLAGS) \
