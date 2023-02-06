@@ -10,9 +10,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.util.KMPLink;
+import com.keyman.engine.BaseActivity;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.util.KMPLink;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

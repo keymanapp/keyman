@@ -6,7 +6,6 @@ G_BEGIN_DECLS
 typedef struct _TestModule TestModule;
 typedef struct _TestModuleClass TestModuleClass;
 
-#define TEST_TYPE_MODULE (test_module_get_type())
 #define TEST_MODULE(module) (G_TYPE_CHECK_INSTANCE_CAST((module), TEST_TYPE_MODULE, TestModule))
 #define TEST_MODULE_CLASS(class) (G_TYPE_CHECK_CLASS_CAST((class), TEST_TYPE_MODULE, TestModuleClass))
 #define TEST_IS_MODULE(module) (G_TYPE_CHECK_INSTANCE_TYPE((module), TEST_TYPE_MODULE))
@@ -24,7 +23,6 @@ struct _TestModuleClass {
   GTypeModuleClass parent_class;
 };
 
-static GType test_module_get_type(void);
 GTypeModule* test_module_new(TestModuleRegisterFunc register_func);
 void test_module_unuse(GTypeModule* test_module);
 
