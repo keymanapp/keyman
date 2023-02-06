@@ -1,4 +1,4 @@
-import OutputTargetBase from "@keymanapp/keyboard-processor/build/obj/text/outputTarget.js";
+import { OutputTarget as OutputTargetBase } from "@keymanapp/keyboard-processor";
 import EventEmitter from 'eventemitter3';
 
 export interface BaseEventMap {

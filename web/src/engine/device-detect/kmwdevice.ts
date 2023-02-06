@@ -3,7 +3,7 @@ import { DeviceSpec, Version } from "@keymanapp/web-utils";
 
 // The Device object definition -------------------------------------------------
 
-export default class Device {
+export class Device {
   touchable: boolean;
   OS: string;
   formFactor: string;
@@ -199,3 +199,5 @@ export default class Device {
     return new DeviceSpec(this.browser, this.formFactor, this.OS, this.touchable);
   }
 }
+
+export default Device;
