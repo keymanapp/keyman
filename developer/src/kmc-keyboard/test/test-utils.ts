@@ -117,20 +117,12 @@ describe('test of util/util.ts', () => {
       }), constants.keys_mod_shift);
       assert.equal(translateLayerAttrToModifier({
         id: 'shift',
-        modifier: 'shiftL shiftR',
+        modifier: 'shift',
       }), constants.keys_mod_shift);
-      assert.equal(translateLayerAttrToModifier({
-        id: 'shiftL',
-        modifier: 'shiftL',
-      }), constants.keys_mod_shiftL);
       assert.equal(translateLayerAttrToModifier({
         id: 'altshift',
         modifier: 'alt shift',
       }), constants.keys_mod_alt | constants.keys_mod_shift);
-      assert.equal(translateLayerAttrToModifier({
-        id: 'altlshiftl',
-        modifier: 'alt shiftL',
-      }), constants.keys_mod_alt | constants.keys_mod_shiftL);
     });
     it('should round trip each possible modifier', () => {
       for(let str of constants.keys_mod_map.keys()) {

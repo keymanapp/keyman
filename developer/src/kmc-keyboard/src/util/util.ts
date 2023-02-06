@@ -61,10 +61,7 @@ export function allUsedKeyIdsInLayers(layersList : LDMLKeyboard.LKLayers[] | nul
  * @returns modifier
  */
 export function translateLayerAttrToModifier(layer: LDMLKeyboard.LKLayer) : number {
-  const {id, modifier} = layer;
-  if(id == 'base') {
-    return constants.keys_mod_none;
-  }
+  const { modifier } = layer;
   if (modifier) {
     let mod = constants.keys_mod_none;
     for (let str of modifier.split(' ')) {

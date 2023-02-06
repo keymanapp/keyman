@@ -250,53 +250,37 @@ class Constants {
    */
   readonly keys_mod_none = 0;
   /**
-   * bitmask for modifier key
+   * bitmask for Left Alt modifier key
    */
   readonly keys_mod_altL = 1 << 2;
   /**
-   * bitmask for modifier key
+   * bitmask for Right Alt (AltGr) modifier key
    */
   readonly keys_mod_altR = 1 << 3;
   /**
-   * bitmask for either alt
+   * bitmask for either Alt (Windows) or Option (Apple) modifier keys
    */
   readonly keys_mod_alt  = this.keys_mod_altL | this.keys_mod_altR;
   /**
-   * bitmask for modifier key
+   * bitmask for Caps modifier key
    */
   readonly keys_mod_caps = 1 << 7;
   /**
-   * bitmask for modifier key
-   */
-  readonly keys_mod_cmd =  1 << 15;
-  /**
-   * bitmask for modifier key
+   * bitmask for Left control modifier key
    */
   readonly keys_mod_ctrlL = 1 << 0;
   /**
-   * bitmask for modifier key
+   * bitmask for Right control modifier key
    */
   readonly keys_mod_ctrlR = 1 << 1;
   /**
-   * bitmask for either ctrl
+   * bitmask for either Control modifier key
    */
   readonly keys_mod_ctrl = this.keys_mod_ctrlL | this.keys_mod_ctrlR;
   /**
-   * bitmask for modifier key
-   */
-  readonly keys_mod_opt = 1 << 14;
-  /**
-   * bitmask for either shift
+   * bitmask for either shift.
    */
   readonly keys_mod_shift = 1 << 4;
-  /**
-   * bitmask for modifier key
-   */
-  readonly keys_mod_shiftL = this.keys_mod_shift;
-  /**
-   * bitmask for modifier key
-   */
-  readonly keys_mod_shiftR =  this.keys_mod_shift;
 
   /**
    * Convenience map for modifiers
@@ -308,14 +292,10 @@ class Constants {
       ["altL", this.keys_mod_altL],
       ["altR", this.keys_mod_altR],
       ["caps", this.keys_mod_caps],
-      ["cmd", this.keys_mod_cmd],
       ["ctrl", this.keys_mod_ctrl],
       ["ctrlL", this.keys_mod_ctrlL],
       ["ctrlR", this.keys_mod_ctrlR],
-      ["opt", this.keys_mod_opt],
       ["shift", this.keys_mod_shift],
-      ["shiftL", this.keys_mod_shiftL],
-      ["shiftR", this.keys_mod_shiftR],
     ]
   );
 

@@ -144,10 +144,8 @@ other keyman values.
 |      3       | `altR`   | `alt` (both) = `altL + altR`                |
 |      4       | `shift`  | Either shift                                |
 |      7       | `caps`   |                                             |
-|     15       | `cmd`    | Nonstandard for keyman                      |
-|     14       | `opt`    | Nonstandard for keyman                      |
-|      4       | `shiftL` | alias for `shift`                           |
-|      4       | `shiftR` | alais for `shift`                           |
+
+TODO-LDML: Note that 'Current' LDML spec allows `shiftL`/`shiftR`, `opt`, and `cmd` but there is a request to drop these.
 
 - `flags`: Flags is a 32-bit bitfield defined as below:
 
