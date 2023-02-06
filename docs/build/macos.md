@@ -65,7 +65,7 @@ These dependencies are also listed below if you'd prefer to install manually.
   sudo ln -s /opt/homebrew/bin/greadlink /usr/local/bin/greadlink
   ```
 
-* Web: node.js, emscripten, openjdk 8
+* Web: node.js 14.6+, emscripten, openjdk 8
 
   ```shell
   brew install node emscripten openjdk@8
