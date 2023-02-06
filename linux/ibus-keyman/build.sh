@@ -14,18 +14,19 @@ builder_describe \
   "Build ibus-keyman." \
   "clean" \
   "configure" \
-  "build" \
+  "build+" \
   "test" \
   ":engine" \
-  "default+                  clean, configure, and build" \
+  "all                       clean, configure, and build" \
   "install                   install artifacts" \
   "uninstall                 uninstall artifacts" \
   "--debug,-d                Debug build" \
-  "--output=OUTPUT_PATH,-o   Output path (default: ../build/)"
+  "--output=OUTPUT_PATH,-o   Output path (default: ../build/)" \
+  "@/core configure build"
 
 builder_parse "$@"
 
-if builder_has_action default; then
+if builder_has_action all; then
   _builder_chosen_action_targets=("clean:engine" "configure:engine" "build:engine")
 fi
 
