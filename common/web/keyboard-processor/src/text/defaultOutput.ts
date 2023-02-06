@@ -1,6 +1,17 @@
+// TODO:  Move to separate folder:  'codes'
+// We should start splitting off code needed by keyboards even without a KeyboardProcessor active.
+// There's an upcoming `/common/web/types` package that 'codes' and 'keyboards' may fit well within.
+
 import Codes from "./codes.js";
 import type KeyEvent from "./keyEvent.js";
 import type OutputTarget from "./outputTarget.js";
+
+// The only members referenced are to produce warning and error logs.  A little abstraction
+// via an optional 'logger' interface can maintain it while facilitating a the split alluded
+// to above.
+//
+// Alternatively, we could just... not take in the parameter at all, which'd also facilitate
+// the future modularization effort.
 import RuleBehavior from "./ruleBehavior.js";
 
 export enum EmulationKeystrokes {
@@ -27,9 +38,9 @@ export default class DefaultOutput {
     var char = '';
 
     // A pretty simple table of lookups, corresponding VERY closely to the original defaultKeyOutput.
-    if((char = DefaultOutput.forSpecialEmulation(Lkc, ruleBehavior)) != null) {
+    if((char = DefaultOutput.forSpecialEmulation(Lkc)) != null) {
       return char;
-    } else if(!isMnemonic && ((char = DefaultOutput.forNumpadKeys(Lkc, ruleBehavior)) != null)) {
+    } else if(!isMnemonic && ((char = DefaultOutput.forNumpadKeys(Lkc)) != null)) {
       return char;
     } else if((char = DefaultOutput.forUnicodeKeynames(Lkc, ruleBehavior)) != null) {
       return char;
@@ -106,7 +117,7 @@ export default class DefaultOutput {
    * Codes matched here generally have default implementations when in a browser but require emulation
    * for 'synthetic' `OutputTarget`s like `Mock`s, which have no default text handling.
    */
-  public static forSpecialEmulation(Lkc: KeyEvent, ruleBehavior?: RuleBehavior): EmulationKeystrokes {
+  public static forSpecialEmulation(Lkc: KeyEvent): EmulationKeystrokes {
     let code = DefaultOutput.codeForEvent(Lkc);
 
     switch(code) {
@@ -122,7 +133,7 @@ export default class DefaultOutput {
   }
 
   // Should not be used for mnenomic keyboards.  forAny()'s use of this method checks first.
-  public static forNumpadKeys(Lkc: KeyEvent, ruleBehavior?: RuleBehavior) {
+  public static forNumpadKeys(Lkc: KeyEvent) {
     // Translate numpad keystrokes into their non-numpad equivalents
     if(Lkc.Lcode >= Codes.keyCodes["K_NP0"]  &&  Lkc.Lcode <= Codes.keyCodes["K_NPSLASH"]) {
       // Number pad, numlock on

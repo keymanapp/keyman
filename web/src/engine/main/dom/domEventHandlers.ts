@@ -399,8 +399,6 @@ namespace com.keyman.dom {
      * Description Processes keyup event and passes event data to keyboard
      */
     _KeyUp: (e: KeyboardEvent) => boolean = function(this: DOMEventHandlers, e: KeyboardEvent): boolean {
-      var osk = this.keyman.osk;
-
       var Levent = PreProcessor._GetKeyEventProperties(e, false);
       if(Levent == null) {
         return true;

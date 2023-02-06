@@ -69,6 +69,7 @@ interface LanguageProcessorEventMap {
   'suggestionapplied': (outputTarget: OutputTarget) => boolean
 }
 
+/* Is more like the model configuration engine */
 export default class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
   private lmEngine: LMLayer;
   private currentModel?: ModelSpec;
@@ -103,6 +104,10 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
 
   public get activeModel(): ModelSpec {
     return this.currentModel;
+  }
+
+  public get isConfigured(): boolean {
+    return !!this.configuration;
   }
 
   public unloadModel() {
