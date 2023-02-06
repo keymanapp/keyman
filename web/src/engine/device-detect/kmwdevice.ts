@@ -3,7 +3,7 @@ import { DeviceSpec, Version } from "@keymanapp/web-utils";
 
 // The Device object definition -------------------------------------------------
 
-export class Device {
+export default class Device {
   touchable: boolean;
   OS: string;
   formFactor: string;

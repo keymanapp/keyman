@@ -1,4 +1,12 @@
-var assert = chai.assert;
+let assert = chai.assert;
+
+import { Mock } from '/@keymanapp/keyboard-processor/build/obj/text/outputTarget.js';
+import { Input } from '/@keymanapp/keyman/build/engine/element-wrappers/lib/index.mjs';
+import extendString from '../../../../../common/web/utils/build/obj/kmwstring.js';
+
+import { toSupplementaryPairString, DynamicElements } from '../test_utils.js';
+
+extendString();
 
 var MockTests;
 
@@ -26,7 +34,7 @@ if(typeof MockTests == 'undefined') {
     MockTests.initBase = function() {
       var id = DynamicElements.addInput();
       var elem = document.getElementById(id);
-      var wrapper = new com.keyman.dom.targets.Input(elem);
+      var wrapper = new Input(elem);
 
       return wrapper;
     }
@@ -86,7 +94,7 @@ describe('OutputTarget Mocking', function() {
   describe('The "Mock" output target', function() {
     describe('Initialization', function() {
       it('properly initializes from a raw string', function() {
-        var mock = new com.keyman.text.Mock(MockTests.Apple.mixed);
+        var mock = new Mock(MockTests.Apple.mixed);
 
         assert.equal(mock.getText(), MockTests.Apple.mixed);
         assert.equal(mock.getDeadkeyCaret(), 5);
@@ -95,7 +103,7 @@ describe('OutputTarget Mocking', function() {
       it('copies an existing OutputTarget without a text selection', function() {
         var base = MockTests.setupBase(4);
 
-        var mock = com.keyman.text.Mock.from(base);
+        var mock = Mock.from(base);
         assert.equal(mock.getText(), MockTests.Apple.mixed);
         assert.deepEqual(mock.deadkeys(), base.deadkeys());
       });
@@ -103,7 +111,7 @@ describe('OutputTarget Mocking', function() {
       it('copies an existing OutputTarget with a text selection', function() {
         var base = MockTests.setupBase(4, 5);
 
-        var mock = com.keyman.text.Mock.from(base);
+        var mock = Mock.from(base);
         // The selection should appear to be automatically deleted, as any text mutation
         // by KMW would automatically erase the text anyway.
         assert.equal(mock.getText(), MockTests.Apple.mixed.substr(0, 5));
@@ -117,7 +125,7 @@ describe('OutputTarget Mocking', function() {
       it('is not affected by mutation of the source element', function() {
         // Already-verified code
         var base = MockTests.setupBase(4);
-        var mock = com.keyman.text.Mock.from(base);
+        var mock = Mock.from(base);
         var baseInitDks = base.deadkeys().clone();
 
         // Now for the actual test.
@@ -136,7 +144,7 @@ describe('OutputTarget Mocking', function() {
       it('does not affect the source element when mutated', function() {
         // Already-verified code
         var base = MockTests.setupBase(4);
-        var mock = com.keyman.text.Mock.from(base);
+        var mock = Mock.from(base);
         var baseInitDks = base.deadkeys().clone();
 
         // Now for the actual test.
