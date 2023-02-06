@@ -6,7 +6,7 @@
 module.exports = {
   // base path that will be used to resolve all patterns (eg. files, exclude)
   // set to Keyman repo base.
-  basePath: '../../../..',
+  basePath: '../../../../..',
 
   // Safeguards against disconnecting after starting tests.
   browserNoActivityTimeout: 60000,
@@ -37,16 +37,17 @@ module.exports = {
 
   // list of files / patterns to load in the browser
   files: [
-    'web/src/test/auto/modernizr.js',               // A dependency-managed utility script that helps with browser feature detection.
+    {pattern: 'web/src/test/auto/dom/kbdLoader.mjs', type: 'module', watched: true, served: true, included: false},
+    {pattern: 'web/src/test/auto/dom/timedPromise.mjs', type: 'module', watched: true, served: true, included: false},
     // 'web/build/engine/element-wrappers/obj/index.bundled.js', // Defines com.keyman.dom objects separate from KMW for unit testing.
     // 'web/build/engine/device-detect/obj/index.bundled.js',    // Defines com.keyman.utils.Device, separated from KMW for use in unit test setup.
     // 'web/build/tools/testing/recorder/obj/index.js',         // The object definitions used to generate/replicate key events for engine tests.
                                                  // Includes KMW's Device class, which is used by test_utils below.
-    {pattern: 'web/src/test/auto/test_init_check.js', type: 'module'},         // Ensures that tests will initialize properly
+    {pattern: 'web/src/test/auto/dom/test_init_check.js', type: 'module'},         // Ensures that tests will initialize properly
     'common/test/resources/timeout-adapter.js',  // Handles configuration timeout setup at runtime.
-    {pattern: 'web/src/test/auto/test_utils.js', type: 'module'},              // A basic utility script useful for constructing tests
+    {pattern: 'web/src/test/auto/dom/test_utils.js', type: 'module'},              // A basic utility script useful for constructing tests
 
-    {pattern: 'web/src/test/auto/cases/**/*.js', type: 'module'},              // Where the tests actually reside.
+    {pattern: 'web/src/test/auto/dom/cases/**/*.js', type: 'module'},              // Where the tests actually reside.
     'common/test/resources/json/**/*.json',      // Where pre-loaded JSON resides.
 
     {pattern: 'web/build/**/*.js',      watched: true, served: true, included: false}, // Includes all top-level KMW products
@@ -66,13 +67,18 @@ module.exports = {
     {pattern: 'web/build/app/web/debug/**/*.gif', watched: false, served: true, included: false}, // OSK resources
     {pattern: 'web/build/app/web/debug/**/*.png', watched: false, served: true, included: false}, // OSK resources
     {pattern: 'web/build/app/web/debug/**/*.ttf', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/src/resources/**/*.ttf', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/src/resources/**/*.css', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/src/resources/**/*.gif', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/src/resources/**/*.png', watched: false, served: true, included: false}, // OSK resources
     {pattern: 'web/build/app/web/debug/*.js', watched: true, served: true, included: false},  // The actual KMW code.
     {pattern: 'web/build/app/web/debug/*.map', watched: true, served: true, included: false}, // + sourcemaps.
     {pattern: 'web/build/app/ui/debug/*.js', watched: true, served: true, included: false},  // The actual KMW UI code.
     {pattern: 'web/build/app/ui/debug/*.map', watched: true, served: true, included: false}, // + sourcemaps.
     {pattern: 'web/build/tools/testing/recorder/obj/index.js.map', watched: true, served: true, included: false},
     {pattern: 'web/build/engine/element-wrappers/obj/index.bundled.js.map', watched: true, served: true, included: false},
-    {pattern: 'web/build/engine/device-detect/obj/index.bundled.js.map', watched: true, served: true, included: false}
+    {pattern: 'web/build/engine/device-detect/obj/index.bundled.js.map', watched: true, served: true, included: false},
+    {pattern: 'node_modules/sinon/**/*.*', watched: false, served: true, included: false}
   ],
 
   proxies: {

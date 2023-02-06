@@ -27,4 +27,9 @@ export default interface Configuration extends CommonConfiguration {
    * for the "inlined" style.
    */
   activator?: Activator<any>;
+
+  /**
+   * If set to `false`, hide animations will be disallowed.  Defaults to `true`.
+   */
+  allowHideAnimations?: boolean;
 }

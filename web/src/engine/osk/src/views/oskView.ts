@@ -19,14 +19,12 @@ import KeyEvent from '@keymanapp/keyboard-processor/build/obj/text/keyEvent.js';
 import TitleBar from '../components/titleBar.js';
 import { StylesheetManager } from 'keyman/build/engine/dom-utils/obj/stylesheets.js';
 import Configuration from '../config/viewConfiguration.js';
-import Activator from './activator.js';
-import ManagedPromise from '../managedPromise.js';
+import Activator, { StaticActivator } from './activator.js';
+import { ManagedPromise } from '@keymanapp/web-utils/build/lib/index.mjs';
 import TouchEventPromiseMap from './touchEventPromiseMap.js';
 
 // These will likely be eliminated from THIS file at some point.
 import type { SystemStoreMutationHandler, MutableSystemStore } from '@keymanapp/keyboard-processor/build/obj/text/systemStores.js';
-import { StateChangeEnum } from '@keymanapp/input-processor/build/obj/text/prediction/languageProcessor.js';
-import PredictionContext from '@keymanapp/input-processor/build/obj/text/prediction/predictionContext.js';
 
 export type OSKPos = {'left'?: number, 'top'?: number};
 
@@ -294,6 +292,11 @@ export default abstract class OSKView extends EventEmitter<EventMap> {
     // Clone the config; do not allow object references to be altered later.
     this.config = configuration = {...configuration};
     this.config.commonStyleSheetRefs = [...configuration.commonStyleSheetRefs];
+
+    // `undefined` is falsy, but we want a `true` default behavior for this config property.
+    if(this.config.allowHideAnimations === undefined) {
+      this.config.allowHideAnimations = true;
+    }
 
     this.config.device = configuration.device || configuration.hostDevice;
 
@@ -777,7 +780,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> {
     // Instantly resets the OSK container, erasing / delinking the previously-loaded keyboard.
     this._Box.innerHTML = '';
 
-    // Install the default OSK stylesheet - but don't have it managed by the stylesheet manager.
+    // Install the default OSK stylesheet - but don't have it managed by the keyboard-specific stylesheet manager.
     // We wish to maintain kmwosk.css whenever keyboard-specific styles are reset/removed.
     for(let sheetHref of this.configuration.commonStyleSheetRefs) {
       this.uiStyleSheetManager.linkExternalSheet(sheetHref);
@@ -1002,7 +1005,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> {
     }
 
     let promise: Promise<boolean> = null;
-    if(this._Box && this.hostDevice.touchable && !(this.keyboardView instanceof EmptyView)) {
+    if(this._Box && this.hostDevice.touchable && !(this.keyboardView instanceof EmptyView) && this.config.allowHideAnimations) {
       /**
        * Note:  this refactored code appears to reflect a currently-dead code path.  14.0's
        * equivalent is either extremely niche or is actually inaccessible.
@@ -1072,6 +1075,10 @@ export default abstract class OSKView extends EventEmitter<EventMap> {
    */
   protected mayHide(hiddenByUser: boolean): boolean {
     if(this.activationModel.conditionsMet && !this.mayDisable) {
+      return false;
+    }
+
+    if(this.activationModel instanceof StaticActivator) {
       return false;
     }
 

@@ -6,6 +6,7 @@ import type KeyboardProcessor from "@keymanapp/keyboard-processor/build/obj/text
 
 interface PredictionContextEventMap {
   update: (suggestions: Suggestion[]) => void;
+
 }
 
 /**
@@ -13,12 +14,12 @@ interface PredictionContextEventMap {
  * OutputTarget).  Instances should be thrown out and replaced when the context is reset and/or the
  * active lexical model has changed.
  *
- * This should only be constructed once the `LanguageProcessor` is in a "configured" state; this
- * prevents error states and helps the context to initialize correctly, fetching initial suggestions.
+ * This should not be constructed if the `LanguageProcessor` is in an "inactive" state; if no model is
+ * available, the 'lexical model' aspect of predictive context is effectively null.
  */
 export default class PredictionContext extends EventEmitter<PredictionContextEventMap> {
   // Historical note:  before 17.0, this code was intertwined with /web/source/osk/banner.ts's
-  // SuggestionBanner class.
+  // SuggestionBanner class.  This class serves as the main implementation of the banner's core logic.
 
   // Designed for use with auto-correct behavior
   private selected: Suggestion;
@@ -52,6 +53,16 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   public constructor(langProcessor: LanguageProcessor, kbdProcessor: KeyboardProcessor, target: OutputTarget) {
     super();
 
+    if(langProcessor.state == 'inactive') {
+      throw new Error("Invalid state:  no predictive-text model is currently available.");
+    }
+
+    if(!target) {
+      throw new Error("No text context is available to use for prediction!");
+    }
+
+    this.langProcessor = langProcessor;
+
     this.suggestionApplier = (suggestion) => {
       return langProcessor.applySuggestion(suggestion, target, () => kbdProcessor.layerId);
     }
@@ -60,6 +71,19 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
       langProcessor.applyReversion(reversion, target);
     }
 
+    // This can probably be handled by... whatever holds the PredictionContext object
+    // instead; possibly InputProcessor.  It was moved here since it's more closely-related
+    // to the old banner code that landed here, hence its current location.
+    //
+    // The "whatever holds the PredictionContext object" bit is significant, as that hasn't
+    // been fully worked out at this point of the ES module-conversion process.
+    //
+    // Note: moving this handler out of this specific class allows the constructor to
+    // drop the `kbdProcessor` parameter in favor of a lambda/closure that's just
+    // `() => kbdProcessor.layerId`.  Yay for narrower abstraction needs; that'd make
+    // unit testing way easier to lightly 'mock' in a proper manner.
+    //
+    // Should not be static, as diff constructor calls may use diff kbdProcessor instances.
     this.postApplicationHandler = (outputTarget: OutputTarget) => {
       if(target != outputTarget) {
         return;
@@ -77,11 +101,29 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
 
     this.connect();
 
-    // Generate the initial prediction for the new context.
-    if(langProcessor.isConfigured && target) {
-      langProcessor.predictFromTarget(target, kbdProcessor.layerId);
+    this.initializeState = () => {
+      if(langProcessor.isConfigured && target) {
+        return langProcessor.predictFromTarget(target, kbdProcessor.layerId);
+      } else {
+        // if(langProcessor.state == 'active') // model is loadING, not loadED.
+        return new Promise((resolve, reject) => {
+          langProcessor.once('statechange', (state) => {
+            if(state == 'configured') {
+              resolve(langProcessor.predictFromTarget(target, kbdProcessor.layerId));
+            } else { // == 'inactive' // an error occurred; the model load failed.
+              reject(new Error("The set predictive-text model failed to load and/or configure properly."));
+            }
+            // 'active' does not occur; we got here because that was the previous value.
+          });
+        });
+      }
     }
   }
+
+  /**
+   * Generates predictions based on the current state of the context, absent any incoming keystrokes.
+   */
+  public readonly initializeState: () => Promise<Suggestion[]>;
 
   private connect() {
     this.langProcessor.addListener('invalidatesuggestions', this.invalidateSuggestions);
@@ -137,7 +179,19 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     }
   }
 
-  public accept(suggestion: Suggestion) {
+  /**
+   * Applies predictive-text suggestions and post-acceptance reversions to the current
+   * prediction context.
+   *
+   * Note that both cases will additionally trigger a new asynchronous `predict` operation,
+   * though no corresponding Promise is returned by this function.  As such, the current
+   * suggestions should be considered outdated after calling this method, pending replacement
+   * upon the completed async `predict`.
+   *
+   * @param suggestion Either a `Suggestion` or `Reversion`.
+   * @returns if `suggestion` is a `Suggestion`, will return a Promise<Reversion>`; else, `null`.
+   */
+  public accept(suggestion: Suggestion): Promise<Reversion> | null {
     let _this = this;
 
     // Selecting a suggestion or a reversion should both clear selection
@@ -152,10 +206,8 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
         // Reversion state management
         this.recentAccept = false;
         this.recentRevert = true;
-
-        this.sendUpdateEvent();
       }
-      return;
+      return null;
     }
 
     this.revertAcceptancePromise.then(function(suggestion) {
@@ -169,7 +221,8 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     this.recentRevert = false;
 
     this.swallowPrediction = true;
-    this.sendUpdateEvent();
+
+    return this.revertAcceptancePromise;
   }
 
   private showRevert() {

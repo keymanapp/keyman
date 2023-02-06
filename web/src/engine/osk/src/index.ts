@@ -12,7 +12,7 @@ export { default as VisualKeyboard } from './visualKeyboard.js';
 export type { default as ViewConfiguration } from './config/viewConfiguration.js';
 export type { default as SpacebarText } from '@keymanapp/keyboard-processor/src/keyboards/spacebarText.js';
 
-export { default as Activator } from './views/activator.js';
+export { default as Activator, StaticActivator } from './views/activator.js';
 export { default as SimpleActivator } from './views/simpleActivator.js';
 export { default as TwoStateActivator } from './views/twoStateActivator.js';
 export { ParsedLengthStyle } from './lengthStyle.js';

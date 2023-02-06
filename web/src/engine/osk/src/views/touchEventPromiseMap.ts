@@ -1,4 +1,4 @@
-import ManagedPromise from "../managedPromise.js";
+import { ManagedPromise } from "@keymanapp/web-utils/build/lib/index.mjs";
 
 export default class TouchEventPromiseMap {
   private map: Record<number, ManagedPromise<void>> = {};

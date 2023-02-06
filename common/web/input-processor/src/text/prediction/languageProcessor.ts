@@ -81,6 +81,8 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
   private _mayPredict: boolean = true;
   private _mayCorrect: boolean = true;
 
+  private _state: StateChangeEnum = 'inactive';
+
   private static readonly TRANSCRIPTION_BUFFER: 10 = 10;
 
   public constructor(predictiveTextWorker: Worker, supportsRightDeletions: boolean = false) {
@@ -110,11 +112,16 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
     return !!this.configuration;
   }
 
+  public get state(): StateChangeEnum {
+    return this._state;
+  }
+
   public unloadModel() {
     this.lmEngine.unloadModel();
     delete this.currentModel;
     delete this.configuration;
 
+    this._state = 'inactive';
     this.emit('statechange', 'inactive');
   }
 
@@ -125,20 +132,21 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
 
     let specType: 'file'|'raw' = model.path ? 'file' : 'raw';
     let source = specType == 'file' ? model.path : model.code;
-    let lp = this;
 
     // We pre-emptively emit so that the banner's DOM elements may update synchronously.
     // Prevents an ugly "flash of unstyled content" layout issue during keyboard load
     // on our mobile platforms when embedded.
-    lp.currentModel = model;
+    this.currentModel = model;
     if(this.mayPredict) {
-      lp.emit('statechange', 'active');
+      this._state = 'active';
+      this.emit('statechange', 'active');
     }
 
-    return this.lmEngine.loadModel(source, specType).then(function(config: Configuration) {
-      lp.configuration = config;
-      lp.emit('statechange', 'configured');
-    }).catch(function(error) {
+    return this.lmEngine.loadModel(source, specType).then((config: Configuration) => {
+      this.configuration = config;
+      this._state = 'configured';
+      this.emit('statechange', 'configured');
+    }).catch((error) => {
       // Does this provide enough logging information?
       let message: string;
       if(error instanceof Error) {
@@ -150,8 +158,9 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
 
       // Since the model couldn't load, immediately deactivate.  Visually, it'll look
       // like the banner crashed shortly after load.
-      lp.currentModel = null;
-      lp.emit('statechange', 'inactive');
+      this.currentModel = null;
+      this._state = 'inactive';
+      this.emit('statechange', 'inactive');
     });
   }
 
@@ -253,8 +262,7 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
       let reversionPromise: Promise<Reversion> = this.lmEngine.acceptSuggestion(suggestion, suggestionContext, original.transform);
 
       // Also, request new prediction set based on the resulting context.
-      let lp = this;
-      reversionPromise = reversionPromise.then(function(reversion) {
+      reversionPromise = reversionPromise.then((reversion) => {
         let mappedReversion: Reversion = {
           // By mapping back to the original Transcription that generated the Suggestion,
           // the input will be automatically rewound to the preInput state.
@@ -268,7 +276,7 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
         // // If using the version from lm-layer:
         // let mappedReversion = reversion;
         // mappedReversion.transformId = reversionTranscription.token;
-        lp.predictFromTarget(outputTarget, getLayerId());
+        this.predictFromTarget(outputTarget, getLayerId());
         return mappedReversion;
       });
 
@@ -308,11 +316,10 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
     // The reason we need to preserve the additive-inverse 'transformId' property on Reversions.
     let promise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput, this.configuration, null))
 
-    let lp = this;
-    return promise.then(function(suggestions: Suggestion[]) {
+    return promise.then((suggestions: Suggestion[]) => {
       let result = new ReadySuggestions(suggestions, transform.id);
-      lp.emit("suggestionsready", result);
-      lp.currentPromise = null;
+      this.emit("suggestionsready", result);
+      this.currentPromise = null;
 
       return suggestions;
     });
@@ -355,12 +362,11 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
     let transform = transcription.transform;
     var promise = this.currentPromise = this.lmEngine.predict(alternates, context);
 
-    let lp = this;
-    return promise.then(function(suggestions: Suggestion[]) {
-      if(promise == lp.currentPromise) {
+    return promise.then((suggestions: Suggestion[]) => {
+      if(promise == this.currentPromise) {
         let result = new ReadySuggestions(suggestions, transform.id);
-        lp.emit("suggestionsready", result);
-        lp.currentPromise = null;
+        this.emit("suggestionsready", result);
+        this.currentPromise = null;
       }
 
       return suggestions;
@@ -383,7 +389,7 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
    * @returns The matching `Transcription`, or `null` none is found.
    */
   public getPredictionState(id: number): Transcription {
-    let match = this.recentTranscriptions.filter(function(t: Transcription) {
+    let match = this.recentTranscriptions.filter((t: Transcription) => {
       return t.token == id;
     })
 
@@ -425,7 +431,9 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
       // If it there was one and we've reached this point, we're globally
       // deactivating, so we're fine.
       if(this.activeModel) {
-        this.emit('statechange', flag ? 'active' : 'inactive');
+        let state: StateChangeEnum = flag ? 'active' : 'inactive';
+        this._state = state;
+        this.emit('statechange', state);
       }
     }
   }
