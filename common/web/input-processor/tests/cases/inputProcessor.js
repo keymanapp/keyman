@@ -99,7 +99,7 @@ describe('InputProcessor', function() {
         core.activeKeyboard = keyboard;
         let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
-        let event = key.constructKeyEvent(core.keyboardProcessor, device);
+        let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
 
         let behavior = core.processKeyEvent(event, context);
         assert.isNotNull(behavior);
@@ -118,7 +118,7 @@ describe('InputProcessor', function() {
         core.activeKeyboard = keyboard;
         let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
-        let event = key.constructKeyEvent(core.keyboardProcessor, device);
+        let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
 
         let behavior = core.processKeyEvent(event, context);
         assert.isNotNull(behavior);
@@ -135,7 +135,7 @@ describe('InputProcessor', function() {
         let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
         key.keyDistribution = testDistribution;
-        let event = key.constructKeyEvent(core.keyboardProcessor, device);
+        let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
 
         let behavior = core.processKeyEvent(event, context);
         assert.isNotNull(behavior);
@@ -158,7 +158,7 @@ describe('InputProcessor', function() {
         let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
         key.keyDistribution = testDistribution;
-        let event = key.constructKeyEvent(core.keyboardProcessor, device);
+        let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
 
         let behavior = core.processKeyEvent(event, context);
         assert.isNotNull(behavior);

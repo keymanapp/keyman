@@ -1,0 +1,24 @@
+{
+  "extends": "../../../../tsconfig-base.json",
+
+  "compilerOptions": {
+    "allowJs": true,
+    "inlineSources": true,
+    "allowSyntheticDefaultImports": true,
+    "module": "es6",
+    "moduleResolution": "Node",
+    "sourceMap": true,
+    "target": "es5",
+    "baseUrl": "./",
+    "outDir": "../../../build/engine/osk/obj/",
+    "tsBuildInfoFile": "../../../build/engine/osk/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
+  },
+
+  "include": [ "src/**/*.ts" ],
+
+  "references": [
+    { "path": "../../../../common/web/keyboard-processor" },
+    { "path": "../dom-utils" }
+  ]
+}

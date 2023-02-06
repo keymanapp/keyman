@@ -1,5 +1,7 @@
 // #region Big ol' list of imports
 
+import EventEmitter from 'eventemitter3';
+
 import Codes from "./codes.js";
 import type Keyboard from "../keyboards/keyboard.js";
 import KeyEvent from "./keyEvent.js";
@@ -32,7 +34,11 @@ export interface ProcessorInitOptions {
   variableStoreSerializer?: VariableStoreSerializer;
 }
 
-export default class KeyboardProcessor {
+interface EventMap {
+  statekeyChange: (stateKeys: typeof KeyboardProcessor.prototype.stateKeys) => void;
+}
+
+export default class KeyboardProcessor extends EventEmitter<EventMap> {
   public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
     baseLayout: 'us'
   }
@@ -67,6 +73,8 @@ export default class KeyboardProcessor {
   errorLogger?: LogMessageHandler;
 
   constructor(device: DeviceSpec, options?: ProcessorInitOptions) {
+    super();
+
     if(!options) {
       options = KeyboardProcessor.DEFAULT_OPTIONS;
     }
@@ -211,54 +219,15 @@ export default class KeyboardProcessor {
     return ruleBehavior;
   }
 
-  setSyntheticEventDefaults(Lkc: KeyEvent) {
-    // Set the flags for the state keys - for desktop devices. For touch
-    // devices, the only state key in use currently is Caps Lock, which is set
-    // when the 'caps' layer is active in ActiveKey::constructBaseKeyEvent.
-    if(!Lkc.device.touchable) {
-      Lkc.Lstates |= this.stateKeys['K_CAPS']    ? Codes.modifierCodes['CAPS'] : Codes.modifierCodes['NO_CAPS'];
-      Lkc.Lstates |= this.stateKeys['K_NUMLOCK'] ? Codes.modifierCodes['NUM_LOCK'] : Codes.modifierCodes['NO_NUM_LOCK'];
-      Lkc.Lstates |= this.stateKeys['K_SCROLL']  ? Codes.modifierCodes['SCROLL_LOCK'] : Codes.modifierCodes['NO_SCROLL_LOCK'];
-    }
-
-    // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
-    if(Lkc.kName && Lkc.kName.substr(0,2) == 'U_') {
-      Lkc.LisVirtualKey=false;
-    }
-
-    // Get code for non-physical keys (T_KOKAI, U_05AB etc)
-    if(typeof Lkc.Lcode == 'undefined') {
-      Lkc.Lcode = this.getVKDictionaryCode(Lkc.kName);// Updated for Build 347
-      if(!Lkc.Lcode) {
-        // Special case for U_xxxx keys. This vk code will never be used
-        // in a keyboard, so we use this to ensure that keystroke processing
-        // occurs for the key.
-        Lkc.Lcode = 1;
-      }
-    }
-
-    // Handles modifier states when the OSK is emulating rightalt through the leftctrl-leftalt layer.
-    if((Lkc.Lmodifiers & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM'] && this.activeKeyboard.emulatesAltGr) {
-      Lkc.Lmodifiers &= ~Codes.modifierBitmasks['ALT_GR_SIM'];
-      Lkc.Lmodifiers |= Codes.modifierCodes['RALT'];
-    }
-  }
-
-  constructNullKeyEvent(device: DeviceSpec): KeyEvent {
-    const keyEvent = KeyEvent.constructNullKeyEvent(device);
-    this.setSyntheticEventDefaults(keyEvent);
-    return keyEvent;
-  }
-
   processNewContextEvent(device: DeviceSpec, outputTarget: OutputTarget): RuleBehavior {
     return this.activeKeyboard ?
-      this.keyboardInterface.processNewContextEvent(outputTarget, this.constructNullKeyEvent(device)) :
+      this.keyboardInterface.processNewContextEvent(outputTarget, this.activeKeyboard.constructNullKeyEvent(device, this.stateKeys)) :
       null;
   }
 
   processPostKeystroke(device: DeviceSpec, outputTarget: OutputTarget): RuleBehavior {
     return this.activeKeyboard ?
-      this.keyboardInterface.processPostKeystroke(outputTarget, this.constructNullKeyEvent(device)) :
+      this.keyboardInterface.processPostKeystroke(outputTarget, this.activeKeyboard.constructNullKeyEvent(device, this.stateKeys)) :
       null;
   }
 
@@ -306,152 +275,6 @@ export default class KeyboardProcessor {
     return matchBehavior;
   }
 
-  // FIXME:  makes some bad assumptions.
-  static setMnemonicCode(Lkc: KeyEvent, shifted: boolean, capsActive: boolean) {
-    // K_SPACE is not handled by defaultKeyOutput for physical keystrokes unless using touch-aliased elements.
-    // It's also a "exception required, March 2013" for clickKey, so at least they both have this requirement.
-    if(Lkc.Lcode != Codes.keyCodes['K_SPACE']) {
-      // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
-      // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
-      let mappingEvent: KeyEvent = new KeyEvent();
-      for(var key in Lkc) {
-        mappingEvent[key] = Lkc[key];
-      }
-
-      // To facilitate storing relevant commands, we should probably reverse-lookup
-      // the actual keyname instead.
-      mappingEvent.kName = 'K_xxxx';
-      mappingEvent.Lmodifiers = (shifted ? 0x10 : 0);  // mnemonic lookups only exist for default & shift layers.
-      var mappedChar: string = DefaultOutput.forAny(mappingEvent, true);
-
-      /* First, save a backup of the original code.  This one won't needlessly trigger keyboard
-        * rules, but allows us to replicate/emulate commands after rule processing if needed.
-        * (Like backspaces)
-        */
-      Lkc.vkCode = Lkc.Lcode;
-      if(mappedChar) {
-        // Will return 96 for 'a', which is a keycode corresponding to Codes.keyCodes('K_NP1') - a numpad key.
-        // That stated, we're in mnemonic mode - this keyboard's rules are based on the char codes.
-        Lkc.Lcode = mappedChar.charCodeAt(0);
-      } else {
-        // Don't let command-type keys (like K_DEL, which will output '.' otherwise!)
-        // trigger keyboard rules.
-        //
-        // However, DO make sure modifier keys pass through safely.
-        // (https://github.com/keymanapp/keyman/issues/3744)
-        if(!KeyboardProcessor.isModifier(Lkc)) {
-          delete Lkc.Lcode;
-        }
-      }
-    }
-
-    if(capsActive) {
-      // TODO:  Needs fixing - does not properly mirror physical keystrokes, as Lcode range 96-111 corresponds
-      // to numpad keys!  (Physical keyboard section has its own issues here.)
-      if((Lkc.Lcode >= 65 && Lkc.Lcode <= 90) /* 'A' - 'Z' */ || (Lkc.Lcode >= 97 && Lkc.Lcode <= 122) /* 'a' - 'z' */) {
-        Lkc.Lmodifiers ^= 0x10;  // Flip the 'shifted' bit, so it'll act as the opposite key.
-        Lkc.Lcode ^= 0x20; // Flips the 'upper' vs 'lower' bit for the base 'a'-'z' ASCII alphabetics.
-      }
-    }
-  }
-
-  /**
-   * Get modifier key state from layer id
-   *
-   * @param       {string}      layerId       layer id (e.g. ctrlshift)
-   * @return      {number}                    modifier key state (desktop keyboards)
-   */
-  static getModifierState(layerId: string): number {
-    var modifier=0;
-    if(layerId.indexOf('shift') >= 0) {
-      modifier |= Codes.modifierCodes['SHIFT'];
-    }
-
-    // The chiral checks must not be directly exclusive due each other to visual OSK feedback.
-    var ctrlMatched=false;
-    if(layerId.indexOf('leftctrl') >= 0) {
-      modifier |= Codes.modifierCodes['LCTRL'];
-      ctrlMatched=true;
-    }
-    if(layerId.indexOf('rightctrl') >= 0) {
-      modifier |= Codes.modifierCodes['RCTRL'];
-      ctrlMatched=true;
-    }
-    if(layerId.indexOf('ctrl')  >= 0 && !ctrlMatched) {
-      modifier |= Codes.modifierCodes['CTRL'];
-    }
-
-    var altMatched=false;
-    if(layerId.indexOf('leftalt') >= 0) {
-      modifier |= Codes.modifierCodes['LALT'];
-      altMatched=true;
-    }
-    if(layerId.indexOf('rightalt') >= 0) {
-      modifier |= Codes.modifierCodes['RALT'];
-      altMatched=true;
-    }
-    if(layerId.indexOf('alt')  >= 0 && !altMatched) {
-      modifier |= Codes.modifierCodes['ALT'];
-    }
-
-    return modifier;
-  }
-
-  /**
-   * Get state key state from layer id
-   *
-   * @param       {string}      layerId       layer id (e.g. caps)
-   * @return      {number}                    modifier key state (desktop keyboards)
-   */
-    static getStateFromLayer(layerId: string): number {
-    var modifier=0;
-
-    if(layerId.indexOf('caps') >= 0) {
-      modifier |= Codes.modifierCodes['CAPS'];
-    } else {
-      modifier |= Codes.modifierCodes['NO_CAPS'];
-    }
-
-    return modifier;
-  }
-
-  /**
-   * @summary Look up a custom virtual key code in the virtual key code dictionary KVKD.  On first run, will build the dictionary.
-   *
-   * `VKDictionary` is constructed from the keyboard's `KVKD` member. This list is constructed
-   * at compile-time and is a list of 'additional' virtual key codes, starting at 256 (i.e.
-   * outside the range of standard virtual key codes). These additional codes are both
-   * `[T_xxx]` and `[U_xxxx]` custom key codes from the Keyman keyboard language. However,
-   * `[U_xxxx]` keys only generate an entry in `KVKD` if there is a corresponding rule that
-   * is associated with them in the keyboard rules. If the `[U_xxxx]` key code is only
-   * referenced as the id of a key in the touch layout, then it does not get an entry in
-   * the `KVKD` property.
-   *
-   * @private
-   * @param       {string}      keyName   custom virtual key code to lookup in the dictionary
-   * @return      {number}                key code > 255 on success, or 0 if not found
-   */
-  getVKDictionaryCode(keyName: string) {
-    var activeKeyboard = this.activeKeyboard;
-    if(!activeKeyboard.scriptObject['VKDictionary']) {
-      var a=[];
-      if(typeof activeKeyboard.scriptObject['KVKD'] == 'string') {
-        // Build the VK dictionary
-        // TODO: Move the dictionary build into the compiler -- so compiler generates code such as following.
-        // Makes the VKDictionary member unnecessary.
-        //       this.KVKD={"K_ABC":256,"K_DEF":257,...};
-        var s=activeKeyboard.scriptObject['KVKD'].split(' ');
-        for(var i=0; i<s.length; i++) {
-          a[s[i].toUpperCase()]=i+256; // We force upper-case since virtual keys should be case-insensitive.
-        }
-      }
-      activeKeyboard.scriptObject['VKDictionary']=a;
-    }
-
-    var res=activeKeyboard.scriptObject['VKDictionary'][keyName.toUpperCase()];
-    return res ? res : 0;
-  }
-
   /**
    * Function     _UpdateVKShift
    * Scope        Private
@@ -481,10 +304,16 @@ export default class KeyboardProcessor {
       }
 
       // Set stateKeys where corresponding value is passed in e.Lstates
+      let stateMutation = false;
       for(let i=0; i < lockNames.length; i++) {
         if(e.Lstates & Codes.stateBitmasks[lockNames[i]]) {
           this.stateKeys[lockKeys[i]] = !!(e.Lstates & Codes.modifierCodes[lockNames[i]]);
+          stateMutation = true;
         }
+      }
+
+      if(stateMutation) {
+        this.emit('statekeyChange', this.stateKeys);
       }
     }
 
@@ -493,7 +322,7 @@ export default class KeyboardProcessor {
     if(this.activeKeyboard.isMnemonic && this.stateKeys['K_CAPS']) {
       // Modifier keypresses doesn't trigger mnemonic manipulation of modifier state.
       // Only an output key does; active use of Caps will also flip the SHIFT flag.
-      if(!e || !KeyboardProcessor.isModifier(e)) {
+      if(!e || !e.isModifier) {
         // Mnemonic keystrokes manipulate the SHIFT property based on CAPS state.
         // We need to unflip them when tracking the OSK layer.
         keyShiftState ^= Codes.modifierCodes['SHIFT'];
@@ -654,7 +483,7 @@ export default class KeyboardProcessor {
       // if(idx == '') with accompanying if-else structural shift would be a far better test here.
       else {
         // Save our current modifier state.
-        var modifier=KeyboardProcessor.getModifierState(s);
+        var modifier=Codes.getModifierState(s);
 
         // Strip down to the base modifiable layer.
         for(i=0; i < replacements.length; i++) {
@@ -716,22 +545,8 @@ export default class KeyboardProcessor {
       this.layerId = 'default';
     }
 
-    let baseModifierState = KeyboardProcessor.getModifierState(this.layerId);
+    let baseModifierState = Codes.getModifierState(this.layerId);
     this.modStateFlags = baseModifierState | keyEvent.Lstates;
-  }
-
-  static isModifier(Levent: KeyEvent): boolean {
-    switch(Levent.Lcode) {
-      case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
-      case 17:
-      case 18:
-      case 20: //"K_CAPS":20, "K_NUMLOCK":144,"K_SCROLL":145
-      case 144:
-      case 145:
-        return true;
-      default:
-        return false;
-    }
   }
 
   // Returns true if the key event is a modifier press, allowing keyPress to return selectively
@@ -744,7 +559,7 @@ export default class KeyboardProcessor {
     if(Levent.Lcode == 8) {
       // I3318 (always clear deadkeys after backspace)
       outputTarget.deadkeys().clear();
-    } else if(KeyboardProcessor.isModifier(Levent)) {
+    } else if(Levent.isModifier) {
       this.activeKeyboard.notify(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0);
       // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
       if(!Levent.device.touchable) {

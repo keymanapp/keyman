@@ -1,12 +1,13 @@
 import Codes from "../text/codes.js";
 import { Layouts, type LayoutFormFactor } from "./defaultLayouts.js";
-import { ActiveLayout } from "./activeLayout.js";
-import type KeyEvent from "../text/keyEvent.js";
+import { ActiveKey, ActiveLayout } from "./activeLayout.js";
+import KeyEvent from "../text/keyEvent.js";
 import type OutputTarget from "../text/outputTarget.js";
 
 import type { ComplexKeyboardStore } from "../text/kbdInterface.js";
 
 import { Version, DeviceSpec } from "@keymanapp/web-utils";
+import StateKeyMap from "./stateKeyMap.js";
 
 /**
  * Stores preprocessed properties of a keyboard for quick retrieval later.
@@ -448,5 +449,118 @@ export default class Keyboard {
 
   public getLayoutState(formFactor: DeviceSpec.FormFactor) {
     return this.layoutStates[formFactor];
+  }
+
+
+  constructNullKeyEvent(device: DeviceSpec, stateKeys?: StateKeyMap): KeyEvent {
+    stateKeys = stateKeys || {
+      K_CAPS: false,
+      K_NUMLOCK: false,
+      K_SCROLL: false
+    }
+
+    const keyEvent = KeyEvent.constructNullKeyEvent(device);
+    this.setSyntheticEventDefaults(keyEvent, stateKeys);
+    return keyEvent;
+  }
+
+  constructKeyEvent(key: ActiveKey, device: DeviceSpec, stateKeys: StateKeyMap): KeyEvent {
+    // Make a deep copy of our preconstructed key event, filling it out from there.
+    const Lkc = key.baseKeyEvent;
+    Lkc.device = device;
+
+    if(this.isMnemonic) {
+      Lkc.setMnemonicCode(key.layer.indexOf('shift') != -1, stateKeys['K_CAPS']);
+    }
+
+    // Performs common pre-analysis for both 'native' and 'embedded' OSK key & subkey input events.
+    // This part depends on the keyboard processor's active state.
+    this.setSyntheticEventDefaults(Lkc, stateKeys);
+
+    // If it's a state key modifier, trigger its effects as part of the
+    // keystroke.
+    const bitmap = {
+      'K_CAPS': Codes.stateBitmasks.CAPS,
+      'K_NUMLOCK': Codes.stateBitmasks.NUM_LOCK,
+      'K_SCROLL': Codes.stateBitmasks.SCROLL_LOCK
+    };
+    const bitmask = bitmap[Lkc.kName];
+
+    if(bitmask) {
+      Lkc.Lstates ^= bitmask;
+      Lkc.LmodifierChange = true;
+    }
+
+    return Lkc;
+  }
+
+  setSyntheticEventDefaults(Lkc: KeyEvent, stateKeys: StateKeyMap) {
+    // Set the flags for the state keys - for desktop devices. For touch
+    // devices, the only state key in use currently is Caps Lock, which is set
+    // when the 'caps' layer is active in ActiveKey::constructBaseKeyEvent.
+    if(!Lkc.device.touchable) {
+      Lkc.Lstates |= stateKeys['K_CAPS']    ? Codes.modifierCodes['CAPS'] : Codes.modifierCodes['NO_CAPS'];
+      Lkc.Lstates |= stateKeys['K_NUMLOCK'] ? Codes.modifierCodes['NUM_LOCK'] : Codes.modifierCodes['NO_NUM_LOCK'];
+      Lkc.Lstates |= stateKeys['K_SCROLL']  ? Codes.modifierCodes['SCROLL_LOCK'] : Codes.modifierCodes['NO_SCROLL_LOCK'];
+    }
+
+    // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
+    if(Lkc.kName && Lkc.kName.substr(0,2) == 'U_') {
+      Lkc.LisVirtualKey=false;
+    }
+
+    // Get code for non-physical keys (T_KOKAI, U_05AB etc)
+    if(typeof Lkc.Lcode == 'undefined') {
+      Lkc.Lcode = this.getVKDictionaryCode(Lkc.kName);// Updated for Build 347
+      if(!Lkc.Lcode) {
+        // Special case for U_xxxx keys. This vk code will never be used
+        // in a keyboard, so we use this to ensure that keystroke processing
+        // occurs for the key.
+        Lkc.Lcode = 1;
+      }
+    }
+
+    // Handles modifier states when the OSK is emulating rightalt through the leftctrl-leftalt layer.
+    if((Lkc.Lmodifiers & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM'] && this.emulatesAltGr) {
+      Lkc.Lmodifiers &= ~Codes.modifierBitmasks['ALT_GR_SIM'];
+      Lkc.Lmodifiers |= Codes.modifierCodes['RALT'];
+    }
+  }
+
+  /**
+   * @summary Look up a custom virtual key code in the virtual key code dictionary KVKD.
+   * On first run, will build the dictionary.
+   *
+   * `VKDictionary` is constructed from the keyboard's `KVKD` member. This list is constructed
+   * at compile-time and is a list of 'additional' virtual key codes, starting at 256 (i.e.
+   * outside the range of standard virtual key codes). These additional codes are both
+   * `[T_xxx]` and `[U_xxxx]` custom key codes from the Keyman keyboard language. However,
+   * `[U_xxxx]` keys only generate an entry in `KVKD` if there is a corresponding rule that
+   * is associated with them in the keyboard rules. If the `[U_xxxx]` key code is only
+   * referenced as the id of a key in the touch layout, then it does not get an entry in
+   * the `KVKD` property.
+   *
+   * @private
+   * @param       {string}      keyName   custom virtual key code to lookup in the dictionary
+   * @return      {number}                key code > 255 on success, or 0 if not found
+   */
+  getVKDictionaryCode(keyName: string) {
+    if(!this.scriptObject['VKDictionary']) {
+      const a=[];
+      if(typeof this.scriptObject['KVKD'] == 'string') {
+        // Build the VK dictionary
+        // TODO: Move the dictionary build into the compiler -- so compiler generates code such as following.
+        // Makes the VKDictionary member unnecessary.
+        //       this.KVKD={"K_ABC":256,"K_DEF":257,...};
+        const s=this.scriptObject['KVKD'].split(' ');
+        for(var i=0; i<s.length; i++) {
+          a[s[i].toUpperCase()]=i+256; // We force upper-case since virtual keys should be case-insensitive.
+        }
+      }
+      this.scriptObject['VKDictionary']=a;
+    }
+
+    const res=this.scriptObject['VKDictionary'][keyName.toUpperCase()];
+    return res ? res : 0;
   }
 }

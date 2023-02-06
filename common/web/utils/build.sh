@@ -16,10 +16,15 @@ cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
+# Ensures color var use in `builder_describe`'s argument respects the specified
+# --color/--no-color option.
+builder_check_color "$@"
+
 builder_describe \
   "Compiles the web-oriented utility function module." \
   "@../keyman-version" \
-  configure clean build
+  configure clean build test \
+  "--ci    For use with action ${BUILDER_TERM_START}test${BUILDER_TERM_END} - emits CI-friendly test reports"
 
 builder_describe_outputs \
   configure "/node_modules" \
@@ -49,4 +54,18 @@ if builder_start_action build; then
     npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/index.d.ts
   fi
   builder_finish_action success build
+fi
+
+if builder_start_action test; then
+  echo_heading "Running web-utils test suite"
+
+  FLAGS=
+  if builder_has_option --ci; then
+    echo "Replacing user-friendly test reports with CI-friendly versions."
+    FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
+  fi
+
+  npm run mocha -- --recursive $FLAGS ./src/test/
+
+  builder_finish_action success test
 fi

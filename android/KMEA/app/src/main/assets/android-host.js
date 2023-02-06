@@ -170,10 +170,8 @@ function deregisterModel(modelID) {
 function enableSuggestions(model, mayPredict, mayCorrect) {
   // Set the options first so that KMW's ModelManager can properly handle model enablement states
   // the moment we actually register the new model.
-  keyman.osk.banner.setOptions({
-    'mayPredict': mayPredict,
-    'mayCorrect': mayCorrect
-  });
+  keyman.core.languageProcessor.mayPredict = mayPredict;
+  keyman.core.languageProcessor.mayCorrect = mayCorrect;
 
   registerModel(model);
 }

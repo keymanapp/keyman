@@ -129,9 +129,9 @@ function getOskHeight() {
 var keyboardOffset = 0;
 function setKeymanLanguage(stub) {
     var kmw = window.keyman;
-    
+
     KeymanWeb.registerStub(stub);
-    
+
     kmw.setActiveKeyboard(stub.KP + '::' + stub.KI, stub.KLC).then(function() {
         kmw.osk.show(true);
         doResetContext();
@@ -316,10 +316,8 @@ function toHex(theString) {
 function enableSuggestions(model, mayPredict, mayCorrect) {
     // Set the options first so that KMW's ModelManager can properly handle model enablement states
     // the moment we actually register the new model.
-    keyman.osk.banner.setOptions({
-    'mayPredict': mayPredict,
-    'mayCorrect': mayCorrect
-    });
+    keyman.core.languageProcessor.mayPredict = mayPredict;
+    keyman.core.languageProcessor.mayCorrect = mayCorrect;
 
     keyman.modelManager.register(model);
 }

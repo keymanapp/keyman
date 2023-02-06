@@ -9,6 +9,7 @@
     "moduleResolution": "Node",
     "sourceMap": true,
     "target": "es5",
+    "baseUrl": "./",
     "outDir": "../../../build/engine/element-wrappers/obj/",
     "tsBuildInfoFile": "../../../build/engine/element-wrappers/obj/tsconfig.tsbuildinfo",
     "rootDir": "./src"
