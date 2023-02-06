@@ -1,4 +1,4 @@
-import Keyboard from '@keymanapp/keyboard-processor/build/obj/keyboards/keyboard.js';
+import { Keyboard } from '@keymanapp/keyboard-processor';
 
 import KeyboardView from './keyboardView.interface.js';
 import { ParsedLengthStyle } from "../lengthStyle.js";

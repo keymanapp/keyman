@@ -1,7 +1,4 @@
-import { ActiveLayer } from '@keymanapp/keyboard-processor/build/obj/keyboards/activeLayout.js';
-import { LayoutLayer } from '@keymanapp/keyboard-processor/build/obj/keyboards/defaultLayouts.js';
-import Keyboard from '@keymanapp/keyboard-processor/build/obj/keyboards/keyboard.js';
-import type DeviceSpec from '@keymanapp/web-utils/build/obj/deviceSpec.js';
+import { ActiveLayer, type DeviceSpec, Keyboard, LayoutLayer } from '@keymanapp/keyboard-processor';
 
 import OSKLayer from './oskLayer.js';
 import VisualKeyboard from '../visualKeyboard.js';

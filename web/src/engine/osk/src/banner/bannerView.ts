@@ -4,8 +4,8 @@ import { Banner, BlankBanner, ImageBanner, SuggestionBanner } from './banner.js'
 import OSKViewComponent from '../components/oskViewComponent.interface.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 
-import DeviceSpec from '@keymanapp/web-utils/build/obj/deviceSpec.js';
-import type { StateChangeEnum } from '@keymanapp/input-processor/build/obj/text/prediction/languageProcessor.js';
+import { DeviceSpec } from '@keymanapp/web-utils';
+import type { StateChangeEnum } from '@keymanapp/input-processor';
 import createUnselectableElement from 'keyman/build/engine/dom-utils/obj/createUnselectableElement.js';
 
 /**

@@ -1,12 +1,10 @@
 import EventEmitter from 'eventemitter3';
 
-import Keyboard from '@keymanapp/keyboard-processor/build/obj/keyboards/keyboard.js';
+import { Keyboard } from '@keymanapp/keyboard-processor';
 
 import OSKViewComponent from './oskViewComponent.interface.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 import MouseDragOperation from '../input/mouseDragOperation.js';
-import OSKView from '../views/oskView.js';
-import FloatingOSKView from '../views/floatingOskView.js';
 
 import createUnselectableElement from 'keyman/build/engine/dom-utils/obj/createUnselectableElement.js';
 

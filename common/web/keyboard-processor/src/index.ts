@@ -4,6 +4,7 @@ export { default as Keyboard } from "./keyboards/keyboard.js";
 export * from "./keyboards/keyboard.js";
 export { default as KeyboardProperties } from "./keyboards/keyboardProperties.js";
 export { default as SpacebarText } from "./keyboards/spacebarText.js";
+export { default as StateKeyMap } from "./keyboards/stateKeyMap.js";
 
 export { default as Codes } from "./text/codes.js";
 export * from "./text/codes.js";

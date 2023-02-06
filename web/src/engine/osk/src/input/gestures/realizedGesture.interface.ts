@@ -1,6 +1,6 @@
 import InputEventCoordinate from '../inputEventCoordinate.js';
 import { type KeyElement } from '../../keyElement.js';
-import type KeyEvent from '@keymanapp/keyboard-processor/build/obj/text/keyEvent.js';
+import { type KeyEvent } from '@keymanapp/keyboard-processor';
 
 /**
  * Implementations of this interface allow individual types of gestures to

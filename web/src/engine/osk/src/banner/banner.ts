@@ -1,9 +1,8 @@
 import EventEmitter from 'eventemitter3';
 
-import DeviceSpec from '@keymanapp/web-utils/build/obj/deviceSpec.js';
-import Keyboard from '@keymanapp/keyboard-processor/build/obj/keyboards/keyboard.js';
-import KeyboardProperties from '@keymanapp/keyboard-processor/build/obj/keyboards/keyboardProperties.js';
-import type PredictionContext from '@keymanapp/input-processor/build/obj/text/prediction/predictionContext.js';
+import { DeviceSpec } from '@keymanapp/web-utils';
+import { Keyboard, KeyboardProperties } from '@keymanapp/keyboard-processor';
+import { type PredictionContext } from '@keymanapp/input-processor';
 import InputEventEngine, { InputEventEngineConfig } from '../input/event-interpreter/inputEventEngine.js';
 import MouseEventEngine from '../input/event-interpreter/mouseEventEngine.js';
 import TouchEventEngine from '../input/event-interpreter/touchEventEngine.js';
