@@ -1,5 +1,41 @@
 # Keyman Version History
 
+## 17.0.42 alpha 2023-02-03
+
+* chore(deps): bump http-cache-semantics from 4.1.0 to 4.1.1 (#8144)
+* feat(developer): check for duplicated language codes in package editor and compiler (#8151)
+* chore: Fail TC build if triggering Jenkins build fails (#8152)
+* chore(linux): Fix lintian warnings (#8154)
+* chore(core): Update meson version (#7882)
+* refactor(android/engine): Consolidate Keyboard picker intent (#8163)
+
+## 17.0.41 alpha 2023-02-02
+
+* chore(web): main web build & test script rework to our common script format + nomenclature (#7474)
+* change(web): conversion to standard filesystem layout:  source -> src, intermediate + release -> build (#7513)
+* change(web): conversion to standard filesystem layout:  testing -> src/test/manual, unit_tests -> src/test/auto (#7515)
+* change(web): conversion to standard filesystem layout:  tools -> src/tools (#7556)
+* chore(web): updates build product references, extracts CI test-build scripts (#7831)
+* feat(common): TS-based sourcemap remapping tool (#7894)
+* feat(web): implements shell scripting for CI release-build configurations (#8001)
+
+## 17.0.40 alpha 2023-02-01
+
+* chore(developer): kmcmpdll debug src path (#8127)
+* chore(common): Merge end of beta from Sprint A17S5 (#8135)
+* refactor(android): Change com.tavultesoft.kmea package to com.keyman.engine (#7981)
+* refactor(android/engine): Split KMInAppKeyboardWebViewClient to new class (#7983)
+* refactor(android/engine): Refactor KMSystemKeyboardWebViewClient (#7993)
+
+## 17.0.39 alpha 2023-01-31
+
+* feat(windows): add additional registry keys to report (#8126)
+
+## 17.0.38 alpha 2023-01-30
+
+* chore(deps): bump ua-parser-js from 0.7.31 to 0.7.33 (#8109)
+* fix(linux): Fix CI build (#8121)
+
 ## 17.0.37 alpha 2023-01-27
 
 * chore(linux): Fix warnings (#8103)
@@ -121,7 +157,7 @@
 ## 17.0.13 alpha 2022-11-29
 
 * fix(windows): lower case filenames for projects (#7837)
-* refactor(linux): Refactor setting keyboard options  ️ (#7804)
+* refactor(linux): Refactor setting keyboard options (#7804)
 
 ## 17.0.12 alpha 2022-11-25
 
@@ -129,7 +165,7 @@
 
 ## 17.0.11 alpha 2022-11-24
 
-* refactor(linux): Use consts instead of strings  ️ (#7803)
+* refactor(linux): Use consts instead of strings (#7803)
 
 ## 17.0.10 alpha 2022-11-21
 
@@ -150,14 +186,14 @@
 
 * chore: fix TIER.md for master (#7704)
 
-## 17.0.6 beta 2022-11-12
+## 17.0.6 alpha 2022-11-12
 
 * chore: merge beta to master B16S1 (#7693)
 * chore(deps): bump minimatch from 3.0.4 to 3.1.2 (#7675)
 
 ## 17.0.5 alpha 2022-11-11
 
-* chore(linux): Update debian changelog :cherries: (#7681)
+* chore(linux): Update debian changelog (#7681)
 
 ## 17.0.4 alpha 2022-11-10
 
@@ -177,6 +213,22 @@
 * feat(windows): configuration UI polish (#7206)
 * chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
+
+## 16.0.136 beta 2023-01-31
+
+* chore(common): Update crowdin strings for Shuwa (Latin) (#8097)
+* chore(common): Check in crowdin for Russian (#8072)
+* chore(common): Check in crowdin for Ukrainian (#8073)
+* chore(common): Add crowdin for Swedish (#8071)
+* chore(common): Add crowdin strings for Czech (#8095)
+
+## 16.0.135 beta 2023-01-30
+
+* chore(linux): Include packaging path in Vcs-Git header (#8110)
+
+## 16.0.134 beta 2023-01-25
+
+* chore(common): Add crowdin strings for Kannada (#7970)
 
 ## 16.0.133 beta 2023-01-19
 

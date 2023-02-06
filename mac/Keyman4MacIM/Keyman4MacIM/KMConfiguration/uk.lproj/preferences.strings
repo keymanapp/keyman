@@ -1,0 +1,38 @@
+/* Checkbox text to always show on-screen keyboard */
+"4UX-80-0Vo.title" = "Завжди показувати на екранній клавіатурі";
+
+/* Checkbox text to enable verbose Console logging */
+"7J6-zy-R20.title" = "Використати докладне ведення журналу";
+
+/* Support button text  */
+"93O-x6-RLF.label" = "Підтримка";
+
+/* Download Keyboard button text */
+"CTw-kf-WNS.title" = "Завантажити клавіатуру...";
+
+/* Keyman Configuration window title */
+"F0z-JX-Cv5.title" = "Налаштування Keyman";
+
+/* button text to go back to previous page */
+"JOK-JV-n8w.title" = "Відмінити";
+
+/* Keyboards button text */
+"MPN-9N-wWc.label" = "Keyboards";
+
+/* text to explain verbose Console logging option */
+"MrI-GM-7d6.title" = "Коли відбувається докладне ведення журналу, Keyman буде журналювати, які можуть допомогти Keyman підтримувати проблему. Програма Консолі може бути використана щоб побачити журнал повідомлень з Keyman. У Console, фільтр для показу всіх повідомлень з процесу \"Keyman\". За необхідності, цей журнал можна експортувати та відправляти в підтримку Keyman.";
+
+/* button text to move forward to the next page */
+"eXr-8V-h1g.title" = "Переслати";
+
+/* button text to return to the home help page */
+"fXS-aC-CMH.title" = "Домашній екран";
+
+/* Options button text */
+"frd-No-seV.label" = "Опції";
+
+/* Installed Keyboard column heading */
+"jex-Nd-Qzg.headerCell.title" = "Встановлена клавіатура";
+
+/* Verbose logging tooltip text */
+"uWx-3J-U0D.ibShadowedToolTip" = "Увімкніть це, якщо у вас виникають проблеми з певною клавіатурою або з Keyman загалом.";
