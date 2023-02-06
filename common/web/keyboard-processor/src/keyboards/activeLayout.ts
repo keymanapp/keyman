@@ -154,16 +154,13 @@ export class ActiveKey implements LayoutKey {
     return deepCopy(this._baseKeyEvent);
   }
 
-  // Since I'll forget to note this otherwise... https://github.com/keymanapp/keyman/pull/7741/files#diff-9c3f288e2f41bf7a787f1aaff8802aee29c239f98d2efcb96d3a42a2ccfae0dd
-  // This implementation was apparently lost in a merge or something?  The question is... exactly where and when?  It's visible in
-  // the repo, but was missing from this branch... UNLIKE certain references to it!
   /**
    * Converts key IDs of the U_* form to their corresponding UTF-16 text.
    * If an ID not matching the pattern is received, returns null.
    * @param id
    * @returns
    */
-    static unicodeIDToText(id: string, errorCallback?: (codeAsString: string) => void) {
+  static unicodeIDToText(id: string, errorCallback?: (codeAsString: string) => void) {
     if(!id || id.substring(0,2) != 'U_') {
       return null;
     }

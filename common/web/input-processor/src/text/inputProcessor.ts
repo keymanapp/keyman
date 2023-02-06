@@ -43,21 +43,6 @@ export default class InputProcessor {
     this.contextDevice = device;
     this.kbdProcessor = new KeyboardProcessor(device, options);
     this.lngProcessor = new LanguageProcessor(predictiveTextWorker);
-
-    this.lngProcessor.on('suggestionapplied', this.onSuggestionApplied);
-  }
-
-  private onSuggestionApplied = (outputTarget: OutputTarget) => {
-    // Tell the keyboard that the current layer has not changed
-    this.keyboardProcessor.newLayerStore.set('');
-    this.keyboardProcessor.oldLayerStore.set('');
-    // Call the keyboard's entry point.
-    this.keyboardProcessor.processPostKeystroke(this.contextDevice, outputTarget)
-      // If we have a RuleBehavior as a result, run it on the target. This should
-      // only change system store and variable store values.
-      ?.finalize(this.keyboardProcessor, outputTarget, true);
-
-    return true;
   }
 
   public get languageProcessor(): LanguageProcessor {
