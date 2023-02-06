@@ -97,10 +97,10 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
 
 builder_describe_outputs \
-  configure                  ../node_modules \
-  configure:device-detect    ../node_modules \
-  configure:element-wrappers ../node_modules \
-  configure:main             ../node_modules \
+  configure                  ../../../node_modules \
+  configure:device-detect    ../../../node_modules \
+  configure:element-wrappers ../../../node_modules \
+  configure:main             ../../../node_modules \
   build:device-detect        $(output_path $DEVICEDETECT $OUTPUT_DIR)/index.js \
   build:element-wrappers     $(output_path $ELEMENTWRAPPERS $OUTPUT_DIR)/index.js \
   build:main                 $(output_path $MAIN $OUTPUT_DIR)/keymanweb.js
@@ -128,15 +128,7 @@ compile ( ) {
   local COMPILE_TARGET=$1
   local COMPILED_OUTPUT_PATH="$(output_path $COMPILE_TARGET $OUTPUT_DIR)"
 
-  BUNDLE_CONFIG=src/$COMPILE_TARGET/tsconfig.bundled.json
-
   $compilecmd -b src/$COMPILE_TARGET -v
-
-  # Handle any 'bundled' compilations, too!
-  # `if`'s working dir:  web/src/engine; $compilecmd's: web/
-  if [ -f "../../$BUNDLE_CONFIG" ]; then
-    $compilecmd -b $BUNDLE_CONFIG -v
-  fi
 
   echo $COMPILE_TARGET TypeScript compiled under $COMPILED_OUTPUT_PATH
 }
