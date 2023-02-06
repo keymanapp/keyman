@@ -13,7 +13,7 @@ describe('ldml keyboard xml reader tests', function() {
       throw new Error('loadLdmlKeyboardSchema not implemented.');
     },
     reportMessage: function (event: CompilerEvent): void {
-      throw new Error('reportMessage not implemented.');
+      throw new Error('Message#' + Number(event.code).toString(16));
     },
     loadKvksJsonSchema: function (): Buffer {
       throw new Error('loadKvksJsonSchema` not implemented.');
@@ -26,10 +26,9 @@ describe('ldml keyboard xml reader tests', function() {
     const data = loadFile(inputFilename, inputFilename);
     const source = reader.load(data);
     assert.isNotNull(source);
-    // TODO-LDML: could report a messge instead of throw
     assert.throws(() => {
       reader.validate(source, loadLdmlKeyboardSchema());
-    }, `/keyboard: required: must have required property 'names' {"missingProperty":"names"}`);
+    }, `Message#301001`);
   });
 
   it("should fail to load files with an invalid conformsTo", function() {
@@ -38,10 +37,9 @@ describe('ldml keyboard xml reader tests', function() {
     const data = loadFile(inputFilename, inputFilename);
     const source = reader.load(data);
     assert.isNotNull(source);
-    // TODO-LDML: could report a messge instead of throw
     assert.throws(() => {
       reader.validate(source, loadLdmlKeyboardSchema());
-    }, `/keyboard/conformsTo: enum: must be equal to one of the allowed values {"allowedValues":["techpreview"]}`);
+    }, `Message#301001`);
   });
 
 });
