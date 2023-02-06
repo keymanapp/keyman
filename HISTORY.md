@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.43 alpha 2023-02-06
+
+* chore(linux): Build with meson instead of autotools  ️ (#8111)
+
 ## 17.0.42 alpha 2023-02-03
 
 * chore(deps): bump http-cache-semantics from 4.1.0 to 4.1.1 (#8144)
