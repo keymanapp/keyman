@@ -72,8 +72,8 @@ module.exports = {
 
   proxies: {
     "/resources/": "/base/common/test/resources/",
-    "/node_modules/": "/base/node_modules/",
-    "/@keymanapp/lm-worker/": "/base/node_modules/@keymanapp/lm-worker/"
+    // "/node_modules/": "/base/node_modules/",
+    // "/@keymanapp/lm-worker/": "/base/node_modules/@keymanapp/lm-worker/"
   },
 
   // web server port

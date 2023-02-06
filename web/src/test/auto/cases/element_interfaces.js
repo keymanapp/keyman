@@ -1,5 +1,14 @@
 var assert = chai.assert;
 
+import * as wrappers from '/@keymanapp/keyman/build/engine/element-wrappers/lib/index.mjs';
+import { Mock } from '/@keymanapp/keyboard-processor/build/obj/text/outputTarget.js';
+import extendString from '../../../../../common/web/utils/build/obj/kmwstring.js';
+import Device from '/@keymanapp/keyman/build/engine/device-detect/lib/index.mjs';
+
+import { toSupplementaryPairString, DynamicElements, DEVICE_DETECT_FAILURE } from '../test_utils.js';
+
+extendString();
+
 var InterfaceTests;
 
 // Define common interface testing functions that can be run upon the OutputTarget interface.
@@ -24,7 +33,7 @@ if(typeof InterfaceTests == 'undefined') {
     InterfaceTests.Input.setupElement = function() {
       var id = DynamicElements.addInput();
       var elem = document.getElementById(id);
-      var wrapper = new com.keyman.dom.targets.Input(elem);
+      var wrapper = new wrappers.Input(elem);
 
       return {elem: elem, wrapper: wrapper};
     }
@@ -70,7 +79,7 @@ if(typeof InterfaceTests == 'undefined') {
     InterfaceTests.TextArea.setupElement = function() {
       var id = DynamicElements.addText();
       var elem = document.getElementById(id);
-      var wrapper = new com.keyman.dom.targets.TextArea(elem);
+      var wrapper = new wrappers.TextArea(elem);
 
       return {elem: elem, wrapper: wrapper};
     }
@@ -120,7 +129,7 @@ if(typeof InterfaceTests == 'undefined') {
     InterfaceTests.ContentEditable.setupElement = function() {
       var id = DynamicElements.addEditable();
       var elem = document.getElementById(id);
-      var wrapper = new com.keyman.dom.targets.ContentEditable(elem);
+      var wrapper = new wrappers.ContentEditable(elem);
 
       return {elem: elem, wrapper: wrapper, node: null};
     }
@@ -128,7 +137,7 @@ if(typeof InterfaceTests == 'undefined') {
     InterfaceTests.ContentEditable.setupDummyElement = function() {
       var id = DynamicElements.addEditable();
       var elem = document.getElementById(id);
-      var wrapper = new com.keyman.dom.targets.ContentEditable(elem);
+      var wrapper = new wrappers.ContentEditable(elem);
 
       return {elem: elem, wrapper: wrapper, node: null};
     }
@@ -155,7 +164,7 @@ if(typeof InterfaceTests == 'undefined') {
     }
 
     InterfaceTests.ContentEditable.setSelectionRange = function(pair, start, end) {
-      var device = new com.keyman.Device();
+      var device = new Device();
       device.detect();
 
       var node = pair.elem.childNodes[0];
@@ -221,11 +230,11 @@ if(typeof InterfaceTests == 'undefined') {
 
       var id1 = DynamicElements.addDesignIFrame(function() {
         var id2 = DynamicElements.addDesignIFrame(function() {
-          elem1 = document.getElementById(id1);
-          elem2 = document.getElementById(id2);
+          let elem1 = document.getElementById(id1);
+          let elem2 = document.getElementById(id2);
 
-          obj.mainPair =  {elem: elem1, wrapper: new com.keyman.dom.targets.DesignIFrame(elem1), document: elem1.contentWindow.document};
-          obj.dummyPair = {elem: elem2, wrapper: new com.keyman.dom.targets.DesignIFrame(elem2), document: elem1.contentWindow.document};
+          obj.mainPair =  {elem: elem1, wrapper: new wrappers.DesignIFrame(elem1), document: elem1.contentWindow.document};
+          obj.dummyPair = {elem: elem2, wrapper: new wrappers.DesignIFrame(elem2), document: elem1.contentWindow.document};
 
           done();
         });
@@ -262,7 +271,7 @@ if(typeof InterfaceTests == 'undefined') {
     }
 
     InterfaceTests.DesignIFrame.setSelectionRange = function(pair, start, end) {
-      var device = new com.keyman.Device();
+      var device = new Device();
       device.detect();
 
       var node = pair.document.documentElement.childNodes[0];
@@ -319,7 +328,7 @@ if(typeof InterfaceTests == 'undefined') {
     InterfaceTests.Mock = {};
 
     InterfaceTests.Mock.setupElement = function() {
-      return {wrapper: new com.keyman.text.Mock()};
+      return {wrapper: new Mock()};
     }
 
     InterfaceTests.Mock.resetWithText = function(pair, string) {
@@ -1136,7 +1145,7 @@ describe('Element Input/Output Interfacing', function() {
   describe('Wrapper: Content-Editable Elements (using DIVs)', function() {
     before(function() {
       // These tests require use of KMW's device-detection functionality.
-      assert.isFalse(com.keyman.karma.DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
+      assert.isFalse(DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
     })
 
     describe('Caret Handling', function() {
@@ -1228,7 +1237,7 @@ describe('Element Input/Output Interfacing', function() {
 
     before(function() {
       // These tests require use of KMW's device-detection functionality.
-      assert.isFalse(com.keyman.karma.DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
+      assert.isFalse(DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
     })
 
     beforeEach(function(done) {
