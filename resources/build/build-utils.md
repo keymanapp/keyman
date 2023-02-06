@@ -45,7 +45,9 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/<relative-path-to-repo-root>/resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-# any other includes, such as jq.inc.sh
+# . "$KEYMAN_ROOT/.../foo.inc.sh"     # any other includes, such as jq.inc.sh
+
+# cd "$THIS_SCRIPT_PATH"              # optionally, run from script directory
 
 ################################ Main script ################################
 ```
@@ -102,6 +104,16 @@ available, so other include scripts should be sourced accordingly, for example:
 . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
 ```
 
+## Setting path
+
+Many scripts will be easier to code if they run from a consistent path. Because
+build scripts should be invokable from any directory, you may wish to add the
+following line here:
+
+```bash
+cd "$THIS_SCRIPT_PATH"
+```
+
 ## Split
 
 The comment line splitting the prologue from the body of the script is optional,
@@ -116,9 +128,9 @@ but makes the script easy to scan!
 The build script should use the `builder` functions and variables to process its
 command line and control its run.
 
-Build scripts can define **targets**, **actions**, and **options**, which are
-parameters passed in to the script when it is run by a user or called by
-another script:
+Build scripts can define **targets**, **actions**, **options**, and
+**dependencies**, which are parameters passed in to the script when it is run by
+a user or called by another script:
 
 * **targets**: these are the expected outputs of the build script. A target is
   prefixed with a `:`, for example `:app`. If no target is defined for a script,
@@ -143,6 +155,15 @@ another script:
 
   Options can be used to provide additional data, by including `=<varname>` in
   their definition. Otherwise, they are treated as a boolean.
+
+* **dependencies**: these are other builder scripts which must be configured and
+  built before the actions in this script can continue. Only `configure` and
+  `build` actions are ever passed to dependency scripts; if you are working on
+  code within a dependency, you are currently expected to rebuild and test that
+  dependency locally.
+
+  Dependencies can be defined for all actions and targets, or may be limited to
+  specific action and/or targets.
 
 The first step in your script is to describe the available parameters, using
 [`builder_describe`], for example:
@@ -269,10 +290,10 @@ Or, a shorthand version for a simple script:
 builder_describe "Build version module" clean configure build test
 ```
 
-Each `param_desc` parameter defines a **target**, **action**, or **option**. All
-parameters passed on the command line in a call to the script (prior to `--`,
-see [`$builder_extra_params`] variable) must match one of the parameters defined
-here.
+Each `param_desc` parameter defines a **target**, **action**, **option**, or
+**dependency**. All parameters passed on the command line in a call to the
+script (prior to `--`, see [`$builder_extra_params`] variable) must match one of
+the parameters defined here.
 
 **Targets** are defined by including a `:` prefix, for example:
 
@@ -337,6 +358,29 @@ There is one option with a predefined description: `--debug`. When including
 this, you should use `--debug,-d` to enable the shorthand form.
 
 Note that you should not include any of the [standard builder parameters] here.
+
+
+**Dependencies** are defined with a `@` prefix, for example:
+
+```bash
+builder_describe "Sample script" \
+  "@/core configure build" \
+  configure \
+  build
+```
+
+A dependency always starts with `@`. The path to the dependency will be relative
+to the build script folder, or to the root of the repository, if the path starts
+with `/`, not to the root of the file system. It is an error to specify a
+dependency outside the repo root.
+
+Relative paths will be expanded to full paths, again, relative to the root of
+the repository.
+
+Dependencies may be limited to specific `action:target` pairs on the current
+script. If not specified, dependencies will be built for all actions on all
+targets. Either `action` or `:target` may be omitted, and multiple actions and
+targets may be specified, space separated.
 
 
 ## `builder_display_usage` function
