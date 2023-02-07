@@ -20,7 +20,7 @@ namespace kmcmp {
     std::u16string u16str(&in);
     std::string stri = string_from_u16string(u16str);
     std::wstring  wstr = wstring_from_string(stri);
-    return  *wstring_from_string(stri).c_str();
+    return *wstr.c_str();
   }
 
   std::wstring MakeHashKeyFromFileKey16(PFILE_KEY kp) {
@@ -55,7 +55,8 @@ KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
       if (kp->Line != k1.Line && reportedLines.count(kp->Line) == 0) {
         reportedLines.insert(kp->Line);
         kmcmp::currentLine = kp->Line;
-        u16sprintf(ErrExtra, _countof(ErrExtra), L"Overridden by rule on line %d", k1.Line);
+        u16sprintf(ErrExtra, _countof(ErrExtra), L" Overridden by rule on line %d", k1.Line);
+        kmcmp::ErrExtra_char = wstrtostr2(ErrExtra);
         AddWarning(CHINT_UnreachableRule);
       }
     }

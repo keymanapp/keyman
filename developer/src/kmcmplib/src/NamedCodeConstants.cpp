@@ -25,6 +25,7 @@
 #include <io.h>
 #include <limits.h>
 #include "NamedCodeConstants.h"
+#include "CheckFilenameConsistency.h"
 #include <kmcmpdll.h>
 using namespace kmcmp;
 
@@ -130,6 +131,11 @@ KMX_BOOL NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
 {
   const int str_size = 256;
   FILE *fp = NULL;
+
+  if (CheckFilenameConsistency(filename, FALSE) != NULL) {
+    return FALSE;
+  }
+
   if(fopen_s(&fp, filename, "rt") != 0) return FALSE;  // I3481
 
   KMX_CHAR str[str_size], *p, *q, *context = NULL;

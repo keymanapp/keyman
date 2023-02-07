@@ -182,3 +182,7 @@ Thumbs.db
 /keyman*.buildinfo
 /keyman*.changes
 /keyman*.tar.?z
+
+#Sabine:
+/developer/src/test/auto/kmcomp/*.kmn
+/developer/src/test/auto/kmcomp/*.kvk*
