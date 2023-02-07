@@ -34,6 +34,8 @@ esbuild.buildSync({
 esbuild.buildSync({
   entryPoints: ['build/obj/index.js'],
   outfile: 'build/lib/index.cjs',
+  bundle: true,
+  sourcemap: true,
   format: "cjs",
   ...commonConfig
 });
