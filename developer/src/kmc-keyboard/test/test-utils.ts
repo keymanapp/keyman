@@ -1,6 +1,6 @@
 import 'mocha';
 import {assert} from 'chai';
-import { isValidEnumValue, calculateUniqueKeys, allUsedKeyIdsInLayers, translateLayerAttrToModifier } from '../src/util/util.js';
+import { isValidEnumValue, calculateUniqueKeys, allUsedKeyIdsInLayers, translateLayerAttrToModifier, validModifier } from '../src/util/util.js';
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { LDMLKeyboard } from '@keymanapp/common-types';
 
@@ -142,6 +142,22 @@ describe('test of util/util.ts', () => {
         };
         assert.equal(translateLayerAttrToModifier(layer),
           constants.keys_mod_map.get(str) | constants.keys_mod_altL, str);
+      }
+    });
+  });
+  describe('isValidModifier()', () => {
+    it('should treat falsy values as valid', () => {
+      for(let str of [
+        null, undefined, '', 'none'
+      ]) {
+        assert.ok(validModifier(str), `validModifier(${JSON.stringify(str)})`);
+      }
+    });
+    it('should treat bad values as invalid', () => {
+      for(let str of [
+        'asdfasdf', 'shift asdfasdf', 'altR-shift', 'altR-shift shift'
+      ]) {
+        assert.notOk(validModifier(str), `validModifier(${JSON.stringify(str)})`);
       }
     });
   });

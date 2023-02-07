@@ -6,13 +6,11 @@
     <name value="keys-minimal" />
   </names>
 
-  <keys>
-    <key id="grave" to="\u{1faa6}" />
-  </keys>
+  <keys />
 
   <layers form="hardware" hardware="us">
-    <layer id="base">
-      <row keys="grave" />
+    <layer id="base" modifier="altR-shift"> <!-- invalid, should be "altR shift" -->
+      <row keys="a b c" />
     </layer>
   </layers>
 

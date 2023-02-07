@@ -1,9 +1,11 @@
 import 'mocha';
 import { assert } from 'chai';
 import { KeysCompiler } from '../src/compiler/keys.js';
-import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
-import { KMXPlus } from '@keymanapp/common-types';
+import { compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
+import { KMXPlus, Constants } from '@keymanapp/common-types';
 import { CompilerMessages } from '../src/compiler/messages.js';
+
+const K = Constants.USVirtualKeyCodes;
 
 import Keys = KMXPlus.Keys;
 import { constants } from '@keymanapp/ldml-keyboard-constants';
@@ -18,42 +20,101 @@ describe('keys', function () {
     assert.equal(keys.keys.length, 1);
   });
 
-  it('should compile escaped keys data', function() {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/escaped.xml', compilerTestCallbacks) as Keys;
-    assert.isNotNull(keys);
-    assert.equal(compilerTestCallbacks.messages.length, 0);
-    assert.equal(keys.keys.length, 1);
-    assert.equal(keys.keys[0].to.value, String.fromCodePoint(0x1faa6));
-  });
-
-  it('should compile a hardware layer', function() {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/hardware.xml', compilerTestCallbacks) as Keys;
-    assert.isNotNull(keys);
-    assert.equal(compilerTestCallbacks.messages.length, 0);
-    assert.equal(keys.keys.length, 4);
-    assert.sameDeepMembers(keys.keys.map(({vkey, to, mod}) => ({vkey, to: to.value, mod})), [
-      {
-        vkey: 192,
-        to: 'qqq',
-        mod: constants.keys_mod_none,
+  testCompilationCases(KeysCompiler, [
+    {
+      subpath: 'sections/keys/escaped.xml',
+      callback: (keys, subpath, callbacks) => {
+        assert.isNotNull(keys);
+        assert.equal((<Keys>keys).keys.length, 1);
+        assert.equal((<Keys>keys).keys[0].to.value, String.fromCodePoint(0x1faa6));
       },
-      {
-        vkey: '1'.charCodeAt(0),
-        to: 'www',
-        mod: constants.keys_mod_none,
+    },
+    {
+      subpath: 'sections/keys/hardware.xml',
+      callback: (sect, subpath, callbacks) => {
+        const keys = sect as Keys;
+        assert.isNotNull(keys);
+        assert.equal(compilerTestCallbacks.messages.length, 0);
+        assert.equal(keys.keys.length, 4);
+        assert.sameDeepMembers(keys.keys.map(({vkey, to, mod}) => ({vkey, to: to.value, mod})), [
+          {
+            vkey: K.K_BKQUOTE,
+            to: 'qqq',
+            mod: constants.keys_mod_none,
+          },
+          {
+            vkey: K.K_1,
+            to: 'www',
+            mod: constants.keys_mod_none,
+          },
+          {
+            vkey: K.K_BKQUOTE,
+            to: 'QQQ',
+            mod: constants.keys_mod_shift,
+          },
+          {
+            vkey: K.K_1,
+            to: 'WWW',
+            mod: constants.keys_mod_shift,
+          },
+        ]);
       },
-      {
-        vkey: 192,
-        to: 'QQQ',
-        mod: constants.keys_mod_shift,
+    },
+    {
+      subpath: 'sections/keys/hardware_us.xml',
+      callback: (sect, subpath, callbacks) => {
+        const keys = sect as Keys;
+        assert.isNotNull(keys);
+        assert.includeDeepMembers(keys.keys.map(({vkey, to, mod}) => ({vkey, to: to.value, mod})), [
+          {
+            vkey: K.K_BKSLASH,
+            to: '\\',
+            mod: constants.keys_mod_none,
+          },
+          {
+            vkey: K.K_Z,
+            to: 'z',
+            mod: constants.keys_mod_none,
+          },
+          {
+            vkey: K.K_BKQUOTE,
+            to: '`',
+            mod: constants.keys_mod_none,
+          },
+        ]);
       },
-      {
-        vkey: '1'.charCodeAt(0),
-        to: 'WWW',
-        mod: constants.keys_mod_shift,
+    },
+    {
+      subpath: 'sections/keys/hardware_iso.xml',
+      callback: (sect, subpath, callbacks) => {
+        const keys = sect as Keys;
+        assert.isNotNull(keys);
+        assert.includeDeepMembers(keys.keys.map(({vkey, to, mod}) => ({vkey, to: to.value, mod})), [
+          {
+            vkey: K.K_oE2,
+            to: '\\',
+            mod: constants.keys_mod_none,
+          },
+          {
+            vkey: 'Z'.charCodeAt(0),
+            to: 'z',
+            mod: constants.keys_mod_none,
+          },
+          {
+            vkey: 192,
+            to: '`',
+            mod: constants.keys_mod_none,
+          },
+        ]);
       },
-    ]);
-  });
+    },
+    {
+      subpath: 'sections/keys/invalid-bad-modifier.xml',
+      errors: [
+        CompilerMessages.Error_InvalidModifier({layer:'base',modifier:'altR-shift'}),
+      ]
+    },
+  ]);
 
   it('should reject structurally invalid layers', function() {
     let keys = loadSectionFixture(KeysCompiler, 'sections/keys/invalid-missing-layer.xml', compilerTestCallbacks) as Keys;
@@ -76,7 +137,7 @@ describe('keys', function () {
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({row: 1}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({row: 1, hardware: 'us'}));
   });
 
   it('should reject layouts with undefined keys', function() {
@@ -98,5 +159,4 @@ describe('keys', function () {
     assert.equal(compilerTestCallbacks.messages.length, 0);
     assert.equal(keys.keys.length, 4);
   });
-  // TODO-LDML:  <modifier="altR-shift" should throw a message
 });
