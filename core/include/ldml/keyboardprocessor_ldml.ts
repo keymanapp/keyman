@@ -245,6 +245,8 @@ class Constants {
    */
   readonly keys_flags_extend = 1;
 
+  /* Modifier key bitmasks. These correspond to the modifier bitmasks from kmx_file.h */
+  
   /**
    * Constant for no modifiers
    */
