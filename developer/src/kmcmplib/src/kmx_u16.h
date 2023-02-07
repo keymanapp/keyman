@@ -31,5 +31,6 @@ long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base)  ;
 double u16tof( KMX_WCHAR* str);
 
 std::string toHex(int num1);
+PKMX_STR wstrtostr2(PKMX_WCHAR in);
 
 #endif  //KMX_U16_H

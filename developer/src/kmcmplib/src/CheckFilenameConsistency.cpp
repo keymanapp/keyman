@@ -59,7 +59,7 @@ bool IsRelativePath(KMX_WCHAR const * p) {
   return TRUE;
 }
 
-KMX_DWORD CheckFilenameConsistency( KMX_CHAR const * Filename, BOOL ReportMissingFile) {
+KMX_DWORD CheckFilenameConsistency( KMX_CHAR const * Filename, bool ReportMissingFile) {
   PKMX_WCHAR WFilename = strtowstr(( KMX_CHAR *)Filename);
   KMX_DWORD const result = CheckFilenameConsistency(WFilename, ReportMissingFile);
   delete WFilename;
@@ -67,9 +67,11 @@ KMX_DWORD CheckFilenameConsistency( KMX_CHAR const * Filename, BOOL ReportMissin
 }
 
 KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissingFile) {
+  // not ready yet: needs more attention-> e.g. _wfindfirst,... and common includes for non-Windows platforms
   KMX_WCHAR Name[_MAX_PATH], FName[_MAX_FNAME], Ext[_MAX_EXT];
   KMX_WCHAR ErrExtra[256];
   intptr_t n;
+  FILE* nfile;
 
   if (IsRelativePath(Filename)) {
     PKMX_WCHAR WCompileDir = strtowstr(kmcmp::CompileDir);
@@ -91,16 +93,16 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   //  std::wstring -> wchar_t*
   const KMX_WCHART* wchptr = wstr.c_str();
 
+  nfile = _wfsopen(wchptr, L"rb", _SH_DENYWR);
   _wfinddata_t fi;
   n = _wfindfirst(wchptr, &fi);
   _findclose(n);
-#else
-  n= access(Name,F_OK);
 #endif
 
-  if (n == -1){
+  if (nfile == NULL) {
     if (ReportMissingFile) {
       u16sprintf(ErrExtra,_countof(ErrExtra),L"referenced file %ls",Filename);
+      kmcmp::ErrExtra_char = wstrtostr2(ErrExtra);
       AddWarning(CWARN_MissingFile);
     }
     return CERR_None;
@@ -120,6 +122,7 @@ u16sprintf(fi_name_char16,_countof(fi.name),fi.name);
 
   if (u16cmp(cptr1, fi_name_char16) != 0) {
     u16sprintf(ErrExtra,_countof(ErrExtra),L"reference '%ls' does not match actual filename '%ls'", cptr1, &fi.name);
+    kmcmp::ErrExtra_char = wstrtostr2(ErrExtra);
     AddWarning(CHINT_FilenameHasDifferingCase);
   }
 #else

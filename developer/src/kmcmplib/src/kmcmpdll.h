@@ -6,6 +6,7 @@ namespace kmcmp {
   KMX_BOOL AddCompileWarning(LPSTR buf);
   extern BOOL FWarnDeprecatedCode;
   extern int currentLine;
+  extern PKMX_STR ErrExtra_char;
 }
 
 KMX_BOOL AddCompileError(KMX_DWORD msg);

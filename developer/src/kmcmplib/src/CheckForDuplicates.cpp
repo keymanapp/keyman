@@ -20,7 +20,8 @@ KMX_DWORD CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
       continue;
     }
     if (u16icmp(gp0->szName, gp->szName) == 0) {
-      u16sprintf(ErrExtra, _countof(ErrExtra), L"Group '%ls' declared on line %d", u16fmt(gp0->szName).c_str(), gp0->Line);
+      u16sprintf(ErrExtra, _countof(ErrExtra), L" Group '%ls' declared on line %d", u16fmt(gp0->szName).c_str(), gp0->Line);
+      kmcmp::ErrExtra_char = wstrtostr2(ErrExtra);
       return CERR_DuplicateGroup;
     }
   }
@@ -41,7 +42,8 @@ KMX_DWORD CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
       continue;
     }
     if (u16icmp(sp0->szName, sp->szName) == 0) {
-        u16sprintf(ErrExtra, _countof(ErrExtra), L"Store '%ls' declared on line %d", u16fmt(sp0->szName).c_str(), sp0->line);
+      u16sprintf(ErrExtra, _countof(ErrExtra), L" Store '%ls' declared on line %d", u16fmt(sp0->szName).c_str(), sp0->line);
+      kmcmp::ErrExtra_char = wstrtostr2(ErrExtra);
       return CERR_DuplicateStore;
     }
   }

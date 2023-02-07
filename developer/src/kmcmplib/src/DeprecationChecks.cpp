@@ -1,9 +1,9 @@
 
 #include "pch.h"
 
-#include <compfile.h>
+#include "compfile.h"
 #include <comperr.h>
-#include <kmcmpdll.h>
+#include "kmcmpdll.h"
 
 BOOL WarnDeprecatedHeader() {   // I4866
   if (kmcmp::FWarnDeprecatedCode) {

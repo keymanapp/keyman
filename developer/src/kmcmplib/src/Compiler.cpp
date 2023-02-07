@@ -97,6 +97,7 @@
 #include <CompMsg.h>
 using namespace kmcmp;
 
+
 namespace kmcmp{
 
   HINSTANCE g_hInstance;
@@ -106,6 +107,7 @@ namespace kmcmp{
   int ErrChr;
   int nErrors = 0;
   KMX_CHAR ErrExtra[256];
+  PKMX_STR ErrExtra_char;
   KMX_BOOL FMnemonicLayout = FALSE;
   KMX_BOOL FOldCharPosMatching = FALSE;
   int CompileTarget;
@@ -305,12 +307,14 @@ KMX_BOOL AddCompileError(KMX_DWORD msg)
   }
 
   if (kmcmp::ErrChr > 0)
-    sprintf(strchr(szText, 0), "  character offset:%d", kmcmp::ErrChr);
+    sprintf(strchr(szText, 0), " character offset: %d", kmcmp::ErrChr);
 
-  if (*kmcmp::ErrExtra)
-    sprintf(strchr(szText, 0), " extra:%s", kmcmp::ErrExtra);
+  if (kmcmp::ErrExtra_char) {
+    sprintf(strchr(szText, 0), "%s", kmcmp::ErrExtra_char);
+  }
 
-  kmcmp::ErrChr = 0; *kmcmp::ErrExtra = 0;
+  kmcmp::ErrExtra_char = NULL;
+  ErrChr = 0; *kmcmp::ErrExtra = 0;
 
   if (!(*msgproc)(kmcmp::currentLine, msg, szText)) return TRUE;
 
@@ -2076,7 +2080,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
       while (iswspace(*p) && !u16chr(token, *p)) p++;
       if (!*p) break;
 
-      kmcmp::ErrChr = (int)(INT_PTR)(p - str) + offset + 1;
+      ErrChr = (int)(INT_PTR)(p - str) + offset + 1;
 
       /*
       char *tokenTypes[] = {
@@ -2666,7 +2670,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
         *newp = p;
         u16ncpy(output,  tstr, max);  // I3481
         output[max - 1] = 0;
-        kmcmp::ErrChr = 0;
+        ErrChr = 0;
         return CERR_None;
       }
       if (mx >= max) return CERR_BufferOverflow;
@@ -2677,7 +2681,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
       *newp = p;
       u16ncpy(output, tstr, max);  // I3481
       output[max - 1] = 0;
-      kmcmp::ErrChr = 0;
+      ErrChr = 0;
       return CERR_None;
     }
 
@@ -3420,8 +3424,8 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
   if (cur == fsize)
 
   // S: Is replacing "\r\n" with "\n" here sufficient or do we need changes at other places as well when we skip "\r"?
-  //u16ncat(str, u"\r\n", _countof(str));  // I3481     // Always a "\r\n" to the EOF, avoids funny bugs
-   u16ncat(str, u"\n", _countof(str));  // I3481
+  u16ncat(str, u"\r\n", _countof(str));  // I3481     // Always a "\r\n" to the EOF, avoids funny bugs
+  // u16ncat(str, u"\n", _countof(str));  // I3481
 
   if (len == 0) return CERR_EndOfFile;
 
