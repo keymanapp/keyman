@@ -1,0 +1,257 @@
+/* A descriptive message used for errors when the app is already busy downloading */
+"alert-download-error-busy" = "Stahování již bylo zaneprázdněno.";
+
+/* A descriptive message used when a download fails */
+"alert-download-error-detail" = "Při stahování nebo instalaci došlo k chybě.";
+
+/* Title for a "download failed" alert */
+"alert-download-error-title" = "Chyba při stahování";
+
+/* Title for a general alert about errors */
+"alert-error-title" = "Chyba";
+
+/* A descriptive message used when no internet connection is detected */
+"alert-no-connection-detail" = "Nelze získat přístup na server Keyman. Opakujte akci později.";
+
+/* Title for a "no connection" alert */
+"alert-no-connection-title" = "Chyba připojení";
+
+/* Short text for a 'back' navigational command.  Used to return to the previous screen */
+"command-back" = "Zpět";
+
+/* Short text for a 'cancel' command.  Used to back out of a menu or install process without making changes */
+"command-cancel" = "Zrušit";
+
+/* Short text for a 'done' command.  Used to back out of settings menus after changes have been made */
+"command-done" = "Hotovo";
+
+/* Short text for an 'install' command.  Used to confirm installation of a package. */
+"command-install" = "Instalovat";
+
+/* Short text for a 'next' navigational command.  Used to advance to the next screen */
+"command-next" = "Další";
+
+/* Short text for an 'OK' command.  Used for some error alerts */
+"command-ok" = "OK";
+
+/* Short text for confirmining 'uninstall' commands. */
+"command-uninstall" = "Odinstalovat";
+
+/* Text for the command to uninstall a keyboard */
+"command-uninstall-keyboard" = "Odinstalovat klávesnici";
+
+/* Confirmation text to display before uninstalling a keyboard */
+"command-uninstall-keyboard-confirm" = "Chcete odinstalovat tuto klávesnici?";
+
+/* Text for the command to uninstall a lexical model */
+"command-uninstall-lexical-model" = "Odinstalovat slovník";
+
+/* Confirmation text to display before uninstalling a lexical model */
+"command-uninstall-lexical-model-confirm" = "Chcete odinstalovat tento slovník?";
+
+/* Text for error when a keyboard cannot load properly */
+"error-loading-keyboard" = "Požadovanou klávesnici nelze načíst";
+
+/* Text for error when a lexical model cannot load properly */
+"error-loading-lexical-model" = "Požadovaný slovník nelze načíst";
+
+/* Text for error when an installed file is unexpectedly missing */
+"error-missing-file" = "Požadovaný soubor nebyl nalezen.";
+
+/* Text for error when an installed file is unexpectedly missing */
+"error-missing-file-critical" = "Kritický soubor nebyl nalezen. Zkuste aplikaci přeinstalovat.";
+
+/* Text for errors in data received from search queries */
+"error-query-decoding" = "Server má v současné době technické problémy";
+
+/* A descriptive message used when a download fails */
+"error-query-general" = "Chyba při komunikaci se serverem";
+
+/* Text for error when a search query is unexpectedly empty */
+"error-query-no-data" = "Server se nepodařilo odpovědět";
+
+/* Text for general errors where not much information is known */
+"error-unknown" = "Došlo k neočekávané chybě";
+
+/* Text for error when updating a resource:  cannot download because no source is available */
+"error-update-no-link" = "Pro tento balíček není k dispozici žádný zdroj aktualizací";
+
+/* Text for error when updating a resource:  Keyman does not know how to update the resource */
+"error-update-not-managed" = "Nelze aktualizovat dokument není spravován pomocí klávesnice";
+
+/* Text for the command to open the help page of a keyboard, as shown on resource information views */
+"info-command-help-keyboard" = "Nápověda pro klávesnici";
+
+/* Text for the command to open the help page of a lexical model, as shown on resource information views */
+"info-command-help-lexical-model" = "Nápověda ke slovníku";
+
+/* Text label for displaying a keyboard's version, as shown on resource information views */
+"info-label-version-keyboard" = "Verze klávesnice";
+
+/* Text label for displaying a lexical model's version, as shown on resource information views */
+"info-label-version-lexical-model" = "Verze slovníku";
+
+/* Label used for the "package info" / readme tab with the package installation prompt on phones. */
+"installer-label-package-info" = "Informace o balíčku";
+
+/* Label used for the language-selection tab with the package installation prompt on phones. */
+"installer-label-select-languages" = "Vyberte jazyk(y)";
+
+/* Label used with a package's version, as seen within the package installation prompt.  Example:  "Version: 14.0.0" */
+"installer-label-version" = "Verze: %@";
+
+/* Section header for languages supported by a package, as seen within the package installation prompt */
+"installer-section-available-languages" = "Dostupné jazyky";
+
+/* Text for the help popup for changing keyboards with the globe key */
+"keyboard-help-change" = "Klepnutím sem změníte klávesnici";
+
+/* Text for the command to exit the Keyman keyboard in favor of other keyboards installed on the system */
+"keyboard-menu-exit" = "Zavřít %@";
+
+/* Error installing a Keyman package - could not allocate a location to install it */
+"kmp-error-file-system" = "Chyba při instalaci balíčku - chyba systému souborů";
+
+/* Error installing a Keyman package - could not copy package files */
+"kmp-error-file-copying" = "Chyba při instalaci balíčku - nelze zkopírovat požadované soubory";
+
+/* Error opening a Keyman package - package is not valid */
+"kmp-error-invalid" = "Soubor balíčku je poškozen.";
+
+/* Error opening a Keyman package - it does not exist / the specified location is wrong */
+"kmp-error-missing" = "Zadaný balíček neexistuje.";
+
+/* Error installing a Keyman package - expected resource (keyboard or dictionary) is missing */
+"kmp-error-missing-resource" = "Tento balíček neobsahuje požadovanou klávesnici ani slovník.";
+
+/* Error installing a Keyman package with a version of Keyman that does not support it */
+"kmp-error-unsupported-keyman-version" = "This package requires a newer version of Keyman.";
+
+/* Error opening a Keyman package - cannot parse contents */
+"kmp-error-no-metadata" = "Tento balíček nebyl správně sestaven - obsah není znám.";
+
+/* Error opening a Keyman package - package's contents are for desktop platforms only */
+"kmp-error-unsupported" = "Tento balíček neobsahuje podporu pro vaše zařízení.";
+
+/* Error opening a Keyman package - package contains unexpected resource (keyboard or dictionary) type */
+"kmp-error-wrong-type" = "Tento balíček neobsahuje očekávaný typ dokumentu.";
+
+/* Title for the Installed Languages menu */
+"menu-installed-languages-title" = "Nainstalované jazyky";
+
+/* Section header for lexical models within a language-specific settings menu */
+"menu-langsettings-label-lexical-models" = "Slovníky";
+
+/* Section header for keyboards within a language-specific settings menu */
+"menu-langsettings-section-keyboards" = "Klávesnice";
+
+/* Section header for the settings toggles within a language-specific settings menu */
+"menu-langsettings-section-settings" = "Nastavení jazyka";
+
+/* Title for the language-specific settings menus */
+"menu-langsettings-title" = "%@ nastavení";
+
+/* Label for the toggle that enables corrections that is displayed within a language-specific settings menu */
+"menu-langsettings-toggle-correct" = "Povolit opravy";
+
+/* Label for the toggle that enables predictions that is displayed within a language-specific settings menu */
+"menu-langsettings-toggle-predict" = "Povolit predikce";
+
+/* Help message for a prompt that appears for confirming a lexical model download:  language (1): lexical model (dictionary) name (2) */
+"menu-lexical-model-install-message" = "Chcete nainstalovat tento slovník?";
+
+/* Title for a prompt that appears for confirming a lexical model download:  language (1): lexical model (dictionary) name (2) */
+"menu-lexical-model-install-title" = "%1$@: %2$@";
+
+/* Text for an info alert indicating that no lexical models are available */
+"menu-lexical-model-none-message" = "Žádné slovníky nejsou k dispozici";
+
+/* Title for the lexical model menu, a submenu of the language-specific settings menus */
+"menu-lexical-model-title" = "%@ slovníků";
+
+/* Title for the keyboard picker */
+"menu-picker-title" = "Klávesnice";
+
+/* Primary text for the Settings menu option to report keyboard crashes */
+"menu-settings-error-report" = "Povolit hlášení chyb";
+
+/* Secondary text for the Settings menu option to report keyboard crashes */
+"menu-settings-error-report-description" = "Může vyžadovat \"plný přístup\"";
+
+/* Primary text for the Settings menu local-file package installation option */
+"menu-settings-install-from-file" = "Instalovat ze souboru";
+
+/* Secondary text for the Settings menu local-file package installation option */
+"menu-settings-install-from-file-description" = "Procházet .kmp soubory";
+
+/* Primary text for the Settings menu option that displays the iOS system menu options for the app's keyboard */
+"menu-settings-system-keyboard-menu" = "Nastavení klávesnice systému";
+
+/* Label for the "Show Banner" toggle on the main settings screen */
+"menu-settings-show-banner" = "Zobrazit banner";
+
+/* Label for the "Get Started" automatic display toggle seen in the Settings menu */
+"menu-settings-startup-get-started" = "Zobrazit 'Začíná' při startu";
+
+/* Title for the main Settings menu */
+"menu-settings-title" = "Nastavení klíče";
+
+/* Secondary text showing current setting for spacebar caption - blank */
+"menu-settings-spacebar-hint-blank" = "Nezobrazovat titulek v mezerníku";
+
+/* Secondary text showing current setting for spacebar caption - keyboard */
+"menu-settings-spacebar-hint-keyboard" = "Zobrazit název klávesnice v mezerníku";
+
+/* Secondary text showing current setting for spacebar caption - language */
+"menu-settings-spacebar-hint-language" = "Zobrazit název jazyka v mezerníku";
+
+/* Secondary text showing current setting for spacebar caption - language + keyboard */
+"menu-settings-spacebar-hint-languageKeyboard" = "Zobrazit název jazyka a klávesnice v mezerníku";
+
+/* Label for the "Spacebar Caption" item on the main settings screen */
+"menu-settings-spacebar-text" = "Popisek mezerníku";
+
+/* Title for the "Spacebar Caption" settings screen */
+"menu-settings-spacebar-title" = "Popisek mezerníku";
+
+/* Text showing name of spacebar caption - blank */
+"menu-settings-spacebar-item-blank" = "Prázdné";
+
+/* Text showing name of spacebar caption - keyboard */
+"menu-settings-spacebar-item-keyboard" = "Keyboard";
+
+/* Text showing name of spacebar caption - language */
+"menu-settings-spacebar-item-language" = "Jazyk";
+
+/* Text showing name of spacebar caption - language + keyboard */
+"menu-settings-spacebar-item-languageKeyboard" = "Jazyk a klávesnice";
+
+/* Short text for notification:  download failure for keyboard */
+"notification-download-failure-keyboard" = "Stahování klávesnice se nezdařilo";
+
+/* Short text for notification:  download failure for lexical model */
+"notification-download-failure-lexical-model" = "Stahování slovníku selhalo";
+
+/* Short text for notification:  download success for keyboard */
+"notification-download-success-keyboard" = "Klávesnice úspěšně stažena";
+
+/* Short text for notification:  download success for lexical model */
+"notification-download-success-lexical-model" = "Lexický model byl úspěšně stažen";
+
+/* Short text for notification:  downloading a keyboard */
+"notification-downloading-keyboard" = "Stahování klávesnice\U2026";
+
+/* Short text for notification:  downloading a lexical model */
+"notification-downloading-lexical-model" = "Stahování slovníku\U2026";
+
+/* Short text for notification:  an update is available */
+"notification-update-available" = "Dostupná aktualizace";
+
+/* Short text for notification:  currently updating */
+"notification-update-processing" = "Aktualizace\U2026";
+
+/* Text indicating success at installing new keyboards or dictionaries */
+"success-install" = "Úspěšně nainstalováno.";
+
+/* A title to use in alerts indicating 'success' at whatever task the user requested */
+"success-title" = "Úspěšně";

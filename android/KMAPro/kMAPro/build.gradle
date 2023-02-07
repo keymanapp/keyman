@@ -34,6 +34,7 @@ android {
         versionCode VERSION_CODE as Integer
         versionName VERSION_NAME
         buildConfigField 'String', 'VERSION_ENVIRONMENT', '"'+VERSION_ENVIRONMENT+'"'
+        buildConfigField 'String', 'VERSION_GIT_TAG', '"'+VERSION_GIT_TAG+'"'
     }
 
     String env_release_store_file = System.getenv("release_store_file")

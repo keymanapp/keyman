@@ -27,6 +27,7 @@ builder_describe \
   ":proctor     Builds headless-testing, node-oriented 'proctor' component"
 
 builder_describe_outputs \
+  configure          "/node_modules" \
   configure:module   "/node_modules" \
   configure:proctor  "/node_modules" \
   build:module    "build/index.js" \

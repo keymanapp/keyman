@@ -41,4 +41,4 @@ cd "$KEYMAN_ROOT/developer/src"
 
 echo "Uploading symbols for developer/"
 sentry-cli upload-dif -p keyman-developer -t breakpad -t pdb . --include-sources
-sentry-cli releases -p keyman-developer files "release@$VERSION_WITH_TAG" upload-sourcemaps ./TIKE/xml ../bin/server ./kmlmc/dist
+sentry-cli releases -p keyman-developer files "$VERSION_GIT_TAG" upload-sourcemaps ./TIKE/xml ../bin/server ./kmlmc/dist

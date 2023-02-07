@@ -150,4 +150,4 @@ dependencies {
 }
 
 ````
-5. include `import com.tavultesoft.kmea.*;` to use Keyman Engine in a class.
+5. include `import com.keyman.engine.*;` to use Keyman Engine in a class.
