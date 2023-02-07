@@ -35,6 +35,7 @@ esbuild.buildSync({
   outfile: 'build/lib/index.cjs',
   bundle: true,
   sourcemap: true,
+  platform: "node",
   format: "cjs",
   ...commonConfig
 });
