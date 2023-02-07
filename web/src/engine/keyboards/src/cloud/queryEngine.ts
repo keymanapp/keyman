@@ -1,6 +1,6 @@
-import { default as KeyboardStub, ErrorStub, KeyboardAPISpec, mergeAndResolveStubPromises } from './keyboardStub.js';
+import { default as KeyboardStub, ErrorStub, KeyboardAPISpec, mergeAndResolveStubPromises } from '../keyboardStub.js';
 import { KeyboardFont, LanguageAPIPropertySpec, ManagedPromise, Version } from '@keymanapp/keyboard-processor';
-import CloudRequesterInterface from './cloudRequesterInterface.js';
+import CloudRequesterInterface from './requesterInterface.js';
 
 // For when the API call straight-up times out.
 export const CLOUD_TIMEOUT_ERR = "The Cloud API request timed out.";

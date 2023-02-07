@@ -1,12 +1,12 @@
 import { ManagedPromise } from '@keymanapp/keyboard-processor';
-import CloudRequesterInterface from './cloudRequesterInterface.js';
+import CloudRequesterInterface from './requesterInterface.js';
 import {
   CLOUD_MALFORMED_OBJECT_ERR,
   CLOUD_TIMEOUT_ERR,
   CLOUD_STUB_REGISTRATION_ERR,
   CloudQueryResult,
   default as CloudQueryEngine
-} from './cloudQueryEngine.js';
+} from './queryEngine.js';
 
 import https from 'https';
 import vm from 'vm';

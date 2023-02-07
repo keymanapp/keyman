@@ -1,6 +1,6 @@
 import { ManagedPromise } from '@keymanapp/keyboard-processor';
-import CloudRequesterInterface from './cloudRequesterInterface.js';
-import { CLOUD_MALFORMED_OBJECT_ERR, CLOUD_TIMEOUT_ERR, CLOUD_STUB_REGISTRATION_ERR } from './cloudQueryEngine.js';
+import CloudRequesterInterface from './requesterInterface.js';
+import { CLOUD_MALFORMED_OBJECT_ERR, CLOUD_TIMEOUT_ERR, CLOUD_STUB_REGISTRATION_ERR } from './queryEngine.js';
 
 export default class CloudWebRequester implements CloudRequesterInterface {
   request<T>(query: string) {
