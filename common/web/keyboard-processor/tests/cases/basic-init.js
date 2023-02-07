@@ -1,8 +1,9 @@
 import { assert } from 'chai';
-import fs from 'fs';
-import vm from 'vm';
 
-import { KeyboardProcessor } from '@keymanapp/keyboard-processor';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+import { KeyboardProcessor, NodeKeyboardLoader } from '@keymanapp/keyboard-processor';
 
 global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
                     // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.
@@ -28,16 +29,16 @@ describe('KeyboardProcessor', function() {
   });
 
   describe('activeKeyboard', function() {
-    it('is automatically set (in headless) on keyboard load', function () {
+    it('is automatically set (in headless) on keyboard load', async function () {
       let kp = new KeyboardProcessor();
 
       // These two lines will load a keyboard from its file; headless-mode `registerKeyboard` will
       // automatically set the keyboard as active.
-      var script = new vm.Script(fs.readFileSync('../../test/resources/keyboards/khmer_angkor.js'));
-      script.runInThisContext();
+      let keyboardLoader = new NodeKeyboardLoader();
+      let keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/khmer_angkor.js'));
 
-      assert.isDefined(kp.activeKeyboard, 'Keyboard failed to register on script load');
-      assert.equal('Keyboard_khmer_angkor', kp.activeKeyboard.id, 'Unexpected keyboard id found after script load');
+      assert.isDefined(keyboard, 'Keyboard failed to register on script load');
+      assert.equal('Keyboard_khmer_angkor', keyboard.id, 'Unexpected keyboard id found after script load');
     });
   });
 });

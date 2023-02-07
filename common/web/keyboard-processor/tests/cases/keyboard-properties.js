@@ -1,6 +1,5 @@
 import { assert } from 'chai';
 import fs from 'fs';
-import vm from 'vm';
 
 import { KeyboardProperties, SpacebarText } from '@keymanapp/keyboard-processor';
 

@@ -1,8 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import LanguageProcessor from '#./text/prediction/languageProcessor.js';
-import PredictionContext from '#./text/prediction/predictionContext.js';
+import { LanguageProcessor, PredictionContext } from '@keymanapp/input-processor';
 import { Worker as LMWorker } from "@keymanapp/lexical-model-layer/node";
 import { DeviceSpec, KeyboardProcessor, Mock } from '@keymanapp/keyboard-processor';
 

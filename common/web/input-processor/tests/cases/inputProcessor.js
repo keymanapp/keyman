@@ -1,12 +1,11 @@
 import { assert } from 'chai';
 import fs from 'fs';
-import vm from 'vm';
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import InputProcessor from '#./text/inputProcessor.js';
-import { Mock } from '@keymanapp/keyboard-processor';
+import { KeyboardInterface, MinimalKeymanGlobal, Mock, NodeKeyboardLoader } from '@keymanapp/keyboard-processor';
 import * as utils from '@keymanapp/web-utils';
 
 // Required initialization setup.
@@ -56,7 +55,7 @@ describe('InputProcessor', function() {
 
   describe('efficiency tests', function() {
     let testDistribution = [];
-    var keyboard;
+    let keyboardWithHarness;
 
     // Easy peasy long context:  use the input processor's full source!
     let coreSourceCode = fs.readFileSync('build/lib/index.mjs', 'utf-8');
@@ -67,7 +66,7 @@ describe('InputProcessor', function() {
       coreSourceCode = coreSourceCode.substring(0, 1000000);
     }
 
-    this.beforeAll(function() {
+    this.beforeAll(async function() {
       testDistribution = [];
 
       for(let c = 'A'.charCodeAt(0); c <= 'Z'.charCodeAt(0); c++) {
@@ -79,15 +78,10 @@ describe('InputProcessor', function() {
         });
       }
 
-      // Load the keyboard.  We'll need an InputProcessor instance as an intermediary.
-      let core = new InputProcessor(device);
-
-      // These two lines will load a keyboard from its file; headless-mode `registerKeyboard` will
-      // automatically set the keyboard as active.
-      let kbdScript = new vm.Script(fs.readFileSync(require.resolve('@keymanapp/common-test-resources/keyboards/test_chirality.js')));
-      kbdScript.runInThisContext();
-
-      keyboard = core.activeKeyboard;
+      // Load the keyboard.
+      let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+      await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_chirality.js'));
+      keyboardWithHarness = keyboardLoader.harness;
     });
 
     describe('without fat-fingering', function() {
@@ -96,7 +90,8 @@ describe('InputProcessor', function() {
         let core = new InputProcessor(device);
         let context = new Mock("", 0);
 
-        core.activeKeyboard = keyboard;
+        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
+        let keyboard = keyboardWithHarness.activeKeyboard;
         let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
         let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
@@ -115,7 +110,8 @@ describe('InputProcessor', function() {
         let core = new InputProcessor(device);  // I mean, it IS long context, and time
                                           // thresholding is disabled within Node.
 
-        core.activeKeyboard = keyboard;
+        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
+        let keyboard = keyboardWithHarness.activeKeyboard;
         let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
         let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
@@ -131,7 +127,8 @@ describe('InputProcessor', function() {
         let core = new InputProcessor(device);
         let context = new Mock("", 0);
 
-        core.activeKeyboard = keyboard;
+        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
+        let keyboard = keyboardWithHarness.activeKeyboard;
         let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
         key.keyDistribution = testDistribution;
@@ -154,7 +151,8 @@ describe('InputProcessor', function() {
         let core = new InputProcessor(device);  // It IS long context, and time
                                           // thresholding is disabled within Node.
 
-        core.activeKeyboard = keyboard;
+        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
+        let keyboard = keyboardWithHarness.activeKeyboard;
         let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
         key.keyDistribution = testDistribution;
