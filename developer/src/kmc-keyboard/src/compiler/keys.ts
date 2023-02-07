@@ -6,7 +6,7 @@ import { SectionCompiler } from "./section-compiler.js";
 import GlobalSections = KMXPlus.GlobalSections;
 import Keys = KMXPlus.Keys;
 import USVirtualKeyMap = Constants.USVirtualKeyMap;
-import { calculateUniqueKeys } from '../util/util.js';
+import { calculateUniqueKeys, translateLayerAttrToModifier } from '../util/util.js';
 
 export class KeysCompiler extends SectionCompiler {
 
@@ -58,6 +58,7 @@ export class KeysCompiler extends SectionCompiler {
       this.callbacks.reportMessage(CompilerMessages.Error_MustBeAtLeastOneLayerElement());
     }
 
+    // TODO-LDML: handle >1 layers!
     if(this.keyboard.layers?.[0]?.form == 'hardware') {
       for(let layer of this.keyboard.layers[0].layer) {
         valid = this.validateHardwareLayer(layer) && valid; // note: always validate even if previously invalid results found
@@ -70,23 +71,24 @@ export class KeysCompiler extends SectionCompiler {
     // Use LayerMap + keys to generate compiled keys for hardware
 
     if(this.keyboard.layers?.[0]?.form == 'hardware') {
+      let sect = new Keys();
       for(let layer of this.keyboard.layers[0].layer) {
-        let sect = this.compileHardwareLayer(sections, layer);
-        return sect;
+        this.compileHardwareLayer(sections, layer, sect);
       }
+      return sect;
     }
 
-    // TODO: generate vkey mapping for touch-only keys
+    // TODO-LDML: generate vkey mapping for touch-only keys
 
     return null;
   }
 
   private compileHardwareLayer(
     sections: GlobalSections,
-    layer: LDMLKeyboard.LKLayer
+    layer: LDMLKeyboard.LKLayer,
+    sect: Keys,
   ): Keys {
-    let result = new Keys();
-    const mod = this.translateLayerIdToModifier(layer.id);
+    const mod = translateLayerAttrToModifier(layer);
 
     let y = -1;
     for(let row of layer.row) {
@@ -99,7 +101,7 @@ export class KeysCompiler extends SectionCompiler {
 
         let keydef = this.keyboard.keys?.key?.find(x => x.id == key);
 
-        result.keys.push({
+        sect.keys.push({
           vkey: USVirtualKeyMap[y][x],
           mod: mod,
           to: sections.strs.allocAndUnescapeString(keydef.to),
@@ -107,15 +109,6 @@ export class KeysCompiler extends SectionCompiler {
         });
       }
     }
-
-    return result;
-  }
-
-  private translateLayerIdToModifier(id: string) {
-    if(id == 'base') {
-      return 0;
-    }
-    // TODO: other modifiers
-    return 0;
+    return sect;
   }
 }

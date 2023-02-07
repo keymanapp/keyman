@@ -6,6 +6,7 @@ import { KMXPlus } from '@keymanapp/common-types';
 import { CompilerMessages } from '../src/compiler/messages.js';
 
 import Keys = KMXPlus.Keys;
+import { constants } from '@keymanapp/ldml-keyboard-constants';
 
 describe('keys', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
@@ -29,7 +30,29 @@ describe('keys', function () {
     let keys = loadSectionFixture(KeysCompiler, 'sections/keys/hardware.xml', compilerTestCallbacks) as Keys;
     assert.isNotNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 0);
-    assert.equal(keys.keys.length, 2);
+    assert.equal(keys.keys.length, 4);
+    assert.sameDeepMembers(keys.keys.map(({vkey, to, mod}) => ({vkey, to: to.value, mod})), [
+      {
+        vkey: 192,
+        to: 'qqq',
+        mod: constants.keys_mod_none,
+      },
+      {
+        vkey: '1'.charCodeAt(0),
+        to: 'www',
+        mod: constants.keys_mod_none,
+      },
+      {
+        vkey: 192,
+        to: 'QQQ',
+        mod: constants.keys_mod_shift,
+      },
+      {
+        vkey: '1'.charCodeAt(0),
+        to: 'WWW',
+        mod: constants.keys_mod_shift,
+      },
+    ]);
   });
 
   it('should reject structurally invalid layers', function() {
@@ -73,6 +96,7 @@ describe('keys', function () {
     let keys = loadSectionFixture(KeysCompiler, 'sections/keys/gap-switch.xml', compilerTestCallbacks) as Keys;
     assert.isNotNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 0);
-    assert.equal(keys.keys.length, 2);
+    assert.equal(keys.keys.length, 4);
   });
+  // TODO-LDML:  <modifier="altR-shift" should throw a message
 });

@@ -1,5 +1,5 @@
-import { LKKey, LKLayers } from "@keymanapp/common-types/src/ldml-keyboard/ldml-keyboard-xml";
-
+import { LDMLKeyboard } from "@keymanapp/common-types";
+import { constants } from "@keymanapp/ldml-keyboard-constants";
 /**
  * Verifies that value is an item in the enumeration.
  */
@@ -13,7 +13,7 @@ export function isValidEnumValue<T extends {[key: number]: string | number}>(enu
  * @param keys list of keys to consider. (mutated)
  * @returns Array of unique keys. Order is not specified.
  */
-export function calculateUniqueKeys(keys?: LKKey[]): LKKey[] {
+export function calculateUniqueKeys(keys?: LDMLKeyboard.LKKey[]): LDMLKeyboard.LKKey[] {
   if (!keys) {
     return [];
   }
@@ -37,7 +37,7 @@ export function calculateUniqueKeys(keys?: LKKey[]): LKKey[] {
  * @param layersList list of layers elements, from `keyboard?.layers`
  * @returns set of key IDs
  */
-export function allUsedKeyIdsInLayers(layersList : LKLayers[] | null): Set<string> {
+export function allUsedKeyIdsInLayers(layersList : LDMLKeyboard.LKLayers[] | null): Set<string> {
   const s = new Set<string>();
   if (layersList) {
     for (const layers of layersList || []) {
@@ -53,4 +53,23 @@ export function allUsedKeyIdsInLayers(layersList : LKLayers[] | null): Set<strin
     }
   }
   return s;
+}
+
+/**
+ * Determine modifier from layer info
+ * @param layer layer obj
+ * @returns modifier
+ */
+export function translateLayerAttrToModifier(layer: LDMLKeyboard.LKLayer) : number {
+  const { modifier } = layer;
+  if (modifier) {
+    let mod = constants.keys_mod_none;
+    for (let str of modifier.split(' ')) {
+      const submod = constants.keys_mod_map.get(str);
+      mod |= submod;
+    }
+    return mod;
+  }
+  // TODO-LDML: other modifiers, other ids?
+  return constants.keys_mod_none;
 }

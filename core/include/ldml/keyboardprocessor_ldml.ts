@@ -245,6 +245,62 @@ class Constants {
    */
   readonly keys_flags_extend = 1;
 
+  /* Modifier key bitmasks. These correspond to the modifier bitmasks from kmx_file.h */
+  
+  /**
+   * Constant for no modifiers
+   */
+  readonly keys_mod_none = 0;
+  /**
+   * bitmask for Left Alt modifier key
+   */
+  readonly keys_mod_altL = 1 << 2;
+  /**
+   * bitmask for Right Alt (AltGr) modifier key
+   */
+  readonly keys_mod_altR = 1 << 3;
+  /**
+   * bitmask for either Alt (Windows) or Option (Apple) modifier keys
+   */
+  readonly keys_mod_alt  = this.keys_mod_altL | this.keys_mod_altR;
+  /**
+   * bitmask for Caps modifier key
+   */
+  readonly keys_mod_caps = 1 << 7;
+  /**
+   * bitmask for Left control modifier key
+   */
+  readonly keys_mod_ctrlL = 1 << 0;
+  /**
+   * bitmask for Right control modifier key
+   */
+  readonly keys_mod_ctrlR = 1 << 1;
+  /**
+   * bitmask for either Control modifier key
+   */
+  readonly keys_mod_ctrl = this.keys_mod_ctrlL | this.keys_mod_ctrlR;
+  /**
+   * bitmask for either shift.
+   */
+  readonly keys_mod_shift = 1 << 4;
+
+  /**
+   * Convenience map for modifiers
+   */
+  readonly keys_mod_map: Map<string, number> = new Map(
+    [
+      ["none", this.keys_mod_none],
+      ["alt", this.keys_mod_alt],
+      ["altL", this.keys_mod_altL],
+      ["altR", this.keys_mod_altR],
+      ["caps", this.keys_mod_caps],
+      ["ctrl", this.keys_mod_ctrl],
+      ["ctrlL", this.keys_mod_ctrlL],
+      ["ctrlR", this.keys_mod_ctrlR],
+      ["shift", this.keys_mod_shift],
+    ]
+  );
+
   /* ------------------------------------------------------------------
    * key2 section
     ------------------------------------------------------------------ */

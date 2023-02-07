@@ -7,14 +7,20 @@
   </names>
 
   <keys>
-    <key id="Q" to="qqq" />
-    <key id="W" to="www" />
+    <key id="qqq" to="qqq" />
+    <key id="www" to="www" />
+    <key id="QQQ" to="QQQ" />
+    <key id="WWW" to="WWW" />
   </keys>
 
   <layers form="hardware" hardware="us">
-    <layer id="base">
+    <layer id="base" modifier="none">
       <!-- beware: this is mapping ` and 1! -->
-      <row keys="Q W" />
+      <row keys="qqq www" />
+    </layer>
+    <layer id="shift" modifier="shift">
+      <!-- beware: this is mapping ` and 1! -->
+      <row keys="QQQ WWW" />
     </layer>
   </layers>
 </keyboard>
