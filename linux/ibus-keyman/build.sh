@@ -21,13 +21,15 @@ builder_describe \
   "install                   install artifacts" \
   "uninstall                 uninstall artifacts" \
   "--debug,-d                Debug build" \
-  "--output=OUTPUT_PATH,-o   Output path (default: ../build/)" \
-  "@/core configure build"
+  "--output=OUTPUT_PATH,-o   Output path (default: ../build/)"
+# We can't yet depend on core until it moved to the new build.sh syntax
+# (currently it doesn't know some parameters that we're passing)
+#  "@/core configure build"
 
 builder_parse "$@"
 
 if builder_has_action all; then
-  _builder_chosen_action_targets=("clean:engine" "configure:engine" "build:engine")
+  _builder_chosen_action_targets=("clean" "configure" "build")
 fi
 
 if builder_has_option --debug; then
@@ -41,6 +43,11 @@ else
   OUTPUT_PATH="$THIS_SCRIPT_PATH/../build"
 fi
 MESON_PATH="$OUTPUT_PATH/$(uname -m)/$MESON_TARGET"
+
+builder_describe_outputs \
+  configure "${MESON_PATH}/build.ninja" \
+  build "${MESON_PATH}/src/ibus-engine-keyman" \
+  build "${MESON_PATH}/tests/ibus-keyman-tests"
 
 if builder_start_action clean; then
   rm -rf "${OUTPUT_PATH:?}/"
