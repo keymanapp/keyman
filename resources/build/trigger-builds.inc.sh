@@ -135,7 +135,7 @@ function triggerGitHubActionsBuild() {
 
   # This will only be true if we created and pushed a tag
   if [ "${action:-""}" == "commit" ]; then
-    GIT_REF="release-$VERSION_WITH_TAG"
+    GIT_REF="release@$VERSION_WITH_TAG"
   fi
 
   if [[ $GIT_BRANCH != stable-* ]] && [[ $GIT_BRANCH =~ [0-9]+ ]]; then

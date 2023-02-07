@@ -46,30 +46,15 @@ jobs:
     - name: Install dependencies
       run: |
         cd linux
-        sudo mk-build-deps --install --tool='apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes' debian/control
+        ./scripts/deb-packaging.sh --gha dependencies
 
     - name: Build source package
       run: |
         TIER=$(cat TIER.md)
         export TIER
         echo "TIER=$TIER" >> $GITHUB_ENV
-
-        echo "${COLOR_GREEN}Make source package for keyman"
         cd linux
-
-        echo "::group::${COLOR_GREEN}reconfigure"
-        ./scripts/reconf.sh keyman
-        echo "::endgroup::"
-
-        echo "::group::${COLOR_GREEN}Make origdist"
-        ./scripts/dist.sh origdist keyman
-        echo "::endgroup::"
-
-        echo "::group::${COLOR_GREEN}Make deb source"
-        ./scripts/deb.sh sourcepackage keyman
-        echo "::endgroup::"
-
-        mv builddebs/* ..
+        ./scripts/deb-packaging.sh --gha source
 
     - name: Set version as output parameter
       id: version_step
@@ -217,16 +202,11 @@ jobs:
 
     - name: Verify API
       run: |
-        tar xf "artifacts/keyman-srcpkg/keyman_${{ needs.sourcepackage.outputs.VERSION }}-1.debian.tar.xz"
-        if [ ! -f debian/libkmnkbp0-0.symbols ]; then
-          echo ":warning: Missing libkmnkbp0-0.symbols file" >> $GITHUB_STEP_SUMMARY
-        else
-          tmpDir=$(mktemp -d)
-          dpkg -x "artifacts/keyman-binarypkgs/libkmnkbp0-0_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" $tmpDir
-          cd debian
-          dpkg-gensymbols -v${{ needs.sourcepackage.outputs.VERSION }} -plibkmnkbp0-0 -e${tmpDir}/usr/lib/x86_64-linux-gnu/libkmnkbp0.so* -Olibkmnkbp0-0.symbols -c4
-          echo ":heavy_check_mark: libkmnkbp0-0 API didn't change" >> $GITHUB_STEP_SUMMARY
-        fi
+        cd linux
+        SRC_PKG="artifacts/keyman-srcpkg/keyman_${{ needs.sourcepackage.outputs.VERSION }}-1.debian.tar.xz" \
+        BIN_PKG="artifacts/keyman-binarypkgs/libkmnkbp0-0_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" \
+        PKG_VERSION="${{ needs.sourcepackage.outputs.VERSION }}" \
+        ./scripts/deb-packaging.sh --gha verify >> $GITHUB_STEP_SUMMARY
 
     - name: Archive .symbols file
       uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
