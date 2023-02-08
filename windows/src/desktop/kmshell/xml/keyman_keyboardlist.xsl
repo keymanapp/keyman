@@ -150,7 +150,7 @@
                 <xsl:with-param name="id">add_remove_<xsl:value-of select="id"/></xsl:with-param>
                 <xsl:with-param name="className">kbd_button</xsl:with-param>
                 <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='SKAddremove']"/></xsl:with-param>
-                <xsl:with-param name="command">javascript:showModifyLink('<xsl:value-of select="../../id" />')</xsl:with-param>
+                <xsl:with-param name="command">javascript:showModifyLink('<xsl:value-of select="id" />')</xsl:with-param>
                 <xsl:with-param name="disabled">
                   <xsl:choose>
                     <xsl:when test='loaded'>0</xsl:when>
@@ -382,10 +382,10 @@
 
 
           <div class='modify'>
-            <xsl:attribute name='id'>modify-<xsl:value-of select="../../id" /></xsl:attribute>
+            <xsl:attribute name='id'>modify-<xsl:value-of select="id" /></xsl:attribute>
             <xsl:attribute name="data-name"><xsl:value-of select="name"/></xsl:attribute>
             <div class='modify_back'>
-              <xsl:attribute name="onclick">return hideModifyLink('<xsl:value-of select="../../id" />')</xsl:attribute>
+              <xsl:attribute name="onclick">return hideModifyLink('<xsl:value-of select="id" />')</xsl:attribute>
             </div>
             <div class='modify_popup'>
 
@@ -405,7 +405,7 @@
                   <xsl:call-template name="button">
                     <xsl:with-param name="className">kbd_button</xsl:with-param>
                     <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Close']"/></xsl:with-param>
-                    <xsl:with-param name="onclick">return hideModifyLink('<xsl:value-of select="../../id" />')</xsl:with-param>
+                    <xsl:with-param name="onclick">return hideModifyLink('<xsl:value-of select="id" />')</xsl:with-param>
                   </xsl:call-template>
                 </div>
               </div>
