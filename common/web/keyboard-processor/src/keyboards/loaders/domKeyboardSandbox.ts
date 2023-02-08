@@ -5,7 +5,7 @@ import { ManagedPromise } from "@keymanapp/web-utils";
 
 export default class DOMKeyboardSandbox {
   public readonly sandboxHost: HTMLIFrameElement;
-  public sandbox(): Window {
+  public get sandbox(): Window {
     return this.sandboxHost.contentWindow;
   }
 
@@ -24,12 +24,24 @@ export default class DOMKeyboardSandbox {
     const promise = new ManagedPromise<DOMKeyboardSandbox>();
     const instance = new DOMKeyboardSandbox();
 
-    instance.sandboxHost.onload = () => promise.resolve(instance);
-    instance.sandboxHost.onerror = () => promise.reject();
+    instance.sandboxHost.onload = () => { promise.resolve(instance) };
+    instance.sandboxHost.onerror = () => { promise.reject() };
 
     // Need to insert the sandbox into the DOM before it can load or error!
-    window.document.appendChild(instance.sandboxHost);
+    instance.attachToDOM();
 
     return promise.corePromise;
+  }
+
+  public attachToDOM() {
+    if(!this.sandboxHost.parentElement) {
+      window.document.body.appendChild(this.sandboxHost);
+    }
+  }
+
+  public detachFromDOM() {
+    if(this.sandboxHost.parentElement) {
+      this.sandboxHost.remove();
+    }
   }
 }

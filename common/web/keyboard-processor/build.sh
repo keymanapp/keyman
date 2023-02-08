@@ -63,7 +63,7 @@ if builder_start_action test; then
     FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
   fi
 
-  npm run mocha -- --recursive $FLAGS ./tests/cases/
+  npm run mocha -- --recursive $FLAGS ./tests/node/
 
   builder_finish_action success test
 fi

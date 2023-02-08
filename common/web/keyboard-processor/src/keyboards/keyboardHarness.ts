@@ -88,5 +88,15 @@ export class KeyboardHarness {
     this._jsGlobal.KeymanWeb = this;
     this._jsGlobal.keyman = this.keymanGlobal;
   }
+
+  public uninstall() {
+    if(this._jsGlobal.KeymanWeb == this) {
+      delete this._jsGlobal.KeymanWeb;
+    }
+
+    if(this._jsGlobal.keyman == this.keymanGlobal) {
+      delete this._jsGlobal.keyman;
+    }
+  }
 }
 
