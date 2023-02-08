@@ -1,5 +1,3 @@
-// TODO:  export from ../index.ts as well!
-
 import { KeyboardHarness, MinimalKeymanGlobal } from './keyboardHarness.js';
 
 import Keyboard from './keyboard.js';

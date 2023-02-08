@@ -1,5 +1,7 @@
 export * from "./keyboards/activeLayout.js";
 export * from "./keyboards/defaultLayouts.js";
+export { default as DOMKeyboardLoader } from "./keyboards/domKeyboardLoader.js";
+export { default as DOMKeyboardSandbox } from "./keyboards/domKeyboardSandbox.js";
 export { default as Keyboard } from "./keyboards/keyboard.js";
 export * from "./keyboards/keyboard.js";
 export { KeyboardHarness, KeyboardKeymanGlobal, MinimalCodesInterface, MinimalKeymanGlobal } from "./keyboards/keyboardHarness.js";
