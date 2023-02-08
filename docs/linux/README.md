@@ -33,23 +33,19 @@ See [license information](../../linux/LICENSE.md) about licensing.
 
 - The process to build and install everything is:
 
-  - `./build.sh configure` to set the version and setup the build system
-  - `./build.sh build` to build
-  - `sudo ./build.sh install` to install to `/usr/local`
+  - `linux/build.sh configure` to set the version and setup the build system
+  - `linux/build.sh build` to build
+  - `sudo linux/build.sh install` to install to `/usr/local`
 
-- Some of the files must be installed to `/usr/share/` so `make install` must
-  be run as `sudo`.
+- Some of the files must be installed to `/usr/share/` or `/usr/local/share`
+  so `linux/build.sh install` must be run as `sudo`.
 
-  To do this run `sudo make install`
+  To do this run `sudo linux/build.sh install`
 
-  - This will install to `/usr/local`
-    - and `/usr/share/ibus/component/keyman.xml` and `/usr/share/keyman/icons`
+  - This will install to `/usr/local` and
+    `/usr/local/share/ibus/component/keyman.xml` and `/usr/local/share/keyman/icons`
 
-  - If you already have the ibus-keyman package installed then it will
-    move the file `/usr/share/ibus/component/keyman.xml` to
-    `/usr/share/doc/ibus-keyman/`
-
-- run `sudo ./build.sh uninstall` to uninstall everything and put it back again
+- run `sudo linux/build.sh uninstall` to uninstall everything and put it back again
 
 #### Tmp install
 
