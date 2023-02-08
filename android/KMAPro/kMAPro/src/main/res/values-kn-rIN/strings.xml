@@ -36,7 +36,7 @@
   <!-- Context: Clear Text dialog -->
   <string name="all_text_will_be_cleared" comment="Erase all the text">\nಎಲ್ಲಾ ಪಠ್ಯವನ್ನು ತೆರವುಗೊಳಿಸಲಾಗುತ್ತದೆ\n</string>
   <!-- Context: Get Started menu -->
-  <string name="get_started" comment="Menu for getting started">ಶುರುಮಾಡಿ</string>
+  <string name="get_started" comment="Menu for getting started">ಪ್ರಾರಂಭಿಕ ಪರದೆ</string>
   <!-- Context: Get Started menu -->
   <string name="add_a_keyboard" comment="Menu item to add a keyboard">ನಿಮ್ಮ ಭಾಷೆಗೆ ಕೀಲಿಮಣೆಯನ್ನು ಸೇರಿಸಿ</string>
   <!-- Context: Get Started menu -->
