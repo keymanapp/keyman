@@ -1,5 +1,23 @@
 # Keyman Version History
 
+## 17.0.44 alpha 2023-02-07
+
+* chore(linux): Set test-helper script executable (#8178)
+* chore(linux): Update debian changelog (#8156)
+
+## 17.0.43 alpha 2023-02-06
+
+* chore(linux): Build with meson instead of autotools  ️ (#8111)
+
+## 17.0.42 alpha 2023-02-03
+
+* chore(deps): bump http-cache-semantics from 4.1.0 to 4.1.1 (#8144)
+* feat(developer): check for duplicated language codes in package editor and compiler (#8151)
+* chore: Fail TC build if triggering Jenkins build fails (#8152)
+* chore(linux): Fix lintian warnings (#8154)
+* chore(core): Update meson version (#7882)
+* refactor(android/engine): Consolidate Keyboard picker intent (#8163)
+
 ## 17.0.41 alpha 2023-02-02
 
 * chore(web): main web build & test script rework to our common script format + nomenclature (#7474)

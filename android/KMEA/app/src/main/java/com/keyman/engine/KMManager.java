@@ -1905,21 +1905,22 @@ public final class KMManager {
   }
 
   public static void showKeyboardPicker(Context context, KeyboardType kbType) {
-    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      Intent i = new Intent(context, KeyboardPickerActivity.class);
-      i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-      i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-      i.putExtra(KMKey_DisplayKeyboardSwitcher, false);
-      context.startActivity(i);
-    } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      Intent i = new Intent(context, KeyboardPickerActivity.class);
-      i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+    if (kbType == KeyboardType.KEYBOARD_TYPE_UNDEFINED) {
+      KMLog.LogError(TAG, String.format("showKeyboardPicker with invalid %s", kbType.toString()));
+      return;
+    }
+
+    Intent i = new Intent(context, KeyboardPickerActivity.class);
+    i.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT); // Replaces FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET
+    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);     // Required to call startActivity() from outside of an Activity context
+
+    if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
       i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-      i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-      i.putExtra(KMKey_DisplayKeyboardSwitcher, true);
-      context.startActivity(i);
     }
+
+    i.putExtra(KMKey_DisplayKeyboardSwitcher, kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM);
+    context.startActivity(i);
   }
 
   public static void setKeyboardPickerFont(Typeface typeface) {
