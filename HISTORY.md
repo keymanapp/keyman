@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.45 alpha 2023-02-08
+
+* chore(ios): update certificate (#8176)
+* fix(linux): Fix autopkgtests (#8181)
+* chore(common): Cleanup Kannada locale (#8182)
+* chore(windows): Fix Portuguese UI language name (#8184)
+
 ## 17.0.44 alpha 2023-02-07
 
 * chore(linux): Set test-helper script executable (#8178)
