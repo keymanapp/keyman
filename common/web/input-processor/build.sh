@@ -31,7 +31,7 @@ builder_describe "Builds the standalone, headless form of Keyman Engine for Web'
   "test" \
   ":module     A headless, Node-oriented version of the module useful for unit tests" \
   ":tools      Related tools useful for development and testing of this module" \
-  "--ci        Sets ${BUILDER_TERM_START}test${BUILDER_TERM_END} action to use CI-based test configurations & reporting"
+  "--ci        Sets $(builder_term test) action to use CI-based test configurations & reporting"
 
 builder_describe_outputs \
   configure          /node_modules \
