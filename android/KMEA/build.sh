@@ -24,11 +24,14 @@ cd "$THIS_SCRIPT_PATH"
 
 # Definition of global compile constants
 
+DEBUG="debug"
+RELEASE="release"
+
 
 builder_describe "Builds Keyman Engine for Android (KMEA)." \
-  "@../../web/build/app/embed/$KMW_CONFIG/keyman.js" \
+  "@../../web build" \
   "clean" \
-  "confiugre" \
+  "configure" \
   "build" \
   "test             Runs unit tests." \
   ":app             Builds KMEA" \
