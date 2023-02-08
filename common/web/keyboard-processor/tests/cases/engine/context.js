@@ -3,7 +3,8 @@ import { assert } from 'chai';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { KeyboardInterface, KeyboardProcessor, MinimalKeymanGlobal, Mock, NodeKeyboardLoader } from '@keymanapp/keyboard-processor';
+import { KeyboardInterface, KeyboardProcessor, MinimalKeymanGlobal, Mock } from '@keymanapp/keyboard-processor';
+import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/nodeKeyboardLoader';
 
 import { NodeProctor, RecordedKeystrokeSequence } from '@keymanapp/recorder-core';
 

@@ -3,7 +3,8 @@ import { assert } from 'chai';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { KeyboardProcessor, NodeKeyboardLoader } from '@keymanapp/keyboard-processor';
+import { KeyboardProcessor } from '@keymanapp/keyboard-processor';
+import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/nodeKeyboardLoader';
 
 global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
                     // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.

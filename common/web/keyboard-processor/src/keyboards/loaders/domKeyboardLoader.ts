@@ -2,14 +2,14 @@
 
 ///<reference lib="dom" />
 
-import { KeyboardHarness, MinimalKeymanGlobal } from './keyboardHarness.js';
+import { KeyboardHarness, MinimalKeymanGlobal } from '../keyboardHarness.js';
 
-import Keyboard from './keyboard.js';
-import KeyboardLoaderBase from './keyboardLoaderBase.js';
+import Keyboard from '../keyboard.js';
+import KeyboardLoaderBase from '../keyboardLoaderBase.js';
 
 import { ManagedPromise } from '@keymanapp/web-utils';
 
-export default class DOMKeyboardLoader extends KeyboardLoaderBase {
+export class DOMKeyboardLoader extends KeyboardLoaderBase {
   public readonly element: HTMLIFrameElement;
 
   constructor()
@@ -57,3 +57,5 @@ export default class DOMKeyboardLoader extends KeyboardLoaderBase {
     return Promise.resolve(this.harness.activeKeyboard);
   }
 }
+
+export { default as DOMKeyboardSandbox } from './domKeyboardSandbox.js';

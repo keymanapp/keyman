@@ -1,13 +1,13 @@
-import { KeyboardHarness, MinimalKeymanGlobal } from './keyboardHarness.js';
+import { KeyboardHarness, MinimalKeymanGlobal } from '../keyboardHarness.js';
 
-import Keyboard from './keyboard.js';
-import KeyboardLoaderBase from './keyboardLoaderBase.js';
+import Keyboard from '../keyboard.js';
+import KeyboardLoaderBase from '../keyboardLoaderBase.js';
 
 import vm from 'vm';
 import fs from 'fs';
 import { globalObject } from '@keymanapp/web-utils';
 
-export default class NodeKeyboardLoader extends KeyboardLoaderBase {
+export class NodeKeyboardLoader extends KeyboardLoaderBase {
   constructor()
   constructor(harness: KeyboardHarness);
   constructor(harness?: KeyboardHarness) {

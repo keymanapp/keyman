@@ -30,7 +30,7 @@ builder_describe \
 
 builder_describe_outputs \
   configure     /node_modules \
-  build         build/index.js
+  build         build/lib/index.mjs
 
 builder_parse "$@"
 
