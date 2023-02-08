@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 17.0.44 alpha 2023-02-07
+
+* chore(linux): Set test-helper script executable (#8178)
+* chore(linux): Update debian changelog (#8156)
+
+## 17.0.43 alpha 2023-02-06
+
+* chore(linux): Build with meson instead of autotools  ️ (#8111)
+
 ## 17.0.42 alpha 2023-02-03
 
 * chore(deps): bump http-cache-semantics from 4.1.0 to 4.1.1 (#8144)
