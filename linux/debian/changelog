@@ -1,3 +1,11 @@
+keyman (16.0.138-2) unstable; urgency=medium
+
+  * Team upload
+  * debian/tests/control: Added missing autopkgtest dependency on
+    pkg-config (closes: #1030815).
+
+ -- Gunnar Hjalmarsson <gunnarhj@debian.org>  Tue, 07 Feb 2023 20:34:35 +0100
+
 keyman (16.0.138-1) unstable; urgency=medium
 
   [ Jelmer Vernooĳ ]
