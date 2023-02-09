@@ -30,7 +30,7 @@ export function build_disp(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILD
     ident: constants.hex_section_id(constants.section.disp),
     size: constants.length_disp + constants.length_disp_item * kmxplus.disp.disps.length,
     _offset: 0,
-    count: kmxplus.vkey.vkeys.length,
+    count: kmxplus.disp.disps.length,
     baseCharacter: build_strs_index(sect_strs, kmxplus.disp.baseCharacter),
     items: []
   };

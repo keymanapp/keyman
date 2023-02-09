@@ -190,7 +190,6 @@ COMP_KMXPLUS_LOCA::valid(KMX_DWORD _kmn_unused(length)) const {
     assert(false);
     return false;
   }
-  // TODO-LDML
   for(KMX_DWORD i=0; i<count; i++) {
     DebugLog(" Locale #%d: #0x%X\n", i, entries[i].locale);
   }
@@ -221,8 +220,14 @@ COMP_KMXPLUS_VKEY::valid(KMX_DWORD _kmn_unused(length)) const {
     assert(false);
     return false;
   }
-  // TODO-LDML
-  DebugLog("TODO: dump vkey");
+  for (KMX_DWORD i = 0; i < count; i++) {
+    DebugLog("vkey #0x%X: 0x%X->0x%X", i, entries[i].vkey, entries[i].target);
+    if (entries[i].vkey > 0xFF || entries[i].target > 0xFF) {
+      DebugLog("vkey source or target out of range [0x00…0xFF]");
+      assert(false);
+      return false;
+    }
+  }
   return true;
 }
 
@@ -234,8 +239,17 @@ COMP_KMXPLUS_DISP::valid(KMX_DWORD _kmn_unused(length)) const {
     assert(false);
     return false;
   }
-  // TODO-LDML
-  DebugLog("TODO: dump disp");
+  if (baseCharacter != 0) {
+    DebugLog("disp: baseCharacter str#0x%X", baseCharacter);
+  }
+  for (KMX_DWORD i=0; i<count; i++) {
+    DebugLog("disp#%d: to: str0x%X -> str0x%X", i, entries[i].to, entries[i].display);
+    if (entries[i].to == 0 || entries[i].display == 0) {
+      DebugLog("disp to: or display: has a zero string");
+      assert(false);
+      return false;
+    }
+  }
   return true;
 }
 

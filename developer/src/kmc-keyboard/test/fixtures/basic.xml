@@ -16,6 +16,7 @@
 
   <vkeys>
     <vkey from="Q" to="A" />
+    <vkey from="A" to="Q" />
   </vkeys>
 
   <displays>

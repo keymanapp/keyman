@@ -12,6 +12,11 @@
     <name value="TestKbd" />
   </names>
 
+  <displays>
+    <display to="a" display="(a)"/>
+    <displayOptions baseCharacter="x"/>
+  </displays>
+
   <keys>
     <!-- no keys listed, keys-Latn-implied.xml will be implicitly imported -->
   </keys>

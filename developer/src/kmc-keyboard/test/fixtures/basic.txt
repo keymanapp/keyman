@@ -515,8 +515,9 @@ block(tran)                         # struct COMP_KMXPLUS_TRAN {
 block(vkey)                         # struct COMP_KMXPLUS_VKEY {
   76 6b 65 79                       #   KMX_DWORD header.ident;   // 0000 Section name - vkey
   sizeof(vkey)                      #   KMX_DWORD header.size;    // 0004 Section length
-  01 00 00 00                       #   KMX_DWORD count;          // 0008 Number of vkey maps
+  02 00 00 00                       #   KMX_DWORD count;          // 0008 Number of vkey maps
 
+  41 00 00 00    51 00 00 00        #   KMX_DWORD vkey;  KMX_DWORD target; // K_A => K_Q
   51 00 00 00    41 00 00 00        #   KMX_DWORD vkey;  KMX_DWORD target; // K_Q => K_A
                                     # };
 
