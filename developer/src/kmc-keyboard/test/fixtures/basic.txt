@@ -335,7 +335,7 @@ block(layr)                         # struct COMP_KMXPLUS_LAYR {
   7B 00 00 00                       #   KMX_DWORD minDeviceWidth; // 123
   # layers 0
   index(strNull,strBase,2)          #   KMXPLUS_STR id;
-  00 00 00 00                       #   KMXPLUS_STR mod str
+  00 00 00 00                       #   KMX_DWORD mod
   00 00 00 00                       #   KMX_DWORD row index
   01 00 00 00                       #   KMX_DWORD  count
   # rows 0

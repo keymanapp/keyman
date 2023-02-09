@@ -26,7 +26,7 @@ interface BUILDER_LAYR_LIST {
 interface BUILDER_LAYR_LAYER {
   id: number; // str of layer id
   _id: string; // original layer id, for sorting
-  modifier: number; // str of modifier string
+  mod: number; // bitfield with modifier info
   row: number; // row index into row subtable
   _rows: LayrRow[]; // original rows, for in-memory only
   count: number; // number of row entries
@@ -112,7 +112,7 @@ export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
       const blayer: BUILDER_LAYR_LAYER = {
         _id: layer.id.value, // original id
         id: build_strs_index(sect_strs, layer.id),
-        modifier: build_strs_index(sect_strs, layer.modifier),
+        mod: layer.mod,
         row: null, // row ID, to be filled in
         _rows: layer.rows, // temporary
         count: layer.rows.length, // number of rows

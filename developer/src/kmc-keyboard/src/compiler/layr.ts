@@ -2,6 +2,8 @@ import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { KMXPlus } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
 import { SectionCompiler } from "./section-compiler.js";
+import { translateLayerAttrToModifier, validModifier } from '../util/util.js';
+
 
 import GlobalSections = KMXPlus.GlobalSections;
 import Layr = KMXPlus.Layr;
@@ -22,7 +24,8 @@ export class LayrCompiler extends SectionCompiler {
       this.callbacks.reportMessage(CompilerMessages.Error_MustBeAtLeastOneLayerElement());
     }
     let hardwareLayers = 0;
-    this.keyboard.layers.forEach(({ hardware, form }) => {
+    this.keyboard.layers.forEach((layers) => {
+      const { hardware, form } = layers;
       // TODO-LDML: in the future >1 hardware layer may be allowed, check for duplicates
       if (form === 'touch') {
         if (hardware) {
@@ -49,6 +52,13 @@ export class LayrCompiler extends SectionCompiler {
           errorText: `INTERNAL ERROR: Invalid XML: Invalid form="${form}" on layers element`
         }));
       }
+      layers.layer.forEach((layer) => {
+        const { modifier, id } = layer;
+        if (!validModifier(modifier)) {
+          this.callbacks.reportMessage(CompilerMessages.Error_InvalidModifier({ modifier, layer: id }));
+          valid = false;
+        }
+      });
     });
     return valid;
   }
@@ -65,7 +75,7 @@ export class LayrCompiler extends SectionCompiler {
         layers: layers.layer.map((layer) => {
           const entry: LayrEntry = {
             id: sections.strs.allocString(layer.id),
-            modifier: sections.strs.allocString(layer.modifier),
+            mod: translateLayerAttrToModifier(layer),
             rows: layer.row.map((row) => {
               const erow: LayrRow = {
                 keys: row.keys.split(' ').map((id) => sections.strs.allocString(id)),
@@ -73,7 +83,6 @@ export class LayrCompiler extends SectionCompiler {
               return erow;
             }),
           };
-          // TODO-LDML: modifiers
           return entry;
         }),
       };

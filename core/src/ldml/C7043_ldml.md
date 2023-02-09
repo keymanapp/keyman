@@ -377,9 +377,11 @@ There are `layerCount` total layer entries.
 | ∆ | Bits | Name       | Description                                    |
 |---|------|------------|------------------------------------------------|
 | 0+|  32  | id         | str: layer id such as `base` or `shift`        |
-| 4+|  32  | modifier   | str: modifier string                           |
+| 4+|  32  | mod        | int: modifier key flags                        |
 | 8+|  32  | row        | int: index into rows area (next section)       |
 |12+|  32  | count      | int: number of `rows` elements for this layer  |
+
+- for `mod` see `keys.key.mod`
 
 ### `layr.rows` subtable
 
@@ -543,4 +545,3 @@ The strings order are significant.  There is not a 'null' string at the end of e
 
 > * UnicodeSets
 > * spec: ABNT2 key has hex value 0xC1 (even if kbdus.dll doesn't produce that)
-> * `keys.key.mod`: TODO define this.  0 for no modifiers. #7533

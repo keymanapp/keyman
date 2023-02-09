@@ -39,7 +39,7 @@ describe('layr', function () {
     assert.equal(row0.keys.length, 1);
 
     assert.equal(layer0.id.value, 'base');
-    // assert.equal(layr.layers[0].modifier, ?); // TODO-LDML
+    assert.equal(layer0.mod, constants.keys_mod_none);
     assert.equal(row0.keys[0]?.value, 'grave');
   });
 
@@ -58,7 +58,7 @@ describe('layr', function () {
     const hardware0 = listHardware.layers[0];
     assert.ok(hardware0);
     assert.equal(hardware0.id.value, 'base');
-    // assert.equal(hardware0.modifier, ?); // TODO-LDML
+    assert.equal(hardware0.mod, constants.keys_mod_none);
     const hardware0row0 = hardware0.rows[0];
     assert.ok(hardware0row0);
     assert.equal(hardware0row0.keys.length, 2);
@@ -67,7 +67,7 @@ describe('layr', function () {
     assert.ok(hardware1);
     assert.equal(hardware1.rows.length, 1);
     assert.equal(hardware1.id.value, 'shift');
-    // assert.equal(hardware0.modifier, ?); // TODO-LDML
+    assert.equal(hardware1.mod, constants.keys_mod_shift);
     const hardware1row0 = hardware1.rows[0];
     assert.ok(hardware1row0);
     assert.equal(hardware1row0.keys.length, 2);
@@ -81,7 +81,7 @@ describe('layr', function () {
     assert.ok(touch0);
     assert.equal(touch0.rows.length, 1);
     assert.equal(touch0.id.value, 'base');
-    // assert.equal(touch0.modifier, ?); // TODO-LDML
+    assert.equal(touch0.mod, constants.keys_mod_none);
     const touch0row0 = touch0.rows[0];
     assert.ok(touch0row0);
     assert.equal(touch0row0.keys.length, 4);

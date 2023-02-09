@@ -247,7 +247,7 @@ export class LayrList {
  */
  export class LayrEntry {
   id: StrsItem;
-  modifier: StrsItem;
+  mod: number;
   rows: LayrRow[] = [];
 };
 

@@ -29,7 +29,7 @@
       <!-- beware: this is mapping ` and 1! -->
       <row keys="Q W" />
     </layer>
-    <layer id="shift">
+    <layer id="shift" modifier="shift">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="q w" />
     </layer>
