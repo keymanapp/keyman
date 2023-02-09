@@ -16,6 +16,7 @@ tests = [
   'k_100_keytest',
   'k_101_keytest',
   'k_102_keytest',
+  'k_103_vkey',
 ]
 
 # Setup kmc
