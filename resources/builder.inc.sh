@@ -124,6 +124,10 @@ function builder_die() {
   exit 1
 }
 
+function builder_warn() {
+  echo "${COLOR_YELLOW}$*${COLOR_RESET}"
+}
+
 ####################################################################################
 #
 # builder_ functions for standard build script parameter and process management
@@ -253,6 +257,90 @@ _builder_cleanup_deps() {
   fi
 }
 
+_builder_execute_child() {
+  local action=$1
+  local target=$2
+
+  local scope="[$THIS_SCRIPT_IDENTIFIER] "
+  local script="$THIS_SCRIPT_PATH/${target:1}/build.sh"
+
+  if $_builder_debug; then
+    echo "${COLOR_BLUE}## $scope$action$target starting...${COLOR_RESET}"
+  fi
+
+  "$script" $action \
+    $builder_verbose \
+    $builder_debug \
+  && (
+    if $_builder_debug; then
+      echo "${COLOR_GREEN}## $scope$action$target completed successfully${COLOR_RESET}"
+    fi
+  ) || (
+    result=$?
+    echo "${COLOR_RED}## $scope$action$target failed with exit code $result${COLOR_RESET}"
+    exit $result
+  )
+}
+
+_builder_run_child_action() {
+  local action="$1" target
+
+  if [[ $action =~ : ]]; then
+    IFS=: read -r action target <<< $action
+    target=:$target
+  else
+    target=':*'
+  fi
+
+  if builder_has_action $action$target; then
+    if [[ $target == ':*' ]]; then
+      # run all children in order specified in builder_describe
+      for target in "${_builder_targets[@]}"; do
+        # We have to re-test the action because the user may not
+        # have specified all targets in their invocation
+        if builder_has_action $action$target; then
+          if [ -f "$THIS_SCRIPT_PATH/${target:1}/build.sh" ]; then
+            _builder_execute_child $action $target
+          fi
+        fi
+      done
+    else
+      # If specified explicitly, we assume existence of a child build script.
+      _builder_execute_child $action $target
+    fi
+  fi
+}
+
+#
+# Executes the specified actions on or all child targets, or on the specified
+# targets. A child target is any target which has a sub-folder of the same name
+# as the target. However, the actions will only be run if they have been
+# specified by the user on the command-line.
+#
+# ### Usage
+#
+# ```bash
+# builder_run_child_actions action1 [...]
+# ```
+#
+# ### Parameters
+#
+#   1...: action[:target]   name of action:target to run
+#
+# ### Example
+#
+# ```bash
+# builder_run_child_actions configure build test install
+# ```
+#
+builder_run_child_actions() {
+  while [[ $# -gt 0 ]]; do
+    local action="$1"
+    _builder_run_child_action "$action"
+    shift
+  done
+}
+
 #
 # Builds the standardized `action:target` string for the specified action-target
 # pairing and also returns 0 if the user has asked to perform it on the command
@@ -268,9 +356,11 @@ _builder_cleanup_deps() {
 #   if build_has_action action[:target]; then ...; fi
 # ````
 #
-# Parameters:
+# ### Parameters
+#
 #   1: action[:target]    name of action:target
-# Example:
+#
+# ### Example
 #
 # ```bash
 #   if builder_has_action build:app; then ...

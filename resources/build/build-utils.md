@@ -126,6 +126,10 @@ another script:
   prefixed with a `:`, for example `:app`. If no target is defined for a script,
   then the default target `:project` is used.
 
+  If a folder exists with the same name as a target, then that automatically
+  denotes the target as a "child project". This can simplify parent-child style
+  scripts, using the [`builder_run_child_actions`] function.
+
 * **actions**: these are the various actions that a build script can take, such
   as `clean`, or `build`. If no action is passed in to on a given script
   invocation, then the default action is `build` (unless the script defines an
@@ -324,6 +328,7 @@ this, you should use `--debug,-d` to enable the shorthand form.
 
 Note that you should not include any of the [standard builder parameters] here.
 
+--------------------------------------------------------------------------------
 
 ## `builder_display_usage` function
 
@@ -337,6 +342,7 @@ builder_describe "sample" clean build test
 builder_display_usage
 ```
 
+--------------------------------------------------------------------------------
 
 ## `$builder_extra_params` variable
 
@@ -356,6 +362,7 @@ array expansion format:
 npm test -- "${builder_extra_params[@]}"
 ```
 
+--------------------------------------------------------------------------------
 
 ## `builder_finish_action` function
 
@@ -398,6 +405,7 @@ with a non-zero exit code:
 ## [common/web/keyman-version] action:target failed with message: yeah, something failed
 ```
 
+--------------------------------------------------------------------------------
 
 ## `builder_has_action` function
 
@@ -415,6 +423,7 @@ fi
 
 See [`builder_start_action`] for more details.
 
+--------------------------------------------------------------------------------
 
 ## `builder_has_option` function
 
@@ -450,6 +459,7 @@ if builder_has_option --path; then
 fi
 ```
 
+--------------------------------------------------------------------------------
 
 ## `builder_parse` function
 
@@ -469,6 +479,35 @@ Generally, you will always pass `"$@"` as the parameter for this call, to pass
 all the command line parameters from the script invocation, with automatically
 correct quoting and escaping.
 
+--------------------------------------------------------------------------------
+
+## `builder_run_child_actions` function
+
+Executes the specified actions on or all child targets, or on the specified
+targets. A child target is any target which has a sub-folder of the same name as
+the target. Like [`builder_start_action`], the actions will only actually be run
+if they have been specified by the user on the command-line.
+
+The child script will be called with the applicable action, for all targets. No
+options apart from standard builder options are passed through.
+
+### Usage
+
+```bash
+builder_run_child_actions action1 [...]
+```
+
+### Parameters
+
+  1...: action[:target]   name of action:target to run
+
+### Example
+
+```bash
+builder_run_child_actions configure build test install
+```
+
+--------------------------------------------------------------------------------
 
 ## `builder_start_action` function
 
@@ -509,6 +548,8 @@ also print a log message indicating that the action has started, for example:
 ## [common/web/keyman-version] build:project starting...
 ```
 
+--------------------------------------------------------------------------------
+
 ## `builder_term` function
 
 Emits the parameters passed to the function, wrapped with the helper function
@@ -522,6 +563,8 @@ builder_describe "sample" \
   "--ci    For use with action $(builder_term test) - emits CI-friendly test reports"
 ```
 
+--------------------------------------------------------------------------------
+
 ## `builder_use_color` function
 
 This will normally be managed internally by build-utils, but can be manually
@@ -532,6 +575,8 @@ builder_use_color true
 # or
 builder_use_color false
 ```
+
+--------------------------------------------------------------------------------
 
 ## `$builder_verbose` variable
 
@@ -550,6 +595,8 @@ if builder_has_option --verbose; then
   # ...
 fi
 ```
+
+--------------------------------------------------------------------------------
 
 ## Formatting variables
 
@@ -584,3 +631,4 @@ Note: it is recommended that you use `$(builder_term text)` instead of
 [`builder_use_color`]: #builderusecolor-function
 [`$builder_verbose`]: #builderverbose-variable
 [formatting variables]: #formatting-variables
+[`builder_run_child_actions`]: #builderrunchildactions-function
