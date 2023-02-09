@@ -16,8 +16,6 @@ cd "$(dirname "$THIS_SCRIPT")"
 
 ################################ Main script ################################
 
-builder_check_color "$@"
-
 # TODO: for predictive-text, we only need :headless, perhaps we should be splitting modules?
 # TODO: remove :tools once kmlmc is a dependency for test:module
 

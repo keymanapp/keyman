@@ -85,8 +85,6 @@ compilecmd="$compiler"
 PREDICTIVE_TEXT_SOURCE="../common/predictive-text/unit_tests/in_browser/resources/models/simple-trie.js"
 PREDICTIVE_TEXT_OUTPUT="src/test/manual/web/prediction-ui/simple-en-trie.js"
 
-builder_check_color "$@"
-
 builder_describe "Builds Keyman Engine for Web (KMW)." \
   "@../common/web/keyman-version build" \
   "@../common/web/input-processor build" \
