@@ -10,7 +10,7 @@
     "@types/node": "^13.7.0",
     "@types/semver": "^7.1.0",
     "semver": "^7.1.2",
-    "ts-node": "^8.6.2"
+    "ts-node": "^10.9.1"
   },
   "engines": {
     "node": ">=16.0"
