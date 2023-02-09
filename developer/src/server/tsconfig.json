@@ -15,7 +15,8 @@
     "noImplicitAny": true,
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "lib": ["es6"]
   },
   "include": [
     "src/**/*.ts"
