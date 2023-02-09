@@ -190,7 +190,6 @@ COMP_KMXPLUS_LOCA::valid(KMX_DWORD _kmn_unused(length)) const {
     assert(false);
     return false;
   }
-  // TODO-LDML
   for(KMX_DWORD i=0; i<count; i++) {
     DebugLog(" Locale #%d: #0x%X\n", i, entries[i].locale);
   }
@@ -221,8 +220,14 @@ COMP_KMXPLUS_VKEY::valid(KMX_DWORD _kmn_unused(length)) const {
     assert(false);
     return false;
   }
-  // TODO-LDML
-  DebugLog("TODO: dump vkey");
+  for (KMX_DWORD i = 0; i < count; i++) {
+    DebugLog("vkey #0x%X: 0x%X->0x%X\n", i, entries[i].vkey, entries[i].target);
+    if (entries[i].vkey > 0xFF || entries[i].target > 0xFF) {
+      DebugLog("vkey source or target out of range [0x00…0xFF]\n");
+      assert(false);
+      return false;
+    }
+  }
   return true;
 }
 

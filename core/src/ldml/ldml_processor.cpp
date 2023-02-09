@@ -1,7 +1,7 @@
 /*
   Copyright:    © SIL International.
   Description:  This is an implementation of the LDML keyboard spec 3.0.
-  Create Date:  5 Aug 2023
+  Create Date:  5 Aug 2022
   Authors:      Marc Durdin (MD)
 */
 
