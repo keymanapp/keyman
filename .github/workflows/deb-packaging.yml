@@ -203,8 +203,8 @@ jobs:
     - name: Verify API
       run: |
         cd linux
-        SRC_PKG="artifacts/keyman-srcpkg/keyman_${{ needs.sourcepackage.outputs.VERSION }}-1.debian.tar.xz" \
-        BIN_PKG="artifacts/keyman-binarypkgs/libkmnkbp0-0_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" \
+        SRC_PKG="${GITHUB_WORKSPACE}/artifacts/keyman-srcpkg/keyman_${{ needs.sourcepackage.outputs.VERSION }}-1.debian.tar.xz" \
+        BIN_PKG="${GITHUB_WORKSPACE}/artifacts/keyman-binarypkgs/libkmnkbp0-0_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" \
         PKG_VERSION="${{ needs.sourcepackage.outputs.VERSION }}" \
         ./scripts/deb-packaging.sh --gha verify >> $GITHUB_STEP_SUMMARY
 
