@@ -33,7 +33,7 @@
     "mocha-teamcity-reporter": "^4.0.0",
     "sinon": "^7.1.1",
     "ts-node": "^9.1.1",
-    "typescript": "^4.5.4"
+    "typescript": "^4.9.5"
   },
   "dependencies": {
     "@keymanapp/models-templates": "*",
