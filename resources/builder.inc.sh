@@ -109,9 +109,17 @@ builder_use_color() {
   fi
 }
 
+#
+# Wraps the input string in `builder_display_usage` with $BUILDER_TERM_START and
+# $BUILDER_TERM_END
+#
+function builder_term() {
+  echo "${BUILDER_TERM_START}$*${BUILDER_TERM_END}"
+}
+
 function builder_die() {
   echo
-  echo "${COLOR_RED}$*"
+  echo "${COLOR_RED}$*${COLOR_RESET}"
   echo
   exit 1
 }
