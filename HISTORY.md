@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 17.0.46 alpha 2023-02-09
+
+* fix(windows): add remove lang id uses correct keyboard id (#8186)
+* chore(common): add `builder_term` function (#8187)
+* chore(common): builder internal dependencies (#8188)
+* chore(linux): Update changelog from Debian (#8192)
+* feat(linux): Add debian packaging GHA (#7911)
+
 ## 17.0.45 alpha 2023-02-08
 
 * chore(ios): update certificate (#8176)
