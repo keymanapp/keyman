@@ -131,9 +131,6 @@ For each key:
   applied.  If this is 256 or above, it is a custom touch layout vkey generated
   by the compiler.
 - `mod`: 32-bit bitfield defined as below. Little endian values.
-Note that conforming to other keyman values, left versus right shift
-cannot be distinguished. Also note that `cmd` and `opt` do not match
-other keyman values.
 
 | Bit position | Meaning  | Comment                                     |
 |--------------|----------|---------------------------------------------|
@@ -143,9 +140,15 @@ other keyman values.
 |      2       | `altL`   |                                             |
 |      3       | `altR`   | `alt` (both) = `altL + altR`                |
 |      4       | `shift`  | Either shift                                |
-|      7       | `caps`   |                                             |
+|      8       | `caps`   |                                             |
 
-TODO-LDML: Note that 'Current' LDML spec allows `shiftL`/`shiftR`, `opt`, and `cmd` but there is a request to drop these.
+TODO-LDML: Note that conforming to other keyman values, left versus right shift
+cannot be distinguished. Also note that `cmd` and `opt` do not match
+other keyman values.
+
+TODO-LDML: Note that 'Current' LDML spec allows `shiftL`/`shiftR`, `opt`,
+and `cmd` but there is a request to drop these. These four are not represented
+here.
 
 - `flags`: Flags is a 32-bit bitfield defined as below:
 

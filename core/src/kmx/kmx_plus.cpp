@@ -10,6 +10,7 @@
 #include <kmx/kmx_xstring.h>
 
 #include "kmx_processevent.h" // for debug functions
+#include "ldml/keyboardprocessor_ldml.h"
 
 #include <assert.h>
 
@@ -17,10 +18,29 @@ namespace km {
 namespace kbp {
 namespace kmx {
 
+// double check these modifier mappings
+static_assert(LCTRLFLAG == LDML_KEYS_MOD_CTRLL, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
+static_assert(RCTRLFLAG == LDML_KEYS_MOD_CTRLR, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
+static_assert(/*K_CTRLFLAG*/ (LCTRLFLAG|RCTRLFLAG) == LDML_KEYS_MOD_CTRL, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
+static_assert(RALTFLAG == LDML_KEYS_MOD_ALTR, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
+static_assert(LALTFLAG == LDML_KEYS_MOD_ALTL, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
+static_assert(/*K_ALTFLAG*/ (RALTFLAG|LALTFLAG) == LDML_KEYS_MOD_ALT, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
+static_assert(CAPITALFLAG == LDML_KEYS_MOD_CAPS, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
+static_assert(K_SHIFTFLAG == LDML_KEYS_MOD_SHIFT, "LDML modifier bitfield vs. kmx_file.h #define mismatch"); // "either" shift
+
+/**
+ * \def LDML_IS_VALID_MODIFIER_BITS test whether x is a valid modifier bitfield
+ * i.e. contains no bits outside of LDML_KEYS_MOD_ALL
+ */
+#define LDML_IS_VALID_MODIFIER_BITS(x) ((LDML_KEYS_MOD_ALL & x) == x)
+
+static_assert(LDML_IS_VALID_MODIFIER_BITS(0), "LDML_IS_VALID_MODIFIER_BITS test");
+static_assert(!LDML_IS_VALID_MODIFIER_BITS(0xFFFFFF), "LDML_IS_VALID_MODIFIER_BITS(0xFFFFFF) should be 0");
+static_assert(LDML_IS_VALID_MODIFIER_BITS(LDML_KEYS_MOD_CAPS), "LDML_IS_VALID_MODIFIER_BITS test");
 
 /**
  * \def _DEBUG_IDENT_SAFE for use by DEBUG_IDENT
-*/
+ */
 #define _DEBUG_IDENT_SAFE(x,b) (((x)>>b)&0x7F)<0x20?'?':(((x)>>b)&0x7F)
 
 /**
@@ -116,7 +136,6 @@ const T *section_from_bytes(const uint8_t *data, KMX_DWORD length) {
 
 template <class T>
 const T *section_from_sect(const COMP_KMXPLUS_SECT* sect) {
-  DebugLog("----"); // separate a new section's validation
   const uint8_t *rawbytes = reinterpret_cast<const uint8_t *>(sect);
   if (rawbytes == nullptr) {
     DebugLog("section_from_sect(nullptr) == nullptr");
@@ -165,6 +184,11 @@ COMP_KMXPLUS_KEYS::valid(KMX_DWORD _kmn_unused(length)) const {
     const COMP_KMXPLUS_KEYS_ENTRY& entry = entries[i];
     DebugLog("  vkey\t0x%X\n", entry.vkey);
     DebugLog("  mod\t0x%X\n", entry.mod);
+    if (!LDML_IS_VALID_MODIFIER_BITS(entry.mod)) {
+      DebugLog("Invalid modifier value");
+      assert(false);
+      return false;
+    }
     DebugLog("  flags\t0x%X\n", entry.flags);
     if (entry.flags & LDML_KEYS_FLAGS_EXTEND) {
         DebugLog("  \t Extend: String #0x%X\n", entry.to);
@@ -401,8 +425,10 @@ COMP_KMXPLUS_LAYR::valid(KMX_DWORD _kmn_unused(length)) const {
     assert(false);
     return false;
   }
-  // TODO-LDML
-  DebugLog("!! More to do here.");
+  DebugLog("layr header is valid");
+  // Note: We only do minimal validation here because of the
+  // dynamic structure. See COMP_KMXPLUS_LAYR_Helper.setLayr()  (below)
+  // all remaining checks
   return true;
 }
 
@@ -411,6 +437,7 @@ COMP_KMXPLUS_LAYR_Helper::COMP_KMXPLUS_LAYR_Helper() : layr(nullptr), is_valid(f
 
 bool
 COMP_KMXPLUS_LAYR_Helper::setLayr(const COMP_KMXPLUS_LAYR *newLayr) {
+  DebugLog("validating newLayr=%p", newLayr);
   is_valid = true;
   if (newLayr == nullptr) {
     // null = invalid
@@ -462,6 +489,9 @@ COMP_KMXPLUS_LAYR_Helper::setLayr(const COMP_KMXPLUS_LAYR *newLayr) {
     for(KMX_DWORD i = 0; is_valid && i < layr->listCount; i++) {
       const COMP_KMXPLUS_LAYR_LIST &list = lists[i];
       // is the count off the end?
+      DebugLog(
+          "<layers> %d: hardware s#0x%X, layers %d..%d, minDeviceWidth %.1fmm", i, list.hardware, list.layer,
+          list.layer + list.count - 1, list.minDeviceWidth * 0.1F);
       if ((list.layer >= layr->layerCount) || (list.layer + list.count > layr->layerCount)) {
         DebugLog("COMP_KMXPLUS_LAYR_Helper: list[%d] would access layer %d+%d, > count %d",
             i, list.layer, list.count, layr->layerCount);
@@ -472,11 +502,18 @@ COMP_KMXPLUS_LAYR_Helper::setLayr(const COMP_KMXPLUS_LAYR *newLayr) {
     for(KMX_DWORD i = 0; is_valid && i < layr->layerCount; i++) {
       const COMP_KMXPLUS_LAYR_ENTRY &entry = entries[i];
       // is the count off the end?
+      DebugLog(
+          "<layer> %d: id s#0x%X, rows %d..%d, modifier=0x%X", i, entry.id, entry.row, entry.row+entry.count-1, entry.mod);
       if ((entry.row >= layr->rowCount) || (entry.row + entry.count > layr->rowCount)) {
         DebugLog("COMP_KMXPLUS_LAYR_Helper: entry[%d] would access row %d+%d, > count %d",
             i, entry.row, entry.count, layr->rowCount);
         is_valid = false;
         assert(is_valid);
+      }
+      if (!LDML_IS_VALID_MODIFIER_BITS(entry.mod)) {
+        DebugLog("Invalid modifier value");
+        assert(false);
+        return false;
       }
     }
     for(KMX_DWORD i = 0; is_valid && i < layr->rowCount; i++) {
