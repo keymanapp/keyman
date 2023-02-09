@@ -191,7 +191,7 @@
 "menu-settings-show-banner" = "ಬ್ಯಾನರ್ ತೋರಿಸು";
 
 /* Label for the "Get Started" automatic display toggle seen in the Settings menu */
-"menu-settings-startup-get-started" = "ಆರಂಭದಲ್ಲಿ 'Get Started' ತೋರಿಸು";
+"menu-settings-startup-get-started" = "ಆರಂಭದಲ್ಲಿ \"ಪ್ರಾರಂಭಿಕ ಪರದೆ\" ತೋರಿಸು";
 
 /* Title for the main Settings menu */
 "menu-settings-title" = "ಕೀಮ್ಯಾನ್ ಸೆಟ್ಟಿಂಗ್‌ಗಳು";

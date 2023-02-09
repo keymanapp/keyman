@@ -42,7 +42,7 @@ underneath the app's name within the app-specific keyboard menu.) */
 "menu-clear-text" = "ಪಠ್ಯವನ್ನು ತೆರವುಗೊಳಿಸಿ";
 
 /* Menu option that displays a list designed to help users start using the app */
-"menu-get-started" = "ಶುರುಮಾಡಿ";
+"menu-get-started" = "ಪ್ರಾರಂಭಿಕ ಪರದೆ";
 
 /* Menu option that displays help for the app */
 "menu-help" = "ಮಾಹಿತಿ";
