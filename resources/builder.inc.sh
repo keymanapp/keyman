@@ -731,7 +731,7 @@ _builder_add_chosen_action_target_dependencies() {
 
   if [[ ${#new_actions[@]} -gt 0 ]]; then
     if builder_is_full_dep_build; then
-      echo "Automatically running all dependent actions due to --force-deps:"
+      echo "Automatically running all dependency actions due to --force-deps:"
     else
       echo "Automatically running following required actions with missing outputs:"
     fi
