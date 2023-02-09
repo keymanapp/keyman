@@ -33,8 +33,8 @@ builder_describe "Builds Keyman Engine for Android (KMEA)." \
   "clean" \
   "configure" \
   "build" \
-  "test             Runs unit tests." \
-  ":app             Builds KMEA" \
+  "test             Runs lint and unit tests." \
+  ":app             Builds KMEA"
 
 builder_describe_outputs \
   build:app     ./app/build/outputs/aar/keyman-android.aar
@@ -44,7 +44,7 @@ builder_parse "$@"
 #### Build
 
 
-display_usage ( ) {
+function display_usage () {
     echo "build.sh [-no-kmw-build] | [-no-kmw] [-no-daemon] | [-no-test] | [-upload-sentry] | [-debug]"
     echo
     echo "Build Keyman Engine Android (KMEA) using Keyman Web (KMW) artifacts"
@@ -70,7 +70,7 @@ SHLVL=0
 KMA_ROOT="$KEYMAN_ROOT/android"
 KMW_ROOT="$KEYMAN_ROOT/web"
 KMEA_ASSETS="$KMA_ROOT/KMEA/app/src/main/assets"
-
+ARTIFACT="app-release.aar"
 
 # Default is building KMW and copying artifacts
 DO_BUILD=true
@@ -82,38 +82,41 @@ KMWFLAGS="build:embed"
 KMW_CONFIG=release
 
 # Parse args
-while [[ $# -gt 0 ]] ; do
-    key="$1"
-    case $key in
-        -no-kmw-build)
-            DO_BUILD=false
-            DO_COPY=true
-            ;;
-        -no-kmw)
-            DO_BUILD=false
-            DO_COPY=false
-            ;;
-        -no-daemon)
-            NO_DAEMON=true
-            ;;
-        -upload-sentry)
-            # Overrides default set by build-utils.sh
-            UPLOAD_SENTRY=true
-            ;;
-        -debug)
-            DEBUG_BUILD=true
-            KMWFLAGS="$KMWFLAGS --debug"
-            KMW_CONFIG=debug
-            ;;
-        -h|-\?)
-            display_usage
-            ;;
-        -no-test)
-            DO_TEST=false
-            ;;
-    esac
-    shift # past argument
-done
+
+function _skip() {
+  while [[ $# -gt 0 ]] ; do
+      key="$1"
+      case $key in
+          -no-kmw-build)
+              DO_BUILD=false
+              DO_COPY=true
+              ;;
+          -no-kmw)
+              DO_BUILD=false
+              DO_COPY=false
+              ;;
+          -no-daemon)
+              NO_DAEMON=true
+              ;;
+          -upload-sentry)
+              # Overrides default set by build-utils.sh
+              UPLOAD_SENTRY=true
+              ;;
+          -debug)
+              DEBUG_BUILD=true
+              KMWFLAGS="$KMWFLAGS --debug"
+              KMW_CONFIG=debug
+              ;;
+          -h|-\?)
+              display_usage
+              ;;
+          -no-test)
+              DO_TEST=false
+              ;;
+      esac
+      shift # past argument
+  done
+}
 
 # Local development optimization - cross-target Sentry uploading when requested
 # by developer. As it's not CI, the Web artifacts won't exist otherwise...
@@ -121,6 +124,47 @@ done
 if [[ $VERSION_ENVIRONMENT == "local" ]] && [[ $UPLOAD_SENTRY == true ]]; then
     # TODO:  handle the -upload-sentry in its eventual new form
     KMWFLAGS="$KMWFLAGS -upload-sentry"
+fi
+
+#### Build action definitions ####
+
+if builder_has_option --debug; then
+  DEBUG_BUILD=true
+  KMW_CONFIG=debug
+  ARTIFACT="app-debug.aar"
+fi
+
+if builder_has_option --ci; then
+  NO_DAEMON=true
+fi
+
+
+if builder_start_action configure; then
+
+  # Copy KeymanWeb artifacts
+  echo "Copying KMW artifacts"
+  cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/osk/ajax-loader.gif $KMEA_ASSETS/ajax-loader.gif
+  cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/keyman.js $KMEA_ASSETS/keymanandroid.js
+  cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/keyman.js.map $KMEA_ASSETS/keyman.js.map
+  cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/osk/kmwosk.css $KMEA_ASSETS/kmwosk.css
+  cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/osk/globe-hint.css $KMEA_ASSETS/globe-hint.css
+  cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/osk/keymanweb-osk.ttf $KMEA_ASSETS/keymanweb-osk.ttf
+
+  cp $KEYMAN_ROOT/common/web/sentry-manager/build/index.js $KMEA_ASSETS/keyman-sentry.js
+
+  echo "Copying es6-shim polyfill"
+  cp $KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js $KMEA_ASSETS/es6-shim.min.js
+
+  if [ $? -ne 0 ]; then
+    die "ERROR: copying artifacts failed"
+  fi
+
+  # Cursory check that KMW exists
+  if [ ! -f "$KMEA_ASSETS/keymanandroid.js" ]; then
+    die "ERROR: keymanweb not built"
+  fi
+
+  builder_finish_action success configure
 fi
 
 echo
@@ -139,83 +183,71 @@ else
   DAEMON_FLAG=
 fi
 
+if builder_start_action clean:app; then
+  if [ -f "$KMA_ROOT/KMEA/app/build/outputs/aar/$ARTIFACT" ]; then
+    rm -f "$KMA_ROOT/KMEA/app/build/outputs/aar/$ARTIFACT"
+    echo "Cleaned $ARTIFACT"
+  else
+    echo "Nothing to clean"
+  fi
+
+  builder_finish_action success clean:app
+fi
+
+
 # Destinations that will need the keymanweb artifacts
 
-PLATFORM=`uname -s`
 
-if [ "$DO_BUILD" = true ]; then
-    echo "Building keyman web engine"
+if builder_start_action build:app; then
+  echo "Gradle Build of KMEA"
+  cd $KMA_ROOT/KMEA
 
-    "$KMW_ROOT/build.sh" $KMWFLAGS
-
-    if [ $? -ne 0 ]; then
-        die "ERROR: keymanweb build failed. Exiting"
+  if [ "$DEBUG_BUILD" = true ]; then
+    BUILD_FLAGS="assembleDebug lintDebug"
+    TEST_FLAGS="testDebug"
+    ARTIFACT="app-debug.aar"
+    if [ "$DO_TEST" = true ]; then
+      # Report JUnit test results to CI
+      echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testDebugUnitTest\']"
     fi
-fi
-if [ "$DO_COPY" = true ]; then
-    echo "Copying KMW artifacts"
-    cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/osk/ajax-loader.gif $KMEA_ASSETS/ajax-loader.gif
-    cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/keyman.js $KMEA_ASSETS/keymanandroid.js
-    cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/keyman.js.map $KMEA_ASSETS/keyman.js.map
-    cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/osk/kmwosk.css $KMEA_ASSETS/kmwosk.css
-    cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/osk/globe-hint.css $KMEA_ASSETS/globe-hint.css
-    cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/osk/keymanweb-osk.ttf $KMEA_ASSETS/keymanweb-osk.ttf
-
-    cp $KEYMAN_ROOT/common/web/sentry-manager/build/index.js $KMEA_ASSETS/keyman-sentry.js
-
-    echo "Copying es6-shim polyfill"
-    cp $KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js $KMEA_ASSETS/es6-shim.min.js
-
-    if [ $? -ne 0 ]; then
-        die "ERROR: copying artifacts failed"
+  else
+    BUILD_FLAGS="aR lint"
+    TEST_FLAGS="testRelease"
+    ARTIFACT="app-release.aar"
+    if [ "$DO_TEST" = true ]; then
+      # Report JUnit test results to CI
+      echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
     fi
-fi
-
-# Cursory check that KMW exists
-if [ ! -f "$KMEA_ASSETS/keymanandroid.js" ]; then
-  die "ERROR: keymanweb not built"
-fi
-
-echo "Gradle Build of KMEA"
-cd $KMA_ROOT/KMEA
-
-if [ "$DEBUG_BUILD" = true ]; then
-  BUILD_FLAGS="assembleDebug lintDebug"
-  TEST_FLAGS="testDebug"
-  ARTIFACT="app-debug.aar"
-  if [ "$DO_TEST" = true ]; then
-    # Report JUnit test results to CI
-    echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testDebugUnitTest\']"
   fi
-else
-  BUILD_FLAGS="aR lint"
-  TEST_FLAGS="testRelease"
-  ARTIFACT="app-release.aar"
-  if [ "$DO_TEST" = true ]; then
-    # Report JUnit test results to CI
-    echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
-  fi
-fi
 
-echo "BUILD_FLAGS $BUILD_FLAGS"
-./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
-if [ $? -ne 0 ]; then
+  echo "BUILD_FLAGS $BUILD_FLAGS"
+  ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
+  if [ $? -ne 0 ]; then
     die "ERROR: Build of KMEA failed"
-fi
-if [ "$DO_TEST" = true ]; then
+  fi
+
+  if [ "$DO_TEST" = true ]; then
     echo "TEST_FLAGS $TEST_FLAGS"
     ./gradlew $DAEMON_FLAG $TEST_FLAGS
     if [ $? -ne 0 ]; then
-        die "ERROR: KMEA test cases failed"
+      die "ERROR: KMEA test cases failed"
     fi
+  fi
+
+  builder_finish_action success build:app
 fi
 
-echo "Copying Keyman Engine for Android to KMAPro, Sample apps, and Tests"
-mv $KMA_ROOT/KMEA/app/build/outputs/aar/$ARTIFACT $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar
-cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Samples/KMSample1/app/libs/keyman-engine.aar
-cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Samples/KMSample2/app/libs/keyman-engine.aar
-cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Tests/KeyboardHarness/app/libs/keyman-engine.aar
-if [ ! -z ${RELEASE_OEM+x} ]; then
-  cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/../oem/firstvoices/android/app/libs/keyman-engine.aar
-fi
-cd ..\
+function _copy_artifacts() {
+  echo "Copying Keyman Engine for Android to KMAPro, Sample apps, and Tests"
+  mv $KMA_ROOT/KMEA/app/build/outputs/aar/$ARTIFACT $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar
+  cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Samples/KMSample1/app/libs/keyman-engine.aar
+  cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Samples/KMSample2/app/libs/keyman-engine.aar
+  cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Tests/KeyboardHarness/app/libs/keyman-engine.aar
+  if [ ! -z ${RELEASE_OEM+x} ]; then
+    cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/../oem/firstvoices/android/app/libs/keyman-engine.aar
+  fi
+  cd ..\
+}
+
+# why do we need this extra brace?
+}
