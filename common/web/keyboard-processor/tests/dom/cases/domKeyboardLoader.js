@@ -54,7 +54,8 @@ describe('Keyboard loading in DOM', function() {
     assert.isOk(window.keyman);
   });
 
-  it('`<iframe>` sandbox, disabled rule processing', async () => {
+  // Note:  tests already pass, but we don't wish to "turn the feature on" and maintain it at this time.
+  it.skip('`<iframe>` sandbox, disabled rule processing', async () => {
     let sandboxedGlobal = await DOMKeyboardSandbox.buildSandbox();
     let keyboardLoader = new DOMKeyboardLoader(new KeyboardHarness(sandboxedGlobal.sandbox, MinimalKeymanGlobal), sandboxedGlobal);
     let keyboard = await keyboardLoader.loadKeyboardFromPath('/resources/keyboards/khmer_angkor.js');
@@ -67,7 +68,8 @@ describe('Keyboard loading in DOM', function() {
     assert.isNotOk(window.keyman);
   });
 
-  it('`<iframe>` sandbox, enabled rule processing', async () => {
+  // Note:  tests already pass, but we don't wish to "turn the feature on" and maintain it at this time.
+  it.skip('`<iframe>` sandbox, enabled rule processing', async () => {
     const sandboxedGlobal = await DOMKeyboardSandbox.buildSandbox();
     const harness = new KeyboardInterface(sandboxedGlobal.sandbox, MinimalKeymanGlobal);
     const keyboardLoader = new DOMKeyboardLoader(harness, sandboxedGlobal);
@@ -90,4 +92,8 @@ describe('Keyboard loading in DOM', function() {
     assert.isNotOk(window.KeymanWeb);
     assert.isNotOk(window.keyman);
   });
+
+  // Obviously, not yet implemented; this aspect is not adequately tested and is a part of
+  // why the potential feature's on pause.
+  it.skip('`<iframe>` sandbox, loading from remote URL', () => {});
 });
