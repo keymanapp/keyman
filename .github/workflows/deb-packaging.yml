@@ -141,7 +141,7 @@ jobs:
     name: Sign source and binary packages
     needs: [sourcepackage, binary_packages]
     runs-on: ubuntu-latest
-    environment: deploy
+    environment: "deploy (linux)"
     if: github.event.client_payload.isTestBuild == 'false'
 
     steps:
@@ -163,7 +163,7 @@ jobs:
   #   name: Upload packages to llso
   #   needs: deb_signing
   #   runs-on: ubuntu-latest
-  #   environment: deploy
+  #   environment: "deploy (linux)"
   #   if: ${{ ! github.event.client_payload.isTestBuild }}
 
   #   steps:
