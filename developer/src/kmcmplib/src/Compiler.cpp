@@ -97,7 +97,7 @@
 #include <CompMsg.h>
 using namespace kmcmp;
 
-
+char ErrExtraLIB[256];
 namespace kmcmp{
 
   HINSTANCE g_hInstance;
@@ -106,8 +106,6 @@ namespace kmcmp{
   KMX_BOOL  FSaveDebug, FCompilerWarningsAsErrors;   // I4865   // I4866
   int ErrChr;
   int nErrors = 0;
-  KMX_CHAR ErrExtra[256];
-  PKMX_STR ErrExtra_char;
   KMX_BOOL FMnemonicLayout = FALSE;
   KMX_BOOL FOldCharPosMatching = FALSE;
   int CompileTarget;
@@ -309,12 +307,11 @@ KMX_BOOL AddCompileError(KMX_DWORD msg)
   if (kmcmp::ErrChr > 0)
     sprintf(strchr(szText, 0), " character offset: %d", kmcmp::ErrChr);
 
-  if (kmcmp::ErrExtra_char) {
-    sprintf(strchr(szText, 0), "%s", kmcmp::ErrExtra_char);
+  if (*ErrExtraLIB) {
+    sprintf(strchr(szText, 0), "%s", ErrExtraLIB);
   }
 
-  kmcmp::ErrExtra_char = NULL;
-  ErrChr = 0; *kmcmp::ErrExtra = 0;
+  ErrChr = 0;  *ErrExtraLIB =0;
 
   if (!(*msgproc)(kmcmp::currentLine, msg, szText)) return TRUE;
 
@@ -2123,8 +2120,8 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
       case 99:
         if (tokenFound) break;
         {
-          PKMX_WCHAR p_ErrExtra =strtowstr(kmcmp::ErrExtra);
-          u16sprintf(p_ErrExtra,_countof(kmcmp::ErrExtra),L"token: %c",(int)*p);
+          PKMX_WCHAR p_ErrExtra =strtowstr(ErrExtraLIB);
+          u16sprintf(p_ErrExtra,_countof(ErrExtraLIB),L"token: %c",(int)*p);
         }
         return CERR_InvalidToken;
       case 0:

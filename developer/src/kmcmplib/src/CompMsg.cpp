@@ -110,10 +110,10 @@ const struct CompilerError CompilerErrors[] = {
     { CERR_DuplicateGroup                                , "A group with this name has already been defined."},
     { CERR_DuplicateStore                                , "A store with this name has already been defined."},
     { CERR_RepeatedBegin                                 , "Begin has already been set"},
-    
+
     { CHINT_FilenameHasDifferingCase                     , "Casing differences may fail on some platforms: "},
     { CHINT_UnreachableRule                              , "This rule will never be matched as another rule takes precedence"},
-    
+
     { CWARN_TooManyWarnings                              , "Too many warnings or errors"},
     { CWARN_OldVersion                                   , "The keyboard file is an old version"},
     { CWARN_BitmapNotUsed                                , "The 'bitmaps' statement is obsolete and only the first bitmap referred to will be used, you should use 'bitmap'."},
@@ -143,8 +143,6 @@ const struct CompilerError CompilerErrors[] = {
     { CWARN_IfShouldBeAtStartOfContext                   , "if, platform and baselayout should be at start of context (after nul, if present)"},
     { CWARN_KeyShouldIncludeNCaps                        , "Other rules which reference this key include CAPS or NCAPS modifiers, so this rule must include NCAPS modifier to avoid inconsistent matches"},
     { CWARN_MissingFile                                  , "The referenced file could not be found"},
-
-
 
     { 0, nullptr }
   };

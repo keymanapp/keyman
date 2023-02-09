@@ -6,9 +6,8 @@ namespace kmcmp {
   KMX_BOOL AddCompileWarning(LPSTR buf);
   extern BOOL FWarnDeprecatedCode;
   extern int currentLine;
-  extern PKMX_STR ErrExtra_char;
 }
-
+extern char ErrExtraLIB[];
 KMX_BOOL AddCompileError(KMX_DWORD msg);
 
 // TODO: These macros can return FALSE in functions that expect a DWORD CERR_x

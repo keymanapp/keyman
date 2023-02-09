@@ -3,7 +3,7 @@
 
 #include <compfile.h>
 #include <comperr.h>
-#include <kmcmpdll.h>
+#include "kmcmpdll.h"
 #include <io.h>
 #include <string>
 #include "CheckFilenameConsistency.h"
@@ -102,7 +102,7 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   if (nfile == NULL) {
     if (ReportMissingFile) {
       u16sprintf(ErrExtra,_countof(ErrExtra),L"referenced file %ls",Filename);
-      kmcmp::ErrExtra_char = wstrtostr2(ErrExtra);
+      strcpy(ErrExtraLIB, wstrtostr2(ErrExtra));
       AddWarning(CWARN_MissingFile);
     }
     return CERR_None;
@@ -122,7 +122,7 @@ u16sprintf(fi_name_char16,_countof(fi.name),fi.name);
 
   if (u16cmp(cptr1, fi_name_char16) != 0) {
     u16sprintf(ErrExtra,_countof(ErrExtra),L"reference '%ls' does not match actual filename '%ls'", cptr1, &fi.name);
-    kmcmp::ErrExtra_char = wstrtostr2(ErrExtra);
+    strcpy(ErrExtraLIB, wstrtostr2(ErrExtra));
     AddWarning(CHINT_FilenameHasDifferingCase);
   }
 #else

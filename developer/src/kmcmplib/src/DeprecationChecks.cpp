@@ -4,6 +4,7 @@
 #include "compfile.h"
 #include <comperr.h>
 #include "kmcmpdll.h"
+#include "DeprecationChecks.h"
 
 BOOL WarnDeprecatedHeader() {   // I4866
   if (kmcmp::FWarnDeprecatedCode) {
