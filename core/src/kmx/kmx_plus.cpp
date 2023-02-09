@@ -491,7 +491,7 @@ COMP_KMXPLUS_LAYR_Helper::setLayr(const COMP_KMXPLUS_LAYR *newLayr) {
       // is the count off the end?
       DebugLog(
           "<layers> %d: hardware s#0x%X, layers %d..%d, minDeviceWidth %.1fmm", i, list.hardware, list.layer,
-          list.layer + list.count - 1, list.minDeviceWidth * 0.1F);
+          list.layer + list.count - 1, list.minDeviceWidth * (double)0.1);
       if ((list.layer >= layr->layerCount) || (list.layer + list.count > layr->layerCount)) {
         DebugLog("COMP_KMXPLUS_LAYR_Helper: list[%d] would access layer %d+%d, > count %d",
             i, list.layer, list.count, layr->layerCount);
