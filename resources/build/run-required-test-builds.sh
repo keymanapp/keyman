@@ -58,6 +58,10 @@ function triggerTestBuilds() {
         local job=${test_build%_Jenkins}
         echo "  -- Triggering build configuration $job/$branch on Jenkins"
         triggerJenkinsBuild "$job" "$branch" "$force"
+      elif [ "${test_build:(-7)}" == "_GitHub" ]; then
+        local job=${test_build%_GitHub}
+        echo "  -- Triggering GitHub action build $job/$branch"
+        triggerGitHubActionsBuild true "$job" "$branch"
       else
         echo "  -- Triggering build configuration $test_build on teamcity"
         triggerTeamCityBuild true "$test_build" "$vcs_test" "$branch"

@@ -1,5 +1,29 @@
 # Keyman Version History
 
+## 17.0.46 alpha 2023-02-09
+
+* fix(windows): add remove lang id uses correct keyboard id (#8186)
+* chore(common): add `builder_term` function (#8187)
+* chore(common): builder internal dependencies (#8188)
+* chore(linux): Update changelog from Debian (#8192)
+* feat(linux): Add debian packaging GHA (#7911)
+
+## 17.0.45 alpha 2023-02-08
+
+* chore(ios): update certificate (#8176)
+* fix(linux): Fix autopkgtests (#8181)
+* chore(common): Cleanup Kannada locale (#8182)
+* chore(windows): Fix Portuguese UI language name (#8184)
+
+## 17.0.44 alpha 2023-02-07
+
+* chore(linux): Set test-helper script executable (#8178)
+* chore(linux): Update debian changelog (#8156)
+
+## 17.0.43 alpha 2023-02-06
+
+* chore(linux): Build with meson instead of autotools  ️ (#8111)
+
 ## 17.0.42 alpha 2023-02-03
 
 * chore(deps): bump http-cache-semantics from 4.1.0 to 4.1.1 (#8144)

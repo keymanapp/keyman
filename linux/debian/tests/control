@@ -1,2 +1,4 @@
 Tests: test-build
-Depends: @, build-essential
+Depends: @,
+ build-essential,
+ pkg-config,
