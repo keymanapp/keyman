@@ -129,17 +129,18 @@ function triggerGitHubActionsBuild() {
   local IS_TEST_BUILD="$1"
   local GITHUB_ACTION="$2"
   local GIT_BRANCH="${3:-master}"
-  local GIT_REF=$GIT_BRANCH
+  local GIT_REF
 
   local GITHUB_SERVER=https://api.github.com/repos/keymanapp/keyman/dispatches
 
-  # This will only be true if we created and pushed a tag
   if [ "${action:-""}" == "commit" ]; then
-    GIT_REF="release@$VERSION_WITH_TAG"
-  fi
-
-  if [[ $GIT_BRANCH != stable-* ]] && [[ $GIT_BRANCH =~ [0-9]+ ]]; then
+    # This will only be true if we created and pushed a tag
+    GIT_REF="refs/tags/release@$VERSION_WITH_TAG"
+  elif [[ $GIT_BRANCH != stable-* ]] && [[ $GIT_BRANCH =~ [0-9]+ ]]; then
+    GIT_REF="refs/pull/${GIT_BRANCH}/merge"
     GIT_BRANCH="PR-${GIT_BRANCH}"
+  else
+    GIT_REF="refs/heads/${GIT_BRANCH}"
   fi
 
   local DATA="{\"event_type\": \"$GITHUB_ACTION\", \
