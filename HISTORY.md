@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.47 alpha 2023-02-10
+
+* fix(linux): Fix autopkgtests (#8201)
+* fix(linux): Fix Verify-API step of GHA (#8199)
+
 ## 17.0.46 alpha 2023-02-09
 
 * fix(windows): add remove lang id uses correct keyboard id (#8186)
