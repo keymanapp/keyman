@@ -6,7 +6,7 @@
 # KMEA - Keyman Engine for Android
 # KMW  - Keyman Web
 
-# set -x
+#set -x
 set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
@@ -44,19 +44,6 @@ builder_parse "$@"
 #### Build
 
 
-function display_usage () {
-    echo "build.sh [-no-kmw-build] | [-no-kmw] [-no-daemon] | [-no-test] | [-upload-sentry] | [-debug]"
-    echo
-    echo "Build Keyman Engine Android (KMEA) using Keyman Web (KMW) artifacts"
-    echo "  -no-kmw-build           Don't build KMW. Just copy existing artifacts"
-    echo "  -no-kmw                 Don't build KMW. Don't copy artifacts"
-    echo "  -no-daemon              Don't start the Gradle daemon. Use for CI"
-    echo "  -no-test                Don't run the unit-test suite.  Use for development builds"
-    echo "                          to facilitate manual debugging and testing"
-    echo "  -upload-sentry          Uploads debug symbols, etc, to Sentry"
-    echo "  -debug                  Local debug build; use for development builds"
-    exit 1
-}
 
 echo Build KMEA
 
@@ -72,51 +59,12 @@ KMW_ROOT="$KEYMAN_ROOT/web"
 KMEA_ASSETS="$KMA_ROOT/KMEA/app/src/main/assets"
 ARTIFACT="app-release.aar"
 
-# Default is building KMW and copying artifacts
-DO_BUILD=true
-DO_COPY=true
-DO_TEST=true
-NO_DAEMON=false
 DEBUG_BUILD=false
-KMWFLAGS="build:embed"
+#KMWFLAGS="build:embed"
 KMW_CONFIG=release
 
 # Parse args
 
-function _skip() {
-  while [[ $# -gt 0 ]] ; do
-      key="$1"
-      case $key in
-          -no-kmw-build)
-              DO_BUILD=false
-              DO_COPY=true
-              ;;
-          -no-kmw)
-              DO_BUILD=false
-              DO_COPY=false
-              ;;
-          -no-daemon)
-              NO_DAEMON=true
-              ;;
-          -upload-sentry)
-              # Overrides default set by build-utils.sh
-              UPLOAD_SENTRY=true
-              ;;
-          -debug)
-              DEBUG_BUILD=true
-              KMWFLAGS="$KMWFLAGS --debug"
-              KMW_CONFIG=debug
-              ;;
-          -h|-\?)
-              display_usage
-              ;;
-          -no-test)
-              DO_TEST=false
-              ;;
-      esac
-      shift # past argument
-  done
-}
 
 # Local development optimization - cross-target Sentry uploading when requested
 # by developer. As it's not CI, the Web artifacts won't exist otherwise...
@@ -130,12 +78,12 @@ fi
 
 if builder_has_option --debug; then
   DEBUG_BUILD=true
-  KMW_CONFIG=debug
   ARTIFACT="app-debug.aar"
 fi
 
+DAEMON_FLAG=
 if builder_has_option --ci; then
-  NO_DAEMON=true
+  DAEMON_FLAG=--no-daemon
 fi
 
 
@@ -168,20 +116,8 @@ if builder_start_action configure; then
 fi
 
 echo
-echo "DO_BUILD: $DO_BUILD"
-echo "DO_COPY: $DO_COPY"
-echo "DO_TEST: $DO_TEST"
-echo "NO_DAEMON: $NO_DAEMON"
 echo "DEBUG_BUILD: $DEBUG_BUILD"
-echo "KMWFLAGS: $KMWFLAGS"
-echo "KMW_CONFIG: $KMW_CONFIG"
 echo
-
-if [ "$NO_DAEMON" = true ]; then
-  DAEMON_FLAG=--no-daemon
-else
-  DAEMON_FLAG=
-fi
 
 if builder_start_action clean:app; then
   if [ -f "$KMA_ROOT/KMEA/app/build/outputs/aar/$ARTIFACT" ]; then
@@ -203,38 +139,50 @@ if builder_start_action build:app; then
   cd $KMA_ROOT/KMEA
 
   if [ "$DEBUG_BUILD" = true ]; then
-    BUILD_FLAGS="assembleDebug lintDebug"
-    TEST_FLAGS="testDebug"
+    BUILD_FLAGS="assembleDebug -x lintDebug -x test"
     ARTIFACT="app-debug.aar"
-    if [ "$DO_TEST" = true ]; then
-      # Report JUnit test results to CI
-      echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testDebugUnitTest\']"
-    fi
   else
-    BUILD_FLAGS="aR lint"
-    TEST_FLAGS="testRelease"
+    BUILD_FLAGS="aR -x lint -x test"
     ARTIFACT="app-release.aar"
-    if [ "$DO_TEST" = true ]; then
-      # Report JUnit test results to CI
-      echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
-    fi
   fi
 
   echo "BUILD_FLAGS $BUILD_FLAGS"
+  # Build without test
   ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
   if [ $? -ne 0 ]; then
     die "ERROR: Build of KMEA failed"
   fi
 
-  if [ "$DO_TEST" = true ]; then
-    echo "TEST_FLAGS $TEST_FLAGS"
-    ./gradlew $DAEMON_FLAG $TEST_FLAGS
-    if [ $? -ne 0 ]; then
-      die "ERROR: KMEA test cases failed"
+  builder_finish_action success build:app
+fi
+
+if builder_start_action test:app; then
+  echo "Gradle test of KMEA"
+  cd $KMA_ROOT/KMEA
+
+  if [ "$DEBUG_BUILD" = true ]; then
+    TEST_FLAGS="-x assembleDebug lintDebug testDebug"
+    ARTIFACT="app-debug.aar"
+    if builder_has_option --ci; then
+      # Report JUnit test results to CI
+      echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testDebugUnitTest\']"
+    fi
+  else
+    TEST_FLAGS="-x aR lint testRelease"
+    ARTIFACT="app-release.aar"
+    if builder_has_option --ci; then
+      # Report JUnit test results to CI
+      echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
     fi
   fi
 
-  builder_finish_action success build:app
+  echo "TEST_FLAGS $TEST_FLAGS"
+  ./gradlew $DAEMON_FLAG $TEST_FLAGS
+  if [ $? -ne 0 ]; then
+    die "ERROR: KMEA test cases failed"
+  fi
+
+  builder_finish_action success test:app
 fi
 
 function _copy_artifacts() {
@@ -249,5 +197,5 @@ function _copy_artifacts() {
   cd ..\
 }
 
-# why do we need this extra brace?
+# TODO: why do we need this extra brace?
 }
