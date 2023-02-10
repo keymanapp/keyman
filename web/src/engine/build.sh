@@ -26,6 +26,7 @@ cd "$THIS_SCRIPT_PATH"
 MAIN=engine/main     # Covers all engine code, including submodules like those listed below.
 DEVICEDETECT=engine/device-detect
 DOMUTILS=engine/dom-utils
+KEYBOARDCACHE=engine/keyboard-cache
 ELEMENTWRAPPERS=engine/element-wrappers
 OSK=engine/osk
 
@@ -92,6 +93,7 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":device-detect     Subset used for device-detection " \
   ":dom-utils         A common subset of function used for DOM calculations, layout, etc" \
   ":element-wrappers  Subset used to integrate with website elements" \
+  ":keyboard-cache    Subset used to collate keyboards and request them from the cloud" \
   ":main              Builds all common code used by KMW's app/-level targets" \
   ":osk               Builds the Web OSK module"
 
@@ -103,11 +105,13 @@ builder_describe_outputs \
   configure:device-detect    ../../../node_modules \
   configure:dom-utils        ../../../node_modules \
   configure:element-wrappers ../../../node_modules \
+  configure:keyboard-cache   ../../../node_modules \
   configure:main             ../../../node_modules \
   configure:osk              ../../../node_modules \
   build:device-detect        $(output_path $DEVICEDETECT $OUTPUT_DIR)/index.js \
   build:dom-utils            $(output_path $DOMUTILS $OUTPUT_DIR)/index.js \
   build:element-wrappers     $(output_path $ELEMENTWRAPPERS $OUTPUT_DIR)/index.js \
+  build:keyboard-cache       $(output_path $KEYBOARDCACHE $OUTPUT_DIR)/index.js \
   build:main                 $(output_path $MAIN $OUTPUT_DIR)/keymanweb.js \
   build:osk                  $(output_path $OSK $OUTPUT_DIR)/index.js
 
@@ -199,6 +203,12 @@ if builder_start_action build:element-wrappers; then
   compile $ELEMENTWRAPPERS
 
   builder_finish_action success build:element-wrappers
+fi
+
+if builder_start_action build:keyboard-cache; then
+  compile $KEYBOARDCACHE
+
+  builder_finish_action success build:keyboard-cache
 fi
 
 if builder_start_action build:osk; then

@@ -10,8 +10,8 @@
     "sourceMap": true,
     "target": "es5",
     "baseUrl": "./",
-    "outDir": "../../../build/engine/keyboards/obj/",
-    "tsBuildInfoFile": "../../../build/engine/keyboards/obj/tsconfig.tsbuildinfo",
+    "outDir": "../../../build/engine/keyboard-cache/obj/",
+    "tsBuildInfoFile": "../../../build/engine/keyboard-cache/obj/tsconfig.tsbuildinfo",
     "rootDir": "./src"
   },
 

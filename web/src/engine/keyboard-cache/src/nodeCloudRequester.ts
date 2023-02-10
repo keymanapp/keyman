@@ -1,17 +1,17 @@
 import { ManagedPromise } from '@keymanapp/keyboard-processor';
-import CloudRequesterInterface from './requesterInterface.js';
+import CloudRequesterInterface from './cloud/requesterInterface.js';
 import {
   CLOUD_MALFORMED_OBJECT_ERR,
   CLOUD_TIMEOUT_ERR,
   CLOUD_STUB_REGISTRATION_ERR,
   CloudQueryResult,
   default as CloudQueryEngine
-} from './queryEngine.js';
+} from './cloud/queryEngine.js';
 
 import https from 'https';
 import vm from 'vm';
 
-export default class CloudNodeRequester implements CloudRequesterInterface {
+export default class NodeCloudRequester implements CloudRequesterInterface {
   private static QUERY_SEED = 1;
 
   private registerMain: (x: CloudQueryResult) => void;
@@ -35,7 +35,7 @@ export default class CloudNodeRequester implements CloudRequesterInterface {
       promise.reject(new Error(CLOUD_TIMEOUT_ERR));
     }, 10000);
 
-    const queryId = CloudNodeRequester.QUERY_SEED++;
+    const queryId = NodeCloudRequester.QUERY_SEED++;
 
     const tFlag='&timerid='+ queryId;
     const fullRef = query + tFlag;
