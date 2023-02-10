@@ -67,10 +67,10 @@ export default class KeyboardStub extends KeyboardProperties {
 
     // Extract all the languages
     let languages: LanguageAPIPropertySpec[] = [];
-    if (!(arg.languages instanceof Array)) {
+    if (!Array.isArray(arg.languages)) {
       languages.push(arg.languages);
     } else {
-      languages.concat(arg.languages);
+      languages = languages.concat(arg.languages);
     }
 
     let stubs: KeyboardStub[] = [];
