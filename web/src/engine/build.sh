@@ -97,10 +97,9 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
 
 builder_describe_outputs \
-  configure                  ../node_modules \
-  configure:device-detect    ../node_modules \
-  configure:element-wrappers ../node_modules \
-  configure:main             ../node_modules \
+  configure:device-detect    ../../../node_modules \
+  configure:element-wrappers ../../../node_modules \
+  configure:main             ../../../node_modules \
   build:device-detect        $(output_path $DEVICEDETECT $OUTPUT_DIR)/index.js \
   build:element-wrappers     $(output_path $ELEMENTWRAPPERS $OUTPUT_DIR)/index.js \
   build:main                 $(output_path $MAIN $OUTPUT_DIR)/keymanweb.js

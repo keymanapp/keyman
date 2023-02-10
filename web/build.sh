@@ -116,10 +116,11 @@ builder_describe_outputs \
   configure:samples ../node_modules \
   configure:tools   ../node_modules \
   build:embed       $(output_path $EMBEDDED $RELEASE)/keyman.js \
+  build:engine      build/engine/main/obj/keymanweb.js \
   build:web         $(output_path $WEB $RELEASE)/keymanweb.js \
   build:ui          $(output_path $UI $RELEASE)/kmwuibutton.js \
-  build:samples     $PREDICTIVE_TEXT_OUTPUT
-# Deliberately excluding build:tools b/c its script provides the definitions.
+  build:samples     $PREDICTIVE_TEXT_OUTPUT \
+  build:tools       build/tools/building/sourcemap-root/index.js
 
 builder_parse "$@"
 
@@ -352,13 +353,13 @@ copy_outputs ( ) {
 # ```
 compile ( ) {
   if [ $# -lt 1 ]; then
-    fail "Scripting error: insufficient argument count!"
+    builder_die "Scripting error: insufficient argument count!"
   fi
 
   local COMPILE_TARGET=$1
   local COMPILED_INTERMEDIATE_PATH="$(output_path $COMPILE_TARGET $INTERMEDIATE)"
 
-  $compilecmd -b src/$COMPILE_TARGET -v
+  $compilecmd -b src/$COMPILE_TARGET -v || builder_die "Build command $compilecmd -b src/$COMIPILE_TARGET -v failed with exit code $?"
 
   echo $COMPILE_TARGET TypeScript compiled under $COMPILED_INTERMEDIATE_PATH
 }
