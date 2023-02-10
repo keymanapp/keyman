@@ -24,12 +24,20 @@ cd "$THIS_SCRIPT_PATH"
 
 # Definition of global compile constants
 
+KMA_ROOT="$KEYMAN_ROOT/android"
+KMW_ROOT="$KEYMAN_ROOT/web"
+KMEA_ASSETS="$KMA_ROOT/KMEA/app/src/main/assets"
+ARTIFACT="app-release.aar"
+
+DEBUG_BUILD=false
+KMW_CONFIG=release
+
 DEBUG="debug"
 RELEASE="release"
 
 
 builder_describe "Builds Keyman Engine for Android (KMEA)." \
-  "@../../web build" \
+  "@../../web configure" \
   "clean" \
   "configure" \
   "build" \
@@ -44,24 +52,12 @@ builder_parse "$@"
 #### Build
 
 
-
-echo Build KMEA
-
 #
 # Prevents 'clear' on exit of mingw64 bash shell
 #
 SHLVL=0
 
-# Path definitions
 
-KMA_ROOT="$KEYMAN_ROOT/android"
-KMW_ROOT="$KEYMAN_ROOT/web"
-KMEA_ASSETS="$KMA_ROOT/KMEA/app/src/main/assets"
-ARTIFACT="app-release.aar"
-
-DEBUG_BUILD=false
-#KMWFLAGS="build:embed"
-KMW_CONFIG=release
 
 # Parse args
 
@@ -78,6 +74,7 @@ fi
 
 if builder_has_option --debug; then
   DEBUG_BUILD=true
+  KMW_CONFIG=debug
   ARTIFACT="app-debug.aar"
 fi
 
@@ -160,6 +157,7 @@ if builder_start_action test:app; then
   echo "Gradle test of KMEA"
   cd $KMA_ROOT/KMEA
 
+  # Gradle flags to test w/o building
   if [ "$DEBUG_BUILD" = true ]; then
     TEST_FLAGS="-x assembleDebug lintDebug testDebug"
     ARTIFACT="app-debug.aar"
