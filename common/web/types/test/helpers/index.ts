@@ -29,3 +29,7 @@ export function loadFile(baseFilename: string, filename: string | URL): Buffer {
 export function loadLdmlKeyboardSchema(): Buffer {
   return fs.readFileSync(new URL(path.join('..', '..', 'src', 'ldml-keyboard.schema.json'), import.meta.url));
 }
+
+export function loadLdmlKeyboardTestDataSchema(): Buffer {
+  return fs.readFileSync(new URL(path.join('..', '..', 'src', 'ldml-keyboardtest.schema.json'), import.meta.url));
+}
