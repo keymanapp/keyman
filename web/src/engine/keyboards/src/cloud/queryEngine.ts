@@ -1,5 +1,5 @@
 import { default as KeyboardStub, ErrorStub, KeyboardAPISpec, mergeAndResolveStubPromises } from '../keyboardStub.js';
-import { KeyboardFont, LanguageAPIPropertySpec, ManagedPromise, Version } from '@keymanapp/keyboard-processor';
+import { LanguageAPIPropertySpec, ManagedPromise, Version } from '@keymanapp/keyboard-processor';
 import CloudRequesterInterface from './requesterInterface.js';
 
 // For when the API call straight-up times out.
@@ -86,10 +86,6 @@ class CloudRequestEntry {
 }
 
 export default class CloudQueryEngine {
-  // Language regions as defined by cloud server
-  static readonly regions = ['World','Africa','Asia','Europe','South America','North America','Oceania','Central America','Middle East'];
-  static readonly regionCodes = ['un','af','as','eu','sa','na','oc','ca','me'];
-
   private cloudResolutionPromises: Record<number, ManagedPromise<KeyboardStub[] | ManagedPromise<LanguageAPIPropertySpec[]>>> = {};
 
   private languageList: LanguageAPIPropertySpec[];
@@ -275,120 +271,44 @@ export default class CloudQueryEngine {
         return this.registerLanguagesForKeyboard(kp[nDflt],options,nArg);
       }
     } else { // Otherwise, process a single keyboard for the specified languages
-      let stubs: KeyboardStub[] = [];
+      /*
+       * Detects the following patterns (at minimum):
+       * ../file (but not .../file)
+       * ./file
+       * /file
+       * http:// (on the colon)
+       * hello:world (on the colon) - that one miiiight be less intentional, though.
+       *
+       * Essentially, detects absolute paths and paths explicitly relative to the host page's URI.
+       *
+       * Alternative clearer version - '^(\.{0,2}/)|(:)'
+       * Unless backslashes should be able to replace dots?
+       */
+      let rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');
+
+      if(!rx.test(kp.filename)) {
+        kp.filename = options.keyboardBaseUri + kp.filename;
+      }
+
+      // Font path defined by cloud entry
+      let fontPath=options.fontBaseUri || '';
+
+      const allStubs = KeyboardStub.toStubs(kp, fontPath);
 
       // May need to filter returned stubs by language
       let lgCode=kbId.split('@')[1];
-      if(typeof(lgCode) == 'string') {
-        lgCode=lgCode.replace(/\$$/,'');
-      }
-
-      // Can only add keyboard stubs for defined languages
-      let ll=kp.languages;
-      if(typeof(ll) != 'undefined') {
-        if(Array.isArray(ll)) {
-          for(let i=0; i<ll.length; i++) {
-            if(typeof(lgCode) == 'undefined' || ll[i]['id'] == lgCode) {
-              stubs.push(CloudQueryEngine.buildCloudStub(kp, ll[i], options));
-            }
-          }
-        } else {
-          stubs.push(CloudQueryEngine.buildCloudStub(kp, ll, options));
-        }
-      }
-
-      return stubs;
-    }
-  }
-
-  /**
-   *  Create or update a keyboard meta-data 'stub' during keyboard registration
-   *
-   *  Cross-reference with https://help.keyman.com/developer/engine/web/11.0/reference/core/addKeyboards.
-   *
-   *  @param  {Object}  kp  (partial) keyboard meta-data object (`spec` object)
-   *  @param  {Object}  lp  language object (`spec.languages` object)
-   *  @param  {Object}  options   KeymanCloud callback options
-   **/
-  private static buildCloudStub(kp: KeyboardAPISpec, lp: LanguageAPIPropertySpec, options: CloudQueryOptions): KeyboardStub {
-    let sp: KeyboardStub = new KeyboardStub(kp['id'], lp['id']);
-
-    // Accept region as number (from Cloud server), code, or name
-    let region=lp['region'], rIndex=0;
-    if(typeof(region) == 'number') {
-      if(region < 1 || region > 9) {
-        rIndex = 0;
+      if(allStubs.length == 1 && typeof (allStubs[0] as ErrorStub).error != undefined) {
+        throw (allStubs[0] as ErrorStub).error;
+      } else if(typeof(lgCode) != 'string') {
+        return allStubs as KeyboardStub[];
       } else {
-        rIndex = region-1;
-      }
-    } else if(typeof(region) == 'string') {
-      let list = (region.length == 2 ? CloudQueryEngine.regionCodes : CloudQueryEngine.regions);
-      for(let i=0; i<list.length; i++) {
-        if(region.toLowerCase() == list[i].toLowerCase()) {
-          rIndex=i;
-          break;
-        }
+        lgCode=lgCode.replace(/\$$/,'');
+        return [(allStubs as KeyboardStub[]).find((stub) => stub.KLC == lgCode)];
       }
     }
 
-    let rx: RegExp;
-
-    sp['KL'] = (typeof sp['KL'] === 'undefined') ? lp['name'] : sp['KL'];
-    sp['KR'] = (typeof sp['KR'] === 'undefined') ? CloudQueryEngine.regions[rIndex] : sp['KR'];
-    sp['KRC'] = (typeof sp['KRC'] === 'undefined') ? CloudQueryEngine.regionCodes[rIndex] : sp['KRC'];
-    sp['KN'] = (typeof sp['KN'] === 'undefined') ? kp['name'] : sp['KN'];
-    sp['displayName'] = (typeof sp['displayName'] === 'undefined') ? kp['displayName'] : sp['displayName'];
-
-    if(typeof(sp['KF']) == 'undefined') {
-      rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');
-      sp['KF'] = kp['filename'];
-
-      if(!rx.test(sp['KF'])) {
-        sp['KF'] = options['keyboardBaseUri']+sp['KF'];
-      }
-    }
-
-    // Font path defined by cloud entry
-    let fontPath=options['fontBaseUri'];
-
-    // // or overridden locally, in page source  (do "in post", outside of the cloud query class)
-    // if(this.keymanweb.options['fonts'] != '') {
-    //   fontPath=this.keymanweb.options['fonts'];
-    //   rx=new RegExp('^https?\\:');
-    //   if(!rx.test(fontPath)) {
-    //     if(fontPath.substr(0,2) == '//') {
-    //       fontPath = this.keymanweb.protocol + fontPath;
-    //     } else if(fontPath.substr(0,1) == '/') {
-    //       fontPath = this.keymanweb.rootPath + fontPath.substr(1);
-    //     } else {
-    //       fontPath = this.keymanweb.rootPath + fontPath;
-    //     }
-    //   }
-    // } else {
-    //   this.keymanweb.options.fonts=fontPath;
-    // }
-
-    function convertToStubFont(fontObj: CloudAPIFont, path: string): KeyboardFont {
-      return {
-        family: fontObj.family,
-        files: typeof fontObj.source == 'string' ? fontObj.source : fontObj.source[0],
-        path: path
-      }
-    }
-
-    // Add font specifiers where necessary and not overridden by user
-    if(typeof(lp['font']) != 'undefined') {
-      sp['KFont'] = (typeof sp['KFont'] === 'undefined') ? convertToStubFont(lp['font'] as CloudAPIFont, fontPath) : sp['KFont'];
-    }
-
-    // Fixed OSK font issue Github #7 (9/1/2015)
-    if(typeof(lp['oskFont']) != 'undefined') {
-      sp['KOskFont'] = (typeof sp['KOskFont'] === 'undefined') ? convertToStubFont(lp['oskFont'] as CloudAPIFont, fontPath) : sp['KOskFont'];
-    }
-
-    return sp;
-
-    // // Update the UI
+    // Originally, would also generate this event as a 'finally' on any returned good stubs.
+    // The corresponding event is needed in order to update UI modules as new keyboard stubs "come online".
     // this.doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC'],sp['KP']);
   }
 

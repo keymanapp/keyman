@@ -1,38 +1,56 @@
 import {
-  type KeyboardInternalPropertySpec,
-  type KeyboardFont,
-  type KeyboardAPIPropertySpec,
-  type KeyboardAPIPropertyMultilangSpec
+  type InternalKeyboardFont,
+  type KeyboardAPIPropertySpec as APISimpleKeyboard,
+  type KeyboardAPIPropertyMultilangSpec as APICompoundKeyboard,
+  KeyboardProperties,
+  type LanguageAPIPropertySpec
 } from '@keymanapp/keyboard-processor';
 
-export type KeyboardAPISpec = (KeyboardAPIPropertySpec | KeyboardAPIPropertyMultilangSpec) & {
-  filename: string,
-  displayName?: string
+import { toPrefixedKeyboardId as prefixed } from './stubAndKeyboardCache.js';
+
+
+// Language regions as defined by cloud server
+export const REGIONS = ['World','Africa','Asia','Europe','South America','North America','Oceania','Central America','Middle East'];
+export const REGION_CODES = ['un','af','as','eu','sa','na','oc','ca','me'];
+
+export type KeyboardAPISpec = (APISimpleKeyboard | APICompoundKeyboard) & {
+  displayName?: string;
+  filename: string
 };
 
-export default class KeyboardStub implements KeyboardInternalPropertySpec {
-  KI: string;
-  KN: string;
-  KL: string;
-  KLC: string;
+export default class KeyboardStub extends KeyboardProperties {
   KR: string;
   KRC: string;
   KF: string;
-  KFont: KeyboardFont;
-  KOskFont: KeyboardFont;
-  displayName: string;
 
-  constructor(kbdId: string, lngId: string) {
-    this.KI = kbdId;
-    this.KLC = lngId;
+  public constructor(apiSpec: APISimpleKeyboard & { filename: string }, fontBaseUri?: string);
+  public constructor(kbdId: string, lngId: string);
+  constructor(arg0: string | (APISimpleKeyboard & { filename: string }), arg1?: string) {
+    if(typeof arg0 !== 'string') {
+      super(arg0, arg1);
+    } else {
+      super(prefixed(arg0), arg1);
+    }
+  }
+
+  get region(): string {
+    return this.KR;
+  }
+
+  get regionCode(): string {
+    return this.KRC;
+  }
+
+  get filename(): string {
+    return this.KF;
   }
 
   /**
-   * Utility to convert stubs to KeyboardStub[]
+   * Utility to convert API 'stubs' to internal KeyboardStub[]
    * @param arg
    * @returns (KeyboardStub|ErrorStub)[]
    */
-  public static toStubs(arg: KeyboardAPISpec): (KeyboardStub|ErrorStub)[] {
+  public static toStubs(arg: KeyboardAPISpec, fontBaseUri: string): (KeyboardStub|ErrorStub)[] {
     let errorMsg: string = '';
     if (!arg) {
       errorMsg = "Stub undefined";
@@ -45,50 +63,59 @@ export default class KeyboardStub implements KeyboardInternalPropertySpec {
       return [{error: new Error(errorMsg)}];
     }
 
+    // We have a valid API object to convert over.
+
     // Extract all the languages
-    let languages: any[] = [];
+    let languages: LanguageAPIPropertySpec[] = [];
     if (!(arg.languages instanceof Array)) {
       languages.push(arg.languages);
     } else {
-      arg.languages.forEach(language => {
-        languages.push(language);
-      });
+      languages.concat(arg.languages);
     }
 
     let stubs: KeyboardStub[] = [];
     languages.forEach(language => {
-      let stub: KeyboardStub = new KeyboardStub(arg.id, language.id);
+      const intermediate = {...arg, languages: language};
+      const stub: KeyboardStub = new KeyboardStub(intermediate, fontBaseUri);
 
-      if (arg.name) {
-        stub['KN'] = arg.name
-      }
-      if (arg.filename) {
-        stub['KF'] = arg.filename;
-      }
-      if (arg.displayName) {
-        stub['displayName'] = arg.displayName;
+      // Accept region as number (from Cloud server), code, or name
+      const region=language.region;
+      let rIndex=0;
+      if(typeof(region) == 'number') {
+        if(region < 1 || region > 9) {
+          rIndex = 0;
+        } else {
+          rIndex = region-1;
+        }
+      } else if(typeof(region) == 'string') {
+        let list = (region.length == 2 ? REGION_CODES : REGIONS);
+        for(let i=0; i<list.length; i++) {
+          if(region.toLowerCase() == list[i].toLowerCase()) {
+            rIndex=i;
+            break;
+          }
+        }
       }
 
-      if (language.name) {
-        stub['KL'] = language.name;
-      }
-      if (language.region) {
-        stub['KR'] = language.region;
-      }
-
-      // Can ignore ['KRC'] RegionCodes used by the Toolbar UI
-
-      if (language.font) {
-        stub['KFont'] = language.font;
-      }
-      if (language.oskFont) {
-        stub['KOskFont'] = language.oskFont;
-      }
+      stub.KR = REGIONS[rIndex];
+      stub.KRC = REGION_CODES[rIndex];
+      stub.KF = arg.filename;
 
       stubs.push(stub);
     })
 
     return stubs;
+  }
+
+  public merge(stub: KeyboardStub) {
+    this.KL ||= stub.KL;
+    this.KR ||= stub.KR;
+    this.KRC ||= stub.KRC;
+    this.KN ||= stub.KN;
+    this.displayName ||= stub.displayName;
+    this.KF ||= stub.KF;
+    this.KFont ||= stub.KFont;
+    this.KOskFont ||= stub.KOskFont;
   }
 }
 

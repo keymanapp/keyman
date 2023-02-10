@@ -1,10 +1,5 @@
 import { DeviceSpec } from '@keymanapp/web-utils';
-
-export interface KeyboardFont {
-  'family': string;
-  'files': string;
-  'path': string;
-}
+import { InternalKeyboardFont as KeyboardFont } from '@keymanapp/keyboard-processor';
 
 type FontFamilyStyleMap = {[family: string]: HTMLStyleElement};
 
@@ -44,18 +39,23 @@ export class StylesheetManager {
       return;
     }
 
-    if(typeof(fd['files']) == 'undefined') {
-      fd['files']=fd['source'];
-    }
-    if(typeof(fd['files']) == 'undefined') {
+    // if(typeof(fd.files) == 'undefined') {
+    //   fd.files=fd['source'];
+    // }
+    if(typeof(fd.files == 'undefined')) {
       return;
     }
 
-    const fontKey = fd['family'];
+    const fontKey = fd.family;
 
     let i, ttf='', woff='', eot='', svg='', fList=[];
 
     // TODO: 22 Aug 2014: check that font path passed from cloud is actually used!
+
+    // 10 Feb 2023 [JH]:  during ES module conversion work, it was noted that the font path passed
+    // from the cloud is 100% ignored; only the init option's 'fonts' member was used.
+    //
+    // See https://github.com/keymanapp/keyman/blob/25a205cbe8d6131068d46aea1a3d1ee719afb9c1/web/src/engine/main/kmwutils.ts#L656-L671
 
     if(!os) {
       os = DeviceSpec.OperatingSystem.Other; // as a fallback option.
@@ -73,10 +73,10 @@ export class StylesheetManager {
       return;
     }
 
-    if(typeof(fd['files']) == 'string') {
-      fList[0]=fd['files'];
+    if(typeof(fd.files) == 'string') {
+      fList[0]=fd.files;
     } else {
-      fList=fd['files'];
+      fList=fd.files;
     }
 
     for(i=0;i<fList.length;i++) {
@@ -106,7 +106,7 @@ export class StylesheetManager {
 
     // Build the font-face definition according to the browser being used
     var s='@font-face {\nfont-family:'
-      +fd['family']+';\nfont-style:normal;\nfont-weight:normal;\n';
+      + fd.family + ';\nfont-style:normal;\nfont-weight:normal;\n';
 
     // Build the font source string according to the browser,
     // but return without adding the style sheet if the required font type is unavailable

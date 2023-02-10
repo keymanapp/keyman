@@ -516,7 +516,7 @@ namespace com.keyman.keyboards {
      * @param       {boolean=}   saveCookie
      */
     _SetActiveKeyboard(PInternalName: string, PLgCode?: string, saveCookie?: boolean): Promise<void> {
-      var n, Ln;
+      let n;
 
       let keyman = com.keyman.singleton;
 
@@ -535,6 +535,7 @@ namespace com.keyman.keyboards {
       for(n=0; n < this.keyboardStubs.length; n++) {
         if(PInternalName == this.keyboardStubs[n]['KI']) {
           if(PLgCode == this.keyboardStubs[n]['KLC'] || PLgCode == '---') break;
+          // This 'n' is used in the condition for the block below... and that's all.
         }
       }
 
@@ -560,7 +561,7 @@ namespace com.keyman.keyboards {
       // Check if current keyboard matches requested keyboard, but not stub
       if(activeKeyboard && (activeKeyboard.id == PInternalName)) {
         // If so, simply update the active stub
-        for(Ln=0; Ln<this.keyboardStubs.length; Ln++) {
+        for(let Ln=0; Ln<this.keyboardStubs.length; Ln++) {
           if((this.keyboardStubs[Ln]['KI'] == PInternalName)
             && (this.keyboardStubs[Ln]['KLC'] == PLgCode)) {
             this.activeStub = this.keyboardStubs[Ln];
@@ -597,7 +598,7 @@ namespace com.keyman.keyboards {
       }
 
       // Determine if the keyboard was previously loaded but is not active and use the prior load if so.
-      for(Ln=0; Ln<this.keyboards.length; Ln++) { // I1511 - array prototype extended
+      for(let Ln=0; Ln<this.keyboards.length; Ln++) { // I1511 - array prototype extended
         if(this.keyboards[Ln]['KI'] == PInternalName) {
           keyman.core.activeKeyboard = new Keyboard(this.keyboards[Ln]);
           // As a rotation may have occurred since the keyboard was swapped out,
@@ -619,7 +620,7 @@ namespace com.keyman.keyboards {
 
       // If we've reached this point, this is the first load request for the requested keyboard.
       if(keyman.core.activeKeyboard == null) {
-        for(Ln=0; Ln<this.keyboardStubs.length; Ln++) { // I1511 - array prototype extended
+        for(let Ln=0; Ln<this.keyboardStubs.length; Ln++) { // I1511 - array prototype extended
           if((this.keyboardStubs[Ln]['KI'] == PInternalName)
             && ((this.keyboardStubs[Ln]['KLC'] == PLgCode) || (PLgCode == '---'))) {
             // Force OSK display for CJK keyboards (keyboards using a pick list)
