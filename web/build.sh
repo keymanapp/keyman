@@ -359,7 +359,7 @@ compile ( ) {
   local COMPILE_TARGET=$1
   local COMPILED_INTERMEDIATE_PATH="$(output_path $COMPILE_TARGET $INTERMEDIATE)"
 
-  $compilecmd -b src/$COMPILE_TARGET -v || builder_die "Build command $compilecmd -b src/$COMIPILE_TARGET -v failed with exit code $?"
+  $compilecmd -b src/$COMPILE_TARGET -v || builder_die "Build command $compilecmd -b src/$COMPILE_TARGET -v failed with exit code $?"
 
   echo $COMPILE_TARGET TypeScript compiled under $COMPILED_INTERMEDIATE_PATH
 }
