@@ -575,15 +575,27 @@ COMP_KMXPLUS_LAYR_Helper::getKey(KMX_DWORD key) const {
 
 bool
 COMP_KMXPLUS_KEY2::valid(KMX_DWORD _kmn_unused(length)) const {
-  // TODO-LDML more to do here
-  DebugLog("TODO-LDML: key2");
+  if (header.size < sizeof(*this)
+      + (keyCount  * sizeof(COMP_KMXPLUS_KEY2_KEY))
+      + (flicksCount * sizeof(COMP_KMXPLUS_KEY2_FLICK_LIST))
+      + (flickCount   * sizeof(COMP_KMXPLUS_KEY2_FLICK_ELEMENT))) {
+    DebugLog("header.size < expected size");
+    assert(false);
+    return false;
+  }
+  // TODO-LDML: further validation in the COMP_KMXPLUS_KEY2_Helper helper obj
   return true;
 }
 
 bool
 COMP_KMXPLUS_LIST::valid(KMX_DWORD _kmn_unused(length)) const {
-  // TODO-LDML more to do here
-  DebugLog("TODO-LDML: list");
+  if (header.size <
+      sizeof(*this) + (sizeof(COMP_KMXPLUS_LIST_ITEM) * listCount) + (sizeof(COMP_KMXPLUS_LIST_INDEX) * indexCount)) {
+    DebugLog("header.size < expected size");
+    assert(false);
+    return false;
+  }
+  // TODO-LDML: further validation in the COMP_KMXPLUS_LIST_Helper class
   return true;
 }
 
