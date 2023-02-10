@@ -26,8 +26,9 @@ jobs:
     - name: Set pending status on PR builds
       id: set_status
       if: github.event.client_payload.isTestBuild == 'true'
+      shell: bash
       run: |
-        GIT_SHA=$(git rev-parse HEAD)
+        GIT_SHA=$(git rev-parse "${{ github.event.client_payload.prhead }}")
         echo "GIT_SHA=$GIT_SHA" >> $GITHUB_OUTPUT
         gh api \
           --method POST \

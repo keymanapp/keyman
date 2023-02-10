@@ -130,6 +130,7 @@ function triggerGitHubActionsBuild() {
   local GITHUB_ACTION="$2"
   local GIT_BRANCH="${3:-master}"
   local GIT_REF
+  local GIT_PRHEAD=""
 
   local GITHUB_SERVER=https://api.github.com/repos/keymanapp/keyman/dispatches
 
@@ -139,6 +140,7 @@ function triggerGitHubActionsBuild() {
   elif [[ $GIT_BRANCH != stable-* ]] && [[ $GIT_BRANCH =~ [0-9]+ ]]; then
     GIT_REF="refs/pull/${GIT_BRANCH}/merge"
     GIT_BRANCH="PR-${GIT_BRANCH}"
+    GIT_PRHEAD="refs/pull/${GIT_BRANCH}/head"
   else
     GIT_REF="refs/heads/${GIT_BRANCH}"
   fi
@@ -146,6 +148,7 @@ function triggerGitHubActionsBuild() {
   local DATA="{\"event_type\": \"$GITHUB_ACTION\", \
       \"client_payload\": { \
         \"ref\": \"$GIT_REF\", \
+        \"prhead\": \"$GIT_PRHEAD\", \
         \"branch\": \"$GIT_BRANCH\", \
         \"isTestBuild\": \"$IS_TEST_BUILD\" \
     }}"
