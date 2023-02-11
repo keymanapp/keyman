@@ -216,21 +216,6 @@ The following parameters are pre-defined and should not be overridden:
 
 # Builder API functions and variables
 
-
-## `builder_check_color` function
-
-If you wish to provide [formatting variables] in your [`builder_describe`] call, you
-will need to use `builder_check_color` first. This function takes the same
-parameters as [`builder_parse`].
-
-### Usage
-
-```bash
-builder_check_color "$@"
-builder_describe "sample" \
-  "--ci    For use with action $(builder_term test) - emits CI-friendly test reports"
-```
-
 ## `builder_describe` function
 
 Describes a build script, defines available parameters and their meanings. Use
@@ -526,13 +511,13 @@ also print a log message indicating that the action has started, for example:
 
 ## `builder_term` function
 
-Emits the parameters passed to the function, wrapped with `$BUILDER_TERM_START`
-and `$BUILDER_TERM_END`.
+Emits the parameters passed to the function, wrapped with the helper function
+`builder_term`, which wraps the passed string with `$BUILDER_TERM_START` and
+`$BUILDER_TERM_END`, e.g.: `$(builder_term text)`.
 
 ### Usage
 
 ```bash
-builder_check_color "$@"
 builder_describe "sample" \
   "--ci    For use with action $(builder_term test) - emits CI-friendly test reports"
 ```
@@ -588,7 +573,6 @@ Note: it is recommended that you use `$(builder_term text)` instead of
 `${BUILDER_TERM_START}text${BUILDER_TERM_END}`.
 
 [standard builder parameters]: #standard-builder-parameters
-[`builder_check_color`]: #buildercheckcolor-function
 [`builder_describe`]: #builderdescribe-function
 [`builder_display_usage`]: #builderdisplayusage-function
 [`$builder_extra_params`]: #builderextraparams-variable

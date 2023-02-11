@@ -19,7 +19,7 @@ function _builder_init() {
   _builder_findRepoRoot
   _builder_setBuildScriptIdentifiers
 
-  if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]]; then
+  if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]] && [ -t 1 ]; then
     builder_use_color true
   else
     builder_use_color false
@@ -673,16 +673,14 @@ _builder_parameter_error() {
 
 }
 
-# Pre-initializes the color setting based on the options specified to a
-# a build.sh script, parsing the command line to do so.  This is only
-# needed if said script wishes to use this script's defined colors while
-# respecting the options provided by the script's caller.
 #
-# Usage:
-#   builder_check_color "$@"
+# Pre-initializes the color setting based on the options specified to a
+# a build.sh script. This is called automatically during init.
+#
 # Parameters
-#   1: $@         all command-line arguments (as with builder_parse)
-builder_check_color() {
+#   1: "$@"         all command-line arguments
+#
+_builder_check_color() {
   # Process command-line arguments
   while [[ $# -gt 0 ]] ; do
     local key="$1"
@@ -1308,3 +1306,4 @@ _builder_has_function_been_called() {
 # Initialize builder once all functions are declared
 #
 _builder_init
+_builder_check_color "$@"
