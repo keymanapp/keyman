@@ -5,7 +5,7 @@ import { boxXmlArray } from '../util/util.js';
 import { CompilerCallbacks } from '../util/compiler-interfaces.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { CommonTypesMessages } from '../util/common-events.js';
-import { LDMLKeyboardTestDataXMLSourceFile } from './ldml-keyboard-testdata-xml.js';
+import { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTTests } from './ldml-keyboard-testdata-xml.js';
 
 interface NameAndProps  {
   '$'?: any; // content
@@ -306,8 +306,10 @@ export default class LDMLKeyboardXMLSourceFileReader {
    * The default test data stuffer.
    * Just gets $ (the attrs) as the body.
    * Override to use something more complex, such as including child nodes.
+   * @param o object to map
+   * @param r back ref to reader
    */
-  static readonly defaultMapper = ((o : NameAndProps) => o?.$);
+  static readonly defaultMapper = ((o : NameAndProps, r: LDMLKeyboardXMLSourceFileReader) => o?.$);
 
   /**
    *
@@ -316,14 +318,15 @@ export default class LDMLKeyboardXMLSourceFileReader {
    * @param subtag name to extract
    * @param mapper custom mapper function
    */
-  stuffBoxes(obj: any, source: NameAndProps[], subtag: string, asArray?: boolean, mapper?: (v: NameAndProps) => any) {
+  stuffBoxes(obj: any, source: NameAndProps[], subtag: string, asArray?: boolean, mapper?: (v: NameAndProps, r: LDMLKeyboardXMLSourceFileReader) => any) {
     if (!mapper) {
       mapper = LDMLKeyboardXMLSourceFileReader.defaultMapper;
     }
     if (asArray) {
-      obj[subtag] = this.findSubtagArray(source, subtag)?.map(mapper); // extract contents only
+      const r = this;
+      obj[subtag] = this.findSubtagArray(source, subtag)?.map((v) => mapper(v, r)); // extract contents only
     } else {
-      obj[subtag] = mapper(this.findSubtag(source, subtag)); // run the mapper once
+      obj[subtag] = mapper(this.findSubtag(source, subtag), this); // run the mapper once
     }
   }
 
@@ -335,11 +338,38 @@ export default class LDMLKeyboardXMLSourceFileReader {
       }
     };
 
-    const $$ = raw?.keyboardTest?.$$;
+    const $$ : NameAndProps[] = raw?.keyboardTest?.$$;
+
+    console.dir({$$}, {depth:Infinity}); // TODO-LDML
+
     this.stuffBoxes(a.keyboardTest, $$, 'info');
     this.stuffBoxes(a.keyboardTest, $$, 'repertoire', true);
-
-    // TODO-LDML: all the things
+    this.stuffBoxes(a.keyboardTest, $$, 'tests', true, (o, r) => {
+      // start with basic unpack
+      const tests : LKTTests = LDMLKeyboardXMLSourceFileReader.defaultMapper(o, r);
+      // add ingredients
+      r.stuffBoxes(tests, o.$$, 'test', true, (o, r) => {
+        // start with basic unpack
+        const test : LKTTest = LDMLKeyboardXMLSourceFileReader.defaultMapper(o, r);
+        // add ingredients
+        const $$ : NameAndProps[] = o.$$;
+        r.stuffBoxes(test, $$, 'startContext'); // singleton
+        // now the actions
+        test.actions = $$.map(v => {
+          const subtag = v['#name'];
+          const subv = LDMLKeyboardXMLSourceFileReader.defaultMapper(v, r);
+          switch(subtag) {
+            case 'keystroke': return { keystroke: subv };
+            case 'check':     return { check:     subv };
+            case 'emit':      return { emit:      subv };
+            case 'startContext': return null; // handled above
+            default: this.callbacks.reportMessage(CommonTypesMessages.Error_TestDataUnexpectedAction({ subtag })); return null;
+          }
+        }).filter(v => v !== null);
+        return test;
+      });
+      return tests;
+    });
 
     return a;
   }
