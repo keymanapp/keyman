@@ -1,3 +1,10 @@
+keyman (16.0.138-4) unstable; urgency=medium
+
+  * Team upload
+  * debian/tests/control: Don't run autopkgtest on s390x
+
+ -- Gunnar Hjalmarsson <gunnarhj@ubuntu.com>  Sat, 11 Feb 2023 18:39:13 +0100
+
 keyman (16.0.138-3) unstable; urgency=medium
 
   * debian/tests/test-build: Fix autopkgtests
