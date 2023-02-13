@@ -51,7 +51,8 @@ export default class StubAndKeyboardCache {
   }
 
   addStub(stub: KeyboardStub) {
-    const stubTable = this.stubSetTable[stub.KI] ?? {};
+    const keyboardID = prefixed(stub.KI);
+    const stubTable = this.stubSetTable[keyboardID] = this.stubSetTable[keyboardID] ?? {};
     stubTable[stub.KLC] = stub;
   }
 
