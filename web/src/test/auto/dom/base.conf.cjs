@@ -46,6 +46,7 @@ module.exports = {
 
     {pattern: 'web/src/test/auto/dom/cases/**/*.js', type: 'module'},              // Where the tests actually reside.
     'common/test/resources/json/**/*.json',      // Where pre-loaded JSON resides.
+    {pattern: 'web/src/test/auto/resources/**/*.js.fixture', watched: true, served: true, included: false},
 
     {pattern: 'web/build/**/*.js',      watched: true, served: true, included: false}, // Includes all top-level KMW products
     {pattern: 'web/build/**/*.js.map',  watched: true, served: true, included: false}, // and their sourcemaps.

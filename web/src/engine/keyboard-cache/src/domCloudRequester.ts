@@ -3,6 +3,12 @@ import CloudRequesterInterface from './cloud/requesterInterface.js';
 import { CLOUD_MALFORMED_OBJECT_ERR, CLOUD_TIMEOUT_ERR, CLOUD_STUB_REGISTRATION_ERR } from './cloud/queryEngine.js';
 
 export default class DOMCloudRequester implements CloudRequesterInterface {
+  private readonly fileLocal: boolean;
+
+  constructor(fileLocal: boolean = false) {
+    this.fileLocal = fileLocal;
+  }
+
   request<T>(query: string) {
     let promise = new ManagedPromise<T>();
 
@@ -44,7 +50,11 @@ export default class DOMCloudRequester implements CloudRequesterInterface {
       promise.reject(new Error(msg));
     }
 
-    Lscript.src = fullRef;
+    if(this.fileLocal) {
+      Lscript.src = query;
+    } else {
+      Lscript.src = fullRef;
+    }
 
     try {
       document.body.appendChild(Lscript);
