@@ -340,8 +340,6 @@ export default class LDMLKeyboardXMLSourceFileReader {
 
     const $$ : NameAndProps[] = raw?.keyboardTest?.$$;
 
-    console.dir({$$}, {depth:Infinity}); // TODO-LDML
-
     this.stuffBoxes(a.keyboardTest, $$, 'info');
     this.stuffBoxes(a.keyboardTest, $$, 'repertoire', true);
     this.stuffBoxes(a.keyboardTest, $$, 'tests', true, (o, r) => {
