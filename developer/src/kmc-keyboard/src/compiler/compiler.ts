@@ -1,4 +1,4 @@
-import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus, CompilerCallbacks } from '@keymanapp/common-types';
+import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus, CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
 import CompilerOptions from './compiler-options.js';
 import { CompilerMessages } from './messages.js';
 import { BkspCompiler, FinlCompiler, TranCompiler } from './tran.js';
@@ -78,6 +78,39 @@ export default class Compiler {
 
     return source;
   }
+
+  /**
+   * Loads a LDML Keyboard test data xml file and compiles into in-memory xml
+   * structures.
+   * @param filename  input filename, will use callback to load from disk
+   * @returns the source file, or null if invalid
+   */
+    public loadTestData(filename: string): LDMLKeyboardTestDataXMLSourceFile | null {
+      const reader = new LDMLKeyboardXMLSourceFileReader(this.callbacks);
+      const data = this.callbacks.loadFile(filename, filename);
+      if(!data) {
+        this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to read XML file'}));
+        return null;
+      }
+      const source = reader.loadTestData(data);
+      if(!source) {
+        this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to load XML file'}));
+        return null;
+      }
+      // TODO-LDML: The unboxed data doesn't match the schema anymore. Skipping validation, for now.
+
+      // try {
+      //   if (!reader.validate(source, this.callbacks.loadLdmlKeyboardTestSchema())) {
+      //     return null;
+      //   }
+      // } catch(e) {
+      //   this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: e.toString()}));
+      //   return null;
+      // }
+
+      return source;
+    }
+
 
   /**
    * Validates that the LDML keyboard source file and lints. Actually just
