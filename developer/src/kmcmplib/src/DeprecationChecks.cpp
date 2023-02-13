@@ -6,7 +6,7 @@
 #include "kmcmpdll.h"
 #include "DeprecationChecks.h"
 
-BOOL WarnDeprecatedHeader() {   // I4866
+KMX_BOOL WarnDeprecatedHeader() {   // I4866
   if (kmcmp::FWarnDeprecatedCode) {
     AddWarning(CWARN_HeaderStatementIsDeprecated);
   }
@@ -14,7 +14,7 @@ BOOL WarnDeprecatedHeader() {   // I4866
 }
 
 /* Flag presence of deprecated features */
-BOOL CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
+KMX_BOOL CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
   /*
     For Keyman 10, we deprecated:
       // < Keyman 7

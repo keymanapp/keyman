@@ -1,7 +1,7 @@
 #pragma once
 
 #include <windows.h>
-#include <Compfile.h>
+#include "Compfile.h"
 #include "kmcmpdll.h"
 
 KMX_DWORD CheckFilenameConsistencyForCalls(PFILE_KEYBOARD fk);

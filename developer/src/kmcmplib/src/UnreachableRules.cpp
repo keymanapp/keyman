@@ -41,7 +41,6 @@ namespace kmcmp {
 KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
   PFILE_KEY kp = gp->dpKeyArray;
   KMX_DWORD i;
-  KMX_WCHAR ErrExtra[256];
 
   int oldCurrentLine = kmcmp::currentLine;
 
@@ -55,8 +54,8 @@ KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
       if (kp->Line != k1.Line && reportedLines.count(kp->Line) == 0) {
         reportedLines.insert(kp->Line);
         kmcmp::currentLine = kp->Line;
-        u16sprintf(ErrExtra, _countof(ErrExtra), L" Overridden by rule on line %d", k1.Line);
-        strcpy(ErrExtraLIB, wstrtostr2(ErrExtra));
+        u16sprintf(ErrExtraW, 256, L" Overridden by rule on line %d", k1.Line);
+        strcpy(ErrExtraLIB, wstrtostr2(ErrExtraW));
         AddWarning(CHINT_UnreachableRule);
       }
     }

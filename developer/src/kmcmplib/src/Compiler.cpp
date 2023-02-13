@@ -72,7 +72,7 @@
 #include <cuchar>
 #include <versioning.h>
 #include "kmcmpdll.h"
-#include <DeprecationChecks.h>
+#include "DeprecationChecks.h"
 
 #include "virtualcharkeys.h"
 
@@ -98,8 +98,8 @@
 using namespace kmcmp;
 
 char ErrExtraLIB[256];
+KMX_WCHAR ErrExtraW[256];
 namespace kmcmp{
-
   HINSTANCE g_hInstance;
   KMX_BOOL  FWarnDeprecatedCode;
   KMX_BOOL  FShouldAddCompilerVersion = TRUE;

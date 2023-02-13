@@ -1,7 +1,7 @@
 
 #include "pch.h"
 
-#include <compfile.h>
+#include "compfile.h"
 #include <comperr.h>
 #include "kmcmpdll.h"
 #include <io.h>
@@ -69,7 +69,6 @@ KMX_DWORD CheckFilenameConsistency( KMX_CHAR const * Filename, bool ReportMissin
 KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissingFile) {
   // not ready yet: needs more attention-> e.g. _wfindfirst,... and common includes for non-Windows platforms
   KMX_WCHAR Name[_MAX_PATH], FName[_MAX_FNAME], Ext[_MAX_EXT];
-  KMX_WCHAR ErrExtra[256];
   intptr_t n;
   FILE* nfile;
 
@@ -101,8 +100,8 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
 
   if (nfile == NULL) {
     if (ReportMissingFile) {
-      u16sprintf(ErrExtra,_countof(ErrExtra),L"referenced file %ls",Filename);
-      strcpy(ErrExtraLIB, wstrtostr2(ErrExtra));
+      u16sprintf(ErrExtraW,256,L"referenced file %ls",Filename);
+      strcpy(ErrExtraLIB, wstrtostr2(ErrExtraW));
       AddWarning(CWARN_MissingFile);
     }
     return CERR_None;
@@ -121,8 +120,8 @@ KMX_WCHAR fi_name_char16[260];
 u16sprintf(fi_name_char16,_countof(fi.name),fi.name);
 
   if (u16cmp(cptr1, fi_name_char16) != 0) {
-    u16sprintf(ErrExtra,_countof(ErrExtra),L"reference '%ls' does not match actual filename '%ls'", cptr1, &fi.name);
-    strcpy(ErrExtraLIB, wstrtostr2(ErrExtra));
+    u16sprintf(ErrExtraW,256,L"reference '%ls' does not match actual filename '%ls'", cptr1, &fi.name);
+    strcpy(ErrExtraLIB, wstrtostr2(ErrExtraW));
     AddWarning(CHINT_FilenameHasDifferingCase);
   }
 #else

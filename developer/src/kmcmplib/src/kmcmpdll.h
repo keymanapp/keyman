@@ -7,7 +7,8 @@ namespace kmcmp {
   extern BOOL FWarnDeprecatedCode;
   extern int currentLine;
 }
-extern char ErrExtraLIB[];
+extern char ErrExtraLIB[256];
+extern KMX_WCHAR ErrExtraW[256];
 KMX_BOOL AddCompileError(KMX_DWORD msg);
 
 // TODO: These macros can return FALSE in functions that expect a DWORD CERR_x
