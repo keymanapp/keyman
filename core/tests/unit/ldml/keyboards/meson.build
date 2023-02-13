@@ -4,10 +4,16 @@
 # Authors:      Marc Durdin
 #
 
+
+# These tests have a k_001_tiny-test.xml file as well.
+
+tests_with_testdata = [
+  'k_001_tiny',
+]
+
 tests = [
 # disabling 000 until we have updates to core or to the keyboard so that it passes
 #  'k_000_null_keyboard',
-  'k_001_tiny',
   'k_002_tinyu32',
   'k_003_transform',
   'k_004_tinyshift',
@@ -17,6 +23,8 @@ tests = [
   'k_101_keytest',
   'k_102_keytest',
 ]
+
+tests += tests_with_testdata
 
 # Setup kmc
 
@@ -36,5 +44,13 @@ foreach kbd : tests
     command: kmc_cmd + ['@INPUT@', '--out-file', '@OUTPUT@'],
     output: kbd + '.kmx',
     input: kbd + '.xml'
+  )
+endforeach
+
+foreach kbd : tests_with_testdata
+  configure_file(
+    command: kmc_cmd + ['@INPUT@', '--test-data', '@OUTPUT@'],
+    output: kbd + '-test.json',
+    input: kbd + '-test.xml'
   )
 endforeach
