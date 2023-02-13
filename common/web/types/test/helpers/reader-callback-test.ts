@@ -8,11 +8,13 @@ import { LDMLKeyboardTestDataXMLSourceFile } from '../ldml-keyboard/ldml-keyboar
 
 // TODO-LDML: this is largely a port from developer/src/kmc-keyboard/test/helpers/index.ts
 
-
 /**
  * A CompilerCallbacks implementation for testing
  */
 class TestCompilerCallbacks implements CompilerCallbacks {
+  loadLdmlKeyboardTestSchema(): Buffer {
+    return loadLdmlKeyboardTestDataSchema();
+  }
   loadLdmlKeyboardSchema(): Buffer {
     return loadLdmlKeyboardSchema();
   }

@@ -9,7 +9,7 @@ import * as path from 'path';
 import { Command } from 'commander';
 import * as kmc from '@keymanapp/kmc-keyboard';
 import KEYMAN_VERSION from "@keymanapp/keyman-version/keyman-version.mjs";
-import { KvkFileWriter, CompilerCallbacks, CompilerEvent } from '@keymanapp/common-types';
+import { KvkFileWriter, CompilerCallbacks, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
 
 let inputFilename: string;
 
@@ -22,7 +22,8 @@ program
   .action((infile:any) => inputFilename = infile)
   .option('-d, --debug', 'Include debug information in output')
   .option('--no-compiler-version', 'Exclude compiler version metadata from output')
-  .option('-o, --out-file <filename>', 'where to save the resulting .kmx file');
+  .option('-o, --out-file <filename>', 'where to save the resulting .kmx file')
+  .option('-T, --test-data <filename>', 'Convert keyboard test .xml to .json');
 
 program.parse(process.argv);
 
@@ -59,6 +60,10 @@ class NodeCompilerCallbacks implements CompilerCallbacks {
   }
   loadLdmlKeyboardSchema(): Buffer {
     let schemaPath = new URL('ldml-keyboard.schema.json', import.meta.url);
+    return fs.readFileSync(schemaPath);
+  }
+  loadLdmlKeyboardTestSchema(): Buffer {
+    let schemaPath = new URL('ldml-keyboardtest.schema.json', import.meta.url);
     return fs.readFileSync(schemaPath);
   }
   loadKvksJsonSchema(): Buffer {
@@ -98,30 +103,56 @@ function compileKeyboard(inputFilename: string, options: kmc.CompilerOptions): [
   return [kmx_binary, kvk_binary];
 }
 
+function loadTestData(inputFilename: string, options: kmc.CompilerOptions): LDMLKeyboardTestDataXMLSourceFile {
+   const c : CompilerCallbacks = new NodeCompilerCallbacks();
+   const k = new kmc.Compiler(c, options);
+   let source = k.loadTestData(inputFilename);
+   if(!source) {
+     return null;
+   }
+   return source;
+}
+
 let options: kmc.CompilerOptions = {
   debug: program.debug ?? false,
   addCompilerVersion: program.compilerVersion ?? true
 }
 
-// TODO-LDML: consider hardware vs touch -- touch-only layout will not have a .kvk
-// Compile:
-let [kmx,kvk] = compileKeyboard(inputFilename, options);
+if (program.testData) {
+  let testData = loadTestData(inputFilename, options);
+  if (testData) {
+    const fileBaseName = program.testData ?? inputFilename;
+    const outFileBase = path.basename(fileBaseName, path.extname(fileBaseName));
+    const outFileDir = path.dirname(fileBaseName);
 
-// Output:
-
-if(kmx && kvk) {
-  const fileBaseName = program.outFile ?? inputFilename;
-  const outFileBase = path.basename(fileBaseName, path.extname(fileBaseName));
-  const outFileDir = path.dirname(fileBaseName);
-
-  const outFileKmx = path.join(outFileDir, outFileBase + '.kmx');
-  console.log(`Writing compiled keyboard to ${outFileKmx}`);
-  fs.writeFileSync(outFileKmx, kmx);
-
-  const outFileKvk = path.join(outFileDir, outFileBase + '.kvk');
-  console.log(`Writing compiled visual keyboard to ${outFileKvk}`);
-  fs.writeFileSync(outFileKvk, kvk);
+    const outFileJson = path.join(outFileDir, outFileBase + '.json');
+    console.log(`Writing JSON test data to ${outFileJson}`);
+    fs.writeFileSync(outFileJson, JSON.stringify(testData, null, '  '));
+  } else {
+    console.error(`An error occurred loading test data ${inputFilename}`);
+    process.exit(1);
+  }
 } else {
-  console.error(`An error occurred compiling ${inputFilename}`);
-  process.exit(1);
+  // TODO-LDML: consider hardware vs touch -- touch-only layout will not have a .kvk
+  // Compile:
+  let [kmx,kvk] = compileKeyboard(inputFilename, options);
+
+  // Output:
+
+  if(kmx && kvk) {
+    const fileBaseName = program.outFile ?? inputFilename;
+    const outFileBase = path.basename(fileBaseName, path.extname(fileBaseName));
+    const outFileDir = path.dirname(fileBaseName);
+
+    const outFileKmx = path.join(outFileDir, outFileBase + '.kmx');
+    console.log(`Writing compiled keyboard to ${outFileKmx}`);
+    fs.writeFileSync(outFileKmx, kmx);
+
+    const outFileKvk = path.join(outFileDir, outFileBase + '.kvk');
+    console.log(`Writing compiled visual keyboard to ${outFileKvk}`);
+    fs.writeFileSync(outFileKvk, kvk);
+  } else {
+    console.error(`An error occurred compiling ${inputFilename}`);
+    process.exit(1);
+  }
 }
