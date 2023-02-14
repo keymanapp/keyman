@@ -19,7 +19,7 @@ function _builder_init() {
   _builder_findRepoRoot
   _builder_setBuildScriptIdentifiers
 
-  if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]]; then
+  if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]] && [ -t 1 ]; then
     builder_use_color true
   else
     builder_use_color false
@@ -109,9 +109,17 @@ builder_use_color() {
   fi
 }
 
+#
+# Wraps the input string in `builder_display_usage` with $BUILDER_TERM_START and
+# $BUILDER_TERM_END
+#
+function builder_term() {
+  echo "${BUILDER_TERM_START}$*${BUILDER_TERM_END}"
+}
+
 function builder_die() {
   echo
-  echo "${COLOR_RED}$*"
+  echo "${COLOR_RED}$*${COLOR_RESET}"
   echo
   exit 1
 }
@@ -127,6 +135,10 @@ function builder_die() {
 # _builder_ names are internal use and subject to change
 #
 _builder_debug=false
+
+if $_builder_debug; then
+  echo "[DEBUG] Command line: $0 $@"
+fi
 
 #
 # builder_extra_params: string containing all parameters after '--'
@@ -482,6 +494,8 @@ _builder_expand_action_targets() {
 #   specified, space separated.
 #
 builder_describe() {
+  _builder_record_function_call builder_describe
+
   _builder_description="$1"
   _builder_actions=()
   _builder_targets=()
@@ -599,6 +613,8 @@ builder_describe() {
 # ```
 #
 function builder_describe_outputs() {
+  _builder_record_function_call builder_describe_outputs
+
   while [[ $# -gt 0 ]]; do
     local key="$1" path="$2" action target
     path="`_builder_expand_relative_path "$path"`"
@@ -620,6 +636,11 @@ function builder_describe_outputs() {
   done
 
   _builder_define_default_internal_dependencies
+
+  # We only want to define internal dependencies after both builder_parse and builder_describe_outputs have been called
+  if _builder_has_function_been_called builder_parse; then
+    _builder_add_chosen_action_target_dependencies
+  fi
 }
 
 _builder_get_default_description() {
@@ -652,16 +673,14 @@ _builder_parameter_error() {
 
 }
 
-# Pre-initializes the color setting based on the options specified to a
-# a build.sh script, parsing the command line to do so.  This is only
-# needed if said script wishes to use this script's defined colors while
-# respecting the options provided by the script's caller.
 #
-# Usage:
-#   builder_check_color "$@"
+# Pre-initializes the color setting based on the options specified to a
+# a build.sh script. This is called automatically during init.
+#
 # Parameters
-#   1: $@         all command-line arguments (as with builder_parse)
-builder_check_color() {
+#   1: "$@"         all command-line arguments
+#
+_builder_check_color() {
   # Process command-line arguments
   while [[ $# -gt 0 ]] ; do
     local key="$1"
@@ -690,16 +709,18 @@ _builder_add_chosen_action_target_dependencies() {
   while (( $i < ${#_builder_chosen_action_targets[@]} )); do
     action_target=${_builder_chosen_action_targets[$i]}
 
-    # If we have an internal dependency for the chosen action:target pair, add
-    # it to the list, but only if there is a defined output and that output is
-    # missing
+    # If we have an internal dependency for the chosen action:target pair
     if [[ ! -z ${_builder_internal_dep[$action_target]+x} ]]; then
       local dep_output=${_builder_internal_dep[$action_target]}
-      if [[ ! -z ${_builder_dep_path[$dep_output]+x} ]] &&
-          [[ ! -e "$KEYMAN_ROOT/${_builder_dep_path[$dep_output]}" ]]; then
-        if ! _builder_item_in_array "$dep_output" "${_builder_chosen_action_targets[@]}"; then
-          _builder_chosen_action_targets+=($dep_output)
-          new_actions+=($dep_output)
+      # If there is a defined output for this dependency
+      if [[ ! -z ${_builder_dep_path[$dep_output]+x} ]]; then
+        # If the output for the dependency is missing, or we have --force-deps
+        if [[ ! -e "$KEYMAN_ROOT/${_builder_dep_path[$dep_output]}" ]] || builder_is_full_dep_build; then
+          # Add the dependency to the chosen action:target list
+          if ! _builder_item_in_array "$dep_output" "${_builder_chosen_action_targets[@]}"; then
+            _builder_chosen_action_targets+=($dep_output)
+            new_actions+=($dep_output)
+          fi
         fi
       fi
     fi
@@ -707,7 +728,11 @@ _builder_add_chosen_action_target_dependencies() {
   done
 
   if [[ ${#new_actions[@]} -gt 0 ]]; then
-    echo "Automatically running following required actions with missing outputs:"
+    if builder_is_full_dep_build; then
+      echo "Automatically running all dependency actions due to --force-deps:"
+    else
+      echo "Automatically running following required actions with missing outputs:"
+    fi
     for e in "${new_actions[@]}"; do
       echo "* $e"
     done
@@ -752,6 +777,9 @@ _builder_define_default_internal_dep() {
 # Parameters
 #   1: $@         command-line arguments
 builder_parse() {
+
+  _builder_record_function_call builder_parse
+
   _builder_build_deps=--deps
   builder_verbose=
   builder_debug=
@@ -876,7 +904,10 @@ builder_parse() {
     done
   fi
 
-  _builder_add_chosen_action_target_dependencies
+  # We only want to define internal dependencies after both builder_parse and builder_describe_outputs have been called
+  if _builder_has_function_been_called builder_describe_outputs; then
+    _builder_add_chosen_action_target_dependencies
+  fi
 
   if $_builder_debug; then
     echo "[DEBUG] Selected actions and targets:"
@@ -1118,7 +1149,7 @@ builder_is_dep_build() {
 # `--deps` parameter (which is the default).
 #
 builder_is_quick_dep_build() {
-  if builder_is_dep_build && [[ $_builder_build_deps == --deps ]]; then
+  if [[ $_builder_build_deps == --deps ]]; then
     return 0
   fi
   return 1
@@ -1129,7 +1160,7 @@ builder_is_quick_dep_build() {
 # corresponds to the `--force-deps`` parameter.
 #
 builder_is_full_dep_build() {
-  if builder_is_dep_build && [[ $_builder_build_deps == --force-deps ]]; then
+  if [[ $_builder_build_deps == --force-deps ]]; then
     return 0
   fi
   return 1
@@ -1247,6 +1278,32 @@ _builder_report_dependencies() {
 }
 
 #
+# Track whether functions have already been called;
+# later we may use this to prevent multiple calls to, e.g.
+# builder_describe
+#
+
+_builder_function_calls=()
+
+_builder_record_function_call() {
+  local func=$1
+  if _builder_has_function_been_called $1; then
+    # builder_die "ERROR: $func cannot be called more than once."
+    return 0
+  fi
+  _builder_function_calls+=($1)
+}
+
+_builder_has_function_been_called() {
+  local func=$1
+  if _builder_item_in_array $1 "${_builder_function_calls[@]}"; then
+    return 0
+  fi
+  return 1
+}
+
+#
 # Initialize builder once all functions are declared
 #
 _builder_init
+_builder_check_color "$@"
