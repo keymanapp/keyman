@@ -1,6 +1,7 @@
 import { default as KeyboardStub, ErrorStub, KeyboardAPISpec, mergeAndResolveStubPromises } from '../keyboardStub.js';
 import { LanguageAPIPropertySpec, ManagedPromise, Version } from '@keymanapp/keyboard-processor';
 import CloudRequesterInterface from './requesterInterface.js';
+import StubAndKeyboardCache from '../stubAndKeyboardCache.js';
 
 // For when the API call straight-up times out.
 export const CLOUD_TIMEOUT_ERR = "The Cloud API request timed out.";
@@ -297,7 +298,7 @@ export default class CloudQueryEngine {
 
       // May need to filter returned stubs by language
       let lgCode=kbId.split('@')[1];
-      if(allStubs.length == 1 && typeof (allStubs[0] as ErrorStub).error != undefined) {
+      if(allStubs.length == 1 && typeof (allStubs[0] as ErrorStub).error != 'undefined') {
         throw (allStubs[0] as ErrorStub).error;
       } else if(typeof(lgCode) != 'string') {
         return allStubs as KeyboardStub[];
@@ -316,9 +317,11 @@ export default class CloudQueryEngine {
    * Build 362: addKeyboardArray() link to Cloud. One or more arguments may be used
    *
    * @param x  keyboard name string or keyboard metadata JSON object
+   * @param localCache Cache of pre-loaded stubs; any requests matching stubs already loaded
+   *                   within the provided cache will be considered duplicates and dropped.
    * @returns resolved or rejected promise with merged array of stubs.
    */
-  async fetchCloudStubs(x: string[]): Promise<(KeyboardStub|ErrorStub)[]> {
+  async fetchCloudStubs(x: string[], localCache?: StubAndKeyboardCache): Promise<(KeyboardStub|ErrorStub)[]> {
     // // Ensure keymanweb is initialized before continuing to add keyboards
     // if(!this.keymanweb.initialized) {
     //   await this.deferment;
@@ -374,6 +377,25 @@ export default class CloudQueryEngine {
     } catch (error) {
       console.error(error);
       return Promise.reject(error);
+    }
+
+    // Filter out any already-fetched stubs.
+    let omitEntries: CloudRequestEntry[] = [];
+
+    if(localCache) {
+      for(let entry of cloudList) {
+        const match = localCache.getStub(entry.id, entry.language);
+        if(match) {
+          omitEntries.push(entry);
+        }
+      }
+    }
+
+    // `includes` requires Chrome for Android 47.
+    cloudList = cloudList.filter((entry) => !omitEntries.includes(entry));
+
+    if(cloudList.length == 0) {
+      return Promise.resolve([]);
     }
 
     // Update the keyboard metadata list from keyman.com - build the command

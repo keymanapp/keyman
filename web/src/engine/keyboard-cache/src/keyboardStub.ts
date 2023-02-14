@@ -27,6 +27,7 @@ export default class KeyboardStub extends KeyboardProperties {
   public constructor(kbdId: string, lngId: string);
   constructor(arg0: string | (APISimpleKeyboard & { filename: string }), arg1?: string) {
     if(typeof arg0 !== 'string') {
+      arg0.id = prefixed(arg0.id);
       super(arg0, arg1);
     } else {
       super(prefixed(arg0), arg1);

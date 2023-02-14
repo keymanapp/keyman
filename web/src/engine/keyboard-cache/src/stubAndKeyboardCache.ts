@@ -31,23 +31,30 @@ export default class StubAndKeyboardCache {
     return this.getKeyboard(stub.KI);
   }
 
-  addKeyboardForStub(stub: KeyboardStub, keyboard: Keyboard | Promise<Keyboard>) {
-    this.addKeyboard(stub.KI, keyboard);
+  expectKeyboardForStub(stub: KeyboardStub, keyboard: Promise<Keyboard>) {
+    this.expectKeyboard(keyboard, stub.KI);
   }
 
   getKeyboard(keyboardID: string): Keyboard | Promise<Keyboard> {
     return this.keyboardTable[prefixed(keyboardID)];
   }
 
-  addKeyboard(keyboardID: string, keyboard: Keyboard | Promise<Keyboard>) {
-    keyboardID = prefixed(keyboardID);
+  addKeyboard(keyboard: Keyboard) {
+    const keyboardID = prefixed(keyboard.id);
     this.keyboardTable[keyboardID] = keyboard;
+  }
 
-    if(keyboard instanceof Promise) {
-      keyboard.then((kbd) => {
-        this.keyboardTable[keyboardID] = kbd;
-      });
+  expectKeyboard(keyboardPromise: Promise<Keyboard>, keyboardID: string) {
+    if(!keyboardID) {
+      throw new Error("Keyboard ID must be specified!");
     }
+
+    keyboardID = prefixed(keyboardID);
+    this.keyboardTable[keyboardID] = keyboardPromise;
+
+    keyboardPromise.then((kbd) => {
+      this.keyboardTable[keyboardID] = kbd;
+    });
   }
 
   addStub(stub: KeyboardStub) {
@@ -57,7 +64,7 @@ export default class StubAndKeyboardCache {
   }
 
   findMatchingStub(stub: KeyboardStub) {
-    return this.getStub(prefixed(stub.KI), stub.KLC);
+    return this.getStub(stub.KI, stub.KLC);
   }
 
   getStub(keyboardID: string, languageID: string);
