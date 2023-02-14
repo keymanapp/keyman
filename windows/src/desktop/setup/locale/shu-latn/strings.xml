@@ -72,9 +72,7 @@ Tasawwa dugut wah?</string>
   <string name="ssDownloadingTitle">Bidukhul %0:s</string>
   <!-- Parameters: %0:s: filename -->
   <string name="ssDownloadingText">Bidukhul %0:s</string>
-  <string name="ssOffline">$APPNAME Aldassasan ma gudur kan ley dassasan ziyada hana shu\'ul finshan ma gudur wassal keyman.com
-
-Albarak shyf kan internet hanak bikhadum, wa ath $APPNAME izin hana dassasan min internet hanak ley firewall hana browser hanak.
-
-Assur hallayt ley dabbaran dassasana, hawul ley dassasana addarey shiyakay, walla halla ley takhadum bala internet.</string>
+  <string name="ssOffline">$APPNAME Aldassasan ma gudur kan ley dassasan ziyada hana shu\'ul finshan ma gudur wassal keyman.com.</string>
+  <string name="ssOffline2">Albarak shyf kan internet hanak bikhadum, wa ath $APPNAME izin hana dassasan min internet hanak ley firewall hana browser hanak.</string>
+  <string name="ssOffline3">Assur hallayt ley dabbaran dassasana, hawul ley dassasana addarey shiyakay, walla halla ley takhadum bala internet.</string>
 </resources>

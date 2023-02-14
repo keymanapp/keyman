@@ -3,8 +3,6 @@
     {
       "name": "linux",
       "includePath": [
-        "${workspaceFolder}/common/include",
-        "${workspaceFolder}/common/include/**",
         "${workspaceFolder}/core/include",
         "${workspaceFolder}/core/include/**",
         "${workspaceFolder}/core/build/arch/debug/include/",

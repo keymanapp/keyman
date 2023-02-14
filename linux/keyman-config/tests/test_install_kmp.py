@@ -272,7 +272,7 @@ class InstallKmpTests(unittest.TestCase):
 
         # Execute
         with self.assertRaises(InstallError) as context:
-            InstallKmp()._install_kmp(kmpfile, False, 'km', InstallLocation.User)
+            InstallKmp()._install_kmp(kmpfile, 'km', InstallLocation.User)
 
         # Verify
         self.assertTrue('foo.kmp requires Keyman 99.0 or higher' in context.exception.message)
@@ -296,7 +296,7 @@ class InstallKmpTests(unittest.TestCase):
                 self._createKmpJson(packagedir, testcase['fileVersion'])
 
                 # Execute
-                InstallKmp()._install_kmp(kmpfile, False, 'km', InstallLocation.User)
+                InstallKmp()._install_kmp(kmpfile, 'km', InstallLocation.User)
 
                 # Verify
                 self.mockInstallToIbus.assert_called_once()

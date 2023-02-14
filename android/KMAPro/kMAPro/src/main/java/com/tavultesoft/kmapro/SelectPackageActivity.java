@@ -19,10 +19,10 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.data.KeyboardController;
-import com.tavultesoft.kmea.util.KMLog;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.data.KeyboardController;
+import com.keyman.engine.util.KMLog;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -87,9 +87,9 @@ public final class SelectPackageActivity extends AppCompatActivity {
     }
 
     String[] from = new String[]{titleKey, subtitleKey, iconKey};
-    int[] to = new int[]{com.tavultesoft.kmea.R.id.text1, com.tavultesoft.kmea.R.id.text2, com.tavultesoft.kmea.R.id.image1};
+    int[] to = new int[]{com.keyman.engine.R.id.text1, com.keyman.engine.R.id.text2, com.keyman.engine.R.id.image1};
 
-    ListAdapter adapter = new SimpleAdapter(context, list, com.tavultesoft.kmea.R.layout.list_row_layout2, from, to) {
+    ListAdapter adapter = new SimpleAdapter(context, list, com.keyman.engine.R.layout.list_row_layout2, from, to) {
     };
     listView.setAdapter(adapter);
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
