@@ -38,7 +38,7 @@ builder_describe "Builds the lm-layer module" \
   "test" \
   ":headless   A headless, Node-oriented version of the module useful for unit tests" \
   ":browser    The standard version of the module for in-browser use" \
-  "--ci        Sets ${BUILDER_TERM_START}test${BUILDER_TERM_END} action to use CI-based test configurations & reporting"
+  "--ci        Sets $(builder_term test) action to use CI-based test configurations & reporting"
 
 builder_describe_outputs \
   configure           /node_modules \

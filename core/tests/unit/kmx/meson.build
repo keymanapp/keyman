@@ -28,13 +28,27 @@ else
   test_path = meson.current_build_dir()
 endif
 
+coretest_files = files(
+    'kmx_test_source.cpp',
+)
+
 kmx = executable('kmx',
     'kmx.cpp',
-    'kmx_test_source.cpp',
+    coretest_files,
     cpp_args: defns + warns,
     include_directories: [inc, libsrc],
     link_args: links + tests_flags,
     objects: lib.extract_all_objects())
+
+test_lib = static_library('kmnkbp-tests',
+  coretest_files,
+  cpp_args: defns + warns + flags,
+  include_directories: [inc, libsrc],
+  link_args: links + tests_flags,
+  objects: lib.extract_all_objects(),
+  pic: true,
+  install: false
+)
 
 tests = [
   '000 - null keyboard',
@@ -90,7 +104,7 @@ tests = [
 ]
 
 if build_machine.system() == 'windows'
-  kmcomp = find_program(join_paths(meson.source_root(),'..','..','..','windows','bin','developer','kmcomp.exe'), 'kmcomp.exe', required: false)
+  kmcomp = find_program(join_paths(meson.current_source_dir(),'..','..','..','..','windows','bin','developer','kmcomp.exe'), 'kmcomp.exe', required: false)
   kmcomp_cmd = [kmcomp]
   copy_cmd = [find_program('cmd.exe', required: true), '/c', 'copy']
   cat_cmd = [find_program('cmd.exe', required: true), '/c', 'type']

@@ -14,7 +14,9 @@ objectives are:
 2. to be self-documenting in usage (`--help` should always tell you all you need
    to know)
 3. for the scripts to be easily readable, coherent, and straightforward for
-   anyone involved in the project to maintain.
+   anyone involved in the project to maintain
+4. for dependencies to be simple (a module dependency will always be to a whole
+   module, not to a specific target within that module)
 
 * [Jump to API definitions](#builder-api-functions-and-variables)
 
@@ -226,9 +228,8 @@ parameters as [`builder_parse`].
 ```bash
 builder_check_color "$@"
 builder_describe "sample" \
-  "--ci    For use with action ${BUILDER_TERM_START}test${BUILDER_TERM_END} - emits CI-friendly test reports"
+  "--ci    For use with action $(builder_term test) - emits CI-friendly test reports"
 ```
-
 
 ## `builder_describe` function
 
@@ -523,6 +524,18 @@ also print a log message indicating that the action has started, for example:
 ## [common/web/keyman-version] build:project starting...
 ```
 
+## `builder_term` function
+
+Emits the parameters passed to the function, wrapped with `$BUILDER_TERM_START`
+and `$BUILDER_TERM_END`.
+
+### Usage
+
+```bash
+builder_check_color "$@"
+builder_describe "sample" \
+  "--ci    For use with action $(builder_term test) - emits CI-friendly test reports"
+```
 
 ## `builder_use_color` function
 
@@ -571,6 +584,8 @@ resolve either to empty string (for `$COLOR_*`), or equivalent plain-text forms
 * `$HEADING_SETMARK`: Add a setmark, e.g. with VSCode
   <https://code.visualstudio.com/updates/v1_69#_setmark-sequence-support>
 
+Note: it is recommended that you use `$(builder_term text)` instead of
+`${BUILDER_TERM_START}text${BUILDER_TERM_END}`.
 
 [standard builder parameters]: #standard-builder-parameters
 [`builder_check_color`]: #buildercheckcolor-function
