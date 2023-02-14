@@ -139,12 +139,17 @@ function GetDebugKMCmpDllPath: string;
 var
   root: string;
 const
+  DevPlatform={$IFDEF WIN64}'x64'{$ELSE}'Win32'{$ENDIF};
+  DevConfig={$IFDEF DEBUG}'Debug'{$ELSE}'Release'{$ENDIF};
+  DevSrcCompilerPath = 'developer\src\kmcmpdll\bin\'+DevPlatform+'\'+DevConfig;
   DevCompilerPath = 'developer\bin';
 begin
-  if TKeymanPaths.RunningFromSource(root) and
-    FileExists(root + DevCompilerPath + '\kmcmpdll.dll')
-    then Result := root + DevCompilerPath
-    else Result := ExtractFilePath(ParamStr(0));
+  if TKeymanPaths.RunningFromSource(root) and FileExists(root + DevSrcCompilerPath + '\kmcmpdll.dll') then
+    Result := root + DevSrcCompilerPath
+  else if TKeymanPaths.RunningFromSource(root) and FileExists(root + DevCompilerPath + '\kmcmpdll.dll') then
+    Result := root + DevCompilerPath
+  else
+    Result := ExtractFilePath(ParamStr(0));
   Result := GetDebugPath('Debug_KMCMPDLLPath', Result);
 end;
 

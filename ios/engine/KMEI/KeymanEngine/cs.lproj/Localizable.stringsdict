@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>menu-langsettings-lexical-model-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u slovník nainstalován</string>
+        <key>few</key>
+        <string>Nainstalováno %u slovníků</string>
+        <key>many</key>
+        <string>Nainstalováno %u slovníků</string>
+        <key>other</key>
+        <string>Nainstalováno %u slovníků</string>
+      </dict>
+    </dict>
+    <key>notification-update-failed</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u aktualizace se nezdařila</string>
+        <key>few</key>
+        <string>%u aktualizace se nezdařily</string>
+        <key>many</key>
+        <string>%u aktualizace se nezdařily</string>
+        <key>other</key>
+        <string>%u aktualizace se nezdařily</string>
+      </dict>
+    </dict>
+    <key>notification-update-success</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u aktualizace byla úspěšná</string>
+        <key>few</key>
+        <string>%u aktualizace byly úspěšné</string>
+        <key>many</key>
+        <string>%u aktualizace byly úspěšné</string>
+        <key>other</key>
+        <string>%u aktualizace byly úspěšné</string>
+      </dict>
+    </dict>
+    <key>settings-keyboards-installed-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u klávesnice nainstalována</string>
+        <key>few</key>
+        <string>%u klávesnice nainstalovány</string>
+        <key>many</key>
+        <string>%u klávesnice nainstalovány</string>
+        <key>other</key>
+        <string>%u klávesnice nainstalovány</string>
+      </dict>
+    </dict>
+    <key>settings-languages-installed-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u jazyk nainstalován</string>
+        <key>few</key>
+        <string>%u jazyků nainstalováno</string>
+        <key>many</key>
+        <string>%u jazyků nainstalováno</string>
+        <key>other</key>
+        <string>%u jazyků nainstalováno</string>
+      </dict>
+    </dict>
+    <key>package-default-found-keyboards</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>Nalezena %u klávesnice v balíčku:</string>
+        <key>few</key>
+        <string>Nalezena %u klávesnice v balíčku:</string>
+        <key>many</key>
+        <string>Nalezena %u klávesnice v balíčku:</string>
+        <key>other</key>
+        <string>Nalezena %u klávesnice v balíčku:</string>
+      </dict>
+    </dict>
+    <key>package-default-found-lexical-models</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>V balíčku byl nalezen %u slovník:</string>
+        <key>few</key>
+        <string>Nalezeno %u slovníků v balíčku:</string>
+        <key>many</key>
+        <string>Nalezeno %u slovníků v balíčku:</string>
+        <key>other</key>
+        <string>Nalezeno %u slovníků v balíčku:</string>
+      </dict>
+    </dict>
+  </dict>
+</plist>

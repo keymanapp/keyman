@@ -20,7 +20,6 @@ def download_and_install_package(url):
     """
     parsedUrl = urlparse(url)
     bcp47 = _extract_bcp47(parsedUrl.query)
-    severity = logging.ERROR
 
     if parsedUrl.scheme == 'keyman':
         logging.info("downloading " + url)
@@ -49,7 +48,7 @@ def download_and_install_package(url):
         return
 
     if packageFile and not _install_package(packageFile, bcp47):
-        logging.log(severity, "Can't find file " + url)
+        logging.error("Can't find file " + url)
 
 
 def _extract_bcp47(query):

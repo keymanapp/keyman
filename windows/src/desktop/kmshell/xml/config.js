@@ -388,20 +388,23 @@ function keyboard_checkclick(n,toggle) {
 /* Disable/Enable Button replaces checkbox for now still use the "check" function in delphi webserver */
 function keyboard_toggle(keyboard_name) {
   const checkbox = document.getElementById('keyboardcheck_'+keyboard_name), li = document.getElementById('list_keyboard_'+keyboard_name);
-  const li_detail = document.getElementById('list_detail_keyboard_'+keyboard_name);
+  const grid_container = document.getElementById('keyboard_grid_'+keyboard_name);
   const disable_btn = document.getElementById('button_disable_'+keyboard_name);
   const enable_btn = document.getElementById('button_enable_'+keyboard_name);
+  const add_remove_btn = document.getElementById('button_add_remove_'+keyboard_name);
 
   checkbox.checked = !checkbox.checked;
   if (checkbox.checked){
     enable_btn.style.display = "none";
     disable_btn.style.display = "block";
-    li_detail.classList.remove("list_disabled");
+    grid_container.classList.remove("grid_disabled");
+    add_remove_btn.disabled = false;
   }
   else {
     disable_btn.style.display = "none";
     enable_btn.style.display = "block";
-    li_detail.classList.add("list_disabled");
+    grid_container.classList.add("grid_disabled");
+    add_remove_btn.disabled = true;
   }
 
   location.href='keyman:keyboard_clickcheck?id='+keyboard_name+'&value='+checkbox.checked;

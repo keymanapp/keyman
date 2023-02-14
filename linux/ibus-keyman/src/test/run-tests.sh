@@ -3,6 +3,15 @@
 SRCDIR=${top_srcdir:-$(realpath $(dirname $0)/../..)}
 PID_FILE=/tmp/keymanutil-tests-pids
 
+if [ -v KEYMAN_PKG_BUILD ]; then
+  # During package builds we skip these tests - they often fail, e.g.
+  # during Debian reproducibility testing with an error like
+  # "cannot open display: :32"
+  echo "1..1"
+  echo "ok 1 # SKIP on package build"
+  exit 0
+fi
+
 if ! which Xvfb > /dev/null || ! which Xephyr > /dev/null || ! which metacity > /dev/null; then
   echo "Please install Xvfb, Xephyr and metacity before running these tests!"
   exit 1

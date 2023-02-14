@@ -8,7 +8,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.widget.TextView;
 
-import com.tavultesoft.kmea.util.KMLog;
+import com.keyman.engine.util.KMLog;
 
 import java.util.Calendar;
 

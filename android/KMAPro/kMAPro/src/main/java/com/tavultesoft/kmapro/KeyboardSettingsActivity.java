@@ -28,20 +28,21 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tavultesoft.kmea.ConfirmDialogFragment;
-import com.tavultesoft.kmea.KMHelpFileActivity;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.data.KeyboardController;
-import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.FileProviderUtils;
-import com.tavultesoft.kmea.util.KMLog;
-import com.tavultesoft.kmea.util.KMString;
-import com.tavultesoft.kmea.util.MapCompat;
-import com.tavultesoft.kmea.util.QRCodeUtil;
+import com.keyman.engine.ConfirmDialogFragment;
+import com.keyman.engine.KMHelpFileActivity;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.KMKeyboardDownloaderActivity;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.data.KeyboardController;
+import com.keyman.engine.util.DependencyUtil;
+import com.keyman.engine.util.DependencyUtil.LibraryType;
+import com.keyman.engine.util.FileUtils;
+import com.keyman.engine.util.FileProviderUtils;
+import com.keyman.engine.util.KMString;
+import com.keyman.engine.util.MapCompat;
+import com.keyman.engine.util.QRCodeUtil;
 
-import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DELETE_KEYBOARD;
+import static com.keyman.engine.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DELETE_KEYBOARD;
 
 // Public access is necessary to avoid IllegalAccessException
 public final class KeyboardSettingsActivity extends AppCompatActivity {
@@ -198,7 +199,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     // If QRGen library included, append the QR code View to the
     // scrollable listview for sharing keyboard
     View view = getLayoutInflater().inflate(R.layout.qr_layout, null);
-    if (QRCodeUtil.libraryExists(context)) {
+    if (DependencyUtil.libraryExists(LibraryType.QRCODE)) {
       LinearLayout qrLayout = (LinearLayout) view.findViewById(R.id.qrLayout);
       listView.addFooterView(qrLayout);
 
