@@ -176,11 +176,21 @@ while IFS= read -r line; do
 done <<< "$prfiles"
 
 debug_echo "Build platforms: ${build_platforms[*]}"
-#
-# Start the test builds
-#
 
-echo ". Start test builds"
-triggerTestBuilds "`echo ${build_platforms[@]}`" "$PRNUM"
+if (( ${#build_platforms[@]} > 0)); then
+  #
+  # Start the test builds
+  #
+  echo ". Start test builds"
+  triggerTestBuilds "`echo ${build_platforms[@]}`" "$PRNUM"
+else
+  echo ". No builds to start"
+  curl --silent --write-out '\n' \
+    --request POST \
+    --header "Accept: application/vnd.github+json" \
+    --header "Authorization: token $GITHUB_TOKEN" \
+    --data '{"state":"success","description":"Skipping since no platform builds necessary","context":"Test Build (Keyman)"}' \
+    "https://api.github.com/repos/keymanapp/keyman/statuses/${BUILD_VCS_NUMBER}"
+fi
 
 exit 0
