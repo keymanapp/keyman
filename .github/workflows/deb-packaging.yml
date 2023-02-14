@@ -26,8 +26,9 @@ jobs:
     - name: Set pending status on PR builds
       id: set_status
       if: github.event.client_payload.isTestBuild == 'true'
+      shell: bash
       run: |
-        GIT_SHA=$(git rev-parse HEAD)
+        GIT_SHA=$(git rev-parse "${{ github.event.client_payload.prhead }}")
         echo "GIT_SHA=$GIT_SHA" >> $GITHUB_OUTPUT
         gh api \
           --method POST \
@@ -212,7 +213,7 @@ jobs:
       uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
       with:
         name: libkmnkbp0-0.symbols
-        path: debian/libkmnkbp0-0.symbols
+        path: linux/debian/libkmnkbp0-0.symbols
       if: always()
 
   set_status:
