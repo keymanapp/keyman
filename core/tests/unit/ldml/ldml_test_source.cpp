@@ -24,6 +24,19 @@ namespace tests {
 LdmlTestSource::LdmlTestSource() {
 }
 
+
+LdmlTestSource::~LdmlTestSource() {
+
+}
+
+km_kbp_status LdmlTestSource::get_expected_load_status() {
+  return KM_KBP_STATUS_OK;
+}
+
+bool LdmlTestSource::get_expected_beep() const {
+  return false;
+}
+
 // String trim functions from https://stackoverflow.com/a/217605/1836776
 // trim from start (in place)
 static inline void
@@ -44,8 +57,16 @@ trim(std::string &s) {
   rtrim(s);
 }
 
+LdmlEmbeddedTestSource::LdmlEmbeddedTestSource() {
+
+}
+
+LdmlEmbeddedTestSource::~LdmlEmbeddedTestSource() {
+
+}
+
 std::u16string
-LdmlTestSource::parse_source_string(std::string const &s) {
+LdmlEmbeddedTestSource::parse_source_string(std::string const &s) {
   std::u16string t;
   for (auto p = s.begin(); p != s.end(); p++) {
     if (*p == '\\') {
@@ -80,7 +101,7 @@ LdmlTestSource::parse_source_string(std::string const &s) {
 }
 
 bool
-LdmlTestSource::is_token(const std::string token, std::string &line) {
+LdmlEmbeddedTestSource::is_token(const std::string token, std::string &line) {
   if (line.compare(0, token.length(), token) == 0) {
     line = line.substr(token.length());
     trim(line);
@@ -90,13 +111,7 @@ LdmlTestSource::is_token(const std::string token, std::string &line) {
 }
 
 int
-LdmlTestSource::load_source(
-    const km::kbp::path &path,
-    std::string &keys,
-    std::u16string &expected,
-    std::u16string &context,
-    bool &expected_beep,
-    bool &expected_error) {
+LdmlEmbeddedTestSource::load_source( const km::kbp::path &path ) {
   const std::string s_keys = "@@keys: ";
   const std::string s_expected = "@@expected: ";
   const std::string s_context = "@@context: ";
@@ -142,8 +157,41 @@ LdmlTestSource::load_source(
   return 0;
 }
 
+km_kbp_status
+LdmlEmbeddedTestSource::get_expected_load_status() {
+  return expected_error ? KM_KBP_STATUS_INVALID_KEYBOARD : KM_KBP_STATUS_OK;
+}
+
+const std::u16string&
+LdmlEmbeddedTestSource::get_context() const {
+  return context;
+}
+
+bool LdmlEmbeddedTestSource::get_expected_beep() const {
+  return expected_beep;
+}
+
+const std::u16string& LdmlEmbeddedTestSource::get_expected() const {
+  return expected;
+}
+
+int
+LdmlEmbeddedTestSource::caps_lock_state() {
+  return _caps_lock_on ? KM_KBP_MODIFIER_CAPS : 0;
+}
+
+void
+LdmlEmbeddedTestSource::toggle_caps_lock_state() {
+  _caps_lock_on = !_caps_lock_on;
+}
+
+void
+LdmlEmbeddedTestSource::set_caps_lock_on(bool caps_lock_on) {
+  _caps_lock_on = caps_lock_on;
+}
+
 key_event
-LdmlTestSource::char_to_event(char ch) {
+LdmlEmbeddedTestSource::char_to_event(char ch) {
   assert(ch >= 32);
   return {
       km::kbp::kmx::s_char_to_vkey[(int)ch - 32].vk,
@@ -151,7 +199,7 @@ LdmlTestSource::char_to_event(char ch) {
 }
 
 uint16_t
-LdmlTestSource::get_modifier(std::string const m) {
+LdmlEmbeddedTestSource::get_modifier(std::string const m) {
   for (int i = 0; km::kbp::kmx::s_modifier_names[i].name; i++) {
     if (m == km::kbp::kmx::s_modifier_names[i].name) {
       return km::kbp::kmx::s_modifier_names[i].modifier;
@@ -161,7 +209,7 @@ LdmlTestSource::get_modifier(std::string const m) {
 }
 
 km_kbp_virtual_key
-LdmlTestSource::get_vk(std::string const &vk) {
+LdmlEmbeddedTestSource::get_vk(std::string const &vk) {
   for (int i = 1; i < 256; i++) {
     if (vk == km::kbp::kmx::s_key_names[i]) {
       return i;
@@ -171,7 +219,7 @@ LdmlTestSource::get_vk(std::string const &vk) {
 }
 
 key_event
-LdmlTestSource::vkey_to_event(std::string const &vk_event) {
+LdmlEmbeddedTestSource::vkey_to_event(std::string const &vk_event) {
   // vkey format is MODIFIER MODIFIER K_NAME
   // std::cout << "VK=" << vk_event << std::endl;
 
@@ -197,8 +245,15 @@ LdmlTestSource::vkey_to_event(std::string const &vk_event) {
 }
 
 key_event
-LdmlTestSource::next_key(std::string &keys) {
+LdmlEmbeddedTestSource::next_key() {
+  // mutate this->keys
+  return next_key(keys);
+}
+
+key_event
+LdmlEmbeddedTestSource::next_key(std::string &keys) {
   // Parse the next element of the string, chop it off, and return it
+  // mutates keys
   if (keys.length() == 0)
     return {0, 0};
   char ch = keys[0];
@@ -217,6 +272,7 @@ LdmlTestSource::next_key(std::string &keys) {
     return char_to_event(ch);
   }
 }
+
 
 }  // namespace tests
 }  // namespace km

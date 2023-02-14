@@ -11,33 +11,47 @@ struct key_event {
   uint16_t modifier_state;
 };
 
+/**
+ * pure virtual representing a test source, or a specific subtest
+ */
 class LdmlTestSource {
 public:
   LdmlTestSource();
+  virtual ~LdmlTestSource();
+  virtual key_event next_key()                     = 0;
+  virtual int caps_lock_state()                    = 0;
+  virtual void toggle_caps_lock_state()            = 0;
+  virtual void set_caps_lock_on(bool caps_lock_on) = 0;
+  virtual km_kbp_status get_expected_load_status();
+  virtual const std::u16string &get_context() const  = 0;
+  virtual const std::u16string &get_expected() const = 0;
+  virtual bool get_expected_beep() const;
+};
 
-  int load_source(
-      const km::kbp::path &path,
-      std::string &keys,
-      std::u16string &expected,
-      std::u16string &context,
-      bool &expected_beep,
-      bool &expected_error);
+class LdmlEmbeddedTestSource : public LdmlTestSource {
+public:
+  LdmlEmbeddedTestSource();
+  virtual ~LdmlEmbeddedTestSource();
 
-  key_event next_key(std::string &keys);
+  /**
+   * Load the test_source from comments in the .xml source
+   */
+  int load_source(const km::kbp::path &path);
 
-  int
-  caps_lock_state() {
-    return _caps_lock_on ? KM_KBP_MODIFIER_CAPS : 0;
-  }
+  virtual key_event next_key();
 
-  void
-  toggle_caps_lock_state() {
-    _caps_lock_on = !_caps_lock_on;
-  }
+  virtual int
+  caps_lock_state();
 
-  void set_caps_lock_on(bool caps_lock_on) {
-    _caps_lock_on = caps_lock_on;
-  }
+  virtual void
+  toggle_caps_lock_state();
+
+  virtual void set_caps_lock_on(bool caps_lock_on);
+
+  virtual km_kbp_status get_expected_load_status();
+  virtual const std::u16string &get_context() const;
+  virtual bool get_expected_beep() const;
+  virtual const std::u16string &get_expected() const;
 
 private:
   bool _caps_lock_on = false;
@@ -48,6 +62,12 @@ private:
   uint16_t get_modifier(std::string const m);
   km_kbp_virtual_key get_vk(std::string const &vk);
   key_event vkey_to_event(std::string const &vk_event);
+  key_event next_key(std::string &keys);
+
+  std::string keys = "";
+  std::u16string expected = u"", context = u"";
+  bool expected_beep = false;
+  bool expected_error = false;
 };
 
 }  // namespace tests

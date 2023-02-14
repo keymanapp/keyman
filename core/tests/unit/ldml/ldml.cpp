@@ -144,26 +144,16 @@ apply_action(
 }
 
 int
-run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
-  std::string keys = "";
-  std::u16string expected = u"", context = u"";
-  bool expected_beep = false;
-  bool expected_error = false;
-  km::tests::LdmlTestSource test_source;
+run_test(const km::kbp::path &source, const km::kbp::path &compiled, km::tests::LdmlTestSource& test_source) {
 
-  int result = test_source.load_source(source, keys, expected, context, expected_beep, expected_error);
-  if (result != 0) return result;
-
-  std::cout << "source file   = " << source << std::endl
-            << "compiled file = " << compiled << std::endl;
 
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;
 
-  const km_kbp_status expect_load_status = expected_error ? KM_KBP_STATUS_INVALID_KEYBOARD : KM_KBP_STATUS_OK;
+  const km_kbp_status expect_load_status = test_source.get_expected_load_status();
   assert_equal(km_kbp_keyboard_load(compiled.c_str(), &test_kb), expect_load_status);
 
-  if (expected_error) {
+  if (expect_load_status != KM_KBP_STATUS_OK) {
     std::cout << "Keyboard was expected to be invalid, so exiting " << std::endl;
     return 0;
   }
@@ -173,7 +163,7 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
 
   // Setup context
   km_kbp_context_item *citems = nullptr;
-  try_status(km_kbp_context_items_from_utf16(context.c_str(), &citems));
+  try_status(km_kbp_context_items_from_utf16(test_source.get_context().c_str(), &citems));
   try_status(km_kbp_context_set(km_kbp_state_context(test_state), citems));
 
   // Make a copy of the setup context for the test
@@ -185,10 +175,10 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
   km_kbp_context_items_dispose(citems);
 
   // Setup baseline text store
-  std::u16string text_store = context;
+  std::u16string text_store = test_source.get_context();
 
   // Run through key events, applying output for each event
-  for (auto p = test_source.next_key(keys); p.vk != 0; p = test_source.next_key(keys)) {
+  for (auto p = test_source.next_key(); p.vk != 0; p = test_source.next_key()) {
     // Because a normal system tracks caps lock state itself,
     // we mimic that in the tests. We assume caps lock state is
     // updated on key_down before the processor receives the
@@ -231,7 +221,7 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
   }
 
   // Test if the beep action was as expected
-  if (g_beep_found != expected_beep)
+  if (g_beep_found != test_source.get_expected_beep())
     return __LINE__;
 
   // Compare final output - retrieve internal context
@@ -251,15 +241,15 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
 
   km_kbp_context_items_dispose(citems);
 
-  std::cout << "expected  : " << string_to_hex(expected) << " [" << expected << "]" << std::endl;
+  std::cout << "expected  : " << string_to_hex(test_source.get_expected()) << " [" << test_source.get_expected() << "]" << std::endl;
   std::cout << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
   std::cout << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
 
   // Compare internal context with expected result
-  if (buf != expected) return __LINE__;
+  if (buf != test_source.get_expected()) return __LINE__;
 
   // Compare text store with expected result
-  if (text_store != expected) return __LINE__;
+  if (text_store != test_source.get_expected()) return __LINE__;
 
   // Destroy them
   km_kbp_state_dispose(test_state);
@@ -267,6 +257,31 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
 
   return 0;
 }
+
+/**
+ * Run all tests for this keyboard
+ */
+int run_all_tests(const km::kbp::path &source, const km::kbp::path &compiled) {
+  std::cout << "source file   = " << source << std::endl
+            << "compiled file = " << compiled << std::endl;
+
+  km::tests::LdmlEmbeddedTestSource embedded_test_source;
+
+  int embedded_result = embedded_test_source.load_source(source);
+  if (embedded_result == 0) {
+    // embedded loaded OK, try it
+    std::cout << "TEST: " << source << " (embedded)" << std::endl;
+    embedded_result = run_test(source, compiled, embedded_test_source);
+  } else {
+    // TODO-LDML: load JSON here
+    // return embedded_result;
+  }
+
+  // TODO-LDML: aggregate result
+  return embedded_result;
+}
+
+
 
 constexpr const auto help_str =
     "\
@@ -299,7 +314,7 @@ int main(int argc, char *argv[]) {
   }
   console_color::enabled = console_color::isaterminal() || arg_color;
 
-  int rc = run_test(argv[first_arg], argv[first_arg + 1]);
+  int rc = run_all_tests(argv[first_arg], argv[first_arg + 1]);
   if (rc != 0) {
     std::cerr << "FAILED" << std::endl;
   }
