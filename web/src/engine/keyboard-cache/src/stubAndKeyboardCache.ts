@@ -85,4 +85,23 @@ export default class StubAndKeyboardCache {
 
     return stubTable[languageID];
   }
+
+  /**
+   * Removes all metadata (stubs) associated with a specific keyboard from the cache, optionally
+   * removing the cached keyboard as well.
+   * @param keyboard Either the keyboard ID or `Keyboard` instance
+   * @param purge If `true`, will also purge the `Keyboard` instance itself from the cache.
+   *              If `false`, only forgets the metadata (stubs).
+   */
+  forgetKeyboard(keyboard: string | Keyboard, purge: boolean = false) {
+    let id: string = (keyboard instanceof Keyboard) ? keyboard.id : keyboard;
+
+    if(this.stubSetTable[id]) {
+      delete this.stubSetTable[id];
+    }
+
+    if(purge && this.keyboardTable[id]) {
+      delete this.keyboardTable[id];
+    }
+  }
 }
