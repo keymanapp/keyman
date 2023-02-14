@@ -7,6 +7,7 @@
 #include <io.h>
 #include <string>
 #include "CheckFilenameConsistency.h"
+#include "kmx_u16.h"
 
 namespace kmcmp {
   extern  KMX_CHAR CompileDir[MAX_PATH];
@@ -66,6 +67,7 @@ KMX_DWORD CheckFilenameConsistency( KMX_CHAR const * Filename, bool ReportMissin
   return result;
 }
 
+
 KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissingFile) {
   // not ready yet: needs more attention-> e.g. _wfindfirst,... and common includes for non-Windows platforms
   KMX_WCHAR Name[_MAX_PATH], FName[_MAX_FNAME], Ext[_MAX_EXT];
@@ -82,14 +84,7 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   }
 
 #if defined(_WIN32) || defined(_WIN64)
-  //  convert char16_t*  -> std::u16string -> std::string -> std::wstring -> wchar_t*
-  //  char16_t* -> std::u16string
-  std::u16string u16str(Name);
-  //  std::u16string -> std::string
-  std::string stri = string_from_u16string(u16str);
-  //  std::string -> std::wstring
-  std::wstring  wstr = wstring_from_string(stri);
-  //  std::wstring -> wchar_t*
+  std::wstring  wstr = convert_pchar16T_To_pwcharT(Name);
   const KMX_WCHART* wchptr = wstr.c_str();
 
   nfile = _wfsopen(wchptr, L"rb", _SH_DENYWR);
