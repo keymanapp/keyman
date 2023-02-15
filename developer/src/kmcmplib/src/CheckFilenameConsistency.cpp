@@ -92,7 +92,6 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   n = _wfindfirst(wchptr, &fi);
   _findclose(n);
 #endif
-
   if (nfile == NULL) {
     if (ReportMissingFile) {
       u16sprintf(ErrExtraW,256,L"referenced file %ls",Filename);
