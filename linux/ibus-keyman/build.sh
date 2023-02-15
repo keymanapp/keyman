@@ -14,10 +14,9 @@ builder_describe \
   "Build ibus-keyman." \
   "clean" \
   "configure" \
-  "build+" \
+  "build" \
   "test" \
   ":engine" \
-  "all                       clean, configure, and build" \
   "install                   install artifacts" \
   "uninstall                 uninstall artifacts" \
   "--debug,-d                Debug build" \
@@ -27,10 +26,6 @@ builder_describe \
 #  "@/core configure build"
 
 builder_parse "$@"
-
-if builder_has_action all; then
-  _builder_chosen_action_targets=("clean" "configure" "build")
-fi
 
 if builder_has_option --debug; then
   MESON_TARGET=debug
