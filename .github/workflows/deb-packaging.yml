@@ -28,7 +28,7 @@ jobs:
       if: github.event.client_payload.isTestBuild == 'true'
       shell: bash
       run: |
-        GIT_SHA="${{ github.event.client_payload.sha }}")
+        GIT_SHA="${{ github.event.client_payload.sha }}"
         echo "GIT_SHA=$GIT_SHA" >> $GITHUB_OUTPUT
         gh api \
           --method POST \
