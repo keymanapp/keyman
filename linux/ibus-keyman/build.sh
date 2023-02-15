@@ -34,6 +34,9 @@ fi
 
 if builder_has_option --debug; then
   MESON_TARGET=debug
+  export CPPFLAGS=-DG_MESSAGES_DEBUG
+  export CFLAGS="-O0"
+  export CXXFLAGS="-O0"
 else
   MESON_TARGET=release
 fi
