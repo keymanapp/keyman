@@ -131,7 +131,7 @@ apply_action(
     std::cout << "action: context invalidated (markers cleared)" << std::endl;
     break;
   case KM_KBP_IT_EMIT_KEYSTROKE:
-    std::cout << "action: emit keystroke" << std::endl;
+    std::cout << "action: emit kestroke" << std::endl;
     break;
   case KM_KBP_IT_CAPSLOCK:
     std::cout << "action: capsLock " << act.capsLock << std::endl;
@@ -143,10 +143,40 @@ apply_action(
   }
 }
 
+/**
+ * verify the current context
+*/
+void
+verify_context(std::u16string& text_store, km_kbp_state* &test_state, std::vector<km_kbp_context_item> &test_context) {
+      // Compare context and text store at each step - should be identical
+    size_t n = 0;
+    km_kbp_context_item* citems = nullptr;
+    try_status(km_kbp_context_get(km_kbp_state_context(test_state), &citems));
+    try_status(km_kbp_context_items_to_utf16(citems, nullptr, &n));
+    km_kbp_cp *buf = new km_kbp_cp[n];
+    try_status(km_kbp_context_items_to_utf16(citems, buf, &n));
+    std::cout << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
+
+    // Verify that both our local test_context and the core's test_state.context have
+    // not diverged
+    auto ci = citems;
+    for (auto test_ci = test_context.begin(); ci->type != KM_KBP_CT_END || test_ci != test_context.end(); ci++, test_ci++) {
+      assert(ci->type != KM_KBP_CT_END && test_ci != test_context.end());  // Verify that both lists are same length
+      assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
+    }
+
+    km_kbp_context_items_dispose(citems);
+    if (text_store != buf) {
+      std::cerr << "text store has diverged from buf" << std::endl;
+      std::cerr << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
+      assert(false);
+    }
+    delete [] buf;
+
+}
+
 int
 run_test(const km::kbp::path &source, const km::kbp::path &compiled, km::tests::LdmlTestSource& test_source) {
-
-
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;
 
@@ -171,52 +201,46 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled, km::tests::
   for(km_kbp_context_item *ci = citems; ci->type != KM_KBP_CT_END; ci++) {
     test_context.emplace_back(*ci);
   }
-
   km_kbp_context_items_dispose(citems);
 
   // Setup baseline text store
   std::u16string text_store = test_source.get_context();
 
-  // Run through key events, applying output for each event
-  for (auto p = test_source.next_key(); p.vk != 0; p = test_source.next_key()) {
-    // Because a normal system tracks caps lock state itself,
-    // we mimic that in the tests. We assume caps lock state is
-    // updated on key_down before the processor receives the
-    // event.
-    if (p.vk == KM_KBP_VKEY_CAPS) {
-      test_source.toggle_caps_lock_state();
-    }
+  km::tests::ldml_action action;
 
-    for (auto key_down = 1; key_down >= 0; key_down--) {
-      // expected error only applies to key down
-      try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down, KM_KBP_EVENT_FLAG_DEFAULT)); // TODO-LDML: for now. Should send touch and hardware events.
+  // verify at beginning
+  verify_context(text_store, test_state, test_context);
 
-      for (auto act = km_kbp_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {
-        apply_action(test_state, *act, text_store, test_context, test_source);
+  // Run through actions, applying output for each event
+  for (test_source.next_action(action); action.type != km::tests::LDML_ACTION_DONE; test_source.next_action(action)) {
+    if (action.type == km::tests::LDML_ACTION_KEY_EVENT) {
+      auto &p = action.k;
+      std::cout << "- key action: 0x" << std::hex << p.vk << "/modifier 0x" << p.modifier_state << std::dec << std::endl;
+      // Because a normal system tracks caps lock state itself,
+      // we mimic that in the tests. We assume caps lock state is
+      // updated on key_down before the processor receives the
+      // event.
+      if (p.vk == KM_KBP_VKEY_CAPS) {
+        test_source.toggle_caps_lock_state();
       }
-    }
 
-    // Compare context and text store at each step - should be identical
-    size_t n = 0;
-    try_status(km_kbp_context_get(km_kbp_state_context(test_state), &citems));
-    try_status(km_kbp_context_items_to_utf16(citems, nullptr, &n));
-    km_kbp_cp *buf = new km_kbp_cp[n];
-    try_status(km_kbp_context_items_to_utf16(citems, buf, &n));
+      for (auto key_down = 1; key_down >= 0; key_down--) {
+        // expected error only applies to key down
+        try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down, KM_KBP_EVENT_FLAG_DEFAULT)); // TODO-LDML: for now. Should send touch and hardware events.
 
-    // Verify that both our local test_context and the core's test_state.context have
-    // not diverged
-    auto ci = citems;
-    for(auto test_ci = test_context.begin(); ci->type != KM_KBP_CT_END || test_ci != test_context.end(); ci++, test_ci++) {
-      assert(ci->type != KM_KBP_CT_END && test_ci != test_context.end()); // Verify that both lists are same length
-      assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
-    }
-
-    km_kbp_context_items_dispose(citems);
-    if (text_store != buf) {
-      std::cerr << "text store has diverged from buf" << std::endl;
-      std::cerr << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
-      std::cerr << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
-      assert(false);
+        for (auto act = km_kbp_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {
+          apply_action(test_state, *act, text_store, test_context, test_source);
+        }
+      }
+      verify_context(text_store, test_state, test_context);
+    } else if (action.type == km::tests::LDML_ACTION_EMIT_STRING) {
+      std::cerr << "TODO-LDML LDML_ACTION_EMIT_STRING" << std::endl;
+    } else if (action.type == km::tests::LDML_ACTION_CHECK_EXPECTED) {
+      std::cout << "- check expected" << std::endl;
+      std::cout << "expected  : " << string_to_hex(action.string) << " [" << action.string << "]" << std::endl;
+      std::cout << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
+      // Compare internal context with expected result
+      if (text_store != action.string) return __LINE__;
     }
   }
 
@@ -224,15 +248,13 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled, km::tests::
   if (g_beep_found != test_source.get_expected_beep())
     return __LINE__;
 
-  // Compare final output - retrieve internal context
-  size_t n = 0;
-  try_status(km_kbp_context_get(km_kbp_state_context(test_state), &citems));
-  try_status(km_kbp_context_items_to_utf16(citems, nullptr, &n));
-  km_kbp_cp *buf = new km_kbp_cp[n];
-  try_status(km_kbp_context_items_to_utf16(citems, buf, &n));
+
+  // re-verify at end.
+  verify_context(text_store, test_state, test_context);
 
   // Verify that both our local test_context and the core's test_state.context have
   // not diverged
+  try_status(km_kbp_context_get(km_kbp_state_context(test_state), &citems));
   auto ci = citems;
   for(auto test_ci = test_context.begin(); ci->type != KM_KBP_CT_END || test_ci != test_context.end(); ci++, test_ci++) {
     assert(ci->type != KM_KBP_CT_END && test_ci != test_context.end()); // Verify that both lists are same length
@@ -240,16 +262,6 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled, km::tests::
   }
 
   km_kbp_context_items_dispose(citems);
-
-  std::cout << "expected  : " << string_to_hex(test_source.get_expected()) << " [" << test_source.get_expected() << "]" << std::endl;
-  std::cout << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
-  std::cout << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
-
-  // Compare internal context with expected result
-  if (buf != test_source.get_expected()) return __LINE__;
-
-  // Compare text store with expected result
-  if (text_store != test_source.get_expected()) return __LINE__;
 
   // Destroy them
   km_kbp_state_dispose(test_state);
@@ -268,17 +280,65 @@ int run_all_tests(const km::kbp::path &source, const km::kbp::path &compiled) {
   km::tests::LdmlEmbeddedTestSource embedded_test_source;
 
   int embedded_result = embedded_test_source.load_source(source);
+
   if (embedded_result == 0) {
     // embedded loaded OK, try it
-    std::cout << "TEST: " << source << " (embedded)" << std::endl;
+    std::cout << "TEST: " << source.name() << " (embedded)" << std::endl;
     embedded_result = run_test(source, compiled, embedded_test_source);
   } else {
-    // TODO-LDML: load JSON here
-    // return embedded_result;
+    embedded_result = -1; // load failed
   }
 
-  // TODO-LDML: aggregate result
-  return embedded_result;
+  km::tests::LdmlJsonTestSourceFactory json_factory;
+  // adjust path
+
+  const auto json_path = km::tests::LdmlJsonTestSourceFactory::kmx_to_test_json(compiled);
+  int json_result = json_factory.load(compiled, json_path);
+  if (json_result != -1) {
+    const km::tests::JsonTestMap& json_tests = json_factory.get_tests();
+
+    assert(json_tests.size() > 0);
+    // Loop over all tests
+    for (const auto& n : json_tests) {
+      std::cout << "TEST: " << json_path.stem() << "/" << n.first << std::endl;
+      int sub_test = run_test(source, compiled, *n.second);
+      if (sub_test != 0) {
+        std::cout << " FAIL: " << json_path.stem() << "/" << n.first << std::endl;
+        json_result = sub_test; // set to last failure
+      } else {
+        std::cout << " PASS: " << json_path.stem() << "/" << n.first << std::endl;
+      }
+    }
+    std::cout << " " << json_tests.size() << " JSON test(s)  in "  << json_path.stem() << std::endl;
+  }
+
+
+  // OK.
+  if (embedded_result == -1) {
+    std::cout << "Note: No embedded test." << std::endl;
+  }
+  if (json_result == -1) {
+    std::cout << "Note: No json test." << std::endl;
+  }
+
+  if (embedded_result == -1 && json_result == -1) {
+    // Can't both be missing.
+    std::cout << "Error: Need either embedded test (@@ directives in " << source.name() << ") or " << json_path.name() << std::endl;
+    return __LINE__;
+  } else if (embedded_result == -1) {
+    return json_result; // Return JSON if embedded missing.
+  } else if (json_result == -1) {
+    return embedded_result; // Return embedded if JSON missing
+  }
+
+  // we have both tests.
+  if (embedded_result == 0) {
+    return json_result; // Both passed or JSON failed
+  } else if(json_result == 0) {
+    return embedded_result; // Embedded may have failed.
+  } else {
+    return json_result;
+  }
 }
 
 

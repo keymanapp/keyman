@@ -668,6 +668,16 @@ COMP_KMXPLUS_KEY2_Helper::getKeys(KMX_DWORD i) const {
   return keys + i;
 }
 
+const COMP_KMXPLUS_KEY2_KEY *
+COMP_KMXPLUS_KEY2_Helper::findKey(KMX_DWORD strId) const {
+  for (KMX_DWORD i = 0; i < key2->keyCount; i++) {
+    if (keys[i].id == strId) {
+      return &keys[i];
+    }
+  }
+  return nullptr;
+}
+
 const COMP_KMXPLUS_KEY2_FLICK_LIST *
 COMP_KMXPLUS_KEY2_Helper::getFlickLists(KMX_DWORD i) const {
   if (!valid() || i >= key2->flicksCount) {
@@ -877,6 +887,20 @@ COMP_KMXPLUS_STRS::get(KMX_DWORD entry) const {
     const KMX_WCHAR* start = reinterpret_cast<const KMX_WCHAR*>(thisptr+offset);
     return std::u16string(start, length);
 }
+
+KMX_DWORD COMP_KMXPLUS_STRS::find(const std::u16string& s) const {
+  if (s.empty()) {
+    return 0; // shortcut
+  }
+  // TODO-LDML: You're not going to search these linearly, reinterpreting each time??!
+  for (KMX_DWORD i = 0; i<count; i++) {
+    if (s == get(i)) {
+      return i;
+    }
+  }
+  return 0; // not found
+}
+
 
 }  // namespace kmx
 }  // namespace kbp

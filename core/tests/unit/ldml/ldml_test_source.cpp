@@ -8,9 +8,23 @@
 #include <sstream>
 #include <string>
 #include <type_traits>
+#include <codecvt>
+
+#if 0
+// TODO-LDML If we need to avoid exceptions in JSON
+#define JSON_TRY_USER if(true)
+#define JSON_CATCH_USER(exception) if(false)
+#define JSON_THROW_USER(exception) { return __LINE__; } // get out
+#endif
+
+#include <json.hpp>
 
 #include <kmx/kmx_processevent.h> // for char to vk mapping tables
 #include <kmx/kmx_xstring.h> // for surrogate pair macros
+#include <kmx/kmx_plus.h>
+#include "ldml/keyboardprocessor_ldml.h"
+#include "ldml/ldml_processor.hpp"
+
 
 #include "path.hpp"
 #include "state.hpp"
@@ -18,8 +32,21 @@
 
 #include "ldml_test_source.hpp"
 
+#define assert_or_return(expr) if(!(expr)) { \
+  std::wcerr << __FILE__ << ":" << __LINE__ << ": " << \
+  console_color::fg(console_color::BRIGHT_RED) \
+             << "warning: " << (#expr) \
+             << console_color::reset() \
+             << std::endl; \
+  return __LINE__; \
+}
+
+#define TEST_JSON_SUFFIX "-test.json"
 namespace km {
 namespace tests {
+
+#include "../test_color.h"
+
 
 LdmlTestSource::LdmlTestSource() {
 }
@@ -66,7 +93,7 @@ LdmlEmbeddedTestSource::~LdmlEmbeddedTestSource() {
 }
 
 std::u16string
-LdmlEmbeddedTestSource::parse_source_string(std::string const &s) {
+LdmlTestSource::parse_source_string(std::string const &s) {
   std::u16string t;
   for (auto p = s.begin(); p != s.end(); p++) {
     if (*p == '\\') {
@@ -79,6 +106,45 @@ LdmlEmbeddedTestSource::parse_source_string(std::string const &s) {
         size_t n;
         std::string s1 = s.substr(p - s.begin(), 8);
         v              = std::stoul(s1, &n, 16);
+        // Allow deadkey_number (U+0001) characters and onward
+        assert(v >= 0x0001 && v <= 0x10FFFF);
+        p += n - 1;
+        if (v < 0x10000) {
+          t += km_kbp_cp(v);
+        } else {
+          t += km_kbp_cp(Uni_UTF32ToSurrogate1(v));
+          t += km_kbp_cp(Uni_UTF32ToSurrogate2(v));
+        }
+      } else if (*p == 'd') {
+        // Deadkey
+        // TODO, not yet supported
+        assert(false);
+      }
+    } else {
+      t += *p;
+    }
+  }
+  return t;
+}
+
+std::u16string
+LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
+  // convert from utf-8 to utf-16 first
+  std::u16string s = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.from_bytes(u8s);
+  std::u16string t;
+  for (auto p = s.begin(); p != s.end(); p++) {
+    if (*p == '\\') {
+      p++;
+      km_kbp_usv v;
+      assert(p != s.end());
+      if (*p == 'u' || *p == 'U') {
+        // Unicode value
+        p++;
+        size_t n;
+        std::u16string s1 = s.substr(p - s.begin(), 8);
+        // TODO-LDML: convert back first?
+        std::string s1b = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(s1);
+        v              = std::stoul(s1b, &n, 16);
         // Allow deadkey_number (U+0001) characters and onward
         assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n - 1;
@@ -145,7 +211,7 @@ LdmlEmbeddedTestSource::load_source( const km::kbp::path &path ) {
     } else if (is_token(s_context, line)) {
       context = parse_source_string(line);
     } else if (is_token(s_capsLock, line)) {
-      _caps_lock_on = parse_source_string(line).compare(u"1") == 0;
+      set_caps_lock_on(parse_source_string(line).compare(u"1") == 0);
     }
   }
 
@@ -171,27 +237,23 @@ bool LdmlEmbeddedTestSource::get_expected_beep() const {
   return expected_beep;
 }
 
-const std::u16string& LdmlEmbeddedTestSource::get_expected() const {
-  return expected;
-}
-
 int
-LdmlEmbeddedTestSource::caps_lock_state() {
+LdmlTestSource::caps_lock_state() {
   return _caps_lock_on ? KM_KBP_MODIFIER_CAPS : 0;
 }
 
 void
-LdmlEmbeddedTestSource::toggle_caps_lock_state() {
+LdmlTestSource::toggle_caps_lock_state() {
   _caps_lock_on = !_caps_lock_on;
 }
 
 void
-LdmlEmbeddedTestSource::set_caps_lock_on(bool caps_lock_on) {
+LdmlTestSource::set_caps_lock_on(bool caps_lock_on) {
   _caps_lock_on = caps_lock_on;
 }
 
 key_event
-LdmlEmbeddedTestSource::char_to_event(char ch) {
+LdmlTestSource::char_to_event(char ch) {
   assert(ch >= 32);
   return {
       km::kbp::kmx::s_char_to_vkey[(int)ch - 32].vk,
@@ -199,7 +261,7 @@ LdmlEmbeddedTestSource::char_to_event(char ch) {
 }
 
 uint16_t
-LdmlEmbeddedTestSource::get_modifier(std::string const m) {
+LdmlTestSource::get_modifier(std::string const m) {
   for (int i = 0; km::kbp::kmx::s_modifier_names[i].name; i++) {
     if (m == km::kbp::kmx::s_modifier_names[i].name) {
       return km::kbp::kmx::s_modifier_names[i].modifier;
@@ -209,7 +271,7 @@ LdmlEmbeddedTestSource::get_modifier(std::string const m) {
 }
 
 km_kbp_virtual_key
-LdmlEmbeddedTestSource::get_vk(std::string const &vk) {
+LdmlTestSource::get_vk(std::string const &vk) {
   for (int i = 1; i < 256; i++) {
     if (vk == km::kbp::kmx::s_key_names[i]) {
       return i;
@@ -244,6 +306,24 @@ LdmlEmbeddedTestSource::vkey_to_event(std::string const &vk_event) {
   return {vk, modifier_state};
 }
 
+void
+LdmlEmbeddedTestSource::next_action(ldml_action &fillin) {
+  if (is_done) {
+    // We were already done. return done.
+    fillin.type = LDML_ACTION_DONE;
+    return;
+  } else if(keys.empty()) {
+    // Got to the end of the keys. time to check
+    fillin.type = LDML_ACTION_CHECK_EXPECTED;
+    fillin.string = expected; // copy expected
+    is_done = true; // so we get DONE next time
+  } else {
+    fillin.type = LDML_ACTION_KEY_EVENT;
+    fillin.k = next_key();
+  }
+}
+
+
 key_event
 LdmlEmbeddedTestSource::next_key() {
   // mutate this->keys
@@ -271,6 +351,201 @@ LdmlEmbeddedTestSource::next_key(std::string &keys) {
     keys.erase(0, 1);
     return char_to_event(ch);
   }
+}
+
+
+class LdmlJsonTestSource : public LdmlTestSource {
+public:
+  LdmlJsonTestSource(const std::string &path, km::kbp::kmx::kmx_plus *kmxplus);
+  virtual ~LdmlJsonTestSource();
+  virtual const std::u16string &get_context() const;
+  int load(const nlohmann::json &test);
+  virtual void next_action(ldml_action &fillin);
+private:
+  std::string path;
+  nlohmann::json data;  // maybe
+  std::u16string context;
+  std::u16string expected;
+  /**
+   * Which action are we on?
+  */
+  std::size_t action_index = -1;
+  const km::kbp::kmx::kmx_plus *kmxplus;
+  /**
+   * Helpers
+  */
+  void set_key_from_id(key_event& k, const std::u16string& id);
+};
+
+LdmlJsonTestSource::LdmlJsonTestSource(const std::string &path, km::kbp::kmx::kmx_plus *k)
+:path(path), kmxplus(k) {
+
+}
+
+LdmlJsonTestSource::~LdmlJsonTestSource() {
+}
+
+void LdmlJsonTestSource::set_key_from_id(key_event& k, const std::u16string& id) {
+  k = {0, 0};  // set to a null value at first.
+
+  assert(kmxplus != nullptr);
+  // lookup the id
+  assert(kmxplus->key2 != nullptr);
+
+  assert(kmxplus->key2Helper.valid());
+
+  // TODO-LDML: optimize. or optimise.
+
+  // First, find the string
+  KMX_DWORD strId = kmxplus->strs->find(id);
+  assert(strId != 0);
+  if (strId == 0) { // will also get here if id is empty.
+    k = {0, 0};
+    return;
+  }
+
+  // OK. Now we can search the keybag
+  auto *key2 = kmxplus->key2Helper.findKey(strId);
+  assert(key2 != nullptr);
+  if (key2 == nullptr) {
+    k = {0, 0};
+    return;
+  }
+
+  k.vk = key2->vkey;
+  // TODO: modifier!
+}
+
+
+void
+LdmlJsonTestSource::next_action(ldml_action &fillin) {
+  if (action_index == data.size()) {
+    // at end, done
+    fillin.type = LDML_ACTION_DONE;
+    return;
+  }
+
+  action_index++;
+  auto action   = data["/actions"_json_pointer].at(action_index);
+  std::cerr << "ACTION: " << action << std::endl;
+
+  // is it a check event?
+  auto as_check = action["/check/result"_json_pointer];
+  if (as_check.is_string()) {
+    fillin.type   = LDML_ACTION_CHECK_EXPECTED;
+    fillin.string = LdmlTestSource::parse_u8_source_string(as_check.get<std::string>());
+    return;
+  }
+
+  // is it a keystroke by id?
+  auto as_key  = action["/keystroke/key"_json_pointer];
+  if (as_key.is_string()) {
+    fillin.type   = LDML_ACTION_KEY_EVENT;
+    auto keyId = LdmlTestSource::parse_u8_source_string(as_key.get<std::string>());
+    // now, look up the key
+    set_key_from_id(fillin.k, keyId);
+    return;
+  }
+  // TODO-LDML: handle gesture, etc
+
+  auto as_emit = action["/emit/to"_json_pointer];
+  if (as_emit.is_string()) {
+    fillin.type   = LDML_ACTION_EMIT_STRING;
+    fillin.string = LdmlTestSource::parse_u8_source_string(as_emit.get<std::string>());
+    return;
+  }
+
+  // TODO-LDML: error passthrough
+  std::cerr << "TODO-LDML: Error, unknown/unhandled action: " << action << std::endl;
+  fillin.type = LDML_ACTION_DONE;
+}
+
+const std::u16string &
+LdmlJsonTestSource::get_context() const {
+  return context;
+}
+
+int LdmlJsonTestSource::load(const nlohmann::json &data) {
+  this->data        = data;  // TODO-LDML
+  auto startContext = data["/startContext/to"_json_pointer];
+  context = LdmlTestSource::parse_u8_source_string(startContext);
+
+  return 0;
+}
+
+LdmlJsonTestSourceFactory::LdmlJsonTestSourceFactory() : test_map() {
+}
+
+km::kbp::path
+LdmlJsonTestSourceFactory::kmx_to_test_json(const km::kbp::path &kmx) {
+  km::kbp::path p = kmx;
+  p.replace_extension(TEST_JSON_SUFFIX);
+  return p;
+}
+
+int LdmlJsonTestSourceFactory::load(const km::kbp::path &compiled, const km::kbp::path &path) {
+  std::ifstream json_file(path.native());
+  if (!json_file) {
+    return -1; // no file
+  }
+  nlohmann::json data = nlohmann::json::parse(json_file);
+  if (data.empty()) {
+    return __LINE__; // empty
+  }
+
+  // check and load the KMX (yes, once again)
+  if(!km::kbp::ldml_processor::is_kmxplus_file(compiled, rawdata)) {
+    std::cerr << "Reading KMX for test purposes failed: " << compiled << std::endl;
+    return __LINE__;
+  }
+
+  auto comp_keyboard = (const km::kbp::kmx::COMP_KEYBOARD*)rawdata.data();
+  // initialize the kmxplus object with our copy
+  kmxplus.reset(new km::kbp::kmx::kmx_plus(comp_keyboard, rawdata.size()));
+
+  if (!kmxplus->is_valid()) {
+    std::cerr << "kmx_plus invalid" << std::endl;
+    return __LINE__;
+  }
+
+  if (!kmxplus->key2Helper.valid()) {
+    std::cerr << "kmx_plus invalid" << std::endl;
+    return __LINE__;
+  }
+
+  auto conformsTo = data["/keyboardTest/conformsTo"_json_pointer].get<std::string>();
+  assert_or_return(std::string(LDML_CLDR_VERSION_LATEST) == conformsTo);
+  auto info_keyboard = data["/keyboardTest/info/keyboard"_json_pointer].get<std::string>();
+  auto info_author = data["/keyboardTest/info/author"_json_pointer].get<std::string>();
+  auto info_name = data["/keyboardTest/info/name"_json_pointer].get<std::string>();
+  // TODO-LDML: store these elsewhere?
+  std::cout << "JSON: reading " << info_name << " test of " << info_keyboard << " by " << info_author << std::endl;
+
+  // TODO-LDML: repertoire test
+
+  auto all_tests = data["/keyboardTest/tests"_json_pointer];
+  assert_or_return((!all_tests.empty()) && (all_tests.size() > 0));
+
+  for(auto tests : all_tests) {
+    auto tests_name = tests["/name"_json_pointer].get<std::string>();
+    for (auto test : tests["/test"_json_pointer]) {
+      auto test_name = test["/name"_json_pointer].get<std::string>();
+      std::string test_path;
+      test_path.append(tests_name).append("/").append(test_name);
+      std::cout << "JSON: reading " << info_name << "/" << test_path << std::endl;
+
+      std::unique_ptr<LdmlJsonTestSource> subtest(new LdmlJsonTestSource(test_path, kmxplus.get()));
+      assert_or_return(subtest->load(test) == 0);
+      test_map[test_path] = std::unique_ptr<LdmlTestSource>(subtest.release());
+    }
+  }
+
+  return 0;
+}
+
+const JsonTestMap&
+LdmlJsonTestSourceFactory::get_tests() const {
+  return test_map;
 }
 
 
