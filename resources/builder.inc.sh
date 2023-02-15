@@ -620,7 +620,7 @@ builder_describe() {
 
     if [[ $value =~ ^: ]]; then
       # Parameter is a target
-      local target_path
+      local target_path=
       if [[ $value =~ = ]]; then
         # The target has a custom child project path
         target_path="$(echo "$value" | cut -d= -f 2 -)"
