@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.49 alpha 2023-02-15
+
+* feat(linux): Pass PR# in the event type (#8221)
+* feat(linux): Implement uploading of packages in packaging GHA (#8223)
+* fix(linux): Fix GHA package build (#8225)
+* fix(linux): Another fix for GHA package build (#8228)
+
 ## 17.0.48 alpha 2023-02-14
 
 * fix(developer): Select BCP47 Code dialog inconsistencies (#8179)
