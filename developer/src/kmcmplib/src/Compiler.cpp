@@ -326,7 +326,7 @@ typedef struct _COMPILER_OPTIONS {
 typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
 
 extern "C" BOOL __declspec(dllexport) kmcmp_SetCompilerOptions(PCOMPILER_OPTIONS options) {
-  printf("°°-> changed to SetCompilerOptions() of kmcmplib \n");
+  //printf("°°-> changed to SetCompilerOptions() of kmcmplib \n");
   if(!options || options->dwSize < sizeof(COMPILER_OPTIONS)) {
     return FALSE;
   }
@@ -342,7 +342,7 @@ extern "C" BOOL __declspec(dllexport) kmcmp_CompileKeyboardFile(PKMX_STR pszInfi
   KMX_DWORD len;
   KMX_CHAR str[260];
 
-  printf("°°-> changed to CompileKeyboardFile() of kmcmplib \n");
+  //printf("°°-> changed to CompileKeyboardFile() of kmcmplib \n");
 
   kmcmp::FSaveDebug = ASaveDebug;
   kmcmp::FCompilerWarningsAsErrors = ACompilerWarningsAsErrors;   // I4865
@@ -433,7 +433,7 @@ extern "C" BOOL __declspec(dllexport) kmcmp_CompileKeyboardFile(PKMX_STR pszInfi
 
 extern "C" BOOL __declspec(dllexport)  kmcmp_CompileKeyboardFileToBuffer(PKMX_STR pszInfile, PFILE_KEYBOARD pfkBuffer, KMX_BOOL ACompilerWarningsAsErrors, KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc, int Target)   // I4865   // I4866
 {
-  printf("°°-> changed to CompileKeyboardFileToBuffer() of kmcmplib \n");
+  //printf("°°-> changed to CompileKeyboardFileToBuffer() of kmcmplib \n");
   FILE* fp_in = NULL;
   KMX_BOOL err;
   KMX_DWORD len;
@@ -3842,7 +3842,7 @@ FILE* UTF16TempFromUTF8(FILE* fp_in , KMX_BOOL hasPreamble)
 
  extern "C" void  __declspec(dllexport) kmcmp_Keyman_Diagnostic(int mode) {
   
-  printf("°°-> changed to Keyman_Diagnostic() of kmcmplib \n");
+  //printf("°°-> changed to Keyman_Diagnostic() of kmcmplib \n");
   if (mode == 0) {
     RaiseException(0x0EA0BEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
   }

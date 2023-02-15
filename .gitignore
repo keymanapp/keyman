@@ -186,3 +186,4 @@ Thumbs.db
 #Sabine:
 /developer/src/test/auto/kmcomp/*.kmn
 /developer/src/test/auto/kmcomp/*.kvk*
+*.bak
