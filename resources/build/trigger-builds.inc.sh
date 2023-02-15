@@ -129,30 +129,30 @@ function triggerGitHubActionsBuild() {
   local IS_TEST_BUILD="$1"
   local GITHUB_ACTION="$2"
   local GIT_BRANCH="${3:-master}"
-  local GIT_REF GIT_PRHEAD
+  local GIT_REF GIT_SHA
 
   local GITHUB_SERVER=https://api.github.com/repos/keymanapp/keyman/dispatches
 
   if [ "${action:-""}" == "commit" ]; then
     # This will only be true if we created and pushed a tag
     GIT_REF="refs/tags/release@$VERSION_WITH_TAG"
-    GIT_PRHEAD="${GIT_REF}"
+    GIT_SHA="$(git rev-parse "${GIT_REF}")"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: release@${VERSION_WITH_TAG}"
   elif [[ $GIT_BRANCH != stable-* ]] && [[ $GIT_BRANCH =~ [0-9]+ ]]; then
     GIT_REF="refs/pull/${GIT_BRANCH}/merge"
-    GIT_BRANCH="PR-${GIT_BRANCH}"
-    GIT_PRHEAD="refs/pull/${GIT_BRANCH}/head"
+    GIT_SHA="$(git rev-parse "refs/pull/${GIT_BRANCH}/head")"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: PR #${GIT_BRANCH}"
+    GIT_BRANCH="PR-${GIT_BRANCH}"
   else
     GIT_REF="refs/heads/${GIT_BRANCH}"
-    GIT_PRHEAD="${GIT_REF}"
+    GIT_SHA="$(git rev-parse "${GIT_REF}")"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: ${GIT_BRANCH}"
   fi
 
   local DATA="{\"event_type\": \"$GIT_EVENT_TYPE\", \
       \"client_payload\": { \
         \"ref\": \"$GIT_REF\", \
-        \"prhead\": \"$GIT_PRHEAD\", \
+        \"sha\": \"$GIT_SHA\", \
         \"branch\": \"$GIT_BRANCH\", \
         \"isTestBuild\": \"$IS_TEST_BUILD\" \
     }}"
