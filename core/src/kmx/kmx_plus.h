@@ -379,7 +379,7 @@ static_assert(sizeof(struct COMP_KMXPLUS_LAYR_LIST) == LDML_LENGTH_LAYR_LIST, "m
 
 struct COMP_KMXPLUS_LAYR_ENTRY {
     KMXPLUS_STR id;
-    KMXPLUS_STR modifier;
+    KMX_DWORD mod;
     KMX_DWORD row;
     KMX_DWORD count;
 };

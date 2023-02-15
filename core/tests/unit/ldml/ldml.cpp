@@ -299,5 +299,9 @@ int main(int argc, char *argv[]) {
   }
   console_color::enabled = console_color::isaterminal() || arg_color;
 
-  return run_test(argv[first_arg], argv[first_arg + 1]);
+  int rc = run_test(argv[first_arg], argv[first_arg + 1]);
+  if (rc != 0) {
+    std::cerr << "FAILED" << std::endl;
+  }
+  return rc;
 }

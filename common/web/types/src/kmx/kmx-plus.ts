@@ -247,7 +247,7 @@ export class LayrList {
  */
  export class LayrEntry {
   id: StrsItem;
-  modifier: StrsItem;
+  mod: number;
   rows: LayrRow[] = [];
 };
 
@@ -513,7 +513,7 @@ export class KMXPlusFile extends KMXFile {
 
     this.COMP_PLUS_LAYR_ENTRY = new r.Struct({
       id: r.uint32le, // str
-      modifier: r.uint32le, // str
+      mod: r.uint32le, // bitfield
       row: r.uint32le, // index into rows
       count: r.uint32le,
     });

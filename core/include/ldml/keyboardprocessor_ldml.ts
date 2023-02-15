@@ -246,7 +246,7 @@ class Constants {
   readonly keys_flags_extend = 1;
 
   /* Modifier key bitmasks. These correspond to the modifier bitmasks from kmx_file.h */
-  
+
   /**
    * Constant for no modifiers
    */
@@ -266,7 +266,7 @@ class Constants {
   /**
    * bitmask for Caps modifier key
    */
-  readonly keys_mod_caps = 1 << 7;
+  readonly keys_mod_caps = 1 << 8;
   /**
    * bitmask for Left control modifier key
    */
@@ -300,6 +300,11 @@ class Constants {
       ["shift", this.keys_mod_shift],
     ]
   );
+
+  /**
+   * a mask combining all valid modifier bits
+   */
+  readonly keys_mod_all: number = Array.from(this.keys_mod_map.values()).reduce((p, v) => (p | v), this.keys_mod_none);
 
   /* ------------------------------------------------------------------
    * key2 section
