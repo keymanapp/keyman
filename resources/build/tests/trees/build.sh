@@ -15,6 +15,7 @@ cd "$THIS_SCRIPT_PATH"
 builder_describe "parent test module" \
   :child1 \
   :child2 \
+  :child3=child3_renamed/src \
   clean \
   configure \
   build \
@@ -52,17 +53,21 @@ function test_present() {
 builder_run_child_actions clean
 test_present child1 clean
 test_present child2 clean
+test_present child3 clean
 
 builder_run_child_actions configure
 test_present child1 configure
 test_present child2 configure
+test_present child3 configure
 
 # Test chaining commands in a single statement
 builder_run_child_actions build test
 test_present child1 build
 test_present child2 build
+test_present child3 build
 test_present child1 test
 test_present child2 test
+test_present child3 test
 
 # We are customising the order in which child scripts are installed, so 2 goes before 1
 builder_run_child_actions install:child2

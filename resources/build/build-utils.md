@@ -130,6 +130,10 @@ another script:
   denotes the target as a "child project". This can simplify parent-child style
   scripts, using the [`builder_run_child_actions`] function.
 
+  A child project with an alternate folder can also be specified by appending
+  `=path` to the target definition, for example `:app=src/app`. Where possible,
+  avoid differences in names of child projects and folders.
+
 * **actions**: these are the various actions that a build script can take, such
   as `clean`, or `build`. If no action is passed in to on a given script
   invocation, then the default action is `build` (unless the script defines an
@@ -280,10 +284,18 @@ own in the call:
   * `:module`:  `"this module"`
   * `:tools`:   `"build tools for this project"`
 
+If a folder exists with the same name as a target, then that automatically
+denotes the target as a "child project". This can simplify parent-child style
+scripts, using the [`builder_run_child_actions`] function.
+
+A child project with an alternate folder can also be specified by appending
+`=path` to the target definition, for example `:app=src/app`. Where possible,
+avoid differences in names of child projects and folders.
+
 **Actions** are defined as single words, for example:
 
 ```bash
-builder_describe "Sample script build "install   installs app on local system"
+builder_describe "Sample script" build "install   installs app on local system"
 ```
 
 There are several predefined actions. Again, these will not be available to

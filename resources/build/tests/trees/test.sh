@@ -3,7 +3,7 @@
 set -eu
 
 ./build.sh clean configure build install test
-if [ $(ls child?.* | wc -l) -ne 10 ]; then
+if [ $(ls child?.* | wc -l) -ne 14 ]; then
   echo unexpected output file count
   exit 1
 fi
