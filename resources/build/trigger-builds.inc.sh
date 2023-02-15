@@ -137,15 +137,18 @@ function triggerGitHubActionsBuild() {
   if [ "${action:-""}" == "commit" ]; then
     # This will only be true if we created and pushed a tag
     GIT_REF="refs/tags/release@$VERSION_WITH_TAG"
+    GIT_EVENT_TYPE="${GITHUB_ACTION}: release@${VERSION_WITH_TAG}"
   elif [[ $GIT_BRANCH != stable-* ]] && [[ $GIT_BRANCH =~ [0-9]+ ]]; then
     GIT_REF="refs/pull/${GIT_BRANCH}/merge"
     GIT_BRANCH="PR-${GIT_BRANCH}"
     GIT_PRHEAD="refs/pull/${GIT_BRANCH}/head"
+    GIT_EVENT_TYPE="${GITHUB_ACTION}: PR #${GIT_BRANCH}"
   else
     GIT_REF="refs/heads/${GIT_BRANCH}"
+    GIT_EVENT_TYPE="${GITHUB_ACTION}: ${GIT_BRANCH}"
   fi
 
-  local DATA="{\"event_type\": \"$GITHUB_ACTION\", \
+  local DATA="{\"event_type\": \"$GIT_EVENT_TYPE\", \
       \"client_payload\": { \
         \"ref\": \"$GIT_REF\", \
         \"prhead\": \"$GIT_PRHEAD\", \
