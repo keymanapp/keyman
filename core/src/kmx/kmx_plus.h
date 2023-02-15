@@ -28,6 +28,13 @@ namespace kmx {
  * Indicates an offset into the strs table (0 = zero length)
  */
 typedef KMX_DWORD KMXPLUS_STR;
+/**
+ * Indicates an offset into the list table (0 = zero length)
+*/
+typedef KMX_DWORD KMXPLUS_LIST;
+/**
+ * Indicates an offset into the elem table (0 = zero length)
+*/
 typedef KMX_DWORD KMXPLUS_ELEM;
 
 // forward declarations
@@ -469,9 +476,36 @@ struct COMP_KMXPLUS_KEY2 {
   bool valid(KMX_DWORD length) const;
 };
 
+struct COMP_KMXPLUS_KEY2_FLICK_ELEMENT {
+  KMXPLUS_LIST directions;
+  KMX_DWORD flags;
+  KMXPLUS_STR to; // string or codepoint
+};
+
+struct COMP_KMXPLUS_KEY2_FLICK_LIST {
+  KMX_DWORD count;
+  KMX_DWORD flick; // flick index
+  KMXPLUS_STR id;
+};
+
+struct COMP_KMXPLUS_KEY2_KEY {
+  KMX_DWORD vkey;
+  KMXPLUS_STR to;
+  KMX_DWORD flags;
+  KMXPLUS_STR id;
+  KMXPLUS_STR switchId; // switch
+  KMX_DWORD width; // unit: 0.1 keys
+  KMXPLUS_LIST longPress;
+  KMXPLUS_STR longPressDefault;
+  KMXPLUS_LIST multiTap;
+  KMX_DWORD flicks; // index
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_KEY2_KEY) == LDML_LENGTH_KEY2_KEY, "mismatched size of key2.key");
+static_assert(sizeof(struct COMP_KMXPLUS_KEY2_FLICK_ELEMENT) == LDML_LENGTH_KEY2_FLICK_ELEMENT, "mismatched size of key2.flick");
+static_assert(sizeof(struct COMP_KMXPLUS_KEY2_FLICK_LIST) == LDML_LENGTH_KEY2_FLICK_LIST, "mismatched size of key2.flicks");
 static_assert(sizeof(struct COMP_KMXPLUS_KEY2) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");
 static_assert(sizeof(struct COMP_KMXPLUS_KEY2) == LDML_LENGTH_KEY2, "mismatched size of section key2");
-
 
 /* ------------------------------------------------------------------
  * list section
@@ -490,9 +524,23 @@ struct COMP_KMXPLUS_LIST {
   bool valid(KMX_DWORD length) const;
 };
 
+/**
+ * list.list subtable
+ */
+struct COMP_KMXPLUS_LIST_ITEM {
+  KMX_DWORD index;
+  KMX_DWORD count;
+};
+
+/**
+ * list.index
+ */
+typedef KMX_DWORD COMP_KMXPLUS_LIST_INDEX;
+
 static_assert(sizeof(struct COMP_KMXPLUS_LIST) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");
 static_assert(sizeof(struct COMP_KMXPLUS_LIST) == LDML_LENGTH_LIST, "mismatched size of section list");
-
+static_assert(sizeof(struct COMP_KMXPLUS_LIST_ITEM) == LDML_LENGTH_LIST_ITEM, "mismatched size of section list.lists subtable");
+static_assert(sizeof(COMP_KMXPLUS_LIST_INDEX) == LDML_LENGTH_LIST_INDEX, "mismatched size of section list.indices subtable");
 
 /**
  * @brief helper accessor object for KMX Plus data
@@ -526,6 +574,8 @@ class kmx_plus {
   private:
     bool valid; // true if valid
     COMP_KMXPLUS_LAYR_Helper layrHelper;
+    // COMP_KMXPLUS_LIST_Helper listHelper;
+    // COMP_KMXPLUS_KEY2_Helper listHelper;
 };
 
 /**
