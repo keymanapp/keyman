@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 17.0.48 alpha 2023-02-14
+
+* fix(developer): Select BCP47 Code dialog inconsistencies (#8179)
+* chore(common): automatically apply _builder_check_color (#8197)
+* docs(linux): Update packaging documentation (#8202)
+* chore(common): Report status if no platform needs build (#8210)
+* chore(linux): Exclude autopkg tests on s390x (#8218)
+* fix(linux): Fix path to symbols file in packaging GHA (#8209)
+
 ## 17.0.47 alpha 2023-02-10
 
 * fix(linux): Fix autopkgtests (#8201)
