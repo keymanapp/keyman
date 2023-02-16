@@ -1,8 +1,7 @@
 import EventEmitter from "eventemitter3";
 import type LanguageProcessor from "./languageProcessor.js";
 import { type ReadySuggestions, type InvalidateSourceEnum } from './languageProcessor.js';
-import type OutputTarget from "@keymanapp/keyboard-processor/build/obj/text/outputTarget.js";
-import type KeyboardProcessor from "@keymanapp/keyboard-processor/build/obj/text/keyboardProcessor.js";
+import { type KeyboardProcessor, type OutputTarget } from "@keymanapp/keyboard-processor";
 
 interface PredictionContextEventMap {
   update: (suggestions: Suggestion[]) => void;

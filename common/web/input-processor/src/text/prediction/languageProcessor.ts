@@ -1,5 +1,5 @@
 import EventEmitter from "eventemitter3";
-import { LMLayer } from "@keymanapp/lexical-model-layer/build/obj/web/index.js";
+import { LMLayer } from "@keymanapp/lexical-model-layer/web";
 import { OutputTarget, Transcription, Mock } from "@keymanapp/keyboard-processor";
 import ContextWindow from "../contextWindow.js";
 
