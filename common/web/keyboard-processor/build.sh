@@ -17,10 +17,6 @@ cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
-# Ensures color var use in `builder_describe`'s argument respects the specified
-# --color/--no-color option.
-builder_check_color "$@"
-
 builder_describe \
   "Compiles the web-oriented utility function module." \
   "@../recorder  test" \
@@ -30,7 +26,7 @@ builder_describe \
   clean \
   build \
   test \
-  "--ci    For use with action ${BUILDER_TERM_START}test${BUILDER_TERM_END} - emits CI-friendly test reports"
+  "--ci    For use with action $(builder_term test) - emits CI-friendly test reports"
 
 builder_describe_outputs \
   configure     /node_modules \

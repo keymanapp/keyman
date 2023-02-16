@@ -337,6 +337,8 @@ type
     procedure SaveJSON(ARoot: TJSONObject); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
     procedure SaveXML(ARoot: IXMLNode); virtual;
+    function ContainsID(const id: string): Boolean;
+    function IndexOfID(const id: string): Integer;
   end;
 
   TPackageLexicalModel = class(TPackageBaseObject)
@@ -2261,6 +2263,21 @@ begin
 end;
 
 { TPackageKeyboardLanguageList }
+
+function TPackageKeyboardLanguageList.ContainsID(const id: string): Boolean;
+begin
+  Result := IndexOfID(id) >= 0;
+end;
+
+function TPackageKeyboardLanguageList.IndexOfID(const id: string): Integer;
+var
+  i: Integer;
+begin
+  for i := 0 to Count - 1 do
+    if SameText(Items[i].ID, id) then
+      Exit(i);
+  Result := -1;
+end;
 
 procedure TPackageKeyboardLanguageList.LoadJSON(ARoot: TJSONObject);
 var

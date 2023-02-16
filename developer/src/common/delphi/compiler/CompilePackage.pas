@@ -27,7 +27,9 @@ unit CompilePackage;
 interface
 
 uses
-  kpsfile, kmpinffile, PackageInfo,
+  kpsfile,
+  kmpinffile,
+  PackageInfo,
   Keyman.Developer.System.Project.ProjectLog;
 
 function DoCompilePackage(pack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent, ACheckFilenameConventions: Boolean; const AOutputFileName: string): Boolean;   // I4688
@@ -37,6 +39,7 @@ implementation
 uses
   Winapi.Windows,
   System.Classes,
+  System.Generics.Collections,
   System.SysUtils,
   System.IniFiles,
   System.Zip,
@@ -85,6 +88,7 @@ type
     procedure CheckKeyboardLanguages;
     procedure CheckFilenameConventions;
     function CheckLexicalModels: Boolean;
+    procedure CheckForDuplicatedLanguages(const resourceType, id: string; languages: TPackageKeyboardLanguageList);
   end;
 
 function DoCompilePackage(pack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent, ACheckFilenameConventions: Boolean; const AOutputFileName: string): Boolean;   // I4688
@@ -141,6 +145,8 @@ begin
 end;
 
 function TCompilePackage.CheckLexicalModels: Boolean;
+var
+  model: TPackageLexicalModel;
 begin
   if pack.LexicalModels.Count > 0 then
   begin
@@ -150,6 +156,12 @@ begin
       Exit(False);
     end;
   end;
+
+  for model in pack.LexicalModels do
+  begin
+    CheckForDuplicatedLanguages('model', model.id, model.Languages);
+  end;
+
 
   Exit(True);
 end;
@@ -487,6 +499,7 @@ end;
 const
   SKKeyboardPackageLanguageNonCanonical = 'The keyboard %0:s has a non-canonical language tag "%1:s" (%2:s), should be "%3:s".';
   SKKeyboardShouldHaveAtLeastOneLanguage = 'The keyboard %0:s has no language tags. It should have at least one language tag.';
+  SKPackageShouldNotRepeatLanguages = 'The %0:s %1:s has a repeated language "%2:s".';
 
 procedure TCompilePackage.CheckKeyboardLanguages;
 var
@@ -496,6 +509,30 @@ begin
   begin
     if k.Languages.Count = 0 then
       WriteMessage(plsWarning, Format(SKKeyboardShouldHaveAtLeastOneLanguage, [k.ID]));
+    CheckForDuplicatedLanguages('keyboard', k.ID, k.Languages);
+  end;
+end;
+
+procedure TCompilePackage.CheckForDuplicatedLanguages(const resourceType, id: string; languages: TPackageKeyboardLanguageList);
+var
+  tags: TDictionary<string,Integer>;
+  lang: TPackageKeyboardLanguage;
+begin
+  tags := TDictionary<string,Integer>.Create;
+  try
+    for lang in languages do
+    begin
+      if tags.ContainsKey(lang.ID.ToLower) then
+      begin
+        WriteMessage(plsWarning, Format(SKPackageShouldNotRepeatLanguages, [resourceType, id, lang.ID]));
+      end
+      else
+      begin
+        tags.Add(lang.ID.ToLower, 0);
+      end;
+    end;
+  finally
+    tags.Free;
   end;
 end;
 
