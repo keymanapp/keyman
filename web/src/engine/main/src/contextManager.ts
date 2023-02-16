@@ -16,7 +16,8 @@ export default abstract class ContextManager extends EventEmitter<EventMap> {
 
     if(outputTarget != null) {
       // While not yet fully connected, ContextManager and its subclasses will be responsible for maintaining
-      // active elements & their focus.
+      // active elements & their focus... something that should only really matter for the website-integrating
+      // subclass.
 
       // Required for the `sil_euro_latin` keyboard's desktop OSK/table to function properly.
       keyman.uiManager.setActivatingUI(true);
