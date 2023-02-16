@@ -587,6 +587,116 @@ COMP_KMXPLUS_KEY2::valid(KMX_DWORD _kmn_unused(length)) const {
   return true;
 }
 
+
+COMP_KMXPLUS_KEY2_Helper::COMP_KMXPLUS_KEY2_Helper() : key2(nullptr), is_valid(false) {
+}
+
+bool
+COMP_KMXPLUS_KEY2_Helper::setKey2(const COMP_KMXPLUS_KEY2 *newKey2) {
+  DebugLog("validating newKey2=%p", newKey2);
+  is_valid = true;
+  if (newKey2 == nullptr) {
+    // null = invalid
+    is_valid = false;
+    // No assert here: just a missing layer
+    return false;
+  }
+  key2 = newKey2;
+  const uint8_t *rawdata = reinterpret_cast<const uint8_t *>(newKey2);
+  rawdata += LDML_LENGTH_KEY2;  // skip past non-dynamic portion
+  // keys
+  if (key2->keyCount > 0) {
+    keys = reinterpret_cast<const COMP_KMXPLUS_KEY2_KEY *>(rawdata);
+  } else {
+    keys    = nullptr;
+    is_valid = false;
+    assert(is_valid);
+  }
+  rawdata += sizeof(COMP_KMXPLUS_KEY2_KEY) * key2->keyCount;
+  // flicks
+  if (key2->flicksCount > 0) {
+    flickLists = reinterpret_cast<const COMP_KMXPLUS_KEY2_FLICK_LIST *>(rawdata);
+  } else {
+    flickLists  = nullptr; // not an error
+  }
+  rawdata += sizeof(COMP_KMXPLUS_KEY2_FLICK_LIST) * key2->flicksCount;
+  // flick
+  if (key2->flickCount > 0) {
+    flickElements = reinterpret_cast<const COMP_KMXPLUS_KEY2_FLICK_ELEMENT *>(rawdata);
+  } else {
+    flickElements = nullptr; // not an error
+  }
+  // rawdata += sizeof(COMP_KMXPLUS_KEY2_FLICK_ELEMENT) * key2->flickCount;
+
+  // Now, validate offsets by walking
+  if (is_valid) {
+    for(KMX_DWORD i = 0; is_valid && i < key2->keyCount; i++) {
+      const auto &key = keys[i];
+      // is the count off the end?
+      DebugLog( "<key #%d> id=0x%X, to=0x%X, flicks=%d", i, key.id, key.to, key.flicks); // TODO-LDML: could dump more fields here
+      if (key.flicks >0 && key.flicks >= key2->flicksCount) {
+        DebugLog("key[%d] has invalid flicks index %d", i, key.flicks);
+        is_valid = false;
+        assert(is_valid);
+      }
+    }
+    for(KMX_DWORD i = 0; is_valid && i < key2->flicksCount; i++) {
+      const auto &e = flickLists[i];
+      // is the count off the end?
+      DebugLog("<flicks> %d: index %d, count %d", i, e.flick, e.count);
+      if (i == 0) {
+        if (e.flick != 0 || e.count != 0) {
+          DebugLog("Error: Invalid Flick #0");
+          is_valid = false;
+          assert(is_valid);
+        }
+      } else if ((e.flick >= key2->flickCount) || (e.flick + e.count > key2->flickCount)) {
+        DebugLog("flicks[%d] would access flick %d+%d, > count %d", i, e.flick, e.count, key2->flickCount);
+        is_valid = false;
+        assert(is_valid);
+      }
+    }
+    for(KMX_DWORD i = 0; is_valid && i < key2->flickCount; i++) {
+      const auto &e = flickElements[i];
+      // is the count off the end?
+      DebugLog("<flick> %d: to=0x%X, directions=0x%X, flags=0x%X", i, e.to, e.directions, e.flags);
+    }
+  }
+  // Return results
+  DebugLog("COMP_KMXPLUS_KEY2_Helper.setKey2(): %s", is_valid ? "valid" : "invalid");
+  assert(is_valid);
+  return is_valid;
+}
+
+const COMP_KMXPLUS_KEY2_KEY *
+COMP_KMXPLUS_KEY2_Helper::getKeys(KMX_DWORD i) const {
+  if (!valid() || i >= key2->keyCount) {
+    assert(false);
+    return nullptr;
+  }
+  return keys + i;
+}
+
+const COMP_KMXPLUS_KEY2_FLICK_LIST *
+COMP_KMXPLUS_KEY2_Helper::getFlickLists(KMX_DWORD i) const {
+  if (!valid() || i >= key2->flicksCount) {
+    assert(false);
+    return nullptr;
+  }
+  return flickLists + i;
+}
+
+const COMP_KMXPLUS_KEY2_FLICK_ELEMENT *
+COMP_KMXPLUS_KEY2_Helper::getFlickElements(KMX_DWORD i) const {
+  if (!valid() || i >= key2->flickCount) {
+    assert(false);
+    return nullptr;
+  }
+  return flickElements + i;
+}
+
+// LIST
+
 bool
 COMP_KMXPLUS_LIST::valid(KMX_DWORD _kmn_unused(length)) const {
   if (header.size < sizeof(*this)
@@ -598,6 +708,86 @@ COMP_KMXPLUS_LIST::valid(KMX_DWORD _kmn_unused(length)) const {
   }
   // TODO-LDML: further validation in the COMP_KMXPLUS_LIST_Helper class
   return true;
+}
+
+
+COMP_KMXPLUS_LIST_Helper::COMP_KMXPLUS_LIST_Helper() : list(nullptr), is_valid(false) {
+}
+
+bool
+COMP_KMXPLUS_LIST_Helper::setList(const COMP_KMXPLUS_LIST *newList) {
+  DebugLog("validating newList=%p", newList);
+  is_valid = true;
+  if (newList == nullptr) {
+    // null = invalid
+    is_valid = false;
+    // No assert here: just a missing layer
+    return false;
+  }
+  list = newList;
+  const uint8_t *rawdata = reinterpret_cast<const uint8_t *>(newList);
+  rawdata += LDML_LENGTH_LIST;  // skip past non-dynamic portion
+  // lists
+  if (list->listCount > 0) {
+    lists = reinterpret_cast<const COMP_KMXPLUS_LIST_ITEM *>(rawdata);
+  } else {
+    lists    = nullptr;
+    // not invalid, just empty.
+  }
+  rawdata += sizeof(COMP_KMXPLUS_LIST_ITEM) * list->listCount;
+  // entries
+  if (list->indexCount > 0) {
+    indices = reinterpret_cast<const COMP_KMXPLUS_LIST_INDEX *>(rawdata);
+  } else {
+    indices  = nullptr;
+  }
+  // rawdata += sizeof(COMP_KMXPLUS_LIST_INDEX) * list->indexCount;
+
+  // Now, validate offsets by walking
+  if (is_valid) {
+    for (KMX_DWORD i = 0; is_valid && i < list->listCount; i++) {
+      const auto &e = lists[i];
+      // is the count off the end?
+      DebugLog("list 0x%X: index %d, count %d", i, e.index, e.count);
+      if (i == 0) {
+        if (e.index != 0 || e.count != 0) {
+          DebugLog("Error: Invalid List #0");
+          is_valid = false;
+          assert(is_valid);
+        }
+      } else if ((e.index >= list->indexCount) || (e.index + e.count > list->indexCount)) {
+        DebugLog("list[%d] would access index %d+%d, > count %d", i, e.index, e.count, list->indexCount);
+        is_valid = false;
+        assert(is_valid);
+      }
+    }
+    for (KMX_DWORD i = 0; is_valid && i < list->indexCount; i++) {
+      const auto &e = indices[i];
+      DebugLog(" index %d: str 0x%X", i, e);
+    }
+  }
+  // Return results
+  DebugLog("COMP_KMXPLUS_LIST_Helper.setList(): %s", is_valid ? "valid" : "invalid");
+  assert(is_valid);
+  return is_valid;
+}
+
+const COMP_KMXPLUS_LIST_ITEM *
+COMP_KMXPLUS_LIST_Helper::getList(KMX_DWORD i) const {
+  if (!valid() || i >= list->listCount) {
+    assert(false);
+    return nullptr;
+  }
+  return lists + i;
+}
+
+const COMP_KMXPLUS_LIST_INDEX *
+COMP_KMXPLUS_LIST_Helper::getIndex(KMX_DWORD i) const {
+  if (!valid() || i >= list->indexCount) {
+    assert(false);
+    return nullptr;
+  }
+  return indices + i;
 }
 
 // ---- constructor
@@ -651,8 +841,10 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     tran = section_from_sect<COMP_KMXPLUS_TRAN>(sect);
     vkey = section_from_sect<COMP_KMXPLUS_VKEY>(sect);
 
-    // calculate and validate the layer dynamic parts
+    // calculate and validate the dynamic parts
+    (void)key2Helper.setKey2(key2);
     (void)layrHelper.setLayr(layr);
+    (void)listHelper.setList(list);
   }
 }
 
