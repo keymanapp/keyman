@@ -314,7 +314,7 @@ _builder_run_child_action() {
 }
 
 #
-# Executes the specified actions on or all child targets, or on the specified
+# Executes the specified actions on all child targets, or on the specified
 # targets. A child target is any target which has a sub-folder of the same name
 # as the target. However, the actions will only be run if they have been
 # specified by the user on the command-line.
