@@ -11,7 +11,7 @@ meson (>= 0.53)
 ## Building
 
 ```bash
-./build.sh all
+./build.sh clean configure build
 ./build.sh test
 sudo ./build.sh install
 ```
@@ -19,5 +19,5 @@ sudo ./build.sh install
 For a debug build:
 
 ```bash
-./build.sh --debug clean config build
+./build.sh --debug clean configure build
 ```
