@@ -161,6 +161,10 @@ a user or called by another script:
   `build` actions are ever passed to dependency scripts; if you are working on
   code within a dependency, you are currently expected to rebuild and test that
   dependency locally.
+  
+  A dependency is similar to, but not the same as, a child project. Child
+  projects live in sub-folders of the parent project, whereas generally a
+  dependency will be in another folder altogether. 
 
   Dependencies can be defined for all actions and targets, or may be limited to
   specific action and/or targets.
