@@ -243,7 +243,7 @@ export default class KeyboardInterface extends KeyboardHarness {
    * This function currently bypasses web-core's standard text handling control path and all predictive text processing.
    * It also has DOM-dependencies that help ensure KMW's active OutputTarget retains focus during use.
    */
-  insertText?: (Ptext: string, PdeadKey: number) => boolean;
+  insertText?: (Ptext: string, PdeadKey: number) => void;
 
   /**
    * Function     registerKeyboard  KR
