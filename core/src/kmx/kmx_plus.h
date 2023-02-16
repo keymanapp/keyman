@@ -466,9 +466,9 @@ struct COMP_KMXPLUS_KEY2 {
   KMX_DWORD keyCount;
   KMX_DWORD flicksCount;
   KMX_DWORD flickCount;
-  // TODO-LDML: keys sub-table
-  // TODO-LDML: flick lists sub-table
-  // TODO-LDML: flick elements sub-table
+  // see helper for: keys sub-table
+  // see helper for: flick lists sub-table
+  // see helper for: flick elements sub-table
 
   /**
    * @brief True if section is valid.
@@ -501,6 +501,29 @@ struct COMP_KMXPLUS_KEY2_KEY {
   KMX_DWORD flicks; // index
 };
 
+class COMP_KMXPLUS_KEY2_Helper {
+public:
+  COMP_KMXPLUS_KEY2_Helper();
+  /**
+   * Initialize the helper to point at a layr section.
+   * @return true if valid
+  */
+  bool setKey2(const COMP_KMXPLUS_KEY2 *newKey2);
+  inline bool valid() const { return is_valid; }
+
+  const COMP_KMXPLUS_KEY2_KEY           *getKeys(KMX_DWORD key) const;
+  const COMP_KMXPLUS_KEY2_FLICK_LIST    *getFlickLists(KMX_DWORD list) const;
+  const COMP_KMXPLUS_KEY2_FLICK_ELEMENT *getFlickElements(KMX_DWORD element) const;
+
+private:
+  const COMP_KMXPLUS_KEY2 *key2;
+  bool is_valid;
+  const COMP_KMXPLUS_KEY2_KEY *keys;
+  const COMP_KMXPLUS_KEY2_FLICK_LIST *flickLists;
+  const COMP_KMXPLUS_KEY2_FLICK_ELEMENT *flickElements;
+};
+
+
 static_assert(sizeof(struct COMP_KMXPLUS_KEY2_KEY) == LDML_LENGTH_KEY2_KEY, "mismatched size of key2.key");
 static_assert(sizeof(struct COMP_KMXPLUS_KEY2_FLICK_ELEMENT) == LDML_LENGTH_KEY2_FLICK_ELEMENT, "mismatched size of key2.flick");
 static_assert(sizeof(struct COMP_KMXPLUS_KEY2_FLICK_LIST) == LDML_LENGTH_KEY2_FLICK_LIST, "mismatched size of key2.flicks");
@@ -515,8 +538,8 @@ struct COMP_KMXPLUS_LIST {
   COMP_KMXPLUS_HEADER header;
   KMX_DWORD listCount;
   KMX_DWORD indexCount;
-  // TODO-LDML: lists sub-table
-  // TODO-LDML: indices sub-table
+  // see helper for: lists sub-table
+  // see helper for: indices sub-table
 
   /**
    * @brief True if section is valid.
@@ -536,6 +559,28 @@ struct COMP_KMXPLUS_LIST_ITEM {
  * list.index
  */
 typedef KMX_DWORD COMP_KMXPLUS_LIST_INDEX;
+
+
+class COMP_KMXPLUS_LIST_Helper {
+public:
+  COMP_KMXPLUS_LIST_Helper();
+  /**
+   * Initialize the helper to point at a layr section.
+   * @return true if valid
+  */
+  bool setList(const COMP_KMXPLUS_LIST *newList);
+  inline bool valid() const { return is_valid; }
+
+  const COMP_KMXPLUS_LIST_ITEM  *getList(KMX_DWORD list) const;
+  const COMP_KMXPLUS_LIST_INDEX *getIndex(KMX_DWORD index) const;
+
+private:
+  const COMP_KMXPLUS_LIST *list;
+  bool is_valid;
+  const COMP_KMXPLUS_LIST_ITEM *lists;
+  const COMP_KMXPLUS_LIST_INDEX *indices;
+};
+
 
 static_assert(sizeof(struct COMP_KMXPLUS_LIST) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");
 static_assert(sizeof(struct COMP_KMXPLUS_LIST) == LDML_LENGTH_LIST, "mismatched size of section list");
@@ -574,8 +619,8 @@ class kmx_plus {
   private:
     bool valid; // true if valid
     COMP_KMXPLUS_LAYR_Helper layrHelper;
-    // COMP_KMXPLUS_LIST_Helper listHelper;
-    // COMP_KMXPLUS_KEY2_Helper listHelper;
+    COMP_KMXPLUS_LIST_Helper listHelper;
+    COMP_KMXPLUS_KEY2_Helper key2Helper;
 };
 
 /**
