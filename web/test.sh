@@ -16,8 +16,6 @@ cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
-builder_check_color "$@"
-
 builder_describe "Runs the Keyman Engine for Web unit-testing suites" \
   "@./src/tools/testing/recorder test:engine" \
   "@./src/engine" \

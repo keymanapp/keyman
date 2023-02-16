@@ -22,8 +22,6 @@ cd "$(dirname "$THIS_SCRIPT")"
 
 ################################ Main script ################################
 
-builder_check_color "$@"
-
 # TODO: once these modules are builder-based, reference here too:
 #  "@../models/templates" \
 #  "@../models/types" \
