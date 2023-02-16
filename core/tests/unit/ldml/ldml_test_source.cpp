@@ -429,7 +429,7 @@ void LdmlJsonTestSource::set_key_from_id(key_event& k, const std::u16string& id)
 
 void
 LdmlJsonTestSource::next_action(ldml_action &fillin) {
-  if (action_index == data.size()) {
+  if ((action_index+1) >= data["/actions"_json_pointer].size()) {
     // at end, done
     fillin.type = LDML_ACTION_DONE;
     return;
@@ -437,7 +437,6 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
 
   action_index++;
   auto action   = data["/actions"_json_pointer].at(action_index);
-  std::cerr << "ACTION: " << action << std::endl;
 
   // is it a check event?
   auto as_check = action["/check/result"_json_pointer];

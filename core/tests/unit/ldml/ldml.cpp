@@ -234,7 +234,20 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled, km::tests::
       }
       verify_context(text_store, test_state, test_context);
     } else if (action.type == km::tests::LDML_ACTION_EMIT_STRING) {
-      std::cerr << "TODO-LDML LDML_ACTION_EMIT_STRING" << std::endl;
+      std::cout << "- string emit action: " << action.string << std::endl;
+      std::cerr << "TODO-LDML: note, LDML_ACTION_EMIT_STRING is NOT going through keyboard, transforms etc." << std::endl;
+      text_store.append(action.string); // TODO-LDML: not going through keyboard
+      // Now, update context?
+      km_kbp_context_item *nitems = nullptr;
+      try_status(km_kbp_context_items_from_utf16(action.string.c_str(), &nitems));
+      try_status(km_kbp_context_append(km_kbp_state_context(test_state), nitems));
+      // update the test_context also.
+      for (km_kbp_context_item *ci = nitems; ci->type != KM_KBP_CT_END; ci++) {
+        test_context.emplace_back(*ci);
+      }
+      km_kbp_context_items_dispose(nitems);
+
+      verify_context(text_store, test_state, test_context);
     } else if (action.type == km::tests::LDML_ACTION_CHECK_EXPECTED) {
       std::cout << "- check expected" << std::endl;
       std::cout << "expected  : " << string_to_hex(action.string) << " [" << action.string << "]" << std::endl;

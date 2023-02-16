@@ -9,6 +9,7 @@
 
 tests_with_testdata = [
   'k_001_tiny',
+  'fr-t-k0-azerty',
 ]
 
 tests = [
