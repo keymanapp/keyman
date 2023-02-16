@@ -12,13 +12,11 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 cd "$THIS_SCRIPT_PATH"
 
-OUTPUT_PATH=
-
 builder_describe \
   "Build Keyman for Linux." \
   "clean" \
   "configure" \
-  "build+" \
+  "build" \
   "test" \
   ":engine=ibus-keyman       ibus-keyman" \
   "install                   install artifacts" \
