@@ -13,7 +13,6 @@ import { BUILDER_SECTION } from "./builder-section.js";
  * This struct is a single <key> in the key2 keybag
  */
 interface BUILDER_KEY2_KEY {
-  vkey: number; // Scan code for the key
   to: number; // str or single codepoint
   flags: number;
   id: number; // str with original key id
@@ -46,6 +45,13 @@ interface BUILDER_KEY2_FLICK {
   to: number; // str or single codepoint
 };
 
+
+interface BUILDER_KEY2_KMAP {
+  vkey: number;
+  mod: number;
+  key: number; //index to key2.key
+};
+
 /**
  * Builder for the 'keys' section
  */
@@ -55,9 +61,11 @@ export interface BUILDER_KEY2 extends BUILDER_SECTION {
   keyCount: number;
   flicksCount: number;
   flickCount: number;
+  kmapCount: number;
   keys: BUILDER_KEY2_KEY[];
   flicks: BUILDER_KEY2_FLICKS[];
   flick: BUILDER_KEY2_FLICK[];
+  kmap: BUILDER_KEY2_KMAP[];
 };
 
 export function build_key2(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_list: BUILDER_LIST): BUILDER_KEY2 {
@@ -72,9 +80,11 @@ export function build_key2(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     keyCount: kmxplus.key2.keys.length,
     flicksCount: kmxplus.key2.flicks.length,
     flickCount: 0,
+    kmapCount: kmxplus.key2.kmap.length,
     keys: [],
     flicks: [],
     flick: [],
+    kmap: [],
     _offset: 0,
   };
 
@@ -108,7 +118,6 @@ export function build_key2(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
   // now, keys
   key2.keys = kmxplus.key2.keys.map((key) => {
     let result : BUILDER_KEY2_KEY = {
-      vkey: key.vkey,
       to: build_strs_index(sect_strs, key.to),
       flags: key.flags,
       id: build_strs_index(sect_strs, key.id),
@@ -129,10 +138,37 @@ export function build_key2(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
   // sort the keys by id
   key2.keys.sort((a, b) => StrsItem.binaryStringCompare(a._id, b._id));
 
+  // finally, kmap
+  key2.kmap = kmxplus.key2.kmap.map(({vkey, mod, key}) => {
+    let result : BUILDER_KEY2_KMAP = {
+      vkey,
+      mod,
+      key: key2.keys.findIndex(k => k._id === key),
+    };
+    // Make sure the key was found
+    if (result.key === -1) {
+      throw new Error(`Key2: Could not find key2.key id=${result.key} for key2.kmap.key=${key}`);
+    }
+    return result;
+  });
+
+  // Sort kmap by vkek, mod order, per C7043
+  key2.kmap.sort((a,b) => {
+    let rc = 0;
+    if (rc === 0) {
+      rc = (a.vkey - b.vkey);
+    }
+    if (rc === 0) {
+      rc = (a.mod - b.mod);
+    }
+    return rc;
+  });
+
   let offset = constants.length_key2 +
     (constants.length_key2_key * key2.keyCount) +
     (constants.length_key2_flick_element * key2.flickCount) +
-    (constants.length_key2_flick_list * key2.flicksCount);
+    (constants.length_key2_flick_list * key2.flicksCount) +
+    (constants.length_key2_kmap * key2.kmapCount);
   key2.size = offset;
 
   return key2;

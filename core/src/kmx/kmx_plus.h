@@ -143,35 +143,8 @@ typedef COMP_KMXPLUS_TRAN_ENTRY COMP_KMXPLUS_FINL_ENTRY;
 typedef COMP_KMXPLUS_TRAN COMP_KMXPLUS_FINL;
 
 /* ------------------------------------------------------------------
- * keys section
+ * keys section is now key2.kmap
    ------------------------------------------------------------------ */
-
-struct COMP_KMXPLUS_KEYS_ENTRY {
-    KMX_DWORD vkey;
-    KMX_DWORD mod;
-    KMX_DWORD to;     // to may be KMXPLUS_STR or UTF32 char
-    KMX_DWORD flags;
-    /**
-     * @brief Get the 'to' as a string, if flags&LDML_KEYS_FLAGS_EXTEND is not set
-     *
-     * @return std::u16string
-     */
-    std::u16string get_string() const;
-};
-
-struct COMP_KMXPLUS_KEYS {
-  static const KMX_DWORD IDENT = LDML_SECTIONID_KEYS;
-  COMP_KMXPLUS_HEADER header;
-  KMX_DWORD count;    // number of keys
-  COMP_KMXPLUS_KEYS_ENTRY entries[];
-  /**
-   * @brief True if section is valid.
-   */
-  bool valid(KMX_DWORD length) const;
-};
-
-static_assert(sizeof(struct COMP_KMXPLUS_KEYS) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");
-static_assert(sizeof(struct COMP_KMXPLUS_KEYS) == LDML_LENGTH_KEYS, "mismatched size of section keys");
 
 /* ------------------------------------------------------------------
  * loca section
@@ -466,9 +439,11 @@ struct COMP_KMXPLUS_KEY2 {
   KMX_DWORD keyCount;
   KMX_DWORD flicksCount;
   KMX_DWORD flickCount;
+  KMX_DWORD kmapCount;
   // see helper for: keys sub-table
   // see helper for: flick lists sub-table
   // see helper for: flick elements sub-table
+  // see helper for: kmap sub-table
 
   /**
    * @brief True if section is valid.
@@ -489,7 +464,6 @@ struct COMP_KMXPLUS_KEY2_FLICK_LIST {
 };
 
 struct COMP_KMXPLUS_KEY2_KEY {
-  KMX_DWORD vkey;
   KMXPLUS_STR to;
   KMX_DWORD flags;
   KMXPLUS_STR id;
@@ -499,6 +473,14 @@ struct COMP_KMXPLUS_KEY2_KEY {
   KMXPLUS_STR longPressDefault;
   KMXPLUS_LIST multiTap;
   KMX_DWORD flicks; // index
+
+  std::u16string get_string() const;
+};
+
+struct COMP_KMXPLUS_KEY2_KMAP {
+    KMX_DWORD vkey;
+    KMX_DWORD mod;
+    KMX_DWORD key;     // index into key subtable
 };
 
 class COMP_KMXPLUS_KEY2_Helper {
@@ -514,6 +496,7 @@ public:
   const COMP_KMXPLUS_KEY2_KEY           *getKeys(KMX_DWORD key) const;
   const COMP_KMXPLUS_KEY2_FLICK_LIST    *getFlickLists(KMX_DWORD list) const;
   const COMP_KMXPLUS_KEY2_FLICK_ELEMENT *getFlickElements(KMX_DWORD element) const;
+  const COMP_KMXPLUS_KEY2_KMAP          *getKmap(KMX_DWORD element) const;
 
 private:
   const COMP_KMXPLUS_KEY2 *key2;
@@ -521,12 +504,13 @@ private:
   const COMP_KMXPLUS_KEY2_KEY *keys;
   const COMP_KMXPLUS_KEY2_FLICK_LIST *flickLists;
   const COMP_KMXPLUS_KEY2_FLICK_ELEMENT *flickElements;
+  const COMP_KMXPLUS_KEY2_KMAP *kmap;
 };
-
 
 static_assert(sizeof(struct COMP_KMXPLUS_KEY2_KEY) == LDML_LENGTH_KEY2_KEY, "mismatched size of key2.key");
 static_assert(sizeof(struct COMP_KMXPLUS_KEY2_FLICK_ELEMENT) == LDML_LENGTH_KEY2_FLICK_ELEMENT, "mismatched size of key2.flick");
 static_assert(sizeof(struct COMP_KMXPLUS_KEY2_FLICK_LIST) == LDML_LENGTH_KEY2_FLICK_LIST, "mismatched size of key2.flicks");
+static_assert(sizeof(struct COMP_KMXPLUS_KEY2_KMAP) == LDML_LENGTH_KEY2_KMAP, "mismatched size of key2.kmap");
 static_assert(sizeof(struct COMP_KMXPLUS_KEY2) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");
 static_assert(sizeof(struct COMP_KMXPLUS_KEY2) == LDML_LENGTH_KEY2, "mismatched size of section key2");
 
@@ -606,7 +590,6 @@ class kmx_plus {
     const COMP_KMXPLUS_DISP *disp;
     const COMP_KMXPLUS_ELEM *elem;
     const COMP_KMXPLUS_KEY2 *key2;
-    const COMP_KMXPLUS_KEYS *keys;
     const COMP_KMXPLUS_LAYR *layr;
     const COMP_KMXPLUS_LIST *list;
     const COMP_KMXPLUS_LOCA *loca;
@@ -616,7 +599,6 @@ class kmx_plus {
     const COMP_KMXPLUS_TRAN *tran;
     const COMP_KMXPLUS_VKEY *vkey;
     inline bool is_valid() { return valid; }
-  private:
     bool valid; // true if valid
     COMP_KMXPLUS_LAYR_Helper layrHelper;
     COMP_KMXPLUS_LIST_Helper listHelper;

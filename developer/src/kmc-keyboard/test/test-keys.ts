@@ -1,60 +1,53 @@
 import 'mocha';
 import { assert } from 'chai';
-import { KeysCompiler } from '../src/compiler/keys.js';
+import { Key2Compiler } from '../src/compiler/key2.js';
 import { compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
 import { KMXPlus, Constants } from '@keymanapp/common-types';
 import { CompilerMessages } from '../src/compiler/messages.js';
 
 const K = Constants.USVirtualKeyCodes;
 
-import Keys = KMXPlus.Keys;
+import Key2 = KMXPlus.Key2;
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 
-describe('keys', function () {
+// Note: keeping the test cases, but they now apply to the subtable
+describe('key2.kmap', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
-  it('should compile minimal keys data', function() {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/minimal.xml', compilerTestCallbacks) as Keys;
-    assert.isNotNull(keys);
+  it('should compile minimal kmap data', function() {
+    let key2 = loadSectionFixture(Key2Compiler, 'sections/keys/minimal.xml', compilerTestCallbacks) as Key2;
+    assert.isNotNull(key2);
     assert.equal(compilerTestCallbacks.messages.length, 0);
-    assert.equal(keys.keys.length, 1);
+    assert.equal(key2.kmap.length, 1);
   });
 
-  testCompilationCases(KeysCompiler, [
-    {
-      subpath: 'sections/keys/escaped.xml',
-      callback: (keys, subpath, callbacks) => {
-        assert.isNotNull(keys);
-        assert.equal((<Keys>keys).keys.length, 1);
-        assert.equal((<Keys>keys).keys[0].to.value, String.fromCodePoint(0x1faa6));
-      },
-    },
+  testCompilationCases(Key2Compiler, [
     {
       subpath: 'sections/keys/hardware.xml',
       callback: (sect, subpath, callbacks) => {
-        const keys = sect as Keys;
+        const keys = sect as Key2;
         assert.isNotNull(keys);
         assert.equal(compilerTestCallbacks.messages.length, 0);
         assert.equal(keys.keys.length, 4);
-        assert.sameDeepMembers(keys.keys.map(({vkey, to, mod}) => ({vkey, to: to.value, mod})), [
+        assert.sameDeepMembers(keys.kmap, [
           {
             vkey: K.K_BKQUOTE,
-            to: 'qqq',
+            key: 'qqq',
             mod: constants.keys_mod_none,
           },
           {
             vkey: K.K_1,
-            to: 'www',
+            key: 'www',
             mod: constants.keys_mod_none,
           },
           {
             vkey: K.K_BKQUOTE,
-            to: 'QQQ',
+            key: 'QQQ',
             mod: constants.keys_mod_shift,
           },
           {
             vkey: K.K_1,
-            to: 'WWW',
+            key: 'WWW',
             mod: constants.keys_mod_shift,
           },
         ]);
@@ -63,22 +56,22 @@ describe('keys', function () {
     {
       subpath: 'sections/keys/hardware_us.xml',
       callback: (sect, subpath, callbacks) => {
-        const keys = sect as Keys;
+        const keys = sect as Key2;
         assert.isNotNull(keys);
-        assert.includeDeepMembers(keys.keys.map(({vkey, to, mod}) => ({vkey, to: to.value, mod})), [
+        assert.includeDeepMembers(keys.kmap, [
           {
             vkey: K.K_BKSLASH,
-            to: '\\',
+            key: 'backslash',
             mod: constants.keys_mod_none,
           },
           {
             vkey: K.K_Z,
-            to: 'z',
+            key: 'z',
             mod: constants.keys_mod_none,
           },
           {
             vkey: K.K_BKQUOTE,
-            to: '`',
+            key: 'grave',
             mod: constants.keys_mod_none,
           },
         ]);
@@ -87,22 +80,22 @@ describe('keys', function () {
     {
       subpath: 'sections/keys/hardware_iso.xml',
       callback: (sect, subpath, callbacks) => {
-        const keys = sect as Keys;
+        const keys = sect as Key2;
         assert.isNotNull(keys);
-        assert.includeDeepMembers(keys.keys.map(({vkey, to, mod}) => ({vkey, to: to.value, mod})), [
+        assert.includeDeepMembers(keys.kmap, [
           {
             vkey: K.K_oE2,
-            to: '\\',
+            key: 'backslash',
             mod: constants.keys_mod_none,
           },
           {
             vkey: 'Z'.charCodeAt(0),
-            to: 'z',
+            key: 'z',
             mod: constants.keys_mod_none,
           },
           {
             vkey: 192,
-            to: '`',
+            key: 'grave',
             mod: constants.keys_mod_none,
           },
         ]);
@@ -117,7 +110,7 @@ describe('keys', function () {
   ]);
 
   it('should reject structurally invalid layers', function() {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/invalid-missing-layer.xml', compilerTestCallbacks) as Keys;
+    let keys = loadSectionFixture(Key2Compiler, 'sections/keys/invalid-missing-layer.xml', compilerTestCallbacks) as Key2;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
@@ -125,7 +118,7 @@ describe('keys', function () {
   });
 
   it('should reject layouts with too many hardware rows', function() {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/invalid-hardware-too-many-rows.xml', compilerTestCallbacks) as Keys;
+    let keys = loadSectionFixture(Key2Compiler, 'sections/keys/invalid-hardware-too-many-rows.xml', compilerTestCallbacks) as Key2;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
@@ -133,7 +126,7 @@ describe('keys', function () {
   });
 
   it('should reject layouts with too many hardware keys', function() {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/invalid-hardware-too-many-keys.xml', compilerTestCallbacks) as Keys;
+    let keys = loadSectionFixture(Key2Compiler, 'sections/keys/invalid-hardware-too-many-keys.xml', compilerTestCallbacks) as Key2;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
@@ -141,20 +134,20 @@ describe('keys', function () {
   });
 
   it('should reject layouts with undefined keys', function() {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/invalid-undefined-key.xml', compilerTestCallbacks) as Keys;
+    let keys = loadSectionFixture(Key2Compiler, 'sections/keys/invalid-undefined-key.xml', compilerTestCallbacks) as Key2;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
     assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_KeyNotFoundInKeyBag({col: 1, form: 'hardware', keyId: 'foo', layer: 'base', row: 1}));
   });
   it('should reject layouts with invalid keys', function() {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/invalid-key-missing-attrs.xml', compilerTestCallbacks) as Keys;
+    let keys = loadSectionFixture(Key2Compiler, 'sections/keys/invalid-key-missing-attrs.xml', compilerTestCallbacks) as Key2;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
     assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_KeyMissingToGapOrSwitch({keyId: 'Q'}));
   });
   it('should accept layouts with gap/switch keys', function() {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/gap-switch.xml', compilerTestCallbacks) as Keys;
+    let keys = loadSectionFixture(Key2Compiler, 'sections/keys/gap-switch.xml', compilerTestCallbacks) as Key2;
     assert.isNotNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 0);
     assert.equal(keys.keys.length, 4);

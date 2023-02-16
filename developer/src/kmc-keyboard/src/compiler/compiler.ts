@@ -4,7 +4,6 @@ import { CompilerMessages } from './messages.js';
 import { BkspCompiler, FinlCompiler, TranCompiler } from './tran.js';
 import { DispCompiler } from './disp.js';
 import { Key2Compiler } from './key2.js';
-import { KeysCompiler } from './keys.js';
 import { LayrCompiler } from './layr.js';
 import { LocaCompiler } from './loca.js';
 import { MetaCompiler } from './meta.js';
@@ -20,7 +19,6 @@ const SECTION_COMPILERS = [
   DispCompiler,
   FinlCompiler,
   Key2Compiler,
-  KeysCompiler,
   LayrCompiler,
   LocaCompiler,
   MetaCompiler,

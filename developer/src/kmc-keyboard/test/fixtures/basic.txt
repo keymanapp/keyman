@@ -110,9 +110,6 @@ block(sectitems)
   6b 65 79 32
   diff(sect,key2)
 
-  6b 65 79 73
-  diff(sect,keys)
-
   6c 61 79 72
   diff(sect,layr)
 
@@ -267,9 +264,9 @@ block(key2)                         # struct COMP_KMXPLUS_KEY2 {
   02 00 00 00                       #   KMX_DWORD keyCount
   01 00 00 00                       #   KMX_DWORD flicksCount
   00 00 00 00                       #   KMX_DWORD flickCount
+  02 00 00 00                       #   KMX_DWORD kmapCount;          // 0008 number of kmap
   # keys
-  #  hmaqtugha
-  00 00 00 00                       #   KMX_DWORD vkey
+  # (#0000) hmaqtugha
   index(strNull,strKey1,2)          #   KMXPLUS_STR 'U+0127'
   01 00 00 00                       #   KMX_DWORD (flags: extend)
   index(strNull,strHmaqtugha,2)     #   KMXPLUS_STR 'hmaqtugha'
@@ -279,8 +276,7 @@ block(key2)                         # struct COMP_KMXPLUS_KEY2 {
   00 00 00 00                       #   STR longPressDefault
   00 00 00 00 # TODO: index(listNull,listNull,4)        #   LIST multiTap
   00 00 00 00                       #   flicks 0
-  # that
-  00 00 00 00                       #   KMX_DWORD vkey
+  # (#0001) that
   index(strNull,strKey2,2)          #   KMXPLUS_STR 'U+0127'
   01 00 00 00                       #   KMX_DWORD flags = extend
   index(strNull,strThat,2)          #   KMXPLUS_STR 'hmaqtugha'
@@ -300,22 +296,14 @@ block(key2)                         # struct COMP_KMXPLUS_KEY2 {
   #00 00 00 00                       #   LIST directions
   #00 00 00 01                       #   flags
   #00 00 00 00                       #   str: to
+  # kmapdata:
+
+  31 00 00 00  00 00 00 00  01 00 00 00  # KMX_DWORD vkey, mod, key;
+  c0 00 00 00  00 00 00 00  00 00 00 00  # KMX_DWORD vkey, mod, key;
 
 # ----------------------------------------------------------------------------------------------------
-# keys
+# keys is now under key2.kmap
 # ----------------------------------------------------------------------------------------------------
-
-
-block(keys)                         # struct COMP_KMXPLUS_KEYS {
-  6b 65 79 73                       #   KMX_DWORD header.ident;   // 0000 Section name - keys
-  sizeof(keys)                      #   KMX_DWORD header.size;    // 0004 Section length
-  02 00 00 00                       #   KMX_DWORD count;          // 0008 number of keys
-                                    # };
-
-# Keys data:
-
-  c0 00 00 00  00 00 00 00  index(strNull,strKey1,2)  01 00 00 00   # KMX_DWORD vkey, mod, to, flags;
-  31 00 00 00  00 00 00 00  index(strNull,strKey2,2)  01 00 00 00   # KMX_DWORD vkey, mod, to, flags;
 
 # ----------------------------------------------------------------------------------------------------
 # layr

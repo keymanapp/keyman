@@ -30,7 +30,6 @@ export type SectionIdent =
   'elem' |
   'finl' |
   'key2' |
-  'keys' |
   'layr' |
   'list' |
   'loca' |
@@ -225,27 +224,8 @@ class Constants {
   readonly finl_flags_error = 0x0001;
 
   /* ------------------------------------------------------------------
-    * keys section
+    * keys section is now key2.jmap
       ------------------------------------------------------------------ */
-
-  /**
-   * Minimum length of the 'keys' section not including variable parts
-   */
-  readonly length_keys = 12;
-  /**
-   *  Length of each item in the 'keys' section variable part
-   */
-  readonly length_keys_item = 16;
-  /**
-   * bitwise or value for extend in keys[key].flags.
-   * If bit is 1, then 'to' is a string.
-   * If bit is 0, then 'to' is a UTF-32LE codepoint
-   *
-   * `extend = flags & keys_flags_extend`
-   */
-  readonly keys_flags_extend = 1;
-
-  /* Modifier key bitmasks. These correspond to the modifier bitmasks from kmx_file.h */
 
   /**
    * Constant for no modifiers
@@ -313,11 +293,11 @@ class Constants {
   /**
    * Minimum length of the 'key2' section not including variable parts
    */
-  readonly length_key2 = 20;
+  readonly length_key2 = 24;
   /**
    *  Length of each item in the 'key2' keys sub-table
    */
-  readonly length_key2_key = 40;
+  readonly length_key2_key = 36;
   /**
    *  Length of each item in the 'key2' flick lists sub-table
    */
@@ -326,6 +306,10 @@ class Constants {
    *  Length of each item in the 'key2' flick elements sub-table
    */
   readonly length_key2_flick_element = 12;
+  /**
+   * Length of each item in the 'key2.kmap' key map subtable
+   */
+  readonly length_key2_kmap = 12;
 
   /**
    * 0 if to is a char, 1 if it is a string
@@ -534,7 +518,6 @@ class Constants {
       elem: 'elem',
       finl: 'finl',
       key2: 'key2',
-      keys: 'keys',
       layr: 'layr',
       list: 'list',
       loca: 'loca',

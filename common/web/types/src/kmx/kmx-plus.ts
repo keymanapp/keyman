@@ -46,24 +46,7 @@ export class Elem extends Section {
 
 // 'finl' -- see 'tran'
 
-// 'keys'
-
-export enum KeyFlags {
-  none = 0,
-  extend = constants.keys_flags_extend,  // note, this should be used only when streaming, ignored in-memory
-  // additional flags reserved for future use
-};
-
-export class KeysItem {
-  vkey: number;
-  mod: number;
-  to: StrsItem;
-  flags: KeyFlags;
-};
-
-export class Keys extends Section {
-  keys: KeysItem[] = [];
-};
+// 'keys' is now `keys2.kmap`
 
 // 'loca'
 
@@ -271,8 +254,14 @@ export class Key2Keys {
   multiTap: ListItem;
   switch: StrsItem;
   to: StrsItem;
-  vkey: number;
   width: number;
+};
+
+
+export class Key2Kmap {
+  vkey: number;
+  mod: number;
+  key: string; // for in-memory only
 };
 
 export class Key2Flicks {
@@ -295,6 +284,7 @@ export class Key2Flick {
 export class Key2 extends Section {
   keys: Key2Keys[] = [];
   flicks: Key2Flicks[] = [];
+  kmap: Key2Kmap[] = [];
   constructor(strs: Strs) {
     super();
     let nullFlicks = new Key2Flicks(strs.allocString(''));
@@ -358,7 +348,6 @@ export interface KMXPlusData {
     elem?: Elem; // elem is ignored in-memory
     finl?: Finl;
     key2?: Key2;
-    keys?: Keys;
     layr?: Layr;
     list?: List; // list is ignored in-memory
     loca?: Loca;
@@ -392,8 +381,7 @@ export class KMXPlusFile extends KMXFile {
   public readonly COMP_PLUS_FINL_ITEM: any;
   public readonly COMP_PLUS_FINL: any;
 
-  public readonly COMP_PLUS_KEYS_ITEM: any;
-  public readonly COMP_PLUS_KEYS: any;
+  // COMP_PLUS_KEYS is now COMP_PLUS_KEY2_KMAP
 
   public readonly COMP_PLUS_LAYR_ENTRY: any;
   public readonly COMP_PLUS_LAYR_KEY: any;
@@ -404,6 +392,7 @@ export class KMXPlusFile extends KMXFile {
   public readonly COMP_PLUS_KEY2_FLICK: any;
   public readonly COMP_PLUS_KEY2_FLICKS: any;
   public readonly COMP_PLUS_KEY2_KEY: any;
+  public readonly COMP_PLUS_KEY2_KMAP: any;
   public readonly COMP_PLUS_KEY2: any;
 
   public readonly COMP_PLUS_LIST_LIST: any;
@@ -493,21 +482,7 @@ export class KMXPlusFile extends KMXFile {
 
     // 'finl' - see 'tran'
 
-    // 'keys'
-
-    this.COMP_PLUS_KEYS_ITEM = new r.Struct({
-      vkey: r.uint32le,
-      mod: r.uint32le,
-      to: r.uint32le, //str or UTF-32 char depending on value of 'extend'
-      flags: r.uint32le, //new r.Bitfield(r.uint32le, ['extend'])
-    });
-
-    this.COMP_PLUS_KEYS = new r.Struct({
-      ident: r.uint32le,
-      size: r.uint32le,
-      count: r.uint32le,
-      items: new r.Array(this.COMP_PLUS_KEYS_ITEM, 'count')
-    });
+    // 'keys' - see 'key2.kmap'
 
     // 'layr'
 
@@ -560,7 +535,6 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_KEY2_KEY = new r.Struct({
-      vkey: r.uint32le,
       to: r.uint32le, // str | codepoint
       flags: r.uint32le,
       id: r.uint32le, // str
@@ -572,15 +546,23 @@ export class KMXPlusFile extends KMXFile {
       flicks: r.uint32le, // index into flicks table
     });
 
+    this.COMP_PLUS_KEY2_KMAP = new r.Struct({
+      vkey: r.uint32le,
+      mod: r.uint32le,
+      key: r.uint32le, // index into 'keys' subtable
+    });
+
     this.COMP_PLUS_KEY2 = new r.Struct({
       ident: r.uint32le,
       size: r.uint32le,
       keyCount: r.uint32le,
       flicksCount: r.uint32le,
       flickCount: r.uint32le,
+      kmapCount: r.uint32le,
       keys: new r.Array(this.COMP_PLUS_KEY2_KEY, 'keyCount'),
       flicks: new r.Array(this.COMP_PLUS_KEY2_FLICKS, 'flicksCount'),
       flick: new r.Array(this.COMP_PLUS_KEY2_FLICK, 'flickCount'),
+      kmap: new r.Array(this.COMP_PLUS_KEY2_KMAP, 'kmapCount'),
     });
 
     // 'list'
