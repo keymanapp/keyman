@@ -38,4 +38,13 @@ export class CommonTypesMessages {
     m(this.ERROR_ImportMergeFail,
       `Problem importing ${o.path}: not sure how to handle non-array ${o.subtag}.${o.subsubtag}`);
   static ERROR_ImportMergeFail = SevError | 0x0006;
+
+  static Error_TestDataUnexpectedArray = (o: {subtag: string}) =>
+    m(this.ERROR_TestDataUnexpectedArray,
+      `Problem reading test data: expected single ${o.subtag} element, found multiple`);
+  static ERROR_TestDataUnexpectedArray = SevError | 0x0007;
+  static Error_TestDataUnexpectedAction = (o: {subtag: string}) =>
+    m(this.ERROR_TestDataUnexpectedAction,
+      `Problem reading test data: unexpected action element ${o.subtag}`);
+  static ERROR_TestDataUnexpectedAction = SevError | 0x0008;
 };

@@ -5,6 +5,13 @@ import { boxXmlArray } from '../util/util.js';
 import { CompilerCallbacks } from '../util/compiler-interfaces.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { CommonTypesMessages } from '../util/common-events.js';
+import { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTTests } from './ldml-keyboard-testdata-xml.js';
+
+interface NameAndProps  {
+  '$'?: any; // content
+  '#name'?: string; // element name
+  '$$'?: any; // children
+};
 
 export default class LDMLKeyboardXMLSourceFileReader {
   callbacks: CompilerCallbacks;
@@ -186,7 +193,7 @@ export default class LDMLKeyboardXMLSourceFileReader {
   /**
    * @returns true if valid, false if invalid
    */
-  public validate(source: LDMLKeyboardXMLSourceFile, schemaSource: Buffer): boolean {
+  public validate(source: LDMLKeyboardXMLSourceFile | LDMLKeyboardTestDataXMLSourceFile, schemaSource: Buffer): boolean {
     const schema = JSON.parse(schemaSource.toString('utf8'));
     const ajv = new Ajv();
     if(!ajv.validate(schema, source)) {
@@ -220,7 +227,7 @@ export default class LDMLKeyboardXMLSourceFileReader {
         // An alternative fix would be to pull xml2js directly from github
         // rather than using the version tagged on npmjs.com.
       });
-      parser.parseString(file, (e: unknown, r: unknown) => { a = r as LDMLKeyboardXMLSourceFile });
+      parser.parseString(file, (e: unknown, r: unknown) => { a = r as LDMLKeyboardXMLSourceFile }); // TODO-LDML: isn't 'e' the error?
       return a;
     })();
     return source;
@@ -240,5 +247,140 @@ export default class LDMLKeyboardXMLSourceFileReader {
     } else {
       return null;
     }
+  }
+
+  loadTestDataUnboxed(file: Uint8Array): any {
+    let source = (() => {
+      let a: any;
+      let parser = new xml2js.Parser({
+        // explicitArray: false,
+        preserveChildrenOrder:true, // needed for test data
+        explicitChildren: true, // needed for test data
+        // mergeAttrs: true,
+        // includeWhiteChars: false,
+        // emptyTag: {} as any
+        // Why "as any"? xml2js is broken:
+        // https://github.com/Leonidas-from-XIV/node-xml2js/issues/648 means
+        // that an old version of `emptyTag` is used which doesn't support
+        // functions, but DefinitelyTyped is requiring use of function or a
+        // string. See also notes at
+        // https://github.com/DefinitelyTyped/DefinitelyTyped/pull/59259#issuecomment-1254405470
+        // An alternative fix would be to pull xml2js directly from github
+        // rather than using the version tagged on npmjs.com.
+      });
+      parser.parseString(file, (e: unknown, r: unknown) => { a = r as any }); // TODO-LDML: isn't 'e' the error?
+      return a; // Why 'any'? Because we need to box up the $'s into proper properties.
+    })();
+    return source;
+  }
+
+  /**
+   * Filter the obj array for a subtag
+   * @param source array of source objs
+   * @param subtag subtag to filter on
+   * @returns
+   */
+  findSubtagArray(source: NameAndProps[], subtag: string): NameAndProps[]  {
+    return source?.filter(o => o['#name'] === subtag);
+  }
+
+  /**
+   * Get exactly one element
+   * @param source
+   * @param subtag
+   * @returns
+   */
+  findSubtag(source: NameAndProps[], subtag: string): NameAndProps | null {
+    const r = this.findSubtagArray(source, subtag);
+    if (!r || r.length === 0) {
+      return null;
+    } else if (r.length === 1) {
+      return r[0];
+    } else {
+      this.callbacks.reportMessage(CommonTypesMessages.Error_TestDataUnexpectedArray({subtag}));
+      return null; // ERROR
+    }
+  }
+
+  /**
+   * The default test data stuffer.
+   * Just gets $ (the attrs) as the body.
+   * Override to use something more complex, such as including child nodes.
+   * @param o object to map
+   * @param r back ref to reader
+   */
+  static readonly defaultMapper = ((o : NameAndProps, r: LDMLKeyboardXMLSourceFileReader) => o?.$);
+
+  /**
+   *
+   * @param obj target object
+   * @param source array of $/#name strings
+   * @param subtag name to extract
+   * @param mapper custom mapper function
+   */
+  stuffBoxes(obj: any, source: NameAndProps[], subtag: string, asArray?: boolean, mapper?: (v: NameAndProps, r: LDMLKeyboardXMLSourceFileReader) => any) {
+    if (!mapper) {
+      mapper = LDMLKeyboardXMLSourceFileReader.defaultMapper;
+    }
+    if (asArray) {
+      const r = this;
+      obj[subtag] = this.findSubtagArray(source, subtag)?.map((v) => mapper(v, r)); // extract contents only
+    } else {
+      obj[subtag] = mapper(this.findSubtag(source, subtag), this); // run the mapper once
+    }
+  }
+
+  boxTestDataArrays(raw: any) : LDMLKeyboardTestDataXMLSourceFile | null {
+    if (!raw) return null;
+    const a : LDMLKeyboardTestDataXMLSourceFile = {
+      keyboardTest: {
+        conformsTo: raw?.keyboardTest?.$?.conformsTo,
+      }
+    };
+
+    const $$ : NameAndProps[] = raw?.keyboardTest?.$$;
+
+    this.stuffBoxes(a.keyboardTest, $$, 'info');
+    this.stuffBoxes(a.keyboardTest, $$, 'repertoire', true);
+    this.stuffBoxes(a.keyboardTest, $$, 'tests', true, (o, r) => {
+      // start with basic unpack
+      const tests : LKTTests = LDMLKeyboardXMLSourceFileReader.defaultMapper(o, r);
+      // add ingredients
+      r.stuffBoxes(tests, o.$$, 'test', true, (o, r) => {
+        // start with basic unpack
+        const test : LKTTest = LDMLKeyboardXMLSourceFileReader.defaultMapper(o, r);
+        // add ingredients
+        const $$ : NameAndProps[] = o.$$;
+        r.stuffBoxes(test, $$, 'startContext'); // singleton
+        // now the actions
+        test.actions = $$.map(v => {
+          const subtag = v['#name'];
+          const subv = LDMLKeyboardXMLSourceFileReader.defaultMapper(v, r);
+          switch(subtag) {
+            case 'keystroke': return { keystroke: subv };
+            case 'check':     return { check:     subv };
+            case 'emit':      return { emit:      subv };
+            case 'startContext': return null; // handled above
+            default: this.callbacks.reportMessage(CommonTypesMessages.Error_TestDataUnexpectedAction({ subtag })); return null;
+          }
+        }).filter(v => v !== null);
+        return test;
+      });
+      return tests;
+    });
+
+    return a;
+  }
+
+  /**
+   * @param file test file
+   * @returns source on success, otherwise null
+   */
+  public loadTestData(file: Uint8Array): LDMLKeyboardTestDataXMLSourceFile | null {
+    if (!file) {
+      return null;
+    }
+    const source = this.loadTestDataUnboxed(file);
+    return this.boxTestDataArrays(source);
   }
 }

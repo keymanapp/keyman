@@ -39,6 +39,7 @@ export interface CompilerCallbacks {
    */
   loadFile(baseFilename: string, filename: string | URL): Buffer;
   loadLdmlKeyboardSchema(): Buffer;
+  loadLdmlKeyboardTestSchema(): Buffer;
   reportMessage(event: CompilerEvent): void;
   loadKvksJsonSchema(): Buffer;
 };

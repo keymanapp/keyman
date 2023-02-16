@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { fileURLToPath } from 'url';
 import { SectionCompiler } from '../../src/compiler/section-compiler.js';
-import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, CompilerCallbacks } from '@keymanapp/common-types';
+import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
 import Compiler from '../../src/compiler/compiler.js';
 import { assert } from 'chai';
 import KMXPlusMetadataCompiler from '../../src/compiler/metadata-compiler.js';
@@ -61,6 +61,9 @@ class TestCompilerCallbacks implements CompilerCallbacks {
   loadKvksJsonSchema(): Buffer {
     return fs.readFileSync(new URL(path.join('..', '..', 'src', 'kvks.schema.json'), import.meta.url));
   }
+  loadLdmlKeyboardTestSchema(): Buffer {
+    return fs.readFileSync(new URL(path.join('..', '..', 'src', 'ldml-keyboardtest.schema.json'), import.meta.url));
+  }
 };
 
 export const compilerTestCallbacks = new TestCompilerCallbacks();
@@ -104,6 +107,12 @@ export function loadSectionFixture(compilerClass: typeof SectionCompiler, filena
   globalSections.list = new List(globalSections.strs);
 
   return compiler.compile(globalSections);
+}
+
+export function loadTestdata(inputFilename: string, options: CompilerOptions) : LDMLKeyboardTestDataXMLSourceFile {
+  const k = new Compiler(compilerTestCallbacks, options);
+  const source = k.loadTestData(inputFilename);
+  return source;
 }
 
 export function compileKeyboard(inputFilename: string, options: CompilerOptions): KMXPlusFile {
