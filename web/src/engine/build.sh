@@ -83,8 +83,6 @@ PATH="../../../node_modules/.bin:$PATH"
 compiler="npm run tsc --"
 compilecmd="$compiler"
 
-builder_check_color "$@"
-
 builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   "@../../../common/web/keyman-version build:main" \
   "@../../../common/web/input-processor build:main" \

@@ -22,8 +22,6 @@ cd "$(dirname "$THIS_SCRIPT")"
 
 ################################ Main script ################################
 
-builder_check_color "$@"
-
 #  "@../models/types" \ # is just a .d.ts, so there's nothing to actually BUILD.
 
 builder_describe "Builds the lm-layer module" \
@@ -35,7 +33,7 @@ builder_describe "Builds the lm-layer module" \
   "configure" \
   "build" \
   "test" \
-  "--ci        Sets ${BUILDER_TERM_START}test${BUILDER_TERM_END} action to use CI-based test configurations & reporting"
+  "--ci        Sets $(builder_term test) action to use CI-based test configurations & reporting"
 
 builder_describe_outputs \
   configure  /node_modules \
