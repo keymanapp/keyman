@@ -6,15 +6,15 @@
 #include "kmcmpdll.h"
 #include "DeprecationChecks.h"
 
-KMX_BOOL WarnDeprecatedHeader() {   // I4866
-  if (kmcmp::FWarnDeprecatedCode) {
-    AddWarning(CWARN_HeaderStatementIsDeprecated);
+KMX_BOOL kmcmp::WarnDeprecatedHeader() {   // I4866
+if( AWarnDeprecatedCode_GLOBAL_LIB){
+  AddWarning(CWARN_HeaderStatementIsDeprecated);
   }
   return TRUE;
 }
 
 /* Flag presence of deprecated features */
-KMX_BOOL CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
+KMX_BOOL kmcmp::CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
   /*
     For Keyman 10, we deprecated:
       // < Keyman 7
@@ -30,7 +30,7 @@ KMX_BOOL CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
   DWORD i;
   PFILE_STORE sp;
 
-  if (!kmcmp::FWarnDeprecatedCode) {
+  if (!AWarnDeprecatedCode_GLOBAL_LIB) {
     return TRUE;
   }
 

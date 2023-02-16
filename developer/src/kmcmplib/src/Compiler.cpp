@@ -97,11 +97,12 @@
 #include <CompMsg.h>
 using namespace kmcmp;
 
-char ErrExtraLIB[256];
-KMX_WCHAR ErrExtraW[256];
+  char ErrExtraLIB[256];
+  KMX_WCHAR ErrExtraW[256];
+  BOOL AWarnDeprecatedCode_GLOBAL_LIB;
+
 namespace kmcmp{
   HINSTANCE g_hInstance;
-  KMX_BOOL  FWarnDeprecatedCode;
   KMX_BOOL  FShouldAddCompilerVersion = TRUE;
   KMX_BOOL  FSaveDebug, FCompilerWarningsAsErrors;   // I4865   // I4866
   int ErrChr;
@@ -312,9 +313,7 @@ KMX_BOOL AddCompileError(KMX_DWORD msg)
   }
 
   ErrChr = 0;  *ErrExtraLIB =0;
-
   if (!(*msgproc)(kmcmp::currentLine, msg, szText)) return TRUE;
-
   return FALSE;
 }
 
@@ -346,7 +345,7 @@ extern "C" BOOL __declspec(dllexport) kmcmp_CompileKeyboardFile(PKMX_STR pszInfi
 
   kmcmp::FSaveDebug = ASaveDebug;
   kmcmp::FCompilerWarningsAsErrors = ACompilerWarningsAsErrors;   // I4865
-  kmcmp::FWarnDeprecatedCode = AWarnDeprecatedCode;   // I4866
+  AWarnDeprecatedCode_GLOBAL_LIB = AWarnDeprecatedCode;
 
   kmcmp::CompileTarget = CKF_KEYMAN;
 
@@ -442,8 +441,7 @@ extern "C" BOOL __declspec(dllexport)  kmcmp_CompileKeyboardFileToBuffer(PKMX_ST
 
   kmcmp::FSaveDebug = TRUE;   // I3681
   kmcmp::FCompilerWarningsAsErrors = ACompilerWarningsAsErrors;   // I4865
-  kmcmp::FWarnDeprecatedCode = AWarnDeprecatedCode;   // I4866
-
+  AWarnDeprecatedCode_GLOBAL_LIB = AWarnDeprecatedCode;
   kmcmp::CompileTarget = Target;
 
   if (!pMsgProc || !pszInfile || !pfkBuffer) SetError(CERR_BadCallParams);
@@ -643,7 +641,7 @@ KMX_BOOL CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
   }
 
   /* Flag presence of deprecated features */
-  CheckForDeprecatedFeatures(fk);
+  kmcmp::CheckForDeprecatedFeatures(fk);
 
   return TRUE;
 }
@@ -761,7 +759,7 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
     break;
 
   case T_NAME:
-    WarnDeprecatedHeader();   // I4866
+    kmcmp::WarnDeprecatedHeader();   // I4866
     q = GetDelimitedString(&p, u"\"\"", 0);
     if (!q) return CERR_InvalidName;
 
@@ -769,7 +767,7 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
     break;
 
   case T_COPYRIGHT:
-    WarnDeprecatedHeader();   // I4866
+    kmcmp::WarnDeprecatedHeader();   // I4866
     q = GetDelimitedString(&p, u"\"\"", 0);
     if (!q) return CERR_InvalidCopyright;
 
@@ -777,7 +775,7 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
     break;
 
   case T_MESSAGE:
-    WarnDeprecatedHeader();   // I4866
+    kmcmp::WarnDeprecatedHeader();   // I4866
     q = GetDelimitedString(&p, u"\"\"", 0);
     if (!q) return CERR_InvalidMessage;
 
@@ -785,7 +783,7 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
     break;
 
   case T_LANGUAGENAME:
-    WarnDeprecatedHeader();   // I4866
+    kmcmp::WarnDeprecatedHeader();   // I4866
     q = GetDelimitedString(&p, u"\"\"", 0);
     if (!q) return CERR_InvalidLanguageName;
 
@@ -794,7 +792,7 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
 
   case T_LANGUAGE:
   {
-    WarnDeprecatedHeader();   // I4866
+    kmcmp::WarnDeprecatedHeader();   // I4866
     KMX_WCHAR *tokcontext = NULL;
     q = u16tok(p,  p_sep, &tokcontext);  // I3481
 
@@ -803,30 +801,30 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
   }
   case T_LAYOUT:
   {
-    WarnDeprecatedHeader();   // I4866
+    kmcmp::WarnDeprecatedHeader();   // I4866
     KMX_WCHAR *tokcontext = NULL;
     q = u16tok(p, p_sep, &tokcontext);  // I3481
     if ((msg = AddStore(fk, TSS_LAYOUT, q)) != CERR_None) return msg;
     break;
   }
   case T_CAPSOFF:
-    WarnDeprecatedHeader();   // I4866
+    kmcmp::WarnDeprecatedHeader();   // I4866
     if ((msg = AddStore(fk, TSS_CAPSALWAYSOFF, u"1")) != CERR_None) return msg;
     break;
 
   case T_CAPSON:
-    WarnDeprecatedHeader();   // I4866
+    kmcmp::WarnDeprecatedHeader();   // I4866
     if ((msg = AddStore(fk, TSS_CAPSONONLY, u"1")) != CERR_None) return msg;
     break;
 
   case T_SHIFT:
-    WarnDeprecatedHeader();   // I4866
+    kmcmp::WarnDeprecatedHeader();   // I4866
     if ((msg = AddStore(fk, TSS_SHIFTFREESCAPS, u"1")) != CERR_None) return msg;
     break;
 
   case T_HOTKEY:
   {
-    WarnDeprecatedHeader();   // I4866
+    kmcmp::WarnDeprecatedHeader();   // I4866
     KMX_WCHAR *tokcontext = NULL;
     if ((q = u16tok(p,  p_sep, &tokcontext)) == NULL) return CERR_CodeInvalidInThisSection;  // I3481
     if ((msg = AddStore(fk, TSS_HOTKEY, q)) != CERR_None) return msg;
@@ -834,7 +832,7 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
   }
   case T_BITMAP:
   {
-    WarnDeprecatedHeader();   // I4866
+    kmcmp::WarnDeprecatedHeader();   // I4866
     KMX_WCHAR *tokcontext = NULL;
     if ((q = u16tok(p,  p_sep, &tokcontext)) == NULL) return CERR_InvalidBitmapLine;  // I3481
 
@@ -850,7 +848,7 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
   }
   case T_BITMAPS:
   {
-    WarnDeprecatedHeader();   // I4866
+    kmcmp::WarnDeprecatedHeader();   // I4866
     KMX_WCHAR *tokcontext = NULL;
     AddWarning(CWARN_BitmapNotUsed);
 
