@@ -370,9 +370,9 @@ builder_describe "Sample script" \
 ```
 
 A dependency always starts with `@`. The path to the dependency will be relative
-to the build script folder, or to the root of the repository, if the path starts
-with `/`, not to the root of the file system. It is an error to specify a
-dependency outside the repo root.
+to the build script folder if the path does not start with `/`.  Otherwise, the path
+to the dependency is interpreted relative to the root of the repository. It is an 
+error to specify a dependency outside the repo root.
 
 Relative paths will be expanded to full paths, again, relative to the root of
 the repository.
