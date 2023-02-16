@@ -5,9 +5,9 @@
 # ----------------------------------------------------------------------
 
 !ifdef NODELPHI
-TARGETS=keymanmc keyman32 keyman64 keymanx64 mcompile kmtip kmrefresh
+TARGETS=keymanmc keyman32 keyman64-ver keymanx64 mcompile kmtip kmrefresh
 !else
-TARGETS=keymanmc keyman32 kmcomapi keyman tsysinfox64 tsysinfo keyman64 keymanx64 mcompile inst kmtip kmrefresh
+TARGETS=keymanmc keyman32 kmcomapi keyman tsysinfox64 tsysinfo keyman64-ver keymanx64 mcompile inst kmtip kmrefresh
 !endif
 MANIFESTS=keyman tsysinfo tsysinfox64 keymanx64 mcompile
 CLEANS=clean-engine
@@ -44,8 +44,8 @@ keymanx64: .virtual
     cd $(ROOT)\src\engine\keymanx64
     $(MAKE) $(TARGET)
 
-keyman64: .virtual
-    cd $(ROOT)\src\engine\keyman64
+keyman64-ver: .virtual
+    cd $(ROOT)\src\engine\keyman64-ver
     $(MAKE) $(TARGET)
 
 kmrefresh: .virtual
@@ -76,16 +76,16 @@ keyman32-install:
     cd $(ROOT)\src\engine\keyman32
     $(MAKE) install
 
-keyman64-build:
-    cd $(ROOT)\src\engine\keyman64
+keyman64-ver-build:
+    cd $(ROOT)\src\engine\keyman64-ver
     $(MAKE) build
 
-keyman64-signcode:
-    cd $(ROOT)\src\engine\keyman64
+keyman64-ver-signcode:
+    cd $(ROOT)\src\engine\keyman64-ver
     $(MAKE) signcode
 
-keyman64-install:
-    cd $(ROOT)\src\engine\keyman64
+keyman64-ver-install:
+    cd $(ROOT)\src\engine\keyman64-ver
     $(MAKE) install
 
 # ----------------------------------------------------------------------

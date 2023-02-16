@@ -80,7 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\keyman32\keyman-debug-etw.rc" />
-    <ResourceCompile Include="Keyman64.RC" />
+    <ResourceCompile Include="Keyman64-ver.RC" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(KEYMAN_ROOT)\common\resources\bitmaps\arrow.bmp" />

@@ -308,9 +308,9 @@ Fail(PCWSTR message) {
 }
 
 #ifdef _WIN64
-#define KEYMAN32 "keyman64.dll"
-#define KEYMAN32_DEBUG "keyman64" / "bin" / "x64" / "Debug" / "keyman64.dll"
-#define KEYMAN32_RELEASE "keyman64" / "bin" / "x64" / "Release" / "keyman64.dll"
+#define KEYMAN32 "keyman64-ver.dll"
+#define KEYMAN32_DEBUG "keyman64-ver" / "bin" / "x64" / "Debug" / "keyman64-ver.dll"
+#define KEYMAN32_RELEASE "keyman64-ver" / "bin" / "x64" / "Release" / "keyman64-ver.dll"
 #else
 #define KEYMAN32 "keyman32.dll"
 #define KEYMAN32_DEBUG "keyman32" / "bin" / "Win32" / "Debug" / "keyman32.dll"
