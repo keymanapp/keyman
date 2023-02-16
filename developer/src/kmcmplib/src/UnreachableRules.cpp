@@ -24,19 +24,14 @@ namespace kmcmp {
   }
 
   std::wstring MakeHashKeyFromFileKey16(PFILE_KEY kp) {
-    std::wstringstream key16;
-    const WCHAR* ctxt = u16fmt((PKMX_WCHAR) kp->dpContext).c_str();
-    key16 << conv_KMX_WCHAR__TO__WCHAR(kp->Key) << "," << (DWORD) kp->ShiftFlags << ",";
-    if (ctxt) key16 << ctxt;
-    return key16.str();
-  };
+    std::wstringstream Key_16;
+    std::wstring Context_ws = u16fmt((const PKMX_WCHAR) kp->dpContext);
 
-  std::wstring MakeHashKeyFromFileKey(PFILE_KEY kp) {
-    std::wstringstream key;
-    key << kp->Key << "," << kp->ShiftFlags << ",";
-    if (kp->dpContext) key << kp->dpContext;
-    return key.str();
-  }
+    Key_16 << conv_KMX_WCHAR__TO__WCHAR(kp->Key) << "," << (DWORD) kp->ShiftFlags << ",";
+    if ((KMX_WCHART*) Context_ws.c_str())
+      Key_16 << (KMX_WCHART*) Context_ws.c_str();
+    return Key_16.str();
+  };
 }
 KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
   PFILE_KEY kp = gp->dpKeyArray;
