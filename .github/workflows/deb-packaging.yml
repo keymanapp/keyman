@@ -162,7 +162,7 @@ jobs:
     needs: deb_signing
     runs-on: self-hosted
     environment: "deploy (linux)"
-    if: ${{ ! github.event.client_payload.isTestBuild }}
+    if: github.event.client_payload.isTestBuild == 'false'
 
     steps:
     - name: Download Artifacts
