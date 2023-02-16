@@ -1,11 +1,12 @@
-var assert = require('chai').assert;
-var fs = require("fs");
-var vm = require("vm");
+import { assert } from 'chai';
+import fs from 'fs';
+import vm from 'vm';
 
-let InputProcessor = require('../../build/index.bundled.js');
+import InputProcessor from '../../build/obj/text/inputProcessor.js';
+import { Mock } from '@keymanapp/keyboard-processor/build/obj/text/outputTarget.js';
+import * as utils from '@keymanapp/web-utils/build/obj/index.js';
 
 // Required initialization setup.
-global.com = InputProcessor.com; // exports all keyboard-processor namespacing.
 global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
                     // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.
 
@@ -55,7 +56,7 @@ describe('InputProcessor', function() {
     var keyboard;
 
     // Easy peasy long context:  use the input processor's full source!
-    let coreSourceCode = fs.readFileSync('build/index.bundled.js', 'utf-8');
+    let coreSourceCode = fs.readFileSync('build/lib/index.mjs', 'utf-8');
 
     // At the time this test block was written...  810485 chars.
     // Let's force it to the same order of magnitude, even if the codebase grows.
@@ -90,12 +91,12 @@ describe('InputProcessor', function() {
       it('with minimal context (no fat-fingers)', function() {
         this.timeout(32); // ms
         let core = new InputProcessor(device);
-        let context = new com.keyman.text.Mock("", 0);
+        let context = new Mock("", 0);
 
         core.activeKeyboard = keyboard;
-        let layout = keyboard.layout(com.keyman.utils.FormFactor.Phone);
+        let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
-        let event = key.constructKeyEvent(core.keyboardProcessor, device);
+        let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
 
         let behavior = core.processKeyEvent(event, context);
         assert.isNotNull(behavior);
@@ -103,7 +104,7 @@ describe('InputProcessor', function() {
 
       it('with extremely long context (' + coreSourceCode._kmwLength() + ' chars, no fat-fingers)', function() {
         // Assumes no SMP chars in the source, which is fine.
-        let context = new com.keyman.text.Mock(coreSourceCode, coreSourceCode._kmwLength());
+        let context = new Mock(coreSourceCode, coreSourceCode._kmwLength());
 
         this.timeout(500);                // 500 ms, excluding text import.
                                           // These often run on VMs, so we'll be a bit generous.
@@ -112,9 +113,9 @@ describe('InputProcessor', function() {
                                           // thresholding is disabled within Node.
 
         core.activeKeyboard = keyboard;
-        let layout = keyboard.layout(com.keyman.utils.FormFactor.Phone);
+        let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
-        let event = key.constructKeyEvent(core.keyboardProcessor, device);
+        let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
 
         let behavior = core.processKeyEvent(event, context);
         assert.isNotNull(behavior);
@@ -125,13 +126,13 @@ describe('InputProcessor', function() {
       it('with minimal context (with fat-fingers)', function() {
         this.timeout(32); // ms
         let core = new InputProcessor(device);
-        let context = new com.keyman.text.Mock("", 0);
+        let context = new Mock("", 0);
 
         core.activeKeyboard = keyboard;
-        let layout = keyboard.layout(com.keyman.utils.FormFactor.Phone);
+        let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
         key.keyDistribution = testDistribution;
-        let event = key.constructKeyEvent(core.keyboardProcessor, device);
+        let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
 
         let behavior = core.processKeyEvent(event, context);
         assert.isNotNull(behavior);
@@ -139,7 +140,7 @@ describe('InputProcessor', function() {
 
       it('with extremely long context (' + coreSourceCode._kmwLength() + ' chars, with fat-fingers)', function() {
         // Assumes no SMP chars in the source, which is fine.
-        let context = new com.keyman.text.Mock(coreSourceCode, coreSourceCode._kmwLength());
+        let context = new Mock(coreSourceCode, coreSourceCode._kmwLength());
 
         this.timeout(500);                // 500 ms, excluding text import.
                                           // These often run on VMs, so we'll be a bit generous.
@@ -151,10 +152,10 @@ describe('InputProcessor', function() {
                                           // thresholding is disabled within Node.
 
         core.activeKeyboard = keyboard;
-        let layout = keyboard.layout(com.keyman.utils.FormFactor.Phone);
+        let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
         key.keyDistribution = testDistribution;
-        let event = key.constructKeyEvent(core.keyboardProcessor, device);
+        let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
 
         let behavior = core.processKeyEvent(event, context);
         assert.isNotNull(behavior);

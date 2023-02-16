@@ -2,7 +2,10 @@
   "extends": "../../tsconfig.base.json",
 
 	"compilerOptions": {
-		"outFile": "../../../build/engine/main/obj/keymanweb.js"
+		"outFile": "../../../build/engine/main/obj/keymanweb.js",
+    "allowSyntheticDefaultImports": true,
+    "module": "es6",
+    "moduleResolution": "Node",
   },
 
 	"include": [
@@ -20,9 +23,9 @@
   "references": [
     { "path": "../../../../common/web/keyman-version"},
     { "path": "../../../../common/web/utils"},
-    { "path": "../../../../common/predictive-text/browser.tsconfig.json"},
-    { "path": "../../../../common/web/input-processor/src"},
-    { "path": "../../../../common/web/keyboard-processor/src"},
+    { "path": "../../../../common/predictive-text"},
+    { "path": "../../../../common/web/input-processor"},
+    { "path": "../../../../common/web/keyboard-processor"},
     { "path": "../../../../common/web/lm-message-types" },
 		{ "path": "../device-detect" }
 	]

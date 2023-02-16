@@ -2,12 +2,14 @@
   "name": "@keymanapp/lm-worker",
   "description": "Keyman/Predictive Text worker",
   "main": "build/index.js",
+  "type": "module",
   "scripts": {
     "karma": "karma",
     "mocha": "mocha",
     "test": "gosh ./test/test.sh",
     "build": "tsc -b",
-    "clean": "tsc -b --clean"
+    "clean": "tsc -b --clean",
+    "tsc": "tsc"
   },
   "license": "MIT",
   "devDependencies": {
@@ -15,6 +17,7 @@
     "@keymanapp/resources-gosh": "*",
     "@types/node": "^10.17.21",
     "chai": "^4.3.4",
+    "combine-source-map": "^0.8.0",
     "karma": "^6.4.1",
     "karma-browserstack-launcher": "^1.6.0",
     "karma-chai": "^0.1.0",
@@ -36,9 +39,10 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
+    "@keymanapp/keyman-version": "*",
     "@keymanapp/models-templates": "*",
     "@keymanapp/models-wordbreakers": "*",
-    "@keymanapp/keyman-version": "*",
+    "@keymanapp/sourcemap-path-remapper": "*",
     "@keymanapp/web-utils": "*",
     "es6-shim": "^0.35.5",
     "string.prototype.codepointat": "^0.2.1",

@@ -35,5 +35,6 @@
     "@keymanapp/keyman-version": "*",
     "@keymanapp/web-utils": "*",
     "@types/node": "^11.9.4"
-  }
+  },
+  "type": "module"
 }

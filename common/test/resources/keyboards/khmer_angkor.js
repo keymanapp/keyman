@@ -2804,7 +2804,7 @@ function Keyboard_khmer_angkor()
       k.KO(-1,t,"»");
     }
     if(m) {
-    
+
       k.KDC(-1,t);
       r=this.g_normalise(t,e);
     }
