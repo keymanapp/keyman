@@ -29,7 +29,6 @@ KMW_ROOT="$KEYMAN_ROOT/web"
 KMEA_ASSETS="$KMA_ROOT/KMEA/app/src/main/assets"
 ARTIFACT="app-release.aar"
 
-DEBUG_BUILD=false
 KMW_CONFIG=release
 
 DEBUG="debug"
@@ -42,10 +41,10 @@ builder_describe "Builds Keyman Engine for Android (KMEA)." \
   "configure" \
   "build" \
   "test             Runs lint and unit tests." \
-  ":app             Builds KMEA"
+  ":engine          Builds KMEA"
 
 builder_describe_outputs \
-  build:app     ./app/build/outputs/aar/keyman-android.aar
+  build:engine     ./app/build/outputs/aar/keyman-android.aar
 
 builder_parse "$@"
 
@@ -73,7 +72,6 @@ fi
 #### Build action definitions ####
 
 if builder_has_option --debug; then
-  DEBUG_BUILD=true
   KMW_CONFIG=debug
   ARTIFACT="app-debug.aar"
 fi
@@ -112,11 +110,7 @@ if builder_start_action configure; then
   builder_finish_action success configure
 fi
 
-echo
-echo "DEBUG_BUILD: $DEBUG_BUILD"
-echo
-
-if builder_start_action clean:app; then
+if builder_start_action clean:engine; then
   if [ -f "$KMA_ROOT/KMEA/app/build/outputs/aar/$ARTIFACT" ]; then
     rm -f "$KMA_ROOT/KMEA/app/build/outputs/aar/$ARTIFACT"
     echo "Cleaned $ARTIFACT"
@@ -124,18 +118,18 @@ if builder_start_action clean:app; then
     echo "Nothing to clean"
   fi
 
-  builder_finish_action success clean:app
+  builder_finish_action success clean:engine
 fi
 
 
 # Destinations that will need the keymanweb artifacts
 
 
-if builder_start_action build:app; then
+if builder_start_action build:engine; then
   echo "Gradle Build of KMEA"
   cd $KMA_ROOT/KMEA
 
-  if [ "$DEBUG_BUILD" = true ]; then
+  if builder_has_option --debug; then
     BUILD_FLAGS="assembleDebug -x lintDebug -x test"
     ARTIFACT="app-debug.aar"
   else
@@ -150,17 +144,18 @@ if builder_start_action build:app; then
     die "ERROR: Build of KMEA failed"
   fi
 
-  builder_finish_action success build:app
+  builder_finish_action success build:engine
 fi
 
-if builder_start_action test:app; then
+if builder_start_action test:engine; then
   echo "Gradle test of KMEA"
   cd $KMA_ROOT/KMEA
 
   # Gradle flags to test w/o building
-  if [ "$DEBUG_BUILD" = true ]; then
+  if builder_has_option --debug; then
     TEST_FLAGS="-x assembleDebug lintDebug testDebug"
     ARTIFACT="app-debug.aar"
+    echo "Building debug"
     if builder_has_option --ci; then
       # Report JUnit test results to CI
       echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testDebugUnitTest\']"
@@ -168,6 +163,7 @@ if builder_start_action test:app; then
   else
     TEST_FLAGS="-x aR lint testRelease"
     ARTIFACT="app-release.aar"
+    echo "Building release"
     if builder_has_option --ci; then
       # Report JUnit test results to CI
       echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
@@ -180,7 +176,7 @@ if builder_start_action test:app; then
     die "ERROR: KMEA test cases failed"
   fi
 
-  builder_finish_action success test:app
+  builder_finish_action success test:engine
 fi
 
 function _copy_artifacts() {
