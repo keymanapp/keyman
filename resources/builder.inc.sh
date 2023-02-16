@@ -124,6 +124,10 @@ function builder_die() {
   exit 1
 }
 
+function builder_warn() {
+  echo "${COLOR_YELLOW}$*${COLOR_RESET}"
+}
+
 ####################################################################################
 #
 # builder_ functions for standard build script parameter and process management
@@ -134,7 +138,9 @@ function builder_die() {
 # builder_ names are reserved.
 # _builder_ names are internal use and subject to change
 #
-_builder_debug=false
+if [ -z ${_builder_debug+x} ]; then
+  _builder_debug=false
+fi
 
 if $_builder_debug; then
   echo "[DEBUG] Command line: $0 $@"
@@ -253,6 +259,90 @@ _builder_cleanup_deps() {
   fi
 }
 
+_builder_execute_child() {
+  local action=$1
+  local target=$2
+
+  local scope="[$THIS_SCRIPT_IDENTIFIER] "
+  local script="$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh"
+
+  if $_builder_debug; then
+    echo "${COLOR_BLUE}## $scope$action$target starting...${COLOR_RESET}"
+  fi
+
+  "$script" $action \
+    $builder_verbose \
+    $builder_debug \
+  && (
+    if $_builder_debug; then
+      echo "${COLOR_GREEN}## $scope$action$target completed successfully${COLOR_RESET}"
+    fi
+  ) || (
+    result=$?
+    echo "${COLOR_RED}## $scope$action$target failed with exit code $result${COLOR_RESET}"
+    exit $result
+  )
+}
+
+_builder_run_child_action() {
+  local action="$1" target
+
+  if [[ $action =~ : ]]; then
+    IFS=: read -r action target <<< $action
+    target=:$target
+  else
+    target=':*'
+  fi
+
+  if builder_has_action $action$target; then
+    if [[ $target == ':*' ]]; then
+      # run all children in order specified in builder_describe
+      for target in "${_builder_targets[@]}"; do
+        # We have to re-test the action because the user may not
+        # have specified all targets in their invocation
+        if builder_has_action $action$target; then
+          if [ -f "$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh" ]; then
+            _builder_execute_child $action $target
+          fi
+        fi
+      done
+    else
+      # If specified explicitly, we assume existence of a child build script.
+      _builder_execute_child $action $target
+    fi
+  fi
+}
+
+#
+# Executes the specified actions on all child targets, or on the specified
+# targets. A child target is any target which has a sub-folder of the same name
+# as the target. However, the actions will only be run if they have been
+# specified by the user on the command-line.
+#
+# ### Usage
+#
+# ```bash
+# builder_run_child_actions action1 [...]
+# ```
+#
+# ### Parameters
+#
+#   1...: action[:target]   name of action:target to run
+#
+# ### Example
+#
+# ```bash
+# builder_run_child_actions configure build test install
+# ```
+#
+builder_run_child_actions() {
+  while [[ $# -gt 0 ]]; do
+    local action="$1"
+    _builder_run_child_action "$action"
+    shift
+  done
+}
+
 #
 # Builds the standardized `action:target` string for the specified action-target
 # pairing and also returns 0 if the user has asked to perform it on the command
@@ -268,9 +358,11 @@ _builder_cleanup_deps() {
 #   if build_has_action action[:target]; then ...; fi
 # ````
 #
-# Parameters:
+# ### Parameters
+#
 #   1: action[:target]    name of action:target
-# Example:
+#
+# ### Example
 #
 # ```bash
 #   if builder_has_action build:app; then ...
@@ -474,9 +566,16 @@ _builder_expand_action_targets() {
 #   default, append a `+` to the action name, e.g. `"test+   Test the project"`.
 #   If there is no default specified, then it will be `build`.
 #
-# * **Target:** `":target   [One line description]"`
+# * **Target:** `":target[=path]   [One line description]"`
 #
-#   A target always starts with colon, e.g. `:project`.
+#   A target always starts with colon, e.g. `:project`. If a folder exists with
+#   the same name as a target, then that automatically denotes the target as a
+#   "child project". This can simplify parent-child style scripts, using the
+#   [`builder_run_child_actions`] function.
+#
+#   A child project with an alternate folder can also be specified by appending
+#   `=path` to the target definition, for example `:app=src/app`. Where
+#   possible, avoid differences in names of child projects and folders.
 #
 # * **Dependency:** "@/path/to/dependency [action][:target] ..."
 #
@@ -508,6 +607,7 @@ builder_describe() {
   declare -A -g _builder_dep_path             # array of output files for action:target pairs
   declare -A -g _builder_dep_related_actions  # array of action:targets associated with a given dependency
   declare -A -g _builder_internal_dep         # array of internal action:targets dependency relationships
+  declare -A -g _builder_target_paths         # array of target child project paths
   shift
   # describe each target, action, and option possibility
   while [[ $# -gt 0 ]]; do
@@ -520,7 +620,25 @@ builder_describe() {
 
     if [[ $value =~ ^: ]]; then
       # Parameter is a target
+      local target_path=
+      if [[ $value =~ = ]]; then
+        # The target has a custom child project path
+        target_path="$(echo "$value" | cut -d= -f 2 -)"
+        value="$(echo "$value" | cut -d= -f 1 -)"
+        if [[ ! -d "$THIS_SCRIPT_PATH/$target_path" ]]; then
+          builder_die "Target path '$target_path' for $value does not exist."
+        fi
+      else
+        # If the target name matches a folder name, implicitly
+        # make it available as a child project
+        if [[ -d "$THIS_SCRIPT_PATH/${value:1}" ]]; then
+          target_path="${value:1}"
+        fi
+      fi
       _builder_targets+=($value)
+      if [[ ! -z "$target_path" ]]; then
+        _builder_target_paths[$value]="$target_path"
+      fi
     elif [[ $value =~ ^@ ]]; then
       # Parameter is a dependency
       local dependency="${value:1}"
