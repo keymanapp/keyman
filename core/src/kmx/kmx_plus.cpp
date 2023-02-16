@@ -668,9 +668,9 @@ COMP_KMXPLUS_KEY2_Helper::getKeys(KMX_DWORD i) const {
   return keys + i;
 }
 
-const COMP_KMXPLUS_KEY2_KEY *
-COMP_KMXPLUS_KEY2_Helper::findKey(KMX_DWORD strId) const {
-  for (KMX_DWORD i = 0; i < key2->keyCount; i++) {
+const COMP_KMXPLUS_KEY2_KEY*
+COMP_KMXPLUS_KEY2_Helper::findKeyByStringId(KMX_DWORD strId, KMX_DWORD &i) const {
+  for (i = 0; i < key2->keyCount; i++) {
     if (keys[i].id == strId) {
       return &keys[i];
     }

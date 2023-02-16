@@ -405,15 +405,25 @@ void LdmlJsonTestSource::set_key_from_id(key_event& k, const std::u16string& id)
   }
 
   // OK. Now we can search the keybag
-  auto *key2 = kmxplus->key2Helper.findKey(strId);
+  KMX_DWORD keyIndex = 0;
+  auto *key2 = kmxplus->key2Helper.findKeyByStringId(strId, keyIndex);
   assert(key2 != nullptr);
   if (key2 == nullptr) {
     k = {0, 0};
     return;
   }
 
-  k.vk = key2->vkey;
-  // TODO: modifier!
+  // Now, look for the _first_ candidate vkey match in the kmap.
+  for (KMX_DWORD kmapIndex = 0; kmapIndex < kmxplus->key2->kmapCount; kmapIndex++) {
+    auto *kmap = kmxplus->key2Helper.getKmap(kmapIndex);
+    assert(kmap != nullptr);
+    if (kmap->key == keyIndex) {
+      k = {(km_kbp_virtual_key)kmap->vkey, (uint16_t)kmap->mod};
+      return;
+    }
+  }
+  // Else, unfound
+  return;
 }
 
 
