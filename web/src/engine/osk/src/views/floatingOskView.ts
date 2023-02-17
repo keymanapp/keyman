@@ -1,5 +1,5 @@
 import { Codes, DeviceSpec, ManagedPromise, Version } from '@keymanapp/keyboard-processor';
-import { getAbsoluteX, getAbsoluteY, landscapeView } from 'keyman/build/engine/dom-utils/obj/index.js';
+import { getAbsoluteX, getAbsoluteY, landscapeView } from 'keyman/engine/dom-utils';
 
 import OSKView, { OSKPos, OSKRect } from './oskView.js';
 import TitleBar from '../components/titleBar.js';

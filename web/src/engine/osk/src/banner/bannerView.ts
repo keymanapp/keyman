@@ -6,7 +6,7 @@ import { ParsedLengthStyle } from '../lengthStyle.js';
 
 import { DeviceSpec } from '@keymanapp/web-utils';
 import type { StateChangeEnum } from '@keymanapp/input-processor';
-import createUnselectableElement from 'keyman/build/engine/dom-utils/obj/createUnselectableElement.js';
+import { createUnselectableElement } from 'keyman/engine/dom-utils';
 
 /**
  * This object is used to specify options by both `BannerManager.getOptions`

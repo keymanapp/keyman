@@ -141,6 +141,9 @@ compile ( ) {
     pushd "../$COMPILE_TARGET"
     node "./build-bundler.js"
     popd
+
+    # So... tsc does declaration-bundling on its own pretty well, at least for local development.
+    $compilecmd --emitDeclarationOnly --outFile ./build/$COMPILE_TARGET/lib/index.d.ts -p src/$COMPILE_TARGET
   fi
 
   echo $COMPILE_TARGET TypeScript compiled under $COMPILED_OUTPUT_PATH

@@ -9,7 +9,7 @@
     "allowJs": false,
     "declaration": true,
     "module": "es6",
-    "moduleResolution": "Node",
+    "moduleResolution": "Node16",
     "inlineSources": true,
     "sourceMap": true,
     "sourceRoot": "keyman",

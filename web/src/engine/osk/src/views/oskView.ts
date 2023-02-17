@@ -17,7 +17,7 @@ import {
   type MutableSystemStore,
   type SystemStoreMutationHandler
 } from '@keymanapp/keyboard-processor';
-import { createUnselectableElement, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/build/engine/dom-utils/obj/index.js';
+import { createUnselectableElement, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
 
 import TitleBar from '../components/titleBar.js';
 import Configuration from '../config/viewConfiguration.js';

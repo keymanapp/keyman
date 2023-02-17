@@ -1,6 +1,6 @@
 import { ActiveKey, ButtonClass, DeviceSpec, LayoutKey } from '@keymanapp/keyboard-processor';
 // At present, we don't use @keymanapp/keyman.  Just `keyman`.  (Refer to <root>/web/package.json.)
-import { getAbsoluteX, getAbsoluteY } from 'keyman/build/engine/dom-utils/obj/index.js';
+import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
 
 import { getFontSizeStyle } from '../fontSizeUtils.js';
 import InputEventCoordinate from '../input/inputEventCoordinate.js';

@@ -13,7 +13,7 @@ import {
   StateKeyMap
 } from '@keymanapp/keyboard-processor';
 
-import { createStyleSheet, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/build/engine/dom-utils/obj/index.js';
+import { createStyleSheet, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
 
 import GlobeHint from './globehint.interface.js';
 import InputEventCoordinate from './input/inputEventCoordinate.js';

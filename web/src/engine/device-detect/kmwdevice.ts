@@ -1,4 +1,4 @@
-import StyleConstants from 'utils/styleConstants.js';
+import StyleConstants from './utils/styleConstants.js';
 import { DeviceSpec, Version } from "@keymanapp/web-utils";
 
 // The Device object definition -------------------------------------------------

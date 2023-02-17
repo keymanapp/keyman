@@ -1,5 +1,5 @@
 import { Codes, DeviceSpec } from '@keymanapp/keyboard-processor';
-import landscapeView from 'keyman/build/engine/dom-utils/obj/landscapeView.js';
+import { landscapeView } from 'keyman/engine/dom-utils';
 
 import OSKView, { OSKPos, OSKRect } from './oskView.js';
 import { getViewportScale } from '../screenUtils.js';

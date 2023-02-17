@@ -6,7 +6,7 @@ import OSKViewComponent from './oskViewComponent.interface.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 import MouseDragOperation from '../input/mouseDragOperation.js';
 
-import createUnselectableElement from 'keyman/build/engine/dom-utils/obj/createUnselectableElement.js';
+import { createUnselectableElement } from 'keyman/engine/dom-utils';
 
 interface EventMap {
   /**
