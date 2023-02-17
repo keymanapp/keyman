@@ -69,7 +69,7 @@ KMX_DWORD CheckFilenameConsistency( KMX_CHAR const * Filename, bool ReportMissin
 
 
 KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissingFile) {
-  // not ready yet: needs more attention-> e.g. _wfindfirst,... and common includes for non-Windows platforms
+  // not ready yet: needs more attention-> e.g. common includes for non-Windows platforms to check casing of filename
   KMX_WCHAR Name[_MAX_PATH], FName[_MAX_FNAME], Ext[_MAX_EXT];
   intptr_t n;
   FILE* nfile;
@@ -82,6 +82,8 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   else {
     u16ncpy(Name, Filename, _countof(Name));  // I3481   // _S2 wcscpy_s(Name, _countof(Name), Filename);  // I3481
   }
+  std::wstring  Name_wstr = convert_pchar16T_To_std_wstring(Name);
+  const KMX_WCHART* Name_wchptr = Name_wstr.c_str();
 
 #if defined(_WIN32) || defined(_WIN64)
   std::wstring  wstr = convert_pchar16T_To_pwcharT(Name);
@@ -92,16 +94,18 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   n = _wfindfirst(wchptr, &fi);
   _findclose(n);
 #endif
-  if (nfile == NULL) {
-    if (ReportMissingFile) {
-      u16sprintf(ErrExtraW,256,L"referenced file %ls",Filename);
-      strcpy(ErrExtraLIB, wstrtostr2(ErrExtraW));
-      AddWarning(CWARN_MissingFile);
-    }
-    return CERR_None;
-  }
-  fclose(nfile);
 
+if (nfile == NULL) {
+  if (ReportMissingFile) {
+    u16sprintf(ErrExtraW,256,L"referenced file %ls",Filename);
+    strcpy(ErrExtraLIB, wstrtostr2(ErrExtraW));
+    AddWarning(CWARN_MissingFile);
+  }
+  return CERR_None;
+}
+fclose(nfile);
+
+//---------------------------------------------------------------------
 #if defined(_WIN32) || defined(_WIN64)
   const KMX_WCHAR* cptr1 = u16rchr(Name, '\\');   // _S2 const wchar_t* cptr1 = wcsrchr(Name, '\\');
 #else
@@ -109,10 +113,12 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
 #endif
   cptr1++;
 
-//TODO: sort out how to find common includes in non-Windows platforms:
 #if defined(_WIN32) || defined(_WIN64)
-KMX_WCHAR fi_name_char16[260];
-u16sprintf(fi_name_char16,_countof(fi.name),fi.name);
+  KMX_WCHAR fi_name_char16[260];
+  _wfinddata_t fi;
+  n = _wfindfirst(Name_wchptr, &fi);
+  _findclose(n);
+  u16sprintf(fi_name_char16,_countof(fi.name),fi.name);
 
   if (u16cmp(cptr1, fi_name_char16) != 0) {
     u16sprintf(ErrExtraW,256,L"reference '%ls' does not match actual filename '%ls'", cptr1, &fi.name);
@@ -120,8 +126,11 @@ u16sprintf(fi_name_char16,_countof(fi.name),fi.name);
     AddWarning(CHINT_FilenameHasDifferingCase);
   }
 #else
-  #error Missing implementation for finding common includes
+  # //TODO: sort out how to find common includes in non-Windows platforms:
+  # check if filename differs in case . is it possible to use
+  # n= access(Name_wchptr,F_OK; n = fopen(Name_wchptr, "rb"); strcasecmp(), strcmp,...?
 #endif
+
   return CERR_None;
 }
 
