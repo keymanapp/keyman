@@ -6,7 +6,7 @@ const require = createRequire(import.meta.url);
 
 import InputProcessor from '#./text/inputProcessor.js';
 import { KeyboardInterface, MinimalKeymanGlobal, Mock } from '@keymanapp/keyboard-processor';
-import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/nodeKeyboardLoader';
+import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-loader';
 import * as utils from '@keymanapp/web-utils';
 
 // Required initialization setup.

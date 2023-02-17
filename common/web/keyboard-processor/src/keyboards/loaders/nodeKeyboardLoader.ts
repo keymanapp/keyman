@@ -1,7 +1,4 @@
-import { KeyboardHarness, MinimalKeymanGlobal } from '../keyboardHarness.js';
-
-import Keyboard from '../keyboard.js';
-import KeyboardLoaderBase from '../keyboardLoaderBase.js';
+import { Keyboard, KeyboardHarness, KeyboardLoaderBase, MinimalKeymanGlobal } from '@keymanapp/keyboard-processor';
 
 import vm from 'vm';
 import fs from 'fs';

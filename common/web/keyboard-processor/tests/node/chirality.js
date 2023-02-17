@@ -5,7 +5,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { Codes, KeyboardInterface, MinimalKeymanGlobal } from '@keymanapp/keyboard-processor';
-import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/nodeKeyboardLoader';
+import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-loader';
 import { KeyboardTest, NodeProctor } from '@keymanapp/recorder-core';
 
 describe('Engine - Chirality', function() {

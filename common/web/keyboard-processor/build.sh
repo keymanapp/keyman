@@ -41,6 +41,7 @@ fi
 
 if builder_start_action clean; then
   npm run clean
+  rm -rf ./build
   builder_finish_action success clean
 fi
 
@@ -50,6 +51,8 @@ if builder_start_action build; then
 
   # Declaration bundling.
   npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/dom-keyboard-loader.d.ts -p src/keyboards/loaders/tsconfig.dom.json
+  npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/node-keyboard-loader.d.ts -p src/keyboards/loaders/tsconfig.node.json
 
   builder_finish_action success build
 fi

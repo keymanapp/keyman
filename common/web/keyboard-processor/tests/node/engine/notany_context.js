@@ -4,7 +4,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { KeyboardInterface, MinimalKeymanGlobal, Mock } from '@keymanapp/keyboard-processor';
-import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/nodeKeyboardLoader';
+import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-loader';
 import { NodeProctor, RecordedKeystrokeSequence } from '@keymanapp/recorder-core';
 import { extendString } from '@keymanapp/web-utils';
 

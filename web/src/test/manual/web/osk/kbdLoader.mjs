@@ -1,5 +1,26 @@
 import { Keyboard, KeyboardProperties, Codes } from '../../../../../build/engine/osk/lib/index.mjs';
 
+// // The following block would be sufficient to replace the `loadKeyboardFromPath` func below...
+// // were it not for common/web/keyboard-processor being outside of the standard `localhost` config
+// // used for manual Web testing.
+
+// import {
+//   DOMKeyboardLoader
+// } from '../../../../../../common/web/keyboard-processor/build/lib/dom-keyboard-loader.mjs';
+// import {
+//   KeyboardInterface,
+//   MinimalKeymanGlobal
+// } from '../../../../../../common/web/keyboard-processor/build/lib/index.mjs';
+
+// // This script may or may not be temporary; the KMW "KeyboardManager" class may be spun off in a manner
+// // that could replace this.
+
+// const loader = new DOMKeyboardLoader(new KeyboardInterface(window, MinimalKeymanGlobal));
+
+// export function loadKeyboardFromPath(path) {
+//   return loader.loadKeyboardFromPath(path);
+// }
+
 // This script may or may not be temporary; the KMW "KeyboardManager" class may be spun off in a manner
 // that could replace this.
 

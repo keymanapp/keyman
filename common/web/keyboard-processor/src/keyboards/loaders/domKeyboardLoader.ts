@@ -3,10 +3,7 @@
 ///<reference lib="dom" />
 
 import { default as DOMKeyboardSandbox } from './domKeyboardSandbox.js';
-import { KeyboardHarness, MinimalKeymanGlobal } from '../keyboardHarness.js';
-
-import Keyboard from '../keyboard.js';
-import KeyboardLoaderBase from '../keyboardLoaderBase.js';
+import { Keyboard, KeyboardHarness, KeyboardLoaderBase, MinimalKeymanGlobal } from '@keymanapp/keyboard-processor';
 
 import { ManagedPromise } from '@keymanapp/web-utils';
 
