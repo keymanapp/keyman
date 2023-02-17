@@ -2,8 +2,7 @@ import { assert } from 'chai';
 import fs from 'fs';
 import vm from 'vm';
 
-import KeyboardProperties from '@keymanapp/keyboard-processor/build/obj/keyboards/keyboardProperties.js';
-import SpacebarText from '@keymanapp/keyboard-processor/build/obj/keyboards/spacebarText.js';
+import { KeyboardProperties, SpacebarText } from '@keymanapp/keyboard-processor';
 
 describe('Keyboard Properties', function() {
   let rootCommonStubPath = '../../test/resources/json/keyboards/';
