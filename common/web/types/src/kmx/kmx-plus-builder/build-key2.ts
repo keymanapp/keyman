@@ -152,7 +152,7 @@ export function build_key2(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     return result;
   });
 
-  // Sort kmap by vkek, mod order, per C7043
+  // Sort kmap by vkey, mod order, per C7043
   key2.kmap.sort((a,b) => {
     let rc = 0;
     if (rc === 0) {
