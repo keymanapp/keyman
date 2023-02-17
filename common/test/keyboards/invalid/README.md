@@ -7,8 +7,6 @@ Most of these tests are copied from balochi_phonetic and contain alterations of 
 <br/>
 <br/>
 
----
-
 ##  Naming Convention of kmn-files for using with kmcompxtest()
 
     CERR_404D_balochi_phonetic.kmn
@@ -25,8 +23,6 @@ The naming convention of the files is as follows:
     ( e.g. CERR_404D_balochi_phonetic.kmn should produce error 0x0000404D).
 
 <br/>
-
----
 <br/>
 
 While running, kmcompxtest extracts those 4 characters from the Filename (e.g. 404D for CERR_404D_balochi_phonetic) and compares those to the actual error found.
@@ -41,119 +37,127 @@ While running, kmcompxtest extracts those 4 characters from the Filename (e.g. 4
 <br/>
 * If more than 1 error is produced, only the error coded in the Filename will be detected
 
-
+<br/>
+<br/>
 
 ### Tests are available for the following CERR_:
-  (&emsp;) &emsp; 00000800  &emsp; CERR_LEXICAL_MODEL_MIN
-  (&emsp;) &emsp; 000008FF  &emsp; CERR_LEXICAL_MODEL_MAX
-  (&emsp;) &emsp; 00000000  &emsp; CERR_None
-  (&emsp;) &emsp; 00000001  &emsp; CERR_EndOfFile
-  (&emsp;) &emsp; 00008002  &emsp; CERR_BadCallParams
-  (&emsp;) &emsp; 00008004  &emsp; CERR_CannotAllocateMemory
-  (&emsp;) &emsp; 00008005  &emsp; CERR_InfileNotExist
-  (&emsp;) &emsp; 00008006  &emsp; CERR_CannotCreateOutfile
-  (&emsp;) &emsp; 00008007  &emsp; CERR_UnableToWriteFully
-  (&emsp;) &emsp; 00008008  &emsp; CERR_CannotReadInfile
-  (&emsp;) &emsp; 00008009  &emsp; CERR_SomewhereIGotItWrong
-  ( **x** ) &emsp; 0000400A  &emsp; CERR_InvalidToken
-  (&emsp;) &emsp; 0000400B  &emsp; CERR_InvalidBegin
-  (&emsp;) &emsp; 0000400C  &emsp; CERR_InvalidName
-  ( **x** ) &emsp; 0000400D  &emsp; CERR_InvalidVersion
-  ( **x** ) &emsp; 0000400E  &emsp; CERR_InvalidLanguageLine
-  (&emsp;) &emsp; 0000400F  &emsp; CERR_LayoutButNoLanguage
-  (&emsp;) &emsp; 00004010  &emsp; CERR_InvalidLayoutLine
-  (&emsp;) &emsp; 00004011  &emsp; CERR_NoVersionLine
-  (&emsp;) &emsp; 00004012  &emsp; CERR_InvalidGroupLine
-  ( **x** ) &emsp; 00004013  &emsp; CERR_InvalidStoreLine
-  (&emsp;) &emsp; 00004014  &emsp; CERR_InvalidCodeInKeyPartOfRule
-  ( **x** ) &emsp; 00004015  &emsp; CERR_InvalidDeadkey
-  ( **x** ) &emsp; 00004016  &emsp; CERR_InvalidValue
-  ( **x** ) &emsp; 00004017  &emsp; CERR_ZeroLengthString
-  (&emsp;) &emsp; 00004018  &emsp; CERR_TooManyIndexToKeyRefs
-  ( **x** ) &emsp; 00004019  &emsp; CERR_UnterminatedString
-  (&emsp;) &emsp; 0000401A  &emsp; CERR_StringInVirtualKeySection
-  (&emsp;) &emsp; 0000401B  &emsp; CERR_AnyInVirtualKeySection
-  (&emsp;) &emsp; 0000401C  &emsp; CERR_InvalidAny
-  ( **x** ) &emsp; 0000401D  &emsp; CERR_StoreDoesNotExist
-  (&emsp;) &emsp; 0000401E  &emsp; CERR_BeepInVirtualKeySection
-  (&emsp;) &emsp; 0000401F  &emsp; CERR_IndexInVirtualKeySection
-  (&emsp;) &emsp; 00004020  &emsp; CERR_InvalidIndex
-  (&emsp;) &emsp; 00004021  &emsp; CERR_OutsInVirtualKeySection
-  (&emsp;) &emsp; 00004022  &emsp; CERR_InvalidOuts
-  (&emsp;) &emsp; 00004024  &emsp; CERR_ContextInVirtualKeySection
-  (&emsp;) &emsp; 00004025  &emsp; CERR_InvalidUse
-  ( **x** ) &emsp; 00004026  &emsp; CERR_GroupDoesNotExist
-  (&emsp;) &emsp; 00004027  &emsp; CERR_VirtualKeyNotAllowedHere
-  (&emsp;) &emsp; 00004028  &emsp; CERR_InvalidSwitch
-  ( **x** ) &emsp; 00004029  &emsp; CERR_NoTokensFound
-  (&emsp;) &emsp; 0000402A  &emsp; CERR_InvalidLineContinuation
-  ( **x** ) &emsp; 0000402B  &emsp; CERR_LineTooLong
-  (&emsp;) &emsp; 0000402C  &emsp; CERR_InvalidCopyright
-  ( **x** ) &emsp; 0000402D  &emsp; CERR_CodeInvalidInThisSection
-  (&emsp;) &emsp; 0000402E  &emsp; CERR_InvalidMessage
-  (&emsp;) &emsp; 0000402F  &emsp; CERR_InvalidLanguageName
-  (&emsp;) &emsp; 00004030  &emsp; CERR_InvalidBitmapLine
-  ( **x** ) &emsp; 00004031  &emsp; CERR_CannotReadBitmapFile
-  (&emsp;) &emsp; 00004032  &emsp; CERR_IndexDoesNotPointToAny
-  (&emsp;) &emsp; 00004033  &emsp; CERR_ReservedCharacter
-  ( **x** ) &emsp; 00004034  &emsp; CERR_InvalidCharacter
-  (&emsp;) &emsp; 00004035  &emsp; CERR_InvalidCall
-  (&emsp;) &emsp; 00004036  &emsp; CERR_CallInVirtualKeySection
-  (&emsp;) &emsp; 00004037  &emsp; CERR_CodeInvalidInKeyStore
-  ( **x** ) &emsp; 00004038  &emsp; CERR_CannotLoadIncludeFile
- ( **x** ) &emsp; 00004039  &emsp; CERR_60FeatureOnly_EthnologueCode
- ( **x** ) &emsp; 0000403A  &emsp; CERR_60FeatureOnly_MnemonicLayout
-  (&emsp;) &emsp; 0000403B  &emsp; CERR_60FeatureOnly_OldCharPosMatching
-  (&emsp;) &emsp; 0000403C  &emsp; CERR_60FeatureOnly_NamedCodes
-  (&emsp;) &emsp; 0000403D  &emsp; CERR_60FeatureOnly_Contextn
-  ( **x** ) &emsp; 0000403E  &emsp; CERR_501FeatureOnly_Call
-  (&emsp;) &emsp; 0000403F  &emsp; CERR_InvalidNamedCode
-  ( **x** ) &emsp; 00004040  &emsp; CERR_InvalidSystemStore
-  ( **x** ) &emsp; 00004044  &emsp; CERR_60FeatureOnly_VirtualCharKey
-  ( **x** ) &emsp; 00004045  &emsp; CERR_VersionAlreadyIncluded
-  ( **x** ) &emsp; 00004046  &emsp; CERR_70FeatureOnly
-  ( **x** ) &emsp; 00004047  &emsp; CERR_80FeatureOnly
-  (&emsp;) &emsp; 00004048  &emsp; CERR_InvalidInVirtualKeySection
-  ( **x** ) &emsp; 00004049  &emsp; CERR_InvalidIf
-  ( **x** ) &emsp; 0000404A  &emsp; CERR_InvalidReset
-  ( **x** ) &emsp; 0000404B  &emsp; CERR_InvalidSet
-  ( **x** ) &emsp; 0000404C  &emsp; CERR_InvalidSave
-  ( **x** ) &emsp; 0000404D  &emsp; CERR_InvalidEthnologueCode
-  (&emsp;) &emsp; 0000804E  &emsp; CERR_CannotCreateTempfile
-  ( **x** ) &emsp; 0000404F  &emsp; CERR_90FeatureOnly_IfSystemStores
-  (&emsp;) &emsp; 00004050  &emsp; CERR_IfSystemStore_NotFound
-  (&emsp;) &emsp; 00004051  &emsp; CERR_90FeatureOnly_SetSystemStores
-  (&emsp;) &emsp; 00004052  &emsp; CERR_SetSystemStore_NotFound
-  (&emsp;) &emsp; 00004053  &emsp; CERR_90FeatureOnlyVirtualKeyDictionary
-  (&emsp;) &emsp; 00004054  &emsp; CERR_NotSupportedInKeymanWebContext
-  (&emsp;) &emsp; 00004055  &emsp; CERR_NotSupportedInKeymanWebOutput
-  (&emsp;) &emsp; 00004056  &emsp; CERR_NotSupportedInKeymanWebStore
-  (&emsp;) &emsp; 00004057  &emsp; CERR_VirtualCharacterKeysNotSupportedInKeymanWeb
-  (&emsp;) &emsp; 00004058  &emsp; CERR_VirtualKeysNotValidForMnemonicLayouts
-  (&emsp;) &emsp; 00004059  &emsp; CERR_InvalidTouchLayoutFile
-  (&emsp;) &emsp; 0000405A  &emsp; CERR_TouchLayoutInvalidIdentifier
-  (&emsp;) &emsp; 0000405B  &emsp; CERR_InvalidKeyCode
-  ( **x** ) &emsp; 0000405C  &emsp; CERR_90FeatureOnlyLayoutFile
-  ( **x** ) &emsp; 0000405D  &emsp; CERR_90FeatureOnlyKeyboardVersion
-  ( **x** ) &emsp; 0000405E  &emsp; CERR_KeyboardVersionFormatInvalid
-  (&emsp;) &emsp; 0000405F  &emsp; CERR_ContextExHasInvalidOffset
-  ( **x** ) &emsp; 00004060  &emsp; CERR_90FeatureOnlyEmbedCSS
-  ( **x** ) &emsp; 00004061  &emsp; CERR_90FeatureOnlyTargets
-  (&emsp;) &emsp; 00004062  &emsp; CERR_ContextAndIndexInvalidInMatchNomatch
-  (&emsp;) &emsp; 00004063  &emsp; CERR_140FeatureOnlyContextAndNotAnyWeb
-  ( **x** ) &emsp; 00004064  &emsp; CERR_ExpansionMustFollowCharacterOrVKey
-  (&emsp;) &emsp; 00004065  &emsp; CERR_VKeyExpansionMustBeFollowedByVKey
-  (&emsp;) &emsp; 00004066  &emsp; CERR_CharacterExpansionMustBeFollowedByCharacter
-  (&emsp;) &emsp; 00004067  &emsp; CERR_VKeyExpansionMustUseConsistentShift
-  (&emsp;) &emsp; 00004068  &emsp; CERR_ExpansionMustBePositive
-  (&emsp;) &emsp; 00004069  &emsp; CERR_CasedKeysMustContainOnlyVirtualKeys
-  (&emsp;) &emsp; 0000406A  &emsp; CERR_CasedKeysMustNotIncludeShiftStates
-  (&emsp;) &emsp; 0000406B  &emsp; CERR_CasedKeysNotSupportedWithMnemonicLayout
-  (&emsp;) &emsp; 0000406C  &emsp; CERR_CannotUseReadWriteGroupFromReadonlyGroup
-  (&emsp;) &emsp; 0000406D  &emsp; CERR_StatementNotPermittedInReadonlyGroup
-  (&emsp;) &emsp; 0000406E  &emsp; CERR_OutputInReadonlyGroup
-  (&emsp;) &emsp; 0000406F  &emsp; CERR_NewContextGroupMustBeReadonly
-  (&emsp;) &emsp; 00004070  &emsp; CERR_PostKeystrokeGroupMustBeReadonly
-  ( **x** ) &emsp; 00004071  &emsp; CERR_DuplicateGroup
-  ( **x** ) &emsp; 00004072  &emsp; CERR_DuplicateStore
-  ( **x** ) &emsp; 00004073  &emsp; CERR_RepeatedBegin
+<font size="1">
+
+|     | Error Number | CERR_                               
+| :-: | :-----------:| :-------------------------------------
+|     | 00000800     |  CERR_LEXICAL_MODEL_MIN  
+|     | 000008FF     |  CERR_LEXICAL_MODEL_MAX
+|     | 00000800     |  CERR_LEXICAL_MODEL_MIN
+|     | 000008FF     |  CERR_LEXICAL_MODEL_MAX
+|     | 00000000     |  CERR_None
+|     | 00000001     |  CERR_EndOfFile 
+|     | 00008002     |  CERR_BadCallParams
+|     | 00008004     |  CERR_CannotAllocateMemory
+|     | 00008005     |  CERR_InfileNotExist
+|     | 00008006     |  CERR_CannotCreateOutfile
+|     | 00008007     |  CERR_UnableToWriteFully
+|     | 00008008     |  CERR_CannotReadInfile
+|     | 00008009     |  CERR_SomewhereIGotItWrong
+|**X**| 0000400A     |  CERR_InvalidToken
+|     | 0000400B     |  CERR_InvalidBegin
+|     | 0000400C     |  CERR_InvalidName
+|**X**| 0000400D     |  CERR_InvalidVersion
+|**X**| 0000400E     |  CERR_InvalidLanguageLine
+|     | 0000400F     |  CERR_LayoutButNoLanguage
+|     | 00004010     |  CERR_InvalidLayoutLine
+|     | 00004011     |  CERR_NoVersionLine
+|     | 00004012     |  CERR_InvalidGroupLine
+|**X**| 00004013     |  CERR_InvalidStoreLine
+|     | 00004014     |  CERR_InvalidCodeInKeyPartOfRule
+|**X**| 00004015     |  CERR_InvalidDeadkey
+|**X**| 00004016     |  CERR_InvalidValue
+|**X**| 00004017     |  CERR_ZeroLengthString
+|     | 00004018     |  CERR_TooManyIndexToKeyRefs
+|**X**| 00004019     |  CERR_UnterminatedString
+|     | 0000401A     |  CERR_StringInVirtualKeySection
+|     | 0000401B     |  CERR_AnyInVirtualKeySection
+|     | 0000401C     |  CERR_InvalidAny
+|**X**| 0000401D     |  CERR_StoreDoesNotExist
+|     | 0000401E     |  CERR_BeepInVirtualKeySection
+|     | 0000401F     |  CERR_IndexInVirtualKeySection
+|     | 00004020     |  CERR_InvalidIndex
+|     | 00004021     |  CERR_OutsInVirtualKeySection
+|     | 00004022     |  CERR_InvalidOuts
+|     | 00004024     |  CERR_ContextInVirtualKeySection
+|     | 00004025     |  CERR_InvalidUse
+|**X**| 00004026     |  CERR_GroupDoesNotExist
+|     | 00004027     |  CERR_VirtualKeyNotAllowedHere
+|     | 00004028     |  CERR_InvalidSwitch
+|**X**| 00004029     |  CERR_NoTokensFound
+|     | 0000402A     |  CERR_InvalidLineContinuation
+|**X**| 0000402B     |  CERR_LineTooLong
+|     | 0000402C     |  CERR_InvalidCopyright
+|**X**| 0000402D     |  CERR_CodeInvalidInThisSection
+|     | 0000402E     |  CERR_InvalidMessage
+|     | 0000402F     |  CERR_InvalidLanguageName
+|     | 00004030     |  CERR_InvalidBitmapLine
+|**X**| 00004031     |  CERR_CannotReadBitmapFile
+|     | 00004032     |  CERR_IndexDoesNotPointToAny
+|     | 00004033     |  CERR_ReservedCharacter
+|**X**| 00004034     |  CERR_InvalidCharacter
+|     | 00004035     |  CERR_InvalidCall
+|     | 00004036     |  CERR_CallInVirtualKeySection
+|     | 00004037     |  CERR_CodeInvalidInKeyStore
+|**X**| 00004038     |  CERR_CannotLoadIncludeFile
+|**X**| 00004039     |  CERR_60FeatureOnly_EthnologueCode
+|**X**| 0000403A     |  CERR_60FeatureOnly_MnemonicLayout
+|     | 0000403B     |  CERR_60FeatureOnly_OldCharPosMatching
+|     | 0000403C     |  CERR_60FeatureOnly_NamedCodes
+|     | 0000403D     |  CERR_60FeatureOnly_Contextn
+|**X**| 0000403E     |  CERR_501FeatureOnly_Call
+|     | 0000403F     |  CERR_InvalidNamedCode
+|**X**| 00004040     |  CERR_InvalidSystemStore
+|**X**| 00004044     |  CERR_60FeatureOnly_VirtualCharKey
+|**X**| 00004045     |  CERR_VersionAlreadyIncluded
+|**X**| 00004046     |  CERR_70FeatureOnly
+|**X**| 00004047     |  CERR_80FeatureOnly
+|     | 00004048     |  CERR_InvalidInVirtualKeySection
+|**X**| 00004049     |  CERR_InvalidIf
+|**X**| 0000404A     |  CERR_InvalidReset
+|**X**| 0000404B     |  CERR_InvalidSet
+|**X**| 0000404C     |  CERR_InvalidSave
+|**X**| 0000404D     |  CERR_InvalidEthnologueCode
+|     | 0000804E     |  CERR_CannotCreateTempfile
+|**X**| 0000404F     |  CERR_90FeatureOnly_IfSystemStores
+|     | 00004050     |  CERR_IfSystemStore_NotFound
+|     | 00004051     |  CERR_90FeatureOnly_SetSystemStores
+|     | 00004052     |  CERR_SetSystemStore_NotFound
+|     | 00004053     |  CERR_90FeatureOnlyVirtualKeyDictionary
+|     | 00004054     |  CERR_NotSupportedInKeymanWebContext
+|     | 00004055     |  CERR_NotSupportedInKeymanWebOutput
+|     | 00004056     |  CERR_NotSupportedInKeymanWebStore
+|     | 00004057     |  CERR_VirtualCharacterKeysNotSupportedInKeymanWeb
+|     | 00004058     |  CERR_VirtualKeysNotValidForMnemonicLayouts
+|     | 00004059     |  CERR_InvalidTouchLayoutFile
+|     | 0000405A     |  CERR_TouchLayoutInvalidIdentifier
+|     | 0000405B     |  CERR_InvalidKeyCode
+|**X**| 0000405C     |  CERR_90FeatureOnlyLayoutFile
+|**X**| 0000405D     |  CERR_90FeatureOnlyKeyboardVersion
+|**X**| 0000405E     |  CERR_KeyboardVersionFormatInvalid
+|     | 0000405F     |  CERR_ContextExHasInvalidOffset
+|**X**| 00004060     |  CERR_90FeatureOnlyEmbedCSS
+|**X**| 00004061     |  CERR_90FeatureOnlyTargets
+|     | 00004062     |  CERR_ContextAndIndexInvalidInMatchNomatch
+|     | 00004063     |  CERR_140FeatureOnlyContextAndNotAnyWeb
+|**X**| 00004064     |  CERR_ExpansionMustFollowCharacterOrVKey
+|**X**| 00004065     |  CERR_VKeyExpansionMustBeFollowedByVKey
+|**X**| 00004066     |  CERR_CharacterExpansionMustBeFollowedByCharacter
+|**X**| 00004067     |  CERR_VKeyExpansionMustUseConsistentShift
+|**X**| 00004068     |  CERR_ExpansionMustBePositive
+|**X**| 00004069     |  CERR_CasedKeysMustContainOnlyVirtualKeys
+|**X**| 0000406A     |  CERR_CasedKeysMustNotIncludeShiftStates
+|**X**| 0000406B     |  CERR_CasedKeysNotSupportedWithMnemonicLayout
+|**X**| 0000406C     |  CERR_CannotUseReadWriteGroupFromReadonlyGroup
+|     | 0000406D     |  CERR_StatementNotPermittedInReadonlyGroup
+|**X**| 0000406E     |  CERR_OutputInReadonlyGroup
+|**X**| 0000406F     |  CERR_NewContextGroupMustBeReadonly
+|**X**| 00004070     |  CERR_PostKeystrokeGroupMustBeReadonly
+|**X**| 00004071     |  CERR_DuplicateGroup
+|**X**| 00004072     |  CERR_DuplicateStore
+|**X**| 00004073     |  CERR_RepeatedBegin
+|**X**| 000080C0     |  CERR_BufferOverflow
