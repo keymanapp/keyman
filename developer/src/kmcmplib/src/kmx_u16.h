@@ -6,7 +6,6 @@
 #include <vector>
 #include <ctype.h>          
 #include <string>
-#include <kmcompx.h>
 
 std::string string_from_wstring(std::wstring const str);
 std::wstring wstring_from_string(std::string const str);
@@ -17,7 +16,6 @@ std::wstring u16fmt(const KMX_WCHAR * str);
 void u16sprintf(KMX_WCHAR * dst, const size_t sz, const wchar_t* fmt, ...) ;
 
 std::wstring  convert_pchar16T_To_pwcharT(KMX_WCHAR Name[_MAX_PATH]);
-KMX_WCHART convert_KMX_WCHAR__TO__WCHAR(KMX_WCHAR in) ;
 
 size_t  u16len(const KMX_WCHAR *p);
 int  u16cmp(const KMX_WCHAR *p, const KMX_WCHAR *q);

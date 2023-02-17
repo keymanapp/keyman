@@ -87,7 +87,7 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   std::wstring  wstr = convert_pchar16T_To_pwcharT(Name);
   const KMX_WCHART* wchptr = wstr.c_str();
 
-  nfile = _wfsopen(wchptr, L"rb", _SH_DENYWR);
+  nfile = _wfsopen(wchptr, L"rb", _SH_DENYNO);
   _wfinddata_t fi;
   n = _wfindfirst(wchptr, &fi);
   _findclose(n);
