@@ -172,42 +172,6 @@ COMP_KMXPLUS_HEADER::valid(KMX_DWORD length) const {
 }
 
 bool
-COMP_KMXPLUS_KEYS::valid(KMX_DWORD _kmn_unused(length)) const {
-  DebugLog(" count: #0x%X\n", count);
-  if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
-    DebugLog("header.size < expected size");
-    assert(false);
-    return false;
-  }
-  for (KMX_DWORD i = 0; i<count; i++) {
-    DebugLog(" #0x%d\n", i);
-    const COMP_KMXPLUS_KEYS_ENTRY& entry = entries[i];
-    DebugLog("  vkey\t0x%X\n", entry.vkey);
-    DebugLog("  mod\t0x%X\n", entry.mod);
-    if (!LDML_IS_VALID_MODIFIER_BITS(entry.mod)) {
-      DebugLog("Invalid modifier value");
-      assert(false);
-      return false;
-    }
-    DebugLog("  flags\t0x%X\n", entry.flags);
-    if (entry.flags & LDML_KEYS_FLAGS_EXTEND) {
-        DebugLog("  \t Extend: String #0x%X\n", entry.to);
-    } else {
-        DebugLog("  \t UTF-32:U+%04X\n", entry.to);
-    }
-  }
-  return true;
-}
-
-std::u16string
-COMP_KMXPLUS_KEYS_ENTRY::get_string() const {
-  assert(!(flags & LDML_KEYS_FLAGS_EXTEND)); // should not be called.
-  char16_single buf;
-  const int len = Utf32CharToUtf16(to, buf);
-  return std::u16string(buf.ch, len);
-}
-
-bool
 COMP_KMXPLUS_LOCA::valid(KMX_DWORD _kmn_unused(length)) const {
   if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
     DebugLog("header.size < expected size");
@@ -578,12 +542,13 @@ COMP_KMXPLUS_KEY2::valid(KMX_DWORD _kmn_unused(length)) const {
   if (header.size < sizeof(*this)
       + (keyCount    * sizeof(COMP_KMXPLUS_KEY2_KEY))
       + (flicksCount * sizeof(COMP_KMXPLUS_KEY2_FLICK_LIST))
-      + (flickCount  * sizeof(COMP_KMXPLUS_KEY2_FLICK_ELEMENT))) {
+      + (flickCount  * sizeof(COMP_KMXPLUS_KEY2_FLICK_ELEMENT))
+      + (kmapCount   * sizeof(COMP_KMXPLUS_KEY2_KMAP))) {
     DebugLog("header.size < expected size");
     assert(false);
     return false;
   }
-  // TODO-LDML: further validation in the COMP_KMXPLUS_KEY2_Helper helper obj
+  // further validation in the COMP_KMXPLUS_KEY2_Helper helper obj
   return true;
 }
 
@@ -626,7 +591,13 @@ COMP_KMXPLUS_KEY2_Helper::setKey2(const COMP_KMXPLUS_KEY2 *newKey2) {
   } else {
     flickElements = nullptr; // not an error
   }
-  // rawdata += sizeof(COMP_KMXPLUS_KEY2_FLICK_ELEMENT) * key2->flickCount;
+  rawdata += sizeof(COMP_KMXPLUS_KEY2_FLICK_ELEMENT) * key2->flickCount;
+  // kmap
+  if (key2->kmapCount > 0) {
+    kmap = reinterpret_cast<const COMP_KMXPLUS_KEY2_KMAP *>(rawdata);
+  } else {
+    kmap = nullptr; // not an error
+  }
 
   // Now, validate offsets by walking
   if (is_valid) {
@@ -661,6 +632,26 @@ COMP_KMXPLUS_KEY2_Helper::setKey2(const COMP_KMXPLUS_KEY2 *newKey2) {
       // is the count off the end?
       DebugLog("<flick> %d: to=0x%X, directions=0x%X, flags=0x%X", i, e.to, e.directions, e.flags);
     }
+    // now the kmap
+    DebugLog(" kmap count: #0x%X\n", key2->kmapCount);
+    for (KMX_DWORD i = 0; i < key2->kmapCount; i++) {
+      DebugLog(" #0x%d\n", i);
+      auto &entry = kmap[i];
+      DebugLog("  vkey\t0x%X\n", entry.vkey);
+      DebugLog("  mod\t0x%X\n", entry.mod);
+      DebugLog("  key\t#0x%X\n", entry.key);
+      if (!LDML_IS_VALID_MODIFIER_BITS(entry.mod)) {
+        DebugLog("Invalid modifier value");
+        assert(false);
+        is_valid = false;
+      }
+      if (entry.key >= key2->keyCount) {
+        // preposterous key #
+        DebugLog("kmap[0x%X].key = #0x%X, but that is >= keyCount 0x%X", i, entry.key, key2->keyCount);
+        assert(false);
+        is_valid = false;
+      }
+    }
   }
   // Return results
   DebugLog("COMP_KMXPLUS_KEY2_Helper.setKey2(): %s", is_valid ? "valid" : "invalid");
@@ -693,6 +684,23 @@ COMP_KMXPLUS_KEY2_Helper::getFlickElements(KMX_DWORD i) const {
     return nullptr;
   }
   return flickElements + i;
+}
+
+const COMP_KMXPLUS_KEY2_KMAP *
+COMP_KMXPLUS_KEY2_Helper::getKmap(KMX_DWORD i) const {
+  if (!valid() || i >= key2->kmapCount) {
+    assert(false);
+    return nullptr;
+  }
+  return kmap + i;
+}
+
+std::u16string
+COMP_KMXPLUS_KEY2_KEY::get_string() const {
+  assert(!(flags & LDML_KEY2_KEY_FLAGS_EXTEND)); // should not be called.
+  char16_single buf;
+  const int len = Utf32CharToUtf16(to, buf);
+  return std::u16string(buf.ch, len);
 }
 
 // LIST
@@ -793,7 +801,7 @@ COMP_KMXPLUS_LIST_Helper::getIndex(KMX_DWORD i) const {
 // ---- constructor
 
 kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
-    : keys(nullptr), loca(nullptr), meta(nullptr),
+    : loca(nullptr), meta(nullptr),
       sect(nullptr), strs(nullptr), vkey(nullptr), valid(false) {
 
   DebugLog("kmx_plus(): Got a COMP_KEYBOARD at %p\n", keyboard);
@@ -832,7 +840,6 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     disp = section_from_sect<COMP_KMXPLUS_DISP>(sect);
     elem = section_from_sect<COMP_KMXPLUS_ELEM>(sect);
     key2 = section_from_sect<COMP_KMXPLUS_KEY2>(sect);
-    keys = section_from_sect<COMP_KMXPLUS_KEYS>(sect);
     layr = section_from_sect<COMP_KMXPLUS_LAYR>(sect);
     list = section_from_sect<COMP_KMXPLUS_LIST>(sect);
     loca = section_from_sect<COMP_KMXPLUS_LOCA>(sect);

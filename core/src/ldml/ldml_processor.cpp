@@ -61,22 +61,27 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
   }
 
   // Now, if we have keys, use them.
-  if (kplus.keys != nullptr) {
+  if (kplus.key2 != nullptr) {
     // read all keys into array
-    for (KMX_DWORD i=0; i<kplus.keys->count; i++) {
+    for (KMX_DWORD i=0; i<kplus.key2->kmapCount; i++) {
       std::u16string str;
-      const kmx::COMP_KMXPLUS_KEYS_ENTRY &entry = kplus.keys->entries[i];
-      if (entry.flags && LDML_KEYS_FLAGS_EXTEND) {
+      auto kmapEntry = kplus.key2Helper.getKmap(i);
+      assert(kmapEntry != nullptr);
+      // now look up the key
+      auto keyEntry = kplus.key2Helper.getKeys(kmapEntry->key);
+      assert(keyEntry != nullptr);
+
+      if (keyEntry->flags && LDML_KEY2_KEY_FLAGS_EXTEND) {
         if (nullptr == kplus.strs) {
           DebugLog("for keys: kplus.strs == nullptr"); // need a string table to get strings
           assert(false);
           return;
         }
-        str = kplus.strs->get(entry.to);
+        str = kplus.strs->get(keyEntry->to);
       } else {
-        str = entry.get_string();
+        str = keyEntry->get_string();
       }
-      keys.add((km_kbp_virtual_key)entry.vkey, (uint16_t)entry.mod, str);
+      keys.add((km_kbp_virtual_key)kmapEntry->vkey, (uint16_t)kmapEntry->mod, str);
     }
   } // else: no keys! but still valid. Just, no keys.
   if (kplus.tran != nullptr) {

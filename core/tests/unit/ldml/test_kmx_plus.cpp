@@ -5,17 +5,12 @@
 using namespace km::kbp::kmx;
 
 int main(int argc, const char *argv[]) {
-    // COMP_KMXPLUS_KEYS_ENTRY test
-    COMP_KMXPLUS_KEYS_ENTRY e[2] = {
+    COMP_KMXPLUS_KEY2_KEY e[2] = {
         {
-            KM_KBP_VKEY__AB,
-            0,
             0x00000127, // to = U+0127 = 295
             0x00000000  // flags: !EXTEND
         },
         {
-            KM_KBP_VKEY__A1,
-            0,
             0x0001F640, // to
             0x00000000  // flags: !EXTEND
         }

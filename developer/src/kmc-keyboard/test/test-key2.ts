@@ -1,7 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { Key2Compiler } from '../src/compiler/key2.js';
-import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
+import { compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 
@@ -94,4 +94,15 @@ describe('key2', function () {
 
   });
 
+  testCompilationCases(Key2Compiler, [
+    {
+      subpath: 'sections/key2/escaped2.xml',
+      callback: (key2, subpath, callbacks) => {
+        assert.isNotNull(key2);
+        assert.equal((<Key2>key2).keys.length, 1);
+        const [q] = (<Key2>key2).keys.filter(({ id }) => id.value === 'grave');
+        assert.equal(q.to.value, String.fromCodePoint(0x1faa6));
+      },
+    },
+  ]);
 });

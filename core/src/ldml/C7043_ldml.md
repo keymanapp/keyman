@@ -107,57 +107,9 @@ Each element string is made up of elements with the following item structure:
 
 See [C7043.2.11](#c7043211-tran-finl-and-bksptransforms).
 
-### C7043.2.5 `keys`—Keybag
+### C7043.2.5 Removed: `keys`
 
-| ∆ | Bits | Name      | Description                              |
-|---|------|-----------|------------------------------------------|
-| 0 |  32  | ident     | `keys`                                   |
-| 4 |  32  | size      | int: Length of section                   |
-| 8 |  32  | count     | int: Number of keys                      |
-
-The keys are sorted in binary order based on the `vkey` and `mod` fields.
-
-For each key:
-
-| ∆ | Bits | Name    | Description                              |
-|---|------|---------|------------------------------------------|
-|16+|  32  | vkey    | int: vkey ID                             |
-|20+|  32  | mod     | int: modifier key flags                  |
-|24+|  32  | to      | str: output string OR UTF-32LE codepoint |
-|28+|  32  | flags   | int: per-key flags                       |
-
-- `vkey`: If this is 0-255, it is the resolved standard/predefined vkey (K_A,
-  etc.). It is resolved because the `vkeyMap` from LDML has already been
-  applied.  If this is 256 or above, it is a custom touch layout vkey generated
-  by the compiler.
-- `mod`: 32-bit bitfield defined as below. Little endian values.
-
-| Bit position | Meaning  | Comment                                     |
-|--------------|----------|---------------------------------------------|
-| `0x00000000` | `none`   | All zeros = no modifiers                    |
-|      0       | `ctrlL`  | `ctrl = ctrlL + ctrlR`                      |
-|      1       | `ctrlR`  |                                             |
-|      2       | `altL`   |                                             |
-|      3       | `altR`   | `alt` (both) = `altL + altR`                |
-|      4       | `shift`  | Either shift                                |
-|      8       | `caps`   |                                             |
-
-TODO-LDML: Note that conforming to other keyman values, left versus right shift
-cannot be distinguished. Also note that `cmd` and `opt` do not match
-other keyman values.
-
-TODO-LDML: Note that 'Current' LDML spec allows `shiftL`/`shiftR`, `opt`,
-and `cmd` but there is a request to drop these. These four are not represented
-here.
-
-- `flags`: Flags is a 32-bit bitfield defined as below:
-
-| Bit position | Meaning  |  Description                                |
-|--------------|----------|---------------------------------------------|
-|       0      | extend   | 0: `to` is a char, 1: `to` is a string      |
-
-- `to`: If `extend` is 0, `to` is a UTF-32LE codepoint. If `extend` is 1, `to`
-  is a 32 bit index into the `strs` table. The string may be zero-length.
+_this section has been merged into `key2.kmap`_
 
 ### C7043.2.6 `loca`—Locales
 
@@ -434,9 +386,11 @@ Entries are sorted in a binary codepoint sort on the `to` field.
 | 8 |  32  | keyCount    | int: Number of keys                      |
 |12 |  32  | flicksCount | int: Number of flick lists               |
 |16 |  32  | flickCount  | int: Number of flick elements            |
-|20 | var  | keys        | keys sub-table                           |
+|20 |  32  | kmapCount   | int: Number of kmap elements             |
+|24 | var  | keys        | keys sub-table                           |
 | - | var  | flicks      | flick lists sub-table                    |
 | - | var  | flick       | flick elements sub-table                 |
+| - | var  | kmap        | key map sub-table                        |
 
 #### `key2.keys` subtable
 
@@ -444,22 +398,17 @@ For each key:
 
 | ∆ | Bits | Name             | Description                                              |
 |---|------|----------------  |----------------------------------------------------------|
-| 0+|  32  | vkey             | int: vkey ID                                             |
-| 4+|  32  | to               | str: output string OR UTF-32LE codepoint                 |
-| 8+|  32  | flags            | int: per-key flags                                       |
-|12+|  32  | id               | str: key id                                              |
-|16+|  32  | switch           | str: layer id to switch to                               |
-|20+|  32  | width            | int: key width*10 (supports 0.1 as min width)            |
-|24+|  32  | longPress        | list: index into `list` section with longPress list or 0 |
-|28+|  32  | longPressDefault | str: default longpress target or 0                       |
-|32+|  32  | multiTap         | list: index into `list` section with multiTap list or 0  |
-|36+|  32  | flicks           | int: index into `key2.flicks` subtable                   |
+| 0+|  32  | to               | str: output string OR UTF-32LE codepoint                 |
+| 4+|  32  | flags            | int: per-key flags                                       |
+| 8+|  32  | id               | str: key id                                              |
+|12+|  32  | switch           | str: layer id to switch to                               |
+|16+|  32  | width            | int: key width*10 (supports 0.1 as min width)            |
+|20+|  32  | longPress        | list: index into `list` section with longPress list or 0 |
+|24+|  32  | longPressDefault | str: default longpress target or 0                       |
+|28+|  32  | multiTap         | list: index into `list` section with multiTap list or 0  |
+|32+|  32  | flicks           | int: index into `key2.flicks` subtable                   |
 
 - `id`: The original string id from XML. This may be 0 to save space (i.e. omit the string id).
-- `vkey`: If this is 0-255, it is the resolved standard/predefined vkey (K_A,
-  etc.). It is resolved because the `vkeyMap` from LDML has already been
-  applied.  If this is 256 or above, it is a custom touch layout vkey generated
-  by the compiler.
 - `flags`: Flags is a 32-bit bitfield defined as below:
 
 | Bit position | Meaning   |  Description                                |
@@ -507,6 +456,43 @@ Elements are ordered by the `flicks.id`, and secondarily by the directions list 
 | Bit position | Meaning   |  Description                                |
 |--------------|-----------|---------------------------------------------|
 |       0      | extend    | 0: `to` is a char, 1: `to` is a string      |
+
+#### `key2.kmap` key map subtable
+
+This table (formerly the `keys` section)
+The keys are sorted in ascending order based on the `vkey`, `mod` fields.
+
+For each key:
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+|16+|  32  | vkey    | int: vkey ID                             |
+|20+|  32  | mod     | int: modifier key flags                  |
+|24+|  32  | key     | int: index into `key` sibling subtable   |
+
+- `vkey`: If this is 0-255, it is the resolved standard/predefined vkey (K_A,
+  etc.). It is resolved because the `vkeyMap` from LDML has already been
+  applied.  If this is 256 or above, it is a custom touch layout vkey generated
+  by the compiler.
+- `mod`: 32-bit bitfield defined as below. Little endian values.
+
+| Bit position | Meaning  | Comment                                     |
+|--------------|----------|---------------------------------------------|
+| `0x00000000` | `none`   | All zeros = no modifiers                    |
+|      0       | `ctrlL`  | `ctrl = ctrlL + ctrlR`                      |
+|      1       | `ctrlR`  |                                             |
+|      2       | `altL`   |                                             |
+|      3       | `altR`   | `alt` (both) = `altL + altR`                |
+|      4       | `shift`  | Either shift                                |
+|      8       | `caps`   |                                             |
+
+TODO-LDML: Note that conforming to other keyman values, left versus right shift
+cannot be distinguished. Also note that `cmd` and `opt` do not match
+other keyman values.
+
+TODO-LDML: Note that 'Current' LDML spec allows `shiftL`/`shiftR`, `opt`,
+and `cmd` but there is a request to drop these. These four are not represented
+here.
 
 
 ### C7043.2.16 `list`—String lists
