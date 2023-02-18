@@ -16,7 +16,7 @@
 namespace kmcmp {
 
   WCHAR conv_KMX_WCHAR__TO__WCHAR(KMX_WCHAR in) {
-    //  char16_t -> std::u16string -> std::string -> std::wstring -> wchar_t
+    //  char16_t -> std::u16string -> std::string -> std::wstring -> wchar_t*
     std::u16string u16str(&in);
     std::string stri = string_from_u16string(u16str);
     std::wstring  wstr = wstring_from_string(stri);
@@ -28,9 +28,8 @@ namespace kmcmp {
     std::wstring Context_ws = u16fmt((const PKMX_WCHAR) kp->dpContext);
 
     Key_16 << conv_KMX_WCHAR__TO__WCHAR(kp->Key) << "," << (DWORD) kp->ShiftFlags << ",";
-    if ((KMX_WCHART*) Context_ws.c_str())
-      Key_16 << (KMX_WCHART*) Context_ws.c_str();
-    return Key_16.str();
+    if ((KMX_WCHART*) Context_ws.c_str()) Key_16 << (KMX_WCHART*) Context_ws.c_str();
+      return Key_16.str();
   };
 }
 KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
