@@ -62,8 +62,8 @@ void u16sprintf(KMX_WCHAR * dst, const size_t sz, const wchar_t* fmt, ...) {
 	delete[] wbuf;
 }
 
-std::wstring  convert_pchar16T_To_std_wstring(KMX_WCHAR Name[_MAX_PATH]){
-  //  convert char16_t*  -> std::u16string -> std::string -> std::wstring
+  std::wstring  convert_pchar16T_To_pwcharT(KMX_WCHAR Name[_MAX_PATH]){
+  //  convert char16_t*  -> std::u16string -> std::string -> std::wstring -> wchar_t*
   //  char16_t* -> std::u16string
   std::u16string u16str(Name);
   //  std::u16string -> std::string
@@ -71,7 +71,8 @@ std::wstring  convert_pchar16T_To_std_wstring(KMX_WCHAR Name[_MAX_PATH]){
   //  std::string -> std::wstring
   std::wstring  wstr = wstring_from_string(stri);
   return wstr;
-}
+  }
+
 
 long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base)
 {
