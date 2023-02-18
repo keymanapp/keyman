@@ -224,7 +224,7 @@ class Constants {
   readonly finl_flags_error = 0x0001;
 
   /* ------------------------------------------------------------------
-    * keys section is now key2.jmap
+    * keys section is now key2.kmap
       ------------------------------------------------------------------ */
 
   /**
