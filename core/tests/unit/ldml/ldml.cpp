@@ -131,7 +131,7 @@ apply_action(
     std::cout << "action: context invalidated (markers cleared)" << std::endl;
     break;
   case KM_KBP_IT_EMIT_KEYSTROKE:
-    std::cout << "action: emit kestroke" << std::endl;
+    std::cout << "action: emit keystroke" << std::endl;
     break;
   case KM_KBP_IT_CAPSLOCK:
     std::cout << "action: capsLock " << act.capsLock << std::endl;
