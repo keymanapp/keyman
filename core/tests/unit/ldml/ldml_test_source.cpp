@@ -408,7 +408,6 @@ void LdmlJsonTestSource::set_key_from_id(key_event& k, const std::u16string& id)
   auto *key2 = kmxplus->key2Helper.findKeyByStringId(strId, keyIndex);
   assert(key2 != nullptr);
   if (key2 == nullptr) {
-    k = {0, 0};
     return;
   }
 
