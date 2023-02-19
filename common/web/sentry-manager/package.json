@@ -16,7 +16,7 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
-    "typescript": "^4.5.4"
+    "typescript": "^4.9.5"
   },
   "dependencies": {
     "@keymanapp/keyman-version": "*",

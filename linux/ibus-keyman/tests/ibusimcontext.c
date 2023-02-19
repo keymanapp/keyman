@@ -28,9 +28,7 @@
 // simplyfying the code a bit by replacing async calls with direct synchronous
 // method calls.
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #ifndef IBUS_HAS_PREFILTER
 #warning Compiling against ibus version that does not include prefilter mask patch (https://github.com/ibus/ibus/pull/2440). Output ordering guarantees will be disabled.

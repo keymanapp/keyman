@@ -3,7 +3,7 @@
 
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es2017",
+    "target": "es2022",
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist/",
@@ -15,7 +15,8 @@
     "noImplicitAny": true,
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "lib": ["es2022"]
   },
   "include": [
     "src/**/*.ts"
