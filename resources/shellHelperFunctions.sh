@@ -52,10 +52,6 @@ log_error() {
   echo "${COLOR_RED}$THIS_SCRIPT_NAME: $*${COLOR_RESET}" >&2
 }
 
-log_warning() {
-  echo "${COLOR_YELLOW}$THIS_SCRIPT_NAME: $*${COLOR_RESET}" >&2
-}
-
 displayInfo() {
     if [ "$QUIET" != true ]; then
         while [[ $# -gt 0 ]] ; do
