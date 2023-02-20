@@ -12,11 +12,11 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 builder_describe \
   "Build ibus-keyman." \
+  ":engine" \
   "clean" \
   "configure" \
   "build" \
   "test" \
-  ":engine" \
   "install                   install artifacts" \
   "uninstall                 uninstall artifacts" \
   "--debug,-d                Debug build" \
@@ -53,37 +53,32 @@ if builder_start_action clean; then
 fi
 
 if builder_start_action configure; then
-  pushd "$THIS_SCRIPT_PATH" > /dev/null
+  cd "$THIS_SCRIPT_PATH"
   # shellcheck disable=SC2086
   meson setup "$MESON_PATH" --werror --buildtype $MESON_TARGET "${builder_extra_params[@]}"
-  popd > /dev/null
   builder_finish_action success configure
 fi
 
 if builder_start_action build; then
-  pushd "$MESON_PATH" > /dev/null
+  cd "$MESON_PATH"
   ninja
-  popd > /dev/null
   builder_finish_action success build
 fi
 
 if builder_start_action test; then
-  pushd "$MESON_PATH" > /dev/null
+  cd "$MESON_PATH"
   meson test --print-errorlogs $builder_verbose
-  popd > /dev/null
   builder_finish_action success test
 fi
 
 if builder_start_action install; then
-  pushd "$MESON_PATH" > /dev/null
+  cd "$MESON_PATH"
   ninja install
-  popd > /dev/null
   builder_finish_action success install
 fi
 
 if builder_start_action uninstall; then
-  pushd "$MESON_PATH" > /dev/null
+  cd "$MESON_PATH"
   ninja uninstall
-  popd > /dev/null
   builder_finish_action success uninstall
 fi
