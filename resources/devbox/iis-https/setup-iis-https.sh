@@ -16,9 +16,7 @@ echo_heading2() {
   echo_heading "$*"
 }
 
-get_builder_OS
-
-if [ $os_id != win ]; then
+if [[ $BUILDER_OS != win ]]; then
   fail "This script can only be run on Windows to setup IIS."
 fi
 

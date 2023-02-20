@@ -37,8 +37,6 @@ display_usage() {
   exit 0
 }
 
-get_builder_OS
-
 MESON_TARGET=release
 HAS_TARGET=false
 CLEAN=false
@@ -271,12 +269,12 @@ locate_emscripten() {
 }
 
 build_meson_cross_file_for_wasm() {
-  if [ $os_id == win ]; then
+  if [[ $BUILDER_OS == win ]]; then
     local R=$(cygpath -w $(echo $EMSCRIPTEN_BASE) | sed 's_\\_\\\\_g')
   else
     local R=$(echo $EMSCRIPTEN_BASE | sed 's_/_\\/_g')
   fi
-  sed -e "s/\$EMSCRIPTEN_BASE/$R/g" wasm.build.$os_id.in > wasm.build
+  sed -e "s/\$EMSCRIPTEN_BASE/$R/g" wasm.build.$BUILDER_OS.in > wasm.build
 }
 
 ###
@@ -286,14 +284,14 @@ if $CLEAN; then
 fi
 
 if [[ $PLATFORM == native ]]; then
-  case $os_id in
-    "linux")
-      build_standard $os_id arch
+  case $BUILDER_OS in
+    linux)
+      build_standard linux arch
       ;;
-    "mac")
-      build_standard $os_id arch
+    mac)
+      build_standard mac arch
       ;;
-    "win")
+    win)
       build_windows
       ;;
   esac
