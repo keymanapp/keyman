@@ -208,7 +208,7 @@ showLanguageMenu() {
   resizeMove: (promise: Promise<void>) => void;
 
 
-  /**s
+  /**
    * Signals that either the mouse or an active touchpoint is interacting with the OSK.
    *
    * The provided `Promise` will resolve once the corresponding interaction is complete.

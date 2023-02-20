@@ -1,5 +1,3 @@
-// TODO:  export from ../index.ts as well?
-
 import Keyboard from "./keyboard.js";
 import { KeyboardHarness } from "./keyboardHarness.js";
 
