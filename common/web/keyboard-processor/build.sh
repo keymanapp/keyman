@@ -60,13 +60,16 @@ fi
 if builder_start_action test; then
   echo_heading "Running Keyboard Processor test suite"
 
-  FLAGS=
+  MOCHA_FLAGS=
+  KARMA_CONFIG="manual.conf.cjs"
   if builder_has_option --ci; then
     echo "Replacing user-friendly test reports with CI-friendly versions."
-    FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
+    MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
+    KARMA_CONFIG="CI.conf.cjs"
   fi
 
-  npm run mocha -- --recursive $FLAGS ./tests/node/
+  npm run mocha -- --recursive $MOCHA_FLAGS ./tests/node/
+  npm run karma -- start ./tests/dom/$KARMA_CONFIG
 
   builder_finish_action success test
 fi
