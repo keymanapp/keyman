@@ -69,8 +69,6 @@ fail() {
     exit 1
 }
 
-warn() { echo "${COLOR_YELLOW}$*${COLOR_RESET}"; }
-
 displayInfo() {
     if [ "$QUIET" != true ]; then
         while [[ $# -gt 0 ]] ; do
@@ -175,7 +173,7 @@ write_download_info() {
   MD5_HASH=$(md5 -q "${BASE_PATH}/${BASE_FILE}")
 
   if [[ -f "$DOWNLOAD_INFO_FILEPATH" ]]; then
-    warn "Overwriting $DOWNLOAD_INFO_FILEPATH"
+    builder_warn "Overwriting $DOWNLOAD_INFO_FILEPATH"
   fi
 
   echo { > "$DOWNLOAD_INFO_FILEPATH"

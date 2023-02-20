@@ -193,10 +193,10 @@ update_bundle ( ) {
     # Our default resources are part of the bundle, so let's check on them.
     if [ ! -f "$base_dir/$BUNDLE_PATH/$DEFAULT_KBD_ID.kmp" ]; then
       DO_KMP_DOWNLOADS=true
-      warn "OVERRIDE:  Performing -download-resources run, as the keyboard package is missing!"
+      builder_warn "OVERRIDE:  Performing -download-resources run, as the keyboard package is missing!"
     elif [ ! -f "$base_dir/$BUNDLE_PATH/$DEFAULT_LM_ID.model.kmp" ]; then
       DO_KMP_DOWNLOADS=true
-      warn "OVERRIDE:  Performing -download-resources run, as the lexical model package is missing!"
+      builder_warn "OVERRIDE:  Performing -download-resources run, as the lexical model package is missing!"
     fi
 
     if [ $DO_KMP_DOWNLOADS = true ]; then

@@ -85,7 +85,7 @@ DMG_FILE_SIZE=$(stat -f"%z" "$DMG_FILEPATH")
 DMG_MD5=$(md5 -q "$DMG_FILEPATH")
 
 if [[ -f "$DOWNLOAD_INFO_FILEPATH" ]]; then
-  warn "Overwriting $DOWNLOAD_INFO_FILEPATH"
+  builder_warn "Overwriting $DOWNLOAD_INFO_FILEPATH"
 fi
 
 echo { > "$DOWNLOAD_INFO_FILEPATH"

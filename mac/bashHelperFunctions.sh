@@ -19,8 +19,6 @@ fail() {
     exit 1
 }
 
-warn() { echo "${WARNING_YELLOW}$*${NORMAL}"; }
-
 displayInfo() {
     if [ "$QUIET" != true ]; then
         while [[ $# -gt 0 ]] ; do

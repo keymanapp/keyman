@@ -171,7 +171,7 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -config)
             if [[ "$2" == "" || "$2" =~ ^\- ]]; then
-                warn "Missing config name on command line. Using 'Debug' as default..."
+                builder_warn "Missing config name on command line. Using 'Debug' as default..."
             else
                 if $PREPRELEASE && [[ "$2" != "Release" ]]; then
                     echo "Deployment option 'preprelease' supersedes $2 configuration."
@@ -268,8 +268,8 @@ displayInfo "" \
 if $LOCALDEPLOY && ! $NOTARIZE ; then
     if [ "$(spctl --status)" == "assessments enabled" ]; then
       echo
-      warn "WARNING: Notarization is disabled but SecAssessment security policy is still active. Keyman will not run correctly."
-      warn "         Disable SecAssessment with 'sudo spctl --master-disable' (or do notarized builds)"
+      builder_warn "WARNING: Notarization is disabled but SecAssessment security policy is still active. Keyman will not run correctly."
+      builder_warn "         Disable SecAssessment with 'sudo spctl --master-disable' (or do notarized builds)"
       fail "Re-run with '-deploy local' or disable SecAssessment."
     fi
 fi

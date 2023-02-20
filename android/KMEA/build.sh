@@ -47,10 +47,6 @@ KMA_ROOT="$KEYMAN_ROOT/android"
 KMW_ROOT="$KEYMAN_ROOT/web"
 KMEA_ASSETS="$KMA_ROOT/KMEA/app/src/main/assets"
 
-warn ( ) {
-    echo "$*"
-}
-
 die ( ) {
     echo
     echo "$*"

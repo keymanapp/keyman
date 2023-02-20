@@ -143,7 +143,7 @@ fi
 WORKING_COPY_OF_IMAGE="$OUTPUT_DIR/Keyman-temp-$VERSION.dmg"
 displayInfo "Copying \"$TEMPLATE_IMAGE\" to \"$WORKING_COPY_OF_IMAGE\"..."
 if [[ -e "$WORKING_COPY_OF_IMAGE" && "$VERBOSITY" != "-quiet" ]] ; then
-    warn "Overwriting: $WORKING_COPY_OF_IMAGE"
+    builder_warn "Overwriting: $WORKING_COPY_OF_IMAGE"
 fi
 cp -f "$TEMPLATE_IMAGE" "$WORKING_COPY_OF_IMAGE"
 
@@ -210,7 +210,7 @@ DMG_FILE_PATH="$DEST_DIR/keyman-$VERSION.dmg"
 displayInfo "Converting/compressing image to create \"$DMG_FILE_PATH\""
 if [[ -e "$DMG_FILE_PATH" ]] ; then
     if [[ "$VERBOSITY" != "-quiet" ]] ; then
-        warn "Overwriting: $DMG_FILE_PATH"
+        builder_warn "Overwriting: $DMG_FILE_PATH"
     fi
     rm -rf "$DMG_FILE_PATH"
 fi
