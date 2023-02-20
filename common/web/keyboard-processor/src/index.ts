@@ -4,6 +4,7 @@ export { default as Keyboard } from "./keyboards/keyboard.js";
 export * from "./keyboards/keyboard.js";
 export { default as KeyboardProperties } from "./keyboards/keyboardProperties.js";
 export { default as SpacebarText } from "./keyboards/spacebarText.js";
+export { default as StateKeyMap } from "./keyboards/stateKeyMap.js";
 
 export { default as Codes } from "./text/codes.js";
 export * from "./text/codes.js";
@@ -22,7 +23,7 @@ export * from "./text/outputTarget.js";
 export { default as RuleBehavior } from "./text/ruleBehavior.js";
 export * from "./text/systemStores.js";
 
-export * from "@keymanapp/web-utils/build/obj/index.js";
+export * from "@keymanapp/web-utils";
 
 // At the top level, there should be no default export.
 

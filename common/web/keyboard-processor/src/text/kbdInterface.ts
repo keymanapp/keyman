@@ -5,7 +5,7 @@
 
 //#region Imports
 
-import { type DeviceSpec } from "@keymanapp/web-utils/build/obj/index.js";
+import { type DeviceSpec } from "@keymanapp/web-utils";
 
 import Codes from "./codes.js";
 import type KeyEvent from "./keyEvent.js";
@@ -17,7 +17,6 @@ import type OutputTarget from "./outputTarget.js";
 import { Mock } from "./outputTarget.js";
 import RuleBehavior from "./ruleBehavior.js";
 import Keyboard, { VariableStoreDictionary } from "../keyboards/keyboard.js";
-
 
 //#endregion
 

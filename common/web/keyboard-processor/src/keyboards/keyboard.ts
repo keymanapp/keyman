@@ -6,7 +6,7 @@ import type OutputTarget from "../text/outputTarget.js";
 
 import type { ComplexKeyboardStore } from "../text/kbdInterface.js";
 
-import { Version, DeviceSpec } from "@keymanapp/web-utils/build/obj/index.js";
+import { Version, DeviceSpec } from "@keymanapp/web-utils";
 import StateKeyMap from "./stateKeyMap.js";
 
 /**

@@ -1,4 +1,4 @@
-import { DeviceSpec } from "@keymanapp/web-utils/build/obj/index.js";
+import { DeviceSpec } from "@keymanapp/web-utils";
 
 /*
  * This file is intended for CSS-styling constants that see use with the OSK.

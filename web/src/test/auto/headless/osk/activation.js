@@ -1,8 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import SimpleActivator from '../../../../../build/engine/osk/obj/views/simpleActivator.js';
-import TwoStateActivator from '../../../../../build/engine/osk/obj/views/twoStateActivator.js';
+import { SimpleActivator, TwoStateActivator } from 'keyman/engine/osk';
 
 // Tests the activation-state logic abstraction & implementations used to model and control OSK visibility.
 

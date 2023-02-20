@@ -36,5 +36,16 @@
     "@keymanapp/web-utils": "*",
     "@types/node": "^11.9.4"
   },
-  "type": "module"
+  "type": "module",
+  "main": "./build/obj/index.js",
+  "types": "./build/obj/index.d.ts",
+  "exports": {
+    ".": "./build/obj/index.js",
+    "./lib": {
+      "types": "./build/lib/index.d.ts",
+      "import": "./build/lib/index.mjs",
+      "require": "./build/lib/index.cjs"
+    },
+    "./obj/*.js": "./build/obj/*.js"
+  }
 }

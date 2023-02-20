@@ -2,9 +2,12 @@ import { assert } from 'chai';
 import fs from 'fs';
 import vm from 'vm';
 
-import InputProcessor from '../../build/obj/text/inputProcessor.js';
-import { Mock } from '@keymanapp/keyboard-processor/build/obj/text/outputTarget.js';
-import * as utils from '@keymanapp/web-utils/build/obj/index.js';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+import InputProcessor from '#./text/inputProcessor.js';
+import { Mock } from '@keymanapp/keyboard-processor';
+import * as utils from '@keymanapp/web-utils';
 
 // Required initialization setup.
 global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
@@ -81,7 +84,7 @@ describe('InputProcessor', function() {
 
       // These two lines will load a keyboard from its file; headless-mode `registerKeyboard` will
       // automatically set the keyboard as active.
-      let kbdScript = new vm.Script(fs.readFileSync('../../test/resources/keyboards/test_chirality.js'));
+      let kbdScript = new vm.Script(fs.readFileSync(require.resolve('@keymanapp/common-test-resources/keyboards/test_chirality.js')));
       kbdScript.runInThisContext();
 
       keyboard = core.activeKeyboard;

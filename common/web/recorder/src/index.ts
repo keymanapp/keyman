@@ -1,11 +1,12 @@
-/// <reference path="proctor.ts" />
-
-import { type OutputTarget } from "@keymanapp/keyboard-processor/build/obj/index.js";
-import { KeyDistribution, KeyEvent, Mock } from "@keymanapp/keyboard-processor/build/obj/index.js";
+import { type OutputTarget } from "@keymanapp/keyboard-processor";
+import { KeyDistribution, KeyEvent, Mock } from "@keymanapp/keyboard-processor";
 
 import Proctor from "./proctor.js";
 
-import * as utils from "@keymanapp/web-utils/build/obj/index.js";
+export { default as Proctor } from "./proctor.js";
+export { default as NodeProctor } from "./nodeProctor.js";
+
+import * as utils from "@keymanapp/web-utils";
 
 //#region Defines the InputEventSpec set, used to reconstruct DOM-based events for browser-based simulation
 export abstract class InputEventSpec {

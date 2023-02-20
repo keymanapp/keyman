@@ -1,13 +1,10 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import LanguageProcessor from '../../build/obj/text/prediction/languageProcessor.js';
-import PredictionContext from '../../build/obj/text/prediction/predictionContext.js';
-import LMWorker from "@keymanapp/lexical-model-layer/build/obj/node/worker.js";
-import KeyboardProcessor from '@keymanapp/keyboard-processor/build/obj/text/keyboardProcessor.js';
-import DeviceSpec from '@keymanapp/web-utils/build/obj/deviceSpec.js';
-
-import { Mock } from '@keymanapp/keyboard-processor/build/obj/text/outputTarget.js';
+import LanguageProcessor from '#./text/prediction/languageProcessor.js';
+import PredictionContext from '#./text/prediction/predictionContext.js';
+import { Worker as LMWorker } from "@keymanapp/lexical-model-layer/node";
+import { DeviceSpec, KeyboardProcessor, Mock } from '@keymanapp/keyboard-processor';
 
 function compileDummyModel(suggestionSets) {
   return `

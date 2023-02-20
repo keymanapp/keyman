@@ -3,9 +3,9 @@
  */
 
 import { assert } from 'chai';
-import DummyModel from '../../../build/obj/models/dummy-model.js';
+import DummyModel from '#./models/dummy-model.js';
 
-import { emptyContext, iGotDistractedByHazel, zeroTransform } from '../../../../../test/resources/model-helpers.mjs';
+import { emptyContext, iGotDistractedByHazel, zeroTransform } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
 describe('LMLayerWorker dummy model', function() {
   describe('instantiation', function () {

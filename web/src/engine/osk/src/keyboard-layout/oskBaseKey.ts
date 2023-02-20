@@ -1,7 +1,5 @@
-import Codes from '@keymanapp/keyboard-processor/build/obj/text/codes.js';
-import { ActiveKey } from '@keymanapp/keyboard-processor/build/obj/keyboards/activeLayout.js';
-import DeviceSpec from '@keymanapp/web-utils/build/obj/deviceSpec.js';
-import landscapeView from 'keyman/build/engine/dom-utils/obj/landscapeView.js';
+import { ActiveKey, Codes, DeviceSpec } from '@keymanapp/keyboard-processor';
+import { landscapeView } from 'keyman/engine/dom-utils';
 
 import OSKKey, { OSKKeySpec } from './oskKey.js';
 import { KeyData, KeyElement, link } from '../keyElement.js';

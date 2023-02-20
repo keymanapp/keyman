@@ -1,7 +1,8 @@
 {
   "name": "@keymanapp/recorder-core",
   "description": "Core classes used to develop KeymanWeb test cases based on keystrokes",
-  "main": "index.js",
+  "main": "build/obj/index.js",
+  "types": "build/obj/index.d.ts",
   "type": "module",
   "scripts": {
     "tsc": "tsc",

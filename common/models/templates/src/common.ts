@@ -1,5 +1,5 @@
 // Allows the kmwstring bindings to resolve.
-import { extendString } from "@keymanapp/web-utils/build/obj/index.js";
+import { extendString } from "@keymanapp/web-utils";
 
 extendString();
 

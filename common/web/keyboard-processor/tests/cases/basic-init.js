@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import fs from 'fs';
 import vm from 'vm';
 
-import KeyboardProcessor from '@keymanapp/keyboard-processor/build/obj/text/keyboardProcessor.js';
+import { KeyboardProcessor } from '@keymanapp/keyboard-processor';
 
 global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
                     // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.

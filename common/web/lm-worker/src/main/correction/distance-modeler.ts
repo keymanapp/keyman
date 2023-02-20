@@ -1,4 +1,5 @@
-import { Comparator, isHighSurrogate, SENTINEL_CODE_UNIT, PriorityQueue } from '@keymanapp/models-templates/build/obj/index.js';
+import { Comparator, isHighSurrogate, SENTINEL_CODE_UNIT, PriorityQueue } from '@keymanapp/models-templates';
+
 import { ClassicalDistanceCalculation, EditToken } from './classical-calculation.js';
 
 type RealizedInput = ProbabilityMass<Transform>[];  // NOT Distribution - they're masses from separate distributions.

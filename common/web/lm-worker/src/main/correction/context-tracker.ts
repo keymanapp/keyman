@@ -1,7 +1,8 @@
+import { tokenize } from '@keymanapp/models-templates';
+import { defaultWordbreaker } from '@keymanapp/models-wordbreakers';
+
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { SearchSpace } from './distance-modeler.js';
-import { tokenize } from '@keymanapp/models-templates/build/obj/index.js';
-import defaultWordbreaker from '@keymanapp/models-wordbreakers/build/obj/index.js';
 import TransformUtils from '../transformUtils.js';
 
 function textToCharTransforms(text: string, transformId?: number) {

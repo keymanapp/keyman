@@ -1,6 +1,5 @@
-import Codes from '@keymanapp/keyboard-processor/build/obj/text/codes.js';
-import { DeviceSpec, Version } from '@keymanapp/web-utils/build/obj/index.js';
-import { getAbsoluteX, getAbsoluteY } from 'keyman/build/engine/dom-utils/obj/getAbsolute.js';
+import { Codes, DeviceSpec, ManagedPromise, Version } from '@keymanapp/keyboard-processor';
+import { getAbsoluteX, getAbsoluteY, landscapeView } from 'keyman/engine/dom-utils';
 
 import OSKView, { OSKPos, OSKRect } from './oskView.js';
 import TitleBar from '../components/titleBar.js';
@@ -8,11 +7,9 @@ import ResizeBar from '../components/resizeBar.js';
 
 import MouseDragOperation from '../input/mouseDragOperation.js';
 import { getViewportScale } from '../screenUtils.js';
-import landscapeView from 'keyman/build/engine/dom-utils/obj/landscapeView.js';
 import Configuration from '../config/viewConfiguration.js';
 import TwoStateActivator from './twoStateActivator.js';
 import FloatingOSKCookie from './floatingOskCookie.js';
-import { ManagedPromise } from '@keymanapp/web-utils/build/lib/index.mjs';
 
 /***
    KeymanWeb 10.0

@@ -1,6 +1,36 @@
 {
   "name": "keyman",
   "description": "Facilitates text input in any language.",
+  "exports": {
+    "./engine/device-detect": {
+      "types": "./build/engine/device-detect/obj/kmwdevice.d.ts",
+      "import": "./build/engine/device-detect/obj/kmwdevice.js"
+    },
+    "./engine/device-detect/lib": {
+      "types": "./build/engine/device-detect/lib/kmwdevice.d.ts",
+      "import": "./build/engine/device-detect/lib/kmwdevice.mjs"
+    },
+    "./engine/dom-utils": {
+      "types": "./build/engine/dom-utils/obj/index.d.ts",
+      "import": "./build/engine/dom-utils/obj/index.js"
+    },
+    "./engine/element-wrappers": {
+      "types": "./build/engine/element-wrappers/obj/index.d.ts",
+      "import": "./build/engine/element-wrappers/obj/index.js"
+    },
+    "./engine/element-wrappers/lib": {
+      "types": "./build/engine/element-wrappers/lib/index.d.ts",
+      "import": "./build/engine/element-wrappers/lib/index.mjs"
+    },
+    "./engine/osk": {
+      "types": "./build/engine/osk/obj/index.d.ts",
+      "import": "./build/engine/osk/obj/index.js"
+    },
+    "./engine/osk/lib": {
+      "types": "./build/engine/osk/lib/index.d.ts",
+      "import": "./build/engine/osk/lib/index.mjs"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/keymanapp/keyman.git"

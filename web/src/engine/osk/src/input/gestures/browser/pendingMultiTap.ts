@@ -1,5 +1,4 @@
-import Codes from '@keymanapp/keyboard-processor/build/obj/text/codes.js';
-import KeyEvent from '@keymanapp/keyboard-processor/build/obj/text/keyEvent.js';
+import { Codes, KeyEvent } from '@keymanapp/keyboard-processor';
 import { type KeyElement } from '../../../keyElement.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 import PendingGesture from '../pendingGesture.interface.js';

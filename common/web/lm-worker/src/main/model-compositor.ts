@@ -1,5 +1,5 @@
-import * as models from '@keymanapp/models-templates/build/obj/index.js';
-import * as wordBreakers from '@keymanapp/models-wordbreakers/build/obj/index.js';
+import * as models from '@keymanapp/models-templates';
+import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import * as correction from './correction/index.js'
 
 import TransformUtils from './transformUtils.js';

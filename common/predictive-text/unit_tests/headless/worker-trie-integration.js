@@ -1,7 +1,10 @@
 import { assert } from 'chai';
 
-import { LMLayer, SourcemappedWorker as Worker } from '../../build/obj/node/index.js';
-import { capabilities } from '../../../../common/test/resources/model-helpers.mjs';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+import { LMLayer, SourcemappedWorker as Worker } from '#./node/index.js';
+import { capabilities } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
 /*
  * How to run the worlist
@@ -17,7 +20,7 @@ describe('LMLayer using the trie model', function () {
       // Not done yet, as this test case is a slightly-edited copy of the in-browser version.
       return lmLayer.loadModel(
         // We're running headlessly, so the path can be relative to the npm root directory.
-        "../../common/test/resources/models/simple-trie.js"
+        require.resolve("@keymanapp/common-test-resources/models/simple-trie.js")
       ).then(function (_actualConfiguration) {
         return Promise.resolve();
       }).then(function () {
@@ -56,7 +59,7 @@ describe('LMLayer using the trie model', function () {
 
       return lmLayer.loadModel(
         // We're running headlessly, so the path can be relative to the npm root directory.
-        "../../common/test/resources/models/naive-trie.js"
+        require.resolve("@keymanapp/common-test-resources/models/naive-trie.js")
       ).then(function (_actualConfiguration) {
         return Promise.resolve();
       }).then(function () {

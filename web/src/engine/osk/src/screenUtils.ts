@@ -1,4 +1,4 @@
-import landscapeView from "keyman/build/engine/dom-utils/obj/landscapeView.js";
+import { landscapeView } from "keyman/engine/dom-utils";
 
 /**
  * Get viewport scale factor for this document

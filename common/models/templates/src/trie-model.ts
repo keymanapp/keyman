@@ -26,8 +26,8 @@
 // Should probably make a 'lm-utils' submodule.
 
 // Allows the kmwstring bindings to resolve.
-import { extendString } from "@keymanapp/web-utils/build/obj/index.js";
-import { default as defaultWordBreaker } from "@keymanapp/models-wordbreakers/build/obj/index.js";
+import { extendString } from "@keymanapp/web-utils";
+import { default as defaultWordBreaker } from "@keymanapp/models-wordbreakers";
 
 import { applyTransform, isHighSurrogate, isSentinel, SENTINEL_CODE_UNIT, transformToSuggestion } from "./common.js";
 import { getLastPreCaretToken } from "./tokenization.js";

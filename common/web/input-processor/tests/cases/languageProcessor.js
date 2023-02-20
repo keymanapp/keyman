@@ -1,14 +1,14 @@
 import { assert } from 'chai';
 
-import LanguageProcessor from '../../build/obj/text/prediction/languageProcessor.js';
-import LMWorker from "@keymanapp/lexical-model-layer/build/obj/node/worker.js";
-import { Mock } from '@keymanapp/keyboard-processor/build/obj/text/outputTarget.js';
+import LanguageProcessor from '#./text/prediction/languageProcessor.js';
+import { SourcemappedWorker as LMWorker } from "@keymanapp/lexical-model-layer/node";
+import { Mock } from '@keymanapp/keyboard-processor';
 
 /*
  * Unit tests for the Dummy prediction model.
  */
 
-import kmlmc from '../../../../../developer/src/kmlmc/dist/lexical-model-compiler/lexical-model-compiler.js';
+import kmlmc from '@keymanapp/lexical-model-compiler/dist/lexical-model-compiler/lexical-model-compiler.js';
 let LexicalModelCompiler = kmlmc.default; // Is compiled to CommonJS at present, which has interesting consequences.
 
 import { fileURLToPath } from 'url';

@@ -1,9 +1,8 @@
-import Codes from '@keymanapp/keyboard-processor/build/obj/text/codes.js';
-import DeviceSpec from '@keymanapp/web-utils/build/obj/deviceSpec.js';
+import { Codes, DeviceSpec } from '@keymanapp/keyboard-processor';
+import { landscapeView } from 'keyman/engine/dom-utils';
 
 import OSKView, { OSKPos, OSKRect } from './oskView.js';
 import { getViewportScale } from '../screenUtils.js';
-import landscapeView from 'keyman/build/engine/dom-utils/obj/landscapeView.js';
 import Configuration from '../config/viewConfiguration.js';
 import { StaticActivator } from './activator.js';
 import TwoStateActivator from './twoStateActivator.js';

@@ -1,7 +1,6 @@
 import EventEmitter, { ArgumentMap } from 'eventemitter3';
 
 import BannerView, { BannerController } from '../banner/bannerView.js';
-import { SuggestionBanner } from '../banner/banner.js';
 import OSKViewComponent from '../components/oskViewComponent.interface.js';
 import EmptyView from '../components/emptyView.js';
 import HelpPageView from '../components/helpPageView.js';
@@ -9,22 +8,23 @@ import KeyboardView from '../components/keyboardView.interface.js';
 import VisualKeyboard from '../visualKeyboard.js';
 import { LengthStyle, ParsedLengthStyle } from '../lengthStyle.js';
 
-import DeviceSpec from '@keymanapp/web-utils/build/obj/deviceSpec.js';
-import Keyboard from '@keymanapp/keyboard-processor/build/obj/keyboards/keyboard.js';
-import KeyboardProperties from '@keymanapp/keyboard-processor/build/obj/keyboards/keyboardProperties.js';
+import {
+  DeviceSpec,
+  Keyboard,
+  KeyEvent,
+  KeyboardProperties,
+  ManagedPromise,
+  type MutableSystemStore,
+  type SystemStoreMutationHandler
+} from '@keymanapp/keyboard-processor';
+import { createUnselectableElement, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
 
-import { getAbsoluteX, getAbsoluteY } from 'keyman/build/engine/dom-utils/obj/getAbsolute.js';
-import createUnselectableElement from 'keyman/build/engine/dom-utils/obj/createUnselectableElement.js';
-import KeyEvent from '@keymanapp/keyboard-processor/build/obj/text/keyEvent.js';
 import TitleBar from '../components/titleBar.js';
-import { StylesheetManager } from 'keyman/build/engine/dom-utils/obj/stylesheets.js';
 import Configuration from '../config/viewConfiguration.js';
 import Activator, { StaticActivator } from './activator.js';
-import { ManagedPromise } from '@keymanapp/web-utils/build/lib/index.mjs';
 import TouchEventPromiseMap from './touchEventPromiseMap.js';
 
-// These will likely be eliminated from THIS file at some point.
-import type { SystemStoreMutationHandler, MutableSystemStore } from '@keymanapp/keyboard-processor/build/obj/text/systemStores.js';
+// These will likely be eliminated from THIS file at some point.\
 
 export type OSKPos = {'left'?: number, 'top'?: number};
 

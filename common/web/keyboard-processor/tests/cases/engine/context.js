@@ -2,8 +2,7 @@ import { assert } from 'chai';
 import fs from 'fs';
 import vm from 'vm';
 
-import KeyboardProcessor from '@keymanapp/keyboard-processor/build/obj/text/keyboardProcessor.js';
-import { Mock } from '@keymanapp/keyboard-processor/build/obj/text/outputTarget.js';
+import { KeyboardProcessor, Mock } from '@keymanapp/keyboard-processor';
 
 import { RecordedKeystrokeSequence } from '@keymanapp/recorder-core/build/obj/index.js';
 import NodeProctor from '@keymanapp/recorder-core/build/obj/nodeProctor.js';

@@ -25,7 +25,9 @@ cd "$THIS_SCRIPT_PATH"
 
 MAIN=engine/main     # Covers all engine code, including submodules like those listed below.
 DEVICEDETECT=engine/device-detect
+DOMUTILS=engine/dom-utils
 ELEMENTWRAPPERS=engine/element-wrappers
+OSK=engine/osk
 
 BUILD_BASE=build
 
@@ -88,8 +90,10 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   "configure" \
   "build" \
   ":device-detect     Subset used for device-detection " \
+  ":dom-utils         A common subset of function used for DOM calculations, layout, etc" \
   ":element-wrappers  Subset used to integrate with website elements" \
-  ":main              Builds all common code used by KMW's app/-level targets"
+  ":main              Builds all common code used by KMW's app/-level targets" \
+  ":osk               Builds the Web OSK module"
 
 # Possible TODO?
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
@@ -97,11 +101,15 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
 builder_describe_outputs \
   configure                  ../../../node_modules \
   configure:device-detect    ../../../node_modules \
+  configure:dom-utils        ../../../node_modules \
   configure:element-wrappers ../../../node_modules \
   configure:main             ../../../node_modules \
+  configure:osk              ../../../node_modules \
   build:device-detect        $(output_path $DEVICEDETECT $OUTPUT_DIR)/index.js \
+  build:dom-utils            $(output_path $DOMUTILS $OUTPUT_DIR)/index.js \
   build:element-wrappers     $(output_path $ELEMENTWRAPPERS $OUTPUT_DIR)/index.js \
-  build:main                 $(output_path $MAIN $OUTPUT_DIR)/keymanweb.js
+  build:main                 $(output_path $MAIN $OUTPUT_DIR)/keymanweb.js \
+  build:osk                  $(output_path $OSK $OUTPUT_DIR)/index.js
 
 builder_parse "$@"
 
@@ -126,14 +134,16 @@ compile ( ) {
   local COMPILE_TARGET=$1
   local COMPILED_OUTPUT_PATH="$(output_path $COMPILE_TARGET $OUTPUT_DIR)"
 
-  BUNDLE_CONFIG=src/$COMPILE_TARGET/tsconfig.bundled.json
-
   $compilecmd -b src/$COMPILE_TARGET -v
 
-  # Handle any 'bundled' compilations, too!
-  # `if`'s working dir:  web/src/engine; $compilecmd's: web/
-  if [ -f "../../$BUNDLE_CONFIG" ]; then
-    $compilecmd -b $BUNDLE_CONFIG -v
+  # COMPILE_TARGET entries are all prefixed with `engine`, so remove that.
+  if [ -f "../$COMPILE_TARGET/build-bundler.js" ]; then
+    pushd "../$COMPILE_TARGET"
+    node "./build-bundler.js"
+    popd
+
+    # So... tsc does declaration-bundling on its own pretty well, at least for local development.
+    $compilecmd --emitDeclarationOnly --outFile ./build/$COMPILE_TARGET/lib/index.d.ts -p src/$COMPILE_TARGET
   fi
 
   echo $COMPILE_TARGET TypeScript compiled under $COMPILED_OUTPUT_PATH
@@ -179,10 +189,22 @@ if builder_start_action build:device-detect; then
   builder_finish_action success build:device-detect
 fi
 
+if builder_start_action build:dom-utils; then
+  compile $DOMUTILS
+
+  builder_finish_action success build:dom-utils
+fi
+
 if builder_start_action build:element-wrappers; then
   compile $ELEMENTWRAPPERS
 
   builder_finish_action success build:element-wrappers
+fi
+
+if builder_start_action build:osk; then
+  compile $OSK
+
+  builder_finish_action success build:osk
 fi
 
 if builder_start_action build:main; then

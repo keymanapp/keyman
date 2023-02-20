@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import TransformUtils from '../../../build/obj/transformUtils.js';
+import TransformUtils from '#./transformUtils.js';
 
 describe('TransformUtils', function () {
   describe('isWhitespace', function () {

@@ -1,4 +1,4 @@
-import { Mock } from "@keymanapp/keyboard-processor/build/obj/text/outputTarget.js";
+import { Mock } from "@keymanapp/keyboard-processor";
 
 export default class ContextWindow implements Context {
   // Used to limit the range of context replicated for use of keyboard rules within

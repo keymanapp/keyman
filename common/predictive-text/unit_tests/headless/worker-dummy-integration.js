@@ -1,8 +1,11 @@
 import { assert } from 'chai';
 import fs from 'fs';
 
-import { LMLayer, SourcemappedWorker as Worker } from '../../build/obj/node/index.js';
-import { capabilities, iGotDistractedByHazel } from '../../../../common/test/resources/model-helpers.mjs';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+import { LMLayer, SourcemappedWorker as Worker } from '#./node/index.js';
+import { capabilities, iGotDistractedByHazel } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
 /*
  * Shows off the LMLayer API, using the full prediction interface.
@@ -28,7 +31,7 @@ describe('LMLayer using dummy model', function () {
       // Not done yet, as this test case is a slightly-edited copy of the in-browser version.
       return lmLayer.loadModel(
         // We're running headlessly, so the path can be relative to the npm root directory.
-        "../../common/test/resources/models/simple-dummy.js"
+        require.resolve("@keymanapp/common-test-resources/models/simple-dummy.js")
       ).then(function (actualConfiguration) {
         return Promise.resolve();
       }).then(function () {
@@ -63,7 +66,7 @@ describe('LMLayer using dummy model', function () {
       };
 
       // We're running headlessly, so the path can be relative to the npm root directory.
-      let modelCode = fs.readFileSync("./../../common/test/resources/models/simple-dummy.js").toString();
+      let modelCode = fs.readFileSync(require.resolve("@keymanapp/common-test-resources/models/simple-dummy.js")).toString();
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax.
@@ -104,7 +107,7 @@ describe('LMLayer using dummy model', function () {
       // Not done yet, as this test case is a slightly-edited copy of the in-browser version.
       return lmLayer.loadModel(
         // We're running headlessly, so the path can be relative to the npm root directory.
-        "../../common/test/resources/models/simple-dummy.js"
+        require.resolve("@keymanapp/common-test-resources/models/simple-dummy.js")
       ).then(function (actualConfiguration) {
         return Promise.resolve();
       }).then(function () {

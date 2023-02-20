@@ -1,8 +1,7 @@
 var assert = chai.assert;
 
+import { extendString, Mock } from '/@keymanapp/keyboard-processor/build/lib/index.mjs';
 import * as wrappers from '/@keymanapp/keyman/build/engine/element-wrappers/lib/index.mjs';
-import { Mock } from '/@keymanapp/keyboard-processor/build/obj/text/outputTarget.js';
-import extendString from '../../../../../../common/web/utils/build/obj/kmwstring.js';
 import Device from '/@keymanapp/keyman/build/engine/device-detect/lib/index.mjs';
 
 import { toSupplementaryPairString, DynamicElements, DEVICE_DETECT_FAILURE } from '../test_utils.js';

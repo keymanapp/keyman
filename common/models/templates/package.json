@@ -16,9 +16,19 @@
   ],
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "license": "MIT",
-  "main": "index.js",
+  "main": "./build/obj/index.js",
+  "types": "./build/obj/index.d.ts",
+  "exports": {
+    ".": "./build/obj/index.js",
+    "./lib": {
+      "types": "./build/lib/index.d.ts",
+      "import": "./build/lib/index.mjs",
+      "require": "./build/lib/index.cjs"
+    },
+    "./obj/*.js": "./build/obj/*.js"
+  },
+
   "type": "module",
-  "types": "index.d.ts",
   "directories": {
     "test": "test"
   },
@@ -35,6 +45,7 @@
   "scripts": {
     "build": "gosh ./build.sh",
     "tsc": "tsc",
+    "mocha": "mocha",
     "test": "mocha -r test/helpers.js"
   },
   "bugs": {

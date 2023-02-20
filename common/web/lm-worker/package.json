@@ -1,7 +1,16 @@
 {
   "name": "@keymanapp/lm-worker",
   "description": "Keyman/Predictive Text worker",
-  "main": "build/index.js",
+  "main": "./build/lib/worker-main.wrapped.js",
+  "exports": {
+    "./worker-main.wrapped.js": "./build/lib/worker-main.wrapped.js",
+    "./worker-main.wrapped.min.js": "./build/lib/worker-main.wrapped.min.js"
+  },
+  "imports": {
+    "#./*.js": "./build/obj/*.js",
+    "#./correction/*.js": "./build/obj/correction/*.js",
+    "#./models/*.js": "./build/obj/models/*.js"
+  },
   "type": "module",
   "scripts": {
     "karma": "karma",
@@ -13,6 +22,7 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@keymanapp/common-test-resources": "*",
     "@keymanapp/models-types": "*",
     "@keymanapp/resources-gosh": "*",
     "@types/node": "^10.17.21",

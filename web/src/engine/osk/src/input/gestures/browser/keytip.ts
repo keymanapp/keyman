@@ -1,4 +1,4 @@
-import OSKBaseKey from '../../../keyboard-layout/oskBaseKey';
+import OSKBaseKey from '../../../keyboard-layout/oskBaseKey.js';
 import { KeyElement } from '../../../keyElement.js';
 import KeyTipInterface from '../../../keytip.interface.js';
 import VisualKeyboard from '../../../visualKeyboard.js';

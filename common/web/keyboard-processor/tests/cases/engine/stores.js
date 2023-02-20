@@ -1,9 +1,7 @@
 import { assert } from 'chai';
 
-import Keyboard from '@keymanapp/keyboard-processor/build/obj/keyboards/keyboard.js';
-import KeyboardProcessor from '@keymanapp/keyboard-processor/build/obj/text/keyboardProcessor.js';
-
-import extendString from '@keymanapp/web-utils/build/obj/kmwstring.js'
+import { Keyboard, KeyboardProcessor } from '@keymanapp/keyboard-processor';
+import { extendString } from '@keymanapp/web-utils';
 
 extendString();
 

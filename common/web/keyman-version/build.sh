@@ -28,7 +28,7 @@ builder_describe "Build the include script for current Keyman version" \
 
 builder_describe_outputs \
   configure "/node_modules" \
-  build     "build/index.js"
+  build     "build/version.inc.js"
 
 builder_parse "$@"
 

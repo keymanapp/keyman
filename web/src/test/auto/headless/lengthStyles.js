@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import { ParsedLengthStyle } from 'keyman/build/engine/osk/obj/lengthStyle.js';
+import { ParsedLengthStyle } from 'keyman/engine/osk';
 
 describe('Length style processing', () => {
   it("constructs from 'px' styling", () => {

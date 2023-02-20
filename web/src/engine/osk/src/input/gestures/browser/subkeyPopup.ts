@@ -6,8 +6,7 @@ import OSKBaseKey from '../../../keyboard-layout/oskBaseKey.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 import InputEventCoordinate from '../../../input/inputEventCoordinate.js';
 
-import KeyEvent from '@keymanapp/keyboard-processor/build/obj/text/keyEvent.js';
-import DeviceSpec from '@keymanapp/web-utils/build/obj/deviceSpec.js';
+import { DeviceSpec, KeyEvent } from '@keymanapp/keyboard-processor';
 
 /**
  * Represents a 'realized' longpress gesture's default implementation

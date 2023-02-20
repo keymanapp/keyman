@@ -7,7 +7,7 @@ import type Keyboard from "./keyboard.js";
 
 import KeyboardProcessor from "../text/keyboardProcessor.js";
 
-import { deepCopy, type DeviceSpec } from "@keymanapp/web-utils/build/obj/index.js";
+import { deepCopy, type DeviceSpec } from "@keymanapp/web-utils";
 
 // TS 3.9 changed behavior of getters to make them
 // non-enumerable by default. This broke our 'polyfill'

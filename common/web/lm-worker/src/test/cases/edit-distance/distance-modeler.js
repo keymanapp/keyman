@@ -1,8 +1,8 @@
 import { assert } from 'chai';
-import * as models from '../../../../build/obj/models/index.js';
-import * as correction from '../../../../build/obj/correction/index.js';
+import * as models from '#./models/index.js';
+import * as correction from '#./correction/index.js';
 
-import { jsonFixture } from '../../../../../../test/resources/model-helpers.mjs';
+import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
 function assertEdgeChars(edge, input, match) {
   assert.isTrue(edgeHasChars(edge, input, match));

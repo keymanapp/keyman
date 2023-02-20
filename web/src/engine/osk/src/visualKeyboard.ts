@@ -1,14 +1,19 @@
 import EventEmitter from 'eventemitter3';
 
-import DeviceSpec from '@keymanapp/web-utils/build/obj/deviceSpec.js';
+import {
+  ActiveKey,
+  ActiveLayout,
+  ButtonClass,
+  DeviceSpec,
+  Keyboard,
+  KeyboardProperties,
+  KeyDistribution,
+  KeyEvent,
+  Layouts,
+  StateKeyMap
+} from '@keymanapp/keyboard-processor';
 
-import { createStyleSheet, StylesheetManager } from 'keyman/build/engine/dom-utils/obj/stylesheets.js';
-
-import { ActiveKey, ActiveLayout } from '@keymanapp/keyboard-processor/build/obj/keyboards/activeLayout.js';
-import { ButtonClass, Layouts } from '@keymanapp/keyboard-processor/build/obj/keyboards/defaultLayouts.js';
-import { KeyDistribution } from '@keymanapp/keyboard-processor/build/obj/text/keyEvent.js';
-import Keyboard from '@keymanapp/keyboard-processor/build/obj/keyboards/keyboard.js';
-import KeyEvent from '@keymanapp/keyboard-processor/build/obj/text/keyEvent.js';
+import { createStyleSheet, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
 
 import GlobeHint from './globehint.interface.js';
 import InputEventCoordinate from './input/inputEventCoordinate.js';
@@ -24,15 +29,12 @@ import OSKLayerGroup from './keyboard-layout/oskLayerGroup.js';
 import { LengthStyle, ParsedLengthStyle } from './lengthStyle.js';
 import PendingGesture from './input/gestures/pendingGesture.interface.js';
 import RealizedGesture from './input/gestures/realizedGesture.interface.js';
-import { getAbsoluteX, getAbsoluteY } from 'keyman/build/engine/dom-utils/obj/getAbsolute.js';
 import { defaultFontSize, getFontSizeStyle } from './fontSizeUtils.js';
 import PendingMultiTap, { PendingMultiTapState } from './input/gestures/browser/pendingMultiTap.js';
 import InternalSubkeyPopup from './input/gestures/browser/subkeyPopup.js';
 import InternalPendingLongpress from './input/gestures/browser/pendingLongpress.js';
 import InternalKeyTip from './input/gestures/browser/keytip.js';
 import CommonConfiguration from './config/commonConfiguration.js';
-import KeyboardProperties from '@keymanapp/keyboard-processor/build/obj/keyboards/keyboardProperties.js';
-import StateKeyMap from '@keymanapp/keyboard-processor/build/obj/keyboards/stateKeyMap.js';
 
 import { getViewportScale } from './screenUtils.js';
 

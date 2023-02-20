@@ -1,5 +1,5 @@
 import InputEventCoordinate from "../inputEventCoordinate.js";
-import { getAbsoluteY } from 'keyman/build/engine/dom-utils/obj/index.js';
+import { getAbsoluteY } from 'keyman/engine/dom-utils';
 
 /**
  * This class was added to facilitate scroll handling for overflow-x elements, though it could

@@ -1,8 +1,11 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import { LMLayer } from '../../build/obj/node/index.js';
-import { capabilities } from '../../../../common/test/resources/model-helpers.mjs';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+import { LMLayer } from '#./node/index.js';
+import { capabilities } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
 // Test the top-level LMLayer interface.
 // Note: these tests can only be run after BOTH stages of compilation are completed.
@@ -44,7 +47,7 @@ describe('LMLayer', function() {
       let fakeWorker = createFakeWorker();
 
       let lmLayer = new LMLayer(capabilities(), fakeWorker);
-      lmLayer.loadModel("./../../common/test/resources/models/simple-dummy.js");
+      lmLayer.loadModel(require.resolve("@keymanapp/common-test-resources/models/simple-dummy.js"));
 
       assert.isFunction(fakeWorker.onmessage, 'LMLayer failed to set a callback!');
     });
@@ -52,7 +55,7 @@ describe('LMLayer', function() {
     it('should send the `load` message to the LMLayer', async function () {
       let fakeWorker = createFakeWorker(fakePostMessage);
       let lmLayer = new LMLayer(capabilities(), fakeWorker);
-      let configuration = await lmLayer.loadModel("./../../common/test/resources/models/simple-dummy.js");
+      let configuration = await lmLayer.loadModel(require.resolve("@keymanapp/common-test-resources/models/simple-dummy.js"));
 
       assert.propertyVal(fakeWorker.postMessage, 'callCount', 2);
       // In the "Worker", assert the message looks right and

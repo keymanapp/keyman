@@ -1,5 +1,5 @@
 import unwrap from '../unwrap.js';
-import { LMLayerWorkerCode, LMLayerWorkerSourcemapComment } from "@keymanapp/lm-worker/build/lib/worker-main.wrapped.js";
+import { LMLayerWorkerCode, LMLayerWorkerSourcemapComment } from "@keymanapp/lm-worker/worker-main.wrapped.min.js";
 
 export default class DefaultWorker {
   static constructInstance(): Worker {

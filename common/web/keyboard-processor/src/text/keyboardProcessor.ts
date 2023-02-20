@@ -15,8 +15,7 @@ import { Mock } from "./outputTarget.js";
 import KeyboardInterface, { SystemStoreIDs, VariableStore } from "./kbdInterface.js";
 import RuleBehavior from "./ruleBehavior.js";
 
-import { DeviceSpec, globalObject as getGlobalObject } from "@keymanapp/web-utils/build/obj/index.js";
-import StateKeyMap from '../keyboards/stateKeyMap.js';
+import { DeviceSpec, globalObject as getGlobalObject } from "@keymanapp/web-utils";
 
 // #endregion
 
@@ -99,7 +98,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
     // Refer to C:\keymanapp\keyman\developer\src\tike\compile\CompileKeymanWeb.pas,
     // TCompileKeymanWeb.JavaScript_SetupDebug.
     const keyman = globalThis['keyman'] = globalThis['keyman'] || {};
-    const osk = keyman['osk'] || keyman['osk'] || {};  // does not otherwise exist when headless or detached from OSKs.
+    const osk = keyman['osk'] = keyman['osk'] || {};  // does not otherwise exist when headless or detached from OSKs.
     osk['modifierCodes'] = Codes.modifierCodes;
     osk['keyCodes'] = Codes.keyCodes;
 
