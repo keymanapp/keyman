@@ -119,7 +119,11 @@ function builder_term() {
 
 function builder_die() {
   echo
-  echo "${COLOR_RED}$*${COLOR_RESET}"
+  if [[ $# -eq 0 ]]; then
+    echo "${COLOR_RED}Unspecified error, aborting script${COLOR_RESET}"
+  else
+    echo "${COLOR_RED}$*${COLOR_RESET}"
+  fi
   echo
   exit 1
 }

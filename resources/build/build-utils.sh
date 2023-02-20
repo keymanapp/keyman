@@ -34,11 +34,6 @@
 #
 SHLVL=0
 
-function die() {
-  # TODO: consolidate this with fail() from shellHelperFunctions.sh
-  builder_die "$*"
-}
-
 function findKeymanRoot() {
     # See https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
     # None of the answers are 100% correct for cross-platform
