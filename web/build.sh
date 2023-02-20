@@ -176,7 +176,7 @@ copy_resources ( ) {
   # thus doesn't need to publish sources or resources.
   local CONFIGS=(debug)
 
-  if ! builder_has_option --skip-minify; then
+  if ! builder_has_option --no-minify; then
     CONFIGS+=(release)
   fi
 
@@ -224,7 +224,7 @@ copy_sources ( ) {
   # thus doesn't need to publish sources or resources.
   CONFIGS=(debug)
 
-  if ! builder_has_option --skip-minify; then
+  if ! builder_has_option --no-minify; then
     CONFIGS+=(release)
   fi
 
