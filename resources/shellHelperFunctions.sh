@@ -44,14 +44,6 @@ verify_platform() {
   fi
 }
 
-# Note: COLOR_ and HEADING_ variables are defined in build-utils.sh
-# which is already required for scripts so these should be safe.
-# (part of TODO: consolidate these two scripts)
-
-log_error() {
-  echo "${COLOR_RED}$THIS_SCRIPT_NAME: $*${COLOR_RESET}" >&2
-}
-
 displayInfo() {
     if [ "$QUIET" != true ]; then
         while [[ $# -gt 0 ]] ; do
