@@ -27,11 +27,12 @@ export class TouchLayoutCompiler {
     // TODO-LDML: consider consolidation with keys.ts?
 
     let fileLayer: TouchLayout.TouchLayoutLayer = {
-      id: this.translateLayerIdToTouchLayoutShift(layer.id),
+      id: this.translateLayerIdToTouchLayoutLayerId(layer.id, layer.modifier),
       row: []
     };
 
     let y = -1;
+
     for(let row of layer.row) {
       y++;
 
@@ -39,14 +40,11 @@ export class TouchLayoutCompiler {
       fileLayer.row.push(fileRow);
 
       const keys = row.keys.split(' ');
-      // let x = -1;
       for(let key of keys) {
-        // x++;
+        const keydef = source.keyboard.keys?.key?.find(x => x.id == key);
 
-        let keydef = source.keyboard.keys?.key?.find(x => x.id == key);
-
-        let fileKey: TouchLayout.TouchLayoutKey = {
-          id: 'K_???', // TODO-LDML: actual key identifier (K_ for default, T_ for others)
+        const fileKey: TouchLayout.TouchLayoutKey = {
+          id: this.translateKeyIdentifierToTouch(keydef.id) as TouchLayout.TouchLayoutKeyId,
           text: keydef.to,
           // TODO-LDML: additional properties
         };
@@ -57,11 +55,50 @@ export class TouchLayoutCompiler {
     return fileLayer;
   }
 
-  private translateLayerIdToTouchLayoutShift(id: string) {
-    if(id == 'base') {
-      return 'default';
+  private translateLayerIdToTouchLayoutLayerId(id: string, modifier: string): string {
+    // Touch layout layers have a set of reserved names that correspond to
+    // hardware modifiers. We want to map these identifiers first before falling
+    // back to the layer ids
+
+    // The set of recognized layer identifiers is:
+    //
+    // touch          | LDML
+    // ---------------+-------------
+    // default        | none
+    // shift          | shift
+    // caps           | caps
+    // rightalt       | altR
+    // rightalt-shift | altR shift
+    //
+
+    const map = {
+      none:         'default',
+      shift:        'shift',
+      caps:         'caps',
+      altR:         'rightalt',
+      "altR shift": 'rightalt-shift',
+      "shift altR": 'rightalt-shift', // TODO-LDML is this required?
+    };
+
+    if(Object.hasOwn(map, modifier)) {
+      return (map as any)[modifier];
     }
-    // TODO-LDML: other modifiers
-    return 'default';
+
+    // TODO-LDML: Other layer names will be used unmodified, is this sufficient?
+    return id;
+  }
+
+  private translateKeyIdentifierToTouch(id: string): string {
+    // Note: keys identifiers in kmx were traditionally case-insensitive, but we
+    // are going to use them as case-insensitive for LDML keyboards. The set of
+    // standard key identifiers a-z, A-Z, 0-9 will be used, where possible, and
+    // all other keys will be mapped to `T_key`.
+
+    if(id.match(/^[0-9a-zA-Z]$/)) {
+      return 'K_'+id;
+    }
+
+    // Not a standard key
+    return 'T_'+id;
   }
 }
