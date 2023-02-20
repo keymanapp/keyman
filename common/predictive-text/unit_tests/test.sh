@@ -43,7 +43,7 @@ if builder_start_action test:libraries; then
   # addition to fair bit of `pushd` and `popd`.
   pushd "$KEYMAN_ROOT/common/models/wordbreakers"
   echo
-  echo "### Running ${BUILDER_TERM_START}common/models/wordbreaker${BUILDER_TERM_END} tests"
+  echo "### Running $(builder_term common/models/wordbreakers) tests"
   # NPM doesn't seem to parse the post `--` part if specified via script variable.
   # So... a simple if-else will do the job for now.
   if builder_has_option --ci; then
@@ -55,7 +55,7 @@ if builder_start_action test:libraries; then
 
   pushd "$KEYMAN_ROOT/common/models/templates"
   echo
-  echo "### Running ${BUILDER_TERM_START}common/models/templates${BUILDER_TERM_END} tests"
+  echo "### Running $builder_term common/models/templates) tests"
   if builder_has_option --ci; then
     npm run test -- -reporter mocha-teamcity-reporter
   else
@@ -65,7 +65,7 @@ if builder_start_action test:libraries; then
 
   pushd "$KEYMAN_ROOT/common/models/types"
   echo
-  echo "### Running ${BUILDER_TERM_START}common/models/types${BUILDER_TERM_END} tests"
+  echo "### Running $builder_term common/models/types) tests"
   # Is not mocha-based; it's TSC-based instead, as we're just ensuring that the .d.ts
   # file is a proper TS declaration file.
   npm run test
@@ -97,7 +97,7 @@ if [[ $VERSION_ENVIRONMENT == test ]] && builder_has_action test :browser; then
   if builder_pull_get_details; then
     if ! ([[ $builder_pull_title =~ \(web\) ]] || builder_pull_has_label test-browserstack); then
 
-      echo "Auto-skipping ${BUILDER_TERM_START}test:browser${BUILDER_TERM_END} for unrelated CI test build"
+      echo "Auto-skipping $builder_term test:browser) for unrelated CI test build"
       exit 0
     fi
   fi
@@ -123,7 +123,7 @@ if builder_start_action test:browser; then
     KARMA_INFO_LEVEL="--log-level=debug"
 
     if builder_has_option --debug; then
-      echo "${BUILDER_TERM_START}--ci${BUILDER_TERM_END} option set; ignoring ${BUILDER_TERM_START}--debug${BUILDER_TERM_END} option"
+      echo "$(builder_term --ci) option set; ignoring $(builder_term --debug) option"
     fi
   else
     KARMA_CONFIG="manual.conf.js"

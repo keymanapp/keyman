@@ -55,6 +55,7 @@ type
   private
     tag: TBCP47Tag;
     FCustomLanguageName: Boolean;
+    procedure EnableControls;
     function GetLanguageID: string;
     function GetLanguageName: string;
     procedure RefreshLanguageName;
@@ -106,6 +107,8 @@ begin
   PopulateComboBoxFromDict(cbLanguageTag, TLanguageCodeUtils.BCP47Languages);
   PopulateComboBoxFromDict(cbScriptTag, TLanguageCodeUtils.BCP47Scripts);
   PopulateComboBoxFromDict(cbRegionTag, TLanguageCodeUtils.BCP47Regions);
+  RefreshLanguageName;
+  EnableControls;
 end;
 
 procedure TfrmSelectBCP47Language.FormDestroy(Sender: TObject);
@@ -144,11 +147,18 @@ procedure TfrmSelectBCP47Language.cmdResetLanguageNameClick(Sender: TObject);
 begin
   editLanguageName.Text := LookupLanguageName;
   FCustomLanguageName := False;
+  EnableControls;
 end;
 
 procedure TfrmSelectBCP47Language.editLanguageNameChange(Sender: TObject);
 begin
   FCustomLanguageName := True;
+  EnableControls;
+end;
+
+procedure TfrmSelectBCP47Language.EnableControls;
+begin
+  cmdResetLanguageName.Enabled := FCustomLanguageName;
 end;
 
 procedure TfrmSelectBCP47Language.cbLanguageTagChange(Sender: TObject);
@@ -175,6 +185,7 @@ begin
   end;
   FCustomLanguageName := False; // Always reset when entering a language tag.
   RefreshLanguageName;
+  EnableControls;
 end;
 
 procedure TfrmSelectBCP47Language.cbRegionTagChange(Sender: TObject);
@@ -213,6 +224,7 @@ begin
   begin
     editLanguageName.Text := LookupLanguageName;
     FCustomLanguageName := False;
+    EnableControls;
   end;
   cmdOK.Enabled := tag.IsValid(True, msg);
   if not cmdOK.Enabled
@@ -228,12 +240,14 @@ begin
   cbScriptTag.Text := tag.Script;
   RefreshLanguageName;
   FCustomLanguageName := editLanguageName.Text <> LookupLanguageName;
+  EnableControls;
 end;
 
 procedure TfrmSelectBCP47Language.SetLanguageName(const Value: string);
 begin
   editLanguageName.Text := Value;
   FCustomLanguageName := editLanguageName.Text <> LookupLanguageName;
+  EnableControls;
 end;
 
 end.

@@ -16,8 +16,6 @@ cd "$(dirname "$THIS_SCRIPT")"
 
 ################################ Main script ################################
 
-builder_check_color "$@"
-
 # TODO: for predictive-text, we only need :headless, perhaps we should be splitting modules?
 # TODO: remove :tools once kmlmc is a dependency for test:module
 
@@ -31,9 +29,10 @@ builder_describe "Builds the standalone, headless form of Keyman Engine for Web'
   "test" \
   ":module     A headless, Node-oriented version of the module useful for unit tests" \
   ":tools      Related tools useful for development and testing of this module" \
-  "--ci        Sets ${BUILDER_TERM_START}test${BUILDER_TERM_END} action to use CI-based test configurations & reporting"
+  "--ci        Sets $(builder_term test) action to use CI-based test configurations & reporting"
 
 builder_describe_outputs \
+  configure          /node_modules \
   configure:module   /node_modules \
   configure:tools    /node_modules \
   build:module       build/index.js \
