@@ -17,7 +17,7 @@ echo_heading2() {
 }
 
 if [[ $BUILDER_OS != win ]]; then
-  fail "This script can only be run on Windows to setup IIS."
+  builder_die "This script can only be run on Windows to setup IIS."
 fi
 
 builder_warn "Warning: this script requires Administrator permissions to install certificates."

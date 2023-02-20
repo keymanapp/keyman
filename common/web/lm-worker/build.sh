@@ -113,7 +113,7 @@ if builder_start_action build; then
   fi
 
   # Build worker with tsc first
-  npm run build -- $builder_verbose || fail "Could not build worker."
+  npm run build -- $builder_verbose || builder_die "Could not build worker."
 
   # Wrap the worker code and create embedded index.js. Must be run after the
   # worker is built
@@ -127,6 +127,6 @@ if builder_start_action build; then
 fi
 
 if builder_start_action test; then
-  npm test || fail "Tests failed"
+  npm test || builder_die "Tests failed"
   builder_finish_action success test
 fi

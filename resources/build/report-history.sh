@@ -73,17 +73,17 @@ while [[ $# -gt 0 ]] ; do
       shift
       ;;
     *)
-      fail "Invalid parameters. Use --help for help"
+      builder_die "Invalid parameters. Use --help for help"
   esac
   shift
 done
 
 if [ -z "$GITHUB_TOKEN" ]; then
-  fail "Github token must be specified"
+  builder_die "Github token must be specified"
 fi
 
 if [ ! "$BASE" == "master" ] && [ ! "$BASE" == "beta" ] && [[ ! $BASE =~ stable-.+ ]]; then
-  fail "Invalid base branch $BASE"
+  builder_die "Invalid base branch $BASE"
 fi
 
 if [ ! -f "$KEYMAN_ROOT/resources/build/version/lib/index.js" ]; then

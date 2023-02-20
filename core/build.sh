@@ -124,7 +124,7 @@ while [[ $# -gt 0 ]] ; do
       break
       ;;
     *)
-      fail "Invalid parameters. Use --help for help"
+      builder_die "Invalid parameters. Use --help for help"
   esac
   shift
 done
@@ -259,13 +259,13 @@ locate_emscripten() {
   if [[ -z ${EMSCRIPTEN_BASE+x} ]]; then
     if [[ -z ${EMCC+x} ]]; then
       local EMCC=`which emcc`
-      [[ -z $EMCC ]] && fail "locate_emscripten: Could not locate emscripten (emcc) on the path or with \$EMCC or \$EMSCRIPTEN_BASE"
+      [[ -z $EMCC ]] && builder_die "locate_emscripten: Could not locate emscripten (emcc) on the path or with \$EMCC or \$EMSCRIPTEN_BASE"
     fi
-    [[ -x $EMCC ]] || fail "locate_emscripten: Variable EMCC ($EMCC) does not point to a valid executable emcc"
+    [[ -x $EMCC ]] || builder_die "locate_emscripten: Variable EMCC ($EMCC) does not point to a valid executable emcc"
     EMSCRIPTEN_BASE="$(dirname "$EMCC")"
   fi
 
-  [[ -x ${EMSCRIPTEN_BASE}/emcc ]] || fail "locate_emscripten: Variable EMSCRIPTEN_BASE ($EMSCRIPTEN_BASE) does not point to emcc's folder"
+  [[ -x ${EMSCRIPTEN_BASE}/emcc ]] || builder_die "locate_emscripten: Variable EMSCRIPTEN_BASE ($EMSCRIPTEN_BASE) does not point to emcc's folder"
 }
 
 build_meson_cross_file_for_wasm() {

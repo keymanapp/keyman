@@ -69,7 +69,7 @@ display_usage() {
 assertOptionsPrecedeTargets() {
     if [[ "$1" =~ ^\- ]]; then
         if $PROCESSING_TARGETS ; then
-            fail "Options must be specified before build targets"
+            builder_die "Options must be specified before build targets"
         fi
     elif ! $PROCESSING_TARGETS ; then
         PROCESSING_TARGETS=true
@@ -161,7 +161,7 @@ while [[ $# -gt 0 ]] ; do
                 NOTARIZE=true
                 CONFIG="Release"
             elif ! [[ "$2" =~ ^(n(one)?)$ ]]; then
-                fail "Invalid deploy option. Must be 'none', 'local', 'quicklocal' or 'preprelease'."
+                builder_die "Invalid deploy option. Must be 'none', 'local', 'quicklocal' or 'preprelease'."
             fi
             shift # past argument
             ;;
@@ -225,9 +225,9 @@ while [[ $# -gt 0 ]] ; do
             ;;
         *)
             if $PROCESSING_TARGETS ; then
-                fail "Unexpected target: $1. Run with --help for help."
+                builder_die "Unexpected target: $1. Run with --help for help."
             else
-                fail "Unexpected option: $1. Run with --help for help."
+                builder_die "Unexpected option: $1. Run with --help for help."
             fi
             ;;
     esac
@@ -270,17 +270,17 @@ if $LOCALDEPLOY && ! $NOTARIZE ; then
       echo
       builder_warn "WARNING: Notarization is disabled but SecAssessment security policy is still active. Keyman will not run correctly."
       builder_warn "         Disable SecAssessment with 'sudo spctl --master-disable' (or do notarized builds)"
-      fail "Re-run with '-deploy local' or disable SecAssessment."
+      builder_die "Re-run with '-deploy local' or disable SecAssessment."
     fi
 fi
 
 if $PREPRELEASE || $NOTARIZE ; then
   if [ ! $DO_CODESIGN ] || [ -z "${CERTIFICATE_ID}" ]; then
-    fail "Code signing must be configured for deployment. See build.sh -help for details."
+    builder_die "Code signing must be configured for deployment. See build.sh -help for details."
   fi
 
   if [ -z "${APPSTORECONNECT_PROVIDER}" ] || [ -z "${APPSTORECONNECT_USERNAME}" ] || [ -z "${APPSTORECONNECT_PASSWORD}" ]; then
-    fail "Appstoreconnect Apple ID credentials must be configured in environment. See build.sh -help for details."
+    builder_die "Appstoreconnect Apple ID credentials must be configured in environment. See build.sh -help for details."
   fi
 fi
 
@@ -309,7 +309,7 @@ execBuildCommand() {
     printXCodeBuildScriptLogs
 
     if [ $ret_code != 0 ]; then
-        fail "Build of $component failed! Error: [$ret_code] when executing command: '$cmnd'"
+        builder_die "Build of $component failed! Error: [$ret_code] when executing command: '$cmnd'"
     fi
 }
 
@@ -318,7 +318,7 @@ updatePlist() {
         KM_PLIST="$1"
         APPNAME="$2"
         if [ ! -f "$KM_PLIST" ]; then
-            fail "File not found: $KM_PLIST"
+            builder_die "File not found: $KM_PLIST"
         fi
         local YEAR=`date "+%Y"`
         echo "Setting version and related fields to $VERSION_WITH_TAG in $KM_PLIST"
@@ -345,7 +345,7 @@ execCodeSign() {
         eval codesign "$@"
         ret_code=$?
         if [ $ret_code != 0 ]; then
-            fail "Unable to sign component (exit code $ret_code)"
+            builder_die "Unable to sign component (exit code $ret_code)"
         fi
     fi
     set -e
@@ -415,7 +415,7 @@ if $DO_KEYMANIM ; then
             cd "$KM4MIM_BASE_PATH"
             sentry-cli upload-dif "build/${CONFIGURATION}"
         else
-            fail "Error: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases"
+            builder_die "Error: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases"
         fi
     fi
 
@@ -435,7 +435,7 @@ fi
 if $PREPRELEASE || $NOTARIZE; then
   echo_heading "Notarizing app"
   if [ "${CODESIGNING_SUPPRESSION}" != "" ] && [ -z "${CERTIFICATE_ID}" ]; then
-    fail "Notarization and signed executable is required for deployment, even locally. Specify CERTIFICATE_ID environment variable for custom certificate."
+    builder_die "Notarization and signed executable is required for deployment, even locally. Specify CERTIFICATE_ID environment variable for custom certificate."
   else
     TARGET_PATH="$KM4MIM_BASE_PATH/build/$CONFIG"
     TARGET_APP_PATH="$TARGET_PATH/$PRODUCT_NAME.app"
@@ -459,7 +459,7 @@ if $PREPRELEASE || $NOTARIZE; then
     xcrun altool --notarize-app --primary-bundle-id "com.Keyman.im.zip" --asc-provider "$APPSTORECONNECT_PROVIDER" --username "$APPSTORECONNECT_USERNAME" --password @env:APPSTORECONNECT_PASSWORD --file "$TARGET_ZIP_PATH" --output-format xml > $ALTOOL_LOG_PATH || (
       ALTOOL_CODE=$?
       cat "$ALTOOL_LOG_PATH"
-      fail "altool failed with code $ALTOOL_CODE"
+      builder_die "altool failed with code $ALTOOL_CODE"
     )
     cat "$ALTOOL_LOG_PATH"
 
@@ -480,7 +480,7 @@ if $PREPRELEASE || $NOTARIZE; then
             continue;
         fi
         cat "$ALTOOL_LOG_PATH"
-        fail "altool failed with code $ALTOOL_CODE"
+        builder_die "altool failed with code $ALTOOL_CODE"
       )
       ALTOOL_STATUS=$(/usr/libexec/PlistBuddy -c "Print notarization-info:Status" "$ALTOOL_LOG_PATH")
       if [ "$ALTOOL_STATUS" == "success" ]; then
@@ -490,7 +490,7 @@ if $PREPRELEASE || $NOTARIZE; then
         cat "$ALTOOL_LOG_PATH"
         ALTOOL_LOG_URL=$(/usr/libexec/PlistBuddy -c "Print notarization-info:LogFileURL" "$ALTOOL_LOG_PATH")
         curl "$ALTOOL_LOG_URL"
-        fail "Notarization failed with $ALTOOL_STATUS; check log at $ALTOOL_LOG_PATH"
+        builder_die "Notarization failed with $ALTOOL_STATUS; check log at $ALTOOL_LOG_PATH"
       fi
     done
 
@@ -500,7 +500,7 @@ if $PREPRELEASE || $NOTARIZE; then
     curl "$ALTOOL_LOG_URL"
     echo
     echo_heading "Attempting to staple notarization to Keyman.app"
-    xcrun stapler staple "$TARGET_APP_PATH" || fail "stapler failed"
+    xcrun stapler staple "$TARGET_APP_PATH" || builder_die "stapler failed"
   fi
 fi
 
@@ -514,7 +514,7 @@ if $LOCALDEPLOY ; then
     if [ $? == 0 ]; then
         displayInfo "Local deployment succeeded!" ""
     else
-        fail "Local deployment failed!"
+        builder_die "Local deployment failed!"
     fi
 elif $PREPRELEASE ; then
     echo_heading "Preparing files for release deployment..."
@@ -527,7 +527,7 @@ elif $PREPRELEASE ; then
     if [ $? == 0 ]; then
         displayInfo "Creating disk image succeeded!" ""
     else
-        fail "Creating disk image failed!"
+        builder_die "Creating disk image failed!"
     fi
 
     # Create download info
@@ -535,7 +535,7 @@ elif $PREPRELEASE ; then
     if [ $? == 0 ]; then
         displayInfo "Writing download_info file succeeded!" ""
     else
-        fail "Writing download_info file failed!"
+        builder_die "Writing download_info file failed!"
     fi
 fi
 

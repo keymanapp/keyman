@@ -331,7 +331,7 @@ run_xcodebuild() {
 
   printXCodeBuildScriptLogs
   if [ $ret_code != 0 ]; then
-    fail "Build failed! Error: [$ret_code] when executing command: 'xcodebuild $cmnd'"
+    builder_die "Build failed! Error: [$ret_code] when executing command: 'xcodebuild $cmnd'"
   fi
 }
 

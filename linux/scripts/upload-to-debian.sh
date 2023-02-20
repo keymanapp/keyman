@@ -47,7 +47,7 @@ while (( $# )); do
             if [ ! $# -eq 0 ]; then
                 DEBKEYID=$1
             else
-                fail "Error: The -k argument is missing a value. Exiting."
+                builder_die "Error: The -k argument is missing a value. Exiting."
             fi;;
         -n) NOOP=: ;;
         --help) usage ; exit 0 ;;
@@ -57,11 +57,11 @@ while (( $# )); do
             if [ ! $# -eq 0 ]; then
                 REVISION=$1
             else
-                fail "Error: The --debian-revision argument is missing a value. Exiting."
+                builder_die "Error: The --debian-revision argument is missing a value. Exiting."
             fi;;
-        *) fail "Error: Unexpected argument \"$1\". Exiting." ;;
+        *) builder_die "Error: Unexpected argument \"$1\". Exiting." ;;
     esac
-    shift || fail "Error: The last argument is missing a value. Exiting."
+    shift || builder_die "Error: The last argument is missing a value. Exiting."
 done
 
 if [ -z "$DEBKEYID" ]; then
@@ -70,7 +70,7 @@ if [ -z "$DEBKEYID" ]; then
 fi
 
 if ! git diff --quiet; then
-    fail "You have changed files in your git working directory. Exiting."
+    builder_die "You have changed files in your git working directory. Exiting."
 fi
 
 echo_heading "Fetching latest changes"
