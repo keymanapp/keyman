@@ -68,10 +68,14 @@ export class KeyboardHarness {
    * Keyman keyboards register themselves into the Keyman Engine for Web by directly
    * calling `KeymanWeb.KR` - the function provided here after "installation" of the harness.
    *
-   * Note that the resulting Keyboard's internal rule scripting will be bound (via
-   * closure/capture) to this specific instance of the harness.  Loading against a harness
-   * that does not supply keyboard rule API functions will result in a Keyboard that cannot
-   * evaluate rules - it will throw `Error`s instead.
+   * Note that the resulting Keyboard's internal rule scripting has its global object bound via
+   * closure/capture; that global object must have a rule-compatible harness set in order to
+   * facilitate keyboard-rule evaluation.  Note that the mechanism for keyboard loading in
+   * Node (for headless unit tests) supplies a unique global per load if not supplied to the
+   * constructor that is not accessible for manipulation after the load!
+   *
+   * If the supplied global's accessible keyboard harness does not supply keyboard rule API
+   * functions, attempts to process keyboard rules will throw `Error`s instead.
    * @param scriptObject
    */
   public KR(scriptObject: any) {
