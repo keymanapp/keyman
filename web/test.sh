@@ -92,7 +92,7 @@ if builder_start_action test:engine; then
     builder_die "Options --ci and --debug are incompatible."
   fi
 
-  if [[ DO_BROWSER_TEST_SUITE == false ]]; then
+  if [[ $DO_BROWSER_TEST_SUITE == false ]]; then
     log_warning "Skipping action test:engine - this CI build does not appear to be for a Web PR."
     builder_finish_action success test:engine
     exit 0
