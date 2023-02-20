@@ -312,7 +312,7 @@ compile ( ) {
 # ```
 finalize ( ) {
   if [ $# -lt 2 ]; then
-    fail "Scripting error: insufficient argument count!"
+    builder_die "Scripting error: insufficient argument count!"
   fi
 
   local COMPILE_TARGET=$1
@@ -443,7 +443,7 @@ if builder_start_action build:embed; then
   #     pushd $EMBED_OUTPUTs
   #   fi
   #   echo "Uploading to Sentry..."
-  #   npm run sentry-cli -- releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix $ARTIFACT_FOLDER --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
+  #   npm run sentry-cli -- releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix $ARTIFACT_FOLDER --rewrite --ext js --ext map --ext ts || builder_die "Sentry upload failed."
   #   echo "Upload successful."
   #   popd
   # fi
@@ -507,7 +507,7 @@ fi
 # if [ $UPLOAD_WEB_SENTRY = true ]; then
 #     pushd $WEB_OUTPUT
 #     echo "Uploading to Sentry..."
-#     npm run sentry-cli -- releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix release/web/ --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
+#     npm run sentry-cli -- releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix release/web/ --rewrite --ext js --ext map --ext ts || builder_die "Sentry upload failed."
 #     echo "Upload successful."
 #     popd
 # fi

@@ -81,7 +81,7 @@ if builder_start_action test:engine; then
   fi
 
   if [[ $DO_BROWSER_TEST_SUITE == false ]]; then
-    log_warning "Skipping action test:engine - this CI build does not appear to be for a Web PR."
+    builder_warn "Skipping action test:engine - this CI build does not appear to be for a Web PR."
     builder_finish_action success test:engine
     exit 0
   fi

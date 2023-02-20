@@ -34,11 +34,6 @@
 #
 SHLVL=0
 
-function die() {
-  # TODO: consolidate this with fail() from shellHelperFunctions.sh
-  builder_die "$*"
-}
-
 function findKeymanRoot() {
     # See https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
     # None of the answers are 100% correct for cross-platform
@@ -336,7 +331,7 @@ run_xcodebuild() {
 
   printXCodeBuildScriptLogs
   if [ $ret_code != 0 ]; then
-    fail "Build failed! Error: [$ret_code] when executing command: 'xcodebuild $cmnd'"
+    builder_die "Build failed! Error: [$ret_code] when executing command: 'xcodebuild $cmnd'"
   fi
 }
 
