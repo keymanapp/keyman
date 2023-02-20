@@ -30,8 +30,8 @@
   "dependencies": {
     "@keymanapp/keyman-version": "*",
     "@keymanapp/models-types": "*",
-    "typescript": "^4.8.3",
     "commander": "^3.0.0",
+    "typescript": "^4.9.5",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
@@ -46,7 +46,7 @@
     "chalk": "^2.4.2",
     "esbuild": "^0.15.7",
     "mocha": "^10.0.0",
-    "ts-node": "^9.1.1"
+    "ts-node": "^10.9.1"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",

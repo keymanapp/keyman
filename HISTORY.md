@@ -1,5 +1,33 @@
 # Keyman Version History
 
+## 17.0.50 alpha 2023-02-16
+
+* feat(common): parent-child scripts for builder (#8198)
+* fix(linux): Another iteration to fix packaging GHA (#8230)
+* chore(common): updates Web & Web-related dependencies (#8196)
+* fix(linux): Fix syntax for skipping upload in packaging GHA (#8236)
+
+## 17.0.49 alpha 2023-02-15
+
+* feat(linux): Pass PR# in the event type (#8221)
+* feat(linux): Implement uploading of packages in packaging GHA (#8223)
+* fix(linux): Fix GHA package build (#8225)
+* fix(linux): Another fix for GHA package build (#8228)
+
+## 17.0.48 alpha 2023-02-14
+
+* fix(developer): Select BCP47 Code dialog inconsistencies (#8179)
+* chore(common): automatically apply _builder_check_color (#8197)
+* docs(linux): Update packaging documentation (#8202)
+* chore(common): Report status if no platform needs build (#8210)
+* chore(linux): Exclude autopkg tests on s390x (#8218)
+* fix(linux): Fix path to symbols file in packaging GHA (#8209)
+
+## 17.0.47 alpha 2023-02-10
+
+* fix(linux): Fix autopkgtests (#8201)
+* fix(linux): Fix Verify-API step of GHA (#8199)
+
 ## 17.0.46 alpha 2023-02-09
 
 * fix(windows): add remove lang id uses correct keyboard id (#8186)
