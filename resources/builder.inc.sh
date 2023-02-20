@@ -586,7 +586,7 @@ _builder_expand_action_targets() {
 #   `=path` to the target definition, for example `:app=src/app`. Where
 #   possible, avoid differences in names of child projects and folders.
 #
-# * **Dependency:** "@/path/to/dependency [action][:target] ..."
+# * **Dependency:** `"@/path/to/dependency [action][:target] ..."``
 #
 #   A dependency always starts with `@`. The path to the dependency will be
 #   relative to the build script folder, or to the root of the repository, if
@@ -596,10 +596,10 @@ _builder_expand_action_targets() {
 #   Relative paths will be expanded to full paths, again, relative to the root
 #   of the repository.
 #
-#   Dependencies may be limited to specific `action:target`. If not specified,
-#   dependencies will be built for all actions on all targets. Either `action`
-#   or `:target` may be omitted, and multiple actions and targets may be
-#   specified, space separated.
+#   Dependencies may be limited to specific `action:target` pairs on the current
+#   script. If not specified, dependencies will be built for all actions on all
+#   targets. Either `action` or `:target` may be omitted, and multiple actions
+#   and targets may be specified, space separated.
 #
 builder_describe() {
   _builder_record_function_call builder_describe
@@ -735,8 +735,8 @@ builder_describe() {
 #
 # ```bash
 #   builder_describe_outputs \
-#     configure /node_modules \
-#     build     build/index.js
+#     "configure" "/node_modules" \
+#     "build"     "build/index.js"
 # ```
 #
 function builder_describe_outputs() {
