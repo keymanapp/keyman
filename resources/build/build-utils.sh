@@ -15,6 +15,7 @@
 #   VERSION_ENVIRONMENT: One of: local, test, alpha, beta, stable
 #   UPLOAD_SENTRY:    true - if VERSION_ENVIRONMENT is one of alpha, beta, stable
 #                     false - if local, test.  Indicates if debug artifacts should be uploaded to Sentry
+#   BUILDER_OS:       win|mac|linux -- current build environment
 #
 # On macOS, this script requires coreutils (`brew install coreutils`)
 #
@@ -338,3 +339,24 @@ run_xcodebuild() {
     fail "Build failed! Error: [$ret_code] when executing command: 'xcodebuild $cmnd'"
   fi
 }
+
+#
+# Sets the BUILDER_OS environment variable to linux|mac|win
+#
+_builder_get_operating_system() {
+  declare -g BUILDER_OS
+  # Default value, since it's the most general case/configuration to detect.
+  BUILDER_OS=linux
+
+  # Subject to change with future improvements.
+  if [[ $OSTYPE == darwin* ]]; then
+    BUILDER_OS=mac
+  elif [[ $OSTYPE == msys ]]; then
+    BUILDER_OS=win
+  elif [[ $OSTYPE == cygwin ]]; then
+    BUILDER_OS=win
+  fi
+  readonly BUILDER_OS
+}
+
+_builder_get_operating_system

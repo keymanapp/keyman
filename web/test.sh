@@ -66,21 +66,9 @@ if [[ $VERSION_ENVIRONMENT == test ]]; then
 fi
 
 get_default_browser_set ( ) {
-  # Default value, since it's the most general case/configuration to detect.
-  local os_id="linux"
-
-  # Subject to change with future improvements.
-  if [[ "${OSTYPE}" = "darwin"* ]]; then
-    os_id="mac"
-  elif [[ "${OSTYPE}" = "msys" ]]; then
-    os_id="win"
-  elif [[ "${OSTYPE}" = "cygwin" ]]; then
-    os_id="win"
-  fi
-
-  if [ $os_id = "mac" ]; then
+  if [[ $BUILDER_OS == mac ]]; then
       BROWSERS="--browsers Firefox,Chrome,Safari"
-  elif [ $os_id = "win" ]; then
+  elif [[ $BUILDER_OS == win ]]; then
       BROWSERS="--browsers Firefox,Chrome,Edge"
   else
       BROWSERS="--browsers Firefox,Chrome"
