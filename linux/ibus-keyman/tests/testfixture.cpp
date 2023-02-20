@@ -528,9 +528,17 @@ main(int argc, char *argv[]) {
       skipReason = "mnemonic keyboards are not yet supported on Linux (#3345)";
     }
 
+    // Wayland related tests - #4273
+    if (use_wayland && (
+        strcmp(filename->str, "k_031___caps_lock") == 0 ||
+        strcmp(filename->str, "k_032___caps_control") == 0)) {
+      skipReason = "capslock related keyboards are not yet working with Wayland (#4273)";
+    }
+
     if (runSurroundingTextTests) {
       add_test(directory, filename->str, TRUE, skipReason, use_wayland);
     }
+
     if (runNoSurroundingTextTests) {
       add_test(directory, filename->str, FALSE, skipReason, use_wayland);
     }

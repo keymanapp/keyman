@@ -38,15 +38,15 @@ if builder_start_action source; then
   echo "${START_STEP}Make source package for keyman${COLOR_RESET}"
 
   echo "${START_STEP}reconfigure${COLOR_RESET}"
-  ./scripts/reconf.sh keyman
+  ./scripts/reconf.sh
   echo "${END_STEP}"
 
   echo "${START_STEP}Make origdist${COLOR_RESET}"
-  ./scripts/dist.sh origdist keyman
+  ./scripts/dist.sh origdist
   echo "${END_STEP}"
 
   echo "${START_STEP}Make deb source${COLOR_RESET}"
-  ./scripts/deb.sh sourcepackage keyman
+  ./scripts/deb.sh sourcepackage
   echo "${END_STEP}"
 
   mv builddebs/* "${OUTPUT_PATH:-..}"
