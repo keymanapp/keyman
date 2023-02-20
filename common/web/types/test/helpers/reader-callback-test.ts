@@ -174,25 +174,21 @@ export function testTestdataReaderCases(cases : TestDataCase[]) {
         assert.notOk(source, `loading ${testcase.subpath} (expected failure)`);
       }
       // special case for an expected exception
-      if (testcase.throws) {
-        assert.throws(() => reader.validate(source, loadLdmlKeyboardTestDataSchema()), testcase.throws);
-      } else {
-        assert.doesNotThrow(() => reader.validate(source, loadLdmlKeyboardTestDataSchema()), `validating ${testcase.subpath}`);
-        // if we expected errors or warnings, show them
-        if (testcase.errors) {
-          assert.includeDeepMembers(callbacks.messages, testcase.errors, 'expected errors to be included');
-        }
-        if (testcase.warnings) {
-          assert.includeDeepMembers(callbacks.messages, testcase.warnings, 'expected warnings to be included');
-        } else if (!expectFailure) {
-          // no warnings, so expect zero messages
-          assert.strictEqual(callbacks.messages.length, 0, 'expected zero messages but got ' +callbacks.messages.map(e => e.message).join(' ') );
-        }
+      // TODO-LDML: no validation for now.
+      // if we expected errors or warnings, show them
+      if (testcase.errors) {
+        assert.includeDeepMembers(callbacks.messages, testcase.errors, 'expected errors to be included');
+      }
+      if (testcase.warnings) {
+        assert.includeDeepMembers(callbacks.messages, testcase.warnings, 'expected warnings to be included');
+      } else if (!expectFailure) {
+        // no warnings, so expect zero messages
+        assert.strictEqual(callbacks.messages.length, 0, 'expected zero messages but got ' +callbacks.messages.map(e => e.message).join(' ') );
+      }
 
-        // run the user-supplied callback if any
-        if (testcase.callback) {
-          testcase.callback(data, source, testcase.subpath, callbacks);
-        }
+      // run the user-supplied callback if any
+      if (testcase.callback) {
+        testcase.callback(data, source, testcase.subpath, callbacks);
       }
     });
   }

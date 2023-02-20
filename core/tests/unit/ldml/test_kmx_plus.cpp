@@ -5,7 +5,7 @@
 using namespace km::kbp::kmx;
 
 int main(int argc, const char *argv[]) {
-    COMP_KMXPLUS_KEY2_KEY e[2] = {
+    COMP_KMXPLUS_KEYS_KEY e[2] = {
         {
             0x00000127, // to = U+0127 = 295
             0x00000000  // flags: !EXTEND

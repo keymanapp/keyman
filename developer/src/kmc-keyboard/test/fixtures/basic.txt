@@ -107,8 +107,8 @@ block(sectitems)
   66 69 6e 6c
   diff(sect,finl)
 
-  6b 65 79 32
-  diff(sect,key2)
+  6b 65 79 73
+  diff(sect,keys)
 
   6c 61 79 72
   diff(sect,layr)
@@ -255,12 +255,12 @@ block(finl)
   01 00 00 00                       #    KMX_DWORD flags;
                                     # };
 # ----------------------------------------------------------------------------------------------------
-# key2
+# keys
 # ----------------------------------------------------------------------------------------------------
 
-block(key2)                         # struct COMP_KMXPLUS_KEY2 {
-  6b 65 79 32                       #   KMX_DWORD header.ident;   // 0000 Section name - key2
-  sizeof(key2)                      #   KMX_DWORD header.size;    // 0004 Section length
+block(keys)                         # struct COMP_KMXPLUS_KEYS {
+  6b 65 79 73                       #   KMX_DWORD header.ident;   // 0000 Section name - keys
+  sizeof(keys)                      #   KMX_DWORD header.size;    // 0004 Section length
   02 00 00 00                       #   KMX_DWORD keyCount
   01 00 00 00                       #   KMX_DWORD flicksCount
   00 00 00 00                       #   KMX_DWORD flickCount
@@ -277,7 +277,7 @@ block(key2)                         # struct COMP_KMXPLUS_KEY2 {
   00 00 00 00 # TODO: index(listNull,listNull,4)        #   LIST multiTap
   00 00 00 00                       #   flicks 0
   # (#0001) that
-  index(strNull,strKey2,2)          #   KMXPLUS_STR 'U+0127'
+  index(strNull,strKeys,2)          #   KMXPLUS_STR 'U+0127'
   01 00 00 00                       #   KMX_DWORD flags = extend
   index(strNull,strThat,2)          #   KMXPLUS_STR 'hmaqtugha'
   00 00 00 00                       #   KMXPLUS_STR switch
@@ -301,9 +301,6 @@ block(key2)                         # struct COMP_KMXPLUS_KEY2 {
   31 00 00 00  00 00 00 00  01 00 00 00  # KMX_DWORD vkey, mod, key;
   c0 00 00 00  00 00 00 00  00 00 00 00  # KMX_DWORD vkey, mod, key;
 
-# ----------------------------------------------------------------------------------------------------
-# keys is now under key2.kmap
-# ----------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------
 # layr
@@ -442,7 +439,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strThat)   sizeof(strThat,2)
   diff(strs,strTranTo)          sizeof(strTranTo,2)
   diff(strs,strKey1)       sizeof(strKey1,2)
-  diff(strs,strKey2)       sizeof(strKey2,2)
+  diff(strs,strKeys)       sizeof(strKeys,2)
   diff(strs,strElemOrdrFrom3)   sizeof(strElemOrdrFrom3,2)
   diff(strs,strElemOrdrFrom1)   sizeof(strElemOrdrFrom1,2)
   diff(strs,strElemOrdrBefore)  sizeof(strElemOrdrBefore,2)
@@ -470,7 +467,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strThat)             74 00 68 00 61 00 74 00 block(x) 00 00                     # 'that'
   block(strTranTo)           E2 00 block(x) 00 00                                       # 'â'
   block(strKey1)             27 01 block(x) 00 00                                     # 'ħ'
-  block(strKey2)             90 17 b6 17 block(x) 00 00                               # 'ថា'
+  block(strKeys)             90 17 b6 17 block(x) 00 00                               # 'ថា'
   # <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
   block(strElemOrdrFrom3)    45 1a block(x) 00 00                                       # 'ᩅ'
   block(strElemOrdrFrom1)    60 1a block(x) 00 00                                       # '᩠'

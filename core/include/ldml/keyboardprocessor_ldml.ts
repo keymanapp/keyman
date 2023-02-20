@@ -29,7 +29,7 @@ export type SectionIdent =
   'disp' |
   'elem' |
   'finl' |
-  'key2' |
+  'keys' |
   'layr' |
   'list' |
   'loca' |
@@ -224,7 +224,7 @@ class Constants {
   readonly finl_flags_error = 0x0001;
 
   /* ------------------------------------------------------------------
-    * keys section is now key2.kmap
+    * keys section is now keys.kmap
       ------------------------------------------------------------------ */
 
   /**
@@ -287,49 +287,49 @@ class Constants {
   readonly keys_mod_all: number = Array.from(this.keys_mod_map.values()).reduce((p, v) => (p | v), this.keys_mod_none);
 
   /* ------------------------------------------------------------------
-   * key2 section
+   * keys section
     ------------------------------------------------------------------ */
 
   /**
-   * Minimum length of the 'key2' section not including variable parts
+   * Minimum length of the 'keys' section not including variable parts
    */
-  readonly length_key2 = 24;
+  readonly length_keys = 24;
   /**
-   *  Length of each item in the 'key2' keys sub-table
+   *  Length of each item in the 'keys' keys sub-table
    */
-  readonly length_key2_key = 36;
+  readonly length_keys_key = 36;
   /**
-   *  Length of each item in the 'key2' flick lists sub-table
+   *  Length of each item in the 'keys' flick lists sub-table
    */
-  readonly length_key2_flick_list = 12;
+  readonly length_keys_flick_list = 12;
   /**
-   *  Length of each item in the 'key2' flick elements sub-table
+   *  Length of each item in the 'keys' flick elements sub-table
    */
-  readonly length_key2_flick_element = 12;
+  readonly length_keys_flick_element = 12;
   /**
-   * Length of each item in the 'key2.kmap' key map subtable
+   * Length of each item in the 'keys.kmap' key map subtable
    */
-  readonly length_key2_kmap = 12;
+  readonly length_keys_kmap = 12;
 
   /**
    * 0 if to is a char, 1 if it is a string
    */
-  readonly key2_key_flags_extend      = 0x00000001;
+  readonly keys_key_flags_extend      = 0x00000001;
 
   /**
    * 1 if the key is a gap
    */
-  readonly key2_key_flags_gap         = 0x00000002;
+  readonly keys_key_flags_gap         = 0x00000002;
 
   /**
    * 1 if the key is transform=no
    */
-  readonly key2_key_flags_notransform = 0x00000004;
+  readonly keys_key_flags_notransform = 0x00000004;
 
   /**
    * 0 if to is a char, 1 if it is a string
    */
-  readonly key2_flick_flags_extend      = 0x00000001;
+  readonly keys_flick_flags_extend      = 0x00000001;
 
   /* ------------------------------------------------------------------
    * layr section
@@ -517,7 +517,7 @@ class Constants {
       disp: 'disp',
       elem: 'elem',
       finl: 'finl',
-      key2: 'key2',
+      keys: 'keys',
       layr: 'layr',
       list: 'list',
       loca: 'loca',
