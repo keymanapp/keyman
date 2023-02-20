@@ -234,7 +234,7 @@ jobs:
         SRC_PKG="${GITHUB_WORKSPACE}/artifacts/keyman-srcpkg/keyman_${{ needs.sourcepackage.outputs.VERSION }}-1.debian.tar.xz" \
         BIN_PKG="${GITHUB_WORKSPACE}/artifacts/keyman-binarypkgs/libkmnkbp0-0_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" \
         PKG_VERSION="${{ needs.sourcepackage.outputs.VERSION }}" \
-        ./scripts/deb-packaging.sh --gha verify >> $GITHUB_STEP_SUMMARY
+        ./scripts/deb-packaging.sh --gha verify 2>> $GITHUB_STEP_SUMMARY
 
     - name: Archive .symbols file
       uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
