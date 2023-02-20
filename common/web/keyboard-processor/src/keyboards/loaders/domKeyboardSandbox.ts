@@ -39,6 +39,8 @@ export default class DOMKeyboardSandbox {
     }
   }
 
+  // KNOWN LIMITATION:  must "throw away" after detaching from the DOM.
+  //                    Attempting to reattach + load more keyboards will fail to load those "more keyboards".
   public detachFromDOM() {
     if(this.sandboxHost.parentElement) {
       this.sandboxHost.remove();
