@@ -25,7 +25,7 @@ export default abstract class ContextManager extends EventEmitter<EventMap> {
       keyman.domManager.focusLastActiveElement();
       dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
 
-      if(Ptext!=null) {
+      if(Ptext != null) {
         kbdInterface.output(0, outputTarget, Ptext);
       }
 

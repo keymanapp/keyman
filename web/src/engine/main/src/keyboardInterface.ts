@@ -1,22 +1,32 @@
 import {
+  Keyboard,
   KeyboardInterface as KeyboardInterfaceBase,
   KeyboardKeymanGlobal,
-  OutputTarget,
-  VariableStoreSerializer
 } from "@keymanapp/keyboard-processor";
-import ContextManager from './contextManager.js';
+import { KeyboardStub, StubAndKeyboardCache } from '../../../../build/engine/keyboard-cache/obj/index.js';
 
+import ContextManager from './contextManager.js';
+import { VariableStoreCookieSerializer } from "./variableStoreCookieSerializer.js";
 
 export default class KeyboardInterface extends KeyboardInterfaceBase {
   private readonly contextManager: ContextManager;
+  private readonly stubAndKeyboardCache: StubAndKeyboardCache;
 
-  constructor(_jsGlobal: any, keymanGlobal: KeyboardKeymanGlobal, variableStoreSerializer: VariableStoreSerializer) {
-    super(_jsGlobal, keymanGlobal, variableStoreSerializer);
+  constructor(
+    _jsGlobal: any,
+    keymanGlobal: KeyboardKeymanGlobal,
+    cache: StubAndKeyboardCache,
+  ) {
+    super(_jsGlobal, keymanGlobal, new VariableStoreCookieSerializer());
+    this.stubAndKeyboardCache = cache;
   }
 
   registerKeyboard(Pk): void {
-    let keyman = com.keyman.singleton;
-    keyman.keyboardManager._registerKeyboard(Pk);
+    super.registerKeyboard(Pk);
+
+    // make sure to call the register method anyway, even without an existing Promise
+    // (b/c inlined script preloading)
+    this.stubAndKeyboardCache.addKeyboard(new Keyboard(Pk));
   }
 
   /**
@@ -29,18 +39,11 @@ export default class KeyboardInterface extends KeyboardInterfaceBase {
    * @return      {?number}               1 if already registered, else null
    */
   registerStub = (Pstub): number => {
-    let keyboardManager = com.keyman.singleton.keyboardManager;
-    if (keyboardManager.keymanweb.initialized) {
-      // If language code already defined (or not specified in stub), check to see if stub already registered
-      for(let Lk=0; Lk < keyboardManager.keyboardStubs.length; Lk++) {
-        if(keyboardManager.keyboardStubs[Lk]['KI'] == Pstub['KI']) {
-          if(Pstub['KLC'] == '' || (keyboardManager.keyboardStubs[Lk]['KLC'] == Pstub['KLC'])) {
-            return 1; // no need to register
-          }
-        }
-      }
+    const stub = new KeyboardStub(Pstub);
+    if(this.stubAndKeyboardCache.findMatchingStub(stub)) {
+      return 1;
     }
-    keyboardManager._registerStub(Pstub);
+
     return null;
   }
 

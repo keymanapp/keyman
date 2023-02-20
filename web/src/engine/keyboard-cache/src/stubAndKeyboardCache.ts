@@ -1,5 +1,7 @@
-import KeyboardStub from "./keyboardStub.js";
 import { Keyboard } from "@keymanapp/keyboard-processor";
+import EventEmitter from "eventemitter3";
+
+import KeyboardStub from "./keyboardStub.js";
 
 const KEYBOARD_PREFIX = "Keyboard_";
 
@@ -23,7 +25,35 @@ function withoutPrefix(text: string) {
 
 export {withoutPrefix as toUnprefixedKeyboardId};
 
-export default class StubAndKeyboardCache {
+interface EventMap {
+  /**
+   * Original event to be generated via this one:
+   *
+   ```
+    // The corresponding event is needed in order to update UI modules as new keyboard stubs "come online".
+    // this.doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC'],sp['KP']);
+   ```
+   *
+   * Note that said events should be deferred until after KMW initializes - UI modules depend on them.
+   * Use a centralized initialization promise for this.
+   */
+  stubAdded: (stub: KeyboardStub) => void;
+
+  /**
+   * Original event to be generated via this one:
+   *
+   ```
+    // // Execute any external (UI) code needed after loading keyboard
+    // this.doKeyboardLoaded(Pk['KI']);
+   ```
+   *
+   * Note that said events should be deferred until after KMW initializes - UI modules depend on them.
+   * Use a centralized initialization promise for this.
+   */
+  keyboardAdded: (keyboard: Keyboard) => void;
+}
+
+export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
   private stubSetTable: Record<string, Record<string, KeyboardStub>> = {};
   private keyboardTable: Record<string, Keyboard | Promise<Keyboard>> = {};
 
@@ -42,6 +72,8 @@ export default class StubAndKeyboardCache {
   addKeyboard(keyboard: Keyboard) {
     const keyboardID = prefixed(keyboard.id);
     this.keyboardTable[keyboardID] = keyboard;
+
+    this.emit('keyboardAdded', keyboard);
   }
 
   expectKeyboard(keyboardPromise: Promise<Keyboard>, keyboardID: string) {
@@ -53,7 +85,7 @@ export default class StubAndKeyboardCache {
     this.keyboardTable[keyboardID] = keyboardPromise;
 
     keyboardPromise.then((kbd) => {
-      this.keyboardTable[keyboardID] = kbd;
+      this.addKeyboard(kbd);
     });
   }
 
@@ -61,6 +93,8 @@ export default class StubAndKeyboardCache {
     const keyboardID = prefixed(stub.KI);
     const stubTable = this.stubSetTable[keyboardID] = this.stubSetTable[keyboardID] ?? {};
     stubTable[stub.KLC] = stub;
+
+    this.emit('stubAdded', stub);
   }
 
   findMatchingStub(stub: KeyboardStub) {
