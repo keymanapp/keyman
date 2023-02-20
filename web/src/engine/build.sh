@@ -120,7 +120,7 @@ builder_parse "$@"
 # ```
 compile ( ) {
   if [ $# -lt 1 ]; then
-    fail "Scripting error: insufficient argument count!"
+    builder_die "Scripting error: insufficient argument count!"
   fi
 
   local COMPILE_TARGET=$1

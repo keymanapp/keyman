@@ -20,7 +20,7 @@ LEXICAL_MODELS_TYPES="$KEYMAN_ROOT/common/models/types"
 
 # Build the main script.
 build () {
-  npm run build || fail "Could not build top-level JavaScript file."
+  npm run build || builder_die "Could not build top-level JavaScript file."
 }
 
 display_usage ( ) {
@@ -90,19 +90,19 @@ fi
 
 # Check if Node.JS/npm is installed.
 type npm >/dev/null ||\
-    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+    builder_die "Build environment setup error detected!  Please ensure Node.js is installed!"
 
 if (( install_dependencies )) ; then
   verify_npm_setup
   # We need to build keyman-version and lm-worker with a script for now
-  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
+  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || builder_die "Could not build keyman-version"
 fi
 
-build || fail "Compilation failed."
+build || builder_die "Compilation failed."
 echo "Typescript compilation successful."
 
 if (( run_tests )); then
-  npm test || fail "Tests failed"
+  npm test || builder_die "Tests failed"
 fi
 
 if (( should_publish )); then
@@ -119,7 +119,7 @@ if (( should_publish )); then
   #
   # See `npm help publish` for more details.
   echo "Publishing $DRY_RUN npm package with tag $npm_dist_tag"
-  npm publish $DRY_RUN --access public --tag $npm_dist_tag || fail "Could not publish $npm_dist_tag release."
+  npm publish $DRY_RUN --access public --tag $npm_dist_tag || builder_die "Could not publish $npm_dist_tag release."
 
   # For now, kmlmc will have responsibility for publishing keyman-version. In
   # the future, we should probably have a top-level npm publish script that

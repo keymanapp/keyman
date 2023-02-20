@@ -29,11 +29,6 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 # the same parent folder as this repo, with the default name 'keyboards'
 KEYBOARDS_ROOT="$KEYMAN_ROOT/../keyboards"
 
-function die {
-  echo "FATAL: $1"
-  exit 99
-}
-
 function display_usage {
   echo "Usage: build_keyboards.sh [-download-keyboards] [-copy-keyboards] [-clean-keyboards] [-debug] [-h|-?]"
   echo "Builds all keyboards used by the app and copies them into the"
@@ -77,7 +72,7 @@ done
 
 # Check that $KEYBOARDS_TARGET is valid
 if [[ -z "$KEYBOARDS_TARGET" ]]; then
-  die "KEYBOARDS_TARGET cannot be empty"
+  builder_die "KEYBOARDS_TARGET cannot be empty"
 fi
 
 # Clean existing Keyboards folder
@@ -113,7 +108,7 @@ if [ $DO_BUILD = true ] || [ $DO_COPY = true ]; then
     while IFS=, read -r shortname id name region old_keyboard; do
       if [ $DO_BUILD = true ]; then
         echo "Building $id ($name)" # $shortname/$id -> $name"
-        WINEDEBUG=fixme-nls,fixme-thread "./build.sh" release/$shortname/$id || die "Unable to build keyboard $shortname/$id"
+        WINEDEBUG=fixme-nls,fixme-thread "./build.sh" release/$shortname/$id || builder_die "Unable to build keyboard $shortname/$id"
       fi
       if [ $DO_COPY = true ]; then
         echo "Copying $id ($name) to $KEYBOARDS_TARGET"
@@ -121,7 +116,6 @@ if [ $DO_BUILD = true ] || [ $DO_COPY = true ]; then
         unzip -o release/$shortname/$id/build/$id.kmp $id.js kmp.json -d "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id/"
         cp release/$shortname/$id/build/$id.keyboard_info "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id.keyboard_info"
       fi
-#        die "done"
     done
   } < "$SCRIPT_ROOT/../keyboards.csv"
 

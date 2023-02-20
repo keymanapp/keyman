@@ -165,11 +165,10 @@ jobs:
     if: github.event.client_payload.isTestBuild == 'false'
 
     steps:
-    - name: Download Artifacts
-      uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
+    - name: Checkout
+      uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c #v3.3.0
       with:
-        name: keyman-signedpkgs
-        path: artifacts
+        ref: '${{ github.event.client_payload.ref }}'
 
     - name: Install dput
       uses: ./.github/actions/apt-install
@@ -179,6 +178,12 @@ jobs:
     - name: Setup .dput.cf
       run: |
         echo "${{vars.ENV_DPUT_CONFIG}}" > ~/.dput.cf
+
+    - name: Download Artifacts
+      uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
+      with:
+        name: keyman-signedpkgs
+        path: artifacts
 
     - name: Upload
       run: |
@@ -234,7 +239,7 @@ jobs:
         SRC_PKG="${GITHUB_WORKSPACE}/artifacts/keyman-srcpkg/keyman_${{ needs.sourcepackage.outputs.VERSION }}-1.debian.tar.xz" \
         BIN_PKG="${GITHUB_WORKSPACE}/artifacts/keyman-binarypkgs/libkmnkbp0-0_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" \
         PKG_VERSION="${{ needs.sourcepackage.outputs.VERSION }}" \
-        ./scripts/deb-packaging.sh --gha verify >> $GITHUB_STEP_SUMMARY
+        ./scripts/deb-packaging.sh --gha verify 2>> $GITHUB_STEP_SUMMARY
 
     - name: Archive .symbols file
       uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2

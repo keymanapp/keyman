@@ -41,24 +41,24 @@ export DEBEMAIL='jenkins@sil.org'
 checkAndInstallRequirements
 
 # clean up prev deb builds
-echo_heading "cleaning previous builds of $1"
+builder_heading "cleaning previous builds of $1"
 
 rm -rf builddebs
 rm -rf "$sourcedir/${1}"_*.{dsc,build,buildinfo,changes,tar.?z,log}
 rm -rf "$sourcedir/../${1}"_*.{dsc,build,buildinfo,changes,tar.?z,log}
 
-echo_heading "Make source package for $fullsourcename"
-echo_heading "reconfigure"
+builder_heading "Make source package for $fullsourcename"
+builder_heading "reconfigure"
 TIER="$tier" ./scripts/reconf.sh
 
-echo_heading "Make origdist"
+builder_heading "Make origdist"
 ./scripts/dist.sh origdist
-echo_heading "Make deb source"
+builder_heading "Make deb source"
 ./scripts/deb.sh sourcepackage
 
 #sign source package
 for file in builddebs/*.dsc; do
-	echo_heading "Signing source package $file"
+	builder_heading "Signing source package $file"
 	debsign -k"$2" "$file"
 done
 

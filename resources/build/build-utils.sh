@@ -15,6 +15,7 @@
 #   VERSION_ENVIRONMENT: One of: local, test, alpha, beta, stable
 #   UPLOAD_SENTRY:    true - if VERSION_ENVIRONMENT is one of alpha, beta, stable
 #                     false - if local, test.  Indicates if debug artifacts should be uploaded to Sentry
+#   BUILDER_OS:       win|mac|linux -- current build environment
 #
 # On macOS, this script requires coreutils (`brew install coreutils`)
 #
@@ -32,11 +33,6 @@
 # Prevents 'clear' on exit of mingw64 bash shell
 #
 SHLVL=0
-
-function die() {
-  # TODO: consolidate this with fail() from shellHelperFunctions.sh
-  builder_die "$*"
-}
 
 function findKeymanRoot() {
     # See https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
@@ -335,6 +331,27 @@ run_xcodebuild() {
 
   printXCodeBuildScriptLogs
   if [ $ret_code != 0 ]; then
-    fail "Build failed! Error: [$ret_code] when executing command: 'xcodebuild $cmnd'"
+    builder_die "Build failed! Error: [$ret_code] when executing command: 'xcodebuild $cmnd'"
   fi
 }
+
+#
+# Sets the BUILDER_OS environment variable to linux|mac|win
+#
+_builder_get_operating_system() {
+  declare -g BUILDER_OS
+  # Default value, since it's the most general case/configuration to detect.
+  BUILDER_OS=linux
+
+  # Subject to change with future improvements.
+  if [[ $OSTYPE == darwin* ]]; then
+    BUILDER_OS=mac
+  elif [[ $OSTYPE == msys ]]; then
+    BUILDER_OS=win
+  elif [[ $OSTYPE == cygwin ]]; then
+    BUILDER_OS=win
+  fi
+  readonly BUILDER_OS
+}
+
+_builder_get_operating_system
