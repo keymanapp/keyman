@@ -36,12 +36,6 @@ export default class FloatingOSKView extends OSKView {
   dfltX: string;
   dfltY: string;
 
-  // Key code definition aliases for legacy keyboards  (They expect window['keyman']['osk'].___)
-  modifierCodes = Codes.modifierCodes;
-  modifierBitmasks = Codes.modifierBitmasks;
-  stateBitmasks = Codes.stateBitmasks;
-  keyCodes = Codes.keyCodes;
-
   private titleBar: TitleBar;
   private resizeBar: ResizeBar;
 

@@ -20,12 +20,6 @@ export default class AnchoredOSKView extends OSKView {
 
   private isResizing: boolean = false;
 
-  // Key code definition aliases for legacy keyboards  (They expect window['keyman']['osk'].___)
-  modifierCodes = Codes.modifierCodes;
-  modifierBitmasks = Codes.modifierBitmasks;
-  stateBitmasks = Codes.stateBitmasks;
-  keyCodes = Codes.keyCodes;
-
   public constructor(config: Configuration) {
     if(config.isEmbedded) {
       config.activator = config.activator || new StaticActivator();

@@ -7,7 +7,7 @@ import Codes from "../text/codes.js";
  */
 export interface KeyboardKeymanGlobal {
   // Omitting this will prevent debug-compiled keyboards from loading.
-  osk: MinimalCodesInterface;
+  readonly osk: MinimalCodesInterface;
 }
 
 /**
@@ -18,11 +18,16 @@ export interface KeyboardKeymanGlobal {
  * TCompileKeymanWeb.JavaScript_SetupDebug.
  */
 export interface MinimalCodesInterface {
-  modifierCodes: typeof Codes.modifierCodes;
-  keyCodes: typeof Codes.keyCodes;
+  readonly modifierCodes: typeof Codes.modifierCodes;
+  readonly keyCodes: typeof Codes.keyCodes;
+  readonly modifierBitmasks: typeof Codes.modifierBitmasks;
+  readonly stateBitmasks: typeof Codes.stateBitmasks;
 }
 
 export const MinimalKeymanGlobal: KeyboardKeymanGlobal = {
+  // While this CERTAINLY isn't polymorphic with an actual OSK, it's "enough" to
+  // facilitate loading of debug-compiled Keyman keyboards that rely on constants
+  // defined within Codes at relevant legacy endpoints.
   osk: Codes
 }
 
