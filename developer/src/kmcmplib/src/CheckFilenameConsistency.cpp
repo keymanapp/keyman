@@ -69,7 +69,7 @@ KMX_DWORD CheckFilenameConsistency( KMX_CHAR const * Filename, bool ReportMissin
 
 
 KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissingFile) {
-  // not ready yet: needs more attention-> e.g. _wfindfirst,... and common includes for non-Windows platforms
+  // not ready yet: needs more attention-> common includes for non-Windows platforms
   KMX_WCHAR Name[_MAX_PATH], FName[_MAX_FNAME], Ext[_MAX_EXT];
   intptr_t n;
   FILE* nfile;
@@ -82,16 +82,15 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   else {
     u16ncpy(Name, Filename, _countof(Name));  // I3481   // _S2 wcscpy_s(Name, _countof(Name), Filename);  // I3481
   }
+  std::wstring  Name_wstr = convert_pchar16T_To_wstr(Name);
+  const KMX_WCHART* Name_wchptr = Name_wstr.c_str();
 
 #if defined(_WIN32) || defined(_WIN64)
-  std::wstring  wstr = convert_pchar16T_To_wstr(Name);
-  const KMX_WCHART* wchptr = wstr.c_str();
-
-  nfile = _wfsopen(wchptr, L"rb", _SH_DENYWR);
-  _wfinddata_t fi;
-  n = _wfindfirst(wchptr, &fi);
-  _findclose(n);
+  nfile = _wfsopen(Name_wchptr, L"rb", _SH_DENYWR);
+#else
+  nfile = fopen(Name_wchptr, "rb");
 #endif
+
   if (nfile == NULL) {
     if (ReportMissingFile) {
       u16sprintf(ErrExtraW,256,L"referenced file %ls",Filename);
@@ -110,18 +109,22 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   cptr1++;
 
 //TODO: sort out how to find common includes in non-Windows platforms:
-#if defined(_WIN32) || defined(_WIN64)
-KMX_WCHAR fi_name_char16[260];
-u16sprintf(fi_name_char16,_countof(fi.name),fi.name);
 
+KMX_WCHAR fi_name_char16[260];
+#if defined(_WIN32) || defined(_WIN64)
+  _wfinddata_t fi;
+  n = _wfindfirst(Name_wchptr, &fi);
+  _findclose(n);
+  u16sprintf(fi_name_char16,_countof(fi.name),fi.name);
+#else
+  #error Missing implementation for finding common includes
+#endif  
   if (u16cmp(cptr1, fi_name_char16) != 0) {
     u16sprintf(ErrExtraW,256,L"reference '%ls' does not match actual filename '%ls'", cptr1, &fi.name);
     strcpy(ErrExtraLIB, wstrtostr2(ErrExtraW));
     AddWarning(CHINT_FilenameHasDifferingCase);
   }
-#else
-  #error Missing implementation for finding common includes
-#endif
+
   return CERR_None;
 }
 
