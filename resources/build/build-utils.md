@@ -158,7 +158,8 @@ a user or called by another script:
 
 * **dependencies**: these are other builder scripts which must be configured and
   built before the actions in this script can continue. Only `configure` and
-  `build` actions are ever passed to dependency scripts; if you are working on
+  `build` actions are ever passed to dependency scripts; these actions
+  will execute for all targets of the dependency script.  If you are working on
   code within a dependency, you are currently expected to rebuild and test that
   dependency locally.
   
