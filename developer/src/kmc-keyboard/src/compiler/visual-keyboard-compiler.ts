@@ -30,7 +30,7 @@ export default class VisualKeyboardCompiler {
     vk: VisualKeyboard.VisualKeyboard,
     layer: LDMLKeyboard.LKLayer
   ) {
-    // TODO: consider consolidation with keys.ts?
+    // TODO-LDML: consider consolidation with keys.ts?
     const shift = this.translateLayerIdToVisualKeyboardShift(layer.id);
 
     let y = -1;
@@ -58,7 +58,7 @@ export default class VisualKeyboardCompiler {
     if(id == 'base') {
       return 0;
     }
-    // TODO: other modifiers
+    // TODO-LDML: other modifiers
     return 0;
   }
 }

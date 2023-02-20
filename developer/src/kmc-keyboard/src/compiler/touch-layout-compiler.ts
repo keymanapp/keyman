@@ -6,12 +6,12 @@ export class TouchLayoutCompiler {
 
     // start with desktop to mimic vk emit
     result.desktop = {
-      defaultHint: "none",  // TODO this should be optional
+      defaultHint: "none",  // TODO-LDML this should be optional
       layer: []
     };
 
-    for(let layerMap of source.keyboard.layerMaps) {
-      for(let layer of layerMap.layerMap) {
+    for(let layers of source.keyboard.layers) {
+      for(let layer of layers.layer) {
         const resultLayer = this.compileHardwareLayer(source, result, layer);
         result.desktop.layer.push(resultLayer);
       }
@@ -22,9 +22,9 @@ export class TouchLayoutCompiler {
   private compileHardwareLayer(
     source: LDMLKeyboard.LDMLKeyboardXMLSourceFile,
     file: TouchLayout.TouchLayoutFile,
-    layer: LDMLKeyboard.LKLayerMap
+    layer: LDMLKeyboard.LKLayer
   ) {
-    // TODO: consider consolidation with keys.ts?
+    // TODO-LDML: consider consolidation with keys.ts?
 
     let fileLayer: TouchLayout.TouchLayoutLayer = {
       id: this.translateLayerIdToTouchLayoutShift(layer.id),
@@ -61,7 +61,7 @@ export class TouchLayoutCompiler {
     if(id == 'base') {
       return 'default';
     }
-    // TODO: other modifiers
+    // TODO-LDML: other modifiers
     return 'default';
   }
 }
