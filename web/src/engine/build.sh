@@ -111,7 +111,7 @@ builder_describe_outputs \
   configure:keyboard-cache   ../../../node_modules \
   configure:main             ../../../node_modules \
   configure:osk              ../../../node_modules \
-  build:device-detect        $(output_path $CONFIGURATION $OUTPUT_DIR)/index.js \
+  build:configuration        $(output_path $CONFIGURATION $OUTPUT_DIR)/index.js \
   build:device-detect        $(output_path $DEVICEDETECT $OUTPUT_DIR)/kmwdevice.js \
   build:dom-utils            $(output_path $DOMUTILS $OUTPUT_DIR)/index.js \
   build:element-wrappers     $(output_path $ELEMENTWRAPPERS $OUTPUT_DIR)/index.js \
