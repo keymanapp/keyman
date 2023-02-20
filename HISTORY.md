@@ -1,5 +1,66 @@
 # Keyman Version History
 
+## 17.0.50 alpha 2023-02-16
+
+* feat(common): parent-child scripts for builder (#8198)
+* fix(linux): Another iteration to fix packaging GHA (#8230)
+* chore(common): updates Web & Web-related dependencies (#8196)
+* fix(linux): Fix syntax for skipping upload in packaging GHA (#8236)
+
+## 17.0.49 alpha 2023-02-15
+
+* feat(linux): Pass PR# in the event type (#8221)
+* feat(linux): Implement uploading of packages in packaging GHA (#8223)
+* fix(linux): Fix GHA package build (#8225)
+* fix(linux): Another fix for GHA package build (#8228)
+
+## 17.0.48 alpha 2023-02-14
+
+* fix(developer): Select BCP47 Code dialog inconsistencies (#8179)
+* chore(common): automatically apply _builder_check_color (#8197)
+* docs(linux): Update packaging documentation (#8202)
+* chore(common): Report status if no platform needs build (#8210)
+* chore(linux): Exclude autopkg tests on s390x (#8218)
+* fix(linux): Fix path to symbols file in packaging GHA (#8209)
+
+## 17.0.47 alpha 2023-02-10
+
+* fix(linux): Fix autopkgtests (#8201)
+* fix(linux): Fix Verify-API step of GHA (#8199)
+
+## 17.0.46 alpha 2023-02-09
+
+* fix(windows): add remove lang id uses correct keyboard id (#8186)
+* chore(common): add `builder_term` function (#8187)
+* chore(common): builder internal dependencies (#8188)
+* chore(linux): Update changelog from Debian (#8192)
+* feat(linux): Add debian packaging GHA (#7911)
+
+## 17.0.45 alpha 2023-02-08
+
+* chore(ios): update certificate (#8176)
+* fix(linux): Fix autopkgtests (#8181)
+* chore(common): Cleanup Kannada locale (#8182)
+* chore(windows): Fix Portuguese UI language name (#8184)
+
+## 17.0.44 alpha 2023-02-07
+
+* chore(linux): Set test-helper script executable (#8178)
+* chore(linux): Update debian changelog (#8156)
+
+## 17.0.43 alpha 2023-02-06
+
+* chore(linux): Build with meson instead of autotools  ️ (#8111)
+
+## 17.0.42 alpha 2023-02-03
+
+* chore(deps): bump http-cache-semantics from 4.1.0 to 4.1.1 (#8144)
+* feat(developer): check for duplicated language codes in package editor and compiler (#8151)
+* chore: Fail TC build if triggering Jenkins build fails (#8152)
+* chore(linux): Fix lintian warnings (#8154)
+* chore(core): Update meson version (#7882)
+* refactor(android/engine): Consolidate Keyboard picker intent (#8163)
+
 ## 17.0.41 alpha 2023-02-02
 
 * chore(web): main web build & test script rework to our common script format + nomenclature (#7474)

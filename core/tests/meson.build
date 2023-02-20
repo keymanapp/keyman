@@ -8,7 +8,7 @@
 
 # Note: this version of cmpfiles ignores line endings, which is better for platform independence
 cmpfiles = ['-c', 'import sys; a = open(sys.argv[1], \'r\').read(); b = open(sys.argv[2], \'r\').read(); exit(not (a==b))']
-stnds = join_paths(meson.source_root(), 'tests', 'standards')
+stnds = join_paths(meson.current_source_dir(), 'standards')
 
 libsrc = include_directories(join_paths('../', 'src'))
 

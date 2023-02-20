@@ -13,7 +13,8 @@ sudo apt install python3-lxml python3-magic python3-numpy python3-qrcode python3
     python3-setuptools python3-pip python3-dbus ibus libglib2.0-bin liblocale-gettext-perl
 ```
 
-Either `python3-raven` or `python3-sentry-sdk` (>= 1.4) is required as well. On Ubuntu 22.04 and later run:
+Either `python3-raven` or `python3-sentry-sdk` (>= 1.4) is required as well.
+On Ubuntu 22.04 and later run:
 
 ```bash
 sudo apt install python3-sentry-sdk
@@ -34,8 +35,8 @@ or install it with pip:
 pip3 install sentry-sdk
 ```
 
-Run the script `./createkeymandirs.sh` to create the directories for these programs to
-install the packages to.
+Run the script `./createkeymandirs.sh` to create the directories for these
+programs to install the packages to.
 
 Also copy and compile the GSettings schema:
 
@@ -65,7 +66,8 @@ To uninstall you can run `sudo make uninstall`.
 
 `./km-config`
 
-This displays a configuration panel that shows the currently installed Keyman keyboard packages and can download and install additional keyboards.
+This displays a configuration panel that shows the currently installed Keyman
+keyboard packages and can download and install additional keyboards.
 
 #### Buttons
 
