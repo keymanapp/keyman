@@ -22,11 +22,19 @@ export default class KeyboardInterface extends KeyboardInterfaceBase {
   }
 
   registerKeyboard(Pk): void {
-    super.registerKeyboard(Pk);
+    const priorActiveKeyboard = this.activeKeyboard;
 
-    // make sure to call the register method anyway, even without an existing Promise
-    // (b/c inlined script preloading)
-    this.stubAndKeyboardCache.addKeyboard(new Keyboard(Pk));
+    // Among other things, sets Pk as a newly-active Keyboard.
+    super.registerKeyboard(Pk);
+    const registeredKeyboard = this.activeKeyboard;
+
+    const cacheEntry = this.stubAndKeyboardCache.getKeyboard(registeredKeyboard.id);
+    if(!(cacheEntry instanceof Promise)) {
+      // Deliberate keyboard pre-loading via direct script-tag link on the page.
+      // Just load the keyboard and set our field back in place.
+      this.stubAndKeyboardCache.addKeyboard(new Keyboard(Pk));
+      this.activeKeyboard = priorActiveKeyboard;
+    }
   }
 
   /**
