@@ -58,15 +58,13 @@ fi
 if builder_start_action verify; then
   tar xf "${SRC_PKG}"
   if [ ! -f debian/libkmnkbp0-0.symbols ]; then
-    # shellcheck disable=SC2210 # File redirection
-    echo ":warning: Missing libkmnkbp0-0.symbols file" >2
+    echo ":warning: Missing libkmnkbp0-0.symbols file" >&2
   else
     tmpDir=$(mktemp -d)
     dpkg -x "${BIN_PKG}" "$tmpDir"
     cd debian
     dpkg-gensymbols -v"${PKG_VERSION}" -plibkmnkbp0-0 -e"${tmpDir}"/usr/lib/x86_64-linux-gnu/libkmnkbp0.so* -Olibkmnkbp0-0.symbols -c4
-    # shellcheck disable=SC2210 # File redirection
-    echo ":heavy_check_mark: libkmnkbp0-0 API didn't change" >2
+    echo ":heavy_check_mark: libkmnkbp0-0 API didn't change" >&2
   fi
   builder_finish_action success verify
   exit 0
