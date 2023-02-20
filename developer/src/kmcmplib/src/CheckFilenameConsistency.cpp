@@ -84,7 +84,7 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   }
 
 #if defined(_WIN32) || defined(_WIN64)
-  std::wstring  wstr = convert_pchar16T_To_pwcharT(Name);
+  std::wstring  wstr = convert_pchar16T_To_wstr(Name);
   const KMX_WCHART* wchptr = wstr.c_str();
 
   nfile = _wfsopen(wchptr, L"rb", _SH_DENYWR);

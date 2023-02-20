@@ -32,6 +32,14 @@ std::string string_from_u16string(std::u16string const str) {
 	return converter.to_bytes(str);
 }
 
+KMX_WCHAR conv_KMX_WCHAR__TO__WCHAR(KMX_WCHAR in) {
+  //  char16_t -> std::u16string -> std::string -> std::wstring -> wchar_t*
+  std::u16string u16str(&in);
+  std::string stri = string_from_u16string(u16str);
+  std::wstring  wstr = wstring_from_string(stri);
+  return *wstr.c_str();
+}
+
 // often used with c_str() e.g. u16fmt( DEBUGSTORE_MATCH).c_str()
 // UTF16 (= const char16_t*) -> UTF8 (= std::string)  -> UTF16 ( = std::wstring 16 bit)
 std::wstring u16fmt(const KMX_WCHAR * str) {
@@ -62,8 +70,8 @@ void u16sprintf(KMX_WCHAR * dst, const size_t sz, const wchar_t* fmt, ...) {
 	delete[] wbuf;
 }
 
-  std::wstring  convert_pchar16T_To_pwcharT(KMX_WCHAR Name[_MAX_PATH]){
-  //  convert char16_t*  -> std::u16string -> std::string -> std::wstring -> wchar_t*
+  std::wstring  convert_pchar16T_To_wstr(KMX_WCHAR Name[_MAX_PATH]){
+  //  convert char16_t*  -> std::u16string -> std::string -> std::wstring
   //  char16_t* -> std::u16string
   std::u16string u16str(Name);
   //  std::u16string -> std::string
