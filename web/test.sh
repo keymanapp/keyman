@@ -40,6 +40,12 @@ if builder_start_action test:libraries; then
   $KEYMAN_ROOT/common/web/keyboard-processor/build.sh test $HEADLESS_FLAGS
   $KEYMAN_ROOT/common/web/input-processor/build.sh build:tools test $HEADLESS_FLAGS
 
+  # For now, we'll also link in the gesture-recognizer unit tests here.
+  echo_heading "Running gesture-recognizer test suite"
+  pushd "$KEYMAN_ROOT/common/web/gesture-recognizer"
+  npm run test -- $HEADLESS_FLAGS
+  popd
+
   builder_finish_action success test:libraries
 fi
 

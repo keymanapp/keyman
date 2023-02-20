@@ -2,6 +2,8 @@
   "files": [],
   "include": [],
   "references": [
+    { "path": "./common/web/gesture-recognizer/tsconfig.json" },
+    { "path": "./common/web/gesture-recognizer/src/tools/unit-test-resources/tsconfig.json" },
     { "path": "./common/web/input-processor/src/tsconfig.json" },
     { "path": "./common/web/keyboard-processor/src/tsconfig.json" },
     { "path": "./common/web/recorder/src/nodeProctor.tsconfig.json" },

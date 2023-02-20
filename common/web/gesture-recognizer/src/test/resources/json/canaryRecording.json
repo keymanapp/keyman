@@ -1,0 +1,167 @@
+{
+  "inputs": [
+    {
+      "touchpoints": [
+        {
+          "isFromTouch": false,
+          "path": {
+            "coords": [
+              {
+                "targetX": 231,
+                "targetY": 32,
+                "t": 388913
+              },
+              {
+                "targetX": 230,
+                "targetY": 32,
+                "t": 389101
+              },
+              {
+                "targetX": 229,
+                "targetY": 32,
+                "t": 389131
+              },
+              {
+                "targetX": 228,
+                "targetY": 32,
+                "t": 389164
+              },
+              {
+                "targetX": 228,
+                "targetY": 33,
+                "t": 389173
+              },
+              {
+                "targetX": 227,
+                "targetY": 33,
+                "t": 389206
+              },
+              {
+                "targetX": 226,
+                "targetY": 34,
+                "t": 389240
+              },
+              {
+                "targetX": 225,
+                "targetY": 34,
+                "t": 389275
+              },
+              {
+                "targetX": 225,
+                "targetY": 35,
+                "t": 389306
+              },
+              {
+                "targetX": 225,
+                "targetY": 36,
+                "t": 389390
+              },
+              {
+                "targetX": 225,
+                "targetY": 37,
+                "t": 389479
+              },
+              {
+                "targetX": 225,
+                "targetY": 38,
+                "t": 389609
+              },
+              {
+                "targetX": 226,
+                "targetY": 38,
+                "t": 389851
+              },
+              {
+                "targetX": 226,
+                "targetY": 39,
+                "t": 389856
+              },
+              {
+                "targetX": 227,
+                "targetY": 39,
+                "t": 389872
+              },
+              {
+                "targetX": 228,
+                "targetY": 39,
+                "t": 389906
+              },
+              {
+                "targetX": 228,
+                "targetY": 40,
+                "t": 389923
+              },
+              {
+                "targetX": 229,
+                "targetY": 40,
+                "t": 389957
+              },
+              {
+                "targetX": 230,
+                "targetY": 40,
+                "t": 389993
+              },
+              {
+                "targetX": 231,
+                "targetY": 40,
+                "t": 390025
+              },
+              {
+                "targetX": 232,
+                "targetY": 40,
+                "t": 390056
+              },
+              {
+                "targetX": 233,
+                "targetY": 39,
+                "t": 390098
+              },
+              {
+                "targetX": 234,
+                "targetY": 39,
+                "t": 390164
+              },
+              {
+                "targetX": 234,
+                "targetY": 38,
+                "t": 390213
+              },
+              {
+                "targetX": 235,
+                "targetY": 38,
+                "t": 390223
+              },
+              {
+                "targetX": 236,
+                "targetY": 38,
+                "t": 390257
+              },
+              {
+                "targetX": 236,
+                "targetY": 37,
+                "t": 390325
+              },
+              {
+                "targetX": 237,
+                "targetY": 37,
+                "t": 390654
+              },
+              {
+                "targetX": 237,
+                "targetY": 36,
+                "t": 390776
+              }
+            ],
+            "wasCancelled": false
+          }
+        }
+      ]
+    }
+  ],
+  "config": {
+    "deviceStyle": "screen4",
+    "roamingStyle": "bounds1",
+    "receiverStyle": "full",
+    "safeZoneStyle": "safe-loose"
+  }
+}

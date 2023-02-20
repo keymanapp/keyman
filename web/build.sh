@@ -31,6 +31,9 @@ DEBUG="debug"
 RELEASE="release"
 INTERMEDIATE="obj"
 
+GESTURE_RECOGNIZER_BUILD="$KEYMAN_ROOT/common/web/gesture-recognizer/build/."
+GESTURE_RECOGNIZER_TARGET="../build/engine/gesture-recognizer/"
+
 # Composites and outputs the output path corresponding to the build configuration
 # specified by the parameters.
 #
@@ -88,6 +91,7 @@ PREDICTIVE_TEXT_OUTPUT="src/test/manual/web/prediction-ui/simple-en-trie.js"
 builder_describe "Builds Keyman Engine for Web (KMW)." \
   "@../common/web/keyman-version build" \
   "@../common/web/input-processor build" \
+  "@../common/web/gesture-recognizer build:engine" \
   "@src/tools/building/sourcemap-root build" \
   "clean" \
   "configure" \
@@ -549,6 +553,15 @@ if builder_start_action build:samples; then
   echo "Copying samples & test page resources..."
   # Should probably be changed into a build script for the `prediction-ui` test page.
   cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}"
+
+  # Copy gesture-recognizer build artifacts into web-space for CI testing
+  if [ -f $GESTURE_RECOGNIZER_TARGET ]; then
+    # Note:  make sure this doesn't break once KeymanWeb actually uses the module!
+    if ! [ -d $GESTURE_RECOGNIZER_TARGET ]; then
+        mkdir -p $GESTURE_RECOGNIZER_TARGET
+    fi
+    cp -a $GESTURE_RECOGNIZER_BUILD $GESTURE_RECOGNIZER_TARGET
+  fi
 
   # Which could then have a parallel script for `prediction-mtnt` that downloads + extracts
   # the current MTNT model.
