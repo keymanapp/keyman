@@ -259,6 +259,11 @@ struct COMP_KMXPLUS_STRS {
    * @return nullptr or a pointer to the output buffer
    */
   std::u16string get(KMX_DWORD entry) const;
+
+  /**
+   * Slow search
+   */
+  KMX_DWORD find(const std::u16string&) const;
   /**
    * @brief True if section is valid.
    */
@@ -498,6 +503,14 @@ public:
   const COMP_KMXPLUS_KEY2_FLICK_ELEMENT *getFlickElements(KMX_DWORD element) const;
   const COMP_KMXPLUS_KEY2_KMAP          *getKmap(KMX_DWORD element) const;
 
+  /**
+   * Search for a key by string id.
+   * @param strID id to search for
+   * @param index on exit, index of item if found. Undefined otherwise.
+   * @return pointer to key or nullptr
+   */
+  const COMP_KMXPLUS_KEY2_KEY *findKeyByStringId(KMX_DWORD strId, KMX_DWORD &index) const;
+
 private:
   const COMP_KMXPLUS_KEY2 *key2;
   bool is_valid;
@@ -599,10 +612,11 @@ class kmx_plus {
     const COMP_KMXPLUS_TRAN *tran;
     const COMP_KMXPLUS_VKEY *vkey;
     inline bool is_valid() { return valid; }
-    bool valid; // true if valid
     COMP_KMXPLUS_LAYR_Helper layrHelper;
     COMP_KMXPLUS_LIST_Helper listHelper;
     COMP_KMXPLUS_KEY2_Helper key2Helper;
+  private:
+    bool valid; // true if valid
 };
 
 /**

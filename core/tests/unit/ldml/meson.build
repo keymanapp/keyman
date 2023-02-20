@@ -52,7 +52,7 @@ ldml = executable('ldml',
     'ldml.cpp',
     'ldml_test_source.cpp',
     cpp_args: defns + warns,
-    include_directories: [inc, libsrc],
+    include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
     link_args: links + tests_flags,
     objects: lib.extract_all_objects())
 

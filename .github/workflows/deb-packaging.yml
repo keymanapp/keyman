@@ -1,7 +1,7 @@
 name: "Ubuntu packaging"
 on:
   repository_dispatch:
-    types: ['deb-release-packaging', 'deb-pr-packaging']
+    types: ['deb-release-packaging:*', 'deb-pr-packaging:*']
 env:
   COLOR_GREEN: "\e[32m"
   GH_TOKEN: ${{ github.token }}
@@ -26,8 +26,9 @@ jobs:
     - name: Set pending status on PR builds
       id: set_status
       if: github.event.client_payload.isTestBuild == 'true'
+      shell: bash
       run: |
-        GIT_SHA=$(git rev-parse HEAD)
+        GIT_SHA="${{ github.event.client_payload.sha }}"
         echo "GIT_SHA=$GIT_SHA" >> $GITHUB_OUTPUT
         gh api \
           --method POST \
@@ -156,28 +157,55 @@ jobs:
           gpg-signing-key: "${{ secrets.GPG_SIGNING_KEY }}"
           debsign-keyid: "${{ secrets.DEBSIGN_KEYID }}"
 
-  # TODO: upload not yet possible - will need a self-hosted runner inside of
-  # the VPN to do that.
+  upload-to-llso:
+    name: Upload packages to llso
+    needs: deb_signing
+    runs-on: self-hosted
+    environment: "deploy (linux)"
+    if: github.event.client_payload.isTestBuild == 'false'
 
-  # upload-to-llso:
-  #   name: Upload packages to llso
-  #   needs: deb_signing
-  #   runs-on: ubuntu-latest
-  #   environment: "deploy (linux)"
-  #   if: ${{ ! github.event.client_payload.isTestBuild }}
+    steps:
+    - name: Download Artifacts
+      uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
+      with:
+        name: keyman-signedpkgs
+        path: artifacts
 
-  #   steps:
-  #   - name: Configure GPG Key
-  #     run: |
-  #       echo -n "${{ secrets.GPG_SIGNING_KEY }}" | base64 --decode | gpg --import
+    - name: Install dput
+      uses: ./.github/actions/apt-install
+      with:
+        packages: dput
 
-  #   - name: Download Artifacts
-  #     uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
-  #     with:
-  #       path: artifacts
+    - name: Setup .dput.cf
+      run: |
+        echo "${{vars.ENV_DPUT_CONFIG}}" > ~/.dput.cf
 
-  #   - name: Upload
-  #     run: echo "Upload..."
+    - name: Upload
+      run: |
+        case ${{ github.event.client_payload.branch }} in
+          stable-*)  destination='' ;;
+          beta)      destination='-proposed' ;;
+          *)         destination='-experimental' ;;
+        esac
+
+        cd artifacts/keyman-signedpkgs
+        ls -R
+
+        echo -e "::group::${COLOR_GREEN}Upload source package"
+        cd artifacts/keyman-srcpkg
+        dput -U llso:ubuntu/jammy${destination} *_source.changes
+        echo "::endgroup::"
+
+        echo -e "::group::${COLOR_GREEN}Uploading binary packages"
+        cd ../keyman-binarypkgs
+        pattern="keyman_${{ needs.sourcepackage.outputs.VERSION }}.+\+(.*)[0-9]_[^.]+.changes"
+        for f in *.changes; do
+          if [[ $f =~ $pattern ]]; then
+            dist=${BASH_REMATCH[1]}
+            dput -U llso:ubuntu/${dist}${destination} $f
+          fi
+        done
+        echo "::endgroup::"
 
   api_verification:
     name: Verify API for libkmnkbp0.so
@@ -212,7 +240,7 @@ jobs:
       uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
       with:
         name: libkmnkbp0-0.symbols
-        path: debian/libkmnkbp0-0.symbols
+        path: linux/debian/libkmnkbp0-0.symbols
       if: always()
 
   set_status:

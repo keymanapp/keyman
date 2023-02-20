@@ -169,37 +169,80 @@ Building packages happen in the [Keyman source tree](https://github.com/keymanap
 
 The Keyman
 [`linux/scripts/jenkins.sh`](https://github.com/keymanapp/keyman/blob/master/linux/scripts/jenkins.sh)
-script can be used to create a source package (replace `packageName` with the name of the package,
-i.e. one of keyman, kmflcomp, libkmfl, and ibus-kmfl).
+script can be used to create a source package.
 
 ```bash
 cd linux
-./scripts/jenkins.sh ${packageName} ${DEBSIGNKEY}
+./scripts/jenkins.sh keyman ${DEBSIGNKEY}
 ```
 
-This creates a source package (`<packageName>_<version>-1.dsc`) and some `*.tar.?z` files in the source root directory for `keyman`.
+This creates a source package (`keyman_<version>-1.dsc`) and some `*.tar.?z`
+files in the source root directory for `keyman`.
 
 ci-builder-script's [`build-package`](https://github.com/sillsdev/ci-builder-scripts/blob/master/bash/build-package)
 script creates the binary packages:
 
 ```bash
-cd linux/${packageName}
+cd $KEYMAN_ROOT
 ~/ci-builder-scripts/bash/build-package \
     --dists "focal bionic" --arches "amd64 i386" \
     --debkeyid ${DEBSIGNKEY} --build-in-place --no-upload
 ```
 
-This will create the binary package `<packageName>_<version>-1+<dist>1_<arch>.deb`.
+This will create the binary package `keyman_<version>-1+<dist>1_<arch>.deb`.
 
 To speed up package building you might want to limit the build to a single dist
 (e.g. `--dists "bionic"`) and arch (e.g. `--arches "amd64"`).
 
-After building packages it might be a good idea to clean up the source tree before doing further
-work:
+After building packages it might be a good idea to clean up the source tree
+before doing further work:
 
 ```bash
 git clean -dxf
 ```
+
+### Local package builds (Docker)
+
+It is possible to use the usual Debian/Ubuntu tools to create the package locally.
+For someone who only occasionally deals with packaging it might be easier to use
+the scripts that run on GitHub actions:
+
+#### Prerequisites for local package builds with Docker
+
+You'll have to create the docker image.
+
+- clone [gha-ubuntu-packaging](https://github.com/sillsdev/gha-ubuntu-packaging)
+  repo
+- create the image:
+
+  ```bash
+  cd /path/to/gha-ubuntu-packaging
+  docker build --build-arg DIST=jammy --build-arg PLATFORM=amd64 -t sillsdev/jammy .
+  ```
+
+#### Building packages with Docker
+
+- create the source package
+
+  ```bash
+  cd $KEYMAN_ROOT
+  TIER=$(cat TIER.md)
+  export TIER
+  cd linux
+  ./scripts/deb-packaging.sh source
+  ```
+
+  This will create the source package in $KEYMAN_ROOT directory.
+
+- Create the binary packages with Docker:
+
+  ```bash
+  cd $KEYMAN_ROOT
+  docker run -v $(pwd):/source -i -t -w /source --platform=linux/amd64 \
+    sillsdev/jammy keyman_*.dsc /source
+  ```
+
+  This will create the binary packages in `$KEYMAN_ROOT/artifacts`.
 
 ## Package builds on Launchpad
 
@@ -210,10 +253,10 @@ Package builds on Launchpad are triggered manually by running the Keyman script
 
 1. If you don't have one, create an account at [launchpad.net](https://launchpad.net)
 2. Request to join the ["Keyman for Linux"](https://launchpad.net/~keymanapp) team.
-3. Create a [GPG](https://help.ubuntu.com/community/GnuPrivacyGuardHowto) key and associate it
-   to your launchpad account
-4. Set the following environment variables in your `~/.profile` or `~/.bashrc` (so you don't have
-   to set them every time)
+3. Create a [GPG](https://help.ubuntu.com/community/GnuPrivacyGuardHowto) key
+   and associate it to your launchpad account
+4. Set the following environment variables in your `~/.profile` or `~/.bashrc`
+   (so you don't have to set them every time)
 
     ```bash
     export GPGKEY=[key_id] # using the `key_id` of your GPG key
@@ -224,8 +267,9 @@ Package builds on Launchpad are triggered manually by running the Keyman script
 ### Building packages on Launchpad
 
 The `launchpad.sh` script downloads the current source code (beta or stable) from
-[downloads.keyman.com](https://downloads.keyman.com/linux/stable/), creates a Debian source package
-and uploads this to launchpad. Launchpad then rebuilds for the different distros and architectures.
+[downloads.keyman.com](https://downloads.keyman.com/linux/stable/), creates a
+Debian source package and uploads this to launchpad. Launchpad then rebuilds
+for the different distros and architectures.
 
 To upload the packages to launchpad, run the following script from the `linux/` directory:
 
@@ -239,14 +283,15 @@ To upload the packages to launchpad, run the following script from the `linux/` 
 - `TIER="<tier>"` - alpha, beta, or stable, default from `../TIER.md`
 - `PROJECT="<project>"` - only upload this package
 - `DIST="<dist>"` - only upload for this distribution
-- `PACKAGEVERSION="<version>"` - normally use the default so don't specify it. But if you
-  change packaging and run another upload you need to increment the number at the end of
-  `PACKAGEVERSION`. e.g. next one is `1~sil2` then `1~sil3`…
+- `PACKAGEVERSION="<version>"` - normally use the default so don't specify
+  it. But if you change packaging and run another upload you need to increment
+  the number at the end of `PACKAGEVERSION`. e.g. next one is `1~sil2` then
+  `1~sil3`…
 
 ### Releasing a new version
 
-As part of releasing a new version it might be good to do some local testing first before uploading
-to Launchpad:
+As part of releasing a new version it might be good to do some local testing
+first before uploading to Launchpad:
 
 - Run `launchpad.sh` with `UPLOAD="no"` to build the packages
 - Then install them on a clean VM and make sure no glaring bugs
@@ -268,11 +313,12 @@ accepted.
 The Keyman packages are maintained on the Debian side by the
 [Debian Input Method Team](https://wiki.debian.org/Teams/IMEPackagingTeam).
 
-**NOTE:** All `changelog` files should contain the exact same entry that was previously
-accepted into the Debian repo (plus the new entry for the new update). This means that
-when your upload got accepted into Debian (not <mentors.debian.net>) you'll have to
-update the `changelog` files to match what got accepted (sometimes the Debian maintainers
-will create additional package versions).
+**NOTE:** All `changelog` files should contain the exact same entry that was
+previously accepted into the Debian repo (plus the new entry for the new
+update). This means that when your upload got accepted into Debian (not
+<mentors.debian.net>) you'll have to update the `changelog` files to match
+what got accepted (sometimes the Debian maintainers will create additional
+package versions).
 
 ### Prerequisites
 
@@ -290,29 +336,40 @@ will create additional package versions).
   allowed_distributions = .*
   ```
 
-- subscribe to the [debian-input-method](debian-input-method@lists.debian.org) mailing list
+- subscribe to the [debian-input-method](https://lists.debian.org/debian-input-method/)
+  mailing list
 
-### Updating and uploading Debian package
+### Updating and uploading a stable release to Debian
 
-This is done in several steps:
-
-1. Download the source code from <download.keyman.com> and create the source package by running
-   `scripts/debian.sh`
-2. sign the source package (you might be able to omit this step if the source package already
-   got signed with the correct key in the previous step)
-3. upload to mentors
-4. file a RFS bug (Request For Sponsorship) against the `sponsorship-requests` pseudo-package,
-   cc'ing `debian-input-method`, or just send an email to the `debian-input-method` list.
-
-After the package got published in Debian you should update the `linux/debian/changelog` file
-with the exact same information that the changelog in Debian has.
-
-The first three steps above and updating the changelog file can be done by running
-the following script:
+To do this you can run the `linux/scripts/upload-to-debian.sh` script:
 
 ```bash
-linux/scripts/upload-to-debian.sh -k $DEBSIGN_KEYID --push
+linux/scripts/upload-to-debian.sh -k ${DEBSIGNKEY} --push
 ```
+
+This does several steps:
+
+1. Download the source code from <download.keyman.com> and create the source
+   package by running `scripts/debian.sh`
+2. sign the source package
+3. upload to mentors (unless `-n` is passed)
+4. Create a branch with the updated `linux/debian/changelog` file based on the
+   stable branch
+5. Cherry-pick the change on a new branch based on `master`
+6. If `--push` is passed, the two branches will be pushed to GitHub
+
+There are a few additional manual required steps:
+
+1. Create a draft-PR for the change against stable branch
+2. Create a draft PR for the cherry-picked change against `master`
+3. file a RFS bug (Request For Sponsorship) against the `sponsorship-requests`
+   pseudo-package, cc'ing `debian-input-method`, or just send an email to the
+   `debian-input-method` list.
+
+After the package got published in Debian you can mark the PRs as ready
+for review. This should only be done after the package got published in
+Debian because the changelog file needs to contain the exact same
+information that the changelog in Debian has.
 
 ## Reference
 
