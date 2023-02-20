@@ -15,15 +15,7 @@
 
 namespace kmcmp {
 
-  WCHAR conv_KMX_WCHAR__TO__WCHAR(KMX_WCHAR in) {
-    //  char16_t -> std::u16string -> std::string -> std::wstring -> wchar_t*
-    std::u16string u16str(&in);
-    std::string stri = string_from_u16string(u16str);
-    std::wstring  wstr = wstring_from_string(stri);
-    return *wstr.c_str();
-  }
-
-  std::wstring MakeHashKeyFromFileKey16(PFILE_KEY kp) {
+  std::wstring MakeHashKeyFromFileKey(PFILE_KEY kp) {
     std::wstringstream Key_16;
     std::wstring Context_ws = u16fmt((const PKMX_WCHAR) kp->dpContext);
 
@@ -42,7 +34,7 @@ KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
   std::unordered_set<int> reportedLines;
 
   for (i = 0; i < gp->cxKeyArray; i++, kp++) {
-    std::wstring key = kmcmp::MakeHashKeyFromFileKey16(kp);
+    std::wstring key = kmcmp::MakeHashKeyFromFileKey(kp);
     if (map.count(key) > 0) {
       FILE_KEY const & k1 = map.at(key);
       if (kp->Line != k1.Line && reportedLines.count(kp->Line) == 0) {
