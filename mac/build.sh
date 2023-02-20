@@ -81,7 +81,7 @@ assertOptionsPrecedeTargets() {
 }
 
 do_clean ( ) {
-  echo_heading "Cleaning source (Carthage)"
+  builder_heading "Cleaning source (Carthage)"
 #  rm -rf $KME4M_BUILD_PATH
 #  rm -rf $APP_BUILD_PATH
   rm -rf $KEYMAN_MAC_BASE_PATH/Carthage
@@ -354,7 +354,7 @@ execCodeSign() {
 ### Build Keyman Engine (kmx processor) ###
 
 if $DO_KEYMANENGINE ; then
-    echo_heading "Building Keyman Engine"
+    builder_heading "Building Keyman Engine"
     execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS $TEST_ACTION -scheme $ENGINE_NAME"
     execBuildCommand "$ENGINE_NAME dSYM file" "dsymutil \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Versions/A/$ENGINE_NAME\" -o \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework.dSYM\""
     updatePlist "$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Resources/Info.plist" "Keyman Engine"
@@ -368,7 +368,7 @@ if $DO_KEYMANIM ; then
         $(dirname "$THIS_SCRIPT")/build-help.sh html
     fi
 
-    echo_heading "Building Keyman.app"
+    builder_heading "Building Keyman.app"
     cd "$KM4MIM_BASE_PATH"
     if $DO_PODS ; then
         pod update
@@ -425,7 +425,7 @@ fi
 ### Build test app ###
 
 if $DO_KEYMANTESTAPP ; then
-    echo_heading "Building test app"
+    builder_heading "Building test app"
     execBuildCommand $TESTAPP_NAME "xcodebuild -project \"$KMTESTAPP_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS"
     updatePlist "$KMTESTAPP_BASE_PATH/build/$CONFIG/$TESTAPP_NAME.app/Contents/Info.plist" "Keyman Test App"
 fi
@@ -433,7 +433,7 @@ fi
 ### Notarize the app for preprelease ###
 
 if $PREPRELEASE || $NOTARIZE; then
-  echo_heading "Notarizing app"
+  builder_heading "Notarizing app"
   if [ "${CODESIGNING_SUPPRESSION}" != "" ] && [ -z "${CERTIFICATE_ID}" ]; then
     builder_die "Notarization and signed executable is required for deployment, even locally. Specify CERTIFICATE_ID environment variable for custom certificate."
   else
@@ -446,15 +446,15 @@ if $PREPRELEASE || $NOTARIZE; then
 
     # We may need to re-run the code signing if a custom certificate has been passed in
     if [ ! -z "${CERTIFICATE_ID}" ]; then
-      echo_heading "Signing with custom certificate (CERTIFICATE_ID environment variable)."
+      builder_heading "Signing with custom certificate (CERTIFICATE_ID environment variable)."
       codesign --force --options runtime --entitlements Keyman4MacIM/Keyman.entitlements --deep --sign "${CERTIFICATE_ID}" "$TARGET_APP_PATH"
     fi
 
-    echo_heading "Zipping Keyman.app for notarization to $TARGET_ZIP_PATH"
+    builder_heading "Zipping Keyman.app for notarization to $TARGET_ZIP_PATH"
 
     /usr/bin/ditto -c -k --keepParent "$TARGET_APP_PATH" "$TARGET_ZIP_PATH"
 
-    echo_heading "Uploading Keyman.zip to Apple for notarization"
+    builder_heading "Uploading Keyman.zip to Apple for notarization"
 
     xcrun altool --notarize-app --primary-bundle-id "com.Keyman.im.zip" --asc-provider "$APPSTORECONNECT_PROVIDER" --username "$APPSTORECONNECT_USERNAME" --password @env:APPSTORECONNECT_PASSWORD --file "$TARGET_ZIP_PATH" --output-format xml > $ALTOOL_LOG_PATH || (
       ALTOOL_CODE=$?
@@ -494,12 +494,12 @@ if $PREPRELEASE || $NOTARIZE; then
       fi
     done
 
-    echo_heading "Notarization completed successfully. Review logs below for any warnings."
+    builder_heading "Notarization completed successfully. Review logs below for any warnings."
     cat "$ALTOOL_LOG_PATH"
     ALTOOL_LOG_URL=$(/usr/libexec/PlistBuddy -c "Print notarization-info:LogFileURL" "$ALTOOL_LOG_PATH")
     curl "$ALTOOL_LOG_URL"
     echo
-    echo_heading "Attempting to staple notarization to Keyman.app"
+    builder_heading "Attempting to staple notarization to Keyman.app"
     xcrun stapler staple "$TARGET_APP_PATH" || builder_die "stapler failed"
   fi
 fi
@@ -507,7 +507,7 @@ fi
 ### Deploy as requested ###
 
 if $LOCALDEPLOY ; then
-    echo_heading "Attempting local deployment with command:"
+    builder_heading "Attempting local deployment with command:"
     KM4MIM_APP_BASE_PATH="$KM4MIM_BASE_PATH/build/$CONFIG"
     displayInfo "$KM4MIM_BASE_PATH/localdeploy.sh \"$KM4MIM_APP_BASE_PATH\""
     eval "$KM4MIM_BASE_PATH/localdeploy.sh" "$KM4MIM_APP_BASE_PATH"
@@ -517,7 +517,7 @@ if $LOCALDEPLOY ; then
         builder_die "Local deployment failed!"
     fi
 elif $PREPRELEASE ; then
-    echo_heading "Preparing files for release deployment..."
+    builder_heading "Preparing files for release deployment..."
     # Create the disk image
     pushd setup
     eval "./build.sh"
@@ -539,5 +539,5 @@ elif $PREPRELEASE ; then
     fi
 fi
 
-echo_heading "Build Succeeded!"
+builder_heading "Build Succeeded!"
 exit 0

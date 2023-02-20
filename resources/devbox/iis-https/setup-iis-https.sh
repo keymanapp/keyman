@@ -13,7 +13,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 echo_heading2() {
   echo ""
-  echo_heading "$*"
+  builder_heading "$*"
 }
 
 if [[ $BUILDER_OS != win ]]; then

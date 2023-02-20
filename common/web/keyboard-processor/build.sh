@@ -52,7 +52,7 @@ fi
 if builder_start_action test; then
   npm run tsc -- --build "$THIS_SCRIPT_PATH/src/tsconfig.bundled.json"
 
-  echo_heading "Running Keyboard Processor test suite"
+  builder_heading "Running Keyboard Processor test suite"
 
   FLAGS=
   if builder_has_option --ci; then

@@ -73,7 +73,7 @@ if ! git diff --quiet; then
     builder_die "You have changed files in your git working directory. Exiting."
 fi
 
-echo_heading "Fetching latest changes"
+builder_heading "Fetching latest changes"
 git fetch -p origin
 stable_branch=$(git branch -r | grep origin/stable- | sort | tail -1)
 stable_branch=${stable_branch##* }
@@ -88,16 +88,16 @@ else
 fi
 
 cd "$KEYMAN_ROOT/linux"
-echo_heading "Building source package"
+builder_heading "Building source package"
 DIST=unstable DEBREVISION=$REVISION scripts/debian.sh
 cd debianpackage/
-echo_heading "Signing source package"
+builder_heading "Signing source package"
 debsign -k"$DEBKEYID" --re-sign ./*.changes
-echo_heading "Uploading packages to mentors.debian.net"
+builder_heading "Uploading packages to mentors.debian.net"
 $NOOP dput mentors ./*.changes
 cd ..
 
-echo_heading "Updating changelog"
+builder_heading "Updating changelog"
 # base changelog branch on remote stable branch
 git checkout -B chore/linux/changelog "$stable_branch"
 cp debianpackage/keyman-*/debian/changelog debian/
@@ -119,7 +119,7 @@ if [ -n "$PUSH" ]; then
     $NOOP git push --force-with-lease origin chore/linux/cherry-pick/changelog
 fi
 
-echo_heading "Finishing"
+builder_heading "Finishing"
 if $ISBETA; then
     git checkout beta
 else

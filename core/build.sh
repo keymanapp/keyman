@@ -179,14 +179,14 @@ build_windows() {
 
   if $BUILD_CPP; then
     if $TESTS_CPP; then
-      echo_heading "======= Building and Testing C++ library for Windows (x86, x64) ======="
+      builder_heading "======= Building and Testing C++ library for Windows (x86, x64) ======="
       cmd //C build.bat all $MESON_TARGET build tests
     else
-      echo_heading "======= Building C++ library for Windows (x86, x64) ======="
+      builder_heading "======= Building C++ library for Windows (x86, x64) ======="
       cmd //C build.bat all $MESON_TARGET build
     fi
   elif $TESTS_CPP; then
-    echo_heading "======= Testing C++ library for Windows (x86, x64) ======="
+    builder_heading "======= Testing C++ library for Windows (x86, x64) ======="
     cmd //C build.bat all $MESON_TARGET tests
   fi
 }
@@ -205,35 +205,35 @@ build_standard() {
 
   # Build meson targets
   if $CONFIGURE; then
-    echo_heading "======= Configuring C++ library for $BUILD_PLATFORM ======="
+    builder_heading "======= Configuring C++ library for $BUILD_PLATFORM ======="
     pushd "$THIS_SCRIPT_PATH" > /dev/null
     meson setup "$MESON_PATH" --werror --buildtype $MESON_TARGET $STANDARD_MESON_ARGS $ADDITIONAL_ARGS
     popd > /dev/null
   fi
 
   if $BUILD_CPP; then
-    echo_heading "======= Building C++ library for $BUILD_PLATFORM ======="
+    builder_heading "======= Building C++ library for $BUILD_PLATFORM ======="
     pushd "$MESON_PATH" > /dev/null
     ninja
     popd > /dev/null
   fi
 
   if $TESTS_CPP; then
-    echo_heading "======= Testing C++ library for $BUILD_PLATFORM ======="
+    builder_heading "======= Testing C++ library for $BUILD_PLATFORM ======="
     pushd "$MESON_PATH" > /dev/null
     meson test --print-errorlogs
     popd > /dev/null
   fi
 
   if $INSTALL_CPP; then
-    echo_heading "======= Installing C++ libraries for $BUILD_PLATFORM ======="
+    builder_heading "======= Installing C++ libraries for $BUILD_PLATFORM ======="
     pushd "$MESON_PATH" > /dev/null
     ninja install
     popd > /dev/null
   fi
 
   if $UNINSTALL_CPP; then
-    echo_heading "======= Uninstalling C++ libraries for $BUILD_PLATFORM ======="
+    builder_heading "======= Uninstalling C++ libraries for $BUILD_PLATFORM ======="
     pushd "$MESON_PATH" > /dev/null
     ninja uninstall
     popd > /dev/null

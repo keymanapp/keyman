@@ -48,10 +48,6 @@ verify_platform() {
 # which is already required for scripts so these should be safe.
 # (part of TODO: consolidate these two scripts)
 
-echo_heading() {
-  echo -e "${HEADING_SETMARK}${COLOR_BLUE}$*${COLOR_RESET}"
-}
-
 log_error() {
   echo "${COLOR_RED}$THIS_SCRIPT_NAME: $*${COLOR_RESET}" >&2
 }

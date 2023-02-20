@@ -83,11 +83,11 @@ TARGET_ZIP_PATH="$TARGETPATH/Install Keyman.zip"
 TARGET_APP_PATH="$TARGETAPP"
 ALTOOL_LOG_PATH="$TARGETPATH/altool.log"
 
-echo_heading "Zipping Install Keyman.app for notarization to $TARGET_ZIP_PATH"
+builder_heading "Zipping Install Keyman.app for notarization to $TARGET_ZIP_PATH"
 
 /usr/bin/ditto -c -k --keepParent "$TARGET_APP_PATH" "$TARGET_ZIP_PATH"
 
-echo_heading "Uploading Install Keyman.zip to Apple for notarization"
+builder_heading "Uploading Install Keyman.zip to Apple for notarization"
 
 xcrun altool --notarize-app --primary-bundle-id "com.Keyman.install.zip" --asc-provider "$APPSTORECONNECT_PROVIDER" --username "$APPSTORECONNECT_USERNAME" --password @env:APPSTORECONNECT_PASSWORD --file "$TARGET_ZIP_PATH" --output-format xml > $ALTOOL_LOG_PATH || builder_die "altool failed"
 cat "$ALTOOL_LOG_PATH"
@@ -113,12 +113,12 @@ do
     fi
 done
 
-echo_heading "Notarization completed successfully. Review logs below for any warnings."
+builder_heading "Notarization completed successfully. Review logs below for any warnings."
 cat "$ALTOOL_LOG_PATH"
 ALTOOL_LOG_URL=$(/usr/libexec/PlistBuddy -c "Print notarization-info:LogFileURL" "$ALTOOL_LOG_PATH")
 curl "$ALTOOL_LOG_URL"
 echo
-echo_heading "Attempting to staple notarization to Install Keyman.app"
+builder_heading "Attempting to staple notarization to Install Keyman.app"
 xcrun stapler staple "$TARGET_APP_PATH" || builder_die "stapler failed"
 
 # Done.

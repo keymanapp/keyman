@@ -200,7 +200,7 @@ update_bundle ( ) {
     fi
 
     if [ $DO_KMP_DOWNLOADS = true ]; then
-      echo_heading "Downloading up-to-date packages for default resources"
+      builder_heading "Downloading up-to-date packages for default resources"
 
       downloadKeyboardPackage "$DEFAULT_KBD_ID" "$base_dir/$BUNDLE_PATH/$DEFAULT_KBD_ID.kmp"
       downloadModelPackage "$DEFAULT_LM_ID" "$base_dir/$BUNDLE_PATH/$DEFAULT_LM_ID.model.kmp"

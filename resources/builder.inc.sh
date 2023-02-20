@@ -132,6 +132,11 @@ function builder_warn() {
   echo "${COLOR_YELLOW}$*${COLOR_RESET}"
 }
 
+function builder_heading() {
+  echo -e "${HEADING_SETMARK}${COLOR_BLUE}$*${COLOR_RESET}"
+}
+
+
 ####################################################################################
 #
 # builder_ functions for standard build script parameter and process management
