@@ -172,16 +172,16 @@ export default class FloatingOSKView extends OSKView {
     var p = this.getPos();
 
     const c: FloatingOSKCookie = {
-      visible: this.displayIfActive ? '1' : '0',
-      userSet: this.userPositioned ? '1' : '0',
-      left: '' + p.left,
-      top: '' + p.top,
+      visible: this.displayIfActive ? 1 : 0,
+      userSet: this.userPositioned ?  1 : 0,
+      left: p.left,
+      top:  p.top,
       _version: Version.CURRENT.toString()
     }
 
     if(this.vkbd) {
-      c.width = '' + this.width.val;
-      c.height = '' + this.height.val;
+      c.width =  this.width.val;
+      c.height = this.height.val;
     }
 
     this.layoutSerializer.save(c as Required<FloatingOSKCookie>);
@@ -193,28 +193,26 @@ export default class FloatingOSKView extends OSKView {
    *  @return {boolean}
    */
   loadCookie(): void {
-    function parseIntWithDefault(str: string, fallback: number) {
-      let val = Number.parseInt(str, 10);
-      return isNaN(val) ? fallback: val;
-    }
+    let c = this.layoutSerializer.loadWithDefaults({
+      visible: 1,
+      userSet: 0,
+      left: -1,
+      top: -1,
+      _version: undefined,
+      width:  0.3*screen.width,
+      height: 0.15*screen.height
+    });
 
-    let c = this.layoutSerializer.load();
-
-    this.activationModel.enabled = parseIntWithDefault(c.visible, 1) == 1;
-    this.userPositioned = parseIntWithDefault(c.userSet, 0) == 1;
-    this.x = parseIntWithDefault(c.left,-1);
-    this.y = parseIntWithDefault(c.top,-1);
-    let cookieVersionString = c._version;
+    this.activationModel.enabled = c.visible == 1;
+    this.userPositioned = c.userSet == 1;
+    this.x = c.left;
+    this.y = c.top;
+    const cookieVersionString = c._version;
 
     // Restore OSK size - font size now fixed in relation to OSK height, unless overridden (in em) by keyboard
-    let dfltWidth=0.3*screen.width;
-    let dfltHeight=0.15*screen.height;
-
-    let newWidth  = parseInt(c.width, 10);
-    let newHeight = parseInt(c.height, 10);
-    let isNewCookie = isNaN(newHeight);
-    newWidth  = isNaN(newWidth)  ? dfltWidth  : newWidth;
-    newHeight = isNaN(newHeight) ? dfltHeight : newHeight;
+    const isNewCookie = cookieVersionString === undefined;
+    let newWidth  = c.width;
+    let newHeight = c.height;
 
     // Limit the OSK dimensions to reasonable values
     if(newWidth < 0.2*screen.width) {
