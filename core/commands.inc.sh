@@ -8,7 +8,6 @@ do_clean() {
   # clean: note build/<target> will be left, but build/<target>/<configuration> should be gone
   local target=$1
   builder_start_action clean:$target || return 0
-
   rm -rf "$MESON_PATH"
   builder_finish_action success clean:$target
 }
@@ -21,7 +20,7 @@ do_configure() {
   local target=$1
   builder_start_action configure:$target || return 0
 
-  local STANDARD_MESON_ARGS=
+  local STANDARD_MESON_ARGS="$MESON_OPTION_keyman_core_tests"
 
   echo_heading "======= Configuring $target ======="
 
@@ -29,17 +28,14 @@ do_configure() {
     # do_configure_wasm
     locate_emscripten
     build_meson_cross_file_for_wasm
-    STANDARD_MESON_ARGS="--cross-file wasm.defs.build --cross-file wasm.build --default-library static"
+    STANDARD_MESON_ARGS="$MESON_OPTION_keyman_core_tests --cross-file wasm.defs.build --cross-file wasm.build --default-library static"
   fi
 
-  if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $CONFIGURATION configure "${builder_extra_params[@]}"
-  else
-    pushd "$THIS_SCRIPT_PATH" > /dev/null
-    # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
-    meson setup "$MESON_PATH" --werror --buildtype $CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
-    popd > /dev/null
-  fi
+  pushd "$THIS_SCRIPT_PATH" > /dev/null
+  # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
+  meson setup "$MESON_PATH" --werror --buildtype $CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
+  popd > /dev/null
+
   builder_finish_action success configure:$target
 }
 
@@ -50,21 +46,7 @@ do_configure() {
 do_build() {
   local target=$1
   builder_start_action build:$target || return 0
-
-  echo_heading "======= Building $target ======="
-
-  if [[ $target =~ ^(x86|x64)$ ]]; then
-    # Build the meson targets, both x86 and x64 also
-    # We need to use a batch file here so we can get
-    # the Visual Studio build environment with vcvarsall.bat
-    # TODO: if PATH is the only variable required, let's try and
-    #       eliminate this difference in the build process
-    cmd //C build.bat $target $CONFIGURATION build "${builder_extra_params[@]}"
-  else
-    pushd "$MESON_PATH" > /dev/null
-    ninja
-    popd > /dev/null
-  fi
+  meson compile -C "$MESON_PATH"
   builder_finish_action success build:$target
 }
 
@@ -75,16 +57,7 @@ do_build() {
 do_test() {
   local target=$1
   builder_start_action test:$target || return 0
-
-  echo_heading "======= Testing $target ======="
-
-  if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $CONFIGURATION test "${builder_extra_params[@]}"
-  else
-    pushd "$MESON_PATH" > /dev/null
-    meson test "${builder_extra_params[@]}"
-    popd > /dev/null
-  fi
+  meson test -C "$MESON_PATH" "${builder_extra_params[@]}"
   builder_finish_action success test:$target
 }
 
@@ -104,9 +77,7 @@ do_command() {
   local command=$1
   local target=$2
   builder_start_action $command:$target || return 0
-  pushd "$MESON_PATH" > /dev/null
-  ninja $command
-  popd > /dev/null
+  meson $command -C "$MESON_PATH"
   builder_finish_action success $command:$target
 }
 

@@ -54,7 +54,7 @@ ldml = executable('ldml',
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
     link_args: links + tests_flags,
-    objects: lib.extract_all_objects())
+    objects: lib.extract_all_objects(recursive: false))
 
 # Run tests on all keyboards (`tests` defined in keyboards/meson.build)
 
@@ -79,5 +79,5 @@ e = executable('test_kmx_plus', 'test_kmx_plus.cpp',
     cpp_args: defns + warns,
     include_directories: [inc, libsrc],
     link_args: links + tests_flags,
-    objects: lib.extract_all_objects())
+    objects: lib.extract_all_objects(recursive: false))
 test('test_kmx_plus', e, suite: 'ldml')

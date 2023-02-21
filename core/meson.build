@@ -6,7 +6,7 @@
 #
 
 project('keyboardprocessor', 'cpp', 'c',
-        version: run_command(find_program('getversion.bat', 'getversion.sh')).stdout().strip(),
+        version: run_command(find_program('getversion.bat', 'getversion.sh'), check:true).stdout().strip(),
         license: 'MIT',
         default_options : ['buildtype=release',
                            'cpp_std=c++14',
@@ -44,4 +44,10 @@ endif
 subdir('doc')
 subdir('include')
 subdir('src')
-subdir('tests')
+
+if get_option('keyman_core_tests')
+  message('option "keyman_core_tests" is true, enabling tests')
+  subdir('tests')
+else
+  message('option "keyman_core_tests" is false, disabling tests')
+endif
