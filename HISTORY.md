@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.53 alpha 2023-02-21
+
+* chore(windows): Remove old Kannada setup strings (#8257)
+* fix(linux): Collect consecutive backspaces (#8274)
+* chore(linux): Improve deb-packaging GHA (#8281)
+* chore(linux): Cleanup GHA (#8282)
+
 ## 17.0.52 alpha 2023-02-20
 
 * fix(windows): use min-width allow to expand (#8215)
