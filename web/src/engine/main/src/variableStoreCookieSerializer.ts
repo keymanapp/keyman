@@ -1,24 +1,35 @@
 import { VariableStore, VariableStoreSerializer } from "@keymanapp/keyboard-processor";
+import { CookieSerializer } from "keyman/build/engine/dom-utils/obj/index.js";
+
+// While there's little reason we couldn't store all of a keyboard's store values within
+// the same cookie... that's not what we had implemented in the last pre-es-module version
+// of KeymanWeb.  We're keeping this transformation _very_ straightforward.
+//
+// Also of note:  there's nothing we can do to allow TS to provide type-checking of
+// dynamic property names; they'd have to be known at compile time to facilitate
+// strict type checking.
+class VarStoreSerializer extends CookieSerializer<VariableStore> {
+  constructor(keyboardID: string, storeName: string) {
+    super(`KeymanWeb_${keyboardID}_Option_${storeName}`);
+  }
+
+  load() {
+    return super.load(decodeURIComponent);
+  }
+
+  save(storeMap: VariableStore) {
+    super.save(storeMap, encodeURIComponent);
+  }
+}
 
 export class VariableStoreCookieSerializer implements VariableStoreSerializer {
   loadStore(keyboardID: string, storeName: string): VariableStore {
-    var cName='KeymanWeb_'+keyboardID+'_Option_'+storeName;
-    let map = com.keyman.singleton.util.loadCookie(cName) as VariableStore;
-
-    if(typeof map[storeName] != 'undefined') {
-      // Since it was stored in a cookie.
-      map[storeName] = decodeURIComponent(map[storeName]);
-    }
-
-    return map || {};
+    const storeCookieSerializer = new VarStoreSerializer(keyboardID, storeName);
+    return storeCookieSerializer.load();
   }
 
   saveStore(keyboardID: string, storeName: string, storeMap: VariableStore) {
-    // The cookie entry includes the store name...
-    var cName='KeymanWeb_'+keyboardID+'_Option_'+storeName;
-    storeMap[storeName] = encodeURIComponent(storeMap[storeName]);
-
-    // And the lookup under that entry looks for the value under the store name, again.
-    com.keyman.singleton.util.saveCookie(cName, storeMap);
+    const storeCookieSerializer = new VarStoreSerializer(keyboardID, storeName);
+    storeCookieSerializer.save(storeMap);
   }
 }
