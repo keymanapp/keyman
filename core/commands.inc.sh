@@ -29,14 +29,16 @@ do_configure() {
     locate_emscripten
     build_meson_cross_file_for_wasm
     STANDARD_MESON_ARGS="$STANDARD_MESON_ARGS --cross-file wasm.defs.build --cross-file wasm.build --default-library static"
-  elif [[ $target =~ ^(x86|x64)$ ]]; then
-    STANDARD_MESON_ARGS="$STANDARD_MESON_ARGS --default-library both"
   fi
 
-  pushd "$THIS_SCRIPT_PATH" > /dev/null
-  # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
-  meson setup "$MESON_PATH" --werror --buildtype $CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
-  popd > /dev/null
+  if [[ $target =~ ^(x86|x64)$ ]]; then
+    cmd //C build.bat $target $CONFIGURATION configure "$BUILD_BAT_keyman_core_tests" "${builder_extra_params[@]}"
+  else
+    pushd "$THIS_SCRIPT_PATH" > /dev/null
+    # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
+    meson setup "$MESON_PATH" --werror $CROSS_FILE --buildtype $CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
+    popd > /dev/null
+  fi
 
   builder_finish_action success configure:$target
 }
@@ -48,7 +50,9 @@ do_configure() {
 do_build() {
   local target=$1
   builder_start_action build:$target || return 0
-  if $MESON_LOW_VERSION; then
+  if [[ $target =~ ^(x86|x64)$ ]]; then
+    cmd //C build.bat $target $CONFIGURATION build "${builder_extra_params[@]}"
+  elif $MESON_LOW_VERSION; then
     pushd "$MESON_PATH" > /dev/null
     ninja
     popd
@@ -65,7 +69,11 @@ do_build() {
 do_test() {
   local target=$1
   builder_start_action test:$target || return 0
-  meson test -C "$MESON_PATH" "${builder_extra_params[@]}"
+  if [[ $target =~ ^(x86|x64)$ ]]; then
+    cmd //C build.bat $target $CONFIGURATION test "${builder_extra_params[@]}"
+  else
+    meson test -C "$MESON_PATH" "${builder_extra_params[@]}"
+  fi
   builder_finish_action success test:$target
 }
 
@@ -94,7 +102,7 @@ do_uninstall() {
   # this probably won't work on Windows
   ninja uninstall
   popd > /dev/null
-  builder_finish_action success uninsatll:$target
+  builder_finish_action success uninstall:$target
 }
 
 # ----------------------------------------------------------------------------

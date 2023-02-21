@@ -79,9 +79,11 @@ builder_parse "$@"
 # in CI
 #
 MESON_OPTION_keyman_core_tests=
+BUILD_BAT_keyman_core_tests=
 
 if builder_is_dep_build || builder_has_option --no-tests; then
   MESON_OPTION_keyman_core_tests="-Dkeyman_core_tests=false"
+  BUILD_BAT_keyman_core_tests=--no-tests
   builder_remove_dep /common/tools/hextobin
   builder_remove_dep /common/web/keyman-version
   builder_remove_dep /developer/src/kmc
