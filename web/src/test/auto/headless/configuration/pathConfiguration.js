@@ -1,12 +1,11 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import PathConfiguration from '../../../../../build/engine/configuration/obj/pathConfiguration.js';
-import { OptionDefaults } from '../../../../../build/engine/configuration/obj/optionSpec.interface.js';
+import { OptionDefaults, PathConfiguration } from 'keyman/engine/configuration';
 
 // Tests the activation-state logic abstraction & implementations used to model and control OSK visibility.
 
-describe.only("Path Configuration", () => {
+describe("Path Configuration", () => {
   it('https://test.site.com/folder/, default options', () => {
     const paths = new PathConfiguration(OptionDefaults, 'https://test.site.com/folder/');
 
