@@ -113,7 +113,7 @@ describe("Cloud-query interface", () => {
 
       assert.equal(stubs.length, 2);
       for(let stub of stubs) {
-        assert.equal(stub.KI, 'sil_euro_latin');
+        assert.equal(stub.KI, 'Keyboard_sil_euro_latin');
         assert.equal(stub.KN, "EuroLatin (SIL)");
       }
 
@@ -129,7 +129,7 @@ describe("Cloud-query interface", () => {
 
       assert.equal(stubs.length, 278);
       for(let stub of stubs) {
-        assert.equal(stub.KI, 'sil_cameroon_azerty');
+        assert.equal(stub.KI, 'Keyboard_sil_cameroon_azerty');
         assert.equal(stub.KN, "Cameroon AZERTY");
       }
 
