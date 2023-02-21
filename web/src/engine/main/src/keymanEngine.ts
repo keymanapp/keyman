@@ -1,9 +1,9 @@
-import { default as Configuration } from "keyman/build/engine/configuration/obj/configuration.js";
+import { Configuration } from "keyman/engine/configuration";
 import { Keyboard, KeyboardKeymanGlobal, ManagedPromise, OutputTarget } from "@keymanapp/keyboard-processor";
-import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/build/obj/keyboards/loaders/dom-keyboard-loader.js";
+import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
 import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
-import { OSKView } from "keyman/build/engine/osk/obj/index.js";
-import { StubAndKeyboardCache } from "keyman/build/engine/keyboard-cache/obj/index.js";
+import { OSKView } from "keyman/engine/osk";
+import { StubAndKeyboardCache } from "keyman/engine/keyboard-cache";
 
 import KeyboardInterface from "./keyboardInterface.js";
 import ContextManager from "./contextManager.js";

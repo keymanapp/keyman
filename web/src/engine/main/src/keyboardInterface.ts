@@ -3,7 +3,7 @@ import {
   KeyboardInterface as KeyboardInterfaceBase,
   KeyboardKeymanGlobal,
 } from "@keymanapp/keyboard-processor";
-import { KeyboardStub, StubAndKeyboardCache } from '../../../../build/engine/keyboard-cache/obj/index.js';
+import { KeyboardStub, StubAndKeyboardCache } from 'keyman/engine/keyboard-cache';
 
 import ContextManager from './contextManager.js';
 import { VariableStoreCookieSerializer } from "./variableStoreCookieSerializer.js";
