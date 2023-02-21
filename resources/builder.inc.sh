@@ -313,6 +313,8 @@ _builder_run_child_action() {
           if [ -f "$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh" ]; then
             _builder_execute_child $action $target
           fi
+        else
+          builder_warn "NO ACTION $action$target"
         fi
       done
     else
@@ -348,6 +350,44 @@ builder_run_child_actions() {
   while [[ $# -gt 0 ]]; do
     local action="$1"
     _builder_run_child_action "$action"
+    shift
+  done
+}
+
+_builder_run_dep_action() {
+  local action="$1"
+  local options="$2"
+
+  for dep in "${_builder_deps[@]}"; do
+    if [ -f "$KEYMAN_ROOT/$dep/build.sh" ]; then
+        builder_heading "======= ${action} == on dependency $dep ========"
+      "${SHELL}" "$KEYMAN_ROOT/$dep/build.sh" ${options} "${action}" || builder_die "Failed: ${dep} ${action}"
+    else
+      builder_die "Missing: $KEYMAN_ROOT/$dep/build.sh"
+    fi
+  done
+}
+
+#
+# Executes the specified actions on all dependencies
+#
+# ### Usage
+#
+# ```bash
+# builder_run_dep_actions --no-deps clean
+# builder_run_dep_actions --no-deps configure build test install
+# ````
+builder_run_dep_actions() {
+  opts=()
+  while [[ $# -gt 0 ]]; do
+    local action="$1"
+    if [[ $action =~ ^-- ]];
+    then
+      # add option flag
+      opts+=("${action}")
+    else
+      _builder_run_dep_action "$action" "${opts[*]}"
+    fi
     shift
   done
 }

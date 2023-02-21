@@ -8,7 +8,8 @@
   },
   "scripts": {
     "build": "echo 'Building @keymanapp/keyman-version' && tsc -b",
-    "clean": "tsc -b --clean"
+    "clean": "tsc -b --clean",
+    "test": "echo 'TODO-LDML: test case'"
   },
   "license": "MIT",
   "devDependencies": {

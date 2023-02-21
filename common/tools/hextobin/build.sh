@@ -19,14 +19,14 @@ cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
-builder_describe "Build hextobin" clean configure build
+builder_describe "Build hextobin" clean configure build test
 builder_describe_outputs \
   configure /node_modules \
   build     build/index.js
 builder_parse "$@"
 
 if builder_start_action clean; then
-  npm run clean
+  npm run clean || builder_warn "npm run clean failed, may not be configured"
   builder_finish_action success clean
 fi
 
@@ -40,3 +40,7 @@ if builder_start_action build; then
   builder_finish_action success build
 fi
 
+if builder_start_action test; then
+  npm test
+  builder_finish_action success test
+fi

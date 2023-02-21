@@ -10,24 +10,33 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-. "$THIS_SCRIPT_PATH/commands.inc.sh"
 
-cd "$THIS_SCRIPT_PATH"
+display_usage() {
+  echo "usage: build.sh [build options] [targets] [-- options to pass to c++ configure]"
+  echo
+  echo "Build options:"
+  echo "  --debug, -d       Debug build"
+  echo "  --target, -t      Target path (linux,macos only, default build/)"
+  echo "  --platform, -p    Platform to build (wasm or native, default native)"
+  echo
+  echo "Targets (all except install if not specified):"
+  echo "  clean             Clean target path"
+  echo "  configure         Configure libraries (linux,macos only)"
+  echo "  build             Build all libraries"
+  echo "    build-cpp         Build c++ libraries"
+  echo "  tests             Run all tests"
+  echo "    tests-cpp         Run c++ tests"
+  echo "  install           Install all libraries"
+  echo "    install-cpp       Install c++ libraries"
+  echo "  uninstall         Uninstall all libraries"
+  echo "    uninstall-cpp     Uninstall c++ libraries"
+  echo
+  echo "C++ libraries will be in:       TARGETPATH/<arch>/<buildtype>/src"
+  echo "WASM libraries will be in:      TARGETPATH/wasm/<buildtype>/src"
+  echo "On Windows, <arch> will be 'x86' or 'x64'; elsewhere it is 'arch'"
+  exit 0
+}
 
-################################ Main script ################################
-
-## TODO-LDML: make sure these get built!
-archdeps=()
-if type node >/dev/null 2>&1; then
-  # Note: Found node, can build kmc and hextobin dependencies
-  archdeps+=(@/common/tools/hextobin @/common/web/keyman-version @/developer/src/kmc)
-else
-  echo "Note: could not find node, skipping hextobin and kmc dependency builds, ldml+binary tests will not be run"
-fi
-
-#
-# Restrict available targets to those that can be built on the current system
-#
 MESON_TARGET=release
 HAS_TARGET=false
 CLEAN=false
@@ -36,12 +45,13 @@ BUILD_CPP=false
 TESTS_CPP=false
 INSTALL_CPP=false
 UNINSTALL_CPP=false
-# QUIET=false
+QUIET=false
 TARGET_PATH="$THIS_SCRIPT_PATH/build"
 ADDITIONAL_ARGS=
 PLATFORM=native
 
-archtargets=(":wasm   WASM build")
+# Parse args
+shopt -s nocasematch
 
 while [[ $# -gt 0 ]] ; do
   key="$1"
@@ -147,7 +157,24 @@ displayInfo "" \
     "TARGET_PATH: $TARGET_PATH" \
     ""
 
+## TODO-LDML: make sure these get built!
+archdeps=()
+if type node >/dev/null 2>&1; then
+  # Note: Found node, can build kmc and hextobin dependencies
+  archdeps+=(@/common/tools/hextobin @/common/web/keyman-version @/developer/src/kmc)
+  displayInfo "Dependencies: ${archdeps[*]}"
+else
+  displayInfo "Dependencies: None"
+  builder_warn "Note: could not find node, skipping hextobin and kmc dependency builds, ldml+binary tests will not be run"
+fi
+
+# use builder_ only for deps
+builder_describe "Build Keyman Core" "${archdeps[@]}" "clean" "configure" "build" "test"
+builder_parse "$@"
+
 clean() {
+  # only for deps
+  builder_run_dep_actions --no-deps clean # TODO-LDML: should include deps, but causes reconfigure
   rm -rf "${TARGET_PATH:?}/"
 }
 
@@ -195,6 +222,7 @@ build_standard() {
 
   # Build meson targets
   if $CONFIGURE; then
+    builder_run_dep_actions build # let the deps configure themselves
     builder_heading "======= Configuring C++ library for $BUILD_PLATFORM ======="
     pushd "$THIS_SCRIPT_PATH" > /dev/null
     meson setup "$MESON_PATH" --werror --buildtype $MESON_TARGET $STANDARD_MESON_ARGS $ADDITIONAL_ARGS
@@ -202,6 +230,7 @@ build_standard() {
   fi
 
   if $BUILD_CPP; then
+    builder_run_dep_actions build
     builder_heading "======= Building C++ library for $BUILD_PLATFORM ======="
     pushd "$MESON_PATH" > /dev/null
     ninja
@@ -209,6 +238,7 @@ build_standard() {
   fi
 
   if $TESTS_CPP; then
+    builder_run_dep_actions test
     builder_heading "======= Testing C++ library for $BUILD_PLATFORM ======="
     pushd "$MESON_PATH" > /dev/null
     meson test --print-errorlogs

@@ -24,6 +24,7 @@ builder_describe "Build the include script for current Keyman version" \
   clean \
   build \
   publish \
+  test \
   --dry-run
 
 builder_describe_outputs \
@@ -39,7 +40,7 @@ if builder_start_action configure; then
 fi
 
 if builder_start_action clean; then
-  npm run clean
+  npm run clean || builder_warn 'npm run clean failed, may not be configured'
   rm -f ./version.inc.ts
   builder_finish_action success clean
 fi
@@ -89,6 +90,11 @@ if builder_start_action build; then
   fi
 
   builder_finish_action success build
+fi
+
+if builder_start_action test; then
+  npm test
+  builder_finish_action success test
 fi
 
 if builder_start_action publish; then
