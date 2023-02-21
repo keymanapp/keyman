@@ -34,15 +34,15 @@ pull-core:
     cd $(KEYMAN_ROOT)\core
 !ifdef GIT_BASH_FOR_KEYMAN
 !ifdef DEBUG
-    $(GIT_BASH_FOR_KEYMAN) build.sh clean:x86 configure:x86 build:x86 --debug
+    $(GIT_BASH_FOR_KEYMAN) build.sh --no-tests clean:x86 configure:x86 build:x86 --debug
 !else
-    $(GIT_BASH_FOR_KEYMAN) build.sh clean:x86 configure:x86 build:x86
+    $(GIT_BASH_FOR_KEYMAN) build.sh --no-tests clean:x86 configure:x86 build:x86
 !endif
 !else
 !ifdef DEBUG
-    start /wait ./build.sh clean:x86 configure:x86 build:x86 --debug
+    start /wait ./build.sh --no-tests clean:x86 configure:x86 build:x86 --debug
 !else
-    start /wait ./build.sh clean:x86 configure:x86 build:x86
+    start /wait ./build.sh --no-tests clean:x86 configure:x86 build:x86
 !endif
 !endif
 
