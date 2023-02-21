@@ -85,11 +85,7 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   std::wstring  Name_wstr = convert_pchar16T_To_wstr(Name);
   const KMX_WCHART* Name_wchptr = Name_wstr.c_str();
 
-#if defined(_WIN32) || defined(_WIN64)
-  nfile = _wfsopen(Name_wchptr, L"rb", _SH_DENYWR);
-#else
-  nfile = fopen(Name_wchptr, "rb");
-#endif
+  nfile = Open_File(Name_wchptr, L"rb");
 
   if (nfile == NULL) {
     if (ReportMissingFile) {
