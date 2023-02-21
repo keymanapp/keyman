@@ -9,7 +9,7 @@ import MouseDragOperation from '../input/mouseDragOperation.js';
 import { getViewportScale } from '../screenUtils.js';
 import Configuration from '../config/viewConfiguration.js';
 import TwoStateActivator from './twoStateActivator.js';
-import FloatingOSKCookie from './floatingOskCookie.js';
+import { FloatingOSKCookie, FloatingOSKCookieSerializer } from './floatingOskCookie.js';
 
 /***
    KeymanWeb 10.0
@@ -18,12 +18,6 @@ import FloatingOSKCookie from './floatingOskCookie.js';
 
 interface FloatingOSKViewConfiguration extends Configuration {
   activator: TwoStateActivator<HTMLElement>;
-
-  // Designed to replace util.saveCookie() within the OSK subproject.
-  saveViewLayout?: (data: FloatingOSKCookie) => void;
-
-  // Designed to replace util.loadCookie() within the OSK subproject.
-  reloadViewLayout?: () => FloatingOSKCookie;
 }
 
 export default class FloatingOSKView extends OSKView {
@@ -36,6 +30,8 @@ export default class FloatingOSKView extends OSKView {
   dfltX: string;
   dfltY: string;
 
+  layoutSerializer = new FloatingOSKCookieSerializer();
+
   private titleBar: TitleBar;
   private resizeBar: ResizeBar;
 
@@ -46,19 +42,11 @@ export default class FloatingOSKView extends OSKView {
   public constructor(config: FloatingOSKViewConfiguration) {
     config.activator = config.activator || new TwoStateActivator<HTMLElement>();
 
-    config.saveViewLayout = config.saveViewLayout || (() => {});
-
-    config.reloadViewLayout = config.reloadViewLayout || (() => {
-      return {} as unknown as FloatingOSKCookie;
-    });
-
     super(config);
 
     this.typedActivationModel.on('triggerChange', () => this.setDisplayPositioning());
 
     document.body.appendChild(this._Box);
-
-    this.loadCookie();
 
     // Add header element to OSK only for desktop browsers
     this.titleBar = new TitleBar(this.titleDragHandler);
@@ -77,6 +65,8 @@ export default class FloatingOSKView extends OSKView {
     this.resizeBar.on('showBuild', () => this.emit('showBuild'));
 
     this.headerView = this.titleBar;
+
+    this.loadCookie();
   }
 
   private get typedActivationModel(): TwoStateActivator<HTMLElement> {
@@ -190,12 +180,11 @@ export default class FloatingOSKView extends OSKView {
     }
 
     if(this.vkbd) {
-      c['width'] = '' + this.width.val;
-      c['height'] = '' + this.height.val;
+      c.width = '' + this.width.val;
+      c.height = '' + this.height.val;
     }
 
-    const typedConfiguration = this.configuration as FloatingOSKViewConfiguration;
-    typedConfiguration.saveViewLayout(c);
+    this.layoutSerializer.save(c as Required<FloatingOSKCookie>);
   }
 
   /**
@@ -209,21 +198,20 @@ export default class FloatingOSKView extends OSKView {
       return isNaN(val) ? fallback: val;
     }
 
-    const typedConfiguration = this.configuration as FloatingOSKViewConfiguration;
-    var c: FloatingOSKCookie = typedConfiguration.reloadViewLayout();
+    let c = this.layoutSerializer.load();
 
-    this.activationModel.enabled = parseIntWithDefault(c['visible'], 1) == 1;
-    this.userPositioned = parseIntWithDefault(c['userSet'], 0) == 1;
-    this.x = parseIntWithDefault(c['left'],-1);
-    this.y = parseIntWithDefault(c['top'],-1);
-    let cookieVersionString = c['_version'];
+    this.activationModel.enabled = parseIntWithDefault(c.visible, 1) == 1;
+    this.userPositioned = parseIntWithDefault(c.userSet, 0) == 1;
+    this.x = parseIntWithDefault(c.left,-1);
+    this.y = parseIntWithDefault(c.top,-1);
+    let cookieVersionString = c._version;
 
     // Restore OSK size - font size now fixed in relation to OSK height, unless overridden (in em) by keyboard
     let dfltWidth=0.3*screen.width;
     let dfltHeight=0.15*screen.height;
 
-    let newWidth  = parseInt(c['width'], 10);
-    let newHeight = parseInt(c['height'], 10);
+    let newWidth  = parseInt(c.width, 10);
+    let newHeight = parseInt(c.height, 10);
     let isNewCookie = isNaN(newHeight);
     newWidth  = isNaN(newWidth)  ? dfltWidth  : newWidth;
     newHeight = isNaN(newHeight) ? dfltHeight : newHeight;

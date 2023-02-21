@@ -1,7 +1,6 @@
 export { Codes, DeviceSpec, Keyboard, KeyboardProperties, SpacebarText } from '@keymanapp/keyboard-processor';
 
 export { default as FloatingOSKView } from './views/floatingOskView.js';
-export { default as FloatingOSKViewCookie } from './views/floatingOskCookie.js';
 export { default as AnchoredOSKView } from './views/anchoredOskView.js';
 export { default as InlinedOSKView } from './views/inlinedOskView.js';
 export { BannerController } from './banner/bannerView.js';

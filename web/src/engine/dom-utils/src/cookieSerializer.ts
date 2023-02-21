@@ -11,7 +11,7 @@ export default class CookieSerializer<Type extends Record<keyof Type, DecodedCoo
     this.name = name;
   }
 
-  load(decoder?: FilteredRecordEncoder): Type {
+  load(decoder?: FilteredRecordDecoder): Type {
     return this.loadCookie(this.name, decoder || no_change) as Type;
   }
 
