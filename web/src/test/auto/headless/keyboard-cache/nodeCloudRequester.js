@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import NodeCloudRequester from '../../../../../build/engine/keyboard-cache/obj/nodeCloudRequester.js';
+import NodeCloudRequester from 'keyman/engine/keyboard-cache/node-requester';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
