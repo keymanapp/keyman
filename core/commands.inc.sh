@@ -28,7 +28,9 @@ do_configure() {
     # do_configure_wasm
     locate_emscripten
     build_meson_cross_file_for_wasm
-    STANDARD_MESON_ARGS="$MESON_OPTION_keyman_core_tests --cross-file wasm.defs.build --cross-file wasm.build --default-library static"
+    STANDARD_MESON_ARGS="$STANDARD_MESON_ARGS --cross-file wasm.defs.build --cross-file wasm.build --default-library static"
+  elif [[ $target =~ ^(x86|x64)$ ]]; then
+    STANDARD_MESON_ARGS="$STANDARD_MESON_ARGS --default-library both"
   fi
 
   pushd "$THIS_SCRIPT_PATH" > /dev/null
@@ -134,4 +136,26 @@ build_meson_cross_file_for_wasm() {
     local R=$(echo $EMSCRIPTEN_BASE | sed 's_/_\\/_g')
   fi
   sed -e "s/\$EMSCRIPTEN_BASE/$R/g" wasm.build.$os_id.in > wasm.build
+}
+
+#
+# Remove Visual Studio from the path so that meson goes looking for it rather than
+# assuming that it's all available. If we don't do this, we get an error with link.exe:
+#
+#     meson.build:8:0: ERROR: Found GNU link.exe instead of MSVC link.exe in C:\Program Files\Git\usr\bin\link.EXE.
+#     This link.exe is not a linker.
+#     You may need to reorder entries to your %PATH% variable to resolve this.
+#
+
+cleanup_visual_studio_path() {
+  local _split_path _new_path=""
+  IFS=':' read -ra _split_path <<<"$PATH"
+  for p in "${_split_path[@]}"; do
+    if ! [[ $p =~ Visual\ Studio ]]; then
+      _new_path="$_new_path:$p"
+    fi
+  done
+  echo
+  PATH="${_new_path:1}"
+  unset VSINSTALLDIR
 }

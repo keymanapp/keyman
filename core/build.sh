@@ -17,6 +17,7 @@ cd "$THIS_SCRIPT_PATH"
 ################################ Main script ################################
 
 get_builder_OS
+cleanup_visual_studio_path
 
 MESON_LOW_VERSION=false
 
