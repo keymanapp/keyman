@@ -41,7 +41,7 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
       }
 
       promise.finally(() => {
-        // https://stackoverflow.com/a/37393041 - totally safe.
+        // It is safe to remove the script once it has been run (https://stackoverflow.com/a/37393041)
         script.remove();
       });
 
