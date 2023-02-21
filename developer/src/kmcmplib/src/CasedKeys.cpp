@@ -1,14 +1,14 @@
 
 #include "pch.h"
 
-#include <compfile.h>
-#include <comperr.h>
+#include "compfile.h"
+#include "comperr.h"
 #include "../../../../common/windows/cpp/include/vkeys.h"
-#include <kmcmpdll.h>
+#include "kmcmpdll.h"
 
 #include "CharToKeyConversion.h"
 #include "kmx_u16.h"
-#include <xstring.h>
+#include "xstring.h"
 
 namespace kmcmp {
   extern KMX_BOOL FMnemonicLayout; // TODO: these globals should be consolidated one day

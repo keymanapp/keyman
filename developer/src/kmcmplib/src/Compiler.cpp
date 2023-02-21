@@ -70,7 +70,7 @@
 #include <comperr.h>
 #include "../../../../common/windows/cpp/include/vkeys.h"
 #include <cuchar>
-#include <versioning.h>
+#include "versioning.h"
 #include "kmcmpdll.h"
 #include "DeprecationChecks.h"
 
@@ -82,6 +82,7 @@
 #include "namedcodeconstants.h"
 #include "../../../../common/windows/cpp/include/unicode.h"
 #include "../../../../common/windows/cpp/include/keymanversion.h"
+#include "../../../../developer/src/kmcmplib/src/xstring.h"
 
 #include "edition.h"
 

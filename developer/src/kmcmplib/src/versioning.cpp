@@ -1,10 +1,11 @@
 #include "pch.h"
-#include <compfile.h>
+#include "compfile.h"
 #include <comperr.h>
-#include <kmcmpdll.h>
+#include "kmcmpdll.h"
+#include "versioning.h"
 
-namespace kmcmp {
-  KMX_BOOL CheckKeyboardFinalVersion(PFILE_KEYBOARD fk) {
+//namespace kmcmp {
+  KMX_BOOL kmcmp::CheckKeyboardFinalVersion(PFILE_KEYBOARD fk) {
     KMX_CHAR buf[128];
 
     if (fk->dwFlags & KF_AUTOMATICVERSION) {
@@ -18,7 +19,7 @@ namespace kmcmp {
 
     return TRUE;
   }
-}
+//}
 KMX_BOOL VerifyKeyboardVersion(PFILE_KEYBOARD fk, KMX_DWORD ver) {
   if (fk->dwFlags & KF_AUTOMATICVERSION) {
     fk->version = max(fk->version, ver);
