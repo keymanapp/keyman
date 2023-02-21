@@ -4,7 +4,7 @@ import fs from 'fs';
 
 import { KeyboardStub, StubAndKeyboardCache } from '../../../../../build/engine/keyboard-cache/obj/index.js';
 
-import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/nodeKeyboardLoader';
+import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-loader';
 import { KeyboardHarness, MinimalKeymanGlobal } from '@keymanapp/keyboard-processor';
 
 // import path from 'path';
