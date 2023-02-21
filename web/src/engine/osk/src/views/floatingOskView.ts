@@ -66,7 +66,7 @@ export default class FloatingOSKView extends OSKView {
 
     this.headerView = this.titleBar;
 
-    this.loadCookie();
+    this.loadPersistedLayout();
   }
 
   private get typedActivationModel(): TwoStateActivator<HTMLElement> {
@@ -110,7 +110,7 @@ export default class FloatingOSKView extends OSKView {
       this.footerView = null;
     }
 
-    this.loadCookie();
+    this.loadPersistedLayout();
     this.setNeedsLayout();
   }
 
@@ -127,13 +127,13 @@ export default class FloatingOSKView extends OSKView {
     let dragPromise = new ManagedPromise<void>();
     this.emit('dragMove', dragPromise.corePromise);
 
-    this.loadCookie();
+    this.loadPersistedLayout();
     this.userPositioned=false;
     if(!keepDefaultPosition) {
       delete this.dfltX;
       delete this.dfltY;
     }
-    this.saveCookie();
+    this.savePersistedLayout();
 
     if(isVisible) {
       this.present();
@@ -168,7 +168,7 @@ export default class FloatingOSKView extends OSKView {
   /**
    * Save size, position, font size and visibility of OSK
    */
-  saveCookie() {
+  private savePersistedLayout() {
     var p = this.getPos();
 
     const c: FloatingOSKCookie = {
@@ -192,7 +192,7 @@ export default class FloatingOSKView extends OSKView {
    *
    *  @return {boolean}
    */
-  loadCookie(): void {
+  private loadPersistedLayout(): void {
     let c = this.layoutSerializer.loadWithDefaults({
       visible: 1,
       userSet: 0,
@@ -406,7 +406,7 @@ export default class FloatingOSKView extends OSKView {
       this.movementEnabled = !this.noDrag;
     }
     // Save the user-defined OSK size
-    this.saveCookie();
+    this.savePersistedLayout();
   }
 
   /**
@@ -539,7 +539,7 @@ export default class FloatingOSKView extends OSKView {
     super.startHide(hiddenByUser);
 
     if(hiddenByUser) {
-      this.saveCookie();  // Save current OSK state, size and position (desktop only)
+      this.savePersistedLayout();  // Save current OSK state, size and position (desktop only)
     }
   }
 
@@ -549,7 +549,7 @@ export default class FloatingOSKView extends OSKView {
     } else {
       super['show']();
     }
-    this.saveCookie();
+    this.savePersistedLayout();
   }
 
   /**
@@ -651,7 +651,7 @@ export default class FloatingOSKView extends OSKView {
         this.dragPromise.then(() => {
           _this.userPositioned = true;
           _this.doResizeMove();
-          _this.saveCookie();
+          _this.savePersistedLayout();
         });
         this.dragPromise = null;
       }
@@ -729,7 +729,7 @@ export default class FloatingOSKView extends OSKView {
         // Remainder should be done after anything else pending on the Promise.
         this.dragPromise.then(() => {
           _this.doResizeMove();
-          _this.saveCookie();
+          _this.savePersistedLayout();
         });
         this.dragPromise = null;
       }
