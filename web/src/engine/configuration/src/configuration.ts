@@ -1,5 +1,6 @@
-import { physicalKeyDeviceAlias } from "../../../../build/engine/device-detect/obj/kmwdevice.js";
+import { physicalKeyDeviceAlias } from "keyman/engine/device-detect";
 import { DeviceSpec, type SpacebarText } from "@keymanapp/keyboard-processor";
+
 import { OptionSpec } from "./optionSpec.interface.js";
 import PathConfiguration from "./pathConfiguration.js";
 
