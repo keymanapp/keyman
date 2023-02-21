@@ -1,9 +1,8 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import CloudQueryEngine from '../../../../../build/engine/keyboard-cache/obj/cloud/queryEngine.js';
-import { default as StubAndKeyboardCache, toPrefixedKeyboardId as prefixed } from '../../../../../build/engine/keyboard-cache/obj/stubAndKeyboardCache.js';
-import NodeCloudRequester from '../../../../../build/engine/keyboard-cache/obj/nodeCloudRequester.js';
+import { CloudQueryEngine, StubAndKeyboardCache, toPrefixedKeyboardId as prefixed } from 'keyman/engine/keyboard-cache';
+import NodeCloudRequester from 'keyman/engine/keyboard-cache/node-requester';
 
 import path from 'path';
 import { fileURLToPath } from 'url';

@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import KeyboardStub, { } from '../../../../../build/engine/keyboard-cache/obj/keyboardStub.js';
-import NodeCloudRequester from '../../../../../build/engine/keyboard-cache/obj/nodeCloudRequester.js';
+import { KeyboardStub } from 'keyman/engine/keyboard-cache';
+import NodeCloudRequester from 'keyman/engine/keyboard-cache/node-requester';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
