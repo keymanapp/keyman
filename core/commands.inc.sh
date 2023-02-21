@@ -46,7 +46,13 @@ do_configure() {
 do_build() {
   local target=$1
   builder_start_action build:$target || return 0
-  meson compile -C "$MESON_PATH"
+  if $MESON_LOW_VERSION; then
+    pushd "$MESON_PATH" > /dev/null
+    ninja
+    popd
+  else
+    meson compile -C "$MESON_PATH"
+  fi
   builder_finish_action success build:$target
 }
 
@@ -66,19 +72,27 @@ do_test() {
 # ----------------------------------------------------------------------------
 
 do_install() {
-  do_command install $1
+  local target=$1
+  builder_start_action install:$target || return 0
+  if $MESON_LOW_VERSION; then
+    pushd "$MESON_PATH" > /dev/null
+    ninja install
+    popd > /dev/null
+  else
+    meson install -C "$MESON_PATH"
+  fi
+  builder_finish_action success install:$target
 }
 
 do_uninstall() {
-  do_command uninstall $1
-}
-
-do_command() {
-  local command=$1
-  local target=$2
-  builder_start_action $command:$target || return 0
-  meson $command -C "$MESON_PATH"
-  builder_finish_action success $command:$target
+  local target=$1
+  builder_start_action uninstall:$target || return 0
+  pushd "$MESON_PATH" > /dev/null
+  # Note: there is no meson uninstall command, which means
+  # this probably won't work on Windows
+  ninja uninstall
+  popd > /dev/null
+  builder_finish_action success uninsatll:$target
 }
 
 # ----------------------------------------------------------------------------

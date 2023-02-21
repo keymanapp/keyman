@@ -18,6 +18,12 @@ cd "$THIS_SCRIPT_PATH"
 
 get_builder_OS
 
+MESON_LOW_VERSION=false
+
+if [[ `meson --version` < 0.54 ]]; then
+  MESON_LOW_VERSION=true
+fi
+
 #
 # Restrict available targets to those that can be built on the current system
 #
