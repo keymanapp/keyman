@@ -191,14 +191,14 @@ for TARGET in "${TARGETS[@]}"; do
   if $CLEAN; then
     if ! $QUIET; then
       echo
-      echo_heading "Cleaning target $TARGET"
+      builder_heading "Cleaning target $TARGET"
       echo
     fi
     clean "$TARGET"
   else
     if ! $QUIET; then
       echo
-      echo_heading "Building target $TARGET"
+      builder_heading "Building target $TARGET"
       echo
     fi
     build "$TARGET"

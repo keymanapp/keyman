@@ -37,13 +37,13 @@ else
 fi
 echo "ppa: ${ppa}"
 
-if [ "${DIST}" != "" ]; then
+if [ "${DIST:-}" != "" ]; then
     distributions="${DIST}"
 else
     distributions="focal jammy kinetic"
 fi
 
-if [ "${PACKAGEVERSION}" != "" ]; then
+if [ "${PACKAGEVERSION:-}" != "" ]; then
     packageversion="${PACKAGEVERSION}"
 else
     packageversion="1~sil1"
@@ -58,18 +58,18 @@ mkdir -p launchpad
 for proj in ${projects}; do
     downloadSource launchpad
 
-    cd ${proj}-${version}
-    echo $(pwd)
+    cd "${proj}-${version}"
+    pwd
     cp debian/changelog ../${proj}-changelog
     for dist in ${distributions}; do
         cp ../${proj}-changelog debian/changelog
-        dch -v ${version}-${packageversion}~${dist} "source package for PPA"
-        dch -D ${dist} -r ""
+        dch -v "${version}-${packageversion}~${dist}" "source package for PPA"
+        dch -D "${dist}" -r ""
         debuild -d -S -sa -Zxz
     done
     cd ..
     for dist in ${distributions}; do
-        dput ${SIM} ${ppa} ${proj}_${version}-${packageversion}~${dist}_source.changes
+        dput ${SIM} ${ppa} "${proj}_${version}-${packageversion}~${dist}_source.changes"
     done
-    cd ${BASEDIR}
+    cd "${BASEDIR}"
 done

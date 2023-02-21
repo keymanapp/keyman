@@ -13,16 +13,14 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 echo_heading2() {
   echo ""
-  echo_heading "$*"
+  builder_heading "$*"
 }
 
-get_builder_OS
-
-if [ $os_id != win ]; then
-  fail "This script can only be run on Windows to setup IIS."
+if [[ $BUILDER_OS != win ]]; then
+  builder_die "This script can only be run on Windows to setup IIS."
 fi
 
-warn "Warning: this script requires Administrator permissions to install certificates."
+builder_warn "Warning: this script requires Administrator permissions to install certificates."
 
 # Generate CA key
 echo_heading2 "Generating CA key"
@@ -108,4 +106,4 @@ echo "   curl.cainfo = \"C:\\tools\\php74\\cacert.pem\""
 echo "4. Finally, you may need to restart IIS for changes to take effect."
 
 echo_heading2 "Complete"
-warn "Please check logs above for errors and manual steps"
+builder_warn "Please check logs above for errors and manual steps"

@@ -17,7 +17,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 LOCALE_DIR="$KEYMAN_ROOT/windows/src/desktop/locale/"
 XSLT="$KEYMAN_ROOT/windows/bin/buildtools/xslt.exe"
-[ -f "$XSLT" ] || die "ERROR: Unable to find xslt.exe; build Keyman buildtools first."
+[ -f "$XSLT" ] || builder_die "ERROR: Unable to find xslt.exe; build Keyman buildtools first."
 
 SOURCE_LOCALE_XML="$KEYMAN_ROOT/windows/src/desktop/kmshell/xml/locale.xml"
 TARGET_STRINGS_XML="$LOCALE_DIR/strings.xml"
@@ -50,7 +50,7 @@ do_upload() {
 ##
 do_download() {
   # crowdin.bat download
-  die "Not yet implemented"
+  builder_die "Not yet implemented"
 }
 
 # Parse args
@@ -71,14 +71,14 @@ while [[ $# -gt 0 ]] ; do
       display_usage
       ;;
     *)
-      die "Invalid parameters specified. $0 --help for help."
+      builder_die "Invalid parameters specified. $0 --help for help."
       ;;
   esac
   shift # past argument
 done
 
 if [ -z $ACTION ]; then
-  die "No parameters specified. $0 --help for help.";
+  builder_die "No parameters specified. $0 --help for help.";
 fi
 
 if [ $ACTION = upload ]; then
