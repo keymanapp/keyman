@@ -16,17 +16,15 @@ cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
-builder_check_color "$@"
-
 builder_describe "Runs the Keyman Engine for Web unit-testing suites" \
   "@./src/tools/testing/recorder test:engine" \
   "@./src/engine" \
   "test+" \
   ":engine               Runs the top-level Keyman Engine for Web unit tests" \
   ":libraries            Runs all unit tests for KMW's submodules.  Currently excludes predictive-text tests" \
-  "--ci                  Set to utilize CI-based test configurations & reporting.  May not be set with ${BUILDER_TERM_START}--debug${BUILDER_TERM_END}." \
+  "--ci                  Set to utilize CI-based test configurations & reporting.  May not be set with $(builder_term --debug)." \
   "--reporters=REPORTERS Set to override the 'reporters' used by the unit testing engines" \
-  "--browsers=BROWSERS   Set to override automatic browser selection for ${BUILDER_TERM_START}:engine${BUILDER_TERM_END} tests"
+  "--browsers=BROWSERS   Set to override automatic browser selection for $(builder_term :engine) tests"
 
 builder_parse "$@"
 
