@@ -16,8 +16,10 @@ cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
+# Temp-removed dependency:
+# "@./src/tools/testing/recorder test:engine" \
+
 builder_describe "Runs the Keyman Engine for Web unit-testing suites" \
-  "@./src/tools/testing/recorder test:engine" \
   "test+" \
   ":engine               Runs the top-level Keyman Engine for Web unit tests" \
   ":libraries            Runs all unit tests for KMW's submodules.  Currently excludes predictive-text tests" \
@@ -80,7 +82,7 @@ get_default_browser_set ( ) {
   if [ $os_id = "mac" ]; then
       BROWSERS="--browsers Firefox,Chrome,Safari"
   elif [ $os_id = "win" ]; then
-      BROWSERS="--browsers Firefox,Chrome,Edge"
+      BROWSERS="--browsers Firefox,Chrome"
   else
       BROWSERS="--browsers Firefox,Chrome"
   fi
@@ -104,9 +106,9 @@ if builder_start_action test:engine; then
 
   # Select the right CONFIG file.
   if builder_has_option --ci; then
-    CONFIG=CI.conf.js
+    CONFIG=CI.conf.cjs
   else
-    CONFIG=manual.conf.js
+    CONFIG=manual.conf.cjs
   fi
 
   # Build modernizr module
@@ -123,11 +125,13 @@ if builder_start_action test:engine; then
     KARMA_FLAGS="$KARMA_FLAGS --reporters $REPORTERS"
   fi
 
+  KARMA_EXT_FLAGS=
   if ! builder_has_option --ci; then
-    KARMA_FLAGS="$KARMA_FLAGS --browsers $BROWSERS"
+    KARMA_EXT_FLAGS="$KARMA_FLAGS --browsers $BROWSERS"
   fi
 
-  npm --no-color run karma -- start $KARMA_FLAGS src/test/auto/integrated/$CONFIG
+  npm --no-color run karma -- start $KARMA_FLAGS src/test/auto/dom/$CONFIG
+  npm --no-color run karma -- start $KARMA_FLAGS $KARMA_EXT_FLAGS src/test/auto/integrated/$CONFIG
 
   builder_finish_action success test:engine
 fi
