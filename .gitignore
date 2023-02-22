@@ -194,5 +194,5 @@ Thumbs.db
 *.bak
 /linux/common/core/desktop/wasm.defs.build
 /linux/common/core/desktop/meson.build
-*.kmx
-*.kvk
+/../*.kmx
+/../*.kvk
