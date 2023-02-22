@@ -9,7 +9,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 JQ_THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-# . "$(dirname "$THIS_SCRIPT")/build-utils.sh"
+# . "${THIS_SCRIPT%/*}/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 case "${OSTYPE}" in

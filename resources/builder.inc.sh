@@ -45,7 +45,7 @@ function _builder_findRepoRoot() {
 #   ## START STANDARD BUILD SCRIPT INCLUDE
 #   # adjust relative paths as necessary
 #   THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-#   . "$(dirname "$THIS_SCRIPT")/resources/builder.inc.sh"
+#   . "${THIS_SCRIPT%/*}/resources/builder.inc.sh"
 #   ## END STANDARD BUILD SCRIPT INCLUDE
 # ```
 #

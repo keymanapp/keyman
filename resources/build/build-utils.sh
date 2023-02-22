@@ -23,7 +23,7 @@
 #    ## START STANDARD BUILD SCRIPT INCLUDE
 #    # adjust relative paths as necessary
 #    THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-#    . "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
+#    . "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
 #    # END STANDARD BUILD SCRIPT INCLUDE
 #
 # Note: keep changes to version, tier and tag determination in sync with mkver (windows/src/buildutils/mkver)
