@@ -20,7 +20,7 @@ pushd "$(dirname "$THIS_SCRIPT")"
 
 # Build the main script.
 build () {
-  npm run build || fail "Could not build top-level JavaScript file."
+  npm run build || builder_die "Could not build top-level JavaScript file."
 }
 
 display_usage ( ) {
@@ -93,7 +93,7 @@ done
 
 # Check if Node.JS/npm is installed.
 type npm >/dev/null ||\
-    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+    builder_die "Build environment setup error detected!  Please ensure Node.js is installed!"
 
 if (( install_dependencies )) ; then
   verify_npm_setup
@@ -148,7 +148,7 @@ fi
 # Build the project
 # ----------------------------------------
 
-npm run build || fail "Compilation failed."
+npm run build || builder_die "Compilation failed."
 echo "Typescript compilation successful."
 
 # ----------------------------------------
@@ -156,7 +156,7 @@ echo "Typescript compilation successful."
 # ----------------------------------------
 
 if (( run_tests )); then
-  npm test || fail "Tests failed"
+  npm test || builder_die "Tests failed"
 fi
 
 # ----------------------------------------

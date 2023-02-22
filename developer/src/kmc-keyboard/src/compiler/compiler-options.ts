@@ -4,10 +4,10 @@ export default interface CompilerOptions {
   /**
    * Add debug information to the .kmx file when compiling
    */
-  debug: boolean;
+  debug?: boolean;
 
   /**
    * Add metadata about the compiler version to .kmx file when compiling
    */
-  addCompilerVersion: boolean;
+  addCompilerVersion?: boolean;
 };

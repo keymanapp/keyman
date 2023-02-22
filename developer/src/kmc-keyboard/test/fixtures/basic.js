@@ -16,6 +16,31 @@ function Keyboard_basic() {
   this.KM=0;
   this.KBVER="1.0.0";
   this.KMBM=0;
+  this.KVKL={
+  "desktop": {
+    "defaultHint": "none",
+    "layer": [
+      {
+        "id": "base",
+        "row": [
+          {
+            "id": 0,
+            "key": [
+              {
+                "id": "T_hmaqtugha",
+                "text": "ħ"
+              },
+              {
+                "id": "T_that",
+                "text": "ថា"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+};
   this.gs=function(t,e){
     return 0;
   };

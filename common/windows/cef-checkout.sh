@@ -47,7 +47,7 @@ if [ ! -f ./libcef.dll ]; then
     rm "$zip"
   done
 
-  [ -f ./libcef.dll ] || die "File libcef.dll could not be found. Path $KEYMAN_CEF4DELPHI_ROOT may not be valid."
+  [ -f ./libcef.dll ] || builder_die "File libcef.dll could not be found. Path $KEYMAN_CEF4DELPHI_ROOT may not be valid."
 fi
 
 popd > /dev/null

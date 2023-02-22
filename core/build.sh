@@ -16,7 +16,6 @@ cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
-get_builder_OS
 cleanup_visual_studio_path
 
 MESON_LOW_VERSION=false
@@ -31,7 +30,7 @@ fi
 
 archtargets=(":wasm   WASM build")
 
-case $os_id in
+case $BUILDER_OS in
   win)
     archtargets+=(
       ":x86    32-bit Windows (x86) build"

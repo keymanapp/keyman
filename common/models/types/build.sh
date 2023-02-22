@@ -82,14 +82,14 @@ fi
 
 # Check if Node.JS/npm is installed.
 type npm >/dev/null ||\
-    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+    builder_die "Build environment setup error detected!  Please ensure Node.js is installed!"
 
 if (( install_dependencies )) ; then
-  npm install || fail "Could not download dependencies."
+  npm install || builder_die "Could not download dependencies."
 fi
 
 if (( run_tests )); then
-  npm test || fail "Tests failed"
+  npm test || builder_die "Tests failed"
 fi
 
 if (( should_publish )); then
@@ -106,5 +106,5 @@ if (( should_publish )); then
   #
   # See `npm help publish` for more details.
   echo "Publishing $DRY_RUN npm package with tag $npm_dist_tag"
-  npm publish $DRY_RUN --access public --tag $npm_dist_tag || fail "Could not publish $npm_dist_tag release."
+  npm publish $DRY_RUN --access public --tag $npm_dist_tag || builder_die "Could not publish $npm_dist_tag release."
 fi

@@ -1,5 +1,33 @@
 # Keyman Version History
 
+## 17.0.53 alpha 2023-02-21
+
+* chore(windows): Remove old Kannada setup strings (#8257)
+* fix(linux): Collect consecutive backspaces (#8274)
+* chore(linux): Improve deb-packaging GHA (#8281)
+* chore(linux): Cleanup GHA (#8282)
+
+## 17.0.52 alpha 2023-02-20
+
+* fix(windows): use min-width allow to expand (#8215)
+* chore(web): minor cleanup of web/build.sh (#8254)
+* fix(web): `--no-minify`, not `--skip-minify` (#8264)
+* chore(web): Actually skip browser-stack for non-web builds (#8266)
+* chore: cleanup some of shellHelperFunctions.sh (#8260)
+* chore: consolidate script helper functions (#8261)
+* chore(linux): Output results of API verification on stderr (#8241)
+* chore(linux): Create draft PR after updating changelog (#8242)
+* fix(linux): Checkout before  running apt-install (#8247)
+* fix(linux): Fix bug in deb-packaging script (#8273)
+* chore(developer): update bundled node to 18.14.1 LTS (#8268)
+* chore(developer): ignore Esc key when compiling (#8263)
+* docs: builder.inc.sh improved documentation around dependencies (#8173)
+* chore(linux): Add build.sh to ibus-keyman  ️ (#8112)
+
+## 17.0.51 alpha 2023-02-18
+
+* chore(common): Update Fula strings for Sprint A17S6 (#8245)
+
 ## 17.0.50 alpha 2023-02-16
 
 * feat(common): parent-child scripts for builder (#8198)

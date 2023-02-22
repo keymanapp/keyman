@@ -57,7 +57,7 @@ fi
 
 if [ -n "$reconfigure" ]; then
     pushd $THIS_DIR/.. > /dev/null
-    ./scripts/reconf.sh keyman-config
+    ./scripts/reconf.sh
     popd > /dev/null
 fi
 

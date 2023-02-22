@@ -104,9 +104,9 @@ if [[ $VERSION_ENVIRONMENT == test ]] && builder_has_action test :browser; then
 fi
 
 get_browser_set_for_OS ( ) {
-  if [ $os_id = "mac" ]; then
+  if [[ $BUILDER_OS == mac ]]; then
     BROWSERS="--browsers Firefox,Chrome,Safari"
-  elif [ $os_id = "win" ]; then
+  elif [[ $BUILDER_OS == win ]]; then
     BROWSERS="--browsers Chrome"
   else
     BROWSERS="--browsers Firefox,Chrome"
@@ -139,7 +139,6 @@ if builder_start_action test:browser; then
   fi
 
   if [[ KARMA_CONFIG == "manual.conf.js" ]]; then
-    get_builder_OS  # return:  os_id="linux"|"mac"|"win"
     get_browser_set_for_OS
   else
     BROWSERS=

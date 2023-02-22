@@ -438,8 +438,8 @@ static_assert(sizeof(struct COMP_KMXPLUS_LAYR) == LDML_LENGTH_LAYR, "mismatched 
 /* ------------------------------------------------------------------
  * key2 section
    ------------------------------------------------------------------ */
-struct COMP_KMXPLUS_KEY2 {
-  static const KMX_DWORD IDENT = LDML_SECTIONID_KEY2;
+struct COMP_KMXPLUS_KEYS {
+  static const KMX_DWORD IDENT = LDML_SECTIONID_KEYS;
   COMP_KMXPLUS_HEADER header;
   KMX_DWORD keyCount;
   KMX_DWORD flicksCount;
@@ -456,19 +456,19 @@ struct COMP_KMXPLUS_KEY2 {
   bool valid(KMX_DWORD length) const;
 };
 
-struct COMP_KMXPLUS_KEY2_FLICK_ELEMENT {
+struct COMP_KMXPLUS_KEYS_FLICK_ELEMENT {
   KMXPLUS_LIST directions;
   KMX_DWORD flags;
   KMXPLUS_STR to; // string or codepoint
 };
 
-struct COMP_KMXPLUS_KEY2_FLICK_LIST {
+struct COMP_KMXPLUS_KEYS_FLICK_LIST {
   KMX_DWORD count;
   KMX_DWORD flick; // flick index
   KMXPLUS_STR id;
 };
 
-struct COMP_KMXPLUS_KEY2_KEY {
+struct COMP_KMXPLUS_KEYS_KEY {
   KMXPLUS_STR to;
   KMX_DWORD flags;
   KMXPLUS_STR id;
@@ -482,26 +482,26 @@ struct COMP_KMXPLUS_KEY2_KEY {
   std::u16string get_string() const;
 };
 
-struct COMP_KMXPLUS_KEY2_KMAP {
+struct COMP_KMXPLUS_KEYS_KMAP {
     KMX_DWORD vkey;
     KMX_DWORD mod;
     KMX_DWORD key;     // index into key subtable
 };
 
-class COMP_KMXPLUS_KEY2_Helper {
+class COMP_KMXPLUS_KEYS_Helper {
 public:
-  COMP_KMXPLUS_KEY2_Helper();
+  COMP_KMXPLUS_KEYS_Helper();
   /**
    * Initialize the helper to point at a layr section.
    * @return true if valid
   */
-  bool setKey2(const COMP_KMXPLUS_KEY2 *newKey2);
+  bool setKeys(const COMP_KMXPLUS_KEYS *newKeys);
   inline bool valid() const { return is_valid; }
 
-  const COMP_KMXPLUS_KEY2_KEY           *getKeys(KMX_DWORD key) const;
-  const COMP_KMXPLUS_KEY2_FLICK_LIST    *getFlickLists(KMX_DWORD list) const;
-  const COMP_KMXPLUS_KEY2_FLICK_ELEMENT *getFlickElements(KMX_DWORD element) const;
-  const COMP_KMXPLUS_KEY2_KMAP          *getKmap(KMX_DWORD element) const;
+  const COMP_KMXPLUS_KEYS_KEY           *getKeys(KMX_DWORD key) const;
+  const COMP_KMXPLUS_KEYS_FLICK_LIST    *getFlickLists(KMX_DWORD list) const;
+  const COMP_KMXPLUS_KEYS_FLICK_ELEMENT *getFlickElements(KMX_DWORD element) const;
+  const COMP_KMXPLUS_KEYS_KMAP          *getKmap(KMX_DWORD element) const;
 
   /**
    * Search for a key by string id.
@@ -509,23 +509,23 @@ public:
    * @param index on exit, index of item if found. Undefined otherwise.
    * @return pointer to key or nullptr
    */
-  const COMP_KMXPLUS_KEY2_KEY *findKeyByStringId(KMX_DWORD strId, KMX_DWORD &index) const;
+  const COMP_KMXPLUS_KEYS_KEY *findKeyByStringId(KMX_DWORD strId, KMX_DWORD &index) const;
 
 private:
-  const COMP_KMXPLUS_KEY2 *key2;
+  const COMP_KMXPLUS_KEYS *key2;
   bool is_valid;
-  const COMP_KMXPLUS_KEY2_KEY *keys;
-  const COMP_KMXPLUS_KEY2_FLICK_LIST *flickLists;
-  const COMP_KMXPLUS_KEY2_FLICK_ELEMENT *flickElements;
-  const COMP_KMXPLUS_KEY2_KMAP *kmap;
+  const COMP_KMXPLUS_KEYS_KEY *keys;
+  const COMP_KMXPLUS_KEYS_FLICK_LIST *flickLists;
+  const COMP_KMXPLUS_KEYS_FLICK_ELEMENT *flickElements;
+  const COMP_KMXPLUS_KEYS_KMAP *kmap;
 };
 
-static_assert(sizeof(struct COMP_KMXPLUS_KEY2_KEY) == LDML_LENGTH_KEY2_KEY, "mismatched size of key2.key");
-static_assert(sizeof(struct COMP_KMXPLUS_KEY2_FLICK_ELEMENT) == LDML_LENGTH_KEY2_FLICK_ELEMENT, "mismatched size of key2.flick");
-static_assert(sizeof(struct COMP_KMXPLUS_KEY2_FLICK_LIST) == LDML_LENGTH_KEY2_FLICK_LIST, "mismatched size of key2.flicks");
-static_assert(sizeof(struct COMP_KMXPLUS_KEY2_KMAP) == LDML_LENGTH_KEY2_KMAP, "mismatched size of key2.kmap");
-static_assert(sizeof(struct COMP_KMXPLUS_KEY2) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");
-static_assert(sizeof(struct COMP_KMXPLUS_KEY2) == LDML_LENGTH_KEY2, "mismatched size of section key2");
+static_assert(sizeof(struct COMP_KMXPLUS_KEYS_KEY) == LDML_LENGTH_KEYS_KEY, "mismatched size of key2.key");
+static_assert(sizeof(struct COMP_KMXPLUS_KEYS_FLICK_ELEMENT) == LDML_LENGTH_KEYS_FLICK_ELEMENT, "mismatched size of key2.flick");
+static_assert(sizeof(struct COMP_KMXPLUS_KEYS_FLICK_LIST) == LDML_LENGTH_KEYS_FLICK_LIST, "mismatched size of key2.flicks");
+static_assert(sizeof(struct COMP_KMXPLUS_KEYS_KMAP) == LDML_LENGTH_KEYS_KMAP, "mismatched size of key2.kmap");
+static_assert(sizeof(struct COMP_KMXPLUS_KEYS) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");
+static_assert(sizeof(struct COMP_KMXPLUS_KEYS) == LDML_LENGTH_KEYS, "mismatched size of section key2");
 
 /* ------------------------------------------------------------------
  * list section
@@ -602,7 +602,7 @@ class kmx_plus {
     // keep the next elements sorted
     const COMP_KMXPLUS_DISP *disp;
     const COMP_KMXPLUS_ELEM *elem;
-    const COMP_KMXPLUS_KEY2 *key2;
+    const COMP_KMXPLUS_KEYS *key2;
     const COMP_KMXPLUS_LAYR *layr;
     const COMP_KMXPLUS_LIST *list;
     const COMP_KMXPLUS_LOCA *loca;
@@ -614,7 +614,7 @@ class kmx_plus {
     inline bool is_valid() { return valid; }
     COMP_KMXPLUS_LAYR_Helper layrHelper;
     COMP_KMXPLUS_LIST_Helper listHelper;
-    COMP_KMXPLUS_KEY2_Helper key2Helper;
+    COMP_KMXPLUS_KEYS_Helper key2Helper;
   private:
     bool valid; // true if valid
 };

@@ -1,12 +1,13 @@
-import { VisualKeyboard, LDMLKeyboard } from "@keymanapp/common-types";
+import { VisualKeyboard, LDMLKeyboard, TouchLayoutFileWriter } from "@keymanapp/common-types";
 
 import * as path from 'path';
+import CompilerOptions from "./compiler-options.js";
+import { TouchLayoutCompiler } from "./touch-layout-compiler.js";
 import VisualKeyboardCompiler from "./visual-keyboard-compiler.js";
 
 const MINIMUM_KMW_VERSION = '16.0';
 
-export interface KeymanWebCompilerOptions {
-  debug?: boolean;
+export interface KeymanWebCompilerOptions extends CompilerOptions {
 };
 
 export class KeymanWebCompiler {
@@ -15,7 +16,7 @@ export class KeymanWebCompiler {
   private readonly tab: string;
 
   constructor(options?: KeymanWebCompilerOptions) {
-    this.options = options;
+    this.options = { ...options };
     this.nl = this.options.debug ? "\n" : '';
     this.tab = this.options.debug ? "  " : '';
   }
@@ -37,10 +38,10 @@ export class KeymanWebCompiler {
   }
 
   public compileTouchLayout(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile) {
-    // const tlc = new TouchLayoutCompiler();
-    // const layout = tlc.compile(source);
-    // TODO-LDML
-    return '';
+    const tlcompiler = new TouchLayoutCompiler();
+    const layout = tlcompiler.compileToJavascript(source);
+    const writer = new TouchLayoutFileWriter({formatted: this.options.debug});
+    return writer.compile(layout);
   }
 
   private cleanName(name: string): string {
@@ -82,7 +83,7 @@ export class KeymanWebCompiler {
       `${tab}this.KDU=${displayUnderlying ? '1' : '0'};${nl}` +
       `${tab}this.KH="";${nl}` +  // TODO-LDML: help text not supported
       `${tab}this.KM=0;${nl}` +  // TODO-LDML: mnemonic layout not supported for LDML keyboards
-      `${tab}this.KBVER=${JSON.stringify(source.keyboard.version.number)};${nl}` +
+      `${tab}this.KBVER=${JSON.stringify(source.keyboard.version?.number || '0.0')};${nl}` +
       `${tab}this.KMBM=${modifierBitmask};${nl}`;
 
     if(isRTL) {
