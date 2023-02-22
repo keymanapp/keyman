@@ -6,6 +6,7 @@
 #include <vector>
 #include <ctype.h>          
 #include <string>
+#include "kmcompx.h"
 
 std::string string_from_wstring(std::wstring const str);
 std::wstring wstring_from_string(std::string const str);
@@ -56,6 +57,7 @@ if (!(std::is_same<T,TT>::value))
     nfile = _wfsopen((const KMX_WCHART*) Filename, (const KMX_WCHART*) mode, _SH_DENYWR);
 
   else if (std::is_same<T,const KMX_WCHAR*>::value)
+
   {
     std::wstring Name_w = convert_pchar16T_To_wstr((KMX_WCHAR*) Filename);
     std::wstring mode_w = convert_pchar16T_To_wstr((KMX_WCHAR*) mode);
