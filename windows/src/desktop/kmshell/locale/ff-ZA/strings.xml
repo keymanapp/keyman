@@ -46,6 +46,10 @@
   <string name="SKButtonCancel" comment="Cancel button in message boxes">Haaytu</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
+  <!-- Introduced: 16.0.47 -->
+  <string name="SKAddremove" comment="Add or Remove languages button opens a dialog window">Ɓeydu/Momtu ɗemngal...</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.330.0 -->
   <string name="SKBalloonClickToSelectKeyboard" comment="Balloon that shows when Keyman icon is first shown during the tutorial">Dobo e ngel maandel ngam labaade tappirde</string>
   <!-- Context: Formatted Messages -->
@@ -64,6 +68,18 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.239.0 -->
   <string name="S_Caption_Help" comment="Configuration dialog link to Help">Heɓɓitorde</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Uninstall" comment="Configuration dialog link to Uninstall Keyboard">Aaftu</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Enable" comment="Configuration dialog link to Enable Keyboard">Hurmin</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Disable" comment="Configuration dialog link to Disable Keyboard">Daaƴ</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -139,11 +155,11 @@
   <!-- Context: Keyboard Install Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 14.0 -->
-  <string name="S_Caption_Keyboard" comment="Keyboard install dialog - term for a single keyboard layout">Lelngo Tappirɗe:</string>
+  <string name="S_Caption_Keyboard" comment="Keyboard install dialog - term for a single keyboard layout">Lelngo Tappirde:</string>
   <!-- Context: Keyboard Install Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 14.0 -->
-  <string name="S_Caption_KeyboardLanguage" comment="Keyboard install dialog - term for caption for language selector a single keyboard layout">Ɗemngal Tappirɗe:</string>
+  <string name="S_Caption_KeyboardLanguage" comment="Keyboard install dialog - term for caption for language selector a single keyboard layout">Ɗemngal Tappirde:</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -174,8 +190,12 @@
   <string name="S_Languages_Install" comment="Add language profile">Ɓeydu ɗemngal</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47 -->
+  <string name="S_Languages_Addremove" comment="Title for dialog to add or remove languages for keyboard layout">Ɓeydu/Momtu ɗemngal</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_OnScreenKeyboard" comment="Term for the On Screen Keyboard">Tappirde Yaynirde :</string>
+  <string name="S_Caption_OnScreenKeyboard" comment="Term for the On Screen Keyboard">Tappirde Yaynirde:</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.306.0 -->
@@ -223,7 +243,7 @@
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.287.0 -->
-  <string name="S_Menu_Options" comment="KL option button submenu - keyboard options">Cuɓe tappirde</string>
+  <string name="S_Menu_Options" comment="KL option button submenu - keyboard options">Cuɓe tappirde...</string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -300,7 +320,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">Hollu yaynirde bismaorde ndee</string>
+  <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">Hollu yaynirde bismorde ndee</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -341,7 +361,7 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set for an option">(ndiga)</string>
+  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set">(Ndiga)</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -429,7 +449,7 @@
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_DownloadKeyboard_Title" comment="Download keyboard layout from keyman.com dialog title">Aawto tappirde ndee to lowre Tavultesoft</string>
+  <string name="S_DownloadKeyboard_Title" comment="Download keyboard layout from keyman.com dialog title">Aawto tappirde ndee to lowre Keyman.com</string>
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -869,9 +889,9 @@ Jokku\?</string>
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">L\'information de débogage de Keyman sera stockée sur le Bureau dans un fichier texte nommé %LOCALAPPDATA%\Keyman\Diag\system#.etl.  Vous devez quitter Keyman avant de lire ou de supprimer ce fichier.
-
+  
   ATTENTION. Ce fichier peut devenir important très rapidement.  Activer le débogage ralentira le sytème et ne doit être fait qu\'à la demande du support Tavultesoft.
-
+  
   CONFIDENTIALITÉ: Veuillez noter que le fichier journal de débogage enregistre toutes les frappes que vous exécutez.  Vous ne devez activer le journal de débogage que pendant la durée de la session de débogage ou de diagnostic, et vous devez effacer le fichier  [Bureau]\keymanlog\system.log file dès que possible.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->

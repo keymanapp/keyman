@@ -16,56 +16,41 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 BASEDIR=$(pwd)
-extra_projects="keyman"
 
 if [ "$1" == "origdist" ]; then
     create_origdist=1
     shift
 fi
 
-if [ "$1" != "" ]; then
-    echo "$1"
-    if [ "$1" == "keyman" ]; then
-        extra_projects="$1"
-    else
-        echo "project $1 does not exist"
-        exit 1
-    fi
-fi
-
 rm -rf dist
 mkdir -p dist
 
-# configure and make dist for autotool projects
-for proj in ${extra_projects}; do
-    # dist for keyman
-    cp -a debian ../
-    cd ..
-    echo "3.0 (native)" > debian/source/format
-    dch keyman --newversion "${VERSION}" --force-bad-version --nomultimaint
-    dpkg-source --tar-ignore=*~ --tar-ignore=.git --tar-ignore=.gitattributes \
-        --tar-ignore=.gitignore --tar-ignore=experiments --tar-ignore=debian \
-        --tar-ignore=.github --tar-ignore=.vscode --tar-ignore=android \
-        --tar-ignore=common/models --tar-ignore=common/predictive-text \
-        --tar-ignore=common/resources --tar-ignore=common/schemas \
-        --tar-ignore=common/test --tar-ignore=common/web --tar-ignore=common/windows \
-        --tar-ignore=developer --tar-ignore=docs --tar-ignore=ios \
-        --tar-ignore=linux/keyman-config/buildtools/build-langtags.py --tar-ignore=__pycache__ \
-        --tar-ignore=linux/help --tar-ignore=linux/Jenkinsfile \
-        --tar-ignore=linux/keyboardprocessor \
-        --tar-ignore=mac --tar-ignore=node_modules --tar-ignore=oem \
-        --tar-ignore=linux/build* --tar-ignore=core/build \
-        --tar-ignore=resources/devbox --tar-ignore=resources/git-hooks \
-        --tar-ignore=resources/scopes \
-        --tar-ignore=resources/build/*.lua --tar-ignore=resources/build/jq* \
-        --tar-ignore=resources/build/vswhere* --tar-ignore=results \
-        --tar-ignore=web --tar-ignore=windows --tar-ignore=keyman_1* \
-        --tar-ignore=dist --tar-ignore=.pbuilderrc --tar-ignore=VERSION \
-        --tar-ignore=scripts -Zgzip -b .
-    mv ../keyman_"${VERSION}".tar.gz linux/dist/keyman-"${VERSION}".tar.gz
-    echo "3.0 (quilt)" > debian/source/format
-    cd "$BASEDIR"
-done
+# dist for keyman
+cp -a debian ../
+cd ..
+echo "3.0 (native)" > debian/source/format
+dch keyman --newversion "${VERSION}" --force-bad-version --nomultimaint
+dpkg-source --tar-ignore=*~ --tar-ignore=.git --tar-ignore=.gitattributes \
+    --tar-ignore=.gitignore --tar-ignore=experiments --tar-ignore=debian \
+    --tar-ignore=.github --tar-ignore=.vscode --tar-ignore=android \
+    --tar-ignore=common/models --tar-ignore=common/predictive-text \
+    --tar-ignore=common/resources --tar-ignore=common/schemas \
+    --tar-ignore=common/test --tar-ignore=common/web --tar-ignore=common/windows \
+    --tar-ignore=developer --tar-ignore=docs --tar-ignore=ios \
+    --tar-ignore=linux/keyman-config/buildtools/build-langtags.py --tar-ignore=__pycache__ \
+    --tar-ignore=linux/help --tar-ignore=linux/Jenkinsfile \
+    --tar-ignore=linux/keyboardprocessor \
+    --tar-ignore=mac --tar-ignore=node_modules --tar-ignore=oem \
+    --tar-ignore=linux/build --tar-ignore=core/build \
+    --tar-ignore=resources/devbox --tar-ignore=resources/git-hooks \
+    --tar-ignore=resources/scopes \
+    --tar-ignore=resources/build/*.lua --tar-ignore=resources/build/jq* \
+    --tar-ignore=resources/build/vswhere* --tar-ignore=results \
+    --tar-ignore=web --tar-ignore=windows --tar-ignore=keyman_1* \
+    --tar-ignore=dist --tar-ignore=.pbuilderrc --tar-ignore=VERSION -Zgzip -b .
+mv ../keyman_"${VERSION}".tar.gz linux/dist/keyman-"${VERSION}".tar.gz
+echo "3.0 (quilt)" > debian/source/format
+cd "$BASEDIR"
 
 # create orig.tar.gz
 if [ -n "$create_origdist" ]; then

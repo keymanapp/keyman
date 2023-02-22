@@ -38,15 +38,15 @@ if builder_start_action source; then
   echo "${START_STEP}Make source package for keyman${COLOR_RESET}"
 
   echo "${START_STEP}reconfigure${COLOR_RESET}"
-  ./scripts/reconf.sh keyman
+  ./scripts/reconf.sh
   echo "${END_STEP}"
 
   echo "${START_STEP}Make origdist${COLOR_RESET}"
-  ./scripts/dist.sh origdist keyman
+  ./scripts/dist.sh origdist
   echo "${END_STEP}"
 
   echo "${START_STEP}Make deb source${COLOR_RESET}"
-  ./scripts/deb.sh sourcepackage keyman
+  ./scripts/deb.sh sourcepackage
   echo "${END_STEP}"
 
   mv builddebs/* "${OUTPUT_PATH:-..}"
@@ -58,13 +58,13 @@ fi
 if builder_start_action verify; then
   tar xf "${SRC_PKG}"
   if [ ! -f debian/libkmnkbp0-0.symbols ]; then
-    echo ":warning: Missing libkmnkbp0-0.symbols file"
+    echo ":warning: Missing libkmnkbp0-0.symbols file" >&2
   else
     tmpDir=$(mktemp -d)
     dpkg -x "${BIN_PKG}" "$tmpDir"
     cd debian
     dpkg-gensymbols -v"${PKG_VERSION}" -plibkmnkbp0-0 -e"${tmpDir}"/usr/lib/x86_64-linux-gnu/libkmnkbp0.so* -Olibkmnkbp0-0.symbols -c4
-    echo ":heavy_check_mark: libkmnkbp0-0 API didn't change"
+    echo ":heavy_check_mark: libkmnkbp0-0 API didn't change" >&2
   fi
   builder_finish_action success verify
   exit 0

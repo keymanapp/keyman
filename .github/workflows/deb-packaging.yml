@@ -165,20 +165,23 @@ jobs:
     if: github.event.client_payload.isTestBuild == 'false'
 
     steps:
+    - name: Install dput
+      run: |
+        export DEBIAN_FRONTEND=noninteractive
+        export DEBIAN_PRIORITY=critical
+        export DEBCONF_NOWARNINGS=yes
+        sudo apt-get update
+        sudo apt-get install -q -y dput
+
+    - name: Setup .dput.cf
+      run: |
+        echo "${{vars.ENV_DPUT_CONFIG}}" > ~/.dput.cf
+
     - name: Download Artifacts
       uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
       with:
         name: keyman-signedpkgs
         path: artifacts
-
-    - name: Install dput
-      uses: ./.github/actions/apt-install
-      with:
-        packages: dput
-
-    - name: Setup .dput.cf
-      run: |
-        echo "${{vars.ENV_DPUT_CONFIG}}" > ~/.dput.cf
 
     - name: Upload
       run: |
@@ -234,7 +237,7 @@ jobs:
         SRC_PKG="${GITHUB_WORKSPACE}/artifacts/keyman-srcpkg/keyman_${{ needs.sourcepackage.outputs.VERSION }}-1.debian.tar.xz" \
         BIN_PKG="${GITHUB_WORKSPACE}/artifacts/keyman-binarypkgs/libkmnkbp0-0_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" \
         PKG_VERSION="${{ needs.sourcepackage.outputs.VERSION }}" \
-        ./scripts/deb-packaging.sh --gha verify >> $GITHUB_STEP_SUMMARY
+        ./scripts/deb-packaging.sh --gha verify 2>> $GITHUB_STEP_SUMMARY
 
     - name: Archive .symbols file
       uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
@@ -245,24 +248,24 @@ jobs:
 
   set_status:
     name: Set result status on PR builds
-    needs: [sourcepackage, binary_packages, deb_signing, api_verification]
+    needs: [sourcepackage, binary_packages, api_verification]
     runs-on: ubuntu-latest
     if: ${{ always() && github.event.client_payload.isTestBuild == 'true' }}
     steps:
     - name: Set success
-      if: needs.sourcepackage.result == 'success' && needs.binary_packages.result == 'success' && (needs.deb_signing.result == 'success' || needs.deb_signing.result == 'skipped') && needs.api_verification.result == 'success'
+      if: needs.sourcepackage.result == 'success' && needs.binary_packages.result == 'success' && needs.api_verification.result == 'success'
       run: |
         echo "RESULT=success" >> $GITHUB_ENV
         echo "MSG=Package build succeeded" >> $GITHUB_ENV
 
     - name: Set cancelled
-      if: needs.sourcepackage.result == 'cancelled' || needs.binary_packages.result == 'cancelled' || needs.deb_signing.result == 'cancelled' || needs.api_verification.result == 'cancelled'
+      if: needs.sourcepackage.result == 'cancelled' || needs.binary_packages.result == 'cancelled' || needs.api_verification.result == 'cancelled'
       run: |
         echo "RESULT=error" >> $GITHUB_ENV
         echo "MSG=Package build cancelled" >> $GITHUB_ENV
 
     - name: Set failure
-      if: needs.sourcepackage.result == 'failure' || needs.binary_packages.result == 'failure' || needs.deb_signing.result == 'failure' || needs.api_verification.result == 'failure'
+      if: needs.sourcepackage.result == 'failure' || needs.binary_packages.result == 'failure' || needs.api_verification.result == 'failure'
       run: |
         echo "RESULT=failure" >> $GITHUB_ENV
         echo "MSG=Package build failed" >> $GITHUB_ENV
