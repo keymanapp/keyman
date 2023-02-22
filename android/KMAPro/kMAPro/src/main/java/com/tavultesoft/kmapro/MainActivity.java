@@ -345,6 +345,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
+    KMManager.onConfigurationChanged(newConfig);
     getSupportActionBar().setBackgroundDrawable(getActionBarDrawable(this));
     resizeTextView(textView.isKeyboardVisible());
     invalidateOptionsMenu();
