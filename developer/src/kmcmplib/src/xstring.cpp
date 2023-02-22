@@ -1,5 +1,6 @@
 
 #include "pch.h"
+#include "xstring.h"
 // used to be  windows/src/global/vc/xstring.cpp
 /*
 * int xstrlen( PKMX_BYTE p );

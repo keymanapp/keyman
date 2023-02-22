@@ -1,6 +1,7 @@
 #pragma once
 
-#include <Compfile.h>
+#include "Compfile.h"
+#include "../../../../common/include/km_types.h"
 
 #define VERIFY_KEYBOARD_VERSION(fk, ver, err) { \
   if(!VerifyKeyboardVersion((fk), (ver))) \

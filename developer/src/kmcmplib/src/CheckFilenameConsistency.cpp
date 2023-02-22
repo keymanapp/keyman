@@ -90,6 +90,7 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
 #else
   nfile = fopen(Name_wchptr, "rb");
 #endif
+  //nfile = Open_File(Name_wchptr, L"rb");
 
   if (nfile == NULL) {
     if (ReportMissingFile) {

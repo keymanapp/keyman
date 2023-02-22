@@ -194,5 +194,14 @@ Thumbs.db
 *.bak
 /linux/common/core/desktop/wasm.defs.build
 /linux/common/core/desktop/meson.build
-/../*.kmx
-/../*.kvk
+/common/test/**/*.kmx
+/common/test/**/*.kvk
+
+/core/tests/unit/kmx/*.kmx
+/mac/**/*.kmx
+
+/web/src/test/manual/*.kmx
+/web/src/test/manual/*.kvk
+
+/windows/src/test/*.kmx
+/windows/src/test/*.kvk

@@ -70,7 +70,7 @@
 #include <comperr.h>
 #include "../../../../common/windows/cpp/include/vkeys.h"
 #include <cuchar>
-#include <versioning.h>
+#include "versioning.h"
 #include "kmcmpdll.h"
 #include "DeprecationChecks.h"
 
@@ -82,6 +82,7 @@
 #include "namedcodeconstants.h"
 #include "../../../../common/windows/cpp/include/unicode.h"
 #include "../../../../common/windows/cpp/include/keymanversion.h"
+#include "../../../../developer/src/kmcmplib/src/xstring.h"
 
 #include "edition.h"
 
@@ -383,7 +384,7 @@ extern "C" BOOL __declspec(dllexport) kmcmp_CompileKeyboardFile(PKMX_STR pszInfi
   {
     fclose(fp_in);
     return CERR_CannotReadInfile;
-  }
+  }fopen
 
   fseek(fp_in, 0, SEEK_SET);
   if (str[0] == UTF8Sig[0] && str[1] == UTF8Sig[1] && str[2] == UTF8Sig[2])
