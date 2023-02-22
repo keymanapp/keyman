@@ -65,6 +65,13 @@ These dependencies are also listed below if you'd prefer to install manually.
   sudo ln -s /opt/homebrew/bin/greadlink /usr/local/bin/greadlink
   ```
 
+  On Ventura, you will need to adjust your PATH so that coreutils’ `realpath` takes precedence over the BSD one:
+
+  ```shell
+  # Credit: brew info coreutils
+  PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
+  ```
+
 * Web: node.js, emscripten, openjdk 8
 
   ```shell
