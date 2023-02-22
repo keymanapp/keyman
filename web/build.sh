@@ -14,8 +14,6 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-WORKING_DIRECTORY=`pwd`
-
 # This script runs from its own folder
 cd "$THIS_SCRIPT_PATH"
 

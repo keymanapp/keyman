@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Compiles the Keyman Engine for Web and its various end-products
+# Compiled the Keyman Engine for Web's old namespaced version
 #
 
 # set -x
@@ -84,8 +84,6 @@ compilecmd="$compiler"
 
 PREDICTIVE_TEXT_SOURCE="../common/predictive-text/unit_tests/in_browser/resources/models/simple-trie.js"
 PREDICTIVE_TEXT_OUTPUT="src/test/manual/web/prediction-ui/simple-en-trie.js"
-
-builder_child_base src/
 
 builder_describe "Builds Keyman Engine for Web (KMW)." \
   "@../common/web/keyman-version build" \

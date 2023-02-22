@@ -12,14 +12,12 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-WORKING_DIRECTORY=`pwd`
-
 # This script runs from its own folder
 cd "$THIS_SCRIPT_PATH"
 
 # Imports common Web build-script definitions & functions
 SUBPROJECT_NAME=engine/dom-utils
-. ../../../common.inc.sh
+. "$KEYMAN_ROOT/web/common.inc.sh"
 
 # ################################ Main script ################################
 
@@ -35,8 +33,8 @@ builder_describe "Builds DOM-utility modules used by the Keyman Engine for Web (
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
 
 builder_describe_outputs \
-  configure    ../../../../node_modules \
-  build        ../../../build/$SUBPROJECT_NAME/obj/index.js
+  configure   /node_modules \
+  build       /web/$SUBPROJECT_NAME/obj/index.js
 
 builder_parse "$@"
 
@@ -49,7 +47,7 @@ if builder_start_action configure; then
 fi
 
 if builder_start_action clean; then
-  rm -rf ../../../build/$SUBPROJECT_NAME
+  rm -rf "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME"
   builder_finish_action success clean
 fi
 

@@ -758,7 +758,7 @@ builder_describe() {
 #
 # ```bash
 #   builder_describe_outputs \
-#     configure /node_modules \
+#     configure   /node_modules \
 #     build     build/index.js
 # ```
 #
