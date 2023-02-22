@@ -83,7 +83,7 @@ export class KeymanWebCompiler {
       `${tab}this.KDU=${displayUnderlying ? '1' : '0'};${nl}` +
       `${tab}this.KH="";${nl}` +  // TODO-LDML: help text not supported
       `${tab}this.KM=0;${nl}` +  // TODO-LDML: mnemonic layout not supported for LDML keyboards
-      `${tab}this.KBVER=${JSON.stringify(source.keyboard.version.number)};${nl}` +
+      `${tab}this.KBVER=${JSON.stringify(source.keyboard.version?.number || '0.0')};${nl}` +
       `${tab}this.KMBM=${modifierBitmask};${nl}`;
 
     if(isRTL) {

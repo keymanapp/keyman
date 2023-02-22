@@ -42,13 +42,16 @@ export class TouchLayoutCompiler {
       const keys = row.keys.split(' ');
       for(let key of keys) {
         const keydef = source.keyboard.keys?.key?.find(x => x.id == key);
-
-        const fileKey: TouchLayout.TouchLayoutKey = {
-          id: this.translateKeyIdentifierToTouch(keydef.id) as TouchLayout.TouchLayoutKeyId,
-          text: keydef.to,
-          // TODO-LDML: additional properties
-        };
-        fileRow.key.push(fileKey);
+        if(keydef) {
+          const fileKey: TouchLayout.TouchLayoutKey = {
+            id: this.translateKeyIdentifierToTouch(keydef.id) as TouchLayout.TouchLayoutKeyId,
+            text: keydef.to || '',
+            // TODO-LDML: additional properties
+          };
+          fileRow.key.push(fileKey);
+        } else {
+          // TODO-LDML: consider logging missing keys
+        }
       }
     }
 
@@ -76,9 +79,11 @@ export class TouchLayoutCompiler {
       shift:        'shift',
       caps:         'caps',
       altR:         'rightalt',
-      "altR shift": 'rightalt-shift',
-      "shift altR": 'rightalt-shift', // TODO-LDML is this required?
+      "altR shift": 'rightalt-shift'
     };
+
+    // canonicalize modifier string, alphabetical
+    modifier = (modifier||'').split(/\b/).sort().join(' ').trim();
 
     if(Object.hasOwn(map, modifier)) {
       return (map as any)[modifier];
