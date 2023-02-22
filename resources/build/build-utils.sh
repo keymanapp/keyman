@@ -39,7 +39,7 @@ function findKeymanRoot() {
     # None of the answers are 100% correct for cross-platform
     # On macOS, requires coreutils (`brew install coreutils`)
     local SCRIPT=$(readlink -f "${BASH_SOURCE[0]}")
-    KEYMAN_ROOT=$(dirname $(dirname $(dirname "$SCRIPT")))
+    KEYMAN_ROOT="${SCRIPT%/*/*/*}"
     readonly KEYMAN_ROOT
 }
 
