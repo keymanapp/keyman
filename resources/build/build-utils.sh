@@ -338,3 +338,9 @@ run_xcodebuild() {
     fail "Build failed! Error: [$ret_code] when executing command: 'xcodebuild $cmnd'"
   fi
 }
+
+#
+# We always want to use tools out of node_modules/.bin to guarantee that we get the
+# correct version
+#
+set_keyman_standard_build_path
