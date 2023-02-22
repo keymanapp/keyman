@@ -384,7 +384,7 @@ extern "C" BOOL __declspec(dllexport) kmcmp_CompileKeyboardFile(PKMX_STR pszInfi
   {
     fclose(fp_in);
     return CERR_CannotReadInfile;
-  }fopen
+  }
 
   fseek(fp_in, 0, SEEK_SET);
   if (str[0] == UTF8Sig[0] && str[1] == UTF8Sig[1] && str[2] == UTF8Sig[2])
