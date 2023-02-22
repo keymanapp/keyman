@@ -28,7 +28,7 @@ if [[ "${BUILDONLY}" == "no" ]]; then
 
 	# We need to build core first before we can configure ibus-keyman!
 	cd "$BASEDIR"
-	../core/build.sh -t keyboardprocessor build
+	../core/build.sh --target-path "$BASEDIR/keyboardprocessor" build:arch
 
 	cd "$BASEDIR/ibus-keyman"
 	./build.sh clean configure -- --prefix="${INSTALLDIR}"
