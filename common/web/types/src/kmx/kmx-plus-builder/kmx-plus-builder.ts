@@ -5,7 +5,7 @@ import { BUILDER_SECTION } from './builder-section.js';
 import { BUILDER_SECT, build_sect } from './build-sect.js';
 import { BUILDER_DISP, build_disp } from './build-disp.js';
 import { BUILDER_ELEM, build_elem } from './build-elem.js';
-import { BUILDER_KEY2, build_key2 } from './build-key2.js';
+import { BUILDER_KEYS, build_keys } from './build-keys.js';
 import { BUILDER_LAYR, build_layr } from './build-layr.js';
 import { BUILDER_LIST, build_list } from './build-list.js';
 import { BUILDER_LOCA, build_loca } from './build-loca.js';
@@ -26,7 +26,7 @@ type SectionBuilders = {
   disp?: BUILDER_DISP;
   elem?: BUILDER_ELEM;
   finl?: BUILDER_FINL;
-  key2?: BUILDER_KEY2;
+  keys?: BUILDER_KEYS;
   layr?: BUILDER_LAYR;
   list?: BUILDER_LIST;
   loca?: BUILDER_LOCA;
@@ -62,7 +62,7 @@ export default class KMXPlusBuilder {
     this.emitSection(file, this.file.COMP_PLUS_ELEM, this.sect.elem);
     this.emitElements(file);
     this.emitSection(file, this.file.COMP_PLUS_FINL, this.sect.finl);
-    this.emitSection(file, this.file.COMP_PLUS_KEY2, this.sect.key2);
+    this.emitSection(file, this.file.COMP_PLUS_KEYS, this.sect.keys);
     this.emitSection(file, this.file.COMP_PLUS_LAYR, this.sect.layr);
     this.emitSection(file, this.file.COMP_PLUS_LIST, this.sect.list);
     this.emitSection(file, this.file.COMP_PLUS_LOCA, this.sect.loca);
@@ -92,7 +92,7 @@ export default class KMXPlusBuilder {
     this.sect.bksp = build_bksp(this.file.kmxplus.bksp, this.sect.strs, this.sect.elem);
     this.sect.disp = build_disp(this.file.kmxplus, this.sect.strs);
     this.sect.finl = build_finl(this.file.kmxplus.finl, this.sect.strs, this.sect.elem);
-    this.sect.key2 = build_key2(this.file.kmxplus, this.sect.strs, this.sect.list);
+    this.sect.keys = build_keys(this.file.kmxplus, this.sect.strs, this.sect.list);
     this.sect.layr = build_layr(this.file.kmxplus, this.sect.strs, this.sect.list);
     this.sect.loca = build_loca(this.file.kmxplus, this.sect.strs);
     this.sect.meta = build_meta(this.file.kmxplus, this.sect.strs);
@@ -128,7 +128,7 @@ export default class KMXPlusBuilder {
     offset = this.finalize_sect_item(this.sect.disp, offset);
     offset = this.finalize_sect_item(this.sect.elem, offset);
     offset = this.finalize_sect_item(this.sect.finl, offset);
-    offset = this.finalize_sect_item(this.sect.key2, offset);
+    offset = this.finalize_sect_item(this.sect.keys, offset);
     offset = this.finalize_sect_item(this.sect.layr, offset);
     offset = this.finalize_sect_item(this.sect.list, offset);
     offset = this.finalize_sect_item(this.sect.loca, offset);

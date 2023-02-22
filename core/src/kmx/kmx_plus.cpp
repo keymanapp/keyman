@@ -538,63 +538,63 @@ COMP_KMXPLUS_LAYR_Helper::getKey(KMX_DWORD key) const {
 }
 
 bool
-COMP_KMXPLUS_KEY2::valid(KMX_DWORD _kmn_unused(length)) const {
+COMP_KMXPLUS_KEYS::valid(KMX_DWORD _kmn_unused(length)) const {
   if (header.size < sizeof(*this)
-      + (keyCount    * sizeof(COMP_KMXPLUS_KEY2_KEY))
-      + (flicksCount * sizeof(COMP_KMXPLUS_KEY2_FLICK_LIST))
-      + (flickCount  * sizeof(COMP_KMXPLUS_KEY2_FLICK_ELEMENT))
-      + (kmapCount   * sizeof(COMP_KMXPLUS_KEY2_KMAP))) {
+      + (keyCount    * sizeof(COMP_KMXPLUS_KEYS_KEY))
+      + (flicksCount * sizeof(COMP_KMXPLUS_KEYS_FLICK_LIST))
+      + (flickCount  * sizeof(COMP_KMXPLUS_KEYS_FLICK_ELEMENT))
+      + (kmapCount   * sizeof(COMP_KMXPLUS_KEYS_KMAP))) {
     DebugLog("header.size < expected size");
     assert(false);
     return false;
   }
-  // further validation in the COMP_KMXPLUS_KEY2_Helper helper obj
+  // further validation in the COMP_KMXPLUS_KEYS_Helper helper obj
   return true;
 }
 
 
-COMP_KMXPLUS_KEY2_Helper::COMP_KMXPLUS_KEY2_Helper() : key2(nullptr), is_valid(false) {
+COMP_KMXPLUS_KEYS_Helper::COMP_KMXPLUS_KEYS_Helper() : key2(nullptr), is_valid(false) {
 }
 
 bool
-COMP_KMXPLUS_KEY2_Helper::setKey2(const COMP_KMXPLUS_KEY2 *newKey2) {
-  DebugLog("validating newKey2=%p", newKey2);
+COMP_KMXPLUS_KEYS_Helper::setKeys(const COMP_KMXPLUS_KEYS *newKeys) {
+  DebugLog("validating newKeys=%p", newKeys);
   is_valid = true;
-  if (newKey2 == nullptr) {
+  if (newKeys == nullptr) {
     // null = invalid
     is_valid = false;
     // No assert here: just a missing layer
     return false;
   }
-  key2 = newKey2;
-  const uint8_t *rawdata = reinterpret_cast<const uint8_t *>(newKey2);
-  rawdata += LDML_LENGTH_KEY2;  // skip past non-dynamic portion
+  key2 = newKeys;
+  const uint8_t *rawdata = reinterpret_cast<const uint8_t *>(newKeys);
+  rawdata += LDML_LENGTH_KEYS;  // skip past non-dynamic portion
   // keys
   if (key2->keyCount > 0) {
-    keys = reinterpret_cast<const COMP_KMXPLUS_KEY2_KEY *>(rawdata);
+    keys = reinterpret_cast<const COMP_KMXPLUS_KEYS_KEY *>(rawdata);
   } else {
     keys    = nullptr;
     is_valid = false;
     assert(is_valid);
   }
-  rawdata += sizeof(COMP_KMXPLUS_KEY2_KEY) * key2->keyCount;
+  rawdata += sizeof(COMP_KMXPLUS_KEYS_KEY) * key2->keyCount;
   // flicks
   if (key2->flicksCount > 0) {
-    flickLists = reinterpret_cast<const COMP_KMXPLUS_KEY2_FLICK_LIST *>(rawdata);
+    flickLists = reinterpret_cast<const COMP_KMXPLUS_KEYS_FLICK_LIST *>(rawdata);
   } else {
     flickLists  = nullptr; // not an error
   }
-  rawdata += sizeof(COMP_KMXPLUS_KEY2_FLICK_LIST) * key2->flicksCount;
+  rawdata += sizeof(COMP_KMXPLUS_KEYS_FLICK_LIST) * key2->flicksCount;
   // flick
   if (key2->flickCount > 0) {
-    flickElements = reinterpret_cast<const COMP_KMXPLUS_KEY2_FLICK_ELEMENT *>(rawdata);
+    flickElements = reinterpret_cast<const COMP_KMXPLUS_KEYS_FLICK_ELEMENT *>(rawdata);
   } else {
     flickElements = nullptr; // not an error
   }
-  rawdata += sizeof(COMP_KMXPLUS_KEY2_FLICK_ELEMENT) * key2->flickCount;
+  rawdata += sizeof(COMP_KMXPLUS_KEYS_FLICK_ELEMENT) * key2->flickCount;
   // kmap
   if (key2->kmapCount > 0) {
-    kmap = reinterpret_cast<const COMP_KMXPLUS_KEY2_KMAP *>(rawdata);
+    kmap = reinterpret_cast<const COMP_KMXPLUS_KEYS_KMAP *>(rawdata);
   } else {
     kmap = nullptr; // not an error
   }
@@ -654,13 +654,13 @@ COMP_KMXPLUS_KEY2_Helper::setKey2(const COMP_KMXPLUS_KEY2 *newKey2) {
     }
   }
   // Return results
-  DebugLog("COMP_KMXPLUS_KEY2_Helper.setKey2(): %s", is_valid ? "valid" : "invalid");
+  DebugLog("COMP_KMXPLUS_KEYS_Helper.setKeys(): %s", is_valid ? "valid" : "invalid");
   assert(is_valid);
   return is_valid;
 }
 
-const COMP_KMXPLUS_KEY2_KEY *
-COMP_KMXPLUS_KEY2_Helper::getKeys(KMX_DWORD i) const {
+const COMP_KMXPLUS_KEYS_KEY *
+COMP_KMXPLUS_KEYS_Helper::getKeys(KMX_DWORD i) const {
   if (!valid() || i >= key2->keyCount) {
     assert(false);
     return nullptr;
@@ -668,8 +668,8 @@ COMP_KMXPLUS_KEY2_Helper::getKeys(KMX_DWORD i) const {
   return keys + i;
 }
 
-const COMP_KMXPLUS_KEY2_KEY*
-COMP_KMXPLUS_KEY2_Helper::findKeyByStringId(KMX_DWORD strId, KMX_DWORD &i) const {
+const COMP_KMXPLUS_KEYS_KEY*
+COMP_KMXPLUS_KEYS_Helper::findKeyByStringId(KMX_DWORD strId, KMX_DWORD &i) const {
   for (i = 0; i < key2->keyCount; i++) {
     if (keys[i].id == strId) {
       return &keys[i];
@@ -678,8 +678,8 @@ COMP_KMXPLUS_KEY2_Helper::findKeyByStringId(KMX_DWORD strId, KMX_DWORD &i) const
   return nullptr;
 }
 
-const COMP_KMXPLUS_KEY2_FLICK_LIST *
-COMP_KMXPLUS_KEY2_Helper::getFlickLists(KMX_DWORD i) const {
+const COMP_KMXPLUS_KEYS_FLICK_LIST *
+COMP_KMXPLUS_KEYS_Helper::getFlickLists(KMX_DWORD i) const {
   if (!valid() || i >= key2->flicksCount) {
     assert(false);
     return nullptr;
@@ -687,8 +687,8 @@ COMP_KMXPLUS_KEY2_Helper::getFlickLists(KMX_DWORD i) const {
   return flickLists + i;
 }
 
-const COMP_KMXPLUS_KEY2_FLICK_ELEMENT *
-COMP_KMXPLUS_KEY2_Helper::getFlickElements(KMX_DWORD i) const {
+const COMP_KMXPLUS_KEYS_FLICK_ELEMENT *
+COMP_KMXPLUS_KEYS_Helper::getFlickElements(KMX_DWORD i) const {
   if (!valid() || i >= key2->flickCount) {
     assert(false);
     return nullptr;
@@ -696,8 +696,8 @@ COMP_KMXPLUS_KEY2_Helper::getFlickElements(KMX_DWORD i) const {
   return flickElements + i;
 }
 
-const COMP_KMXPLUS_KEY2_KMAP *
-COMP_KMXPLUS_KEY2_Helper::getKmap(KMX_DWORD i) const {
+const COMP_KMXPLUS_KEYS_KMAP *
+COMP_KMXPLUS_KEYS_Helper::getKmap(KMX_DWORD i) const {
   if (!valid() || i >= key2->kmapCount) {
     assert(false);
     return nullptr;
@@ -706,8 +706,8 @@ COMP_KMXPLUS_KEY2_Helper::getKmap(KMX_DWORD i) const {
 }
 
 std::u16string
-COMP_KMXPLUS_KEY2_KEY::get_string() const {
-  assert(!(flags & LDML_KEY2_KEY_FLAGS_EXTEND)); // should not be called.
+COMP_KMXPLUS_KEYS_KEY::get_string() const {
+  assert(!(flags & LDML_KEYS_KEY_FLAGS_EXTEND)); // should not be called.
   char16_single buf;
   const int len = Utf32CharToUtf16(to, buf);
   return std::u16string(buf.ch, len);
@@ -849,7 +849,7 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     // these will be nullptr if they don't validate
     disp = section_from_sect<COMP_KMXPLUS_DISP>(sect);
     elem = section_from_sect<COMP_KMXPLUS_ELEM>(sect);
-    key2 = section_from_sect<COMP_KMXPLUS_KEY2>(sect);
+    key2 = section_from_sect<COMP_KMXPLUS_KEYS>(sect);
     layr = section_from_sect<COMP_KMXPLUS_LAYR>(sect);
     list = section_from_sect<COMP_KMXPLUS_LIST>(sect);
     loca = section_from_sect<COMP_KMXPLUS_LOCA>(sect);
@@ -859,7 +859,7 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     vkey = section_from_sect<COMP_KMXPLUS_VKEY>(sect);
 
     // calculate and validate the dynamic parts
-    (void)key2Helper.setKey2(key2);
+    (void)key2Helper.setKeys(key2);
     (void)layrHelper.setLayr(layr);
     (void)listHelper.setList(list);
   }

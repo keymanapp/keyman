@@ -3,7 +3,7 @@
 <!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
 <keyboard locale="mt" conformsTo="techpreview">
   <names>
-    <name value="key2-escaped2" />
+    <name value="keys-escaped2" />
   </names>
 
   <keys>

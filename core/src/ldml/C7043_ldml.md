@@ -109,7 +109,7 @@ See [C7043.2.11](#c7043211-tran-finl-and-bksptransforms).
 
 ### C7043.2.5 Removed: `keys`
 
-_this section has been merged into `key2.kmap`_
+_this section has been merged into the new `keys.kmap`_
 
 ### C7043.2.6 `loca`—Locales
 

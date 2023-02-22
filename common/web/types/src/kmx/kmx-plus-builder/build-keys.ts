@@ -1,18 +1,18 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { Key2Flick, KMXPlusData, StrsItem } from "../kmx-plus.js";
+import { KeysFlick, KMXPlusData, StrsItem } from "../kmx-plus.js";
 import { build_strs_index, BUILDER_STRS } from "./build-strs.js";
 import { build_list_index, BUILDER_LIST } from "./build-list.js";
 import { BUILDER_SECTION } from "./builder-section.js";
 
 /* ------------------------------------------------------------------
- * key2 section
+ * keys section
    ------------------------------------------------------------------ */
 
 /**
- * This struct is a single <key> in the key2 keybag
+ * This struct is a single <key> in the keys keybag
  */
-interface BUILDER_KEY2_KEY {
+interface BUILDER_KEYS_KEY {
   to: number; // str or single codepoint
   flags: number;
   id: number; // str with original key id
@@ -28,59 +28,59 @@ interface BUILDER_KEY2_KEY {
 /**
  * This is a <flicks>, a list of <flick> elements.
  */
-interface BUILDER_KEY2_FLICKS {
-  count: number; // number of BUILDER_KEY2_FLICK entries in this flick list
+interface BUILDER_KEYS_FLICKS {
+  count: number; // number of BUILDER_KEYS_FLICK entries in this flick list
   flick: number; // index into the flick[] subtable of the first flick in the list
   id: number; // str with the original id of this flicks
   _id: string; // copy of the flicks id, used for sorting during build
-  _flicks: Key2Flick[]; // temporary copy of Key2Flick object
+  _flicks: KeysFlick[]; // temporary copy of KeysFlick object
 };
 
 /**
  * This is a single <flick> element.
  */
-interface BUILDER_KEY2_FLICK {
+interface BUILDER_KEYS_FLICK {
   directions: number; // list of cardinal/intercardinal directions
   flags: number; //
   to: number; // str or single codepoint
 };
 
 
-interface BUILDER_KEY2_KMAP {
+interface BUILDER_KEYS_KMAP {
   vkey: number;
   mod: number;
-  key: number; //index to key2.key
+  key: number; //index to keys.key
 };
 
 /**
  * Builder for the 'keys' section
  */
-export interface BUILDER_KEY2 extends BUILDER_SECTION {
+export interface BUILDER_KEYS extends BUILDER_SECTION {
   ident: number;
   size: number;
   keyCount: number;
   flicksCount: number;
   flickCount: number;
   kmapCount: number;
-  keys: BUILDER_KEY2_KEY[];
-  flicks: BUILDER_KEY2_FLICKS[];
-  flick: BUILDER_KEY2_FLICK[];
-  kmap: BUILDER_KEY2_KMAP[];
+  keys: BUILDER_KEYS_KEY[];
+  flicks: BUILDER_KEYS_FLICKS[];
+  flick: BUILDER_KEYS_FLICK[];
+  kmap: BUILDER_KEYS_KMAP[];
 };
 
-export function build_key2(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_list: BUILDER_LIST): BUILDER_KEY2 {
-  if(kmxplus.key2.keys.length == 0 &&
-      (kmxplus.key2.flicks.length <= 1)) { // if no keys and only the 'null' flick.
+export function build_keys(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_list: BUILDER_LIST): BUILDER_KEYS {
+  if(kmxplus.keys.keys.length == 0 &&
+      (kmxplus.keys.flicks.length <= 1)) { // if no keys and only the 'null' flick.
     return null;
   }
 
-  let key2: BUILDER_KEY2 = {
-    ident: constants.hex_section_id(constants.section.key2),
+  let keys: BUILDER_KEYS = {
+    ident: constants.hex_section_id(constants.section.keys),
     size: 0,
-    keyCount: kmxplus.key2.keys.length,
-    flicksCount: kmxplus.key2.flicks.length,
+    keyCount: kmxplus.keys.keys.length,
+    flicksCount: kmxplus.keys.flicks.length,
     flickCount: 0,
-    kmapCount: kmxplus.key2.kmap.length,
+    kmapCount: kmxplus.keys.kmap.length,
     keys: [],
     flicks: [],
     flick: [],
@@ -90,11 +90,11 @@ export function build_key2(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
 
   // flicks first: the keys will need to index into the flicks table.
 
-  // Note that per the Key2 class and spec, there is always a flicks=0 meaning 'no flicks'
-  key2.flicks = kmxplus.key2.flicks.map((flicks) => {
-    let result : BUILDER_KEY2_FLICKS = {
+  // Note that per the Keys class and spec, there is always a flicks=0 meaning 'no flicks'
+  keys.flicks = kmxplus.keys.flicks.map((flicks) => {
+    let result : BUILDER_KEYS_FLICKS = {
       count: flicks.flicks.length,
-      flick: key2.flick.length, // index of first flick
+      flick: keys.flick.length, // index of first flick
       id: build_strs_index(sect_strs, flicks.id),
       _id: flicks.id.value,
       _flicks: flicks.flicks,
@@ -102,22 +102,22 @@ export function build_key2(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     return result;
   });
   // Sort the flicks array by id
-  key2.flicks.sort((a, b) => StrsItem.binaryStringCompare(a._id, b._id));
+  keys.flicks.sort((a, b) => StrsItem.binaryStringCompare(a._id, b._id));
   // now, allocate 'flick' entries for each 'flicks'
-  key2.flicks.forEach((flicks) => {
+  keys.flicks.forEach((flicks) => {
     flicks._flicks.forEach((flick) => {
-      key2.flick.push({
+      keys.flick.push({
         directions: build_list_index(sect_list, flick.directions),
         flags: flick.flags,
         to: build_strs_index(sect_strs, flick.to),
       });
-      key2.flickCount++;
+      keys.flickCount++;
     });
   });
 
   // now, keys
-  key2.keys = kmxplus.key2.keys.map((key) => {
-    let result : BUILDER_KEY2_KEY = {
+  keys.keys = kmxplus.keys.keys.map((key) => {
+    let result : BUILDER_KEYS_KEY = {
       to: build_strs_index(sect_strs, key.to),
       flags: key.flags,
       id: build_strs_index(sect_strs, key.id),
@@ -127,33 +127,33 @@ export function build_key2(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
       longPress: build_list_index(sect_list, key.longPress),
       longPressDefault: build_strs_index(sect_strs, key.longPressDefault),
       multiTap: build_list_index(sect_list, key.multiTap),
-      flicks: key2.flicks.findIndex(v => v._id === (key.flicks || '')), // flicks id='' is the 'null' flicks
+      flicks: keys.flicks.findIndex(v => v._id === (key.flicks || '')), // flicks id='' is the 'null' flicks
     };
     // Make sure the flicks were found
     if (result.flicks === -1) {
-      throw new Error(`Key2: Could not find flicks id=${key.flicks} for key=${key.id.value}`);
+      throw new Error(`Keys: Could not find flicks id=${key.flicks} for key=${key.id.value}`);
     }
     return result;
   });
   // sort the keys by id
-  key2.keys.sort((a, b) => StrsItem.binaryStringCompare(a._id, b._id));
+  keys.keys.sort((a, b) => StrsItem.binaryStringCompare(a._id, b._id));
 
   // finally, kmap
-  key2.kmap = kmxplus.key2.kmap.map(({vkey, mod, key}) => {
-    let result : BUILDER_KEY2_KMAP = {
+  keys.kmap = kmxplus.keys.kmap.map(({vkey, mod, key}) => {
+    let result : BUILDER_KEYS_KMAP = {
       vkey,
       mod,
-      key: key2.keys.findIndex(k => k._id === key),
+      key: keys.keys.findIndex(k => k._id === key),
     };
     // Make sure the key was found
     if (result.key === -1) {
-      throw new Error(`Key2: Could not find key2.key id=${result.key} for key2.kmap.key=${key}`);
+      throw new Error(`Keys: Could not find keys.key id=${result.key} for keys.kmap.key=${key}`);
     }
     return result;
   });
 
   // Sort kmap by vkey, mod order, per C7043
-  key2.kmap.sort((a,b) => {
+  keys.kmap.sort((a,b) => {
     let rc = 0;
     if (rc === 0) {
       rc = (a.vkey - b.vkey);
@@ -164,12 +164,12 @@ export function build_key2(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     return rc;
   });
 
-  let offset = constants.length_key2 +
-    (constants.length_key2_key * key2.keyCount) +
-    (constants.length_key2_flick_element * key2.flickCount) +
-    (constants.length_key2_flick_list * key2.flicksCount) +
-    (constants.length_key2_kmap * key2.kmapCount);
-  key2.size = offset;
+  let offset = constants.length_keys +
+    (constants.length_keys_key * keys.keyCount) +
+    (constants.length_keys_flick_element * keys.flickCount) +
+    (constants.length_keys_flick_list * keys.flicksCount) +
+    (constants.length_keys_kmap * keys.kmapCount);
+  keys.size = offset;
 
-  return key2;
+  return keys;
 }

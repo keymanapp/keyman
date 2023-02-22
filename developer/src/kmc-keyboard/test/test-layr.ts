@@ -43,9 +43,9 @@ describe('layr', function () {
     assert.equal(row0.keys[0]?.value, 'grave');
   });
 
-  // reuse key2 maximal
-  it('should compile maximal key2 data', function () {
-    let layr = loadSectionFixture(LayrCompiler, 'sections/key2/maximal.xml', compilerTestCallbacks) as Layr;
+  // reuse keys maximal
+  it('should compile maximal keys data', function () {
+    let layr = loadSectionFixture(LayrCompiler, 'sections/keys/maximal.xml', compilerTestCallbacks) as Layr;
     assert.ok(layr);
     assert.equal(compilerTestCallbacks.messages.length, 0);
 
