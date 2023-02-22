@@ -43,7 +43,7 @@ set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/<relative-path-to-repo-root>/resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
@@ -78,14 +78,12 @@ We use `set -eu` throughout:
 ```bash
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/<relative-path-to-repo-root>/resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 ```
 
-This somewhat unwieldy incantation handles all our build environments, with
-`greadlink` necessary on macOS (again installed with homebrew) due to the
-included macOS `readlink` struggling with canonicalization of symbolic links.
+This somewhat unwieldy incantation handles all our build environments.
 The intent is to get a good solid consistent path for the script so that we can
 safely include the build script, no matter what `pwd` is when the script is run.
 
@@ -172,10 +170,10 @@ a user or called by another script:
   will execute for all targets of the dependency script.  If you are working on
   code within a dependency, you are currently expected to rebuild and test that
   dependency locally.
-  
+
   A dependency is similar to, but not the same as, a child project. Child
   projects live in sub-folders of the parent project, whereas generally a
-  dependency will be in another folder altogether. 
+  dependency will be in another folder altogether.
 
   Dependencies can be defined for all actions and targets, or may be limited to
   specific action and/or targets.
@@ -379,7 +377,7 @@ builder_describe "Sample script" \
 
 A dependency always starts with `@`. The path to the dependency will be relative
 to the build script folder if the path does not start with `/`.  Otherwise, the path
-to the dependency is interpreted relative to the root of the repository. It is an 
+to the dependency is interpreted relative to the root of the repository. It is an
 error to specify a dependency outside the repo root.
 
 Relative paths will be expanded to full paths, again, relative to the root of

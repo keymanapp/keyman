@@ -1,4 +1,4 @@
-source $HOME/.cargo/env
+# source $HOME/.cargo/env
 #echo 'export PATH="/usr/local/opt/openjdk@8/bin:$PATH"' >> ~/.zshrc
 #echo 'export PATH="/usr/local/opt/openjdk@8/bin:$PATH"' >> ~/.bashrc
 export ANT_HOME=/usr/local/opt/ant
@@ -15,7 +15,7 @@ export PATH=$ANDROID_HOME/tools/bin:$PATH
 export PATH=$ANDROID_HOME/platform-tools:$PATH
 export PATH=$ANDROID_HOME/build-tools/30.0.3:$PATH
 export PATH="/usr/local/opt/openjdk@8/bin:$PATH"
-
+export PATH="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
 export JAVA_HOME=/usr/local/opt/openjdk@8
 
 # Python 2.7
