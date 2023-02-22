@@ -303,11 +303,9 @@ _builder_run_child_action() {
         if builder_has_action $action$target; then
           # Is this a child target? If so, there's a stored target path.
           # To detect the latter... https://stackoverflow.com/a/13221491
-          if [ "${_builder_target_paths[$target]+abc}" ]; then
-            if [ -f "$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh" ]; then
-              _builder_execute_child $action $target
-            fi
-          fi
+          #if [ "${_builder_target_paths[$target]+abc}" ]; then
+            _builder_execute_child $action $target
+          #fi
         fi
       done
     else

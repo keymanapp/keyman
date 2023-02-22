@@ -41,7 +41,6 @@ compiler="npm run tsc --"
 compilecmd="$compiler"
 
 builder_set_child_base src
-
 builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   "clean" \
   "configure" \
@@ -90,13 +89,6 @@ builder_run_child_actions build:engine/configuration
 
 # Uses engine/device-detect + engine/dom-utils
 builder_run_child_actions build:engine/osk
-
-
-# if builder_start_action build:osk; then
-#   compile $OSK
-
-#   builder_finish_action success build:osk
-# fi
 
 # if builder_start_action build:main; then
 #   compile $MAIN

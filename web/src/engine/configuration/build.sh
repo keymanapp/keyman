@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 #
-# Compile keymanweb and copy compiled javascript and resources to output/embedded folder
-#
 
 # set -x
 set -eu
@@ -37,7 +35,7 @@ builder_describe "Builds configuration subclasses used by the Keyman Engine for 
 
 builder_describe_outputs \
   configure    ../../../../node_modules \
-  build        ../../../build/$SUBPROJECT_NAME/lib/index.mjs
+  build        ../../../build/$SUBPROJECT_NAME/obj/index.js
 
 builder_parse "$@"
 
