@@ -8,25 +8,34 @@ import { StubAndKeyboardCache } from "keyman/engine/keyboard-cache";
 import KeyboardInterface from "./keyboardInterface.js";
 import ContextManager from "./contextManager.js";
 import HardKeyboard from "./hardKeyboard.js";
+import { LegacyAPIEventEngine } from "./legacyAPIEvents.js";
 
 export default /*abstract*/ class KeymanEngine implements KeyboardKeymanGlobal {
   readonly config: Configuration;
   readonly cache: StubAndKeyboardCache = new StubAndKeyboardCache();
+  readonly contextManager: ContextManager;
   readonly interface: KeyboardInterface;
   readonly initPromise: ManagedPromise<void> = new ManagedPromise();
   readonly keyboardLoader: KeyboardLoader;
+  private legacyAPIEvents = new LegacyAPIEventEngine();
 
   constructor(config: Configuration) {
     this.config = config;
 
     // Since we're not sandboxing keyboard loads yet, we just use `window` as the jsGlobal object.
-    this.interface = new KeyboardInterface(window, this, this.cache);
+    this.interface = new KeyboardInterface(window, this, this.cache, this.contextManager);
     this.keyboardLoader = new KeyboardLoader(this.interface);
 
     this.cache.on('stubAdded', (stub) => {
       let eventRaiser = () => {
         // The corresponding event is needed in order to update UI modules as new keyboard stubs "come online".
-        this.doKeyboardRegistered(stub.KI, stub.KL, stub.KN, stub.KLC, stub['KP']);
+        this.legacyAPIEvents.emit('kmw.keyboardregistered', {
+          internalName: stub.KI,
+          language: stub.KL,
+          keyboardName: stub.KN,
+          languageCode: stub.KLC,
+          package: stub.KP
+        });
       }
 
       if(this.initPromise.hasFinalized) {
@@ -39,7 +48,9 @@ export default /*abstract*/ class KeymanEngine implements KeyboardKeymanGlobal {
     this.cache.on('keyboardAdded', (keyboard) => {
       let eventRaiser = () => {
         // Execute any external (UI) code needed after loading keyboard
-        this.doKeyboardLoaded(keyboard.id);
+        this.legacyAPIEvents.emit('kmw.keyboardloaded', {
+          keyboardName: keyboard.id
+        });
       }
 
       if(this.initPromise.hasFinalized) {

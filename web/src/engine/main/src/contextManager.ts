@@ -9,6 +9,7 @@ export default abstract class ContextManager extends EventEmitter<EventMap> {
   abstract initialize(): void;
 
   abstract get activeTarget(): OutputTarget;
+  // activeKeyboard: Keyboard; // probably belongs here.
 
   insertText(kbdInterface: KeyboardInterface, Ptext: string, PdeadKey: number) {
     // Find the correct output target to manipulate.

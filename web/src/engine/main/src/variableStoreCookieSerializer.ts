@@ -1,5 +1,5 @@
 import { VariableStore, VariableStoreSerializer } from "@keymanapp/keyboard-processor";
-import { CookieSerializer } from "keyman/build/engine/dom-utils/obj/index.js";
+import { CookieSerializer } from "keyman/engine/dom-utils";
 
 // While there's little reason we couldn't store all of a keyboard's store values within
 // the same cookie... that's not what we had implemented in the last pre-es-module version

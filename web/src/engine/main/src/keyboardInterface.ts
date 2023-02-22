@@ -16,9 +16,11 @@ export default class KeyboardInterface extends KeyboardInterfaceBase {
     _jsGlobal: any,
     keymanGlobal: KeyboardKeymanGlobal,
     cache: StubAndKeyboardCache,
+    contextManager: ContextManager
   ) {
     super(_jsGlobal, keymanGlobal, new VariableStoreCookieSerializer());
     this.stubAndKeyboardCache = cache;
+    this.contextManager = contextManager;
   }
 
   registerKeyboard(Pk): void {
@@ -47,16 +49,26 @@ export default class KeyboardInterface extends KeyboardInterfaceBase {
    * @return      {?number}               1 if already registered, else null
    */
   registerStub = (Pstub): number => {
+    // Other notes:  this is where app-hosted KeymanWeb receives pre-formed stubs.
+    // They're specified in the "internal" format (KI, KN, KLC...)
+    // (SHIFT-CTRL-F @ repo-level:  `setKeymanLanguage`)
+    //
+    // It may also be used by documented legacy API:
+    // https://help.keyman.com/DEVELOPER/ENGINE/WEB/2.0/guide/examples/manual-control
+    // (See: referenced laokeys_load.js)
     const stub = new KeyboardStub(Pstub);
     if(this.stubAndKeyboardCache.findMatchingStub(stub)) {
       return 1;
     }
 
+    this.stubAndKeyboardCache.addStub(stub);
     return null;
   }
 
   insertText = (Ptext: string, PdeadKey:number): void => {
     this.resetContextCache();
+    // As this function isn't provided a handle to an active outputTarget, we rely on
+    // the context manager to resolve said issue.
     this.contextManager.insertText(this, Ptext, PdeadKey);
   }
 
@@ -128,6 +140,5 @@ export default class KeyboardInterface extends KeyboardInterfaceBase {
 }
 
 (function() {
-  // This will be the only call within the keyboard-processor module.
   KeyboardInterface.__publishShorthandAPI();
 }());
