@@ -36,4 +36,35 @@ double u16tof( KMX_WCHAR* str);
 std::string toHex(int num1);
 PKMX_STR wstrtostr2(PKMX_WCHAR in);
 
+// This template can be used for const KMX_CHAR*,  const KMX_WCHART* and  const KMX_WCHAR*
+// Opens files on windows and non-windows platforms. Datatypes for Filename and mode must be the same.
+// returns FILE* if file could be opened; Returns NULL if either the input datatypes are unknown or not identical.
+// FILE needs to be closed in calling function
+template <typename T, typename TT>
+FILE* Open_File(T Filename, TT mode) {
+  FILE* nfile = NULL;
+
+if (!(std::is_same<T,TT>::value))
+    return nfile;
+
+#if defined(_WIN32) || defined(_WIN64)
+
+  if (std::is_same<T,const KMX_CHAR*>::value)
+    nfile = fopen((const KMX_CHAR*) Filename, (const KMX_CHAR*) mode);
+
+  else if (std::is_same<T,const KMX_WCHART*>::value)
+    nfile = _wfsopen((const KMX_WCHART*) Filename, (const KMX_WCHART*) mode, _SH_DENYWR);
+
+  else if (std::is_same<T,const KMX_WCHAR*>::value)
+  {
+    std::wstring Name_w = convert_pchar16T_To_wstr((KMX_WCHAR*) Filename);
+    std::wstring mode_w = convert_pchar16T_To_wstr((KMX_WCHAR*) mode);
+    nfile = _wfsopen(Name_w.c_str(), mode_w.c_str(), _SH_DENYWR);
+  }
+  else return nfile;
+#else
+  nfile = fopen(Filename, "rb");
+#endif
+  return nfile;
+}
 #endif  //KMX_U16_H
