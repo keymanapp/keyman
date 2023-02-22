@@ -1,0 +1,48 @@
+{
+  "system": {
+    "keymanDeveloperVersion": "12.0.1500.0",
+    "fileVersion": "12.0"
+  },
+  "options": {},
+  "info": {
+    "author": {
+      "description": "Eddie Antonio Santos",
+      "url": "mailto:Eddie.Santos@nrc-cnrc.gc.ca"
+    },
+    "copyright": {
+      "description": "© 2019 National Research Council Canada"
+    },
+    "name": {
+      "description": "SENĆOŦEN (Saanich Dialect) Lexical Model"
+    },
+    "version": {
+      "description": "0.0.0"
+    }
+  },
+  "files": [
+    {
+      "name": "..\\build\\example.qaa.sencoten.model.js",
+      "description": "Lexical model example.qaa.sencoten.model.js"
+    },
+    {
+      "name": "kmp.json",
+      "description": "Package information (JSON)"
+    }
+  ],
+  "lexicalModels": [
+    {
+      "name": "SENĆOŦEN dictionary",
+      "id": "example.qaa.sencoten",
+      "languages": [
+        {
+          "name": "North Straits Salish",
+          "id": "qaa"
+        },
+        {
+          "name": "SENĆOŦEN",
+          "id": "qaa-Latn"
+        }
+      ]
+    }
+  ]
+}

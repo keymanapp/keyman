@@ -36,7 +36,7 @@ builder_describe_outputs \
   configure:module   /node_modules \
   configure:tools    /node_modules \
   build:module       build/index.js \
-  build:tools        /developer/src/kmlmc/dist/kmlmc.js    # TODO: remove this once kmlmc is a dependency
+  build:tools        /developer/src/kmc/build/src/kmlmc.js    # TODO: remove this once kmlmc is a dependency
 
 builder_parse "$@"
 
@@ -59,8 +59,11 @@ fi
 if builder_start_action build:tools; then
   # Used by test:module
   # TODO: convert to a dependency once we have updated kmlmc to use builder script
-  pushd "$KEYMAN_ROOT/developer/src/kmlmc"
-  ./build.sh -S
+  pushd "$KEYMAN_ROOT/developer/src/kmc-model"
+  ./build.sh
+  popd
+  pushd "$KEYMAN_ROOT/developer/src/kmc"
+  ./build.sh
   popd
 
   builder_finish_action success build:tools

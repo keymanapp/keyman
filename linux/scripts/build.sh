@@ -20,7 +20,7 @@ fi
 
 if [[ "${BUILDONLY}" == "no" ]]; then
 	cd "$BASEDIR"
-	../core/build.sh -t keyboardprocessor configure
+	../core/build.sh --target-path "$BASEDIR/keyboardprocessor" configure:arch
 
 	cd keyboardprocessor/arch/release
 	echo "reconfiguring keyboardprocessor meson with prefix ${INSTALLDIR}"
@@ -40,7 +40,7 @@ if [[ "${CONFIGUREONLY}" == "no" ]]; then
 	# May 2021: For now, running tests here as well. We could move this elsewhere
 	# in the future if we want to split out the tests, but they run in a couple of seconds
 	# at present.
-	../core/build.sh -t keyboardprocessor build tests
+	../core/build.sh --target-path "$BASEDIR/keyboardprocessor" build:arch test:arch
 
 	echo "building ibus-keyman"
 	cd "$BASEDIR/ibus-keyman"

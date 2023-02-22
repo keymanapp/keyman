@@ -23,7 +23,7 @@ override_dh_auto_configure:
 	# keymankeyboardprocessor - we need to configure and build core before
 	# we can configure ibus-keyman!
 	cd core && \
-		./build.sh configure build -- --wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc \
+		./build.sh configure:arch build:arch -- --wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc \
 			--localstatedir=/var --libdir=lib/$(DEB_TARGET_MULTIARCH) \
 			--libexecdir=lib/$(DEB_TARGET_MULTIARCH)
 	# ibus-keyman
@@ -35,7 +35,7 @@ override_dh_auto_configure:
 override_dh_auto_build:
 	# keymankeyboardprocessor
 	cd core && \
-		./build.sh build
+	  ./build.sh build:arch
 	# ibus-keyman
 	cd linux/ibus-keyman && \
 		./build.sh build
@@ -50,7 +50,7 @@ override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 	# keymankeyboardprocessor
 	cd core && \
-		./build.sh tests
+	  ./build.sh test:arch
 	# ibus-keyman
 	cd linux/ibus-keyman && \
 		./build.sh test
@@ -60,9 +60,8 @@ endif
 
 override_dh_auto_install:
 	install -d $(CURDIR)/debian/tmp
-	# keymankeyboardprocessor
 	cd core && \
-		DESTDIR=$(CURDIR)/debian/tmp ./build.sh install
+	  DESTDIR=$(CURDIR)/debian/tmp ./build.sh install:arch
 	# ibus-keyman
 	cd linux/ibus-keyman && \
 		DESTDIR=$(CURDIR)/debian/tmp ./build.sh install

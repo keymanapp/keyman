@@ -59,22 +59,33 @@ namespace kbp
     template<typename C>
     path(C const * p): path(std::basic_string<C>(p)) {}
 
-
+    /**
+     * @return the enclosing directory's path
+    */
     path parent() const {
       auto i = _path.find_last_of(parent_separator);
       return _path.substr(0, i == string_type::npos ? 0UL : i);
     }
 
+    /**
+     * @return just the filename, such as "angkor.kmx"
+    */
     path name() const {
       auto i = _path.find_last_of(parent_separator);
       return _path.substr(i == string_type::npos ? 0UL : i+1);
     }
 
+    /**
+     * @return the suffix of the file, such as ".kmx"
+    */
     path suffix() const {
       auto i = _path.find_last_of(suffix_separator);
       return _path.substr(i == string_type::npos ? _path.size() : i);
     }
 
+    /**
+     * @return just the child filename, such as "angkor" for "angkor.kmx"
+    */
     path stem() const {
       auto psep = _path.find_last_of(parent_separator),
            ssep = _path.find_last_of(suffix_separator);
@@ -82,6 +93,10 @@ namespace kbp
                           ssep == string_type::npos ? _path.size() : ssep);
     }
 
+    /**
+     * Mutate the path to change the extension
+     * @param replacement new suffix, such as ".kmp". default is to remove the suffix
+    */
     void replace_extension(path const & replacment = path()) {
       _path.resize(std::min(_path.find_last_of(suffix_separator), _path.size()));
       _path += replacment;

@@ -31,7 +31,7 @@ inst/setup.inf
 inst/setup.zip
 inst/templates.wxs
 inst/xml.wxs
-inst/kmlmc.wxs
+inst/kmc.wxs
 
 # /developer/TIKE/
 tike/stock.kct
@@ -86,7 +86,8 @@ tds_file.txt
 # Breakpad files generated for Sentry
 **/*.sym
 
-
-
+# All kmc projects have build/ folders
+kmc/build/
+kmc-*/build/
 
 
