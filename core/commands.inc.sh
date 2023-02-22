@@ -143,10 +143,10 @@ locate_emscripten() {
 }
 
 build_meson_cross_file_for_wasm() {
-  if [ $os_id == win ]; then
+  if [ $BUILDER_OS == win ]; then
     local R=$(cygpath -w $(echo $EMSCRIPTEN_BASE) | sed 's_\\_\\\\_g')
   else
     local R=$(echo $EMSCRIPTEN_BASE | sed 's_/_\\/_g')
   fi
-  sed -e "s/\$EMSCRIPTEN_BASE/$R/g" wasm.build.$os_id.in > wasm.build
+  sed -e "s/\$EMSCRIPTEN_BASE/$R/g" wasm.build.$BUILDER_OS.in > wasm.build
 }
