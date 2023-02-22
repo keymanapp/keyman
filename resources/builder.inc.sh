@@ -109,6 +109,8 @@ builder_use_color() {
   fi
 }
 
+BUILDER_BAD_PARAM_CODE=64
+
 #
 # Wraps the input string in `builder_display_usage` with $BUILDER_TERM_START and
 # $BUILDER_TERM_END
@@ -236,12 +238,12 @@ _builder_failure_trap() {
     fi
 
     builder_finish_action failure $action$target
-
-    # Make 100% sure that the exit code chains fully.
-    # Without this, nested scripts have failed to chain errors from npm calls past the script
-    # that directly executed the failed npm command.
-    exit $trappedExitCode
   fi
+
+  # Make 100% sure that the exit code chains fully.
+  # Without this, nested scripts have failed to chain errors from npm calls past the script
+  # that directly executed the failed npm command.
+  exit $trappedExitCode
 }
 
 #
@@ -279,8 +281,12 @@ _builder_execute_child() {
     fi
   ) || (
     result=$?
-    echo "${COLOR_RED}## $scope$action$target failed with exit code $result${COLOR_RESET}"
-    exit $result
+    if [ $result != $BUILDER_BAD_PARAM_CODE ]; then
+      echo "${COLOR_RED}## $scope$action$target failed with exit code $result${COLOR_RESET}"
+      exit $result
+    else
+      echo "${COLOR_TEAL}## $scope$action$target not defined${COLOR_RESET}"
+    fi
   )
 }
 
@@ -303,9 +309,9 @@ _builder_run_child_action() {
         if builder_has_action $action$target; then
           # Is this a child target? If so, there's a stored target path.
           # To detect the latter... https://stackoverflow.com/a/13221491
-          #if [ "${_builder_target_paths[$target]+abc}" ]; then
+          if [ "${_builder_target_paths[$target]+abc}" ]; then
             _builder_execute_child $action $target
-          #fi
+          fi
         fi
       done
     else
@@ -813,8 +819,7 @@ _builder_parameter_error() {
   echo "$COLOR_RED$program: invalid $type: $param$COLOR_RESET"
   echo
   builder_display_usage
-  exit 64
-
+  exit $BUILDER_BAD_PARAM_CODE
 }
 
 #
@@ -921,7 +926,6 @@ _builder_define_default_internal_dep() {
 # Parameters
 #   1: $@         command-line arguments
 builder_parse() {
-
   _builder_record_function_call builder_parse
 
   _builder_build_deps=--deps
@@ -1036,6 +1040,7 @@ builder_parse() {
           _builder_report_dependencies
           ;;
         *)
+          # script does not recognize anything of action or target form at this point.
           _builder_parameter_error "$0" parameter "$key"
       esac
     fi
@@ -1274,6 +1279,13 @@ _builder_do_build_deps() {
       $_builder_build_deps \
       --builder-deps-built "$_builder_deps_built" \
       --builder-dep-parent "$THIS_SCRIPT_IDENTIFIER"
+
+    # Interestingly, any errors from the command above don't get trapped or cause an instant exit.
+    # We need to propagate any errors a bit more... manually here.
+    local dep_exit_code=$?
+    if [ $dep_exit_code != 0 ]; then
+      exit $dep_exit_code
+    fi
   done
 }
 

@@ -18,7 +18,6 @@ cd "$THIS_SCRIPT_PATH"
 
 builder_describe "Runs the Keyman Engine for Web unit-testing suites" \
   "@./src/tools/testing/recorder test:engine" \
-  "@./src/engine" \
   "test+" \
   ":engine               Runs the top-level Keyman Engine for Web unit tests" \
   ":libraries            Runs all unit tests for KMW's submodules.  Currently excludes predictive-text tests" \

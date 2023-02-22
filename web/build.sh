@@ -45,6 +45,7 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   "clean" \
   "configure" \
   "build" \
+  "test" \
   ":engine/configuration     Subset used to configure KMW" \
   ":engine/device-detect     Subset used for device-detection " \
   ":engine/dom-utils         A common subset of function used for DOM calculations, layout, etc" \
@@ -57,7 +58,13 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
 
 builder_describe_outputs \
-  configure                  ../node_modules
+  configure                      ../node_modules \
+  build:engine/configuration     build/engine/configuration/obj/index.js \
+  build:engine/device-detect     build/engine/device-detect/lib/index.mjs \
+  build:engine/dom-utils         build/engine/dom-utils/obj/index.js \
+  build:engine/element-wrappers  build/engine/element-wrappers/lib/index.mjs \
+  build:engine/keyboard-cache    build/engine/keyboard-cache/lib/index.mjs \
+  build:engine/osk               build/engine/osk/lib/index.mjs
 
 builder_parse "$@"
 
@@ -95,3 +102,11 @@ builder_run_child_actions build:engine/osk
 
 #   builder_finish_action success build:main
 # fi
+
+builder_run_child_actions test
+
+if builder_start_action test; then
+  ./test.sh :engine
+fi
+
+builder_die "Modularization work is not yet complete; builds dependent on this will fail."
