@@ -301,8 +301,12 @@ _builder_run_child_action() {
         # We have to re-test the action because the user may not
         # have specified all targets in their invocation
         if builder_has_action $action$target; then
-          if [ -f "$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh" ]; then
-            _builder_execute_child $action $target
+          # Is this a child target? If so, there's a stored target path.
+          # To detect the latter... https://stackoverflow.com/a/13221491
+          if [ "${_builder_target_paths[$target]+abc}" ]; then
+            if [ -f "$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh" ]; then
+              _builder_execute_child $action $target
+            fi
           fi
         fi
       done
@@ -530,6 +534,30 @@ _builder_expand_action_targets() {
   fi
 }
 
+_builder_child_base=
+#
+# Describes the path from the build script's working directory to the common subfolder
+# containing child scripts / projects without defined custom paths.
+#
+# This function must be called to set the child base path before builder_describe is
+# called in order to work correctly.  Furthermore, note that this setting will be
+# ignored by targets with custom paths.
+#
+# ### Usage
+#
+# ```bash
+#    builder_set_child_base path
+# ```
+#
+# ### Parameters
+#
+#  * `path`  The relative path from the directory containing the calling script to
+#            the base folder to use for child-project detection and resolution
+#
+builder_set_child_base() {
+  _builder_child_base="$1"
+}
+
 #
 # Describes a build script, defines available parameters and their meanings. Use
 # together with `builder_parse` to process input parameters.
@@ -631,8 +659,8 @@ builder_describe() {
       else
         # If the target name matches a folder name, implicitly
         # make it available as a child project
-        if [[ -d "$THIS_SCRIPT_PATH/${value:1}" ]]; then
-          target_path="${value:1}"
+        if [[ -d "$THIS_SCRIPT_PATH/$_builder_child_base/${value:1}" ]]; then
+          target_path="$_builder_child_base/${value:1}"
         fi
       fi
       _builder_targets+=($value)

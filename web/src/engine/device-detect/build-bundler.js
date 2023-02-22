@@ -14,11 +14,10 @@ await esbuild.build({
   format: "esm",
   nodePaths: ['../../../../node_modules', '../../../build/engine/device-detect/obj'],
   entryPoints: {
-    'index': '../../../build/engine/device-detect/obj/kmwdevice.js',
+    'index': '../../../build/engine/device-detect/obj/index.js',
   },
   external: ['fs', 'vm'],
-  outdir: '../../../build/engine/device-detect/lib/',
-  outExtension: { '.js': '.mjs' },
+  outfile: '../../../build/engine/device-detect/lib/index.mjs',
   tsconfig: './tsconfig.json',
   target: "es5"
 });

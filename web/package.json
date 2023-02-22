@@ -7,12 +7,12 @@
       "import": "./build/engine/configuration/obj/index.js"
     },
     "./engine/device-detect": {
-      "types": "./build/engine/device-detect/obj/kmwdevice.d.ts",
-      "import": "./build/engine/device-detect/obj/kmwdevice.js"
+      "types": "./build/engine/device-detect/obj/index.d.ts",
+      "import": "./build/engine/device-detect/obj/index.js"
     },
     "./engine/device-detect/lib": {
-      "types": "./build/engine/device-detect/lib/kmwdevice.d.ts",
-      "import": "./build/engine/device-detect/lib/kmwdevice.mjs"
+      "types": "./build/engine/device-detect/lib/index.d.ts",
+      "import": "./build/engine/device-detect/lib/index.mjs"
     },
     "./engine/dom-utils": {
       "types": "./build/engine/dom-utils/obj/index.d.ts",
