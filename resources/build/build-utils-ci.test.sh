@@ -8,7 +8,7 @@ set -eu
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/build-utils.sh"
+. "${THIS_SCRIPT%/*}/build-utils.sh"
 # END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
