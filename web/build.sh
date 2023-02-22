@@ -105,8 +105,8 @@ builder_run_child_actions build:engine/osk
 
 builder_run_child_actions test
 
-if builder_start_action test; then
-  ./test.sh :engine
-fi
+# if builder_start_action test; then
+#   ./test.sh :engine
+# fi
 
 builder_die "Modularization work is not yet complete; builds dependent on this will fail."

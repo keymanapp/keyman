@@ -19,7 +19,7 @@ cd "$THIS_SCRIPT_PATH"
 
 # Imports common Web build-script definitions & functions
 SUBPROJECT_NAME=engine/dom-utils
-. ../../../.common.sh
+. ../../../common.inc.sh
 
 # ################################ Main script ################################
 
@@ -28,7 +28,8 @@ builder_describe "Builds DOM-utility modules used by the Keyman Engine for Web (
   "@../../../../common/web/keyboard-processor" \
   "clean" \
   "configure" \
-  "build"
+  "build" \
+  "test"
 
 # Possible TODO?
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
@@ -56,4 +57,11 @@ if builder_start_action build; then
   compile $SUBPROJECT_NAME
 
   builder_finish_action success build
+fi
+
+if builder_start_action test; then
+  # No HEADLESS tests yet.
+
+  # TODO:  DOM tests
+  builder_finish_action success test
 fi

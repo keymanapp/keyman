@@ -19,7 +19,7 @@ cd "$THIS_SCRIPT_PATH"
 
 # Imports common Web build-script definitions & functions
 SUBPROJECT_NAME=engine/osk
-. ../../../.common.sh
+. ../../../common.inc.sh
 
 # ################################ Main script ################################
 
@@ -29,7 +29,8 @@ builder_describe "Builds the Keyman Engine for Web's On-Screen Keyboard package 
   "@../dom-utils build" \
   "clean" \
   "configure" \
-  "build"
+  "build" \
+  "test"
 
 # Possible TODO?s
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
@@ -57,4 +58,10 @@ if builder_start_action build; then
   compile $SUBPROJECT_NAME
 
   builder_finish_action success build
+fi
+
+if builder_start_action test; then
+  # TODO:  CI vs manual:  how the tests are reported.
+  npm run mocha -- --recursive src/test/auto/headless/osk
+  builder_finish_action success test
 fi
