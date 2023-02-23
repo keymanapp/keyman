@@ -28,27 +28,13 @@ else
   test_path = meson.current_build_dir()
 endif
 
-coretest_files = files(
-    'kmx_test_source.cpp',
-)
-
 kmx = executable('kmx',
     'kmx.cpp',
-    coretest_files,
+    link_with: kmx_test_source_lib,
     cpp_args: defns + warns,
     include_directories: [inc, libsrc],
     link_args: links + tests_flags,
     objects: lib.extract_all_objects(recursive: false))
-
-test_lib = static_library('kmnkbp-tests',
-  coretest_files,
-  cpp_args: defns + warns + flags,
-  include_directories: [inc, libsrc],
-  link_args: links + tests_flags,
-  objects: lib.extract_all_objects(recursive: false),
-  pic: true,
-  install: false
-)
 
 tests = [
   '000 - null keyboard',
