@@ -1,0 +1,17 @@
+{
+  "extends": "../../../tsconfig.esm-base.json",
+
+  "compilerOptions": {
+    "outDir": "build/src/",
+    "rootDir": "src/",
+    "baseUrl": ".",
+    "allowSyntheticDefaultImports": true // for ajv
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "references": [
+    { "path": "../keyman-version/tsconfig.esm.json" },
+    { "path": "../../../core/include/ldml/tsconfig.json"},
+  ]
+}

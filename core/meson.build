@@ -36,6 +36,11 @@ cc = meson.get_compiler('c')
 # For now, we use KMN_KBP to inject the km::kbp::kmx namespace
 defns = ['-DKMN_KBP']
 
+# #define DEBUG when we are on a debug build
+if get_option('buildtype') == 'debug'
+  add_global_arguments('-DDEBUG', language : 'cpp')
+endif
+
 subdir('doc')
 subdir('include')
 subdir('src')
