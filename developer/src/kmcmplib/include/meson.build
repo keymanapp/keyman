@@ -20,7 +20,6 @@ configure_file(
 inc = include_directories( # '.', is_system: true)
   '.',
   '../../../../common/include',
-  '../../kmcmpdll',
   '../../ext/json',
   '../../ext/json-schema-validator'
 )
