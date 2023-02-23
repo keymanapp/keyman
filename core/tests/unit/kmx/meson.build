@@ -32,7 +32,7 @@ kmx = executable('kmx',
     'kmx.cpp',
     link_with: kmx_test_source_lib,
     cpp_args: defns + warns,
-    include_directories: [inc, libsrc],
+    include_directories: [inc, libsrc, '../../kmx_test_source'],
     link_args: links + tests_flags,
     objects: lib.extract_all_objects(recursive: false))
 
