@@ -359,6 +359,8 @@ extern "C" BOOL __declspec(dllexport) kmcmp_CompileKeyboardFile(PKMX_STR pszInfi
 #else
   if (p = strrchr(pszInfile, '/'))
 #endif
+
+
   {
     strncpy_s(kmcmp::CompileDir, _countof(kmcmp::CompileDir), pszInfile, (INT_PTR)(p - pszInfile + 1));  // I3481
     kmcmp::CompileDir[(INT_PTR)(p - pszInfile + 1)] = 0;
@@ -467,8 +469,8 @@ extern "C" BOOL __declspec(dllexport)  kmcmp_CompileKeyboardFileToBuffer(PKMX_ST
   kmcmp::currentLine = 0;
   kmcmp::nErrors = 0;
 
-  fp_in = fopen(pszInfile,"rb");
-  //fp_in = Open_File(pszInfile,"rb");
+  fp_in = fopen((const  KMX_CHAR*)pszInfile,"rb");
+  //fp_in = Open_File((const  KMX_CHAR*)pszInfile,"rb");
 
   if (fp_in == NULL) SetError(CERR_InfileNotExist);
 
@@ -1360,12 +1362,15 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     {
       // Strip path from the store, leaving bare filename only
       p = sp->dpString;
-
+/*
 #if defined(_WIN32) || defined(_WIN64)
       KMX_WCHAR *pp = (KMX_WCHAR*) u16chr((const PKMX_WCHAR) p, u'\\');
 #else
       KMX_WCHAR *pp = (KMX_WCHAR*) u16chr((const PKMX_WCHAR) p, u'/');
 #endif
+*/
+  KMX_WCHAR *pp = (KMX_WCHAR*) u16rchr_LinWin((const PKMX_WCHAR) p);
+
 
       if (!pp) {
         pp = p;

@@ -102,13 +102,13 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
     return CERR_None;
   }
   fclose(nfile);
-
+/*
 #if defined(_WIN32) || defined(_WIN64)
   const KMX_WCHAR* cptr1 = u16rchr(Name, '\\');   // _S2 const wchar_t* cptr1 = wcsrchr(Name, '\\');
 #else
   const KMX_WCHAR* cptr1 = u16rchr(Name, '/');
-#endif
-
+#endif*/
+const KMX_WCHAR* cptr1 = u16rchr_LinWin(Name);
 
 
   cptr1++;

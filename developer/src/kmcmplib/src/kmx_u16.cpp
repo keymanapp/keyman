@@ -121,7 +121,25 @@ const KMX_WCHAR *  u16ncat(KMX_WCHAR *dst, const KMX_WCHAR *src, size_t max) {
   return o;
 }
 
-// u16rchr returns last occurence of ch in p; It returns p_end + 1 if ch = '\0' and NULL if ch is not found
+const KMX_WCHAR* u16rchr_LinWin(KMX_WCHAR const* Name)
+{
+  const KMX_WCHAR* cp = NULL;
+  cp = u16rchr(Name, '\\');
+  if (cp == NULL)
+    cp = u16rchr(Name, '/');
+  return cp;
+}
+
+const KMX_CHAR* strrchr_LinWin(KMX_CHAR const* Name)
+{
+  const KMX_CHAR* cp = NULL;
+  cp = strrchr(Name, '\\');
+  if (cp == NULL)
+    cp = strrchr(Name, '/');
+  return cp;
+}
+
+// u16rchr returns last occurence of ch in p; It returns NULL  if ch = '\0' and NULL if ch is not found
 const KMX_WCHAR* u16rchr(const KMX_WCHAR* p, KMX_WCHAR ch) {
   const KMX_WCHAR* p_end = p + u16len(p) - 1;
 
