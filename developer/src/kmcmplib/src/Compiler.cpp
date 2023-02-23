@@ -370,8 +370,8 @@ extern "C" BOOL __declspec(dllexport) kmcmp_CompileKeyboardFile(PKMX_STR pszInfi
   kmcmp::currentLine = 0;
   kmcmp::nErrors = 0;
 
-  //fp_in = fopen((const  KMX_CHAR*)pszInfile, "rb");
-  fp_in = Open_File((const  KMX_CHAR*)pszInfile, "rb");
+  fp_in = fopen((const  KMX_CHAR*)pszInfile, "rb");
+  //fp_in = Open_File((const  KMX_CHAR*)pszInfile, "rb");
 
   if (fp_in == NULL) SetError(CERR_InfileNotExist);
 
@@ -399,8 +399,8 @@ extern "C" BOOL __declspec(dllexport) kmcmp_CompileKeyboardFile(PKMX_STR pszInfi
     return CERR_CannotCreateTempfile;
   }
 
-  //fp_out = fopen((const  KMX_CHAR*)pszOutfile, "wb");
-  fp_out = Open_File((const  KMX_CHAR*)pszOutfile, "wb");
+  fp_out = fopen((const  KMX_CHAR*)pszOutfile, "wb");
+  //fp_out = Open_File((const  KMX_CHAR*)pszOutfile, "wb");
 
   if (fp_out == NULL) SetError(CERR_CannotCreateOutfile);
 
@@ -467,8 +467,8 @@ extern "C" BOOL __declspec(dllexport)  kmcmp_CompileKeyboardFileToBuffer(PKMX_ST
   kmcmp::currentLine = 0;
   kmcmp::nErrors = 0;
 
-  //fp_in = fopen(pszInfile,"rb");
-  fp_in = Open_File(pszInfile,"rb");
+  fp_in = fopen(pszInfile,"rb");
+  //fp_in = Open_File(pszInfile,"rb");
 
   if (fp_in == NULL) SetError(CERR_InfileNotExist);
 
@@ -3563,13 +3563,13 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
     u16ncpy(szNewName, szName, _countof(szNewName));  // I3481
 
 
-/*
+
 #if defined(_WIN32) || defined(_WIN64)
   fp =_wfsopen((KMX_WCHART*)szNewName, L"rb", _SH_DENYWR);
 #else
   //fp = fopen( ( const PKMX_CHAR) szNewName, "rb");
-#endif*/
-fp=Open_File(( const KMX_WCHART*)szNewName, L"rb");
+#endif
+//fp=Open_File(( const KMX_WCHART*)szNewName, L"rb");
 
 
   if ( fp == NULL)
@@ -3577,13 +3577,13 @@ fp=Open_File(( const KMX_WCHART*)szNewName, L"rb");
     // else if filename.bmp is not in the folder -> attempt to open filename.bmp.bmp !
     if ( u16cmp(szNewName+u16len(szNewName)-4, u".bmp") )
       u16ncat(szNewName, u".bmp", _countof(szNewName));  // I3481
-    /*
+
     #if defined(_WIN32) || defined(_WIN64)
       fp = _wfsopen((const KMX_WCHART*)szNewName, L"rb", _SH_DENYWR);
     #else
       fp = fopen(( const PKMX_CHAR) szNewName, "rb");
-    #endif*/
-    fp= Open_File((const KMX_WCHART*)szNewName, L"rb");
+    #endif
+    //fp= Open_File((const KMX_WCHART*)szNewName, L"rb");
 
     if ( fp == NULL)
       return CERR_CannotReadBitmapFile;

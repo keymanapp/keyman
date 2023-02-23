@@ -24,14 +24,14 @@ bool IsRelativePath(KMX_CHAR const * p) {
   // Absolute path (returns FALSE):
   //  C:\...\BITMAP.BMP
   //  \\SERVER\SHARE\...\BITMAP.BMP
-
+/*
 #if defined(_WIN32) || defined(_WIN64)
   if (*p == '\\') return FALSE;
 #else
   if (*p == '/') return FALSE;
-#endif
-
-  if (*p && *(p + 1) == ':') return FALSE;
+#endif*/
+if ((*p == '\\') || (*p == '/')) return FALSE;
+if (*p && *(p + 1) == ':') return FALSE;
 
   return TRUE;
 }
@@ -48,14 +48,15 @@ bool IsRelativePath(KMX_WCHAR const * p) {
   // Absolute path (returns FALSE):
   //  C:\...\BITMAP.BMP
   //  \\SERVER\SHARE\...\BITMAP.BMP
-
+/*
 #if defined(_WIN32) || defined(_WIN64)
   if (*p == u'\\') return FALSE;
 #else
   if (*p == u'/') return FALSE;
 #endif
-
-  if (*p && *(p + 1) == u':') return FALSE;
+*/
+if ((*p == u'\\') || (*p == u'/'))return FALSE;
+if (*p && *(p + 1) == u':') return FALSE;
 
   return TRUE;
 }
@@ -84,13 +85,13 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   }
   std::wstring  Name_wstr = convert_pchar16T_To_wstr(Name);
   const KMX_WCHART* Name_wchptr = Name_wstr.c_str();
-/*
+
 #if defined(_WIN32) || defined(_WIN64)
   nfile = _wfsopen(Name_wchptr, L"rb", _SH_DENYWR);
 #else
   nfile = fopen(Name_wchptr, "rb");
-#endif*/
-  nfile = Open_File(Name_wchptr, L"rb");
+#endif
+  //nfile = Open_File(Name_wchptr, L"rb");
 
   if (nfile == NULL) {
     if (ReportMissingFile) {
@@ -107,6 +108,9 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
 #else
   const KMX_WCHAR* cptr1 = u16rchr(Name, '/');
 #endif
+
+
+
   cptr1++;
 
 //TODO: sort out how to find common includes in non-Windows platforms:
