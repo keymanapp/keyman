@@ -37,7 +37,7 @@ DEBUG="debug"
 RELEASE="release"
 
 builder_describe "Builds Keyman Engine for Android (KMEA)." \
-  "@../../web configure" \
+  "@../../web" \
   "clean" \
   "configure" \
   "build" \
@@ -113,25 +113,13 @@ if builder_start_action configure; then
   echo "Copying es6-shim polyfill"
   cp $KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js $KMEA_ASSETS/es6-shim.min.js
 
-  if [ $? -ne 0 ]; then
-        builder_die "ERROR: copying artifacts failed"
-  fi
 
-  # Cursory check that KMW exists
-  if [ ! -f "$KMEA_ASSETS/keymanandroid.js" ]; then
-    builder_die "ERROR: keymanweb not built"
-  fi
 
   builder_finish_action success configure
 fi
 
 if builder_start_action clean:engine; then
-  if [ -f "$KMA_ROOT/KMEA/app/build/outputs/aar/$ARTIFACT" ]; then
-    rm -f "$KMA_ROOT/KMEA/app/build/outputs/aar/$ARTIFACT"
-    echo "Cleaned $ARTIFACT"
-  else
-    echo "Nothing to clean"
-  fi
+  rm -f "$KMA_ROOT/KMEA/app/build/outputs/aar/$ARTIFACT"
 
   builder_finish_action success clean:engine
 fi
@@ -141,15 +129,11 @@ fi
 
 
 if builder_start_action build:engine; then
-  echo "Gradle Build of KMEA"
-  cd $KMA_ROOT/KMEA
+  cd "$KMA_ROOT/KMEA"
 
   echo "BUILD_FLAGS $BUILD_FLAGS"
   # Build without test
   ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
-  if [ $? -ne 0 ]; then
-    builder_die "ERROR: Build of KMEA failed"
-  fi
 
   # TODO: remove _copy_artifacts() when all the Android projects have builder
   _copy_artifacts
@@ -158,8 +142,7 @@ if builder_start_action build:engine; then
 fi
 
 if builder_start_action test:engine; then
-  echo "Gradle test of KMEA"
-  cd $KMA_ROOT/KMEA
+  cd "$KMA_ROOT/KMEA"
 
   if builder_has_option --ci; then
     # Report JUnit test results to CI
@@ -168,9 +151,6 @@ if builder_start_action test:engine; then
 
   echo "TEST_FLAGS: $TEST_FLAGS"
   ./gradlew $DAEMON_FLAG $TEST_FLAGS
-  if [ $? -ne 0 ]; then
-    builder_die "ERROR: KMEA test cases failed"
-  fi
 
   builder_finish_action success test:engine
 fi
