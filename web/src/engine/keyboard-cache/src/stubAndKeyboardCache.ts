@@ -27,28 +27,12 @@ export {withoutPrefix as toUnprefixedKeyboardId};
 
 interface EventMap {
   /**
-   * Original event to be generated via this one:
-   *
-   ```
-    // The corresponding event is needed in order to update UI modules as new keyboard stubs "come online".
-    // this.doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC'],sp['KP']);
-   ```
-   *
-   * Note that said events should be deferred until after KMW initializes - UI modules depend on them.
-   * Use a centralized initialization promise for this.
+   * Indicates that the specified stub has just been registered within the cache.
    */
   stubAdded: (stub: KeyboardStub) => void;
 
   /**
-   * Original event to be generated via this one:
-   *
-   ```
-    // // Execute any external (UI) code needed after loading keyboard
-    // this.doKeyboardLoaded(Pk['KI']);
-   ```
-   *
-   * Note that said events should be deferred until after KMW initializes - UI modules depend on them.
-   * Use a centralized initialization promise for this.
+   * Indicates that the specified Keyboard has just been added to the cache.
    */
   keyboardAdded: (keyboard: Keyboard) => void;
 }
