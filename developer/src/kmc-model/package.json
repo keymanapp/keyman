@@ -30,7 +30,6 @@
   "dependencies": {
     "@keymanapp/keyman-version": "*",
     "@keymanapp/models-types": "*",
-    "commander": "^3.0.0",
     "typescript": "^4.9.5",
     "xml2js": "^0.4.19"
   },
