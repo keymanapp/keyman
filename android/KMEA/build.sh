@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build Keyman Engine Android using Keyman Web artifacts
+# Build Keyman Engine for Android using Keyman Web artifacts
 #
 # Abbreviations:
 # KMA  - Keyman for Android
@@ -27,14 +27,10 @@ cd "$THIS_SCRIPT_PATH"
 KMA_ROOT="$KEYMAN_ROOT/android"
 KMW_ROOT="$KEYMAN_ROOT/web"
 KMEA_ASSETS="$KMA_ROOT/KMEA/app/src/main/assets"
-KMW_CONFIG=release
+CONFIG="release"
 BUILD_FLAGS="aR -x lint -x test"    # Gradle build w/o test
 TEST_FLAGS="-x aR lint testRelease" # Gradle test w/o build
 JUNIT_RESULTS="##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
-ARTIFACT="app-release.aar"
-
-DEBUG="debug"
-RELEASE="release"
 
 builder_describe "Builds Keyman Engine for Android (KMEA)." \
   "@../../web" \
@@ -50,12 +46,13 @@ builder_parse "$@"
 
 if builder_has_option --debug; then
   builder_heading "### Debug config ####"
-  KMW_CONFIG="$DEBUG"
+  CONFIG="debug"
   BUILD_FLAGS="assembleDebug -x lintDebug -x test"
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
   JUNIT_RESULTS="##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testDebugUnitTest\']"
-  ARTIFACT="app-debug.aar"
 fi
+
+ARTIFACT="app-$CONFIG.aar"
 
 builder_describe_outputs \
   build:engine     ./app/build/outputs/aar/${ARTIFACT}
@@ -97,33 +94,32 @@ fi
 
 #### Build action definitions ####
 
+if builder_start_action clean:engine; then
+  # Clean debug and release artifacts
+  rm -f "$KMA_ROOT/KMEA/app/build/outputs/aar/app-debug.aar"
+  rm -f "$KMA_ROOT/KMEA/app/build/outputs/aar/app-release.aar"
+
+  builder_finish_action success clean:engine
+fi
+
 if builder_start_action configure; then
 
   # Copy KeymanWeb artifacts
   echo "Copying KMW artifacts"
-  cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/osk/ajax-loader.gif $KMEA_ASSETS/ajax-loader.gif
-  cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/keyman.js $KMEA_ASSETS/keymanandroid.js
-  cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/keyman.js.map $KMEA_ASSETS/keyman.js.map
-  cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/osk/kmwosk.css $KMEA_ASSETS/kmwosk.css
-  cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/osk/globe-hint.css $KMEA_ASSETS/globe-hint.css
-  cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/osk/keymanweb-osk.ttf $KMEA_ASSETS/keymanweb-osk.ttf
+  cp $KMW_ROOT/build/app/embed/$CONFIG/osk/ajax-loader.gif $KMEA_ASSETS/ajax-loader.gif
+  cp $KMW_ROOT/build/app/embed/$CONFIG/keyman.js $KMEA_ASSETS/keymanandroid.js
+  cp $KMW_ROOT/build/app/embed/$CONFIG/keyman.js.map $KMEA_ASSETS/keyman.js.map
+  cp $KMW_ROOT/build/app/embed/$CONFIG/osk/kmwosk.css $KMEA_ASSETS/kmwosk.css
+  cp $KMW_ROOT/build/app/embed/$CONFIG/osk/globe-hint.css $KMEA_ASSETS/globe-hint.css
+  cp $KMW_ROOT/build/app/embed/$CONFIG/osk/keymanweb-osk.ttf $KMEA_ASSETS/keymanweb-osk.ttf
 
   cp $KEYMAN_ROOT/common/web/sentry-manager/build/index.js $KMEA_ASSETS/keyman-sentry.js
 
   echo "Copying es6-shim polyfill"
   cp $KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js $KMEA_ASSETS/es6-shim.min.js
 
-
-
   builder_finish_action success configure
 fi
-
-if builder_start_action clean:engine; then
-  rm -f "$KMA_ROOT/KMEA/app/build/outputs/aar/$ARTIFACT"
-
-  builder_finish_action success clean:engine
-fi
-
 
 # Destinations that will need the keymanweb artifacts
 
