@@ -94,9 +94,8 @@ builder_run_child_actions build:engine/main
 # Uses all but engine/element-wrappers
 builder_run_child_actions build:app/webview
 
-### Intentionally disabled at this time - the current focus is on build:app/webview.
-# # Uses literally everything `engine/` above
-# builder_run_child_actions build:app/browser
+# Uses literally everything `engine/` above
+builder_run_child_actions build:app/browser
 
 builder_run_child_actions test
 
