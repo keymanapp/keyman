@@ -33,7 +33,7 @@ builder_describe "Builds DOM-based OutputTarget subclasses used by the Keyman En
 
 builder_describe_outputs \
   configure   /node_modules \
-  build       /web/$SUBPROJECT_NAME/lib/index.mjs
+  build       /web/build/$SUBPROJECT_NAME/lib/index.mjs
 
 builder_parse "$@"
 

@@ -33,7 +33,7 @@ builder_describe "Builds keyboard cloud-querying & caching modules used by the K
 
 builder_describe_outputs \
   configure   /node_modules \
-  build       /web/$SUBPROJECT_NAME/lib/index.mjs
+  build       /web/build/$SUBPROJECT_NAME/lib/index.mjs
 
 builder_parse "$@"
 

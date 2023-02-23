@@ -35,7 +35,7 @@ builder_describe "Builds the Keyman Engine for Web's On-Screen Keyboard package 
 
 builder_describe_outputs \
   configure   /node_modules \
-  build       /web/$SUBPROJECT_NAME/lib/index.mjs
+  build       /web/build/$SUBPROJECT_NAME/lib/index.mjs
 
 builder_parse "$@"
 

@@ -34,7 +34,7 @@ builder_describe "Builds DOM-utility modules used by the Keyman Engine for Web (
 
 builder_describe_outputs \
   configure   /node_modules \
-  build       /web/$SUBPROJECT_NAME/obj/index.js
+  build       /web/build/$SUBPROJECT_NAME/obj/index.js
 
 builder_parse "$@"
 
