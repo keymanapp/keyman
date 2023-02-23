@@ -22,7 +22,7 @@ SUBPROJECT_NAME=engine/osk
 # ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's On-Screen Keyboard package (OSK)." \
-  "@/common/web/keyboard-processor build" \
+  "@/common/web/input-processor build" \
   "@../device-detect build" \
   "@../dom-utils build" \
   "clean" \
