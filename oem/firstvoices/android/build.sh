@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
+# Build FirstVoices for Android app
 
-# Set sensible script defaults:
-# set -e: Terminate script if a command returns an error
-set -e
-# set -u: Terminate script if an unset variable is used
-set -u
-# set -x: Debugging use, print each statement
 # set -x
+set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -14,7 +10,81 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
+
+# This script runs from its own folder
+cd "$THIS_SCRIPT_PATH"
+
+# ################################ Main script ################################
+
+# Definition of global compile constants
+
+CONFIG="release"
+BUILD_FLAGS="build -x lint -x test"                     # Gradle build w/o test
+TEST_FLAGS="-x assembleRelease lintRelease testRelease" # Gradle test w/o build
+DAEMON_FLAG=
+
+builder_describe "Builds FirstVoices for Android app." \
+  "@../../../android/KMEA" \
+  "configure" \
+  "build" \
+  "test             Runs lint and tests." \
+  "--ci             Don't start the GRadle daemon. For CI" \
+  "--upload-sentry  Upload to sentry"
+
+# parse before describe_outputs to check debug flags
+builder_parse "$@"
+
+if builder_has_option --debug; then
+  builder_heading "### Debug config ####"
+  CONFIG="debug"
+  BUILD_FLAGS="assembleDebug -x lint -x test"
+  TEST_FLAGS="-x assembleDebug lintDebug testDebug"
+fi  
+
+ARTIFACT="app-$CONFIG.apk"
+
+builder_describe_outputs \
+  build:app     ./app/build/outputs/apk/$CONFIG/${ARTIFACT}
+
+#### Build
+
+#
+# Prevents 'clear' on exit of mingw64 bash shell
+#
+SHLVL=0
+
+
+# Parse args
+
+if builder_has_option --ci; then
+  DAEMON_FLAG=--no-daemon
+fi
+
+#### Build action definitions ####
+
+function makeLocalSentryRelease() {
+  echo
+}
+
+#### Build action definitions ####
+
+# Check about cleaning artifact paths and upload directories
+if builder_start_action clean; then
+  cd "$KEYMAN_ROOT/oem/firstvoices/android/"
+
+  if [ -d "$KEYMAN_ROOT/oem/firstvoices/android/app/build/outputs" ]; then
+    rm -rf "$KEYMAN_ROOT/oem/firstvoices/android/app/build/outputs"
+  fi
+
+  if [ -d "$KEYMAN_ROOT/android/upload" ]; then
+    rm -rf "$KEYMAN_ROOT/android/upload"
+  fi
+
+  builder_finish_action success clean
+fi
 
 display_usage ( ) {
   echo "build.sh [-no-daemon] [-debug] [-no-update] [-lib-build|-no-lib-build] [-download-keyboards] [-h|-?]"
@@ -30,68 +100,29 @@ display_usage ( ) {
   exit 1
 }
 
-export TARGET=FirstVoices
-KEYBOARD_PACKAGE_ID="fv_all"
-KEYBOARDS_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
-KEYBOARDS_CSV="$KEYMAN_ROOT/oem/firstvoices/keyboards.csv"
-KEYBOARDS_CSV_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/keyboards.csv"
+if builder_start_action configure; then
+  KEYBOARDS_CSV="$KEYMAN_ROOT/oem/firstvoices/keyboards.csv"
+  KEYBOARDS_CSV_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/keyboards.csv"
 
-# This build script assumes that the https://github.com/keymanapp/keyboards repo is in
-# the same parent folder as this repo, with the default name 'keyboards'
+  KEYBOARD_PACKAGE_ID="fv_all"
+  KEYBOARDS_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
 
-PARAM_DEBUG=
-PARAM_NO_DAEMON=
-PARAM_NO_UPDATE=
-PARAM_LIB_BUILD=
-PARAM_NO_LIB_BUILD=
-DO_KEYBOARDS_DOWNLOAD=false
-
-while [[ $# -gt 0 ]] ; do
-  key="$1"
-  case $key in
-    -download-resources)
-      DO_KEYBOARDS_DOWNLOAD=true
-      ;;
-    -h|-\?)
-      display_usage
-      ;;
-    -debug)
-      PARAM_DEBUG=-debug
-      ;;
-    -no-daemon)
-      PARAM_NO_DAEMON=-no-daemon
-      ;;
-    -no-update)
-      PARAM_NO_UDPATE=-no-update
-      ;;
-    -lib-build)
-      PARAM_LIB_BUILD=-lib-build
-      ;;
-    -no-lib-build|-lib-nobuild)
-      PARAM_NO_LIB_BUILD=-no-lib-build
-      ;;
-  esac
-  shift
-done
-
-# Verify default keyboard package exists
-if [[ ! -f "$KEYBOARDS_TARGET" || ! -f "$KEYBOARDS_CSV_TARGET" ]]; then
-  echo "$KEYBOARDS_TARGET and $KEYBOARDS_CSV_TARGET required. Will download the latest version"
-  DO_KEYBOARDS_DOWNLOAD=true
-fi
-
-if [ ! -z "$PARAM_LIB_BUILD" ] && [ ! -z "$PARAM_NO_LIB_BUILD" ]; then
-  echo "ERROR: Cannot set both -lib-build and -no-lib-build"
-  exit 1
-fi
-
-# Download default keyboard package
-if [ "$DO_KEYBOARDS_DOWNLOAD" = true ]; then
-  echo "Copying keyboards.csv"
   cp "$KEYBOARDS_CSV" "$KEYBOARDS_CSV_TARGET"
-
   downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "$KEYBOARDS_TARGET"
+
+  builder_finish_action success configure
 fi
 
-# TODO: in the future build_common.sh should probably be shared with all oem products?
-./build_common.sh $PARAM_DEBUG $PARAM_NO_DAEMON $PARAM_NO_UPDATE $PARAM_LIB_BUILD $PARAM_NO_LIB_BUILD
+if builder_start_action build; then
+  echo "BUILD_FLAGS: $BUILD_FLAGS"
+  ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
+
+  builder_finish_action success build
+fi
+
+if builder_start_action test; then
+  echo "TEST_FLAGS: $TEST_FLAGS"
+  ./gradlew $DAEMON_FLAG $TEST_FLAGS
+
+  builder_finish_action_success test
+fi
