@@ -191,11 +191,8 @@ Thumbs.db
 /developer/src/test/auto/kmcomp/*.txt
 /developer/src/kmcmplib/tests/*.txt
 /developer/src/kmcmplib/tests/Run_KMCOMP*.bat
-*.bak
+/**/*.bak
 /linux/common/core/desktop/wasm.defs.build
 /linux/common/core/desktop/meson.build
-/common/test/**/*.kmx
-/common/test/**/*.kvk
-/core/tests/unit/kmx/*.kmx
 /**/*.kmx
 /**/*.kvk
