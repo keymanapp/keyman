@@ -8,7 +8,7 @@ set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
@@ -19,36 +19,41 @@ cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
-builder_describe \
-  "Build KMSample1 app for Android." \
-  clean \
-  build \
+builder_describe "Build KMSample1 app for Android." \
+  "@../../KMEA configure" \
+  "clean" \
+  "build" \
   ":app                   KMSample1" \
-  "--ci                   Don't start the Gradle daemon. Use for CI" \
-  "--debug,-d             Local debug build; use for development builds"
+  "--ci                   Don't start the Gradle daemon. Use for CI" 
 
+# parse before describe_outputs to check debug flags
 builder_parse "$@"
 
-SAMPLE_FLAGS=""
+CONFIG="release"
+SAMPLE_FLAGS="build"
+ARTIFACT="app-release.apk"
+
+if builder_has_option --debug; then
+  CONFIG="debug"
+  SAMPLE_FLAGS="assembleDebug"
+  ARTIFACT="app-debug.apk"
+fi
 
 # Build flags that apply to all targets
 if builder_has_option --ci; then
   SAMPLE_FLAGS="$SAMPLE_FLAGS -no-daemon"
 fi
 
-if builder_has_option --debug; then
-  SAMPLE_FLAGS="$SAMPLE_FLAGS assembleDebug"
-else
-  SAMPLE_FLAGS="$SAMPLE_FLAGS build"
-fi
+builder_describe_outputs \
+  build:app             ./app/build/outputs/apk/$CONFIG/$ARTIFACT
 
 #
 # Prevents 'clear' on exit of mingw64 bash shell
 #
 SHLVL=0
 
-# Clean build artifacts: output and upload directories
-function _clean() {
+# Check about cleaning artifact paths and upload directories
+if builder_start_action clean; then
   cd "$KEYMAN_ROOT/android/Samples/KMSample1/"
 
   if [ -d "$KEYMAN_ROOT/android/Samples/KMSample1/app/build/outputs" ]; then
@@ -60,26 +65,18 @@ function _clean() {
     echo "Cleaning upload directory"
     rm -rf "$KEYMAN_ROOT/android/upload"
   fi
-}
 
-function _build_app() {
-  cd "$KEYMAN_ROOT/android/Samples/KMSample1"
-  ./gradlew clean $SAMPLE_FLAGS
-
-  if [ $? -ne 0 ]; then
-    die "ERROR: KMSample1/build.sh failed"
-  fi
-}
-
-
-# Check about cleaning artifact paths
-if builder_start_action clean; then
-  _clean
   builder_finish_action success clean
 fi
 
 # Building KMSample1
 if builder_start_action build:app; then
-  _build_app
+  cd "$KEYMAN_ROOT/android/Samples/KMSample1"
+  ./gradlew clean $SAMPLE_FLAGS
+
+  if [ $? -ne 0 ]; then
+    builder_die "ERROR: KMSample1/build.sh failed"
+  fi
+
   builder_finish_action success build:app
 fi
