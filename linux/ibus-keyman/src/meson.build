@@ -25,6 +25,7 @@ deps = [ibus, gtk, x11, json_glib, kmnkbp_lib]
 prefix = get_option('prefix')
 cfg = configuration_data()
 cfg.set('VERSION', meson.project_version())
+cfg.set('LIBEXECDIR', get_option('prefix') / get_option('libexecdir'))
 
 configure_file(
   configuration: cfg,
