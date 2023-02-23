@@ -24,5 +24,5 @@ function npm_publish() {
   #
   # See `npm help publish` for more details.
   echo "Publishing $DRY_RUN npm package with tag $npm_dist_tag"
-  npm publish $DRY_RUN --access public --tag $npm_dist_tag || fail "Could not publish $npm_dist_tag release."
+  npm publish $DRY_RUN --access public --tag $npm_dist_tag || builder_die "Could not publish $npm_dist_tag release."
 fi
