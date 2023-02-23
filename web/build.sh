@@ -29,6 +29,8 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   "configure" \
   "build" \
   "test" \
+  ":app/browser              The website-integrating, browser-based version of KMW" \
+  ":app/webview              A puppetable version of KMW designed for use in a host app's WebView" \
   ":engine/configuration     Subset used to configure KMW" \
   ":engine/device-detect     Subset used for device-detection " \
   ":engine/dom-utils         A common subset of function used for DOM calculations, layout, etc" \
@@ -42,12 +44,17 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
 
 builder_describe_outputs \
   configure                      ../node_modules \
+  build:app/browser              build/app/browser/lib/index.js \
+  build:app/webview              build/app/webview/lib/index.js \
   build:engine/configuration     build/engine/configuration/obj/index.js \
   build:engine/device-detect     build/engine/device-detect/lib/index.mjs \
   build:engine/dom-utils         build/engine/dom-utils/obj/index.js \
   build:engine/element-wrappers  build/engine/element-wrappers/lib/index.mjs \
   build:engine/keyboard-cache    build/engine/keyboard-cache/lib/index.mjs \
+  build:engine/main              build/engine/main/lib/index.mjs \
   build:engine/osk               build/engine/osk/lib/index.mjs
+
+  # TODO:  app/ui linkage.
 
 builder_parse "$@"
 
@@ -81,11 +88,14 @@ builder_run_child_actions build:engine/configuration
 # Uses engine/dom-utils
 builder_run_child_actions build:engine/osk
 
-# if builder_start_action build:main; then
-#   compile $MAIN
+# Uses engine/configuration, engine/device-detect, engine/keyboard-cache, & engine/osk
+builder_run_child_actions build:engine/main
 
-#   builder_finish_action success build:main
-# fi
+# Uses all but engine/element-wrappers
+builder_run_child_actions build:app/webview
+
+# Uses literally everything `engine/` above
+builder_run_child_actions build:app/browser
 
 builder_run_child_actions test
 

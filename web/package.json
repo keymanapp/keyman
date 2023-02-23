@@ -50,6 +50,14 @@
       "types": "./build/engine/keyboard-cache/lib/index.d.ts",
       "import": "./build/engine/keyboard-cache/lib/node-cloud-requester.mjs"
     },
+    "./engine/main": {
+      "types": "./build/engine/main/obj/index.d.ts",
+      "import": "./build/engine/main/obj/index.js"
+    },
+    "./engine/main/lib": {
+      "types": "./build/engine/main/lib/index.d.ts",
+      "import": "./build/engine/main/lib/index.mjs"
+    },
     "./engine/osk": {
       "types": "./build/engine/osk/obj/index.d.ts",
       "import": "./build/engine/osk/obj/index.js"

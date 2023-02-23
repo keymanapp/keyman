@@ -16,16 +16,6 @@ export default abstract class ContextManager extends EventEmitter<EventMap> {
     const outputTarget = this.activeTarget;
 
     if(outputTarget != null) {
-      // While not yet fully connected, ContextManager and its subclasses will be responsible for maintaining
-      // active elements & their focus... something that should only really matter for the website-integrating
-      // subclass.
-
-      // Required for the `sil_euro_latin` keyboard's desktop OSK/table to function properly.
-      keyman.uiManager.setActivatingUI(true);
-      dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
-      keyman.domManager.focusLastActiveElement();
-      dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
-
       if(Ptext != null) {
         kbdInterface.output(0, outputTarget, Ptext);
       }
