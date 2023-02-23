@@ -28,7 +28,7 @@ if (!inputFilename) {
   exitDueToUsageError('Must provide a lexical model package source file.');
 }
 
-let outputFilename: string = program.outFile ? program.outFile : inputFilename.replace(/\.kps$/, ".kmp");
+let outputFilename: string = program.opts().outFile ? program.opts().outFile : inputFilename.replace(/\.kps$/, ".kmp");
 
 //
 // Load .kps source data
@@ -51,7 +51,7 @@ promise.then(data => {
 });
 
 function exitDueToUsageError(message: string): never  {
-  console.error(`${program._name}: ${message}`);
+  console.error(`${program.name()}: ${message}`);
   console.error();
   program.outputHelp();
   return process.exit(SysExits.EX_USAGE);
