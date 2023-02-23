@@ -42,7 +42,8 @@ builder_describe "Builds Keyman Engine for Android (KMEA)." \
   "configure" \
   "build" \
   "test             Runs lint and unit tests." \
-  ":engine          Builds KMEA"
+  ":engine          Builds KMEA" \
+  "--ci             Don't start the Gradle daemon. For CI"
 
 # parse before describe_outputs to check debug flags
 builder_parse "$@"
@@ -63,7 +64,7 @@ builder_describe_outputs \
 
 function _copy_artifacts() {
   echo "Copying Keyman Engine for Android to KMAPro, Sample apps, and Tests"
-  mv $KMA_ROOT/KMEA/app/build/outputs/aar/$ARTIFACT $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar
+  cp $KMA_ROOT/KMEA/app/build/outputs/aar/$ARTIFACT $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar
   cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Samples/KMSample1/app/libs/keyman-engine.aar
   cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Samples/KMSample2/app/libs/keyman-engine.aar
   cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Tests/KeyboardHarness/app/libs/keyman-engine.aar
