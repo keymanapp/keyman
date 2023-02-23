@@ -2,6 +2,9 @@ import { Mock } from '@keymanapp/keyboard-processor';
 import { ContextManager as ContextManagerBase } from 'keyman/engine/main';
 
 export default class ContextManager extends ContextManagerBase {
+  // Change of context?  Just replace the Mock.  Context will be ENTIRELY controlled
+  // by whatever is hosting the WebView.  (Some aspects of this context replacement have
+  // yet to be modularized at this time, though.)
   private contextBase: Mock;
 
   constructor() {
