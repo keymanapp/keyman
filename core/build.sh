@@ -17,6 +17,14 @@ cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
+cleanup_visual_studio_path
+
+MESON_LOW_VERSION=false
+
+if [[ `meson --version` < 0.54 ]]; then
+  MESON_LOW_VERSION=true
+fi
+
 #
 # Restrict available targets to those that can be built on the current system
 #
@@ -41,14 +49,6 @@ esac
 #  ":linux          Build for current Linux architecture"
 #  ":mac            Build for current macOS architecture"
 
-archdeps=()
-if type node >/dev/null 2>&1; then
-  # Note: Found node, can build kmc and hextobin dependencies
-  archdeps+=(@/common/tools/hextobin @/common/web/keyman-version @/developer/src/kmc)
-else
-  echo "Note: could not find node, skipping hextobin and kmc dependency builds, ldml+binary tests will not be run"
-fi
-
 builder_describe \
 "Build Keyman Core
 
@@ -56,7 +56,9 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   * <configuration>: 'debug' or 'release' (see --debug flag)
   * All parameters after '--' are passed to meson or ninja
 " \
-  "${archdeps[@]}" \
+  "@/common/tools/hextobin" \
+  "@/common/web/keyman-version" \
+  "@/developer/src/kmc" \
   "clean" \
   "configure" \
   "build" \
@@ -65,10 +67,27 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   "uninstall       uninstall libraries from current system" \
   "${archtargets[@]}" \
   "--debug,-d                      configuration is 'debug', not 'release'" \
+  "--no-tests      do not configure tests (used by other projects)" \
   "--target-path=opt_target_path   override for build/ target path" \
   "--test=opt_tests,-t             test[s] to run (space separated)"
 
 builder_parse "$@"
+
+#
+# meson forces us to configure tests, including building compilers, even
+# if we don't plan to run them, for example when doing a dependency build
+# in CI
+#
+MESON_OPTION_keyman_core_tests=
+BUILD_BAT_keyman_core_tests=
+
+if builder_is_dep_build || builder_has_option --no-tests; then
+  MESON_OPTION_keyman_core_tests="-Dkeyman_core_tests=false"
+  BUILD_BAT_keyman_core_tests=--no-tests
+  builder_remove_dep /common/tools/hextobin
+  builder_remove_dep /common/web/keyman-version
+  builder_remove_dep /developer/src/kmc
+fi
 
 if builder_has_option --debug; then
   CONFIGURATION=debug

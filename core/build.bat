@@ -79,7 +79,11 @@ shift
 if "!COMMAND!" == "configure" (
   echo === Configuring Keyman Core for Windows !ARCH! !BUILDTYPE! ===
   if exist build\!ARCH!\!BUILDTYPE! rd /s/q build\!ARCH!\!BUILDTYPE!
-  meson setup build\!ARCH!\!BUILDTYPE! !STATIC_LIBRARY! --buildtype !BUILDTYPE! --werror %1 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
+  if "%1" == "--no-tests" (
+    meson setup build\!ARCH!\!BUILDTYPE! !STATIC_LIBRARY! --buildtype !BUILDTYPE! -Dkeyman_core_tests=false --werror %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
+  ) else (
+    meson setup build\!ARCH!\!BUILDTYPE! !STATIC_LIBRARY! --buildtype !BUILDTYPE! --werror %1 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
+  )
   shift
 )
 

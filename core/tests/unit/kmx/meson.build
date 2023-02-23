@@ -38,14 +38,14 @@ kmx = executable('kmx',
     cpp_args: defns + warns,
     include_directories: [inc, libsrc],
     link_args: links + tests_flags,
-    objects: lib.extract_all_objects())
+    objects: lib.extract_all_objects(recursive: false))
 
 test_lib = static_library('kmnkbp-tests',
   coretest_files,
   cpp_args: defns + warns + flags,
   include_directories: [inc, libsrc],
   link_args: links + tests_flags,
-  objects: lib.extract_all_objects(),
+  objects: lib.extract_all_objects(recursive: false),
   pic: true,
   install: false
 )
@@ -248,7 +248,7 @@ key_e = executable('key_list', 'kmx_key_list.cpp',
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,
-                objects: lib.extract_all_objects())
+                objects: lib.extract_all_objects(recursive: false))
 test_kbd = 'kmx_key_list'
 if kmcomp.found()
   kbd_src = files(test_kbd + '.kmn')
@@ -270,7 +270,7 @@ imx_e = executable('imx_list', 'kmx_imx.cpp',
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,
-                objects: lib.extract_all_objects())
+                objects: lib.extract_all_objects(recursive: false))
 
 test_kbd = 'kmx_imsample'
 if kmcomp.found()

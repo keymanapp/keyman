@@ -8,7 +8,6 @@ do_clean() {
   # clean: note build/<target> will be left, but build/<target>/<configuration> should be gone
   local target=$1
   builder_start_action clean:$target || return 0
-
   rm -rf "$MESON_PATH"
   builder_finish_action success clean:$target
 }
@@ -21,7 +20,7 @@ do_configure() {
   local target=$1
   builder_start_action configure:$target || return 0
 
-  local STANDARD_MESON_ARGS=
+  local STANDARD_MESON_ARGS="$MESON_OPTION_keyman_core_tests"
 
   builder_heading "======= Configuring $target ======="
 
@@ -29,17 +28,18 @@ do_configure() {
     # do_configure_wasm
     locate_emscripten
     build_meson_cross_file_for_wasm
-    STANDARD_MESON_ARGS="--cross-file wasm.defs.build --cross-file wasm.build --default-library static"
+    STANDARD_MESON_ARGS="$STANDARD_MESON_ARGS --cross-file wasm.defs.build --cross-file wasm.build --default-library static"
   fi
 
   if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $CONFIGURATION configure "${builder_extra_params[@]}"
+    cmd //C build.bat $target $CONFIGURATION configure $BUILD_BAT_keyman_core_tests "${builder_extra_params[@]}"
   else
     pushd "$THIS_SCRIPT_PATH" > /dev/null
     # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
     meson setup "$MESON_PATH" --werror --buildtype $CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
     popd > /dev/null
   fi
+
   builder_finish_action success configure:$target
 }
 
@@ -50,20 +50,14 @@ do_configure() {
 do_build() {
   local target=$1
   builder_start_action build:$target || return 0
-
-  builder_heading "======= Building $target ======="
-
   if [[ $target =~ ^(x86|x64)$ ]]; then
-    # Build the meson targets, both x86 and x64 also
-    # We need to use a batch file here so we can get
-    # the Visual Studio build environment with vcvarsall.bat
-    # TODO: if PATH is the only variable required, let's try and
-    #       eliminate this difference in the build process
     cmd //C build.bat $target $CONFIGURATION build "${builder_extra_params[@]}"
-  else
+  elif $MESON_LOW_VERSION; then
     pushd "$MESON_PATH" > /dev/null
     ninja
-    popd > /dev/null
+    popd
+  else
+    meson compile -C "$MESON_PATH"
   fi
   builder_finish_action success build:$target
 }
@@ -75,15 +69,10 @@ do_build() {
 do_test() {
   local target=$1
   builder_start_action test:$target || return 0
-
-  builder_heading "======= Testing $target ======="
-
   if [[ $target =~ ^(x86|x64)$ ]]; then
     cmd //C build.bat $target $CONFIGURATION test "${builder_extra_params[@]}"
   else
-    pushd "$MESON_PATH" > /dev/null
-    meson test "${builder_extra_params[@]}"
-    popd > /dev/null
+    meson test -C "$MESON_PATH" "${builder_extra_params[@]}"
   fi
   builder_finish_action success test:$target
 }
@@ -93,21 +82,27 @@ do_test() {
 # ----------------------------------------------------------------------------
 
 do_install() {
-  do_command install $1
+  local target=$1
+  builder_start_action install:$target || return 0
+  if $MESON_LOW_VERSION; then
+    pushd "$MESON_PATH" > /dev/null
+    ninja install
+    popd > /dev/null
+  else
+    meson install -C "$MESON_PATH"
+  fi
+  builder_finish_action success install:$target
 }
 
 do_uninstall() {
-  do_command uninstall $1
-}
-
-do_command() {
-  local command=$1
-  local target=$2
-  builder_start_action $command:$target || return 0
+  local target=$1
+  builder_start_action uninstall:$target || return 0
   pushd "$MESON_PATH" > /dev/null
-  ninja $command
+  # Note: there is no meson uninstall command, which means
+  # this probably won't work on Windows
+  ninja uninstall
   popd > /dev/null
-  builder_finish_action success $command:$target
+  builder_finish_action success uninstall:$target
 }
 
 # ----------------------------------------------------------------------------
@@ -149,4 +144,26 @@ build_meson_cross_file_for_wasm() {
     local R=$(echo $EMSCRIPTEN_BASE | sed 's_/_\\/_g')
   fi
   sed -e "s/\$EMSCRIPTEN_BASE/$R/g" wasm.build.$BUILDER_OS.in > wasm.build
+}
+
+#
+# Remove Visual Studio from the path so that meson goes looking for it rather than
+# assuming that it's all available. If we don't do this, we get an error with link.exe:
+#
+#     meson.build:8:0: ERROR: Found GNU link.exe instead of MSVC link.exe in C:\Program Files\Git\usr\bin\link.EXE.
+#     This link.exe is not a linker.
+#     You may need to reorder entries to your %PATH% variable to resolve this.
+#
+
+cleanup_visual_studio_path() {
+  local _split_path _new_path=""
+  IFS=':' read -ra _split_path <<<"$PATH"
+  for p in "${_split_path[@]}"; do
+    if ! [[ $p =~ Visual\ Studio ]]; then
+      _new_path="$_new_path:$p"
+    fi
+  done
+  echo
+  PATH="${_new_path:1}"
+  unset VSINSTALLDIR
 }

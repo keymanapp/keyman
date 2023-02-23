@@ -20,7 +20,7 @@ fi
 
 if [[ "${BUILDONLY}" == "no" ]]; then
 	cd "$BASEDIR"
-	../core/build.sh --target-path "$BASEDIR/keyboardprocessor" configure:arch
+	../core/build.sh --no-tests --target-path "$BASEDIR/keyboardprocessor" configure:arch
 
 	cd keyboardprocessor/arch/release
 	echo "reconfiguring keyboardprocessor meson with prefix ${INSTALLDIR}"

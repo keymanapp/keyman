@@ -335,7 +335,7 @@ run_xcodebuild() {
   fi
 }
 
-#
+
 # Sets the BUILDER_OS environment variable to linux|mac|win
 #
 _builder_get_operating_system() {
@@ -355,3 +355,9 @@ _builder_get_operating_system() {
 }
 
 _builder_get_operating_system
+
+#
+# We always want to use tools out of node_modules/.bin to guarantee that we get the
+# correct version
+#
+set_keyman_standard_build_path

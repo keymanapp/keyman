@@ -15,7 +15,7 @@ echo "Found tier ${TIER}, version ${VERSION}"
 
 # We need to configure+build core before we can configure ibus-keyman
 cd ../core
-./build.sh clean:arch configure:arch build:arch
+./build.sh --no-tests clean:arch configure:arch build:arch
 
 cd "$BASEDIR/ibus-keyman"
 ./build.sh clean configure
