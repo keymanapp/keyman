@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
 # Compiled the Keyman Engine for Web's old namespaced version
+# Will be removed by the end of the Web modularization work.
 #
 
 # set -x
