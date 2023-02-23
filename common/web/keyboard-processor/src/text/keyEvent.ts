@@ -147,7 +147,7 @@ export default class KeyEvent implements KeyEventSpec {
       // the actual keyname instead.
       mappingEvent.kName = 'K_xxxx';
       mappingEvent.Lmodifiers = (shifted ? 0x10 : 0);  // mnemonic lookups only exist for default & shift layers.
-      var mappedChar: string = DefaultOutput.forAny(mappingEvent, true);
+      var mappedChar: string = DefaultOutput.BASE.forAny(mappingEvent, true);
 
       /* First, save a backup of the original code.  This one won't needlessly trigger keyboard
         * rules, but allows us to replicate/emulate commands after rule processing if needed.

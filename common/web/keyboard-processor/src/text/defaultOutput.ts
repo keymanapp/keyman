@@ -23,10 +23,12 @@ export enum EmulationKeystrokes {
  * Defines a collection of static library functions that define KeymanWeb's default (implied) keyboard rule behaviors.
  */
 export default class DefaultOutput {
-  private constructor() {
+  public static BASE = new DefaultOutput();
+
+  public constructor() {
   }
 
-  static codeForEvent(Lkc: KeyEvent) {
+  codeForEvent(Lkc: KeyEvent) {
     return Codes.keyCodes[Lkc.kName] || Lkc.Lcode;;
   }
 
@@ -34,24 +36,24 @@ export default class DefaultOutput {
    * Serves as a default keycode lookup table.  This may be referenced safely by mnemonic handling without fear of side-effects.
    * Also used by Processor.defaultRuleBehavior to generate output after filtering for special cases.
    */
-  public static forAny(Lkc: KeyEvent, isMnemonic: boolean, ruleBehavior?: RuleBehavior) {
+  public forAny(Lkc: KeyEvent, isMnemonic: boolean, ruleBehavior?: RuleBehavior) {
     var char = '';
 
     // A pretty simple table of lookups, corresponding VERY closely to the original defaultKeyOutput.
-    if((char = DefaultOutput.forSpecialEmulation(Lkc)) != null) {
+    if((char = this.forSpecialEmulation(Lkc)) != null) {
       return char;
-    } else if(!isMnemonic && ((char = DefaultOutput.forNumpadKeys(Lkc)) != null)) {
+    } else if(!isMnemonic && ((char = this.forNumpadKeys(Lkc)) != null)) {
       return char;
-    } else if((char = DefaultOutput.forUnicodeKeynames(Lkc, ruleBehavior)) != null) {
+    } else if((char = this.forUnicodeKeynames(Lkc, ruleBehavior)) != null) {
       return char;
-    } else if((char = DefaultOutput.forBaseKeys(Lkc, ruleBehavior)) != null) {
+    } else if((char = this.forBaseKeys(Lkc, ruleBehavior)) != null) {
       return char;
     } else {
       // // For headless and embeddded, we may well allow '\t'.  It's DOM mode that has other uses.
       // // Not originally defined for text output within defaultKeyOutput.
       // // We can't enable it yet, as it'll cause hardware keystrokes in the DOM to output '\t' rather
       // // than rely on the browser-default handling.
-      let code = DefaultOutput.codeForEvent(Lkc);
+      let code = this.codeForEvent(Lkc);
       switch(code) {
       //   case Codes.keyCodes['K_TAB']:
       //   case Codes.keyCodes['K_TABBACK']:
@@ -66,8 +68,8 @@ export default class DefaultOutput {
   /**
    * isCommand - returns a boolean indicating if a non-text event should be triggered by the keystroke.
    */
-  public static isCommand(Lkc: KeyEvent): boolean {
-    let code = DefaultOutput.codeForEvent(Lkc);
+  public isCommand(Lkc: KeyEvent): boolean {
+    let code = this.codeForEvent(Lkc);
 
     switch(code) {
       // Should we ever implement them:
@@ -86,7 +88,7 @@ export default class DefaultOutput {
    *
    * Note:  is extended by DOM-aware KeymanWeb code.
    */
-  public static applyCommand(Lkc: KeyEvent, outputTarget: OutputTarget): void {
+  public applyCommand(Lkc: KeyEvent, outputTarget: OutputTarget): void {
     // Notes for potential default-handling extensions:
     //
     // switch(code) {
@@ -117,8 +119,8 @@ export default class DefaultOutput {
    * Codes matched here generally have default implementations when in a browser but require emulation
    * for 'synthetic' `OutputTarget`s like `Mock`s, which have no default text handling.
    */
-  public static forSpecialEmulation(Lkc: KeyEvent): EmulationKeystrokes {
-    let code = DefaultOutput.codeForEvent(Lkc);
+  public forSpecialEmulation(Lkc: KeyEvent): EmulationKeystrokes {
+    let code = this.codeForEvent(Lkc);
 
     switch(code) {
       case Codes.keyCodes['K_BKSP']:
@@ -133,7 +135,7 @@ export default class DefaultOutput {
   }
 
   // Should not be used for mnenomic keyboards.  forAny()'s use of this method checks first.
-  public static forNumpadKeys(Lkc: KeyEvent) {
+  public forNumpadKeys(Lkc: KeyEvent) {
     // Translate numpad keystrokes into their non-numpad equivalents
     if(Lkc.Lcode >= Codes.keyCodes["K_NP0"]  &&  Lkc.Lcode <= Codes.keyCodes["K_NPSLASH"]) {
       // Number pad, numlock on
@@ -151,7 +153,7 @@ export default class DefaultOutput {
 
   // Test for fall back to U_xxxxxx key id
   // For this first test, we ignore the keyCode and use the keyName
-  public static forUnicodeKeynames(Lkc: KeyEvent, ruleBehavior?: RuleBehavior) {
+  public forUnicodeKeynames(Lkc: KeyEvent, ruleBehavior?: RuleBehavior) {
     const keyName = Lkc.kName;
 
     // Test for fall back to U_xxxxxx key id
@@ -184,7 +186,7 @@ export default class DefaultOutput {
 
   // Test for otherwise unimplemented keys on the the base default & shift layers.
   // Those keys must be blocked by keyboard rules if intentionally unimplemented; otherwise, this function will trigger.
-  public static forBaseKeys(Lkc: KeyEvent, ruleBehavior?: RuleBehavior) {
+  public forBaseKeys(Lkc: KeyEvent, ruleBehavior?: RuleBehavior) {
     let n = Lkc.Lcode;
     let keyShiftState = Lkc.Lmodifiers;
 
