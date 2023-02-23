@@ -11,8 +11,8 @@ set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -57,7 +57,6 @@ builder_parse "$@"
 SHLVL=0
 
 
-
 # Parse args
 
 
@@ -99,12 +98,12 @@ if builder_start_action configure; then
   cp $KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js $KMEA_ASSETS/es6-shim.min.js
 
   if [ $? -ne 0 ]; then
-    die "ERROR: copying artifacts failed"
+        builder_die "ERROR: copying artifacts failed"
   fi
 
   # Cursory check that KMW exists
   if [ ! -f "$KMEA_ASSETS/keymanandroid.js" ]; then
-    die "ERROR: keymanweb not built"
+    builder_die "ERROR: keymanweb not built"
   fi
 
   builder_finish_action success configure
@@ -170,10 +169,11 @@ if builder_start_action test:engine; then
     fi
   fi
 
+    die "ERROR: Build of KMEA failed"
   echo "TEST_FLAGS $TEST_FLAGS"
   ./gradlew $DAEMON_FLAG $TEST_FLAGS
   if [ $? -ne 0 ]; then
-    die "ERROR: KMEA test cases failed"
+        builder_die "ERROR: KMEA test cases failed"
   fi
 
   builder_finish_action success test:engine

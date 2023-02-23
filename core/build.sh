@@ -5,8 +5,9 @@ set -u
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
+
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -36,8 +37,6 @@ display_usage() {
   echo "On Windows, <arch> will be 'x86' or 'x64'; elsewhere it is 'arch'"
   exit 0
 }
-
-get_builder_OS
 
 MESON_TARGET=release
 HAS_TARGET=false
@@ -126,7 +125,7 @@ while [[ $# -gt 0 ]] ; do
       break
       ;;
     *)
-      fail "Invalid parameters. Use --help for help"
+      builder_die "Invalid parameters. Use --help for help"
   esac
   shift
 done
@@ -160,7 +159,7 @@ displayInfo "" \
     ""
 
 clean() {
-  rm -rf "$TARGET_PATH/"
+  rm -rf "${TARGET_PATH:?}/"
 }
 
 path_remove() {
@@ -181,14 +180,14 @@ build_windows() {
 
   if $BUILD_CPP; then
     if $TESTS_CPP; then
-      echo_heading "======= Building and Testing C++ library for Windows (x86, x64) ======="
+      builder_heading "======= Building and Testing C++ library for Windows (x86, x64) ======="
       cmd //C build.bat all $MESON_TARGET build tests
     else
-      echo_heading "======= Building C++ library for Windows (x86, x64) ======="
+      builder_heading "======= Building C++ library for Windows (x86, x64) ======="
       cmd //C build.bat all $MESON_TARGET build
     fi
   elif $TESTS_CPP; then
-    echo_heading "======= Testing C++ library for Windows (x86, x64) ======="
+    builder_heading "======= Testing C++ library for Windows (x86, x64) ======="
     cmd //C build.bat all $MESON_TARGET tests
   fi
 }
@@ -207,35 +206,35 @@ build_standard() {
 
   # Build meson targets
   if $CONFIGURE; then
-    echo_heading "======= Configuring C++ library for $BUILD_PLATFORM ======="
+    builder_heading "======= Configuring C++ library for $BUILD_PLATFORM ======="
     pushd "$THIS_SCRIPT_PATH" > /dev/null
     meson setup "$MESON_PATH" --werror --buildtype $MESON_TARGET $STANDARD_MESON_ARGS $ADDITIONAL_ARGS
     popd > /dev/null
   fi
 
   if $BUILD_CPP; then
-    echo_heading "======= Building C++ library for $BUILD_PLATFORM ======="
+    builder_heading "======= Building C++ library for $BUILD_PLATFORM ======="
     pushd "$MESON_PATH" > /dev/null
     ninja
     popd > /dev/null
   fi
 
   if $TESTS_CPP; then
-    echo_heading "======= Testing C++ library for $BUILD_PLATFORM ======="
+    builder_heading "======= Testing C++ library for $BUILD_PLATFORM ======="
     pushd "$MESON_PATH" > /dev/null
     meson test --print-errorlogs
     popd > /dev/null
   fi
 
   if $INSTALL_CPP; then
-    echo_heading "======= Installing C++ libraries for $BUILD_PLATFORM ======="
+    builder_heading "======= Installing C++ libraries for $BUILD_PLATFORM ======="
     pushd "$MESON_PATH" > /dev/null
     ninja install
     popd > /dev/null
   fi
 
   if $UNINSTALL_CPP; then
-    echo_heading "======= Uninstalling C++ libraries for $BUILD_PLATFORM ======="
+    builder_heading "======= Uninstalling C++ libraries for $BUILD_PLATFORM ======="
     pushd "$MESON_PATH" > /dev/null
     ninja uninstall
     popd > /dev/null
@@ -261,22 +260,22 @@ locate_emscripten() {
   if [[ -z ${EMSCRIPTEN_BASE+x} ]]; then
     if [[ -z ${EMCC+x} ]]; then
       local EMCC=`which emcc`
-      [[ -z $EMCC ]] && fail "locate_emscripten: Could not locate emscripten (emcc) on the path or with \$EMCC or \$EMSCRIPTEN_BASE"
+      [[ -z $EMCC ]] && builder_die "locate_emscripten: Could not locate emscripten (emcc) on the path or with \$EMCC or \$EMSCRIPTEN_BASE"
     fi
-    [[ -x $EMCC ]] || fail "locate_emscripten: Variable EMCC ($EMCC) does not point to a valid executable emcc"
+    [[ -x $EMCC ]] || builder_die "locate_emscripten: Variable EMCC ($EMCC) does not point to a valid executable emcc"
     EMSCRIPTEN_BASE="$(dirname "$EMCC")"
   fi
 
-  [[ -x ${EMSCRIPTEN_BASE}/emcc ]] || fail "locate_emscripten: Variable EMSCRIPTEN_BASE ($EMSCRIPTEN_BASE) does not point to emcc's folder"
+  [[ -x ${EMSCRIPTEN_BASE}/emcc ]] || builder_die "locate_emscripten: Variable EMSCRIPTEN_BASE ($EMSCRIPTEN_BASE) does not point to emcc's folder"
 }
 
 build_meson_cross_file_for_wasm() {
-  if [ $os_id == win ]; then
+  if [[ $BUILDER_OS == win ]]; then
     local R=$(cygpath -w $(echo $EMSCRIPTEN_BASE) | sed 's_\\_\\\\_g')
   else
     local R=$(echo $EMSCRIPTEN_BASE | sed 's_/_\\/_g')
   fi
-  sed -e "s/\$EMSCRIPTEN_BASE/$R/g" wasm.build.$os_id.in > wasm.build
+  sed -e "s/\$EMSCRIPTEN_BASE/$R/g" wasm.build.$BUILDER_OS.in > wasm.build
 }
 
 ###
@@ -286,14 +285,14 @@ if $CLEAN; then
 fi
 
 if [[ $PLATFORM == native ]]; then
-  case $os_id in
-    "linux")
-      build_standard $os_id arch
+  case $BUILDER_OS in
+    linux)
+      build_standard linux arch
       ;;
-    "mac")
-      build_standard $os_id arch
+    mac)
+      build_standard mac arch
       ;;
-    "win")
+    win)
       build_windows
       ;;
   esac

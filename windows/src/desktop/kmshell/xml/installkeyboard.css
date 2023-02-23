@@ -76,7 +76,7 @@ div {
   font-weight: bold;
   font-size: 13.3px;
   padding: 2px;
-  width: 76px; background: #cccccc; text-align: center;
+  min-width: 76px; background: #cccccc; text-align: center;
   top: -2px; margin-left: -2px;
   border-left: solid 2px #888888;
   border-right: solid 2px #888888;

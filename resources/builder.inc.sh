@@ -30,8 +30,8 @@ function _builder_findRepoRoot() {
     # See https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
     # None of the answers are 100% correct for cross-platform
     # On macOS, requires coreutils (`brew install coreutils`)
-    local SCRIPT=$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")
-    REPO_ROOT=$(dirname $(dirname "$SCRIPT"))
+    local SCRIPT=$(readlink -f "${BASH_SOURCE[0]}")
+    REPO_ROOT="${SCRIPT%/*/*}"
     readonly REPO_ROOT
 }
 
@@ -44,16 +44,16 @@ function _builder_findRepoRoot() {
 # ```bash
 #   ## START STANDARD BUILD SCRIPT INCLUDE
 #   # adjust relative paths as necessary
-#   THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-#   . "$(dirname "$THIS_SCRIPT")/resources/builder.inc.sh"
+#   THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+#   . "${THIS_SCRIPT%/*}/resources/builder.inc.sh"
 #   ## END STANDARD BUILD SCRIPT INCLUDE
 # ```
 #
 function _builder_setBuildScriptIdentifiers() {
   if [ ! -z ${THIS_SCRIPT+x} ]; then
-    THIS_SCRIPT_PATH="$(dirname "$THIS_SCRIPT")"
+    THIS_SCRIPT_PATH="${THIS_SCRIPT%/*}"
     readonly THIS_SCRIPT_PATH
-    THIS_SCRIPT_NAME="$(basename "$THIS_SCRIPT")"
+    THIS_SCRIPT_NAME="${THIS_SCRIPT##*/}"
     readonly THIS_SCRIPT_NAME
     # Leaves only the part of the path based upon REPO_ROOT.
     THIS_SCRIPT_IDENTIFIER=${THIS_SCRIPT_PATH#"$REPO_ROOT/"}
@@ -119,7 +119,11 @@ function builder_term() {
 
 function builder_die() {
   echo
-  echo "${COLOR_RED}$*${COLOR_RESET}"
+  if [[ $# -eq 0 ]]; then
+    echo "${COLOR_RED}Unspecified error, aborting script${COLOR_RESET}"
+  else
+    echo "${COLOR_RED}$*${COLOR_RESET}"
+  fi
   echo
   exit 1
 }
@@ -127,6 +131,11 @@ function builder_die() {
 function builder_warn() {
   echo "${COLOR_YELLOW}$*${COLOR_RESET}"
 }
+
+function builder_heading() {
+  echo -e "${HEADING_SETMARK}${COLOR_BLUE}$*${COLOR_RESET}"
+}
+
 
 ####################################################################################
 #
@@ -577,7 +586,7 @@ _builder_expand_action_targets() {
 #   `=path` to the target definition, for example `:app=src/app`. Where
 #   possible, avoid differences in names of child projects and folders.
 #
-# * **Dependency:** "@/path/to/dependency [action][:target] ..."
+# * **Dependency:** `"@/path/to/dependency [action][:target] ..."``
 #
 #   A dependency always starts with `@`. The path to the dependency will be
 #   relative to the build script folder, or to the root of the repository, if
@@ -587,10 +596,10 @@ _builder_expand_action_targets() {
 #   Relative paths will be expanded to full paths, again, relative to the root
 #   of the repository.
 #
-#   Dependencies may be limited to specific `action:target`. If not specified,
-#   dependencies will be built for all actions on all targets. Either `action`
-#   or `:target` may be omitted, and multiple actions and targets may be
-#   specified, space separated.
+#   Dependencies may be limited to specific `action:target` pairs on the current
+#   script. If not specified, dependencies will be built for all actions on all
+#   targets. Either `action` or `:target` may be omitted, and multiple actions
+#   and targets may be specified, space separated.
 #
 builder_describe() {
   _builder_record_function_call builder_describe
@@ -726,8 +735,8 @@ builder_describe() {
 #
 # ```bash
 #   builder_describe_outputs \
-#     configure /node_modules \
-#     build     build/index.js
+#     "configure" "/node_modules" \
+#     "build"     "build/index.js"
 # ```
 #
 function builder_describe_outputs() {

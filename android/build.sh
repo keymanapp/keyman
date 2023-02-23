@@ -9,8 +9,8 @@ set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -140,7 +140,7 @@ function _build_engine() {
   ./build.sh $KMEA_FLAGS
 
   if [ $? -ne 0 ]; then
-    die "ERROR: KMEA/build.sh failed"
+    builder_die "ERROR: KMEA/build.sh failed"
   fi
 }
 
@@ -149,7 +149,7 @@ function _build_app() {
   ./build.sh $KMAPRO_FLAGS
 
   if [ $? -ne 0 ]; then
-    die "ERROR: KMAPro/build.sh failed"
+    builder_die "ERROR: KMAPro/build.sh failed"
   fi
 }
 
@@ -183,7 +183,7 @@ function _build_fv() {
   ./build.sh $FV_FLAGS
 
   if [ $? -ne 0 ]; then
-    die "ERROR: oem/firstvoices/android/build.sh failed"
+    builder_die "ERROR: oem/firstvoices/android/build.sh failed"
   fi
 }
 

@@ -7,8 +7,8 @@ set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/build-utils.sh"
 # END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
@@ -20,7 +20,7 @@ echo "${COLOR_BLUE}## Testing: builder_pull_get_details with \$TEAMCITY_PR_NUMBE
 if ! builder_pull_get_details; then
   echo "PASS: builder_pull_get_details should get no details if \$TEAMCITY_PR_NUMBER is not set"
 else
-  fail "FAIL: builder_pull_get_details should get no details if \$TEAMCITY_PR_NUMBER is not set"
+  builder_die "FAIL: builder_pull_get_details should get no details if \$TEAMCITY_PR_NUMBER is not set"
 fi
 
 
@@ -29,14 +29,14 @@ TEAMCITY_PR_NUMBER=master
 if ! builder_pull_get_details; then
   echo "PASS: builder_pull_get_details should get no details if \$TEAMCITY_PR_NUMBER=master"
 else
-  fail "FAIL: builder_pull_get_details should get no details if \$TEAMCITY_PR_NUMBER=master"
+  builder_die "FAIL: builder_pull_get_details should get no details if \$TEAMCITY_PR_NUMBER=master"
 fi
 
 
 echo "${COLOR_BLUE}## Testing: builder_pull_get_details with \$TEAMCITY_PR_NUMBER=$TEAMCITY_PR_NUMBER${COLOR_RESET}"
 TEAMCITY_PR_NUMBER=7248
 if ! builder_pull_get_details; then
-  fail "FAIL: builder_pull_get_details was unable to read and parse PR details for #$TEAMCITY_PR_NUMBER from GitHub"
+  builder_die "FAIL: builder_pull_get_details was unable to read and parse PR details for #$TEAMCITY_PR_NUMBER from GitHub"
 fi
 
 # print metadata from PR
@@ -49,7 +49,7 @@ echo "PASS: builder_pull_get_details with \$TEAMCITY_PR_NUMBER=$TEAMCITY_PR_NUMB
 
 echo "${COLOR_BLUE}## Testing: builder_pull_has_label epic-ldml${COLOR_RESET}"
 if ! builder_pull_has_label epic-ldml; then
-  fail "FAIL: builder_pull_has_label epic-ldml"
+  builder_die "FAIL: builder_pull_has_label epic-ldml"
 fi
 
 echo "PASS: builder_pull_has_label epic-ldml"
