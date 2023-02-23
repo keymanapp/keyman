@@ -24,8 +24,8 @@ KEYMAN_ANDROID_ROOT="$KEYMAN_ROOT/android"
 KEYMAN_WEB_ROOT="$KEYMAN_ROOT/web"
 ENGINE_ASSETS="$KEYMAN_ANDROID_ROOT/KMEA/app/src/main/assets"
 CONFIG="release"
-BUILD_FLAGS="aR -x lint -x test"    # Gradle build w/o test
-TEST_FLAGS="-x aR lint testRelease" # Gradle test w/o build
+BUILD_FLAGS="aR -x lint -x test"           # Gradle build w/o test
+TEST_FLAGS="-x aR lintRelease testRelease" # Gradle test w/o build
 JUNIT_RESULTS="##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
 
 builder_describe "Builds Keyman Engine for Android." \
@@ -43,7 +43,7 @@ builder_parse "$@"
 if builder_has_option --debug; then
   builder_heading "### Debug config ####"
   CONFIG="debug"
-  BUILD_FLAGS="assembleDebug -x lintDebug -x test"
+  BUILD_FLAGS="assembleDebug -x lint -x test"
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
   JUNIT_RESULTS="##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testDebugUnitTest\']"
 fi
