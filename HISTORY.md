@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.54 alpha 2023-02-22
+
+* fix(ios): allow duplicate languages in kmp file (#8125)
+* fix(linux): Fix paths in upload action of packaging GHA (#8285)
+* fix(android/app): Fix OSK width when rotating (#8291)
+
 ## 17.0.53 alpha 2023-02-21
 
 * chore(windows): Remove old Kannada setup strings (#8257)

@@ -181,7 +181,6 @@ jobs:
       uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
       with:
         name: keyman-signedpkgs
-        path: artifacts
 
     - name: Upload
       run: |
@@ -191,11 +190,10 @@ jobs:
           *)         destination='-experimental' ;;
         esac
 
-        cd artifacts/keyman-signedpkgs
         ls -R
 
         echo -e "::group::${COLOR_GREEN}Upload source package"
-        cd artifacts/keyman-srcpkg
+        cd keyman-srcpkg
         dput -U llso:ubuntu/jammy${destination} *_source.changes
         echo "::endgroup::"
 

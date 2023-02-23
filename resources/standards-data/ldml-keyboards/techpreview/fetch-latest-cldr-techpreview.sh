@@ -15,8 +15,8 @@ fi
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
@@ -38,12 +38,12 @@ CHECK_2="${DTD_DIR}/ldmlKeyboardTest.dtd"  # Only in Keyboard 3.0+
 
 if [[ ! -f "${CHECK_1}" ]];
 then
-    die "${CHECK_1} did not exist: is ${CLDR_DIR} a valid CLDR keyboard directory?"
+    builder_die "${CHECK_1} did not exist: is ${CLDR_DIR} a valid CLDR keyboard directory?"
 fi
 
 if [[ ! -f "${CHECK_2}" ]];
 then
-    die "${CHECK_2} did not exist: is ${CLDR_DIR} a valid CLDR keyboard directory?"
+    builder_die "${CHECK_2} did not exist: is ${CLDR_DIR} a valid CLDR keyboard directory?"
 fi
 
 # collect git info
@@ -71,8 +71,8 @@ do
     echo "${xsd} -> ${json}"
     (cd .. ; npx -p  jgexml xsd2json techpreview/"${xsd}" techpreview/"${json}") || exit
     echo 'fixup-schema.js' "${json}"
-    node fixup-schema.js "${json}" || die "failed to fixup schema ${json}"
+    node fixup-schema.js "${json}" || builder_die "failed to fixup schema ${json}"
     mv "${json}" tmp.json
-    ${JQ} . -S < tmp.json > "${json}" || (rm tmp.json ; die "failed to transform final schema ${json}")
+    ${JQ} . -S < tmp.json > "${json}" || (rm tmp.json ; builder_die "failed to transform final schema ${json}")
     rm tmp.json
 done

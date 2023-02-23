@@ -22,8 +22,8 @@
 # Here is how to include this script reliably, cross-platform:
 #    ## START STANDARD BUILD SCRIPT INCLUDE
 #    # adjust relative paths as necessary
-#    THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-#    . "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
+#    THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+#    . "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
 #    # END STANDARD BUILD SCRIPT INCLUDE
 #
 # Note: keep changes to version, tier and tag determination in sync with mkver (windows/src/buildutils/mkver)
@@ -38,8 +38,8 @@ function findKeymanRoot() {
     # See https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
     # None of the answers are 100% correct for cross-platform
     # On macOS, requires coreutils (`brew install coreutils`)
-    local SCRIPT=$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")
-    KEYMAN_ROOT=$(dirname $(dirname $(dirname "$SCRIPT")))
+    local SCRIPT=$(readlink -f "${BASH_SOURCE[0]}")
+    KEYMAN_ROOT="${SCRIPT%/*/*/*}"
     readonly KEYMAN_ROOT
 }
 
