@@ -3,7 +3,6 @@
 
   "compilerOptions": {
     "allowJs": false,
-    "declaration": true,
     "inlineSources": true,
     "allowSyntheticDefaultImports": true,
     "module": "es6",
@@ -11,8 +10,8 @@
     "sourceMap": true,
     "target": "es5",
     "baseUrl": "./",
-    "outDir": "../../../build/engine/device-detect/obj/",
-    "tsBuildInfoFile": "../../../build/engine/device-detect/obj/tsconfig.tsbuildinfo",
+    "outDir": "../../../build/engine/configuration/obj/",
+    "tsBuildInfoFile": "../../../build/engine/configuration/obj/tsconfig.tsbuildinfo",
     "rootDir": "./src"
   },
 

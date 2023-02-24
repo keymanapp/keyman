@@ -12,8 +12,7 @@ import { spawn } from 'child_process';
 const commonConfig = {
   bundle: true,
   sourcemap: true,
-  tsconfig: 'tsconfig.json',
-  target: 'es5',
+  format: "esm",
   // Sets 'common/web' as a root folder for module resolution;
   // this allows the keyman-version and utils imports to resolve.
   //

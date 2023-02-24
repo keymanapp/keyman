@@ -24,6 +24,7 @@ cd "$THIS_SCRIPT_PATH"
 # Definition of global compile constants
 
 MAIN=engine/main     # Covers all engine code, including submodules like those listed below.
+CONFIGURATION=engine/configuration
 DEVICEDETECT=engine/device-detect
 DOMUTILS=engine/dom-utils
 KEYBOARDCACHE=engine/keyboard-cache
@@ -90,6 +91,7 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   "clean" \
   "configure" \
   "build" \
+  ":configuration     Subset used to configure KMW" \
   ":device-detect     Subset used for device-detection " \
   ":dom-utils         A common subset of function used for DOM calculations, layout, etc" \
   ":element-wrappers  Subset used to integrate with website elements" \
@@ -102,13 +104,15 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
 
 builder_describe_outputs \
   configure                  ../../../node_modules \
+  configure:configuration    ../../../node_modules \
   configure:device-detect    ../../../node_modules \
   configure:dom-utils        ../../../node_modules \
   configure:element-wrappers ../../../node_modules \
   configure:keyboard-cache   ../../../node_modules \
   configure:main             ../../../node_modules \
   configure:osk              ../../../node_modules \
-  build:device-detect        $(output_path $DEVICEDETECT $OUTPUT_DIR)/index.js \
+  build:configuration        $(output_path $CONFIGURATION $OUTPUT_DIR)/index.js \
+  build:device-detect        $(output_path $DEVICEDETECT $OUTPUT_DIR)/kmwdevice.js \
   build:dom-utils            $(output_path $DOMUTILS $OUTPUT_DIR)/index.js \
   build:element-wrappers     $(output_path $ELEMENTWRAPPERS $OUTPUT_DIR)/index.js \
   build:keyboard-cache       $(output_path $KEYBOARDCACHE $OUTPUT_DIR)/index.js \
@@ -193,6 +197,12 @@ if builder_start_action build:device-detect; then
   builder_finish_action success build:device-detect
 fi
 
+if builder_start_action build:configuration; then
+  compile $CONFIGURATION
+
+  builder_finish_action success build:configuration
+fi
+
 if builder_start_action build:dom-utils; then
   compile $DOMUTILS
 
@@ -217,8 +227,8 @@ if builder_start_action build:osk; then
   builder_finish_action success build:osk
 fi
 
-if builder_start_action build:main; then
-  compile $MAIN
+# if builder_start_action build:main; then
+#   compile $MAIN
 
-  builder_finish_action success build:main
-fi
+#   builder_finish_action success build:main
+# fi

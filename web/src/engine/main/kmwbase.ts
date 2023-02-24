@@ -39,6 +39,8 @@ namespace com.keyman {
     resources?: string;
     keyboards?: string;
     fonts?: string;
+    // attachType and ui are 100% ignored for embedded (app-WebView hosted) contexts.
+    // They should only be expected for website-based KMW use.
     attachType?: 'auto' | 'manual' | ''; // If blank or undefined, attachType will be assigned to "auto" or "manual"
     ui?: string;
     setActiveOnRegister?: string; // TODO: Convert to boolean. Option loader needs to be able to receive this as a string or boolean
@@ -47,6 +49,7 @@ namespace com.keyman {
     spacebarText?: SpacebarText;
 
     // Determines whether or not KeymanWeb should display its own alert messages
+    // Only relevant for website-based KMW use.
     useAlerts?: boolean;
   }
 

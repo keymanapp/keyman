@@ -4,29 +4,34 @@ import { DeviceSpec, Version } from "@keymanapp/web-utils";
 // The Device object definition -------------------------------------------------
 
 export class Device {
+  // These correspond directly to the properties & parameters for `DeviceSpec`.
   touchable: boolean;
   OS: string;
   formFactor: string;
-  dyPortrait: number;
-  dyLandscape: number;
-  version: string;
-  orientation: string|number;
   browser: string;
-  colorScheme: 'light' | 'dark';
+
+  // These components aren't needed for key events.  All but `version` could be a sort
+  // of `DeviceStyle`.
+  dyPortrait: number;   // Its value is only referenced by an unused method.
+  dyLandscape: number;  // Its value is only referenced by an unused method.
+  orientation: string|number; // Appears to be unused as well?
+  colorScheme: 'light' | 'dark';  // Also unused?
+  version: string;  // As in, device version; only really persisted for Android.
+                    // No real sign of actual use, though.
 
   private detected: boolean = false;
-  private _styles: StyleConstants;
 
   // Generates a default Device value.
   constructor() {
     this.touchable = !!('ontouchstart' in window);
     this.OS = '';
     this.formFactor='desktop';
+    this.browser='';
+
     this.dyPortrait=0;
     this.dyLandscape=0;
     this.version='0';
     this.orientation=window.orientation;
-    this.browser='';
   }
 
   /**
@@ -201,3 +206,7 @@ export class Device {
 }
 
 export default Device;
+
+export function physicalKeyDeviceAlias(device: DeviceSpec) {
+  return new DeviceSpec(device.browser, DeviceSpec.FormFactor.Desktop, device.OS, false);
+}
