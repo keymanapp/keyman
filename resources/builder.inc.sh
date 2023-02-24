@@ -402,6 +402,22 @@ builder_has_action() {
   fi
 }
 
+_builder_dep_output_defined() {
+  if [[ ! -z ${_builder_dep_path[$1]+x} ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+_builder_dep_output_exists() {
+  if _builder_dep_output_defined $1 && [[ -e "$KEYMAN_ROOT/${_builder_dep_path[$1]}" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
 #
 # Returns `0` if the user has asked to perform action on target on the command
 # line, and then starts the action. Should be paired with
@@ -433,8 +449,7 @@ builder_start_action() {
     # verify whether a target output is present.
     if builder_is_dep_build &&
         ! builder_is_full_dep_build &&
-        [[ ! -z ${_builder_dep_path[$_builder_matched_action]+x} ]] &&
-        [[ -e "$KEYMAN_ROOT/${_builder_dep_path[$_builder_matched_action]}" ]]; then
+        _builder_dep_output_exists $_builder_matched_action; then
       echo "$scope skipping $_builder_matched_action_name, up-to-date"
       return 1
     fi
@@ -1190,10 +1205,18 @@ builder_finish_action() {
   fi
 
   local scope="[$THIS_SCRIPT_IDENTIFIER] "
+  local matched_action="$action$target"
 
-  if [[ "$action$target" == "${_builder_current_action}" ]]; then
+  if [[ "$matched_action" == "${_builder_current_action}" ]]; then
     if [[ $result == success ]]; then
-      echo "${COLOR_GREEN}## $scope$action_name completed successfully${COLOR_RESET}"
+      # Sanity check:  if there is a described output for this action, does the corresponding
+      # file or directory exist now?
+      if _builder_dep_output_defined $matched_action && ! _builder_dep_output_exists "$matched_action"; then
+        builder_warn "## $scope$action_name was successful, but output does not exist"
+        builder_warn "## ${scope}Expected output: '${_builder_dep_path[$matched_action]}'."
+      else
+        echo "${COLOR_GREEN}## $scope$action_name completed successfully${COLOR_RESET}"
+      fi
     elif [[ $result == failure ]]; then
       echo "${COLOR_RED}## $scope$action_name failed${COLOR_RESET}"
     else
