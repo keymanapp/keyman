@@ -26,6 +26,7 @@ TEST_FLAGS="-x aR lintRelease testRelease" # Gradle test w/o build
 builder_describe "Build KeyboardHarness test app for Android." \
   "@../../KMEA" \
   "clean" \
+  "configure" \
   "build" \
   ":app                   KeyboardHarness" \
   "--ci                   Don't start the Gradle daemon. Use for CI" 
@@ -79,6 +80,13 @@ if builder_start_action clean; then
   fi
 
   builder_finish_action success clean
+fi
+
+if builder_start_action configure; then
+  # Copy Keyman Engine for Android
+  cp "$KEYMAN_ROOT/android/KMEA/app/build/outputs/aar/keyman-engine.aar" "$KEYMAN_ROOT/android/Tests/KeyboardHarness/app/libs/keyman-engine.aar"
+
+  builder_finish_action success configure
 fi
 
 # Building KeyboardHarness

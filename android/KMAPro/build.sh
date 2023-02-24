@@ -100,6 +100,9 @@ if builder_start_action clean; then
 fi
 
 if builder_start_action configure; then
+  # Copy Keyman Engine for Android
+  cp "$KEYMAN_ROOT/android/KMEA/app/build/outputs/aar/$ARTIFACT" "$KEYMAN_ROOT/android/KMAPro/kMAPro/libs/keyman-engine.aar"
+
   KEYBOARD_PACKAGE_ID="sil_euro_latin"
   KEYBOARDS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
   MODEL_PACKAGE_ID="nrc.en.mtnt"

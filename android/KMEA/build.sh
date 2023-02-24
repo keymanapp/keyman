@@ -48,23 +48,12 @@ if builder_has_option --debug; then
   JUNIT_RESULTS="##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testDebugUnitTest\']"
 fi
 
-ARTIFACT="app-$CONFIG.aar"
+ARTIFACT="app-$CONFIG.aar" # Note: dependants will use keyman-engine.aar
 
 builder_describe_outputs \
   build:engine     ./app/build/outputs/aar/${ARTIFACT}
 
 #### Build
-
-function _copy_artifacts() {
-  echo "Copying Keyman Engine for Android to Keyman App, Sample apps, and Tests"
-  cp $KEYMAN_ANDROID_ROOT/KMEA/app/build/outputs/aar/$ARTIFACT $KEYMAN_ANDROID_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar
-  cp $KEYMAN_ANDROID_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KEYMAN_ANDROID_ROOT/Samples/KMSample1/app/libs/keyman-engine.aar
-  cp $KEYMAN_ANDROID_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KEYMAN_ANDROID_ROOT/Samples/KMSample2/app/libs/keyman-engine.aar
-  cp $KEYMAN_ANDROID_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KEYMAN_ANDROID_ROOT/Tests/KeyboardHarness/app/libs/keyman-engine.aar
-  if [ ! -z ${RELEASE_OEM+x} ]; then
-    cp $KEYMAN_ANDROID_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KEYMAN_ANDROID_ROOT/../oem/firstvoices/android/app/libs/keyman-engine.aar
-  fi
-}
 
 #
 # Prevents 'clear' on exit of mingw64 bash shell
@@ -81,10 +70,17 @@ fi
 
 #### Build action definitions ####
 
+# Check about cleaning arifact paths and upload directories
 if builder_start_action clean:engine; then
-  # Clean debug and release artifacts
-  rm -f "$KEYMAN_ANDROID_ROOT/KMEA/app/build/outputs/aar/app-debug.aar"
-  rm -f "$KEYMAN_ANDROID_ROOT/KMEA/app/build/outputs/aar/app-release.aar"
+  cd "$KEYMAN_ROOT/android/KMEA/"
+
+  if [ -d "$KEYMAN_ROOT/android/KMEA/app/build/outputs" ]; then
+    rm -rf "$KEYMAN_ROOT/android/KMEA/app/build/outputs"
+  fi  
+
+  if [ -d "$KEYMAN_ROOT/android/upload" ]; then
+    rm -rf "$KEYMAN_ROOT/android/upload"
+  fi
 
   builder_finish_action success clean:engine
 fi
@@ -118,8 +114,11 @@ if builder_start_action build:engine; then
   # Build without test
   ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
 
+  # Copy ARTIFACT to "keyman-engine.aar"
+  cp "$KEYMAN_ROOT/android/kmea/app/build/outputs/aar/${ARTIFACT}" "$KEYMAN_ROOT/android/kmea/app/build/outputs/aar/keyman-engine.aar"
+
   # TODO: remove _copy_artifacts() when all the Android projects have builder
-  _copy_artifacts
+  #_copy_artifacts
 
   builder_finish_action success build:engine
 fi

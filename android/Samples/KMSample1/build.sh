@@ -76,6 +76,13 @@ if builder_start_action clean; then
   builder_finish_action success clean
 fi
 
+if builder_start_action configure; then
+  # Copy Keyman Engine for Android
+  cp "$KEYMAN_ROOT/android/KMEA/app/build/outputs/aar/keyman-engine.aar" "$KEYMAN_ROOT/android/Samples/KMSample1/app/libs/keyman-engine.aar"
+
+  builder_finish_action success configure
+fi
+
 # Building KMSample1
 if builder_start_action build:app; then
   cd "$KEYMAN_ROOT/android/Samples/KMSample1"
