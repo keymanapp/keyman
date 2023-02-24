@@ -117,9 +117,6 @@ if builder_start_action build:engine; then
   # Copy ARTIFACT to "keyman-engine.aar"
   cp "$KEYMAN_ROOT/android/kmea/app/build/outputs/aar/${ARTIFACT}" "$KEYMAN_ROOT/android/kmea/app/build/outputs/aar/keyman-engine.aar"
 
-  # TODO: remove _copy_artifacts() when all the Android projects have builder
-  #_copy_artifacts
-
   builder_finish_action success build:engine
 fi
 
