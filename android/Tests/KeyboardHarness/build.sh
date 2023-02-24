@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 #
-# Tests: KeyboardHarness
+# Build Test app: KeyboardHarness
 
+#set -x
 set -eu
-# set -x: Debugging use, print each statement
-# set -x
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -19,36 +18,54 @@ cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
-builder_describe \
-  "Build KeyboardHarness test app for Android." \
-  clean \
-  build \
-  ":app                   KeyboardHarness" \
-  "--ci                   Don't start the Gradle daemon. Use for CI" \
-  "--debug,-d             Local debug build; use for development builds"
+# Definition of global compile constants
+CONFIG="release"
+BUILD_FLAGS="aR -x lint -x test"           # Gradle build w/o test
+TEST_FLAGS="-x aR lintRelease testRelease" # Gradle test w/o build
 
+builder_describe "Build KeyboardHarness test app for Android." \
+  "@../../KMEA" \
+  "clean" \
+  "build" \
+  ":app                   KeyboardHarness" \
+  "--ci                   Don't start the Gradle daemon. Use for CI" 
+
+# parse before describe outputs to check debug flags  
 builder_parse "$@"
 
-BUILD_FLAGS=""
-
-# Build flags that apply to all targets
-if builder_has_option --ci; then
-  BUILD_FLAGS="$BUILD_FLAGS -no-daemon"
-fi
-
 if builder_has_option --debug; then
-  BUILD_FLAGS="$BUILD_FLAGS assembleDebug"
-else
-  BUILD_FLAGS="$BUILD_FLAGS build"
+  builder_heading "### Debug config ####"
+  CONFIG=-"debug"
+  BUILD_FLAGS="assembleDebug -x lint -x test"
+  TEST_FLAGS="-x assembleDebug lintDebug testDebug"
 fi
+
+ARTIFACT="app-$CONFIG.apk"
+
+builder_describe_outputs \
+  build:app    ./app/build/outputs/apk/$CONFIG/${ARTIFACT}
+
+#### Build
+
 
 #
 # Prevents 'clear' on exit of mingw64 bash shell
 #
 SHLVL=0
 
-# Clean build artifacts: output and upload directories
-function _clean() {
+
+# Parse args
+
+# Build flags that apply to all targets
+if builder_has_option --ci; then
+  BUILD_FLAGS="$BUILD_FLAGS -no-daemon"
+  TEST_FLAGS="$TEST_FLAGS -no-daemon"
+fi
+
+#### Build action definitions ####
+
+# Check about cleaning artifact paths and upload directories
+if builder_start_action clean; then
   cd "$KEYMAN_ROOT/android/Tests/KeyboardHarness"
 
   if [ -d "$KEYMAN_ROOT/android/Tests/KeyboardHarness/app/build/outputs" ]; then
@@ -60,26 +77,21 @@ function _clean() {
     echo "Cleaning upload directory"
     rm -rf "$KEYMAN_ROOT/android/upload"
   fi
-}
 
-function _build_app() {
-  cd "$KEYMAN_ROOT/android/Tests/KeyboardHarness"
-  ./gradlew clean $BUILD_FLAGS
-
-  if [ $? -ne 0 ]; then
-    die "ERROR: KeyboardHarness/build.sh failed"
-  fi
-}
-
-
-# Check about cleaning artifact paths
-if builder_start_action clean; then
-  _clean
   builder_finish_action success clean
 fi
 
 # Building KeyboardHarness
 if builder_start_action build:app; then
-  _build_app
+  cd "$KEYMAN_ROOT/android/Tests/KeyboardHarness"
+
+  echo "BUILD_FLAGS: $BUILD_FLAGS"
+  ./gradlew clean $BUILD_FLAGS
   builder_finish_action success build:app
+fi
+
+if builder_start_action test; then
+  echo "TEST_FLAGS $TEST_FLAGS"
+
+  builder_finish_action succes test
 fi

@@ -28,6 +28,7 @@ DAEMON_FLAG=
 
 builder_describe "Builds FirstVoices for Android app." \
   "@../../../android/KMEA" \
+  "clean" \
   "configure" \
   "build" \
   "test             Runs lint and tests." \
@@ -66,7 +67,7 @@ fi
 #### Build action definitions ####
 
 function makeLocalSentryRelease() {
-  echo
+  echo "Placeholder for uploading symbols to Sentry"
 }
 
 #### Build action definitions ####
