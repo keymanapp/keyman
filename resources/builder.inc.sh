@@ -406,7 +406,6 @@ _builder_dep_output_defined() {
   if [[ ! -z ${_builder_dep_path[$1]+x} ]]; then
     return 0
   else
-    echo "${_builder_dep_path[*]}"
     return 1
   fi
 }
@@ -1214,6 +1213,7 @@ builder_finish_action() {
       # file or directory exist now?
       if _builder_dep_output_defined $matched_action && ! _builder_dep_output_exists "$matched_action"; then
         builder_warn "## $scope$action_name's described output does not exist"
+        builder_warn "## ${scope}Expected output: '${_builder_dep_path[$matched_action]}'."
       fi
       echo "${COLOR_GREEN}## $scope$action_name completed successfully${COLOR_RESET}"
     elif [[ $result == failure ]]; then
