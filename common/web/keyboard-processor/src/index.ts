@@ -5,10 +5,13 @@ export * from "./keyboards/keyboard.js";
 export { KeyboardHarness, KeyboardKeymanGlobal, MinimalCodesInterface, MinimalKeymanGlobal } from "./keyboards/keyboardHarness.js";
 export { default as KeyboardLoaderBase } from "./keyboards/keyboardLoaderBase.js";
 export {
-  default as KeyboardProperties,
-  KeyboardInternalPropertySpec,
+  CloudKeyboardFont,
+  internalizeFont,
+  InternalKeyboardFont,
   KeyboardAPIPropertyMultilangSpec,
   KeyboardAPIPropertySpec,
+  KeyboardInternalPropertySpec,
+  default as KeyboardProperties,
   KeyboardFont,
   LanguageAPIPropertySpec
 } from "./keyboards/keyboardProperties.js";

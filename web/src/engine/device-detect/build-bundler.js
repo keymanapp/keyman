@@ -12,7 +12,7 @@ await esbuild.build({
   bundle: true,
   sourcemap: true,
   format: "esm",
-  nodePaths: ['../../../../node_modules'],
+  nodePaths: ['../../../../node_modules', '../../../build/engine/device-detect/obj'],
   entryPoints: {
     'index': '../../../build/engine/device-detect/obj/kmwdevice.js',
   },
