@@ -1,6 +1,7 @@
 import { PathOptionSpec } from "./optionSpec.interface.js";
+import { OSKResourcePathConfiguration } from 'keyman/engine/osk';
 
-export default class PathConfiguration {
+export default class PathConfiguration implements OSKResourcePathConfiguration {
   readonly root: string;
   readonly resources: string;
   readonly keyboards: string;

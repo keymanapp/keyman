@@ -1,30 +1,81 @@
 import { Configuration } from "keyman/engine/configuration";
-import { Keyboard, KeyboardKeymanGlobal, ManagedPromise, OutputTarget } from "@keymanapp/keyboard-processor";
+import { DefaultOutput, Keyboard, KeyboardKeymanGlobal, OutputTarget, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
 import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
 import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
+import { Worker } from "@keymanapp/lexical-model-layer/web";
 import { OSKView } from "keyman/engine/osk";
 import { StubAndKeyboardCache } from "keyman/engine/keyboard-cache";
 
 import KeyboardInterface from "./keyboardInterface.js";
-import ContextManager from "./contextManager.js";
-import HardKeyboard from "./hardKeyboard.js";
+import ContextManagerBase from "./contextManager.js";
+import { KeyEventHandler } from './keyEventSource.interface.js';
+import HardKeyboardBase from "./hardKeyboard.js";
 import { LegacyAPIEventEngine } from "./legacyAPIEvents.js";
 
-export default /*abstract*/ class KeymanEngine implements KeyboardKeymanGlobal {
+export default class KeymanEngine<ContextManager extends ContextManagerBase, HardKeyboard extends HardKeyboardBase> implements KeyboardKeymanGlobal {
   readonly config: Configuration;
   readonly cache: StubAndKeyboardCache = new StubAndKeyboardCache();
   readonly contextManager: ContextManager;
   readonly interface: KeyboardInterface;
-  readonly initPromise: ManagedPromise<void> = new ManagedPromise();
   readonly keyboardLoader: KeyboardLoader;
-  private legacyAPIEvents = new LegacyAPIEventEngine();
+  readonly processor: InputProcessor;
 
-  constructor(config: Configuration) {
+  private legacyAPIEvents = new LegacyAPIEventEngine();
+  private _hardKeyboard: HardKeyboard;
+  private _osk: OSKView;
+
+  private keyEventListener: KeyEventHandler = (event, callback) => {
+    const outputTarget = this.contextManager.activeTarget;
+
+    if(!this.contextManager.activeKeyboard || !outputTarget) {
+      if(callback) {
+        callback(null, null);
+      }
+    }
+
+    //... probably only applies for physical keystrokes.
+    if(!event.isSynthetic) {
+      if(this.osk?.vkbd?.keyPending) {
+        this.osk.vkbd.keyPending = null;
+      }
+    } else {
+      // Do anything needed to guarantee that the outputTarget stays active (`browser`: maintains focus).
+    }
+
+    try {
+      // Clear any cached codepoint data; we can rebuild it if it's unchanged.
+      outputTarget.invalidateSelection();
+      // Deadkey matching continues to be troublesome.
+      // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
+      outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
+
+      const result = this.processor.processKeyEvent(event, outputTarget);
+      if(callback) {
+        callback(result, null);
+      }
+    } catch (err) {
+      if(callback) {
+        callback(null, err);
+      }
+    }
+  };
+
+  // Should be overwritten as needed by engine subclasses; `browser` should set its DefaultOutput subclass in place.
+  protected processorConfiguration(): ProcessorInitOptions {
+    return {
+      keyboardInterface: this.interface,
+      defaultOutputRules: new DefaultOutput()
+    };
+  };
+
+  constructor(config: Configuration, contextManager: ContextManager) {
     this.config = config;
+    this.contextManager = contextManager;
 
     // Since we're not sandboxing keyboard loads yet, we just use `window` as the jsGlobal object.
     this.interface = new KeyboardInterface(window, this, this.cache, this.contextManager);
     this.keyboardLoader = new KeyboardLoader(this.interface);
+    this.processor = new InputProcessor(config.hostDevice, Worker.constructInstance(), this.processorConfiguration());
 
     this.cache.on('stubAdded', (stub) => {
       let eventRaiser = () => {
@@ -38,10 +89,10 @@ export default /*abstract*/ class KeymanEngine implements KeyboardKeymanGlobal {
         });
       }
 
-      if(this.initPromise.hasFinalized) {
+      if(this.config.deferForInitialization.hasFinalized) {
         eventRaiser();
       } else {
-        this.initPromise.then(eventRaiser);
+        this.config.deferForInitialization.then(eventRaiser);
       }
     });
 
@@ -53,10 +104,10 @@ export default /*abstract*/ class KeymanEngine implements KeyboardKeymanGlobal {
         });
       }
 
-      if(this.initPromise.hasFinalized) {
+      if(this.config.deferForInitialization.hasFinalized) {
         eventRaiser();
       } else {
-        this.initPromise.then(eventRaiser);
+        this.config.deferForInitialization.then(eventRaiser);
       }
     });
   }
@@ -65,22 +116,37 @@ export default /*abstract*/ class KeymanEngine implements KeyboardKeymanGlobal {
     // There may be some valid mutations possible even on repeated calls?
     // The original seems to allow it.
 
-    if(this.initPromise.hasFinalized) {
+    if(this.config.deferForInitialization.hasFinalized) {
       // abort!
       return;
     }
 
     // Once initialization is fully done:
-    this.initPromise.resolve();
+    this.config.deferForInitialization.resolve();
+  }
+
+  public get hardKeyboard(): HardKeyboard {
+    return this._hardKeyboard;
+  }
+
+  protected set hardKeyboard(keyboard: HardKeyboard) {
+    if(this._hardKeyboard) {
+      this._hardKeyboard.off('keyEvent', this.keyEventListener);
+    }
+    this._hardKeyboard = keyboard;
+    keyboard.on('keyEvent', this.keyEventListener);
   }
 
   public get osk(): OSKView {
-    // TODO:
-    return null;
+    return this._osk;
   }
 
-  private set osk(value: OSKView) {
-    // TODO:
+  public set osk(value: OSKView) {
+    if(this._osk) {
+      this._osk.off('keyEvent', this.keyEventListener);
+    }
+    this._osk = value;
+    this._osk.on('keyEvent', this.keyEventListener);
   }
 }
 

@@ -111,10 +111,7 @@ if builder_start_action test:engine; then
     CONFIG=manual.conf.cjs
   fi
 
-  # Build modernizr module
-  npm --no-color run modernizr -- -c src/test/auto/integrated/modernizr.config.json -d src/test/auto/integrated/modernizr.js
-
-  # Prepare the flags for the karma command.
+    # Prepare the flags for the karma command.
   KARMA_FLAGS=
 
   if builder_has_option --debug; then
@@ -131,6 +128,9 @@ if builder_start_action test:engine; then
   fi
 
   npm --no-color run karma -- start $KARMA_FLAGS src/test/auto/dom/$CONFIG
+
+  # Build modernizr module
+  npm --no-color run modernizr -- -c src/test/auto/integrated/modernizr.config.json -d src/test/auto/integrated/modernizr.js
   npm --no-color run karma -- start $KARMA_FLAGS $KARMA_EXT_FLAGS src/test/auto/integrated/$CONFIG
 
   builder_finish_action success test:engine

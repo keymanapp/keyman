@@ -1,5 +1,7 @@
 import { DeviceSpec } from "@keymanapp/web-utils";
 
+import OSKResourcePathConfiguration from "./oskResourcePathConfiguration.interface.js";
+
 export default interface CommonConfiguration {
   /**
    * Metadata for the type of device to emulate and target with the on-screen keyboard.
@@ -18,7 +20,7 @@ export default interface CommonConfiguration {
   isEmbedded?: boolean,
 
   /**
-   * The base resource path to use for font fetches.
+   * Configured paths usable to find OSK resources.
    */
-  fontRootPath: string
+  pathConfig: OSKResourcePathConfiguration;
 }

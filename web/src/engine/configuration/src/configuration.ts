@@ -1,35 +1,59 @@
-import { physicalKeyDeviceAlias } from "keyman/engine/device-detect";
-import { DeviceSpec, type SpacebarText } from "@keymanapp/keyboard-processor";
+import { DeviceSpec, ManagedPromise, physicalKeyDeviceAlias, type SpacebarText } from "@keymanapp/keyboard-processor";
 
 import { OptionSpec } from "./optionSpec.interface.js";
 import PathConfiguration from "./pathConfiguration.js";
 
 export default class Configuration {
-  readonly paths: PathConfiguration;
-  readonly activateFirstKeyboard: boolean;
-  readonly defaultSpacebarText: SpacebarText;
-
   readonly hostDevice: DeviceSpec;
-  readonly embeddingApp: string;
+  readonly sourcePath: string;
+  readonly deferForInitialization: ManagedPromise<void>;
+
+  private _paths: PathConfiguration;
+  private _activateFirstKeyboard: boolean;
+  private _defaultSpacebarText: SpacebarText;
+  private _embeddingApp: string;
 
   // sourcePath:  see `var sPath =` in kmwbase.ts.  It is not obtainable headlessly.
-  constructor(options: Required<OptionSpec>, device: DeviceSpec, sourcePath: string) {
-    this.paths = new PathConfiguration(options, sourcePath);
+  constructor(device: DeviceSpec, sourcePath: string) {
+    this.sourcePath = sourcePath;
+    this.hostDevice = device;
+    this.deferForInitialization = new ManagedPromise<void>();
+  }
+
+  initialize(options: Required<OptionSpec>) {
+    this._paths = new PathConfiguration(options, this.sourcePath);
     if(typeof options.setActiveOnRegister == 'boolean') {
-      this.activateFirstKeyboard = options.setActiveOnRegister;
+      this._activateFirstKeyboard = options.setActiveOnRegister;
     } else if (typeof options.setActiveOnRegister == 'string') {
       let str = options.setActiveOnRegister.toLowerCase();
-      this.activateFirstKeyboard = str === 'true';
+      this._activateFirstKeyboard = str === 'true';
     } else {
-      this.activateFirstKeyboard = true;
+      this._activateFirstKeyboard = true;
     }
 
-    this.defaultSpacebarText = options.spacebarText;
-    this.hostDevice = device;
+    this._defaultSpacebarText = options.spacebarText;
 
     if(options.embeddingApp) {
-      this.embeddingApp = options.embeddingApp;
+      this._embeddingApp = options.embeddingApp;
     }
+
+    this.deferForInitialization.resolve();
+  }
+
+  get paths() {
+    return this._paths;
+  }
+
+  get activateFirstKeyboard() {
+    return this._activateFirstKeyboard;
+  }
+
+  get defaultSpacebarText() {
+    return this._defaultSpacebarText;
+  }
+
+  get embeddingApp() {
+    return this._embeddingApp;
   }
 
   get softDevice(): DeviceSpec {

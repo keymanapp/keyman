@@ -38,9 +38,11 @@ window.targetDevice = new modules.osk.DeviceSpec('safari', 'phone', 'ios', true)
 
 window.BaseConfiguration = {
   isEmbedded: false,
-  fontRootPath: '',
   // Relative path to the resources' original versions.
-  commonStyleSheetRefs: ['../../../../../resources/osk/kmwosk.css', '../../../../../resources/osk/globe-hint.css']
+  pathConfig: {
+    resources: '../../../../../resources',
+    fonts: ''
+  }
 };
 
 window.keyboardLoader = loadKeyboardFromPath;

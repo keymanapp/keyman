@@ -1,11 +1,13 @@
 import EventEmitter from 'eventemitter3';
-import { type Keyboard, type KeyboardInterface, type OutputTarget } from '@keymanapp/keyboard-processor';
+import { type Keyboard, type KeyboardInterface, type KeyboardProperties, type OutputTarget } from '@keymanapp/keyboard-processor';
 
 interface EventMap {
   'changedcontext': (target: OutputTarget, keyboard: Keyboard) => void;
 }
 
 export default abstract class ContextManager extends EventEmitter<EventMap> {
+  private _activeKeyboard: {keyboard: Keyboard, metadata: KeyboardProperties};
+
   abstract initialize(): void;
 
   abstract get activeTarget(): OutputTarget;
@@ -28,6 +30,10 @@ export default abstract class ContextManager extends EventEmitter<EventMap> {
       return true;
     }
     return false;
+  }
+
+  get activeKeyboard(): {keyboard: Keyboard, metadata: KeyboardProperties} {
+    return this._activeKeyboard;
   }
 }
 

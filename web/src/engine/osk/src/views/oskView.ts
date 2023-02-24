@@ -306,12 +306,13 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
   private mouseEnterPromise?: ManagedPromise<void>;
   private touchEventPromiseManager = new TouchEventPromiseMap();
 
+  private static readonly STYLESHEET_FILES = ['osk/kmwosk.css', 'osk/globe-hint.css'];
+
   constructor(configuration: Configuration) {
     super();
 
     // Clone the config; do not allow object references to be altered later.
     this.config = configuration = {...configuration};
-    this.config.commonStyleSheetRefs = [...configuration.commonStyleSheetRefs];
 
     // `undefined` is falsy, but we want a `true` default behavior for this config property.
     if(this.config.allowHideAnimations === undefined) {
@@ -355,7 +356,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
   }
 
   public get fontRootPath(): string {
-    return this.config.fontRootPath;
+    return this.config.pathConfig.fonts;
   }
 
   public get isEmbedded(): boolean {
@@ -802,7 +803,8 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
 
     // Install the default OSK stylesheet - but don't have it managed by the keyboard-specific stylesheet manager.
     // We wish to maintain kmwosk.css whenever keyboard-specific styles are reset/removed.
-    for(let sheetHref of this.configuration.commonStyleSheetRefs) {
+    for(let sheetFile of OSKView.STYLESHEET_FILES) {
+      const sheetHref = `${this.config.pathConfig.resources}/${sheetFile}`;
       this.uiStyleSheetManager.linkExternalSheet(sheetHref);
     }
 
@@ -894,7 +896,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
       hostDevice: this.hostDevice,
       topContainer: this._Box,
       styleSheetManager: this.kbdStyleSheetManager,
-      fontRootPath: this.fontRootPath
+      pathConfig: this.config.pathConfig
     });
 
     vkbd.on('keyEvent', (keyEvent) => this.emit('keyEvent', keyEvent));

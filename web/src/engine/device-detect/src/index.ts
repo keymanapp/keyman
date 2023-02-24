@@ -206,7 +206,3 @@ export class Device {
 }
 
 export default Device;
-
-export function physicalKeyDeviceAlias(device: DeviceSpec) {
-  return new DeviceSpec(device.browser, DeviceSpec.FormFactor.Desktop, device.OS, false);
-}

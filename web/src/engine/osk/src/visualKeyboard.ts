@@ -415,7 +415,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   public get fontRootPath(): string {
-    return this.config.fontRootPath;
+    return this.config.pathConfig.fonts;
   }
 
   public get styleSheetManager(): StylesheetManager {
@@ -1643,7 +1643,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       hostDevice: deviceSpec,
       isStatic: true,
       topContainer: null,
-      fontRootPath: fontRootPath,
+      pathConfig: {
+        fonts: fontRootPath,
+        resources: '' // ignored
+      },
       styleSheetManager: null
     }); //
 

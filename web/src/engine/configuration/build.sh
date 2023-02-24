@@ -23,7 +23,7 @@ SUBPROJECT_NAME=engine/configuration
 
 builder_describe "Builds configuration subclasses used by the Keyman Engine for Web (KMW)." \
   "@/common/web/keyboard-processor build" \
-  "@../device-detect build" \
+  "@../osk build" \
   "clean" \
   "configure" \
   "build" \

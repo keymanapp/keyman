@@ -8,6 +8,7 @@ export { BannerController } from './banner/bannerView.js';
 // Is referenced by at least one desktop UI module.
 export { FloatingOSKCookie as FloatingOSKViewCookie } from './views/floatingOskCookie.js';
 export { default as VisualKeyboard } from './visualKeyboard.js';
+export { type default as OSKResourcePathConfiguration } from './config/oskResourcePathConfiguration.interface.js';
 export type { default as ViewConfiguration } from './config/viewConfiguration.js';
 
 export { default as Activator, StaticActivator } from './views/activator.js';

@@ -2,7 +2,7 @@
 
 export { default as deepCopy } from "./deepCopy.js";
 
-export { default as DeviceSpec } from "./deviceSpec.js";
+export { default as DeviceSpec, physicalKeyDeviceAlias } from "./deviceSpec.js";
 
 /*
   // An example valid use, post-import:
