@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.56 alpha 2023-02-24
+
+* fix(linux): Fix upload in packaging GHA (#8308)
+* feat(common): adds warning if described output does not exist (#8304)
+* chore(linux): Improve detecting presence of test files (#8313)
+
 ## 17.0.55 alpha 2023-02-23
 
 * chore(docs): update docs due to Mac Ventura (#8277)
