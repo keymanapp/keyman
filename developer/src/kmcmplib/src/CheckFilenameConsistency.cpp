@@ -108,8 +108,8 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
 #else
   const KMX_WCHAR* cptr1 = u16rchr(Name, '/');
 #endif*/
-const KMX_WCHAR* cptr1 = u16rchr_LinWin(Name);
 
+  const KMX_WCHAR* cptr1 = u16rchr_LinWin((const PKMX_WCHAR) Name);
 
   cptr1++;
 

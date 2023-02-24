@@ -130,9 +130,9 @@ const KMX_WCHAR* u16rchr_LinWin(KMX_WCHAR const* Name)
   return cp;
 }
 
-const KMX_CHAR* strrchr_LinWin(KMX_CHAR const* Name)
+KMX_CHAR* strrchr_LinWin(KMX_CHAR* Name)
 {
-  const KMX_CHAR* cp = NULL;
+  KMX_CHAR* cp = NULL;
   cp = strrchr(Name, '\\');
   if (cp == NULL)
     cp = strrchr(Name, '/');

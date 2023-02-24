@@ -353,13 +353,14 @@ extern "C" BOOL __declspec(dllexport) kmcmp_CompileKeyboardFile(PKMX_STR pszInfi
   if (!pMsgProc || !pszInfile || !pszOutfile) SetError(CERR_BadCallParams);
 
   PKMX_STR p;
-
+/*
 #if defined(_WIN32) || defined(_WIN64)
   if (p = strrchr(pszInfile, '\\'))
 #else
   if (p = strrchr(pszInfile, '/'))
-#endif
+#endif*/
 
+  if (p = strrchr_LinWin(pszInfile))
 
   {
     strncpy_s(kmcmp::CompileDir, _countof(kmcmp::CompileDir), pszInfile, (INT_PTR)(p - pszInfile + 1));  // I3481
@@ -452,12 +453,13 @@ extern "C" BOOL __declspec(dllexport)  kmcmp_CompileKeyboardFileToBuffer(PKMX_ST
   if (!pMsgProc || !pszInfile || !pfkBuffer) SetError(CERR_BadCallParams);
 
   PKMX_STR p;
-
+/*
 #if defined(_WIN32) || defined(_WIN64)
   if (p = strrchr(pszInfile, '\\'))
 #else
   if (p = strrchr(pszInfile, '/'))
-#endif
+#endif*/
+  if (p = strrchr_LinWin(pszInfile))
   {
     strncpy_s(kmcmp::CompileDir, _countof(kmcmp::CompileDir), pszInfile, (INT_PTR)(p - pszInfile + 1));  // I3481
     kmcmp::CompileDir[(INT_PTR)(p - pszInfile + 1)] = 0;
@@ -3451,7 +3453,7 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
       *p = L' ';
       continue;
     }
-    if (*p == L'\\') {
+    if((*p == L'\\') || (*p == L'/')) {
       LineCarry = TRUE;
       *p = L' ';
       continue;
