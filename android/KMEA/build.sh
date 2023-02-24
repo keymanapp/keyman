@@ -51,7 +51,7 @@ fi
 ARTIFACT="app-$CONFIG.aar" # Note: dependants will use keyman-engine.aar
 
 builder_describe_outputs \
-  build:engine     ./app/build/outputs/aar/${ARTIFACT}
+  build:engine     app/build/outputs/aar/${ARTIFACT}
 
 #### Build
 
@@ -115,7 +115,7 @@ if builder_start_action build:engine; then
   ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
 
   # Copy ARTIFACT to "keyman-engine.aar"
-  cp "$KEYMAN_ROOT/android/kmea/app/build/outputs/aar/${ARTIFACT}" "$KEYMAN_ROOT/android/kmea/app/build/outputs/aar/keyman-engine.aar"
+  cp "$KEYMAN_ROOT/android/KMEA/app/build/outputs/aar/${ARTIFACT}" "$KEYMAN_ROOT/android/KMEA/app/build/outputs/aar/keyman-engine.aar"
 
   builder_finish_action success build:engine
 fi

@@ -45,7 +45,7 @@ ARTIFACT="app-$CONFIG.apk"
 
 
 builder_describe_outputs \
-  build:app             ./app/build/outputs/apk/$CONFIG/$ARTIFACT
+  build:app             app/build/outputs/apk/$CONFIG/$ARTIFACT
 
 #
 # Prevents 'clear' on exit of mingw64 bash shell

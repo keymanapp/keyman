@@ -48,7 +48,7 @@ fi
 ARTIFACT="app-$CONFIG.apk"
 
 builder_describe_outputs \
-  build:app     ./app/build/outputs/apk/$CONFIG/${ARTIFACT}
+  build:app     app/build/outputs/apk/$CONFIG/${ARTIFACT}
 
 #### Build
 
@@ -86,20 +86,6 @@ if builder_start_action clean; then
 
   builder_finish_action success clean
 fi
-
-display_usage ( ) {
-  echo "build.sh [-no-daemon] [-debug] [-no-update] [-lib-build|-no-lib-build] [-download-keyboards] [-h|-?]"
-  echo "Build $TARGET"
-  echo "  -no-daemon              Don't start the Gradle daemon. Use for CI"
-  echo "  -debug                  Compile only Debug variant"
-  echo "  -no-update              Don't copy or build the Keyman Engine library in (assumes already present)"
-  echo "  -lib-build              Force rebuild of the Keyman Engine library"
-  echo "  -no-lib-build           Only rebuild the Keyman Engine library if it doesn't exist in /android"
-  echo "  -download-resources     Download fv_all.kmp from downloads.keyman.com"
-  echo "                          (dictionaries will be downloaded within the app)"
-  echo ""
-  exit 1
-}
 
 if builder_start_action configure; then
   # Copy Keyman Engine for Android

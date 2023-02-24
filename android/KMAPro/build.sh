@@ -48,7 +48,7 @@ fi
 ARTIFACT="kMAPro-$CONFIG.apk"
 
 builder_describe_outputs \
-  build:app     ./kMAPro/build/outputs/apk/$CONFIG/${ARTIFACT}
+  build:app     kMAPro/build/outputs/apk/$CONFIG/${ARTIFACT}
 
 #### Build
 

@@ -44,7 +44,7 @@ fi
 ARTIFACT="app-$CONFIG.apk"
 
 builder_describe_outputs \
-  build:app    ./app/build/outputs/apk/$CONFIG/${ARTIFACT}
+  build:app    app/build/outputs/apk/$CONFIG/${ARTIFACT}
 
 #### Build
 
