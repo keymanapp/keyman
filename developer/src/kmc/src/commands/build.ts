@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+import { buildPackage } from '../activities/buildPackage.js';
 import { buildKmnKeyboard } from '../activities/buildKmnKeyboard.js';
 import { buildLdmlKeyboard } from '../activities/buildLdmlKeyboard.js';
 
@@ -16,33 +17,34 @@ export function declareBuild(program: Command) {
     .option('-o, --out-file <filename>', 'where to save the resulting .kmx file')
     .option('--no-compiler-version', 'Exclude compiler version metadata from output')
     .action((infiles: string[], options: any) => {
+      let p = [];
       if(!infiles.length) {
         console.debug('Assuming infile == .');
-        build('.', options);
+        p.push(build('.', options));
       }
       for(let infile of infiles) {
-        build(infile, options);
+        p.push(build(infile, options));
       }
+      return Promise.all(p).then();
     });
 }
 
-function build(infile: string, options: BuildCommandOptions) {
+async function build(infile: string, options: BuildCommandOptions): Promise<boolean> {
   console.log(`Building ${infile}`);
 
   if(infile.endsWith('.xml')) {
     return buildLdmlKeyboard(infile, options);
   }
 
-
   if(infile.endsWith('.kmn')) {
     return buildKmnKeyboard(infile, options);
   }
 
-  /*
   if(infile.endsWith('.kps')) {
     return buildPackage(infile, options);
   }
 
+  /*
   if(infile.endsWith('.model.ts')) {
     return buildModel(infile, options);
   }

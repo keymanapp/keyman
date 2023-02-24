@@ -5,7 +5,7 @@ import { KvkFileWriter, CompilerCallbacks } from '@keymanapp/common-types';
 import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
 import { BuildCommandOptions } from '../commands/build.js';
 
-export function buildLdmlKeyboard(infile: string, options: BuildCommandOptions) {
+export async function buildLdmlKeyboard(infile: string, options: BuildCommandOptions): Promise<boolean> {
   // TODO-LDML: consider hardware vs touch -- touch-only layout will not have a .kvk
   // Compile:
   let [kmx,kvk,kmw] = buildLdmlKeyboardToMemory(infile, options);
@@ -25,7 +25,7 @@ export function buildLdmlKeyboard(infile: string, options: BuildCommandOptions) 
     fs.writeFileSync(outFileKvk, kvk);
   } else {
     console.error(`An error occurred compiling ${infile}`);
-    process.exit(1);
+    return false;
   }
 
   if(kmw) {
@@ -33,6 +33,8 @@ export function buildLdmlKeyboard(infile: string, options: BuildCommandOptions) 
     console.log(`Writing compiled js keyboard to ${outFileKmw}`);
     fs.writeFileSync(outFileKmw, kmw);
   }
+
+  return true;
 }
 
 function buildLdmlKeyboardToMemory(inputFilename: string, options: BuildCommandOptions): [Uint8Array, Uint8Array, Uint8Array] {

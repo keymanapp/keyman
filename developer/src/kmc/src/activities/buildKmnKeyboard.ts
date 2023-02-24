@@ -3,7 +3,7 @@ import * as path from 'path';
 import { BuildCommandOptions } from '../commands/build.js';
 import { getDeveloperBinPath } from '../util/getDeveloperBinPath.js';
 
-export function buildKmnKeyboard(infile: string, options: BuildCommandOptions) {
+export async function buildKmnKeyboard(infile: string, options: BuildCommandOptions): Promise<boolean> {
   // We'll call out to kmcomp.exe to build a .kmn keyboard into a .kmx
   const binRoot = getDeveloperBinPath();
   if(binRoot == null) {
