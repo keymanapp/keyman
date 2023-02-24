@@ -24,14 +24,9 @@ bool IsRelativePath(KMX_CHAR const * p) {
   // Absolute path (returns FALSE):
   //  C:\...\BITMAP.BMP
   //  \\SERVER\SHARE\...\BITMAP.BMP
-/*
-#if defined(_WIN32) || defined(_WIN64)
-  if (*p == '\\') return FALSE;
-#else
-  if (*p == '/') return FALSE;
-#endif*/
-if ((*p == '\\') || (*p == '/')) return FALSE;
-if (*p && *(p + 1) == ':') return FALSE;
+
+  if ((*p == '\\') || (*p == '/')) return FALSE;
+  if (*p && *(p + 1) == ':') return FALSE;
 
   return TRUE;
 }
@@ -48,15 +43,9 @@ bool IsRelativePath(KMX_WCHAR const * p) {
   // Absolute path (returns FALSE):
   //  C:\...\BITMAP.BMP
   //  \\SERVER\SHARE\...\BITMAP.BMP
-/*
-#if defined(_WIN32) || defined(_WIN64)
-  if (*p == u'\\') return FALSE;
-#else
-  if (*p == u'/') return FALSE;
-#endif
-*/
-if ((*p == u'\\') || (*p == u'/'))return FALSE;
-if (*p && *(p + 1) == u':') return FALSE;
+
+  if ((*p == u'\\') || (*p == u'/'))return FALSE;
+  if (*p && *(p + 1) == u':') return FALSE;
 
   return TRUE;
 }
@@ -80,13 +69,11 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
     u16ncpy(Name, WCompileDir, _countof(Name));  // I3481
     u16ncat(Name, Filename, _countof(Name));  // I3481
   }
-  else {
+  else
     u16ncpy(Name, Filename, _countof(Name));  // I3481   // _S2 wcscpy_s(Name, _countof(Name), Filename);  // I3481
-  }
-  std::wstring  Name_wstr = convert_pchar16T_To_wstr(Name);
-  const KMX_WCHART* Name_wchptr = Name_wstr.c_str();
 
-  nfile = Open_File(Name_wchptr, L"rb");
+  const KMX_WCHAR* pName = Name;
+  nfile = Open_File(pName, u"rb");
 
   if (nfile == NULL) {
     if (ReportMissingFile) {
@@ -102,9 +89,11 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
 
   cptr1++;
 
-//TODO: sort out how to find common includes in non-Windows platforms:
+//TODO: sort out how to find common includes in non-Windows platforms: (Works for windows though)
 
-KMX_WCHAR fi_name_char16[260];
+  std::wstring  Name_wstr = convert_pchar16T_To_wstr(Name);
+  const KMX_WCHART* Name_wchptr = Name_wstr.c_str();
+  KMX_WCHAR fi_name_char16[260];
 #if defined(_WIN32) || defined(_WIN64)
   _wfinddata_t fi;
   n = _wfindfirst(Name_wchptr, &fi);
