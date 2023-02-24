@@ -470,6 +470,11 @@ export default function extendString() {
     p._kmwCodePointToCodeUnit = bEnable ? p.kmwCodePointToCodeUnit : p.kmwBMPCodePointToCodeUnit;
     p._kmwCodeUnitToCodePoint = bEnable ? p.kmwCodeUnitToCodePoint : p.kmwBMPCodeUnitToCodePoint;
   }
+
+  // Ensure that _all_ String extensions are established, even if disabled by default.
+  if(!String._kmwFromCharCode) {
+    String.kmwEnableSupplementaryPlane(false);
+  }
 }
 
 // For side-effect imports:

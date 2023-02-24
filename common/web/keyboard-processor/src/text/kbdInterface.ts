@@ -17,6 +17,7 @@ import type OutputTarget from "./outputTarget.js";
 import { Mock } from "./outputTarget.js";
 import RuleBehavior from "./ruleBehavior.js";
 import Keyboard, { VariableStoreDictionary } from "../keyboards/keyboard.js";
+import { KeyboardHarness, KeyboardKeymanGlobal } from "../keyboards/keyboardHarness.js";
 
 //#endregion
 
@@ -190,7 +191,7 @@ export enum SystemStoreIDs {
 
 //#endregion
 
-export default class KeyboardInterface {
+export default class KeyboardInterface extends KeyboardHarness {
   static readonly GLOBAL_NAME = 'KeymanWeb';
 
   cachedContext: CachedContext = new CachedContext();
@@ -215,7 +216,9 @@ export default class KeyboardInterface {
     return Codes;
   }
 
-  constructor(variableStoreSerializer: VariableStoreSerializer = null) {
+  constructor(_jsGlobal: any, keymanGlobal: KeyboardKeymanGlobal, variableStoreSerializer: VariableStoreSerializer = null) {
+    super(_jsGlobal, keymanGlobal);
+
     this.systemStores = {};
 
     this.systemStores[SystemStoreIDs.TSS_PLATFORM] = new PlatformSystemStore(this);

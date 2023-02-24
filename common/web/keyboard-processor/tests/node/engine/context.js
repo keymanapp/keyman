@@ -1,11 +1,12 @@
 import { assert } from 'chai';
-import fs from 'fs';
-import vm from 'vm';
 
-import { KeyboardProcessor, Mock } from '@keymanapp/keyboard-processor';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 
-import { RecordedKeystrokeSequence } from '@keymanapp/recorder-core/build/obj/index.js';
-import NodeProctor from '@keymanapp/recorder-core/build/obj/nodeProctor.js';
+import { KeyboardInterface, KeyboardProcessor, MinimalKeymanGlobal, Mock } from '@keymanapp/keyboard-processor';
+import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-loader';
+
+import { NodeProctor, RecordedKeystrokeSequence } from '@keymanapp/recorder-core';
 
 /*
  * ABOUT THIS TEST SUITE
@@ -34,7 +35,7 @@ let device = {
   browser: 'native'
 }
 
-var keyboard;
+let keyboardWithHarness;
 
 var toSupplementaryPairString = function(code){
   var H = Math.floor((code - 0x10000) / 0x400) + 0xD800;
@@ -59,7 +60,7 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
       // Prepare the context!
       var matchTest = matchDefs[j];
       var ruleSeq = new RecordedKeystrokeSequence(matchTest.sequence);
-      let proctor = new NodeProctor(keyboard, device, assert.equal);
+      let proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);
 
       // We want to specify the OutputTarget for this test; our actual concern is the resulting context.
       var target = new Mock();
@@ -67,7 +68,7 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
 
       // Now for the real test!
       let processor = new KeyboardProcessor(device);
-      processor.activeKeyboard = keyboard;
+      processor.keyboardInterface = keyboardWithHarness;
       var res = processor.keyboardInterface.fullContextMatch(ruleDef.n, target, ruleDef.rule);
 
       var msg = matchTest.msg;
@@ -78,6 +79,8 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
     }
   }
 }
+
+//#region Test Spec Definitions
 
 // Unfortunately, at present, this is all handwritten stuff crafted from partial Recorder use.  Might should make
 // a page that writes this format instead.  Note that I've omitted the eventSpec part here, since these tests are
@@ -978,16 +981,13 @@ var NOTANY_NUL_RULE_SET = [ NOTANY_NUL_TEST_1, NOTANY_NUL_TEST_2, NOTANY_NUL_TES
 
   // -----------
 
+//#endregion
+
 describe('Engine - Context Matching', function() {
-  before(function() {
-    let kp = new KeyboardProcessor(device);
-
-    // These two lines will load a keyboard from its file; headless-mode `registerKeyboard` will
-    // automatically set the keyboard as active.
-    var script = new vm.Script(fs.readFileSync('../../test/resources/keyboards/test_simple_deadkeys.js'));
-    script.runInThisContext();
-
-    keyboard = kp.activeKeyboard;
+  before(async function() {
+    let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+    await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_simple_deadkeys.js'));
+    keyboardWithHarness = keyboardLoader.harness;
   });
 
   // Tests "stage 1" of fullContextMatch - ensuring that a proper context index map is built.
@@ -998,7 +998,7 @@ describe('Engine - Context Matching', function() {
       // Prepare the context!
       var ruleDef = matchDefs[j];
       var ruleSeq = new RecordedKeystrokeSequence(ruleDef.baseSequence);
-      let proctor = new NodeProctor(keyboard, device, assert.equal);
+      let proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);
 
       // We want to specify the OutputTarget for this test; our actual concern is the resulting context.
       var target = new Mock();
@@ -1006,7 +1006,7 @@ describe('Engine - Context Matching', function() {
 
       // Now for the real test!
       let processor = new KeyboardProcessor(device);
-      processor.activeKeyboard = keyboard;
+      processor.keyboardInterface = keyboardWithHarness;
       var res = processor.keyboardInterface._BuildExtendedContext(ruleDef.n, ruleDef.ln, target);
 
       assert.sameOrderedMembers(res.valContext, ruleDef.contextCache);

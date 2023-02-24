@@ -1,17 +1,26 @@
 import { assert } from 'chai';
 import fs from 'fs';
-import vm from 'vm';
+import path from 'path';
+
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 
 import { KeyboardProperties, SpacebarText } from '@keymanapp/keyboard-processor';
 
 describe('Keyboard Properties', function() {
-  let rootCommonStubPath = '../../test/resources/json/keyboards/';
+  let commonResourcesPackage = '@keymanapp/common-test-resources';
+  let commonStubsSubpath = 'json/keyboards';
+  let rootCommonStubPath = `${commonResourcesPackage}/${commonStubsSubpath}`;
 
   it('initialization from KMW\'s addKeyboards() API spec', () => {
-    let files = fs.readdirSync(rootCommonStubPath);
+    // require.resolve cannot resolve a directory directly, unfortunately.
+    // Needs a file to 'root' the resolution mechanism.  See https://github.com/nodejs/node/issues/42219.
+    const resolvedResourcesPath = path.dirname(require.resolve(`${commonResourcesPackage}/index.mjs`));
+    const resolvedCommonStubPath = `${resolvedResourcesPath}/${commonStubsSubpath}`;
+    let files = fs.readdirSync(resolvedCommonStubPath);
 
     for(let file of files) {
-      let stub = JSON.parse(fs.readFileSync(`${rootCommonStubPath}/${file}`));
+      let stub = JSON.parse(fs.readFileSync(`${resolvedCommonStubPath}/${file}`));
 
       let dataset = [];
       if(stub.languages instanceof Array) {
@@ -36,7 +45,7 @@ describe('Keyboard Properties', function() {
 
   it('generates display-name text if not directly-specified', () => {
     // Could convert to run on all stubs, but... this should be fine as-is.
-    let stub = JSON.parse(fs.readFileSync(`${rootCommonStubPath}/khmer_angkor.json`));
+    let stub = JSON.parse(fs.readFileSync(require.resolve(`${rootCommonStubPath}/khmer_angkor.json`)));
     let propObject = new KeyboardProperties(stub);
 
     // Without a configured SpacebarText value, will display the keyboard name.
@@ -57,7 +66,7 @@ describe('Keyboard Properties', function() {
 
   it('does not override directly-specified display-name text', () => {
     // Could convert to run on all stubs, but... this should be fine as-is.
-    let stub = JSON.parse(fs.readFileSync(`${rootCommonStubPath}/khmer_angkor.json`));
+    let stub = JSON.parse(fs.readFileSync(require.resolve(`${rootCommonStubPath}/khmer_angkor.json`)));
 
     const customDisplayName = "(custom)";
     let propObject = new KeyboardProperties(stub);

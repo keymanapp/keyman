@@ -13,6 +13,7 @@ esbuild.buildSync({
   entryPoints: ['build/obj/index.js'],
   bundle: true,
   sourcemap: true,
+  external: ['fs', 'vm'],
   format: "esm",
   // Sets 'common/web' as a root folder for module resolution;
   // this allows the keyman-version and utils imports to resolve.
@@ -30,6 +31,7 @@ esbuild.buildSync({
   entryPoints: ['build/obj/index.js'],
   bundle: true,
   sourcemap: true,
+  external: ['fs', 'vm'],
   format: "cjs",
   // Sets 'common/web' as a root folder for module resolution;
   // this allows the keyman-version and utils imports to resolve.

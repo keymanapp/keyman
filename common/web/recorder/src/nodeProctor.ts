@@ -8,17 +8,17 @@ import {
   RecordedSyntheticKeystroke
 } from "./index.js";
 
-import { Keyboard, KeyEvent, KeyEventSpec, KeyboardProcessor, Mock, type OutputTarget } from "@keymanapp/keyboard-processor";
+import { KeyboardInterface, KeyEvent, KeyEventSpec, KeyboardProcessor, Mock, type OutputTarget, KeyboardHarness } from "@keymanapp/keyboard-processor";
 import { DeviceSpec } from "@keymanapp/web-utils";
 
 export default class NodeProctor extends Proctor {
-  private keyboard: Keyboard;
+  private keyboardWithHarness: KeyboardHarness;
   public __debug = false;
 
-  constructor(keyboard: Keyboard, device: DeviceSpec, assert: AssertCallback) {
+  constructor(kbdHarness: KeyboardHarness, device: DeviceSpec, assert: AssertCallback) {
     super(device, assert);
 
-    this.keyboard = keyboard;
+    this.keyboardWithHarness = kbdHarness;
   }
 
   beforeAll() {
@@ -55,7 +55,8 @@ export default class NodeProctor extends Proctor {
 
     // Establish a fresh processor, setting its keyboard appropriately for the test.
     let processor = new KeyboardProcessor(this.device);
-    processor.activeKeyboard = this.keyboard;
+    processor.keyboardInterface = this.keyboardWithHarness as KeyboardInterface;
+    const keyboard = this.keyboardWithHarness.activeKeyboard;
 
     if(sequence instanceof RecordedKeystrokeSequence) {
       for(let keystroke of sequence.inputs) {
@@ -71,11 +72,11 @@ export default class NodeProctor extends Proctor {
             kName: '',
             device: this.device,
             isSynthetic: false,
-            LisVirtualKey: this.keyboard.definesPositionalOrMnemonic // Only false for 1.0 keyboards.
+            LisVirtualKey: keyboard.definesPositionalOrMnemonic // Only false for 1.0 keyboards.
           }
         } else if(keystroke instanceof RecordedSyntheticKeystroke) {
-          let key = this.keyboard.layout(this.device.formFactor).getLayer(keystroke.layer).getKey(keystroke.keyName);
-          keyEvent = this.keyboard.constructKeyEvent(key, this.device, processor.stateKeys);
+          let key = keyboard.layout(this.device.formFactor).getLayer(keystroke.layer).getKey(keystroke.keyName);
+          keyEvent = keyboard.constructKeyEvent(key, this.device, processor.stateKeys);
         }
 
         // Fill in the final details of the KeyEvent...

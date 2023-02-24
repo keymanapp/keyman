@@ -19,6 +19,12 @@
   "devDependencies": {
     "@keymanapp/resources-gosh": "*",
     "chai": "^4.3.4",
+    "karma": "^6.4.1",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-mocha": "^2.0.1",
+    "karma-mocha-reporter": "^2.2.5",
+    "karma-teamcity-reporter": "^1.1.0",
     "mocha": "^10.0.0",
     "mocha-teamcity-reporter": "^4.0.0",
     "ts-node": "^10.9.1",
@@ -26,7 +32,8 @@
   },
   "scripts": {
     "tsc": "tsc",
-    "clean": "tsc -b --clean src/tsconfig.json && tsc -b --clean src/tsconfig.bundled.json",
+    "clean": "tsc -b --clean tsconfig.json",
+    "karma": "karma",
     "test": "gosh ./test.sh",
     "mocha": "mocha"
   },
@@ -41,10 +48,26 @@
   "types": "./build/obj/index.d.ts",
   "exports": {
     ".": "./build/obj/index.js",
+    "./node-keyboard-loader": {
+      "types": "./build/obj/keyboards/loaders/node-keyboard-loader.d.ts",
+      "import": "./build/obj/keyboards/loaders/node-keyboard-loader.js"
+    },
+    "./dom-keyboard-loader": {
+      "types": "./build/obj/keyboards/loaders/dom-keyboard-loader.d.ts",
+      "import": "./build/obj/keyboards/loaders/dom-keyboard-loader.js"
+    },
     "./lib": {
       "types": "./build/lib/index.d.ts",
       "import": "./build/lib/index.mjs",
       "require": "./build/lib/index.cjs"
+    },
+    "./lib/node-keyboard-loader": {
+      "types": "./build/lib/node-keyboard-loader.d.ts",
+      "import": "./build/lib/node-keyboard-loader.mjs"
+    },
+    "./lib/dom-keyboard-loader": {
+      "types": "./build/lib/dom-keyboard-loader.d.ts",
+      "import": "./build/lib/dom-keyboard-loader.mjs"
     },
     "./obj/*.js": "./build/obj/*.js"
   }

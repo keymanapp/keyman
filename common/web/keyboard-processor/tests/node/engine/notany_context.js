@@ -1,8 +1,10 @@
 import { assert } from 'chai';
-import fs from 'fs';
-import vm from 'vm';
 
-import { KeyboardProcessor, Mock } from '@keymanapp/keyboard-processor';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+import { KeyboardInterface, MinimalKeymanGlobal, Mock } from '@keymanapp/keyboard-processor';
+import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-loader';
 import { NodeProctor, RecordedKeystrokeSequence } from '@keymanapp/recorder-core';
 import { extendString } from '@keymanapp/web-utils';
 
@@ -17,13 +19,13 @@ const device = {
   browser: 'native'
 }
 
-let keyboard;
+let keyboardWithHarness;
 
 function runEngineRuleSet(ruleSet) {
   for(let ruleDef of ruleSet) {
     // Prepare the context!
     const ruleSeq = new RecordedKeystrokeSequence(ruleDef);
-    const proctor = new NodeProctor(keyboard, device, assert.equal);
+    const proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);
     const target = new Mock();
     ruleSeq.test(proctor, target);
   }
@@ -52,15 +54,10 @@ function runStringRuleSet(input, output) {
 // -----------
 
 describe('Engine - notany() and context()', function() {
-  before(function() {
-    const kp = new KeyboardProcessor();
-
-    // These two lines will load a keyboard from its file; headless-mode `registerKeyboard` will
-    // automatically set the keyboard as active.
-    const script = new vm.Script(fs.readFileSync('../../test/resources/keyboards/test_917.js'));
-    script.runInThisContext();
-
-    keyboard = kp.activeKeyboard;
+  before(async function() {
+    let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+    await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_917.js'));
+    keyboardWithHarness = keyboardLoader.harness;
   });
 
   /*

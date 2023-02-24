@@ -4,6 +4,7 @@ import EventEmitter from 'eventemitter3';
 
 import Codes from "./codes.js";
 import type Keyboard from "../keyboards/keyboard.js";
+import { MinimalKeymanGlobal } from '../keyboards/keyboardHarness.js';
 import KeyEvent from "./keyEvent.js";
 import { Layouts } from "../keyboards/defaultLayouts.js";
 import type { MutableSystemStore } from "./systemStores.js";
@@ -15,7 +16,7 @@ import { Mock } from "./outputTarget.js";
 import KeyboardInterface, { SystemStoreIDs, VariableStore } from "./kbdInterface.js";
 import RuleBehavior from "./ruleBehavior.js";
 
-import { DeviceSpec, globalObject as getGlobalObject } from "@keymanapp/web-utils";
+import { DeviceSpec, globalObject } from "@keymanapp/web-utils";
 
 // #endregion
 
@@ -31,7 +32,7 @@ export interface VariableStoreSerializer {
 
 export interface ProcessorInitOptions {
   baseLayout?: string;
-  variableStoreSerializer?: VariableStoreSerializer;
+  keyboardInterface?: KeyboardInterface;
 }
 
 interface EventMap {
@@ -82,30 +83,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
     this.contextDevice = device;
 
     this.baseLayout = options.baseLayout || KeyboardProcessor.DEFAULT_OPTIONS.baseLayout;
-    this.keyboardInterface = new KeyboardInterface(options.variableStoreSerializer);
-    this.installInterface();
-  }
-
-  private installInterface() {
-    // We must ensure that the keyboard can find the API functions at the expected place.
-    let globalThis = getGlobalObject();
-    globalThis[KeyboardInterface.GLOBAL_NAME] = this.keyboardInterface;
-
-    // Maintains debug definitions - debug keyboard compilations refer to these code definitions.
-    //
-    // Note:  these are targeted for deprecation and is only included for legacy precompiled keyboards.
-    //
-    // Refer to C:\keymanapp\keyman\developer\src\tike\compile\CompileKeymanWeb.pas,
-    // TCompileKeymanWeb.JavaScript_SetupDebug.
-    const keyman = globalThis['keyman'] = globalThis['keyman'] || {};
-    const osk = keyman['osk'] = keyman['osk'] || {};  // does not otherwise exist when headless or detached from OSKs.
-    osk['modifierCodes'] = Codes.modifierCodes;
-    osk['keyCodes'] = Codes.keyCodes;
-
-    // Ensure that the active keyboard is set on the keyboard interface object.
-    if(this.activeKeyboard) {
-      this.keyboardInterface.activeKeyboard = this.activeKeyboard;
-    }
+    this.keyboardInterface = options.keyboardInterface || new KeyboardInterface(globalObject(), MinimalKeymanGlobal);
   }
 
   public get activeKeyboard(): Keyboard {
@@ -236,15 +214,6 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
 
     // Pass this key code and state to the keyboard program
     if(this.activeKeyboard && keyEvent.Lcode != 0) {
-      /*
-        * The `this.installInterface()` call is insurance against something I've seen in unit tests when things break a bit.
-        *
-        * Currently, when a KMW shutdown doesn't go through properly or completely, sometimes we end up with parallel
-        * versions of KMW running, and an old, partially-shutdown one will "snipe" a command meant for the most-recent
-        * one's test. So, installing here ensures that the active Processor has its matching KeyboardInterface ready,
-        * even should that occur.
-        */
-      this.installInterface();
       matchBehavior = this.keyboardInterface.processKeystroke(outputTarget, keyEvent);
     }
 

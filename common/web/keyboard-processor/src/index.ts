@@ -2,7 +2,16 @@ export * from "./keyboards/activeLayout.js";
 export * from "./keyboards/defaultLayouts.js";
 export { default as Keyboard } from "./keyboards/keyboard.js";
 export * from "./keyboards/keyboard.js";
-export { default as KeyboardProperties } from "./keyboards/keyboardProperties.js";
+export { KeyboardHarness, KeyboardKeymanGlobal, MinimalCodesInterface, MinimalKeymanGlobal } from "./keyboards/keyboardHarness.js";
+export { default as KeyboardLoaderBase } from "./keyboards/keyboardLoaderBase.js";
+export {
+  default as KeyboardProperties,
+  KeyboardInternalPropertySpec,
+  KeyboardAPIPropertyMultilangSpec,
+  KeyboardAPIPropertySpec,
+  KeyboardFont,
+  LanguageAPIPropertySpec
+} from "./keyboards/keyboardProperties.js";
 export { default as SpacebarText } from "./keyboards/spacebarText.js";
 export { default as StateKeyMap } from "./keyboards/stateKeyMap.js";
 

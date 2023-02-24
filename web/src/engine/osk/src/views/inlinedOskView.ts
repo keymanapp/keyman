@@ -15,12 +15,6 @@ import SimpleActivator from './simpleActivator.js';
  * as part of the host page's layout.
  */
 export default class InlinedOSKView extends OSKView {
-  // Key code definition aliases for legacy keyboards  (They expect window['keyman']['osk'].___)
-  modifierCodes = Codes.modifierCodes;
-  modifierBitmasks = Codes.modifierBitmasks;
-  stateBitmasks = Codes.stateBitmasks;
-  keyCodes = Codes.keyCodes;
-
   public constructor(config: Configuration) {
     config.activator = config.activator || new SimpleActivator();
     super(config);

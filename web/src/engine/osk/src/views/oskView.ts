@@ -9,11 +9,13 @@ import VisualKeyboard from '../visualKeyboard.js';
 import { LengthStyle, ParsedLengthStyle } from '../lengthStyle.js';
 
 import {
+  Codes,
   DeviceSpec,
   Keyboard,
   KeyEvent,
   KeyboardProperties,
   ManagedPromise,
+  type MinimalCodesInterface,
   type MutableSystemStore,
   type SystemStoreMutationHandler
 } from '@keymanapp/keyboard-processor';
@@ -225,8 +227,26 @@ showLanguageMenu() {
   pointerInteraction: (promise: Promise<void>) => void;
 }
 
-export default abstract class OSKView extends EventEmitter<EventMap> {
+export default abstract class OSKView extends EventEmitter<EventMap> implements MinimalCodesInterface {
   _Box: HTMLDivElement;
+
+  // #region Key code definition aliases for legacy keyboards (that expect window['keyman']['osk'].___)
+  get keyCodes() {
+    return Codes.keyCodes;
+  }
+
+  get modifierCodes() {
+    return Codes.modifierCodes;
+  }
+
+  get modifierBitmasks() {
+    return Codes.modifierBitmasks;
+  }
+
+  get stateBitmasks() {
+    return Codes.stateBitmasks;
+  }
+  // #endregion
 
   headerView:   OSKViewComponent;
   bannerView:   BannerView; // Which implements OSKViewComponent

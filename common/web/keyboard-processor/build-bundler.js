@@ -8,36 +8,49 @@
 import esbuild from 'esbuild';
 import { spawn } from 'child_process';
 
-// Bundled ES module version
-esbuild.buildSync({
-  entryPoints: ['build/obj/index.js'],
+/** @type {esbuild.BuildOptions} */
+const commonConfig = {
   bundle: true,
   sourcemap: true,
-  format: "esm",
+  tsconfig: 'tsconfig.json',
+  target: 'es5',
   // Sets 'common/web' as a root folder for module resolution;
   // this allows the keyman-version and utils imports to resolve.
   //
   // We also need to point it at the nested build output folder to resolve in-project
   // imports when compiled - esbuild doesn't seem to pick up on the shifted base.
-  nodePaths: ['..', "build/obj"],
+  nodePaths: ['..', "build/obj"]
+};
+
+// Bundled ES module version
+esbuild.buildSync({
+  entryPoints: ['build/obj/index.js'],
   outfile: "build/lib/index.mjs",
-  tsconfig: 'tsconfig.json',
-  target: "es5"
+  format: "esm",
+  ...commonConfig
 });
 
 // Bundled CommonJS (classic Node) module version
 esbuild.buildSync({
   entryPoints: ['build/obj/index.js'],
-  bundle: true,
-  sourcemap: true,
+  outfile: 'build/lib/index.cjs',
   format: "cjs",
-  // Sets 'common/web' as a root folder for module resolution;
-  // this allows the keyman-version and utils imports to resolve.
-  //
-  // We also need to point it at the nested build output folder to resolve in-project
-  // imports when compiled - esbuild doesn't seem to pick up on the shifted base.
-  nodePaths: ['..', "build/obj"],
-  outfile: "build/lib/index.cjs",
-  tsconfig: 'tsconfig.json',
-  target: "es5"
+  ...commonConfig
+});
+
+
+esbuild.buildSync({
+  entryPoints: ['build/obj/keyboards/loaders/dom-keyboard-loader.js'],
+  outfile: 'build/lib/dom-keyboard-loader.mjs',
+  format: "esm",
+  ...commonConfig
+});
+
+// The node-based keyboard loader needs an extra parameter due to Node-built-in imports:
+esbuild.buildSync({
+  entryPoints: ['build/obj/keyboards/loaders/node-keyboard-loader.js'],
+  outfile: 'build/lib/node-keyboard-loader.mjs',
+  format: "esm",
+  platform: "node",
+  ...commonConfig
 });

@@ -13,15 +13,13 @@
     "types": ["node"],
     "lib": ["es6"],
     "experimentalDecorators": true,
-    "baseUrl": "./",
-    "outDir": "build/obj/",
-    "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
-    "rootDir": "./src"
+    "baseUrl": "../../../",
+    "outDir": "../../../build/obj/keyboards/loaders/",
+    "tsBuildInfoFile": "../../../build/obj/keyboards/loaders/tsconfig.dom.tsbuildinfo",
+    "rootDir": "."
   },
   "references": [
-    { "path": "./src/keyboards/loaders/tsconfig.dom.json" },
-    { "path": "./src/keyboards/loaders/tsconfig.node.json" }
+    { "path": "../../../tsconfig.common.json" }
   ],
-  "include": ["./src/**/*.ts"],
-  "exclude": ["./src/keyboards/loaders/**/*.ts"]
+  "include": ["dom-keyboard-loader.ts", "domKeyboardLoader.ts"],
 }

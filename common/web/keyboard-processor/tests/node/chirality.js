@@ -1,33 +1,32 @@
 import { assert } from 'chai';
 import fs from 'fs';
-import vm from 'vm';
 
-import { Codes, KeyboardInterface, KeyboardProcessor } from '@keymanapp/keyboard-processor';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+import { Codes, KeyboardInterface, MinimalKeymanGlobal } from '@keymanapp/keyboard-processor';
+import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-loader';
 import { KeyboardTest, NodeProctor } from '@keymanapp/recorder-core';
 
 describe('Engine - Chirality', function() {
-  let testJSONtext = fs.readFileSync('../../test/resources/json/engine_tests/chirality.json');
+  let testJSONtext = fs.readFileSync(require.resolve('@keymanapp/common-test-resources/json/engine_tests/chirality.json'));
   // Common test suite setup.
   let testSuite = new KeyboardTest(JSON.parse(testJSONtext));
 
-  var keyboard;
+  let keyboardWithHarness;
+
   let device = {
     formFactor: 'desktop',
     OS: 'windows',
     browser: 'native'
   }
 
-  before(function() {
+  before(async function() {
     // -- START: Standard Recorder-based unit test loading boilerplate --
-    // Load the keyboard.  We'll need a KeyboardProcessor instance as an intermediary.
-    let kp = new KeyboardProcessor();
+    let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+    let keyboard = await keyboardLoader.loadKeyboardFromPath('../../test/' + testSuite.keyboard.filename);
+    keyboardWithHarness = keyboardLoader.harness;
 
-    // These two lines will load a keyboard from its file; headless-mode `registerKeyboard` will
-    // automatically set the keyboard as active.
-    var script = new vm.Script(fs.readFileSync('../../test/' + testSuite.keyboard.filename));
-    script.runInThisContext();
-
-    keyboard = kp.activeKeyboard;
     assert.equal(keyboard.id, "Keyboard_" + testSuite.keyboard.id);
     // --  END:  Standard Recorder-based unit test loading boilerplate --
 
@@ -37,14 +36,14 @@ describe('Engine - Chirality', function() {
 
   // Converts each test set into its own Mocha-level test.
   for(let set of testSuite.inputTestSets) {
-    let proctor = new NodeProctor(keyboard, device, assert.equal);
+    let proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);
 
     if(!proctor.compatibleWithSuite(testSuite)) {
       it.skip(set.toTestName() + " - Cannot run this test suite on Node.");
     } else if(set.constraint.target == 'hardware') {
       it(set.toTestName(), function() {
         // Refresh the proctor instance at runtime.
-        let proctor = new NodeProctor(keyboard, device, assert.equal);
+        let proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);
         set.test(proctor);
       });
     } else {
