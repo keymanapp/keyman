@@ -29,8 +29,6 @@ namespace com.keyman {
     activeDevice: Device;
     physicalDevice: Device;
 
-    linkedStylesheets: (HTMLLinkElement|HTMLStyleElement)[] = [];
-
     waiting: HTMLDivElement;                  // The element displayed for util.wait and util.alert.
 
     // An object mapping event names to individual event lists.  Maps strings to arrays.
@@ -262,37 +260,6 @@ namespace com.keyman {
     setOption(optionName,value) {
       this.keyman.options[optionName] = value;
     }
-
-    //  Unofficial API used by our desktop UIs.
-    getAbsoluteX(Pobj: HTMLElement): number {
-      return dom.Utils.getAbsoluteX(Pobj);
-    }
-
-    //  Unofficial API used by our desktop UIs.
-    getAbsoluteY(Pobj: HTMLElement): number {
-      return dom.Utils.getAbsoluteY(Pobj);
-    }
-
-    /**
-     * Function     getAbsolute
-     * Scope        Public
-     * @param       {Object}    Pobj        HTML element
-     * @return      {Object.<string,number>}
-     * Description  Returns absolute position of Pobj element with respect to page
-     */
-    getAbsolute(Pobj: HTMLElement) {
-      var p={
-        /* @ export */
-        x: this.getAbsoluteX(Pobj),
-        /* @ export */
-        y: this.getAbsoluteY(Pobj)
-      };
-      return p;
-    }
-
-    //  Unofficial API used by our desktop UIs.
-    _GetAbsolute = this.getAbsolute;
-
     /**
      * Select start handler (to replace multiple inline handlers) (Build 360)
      */
@@ -542,196 +509,6 @@ namespace com.keyman {
     }
 
     /**
-     * Add a stylesheet to a page programmatically, for use by the OSK, the UI or the page creator
-     *
-     * @param       {string}        s             style string
-     * @return      {Object}                      returns the object reference
-     **/
-    addStyleSheet(s: string): HTMLStyleElement {
-      var _ElemStyle: HTMLStyleElement = <HTMLStyleElement>document.createElement<'style'>('style');
-
-      _ElemStyle.type = 'text/css';
-      _ElemStyle.appendChild(document.createTextNode(s));
-
-      var _ElemHead=document.getElementsByTagName('HEAD');
-      if(_ElemHead.length > 0) {
-        _ElemHead[0].appendChild(_ElemStyle);
-      } else {
-        document.body.appendChild(_ElemStyle); // Won't work on Chrome, ah well
-      }
-
-      this.linkedStylesheets.push(_ElemStyle);
-
-      return _ElemStyle;
-    }
-
-    /**
-     * Remove a stylesheet element
-     *
-     * @param       {Object}        s             style sheet reference
-     * @return      {boolean}                     false if element is not a style sheet
-     **/
-    removeStyleSheet(s: HTMLStyleElement) {
-      if(s == null || typeof(s) != 'object') {
-        return false;
-      }
-
-      if(s.nodeName != 'STYLE') {
-        return false;
-      }
-
-      if(typeof(s.parentNode) == 'undefined' || s.parentNode == null) {
-        return false;
-      }
-
-      s.parentNode.removeChild(s);
-      return true;
-    }
-
-    /**
-     * Add a reference to an external stylesheet file
-     *
-     * @param   {string}  s   path to stylesheet file
-     */
-    linkStyleSheet(s: string): void {
-      try {
-        if(document.querySelector("link[href="+JSON.stringify(s)+"]") != null) {
-          // We've already linked this stylesheet, don't do it again
-          return;
-        }
-      } catch(e) {
-        // We've built an invalid href, somehow?
-        return;
-      }
-
-      var headElements=document.getElementsByTagName('head');
-      if(headElements.length > 0) {
-        var linkElement=document.createElement('link');
-        linkElement.type='text/css';
-        linkElement.rel='stylesheet';
-        linkElement.href=s;
-        this.linkedStylesheets.push(linkElement);
-        headElements[0].appendChild(linkElement);
-      }
-    }
-
-    /**
-     * Add a stylesheet with a font-face CSS descriptor for the embedded font appropriate
-     * for the browser being used
-     *
-     * @param    {Object}  fd  keymanweb font descriptor
-     **/
-    addFontFaceStyleSheet(fd: any) { // TODO:  Font descriptor object needs definition!
-      // Test if a valid font descriptor
-      if(typeof(fd) == 'undefined') return;
-
-      if(typeof(fd['files']) == 'undefined') fd['files']=fd['source'];
-      if(typeof(fd['files']) == 'undefined') return;
-
-      var i,ttf='',woff='',eot='',svg='',fList=[];
-
-  // TODO: 22 Aug 2014: check that font path passed from cloud is actually used!
-
-      // Do not add a new font-face style sheet if already added for this font
-      for(i=0; i<this.embeddedFonts.length; i++) {
-        if(this.embeddedFonts[i] == fd['family']) {
-          return;
-        }
-      }
-
-      if(typeof(fd['files']) == 'string') {
-        fList[0]=fd['files'];
-      } else {
-        fList=fd['files'];
-      }
-
-      for(i=0;i<fList.length;i++) {
-        if(fList[i].toLowerCase().indexOf('.otf') > 0) ttf=fList[i];
-        if(fList[i].toLowerCase().indexOf('.ttf') > 0) ttf=fList[i];
-        if(fList[i].toLowerCase().indexOf('.woff') > 0) woff=fList[i];
-        if(fList[i].toLowerCase().indexOf('.eot') > 0) eot=fList[i];
-        if(fList[i].toLowerCase().indexOf('.svg') > 0) svg=fList[i];
-      }
-
-      // Font path qualified to support page-relative fonts (build 347)
-      if(ttf != '' && (ttf.indexOf('/') < 0))  {
-        ttf = this.keyman.options['fonts']+ttf;
-      }
-
-      if(woff != '' && (woff.indexOf('/') < 0)) {
-        woff = this.keyman.options['fonts']+woff;
-      }
-
-      if(eot != '' && (eot.indexOf('/') < 0)) {
-        eot = this.keyman.options['fonts']+eot;
-      }
-
-      if(svg != '' && (svg.indexOf('/') < 0)) {
-        svg = this.keyman.options['fonts']+svg;
-      }
-
-      // Build the font-face definition according to the browser being used
-      var s='@font-face {\nfont-family:'
-        +fd['family']+';\nfont-style:normal;\nfont-weight:normal;\n';
-
-      // Build the font source string according to the browser,
-      // but return without adding the style sheet if the required font type is unavailable
-
-      // Modern browsers: use WOFF, TTF and fallback finally to SVG. Don't provide EOT
-      if(this.device.OS == 'iOS') {
-        if(ttf != '') {
-          // Modify the url if required to prevent caching
-          ttf = this.unCached(ttf);
-          s=s+'src:url(\''+ttf+'\') format(\'truetype\');';
-        } else {
-          return;
-        }
-      } else {
-        var s0 = [];
-
-        if(this.device.OS == 'Android') {
-          // Android 4.2 and 4.3 have bugs in their rendering for some scripts
-          // with embedded ttf or woff.  svg mostly works so is a better initial
-          // choice on the Android browser.
-          if(svg != '') {
-            s0.push("url('"+svg+"') format('svg')");
-          }
-
-          if(woff != '') {
-            s0.push("url('"+woff+"') format('woff')");
-          }
-
-          if(ttf != '') {
-            s0.push("url('"+ttf+"') format('truetype')");
-          }
-        } else {
-          if(woff != '') {
-            s0.push("url('"+woff+"') format('woff')");
-          }
-
-          if(ttf != '') {
-            s0.push("url('"+ttf+"') format('truetype')");
-          }
-
-          if(svg != '') {
-            s0.push("url('"+svg+"') format('svg')");
-          }
-        }
-
-        if(s0.length == 0) {
-          return;
-        }
-
-        s += 'src:'+s0.join(',')+';';
-      }
-
-      s=s+'\n}\n';
-
-      this.addStyleSheet(s);
-      this.embeddedFonts.push(fd['family']);
-    }
-
-    /**
      * Allow forced reload if necessary (stub only here)
      *
      *  @param  {string}  s unmodified URL
@@ -741,59 +518,6 @@ namespace com.keyman {
       // var t=(new Date().getTime());
       // s = s + '?v=' + t;
       return s;
-    }
-
-    /**
-     * Document cookie parsing for use by kernel, OSK, UI etc.
-     *
-     * @param       {string=}       cn        cookie name (optional)
-     * @return      {Object}                  array of names and strings, or array of variables and values
-     */
-    loadCookie(cn?: string) {
-      var v={};
-      if(arguments.length > 0) {
-        var cx = this.loadCookie();
-        for(var t in cx) {
-          if(t == cn) {
-            var d = decodeURIComponent(cx[t]).split(';');
-            for(var i=0; i<d.length; i++) {
-              var xc = d[i].split('=');
-              if(xc.length > 1) {
-                v[xc[0]] = xc[1];
-              } else {
-                v[xc[0]] = '';
-              }
-            }
-          }
-        }
-      } else {
-        if(typeof(document.cookie) != 'undefined' && document.cookie != '') {
-          var c = document.cookie.split(/;\s*/);
-          for(var i = 0; i < c.length; i++) {
-            var d = c[i].split('=');
-            if(d.length == 2) {
-              v[d[0]] = d[1];
-            }
-          }
-        }
-      }
-      return v;
-    }
-
-    /**
-     * Standard cookie saving for use by kernel, OSK, UI etc.
-     *
-     * @param       {string}      cn            name of cookie
-     * @param       {Object}      cv            object with array of named arguments and values
-     */
-    saveCookie(cn: string, cv) {
-      var s='';
-      for(var v in cv) {
-        s = s + v+'='+cv[v]+";";
-      }
-
-      var d = new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * 30).toUTCString();
-      document.cookie = cn+'='+encodeURIComponent(s)+'; path=/; expires='+d;//Fri, 31 Dec 2099 23:59:59 GMT;';
     }
 
     /**
@@ -973,14 +697,6 @@ namespace com.keyman {
 
       // Remove any KMW-added DOM element clutter.
       this.waiting.parentNode.removeChild(this.waiting);
-
-      for(let ss of this.linkedStylesheets) {
-        if(ss.remove) {
-          ss.remove();
-        } else if(ss.parentNode) {
-          ss.parentNode.removeChild(ss);
-        }
-      }
     }
 
     /**
