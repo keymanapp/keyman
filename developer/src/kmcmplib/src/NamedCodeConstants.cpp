@@ -187,7 +187,7 @@ KMX_BOOL NamedCodeConstants::LoadFile(const KMX_CHAR *filename)
   #ifdef _WINDOWS_
     // Finally look in kmcmpdll.dll directory
     GetModuleFileName(0, buf, buf_size);
-    //KMX_CHAR *p = strrchr(buf, '\\');
+
     KMX_CHAR *p = strrchr_LinWin(buf);
     if(p)
       p++;

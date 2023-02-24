@@ -17,7 +17,6 @@ std::wstring u16fmt(const KMX_WCHAR * str);
 void u16sprintf(KMX_WCHAR * dst, const size_t sz, const wchar_t* fmt, ...) ;
 
 std::wstring  convert_pchar16T_To_wstr(KMX_WCHAR Name[_MAX_PATH]);
-KMX_WCHAR  conv_KMX_WCHAR__TO__WCHAR(KMX_WCHAR in);
 
 size_t  u16len(const KMX_WCHAR *p);
 int  u16cmp(const KMX_WCHAR *p, const KMX_WCHAR *q);

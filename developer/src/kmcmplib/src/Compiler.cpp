@@ -353,15 +353,8 @@ extern "C" BOOL __declspec(dllexport) kmcmp_CompileKeyboardFile(PKMX_STR pszInfi
   if (!pMsgProc || !pszInfile || !pszOutfile) SetError(CERR_BadCallParams);
 
   PKMX_STR p;
-/*
-#if defined(_WIN32) || defined(_WIN64)
-  if (p = strrchr(pszInfile, '\\'))
-#else
-  if (p = strrchr(pszInfile, '/'))
-#endif*/
 
   if (p = strrchr_LinWin(pszInfile))
-
   {
     strncpy_s(kmcmp::CompileDir, _countof(kmcmp::CompileDir), pszInfile, (INT_PTR)(p - pszInfile + 1));  // I3481
     kmcmp::CompileDir[(INT_PTR)(p - pszInfile + 1)] = 0;
@@ -373,7 +366,6 @@ extern "C" BOOL __declspec(dllexport) kmcmp_CompileKeyboardFile(PKMX_STR pszInfi
   kmcmp::currentLine = 0;
   kmcmp::nErrors = 0;
 
-  //fp_in = fopen((const  KMX_CHAR*)pszInfile, "rb");
   fp_in = Open_File((const  KMX_CHAR*)pszInfile, "rb");
 
   if (fp_in == NULL) SetError(CERR_InfileNotExist);
@@ -402,7 +394,6 @@ extern "C" BOOL __declspec(dllexport) kmcmp_CompileKeyboardFile(PKMX_STR pszInfi
     return CERR_CannotCreateTempfile;
   }
 
-  //fp_out = fopen((const  KMX_CHAR*)pszOutfile, "wb");
   fp_out = Open_File((const  KMX_CHAR*)pszOutfile, "wb");
 
   if (fp_out == NULL) SetError(CERR_CannotCreateOutfile);
@@ -453,12 +444,7 @@ extern "C" BOOL __declspec(dllexport)  kmcmp_CompileKeyboardFileToBuffer(PKMX_ST
   if (!pMsgProc || !pszInfile || !pfkBuffer) SetError(CERR_BadCallParams);
 
   PKMX_STR p;
-/*
-#if defined(_WIN32) || defined(_WIN64)
-  if (p = strrchr(pszInfile, '\\'))
-#else
-  if (p = strrchr(pszInfile, '/'))
-#endif*/
+
   if (p = strrchr_LinWin(pszInfile))
   {
     strncpy_s(kmcmp::CompileDir, _countof(kmcmp::CompileDir), pszInfile, (INT_PTR)(p - pszInfile + 1));  // I3481
@@ -471,7 +457,6 @@ extern "C" BOOL __declspec(dllexport)  kmcmp_CompileKeyboardFileToBuffer(PKMX_ST
   kmcmp::currentLine = 0;
   kmcmp::nErrors = 0;
 
-  //fp_in = fopen((const  KMX_CHAR*)pszInfile,"rb");
   fp_in = Open_File((const  KMX_CHAR*)pszInfile,"rb");
 
   if (fp_in == NULL) SetError(CERR_InfileNotExist);
@@ -1364,15 +1349,8 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     {
       // Strip path from the store, leaving bare filename only
       p = sp->dpString;
-/*
-#if defined(_WIN32) || defined(_WIN64)
-      KMX_WCHAR *pp = (KMX_WCHAR*) u16chr((const PKMX_WCHAR) p, u'\\');
-#else
-      KMX_WCHAR *pp = (KMX_WCHAR*) u16chr((const PKMX_WCHAR) p, u'/');
-#endif
-*/
-  KMX_WCHAR *pp = (KMX_WCHAR*) u16rchr_LinWin((const PKMX_WCHAR) p);
 
+      KMX_WCHAR *pp = (KMX_WCHAR*) u16rchr_LinWin((const PKMX_WCHAR) p);
 
       if (!pp) {
         pp = p;
@@ -3559,7 +3537,7 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
 {
   FILE *fp;
   KMX_WCHAR szNewName[260], *p;
-  //if (IsRelativePath(u16fmt(szName).c_str()))
+
   if (IsRelativePath(szName))
   {
     PKMX_WCHAR WCompileDir = strtowstr(kmcmp::CompileDir);
@@ -3569,29 +3547,14 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
   else
     u16ncpy(szNewName, szName, _countof(szNewName));  // I3481
 
-
-/*
-#if defined(_WIN32) || defined(_WIN64)
-  fp =_wfsopen((KMX_WCHART*)szNewName, L"rb", _SH_DENYWR);
-#else
-  //fp = fopen( ( const PKMX_CHAR) szNewName, "rb");
-#endif*/
-//fp=Open_File(( const KMX_WCHART*)szNewName, L"rb");
-fp=Open_File(( const KMX_WCHAR*)szNewName, u"rb");
-
+  fp=Open_File(( const KMX_WCHAR*)szNewName, u"rb");
 
   if ( fp == NULL)
   {
     // else if filename.bmp is not in the folder -> attempt to open filename.bmp.bmp !
     if ( u16cmp(szNewName+u16len(szNewName)-4, u".bmp") )
       u16ncat(szNewName, u".bmp", _countof(szNewName));  // I3481
-/*
-    #if defined(_WIN32) || defined(_WIN64)
-      fp = _wfsopen((const KMX_WCHART*)szNewName, L"rb", _SH_DENYWR);
-    #else
-      fp = fopen(( const PKMX_CHAR) szNewName, "rb");
-    #endif*/
-    //fp= Open_File((const KMX_WCHART*)szNewName, L"rb");
+
     fp= Open_File(( const KMX_WCHAR*)szNewName, u"rb");
 
     if ( fp == NULL)
