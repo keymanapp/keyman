@@ -177,6 +177,13 @@ jobs:
       run: |
         echo "${{vars.ENV_DPUT_CONFIG}}" > ~/.dput.cf
 
+    - name: Configure GPG Key
+      shell: bash
+      run: |
+        echo -e "::group::\e[32mConfigure GPG key"
+        echo -n "${{ secrets.GPG_SIGNING_KEY }}" | base64 --decode | gpg --import
+        echo "::endgroup::"
+
     - name: Download Artifacts
       uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
       with:
