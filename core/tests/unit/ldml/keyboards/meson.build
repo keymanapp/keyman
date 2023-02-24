@@ -50,7 +50,7 @@ endforeach
 
 foreach kbd : tests_with_testdata
   configure_file(
-    command: kmc_cmd + ['build-test-data', '@INPUT@', '@OUTPUT@'],
+    command: kmc_cmd + ['build-test-data', '@INPUT@', '--out-file', '@OUTPUT@'],
     output: kbd + '-test.json',
     input: kbd + '-test.xml'
   )

@@ -4,7 +4,7 @@ import * as kmc from '@keymanapp/kmc-keyboard';
 import { CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
 import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
 
-export function buildTestData(infile: string) {
+export function buildTestData(infile: string, options: any) {
   let compilerOptions: kmc.CompilerOptions = {
     debug: false,
     addCompilerVersion: false
@@ -15,7 +15,7 @@ export function buildTestData(infile: string) {
     return;
   }
 
-  const fileBaseName = infile;
+  const fileBaseName = options.outFile ?? infile;
   const outFileBase = path.basename(fileBaseName, path.extname(fileBaseName));
   const outFileDir = path.dirname(fileBaseName);
   const outFileJson = path.join(outFileDir, outFileBase + '.json');
