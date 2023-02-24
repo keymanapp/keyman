@@ -92,7 +92,7 @@ builder_run_child_actions build:engine/keyboard-cache
 # Uses engine/device-detect
 builder_run_child_actions build:engine/configuration
 
-# Uses engine/device-detect + engine/dom-utils
+# Uses engine/dom-utils
 builder_run_child_actions build:engine/osk
 
 # if builder_start_action build:main; then
