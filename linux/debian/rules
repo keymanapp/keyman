@@ -23,7 +23,7 @@ override_dh_auto_configure:
 	# keymankeyboardprocessor - we need to configure and build core before
 	# we can configure ibus-keyman!
 	cd core && \
-		./build.sh configure:arch build:arch -- --wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc \
+		./build.sh --no-tests configure:arch build:arch -- --wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc \
 			--localstatedir=/var --libdir=lib/$(DEB_TARGET_MULTIARCH) \
 			--libexecdir=lib/$(DEB_TARGET_MULTIARCH)
 	# ibus-keyman

@@ -44,10 +44,4 @@ endif
 subdir('doc')
 subdir('include')
 subdir('src')
-
-if get_option('keyman_core_tests')
-  message('option "keyman_core_tests" is true, enabling tests')
-  subdir('tests')
-else
-  message('option "keyman_core_tests" is false, disabling tests')
-endif
+subdir('tests')

@@ -1,5 +1,4 @@
-
-node = find_program('node', required: false)
+node = find_program('node', required: true)
 
 hextobin_root = join_paths(meson.source_root(),'..','common','tools','hextobin','build','hextobin.js')
 hextobin_cmd = [node, hextobin_root]
