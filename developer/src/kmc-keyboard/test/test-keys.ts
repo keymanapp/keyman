@@ -204,6 +204,12 @@ describe('keys.kmap', function () {
         CompilerMessages.Error_InvalidModifier({layer:'base',modifier:'altR-shift'}),
       ]
     },
+    {
+      subpath: 'sections/keys/invalid-missing-flick.xml',
+      errors: [
+        CompilerMessages.Error_MissingFlicks({flicks:'an-undefined-flick-id',id:'Q'}),
+      ]
+    },
   ]);
 
   it('should reject structurally invalid layers', function() {

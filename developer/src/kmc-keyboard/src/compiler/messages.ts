@@ -91,6 +91,10 @@ export class CompilerMessages {
     `layer has invalid modifier='${o.modifier}' on layer id=${o.layer}`);
   static ERROR_InvalidModifier = SevError | 0x0016;
 
+  static Error_MissingFlicks = (o:{flicks: string, id: string}) => m(this.ERROR_MissingFlicks,
+    `key id=${o.id} refers to missing flicks=${o.flicks}`);
+  static ERROR_MissingFlicks = SevError | 0x0017;
+
   static severityName(code: number): string {
     let severity = code & CompilerErrorSeverity.Severity_Mask;
     switch(severity) {

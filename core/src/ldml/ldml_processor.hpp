@@ -17,8 +17,6 @@
 #include "option.hpp"
 #include "ldml_vkeys.hpp"
 #include "ldml_transforms.hpp"
-// TODO-LDML: May not need this eventually
-#include <kmx/kmx_plus.h>
 
 namespace km {
 namespace kbp {
