@@ -16,12 +16,12 @@ describe('TouchLayoutFile', function () {
     // We don't want to assert equality on formatting differences, or on the
     // fixups that we do on input files (empty arrays, stringified numbers), so
     // we'll re-read the output and compare it
-    let output = writer.write(layout, {formatted:true});
+    let output = writer.write(layout);
     let newLayout = reader.read(output);
     assert.deepEqual(layout, newLayout);
 
     // And do the same without formatted output
-    output = writer.write(layout, {formatted:false});
+    output = writer.write(layout);
     newLayout = reader.read(output);
     assert.deepEqual(layout, newLayout);
 
