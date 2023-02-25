@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import 'mocha';
 import {assert} from 'chai';
 import { loadKpjJsonSchema, makePathToFixture } from '../helpers/index.js';
-import KPJFileReader from "../../src/kpj/kpj-file-reader.js";
+import { KPJFileReader } from "../../src/kpj/kpj-file-reader.js";
 import { KeymanDeveloperProjectType } from '../../src/kpj/keyman-developer-project.js';
 
 describe('kpj-file-reader', function () {

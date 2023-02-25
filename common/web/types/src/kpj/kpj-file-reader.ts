@@ -4,7 +4,7 @@ import Ajv from 'ajv';
 import { boxXmlArray } from '../util/util.js';
 import { KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanDeveloperProjectType } from './keyman-developer-project.js';
 
-export default class KPJFileReader {
+export class KPJFileReader {
   public read(file: Uint8Array): KPJFile {
     let data: KPJFile;
 
