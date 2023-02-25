@@ -479,16 +479,17 @@ For each key:
 | Bit position | Meaning  | Comment                                     |
 |--------------|----------|---------------------------------------------|
 | `0x00000000` | `none`   | All zeros = no modifiers                    |
-|      0       | `ctrlL`  | `ctrl = ctrlL + ctrlR`                      |
-|      1       | `ctrlR`  |                                             |
-|      2       | `altL`   |                                             |
-|      3       | `altR`   | `alt` (both) = `altL + altR`                |
-|      4       | `shift`  | Either shift                                |
-|      8       | `caps`   |                                             |
+|      0       | `ctrlL`  | Left Control                                |
+|      1       | `ctrlR`  | Right Control                               |
+|      2       | `altL`   | Left Alt                                    |
+|      3       | `altR`   | Right Alt                                   |
+|      4       | `shift`  | Either Shift                                |
+|      5       | `ctrl`   | Either Control                              |
+|      6       | `alt`    | Either Alt                                  |
+|      8       | `caps`   | Caps lock                                   |
 
 TODO-LDML: Note that conforming to other keyman values, left versus right shift
-cannot be distinguished. Also note that `cmd` and `opt` do not match
-other keyman values.
+cannot be distinguished.
 
 TODO-LDML: Note that 'Current' LDML spec allows `shiftL`/`shiftR`, `opt`,
 and `cmd` but there is a request to drop these. These four are not represented
