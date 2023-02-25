@@ -121,12 +121,13 @@ make-kmcomp-install-zip: copy-schemas
         kmdecomp.exe \
         keyboard_info.source.json keyboard_info.distribution.json \
         keyman-touch-layout.spec.json keyman-touch-layout.clean.spec.json \
-        kpj.schema.json kvks.schema.json \
-        ldml-keyboard.schema.json ldml-keyboardtest.schema.json \
         xml\layoutbuilder\*.keyman-touch-layout \
         projects\* \
         server\*
 
+# TODO: are these required?
+# kpj.schema.json kvks.schema.json \
+# ldml-keyboard.schema.json ldml-keyboardtest.schema.json \
 
 copy-schemas:
     copy $(KEYMAN_ROOT)\common\schemas\keyboard_info\keyboard_info.source.json $(DEVELOPER_ROOT)\bin
