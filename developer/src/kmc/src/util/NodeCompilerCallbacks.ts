@@ -33,4 +33,11 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     let schemaPath = new URL('kvks.schema.json', import.meta.url);
     return fs.readFileSync(schemaPath);
   }
+  loadKpjJsonSchema(): Buffer {
+    let schemaPath = new URL('kpj.schema.json', import.meta.url);
+    return fs.readFileSync(schemaPath);
+  }
+  forceDirectories(dir: string): void {
+    fs.mkdirSync(dir, {recursive:true});
+  }
 }
