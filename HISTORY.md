@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.57 alpha 2023-02-26
+
+* chore(android/app): Revert #8291 (#8314)
+
 ## 17.0.56 alpha 2023-02-24
 
 * fix(linux): Fix upload in packaging GHA (#8308)
