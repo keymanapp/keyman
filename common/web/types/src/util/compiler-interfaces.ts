@@ -43,7 +43,6 @@ export interface CompilerCallbacks {
   reportMessage(event: CompilerEvent): void;
   loadKvksJsonSchema(): Buffer;
   loadKpjJsonSchema(): Buffer;
-  forceDirectories(dir: string): void;
 };
 
 /**

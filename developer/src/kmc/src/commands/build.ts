@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { Command } from 'commander';
 import { buildPackage } from '../activities/buildPackage.js';
 import { buildKmnKeyboard } from '../activities/buildKmnKeyboard.js';
@@ -53,11 +54,10 @@ async function build(infile: string, options: BuildCommandOptions): Promise<bool
   if(infile.endsWith('.kpj')) {
     return buildProject(infile, options);
   }
-/*
+
   if(fs.statSync(infile).isDirectory()) {
-    return buildProjectFolder(infile, options);
+    return buildProject(infile, options);
   }
-*/
 
   console.error(`Unrecognised input file ${infile}, expecting .xml, .kmn, .kps, .model.ts, .kpj, or project folder`);
   process.exit(2);

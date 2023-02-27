@@ -13,8 +13,7 @@
         }
       },
       "required": [
-        "Options",
-        "Files"
+        "Options"
       ],
       "additionalProperties": false,
       "type": "object"
@@ -29,6 +28,9 @@
       "type": "object",
       "properties": {
         "BuildPath": {
+          "type": "string"
+        },
+        "SourcePath": {
           "type": "string"
         },
         "CompilerWarningsAsErrors": {
@@ -48,7 +50,8 @@
           "pattern": "^(keyboard|lexicalmodel)$"
         },
         "Version": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^(1\\.0|2\\.0)$"
         }
       },
       "required": [
