@@ -36,16 +36,18 @@ if builder_start_action clean; then
   rm -rf ./build/ ./tsconfig.tsbuildinfo
   builder_finish_action success clean
 else
-  # We need the schema file at runtime and bundled, so always copy it for all actions except `clean`
+  # We need the schema files at runtime and bundled, so always copy it for all actions except `clean`
   mkdir -p "$THIS_SCRIPT_PATH/build/src/"
   cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json" "$THIS_SCRIPT_PATH/build/src/"
   cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboardtest.schema.json" "$THIS_SCRIPT_PATH/build/src/"
   cp "$KEYMAN_ROOT/common/schemas/kvks/kvks.schema.json" "$THIS_SCRIPT_PATH/build/src/"
+  cp "$KEYMAN_ROOT/common/schemas/kpj/kpj.schema.json" "$THIS_SCRIPT_PATH/build/src/"
   cp "$KEYMAN_ROOT/common/schemas/keyman-touch-layout/keyman-touch-layout.clean.spec.json" "$THIS_SCRIPT_PATH/build/src/"
   # Store CLDR imports
   # load all versions that have a cldr_info.json
   for CLDR_INFO_PATH in "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/"*/cldr_info.json
   do
+    # TODO-LDML: developer/src/inst/download.in.mak needs these also...
     CLDR_PATH=$(dirname "$CLDR_INFO_PATH")
     CLDR_VER=$(basename "$CLDR_PATH")
     mkdir -p "$THIS_SCRIPT_PATH/build/src/import/$CLDR_VER"

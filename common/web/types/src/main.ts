@@ -21,3 +21,7 @@ export { CommonTypesMessages } from './util/common-events.js';
 export * as TouchLayout from './keyman-touch-layout/keyman-touch-layout-file.js';
 export { TouchLayoutFileReader } from './keyman-touch-layout/keyman-touch-layout-file-reader.js';
 export { TouchLayoutFileWriter, TouchLayoutFileWriterOptions } from './keyman-touch-layout/keyman-touch-layout-file-writer.js';
+
+export * as KPJ from './kpj/kpj-file.js';
+export { KPJFileReader } from './kpj/kpj-file-reader.js';
+export { KeymanDeveloperProject } from './kpj/keyman-developer-project.js';

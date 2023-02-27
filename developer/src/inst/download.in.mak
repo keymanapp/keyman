@@ -125,6 +125,9 @@ make-kmcomp-install-zip: copy-schemas
         projects\* \
         server\*
 
+# TODO: are these required?
+# kpj.schema.json kvks.schema.json \
+# ldml-keyboard.schema.json ldml-keyboardtest.schema.json \
 
 copy-schemas:
     copy $(KEYMAN_ROOT)\common\schemas\keyboard_info\keyboard_info.source.json $(DEVELOPER_ROOT)\bin
