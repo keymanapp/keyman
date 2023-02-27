@@ -55,11 +55,17 @@ class TestCompilerCallbacks implements CompilerCallbacks {
     // console.log(event.message);
     this.messages.push(event);
   }
+  forceDirectories(dir: string): void {
+    fs.mkdirSync(dir, {recursive:true});
+  }
   loadLdmlKeyboardSchema(): Buffer {
     return fs.readFileSync(new URL(path.join('..', '..', 'src', 'ldml-keyboard.schema.json'), import.meta.url));
   }
   loadKvksJsonSchema(): Buffer {
     return fs.readFileSync(new URL(path.join('..', '..', 'src', 'kvks.schema.json'), import.meta.url));
+  }
+  loadKpjJsonSchema(): Buffer {
+    return fs.readFileSync(new URL(path.join('..', '..', 'src', 'kpj.schema.json'), import.meta.url));
   }
   loadLdmlKeyboardTestSchema(): Buffer {
     return fs.readFileSync(new URL(path.join('..', '..', 'src', 'ldml-keyboardtest.schema.json'), import.meta.url));
