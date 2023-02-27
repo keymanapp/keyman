@@ -25,6 +25,13 @@ android {
         }
     }
 
+    // Sepcify library filename keyman-engine.aar
+    libraryVariants.all { variant -> 
+        variant.outputs.all {
+            outputFileName = "keyman-engine.aar"
+        }
+    }
+
     // TODO: Remove ResourceType when SDK > 17
     lintOptions {
         disable 'ImpliedQuantity', 'MissingQuantity', 'MissingTranslation', 'ResourceType'
