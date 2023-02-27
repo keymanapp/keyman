@@ -6,8 +6,8 @@ import ContextManager from './contextManager.js';
 import PassthroughKeyboard from './passthroughKeyboard.js';
 
 export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKeyboard> {
-  constructor(config: Configuration) {
-    super(config, new ContextManager());
+  constructor(config: Configuration, worker: Worker) {
+    super(config, worker, new ContextManager());
 
     this.hardKeyboard = new PassthroughKeyboard(config.hardDevice);
   }

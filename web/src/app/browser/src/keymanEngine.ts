@@ -4,10 +4,11 @@ import { Configuration } from "keyman/engine/configuration";
 
 import ContextManager from './contextManager.js';
 import DefaultOutput from './defaultOutput.js';
+import KeyEventKeyboard from './keyEventKeyboard.js';
 
-export class KeymanEngine extends KeymanEngineBase<ContextManager, never /* Not yet implemented */> {
-  constructor(config: Configuration) {
-    super(config, new ContextManager());
+export class KeymanEngine extends KeymanEngineBase<ContextManager, KeyEventKeyboard> {
+  constructor(config: Configuration, worker: Worker) {
+    super(config, worker, new ContextManager());
   }
 
   protected processorConfiguration(): ProcessorInitOptions {

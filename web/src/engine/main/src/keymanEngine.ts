@@ -2,7 +2,6 @@ import { Configuration } from "keyman/engine/configuration";
 import { DefaultOutput, Keyboard, KeyboardKeymanGlobal, OutputTarget, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
 import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
 import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
-import { Worker } from "@keymanapp/lexical-model-layer/web";
 import { OSKView } from "keyman/engine/osk";
 import { StubAndKeyboardCache } from "keyman/engine/keyboard-cache";
 
@@ -68,14 +67,14 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
     };
   };
 
-  constructor(config: Configuration, contextManager: ContextManager) {
+  constructor(config: Configuration, worker: Worker, contextManager: ContextManager) {
     this.config = config;
     this.contextManager = contextManager;
 
     // Since we're not sandboxing keyboard loads yet, we just use `window` as the jsGlobal object.
     this.interface = new KeyboardInterface(window, this, this.cache, this.contextManager);
     this.keyboardLoader = new KeyboardLoader(this.interface);
-    this.processor = new InputProcessor(config.hostDevice, Worker.constructInstance(), this.processorConfiguration());
+    this.processor = new InputProcessor(config.hostDevice, worker, this.processorConfiguration());
 
     this.cache.on('stubAdded', (stub) => {
       let eventRaiser = () => {
