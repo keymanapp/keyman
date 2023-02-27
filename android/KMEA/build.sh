@@ -27,7 +27,6 @@ CONFIG="release"
 BUILD_FLAGS="aR -x lint -x test"           # Gradle build w/o test
 TEST_FLAGS="-x aR lintRelease testRelease" # Gradle test w/o build
 JUNIT_RESULTS="##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
-ARTIFACT="keyman-engine.aar"
 
 builder_describe "Builds Keyman Engine for Android." \
   "@../../web" \
@@ -38,18 +37,6 @@ builder_describe "Builds Keyman Engine for Android." \
   ":engine          Builds Engine" \
   "--ci             Don't start the Gradle daemon. For CI"
 
-builder_describe_outputs \
-  build:engine     app/build/outputs/aar/${ARTIFACT}
-
-#### Build
-
-#
-# Prevents 'clear' on exit of mingw64 bash shell
-#
-SHLVL=0
-
-
-# Parse args
 # parse before describe_outputs to check debug flags
 builder_parse "$@"
 
@@ -60,6 +47,18 @@ if builder_has_option --debug; then
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
   JUNIT_RESULTS="##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testDebugUnitTest\']"
 fi
+
+builder_describe_outputs \
+  build:engine     app/build/outputs/aar/${CONFIG}/keyman-engine.aar
+
+#### Build
+
+#
+# Prevents 'clear' on exit of mingw64 bash shell
+#
+SHLVL=0
+
+# Parse args
 
 DAEMON_FLAG=
 if builder_has_option --ci; then
@@ -111,9 +110,6 @@ if builder_start_action build:engine; then
   echo "BUILD_FLAGS $BUILD_FLAGS"
   # Build without test
   ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
-
-  # Copy ARTIFACT to "keyman-engine.aar"
-  # cp "$KEYMAN_ROOT/android/KMEA/app/build/outputs/aar/${ARTIFACT}" "$KEYMAN_ROOT/android/KMEA/app/build/outputs/aar/keyman-engine.aar"
 
   builder_finish_action success build:engine
 fi

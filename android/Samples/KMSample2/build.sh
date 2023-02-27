@@ -45,6 +45,7 @@ ARTIFACT="app-$CONFIG.apk"
 
 
 builder_describe_outputs \
+  configure             app/libs/keyman-engine.aar \
   build:app             app/build/outputs/apk/$CONFIG/$ARTIFACT
 
 #

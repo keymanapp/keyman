@@ -25,10 +25,10 @@ android {
         }
     }
 
-    // Sepcify library filename keyman-engine.aar
+    // Sepcify library filename $CONFIG/keyman-engine.aar
     libraryVariants.all { variant -> 
         variant.outputs.all {
-            outputFileName = "keyman-engine.aar"
+            outputFileName = "${variant.buildType.name}/keyman-engine.aar"
         }
     }
 
