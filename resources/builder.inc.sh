@@ -553,7 +553,7 @@ _builder_child_base=
 #            the base folder to use for child-project detection and resolution
 #
 builder_set_child_base() {
-  _builder_child_base="$1"
+  _builder_child_base="$1/"
 }
 
 #
@@ -657,8 +657,8 @@ builder_describe() {
       else
         # If the target name matches a folder name, implicitly
         # make it available as a child project
-        if [[ -d "$THIS_SCRIPT_PATH/$_builder_child_base/${value:1}" ]]; then
-          target_path="$_builder_child_base/${value:1}"
+        if [[ -d "$THIS_SCRIPT_PATH/$_builder_child_base${value:1}" ]]; then
+          target_path="$_builder_child_base${value:1}"
         fi
       fi
       _builder_targets+=($value)
