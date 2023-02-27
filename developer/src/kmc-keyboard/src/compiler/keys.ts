@@ -18,6 +18,25 @@ export class KeysCompiler extends SectionCompiler {
   public validate() {
     let valid = true;
 
+    // general key-level validation here, only of used keys
+    const usedKeys = allUsedKeyIdsInLayers(this.keyboard?.layers);
+    const uniqueKeys = calculateUniqueKeys([...this.keyboard.keys?.key]);
+    for (let key of uniqueKeys) {
+      const {id, flicks} = key;
+      if (!usedKeys.has(id)) {
+        continue; // unused key, ignore
+      }
+      // TODO-LDML: further key-level validation here
+      if (!flicks) {
+        continue; // no flicks
+      }
+      const flickEntry = this.keyboard.keys?.flicks?.find(x => x.id === flicks);
+      if (!flickEntry ) {
+        valid = false;
+        this.callbacks.reportMessage(CompilerMessages.Error_MissingFlicks({flicks, id}));
+      }
+    }
+
     // Kmap validation
     const theLayers = this.keyboard.layers?.[0]; // TODO-LDML: handle >1 layers. #8160
 
@@ -92,12 +111,11 @@ export class KeysCompiler extends SectionCompiler {
 
     for (let key of uniqueKeys) {
       if (!usedKeys.has(key.id)) {
-        // TODO-LDML: linting for unused keys
+        // TODO-LDML: linting for unused, non-implied and non-imported keys,
         continue; // unused key, skip
       }
       let flags = 0;
       const flicks = key.flicks;
-      // TODO-LDML: verify that this flick id exists
       if (!!key.gap) {
         flags |= constants.keys_key_flags_gap;
       }
