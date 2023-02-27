@@ -290,7 +290,7 @@ _builder_execute_child() {
     result=$?
     echo "${COLOR_RED}## $scope$action$target failed with exit code $result${COLOR_RESET}"
     exit $result
-  )
+  ) || exit $? # Required due to above subshell masking exit
 }
 
 _builder_run_child_action() {
@@ -1263,7 +1263,7 @@ _builder_do_build_deps() {
     # Don't attempt to build dependencies that don't match the current
     # action:target (wildcards supported for matches here)
     if ! _builder_should_build_dep "$action_target" "$dep"; then
-      echo "[$THIS_SCRIPT_IDENTIFIER] Skipping dependency build $dep for $_builder_matched_action_name"
+      echo "[$THIS_SCRIPT_IDENTIFIER] Skipping dependency $dep for $_builder_matched_action_name"
       continue
     fi
 
@@ -1279,7 +1279,15 @@ _builder_do_build_deps() {
       $builder_debug \
       $_builder_build_deps \
       --builder-deps-built "$_builder_deps_built" \
-      --builder-dep-parent "$THIS_SCRIPT_IDENTIFIER"
+      --builder-dep-parent "$THIS_SCRIPT_IDENTIFIER" && (
+      if $_builder_debug; then
+        echo "${COLOR_GREEN}## [$THIS_SCRIPT_IDENTIFIER] Dependency $dep for $_builder_matched_action_name successfully${COLOR_RESET}"
+      fi
+    ) || (
+      result=$?
+      echo "${COLOR_RED}## [$THIS_SCRIPT_IDENTIFIER] Dependency failed with exit code $result${COLOR_RESET}"
+      exit $result
+    ) || exit $? # Required due to above subshell masking exit
   done
 }
 
