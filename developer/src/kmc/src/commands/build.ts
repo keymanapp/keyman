@@ -1,5 +1,12 @@
 import { Command } from 'commander';
+import { buildKmnKeyboard } from '../activities/buildKmnKeyboard.js';
 import { buildLdmlKeyboard } from '../activities/buildLdmlKeyboard.js';
+
+export interface BuildCommandOptions {
+  debug?: boolean;
+  outFile?: string;
+  compilerVersion?: boolean;
+};
 
 export function declareBuild(program: Command) {
   program
@@ -19,18 +26,19 @@ export function declareBuild(program: Command) {
     });
 }
 
-function build(infile: string, options: any) {
+function build(infile: string, options: BuildCommandOptions) {
   console.log(`Building ${infile}`);
 
   if(infile.endsWith('.xml')) {
     return buildLdmlKeyboard(infile, options);
   }
 
-/*
+
   if(infile.endsWith('.kmn')) {
     return buildKmnKeyboard(infile, options);
   }
 
+  /*
   if(infile.endsWith('.kps')) {
     return buildPackage(infile, options);
   }

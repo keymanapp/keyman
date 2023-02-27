@@ -3,8 +3,9 @@ import * as fs from 'fs';
 import * as kmc from '@keymanapp/kmc-keyboard';
 import { KvkFileWriter, CompilerCallbacks } from '@keymanapp/common-types';
 import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
+import { BuildCommandOptions } from '../commands/build.js';
 
-export function buildLdmlKeyboard(infile: string, options: any) {
+export function buildLdmlKeyboard(infile: string, options: BuildCommandOptions) {
   // TODO-LDML: consider hardware vs touch -- touch-only layout will not have a .kvk
   // Compile:
   let [kmx,kvk,kmw] = buildLdmlKeyboardToMemory(infile, options);
@@ -34,7 +35,7 @@ export function buildLdmlKeyboard(infile: string, options: any) {
   }
 }
 
-function buildLdmlKeyboardToMemory(inputFilename: string, options: any): [Uint8Array, Uint8Array, Uint8Array] {
+function buildLdmlKeyboardToMemory(inputFilename: string, options: BuildCommandOptions): [Uint8Array, Uint8Array, Uint8Array] {
   let compilerOptions: kmc.CompilerOptions = {
     debug: options.debug ?? false,
     addCompilerVersion: options.compilerVersion ?? true
