@@ -4,6 +4,7 @@ import { AnchoredOSKView, ViewConfiguration, StaticActivator } from 'keyman/engi
 
 import ContextManager from './contextManager.js';
 import PassthroughKeyboard from './passthroughKeyboard.js';
+import { buildEmbeddedGestureConfig, setupEmbeddedListeners } from './oskConfiguration.js';
 
 export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKeyboard> {
   constructor(config: Configuration, worker: Worker) {
@@ -19,9 +20,11 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
       hostDevice: this.config.hostDevice,
       pathConfig: this.config.paths,
       // When hosted in a WebView, we never hide the Web OSK without hiding the hosting WebView.
-      activator: new StaticActivator()
+      activator: new StaticActivator(),
+      embeddedGestureConfig: buildEmbeddedGestureConfig(this.config.softDevice)
     }
 
     this.osk = new AnchoredOSKView(oskConfig);
+    setupEmbeddedListeners(this.osk);
   }
 }

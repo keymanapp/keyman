@@ -9,7 +9,16 @@ export { BannerController } from './banner/bannerView.js';
 export { FloatingOSKCookie as FloatingOSKViewCookie } from './views/floatingOskCookie.js';
 export { default as VisualKeyboard } from './visualKeyboard.js';
 export { type default as OSKResourcePathConfiguration } from './config/oskResourcePathConfiguration.interface.js';
-export type { default as ViewConfiguration } from './config/viewConfiguration.js';
+export { type default as ViewConfiguration } from './config/viewConfiguration.js';
+export { type KeyElement } from './keyElement.js';
+export { type default as OSKBaseKey } from './keyboard-layout/oskBaseKey.js';
+export { type default as GlobeHint } from './globehint.interface.js';
+export { type default as KeyTip } from './keytip.interface.js';
+export { type default as PendingGesture } from './input/gestures/pendingGesture.interface.js';
+export { type default as RealizedGesture } from './input/gestures/realizedGesture.interface.js';
+export { type OSKKeySpec } from './keyboard-layout/oskKey.js';
+export { type default as InputEventCoordinate } from './input/inputEventCoordinate.js';
+export { type default as EmbeddedGestureConfig } from './config/embeddedGestureConfig.js';
 
 export { default as Activator, StaticActivator } from './views/activator.js';
 export { default as SimpleActivator } from './views/simpleActivator.js';

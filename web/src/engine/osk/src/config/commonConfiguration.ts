@@ -1,5 +1,6 @@
 import { DeviceSpec } from "@keymanapp/web-utils";
 
+import EmbeddedGestureConfig from './embeddedGestureConfig.js';
 import OSKResourcePathConfiguration from "./oskResourcePathConfiguration.interface.js";
 
 export default interface CommonConfiguration {
@@ -23,4 +24,10 @@ export default interface CommonConfiguration {
    * Configured paths usable to find OSK resources.
    */
   pathConfig: OSKResourcePathConfiguration;
+
+  /**
+   * Allows control-flow forwarding of gestures that may have special implementation when
+   * embedded within a WebView.
+   */
+  embeddedGestureConfig?: EmbeddedGestureConfig;
 }

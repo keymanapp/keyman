@@ -45,8 +45,8 @@ function init() {
     kmw.init({'app':device,'fonts':'fonts/'});//.then(function() {
         kmw['util']['setOption']('attachType','manual');
         kmw['oninserttext'] = insertText;
-        kmw['showKeyboardList'] = menuKeyDown;
-        kmw['hideKeyboard'] = hideKeyboard;
+        window['showKeyboardList'] = menuKeyDown;
+        window['hideKeyboard'] = hideKeyboard;
         kmw['getOskHeight'] = getOskHeight;
         kmw['getOskWidth'] = getOskWidth;
         kmw['beepKeyboard'] = beepKeyboard;

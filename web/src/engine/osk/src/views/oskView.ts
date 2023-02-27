@@ -7,6 +7,7 @@ import HelpPageView from '../components/helpPageView.js';
 import KeyboardView from '../components/keyboardView.interface.js';
 import VisualKeyboard from '../visualKeyboard.js';
 import { LengthStyle, ParsedLengthStyle } from '../lengthStyle.js';
+import { type KeyElement } from '../keyElement.js';
 
 import {
   Codes,
@@ -111,6 +112,8 @@ interface EventMap {
   onhide(hiddenByUser: boolean): void;
 
   /**
+   *
+   * When `on` == `true`:
    ```
 // Display list of installed keyboards in pop-up menu
 
@@ -126,8 +129,19 @@ showLanguageMenu() {
 }
   ```
    */
-  shouldShowLanguageMenu: (e: HTMLElement) => void;
-  shouldHideLanguageMenu: () => void;
+  globeKey: (e: KeyElement, on: boolean) => void;
+
+  /**
+   * A virtual keystroke corresponding to a "hide" command has been received.
+   *
+   * Original handling:
+   ```
+keyman.uiManager.setActivatingUI(false);
+oskManager.startHide(true);
+keyman.domManager.lastActiveElement = null;
+   ```
+   */
+  hideRequested: (key: KeyElement) => void;
 
   /**
    * This event is raised when the OSK's 'config' button is clicked.
@@ -322,6 +336,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
     this.config.device = configuration.device || configuration.hostDevice;
 
     this.config.isEmbedded = configuration.isEmbedded || false;
+    this.config.embeddedGestureConfig = configuration.embeddedGestureConfig || {};
     this.config.activator.on('activate', this.activationListener);
 
     // OSK initialization - create DIV and set default styles
@@ -837,8 +852,12 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
     if(this.vkbd) {
       // Create the key preview (for phones)
       this.vkbd.createKeyTip();
+
       // Create the globe hint (for embedded contexts; has a stub for other contexts)
-      this.vkbd.createGlobeHint();
+      const globeHint = this.vkbd.createGlobeHint();
+      if(globeHint) {
+        this._Box.appendChild(globeHint.element);
+      }
 
       // Append a stylesheet for this keyboard for keyboard specific styles
       // or if needed to specify an embedded font
@@ -896,11 +915,16 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
       hostDevice: this.hostDevice,
       topContainer: this._Box,
       styleSheetManager: this.kbdStyleSheetManager,
-      pathConfig: this.config.pathConfig
+      pathConfig: this.config.pathConfig,
+      embeddedGestureConfig: this.config.embeddedGestureConfig
     });
 
     vkbd.on('keyEvent', (keyEvent) => this.emit('keyEvent', keyEvent));
-    vkbd.on('globeKey', (keyElement) => this.emit('shouldShowLanguageMenu', keyElement));
+    vkbd.on('globeKey', (keyElement, on) => this.emit('globeKey', keyElement, on));
+    vkbd.on('hideRequested', (keyElement) => {
+      this.doHide(true);
+      this.emit('hideRequested', keyElement);
+    });
 
     // Set box class - OS and keyboard added for Build 360
     this._Box.className=device.formFactor+' '+ device.OS.toLowerCase() + ' kmw-osk-frame';

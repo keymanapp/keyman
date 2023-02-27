@@ -1,9 +1,3 @@
-// Since 'web' compilation is the path recognized by VSCode, we need to make references here to prevent TS errors.
-// References the base Keyman object (and consequently, the rest of the core objects).
-/// <reference path="osk/embedded/keytip.ts" />
-/// <reference path="osk/embedded/pendingLongpress.ts" />
-/// <reference path="osk/embedded/globeHint.ts" />
-
 // KeymanWeb 11.0
 // Copyright 2019 SIL International
 
@@ -12,91 +6,6 @@
 /*   Embedded application-specific code  */
 /*                                       */
 /*****************************************/
-
-namespace com.keyman.osk {
-  VisualKeyboard.prototype.optionKey = function(this: VisualKeyboard, e: KeyElement, keyName: string, keyDown: boolean) {
-    let keyman = com.keyman.singleton;
-
-    if(keyName.indexOf('K_LOPT') >= 0) {
-      if(keyDown) {
-        this.menuEvent = e;
-        if(typeof keyman['showKeyboardList'] == 'function') {
-          keyman['showKeyboardList']();
-        }
-      } else {
-        if(this.menuEvent) {
-          this.highlightKey(this.menuEvent, false);
-        }
-        if(typeof(window['menuKeyUp']) == 'function') {
-          window['menuKeyUp']();
-        }
-        this.menuEvent = null;
-      }
-    } else if(keyName.indexOf('K_ROPT') >= 0) {
-      if(keyDown) {
-        this.highlightKey(e,false);
-        if(typeof keyman['hideKeyboard'] == 'function') {
-          keyman['hideKeyboard']();
-        }
-      }
-    }
-  };
-
-  // iOS now relies upon native-mode popup key management, so we only implement these hybrid-targeted
-  // methods when embedding in Android.
-  let device = com.keyman.singleton.util.device;
-
-  if(device.OS == 'Android') { // assumption - if this file is being loaded, keyman.isEmbedded == true.
-    // Send the subkey array to iOS, with centre,top of base key position
-    /**
-     * Create a popup key array natively
-     *
-     * @param {Object}  key   base key element
-     */
-    VisualKeyboard.prototype.startLongpress = function(this: VisualKeyboard, key: KeyElement): PendingGesture {
-      if(typeof(window['oskCreatePopup']) == 'function') {
-        var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
-            yBase = dom.Utils.getAbsoluteY(key);
-
-        // #3718: No longer prepend base key to subkey array
-        window['oskCreatePopup'](key['subKeys'], xBase, yBase, key.offsetWidth, key.offsetHeight);
-
-        return new embedded.PendingLongpress(this, key);
-      } else {
-        // When embedded within our Android app, we expect the `oskCreatePopup` function to
-        // exist; all subkey control is delegated to the app.
-        //
-        // No function = big problem.
-        console.error("Missing `oskCreatePopup` function for engine integration.");
-        return null;
-      }
-    };
-
-    VisualKeyboard.prototype.createKeyTip = function(this: VisualKeyboard) {
-      if(com.keyman.singleton.util.device.formFactor == 'phone') {
-        this.keytip = new osk.embedded.KeyTip(window['oskCreateKeyPreview'], window['oskClearKeyPreview']);
-      }
-    };
-  } // end Android-only block.
-
-  VisualKeyboard.prototype.createGlobeHint = function(this: VisualKeyboard) {
-    this.globeHint = new com.keyman.osk.embedded.GlobeHint(this);
-    let keyman = com.keyman.singleton;
-    keyman.osk._Box.appendChild(this.globeHint.element!);
-  }
-
-  SuggestionManager.prototype.platformHold = function(this: SuggestionManager, suggestionObj: BannerSuggestion, isCustom: boolean) {
-    // Parallels VisualKeyboard.prototype.touchHold, but for predictive suggestions instead of keystrokes.
-    let suggestionEle = suggestionObj.div;
-
-    // Need to know if it's a <keep> option or not!
-
-    var xBase = dom.Utils.getAbsoluteX(suggestionEle) - dom.Utils.getAbsoluteX(suggestionEle.parentElement) + suggestionEle.offsetWidth/2,
-        yBase = dom.Utils.getAbsoluteY(suggestionEle) - dom.Utils.getAbsoluteY(suggestionEle.parentElement);
-
-    window['suggestionPopup'](suggestionObj.suggestion, isCustom, xBase, yBase, suggestionEle.offsetWidth, suggestionEle.offsetHeight);
-  }
-}
 
 (function() {
   // Declare KeymanWeb and related objects
