@@ -13,14 +13,14 @@ export function setupEmbeddedListeners(osk: OSKView) {
       if(typeof window['showKeyboardList'] == 'function') { // OSKView event: shouldShowLanguageMenu
         window['showKeyboardList']();                       // Is connected to VisualKeyboard event: globeKey
       }
-    } else {
-      if(this.menuEvent) {
-        this.highlightKey(this.menuEvent, false);
+    } else if(osk.vkbd) {
+      if(osk.vkbd.menuEvent) {
+        this.highlightKey(osk.vkbd.menuEvent, false);
       }
       if(typeof(window['menuKeyUp']) == 'function') { // VisualKeyboard event:  globeKey
         window['menuKeyUp']();
       }
-      this.menuEvent = null;
+      osk.vkbd.menuEvent = null;
     }
 
     if(osk.vkbd) {

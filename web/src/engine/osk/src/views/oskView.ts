@@ -60,26 +60,27 @@ interface EventMap {
     var Lelem = keyman.domManager.lastActiveElement;
 
     if(Lelem != null) {
-      // Handle any DOM state management related to click inputs.
+      // Handle any DOM state management related to click inputs.   // To be done:  handled through ContextManager
       let outputTarget = dom.Utils.getOutputTarget(Lelem);
       keyman.domManager.initActiveElement(Lelem);
 
-      // Clear any cached codepoint data; we can rebuild it if it's unchanged.
+      // Clear any cached codepoint data; we can rebuild it if it's unchanged.     // Handled!
       outputTarget.invalidateSelection();
       // Deadkey matching continues to be troublesome.
       // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
       outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
 
-      if(!keyman.isEmbedded) {
+      if(!keyman.isEmbedded) { // To be done:  handled through ContextManager
         keyman.uiManager.setActivatingUI(true);
         com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
         keyman.domManager.focusLastActiveElement();
         com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
       }
 
-      let retVal = !!keyman.core.processKeyEvent(Lkc, outputTarget);
+      let retVal = !!keyman.core.processKeyEvent(Lkc, outputTarget);              // Handled!
 
       // Now that processing is done, we can do a bit of post-processing, too.
+      // To be done:  handled through ContextManager
       keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
       return retVal;
     } else {
@@ -102,44 +103,17 @@ interface EventMap {
   onshow(): void;
   /**
    *
-  ```
-    // If hidden by the UI, be sure to restore the focus
-    if(hiddenByUser && this.activeTarget) {
-      this.activeTarget?.focus();
-    }
-  ```
    */
   onhide(hiddenByUser: boolean): void;
 
   /**
-   *
-   * When `on` == `true`:
-   ```
-// Display list of installed keyboards in pop-up menu
-
-// In the future, this language menu should be defined as a UI module like the standard
-// desktop UI modules.  The globe key should then trigger an event to _request_ that the
-// consuming engine display the active UI module's menu.
-
-showLanguageMenu() {
-  if(this.hostDevice.touchable) {
-    this.lgMenu = new LanguageMenu(com.keyman.singleton);
-    this.lgMenu.show();
-  }
-}
-  ```
+   * Indicates that the globe key has either been pressed (`on` == `true`)
+   * or released (`on` == `false`).
    */
   globeKey: (e: KeyElement, on: boolean) => void;
 
   /**
    * A virtual keystroke corresponding to a "hide" command has been received.
-   *
-   * Original handling:
-   ```
-keyman.uiManager.setActivatingUI(false);
-oskManager.startHide(true);
-keyman.domManager.lastActiveElement = null;
-   ```
    */
   hideRequested: (key: KeyElement) => void;
 
