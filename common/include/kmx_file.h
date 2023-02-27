@@ -14,6 +14,7 @@ namespace kbp {
 namespace kmx {
 #endif
 
+#define KMX_MAX_ALLOWED_FILE_SIZE (128 * 1024 * 1024)  /* 128MB */
 /* */
 
 #define KEYMAN_LAYOUT_DEFAULT 0x000005FE
@@ -48,8 +49,10 @@ namespace kmx {
 #define VERSION_140 0x00000E00
 #define VERSION_150 0x00000F00
 
+#define VERSION_160 0x00001000
+
 #define VERSION_MIN VERSION_50
-#define VERSION_MAX VERSION_150
+#define VERSION_MAX VERSION_160
 
 //
 // Backspace types
@@ -261,6 +264,9 @@ namespace kmx {
 #define KF_LOGICALLAYOUT  0x0008
 #define KF_AUTOMATICVERSION 0x0010
 
+// 16.0: Support for LDML Keyboards in KMXPlus file format
+#define KF_KMXPLUS  0x0020
+
 #define HK_ALT      0x00010000
 #define HK_CTRL     0x00020000
 #define HK_SHIFT    0x00040000
@@ -316,7 +322,7 @@ struct COMP_KEYBOARD {
 
   KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
 
-  KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard
+  KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard. DEPRECATED as of 16.0
   KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
   KMX_DWORD IsRegistered;   // 0010
   KMX_DWORD version;        // 0014 keyboard version
@@ -335,7 +341,20 @@ struct COMP_KEYBOARD {
 
   KMX_DWORD dpBitmapOffset; // 0038 offset of the bitmaps in the file
   KMX_DWORD dwBitmapSize;   // 003C size in bytes of the bitmaps
-  };
+};
+
+struct COMP_KEYBOARD_KMXPLUSINFO {
+  KMX_DWORD dpKMXPlus;      // 0040 offset of KMXPlus data, <sect> header is first
+  KMX_DWORD dwKMXPlusSize;  // 0044 size in bytes of entire KMXPlus data
+};
+
+/**
+ * Only valid if comp_keyboard.dwFlags&KF_KMXPLUS
+ */
+struct COMP_KEYBOARD_EX {
+  COMP_KEYBOARD             header;    // 0000 see COMP_KEYBOARD
+  COMP_KEYBOARD_KMXPLUSINFO kmxplus;   // 0040 see COMP_KEYBOARD_EXTRA
+};
 
 typedef COMP_KEYBOARD *PCOMP_KEYBOARD;
 typedef COMP_STORE *PCOMP_STORE;

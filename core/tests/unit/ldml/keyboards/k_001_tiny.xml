@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Note that the corresponding .kmx is currently
+  hand-crafted
+
+@@keys: [K_BKQUOTE][K_1][K_BKQUOTE]
+@@expected: \u0127\u1790\u17B6\u0127
+
+-->
+<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
+<keyboard locale="mt" conformsTo="techpreview">
+  <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
+
+  <names>
+    <name value="TestKbd" />
+  </names>
+
+  <keys>
+    <key id="hmaqtugha" to="ħ" />
+    <key id="that" to="ថា" />
+  </keys>
+
+  <layers form="hardware" hardware="us">
+    <layer id="base">
+      <row keys="hmaqtugha that" /> <!-- number row -->
+    </layer>
+  </layers>
+</keyboard>

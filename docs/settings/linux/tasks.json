@@ -6,6 +6,8 @@
       "label": "core: build",
       "command": "${workspaceFolder}/core/build.sh",
       "args": [
+        "configure:arch",
+        "build:arch",
         "--debug"
       ],
       "options": {
@@ -117,7 +119,7 @@
       "command": "${workspaceFolder}/core/build.sh",
       "args": [
         "--debug",
-        "tests"
+        "test:arch"
       ],
       "problemMatcher": [
         "$gcc"

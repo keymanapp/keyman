@@ -13,7 +13,6 @@ uses
   DUnitX.TestFramework,
   Keyman.System.KMXFileLanguages in '..\..\..\common\delphi\keyboards\Keyman.System.KMXFileLanguages.pas',
   kmxfile in '..\..\..\..\..\common\windows\delphi\keyboards\kmxfile.pas',
-  CRC32 in '..\..\..\..\..\common\windows\delphi\general\CRC32.pas',
   KeyNames in '..\..\..\..\..\common\windows\delphi\general\KeyNames.pas',
   utildir in '..\..\..\..\..\common\windows\delphi\general\utildir.pas',
   utilfiletypes in '..\..\..\..\..\common\windows\delphi\general\utilfiletypes.pas',

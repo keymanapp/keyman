@@ -112,7 +112,6 @@
         <DCCReference Include="..\..\global\delphi\cust\custinterfaces.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
-        <DCCReference Include="..\..\..\..\common\windows\delphi\general\CRC32.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\MessageIdentifiers.pas"/>
         <DCCReference Include="kmint.pas"/>

@@ -166,6 +166,7 @@ resources/environment.sh
 /core/VERSION.md
 
 **/node_modules/
+tsconfig.tsbuildinfo
 
 # Windows system files
 Thumbs.db
@@ -173,6 +174,13 @@ Thumbs.db
 # Temporary file for logging scripts in xcode runs, see build-utils.sh for
 # details
 /xcodebuild-scripts.log
+
+#
+# Code coverage tools for JS/TS - nyc and c8
+#
+.nyc_output/
+lcov-report/
+lcov.info
 
 # Linux packaging related
 /debian/
