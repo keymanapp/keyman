@@ -35,6 +35,7 @@ builder_describe \
 
 builder_parse "$@"
 
+CONFIG="release"
 DEBUG_FLAG=""
 CI_FLAG=""
 SENTRY_FLAG=""
@@ -44,8 +45,18 @@ if builder_has_option --ci; then
 fi
 
 if builder_has_option --debug; then
+  CONFIG="debug"
   DEBUG_FLAG="--debug"
 fi
+
+builder_describe_outputs \
+  build:engine            KMEA/app/build/outputs/aar/$CONFIG/keyman-engine.aar \
+  build:app               KMAPro/kMAPro/build/outputs/$CONFIG/keyman-${VERSION}.apk \
+  build:sample1           Samples/KMSample1/app/build/outputs/apk/${CONFIG}/app-${CONFIG}.apk \
+  build:sample2           Samples/KMSample2/app/build/outputs/apk/${CONFIG}/app-${CONFIG}.apk \
+  build:keyboardharness   Tests/KeyboardHarness/app/build/outputs/apk/${CONFIG}/app-${CONFIG}.apk \
+  build:fv                ../oem/firstvoices/android/app/build/outputs/apk/$CONFIG/firstvoices-${VERSION}.apk
+
 
 if builder_has_option --upload-sentry; then
   SENTRY_FLAG="--upload-sentry"
@@ -81,13 +92,6 @@ function _clean() {
 if builder_start_action clean; then
   _clean
   builder_finish_action success clean
-fi
-
-# Building Keyman Engine for Android
-if builder_start_action build:engine; then
-  cd "$KEYMAN_ROOT/android/KMEA"
-  ./build.sh build:engine $CI_FLAG $DEBUG_FLAG
-  builder_finish_action success build:engine
 fi
 
 # Building Keyman for Android
@@ -134,8 +138,9 @@ if builder_start_action publish:app; then
   builder_finish_action success publish:app
 fi
 
+# Publish FirstVoices for Android to Play Store
 if builder_start_action publish:fv; then
-  echo "publishing OEM FirstVoices app"
+  echo "publishing OEM FirstVoices Android app"
 
   cd "$KEYMAN_ROOT/android"
   ./build-publish.sh -no-daemon -fv
