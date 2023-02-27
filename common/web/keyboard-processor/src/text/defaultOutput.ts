@@ -213,6 +213,8 @@ export default class DefaultOutput {
         return Codes.codesUS[keyShiftState][1][n-Codes.keyCodes['K_COLON']];
       } else if(n >= Codes.keyCodes['K_LBRKT'] && n <= Codes.keyCodes['K_QUOTE']) {
         return Codes.codesUS[keyShiftState][2][n-Codes.keyCodes['K_LBRKT']];
+      } else if(n == Codes.keyCodes['K_oE2']) {
+        return keyShiftState ? '|' : '\\';
       }
     } catch (e) {
       if(ruleBehavior) {

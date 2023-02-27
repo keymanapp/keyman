@@ -98,30 +98,6 @@ namespace com.keyman.osk {
   }
 }
 
-namespace com.keyman.text {
-  let nativeForBaseKeys = DefaultOutput.forBaseKeys;
-
-  // Overrides the 'native'-mode implementation with in-app friendly defaults prioritized over 'native' defaults.
-  DefaultOutput.forBaseKeys = function(Lkc: KeyEvent): string {
-    let Codes = com.keyman.text.Codes;
-    let code = Lkc.Lcode;
-
-    // Intentionally not assigning K_TAB or K_ENTER so KMW will pass them back
-    // to the mobile apps to handle (insert characters or navigate forms).
-    if (code == Codes.keyCodes.K_oE2) {
-      // Using defaults of English US layout for the 102nd key
-      if (Lkc.Lmodifiers == Codes.modifierCodes['SHIFT']) {
-        return '|';
-      } else {
-        return '\\';
-      }
-    }
-
-    // Use 'native'-mode defaults, determining the character from the OSK
-    return nativeForBaseKeys(Lkc);
-  }
-}
-
 (function() {
   // Declare KeymanWeb and related objects
   var keymanweb=window['keyman'], util=keymanweb['util'],device=util.device;
