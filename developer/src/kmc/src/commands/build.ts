@@ -3,6 +3,7 @@ import { buildPackage } from '../activities/buildPackage.js';
 import { buildKmnKeyboard } from '../activities/buildKmnKeyboard.js';
 import { buildLdmlKeyboard } from '../activities/buildLdmlKeyboard.js';
 import { buildModel } from '../activities/buildModel.js';
+import { buildProject } from '../activities/buildProject.js';
 
 export interface BuildCommandOptions {
   debug?: boolean;
@@ -48,11 +49,11 @@ async function build(infile: string, options: BuildCommandOptions): Promise<bool
   if(infile.endsWith('.model.ts')) {
     return buildModel(infile, options);
   }
-/*
+
   if(infile.endsWith('.kpj')) {
     return buildProject(infile, options);
   }
-
+/*
   if(fs.statSync(infile).isDirectory()) {
     return buildProjectFolder(infile, options);
   }
