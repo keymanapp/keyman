@@ -1125,7 +1125,7 @@ builder_display_usage() {
   echo "Actions: "
 
   for e in "${_builder_actions[@]}"; do
-    if [[ -v _builder_params[$e] ]]; then
+    if _builder_item_in_glob_array "$e" "${_builder_params[@]}"; then
       description="${_builder_params[$e]}"
     else
       description=$(_builder_get_default_description "$e")
@@ -1137,7 +1137,7 @@ builder_display_usage() {
   echo "Targets: "
 
   for e in "${_builder_targets[@]}"; do
-    if [[ -v _builder_params[$e] ]]; then
+    if _builder_item_in_glob_array "$e" "${_builder_params[@]}"; then
       description="${_builder_params[$e]}"
     else
       description=$(_builder_get_default_description "$e")
