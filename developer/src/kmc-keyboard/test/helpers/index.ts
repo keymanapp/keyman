@@ -55,9 +55,6 @@ class TestCompilerCallbacks implements CompilerCallbacks {
     // console.log(event.message);
     this.messages.push(event);
   }
-  forceDirectories(dir: string): void {
-    fs.mkdirSync(dir, {recursive:true});
-  }
   loadLdmlKeyboardSchema(): Buffer {
     return fs.readFileSync(new URL(path.join('..', '..', 'src', 'ldml-keyboard.schema.json'), import.meta.url));
   }

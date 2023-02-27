@@ -4,6 +4,7 @@ import { KeymanDeveloperProjectFile } from '../../../../../common/web/types/src/
 import { BuildCommandOptions } from '../commands/build.js';
 import { buildKmnKeyboard } from './buildKmnKeyboard.js';
 import * as path from 'path';
+import * as fs from 'fs';
 import { buildLdmlKeyboard } from './buildLdmlKeyboard.js';
 import { buildModel } from './buildModel.js';
 import { buildPackage } from './buildPackage.js';
@@ -56,6 +57,9 @@ class ProjectBuilder {
       return false;
     }
 
+    // TODO: generate .keyboard_info from .kps + etc (and support merge of
+    // $PROJECTPATH/.keyboard_info for version 1.0 projects)
+
     return true;
   }
 
@@ -63,6 +67,29 @@ class ProjectBuilder {
     // TODO: callbacks.reportMessage on exceptions
     // TODO: version 2.0 projects are folder-based and scan source/ folder for valid
     // files. .kpj need not exist, but if it does, is used just for options.
+
+    this.infile = path.resolve(this.infile.replace(/\\/g, '/'));
+
+    if(fs.statSync(this.infile).isDirectory()) {
+      // This is a project folder, look for folder-name.kpj
+      this.infile = path.join(this.infile, path.basename(this.infile) + '.kpj');
+    }
+
+    const project = fs.existsSync(this.infile) ?
+      this.loadProjectFromFile() :
+      this.loadDefaultProjectFromFolder();
+
+    return project;
+  }
+
+  loadDefaultProjectFromFolder() {
+    // The folder does not contain a .kpj, so construct a default 2.0 .kpj
+    const project = new KeymanDeveloperProject('2.0');
+    project.populateFiles(this.infile);
+    return project;
+  }
+
+  loadProjectFromFile(): KeymanDeveloperProject {
     const kpjData = this.callbacks.loadFile(null, this.infile);
     const reader = new KPJFileReader();
     const kpj = reader.read(kpjData);
@@ -74,7 +101,7 @@ class ProjectBuilder {
       console.error(e);
       return null;
     }
-    const project = reader.transform(kpj);
+    const project = reader.transform(this.infile, kpj);
     return project;
   }
 
@@ -99,11 +126,13 @@ class ProjectBuilder {
     outputFileType: '.kmx'|'.model.js'|'.kmp'
   ): Promise<boolean> {
     const options = {...this.options};
-    options.outFile = this.resolveOutputFilePath(file, fileType, outputFileType);
-    const infile = this.resolveInputFilePath(file);
+    options.outFile = this.project.resolveOutputFilePath(this.infile, file, fileType, outputFileType);
+    const infile = this.project.resolveInputFilePath(this.infile, file);
     // TODO: callbacks.reportMessage, improve logging and make consistent
     console.log(`Building ${infile}\n  Output ${options.outFile}`);
-    this.callbacks.forceDirectories(path.dirname(options.outFile));
+
+    fs.mkdirSync(path.dirname(options.outFile), {recursive:true});
+
     let result = await buildTarget(infile, options);
     if(result) {
       console.log(`${path.basename(infile )} built successfully.`);
@@ -113,20 +142,4 @@ class ProjectBuilder {
     return result;
   }
 
-  resolveInputFilePath(file: KeymanDeveloperProjectFile): string {
-    let p = path.dirname(this.infile);
-    return path.normalize(path.join(p, file.filePath));
-  }
-
-  resolveOutputFilePath(file: KeymanDeveloperProjectFile, sourceExt: string, targetExt: string): string {
-    // Matches Delphi TProject.GetTargetFileName
-    let p = this.project.options.buildPath || '$SOURCEPATH';
-
-    // Replace placeholders in the target path
-    // TODO: do we need to support $VERSION?
-    p = p.replace('$SOURCEPATH', path.dirname(this.resolveInputFilePath(file)));
-    p = p.replace('$PROJECTPATH', path.dirname(this.infile));
-    let f = file.filename.replace(new RegExp(`\\${sourceExt}$`, 'i'), targetExt);
-    return path.normalize(path.join(p, f));
-  }
 }

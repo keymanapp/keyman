@@ -1,8 +1,8 @@
 import * as xml2js from 'xml2js';
-import { KPJFile } from './kpj-file.js';
+import { KPJFile, KPJFileProject } from './kpj-file.js';
 import Ajv from 'ajv';
 import { boxXmlArray } from '../util/util.js';
-import { KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanDeveloperProjectType } from './keyman-developer-project.js';
+import { KeymanDeveloperProject, KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from './keyman-developer-project.js';
 
 export class KPJFileReader {
   public read(file: Uint8Array): KPJFile {
@@ -36,13 +36,18 @@ export class KPJFileReader {
     return def;
   }
 
-  public transform(source: KPJFile): KeymanDeveloperProject {
+  public transform(projectPath: string, source: KPJFile): KeymanDeveloperProject {
     // NOTE: at this point, the xml should have been validated
     // and matched the schema result so we can assume the source
     // is a valid shape
     let project = source.KeymanDeveloperProject;
-    let result: KeymanDeveloperProject = new KeymanDeveloperProject();
-    result.options.buildPath = (project.Options?.BuildPath || '').replace(/\\/g, '/');
+    let result: KeymanDeveloperProject = new KeymanDeveloperProject(project.Options?.Version || "1.0");
+    if(result.options.version == '2.0') {
+      result.options.buildPath = (project.Options?.BuildPath || result.options.buildPath).replace(/\\/g, '/');
+      result.options.sourcePath = (project.Options?.SourcePath || result.options.sourcePath).replace(/\\/g, '/');
+    } else {
+      result.options.buildPath = (project.Options?.BuildPath || '').replace(/\\/g, '/');
+    }
     result.options.checkFilenameConventions = this.boolFromString(project.Options?.CheckFilenameConventions, true);
     result.options.compilerWarningsAsErrors = this.boolFromString(project.Options?.CompilerWarningsAsErrors, false);
     result.options.warnDeprecatedCode = this.boolFromString(project.Options?.WarnDeprecatedCode, true);
@@ -50,31 +55,39 @@ export class KPJFileReader {
       project.Options?.ProjectType == 'keyboard' ? KeymanDeveloperProjectType.Keyboard :
       project.Options?.ProjectType == 'lexicalmodel' ? KeymanDeveloperProjectType.LexicalModel :
       KeymanDeveloperProjectType.Keyboard; // Default is keyboard if missing
-    result.options.version = project.Options?.Version || "1.0";
 
-    let ids: {[id:string]:KeymanDeveloperProjectFile} = {};
-    for(let sourceFile of project.Files?.File) {
-      let file: KeymanDeveloperProjectFile = new KeymanDeveloperProjectFile();
-      file.fileType = sourceFile.FileType || '';
-      file.fileVersion = sourceFile.FileVersion || '';
-      file.filename = sourceFile.Filename || '';
-      file.filePath = (sourceFile.Filepath || '').replace(/\\/g, '/');  // TODO: consider normalizing
-      file.id = sourceFile.ID || '';
-      if(sourceFile.Details) {
+    if(result.options.version == '1.0') {
+      this.transformFilesVersion10(project, result);
+    } else {
+      result.populateFiles(projectPath);
+    }
+
+    return result;
+  }
+
+  private transformFilesVersion10(project: KPJFileProject, result: KeymanDeveloperProject) {
+    let ids: { [id: string]: KeymanDeveloperProjectFile10; } = {};
+    for (let sourceFile of project.Files?.File) {
+      let file: KeymanDeveloperProjectFile10 = new KeymanDeveloperProjectFile10(
+        sourceFile.ID || '',
+        sourceFile.Filename || '',
+        (sourceFile.Filepath || '').replace(/\\/g, '/'),
+        sourceFile.FileVersion || '',
+        sourceFile.FileType || ''
+      );
+      if (sourceFile.Details) {
         file.details.copyright = sourceFile.Details.Copyright;
         file.details.name = sourceFile.Details.Name;
         file.details.message = sourceFile.Details.Message;
         file.details.version = sourceFile.Details.Version;
       }
-      if(sourceFile.ParentFileID && ids[sourceFile.ParentFileID]) {
+      if (sourceFile.ParentFileID && ids[sourceFile.ParentFileID]) {
         ids[sourceFile.ParentFileID].childFiles.push(file);
       } else {
         result.files.push(file);
         ids[file.id] = file;
       }
     }
-
-    return result;
   }
 
   /**
