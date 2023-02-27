@@ -33,8 +33,12 @@ else
   exit 2
 fi
 
+# TODO: we are borrowing the KMX tests out of core; these should be shared in common
+# to avoid deep links like this in future
+KMX_TEST_DIR="${TOP_SRCDIR}"/../../core/tests/unit/kmx
+
 if [ ! -d "$TESTDIR" ] || ! [[ $(find "${TESTDIR}/" -name k_\*.kmx 2>/dev/null | wc -l) -gt 0 ]]; then
-  if [[ $(find "${COMMON_ARCH_DIR}/tests/unit/kmx/" -name k_\*.kmx 2>/dev/null | wc -l) -gt 0 ]]; then
+  if [[ $(find "${KMX_TEST_DIR}/" -name k_\*.kmx 2>/dev/null | wc -l) -gt 0 ]]; then
     mkdir -p "$(realpath --canonicalize-missing "$TESTDIR"/..)"
     ln -sf "$(realpath "${KMX_TEST_DIR}")" "$TESTDIR"
   else
