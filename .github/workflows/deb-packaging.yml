@@ -202,6 +202,12 @@ jobs:
 
         echo -e "::group::${COLOR_GREEN}Upload source package"
         cd keyman-srcpkg
+
+        # DEBUG
+        echo "${COLOR_GREEN}Verify signature"
+        gpg --verify *.changes
+        # DEBUG
+
         dput -U llso:ubuntu/jammy${destination} *_source.changes
         echo "::endgroup::"
 
