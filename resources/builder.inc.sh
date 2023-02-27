@@ -109,8 +109,6 @@ builder_use_color() {
   fi
 }
 
-BUILDER_BAD_PARAM_CODE=64
-
 #
 # Wraps the input string in `builder_display_usage` with $BUILDER_TERM_START and
 # $BUILDER_TERM_END
@@ -281,12 +279,8 @@ _builder_execute_child() {
     fi
   ) || (
     result=$?
-    if [ $result != $BUILDER_BAD_PARAM_CODE ]; then
-      echo "${COLOR_RED}## $scope$action$target failed with exit code $result${COLOR_RESET}"
-      exit $result
-    else
-      echo "${COLOR_TEAL}## $scope$action$target not defined${COLOR_RESET}"
-    fi
+    echo "${COLOR_RED}## $scope$action$target failed with exit code $result${COLOR_RESET}"
+    exit $result
   )
 }
 
@@ -819,7 +813,7 @@ _builder_parameter_error() {
   echo "$COLOR_RED$program: invalid $type: $param$COLOR_RESET"
   echo
   builder_display_usage
-  exit $BUILDER_BAD_PARAM_CODE
+  exit 64
 }
 
 #

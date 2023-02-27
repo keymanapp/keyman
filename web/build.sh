@@ -19,24 +19,9 @@ cd "$THIS_SCRIPT_PATH"
 
 # ################################ Main script ################################
 
-# Definition of global compile constants
-
-MAIN=engine/main     # Covers all engine code, including submodules like those listed below.
-KEYBOARDCACHE=engine/keyboard-cache
-OSK=engine/osk
-
-BUILD_BASE=build
-
-OUTPUT_DIR=obj
-
-SOURCE="src"
-
 # Ensures that we rely first upon the local npm-based install of Typescript.
 # (Facilitates automated setup for build agents.)
-PATH="../../../node_modules/.bin:$PATH"
-
-compiler="npm run tsc --"
-compilecmd="$compiler"
+PATH="../node_modules/.bin:$PATH"
 
 builder_set_child_base src
 builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
@@ -72,7 +57,8 @@ builder_parse "$@"
 
 # We can run all clean & configure actions at once without much issue.
 
-builder_run_child_actions clean configure
+builder_run_child_actions clean
+builder_run_child_actions configure
 
 ## Clean actions
 
@@ -105,6 +91,8 @@ builder_run_child_actions test
 
 if builder_start_action test; then
   ./test.sh :engine
+
+  builder_finish_action success test
 fi
 
 builder_die "Modularization work is not yet complete; builds dependent on this will fail."
