@@ -42,5 +42,6 @@ program
   .command('publish');
 */
 
-program.parse(process.argv);
+program.parseAsync(process.argv)
+  .catch(reason => console.error(reason));
 

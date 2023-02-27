@@ -219,7 +219,7 @@ export default class KmpCompiler {
    * @param kpsFilename - Filename of the kps, not read, used only for calculating relative paths
    * @param kmpJsonData - The kmp.json Object
    */
-  public buildKmpFile(kpsFilename: string, kmpJsonData: KmpJsonFile): Promise<any> {
+  public buildKmpFile(kpsFilename: string, kmpJsonData: KmpJsonFile): Promise<string> {
     const zip = JSZip();
 
     const kmpJsonFileName = 'kmp.json';
