@@ -35,11 +35,11 @@ if (!inputFilename) {
   exitDueToUsageError('Must provide a lexical model .model_info source file.');
 }
 
-let model_id: string = program.model ? program.model : path.basename(inputFilename).replace(/\.model_info$/, "");
-let outputFilename: string = program.outFile ? program.outFile : path.join(path.dirname(inputFilename), 'build', path.basename(inputFilename));
-let kpsFilename = program.kpsFilename ? program.kpsFilename : path.join(path.dirname(inputFilename), 'source', path.basename(inputFilename).replace(/\.model_info$/, '.model.kps'));
-let kmpFilename = program.kmpFilename ? program.kmpFilename : path.join(path.dirname(inputFilename), 'build', path.basename(inputFilename).replace(/\.model_info$/, '.model.kmp'));
-let jsFilename = program.jsFilename ? program.jsFilename : path.join(path.dirname(inputFilename), 'build', path.basename(inputFilename).replace(/\.model_info$/, '.model.js'));
+let model_id: string = program.opts().model ? program.opts().model : path.basename(inputFilename).replace(/\.model_info$/, "");
+let outputFilename: string = program.opts().outFile ? program.opts().outFile : path.join(path.dirname(inputFilename), 'build', path.basename(inputFilename));
+let kpsFilename = program.opts().kpsFilename ? program.opts().kpsFilename : path.join(path.dirname(inputFilename), 'source', path.basename(inputFilename).replace(/\.model_info$/, '.model.kps'));
+let kmpFilename = program.opts().kmpFilename ? program.opts().kmpFilename : path.join(path.dirname(inputFilename), 'build', path.basename(inputFilename).replace(/\.model_info$/, '.model.kmp'));
+let jsFilename = program.opts().jsFilename ? program.opts().jsFilename : path.join(path.dirname(inputFilename), 'build', path.basename(inputFilename).replace(/\.model_info$/, '.model.js'));
 
 //
 // Load .kps source data
@@ -56,7 +56,7 @@ let kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsString, kpsFilename);
 let modelInfoOptions: ModelInfoOptions = {
   model_id: model_id,
   kmpJsonData: kmpJsonData,
-  sourcePath: program.source,
+  sourcePath: program.opts().source,
   modelFileName: jsFilename,
   kmpFileName: kmpFilename
 };
@@ -72,7 +72,7 @@ try {
 }
 
 function exitDueToUsageError(message: string): never  {
-  console.error(`${program._name}: ${message}`);
+  console.error(`${program.name()}: ${message}`);
   console.error();
   program.outputHelp();
   return process.exit(SysExits.EX_USAGE);

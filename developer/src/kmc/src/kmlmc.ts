@@ -42,14 +42,14 @@ if(!code) {
 }
 
 // Output:
-if (program.outFile) {
-  fs.writeFileSync(program.outFile, code, 'utf8');
+if (program.opts().outFile) {
+  fs.writeFileSync(program.opts().outFile, code, 'utf8');
 } else {
   console.log(code);
 }
 
 function exitDueToUsageError(message: string): never  {
-  console.error(`${program._name}: ${message}`);
+  console.error(`${program.name()}: ${message}`);
   console.error();
   program.outputHelp();
   return process.exit(SysExits.EX_USAGE);

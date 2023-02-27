@@ -34,7 +34,7 @@ kmc Usage
 
 To compile an LDML keyboard from its `.xml` source, use `kmc`:
 
-    kmc my-keyboard.xml --outFile my-keyboard.kmx
+    kmc build my-keyboard.xml --outFile my-keyboard.kmx
 
 To see more command line options by using the `--help` option:
 

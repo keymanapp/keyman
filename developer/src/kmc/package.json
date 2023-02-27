@@ -44,7 +44,7 @@
     "@keymanapp/kmc-model-info": "*",
     "@keymanapp/kmc-package": "*",
     "@keymanapp/models-types": "*",
-    "commander": "^3.0.0"
+    "commander": "^10.0.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
