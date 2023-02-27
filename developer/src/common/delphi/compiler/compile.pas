@@ -174,6 +174,7 @@ type
   TCompilerOptions = record
     dwSize: DWORD;
     ShouldAddCompilerVersion: BOOL;
+    UseKmcmpLib: BOOL;
   end;
 
   COMPILER_OPTIONS = TCompilerOptions;
