@@ -58,6 +58,12 @@ android {
     productFlavors {
     }
 
+    applicationVariants.all { variant ->
+        // Adjust output name to "firstvoices-${VERSION_MD}.apk"
+        variant.outputs.all {
+            outputFileName = "firstvoices-" + VERSION_MD + ".apk"
+        }
+    }
     lintOptions {
         disable 'MissingTranslation'
         lintConfig file("lint.xml")
