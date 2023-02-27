@@ -45,11 +45,9 @@ if builder_has_option --debug; then
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
 fi
 
-ARTIFACT="kMAPro-$CONFIG.apk"
-
 builder_describe_outputs \
   configure     kMAPro/libs/keyman-engine.aar \
-  build:app     kMAPro/build/outputs/apk/$CONFIG/${ARTIFACT}
+  build:app     kMAPro/build/outputs/apk/$CONFIG/keyman-${VERSION}.apk
 
 #### Build
 
