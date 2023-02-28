@@ -35,7 +35,7 @@ function downloadKeyboardPackage() {
   
   # Test curl limitation, split KEYBOARDS_TARGET to DIR and FILENAME  
   local KEYBOARDS_TARGET_DIR=$(dirname $KEYBOARDS_TARGET)
-  local KEYBOARDS_TARGET_FILE=$(basename $KEYBOARDS_TARGET)
+  local KEYBOARDS_TARGET_FILE=$(basename -- $KEYBOARDS_TARGET)
 
   cd "$KEYBOARDS_TARGET_DIR"
   curl -f "$URL_DOWNLOAD_FILE" -o "$KEYBOARDS_TARGET_FILE" || {
@@ -60,7 +60,7 @@ function downloadModelPackage() {
 
   # Test curl limitation, split MODELS_TARGET to DIR and FILENAME  
   local MODELS_TARGET_DIR=$(dirname $MODELS_TARGET)
-  local MODELS_TARGET_FILE=$(basename $MODELS_TARGET)
+  local MODELS_TARGET_FILE=$(basename -- $MODELS_TARGET)
 
   cd "$MODELS_TARGET_DIR"
 
