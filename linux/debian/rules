@@ -61,7 +61,7 @@ endif
 override_dh_auto_install:
 	install -d $(CURDIR)/debian/tmp
 	cd core && \
-	  DESTDIR=$(CURDIR)/debian/tmp ./build.sh install:arch
+	  DESTDIR=$(CURDIR)/debian/tmp ./build.sh --no-tests install:arch
 	# ibus-keyman
 	cd linux/ibus-keyman && \
 		DESTDIR=$(CURDIR)/debian/tmp ./build.sh install
