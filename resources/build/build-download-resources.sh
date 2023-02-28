@@ -34,6 +34,13 @@ function downloadKeyboardPackage() {
   local URL_DOWNLOAD_FILE=`curl -s "$URL_API_KEYBOARD_VERSION/${ID}" | "$JQ" -r .kmp`
   echo "URL_DOWNLOAD_FILE: ${URL_DOWNLOAD_FILE}"
   set -x
+
+  local KEYBOARDS_DIR=$(dirname $KEYBOARDS_TARGET)
+
+  if [ ! -w $KEYBOARDS_DIR ]; then
+    echo "Unable to write to $KEYBOARRDS_DIR"
+  fi  
+
   curl -f "$URL_DOWNLOAD_FILE" -o "$KEYBOARDS_TARGET" || {
       builder_die "Downloading $KEYBOARDS_TARGET failed with error $?"
   }
