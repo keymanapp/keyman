@@ -19,10 +19,8 @@ builder_describe \
   "test" \
   "install                   install artifacts" \
   "uninstall                 uninstall artifacts" \
-  "--debug,-d                Debug build"
-# We can't yet depend on core until it moved to the new build.sh syntax
-# (currently it doesn't know some parameters that we're passing)
-#  "@/core configure build"
+  "--debug,-d                Debug build" \
+  "@/core :arch"
 
 builder_parse "$@"
 
