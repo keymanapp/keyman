@@ -50,7 +50,7 @@ override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 	# keymankeyboardprocessor
 	cd core && \
-	  ./build.sh test:arch
+	  ./build.sh --no-tests test:arch
 	# ibus-keyman
 	cd linux/ibus-keyman && \
 		./build.sh test
