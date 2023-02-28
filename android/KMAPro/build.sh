@@ -99,6 +99,8 @@ if builder_start_action clean; then
 fi
 
 if builder_start_action configure; then
+  cd "$KEYMAN_ROOT/android/KMAPro/"
+
   # Copy Keyman Engine for Android
   cp "$KEYMAN_ROOT/android/KMEA/app/build/outputs/aar/${CONFIG}/keyman-engine.aar" "$KEYMAN_ROOT/android/KMAPro/kMAPro/libs/keyman-engine.aar"
 
