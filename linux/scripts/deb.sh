@@ -59,6 +59,7 @@ cp -a ../../debian "keyman-${vers}"
 cd "keyman-${vers}"
 dch -v "${vers}-1" "local build"
 echo "keyman-${vers}"
+dch --release --distribution unstable ""
 debuild -d -S -sa -Zxz -us -uc
 cd "$BASEDIR/builddebs"
 rm -rf "keyman-${vers}"
