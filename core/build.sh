@@ -102,7 +102,7 @@ builder_describe_outputs \
   configure:wasm     build/wasm/$CONFIGURATION/build.ninja \
   build:x86          build/x86/$CONFIGURATION/src/libkmnkbp0.a \
   build:x64          build/x64/$CONFIGURATION/src/libkmnkbp0.a \
-  build:arch         build/arch/$CONFIGURATION/src/libkmnkbp0.a \
+  build:arch         build/arch/$CONFIGURATION/src/libkmnkbp0-static.a \
   build:wasm         build/wasm/$CONFIGURATION/src/libkmnkbp0.a
 
 # Target path is used by Linux build, e.g. --target-path keyboardprocessor
