@@ -23,7 +23,6 @@ uses
   VKeys in '..\..\..\common\windows\delphi\general\VKeys.pas',
   WindowsLanguages in '..\common\delphi\general\WindowsLanguages.pas',
   GetOsVersion in '..\..\..\common\windows\delphi\general\GetOsVersion.pas',
-  CRC32 in '..\..\..\common\windows\delphi\general\CRC32.pas',
   KeyNames in '..\..\..\common\windows\delphi\general\KeyNames.pas',
   utildir in '..\..\..\common\windows\delphi\general\utildir.pas',
   TextFileFormat in '..\common\delphi\general\TextFileFormat.pas',

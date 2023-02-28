@@ -6,7 +6,7 @@
 #
 
 project('keyboardprocessor', 'cpp', 'c',
-        version: run_command(find_program('getversion.bat', 'getversion.sh')).stdout().strip(),
+        version: run_command(find_program('getversion.bat', 'getversion.sh'), check:true).stdout().strip(),
         license: 'MIT',
         default_options : ['buildtype=release',
                            'cpp_std=c++14',
@@ -35,6 +35,11 @@ cc = meson.get_compiler('c')
 # TODO: Shared includes may use namespaces, etc which need future tidyup.
 # For now, we use KMN_KBP to inject the km::kbp::kmx namespace
 defns = ['-DKMN_KBP']
+
+# #define DEBUG when we are on a debug build
+if get_option('buildtype') == 'debug'
+  add_global_arguments('-DDEBUG', language : 'cpp')
+endif
 
 subdir('doc')
 subdir('include')

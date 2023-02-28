@@ -1275,6 +1275,7 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
     else if (wcsncmp(p, L"10.0", 4) == 0)  fk->version = VERSION_100;
     else if (wcsncmp(p, L"14.0", 4) == 0)  fk->version = VERSION_140; // Adds support for #917 -- context() with notany() for KeymanWeb
     else if (wcsncmp(p, L"15.0", 4) == 0)  fk->version = VERSION_150; // Adds support for U_xxxx_yyyy #2858
+    else if (wcsncmp(p, L"16.0", 4) == 0)  fk->version = VERSION_160; // KMXPlus
     else return CERR_InvalidVersion;
 
     if (fk->version < VERSION_60) FOldCharPosMatching = TRUE;
@@ -3336,7 +3337,12 @@ DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, HANDLE hOutfile)
     return CERR_SomewhereIGotItWrong;
   }
 
-  SetChecksum(buf, &ck->dwCheckSum, (DWORD)size);
+  if (ck->dwFileVersion < VERSION_160) {
+    SetChecksum(buf, &ck->dwCheckSum, (DWORD)size);
+  }
+  else {
+    ck->dwCheckSum = 0; // checksum is deprecated for 16.0+
+  }
 
   DWORD dwBytesWritten = 0;
   WriteFile(hOutfile, buf, (DWORD)size, &dwBytesWritten, NULL);

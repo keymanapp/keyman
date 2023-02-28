@@ -1,0 +1,16 @@
+{
+    "extends": "../../../tsconfig.esm-base.json",
+    "compilerOptions": {
+        "composite": true,
+        "declaration": true,
+        "rootDir": ".",
+        "outDir": "ldml-const-builder/",
+    },
+    "exclude": [
+        "node_modules"
+    ],
+    "files": [
+        "keyboardprocessor_ldml.ts",
+        "ldml-const-builder.ts"
+    ]
+}
