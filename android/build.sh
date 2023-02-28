@@ -51,7 +51,7 @@ fi
 
 builder_describe_outputs \
   build:engine            KMEA/app/build/outputs/aar/$CONFIG/keyman-engine.aar \
-  build:app               KMAPro/kMAPro/build/outputs/$CONFIG/keyman-${VERSION}.apk \
+  build:app               KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${VERSION}.apk \
   build:sample1           Samples/KMSample1/app/build/outputs/apk/${CONFIG}/app-${CONFIG}.apk \
   build:sample2           Samples/KMSample2/app/build/outputs/apk/${CONFIG}/app-${CONFIG}.apk \
   build:keyboardharness   Tests/KeyboardHarness/app/build/outputs/apk/${CONFIG}/app-${CONFIG}.apk \
