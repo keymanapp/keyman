@@ -1,5 +1,22 @@
 # Keyman Version History
 
+## 17.0.57 alpha 2023-02-26
+
+* chore(android/app): Revert #8291 (#8314)
+
+## 17.0.56 alpha 2023-02-24
+
+* fix(linux): Fix upload in packaging GHA (#8308)
+* feat(common): adds warning if described output does not exist (#8304)
+* chore(linux): Improve detecting presence of test files (#8313)
+
+## 17.0.55 alpha 2023-02-23
+
+* chore(docs): update docs due to Mac Ventura (#8277)
+* chore: remove greadlink from standard script prolog (#8288)
+* chore: use builtin instead of dirname for perf (#8289)
+* chore(common): stats script for planning (#7861)
+
 ## 17.0.54 alpha 2023-02-22
 
 * fix(ios): allow duplicate languages in kmp file (#8125)

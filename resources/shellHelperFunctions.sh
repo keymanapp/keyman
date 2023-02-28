@@ -26,24 +26,6 @@ verify_project() {
   fi
 }
 
-# The list of valid platforms that our build scripts ought expect.
-platforms=("android" "ios" "linux" "lmlayer" "mac" "web" "desktop" "developer")
-
-# Used to validate a specified 'platform' parameter.
-verify_platform() {
-  match=false
-  for proj in ${platforms[@]}
-  do
-    if [ $proj = $1 ]; then
-      match=true
-    fi
-  done
-
-  if [ $match = false ]; then
-    builder_die "Invalid platform specified!"
-  fi
-}
-
 displayInfo() {
     if [ "$QUIET" != true ]; then
         while [[ $# -gt 0 ]] ; do
