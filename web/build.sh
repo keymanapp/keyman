@@ -57,10 +57,11 @@ builder_describe_outputs \
   configure:samples ../node_modules \
   configure:tools   ../node_modules \
   build:embed       build/app/embed/release/keyman.js \
+  build:engine      build/engine/main/obj/keymanweb.js \
   build:web         build/app/web/release/keymanweb.js \
   build:ui          build/app/ui/release/kmwuibutton.js \
-  build:samples     $PREDICTIVE_TEXT_OUTPUT
-# Deliberately excluding build:tools b/c its script provides the definitions.
+  build:samples     $PREDICTIVE_TEXT_OUTPUT \
+  build:tools       build/tools/building/sourcemap-root/index.js
 
 builder_parse "$@"
 
@@ -292,7 +293,7 @@ copy_outputs ( ) {
 # ```
 compile ( ) {
   local COMPILE_TARGET=$1
-  npm run tsc -- -b src/$COMPILE_TARGET -v
+  npm run tsc -- -b src/$COMPILE_TARGET -v || builder_die "Build command tsc -- -b src/$COMPILE_TARGET -v failed with exit code $?"
   echo $COMPILE_TARGET TypeScript compiled under build/$COMPILE_TARGET/obj
 }
 
