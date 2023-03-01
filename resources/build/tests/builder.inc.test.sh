@@ -175,9 +175,13 @@ $THIS_SCRIPT_PATH/dependencies/app/build.sh error && \
 echo "${COLOR_BLUE}## End external tests${COLOR_RESET}"
 echo
 
-# Finally, run with --help so we can see what it looks like
-# Note:  calls `exit`, so no further tests may be defined.
+(
+  # Finally, run with --help so we can see what it looks like; note:
+  # builder_parse calls `exit 0` on a --help run, so running in a subshell
+  echo "${COLOR_BLUE}## Testing --help${COLOR_RESET}"
+  builder_parse --no-color --help
+) || builder_die "FAIL: builder-parse returned failure code $? unexpectedly"
 
-echo "${COLOR_BLUE}## Testing --help${COLOR_RESET}"
-
-builder_parse --no-color --help
+echo "${COLOR_GREEN}======================================================${COLOR_RESET}"
+echo "${COLOR_GREEN}All tests passed successfully${COLOR_RESET}"
+echo "${COLOR_GREEN}======================================================${COLOR_RESET}"

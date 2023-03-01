@@ -1240,6 +1240,12 @@ _builder_should_build_dep() {
   local action_target="$1"
   local dep="$2"
   local related_actions=(${_builder_dep_related_actions[$dep]})
+
+  if [[ $action_target =~ ^clean ]]; then
+    # don't attempt to build dependencies for a 'clean' action
+    return 1
+  fi
+
   # echo "bdra: ${_builder_dep_related_actions[@]}"
   # echo "target: $action_target"
   # echo "dep: $2"

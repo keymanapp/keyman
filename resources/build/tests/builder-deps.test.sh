@@ -18,6 +18,7 @@ builder_describe \
   "@./dep4 *:project" \
   "@./dep5 build:bar test:*" \
   "@./dep6 build:bar test" \
+  clean \
   configure \
   build \
   test \
@@ -94,6 +95,19 @@ test_dep_should_build test:project dep6
 test_dep_should_not_build configure:bar dep6
 test_dep_should_build build:bar dep6
 test_dep_should_build test:bar dep6
+
+test_dep_should_not_build clean:project dep1
+test_dep_should_not_build clean:bar dep1
+test_dep_should_not_build clean:project dep2
+test_dep_should_not_build clean:bar dep2
+test_dep_should_not_build clean:project dep3
+test_dep_should_not_build clean:bar dep3
+test_dep_should_not_build clean:project dep4
+test_dep_should_not_build clean:bar dep4
+test_dep_should_not_build clean:project dep5
+test_dep_should_not_build clean:bar dep5
+test_dep_should_not_build clean:project dep6
+test_dep_should_not_build clean:bar dep6
 
 # Test if 'build' actions are added because their output
 # is missing
