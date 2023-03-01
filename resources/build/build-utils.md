@@ -244,10 +244,12 @@ All build scripts have a set of automatic internal dependencies:
 * `build` depends on `configure`
 * `test`, `install`, and `publish` depend on `build`
 
-These dependencies will be added to the list of targets for the build if you
-have described outputs for them, and the outputs do not exist. The build order
-is determined by the order in which `builder_start_action` is called in the
-script for each action.
+Internal dependencies will be added to the list of targets for the build if you
+have described outputs for them, and the outputs do not exist, and the
+dependency is required for one of the targets specified on the command line.
+
+The build order of dependencies is determined by the order in which
+`builder_start_action` is called in the script for each action.
 
 You can also define your own internal dependencies with
 `builder_describe_internal_dependency`. This allows you to define dependencies
