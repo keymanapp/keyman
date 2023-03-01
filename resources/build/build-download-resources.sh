@@ -32,7 +32,7 @@ function downloadKeyboardPackage() {
 
   echo "Downloading ${ID}.kmp from downloads.keyman.com"
   local URL_DOWNLOAD_FILE=`curl -s "$URL_API_KEYBOARD_VERSION/${ID}" | "$JQ" -r .kmp`
-  curl -f "$URL_DOWNLOAD_FILE" -o "$KEYBOARDS_TARGET" || {
+  curl -f -s "$URL_DOWNLOAD_FILE" -o "$KEYBOARDS_TARGET" || {
       builder_die "Downloading $KEYBOARDS_TARGET failed with error $?"
   }
 }
