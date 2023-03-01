@@ -922,6 +922,8 @@ builder_parse() {
 
   _builder_record_function_call builder_parse
 
+  local _builder_params="$@"
+
   _builder_build_deps=--deps
   builder_verbose=
   builder_debug=
@@ -1064,7 +1066,7 @@ builder_parse() {
   fi
 
   if builder_is_dep_build; then
-    echo "[$THIS_SCRIPT_IDENTIFIER] dependency build, started by $builder_dep_parent"
+    echo -e "${HEADING_SETMARK}${COLOR_PURPLE}[$THIS_SCRIPT_IDENTIFIER] dependency build, started by $builder_dep_parent${COLOR_RESET}"
     if [[ -z ${_builder_deps_built+x} ]]; then
       echo "FATAL ERROR: Expected --builder-deps-built parameter"
       exit 1
@@ -1073,6 +1075,7 @@ builder_parse() {
     # This is a top-level invocation, not a dependency build, so we want to
     # track which dependencies have been built, so they don't get built multiple
     # times.
+    echo -e "${HEADING_SETMARK}${COLOR_PURPLE}[$THIS_SCRIPT_IDENTIFIER] build.sh launched with: <${_builder_params[@]}>${COLOR_RESET}"
     _builder_deps_built=`mktemp`
   fi
 
@@ -1237,6 +1240,12 @@ _builder_should_build_dep() {
   local action_target="$1"
   local dep="$2"
   local related_actions=(${_builder_dep_related_actions[$dep]})
+
+  if [[ $action_target =~ ^clean ]]; then
+    # don't attempt to build dependencies for a 'clean' action
+    return 1
+  fi
+
   # echo "bdra: ${_builder_dep_related_actions[@]}"
   # echo "target: $action_target"
   # echo "dep: $2"
@@ -1245,6 +1254,26 @@ _builder_should_build_dep() {
     return 1
   fi
   return 0
+}
+
+#
+# Removes a dependency from the list of available dependencies
+#
+# Parameters:
+#   $1    path to dependency
+#
+builder_remove_dep() {
+  local dependency="$1" i
+  dependency="`_builder_expand_relative_path "$dependency"`"
+
+  for i in "${!_builder_deps[@]}"; do
+    if [[ ${_builder_deps[i]} = $dependency ]]; then
+      unset '_builder_deps[i]'
+    fi
+  done
+
+  # rebuild the array to remove the empty item
+  _builder_deps=( "${_builder_deps[@]}" )
 }
 
 #

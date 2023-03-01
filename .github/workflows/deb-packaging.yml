@@ -147,7 +147,7 @@ jobs:
 
     steps:
       - name: Sign packages
-        uses: sillsdev/gha-deb-signing@cd1af3dddf83787f9da20a93fc449d927a63bfbf # v0.4
+        uses: sillsdev/gha-deb-signing@c85704766bdf6056e03ea2b2e761c33ed0acc187 # v0.5
         with:
           src-pkg-path: "artifacts/keyman-srcpkg"
           src-pkg-name: "keyman_${{ needs.sourcepackage.outputs.VERSION }}-1_source.changes"
@@ -182,6 +182,7 @@ jobs:
       run: |
         echo -e "::group::\e[32mConfigure GPG key"
         echo -n "${{ secrets.GPG_SIGNING_KEY }}" | base64 --decode | gpg --import
+        echo "${{ secrets.DEBSIGN_KEYID }}:6:" | gpg --import-ownertrust
         echo "::endgroup::"
 
     - name: Download Artifacts
@@ -191,6 +192,10 @@ jobs:
 
     - name: Upload
       run: |
+        # DEBUG
+        set +x
+        # DEBUG
+
         case ${{ github.event.client_payload.branch }} in
           stable-*)  destination='' ;;
           beta)      destination='-proposed' ;;
@@ -201,6 +206,13 @@ jobs:
 
         echo -e "::group::${COLOR_GREEN}Upload source package"
         cd keyman-srcpkg
+
+        # DEBUG
+        echo "${COLOR_GREEN}Verify signature"
+        gpg --verify *.changes
+        echo "${COLOR_GREEN}dput source package"
+        # DEBUG
+
         dput -U llso:ubuntu/jammy${destination} *_source.changes
         echo "::endgroup::"
 

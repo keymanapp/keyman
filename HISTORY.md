@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 17.0.58 alpha 2023-02-28
+
+* chore(common): fix child build error handling (#8327)
+* chore(linux): Improve and fix packaging GHA (#8328)
+* fix(linux): Fix ibus-keyman/build.sh (#8329)
+* epic: LDML keyboard support (#7054)
+* fix(linux): Fix debian postinst script (#8294)
+
 ## 17.0.57 alpha 2023-02-26
 
 * chore(android/app): Revert #8291 (#8314)

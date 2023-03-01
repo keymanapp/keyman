@@ -45,7 +45,7 @@ BUILD_DEBUG=
 
 pull-core:
     cd $(ROOT)\..\core
-    $(CALLER) ./build.sh -p native $(BUILD_DEBUG)
+    $(CALLER) ./build.sh --no-tests clean:x86 configure:x86 build:x86 clean:x64 configure:x64 build:x64 $(BUILD_DEBUG)
     cd $(ROOT)\src\engine\keyman32
 
 !include ..\..\Target.mak

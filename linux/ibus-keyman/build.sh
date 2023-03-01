@@ -19,8 +19,7 @@ builder_describe \
   "test" \
   "install                   install artifacts" \
   "uninstall                 uninstall artifacts" \
-  "--debug,-d                Debug build" \
-  "--output=OUTPUT_PATH,-o   Output path (default: ../build/)"
+  "--debug,-d                Debug build"
 # We can't yet depend on core until it moved to the new build.sh syntax
 # (currently it doesn't know some parameters that we're passing)
 #  "@/core configure build"
@@ -35,12 +34,7 @@ if builder_has_option --debug; then
 else
   MESON_TARGET=release
 fi
-if builder_has_option --output; then
-  OUTPUT_PATH=$(readlink -f "$OUTPUT_PATH")
-else
-  OUTPUT_PATH="$THIS_SCRIPT_PATH/../build"
-fi
-MESON_PATH="$OUTPUT_PATH/$(uname -m)/$MESON_TARGET"
+MESON_PATH="../build/$(uname -m)/$MESON_TARGET"
 
 builder_describe_outputs \
   configure "${MESON_PATH}/build.ninja" \
@@ -48,7 +42,7 @@ builder_describe_outputs \
   build "${MESON_PATH}/tests/ibus-keyman-tests"
 
 if builder_start_action clean; then
-  rm -rf "${OUTPUT_PATH:?}/"
+  rm -rf "$THIS_SCRIPT_PATH/../build/"
   builder_finish_action success clean
 fi
 

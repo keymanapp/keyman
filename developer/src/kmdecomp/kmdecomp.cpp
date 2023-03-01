@@ -27,7 +27,6 @@
 
 BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard, LPBYTE *lpBitmap, DWORD *cbBitmap);
 
-extern BOOL VerifyChecksum(LPBYTE buf, LPDWORD CheckSum, DWORD sz);
 void Err(char *p);
 int SaveKeyboardSource(LPKEYBOARD kbd, LPBYTE lpBitmap, DWORD cbBitmap, char *filename, char *bmpfile);
 int run(int argc, char *argv[]);
@@ -152,24 +151,20 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard, LPBYTE *lpBitmap, DWOR
 	   ckbp->dwFileVersion > VERSION_MAX)
 	{
 		/* Old or new version -- identify the desired program version */
-		if(VerifyChecksum(buf, &kbp->dwCheckSum, sz))
-		{
-			kbp->dpStoreArray = (LPSTORE) (buf + ckbp->dpStoreArray);
-			for(sp = kbp->dpStoreArray, i = 0; i < kbp->cxStoreArray; i++, sp++)
-				if(sp->dwSystemID == TSS_COMPILEDVERSION)
-				{
-					char buf2[256];
-					wsprintf(buf2, "Wrong File Version: file version is %ls", ((PBYTE)kbp) + (INT_PTR)sp->dpString);
-					delete buf;
-					Err(buf2);
-					return FALSE;
-				}
+		kbp->dpStoreArray = (LPSTORE) (buf + ckbp->dpStoreArray);
+		for(sp = kbp->dpStoreArray, i = 0; i < kbp->cxStoreArray; i++, sp++) {
+			if(sp->dwSystemID == TSS_COMPILEDVERSION)
+			{
+				char buf2[256];
+				wsprintf(buf2, "Wrong File Version: file version is %ls", ((PBYTE)kbp) + (INT_PTR)sp->dpString);
+				delete buf;
+				Err(buf2);
+				return FALSE;
+			}
 		}
 		delete buf; Err("Unknown File Version: try using the latest version of KMDECOMP");
 		return FALSE;
 	}
-
-	if(!VerifyChecksum(buf, &kbp->dwCheckSum, sz)) { delete buf; Err("Bad Checksum in file"); return FALSE; }
 
 	kbp->dpStoreArray = (LPSTORE) (buf + ckbp->dpStoreArray);
 	kbp->dpGroupArray = (LPGROUP) (buf + ckbp->dpGroupArray);

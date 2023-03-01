@@ -293,7 +293,7 @@ copy_outputs ( ) {
 # ```
 compile ( ) {
   local COMPILE_TARGET=$1
-  npm run tsc -- -b src/$COMPILE_TARGET -v
+  npm run tsc -- -b src/$COMPILE_TARGET -v || builder_die "Build command tsc -- -b src/$COMPILE_TARGET -v failed with exit code $?"
   echo $COMPILE_TARGET TypeScript compiled under build/$COMPILE_TARGET/obj
 }
 

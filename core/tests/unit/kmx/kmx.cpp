@@ -78,11 +78,12 @@ apply_action(
             0,
         },
         {act.character}});
-    if (Uni_IsSMP(act.character)) {
-      text_store.push_back(Uni_UTF32ToSurrogate1(act.character));
-      text_store.push_back(Uni_UTF32ToSurrogate2(act.character));
-    } else {
-      text_store.push_back((char16_t)act.character);
+    {
+      km::kbp::kmx::char16_single buf;
+      const int len = km::kbp::kmx::Utf32CharToUtf16(act.character, buf);
+      for(int i=0; i<len; i++) {
+        text_store.push_back(buf.ch[i]);
+      }
     }
     // std::cout << "char(" << act.character << ") size=" << cp->size() << std::endl;
     break;
@@ -218,7 +219,7 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
     }
 
     for (auto key_down = 1; key_down >= 0; key_down--) {
-      try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down));
+      try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down, KM_KBP_EVENT_FLAG_DEFAULT));
 
       for (auto act = km_kbp_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {
         apply_action(test_state, *act, text_store, test_context, options, test_source);
