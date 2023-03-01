@@ -62,6 +62,9 @@ KMX_DWORD CheckFilenameConsistency( KMX_CHAR const * Filename, bool ReportMissin
 
 
 KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissingFile) {
+  // Comment for non-windows platforms: If files are different in casing only CWARN_MissingFile 
+  // will be added. CHINT_FilenameHasDifferingCase will not be added on those platforms.
+
   KMX_WCHAR Name[_MAX_PATH], FName[_MAX_FNAME], Ext[_MAX_EXT];
   intptr_t n;
   FILE* nfile;
@@ -94,7 +97,6 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
 
   for (const auto & file : directory_iterator(kmcmp::CompileDir)) {
     std::string dir_file_path{ file.path().u8string() };
-    std::replace(dir_file_path.begin(), dir_file_path.end(), '\\', '/');
     std::u16string dir_file_path_str = u16string_from_string(dir_file_path);
     const KMX_WCHAR* dir_file_path_16 = dir_file_path_str.c_str();
     dir_file_16 = u16rchr_slash(dir_file_path_16);
