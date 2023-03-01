@@ -157,21 +157,26 @@ builder_echo() {
     message="$1"
   fi
 
-  case $color in
-    white) color="$COLOR_WHITE" ;;
-    grey) color="$COLOR_GREY" ;;
-    green|success) color="$COLOR_GREEN" ;;
-    blue|heading) color="$COLOR_BLUE" ;;
-    yellow|warning) color="$COLOR_YELLOW" ;;
-    red|error) color="$COLOR_RED" ;;
-    teal) color="$COLOR_TEAL" ;;
-    setmark) mark="$HEADING_SETMARK" color="$COLOR_PURPLE" ;;
-  esac
+  if [[ ! -z ${COLOR_RED+x} ]]; then
+    case $color in
+      white) color="$COLOR_WHITE" ;;
+      grey) color="$COLOR_GREY" ;;
+      green|success) color="$COLOR_GREEN" ;;
+      blue|heading) color="$COLOR_BLUE" ;;
+      yellow|warning) color="$COLOR_YELLOW" ;;
+      red|error) color="$COLOR_RED" ;;
+      teal) color="$COLOR_TEAL" ;;
+      setmark) mark="$HEADING_SETMARK" color="$COLOR_PURPLE" ;;
+    esac
 
-  if builder_is_dep_build; then
-    echo -e "$mark$COLOR_GREY[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
+    if builder_is_dep_build; then
+      echo -e "$mark$COLOR_GREY[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
+    else
+      echo -e "$mark$BUILDER_BOLD$COLOR_BRIGHT_WHITE[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
+    fi
   else
-    echo -e "$mark$BUILDER_BOLD$COLOR_BRIGHT_WHITE[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
+    # Cope with the case of pre-init message and just emit plain text
+    echo -e "$message"
   fi
 }
 
