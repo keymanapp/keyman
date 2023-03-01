@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.59 alpha 2023-03-01
+
+* fix(common): builder: skip dependency build for clean action (#8341)
+* chore(web): fixup dependencies in web build script (#8332)
+* chore(linux): More debug output (#8345)
+
 ## 17.0.58 alpha 2023-02-28
 
 * chore(common): fix child build error handling (#8327)
