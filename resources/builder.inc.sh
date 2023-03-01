@@ -910,6 +910,31 @@ _builder_define_default_internal_dep() {
   fi
 }
 
+#
+# Define a local dependency between one action:target and
+# another.
+#
+# Usage:
+#   builder_define_internal_dependency action:target depaction:deptarget ...
+# Parameters:
+#   1: action:target         The action and target that has a dependency
+#   2: depaction:deptarget   The dependency action and target
+# Example:
+#   builder_define_internal_dependency \
+#     mac:build mac-x86_64:build \
+#     mac:build mac-arm64:build
+#
+# Note: actions and targets must be fully specified, and this _must_
+# be called before either builder_describe_outputs or builder_parse in
+# order for dependencies to be resolved.
+builder_define_internal_dependency() {
+  while [[ $# -gt 0 ]]; do
+    local action_target=$1 dep_action_target=$2
+    _builder_internal_dep[$action_target]=$dep_action_target
+    shift 2
+  done
+}
+
 # Initializes a build.sh script, parses command line. Will abort the script if
 # invalid parameters are passed in. Use together with builder_describe which
 # sets up the possible command line parameters

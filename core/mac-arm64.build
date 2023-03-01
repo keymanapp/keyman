@@ -1,0 +1,11 @@
+#[binaries]
+#c = ['emcc.py', '-s', 'WASM=1', '-O2']
+#cpp = ['em++.py', '-s', 'WASM=1','-O2']
+#ar = ['emar.py']
+#exe_wrapper = 'node'
+
+[host_machine]
+system = 'darwin'
+cpu_family = 'aarch64'
+cpu = 'arm64'
+endian = 'little'

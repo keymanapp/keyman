@@ -1,0 +1,28 @@
+#[binaries]
+#c = ['emcc.py', '-s', 'WASM=1', '-O2']
+#cpp = ['em++.py', '-s', 'WASM=1','-O2']
+#ar = ['emar.py']
+#exe_wrapper = 'node'
+
+[host_machine]
+system = 'darwin'
+cpu_family = 'x86_64'
+cpu = 'x86_64'
+endian = 'little'
+
+[binaries]
+c = 'clang -target=x86_64-apple-darwin'
+objc = 'clang -target=x86_64-apple-darwin'
+cpp = 'clang++ -target=x86_64-apple-darwin'
+ar = 'ar'
+ld = 'ld'
+strip = 'strip'
+lipo = 'lipo'
+ranlib = 'ranlib'
+
+#[built-in options]
+#prefix = '/some_place/x86_64-glib'
+#c_args = ['-arch', 'x86_64']
+#c_link_args = []
+#default_library = 'static'
+#buildtype = 'release'
