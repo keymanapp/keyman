@@ -1,0 +1,30 @@
+﻿store(&NAME) '014 - groups and virtual keys'
+c Description: Tests multiple groups and virtual keys with mnemonic layout
+c keys: [K_A][SHIFT K_2][K_A][LCTRL K_2][K_A]
+c expected: \u03B1\u1FB0\u1FB1
+
+store(&VERSION) '9.0'
+
+begin Unicode > use(UMain)
+
+store(&MnemonicLayout) "0"
+
+c ----------------------------------------------
+
+group(UMain) using keys 
+  + [K_A] > U+03B1
+  
+c ***** CERR_InvalidDeadkey 0x00004015 ******************************
+  + [CTRL  K_q] > deadkey('–')
+c *******************************************************************
+
+  + [ALT  K_2] > deadkey(MacronBug)
+  + [SHIFT    K_2] > deadkey(BreveBug)
+      
+  match > use(DK1)
+ 
+c ----------------------------------------------
+
+group(DK1)           
+  deadkey(MacronBug) U+03B1 > U+1FB1 c won't work  
+  deadkey(BreveBug)  U+03B1 > U+1FB0 c works

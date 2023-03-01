@@ -16,7 +16,8 @@
 std::wstring MakeHashKeyFromFileKey(PFILE_KEY kp) {
   std::wstringstream key;
   key << kp->Key << "," << kp->ShiftFlags << ",";
-  if (kp->dpContext) key << kp->dpContext;
+  if (kp->dpContext)
+    key << kp->dpContext;
   return key.str();
 }
 

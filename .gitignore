@@ -182,3 +182,17 @@ Thumbs.db
 /keyman*.buildinfo
 /keyman*.changes
 /keyman*.tar.?z
+
+#Sabine:
+/common/test/keyboards/invalid/source/*.kmx
+/developer/src/test/auto/kmcomp/*.kmn
+/developer/src/test/auto/kmcomp/*.kvk
+/developer/src/test/auto/kmcomp/*.kvk*
+/developer/src/test/auto/kmcomp/*.txt
+/developer/src/kmcmplib/tests/*.txt
+/developer/src/kmcmplib/tests/Run_KMCOMP*.bat
+/**/*.bak
+/linux/common/core/desktop/wasm.defs.build
+/linux/common/core/desktop/meson.build
+/**/*.kmx
+/**/*.kvk

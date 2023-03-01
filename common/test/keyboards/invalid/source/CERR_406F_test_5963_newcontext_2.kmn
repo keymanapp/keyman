@@ -1,0 +1,9 @@
+﻿c Should fail to compile, group is not readonly
+
+begin Unicode > use(main)
+begin NewContext > use(NewContext)
+
+group(NewContext)
+
+group(main) using keys
+
