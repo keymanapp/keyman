@@ -32,13 +32,7 @@ function downloadKeyboardPackage() {
 
   echo "Downloading ${ID}.kmp from downloads.keyman.com"
   local URL_DOWNLOAD_FILE=`curl -s "$URL_API_KEYBOARD_VERSION/${ID}" | "$JQ" -r .kmp`
-  
-  # Test curl limitation, split KEYBOARDS_TARGET to DIR and FILENAME  
-  local KEYBOARDS_TARGET_DIR=$(dirname $KEYBOARDS_TARGET)
-  local KEYBOARDS_TARGET_FILE=$(basename -- $KEYBOARDS_TARGET)
-
-  cd "$KEYBOARDS_TARGET_DIR"
-  curl -f "$URL_DOWNLOAD_FILE" -o "$KEYBOARDS_TARGET_FILE" || {
+  curl -f "$URL_DOWNLOAD_FILE" -o "$KEYBOARDS_TARGET" || {
       builder_die "Downloading $KEYBOARDS_TARGET failed with error $?"
   }
 }
@@ -57,14 +51,7 @@ function downloadModelPackage() {
 
   echo "Downloading ${ID}.model.kmp from downloads.keyman.com"
   local URL_DOWNLOAD_FILE=`curl -s "$URL_API_MODEL_VERSION/${ID}" | "$JQ" -r .kmp`
-
-  # Test curl limitation, split MODELS_TARGET to DIR and FILENAME  
-  local MODELS_TARGET_DIR=$(dirname $MODELS_TARGET)
-  local MODELS_TARGET_FILE=$(basename -- $MODELS_TARGET)
-
-  cd "$MODELS_TARGET_DIR"
-
-  curl -f -s "$URL_DOWNLOAD_FILE" -o "$MODELS_TARGET_FILE" || {
+  curl -f -s "$URL_DOWNLOAD_FILE" -o "$MODELS_TARGET" || {
       builder_die "Downloading $MODELS_TARGET failed with error $?"
   }
 }
