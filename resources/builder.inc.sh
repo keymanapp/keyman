@@ -1085,14 +1085,14 @@ builder_parse() {
   fi
 
   if $_builder_debug; then
-    echo "[DEBUG] Selected actions and targets:"
+    echo "[$THIS_SCRIPT_IDENTIFIER] [DEBUG] Selected actions and targets:"
     for e in "${_builder_chosen_action_targets[@]}"; do
-      echo "* $e"
+      echo "[$THIS_SCRIPT_IDENTIFIER] * $e"
     done
     echo
-    echo "[DEBUG] Selected options:"
+    echo "[$THIS_SCRIPT_IDENTIFIER] [DEBUG] Selected options:"
     for e in "${_builder_chosen_options[@]}"; do
-      echo "* $e"
+      echo "[$THIS_SCRIPT_IDENTIFIER] * $e"
     done
   fi
 

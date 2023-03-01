@@ -105,9 +105,7 @@ fi
 # generates a 'fat' library from them.
 builder_describe_internal_dependency \
   build:mac build:mac-x86_64 \
-  build:mac build:mac-arm64 \
-  test:mac test:mac-x86_64 \
-  test:mac test:mac-arm64
+  build:mac build:mac-arm64
 
 builder_describe_outputs \
   configure:x86             build/x86/$CONFIGURATION/build.ninja \
@@ -164,4 +162,14 @@ if builder_start_action build:mac; then
     "$TARGET_PATH/mac-arm64/$CONFIGURATION/src/libkmnkbp0.a" \
     -output "$TARGET_PATH/mac/$CONFIGURATION/libkmnkbp0.a"
   builder_finish_action success build:mac
+fi
+
+if builder_start_action test:mac; then
+  # We can only run the tests for the current architecture; we can
+  # assume that build:mac has run so both architectures will be
+  # available
+  target=mac-`uname -m`
+  MESON_PATH="$TARGET_PATH/$target/$CONFIGURATION"
+  meson test -C "$MESON_PATH" "${builder_extra_params[@]}"
+  builder_finish_action success test:mac
 fi
