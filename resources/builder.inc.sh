@@ -844,7 +844,7 @@ _builder_check_color() {
 # its full internal dependency tree
 #
 _builder_add_chosen_action_target_dependencies() {
-  local action_target e i=0 new_actions=()
+  local action_target i=0 new_actions=()
 
   # Iterate through every action specified on command line; we use this loop
   # style so that any new actions added here will also be iteratively checked
@@ -853,18 +853,20 @@ _builder_add_chosen_action_target_dependencies() {
 
     # If we have an internal dependency for the chosen action:target pair
     if [[ ! -z ${_builder_internal_dep[$action_target]+x} ]]; then
-      local dep_output=${_builder_internal_dep[$action_target]}
-      # If there is a defined output for this dependency
-      if [[ ! -z ${_builder_dep_path[$dep_output]+x} ]]; then
-        # If the output for the dependency is missing, or we have --force-deps
-        if [[ ! -e "$KEYMAN_ROOT/${_builder_dep_path[$dep_output]}" ]] || builder_is_full_dep_build; then
-          # Add the dependency to the chosen action:target list
-          if ! _builder_item_in_array "$dep_output" "${_builder_chosen_action_targets[@]}"; then
-            _builder_chosen_action_targets+=($dep_output)
-            new_actions+=($dep_output)
+      local dep_outputs=(${_builder_internal_dep[$action_target]}) dep_output
+      for dep_output in "${dep_outputs[@]}"; do
+        # If there is a defined output for this dependency
+        if [[ ! -z ${_builder_dep_path[$dep_output]+x} ]]; then
+          # If the output for the dependency is missing, or we have --force-deps
+          if [[ ! -e "$KEYMAN_ROOT/${_builder_dep_path[$dep_output]}" ]] || builder_is_full_dep_build; then
+            # Add the dependency to the chosen action:target list
+            if ! _builder_item_in_array "$dep_output" "${_builder_chosen_action_targets[@]}"; then
+              _builder_chosen_action_targets+=($dep_output)
+              new_actions+=($dep_output)
+            fi
           fi
         fi
-      fi
+      done
     fi
     i=$((i + 1))
   done
@@ -906,7 +908,9 @@ _builder_define_default_internal_dep() {
   local target=$1 dep=$2 action=$3
   if _builder_item_in_array $dep "${_builder_actions[@]}" &&
         _builder_item_in_array $action "${_builder_actions[@]}"; then
-    _builder_internal_dep[$action$target]=$dep$target
+    [[ -z ${_builder_internal_dep[$action$target]+x} ]] &&
+      _builder_internal_dep[$action$target]=$dep$target ||
+      _builder_internal_dep[$action$target]="${_builder_internal_dep[$action$target]} $dep$target"
   fi
 }
 
@@ -915,22 +919,24 @@ _builder_define_default_internal_dep() {
 # another.
 #
 # Usage:
-#   builder_define_internal_dependency action:target depaction:deptarget ...
+#   builder_describe_internal_dependency action:target depaction:deptarget ...
 # Parameters:
 #   1: action:target         The action and target that has a dependency
 #   2: depaction:deptarget   The dependency action and target
 # Example:
-#   builder_define_internal_dependency \
+#   builder_describe_internal_dependency \
 #     mac:build mac-x86_64:build \
 #     mac:build mac-arm64:build
 #
 # Note: actions and targets must be fully specified, and this _must_
 # be called before either builder_describe_outputs or builder_parse in
 # order for dependencies to be resolved.
-builder_define_internal_dependency() {
+builder_describe_internal_dependency() {
   while [[ $# -gt 0 ]]; do
     local action_target=$1 dep_action_target=$2
-    _builder_internal_dep[$action_target]=$dep_action_target
+    [[ -z ${_builder_internal_dep[$action_target]+x} ]] &&
+      _builder_internal_dep[$action_target]=$dep_action_target ||
+      _builder_internal_dep[$action_target]="${_builder_internal_dep[$action_target]} $dep_action_target"
     shift 2
   done
 }

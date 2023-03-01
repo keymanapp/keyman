@@ -101,9 +101,13 @@ else
   CONFIGURATION=release
 fi
 
-builder_define_internal_dependency \
-  mac:build mac-x86_64:build \
-  mac:build mac-arm64:build
+# 'mac' target builds both x86_64 and arm architectures and
+# generates a 'fat' library from them.
+builder_describe_internal_dependency \
+  build:mac build:mac-x86_64 \
+  build:mac build:mac-arm64 \
+  test:mac test:mac-x86_64 \
+  test:mac test:mac-arm64
 
 builder_describe_outputs \
   configure:x86             build/x86/$CONFIGURATION/build.ninja \
@@ -148,7 +152,7 @@ for target in "${targets[@]}"; do
 done
 
 # After we have built the necessary internal dependencies, then we can go
-# ahead an
+# ahead and build a fat library for external consumption
 if builder_start_action configure:mac; then
   mkdir -p "$TARGET_PATH/mac/$CONFIGURATION"
   builder_finish_action success configure:mac
