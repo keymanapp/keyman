@@ -1,7 +1,8 @@
+import { PathConfiguration } from 'keyman/engine/configuration';
+
 import { default as KeyboardStub, ErrorStub, KeyboardAPISpec, mergeAndResolveStubPromises } from '../keyboardStub.js';
 import { LanguageAPIPropertySpec, ManagedPromise, Version } from '@keymanapp/keyboard-processor';
 import CloudRequesterInterface from './requesterInterface.js';
-import StubAndKeyboardCache from '../stubAndKeyboardCache.js';
 
 // For when the API call straight-up times out.
 export const CLOUD_TIMEOUT_ERR = "The Cloud API request timed out.";
@@ -54,47 +55,37 @@ type CloudLanguagesQueryResult = {
 
 export type CloudQueryResult = CloudKeyboardQueryResult | CloudLanguagesQueryResult;
 
-class CloudRequestEntry {
-  id: string;
-  language?: string;
-  version?: string;
-
-  constructor(id: string, language?: string) {
-    this.id = id;
-    this.language = language;
-  }
-
-  toString(): string {
-    var kbid=this.id;
-    var lgid='';
-    var kvid='';
-
-    if(this.language) {
-      kbid=kbid+'@'+this.language;
-      if(this.version) {
-        kbid=kbid+'@'+this.version;
-      }
-    } else {
-      if(this.version) {
-        kbid=kbid+'@@'+this.version;
-      }
-    }
-
-    //TODO: add specifier validation...
-
-    return kbid;
-  }
-}
-
 export default class CloudQueryEngine {
   private cloudResolutionPromises: Record<number, ManagedPromise<KeyboardStub[] | ManagedPromise<LanguageAPIPropertySpec[]>>> = {};
 
-  private languageList: LanguageAPIPropertySpec[];
+  private _languageListPromise: ManagedPromise<LanguageAPIPropertySpec[]>;
+  private languageFetchStarted: boolean = false;
 
   private requestEngine: CloudRequesterInterface;
+  private pathConfig: PathConfiguration;
 
-  constructor(requestEngine: CloudRequesterInterface) {
+  constructor(requestEngine: CloudRequesterInterface, pathConfig: PathConfiguration) {
     this.requestEngine = requestEngine;
+    this.pathConfig = pathConfig;
+
+    this._languageListPromise = new ManagedPromise<LanguageAPIPropertySpec[]>;
+  }
+
+  public get languageListPromise(): Promise<LanguageAPIPropertySpec[]> {
+    if(!this.languageFetchStarted) {
+      this.languageFetchStarted = true;
+
+      this.keymanCloudRequest('', true).catch((error) => {
+        // If promise is not error, then...
+        this.languageFetchStarted = false;
+
+        // We should allow retries.
+        this._languageListPromise.reject(error);
+        this._languageListPromise = new ManagedPromise<LanguageAPIPropertySpec[]>;
+      });
+    }
+
+    return this._languageListPromise.corePromise;
   }
 
   /**
@@ -172,6 +163,18 @@ export default class CloudQueryEngine {
   private _registerCore(queryResult: CloudQueryResult): KeyboardStub[] | LanguageAPIPropertySpec[] | Error { // TODO (#5044): should return heterogenous type; allow array of stubs.
     const options: CloudQueryOptions = queryResult.options;
 
+    // Font path defined by cloud entry
+    let fontPath=options['fontBaseUri'];
+
+    // or overridden locally, in page source
+    if(this.pathConfig.fonts != '') {
+      fontPath=this.pathConfig.fonts;
+    }
+    else {
+      // If there's no preconfigured option for font paths, uses the cloud's returned `fontPath` in its place.
+      this.pathConfig.fonts = fontPath;
+    }
+
     // Indicate if unable to register keyboard
     if(typeof(queryResult.error) == 'string') {
       // Currently unreachable (24 May 2021 - API returns a 404; returned 'script' does not call register)
@@ -205,7 +208,9 @@ export default class CloudQueryEngine {
         stubs = stubs.concat(CloudQueryEngine.registerLanguagesForKeyboard(kp,options,0));
       }
     } else if(options.context == 'language') { // Download the full list of supported keyboard languages
-      return this.languageList = (queryResult as CloudLanguagesQueryResult).languages;
+      const languageList = (queryResult as CloudLanguagesQueryResult).languages;
+      this._languageListPromise.resolve(languageList);
+      return languageList;
     }
 
     // Return any new entries to the `keyboardStubs` array.
@@ -272,29 +277,10 @@ export default class CloudQueryEngine {
         return this.registerLanguagesForKeyboard(kp[nDflt],options,nArg);
       }
     } else { // Otherwise, process a single keyboard for the specified languages
-      /*
-       * Detects the following patterns (at minimum):
-       * ../file (but not .../file)
-       * ./file
-       * /file
-       * http:// (on the colon)
-       * hello:world (on the colon) - that one miiiight be less intentional, though.
-       *
-       * Essentially, detects absolute paths and paths explicitly relative to the host page's URI.
-       *
-       * Alternative clearer version - '^(\.{0,2}/)|(:)'
-       * Unless backslashes should be able to replace dots?
-       */
-      let rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');
-
-      if(!rx.test(kp.filename)) {
-        kp.filename = options.keyboardBaseUri + kp.filename;
-      }
-
       // Font path defined by cloud entry
-      let fontPath=options.fontBaseUri || '';
+      let fontPath = options.fontBaseUri || '';
 
-      const allStubs = KeyboardStub.toStubs(kp, fontPath);
+      const allStubs = KeyboardStub.toStubs(kp, options.keyboardBaseUri, fontPath);
 
       // May need to filter returned stubs by language
       let lgCode=kbId.split('@')[1];
@@ -312,83 +298,14 @@ export default class CloudQueryEngine {
   /**
    * Build 362: addKeyboardArray() link to Cloud. One or more arguments may be used
    *
-   * @param x  keyboard name string or keyboard metadata JSON object
-   * @param localCache Cache of pre-loaded stubs; any requests matching stubs already loaded
-   *                   within the provided cache will be considered duplicates and dropped.
+   * @param   x  keyboard name string or keyboard metadata JSON object
    * @returns resolved or rejected promise with merged array of stubs.
    */
-  async fetchCloudStubs(x: string[], localCache?: StubAndKeyboardCache): Promise<(KeyboardStub|ErrorStub)[]> {
+  async fetchCloudStubs(cloudList: string[]): Promise<(KeyboardStub|ErrorStub)[]> {
     // // Ensure keymanweb is initialized before continuing to add keyboards
     // if(!this.keymanweb.initialized) {
     //   await this.deferment;
     // }
-
-    // Ignore empty array passed as argument
-    if(x.length == 0) {
-      let stub: ErrorStub = {error: new Error("No keyboards to add")}
-      let errorStubs = [stub];
-      // Normally reject error, but this can be a warning
-      return Promise.resolve(errorStubs);
-    }
-
-    // Create a temporary array of metadata objects from the arguments used
-    let cloudList: CloudRequestEntry[] = [];
-    let tEntry: CloudRequestEntry;
-
-    for(let i=0; i<x.length; i++) {
-      let pList=x[i].split('@'), lList=[''];
-      if(pList[0].toLowerCase() == 'english') {
-        pList[0] = 'us';
-      }
-
-      if(pList.length > 1) {
-        lList=pList[1].split(',');
-      }
-
-      for(let j=0; j<lList.length; j++) {
-        tEntry = new CloudRequestEntry(pList[0]);
-
-        if(lList[j] != '') {
-          tEntry.language=lList[j];
-        }
-
-        if(pList.length > 2) {
-          tEntry.version=pList[2];
-        }
-
-        // If we've already registered or requested a stub for this keyboard-language pairing,
-        // don't bother with a cloud request.
-        // if(this.isUniqueRequest(cloudList, tEntry)) {
-        if(!cloudList.find((entry) => entry.id == tEntry.id && entry.language == tEntry.language)) {
-          cloudList.push(tEntry);
-        }
-      }
-    }
-
-    // Return if all keyboards being registered are local and fully specified
-    try {
-      if(cloudList.length == 0) {
-        return mergeAndResolveStubPromises([], []);
-      }
-    } catch (error) {
-      console.error(error);
-      return Promise.reject(error);
-    }
-
-    // Filter out any already-fetched stubs.
-    let omitEntries: CloudRequestEntry[] = [];
-
-    if(localCache) {
-      for(let entry of cloudList) {
-        const match = localCache.getStub(entry.id, entry.language);
-        if(match) {
-          omitEntries.push(entry);
-        }
-      }
-    }
-
-    // `includes` requires Chrome for Android 47.
-    cloudList = cloudList.filter((entry) => !omitEntries.includes(entry));
 
     if(cloudList.length == 0) {
       return Promise.resolve([]);
@@ -415,27 +332,4 @@ export default class CloudQueryEngine {
       return Promise.reject(errorStubs);
     }
   }
-
-  // ------------------------------------------------------------------------------
-  // /**
-  //  * Function       isUniqueRequest
-  //  * Scope          Private
-  //  * @param         {Object}    tEntry
-  //  * Description    Checks to ensure that the stub isn't already loaded within KMW or subject
-  //  *                to an already-pending request.
-  //  */
-  // isUniqueRequest(cloudList: {id: string, language?: string}[], tEntry: CloudRequestEntry) {
-  //   var k;
-
-  //   if(this.findStub(tEntry.id, tEntry.language) == null) {
-  //     for(k=0; k < cloudList.length; k++) {
-  //       if(cloudList[k].id == tEntry['id'] && cloudList[k].language == tEntry.language) {
-  //         return false;
-  //       }
-  //     }
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // };
 }

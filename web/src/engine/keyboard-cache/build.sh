@@ -23,6 +23,7 @@ SUBPROJECT_NAME=engine/keyboard-cache
 
 builder_describe "Builds keyboard cloud-querying & caching modules used by the Keyman Engine for Web (KMW)." \
   "@/common/web/keyboard-processor build" \
+  "@../configuration" \
   "clean" \
   "configure" \
   "build" \

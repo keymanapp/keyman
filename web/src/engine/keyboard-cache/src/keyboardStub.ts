@@ -1,10 +1,11 @@
 import {
-  type InternalKeyboardFont,
   type KeyboardAPIPropertySpec as APISimpleKeyboard,
   type KeyboardAPIPropertyMultilangSpec as APICompoundKeyboard,
   KeyboardProperties,
-  type LanguageAPIPropertySpec
+  type LanguageAPIPropertySpec,
+  KeyboardAPIPropertySpec
 } from '@keymanapp/keyboard-processor';
+import { PathConfiguration } from 'keyman/engine/configuration';
 
 import { toPrefixedKeyboardId as prefixed } from './stubAndKeyboardCache.js';
 
@@ -18,7 +19,7 @@ export type KeyboardAPISpec = (APISimpleKeyboard | APICompoundKeyboard) & {
   filename: string
 };
 
-interface RawKeyboardStub extends KeyboardStub {};
+export interface RawKeyboardStub extends KeyboardStub {};
 
 export default class KeyboardStub extends KeyboardProperties {
   KR: string;
@@ -28,18 +29,38 @@ export default class KeyboardStub extends KeyboardProperties {
   KP?: string;
 
   public constructor(rawStub: RawKeyboardStub);
-  public constructor(apiSpec: APISimpleKeyboard & { filename: string }, fontBaseUri?: string);
+  public constructor(apiSpec: APISimpleKeyboard & { filename: string }, keyboardBaseUri?: string, fontBaseUri?: string);
   public constructor(kbdId: string, lngId: string);
-  constructor(arg0: string | RawKeyboardStub | (APISimpleKeyboard & { filename: string }), arg1?: string) {
+  constructor(arg0: string | RawKeyboardStub | (APISimpleKeyboard & { filename: string }), arg1?: string, arg2?: string) {
     if(typeof arg0 !== 'string') {
       if(arg0.id !== undefined) {
         let apiSpec = arg0 as APISimpleKeyboard & { filename: string };
         apiSpec.id = prefixed(apiSpec.id);
-        super(apiSpec, arg1);
+        super(apiSpec, arg2);
+
+        /*
+         * Detects the following patterns (at minimum):
+         * ../file (but not .../file)
+         * ./file
+         * /file
+         * http:// (on the colon)
+         * hello:world (on the colon) - that one miiiight be less intentional, though.
+         *
+         * Essentially, detects absolute paths and paths explicitly relative to the host page's URI.
+         *
+         * Alternative clearer version - '^(\.{0,2}/)|(:)'
+         * Unless backslashes should be able to replace dots?
+         */
+        let rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');
+
+        if(!rx.test(this.KF)) {
+          this.KF = arg1 + this.KF;
+        }
       } else {
         let rawStub = arg0 as RawKeyboardStub;
         rawStub.KI = prefixed(rawStub.KI);
         super(rawStub);
+        return;
       }
     } else {
       super(prefixed(arg0), arg1);
@@ -63,8 +84,14 @@ export default class KeyboardStub extends KeyboardProperties {
    * @param arg
    * @returns (KeyboardStub|ErrorStub)[]
    */
-  public static toStubs(arg: KeyboardAPISpec, fontBaseUri: string): (KeyboardStub|ErrorStub)[] {
+  public static toStubs(arg: KeyboardAPISpec, keyboardBaseUri: string, fontBaseUri: string): (KeyboardStub|ErrorStub)[] {
     let errorMsg: string = '';
+
+    if(typeof(arg.language) != "undefined") {
+      console.warn("The 'language' property for keyboard stubs has been deprecated.  Please use the 'languages' property instead.");
+    }
+    arg.languages ||= arg.language;
+
     if (!arg) {
       errorMsg = "Stub undefined";
     } else if (!arg.id) {
@@ -88,8 +115,9 @@ export default class KeyboardStub extends KeyboardProperties {
 
     let stubs: KeyboardStub[] = [];
     languages.forEach(language => {
-      const intermediate = {...arg, languages: language};
-      const stub: KeyboardStub = new KeyboardStub(intermediate, fontBaseUri);
+      // The deprecated `language` is assigned to satisfy TS type-checking.
+      const intermediate = {...arg, languages: language, language: undefined};
+      const stub: KeyboardStub = new KeyboardStub(intermediate, keyboardBaseUri, fontBaseUri);
 
       // Accept region as number (from Cloud server), code, or name
       const region=language.region;
@@ -129,6 +157,14 @@ export default class KeyboardStub extends KeyboardProperties {
     this.KF ||= stub.KF;
     this.KFont ||= stub.KFont;
     this.KOskFont ||= stub.KOskFont;
+  }
+
+  public validateForCustomKeyboard(): Error {
+    if(super.validateForCustomKeyboard() || !this.KF || !this.KR) {
+      return new Error('To use a custom keyboard, you must specify file name, keyboard id, keyboard name, language, language code, and region.');
+    } else {
+      return null;
+    }
   }
 }
 

@@ -81,6 +81,11 @@ export type LanguageAPIPropertySpec = {
 export type KeyboardAPIPropertySpec = {
   id: string,
   name: string,
+
+  /**
+   * @deprecated Replaced with `languages`.
+   */
+  language?: LanguageAPIPropertySpec;
   languages: LanguageAPIPropertySpec;
 }
 
@@ -94,10 +99,15 @@ export type KeyboardAPIPropertySpec = {
 export type KeyboardAPIPropertyMultilangSpec = {
   id: string,
   name: string,
+
+  /**
+   * @deprecated Replaced with `languages`.
+   */
+  language?: LanguageAPIPropertySpec[];
   languages: LanguageAPIPropertySpec[];
 }
 
-type MetadataObj = KeyboardInternalPropertySpec | KeyboardAPIPropertySpec | KeyboardAPIPropertyMultilangSpec;
+export type MetadataObj = KeyboardInternalPropertySpec | KeyboardAPIPropertySpec | KeyboardAPIPropertyMultilangSpec;
 
 export default class KeyboardProperties implements KeyboardInternalPropertySpec {
   KI: string;
@@ -112,9 +122,9 @@ export default class KeyboardProperties implements KeyboardInternalPropertySpec 
 
   public constructor(metadataObj: MetadataObj, fontPath?: string);
   public constructor(keyboardId: string, languageCode: string);
-  public constructor(arg1: MetadataObj | string, arg2?: string | SpacebarText, arg3?: string, arg4?: KeyboardFont, arg5?: KeyboardFont) {
+  public constructor(arg1: MetadataObj | string, arg2?: string | SpacebarText) {
     if(!(typeof arg1 == 'string')) {
-      if(arg1['KI'] || arg1['KLC'] || arg1['KFont'] || arg1['KOskFont']) {
+      if(arg1['KI'] || arg1['KL'] || arg1['KLC'] || arg1['KFont'] || arg1['KOskFont']) {
         const other = arg1 as KeyboardInternalPropertySpec;
         this.KI = other.KI;
         this.KN = other.KN;
@@ -122,9 +132,12 @@ export default class KeyboardProperties implements KeyboardInternalPropertySpec 
         this.KLC = other.KLC;
         this.KFont = other.KFont;
         this.KOskFont = other.KOskFont;
-        this._displayName = other.displayName;
+        this._displayName = (other instanceof KeyboardProperties) ? other._displayName : other.displayName;
       } else {
         let apiStub = arg1 as KeyboardAPIPropertySpec; // TODO:  could be an array, as currently specified.  :(
+
+        apiStub.languages ||= apiStub.language;
+
         this.KI = apiStub.id,
         this.KN = apiStub.name,
         this.KL = apiStub.languages.name,
@@ -140,6 +153,8 @@ export default class KeyboardProperties implements KeyboardInternalPropertySpec 
 
   public static fromMultilanguageAPIStub(apiStub: KeyboardAPIPropertyMultilangSpec, spacebarTextMode?: SpacebarText): KeyboardProperties[] {
     let stubs: KeyboardProperties[] = [];
+
+    apiStub.languages ||= apiStub.language;
 
     for(let langSpec of apiStub.languages) {
       let stub: KeyboardAPIPropertySpec = {
@@ -203,5 +218,34 @@ export default class KeyboardProperties implements KeyboardInternalPropertySpec 
 
   public get oskFont() {
     return this.KOskFont;
+  }
+
+  /**
+   * Generates an error for objects with specification levels insufficient for use in the on-screen-keyboard
+   * module, complete with a message about one or more details in need of correction.
+   * @returns A preconstructed `Error` instance that may be thrown by the caller.
+   */
+  public validateForOSK(): Error {
+    if(!this.KLC) {
+      if(this.KI || this.KN) {
+        return new Error(`No language code was specified for use with the ${this.KI || this.KN} keyboard`);
+      } else {
+        return new Error("No language code was specified for use with the corresponding keyboard")
+      }
+    }
+
+    if(this.displayName === undefined || (this.spacebarTextMode != SpacebarText.BLANK && !this.displayName)) {
+      return new Error("A display name is missing for this keyboard and cannot be generated.")
+    }
+
+    return null;
+  }
+
+  public validateForCustomKeyboard(): Error {
+    if(!this.KI || !this.KN || !this.KL || !this.KLC) {
+      return new Error("To use a custom keyboard, you must specify keyboard id, keyboard name, language and language code.");
+    } else {
+      return null;
+    }
   }
 }

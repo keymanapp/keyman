@@ -52,11 +52,6 @@ export class StylesheetManager {
 
     // TODO: 22 Aug 2014: check that font path passed from cloud is actually used!
 
-    // 10 Feb 2023 [JH]:  during ES module conversion work, it was noted that the font path passed
-    // from the cloud is 100% ignored; only the init option's 'fonts' member was used.
-    //
-    // See https://github.com/keymanapp/keyman/blob/25a205cbe8d6131068d46aea1a3d1ee719afb9c1/web/src/engine/main/kmwutils.ts#L656-L671
-
     if(!os) {
       os = DeviceSpec.OperatingSystem.Other; // as a fallback option.
     }
