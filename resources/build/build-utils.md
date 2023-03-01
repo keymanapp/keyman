@@ -237,6 +237,24 @@ include.
 Use the longer form of `if ...; then` rather than the shorter `[ ... ] && `
 pattern, for consistency and readability.
 
+# Internal dependencies
+
+All build scripts have a set of automatic internal dependencies:
+
+* `build` depends on `configure`
+* `test`, `install`, and `publish` depend on `build`
+
+These dependencies will be added to the list of targets for the build if you
+have described outputs for them, and the outputs do not exist. The build order
+is determined by the order in which `builder_start_action` is called in the
+script for each action.
+
+You can also define your own internal dependencies with
+`builder_describe_internal_dependency`. This allows you to define dependencies
+across targets. Use this judiciously; for example, Keyman Core uses this to
+build both x86_64 and arm64 targets, and test only the appropriate architecture
+on macOS.
+
 # Standard builder parameters
 
 The following parameters are pre-defined and should not be overridden:
@@ -245,6 +263,8 @@ The following parameters are pre-defined and should not be overridden:
 * `--color`: forces on ANSI color output for the script
 * `--no-color`: forces off ANSI color output for the script
 * `--verbose`, `-v`: verbose mode, sets the [`$builder_verbose`] variable
+
+--------------------------------------------------------------------------------
 
 # Builder API functions and variables
 
@@ -364,8 +384,6 @@ this, you should use `--debug,-d` to enable the shorthand form.
 
 Note that you should not include any of the [standard builder parameters] here.
 
---------------------------------------------------------------------------------
-
 **Dependencies** are defined with a `@` prefix, for example:
 
 ```bash
@@ -388,6 +406,35 @@ script. If not specified, dependencies will be built for all actions on all
 targets. Either `action` or `:target` may be omitted, and multiple actions and
 targets may be specified, space separated.
 
+--------------------------------------------------------------------------------
+
+## `builder_describe_internal_dependency` function
+
+Define a local dependency between one action:target and another.
+
+### Usage
+
+```bash
+builder_describe_internal_dependency action:target depaction:deptarget ...
+```
+
+### Parameters
+  * **action:target**:        The action and target that has a dependency
+  * **depaction:deptarget**:  The dependency action and target
+
+### Example
+
+```bash
+builder_describe_internal_dependency \
+  mac:build mac-x86_64:build \
+  mac:build mac-arm64:build
+```
+
+**Note:** actions and targets must be fully specified, and this _must_ be called
+before either builder_describe_outputs or builder_parse in order for
+dependencies to be resolved.
+
+--------------------------------------------------------------------------------
 
 ## `builder_display_usage` function
 
