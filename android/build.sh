@@ -23,6 +23,7 @@ builder_describe \
   "Build Keyman Engine for Android, Keyman for Android, and FirstVoices Android app." \
   clean \
   build \
+  test \
   "publish                                  Publishes the APKs to the Play Store." \
   ":engine=KMEA                             Keyman Engine for Android" \
   ":app=KMAPro                              Keyman for Android" \
@@ -128,6 +129,26 @@ if builder_start_action build:fv; then
   ./build.sh build $CI_FLAG $DEBUG_FLAG
   builder_finish_action success build:fv
 fi
+
+#### Tests #####
+if builder_start_action test:engine; then
+  cd "$KEYMAN_ROOT/android/KMEA"
+  ./build.sh test $CI_FLAG $DEBUG_FLAG
+  builder_finish_action success test:engine
+fi
+
+if builder_start_action test:app; then
+  cd "$KEYMAN_ROOT/android/KMAPro"
+  ./build.sh test $CI_FLAG $DEBUG_FLAG
+  builder_finish_action success test:app
+fi
+
+if builder_start_action test:fv; then
+  cd "$KEYMAN_ROOT/oem/firstvoices/android"
+  ./build.sh test $CI_FLAG $DEBUG_FLAG
+  builder_finish_action success test:fv
+fi
+
 
 # Publish Keyman for Android to Play Store
 if builder_start_action publish:app; then

@@ -115,5 +115,5 @@ if builder_start_action test; then
   echo "TEST_FLAGS: $TEST_FLAGS"
   ./gradlew $DAEMON_FLAG $TEST_FLAGS
 
-  builder_finish_action_success test
+  builder_finish_action success test
 fi
