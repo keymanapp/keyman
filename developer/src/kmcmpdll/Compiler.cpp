@@ -292,7 +292,6 @@ BOOL AddCompileMessage(DWORD msg)
 bool flag_use_new_kmcomp  = true;   // flag to switch to new kmcompx
 
 extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options) {
-
   if(!options || options->dwSize < sizeof(COMPILER_OPTIONS)) {
     return FALSE;
   }
@@ -324,6 +323,8 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
   {
     return kmcmp_CompileKeyboardFile(pszInfile, pszOutfile, ASaveDebug, ACompilerWarningsAsErrors,AWarnDeprecatedCode, pMsgProc);
   }
+
+  //printf("--->  stayed in CompileKeyboardFile() of kmcmpdll\n");
 
   FSaveDebug = ASaveDebug;
   FCompilerWarningsAsErrors = ACompilerWarningsAsErrors;   // I4865
