@@ -194,6 +194,9 @@ jobs:
       run: |
         # DEBUG
         set +x
+
+        ping -c 4 package-drop.psonet
+        cat ~/.dput.cf
         # DEBUG
 
         case ${{ github.event.client_payload.branch }} in
