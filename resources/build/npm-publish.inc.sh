@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# This script requires builder.inc.sh to be included first
+# This script requires builder.inc.sh to already be included
 #
 
 function npm_publish() {
