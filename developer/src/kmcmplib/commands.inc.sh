@@ -23,8 +23,6 @@ do_configure() {
 
   local STANDARD_MESON_ARGS=
 
-  echo_heading "======= Configuring $target ======="
-
   if [[ $target == wasm ]]; then
     # do_configure_wasm
     locate_emscripten
@@ -51,8 +49,6 @@ do_build() {
   local target=$1
   builder_start_action build:$target || return 0
 
-  echo_heading "======= Building $target ======="
-
   if [[ $target =~ ^(x86|x64)$ ]]; then
     # Build the meson targets, both x86 and x64 also
     # We need to use a batch file here so we can get
@@ -75,8 +71,6 @@ do_build() {
 do_test() {
   local target=$1
   builder_start_action test:$target || return 0
-
-  echo_heading "======= Testing $target ======="
 
   if [[ $target =~ ^(x86|x64)$ ]]; then
     cmd //C build.bat $target $CONFIGURATION test "${builder_extra_params[@]}"
