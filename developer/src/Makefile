@@ -29,11 +29,11 @@ imsample: .virtual
     cd $(DEVELOPER_ROOT)\src\imsample
     $(MAKE) $(TARGET)
 
-kmcmplib: .virtual
+kmcmplib: global-versions .virtual
     cd $(DEVELOPER_ROOT)\src\kmcmplib
     $(MAKE) $(TARGET)
 
-kmcmpdll: .virtual
+kmcmpdll: kmcmplib .virtual
     cd $(DEVELOPER_ROOT)\src\kmcmpdll
     $(MAKE) $(TARGET)
 

@@ -408,6 +408,7 @@ typedef COMP_GROUP *PCOMP_GROUP;
 typedef struct _COMPILER_OPTIONS {
   DWORD dwSize;
   BOOL ShouldAddCompilerVersion;
+	BOOL UseKmcmpLib;
 } COMPILER_OPTIONS;
 
 typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;

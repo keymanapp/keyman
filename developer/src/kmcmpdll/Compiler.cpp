@@ -292,6 +292,11 @@ BOOL AddCompileMessage(DWORD msg)
 bool flag_use_new_kmcomp  = true;   // flag to switch to new kmcompx
 
 extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options) {
+  if(!options || options->dwSize < sizeof(COMPILER_OPTIONS)) {
+    return FALSE;
+  }
+
+  flag_use_new_kmcomp = options->UseKmcmpLib;
 
   //printf("\n---> started in SetCompilerOptions() of kmcmpdll\n");
   if ( flag_use_new_kmcomp )
@@ -300,9 +305,6 @@ extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS optio
   }
   //printf("--->  stayed in SetCompilerOptions() of kmcmpdll\n");
 
-  if(!options || options->dwSize < sizeof(COMPILER_OPTIONS)) {
-    return FALSE;
-  }
   FShouldAddCompilerVersion = options->ShouldAddCompilerVersion;
   return TRUE;
 }
@@ -321,6 +323,7 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
   {
     return kmcmp_CompileKeyboardFile(pszInfile, pszOutfile, ASaveDebug, ACompilerWarningsAsErrors,AWarnDeprecatedCode, pMsgProc);
   }
+
   //printf("--->  stayed in CompileKeyboardFile() of kmcmpdll\n");
 
   FSaveDebug = ASaveDebug;
@@ -343,6 +346,8 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
   msgproc = pMsgProc;
   currentLine = 0;
   nErrors = 0;
+
+  AddCompileString("NOTE: Using legacy compiler");
 
   hInfile = CreateFileA(pszInfile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
   if (hInfile == INVALID_HANDLE_VALUE) SetError(CERR_InfileNotExist);
@@ -434,6 +439,8 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PSTR pszInfile
   msgproc = pMsgProc;
   currentLine = 0;
   nErrors = 0;
+
+  AddCompileString("NOTE: Using legacy compiler");
 
   hInfile = CreateFileA(pszInfile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
   if (hInfile == INVALID_HANDLE_VALUE) SetError(CERR_InfileNotExist);
