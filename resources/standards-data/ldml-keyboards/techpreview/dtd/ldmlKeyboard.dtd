@@ -1,0 +1,189 @@
+<!--
+Copyright © 1991-2023 Unicode, Inc.
+For terms of use, see http://www.unicode.org/copyright.html
+SPDX-License-Identifier: Unicode-DFS-2016
+CLDR data files are interpreted according to the LDML specification (http://unicode.org/reports/tr35/)
+-->
+<!-- Important Note:
+
+The CLDR Keyboard Workgroup is currently developing major changes to the
+CLDR keyboard specification.
+
+This DTD is a work in progress.
+
+Please see CLDR-15034 for the latest information. -->
+
+<!ELEMENT keyboard ( import*, locales?, version?, info?, names, settings?, vkeys?, displays?, keys?, layers*, transforms*, reorders?, special* ) >
+<!ATTLIST keyboard locale CDATA #REQUIRED >
+    <!--@MATCH:validity/bcp47-->
+<!ATTLIST keyboard conformsTo (techpreview) #REQUIRED >
+    <!--@MATCH:any-->
+    <!--@METADATA-->
+
+<!ELEMENT import EMPTY >
+<!ATTLIST import path CDATA #REQUIRED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+<!ATTLIST import base (cldr) #IMPLIED >
+    <!--@VALUE-->
+
+<!ELEMENT locales ( locale* ) >
+
+<!ELEMENT locale EMPTY >
+<!ATTLIST locale id CDATA #REQUIRED >
+    <!--@MATCH:validity/bcp47-->
+    <!--@VALUE-->
+
+<!ELEMENT version EMPTY >
+<!ATTLIST version number CDATA #IMPLIED >
+    <!-- Note: post techpreview, change cldrVersion to MATCH:version -->
+    <!--@MATCH:semver-->
+    <!--@VALUE-->
+<!ATTLIST version cldrVersion CDATA #FIXED "techpreview" >
+    <!--@MATCH:any-->
+    <!--@METADATA-->
+
+<!ELEMENT info EMPTY >
+<!ATTLIST info author CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+<!ATTLIST info normalization CDATA #IMPLIED >
+    <!--@MATCH:literal/NFC, NFD, other-->
+    <!--@VALUE-->
+<!ATTLIST info layout CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+<!ATTLIST info indicator CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+
+<!ELEMENT names ( import*, name+, special* ) >
+
+<!ELEMENT name EMPTY >
+    <!--@ORDERED-->
+<!ATTLIST name value CDATA #REQUIRED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+
+<!ELEMENT special ANY >
+
+<!ELEMENT settings EMPTY >
+    <!--@ORDERED-->
+<!ATTLIST settings fallback (omit) #IMPLIED >
+    <!--@VALUE-->
+<!ATTLIST settings transformFailure (omit) #IMPLIED >
+    <!--@VALUE-->
+<!ATTLIST settings transformPartial (hide) #IMPLIED >
+    <!--@VALUE-->
+
+<!ELEMENT vkeys ( import*, vkey*, special* ) >
+
+<!ELEMENT vkey EMPTY >
+<!ATTLIST vkey from CDATA #REQUIRED >
+    <!--@MATCH:any-->
+<!ATTLIST vkey to CDATA #REQUIRED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+
+<!ELEMENT displays ( import*, display*, displayOptions*, special* ) >
+
+<!ELEMENT display EMPTY >
+<!ATTLIST display to CDATA #REQUIRED >
+    <!--@MATCH:any-->
+<!ATTLIST display display CDATA #REQUIRED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+
+<!ELEMENT displayOptions EMPTY >
+<!ATTLIST displayOptions baseCharacter CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+
+<!ELEMENT keys ( import*, ( key | flicks )*, special* ) >
+
+<!ELEMENT key EMPTY >
+<!ATTLIST key id CDATA #REQUIRED >
+    <!--@MATCH:regex/[A-Za-z0-9][A-Za-z0-9-]*-->
+<!ATTLIST key flicks NMTOKEN #IMPLIED >
+    <!--@MATCH:regex/[A-Za-z0-9][A-Za-z0-9-]*-->
+<!ATTLIST key gap (true) #IMPLIED >
+    <!--@VALUE-->
+<!ATTLIST key to CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+<!ATTLIST key longPress CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+<!ATTLIST key longPressDefault CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+<!ATTLIST key multiTap CDATA #IMPLIED >
+    <!--@VALUE-->
+<!ATTLIST key stretch (true) #IMPLIED >
+    <!--@VALUE-->
+<!ATTLIST key switch NMTOKEN #IMPLIED >
+    <!--@MATCH:regex/[A-Za-z0-9][A-Za-z0-9-]*-->
+    <!--@VALUE-->
+<!ATTLIST key transform (no) #IMPLIED >
+    <!--@VALUE-->
+<!ATTLIST key width CDATA #IMPLIED >
+    <!--@MATCH:range/0.01~100.0-->
+    <!--@VALUE-->
+
+<!ELEMENT flicks ( flick+, special* ) >
+<!ATTLIST flicks id NMTOKEN #REQUIRED >
+    <!--@MATCH:regex/[A-Za-z0-9][A-Za-z0-9-]*-->
+
+<!ELEMENT flick EMPTY >
+<!ATTLIST flick directions NMTOKENS #REQUIRED >
+    <!--@MATCH:regex/(n|e|s|w|ne|nw|se|sw)([ ]+(n|e|s|w|ne|nw|se|sw))*-->
+<!ATTLIST flick to CDATA #REQUIRED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+
+<!ELEMENT layers ( import*, layer*, special* ) >
+<!ATTLIST layers form (hardware | touch) #REQUIRED >
+<!ATTLIST layers minDeviceWidth CDATA #IMPLIED >
+    <!--@MATCH:range/1~999-->
+<!ATTLIST layers hardware NMTOKEN #IMPLIED >
+    <!--@MATCH:literal/us, iso, jis, abnt2-->
+
+<!ELEMENT layer ( row+, special* ) >
+<!ATTLIST layer id NMTOKEN #IMPLIED >
+    <!--@MATCH:any-->
+<!ATTLIST layer modifier NMTOKEN #IMPLIED >
+    <!--@MATCH:any-->
+
+<!ELEMENT row EMPTY >
+    <!--@ORDERED-->
+<!ATTLIST row keys NMTOKENS #REQUIRED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+
+<!ELEMENT transforms ( import*, transform*, special* ) >
+<!ATTLIST transforms type (simple | final | backspace) #REQUIRED >
+    <!--@MATCH:literal/simple, final, backspace-->
+
+<!ELEMENT transform EMPTY >
+<!ATTLIST transform before CDATA #IMPLIED >
+<!ATTLIST transform from CDATA #REQUIRED >
+    <!--@MATCH:any-->
+<!ATTLIST transform to CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+<!ATTLIST transform error (fail) #IMPLIED >
+    <!--@VALUE-->
+
+<!ELEMENT reorders ( import*, reorder*, special* ) >
+
+<!ELEMENT reorder EMPTY >
+<!ATTLIST reorder before CDATA #IMPLIED >
+<!ATTLIST reorder from CDATA #REQUIRED >
+<!ATTLIST reorder order CDATA #IMPLIED >
+    <!--@VALUE-->
+<!ATTLIST reorder tertiary CDATA #IMPLIED >
+    <!--@VALUE-->
+<!ATTLIST reorder tertiaryBase CDATA #IMPLIED >
+    <!--@VALUE-->
+<!ATTLIST reorder preBase CDATA #IMPLIED >
+    <!--@VALUE-->

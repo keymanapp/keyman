@@ -134,7 +134,7 @@ PowerShell.
 * git for Windows
 * jq
 * Python 3
-* Meson 0.56+
+* Meson 1.0+
 * Ninja
 * Pandoc
 
@@ -144,7 +144,7 @@ PowerShell.
 $ProgressPreference = 'SilentlyContinue'
 choco install git jq python ninja pandoc
 refreshenv
-# choco meson (0.55) is too old, 0.56 required:
+# choco meson (0.55) is too old, 1.0 required:
 python -m pip install meson
 
 **Environment variables**:

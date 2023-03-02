@@ -7,11 +7,13 @@ set -u
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+
+. "$THIS_SCRIPT_PATH/package-build.inc.sh"
 
 keyman_projects="keyman"
 
@@ -36,56 +38,28 @@ sourcename=${sourcename%"-beta"}
 export DEBFULLNAME="${fullsourcename} Package Signing Key"
 export DEBEMAIL='jenkins@sil.org'
 
-checkAndInstallRequirements()
-{
-	local TOINSTALL=""
-
-	for p in devscripts equivs
-	do
-		if ! dpkg -s $p >/dev/null 2>&1; then
-			TOINSTALL="$TOINSTALL $p"
-		fi
-	done
-
-	export DEBIAN_FRONTEND=noninteractive
-
-	if [ -n "$TOINSTALL" ]; then
-		sudo apt-get update
-		sudo apt-get -qy install "$TOINSTALL"
-	fi
-
-	sudo mk-build-deps debian/control
-	sudo apt-get -qy --allow-downgrades install ./keyman-build-deps_*.deb
-	sudo rm -f keyman-buid-deps_*
-}
-
 checkAndInstallRequirements
 
 # clean up prev deb builds
-echo_heading "cleaning previous builds of $1"
+builder_heading "cleaning previous builds of $1"
 
 rm -rf builddebs
 rm -rf "$sourcedir/${1}"_*.{dsc,build,buildinfo,changes,tar.?z,log}
 rm -rf "$sourcedir/../${1}"_*.{dsc,build,buildinfo,changes,tar.?z,log}
 
-echo_heading "Make source package for $fullsourcename"
-echo_heading "reconfigure"
-TIER="$tier" ./scripts/reconf.sh $sourcename
+builder_heading "Make source package for $fullsourcename"
+builder_heading "reconfigure"
+TIER="$tier" ./scripts/reconf.sh
 
-echo_heading "Make origdist"
-./scripts/dist.sh origdist $sourcename
-echo_heading "Make deb source"
-./scripts/deb.sh sourcepackage "$proj"
+builder_heading "Make origdist"
+./scripts/dist.sh origdist
+builder_heading "Make deb source"
+./scripts/deb.sh sourcepackage
 
 #sign source package
 for file in builddebs/*.dsc; do
-	echo_heading "Signing source package $file"
+	builder_heading "Signing source package $file"
 	debsign -k"$2" "$file"
 done
 
-if [ "$proj" == "keyman" ]; then
-    mv builddebs/* ..
-else
-    mkdir -p "$sourcedir"
-    mv builddebs/* "$sourcedir"
-fi
+mv builddebs/* ..
