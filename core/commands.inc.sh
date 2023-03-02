@@ -27,6 +27,12 @@ do_configure() {
     MESON_CROSS_FILE="--cross-file cross-$target.build"
   fi
 
+  if [[ $target =~ ^mac ]]; then
+    # On mac, build both dynamic and static libraries; win does the same in build.bat
+    # In the future, we may do this on Linux as well
+    STANDARD_MESON_ARGS="$STANDARD_MESON_ARGS --default-library both"
+  fi
+
   builder_heading "======= Configuring $target ======="
 
   if [[ $target == wasm ]]; then
@@ -41,7 +47,7 @@ do_configure() {
   else
     pushd "$THIS_SCRIPT_PATH" > /dev/null
     # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
-    meson setup "$MESON_PATH" --default-library both $MESON_CROSS_FILE --werror --buildtype $CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
+    meson setup "$MESON_PATH" $MESON_CROSS_FILE --werror --buildtype $CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
     popd > /dev/null
   fi
 
