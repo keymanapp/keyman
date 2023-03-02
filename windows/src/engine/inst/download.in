@@ -18,4 +18,4 @@ clean:
   rem
 
 candle:
-  $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -ext WixUtilExtension keymanengine.wxs components.wxs
+  $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease  -dVERSION_WITH_TAG=$VersionWithTag -ext WixUtilExtension keymanengine.wxs components.wxs

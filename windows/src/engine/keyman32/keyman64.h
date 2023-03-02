@@ -82,7 +82,7 @@
 #include "../../../../common/windows/cpp/include/legacy_kmx_memory.h"
 
 #ifdef _WIN64
-#define LIBRARY_NAME "KEYMAN64"
+#define LIBRARY_NAME "keyman64-ver17.0.48-alpha-local"
 #else
 #define LIBRARY_NAME "KEYMAN32"
 #endif

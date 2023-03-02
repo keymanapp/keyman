@@ -2,25 +2,30 @@
 # Keyman64-ver Makefile
 #
 
+
+
 !include ..\..\Defines.mak
 
 build: version.res dirs
-    $(MSBUILD) keyman64-ver.sln $(MSBUILD_BUILD) "/p:Platform=x64;VersionWithTag=$(__VERSION_WITH_TAG)"
-    $(COPY) $(X64_TARGET_PATH)\keyman64-ver$(__VERSION_WITH_TAG).dll $(PROGRAM)\engine
-    $(COPY) $(X64_TARGET_PATH)\keyman64-ver$(__VERSION_WITH_TAG).pdb $(DEBUGPATH)\engine
+   $(MKVER_U) download.in download.mak
+	 $(MAKE) -fdownload.mak build
+
 #   $(COPY) keyman64-ver.lib $(OUTLIB) - already done
 
 clean: def-clean
-    $(MSBUILD) keyman64-ver.sln $(MSBUILD_CLEAN) "/p:Platform=x64;VersionWithTag=$(__VERSION_WITH_TAG)"
+		$(MKVER_U) download.in download.mak
+    $(MAKE) -fdownload.mak clean
 
 signcode:
-    $(SIGNCODE) /d "Keyman Engine x64" $(PROGRAM)\engine\keyman64-ver$(__VERSION_WITH_TAG).dll
+    $(MKVER_U) download.in download.mak
+    $(MAKE) -fdownload.mak signcode
 
 wrap-symbols:
-    $(SYMSTORE) $(PROGRAM)\engine\keyman64-ver$(__VERSION_WITH_TAG).dll /t keyman-engine-windows
-    $(SYMSTORE) $(DEBUGPATH)\engine\keyman64-ver$(__VERSION_WITH_TAG).pdb /t keyman-engine-windows
+    $(MKVER_U) download.in download.mak
+    $(MAKE) -fdownload.mak wrap-symbols
 
 install:
-    $(COPY) $(PROGRAM)\engine\keyman64-ver$(__VERSION_WITH_TAG).dll "$(INSTALLPATH_KEYMANENGINE)\keyman64-ver$(__VERSION_WITH_TAG).dll"
+    $(MKVER_U) download.in download.mak
+    $(MAKE) -fdownload.mak install
 
 !include ..\..\Target.mak
