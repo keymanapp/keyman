@@ -53,8 +53,9 @@ builder_describe_outputs \
 
 function convert_markdown_to_html() {
   echo "Converting markdown to html for offline help"
-  cd "$KEYMAN_ROOT/android"
+  pushd "$KEYMAN_ROOT/android"
   ./build-help.sh htm
+  popd
 }
 
 
@@ -108,9 +109,7 @@ fi
 if builder_start_action build; then
 
   # Convert markdown to html for offline help
-  _convert_markdown_to_html
-
-  cd "$KEYMAN_ROOT/android/KMAPro"
+  convert_markdown_to_html
 
   echo "BUILD_FLAGS $BUILD_FLAGS"
   ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS

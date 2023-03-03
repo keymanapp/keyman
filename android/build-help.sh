@@ -69,7 +69,7 @@ displayInfo "" \
 # Compile all .md to .html
 #
 
-cd $KEYMAN_ROOT/android/help
+cd "$KEYMAN_ROOT/android/help"
 
 MDLUA="$KEYMAN_ROOT/resources/build/html-link.lua"
 CSS="../../resources/build/offline-help-style-spec.txt"
