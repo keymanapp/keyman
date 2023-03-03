@@ -45,15 +45,13 @@ if builder_has_option --debug; then
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
 fi  
 
-ARTIFACT="app-$CONFIG.apk"
+ARTIFACT="firstvoices-$VERSION.apk"
 
 builder_describe_outputs \
   configure     app/libs/keyman-engine.aar \
-  build:app     app/build/outputs/apk/$CONFIG/firstvoices${ARTIFACT}
+  build         app/build/outputs/apk/$CONFIG/${ARTIFACT}
 
 #### Build
-
-
 
 # Parse args
 
