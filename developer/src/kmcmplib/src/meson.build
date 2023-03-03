@@ -63,7 +63,6 @@ if compiler.get_id() == 'emscripten'
   links = []
 endif
 
-version_lib = compiler.find_library('version')
 
 lib = library('kmcmplib',
   'CasedKeys.cpp',
@@ -97,7 +96,6 @@ lib = library('kmcmplib',
   version_res,
   cpp_args: defns + warns + flags,
   link_args: links,
-  dependencies: [version_lib],
   version: meson.project_version(),
   include_directories: inc,
   install: true)
