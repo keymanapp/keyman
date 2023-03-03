@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.61 alpha 2023-03-03
+
+* fix(android/app): Another attempt at fixing OSK rotation (#8353)
+
 ## 17.0.60 alpha 2023-03-02
 
 * fix(android/engine): Fix various OSK bugs due to refactor (#8349)
