@@ -3,7 +3,7 @@
 
 #include "compfile.h"
 #include <comperr.h>
-#include "kmcmpdll.h"
+#include "kmcmplib.h"
 #include "DeprecationChecks.h"
 
 KMX_BOOL kmcmp::WarnDeprecatedHeader() {   // I4866

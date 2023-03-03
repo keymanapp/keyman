@@ -71,7 +71,7 @@
 #include "../../../../common/windows/cpp/include/vkeys.h"
 #include <cuchar>
 #include "versioning.h"
-#include "kmcmpdll.h"
+#include "kmcmplib.h"
 #include "DeprecationChecks.h"
 
 #include "virtualcharkeys.h"

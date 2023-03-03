@@ -3,7 +3,7 @@
 
 #include "compfile.h"
 #include <comperr.h>
-#include "kmcmpdll.h"
+#include "kmcmplib.h"
 #include <io.h>
 #include <string>
 #include "CheckFilenameConsistency.h"
@@ -101,7 +101,7 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   u16sprintf(fi_name_char16,_countof(fi.name),fi.name);
 #else
   #error Missing implementation for finding common includes
-#endif  
+#endif
   if (u16cmp(cptr1, fi_name_char16) != 0) {
     u16sprintf(ErrExtraW,256,L"reference '%ls' does not match actual filename '%ls'", cptr1, &fi.name);
     strcpy(ErrExtraLIB, wstrtostr2(ErrExtraW));

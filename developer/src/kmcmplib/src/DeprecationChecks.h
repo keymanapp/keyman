@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Compfile.h"
-#include "kmcmpdll.h"
+#include "kmcmplib.h"
 
 namespace kmcmp{
 KMX_BOOL WarnDeprecatedHeader();

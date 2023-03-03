@@ -1,8 +1,7 @@
 #pragma once
 
-#include <windows.h>
 #include "Compfile.h"
-#include "kmcmpdll.h"
+#include "kmcmplib.h"
 
 KMX_DWORD CheckFilenameConsistencyForCalls(PFILE_KEYBOARD fk);
 KMX_DWORD CheckFilenameConsistency(KMX_CHAR const * Filename, bool ReportMissingFile);

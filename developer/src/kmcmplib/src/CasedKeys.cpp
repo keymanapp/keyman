@@ -4,7 +4,7 @@
 #include "compfile.h"
 #include "comperr.h"
 #include "../../../../common/windows/cpp/include/vkeys.h"
-#include "kmcmpdll.h"
+#include "kmcmplib.h"
 
 #include "CharToKeyConversion.h"
 #include "kmx_u16.h"
@@ -137,12 +137,12 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
   gp->dpKeyArray = k;
   gp->cxKeyArray++;
 
-  k = &k[gp->cxKeyArray - 1];  
+  k = &k[gp->cxKeyArray - 1];
   k->dpContext = new KMX_WCHAR[u16len(kpp->dpContext) + 1];
-  k->dpOutput  = new KMX_WCHAR[u16len(kpp->dpOutput) + 1];   
+  k->dpOutput  = new KMX_WCHAR[u16len(kpp->dpOutput) + 1];
   u16cpy(k->dpContext, kpp->dpContext );  // copy the context.
   u16cpy(k->dpOutput, kpp->dpOutput );    // copy the output.
-  
+
   k->Key = key;
   k->Line = kpp->Line;
   // Add the CAPITAL FLAG, invert shift flag for the rule
