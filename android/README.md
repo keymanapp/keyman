@@ -21,7 +21,7 @@ Keyman for Android uses [Sentry](https://sentry.io) for crash reporting at a ser
  
 ### Compiling From Command Line
 1. Launch a command prompt and cd to the directory **keyman/android**
-2. Run the top level build script `./build.sh build:engine build:app --debug` which will:
+2. Run the top level build script `./build.sh configure build --debug` which will:
     * Compile KMEA (and its KMW dependency)
     * Download default keyboard and dictionary resources as needed
     * Compile KMAPro
@@ -80,7 +80,7 @@ Both sample apps include a default Tamil keyboard and sample dictionary.
 Building these projects follow the same steps as KMAPro:
 
 1. cd to the desired KMSample directory
-2. `./build.sh build:engine build:app`
+2. `./build.sh`
 3. Open Android Studio to run the app
 
 ### Tests: KeyboardHarness
@@ -93,14 +93,14 @@ Building these projects follow the same steps as KMAPro:
   * Build the keyboardharness.kmp keyboard package
 3. Add the keyboard in *android/Tests/KeyboardHarness/app/src/main/java/com/keyman/android/tests/keyboardHarness/MainActivity.java*
 4. cd to android/Tests/KeyboardHarness/
-5. `./build.sh build:engine build:app`
+5. `./build.sh`
 6. Open Android Studio to run the app
 
 --------------------------------------------------------------
 
 ## How to Build Keyman Engine for Android
 1. Open a terminal or Git Bash prompt and go to the Android project folder (e.g. `cd ~/keyman/android/`)
-2. Run `./build.sh build:engine --debug`
+2. Run `./build.sh --debug`
 
 Keyman Engine for Android library (**keyman-engine.aar**) is now ready to be imported in any project.
 

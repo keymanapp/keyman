@@ -27,12 +27,12 @@ TEST_FLAGS="-x assembleRelease lintRelease testRelease" # Gradle test w/o build
 DAEMON_FLAG=
 
 builder_describe "Builds FirstVoices for Android app." \
-  "@../../../android/KMEA" \
+  "@/android/KMEA" \
   "clean" \
   "configure" \
   "build" \
   "test             Runs lint and tests." \
-  "--ci             Don't start the GRadle daemon. For CI" \
+  "--ci             Don't start the Gradle daemon. For CI" \
   "--upload-sentry  Upload to sentry"
 
 # parse before describe_outputs to check debug flags
@@ -53,10 +53,6 @@ builder_describe_outputs \
 
 #### Build
 
-#
-# Prevents 'clear' on exit of mingw64 bash shell
-#
-SHLVL=0
 
 
 # Parse args
@@ -75,15 +71,7 @@ function makeLocalSentryRelease() {
 
 # Check about cleaning artifact paths and upload directories
 if builder_start_action clean; then
-  cd "$KEYMAN_ROOT/oem/firstvoices/android/"
-
-  if [ -d "$KEYMAN_ROOT/oem/firstvoices/android/app/build/outputs" ]; then
-    rm -rf "$KEYMAN_ROOT/oem/firstvoices/android/app/build/outputs"
-  fi
-
-  if [ -d "$KEYMAN_ROOT/android/upload" ]; then
-    rm -rf "$KEYMAN_ROOT/android/upload"
-  fi
+  rm -rf "$KEYMAN_ROOT/oem/firstvoices/android/app/build/outputs"
 
   builder_finish_action success clean
 fi

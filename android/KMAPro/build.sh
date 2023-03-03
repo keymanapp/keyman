@@ -47,20 +47,16 @@ fi
 
 builder_describe_outputs \
   configure     kMAPro/libs/keyman-engine.aar \
-  build:app     kMAPro/build/outputs/apk/$CONFIG/keyman-${VERSION}.apk
+  build         kMAPro/build/outputs/apk/$CONFIG/keyman-${VERSION}.apk
 
 #### Build
 
-function _convert_markdown_to_html() {
+function convert_markdown_to_html() {
   echo "Converting markdown to html for offline help"
   cd "$KEYMAN_ROOT/android"
   ./build-help.sh htm
 }
 
-#
-# Prevents 'clear' on exit of mingw64 bash shell
-#
-SHLVL=0
 
 
 # Parse args
@@ -85,21 +81,15 @@ function makeLocalSentryRelease() {
 
 # Check about cleaning artifact paths and upload directories
 if builder_start_action clean; then
-  cd "$KEYMAN_ROOT/android/KMAPro/"
 
-  if [ -d "$KEYMAN_ROOT/android/KMAPro/kMAPro/build/outputs" ]; then
-    rm -rf "$KEYMAN_ROOT/android/KMAPro/kMAPro/build/outputs"
-  fi
+  rm -rf "$KEYMAN_ROOT/android/KMAPro/kMAPro/build/outputs"
 
-  if [ -d "$KEYMAN_ROOT/android/upload" ]; then
-    rm -rf "$KEYMAN_ROOT/android/upload"
-  fi
+  rm -rf "$KEYMAN_ROOT/android/upload"
 
   builder_finish_action success clean
 fi
 
 if builder_start_action configure; then
-  cd "$KEYMAN_ROOT/android/KMAPro/"
 
   # Copy Keyman Engine for Android
   cp "$KEYMAN_ROOT/android/KMEA/app/build/outputs/aar/${CONFIG}/keyman-engine.aar" "$KEYMAN_ROOT/android/KMAPro/kMAPro/libs/keyman-engine.aar"

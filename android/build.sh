@@ -22,13 +22,14 @@ cd "$THIS_SCRIPT_PATH"
 builder_describe \
   "Build Keyman Engine for Android, Keyman for Android, and FirstVoices Android app." \
   clean \
+  configure \
   build \
   test \
   "publish                                  Publishes the APKs to the Play Store." \
   ":engine=KMEA                             Keyman Engine for Android" \
   ":app=KMAPro                              Keyman for Android" \
-  ":sample1=Samples/KMSample1               Sample apps: KMSample1" \
-  ":sample2=Samples/KMSample2               Sample app:  KMSample2" \
+  ":sample1=Samples/KMSample1               Sample app: KMSample1" \
+  ":sample2=Samples/KMSample2               Sample app: KMSample2" \
   ":keyboardharness=Tests/KeyboardHarness   Test app: KeyboardHarness" \
   ":fv=../oem/firstvoices/android           OEM FirstVoices for Android app" \
   "--ci                                     Don't start the Gradle daemon. Use for CI" \
@@ -36,18 +37,18 @@ builder_describe \
 
 builder_parse "$@"
 
-CONFIG="release"
-DEBUG_FLAG=""
-CI_FLAG=""
-SENTRY_FLAG=""
+CONFIG=release
+DEBUG_FLAG=
+CI_FLAG=
+SENTRY_FLAG=
 
 if builder_has_option --ci; then
-  CI_FLAG="--ci"
+  CI_FLAG=--ci
 fi
 
 if builder_has_option --debug; then
-  CONFIG="debug"
-  DEBUG_FLAG="--debug"
+  CONFIG=debug
+  DEBUG_FLAG=--debug
 fi
 
 builder_describe_outputs \
@@ -63,10 +64,6 @@ if builder_has_option --upload-sentry; then
   SENTRY_FLAG="--upload-sentry"
 fi
 
-#
-# Prevents 'clear' on exit of mingw64 bash shell
-#
-SHLVL=0
 
 # Clean build artifacts: keyman-engine.aar libaries, output and upload directories
 function _clean() {

@@ -68,18 +68,7 @@ fi
 
 # Check about cleaning artifact paths and upload directories
 if builder_start_action clean; then
-  cd "$KEYMAN_ROOT/android/Tests/KeyboardHarness"
-
-  if [ -d "$KEYMAN_ROOT/android/Tests/KeyboardHarness/app/build/outputs" ]; then
-    echo "Cleaning KeyboardHarness build outputs directory"
-    rm -rf "$KEYMAN_ROOT/android/Tests/KeyboardHarness/app/build/outputs"
-  fi
-
-  if [ -d "$KEYMAN_ROOT/android/upload" ]; then
-    echo "Cleaning upload directory"
-    rm -rf "$KEYMAN_ROOT/android/upload"
-  fi
-
+  rm -rf "$KEYMAN_ROOT/android/Tests/KeyboardHarness/app/build/outputs"
   builder_finish_action success clean
 fi
 
@@ -92,7 +81,6 @@ fi
 
 # Building KeyboardHarness
 if builder_start_action build:app; then
-  cd "$KEYMAN_ROOT/android/Tests/KeyboardHarness"
 
   echo "BUILD_FLAGS: $BUILD_FLAGS"
   ./gradlew clean $BUILD_FLAGS

@@ -29,7 +29,7 @@ TEST_FLAGS="-x aR lintRelease testRelease" # Gradle test w/o build
 JUNIT_RESULTS="##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
 
 builder_describe "Builds Keyman Engine for Android." \
-  "@../../web" \
+  "@/web" \
   "clean" \
   "configure" \
   "build" \
@@ -53,10 +53,6 @@ builder_describe_outputs \
 
 #### Build
 
-#
-# Prevents 'clear' on exit of mingw64 bash shell
-#
-SHLVL=0
 
 # Parse args
 
@@ -69,15 +65,9 @@ fi
 
 # Check about cleaning arifact paths and upload directories
 if builder_start_action clean:engine; then
-  cd "$KEYMAN_ROOT/android/KMEA/"
 
-  if [ -d "$KEYMAN_ROOT/android/KMEA/app/build/outputs" ]; then
-    rm -rf "$KEYMAN_ROOT/android/KMEA/app/build/outputs"
-  fi  
-
-  if [ -d "$KEYMAN_ROOT/android/upload" ]; then
-    rm -rf "$KEYMAN_ROOT/android/upload"
-  fi
+  rm -rf "$KEYMAN_ROOT/android/KMEA/app/build/outputs"
+  rm -rf "$KEYMAN_ROOT/android/upload"
 
   builder_finish_action success clean:engine
 fi
@@ -86,17 +76,17 @@ if builder_start_action configure; then
 
   # Copy KeymanWeb artifacts
   echo "Copying Keyman Web artifacts"
-  cp $KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/osk/ajax-loader.gif $ENGINE_ASSETS/ajax-loader.gif
-  cp $KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/keyman.js $ENGINE_ASSETS/keymanandroid.js
-  cp $KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/keyman.js.map $ENGINE_ASSETS/keyman.js.map
-  cp $KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/osk/kmwosk.css $ENGINE_ASSETS/kmwosk.css
-  cp $KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/osk/globe-hint.css $ENGINE_ASSETS/globe-hint.css
-  cp $KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/osk/keymanweb-osk.ttf $ENGINE_ASSETS/keymanweb-osk.ttf
+  cp "$KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/osk/ajax-loader.gif" "$ENGINE_ASSETS/ajax-loader.gif"
+  cp "$KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/keyman.js" "$ENGINE_ASSETS/keymanandroid.js"
+  cp "$KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/keyman.js.map" "$ENGINE_ASSETS/keyman.js.map"
+  cp "$KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/osk/kmwosk.css" "$ENGINE_ASSETS/kmwosk.css"
+  cp "$KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/osk/globe-hint.css" "$ENGINE_ASSETS/globe-hint.css"
+  cp "$KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/osk/keymanweb-osk.ttf" "$ENGINE_ASSETS/keymanweb-osk.ttf"
 
-  cp $KEYMAN_ROOT/common/web/sentry-manager/build/index.js $ENGINE_ASSETS/keyman-sentry.js
+  cp "$KEYMAN_ROOT/common/web/sentry-manager/build/index.js" "$ENGINE_ASSETS/keyman-sentry.js"
 
   echo "Copying es6-shim polyfill"
-  cp $KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js $ENGINE_ASSETS/es6-shim.min.js
+  cp "$KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js" "$ENGINE_ASSETS/es6-shim.min.js"
 
   builder_finish_action success configure
 fi
@@ -105,7 +95,6 @@ fi
 
 
 if builder_start_action build:engine; then
-  cd "$KEYMAN_ANDROID_ROOT/KMEA"
 
   echo "BUILD_FLAGS $BUILD_FLAGS"
   # Build without test
@@ -115,7 +104,6 @@ if builder_start_action build:engine; then
 fi
 
 if builder_start_action test:engine; then
-  cd "$KEYMAN_ANDROID_ROOT/KMEA"
 
   if builder_has_option --ci; then
     # Report JUnit test results to CI

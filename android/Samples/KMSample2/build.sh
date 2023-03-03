@@ -29,7 +29,7 @@ builder_describe "Build KMSample2 app for Android." \
   "clean" \
   "configure" \
   "build" \
-  ":app                   KMSample1" \
+  ":app                   KMSample2" \
   "--ci                   Don't start the Gradle daemon. Use for CI" 
 
 # parse before describe_outputs to check debug flags
@@ -48,10 +48,6 @@ builder_describe_outputs \
   configure             app/libs/keyman-engine.aar \
   build:app             app/build/outputs/apk/$CONFIG/$ARTIFACT
 
-#
-# Prevents 'clear' on exit of mingw64 bash shell
-#
-SHLVL=0
 
 
 # Parse args
@@ -64,16 +60,7 @@ fi
 
 # Check about cleaning artifact paths and upload directories
 if builder_start_action clean; then
-  cd "$KEYMAN_ROOT/android/Samples/KMSample2/"
-
-  if [ -d "$KEYMAN_ROOT/android/Samples/KMSample2/app/build/outputs" ]; then
-    rm -rf "$KEYMAN_ROOT/android/Samples/KMSample2/app/build/outputs"
-  fi
-
-  if [ -d "$KEYMAN_ROOT/android/upload" ]; then
-    rm -rf "$KEYMAN_ROOT/android/upload"
-  fi
-
+  rm -rf "$KEYMAN_ROOT/android/Samples/KMSample2/app/build/outputs"
   builder_finish_action success clean
 fi
 
@@ -86,7 +73,6 @@ fi
 
 # Building KMSample2
 if builder_start_action build:app; then
-  cd "$KEYMAN_ROOT/android/Samples/KMSample2"
   ./gradlew clean $SAMPLE_FLAGS
 
 
