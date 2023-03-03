@@ -10,7 +10,7 @@
 #include "kmx_u16.h"
 
 namespace kmcmp {
-  extern  KMX_CHAR CompileDir[MAX_PATH];
+  extern  KMX_CHAR CompileDir[260]; // TODO: this should not be a fixed buffer
 }
 bool IsRelativePath(KMX_CHAR const * p) {
   // Relative path (returns TRUE):
@@ -119,7 +119,7 @@ KMX_DWORD CheckFilenameConsistencyForCalls(PFILE_KEYBOARD fk) {
   // But let's check what we have anyway
 
   PFILE_STORE sp;
-  DWORD i, msg;
+  KMX_DWORD i, msg;
   for (i = 0, sp = fk->dpStoreArray; i < fk->cxStoreArray; i++, sp++) {
     if (!sp->fIsCall) continue;
 

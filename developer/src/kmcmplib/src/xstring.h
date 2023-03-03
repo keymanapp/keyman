@@ -1,3 +1,4 @@
+// TODO: merge with xstring.h from common
 #pragma once
 #ifndef XSTRING_H
 #define SXTRING_H

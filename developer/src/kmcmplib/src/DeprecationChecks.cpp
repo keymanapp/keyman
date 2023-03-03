@@ -27,7 +27,7 @@ KMX_BOOL kmcmp::CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
       #define TSS_WINDOWSLANGUAGES 29
   */
   int oldCurrentLine = kmcmp::currentLine;
-  DWORD i;
+  KMX_DWORD i;
   PFILE_STORE sp;
 
   if (!AWarnDeprecatedCode_GLOBAL_LIB) {
