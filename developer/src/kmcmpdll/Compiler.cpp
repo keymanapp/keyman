@@ -90,6 +90,17 @@
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
 
+/*
+  Following kmcmplib definitions are translated to Windows types
+  because we can't import the kmcmplib headers. The structure
+  sizes and alignments have been manually verified.
+*/
+
+extern "C" BOOL kmcmp_CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL FSaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc);   // I4865   // I4866
+extern "C" BOOL kmcmp_CompileKeyboardFileToBuffer(PSTR pszInfile, void* pfkBuffer, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc, int Target);  // I4865   // I4866
+extern "C" void kmcmp_Keyman_Diagnostic(int mode) ;
+extern "C" BOOL kmcmp_SetCompilerOptions(PCOMPILER_OPTIONS options);
+
 int xatoi(PWSTR *p);
 int atoiW(PWSTR p);
 void safe_wcsncpy(PWSTR out, PWSTR in, int cbMax);
