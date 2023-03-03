@@ -45,6 +45,13 @@ public:
    */
   std::u16string
   lookup(km_kbp_virtual_key vk, uint16_t modifier_state) const;
+
+private:
+  /**
+   * Non-recursive internal lookup of a specific ID
+  */
+  std::u16string
+  lookup(const vkey_id &id) const;
 };
 
 }  // namespace ldml
