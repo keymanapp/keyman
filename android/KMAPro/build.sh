@@ -80,13 +80,9 @@ function makeLocalSentryRelease() {
 
 #### Build action definitions ####
 
-# Check about cleaning artifact paths and upload directories
+# Check about cleaning artifact paths
 if builder_start_action clean; then
-
   rm -rf "$KEYMAN_ROOT/android/KMAPro/kMAPro/build/outputs"
-
-  rm -rf "$KEYMAN_ROOT/android/upload"
-
   builder_finish_action success clean
 fi
 

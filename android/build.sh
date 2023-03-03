@@ -88,7 +88,11 @@ function _clean() {
 
 # Check about cleaning artifact paths
 if builder_start_action clean; then
-  _clean
+  _clean # TODO: This gets removed with builder_run_child_actions
+
+  # This script also responsible for cleaning up /android/upload
+  echo "Cleanup upload"
+  rm -rf "$KEYMAN_ROOT/android/upload"
   builder_finish_action success clean
 fi
 

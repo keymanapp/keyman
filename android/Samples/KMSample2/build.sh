@@ -58,7 +58,7 @@ fi
 
 #### Build action definitions ####
 
-# Check about cleaning artifact paths and upload directories
+# Check about cleaning artifact paths
 if builder_start_action clean; then
   rm -rf "$KEYMAN_ROOT/android/Samples/KMSample2/app/build/outputs"
   builder_finish_action success clean

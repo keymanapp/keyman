@@ -63,12 +63,9 @@ fi
 
 #### Build action definitions ####
 
-# Check about cleaning arifact paths and upload directories
+# Check about cleaning arifact paths
 if builder_start_action clean:engine; then
-
   rm -rf "$KEYMAN_ROOT/android/KMEA/app/build/outputs"
-  rm -rf "$KEYMAN_ROOT/android/upload"
-
   builder_finish_action success clean:engine
 fi
 
