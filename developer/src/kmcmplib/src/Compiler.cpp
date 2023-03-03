@@ -66,6 +66,8 @@
 */
 #include "pch.h"
 
+#include <kmcmplibapi.h>
+
 #include "compfile.h"
 #include <comperr.h>
 #include "../../../../common/windows/cpp/include/vkeys.h"
@@ -241,7 +243,9 @@ enum LinePrefixType { lptNone, lptKeymanAndKeymanWeb, lptKeymanWebOnly, lptKeyma
 
 /* Compile target */
 
-CompilerMessageProc msgproc = NULL;
+kmcmp_CompilerMessageProc msgproc = NULL;
+void* msgprocContext = NULL;
+
 int kmcmp::currentLine = 0;
 
 kmcmp::NamedCodeConstants *CodeConstants = NULL;
@@ -276,7 +280,7 @@ PKMX_STR wstrtostr(PKMX_WCHAR in)
 KMX_BOOL kmcmp::AddCompileWarning(LPSTR buf)
 {
   SetLastError(0);
-  (*msgproc)(kmcmp::currentLine + 1, CWARN_Info, buf);
+  (*msgproc)(kmcmp::currentLine + 1, CWARN_Info, buf, msgprocContext);
   return FALSE;
 }
 
@@ -290,7 +294,7 @@ KMX_BOOL AddCompileError(KMX_DWORD msg)
   if (msg & CERR_FATAL)
   {
     szTextp = GetCompilerErrorString(msg);
-    (*msgproc)(kmcmp::currentLine + 1, msg, szTextp);
+    (*msgproc)(kmcmp::currentLine + 1, msg, szTextp, msgprocContext);
     kmcmp::nErrors++;
     return TRUE;
   }
@@ -314,28 +318,23 @@ KMX_BOOL AddCompileError(KMX_DWORD msg)
   }
 
   ErrChr = 0;  *ErrExtraLIB =0;
-  if (!(*msgproc)(kmcmp::currentLine, msg, szText)) return TRUE;
+  if (!(*msgproc)(kmcmp::currentLine, msg, szText, msgprocContext)) return TRUE;
   return FALSE;
 }
 
-typedef struct _COMPILER_OPTIONS {
-  KMX_DWORD dwSize;
-  bool ShouldAddCompilerVersion;
-} COMPILER_OPTIONS;
-
-typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
-
-extern "C" KMX_BOOL kmcmp_SetCompilerOptions(PCOMPILER_OPTIONS options) {
+extern "C" bool kmcmp_SetCompilerOptions(KMCMP_COMPILER_OPTIONS* options) {
   //printf("°°-> changed to SetCompilerOptions() of kmcmplib \n");
-  if(!options || options->dwSize < sizeof(COMPILER_OPTIONS)) {
+  if(!options || options->dwSize < sizeof(KMCMP_COMPILER_OPTIONS)) {
     return FALSE;
   }
   kmcmp::FShouldAddCompilerVersion = options->ShouldAddCompilerVersion;
   return TRUE;
 }
 
-extern "C" KMX_BOOL kmcmp_CompileKeyboardFile(PKMX_STR pszInfile, PKMX_STR pszOutfile, KMX_BOOL ASaveDebug, KMX_BOOL ACompilerWarningsAsErrors, KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc)   // I4865   // I4866
-{
+extern "C" uint32_t kmcmp_CompileKeyboardFile(char* pszInfile,
+  char* pszOutfile, bool ASaveDebug, bool ACompilerWarningsAsErrors,
+	bool AWarnDeprecatedCode, kmcmp_CompilerMessageProc pMsgproc, void* AmsgprocContext
+) {
   FILE* fp_in = NULL;
   FILE* fp_out = NULL;
   KMX_BOOL err;
@@ -350,7 +349,7 @@ extern "C" KMX_BOOL kmcmp_CompileKeyboardFile(PKMX_STR pszInfile, PKMX_STR pszOu
 
   kmcmp::CompileTarget = CKF_KEYMAN;
 
-  if (!pMsgProc || !pszInfile || !pszOutfile) SetError(CERR_BadCallParams);
+  if (!pMsgproc || !pszInfile || !pszOutfile) SetError(CERR_BadCallParams);
 
   PKMX_STR p;
 
@@ -362,7 +361,8 @@ extern "C" KMX_BOOL kmcmp_CompileKeyboardFile(PKMX_STR pszInfile, PKMX_STR pszOu
   else
     kmcmp::CompileDir[0] = 0;
 
-  msgproc = pMsgProc;
+  msgproc = pMsgproc;
+  msgprocContext = AmsgprocContext;
   kmcmp::currentLine = 0;
   kmcmp::nErrors = 0;
 
@@ -427,7 +427,8 @@ extern "C" KMX_BOOL kmcmp_CompileKeyboardFile(PKMX_STR pszInfile, PKMX_STR pszOu
 
 
 
-extern "C" KMX_BOOL kmcmp_CompileKeyboardFileToBuffer(PKMX_STR pszInfile, PFILE_KEYBOARD pfkBuffer, KMX_BOOL ACompilerWarningsAsErrors, KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc, int Target)   // I4865   // I4866
+extern "C" uint32_t kmcmp_CompileKeyboardFileToBuffer(char* pszInfile, void* pfkBuffer, bool ACompilerWarningsAsErrors, bool AWarnDeprecatedCode,
+  kmcmp_CompilerMessageProc pMsgproc, void* AmsgprocContext, int Target)   // I4865   // I4866
 {
   //printf("°°-> changed to CompileKeyboardFileToBuffer() of kmcmplib \n");
   FILE* fp_in = NULL;
@@ -441,7 +442,7 @@ extern "C" KMX_BOOL kmcmp_CompileKeyboardFileToBuffer(PKMX_STR pszInfile, PFILE_
   AWarnDeprecatedCode_GLOBAL_LIB = AWarnDeprecatedCode;
   kmcmp::CompileTarget = Target;
 
-  if (!pMsgProc || !pszInfile || !pfkBuffer) SetError(CERR_BadCallParams);
+  if (!pMsgproc || !pszInfile || !pfkBuffer) SetError(CERR_BadCallParams);
 
   PKMX_STR p;
 
@@ -453,7 +454,8 @@ extern "C" KMX_BOOL kmcmp_CompileKeyboardFileToBuffer(PKMX_STR pszInfile, PFILE_
   else
     kmcmp::CompileDir[0] = 0;
 
-  msgproc = pMsgProc;
+  msgproc = pMsgproc;
+  msgprocContext = AmsgprocContext;
   kmcmp::currentLine = 0;
   kmcmp::nErrors = 0;
 
@@ -481,7 +483,7 @@ extern "C" KMX_BOOL kmcmp_CompileKeyboardFileToBuffer(PKMX_STR pszInfile, PFILE_
 
   CodeConstants = new kmcmp::NamedCodeConstants;
 
-  err = CompileKeyboardHandle(fp_in, pfkBuffer);
+  err = CompileKeyboardHandle(fp_in, static_cast<PFILE_KEYBOARD>(pfkBuffer));
   delete CodeConstants;
   fclose(fp_in);
 
@@ -3813,14 +3815,6 @@ FILE* UTF16TempFromUTF8(FILE* fp_in , KMX_BOOL hasPreamble)
   delete[] outbuf;
   fseek( fp_out,2,SEEK_SET);
   return fp_out;
-}
-
- extern "C" void kmcmp_Keyman_Diagnostic(int mode) {
-
-  //printf("°°-> changed to Keyman_Diagnostic() of kmcmplib \n");
-  if (mode == 0) {
-    RaiseException(0x0EA0BEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
-  }
 }
 
 PFILE_STORE FindSystemStore(PFILE_KEYBOARD fk, KMX_DWORD dwSystemID)

@@ -4,18 +4,17 @@
  * Tiny frame console app to compile a .kmx from a .kmn
  */
 
-#include <windows.h>
 #include <stdio.h>
-#include "kmcompx.h"
 #include <iostream>
 #include <vector>
 #include <string>
 #include <sstream>
+#include <kmcmplibapi.h>
 using namespace std;
 
 vector < int > error_vec;
 
-int WINAPI msgproc(int line, KMX_DWORD dwMsgCode, char* szText)
+int msgproc(int line, uint32_t dwMsgCode, char* szText, void* context)
 {
   error_vec.push_back(dwMsgCode);
   printf("line %d  error %x  %s\n", line, (unsigned int)dwMsgCode, szText);
@@ -24,8 +23,8 @@ int WINAPI msgproc(int line, KMX_DWORD dwMsgCode, char* szText)
 
 int main(int argc, char *argv[])
 {
-  PKMX_STR kmn_file = argv[1];
-  PKMX_STR kmx_file = argv[2];
+  char* kmn_file = argv[1];
+  char* kmx_file = argv[2];
 
 	if(argc < 3) {
 		puts("Usage: kmcompxtest source.kmn compiled.kmx");
@@ -46,7 +45,7 @@ int main(int argc, char *argv[])
   char  first5[6] = "CERR_";
   char* pfirst5 = first5;
 
-  if (kmcmp_CompileKeyboardFile(kmn_file, kmx_file, FALSE, FALSE, TRUE, msgproc)) {
+  if (kmcmp_CompileKeyboardFile(kmn_file, kmx_file, false, false, true, msgproc, nullptr)) {
     char* testname = strrchr( (char*) kmn_file, '\\') + 1;
     if (strncmp(testname, pfirst5, 5) == 0) return 1;  // exit code 1: CERR_ in Name + no Error found
 
