@@ -30,6 +30,8 @@ export class NodeKeyboardLoader extends KeyboardLoaderBase {
       return Promise.reject(err);
     }
 
-    return Promise.resolve(this.harness.activeKeyboard);
+    const keyboard = this.harness.loadedKeyboard;
+    this.harness.loadedKeyboard = null;
+    return Promise.resolve(keyboard);
   }
 }

@@ -1,6 +1,6 @@
 let assert = chai.assert;
 
-import { DOMKeyboardLoader, DOMKeyboardSandbox } from '../../../build/lib/keyboards/loaders/domKeyboardLoader.mjs';
+import { DOMKeyboardLoader, DOMKeyboardSandbox } from '../../../build/lib/dom-keyboard-loader.mjs';
 import { extendString, KeyboardHarness, KeyboardInterface, MinimalKeymanGlobal, Mock } from '../../../build/lib/index.mjs';
 
 // Note:  rule processing tests will fail if string extensions are not established beforehand.
@@ -36,6 +36,7 @@ describe('Keyboard loading in DOM', function() {
     const harness = new KeyboardInterface(window, MinimalKeymanGlobal);
     const keyboardLoader = new DOMKeyboardLoader(harness);
     const keyboard = await keyboardLoader.loadKeyboardFromPath('/resources/keyboards/khmer_angkor.js');
+    harness.activeKeyboard = keyboard;
 
     assert.isOk(keyboard);
     assert.equal(keyboard.id, 'Keyboard_khmer_angkor');
@@ -74,6 +75,7 @@ describe('Keyboard loading in DOM', function() {
     const harness = new KeyboardInterface(sandboxedGlobal.sandbox, MinimalKeymanGlobal);
     const keyboardLoader = new DOMKeyboardLoader(harness, sandboxedGlobal);
     const keyboard = await keyboardLoader.loadKeyboardFromPath('/resources/keyboards/khmer_angkor.js');
+    harness.activeKeyboard = keyboard;
     assert.isNotOk(window.KeymanWeb);
 
     assert.isOk(keyboard);

@@ -58,6 +58,7 @@ describe('Headless keyboard loading', function() {
       let harness = new KeyboardInterface({}, MinimalKeymanGlobal);
       let keyboardLoader = new NodeKeyboardLoader(harness);
       let keyboard = await keyboardLoader.loadKeyboardFromPath(laoPath);
+      harness.activeKeyboard = keyboard;
       // --  END:  Standard Recorder-based unit test loading boilerplate --
 
       // This part provides assurance that the keyboard properly loaded.
@@ -69,6 +70,7 @@ describe('Headless keyboard loading', function() {
       let harness = new KeyboardInterface({}, MinimalKeymanGlobal);
       let keyboardLoader = new NodeKeyboardLoader(harness);
       let keyboard = await keyboardLoader.loadKeyboardFromPath(laoPath);
+      harness.activeKeyboard = keyboard;
       // --  END:  Standard Recorder-based unit test loading boilerplate --
 
       // Runs a blank KeyEvent through the keyboard's rule processing.

@@ -23,8 +23,9 @@ describe('Engine - Unmatched Final Groups', function() {
   before(async function() {
     // -- START: Standard Recorder-based unit test loading boilerplate --
     let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
-    let keyboard = await keyboardLoader.loadKeyboardFromPath('../../test/' + testSuite.keyboard.filename);
+    const keyboard = await keyboardLoader.loadKeyboardFromPath('../../test/' + testSuite.keyboard.filename);
     keyboardWithHarness = keyboardLoader.harness;
+    keyboardWithHarness.activeKeyboard = keyboard;
 
     assert.equal(keyboard.id, "Keyboard_" + testSuite.keyboard.id);
     // --  END:  Standard Recorder-based unit test loading boilerplate --

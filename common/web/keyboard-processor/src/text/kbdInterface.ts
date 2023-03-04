@@ -258,7 +258,7 @@ export default class KeyboardInterface extends KeyboardHarness {
     // NOTE:  This implementation is web-core specific and is intentionally replaced, whole-sale,
     //        by DOM-aware code.
     let keyboard = new Keyboard(Pk);
-    this.activeKeyboard = keyboard;
+    this.loadedKeyboard = keyboard;
   }
 
   /**

@@ -29,7 +29,6 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   "configure" \
   "build" \
   "test" \
-  ":app/browser              The website-integrating, browser-based version of KMW" \
   ":app/webview              A puppetable version of KMW designed for use in a host app's WebView" \
   ":engine/configuration     Subset used to configure KMW" \
   ":engine/device-detect     Subset used for device-detection " \
@@ -39,13 +38,14 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":engine/main              Builds all common code used by KMW's app/-level targets" \
   ":engine/osk               Builds the Web OSK module"
 
+# ":app/browser              The website-integrating, browser-based version of KMW" \
+
 # Possible TODO?
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
 
 builder_describe_outputs \
   configure                      ../node_modules \
   build:app/browser              build/app/browser/lib/index.js \
-  build:app/webview              build/app/webview/lib/index.js \
   build:engine/configuration     build/engine/configuration/obj/index.js \
   build:engine/device-detect     build/engine/device-detect/lib/index.mjs \
   build:engine/dom-utils         build/engine/dom-utils/obj/index.js \
@@ -53,6 +53,8 @@ builder_describe_outputs \
   build:engine/keyboard-cache    build/engine/keyboard-cache/lib/index.mjs \
   build:engine/main              build/engine/main/lib/index.mjs \
   build:engine/osk               build/engine/osk/lib/index.mjs
+
+# build:app/webview              build/app/webview/lib/index.js \
 
   # TODO:  app/ui linkage.
 
@@ -98,7 +100,8 @@ builder_run_child_actions build:engine/main
 builder_run_child_actions build:app/webview
 
 # Uses literally everything `engine/` above
-builder_run_child_actions build:app/browser
+# Is not yet compilable due to unmodularized components.
+# builder_run_child_actions build:app/browser
 
 builder_run_child_actions test
 
