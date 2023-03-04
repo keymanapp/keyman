@@ -24,18 +24,16 @@ export default class KeyboardInterface extends KeyboardInterfaceBase {
   }
 
   registerKeyboard(Pk): void {
-    const priorActiveKeyboard = this.activeKeyboard;
-
     // Among other things, sets Pk as a newly-active Keyboard.
     super.registerKeyboard(Pk);
-    const registeredKeyboard = this.activeKeyboard;
+    const registeredKeyboard = this.loadedKeyboard;
 
     const cacheEntry = this.stubAndKeyboardCache.getKeyboard(registeredKeyboard.id);
     if(!(cacheEntry instanceof Promise)) {
       // Deliberate keyboard pre-loading via direct script-tag link on the page.
-      // Just load the keyboard and set our field back in place.
+      // Just load the keyboard and reset the harness's keyboard-receiver field.
       this.stubAndKeyboardCache.addKeyboard(new Keyboard(Pk));
-      this.activeKeyboard = priorActiveKeyboard;
+      this.loadedKeyboard = null;
     }
   }
 
