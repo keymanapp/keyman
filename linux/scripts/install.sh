@@ -31,7 +31,7 @@ if [ -f "/usr/share/ibus/component/keyman.xml" ] && [ "${SUDOINSTALL}" == "yes" 
 	fi
 fi
 
-cd keyboardprocessor/arch/release
+cd ../core/build/arch/release
 ninja install
 cd "$BASEDIR"
 
