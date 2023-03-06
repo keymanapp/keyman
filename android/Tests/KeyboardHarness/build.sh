@@ -29,9 +29,11 @@ builder_describe "Build KeyboardHarness test app for Android." \
   "configure" \
   "build" \
   ":app                   KeyboardHarness" \
-  "--ci                   Don't start the Gradle daemon. Use for CI" 
+  "--ci                   Don't start the Gradle daemon. Use for CI" \
+  --debug \
+  --upload-sentry
 
-# parse before describe outputs to check debug flags  
+# parse before describe outputs to check debug flags
 builder_parse "$@"
 
 if builder_has_option --debug; then

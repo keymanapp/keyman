@@ -33,6 +33,7 @@ builder_describe "Builds FirstVoices for Android app." \
   "build" \
   "test             Runs lint and tests." \
   "--ci             Don't start the Gradle daemon. For CI" \
+  --debug \
   "--upload-sentry  Upload to sentry"
 
 # parse before describe_outputs to check debug flags
@@ -43,7 +44,7 @@ if builder_has_option --debug; then
   CONFIG="debug"
   BUILD_FLAGS="assembleDebug -x lint -x test"
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
-fi  
+fi
 
 ARTIFACT="firstvoices-$VERSION.apk"
 

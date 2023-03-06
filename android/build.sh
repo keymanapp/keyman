@@ -26,6 +26,9 @@ builder_describe \
   build \
   test \
   "publish                                  Publishes the APKs to the Play Store." \
+  --ci+ \
+  --debug+ \
+  --upload-sentry+ \
   ":engine=KMEA                             Keyman Engine for Android" \
   ":app=KMAPro                              Keyman for Android" \
   ":sample1=Samples/KMSample1               Sample app: KMSample1" \
@@ -35,35 +38,14 @@ builder_describe \
 
 builder_parse "$@"
 
-CONFIG=release
-DEBUG_FLAG=
-CI_FLAG=
-SENTRY_FLAG=
-
-if builder_has_option --ci; then
-  CI_FLAG=--ci
-fi
-
-if builder_has_option --debug; then
-  CONFIG=debug
-  DEBUG_FLAG=--debug
-fi
-
-builder_run_child_actions clean configure build test publish
-
-if builder_has_option --upload-sentry; then
-  SENTRY_FLAG="--upload-sentry"
-fi
-
-# TODO: 
-# builder_declare_inheritable_parameters \
-#  "--ci                                     Don't start the Gradle daemon. Use for CI" \
-#  "--upload-sentry                          Uploads debug symbols, etc, to Sentry"
-
 # This script also responsible for cleaning up /android/upload
-if builder_start_action clean; then
+builder_run_child_actions clean
 
-  builder_heading "Cleanup /android/upload"
+if builder_start_action clean; then
+  builder_echo "Cleaning /android/upload"
   rm -rf "$KEYMAN_ROOT/android/upload"
   builder_finish_action success clean
 fi
+
+builder_run_child_actions configure build test publish
+

@@ -337,7 +337,9 @@ a definition:
 builder_describe "Testing script" clean test+
 ```
 
-**Options** are defined by including a `--` prefix, for example:
+**Options** are defined by including a `--` prefix.
+
+Specification of options: `"--option[,-o][+][=var]   [One line description]"`
 
 ```bash
 builder_describe "Sample script" \
@@ -349,6 +351,12 @@ A shorthand form may optionally be provided by appending `,-x` to the parameter
 definition, where `x` is a one letter shorthand form. Currently, shorthand forms
 may not be combined when invoking the script -- each must be passed separately.
 Ensure that you do not include a space after the comma.
+
+If a `+` is appended (after the optional shorthand form, but before the
+default), then the option will be passed to child scripts. All child scripts
+_must_ accept this option, or they will fail. It is acceptable for the child
+script to declare the option but ignore it. However, the option will _not_ be
+passed to dependencies.
 
 By default, an option will be treated as a boolean. It can be tested with
 [`builder_has_option`]. If you need to pass additional data, then the

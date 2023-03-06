@@ -35,7 +35,9 @@ builder_describe "Builds Keyman Engine for Android." \
   "build" \
   "test             Runs lint and unit tests." \
   ":engine          Builds Engine" \
-  "--ci             Don't start the Gradle daemon. For CI"
+  "--ci             Don't start the Gradle daemon. For CI" \
+  --debug \
+  --upload-sentry
 
 # parse before describe_outputs to check debug flags
 builder_parse "$@"

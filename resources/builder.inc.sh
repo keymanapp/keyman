@@ -279,7 +279,17 @@ _builder_execute_child() {
     echo "${COLOR_BLUE}## $scope$action$target starting...${COLOR_RESET}"
   fi
 
+  # Build array of specified inheritable options
+  local child_options=()
+  local opt
+  for opt in "${_builder_options_inheritable[@]}"; do
+    if builder_has_option $opt; then
+      child_options+=($opt)
+    fi
+  done
+
   "$script" $action \
+    ${child_options[@]} \
     $builder_verbose \
     $builder_debug \
   && (
@@ -573,16 +583,21 @@ _builder_expand_action_targets() {
 #
 # There are four types of parameters that may be specified:
 #
-# * **Option:** `"--option[,-o][=var]   [One line description]"`
+# * **Option:** `"--option[,-o][+][=var]   [One line description]"`
 #
 #   All options must have a longhand form with two prefix hyphens,
 #   e.g. `--option`. The `,-o` shorthand form is optional. When testing if
 #   the option is set with `builder_has_option`, always use the longhand
 #   form.
 #
-#   if `=var` is specified, then the next parameter will be a variable stored in
+#   If `=var` is specified, then the next parameter will be a variable stored in
 #   `$var` for that option. e.g. `--option=opt` means `$opt` will have the value
 #   `"foo"` when the script is called for `--option foo`.
+#
+#   If `+` is specified, then the option will be passed to child scripts. All
+#   child scripts _must_ accept this option, or they will fail. It is acceptable
+#   for the child script to declare the option but ignore it. However, the option
+#   will _not_ be passed to dependencies.
 #
 # * **Action**: `"action   [One line description]"`
 #
@@ -624,6 +639,7 @@ builder_describe() {
   _builder_targets=()
   _builder_options=()
   _builder_deps=()                    # array of all dependencies for this script
+  _builder_options_inheritable=()     # array of all options that should be passed to child scripts
   _builder_default_action=build
   declare -A -g _builder_params
   declare -A -g _builder_options_short
@@ -682,10 +698,21 @@ builder_describe() {
         value="$(echo "$value" | cut -d= -f 1 -)"
       fi
 
+      local is_inheritable=false
+
+      if [[ $value =~ \+$ ]]; then
+        # final + indicates that option is inheritable
+        is_inheritable=true
+        value="${value:0:-1}"
+      fi
+
       if [[ $value =~ , ]]; then
         local option_long="$(echo "$value" | cut -d, -f 1 -)"
         local option_short="$(echo "$value" | cut -d, -f 2 -)"
         _builder_options+=($option_long)
+        if $is_inheritable; then
+          _builder_options_inheritable+=($option_long)
+        fi
         _builder_options_short[$option_short]="$option_long"
         if [[ ! -z "$option_var" ]]; then
           _builder_options_var[$option_long]="$option_var"
@@ -693,6 +720,9 @@ builder_describe() {
         value="$option_long, $option_short"
       else
         _builder_options+=($value)
+        if $is_inheritable; then
+          _builder_options_inheritable+=($value)
+        fi
         if [[ ! -z "$option_var" ]]; then
           _builder_options_var[$value]="$option_var"
         fi
@@ -701,6 +731,7 @@ builder_describe() {
       if [[ ! -z $option_var ]]; then
         value="$value $option_var"
       fi
+
     else
       # Parameter is an action
       if [[ $value =~ \+$ ]]; then

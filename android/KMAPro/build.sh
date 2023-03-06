@@ -33,6 +33,7 @@ builder_describe "Builds Keyman for Android app." \
   "build" \
   "test             Runs lint and unit tests." \
   "--ci             Don't start the Gradle daemon. For CI" \
+  "--debug" \
   "--upload-sentry  Upload to sentry"
 
 # parse before describe_outputs to check debug flags
