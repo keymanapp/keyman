@@ -9,7 +9,7 @@ project('keyboardprocessor', 'cpp', 'c',
         version: run_command(find_program('getversion.bat', 'getversion.sh'), check:true).stdout().strip(),
         license: 'MIT',
         default_options : ['buildtype=release',
-                           'cpp_std=c++14',
+                           'cpp_std=c++17',
                            'b_vscrt=static_from_buildtype',
                            'warning_level=2'],
         meson_version: '>=0.53.0')
