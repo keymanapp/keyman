@@ -42,7 +42,7 @@ builder_parse "$@"
 builder_run_child_actions clean
 
 if builder_start_action clean; then
-  builder_echo "Cleaning /android/upload"
+  echo "Cleaning /android/upload"
   rm -rf "$KEYMAN_ROOT/android/upload"
   builder_finish_action success clean
 fi
