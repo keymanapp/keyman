@@ -31,9 +31,7 @@ builder_describe \
   ":sample1=Samples/KMSample1               Sample app: KMSample1" \
   ":sample2=Samples/KMSample2               Sample app: KMSample2" \
   ":keyboardharness=Tests/KeyboardHarness   Test app: KeyboardHarness" \
-  ":fv=../oem/firstvoices/android           OEM FirstVoices for Android app" \
-  "--ci                                     Don't start the Gradle daemon. Use for CI" \
-  "--upload-sentry                          Uploads debug symbols, etc, to Sentry" 
+  ":fv=../oem/firstvoices/android           OEM FirstVoices for Android app"
 
 builder_parse "$@"
 
@@ -51,120 +49,21 @@ if builder_has_option --debug; then
   DEBUG_FLAG=--debug
 fi
 
-builder_describe_outputs \
-  build:engine            KMEA/app/build/outputs/aar/$CONFIG/keyman-engine.aar \
-  build:app               KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${VERSION}.apk \
-  build:sample1           Samples/KMSample1/app/build/outputs/apk/${CONFIG}/app-${CONFIG}.apk \
-  build:sample2           Samples/KMSample2/app/build/outputs/apk/${CONFIG}/app-${CONFIG}.apk \
-  build:keyboardharness   Tests/KeyboardHarness/app/build/outputs/apk/${CONFIG}/app-${CONFIG}.apk \
-  build:fv                ../oem/firstvoices/android/app/build/outputs/apk/$CONFIG/firstvoices-${VERSION}.apk
-
+builder_run_child_actions clean configure build test publish
 
 if builder_has_option --upload-sentry; then
   SENTRY_FLAG="--upload-sentry"
 fi
 
+# TODO: 
+# builder_declare_inheritable_parameters \
+#  "--ci                                     Don't start the Gradle daemon. Use for CI" \
+#  "--upload-sentry                          Uploads debug symbols, etc, to Sentry"
 
-# Clean build artifacts: keyman-engine.aar libaries, output and upload directories
-function _clean() {
-  cd "$KEYMAN_ROOT/android/KMEA"
-  ./build.sh clean
-
-  cd "$KEYMAN_ROOT/android/KMAPro"
-  ./build.sh clean
-
-  cd "$KEYMAN_ROOT/android/Samples/KMSample1"
-  ./build.sh clean
-
-  cd "$KEYMAN_ROOT/android/Samples/KMSample2"
-  ./build.sh clean
-
-  cd "$KEYMAN_ROOT/android/Tests/KeyboardHarness"
-  ./build.sh clean
-
-  cd "$KEYMAN_ROOT/oem/firstvoices/android"
-  ./build.sh clean
-}
-
-# Check about cleaning artifact paths
+# This script also responsible for cleaning up /android/upload
 if builder_start_action clean; then
-  _clean # TODO: This gets removed with builder_run_child_actions
 
-  # This script also responsible for cleaning up /android/upload
-  echo "Cleanup upload"
+  builder_heading "Cleanup /android/upload"
   rm -rf "$KEYMAN_ROOT/android/upload"
   builder_finish_action success clean
-fi
-
-# Building Keyman for Android
-if builder_start_action build:app; then
-  cd "$KEYMAN_ROOT/android/KMAPro"
-  ./build.sh build $CI_FLAG $DEBUG_FLAG $SENTRY_FLAG
-  builder_finish_action success build:app
-fi
-
-# Building KMSample1 app
-if builder_start_action build:sample1; then
-  cd "$KEYMAN_ROOT/android/Samples/KMSample1"
-  ./build.sh build $CI_FLAG $DEBUG_FLAG
-  builder_finish_action success build:sample1
-fi
-
-# Building KMSample2 app
-if builder_start_action build:sample2; then
-  cd "$KEYMAN_ROOT/android/Samples/KMSample2"
-  ./build.sh build $CI_FLAG $DEBUG_FLAG
-  builder_finish_action success build:sample2
-fi
-
-# Building KeyboardHarness app
-if builder_start_action build:keyboardharness; then
-  cd "$KEYMAN_ROOT/android/Tests/KeyboardHarness"
-  ./build.sh build $CI_FLAG $DEBUG_FLAG
-  builder_finish_action success build:keyboardharness
-fi
-
-# Building OEM app
-if builder_start_action build:fv; then
-  cd "$KEYMAN_ROOT/oem/firstvoices/android"
-  ./build.sh build $CI_FLAG $DEBUG_FLAG
-  builder_finish_action success build:fv
-fi
-
-#### Tests #####
-if builder_start_action test:engine; then
-  cd "$KEYMAN_ROOT/android/KMEA"
-  ./build.sh test $CI_FLAG $DEBUG_FLAG
-  builder_finish_action success test:engine
-fi
-
-if builder_start_action test:app; then
-  cd "$KEYMAN_ROOT/android/KMAPro"
-  ./build.sh test $CI_FLAG $DEBUG_FLAG
-  builder_finish_action success test:app
-fi
-
-if builder_start_action test:fv; then
-  cd "$KEYMAN_ROOT/oem/firstvoices/android"
-  ./build.sh test $CI_FLAG $DEBUG_FLAG
-  builder_finish_action success test:fv
-fi
-
-
-# Publish Keyman for Android to Play Store
-if builder_start_action publish:app; then
-  echo "publishing Keyman for Android"
-
-  cd "$KEYMAN_ROOT/android"
-  ./build-publish.sh -no-daemon -kmapro
-  builder_finish_action success publish:app
-fi
-
-# Publish FirstVoices for Android to Play Store
-if builder_start_action publish:fv; then
-  echo "publishing OEM FirstVoices Android app"
-
-  cd "$KEYMAN_ROOT/android"
-  ./build-publish.sh -no-daemon -fv
-  builder_finish_action success publish:fv
 fi
