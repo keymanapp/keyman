@@ -165,7 +165,9 @@ builder_echo() {
       blue|heading) color="$COLOR_BLUE" ;;
       yellow|warning) color="$COLOR_YELLOW" ;;
       red|error) color="$COLOR_RED" ;;
-      teal) color="$COLOR_TEAL" ;;
+      purple) color="$COLOR_PURPLE" ;;
+      brightwhite) color="$COLOR_BRIGHTWHITE" ;;
+      teal|debug) color="$COLOR_TEAL" ;;
       setmark) mark="$HEADING_SETMARK" color="$COLOR_PURPLE" ;;
     esac
 
@@ -181,7 +183,7 @@ builder_echo() {
 }
 
 builder_echo_debug() {
-  builder_echo teal "[DEBUG] $*"
+  builder_echo debug "[DEBUG] $*"
 }
 
 #

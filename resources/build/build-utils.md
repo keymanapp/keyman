@@ -452,6 +452,91 @@ builder_display_usage
 
 --------------------------------------------------------------------------------
 
+## `builder_echo` function
+
+Wraps the `echo` command with color and a script identifier prefix.
+
+### Usage
+
+```bash
+builder_echo [mode] message
+```
+
+### Parameters
+
+Note: if only a single parameter passed, it will be the **message** parameter, and
+mode will be `white`.
+
+* **mode**: one of the following modes:
+  * `success`: A message indicating success, represented with green text
+  * `heading`: A heading, represented with blue text
+  * `warning`: A warning message, represented with yellow text
+  * `error`: An error message, represented with red text (consider [`builder_die`])
+  * `debug`: A debug string, represented with teal text (consider [`builder_echo_debug`])
+  
+  Or color identifiers:
+  * `white`: Normal white text, the default if **mode** is omitted
+  * `grey`: Darker grey text
+  * `green`: Equivalent to `success`
+  * `blue`: Equivalent to `heading`
+  * `yellow`: Equivalent to `warning`
+  * `red`: Equivalent to `error`
+  * `purple`: Purple text, generally reserved by Builder for `setmark` section 
+    headings
+  * `brightwhite`: Bright white text, generally reserved by Builder for
+    delineating current script messages
+  * `teal`: Teal text, equivalent to `debug`, generally reserved for debugging
+    messages
+
+  The following modes are used mostly by Builder internally:
+  * `setmark`: A marker for a section heading, represented with purple text
+
+* **message**: a string (surround with quote marks)
+
+### Description
+
+The `builder_echo` command will emit a string, with the current script
+identifier  at the start, optionally with color formatting (as long as the terminal 
+supports color).
+
+```bash
+builder_echo "this went well"
+builder_echo error "this didn't go so well"
+```
+
+```
+[this/script/identifier] this went well
+[this/script/identifier] this didn't go so well
+```
+
+(Red text cannot be represented here!)
+
+The current script identifier will be grey for dependency builds and bright
+white for top-level builds and child builds.
+
+--------------------------------------------------------------------------------
+
+## `builder_echo_debug` function
+
+Wraps the `builder_echo` command with debug mode and a `[DEBUG]` prefix.
+
+### Usage
+
+```bash
+builder_echo_debug message
+```
+
+### Parameters
+
+* **message**: The message to emit to the console
+
+### Description
+
+This function is used internally within Builder, but can also be used by
+any builder scripts as required.
+
+--------------------------------------------------------------------------------
+
 ## `$builder_extra_params` variable
 
 If a build script needs to be able to pass arbitrary additional parameters onto
@@ -724,6 +809,8 @@ resolve either to empty string (for `$COLOR_*`), or equivalent plain-text forms
 * `$HEADING_SETMARK`: Add a setmark, e.g. with VSCode
   <https://code.visualstudio.com/updates/v1_69#_setmark-sequence-support>
 
+Note: it is often cleaner to use [`builder_echo`] than to use these variables directly.
+
 Note: it is recommended that you use `$(builder_term text)` instead of
 `${BUILDER_TERM_START}text${BUILDER_TERM_END}`.
 
@@ -740,3 +827,6 @@ Note: it is recommended that you use `$(builder_term text)` instead of
 [`$builder_verbose`]: #builderverbose-variable
 [formatting variables]: #formatting-variables
 [`builder_run_child_actions`]: #builderrunchildactions-function
+[`builder_echo`]: #builderecho-function
+[`builder_die`]: #builderdie-function
+[`builder_echo_debug`]: #builderechodebug-function
