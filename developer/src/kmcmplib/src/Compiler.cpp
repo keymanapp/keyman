@@ -3413,7 +3413,7 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
       *p = L' ';
       continue;
     }
-    if((*p == L'\\') || (*p == L'/')) {
+    if((*p == L'\\')) {
       LineCarry = TRUE;
       *p = L' ';
       continue;
