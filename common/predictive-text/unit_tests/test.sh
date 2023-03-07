@@ -23,8 +23,7 @@ builder_describe "Runs all tests for the language-modeling / predictive-text lay
   ":libraries  Runs unit tests for in-repo libraries used by this module"\
   ":headless   Runs this module's headless user tests" \
   ":browser    Runs this module's browser-based user tests" \
-  "--ci        Uses CI-based test configurations & emits CI-friendly test reports" \
-  "--debug,-d  Activates developer-friendly debug mode for unit tests where applicable"
+  "--ci        Uses CI-based test configurations & emits CI-friendly test reports"
 
 # TODO: consider dependencies? ideally this will be test.inc.sh?
 
@@ -122,12 +121,12 @@ if builder_start_action test:browser; then
     KARMA_CONFIG="CI.conf.js"
     KARMA_INFO_LEVEL="--log-level=debug"
 
-    if builder_has_option --debug; then
+    if builder_is_debug_build; then
       echo "$(builder_term --ci) option set; ignoring $(builder_term --debug) option"
     fi
   else
     KARMA_CONFIG="manual.conf.js"
-    if builder_has_option --debug; then
+    if builder_is_debug_build; then
       KARMA_FLAGS="$KARMA_FLAGS --no-single-run"
       KARMA_CONFIG="manual.conf.js"
       KARMA_INFO_LEVEL="--log-level=debug"

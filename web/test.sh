@@ -76,7 +76,7 @@ get_default_browser_set ( ) {
 }
 
 if builder_start_action test:engine; then
-  if builder_has_option --ci && builder_has_option --debug; then
+  if builder_has_option --ci && builder_is_debug_build; then
     builder_die "Options --ci and --debug are incompatible."
   fi
 
@@ -104,7 +104,7 @@ if builder_start_action test:engine; then
   # Prepare the flags for the karma command.
   KARMA_FLAGS=
 
-  if builder_has_option --debug; then
+  if builder_is_debug_build; then
     KARMA_FLAGS="$KARMA_FLAGS --no-single-run"
   fi
 
