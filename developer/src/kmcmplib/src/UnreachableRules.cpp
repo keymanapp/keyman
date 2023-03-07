@@ -4,7 +4,7 @@
 #include "compfile.h"
 #include <comperr.h>
 #include "../../../../common/windows/cpp/include/vkeys.h"
-#include "kmcmpdll.h"
+#include "kmcmplib.h"
 
 #include <unordered_map>
 #include <unordered_set>
