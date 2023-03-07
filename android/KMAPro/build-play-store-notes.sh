@@ -6,8 +6,8 @@ set -u
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 QUIET=0
@@ -35,7 +35,7 @@ DEFAULT_RELEASE_NOTE="* Additional bug fixes and improvements"
 FILTERED_LINES=$( grep '^\s*\*.*$' "$KEYMAN_ROOT/android/help/about/whatsnew.md" || [[ $? == 1 ]] ) # Continue if grep has no matches
 if [ -z "$FILTERED_LINES" ]; then
   FILTERED_LINES="$DEFAULT_RELEASE_NOTE"
-  warn "Warning: whatsnew.md empty so using default release note: '$FILTERED_LINES'"
+  builder_warn "Warning: whatsnew.md empty so using default release note: '$FILTERED_LINES'"
 fi
 
 IFS=$'\n'      # Change IFS to new line
@@ -48,8 +48,8 @@ do
     echo "$line" >> $PLAY_RELEASE_NOTES
   else
     # 450 chars reached
-    warn "Warning: Play Store release notes approaching 500 character limit"
+    builder_warn "Warning: Play Store release notes approaching 500 character limit"
     echo "$DEFAULT_RELEASE_NOTE" >> $PLAY_RELEASE_NOTES
     break
-  fi  
+  fi
 done

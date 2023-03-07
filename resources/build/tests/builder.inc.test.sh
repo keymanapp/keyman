@@ -4,8 +4,8 @@ set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../build-utils.sh"
 # END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -15,14 +15,14 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 builder_describe - clean build
 builder_parse "build"
 if [[ "${_builder_chosen_action_targets[@]}" != "build:project" ]]; then
-  fail "  Test: builder_parse, shorthand form 'build' should give us 'build:project"
+  builder_die "  Test: builder_parse, shorthand form 'build' should give us 'build:project"
 fi
 
 if builder_start_action build; then
   echo "building project"
   builder_finish_action success build
 else
-  fail "FAIL: should have matched action build for :project"
+  builder_die "FAIL: should have matched action build for :project"
 fi
 
 # Longhand builder_describe, builder_parse
@@ -33,10 +33,10 @@ builder_describe_parse_short_test() {
   local expected="$3"
   local parameters="$4"
   echo "Testing: builder_describe, parse \"$actions\" \"$targets\" $parameters"
-  builder_describe "-" $actions $targets || fail "builder_describe died under curious circumstances"
-  builder_parse $parameters || fail "builder_parse died under curious circumstances"
+  builder_describe "-" $actions $targets || builder_die "builder_describe died under curious circumstances"
+  builder_parse $parameters || builder_die "builder_parse died under curious circumstances"
   if [[ "$expected" != "${_builder_chosen_action_targets[@]}" ]]; then
-    fail "  Test: builder_describe, parse \"$actions\" \"$targets\" $parameters != \"$expected\""
+    builder_die "  Test: builder_describe, parse \"$actions\" \"$targets\" $parameters != \"$expected\""
   fi
 }
 
@@ -50,7 +50,7 @@ builder_describe_parse_short_test "clean build test" ":module :tools :app :proje
 builder_describe "-" clean build test 'default+' :module :tools :app
 
 if [[ $_builder_default_action != "default" ]]; then
-  fail "FAIL: default action should have been 'default'"
+  builder_die "FAIL: default action should have been 'default'"
 fi
 
 # Shorthand form where we don't have a :target (default is ":project")
@@ -58,25 +58,25 @@ if builder_start_action build; then
   echo "building project"
   builder_finish_action success build
 else
-  fail "FAIL: should have matched action build for :project"
+  builder_die "FAIL: should have matched action build for :project"
 fi
 
 if builder_start_action clean:app; then
   echo "Cleaning <clean:app>"
   builder_finish_action success clean:app
 else
-  fail "FAIL: should have matched action clean for :app"
+  builder_die "FAIL: should have matched action clean for :app"
 fi
 
 if builder_start_action build:app; then
   echo "Building app"
   builder_finish_action success build:app
 else
-  fail "FAIL: should have matched action build for :app"
+  builder_die "FAIL: should have matched action build for :app"
 fi
 
 if builder_start_action build:module; then
-  fail "FAIL: should not have matched action build for :module"
+  builder_die "FAIL: should not have matched action build for :module"
 fi
 
 # "clean build test" ":app :engine" "--help"
@@ -88,12 +88,12 @@ builder_parse_test() {
   shift
   local parameters="$@"
   echo "${COLOR_BLUE}## Testing: builder_parse $parameters${COLOR_RESET}"
-  builder_parse $parameters || fail "builder_parse died under curious circumstances"
+  builder_parse $parameters || builder_die "builder_parse died under curious circumstances"
   if [[ "$expected" != "${_builder_chosen_action_targets[@]}" ]]; then
-    fail "  Test: builder_parse $parameters action:target != \"$expected\""
+    builder_die "  Test: builder_parse $parameters action:target != \"$expected\""
   fi
   if [[ "$expected_options" != "${_builder_chosen_options[@]}" ]]; then
-    fail "  Test: builder_parse $parameters, options != \"$expected\""
+    builder_die "  Test: builder_parse $parameters, options != \"$expected\""
   fi
 }
 
@@ -115,7 +115,7 @@ builder_parse_test "clean:app test:engine" "--power" clean:app test:engine --pow
 if builder_has_option --power; then
   echo "PASS: --power option found"
 else
-  fail "FAIL: --power option not found"
+  builder_die "FAIL: --power option not found"
 fi
 
 builder_parse_test "clean:app test:engine" "--zoom" clean:app test:engine -z
@@ -123,7 +123,7 @@ builder_parse_test "clean:app test:engine" "--zoom" clean:app test:engine -z
 if builder_has_option --zoom; then
   echo "PASS: --zoom option found"
 else
-  fail "FAIL: --zoom option not found"
+  builder_die "FAIL: --zoom option not found"
 fi
 
 # Test --feature <foo>
@@ -135,21 +135,21 @@ if builder_has_option --feature; then
   if [[ $FOO == xyzzy ]]; then
     echo "PASS: --feature option variable \$FOO has expected value 'xyzzy'"
   else
-    fail "FAIL: --feature option variable \$FOO had value '$FOO' but should have had 'xyzzy'"
+    builder_die "FAIL: --feature option variable \$FOO had value '$FOO' but should have had 'xyzzy'"
   fi
 else
-  echo "FAIL: --feature option not found"
+  builder_die "FAIL: --feature option not found"
 fi
 
 builder_parse -- one two "three four five"
 if [[ ${builder_extra_params[0]} != "one" ]]; then
-  fail "FAIL: -- extra parameter 'one' not found"
+  builder_die "FAIL: -- extra parameter 'one' not found"
 fi
 if [[ ${builder_extra_params[1]} != "two" ]]; then
-  fail "FAIL: -- extra parameter 'two' not found"
+  builder_die "FAIL: -- extra parameter 'two' not found"
 fi
 if [[ ${builder_extra_params[2]} != "three four five" ]]; then
-  fail "FAIL: -- extra parameter 'three four five' not found"
+  builder_die "FAIL: -- extra parameter 'three four five' not found"
 fi
 
 # Run tests based in separate scripts to facilitate their operation
@@ -162,12 +162,26 @@ $THIS_SCRIPT_PATH/build-utils-traps.test.sh error-in-function
 $THIS_SCRIPT_PATH/build-utils-traps.test.sh incomplete
 echo "${COLOR_BLUE}## Running dependency tests${COLOR_RESET}"
 $THIS_SCRIPT_PATH/builder-deps.test.sh
+$THIS_SCRIPT_PATH/dependencies/app/build.sh configure build
+
+$THIS_SCRIPT_PATH/dependencies/app/build.sh error && \
+  builder_die "FAIL: error code 0 but should have failed with exit code 22 from child dep" || (
+    result=$?
+    if [[ $result != 22 ]]; then
+      builder_die "FAIL: exit code $result but should have failed with exit code 22 from child dep"
+    fi
+  ) || exit $?
+
 echo "${COLOR_BLUE}## End external tests${COLOR_RESET}"
 echo
 
-# Finally, run with --help so we can see what it looks like
-# Note:  calls `exit`, so no further tests may be defined.
+(
+  # Finally, run with --help so we can see what it looks like; note:
+  # builder_parse calls `exit 0` on a --help run, so running in a subshell
+  echo "${COLOR_BLUE}## Testing --help${COLOR_RESET}"
+  builder_parse --no-color --help
+) || builder_die "FAIL: builder-parse returned failure code $? unexpectedly"
 
-echo "${COLOR_BLUE}## Testing --help${COLOR_RESET}"
-
-builder_parse --no-color --help
+echo "${COLOR_GREEN}======================================================${COLOR_RESET}"
+echo "${COLOR_GREEN}All tests passed successfully${COLOR_RESET}"
+echo "${COLOR_GREEN}======================================================${COLOR_RESET}"

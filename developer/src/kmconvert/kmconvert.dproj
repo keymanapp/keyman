@@ -129,7 +129,6 @@
         <DCCReference Include="..\..\..\common\windows\delphi\general\VKeys.pas"/>
         <DCCReference Include="..\common\delphi\general\WindowsLanguages.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
-        <DCCReference Include="..\..\..\common\windows\delphi\general\CRC32.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\utildir.pas"/>
         <DCCReference Include="..\common\delphi\general\TextFileFormat.pas"/>

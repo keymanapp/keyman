@@ -4,8 +4,8 @@ set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../build-utils.sh"
 # END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -18,6 +18,7 @@ builder_describe \
   "@./dep4 *:project" \
   "@./dep5 build:bar test:*" \
   "@./dep6 build:bar test" \
+  clean \
   configure \
   build \
   test \
@@ -36,7 +37,7 @@ function test_dep_should_build() {
   local dep="$2"
 
   if ! _builder_should_build_dep "$at" "resources/build/tests/$dep"; then
-    fail "FAIL: expecting to build dependency $dep for $at"
+    builder_die "FAIL: expecting to build dependency $dep for $at"
   else
     echo "PASS: will build dependency $dep for $at"
   fi
@@ -47,7 +48,7 @@ function test_dep_should_not_build() {
   local dep="$2"
 
   if _builder_should_build_dep "$at" "resources/build/tests/$dep"; then
-    fail "FAIL: not expecting to build dependency $dep for $at"
+    builder_die "FAIL: not expecting to build dependency $dep for $at"
   else
     echo "PASS: will not build dependency $dep for $at"
   fi
@@ -95,6 +96,19 @@ test_dep_should_not_build configure:bar dep6
 test_dep_should_build build:bar dep6
 test_dep_should_build test:bar dep6
 
+test_dep_should_not_build clean:project dep1
+test_dep_should_not_build clean:bar dep1
+test_dep_should_not_build clean:project dep2
+test_dep_should_not_build clean:bar dep2
+test_dep_should_not_build clean:project dep3
+test_dep_should_not_build clean:bar dep3
+test_dep_should_not_build clean:project dep4
+test_dep_should_not_build clean:bar dep4
+test_dep_should_not_build clean:project dep5
+test_dep_should_not_build clean:bar dep5
+test_dep_should_not_build clean:project dep6
+test_dep_should_not_build clean:bar dep6
+
 # Test if 'build' actions are added because their output
 # is missing
 builder_parse test
@@ -102,5 +116,5 @@ if [[ "${_builder_chosen_action_targets[@]}" == "test:project test:bar build:pro
   echo "PASS: 'build' actions automatically added"
 else
   echo "All targets: ${_builder_chosen_action_targets[@]}"
-  fail "FAIL: 'build' actions not automatically added, or unexpected action:targets added"
+  builder_die "FAIL: 'build' actions not automatically added, or unexpected action:targets added"
 fi

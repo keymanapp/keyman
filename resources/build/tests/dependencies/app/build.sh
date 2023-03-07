@@ -4,8 +4,8 @@ set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../build-utils.sh"
 # END STANDARD BUILD SCRIPT INCLUDE
 
 cd "$THIS_SCRIPT_PATH"
@@ -14,8 +14,10 @@ cd "$THIS_SCRIPT_PATH"
 
 builder_describe "app test module" \
   @../library \
+  "@../error error" \
   configure \
-  build
+  build \
+  error
 
 builder_parse "$@"
 
@@ -38,4 +40,10 @@ if builder_start_action build:project; then
   echo " ... doing the 'build' action for 'app'"
   touch out.build
   builder_finish_action success build:project
+fi
+
+if builder_start_action error:project; then
+  echo " ... doing the 'error' action for 'app'; we shouldn't have gotten here"
+  echo " ... because dependencies/error should have failed"
+  exit 99
 fi

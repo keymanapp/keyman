@@ -8,8 +8,8 @@ set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -57,10 +57,11 @@ builder_describe_outputs \
   configure:samples ../node_modules \
   configure:tools   ../node_modules \
   build:embed       build/app/embed/release/keyman.js \
+  build:engine      build/engine/main/obj/keymanweb.js \
   build:web         build/app/web/release/keymanweb.js \
   build:ui          build/app/ui/release/kmwuibutton.js \
-  build:samples     $PREDICTIVE_TEXT_OUTPUT
-# Deliberately excluding build:tools b/c its script provides the definitions.
+  build:samples     $PREDICTIVE_TEXT_OUTPUT \
+  build:tools       build/tools/building/sourcemap-root/index.js
 
 builder_parse "$@"
 
@@ -176,7 +177,7 @@ copy_resources ( ) {
   # thus doesn't need to publish sources or resources.
   local CONFIGS=(debug)
 
-  if ! builder_has_option --skip-minify; then
+  if ! builder_has_option --no-minify; then
     CONFIGS+=(release)
   fi
 
@@ -224,7 +225,7 @@ copy_sources ( ) {
   # thus doesn't need to publish sources or resources.
   CONFIGS=(debug)
 
-  if ! builder_has_option --skip-minify; then
+  if ! builder_has_option --no-minify; then
     CONFIGS+=(release)
   fi
 
@@ -292,7 +293,7 @@ copy_outputs ( ) {
 # ```
 compile ( ) {
   local COMPILE_TARGET=$1
-  npm run tsc -- -b src/$COMPILE_TARGET -v
+  npm run tsc -- -b src/$COMPILE_TARGET -v || builder_die "Build command tsc -- -b src/$COMPILE_TARGET -v failed with exit code $?"
   echo $COMPILE_TARGET TypeScript compiled under build/$COMPILE_TARGET/obj
 }
 
@@ -312,7 +313,7 @@ compile ( ) {
 # ```
 finalize ( ) {
   if [ $# -lt 2 ]; then
-    fail "Scripting error: insufficient argument count!"
+    builder_die "Scripting error: insufficient argument count!"
   fi
 
   local COMPILE_TARGET=$1
@@ -443,7 +444,7 @@ if builder_start_action build:embed; then
   #     pushd $EMBED_OUTPUTs
   #   fi
   #   echo "Uploading to Sentry..."
-  #   npm run sentry-cli -- releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix $ARTIFACT_FOLDER --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
+  #   npm run sentry-cli -- releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix $ARTIFACT_FOLDER --rewrite --ext js --ext map --ext ts || builder_die "Sentry upload failed."
   #   echo "Upload successful."
   #   popd
   # fi
@@ -507,7 +508,7 @@ fi
 # if [ $UPLOAD_WEB_SENTRY = true ]; then
 #     pushd $WEB_OUTPUT
 #     echo "Uploading to Sentry..."
-#     npm run sentry-cli -- releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix release/web/ --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
+#     npm run sentry-cli -- releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix release/web/ --rewrite --ext js --ext map --ext ts || builder_die "Sentry upload failed."
 #     echo "Upload successful."
 #     popd
 # fi
