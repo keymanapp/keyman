@@ -476,19 +476,20 @@ For each key:
   by the compiler.
 - `mod`: 32-bit bitfield defined as below. Little endian values.
 
-| Bit position | Meaning  | Comment                                     |
-|--------------|----------|---------------------------------------------|
-| `0x00000000` | `none`   | All zeros = no modifiers                    |
-|      0       | `ctrlL`  | `ctrl = ctrlL + ctrlR`                      |
-|      1       | `ctrlR`  |                                             |
-|      2       | `altL`   |                                             |
-|      3       | `altR`   | `alt` (both) = `altL + altR`                |
-|      4       | `shift`  | Either shift                                |
-|      8       | `caps`   |                                             |
+|  Value   | Meaning  |`kmx_file.h`   | Comment                                     |
+|----------|----------|---------------|---------------------------------------------|
+|  0x0000  | `none`   |               | All zeros = no modifiers                    |
+|  0x0001  | `ctrlL`  | `LCTRLFLAG`   | Left Control                                |
+|  0x0002  | `ctrlR`  | `RCTRLFLAG`   | Right Control                               |
+|  0x0004  | `altL`   | `LALTFLAG`    | Left Alt                                    |
+|  0x0008  | `altR`   | `RALTFLAG`    | Right Alt                                   |
+|  0x0010  | `shift`  | `K_SHIFTFLAG` | Either Shift                                |
+|  0x0020  | `ctrl`   | `K_CTRLFLAG`  | Either Control                              |
+|  0x0040  | `alt`    | `K_ALTFLAG`   | Either Alt                                  |
+|  0x0100  | `caps`   | `CAPITALFLAG` | Caps lock                                   |
 
 TODO-LDML: Note that conforming to other keyman values, left versus right shift
-cannot be distinguished. Also note that `cmd` and `opt` do not match
-other keyman values.
+cannot be distinguished.
 
 TODO-LDML: Note that 'Current' LDML spec allows `shiftL`/`shiftR`, `opt`,
 and `cmd` but there is a request to drop these. These four are not represented
