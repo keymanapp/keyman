@@ -2,13 +2,13 @@
 #include <json-schema.hpp>
 #include <fstream>
 
-#include <windows.h>
+#include "kmcompx.h"
 
 using nlohmann::json;
 using nlohmann::json_uri;
 using nlohmann::json_schema_draft4::json_validator;
 
-typedef BOOL (CALLBACK *ValidateJsonMessageProc)(INT64 offset, const char* szText);
+typedef bool (*kmcmp_ValidateJsonMessageProc)(int64_t offset, const char* szText, void* context);
 
 static void loader(const json_uri &uri, json &schema)
 {
@@ -16,13 +16,12 @@ static void loader(const json_uri &uri, json &schema)
   if (!lf.good())
     throw std::invalid_argument("could not open " + uri.url() + " tried with " + uri.path());
 
-    lf >> schema;
+  lf >> schema;
 }
 
-extern "C" BOOL __declspec(dllexport) ValidateJsonFile(PWSTR schemaStream, PWSTR jsonStream , ValidateJsonMessageProc MessageProc) {
-  std::fstream f(schemaStream);
+extern "C" bool kmcmp_ValidateJsonFile(std::fstream& f, std::fstream& fd, kmcmp_ValidateJsonMessageProc MessageProc, void* context) {
   if (!f.good()) {
-    MessageProc(-1, "Schema file could not be loaded.");
+    MessageProc(-1, "Schema file could not be loaded.", context);
     return FALSE;
   }
 
@@ -32,7 +31,7 @@ extern "C" BOOL __declspec(dllexport) ValidateJsonFile(PWSTR schemaStream, PWSTR
     f >> schema;
   }
   catch (std::exception &e) {
-    MessageProc(f.tellp(), e.what());
+    MessageProc(f.tellp(), e.what(), context);
     return FALSE;
   }
 
@@ -45,16 +44,15 @@ extern "C" BOOL __declspec(dllexport) ValidateJsonFile(PWSTR schemaStream, PWSTR
     validator.set_root_schema(schema);
   }
   catch (std::exception &e) {
-    MessageProc(-2, e.what());
+    MessageProc(-2, e.what(), context);
     return FALSE;
   }
 
   // 3) do the actual validation of the document
   json document;
 
-  std::fstream fd(jsonStream );
   if (!fd.good()) {
-    MessageProc(-3, "Json file could not be loaded.");
+    MessageProc(-3, "Json file could not be loaded.", context);
     return FALSE;
   }
 
@@ -63,7 +61,7 @@ extern "C" BOOL __declspec(dllexport) ValidateJsonFile(PWSTR schemaStream, PWSTR
     validator.validate(document);
   }
   catch (std::exception &e) {
-    MessageProc(fd.tellp(), e.what());
+    MessageProc(fd.tellp(), e.what(), context);
     return FALSE;
   }
 
