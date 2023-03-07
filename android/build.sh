@@ -44,9 +44,8 @@ if builder_has_option --ci; then
   CI_FLAG=--ci
 fi
 
-if builder_has_option --debug; then
+if builder_is_debug_build; then
   CONFIG=debug
-  DEBUG_FLAG=--debug
 fi
 
 builder_run_child_actions clean configure build test publish
@@ -55,7 +54,7 @@ if builder_has_option --upload-sentry; then
   SENTRY_FLAG="--upload-sentry"
 fi
 
-# TODO: 
+# TODO:
 # builder_declare_inheritable_parameters \
 #  "--ci                                     Don't start the Gradle daemon. Use for CI" \
 #  "--upload-sentry                          Uploads debug symbols, etc, to Sentry"

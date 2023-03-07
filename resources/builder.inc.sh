@@ -147,11 +147,15 @@ function builder_heading() {
 # builder_ names are reserved.
 # _builder_ names are internal use and subject to change
 #
-if [ -z ${_builder_debug+x} ]; then
-  _builder_debug=false
+# _builder_debug_internal flag can be used to emit verbose logs for builder itself,
+# e.g.:
+#   _builder_debug_internal=true ./build.sh
+#
+if [ -z ${_builder_debug_internal+x} ]; then
+  _builder_debug_internal=false
 fi
 
-if $_builder_debug; then
+if $_builder_debug_internal; then
   echo "[DEBUG] Command line: $0 $@"
 fi
 
@@ -259,7 +263,7 @@ _builder_failure_trap() {
 #
 _builder_cleanup_deps() {
   if ! builder_is_dep_build && [[ ! -z ${_builder_deps_built+x} ]]; then
-    if $_builder_debug; then
+    if $_builder_debug_internal; then
       echo "[DEBUG] Dependencies that were built:"
       cat "$_builder_deps_built"
     fi
@@ -275,7 +279,7 @@ _builder_execute_child() {
   local scope="[$THIS_SCRIPT_IDENTIFIER] "
   local script="$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh"
 
-  if $_builder_debug; then
+  if $_builder_debug_internal; then
     echo "${COLOR_BLUE}## $scope$action$target starting...${COLOR_RESET}"
   fi
 
@@ -283,7 +287,7 @@ _builder_execute_child() {
     $builder_verbose \
     $builder_debug \
   && (
-    if $_builder_debug; then
+    if $_builder_debug_internal; then
       echo "${COLOR_GREEN}## $scope$action$target completed successfully${COLOR_RESET}"
     fi
   ) || (
@@ -1053,7 +1057,7 @@ builder_parse() {
     _builder_add_chosen_action_target_dependencies
   fi
 
-  if $_builder_debug; then
+  if $_builder_debug_internal; then
     echo "[DEBUG] Selected actions and targets:"
     for e in "${_builder_chosen_action_targets[@]}"; do
       echo "* $e"
@@ -1067,6 +1071,7 @@ builder_parse() {
 
   if builder_is_dep_build; then
     echo -e "${HEADING_SETMARK}${COLOR_PURPLE}[$THIS_SCRIPT_IDENTIFIER] dependency build, started by $builder_dep_parent${COLOR_RESET}"
+    echo -e "${HEADING_SETMARK}${COLOR_PURPLE}[$THIS_SCRIPT_IDENTIFIER] parameters: <${_builder_params[@]}>${COLOR_RESET}"
     if [[ -z ${_builder_deps_built+x} ]]; then
       echo "FATAL ERROR: Expected --builder-deps-built parameter"
       exit 1
@@ -1301,7 +1306,6 @@ _builder_do_build_deps() {
       continue
     fi
 
-    # TODO: add --debug as a standard builder parameter
     builder_set_module_has_been_built "$dep"
     "$KEYMAN_ROOT/$dep/build.sh" configure build \
       $builder_verbose \
@@ -1309,7 +1313,7 @@ _builder_do_build_deps() {
       $_builder_build_deps \
       --builder-deps-built "$_builder_deps_built" \
       --builder-dep-parent "$THIS_SCRIPT_IDENTIFIER" && (
-      if $_builder_debug; then
+      if $_builder_debug_internal; then
         echo "${COLOR_GREEN}## [$THIS_SCRIPT_IDENTIFIER] Dependency $dep for $_builder_matched_action_name successfully${COLOR_RESET}"
       fi
     ) || (
@@ -1448,7 +1452,7 @@ builder_verbose() {
 #
 # returns `0` if we are doing a debug build
 #
-builder_debug() {
+builder_is_debug_build() {
   if [[ $builder_debug == --debug ]]; then
     return 0
   fi

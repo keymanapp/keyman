@@ -38,12 +38,12 @@ builder_describe "Builds FirstVoices for Android app." \
 # parse before describe_outputs to check debug flags
 builder_parse "$@"
 
-if builder_has_option --debug; then
+if builder_is_debug_build; then
   builder_heading "### Debug config ####"
   CONFIG="debug"
   BUILD_FLAGS="assembleDebug -x lint -x test"
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
-fi  
+fi
 
 ARTIFACT="firstvoices-$VERSION.apk"
 
