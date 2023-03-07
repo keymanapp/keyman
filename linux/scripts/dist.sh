@@ -45,7 +45,7 @@ dpkg-source --tar-ignore=*~ --tar-ignore=.git --tar-ignore=.gitattributes \
     --tar-ignore=resources/devbox --tar-ignore=resources/git-hooks \
     --tar-ignore=resources/scopes \
     --tar-ignore=resources/build/*.lua --tar-ignore=resources/build/jq* \
-    --tar-ignore=resources/build/vswhere* --tar-ignore=results \
+    --tar-ignore=results \
     --tar-ignore=web --tar-ignore=windows --tar-ignore=keyman_1* \
     --tar-ignore=dist --tar-ignore=.pbuilderrc --tar-ignore=VERSION -Zgzip -b .
 mv ../keyman_"${VERSION}".tar.gz linux/dist/keyman-"${VERSION}".tar.gz
