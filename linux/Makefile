@@ -54,10 +54,8 @@ nightlydist: reconf sources
 
 check:
 	cd keyman-config && ./run-tests.sh
-	cd ibus-keyman && make check
+	cd ibus-keyman && ./build.sh test
 
-tmpcheck:
-	cd keyman-config && ./run-tests.sh
-	cd build-ibus-keyman && make check
+tmpcheck: check
 
 tests: check

@@ -1,0 +1,19 @@
+{
+    "extends": "../../../tsconfig-base.json",
+    "compilerOptions": {
+        "composite": true,
+        "declaration": true,
+        "target": "ES2020",
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "rootDir": ".",
+        "outDir": "build/",
+    },
+    "exclude": [
+        "node_modules"
+    ],
+    "files": [
+        "index.ts",
+        "hextobin.ts"
+    ]
+}

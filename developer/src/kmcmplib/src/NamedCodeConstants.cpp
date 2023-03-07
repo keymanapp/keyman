@@ -1,18 +1,18 @@
 /*2012
   Name:             NamedCodeConstants
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      19 Jul 2011
 
   Modified Date:    13 Dec 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          19 Jul 2011 - mcdurdin - I2993 - Named code constants cause a warning 0x208D to appear
                     24 Oct 2012 - mcdurdin - I3481 - V9.0 - Eliminate unsafe calls in C++
                     06 Feb 2012 - mcdurdin - I3056 - If file was not found in first search folder, named code constants failed to compile
@@ -26,7 +26,7 @@
 #include <limits.h>
 #include "NamedCodeConstants.h"
 #include "CheckFilenameConsistency.h"
-#include <kmcmpdll.h>
+#include <kmcmplib.h>
 using namespace kmcmp;
 
 int IsHangulSyllable(const KMX_WCHAR *codename, int *code);
@@ -165,7 +165,7 @@ KMX_BOOL NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
   }
 
   fclose(fp);
- 
+
   return TRUE;
 }
 
@@ -300,12 +300,12 @@ int IsHangulSyllable(const KMX_WCHAR *codename, int *code)
 
   int i, LIndex, VIndex, TIndex;
 
-    /* Find initial */ 
+    /* Find initial */
 
-  int ch = towupper(*codename); 
+  int ch = towupper(*codename);
   if(strchr("GNDRMBSJCKTPH", ch))
   {
-    /* Has an initial syllable */ 
+    /* Has an initial syllable */
     int isDoubled = towupper(*(codename+1)) == ch;
 
     LIndex = -1;
@@ -319,9 +319,9 @@ int IsHangulSyllable(const KMX_WCHAR *codename, int *code)
     codename++;
     if(isDoubled) codename++;
   }
-  else LIndex = 11; /* no initial */ 
+  else LIndex = 11; /* no initial */
 
-    /* Find vowel */ 
+    /* Find vowel */
 
   KMX_WCHAR V[4] = u"";
   V[0] = *codename;
@@ -340,10 +340,10 @@ int IsHangulSyllable(const KMX_WCHAR *codename, int *code)
 
   codename += u16len(V);
 
-  /* Find final */ 
+  /* Find final */
 
   TIndex = -1;
-    
+
   for(i = 0; i < HangulTCount; i++) {
     if(!u16icmp(Hangul_JAMO_T_TABLE[i], codename)) {
       TIndex = i;
@@ -353,7 +353,7 @@ int IsHangulSyllable(const KMX_WCHAR *codename, int *code)
 
   if(TIndex == -1) return 0;
 
-  /* Composition */ 
+  /* Composition */
 
   *code = (HangulSBase + (LIndex * HangulVCount + VIndex) * HangulTCount) + TIndex;
 

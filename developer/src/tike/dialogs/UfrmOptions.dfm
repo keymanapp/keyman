@@ -30,7 +30,7 @@ inherited frmOptions: TfrmOptions
         Width = 125
         Height = 25
         Caption = '&Proxy Settings...'
-        TabOrder = 4
+        TabOrder = 5
         OnClick = cmdProxySettingsClick
       end
       object gbExternalEditor: TGroupBox
@@ -39,7 +39,7 @@ inherited frmOptions: TfrmOptions
         Width = 401
         Height = 45
         Caption = '&External Editor Path'
-        TabOrder = 1
+        TabOrder = 2
         object editExternalEditorPath: TEdit
           Left = 8
           Top = 16
@@ -62,7 +62,7 @@ inherited frmOptions: TfrmOptions
         Width = 125
         Height = 25
         Caption = 'S&MTP Settings...'
-        TabOrder = 3
+        TabOrder = 6
         OnClick = cmdSMTPSettingsClick
       end
       object chkOpenKeyboardFilesInSourceView: TCheckBox
@@ -71,7 +71,7 @@ inherited frmOptions: TfrmOptions
         Width = 221
         Height = 17
         Caption = 'Open &keyboard files in source view'
-        TabOrder = 0
+        TabOrder = 1
       end
       object cmdResetToolWindows: TButton
         Left = 8
@@ -79,7 +79,7 @@ inherited frmOptions: TfrmOptions
         Width = 125
         Height = 25
         Caption = '&Reset tool windows'
-        TabOrder = 2
+        TabOrder = 4
         OnClick = cmdResetToolWindowsClick
       end
       object chkAllowMultipleInstances: TCheckBox
@@ -88,7 +88,7 @@ inherited frmOptions: TfrmOptions
         Width = 289
         Height = 17
         Caption = '&Allow multiple instances of Keyman Developer'
-        TabOrder = 5
+        TabOrder = 0
       end
       object gbDefaultProjectPath: TGroupBox
         Left = 8
@@ -96,7 +96,7 @@ inherited frmOptions: TfrmOptions
         Width = 401
         Height = 45
         Caption = '&Default Project Folder'
-        TabOrder = 6
+        TabOrder = 3
         object editDefaultProjectPath: TEdit
           Left = 8
           Top = 16
@@ -136,14 +136,14 @@ inherited frmOptions: TfrmOptions
         Width = 401
         Height = 73
         Caption = 'Privacy'
-        TabOrder = 9
+        TabOrder = 10
         object chkReportUsage: TCheckBox
           Left = 8
           Top = 44
           Width = 311
           Height = 17
           Caption = '&Share anonymous usage statistics with keyman.com'
-          TabOrder = 0
+          TabOrder = 1
         end
         object chkReportErrors: TCheckBox
           Left = 8
@@ -151,8 +151,16 @@ inherited frmOptions: TfrmOptions
           Width = 311
           Height = 17
           Caption = 'Automatically report &errors to keyman.com'
-          TabOrder = 1
+          TabOrder = 0
         end
+      end
+      object chkUseLegacyCompiler: TCheckBox
+        Left = 152
+        Top = 244
+        Width = 250
+        Height = 17
+        Caption = 'Use legacy .kmn compiler (removing in 18.0)'
+        TabOrder = 9
       end
     end
     object tabEditor: TTabSheet

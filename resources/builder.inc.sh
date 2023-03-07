@@ -30,8 +30,8 @@ function _builder_findRepoRoot() {
     # See https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
     # None of the answers are 100% correct for cross-platform
     # On macOS, requires coreutils (`brew install coreutils`)
-    local SCRIPT=$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")
-    REPO_ROOT=$(dirname $(dirname "$SCRIPT"))
+    local SCRIPT=$(readlink -f "${BASH_SOURCE[0]}")
+    REPO_ROOT="${SCRIPT%/*/*}"
     readonly REPO_ROOT
 }
 
@@ -44,16 +44,16 @@ function _builder_findRepoRoot() {
 # ```bash
 #   ## START STANDARD BUILD SCRIPT INCLUDE
 #   # adjust relative paths as necessary
-#   THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-#   . "$(dirname "$THIS_SCRIPT")/resources/builder.inc.sh"
+#   THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+#   . "${THIS_SCRIPT%/*}/resources/builder.inc.sh"
 #   ## END STANDARD BUILD SCRIPT INCLUDE
 # ```
 #
 function _builder_setBuildScriptIdentifiers() {
   if [ ! -z ${THIS_SCRIPT+x} ]; then
-    THIS_SCRIPT_PATH="$(dirname "$THIS_SCRIPT")"
+    THIS_SCRIPT_PATH="${THIS_SCRIPT%/*}"
     readonly THIS_SCRIPT_PATH
-    THIS_SCRIPT_NAME="$(basename "$THIS_SCRIPT")"
+    THIS_SCRIPT_NAME="${THIS_SCRIPT##*/}"
     readonly THIS_SCRIPT_NAME
     # Leaves only the part of the path based upon REPO_ROOT.
     THIS_SCRIPT_IDENTIFIER=${THIS_SCRIPT_PATH#"$REPO_ROOT/"}
@@ -119,7 +119,11 @@ function builder_term() {
 
 function builder_die() {
   echo
-  echo "${COLOR_RED}$*${COLOR_RESET}"
+  if [[ $# -eq 0 ]]; then
+    echo "${COLOR_RED}Unspecified error, aborting script${COLOR_RESET}"
+  else
+    echo "${COLOR_RED}$*${COLOR_RESET}"
+  fi
   echo
   exit 1
 }
@@ -127,6 +131,11 @@ function builder_die() {
 function builder_warn() {
   echo "${COLOR_YELLOW}$*${COLOR_RESET}"
 }
+
+function builder_heading() {
+  echo -e "${HEADING_SETMARK}${COLOR_BLUE}$*${COLOR_RESET}"
+}
+
 
 ####################################################################################
 #
@@ -281,7 +290,7 @@ _builder_execute_child() {
     result=$?
     echo "${COLOR_RED}## $scope$action$target failed with exit code $result${COLOR_RESET}"
     exit $result
-  )
+  ) || exit $? # Required due to above subshell masking exit
 }
 
 _builder_run_child_action() {
@@ -393,6 +402,22 @@ builder_has_action() {
   fi
 }
 
+_builder_dep_output_defined() {
+  if [[ ! -z ${_builder_dep_path[$1]+x} ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+_builder_dep_output_exists() {
+  if _builder_dep_output_defined $1 && [[ -e "$KEYMAN_ROOT/${_builder_dep_path[$1]}" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
 #
 # Returns `0` if the user has asked to perform action on target on the command
 # line, and then starts the action. Should be paired with
@@ -424,8 +449,7 @@ builder_start_action() {
     # verify whether a target output is present.
     if builder_is_dep_build &&
         ! builder_is_full_dep_build &&
-        [[ ! -z ${_builder_dep_path[$_builder_matched_action]+x} ]] &&
-        [[ -e "$KEYMAN_ROOT/${_builder_dep_path[$_builder_matched_action]}" ]]; then
+        _builder_dep_output_exists $_builder_matched_action; then
       echo "$scope skipping $_builder_matched_action_name, up-to-date"
       return 1
     fi
@@ -577,7 +601,7 @@ _builder_expand_action_targets() {
 #   `=path` to the target definition, for example `:app=src/app`. Where
 #   possible, avoid differences in names of child projects and folders.
 #
-# * **Dependency:** "@/path/to/dependency [action][:target] ..."
+# * **Dependency:** `"@/path/to/dependency [action][:target] ..."``
 #
 #   A dependency always starts with `@`. The path to the dependency will be
 #   relative to the build script folder, or to the root of the repository, if
@@ -587,10 +611,10 @@ _builder_expand_action_targets() {
 #   Relative paths will be expanded to full paths, again, relative to the root
 #   of the repository.
 #
-#   Dependencies may be limited to specific `action:target`. If not specified,
-#   dependencies will be built for all actions on all targets. Either `action`
-#   or `:target` may be omitted, and multiple actions and targets may be
-#   specified, space separated.
+#   Dependencies may be limited to specific `action:target` pairs on the current
+#   script. If not specified, dependencies will be built for all actions on all
+#   targets. Either `action` or `:target` may be omitted, and multiple actions
+#   and targets may be specified, space separated.
 #
 builder_describe() {
   _builder_record_function_call builder_describe
@@ -726,8 +750,8 @@ builder_describe() {
 #
 # ```bash
 #   builder_describe_outputs \
-#     configure /node_modules \
-#     build     build/index.js
+#     "configure" "/node_modules" \
+#     "build"     "build/index.js"
 # ```
 #
 function builder_describe_outputs() {
@@ -898,6 +922,8 @@ builder_parse() {
 
   _builder_record_function_call builder_parse
 
+  local _builder_params="$@"
+
   _builder_build_deps=--deps
   builder_verbose=
   builder_debug=
@@ -1040,7 +1066,7 @@ builder_parse() {
   fi
 
   if builder_is_dep_build; then
-    echo "[$THIS_SCRIPT_IDENTIFIER] dependency build, started by $builder_dep_parent"
+    echo -e "${HEADING_SETMARK}${COLOR_PURPLE}[$THIS_SCRIPT_IDENTIFIER] dependency build, started by $builder_dep_parent${COLOR_RESET}"
     if [[ -z ${_builder_deps_built+x} ]]; then
       echo "FATAL ERROR: Expected --builder-deps-built parameter"
       exit 1
@@ -1049,6 +1075,7 @@ builder_parse() {
     # This is a top-level invocation, not a dependency build, so we want to
     # track which dependencies have been built, so they don't get built multiple
     # times.
+    echo -e "${HEADING_SETMARK}${COLOR_PURPLE}[$THIS_SCRIPT_IDENTIFIER] build.sh launched with: <${_builder_params[@]}>${COLOR_RESET}"
     _builder_deps_built=`mktemp`
   fi
 
@@ -1101,7 +1128,7 @@ builder_display_usage() {
   echo "Actions: "
 
   for e in "${_builder_actions[@]}"; do
-    if [[ -v _builder_params[$e] ]]; then
+    if _builder_item_in_glob_array "$e" "${_builder_params[@]}"; then
       description="${_builder_params[$e]}"
     else
       description=$(_builder_get_default_description "$e")
@@ -1113,7 +1140,7 @@ builder_display_usage() {
   echo "Targets: "
 
   for e in "${_builder_targets[@]}"; do
-    if [[ -v _builder_params[$e] ]]; then
+    if _builder_item_in_glob_array "$e" "${_builder_params[@]}"; then
       description="${_builder_params[$e]}"
     else
       description=$(_builder_get_default_description "$e")
@@ -1181,10 +1208,18 @@ builder_finish_action() {
   fi
 
   local scope="[$THIS_SCRIPT_IDENTIFIER] "
+  local matched_action="$action$target"
 
-  if [[ "$action$target" == "${_builder_current_action}" ]]; then
+  if [[ "$matched_action" == "${_builder_current_action}" ]]; then
     if [[ $result == success ]]; then
-      echo "${COLOR_GREEN}## $scope$action_name completed successfully${COLOR_RESET}"
+      # Sanity check:  if there is a described output for this action, does the corresponding
+      # file or directory exist now?
+      if _builder_dep_output_defined $matched_action && ! _builder_dep_output_exists "$matched_action"; then
+        builder_warn "## $scope$action_name was successful, but output does not exist"
+        builder_warn "## ${scope}Expected output: '${_builder_dep_path[$matched_action]}'."
+      else
+        echo "${COLOR_GREEN}## $scope$action_name completed successfully${COLOR_RESET}"
+      fi
     elif [[ $result == failure ]]; then
       echo "${COLOR_RED}## $scope$action_name failed${COLOR_RESET}"
     else
@@ -1205,6 +1240,12 @@ _builder_should_build_dep() {
   local action_target="$1"
   local dep="$2"
   local related_actions=(${_builder_dep_related_actions[$dep]})
+
+  if [[ $action_target =~ ^clean ]]; then
+    # don't attempt to build dependencies for a 'clean' action
+    return 1
+  fi
+
   # echo "bdra: ${_builder_dep_related_actions[@]}"
   # echo "target: $action_target"
   # echo "dep: $2"
@@ -1213,6 +1254,26 @@ _builder_should_build_dep() {
     return 1
   fi
   return 0
+}
+
+#
+# Removes a dependency from the list of available dependencies
+#
+# Parameters:
+#   $1    path to dependency
+#
+builder_remove_dep() {
+  local dependency="$1" i
+  dependency="`_builder_expand_relative_path "$dependency"`"
+
+  for i in "${!_builder_deps[@]}"; do
+    if [[ ${_builder_deps[i]} = $dependency ]]; then
+      unset '_builder_deps[i]'
+    fi
+  done
+
+  # rebuild the array to remove the empty item
+  _builder_deps=( "${_builder_deps[@]}" )
 }
 
 #
@@ -1231,7 +1292,7 @@ _builder_do_build_deps() {
     # Don't attempt to build dependencies that don't match the current
     # action:target (wildcards supported for matches here)
     if ! _builder_should_build_dep "$action_target" "$dep"; then
-      echo "[$THIS_SCRIPT_IDENTIFIER] Skipping dependency build $dep for $_builder_matched_action_name"
+      echo "[$THIS_SCRIPT_IDENTIFIER] Skipping dependency $dep for $_builder_matched_action_name"
       continue
     fi
 
@@ -1247,7 +1308,15 @@ _builder_do_build_deps() {
       $builder_debug \
       $_builder_build_deps \
       --builder-deps-built "$_builder_deps_built" \
-      --builder-dep-parent "$THIS_SCRIPT_IDENTIFIER"
+      --builder-dep-parent "$THIS_SCRIPT_IDENTIFIER" && (
+      if $_builder_debug; then
+        echo "${COLOR_GREEN}## [$THIS_SCRIPT_IDENTIFIER] Dependency $dep for $_builder_matched_action_name successfully${COLOR_RESET}"
+      fi
+    ) || (
+      result=$?
+      echo "${COLOR_RED}## [$THIS_SCRIPT_IDENTIFIER] Dependency failed with exit code $result${COLOR_RESET}"
+      exit $result
+    ) || exit $? # Required due to above subshell masking exit
   done
 }
 

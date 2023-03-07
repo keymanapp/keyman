@@ -90,6 +90,17 @@
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
 
+/*
+  Following kmcmplib definitions are translated to Windows types
+  because we can't import the kmcmplib headers. The structure
+  sizes and alignments have been manually verified.
+*/
+
+extern "C" BOOL kmcmp_CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL FSaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc);   // I4865   // I4866
+extern "C" BOOL kmcmp_CompileKeyboardFileToBuffer(PSTR pszInfile, void* pfkBuffer, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc, int Target);  // I4865   // I4866
+extern "C" void kmcmp_Keyman_Diagnostic(int mode) ;
+extern "C" BOOL kmcmp_SetCompilerOptions(PCOMPILER_OPTIONS options);
+
 int xatoi(PWSTR *p);
 int atoiW(PWSTR p);
 void safe_wcsncpy(PWSTR out, PWSTR in, int cbMax);
@@ -292,6 +303,11 @@ BOOL AddCompileMessage(DWORD msg)
 bool flag_use_new_kmcomp  = true;   // flag to switch to new kmcompx
 
 extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options) {
+  if(!options || options->dwSize < sizeof(COMPILER_OPTIONS)) {
+    return FALSE;
+  }
+
+  flag_use_new_kmcomp = options->UseKmcmpLib;
 
   //printf("\n---> started in SetCompilerOptions() of kmcmpdll\n");
   if ( flag_use_new_kmcomp )
@@ -300,9 +316,6 @@ extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS optio
   }
   //printf("--->  stayed in SetCompilerOptions() of kmcmpdll\n");
 
-  if(!options || options->dwSize < sizeof(COMPILER_OPTIONS)) {
-    return FALSE;
-  }
   FShouldAddCompilerVersion = options->ShouldAddCompilerVersion;
   return TRUE;
 }
@@ -321,6 +334,7 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
   {
     return kmcmp_CompileKeyboardFile(pszInfile, pszOutfile, ASaveDebug, ACompilerWarningsAsErrors,AWarnDeprecatedCode, pMsgProc);
   }
+
   //printf("--->  stayed in CompileKeyboardFile() of kmcmpdll\n");
 
   FSaveDebug = ASaveDebug;
@@ -343,6 +357,8 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
   msgproc = pMsgProc;
   currentLine = 0;
   nErrors = 0;
+
+  AddCompileString("NOTE: Using legacy compiler");
 
   hInfile = CreateFileA(pszInfile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
   if (hInfile == INVALID_HANDLE_VALUE) SetError(CERR_InfileNotExist);
@@ -434,6 +450,8 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PSTR pszInfile
   msgproc = pMsgProc;
   currentLine = 0;
   nErrors = 0;
+
+  AddCompileString("NOTE: Using legacy compiler");
 
   hInfile = CreateFileA(pszInfile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
   if (hInfile == INVALID_HANDLE_VALUE) SetError(CERR_InfileNotExist);
@@ -543,7 +561,6 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
   // must preprocess for group and store names -> this isn't really necessary, but never mind!
   while ((msg = ReadLine(hInfile, str, TRUE)) == CERR_None)
   {
-    if (GetAsyncKeyState(VK_ESCAPE) < 0) SetError(CERR_Break);
     p = str;
     switch (LineTokenType(&p))
     {
@@ -577,7 +594,6 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
   /* ReadLine will automatically skip over $Keyman lines, and parse wrapped lines */
   while ((msg = ReadLine(hInfile, str, FALSE)) == CERR_None)
   {
-    if (GetAsyncKeyState(VK_ESCAPE) < 0) SetError(CERR_Break);
     msg = ParseLine(fk, str);
     if (msg != CERR_None) SetError(msg);
   }
@@ -1298,6 +1314,7 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
     else if (wcsncmp(p, L"10.0", 4) == 0)  fk->version = VERSION_100;
     else if (wcsncmp(p, L"14.0", 4) == 0)  fk->version = VERSION_140; // Adds support for #917 -- context() with notany() for KeymanWeb
     else if (wcsncmp(p, L"15.0", 4) == 0)  fk->version = VERSION_150; // Adds support for U_xxxx_yyyy #2858
+    else if (wcsncmp(p, L"16.0", 4) == 0)  fk->version = VERSION_160; // KMXPlus
     else return CERR_InvalidVersion;
 
     if (fk->version < VERSION_60) FOldCharPosMatching = TRUE;
@@ -3359,7 +3376,12 @@ DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, HANDLE hOutfile)
     return CERR_SomewhereIGotItWrong;
   }
 
-  SetChecksum(buf, &ck->dwCheckSum, (DWORD)size);
+  if (ck->dwFileVersion < VERSION_160) {
+    SetChecksum(buf, &ck->dwCheckSum, (DWORD)size);
+  }
+  else {
+    ck->dwCheckSum = 0; // checksum is deprecated for 16.0+
+  }
 
   DWORD dwBytesWritten = 0;
   WriteFile(hOutfile, buf, (DWORD)size, &dwBytesWritten, NULL);

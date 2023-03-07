@@ -18,7 +18,7 @@ COMMIT_SOURCE=$2
 SHA1=$3
 
 # Get the directory where this script lives, i.e. resources/git-hooks
-HOOK_DIRECTORY="$(dirname "$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")")"
+HOOK_DIRECTORY="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
 if [ -f $(dirname "${BASH_SOURCE[0]}")/commit-msg-defs ]; then
   # This script was run from a symlink and the repo in question has its own commit-msg-defs.

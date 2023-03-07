@@ -1,6 +1,8 @@
 #pragma once
 #include <stdint.h>
 
+#include <stdint.h>
+
 /*
 #if defined(_WIN32) || defined(_WIN64)
 #define snprintf _snprintf

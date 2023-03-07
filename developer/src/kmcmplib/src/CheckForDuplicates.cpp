@@ -3,7 +3,7 @@
 
 #include "compfile.h"
 #include <comperr.h>
-#include "kmcmpdll.h"
+#include "kmcmplib.h"
 #include <xstring.h>
 #include "kmx_u16.h"
 #include <kmcompx.h>

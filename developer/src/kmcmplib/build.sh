@@ -5,8 +5,8 @@ set -u
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -16,8 +16,6 @@ cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
-get_builder_OS
-
 #
 # Restrict available targets to those that can be built on the current system
 #
@@ -25,7 +23,7 @@ get_builder_OS
 #archtargets=(":wasm   WASM build")
 archtargets=()
 
-case $os_id in
+case $BUILDER_OS in
   win)
     archtargets+=(
       ":x86    32-bit Windows (x86) build"
@@ -44,7 +42,7 @@ esac
 #  ":mac            Build for current macOS architecture"
 
 builder_describe \
-"Build Keyman KMX Compiler Static Library
+  "Build Keyman KMX Compiler Static Library
 Libraries will be built in 'build/<target>/<configuration>/src'.
   * <configuration>: 'debug' or 'release' (see --debug flag)
   * All parameters after '--' are passed to meson or ninja
@@ -70,10 +68,10 @@ builder_describe_outputs \
   configure:x64      build/x64/$CONFIGURATION/build.ninja \
   configure:arch     build/arch/$CONFIGURATION/build.ninja \
   configure:wasm     build/wasm/$CONFIGURATION/build.ninja \
-  build:x86          build/x86/$CONFIGURATION/src/libkmnkbp0.a \
-  build:x64          build/x64/$CONFIGURATION/src/libkmnkbp0.a \
-  build:arch         build/arch/$CONFIGURATION/src/libkmnkbp0.a \
-  build:wasm         build/wasm/$CONFIGURATION/src/libkmnkbp0.a
+  build:x86          build/x86/$CONFIGURATION/src/libkmcmplib.a \
+  build:x64          build/x64/$CONFIGURATION/src/libkmcmplib.a \
+  build:arch         build/arch/$CONFIGURATION/src/libkmcmplib.a \
+  build:wasm         build/wasm/$CONFIGURATION/src/libkmcmplib.a
 
 TARGET_PATH="$THIS_SCRIPT_PATH/build"
 

@@ -107,7 +107,6 @@ uses
   utilolepicture in '..\..\engine\kmcomapi\util\utilolepicture.pas',
   kmxfile in '..\..\..\..\common\windows\delphi\keyboards\kmxfile.pas',
   utilfiletypes in '..\..\..\..\common\windows\delphi\general\utilfiletypes.pas',
-  CRC32 in '..\..\..\..\common\windows\delphi\general\CRC32.pas',
   input_installlayoutortip in '..\..\global\delphi\winapi\input_installlayoutortip.pas',
   KPInstallPackageStartMenu in '..\..\global\delphi\general\KPInstallPackageStartMenu.pas',
   kmpinffile in '..\..\..\..\common\windows\delphi\packages\kmpinffile.pas',

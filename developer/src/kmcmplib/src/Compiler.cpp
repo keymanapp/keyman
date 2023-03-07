@@ -71,7 +71,7 @@
 #include "../../../../common/windows/cpp/include/vkeys.h"
 #include <cuchar>
 #include "versioning.h"
-#include "kmcmpdll.h"
+#include "kmcmplib.h"
 #include "DeprecationChecks.h"
 
 #include "virtualcharkeys.h"
@@ -325,7 +325,7 @@ typedef struct _COMPILER_OPTIONS {
 
 typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
 
-extern "C" BOOL __declspec(dllexport) kmcmp_SetCompilerOptions(PCOMPILER_OPTIONS options) {
+extern "C" KMX_BOOL kmcmp_SetCompilerOptions(PCOMPILER_OPTIONS options) {
   //printf("°°-> changed to SetCompilerOptions() of kmcmplib \n");
   if(!options || options->dwSize < sizeof(COMPILER_OPTIONS)) {
     return FALSE;
@@ -334,7 +334,7 @@ extern "C" BOOL __declspec(dllexport) kmcmp_SetCompilerOptions(PCOMPILER_OPTIONS
   return TRUE;
 }
 
-extern "C" BOOL __declspec(dllexport) kmcmp_CompileKeyboardFile(PKMX_STR pszInfile, PKMX_STR pszOutfile, KMX_BOOL ASaveDebug, KMX_BOOL ACompilerWarningsAsErrors, KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc)   // I4865   // I4866
+extern "C" KMX_BOOL kmcmp_CompileKeyboardFile(PKMX_STR pszInfile, PKMX_STR pszOutfile, KMX_BOOL ASaveDebug, KMX_BOOL ACompilerWarningsAsErrors, KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc)   // I4865   // I4866
 {
   FILE* fp_in = NULL;
   FILE* fp_out = NULL;
@@ -427,7 +427,7 @@ extern "C" BOOL __declspec(dllexport) kmcmp_CompileKeyboardFile(PKMX_STR pszInfi
 
 
 
-extern "C" BOOL __declspec(dllexport)  kmcmp_CompileKeyboardFileToBuffer(PKMX_STR pszInfile, PFILE_KEYBOARD pfkBuffer, KMX_BOOL ACompilerWarningsAsErrors, KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc, int Target)   // I4865   // I4866
+extern "C" KMX_BOOL kmcmp_CompileKeyboardFileToBuffer(PKMX_STR pszInfile, PFILE_KEYBOARD pfkBuffer, KMX_BOOL ACompilerWarningsAsErrors, KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc, int Target)   // I4865   // I4866
 {
   //printf("°°-> changed to CompileKeyboardFileToBuffer() of kmcmplib \n");
   FILE* fp_in = NULL;
@@ -544,7 +544,7 @@ KMX_BOOL CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
   fk->szLanguageName[0] = 0;*/
   fk->dwBitmapSize = 0;
   fk->dwHotKey = 0;
-  
+
   kmcmp::BeginLine[BEGIN_ANSI] = -1;
   kmcmp::BeginLine[BEGIN_UNICODE] = -1;
   kmcmp::BeginLine[BEGIN_NEWCONTEXT] = -1;
@@ -3815,8 +3815,8 @@ FILE* UTF16TempFromUTF8(FILE* fp_in , KMX_BOOL hasPreamble)
   return fp_out;
 }
 
- extern "C" void  __declspec(dllexport) kmcmp_Keyman_Diagnostic(int mode) {
-  
+ extern "C" void kmcmp_Keyman_Diagnostic(int mode) {
+
   //printf("°°-> changed to Keyman_Diagnostic() of kmcmplib \n");
   if (mode == 0) {
     RaiseException(0x0EA0BEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
