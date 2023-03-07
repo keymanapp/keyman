@@ -17,7 +17,6 @@ kmcompxtest = executable('kmcompxtest', 'kmcompxtest.cpp',
     cpp_args: defns,
     include_directories: inc,
     link_args: links + tests_flags,
-    dependencies: [version_lib],
     objects: lib.extract_all_objects())
 
 tests = [
