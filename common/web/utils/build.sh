@@ -40,7 +40,7 @@ fi
 if builder_start_action build; then
   # Note: in a dependency build, we'll expect utils to be built by tsc -b
   if builder_is_dep_build; then
-    echo "[$THIS_SCRIPT_IDENTIFIER] skipping tsc -b; will be completed by $builder_dep_parent"
+    builder_echo "skipping tsc -b; will be completed by $builder_dep_parent"
   else
     npm run tsc -- --build "$THIS_SCRIPT_PATH/tsconfig.json"
   fi
