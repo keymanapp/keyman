@@ -354,7 +354,7 @@ extern "C" KMX_BOOL kmcmp_CompileKeyboardFile(PKMX_STR pszInfile, PKMX_STR pszOu
 
   PKMX_STR p;
 
-  if (p = strrchr_LinWin(pszInfile))
+  if (p = strrchr_slash(pszInfile))
   {
     strncpy_s(kmcmp::CompileDir, _countof(kmcmp::CompileDir), pszInfile, (INT_PTR)(p - pszInfile + 1));  // I3481
     kmcmp::CompileDir[(INT_PTR)(p - pszInfile + 1)] = 0;
@@ -445,7 +445,7 @@ extern "C" KMX_BOOL kmcmp_CompileKeyboardFileToBuffer(PKMX_STR pszInfile, PFILE_
 
   PKMX_STR p;
 
-  if (p = strrchr_LinWin(pszInfile))
+  if (p = strrchr_slash(pszInfile))
   {
     strncpy_s(kmcmp::CompileDir, _countof(kmcmp::CompileDir), pszInfile, (INT_PTR)(p - pszInfile + 1));  // I3481
     kmcmp::CompileDir[(INT_PTR)(p - pszInfile + 1)] = 0;
@@ -1350,7 +1350,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
       // Strip path from the store, leaving bare filename only
       p = sp->dpString;
 
-      KMX_WCHAR *pp = (KMX_WCHAR*) u16rchr_LinWin((const PKMX_WCHAR) p);
+      KMX_WCHAR *pp = (KMX_WCHAR*) u16rchr_slash((const PKMX_WCHAR) p);
 
       if (!pp) {
         pp = p;

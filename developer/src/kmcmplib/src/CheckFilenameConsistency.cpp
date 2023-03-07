@@ -1,6 +1,6 @@
 
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING 1
 #include "pch.h"
-
 #include "compfile.h"
 #include <comperr.h>
 #include "kmcmplib.h"
@@ -8,6 +8,9 @@
 #include <string>
 #include "CheckFilenameConsistency.h"
 #include "kmx_u16.h"
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+using std::experimental::filesystem::directory_iterator;
 
 namespace kmcmp {
   extern  KMX_CHAR CompileDir[MAX_PATH];
@@ -59,7 +62,9 @@ KMX_DWORD CheckFilenameConsistency( KMX_CHAR const * Filename, bool ReportMissin
 
 
 KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissingFile) {
-  // not ready yet: needs more attention-> common includes for non-Windows platforms
+  // Comment for non-windows platforms: If files are different in casing only CWARN_MissingFile 
+  // will be added. CHINT_FilenameHasDifferingCase will not be added on those platforms.
+
   KMX_WCHAR Name[_MAX_PATH], FName[_MAX_FNAME], Ext[_MAX_EXT];
   intptr_t n;
   FILE* nfile;
@@ -70,7 +75,7 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
     u16ncat(Name, Filename, _countof(Name));  // I3481
   }
   else
-    u16ncpy(Name, Filename, _countof(Name));  // I3481   // _S2 wcscpy_s(Name, _countof(Name), Filename);  // I3481
+    u16ncpy(Name, Filename, _countof(Name));  // I3481
 
   const KMX_WCHAR* pName = Name;
   nfile = Open_File(pName, u"rb");
@@ -85,27 +90,25 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   }
   fclose(nfile);
 
-  const KMX_WCHAR* cptr1 = u16rchr_LinWin((const PKMX_WCHAR) Name);
-
+  const KMX_WCHAR* cptr1 = u16rchr_slash((const PKMX_WCHAR) Name);
   cptr1++;
 
-//TODO: sort out how to find common includes in non-Windows platforms: (Works for windows though)
+  const KMX_WCHAR* dir_file_16;
 
-  std::wstring  Name_wstr = convert_pchar16T_To_wstr(Name);
-  const KMX_WCHART* Name_wchptr = Name_wstr.c_str();
-  KMX_WCHAR fi_name_char16[260];
-#if defined(_WIN32) || defined(_WIN64)
-  _wfinddata_t fi;
-  n = _wfindfirst(Name_wchptr, &fi);
-  _findclose(n);
-  u16sprintf(fi_name_char16,_countof(fi.name),fi.name);
-#else
-  #error Missing implementation for finding common includes
-#endif
-  if (u16cmp(cptr1, fi_name_char16) != 0) {
-    u16sprintf(ErrExtraW,256,L"reference '%ls' does not match actual filename '%ls'", cptr1, &fi.name);
-    strcpy(ErrExtraLIB, wstrtostr2(ErrExtraW));
-    AddWarning(CHINT_FilenameHasDifferingCase);
+  for (const auto & file : directory_iterator(kmcmp::CompileDir)) {
+    std::string dir_file_path{ file.path().u8string() };
+    std::u16string dir_file_path_str = u16string_from_string(dir_file_path);
+    const KMX_WCHAR* dir_file_path_16 = dir_file_path_str.c_str();
+    dir_file_16 = u16rchr_slash(dir_file_path_16);
+    dir_file_16++;
+
+    if (u16icmp(cptr1, dir_file_16) == 0) {
+      if (u16cmp(cptr1, dir_file_16) != 0) {
+        u16sprintf(ErrExtraW, 256, L"reference '%ls' does not match actual filename '%ls'", cptr1, dir_file_16);
+        strcpy(ErrExtraLIB, wstrtostr2(ErrExtraW));
+        AddWarning(CHINT_FilenameHasDifferingCase);
+      }
+    }
   }
 
   return CERR_None;

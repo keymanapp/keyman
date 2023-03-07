@@ -17,6 +17,7 @@ std::wstring u16fmt(const KMX_WCHAR * str);
 void u16sprintf(KMX_WCHAR * dst, const size_t sz, const wchar_t* fmt, ...) ;
 
 std::wstring  convert_pchar16T_To_wstr(KMX_WCHAR Name[_MAX_PATH]);
+std::string   convert_pchar16T_To_str(KMX_WCHAR Name[_MAX_PATH]);
 
 size_t  u16len(const KMX_WCHAR *p);
 int  u16cmp(const KMX_WCHAR *p, const KMX_WCHAR *q);
@@ -33,8 +34,8 @@ KMX_WCHAR * u16tok(KMX_WCHAR* p,  KMX_WCHAR* ch, KMX_WCHAR** ctx) ;
 long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base)  ;
 double u16tof( KMX_WCHAR* str);
 
-KMX_CHAR* strrchr_LinWin(KMX_CHAR* Name);
-const KMX_WCHAR* u16rchr_LinWin(KMX_WCHAR const* Name);
+KMX_CHAR* strrchr_slash(KMX_CHAR* Name);
+const KMX_WCHAR* u16rchr_slash(KMX_WCHAR const* Name);
 
 std::string toHex(int num1);
 PKMX_STR wstrtostr2(PKMX_WCHAR in);
