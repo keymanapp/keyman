@@ -95,7 +95,7 @@ if builder_is_dep_build || builder_has_option --no-tests; then
   builder_remove_dep /developer/src/kmc
 fi
 
-if builder_has_option --debug; then
+if builder_is_debug_build; then
   CONFIGURATION=debug
 else
   CONFIGURATION=release

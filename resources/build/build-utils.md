@@ -151,15 +151,18 @@ a user or called by another script:
 
 * **options**: these are possible additional options that can be passed to the
   script to modify the behavior of the script. All options should be prefixed
-  with `--`, such as `--debug`, and a shorthand single letter form may also be
-  optionally provided, such as `-d`.
+  with `--`, such as `--option`, and a shorthand single letter form may also be
+  optionally provided, such as `-o`.
 
   Note that when we call scripts from other scripts, particularly in CI, we
   should always use the longhand form; the shorthand form is for convenience on
   the command line only.
 
-  Be judicious in use of options; a common one will be `--debug` to do a debug
-  build, but overuse of options will make scripts hard to use.
+  Be judicious in use of options; overuse of options will make scripts hard to
+  use.
+
+  **Note:** `--debug` (or `-d`) is a standard option and should not be declared
+  again. See [`builder_is_debug_build`] for more details on the `--debug` flag.
 
   Options can be used to provide additional data, by including `=<varname>` in
   their definition. Otherwise, they are treated as a boolean.
@@ -265,10 +268,26 @@ The following parameters are pre-defined and should not be overridden:
 * `--color`: forces on ANSI color output for the script
 * `--no-color`: forces off ANSI color output for the script
 * `--verbose`, `-v`: verbose mode, sets the [`$builder_verbose`] variable
+* `--debug`, `-d`: debug build; see [`builder_is_debug_build`] for more detail
 
 --------------------------------------------------------------------------------
 
 # Builder API functions and variables
+
+## `$builder_debug` variable
+
+This standard variable will be set to `"--debug"`, if the `--debug` or `-d`
+parameter is passed on the command line, and otherwise will be set to `""`.
+
+### Usage
+
+For example, can be used to pass `--debug` to another app:
+
+```bash
+npm test -- $builder_debug
+```
+
+--------------------------------------------------------------------------------
 
 ## `builder_describe` function
 
@@ -363,7 +382,7 @@ builder_describe "Testing script" clean test+
 
 ```bash
 builder_describe "Sample script" \
-  --debug,-d \
+  --option,-o \
   "--out-path,-o=OUT_PATH    Specify output path"
 ```
 
@@ -381,8 +400,9 @@ to test for the presence of the parameter before attempting to use the variable.
 **Note:** although the definition uses `=` to define the variable, when invoking
 script, the value should be passed in as a separate parameter.
 
-There is one option with a predefined description: `--debug`. When including
-this, you should use `--debug,-d` to enable the shorthand form.
+There is one standard option: `--debug`. You should not include `--debug` in the
+`builder_describe` call, as it is always available. See
+[`builder_is_debug_build`] for more details.
 
 Note that you should not include any of the [standard builder parameters] here.
 
@@ -473,7 +493,7 @@ mode will be `white`.
   * `warning`: A warning message, represented with yellow text
   * `error`: An error message, represented with red text (consider [`builder_die`])
   * `debug`: A debug string, represented with teal text (consider [`builder_echo_debug`])
-  
+
   Or color identifiers:
   * `white`: Normal white text, the default if **mode** is omitted
   * `grey`: Darker grey text
@@ -481,7 +501,7 @@ mode will be `white`.
   * `blue`: Equivalent to `heading`
   * `yellow`: Equivalent to `warning`
   * `red`: Equivalent to `error`
-  * `purple`: Purple text, generally reserved by Builder for `setmark` section 
+  * `purple`: Purple text, generally reserved by Builder for `setmark` section
     headings
   * `brightwhite`: Bright white text, generally reserved by Builder for
     delineating current script messages
@@ -496,7 +516,7 @@ mode will be `white`.
 ### Description
 
 The `builder_echo` command will emit a string, with the current script
-identifier  at the start, optionally with color formatting (as long as the terminal 
+identifier  at the start, optionally with color formatting (as long as the terminal
 supports color).
 
 ```bash
@@ -651,6 +671,29 @@ if builder_has_option --path; then
   echo "The output path is $OUT_PATH"
 fi
 ```
+
+--------------------------------------------------------------------------------
+
+## `builder_is_debug_build` function
+
+Returns `true` (aka 0) if the `--debug` standard option was passed in. This
+should be used instead of `builder_has_option --debug`.
+
+### Usage
+
+```bash
+if builder_is_debug_build; then
+  ... # e.g. CONFIG=debug
+fi
+```
+
+### Description
+
+The `--debug` standard option is currently handled differently to other options.
+It should never be declared in `builder_describe`, because it is always
+available anyway.
+
+`--debug` is automatically passed to child scripts and dependency scripts.
 
 --------------------------------------------------------------------------------
 
@@ -830,3 +873,4 @@ Note: it is recommended that you use `$(builder_term text)` instead of
 [`builder_echo`]: #builderecho-function
 [`builder_die`]: #builderdie-function
 [`builder_echo_debug`]: #builderechodebug-function
+[`builder_is_debug_build`]: #builderisdebugbuild-function
