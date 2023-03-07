@@ -25,7 +25,7 @@ PKMX_WCHAR incxstr(PKMX_WCHAR p) {
   // UC_SENTINEL(FFFF) with UC_SENTINEL_EXTENDEDEND(0x10) == variable length
   if (*(p + 1) == CODE_EXTENDED) {
     p += 2;
-    while (*p && *p != UC_SENTINEL_EXTENDEDEND)
+    while (*p && *p != NULL && *p != UC_SENTINEL_EXTENDEDEND)
       p++;
 
     if (*p == 0)        return p;
@@ -58,10 +58,10 @@ PKMX_WCHAR decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
   p--;
   if(*p == UC_SENTINEL_EXTENDEDEND) {
     int n = 0;
-    while (p >= pStart && *p != UC_SENTINEL && n < 10) {
+    while (p > pStart && *p != UC_SENTINEL && n < 10) {
       p--; n++; }
 
-    if(p < pStart) {
+    if(p <= pStart) {
       // May be a malformed virtual key
       return pStart;
     }
