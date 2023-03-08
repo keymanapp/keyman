@@ -30,12 +30,12 @@ builder_describe "Build KMSample2 app for Android." \
   "configure" \
   "build" \
   ":app                   KMSample2" \
-  "--ci                   Don't start the Gradle daemon. Use for CI" 
+  "--ci                   Don't start the Gradle daemon. Use for CI"
 
 # parse before describe_outputs to check debug flags
 builder_parse "$@"
 
-if builder_has_option --debug; then
+if builder_is_debug_build; then
   builder_heading "### Debug config ####"
   CONFIG="debug"
   SAMPLE_FLAGS="assembleDebug"

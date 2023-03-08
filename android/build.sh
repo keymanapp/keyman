@@ -36,7 +36,6 @@ builder_describe \
 builder_parse "$@"
 
 CONFIG=release
-DEBUG_FLAG=
 CI_FLAG=
 SENTRY_FLAG=
 
@@ -44,9 +43,8 @@ if builder_has_option --ci; then
   CI_FLAG=--ci
 fi
 
-if builder_has_option --debug; then
+if builder_is_debug_build; then
   CONFIG=debug
-  DEBUG_FLAG=--debug
 fi
 
 builder_run_child_actions clean configure build test publish
