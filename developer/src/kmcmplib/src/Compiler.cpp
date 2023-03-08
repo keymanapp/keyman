@@ -337,7 +337,6 @@ extern "C" uint32_t kmcmp_CompileKeyboardFile(char* pszInfile,
   FILE* fp_in = NULL;
   FILE* fp_out = NULL;
   KMX_BOOL err;
-  KMX_DWORD len;
   KMX_CHAR str[260];
 
   //printf("°°-> changed to CompileKeyboardFile() of kmcmplib \n");
@@ -365,16 +364,13 @@ extern "C" uint32_t kmcmp_CompileKeyboardFile(char* pszInfile,
   kmcmp::currentLine = 0;
   kmcmp::nErrors = 0;
 
-  fp_in = Open_File((const  KMX_CHAR*)pszInfile, "rb");
+  fp_in = Open_File(pszInfile, "rb");
 
   if (fp_in == NULL) SetError(CERR_InfileNotExist);
 
 
   // Transfer the file to a memory stream for processing UTF-8 or ANSI to UTF-16?
   // What about really large files?  Transfer to a temp file...
-  fseek(fp_in, 0, SEEK_END);
-  len = ftell(fp_in);
-  fseek(fp_in, 0, SEEK_SET);
   if (!fread(str, 1, 3, fp_in))
   {
     fclose(fp_in);
@@ -393,7 +389,7 @@ extern "C" uint32_t kmcmp_CompileKeyboardFile(char* pszInfile,
     return CERR_CannotCreateTempfile;
   }
 
-  fp_out = Open_File((const  KMX_CHAR*)pszOutfile, "wb");
+  fp_out = Open_File(pszOutfile, "wb");
 
   if (fp_out == NULL) SetError(CERR_CannotCreateOutfile);
 
@@ -432,8 +428,6 @@ extern "C" uint32_t kmcmp_CompileKeyboardFileToBuffer(char* pszInfile, void* pfk
   //printf("°°-> changed to CompileKeyboardFileToBuffer() of kmcmplib \n");
   FILE* fp_in = NULL;
   KMX_BOOL err;
-  KMX_DWORD len;
-  KMX_DWORD len2;
   KMX_CHAR str[260];
 
   kmcmp::FSaveDebug = TRUE;   // I3681
@@ -458,14 +452,13 @@ extern "C" uint32_t kmcmp_CompileKeyboardFileToBuffer(char* pszInfile, void* pfk
   kmcmp::currentLine = 0;
   kmcmp::nErrors = 0;
 
-  fp_in = Open_File((const  KMX_CHAR*)pszInfile,"rb");
+  fp_in = Open_File(pszInfile,"rb");
 
   if (fp_in == NULL) SetError(CERR_InfileNotExist);
 
   // Transfer the file to a memory stream for processing UTF-8 or ANSI to UTF-16?
   // What about really large files?  Transfer to a temp file...
 
-  KMX_DWORD sz = ftell(fp_in);
   if( !fread(str,1,3,fp_in))
   {
     fclose(fp_in);
@@ -1143,7 +1136,6 @@ KMX_DWORD AddDebugStore(PFILE_KEYBOARD fk, KMX_WCHAR const * str)
 {
   PFILE_STORE sp;
   KMX_WCHAR tstr[16];
-  PKMX_WCHAR p_tstr=tstr;
   u16sprintf(tstr, _countof(tstr), L"%d", kmcmp::currentLine);  // I3481
 
   sp = new FILE_STORE[fk->cxStoreArray + 1];
@@ -3537,7 +3529,7 @@ KMX_BOOL IsSameToken(PKMX_WCHAR *p, KMX_WCHAR const * token)
 KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD FileSize, PKMX_BYTE *Buf)
 {
   FILE *fp;
-  KMX_WCHAR szNewName[260], *p;
+  KMX_WCHAR szNewName[260];
 
   if (IsRelativePath(szName))
   {
@@ -3548,7 +3540,7 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
   else
     u16ncpy(szNewName, szName, _countof(szNewName));  // I3481
 
-  fp=Open_File(( const KMX_WCHAR*)szNewName, u"rb");
+  fp=Open_File(szNewName, u"rb");
 
   if ( fp == NULL)
   {
@@ -3556,7 +3548,7 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
     if ( u16cmp(szNewName+u16len(szNewName)-4, u".bmp") )
       u16ncat(szNewName, u".bmp", _countof(szNewName));  // I3481
 
-    fp= Open_File(( const KMX_WCHAR*)szNewName, u"rb");
+    fp= Open_File(szNewName, u"rb");
 
     if ( fp == NULL)
       return CERR_CannotReadBitmapFile;
