@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Compfile.h"
+#include "compfile.h"
 #include "kmcmplib.h"
 
 KMX_DWORD CheckFilenameConsistencyForCalls(PFILE_KEYBOARD fk);

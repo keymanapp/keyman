@@ -20,6 +20,9 @@
 #ifndef _COMPFILE_H
 #define _COMPFILE_H
 
+#include "kmcompx.h"
+#include <kmx_file.h>
+
 #define LINESIZE 8192
 #define GLOBAL_BUFSIZE  4096
 

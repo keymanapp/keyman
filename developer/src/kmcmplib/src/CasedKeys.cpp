@@ -146,7 +146,7 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
   k->Key = key;
   k->Line = kpp->Line;
   // Add the CAPITAL FLAG, invert shift flag for the rule
-  k->ShiftFlags = shift ^ K_SHIFTFLAG | CAPITALFLAG;
+  k->ShiftFlags = (shift ^ K_SHIFTFLAG) | CAPITALFLAG;
   kpp->Key = key;
   kpp->ShiftFlags = shift | NOTCAPITALFLAG;
 
