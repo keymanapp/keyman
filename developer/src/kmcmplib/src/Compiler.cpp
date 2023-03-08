@@ -984,10 +984,23 @@ int kmcmp::cmpkeys(const void *key, const void *elem)
     {
       if (akey->Line < aelem->Line) return -1;
       if (akey->Line > aelem->Line) return 1;
-      return 0;
+      if(akey->Key == aelem->Key) {
+        if(akey->ShiftFlags == aelem->ShiftFlags) {
+          return akey->LineStoreIndex - aelem->LineStoreIndex;
+        }
+        return akey->ShiftFlags - aelem->ShiftFlags;
+      }
+      return akey->Key - aelem->Key;
     }
     if (l1 < l2) return 1;
     if (l1 > l2) return -1;
+    if(akey->Key == aelem->Key) {
+      if(akey->ShiftFlags == aelem->ShiftFlags) {
+        return akey->LineStoreIndex - aelem->LineStoreIndex;
+      }
+      return akey->ShiftFlags - aelem->ShiftFlags;
+    }
+    return akey->Key - aelem->Key;
   }
   return(char_key - char_elem); // akey->Key - aelem->Key);
 }
@@ -1753,7 +1766,7 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
   u16ncpy(kp->dpContext, pklIn, u16len(pklIn) + 1);  // I3481
 
   kp->Line = kmcmp::currentLine;
-    kp->Line = kmcmp::currentLine;
+  kp->LineStoreIndex = 0;
 
   // Finished if we are not using keys
 
@@ -1887,6 +1900,7 @@ KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
       k->ShiftFlags = 0;
     }
     k->Line = kpp->Line;
+    k->LineStoreIndex = n;
     ExpandKp_ReplaceIndex(fk, k, keyIndex, n);
   }
 
@@ -3339,6 +3353,7 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
     offset += gp->cxKeyArray * sizeof(COMP_KEY);
     for (j = 0; j < gp->cxKeyArray; j++, kp++, fkp++)
     {
+      kp->_reserved = 0;
       kp->Key = fkp->Key;
       if (kmcmp::FSaveDebug) kp->Line = fkp->Line; else kp->Line = 0;
       kp->ShiftFlags = fkp->ShiftFlags;
