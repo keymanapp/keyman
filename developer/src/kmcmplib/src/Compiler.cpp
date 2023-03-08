@@ -99,6 +99,7 @@
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
 #include "kmx_u16.h"
+#include "filesystem.h"
 #include <CompMsg.h>
 
 /* These macros are adapted from winnt.h and legacy use only */
