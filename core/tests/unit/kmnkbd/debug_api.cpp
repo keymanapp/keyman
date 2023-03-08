@@ -312,11 +312,11 @@ void test_store_offsets() {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_B, 0, 'b'}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
 
-      // store_offsets: 6 = store #, 1 = index into store, 6 = store #, 0 = index into store
+      // store_offsets: 5 = store #, 1 = index into store, 6 = store #, 0 = index into store
       // store: store(diaeresisBase) 'ae'
       // context: exay
-      km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_ENTER, 0, {}, {u"exay", &gp, &kpb, {6, 1, 6, 0, 0xFFFF}}},
-      km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"exay", &gp, &kpb, {6, 1, 6, 0, 0xFFFF}, 6}},
+      km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_ENTER, 0, {}, {u"exay", &gp, &kpb, {5, 1, 5, 0, 0xFFFF}}},
+      km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"exay", &gp, &kpb, {5, 1, 5, 0, 0xFFFF}, 6}},
 
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, 0, {}, {u"", &gp, nullptr, {}, 6}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_END, 0, {}, {u"", nullptr, nullptr, {}, 6}},
