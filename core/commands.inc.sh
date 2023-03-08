@@ -20,7 +20,12 @@ do_configure() {
   local target=$1
   builder_start_action configure:$target || return 0
 
-  local STANDARD_MESON_ARGS="$MESON_OPTION_keyman_core_tests"
+  local STANDARD_MESON_ARGS="$MESON_OPTION_keyman_core_tests --default-library both"
+  local MESON_CROSS_FILE=
+
+  if [[ -f "$THIS_SCRIPT_PATH/cross-$target.build" ]]; then
+    MESON_CROSS_FILE="--cross-file cross-$target.build"
+  fi
 
   builder_heading "======= Configuring $target ======="
 
@@ -36,7 +41,7 @@ do_configure() {
   else
     pushd "$THIS_SCRIPT_PATH" > /dev/null
     # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
-    meson setup "$MESON_PATH" --werror --buildtype $CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
+    meson setup "$MESON_PATH" $MESON_CROSS_FILE --werror --buildtype $CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
     popd > /dev/null
   fi
 

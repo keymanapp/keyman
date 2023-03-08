@@ -27,14 +27,14 @@ import java.util.HashMap;
 public final class KMKeyboardWebViewClient extends WebViewClient {
   public static final String TAG = "KMKeyboardWebViewClient";
 
-  public static Context context;
-  private static KeyboardType keyboardType;
-  private static boolean keyboardLoaded;
+  public Context context;
+  private KeyboardType keyboardType;
+  private boolean keyboardLoaded;
 
   KMKeyboardWebViewClient(Context context, KeyboardType keyboardType) {
-    KMKeyboardWebViewClient.context = context;
-    KMKeyboardWebViewClient.keyboardType = keyboardType;
-    KMKeyboardWebViewClient.keyboardLoaded = false;
+    this.context = context;
+    this.keyboardType = keyboardType;
+    this.keyboardLoaded = false;
 
     if (keyboardType != KeyboardType.KEYBOARD_TYPE_INAPP && keyboardType != KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       KMLog.LogError(TAG, String.format("Cannot initialize: Invalid keyboard type: %s", keyboardType.toString()));
@@ -42,7 +42,7 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
   }
 
   public void setContext(Context context) {
-    KMKeyboardWebViewClient.context = context;
+    this.context = context;
   }
 
   public boolean getKeyboardLoaded() {
@@ -50,7 +50,7 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
   }
 
   public void setKeyboardLoaded(boolean keyboardLoaded) {
-    KMKeyboardWebViewClient.keyboardLoaded = keyboardLoaded;
+    this.keyboardLoaded = keyboardLoaded;
   }
 
   @Override
@@ -74,7 +74,7 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
     KMManager.currentLexicalModel = null;
 
     if (url.startsWith("file")) { // TODO: is this test necessary?
-      KMKeyboardWebViewClient.keyboardLoaded = true;
+      this.keyboardLoaded = true;
 
       SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
       int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);

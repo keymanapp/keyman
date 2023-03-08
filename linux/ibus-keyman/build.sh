@@ -18,15 +18,15 @@ builder_describe \
   "build" \
   "test" \
   "install                   install artifacts" \
-  "uninstall                 uninstall artifacts" \
-  "--debug,-d                Debug build"
+  "uninstall                 uninstall artifacts"
+
 # We can't yet depend on core until it moved to the new build.sh syntax
 # (currently it doesn't know some parameters that we're passing)
 #  "@/core configure build"
 
 builder_parse "$@"
 
-if builder_has_option --debug; then
+if builder_is_debug_build; then
   MESON_TARGET=debug
   export CPPFLAGS=-DG_MESSAGES_DEBUG
   export CFLAGS="-O0"

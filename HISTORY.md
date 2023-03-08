@@ -1,5 +1,22 @@
 # Keyman Version History
 
+## 17.0.61 alpha 2023-03-03
+
+* fix(android/app): Another attempt at fixing OSK rotation (#8353)
+
+## 17.0.60 alpha 2023-03-02
+
+* fix(android/engine): Fix various OSK bugs due to refactor (#8349)
+* feat(core): Build both architectures for mac and generate a 'fat' library for them (#8342)
+* fix(common): fixup npm publish (#8350)
+* chore(linux): More GHA debugging (#8354)
+
+## 17.0.59 alpha 2023-03-01
+
+* fix(common): builder: skip dependency build for clean action (#8341)
+* chore(web): fixup dependencies in web build script (#8332)
+* chore(linux): More debug output (#8345)
+
 ## 17.0.58 alpha 2023-02-28
 
 * chore(common): fix child build error handling (#8327)

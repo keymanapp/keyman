@@ -32,7 +32,6 @@ builder_describe "Defines and implements the CI build steps for Keyman Engine fo
   "prepare                      Prepare upload artifacts for specified target(s)" \
   ":s.keyman.com                Target:  builds artifacts for s.keyman.com " \
   ":downloads.keyman.com        Target:  builds artifacts for downloads.keyman.com" \
-  "--debug                      Runs this script in local-development mode; reports and tests will be locally logged" \
   "--s.keyman.com=S_KEYMAN_COM  Sets the root location of a checked-out s.keyman.com repo"
 
 builder_parse "$@"
@@ -58,7 +57,7 @@ if builder_start_action test; then
   # For all others, specify only the :libraries target
   FLAGS=
 
-  if ! builder_has_option --debug; then
+  if ! builder_is_debug_build; then
     FLAGS=--ci
   fi
 
@@ -80,7 +79,7 @@ if builder_start_action validate-size; then
   # Performs the web build product size check as reported on Web test PRs.
   FLAGS=
 
-  if ! builder_has_option --debug; then
+  if ! builder_is_debug_build; then
     FLAGS=--write-status
   fi
 
@@ -96,7 +95,7 @@ if builder_start_action prepare:s.keyman.com; then
     builder_die "--s.keyman.com is unset!"
   fi
 
-  if builder_has_option --debug; then
+  if builder_is_debug_build; then
     # First phase: make sure the s.keyman.com repo is locally-available and up to date.
     pushd "$S_KEYMAN_COM"
 
