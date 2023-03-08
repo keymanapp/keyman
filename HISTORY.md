@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 17.0.62 alpha 2023-03-08
+
+* chore(linux): Remove debug output from packaging GHA (#8372)
+* chore: merge feature-ldml to master, again (#8377)
+* chore(common): cleanup build.inc.sh echo (#8344)
+* chore(common): remove vswhere (#8357)
+* feat(linux): Add DBus method `SendText` (#8039)
+* chore(core): Create both dynamic and static libs on Linux (#8375)
+* chore(common): clean up `--debug` usage in build scripts (#8382)
+* feat(common): builder.inc.sh inheritable options (#8384)
+
 ## 17.0.61 alpha 2023-03-03
 
 * fix(android/app): Another attempt at fixing OSK rotation (#8353)
