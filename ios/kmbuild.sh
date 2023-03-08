@@ -252,7 +252,7 @@ echo "KMEI build complete."
 if [ $DO_KEYMANAPP = true ]; then
   echo ""
   echo "Building offline help."
-  ./build-help.sh html
+  _help ios
 
   echo ""
   echo "Building Keyman app."
