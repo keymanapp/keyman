@@ -19,6 +19,7 @@ cd "$(dirname "$THIS_SCRIPT")"
 # Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
+. "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac

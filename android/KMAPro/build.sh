@@ -15,6 +15,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 
 echo Build KMAPro
@@ -113,7 +115,7 @@ fi
 # Convert markdown to html for offline help
 echo "Converting markdown to html for offline help"
 cd "$KEYMAN_ROOT/android"
-./build-help.sh htm
+_help android
 cd "$KEYMAN_ROOT/android/KMAPro"
 
 # Download default keyboard and dictionary
