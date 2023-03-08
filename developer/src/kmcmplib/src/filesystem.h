@@ -16,7 +16,4 @@
 FILE* Open_File(const KMX_CHAR* Filename, const KMX_CHAR* mode);
 FILE* Open_File(const KMX_WCHART* Filename, const KMX_WCHART* mode);
 FILE* Open_File(const KMX_WCHAR* Filename, const KMX_WCHAR* mode);
-
-namespace kmcmp {
-  KMX_BOOL FileExists(const KMX_CHAR *filename);
-};
+KMX_BOOL FileExists(const KMX_CHAR *filename);

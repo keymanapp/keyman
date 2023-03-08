@@ -165,7 +165,7 @@ KMX_BOOL NamedCodeConstants::LoadFile(const KMX_CHAR *filename)
   // Then look in keyboard file directory (CompileDir)
   strncpy(buf, CompileDir, (buf_size-1)); buf[buf_size-1] = 0;  // I3481
   strncat(buf, filename, (buf_size-1)-strlen(CompileDir)); buf[buf_size-1] = 0;
-  if(kmcmp::FileExists(buf))
+  if(FileExists(buf))
     return IntLoadFile(buf);
 
   //TODO: sort out how to find common includes in non-Windows platforms:

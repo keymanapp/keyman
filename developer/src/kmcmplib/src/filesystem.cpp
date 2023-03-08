@@ -101,7 +101,6 @@ FILE* Open_File(const KMX_CHAR* Filename, const KMX_CHAR* mode) {
 #ifdef _MSC_VER
   std::string cpath = Filename; //, cmode = mode;
   std::replace(cpath.begin(), cpath.end(), '/', '\\');
-  std::cout << cpath << std::endl;
   return fopen(cpath.c_str(), (const KMX_CHAR*) mode);
 #else
   return fopen_wrapper(Filename, mode);
@@ -116,7 +115,6 @@ FILE* Open_File(const KMX_WCHART* Filename, const KMX_WCHART* mode) {
 #ifdef _MSC_VER
   std::wstring cpath = Filename; //, cmode = mode;
   std::replace(cpath.begin(), cpath.end(), '/', '\\');
-  std::cout << string_from_wstring(cpath) << std::endl;
   return _wfsopen(cpath.c_str(), mode, _SH_DENYWR);
 #else
   std::string cpath, cmode;
@@ -131,7 +129,6 @@ FILE* Open_File(const KMX_WCHAR* Filename, const KMX_WCHAR* mode) {
   std::wstring cpath = convert_pchar16T_To_wstr((KMX_WCHAR*) Filename);
   std::wstring cmode = convert_pchar16T_To_wstr((KMX_WCHAR*) mode);
   std::replace(cpath.begin(), cpath.end(), '/', '\\');
-  std::cout << string_from_wstring(cpath) << std::endl;
   return _wfsopen(cpath.c_str(), cmode.c_str(), _SH_DENYWR);
 #else
   std::string cpath, cmode;
@@ -141,7 +138,6 @@ FILE* Open_File(const KMX_WCHAR* Filename, const KMX_WCHAR* mode) {
 #endif
 };
 
-namespace kmcmp {
 KMX_BOOL FileExists(const KMX_CHAR *filename) {
 
 #ifdef _MSC_VER
@@ -167,4 +163,3 @@ KMX_BOOL FileExists(const KMX_CHAR *filename) {
 
   return FALSE;
 }
-};

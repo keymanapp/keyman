@@ -2110,8 +2110,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 99:
       if (tokenFound) break;
       {
-        PKMX_WCHAR p_ErrExtra =strtowstr(ErrExtraLIB);
-        u16sprintf(p_ErrExtra,_countof(ErrExtraLIB),L"token: %c",(int)*p);
+        sprintf(ErrExtraLIB,"token: %c",(int)*p);
       }
       return CERR_InvalidToken;
     case 0:

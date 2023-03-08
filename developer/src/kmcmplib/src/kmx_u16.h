@@ -37,6 +37,5 @@ KMX_CHAR* strrchr_LinWin(KMX_CHAR* Name);
 const KMX_WCHAR* u16rchr_LinWin(KMX_WCHAR const* Name);
 
 std::string toHex(int num1);
-PKMX_STR wstrtostr2(PKMX_WCHAR in);
 
 #endif  //KMX_U16_H
