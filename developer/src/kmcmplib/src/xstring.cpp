@@ -63,10 +63,6 @@ PKMX_WCHAR decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
       n++;
     }
 
-    if(p <= pStart) {
-      // May be a malformed virtual key
-      return pStart;
-    }
     return p;
   }
 
