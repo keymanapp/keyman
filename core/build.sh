@@ -72,7 +72,6 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   "install                         install libraries to current system" \
   "uninstall                       uninstall libraries from current system" \
   "${archtargets[@]}" \
-  "--debug,-d                      configuration is 'debug', not 'release'" \
   "--no-tests                      do not configure tests (used by other projects)" \
   "--target-path=opt_target_path   override for build/ target path" \
   "--test=opt_tests,-t             test[s] to run (space separated)"
@@ -95,7 +94,7 @@ if builder_is_dep_build || builder_has_option --no-tests; then
   builder_remove_dep /developer/src/kmc
 fi
 
-if builder_has_option --debug; then
+if builder_is_debug_build; then
   CONFIGURATION=debug
 else
   CONFIGURATION=release

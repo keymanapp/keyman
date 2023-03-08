@@ -294,7 +294,7 @@ _builder_failure_trap() {
 #
 _builder_cleanup_deps() {
   if ! builder_is_dep_build && [[ ! -z ${_builder_deps_built+x} ]]; then
-    if $_builder_debug; then
+    if $_builder_debug_internal; then
       builder_echo_debug "Dependencies that were built:"
       cat "$_builder_deps_built"
     fi
@@ -309,7 +309,7 @@ _builder_execute_child() {
 
   local script="$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh"
 
-  if $_builder_debug; then
+  if $_builder_debug_internal; then
     builder_echo heading "## $action$target starting..."
   fi
 
@@ -317,7 +317,7 @@ _builder_execute_child() {
     $builder_verbose \
     $builder_debug \
   && (
-    if $_builder_debug; then
+    if $_builder_debug_internal; then
       builder_echo success "## $action$target completed successfully"
     fi
   ) || (
@@ -1115,7 +1115,7 @@ builder_parse() {
     _builder_add_chosen_action_target_dependencies
   fi
 
-  if $_builder_debug; then
+  if $_builder_debug_internal; then
     builder_echo_debug "Selected actions and targets:"
     for e in "${_builder_chosen_action_targets[@]}"; do
       builder_echo_debug "* $e"
@@ -1129,6 +1129,7 @@ builder_parse() {
 
   if builder_is_dep_build; then
     builder_echo setmark "dependency build, started by $builder_dep_parent"
+    builder_echo grey "build.sh parameters: <${_builder_params[@]}>"
     if [[ -z ${_builder_deps_built+x} ]]; then
       builder_die "FATAL ERROR: Expected --builder-deps-built parameter"
     fi
@@ -1136,7 +1137,7 @@ builder_parse() {
     # This is a top-level invocation, not a dependency build, so we want to
     # track which dependencies have been built, so they don't get built multiple
     # times.
-    builder_echo setmark "build.sh parameters: '${_builder_params[@]}'"
+    builder_echo setmark "build.sh parameters: <${_builder_params[@]}>"
     _builder_deps_built=`mktemp`
   fi
 
@@ -1357,7 +1358,6 @@ _builder_do_build_deps() {
       continue
     fi
 
-    # TODO: add --debug as a standard builder parameter
     builder_set_module_has_been_built "$dep"
     "$KEYMAN_ROOT/$dep/build.sh" configure build \
       $builder_verbose \
@@ -1365,7 +1365,7 @@ _builder_do_build_deps() {
       $_builder_build_deps \
       --builder-deps-built "$_builder_deps_built" \
       --builder-dep-parent "$THIS_SCRIPT_IDENTIFIER" && (
-      if $_builder_debug; then
+      if $_builder_debug_internal; then
         builder_echo success "## Dependency $dep for $_builder_matched_action_name successfully"
       fi
     ) || (
@@ -1504,7 +1504,7 @@ builder_verbose() {
 #
 # returns `0` if we are doing a debug build
 #
-builder_debug() {
+builder_is_debug_build() {
   if [[ $builder_debug == --debug ]]; then
     return 0
   fi
@@ -1551,10 +1551,14 @@ _builder_has_function_been_called() {
 _builder_init
 _builder_check_color "$@"
 
-if [ -z ${_builder_debug+x} ]; then
-  _builder_debug=false
+# _builder_debug_internal flag can be used to emit verbose logs for builder itself,
+# e.g.:
+#   _builder_debug_internal=true ./build.sh
+#
+if [ -z ${_builder_debug_internal+x} ]; then
+  _builder_debug_internal=false
 fi
 
-if $_builder_debug; then
+if $_builder_debug_internal; then
   builder_echo_debug "Command line: $0 $@"
 fi
