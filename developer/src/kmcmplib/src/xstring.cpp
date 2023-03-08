@@ -25,7 +25,7 @@ PKMX_WCHAR incxstr(PKMX_WCHAR p) {
   // UC_SENTINEL(FFFF) with UC_SENTINEL_EXTENDEDEND(0x10) == variable length
   if (*(p + 1) == CODE_EXTENDED) {
     p += 2;
-    while (*p && *p != NULL && *p != UC_SENTINEL_EXTENDEDEND)
+    while (*p && *p != UC_SENTINEL_EXTENDEDEND)
       p++;
 
     if (*p == 0)        return p;
