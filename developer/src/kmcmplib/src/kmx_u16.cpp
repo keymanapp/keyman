@@ -7,6 +7,7 @@
 #include <km_types.h>
 #include <kmx_file.h>
 #include <codecvt>
+#include <locale>
 #include <stdarg.h>
 
 //String <- wstring
