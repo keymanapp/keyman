@@ -78,7 +78,7 @@ tests = [
     kbd_src = join_paths(input_path, kbd) + '.kmn'
     kbd_obj = join_paths(output_path, kbd) + '.kmx'
 
-    if compiler.get_id() == 'msvc'
+    if cpp_compiler.get_id() == 'msvc'
       test(kbd, kmcompxtest, args: [kbd_src, kbd_obj])
     else
       test(kbd, kmcompxtest, args: [kbd_src, kbd_obj, join_paths(input_path, kbd) + '.kmx'])
@@ -104,7 +104,7 @@ foreach kbd : tests
     kbd_src = kbd
     kbd_obj = output_path / test_basename + '.kmx'
 
-    if compiler.get_id() == 'msvc'
+    if cpp_compiler.get_id() == 'msvc'
       test(test_basename, kmcompxtest, args: [kbd_src, kbd_obj])
     else
       # Note: need to pre-run keyboards repo regression.sh and then copy the
