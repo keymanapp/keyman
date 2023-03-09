@@ -303,6 +303,10 @@ _builder_cleanup_deps() {
   fi
 }
 
+#------------------------------------------------------------------------------------------
+# Child scripts
+#------------------------------------------------------------------------------------------
+
 _builder_execute_child() {
   local action=$1
   local target=$2
@@ -396,6 +400,10 @@ builder_run_child_actions() {
   done
 }
 
+#------------------------------------------------------------------------------------------
+# Various API endpoints
+#------------------------------------------------------------------------------------------
+
 #
 # Builds the standardized `action:target` string for the specified action-target
 # pairing and also returns 0 if the user has asked to perform it on the command
@@ -442,22 +450,6 @@ builder_has_action() {
     return 0
   else
     _builder_matched_action=
-    return 1
-  fi
-}
-
-_builder_dep_output_defined() {
-  if [[ ! -z ${_builder_dep_path[$1]+x} ]]; then
-    return 0
-  else
-    return 1
-  fi
-}
-
-_builder_dep_output_exists() {
-  if _builder_dep_output_defined $1 && [[ -e "$KEYMAN_ROOT/${_builder_dep_path[$1]}" ]]; then
-    return 0
-  else
     return 1
   fi
 }
@@ -648,7 +640,7 @@ _builder_expand_action_targets() {
 #   `=path` to the target definition, for example `:app=src/app`. Where
 #   possible, avoid differences in names of child projects and folders.
 #
-# * **Dependency:** `"@/path/to/dependency [action][:target] ..."``
+# * **Dependency:** `"@/path/to/dependency[:target] [action][:target] ..."``
 #
 #   A dependency always starts with `@`. The path to the dependency will be
 #   relative to the build script folder, or to the root of the repository, if
@@ -657,6 +649,10 @@ _builder_expand_action_targets() {
 #
 #   Relative paths will be expanded to full paths, again, relative to the root
 #   of the repository.
+#
+#   A dependency definition can include a target for that dependency, for
+#   example, `"@/core:arch"`. This would build only the ':arch' target for the
+#   core module.
 #
 #   Dependencies may be limited to specific `action:target` pairs on the current
 #   script. If not specified, dependencies will be built for all actions on all
@@ -680,6 +676,7 @@ builder_describe() {
   declare -A -g _builder_dep_related_actions  # array of action:targets associated with a given dependency
   declare -A -g _builder_internal_dep         # array of internal action:targets dependency relationships
   declare -A -g _builder_target_paths         # array of target child project paths
+  declare -A -g _builder_dep_targets          # array of :targets given for a specific dependency (comma separated if more than one)
   shift
   # describe each target, action, and option possibility
   while [[ $# -gt 0 ]]; do
@@ -714,10 +711,16 @@ builder_describe() {
     elif [[ $value =~ ^@ ]]; then
       # Parameter is a dependency
       local dependency="${value:1}"
+      local dependency_target= # all targets
+      if [[ $dependency =~ : ]]; then
+        dependency_target=":$(echo "$dependency" | cut -d: -f 2 -)"
+        dependency="$(echo "$dependency" | cut -d: -f 1 -)"
+      fi
+
       dependency="`_builder_expand_relative_path "$dependency"`"
       _builder_deps+=($dependency)
       _builder_dep_related_actions[$dependency]="`_builder_expand_action_targets "$description"`"
-
+      _builder_dep_targets[$dependency]="$dependency_target"
       # We don't want to add deps to params, so shift+continue
       shift
       continue
@@ -1325,12 +1328,33 @@ builder_finish_action() {
   fi
 }
 
+#------------------------------------------------------------------------------------------
+# Dependencies
+#------------------------------------------------------------------------------------------
+
+_builder_dep_output_defined() {
+  if [[ ! -z ${_builder_dep_path[$1]+x} ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+_builder_dep_output_exists() {
+  if _builder_dep_output_defined $1 && [[ -e "$KEYMAN_ROOT/${_builder_dep_path[$1]}" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
 #
 # Returns `0` if the dependency should be built for the given action:target
 #
 _builder_should_build_dep() {
   local action_target="$1"
   local dep="$2"
+  echo $dep
   local related_actions=(${_builder_dep_related_actions[$dep]})
 
   if [[ $action_target =~ ^clean ]]; then
@@ -1389,8 +1413,15 @@ _builder_do_build_deps() {
       continue
     fi
 
+    dep_target=
+    if [[ ! -z ${_builder_dep_targets[$dep]+x} ]]; then
+      # TODO: in the future split _builder_dep_targets into comma-separated
+      #       array for multiple targets for a dep?
+      dep_target=${_builder_dep_targets[$dep]}
+    fi
+
     builder_set_module_has_been_built "$dep"
-    "$KEYMAN_ROOT/$dep/build.sh" configure build \
+    "$KEYMAN_ROOT/$dep/build.sh" "configure$dep_target" "build$dep_target" \
       $builder_verbose \
       $builder_debug \
       $_builder_build_deps \
@@ -1523,6 +1554,19 @@ builder_set_module_has_been_built() {
 }
 
 #
+# Reports on all described dependencies, then exits
+# used by builder-controls.sh
+#
+_builder_report_dependencies() {
+  echo "${_builder_deps[@]}"
+  exit 0
+}
+
+#------------------------------------------------------------------------------------------
+# Utility functions
+#------------------------------------------------------------------------------------------
+
+#
 # returns `0` if we should be verbose in output
 #
 builder_verbose() {
@@ -1540,15 +1584,6 @@ builder_is_debug_build() {
     return 0
   fi
   return 1
-}
-
-#
-# Reports on all described dependencies, then exits
-# used by builder-controls.sh
-#
-_builder_report_dependencies() {
-  echo "${_builder_deps[@]}"
-  exit 0
 }
 
 #
