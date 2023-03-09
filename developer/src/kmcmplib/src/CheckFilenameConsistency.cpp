@@ -78,7 +78,7 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
 #ifndef _MSC_VER
   // Filename consistency only needs to be checked on Windows, because other
   // platforms are going to fail if the filename is inconsistent anyway!
-  if(!FileExists(Name)) {
+  if(!kmcmp_FileExists(Name)) {
     if (ReportMissingFile) {
       u16cpy(ErrExtraW, u"referenced file '");
       u16ncat(ErrExtraW, 256, FileName);

@@ -138,7 +138,7 @@ FILE* Open_File(const KMX_WCHAR* Filename, const KMX_WCHAR* mode) {
 #endif
 };
 
-KMX_BOOL FileExists(const KMX_CHAR *filename) {
+KMX_BOOL kmcmp_FileExists(const KMX_CHAR *filename) {
 
 #ifdef _MSC_VER
   intptr_t n;

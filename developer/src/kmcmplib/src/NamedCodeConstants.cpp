@@ -159,13 +159,13 @@ KMX_BOOL NamedCodeConstants::LoadFile(const KMX_CHAR *filename)
   KMX_CHAR buf[buf_size];
   // Look in current directory first -- REMOVED AS DANGEROUS
   /* strncpy(buf, filename, (buf_size-1)); buf[buf_size-1] = 0;  // I3481
-  if(FileExists(buf))
+  if(kmcmp_FileExists(buf))
     return IntLoadFile(buf);
   */
   // Then look in keyboard file directory (CompileDir)
   strncpy(buf, CompileDir, (buf_size-1)); buf[buf_size-1] = 0;  // I3481
   strncat(buf, filename, (buf_size-1)-strlen(CompileDir)); buf[buf_size-1] = 0;
-  if(FileExists(buf))
+  if(kmcmp_FileExists(buf))
     return IntLoadFile(buf);
 
   //TODO: sort out how to find common includes in non-Windows platforms:
@@ -180,7 +180,7 @@ KMX_BOOL NamedCodeConstants::LoadFile(const KMX_CHAR *filename)
       p = buf;
     *p = 0;
     strncat_s(buf, _countof(buf), filename, (buf_size-1)-strlen(buf)); buf[buf_size-1] = 0;  // I3481   // I3641
-    if(FileExists(buf))
+    if(kmcmp_FileExists(buf))
       return IntLoadFile(buf);
   #endif
 
