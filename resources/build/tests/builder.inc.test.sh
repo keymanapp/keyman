@@ -162,15 +162,7 @@ $THIS_SCRIPT_PATH/build-utils-traps.test.sh error-in-function
 $THIS_SCRIPT_PATH/build-utils-traps.test.sh incomplete
 echo "${COLOR_BLUE}## Running dependency tests${COLOR_RESET}"
 $THIS_SCRIPT_PATH/builder-deps.test.sh
-$THIS_SCRIPT_PATH/dependencies/app/build.sh configure build
-
-$THIS_SCRIPT_PATH/dependencies/app/build.sh error && \
-  builder_die "FAIL: error code 0 but should have failed with exit code 22 from child dep" || (
-    result=$?
-    if [[ $result != 22 ]]; then
-      builder_die "FAIL: exit code $result but should have failed with exit code 22 from child dep"
-    fi
-  ) || exit $?
+$THIS_SCRIPT_PATH/dependencies/test.sh
 
 echo "${COLOR_BLUE}## End external tests${COLOR_RESET}"
 echo
