@@ -58,13 +58,11 @@ PKMX_WCHAR decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
   p--;
   if(*p == UC_SENTINEL_EXTENDEDEND) {
     int n = 0;
-    while (p >= pStart && *p != UC_SENTINEL && n < 10) {
-      p--; n++; }
-
-    if(p < pStart) {
-      // May be a malformed virtual key
-      return pStart;
+    while (p > pStart && *p != UC_SENTINEL && n < 10) {
+      p--; 
+      n++;
     }
+
     return p;
   }
 
