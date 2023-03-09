@@ -60,7 +60,7 @@ builder_describe \
 
 Libraries will be built in 'build/<target>/<configuration>/src'.
   * <configuration>: 'debug' or 'release' (see --debug flag)
-  * All parameters after '--' are passed to meson or ninja
+  * All parameters after '--' are passed to meson or ninja \
 " \
   "@/common/tools/hextobin" \
   "@/common/web/keyman-version" \
@@ -126,16 +126,21 @@ builder_describe_outputs \
 # settings above
 targets=(wasm x86 x64 mac-x86_64 mac-arm64 arch)
 
-for target in "${targets[@]}"; do
-  MESON_PATH="$KEYMAN_ROOT/core/build/$target/$CONFIGURATION"
+do_action() {
+  local action_function=do_$1
+  for target in "${targets[@]}"; do
+    MESON_PATH="$KEYMAN_ROOT/core/build/$target/$CONFIGURATION"
+    $action_function $target
+  done
+}
 
-  do_clean $target
-  do_configure $target
-  do_build $target
-  do_test $target
-  do_install $target
-  do_uninstall $target
-done
+# -------------------------------------------------------------------------------
+
+do_action clean
+
+# -------------------------------------------------------------------------------
+
+do_action configure
 
 # After we have built the necessary internal dependencies, then we can go
 # ahead and build a fat library for external consumption
@@ -144,6 +149,10 @@ if builder_start_action configure:mac; then
   builder_finish_action success configure:mac
 fi
 
+# -------------------------------------------------------------------------------
+
+do_action build
+
 if builder_start_action build:mac; then
   lipo -create \
     "$KEYMAN_ROOT/core/build/mac-x86_64/$CONFIGURATION/src/libkmnkbp0.a" \
@@ -151,6 +160,10 @@ if builder_start_action build:mac; then
     -output "$KEYMAN_ROOT/core/build/mac/$CONFIGURATION/libkmnkbp0.a"
   builder_finish_action success build:mac
 fi
+
+# -------------------------------------------------------------------------------
+
+do_action test
 
 if builder_start_action test:mac; then
   # We can only run the tests for the current architecture; we can
@@ -161,3 +174,8 @@ if builder_start_action test:mac; then
   meson test -C "$MESON_PATH" "${builder_extra_params[@]}"
   builder_finish_action success test:mac
 fi
+
+# -------------------------------------------------------------------------------
+
+do_action install
+do_action uninstall
