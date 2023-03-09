@@ -1,6 +1,6 @@
 
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING 1
 #include "pch.h"
-
 #include "compfile.h"
 #include <comperr.h>
 #include "kmcmplib.h"
@@ -65,16 +65,16 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   // not ready yet: needs more attention-> common includes for non-Windows platforms
   KMX_WCHAR Name[260];  // TODO: fixed buffer sizes bad
 
+
   if (IsRelativePath(Filename)) {
     PKMX_WCHAR WCompileDir = strtowstr(kmcmp::CompileDir);
     u16ncpy(Name, WCompileDir, _countof(Name));  // I3481
     u16ncat(Name, Filename, _countof(Name));  // I3481
     delete[] WCompileDir;
+  } else {
+    u16ncpy(Name, Filename, _countof(Name));  // I3481
   }
-  else {
-    u16ncpy(Name, Filename, _countof(Name));  // I3481   // _S2 wcscpy_s(Name, _countof(Name), Filename);  // I3481
-  }
-
+  
 #ifndef _MSC_VER
   // Filename consistency only needs to be checked on Windows, because other
   // platforms are going to fail if the filename is inconsistent anyway!
@@ -110,6 +110,7 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
     sprintf(ErrExtraLIB, "reference '%ls' does not match actual filename '%ls'", WChName, fi.name);
 
     AddWarning(CHINT_FilenameHasDifferingCase);
+
   }
 #endif
 
