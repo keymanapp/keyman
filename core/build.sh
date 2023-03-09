@@ -73,7 +73,6 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   "uninstall                       uninstall libraries from current system" \
   "${archtargets[@]}" \
   "--no-tests                      do not configure tests (used by other projects)" \
-  "--target-path=opt_target_path   override for build/ target path" \
   "--test=opt_tests,-t             test[s] to run (space separated)"
 
 builder_parse "$@"
@@ -122,23 +121,13 @@ builder_describe_outputs \
   build:arch                build/arch/$CONFIGURATION/src/libkmnkbp0.a \
   build:wasm                build/wasm/$CONFIGURATION/src/libkmnkbp0.a
 
-# Target path is used by Linux build, e.g. --target-path keyboardprocessor
-# TODO: sort out builder_describe_outputs and TARGET_PATH -- preferably by
-#       having Keyman for Linux build Core normally and then _copy_ the
-#       required files into its target path, and eliminating --target-path
-if builder_has_option --target-path; then
-  TARGET_PATH="$opt_target_path"
-else
-  TARGET_PATH="$KEYMAN_ROOT/core/build"
-fi
-
 # Iterate through all possible targets; note that targets that cannot be built
 # on the current platform have already been excluded through the archtargets
 # settings above
 targets=(wasm x86 x64 mac-x86_64 mac-arm64 arch)
 
 for target in "${targets[@]}"; do
-  MESON_PATH="$TARGET_PATH/$target/$CONFIGURATION"
+  MESON_PATH="$KEYMAN_ROOT/core/build/$target/$CONFIGURATION"
 
   do_clean $target
   do_configure $target
@@ -151,15 +140,15 @@ done
 # After we have built the necessary internal dependencies, then we can go
 # ahead and build a fat library for external consumption
 if builder_start_action configure:mac; then
-  mkdir -p "$TARGET_PATH/mac/$CONFIGURATION"
+  mkdir -p "$KEYMAN_ROOT/core/build/mac/$CONFIGURATION"
   builder_finish_action success configure:mac
 fi
 
 if builder_start_action build:mac; then
   lipo -create \
-    "$TARGET_PATH/mac-x86_64/$CONFIGURATION/src/libkmnkbp0.a" \
-    "$TARGET_PATH/mac-arm64/$CONFIGURATION/src/libkmnkbp0.a" \
-    -output "$TARGET_PATH/mac/$CONFIGURATION/libkmnkbp0.a"
+    "$KEYMAN_ROOT/core/build/mac-x86_64/$CONFIGURATION/src/libkmnkbp0.a" \
+    "$KEYMAN_ROOT/core/build/mac-arm64/$CONFIGURATION/src/libkmnkbp0.a" \
+    -output "$KEYMAN_ROOT/core/build/mac/$CONFIGURATION/libkmnkbp0.a"
   builder_finish_action success build:mac
 fi
 
@@ -168,7 +157,7 @@ if builder_start_action test:mac; then
   # assume that build:mac has run so both architectures will be
   # available
   target=mac-`uname -m`
-  MESON_PATH="$TARGET_PATH/$target/$CONFIGURATION"
+  MESON_PATH="$KEYMAN_ROOT/core/build/$target/$CONFIGURATION"
   meson test -C "$MESON_PATH" "${builder_extra_params[@]}"
   builder_finish_action success test:mac
 fi
