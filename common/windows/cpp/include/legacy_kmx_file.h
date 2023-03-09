@@ -346,6 +346,7 @@ static_assert(sizeof(COMP_STORE) == KEYBOARDFILESTORE_SIZE, "COMP_STORE must be 
 
 struct COMP_KEY {
 	WORD Key;
+	WORD _reserved;
 	DWORD Line;
 	DWORD ShiftFlags;
 	DWORD dpOutput;

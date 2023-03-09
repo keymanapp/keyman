@@ -304,6 +304,7 @@ struct COMP_STORE {
 
 struct COMP_KEY {
   KMX_WORD Key;
+  KMX_WORD _reserved;
   KMX_DWORD Line;
   KMX_DWORD ShiftFlags;
   KMX_DWORD dpOutput;
