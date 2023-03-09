@@ -3,11 +3,11 @@
 #include "compfile.h"
 
 namespace kmcmp {
-  KMX_BOOL AddCompileWarning(LPSTR buf);
+  KMX_BOOL AddCompileWarning(char* buf);
   extern int currentLine;
 }
 
-extern BOOL AWarnDeprecatedCode_GLOBAL_LIB;
+extern KMX_BOOL AWarnDeprecatedCode_GLOBAL_LIB;
 extern char ErrExtraLIB[256];
 extern KMX_WCHAR ErrExtraW[256];
 KMX_BOOL AddCompileError(KMX_DWORD msg);
