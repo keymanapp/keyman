@@ -5,7 +5,8 @@
 # History:      19  Oct 2018 - TSE - Added test for context API functions.
 #
 
-if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang' or compiler.get_id() == 'emscripten'
+# TODO -- why are these differing from the standard.meson.build flags?
+if cpp_compiler.get_id() == 'gcc' or cpp_compiler.get_id() == 'clang' or cpp_compiler.get_id() == 'emscripten'
   warns = [
      '-Wno-missing-field-initializers',
      '-Wno-unused-parameter'
@@ -15,7 +16,7 @@ else
 endif
 
 
-if compiler.get_id() == 'emscripten'
+if cpp_compiler.get_id() == 'emscripten'
   tests_flags = ['--embed-file', join_paths(meson.current_source_dir(),'@/')]
   # we have to link in files from the binary folder also as the binary tests
   # use the kmx test runner.
@@ -108,7 +109,7 @@ else
   cat_cmd = [find_program('cat', required: true)]
 endif
 
-if compiler.get_id() == 'emscripten'
+if cpp_compiler.get_id() == 'emscripten'
   # The .kmx files are linked in to the unit test,
   # so kmcomp is too late here
   kmcomp = disabler()
@@ -206,7 +207,7 @@ if kmcomp.found()
   endforeach
 else
   foreach kbd : tests
-    if compiler.get_id() == 'emscripten'
+    if cpp_compiler.get_id() == 'emscripten'
       kbd_basename = kbd
     else
       kbd_basename = 'k_' + kbd.underscorify().to_lower()

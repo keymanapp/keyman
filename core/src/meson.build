@@ -4,58 +4,17 @@
 # Authors:      Tim Eves (TSE)
 #
 
-defns += ['-DKMN_KBP_EXPORTING']
 version_res = []
+defns += ['-DKMN_KBP_EXPORTING']
 
-if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
-  warns = [
-     '-Wctor-dtor-privacy',
-     '-Wdouble-promotion',
-     '-Wendif-labels',
-     '-Wno-unknown-pragmas',
-     '-Wno-missing-field-initializers',
-     '-Wnon-virtual-dtor',
-     '-Wshadow'
-  ]
-  flags = [
-    '-fvisibility=hidden',
-    '-fvisibility-inlines-hidden'
-  ]
-  links = []
-
-  if compiler.get_id() == 'clang'
-    warns += [
-      '-Wimplicit-fallthrough',
-      '-Wno-double-promotion',
-      '-Wshorten-64-to-32'
-    ]
-  endif
-
-  if host_machine.system() == 'darwin'
-    warns += ['-Wno-ctor-dtor-privacy', '-Wno-non-virtual-dtor']
-  endif
-endif
-
-if compiler.get_id() == 'msvc'
-  warns = []
-  flags = []
-  defns += [
-    '-D_SCL_SECURE_NO_WARNINGS',
-    '-D_CRT_SECURE_NO_WARNINGS',
-    '-DUNICODE'
-  ]
-  links = []
-
+if cpp_compiler.get_id() == 'msvc'
   # /n = append null
   # /c65001 = utf-8 file format
   version_res += import('windows').compile_resources('version.rc', args:['/n','/c65001'])
 endif
 
-if compiler.get_id() == 'emscripten'
-  warns = []
-  flags = []
-  defns = ['-DKMN_KBP']
-  links = []
+if cpp_compiler.get_id() == 'emscripten'
+  defns += ['-DKMN_KBP']
 endif
 
 kmx_files = files(
