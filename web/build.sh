@@ -333,7 +333,7 @@ finalize ( ) {
   echo Compiled $COMPILE_TARGET debug version saved under $DEBUG_OUT_PATH: ${OUTPUT_SCRIPTS[*]}
 
   # START:  release output
-  if ! builder_has_option --skip-minify; then
+  if ! builder_has_option --no-minify; then
     for SCRIPT in "${OUTPUT_SCRIPTS[@]}";
     do
       minify "$COMPILED_INTERMEDIATE_PATH/$SCRIPT" "$RELEASE_OUT_PATH/$SCRIPT" SIMPLE_OPTIMIZATIONS
