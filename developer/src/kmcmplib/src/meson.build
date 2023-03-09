@@ -4,70 +4,25 @@
 # Cross platform build script to compile kmcompx
 #
 
-defns = ['-DKMN_KBP_EXPORTING']
+# TODO: is this required? It should be Keyman Core only
+defns += ['-DKMN_KBP_EXPORTING']
 version_res = []
 
-# TODO: move these shared defines to a resources/meson folder?
-if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
-  warns = [
+if cpp_compiler.get_id() == 'gcc' or cpp_compiler.get_id() == 'clang'
+  warns += [
      '-Wall',
-     '-Wctor-dtor-privacy',
-     '-Wdouble-promotion',
-     '-Wendif-labels',
-     '-Wextra',
-     '-Wno-unknown-pragmas',
-     '-Wno-missing-field-initializers',
-     '-Wnon-virtual-dtor',
-     '-Wshadow'
+     '-Wextra'
   ]
-  flags = [
-    '-fvisibility=hidden',
-    '-fvisibility-inlines-hidden'
-  ]
-  defns = []
-  links = []
-
-  if compiler.get_id() == 'clang'
-    warns += [
-      '-Wimplicit-fallthrough',
-      '-Wno-double-promotion',
-      '-Wshorten-64-to-32'
-    ]
-  endif
-
-  if host_machine.system() == 'darwin'
-    warns += ['-Wno-ctor-dtor-privacy', '-Wno-non-virtual-dtor']
-  endif
 endif
 
-if compiler.get_id() == 'msvc'
-  warns = []
-  flags = []
-  defns += [
-    '-D_SCL_SECURE_NO_WARNINGS',
-    '-D_CRT_SECURE_NO_WARNINGS',
-    #'-DUNICODE'
-  ]
-  links = []
-
+if cpp_compiler.get_id() == 'msvc'
   # /n = append null
   # /c65001 = utf-8 file format
   version_res += import('windows').compile_resources('version.rc', args:['/n','/c65001'])
 endif
 
-
-if compiler.get_id() == 'emscripten'
-  warns = []
-  flags = []
-  links = ['-lnodefs.js', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
-  if get_option('buildtype') == 'debug'
-    # Enable DWARF symbols for debug builds
-    defns = ['-g']
-    links += ['-g']
-  else
-    defns = ['-O2']
-    links += ['-O2']
-  endif
+if cpp_compiler.get_id() == 'emscripten'
+  links += ['-lnodefs.js', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
 endif
 
 

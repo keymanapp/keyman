@@ -21,6 +21,7 @@ endif
 # Standard informational messages for our builds
 #
 
+message('meson.project_version(): ' + meson.project_version())
 message('host_machine.system(): ' + host_machine.system())
 message('compiler.get_id(): ' + cpp_compiler.get_id())
 
@@ -57,18 +58,29 @@ if cpp_compiler.get_id() == 'gcc' or cpp_compiler.get_id() == 'clang'
   endif
 
   if host_machine.system() == 'darwin'
-    warns += ['-Wno-ctor-dtor-privacy', '-Wno-non-virtual-dtor']
+    # TODO: this seems to be inverting above options, is this necessary, or can
+    #       we resolve another way?
+    warns += [
+      '-Wno-ctor-dtor-privacy',
+      '-Wno-non-virtual-dtor'
+    ]
   endif
 endif
 
 if cpp_compiler.get_id() == 'msvc'
   defns += [
     '-D_SCL_SECURE_NO_WARNINGS',
-    '-D_CRT_SECURE_NO_WARNINGS',
-    '-DUNICODE'
+    '-D_CRT_SECURE_NO_WARNINGS'
   ]
 endif
 
 if cpp_compiler.get_id() == 'emscripten'
-  #
+  if get_option('buildtype') == 'debug'
+    # Enable DWARF symbols for debug builds
+    flags += ['-g']
+    links += ['-g']
+  else
+    flags += ['-O2']
+    links += ['-O2']
+  endif
 endif

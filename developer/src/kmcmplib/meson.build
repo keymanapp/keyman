@@ -12,23 +12,13 @@ project('kmcmplib', 'cpp', 'c',
                            'b_vscrt=static_from_buildtype',
                            'default_library=static'])
 
-message('meson.project_version(): ' + meson.project_version() + '\n')
-compiler = meson.get_compiler('cpp')
+# Import our standard compiler defines; this is copied from
+# /resources/build/standard.meson.build by build.sh, because
+# meson doesn't allow us to reference a file outside its root
+subdir('resources')
 
-# lib_version = '0.0.0'
+# ------------------------------------------------------------
 
-if compiler.get_id() == 'msvc'
-  add_global_arguments('/source-charset:utf-8', language: ['c', 'cpp'])
-endif
-
-message('host_machine.system(): ' + host_machine.system())
-message('compiler.get_id(): ' + compiler.get_id())
-
-cc = meson.get_compiler('c')
-
-defns=['-DUSE_CHAR16_T']
-
-# subdir('doc')
 subdir('include')
 subdir('src')
 subdir('tests')

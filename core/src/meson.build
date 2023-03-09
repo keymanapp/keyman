@@ -5,15 +5,19 @@
 #
 
 version_res = []
+
+# TODO: shouldn't this be defined only for dylib and not static lib?
 defns += ['-DKMN_KBP_EXPORTING']
 
 if cpp_compiler.get_id() == 'msvc'
+  defns += ['-DUNICODE']
   # /n = append null
   # /c65001 = utf-8 file format
   version_res += import('windows').compile_resources('version.rc', args:['/n','/c65001'])
 endif
 
 if cpp_compiler.get_id() == 'emscripten'
+  # TODO: why do we need this defn here?
   defns += ['-DKMN_KBP']
 endif
 

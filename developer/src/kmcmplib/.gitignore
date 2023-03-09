@@ -1,3 +1,4 @@
 build/
 wasm.build
 tests/fixtures/
+resources/
