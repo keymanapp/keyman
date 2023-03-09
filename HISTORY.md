@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.63 alpha 2023-03-09
+
+* fix(web): --no-minify, not --skip-minify (#8394)
+* chore(core): Remove obsolete `--target-path` option (#8376)
+
 ## 17.0.62 alpha 2023-03-08
 
 * chore(linux): Remove debug output from packaging GHA (#8372)
