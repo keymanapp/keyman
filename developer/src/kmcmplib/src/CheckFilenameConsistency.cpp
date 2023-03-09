@@ -4,13 +4,14 @@
 #include "compfile.h"
 #include <comperr.h>
 #include "kmcmplib.h"
-#include <io.h>
 #include <string>
 #include "CheckFilenameConsistency.h"
 #include "kmx_u16.h"
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-using std::experimental::filesystem::directory_iterator;
+#include "filesystem.h"
+
+#ifdef _MSC_VER
+#include <io.h>
+#endif
 
 namespace kmcmp {
   extern  KMX_CHAR CompileDir[260]; // TODO: this should not be a fixed buffer
@@ -60,56 +61,58 @@ KMX_DWORD CheckFilenameConsistency( KMX_CHAR const * Filename, bool ReportMissin
   return result;
 }
 
-
 KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissingFile) {
-  // Comment for non-windows platforms: If files are different in casing only CWARN_MissingFile 
-  // will be added. CHINT_FilenameHasDifferingCase will not be added on those platforms.
+  // not ready yet: needs more attention-> common includes for non-Windows platforms
+  KMX_WCHAR Name[260];  // TODO: fixed buffer sizes bad
 
-  KMX_WCHAR Name[_MAX_PATH], FName[_MAX_FNAME], Ext[_MAX_EXT];
-  intptr_t n;
-  FILE* nfile;
 
   if (IsRelativePath(Filename)) {
     PKMX_WCHAR WCompileDir = strtowstr(kmcmp::CompileDir);
     u16ncpy(Name, WCompileDir, _countof(Name));  // I3481
     u16ncat(Name, Filename, _countof(Name));  // I3481
-  }
-  else
+    delete[] WCompileDir;
+  } else {
     u16ncpy(Name, Filename, _countof(Name));  // I3481
-
-  const KMX_WCHAR* pName = Name;
-  nfile = Open_File(pName, u"rb");
-
-  if (nfile == NULL) {
+  }
+  
+#ifndef _MSC_VER
+  // Filename consistency only needs to be checked on Windows, because other
+  // platforms are going to fail if the filename is inconsistent anyway!
+  if(!kmcmp_FileExists(Name)) {
     if (ReportMissingFile) {
-      u16sprintf(ErrExtraW,256,L"referenced file %ls",Filename);
-      strcpy(ErrExtraLIB, wstrtostr2(ErrExtraW));
+      u16cpy(ErrExtraW, u"referenced file '");
+      u16ncat(ErrExtraW, 256, FileName);
+      u16ncat(ErrExtraW, 256, u"'");
+      strcpy(ErrExtraLIB, string_from_u16string(ErrExtraW).c_str());
       AddWarning(CWARN_MissingFile);
     }
     return CERR_None;
   }
-  fclose(nfile);
-
-  const KMX_WCHAR* cptr1 = u16rchr_slash((const PKMX_WCHAR) Name);
-  cptr1++;
-
-  const KMX_WCHAR* dir_file_16;
-
-  for (const auto & file : directory_iterator(kmcmp::CompileDir)) {
-    std::string dir_file_path{ file.path().u8string() };
-    std::u16string dir_file_path_str = u16string_from_string(dir_file_path);
-    const KMX_WCHAR* dir_file_path_16 = dir_file_path_str.c_str();
-    dir_file_16 = u16rchr_slash(dir_file_path_16);
-    dir_file_16++;
-
-    if (u16icmp(cptr1, dir_file_16) == 0) {
-      if (u16cmp(cptr1, dir_file_16) != 0) {
-        u16sprintf(ErrExtraW, 256, L"reference '%ls' does not match actual filename '%ls'", cptr1, dir_file_16);
-        strcpy(ErrExtraLIB, wstrtostr2(ErrExtraW));
-        AddWarning(CHINT_FilenameHasDifferingCase);
-      }
+  return CERR_None;
+#else
+  _wfinddata_t fi;
+  intptr_t n;
+  if ((n = _wfindfirst((const wchar_t*) Name, &fi)) == -1) {
+    if (ReportMissingFile) {
+      sprintf(ErrExtraLIB, "referenced file '%ls'", (wchar_t*) Filename);
+      AddWarning(CWARN_MissingFile);
     }
+    return CERR_None;
   }
+
+  _findclose(n);
+
+  KMX_WCHAR FName[_MAX_FNAME], Ext[_MAX_EXT];
+  wchar_t WChName[_MAX_PATH];
+  _wsplitpath_s((const wchar_t*)Filename, nullptr, 0, nullptr, 0, (wchar_t*) FName, _MAX_FNAME, (wchar_t*) Ext, _MAX_EXT);
+  _wmakepath_s(WChName, _MAX_PATH, nullptr, nullptr, (const wchar_t*) FName, (const wchar_t*) Ext);
+  if (wcscmp(WChName, fi.name) != 0) {
+    sprintf(ErrExtraLIB, "reference '%ls' does not match actual filename '%ls'", WChName, fi.name);
+
+    AddWarning(CHINT_FilenameHasDifferingCase);
+
+  }
+#endif
 
   return CERR_None;
 }

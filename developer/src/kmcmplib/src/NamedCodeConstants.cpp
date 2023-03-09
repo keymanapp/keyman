@@ -22,11 +22,13 @@
 */
 
 #include "pch.h"
-#include <io.h>
 #include <limits.h>
 #include "NamedCodeConstants.h"
 #include "CheckFilenameConsistency.h"
 #include <kmcmplib.h>
+#include "kmcompx.h"
+#include "filesystem.h"
+
 using namespace kmcmp;
 
 int IsHangulSyllable(const KMX_WCHAR *codename, int *code);
@@ -39,27 +41,6 @@ namespace kmcmp {
     return u16icmp(
       ((NCCENTRY *)elem1)->name,
       ((NCCENTRY *)elem2)->name);
-  }
-
-
-  KMX_BOOL FileExists(const KMX_CHAR *filename)
-  {
-    intptr_t n;
-
-  #if defined(_WIN32) || defined(_WIN64)
-    _finddata_t fi;
-    if((n = _findfirst(filename, &fi)) != -1)  // I3056   // I3512
-    {
-      _findclose(n);
-      return TRUE;
-    }
-  #else
-    if((n= access(filename,F_OK)) != -1)  // I3056   // I3512
-    {
-      return TRUE;
-    }
-  #endif
-    return FALSE;
   }
 }
 
@@ -136,7 +117,10 @@ KMX_BOOL NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
     return FALSE;
   }
 
-  if(fopen_s(&fp, filename, "rt") != 0) return FALSE;  // I3481
+  fp = Open_File(filename, "rt");
+  if(fp == NULL) {
+    return FALSE;  // I3481
+  }
 
   KMX_CHAR str[str_size], *p, *q, *context = NULL;
   KMX_BOOL isEol , first = TRUE;
@@ -173,14 +157,15 @@ KMX_BOOL NamedCodeConstants::LoadFile(const KMX_CHAR *filename)
 {
   const int buf_size = 260;
   KMX_CHAR buf[buf_size];
-  // Look in current directory first
-  strncpy_s(buf, _countof(buf), filename, (buf_size-1)); buf[buf_size-1] = 0;  // I3481
-  if(FileExists(buf))
+  // Look in current directory first -- REMOVED AS DANGEROUS
+  /* strncpy(buf, filename, (buf_size-1)); buf[buf_size-1] = 0;  // I3481
+  if(kmcmp_FileExists(buf))
     return IntLoadFile(buf);
+  */
   // Then look in keyboard file directory (CompileDir)
-  strncpy_s(buf, _countof(buf), CompileDir, (buf_size-1)); buf[buf_size-1] = 0;  // I3481
-  strncat_s(buf, _countof(buf), filename, (buf_size-1)-strlen(CompileDir)); buf[buf_size-1] = 0;
-  if(FileExists(buf))
+  strncpy(buf, CompileDir, (buf_size-1)); buf[buf_size-1] = 0;  // I3481
+  strncat(buf, filename, (buf_size-1)-strlen(CompileDir)); buf[buf_size-1] = 0;
+  if(kmcmp_FileExists(buf))
     return IntLoadFile(buf);
 
   //TODO: sort out how to find common includes in non-Windows platforms:
@@ -195,7 +180,7 @@ KMX_BOOL NamedCodeConstants::LoadFile(const KMX_CHAR *filename)
       p = buf;
     *p = 0;
     strncat_s(buf, _countof(buf), filename, (buf_size-1)-strlen(buf)); buf[buf_size-1] = 0;  // I3481   // I3641
-    if(FileExists(buf))
+    if(kmcmp_FileExists(buf))
       return IntLoadFile(buf);
   #endif
 

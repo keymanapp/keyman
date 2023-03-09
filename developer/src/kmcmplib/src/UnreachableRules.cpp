@@ -42,7 +42,7 @@ KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
         reportedLines.insert(kp->Line);
         kmcmp::currentLine = kp->Line;
         u16sprintf(ErrExtraW, 256, L" Overridden by rule on line %d", k1.Line);
-        strcpy(ErrExtraLIB, wstrtostr2(ErrExtraW));
+        strcpy(ErrExtraLIB, string_from_u16string(ErrExtraW).c_str());
         AddWarning(CHINT_UnreachableRule);
       }
     }

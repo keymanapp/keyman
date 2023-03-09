@@ -302,12 +302,3 @@ double u16tof( KMX_WCHAR* str)
 	}
 	return val;
 }
-
-PKMX_STR wstrtostr2(PKMX_WCHAR in)
-{
-  PKMX_STR result;
-  auto c = string_from_u16string(in);
-  result = new KMX_CHAR[c.length() + 1];
-  strcpy(result, c.c_str());
-  return result;
-}
