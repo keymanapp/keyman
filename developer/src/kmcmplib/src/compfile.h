@@ -88,6 +88,7 @@ typedef FILE_STORE * PFILE_STORE;
 
 struct FILE_KEY {
 	KMX_WCHAR   Key;            // WCHAR for consistency; only a byte used however
+	KMX_WORD    LineStoreIndex;
 	KMX_DWORD   Line;
 	KMX_DWORD   ShiftFlags;
 	PKMX_WCHAR  dpOutput;		// from start of key structure

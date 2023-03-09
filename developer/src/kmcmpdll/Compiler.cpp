@@ -990,10 +990,23 @@ int cmpkeys(const void *key, const void *elem)
     {
       if (akey->Line < aelem->Line) return -1;
       if (akey->Line > aelem->Line) return 1;
-      return 0;
+      if(akey->Key == aelem->Key) {
+        if(akey->ShiftFlags == aelem->ShiftFlags) {
+          return akey->LineStoreIndex - aelem->LineStoreIndex;
+        }
+        return akey->ShiftFlags - aelem->ShiftFlags;
+      }
+      return akey->Key - aelem->Key;
     }
     if (l1 < l2) return 1;
     if (l1 > l2) return -1;
+    if(akey->Key == aelem->Key) {
+      if(akey->ShiftFlags == aelem->ShiftFlags) {
+        return akey->LineStoreIndex - aelem->LineStoreIndex;
+      }
+      return akey->ShiftFlags - aelem->ShiftFlags;
+    }
+    return akey->Key - aelem->Key;
   }
   return(char_key - char_elem); // akey->Key - aelem->Key);
 }
@@ -1776,6 +1789,7 @@ CheckOutputIsReadonly(const PFILE_KEYBOARD fk, const PWSTR output) {  // I4867
     wcscpy_s(kp->dpContext, wcslen(pklIn) + 1, pklIn);  // I3481
 
     kp->Line = currentLine;
+    kp->LineStoreIndex = 0;
 
     // Finished if we are not using keys
 
@@ -1917,6 +1931,7 @@ DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, DWORD storeIndex)
       k->ShiftFlags = 0;
     }
     k->Line = kpp->Line;
+    k->LineStoreIndex = (WORD)n;
     ExpandKp_ReplaceIndex(fk, k, keyIndex, n);
   }
 
@@ -3363,6 +3378,7 @@ DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, HANDLE hOutfile)
     offset += gp->cxKeyArray * sizeof(COMP_KEY);
     for (j = 0; j < gp->cxKeyArray; j++, kp++, fkp++)
     {
+      kp->_reserved = 0;
       kp->Key = fkp->Key;
       if (FSaveDebug) kp->Line = fkp->Line; else kp->Line = 0;
       kp->ShiftFlags = fkp->ShiftFlags;
