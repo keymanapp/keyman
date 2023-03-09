@@ -9,6 +9,7 @@ import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-
 
 describe('Headless keyboard loading', function() {
   const laoPath = require.resolve('@keymanapp/common-test-resources/keyboards/lao_2008_basic.js');
+  const khmerPath = require.resolve('@keymanapp/common-test-resources/keyboards/khmer_angkor.js');
   // Common test suite setup.
 
   let device = {
@@ -24,6 +25,12 @@ describe('Headless keyboard loading', function() {
       let keyboardLoader = new NodeKeyboardLoader(harness);
       let keyboard = await keyboardLoader.loadKeyboardFromPath(laoPath);
       // --  END:  Standard Recorder-based unit test loading boilerplate --
+
+      // Asserts that the harness's loading field is cleared once the load is complete.
+      assert.isNotOk(harness.loadedKeyboard);
+
+      // Asserts that the `activeKeyboard` field was not set by the operation.
+      assert.isNotOk(harness.activeKeyboard);
 
       // This part provides assurance that the keyboard properly loaded.
       assert.equal(keyboard.id, "Keyboard_lao_2008_basic");
@@ -75,6 +82,24 @@ describe('Headless keyboard loading', function() {
 
       // Runs a blank KeyEvent through the keyboard's rule processing.
       harness.processKeystroke(new Mock(), keyboard.constructNullKeyEvent(device));
+    });
+
+    it('does not change the active kehboard', async function() {
+      let harness = new KeyboardInterface({}, MinimalKeymanGlobal);
+      let keyboardLoader = new NodeKeyboardLoader(harness);
+      const lao_keyboard = await keyboardLoader.loadKeyboardFromPath(laoPath);
+      assert.isNotOk(harness.activeKeyboard);
+      assert.isOk(lao_keyboard);
+
+      // This part provides assurance that the keyboard properly loaded.
+      assert.equal(lao_keyboard.id, "Keyboard_lao_2008_basic");
+
+      harness.activeKeyboard = lao_keyboard;
+
+      const khmer_keyboard = await keyboardLoader.loadKeyboardFromPath(khmerPath);
+      assert.strictEqual(lao_keyboard, harness.activeKeyboard);
+
+      assert.equal(khmer_keyboard.id, "Keyboard_khmer_angkor");
     });
   })
 });
