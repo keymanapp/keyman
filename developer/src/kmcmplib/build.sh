@@ -74,24 +74,29 @@ builder_describe_outputs \
 
 TARGET_PATH="$THIS_SCRIPT_PATH/build"
 
-# Import our standard compiler defines; this is copied from
-# /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
-# allow us to reference a file outside its root
-if builder_has_action configure; then
-  mkdir -p "$THIS_SCRIPT_PATH/resources"
-  cp "$KEYMAN_ROOT/resources/build/meson/standard.meson.build" "$THIS_SCRIPT_PATH/resources/meson.build"
-fi
-
 # Iterate through all possible targets; note that targets that cannot be built
 # on the current platform have already been excluded through the archtargets
 # settings above
 targets=(wasm x86 x64 arch)
 
-for target in "${targets[@]}"; do
-  MESON_PATH="$TARGET_PATH/$target/$CONFIGURATION"
+do_action() {
+  local action_function=do_$1
+  for target in "${targets[@]}"; do
+    MESON_PATH="$TARGET_PATH/$target/$CONFIGURATION"
+    $action_function $target
+  done
+}
 
-  do_clean $target
-  do_configure $target
-  do_build $target
-  do_test $target
-done
+do_action clean
+
+if builder_has_action configure; then
+  # Import our standard compiler defines; this is copied from
+  # /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
+  # allow us to reference a file outside its root
+  mkdir -p "$THIS_SCRIPT_PATH/resources"
+  cp "$KEYMAN_ROOT/resources/build/meson/standard.meson.build" "$THIS_SCRIPT_PATH/resources/meson.build"
+fi
+
+do_action configure
+do_action build
+do_action test
