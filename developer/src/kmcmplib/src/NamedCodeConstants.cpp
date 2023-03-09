@@ -144,13 +144,13 @@ KMX_BOOL NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
   while(fgets(str, str_size, fp))
   {
     isEol  = *(strchr(str, 0) - 1) == '\n';
-    p = strtok_s(str, ";", &context);  // I3481
-    q = strtok_s(NULL, ";\n", &context);
+    p = strtok_r(str, ";", &context);  // I3481
+    q = strtok_r(NULL, ";\n", &context);
     if(p && q)
     {
       if(first && *p == (KMX_CHAR)0xEF && *(p+1) == (KMX_CHAR)0xBB && *(p+2) == (KMX_CHAR)0xBF) p += 3;  // I3056 UTF-8   // I3512
       first = FALSE;
-      _strupr_s(q, strlen(q)+1);  // I3481   // I3641
+      strupr(q);  // I3481   // I3641
       int n = strtol(p, NULL, 16);
       if (*q != '<') {
         PKMX_WCHAR q0 =  strtowstr(q);
@@ -264,14 +264,14 @@ int NamedCodeConstants::GetCode_IncludedCodes(const KMX_WCHAR *codename)
 
 const int
  HangulSBase = 0xAC00,
- HangulLBase = 0x1100,
- HangulVBase = 0x1161,
- HangulTBase = 0x11A7,
+ //HangulLBase = 0x1100,
+ //HangulVBase = 0x1161,
+ //HangulTBase = 0x11A7,
  HangulLCount = 19,
  HangulVCount = 21,
- HangulTCount = 28,
- HangulNCount = HangulVCount * HangulTCount,   // 588
- HangulSCount = HangulLCount * HangulNCount;   // 11172
+ HangulTCount = 28;
+ //HangulNCount = HangulVCount * HangulTCount;   // 588
+ //HangulSCount = HangulLCount * HangulNCount;   // 11172
 
 const KMX_WCHAR *
   Hangul_JAMO_L_TABLE[] = {

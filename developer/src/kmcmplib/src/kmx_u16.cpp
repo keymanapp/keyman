@@ -22,13 +22,13 @@ std::wstring wstring_from_string(std::string const str) {
 
 //u16String <- string
 std::u16string u16string_from_string(std::string const str) {
-  std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> converter;
+  std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
   return converter.from_bytes(str);
 }
 
 //string <- u16string
 std::string string_from_u16string(std::u16string const str) {
-	std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> converter;
+	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
 	return converter.to_bytes(str);
 }
 
@@ -62,8 +62,8 @@ void u16sprintf(KMX_WCHAR * dst, const size_t sz, const wchar_t* fmt, ...) {
 	delete[] wbuf;
 }
 
-  std::wstring  convert_pchar16T_To_wstr(KMX_WCHAR Name[_MAX_PATH]){
-  //  convert char16_t*  -> std::u16string -> std::string
+  std::wstring  convert_pchar16T_To_wstr(KMX_WCHAR *Name){
+  //  convert char16_t*  -> std::u16string -> std::string -> std::wstring
   //  char16_t* -> std::u16string
   std::u16string u16str(Name);
   //  std::u16string -> std::string
@@ -280,7 +280,7 @@ double u16tof( KMX_WCHAR* str)
 {
 	double val = 0;
 	int offsetdot=0;
-	char digit;  
+	char digit;
 
 	PKMX_WCHAR q = (PKMX_WCHAR)u16chr(str, '.');
 	int pos_dot = q-str  ;
@@ -290,14 +290,14 @@ double u16tof( KMX_WCHAR* str)
 
 	for (int i = 0; i < u16len(str); i++)
 	{
-		digit = static_cast<char>(towupper(*str));		
+		digit = static_cast<char>(towupper(*str));
 
 		if (i > pos_dot - 1)
 			offsetdot = 1;
 
-		if (digit != '.') 			
+		if (digit != '.')
 			val =val+ ((int(digit)) - 48) * pow(10, (pos_dot - 1- i  + offsetdot));
-		
+
 		str++;
 	}
 	return val;

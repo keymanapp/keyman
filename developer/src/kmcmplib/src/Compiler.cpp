@@ -84,11 +84,11 @@
 #include "../../../../common/windows/cpp/include/ConvertUTF.h"
 
 #include "debugstore.h"
-#include "namedcodeconstants.h"
+#include "NamedCodeConstants.h"
 
 #include "xstring.h"
 
-#include "edition.h"
+#include "Edition.h"
 
 #include "CharToKeyConversion.h"
 #include "CasedKeys.h"
@@ -239,7 +239,7 @@ const KMX_WCHAR * StoreTokens[TSS__MAX + 2] = {
   NULL
 };
 
-static_assert(_countof(StoreTokens) == TSS__MAX + 2, "StoreTokens should have exactly TSS__MAX+2 elements");
+static_assert(sizeof(StoreTokens) / sizeof(StoreTokens[0]) == TSS__MAX + 2, "StoreTokens should have exactly TSS__MAX+2 elements");
 
 enum LinePrefixType { lptNone, lptKeymanAndKeymanWeb, lptKeymanWebOnly, lptKeymanOnly, lptOther };
 
@@ -352,9 +352,9 @@ extern "C" uint32_t kmcmp_CompileKeyboardFile(char* pszInfile,
 
   PKMX_STR p;
 
-  if (p = strrchr_slash(pszInfile))
+  if ((p = strrchr_slash(pszInfile)) != nullptr)
   {
-    strncpy_s(kmcmp::CompileDir, _countof(kmcmp::CompileDir), pszInfile, (int)(p - pszInfile + 1));  // I3481
+    strncpy(kmcmp::CompileDir, pszInfile, (int)(p - pszInfile + 1));  // I3481
     kmcmp::CompileDir[(int)(p - pszInfile + 1)] = 0;
   }
   else
@@ -445,9 +445,9 @@ extern "C" uint32_t kmcmp_CompileKeyboardFileToBuffer(char* pszInfile, void* pfk
 
   PKMX_STR p;
 
-  if (p = strrchr_slash(pszInfile))
+  if ((p = strrchr_slash(pszInfile)) != nullptr)
   {
-    strncpy_s(kmcmp::CompileDir, _countof(kmcmp::CompileDir), pszInfile, (int)(p - pszInfile + 1));  // I3481
+    strncpy(kmcmp::CompileDir, pszInfile, (int)(p - pszInfile + 1));  // I3481
     kmcmp::CompileDir[(int)(p - pszInfile + 1)] = 0;
   }
   else
@@ -845,12 +845,12 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
       PKMX_WCHAR buf = new KMX_WCHAR[GLOBAL_BUFSIZE];
       if ((msg = GetRHS(fk, p, buf, GLOBAL_BUFSIZE - 1, (int)(p - pp), IsUnicode)) != CERR_None)
       {
-        delete buf;
+        delete[] buf;
         return msg;
       }
 
       if ((msg = ValidateMatchNomatchOutput(buf)) != CERR_None) {
-        delete buf;
+        delete[] buf;
         return msg;
       }
 
@@ -859,7 +859,7 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
       gp->dpMatch = new KMX_WCHAR[u16len(buf) + 1];
       u16ncpy(gp->dpMatch, buf, u16len(buf) + 1);  // I3481
 
-      delete buf;
+      delete[] buf;
 
       if (kmcmp::FSaveDebug)
       {
@@ -867,7 +867,9 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
         //swprintf(tstr, "%d", fk->currentGroup);
         /* Record a system store for the line number of the begin statement */
         //wcscpy(tstr, DEBUGSTORE_MATCH);
-        u16sprintf(tstr, _countof(tstr), L"%s%d %s",u16fmt( DEBUGSTORE_MATCH).c_str(), (int) fk->currentGroup, u16fmt(gp->szName).c_str());  // I3481
+        u16sprintf(tstr, _countof(tstr), L"%ls%d ", u16fmt(DEBUGSTORE_MATCH).c_str(), (int) fk->currentGroup);
+        u16ncat(tstr, gp->szName, _countof(tstr));
+
         AddDebugStore(fk, tstr);
       }
     }
@@ -898,9 +900,9 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
       if (kmcmp::FSaveDebug)
       {
         KMX_WCHAR tstr[128];
-        PKMX_WCHAR p_tstr;
         /* Record a system store for the line number of the begin statement */
-        u16sprintf(tstr, _countof(tstr), L"%s%d %s", u16fmt(DEBUGSTORE_NOMATCH).c_str(), fk->currentGroup, u16fmt(gp->szName).c_str());  // I3481
+        u16sprintf(tstr, _countof(tstr), L"%ls%d ", u16fmt(DEBUGSTORE_NOMATCH).c_str(), (int) fk->currentGroup);
+        u16ncat(tstr, gp->szName, _countof(tstr));
         AddDebugStore(fk, tstr);
       }
     }
@@ -955,10 +957,9 @@ KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   if (kmcmp::FSaveDebug)
   {
     KMX_WCHAR tstr[128];
-    PKMX_WCHAR p_tstr;
     /* Record a system store for the line number of the begin statement */
-    u16sprintf(tstr, _countof(tstr), L"%s%d %s", u16fmt(DEBUGSTORE_GROUP).c_str(), fk->cxGroupArray - 1, u16fmt(gp->szName).c_str());  // I3481
-
+    u16sprintf(tstr, _countof(tstr), L"%ls%d ", u16fmt(DEBUGSTORE_GROUP).c_str(), fk->cxGroupArray - 1);
+    u16ncat(tstr, gp->szName, _countof(tstr));
     AddDebugStore(fk, tstr);
   }
 
@@ -1659,12 +1660,10 @@ KMX_DWORD CheckOutputIsReadonly(const PFILE_KEYBOARD fk, const PKMX_WCHAR output
   return CERR_None;
 }
 
+KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnicode, PKMX_WCHAR pklIn, PKMX_WCHAR pklKey, PKMX_WCHAR pklOut);
+
 KMX_DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnicode)
 {
-  PKMX_WCHAR p, pp;
-  KMX_DWORD msg;
-  PFILE_GROUP gp;
-  PFILE_KEY kp;
   PKMX_WCHAR pklIn, pklKey, pklOut;
 
   pklIn  = new KMX_WCHAR[GLOBAL_BUFSIZE];    // I2432 - Allocate buffers each line -- slightly slower but safer than keeping a single buffer
@@ -1673,115 +1672,121 @@ KMX_DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnicode)
   if (!pklIn || !pklKey || !pklOut)
     return CERR_CannotAllocateMemory; // forget about the little leak if pklKey or pklOut fail...
 
-  __try
-  {
+  KMX_DWORD result = ProcessKeyLineImpl(fk, str, IsUnicode, pklIn, pklKey, pklOut);
 
-    gp = &fk->dpGroupArray[fk->currentGroup];
+  delete[] pklIn;   // I2432 - Allocate buffers each line -- slightly slower but safer than keeping a single buffer
+  delete[] pklKey;
+  delete[] pklOut;
 
-    pp = str;
+  return result;
+}
 
-    if (gp->fUsingKeys) {
-      if ((msg = GetXString(fk, str, u"+", pklIn, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
+KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnicode, PKMX_WCHAR pklIn, PKMX_WCHAR pklKey, PKMX_WCHAR pklOut) {
+  PKMX_WCHAR p, pp;
+  KMX_DWORD msg;
+  PFILE_GROUP gp;
+  PFILE_KEY kp;
 
-      str = p + 1;
-      if ((msg = GetXString(fk, str, u">", pklKey, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
-      if (pklKey[0] == 0) return CERR_ZeroLengthString;
-      if (xstrlen(pklKey) > 1) AddWarning(CWARN_KeyBadLength);
-    } else {
-      if ((msg = GetXString(fk, str, u">", pklIn, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
-      if (pklIn[0] == 0) return CERR_ZeroLengthString;
-    }
+  gp = &fk->dpGroupArray[fk->currentGroup];
+
+  pp = str;
+
+  if (gp->fUsingKeys) {
+    if ((msg = GetXString(fk, str, u"+", pklIn, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
 
     str = p + 1;
-    if ((msg = GetXString(fk, str, u"c\n", pklOut, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
+    if ((msg = GetXString(fk, str, u">", pklKey, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
+    if (pklKey[0] == 0) return CERR_ZeroLengthString;
+    if (xstrlen(pklKey) > 1) AddWarning(CWARN_KeyBadLength);
+  } else {
+    if ((msg = GetXString(fk, str, u">", pklIn, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
+    if (pklIn[0] == 0) return CERR_ZeroLengthString;
+  }
 
-    if (pklOut[0] == 0) return CERR_ZeroLengthString;
+  str = p + 1;
+  if ((msg = GetXString(fk, str, u"c\n", pklOut, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
 
-    CheckContextStatementPositions(pklIn);
+  if (pklOut[0] == 0) return CERR_ZeroLengthString;
 
-    // Test index and context offsets in context
-    if ((msg = CheckStatementOffsets(fk, gp, pklIn, pklOut, pklKey)) != CERR_None) return msg;
+  CheckContextStatementPositions(pklIn);
 
-    // Test that use() statements are not followed by other content
-    if ((msg = CheckUseStatementsInOutput(gp, pklOut)) != CERR_None) {
-      return msg;   // I4867
+  // Test index and context offsets in context
+  if ((msg = CheckStatementOffsets(fk, gp, pklIn, pklOut, pklKey)) != CERR_None) return msg;
+
+  // Test that use() statements are not followed by other content
+  if ((msg = CheckUseStatementsInOutput(gp, pklOut)) != CERR_None) {
+    return msg;   // I4867
+  }
+
+  if (gp->fReadOnly) {
+    // Ensure no output is made from the rule, and that
+    // use() statements meet required readonly semantics
+    if ((msg = CheckOutputIsReadonly(fk, pklOut)) != CERR_None) {
+      return msg;
     }
 
-    if (gp->fReadOnly) {
-      // Ensure no output is made from the rule, and that
-      // use() statements meet required readonly semantics
-      if ((msg = CheckOutputIsReadonly(fk, pklOut)) != CERR_None) {
-        return msg;
-      }
-
-      // Inject `context` to start of output if group is readonly
-      // to keep the output internally consistent
-      if ((msg = InjectContextToReadonlyOutput(pklOut)) != CERR_None) {
-        return msg;
-      }
+    // Inject `context` to start of output if group is readonly
+    // to keep the output internally consistent
+    if ((msg = InjectContextToReadonlyOutput(pklOut)) != CERR_None) {
+      return msg;
     }
+  }
 
-    kp = new FILE_KEY[gp->cxKeyArray + 1];
-    if (!kp) return CERR_CannotAllocateMemory;
-    if (gp->dpKeyArray)
-    {
-      memcpy(kp, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
-      delete gp->dpKeyArray;
-    }
+  kp = new FILE_KEY[gp->cxKeyArray + 1];
+  if (!kp) return CERR_CannotAllocateMemory;
+  if (gp->dpKeyArray)
+  {
+    memcpy(kp, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
+    delete gp->dpKeyArray;
+  }
 
-    gp->dpKeyArray = kp;
-    kp = &gp->dpKeyArray[gp->cxKeyArray];
-    gp->cxKeyArray++;
+  gp->dpKeyArray = kp;
+  kp = &gp->dpKeyArray[gp->cxKeyArray];
 
-    kp->dpOutput = new KMX_WCHAR[u16len(pklOut) + 1];
-    u16ncpy(kp->dpOutput, pklOut, u16len(pklOut) + 1);  // I3481
+  gp->cxKeyArray++;
 
-    kp->dpContext = new KMX_WCHAR[u16len(pklIn) + 1];
-    u16ncpy(kp->dpContext, pklIn, u16len(pklIn) + 1);  // I3481
+  kp->dpOutput = new KMX_WCHAR[u16len(pklOut) + 1];
+  u16ncpy(kp->dpOutput, pklOut, u16len(pklOut) + 1);  // I3481
 
+  kp->dpContext = new KMX_WCHAR[u16len(pklIn) + 1];
+  u16ncpy(kp->dpContext, pklIn, u16len(pklIn) + 1);  // I3481
+
+  kp->Line = kmcmp::currentLine;
     kp->Line = kmcmp::currentLine;
 
-    // Finished if we are not using keys
+  // Finished if we are not using keys
 
-    if (!gp->fUsingKeys)
-    {
-      kp->Key = 0;
-      kp->ShiftFlags = 0;
-      return CERR_None;
-    }
-
-    // Expand each rule out into multiple rules - much faster processing at the key hit time
-
-    if (*pklKey == 0) return CERR_ZeroLengthString;
-
-    if (*pklKey == UC_SENTINEL)
-      switch (*(pklKey + 1))
-      {
-      case CODE_ANY:
-        kp->ShiftFlags = 0;
-        if ((msg = ExpandKp(fk, kp, *(pklKey + 2) - 1)) != CERR_None) return msg;
-        break;
-
-      case CODE_EXTENDED:
-        kp->Key = *(pklKey + 3);
-        kp->ShiftFlags = *(pklKey + 2);
-        break;
-
-      default:
-        return CERR_InvalidCodeInKeyPartOfRule;
-      }
-    else
-    {
-      kp->ShiftFlags = 0;
-      kp->Key = *pklKey;
-    }
-
-  }
-  __finally
+  if (!gp->fUsingKeys)
   {
-    delete pklIn;   // I2432 - Allocate buffers each line -- slightly slower but safer than keeping a single buffer
-    delete pklKey;
-    delete pklOut;
+    kp->Key = 0;
+    kp->ShiftFlags = 0;
+    return CERR_None;
+  }
+
+  // Expand each rule out into multiple rules - much faster processing at the key hit time
+
+  if (*pklKey == 0) return CERR_ZeroLengthString;
+
+  if (*pklKey == UC_SENTINEL)
+    switch (*(pklKey + 1))
+    {
+    case CODE_ANY:
+      kp->ShiftFlags = 0;
+      if ((msg = ExpandKp(fk, kp, *(pklKey + 2) - 1)) != CERR_None) return msg;
+      break;
+
+    case CODE_EXTENDED:
+      kp->Key = *(pklKey + 3);
+      kp->ShiftFlags = *(pklKey + 2);
+      break;
+
+    default:
+      return CERR_InvalidCodeInKeyPartOfRule;
+    }
+  else
+  {
+    kp->ShiftFlags = 0;
+    kp->Key = *pklKey;
   }
 
   return CERR_None;
@@ -1930,6 +1935,9 @@ PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_W
   return q;							// Return delimited string
 }
 
+#ifndef __iswcsym
+#define __iswcsym(_c) (iswalnum(_c) || ((_c)=='_'))
+#endif
 
 LinePrefixType GetLinePrefixType(PKMX_WCHAR *p)
 {
@@ -2018,8 +2026,22 @@ KMX_BOOL StrValidChrs(PKMX_WCHAR q, KMX_WCHAR const * chrs)
   return TRUE;
 }
 
-KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token, PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode)
-{
+KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
+  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode
+);
+
+KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
+  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode
+) {
+  PKMX_WCHAR tstr = new KMX_WCHAR[max];    // I2432 - Allocate buffers each line -- slightly slower but safer than keeping a single buffer - GetXString is re-entrant with if()
+  KMX_DWORD err = GetXStringImpl(tstr, fk, str, token, output, max, offset, newp, isVKey, isUnicode);
+  delete[] tstr;
+  return err;
+}
+
+KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
+  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode
+) {
   KMX_DWORD err;
   PKMX_WCHAR p = str, q, r;
   int type, mx = 0, n, n1, n2, tokenFound = FALSE, z, sFlag = 0, j;
@@ -2027,123 +2049,288 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
   KMX_BOOL finished = FALSE;
   KMX_WCHAR c;
 
-  PKMX_WCHAR tstr = NULL;
-  int tstrMax = 0;
+  *tstr = 0;
 
-  tstr = new KMX_WCHAR[max];    // I2432 - Allocate buffers each line -- slightly slower but safer than keeping a single buffer - GetXString is re-entrant with if()
-  tstrMax = max;
+  *output = 0;
 
-  __try
+  p = str;
+  do
   {
-    *tstr = 0;
+    tokenFound = FALSE;
+    while (iswspace(*p) && !u16chr(token, *p)) p++;
+    if (!*p) break;
 
-    *output = 0;
+    ErrChr = (int)(p - str) + offset + 1;
 
-    p = str;
-    do
+    /*
+    char *tokenTypes[] = {
+      "clearcontext", "deadkey", "context", "return", "switch",
+      "index", "outs", "beep", "nul", "use", "any", "fix", "dk", "k_", "x", "d", "c",
+      "[", "]" };
+    */
+
+    switch (towupper(*p))
     {
-      tokenFound = FALSE;
-      while (iswspace(*p) && !u16chr(token, *p)) p++;
-      if (!*p) break;
+    case 'X':
+    case 'D':  type = 0; break;		// xFF, d130: chars, deadkey(n)
+    case '\"': type = 1; break;		// "xxxx": chars
+    case '\'': type = 2; break;		// 'xxxx': chars
+    case 'A':  type = 3; break;		// any(s)
+    case 'B':  type = 4; break;		// beep, baselayout (synonym for if(&baselayout))  // I3430
+    case 'I':  type = 5; break;		// index(s,n), if
+    case 'O':  type = 6; break;		// outs(s)
+    case 'C':  type = 7; break;		// context, comments, clearcontext, call(s)
+    case 'N':  type = 8; break;		// nul, notany
+    case 'U':  type = 9; break;		// use(g)
+    case 'R':  type = 10; break;	// return, reset
+    case '[':  type = 11; break;	// start of vkey section
+    //case ']':  type = 12; break;	// end of vkey section
+    //case 'K':  type = 13; break;	// virtual key name or "key"
+    case 'S':  type = 14; break;	// switch, set, save
+    case 'F':  type = 15; break;	// fix (synonym for clearcontext)
+    case '$':  type = 16; break;	// named code constants
+    case 'P':  type = 17; break;  // platform (synonym for if(&platform))  // I3430
+    case 'L':  type = 18; break;  // layer (synonym for set(&layer))  // I3437
+    case '.':  type = 19; break;  // .. allows us to specify ranges -- either vkeys or characters
+    default:
+      if (iswdigit(*p)) type = 0;	// octal number
+      else type = 99;				// error!
+    }
+    if (u16chr(token, *p)) tokenFound = TRUE;
 
-      ErrChr = (int)(p - str) + offset + 1;
-
-      /*
-      char *tokenTypes[] = {
-        "clearcontext", "deadkey", "context", "return", "switch",
-        "index", "outs", "beep", "nul", "use", "any", "fix", "dk", "k_", "x", "d", "c",
-        "[", "]" };
-      */
-
-      switch (towupper(*p))
+    switch (type)
+    {
+    case 99:
+      if (tokenFound) break;
       {
-      case 'X':
-      case 'D':  type = 0; break;		// xFF, d130: chars, deadkey(n)
-      case '\"': type = 1; break;		// "xxxx": chars
-      case '\'': type = 2; break;		// 'xxxx': chars
-      case 'A':  type = 3; break;		// any(s)
-      case 'B':  type = 4; break;		// beep, baselayout (synonym for if(&baselayout))  // I3430
-      case 'I':  type = 5; break;		// index(s,n), if
-      case 'O':  type = 6; break;		// outs(s)
-      case 'C':  type = 7; break;		// context, comments, clearcontext, call(s)
-      case 'N':  type = 8; break;		// nul, notany
-      case 'U':  type = 9; break;		// use(g)
-      case 'R':  type = 10; break;	// return, reset
-      case '[':  type = 11; break;	// start of vkey section
-      //case ']':  type = 12; break;	// end of vkey section
-      //case 'K':  type = 13; break;	// virtual key name or "key"
-      case 'S':  type = 14; break;	// switch, set, save
-      case 'F':  type = 15; break;	// fix (synonym for clearcontext)
-      case '$':  type = 16; break;	// named code constants
-      case 'P':  type = 17; break;  // platform (synonym for if(&platform))  // I3430
-      case 'L':  type = 18; break;  // layer (synonym for set(&layer))  // I3437
-      case '.':  type = 19; break;  // .. allows us to specify ranges -- either vkeys or characters
-      default:
-        if (iswdigit(*p)) type = 0;	// octal number
-        else type = 99;				// error!
+        PKMX_WCHAR p_ErrExtra =strtowstr(ErrExtraLIB);
+        u16sprintf(p_ErrExtra,_countof(ErrExtraLIB),L"token: %c",(int)*p);
       }
-      if (u16chr(token, *p)) tokenFound = TRUE;
-
-      switch (type)
+      return CERR_InvalidToken;
+    case 0:
+      if (u16nicmp(p, u"deadkey", z = 7) == 0 ||
+        u16nicmp(p, u"dk", z = 2) == 0)
       {
-      case 99:
-        if (tokenFound) break;
-        {
-          PKMX_WCHAR p_ErrExtra =strtowstr(ErrExtraLIB);
-          u16sprintf(p_ErrExtra,_countof(ErrExtraLIB),L"token: %c",(int)*p);
-        }
+        p += z;
+        q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+        if (!q || !*q) return CERR_InvalidDeadkey;
+
+        tstr[mx++] = UC_SENTINEL;
+        tstr[mx++] = CODE_DEADKEY;
+        if (!StrValidChrs(q, DeadKeyChars)) return CERR_InvalidDeadkey;
+        tstr[mx++] = GetDeadKey(fk, q); //atoiW(q); 7-5-01: named deadkeys
+        tstr[mx] = 0;
+      }
+      else
+      {
+        n = xatoi(&p);
+        if (*p != '\0' && !iswspace(*p)) return CERR_InvalidValue;
+        if ((err = kmcmp::UTF32ToUTF16(n, &n1, &n2)) != CERR_None) return err;
+        tstr[mx++] = n1;
+        if (n2 >= 0) tstr[mx++] = n2;
+        tstr[mx] = 0;
+      }
+      continue;
+
+    case 1:
+      q = (PKMX_WCHAR) u16chr(p + 1, '\"');
+      if (!q) return CERR_UnterminatedString;
+      if ((int)(q - p) - 1 + mx > max) return CERR_UnterminatedString;
+      if (sFlag) return CERR_StringInVirtualKeySection;
+      u16ncat(tstr,  p + 1, (int)(q - p) - 1);  // I3481
+      mx += (int)(q - p) - 1;
+      tstr[mx] = 0;
+      p = q + 1;
+      continue;
+    case 2:
+      q = (PKMX_WCHAR) u16chr(p + 1, '\'');
+      if (!q) return CERR_UnterminatedString;
+      if ((int)(q - p) - 1 + mx > max) return CERR_UnterminatedString;
+      if (sFlag) return CERR_StringInVirtualKeySection;
+      u16ncat(tstr,  p + 1, (int)(q - p) - 1);  // I3481
+      mx += (int)(q - p) - 1;
+      tstr[mx] = 0;
+      p = q + 1;
+      continue;
+    case 3:
+      if (u16nicmp(p, u"any", 3) != 0) return CERR_InvalidToken;
+      if (sFlag) return CERR_AnyInVirtualKeySection;
+      p += 3;
+      q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+      if (!q || !*q) return CERR_InvalidAny;
+
+      for (i = 0; i < fk->cxStoreArray; i++)
+      {
+        if (u16icmp(q, fk->dpStoreArray[i].szName) == 0) break;
+      }
+      if (i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
+
+      if (!*fk->dpStoreArray[i].dpString) return CERR_ZeroLengthString;
+      kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
+
+      tstr[mx++] = UC_SENTINEL;
+      tstr[mx++] = CODE_ANY;
+      tstr[mx++] = (KMX_WCHAR)i + 1;	// store to index + 1, avoids End-of-string
+      tstr[mx] = 0;
+      continue;
+    case 4:
+      if (u16nicmp(p, u"beep", 4) == 0)
+      {
+        if (sFlag) return CERR_BeepInVirtualKeySection;
+        p += 4;
+        tstr[mx++] = UC_SENTINEL;
+        tstr[mx++] = CODE_BEEP;
+        tstr[mx] = 0;
+      }
+      else if (u16nicmp(p, u"baselayout", 10) == 0)  // I3430
+      {
+        VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnly_IfSystemStores);
+        if (sFlag) return CERR_InvalidInVirtualKeySection;
+        p += 10;
+        q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+        if (!q || !*q) return CERR_InvalidToken;
+        err = process_baselayout(fk, q, tstr, &mx);
+        if (err != CERR_None) return err;
+      }
+      else
         return CERR_InvalidToken;
-      case 0:
-        if (u16nicmp(p, u"deadkey", z = 7) == 0 ||
-          u16nicmp(p, u"dk", z = 2) == 0)
+
+      continue;
+    case 5:
+      if (u16nicmp(p, u"if", 2) == 0)
+      {
+        VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
+        if (sFlag) return CERR_InvalidInVirtualKeySection;
+        p += 2;
+        q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+        if (!q || !*q) return CERR_InvalidIf;
+
+        err = process_if(fk, q, tstr, &mx);
+        if (err != CERR_None) return err;
+      }
+      else
+      {
+        if (u16nicmp(p, u"index", 5) != 0) return CERR_InvalidToken;
+        if (sFlag) return CERR_IndexInVirtualKeySection;
+        p += 5;
+        q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+
+        if (!q || !*q) return CERR_InvalidIndex;
+
         {
-          p += z;
-          q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-          if (!q || !*q) return CERR_InvalidDeadkey;
+          KMX_WCHAR *context = NULL;
+          KMX_WCHAR sep_com[3] = u" ,";
+          PKMX_WCHAR p_sep_com = sep_com;
+          r = u16tok(q, p_sep_com, &context);  // I3481
+          if (!r) return CERR_InvalidIndex;
 
-          KMX_DWORD n = fk->cxDeadKeyArray;
+          for (i = 0; i < fk->cxStoreArray; i++)
+          {
+            if (u16icmp(r, fk->dpStoreArray[i].szName) == 0) break;
+          }
+          if (i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
 
+          kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
+
+          r = u16tok(NULL, p_sep_com, &context);  // I3481
+          if (!r) return CERR_InvalidIndex;
+        }
+        tstr[mx++] = UC_SENTINEL;
+        tstr[mx++] = CODE_INDEX;
+        tstr[mx++] = (KMX_WCHAR)i + 1;	    // avoid EOS for stores
+        tstr[mx++] = atoiW(r);	// character offset of original any.
+
+        tstr[mx] = 0;
+      }
+      continue;
+    case 6:
+      if (u16nicmp(p, u"outs", 4) != 0) return CERR_InvalidToken;
+      if (sFlag) return CERR_OutsInVirtualKeySection;
+      p += 4;
+      q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+      if (!q || !*q) return CERR_InvalidOuts;
+
+      for (i = 0; i < fk->cxStoreArray; i++)
+      {
+        if (u16icmp(q, fk->dpStoreArray[i].szName) == 0) break;
+      }
+      if (i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
+
+      kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
+
+      for (q = fk->dpStoreArray[i].dpString; *q; q++)
+      {
+        tstr[mx++] = *q;
+        if (mx >= max - 1) return CERR_BufferOverflow;
+      }
+      tstr[mx] = 0;
+      continue;
+    case 7:
+      if (iswspace(*(p + 1))) break;		// is a comment -- pre-stripped - so why this test?
+      if (u16nicmp(p, u"context", 7) == 0)
+      {
+        if (sFlag) return CERR_ContextInVirtualKeySection;
+        p += 7;
+
+        q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+        if (q && *q)
+        {
+          VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_Contextn);
+          int n1;
+          n1 = atoiW(q);
+          if (n1 < 1 || n1 >= 0xF000) return CERR_InvalidToken;
           tstr[mx++] = UC_SENTINEL;
-          tstr[mx++] = CODE_DEADKEY;
-          if (!StrValidChrs(q, DeadKeyChars)) return CERR_InvalidDeadkey;
-          tstr[mx++] = GetDeadKey(fk, q); //atoiW(q); 7-5-01: named deadkeys
+          tstr[mx++] = CODE_CONTEXTEX;
+          tstr[mx++] = n1;
           tstr[mx] = 0;
         }
         else
         {
-          n = xatoi(&p);
-          if (*p != '\0' && !iswspace(*p)) return CERR_InvalidValue;
-          if ((err = kmcmp::UTF32ToUTF16(n, &n1, &n2)) != CERR_None) return err;
-          tstr[mx++] = n1;
-          if (n2 >= 0) tstr[mx++] = n2;
+          tstr[mx++] = UC_SENTINEL;
+          tstr[mx++] = CODE_CONTEXT;
           tstr[mx] = 0;
         }
-        continue;
+      }
+      else if (u16nicmp(p, u"clearcontext", 12) == 0)
+      {
+        p += 12;
+        tstr[mx++] = UC_SENTINEL;
+        tstr[mx++] = CODE_CLEARCONTEXT;
+        tstr[mx] = 0;
+      }
+      else if (u16nicmp(p, u"call", 4) == 0)
+      {
+        VERIFY_KEYBOARD_VERSION(fk, VERSION_501, CERR_501FeatureOnly_Call);
+        if (sFlag) return CERR_CallInVirtualKeySection;
+        p += 4;
+        q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+        if (!q || !*q) return CERR_InvalidCall;
 
-      case 1:
-        q = (PKMX_WCHAR) u16chr(p + 1, '\"');
-        if (!q) return CERR_UnterminatedString;
-        if ((int)(q - p) - 1 + mx > max) return CERR_UnterminatedString;
-        if (sFlag) return CERR_StringInVirtualKeySection;
-        u16ncat(tstr,  p + 1, (int)(q - p) - 1);  // I3481
-        mx += (int)(q - p) - 1;
+        for (i = 0; i < fk->cxStoreArray; i++)
+        {
+          if (u16icmp(q, fk->dpStoreArray[i].szName) == 0) break;
+        }
+
+        if (!kmcmp::IsValidCallStore(&fk->dpStoreArray[i])) return CERR_InvalidCall;
+        kmcmp::CheckStoreUsage(fk, i, FALSE, FALSE, TRUE);
+
+        if (i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
+        tstr[mx++] = UC_SENTINEL;
+        tstr[mx++] = CODE_CALL;
+        tstr[mx++] = (KMX_WCHAR)i + 1;
         tstr[mx] = 0;
-        p = q + 1;
-        continue;
-      case 2:
-        q = (PKMX_WCHAR) u16chr(p + 1, '\'');
-        if (!q) return CERR_UnterminatedString;
-        if ((int)(q - p) - 1 + mx > max) return CERR_UnterminatedString;
-        if (sFlag) return CERR_StringInVirtualKeySection;
-        u16ncat(tstr,  p + 1, (int)(q - p) - 1);  // I3481
-        mx += (int)(q - p) - 1;
-        tstr[mx] = 0;
-        p = q + 1;
-        continue;
-      case 3:
-        if (u16nicmp(p, u"any", 3) != 0) return CERR_InvalidToken;
-        if (sFlag) return CERR_AnyInVirtualKeySection;
-        p += 3;
+
+        fk->dpStoreArray[i].dwSystemID = TSS_CALLDEFINITION;
+      }
+      else
+        return CERR_InvalidToken;
+      continue;
+    case 8:
+      if (u16nicmp(p, u"notany", 6) == 0)
+      {
+        VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly)
+          if (sFlag) return CERR_AnyInVirtualKeySection;
+        p += 6;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (!q || !*q) return CERR_InvalidAny;
 
@@ -2152,509 +2339,328 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
           if (u16icmp(q, fk->dpStoreArray[i].szName) == 0) break;
         }
         if (i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
-
-        if (!*fk->dpStoreArray[i].dpString) return CERR_ZeroLengthString;
         kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
-
         tstr[mx++] = UC_SENTINEL;
-        tstr[mx++] = CODE_ANY;
+        tstr[mx++] = CODE_NOTANY;
         tstr[mx++] = (KMX_WCHAR)i + 1;	// store to index + 1, avoids End-of-string
         tstr[mx] = 0;
         continue;
-      case 4:
-        if (u16nicmp(p, u"beep", 4) == 0)
+      }
+      if (u16nicmp(p, u"nul", 3) != 0) return CERR_InvalidToken;
+
+      p += 3;
+      tstr[mx++] = UC_SENTINEL;
+      tstr[mx++] = CODE_NUL;
+      tstr[mx] = 0;
+      continue;
+    case 9:
+      if (u16nicmp(p, u"use", 3) != 0)
+      {
+        if (*(p + 1) == '+')
         {
-          if (sFlag) return CERR_BeepInVirtualKeySection;
-          p += 4;
-          tstr[mx++] = UC_SENTINEL;
-          tstr[mx++] = CODE_BEEP;
+          n = xatoi(&p);
+          if (*p != '\0' && !iswspace(*p)) return CERR_InvalidValue;
+          if ((err = kmcmp::UTF32ToUTF16(n, &n1, &n2)) != CERR_None) return err;
+          tstr[mx++] = n1;
+          if (n2 >= 0) tstr[mx++] = n2;
           tstr[mx] = 0;
-        }
-        else if (u16nicmp(p, u"baselayout", 10) == 0)  // I3430
-        {
-          VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnly_IfSystemStores);
-          if (sFlag) return CERR_InvalidInVirtualKeySection;
-          p += 10;
-          q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-          if (!q || !*q) return CERR_InvalidToken;
-          err = process_baselayout(fk, q, tstr, &mx);
-          if (err != CERR_None) return err;
-        }
-        else
-          return CERR_InvalidToken;
-
-        continue;
-      case 5:
-        if (u16nicmp(p, u"if", 2) == 0)
-        {
-          VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
-          if (sFlag) return CERR_InvalidInVirtualKeySection;
-          p += 2;
-          q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-          if (!q || !*q) return CERR_InvalidIf;
-
-          err = process_if(fk, q, tstr, &mx);
-          if (err != CERR_None) return err;
-        }
-        else
-        {
-          if (u16nicmp(p, u"index", 5) != 0) return CERR_InvalidToken;
-          if (sFlag) return CERR_IndexInVirtualKeySection;
-          p += 5;
-          q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-
-          if (!q || !*q) return CERR_InvalidIndex;
-
-          {
-            KMX_WCHAR *context = NULL;
-            KMX_WCHAR sep_com[3] = u" ,";
-            PKMX_WCHAR p_sep_com = sep_com;
-            r = u16tok(q, p_sep_com, &context);  // I3481
-            if (!r) return CERR_InvalidIndex;
-
-            for (i = 0; i < fk->cxStoreArray; i++)
-            {
-              if (u16icmp(r, fk->dpStoreArray[i].szName) == 0) break;
-            }
-            if (i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
-
-            kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
-
-            r = u16tok(NULL, p_sep_com, &context);  // I3481
-            if (!r) return CERR_InvalidIndex;
-          }
-          tstr[mx++] = UC_SENTINEL;
-          tstr[mx++] = CODE_INDEX;
-          tstr[mx++] = (KMX_WCHAR)i + 1;	    // avoid EOS for stores
-          tstr[mx++] = atoiW(r);	// character offset of original any.
-
-          tstr[mx] = 0;
-        }
-        continue;
-      case 6:
-        if (u16nicmp(p, u"outs", 4) != 0) return CERR_InvalidToken;
-        if (sFlag) return CERR_OutsInVirtualKeySection;
-        p += 4;
-        q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-        if (!q || !*q) return CERR_InvalidOuts;
-
-        for (i = 0; i < fk->cxStoreArray; i++)
-        {
-          if (u16icmp(q, fk->dpStoreArray[i].szName) == 0) break;
-        }
-        if (i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
-
-        kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
-
-        for (q = fk->dpStoreArray[i].dpString; *q; q++)
-        {
-          tstr[mx++] = *q;
-          if (mx >= max - 1) return CERR_BufferOverflow;
-        }
-        tstr[mx] = 0;
-        continue;
-      case 7:
-        if (iswspace(*(p + 1))) break;		// is a comment -- pre-stripped - so why this test?
-        if (u16nicmp(p, u"context", 7) == 0)
-        {
-          if (sFlag) return CERR_ContextInVirtualKeySection;
-          p += 7;
-
-          q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-          if (q && *q)
-          {
-            VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_Contextn);
-            int n1;
-            n1 = atoiW(q);
-            if (n1 < 1 || n1 >= 0xF000) return CERR_InvalidToken;
-            tstr[mx++] = UC_SENTINEL;
-            tstr[mx++] = CODE_CONTEXTEX;
-            tstr[mx++] = n1;
-            tstr[mx] = 0;
-          }
-          else
-          {
-            tstr[mx++] = UC_SENTINEL;
-            tstr[mx++] = CODE_CONTEXT;
-            tstr[mx] = 0;
-          }
-        }
-        else if (u16nicmp(p, u"clearcontext", 12) == 0)
-        {
-          p += 12;
-          tstr[mx++] = UC_SENTINEL;
-          tstr[mx++] = CODE_CLEARCONTEXT;
-          tstr[mx] = 0;
-        }
-        else if (u16nicmp(p, u"call", 4) == 0)
-        {
-          VERIFY_KEYBOARD_VERSION(fk, VERSION_501, CERR_501FeatureOnly_Call);
-          if (sFlag) return CERR_CallInVirtualKeySection;
-          p += 4;
-          q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-          if (!q || !*q) return CERR_InvalidCall;
-
-          for (i = 0; i < fk->cxStoreArray; i++)
-          {
-            if (u16icmp(q, fk->dpStoreArray[i].szName) == 0) break;
-          }
-
-          if (!kmcmp::IsValidCallStore(&fk->dpStoreArray[i])) return CERR_InvalidCall;
-          kmcmp::CheckStoreUsage(fk, i, FALSE, FALSE, TRUE);
-
-          if (i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
-          tstr[mx++] = UC_SENTINEL;
-          tstr[mx++] = CODE_CALL;
-          tstr[mx++] = (KMX_WCHAR)i + 1;
-          tstr[mx] = 0;
-
-          fk->dpStoreArray[i].dwSystemID = TSS_CALLDEFINITION;
-        }
-        else
-          return CERR_InvalidToken;
-        continue;
-      case 8:
-        if (u16nicmp(p, u"notany", 6) == 0)
-        {
-          VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly)
-            if (sFlag) return CERR_AnyInVirtualKeySection;
-          p += 6;
-          q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-          if (!q || !*q) return CERR_InvalidAny;
-
-          for (i = 0; i < fk->cxStoreArray; i++)
-          {
-            if (u16icmp(q, fk->dpStoreArray[i].szName) == 0) break;
-          }
-          if (i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
-          kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
-          tstr[mx++] = UC_SENTINEL;
-          tstr[mx++] = CODE_NOTANY;
-          tstr[mx++] = (KMX_WCHAR)i + 1;	// store to index + 1, avoids End-of-string
-          tstr[mx] = 0;
+          if (!isUnicode) AddWarning(CWARN_UnicodeInANSIGroup);
           continue;
         }
-        if (u16nicmp(p, u"nul", 3) != 0) return CERR_InvalidToken;
+        return CERR_InvalidToken;
+      }
+      p += 3;
 
-        p += 3;
-        tstr[mx++] = UC_SENTINEL;
-        tstr[mx++] = CODE_NUL;
-        tstr[mx] = 0;
-        continue;
-      case 9:
-        if (u16nicmp(p, u"use", 3) != 0)
-        {
-          if (*(p + 1) == '+')
-          {
-            n = xatoi(&p);
-            if (*p != '\0' && !iswspace(*p)) return CERR_InvalidValue;
-            if ((err = kmcmp::UTF32ToUTF16(n, &n1, &n2)) != CERR_None) return err;
-            tstr[mx++] = n1;
-            if (n2 >= 0) tstr[mx++] = n2;
-            tstr[mx] = 0;
-            if (!isUnicode) AddWarning(CWARN_UnicodeInANSIGroup);
-            continue;
-          }
-          return CERR_InvalidToken;
-        }
-        p += 3;
-
-        q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-        if (!q || !*q) return CERR_InvalidUse;
-        tstr[mx++] = UC_SENTINEL;
-        tstr[mx++] = CODE_USE;
-        tstr[mx] = GetGroupNum(fk, q);
-        if (tstr[mx] == 0) return CERR_GroupDoesNotExist;
-        tstr[++mx] = 0;
-        continue;
-      case 10:
-        if (u16nicmp(p, u"reset", 5) == 0)
-        {
-          VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
-          if (sFlag) return CERR_InvalidInVirtualKeySection;
-          p += 5;
-          q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-          if (!q || !*q) return CERR_InvalidReset;
-
-          err = process_reset(fk, q, tstr, &mx);
-          if (err != CERR_None) return err;
-        }
-        else
-        {
-          if (u16nicmp(p, u"return", 6) != 0) return CERR_InvalidToken;
-
-          p += 6;
-          tstr[mx++] = UC_SENTINEL;
-          tstr[mx++] = CODE_RETURN;
-          tstr[mx] = 0;
-          u16ncpy(output, tstr, max);  // I3481
-          output[max - 1] = 0;
-          return 0;
-        }
-        continue;
-      case 11:
-        p++; sFlag = ISVIRTUALKEY /* 0 */; finished = FALSE;
-
-        //printf("--EXTENDEDSTRING--\n");
-
-        do
-        {
-          while (iswspace(*p)) p++;
-
-          switch (towupper(*p))
-          {
-          case 'N':
-            if (u16nicmp(p, u"NCAPS", 5) == 0)
-              sFlag |= NOTCAPITALFLAG, p += 5;
-            else finished = TRUE;
-            break;
-          case 'L':
-            if (u16nicmp(p, u"LALT", 4) == 0)
-              sFlag |= LALTFLAG, p += 4;
-            else if (u16nicmp(p, u"LCTRL", 5) == 0)
-              sFlag |= LCTRLFLAG, p += 5;
-            else finished = TRUE;
-            break;
-          case 'R':
-            if (u16nicmp(p, u"RALT", 4) == 0)
-              sFlag |= RALTFLAG, p += 4;
-            else if (u16nicmp(p, u"RCTRL", 5) == 0)
-              sFlag |= RCTRLFLAG, p += 5;
-            else finished = TRUE;
-            break;
-          case 'A':
-            if (u16nicmp(p, u"ALT", 3) == 0)
-              sFlag |= K_ALTFLAG, p += 3;
-            else finished = TRUE;
-            break;
-          case 'C':
-            if (u16nicmp(p, u"CTRL", 4) == 0)
-              sFlag |= K_CTRLFLAG, p += 4;
-            else if (u16nicmp(p, u"CAPS", 4) == 0)
-              sFlag |= CAPITALFLAG, p += 4;
-            else finished = TRUE;
-            break;
-          case 'S':
-            if (u16nicmp(p, u"SHIFT", 5) == 0)
-              sFlag |= K_SHIFTFLAG, p += 5;
-            else finished = TRUE;
-            break;
-          default:
-            finished = TRUE;
-            break;
-          }
-        } while (!finished);
-
-        if ((sFlag & (LCTRLFLAG | LALTFLAG)) && (sFlag & (RCTRLFLAG | RALTFLAG))) {
-          AddWarning(CWARN_MixingLeftAndRightModifiers);
-        }
-
-        // If we use chiral modifiers, or we use state keys, and we target web in the keyboard, and we don't manually specify a keyboard version, bump the minimum
-        // version to 10.0. This makes an assumption that if we are using these features in a keyboard and it has no version specified, that we want to use the features
-        // in the web target platform, even if there are platform() rules excluding this possibility. In that (rare) situation, the keyboard developer should simply specify
-        // the &version to be 9.0 or whatever to avoid this behaviour.
-        if (sFlag & (LCTRLFLAG | LALTFLAG | RCTRLFLAG | RALTFLAG | CAPITALFLAG | NOTCAPITALFLAG | NUMLOCKFLAG | NOTNUMLOCKFLAG | SCROLLFLAG | NOTSCROLLFLAG) &&
-          kmcmp::CompileTarget == CKF_KEYMANWEB &&
-          fk->dwFlags & KF_AUTOMATICVERSION) {
-          VERIFY_KEYBOARD_VERSION(fk, VERSION_100, 0);
-        }
-        //printf("sFlag: %x\n", sFlag);
-
-        tstr[mx++] = UC_SENTINEL;
-        tstr[mx++] = CODE_EXTENDED;
-        tstr[mx++] = sFlag;
-
-        while (iswspace(*p)) p++;
-
-        q = p;
-
-        if (*q == ']')
-        {
-          return CERR_InvalidToken; // I3137 - key portion of VK is missing e.g. "[CTRL ALT]", this generates invalid kmx file that can crash Keyman or compiler later on   // I3511
-        }
-
-        while (*q != ']')
-        {
-          if (*q == '\'' || *q == '"')
-          {
-            VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_VirtualCharKey);
-            if (!kmcmp::FMnemonicLayout) AddWarning(CWARN_VirtualCharKeyWithPositionalLayout);
-            KMX_WCHAR chQuote = *q;
-            q++; if (*q == chQuote || *q == '\n' || *q == 0) return CERR_InvalidToken;
-            tstr[mx - 1] |= VIRTUALCHARKEY;
-            tstr[mx++] = *q;
-            q++; if (*q != chQuote) return CERR_InvalidToken;
-            q++;
-            while (iswspace(*q)) q++;
-            if (*q != ']') return CERR_InvalidToken;
-            break; /* out of while loop */
-          }
-
-          for (j = 0; !iswspace(*q) && *q != ']' && *q != 0; q++, j++);
-
-          if (*q == 0) return CERR_InvalidToken;
-
-          KMX_WCHAR vkname[SZMAX_VKDICTIONARYNAME];  // I3438
-
-          if (j >= SZMAX_VKDICTIONARYNAME) return CERR_InvalidToken;
-
-          u16ncpy(vkname,  p, j);  // I3481
-          vkname[j] = 0;
-
-          if (u16icmp(vkname, u"K_NPENTER") == 0)
-            i = 5;  // I649 - K_NPENTER hack
-          else
-          {
-            for (i = 0; i <= VK__MAX; i++)
-            {
-              if (u16icmp(vkname, VKeyNames[i]) == 0 || u16icmp(vkname, VKeyISO9995Names[i]) == 0)
-                break;
-            }
-          }
-
-          if (i == VK__MAX + 1)
-          {
-            VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_InvalidToken);
-
-            i = GetVKCode(fk, vkname);  // I3438
-            if (i == 0)
-              return CERR_InvalidToken;
-          }
-
-          p = q;
-
-          tstr[mx++] = (int)i;
-
-          if (kmcmp::FMnemonicLayout && (i <= VK__MAX) && VKeyMayBeVCKey[i]) AddWarning(CWARN_VirtualKeyWithMnemonicLayout);  // I3438
-
-          while (iswspace(*q)) q++;
-        }
-        tstr[mx++] = UC_SENTINEL_EXTENDEDEND;
-        tstr[mx] = 0;
-        //printf("--EXTENDEDEND--\n");
-
-        p = q + 1;
-
-        sFlag = 0;
-
-        continue;
-      case 14:
-        if (u16nicmp(p, u"set", 3) == 0)
-        {
-          VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
-          p += 3;
-          q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-          if (!q || !*q) return CERR_InvalidSet;
-
-          err = process_set(fk, q, tstr, &mx);
-          if (err != CERR_None) return err;
-        }
-        else if (u16nicmp(p, u"save", 4) == 0)
-        {
-          VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
-          p += 4;
-          q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-          if (!q || !*q) return CERR_InvalidSave;
-
-          err = process_save(fk, q, tstr, &mx);
-          if (err != CERR_None) return err;
-        }
-        else
-        {
-          if (u16nicmp(p, u"switch", 6) != 0) return CERR_InvalidToken;
-          p += 6;
-          q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-          if (!q || !*q) return CERR_InvalidSwitch;
-          tstr[mx++] = UC_SENTINEL;
-          tstr[mx++] = CODE_SWITCH;
-          tstr[mx++] = atoiW(q);
-          tstr[mx] = 0;
-        }
-        continue;
-      case 15:
-        if (u16nicmp(p, u"fix", 3) == 0)
-        {
-          p += 3;
-          tstr[mx++] = UC_SENTINEL;
-          tstr[mx++] = CODE_CLEARCONTEXT;
-          tstr[mx] = 0;
-        }
-        else
-          return CERR_InvalidToken;
-        continue;
-      case 16:
-        VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_NamedCodes);
-        q = p + 1;
-        while (*q && !iswspace(*q)) q++;
-        c = *q; *q = 0;
-        n = CodeConstants->GetCode(p + 1, &i);
-        *q = c;
-        if (n == 0) return CERR_InvalidNamedCode;
-        if (i < 0xFFFFFFFFL) kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);   // I2993
-        if (n > 0xFFFF)
-        {
-          tstr[mx++] = Uni_UTF32ToSurrogate1(n);
-          tstr[mx++] = Uni_UTF32ToSurrogate2(n);
-        }
-        else
-          tstr[mx++] = n;
-        tstr[mx] = 0;
-        p = q;
-        continue;
-      case 17:
-        if (u16nicmp(p, u"platform", 8) != 0) return CERR_InvalidToken;  // I3430
-        VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnly_IfSystemStores);
-        if (sFlag) return CERR_InvalidInVirtualKeySection;
-        p += 8;
-        q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-        if (!q || !*q) return CERR_InvalidToken;
-        err = process_platform(fk, q, tstr, &mx);
-        if (err != CERR_None) return err;
-        continue;
-      case 18:  // I3437
-        if (u16nicmp(p, u"layer", 5) != 0) return CERR_InvalidToken;
-        VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnly_SetSystemStores);
+      q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+      if (!q || !*q) return CERR_InvalidUse;
+      tstr[mx++] = UC_SENTINEL;
+      tstr[mx++] = CODE_USE;
+      tstr[mx] = GetGroupNum(fk, q);
+      if (tstr[mx] == 0) return CERR_GroupDoesNotExist;
+      tstr[++mx] = 0;
+      continue;
+    case 10:
+      if (u16nicmp(p, u"reset", 5) == 0)
+      {
+        VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
         if (sFlag) return CERR_InvalidInVirtualKeySection;
         p += 5;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-        if (!q || !*q) return CERR_InvalidToken;
-        err = process_set_synonym(TSS_LAYER, fk, q, tstr, &mx);
-        if (err != CERR_None) return err;
-        continue;
-      case 19:  // #2241
-        if (*(p + 1) != '.') return CERR_InvalidToken;
-        if (sFlag) return CERR_InvalidInVirtualKeySection;
-        p += 2;
-        err = process_expansion(fk, p, tstr, &mx, max);
-        if (err != CERR_None) return err;
-        continue;
-      default:
-        return CERR_InvalidToken;
-      }
-      if (tokenFound)
-      {
-        *newp = p;
-        u16ncpy(output,  tstr, max);  // I3481
-        output[max - 1] = 0;
-        ErrChr = 0;
-        return CERR_None;
-      }
-      if (mx >= max) return CERR_BufferOverflow;
-    } while (*p);
+        if (!q || !*q) return CERR_InvalidReset;
 
-    if (!*token)
+        err = process_reset(fk, q, tstr, &mx);
+        if (err != CERR_None) return err;
+      }
+      else
+      {
+        if (u16nicmp(p, u"return", 6) != 0) return CERR_InvalidToken;
+
+        p += 6;
+        tstr[mx++] = UC_SENTINEL;
+        tstr[mx++] = CODE_RETURN;
+        tstr[mx] = 0;
+        u16ncpy(output, tstr, max);  // I3481
+        output[max - 1] = 0;
+        return 0;
+      }
+      continue;
+    case 11:
+      p++; sFlag = ISVIRTUALKEY /* 0 */; finished = FALSE;
+
+      //printf("--EXTENDEDSTRING--\n");
+
+      do
+      {
+        while (iswspace(*p)) p++;
+
+        switch (towupper(*p))
+        {
+        case 'N':
+          if (u16nicmp(p, u"NCAPS", 5) == 0)
+            sFlag |= NOTCAPITALFLAG, p += 5;
+          else finished = TRUE;
+          break;
+        case 'L':
+          if (u16nicmp(p, u"LALT", 4) == 0)
+            sFlag |= LALTFLAG, p += 4;
+          else if (u16nicmp(p, u"LCTRL", 5) == 0)
+            sFlag |= LCTRLFLAG, p += 5;
+          else finished = TRUE;
+          break;
+        case 'R':
+          if (u16nicmp(p, u"RALT", 4) == 0)
+            sFlag |= RALTFLAG, p += 4;
+          else if (u16nicmp(p, u"RCTRL", 5) == 0)
+            sFlag |= RCTRLFLAG, p += 5;
+          else finished = TRUE;
+          break;
+        case 'A':
+          if (u16nicmp(p, u"ALT", 3) == 0)
+            sFlag |= K_ALTFLAG, p += 3;
+          else finished = TRUE;
+          break;
+        case 'C':
+          if (u16nicmp(p, u"CTRL", 4) == 0)
+            sFlag |= K_CTRLFLAG, p += 4;
+          else if (u16nicmp(p, u"CAPS", 4) == 0)
+            sFlag |= CAPITALFLAG, p += 4;
+          else finished = TRUE;
+          break;
+        case 'S':
+          if (u16nicmp(p, u"SHIFT", 5) == 0)
+            sFlag |= K_SHIFTFLAG, p += 5;
+          else finished = TRUE;
+          break;
+        default:
+          finished = TRUE;
+          break;
+        }
+      } while (!finished);
+
+      if ((sFlag & (LCTRLFLAG | LALTFLAG)) && (sFlag & (RCTRLFLAG | RALTFLAG))) {
+        AddWarning(CWARN_MixingLeftAndRightModifiers);
+      }
+
+      // If we use chiral modifiers, or we use state keys, and we target web in the keyboard, and we don't manually specify a keyboard version, bump the minimum
+      // version to 10.0. This makes an assumption that if we are using these features in a keyboard and it has no version specified, that we want to use the features
+      // in the web target platform, even if there are platform() rules excluding this possibility. In that (rare) situation, the keyboard developer should simply specify
+      // the &version to be 9.0 or whatever to avoid this behaviour.
+      if (sFlag & (LCTRLFLAG | LALTFLAG | RCTRLFLAG | RALTFLAG | CAPITALFLAG | NOTCAPITALFLAG | NUMLOCKFLAG | NOTNUMLOCKFLAG | SCROLLFLAG | NOTSCROLLFLAG) &&
+        kmcmp::CompileTarget == CKF_KEYMANWEB &&
+        fk->dwFlags & KF_AUTOMATICVERSION) {
+        VERIFY_KEYBOARD_VERSION(fk, VERSION_100, 0);
+      }
+      //printf("sFlag: %x\n", sFlag);
+
+      tstr[mx++] = UC_SENTINEL;
+      tstr[mx++] = CODE_EXTENDED;
+      tstr[mx++] = sFlag;
+
+      while (iswspace(*p)) p++;
+
+      q = p;
+
+      if (*q == ']')
+      {
+        return CERR_InvalidToken; // I3137 - key portion of VK is missing e.g. "[CTRL ALT]", this generates invalid kmx file that can crash Keyman or compiler later on   // I3511
+      }
+
+      while (*q != ']')
+      {
+        if (*q == '\'' || *q == '"')
+        {
+          VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_VirtualCharKey);
+          if (!kmcmp::FMnemonicLayout) AddWarning(CWARN_VirtualCharKeyWithPositionalLayout);
+          KMX_WCHAR chQuote = *q;
+          q++; if (*q == chQuote || *q == '\n' || *q == 0) return CERR_InvalidToken;
+          tstr[mx - 1] |= VIRTUALCHARKEY;
+          tstr[mx++] = *q;
+          q++; if (*q != chQuote) return CERR_InvalidToken;
+          q++;
+          while (iswspace(*q)) q++;
+          if (*q != ']') return CERR_InvalidToken;
+          break; /* out of while loop */
+        }
+
+        for (j = 0; !iswspace(*q) && *q != ']' && *q != 0; q++, j++);
+
+        if (*q == 0) return CERR_InvalidToken;
+
+        KMX_WCHAR vkname[SZMAX_VKDICTIONARYNAME];  // I3438
+
+        if (j >= SZMAX_VKDICTIONARYNAME) return CERR_InvalidToken;
+
+        u16ncpy(vkname,  p, j);  // I3481
+        vkname[j] = 0;
+
+        if (u16icmp(vkname, u"K_NPENTER") == 0)
+          i = 5;  // I649 - K_NPENTER hack
+        else
+        {
+          for (i = 0; i <= VK__MAX; i++)
+          {
+            if (u16icmp(vkname, VKeyNames[i]) == 0 || u16icmp(vkname, VKeyISO9995Names[i]) == 0)
+              break;
+          }
+        }
+
+        if (i == VK__MAX + 1)
+        {
+          VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_InvalidToken);
+
+          i = GetVKCode(fk, vkname);  // I3438
+          if (i == 0)
+            return CERR_InvalidToken;
+        }
+
+        p = q;
+
+        tstr[mx++] = (int)i;
+
+        if (kmcmp::FMnemonicLayout && (i <= VK__MAX) && VKeyMayBeVCKey[i]) AddWarning(CWARN_VirtualKeyWithMnemonicLayout);  // I3438
+
+        while (iswspace(*q)) q++;
+      }
+      tstr[mx++] = UC_SENTINEL_EXTENDEDEND;
+      tstr[mx] = 0;
+      //printf("--EXTENDEDEND--\n");
+
+      p = q + 1;
+
+      sFlag = 0;
+
+      continue;
+    case 14:
+      if (u16nicmp(p, u"set", 3) == 0)
+      {
+        VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
+        p += 3;
+        q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+        if (!q || !*q) return CERR_InvalidSet;
+
+        err = process_set(fk, q, tstr, &mx);
+        if (err != CERR_None) return err;
+      }
+      else if (u16nicmp(p, u"save", 4) == 0)
+      {
+        VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
+        p += 4;
+        q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+        if (!q || !*q) return CERR_InvalidSave;
+
+        err = process_save(fk, q, tstr, &mx);
+        if (err != CERR_None) return err;
+      }
+      else
+      {
+        if (u16nicmp(p, u"switch", 6) != 0) return CERR_InvalidToken;
+        p += 6;
+        q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+        if (!q || !*q) return CERR_InvalidSwitch;
+        tstr[mx++] = UC_SENTINEL;
+        tstr[mx++] = CODE_SWITCH;
+        tstr[mx++] = atoiW(q);
+        tstr[mx] = 0;
+      }
+      continue;
+    case 15:
+      if (u16nicmp(p, u"fix", 3) == 0)
+      {
+        p += 3;
+        tstr[mx++] = UC_SENTINEL;
+        tstr[mx++] = CODE_CLEARCONTEXT;
+        tstr[mx] = 0;
+      }
+      else
+        return CERR_InvalidToken;
+      continue;
+    case 16:
+      VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_NamedCodes);
+      q = p + 1;
+      while (*q && !iswspace(*q)) q++;
+      c = *q; *q = 0;
+      n = CodeConstants->GetCode(p + 1, &i);
+      *q = c;
+      if (n == 0) return CERR_InvalidNamedCode;
+      if (i < 0xFFFFFFFFL) kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);   // I2993
+      if (n > 0xFFFF)
+      {
+        tstr[mx++] = Uni_UTF32ToSurrogate1(n);
+        tstr[mx++] = Uni_UTF32ToSurrogate2(n);
+      }
+      else
+        tstr[mx++] = n;
+      tstr[mx] = 0;
+      p = q;
+      continue;
+    case 17:
+      if (u16nicmp(p, u"platform", 8) != 0) return CERR_InvalidToken;  // I3430
+      VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnly_IfSystemStores);
+      if (sFlag) return CERR_InvalidInVirtualKeySection;
+      p += 8;
+      q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+      if (!q || !*q) return CERR_InvalidToken;
+      err = process_platform(fk, q, tstr, &mx);
+      if (err != CERR_None) return err;
+      continue;
+    case 18:  // I3437
+      if (u16nicmp(p, u"layer", 5) != 0) return CERR_InvalidToken;
+      VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnly_SetSystemStores);
+      if (sFlag) return CERR_InvalidInVirtualKeySection;
+      p += 5;
+      q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+      if (!q || !*q) return CERR_InvalidToken;
+      err = process_set_synonym(TSS_LAYER, fk, q, tstr, &mx);
+      if (err != CERR_None) return err;
+      continue;
+    case 19:  // #2241
+      if (*(p + 1) != '.') return CERR_InvalidToken;
+      if (sFlag) return CERR_InvalidInVirtualKeySection;
+      p += 2;
+      err = process_expansion(fk, p, tstr, &mx, max);
+      if (err != CERR_None) return err;
+      continue;
+    default:
+      return CERR_InvalidToken;
+    }
+    if (tokenFound)
     {
       *newp = p;
-      u16ncpy(output, tstr, max);  // I3481
+      u16ncpy(output,  tstr, max);  // I3481
       output[max - 1] = 0;
       ErrChr = 0;
       return CERR_None;
     }
+    if (mx >= max) return CERR_BufferOverflow;
+  } while (*p);
 
-  }
-  __finally
+  if (!*token)
   {
-    delete[] tstr;   // I2432 - Allocate buffers each line -- slightly slower but safer than keeping a single buffer - GetXString is re-entrant with if()
+    *newp = p;
+    u16ncpy(output, tstr, max);  // I3481
+    output[max - 1] = 0;
+    ErrChr = 0;
+    return CERR_None;
   }
 
   return CERR_NoTokensFound;
@@ -2684,7 +2690,7 @@ KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR
 
   if ((msg = GetXString(fk, q, u"", temp, GLOBAL_BUFSIZE - 1, 0, &r, FALSE, TRUE)) != CERR_None)
   {
-    delete temp;
+    delete[] temp;
     return msg;
   }
 
@@ -2692,7 +2698,7 @@ KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR
 
   if ((msg = AddStore(fk, TSS_COMPARISON, temp, &dwStoreID)) != CERR_None)
   {
-    delete temp;
+    delete[] temp;
     return msg;
   }
 
@@ -2899,7 +2905,6 @@ KMX_DWORD process_expansion(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, in
 KMX_DWORD process_set_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)  // I3437
 {
   /* set(<store> <'='> <XString+outs>), layer */
-  KMX_DWORD code = CODE_SETSYSTEMSTORE;
   PKMX_WCHAR temp = new KMX_WCHAR[GLOBAL_BUFSIZE], r;
   KMX_DWORD msg;
 
@@ -2952,7 +2957,6 @@ KMX_DWORD process_set(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
   {
     KMX_WCHAR *context = NULL;
     KMX_WCHAR sep_eq[3] = u" =";
-    PKMX_WCHAR p_sep_eq = sep_eq;
     PKMX_WCHAR r = u16tok(q,  sep_eq, &context);  // I3481
 
     for (i = 0; i < fk->cxStoreArray; i++)
@@ -3703,11 +3707,12 @@ int GetDeadKey(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 void kmcmp::RecordDeadkeyNames(PFILE_KEYBOARD fk)
 {
   KMX_WCHAR buf[SZMAX_DEADKEYNAME + 16];
-  PKMX_WCHAR p_buf =buf;
   KMX_DWORD i;
   for (i = 0; i < fk->cxDeadKeyArray; i++)
   {
-    u16sprintf(buf, _countof(buf), L"%s%d %s", u16fmt(DEBUGSTORE_DEADKEY).c_str(), (int)i, u16fmt(fk->dpDeadKeyArray[i].szName).c_str());  // I3481
+    u16sprintf(buf, _countof(buf), L"%ls%d ", u16fmt(DEBUGSTORE_DEADKEY).c_str(), (int)i);
+    u16ncat(buf, fk->dpDeadKeyArray[i].szName, _countof(buf));
+
     AddDebugStore(fk, buf);
   }
 }
@@ -3770,7 +3775,7 @@ FILE* UTF16TempFromUTF8(FILE* fp_in , KMX_BOOL hasPreamble)
     if (hasPreamble) {
       // We have a preamble, so we attempt to read as UTF-8 and allow conversion errors to be filtered. This is not great for a
       // compiler but matches existing behaviour -- in future versions we may not do lenient conversion.
-      ConversionResult cr = ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], lenientConversion);
+      ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], lenientConversion);
       fwrite(outbuf, (KMX_DWORD)(poutbuf - outbuf) * 2 , 1, fp_out);
     }
     else {

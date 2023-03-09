@@ -17,5 +17,8 @@ rem		- vietnamese_vni
 
 rem added CERR_XXXX-Tests to test if right ErrorMessage is sent
 
-dir  /s/b %KEYMAN_ROOT%\common\test\keyboards\invalid\*.kmn
-dir  /s/b %KEYMAN_ROOT%\..\keyboards\release\*.kmn | more |   findstr /v /i  "viet*" |  findstr /v /i  "eKwTamil99UniUpdt"
+rem running under cmd under meson under bash causes pain:
+set KR=%KEYMAN_ROOT:/=\%
+
+dir  /s/b %KR%\common\test\keyboards\invalid\*.kmn
+dir  /s/b %KR%\..\keyboards\release\*.kmn |   findstr /v /i  "viet*" |  findstr /v /i  "eKwTamil99UniUpdt" | findstr /c:"\\source\\"

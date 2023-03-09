@@ -1,6 +1,6 @@
 
 #include "pch.h"
-#include "edition.h"
+#include "Edition.h"
 
 int GetEdition()
 {
