@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2993C32C29B1D92E00FB5E95 /* CoreAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 2993C32229B1D92E00FB5E95 /* CoreAction.m */; };
+		2993C32D29B1D92E00FB5E95 /* ActionArrayOptimizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 2993C32329B1D92E00FB5E95 /* ActionArrayOptimizer.m */; };
+		2993C32E29B1D92E00FB5E95 /* CoreWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 2993C32429B1D92E00FB5E95 /* CoreWrapper.m */; };
+		2993C32F29B1D92E00FB5E95 /* CoreHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 2993C32529B1D92E00FB5E95 /* CoreHelper.m */; };
+		2993C33229B1D92E00FB5E95 /* CoreWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32829B1D92E00FB5E95 /* CoreWrapper.h */; };
+		2993C33329B1D92E00FB5E95 /* ActionArrayOptimizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32929B1D92E00FB5E95 /* ActionArrayOptimizer.h */; };
+		2993C33429B1D92E00FB5E95 /* CoreAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32A29B1D92E00FB5E95 /* CoreAction.h */; };
+		2993C33529B1D92E00FB5E95 /* CoreHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32B29B1D92E00FB5E95 /* CoreHelper.h */; };
+		2993C33829B1DD6900FB5E95 /* libkmnkbp0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2993C33729B1DD6900FB5E95 /* libkmnkbp0.a */; };
 		378568D122FCCF0A00B481B5 /* sil_ipa.kmx in Resources */ = {isa = PBXBuildFile; fileRef = 378568D022FCCF0A00B481B5 /* sil_ipa.kmx */; };
 		378568D322FCD93300B481B5 /* indexoffset1892.kmx in Resources */ = {isa = PBXBuildFile; fileRef = 378568D222FCD93300B481B5 /* indexoffset1892.kmx */; };
 		980053351B37C9B50088DDDD /* NFont.h in Headers */ = {isa = PBXBuildFile; fileRef = 980053311B37C9B50088DDDD /* NFont.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -66,6 +75,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2993C32229B1D92E00FB5E95 /* CoreAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreAction.m; sourceTree = "<group>"; };
+		2993C32329B1D92E00FB5E95 /* ActionArrayOptimizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ActionArrayOptimizer.m; sourceTree = "<group>"; };
+		2993C32429B1D92E00FB5E95 /* CoreWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreWrapper.m; sourceTree = "<group>"; };
+		2993C32529B1D92E00FB5E95 /* CoreHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreHelper.m; sourceTree = "<group>"; };
+		2993C32829B1D92E00FB5E95 /* CoreWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreWrapper.h; sourceTree = "<group>"; };
+		2993C32929B1D92E00FB5E95 /* ActionArrayOptimizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActionArrayOptimizer.h; sourceTree = "<group>"; };
+		2993C32A29B1D92E00FB5E95 /* CoreAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreAction.h; sourceTree = "<group>"; };
+		2993C32B29B1D92E00FB5E95 /* CoreHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreHelper.h; sourceTree = "<group>"; };
+		2993C33729B1DD6900FB5E95 /* libkmnkbp0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libkmnkbp0.a; path = ../../core/build/mac/debug/libkmnkbp0.a; sourceTree = "<group>"; };
 		378568D022FCCF0A00B481B5 /* sil_ipa.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = sil_ipa.kmx; sourceTree = "<group>"; };
 		378568D222FCD93300B481B5 /* indexoffset1892.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = indexoffset1892.kmx; sourceTree = "<group>"; };
 		980053311B37C9B50088DDDD /* NFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NFont.h; sourceTree = "<group>"; };
@@ -123,6 +141,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2993C33829B1DD6900FB5E95 /* libkmnkbp0.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -137,6 +156,29 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2993C32129B1D92E00FB5E95 /* CoreWrapper */ = {
+			isa = PBXGroup;
+			children = (
+				2993C32B29B1D92E00FB5E95 /* CoreHelper.h */,
+				2993C32529B1D92E00FB5E95 /* CoreHelper.m */,
+				2993C32829B1D92E00FB5E95 /* CoreWrapper.h */,
+				2993C32429B1D92E00FB5E95 /* CoreWrapper.m */,
+				2993C32A29B1D92E00FB5E95 /* CoreAction.h */,
+				2993C32229B1D92E00FB5E95 /* CoreAction.m */,
+				2993C32329B1D92E00FB5E95 /* ActionArrayOptimizer.m */,
+				2993C32929B1D92E00FB5E95 /* ActionArrayOptimizer.h */,
+			);
+			path = CoreWrapper;
+			sourceTree = "<group>";
+		};
+		2993C33629B1DD6800FB5E95 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2993C33729B1DD6900FB5E95 /* libkmnkbp0.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		981880641BC1EA5800A1FBA5 /* OnScreenKeyboard */ = {
 			isa = PBXGroup;
 			children = (
@@ -161,6 +203,7 @@
 				984C2AD41A79C98D0023F89D /* KeymanEngine4Mac */,
 				984C2AE11A79C98D0023F89D /* KeymanEngine4MacTests */,
 				984C2AD31A79C98D0023F89D /* Products */,
+				2993C33629B1DD6800FB5E95 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -176,6 +219,7 @@
 		984C2AD41A79C98D0023F89D /* KeymanEngine4Mac */ = {
 			isa = PBXGroup;
 			children = (
+				2993C32129B1D92E00FB5E95 /* CoreWrapper */,
 				984C2AEE1A79CA4F0023F89D /* KME */,
 				984C2AD71A79C98D0023F89D /* KeymanEngine4Mac.h */,
 				984C2AD51A79C98D0023F89D /* Supporting Files */,
@@ -271,6 +315,7 @@
 				984C2B161A79CA4F0023F89D /* KVKFile.h in Headers */,
 				984C2B061A79CA4F0023F89D /* NSString+XString.h in Headers */,
 				984C2AD81A79C98D0023F89D /* KeymanEngine4Mac.h in Headers */,
+				2993C33429B1D92E00FB5E95 /* CoreAction.h in Headers */,
 				984C2B041A79CA4F0023F89D /* NSArray+Action.h in Headers */,
 				980053351B37C9B50088DDDD /* NFont.h in Headers */,
 				9818807B1BC1EE9700A1FBA5 /* TimerTarget.h in Headers */,
@@ -283,6 +328,9 @@
 				9840F5ED1B43B02500410ABA /* MacVKCodes.h in Headers */,
 				981880711BC1EA5800A1FBA5 /* KeyLabelCell.h in Headers */,
 				981880731BC1EA5800A1FBA5 /* KeyView.h in Headers */,
+				2993C33529B1D92E00FB5E95 /* CoreHelper.h in Headers */,
+				2993C33329B1D92E00FB5E95 /* ActionArrayOptimizer.h in Headers */,
+				2993C33229B1D92E00FB5E95 /* CoreWrapper.h in Headers */,
 				9818806F1BC1EA5800A1FBA5 /* KeyLabel.h in Headers */,
 				981880751BC1EA5800A1FBA5 /* OSKKey.h in Headers */,
 			);
@@ -432,15 +480,19 @@
 				9818807C1BC1EE9700A1FBA5 /* TimerTarget.m in Sources */,
 				980053381B37C9B50088DDDD /* NKey.m in Sources */,
 				981880701BC1EA5800A1FBA5 /* KeyLabel.m in Sources */,
+				2993C32D29B1D92E00FB5E95 /* ActionArrayOptimizer.m in Sources */,
 				981880721BC1EA5800A1FBA5 /* KeyLabelCell.m in Sources */,
 				981880781BC1EA5800A1FBA5 /* OSKView.m in Sources */,
+				2993C32E29B1D92E00FB5E95 /* CoreWrapper.m in Sources */,
 				984C2B0F1A79CA4F0023F89D /* KMCompKey.m in Sources */,
 				984C2B131A79CA4F0023F89D /* KMEngine.m in Sources */,
 				984C2B171A79CA4F0023F89D /* KVKFile.m in Sources */,
 				981880741BC1EA5800A1FBA5 /* KeyView.m in Sources */,
 				981880761BC1EA5800A1FBA5 /* OSKKey.m in Sources */,
+				2993C32F29B1D92E00FB5E95 /* CoreHelper.m in Sources */,
 				984C2B0D1A79CA4F0023F89D /* KMCompGroup.m in Sources */,
 				984C2B111A79CA4F0023F89D /* KMCompStore.m in Sources */,
+				2993C32C29B1D92E00FB5E95 /* CoreAction.m in Sources */,
 				984C2B151A79CA4F0023F89D /* KMXFile.m in Sources */,
 				980053361B37C9B50088DDDD /* NFont.m in Sources */,
 				984C2B051A79CA4F0023F89D /* NSArray+Action.m in Sources */,
@@ -499,7 +551,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -514,7 +566,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				"HEADER_SEARCH_PATHS[arch=*]" = (
+					"$(PROJECT_DIR)/../../core/**",
+					"$(PROJECT_DIR)/../../common/include",
+				);
 				INSTALL_PATH = "";
+				"LIBRARY_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../core/build/mac/debug";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -554,7 +611,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -562,7 +619,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				"HEADER_SEARCH_PATHS[arch=*]" = (
+					"$(PROJECT_DIR)/../../core/**",
+					"$(PROJECT_DIR)/../../common/include\n$(PROJECT_DIR)/../../common/include\n$(PROJECT_DIR)/../../common/include\n$(PROJECT_DIR)/../../common/include",
+				);
 				INSTALL_PATH = "";
+				"LIBRARY_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../core/build/mac/release";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
@@ -592,6 +654,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = NO;
+				"OTHER_LDFLAGS[arch=*]" = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.KeymanEngine4Mac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PRODUCT_VERSION = 0.0.1;
@@ -622,6 +685,7 @@
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				"OTHER_LDFLAGS[arch=*]" = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.KeymanEngine4Mac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PRODUCT_VERSION = 0.0.1;

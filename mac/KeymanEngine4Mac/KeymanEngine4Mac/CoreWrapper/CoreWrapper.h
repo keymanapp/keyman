@@ -1,0 +1,32 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ * 
+ * CoreWrapper.h
+ * CoreTester
+ * 
+ * Created by Shawn Schantz on 2022-12-12.
+ */
+
+#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
+#import "CoreHelper.h"
+#import "CoreAction.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface CoreWrapper : NSObject
+
+@property (strong, nonatomic, readonly) NSString * keyboardId;
+@property (strong, nonatomic, readonly) NSString * keyboardVersion;
+
+-(instancetype)initWithHelper:(CoreHelper*)helper kmxFilePath:(nullable NSString*) path;
+-(void)changeKeyboardWithKmxFilePath:(NSString*) path;
+-(NSArray*)processMacVirtualKey:(unsigned short)macKeyCode
+              withModifiers:(NSEventModifierFlags)modifierState
+                withKeyDown:(BOOL) isKeyDown;
+-(NSString *)getCurrentContext;
+-(void) dealloc;
+
+@end
+
+NS_ASSUME_NONNULL_END
