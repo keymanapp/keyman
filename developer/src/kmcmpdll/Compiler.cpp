@@ -96,10 +96,13 @@
   sizes and alignments have been manually verified.
 */
 
-extern "C" BOOL kmcmp_CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL FSaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc);   // I4865   // I4866
-extern "C" BOOL kmcmp_CompileKeyboardFileToBuffer(PSTR pszInfile, void* pfkBuffer, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc, int Target);  // I4865   // I4866
+
+#include "../kmcmplib/include/kmcmplibapi.h"
+/*typedef int (*kmcmp_CompilerMessageProc)(int line, KMX_DWORD dwMsgCode, PKMX_STR  szText, void* context);
+extern "C" BOOL kmcmp_CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL FSaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, kmcmp_CompilerMessageProc pMsgProc, void* context);   // I4865   // I4866
+extern "C" BOOL kmcmp_CompileKeyboardFileToBuffer(PSTR pszInfile, void* pfkBuffer, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, kmcmp_CompilerMessageProc pMsgProc, void* context, int Target);  // I4865   // I4866
 extern "C" void kmcmp_Keyman_Diagnostic(int mode) ;
-extern "C" BOOL kmcmp_SetCompilerOptions(PCOMPILER_OPTIONS options);
+extern "C" BOOL kmcmp_SetCompilerOptions(PCOMPILER_OPTIONS options);*/
 
 int xatoi(PWSTR *p);
 int atoiW(PWSTR p);
@@ -312,7 +315,10 @@ extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS optio
   //printf("\n---> started in SetCompilerOptions() of kmcmpdll\n");
   if ( flag_use_new_kmcomp )
   {
-    return kmcmp_SetCompilerOptions(options);
+    KMCMP_COMPILER_OPTIONS kmcmp_options = {0};
+    kmcmp_options.dwSize = sizeof(KMCMP_COMPILER_OPTIONS);
+    kmcmp_options.ShouldAddCompilerVersion = options->ShouldAddCompilerVersion;
+    return kmcmp_SetCompilerOptions(&kmcmp_options);
   }
   //printf("--->  stayed in SetCompilerOptions() of kmcmpdll\n");
 
@@ -320,6 +326,9 @@ extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS optio
   return TRUE;
 }
 
+int kmcmpMsgproc(int line, uint32_t dwMsgCode, char* szText, void* context) {
+  return static_cast<CompilerMessageProc>(context)(line, dwMsgCode, szText);
+}
 
 extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL ASaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc)   // I4865   // I4866
 {
@@ -332,7 +341,7 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
 
   if ( flag_use_new_kmcomp )
   {
-    return kmcmp_CompileKeyboardFile(pszInfile, pszOutfile, ASaveDebug, ACompilerWarningsAsErrors,AWarnDeprecatedCode, pMsgProc);
+    return kmcmp_CompileKeyboardFile(pszInfile, pszOutfile, ASaveDebug, ACompilerWarningsAsErrors,AWarnDeprecatedCode, kmcmpMsgproc, (void*) pMsgProc);
   }
 
   //printf("--->  stayed in CompileKeyboardFile() of kmcmpdll\n");
@@ -424,7 +433,7 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PSTR pszInfile
   //printf("\n---> started in CompileKeyboardFileToBuffer() of kmcmpdll\n");
   if ( flag_use_new_kmcomp )
   {
-    return kmcmp_CompileKeyboardFileToBuffer( pszInfile, (void*) pfkBuffer,  ACompilerWarningsAsErrors,  AWarnDeprecatedCode,  pMsgProc,  Target);
+    return kmcmp_CompileKeyboardFileToBuffer( pszInfile, (void*) pfkBuffer,  ACompilerWarningsAsErrors,  AWarnDeprecatedCode, kmcmpMsgproc, (void*) pMsgProc, Target);
   }
 
   //printf("--->  stayed in CompileKeyboardFileToBuffer() of kmcmpdll\n");
@@ -3801,14 +3810,6 @@ HANDLE UTF16TempFromUTF8(HANDLE hInfile, BOOL hasPreamble)
 }
 
 extern "C" void __declspec(dllexport) Keyman_Diagnostic(int mode) {
-
-  //printf("\n---> started in Keyman_Diagnostic() of kmcmpdll\n");
-  if ( flag_use_new_kmcomp )
-  {
-    kmcmp_Keyman_Diagnostic( mode);
-  }
-  //printf("--->  stayed in Keyman_Diagnostic() of kmcmpdll\n");
-
   if (mode == 0) {
     RaiseException(0x0EA0BEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
   }

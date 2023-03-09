@@ -2,13 +2,12 @@
 #include <json-schema.hpp>
 #include <fstream>
 
+#include <kmcmplibapi.h>
 #include "kmcompx.h"
 
 using nlohmann::json;
 using nlohmann::json_uri;
 using nlohmann::json_schema_draft4::json_validator;
-
-typedef bool (*kmcmp_ValidateJsonMessageProc)(int64_t offset, const char* szText, void* context);
 
 static void loader(const json_uri &uri, json &schema)
 {
