@@ -163,3 +163,20 @@ KMX_BOOL kmcmp_FileExists(const KMX_CHAR *filename) {
 
   return FALSE;
 }
+
+KMX_BOOL kmcmp_FileExists(const KMX_WCHAR* filename) {
+#ifdef _MSC_VER
+  intptr_t n;
+  _wfinddata_t fi;
+  if((n = _wfindfirst((wchar_t*) filename, &fi)) != -1) {
+    _findclose(n);
+    return TRUE;
+  }
+#else
+  std::string cpath;
+  cpath = string_from_u16string(filename);
+  return kmcmp_FileExists(cpath.c_str());
+#endif
+
+  return FALSE;
+};

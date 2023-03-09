@@ -81,8 +81,8 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   if(!kmcmp_FileExists(Name)) {
     if (ReportMissingFile) {
       u16cpy(ErrExtraW, u"referenced file '");
-      u16ncat(ErrExtraW, 256, FileName);
-      u16ncat(ErrExtraW, 256, u"'");
+      u16ncat(ErrExtraW, Filename, 256);
+      u16ncat(ErrExtraW, u"'", 256);
       strcpy(ErrExtraLIB, string_from_u16string(ErrExtraW).c_str());
       AddWarning(CWARN_MissingFile);
     }

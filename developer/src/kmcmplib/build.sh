@@ -20,8 +20,7 @@ cd "$THIS_SCRIPT_PATH"
 # Restrict available targets to those that can be built on the current system
 #
 
-#archtargets=(":wasm   WASM build")
-archtargets=()
+archtargets=(":wasm   WASM build")
 
 case $BUILDER_OS in
   win)

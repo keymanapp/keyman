@@ -59,8 +59,15 @@ endif
 if compiler.get_id() == 'emscripten'
   warns = []
   flags = []
-  defns = []
-  links = []
+  links = ['-lnodefs.js', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
+  if get_option('buildtype') == 'debug'
+    # Enable DWARF symbols for debug builds
+    defns = ['-g']
+    links += ['-g']
+  else
+    defns = ['-O2']
+    links += ['-O2']
+  endif
 endif
 
 

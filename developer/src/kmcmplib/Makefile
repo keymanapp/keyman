@@ -16,10 +16,10 @@ BUILD_DEBUG=
 !endif
 
 build: .virtual
-    $(CALLER) ./build.sh clean:x86 configure:x86 build:x86 clean:x64 configure:x64 build:x64 $(BUILD_DEBUG)
+    $(CALLER) ./build.sh clean configure build $(BUILD_DEBUG)
 
 clean:
-    $(CALLER) ./build.sh clean:x86 clean:x64
+    $(CALLER) ./build.sh clean $(BUILD_DEBUG)
 
 signcode:
     @rem Not required
@@ -29,6 +29,9 @@ wrap-symbols:
 
 test-manifest:
     @rem This target needed as dependency for TIKE and KMCMPDLL
+
+test:
+    $(CALLER) ./build.sh test $(BUILD_DEBUG)
 
 install:
     @rem Not required

@@ -4,6 +4,8 @@
 # Cross platform build script to compile and run tests for kmcompx
 #
 
+fs = import('fs')
+
 tests_flags = []
 
 # We'll use the test kmx files from Core for now
@@ -76,26 +78,40 @@ tests = [
     kbd_src = join_paths(input_path, kbd) + '.kmn'
     kbd_obj = join_paths(output_path, kbd) + '.kmx'
 
-    test(kbd, kmcompxtest, args: [kbd_src, kbd_obj])
+    if compiler.get_id() == 'msvc'
+      test(kbd, kmcompxtest, args: [kbd_src, kbd_obj])
+    else
+      test(kbd, kmcompxtest, args: [kbd_src, kbd_obj, join_paths(input_path, kbd) + '.kmx'])
+    endif
   endforeach
 
 
 if build_machine.system() == 'windows'
-  test_source = run_command('get_test_source_exclude_some_kmn.bat', check: true)
+  test_source = run_command('get_test_source_exclude_some_kmn.bat', capture: true, check: true)
   #test_source = run_command('get_test_source.bat', check: true)
 else
-  test_source = run_command('get_test_source.sh', check: true)
+  test_source = run_command('get_test_source.sh', capture: true, check: true)
 endif
 
 tests = test_source.stdout().strip().split('\n')
 
 foreach kbd : tests
-  kbd_src = join_paths(input_path, kbd)
-  kbd_obj = join_paths(output_path, kbd)
-  kbd_obj = kbd_obj.split('.')[0] + '.kmx'
-  test_name = kbd_obj.split('/')
-  test_name = test_name[test_name.length() - 1]
+  if kbd.strip() != ''
+    kbd = kbd.replace('\\', '/')
+    test_basename = fs.replace_suffix(fs.name(kbd), '')
 
-  test(test_name, kmcompxtest, args: [kbd_src, kbd_obj])
+    # kbd is going to be an absolute path
+    kbd_src = kbd
+    kbd_obj = output_path / test_basename + '.kmx'
+
+    if compiler.get_id() == 'msvc'
+      test(test_basename, kmcompxtest, args: [kbd_src, kbd_obj])
+    else
+      # Note: need to pre-run keyboards repo regression.sh and then copy the
+      # contents of the resulting folder into ./fixtures/
+      reference_kmx = meson.current_source_dir() / 'fixtures' / test_basename + '.kmx'
+      test(test_basename, kmcompxtest, args: [kbd_src, kbd_obj, reference_kmx])
+    endif
+  endif
 endforeach
 
