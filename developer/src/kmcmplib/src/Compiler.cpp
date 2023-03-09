@@ -352,7 +352,7 @@ extern "C" uint32_t kmcmp_CompileKeyboardFile(char* pszInfile,
 
   PKMX_STR p;
 
-  if ((p = strrchr_slash(pszInfile) != nullptr)
+  if ((p = strrchr_slash(pszInfile)) != nullptr)
   {
     strncpy(kmcmp::CompileDir, pszInfile, (int)(p - pszInfile + 1));  // I3481
     kmcmp::CompileDir[(int)(p - pszInfile + 1)] = 0;
