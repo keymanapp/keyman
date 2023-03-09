@@ -352,7 +352,7 @@ extern "C" uint32_t kmcmp_CompileKeyboardFile(char* pszInfile,
 
   PKMX_STR p;
 
-  if ((p = strrchr_LinWin(pszInfile)) != nullptr)
+  if ((p = strrchr_slash(pszInfile) != nullptr)
   {
     strncpy(kmcmp::CompileDir, pszInfile, (int)(p - pszInfile + 1));  // I3481
     kmcmp::CompileDir[(int)(p - pszInfile + 1)] = 0;
@@ -445,7 +445,7 @@ extern "C" uint32_t kmcmp_CompileKeyboardFileToBuffer(char* pszInfile, void* pfk
 
   PKMX_STR p;
 
-  if ((p = strrchr_LinWin(pszInfile)) != nullptr)
+  if ((p = strrchr_slash(pszInfile)) != nullptr)
   {
     strncpy(kmcmp::CompileDir, pszInfile, (int)(p - pszInfile + 1));  // I3481
     kmcmp::CompileDir[(int)(p - pszInfile + 1)] = 0;
@@ -1333,7 +1333,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
       // Strip path from the store, leaving bare filename only
       p = sp->dpString;
 
-      KMX_WCHAR *pp = (KMX_WCHAR*) u16rchr_LinWin((const PKMX_WCHAR) p);
+      KMX_WCHAR *pp = (KMX_WCHAR*) u16rchr_slash((const PKMX_WCHAR) p);
 
       if (!pp) {
         pp = p;
@@ -3393,12 +3393,20 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
 
   if (cur == fsize)
 
-  // S: Is replacing "\r\n" with "\n" here sufficient or do we need changes at other places as well when we skip "\r"?
+  // \r\n is still added here even though Linux doesn`t use \r.
+  // This is to ensure to still have a working windows-only-version
   u16ncat(str, u"\r\n", _countof(str));  // I3481     // Always a "\r\n" to the EOF, avoids funny bugs
-  // u16ncat(str, u"\n", _countof(str));  // I3481
 
   if (len == 0) return CERR_EndOfFile;
 
+  // neccessary to add this block for using on non-windows platforms (removes all \r for platforms that use \n instead of \r\n)
+  for (p = str, n = 0; n < len; n++, p++) {
+    if (*p == L'\r')
+      *p = L' ';
+  }
+
+  // \r is still left in this block even though Linux doesn`t use \r.
+  // This is to ensure to still have a working windows-only-version
   for (p = str, n = 0; n < len; n++, p++)
   {
     if (currentQuotes != 0)
@@ -3417,7 +3425,7 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
       *p = L' ';
       continue;
     }
-    if((*p == L'\\') || (*p == L'/')) {
+    if((*p == L'\\')) {
       LineCarry = TRUE;
       *p = L' ';
       continue;

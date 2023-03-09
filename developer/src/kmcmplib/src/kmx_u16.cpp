@@ -73,6 +73,14 @@ void u16sprintf(KMX_WCHAR * dst, const size_t sz, const wchar_t* fmt, ...) {
   return wstr;
   }
 
+std::string  convert_pchar16T_To_str(KMX_WCHAR Name[_MAX_PATH]){
+  //  convert char16_t*  -> std::wstring -> std::string -
+  //  char16_t* -> std::wstring
+  std::wstring Name_ws = u16fmt(Name);
+  //  std::wstring -> std::string
+  std::string Name_s = string_from_wstring((std::wstring const)Name_ws );
+  return Name_s;
+}
 
 long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base)
 {
@@ -113,7 +121,7 @@ const KMX_WCHAR *  u16ncat(KMX_WCHAR *dst, const KMX_WCHAR *src, size_t max) {
   return o;
 }
 
-const KMX_WCHAR* u16rchr_LinWin(KMX_WCHAR const* Name)
+const KMX_WCHAR* u16rchr_slash(KMX_WCHAR const* Name)
 {
   const KMX_WCHAR* cp = NULL;
   cp = u16rchr(Name, '\\');
@@ -122,7 +130,7 @@ const KMX_WCHAR* u16rchr_LinWin(KMX_WCHAR const* Name)
   return cp;
 }
 
-KMX_CHAR* strrchr_LinWin(KMX_CHAR* Name)
+KMX_CHAR* strrchr_slash(KMX_CHAR* Name)
 {
   KMX_CHAR* cp = NULL;
   cp = strrchr(Name, '\\');
