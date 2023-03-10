@@ -11,7 +11,7 @@
     <key id="one" to="1" />
   </keys>
 
-  <layers form="hardware" hardware="us">
+  <layers form="us">
     <layer id="base">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="grave one" />

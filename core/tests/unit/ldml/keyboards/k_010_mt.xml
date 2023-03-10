@@ -59,7 +59,7 @@ Gets part of the way,
     <!-- TODO-LDML: This has been modified to be the US 47-key format.
         See MSA 100:2002, Appendix, figure A.1 -->
 
-    <layers form="hardware" hardware="us">
+    <layers form="us">
         <layer modifier="none">
             <row keys="c-tikka 1 2 3 4 5 6 7 8 9 0 hyphen equal" />
             <row keys="q w e r t y u i o p g-tikka h-maqtugha z-tikka" />
