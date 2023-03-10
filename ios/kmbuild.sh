@@ -17,6 +17,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 cd "$(dirname "$THIS_SCRIPT")"
 
 # Include our resource functions; they're pretty useful!
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 . "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 
