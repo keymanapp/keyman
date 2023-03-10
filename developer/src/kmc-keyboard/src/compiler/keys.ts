@@ -45,13 +45,13 @@ export class KeysCompiler extends SectionCompiler {
       this.callbacks.reportMessage(CompilerMessages.Error_MustBeAtLeastOneLayerElement());
     }
 
-    if(theLayers?.form == 'hardware') {
+    if(theLayers?.form !== 'touch') {
       for(let layer of theLayers?.layer) {
-        valid = this.validateHardwareLayerForKmap(theLayers?.hardware, layer) && valid; // note: always validate even if previously invalid results found
+        valid = this.validateHardwareLayerForKmap(theLayers?.form, layer) && valid; // note: always validate even if previously invalid results found
       }
+    } else {
+      // TODO-LDML: 'touch'
     }
-
-    // TODO-LDML: some additional validation needed here?
     return valid;
   }
 
@@ -73,13 +73,14 @@ export class KeysCompiler extends SectionCompiler {
     // Use LayerMap + keys to generate compiled keys for hardware
     const theLayers = this.keyboard.layers?.[0]; // TODO-LDML: handle >1 layers. #8160
 
-    if(theLayers?.form == 'hardware') {
+    if(theLayers?.form !== 'touch') {
       for(let layer of theLayers.layer) {
-        this.compileHardwareLayerToKmap(sections, layer, sect, theLayers.hardware);
+        this.compileHardwareLayerToKmap(sections, layer, sect, theLayers.form);
       }
       return sect;
+    } else {
+      // TODO-LDML: generate vkey mapping for touch-only keys
     }
-    // TODO-LDML: generate vkey mapping for touch-only keys
 
     return sect;
   }
@@ -147,7 +148,7 @@ export class KeysCompiler extends SectionCompiler {
   /**
    * TODO-LDML: from old 'keys'
    * Validate for purpose of kmap
-   * @param hardware
+   * @param hardware the 'form' parameter
    * @param layer
    * @returns
    */
@@ -162,7 +163,7 @@ export class KeysCompiler extends SectionCompiler {
 
     const keymap = Constants.HardwareToKeymap.get(hardware);
     if (!keymap) {
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidHardware({ hardware }));
+      this.callbacks.reportMessage(CompilerMessages.Error_InvalidHardware({ form: hardware }));
       valid = false;
       return valid; // can't do anything else here
     }
@@ -202,7 +203,6 @@ export class KeysCompiler extends SectionCompiler {
     return valid;
   }
 
-
   private compileHardwareLayerToKmap(
     sections: GlobalSections,
     layer: LDMLKeyboard.LKLayer,
@@ -234,5 +234,4 @@ export class KeysCompiler extends SectionCompiler {
     }
     return sect;
   }
-
 }

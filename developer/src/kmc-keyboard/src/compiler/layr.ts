@@ -24,33 +24,23 @@ export class LayrCompiler extends SectionCompiler {
       this.callbacks.reportMessage(CompilerMessages.Error_MustBeAtLeastOneLayerElement());
     }
     let hardwareLayers = 0;
+    // let touchLayers = 0;
     this.keyboard.layers.forEach((layers) => {
-      const { hardware, form } = layers;
-      // TODO-LDML: in the future >1 hardware layer may be allowed, check for duplicates
-      if (form === 'touch') {
-        if (hardware) {
-          valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_NoHardwareOnTouch({hardware}));
-        }
-      } else if (form === 'hardware') {
-        hardwareLayers++;
-        if (!hardware) {
-          valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_MissingHardware());
-        } else if (!constants.layr_list_hardware_map.get(hardware)) {
-          valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_InvalidHardware({hardware}));
-        } else if (hardwareLayers > 1) { // TODO-LDML: revisit if spec changes
-          valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_MustHaveAtMostOneLayersElementPerForm({ form }));
-        }
+      const { form } = layers;
+      if (form !== 'touch') {
+        // touchLayers++;
+        // multiple touch layers are OK
+        // TODO-LDML: check that widths are distinct
       } else {
-        /* c8 ignore next 7 */
-        // Should not be reached due to XML validation.
-        valid = false;
-        this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({
-          errorText: `INTERNAL ERROR: Invalid XML: Invalid form="${form}" on layers element`
-        }));
+        // hardware
+        hardwareLayers++;
+        if (hardwareLayers > 1) {
+          valid = false;
+          this.callbacks.reportMessage(CompilerMessages.Error_ExcessHardware({form}));
+        } else if (!constants.layr_list_hardware_map.get(form)) {
+          valid = false;
+          this.callbacks.reportMessage(CompilerMessages.Error_InvalidHardware({form}));
+        }
       }
       layers.layer.forEach((layer) => {
         const { modifier, id } = layer;
@@ -67,8 +57,8 @@ export class LayrCompiler extends SectionCompiler {
     const sect = new Layr();
 
     sect.lists = this.keyboard.layers.map((layers) => {
-      const hardware = constants.layr_list_hardware_map.get(layers.hardware || 'touch');
-      // Don't need to check 'form' because it is checked in validate
+      const hardware = constants.layr_list_hardware_map.get(layers.form);
+      // Already validated in validate
       const list: LayrList = {
         hardware,
         minDeviceWidth: layers.minDeviceWidth || 0,

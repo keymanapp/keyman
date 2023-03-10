@@ -90,19 +90,15 @@ describe('layr', function () {
   testCompilationCases(LayrCompiler, [
     {
       subpath: 'sections/layr/invalid-invalid-hardware.xml',
-      errors: [CompilerMessages.Error_InvalidHardware({hardware: 'stenography'})],
+      errors: [CompilerMessages.Error_InvalidHardware({form: 'stenography'})],
     },
     {
       subpath: 'sections/layr/invalid-missing-hardware.xml',
-      errors: [CompilerMessages.Error_MissingHardware()],
+      errors: [],
     },
     {
       subpath: 'sections/layr/invalid-multi-hardware.xml',
-      errors: [CompilerMessages.Error_MustHaveAtMostOneLayersElementPerForm({ form: 'hardware' })],
-    },
-    {
-      subpath: 'sections/layr/invalid-touch-hardware.xml',
-      errors: [CompilerMessages.Error_NoHardwareOnTouch({ hardware: 'iso' })],
+      errors: [CompilerMessages.Error_ExcessHardware({ form: 'hardware' })],
     },
     {
       subpath: 'sections/layr/invalid-invalid-form.xml',
