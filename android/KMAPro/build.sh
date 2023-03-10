@@ -11,7 +11,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
+. "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 
 # This script runs from its own folder
@@ -50,14 +50,6 @@ builder_describe_outputs \
   build         kMAPro/build/outputs/apk/$CONFIG/keyman-${VERSION}.apk
 
 #### Build
-
-function convert_markdown_to_html() {
-  echo "Converting markdown to html for offline help"
-  pushd "$KEYMAN_ROOT/android"
-  ./build-help.sh htm
-  popd
-}
-
 
 
 # Parse args
@@ -105,7 +97,7 @@ fi
 if builder_start_action build; then
 
   # Convert markdown to html for offline help
-  convert_markdown_to_html
+  build_help_html android KMAPro/kMAPro/src/main/assets/info
 
   echo "BUILD_FLAGS $BUILD_FLAGS"
   ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
