@@ -303,6 +303,10 @@ _builder_cleanup_deps() {
   fi
 }
 
+#------------------------------------------------------------------------------------------
+# Child scripts
+#------------------------------------------------------------------------------------------
+
 _builder_execute_child() {
   local action=$1
   local target=$2
@@ -313,7 +317,17 @@ _builder_execute_child() {
     builder_echo heading "## $action$target starting..."
   fi
 
+  # Build array of specified inheritable options
+  local child_options=()
+  local opt
+  for opt in "${_builder_options_inheritable[@]}"; do
+    if builder_has_option $opt; then
+      child_options+=($opt)
+    fi
+  done
+
   "$script" $action \
+    ${child_options[@]} \
     $builder_verbose \
     $builder_debug \
   && (
@@ -386,6 +400,10 @@ builder_run_child_actions() {
   done
 }
 
+#------------------------------------------------------------------------------------------
+# Various API endpoints
+#------------------------------------------------------------------------------------------
+
 #
 # Builds the standardized `action:target` string for the specified action-target
 # pairing and also returns 0 if the user has asked to perform it on the command
@@ -432,22 +450,6 @@ builder_has_action() {
     return 0
   else
     _builder_matched_action=
-    return 1
-  fi
-}
-
-_builder_dep_output_defined() {
-  if [[ ! -z ${_builder_dep_path[$1]+x} ]]; then
-    return 0
-  else
-    return 1
-  fi
-}
-
-_builder_dep_output_exists() {
-  if _builder_dep_output_defined $1 && [[ -e "$KEYMAN_ROOT/${_builder_dep_path[$1]}" ]]; then
-    return 0
-  else
     return 1
   fi
 }
@@ -605,16 +607,21 @@ _builder_expand_action_targets() {
 #
 # There are four types of parameters that may be specified:
 #
-# * **Option:** `"--option[,-o][=var]   [One line description]"`
+# * **Option:** `"--option[,-o][+][=var]   [One line description]"`
 #
 #   All options must have a longhand form with two prefix hyphens,
 #   e.g. `--option`. The `,-o` shorthand form is optional. When testing if
 #   the option is set with `builder_has_option`, always use the longhand
 #   form.
 #
-#   if `=var` is specified, then the next parameter will be a variable stored in
+#   If `=var` is specified, then the next parameter will be a variable stored in
 #   `$var` for that option. e.g. `--option=opt` means `$opt` will have the value
 #   `"foo"` when the script is called for `--option foo`.
+#
+#   If `+` is specified, then the option will be passed to child scripts. All
+#   child scripts _must_ accept this option, or they will fail. It is acceptable
+#   for the child script to declare the option but ignore it. However, the option
+#   will _not_ be passed to dependencies.
 #
 # * **Action**: `"action   [One line description]"`
 #
@@ -633,7 +640,7 @@ _builder_expand_action_targets() {
 #   `=path` to the target definition, for example `:app=src/app`. Where
 #   possible, avoid differences in names of child projects and folders.
 #
-# * **Dependency:** `"@/path/to/dependency [action][:target] ..."``
+# * **Dependency:** `"@/path/to/dependency[:target] [action][:target] ..."``
 #
 #   A dependency always starts with `@`. The path to the dependency will be
 #   relative to the build script folder, or to the root of the repository, if
@@ -642,6 +649,10 @@ _builder_expand_action_targets() {
 #
 #   Relative paths will be expanded to full paths, again, relative to the root
 #   of the repository.
+#
+#   A dependency definition can include a target for that dependency, for
+#   example, `"@/core:arch"`. This would build only the ':arch' target for the
+#   core module.
 #
 #   Dependencies may be limited to specific `action:target` pairs on the current
 #   script. If not specified, dependencies will be built for all actions on all
@@ -656,6 +667,7 @@ builder_describe() {
   _builder_targets=()
   _builder_options=()
   _builder_deps=()                    # array of all dependencies for this script
+  _builder_options_inheritable=()     # array of all options that should be passed to child scripts
   _builder_default_action=build
   declare -A -g _builder_params
   declare -A -g _builder_options_short
@@ -664,6 +676,7 @@ builder_describe() {
   declare -A -g _builder_dep_related_actions  # array of action:targets associated with a given dependency
   declare -A -g _builder_internal_dep         # array of internal action:targets dependency relationships
   declare -A -g _builder_target_paths         # array of target child project paths
+  declare -A -g _builder_dep_targets          # array of :targets given for a specific dependency (comma separated if more than one)
   shift
   # describe each target, action, and option possibility
   while [[ $# -gt 0 ]]; do
@@ -698,10 +711,16 @@ builder_describe() {
     elif [[ $value =~ ^@ ]]; then
       # Parameter is a dependency
       local dependency="${value:1}"
+      local dependency_target= # all targets
+      if [[ $dependency =~ : ]]; then
+        dependency_target=":$(echo "$dependency" | cut -d: -f 2 -)"
+        dependency="$(echo "$dependency" | cut -d: -f 1 -)"
+      fi
+
       dependency="`_builder_expand_relative_path "$dependency"`"
       _builder_deps+=($dependency)
       _builder_dep_related_actions[$dependency]="`_builder_expand_action_targets "$description"`"
-
+      _builder_dep_targets[$dependency]="$dependency_target"
       # We don't want to add deps to params, so shift+continue
       shift
       continue
@@ -714,10 +733,21 @@ builder_describe() {
         value="$(echo "$value" | cut -d= -f 1 -)"
       fi
 
+      local is_inheritable=false
+
+      if [[ $value =~ \+$ ]]; then
+        # final + indicates that option is inheritable
+        is_inheritable=true
+        value="${value:0:-1}"
+      fi
+
       if [[ $value =~ , ]]; then
         local option_long="$(echo "$value" | cut -d, -f 1 -)"
         local option_short="$(echo "$value" | cut -d, -f 2 -)"
         _builder_options+=($option_long)
+        if $is_inheritable; then
+          _builder_options_inheritable+=($option_long)
+        fi
         _builder_options_short[$option_short]="$option_long"
         if [[ ! -z "$option_var" ]]; then
           _builder_options_var[$option_long]="$option_var"
@@ -725,6 +755,9 @@ builder_describe() {
         value="$option_long, $option_short"
       else
         _builder_options+=($value)
+        if $is_inheritable; then
+          _builder_options_inheritable+=($value)
+        fi
         if [[ ! -z "$option_var" ]]; then
           _builder_options_var[$value]="$option_var"
         fi
@@ -733,6 +766,7 @@ builder_describe() {
       if [[ ! -z $option_var ]]; then
         value="$value $option_var"
       fi
+
     else
       # Parameter is an action
       if [[ $value =~ \+$ ]]; then
@@ -1294,12 +1328,33 @@ builder_finish_action() {
   fi
 }
 
+#------------------------------------------------------------------------------------------
+# Dependencies
+#------------------------------------------------------------------------------------------
+
+_builder_dep_output_defined() {
+  if [[ ! -z ${_builder_dep_path[$1]+x} ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+_builder_dep_output_exists() {
+  if _builder_dep_output_defined $1 && [[ -e "$KEYMAN_ROOT/${_builder_dep_path[$1]}" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
 #
 # Returns `0` if the dependency should be built for the given action:target
 #
 _builder_should_build_dep() {
   local action_target="$1"
   local dep="$2"
+  echo $dep
   local related_actions=(${_builder_dep_related_actions[$dep]})
 
   if [[ $action_target =~ ^clean ]]; then
@@ -1358,8 +1413,15 @@ _builder_do_build_deps() {
       continue
     fi
 
+    dep_target=
+    if [[ ! -z ${_builder_dep_targets[$dep]+x} ]]; then
+      # TODO: in the future split _builder_dep_targets into comma-separated
+      #       array for multiple targets for a dep?
+      dep_target=${_builder_dep_targets[$dep]}
+    fi
+
     builder_set_module_has_been_built "$dep"
-    "$KEYMAN_ROOT/$dep/build.sh" configure build \
+    "$KEYMAN_ROOT/$dep/build.sh" "configure$dep_target" "build$dep_target" \
       $builder_verbose \
       $builder_debug \
       $_builder_build_deps \
@@ -1492,6 +1554,19 @@ builder_set_module_has_been_built() {
 }
 
 #
+# Reports on all described dependencies, then exits
+# used by builder-controls.sh
+#
+_builder_report_dependencies() {
+  echo "${_builder_deps[@]}"
+  exit 0
+}
+
+#------------------------------------------------------------------------------------------
+# Utility functions
+#------------------------------------------------------------------------------------------
+
+#
 # returns `0` if we should be verbose in output
 #
 builder_verbose() {
@@ -1509,15 +1584,6 @@ builder_is_debug_build() {
     return 0
   fi
   return 1
-}
-
-#
-# Reports on all described dependencies, then exits
-# used by builder-controls.sh
-#
-_builder_report_dependencies() {
-  echo "${_builder_deps[@]}"
-  exit 0
 }
 
 #

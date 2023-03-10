@@ -15,8 +15,7 @@ objectives are:
    to know)
 3. for the scripts to be easily readable, coherent, and straightforward for
    anyone involved in the project to maintain
-4. for dependencies to be simple (a module dependency will always be to a whole
-   module, not to a specific target within that module)
+4. for dependencies to be simple, but flexible
 
 * [Jump to API definitions](#builder-api-functions-and-variables)
 
@@ -169,10 +168,10 @@ a user or called by another script:
 
 * **dependencies**: these are other builder scripts which must be configured and
   built before the actions in this script can continue. Only `configure` and
-  `build` actions are ever passed to dependency scripts; these actions
-  will execute for all targets of the dependency script.  If you are working on
-  code within a dependency, you are currently expected to rebuild and test that
-  dependency locally.
+  `build` actions are ever passed to dependency scripts; these actions will
+  execute by default, for all targets of the dependency script.  If you are
+  working on code within a dependency, you are currently expected to rebuild and
+  test that dependency locally.
 
   A dependency is similar to, but not the same as, a child project. Child
   projects live in sub-folders of the parent project, whereas generally a
@@ -180,6 +179,9 @@ a user or called by another script:
 
   Dependencies can be defined for all actions and targets, or may be limited to
   specific action and/or targets.
+
+  A dependency can be on a single target within a module, instead of all targets
+  within the module.
 
 The first step in your script is to describe the available parameters, using
 [`builder_describe`], for example:
@@ -378,7 +380,9 @@ a definition:
 builder_describe "Testing script" clean test+
 ```
 
-**Options** are defined by including a `--` prefix, for example:
+**Options** are defined by including a `--` prefix.
+
+Specification of options: `"--option[,-o][+][=var]   [One line description]"`
 
 ```bash
 builder_describe "Sample script" \
@@ -390,6 +394,12 @@ A shorthand form may optionally be provided by appending `,-x` to the parameter
 definition, where `x` is a one letter shorthand form. Currently, shorthand forms
 may not be combined when invoking the script -- each must be passed separately.
 Ensure that you do not include a space after the comma.
+
+If a `+` is appended (after the optional shorthand form, but before the
+default), then the option will be passed to child scripts. All child scripts
+_must_ accept this option, or they will fail. It is acceptable for the child
+script to declare the option but ignore it. However, the option will _not_ be
+passed to dependencies.
 
 By default, an option will be treated as a boolean. It can be tested with
 [`builder_has_option`]. If you need to pass additional data, then the
@@ -419,6 +429,9 @@ A dependency always starts with `@`. The path to the dependency will be relative
 to the build script folder if the path does not start with `/`.  Otherwise, the path
 to the dependency is interpreted relative to the root of the repository. It is an
 error to specify a dependency outside the repo root.
+
+A dependency definition can include a target for that dependency, for example,
+`"@/core:arch"`. This would build only the ':arch' target for the core module.
 
 Relative paths will be expanded to full paths, again, relative to the root of
 the repository.
