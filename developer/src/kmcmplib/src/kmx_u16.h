@@ -1,6 +1,4 @@
-
-#ifndef KMX_U16H_H
-#define KMX_U16H_H
+#pragma once
 
 #include <cmath>
 #include <vector>
@@ -37,4 +35,3 @@ KMX_CHAR* strrchr_slash(KMX_CHAR* Name);
 const KMX_WCHAR* u16rchr_slash(KMX_WCHAR const* Name);
 
 std::string toHex(int num1);
-
