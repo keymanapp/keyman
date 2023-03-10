@@ -74,15 +74,6 @@ void u16sprintf(KMX_WCHAR * dst, const size_t sz, const wchar_t* fmt, ...) {
   return wstr;
   }
 
-std::string  convert_pchar16T_To_str(KMX_WCHAR Name[_MAX_PATH]){
-  //  convert char16_t*  -> std::wstring -> std::string -
-  //  char16_t* -> std::wstring
-  std::wstring Name_ws = u16fmt(Name);
-  //  std::wstring -> std::string
-  std::string Name_s = string_from_wstring((std::wstring const)Name_ws );
-  return Name_s;
-}
-
 long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base)
 {
   auto s = string_from_u16string(str);
