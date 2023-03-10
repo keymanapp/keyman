@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.64 alpha 2023-03-10
+
+* feat(common): support single target for a dependency (#8404)
+* chore(core): breadth-first build (#8400)
+* refactor(common): Make build-help into helper functions (#8386)
+
 ## 17.0.63 alpha 2023-03-09
 
 * fix(web): --no-minify, not --skip-minify (#8394)
