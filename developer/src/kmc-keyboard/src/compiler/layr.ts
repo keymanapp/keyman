@@ -19,17 +19,15 @@ export class LayrCompiler extends SectionCompiler {
 
   public validate() {
     let valid = true;
-    if (!this.keyboard.layers?.[0]?.layer?.length) {
-      valid = false;
-      this.callbacks.reportMessage(CompilerMessages.Error_MustBeAtLeastOneLayerElement());
-    }
+    let totalLayerCount = 0;
     let hardwareLayers = 0;
     // let touchLayers = 0;
-    this.keyboard.layers.forEach((layers) => {
+    this.keyboard.layers?.forEach((layers) => {
       const { form } = layers;
-      if (form !== 'touch') {
+      if (form === 'touch') {
         // touchLayers++;
         // multiple touch layers are OK
+        totalLayerCount += layers.layer?.length;
         // TODO-LDML: check that widths are distinct
       } else {
         // hardware
@@ -44,12 +42,18 @@ export class LayrCompiler extends SectionCompiler {
       }
       layers.layer.forEach((layer) => {
         const { modifier, id } = layer;
+        totalLayerCount++;
         if (!validModifier(modifier)) {
           this.callbacks.reportMessage(CompilerMessages.Error_InvalidModifier({ modifier, layer: id }));
           valid = false;
         }
       });
     });
+    if (totalLayerCount === 0) { // TODO-LDML: does not validate touch layers yet
+      // no layers seen anywhere
+      valid = false;
+      this.callbacks.reportMessage(CompilerMessages.Error_MustBeAtLeastOneLayerElement());
+    }
     return valid;
   }
 
