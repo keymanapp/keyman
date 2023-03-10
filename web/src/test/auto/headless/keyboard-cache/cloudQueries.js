@@ -168,6 +168,7 @@ describe("Cloud-query interface", () => {
       for(let stub of stubs) {
         assert.equal(stub.KI, prefixed('sil_euro_latin'));
         assert.equal(stub.KN, "EuroLatin (SIL)");
+        assert.isTrue(stub.KF.includes('s.keyman.com')); // The keyboardsURI property from the cloud options should be applied.
       }
 
       assert.sameOrderedMembers(stubs.map((stub) => stub.KLC), ['no', 'sv']);
@@ -184,6 +185,7 @@ describe("Cloud-query interface", () => {
       for(let stub of stubs) {
         assert.equal(stub.KI, prefixed('sil_cameroon_azerty'));
         assert.equal(stub.KN, "Cameroon AZERTY");
+        assert.isTrue(stub.KF.includes('s.keyman.com')); // The keyboardsURI property from the cloud options should be applied.
       }
 
       assert.equal(stubs.find((stub) => stub.KLC == 'pny').KL, 'Pinyin');
@@ -202,6 +204,7 @@ describe("Cloud-query interface", () => {
       assert.equal(stubs.length, 1);
       // When available, a perfect match between keyboard and language name = "the default keyboard".
       assert.equal(stubs[0].KN, "Dzongkha");
+      assert.isTrue(stubs[0].KF.includes('s.keyman.com')); // The keyboardsURI property from the cloud options should be applied.
     });
   });
 

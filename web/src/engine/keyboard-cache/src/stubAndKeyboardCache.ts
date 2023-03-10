@@ -1,5 +1,6 @@
-import { Keyboard } from "@keymanapp/keyboard-processor";
+import { Keyboard, KeyboardLoaderBase as KeyboardLoader } from "@keymanapp/keyboard-processor";
 import EventEmitter from "eventemitter3";
+import { type PathConfiguration } from "keyman/engine/configuration";
 
 import KeyboardStub from "./keyboardStub.js";
 
@@ -41,16 +42,20 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
   private stubSetTable: Record<string, Record<string, KeyboardStub>> = {};
   private keyboardTable: Record<string, Keyboard | Promise<Keyboard>> = {};
 
-  getKeyboardForStub(stub: KeyboardStub): Keyboard | Promise<Keyboard> {
+  private readonly keyboardLoader: KeyboardLoader;
+
+  constructor(keyboardLoader?: KeyboardLoader) {
+    super();
+    this.keyboardLoader = keyboardLoader;
+  }
+
+  getKeyboardForStub(stub: KeyboardStub): Keyboard {
     return this.getKeyboard(stub.KI);
   }
 
-  expectKeyboardForStub(stub: KeyboardStub, keyboard: Promise<Keyboard>) {
-    this.expectKeyboard(keyboard, stub.KI);
-  }
-
-  getKeyboard(keyboardID: string): Keyboard | Promise<Keyboard> {
-    return this.keyboardTable[prefixed(keyboardID)];
+  getKeyboard(keyboardID: string): Keyboard {
+    const entry = this.keyboardTable[prefixed(keyboardID)];
+    return entry instanceof Keyboard ? entry : null;
   }
 
   addKeyboard(keyboard: Keyboard) {
@@ -60,17 +65,48 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
     this.emit('keyboardAdded', keyboard);
   }
 
-  expectKeyboard(keyboardPromise: Promise<Keyboard>, keyboardID: string) {
+  fetchKeyboardForStub(stub: KeyboardStub) : Promise<Keyboard> {
+    return this.fetchKeyboard(stub.KI);
+  }
+
+  fetchKeyboard(keyboardID: string): Promise<Keyboard> {
     if(!keyboardID) {
-      throw new Error("Keyboard ID must be specified!");
+      throw new Error("Keyboard ID must be specified");
+    }
+
+    if(!this.keyboardLoader) {
+      throw new Error("Cannot load keyboards; this cache was configured without a loader");
     }
 
     keyboardID = prefixed(keyboardID);
-    this.keyboardTable[keyboardID] = keyboardPromise;
 
-    keyboardPromise.then((kbd) => {
+    const cachedEntry = this.keyboardTable[keyboardID];
+    if(cachedEntry instanceof Keyboard) {
+      return Promise.resolve(cachedEntry);
+    } else if(cachedEntry instanceof Promise) {
+      return cachedEntry;
+    }
+
+    const stub = this.getStub(keyboardID, null);
+    if(!stub) {
+      throw new Error(`No stub for ${withoutPrefix(keyboardID)} has been registered`);
+    }
+
+    if(!stub.filename) {
+      throw new Error(`The registered stub for ${withoutPrefix(keyboardID)} lacks a path to the main keyboard file`);
+    }
+
+    const promise = this.keyboardLoader.loadKeyboardFromPath(stub.filename);
+    this.keyboardTable[keyboardID] = promise;
+
+    promise.then((kbd) => {
       this.addKeyboard(kbd);
-    });
+    }).catch((err) => {
+      delete this.keyboardTable[keyboardID];
+      throw err;
+    })
+
+    return promise;
   }
 
   addStub(stub: KeyboardStub) {
@@ -85,9 +121,9 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
     return this.getStub(stub.KI, stub.KLC);
   }
 
-  getStub(keyboardID: string, languageID: string);
-  getStub(keyboard: Keyboard, languageID?: string);
-  getStub(arg0: string | Keyboard, arg1?: string) {
+  getStub(keyboardID: string, languageID: string): KeyboardStub;
+  getStub(keyboard: Keyboard, languageID?: string): KeyboardStub;
+  getStub(arg0: string | Keyboard, arg1?: string): KeyboardStub {
     let keyboardID: string;
     let languageID = arg1 || '---';
 
@@ -101,7 +137,16 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
 
     const stubTable = this.stubSetTable[keyboardID] ?? {};
 
-    return stubTable[languageID];
+    if(languageID != '---') {
+      return stubTable[languageID];
+    } else {
+      const keys = Object.keys(stubTable);
+      if(keys.length == 0) {
+        return null;
+      } else {
+        return stubTable[keys[0]];
+      }
+    };
   }
 
   /**

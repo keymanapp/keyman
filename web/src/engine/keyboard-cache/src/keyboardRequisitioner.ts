@@ -82,13 +82,11 @@ function isUniqueRequest(cache: StubAndKeyboardCache, cloudList: {id: string, la
 export default class KeyboardRequisitioner {
   readonly cache: StubAndKeyboardCache;
   readonly cloudQueryEngine: CloudQueryEngine;
-  readonly keyboardLoader: KeyboardLoader;
   readonly pathConfig: PathConfiguration;
 
   constructor(keyboardLoader: KeyboardLoader, keyboardRequester: CloudRequesterInterface, pathConfig: PathConfiguration) {
     this.pathConfig = pathConfig;
-    this.keyboardLoader = keyboardLoader;
-    this.cache = new StubAndKeyboardCache();
+    this.cache = new StubAndKeyboardCache(keyboardLoader);
     this.cloudQueryEngine = new CloudQueryEngine(keyboardRequester, this.pathConfig);
   }
 

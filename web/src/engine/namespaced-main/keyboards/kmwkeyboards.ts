@@ -270,6 +270,7 @@ namespace com.keyman.keyboards {
             return Promise.resolve();
           }
         }
+        // huh, does not verify that we matched a stub.  Weird.
       }
 
       keyman.core.activeKeyboard = null;
@@ -378,6 +379,7 @@ namespace com.keyman.keyboards {
               loadingStub.asyncLoader.promise = new Promise<void>(function(resolve, reject) {
                 window.setTimeout(function(){
                   manager.installKeyboard(resolve, reject, loadingStub);
+                  // To be modularized:  activation after the keyboard's loaded.
                 },0);
               });
             }
@@ -428,28 +430,14 @@ namespace com.keyman.keyboards {
 
       // Add a handler for cases where the new <script> block fails to load.
       Lscript.addEventListener('error', function() {
-        if(kbdStub.asyncLoader.timer !== null) {
-          // Clear the timeout timer.
-          window.clearTimeout(kbdStub.asyncLoader.timer);
-          kbdStub.asyncLoader.timer = null;
-        }
-
-        // We already know the load has failed... why wait?
-        const msg = 'Cannot find the ' + kbdName + ' keyboard for ' + kbdLang + ' at ' + scriptSrc + '.';
-        kbdStub.asyncLoader.callback(msg, 'warn');
-        kbdStub.asyncLoader = null;
-
-        reject(msg);
+        // Omitted:  parts that are now handled modularly.
       });
 
 
       // The load event will activate a newly-loaded keyboard if successful and report an error if it is not.
       Lscript.addEventListener('load', function() {
-        if(kbdStub.asyncLoader.timer !== null) {
-          // Clear the timeout timer.
-          window.clearTimeout(kbdStub.asyncLoader.timer);
-          kbdStub.asyncLoader.timer = null;
-        }
+
+        // Omitted:  parts that are now handled modularly.
 
         // To determine if the load was successful, we'll need to check the keyboard array for our desired keyboard.
         // Test if keyboard already loaded
@@ -488,10 +476,7 @@ namespace com.keyman.keyboards {
           resolve();
           // A handler portion for cases where the new <script> block loads, but fails to process.
         } else {  // Output error messages even when embedded - they're useful when debugging the apps and KMEA/KMEI engines.
-          const msg = 'Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '; keyboard script at ' + scriptSrc + ' may contain an error.';
-          kbdStub.asyncLoader.callback(msg, 'error');
-          kbdStub.asyncLoader = null;
-          reject(msg);
+          // Omitted:  parts that are now handled modularly.
         }
       }, false);
 

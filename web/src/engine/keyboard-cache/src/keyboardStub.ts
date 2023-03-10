@@ -3,10 +3,7 @@ import {
   type KeyboardAPIPropertyMultilangSpec as APICompoundKeyboard,
   KeyboardProperties,
   type LanguageAPIPropertySpec,
-  KeyboardAPIPropertySpec
 } from '@keymanapp/keyboard-processor';
-import { PathConfiguration } from 'keyman/engine/configuration';
-
 import { toPrefixedKeyboardId as prefixed } from './stubAndKeyboardCache.js';
 
 
@@ -37,6 +34,7 @@ export default class KeyboardStub extends KeyboardProperties {
         let apiSpec = arg0 as APISimpleKeyboard & { filename: string };
         apiSpec.id = prefixed(apiSpec.id);
         super(apiSpec, arg2);
+        this.KF = apiSpec.filename;
 
         /*
          * Detects the following patterns (at minimum):
@@ -53,6 +51,7 @@ export default class KeyboardStub extends KeyboardProperties {
          */
         let rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');
 
+        arg1 = arg1 || '';
         if(!rx.test(this.KF)) {
           this.KF = arg1 + this.KF;
         }
@@ -60,6 +59,11 @@ export default class KeyboardStub extends KeyboardProperties {
         let rawStub = arg0 as RawKeyboardStub;
         rawStub.KI = prefixed(rawStub.KI);
         super(rawStub);
+
+        this.KF = rawStub.KF;
+        this.KP = rawStub.KP;
+        this.KR = rawStub.KR;
+        this.KRC = rawStub.KRC;
         return;
       }
     } else {
@@ -140,7 +144,6 @@ export default class KeyboardStub extends KeyboardProperties {
 
       stub.KR = REGIONS[rIndex];
       stub.KRC = REGION_CODES[rIndex];
-      stub.KF = arg.filename;
 
       stubs.push(stub);
     })
