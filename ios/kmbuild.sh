@@ -17,7 +17,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 cd "$(dirname "$THIS_SCRIPT")"
 
 # Include our resource functions; they're pretty useful!
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 . "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 
@@ -252,7 +251,7 @@ echo "KMEI build complete."
 if [ $DO_KEYMANAPP = true ]; then
   echo ""
   echo "Building offline help."
-  _help ios
+  build_help_html ios keyman/Keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources
 
   echo ""
   echo "Building Keyman app."

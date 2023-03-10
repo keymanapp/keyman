@@ -366,7 +366,7 @@ fi
 if $DO_KEYMANIM ; then
     if $DO_HELP ; then
         echo "Building help"
-        _help mac
+        build_help_html mac Keyman4MacIM/Keyman4MacIM/Help
     fi
 
     builder_heading "Building Keyman.app"

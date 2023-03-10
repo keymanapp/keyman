@@ -115,7 +115,7 @@ fi
 # Convert markdown to html for offline help
 echo "Converting markdown to html for offline help"
 cd "$KEYMAN_ROOT/android"
-_help android
+build_help_html android KMAPro/kMAPro/src/main/assets/info
 cd "$KEYMAN_ROOT/android/KMAPro"
 
 # Download default keyboard and dictionary

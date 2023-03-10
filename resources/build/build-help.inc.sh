@@ -15,13 +15,8 @@
 #
 function _build_help_clean() {
   echo "Cleaning"
-  if [[ "$1" == "android" ]]; then
-    DESTHTM="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/info"
-  elif [[ "$1" == "ios" ]]; then
-    DESTHTM="$KEYMAN_ROOT/ios/keyman/Keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources"
-  elif [[ "$1" == "mac" ]]; then
-    DESTHTM="$KEYMAN_ROOT/mac/Keyman4MacIM/Keyman4MacIM/Help"
-  fi
+  local PLATFORM="$1"
+  local DESTHTM="$KEYMAN_ROOT/$PLATFORM/$2"
 
   echo "rm DESTHTM: $DESTHTM"
   rm -rf "$DESTHTM"
@@ -37,20 +32,13 @@ function _build_help_clean() {
 # * `output_path`  path to emit files to, relative to `$KEYMAN_ROOT/$platform`
 #
 function _build_help_build() {
-  MDLUA="$KEYMAN_ROOT/resources/build/html-link.lua"
-  CSS="$KEYMAN_ROOT/resources/build/offline-help-style-spec.txt"
-  DESTHTM=
-  PLATFORM="$1"
+  local MDLUA="$KEYMAN_ROOT/resources/build/html-link.lua"
+  local CSS="$KEYMAN_ROOT/resources/build/offline-help-style-spec.txt"
+  local PLATFORM="$1"
 
   cd "$KEYMAN_ROOT/$PLATFORM/help"
-  MD=`find . -name "*.md"`
-  if [[ "$1" == "android" ]]; then
-    DESTHTM="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/info"
-  elif [[ "$1" == "ios" ]]; then
-    DESTHTM="$KEYMAN_ROOT/ios/keyman/Keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources"
-  elif [[ "$1" == "mac" ]]; then
-    DESTHTM="$KEYMAN_ROOT/mac/Keyman4MacIM/Keyman4MacIM/Help"
-  fi
+  local MD=`find . -name "*.md"`
+  local DESTHTM="$KEYMAN_ROOT/$PLATFORM/$2"
 
   #
   # Generate HTML files from Markdown
