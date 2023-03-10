@@ -3,21 +3,22 @@ import { DefaultOutput, Keyboard, KeyboardKeymanGlobal, OutputTarget, ProcessorI
 import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
 import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
 import { OSKView } from "keyman/engine/osk";
-import { StubAndKeyboardCache } from "keyman/engine/keyboard-cache";
+import { KeyboardRequisitioner } from "keyman/engine/keyboard-cache";
+import DomCloudRequester from "keyman/engine/keyboard-cache/dom-requester";
 
 import KeyboardInterface from "./keyboardInterface.js";
 import ContextManagerBase from "./contextManager.js";
 import { KeyEventHandler } from './keyEventSource.interface.js';
 import HardKeyboardBase from "./hardKeyboard.js";
 import { LegacyAPIEventEngine } from "./legacyAPIEvents.js";
+import DOMCloudRequester from "keyman/engine/keyboard-cache/dom-requester";
 
 export default class KeymanEngine<ContextManager extends ContextManagerBase, HardKeyboard extends HardKeyboardBase> implements KeyboardKeymanGlobal {
   readonly config: Configuration;
-  readonly cache: StubAndKeyboardCache = new StubAndKeyboardCache();
   readonly contextManager: ContextManager;
   readonly interface: KeyboardInterface;
-  readonly keyboardLoader: KeyboardLoader;
   readonly processor: InputProcessor;
+  readonly keyboardRequisitioner: KeyboardRequisitioner;
 
   private legacyAPIEvents = new LegacyAPIEventEngine();
   private _hardKeyboard: HardKeyboard;
@@ -72,11 +73,16 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
     this.contextManager = contextManager;
 
     // Since we're not sandboxing keyboard loads yet, we just use `window` as the jsGlobal object.
-    this.interface = new KeyboardInterface(window, this, this.cache, this.contextManager);
-    this.keyboardLoader = new KeyboardLoader(this.interface);
+    this.interface = new KeyboardInterface(window, this, this.contextManager);
+    const keyboardLoader = new KeyboardLoader(this.interface);
+    this.keyboardRequisitioner = new KeyboardRequisitioner(keyboardLoader, new DOMCloudRequester(), this.config.paths);
+
+    const cache = this.keyboardRequisitioner.cache;
+    this.interface.setKeyboardCache(this.keyboardRequisitioner.cache);
+
     this.processor = new InputProcessor(config.hostDevice, worker, this.processorConfiguration());
 
-    this.cache.on('stubAdded', (stub) => {
+    cache.on('stubAdded', (stub) => {
       let eventRaiser = () => {
         // The corresponding event is needed in order to update UI modules as new keyboard stubs "come online".
         this.legacyAPIEvents.emit('kmw.keyboardregistered', {
@@ -95,7 +101,7 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
       }
     });
 
-    this.cache.on('keyboardAdded', (keyboard) => {
+    cache.on('keyboardAdded', (keyboard) => {
       let eventRaiser = () => {
         // Execute any external (UI) code needed after loading keyboard
         this.legacyAPIEvents.emit('kmw.keyboardloaded', {

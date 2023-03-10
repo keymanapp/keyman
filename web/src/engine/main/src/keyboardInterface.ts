@@ -10,17 +10,19 @@ import { VariableStoreCookieSerializer } from "./variableStoreCookieSerializer.j
 
 export default class KeyboardInterface extends KeyboardInterfaceBase {
   private readonly contextManager: ContextManager;
-  private readonly stubAndKeyboardCache: StubAndKeyboardCache;
+  private stubAndKeyboardCache: StubAndKeyboardCache;
 
   constructor(
     _jsGlobal: any,
     keymanGlobal: KeyboardKeymanGlobal,
-    cache: StubAndKeyboardCache,
     contextManager: ContextManager
   ) {
     super(_jsGlobal, keymanGlobal, new VariableStoreCookieSerializer());
-    this.stubAndKeyboardCache = cache;
     this.contextManager = contextManager;
+  }
+
+  setKeyboardCache(cache: StubAndKeyboardCache) {
+    this.stubAndKeyboardCache = cache;
   }
 
   registerKeyboard(Pk): void {
