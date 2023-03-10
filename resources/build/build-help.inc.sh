@@ -59,7 +59,26 @@ function _build_help_build() {
   cp $KEYMAN_ROOT/$PLATFORM/help/${PLATFORM}_images/* "$DESTHTM/${PLATFORM}_images/"
 }
 
-function _help() {
+#
+# Builds .html files from .md source
+#
+# ### Usage
+# 
+# ```bash
+#   build_help_html platform output_path
+# ```
+# 
+# ### Parameters
+# 
+# * `platform`     the platform to build, matching the platform folder name
+# * `output_path`  path to emit files to, relative to `$KEYMAN_ROOT/$platform`
+# 
+# ### Description
+# 
+# Expects to find .md source under $KEYMAN_ROOT/$platform/help/, and
+# will write the output .html to $KEYMAN_ROOT/$platform/$output_path.
+#
+function build_help_html() {
   pushd $(pwd)
   _build_help_clean $1
   _build_help_build $1
