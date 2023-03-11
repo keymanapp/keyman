@@ -1,10 +1,11 @@
 [binaries]
-c = ['emcc.py', '-s', 'WASM=1', '-O2']
-cpp = ['em++.py', '-s', 'WASM=1','-O2']
+c = ['emcc.py']
+cpp = ['em++.py']
 ar = ['emar.py']
 exe_wrapper = 'node'
 
 [properties]
+root = '$EMSCRIPTEN_BASE/system'
 shared_lib_suffix = 'js'
 static_lib_suffix = 'js'
 shared_module_suffix = 'js'
