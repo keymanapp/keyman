@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.65 alpha 2023-03-12
+
+* refactor(core): consolidate wasm defs (#8409)
+
 ## 17.0.64 alpha 2023-03-10
 
 * feat(common): support single target for a dependency (#8404)
