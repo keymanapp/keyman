@@ -152,10 +152,9 @@ builder_echo() {
   local color=white message= mark=
   if [[ $# -gt 1 ]]; then
     color="$1"
-    message="$2"
-  else
-    message="$1"
+    shift
   fi
+  message="$*"
 
   if [[ ! -z ${COLOR_RED+x} ]]; then
     case $color in
@@ -1159,7 +1158,7 @@ _builder_parse_expanded_parameters() {
 
     # Expand shorthand parameters
 
-    new_action=`_builder_expand_shorthand $action "${_builder_actions[@]}"` ||
+    new_action=$(_builder_expand_shorthand $action "${_builder_actions[@]}") ||
       case $? in
         1)
           action=$new_action
@@ -1170,7 +1169,7 @@ _builder_parse_expanded_parameters() {
           ;;
       esac
 
-    new_target=`_builder_expand_shorthand $target "${_builder_targets[@]}"` ||
+    new_target=$(_builder_expand_shorthand $target "${_builder_targets[@]}") ||
       case $? in
         1)
           target=$new_target
