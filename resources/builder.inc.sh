@@ -235,6 +235,67 @@ _builder_item_in_glob_array() {
   return 1
 }
 
+#
+# Expands a shorthand item into a full match from an array of possibilities;
+# reports an error if there are ambiguous options. Note that this function
+# returns the number of matches, so 0 = no match, 1 = a precise match.
+#
+# ### Parameters
+#
+# * 1: `item`       item to search for in array, e.g. "t"
+# * 2: `array`      bash array, e.g. `array=(one two three)`
+#
+# ### Description
+#
+# Does a substring search by regex for
+#
+# ### Example
+#
+# ```bash
+#   actions=(clean configure build test)
+#
+#   action=`_builder_expand_shorthand $1 "${actions[@]}"` &&
+#     builder_die "Unrecognized parameter $1" ||
+#     case $? in
+#       1) echo "Parameter $1 matches {$action}"
+#       ;;
+#       *) builder_die "Parameter $1 has $? matches, could mean any of {$action}"
+#     esac
+# ```
+#
+_builder_expand_shorthand() {
+  local item=$1
+  shift
+  local count=0
+  local result=
+  for e; do
+    if [[ $e == $item ]]; then
+      # Exact match trumps substring matches
+      echo $item
+      return 1
+    fi
+    if [[ $e == "$item"* ]]; then
+      count=$((count+1))
+      if [[ $count == 2 ]]; then
+        printf "$result"
+        printf ", $e"
+        result=$item
+      elif [[ $count -gt 2 ]]; then
+        printf ", $e"
+      else
+        result=$e
+      fi
+    fi
+  done
+
+  if [[ $count -lt 2 ]]; then
+    echo $result
+  else
+    echo
+  fi
+  return $count
+}
+
 
 _builder_item_is_target() {
   local item="$1"
@@ -1015,18 +1076,71 @@ builder_describe_internal_dependency() {
 # Parameters
 #   1: $@         command-line arguments
 builder_parse() {
-
   _builder_record_function_call builder_parse
 
-  local _builder_params="$@"
+  local exp=()
+  builder_extra_params=()
 
+  while [[ $# -gt 0 ]] ; do
+    local action= target=
+    local key="$1"
+    if [[ $key == "--" ]]; then
+      shift
+      builder_extra_params=("$@")
+      break
+    fi
+
+    if [[ $key =~ ^- ]]; then
+      exp+=($key)
+    else
+      # Expand comma separated values
+      if [[ $key =~ : ]]; then
+        IFS=: read -r action target <<< $key
+      else
+        action="$key"
+        target=
+      fi
+
+      local actions targets
+      IFS=, read -r -a actions <<< "$action"
+      IFS=, read -r -a targets <<< "$target"
+
+      if [[ "${#actions[@]}" -eq 0 ]]; then
+        # No actions, so must be at least one :target
+        for target in "${targets[@]}"; do
+          exp+=(:$target)
+        done
+      else
+        for action in "${actions[@]}"; do
+          if [[ "${#targets[@]}" -eq 0 ]]; then
+            # No :targets so just expand actions
+            exp+=($action)
+          else
+            # Actions:targets, expand them all
+            for target in "${targets[@]}"; do
+              exp+=($action:$target)
+            done
+          fi
+        done
+      fi
+    fi
+
+    shift
+  done
+
+  _builder_parse_expanded_parameters "${exp[@]}"
+}
+
+_builder_parse_expanded_parameters() {
   _builder_build_deps=--deps
   builder_verbose=
   builder_debug=
-  builder_extra_params=()
+  local _params=($@)
   _builder_chosen_action_targets=()
   _builder_chosen_options=()
   _builder_current_action=
+
+  local n=0
 
   # Process command-line arguments
   while [[ $# -gt 0 ]] ; do
@@ -1034,12 +1148,6 @@ builder_parse() {
     local action=
     local target=
     local e has_action has_target has_option longhand_option
-
-    if [[ $key == "--" ]]; then
-      shift
-      builder_extra_params=("$@")
-      break
-    fi
 
     if [[ $key =~ : ]]; then
       IFS=: read -r action target <<< $key
@@ -1049,8 +1157,38 @@ builder_parse() {
       target=
     fi
 
+    # Expand shorthand parameters
+
+    new_action=`_builder_expand_shorthand $action "${_builder_actions[@]}"` ||
+      case $? in
+        1)
+          action=$new_action
+          ;;
+        *)
+          builder_warn "Parameter $action has $? matches, could mean any of {$new_action}"
+          exit 1
+          ;;
+      esac
+
+    new_target=`_builder_expand_shorthand $target "${_builder_targets[@]}"` ||
+      case $? in
+        1)
+          target=$new_target
+          ;;
+        *)
+          builder_warn "Parameter $target has $? matches, could mean any of {$new_target}"
+          exit 1
+          ;;
+      esac
+
     _builder_item_in_array "$action" "${_builder_actions[@]}" && has_action=1 || has_action=0
     _builder_item_in_array "$target" "${_builder_targets[@]}" && has_target=1 || has_target=0
+
+    if (( has_action )) || (( has_target )); then
+      # Document parameter expansion for end use
+      _params[$n]=$action$target
+    fi
+    n=$((n + 1))
 
     # Expand short -o to --option in options lookup
     if [[ ! -z ${_builder_options_short[$key]+x} ]]; then
@@ -1060,7 +1198,7 @@ builder_parse() {
 
     if (( has_action )) && (( has_target )); then
       # apply the selected action and selected target
-      _builder_chosen_action_targets+=("$key")
+      _builder_chosen_action_targets+=("$action$target")
     elif (( has_action )); then
       # apply the selected action to all targets
       if [[ ! -z $target ]]; then
@@ -1163,7 +1301,7 @@ builder_parse() {
 
   if builder_is_dep_build; then
     builder_echo setmark "dependency build, started by $builder_dep_parent"
-    builder_echo grey "build.sh parameters: <${_builder_params[@]}>"
+    builder_echo grey "build.sh parameters: <${_params[@]}>"
     if [[ -z ${_builder_deps_built+x} ]]; then
       builder_die "FATAL ERROR: Expected --builder-deps-built parameter"
     fi
@@ -1171,7 +1309,12 @@ builder_parse() {
     # This is a top-level invocation, not a dependency build, so we want to
     # track which dependencies have been built, so they don't get built multiple
     # times.
-    builder_echo setmark "build.sh parameters: <${_builder_params[@]}>"
+    # TODO: consider printing expanded builder parameters instead of shorthand
+    echo "${_params[@]}"
+    builder_echo setmark "build.sh parameters: <${_params[@]}>"
+    if [[ ${#builder_extra_params[@]} -gt 0 ]]; then
+      builder_echo grey "build.sh extar parameters: <${builder_extra_params[@]}>"
+    fi
     _builder_deps_built=`mktemp`
   fi
 
