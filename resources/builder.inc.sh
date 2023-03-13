@@ -889,11 +889,11 @@ function builder_describe_outputs() {
   _builder_record_function_call builder_describe_outputs
 
   while [[ $# -gt 0 ]]; do
-    local key="$1" path="$2" action target
+    local key="$1" path="$2" action= target=
     path="`_builder_expand_relative_path "$path"`"
 
     if [[ $key =~ : ]]; then
-      IFS=":" read -r -a action target <<< "$key"
+      IFS=":" read -r action target <<< "$key"
       target=":$target"
     else
       # Add dependency expected output file for all targets, as well as a
