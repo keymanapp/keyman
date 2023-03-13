@@ -35,6 +35,7 @@ import android.widget.FrameLayout;
 
 import io.sentry.android.core.SentryAndroid;
 import io.sentry.Sentry;
+import io.sentry.protocol.User;
 
 public class SystemKeyboard extends InputMethodService implements OnKeyboardEventListener {
 
@@ -55,6 +56,14 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     if (DependencyUtil.libraryExists(LibraryType.SENTRY) && !Sentry.isEnabled()) {
       Log.d(TAG, "Initializing Sentry");
       SentryAndroid.init(getApplicationContext(), options -> {
+        options.setSendDefaultPii(false);
+        options.setBeforeSend((event, hint) -> {
+          // Delete user email
+          User user = event.getUser();
+          user.setEmail(null);
+          event.setUser(user);
+          return event;
+        });
         options.setRelease(com.tavultesoft.kmapro.BuildConfig.VERSION_GIT_TAG);
         options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.VERSION_ENVIRONMENT);
       });

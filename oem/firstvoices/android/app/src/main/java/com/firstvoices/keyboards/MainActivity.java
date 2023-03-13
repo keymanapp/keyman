@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import io.sentry.android.core.SentryAndroid;
+import io.sentry.protocol.User;
 
 import com.keyman.engine.*;
 import com.keyman.engine.data.Keyboard;
@@ -40,6 +41,14 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
         context = this;
 
         SentryAndroid.init(context, options -> {
+            options.setSendDefaultPii(false);
+            options.setBeforeSend((event, hint) -> {
+              // Delete user email
+              User user = event.getUser();
+              user.setEmail(null);
+              event.setUser(user);
+              return event;
+            });
             options.setRelease(com.firstvoices.keyboards.BuildConfig.VERSION_GIT_TAG);
             options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
         });

@@ -30,6 +30,7 @@ import com.keyman.engine.util.DependencyUtil;
 import com.keyman.engine.util.DependencyUtil.LibraryType;
 
 import io.sentry.android.core.SentryAndroid;
+import io.sentry.protocol.User;
 import io.sentry.Sentry;
 
 public class SystemKeyboard extends InputMethodService implements OnKeyboardEventListener {
@@ -49,6 +50,14 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         if (DependencyUtil.libraryExists(LibraryType.SENTRY) && !Sentry.isEnabled()) {
             Log.d(TAG, "Initializing Sentry");
             SentryAndroid.init(getApplicationContext(), options -> {
+                options.setSendDefaultPii(false);
+                options.setBeforeSend((event, hint) -> {
+                  // Delete user email
+                  User user = event.getUser();
+                  user.setEmail(null);
+                  event.setUser(user);
+                  return event;
+                });
                 options.setRelease(com.firstvoices.keyboards.BuildConfig.VERSION_GIT_TAG);
                 options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
             });

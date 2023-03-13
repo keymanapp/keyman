@@ -94,6 +94,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import io.sentry.android.core.SentryAndroid;
+import io.sentry.protocol.User;
 
 public class MainActivity extends BaseActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
     ActivityCompat.OnRequestPermissionsResultCallback {
@@ -131,6 +132,14 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     checkSendCrashReport();
     if (KMManager.getMaySendCrashReport()) {
       SentryAndroid.init(context, options -> {
+        options.setSendDefaultPii(false);
+        options.setBeforeSend((event, hint) -> {
+          // Delete user email
+          User user = event.getUser();
+          user.setEmail(null);
+          event.setUser(user);
+          return event;
+        });
         options.setRelease(com.tavultesoft.kmapro.BuildConfig.VERSION_GIT_TAG);
         options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.VERSION_ENVIRONMENT);
       });
