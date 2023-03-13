@@ -29,6 +29,10 @@ export {withoutPrefix as toUnprefixedKeyboardId};
 interface EventMap {
   /**
    * Indicates that the specified stub has just been registered within the cache.
+   *
+   * Note for future hook:  establish a listener for this event during engine init
+   * to denote the first added stub to facilitate auto-activation of the first
+   * keyboard to be registered.
    */
   stubAdded: (stub: KeyboardStub) => void;
 
