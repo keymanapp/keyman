@@ -148,7 +148,7 @@ function builder_heading() {
 
 builder_echo() {
   local color=white message= mark=
-  if [[ $# -gt 1 ]]; then
+  if [[ $# -gt 1 && $1 =~ ^(white|grey|green|success|blue|heading|yellow|warning|red|error|purple|brightwhite|teal|debug|setmark)$ ]]; then
     color="$1"
     shift
   fi
@@ -331,7 +331,7 @@ _builder_failure_trap() {
   if [ -n "${_builder_current_action}" ]; then
     action="${_builder_current_action}"
     if [[ $action =~ : ]]; then
-      IFS=: read -r action target <<< $action
+      IFS=: read -r action target <<< "$action"
       target=:$target
     else
       target=:project
@@ -403,7 +403,7 @@ _builder_run_child_action() {
   local action="$1" target
 
   if [[ $action =~ : ]]; then
-    IFS=: read -r action target <<< $action
+    IFS=: read -r action target <<< "$action"
     target=:$target
   else
     target=':*'
@@ -491,7 +491,7 @@ builder_has_action() {
   local action="$1" target
 
   if [[ $action =~ : ]]; then
-    IFS=: read -r action target <<< $action
+    IFS=: read -r action target <<< "$action"
     target=:$target
   else
     target=':*'
@@ -617,10 +617,9 @@ _builder_expand_relative_path() {
 _builder_expand_action_target() {
   local input="$1" target= action=
   if [[ "$input" =~ : ]]; then
-    IFS=":" read -r action target <<< "$value"
-    target=":$target"
+    IFS=":" read -r action target <<< "$input"
   else
-    action=$input
+    action="$input"
   fi
 
   if [[ -z "$action" ]]; then
@@ -636,8 +635,8 @@ _builder_expand_action_target() {
 _builder_expand_action_targets() {
   local input=($1) e output=()
   for e in "${input[@]}"; do
-    e=`_builder_expand_action_target "$e"`
-    output+=($e)
+    e="$(_builder_expand_action_target "$e")"
+    output+=("$e")
   done
   if [[ ${#output[@]} == 0 ]]; then
     echo "*:*"
@@ -775,14 +774,13 @@ builder_describe() {
       local dependency="${value:1}"
       local dependency_target= # all targets
       if [[ $dependency =~ : ]]; then
-        IFS=":" read -r -a sub <<< "$dependency"
-        dependency_target=":${sub[@]:1}"
-        dependency="${sub[0]}"
+        IFS=":" read -r dependency dependency_target <<< "$dependency"
+        dependency_target=":$dependency_target"
       fi
 
       dependency="`_builder_expand_relative_path "$dependency"`"
       _builder_deps+=($dependency)
-      _builder_dep_related_actions[$dependency]="`_builder_expand_action_targets "$description"`"
+      _builder_dep_related_actions[$dependency]="$(_builder_expand_action_targets "$description")"
       _builder_dep_targets[$dependency]="$dependency_target"
       # We don't want to add deps to params, so shift+continue
       shift
@@ -1099,7 +1097,7 @@ builder_parse() {
     else
       # Expand comma separated values
       if [[ $key =~ : ]]; then
-        IFS=: read -r action target <<< $key
+        IFS=: read -r action target <<< "$key"
       else
         action="$key"
         target=
@@ -1154,7 +1152,7 @@ _builder_parse_expanded_parameters() {
     local e has_action has_target has_option longhand_option
 
     if [[ $key =~ : ]]; then
-      IFS=: read -r action target <<< $key
+      IFS=: read -r action target <<< "$key"
       target=:$target
     else
       action="$key"
@@ -1426,10 +1424,10 @@ builder_display_usage() {
   local c1=$BUILDER_TERM_START
   local c0=$BUILDER_TERM_END
   echo
-  echo "* Specify ${c1}action:target${c0} to run a specific ${c1}action${c0} against a specific ${c1}:target${c0}."
-  echo "* If ${c1}action${c0} is specified without a ${c1}target${c0} suffix, it will be applied to all ${c1}:target${c0}s."
-  echo "* If ${c1}:target${c0} is specified without an ${c1}action${c0} prefix, ${c1}$_builder_default_action:target${c0} will be inferred."
-  echo "* If no ${c1}action${c0}, ${c1}:target${c0}, or ${c1}action:target${c0} entries are specified, ${c1}$_builder_default_action${c0} will run on all ${c1}:target${c0}s."
+  echo -e "* Specify ${c1}action:target${c0} to run a specific ${c1}action${c0} against a specific ${c1}:target${c0}."
+  echo -e "* If ${c1}action${c0} is specified without a ${c1}target${c0} suffix, it will be applied to all ${c1}:target${c0}s."
+  echo -e "* If ${c1}:target${c0} is specified without an ${c1}action${c0} prefix, ${c1}$_builder_default_action:target${c0} will be inferred."
+  echo -e "* If no ${c1}action${c0}, ${c1}:target${c0}, or ${c1}action:target${c0} entries are specified, ${c1}$_builder_default_action${c0} will run on all ${c1}:target${c0}s."
   echo
 }
 
@@ -1438,7 +1436,7 @@ builder_finish_action() {
   local action="$2" target action_name
 
   if [[ $action =~ : ]]; then
-    IFS=: read -r action target <<< $action
+    IFS=: read -r action target <<< "$action"
     target=":$target"
   else
     target=':*'
@@ -1501,7 +1499,6 @@ _builder_dep_output_exists() {
 _builder_should_build_dep() {
   local action_target="$1"
   local dep="$2"
-  echo $dep
   local related_actions=(${_builder_dep_related_actions[$dep]})
 
   if [[ $action_target =~ ^clean ]]; then
