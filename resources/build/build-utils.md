@@ -116,7 +116,7 @@ cd "$THIS_SCRIPT_PATH"
 ## Standard environment
 
 `build-utils.sh` will prepend `$KEYMAN_ROOT/node_modules/.bin` to the `PATH`
-variable to ensure that we run the correct versions of node-based commands, so
+variable to ensure that we run the correct versions of npm package commands, so
 there is no need to hard-code path references or add script wrappers to
 package.json (`npm run <script>`).
 

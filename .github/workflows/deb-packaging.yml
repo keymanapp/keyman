@@ -62,7 +62,7 @@ jobs:
       shell: bash
       run: |
         THIS_SCRIPT="$GITHUB_WORKSPACE/.github/workflows/deb-packaging.yml"
-        . "resources/build/build-utils.sh"
+        . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
         echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
     - name: Set prerelease tag as output parameter
