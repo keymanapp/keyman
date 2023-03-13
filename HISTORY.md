@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.66 alpha 2023-03-13
+
+* refactor(android): Use builder scripts (#7407)
+
 ## 17.0.65 alpha 2023-03-12
 
 * refactor(core): consolidate wasm defs (#8409)
