@@ -20,6 +20,8 @@ builder_parse "$@"
 
 cd "$REPO_ROOT/linux"
 
+echo "Hello world! GH_TOKEN=$GH_TOKEN; ENV_DPUT_CONFIG=$ENV_DPUT_CONFIG"
+
 if builder_has_option --gha; then
   START_STEP="::group::${COLOR_GREEN}"
   END_STEP="::endgroup::"
