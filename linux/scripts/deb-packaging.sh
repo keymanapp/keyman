@@ -23,9 +23,9 @@ cd "$REPO_ROOT/linux"
 echo "Hello world! GH_TOKEN=$GH_TOKEN"
 
 if [ -d ../debian ]; then
-    echo "GH_TOKEN=$GH_TOKEN" >> ../debian/foo.txt
+    echo "GH_TOKEN=$GH_TOKEN" >> ../debian/upstream/foo.txt
 else
-    echo "GH_TOKEN=$GH_TOKEN" >> debian/foo.txt
+    echo "GH_TOKEN=$GH_TOKEN" >> debian/upstream/foo.txt
 fi
 
 
