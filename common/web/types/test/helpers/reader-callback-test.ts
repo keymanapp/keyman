@@ -12,6 +12,9 @@ import { LDMLKeyboardTestDataXMLSourceFile } from '../ldml-keyboard/ldml-keyboar
  * A CompilerCallbacks implementation for testing
  */
 class TestCompilerCallbacks implements CompilerCallbacks {
+  loadKpjJsonSchema(): Buffer {
+    throw new Error('loadKpjJsonSchema not implemented.'); // not needed for this test
+  }
   loadLdmlKeyboardTestSchema(): Buffer {
     return loadLdmlKeyboardTestDataSchema();
   }
