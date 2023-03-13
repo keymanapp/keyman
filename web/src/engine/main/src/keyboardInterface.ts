@@ -48,7 +48,7 @@ export default class KeyboardInterface extends KeyboardInterfaceBase {
    * @param       {Object}      Pstub     Keyboard stub object
    * @return      {?number}               1 if already registered, else null
    */
-  registerStub = (Pstub): number => {
+  registerStub(Pstub): number {
     // Other notes:  this is where app-hosted KeymanWeb receives pre-formed stubs.
     // They're specified in the "internal" format (KI, KN, KLC...)
     // (SHIFT-CTRL-F @ repo-level:  `setKeymanLanguage`)

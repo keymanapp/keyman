@@ -8,6 +8,10 @@ import { buildEmbeddedGestureConfig, setupEmbeddedListeners } from './oskConfigu
 
 export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKeyboard> {
   constructor(config: Configuration, worker: Worker) {
+    // TODO:  set the old `namespacedID` function in a new Configuration property
+    // for use within `KeyboardInterface.registerStub` when available.
+    //
+    // Or... just build it in and configure via boolean flag?
     super(config, worker, new ContextManager());
 
     this.hardKeyboard = new PassthroughKeyboard(config.hardDevice);

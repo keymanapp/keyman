@@ -262,12 +262,6 @@ export default class KeyboardInterface extends KeyboardHarness {
   }
 
   /**
-   * Used by DOM-aware KeymanWeb to add keyboard stubs, used by the `KeyboardManager` type
-   * to optimize resource use.
-   */
-  registerStub?: (Pstub) => number;
-
-  /**
    * Get *cached or uncached* keyboard context for a specified range, relative to caret
    *
    * @param       {number}      n       Number of characters to move back from caret
@@ -1145,7 +1139,9 @@ export default class KeyboardInterface extends KeyboardHarness {
     let prototype = this.prototype;
 
     var exportKBCallback = function(miniName: string, longName: string) {
-      prototype[miniName] = prototype[longName];
+      if(prototype[longName]) {
+        prototype[miniName] = prototype[longName];
+      }
     }
 
     exportKBCallback('KSF', 'saveFocus');
