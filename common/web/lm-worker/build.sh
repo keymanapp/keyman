@@ -113,7 +113,7 @@ if builder_start_action build; then
   fi
 
   # Build worker with tsc first
-  tsb -b $builder_verbose || builder_die "Could not build worker."
+  tsc -b $builder_verbose || builder_die "Could not build worker."
 
   # Wrap the worker code and create embedded index.js. Must be run after the
   # worker is built
