@@ -20,7 +20,14 @@ builder_parse "$@"
 
 cd "$REPO_ROOT/linux"
 
-echo "Hello world! GH_TOKEN=$GH_TOKEN; ENV_DPUT_CONFIG=$ENV_DPUT_CONFIG"
+echo "Hello world! GH_TOKEN=$GH_TOKEN"
+
+if [ -d ../debian ]; then
+    echo "GH_TOKEN=$GH_TOKEN" >> ../debian/foo.txt
+else
+    echo "GH_TOKEN=$GH_TOKEN" >> debian/foo.txt
+fi
+
 
 if builder_has_option --gha; then
   START_STEP="::group::${COLOR_GREEN}"
