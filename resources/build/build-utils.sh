@@ -45,7 +45,7 @@ function findKeymanRoot() {
 
 function findVersion() {
     local VERSION_MD="$KEYMAN_ROOT/VERSION.md"
-    VERSION=$(trim $(<"$VERSION_MD"))
+    VERSION=$(builder_trim $(<"$VERSION_MD"))
     [[ "$VERSION" =~ ^([[:digit:]]+)\.([[:digit:]]+)\.([[:digit:]]+)$ ]] && {
         VERSION_MAJOR="${BASH_REMATCH[1]}"
         VERSION_MINOR="${BASH_REMATCH[2]}"
@@ -118,18 +118,9 @@ function findVersion() {
     export VERSION_GIT_TAG
 }
 
-function trim() {
-  local var="$*"
-  # remove leading whitespace characters
-  var="${var#"${var%%[![:space:]]*}"}"
-  # remove trailing whitespace characters
-  var="${var%"${var##*[![:space:]]}"}"
-  printf '%s' "$var"
-}
-
 function findTier() {
   local TIER_MD="$KEYMAN_ROOT/TIER.md"
-  TIER=$(trim $(<"$TIER_MD"))
+  TIER=$(builder_trim $(<"$TIER_MD"))
   [[ "$TIER" =~ ^(alpha|beta|stable)$ ]] || {
       echo "Invalid TIER.md file: expected alpha, beta or stable."
       exit 1;
@@ -180,11 +171,13 @@ function findShouldSentryRelease() {
 }
 
 findKeymanRoot
-findTier
-findVersion
 
 # Source builder_script
 . "$KEYMAN_ROOT/resources/builder.inc.sh"
+
+findTier
+findVersion
+
 # printVersionUtilsDebug
 printBuildNumberForTeamCity
 

@@ -579,7 +579,20 @@ builder_has_option() {
   return 1
 }
 
-_builder_trim() {
+#
+# Trims leading and following whitespace from the input parameters
+#
+# ### Usage
+#
+# ```bash
+#   my_string="$(builder_trim "$my_string")"
+# ```
+#
+# ### Parameters
+#
+# * `my_string`    An input string
+#
+builder_trim() {
   local var="$*"
   # remove leading whitespace characters
   var="${var#"${var%%[![:space:]]*}"}"
@@ -744,7 +757,7 @@ builder_describe() {
     if [[ $key =~ [[:space:]] ]]; then
       IFS=" " read -r -a sub <<< "$key"
       value="${sub[0]}"
-      description="$(_builder_trim "${sub[@]:1}")"
+      description="$(builder_trim "${sub[@]:1}")"
     fi
 
     if [[ $value =~ ^: ]]; then

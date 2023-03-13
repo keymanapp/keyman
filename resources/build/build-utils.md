@@ -828,6 +828,22 @@ builder_describe "sample" \
 
 --------------------------------------------------------------------------------
 
+## `builder_trim` function
+
+Trims leading and following whitespace from the input parameters.
+
+### Usage
+
+```bash
+  my_string="$(builder_trim "$my_string")"
+```
+
+### Parameters
+
+* `my_string`    An input string
+
+--------------------------------------------------------------------------------
+
 ## `builder_use_color` function
 
 This will normally be managed internally by build-utils, but can be manually
