@@ -1312,7 +1312,7 @@ _builder_parse_expanded_parameters() {
     echo "${_params[@]}"
     builder_echo setmark "build.sh parameters: <${_params[@]}>"
     if [[ ${#builder_extra_params[@]} -gt 0 ]]; then
-      builder_echo grey "build.sh extar parameters: <${builder_extra_params[@]}>"
+      builder_echo grey "build.sh extra parameters: <${builder_extra_params[@]}>"
     fi
     _builder_deps_built=`mktemp`
   fi
