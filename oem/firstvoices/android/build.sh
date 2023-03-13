@@ -48,8 +48,8 @@ fi
 ARTIFACT="firstvoices-$VERSION.apk"
 
 builder_describe_outputs \
-  configure     app/libs/keyman-engine.aar \
-  build         app/build/outputs/apk/$CONFIG/${ARTIFACT}
+  configure     /oem/firstvoices/android/app/libs/keyman-engine.aar \
+  build         /oem/firstvoices/android/app/build/outputs/apk/$CONFIG/${ARTIFACT}
 
 #### Build
 

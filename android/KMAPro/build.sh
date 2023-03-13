@@ -27,7 +27,7 @@ TEST_FLAGS="-x assembleRelease lintRelease testRelease" # Gradle test w/o build
 DAEMON_FLAG=
 
 builder_describe "Builds Keyman for Android app." \
-  "@../KMEA" \
+  "@/android/KMEA" \
   "clean" \
   "configure" \
   "build" \
@@ -46,8 +46,8 @@ if builder_is_debug_build; then
 fi
 
 builder_describe_outputs \
-  configure     kMAPro/libs/keyman-engine.aar \
-  build         kMAPro/build/outputs/apk/$CONFIG/keyman-${VERSION}.apk
+  configure     /android/KMAPro/kMAPro/libs/keyman-engine.aar \
+  build         /android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${VERSION}.apk
 
 #### Build
 

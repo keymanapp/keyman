@@ -25,7 +25,7 @@ CONFIG="release"
 SAMPLE_FLAGS="build"
 
 builder_describe "Build KMSample1 app for Android." \
-  "@../../KMEA" \
+  "@/android/KMEA" \
   "clean" \
   "configure" \
   "build" \
@@ -45,8 +45,8 @@ ARTIFACT="app-$CONFIG.apk"
 
 
 builder_describe_outputs \
-  configure             app/libs/keyman-engine.aar \
-  build:app             app/build/outputs/apk/$CONFIG/$ARTIFACT
+  configure             /android/Samples/KMSample1/app/libs/keyman-engine.aar \
+  build:app             /android/Samples/KMSample1/app/build/outputs/apk/$CONFIG/$ARTIFACT
 
 
 
@@ -59,16 +59,16 @@ fi
 #### Build action definitions ####
 
 # Check about cleaning artifact paths
-if builder_start_action clean; then
+if builder_start_action clean:app; then
   rm -rf "$KEYMAN_ROOT/android/Samples/KMSample1/app/build/outputs"
-  builder_finish_action success clean
+  builder_finish_action success clean:app
 fi
 
-if builder_start_action configure; then
+if builder_start_action configure:app; then
   # Copy Keyman Engine for Android
   cp "$KEYMAN_ROOT/android/KMEA/app/build/outputs/aar/${CONFIG}/keyman-engine.aar" "$KEYMAN_ROOT/android/Samples/KMSample1/app/libs/keyman-engine.aar"
 
-  builder_finish_action success configure
+  builder_finish_action success configure:app
 fi
 
 # Building KMSample1

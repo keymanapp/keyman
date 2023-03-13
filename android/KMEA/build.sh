@@ -49,7 +49,7 @@ if builder_is_debug_build; then
 fi
 
 builder_describe_outputs \
-  build:engine     app/build/outputs/aar/${CONFIG}/keyman-engine.aar
+  build:engine     /android/KMEA/app/build/outputs/aar/${CONFIG}/keyman-engine.aar
 
 #### Build
 
@@ -63,13 +63,13 @@ fi
 
 #### Build action definitions ####
 
-# Check about cleaning arifact paths
+# Check about cleaning artifact paths
 if builder_start_action clean:engine; then
   rm -rf "$KEYMAN_ROOT/android/KMEA/app/build/outputs"
   builder_finish_action success clean:engine
 fi
 
-if builder_start_action configure; then
+if builder_start_action configure:engine; then
 
   # Copy KeymanWeb artifacts
   echo "Copying Keyman Web artifacts"
@@ -85,7 +85,7 @@ if builder_start_action configure; then
   echo "Copying es6-shim polyfill"
   cp "$KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js" "$ENGINE_ASSETS/es6-shim.min.js"
 
-  builder_finish_action success configure
+  builder_finish_action success configure:engine
 fi
 
 # Destinations that will need the keymanweb artifacts

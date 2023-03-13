@@ -24,7 +24,7 @@ BUILD_FLAGS="aR -x lint -x test"           # Gradle build w/o test
 TEST_FLAGS="-x aR lintRelease testRelease" # Gradle test w/o build
 
 builder_describe "Build KeyboardHarness test app for Android." \
-  "@../../KMEA" \
+  "@/android/KMEA" \
   "clean" \
   "configure" \
   "build" \
@@ -44,8 +44,8 @@ fi
 ARTIFACT="app-$CONFIG.apk"
 
 builder_describe_outputs \
-  configure    app/libs/keyman-engine.aar \
-  build:app    app/build/outputs/apk/$CONFIG/${ARTIFACT}
+  configure    /android/Tests/KeyboardHarness/app/libs/keyman-engine.aar \
+  build:app    /android/Tests/KeyboardHarness/app/build/outputs/apk/$CONFIG/${ARTIFACT}
 
 #### Build
 
@@ -67,16 +67,16 @@ fi
 #### Build action definitions ####
 
 # Check about cleaning artifact paths
-if builder_start_action clean; then
+if builder_start_action clean:app; then
   rm -rf "$KEYMAN_ROOT/android/Tests/KeyboardHarness/app/build/outputs"
-  builder_finish_action success clean
+  builder_finish_action success clean:app
 fi
 
-if builder_start_action configure; then
+if builder_start_action configure:app; then
   # Copy Keyman Engine for Android
   cp "$KEYMAN_ROOT/android/KMEA/app/build/outputs/aar/${CONFIG}/keyman-engine.aar" "$KEYMAN_ROOT/android/Tests/KeyboardHarness/app/libs/keyman-engine.aar"
 
-  builder_finish_action success configure
+  builder_finish_action success configure:app
 fi
 
 # Building KeyboardHarness
@@ -87,8 +87,8 @@ if builder_start_action build:app; then
   builder_finish_action success build:app
 fi
 
-if builder_start_action test; then
+if builder_start_action test:app; then
   echo "TEST_FLAGS $TEST_FLAGS"
 
-  builder_finish_action succes test
+  builder_finish_action success test:app
 fi
