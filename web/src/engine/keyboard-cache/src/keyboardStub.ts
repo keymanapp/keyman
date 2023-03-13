@@ -35,6 +35,7 @@ export default class KeyboardStub extends KeyboardProperties {
         apiSpec.id = prefixed(apiSpec.id);
         super(apiSpec, arg2);
         this.KF = apiSpec.filename;
+        this.mapRegion(apiSpec.languages);
 
         /*
          * Detects the following patterns (at minimum):
@@ -69,6 +70,30 @@ export default class KeyboardStub extends KeyboardProperties {
     } else {
       super(prefixed(arg0), arg1);
     }
+  }
+
+  private mapRegion(language: LanguageAPIPropertySpec) {
+    // Accept region as number (from Cloud server), code, or name
+    const region=language.region;
+    let rIndex=0;
+    if(typeof(region) == 'number') {
+      if(region < 1 || region > 9) {
+        rIndex = 0;
+      } else {
+        rIndex = region-1;
+      }
+    } else if(typeof(region) == 'string') {
+      let list = (region.length == 2 ? REGION_CODES : REGIONS);
+      for(let i=0; i<list.length; i++) {
+        if(region.toLowerCase() == list[i].toLowerCase()) {
+          rIndex=i;
+          break;
+        }
+      }
+    }
+
+    this.KR = REGIONS[rIndex];
+    this.KRC = REGION_CODES[rIndex];
   }
 
   get region(): string {
@@ -122,28 +147,6 @@ export default class KeyboardStub extends KeyboardProperties {
       // The deprecated `language` is assigned to satisfy TS type-checking.
       const intermediate = {...arg, languages: language, language: undefined};
       const stub: KeyboardStub = new KeyboardStub(intermediate, keyboardBaseUri, fontBaseUri);
-
-      // Accept region as number (from Cloud server), code, or name
-      const region=language.region;
-      let rIndex=0;
-      if(typeof(region) == 'number') {
-        if(region < 1 || region > 9) {
-          rIndex = 0;
-        } else {
-          rIndex = region-1;
-        }
-      } else if(typeof(region) == 'string') {
-        let list = (region.length == 2 ? REGION_CODES : REGIONS);
-        for(let i=0; i<list.length; i++) {
-          if(region.toLowerCase() == list[i].toLowerCase()) {
-            rIndex=i;
-            break;
-          }
-        }
-      }
-
-      stub.KR = REGIONS[rIndex];
-      stub.KRC = REGION_CODES[rIndex];
 
       stubs.push(stub);
     })

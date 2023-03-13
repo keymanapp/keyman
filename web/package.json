@@ -28,7 +28,8 @@
     },
     "./engine/keyboard-cache": {
       "types": "./build/engine/keyboard-cache/obj/index.d.ts",
-      "import": "./build/engine/keyboard-cache/obj/index.js"
+      "import": "./build/engine/keyboard-cache/obj/index.js",
+      "require": "./build/engine/keyboard-cache/obj/index.js"
     },
     "./engine/keyboard-cache/lib": {
       "types": "./build/engine/keyboard-cache/lib/index.d.ts",

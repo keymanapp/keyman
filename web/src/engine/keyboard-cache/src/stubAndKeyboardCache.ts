@@ -55,7 +55,12 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
 
   getKeyboard(keyboardID: string): Keyboard {
     const entry = this.keyboardTable[prefixed(keyboardID)];
-    return entry instanceof Keyboard ? entry : null;
+
+    // Unit testing may 'trip up' in the DOM, as bundled versions of a class from one bundled
+    // module will fail against an `instanceof` expecting the version bundled in a second.
+    //
+    // Thus, we filter based on `Promise`, which needs no module.
+    return entry instanceof Promise ? null : entry;
   }
 
   addKeyboard(keyboard: Keyboard) {
