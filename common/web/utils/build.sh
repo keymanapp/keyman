@@ -18,12 +18,12 @@ cd "$THIS_SCRIPT_PATH"
 
 builder_describe \
   "Compiles the web-oriented utility function module." \
-  "@../keyman-version" \
+  "@/common/web/keyman-version" \
   configure clean build
 
 builder_describe_outputs \
   configure "/node_modules" \
-  build     "build/index.js"
+  build     "/common/web/utils/build/index.js"
 
 builder_parse "$@"
 
@@ -42,7 +42,7 @@ if builder_start_action build; then
   if builder_is_dep_build; then
     builder_echo "skipping tsc -b; will be completed by $builder_dep_parent"
   else
-    npm run tsc -- --build "$THIS_SCRIPT_PATH/tsconfig.json"
+    tsc --build "$THIS_SCRIPT_PATH/tsconfig.json"
   fi
   builder_finish_action success build
 fi

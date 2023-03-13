@@ -18,8 +18,8 @@ cd "$THIS_SCRIPT_PATH"
 ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's development & unit-testing tools" \
-  "@../../../common/web/keyman-version" \
-  "@../../../common/web/keyboard-processor" \
+  "@/common/web/keyman-version" \
+  "@/common/web/keyboard-processor" \
   "clean" \
   "build" \
   ":bulk_rendering     Builds the bulk-rendering tool used to validate changes to OSK display code" \

@@ -168,7 +168,6 @@ cleanup_visual_studio_path() {
       _new_path="$_new_path:$p"
     fi
   done
-  echo
   PATH="${_new_path:1}"
   unset VSINSTALLDIR
 }

@@ -106,20 +106,20 @@ builder_describe_internal_dependency \
   build:mac build:mac-arm64
 
 builder_describe_outputs \
-  configure:x86             build/x86/$CONFIGURATION/build.ninja \
-  configure:x64             build/x64/$CONFIGURATION/build.ninja \
-  configure:mac             build/mac/$CONFIGURATION/ \
-  configure:mac-x86_64      build/mac-x86_64/$CONFIGURATION/build.ninja \
-  configure:mac-arm64       build/mac-arm64/$CONFIGURATION/build.ninja \
-  configure:arch            build/arch/$CONFIGURATION/build.ninja \
-  configure:wasm            build/wasm/$CONFIGURATION/build.ninja \
-  build:x86                 build/x86/$CONFIGURATION/src/libkmnkbp0.a \
-  build:x64                 build/x64/$CONFIGURATION/src/libkmnkbp0.a \
-  build:mac                 build/mac/$CONFIGURATION/libkmnkbp0.a \
-  build:mac-x86_64          build/mac-x86_64/$CONFIGURATION/src/libkmnkbp0.a \
-  build:mac-arm64           build/mac-arm64/$CONFIGURATION/src/libkmnkbp0.a \
-  build:arch                build/arch/$CONFIGURATION/src/libkmnkbp0.a \
-  build:wasm                build/wasm/$CONFIGURATION/src/libkmnkbp0.a
+  configure:x86             /core/build/x86/$CONFIGURATION/build.ninja \
+  configure:x64             /core/build/x64/$CONFIGURATION/build.ninja \
+  configure:mac             /core/build/mac/$CONFIGURATION/ \
+  configure:mac-x86_64      /core/build/mac-x86_64/$CONFIGURATION/build.ninja \
+  configure:mac-arm64       /core/build/mac-arm64/$CONFIGURATION/build.ninja \
+  configure:arch            /core/build/arch/$CONFIGURATION/build.ninja \
+  configure:wasm            /core/build/wasm/$CONFIGURATION/build.ninja \
+  build:x86                 /core/build/x86/$CONFIGURATION/src/libkmnkbp0.a \
+  build:x64                 /core/build/x64/$CONFIGURATION/src/libkmnkbp0.a \
+  build:mac                 /core/build/mac/$CONFIGURATION/libkmnkbp0.a \
+  build:mac-x86_64          /core/build/mac-x86_64/$CONFIGURATION/src/libkmnkbp0.a \
+  build:mac-arm64           /core/build/mac-arm64/$CONFIGURATION/src/libkmnkbp0.a \
+  build:arch                /core/build/arch/$CONFIGURATION/src/libkmnkbp0.a \
+  build:wasm                /core/build/wasm/$CONFIGURATION/src/libkmnkbp0.a
 
 # Iterate through all possible targets; note that targets that cannot be built
 # on the current platform have already been excluded through the archtargets

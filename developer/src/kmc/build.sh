@@ -19,10 +19,10 @@ cd "$THIS_SCRIPT_PATH"
 builder_describe "Build Keyman Keyboard Compiler kmc" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
-  "@../kmc-keyboard" \
-  "@../kmc-model" \
-  "@../kmc-model-info" \
-  "@../kmc-package" \
+  "@/developer/src/kmc-keyboard" \
+  "@/developer/src/kmc-model" \
+  "@/developer/src/kmc-model-info" \
+  "@/developer/src/kmc-package" \
   "configure                 runs 'npm ci' on root folder" \
   "build                     (default) builds kmc to build/" \
   "clean                     cleans build/ folder" \
@@ -33,7 +33,7 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "--dry-run,-n              don't actually publish, just dry run"
 builder_describe_outputs \
   configure     /node_modules \
-  build         build/src/kmc.js
+  build         /developer/src/kmc/build/src/kmc.js
 
 builder_parse "$@"
 

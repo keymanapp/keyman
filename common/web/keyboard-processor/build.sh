@@ -19,9 +19,9 @@ cd "$THIS_SCRIPT_PATH"
 
 builder_describe \
   "Compiles the web-oriented utility function module." \
-  "@../recorder  test" \
-  "@../keyman-version" \
-  "@../utils" \
+  "@/common/web/recorder  test" \
+  "@/common/web/keyman-version" \
+  "@/common/web/utils" \
   configure \
   clean \
   build \
@@ -30,7 +30,7 @@ builder_describe \
 
 builder_describe_outputs \
   configure     /node_modules \
-  build         build/index.js
+  build         /common/web/keyboard-processor/build/index.js
 
 builder_parse "$@"
 
@@ -45,12 +45,12 @@ if builder_start_action clean; then
 fi
 
 if builder_start_action build; then
-  npm run tsc -- --build "$THIS_SCRIPT_PATH/src/tsconfig.json"
+  tsc --build "$THIS_SCRIPT_PATH/src/tsconfig.json"
   builder_finish_action success build
 fi
 
 if builder_start_action test; then
-  npm run tsc -- --build "$THIS_SCRIPT_PATH/src/tsconfig.bundled.json"
+  tsc --build "$THIS_SCRIPT_PATH/src/tsconfig.bundled.json"
 
   builder_heading "Running Keyboard Processor test suite"
 
@@ -60,7 +60,7 @@ if builder_start_action test; then
     FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
   fi
 
-  npm run mocha -- --recursive $FLAGS ./tests/cases/
+  mocha --recursive $FLAGS ./tests/cases/
 
   builder_finish_action success test
 fi
