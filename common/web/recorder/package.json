@@ -18,8 +18,8 @@
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "dependencies": {
     "@keymanapp/keyboard-processor": "*",
-    "@keymanapp/models-types": "*",
     "@keymanapp/keyman-version": "*",
+    "@keymanapp/models-types": "*",
     "@keymanapp/web-utils": "*",
     "@types/node": "^11.9.4"
   },

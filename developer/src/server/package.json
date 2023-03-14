@@ -24,8 +24,8 @@
     "node-windows-trayicon": "keymanapp/node-windows-trayicon#keyman-16.0"
   },
   "devDependencies": {
-    "@keymanapp/resources-gosh": "*",
     "@keymanapp/keyman-version": "*",
+    "@keymanapp/resources-gosh": "*",
     "@types/chai": "^4.3.0",
     "@types/express": "^4.17.13",
     "@types/mocha": "^9.1.0",

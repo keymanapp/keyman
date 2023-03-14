@@ -33,9 +33,9 @@
   },
   "dependencies": {
     "@keymanapp/keyboard-processor": "*",
+    "@keymanapp/keyman-version": "*",
     "@keymanapp/lexical-model-layer": "*",
     "@keymanapp/models-types": "*",
-    "@keymanapp/keyman-version": "*",
     "@keymanapp/web-utils": "*",
     "eventemitter3": "^4.0.0"
   }
