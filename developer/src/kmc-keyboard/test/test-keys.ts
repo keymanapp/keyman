@@ -20,7 +20,7 @@ describe('keys', function () {
         assert.equal(compilerTestCallbacks.messages.length, 0);
         assert.equal(keys.keys.length, 1);
         assert.equal(keys.flicks.length, 1); // there's always a 'null' flick
-        assert.equal(keys.keys[0].to.value, '🪦');
+        assert.equal(keys.keys[0].to.value, String.fromCodePoint(0x1FAA6));
         assert.equal(keys.keys[0].id.value, 'grave');
       },
     },
