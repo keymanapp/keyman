@@ -424,7 +424,8 @@ _builder_run_child_action() {
         # We have to re-test the action because the user may not
         # have specified all targets in their invocation
         if builder_has_action $action$target; then
-          if [ -f "$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh" ]; then
+          if [[ ! -z ${_builder_target_paths[$target]+x} ]] &&
+            [[ -f "$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh" ]]; then
             _builder_execute_child $action $target
           fi
         fi
