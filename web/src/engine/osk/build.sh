@@ -23,7 +23,7 @@ SUBPROJECT_NAME=engine/osk
 
 builder_describe "Builds the Keyman Engine for Web's On-Screen Keyboard package (OSK)." \
   "@/common/web/input-processor build" \
-  "@../dom-utils build" \
+  "@/web/src/engine/dom-utils build" \
   "clean" \
   "configure" \
   "build" \
@@ -59,6 +59,6 @@ fi
 
 if builder_start_action test; then
   # TODO:  CI vs manual:  how the tests are reported.
-  npm run mocha -- --recursive src/test/auto/headless/osk
+  mocha --recursive "${KEYMAN_ROOT}/web/src/test/auto/headless/osk"
   builder_finish_action success test
 fi

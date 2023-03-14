@@ -41,13 +41,7 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
 
 builder_describe_outputs \
-  configure                      /node_modules \
-  build:engine/configuration     /web/build/engine/configuration/obj/index.js \
-  build:engine/device-detect     /web/build/engine/device-detect/lib/index.mjs \
-  build:engine/dom-utils         /web/build/engine/dom-utils/obj/index.js \
-  build:engine/element-wrappers  /web/build/engine/element-wrappers/lib/index.mjs \
-  build:engine/keyboard-cache    /web/build/engine/keyboard-cache/lib/index.mjs \
-  build:engine/osk               web/build/engine/osk/lib/index.mjs
+  configure                      /node_modules
 
 builder_parse "$@"
 

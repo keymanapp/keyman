@@ -69,7 +69,7 @@ fi
 get_default_browser_set ( ) {
   if [[ $BUILDER_OS == mac ]]; then
       BROWSERS="--browsers Firefox,Chrome,Safari"
-  elif [ $os_id = "win" ]; then
+  elif [[ $BUILDER_OS == win ]]; then
       BROWSERS="--browsers Firefox,Chrome"
   else
       BROWSERS="--browsers Firefox,Chrome"
@@ -100,7 +100,7 @@ if builder_start_action test:engine; then
   fi
 
   # Build modernizr module
-  npm --no-color run modernizr -- -c src/test/auto/integrated/modernizr.config.json -d src/test/auto/integrated/modernizr.js
+  modernizr -c src/test/auto/integrated/modernizr.config.json -d src/test/auto/integrated/modernizr.js
 
   # Prepare the flags for the karma command.
   KARMA_FLAGS=
@@ -118,8 +118,8 @@ if builder_start_action test:engine; then
     KARMA_EXT_FLAGS="$KARMA_FLAGS --browsers $BROWSERS"
   fi
 
-  npm --no-color run karma -- start $KARMA_FLAGS src/test/auto/dom/$CONFIG
-  npm --no-color run karma -- start $KARMA_FLAGS $KARMA_EXT_FLAGS src/test/auto/integrated/$CONFIG
+  karma start $KARMA_FLAGS "${KEYMAN_ROOT}/web/src/test/auto/dom/$CONFIG"
+  karma start $KARMA_FLAGS $KARMA_EXT_FLAGS "${KEYMAN_ROOT}/web/src/test/auto/integrated/$CONFIG"
 
   builder_finish_action success test:engine
 fi
