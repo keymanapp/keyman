@@ -8,7 +8,7 @@ import { Mock } from '@keymanapp/keyboard-processor';
  * Unit tests for the Dummy prediction model.
  */
 
-import { LexicalModelCompiler } from '@keymanapp/lexical-model-compiler';
+import { LexicalModelCompiler } from '@keymanapp/kmc-model';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
@@ -51,7 +51,7 @@ describe('LanguageProcessor', function() {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
 
-    const PATH = path.join(__dirname, '../../../../../developer/src/kmc-model/tests/fixtures', MODEL_ID);
+    const PATH = path.join(__dirname, '../../../../../developer/src/kmc-model/test/fixtures', MODEL_ID);
 
     describe('using angle brackets for quotes', function() {
       let modelCode = compiler.generateLexicalModelCode(MODEL_ID, {
