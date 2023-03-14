@@ -1,11 +1,13 @@
-/// <reference path="kps-file.ts" />
-/// <reference path="kmp-json-file.ts" />
-
 import * as fs from 'fs';
 import * as path from 'path';
 import * as xml2js from 'xml2js';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
+
+import type { KpsFile, KpsFileContentFile, KpsFileInfo, KpsFileKeyboard, KpsFileLanguage, KpsFileLexicalModel, KpsFileOptions, KpsPackage } from './kps-file.js';
+import type { KmpJsonFile, KmpJsonFileInfo, KmpJsonFileLanguage, KmpJsonFileOptions } from './kmp-json-file.js';
+
+export { type KmpJsonFile } from './kmp-json-file.js';
 
 const FILEVERSION_KMP_JSON = '12.0';
 

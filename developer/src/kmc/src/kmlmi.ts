@@ -8,7 +8,7 @@ import * as path from 'path';
 import { Command } from 'commander';
 import KmpCompiler from '@keymanapp/kmc-package';
 import { ModelInfoOptions as ModelInfoOptions, writeMergedModelMetadataFile } from '@keymanapp/kmc-model-info';
-import { SysExits } from './util/sysexits';
+import { SysExits } from './util/sysexits.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 let inputFilename: string;
