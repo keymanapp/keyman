@@ -30,7 +30,7 @@ export class StylesheetManager {
    * Build a stylesheet with a font-face CSS descriptor for the embedded font appropriate
    * for the browser being used
    *
-   * @param    {Object}  fd            keymanweb font descriptor
+   * @param    {Object}  fd            keymanweb font descriptor (internal format; should be preprocessed)
    * @param    {string}  fontPathRoot  Should correspond to `this.keyman.options['fonts']`
    **/
   addStyleSheetForFont(fd: KeyboardFont, fontPathRoot: string, os?: DeviceSpec.OperatingSystem) {
@@ -39,9 +39,6 @@ export class StylesheetManager {
       return;
     }
 
-    // if(typeof(fd.files) == 'undefined') {
-    //   fd.files=fd['source'];
-    // }
     if(typeof(fd.files == 'undefined')) {
       return;
     }

@@ -95,6 +95,11 @@ android {
             }
         }
         variant.resValue "string", "app_name", 'Keyman' + appSuffix;
+
+        // Adjust output name to "keyman-${VERSION_MD}.apk"
+        variant.outputs.all {
+            outputFileName = "keyman-" + VERSION_MD + ".apk"
+        }
     }
     lintOptions {
         disable 'MissingQuantity', 'MissingTranslation'

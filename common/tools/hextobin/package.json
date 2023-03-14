@@ -1,0 +1,28 @@
+{
+  "name": "@keymanapp/hextobin",
+  "description": "hextobin conversion tool",
+  "keywords": [
+    "keyman",
+    "hex",
+    "binary"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^5.1.0"
+  },
+  "main": "build/index.js",
+  "bin": {
+    "hextobin": "build/hextobin.js"
+  },
+  "scripts": {
+    "clean": "tsc -b --clean",
+    "build": "tsc -b"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  },
+  "devDependencies": {
+    "@types/node": "^18.7.18"
+  }
+}

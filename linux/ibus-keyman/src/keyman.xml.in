@@ -2,7 +2,7 @@
 <component>
 	<name>org.freedesktop.IBus.Keyman</name>
 	<description>Keyman Component</description>
-	<exec>@libexecdir@/ibus-engine-keyman --ibus</exec>
+	<exec>@LIBEXECDIR@/ibus-engine-keyman --ibus</exec>
 	<version>@VERSION@</version>
 	<author>Keyman Team &lt;support@keyman.com&gt;</author>
 	<license>GPL</license>
@@ -13,5 +13,5 @@
 		<path>/usr/local/share/keyman/</path>
 		<path>~/.local/share/keyman/</path>
 	</observed-paths>
-	<engines exec="@libexecdir@/ibus-engine-keyman --xml" />
+	<engines exec="@LIBEXECDIR@/ibus-engine-keyman --xml" />
 </component>

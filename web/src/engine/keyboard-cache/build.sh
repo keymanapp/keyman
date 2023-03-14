@@ -59,7 +59,7 @@ fi
 
 if builder_start_action test; then
   # TODO:  CI vs manual:  how the tests are reported.
-  npm run mocha -- --recursive src/test/auto/headless/keyboard-cache
+  mocha --recursive "${KEYMAN_ROOT}/web/src/test/auto/headless/keyboard-cache"
 
   # TODO:  DOM tests
   builder_finish_action success test

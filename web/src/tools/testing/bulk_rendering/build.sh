@@ -6,8 +6,8 @@ set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -27,7 +27,7 @@ builder_describe \
 
 builder_describe_outputs \
   configure  /node_modules \
-  build      ../../../../build/tools/testing/bulk_rendering/bulk_render.js
+  build      /web/build/tools/testing/bulk_rendering/bulk_render.js
 
 builder_parse "$@"
 

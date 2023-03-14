@@ -44,9 +44,6 @@
     <ClCompile Include="..\..\global\cpp\VKScanCodes.cpp">
       <Filter>Library Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mc_crc32.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="mc_import_rules.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
