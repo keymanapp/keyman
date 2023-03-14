@@ -17,6 +17,9 @@ endif
 
 if compiler.get_id() == 'emscripten'
   tests_flags = ['--embed-file', join_paths(meson.current_source_dir(),'@/')]
+  # we have to link in files from the binary folder also as the binary tests
+  # use the kmx test runner.
+  tests_flags += ['--embed-file', join_paths(meson.current_build_dir(),'fixtures','binary','@')]
   source_path = '/'
   test_path = '/'
 else
@@ -25,27 +28,12 @@ else
   test_path = meson.current_build_dir()
 endif
 
-coretest_files = files(
-    'kmx_test_source.cpp',
-)
-
 kmx = executable('kmx',
     'kmx.cpp',
-    coretest_files,
     cpp_args: defns + warns,
-    include_directories: [inc, libsrc],
+    include_directories: [inc, libsrc, '../../kmx_test_source'],
     link_args: links + tests_flags,
-    objects: lib.extract_all_objects())
-
-test_lib = static_library('kmnkbp-tests',
-  coretest_files,
-  cpp_args: defns + warns + flags,
-  include_directories: [inc, libsrc],
-  link_args: links + tests_flags,
-  objects: lib.extract_all_objects(),
-  pic: true,
-  install: false
-)
+    objects: [lib.extract_all_objects(recursive: false), kmx_test_source_lib.extract_all_objects(recursive: false)])
 
 tests = [
   '000 - null keyboard',
@@ -230,6 +218,9 @@ else
   endforeach
 endif
 
+# binary file unit tests
+
+subdir('fixtures')
 
 # test for km_kbp_keyboard_get_key_list
 
@@ -242,7 +233,7 @@ key_e = executable('key_list', 'kmx_key_list.cpp',
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,
-                objects: lib.extract_all_objects())
+                objects: lib.extract_all_objects(recursive: false))
 test_kbd = 'kmx_key_list'
 if kmcomp.found()
   kbd_src = files(test_kbd + '.kmn')
@@ -264,7 +255,7 @@ imx_e = executable('imx_list', 'kmx_imx.cpp',
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,
-                objects: lib.extract_all_objects())
+                objects: lib.extract_all_objects(recursive: false))
 
 test_kbd = 'kmx_imsample'
 if kmcomp.found()

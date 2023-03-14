@@ -110,7 +110,7 @@ var
 begin
   context := km_kbp_state_context(FCore.State);
   km_kbp_context_clear(context);
-  if km_kbp_process_event(FCore.State, vk.vkey, vk.kmshift, 1) = KM_KBP_STATUS_OK then
+  if km_kbp_process_event(FCore.State, vk.vkey, vk.kmshift, 1, KM_KBP_EVENT_FLAG_DEFAULT) = KM_KBP_STATUS_OK then
   begin
     FEvents.Clear;
     FEvents.AddStateItems(FCore.State, vk.vkey, vk.kmshift);

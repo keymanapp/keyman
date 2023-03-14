@@ -59,7 +59,7 @@ man:
 	./build-help.sh --man --no-reconf
 
 version_reconf:
-	cd .. && ./scripts/reconf.sh keyman-config
+	cd .. && ./scripts/reconf.sh
 
 version: version_reconf
 	$(eval VERSION := $(shell python3 -c "from keyman_config import __releaseversion__; print(__releaseversion__)"))

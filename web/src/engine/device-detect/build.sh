@@ -22,8 +22,8 @@ SUBPROJECT_NAME=engine/device-detect
 # ################################ Main script ################################
 
 builder_describe "Builds the device-detection component of Keyman Engine for Web (KMW)." \
-  "@../../../../common/web/keyman-version" \
-  "@../../../../common/web/utils" \
+  "@/common/web/keyman-version" \
+  "@/common/web/utils" \
   "clean" \
   "configure" \
   "build" \

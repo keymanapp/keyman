@@ -19,15 +19,15 @@ compile ( ) {
     builder_die "Scripting error: insufficient argument count!"
   fi
 
-  local COMPILE_TARGET=$1
+  local COMPILE_TARGET="$1"
 
-  npm run tsc -- -b src/$COMPILE_TARGET -v
+  tsc -b "${KEYMAN_ROOT}/web/src/$COMPILE_TARGET" -v
 
   # COMPILE_TARGET entries are all prefixed with `engine`, so remove that.
   if [ -f "./build-bundler.js" ]; then
     node "./build-bundler.js"
 
     # So... tsc does declaration-bundling on its own pretty well, at least for local development.
-    npm run tsc -- --emitDeclarationOnly --outFile ./build/$COMPILE_TARGET/lib/index.d.ts -p src/$COMPILE_TARGET
+    tsc --emitDeclarationOnly --outFile "${KEYMAN_ROOT}/web/build/$COMPILE_TARGET/lib/index.d.ts" -p "${KEYMAN_ROOT}/web/src/$COMPILE_TARGET"
   fi
 }

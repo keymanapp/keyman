@@ -59,18 +59,33 @@ if compiler.get_id() == 'emscripten'
 endif
 
 kmx_files = files(
+  'option.cpp',
+  'keyboard.cpp',
+  'state.cpp',
+  'debuglog.cpp',
+  'km_kbp_context_api.cpp',
+  'km_kbp_keyboard_api.cpp',
+  'km_kbp_options_api.cpp',
+  'km_kbp_state_api.cpp',
+  'km_kbp_debug_api.cpp',
+  'km_kbp_processevent_api.cpp',
+  'jsonpp.cpp',
+  'ldml/ldml_processor.cpp',
+  'ldml/ldml_transforms.cpp',
+  'ldml/ldml_vkeys.cpp',
+  'mock/mock_processor.cpp',
   'kmx/kmx_consts.cpp',
   'kmx/kmx_processevent.cpp',
   'kmx/kmx_actions.cpp',
   'kmx/kmx_capslock.cpp',
   'kmx/kmx_context.cpp',
   'kmx/kmx_conversion.cpp',
-  'kmx/kmx_debug.cpp',
   'kmx/kmx_debugger.cpp',
   'kmx/kmx_environment.cpp',
   'kmx/kmx_file.cpp',
   'kmx/kmx_modifiers.cpp',
   'kmx/kmx_options.cpp',
+  'kmx/kmx_plus.cpp',
   'kmx/kmx_processor.cpp',
   'kmx/kmx_xstring.cpp',
 )
@@ -108,22 +123,6 @@ lib = library('kmnkbp0',
   include_directories: inc,
   pic: true,
   install: true)
-
-if host_machine.system() == 'linux'
-  # on Linux we need the static lib for ibus-keyman tests
-  static_library('kmnkbp0-static',
-    api_files,
-    core_files,
-    kmx_files,
-    mock_files,
-    version_res,
-    cpp_args: defns + warns + flags,
-    link_args: links,
-    include_directories: inc,
-    pic: true,
-    install: false
-  )
-endif
 
 headerdirs = [ '.', 'keyman' ] # subdirectories of ${prefix}/include to add to header path
 
