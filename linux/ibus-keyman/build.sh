@@ -19,7 +19,7 @@ builder_describe \
   "test" \
   "install                   install artifacts" \
   "uninstall                 uninstall artifacts" \
-  "@/core :arch"
+  "@/core:arch"
 
 builder_parse "$@"
 
