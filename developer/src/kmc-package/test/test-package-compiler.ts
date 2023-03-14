@@ -5,7 +5,7 @@ import {assert} from 'chai';
 import KmpCompiler from '../src/kmp-compiler.js';
 import {makePathToFixture} from './helpers/index.js';
 import JSZip from 'jszip';
-import KEYMAN_VERSION from "@keymanapp/keyman-version/keyman-version.mjs";
+import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 describe('KmpCompiler', function () {
   const MODELS : string[] = [

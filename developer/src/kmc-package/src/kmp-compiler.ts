@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as xml2js from 'xml2js';
 import JSZip from 'jszip';
-import KEYMAN_VERSION from "@keymanapp/keyman-version/keyman-version.mjs";
+import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 const FILEVERSION_KMP_JSON = '12.0';
 

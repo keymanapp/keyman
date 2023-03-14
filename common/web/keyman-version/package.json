@@ -3,8 +3,10 @@
   "description": "Keyman global version data",
   "main": "./build/index.js",
   "exports": {
-    ".": "./build/index.js",
-    "./keyman-version.mjs": "./build/keyman-version.mjs"
+    ".": {
+      "import": "./build/keyman-version.mjs",
+      "require": "./build/index.js"
+    }
   },
   "scripts": {
     "build": "echo 'Building @keymanapp/keyman-version' && tsc -b",

@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import { Command } from 'commander';
 import KmpCompiler from '@keymanapp/kmc-package';
 import { SysExits } from './util/sysexits';
-import KEYMAN_VERSION from "@keymanapp/keyman-version/keyman-version.mjs";
+import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 let inputFilename: string;
 const program = new Command();
