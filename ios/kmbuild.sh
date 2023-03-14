@@ -9,8 +9,8 @@ set -u
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # This script runs from its own folder
@@ -19,6 +19,7 @@ cd "$(dirname "$THIS_SCRIPT")"
 # Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
+. "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac
@@ -172,7 +173,7 @@ update_bundle ( ) {
 
         "$KEYMAN_ROOT/web/build.sh" $KMWFLAGS
         if [ $? -ne 0 ]; then
-            fail "ERROR:  KeymanWeb's build.sh failed."
+            builder_die "ERROR:  KeymanWeb's build.sh failed."
         fi
 
         #Copy over the relevant resources!  It's easiest to do if we navigate to the resulting folder.
@@ -193,14 +194,14 @@ update_bundle ( ) {
     # Our default resources are part of the bundle, so let's check on them.
     if [ ! -f "$base_dir/$BUNDLE_PATH/$DEFAULT_KBD_ID.kmp" ]; then
       DO_KMP_DOWNLOADS=true
-      warn "OVERRIDE:  Performing -download-resources run, as the keyboard package is missing!"
+      builder_warn "OVERRIDE:  Performing -download-resources run, as the keyboard package is missing!"
     elif [ ! -f "$base_dir/$BUNDLE_PATH/$DEFAULT_LM_ID.model.kmp" ]; then
       DO_KMP_DOWNLOADS=true
-      warn "OVERRIDE:  Performing -download-resources run, as the lexical model package is missing!"
+      builder_warn "OVERRIDE:  Performing -download-resources run, as the lexical model package is missing!"
     fi
 
     if [ $DO_KMP_DOWNLOADS = true ]; then
-      echo_heading "Downloading up-to-date packages for default resources"
+      builder_heading "Downloading up-to-date packages for default resources"
 
       downloadKeyboardPackage "$DEFAULT_KBD_ID" "$base_dir/$BUNDLE_PATH/$DEFAULT_KBD_ID.kmp"
       downloadModelPackage "$DEFAULT_LM_ID" "$base_dir/$BUNDLE_PATH/$DEFAULT_LM_ID.model.kmp"
@@ -218,11 +219,11 @@ if [ $DO_CARTHAGE = true ]; then
   echo
   echo "Load dependencies with Carthage"
 
-  carthage checkout || fail "Carthage dependency loading failed"
+  carthage checkout || builder_die "Carthage dependency loading failed"
 
   # --no-use-binaries: due to https://github.com/Carthage/Carthage/issues/3134,
   # which affects the sentry-cocoa dependency.
-  carthage build --use-xcframeworks --no-use-binaries --platform iOS || fail "Carthage dependency loading failed"
+  carthage build --use-xcframeworks --no-use-binaries --platform iOS || builder_die "Carthage dependency loading failed"
 fi
 
 echo
@@ -251,7 +252,7 @@ echo "KMEI build complete."
 if [ $DO_KEYMANAPP = true ]; then
   echo ""
   echo "Building offline help."
-  ./build-help.sh html
+  build_help_html ios keyman/Keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources
 
   echo ""
   echo "Building Keyman app."

@@ -16,7 +16,7 @@ typedef uint32_t DWORD;
 struct COMP_KEYBOARD {
     DWORD dwIdentifier;     // 0000 Keyman compiled keyboard id
     DWORD dwFileVersion;    // 0004 Version of the file - Keyman 4.0 is 0x0400
-    DWORD dwCheckSum;       // 0008 As stored in keyboard
+    DWORD dwCheckSum;       // 0008 As stored in keyboard. DEPRECATED as of 16.0
     DWORD KeyboardID;       // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
     DWORD IsRegistered;     // 0010
     DWORD version;          // 0014 keyboard version
@@ -44,8 +44,9 @@ struct COMP_KEYBOARD {
 #define VERSION_100 0x00000A00
 #define VERSION_140 0x00000E00
 #define VERSION_150 0x00000F00
+#define VERSION_160 0x00001000
 #define VERSION_MIN VERSION_50
-#define VERSION_MAX VERSION_150
+#define VERSION_MAX VERSION_160
 
 struct COMP_GROUP {
     DWORD dpName;           // string (only debug)

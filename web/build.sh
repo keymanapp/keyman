@@ -3,13 +3,12 @@
 # Compile keymanweb and copy compiled javascript and resources to output/embedded folder
 #
 
-# set -x
 set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -21,6 +20,7 @@ cd "$THIS_SCRIPT_PATH"
 
 # Ensures that we rely first upon the local npm-based install of Typescript.
 # (Facilitates automated setup for build agents.)
+# TODO: this should be removeable given set_keyman_standard_build_path does this in build-utils.sh (and relative paths are dodgy in $PATH!)
 PATH="../node_modules/.bin:$PATH"
 
 builder_set_child_base src
@@ -41,13 +41,13 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
 
 builder_describe_outputs \
-  configure                      ../node_modules \
-  build:engine/configuration     build/engine/configuration/obj/index.js \
-  build:engine/device-detect     build/engine/device-detect/lib/index.mjs \
-  build:engine/dom-utils         build/engine/dom-utils/obj/index.js \
-  build:engine/element-wrappers  build/engine/element-wrappers/lib/index.mjs \
-  build:engine/keyboard-cache    build/engine/keyboard-cache/lib/index.mjs \
-  build:engine/osk               build/engine/osk/lib/index.mjs
+  configure                      /node_modules \
+  build:engine/configuration     /web/build/engine/configuration/obj/index.js \
+  build:engine/device-detect     /web/build/engine/device-detect/lib/index.mjs \
+  build:engine/dom-utils         /web/build/engine/dom-utils/obj/index.js \
+  build:engine/element-wrappers  /web/build/engine/element-wrappers/lib/index.mjs \
+  build:engine/keyboard-cache    /web/build/engine/keyboard-cache/lib/index.mjs \
+  build:engine/osk               web/build/engine/osk/lib/index.mjs
 
 builder_parse "$@"
 

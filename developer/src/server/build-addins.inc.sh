@@ -57,10 +57,10 @@ build_addins() {
   #
 
   if (( NODEX64 )); then
-    [[ $(isFileX64 "$TRAYICON_TARGET") == 1 ]] || die "$TRAYICON_TARGET should be 64-bit"
-    [[ $(isFileX64 "$HIDECONSOLE_TARGET") == 1 ]] || die "$HIDECONSOLE_TARGET should be 64-bit"
+    [[ $(isFileX64 "$TRAYICON_TARGET") == 1 ]] || builder_die "$TRAYICON_TARGET should be 64-bit"
+    [[ $(isFileX64 "$HIDECONSOLE_TARGET") == 1 ]] || builder_die "$HIDECONSOLE_TARGET should be 64-bit"
   else
-    [[ $(isFileX64 "$TRAYICON_TARGET") == 0 ]] || die "$TRAYICON_TARGET should not be 64-bit"
-    [[ $(isFileX64 "$HIDECONSOLE_TARGET") == 0 ]] || die "$HIDECONSOLE_TARGET should not be 64-bit"
+    [[ $(isFileX64 "$TRAYICON_TARGET") == 0 ]] || builder_die "$TRAYICON_TARGET should not be 64-bit"
+    [[ $(isFileX64 "$HIDECONSOLE_TARGET") == 0 ]] || builder_die "$HIDECONSOLE_TARGET should not be 64-bit"
   fi
 }

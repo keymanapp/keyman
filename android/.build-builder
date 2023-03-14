@@ -1,0 +1,4 @@
+The presence of this file tells CI to use the new builder_ style parameters for build.sh
+
+Once all branches for 16.0+ are updated to merge #7407, then we
+can remove this file and the corresponding bash test branches in CI.

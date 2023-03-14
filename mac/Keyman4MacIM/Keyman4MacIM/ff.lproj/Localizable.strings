@@ -68,4 +68,4 @@
 "copyright-label" = "Copyright:";
 
 /* message displayed to alert user to need grant accessibility permission */
-"privacy-alert-text" = "To function properly, Keyman requires accessibility features:\n\nGrant access in System Preferences, Security & Privacy.\nRestart your system.";
+"privacy-alert-text" = "Ngam waawde huutoreede, Keyman ena laaɓndii fannuuji heɓindaare:\n\nYamir ɗum to Cuɓoraaɗe Yuɓɓo toh, Kisnal & Suturo.\nHurmitin yuɓɓomaa.";

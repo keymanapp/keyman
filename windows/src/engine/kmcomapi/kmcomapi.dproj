@@ -185,7 +185,6 @@
         <DCCReference Include="util\isadmin.pas"/>
         <DCCReference Include="util\baseerror.pas"/>
         <DCCReference Include="util\utilkeyman.pas"/>
-        <DCCReference Include="..\..\..\..\common\windows\delphi\general\CRC32.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>

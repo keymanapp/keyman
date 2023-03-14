@@ -120,7 +120,6 @@
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\VKeys.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\keyboards\kmxfile.pas"/>
-        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\CRC32.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\..\tike\main\KeymanDeveloperOptions.pas"/>
         <DCCReference Include="..\..\..\common\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas"/>
