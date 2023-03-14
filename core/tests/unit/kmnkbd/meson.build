@@ -39,7 +39,7 @@ foreach t : tests
     cpp_args: defns + warns,
     include_directories: [inc, libsrc],
     link_args: links + tests_flags,
-    objects: lib.extract_all_objects())
+    objects: lib.extract_all_objects(recursive: false))
 
   test(t[0], bin, args: ['--color', test_path])
 endforeach

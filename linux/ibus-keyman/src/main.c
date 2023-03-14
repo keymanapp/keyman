@@ -51,7 +51,7 @@ ibus_disconnected_cb (IBusBus  *bus,
                       gpointer  user_data)
 {
     g_debug ("bus disconnected");
-    KeymanService *service = km_service_get_default();
+    KeymanService *service = km_service_get_default(NULL);
     g_clear_object(&service);
 
     ibus_quit ();
@@ -92,7 +92,7 @@ start_component (void)
     }
 
     g_object_unref (component);
-    km_service_get_default(); // initialise dbus service
+    km_service_get_default(NULL); // initialise dbus service
 
     ibus_main ();
 }

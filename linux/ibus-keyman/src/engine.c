@@ -99,6 +99,7 @@ struct _IBusKeymanEngine {
 
   commit_queue_item commit_queue[MAX_QUEUE_SIZE];
   commit_queue_item *commit_item;
+  guint             consecutive_backspaces;
 };
 
 struct _IBusKeymanEngineClass {
@@ -467,6 +468,7 @@ ibus_keyman_engine_constructor(
     keyman->lctrl_pressed = FALSE;
     keyman->ralt_pressed = FALSE;
     keyman->rctrl_pressed = FALSE;
+    keyman->consecutive_backspaces = 0;
     initialize_queue(keyman, 0, MAX_QUEUE_SIZE);
     keyman->commit_item    = &keyman->commit_queue[0];
     gchar **split_name     = g_strsplit(engine_name, ":", 2);
@@ -572,6 +574,16 @@ ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
     IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)keyman);
 }
 
+void ibus_keyman_set_text(IBusEngine *engine, const gchar *text)
+{
+    IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
+    if (!keyman) {
+        g_error("%s: parameter `engine` is not an `IBusKeymanEngine` (%p)", __FUNCTION__, engine);
+        return;
+    }
+    commit_string(keyman, text);
+}
+
 static void commit_string(IBusKeymanEngine *keyman, const gchar *string)
 {
     IBusText *text;
@@ -656,8 +668,8 @@ process_backspace_action(
         "DAR: %s - client_capabilities=%x, %x", __FUNCTION__, engine->client_capabilities, IBUS_CAP_SURROUNDING_TEXT);
 
     if (client_supports_surrounding_text(engine)) {
-      g_message("%s: deleting surrounding text 1 char", __FUNCTION__);
-      ibus_engine_delete_surrounding_text(engine, -1, 1);
+      keyman->consecutive_backspaces++;
+      g_message("%s: increment consecutive backspaces to %d", __FUNCTION__, keyman->consecutive_backspaces);
     } else {
       g_message("%s: forwarding backspace with reset context", __FUNCTION__);
       km_kbp_context_item *context_items;
@@ -668,6 +680,21 @@ process_backspace_action(
       km_kbp_context_items_dispose(context_items);
     }
   }
+  return TRUE;
+}
+
+static gboolean
+finish_backspace_action(
+  IBusEngine *engine
+) {
+  IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
+  if (keyman->consecutive_backspaces <= 0)
+    return TRUE;
+
+  g_assert(client_supports_surrounding_text(engine));
+  g_message("%s: deleting surrounding text %d char", __FUNCTION__, keyman->consecutive_backspaces);
+  ibus_engine_delete_surrounding_text(engine, -keyman->consecutive_backspaces, keyman->consecutive_backspaces);
+  keyman->consecutive_backspaces = 0;
   return TRUE;
 }
 
@@ -816,6 +843,9 @@ process_actions(
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
   for (int i = 0; i < num_action_items; i++) {
     gboolean continue_with_next_action = TRUE;
+    if (action_items[i].type != KM_KBP_IT_BACK && keyman->consecutive_backspaces > 0) {
+      finish_backspace_action(engine);
+    }
     switch (action_items[i].type) {
     case KM_KBP_IT_CHAR:
       g_message("CHAR action %d/%d", i + 1, (int)num_action_items);
@@ -956,7 +986,7 @@ ibus_keyman_engine_process_key_event(
   km_kbp_context *context = km_kbp_state_context(keyman->state);
   g_free(get_current_context_text(context));
   g_message("DAR: %s - km_mod_state=0x%x", __FUNCTION__, km_mod_state);
-  km_kbp_process_event(keyman->state, keycode_to_vk[keycode], km_mod_state, isKeyDown);
+  km_kbp_process_event(keyman->state, keycode_to_vk[keycode], km_mod_state, isKeyDown, KM_KBP_EVENT_FLAG_DEFAULT);
   context                    = km_kbp_state_context(keyman->state);
   g_message("%s: after process key event", __FUNCTION__);
   g_free(get_current_context_text(context));
@@ -1056,7 +1086,7 @@ ibus_keyman_engine_enable (IBusEngine *engine)
     {
         // own dbus name com.Keyman
         // expose properties LDMLFile and Name
-        KeymanService *service = km_service_get_default();
+        KeymanService *service = km_service_get_default(engine);
         km_service_set_ldmlfile (service, keyman->ldmlfile);
         km_service_set_name (service, keyman->kb_name);
     }
@@ -1073,7 +1103,7 @@ ibus_keyman_engine_disable (IBusEngine *engine)
     g_message("WDG: %s %s", __FUNCTION__, engine_name);
     ibus_keyman_engine_focus_out (engine);
     // stop owning dbus name com.Keyman
-    KeymanService *service = km_service_get_default();
+    KeymanService *service = km_service_get_default(engine);
     km_service_set_ldmlfile (service, "");
     km_service_set_name (service, "None");
     // g_clear_object(&service);

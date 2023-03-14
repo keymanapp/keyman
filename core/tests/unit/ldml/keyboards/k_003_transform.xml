@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-keyboards.md#element-transform
+
+Note: keys should start with [K_A][K_B][K_C] not [K_Y] when transforms are functioning properly.
+
+@@keys: [K_Y][K_BKQUOTE][K_A][K_B][K_D][K_BKQUOTE][K_A][K_B][K_E][K_Q][K_BKQUOTE][K_B][K_C]
+@@expected: y\u0020xd\u0020xeq\u0020m
+
+-->
+<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
+<keyboard locale="en" conformsTo="techpreview">
+  <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
+
+  <names>
+    <name value="TestKbd" />
+  </names>
+
+  <keys>
+    <key id="backslash" to="\u{005c}"/>
+    <key id="bquote" to="`"/>
+    <key id="equals" to="="/>
+    <key id="hyphen" to="-"/>
+  </keys>
+
+  <layers form="hardware" hardware="us">
+    <layer id="base">
+      <row keys="space" /> <!-- number row -->
+      <row keys="q w e r t y u i o p" />
+      <row keys="a s d f g h j k l" />
+      <row keys="z x c v b n m" />
+      <row keys="space" />
+    </layer>
+  </layers>
+
+  <transforms type="simple">
+    <transform from="ab" to="x" />
+    <transform from="abc" to="y" />
+    <transform from="abef" to="z" />
+    <transform from="bc" to="m" />
+    <transform from="beq" to="n" />
+  </transforms>
+</keyboard>

@@ -13,13 +13,25 @@
   "workspaces": [
     "resources/gosh",
     "resources/build/version",
-    "developer/src/kmlmc",
+    "core/include/ldml",
+    "developer/src/kmc-keyboard",
+    "developer/src/kmc-model",
+    "developer/src/kmc-model-info",
+    "developer/src/kmc-package",
+    "developer/src/kmc",
     "developer/src/server",
     "common/models/*",
     "common/test/resources",
     "common/tools/*",
     "common/web/*",
     "common/predictive-text",
+    "common/tools/hextobin",
     "web"
-  ]
+  ],
+  "dependencies": {
+    "@keymanapp/hextobin": "file:common/tools/hextobin",
+    "@keymanapp/keyman-version": "file:common/web/keyman-version",
+    "@keymanapp/common-types": "file:common/web/types",
+    "@keymanapp/ldml-keyboard-constants": "file:core/include/ldml"
+  }
 }

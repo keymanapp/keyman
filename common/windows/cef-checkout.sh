@@ -12,8 +12,8 @@ set -u
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 # . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
@@ -47,7 +47,7 @@ if [ ! -f ./libcef.dll ]; then
     rm "$zip"
   done
 
-  [ -f ./libcef.dll ] || die "File libcef.dll could not be found. Path $KEYMAN_CEF4DELPHI_ROOT may not be valid."
+  [ -f ./libcef.dll ] || builder_die "File libcef.dll could not be found. Path $KEYMAN_CEF4DELPHI_ROOT may not be valid."
 fi
 
 popd > /dev/null

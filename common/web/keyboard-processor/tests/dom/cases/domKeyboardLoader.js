@@ -1,6 +1,6 @@
 let assert = chai.assert;
 
-import { DOMKeyboardLoader, DOMKeyboardSandbox } from '../../../build/lib/keyboards/loaders/domKeyboardLoader.mjs';
+import { DOMKeyboardLoader } from '../../../build/lib/dom-keyboard-loader.mjs';
 import { extendString, KeyboardHarness, KeyboardInterface, MinimalKeymanGlobal, Mock } from '../../../build/lib/index.mjs';
 
 // Note:  rule processing tests will fail if string extensions are not established beforehand.
