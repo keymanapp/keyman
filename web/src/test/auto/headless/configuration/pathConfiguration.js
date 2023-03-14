@@ -1,13 +1,13 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import { OptionDefaults, PathConfiguration } from 'keyman/engine/configuration';
+import { PathOptionDefaults, PathConfiguration } from 'keyman/engine/configuration';
 
 // Tests the activation-state logic abstraction & implementations used to model and control OSK visibility.
 
 describe("Path Configuration", () => {
   it('https://test.site.com/folder/, default options', () => {
-    const paths = new PathConfiguration(OptionDefaults, 'https://test.site.com/folder/');
+    const paths = new PathConfiguration(PathOptionDefaults, 'https://test.site.com/folder/');
 
     assert.equal(paths.protocol, 'https:');
     assert.equal(paths.root, 'https://test.site.com/');
@@ -17,7 +17,7 @@ describe("Path Configuration", () => {
   });
 
   it('https://test.site.com/folder, non-standard option values', () => {
-    const paths = new PathConfiguration({...OptionDefaults,
+    const paths = new PathConfiguration({...PathOptionDefaults,
       keyboards: 'https://s.keyman.com/keyboard',
       fonts: '/fonts',
       resources: 'resources',
@@ -32,7 +32,7 @@ describe("Path Configuration", () => {
   });
 
   it('http://test.site.com/folder, non-standard option values', () => {
-    const paths = new PathConfiguration({...OptionDefaults,
+    const paths = new PathConfiguration({...PathOptionDefaults,
       keyboards: 'https://s.keyman.com/keyboard',
       fonts: '/fonts',
       resources: 'resources',
@@ -47,7 +47,7 @@ describe("Path Configuration", () => {
   });
 
   it('http://localhost/keymanweb/src/test/manual/web', () => {
-    const paths = new PathConfiguration(OptionDefaults, 'http://localhost/keymanweb/src/test/manual/web');
+    const paths = new PathConfiguration(PathOptionDefaults, 'http://localhost/keymanweb/src/test/manual/web');
 
     assert.equal(paths.protocol, 'http:');
     assert.equal(paths.root, 'http://localhost/');
@@ -57,7 +57,7 @@ describe("Path Configuration", () => {
   });
 
   it('file:///C:/keymanapp/keyman/web/src/test/manual/web', () => {
-    const paths = new PathConfiguration({...OptionDefaults,
+    const paths = new PathConfiguration({...PathOptionDefaults,
       resources: '../../../../build/resources'
     }, 'file:///C:/keymanapp/keyman/web/src/test/manual/web');
 

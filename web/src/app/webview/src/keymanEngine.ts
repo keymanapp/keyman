@@ -1,24 +1,33 @@
-import { KeymanEngine as KeymanEngineBase } from 'keyman/engine/main';
-import { Configuration } from "keyman/engine/configuration";
+import { Configuration, InitOptionSpec, KeymanEngine as KeymanEngineBase } from 'keyman/engine/main';
 import { AnchoredOSKView, ViewConfiguration, StaticActivator } from 'keyman/engine/osk';
+import { toPrefixedKeyboardId, toUnprefixedKeyboardId } from 'keyman/engine/keyboard-cache';
 
 import ContextManager from './contextManager.js';
 import PassthroughKeyboard from './passthroughKeyboard.js';
 import { buildEmbeddedGestureConfig, setupEmbeddedListeners } from './oskConfiguration.js';
 
 export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKeyboard> {
-  constructor(config: Configuration, worker: Worker) {
-    // TODO:  set the old `namespacedID` function in a new Configuration property
-    // for use within `KeyboardInterface.registerStub` when available.
-    //
-    // Or... just build it in and configure via boolean flag?
-    super(config, worker, new ContextManager());
+  // Ideally, we would be able to auto-detect `sourceUri`: https://stackoverflow.com/a/60244278.
+  // But it's too new of a feature to utilize... and also expects to be in a module, when this may
+  // be compiled down to an IIFE.
+  constructor(worker: Worker, sourceUri: string) {
+    const config = new Configuration(sourceUri);  // currently set to perform device auto-detect.
+    config.stubNamespacer = (stub) => {
+      // If the package has not yet been applied as namespacing...
+      if(stub.KP && stub.KI.indexOf(`${stub.KP}::`) == -1) {
+        // Apply namespacing.  To make 100% sure that we don't muck up internal prefixing,
+        // we ensure it is applied consistently in the manner specified below.
+        stub.KI = toPrefixedKeyboardId(`${stub.KP}::${toUnprefixedKeyboardId(stub.KI)}`);
+      }
+    }
+
+    super(worker, config, new ContextManager());
 
     this.hardKeyboard = new PassthroughKeyboard(config.hardDevice);
   }
 
-  initialize() {
-    super.initialize();
+  initialize(options: InitOptionSpec) {
+    super.initialize(options);
 
     const oskConfig: ViewConfiguration = {
       hostDevice: this.config.hostDevice,

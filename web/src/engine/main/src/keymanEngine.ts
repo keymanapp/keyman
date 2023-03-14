@@ -1,11 +1,10 @@
-import { Configuration } from "keyman/engine/configuration";
 import { DefaultOutput, Keyboard, KeyboardKeymanGlobal, OutputTarget, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
 import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
 import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
 import { OSKView } from "keyman/engine/osk";
 import { KeyboardRequisitioner } from "keyman/engine/keyboard-cache";
-import DomCloudRequester from "keyman/engine/keyboard-cache/dom-requester";
 
+import { Configuration, InitOptionDefaults, InitOptionSpec } from "./configuration.js";
 import KeyboardInterface from "./keyboardInterface.js";
 import ContextManagerBase from "./contextManager.js";
 import { KeyEventHandler } from './keyEventSource.interface.js';
@@ -67,13 +66,20 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
       defaultOutputRules: new DefaultOutput()
     };
   };
-
-  constructor(config: Configuration, worker: Worker, contextManager: ContextManager) {
+  /**
+   * @param worker  A configured WebWorker to serve as the predictive-text engine's main thread.
+   *                Available in the following variants:
+   *                - sourcemapped, unminified (debug)
+   *                - non-sourcemapped + minified (release)
+   * @param config
+   * @param contextManager
+   */
+  constructor(worker: Worker, config: Configuration, contextManager: ContextManager) {
     this.config = config;
     this.contextManager = contextManager;
 
     // Since we're not sandboxing keyboard loads yet, we just use `window` as the jsGlobal object.
-    this.interface = new KeyboardInterface(window, this, this.contextManager);
+    this.interface = new KeyboardInterface(window, this, this.contextManager, config.stubNamespacer);
     const keyboardLoader = new KeyboardLoader(this.interface);
     this.keyboardRequisitioner = new KeyboardRequisitioner(keyboardLoader, new DOMCloudRequester(), this.config.paths);
 
@@ -117,17 +123,16 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
     });
   }
 
-  initialize(): void {
+  initialize(optionSpec: InitOptionSpec): void {
     // There may be some valid mutations possible even on repeated calls?
     // The original seems to allow it.
 
     if(this.config.deferForInitialization.hasFinalized) {
-      // abort!
+      // abort!  Maybe throw an error, too.
       return;
     }
 
-    // Once initialization is fully done:
-    this.config.deferForInitialization.resolve();
+    this.config.initialize({...InitOptionDefaults, ...optionSpec});
   }
 
   public get hardKeyboard(): HardKeyboard {
