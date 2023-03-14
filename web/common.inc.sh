@@ -19,7 +19,7 @@ compile ( ) {
     builder_die "Scripting error: insufficient argument count!"
   fi
 
-  local COMPILE_TARGET=$1
+  local COMPILE_TARGET="$1"
 
   tsc -b "${KEYMAN_ROOT}/web/src/$COMPILE_TARGET" -v
 
