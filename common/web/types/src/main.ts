@@ -10,7 +10,7 @@ export { default as KvksFileReader } from './kvk/kvks-file-reader.js';
 export { default as KvkFileWriter } from './kvk/kvk-file-writer.js';
 
 export * as LDMLKeyboard from './ldml-keyboard/ldml-keyboard-xml.js';
-export { LDMLKeyboardTestDataXMLSourceFile } from './ldml-keyboard/ldml-keyboard-testdata-xml';
+export { LDMLKeyboardTestDataXMLSourceFile } from './ldml-keyboard/ldml-keyboard-testdata-xml.js';
 export { default as LDMLKeyboardXMLSourceFileReader } from './ldml-keyboard/ldml-keyboard-xml-reader.js';
 
 export * as Constants from './consts/virtual-key-constants.js';

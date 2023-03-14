@@ -3,7 +3,7 @@ import { defaultApplyCasing,
          defaultSearchTermToKey
        } from "./model-defaults.js";
 
-import KEYMAN_VERSION from "@keymanapp/keyman-version/keyman-version.mjs";
+import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { LexicalModelSource, WordformToKeySpec } from "./lexical-model.js";
 
 /**

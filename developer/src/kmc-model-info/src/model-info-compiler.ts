@@ -9,7 +9,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import { minKeymanVersion } from "./min-keyman-version.js";
-// import KmpJsonFile from "@keymanapp/kmc-package/kmp-json-file";
+import { ModelInfoFile } from "./model-info-file.js";
+import { type KmpJsonFile } from "@keymanapp/kmc-package";
 
 export class ModelInfoOptions {
   /** The identifier for the model */
