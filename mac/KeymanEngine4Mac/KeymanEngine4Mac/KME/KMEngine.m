@@ -63,37 +63,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
       
       if (kmx) {
         [self loadCoreWrapperFromKmxFile:self.kmx.filePath];
-      } else {
-        //TODO remove test code
-        /*
-        NSString* keyboardPath = @"/a/dummy/keyboard.mock";
-        @try {
-          _keymanCore = [[CoreWrapper alloc] initWithHelper:_coreHelper kmxFilePath:keyboardPath];
-          NSLog(@"**SGS CoreWrapper id = %@", [self.keymanCore keyboardId]);
-        }
-        @catch (NSException *exception) {
-          NSLog(@"**SGS failed to create keyboard for path '%@' with exception: %@", keyboardPath, exception.description);
-        }
-        NSArray *actions = [self.keymanCore processMacVirtualKey:MVK_A
-                              withModifiers:0
-                               withKeyDown:YES];
-        NSLog(@"**SGS actions generated = %lu", (unsigned long)[actions count]);
-        
-        for (CoreAction *action in actions) {
-          NSLog(@"**SGS test type = %@", [action typeName]);
-          NSLog(@"**SGS test action = %@", [action description]);
-        }
-
-        actions = [self.keymanCore processMacVirtualKey:MVK_1
-                              withModifiers:0
-                               withKeyDown:YES];
-        NSLog(@"**SGS actions generated = %lu", (unsigned long)[actions count]);
-        
-        for (CoreAction *action in actions) {
-          NSLog(@"**SGS test type = %@", [action typeName]);
-          NSLog(@"**SGS test action = %@", [action description]);
-        }
-         */
+        [self.keymanCore setContext:ctxBuf];
       }
 
         _tmpCtxBuf = [[NSMutableString alloc] initWithString:ctxBuf];

@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic, readonly) NSString * keyboardId;
 @property (strong, nonatomic, readonly) NSString * keyboardVersion;
+@property (strong, nonatomic) NSString * context;
 
 -(instancetype)initWithHelper:(CoreHelper*)helper kmxFilePath:(nullable NSString*)path;
 -(void)changeKeyboardWithKmxFilePath:(NSString*)path;

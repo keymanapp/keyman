@@ -39,6 +39,14 @@
   return self;
 }
 
+-(NSString*)context {
+  return [self getContextAsStringUsingCore];
+}
+
+-(void)setContext:(NSString*)newValue {
+  [self setContextUsingCore:newValue];
+}
+
 -(void)changeKeyboardWithKmxFilePath:(NSString*) path {
   if (path != nil) {
     @try {
@@ -187,12 +195,8 @@
   return eventArray;
 }
 
--(NSString *)getCurrentContext {
-  return [self getContextAsStringUsingCore];
-}
-
 -(NSString *)getContextAsStringUsingCore {
-  km_kbp_context * context =  km_kbp_state_context(self.keyboardState);;
+  km_kbp_context * context =  km_kbp_state_context(self.keyboardState);
   
   km_kbp_context_item * contextItemsArray = nil;
   size_t contextLength = km_kbp_context_length(context);
@@ -226,6 +230,21 @@
   
   //NSLog(@"resulting contextString=%@", immutableString);
   return immutableString;
+}
+
+-(void)setContextUsingCore:(NSString*)context {
+  char const *coreString = [context cStringUsingEncoding:NSUTF8StringEncoding];
+  km_kbp_context_item *contextItemArray;
+
+  // create array of context items
+  km_kbp_status result = km_kbp_context_items_from_utf8(coreString, &contextItemArray);
+  NSLog(@"km_kbp_context_items_from_utf8, result=%i", result);
+
+  // set the context in core using the array
+  km_kbp_context * coreContext =  km_kbp_state_context(self.keyboardState);
+  km_kbp_context_set(coreContext, contextItemArray);
+  // dispose
+  km_kbp_context_items_dispose(contextItemArray);
 }
 
 //TODO create and save as static
