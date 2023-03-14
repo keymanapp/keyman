@@ -15,6 +15,14 @@ export class KeysCompiler extends SectionCompiler {
     return constants.section.keys;
   }
 
+  /**
+   *
+   * @returns just the non-touch layers.
+   */
+  public hardwareLayers() {
+    return this.keyboard.layers?.filter(({form}) => form !== 'touch');
+  }
+
   public validate() {
     let valid = true;
 
@@ -40,7 +48,7 @@ export class KeysCompiler extends SectionCompiler {
     // the layr compiler does more extensive validation of the layer attributes.
 
     // Kmap validation
-    const hardwareLayers = this.keyboard.layers?.filter(({form}) => form !== 'touch');
+    const hardwareLayers = this.hardwareLayers();
 
     if (hardwareLayers.length >= 1) {
       // validate all errors
@@ -72,7 +80,7 @@ export class KeysCompiler extends SectionCompiler {
 
     // Finally, kmap
     // Use LayerMap + keys to generate compiled keys for hardware
-    const hardwareLayers = this.keyboard.layers?.filter(({form}) => form !== 'touch');
+    const hardwareLayers = this.hardwareLayers();
     if (hardwareLayers.length > 1) {
       // validation should have already caught this
       throw Error(`Internal error: Expected 0 or 1 hardware layer, not ${hardwareLayers.length}`);
