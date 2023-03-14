@@ -22,7 +22,7 @@ SUBPROJECT_NAME=engine/element-wrappers
 # ################################ Main script ################################
 
 builder_describe "Builds DOM-based OutputTarget subclasses used by the Keyman Engine for Web (KMW)." \
-  "@../../../../common/web/keyboard-processor" \
+  "@/common/web/keyboard-processor" \
   "clean" \
   "configure" \
   "build" \

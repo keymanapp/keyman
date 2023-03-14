@@ -21,11 +21,11 @@ Keyman for Android uses [Sentry](https://sentry.io) for crash reporting at a ser
  
 ### Compiling From Command Line
 1. Launch a command prompt and cd to the directory **keyman/android**
-2. Run the top level build script `./build.sh -debug` which will:
+2. Run the top level build script `./build.sh configure build --debug` which will:
     * Compile KMEA (and its KMW dependency)
     * Download default keyboard and dictionary resources as needed
     * Compile KMAPro
-    * Note: to force an update to the latest keyboard and dictionary packages, use the `-download-resources` flag.
+    * Note: to force an update to the latest keyboard and dictionary packages, use the `--download-resources` flag.
 
 3. The APK will be found in **keyman/android/KMAPro/kMAPro/build/outputs/apk/debug/kMAPro-debug.apk**
 
@@ -75,14 +75,13 @@ There are two included sample projects that can be modified to test a keyboard.
 **android/Samples/KMSample1** app runs a bare Keyman app for testing a keyboard.
 
 **android/Samples/KMSample2** app provides prompts for setting KMSample2 as a system level keyboard.
-Both sample apps include a default Tamil keyboard.
+Both sample apps include a default Tamil keyboard and sample dictionary.
 
 Building these projects follow the same steps as KMAPro:
 
-1. Build KMEA
-2. cd to the desired KMSample directory
-3. `./build.sh`
-4. Open Android Studio to run the app
+1. cd to the desired KMSample directory
+2. `./build.sh`
+3. Open Android Studio to run the app
 
 ### Tests: KeyboardHarness
 
@@ -100,8 +99,8 @@ Building these projects follow the same steps as KMAPro:
 --------------------------------------------------------------
 
 ## How to Build Keyman Engine for Android
-1. Open a terminal or Git Bash prompt and go to Keyman Engine for Android project folder (e.g. `cd ~/keyman/android/KMEA/`)
-2. Run `./build.sh`
+1. Open a terminal or Git Bash prompt and go to the Android project folder (e.g. `cd ~/keyman/android/`)
+2. Run `./build.sh --debug`
 
 Keyman Engine for Android library (**keyman-engine.aar**) is now ready to be imported in any project.
 

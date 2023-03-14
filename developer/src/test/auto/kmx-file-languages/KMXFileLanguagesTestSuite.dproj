@@ -93,7 +93,6 @@
         </DelphiCompile>
         <DCCReference Include="..\..\..\common\delphi\keyboards\Keyman.System.KMXFileLanguages.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\keyboards\kmxfile.pas"/>
-        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\CRC32.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\utilfiletypes.pas"/>

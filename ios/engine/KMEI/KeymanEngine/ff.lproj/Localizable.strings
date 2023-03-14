@@ -83,7 +83,7 @@
 "info-command-help-keyboard" = "Ballal tappirde";
 
 /* Text for the command to open the help page of a lexical model, as shown on resource information views */
-"info-command-help-lexical-model" = "Ballal tappirde";
+"info-command-help-lexical-model" = "Ballal Saggitorde";
 
 /* Text label for displaying a keyboard's version, as shown on resource information views */
 "info-label-version-keyboard" = "Yamre tappirde";

@@ -214,26 +214,26 @@ void test_queue_actions (const km::kbp::path &source_keyboard) {
   km_kbp_state_imx_register_callback(test_state, test_imx_callback, (void*)&g_extract_imx_map);
 
   // Key Press that doesn't trigger a call back
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_S,KM_KBP_MODIFIER_SHIFT, 1));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_S,KM_KBP_MODIFIER_SHIFT, 1, KM_KBP_EVENT_FLAG_DEFAULT));
   assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('S')}}, {KM_KBP_IT_END}}));
 
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_BKSP, 0, 1));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_BKSP, 0, 1, KM_KBP_EVENT_FLAG_DEFAULT));
   assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('X')}}, {KM_KBP_IT_ALERT, {0,}, {0}}, {KM_KBP_IT_END}}));
 
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_ESC, 0, 1));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_ESC, 0, 1, KM_KBP_EVENT_FLAG_DEFAULT));
   assert(action_items(test_state, { {KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('Y')}},
                                     {KM_KBP_IT_MARKER, {0,}, {1}},
                                     {KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('A')}},
                                     {KM_KBP_IT_END}}));
 
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_1, 0, 1));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_1, 0, 1, KM_KBP_EVENT_FLAG_DEFAULT));
 
   km_kbp_action_item bksp_a = {KM_KBP_IT_BACK};
   bksp_a.backspace.expected_type = KM_KBP_BT_CHAR;
   bksp_a.backspace.expected_value = 'A';
   assert(action_items(test_state, {bksp_a,{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('Z')}}, {KM_KBP_IT_END}}));
 
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_2, 0, 1));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_2, 0, 1, KM_KBP_EVENT_FLAG_DEFAULT));
   assert(action_items(test_state, {{KM_KBP_IT_INVALIDATE_CONTEXT, {0,}, {0}}, {KM_KBP_IT_END}}));
 
   km_kbp_state_imx_deregister_callback(test_state);

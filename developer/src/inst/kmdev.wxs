@@ -264,6 +264,10 @@
       <Component Directory="INSTALLDIR">
         <File Name='kmlmp.cmd' KeyPath="yes" Source="node\kmlmp.cmd" />
       </Component>
+
+      <Component Directory="INSTALLDIR">
+        <File Name='kmc.cmd' KeyPath="yes" Source="node\kmc.cmd" />
+      </Component>
     </ComponentGroup>
 
     <ComponentGroup Id="AppData">
@@ -287,7 +291,7 @@
       <ComponentGroupRef Id="XML" />
       <ComponentGroupRef Id="CEF" />
       <ComponentGroupRef Id="Templates" />
-      <ComponentGroupRef Id="ModelCompiler" />
+      <ComponentGroupRef Id="kmc" />
       <ComponentGroupRef Id="Node" />
       <ComponentGroupRef Id="KeymanDevSentryComponents" />
       <ComponentGroupRef Id="Server" />

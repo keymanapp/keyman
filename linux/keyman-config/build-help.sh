@@ -5,7 +5,7 @@ set -u
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 THIS_DIR=$(dirname "$THIS_SCRIPT")
@@ -57,7 +57,7 @@ fi
 
 if [ -n "$reconfigure" ]; then
     pushd $THIS_DIR/.. > /dev/null
-    ./scripts/reconf.sh keyman-config
+    ./scripts/reconf.sh
     popd > /dev/null
 fi
 

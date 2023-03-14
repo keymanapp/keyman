@@ -31,25 +31,17 @@ if [ -f "/usr/share/ibus/component/keyman.xml" ] && [ "${SUDOINSTALL}" == "yes" 
 	fi
 fi
 
-cd keyboardprocessor/arch/release
+cd ../core/build/arch/release
 ninja install
 cd "$BASEDIR"
 
-cd build-ibus-keyman
+cd ibus-keyman
 if [[ "${SUDOINSTALL}" == "uninstall" ]]; then
-    if [ ! -f Makefile ]; then
-        echo "ibus-keyman must be configured before it is uninstalled. First run 'make configure'"
-        exit 1
-    fi
     echo "doing make uninstall of ibus-keyman"
-    make uninstall
+    ./build.sh uninstall
 else
-    if [ ! -f Makefile ]; then
-        echo "ibus-keyman must be configured and built before it is installed. First run 'make' or 'make tmpinstall'"
-        exit 1
-    fi
     echo "doing make install of ibus-keyman"
-    make install
+    ./build.sh install
 fi
 cd "$BASEDIR"
 

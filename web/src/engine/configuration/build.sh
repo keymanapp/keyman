@@ -23,7 +23,7 @@ SUBPROJECT_NAME=engine/configuration
 
 builder_describe "Builds configuration subclasses used by the Keyman Engine for Web (KMW)." \
   "@/common/web/keyboard-processor build" \
-  "@../device-detect build" \
+  "@/web/src/engine/device-detect build" \
   "clean" \
   "configure" \
   "build" \
@@ -59,6 +59,6 @@ fi
 
 if builder_start_action test; then
   # TODO:  CI vs manual:  how the tests are reported.
-  npm run mocha -- --recursive src/test/auto/headless/configuration
+  mocha --recursive "${KEYMAN_ROOT}/web/src/test/auto/headless/configuration"
   builder_finish_action success test
 fi

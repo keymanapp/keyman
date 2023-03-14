@@ -30,13 +30,13 @@ function debug_echo() {
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$(dirname "$THIS_SCRIPT")/trigger-definitions.inc.sh"
-. "$(dirname "$THIS_SCRIPT")/trigger-builds.inc.sh"
-. "$(dirname "$THIS_SCRIPT")/jq.inc.sh"
+. "${THIS_SCRIPT%/*}/trigger-definitions.inc.sh"
+. "${THIS_SCRIPT%/*}/trigger-builds.inc.sh"
+. "${THIS_SCRIPT%/*}/jq.inc.sh"
 
 #
 # Iterate through the platforms 'array' passed in and
