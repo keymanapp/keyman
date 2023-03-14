@@ -19,14 +19,14 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe \
   "Compiles the web-oriented utility function module." \
-  "@../keyman-version" \
+  "@/common/web/keyman-version" \
   configure \
   clean \
   build
 
 builder_describe_outputs \
   configure   "/node_modules" \
-  build       "build/obj/index.js"
+  build       "/common/web/recorder/build/obj/index.js"
 
 builder_parse "$@"
 
@@ -36,11 +36,11 @@ if builder_start_action configure; then
 fi
 
 if builder_start_action clean; then
-  npm run tsc -- -b --clean "$THIS_SCRIPT_PATH/tsconfig.json"
+  tsc --build --clean "$THIS_SCRIPT_PATH/tsconfig.json"
   builder_finish_action success clean
 fi
 
 if builder_start_action build; then
-  npm run tsc -- --build "$THIS_SCRIPT_PATH/tsconfig.json"
+  tsc --build "$THIS_SCRIPT_PATH/tsconfig.json"
   builder_finish_action success build
 fi

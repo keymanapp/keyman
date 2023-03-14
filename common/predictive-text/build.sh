@@ -25,10 +25,8 @@ cd "$(dirname "$THIS_SCRIPT")"
 #  "@../models/types" \ # is just a .d.ts, so there's nothing to actually BUILD.
 
 builder_describe "Builds the lm-layer module" \
-  "@../web/keyman-version" \
-  "@../models/templates" \
-  "@../models/wordbreakers" \
-  "@../web/lm-worker" \
+  "@/common/web/keyman-version" \
+  "@/common/web/lm-worker" \
   "clean" \
   "configure" \
   "build" \
@@ -37,7 +35,7 @@ builder_describe "Builds the lm-layer module" \
 
 builder_describe_outputs \
   configure  /node_modules \
-  build      build/lib/web/index.mjs # is built by the final step.
+  build      /common/predictive-text/build/lib/web/index.mjs # is built by the final step.
 
 builder_parse "$@"
 

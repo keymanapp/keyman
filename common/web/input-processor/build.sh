@@ -17,9 +17,9 @@ cd "$(dirname "$THIS_SCRIPT")"
 ################################ Main script ################################
 
 builder_describe "Builds the standalone, headless form of Keyman Engine for Web's input-processor module" \
-  "@../keyman-version" \
-  "@../keyboard-processor" \
-  "@../../predictive-text" \
+  "@/common/web/keyman-version" \
+  "@/common/web/keyboard-processor" \
+  "@/common/predictive-text" \
   "@/developer/src/kmc-model test" \
   "clean" \
   "configure" \
@@ -31,7 +31,7 @@ builder_describe "Builds the standalone, headless form of Keyman Engine for Web'
 
 builder_describe_outputs \
   configure          /node_modules \
-  build              build/lib/index.mjs \
+  build              /common/web/input-processor/build/lib/index.mjs \
 
 builder_parse "$@"
 
@@ -52,11 +52,11 @@ fi
 ### BUILD ACTIONS
 
 if builder_start_action build; then
-  npm run tsc -- -b ./tsconfig.json
+  tsc -b ./tsconfig.json
   node build-bundler.js
 
   # Declaration bundling.
-  npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
 
   builder_finish_action success build
 fi
@@ -69,7 +69,7 @@ if builder_start_action test; then
     FLAGS="--reporter mocha-teamcity-reporter"
   fi
 
-  npm run mocha -- --recursive $FLAGS ./tests/cases/
+  mocha --recursive $FLAGS ./tests/cases/
 
   builder_finish_action success test
 fi

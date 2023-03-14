@@ -28,7 +28,7 @@ builder_describe "Build the include script for current Keyman version" \
 
 builder_describe_outputs \
   configure "/node_modules" \
-  build     "build/version.inc.js"
+  build     "/common/web/keyman-version/build/version.inc.js"
 
 builder_parse "$@"
 
@@ -70,7 +70,7 @@ export class KEYMAN_VERSION {
 export default KEYMAN_VERSION;
   " > ./version.inc.ts
 
-  npm run tsc -- -b $builder_verbose
+  tsc -b $builder_verbose
   # kmlmc (the lexical model compiler) relies on a Node-based import, but after some of the earlier
   # ES-modularization work, our main output's an ES module.  Fortunately, esbuild can provide an easy stopgap.
 
