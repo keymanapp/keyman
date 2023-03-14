@@ -8,7 +8,7 @@
  * 
  * A class to encapsulate type conversions between Keyman Core C++ code and
  *  Keyman Engine for Mac Objective C code.
-
+ *
  * Only a single instance of this class is created, and it is injected at init
  * time to the other classes like CoreWrapper and CoreAction that use it. The
  * only data it contains is reference data, and it should never change state.
@@ -18,16 +18,23 @@
 #import "CoreAction.h"
 #import "keyboardprocessor.h"
 #import "KMEngine.h"  // included for VKMap
+#import "ActionArrayOptimizer.h"
 
 // TODO move VKMap here from KMEngine
 const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
 //uint32_t VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
+
+@interface CoreHelper()
+@property (strong, nonatomic, readonly) ActionArrayOptimizer *optimizer;
+@end
+
 
 @implementation CoreHelper
 
 -(instancetype)init {
   self = [super init];
   if (self) {
+    _optimizer = [[ActionArrayOptimizer alloc] init];
     //[self setVKMapping];
     }
     return self;
@@ -42,21 +49,30 @@ const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
 }
 
 /*
- The Keyman for Mac code represents each action returned from Keyman Engine as an NSDictionary.
- CoreWrapper returns CoreAction objects.
- This method converts an array of CoreAction objects to an array of NSDictionary objects.
- This allow us to replace the key processing code in Keyman Engine with Keyman Core and CoreWrapper
- without rewriting the Keyman Input Method code consuming the actions.
+ The legacy Keyman for Mac code represents each action returned from Keyman
+ Engine as an NSDictionary. CoreWrapper returns CoreAction objects. This method
+ converts an array of CoreAction objects to an array of NSDictionary objects.
+ This allows us to replace the key processing code in Keyman Engine with Keyman
+ Core and CoreWrapper without rewriting the Keyman Input Method code consuming
+ the actions.
+
+ Note that the CoreAction of type EndAction produced by Keyman Core is not
+ expected by Keyman for Mac and is removed during this conversion.
  */
--(NSArray*)actionObjectArrayToActionMapArray:(NSArray*)actionArray {
+-(NSArray*)actionObjectArrayToLegacyActionMapArray:(NSArray*)actionArray {
+
+  // legacy code expects the map array to be optimized, so we can do that before converting to NSDictionary
+  NSArray *optimizedArray = [self.optimizer actionArrayToOptimizedActionArray:actionArray];
+  
   NSMutableArray *mapArray = [[NSMutableArray alloc] init];
-  for (CoreAction *action in actionArray) {
+  for (CoreAction *action in optimizedArray) {
     NSLog(@"%@\n", action.typeName.description);
-    NSDictionary *actionMap = [action dictionaryForAction:action];
+    NSDictionary *actionMap = [action legacyDictionaryActionForActionObject:action];
     if (actionMap) {
       [mapArray addObject:actionMap];
     }
   }
+  
   return mapArray;
 }
 

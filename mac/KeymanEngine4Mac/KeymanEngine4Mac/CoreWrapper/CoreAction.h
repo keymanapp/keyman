@@ -29,8 +29,11 @@ enum ActionType {EndAction,
 @property (readonly) enum ActionType actionType;
 @property (strong, nonatomic, readonly) NSString *typeName;
 @property (strong, nonatomic, readonly) NSString *content;
+@property (readonly) int backspaceCount;
 -(instancetype)initWithActionStruct:(km_kbp_action_item*)actionStruct coreHelper:(CoreHelper*)helper;
--(NSDictionary*) dictionaryForAction:(CoreAction*)action;
+-(instancetype)initWithString:(NSString*)content;
+-(instancetype)initWithBackspaceCount:(int)count;
+-(NSDictionary*) legacyDictionaryActionForActionObject:(CoreAction*)action;
 @end
 
 NS_ASSUME_NONNULL_END

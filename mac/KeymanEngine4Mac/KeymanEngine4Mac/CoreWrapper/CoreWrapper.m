@@ -6,12 +6,10 @@
  * 
  * Created by Shawn Schantz on 2022-12-12.
  * 
- * A class to wrap an instance of a Keyman Core keyboard (a km_kbp_keyboard object) and
- * its associated objects.
- * A new CoreWrapper is created whenever Keyman for Mac
- * switches to a new keyboard.
- * The CoreWrapper allows Keyman Engine to be
- * mostly unaware of Keyman Core.  
+ * A class to wrap an instance of a Keyman Core keyboard (a km_kbp_keyboard
+ * object) and its associated objects. A new CoreWrapper is created whenever
+ * Keyman for Mac switches to a new keyboard. The CoreWrapper allows Keyman
+ * Engine to be mostly unaware of Keyman Core.
  */
 
 #import "CoreWrapper.h"
@@ -119,6 +117,26 @@
   }
 }
 
+-(NSArray*)processEvent:(nonnull NSEvent *)event {
+  // process key down events only
+  if (event.type != NSEventTypeKeyDown) {
+      return nil;
+  }
+  // do not process command keys
+  if ([event modifierFlags] & NSEventModifierFlagCommand) {
+      return nil;
+  }
+  
+  unsigned short macKeyCode = event.keyCode;
+  NSEventModifierFlags modifiers = event.modifierFlags;
+  //NSString *characters = [keyDownEvent characters];
+  //NSString *keycap = [keyDownEvent charactersIgnoringModifiers];
+
+  return [self processMacVirtualKey:macKeyCode
+                      withModifiers:modifiers
+                        withKeyDown:YES];
+}
+
 -(NSArray*)processMacVirtualKey:(unsigned short)macKeyCode
             withModifiers:(NSEventModifierFlags)modifiers
              withKeyDown:(BOOL) isKeyDown {
@@ -218,12 +236,12 @@
   coreOptionArray[0].scope = KM_KBP_OPT_ENVIRONMENT;
   coreOptionArray[0].key = KM_KBP_KMX_ENV_BASELAYOUT;
   //coreOptionArray[0].value = reinterpret_cast<km_kbp_cp*>(Globals::get_BaseKeyboardName());
-  coreOptionArray[0].value = u"";   // const char16_t*, encoded as UTF-16
+  coreOptionArray[0].value = u"kbdus.dll";   // const char16_t*, encoded as UTF-16
 
   coreOptionArray[1].scope = KM_KBP_OPT_ENVIRONMENT;
   coreOptionArray[1].key = KM_KBP_KMX_ENV_BASELAYOUTALT;
   //coreOptionArray[1].value = reinterpret_cast<km_kbp_cp*>(Globals::get_BaseKeyboardNameAlt());
-  coreOptionArray[1].value = u"";   // const char16_t*, encoded as UTF-16
+  coreOptionArray[1].value = u"en-US";   // const char16_t*, encoded as UTF-16
 
   coreOptionArray[2].scope = KM_KBP_OPT_ENVIRONMENT;
   coreOptionArray[2].key = KM_KBP_KMX_ENV_SIMULATEALTGR;
@@ -238,7 +256,7 @@
   coreOptionArray[4].scope = KM_KBP_OPT_ENVIRONMENT;
   coreOptionArray[4].key = KM_KBP_KMX_ENV_PLATFORM;
   //coreOptionArray[4].value = WINDOWS_PLATFORM_ENV;
-  coreOptionArray[4].value = u"mac hardware desktop native";   // const char16_t*, encoded as UTF-16
+  coreOptionArray[4].value = u"mac macos macosx hardware desktop native";   // const char16_t*, encoded as UTF-16
   
   coreOptionArray[5] = (km_kbp_option_item) {0};
   

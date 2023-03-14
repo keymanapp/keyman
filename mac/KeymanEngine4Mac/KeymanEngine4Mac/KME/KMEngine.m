@@ -62,9 +62,10 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
         _coreHelper = [[CoreHelper alloc] init];
       
       if (kmx) {
-        [self loadCoreWrapper];
+        [self loadCoreWrapperFromKmxFile:self.kmx.filePath];
       } else {
         //TODO remove test code
+        /*
         NSString* keyboardPath = @"/a/dummy/keyboard.mock";
         @try {
           _keymanCore = [[CoreWrapper alloc] initWithHelper:_coreHelper kmxFilePath:keyboardPath];
@@ -92,6 +93,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
           NSLog(@"**SGS test type = %@", [action typeName]);
           NSLog(@"**SGS test action = %@", [action description]);
         }
+         */
       }
 
         _tmpCtxBuf = [[NSMutableString alloc] initWithString:ctxBuf];
@@ -104,9 +106,8 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     return self;
 }
 
--(void)loadCoreWrapper {
-  NSString *kmxFilePath = self.kmx.filePath;
-  NSLog(@"**SGS setting kmxFile to path %@", kmxFilePath);
+-(void)loadCoreWrapperFromKmxFile:(NSString *)kmxFilePath {
+  NSLog(@"**SGS loading wrapper from kmx file: %@", kmxFilePath);
   
   @try {
     _keymanCore = [[CoreWrapper alloc] initWithHelper:_coreHelper kmxFilePath:kmxFilePath];
@@ -115,25 +116,15 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
   @catch (NSException *exception) {
     NSLog(@"**SGS failed to create keyboard for path '%@' with exception: %@", kmxFilePath, exception.description);
   }
-  
-  // send character to test
-  NSArray *actions = [self.keymanCore processMacVirtualKey:MVK_K
-                        withModifiers:0
-                         withKeyDown:YES];
-  NSLog(@"**SGS actions generated = %lu", (unsigned long)[actions count]);
-  
-  for (CoreAction *action in actions) {
-    NSLog(@"**SGS test type = %@", [action typeName]);
-    NSLog(@"**SGS test action = %@", [action description]);
-  }
 }
 
 -(void)setKmx:(KMXFile*) kmxFile {
-  if (_kmx == kmxFile) {
-    return;
-  } else {
+  if (_kmx!=kmxFile) {
     _kmx = kmxFile;
-    [self loadCoreWrapper];
+    //TODO is it valid to set kmx to nil? do we then dispose of the wrapper?
+    if (kmxFile != nil) {
+      [self loadCoreWrapperFromKmxFile:kmxFile.filePath];
+    }
   }
 }
 
@@ -183,12 +174,26 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     storeSaved.string = [[NSString alloc] initWithString:value];
 }
 
+/*
+ * Returns an NSArray of NSDictionary objects, one dictionary per action. Returns nil if no actions result.
+ */
 - (NSArray *)processEvent:(NSEvent *)event {
+  if (!self.kmx)
+      return nil;
+
+  if (self.keymanCore) {
+    NSLog(@"**SGS KME processEvent using CoreWrapper");
+    // CoreWrapper returns an array of CoreAction objects
+    NSArray *coreActions = [self.keymanCore processEvent:event];
+    // convert the CoreAction objects into Dictionary objects expected by the Input Method
+    //TODO make this nil assignment part of the conversion method
+    if ([coreActions count] == 0) {
+      return nil;
+    } else {
+      return [self.coreHelper actionObjectArrayToLegacyActionMapArray:coreActions];
+    }
+  } else {
     NSArray *actions = nil;
-
-    if (!self.kmx)
-        return nil;
-
     NSInteger startIndex = [[self.kmx.startGroup objectAtIndex:1] integerValue];
     if (startIndex < 0 || startIndex >= [self.kmx.group count])
         startIndex = [[self.kmx.startGroup objectAtIndex:0] integerValue];
@@ -203,6 +208,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     }
 
     return [[actions mutableCopy] optimise];
+  }
 }
 
 - (void) processPossibleEasterEggCharacterFrom:(NSString *)characters {

@@ -60,6 +60,7 @@ NSString *const Q_SAVEOPT = @"Q_SAVEOPT"; // KM_KBP_IT_PERSIST_OPT
       case KM_KBP_IT_BACK: {
         self->_actionType = BackspaceAction;
         self->_typeName = @"Backspace";
+        self->_backspaceCount = 1;
         break;
       }
       case KM_KBP_IT_PERSIST_OPT: {
@@ -91,6 +92,26 @@ NSString *const Q_SAVEOPT = @"Q_SAVEOPT"; // KM_KBP_IT_PERSIST_OPT
   return self;
 }
 
+-(instancetype)initWithString:(NSString*)content {
+  self = [super init];
+  if (self) {
+    self->_actionType = CharacterAction;
+    self->_typeName = @"Character";
+    self->_content = content;
+  }
+  return self;
+}
+
+-(instancetype)initWithBackspaceCount:(int)count {
+  self = [super init];
+  if (self) {
+    self->_actionType = BackspaceAction;
+    self->_typeName = @"Backspace";
+    self->_backspaceCount = count;
+  }
+  return self;
+}
+
 -(NSString *)description
 {
   NSString *actionDescription = @"";
@@ -101,7 +122,15 @@ NSString *const Q_SAVEOPT = @"Q_SAVEOPT"; // KM_KBP_IT_PERSIST_OPT
   return actionDescription;
 }
 
--(NSDictionary*) dictionaryForAction:(CoreAction*)action {
+/*
+ The legacy Keyman for Mac code represents each action returned from Keyman
+ Engine as an NSDictionary. CoreWrapper returns CoreAction objects. This method
+ converts a CoreAction object as an array of NSDictionary objects. This allows
+ us to replace the key processing code in Keyman Engine with Keyman Core and
+ CoreWrapper without rewriting the Keyman Input Method code consuming the
+ actions.
+ */
+-(NSDictionary*) legacyDictionaryActionForActionObject:(CoreAction*)action {
   NSDictionary *actionMap = nil;
   
   switch (action.actionType)
@@ -129,6 +158,10 @@ NSString *const Q_SAVEOPT = @"Q_SAVEOPT"; // KM_KBP_IT_PERSIST_OPT
     }
     case EmitKeystrokeAction: {
       actionMap = [[NSDictionary alloc] initWithObjectsAndKeys:@"", Q_RETURN, nil];
+      break;
+    }
+    case EndAction: {
+      // purposely return nil for EndAction, as it is not needed by the legacy Keyman for Mac code
       break;
     }
     default: {
