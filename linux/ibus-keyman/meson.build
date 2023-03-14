@@ -36,7 +36,9 @@ configure_file(output : 'config.h',
 core_include_dirs = [
   include_directories('../../core/src'),
   include_directories('../../core/src/kmx'),
+  include_directories('../../core/include'),
   include_directories('../../common/include'),
+  include_directories('../../core/build/arch' / get_option('buildtype') / 'include'),
 ]
 
 subdir('icons')

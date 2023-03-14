@@ -13,8 +13,8 @@ SIZE_THRESHOLD=1024
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
 . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
 . "$KEYMAN_ROOT/resources/build/github.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
@@ -154,7 +154,7 @@ if $WRITE_STATUS; then
     # If we have a GITHUB_TOKEN env var set, either via environment in TeamCity,
     # or via command line parameter, then we can attempt to report a GitHub status
     # check
-    die "Error: GITHUB_TOKEN variable is not set."
+    builder_die "Error: GITHUB_TOKEN variable is not set."
   fi
 
   if [ ! -z ${BUILD_VCS_NUMBER+x} ]; then
@@ -166,7 +166,7 @@ if $WRITE_STATUS; then
     # command line
     write_github_status_check "check/web/file-size" "$RESULT_STATE" "$RESULT_MESSAGE" "" $TARGET_SHA
   else
-    die "Error: could not find SHA to report against."
+    builder_die "Error: could not find SHA to report against."
   fi
 fi
 

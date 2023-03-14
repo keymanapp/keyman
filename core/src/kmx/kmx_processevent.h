@@ -12,6 +12,7 @@
 #include <string>
 #include <string.h>
 #include <keyman/keyboardprocessor_bits.h>
+#include "debuglog.h"
 #include "kmx_base.h"
 #include "kmx_file.h"
 #include "kmx_context.h"
@@ -28,7 +29,6 @@
 namespace km {
 namespace kbp {
 namespace kmx {
-
 
 /* Utility */
 
@@ -57,7 +57,6 @@ private:
   KMX_BOOL LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKeyboard);
   KMX_BOOL VerifyKeyboard(PKMX_BYTE filebase, size_t sz);
   KMX_BOOL VerifyChecksum(PKMX_BYTE buf,  size_t sz);
-  PKMX_WCHAR StringOffset(PKMX_BYTE base, KMX_DWORD offset);
 #ifdef KMX_64BIT
   LPKEYBOARD CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base);
 #else
@@ -108,6 +107,10 @@ public:
   KMX_Environment *GetEnvironment();
   KMX_Environment const *GetEnvironment() const;
   INTKEYBOARDINFO const *GetKeyboard() const;
+
+  // Utility function
+public:
+  static PKMX_WCHAR StringOffset(PKMX_BYTE base, KMX_DWORD offset);
 };
 
 inline KMX_BOOL KMX_ProcessEvent::IsCapsLockOn(KMX_DWORD modifiers) {
@@ -121,41 +124,7 @@ struct char_to_vkey {
   bool shifted, caps;
 };
 
-struct modifier_names {
-  const char *name;
-  uint16_t modifier;
-};
-
 extern const struct char_to_vkey s_char_to_vkey[];
-extern const char *s_key_names[];
-extern const struct modifier_names s_modifier_names[];
-
-/* Debugging */
-
-extern KMX_BOOL g_debug_ToConsole, g_debug_KeymanLog, g_silent;
-
-#ifdef _MSC_VER
-#define DebugLog(msg,...) (km::kbp::kmx::ShouldDebug() ? km::kbp::kmx::DebugLog_1(__FILE__, __LINE__, __FUNCTION__, (msg),__VA_ARGS__) : 0)
-#define console_error(msg,...) write_console(TRUE, (msg), __VA_ARGS__)
-#define console_log(msg,...) write_console(FALSE, (msg), __VA_ARGS__)
-#else
-#define DebugLog(msg,...) (ShouldDebug() ? DebugLog_1(__FILE__, __LINE__, __FUNCTION__, (msg), ##__VA_ARGS__) : 0)
-#define console_error(msg,...) write_console(TRUE, (msg), ##__VA_ARGS__)
-#define console_log(msg,...) write_console(FALSE, (msg), ##__VA_ARGS__)
-#endif
-
-int DebugLog_1(const char *file, int line, const char *function, const char *fmt, ...);
-const char *Debug_VirtualKey(KMX_WORD vk);
-const char *Debug_UnicodeString(PKMX_WCHAR s, int x = 0);
-const char *Debug_UnicodeString(std::u16string s, int x = 0);
-const char *Debug_ModifierName(KMX_UINT modifiers);
-
-inline KMX_BOOL ShouldDebug() {
-  return g_debug_KeymanLog;
-}
-
-
-void write_console(KMX_BOOL error, const wchar_t *fmt, ...);
 
 } // namespace kmx
 } // namespace kbp

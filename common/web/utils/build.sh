@@ -6,8 +6,8 @@ set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -41,7 +41,7 @@ fi
 if builder_start_action build; then
   # Note: in a dependency build, we'll expect utils to be built by tsc -b
   if builder_is_dep_build; then
-    echo "[$THIS_SCRIPT_IDENTIFIER] skipping tsc -b; will be completed by $builder_dep_parent"
+    builder_echo "skipping tsc -b; will be completed by $builder_dep_parent"
   else
     npm run tsc -- --build "$THIS_SCRIPT_PATH/tsconfig.json"
     node build-bundler.js
@@ -53,7 +53,7 @@ if builder_start_action build; then
 fi
 
 if builder_start_action test; then
-  echo_heading "Running web-utils test suite"
+  builder_heading "Running web-utils test suite"
 
   FLAGS=
   if builder_has_option --ci; then

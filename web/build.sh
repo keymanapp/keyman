@@ -8,8 +8,8 @@ set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -21,66 +21,9 @@ cd "$THIS_SCRIPT_PATH"
 
 # Definition of global compile constants
 
-UI="app/ui"
-WEB="app/web"
-EMBEDDED="app/embed"
-
-BUILD_BASE="build"
-
-DEBUG="debug"
-RELEASE="release"
-INTERMEDIATE="obj"
-
-# Composites and outputs the output path corresponding to the build configuration
-# specified by the parameters.
-#
-# ### Parameters
-#
-# * 1: - build product (app/embed, app/web, app/ui, engine)
-# * 2: (optional) - build stage / config (obj, debug, release)
-#
-# ### Example
-#
-# ```bash
-#   cp index.js "$(output_path app/web debug)/index.js"
-# ```
-#
-# The block above would copy index.js into the build output folder for app/web's debug
-# product.
-#
-# ``` bash
-#   rm -rf "$(output_path app/web)"
-# ```
-#
-# The block above is useful for deleting all app/web build products as part of a `clean`
-# action.
-#
-# ### Other Notes
-#
-# In the future, we may opt to move $INTERMEDIATE stuff underneath both $DEBUG and $RELEASE,
-# making it a third param.  This is currently unclear, but if so, we'd do
-# $DEBUG/$INTERMEDIATE and $RELEASE/$INTERMEDIATE via a third argument.
-output_path ( ) {
-  if [ $# -lt 1 ]; then
-    builder_die "Insufficient argument count!"
-  elif [ $# -eq 1 ]; then
-    # Used by clean:<target> actions
-    echo "$BUILD_BASE/$1"
-  else
-    echo "$BUILD_BASE/$1/$2"
-  fi
-}
-
-SOURCE="src"
-
-SENTRY_RELEASE_VERSION="release@$VERSION_WITH_TAG"
-
 # Ensures that we rely first upon the local npm-based install of Typescript.
 # (Facilitates automated setup for build agents.)
 PATH="../node_modules/.bin:$PATH"
-
-compiler="npm run tsc --"
-compilecmd="$compiler"
 
 PREDICTIVE_TEXT_SOURCE="../common/predictive-text/unit_tests/in_browser/resources/models/simple-trie.js"
 PREDICTIVE_TEXT_OUTPUT="src/test/manual/web/prediction-ui/simple-en-trie.js"
@@ -113,11 +56,12 @@ builder_describe_outputs \
   configure:ui      ../node_modules \
   configure:samples ../node_modules \
   configure:tools   ../node_modules \
-  build:embed       $(output_path $EMBEDDED $RELEASE)/keyman.js \
-  build:web         $(output_path $WEB $RELEASE)/keymanweb.js \
-  build:ui          $(output_path $UI $RELEASE)/kmwuibutton.js \
-  build:samples     $PREDICTIVE_TEXT_OUTPUT
-# Deliberately excluding build:tools b/c its script provides the definitions.
+  build:embed       build/app/embed/release/keyman.js \
+  build:engine      build/engine/main/obj/keymanweb.js \
+  build:web         build/app/web/release/keymanweb.js \
+  build:ui          build/app/ui/release/kmwuibutton.js \
+  build:samples     $PREDICTIVE_TEXT_OUTPUT \
+  build:tools       build/tools/building/sourcemap-root/index.js
 
 builder_parse "$@"
 
@@ -163,9 +107,8 @@ minified_sourcemap_cleaner="build/tools/building/sourcemap-root/index.mjs"
 
 # Fails the build if a specified file does not exist.
 assert_exists ( ) {
-  if ! [ -f $1 ]; then
-    echo "Build failed:  expected file ${COLOR_GREY}$1${COLOR_RESET} is missing."
-    exit 1
+  if [[ ! -f $1 ]]; then
+    builder_die "Build failed:  expected file ${COLOR_GREY}$1${COLOR_RESET} is missing."
   fi
 }
 
@@ -230,19 +173,19 @@ copy_resources ( ) {
 
   local RESOURCES_TO_COPY=("$@")
 
-  # We leave out $INTERMEDIATE here, as it's not a 'release' of any sort and
+  # We leave out obj here, as it's not a 'release' of any sort and
   # thus doesn't need to publish sources or resources.
-  local CONFIGS=($DEBUG)
+  local CONFIGS=(debug)
 
-  if ! builder_has_option --skip-minify; then
-    CONFIGS+=($RELEASE)
+  if ! builder_has_option --no-minify; then
+    CONFIGS+=(release)
   fi
 
   echo
 
   for CONFIG in "${CONFIGS[@]}";
   do
-    local CONFIG_OUT_PATH="$(output_path $COMPILE_TARGET $CONFIG)"
+    local CONFIG_OUT_PATH=build/$COMPILE_TARGET/$CONFIG
 
     echo Copying resources to $CONFIG_OUT_PATH/src
 
@@ -251,8 +194,8 @@ copy_resources ( ) {
       mkdir -p "$CONFIG_OUT_PATH/$RESOURCE"
       mkdir -p "$CONFIG_OUT_PATH/src/resources/$RESOURCE"
 
-      echo "- $SOURCE/resources/$RESOURCE/ => $CONFIG_OUT_PATH/$RESOURCE"
-      cp -Rf "$SOURCE/resources/$RESOURCE"  "$CONFIG_OUT_PATH/"  >/dev/null
+      echo "- src/resources/$RESOURCE/ => $CONFIG_OUT_PATH/$RESOURCE"
+      cp -Rf "src/resources/$RESOURCE"  "$CONFIG_OUT_PATH/"  >/dev/null
     done
 
     echo
@@ -278,17 +221,17 @@ copy_sources ( ) {
 
   local SOURCES_TO_COPY=("$@")
 
-  # We leave out $INTERMEDIATE here, as it's not a 'release' of any sort and
+  # We leave out obj here, as it's not a 'release' of any sort and
   # thus doesn't need to publish sources or resources.
-  CONFIGS=($DEBUG)
+  CONFIGS=(debug)
 
-  if ! builder_has_option --skip-minify; then
-    CONFIGS+=($RELEASE)
+  if ! builder_has_option --no-minify; then
+    CONFIGS+=(release)
   fi
 
   for CONFIG in "${CONFIGS[@]}";
   do
-    CONFIG_OUT_PATH="$(output_path $COMPILE_TARGET $CONFIG)"
+    local CONFIG_OUT_PATH=build/$COMPILE_TARGET/$CONFIG
     echo Copying $COMPILE_TARGET sources to $CONFIG_OUT_PATH/src
 
     rm -rf "$CONFIG_OUT_PATH/src"
@@ -297,9 +240,9 @@ copy_sources ( ) {
 
     for SOURCE_FOLDER in "${SOURCES_TO_COPY[@]}";
     do
-      echo "- $SOURCE/$SOURCE_FOLDER/ => $CONFIG_OUT_PATH/src/$SOURCE_FOLDER/"
+      echo "- src/$SOURCE_FOLDER/ => $CONFIG_OUT_PATH/src/$SOURCE_FOLDER/"
       mkdir -p "$CONFIG_OUT_PATH/src/$SOURCE_FOLDER"
-      cp -Rf  "$SOURCE/$SOURCE_FOLDER/"*    "$CONFIG_OUT_PATH/src/$SOURCE_FOLDER/"
+      cp -Rf  "src/$SOURCE_FOLDER/"*    "$CONFIG_OUT_PATH/src/$SOURCE_FOLDER/"
     done
 
     echo
@@ -349,16 +292,9 @@ copy_outputs ( ) {
 #   compile app/embed
 # ```
 compile ( ) {
-  if [ $# -lt 1 ]; then
-    fail "Scripting error: insufficient argument count!"
-  fi
-
   local COMPILE_TARGET=$1
-  local COMPILED_INTERMEDIATE_PATH="$(output_path $COMPILE_TARGET $INTERMEDIATE)"
-
-  $compilecmd -b src/$COMPILE_TARGET -v
-
-  echo $COMPILE_TARGET TypeScript compiled under $COMPILED_INTERMEDIATE_PATH
+  npm run tsc -- -b src/$COMPILE_TARGET -v || builder_die "Build command tsc -- -b src/$COMPILE_TARGET -v failed with exit code $?"
+  echo $COMPILE_TARGET TypeScript compiled under build/$COMPILE_TARGET/obj
 }
 
 # Finalizes all build products corresponding to the specified target.
@@ -377,13 +313,13 @@ compile ( ) {
 # ```
 finalize ( ) {
   if [ $# -lt 2 ]; then
-    fail "Scripting error: insufficient argument count!"
+    builder_die "Scripting error: insufficient argument count!"
   fi
 
   local COMPILE_TARGET=$1
-  local COMPILED_INTERMEDIATE_PATH="$(output_path $COMPILE_TARGET $INTERMEDIATE)"
-  local DEBUG_OUT_PATH="$(output_path $COMPILE_TARGET $DEBUG)"
-  local RELEASE_OUT_PATH="$(output_path $COMPILE_TARGET $RELEASE)"
+  local COMPILED_INTERMEDIATE_PATH=build/$COMPILE_TARGET/obj
+  local DEBUG_OUT_PATH=build/$COMPILE_TARGET/debug
+  local RELEASE_OUT_PATH=build/$COMPILE_TARGET/release
 
   shift
 
@@ -397,7 +333,7 @@ finalize ( ) {
   echo Compiled $COMPILE_TARGET debug version saved under $DEBUG_OUT_PATH: ${OUTPUT_SCRIPTS[*]}
 
   # START:  release output
-  if ! builder_has_option --skip-minify; then
+  if ! builder_has_option --no-minify; then
     for SCRIPT in "${OUTPUT_SCRIPTS[@]}";
     do
       minify "$COMPILED_INTERMEDIATE_PATH/$SCRIPT" "$RELEASE_OUT_PATH/$SCRIPT" SIMPLE_OPTIMIZATIONS
@@ -441,17 +377,17 @@ if builder_start_action clean:engine; then
 fi
 
 if builder_start_action clean:embed; then
-  rm -rf "$(output_path $EMBEDDED)"
+  rm -rf build/app/embed
   builder_finish_action success clean:embed
 fi
 
 if builder_start_action clean:web; then
-  rm -rf "$(output_path $WEB)"
+  rm -rf build/app/web
   builder_finish_action success clean:web
 fi
 
 if builder_start_action clean:ui; then
-  rm -rf "$(output_path $UI)"
+  rm -rf build/app/ui
   builder_finish_action success clean:ui
 fi
 
@@ -488,12 +424,12 @@ if builder_start_action build:engine; then
 fi
 
 if builder_start_action build:embed; then
-  compile $EMBEDDED
-  finalize $EMBEDDED ${EMBED_TARGETS[@]}
+  compile app/embed
+  finalize app/embed ${EMBED_TARGETS[@]}
 
   # The embedded version doesn't use UI modules.
-  copy_resources $EMBEDDED osk
-  copy_sources $EMBEDDED app/embed engine resources/osk
+  copy_resources app/embed osk
+  copy_sources app/embed app/embed engine resources/osk
 
   builder_finish_action success build:embed
 
@@ -508,7 +444,7 @@ if builder_start_action build:embed; then
   #     pushd $EMBED_OUTPUTs
   #   fi
   #   echo "Uploading to Sentry..."
-  #   npm run sentry-cli -- releases files "$SENTRY_RELEASE_VERSION" upload-sourcemaps --strip-common-prefix $ARTIFACT_FOLDER --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
+  #   npm run sentry-cli -- releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix $ARTIFACT_FOLDER --rewrite --ext js --ext map --ext ts || builder_die "Sentry upload failed."
   #   echo "Upload successful."
   #   popd
   # fi
@@ -517,22 +453,22 @@ fi
 ### -embed section complete.
 
 if builder_start_action build:web; then
-  compile $WEB
-  finalize $WEB ${WEB_TARGETS[@]}
+  compile app/web
+  finalize app/web ${WEB_TARGETS[@]}
 
   # The testing pages need both osk & ui resources in the same place.
-  copy_resources $WEB osk ui
-  copy_sources $WEB app/web engine resources/osk
+  copy_resources app/web osk ui
+  copy_sources app/web app/web engine resources/osk
 
   builder_finish_action success build:web
 fi
 
 if builder_start_action build:ui; then
-  compile $UI
-  finalize $UI ${UI_TARGETS[@]}
+  compile app/ui
+  finalize app/ui ${UI_TARGETS[@]}
 
-  copy_resources $UI ui
-  copy_sources $UI app/ui resources/ui
+  copy_resources app/ui ui
+  copy_sources app/ui app/ui resources/ui
 
   builder_finish_action success build:ui
 fi
@@ -572,7 +508,7 @@ fi
 # if [ $UPLOAD_WEB_SENTRY = true ]; then
 #     pushd $WEB_OUTPUT
 #     echo "Uploading to Sentry..."
-#     npm run sentry-cli -- releases files "$SENTRY_RELEASE_VERSION" upload-sourcemaps --strip-common-prefix release/web/ --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
+#     npm run sentry-cli -- releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix release/web/ --rewrite --ext js --ext map --ext ts || builder_die "Sentry upload failed."
 #     echo "Upload successful."
 #     popd
 # fi

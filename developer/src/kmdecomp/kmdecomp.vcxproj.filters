@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="crc32.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="kmdecomp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

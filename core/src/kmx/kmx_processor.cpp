@@ -249,7 +249,8 @@ kmx_processor::process_event(
   km_kbp_state *state,
   km_kbp_virtual_key vk,
   uint16_t modifier_state,
-  uint8_t is_key_down
+  uint8_t is_key_down,
+  uint16_t /* event_flags */
 ) {
   // Construct a context buffer from the items
   std::u16string ctxt;
@@ -257,11 +258,10 @@ kmx_processor::process_event(
   for (auto c = cp.begin(); c != cp.end(); c++) {
     switch (c->type) {
     case KM_KBP_CT_CHAR:
-      if (Uni_IsSMP(c->character)) {
-        ctxt += Uni_UTF32ToSurrogate1(c->character);
-        ctxt += Uni_UTF32ToSurrogate2(c->character);
-      } else {
-        ctxt += (km_kbp_cp)c->character;
+      {
+        km::kbp::kmx::char16_single buf;
+        const int len = km::kbp::kmx::Utf32CharToUtf16(c->character, buf);
+        ctxt.append(buf.ch, len);
       }
       break;
     case KM_KBP_CT_MARKER:

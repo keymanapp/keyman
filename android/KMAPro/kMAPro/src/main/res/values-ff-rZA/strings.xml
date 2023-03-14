@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <!-- app_name removed in 16.0 beta. Set in build.gradle -->
   <!-- Context: Menu Action -->
   <string name="action_share" comment="Menu action to send text content to another app">Lollin</string>
   <!-- Context: Menu Action -->
@@ -82,7 +83,7 @@
   <!-- Context: Keyman Settings menu / Spacebar caption hint -->
   <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">Hoto hollu cifol e palal boowe</string>
   <!-- Context: Keyman Settings menu / Haptic feedback -->
-  <string name="haptic_feedback" comment="haptic feedback on key press">Vibrate when typing</string>
+  <string name="haptic_feedback" comment="haptic feedback on key press">Yerɓu tuma tappugol</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner" comment="text suggestions banner">Hollu beywal sahaa kala</string>
   <!-- Context: Keyman Settings menu -->
@@ -156,5 +157,5 @@
   <!-- Context: KMP Package strings -->
   <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">Tappirde ena naamndii yamre Keyman ɓurnde hesɗude</string>
   <!-- Context: anywhere -->
-  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Horiima hurminde wanngorde geese</string>
 </resources>

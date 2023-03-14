@@ -33,12 +33,6 @@ BOOL SaveKeyboard(LPKEYBOARD kbd, PWSTR filename) {
   return TRUE;
 }
 
-void SetChecksum(LPBYTE buf, LPDWORD CheckSum, DWORD sz)
-{
-	BuildCRCTable();
-	*CheckSum = CalculateBufferCRC(buf, sz);
-}
-
 DWORD WriteCompiledKeyboard(LPKEYBOARD fk, HANDLE hOutfile, BOOL FSaveDebug)
 {
 	LPGROUP fgp;
@@ -93,7 +87,7 @@ DWORD WriteCompiledKeyboard(LPKEYBOARD fk, HANDLE hOutfile, BOOL FSaveDebug)
 	ck->dwIdentifier = FILEID_COMPILED;
 
   ck->dwFileVersion = fk->dwFileVersion;
-	ck->dwCheckSum = 0;		// do checksum afterwards.
+	ck->dwCheckSum = 0; // No checksum in 16.0, see #7276
 	ck->KeyboardID = fk->xxkbdlayout;
   ck->IsRegistered = fk->IsRegistered;
 	ck->cxStoreArray = fk->cxStoreArray;
@@ -206,8 +200,6 @@ DWORD WriteCompiledKeyboard(LPKEYBOARD fk, HANDLE hOutfile, BOOL FSaveDebug)
     delete[] buf;
     return CERR_SomewhereIGotItWrong;
   }
-
-	SetChecksum(buf, &ck->dwCheckSum, size);
 
 	WriteFile(hOutfile, buf, size, &offset, NULL);
 

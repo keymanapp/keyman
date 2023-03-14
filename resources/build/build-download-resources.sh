@@ -21,7 +21,7 @@ SHLVL=0
 function downloadKeyboardPackage() {
   # Check that $KEYBOARDS_TARGET is valid
   if [ "$#" -ne 2 ]; then
-      die "downloadKeyboardPackage requires KEYBOARD_PACKAGE_ID and KEYBOARDS_TARGET to be set"
+      builder_die "downloadKeyboardPackage requires KEYBOARD_PACKAGE_ID and KEYBOARDS_TARGET to be set"
   fi
   # Default Keyboard
   local ID="$1"
@@ -33,14 +33,14 @@ function downloadKeyboardPackage() {
   echo "Downloading ${ID}.kmp from downloads.keyman.com"
   local URL_DOWNLOAD_FILE=`curl -s "$URL_API_KEYBOARD_VERSION/${ID}" | "$JQ" -r .kmp`
   curl -f -s "$URL_DOWNLOAD_FILE" -o "$KEYBOARDS_TARGET" || {
-      die "Downloading $KEYBOARDS_TARGET failed with error $?"
+      builder_die "Downloading $KEYBOARDS_TARGET failed with error $?"
   }
 }
 
 function downloadModelPackage() {
   # Check that $MODELS_TARGET is valid
   if [ "$#" -ne 2 ]; then
-    die "downloadModelPackage requires MODEL_PACKAGE_ID and MODELS_TARGET to be set"
+    builder_die "downloadModelPackage requires MODEL_PACKAGE_ID and MODELS_TARGET to be set"
   fi
   # Default Model
   local ID="$1"
@@ -52,6 +52,6 @@ function downloadModelPackage() {
   echo "Downloading ${ID}.model.kmp from downloads.keyman.com"
   local URL_DOWNLOAD_FILE=`curl -s "$URL_API_MODEL_VERSION/${ID}" | "$JQ" -r .kmp`
   curl -f -s "$URL_DOWNLOAD_FILE" -o "$MODELS_TARGET" || {
-      die "Downloading $MODELS_TARGET failed with error $?"
+      builder_die "Downloading $MODELS_TARGET failed with error $?"
   }
 }

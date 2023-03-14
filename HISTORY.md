@@ -1,5 +1,114 @@
 # Keyman Version History
 
+## 17.0.65 alpha 2023-03-12
+
+* refactor(core): consolidate wasm defs (#8409)
+
+## 17.0.64 alpha 2023-03-10
+
+* feat(common): support single target for a dependency (#8404)
+* chore(core): breadth-first build (#8400)
+* refactor(common): Make build-help into helper functions (#8386)
+
+## 17.0.63 alpha 2023-03-09
+
+* fix(web): --no-minify, not --skip-minify (#8394)
+* chore(core): Remove obsolete `--target-path` option (#8376)
+
+## 17.0.62 alpha 2023-03-08
+
+* chore(linux): Remove debug output from packaging GHA (#8372)
+* chore: merge feature-ldml to master, again (#8377)
+* chore(common): cleanup build.inc.sh echo (#8344)
+* chore(common): remove vswhere (#8357)
+* feat(linux): Add DBus method `SendText` (#8039)
+* chore(core): Create both dynamic and static libs on Linux (#8375)
+* chore(common): clean up `--debug` usage in build scripts (#8382)
+* feat(common): builder.inc.sh inheritable options (#8384)
+
+## 17.0.61 alpha 2023-03-03
+
+* fix(android/app): Another attempt at fixing OSK rotation (#8353)
+
+## 17.0.60 alpha 2023-03-02
+
+* fix(android/engine): Fix various OSK bugs due to refactor (#8349)
+* feat(core): Build both architectures for mac and generate a 'fat' library for them (#8342)
+* fix(common): fixup npm publish (#8350)
+* chore(linux): More GHA debugging (#8354)
+
+## 17.0.59 alpha 2023-03-01
+
+* fix(common): builder: skip dependency build for clean action (#8341)
+* chore(web): fixup dependencies in web build script (#8332)
+* chore(linux): More debug output (#8345)
+
+## 17.0.58 alpha 2023-02-28
+
+* chore(common): fix child build error handling (#8327)
+* chore(linux): Improve and fix packaging GHA (#8328)
+* fix(linux): Fix ibus-keyman/build.sh (#8329)
+* epic: LDML keyboard support (#7054)
+* fix(linux): Fix debian postinst script (#8294)
+
+## 17.0.57 alpha 2023-02-26
+
+* chore(android/app): Revert #8291 (#8314)
+
+## 17.0.56 alpha 2023-02-24
+
+* fix(linux): Fix upload in packaging GHA (#8308)
+* feat(common): adds warning if described output does not exist (#8304)
+* chore(linux): Improve detecting presence of test files (#8313)
+
+## 17.0.55 alpha 2023-02-23
+
+* chore(docs): update docs due to Mac Ventura (#8277)
+* chore: remove greadlink from standard script prolog (#8288)
+* chore: use builtin instead of dirname for perf (#8289)
+* chore(common): stats script for planning (#7861)
+
+## 17.0.54 alpha 2023-02-22
+
+* fix(ios): allow duplicate languages in kmp file (#8125)
+* fix(linux): Fix paths in upload action of packaging GHA (#8285)
+* fix(android/app): Fix OSK width when rotating (#8291)
+
+## 17.0.53 alpha 2023-02-21
+
+* chore(windows): Remove old Kannada setup strings (#8257)
+* fix(linux): Collect consecutive backspaces (#8274)
+* chore(linux): Improve deb-packaging GHA (#8281)
+* chore(linux): Cleanup GHA (#8282)
+
+## 17.0.52 alpha 2023-02-20
+
+* fix(windows): use min-width allow to expand (#8215)
+* chore(web): minor cleanup of web/build.sh (#8254)
+* fix(web): `--no-minify`, not `--skip-minify` (#8264)
+* chore(web): Actually skip browser-stack for non-web builds (#8266)
+* chore: cleanup some of shellHelperFunctions.sh (#8260)
+* chore: consolidate script helper functions (#8261)
+* chore(linux): Output results of API verification on stderr (#8241)
+* chore(linux): Create draft PR after updating changelog (#8242)
+* fix(linux): Checkout before  running apt-install (#8247)
+* fix(linux): Fix bug in deb-packaging script (#8273)
+* chore(developer): update bundled node to 18.14.1 LTS (#8268)
+* chore(developer): ignore Esc key when compiling (#8263)
+* docs: builder.inc.sh improved documentation around dependencies (#8173)
+* chore(linux): Add build.sh to ibus-keyman  ️ (#8112)
+
+## 17.0.51 alpha 2023-02-18
+
+* chore(common): Update Fula strings for Sprint A17S6 (#8245)
+
+## 17.0.50 alpha 2023-02-16
+
+* feat(common): parent-child scripts for builder (#8198)
+* fix(linux): Another iteration to fix packaging GHA (#8230)
+* chore(common): updates Web & Web-related dependencies (#8196)
+* fix(linux): Fix syntax for skipping upload in packaging GHA (#8236)
+
 ## 17.0.49 alpha 2023-02-15
 
 * feat(linux): Pass PR# in the event type (#8221)

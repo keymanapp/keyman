@@ -15,8 +15,7 @@ objectives are:
    to know)
 3. for the scripts to be easily readable, coherent, and straightforward for
    anyone involved in the project to maintain
-4. for dependencies to be simple (a module dependency will always be to a whole
-   module, not to a specific target within that module)
+4. for dependencies to be simple, but flexible
 
 * [Jump to API definitions](#builder-api-functions-and-variables)
 
@@ -43,11 +42,13 @@ set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/<relative-path-to-repo-root>/resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-# any other includes, such as jq.inc.sh
+# . "$KEYMAN_ROOT/.../foo.inc.sh"     # any other includes, such as jq.inc.sh
+
+# cd "$THIS_SCRIPT_PATH"              # optionally, run from script directory
 
 ################################ Main script ################################
 ```
@@ -76,14 +77,12 @@ We use `set -eu` throughout:
 ```bash
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/<relative-path-to-repo-root>/resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 ```
 
-This somewhat unwieldy incantation handles all our build environments, with
-`greadlink` necessary on macOS (again installed with homebrew) due to the
-included macOS `readlink` struggling with canonicalization of symbolic links.
+This somewhat unwieldy incantation handles all our build environments.
 The intent is to get a good solid consistent path for the script so that we can
 safely include the build script, no matter what `pwd` is when the script is run.
 
@@ -104,6 +103,16 @@ available, so other include scripts should be sourced accordingly, for example:
 . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
 ```
 
+## Setting path
+
+Many scripts will be easier to code if they run from a consistent path. Because
+build scripts should be invokable from any directory, you may wish to add the
+following line here:
+
+```bash
+cd "$THIS_SCRIPT_PATH"
+```
+
 ## Split
 
 The comment line splitting the prologue from the body of the script is optional,
@@ -118,9 +127,9 @@ but makes the script easy to scan!
 The build script should use the `builder` functions and variables to process its
 command line and control its run.
 
-Build scripts can define **targets**, **actions**, and **options**, which are
-parameters passed in to the script when it is run by a user or called by
-another script:
+Build scripts can define **targets**, **actions**, **options**, and
+**dependencies**, which are parameters passed in to the script when it is run by
+a user or called by another script:
 
 * **targets**: these are the expected outputs of the build script. A target is
   prefixed with a `:`, for example `:app`. If no target is defined for a script,
@@ -141,18 +150,38 @@ another script:
 
 * **options**: these are possible additional options that can be passed to the
   script to modify the behavior of the script. All options should be prefixed
-  with `--`, such as `--debug`, and a shorthand single letter form may also be
-  optionally provided, such as `-d`.
+  with `--`, such as `--option`, and a shorthand single letter form may also be
+  optionally provided, such as `-o`.
 
   Note that when we call scripts from other scripts, particularly in CI, we
   should always use the longhand form; the shorthand form is for convenience on
   the command line only.
 
-  Be judicious in use of options; a common one will be `--debug` to do a debug
-  build, but overuse of options will make scripts hard to use.
+  Be judicious in use of options; overuse of options will make scripts hard to
+  use.
+
+  **Note:** `--debug` (or `-d`) is a standard option and should not be declared
+  again. See [`builder_is_debug_build`] for more details on the `--debug` flag.
 
   Options can be used to provide additional data, by including `=<varname>` in
   their definition. Otherwise, they are treated as a boolean.
+
+* **dependencies**: these are other builder scripts which must be configured and
+  built before the actions in this script can continue. Only `configure` and
+  `build` actions are ever passed to dependency scripts; these actions will
+  execute by default, for all targets of the dependency script.  If you are
+  working on code within a dependency, you are currently expected to rebuild and
+  test that dependency locally.
+
+  A dependency is similar to, but not the same as, a child project. Child
+  projects live in sub-folders of the parent project, whereas generally a
+  dependency will be in another folder altogether.
+
+  Dependencies can be defined for all actions and targets, or may be limited to
+  specific action and/or targets.
+
+  A dependency can be on a single target within a module, instead of all targets
+  within the module.
 
 The first step in your script is to describe the available parameters, using
 [`builder_describe`], for example:
@@ -213,6 +242,26 @@ include.
 Use the longer form of `if ...; then` rather than the shorter `[ ... ] && `
 pattern, for consistency and readability.
 
+# Internal dependencies
+
+All build scripts have a set of automatic internal dependencies:
+
+* `build` depends on `configure`
+* `test`, `install`, and `publish` depend on `build`
+
+Internal dependencies will be added to the list of targets for the build if you
+have described outputs for them, and the outputs do not exist, and the
+dependency is required for one of the targets specified on the command line.
+
+The build order of dependencies is determined by the order in which
+`builder_start_action` is called in the script for each action.
+
+You can also define your own internal dependencies with
+`builder_describe_internal_dependency`. This allows you to define dependencies
+across targets. Use this judiciously; for example, Keyman Core uses this to
+build both x86_64 and arm64 targets, and test only the appropriate architecture
+on macOS.
+
 # Standard builder parameters
 
 The following parameters are pre-defined and should not be overridden:
@@ -221,8 +270,26 @@ The following parameters are pre-defined and should not be overridden:
 * `--color`: forces on ANSI color output for the script
 * `--no-color`: forces off ANSI color output for the script
 * `--verbose`, `-v`: verbose mode, sets the [`$builder_verbose`] variable
+* `--debug`, `-d`: debug build; see [`builder_is_debug_build`] for more detail
+
+--------------------------------------------------------------------------------
 
 # Builder API functions and variables
+
+## `$builder_debug` variable
+
+This standard variable will be set to `"--debug"`, if the `--debug` or `-d`
+parameter is passed on the command line, and otherwise will be set to `""`.
+
+### Usage
+
+For example, can be used to pass `--debug` to another app:
+
+```bash
+npm test -- $builder_debug
+```
+
+--------------------------------------------------------------------------------
 
 ## `builder_describe` function
 
@@ -263,10 +330,10 @@ Or, a shorthand version for a simple script:
 builder_describe "Build version module" clean configure build test
 ```
 
-Each `param_desc` parameter defines a **target**, **action**, or **option**. All
-parameters passed on the command line in a call to the script (prior to `--`,
-see [`$builder_extra_params`] variable) must match one of the parameters defined
-here.
+Each `param_desc` parameter defines a **target**, **action**, **option**, or
+**dependency**. All parameters passed on the command line in a call to the
+script (prior to `--`, see [`$builder_extra_params`] variable) must match one of
+the parameters defined here.
 
 **Targets** are defined by including a `:` prefix, for example:
 
@@ -313,11 +380,13 @@ a definition:
 builder_describe "Testing script" clean test+
 ```
 
-**Options** are defined by including a `--` prefix, for example:
+**Options** are defined by including a `--` prefix.
+
+Specification of options: `"--option[,-o][+][=var]   [One line description]"`
 
 ```bash
 builder_describe "Sample script" \
-  --debug,-d \
+  --option,-o \
   "--out-path,-o=OUT_PATH    Specify output path"
 ```
 
@@ -325,6 +394,12 @@ A shorthand form may optionally be provided by appending `,-x` to the parameter
 definition, where `x` is a one letter shorthand form. Currently, shorthand forms
 may not be combined when invoking the script -- each must be passed separately.
 Ensure that you do not include a space after the comma.
+
+If a `+` is appended (after the optional shorthand form, but before the
+default), then the option will be passed to child scripts. All child scripts
+_must_ accept this option, or they will fail. It is acceptable for the child
+script to declare the option but ignore it. However, the option will _not_ be
+passed to dependencies.
 
 By default, an option will be treated as a boolean. It can be tested with
 [`builder_has_option`]. If you need to pass additional data, then the
@@ -335,10 +410,64 @@ to test for the presence of the parameter before attempting to use the variable.
 **Note:** although the definition uses `=` to define the variable, when invoking
 script, the value should be passed in as a separate parameter.
 
-There is one option with a predefined description: `--debug`. When including
-this, you should use `--debug,-d` to enable the shorthand form.
+There is one standard option: `--debug`. You should not include `--debug` in the
+`builder_describe` call, as it is always available. See
+[`builder_is_debug_build`] for more details.
 
 Note that you should not include any of the [standard builder parameters] here.
+
+**Dependencies** are defined with a `@` prefix, for example:
+
+```bash
+builder_describe "Sample script" \
+  "@/core configure build" \
+  configure \
+  build
+```
+
+A dependency always starts with `@`. The path to the dependency will be relative
+to the build script folder if the path does not start with `/`.  Otherwise, the path
+to the dependency is interpreted relative to the root of the repository. It is an
+error to specify a dependency outside the repo root.
+
+A dependency definition can include a target for that dependency, for example,
+`"@/core:arch"`. This would build only the ':arch' target for the core module.
+
+Relative paths will be expanded to full paths, again, relative to the root of
+the repository.
+
+Dependencies may be limited to specific `action:target` pairs on the current
+script. If not specified, dependencies will be built for all actions on all
+targets. Either `action` or `:target` may be omitted, and multiple actions and
+targets may be specified, space separated.
+
+--------------------------------------------------------------------------------
+
+## `builder_describe_internal_dependency` function
+
+Define a local dependency between one action:target and another.
+
+### Usage
+
+```bash
+builder_describe_internal_dependency action:target depaction:deptarget ...
+```
+
+### Parameters
+  * **action:target**:        The action and target that has a dependency
+  * **depaction:deptarget**:  The dependency action and target
+
+### Example
+
+```bash
+builder_describe_internal_dependency \
+  mac:build mac-x86_64:build \
+  mac:build mac-arm64:build
+```
+
+**Note:** actions and targets must be fully specified, and this _must_ be called
+before either builder_describe_outputs or builder_parse in order for
+dependencies to be resolved.
 
 --------------------------------------------------------------------------------
 
@@ -353,6 +482,91 @@ parameters, so must be called after `builder_describe`.
 builder_describe "sample" clean build test
 builder_display_usage
 ```
+
+--------------------------------------------------------------------------------
+
+## `builder_echo` function
+
+Wraps the `echo` command with color and a script identifier prefix.
+
+### Usage
+
+```bash
+builder_echo [mode] message
+```
+
+### Parameters
+
+Note: if only a single parameter passed, it will be the **message** parameter, and
+mode will be `white`.
+
+* **mode**: one of the following modes:
+  * `success`: A message indicating success, represented with green text
+  * `heading`: A heading, represented with blue text
+  * `warning`: A warning message, represented with yellow text
+  * `error`: An error message, represented with red text (consider [`builder_die`])
+  * `debug`: A debug string, represented with teal text (consider [`builder_echo_debug`])
+
+  Or color identifiers:
+  * `white`: Normal white text, the default if **mode** is omitted
+  * `grey`: Darker grey text
+  * `green`: Equivalent to `success`
+  * `blue`: Equivalent to `heading`
+  * `yellow`: Equivalent to `warning`
+  * `red`: Equivalent to `error`
+  * `purple`: Purple text, generally reserved by Builder for `setmark` section
+    headings
+  * `brightwhite`: Bright white text, generally reserved by Builder for
+    delineating current script messages
+  * `teal`: Teal text, equivalent to `debug`, generally reserved for debugging
+    messages
+
+  The following modes are used mostly by Builder internally:
+  * `setmark`: A marker for a section heading, represented with purple text
+
+* **message**: a string (surround with quote marks)
+
+### Description
+
+The `builder_echo` command will emit a string, with the current script
+identifier  at the start, optionally with color formatting (as long as the terminal
+supports color).
+
+```bash
+builder_echo "this went well"
+builder_echo error "this didn't go so well"
+```
+
+```
+[this/script/identifier] this went well
+[this/script/identifier] this didn't go so well
+```
+
+(Red text cannot be represented here!)
+
+The current script identifier will be grey for dependency builds and bright
+white for top-level builds and child builds.
+
+--------------------------------------------------------------------------------
+
+## `builder_echo_debug` function
+
+Wraps the `builder_echo` command with debug mode and a `[DEBUG]` prefix.
+
+### Usage
+
+```bash
+builder_echo_debug message
+```
+
+### Parameters
+
+* **message**: The message to emit to the console
+
+### Description
+
+This function is used internally within Builder, but can also be used by
+any builder scripts as required.
 
 --------------------------------------------------------------------------------
 
@@ -470,6 +684,29 @@ if builder_has_option --path; then
   echo "The output path is $OUT_PATH"
 fi
 ```
+
+--------------------------------------------------------------------------------
+
+## `builder_is_debug_build` function
+
+Returns `true` (aka 0) if the `--debug` standard option was passed in. This
+should be used instead of `builder_has_option --debug`.
+
+### Usage
+
+```bash
+if builder_is_debug_build; then
+  ... # e.g. CONFIG=debug
+fi
+```
+
+### Description
+
+The `--debug` standard option is currently handled differently to other options.
+It should never be declared in `builder_describe`, because it is always
+available anyway.
+
+`--debug` is automatically passed to child scripts and dependency scripts.
 
 --------------------------------------------------------------------------------
 
@@ -628,6 +865,8 @@ resolve either to empty string (for `$COLOR_*`), or equivalent plain-text forms
 * `$HEADING_SETMARK`: Add a setmark, e.g. with VSCode
   <https://code.visualstudio.com/updates/v1_69#_setmark-sequence-support>
 
+Note: it is often cleaner to use [`builder_echo`] than to use these variables directly.
+
 Note: it is recommended that you use `$(builder_term text)` instead of
 `${BUILDER_TERM_START}text${BUILDER_TERM_END}`.
 
@@ -644,3 +883,7 @@ Note: it is recommended that you use `$(builder_term text)` instead of
 [`$builder_verbose`]: #builderverbose-variable
 [formatting variables]: #formatting-variables
 [`builder_run_child_actions`]: #builderrunchildactions-function
+[`builder_echo`]: #builderecho-function
+[`builder_die`]: #builderdie-function
+[`builder_echo_debug`]: #builderechodebug-function
+[`builder_is_debug_build`]: #builderisdebugbuild-function
