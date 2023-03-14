@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.67 alpha 2023-03-14
+
+* (developer):Update copyright period in License.rtf (#8425)
+* chore(common): support shorthand for build.sh (#8415)
+* chore(common): build script performance improvements (#8416)
+* chore(common): TS updates to non-sync'd packages, feature-esmodule merge conflict prevention (#8429)
+
 ## 17.0.66 alpha 2023-03-13
 
 * refactor(android): Use builder scripts (#7407)
