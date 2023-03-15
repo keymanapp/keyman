@@ -28,7 +28,7 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
     this.hardKeyboard = new PassthroughKeyboard(config.hardDevice);
   }
 
-  initialize(options: WebviewInitOptionSpec) {
+  initialize(options: Required<WebviewInitOptionSpec>) {
     let device = new DeviceSpec('native', options.embeddingApp.indexOf('Tablet') >= 0 ? 'tablet' : 'phone', this.config.hostDevice.OS, true);
     this.config.hostDevice = device;
 
