@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+
+# Note: these two lines can be uncommented for debugging and profiling build
+# scripts:
+#
+#   set -x
+#   PS4='+ $EPOCHREALTIME $0 $LINENO   '
+#
+
 #
 # This script contains utilities for builder_script calls
 #
@@ -416,7 +424,8 @@ _builder_run_child_action() {
         # We have to re-test the action because the user may not
         # have specified all targets in their invocation
         if builder_has_action $action$target; then
-          if [ -f "$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh" ]; then
+          if [[ ! -z ${_builder_target_paths[$target]+x} ]] &&
+            [[ -f "$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh" ]]; then
             _builder_execute_child $action $target
           fi
         fi
@@ -1325,7 +1334,6 @@ _builder_parse_expanded_parameters() {
     # track which dependencies have been built, so they don't get built multiple
     # times.
     # TODO: consider printing expanded builder parameters instead of shorthand
-    echo "${_params[@]}"
     builder_echo setmark "build.sh parameters: <${_params[@]}>"
     if [[ ${#builder_extra_params[@]} -gt 0 ]]; then
       builder_echo grey "build.sh extra parameters: <${builder_extra_params[@]}>"

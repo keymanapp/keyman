@@ -1,17 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-@@keys: [SHIFT K_B][K_O][K_N][K_LBRKT][K_U][K_SPACE][K_S][K_A][K_RBRKT][K_RBRKT][K_A]
-@@expected: \u0042\u006f\u006e\u0121\u0075\u0020\u0073\u0061\u0127\u0127\u0061
-
-Note:
-    "Bonġu saħħa".split('').map(s=>`\\u${s.codePointAt(0).toString(16)}`).join('')
-Gets part of the way,
-
-    Based on mt.xml from CLDR.  'TODO-LDML' denotes modifications.
-    Note this is the 47-key version.
--->
-<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<!-- remainder entirely from resources/standards-data/ldml-keyboards/techpreview/3.0/mt-t-k0-47key.xml -->
+<!DOCTYPE keyboard SYSTEM "../dtd/ldmlKeyboard.dtd">
 <keyboard locale="mt-t-k0-47key" conformsTo="techpreview">
     <locales>
         <!-- English is also an official language in Malta.-->
@@ -26,8 +14,7 @@ Gets part of the way,
 
     <keys>
         <!-- imports -->
-        <import base="cldr" path="techpreview/keys-Zyyy-punctuation.xml" />
-        <import base="cldr" path="techpreview/keys-Zyyy-currency.xml" />
+        <import base="cldr" path="techpreview/key-Zyyy-punctuation.xml" />
 
         <!-- accent grave -->
         <key id="a-grave" to="à" />
@@ -84,7 +71,7 @@ Gets part of the way,
             <row keys="space" />
         </layer>
 
-        <layer modifier="altR shift">
+        <layer modifier="altR-shift">
             <row keys="tilde gap gap gap gap gap gap gap gap gap gap gap gap" />
             <row keys="gap gap E-grave gap gap gap U-grave I-grave O-grave gap open-curly close-curly pipe" />
             <row keys="A-grave gap gap gap gap gap gap gap gap gap gap" />

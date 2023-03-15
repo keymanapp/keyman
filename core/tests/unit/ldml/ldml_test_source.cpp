@@ -528,7 +528,7 @@ int LdmlJsonTestSourceFactory::load(const km::kbp::path &compiled, const km::kbp
   // TODO-LDML: store these elsewhere?
   std::cout << "JSON: reading " << info_name << " test of " << info_keyboard << " by " << info_author << std::endl;
 
-  // TODO-LDML: repertoire test
+  // TODO-LDML: repertoire test #8435
 
   auto all_tests = data["/keyboardTest/tests"_json_pointer];
   assert_or_return((!all_tests.empty()) && (all_tests.size() > 0));

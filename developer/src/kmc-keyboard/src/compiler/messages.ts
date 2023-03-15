@@ -71,29 +71,24 @@ export class CompilerMessages {
   m(this.ERROR_KeyMissingToGapOrSwitch, `key id='${o.keyId}' must have either to=, gap=, or switch=.`);
   static ERROR_KeyMissingToGapOrSwitch = SevError | 0x0011;
 
-  static Error_MustHaveAtMostOneLayersElementPerForm = (o:{form: string}) => m(this.ERROR_MustHaveAtMostOneLayersElementPerForm,
-      `Must have at most one layers element with form=${o.form}`);
-  static ERROR_MustHaveAtMostOneLayersElementPerForm = SevError | 0x0012;
+  static Error_ExcessHardware = (o:{form: string}) => m(this.ERROR_ExcessHardware,
+    `layers form=${o.form}: Can only have one non-'touch' element`);
+  static ERROR_ExcessHardware = SevError | 0x0012;
 
-  static Error_NoHardwareOnTouch = (o:{hardware: string}) => m(this.ERROR_NoHardwareOnTouch,
-    `Not allowed: form=touch with hardware=${o.hardware}`);
-  static ERROR_NoHardwareOnTouch = SevError | 0x0013;
-
-  static Error_MissingHardware = () => m(this.ERROR_MissingHardware,
-    `layers form=hardware missing hardware= attribute`);
-  static ERROR_MissingHardware = SevError | 0x0014;
-
-  static Error_InvalidHardware = (o:{hardware: string}) => m(this.ERROR_InvalidHardware,
-    `layers has invalid value hardware=${o.hardware}`);
-  static ERROR_InvalidHardware = SevError | 0x0015;
+  static Error_InvalidHardware = (o:{form: string}) => m(this.ERROR_InvalidHardware,
+    `layers has invalid value form=${o.form}`);
+  /**
+   * Note: may not hit this due to XML validation.
+   */
+  static ERROR_InvalidHardware = SevError | 0x0013;
 
   static Error_InvalidModifier = (o:{layer: string, modifier: string}) => m(this.ERROR_InvalidModifier,
     `layer has invalid modifier='${o.modifier}' on layer id=${o.layer}`);
-  static ERROR_InvalidModifier = SevError | 0x0016;
+  static ERROR_InvalidModifier = SevError | 0x0014;
 
   static Error_MissingFlicks = (o:{flicks: string, id: string}) => m(this.ERROR_MissingFlicks,
     `key id=${o.id} refers to missing flicks=${o.flicks}`);
-  static ERROR_MissingFlicks = SevError | 0x0017;
+  static ERROR_MissingFlicks = SevError | 0x0015;
 
   static severityName(code: number): string {
     let severity = code & CompilerErrorSeverity.Severity_Mask;
