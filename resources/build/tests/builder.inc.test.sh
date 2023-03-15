@@ -5,7 +5,7 @@ set -eu
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
 # END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -87,7 +87,7 @@ builder_parse_test() {
   shift
   shift
   local parameters="$@"
-  echo "${COLOR_BLUE}## Testing: builder_parse $parameters${COLOR_RESET}"
+  echo -e "${COLOR_BLUE}## Testing: builder_parse $parameters${COLOR_RESET}"
   builder_parse $parameters || builder_die "builder_parse died under curious circumstances"
   if [[ "$expected" != "${_builder_chosen_action_targets[@]}" ]]; then
     builder_die "  Test: builder_parse $parameters action:target != \"$expected\""
@@ -128,7 +128,7 @@ fi
 
 # Test --feature <foo>
 
-echo "${COLOR_BLUE}## Testing: builder_parse --feature xyzzy${COLOR_RESET}"
+echo -e "${COLOR_BLUE}## Testing: builder_parse --feature xyzzy${COLOR_RESET}"
 builder_parse --feature xyzzy
 
 if builder_has_option --feature; then
@@ -156,32 +156,24 @@ fi
 
 # Due to the nature of the build-utils-traps tests, only one may be
 # specified at a time; each ends with an `exit`.
-echo "${COLOR_BLUE}## Running trap tests${COLOR_RESET}"
+echo -e "${COLOR_BLUE}## Running trap tests${COLOR_RESET}"
 $THIS_SCRIPT_PATH/build-utils-traps.test.sh error
 $THIS_SCRIPT_PATH/build-utils-traps.test.sh error-in-function
 $THIS_SCRIPT_PATH/build-utils-traps.test.sh incomplete
-echo "${COLOR_BLUE}## Running dependency tests${COLOR_RESET}"
+echo -e "${COLOR_BLUE}## Running dependency tests${COLOR_RESET}"
 $THIS_SCRIPT_PATH/builder-deps.test.sh
-$THIS_SCRIPT_PATH/dependencies/app/build.sh configure build
+$THIS_SCRIPT_PATH/dependencies/test.sh
 
-$THIS_SCRIPT_PATH/dependencies/app/build.sh error && \
-  builder_die "FAIL: error code 0 but should have failed with exit code 22 from child dep" || (
-    result=$?
-    if [[ $result != 22 ]]; then
-      builder_die "FAIL: exit code $result but should have failed with exit code 22 from child dep"
-    fi
-  ) || exit $?
-
-echo "${COLOR_BLUE}## End external tests${COLOR_RESET}"
+echo -e "${COLOR_BLUE}## End external tests${COLOR_RESET}"
 echo
 
 (
   # Finally, run with --help so we can see what it looks like; note:
   # builder_parse calls `exit 0` on a --help run, so running in a subshell
-  echo "${COLOR_BLUE}## Testing --help${COLOR_RESET}"
+  echo -e "${COLOR_BLUE}## Testing --help${COLOR_RESET}"
   builder_parse --no-color --help
 ) || builder_die "FAIL: builder-parse returned failure code $? unexpectedly"
 
-echo "${COLOR_GREEN}======================================================${COLOR_RESET}"
-echo "${COLOR_GREEN}All tests passed successfully${COLOR_RESET}"
-echo "${COLOR_GREEN}======================================================${COLOR_RESET}"
+echo -e "${COLOR_GREEN}======================================================${COLOR_RESET}"
+echo -e "${COLOR_GREEN}All tests passed successfully${COLOR_RESET}"
+echo -e "${COLOR_GREEN}======================================================${COLOR_RESET}"

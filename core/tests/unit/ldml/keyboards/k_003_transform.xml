@@ -24,7 +24,7 @@ Note: keys should start with [K_A][K_B][K_C] not [K_Y] when transforms are funct
     <key id="hyphen" to="-"/>
   </keys>
 
-  <layers form="hardware" hardware="us">
+  <layers form="us">
     <layer id="base">
       <row keys="space" /> <!-- number row -->
       <row keys="q w e r t y u i o p" />

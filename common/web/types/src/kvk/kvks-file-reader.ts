@@ -1,6 +1,7 @@
 import * as xml2js from 'xml2js';
 import KVKSourceFile from './kvks-file.js';
-import Ajv from 'ajv';
+import { default as AjvModule } from 'ajv';
+const Ajv = AjvModule.default; // The actual expected Ajv type.
 import { boxXmlArray } from '../util/util.js';
 import { VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKey, VisualKeyboardKeyFlags, VisualKeyboardLegalShiftStates, VisualKeyboardShiftState } from './visual-keyboard.js';
 import { USVirtualKeyCodes } from '../consts/virtual-key-constants.js';

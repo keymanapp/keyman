@@ -62,7 +62,7 @@ jobs:
       shell: bash
       run: |
         THIS_SCRIPT="$GITHUB_WORKSPACE/.github/workflows/deb-packaging.yml"
-        . "resources/build/build-utils.sh"
+        . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
         echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
     - name: Set prerelease tag as output parameter
@@ -192,29 +192,14 @@ jobs:
 
     - name: Upload
       run: |
-        # DEBUG
-        set +x
-
-        ping -c 4 package-drop.psonet
-        cat ~/.dput.cf
-        # DEBUG
-
         case ${{ github.event.client_payload.branch }} in
           stable-*)  destination='' ;;
           beta)      destination='-proposed' ;;
           *)         destination='-experimental' ;;
         esac
 
-        ls -R
-
         echo -e "::group::${COLOR_GREEN}Upload source package"
         cd keyman-srcpkg
-
-        # DEBUG
-        echo "${COLOR_GREEN}Verify signature"
-        gpg --verify *.changes
-        echo "${COLOR_GREEN}dput source package"
-        # DEBUG
 
         dput -U llso:ubuntu/jammy${destination} *_source.changes
         echo "::endgroup::"

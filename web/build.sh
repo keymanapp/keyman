@@ -3,7 +3,6 @@
 # Compiles the Keyman Engine for Web and its various end-products
 #
 
-# set -x
 set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
@@ -23,15 +22,16 @@ cd "$THIS_SCRIPT_PATH"
 
 # Ensures that we rely first upon the local npm-based install of Typescript.
 # (Facilitates automated setup for build agents.)
+# TODO: this should be removeable given set_keyman_standard_build_path does this in build-utils.sh (and relative paths are dodgy in $PATH!)
 PATH="../node_modules/.bin:$PATH"
 
 PREDICTIVE_TEXT_SOURCE="../common/predictive-text/unit_tests/in_browser/resources/models/simple-trie.js"
 PREDICTIVE_TEXT_OUTPUT="src/test/manual/web/prediction-ui/simple-en-trie.js"
 
 builder_describe "Builds Keyman Engine for Web (KMW)." \
-  "@../common/web/keyman-version build" \
-  "@../common/web/input-processor build" \
-  "@src/tools/building/sourcemap-root build" \
+  "@/common/web/keyman-version build" \
+  "@/common/web/input-processor build" \
+  "@/web/src/tools/building/sourcemap-root build" \
   "clean" \
   "configure" \
   "build" \
@@ -49,19 +49,19 @@ builder_describe "Builds Keyman Engine for Web (KMW)." \
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $(builder_term build:embed) and $(builder_term build:web)" \
 
 builder_describe_outputs \
-  configure         ../node_modules \
-  configure:embed   ../node_modules \
-  configure:engine  ../node_modules \
-  configure:web     ../node_modules \
-  configure:ui      ../node_modules \
-  configure:samples ../node_modules \
-  configure:tools   ../node_modules \
-  build:embed       build/app/embed/release/keyman.js \
-  build:engine      build/engine/main/obj/keymanweb.js \
-  build:web         build/app/web/release/keymanweb.js \
-  build:ui          build/app/ui/release/kmwuibutton.js \
-  build:samples     $PREDICTIVE_TEXT_OUTPUT \
-  build:tools       build/tools/building/sourcemap-root/index.js
+  configure         /node_modules \
+  configure:embed   /node_modules \
+  configure:engine  /node_modules \
+  configure:web     /node_modules \
+  configure:ui      /node_modules \
+  configure:samples /node_modules \
+  configure:tools   /node_modules \
+  build:embed       /web/build/app/embed/release/keyman.js \
+  build:engine      /web/build/engine/main/obj/keymanweb.js \
+  build:web         /web/build/app/web/release/keymanweb.js \
+  build:ui          /web/build/app/ui/release/kmwuibutton.js \
+  build:samples     /web/$PREDICTIVE_TEXT_OUTPUT \
+  build:tools       /web/build/tools/building/sourcemap-root/index.js
 
 builder_parse "$@"
 
@@ -293,7 +293,7 @@ copy_outputs ( ) {
 # ```
 compile ( ) {
   local COMPILE_TARGET=$1
-  npm run tsc -- -b src/$COMPILE_TARGET -v || builder_die "Build command tsc -- -b src/$COMPILE_TARGET -v failed with exit code $?"
+  tsc -b src/$COMPILE_TARGET -v || builder_die "Build command tsc -b src/$COMPILE_TARGET -v failed with exit code $?"
   echo $COMPILE_TARGET TypeScript compiled under build/$COMPILE_TARGET/obj
 }
 
@@ -333,7 +333,7 @@ finalize ( ) {
   echo Compiled $COMPILE_TARGET debug version saved under $DEBUG_OUT_PATH: ${OUTPUT_SCRIPTS[*]}
 
   # START:  release output
-  if ! builder_has_option --skip-minify; then
+  if ! builder_has_option --no-minify; then
     for SCRIPT in "${OUTPUT_SCRIPTS[@]}";
     do
       minify "$COMPILED_INTERMEDIATE_PATH/$SCRIPT" "$RELEASE_OUT_PATH/$SCRIPT" SIMPLE_OPTIMIZATIONS

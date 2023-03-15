@@ -19,6 +19,7 @@ cd "$(dirname "$THIS_SCRIPT")"
 # Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
+. "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac
@@ -251,7 +252,7 @@ echo "KMEI build complete."
 if [ $DO_KEYMANAPP = true ]; then
   echo ""
   echo "Building offline help."
-  ./build-help.sh html
+  build_help_html ios keyman/Keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources
 
   echo ""
   echo "Building Keyman app."

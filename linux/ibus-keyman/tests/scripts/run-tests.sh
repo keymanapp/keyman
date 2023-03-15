@@ -60,7 +60,6 @@ function run_tests() {
 
   COMMON_ARCH_DIR=
   [ -d "${TOP_SRCDIR}"/../../core/build/arch ] && COMMON_ARCH_DIR=${TOP_SRCDIR}/../../core/build/arch
-  [ -d "${TOP_SRCDIR}"/../keyboardprocessor/arch ] && COMMON_ARCH_DIR=${TOP_SRCDIR}/../keyboardprocessor/arch
 
   if [ -d "${COMMON_ARCH_DIR}"/release ]; then
     COMMON_ARCH_DIR=${COMMON_ARCH_DIR}/release

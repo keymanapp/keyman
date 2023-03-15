@@ -18,6 +18,7 @@ tests = [
   'k_002_tinyu32',
   'k_003_transform',
   'k_004_tinyshift',
+  'k_005_modbittest',
   'k_010_mt',
   'k_011_mt_iso',
   'k_100_keytest',

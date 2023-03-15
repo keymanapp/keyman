@@ -17,7 +17,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 cd "$THIS_SCRIPT_PATH"
 
 builder_describe "Build Keyman common file types module" \
-  "@../keyman-version" \
+  "@/common/web/keyman-version" \
   "configure" \
   "build" \
   "clean" \
@@ -26,7 +26,7 @@ builder_describe "Build Keyman common file types module" \
   "--dry-run,-n              don't actually publish, just dry run"
 builder_describe_outputs \
   configure   /node_modules \
-  build       build/src/main.js
+  build       /common/web/types/build/src/main.js
 
 builder_parse "$@"
 

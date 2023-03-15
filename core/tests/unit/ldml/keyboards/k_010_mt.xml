@@ -11,7 +11,8 @@ Gets part of the way,
     Note this is the 47-key version.
 -->
 <!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
+<!-- remainder entirely from resources/standards-data/ldml-keyboards/techpreview/3.0/mt-t-k0-47key.xml -->
+<keyboard locale="mt-t-k0-47key" conformsTo="techpreview">
     <locales>
         <!-- English is also an official language in Malta.-->
         <locale id="en" />
@@ -19,16 +20,15 @@ Gets part of the way,
     <info author="Steven R. Loomis" normalization="NFC" layout="QWERTY" indicator="MT" />
 
     <names>
-        <name value="Maltese (47-key)" />
-        <!-- <name value="MSA 100:2002" /> -->
+        <name value="Maltese 47-key" />
+        <name value="MSA 100:2002 47-key" />
     </names>
 
     <keys>
         <!-- imports -->
-        <import base="cldr" path="techpreview/keys-Zyyy-punctuation.xml"/>
+        <import base="cldr" path="techpreview/keys-Zyyy-punctuation.xml" />
+        <import base="cldr" path="techpreview/keys-Zyyy-currency.xml" />
 
-        <!-- TODO-LDML: added next (but it is in a pending CLDR PR) #2652 -->
-        <key id="asterisk" to="*" />
         <!-- accent grave -->
         <key id="a-grave" to="à" />
         <key id="A-grave" to="À" />
@@ -41,8 +41,8 @@ Gets part of the way,
         <key id="u-grave" to="ù" />
         <key id="U-grave" to="Ù" />
 
-        <!-- tikka and maqtua -->
-        <key id="c-tikka" to="ċ" />
+        <!-- tikka and maqtugha -->
+        <key id="c-tikka" to="ċ" /> <!-- tikka is a dot -->
         <key id="C-tikka" to="Ċ" />
         <key id="g-tikka" to="ġ" />
         <key id="G-tikka" to="Ġ" />
@@ -53,13 +53,13 @@ Gets part of the way,
 
         <!-- Cedilla -->
         <key id="c-cedilla" to="ç" />
+
+        <!-- gaps -->
+        <key id="gap" gap="true" width="1" />
     </keys>
 
-
-    <!-- TODO-LDML: This has been modified to be the US 47-key format.
-        See MSA 100:2002, Appendix, figure A.1 -->
-
-    <layers form="hardware" hardware="us">
+    <!-- 47-key: MSA 100:2002, Appendix, figure A.1 -->
+    <layers form="us">
         <layer modifier="none">
             <row keys="c-tikka 1 2 3 4 5 6 7 8 9 0 hyphen equal" />
             <row keys="q w e r t y u i o p g-tikka h-maqtugha z-tikka" />
@@ -84,7 +84,7 @@ Gets part of the way,
             <row keys="space" />
         </layer>
 
-        <layer modifier="altR shift"> <!-- TODO-LDML: disallowed by current DTD but see CLDR https://github.com/unicode-org/cldr/pull/2661 -->
+        <layer modifier="altR shift">
             <row keys="tilde gap gap gap gap gap gap gap gap gap gap gap gap" />
             <row keys="gap gap E-grave gap gap gap U-grave I-grave O-grave gap open-curly close-curly pipe" />
             <row keys="A-grave gap gap gap gap gap gap gap gap gap gap" />
@@ -92,4 +92,5 @@ Gets part of the way,
             <row keys="space" />
         </layer>
     </layers>
+
 </keyboard>

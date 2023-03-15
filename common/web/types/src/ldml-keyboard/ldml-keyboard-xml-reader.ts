@@ -1,6 +1,7 @@
 import * as xml2js from 'xml2js';
 import { LDMLKeyboardXMLSourceFile, LKImport } from './ldml-keyboard-xml.js';
-import Ajv from 'ajv';
+import { default as AjvModule } from 'ajv';
+const Ajv = AjvModule.default; // The actual expected Ajv type.
 import { boxXmlArray } from '../util/util.js';
 import { CompilerCallbacks } from '../util/compiler-interfaces.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';

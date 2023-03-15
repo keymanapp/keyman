@@ -36,16 +36,16 @@ dpkg-source --tar-ignore=*~ --tar-ignore=.git --tar-ignore=.gitattributes \
     --tar-ignore=common/models --tar-ignore=common/predictive-text \
     --tar-ignore=common/resources --tar-ignore=common/schemas \
     --tar-ignore=common/test --tar-ignore=common/web --tar-ignore=common/windows \
+    --tar-ignore=core/build \
     --tar-ignore=developer --tar-ignore=docs --tar-ignore=ios \
     --tar-ignore=linux/keyman-config/buildtools/build-langtags.py --tar-ignore=__pycache__ \
     --tar-ignore=linux/help --tar-ignore=linux/Jenkinsfile \
-    --tar-ignore=linux/keyboardprocessor \
     --tar-ignore=mac --tar-ignore=node_modules --tar-ignore=oem \
     --tar-ignore=linux/build --tar-ignore=core/build \
     --tar-ignore=resources/devbox --tar-ignore=resources/git-hooks \
     --tar-ignore=resources/scopes \
     --tar-ignore=resources/build/*.lua --tar-ignore=resources/build/jq* \
-    --tar-ignore=resources/build/vswhere* --tar-ignore=results \
+    --tar-ignore=results \
     --tar-ignore=web --tar-ignore=windows --tar-ignore=keyman_1* \
     --tar-ignore=dist --tar-ignore=.pbuilderrc --tar-ignore=VERSION -Zgzip -b .
 mv ../keyman_"${VERSION}".tar.gz linux/dist/keyman-"${VERSION}".tar.gz

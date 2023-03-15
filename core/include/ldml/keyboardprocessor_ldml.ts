@@ -230,39 +230,39 @@ class Constants {
   /**
    * Constant for no modifiers
    */
-  readonly keys_mod_none = 0;
+  readonly keys_mod_none = 0x0000;
   /**
    * bitmask for Left Alt modifier key
    */
-  readonly keys_mod_altL = 1 << 2;
+  readonly keys_mod_altL = 0x0004;
   /**
    * bitmask for Right Alt (AltGr) modifier key
    */
-  readonly keys_mod_altR = 1 << 3;
+  readonly keys_mod_altR = 0x0008;
   /**
    * bitmask for either Alt (Windows) or Option (Apple) modifier keys
    */
-  readonly keys_mod_alt  = this.keys_mod_altL | this.keys_mod_altR;
+  readonly keys_mod_alt  = 0x0040;
   /**
    * bitmask for Caps modifier key
    */
-  readonly keys_mod_caps = 1 << 8;
+  readonly keys_mod_caps = 0x0100;
   /**
    * bitmask for Left control modifier key
    */
-  readonly keys_mod_ctrlL = 1 << 0;
+  readonly keys_mod_ctrlL = 0x0001;
   /**
    * bitmask for Right control modifier key
    */
-  readonly keys_mod_ctrlR = 1 << 1;
+  readonly keys_mod_ctrlR = 0x0002;
   /**
    * bitmask for either Control modifier key
    */
-  readonly keys_mod_ctrl = this.keys_mod_ctrlL | this.keys_mod_ctrlR;
+  readonly keys_mod_ctrl = 0x0020;
   /**
    * bitmask for either shift.
    */
-  readonly keys_mod_shift = 1 << 4;
+  readonly keys_mod_shift = 0x0010;
 
   /**
    * Convenience map for modifiers

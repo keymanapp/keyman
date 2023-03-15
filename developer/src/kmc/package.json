@@ -12,10 +12,10 @@
   "scripts": {
     "build": "tsc -b",
     "bundle": "npm run bundle-kmc && npm run bundle-kmlmc && npm run bundle-kmlmi && npm run bundle-kmlmp",
-    "bundle-kmc": "esbuild build/src/kmc.js --bundle --platform=node > build/cjs-src/kmc.cjs",
-    "bundle-kmlmc": "esbuild build/src/kmlmc.js --bundle --platform=node > build/cjs-src/kmlmc.cjs",
-    "bundle-kmlmi": "esbuild build/src/kmlmi.js --bundle --platform=node > build/cjs-src/kmlmi.cjs",
-    "bundle-kmlmp": "esbuild build/src/kmlmp.js --bundle --platform=node > build/cjs-src/kmlmp.cjs",
+    "bundle-kmc": "esbuild build/src/kmc.js --bundle --platform=node --target=es2022 > build/cjs-src/kmc.cjs",
+    "bundle-kmlmc": "esbuild build/src/kmlmc.js --bundle --platform=node --target=es2022 > build/cjs-src/kmlmc.cjs",
+    "bundle-kmlmi": "esbuild build/src/kmlmi.js --bundle --platform=node --target=es2022 > build/cjs-src/kmlmi.cjs",
+    "bundle-kmlmp": "esbuild build/src/kmlmp.js --bundle --platform=node --target=es2022 > build/cjs-src/kmlmp.cjs",
     "test": "cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha",
     "prepublishOnly": "npm run build"
   },
@@ -57,7 +57,7 @@
     "esbuild": "^0.15.8",
     "mocha": "^8.4.0",
     "ts-node": "^9.1.1",
-    "typescript": "^4.5.4"
+    "typescript": "^4.9.5"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",

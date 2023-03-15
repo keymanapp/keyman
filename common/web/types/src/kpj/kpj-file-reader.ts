@@ -1,6 +1,7 @@
 import * as xml2js from 'xml2js';
 import { KPJFile, KPJFileProject } from './kpj-file.js';
-import Ajv from 'ajv';
+import { default as AjvModule } from 'ajv';
+const Ajv = AjvModule.default; // The actual expected Ajv type.
 import { boxXmlArray } from '../util/util.js';
 import { KeymanDeveloperProject, KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from './keyman-developer-project.js';
 

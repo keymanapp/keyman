@@ -3,7 +3,7 @@
 # This file maps specific paths to build triggers
 #
 
-available_platforms=(android ios linux mac web windows developer)
+available_platforms=(android common_web common_windows common_mac common_linux ios linux mac web windows developer)
 
 # the base folder for each pattern does not need to be included, nor oem folders
 # e.g. android='common/models|common/predictive-text'
@@ -16,6 +16,11 @@ watch_mac='core'
 watch_web='common/models|common/predictive-text|common/web|core'
 watch_windows='common|core|web'
 watch_developer='common|core|web'
+
+watch_common_web='common/web'
+watch_common_windows='common/windows'
+watch_common_mac='common/mac'
+watch_common_linux='common/linux'
 
 #
 # Available build configurations and VCS identifiers; identifiers are somewhat inconsistent due
@@ -41,6 +46,12 @@ bc_test_mac=(Keyman_KeymanMac_PullRequests Keyman_Common_KPAPI_TestPullRequests_
 bc_test_windows=(KeymanDesktop_TestPullRequests KeymanDesktop_TestPrRenderOnScreenKeyboards Keyman_Common_KPAPI_TestPullRequests_Windows)
 bc_test_web=(Keymanweb_TestPullRequests Keyman_Common_LMLayer_TestPullRequests Keyman_Common_KPAPI_TestPullRequests_WASM)
 bc_test_developer=(Keyman_Developer_Test)
+
+bc_test_common_web=(Keyman_Test_Common_Web)
+bc_test_common_windows=(Keyman_Test_Common_Windows)
+bc_test_common_mac=(Keyman_Test_Common_Mac)
+bc_test_common_linux=(Keyman_Test_Common_Linux)
+
 # Keymanweb_TestPullRequestRegressions : currently this is timing out so disabled until we have
 #                                        time to investigate further
 

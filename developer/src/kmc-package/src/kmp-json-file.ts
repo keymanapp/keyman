@@ -1,4 +1,4 @@
-interface KmpJsonFile {
+export interface KmpJsonFile {
   system: KmpJsonFileSystem;
   options: KmpJsonFileOptions;
   info?: KmpJsonFileInfo;
@@ -9,12 +9,12 @@ interface KmpJsonFile {
   strings?: string[];
 }
 
-interface KmpJsonFileSystem {
+export interface KmpJsonFileSystem {
   keymanDeveloperVersion: string;
   fileVersion: string;
 }
 
-interface KmpJsonFileOptions {
+export interface KmpJsonFileOptions {
   readmeFile?: string;
   graphicFile?: string;
   executeProgram?: string;
@@ -22,7 +22,7 @@ interface KmpJsonFileOptions {
   msiOptions?: string;
 }
 
-interface KmpJsonFileInfo {
+export interface KmpJsonFileInfo {
   website?: KmpJsonFileInfoItem;
   version?: KmpJsonFileInfoItem;
   name?: KmpJsonFileInfoItem;
@@ -30,29 +30,29 @@ interface KmpJsonFileInfo {
   author?: KmpJsonFileInfoItem;
 }
 
-interface KmpJsonFileInfoItem {
+export interface KmpJsonFileInfoItem {
   description: string;
   url?: string;
 }
 
-interface KmpJsonFileContentFile {
+export interface KmpJsonFileContentFile {
   name: string;
   description: string;
   copyLocation?: number;
 }
 
-interface KmpJsonFileLexicalModel {
+export interface KmpJsonFileLexicalModel {
   name: string;
   id: string;
   languages: KmpJsonFileLanguage[];
 }
 
-interface KmpJsonFileLanguage {
+export interface KmpJsonFileLanguage {
   name: string;
   id: string;
 }
 
-interface KmpJsonFileKeyboard {
+export interface KmpJsonFileKeyboard {
   name: string;
   id: string;
   version: string;
@@ -62,13 +62,13 @@ interface KmpJsonFileKeyboard {
   languages?: KmpJsonFileLanguage[];
 }
 
-interface KmpJsonFileStartMenu {
+export interface KmpJsonFileStartMenu {
   folder?: string;
   addUninstallEntry?: boolean;
   items?: KmpJsonFileStartMenuItem[];
 }
 
-interface KmpJsonFileStartMenuItem {
+export interface KmpJsonFileStartMenuItem {
   name: string;
   filename: string;
   arguments?: string;
