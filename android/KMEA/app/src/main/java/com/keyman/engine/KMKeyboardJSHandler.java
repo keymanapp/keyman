@@ -64,6 +64,111 @@ public abstract class KMKeyboardJSHandler {
     }
   }
 
+  /**
+   * Inserts the selected string <i>s</i>
+   * @param dn  Number of pre-caret code points (UTF+8 characters) to delete
+   * @param s   Text to insert
+   * @param dr  Number of post-caret code points to delete.
+   */
+  @JavascriptInterface
+  public void insertText(final int dn, final String s, final int dr, final boolean executingHardwareKeystroke) {
+    Handler mainLoop = new Handler(Looper.getMainLooper());
+    mainLoop.post(new Runnable() {
+      public void run() {
+        if (SystemKeyboard == null) {
+          KMLog.LogError(TAG, "insertText failed: SystemKeyboard is null");
+          return;
+        }
+
+        if (SystemKeyboard.subKeysWindow != null) {
+          return;
+        }
+
+        InputConnection ic = IMService.getCurrentInputConnection();
+        if (ic == null) {
+          if (isDebugMode()) {
+            Log.w(HANDLER_TAG, "insertText failed: InputConnection is null");
+          }
+          return;
+        }
+
+        ic.beginBatchEdit();
+
+        int deleteLeft = dn;
+
+        // Delete any existing selected text.
+        ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
+        if (icText != null) { // This can be null if the input connection becomes invalid.
+          int start = icText.startOffset + icText.selectionStart;
+          int end = icText.startOffset + icText.selectionEnd;
+          if (end < start) {
+            // Swap start/end for backward selection
+            int temp = start;
+            start = end;
+            end = temp;
+          }
+          if (end > start) {
+            if (s.length() == 0) {
+              ic.setSelection(start, start);
+              ic.deleteSurroundingText(0, end - start);
+              ic.endBatchEdit();
+              return;
+            } else {
+              SystemKeyboardShouldIgnoreSelectionChange = true;
+              ic.setSelection(start, start);
+              ic.deleteSurroundingText(0, end - start);
+            }
+
+            // KeymanWeb tells us how to delete the selection, but we don't
+            // want to do that twice
+            deleteLeft = 0;
+          }
+        }
+
+        if (s.length() > 0 && s.charAt(0) == '\n') {
+          keyDownUp(KeyEvent.KEYCODE_ENTER);
+          ic.endBatchEdit();
+          return;
+        }
+
+        // Perform left-deletions
+        if (deleteLeft > 0) {
+          performLeftDeletions(ic, deleteLeft);
+        }
+
+        // Perform right-deletions
+        for (int i = 0; i < dr; i++) {
+          CharSequence chars = ic.getTextAfterCursor(1, 0);
+          if (chars != null && chars.length() > 0) {
+            char c = chars.charAt(0);
+            SystemKeyboardShouldIgnoreSelectionChange = true;
+            if (Character.isHighSurrogate(c)) {
+              ic.deleteSurroundingText(0, 2);
+            } else {
+              ic.deleteSurroundingText(0, 1);
+            }
+          }
+        }
+
+        if (s.length() > 0) {
+          SystemKeyboardShouldIgnoreSelectionChange = true;
+
+          // Commit the string s. Use newCursorPosition 1 so cursor will end up after the string.
+          ic.commitText(s, 1);
+        }
+
+        SystemKeyboard.dismissHelpBubble();
+        SystemKeyboard.setShouldShowHelpBubble(false);
+
+        ic.endBatchEdit();
+        ViewGroup parent = (ViewGroup) SystemKeyboard.getParent();
+        if (parent != null && mayHaveHapticFeedback && !executingHardwareKeystroke) {
+          parent.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+        }
+      }
+    });
+  }
+
   // Store the current keyboard chirality status from KMW in the Keyboard
   @JavascriptInterface
   public void setIsChiral(boolean isChiral) {
