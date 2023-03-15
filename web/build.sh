@@ -59,7 +59,6 @@ builder_parse "$@"
 # We can run all clean & configure actions at once without much issue.
 
 builder_run_child_actions clean
-builder_run_child_actions configure
 
 ## Clean actions
 
@@ -67,6 +66,14 @@ builder_run_child_actions configure
 if builder_start_action clean; then
   rm -rf ./build
   builder_finish_action success clean
+fi
+
+# Do not call child actions for configure - they all do the same thing, and it can take a while.
+
+if builder_start_action configure; then
+  verify_npm_setup
+
+  builder_finish_action success configure
 fi
 
 ## Build actions
