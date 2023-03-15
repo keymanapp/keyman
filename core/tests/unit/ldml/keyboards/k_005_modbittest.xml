@@ -16,7 +16,7 @@
 
   <keys/> <!-- implied only -->
 
-  <layers form="hardware" hardware="us">
+  <layers form="us">
     <layer id="base" modifier="none">
       <row keys="a" /> <!-- K_BKQUOTE -->
     </layer>
