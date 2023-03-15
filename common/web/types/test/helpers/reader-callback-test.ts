@@ -6,7 +6,8 @@ import { CompilerCallbacks, CompilerEvent } from '../../src/util/compiler-interf
 import { LDMLKeyboardXMLSourceFile } from '../../src/ldml-keyboard/ldml-keyboard-xml.js';
 import { LDMLKeyboardTestDataXMLSourceFile } from '../ldml-keyboard/ldml-keyboard-testdata-xml.js';
 
-// TODO-LDML: this is largely a port from developer/src/kmc-keyboard/test/helpers/index.ts
+// This is related to developer/src/kmc-keyboard/test/helpers/index.ts but has a slightly different API surface
+// as this runs at a lower level than the compiler.
 
 /**
  * A CompilerCallbacks implementation for testing
