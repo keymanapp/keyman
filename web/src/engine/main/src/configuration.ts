@@ -4,7 +4,11 @@ import { Device } from "keyman/engine/device-detect";
 import { KeyboardStub } from "keyman/engine/keyboard-cache";
 
 export class Configuration {
-  readonly hostDevice: DeviceSpec;
+  // The app/webview path replaces this during init, but we expect to have something set for this
+  // during engine construction, which occurs earlier.  So no `readonly`, sadly.
+  //
+  // May also be manipulated by Developer's debug-host?
+  public hostDevice: DeviceSpec;
   readonly sourcePath: string;
   readonly deferForInitialization: ManagedPromise<void>;
 
@@ -90,6 +94,7 @@ export interface InitOptionSpec extends PathOptionSpec {
   embeddingApp?: string | undefined;
 
   // ui?: string;
+  // attachType?: 'auto' | 'manual' | ''; // If blank or undefined, attachType will be assigned to "auto" or "manual"
 
   /**
    * If set to true || "true" or if left undefined, the engine will automatically select the first available

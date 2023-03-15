@@ -55,7 +55,7 @@ export class Device {
     return dpi;
   }
 
-  detect() : void {
+  detect() : DeviceSpec {
     var possMacSpoof = false;
 
     if(navigator && navigator.userAgent) {
@@ -195,6 +195,8 @@ export class Device {
 
     this.colorScheme = StyleConstants.prefersDarkMode() ? 'dark' : 'light';
     this.detected = true;
+
+    return this.coreSpec;
   }
 
   /**

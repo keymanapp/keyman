@@ -1,3 +1,4 @@
+import { DeviceSpec } from '@keymanapp/keyboard-processor'
 import { Configuration, InitOptionSpec, KeymanEngine as KeymanEngineBase } from 'keyman/engine/main';
 import { AnchoredOSKView, ViewConfiguration, StaticActivator } from 'keyman/engine/osk';
 import { toPrefixedKeyboardId, toUnprefixedKeyboardId } from 'keyman/engine/keyboard-cache';
@@ -27,6 +28,9 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
   }
 
   initialize(options: InitOptionSpec) {
+    let device = new DeviceSpec('native', options.embeddingApp.indexOf('Tablet') >= 0 ? 'tablet' : 'phone', this.config.hostDevice.OS, true);
+    this.config.hostDevice = device;
+
     super.initialize(options);
 
     const oskConfig: ViewConfiguration = {

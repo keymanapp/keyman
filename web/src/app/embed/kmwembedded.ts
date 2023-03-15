@@ -9,38 +9,14 @@
 
 (function() {
   // Declare KeymanWeb and related objects
-  var keymanweb=window['keyman'], util=keymanweb['util'],device=util.device;
+  var keymanweb=window['keyman'], util=keymanweb['util'];
   var dom = com.keyman.dom;
-
-  // Allow definition of application name
-  keymanweb.options['app']='';
 
   // Flag to control refreshing of a keyboard that is already loaded
   keymanweb.mustReloadKeyboard = true;
 
   // Skip full page initialization - skips native-mode only code
   keymanweb.isEmbedded = true;
-
-  // Set default device options
-  keymanweb.setDefaultDeviceOptions = function(opt: com.keyman.OptionType) {
-    opt['attachType'] = 'manual';
-    device.app=opt['app'];
-    device.touchable=true;
-    device.formFactor = device.app.indexOf('Tablet') >= 0 ? 'tablet' : 'phone';
-    device.browser='native';
-  };
-
-  /**
-   * Force reload of resource
-   *
-   *  @param  {string}  s unmodified URL
-   *  @return {string}    modified URL
-   */
-  util.unCached = function(s) {
-    var t=(new Date().getTime());
-    s = s + '?v=' + t;
-    return s;
-  };
 
   util.wait = function() {
     // Empty stub - this function should not be implemented or used within embedded code routes.
@@ -50,16 +26,6 @@
   util.alert = function() {
     // Empty stub - this function should not be implemented or used within embedded code routes.
     console.warn("util.alert() call attempted in embedded mode!");  // Sends log message to embedding app.
-  };
-
-  /**
-   * Refresh element content after change of text (if required)
-   *
-   *  @param  {Object}  Pelem   input element
-   */
-  keymanweb.refreshElementContent = function(Pelem)
-  {
-    if('ontextchange' in keymanweb) keymanweb['ontextchange'](Pelem);
   };
 
   /**

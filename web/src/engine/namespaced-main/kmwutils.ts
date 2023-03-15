@@ -509,18 +509,6 @@ namespace com.keyman {
     }
 
     /**
-     * Allow forced reload if necessary (stub only here)
-     *
-     *  @param  {string}  s unmodified URL
-     *  @return {string}    modified URL
-     */
-    unCached(s: string): string {
-      // var t=(new Date().getTime());
-      // s = s + '?v=' + t;
-      return s;
-    }
-
-    /**
      * Function     toNumber
      * Scope        Public
      * @param       {string}      s            numeric string
