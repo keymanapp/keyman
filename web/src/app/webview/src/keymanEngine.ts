@@ -39,7 +39,8 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
       pathConfig: this.config.paths,
       // When hosted in a WebView, we never hide the Web OSK without hiding the hosting WebView.
       activator: new StaticActivator(),
-      embeddedGestureConfig: buildEmbeddedGestureConfig(this.config.softDevice)
+      embeddedGestureConfig: buildEmbeddedGestureConfig(this.config.softDevice),
+      doCacheBusting: true
     }
 
     this.osk = new AnchoredOSKView(oskConfig);
