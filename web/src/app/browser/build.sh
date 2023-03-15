@@ -39,7 +39,7 @@ builder_describe "Builds the Keyman Engine for Web's website-integrating version
 
 builder_describe_outputs \
   configure   /node_modules \
-  build       /web/$SUBPROJECT_NAME/lib/index.mjs
+  build       /web/build/$SUBPROJECT_NAME/lib/index.js
 
 builder_parse "$@"
 

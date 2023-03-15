@@ -3,7 +3,7 @@ import { PathConfiguration, PathOptionDefaults, PathOptionSpec } from "keyman/en
 import { Device } from "keyman/engine/device-detect";
 import { KeyboardStub } from "keyman/engine/keyboard-cache";
 
-export class Configuration {
+export class EngineConfiguration {
   // The app/webview path replaces this during init, but we expect to have something set for this
   // during engine construction, which occurs earlier.  So no `readonly`, sadly.
   //
@@ -15,7 +15,6 @@ export class Configuration {
   private _paths: PathConfiguration;
   private _activateFirstKeyboard: boolean;
   private _defaultSpacebarText: SpacebarText;
-  private _embeddingApp: string;
   private _stubNamespacer?: (KeyboardStub) => void;
 
   public applyCacheBusting: boolean = false;
@@ -47,10 +46,6 @@ export class Configuration {
 
     this._defaultSpacebarText = options.spacebarText;
 
-    if(options.embeddingApp) {
-      this._embeddingApp = options.embeddingApp;
-    }
-
     this.deferForInitialization.resolve();
   }
 
@@ -64,10 +59,6 @@ export class Configuration {
 
   get defaultSpacebarText() {
     return this._defaultSpacebarText;
-  }
-
-  get embeddingApp() {
-    return this._embeddingApp;
   }
 
   get softDevice(): DeviceSpec {
@@ -85,17 +76,16 @@ export class Configuration {
   set stubNamespacer(functor: (stub: KeyboardStub) => void) {
     this._stubNamespacer = functor;
   }
+
+  debugReport(): Record<string, any> {
+    return {
+      hostDevice: this.hostDevice,
+      initialized: this.deferForInitialization.hasFinalized
+    }
+  }
 }
 
 export interface InitOptionSpec extends PathOptionSpec {
-  /**
-   * May be used to denote the name of the embedding application
-   */
-  embeddingApp?: string | undefined;
-
-  // ui?: string;
-  // attachType?: 'auto' | 'manual' | ''; // If blank or undefined, attachType will be assigned to "auto" or "manual"
-
   /**
    * If set to true || "true" or if left undefined, the engine will automatically select the first available
    * keyboard for activation.
@@ -112,8 +102,7 @@ export interface InitOptionSpec extends PathOptionSpec {
 }
 
 export const InitOptionDefaults: Required<InitOptionSpec> = {
-  embeddingApp: undefined,    // only needed for embedded.
-  setActiveOnRegister: true,  // only needed for browser
+  setActiveOnRegister: true,  // only needed for browser?
   spacebarText: SpacebarText.LANGUAGE_KEYBOARD,  // useful in both, for OSK config.
   ...PathOptionDefaults
 }

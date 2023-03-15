@@ -4,7 +4,7 @@ import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
 import { OSKView } from "keyman/engine/osk";
 import { KeyboardRequisitioner } from "keyman/engine/keyboard-cache";
 
-import { Configuration, InitOptionDefaults, InitOptionSpec } from "./configuration.js";
+import { EngineConfiguration, InitOptionDefaults, InitOptionSpec } from "./engineConfiguration.js";
 import KeyboardInterface from "./keyboardInterface.js";
 import ContextManagerBase from "./contextManager.js";
 import { KeyEventHandler } from './keyEventSource.interface.js';
@@ -13,7 +13,7 @@ import { LegacyAPIEventEngine } from "./legacyAPIEvents.js";
 import DOMCloudRequester from "keyman/engine/keyboard-cache/dom-requester";
 
 export default class KeymanEngine<ContextManager extends ContextManagerBase, HardKeyboard extends HardKeyboardBase> implements KeyboardKeymanGlobal {
-  readonly config: Configuration;
+  readonly config: EngineConfiguration;
   readonly contextManager: ContextManager;
   readonly interface: KeyboardInterface;
   readonly processor: InputProcessor;
@@ -74,7 +74,7 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
    * @param config
    * @param contextManager
    */
-  constructor(worker: Worker, config: Configuration, contextManager: ContextManager) {
+  constructor(worker: Worker, config: EngineConfiguration, contextManager: ContextManager) {
     this.config = config;
     this.contextManager = contextManager;
 
@@ -123,7 +123,7 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
     });
   }
 
-  initialize(optionSpec: InitOptionSpec): void {
+  initialize(optionSpec: Required<InitOptionSpec>): void {
     // There may be some valid mutations possible even on repeated calls?
     // The original seems to allow it.
 
@@ -132,7 +132,7 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
       return;
     }
 
-    this.config.initialize({...InitOptionDefaults, ...optionSpec});
+    this.config.initialize(optionSpec);
   }
 
   public get hardKeyboard(): HardKeyboard {
@@ -157,6 +157,18 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
     }
     this._osk = value;
     this._osk.on('keyEvent', this.keyEventListener);
+  }
+
+  public getDebugInfo(): Record<string, any> {
+    const report = {
+      configReport: this.config.debugReport()
+      // oskType / oskReport?
+      // - mode
+      // - dimensions
+      // other possible entries?
+    };
+
+    return report;
   }
 }
 

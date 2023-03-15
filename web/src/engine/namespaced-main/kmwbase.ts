@@ -216,25 +216,6 @@ namespace com.keyman {
     }
 
     /**
-     * Returns a generalized metadata object about the state of KMW for use with error reporting.
-     */
-    ['getDebugInfo']() {
-      let metadata = {
-        attachType: this.options.attachType,
-        device: this.util.device,
-        initialized: this.initialized,
-        isEmbedded: this.isEmbedded,
-        ui: this.ui ? this.ui.name : null
-      }
-
-      if(this.util.device.touchable) {
-        metadata.ui = 'touch';
-      }
-
-      return metadata;
-    }
-
-    /**
      * Function     addEventListener
      * Scope        Public
      * @param       {string}            event     event to handle

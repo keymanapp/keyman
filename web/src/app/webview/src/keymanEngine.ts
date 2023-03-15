@@ -1,8 +1,9 @@
 import { DeviceSpec } from '@keymanapp/keyboard-processor'
-import { Configuration, InitOptionSpec, KeymanEngine as KeymanEngineBase } from 'keyman/engine/main';
+import { KeymanEngine as KeymanEngineBase } from 'keyman/engine/main';
 import { AnchoredOSKView, ViewConfiguration, StaticActivator } from 'keyman/engine/osk';
 import { toPrefixedKeyboardId, toUnprefixedKeyboardId } from 'keyman/engine/keyboard-cache';
 
+import { WebviewConfiguration, WebviewInitOptionDefaults, WebviewInitOptionSpec } from './configuration.js';
 import ContextManager from './contextManager.js';
 import PassthroughKeyboard from './passthroughKeyboard.js';
 import { buildEmbeddedGestureConfig, setupEmbeddedListeners } from './oskConfiguration.js';
@@ -12,7 +13,7 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
   // But it's too new of a feature to utilize... and also expects to be in a module, when this may
   // be compiled down to an IIFE.
   constructor(worker: Worker, sourceUri: string) {
-    const config = new Configuration(sourceUri);  // currently set to perform device auto-detect.
+    const config = new WebviewConfiguration(sourceUri);  // currently set to perform device auto-detect.
     config.stubNamespacer = (stub) => {
       // If the package has not yet been applied as namespacing...
       if(stub.KP && stub.KI.indexOf(`${stub.KP}::`) == -1) {
@@ -27,11 +28,11 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
     this.hardKeyboard = new PassthroughKeyboard(config.hardDevice);
   }
 
-  initialize(options: InitOptionSpec) {
+  initialize(options: WebviewInitOptionSpec) {
     let device = new DeviceSpec('native', options.embeddingApp.indexOf('Tablet') >= 0 ? 'tablet' : 'phone', this.config.hostDevice.OS, true);
     this.config.hostDevice = device;
 
-    super.initialize(options);
+    super.initialize({...WebviewInitOptionDefaults, ...options});
 
     const oskConfig: ViewConfiguration = {
       hostDevice: this.config.hostDevice,
