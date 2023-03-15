@@ -1,7 +1,6 @@
 package com.keyman.engine;
 
 import android.content.Context;
-import android.inputmethodservice.InputMethodService;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,7 +15,6 @@ import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.webkit.JavascriptInterface;
-import android.widget.RelativeLayout;
 
 import static android.content.Context.VIBRATOR_SERVICE;
 
