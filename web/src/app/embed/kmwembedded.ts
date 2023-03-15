@@ -30,11 +30,6 @@
     device.browser='native';
   };
 
-  // Get KMEI, KMEA keyboard path (overrides default function, allows direct app control of paths)
-  keymanweb.getKeyboardPath = function(Lfilename, packageID) {
-    return Lfilename + "?v=" + (new Date()).getTime(); /*cache buster*/
-  };
-
   /**
    * Force reload of resource
    *

@@ -14,6 +14,8 @@ export class Configuration {
   private _embeddingApp: string;
   private _stubNamespacer?: (KeyboardStub) => void;
 
+  public applyCacheBusting: boolean = false;
+
   // sourcePath:  see `var sPath =` in kmwbase.ts.  It is not obtainable headlessly.
   constructor(sourcePath: string, device?: DeviceSpec) {
     if(!device) {

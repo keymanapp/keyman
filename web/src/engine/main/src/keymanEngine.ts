@@ -80,7 +80,7 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
 
     // Since we're not sandboxing keyboard loads yet, we just use `window` as the jsGlobal object.
     this.interface = new KeyboardInterface(window, this, this.contextManager, config.stubNamespacer);
-    const keyboardLoader = new KeyboardLoader(this.interface);
+    const keyboardLoader = new KeyboardLoader(this.interface, config.applyCacheBusting);
     this.keyboardRequisitioner = new KeyboardRequisitioner(keyboardLoader, new DOMCloudRequester(), this.config.paths);
 
     const cache = this.keyboardRequisitioner.cache;
