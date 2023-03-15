@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 17.0.68 alpha 2023-03-15
+
+* chore(common): add common test build configurations (#8431)
+* fix(common): fix broken common/web/types cases (#8426)
+* fix(developer/compilers): locks esbuild target detection for kmc building (#8437)
+*  (#8412)
+*  (#8436)
+* chore(linux): Use dependency on core in ibus-keyman/build.sh (#8423)
+
 ## 17.0.67 alpha 2023-03-14
 
 * (developer):Update copyright period in License.rtf (#8425)
