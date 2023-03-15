@@ -4,6 +4,10 @@
 # Authors:      Marc Durdin
 #
 
+pkgconfig = 'pkg-config'
+icu4c = dependency('icu-uc', required: false)
+
+
 if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang' or compiler.get_id() == 'emscripten'
   warns = [
      '-Wno-missing-field-initializers',
