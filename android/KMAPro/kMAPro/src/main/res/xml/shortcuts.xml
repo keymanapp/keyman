@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+  <shortcut
+    android:shortcutId="addKeyboard"
+    android:enabled="true"
+    android:icon="@drawable/ic_content_add"
+    android:shortcutShortLabel="@string/add_shortcut_short_label"
+    android:shortcutLongLabel="@string/add_shortcut_long_label">
+    <intent
+      android:action="android.intent.action.VIEW"
+      android:targetPackage="com.tavultesoft.kmapro.debug"
+      android:targetClass="com.tavultesoft.kmapro.KMPBrowserActivity" />
+    <categories android:name="android.shortcut.keyboard "/>
+<!--       android:targetPackage="${applicationId}" -->
+  </shortcut>
+</shortcuts>
