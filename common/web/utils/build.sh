@@ -19,7 +19,7 @@ cd "$THIS_SCRIPT_PATH"
 builder_describe \
   "Compiles the web-oriented utility function module." \
   "@/common/web/keyman-version" \
-  configure clean build
+  clean configure build test
 
 builder_describe_outputs \
   configure "/node_modules" \
