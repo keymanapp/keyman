@@ -90,6 +90,6 @@ fi
 
 if builder_start_action test:app; then
   echo "TEST_FLAGS $TEST_FLAGS"
-
+  # TODO: define tests
   builder_finish_action success test:app
 fi
