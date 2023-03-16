@@ -181,24 +181,24 @@ copy_resources ( ) {
     CONFIGS+=(release)
   fi
 
-  echo
+  builder_echo
 
   for CONFIG in "${CONFIGS[@]}";
   do
     local CONFIG_OUT_PATH=build/$COMPILE_TARGET/$CONFIG
 
-    echo Copying resources to $CONFIG_OUT_PATH/src
+    builder_echo "Copying resources to $CONFIG_OUT_PATH/src"
 
     for RESOURCE in "${RESOURCES_TO_COPY[@]}";
     do
       mkdir -p "$CONFIG_OUT_PATH/$RESOURCE"
       mkdir -p "$CONFIG_OUT_PATH/src/resources/$RESOURCE"
 
-      echo "- src/resources/$RESOURCE/ => $CONFIG_OUT_PATH/$RESOURCE"
+      builder_echo "- src/resources/$RESOURCE/ => $CONFIG_OUT_PATH/$RESOURCE"
       cp -Rf "src/resources/$RESOURCE"  "$CONFIG_OUT_PATH/"  >/dev/null
     done
 
-    echo
+    builder_echo
   done
 }
 
@@ -232,7 +232,7 @@ copy_sources ( ) {
   for CONFIG in "${CONFIGS[@]}";
   do
     local CONFIG_OUT_PATH=build/$COMPILE_TARGET/$CONFIG
-    echo Copying $COMPILE_TARGET sources to $CONFIG_OUT_PATH/src
+    builder_echo "Copying $COMPILE_TARGET sources to $CONFIG_OUT_PATH/src"
 
     rm -rf "$CONFIG_OUT_PATH/src"
     mkdir -p "$CONFIG_OUT_PATH/src"
@@ -240,12 +240,12 @@ copy_sources ( ) {
 
     for SOURCE_FOLDER in "${SOURCES_TO_COPY[@]}";
     do
-      echo "- src/$SOURCE_FOLDER/ => $CONFIG_OUT_PATH/src/$SOURCE_FOLDER/"
+      builder_echo "- src/$SOURCE_FOLDER/ => $CONFIG_OUT_PATH/src/$SOURCE_FOLDER/"
       mkdir -p "$CONFIG_OUT_PATH/src/$SOURCE_FOLDER"
       cp -Rf  "src/$SOURCE_FOLDER/"*    "$CONFIG_OUT_PATH/src/$SOURCE_FOLDER/"
     done
 
-    echo
+    builder_echo
   done
 }
 
@@ -294,7 +294,7 @@ copy_outputs ( ) {
 compile ( ) {
   local COMPILE_TARGET=$1
   tsc -b src/$COMPILE_TARGET -v || builder_die "Build command tsc -b src/$COMPILE_TARGET -v failed with exit code $?"
-  echo $COMPILE_TARGET TypeScript compiled under build/$COMPILE_TARGET/obj
+  builder_echo $COMPILE_TARGET TypeScript compiled under build/$COMPILE_TARGET/obj
 }
 
 # Finalizes all build products corresponding to the specified target.
@@ -330,7 +330,7 @@ finalize ( ) {
   mkdir -p "$DEBUG_OUT_PATH"
   copy_outputs "$COMPILED_INTERMEDIATE_PATH" "$DEBUG_OUT_PATH" "${OUTPUT_SCRIPTS[@]}"
 
-  echo Compiled $COMPILE_TARGET debug version saved under $DEBUG_OUT_PATH: ${OUTPUT_SCRIPTS[*]}
+  builder_echo "Compiled $COMPILE_TARGET debug version saved under $DEBUG_OUT_PATH: ${OUTPUT_SCRIPTS[*]}"
 
   # START:  release output
   if ! builder_has_option --no-minify; then
@@ -339,7 +339,7 @@ finalize ( ) {
       minify "$COMPILED_INTERMEDIATE_PATH/$SCRIPT" "$RELEASE_OUT_PATH/$SCRIPT" SIMPLE_OPTIMIZATIONS
     done
 
-    echo Compiled $COMPILE_TARGET release version saved under $RELEASE_OUT_PATH: ${OUTPUT_SCRIPTS[*]}
+    builder_echo "Compiled $COMPILE_TARGET release version saved under $RELEASE_OUT_PATH: ${OUTPUT_SCRIPTS[*]}"
   else
     # The prior 'release' is now outdated:  delete it.
     rm -rf "$RELEASE_OUT_PATH"
@@ -355,8 +355,7 @@ if builder_start_action configure; then
     # NPM install is required for the file to be present.
     if ! [ -f $minifier ];
     then
-      echo File $minifier does not exist:  have you set the environment variable \$CLOSURECOMPILERPATH?
-      exit 1
+      builder_die "File $minifier does not exist:  have you set the environment variable \$CLOSURECOMPILERPATH?"
     fi
   fi
 
@@ -410,11 +409,11 @@ if builder_has_action build:embed || \
    builder_has_action build:web || \
    builder_has_action build:ui; then
 
-  echo ""
-  echo "${COLOR_PURPLE}Compiling version ${VERSION}${COLOR_RESET}"
+  builder_echo ""
+  builder_echo purple "Compiling version ${VERSION}"
 fi
 
-echo ""
+builder_echo ""
 
 
 if builder_start_action build:engine; then
@@ -482,7 +481,7 @@ if builder_start_action build:samples; then
   # Some test pages actually have build scripts.
   ./src/test/manual/embed/android-harness/build.sh  # is not yet builder-based.
 
-  echo "Copying samples & test page resources..."
+  builder_echo "Copying samples & test page resources..."
   # Should probably be changed into a build script for the `prediction-ui` test page.
   cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}"
 
