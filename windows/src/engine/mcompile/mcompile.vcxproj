@@ -96,7 +96,7 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\engine\keyman32\KBD.H" />
+    <ClInclude Include="..\..\..\..\engine\keyman32-ver\KBD.H" />
     <ClInclude Include="mc_kmxfile.h" />
     <ClInclude Include="mcompile.h" />
     <ClInclude Include="pch.h" />

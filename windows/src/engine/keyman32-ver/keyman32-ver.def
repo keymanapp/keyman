@@ -1,4 +1,4 @@
-LIBRARY   KEYMAN32
+LIBRARY   keyman32-ver17.0.48-alpha-local
 
 EXPORTS
       Keyman_GetInitialised

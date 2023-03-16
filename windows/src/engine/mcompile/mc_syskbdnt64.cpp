@@ -28,7 +28,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch.h"
-#include "../../engine/keyman32/kbd.h"	/* DDK kbdlayout */
+#include "../../engine/keyman32-ver/kbd.h"	/* DDK kbdlayout */
 
 typedef struct {
     PVK_TO_BIT pVkToBit;     // Virtual Keys -> Mod bits

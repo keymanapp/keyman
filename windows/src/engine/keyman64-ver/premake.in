@@ -21,6 +21,6 @@ install:
 
 
 build:
-    $(MSBUILD) keyman64-ver.sln $(MSBUILD_BUILD) "/p:Platform=x64;VersionWithTag=$VersionWithTag
+    $(MSBUILD) keyman64-ver.sln $(MSBUILD_BUILD) "/p:Platform=x64;VersionWithTag=$VersionWithTag"
     $(COPY) $(X64_TARGET_PATH)\keyman64-ver$VersionWithTag.dll $(PROGRAM)\engine
     $(COPY) $(X64_TARGET_PATH)\keyman64-ver$VersionWithTag.pdb $(DEBUGPATH)\engine

@@ -21,6 +21,6 @@ install:
 
 
 build:
-    $(MSBUILD) keyman64-ver.sln $(MSBUILD_BUILD) "/p:Platform=x64;VersionWithTag=17.0.48-alpha-local
+    $(MSBUILD) keyman64-ver.sln $(MSBUILD_BUILD) "/p:Platform=x64;VersionWithTag=17.0.48-alpha-local"
     $(COPY) $(X64_TARGET_PATH)\keyman64-ver17.0.48-alpha-local.dll $(PROGRAM)\engine
     $(COPY) $(X64_TARGET_PATH)\keyman64-ver17.0.48-alpha-local.pdb $(DEBUGPATH)\engine

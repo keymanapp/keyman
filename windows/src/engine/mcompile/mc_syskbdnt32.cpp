@@ -28,7 +28,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch.h"
-#include "../../engine/keyman32/kbd.h"	/* DDK kbdlayout */
+#include "../../engine/keyman32-ver/kbd.h"	/* DDK kbdlayout */
 
 
 typedef PKBDTABLES (WINAPI *PKBDLAYERDESCRIPTORFUNC)(VOID);

@@ -8,6 +8,7 @@
 
 build: version.res dirs
    $(MKVER_U) premake.in premake.mak
+	 $(MKVER_U) $(ROOT)\src\engine\keyman32-ver\keyman64-build-version.in $(ROOT)\src\engine\keyman32-ver\keyman64-build-version.h
 	 $(MAKE) -fpremake.mak build
 
 #   $(COPY) keyman64-ver.lib $(OUTLIB) - already done

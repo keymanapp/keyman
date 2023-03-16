@@ -101,7 +101,7 @@
       </Component>
 
       <Component Guid="{9BBD330E-F0CE-44EB-8799-BF49CB670EFC}" SharedDllRefCount="yes">
-        <File Id="keyman32.dll" Name="keyman32.dll" KeyPath="yes" />
+        <File Id="keyman32-ver.dll" Name="keyman32-ver$(var.VERSION_WITH_TAG).dll" KeyPath="yes" />
       </Component>
 
       <Component Guid="{1853C94A-0F4C-4D43-AF07-E3F27794FDC9}">
@@ -240,8 +240,8 @@
 
       <Component Id="etw" Guid="{2AA8D519-C9B7-4995-9496-D87DD2EF2B7D}">
         <!-- The file id needs to be short to avoid an overflow in the XmlFile table during link time -->
-        <File Id="etw" Name="keyman-debug-etw.man" KeyPath="yes" Source="..\keyman32\keyman-debug-etw.man">
-          <util:EventManifest MessageFile="[#keyman32.dll]" ResourceFile="[#keyman32.dll]" />
+        <File Id="etw" Name="keyman-debug-etw.man" KeyPath="yes" Source="..\keyman32-ver\keyman-debug-etw.man">
+          <util:EventManifest MessageFile="[#keyman32-ver$(var.VERSION_WITH_TAG).dll]" ResourceFile="[#keyman32-ver$(var.VERSION_WITH_TAG).dll]" />
         </File>
       </Component>
 

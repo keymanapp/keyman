@@ -24,7 +24,7 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\engine\keyman32\KBD.H">
+    <ClInclude Include="..\..\..\..\engine\keyman32-ver\KBD.H">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="mc_kmxfile.h">
