@@ -12,9 +12,7 @@
 #include <string>
 #include <sstream>
 #include <kmcmplibapi.h>
-//#include "../src/compfile.h"
 #include <kmx_file.h>
-
 
 #ifdef _MSC_VER
 #else
@@ -22,8 +20,6 @@
 #endif
 
 using namespace std;
-
-bool isDesktopKeyboard(FILE* fp);
 
 vector < int > error_vec;
 
@@ -48,81 +44,16 @@ int msgproc(int line, uint32_t dwMsgCode, char* szText, void* context)
 
 #include "../src/filesystem.h"
 
-#ifdef __EMSCRIPTEN__
-
-#else
-
-#ifdef _WIN32
-#include <windows.h>
-
-// On Windows, we'll rely on the presence of kmcmpdll.dll in a
-// specific folder to run these tests.
-
-#ifdef _DEBUG
-#define KMCMPDLL_DEBUG "debug"
-#else
-#define KMCMPDLL_DEBUG "release"
-#endif
-
-// TODO: this is unsafe -- kmcmpdll may not exist at time of running tests?
-#ifdef _WIN64
-#define KMCMPDLL "..\\..\\..\\..\\kmcmpdll\\bin\\x64\\" KMCMPDLL_DEBUG "\\kmcmpdll.x64.dll"
-#else
-#define KMCMPDLL "..\\..\\..\\..\\kmcmpdll\\bin\\Win32\\" KMCMPDLL_DEBUG "\\kmcmpdll.dll"
-#endif
-
-#endif
-
-
-int CALLBACK winmsgproc(int line, DWORD dwMsgCode, LPSTR szText) {
-  const char*t = "unknown";
-  switch(dwMsgCode & 0xF000) {
-    case CERR_HINT:    t="   hint"; break;
-    case CERR_WARNING: t="warning"; break;
-    case CERR_ERROR:   t="  error"; break;
-    case CERR_FATAL:   t="  fatal"; break;
-  }
-  printf("[kmcmpdll.dll] line %d  %s %04.4x:  %s\n", line, t, (unsigned int)dwMsgCode, szText);
-
-  return 1;
-}
-
-typedef struct _COMPILER_OPTIONS {
-  DWORD dwSize;
-  BOOL ShouldAddCompilerVersion;
-	BOOL UseKmcmpLib;
-} COMPILER_OPTIONS;
-
-typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
-
-typedef int (CALLBACK *CompilerMessageProc)(int line, DWORD dwMsgCode, LPSTR szText);
-typedef BOOL (*PCOMPILEKEYBOARDFILE)(PSTR pszInfile, PSTR pszOutfile, BOOL FSaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc);
-typedef BOOL (*PSETCOMPILEROPTIONS)(PCOMPILER_OPTIONS options);
-
-#endif
-
-
 int main(int argc, char *argv[])
 {
-	if(argc < 3) {
-		puts("Usage: kmcompxtest source.kmn compiled.kmx [reference.kmx]");
+	if(argc < 4) {
+		puts("Usage: kmcompxtest source.kmn output.kmx fixture.kmx");
 		return __LINE__;
 	}
 
   char* kmn_file = argv[1];
   char* kmx_file = argv[2];
-  char* reference_kmx = nullptr;
-
-  if(argc >= 4) {
-    // If we are passed a reference .kmx, we'll use that, and skip attempting to build it.
-    // Otherwise, we will attempt to build it. On non-Win32 platforms, we cannot build the
-    // reference .kmx, so this parametr is only optional for Win32. (We will never assume
-    // the presence of WINE and kmcomp.exe to host kmcmpdll.dll.)
-    reference_kmx = argv[3];
-    for(char *p = reference_kmx; *p; p++) {
-      if(*p == '\\') *p = '/';
-    }
-  }
+  char* reference_kmx = argv[3];
 
   // Replace \ with /
 	for(char *p = kmn_file; *p; p++) {
@@ -132,6 +63,10 @@ int main(int argc, char *argv[])
 	for(char *p = kmx_file; *p; p++) {
 		if(*p == '\\') *p = '/';
 	}
+
+  for(char *p = reference_kmx; *p; p++) {
+    if(*p == '\\') *p = '/';
+  }
 
   char  first5[6] = "CERR_";
   char* pfirst5 = first5;
@@ -143,89 +78,36 @@ int main(int argc, char *argv[])
     return __LINE__;
   }
 
-#ifdef _MSC_VER
-  // Configure Win32 kmcmpdll.dll
-  // TODO: customise path to kmcmpdll.dll?
-  HMODULE hLibrary = LoadLibrary(KMCMPDLL);
-  if(!hLibrary) return __LINE__;
-  PCOMPILEKEYBOARDFILE pCompileKeyboardFile = (PCOMPILEKEYBOARDFILE) GetProcAddress(hLibrary, "CompileKeyboardFile");
-  if(!pCompileKeyboardFile) return __LINE__;
-  PSETCOMPILEROPTIONS pSetCompilerOptions = (PSETCOMPILEROPTIONS) GetProcAddress(hLibrary, "SetCompilerOptions");
-  if(!pSetCompilerOptions) return __LINE__;
-  COMPILER_OPTIONS opts;
-  opts.dwSize = sizeof(COMPILER_OPTIONS);
-  opts.ShouldAddCompilerVersion = false;
-  opts.UseKmcmpLib = false;
-  if(!pSetCompilerOptions(&opts)) {
-    return __LINE__;
-  }
-#endif
-
   if(kmcmp_CompileKeyboardFile(kmn_file, kmx_file, true, false, true, msgproc, nullptr)) {
     char* testname = strrchr( (char*) kmn_file, '/') + 1;
     if(strncmp(testname, pfirst5, 5) == 0){
       return __LINE__;  // exit code: CERR_ in Name + no Error found
     }
 
-#ifdef _MSC_VER
-    char kmx_file_2[362];
-    strcpy(kmx_file_2, kmx_file);
-    strcat(kmx_file_2, ".2");
-
-    char kmn_file_3[362];
-    strcpy(kmn_file_3, kmn_file);
-
-    // Replace / with \ .
-    for(char *p = kmn_file_3; *p; p++) {
-      if(*p == '/') *p = '\\';
-    }
-
-    char kmx_file_3[362];
-    strcpy(kmx_file_3, kmx_file_2);
-
-    for(char *p = kmx_file_3; *p; p++) {
-      if(*p == '\\') *p = '/';
-    }
-
-    reference_kmx = kmx_file_2;
-
-    if(pCompileKeyboardFile(kmn_file_3, kmx_file_3, true, false, true, winmsgproc)) {
-#else
     // On non-win32 platforms, we cannot get kmcmpdll.dll to build keyboards
     // legacy-mode, so we'll compare to a hopefully existing file that we've
     // been passed
-    if(reference_kmx != nullptr) {
-#endif
-      FILE* fp1 = Open_File(kmx_file, "rb");
-      if(!fp1) return __LINE__;
+    FILE* fp1 = Open_File(kmx_file, "rb");
+    if(!fp1) return __LINE__;
 
-#ifndef _MSC_VER
-      if(!isDesktopKeyboard(fp1)) {
-        // reference_kmx will never exist for mobile/tablet-only keyboards
-        return 77;  // SKIP_TEST
-      }
-#endif
 
-      FILE* fp2 = Open_File(reference_kmx, "rb");
-      if(!fp2) return __LINE__;                      // exit code: fail if no reference kmx file in build-folder
+    FILE* fp2 = Open_File(reference_kmx, "rb");
+    if(!fp2) return __LINE__;                      // exit code: fail if no reference kmx file in build-folder
 
-      fseek(fp1, 0, SEEK_END);
-      auto sz1 = ftell(fp1);
-      fseek(fp1, 0, SEEK_SET);
-      fseek(fp2, 0, SEEK_END);
-      auto sz2 = ftell(fp2);
-      fseek(fp2, 0, SEEK_SET);
-      if (sz1 != sz2) return __LINE__;                //  exit code: size of kmx-file in build differs from size of kmx-file in source folder
+    fseek(fp1, 0, SEEK_END);
+    auto sz1 = ftell(fp1);
+    fseek(fp1, 0, SEEK_SET);
+    fseek(fp2, 0, SEEK_END);
+    auto sz2 = ftell(fp2);
+    fseek(fp2, 0, SEEK_SET);
+    if (sz1 != sz2) return __LINE__;                //  exit code: size of kmx-file in build differs from size of kmx-file in source folder
 
-      char* buf1 = new char[sz1];
-      char* buf2 = new char[sz1];
-      fread(buf1, 1, sz1, fp1);
-      fread(buf2, 1, sz1, fp2);
-      return memcmp(buf1, buf2, sz1) ? __LINE__ : 0;  // exit code:  when contents of kmx-file in build differs from contents of kmx-file in source folder
-                                                      // success:    when contents of kmx-file in build and source folder are the same
-    }
-    // exit code: File does not exist, or build failed
-    return __LINE__;
+    char* buf1 = new char[sz1];
+    char* buf2 = new char[sz1];
+    fread(buf1, 1, sz1, fp1);
+    fread(buf2, 1, sz1, fp2);
+    return memcmp(buf1, buf2, sz1) ? __LINE__ : 0;  // exit code:  when contents of kmx-file in build differs from contents of kmx-file in source folder
+                                                    // success:    when contents of kmx-file in build and source folder are the same
   }
   else {  /*if Errors found: check number (e.g. CERR_4061_balochi_phonetic.kmn should produce Error 4061)*/
     int error_val = 0;

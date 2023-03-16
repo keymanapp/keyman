@@ -1,0 +1,1 @@
+option('kmcmplib_keyboards_root', type: 'string', value: '')

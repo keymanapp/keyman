@@ -10,9 +10,12 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$THIS_SCRIPT_PATH/tests/checkout-keyboards.inc.sh"
 . "$THIS_SCRIPT_PATH/commands.inc.sh"
 
 cd "$THIS_SCRIPT_PATH"
+
+locate_keyboards_repo
 
 ################################ Main script ################################
 
