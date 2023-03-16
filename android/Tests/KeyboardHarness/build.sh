@@ -28,6 +28,7 @@ builder_describe "Build KeyboardHarness test app for Android." \
   "clean" \
   "configure" \
   "build" \
+  "test" \
   ":app                   KeyboardHarness" \
   "--ci                   Don't start the Gradle daemon. Use for CI"
 
