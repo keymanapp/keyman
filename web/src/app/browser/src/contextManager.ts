@@ -1,10 +1,15 @@
-import { OutputTarget } from '@keymanapp/keyboard-processor';
+import { type Keyboard, Mock, OutputTarget } from '@keymanapp/keyboard-processor';
+import { type KeyboardStub } from 'keyman/engine/keyboard-cache';
 import {
   ContextManager as ContextManagerBase,
   type KeyboardInterface
 } from 'keyman/engine/main';
+import { BrowserConfiguration } from './configuration.js';
 
 export default class ContextManager extends ContextManagerBase {
+  private _activeKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
+  private config: BrowserConfiguration;
+
   initialize(): void {
     // TBD:  keyman.domManager.init (the page-integration parts)
     // CTRL+F: `// Exit initialization here if we're using an embedded code path.`
@@ -16,6 +21,17 @@ export default class ContextManager extends ContextManagerBase {
   get activeTarget(): OutputTarget {
     // TBD:  basically DOMManager's .activeElement.
     throw new Error('Method not implemented.');
+  }
+
+  get activeKeyboard() {
+    return this._activeKeyboard;
+  }
+
+  set activeKeyboard(kbd: {keyboard: Keyboard, metadata: KeyboardStub}) {
+    throw new Error('Method not implemented.');
+    // depends on the target
+    // if not set with an "independent keyboard", changes the global.
+    // if set with an "independent keyboard", changes only the active target's keyboard.
   }
 
   insertText(kbdInterface: KeyboardInterface, Ptext: string, PdeadKey: number) {

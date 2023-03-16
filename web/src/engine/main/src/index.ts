@@ -1,5 +1,5 @@
 export { EngineConfiguration, InitOptionDefaults, InitOptionSpec } from './engineConfiguration.js';
-export { default as ContextManager } from './contextManager.js';
+export { ContextManagerBase, ContextManagerConfiguration } from './contextManagerBase.js';
 export { default as HardKeyboard } from './hardKeyboard.js';
 export { default as KeyboardInterface } from './keyboardInterface.js';
 export { default as KeymanEngine } from './keymanEngine.js';

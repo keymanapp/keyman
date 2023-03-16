@@ -5,18 +5,18 @@ import {
 } from "@keymanapp/keyboard-processor";
 import { KeyboardStub, RawKeyboardStub, StubAndKeyboardCache } from 'keyman/engine/keyboard-cache';
 
-import ContextManager from './contextManager.js';
+import { ContextManagerBase } from './contextManagerBase.js';
 import { VariableStoreCookieSerializer } from "./variableStoreCookieSerializer.js";
 
 export default class KeyboardInterface extends KeyboardInterfaceBase {
-  private readonly contextManager: ContextManager;
+  private readonly contextManager: ContextManagerBase;
   private stubAndKeyboardCache: StubAndKeyboardCache;
   private stubNamespacer?: (stub: RawKeyboardStub) => void;
 
   constructor(
     _jsGlobal: any,
     keymanGlobal: KeyboardKeymanGlobal,
-    contextManager: ContextManager,
+    contextManager: ContextManagerBase,
     stubNamespacer?: (stub: RawKeyboardStub) => void
   ) {
     super(_jsGlobal, keymanGlobal, new VariableStoreCookieSerializer());

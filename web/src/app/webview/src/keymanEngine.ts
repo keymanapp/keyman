@@ -23,7 +23,7 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
       }
     }
 
-    super(worker, config, new ContextManager());
+    super(worker, config, new ContextManager(config));
 
     this.hardKeyboard = new PassthroughKeyboard(config.hardDevice);
   }
@@ -34,14 +34,17 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
 
     super.init({...WebviewInitOptionDefaults, ...options});
 
+    this.contextManager.initialize();
+
     const oskConfig: ViewConfiguration = {
       hostDevice: this.config.hostDevice,
       pathConfig: this.config.paths,
       // When hosted in a WebView, we never hide the Web OSK without hiding the hosting WebView.
       activator: new StaticActivator(),
       embeddedGestureConfig: buildEmbeddedGestureConfig(this.config.softDevice),
-      doCacheBusting: true
-    }
+      doCacheBusting: true,
+      predictionContextManager: this.contextManager.predictionContext
+    };
 
     this.osk = new AnchoredOSKView(oskConfig);
     setupEmbeddedListeners(this, this.osk);

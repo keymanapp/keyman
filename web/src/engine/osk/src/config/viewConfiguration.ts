@@ -1,3 +1,4 @@
+import { type PredictionContext } from "@keymanapp/input-processor";
 import type Activator from "../views/activator.js";
 import CommonConfiguration from "./commonConfiguration.js";
 
@@ -33,4 +34,10 @@ export default interface Configuration extends CommonConfiguration {
    * Defaults to 'false'.
    */
   doCacheBusting?: boolean;
+
+  /**
+   * A predictive-state management object that interfaces the predictive-text banner
+   * with the active context.
+   */
+  predictionContextManager?: PredictionContext;
 }

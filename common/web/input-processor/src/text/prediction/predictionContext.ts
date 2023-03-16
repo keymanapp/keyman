@@ -50,7 +50,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     if(originalTarget != target) {
       // Note:  should be triggered after the corresponding new-context event rule has been processed,
       // as that may affect the value of layerId here.
-      return this.langProcessor.invalidateContext(target, this.kbdProcessor.layerId);
+      return this.resetContext();
     } else {
       return Promise.resolve([]);
     }
@@ -336,5 +336,17 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
 
   public sendUpdateEvent() {
     this.emit('update', this.currentSuggestions);
+  }
+
+  public resetContext(): Promise<Suggestion[]> {
+    const target = this.currentTarget;
+
+    if(target) {
+      // Note:  should be triggered after the corresponding new-context event rule has been processed,
+      // as that may affect the value of layerId here.
+      return this.langProcessor.invalidateContext(target, this.kbdProcessor.layerId);
+    } else {
+      return Promise.resolve([]);
+    }
   }
 }

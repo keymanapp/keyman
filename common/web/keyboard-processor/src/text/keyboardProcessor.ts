@@ -554,9 +554,15 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
     return false;
   }
 
-  resetContext() {
+  resetContext(target?: OutputTarget) {
     this.layerId = 'default';
     this.keyboardInterface.resetContextCache();
+
+    // May be null if it's a keyboard swap.
+    if(target) {
+      this.processNewContextEvent(this.contextDevice, target);
+    }
+
     if(!this.contextDevice.touchable) {
       this._UpdateVKShift(null);
     }
