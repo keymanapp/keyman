@@ -28,6 +28,7 @@ builder_describe "Build KeyboardHarness test app for Android." \
   "clean" \
   "configure" \
   "build" \
+  "test" \
   ":app                   KeyboardHarness" \
   "--ci                   Don't start the Gradle daemon. Use for CI"
 
@@ -89,6 +90,6 @@ fi
 
 if builder_start_action test:app; then
   echo "TEST_FLAGS $TEST_FLAGS"
-
+  # TODO: define tests
   builder_finish_action success test:app
 fi
