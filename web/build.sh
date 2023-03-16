@@ -294,7 +294,7 @@ copy_outputs ( ) {
 compile ( ) {
   local COMPILE_TARGET=$1
   tsc -b src/$COMPILE_TARGET -v || builder_die "Build command tsc -b src/$COMPILE_TARGET -v failed with exit code $?"
-  builder_echo $COMPILE_TARGET TypeScript compiled under build/$COMPILE_TARGET/obj
+  builder_echo "$COMPILE_TARGET TypeScript compiled under build/$COMPILE_TARGET/obj"
 }
 
 # Finalizes all build products corresponding to the specified target.
@@ -413,7 +413,7 @@ if builder_has_action build:embed || \
   builder_echo purple "Compiling version ${VERSION}"
 fi
 
-builder_echo ""
+builder_echo
 
 
 if builder_start_action build:engine; then
