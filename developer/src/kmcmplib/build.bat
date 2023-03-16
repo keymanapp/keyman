@@ -80,7 +80,7 @@ shift
 if "!COMMAND!" == "configure" (
   echo === Configuring Keyman KMX Compiler for Windows !ARCH! !BUILDTYPE! ===
   if exist build\!ARCH!\!BUILDTYPE! rd /s/q build\!ARCH!\!BUILDTYPE!
-  meson setup build\!ARCH!\!BUILDTYPE! !STATIC_LIBRARY! -Dkmcmplib_keyboards_root=!KEYBOARDS_ROOT! --buildtype !BUILDTYPE! --werror %1 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
+  meson setup build\!ARCH!\!BUILDTYPE! !STATIC_LIBRARY! --buildtype !BUILDTYPE! --werror %1 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
   shift
 )
 

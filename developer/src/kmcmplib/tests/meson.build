@@ -80,8 +80,7 @@ endforeach
 
 # Test fixtures that come from keyboards repo
 
-keyboards_root = get_option('kmcmplib_keyboards_root')
-message('keyboards_root='+keyboards_root)
+keyboards_root = meson.current_source_dir() / 'keyboards'
 
 if build_machine.system() == 'windows'
   test_source = run_command('run-shell.bat', 'get-test-source.inc.sh', keyboards_root, capture: true, check: true)

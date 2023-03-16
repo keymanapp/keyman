@@ -35,7 +35,7 @@ do_configure() {
   else
     pushd "$THIS_SCRIPT_PATH" > /dev/null
     # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
-    meson setup "$MESON_PATH" --werror --buildtype $CONFIGURATION "-Dkmcmplib_keyboards_root=$KEYBOARDS_ROOT" $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
+    meson setup "$MESON_PATH" --werror --buildtype $CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
     popd > /dev/null
   fi
   builder_finish_action success configure:$target
@@ -72,6 +72,8 @@ do_test() {
   local target=$1
   builder_start_action test:$target || return 0
 
+  # Works on a local clone of keyboards repository, to avoid clobbering
+  # user's existing keyboards repo, if present
   checkout_keyboards
 
   if [[ $target =~ ^(x86|x64)$ ]]; then

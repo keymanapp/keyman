@@ -10,12 +10,10 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-. "$THIS_SCRIPT_PATH/tests/checkout-keyboards.inc.sh"
+. "$THIS_SCRIPT_PATH/checkout-keyboards.inc.sh"
 . "$THIS_SCRIPT_PATH/commands.inc.sh"
 
 cd "$THIS_SCRIPT_PATH"
-
-locate_keyboards_repo
 
 ################################ Main script ################################
 
@@ -90,16 +88,32 @@ do_action() {
   done
 }
 
+locate_keyboards_repo
+
+# Note, we have a 'global' clean and also a per-arch clean
+if builder_start_action clean; then
+  rm -rf "$THIS_SCRIPT_PATH/tests/keyboards"
+  builder_finish_action success clean
+fi
+
 do_action clean
 
-if builder_has_action configure; then
+# Note, we have a 'global' configure and also a per-arch configure
+if builder_start_action configure; then
   # Import our standard compiler defines; this is copied from
   # /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
   # allow us to reference a file outside its root
   mkdir -p "$THIS_SCRIPT_PATH/resources"
   cp "$KEYMAN_ROOT/resources/build/meson/standard.meson.build" "$THIS_SCRIPT_PATH/resources/meson.build"
+
+  # We have to checkout the keyboards repo in a 'configure' action because
+  # otherwise meson will not get the right list of keyboard source files,
+  # even though we only use it in the 'test' action
+  checkout_keyboards
+  builder_finish_action success configure
 fi
 
 do_action configure
+
 do_action build
 do_action test
