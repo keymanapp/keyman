@@ -19,6 +19,7 @@
 #import "keyboardprocessor.h"
 #import "KMEngine.h"  // included for VKMap
 #import "ActionArrayOptimizer.h"
+#import "MacVKCodes.h"
 
 // TODO move VKMap here from KMEngine
 const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
@@ -78,16 +79,44 @@ const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
 
 -(UInt32)macToKeymanModifier:(NSEventModifierFlags)modifiers {
   UInt32 keymanModifiers = 0;
-  if(modifiers & NSEventModifierFlagShift) {
-    keymanModifiers = keymanModifiers ^ KM_KBP_MODIFIER_SHIFT;
+  if([self isShiftKey:modifiers]) {
+    keymanModifiers |= KM_KBP_MODIFIER_SHIFT;
   }
-  if(modifiers & NSEventModifierFlagControl) {
-    keymanModifiers = keymanModifiers ^ KM_KBP_MODIFIER_RCTRL;
+  if([self isLeftControlKey:modifiers]) {
+    keymanModifiers |= KM_KBP_MODIFIER_LCTRL;
   }
-  if(modifiers & NSEventModifierFlagOption) {
-    keymanModifiers = keymanModifiers ^ KM_KBP_MODIFIER_RALT;
+  if([self isRightControlKey:modifiers]) {
+    keymanModifiers |= KM_KBP_MODIFIER_RCTRL;
   }
+  if([self isLeftOptionKey:modifiers]) {
+    keymanModifiers |= KM_KBP_MODIFIER_LALT;
+  }
+  if([self isRightOptionKey:modifiers]) {
+    keymanModifiers |= KM_KBP_MODIFIER_RALT;
+  }
+
+  NSLog(@"macToKeymanModifier result  = %u", (unsigned int)keymanModifiers);
   return keymanModifiers;
+}
+
+-(BOOL)isShiftKey:(NSEventModifierFlags) modifiers {
+  return (modifiers & NSEventModifierFlagShift) == NSEventModifierFlagShift;
+}
+
+-(BOOL)isLeftControlKey:(NSEventModifierFlags) modifiers {
+  return ((modifiers & MK_LEFT_CTRL_MASK) == MK_LEFT_CTRL_MASK);
+}
+
+-(BOOL)isRightControlKey:(NSEventModifierFlags) modifiers {
+  return ((modifiers & MK_RIGHT_CTRL_MASK) == MK_RIGHT_CTRL_MASK);
+}
+
+-(BOOL)isLeftOptionKey:(NSEventModifierFlags) modifiers {
+  return ((modifiers & MK_LEFT_ALT_MASK) == MK_LEFT_ALT_MASK);
+}
+
+-(BOOL)isRightOptionKey:(NSEventModifierFlags) modifiers {
+  return ((modifiers & MK_RIGHT_ALT_MASK) == MK_RIGHT_ALT_MASK);
 }
 
 /*
