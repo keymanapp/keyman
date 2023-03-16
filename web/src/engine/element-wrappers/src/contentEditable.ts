@@ -20,7 +20,7 @@ class SelectionRange {
   }
 }
 
-export default class ContentEditable extends OutputTarget {
+export default class ContentEditable extends OutputTarget<{}> {
   root: HTMLElement;
 
   constructor(ele: HTMLElement) {
@@ -118,6 +118,12 @@ export default class ContentEditable extends OutputTarget {
     }
 
     return caret.node.textContent.substr(0, caret.offset);
+  }
+
+  getSelectedText(): string {
+    // TODO:  figure out the proper implementation.
+    // KMW 16 and before behavior may be maintained by just returning the empty string.
+    return '';
   }
 
   getTextAfterCaret(): string {

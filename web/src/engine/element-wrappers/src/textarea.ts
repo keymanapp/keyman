@@ -1,6 +1,6 @@
-import OutputTarget, { BaseEventMap } from './outputTarget.js';
+import OutputTarget from './outputTarget.js';
 
-interface EventMap extends BaseEventMap {
+interface EventMap {
   /**
    * Used to facilitate a pre-modularization utility method we wish to maintain:
    ```
@@ -171,6 +171,11 @@ export default class TextArea extends OutputTarget<EventMap> {
   getTextAfterCaret(): string {
     this.getCaret();
     return this.getText()._kmwSubstring(this.processedSelectionEnd);
+  }
+
+  getSelectedText(): string {
+    this.getCaret();
+    return this.getText()._kmwSubstring(this.processedSelectionStart, this.processedSelectionEnd - this.processedSelectionStart);
   }
 
   getText(): string {

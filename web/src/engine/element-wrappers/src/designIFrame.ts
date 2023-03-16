@@ -31,7 +31,7 @@ class StyleCommand {
   }
 }
 
-export default class DesignIFrame extends OutputTarget {
+export default class DesignIFrame extends OutputTarget<{}> {
   root: HTMLIFrameElement;
   doc: Document;
   docRoot: HTMLElement;
@@ -140,6 +140,12 @@ export default class DesignIFrame extends OutputTarget {
     }
 
     return caret.node.textContent.substr(0, caret.offset);
+  }
+
+  getSelectedText(): string {
+    // TODO:  figure out the proper implementation.
+    // KMW 16 and before behavior may be maintained by just returning the empty string.
+    return '';
   }
 
   getTextAfterCaret(): string {
