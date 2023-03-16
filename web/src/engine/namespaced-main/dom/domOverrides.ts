@@ -8,6 +8,9 @@ namespace com.keyman.dom {
     return true;
   }
 
+  // TODO:  noting that we do the default behavior instantly... just make it a callback used to
+  // configure the processors.  Have them call it whenever finalizing rules... or even pass it
+  // to constructing RuleBehavior instances.
   let headlessRuleBehaviorFinalize = text.RuleBehavior.prototype.finalize;
   text.RuleBehavior.prototype.finalize = function(this: text.RuleBehavior, processor: text.KeyboardProcessor, outputTarget: text.OutputTarget, readonly: boolean) {
     let keyman = com.keyman.singleton;
