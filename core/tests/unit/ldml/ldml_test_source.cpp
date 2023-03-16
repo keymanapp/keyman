@@ -403,7 +403,7 @@ void LdmlJsonTestSource::set_key_from_id(key_event& k, const std::u16string& id)
   }
 
   // OK. Now we can search the keybag
-  KMX_DWORD keyIndex = 0;
+  KMX_DWORD keyIndex = 0; // initialize loop
   auto *key2 = kmxplus->key2Helper.findKeyByStringId(strId, keyIndex);
   assert(key2 != nullptr);
   if (key2 == nullptr) {
@@ -480,7 +480,6 @@ int LdmlJsonTestSource::load(const nlohmann::json &data) {
 }
 
 #if defined(HAVE_ICU4C)
-
 class LdmlJsonRepertoireTestSource : public LdmlTestSource {
 public:
   LdmlJsonRepertoireTestSource(const std::string &path, km::kbp::kmx::kmx_plus *kmxplus);
@@ -515,7 +514,14 @@ LdmlJsonRepertoireTestSource::~LdmlJsonRepertoireTestSource() {
 
 void
 LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
+  if (type != "simple") {
+    std::cerr << "TODO-LDML: Warning: only 'simple' is supported now, not "  << type << std::endl;
+    fillin.type = LDML_ACTION_DONE;
+    return;
+  }
+
   if (!iterator->next()) {
+    std::cout << "TODO-LDML: end of unicode set iterator" << std::endl;
     fillin.type = LDML_ACTION_DONE;
     return;
   }
@@ -540,8 +546,56 @@ LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
   expected.append(chstr);
   need_check = true;
 
-  fillin.type = LDML_ACTION_EMIT_STRING; // TODO-LDML: need lookup of key
-  fillin.string = chstr;
+  // ---------------------------------------------------
+  // find a key that can emit this string.
+  // TODO-LDML: no transforms yet.
+  // TODO-LDML: looking for an exact single key for now
+
+  assert(kmxplus != nullptr);
+  // lookup the id
+  assert(kmxplus->strs != nullptr);
+  assert(kmxplus->key2 != nullptr);
+  assert(kmxplus->layr != nullptr);
+
+  assert(kmxplus->key2Helper.valid());
+  assert(kmxplus->layrHelper.valid());
+
+  // First, find the string as an id
+  // TODO-LDML: will not work for multi string cases
+  KMX_DWORD strId = kmxplus->strs->find(chstr);
+  if (strId == 0) { // will also get here if id is empty.
+    fillin.string = u"No string for repertoire test: ";
+    fillin.string.append(chstr);
+    fillin.type = LDML_ACTION_FAIL;
+    return;
+  }
+  assert(strId != 0);
+
+  // OK. Now we can search the keybag
+  KMX_DWORD keyIndex = 0;
+  auto *key2 = kmxplus->key2Helper.findKeyByStringTo(strId, keyIndex);
+  if (key2 == nullptr) {
+    fillin.string = u"No key for repertoire test: ";
+    fillin.string.append(chstr);
+    fillin.type = LDML_ACTION_FAIL;
+  }
+  assert(key2 != nullptr);
+
+  // Now, look for the _first_ candidate vkey match in the kmap.
+  for (KMX_DWORD kmapIndex = 0; kmapIndex < kmxplus->key2->kmapCount; kmapIndex++) {
+    auto *kmap = kmxplus->key2Helper.getKmap(kmapIndex);
+    assert(kmap != nullptr);
+    if (kmap->key == keyIndex) {
+      fillin.k = {(km_kbp_virtual_key)kmap->vkey, (uint16_t)kmap->mod};
+      std::cout << "found vkey " << fillin.k.vk << ":" << fillin.k.modifier_state << std::endl;
+      fillin.type = LDML_ACTION_KEY_EVENT;
+      return;
+    }
+  }
+
+  fillin.type = LDML_ACTION_FAIL;
+  fillin.string = u"Could not find candidate vkey: ";
+  fillin.string.append(chstr);
 }
 
 const std::u16string &
@@ -568,7 +622,7 @@ int LdmlJsonRepertoireTestSource::load(const nlohmann::json &data) {
     std::cerr << "UnicodeSet c'tor problem " << u_errorName(status) << std::endl;
     return 1;
   }
-  std::cout << "Got UnicodeSet of " << uset->size() << "chars." << std::endl;
+  std::cout << "Got UnicodeSet of " << uset->size() << " char(s)." << std::endl;
   if (uset->hasStrings()) {
     // illegal unicodeset of this form:  [a b c {this_is_a_string}]
     std::cerr << "Spec err: may not have strings. " << chars << std::endl;

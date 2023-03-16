@@ -254,8 +254,16 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled, km::tests::
       std::cout << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
       // Compare internal context with expected result
       if (text_store != action.string) return __LINE__;
+    } else if (action.type == km::tests::LDML_ACTION_FAIL) {
+      // test requested failure
+      std::cout << "- FAIL: " << action.string << std::endl;
+      return __LINE__;
+    } else {
+      std::cerr << " Err: unhandled action type " << action.type << std::endl;
+      return __LINE__;
     }
   }
+  std::cout << "- DONE" << std::endl;
 
   // Test if the beep action was as expected
   if (g_beep_found != test_source.get_expected_beep())
