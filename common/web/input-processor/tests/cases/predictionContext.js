@@ -71,22 +71,20 @@ describe("PredictionContext", () => {
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const kbdProcessor = new KeyboardProcessor(deviceSpec);
+    const predictiveContext = new PredictionContext(langProcessor, kbdProcessor);
+
+    let updateFake = sinon.fake();
+    predictiveContext.on('update', updateFake);
 
     let mock = new Mock("appl", 4); // "appl|", with '|' as the caret position.
     const initialMock = Mock.from(mock);
-
-    let context = new PredictionContext(langProcessor, kbdProcessor, mock);
-
-    let updateFake = sinon.fake();
-    context.on('update', updateFake);
-    context.sendUpdateEvent(); // Allows external code to request a re-retrieval of current suggestion state.
+    const promise = predictiveContext.setCurrentTarget(mock);
 
     // Initial predictive state:  no suggestions.  context.initializeState() has not yet been called.
     assert.equal(updateFake.callCount, 1);
     assert.isEmpty(updateFake.firstCall.args[0]); // should have no suggestions. (if convenient for testing)
 
-    // Now, let's initialize the predictive state - this will load the initial suggestions.
-    await context.initializeState();
+    await promise;
     let suggestions;
 
     // Initialization results:  our first set of dummy suggestions.
@@ -95,7 +93,6 @@ describe("PredictionContext", () => {
     assert.deepEqual(suggestions.map((obj) => obj.displayAs), ['apple', 'apply', 'apples']);
     assert.isNotOk(suggestions.find((obj) => obj.tag == 'keep'));
     assert.isNotOk(suggestions.find((obj) => obj.transform.deleteLeft != 0));
-
 
     mock.insertTextBeforeCaret('e'); // appl| + e = apple
     let transcription = mock.buildTranscriptionFrom(initialMock, null, true);
@@ -115,15 +112,14 @@ describe("PredictionContext", () => {
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const kbdProcessor = new KeyboardProcessor(deviceSpec);
+    const predictiveContext = new PredictionContext(langProcessor, kbdProcessor);
 
     let mock = new Mock("appl", 4); // "appl|", with '|' as the caret position.
-
-    let context = new PredictionContext(langProcessor, kbdProcessor, mock);
-    let initialSuggestions = await context.initializeState();
+    const initialSuggestions = await predictiveContext.setCurrentTarget(mock);
 
     let updateFake = sinon.fake();
-    context.on('update', updateFake);
-    context.sendUpdateEvent(); // Allows external code to request a re-retrieval of current suggestion state.
+    predictiveContext.on('update', updateFake);
+    predictiveContext.sendUpdateEvent(); // Allows external code to request a re-retrieval of current suggestion state.
 
     // Now, let's initialize the predictive state - this will load the initial suggestions.
     let suggestions;
@@ -142,12 +138,11 @@ describe("PredictionContext", () => {
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const kbdProcessor = new KeyboardProcessor(deviceSpec);
+    const predictiveContext = new PredictionContext(langProcessor, kbdProcessor);
 
     let textState = new Mock("appl", 4); // "appl|", with '|' as the caret position.
 
-    let predictiveContext = new PredictionContext(langProcessor, kbdProcessor, textState);
-    // Pre-initialize the predictive state.
-    await predictiveContext.initializeState();
+    await predictiveContext.setCurrentTarget(textState);
 
     let updateFake = sinon.fake();
     predictiveContext.on('update', updateFake);
@@ -203,14 +198,13 @@ describe("PredictionContext", () => {
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const kbdProcessor = new KeyboardProcessor(deviceSpec);
+    const predictiveContext = new PredictionContext(langProcessor, kbdProcessor);
 
     let textState = new Mock("appl", 4); // "appl|", with '|' as the caret position.
 
     // Test setup - return to the state at the end of the prior-defined unit test ('suggestion application...')
 
-    let predictiveContext = new PredictionContext(langProcessor, kbdProcessor, textState);
-    // Pre-initialize the predictive state.
-    await predictiveContext.initializeState();
+    await predictiveContext.setCurrentTarget(textState);
 
     // This is the point in time that a reversion operation will rewind the context to.
     const revertBaseTextState = Mock.from(textState);
