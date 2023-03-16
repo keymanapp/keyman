@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 17.0.69 alpha 2023-03-16
+
+* chore(web): Cleanup build echo (#8446)
+* fix(developer): lm compiler handle missing line no in errors (#8444)
+* fix(android/app): Temporarily disable Keyman browser (#8430)
+* fix(android/engine): Add builder output for configure (#8442)
+* chore(linux): Update debian changelog (#8452)
+
 ## 17.0.68 alpha 2023-03-15
 
 * chore(common): add common test build configurations (#8431)
