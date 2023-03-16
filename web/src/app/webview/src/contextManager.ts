@@ -21,8 +21,6 @@ class ContextHost extends Mock {
       this.oninserttext(transform.deleteLeft, transform.insert, transform.deleteRight);
     }
   }
-
-  // ... selected text is actually looking kinda tricky here.
 }
 
 export default class ContextManager extends ContextManagerBase {
