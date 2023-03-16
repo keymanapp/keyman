@@ -623,11 +623,14 @@ int LdmlJsonRepertoireTestSource::load(const nlohmann::json &data) {
     return 1;
   }
   std::cout << "Got UnicodeSet of " << uset->size() << " char(s)." << std::endl;
+  #if (U_ICU_VERSION_MAJOR_NUM >= 70)
+  // TODO-LDML: function was private previously
   if (uset->hasStrings()) {
     // illegal unicodeset of this form:  [a b c {this_is_a_string}]
     std::cerr << "Spec err: may not have strings. " << chars << std::endl;
     return 1;
   }
+  #endif
   iterator = std::unique_ptr<icu::UnicodeSetIterator>(new icu::UnicodeSetIterator(*uset));
 
   return 0;
