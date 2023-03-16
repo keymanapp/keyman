@@ -83,9 +83,9 @@ endforeach
 keyboards_root = meson.current_source_dir() / 'keyboards'
 
 if build_machine.system() == 'windows'
-  test_source = run_command('run-shell.bat', 'get-test-source.inc.sh', keyboards_root, capture: true, check: true)
+  test_source = run_command('run-shell.bat', 'get-test-source.sh', keyboards_root, capture: true, check: true)
 else
-  test_source = run_command('get_test_source.inc.sh', keyboards_root, capture: true, check: true)
+  test_source = run_command('get_test_source.sh', keyboards_root, capture: true, check: true)
 endif
 
 tests = test_source.stdout().strip().split('\n')
