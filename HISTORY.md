@@ -1,5 +1,23 @@
 # Keyman Version History
 
+## 16.0.139 stable 2023-03-16
+
+* chore: Fail TC build if triggering Jenkins build fails (#8141)
+* chore(linux): Fix lintian warnings (#8153)
+* chore(linux): Update debian changelog (#8155)
+* chore(ios): update certificate (#8177)
+* cherrypick(windows): Fix Portuguese UI language name (#8190)
+* fix(linux): Fix autopkgtests (#8180)
+* chore(linux): Update changelog from Debian (#8191)
+* cherrypick(common): Cleanup Kannada locale (#8189)
+* fix(windows): add remove lang id uses correct kbd (#8195)
+* fix(linux): Fix autopkgtests (#8200)
+* chore(linux): Exclude autopkg tests on s390x (#8217)
+* chore(common): Update Fula strings for Sprint A17S6 (#8246)
+* chore(windows): Remove old Kannada setup strings (#8258)
+* fix(linux): Fix debian postinst script (#8295)
+* fix(developer): lm compiler handle missing line no in errors (#8445)
+
 ## 16.0.138 stable 2023-02-01
 
 * chore: add new developer build trigger (#8139)
