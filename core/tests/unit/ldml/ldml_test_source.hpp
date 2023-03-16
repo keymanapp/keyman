@@ -60,7 +60,6 @@ public:
   // helper functions
   static key_event char_to_event(char ch);
   static uint16_t get_modifier(std::string const m);
-  static km_kbp_virtual_key get_vk(std::string const &vk);
   static std::u16string parse_source_string(std::string const &s);
   static std::u16string parse_u8_source_string(std::string const &s);
 

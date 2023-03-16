@@ -31,6 +31,15 @@
 #include "utfcodec.hpp"
 
 #include "ldml_test_source.hpp"
+#include "ldml_test_utils.hpp"
+
+// Optional ICU4C
+#if defined(HAVE_ICU4C)
+// ?!
+#define U_FALLTHROUGH
+#include "unicode/uniset.h"
+#include "unicode/usetiter.h"
+#endif
 
 #define assert_or_return(expr) if(!(expr)) { \
   std::wcerr << __FILE__ << ":" << __LINE__ << ": " << \
@@ -270,16 +279,6 @@ LdmlTestSource::get_modifier(std::string const m) {
   return 0;
 }
 
-km_kbp_virtual_key
-LdmlTestSource::get_vk(std::string const &vk) {
-  for (int i = 1; i < 256; i++) {
-    if (vk == km::kbp::kmx::s_key_names[i]) {
-      return i;
-    }
-  }
-  return 0;
-}
-
 key_event
 LdmlEmbeddedTestSource::vkey_to_event(std::string const &vk_event) {
   // vkey format is MODIFIER MODIFIER K_NAME
@@ -480,6 +479,107 @@ int LdmlJsonTestSource::load(const nlohmann::json &data) {
   return 0;
 }
 
+#if defined(HAVE_ICU4C)
+
+class LdmlJsonRepertoireTestSource : public LdmlTestSource {
+public:
+  LdmlJsonRepertoireTestSource(const std::string &path, km::kbp::kmx::kmx_plus *kmxplus);
+  virtual ~LdmlJsonRepertoireTestSource();
+  virtual const std::u16string &get_context() const;
+  int load(const nlohmann::json &test);
+  virtual void next_action(ldml_action &fillin);
+private:
+  std::string path;
+  nlohmann::json data;  // maybe
+  std::string type;
+  std::u16string context;
+  std::u16string expected;
+  std::string chars;
+  std::unique_ptr<icu::UnicodeSet> uset;
+  std::unique_ptr<icu::UnicodeSetIterator> iterator;
+  bool need_check = false; // set this after each char
+  const km::kbp::kmx::kmx_plus *kmxplus;
+  /**
+   * Helpers
+  */
+  void set_key_from_id(key_event& k, const std::u16string& id);
+};
+
+LdmlJsonRepertoireTestSource::LdmlJsonRepertoireTestSource(const std::string &path, km::kbp::kmx::kmx_plus *k)
+:path(path), kmxplus(k){
+
+}
+
+LdmlJsonRepertoireTestSource::~LdmlJsonRepertoireTestSource() {
+}
+
+void
+LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
+  if (!iterator->next()) {
+    fillin.type = LDML_ACTION_DONE;
+    return;
+  }
+
+  if (need_check) {
+    need_check = false;
+    fillin.type = LDML_ACTION_CHECK_EXPECTED;
+    fillin.string = expected;
+    return;
+  }
+
+  // we have already excluded strings, so just get the codepoint
+  const km_kbp_usv ch = iterator->getCodepoint();
+
+  // as string for debugging.
+  // const icu::UnicodeString& str = iterator->getString();
+
+  km::kbp::kmx::char16_single ch16;
+  std::size_t len = km::kbp::kmx::Utf32CharToUtf16(ch, ch16);
+  std::u16string chstr = std::u16string(ch16.ch, len);
+  // append to expected
+  expected.append(chstr);
+  need_check = true;
+
+  fillin.type = LDML_ACTION_EMIT_STRING; // TODO-LDML: need lookup of key
+  fillin.string = chstr;
+}
+
+const std::u16string &
+LdmlJsonRepertoireTestSource::get_context() const {
+  return context; // no context needed
+}
+
+int LdmlJsonRepertoireTestSource::load(const nlohmann::json &data) {
+  this->data = data;  // TODO-LDML
+  // Need an update to json.hpp to use contains()
+  // if (data.contains("/type"_json_pointer)) {
+  if (data.find("type") != data.end()) {
+    type = data["/type"_json_pointer].get<std::string>();
+  } else {
+    type = "default";
+  }
+  chars      = data["/chars"_json_pointer].get<std::string>();
+  std::cout << "Loaded " << path << " = " << this->type << " || " << this->chars << std::endl;
+  UErrorCode status = U_ZERO_ERROR;
+  icu::UnicodeString pattern(chars.data(), chars.length());
+  uset = std::unique_ptr<icu::UnicodeSet>(new icu::UnicodeSet(pattern, status));
+  if (U_FAILURE(status)) {
+    // could be a malformed syntax isue
+    std::cerr << "UnicodeSet c'tor problem " << u_errorName(status) << std::endl;
+    return 1;
+  }
+  std::cout << "Got UnicodeSet of " << uset->size() << "chars." << std::endl;
+  if (uset->hasStrings()) {
+    // illegal unicodeset of this form:  [a b c {this_is_a_string}]
+    std::cerr << "Spec err: may not have strings. " << chars << std::endl;
+    return 1;
+  }
+  iterator = std::unique_ptr<icu::UnicodeSetIterator>(new icu::UnicodeSetIterator(*uset));
+
+  return 0;
+}
+#endif // HAVE_ICU4C
+
 LdmlJsonTestSourceFactory::LdmlJsonTestSourceFactory() : test_map() {
 }
 
@@ -528,17 +628,15 @@ int LdmlJsonTestSourceFactory::load(const km::kbp::path &compiled, const km::kbp
   // TODO-LDML: store these elsewhere?
   std::cout << "JSON: reading " << info_name << " test of " << info_keyboard << " by " << info_author << std::endl;
 
-  // TODO-LDML: repertoire test #8435
-
   auto all_tests = data["/keyboardTest/tests"_json_pointer];
-  assert_or_return((!all_tests.empty()) && (all_tests.size() > 0));
+  assert_or_return((!all_tests.empty()) && (all_tests.size() > 0));  // TODO-LDML: can be empty if repertoire only?
 
   for(auto tests : all_tests) {
     auto tests_name = tests["/name"_json_pointer].get<std::string>();
     for (auto test : tests["/test"_json_pointer]) {
       auto test_name = test["/name"_json_pointer].get<std::string>();
       std::string test_path;
-      test_path.append(tests_name).append("/").append(test_name);
+      test_path.append(info_name).append("/tests/").append(tests_name).append("/").append(test_name);
       std::cout << "JSON: reading " << info_name << "/" << test_path << std::endl;
 
       std::unique_ptr<LdmlJsonTestSource> subtest(new LdmlJsonTestSource(test_path, kmxplus.get()));
@@ -546,6 +644,26 @@ int LdmlJsonTestSourceFactory::load(const km::kbp::path &compiled, const km::kbp
       test_map[test_path] = std::unique_ptr<LdmlTestSource>(subtest.release());
     }
   }
+
+#if defined(HAVE_ICU4C)
+  auto rep_tests = data["/keyboardTest/repertoire"_json_pointer];
+  assert_or_return((!rep_tests.empty()) && (rep_tests.size() > 0));  // TODO-LDML: can be empty if tests only?
+
+  for(auto rep : rep_tests) {
+    auto rep_name  = rep["/name"_json_pointer].get<std::string>();
+
+    std::string test_path;
+    test_path.append(info_name).append("/repertoire/").append(rep_name);
+
+    std::unique_ptr<LdmlJsonRepertoireTestSource> reptest(new LdmlJsonRepertoireTestSource(test_path, kmxplus.get()));
+    assert_or_return(reptest->load(rep) == 0);
+    test_map[test_path] = std::unique_ptr<LdmlTestSource>(reptest.release());
+  }
+
+
+#else
+  std::cerr << "Warning: HAVE_ICU4C not defined, so not enabling repertoire tests" << std::endl;
+#endif
 
   return 0;
 }

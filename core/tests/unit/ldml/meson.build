@@ -4,9 +4,12 @@
 # Authors:      Marc Durdin
 #
 
-pkgconfig = 'pkg-config'
+# ICU4C is an optional dependency and used for repertoire tests
 icu4c = dependency('icu-uc', required: false)
 
+if icu4c.found()
+  defns += '-DHAVE_ICU4C'
+endif
 
 if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang' or compiler.get_id() == 'emscripten'
   warns = [
@@ -55,10 +58,13 @@ endif
 ldml = executable('ldml',
     'ldml.cpp',
     'ldml_test_source.cpp',
+    'ldml_test_utils.cpp',
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
     link_args: links + tests_flags,
-    objects: lib.extract_all_objects(recursive: false))
+    objects: lib.extract_all_objects(recursive: false),
+    dependencies: [icu4c],
+    )
 
 # Run tests on all keyboards (`tests` defined in keyboards/meson.build)
 
@@ -80,7 +86,7 @@ endforeach
 # Build and run additional test_kmx_plus test
 
 e = executable('test_kmx_plus', 'test_kmx_plus.cpp',
-    'ldml_test_source.cpp',
+    'ldml_test_utils.cpp',
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
     link_args: links + tests_flags,
