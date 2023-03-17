@@ -1,6 +1,5 @@
 ///<reference types="@keymanapp/models-types" />
 
-import DefaultOutput from "./defaultOutput.js";
 import KeyboardProcessor from "./keyboardProcessor.js";
 import OutputTarget, { Mock, type Transcription } from "./outputTarget.js";
 import { VariableStoreDictionary } from "../keyboards/keyboard.js";

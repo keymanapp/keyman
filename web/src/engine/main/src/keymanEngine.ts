@@ -1,5 +1,5 @@
 import { Configuration } from "keyman/engine/configuration";
-import { DefaultOutput, Keyboard, KeyboardKeymanGlobal, OutputTarget, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
+import { DefaultRules, Keyboard, KeyboardKeymanGlobal, OutputTarget, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
 import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
 import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
 import { OSKView } from "keyman/engine/osk";
@@ -64,7 +64,7 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
   protected processorConfiguration(): ProcessorInitOptions {
     return {
       keyboardInterface: this.interface,
-      defaultOutputRules: new DefaultOutput()
+      defaultOutputRules: new DefaultRules()
     };
   };
 

@@ -29,6 +29,10 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
     }
 
     this.osk = new AnchoredOSKView(oskConfig);
-    setupEmbeddedListeners(this.osk);
+    setupEmbeddedListeners(this, this.osk);
   }
+
+  // Properties set by the WebView hosting page
+  hideKeyboard?: () => void = null;
+  menuKeyUp?: () => void = null;
 }
