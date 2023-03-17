@@ -20,7 +20,7 @@ class SelectionRange {
   }
 }
 
-export default class ContentEditable extends OutputTarget<{}> {
+export default class ContentEditable extends OutputTarget {
   root: HTMLElement;
 
   constructor(ele: HTMLElement) {
