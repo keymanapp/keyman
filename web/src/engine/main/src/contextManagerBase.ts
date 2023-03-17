@@ -80,9 +80,3 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
   abstract get activeKeyboard(): {keyboard: Keyboard, metadata: KeyboardStub};
   abstract set activeKeyboard(kbd: {keyboard: Keyboard, metadata: KeyboardStub});
 }
-
-// Intended design:
-// - SiteContextManager - for website, document-aware context management
-//   - app/embed
-// - PassthroughContextManager - for WebView-hosted, app-embedded context management.
-//   - app/web
