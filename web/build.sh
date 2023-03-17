@@ -30,7 +30,7 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   "build" \
   "test" \
   ":app/webview              A puppetable version of KMW designed for use in a host app's WebView" \
-  ":engine/paths     Subset used to configure KMW" \
+  ":engine/paths             Subset used to configure KMW" \
   ":engine/device-detect     Subset used for device-detection " \
   ":engine/dom-utils         A common subset of function used for DOM calculations, layout, etc" \
   ":engine/element-wrappers  Subset used to integrate with website elements" \
