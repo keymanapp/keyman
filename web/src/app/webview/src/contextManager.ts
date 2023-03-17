@@ -57,11 +57,7 @@ export default class ContextManager extends ContextManagerBase {
 
     if(priorEntry.keyboard != kbd.keyboard || priorEntry.metadata != kbd.metadata) {
       this.emit('keyboardchange', kbd);
-
-      // Differs from the standard 'resetContext' by not using new-context rules; this IS
-      // a keyboard change, not a true context change.
-      this.resetKeyState();
-      this.predictionContext.resetContext();
+      this.resetContext();
     }
   }
 }
