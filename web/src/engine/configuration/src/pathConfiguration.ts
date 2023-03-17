@@ -3,7 +3,7 @@ import { OSKResourcePathConfiguration } from 'keyman/engine/osk';
 
 const addDelimiter = (p: string) => {
   // Add delimiter if missing
-  if(p.substring(p.length-1, p.length) != '/') {
+  if(p.substring(p.length-1) != '/') {
     return p + '/';
   } else {
     return p;
