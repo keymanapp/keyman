@@ -6,7 +6,7 @@
     "inlineSources": true,
     "allowSyntheticDefaultImports": true,
     "module": "es6",
-    "moduleResolution": "Node",
+    "moduleResolution": "Node16",
     "sourceMap": true,
     "target": "es5",
     "baseUrl": "./",

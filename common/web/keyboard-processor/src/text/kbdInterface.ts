@@ -258,14 +258,8 @@ export default class KeyboardInterface extends KeyboardHarness {
     // NOTE:  This implementation is web-core specific and is intentionally replaced, whole-sale,
     //        by DOM-aware code.
     let keyboard = new Keyboard(Pk);
-    this.activeKeyboard = keyboard;
+    this.loadedKeyboard = keyboard;
   }
-
-  /**
-   * Used by DOM-aware KeymanWeb to add keyboard stubs, used by the `KeyboardManager` type
-   * to optimize resource use.
-   */
-  registerStub?: (Pstub) => number;
 
   /**
    * Get *cached or uncached* keyboard context for a specified range, relative to caret
@@ -1145,7 +1139,9 @@ export default class KeyboardInterface extends KeyboardHarness {
     let prototype = this.prototype;
 
     var exportKBCallback = function(miniName: string, longName: string) {
-      prototype[miniName] = prototype[longName];
+      if(prototype[longName]) {
+        prototype[miniName] = prototype[longName];
+      }
     }
 
     exportKBCallback('KSF', 'saveFocus');

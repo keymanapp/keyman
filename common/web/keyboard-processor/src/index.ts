@@ -13,6 +13,7 @@ export {
   KeyboardInternalPropertySpec,
   default as KeyboardProperties,
   KeyboardFont,
+  MetadataObj as RawKeyboardMetadata,
   LanguageAPIPropertySpec
 } from "./keyboards/keyboardProperties.js";
 export { default as SpacebarText } from "./keyboards/spacebarText.js";

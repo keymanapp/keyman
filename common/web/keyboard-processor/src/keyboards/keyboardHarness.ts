@@ -62,7 +62,7 @@ export class KeyboardHarness {
   /**
    * This field serves as the receptacle for a successfully-loaded Keyboard.
    */
-  public activeKeyboard: Keyboard;
+  public loadedKeyboard: Keyboard = null;
 
   /**
    * Keyman keyboards register themselves into the Keyman Engine for Web by directly
@@ -79,7 +79,10 @@ export class KeyboardHarness {
    * @param scriptObject
    */
   public KR(scriptObject: any) {
-    this.activeKeyboard = new Keyboard(scriptObject);
+    if(this.loadedKeyboard) {
+      throw new Error("Unexpected state:  the most-recently loaded keyboard field was not properly reset.");
+    }
+    this.loadedKeyboard = new Keyboard(scriptObject);
   }
 
   /**

@@ -81,8 +81,9 @@ describe('InputProcessor', function() {
 
       // Load the keyboard.
       let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
-      await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_chirality.js'));
+      const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_chirality.js'));
       keyboardWithHarness = keyboardLoader.harness;
+      keyboardWithHarness.activeKeyboard = keyboard;
     });
 
     describe('without fat-fingering', function() {

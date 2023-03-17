@@ -33,8 +33,10 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
       document.head.appendChild(script);
       script.onerror = promise.reject;
       script.onload = () => {
-        if(this.harness.activeKeyboard) {
-          promise.resolve(this.harness.activeKeyboard);
+        if(this.harness.loadedKeyboard) {
+          const keyboard = this.harness.loadedKeyboard;
+          this.harness.loadedKeyboard = null;
+          promise.resolve(keyboard);
         } else {
           promise.reject();
         }

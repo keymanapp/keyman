@@ -10,32 +10,32 @@ import { VariableStoreCookieSerializer } from "./variableStoreCookieSerializer.j
 
 export default class KeyboardInterface extends KeyboardInterfaceBase {
   private readonly contextManager: ContextManager;
-  private readonly stubAndKeyboardCache: StubAndKeyboardCache;
+  private stubAndKeyboardCache: StubAndKeyboardCache;
 
   constructor(
     _jsGlobal: any,
     keymanGlobal: KeyboardKeymanGlobal,
-    cache: StubAndKeyboardCache,
     contextManager: ContextManager
   ) {
     super(_jsGlobal, keymanGlobal, new VariableStoreCookieSerializer());
-    this.stubAndKeyboardCache = cache;
     this.contextManager = contextManager;
   }
 
-  registerKeyboard(Pk): void {
-    const priorActiveKeyboard = this.activeKeyboard;
+  setKeyboardCache(cache: StubAndKeyboardCache) {
+    this.stubAndKeyboardCache = cache;
+  }
 
+  registerKeyboard(Pk): void {
     // Among other things, sets Pk as a newly-active Keyboard.
     super.registerKeyboard(Pk);
-    const registeredKeyboard = this.activeKeyboard;
+    const registeredKeyboard = this.loadedKeyboard;
 
     const cacheEntry = this.stubAndKeyboardCache.getKeyboard(registeredKeyboard.id);
     if(!(cacheEntry instanceof Promise)) {
       // Deliberate keyboard pre-loading via direct script-tag link on the page.
-      // Just load the keyboard and set our field back in place.
+      // Just load the keyboard and reset the harness's keyboard-receiver field.
       this.stubAndKeyboardCache.addKeyboard(new Keyboard(Pk));
-      this.activeKeyboard = priorActiveKeyboard;
+      this.loadedKeyboard = null;
     }
   }
 
@@ -48,7 +48,7 @@ export default class KeyboardInterface extends KeyboardInterfaceBase {
    * @param       {Object}      Pstub     Keyboard stub object
    * @return      {?number}               1 if already registered, else null
    */
-  registerStub = (Pstub): number => {
+  registerStub(Pstub): number {
     // Other notes:  this is where app-hosted KeymanWeb receives pre-formed stubs.
     // They're specified in the "internal" format (KI, KN, KLC...)
     // (SHIFT-CTRL-F @ repo-level:  `setKeymanLanguage`)

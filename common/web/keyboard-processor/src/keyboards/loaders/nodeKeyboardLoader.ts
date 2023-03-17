@@ -24,12 +24,18 @@ export class NodeKeyboardLoader extends KeyboardLoaderBase {
 
   protected loadKeyboardInternal(uri: string): Promise<Keyboard> {
     try {
+      // `fs` does not like 'file:///'; it IS "File System" oriented, after all, and wants a path, not a URI.
+      if(uri.indexOf('file:///') == 0) {
+        uri = uri.substring('file:///'.length);
+      }
       const script = new vm.Script(fs.readFileSync(uri).toString());
       script.runInContext(this.harness._jsGlobal);
     } catch (err) {
       return Promise.reject(err);
     }
 
-    return Promise.resolve(this.harness.activeKeyboard);
+    const keyboard = this.harness.loadedKeyboard;
+    this.harness.loadedKeyboard = null;
+    return Promise.resolve(keyboard);
   }
 }

@@ -29,7 +29,6 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   "configure" \
   "build" \
   "test" \
-  ":app/browser              The website-integrating, browser-based version of KMW" \
   ":app/webview              A puppetable version of KMW designed for use in a host app's WebView" \
   ":engine/configuration     Subset used to configure KMW" \
   ":engine/device-detect     Subset used for device-detection " \
@@ -39,11 +38,15 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":engine/main              Builds all common code used by KMW's app/-level targets" \
   ":engine/osk               Builds the Web OSK module"
 
+# ":app/browser              The website-integrating, browser-based version of KMW" \
+
 # Possible TODO?
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
 
 builder_describe_outputs \
   configure                      /node_modules
+
+# build:app/webview              build/app/webview/lib/index.js \
 
   # TODO:  app/ui linkage.
 
@@ -71,13 +74,16 @@ fi
 builder_run_child_actions build:engine/device-detect
 builder_run_child_actions build:engine/dom-utils
 builder_run_child_actions build:engine/element-wrappers
-builder_run_child_actions build:engine/keyboard-cache
 
 # Uses engine/dom-utils
 builder_run_child_actions build:engine/osk
 
 # Uses engine/osk (due to resource-path config interface)
 builder_run_child_actions build:engine/configuration
+
+# Uses engine/config (also due to resource-path config interface, but for the
+# more complete version of that interface)
+builder_run_child_actions build:engine/keyboard-cache
 
 # Uses engine/configuration, engine/device-detect, engine/keyboard-cache, & engine/osk
 builder_run_child_actions build:engine/main
@@ -86,7 +92,8 @@ builder_run_child_actions build:engine/main
 builder_run_child_actions build:app/webview
 
 # Uses literally everything `engine/` above
-builder_run_child_actions build:app/browser
+# Is not yet compilable due to unmodularized components.
+# builder_run_child_actions build:app/browser
 
 builder_run_child_actions test
 

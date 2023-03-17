@@ -34,7 +34,7 @@ builder_describe "Builds configuration subclasses used by the Keyman Engine for 
 
 builder_describe_outputs \
   configure    /node_modules \
-  build        /web/build/$SUBPROJECT_NAME/obj/index.js
+  build        /web/build/$SUBPROJECT_NAME/lib/index.mjs
 
 builder_parse "$@"
 

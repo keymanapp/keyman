@@ -56,8 +56,9 @@ function runStringRuleSet(input, output) {
 describe('Engine - notany() and context()', function() {
   before(async function() {
     let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
-    await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_917.js'));
+    const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_917.js'));
     keyboardWithHarness = keyboardLoader.harness;
+    keyboardWithHarness.activeKeyboard = keyboard;
   });
 
   /*

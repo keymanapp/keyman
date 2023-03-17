@@ -16,7 +16,7 @@ const TestResources = {
     isEmbedded: false,
     pathConfig: {
       fonts: '',
-      resources: '/@keymanapp/keyman/src/resources/osk'
+      resources: '/@keymanapp/keyman/src/resources'
     },
     hostDevice: device.coreSpec,
     allowHideAnimations: false // shortens timings.

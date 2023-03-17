@@ -28,14 +28,15 @@
     },
     "./engine/keyboard-cache": {
       "types": "./build/engine/keyboard-cache/obj/index.d.ts",
-      "import": "./build/engine/keyboard-cache/obj/index.js"
+      "import": "./build/engine/keyboard-cache/obj/index.js",
+      "require": "./build/engine/keyboard-cache/obj/index.js"
     },
     "./engine/keyboard-cache/lib": {
       "types": "./build/engine/keyboard-cache/lib/index.d.ts",
       "import": "./build/engine/keyboard-cache/lib/index.mjs"
     },
     "./engine/keyboard-cache/dom-requester": {
-      "types": "./build/engine/keyboard-cache/obj/index.d.ts",
+      "types": "./build/engine/keyboard-cache/obj/domCloudRequester.d.ts",
       "import": "./build/engine/keyboard-cache/obj/domCloudRequester.js"
     },
     "./engine/keyboard-cache/dom-requester/lib": {
@@ -43,7 +44,7 @@
       "import": "./build/engine/keyboard-cache/lib/dom-cloud-requester.mjs"
     },
     "./engine/keyboard-cache/node-requester": {
-      "types": "./build/engine/keyboard-cache/obj/index.d.ts",
+      "types": "./build/engine/keyboard-cache/obj/nodeCloudRequester.d.ts",
       "import": "./build/engine/keyboard-cache/obj/nodeCloudRequester.js"
     },
     "./engine/keyboard-cache/node-requester/lib": {
