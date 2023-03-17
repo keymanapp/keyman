@@ -4,7 +4,7 @@ Keyman Third Party Package Readme: Sentry
 Name:              Sentry
 Purpose:           Sentry provides error reporting to a Sentry server
 Source:            https://github.com/getsentry/sentry-native
-Version:           0.4.9
+Version:           0.6.0
 License:           MIT
 Updated for:       N/A
 Documentation:     https://docs.sentry.io/platforms/native/
