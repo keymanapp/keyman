@@ -10,11 +10,17 @@ import type Keyboard from "../keyboards/keyboard.js";
 import { type DeviceSpec } from "@keymanapp/web-utils";
 
 import Codes from './codes.js';
-import DefaultOutput from './defaultOutput.js';
+import DefaultRules from './defaultRules.js';
 
 // Represents a probability distribution over a keyboard's keys.
 // Defined here to avoid compilation issues.
 export type KeyDistribution = {keyId: string, p: number}[];
+
+/**
+ * A simple instance of the standard 'default rules' for keystroke processing from the
+ * DefaultRules base class.
+ */
+const BASE_DEFAULT_RULES = new DefaultRules();
 
 export interface KeyEventSpec {
 
@@ -147,7 +153,7 @@ export default class KeyEvent implements KeyEventSpec {
       // the actual keyname instead.
       mappingEvent.kName = 'K_xxxx';
       mappingEvent.Lmodifiers = (shifted ? 0x10 : 0);  // mnemonic lookups only exist for default & shift layers.
-      var mappedChar: string = DefaultOutput.BASE.forAny(mappingEvent, true);
+      var mappedChar: string = BASE_DEFAULT_RULES.forAny(mappingEvent, true);
 
       /* First, save a backup of the original code.  This one won't needlessly trigger keyboard
         * rules, but allows us to replicate/emulate commands after rule processing if needed.

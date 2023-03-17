@@ -23,10 +23,10 @@ SUBPROJECT_NAME=engine/main
 
 builder_describe "Builds the Keyman Engine for Web's common top-level base classes." \
   "@/common/web/input-processor build" \
-  "@../configuration build" \
-  "@../device-detect build" \
-  "@../keyboard-cache build" \
-  "@../osk build" \
+  "@/web/src/engine/configuration build" \
+  "@/web/src/engine/device-detect build" \
+  "@/web/src/engine/keyboard-cache build" \
+  "@/web/src/engine/osk build" \
   "clean" \
   "configure" \
   "build" \
