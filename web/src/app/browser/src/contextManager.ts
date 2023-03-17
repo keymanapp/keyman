@@ -27,6 +27,10 @@ export default class ContextManager extends ContextManagerBase {
       // `this` itself will be responsible for _IgnoreNextSelChange and focusLastActiveElement.
       // Still trying to work out the uiManager bit, since the OSK does need to interact with that.
       // Keep the rest of the comment below post-modularization, though:
+      //
+      // While not yet fully connected, ContextManager and its subclasses will be responsible for maintaining
+      // active elements & their focus... something that should only really matter for the website-integrating
+      // subclass.
 
       // Required for the `sil_euro_latin` keyboard's desktop OSK/table to function properly.
       keyman.uiManager.setActivatingUI(true);

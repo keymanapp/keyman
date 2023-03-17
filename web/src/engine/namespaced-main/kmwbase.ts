@@ -67,10 +67,8 @@ namespace com.keyman {
     globalLanguageCode = null; // Indicates the language code corresponding to `globalKeyboard`.
     isEmbedded = false;        // Indicates if the KeymanWeb instance is embedded within a mobile app.
                                // Blocks full page initialization when set to `true`.
-    refocusTimer = 0;          // Tracks a timeout event that aids of OSK modifier/state key tracking when the document loses focus.
 
     initialized: number;       // Signals the initialization state of the KeymanWeb system.
-    isHeadless = false;        // Indicates that KMW lacks any access to the DOM.  Nothing yet implemented for '= true'.
     'build' = 300;             // TS needs this to be defined within the class.
     _BrowserIsSafari: boolean; // A legacy browser-check variable.
 

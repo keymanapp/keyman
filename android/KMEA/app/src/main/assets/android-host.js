@@ -28,9 +28,9 @@ function init() {
   keyman.init({'app':device,'fonts':'packages/',root:'./'});
   keyman.util.setOption('attachType','manual');
   keyman.oninserttext = insertText;
-  keyman.showKeyboardList = showMenu;
-  keyman.menuKeyUp = menuKeyUp;
-  keyman.hideKeyboard = hideKeyboard;
+  window.showKeyboardList = showMenu;
+  window.hideKeyboard = hideKeyboard;
+  window.menuKeyUp = menuKeyUp;
   keyman.getOskHeight = getOskHeight;
   keyman.getOskWidth = getOskWidth;
   keyman.beepKeyboard = beepKeyboard;

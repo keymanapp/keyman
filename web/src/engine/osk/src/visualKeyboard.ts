@@ -121,25 +121,9 @@ interface EventMap {
    */
   'keyEvent': (event: KeyEvent) => void,
 
-  /**
-   * A virtual keystroke corresponding to a "hide" command has been received.
-   *
-   * Original handling:
-   ```
-    keyman.uiManager.setActivatingUI(false);
-    oskManager.startHide(true);
-    keyman.domManager.lastActiveElement = null;
-   ```
-   */
-  'hideRequested': () => void,
+  'hideRequested': (keyElement: KeyElement) => void,
 
-  /**
-   * Event replacing the following original code line:
-   ```
-    oskManager.showLanguageMenu();
-   ```
-   */
-  'globeKey': (keyElement: KeyElement) => void
+  'globeKey': (keyElement: KeyElement, on: boolean) => void
 }
 
 export default class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardView {
@@ -415,7 +399,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   public get fontRootPath(): string {
-    return this.config.fontRootPath;
+    return this.config.pathConfig.fonts;
   }
 
   public get styleSheetManager(): StylesheetManager {
@@ -1643,7 +1627,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       hostDevice: deviceSpec,
       isStatic: true,
       topContainer: null,
-      fontRootPath: fontRootPath,
+      pathConfig: {
+        fonts: fontRootPath,
+        resources: '' // ignored
+      },
       styleSheetManager: null
     }); //
 
@@ -1746,7 +1733,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * @returns
    */
   startLongpress(key: KeyElement): PendingGesture {
-    let _this = this;
+    if(this.config.embeddedGestureConfig.startLongpress) {
+      return this.config.embeddedGestureConfig.startLongpress(this, key);
+    }
 
     // First-level object/Promise:  will produce a subkey popup when the longpress gesture completes.
     // 'Returns' a second-level object/Promise:  resolves when a subkey is selected or is cancelled.
@@ -1759,7 +1748,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         this.topContainer.appendChild(subkeyPopup.shim);
 
         // Must be placed after its `.element` has been inserted into the DOM.
-        subkeyPopup.reposition(_this);
+        subkeyPopup.reposition(this);
       }
     });
 
@@ -1893,11 +1882,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   optionKey(e: KeyElement, keyName: string, keyDown: boolean) {
-    if (keyDown) {
-      if (keyName.indexOf('K_LOPT') >= 0) {
-        this.emit('globeKey', e);
-      } else if (keyName.indexOf('K_ROPT') >= 0) {
-        this.emit('hideRequested');
+    if (keyName.indexOf('K_LOPT') >= 0) {
+      this.emit('globeKey', e, keyDown);
+    } else if (keyName.indexOf('K_ROPT') >= 0) {
+      if (keyDown) {
+        this.emit('hideRequested', e);
       }
     }
   };
@@ -1928,22 +1917,28 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    *  Create a key preview element for phone devices
    */
   createKeyTip() {
-    if (this.device.formFactor == 'phone') {
+    if(this.config.embeddedGestureConfig.createKeyTip) {
+      this.keytip = this.config.embeddedGestureConfig.createKeyTip(this);
+    } else if (this.device.formFactor == 'phone') {
       if (this.keytip == null) {
         // For now, should only be true (in production) when keyman.isEmbedded == true.
         let constrainPopup = this.isEmbedded;
         this.keytip = new InternalKeyTip(constrainPopup);
       }
+    }
 
-      // Always append to _Box (since cleared during OSK Load)
-      if (this.keytip && this.keytip.element) {
-        this.topContainer.appendChild(this.keytip.element);
-      }
+    // Always append to _Box (since cleared during OSK Load)
+    if (this.keytip && this.keytip.element) {
+      this.topContainer.appendChild(this.keytip.element);
     }
   };
 
-  createGlobeHint() {
-    // A no-op for standard, non-app-embedded use cases.
+  createGlobeHint(): GlobeHint {
+    if(this.config.embeddedGestureConfig.createGlobeHint) {
+      return this.config.embeddedGestureConfig.createGlobeHint(this);
+    } else {
+      return null;
+    }
   }
 
   shutdown() {

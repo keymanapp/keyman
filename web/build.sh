@@ -73,11 +73,11 @@ builder_run_child_actions build:engine/dom-utils
 builder_run_child_actions build:engine/element-wrappers
 builder_run_child_actions build:engine/keyboard-cache
 
-# Uses engine/device-detect
-builder_run_child_actions build:engine/configuration
-
 # Uses engine/dom-utils
 builder_run_child_actions build:engine/osk
+
+# Uses engine/osk (due to resource-path config interface)
+builder_run_child_actions build:engine/configuration
 
 # Uses engine/configuration, engine/device-detect, engine/keyboard-cache, & engine/osk
 builder_run_child_actions build:engine/main
@@ -85,9 +85,8 @@ builder_run_child_actions build:engine/main
 # Uses all but engine/element-wrappers
 builder_run_child_actions build:app/webview
 
-### Intentionally disabled at this time - the current focus is on build:app/webview.
-# # Uses literally everything `engine/` above
-# builder_run_child_actions build:app/browser
+# Uses literally everything `engine/` above
+builder_run_child_actions build:app/browser
 
 builder_run_child_actions test
 

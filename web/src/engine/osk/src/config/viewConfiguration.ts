@@ -3,12 +3,6 @@ import CommonConfiguration from "./commonConfiguration.js";
 
 export default interface Configuration extends CommonConfiguration {
   /**
-   * Denotes a list of hrefs to any and all common stylesheets to be applied to the OSK.
-   * Only language/keyboard-independent ones.
-   */
-  commonStyleSheetRefs: string[],
-
-  /**
    * If set, the value returned by the function set here will be used instead of any automatic
    * width detection functionality.
    */

@@ -7,6 +7,7 @@ import HelpPageView from '../components/helpPageView.js';
 import KeyboardView from '../components/keyboardView.interface.js';
 import VisualKeyboard from '../visualKeyboard.js';
 import { LengthStyle, ParsedLengthStyle } from '../lengthStyle.js';
+import { type KeyElement } from '../keyElement.js';
 
 import {
   Codes,
@@ -59,26 +60,27 @@ interface EventMap {
     var Lelem = keyman.domManager.lastActiveElement;
 
     if(Lelem != null) {
-      // Handle any DOM state management related to click inputs.
+      // Handle any DOM state management related to click inputs.   // To be done:  handled through ContextManager
       let outputTarget = dom.Utils.getOutputTarget(Lelem);
       keyman.domManager.initActiveElement(Lelem);
 
-      // Clear any cached codepoint data; we can rebuild it if it's unchanged.
+      // Clear any cached codepoint data; we can rebuild it if it's unchanged.     // Handled!
       outputTarget.invalidateSelection();
       // Deadkey matching continues to be troublesome.
       // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
       outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
 
-      if(!keyman.isEmbedded) {
+      if(!keyman.isEmbedded) { // To be done:  handled through ContextManager
         keyman.uiManager.setActivatingUI(true);
         com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
         keyman.domManager.focusLastActiveElement();
         com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
       }
 
-      let retVal = !!keyman.core.processKeyEvent(Lkc, outputTarget);
+      let retVal = !!keyman.core.processKeyEvent(Lkc, outputTarget);              // Handled!
 
       // Now that processing is done, we can do a bit of post-processing, too.
+      // To be done:  handled through ContextManager
       keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
       return retVal;
     } else {
@@ -101,33 +103,19 @@ interface EventMap {
   onshow(): void;
   /**
    *
-  ```
-    // If hidden by the UI, be sure to restore the focus
-    if(hiddenByUser && this.activeTarget) {
-      this.activeTarget?.focus();
-    }
-  ```
    */
   onhide(hiddenByUser: boolean): void;
 
   /**
-   ```
-// Display list of installed keyboards in pop-up menu
-
-// In the future, this language menu should be defined as a UI module like the standard
-// desktop UI modules.  The globe key should then trigger an event to _request_ that the
-// consuming engine display the active UI module's menu.
-
-showLanguageMenu() {
-  if(this.hostDevice.touchable) {
-    this.lgMenu = new LanguageMenu(com.keyman.singleton);
-    this.lgMenu.show();
-  }
-}
-  ```
+   * Indicates that the globe key has either been pressed (`on` == `true`)
+   * or released (`on` == `false`).
    */
-  shouldShowLanguageMenu: (e: HTMLElement) => void;
-  shouldHideLanguageMenu: () => void;
+  globeKey: (e: KeyElement, on: boolean) => void;
+
+  /**
+   * A virtual keystroke corresponding to a "hide" command has been received.
+   */
+  hideRequested: (key: KeyElement) => void;
 
   /**
    * This event is raised when the OSK's 'config' button is clicked.
@@ -306,12 +294,13 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
   private mouseEnterPromise?: ManagedPromise<void>;
   private touchEventPromiseManager = new TouchEventPromiseMap();
 
+  private static readonly STYLESHEET_FILES = ['osk/kmwosk.css', 'osk/globe-hint.css'];
+
   constructor(configuration: Configuration) {
     super();
 
     // Clone the config; do not allow object references to be altered later.
     this.config = configuration = {...configuration};
-    this.config.commonStyleSheetRefs = [...configuration.commonStyleSheetRefs];
 
     // `undefined` is falsy, but we want a `true` default behavior for this config property.
     if(this.config.allowHideAnimations === undefined) {
@@ -321,6 +310,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
     this.config.device = configuration.device || configuration.hostDevice;
 
     this.config.isEmbedded = configuration.isEmbedded || false;
+    this.config.embeddedGestureConfig = configuration.embeddedGestureConfig || {};
     this.config.activator.on('activate', this.activationListener);
 
     // OSK initialization - create DIV and set default styles
@@ -355,7 +345,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
   }
 
   public get fontRootPath(): string {
-    return this.config.fontRootPath;
+    return this.config.pathConfig.fonts;
   }
 
   public get isEmbedded(): boolean {
@@ -802,7 +792,8 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
 
     // Install the default OSK stylesheet - but don't have it managed by the keyboard-specific stylesheet manager.
     // We wish to maintain kmwosk.css whenever keyboard-specific styles are reset/removed.
-    for(let sheetHref of this.configuration.commonStyleSheetRefs) {
+    for(let sheetFile of OSKView.STYLESHEET_FILES) {
+      const sheetHref = `${this.config.pathConfig.resources}/${sheetFile}`;
       this.uiStyleSheetManager.linkExternalSheet(sheetHref);
     }
 
@@ -835,8 +826,12 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
     if(this.vkbd) {
       // Create the key preview (for phones)
       this.vkbd.createKeyTip();
+
       // Create the globe hint (for embedded contexts; has a stub for other contexts)
-      this.vkbd.createGlobeHint();
+      const globeHint = this.vkbd.createGlobeHint();
+      if(globeHint) {
+        this._Box.appendChild(globeHint.element);
+      }
 
       // Append a stylesheet for this keyboard for keyboard specific styles
       // or if needed to specify an embedded font
@@ -894,11 +889,16 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
       hostDevice: this.hostDevice,
       topContainer: this._Box,
       styleSheetManager: this.kbdStyleSheetManager,
-      fontRootPath: this.fontRootPath
+      pathConfig: this.config.pathConfig,
+      embeddedGestureConfig: this.config.embeddedGestureConfig
     });
 
     vkbd.on('keyEvent', (keyEvent) => this.emit('keyEvent', keyEvent));
-    vkbd.on('globeKey', (keyElement) => this.emit('shouldShowLanguageMenu', keyElement));
+    vkbd.on('globeKey', (keyElement, on) => this.emit('globeKey', keyElement, on));
+    vkbd.on('hideRequested', (keyElement) => {
+      this.doHide(true);
+      this.emit('hideRequested', keyElement);
+    });
 
     // Set box class - OS and keyboard added for Build 360
     this._Box.className=device.formFactor+' '+ device.OS.toLowerCase() + ' kmw-osk-frame';

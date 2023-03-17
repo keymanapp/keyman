@@ -99,10 +99,7 @@ if builder_start_action test:engine; then
     CONFIG=manual.conf.cjs
   fi
 
-  # Build modernizr module
-  modernizr -c src/test/auto/integrated/modernizr.config.json -d src/test/auto/integrated/modernizr.js
-
-  # Prepare the flags for the karma command.
+    # Prepare the flags for the karma command.
   KARMA_FLAGS=
 
   if builder_is_debug_build; then
@@ -119,6 +116,9 @@ if builder_start_action test:engine; then
   fi
 
   karma start $KARMA_FLAGS "${KEYMAN_ROOT}/web/src/test/auto/dom/$CONFIG"
+
+  # Build modernizr module
+  modernizr -c src/test/auto/integrated/modernizr.config.json -d src/test/auto/integrated/modernizr.js
   karma start $KARMA_FLAGS $KARMA_EXT_FLAGS "${KEYMAN_ROOT}/web/src/test/auto/integrated/$CONFIG"
 
   builder_finish_action success test:engine

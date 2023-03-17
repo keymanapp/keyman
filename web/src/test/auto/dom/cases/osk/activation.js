@@ -12,8 +12,10 @@ device.detect();
 const TestResources = {
   OskConfig: {
     isEmbedded: false,
-    fontRootPath: '',
-    commonStyleSheetRefs: ['/@keymanapp/keyman/src/resources/osk/kmwosk.css', '@keymanapp/keyman/src/resources/osk/globe-hint.css'],
+    pathConfig: {
+      fonts: '',
+      resources: '/@keymanapp/keyman/src/resources'
+    },
     hostDevice: device.coreSpec,
     allowHideAnimations: false // shortens timings.
   }

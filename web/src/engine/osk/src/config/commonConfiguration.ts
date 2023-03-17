@@ -1,5 +1,8 @@
 import { DeviceSpec } from "@keymanapp/web-utils";
 
+import EmbeddedGestureConfig from './embeddedGestureConfig.js';
+import OSKResourcePathConfiguration from "./oskResourcePathConfiguration.interface.js";
+
 export default interface CommonConfiguration {
   /**
    * Metadata for the type of device to emulate and target with the on-screen keyboard.
@@ -18,7 +21,13 @@ export default interface CommonConfiguration {
   isEmbedded?: boolean,
 
   /**
-   * The base resource path to use for font fetches.
+   * Configured paths usable to find OSK resources.
    */
-  fontRootPath: string
+  pathConfig: OSKResourcePathConfiguration;
+
+  /**
+   * Allows control-flow forwarding of gestures that may have special implementation when
+   * embedded within a WebView.
+   */
+  embeddedGestureConfig?: EmbeddedGestureConfig;
 }
