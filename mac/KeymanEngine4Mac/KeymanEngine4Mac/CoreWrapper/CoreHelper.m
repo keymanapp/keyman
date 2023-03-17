@@ -79,20 +79,24 @@ const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
 
 -(UInt32)macToKeymanModifier:(NSEventModifierFlags)modifiers {
   UInt32 keymanModifiers = 0;
-  if([self isShiftKey:modifiers]) {
+  if ([self isShiftKey:modifiers]) {
     keymanModifiers |= KM_KBP_MODIFIER_SHIFT;
   }
-  if([self isLeftControlKey:modifiers]) {
+  
+  if ([self isLeftControlKey:modifiers]) {
     keymanModifiers |= KM_KBP_MODIFIER_LCTRL;
-  }
-  if([self isRightControlKey:modifiers]) {
+  } else if ([self isRightControlKey:modifiers]) {
     keymanModifiers |= KM_KBP_MODIFIER_RCTRL;
+  } else if ([self isControlKey:modifiers]) {
+    keymanModifiers |= KM_KBP_MODIFIER_CTRL;
   }
+  
   if([self isLeftOptionKey:modifiers]) {
     keymanModifiers |= KM_KBP_MODIFIER_LALT;
-  }
-  if([self isRightOptionKey:modifiers]) {
+  } else if([self isRightOptionKey:modifiers]) {
     keymanModifiers |= KM_KBP_MODIFIER_RALT;
+  } else if ([self isOptionKey:modifiers]) {
+    keymanModifiers |= KM_KBP_MODIFIER_ALT;
   }
 
   NSLog(@"macToKeymanModifier result  = %u", (unsigned int)keymanModifiers);
@@ -111,12 +115,20 @@ const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
   return ((modifiers & MK_RIGHT_CTRL_MASK) == MK_RIGHT_CTRL_MASK);
 }
 
+-(BOOL)isControlKey:(NSEventModifierFlags) modifiers {
+  return (modifiers & NSEventModifierFlagControl) == NSEventModifierFlagControl;
+}
+
 -(BOOL)isLeftOptionKey:(NSEventModifierFlags) modifiers {
   return ((modifiers & MK_LEFT_ALT_MASK) == MK_LEFT_ALT_MASK);
 }
 
 -(BOOL)isRightOptionKey:(NSEventModifierFlags) modifiers {
   return ((modifiers & MK_RIGHT_ALT_MASK) == MK_RIGHT_ALT_MASK);
+}
+
+-(BOOL)isOptionKey:(NSEventModifierFlags) modifiers {
+  return (modifiers & NSEventModifierFlagOption) == NSEventModifierFlagOption;
 }
 
 /*
