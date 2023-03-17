@@ -1,13 +1,13 @@
 import {
   Codes,
-  DefaultOutput as DefaultOutputBase,
+  DefaultRules,
   type KeyEvent,
   type OutputTarget
 } from '@keymanapp/keyboard-processor';
 
 import ContextManager from './contextManager.js';
 
-export default class DefaultOutput extends DefaultOutputBase {
+export default class DefaultBrowserRules extends DefaultRules {
   private contextManager: ContextManager;
 
   constructor(contextManager: ContextManager) {

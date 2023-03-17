@@ -9,7 +9,7 @@ import KeyEvent from "./keyEvent.js";
 import { Layouts } from "../keyboards/defaultLayouts.js";
 import type { MutableSystemStore } from "./systemStores.js";
 
-import DefaultOutput, { EmulationKeystrokes } from "./defaultOutput.js";
+import DefaultRules, { EmulationKeystrokes } from "./defaultRules.js";
 import type OutputTarget from "./outputTarget.js";
 import { Mock } from "./outputTarget.js";
 
@@ -33,7 +33,7 @@ export interface VariableStoreSerializer {
 export interface ProcessorInitOptions {
   baseLayout?: string;
   keyboardInterface?: KeyboardInterface;
-  defaultOutputRules?: DefaultOutput; // Takes the class def object, not an instance thereof.
+  defaultOutputRules?: DefaultRules; // Takes the class def object, not an instance thereof.
 }
 
 interface EventMap {
@@ -43,7 +43,7 @@ interface EventMap {
 export default class KeyboardProcessor extends EventEmitter<EventMap> {
   public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
     baseLayout: 'us',
-    defaultOutputRules: new DefaultOutput()
+    defaultOutputRules: new DefaultRules()
   };
 
   // Tracks the simulated value for supported state keys, allowing the OSK to mirror a physical keyboard for them.
@@ -70,7 +70,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
 
   baseLayout: string;
 
-  defaultRules: DefaultOutput;
+  defaultRules: DefaultRules;
 
   // Callbacks for various feedback types
   beepHandler?: BeepHandler;
