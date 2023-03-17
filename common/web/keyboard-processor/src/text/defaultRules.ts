@@ -22,9 +22,7 @@ export enum EmulationKeystrokes {
 /**
  * Defines a collection of static library functions that define KeymanWeb's default (implied) keyboard rule behaviors.
  */
-export default class DefaultOutput {
-  public static BASE = new DefaultOutput();
-
+export default class DefaultRules {
   public constructor() {
   }
 
