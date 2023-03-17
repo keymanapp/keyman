@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.70 alpha 2023-03-17
+
+* chore(android): Document builder script steps (#8449)
+
 ## 17.0.69 alpha 2023-03-16
 
 * chore(web): Cleanup build echo (#8446)
