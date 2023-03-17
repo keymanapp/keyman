@@ -1,5 +1,7 @@
-import KeyboardStub from "./keyboardStub.js";
 import { Keyboard } from "@keymanapp/keyboard-processor";
+import EventEmitter from "eventemitter3";
+
+import KeyboardStub from "./keyboardStub.js";
 
 const KEYBOARD_PREFIX = "Keyboard_";
 
@@ -23,7 +25,19 @@ function withoutPrefix(text: string) {
 
 export {withoutPrefix as toUnprefixedKeyboardId};
 
-export default class StubAndKeyboardCache {
+interface EventMap {
+  /**
+   * Indicates that the specified stub has just been registered within the cache.
+   */
+  stubAdded: (stub: KeyboardStub) => void;
+
+  /**
+   * Indicates that the specified Keyboard has just been added to the cache.
+   */
+  keyboardAdded: (keyboard: Keyboard) => void;
+}
+
+export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
   private stubSetTable: Record<string, Record<string, KeyboardStub>> = {};
   private keyboardTable: Record<string, Keyboard | Promise<Keyboard>> = {};
 
@@ -42,6 +56,8 @@ export default class StubAndKeyboardCache {
   addKeyboard(keyboard: Keyboard) {
     const keyboardID = prefixed(keyboard.id);
     this.keyboardTable[keyboardID] = keyboard;
+
+    this.emit('keyboardAdded', keyboard);
   }
 
   expectKeyboard(keyboardPromise: Promise<Keyboard>, keyboardID: string) {
@@ -53,7 +69,7 @@ export default class StubAndKeyboardCache {
     this.keyboardTable[keyboardID] = keyboardPromise;
 
     keyboardPromise.then((kbd) => {
-      this.keyboardTable[keyboardID] = kbd;
+      this.addKeyboard(kbd);
     });
   }
 
@@ -61,6 +77,8 @@ export default class StubAndKeyboardCache {
     const keyboardID = prefixed(stub.KI);
     const stubTable = this.stubSetTable[keyboardID] = this.stubSetTable[keyboardID] ?? {};
     stubTable[stub.KLC] = stub;
+
+    this.emit('stubAdded', stub);
   }
 
   findMatchingStub(stub: KeyboardStub) {

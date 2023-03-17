@@ -18,17 +18,29 @@ export type KeyboardAPISpec = (APISimpleKeyboard | APICompoundKeyboard) & {
   filename: string
 };
 
+interface RawKeyboardStub extends KeyboardStub {};
+
 export default class KeyboardStub extends KeyboardProperties {
   KR: string;
   KRC: string;
   KF: string;
 
+  KP?: string;
+
+  public constructor(rawStub: RawKeyboardStub);
   public constructor(apiSpec: APISimpleKeyboard & { filename: string }, fontBaseUri?: string);
   public constructor(kbdId: string, lngId: string);
-  constructor(arg0: string | (APISimpleKeyboard & { filename: string }), arg1?: string) {
+  constructor(arg0: string | RawKeyboardStub | (APISimpleKeyboard & { filename: string }), arg1?: string) {
     if(typeof arg0 !== 'string') {
-      arg0.id = prefixed(arg0.id);
-      super(arg0, arg1);
+      if(arg0.id !== undefined) {
+        let apiSpec = arg0 as APISimpleKeyboard & { filename: string };
+        apiSpec.id = prefixed(apiSpec.id);
+        super(apiSpec, arg1);
+      } else {
+        let rawStub = arg0 as RawKeyboardStub;
+        rawStub.KI = prefixed(rawStub.KI);
+        super(rawStub);
+      }
     } else {
       super(prefixed(arg0), arg1);
     }

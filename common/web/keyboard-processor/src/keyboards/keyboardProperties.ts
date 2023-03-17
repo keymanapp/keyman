@@ -112,7 +112,7 @@ export default class KeyboardProperties implements KeyboardInternalPropertySpec 
 
   public constructor(metadataObj: MetadataObj, fontPath?: string);
   public constructor(keyboardId: string, languageCode: string);
-  public constructor(arg1: (MetadataObj) | string, arg2?: string | SpacebarText, arg3?: string, arg4?: KeyboardFont, arg5?: KeyboardFont) {
+  public constructor(arg1: MetadataObj | string, arg2?: string | SpacebarText, arg3?: string, arg4?: KeyboardFont, arg5?: KeyboardFont) {
     if(!(typeof arg1 == 'string')) {
       if(arg1['KI'] || arg1['KLC'] || arg1['KFont'] || arg1['KOskFont']) {
         const other = arg1 as KeyboardInternalPropertySpec;

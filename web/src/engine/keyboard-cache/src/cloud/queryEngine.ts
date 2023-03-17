@@ -307,10 +307,6 @@ export default class CloudQueryEngine {
         return [(allStubs as KeyboardStub[]).find((stub) => stub.KLC == lgCode)];
       }
     }
-
-    // Originally, would also generate this event as a 'finally' on any returned good stubs.
-    // The corresponding event is needed in order to update UI modules as new keyboard stubs "come online".
-    // this.doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC'],sp['KP']);
   }
 
   /**

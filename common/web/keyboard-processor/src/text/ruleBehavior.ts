@@ -1,6 +1,5 @@
 ///<reference types="@keymanapp/models-types" />
 
-import DefaultOutput from "./defaultOutput.js";
 import KeyboardProcessor from "./keyboardProcessor.js";
 import OutputTarget, { Mock, type Transcription } from "./outputTarget.js";
 import { VariableStoreDictionary } from "../keyboards/keyboard.js";
@@ -100,7 +99,7 @@ export default class RuleBehavior {
 
     if(this.triggersDefaultCommand) {
       let keyEvent = this.transcription.keystroke;
-      DefaultOutput.applyCommand(keyEvent, outputTarget);
+      processor.defaultRules.applyCommand(keyEvent, outputTarget);
     }
 
     if(processor.warningLogger && this.warningLog) {

@@ -1420,60 +1420,6 @@ namespace com.keyman.dom {
       this.keyman.core.keyboardProcessor.warningLogger = console.warn.bind(console);
       this.keyman.core.keyboardProcessor.errorLogger = console.error.bind(console);
 
-      // Local function to convert relative to absolute URLs
-      // with respect to the source path, server root and protocol
-      var fixPath = function(p) {
-        if(p.length == 0) return p;
-
-        // Add delimiter if missing
-        if(p.substr(p.length-1,1) != '/') p = p+'/';
-
-        // Absolute
-        if((p.replace(/^(http)s?:.*/,'$1') == 'http')
-            || (p.replace(/^(file):.*/,'$1') == 'file'))
-          return p;
-
-        // Absolute (except for protocol)
-        if(p.substr(0,2) == '//')
-          return this.keyman.protocol+p;
-
-        // Relative to server root
-        if(p.substr(0,1) == '/')
-          return this.keyman.rootPath+p.substr(1);
-
-        // Otherwise, assume relative to source path
-        return this.keyman.srcPath+p;
-      }.bind(this);
-
-      // Explicit (user-defined) parameter initialization
-      opt=this.keyman.options;
-      if(typeof(arg) == 'object' && arg !== null)
-      {
-        for(p in opt)
-        {
-          if(arg.hasOwnProperty(p)) opt[p] = arg[p];
-        }
-      }
-
-      // Get default paths and device options
-      if(opt['root'] != '') {
-        this.keyman.rootPath = fixPath(opt['root']);
-      }
-
-      // Keyboards and fonts are located with respect to the server root by default
-      //if(opt['keyboards'] == '') opt['keyboards'] = keymanweb.rootPath+'keyboard/';
-      //if(opt['fonts'] == '') opt['fonts'] = keymanweb.rootPath+'font/';
-
-      // Resources are located with respect to the engine by default
-      if(opt['resources'] == '') {
-        opt['resources'] = this.keyman.srcPath;
-      }
-
-      // Convert resource, keyboard and font paths to absolute URLs
-      opt['resources'] = fixPath(opt['resources']);
-      opt['keyboards'] = fixPath(opt['keyboards']);
-      opt['fonts'] = fixPath(opt['fonts']);
-
       // Set default device options
       this.keyman.setDefaultDeviceOptions(opt);
 

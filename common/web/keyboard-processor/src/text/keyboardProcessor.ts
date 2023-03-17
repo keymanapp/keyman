@@ -9,7 +9,7 @@ import KeyEvent from "./keyEvent.js";
 import { Layouts } from "../keyboards/defaultLayouts.js";
 import type { MutableSystemStore } from "./systemStores.js";
 
-import DefaultOutput, { EmulationKeystrokes } from "./defaultOutput.js";
+import DefaultRules, { EmulationKeystrokes } from "./defaultRules.js";
 import type OutputTarget from "./outputTarget.js";
 import { Mock } from "./outputTarget.js";
 
@@ -33,6 +33,7 @@ export interface VariableStoreSerializer {
 export interface ProcessorInitOptions {
   baseLayout?: string;
   keyboardInterface?: KeyboardInterface;
+  defaultOutputRules?: DefaultRules; // Takes the class def object, not an instance thereof.
 }
 
 interface EventMap {
@@ -41,8 +42,9 @@ interface EventMap {
 
 export default class KeyboardProcessor extends EventEmitter<EventMap> {
   public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
-    baseLayout: 'us'
-  }
+    baseLayout: 'us',
+    defaultOutputRules: new DefaultRules()
+  };
 
   // Tracks the simulated value for supported state keys, allowing the OSK to mirror a physical keyboard for them.
   // Using the exact keyCode name from the Codes definitions will allow for certain optimizations elsewhere in the code.
@@ -68,6 +70,8 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
 
   baseLayout: string;
 
+  defaultRules: DefaultRules;
+
   // Callbacks for various feedback types
   beepHandler?: BeepHandler;
   warningLogger?: LogMessageHandler;
@@ -84,6 +88,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
 
     this.baseLayout = options.baseLayout || KeyboardProcessor.DEFAULT_OPTIONS.baseLayout;
     this.keyboardInterface = options.keyboardInterface || new KeyboardInterface(globalObject(), MinimalKeymanGlobal);
+    this.defaultRules = options.defaultOutputRules || KeyboardProcessor.DEFAULT_OPTIONS.defaultOutputRules;
   }
 
   public get activeKeyboard(): Keyboard {
@@ -138,13 +143,13 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
       matched = true;  // All the conditions below result in matches until the final else, which restores the expected default
                         // if no match occurs.
 
-      if(DefaultOutput.isCommand(Lkc)) {
+      if(this.defaultRules.isCommand(Lkc)) {
         // Note this in the rule behavior, return successfully.  We'll consider applying it later.
         ruleBehavior.triggersDefaultCommand = true;
 
         // We'd rather let the browser handle these keys, but we're using emulated keystrokes, forcing KMW
         // to emulate default behavior here.
-      } else if((special = DefaultOutput.forSpecialEmulation(Lkc)) != null) {
+      } else if((special = this.defaultRules.forSpecialEmulation(Lkc)) != null) {
         switch(special) {
           case EmulationKeystrokes.Backspace:
             this.keyboardInterface.defaultBackspace(outputTarget);
@@ -168,12 +173,12 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
     let isMnemonic = this.activeKeyboard && this.activeKeyboard.isMnemonic;
 
     if(!matched) {
-      if((char = DefaultOutput.forAny(Lkc, isMnemonic)) != null) {
-        special = DefaultOutput.forSpecialEmulation(Lkc)
+      if((char = this.defaultRules.forAny(Lkc, isMnemonic)) != null) {
+        special = this.defaultRules.forSpecialEmulation(Lkc)
         if(special == EmulationKeystrokes.Backspace) {
           // A browser's default backspace may fail to delete both parts of an SMP character.
           this.keyboardInterface.defaultBackspace(outputTarget);
-        } else if(special || DefaultOutput.isCommand(Lkc)) { // Filters out 'commands' like TAB.
+        } else if(special || this.defaultRules.isCommand(Lkc)) { // Filters out 'commands' like TAB.
           // We only do the "for special emulation" cases under the condition above... aside from backspace
           // Let the browser handle those.
           return null;

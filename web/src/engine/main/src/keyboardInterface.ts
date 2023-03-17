@@ -1,0 +1,78 @@
+import {
+  Keyboard,
+  KeyboardInterface as KeyboardInterfaceBase,
+  KeyboardKeymanGlobal,
+} from "@keymanapp/keyboard-processor";
+import { KeyboardStub, StubAndKeyboardCache } from 'keyman/engine/keyboard-cache';
+
+import ContextManager from './contextManager.js';
+import { VariableStoreCookieSerializer } from "./variableStoreCookieSerializer.js";
+
+export default class KeyboardInterface extends KeyboardInterfaceBase {
+  private readonly contextManager: ContextManager;
+  private readonly stubAndKeyboardCache: StubAndKeyboardCache;
+
+  constructor(
+    _jsGlobal: any,
+    keymanGlobal: KeyboardKeymanGlobal,
+    cache: StubAndKeyboardCache,
+    contextManager: ContextManager
+  ) {
+    super(_jsGlobal, keymanGlobal, new VariableStoreCookieSerializer());
+    this.stubAndKeyboardCache = cache;
+    this.contextManager = contextManager;
+  }
+
+  registerKeyboard(Pk): void {
+    const priorActiveKeyboard = this.activeKeyboard;
+
+    // Among other things, sets Pk as a newly-active Keyboard.
+    super.registerKeyboard(Pk);
+    const registeredKeyboard = this.activeKeyboard;
+
+    const cacheEntry = this.stubAndKeyboardCache.getKeyboard(registeredKeyboard.id);
+    if(!(cacheEntry instanceof Promise)) {
+      // Deliberate keyboard pre-loading via direct script-tag link on the page.
+      // Just load the keyboard and set our field back in place.
+      this.stubAndKeyboardCache.addKeyboard(new Keyboard(Pk));
+      this.activeKeyboard = priorActiveKeyboard;
+    }
+  }
+
+  /**
+   * Add the basic keyboard parameters (keyboard stub) to the array of keyboard stubs
+   * If no language code is specified in a keyboard it cannot be registered,
+   * and a keyboard stub must be registered before the keyboard is loaded
+   * for the keyboard to be usable.
+   *
+   * @param       {Object}      Pstub     Keyboard stub object
+   * @return      {?number}               1 if already registered, else null
+   */
+  registerStub = (Pstub): number => {
+    // Other notes:  this is where app-hosted KeymanWeb receives pre-formed stubs.
+    // They're specified in the "internal" format (KI, KN, KLC...)
+    // (SHIFT-CTRL-F @ repo-level:  `setKeymanLanguage`)
+    //
+    // It may also be used by documented legacy API:
+    // https://help.keyman.com/DEVELOPER/ENGINE/WEB/2.0/guide/examples/manual-control
+    // (See: referenced laokeys_load.js)
+    const stub = new KeyboardStub(Pstub);
+    if(this.stubAndKeyboardCache.findMatchingStub(stub)) {
+      return 1;
+    }
+
+    this.stubAndKeyboardCache.addStub(stub);
+    return null;
+  }
+
+  insertText = (Ptext: string, PdeadKey:number): void => {
+    this.resetContextCache();
+    // As this function isn't provided a handle to an active outputTarget, we rely on
+    // the context manager to resolve said issue.
+    this.contextManager.insertText(this, Ptext, PdeadKey);
+  }
+}
+
+(function() {
+  KeyboardInterface.__publishShorthandAPI();
+}());
