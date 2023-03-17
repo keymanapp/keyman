@@ -123,7 +123,7 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
     });
   }
 
-  initialize(optionSpec: Required<InitOptionSpec>): void {
+  init(optionSpec: Required<InitOptionSpec>): void {
     // There may be some valid mutations possible even on repeated calls?
     // The original seems to allow it.
 
