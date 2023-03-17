@@ -107,10 +107,6 @@ android {
     }
 }
 
-resourcePlaceholders {
-    files = ['xml/shortcuts.xml']
-}
-
 // how to configure the sentry android gradle plugin
 sentry {
     // Disables or enables the automatic configuration of Native symbols

@@ -10,9 +10,10 @@
     android:shortcutShortLabel="@string/add_shortcut_short_label"
     android:shortcutLongLabel="@string/add_shortcut_long_label">
 
+    <!-- Duplicate file for debug flavor (different targetPackage) -->
     <intent
       android:action="android.intent.action.VIEW"
-      android:targetPackage="com.tavultesoft.kmapro"
+      android:targetPackage="com.tavultesoft.kmapro.debug"
       android:targetClass="com.tavultesoft.kmapro.KMPBrowserActivity"/>
 
   </shortcut>

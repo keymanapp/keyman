@@ -4,9 +4,6 @@ buildscript {
         google()
         jcenter()
         mavenCentral()
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.2'
@@ -17,11 +14,8 @@ buildscript {
         // From jcenter() which could be sunset in future
         // https://jfrog.com/blog/into-the-sunset-bintray-jcenter-gocenter-and-chartcenter/
         classpath 'com.stepstone.stepper:material-stepper:4.3.1'
-        classpath 'de.timfreiheit.resourceplaceholders:placeholders:0.4'
     }
 }
-
-apply plugin: 'de.timfreiheit.resourceplaceholders.plugin'
 
 allprojects {
     repositories {
