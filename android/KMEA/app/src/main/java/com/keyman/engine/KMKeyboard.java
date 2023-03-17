@@ -67,12 +67,12 @@ import io.sentry.SentryLevel;
 final class KMKeyboard extends WebView {
   private static final String TAG = "KMKeyboard";
   private final Context context;
-  private KeyboardType keyboardType = KeyboardType.KEYBOARD_TYPE_UNDEFINED;
   private String packageID;
   private String keyboardID;
   private String keyboardName;
   private String keyboardVersion;
 
+  protected KeyboardType keyboardType = KeyboardType.KEYBOARD_TYPE_UNDEFINED;
   protected ArrayList<String> javascriptAfterLoad = new ArrayList<String>();
 
   private static String currentKeyboard = null;

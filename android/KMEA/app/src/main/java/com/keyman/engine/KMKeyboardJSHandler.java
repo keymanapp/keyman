@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
@@ -18,6 +19,7 @@ import android.webkit.JavascriptInterface;
 
 import static android.content.Context.VIBRATOR_SERVICE;
 
+import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.util.CharSequenceUtil;
 import com.keyman.engine.util.KMLog;
 
@@ -94,7 +96,17 @@ public abstract class KMKeyboardJSHandler {
           return;
         }
 
-        InputConnection ic = KMManager.getInputMethodService().getCurrentInputConnection();
+        if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP &&
+          (KMTextView.activeView == null || KMTextView.activeView.getClass() != KMTextView.class)) {
+          if (KMTextView.activeView == null && !KMManager.isDebugMode()) {
+            Log.w(TAG, "insertText failed: activeView is null");
+          }
+          return;
+        }
+
+        InputConnection ic = (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) ?
+            KMTextView.activeView.onCreateInputConnection(new EditorInfo()) :
+            KMManager.getInputMethodService().getCurrentInputConnection();
         if (ic == null) {
           if (KMManager.isDebugMode()) {
             Log.w(TAG, "insertText failed: InputConnection is null");
@@ -124,7 +136,9 @@ public abstract class KMKeyboardJSHandler {
               ic.endBatchEdit();
               return;
             } else {
-              KMManager.SystemKeyboardShouldIgnoreSelectionChange = true;
+              if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+                KMManager.SystemKeyboardShouldIgnoreSelectionChange = true;
+              }
               ic.setSelection(start, start);
               ic.deleteSurroundingText(0, end - start);
             }
@@ -136,7 +150,12 @@ public abstract class KMKeyboardJSHandler {
         }
 
         if (s.length() > 0 && s.charAt(0) == '\n') {
-          keyDownUp(KeyEvent.KEYCODE_ENTER);
+          if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+            KMTextView textView = (KMTextView)KMTextView.activeView;
+            textView.keyDownUp(KeyEvent.KEYCODE_ENTER);
+          } else if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+            keyDownUp(KeyEvent.KEYCODE_ENTER);
+          }
           ic.endBatchEdit();
           return;
         }
@@ -151,7 +170,9 @@ public abstract class KMKeyboardJSHandler {
           CharSequence chars = ic.getTextAfterCursor(1, 0);
           if (chars != null && chars.length() > 0) {
             char c = chars.charAt(0);
-            KMManager.SystemKeyboardShouldIgnoreSelectionChange = true;
+            if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+              KMManager.SystemKeyboardShouldIgnoreSelectionChange = true;
+            }
             if (Character.isHighSurrogate(c)) {
               ic.deleteSurroundingText(0, 2);
             } else {
@@ -161,8 +182,9 @@ public abstract class KMKeyboardJSHandler {
         }
 
         if (s.length() > 0) {
-          KMManager.SystemKeyboardShouldIgnoreSelectionChange = true;
-
+          if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+            KMManager.SystemKeyboardShouldIgnoreSelectionChange = true;
+          }
           // Commit the string s. Use newCursorPosition 1 so cursor will end up after the string.
           ic.commitText(s, 1);
         }
