@@ -1,4 +1,4 @@
-import { PathConfiguration } from 'keyman/engine/configuration';
+import { PathConfiguration } from 'keyman/engine/paths';
 
 import { default as KeyboardStub, ErrorStub, KeyboardAPISpec, mergeAndResolveStubPromises } from '../keyboardStub.js';
 import { LanguageAPIPropertySpec, ManagedPromise, Version } from '@keymanapp/keyboard-processor';

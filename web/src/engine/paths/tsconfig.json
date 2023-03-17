@@ -10,8 +10,8 @@
     "sourceMap": true,
     "target": "es5",
     "baseUrl": "./",
-    "outDir": "../../../build/engine/configuration/obj/",
-    "tsBuildInfoFile": "../../../build/engine/configuration/obj/tsconfig.tsbuildinfo",
+    "outDir": "../../../build/engine/paths/obj/",
+    "tsBuildInfoFile": "../../../build/engine/paths/obj/tsconfig.tsbuildinfo",
     "rootDir": "./src"
   },
 
