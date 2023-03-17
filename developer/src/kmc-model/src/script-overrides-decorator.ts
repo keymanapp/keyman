@@ -1,4 +1,4 @@
-import { OverrideScriptDefaults } from "./lexical-model";
+import { OverrideScriptDefaults } from "./lexical-model.js";
 
 export function decorateWithScriptOverrides(breaker: WordBreakingFunction, option: OverrideScriptDefaults) {
   if (option !== 'break-words-at-spaces') {

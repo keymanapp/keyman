@@ -3,7 +3,6 @@
 # Compiles the Keyman Engine for Web and its various end-products
 #
 
-# set -x
 set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
@@ -23,15 +22,16 @@ cd "$THIS_SCRIPT_PATH"
 
 # Ensures that we rely first upon the local npm-based install of Typescript.
 # (Facilitates automated setup for build agents.)
+# TODO: this should be removeable given set_keyman_standard_build_path does this in build-utils.sh (and relative paths are dodgy in $PATH!)
 PATH="../node_modules/.bin:$PATH"
 
 PREDICTIVE_TEXT_SOURCE="../common/predictive-text/unit_tests/in_browser/resources/models/simple-trie.js"
 PREDICTIVE_TEXT_OUTPUT="src/test/manual/web/prediction-ui/simple-en-trie.js"
 
 builder_describe "Builds Keyman Engine for Web (KMW)." \
-  "@../common/web/keyman-version build" \
-  "@../common/web/input-processor build" \
-  "@src/tools/building/sourcemap-root build" \
+  "@/common/web/keyman-version build" \
+  "@/common/web/input-processor build" \
+  "@/web/src/tools/building/sourcemap-root build" \
   "clean" \
   "configure" \
   "build" \
@@ -49,19 +49,19 @@ builder_describe "Builds Keyman Engine for Web (KMW)." \
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $(builder_term build:embed) and $(builder_term build:web)" \
 
 builder_describe_outputs \
-  configure         ../node_modules \
-  configure:embed   ../node_modules \
-  configure:engine  ../node_modules \
-  configure:web     ../node_modules \
-  configure:ui      ../node_modules \
-  configure:samples ../node_modules \
-  configure:tools   ../node_modules \
-  build:embed       build/app/embed/release/keyman.js \
-  build:engine      build/engine/main/obj/keymanweb.js \
-  build:web         build/app/web/release/keymanweb.js \
-  build:ui          build/app/ui/release/kmwuibutton.js \
-  build:samples     $PREDICTIVE_TEXT_OUTPUT \
-  build:tools       build/tools/building/sourcemap-root/index.js
+  configure         /node_modules \
+  configure:embed   /node_modules \
+  configure:engine  /node_modules \
+  configure:web     /node_modules \
+  configure:ui      /node_modules \
+  configure:samples /node_modules \
+  configure:tools   /node_modules \
+  build:embed       /web/build/app/embed/release/keyman.js \
+  build:engine      /web/build/engine/main/obj/keymanweb.js \
+  build:web         /web/build/app/web/release/keymanweb.js \
+  build:ui          /web/build/app/ui/release/kmwuibutton.js \
+  build:samples     /web/$PREDICTIVE_TEXT_OUTPUT \
+  build:tools       /web/build/tools/building/sourcemap-root/index.js
 
 builder_parse "$@"
 
@@ -181,24 +181,24 @@ copy_resources ( ) {
     CONFIGS+=(release)
   fi
 
-  echo
+  builder_echo
 
   for CONFIG in "${CONFIGS[@]}";
   do
     local CONFIG_OUT_PATH=build/$COMPILE_TARGET/$CONFIG
 
-    echo Copying resources to $CONFIG_OUT_PATH/src
+    builder_echo "Copying resources to $CONFIG_OUT_PATH/src"
 
     for RESOURCE in "${RESOURCES_TO_COPY[@]}";
     do
       mkdir -p "$CONFIG_OUT_PATH/$RESOURCE"
       mkdir -p "$CONFIG_OUT_PATH/src/resources/$RESOURCE"
 
-      echo "- src/resources/$RESOURCE/ => $CONFIG_OUT_PATH/$RESOURCE"
+      builder_echo "- src/resources/$RESOURCE/ => $CONFIG_OUT_PATH/$RESOURCE"
       cp -Rf "src/resources/$RESOURCE"  "$CONFIG_OUT_PATH/"  >/dev/null
     done
 
-    echo
+    builder_echo
   done
 }
 
@@ -232,7 +232,7 @@ copy_sources ( ) {
   for CONFIG in "${CONFIGS[@]}";
   do
     local CONFIG_OUT_PATH=build/$COMPILE_TARGET/$CONFIG
-    echo Copying $COMPILE_TARGET sources to $CONFIG_OUT_PATH/src
+    builder_echo "Copying $COMPILE_TARGET sources to $CONFIG_OUT_PATH/src"
 
     rm -rf "$CONFIG_OUT_PATH/src"
     mkdir -p "$CONFIG_OUT_PATH/src"
@@ -240,12 +240,12 @@ copy_sources ( ) {
 
     for SOURCE_FOLDER in "${SOURCES_TO_COPY[@]}";
     do
-      echo "- src/$SOURCE_FOLDER/ => $CONFIG_OUT_PATH/src/$SOURCE_FOLDER/"
+      builder_echo "- src/$SOURCE_FOLDER/ => $CONFIG_OUT_PATH/src/$SOURCE_FOLDER/"
       mkdir -p "$CONFIG_OUT_PATH/src/$SOURCE_FOLDER"
       cp -Rf  "src/$SOURCE_FOLDER/"*    "$CONFIG_OUT_PATH/src/$SOURCE_FOLDER/"
     done
 
-    echo
+    builder_echo
   done
 }
 
@@ -293,8 +293,8 @@ copy_outputs ( ) {
 # ```
 compile ( ) {
   local COMPILE_TARGET=$1
-  npm run tsc -- -b src/$COMPILE_TARGET -v || builder_die "Build command tsc -- -b src/$COMPILE_TARGET -v failed with exit code $?"
-  echo $COMPILE_TARGET TypeScript compiled under build/$COMPILE_TARGET/obj
+  tsc -b src/$COMPILE_TARGET -v || builder_die "Build command tsc -b src/$COMPILE_TARGET -v failed with exit code $?"
+  builder_echo "$COMPILE_TARGET TypeScript compiled under build/$COMPILE_TARGET/obj"
 }
 
 # Finalizes all build products corresponding to the specified target.
@@ -330,16 +330,16 @@ finalize ( ) {
   mkdir -p "$DEBUG_OUT_PATH"
   copy_outputs "$COMPILED_INTERMEDIATE_PATH" "$DEBUG_OUT_PATH" "${OUTPUT_SCRIPTS[@]}"
 
-  echo Compiled $COMPILE_TARGET debug version saved under $DEBUG_OUT_PATH: ${OUTPUT_SCRIPTS[*]}
+  builder_echo "Compiled $COMPILE_TARGET debug version saved under $DEBUG_OUT_PATH: ${OUTPUT_SCRIPTS[*]}"
 
   # START:  release output
-  if ! builder_has_option --skip-minify; then
+  if ! builder_has_option --no-minify; then
     for SCRIPT in "${OUTPUT_SCRIPTS[@]}";
     do
       minify "$COMPILED_INTERMEDIATE_PATH/$SCRIPT" "$RELEASE_OUT_PATH/$SCRIPT" SIMPLE_OPTIMIZATIONS
     done
 
-    echo Compiled $COMPILE_TARGET release version saved under $RELEASE_OUT_PATH: ${OUTPUT_SCRIPTS[*]}
+    builder_echo "Compiled $COMPILE_TARGET release version saved under $RELEASE_OUT_PATH: ${OUTPUT_SCRIPTS[*]}"
   else
     # The prior 'release' is now outdated:  delete it.
     rm -rf "$RELEASE_OUT_PATH"
@@ -355,8 +355,7 @@ if builder_start_action configure; then
     # NPM install is required for the file to be present.
     if ! [ -f $minifier ];
     then
-      echo File $minifier does not exist:  have you set the environment variable \$CLOSURECOMPILERPATH?
-      exit 1
+      builder_die "File $minifier does not exist:  have you set the environment variable \$CLOSURECOMPILERPATH?"
     fi
   fi
 
@@ -410,11 +409,11 @@ if builder_has_action build:embed || \
    builder_has_action build:web || \
    builder_has_action build:ui; then
 
-  echo ""
-  echo "${COLOR_PURPLE}Compiling version ${VERSION}${COLOR_RESET}"
+  builder_echo ""
+  builder_echo purple "Compiling version ${VERSION}"
 fi
 
-echo ""
+builder_echo
 
 
 if builder_start_action build:engine; then
@@ -482,7 +481,7 @@ if builder_start_action build:samples; then
   # Some test pages actually have build scripts.
   ./src/test/manual/embed/android-harness/build.sh  # is not yet builder-based.
 
-  echo "Copying samples & test page resources..."
+  builder_echo "Copying samples & test page resources..."
   # Should probably be changed into a build script for the `prediction-ui` test page.
   cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}"
 

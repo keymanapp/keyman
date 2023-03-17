@@ -87,22 +87,6 @@ lib = library('kmnkbp0',
   pic: true,
   install: true)
 
-if host_machine.system() == 'linux'
-  # on Linux we need the static lib for ibus-keyman tests
-  static_library('kmnkbp0-static',
-    api_files,
-    core_files,
-    kmx_files,
-    mock_files,
-    version_res,
-    cpp_args: defns + warns + flags,
-    link_args: links,
-    include_directories: inc,
-    pic: true,
-    install: false
-  )
-endif
-
 headerdirs = [ '.', 'keyman' ] # subdirectories of ${prefix}/include to add to header path
 
 kmnkbp = declare_dependency(link_with: lib, include_directories: inc)

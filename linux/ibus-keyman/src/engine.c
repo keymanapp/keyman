@@ -574,6 +574,16 @@ ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
     IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)keyman);
 }
 
+void ibus_keyman_set_text(IBusEngine *engine, const gchar *text)
+{
+    IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
+    if (!keyman) {
+        g_error("%s: parameter `engine` is not an `IBusKeymanEngine` (%p)", __FUNCTION__, engine);
+        return;
+    }
+    commit_string(keyman, text);
+}
+
 static void commit_string(IBusKeymanEngine *keyman, const gchar *string)
 {
     IBusText *text;
@@ -1076,7 +1086,7 @@ ibus_keyman_engine_enable (IBusEngine *engine)
     {
         // own dbus name com.Keyman
         // expose properties LDMLFile and Name
-        KeymanService *service = km_service_get_default();
+        KeymanService *service = km_service_get_default(engine);
         km_service_set_ldmlfile (service, keyman->ldmlfile);
         km_service_set_name (service, keyman->kb_name);
     }
@@ -1093,7 +1103,7 @@ ibus_keyman_engine_disable (IBusEngine *engine)
     g_message("WDG: %s %s", __FUNCTION__, engine_name);
     ibus_keyman_engine_focus_out (engine);
     // stop owning dbus name com.Keyman
-    KeymanService *service = km_service_get_default();
+    KeymanService *service = km_service_get_default(engine);
     km_service_set_ldmlfile (service, "");
     km_service_set_name (service, "None");
     // g_clear_object(&service);

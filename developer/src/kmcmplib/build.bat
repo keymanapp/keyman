@@ -49,8 +49,8 @@ if "%1"=="-c" goto :setup
 echo === Locating Visual Studio ===
 
 rem From https://github.com/microsoft/vswhere
-for /f "usebackq tokens=*" %%i in (`..\..\..\resources\build\vswhere -latest -requires Microsoft.Component.MSBuild -find **\vcvarsall.bat`) do (
-  set VCVARSALL="%%i"
+for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do (
+  set VsDevCmd_Path=%%a\Common7\Tools\VsDevCmd.bat
 )
 
 if errorlevel 1 (
@@ -58,13 +58,14 @@ if errorlevel 1 (
   exit /b !errorlevel!
 )
 
-if not exist "!VCVARSALL!" (
-  echo Could not find vcvarsall.bat [!VCVARSALL!]
+if not exist "!VsDevCmd_Path!" (
+  echo Could not find vsdevcmd.bat [!VsDevCmd_Path!]
   exit /b 1
 )
 
 echo === Configuring VC++ ===
-call !VCVARSALL! !ARCH! || exit !errorlevel!
+set VSCMD_SKIP_SENDTELEMETRY=1
+call "!VsDevCmd_Path!" -arch=!ARCH! -no_logo -startdir=none || exit !errorlevel!
 
 cd %KEYMAN_ROOT%\developer\src\kmcmplib
 
@@ -109,10 +110,12 @@ rem Standalone build, so we'll make the environment available to the caller
 rem Also setup
 rem Note: Visual Studio 2022 doesn't provide vcvarsall.bat, so we'll have to find a different solution
 endlocal
-for /f "usebackq tokens=*" %%i in (`..\..\..\resources\build\vswhere -version [15^,17^) -latest -requires Microsoft.Component.MSBuild -find **\vcvarsall.bat`) do (
-  set VCVARSALL="%%i"
+for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do (
+  set VsDevCmd_Path=%%a\Common7\Tools\VsDevCmd.bat
 )
-%VCVARSALL% !ARCH!
+
+set VSCMD_SKIP_SENDTELEMETRY=1
+"!VsDevCmd_Path!" -arch=!ARCH! -no_logo -startdir=none
 goto :eof
 
 rem ----------------------------------

@@ -5,7 +5,7 @@ set -eu
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
 # END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -18,6 +18,8 @@ builder_describe \
   "@./dep4 *:project" \
   "@./dep5 build:bar test:*" \
   "@./dep6 build:bar test" \
+  "@./dep7:foo" \
+  "@./dep8:foo test" \
   clean \
   configure \
   build \
@@ -108,6 +110,10 @@ test_dep_should_not_build clean:project dep5
 test_dep_should_not_build clean:bar dep5
 test_dep_should_not_build clean:project dep6
 test_dep_should_not_build clean:bar dep6
+
+test_dep_should_build     configure:project  dep7
+test_dep_should_build     build:project      dep7
+test_dep_should_build     test:project       dep7
 
 # Test if 'build' actions are added because their output
 # is missing

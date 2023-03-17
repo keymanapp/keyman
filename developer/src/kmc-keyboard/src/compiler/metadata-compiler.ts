@@ -1,6 +1,6 @@
 import { KMX, KMXPlus } from '@keymanapp/common-types';
 import CompilerOptions from "./compiler-options.js";
-import KEYMAN_VERSION from "@keymanapp/keyman-version/keyman-version.mjs";
+import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 import KMXPlusData = KMXPlus.KMXPlusData;
 import KMXFile = KMX.KMXFile;

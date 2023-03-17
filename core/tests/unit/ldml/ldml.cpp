@@ -388,8 +388,9 @@ int main(int argc, char *argv[]) {
   console_color::enabled = console_color::isaterminal() || arg_color;
 
   int rc = run_all_tests(argv[first_arg], argv[first_arg + 1]);
-  if (rc != 0) {
+  if (rc != EXIT_SUCCESS) {
     std::cerr << "FAILED" << std::endl;
+    rc = EXIT_FAILURE;
   }
   return rc;
 }

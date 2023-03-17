@@ -21,10 +21,10 @@ namespace kmx {
 // double check these modifier mappings
 static_assert(LCTRLFLAG == LDML_KEYS_MOD_CTRLL, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
 static_assert(RCTRLFLAG == LDML_KEYS_MOD_CTRLR, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
-static_assert(/*K_CTRLFLAG*/ (LCTRLFLAG|RCTRLFLAG) == LDML_KEYS_MOD_CTRL, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
+static_assert(K_CTRLFLAG == LDML_KEYS_MOD_CTRL, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
 static_assert(RALTFLAG == LDML_KEYS_MOD_ALTR, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
 static_assert(LALTFLAG == LDML_KEYS_MOD_ALTL, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
-static_assert(/*K_ALTFLAG*/ (RALTFLAG|LALTFLAG) == LDML_KEYS_MOD_ALT, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
+static_assert(K_ALTFLAG == LDML_KEYS_MOD_ALT, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
 static_assert(CAPITALFLAG == LDML_KEYS_MOD_CAPS, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
 static_assert(K_SHIFTFLAG == LDML_KEYS_MOD_SHIFT, "LDML modifier bitfield vs. kmx_file.h #define mismatch"); // "either" shift
 
@@ -724,7 +724,6 @@ COMP_KMXPLUS_LIST::valid(KMX_DWORD _kmn_unused(length)) const {
     assert(false);
     return false;
   }
-  // TODO-LDML: further validation in the COMP_KMXPLUS_LIST_Helper class
   return true;
 }
 
@@ -892,7 +891,7 @@ KMX_DWORD COMP_KMXPLUS_STRS::find(const std::u16string& s) const {
   if (s.empty()) {
     return 0; // shortcut
   }
-  // TODO-LDML: You're not going to search these linearly, reinterpreting each time??!
+  // TODO-LDML: suboptimal, but currently only run from the test runner. Could be a binary search since the strings are already in codepoint order.
   for (KMX_DWORD i = 0; i<count; i++) {
     if (s == get(i)) {
       return i;

@@ -72,6 +72,10 @@ do_test() {
   local target=$1
   builder_start_action test:$target || return 0
 
+  # Works on a local clone of keyboards repository, to avoid clobbering
+  # user's existing keyboards repo, if present
+  checkout_keyboards
+
   if [[ $target =~ ^(x86|x64)$ ]]; then
     cmd //C build.bat $target $CONFIGURATION test "${builder_extra_params[@]}"
   else

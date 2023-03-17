@@ -38,16 +38,22 @@ case $BUILDER_OS in
       ":x64    64-bit Windows (x64) build"
     )
     ;;
-  mac|linux)
+  mac)
     archtargets+=(
-      ":arch   Linux or mac build -- current architecture"
+      ":mac           Mac all architectures fat library build"
+      ":mac-x86_64    Mac Intel build"
+      ":mac-arm64     Mac arm64 (M1) build"
+    )
+    ;;
+  linux)
+    archtargets+=(
+      ":arch   Linux build -- current architecture"
     )
     ;;
 esac
 
-# TODO: consider using "linux" and "mac" instead of "arch"?
+# TODO: consider using "linux" instead of "arch"?
 #  ":linux          Build for current Linux architecture"
-#  ":mac            Build for current macOS architecture"
 
 builder_describe \
 "Build Keyman Core
@@ -63,12 +69,10 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   "configure" \
   "build" \
   "test" \
-  "install         install libraries to current system" \
-  "uninstall       uninstall libraries from current system" \
+  "install                         install libraries to current system" \
+  "uninstall                       uninstall libraries from current system" \
   "${archtargets[@]}" \
-  "--debug,-d                      configuration is 'debug', not 'release'" \
-  "--no-tests      do not configure tests (used by other projects)" \
-  "--target-path=opt_target_path   override for build/ target path" \
+  "--no-tests                      do not configure tests (used by other projects)" \
   "--test=opt_tests,-t             test[s] to run (space separated)"
 
 builder_parse "$@"
@@ -89,28 +93,33 @@ if builder_is_dep_build || builder_has_option --no-tests; then
   builder_remove_dep /developer/src/kmc
 fi
 
-if builder_has_option --debug; then
+if builder_is_debug_build; then
   CONFIGURATION=debug
 else
   CONFIGURATION=release
 fi
 
-builder_describe_outputs \
-  configure:x86      build/x86/$CONFIGURATION/build.ninja \
-  configure:x64      build/x64/$CONFIGURATION/build.ninja \
-  configure:arch     build/arch/$CONFIGURATION/build.ninja \
-  configure:wasm     build/wasm/$CONFIGURATION/build.ninja \
-  build:x86          build/x86/$CONFIGURATION/src/libkmnkbp0.a \
-  build:x64          build/x64/$CONFIGURATION/src/libkmnkbp0.a \
-  build:arch         build/arch/$CONFIGURATION/src/libkmnkbp0.a \
-  build:wasm         build/wasm/$CONFIGURATION/src/libkmnkbp0.a
+# 'mac' target builds both x86_64 and arm architectures and
+# generates a 'fat' library from them.
+builder_describe_internal_dependency \
+  build:mac build:mac-x86_64 \
+  build:mac build:mac-arm64
 
-# Target path is used by Linux build, e.g. --target-path keyboardprocessor
-if builder_has_option --target-path; then
-  TARGET_PATH="$opt_target_path"
-else
-  TARGET_PATH="$KEYMAN_ROOT/core/build"
-fi
+builder_describe_outputs \
+  configure:x86             /core/build/x86/$CONFIGURATION/build.ninja \
+  configure:x64             /core/build/x64/$CONFIGURATION/build.ninja \
+  configure:mac             /core/build/mac/$CONFIGURATION/ \
+  configure:mac-x86_64      /core/build/mac-x86_64/$CONFIGURATION/build.ninja \
+  configure:mac-arm64       /core/build/mac-arm64/$CONFIGURATION/build.ninja \
+  configure:arch            /core/build/arch/$CONFIGURATION/build.ninja \
+  configure:wasm            /core/build/wasm/$CONFIGURATION/build.ninja \
+  build:x86                 /core/build/x86/$CONFIGURATION/src/libkmnkbp0.a \
+  build:x64                 /core/build/x64/$CONFIGURATION/src/libkmnkbp0.a \
+  build:mac                 /core/build/mac/$CONFIGURATION/libkmnkbp0.a \
+  build:mac-x86_64          /core/build/mac-x86_64/$CONFIGURATION/src/libkmnkbp0.a \
+  build:mac-arm64           /core/build/mac-arm64/$CONFIGURATION/src/libkmnkbp0.a \
+  build:arch                /core/build/arch/$CONFIGURATION/src/libkmnkbp0.a \
+  build:wasm                /core/build/wasm/$CONFIGURATION/src/libkmnkbp0.a
 
 # Import our standard compiler defines; this is copied from
 # /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
@@ -123,15 +132,58 @@ fi
 # Iterate through all possible targets; note that targets that cannot be built
 # on the current platform have already been excluded through the archtargets
 # settings above
-targets=(wasm x86 x64 arch)
+targets=(wasm x86 x64 mac-x86_64 mac-arm64 arch)
 
-for target in "${targets[@]}"; do
-  MESON_PATH="$TARGET_PATH/$target/$CONFIGURATION"
+do_action() {
+  local action_function=do_$1
+  for target in "${targets[@]}"; do
+    MESON_PATH="$KEYMAN_ROOT/core/build/$target/$CONFIGURATION"
+    $action_function $target
+  done
+}
 
-  do_clean $target
-  do_configure $target
-  do_build $target
-  do_test $target
-  do_install $target
-  do_uninstall $target
-done
+# -------------------------------------------------------------------------------
+
+do_action clean
+
+# -------------------------------------------------------------------------------
+
+do_action configure
+
+# After we have built the necessary internal dependencies, then we can go
+# ahead and build a fat library for external consumption
+if builder_start_action configure:mac; then
+  mkdir -p "$KEYMAN_ROOT/core/build/mac/$CONFIGURATION"
+  builder_finish_action success configure:mac
+fi
+
+# -------------------------------------------------------------------------------
+
+do_action build
+
+if builder_start_action build:mac; then
+  lipo -create \
+    "$KEYMAN_ROOT/core/build/mac-x86_64/$CONFIGURATION/src/libkmnkbp0.a" \
+    "$KEYMAN_ROOT/core/build/mac-arm64/$CONFIGURATION/src/libkmnkbp0.a" \
+    -output "$KEYMAN_ROOT/core/build/mac/$CONFIGURATION/libkmnkbp0.a"
+  builder_finish_action success build:mac
+fi
+
+# -------------------------------------------------------------------------------
+
+do_action test
+
+if builder_start_action test:mac; then
+  # We can only run the tests for the current architecture; we can
+  # assume that build:mac has run so both architectures will be
+  # available
+  target=mac-`uname -m`
+  MESON_PATH="$KEYMAN_ROOT/core/build/$target/$CONFIGURATION"
+  meson test -C "$MESON_PATH" "${builder_extra_params[@]}"
+  builder_finish_action success test:mac
+fi
+
+# -------------------------------------------------------------------------------
+
+do_action install
+do_action uninstall

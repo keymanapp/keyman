@@ -28,8 +28,8 @@ cd "$(dirname "$THIS_SCRIPT")"
 #  "@../models/wordbreakers"
 
 builder_describe "Builds the lm-layer module" \
-  "@../web/keyman-version" \
-  "@../web/lm-worker" \
+  "@/common/web/keyman-version" \
+  "@/common/web/lm-worker" \
   "clean" \
   "configure" \
   "build" \
@@ -42,8 +42,8 @@ builder_describe_outputs \
   configure           /node_modules \
   configure:headless  /node_modules \
   configure:browser   /node_modules \
-  build:headless      build/headless.js \
-  build:browser       build/index.js
+  build:headless      /common/predictive-text/build/headless.js \
+  build:browser       /common/predictive-text/build/index.js
 
 builder_parse "$@"
 

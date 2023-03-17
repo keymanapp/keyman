@@ -1,5 +1,62 @@
 # Keyman Version History
 
+## 17.0.68 alpha 2023-03-15
+
+* chore(common): add common test build configurations (#8431)
+* fix(common): fix broken common/web/types cases (#8426)
+* fix(developer/compilers): locks esbuild target detection for kmc building (#8437)
+*  (#8412)
+*  (#8436)
+* chore(linux): Use dependency on core in ibus-keyman/build.sh (#8423)
+
+## 17.0.67 alpha 2023-03-14
+
+* (developer):Update copyright period in License.rtf (#8425)
+* chore(common): support shorthand for build.sh (#8415)
+* chore(common): build script performance improvements (#8416)
+* chore(common): TS updates to non-sync'd packages, feature-esmodule merge conflict prevention (#8429)
+
+## 17.0.66 alpha 2023-03-13
+
+* refactor(android): Use builder scripts (#7407)
+
+## 17.0.65 alpha 2023-03-12
+
+* refactor(core): consolidate wasm defs (#8409)
+
+## 17.0.64 alpha 2023-03-10
+
+* feat(common): support single target for a dependency (#8404)
+* chore(core): breadth-first build (#8400)
+* refactor(common): Make build-help into helper functions (#8386)
+
+## 17.0.63 alpha 2023-03-09
+
+* fix(web): --no-minify, not --skip-minify (#8394)
+* chore(core): Remove obsolete `--target-path` option (#8376)
+
+## 17.0.62 alpha 2023-03-08
+
+* chore(linux): Remove debug output from packaging GHA (#8372)
+* chore: merge feature-ldml to master, again (#8377)
+* chore(common): cleanup build.inc.sh echo (#8344)
+* chore(common): remove vswhere (#8357)
+* feat(linux): Add DBus method `SendText` (#8039)
+* chore(core): Create both dynamic and static libs on Linux (#8375)
+* chore(common): clean up `--debug` usage in build scripts (#8382)
+* feat(common): builder.inc.sh inheritable options (#8384)
+
+## 17.0.61 alpha 2023-03-03
+
+* fix(android/app): Another attempt at fixing OSK rotation (#8353)
+
+## 17.0.60 alpha 2023-03-02
+
+* fix(android/engine): Fix various OSK bugs due to refactor (#8349)
+* feat(core): Build both architectures for mac and generate a 'fat' library for them (#8342)
+* fix(common): fixup npm publish (#8350)
+* chore(linux): More GHA debugging (#8354)
+
 ## 17.0.59 alpha 2023-03-01
 
 * fix(common): builder: skip dependency build for clean action (#8341)

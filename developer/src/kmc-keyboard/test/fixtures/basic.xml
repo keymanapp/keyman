@@ -30,7 +30,7 @@
     <key id="that" to="ថា" />
   </keys>
 
-  <layers form="hardware" hardware="us" minDeviceWidth="123">
+  <layers form="us" minDeviceWidth="123">
     <layer id="base">
       <row keys="hmaqtugha that" />
     </layer>

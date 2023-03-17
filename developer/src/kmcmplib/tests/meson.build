@@ -8,11 +8,7 @@ fs = import('fs')
 
 tests_flags = []
 
-# We'll use the test kmx files from Core for now
-input_path = join_paths(
-  meson.current_source_dir(),
-  '../../../../core/tests/unit/kmx'
-)
+input_path = meson.current_source_dir() / '../../../../core/tests/unit/kmx'
 output_path = meson.current_build_dir()
 
 kmcompxtest = executable('kmcompxtest', 'kmcompxtest.cpp',
@@ -20,6 +16,8 @@ kmcompxtest = executable('kmcompxtest', 'kmcompxtest.cpp',
     include_directories: inc,
     link_args: links + tests_flags,
     objects: lib.extract_all_objects())
+
+# Test keyboards that we have in Core
 
 tests = [
   '000 - null keyboard',
@@ -74,44 +72,33 @@ tests = [
   '048 - modifier keys keep context'
 ]
 
-  foreach kbd : tests
-    kbd_src = join_paths(input_path, kbd) + '.kmn'
-    kbd_obj = join_paths(output_path, kbd) + '.kmx'
+foreach kbd : tests
+  kbd_src = join_paths(input_path, kbd) + '.kmn'
+  kbd_obj = join_paths(output_path, kbd) + '.kmx'
+  test(kbd, kmcompxtest, args: [kbd_src, kbd_obj, join_paths(input_path, kbd) + '.kmx'])
+endforeach
 
-    if cpp_compiler.get_id() == 'msvc'
-      test(kbd, kmcompxtest, args: [kbd_src, kbd_obj])
-    else
-      test(kbd, kmcompxtest, args: [kbd_src, kbd_obj, join_paths(input_path, kbd) + '.kmx'])
-    endif
-  endforeach
+# Test fixtures that come from keyboards repo
 
+keyboards_root = meson.current_source_dir() / 'keyboards'
 
 if build_machine.system() == 'windows'
-  test_source = run_command('get_test_source_exclude_some_kmn.bat', capture: true, check: true)
-  #test_source = run_command('get_test_source.bat', check: true)
+  test_source = run_command('run-shell.bat', 'get-test-source.sh', keyboards_root, capture: true, check: true)
 else
-  test_source = run_command('get_test_source.sh', capture: true, check: true)
+  test_source = run_command('get_test_source.sh', keyboards_root, capture: true, check: true)
 endif
 
 tests = test_source.stdout().strip().split('\n')
 
 foreach kbd : tests
-  if kbd.strip() != ''
-    kbd = kbd.replace('\\', '/')
-    test_basename = fs.replace_suffix(fs.name(kbd), '')
+  test_basename = fs.replace_suffix(fs.name(kbd), '')
 
-    # kbd is going to be an absolute path
-    kbd_src = kbd
-    kbd_obj = output_path / test_basename + '.kmx'
+  # kbd is going to be an absolute path
+  kbd_obj = output_path / test_basename + '.kmx'
+  reference_kmx = meson.current_source_dir() / 'fixtures' / test_basename + '.kmx'
 
-    if cpp_compiler.get_id() == 'msvc'
-      test(test_basename, kmcompxtest, args: [kbd_src, kbd_obj])
-    else
-      # Note: need to pre-run keyboards repo regression.sh and then copy the
-      # contents of the resulting folder into ./fixtures/
-      reference_kmx = meson.current_source_dir() / 'fixtures' / test_basename + '.kmx'
-      test(test_basename, kmcompxtest, args: [kbd_src, kbd_obj, reference_kmx])
-    endif
+  if fs.is_file(reference_kmx)
+    test(test_basename, kmcompxtest, args: [kbd, kbd_obj, reference_kmx])
   endif
 endforeach
 
