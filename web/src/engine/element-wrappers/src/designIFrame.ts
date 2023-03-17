@@ -31,7 +31,7 @@ class StyleCommand {
   }
 }
 
-export default class DesignIFrame extends OutputTarget {
+export default class DesignIFrame extends OutputTarget<[]> {
   root: HTMLIFrameElement;
   doc: Document;
   docRoot: HTMLElement;
