@@ -6,8 +6,9 @@ import { type EmbeddedGestureConfig } from "keyman/engine/osk";
 import { GlobeHint } from './osk/globeHint.js';
 import { KeyTip } from './osk/keytip.js';
 import { PendingLongpress } from './osk/pendingLongpress.js';
+import { type KeymanEngine } from "./keymanEngine.js";
 
-export function setupEmbeddedListeners(osk: OSKView) {
+export function setupEmbeddedListeners(engine: KeymanEngine, osk: OSKView) {
   osk.on('globeKey', (key, on) => {
     if(on) {
       if(typeof window['showKeyboardList'] == 'function') { // OSKView event: shouldShowLanguageMenu
@@ -17,8 +18,8 @@ export function setupEmbeddedListeners(osk: OSKView) {
       if(osk.vkbd.menuEvent) {
         this.highlightKey(osk.vkbd.menuEvent, false);
       }
-      if(typeof(window['menuKeyUp']) == 'function') { // VisualKeyboard event:  globeKey
-        window['menuKeyUp']();
+      if(typeof(engine.menuKeyUp) == 'function') { // VisualKeyboard event:  globeKey
+        engine.menuKeyUp();
       }
       osk.vkbd.menuEvent = null;
     }
@@ -32,8 +33,8 @@ export function setupEmbeddedListeners(osk: OSKView) {
     if(osk.vkbd) {
       osk.vkbd.highlightKey(key, false);
     }
-    if(typeof window['hideKeyboard'] == 'function') { // VisualKeyboard event:  hideRequested
-      window['hideKeyboard']();
+    if(typeof engine.hideKeyboard == 'function') { // VisualKeyboard event:  hideRequested
+      engine.hideKeyboard();
     }
   })
 }
