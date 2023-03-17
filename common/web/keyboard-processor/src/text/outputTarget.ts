@@ -393,13 +393,10 @@ export class Mock extends OutputTarget {
       let selectionStart = beforeText._kmwLength();
       let selectionEnd = text._kmwLength() - afterText._kmwLength();
 
-      // for NewContext and PostOutput, we want the caret at the selection's end.
-      // Refer to https://github.com/keymanapp/keyman/pull/6249.
-      if(readonly) {
-        clone = new Mock(text, selectionEnd);
-      } else {
-        clone = new Mock(text, selectionStart, selectionEnd);
-      }
+      // readonly group or not, the returned Mock remains the same.
+      // New-context events should act as if the caret were at the earlier-in-context
+      // side of the selection, same as standard keyboard rules.
+      clone = new Mock(text, selectionStart, selectionEnd);
     }
 
     // Also duplicate deadkey state!  (Needed for fat-finger ops.)
