@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.71 alpha 2023-03-18
+
+* fix(core): ldml update fr-azerty for VKEY mapping (#8434)
+
 ## 17.0.70 alpha 2023-03-17
 
 * chore(android): Document builder script steps (#8449)
