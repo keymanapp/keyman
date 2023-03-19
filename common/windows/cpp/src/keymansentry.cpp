@@ -43,8 +43,7 @@ int keyman_sentry_init(bool is_keyman_developer, const char *logger) {
         *p = 0;
       }
 
-      // TODO: this should use the SENTRY_VERSOIN
-      strcat_s(szPath, "sentry-0.6.0-db");
+      strcat_s(szPath, "sentry-" SENTRY_SDK_VERSION "-db");
       sentry_options_set_database_path(options, szPath);
     }
     ILFree(pidl);
@@ -302,7 +301,7 @@ void keyman_sentry_test_crash() {
 #else
 #define SENTRY_DLL SENTRY_BASE_DLL
 #endif
-#define SENTRY_INSTALL_PATH "sentry-0.6.0\\" SENTRY_DLL
+#define SENTRY_INSTALL_PATH "sentry-" SENTRY_SDK_VERSION "\\" SENTRY_DLL
 #define SENTRY_DEV_PATH "common\\windows\\delphi\\ext\\sentry\\" SENTRY_DLL
 #define ENV_KEYMAN_ROOT "KEYMAN_ROOT"
 
