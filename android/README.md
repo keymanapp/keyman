@@ -25,9 +25,7 @@ Keyman for Android uses [Sentry](https://sentry.io) for crash reporting at a ser
     * Compile KMEA (and its KMW dependency)
     * Download default keyboard and dictionary resources as needed
     * Compile KMAPro
-    * Note: to force an update to the latest keyboard and dictionary packages, use the `--download-resources` flag.
-
-3. The APK will be found in **keyman/android/KMAPro/kMAPro/build/outputs/apk/debug/kMAPro-debug.apk**
+3. The APK will be found in **keyman/android/KMAPro/kMAPro/build/outputs/apk/debug/keyman-${version}.apk** where `${version}` is the current version number.
 
 ### Compiling From Android Studio
 1. Ensure that [Keyman Engine for Android](#how-to-build-keyman-engine-for-android) is built.
@@ -60,10 +58,11 @@ Keyman for Android uses [Sentry](https://sentry.io) for crash reporting at a ser
 
 ### Compiling the app's offline help
 Keyman for Android help is maintained in the Markdown files in android/help/.
-The script `build-help.sh` uses the `pandoc` tool to convert the Markdown files into html.
+The script `/resources/build/build-help.inc.sh` uses the `pandoc` tool to convert the Markdown files into html.
 
 ```bash
-./build-help.sh htm
+  # Convert markdown to html for offline help
+  build_help_html android KMAPro/kMAPro/src/main/assets/info
 ```
 
 This script is automatically called when Keyman for Android is built.
@@ -80,7 +79,7 @@ Both sample apps include a default Tamil keyboard and sample dictionary.
 Building these projects follow the same steps as KMAPro:
 
 1. cd to the desired KMSample directory
-2. `./build.sh`
+2. `./build.sh configure build --debug`
 3. Open Android Studio to run the app
 
 ### Tests: KeyboardHarness
@@ -93,7 +92,7 @@ Building these projects follow the same steps as KMAPro:
   * Build the keyboardharness.kmp keyboard package
 3. Add the keyboard in *android/Tests/KeyboardHarness/app/src/main/java/com/keyman/android/tests/keyboardHarness/MainActivity.java*
 4. cd to android/Tests/KeyboardHarness/
-5. `./build.sh`
+5. `./build.sh configure build --debug`
 6. Open Android Studio to run the app
 
 --------------------------------------------------------------
