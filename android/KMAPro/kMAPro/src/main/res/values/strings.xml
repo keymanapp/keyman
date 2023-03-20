@@ -4,9 +4,9 @@
   <!-- app_name removed in 16.0 beta. Set in build.gradle -->
 
   <!-- Shortcut Menu -->
-  <string name="add_shortcut_short_label" comment="Shortcut action to add keyboard (short name)">Add keyboard</string>
+  <string name="add_shortcut_short_label" comment="Shortcut action to install keyboard (short name)">Add keyboard</string>
 
-  <string name="add_shortcut_long_label" comment="Shortcut action to add keyboard from keyman.com">Add keyboard from keyman.com</string>
+  <string name="add_shortcut_long_label" comment="Shortcut action to install keyboard or dictionary">Add keyboard or dictionary</string>
 
   <!-- Context: Menu Action -->
   <string name="action_share" comment="Menu action to send text content to another app">Share</string>
