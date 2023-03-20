@@ -210,11 +210,19 @@ public abstract class KMKeyboardJSHandler {
     mainLoop.post(new Runnable() {
       public void run() {
         if (k == null) {
-          KMLog.LogError(TAG, "dispatchKey failed: SystemKeyboard is null");
+          KMLog.LogError(TAG, "dispatchKey failed: Keyboard is null");
           return;
         }
 
         if (k.subKeysWindow != null) {
+          return;
+        }
+
+        if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP &&
+            (KMTextView.activeView == null || KMTextView.activeView.getClass() != KMTextView.class)) {
+          if (KMTextView.activeView == null && KMManager.isDebugMode()) {
+            Log.w(TAG, "dispatchKey failed: activeView is null");
+          }
           return;
         }
 
@@ -235,10 +243,20 @@ public abstract class KMKeyboardJSHandler {
         Log.d(TAG, "dispatchKey called with code: " + code + ", eventModifiers: " + eventModifiers);
         if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_TAB]) {
           KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_TAB, 0, eventModifiers, 0, 0, 0);
-          ic.sendKeyEvent(event);
+          if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+            KMTextView textView = (KMTextView)KMTextView.activeView;
+            textView.dispatchKeyEvent(event);
+          } else {
+            ic.sendKeyEvent(event);
+          }
         } else if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_ENTER]) {
           KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_ENTER, 0, eventModifiers, 0, 0, 0);
-          ic.sendKeyEvent(event);
+          if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+            KMTextView textView = (KMTextView)KMTextView.activeView;
+            textView.dispatchKeyEvent(event);
+          } else {
+            ic.sendKeyEvent(event);
+          }
         }
       }
     });

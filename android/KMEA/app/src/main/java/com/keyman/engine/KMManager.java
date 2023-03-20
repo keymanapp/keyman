@@ -2228,41 +2228,8 @@ public final class KMManager {
   }
 
   private static final class KMInAppKeyboardJSHandler extends KMKeyboardJSHandler {
-
     KMInAppKeyboardJSHandler(Context context, KMKeyboard k) {
       super(context, k);
-    }
-    private static final String HANDLER_TAG = "IAK: JS Handler";
-
-    @JavascriptInterface
-    public boolean dispatchKey(final int code, final int eventModifiers) {
-      Handler mainLoop = new Handler(Looper.getMainLooper());
-      mainLoop.post(new Runnable() {
-        public void run() {
-          if (InAppKeyboard == null) {
-            KMLog.LogError(TAG, "dispatchKey failed: InAppKeyboard is null");
-            return;
-          }
-
-          if (InAppKeyboard.subKeysWindow != null || KMTextView.activeView == null || KMTextView.activeView.getClass() != KMTextView.class) {
-            if ((KMTextView.activeView == null) && isDebugMode()) {
-              Log.w(HANDLER_TAG, "dispatchKey failed: activeView is null");
-            }
-            return;
-          }
-
-          // Handle tab or enter since KMW didn't process it
-          KMTextView textView = (KMTextView) KMTextView.activeView;
-          if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_TAB]) {
-            KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_TAB, 0, eventModifiers, 0, 0, 0);
-            textView.dispatchKeyEvent(event);
-          } else if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_ENTER]) {
-            KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_ENTER, 0, eventModifiers, 0, 0, 0);
-            textView.dispatchKeyEvent(event);
-          }
-        }
-      });
-      return true;
     }
   }
 
@@ -2270,6 +2237,5 @@ public final class KMManager {
     KMSystemKeyboardJSHandler(Context context, KMKeyboard k) {
       super(context, k);
     }
-    private static final String HANDLER_TAG = "SWK: JS Handler";
   }
 }
