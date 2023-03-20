@@ -9,8 +9,8 @@
 #include "framework.h"
 
 /**
- * This class exists as simple class for allowing a user to
- * select a font making use of the common dialog box
+ * This class for allowing a user to select a
+ * font making use of the common dialog box
  *
  */
 class font_select {
