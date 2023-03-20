@@ -162,14 +162,14 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
    *                              e.g: 'shift-K_E+rightalt-shift'
    **/
   executePopupKey(keyName: string) {
-    let osk = this.osk;
+    const vkbd = this.osk?.vkbd;
     let origArg = keyName;
-    if(!this.contextManager.activeKeyboard || !osk.vkbd) {
+    if(!this.contextManager.activeKeyboard || !vkbd) {
       return false;
     }
 
     /* Clear any pending (non-popup) key */
-    osk.vkbd.keyPending = null;
+    vkbd.keyPending = null;
 
     // Changes for Build 353 to resolve KMEI popup key issues
     keyName=keyName.replace('popup-',''); //remove popup prefix if present (unlikely)
@@ -187,10 +187,10 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
     keyName = matches[2] + (matches[3] ? '+' + matches[3] : '');
 
     // This should be set if we're within this method... but it's best to guard against nulls here, just in case.
-    if(osk.vkbd.subkeyGesture) {
-      let gesture = osk.vkbd.subkeyGesture as SubkeyDelegator;
+    if(vkbd.subkeyGesture) {
+      let gesture = vkbd.subkeyGesture as SubkeyDelegator;
       gesture.resolve(keyName);
-      osk.vkbd.subkeyGesture = null;
+      vkbd.subkeyGesture = null;
     } else {
       console.warn("No base key exists for the subkey being executed: '" + origArg + "'");
     }
