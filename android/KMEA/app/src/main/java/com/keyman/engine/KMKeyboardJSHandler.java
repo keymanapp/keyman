@@ -205,7 +205,43 @@ public abstract class KMKeyboardJSHandler {
   }
 
   @JavascriptInterface
-  public abstract boolean dispatchKey(final int code, final int eventModifiers);
+  public boolean dispatchKey(final int code, final int eventModifiers) {
+    Handler mainLoop = new Handler(Looper.getMainLooper());
+    mainLoop.post(new Runnable() {
+      public void run() {
+        if (SystemKeyboard == null) {
+          KMLog.LogError(TAG, "dispatchKey failed: SystemKeyboard is null");
+          return;
+        }
+
+        if (SystemKeyboard.subKeysWindow != null) {
+          return;
+        }
+
+        InputConnection ic = IMService.getCurrentInputConnection();
+        if (ic == null) {
+          if (isDebugMode()) {
+            Log.w(HANDLER_TAG, "insertText failed: InputConnection is null");
+          }
+          return;
+        }
+
+        SystemKeyboard.dismissHelpBubble();
+        SystemKeyboard.setShouldShowHelpBubble(false);
+
+        // Handle tab or enter since KMW didn't process it
+        Log.d(HANDLER_TAG, "dispatchKey called with code: " + code + ", eventModifiers: " + eventModifiers);
+        if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_TAB]) {
+          KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_TAB, 0, eventModifiers, 0, 0, 0);
+          ic.sendKeyEvent(event);
+        } else if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_ENTER]) {
+          KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_ENTER, 0, eventModifiers, 0, 0, 0);
+          ic.sendKeyEvent(event);
+        }
+      }
+    });
+    return true;
+  }
 
   private void keyDownUp(int keyEventCode) {
     if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
