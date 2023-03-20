@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.72 alpha 2023-03-20
+
+* chore(common): die early when --ci and --debug passed to test.sh (#8465)
+* chore(common): Update crowdin strings for Kibaku (#8447)
+
 ## 17.0.71 alpha 2023-03-18
 
 * fix(core): ldml update fr-azerty for VKEY mapping (#8434)
