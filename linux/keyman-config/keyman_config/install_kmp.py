@@ -283,8 +283,11 @@ class InstallKmp():
 
 
 def extract_kmp(kmpfile, directory):
-    with zipfile.ZipFile(kmpfile, "r") as zip_ref:
-        zip_ref.extractall(directory)
+    try:
+        with zipfile.ZipFile(kmpfile, "r") as zip_ref:
+            zip_ref.extractall(directory)
+    except zipfile.BadZipFile as e:
+        raise InstallError(InstallStatus.Abort, e)
 
 
 def process_keyboard_data(keyboardID, packageDir) -> None:
