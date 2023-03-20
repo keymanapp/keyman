@@ -7,7 +7,7 @@ test_files = [
 ]
 
 kmx_dir = [
-  core_dir / 'build/arch' / get_option('buildtype') / 'tests/unit/kmx'
+  core_dir / 'build/arch' / get_option('buildtype') / 'tests/kmx_test_source'
 ]
 
 kmnkbp_tests_lib = cc.find_library(
@@ -24,7 +24,7 @@ test_env = [
 
 test_include_dirs = [
   core_include_dirs,
-  include_directories('../../../core/tests/unit/kmx'),
+  include_directories('../../../core/tests/kmx_test_source'),
   include_directories('../src'),
   include_directories('..'),
 ]

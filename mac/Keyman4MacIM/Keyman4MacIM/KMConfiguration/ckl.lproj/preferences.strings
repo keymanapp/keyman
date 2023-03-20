@@ -1,0 +1,38 @@
+/* Checkbox text to always show on-screen keyboard */
+"4UX-80-0Vo.title" = "Ka dzǝ tsanti ata skrin nǝr kibod kǝlara saka";
+
+/* Checkbox text to enable verbose Console logging */
+"7J6-zy-R20.title" = "Kǝthlǝr aka verbos Konsol akwa sakar lukwa layir sambar";
+
+/* Support button text  */
+"93O-x6-RLF.label" = "Sǝr dlarɛ";
+
+/* Download Keyboard button text */
+"CTw-kf-WNS.title" = "Sǝgǝl aka Kibod...";
+
+/* Keyman Configuration window title */
+"F0z-JX-Cv5.title" = "Su namtǝ ndǝ ɗǝmɦɛ ŋǝr Keyman";
+
+/* button text to go back to previous page */
+"JOK-JV-n8w.title" = "Mwari tubwa hi";
+
+/* Keyboards button text */
+"MPN-9N-wWc.label" = "Kibodyere";
+
+/* text to explain verbose Console logging option */
+"MrI-GM-7d6.title" = "Ma saka namtǝ verbos logging ada kǝthlǝr, Keyman ata kǝthlǝr akwa whalɛ namtǝ sǝr dlarǝrniyere ata ʻya ka zǝndiba damicinyere nam adai. Ndata mǝzi kǝthlǝr aka Program nǝr Klnsol ka ndǝ wuti labaryere nǝr Keyman nam akwa Klnsole, ka ndǝ tsanti shanga labaryere nam akwa kuta Keyman. Ndata mǝzi hyanba shanga labaryere ǝni alukwa dlarǝr Keyman ma ndɛ ada bara.";
+
+/* button text to move forward to the next page */
+"eXr-8V-h1g.title" = "Alǝkǝma";
+
+/* button text to return to the home help page */
+"fXS-aC-CMH.title" = "Livi ko alivi";
+
+/* Options button text */
+"frd-No-seV.label" = "Sǝr tsarba ka ʻyayere";
+
+/* Installed Keyboard column heading */
+"jex-Nd-Qzg.headerCell.title" = "Hau ko vu kibod";
+
+/* Verbose logging tooltip text */
+"uWx-3J-U0D.ibShadowedToolTip" = "Hyanti su ǝni ma gaka damicinidzi laka aka kibod laka ko aka kǝlara Keyman laka.";

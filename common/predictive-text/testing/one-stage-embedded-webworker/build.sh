@@ -6,8 +6,8 @@
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
@@ -23,14 +23,14 @@ echo "Node.js + dependencies check"
 npm install --no-optional
 
 if [ $? -ne 0 ]; then
-  fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+  builder_die "Build environment setup error detected!  Please ensure Node.js is installed!"
 fi
 
 # A nice, extensible method for -clean operations.  Add to this as necessary.
 clean ( ) {
   rm -rf "./*.js"
   if [ $? -ne 0 ]; then
-    fail "Failed to erase the prior build."
+    builder_die "Failed to erase the prior build."
   fi
 }
 
@@ -48,7 +48,7 @@ done
 npm run tsc -- -p $SOURCE/tsconfig.json
 
 if [ $? -ne 0 ]; then
-  fail "Compilation failed."
+  builder_die "Compilation failed."
 fi
 
 echo "Typescript compilation successful."

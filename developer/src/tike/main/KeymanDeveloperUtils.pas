@@ -91,7 +91,7 @@ uses
   Classes, SysUtils,
   ErrorControlledRegistry, ActiveX, shlobj, RegistryKeys, //Dialogs,
      utilsystem, Forms, kmxfile, Dialogs, utilexecute,
-     KeymanVersion, CRC32, VisualKeyboard, Controls;
+     KeymanVersion, VisualKeyboard, Controls;
 
 function GetKMShellPath(var ps: string): Boolean; forward;  // I3655
 

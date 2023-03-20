@@ -8,12 +8,13 @@
         app:showAsAction="always"
         android:title="@string/action_share"
         android:icon="@drawable/ic_light_action_share" />
-    
-    <item
+
+  <!-- Disable Web Browser to investigate Google sign-in -->
+  <!--item
         android:id="@+id/action_web"
         app:showAsAction="always"
         android:title="@string/action_web"
-        android:icon="@drawable/ic_light_action_web" />
+        android:icon="@drawable/ic_light_action_web" /> -->
 
     <item
         android:id="@+id/action_text_size"
