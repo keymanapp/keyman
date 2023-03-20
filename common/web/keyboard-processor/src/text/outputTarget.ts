@@ -430,6 +430,13 @@ export class Mock extends OutputTarget {
   setSelection(start: number, end?: number) {
     this.selStart = start;
     this.selEnd = typeof end == 'number' ? end : start;
+
+    this.selForward = end >= start;
+    if(!this.selForward) {
+      let temp = this.selStart;
+      this.selStart = this.selEnd;
+      this.selEnd = temp;
+    }
   }
 
   getTextBeforeCaret(): string {
@@ -454,7 +461,7 @@ export class Mock extends OutputTarget {
         dn = this.selStart;
       }
       this.adjustDeadkeys(-dn);
-      this.text = this.text.kmwSubstr(0, this.selStart - dn) + this.getTextAfterCaret();
+      this.text = this.text.kmwSubstr(0, this.selStart - dn) + this.text.kmwSubstr(this.selStart);
       this.selStart -= dn;
       this.selEnd -= dn;
     }
@@ -462,7 +469,7 @@ export class Mock extends OutputTarget {
 
   insertTextBeforeCaret(s: string): void {
     this.adjustDeadkeys(s._kmwLength());
-    this.text = this.getTextBeforeCaret() + s + this.getTextAfterCaret();
+    this.text = this.getTextBeforeCaret() + s + this.text.kmwSubstr(this.selStart);
     this.selStart += s.kmwLength();
     this.selEnd += s.kmwLength();
   }
