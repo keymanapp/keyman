@@ -98,7 +98,7 @@ public abstract class KMKeyboardJSHandler {
 
         if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP &&
           (KMTextView.activeView == null || KMTextView.activeView.getClass() != KMTextView.class)) {
-          if (KMTextView.activeView == null && !KMManager.isDebugMode()) {
+          if (KMTextView.activeView == null && KMManager.isDebugMode()) {
             Log.w(TAG, "insertText failed: activeView is null");
           }
           return;
@@ -150,12 +150,7 @@ public abstract class KMKeyboardJSHandler {
         }
 
         if (s.length() > 0 && s.charAt(0) == '\n') {
-          if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-            KMTextView textView = (KMTextView)KMTextView.activeView;
-            textView.keyDownUp(KeyEvent.KEYCODE_ENTER);
-          } else if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-            keyDownUp(KeyEvent.KEYCODE_ENTER);
-          }
+          keyDownUp(KeyEvent.KEYCODE_ENTER);
           ic.endBatchEdit();
           return;
         }
@@ -213,8 +208,13 @@ public abstract class KMKeyboardJSHandler {
   public abstract boolean dispatchKey(final int code, final int eventModifiers);
 
   private void keyDownUp(int keyEventCode) {
-    KMManager.getInputMethodService().getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyEventCode));
-    KMManager.getInputMethodService().getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyEventCode));
+    if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      KMTextView textView = (KMTextView)KMTextView.activeView;
+      textView.keyDownUp(KeyEvent.KEYCODE_ENTER);
+    } else if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      KMManager.getInputMethodService().getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyEventCode));
+      KMManager.getInputMethodService().getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyEventCode));
+    }
   }
 
   /*
