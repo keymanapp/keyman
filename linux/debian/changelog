@@ -1,3 +1,10 @@
+keyman (16.0.139-2) unstable; urgency=medium
+
+  * Don't build on s390x because Keyman doesn't work on big-endian architectures
+   (upstream bug https://github.com/keymanapp/keyman/issues/5111)
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 20 Mar 2023 19:54:44 +0100
+
 keyman (16.0.139-1) unstable; urgency=medium
 
   * New upstream release.
