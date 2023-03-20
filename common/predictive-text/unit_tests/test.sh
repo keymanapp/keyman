@@ -29,6 +29,10 @@ builder_describe "Runs all tests for the language-modeling / predictive-text lay
 
 builder_parse "$@"
 
+if builder_has_option --ci && builder_is_debug_build; then
+  builder_die "Options --ci and --debug are incompatible."
+fi
+
 if builder_start_action configure; then
   verify_npm_setup
   builder_finish_action success configure
@@ -120,10 +124,6 @@ if builder_start_action test:browser; then
     KARMA_FLAGS="$KARMA_FLAGS --reporters teamcity,BrowserStack"
     KARMA_CONFIG="CI.conf.js"
     KARMA_INFO_LEVEL="--log-level=debug"
-
-    if builder_is_debug_build; then
-      echo "$(builder_term --ci) option set; ignoring $(builder_term --debug) option"
-    fi
   else
     KARMA_CONFIG="manual.conf.js"
     if builder_is_debug_build; then
