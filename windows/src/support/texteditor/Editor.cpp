@@ -1,6 +1,11 @@
-// Editor.cpp : Defines the entry point for the application.
-//
+/*
+  Name:             TextEditor
+  Copyright:        Copyright (C) SIL International. MIT License.
 
+  Create Date:      10/03/2023
+  Authors:          rcruickshank
+
+*/
 
 #include "framework.h"
 #include "Editor.h"
@@ -168,7 +173,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                   font_select_control->choose_font();
                   SendMessage(hWndEdit, WM_SETFONT, (LPARAM)font_select_control->get_font_handle(), TRUE);
                 }
-                
+
                 break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);

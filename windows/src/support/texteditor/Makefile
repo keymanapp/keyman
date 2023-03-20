@@ -13,7 +13,6 @@ clean: def-clean
     $(MSBUILD) $(MSBUILD_CLEAN) editor.sln
     rmdir /s /q release
 
-
 signcode:
     $(SIGNCODE) /d "Keyman Engine x64" $(PROGRAM)\support\editor.exe
 
