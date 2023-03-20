@@ -14,7 +14,7 @@
     <intent
       android:action="android.intent.action.VIEW"
       android:targetPackage="com.tavultesoft.kmapro.debug"
-      android:targetClass="com.tavultesoft.kmapro.KMPBrowserActivity"/>
+      android:targetClass="com.tavultesoft.kmapro.KeymanSettingsInstallActivity"/>
 
   </shortcut>
 
