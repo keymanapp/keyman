@@ -12,12 +12,5 @@
   var keymanweb=window['keyman'];
 
   // Flag to control refreshing of a keyboard that is already loaded
-  keymanweb.mustReloadKeyboard = true;
-
-  /**
-   * Set target element text direction (LTR or RTL): not functional for KMEI, KMEA
-   *
-   * @param       {Object}      Ptarg      Target element
-   */
-  keymanweb.domManager._SetTargDir = function(Ptarg){};
+  keymanweb.mustReloadKeyboard = true; // pretty much tied to cache-busting, isn't it?
 })();
