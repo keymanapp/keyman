@@ -209,28 +209,30 @@ public abstract class KMKeyboardJSHandler {
     Handler mainLoop = new Handler(Looper.getMainLooper());
     mainLoop.post(new Runnable() {
       public void run() {
-        if (SystemKeyboard == null) {
+        if (k == null) {
           KMLog.LogError(TAG, "dispatchKey failed: SystemKeyboard is null");
           return;
         }
 
-        if (SystemKeyboard.subKeysWindow != null) {
+        if (k.subKeysWindow != null) {
           return;
         }
 
-        InputConnection ic = IMService.getCurrentInputConnection();
+        InputConnection ic = (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) ?
+          KMTextView.activeView.onCreateInputConnection(new EditorInfo()) :
+          KMManager.getInputMethodService().getCurrentInputConnection();
         if (ic == null) {
-          if (isDebugMode()) {
-            Log.w(HANDLER_TAG, "insertText failed: InputConnection is null");
+          if (KMManager.isDebugMode()) {
+            Log.w(TAG, "insertText failed: InputConnection is null");
           }
           return;
         }
 
-        SystemKeyboard.dismissHelpBubble();
-        SystemKeyboard.setShouldShowHelpBubble(false);
+        k.dismissHelpBubble();
+        k.setShouldShowHelpBubble(false);
 
         // Handle tab or enter since KMW didn't process it
-        Log.d(HANDLER_TAG, "dispatchKey called with code: " + code + ", eventModifiers: " + eventModifiers);
+        Log.d(TAG, "dispatchKey called with code: " + code + ", eventModifiers: " + eventModifiers);
         if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_TAB]) {
           KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_TAB, 0, eventModifiers, 0, 0, 0);
           ic.sendKeyEvent(event);
