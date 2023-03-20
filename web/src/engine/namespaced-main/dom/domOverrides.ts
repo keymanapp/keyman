@@ -29,14 +29,5 @@ namespace com.keyman.dom {
         dom.DOMEventHandlers.states.changed = true;
       }
     }
-
-    // KMEA and KMEI (embedded mode) use direct insertion of the character string
-    if(keyman.isEmbedded) {
-      // A special embedded callback used to setup direct callbacks to app-native code.
-      keyman['oninserttext'](ruleTransform.deleteLeft, ruleTransform.insert, ruleTransform.deleteRight);
-      if(outputTarget instanceof targets.OutputTarget) {
-        keyman.refreshElementContent(outputTarget.getElement());
-      }
-    }
   }
 }
