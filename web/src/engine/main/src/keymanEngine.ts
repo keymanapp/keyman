@@ -2,7 +2,7 @@ import { DefaultRules, KeyboardKeymanGlobal, ProcessorInitOptions } from "@keyma
 import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
 import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
 import { OSKView } from "keyman/engine/osk";
-import { KeyboardRequisitioner, ModelCache, ModelSpec } from "keyman/engine/keyboard-cache";
+import { KeyboardRequisitioner, ModelCache, ModelSpec } from "keyman/engine/package-cache";
 
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
 import KeyboardInterface from "./keyboardInterface.js";
@@ -10,7 +10,7 @@ import { ContextManagerBase } from "./contextManagerBase.js";
 import { KeyEventHandler } from './keyEventSource.interface.js';
 import HardKeyboardBase from "./hardKeyboard.js";
 import { LegacyAPIEventEngine } from "./legacyAPIEvents.js";
-import DOMCloudRequester from "keyman/engine/keyboard-cache/dom-requester";
+import DOMCloudRequester from "keyman/engine/package-cache/dom-requester";
 
 export default class KeymanEngine<ContextManager extends ContextManagerBase, HardKeyboard extends HardKeyboardBase> implements KeyboardKeymanGlobal {
   readonly config: EngineConfiguration;

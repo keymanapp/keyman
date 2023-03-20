@@ -34,7 +34,7 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":engine/device-detect     Subset used for device-detection " \
   ":engine/dom-utils         A common subset of function used for DOM calculations, layout, etc" \
   ":engine/element-wrappers  Subset used to integrate with website elements" \
-  ":engine/keyboard-cache    Subset used to collate keyboards and request them from the cloud" \
+  ":engine/package-cache    Subset used to collate keyboards and request them from the cloud" \
   ":engine/main              Builds all common code used by KMW's app/-level targets" \
   ":engine/osk               Builds the Web OSK module"
 
@@ -90,9 +90,9 @@ builder_run_child_actions build:engine/paths
 
 # Uses engine/config (also due to resource-path config interface, but for the
 # more complete version of that interface)
-builder_run_child_actions build:engine/keyboard-cache
+builder_run_child_actions build:engine/package-cache
 
-# Uses engine/paths, engine/device-detect, engine/keyboard-cache, & engine/osk
+# Uses engine/paths, engine/device-detect, engine/package-cache, & engine/osk
 builder_run_child_actions build:engine/main
 
 # Uses all but engine/element-wrappers

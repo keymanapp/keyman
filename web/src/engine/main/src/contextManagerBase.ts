@@ -1,6 +1,6 @@
 import EventEmitter from 'eventemitter3';
 import { type Keyboard, type KeyboardInterface, type OutputTarget } from '@keymanapp/keyboard-processor';
-import { type KeyboardStub } from 'keyman/engine/keyboard-cache';
+import { type KeyboardStub } from 'keyman/engine/package-cache';
 import { PredictionContext } from '@keymanapp/input-processor';
 
 interface EventMap {

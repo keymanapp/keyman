@@ -16,13 +16,13 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 cd "$THIS_SCRIPT_PATH"
 
 # Imports common Web build-script definitions & functions
-SUBPROJECT_NAME=engine/keyboard-cache
+SUBPROJECT_NAME=engine/package-cache
 . "$KEYMAN_ROOT/web/common.inc.sh"
 
 # ################################ Main script ################################
 
-builder_describe "Builds keyboard cloud-querying & caching modules used by the Keyman Engine for Web (KMW)." \
-  "@/common/web/keyboard-processor build" \
+builder_describe "Builds Keyman Engine modules for keyboard cloud-querying & caching + model caching." \
+  "@/common/web/input-processor build" \
   "@/web/src/engine/paths" \
   "clean" \
   "configure" \
@@ -59,7 +59,7 @@ fi
 
 if builder_start_action test; then
   # TODO:  CI vs manual:  how the tests are reported.
-  mocha --recursive "${KEYMAN_ROOT}/web/src/test/auto/headless/keyboard-cache"
+  mocha --recursive "${KEYMAN_ROOT}/web/src/test/auto/headless/packages"
 
   # TODO:  DOM tests
   builder_finish_action success test

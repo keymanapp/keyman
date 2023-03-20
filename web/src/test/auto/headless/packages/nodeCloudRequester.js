@@ -1,11 +1,17 @@
-const assert = chai.assert;
-import sinon from '/node_modules/sinon/pkg/sinon-esm.js';
+import { assert } from 'chai';
+import sinon from 'sinon';
 
-import DOMCloudRequester from '/@keymanapp/keyman/build/engine/keyboard-cache/lib/dom-cloud-requester.mjs';
+import NodeCloudRequester from 'keyman/engine/package-cache/node-requester';
 
-describe("Mocked cloud query results ('canary' testing)", () => {
-  function performMockedRequest(mockedResultsPath) {
-    const requester = new DOMCloudRequester(true);
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+describe("Mocked cloud query results in headless mode ('canary' testing)", () => {
+  function performMockedRequest(mockedResultsFile) {
+    const requester = new NodeCloudRequester(true /* mocked mode:  local files */);
 
     /*
      * We aren't actually attaching to `CloudQueryEngine`, so we need two things:
@@ -15,12 +21,11 @@ describe("Mocked cloud query results ('canary' testing)", () => {
      */
     const mockedRegisterOwner = {
       // Query promises are stored for resolution by the registration function.
-      register: sinon.spy(() => mockedRegisterOwner.promise.resolve())
+      registerFromCloud: sinon.spy(() => mockedRegisterOwner.promise.resolve())
     };
-    // Must be available via keyman.register().
-    window.keyman = mockedRegisterOwner;
+    requester.link(mockedRegisterOwner);
 
-    const queryString = mockedResultsPath;
+    const queryString = mockedResultsFile;
     const queryHandle = requester.request(queryString).promise;
 
     // Store the query's promise for resolution by our mocked register (as seen above).
@@ -28,12 +33,12 @@ describe("Mocked cloud query results ('canary' testing)", () => {
 
     return {
       promise: queryHandle.corePromise,
-      mockedRegister: mockedRegisterOwner.register
+      mockedRegister: mockedRegisterOwner.registerFromCloud
     };
   }
 
   it('sil_euro_latin@no,sv', async () => {
-    const query = performMockedRequest('base/web/src/test/auto/resources/query-mock-results/sil_euro_latin@no_sv.js.fixture');
+    const query = performMockedRequest(`${__dirname}/../../resources/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
     await query.promise;
 
     assert.isTrue(query.mockedRegister.called);
@@ -53,7 +58,7 @@ describe("Mocked cloud query results ('canary' testing)", () => {
   });
 
   it('sil_cameroon_azerty', async () => {
-    const query = performMockedRequest('base/web/src/test/auto/resources/query-mock-results/sil_cameroon_azerty.js.fixture');
+    const query = performMockedRequest(`${__dirname}/../../resources/query-mock-results/sil_cameroon_azerty.js.fixture`);
     await query.promise;
 
     assert.isTrue(query.mockedRegister.called);
@@ -70,7 +75,7 @@ describe("Mocked cloud query results ('canary' testing)", () => {
   });
 
   it('@dz', async () => {
-    const query = performMockedRequest('base/web/src/test/auto/resources/query-mock-results/@dz.js.fixture');
+    const query = performMockedRequest(`${__dirname}/../../resources/query-mock-results/@dz.js.fixture`);
     await query.promise;
 
     assert.isTrue(query.mockedRegister.called);

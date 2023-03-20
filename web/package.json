@@ -26,30 +26,30 @@
       "types": "./build/engine/element-wrappers/lib/index.d.ts",
       "import": "./build/engine/element-wrappers/lib/index.mjs"
     },
-    "./engine/keyboard-cache": {
-      "types": "./build/engine/keyboard-cache/obj/index.d.ts",
-      "import": "./build/engine/keyboard-cache/obj/index.js",
-      "require": "./build/engine/keyboard-cache/obj/index.js"
+    "./engine/package-cache": {
+      "types": "./build/engine/package-cache/obj/index.d.ts",
+      "import": "./build/engine/package-cache/obj/index.js",
+      "require": "./build/engine/package-cache/obj/index.js"
     },
-    "./engine/keyboard-cache/lib": {
-      "types": "./build/engine/keyboard-cache/lib/index.d.ts",
-      "import": "./build/engine/keyboard-cache/lib/index.mjs"
+    "./engine/package-cache/lib": {
+      "types": "./build/engine/package-cache/lib/index.d.ts",
+      "import": "./build/engine/package-cache/lib/index.mjs"
     },
-    "./engine/keyboard-cache/dom-requester": {
-      "types": "./build/engine/keyboard-cache/obj/domCloudRequester.d.ts",
-      "import": "./build/engine/keyboard-cache/obj/domCloudRequester.js"
+    "./engine/package-cache/dom-requester": {
+      "types": "./build/engine/package-cache/obj/domCloudRequester.d.ts",
+      "import": "./build/engine/package-cache/obj/domCloudRequester.js"
     },
-    "./engine/keyboard-cache/dom-requester/lib": {
-      "types": "./build/engine/keyboard-cache/lib/index.d.ts",
-      "import": "./build/engine/keyboard-cache/lib/dom-cloud-requester.mjs"
+    "./engine/package-cache/dom-requester/lib": {
+      "types": "./build/engine/package-cache/lib/index.d.ts",
+      "import": "./build/engine/package-cache/lib/dom-cloud-requester.mjs"
     },
-    "./engine/keyboard-cache/node-requester": {
-      "types": "./build/engine/keyboard-cache/obj/nodeCloudRequester.d.ts",
-      "import": "./build/engine/keyboard-cache/obj/nodeCloudRequester.js"
+    "./engine/package-cache/node-requester": {
+      "types": "./build/engine/package-cache/obj/nodeCloudRequester.d.ts",
+      "import": "./build/engine/package-cache/obj/nodeCloudRequester.js"
     },
-    "./engine/keyboard-cache/node-requester/lib": {
-      "types": "./build/engine/keyboard-cache/lib/index.d.ts",
-      "import": "./build/engine/keyboard-cache/lib/node-cloud-requester.mjs"
+    "./engine/package-cache/node-requester/lib": {
+      "types": "./build/engine/package-cache/lib/index.d.ts",
+      "import": "./build/engine/package-cache/lib/node-cloud-requester.mjs"
     },
     "./engine/main": {
       "types": "./build/engine/main/obj/index.d.ts",

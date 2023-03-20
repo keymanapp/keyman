@@ -1,5 +1,5 @@
 import { type Keyboard, Mock, OutputTarget } from '@keymanapp/keyboard-processor';
-import { type KeyboardStub } from 'keyman/engine/keyboard-cache';
+import { type KeyboardStub } from 'keyman/engine/package-cache';
 import {
   ContextManager as ContextManagerBase,
   type KeyboardInterface

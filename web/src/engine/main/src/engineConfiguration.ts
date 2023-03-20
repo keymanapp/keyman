@@ -1,7 +1,7 @@
 import { DeviceSpec, ManagedPromise, physicalKeyDeviceAlias, SpacebarText } from "@keymanapp/keyboard-processor";
 import { PathConfiguration, PathOptionDefaults, PathOptionSpec } from "keyman/engine/paths";
 import { Device } from "keyman/engine/device-detect";
-import { KeyboardStub } from "keyman/engine/keyboard-cache";
+import { KeyboardStub } from "keyman/engine/package-cache";
 
 export class EngineConfiguration {
   // The app/webview path replaces this during init, but we expect to have something set for this

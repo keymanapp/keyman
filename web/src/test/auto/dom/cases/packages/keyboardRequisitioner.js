@@ -4,8 +4,8 @@ import sinon from '/node_modules/sinon/pkg/sinon-esm.js';
 import { KeyboardHarness, MinimalKeymanGlobal } from '/@keymanapp/keyboard-processor/build/lib/index.mjs';
 import { DOMKeyboardLoader } from '/@keymanapp/keyboard-processor/build/lib/dom-keyboard-loader.mjs';
 import { PathConfiguration } from '/@keymanapp/keyman/build/engine/paths/lib/index.mjs';
-import { KeyboardRequisitioner } from '/@keymanapp/keyman/build/engine/keyboard-cache/lib/index.mjs';
-import DOMCloudRequester from '/@keymanapp/keyman/build/engine/keyboard-cache/lib/dom-cloud-requester.mjs';
+import { KeyboardRequisitioner } from '/@keymanapp/keyman/build/engine/package-cache/lib/index.mjs';
+import DOMCloudRequester from '/@keymanapp/keyman/build/engine/package-cache/lib/dom-cloud-requester.mjs';
 
 const pathConfig = new PathConfiguration({
   root: '',
@@ -14,7 +14,7 @@ const pathConfig = new PathConfiguration({
   fonts: '',
   // The primary / top-level module here is the keyboard-cache bundle.
   // So, we set up our path config based upon that module for verification purposes.
-}, 'http://localhost:9876/@keymanapp/keyman/build/engine/keyboard-cache/lib'); // TODO:  set up the current path like actual KMW does it.
+}, 'http://localhost:9876/@keymanapp/keyman/build/engine/package-cache/lib'); // TODO:  set up the current path like actual KMW does it.
 
 /**
  * Performs mocking setup to facilitate unit testing for the `CloudQueryEngine` class.

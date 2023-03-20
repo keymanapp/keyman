@@ -1,9 +1,9 @@
 const assert = chai.assert;
 import sinon from '/node_modules/sinon/pkg/sinon-esm.js';
 
-import { CloudQueryEngine } from '/@keymanapp/keyman/build/engine/keyboard-cache/lib/index.mjs';
+import { CloudQueryEngine } from '/@keymanapp/keyman/build/engine/package-cache/lib/index.mjs';
 import { PathConfiguration } from '/@keymanapp/keyman/build/engine/paths/lib/index.mjs';
-import DOMCloudRequester from '/@keymanapp/keyman/build/engine/keyboard-cache/lib/dom-cloud-requester.mjs';
+import DOMCloudRequester from '/@keymanapp/keyman/build/engine/package-cache/lib/dom-cloud-requester.mjs';
 
 const pathConfig = new PathConfiguration({
   root: '',
