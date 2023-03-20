@@ -61,15 +61,6 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
     this.osk?.refreshLayout();
   };
 
-  // /**
-  //  * Register a lexical model
-  //  *
-  //  * @param {ModelSpec} model  Spec of the lexical model
-  //  */
-  // registerModel(model: ModelSpec) {
-  //   keymanweb.modelManager.register(model);
-  // };
-
   /**
    * Function called by Android and iOS when a device-implemented keyboard popup
    * is displayed or hidden.  As this is controlled by the app, we use it as a
