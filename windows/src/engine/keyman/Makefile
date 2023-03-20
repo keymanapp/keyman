@@ -17,7 +17,7 @@ clean: def-clean
 
 signcode:
     $(SIGNCODE) /d "Keyman Engine" $(PROGRAM)\engine\keyman.exe
-    # Sign the Sentry executables and libraries here
+# Sign the Sentry executables and libraries here
     $(SIGNCODE) /d "Keyman Engine" $(PROGRAM)\engine\sentry.dll
     $(SIGNCODE) /d "Keyman Engine" $(PROGRAM)\engine\sentry.x64.dll
     $(SIGNCODE) /d "Keyman Engine" $(PROGRAM)\engine\crashpad_handler.exe

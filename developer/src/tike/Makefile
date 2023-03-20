@@ -68,7 +68,7 @@ clean: def-clean
 signcode:
     $(SIGNCODE) /d "Keyman Developer" $(DEVELOPER_PROGRAM)\tike.exe
     $(SIGNCODE) /d "Keyman Core" $(DEVELOPER_PROGRAM)\kmnkbp0-0.dll
-    # Sign the Sentry executables and libraries here
+# Sign the Sentry executables and libraries here
     $(SIGNCODE) /d "Keyman Developer" $(DEVELOPER_PROGRAM)\sentry.dll
     $(SIGNCODE) /d "Keyman Developer" $(DEVELOPER_PROGRAM)\sentry.x64.dll
     $(SIGNCODE) /d "Keyman Developer" $(DEVELOPER_PROGRAM)\crashpad_handler.exe
