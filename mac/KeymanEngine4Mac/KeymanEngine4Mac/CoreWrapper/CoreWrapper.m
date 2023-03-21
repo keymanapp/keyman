@@ -137,8 +137,6 @@
   
   unsigned short macKeyCode = event.keyCode;
   NSEventModifierFlags modifiers = event.modifierFlags;
-  //NSString *characters = [keyDownEvent characters];
-  //NSString *keycap = [keyDownEvent charactersIgnoringModifiers];
 
   return [self processMacVirtualKey:macKeyCode
                       withModifiers:modifiers

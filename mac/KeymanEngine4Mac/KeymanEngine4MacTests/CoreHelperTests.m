@@ -1,0 +1,98 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ * 
+ * CoreHelperTests.m
+ * CoreHelperTests
+ * 
+ * Created by Shawn Schantz on 2022-12-12.
+ * 
+ * Description...
+ */
+
+#import <XCTest/XCTest.h>
+#import "CoreHelper.h"
+#import <Cocoa/Cocoa.h>
+#import "CoreTestStaticHelperMethods.h"
+#import "keyboardprocessor.h"
+#import "KMEngine.h"  // included for VKMap
+#import "MacVKCodes.h"
+
+@interface CoreHelperTests : XCTestCase
+
+@end
+
+@implementation CoreHelperTests
+
++ (void)setUp {
+  //TODO remove when VKMap is moved to CoreHelper class
+  // calling engine with nil kmx file so that static VKMap array is initialized
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:nil contextBuffer:@""];
+}
+
+- (void)tearDown {
+    // Put teardown code here. This method is called after the invocation of each test method in the class.
+}
+
+- (void)testKeycodeConversion_MacA_ReturnsWindowsA {
+  const unsigned int MAC_A_KEYCODE = 0;
+  // Mac 'A' key = 0, Windows 'S' key = 83;
+  uint16_t windowsKeyCode = [[CoreTestStaticHelperMethods helper] macVirtualKeyToWindowsVirtualKey:MAC_A_KEYCODE];
+  XCTAssertEqual(windowsKeyCode, KM_KBP_VKEY_A, @"Unexpected conversion from Mac to Windows key code.");
+}
+
+- (void)testKeycodeConversion_MacS_ReturnsWindowsS {
+  const unsigned int MAC_S_KEYCODE = 1;
+  // Mac 'S' key = 1, Windows 'S' key = 65;
+  uint16_t windowsKeyCode = [[CoreTestStaticHelperMethods helper] macVirtualKeyToWindowsVirtualKey:MAC_S_KEYCODE];
+  XCTAssertEqual(windowsKeyCode, KM_KBP_VKEY_S, @"Unexpected conversion from Mac to Windows key code.");
+}
+
+/*
+- (void)testMacUpArrowKeycodeConvertsToWindows {
+  const unsigned int MAC_UPARROW_KEYCODE = 0X7E;
+  // Mac Up Arrow key = 0X7E, Windows 'S' key = 83;
+  uint16_t windowsKeyCode = [coreHelper macVirtualKeyToWindowsVirtualKey:MAC_UPARROW_KEYCODE];
+  XCTAssertEqual(windowsKeyCode, KM_KBP_VKEY_S, @"Unexpected conversion from Mac to Windows key code.");
+}
+*/
+
+- (void)testKeycodeConversion_NegativeKeycode_ReturnsZero {
+  const unsigned short int INVALID_KEYCODE = -1;
+  uint16_t windowsKeyCode = [[CoreTestStaticHelperMethods helper] macVirtualKeyToWindowsVirtualKey:INVALID_KEYCODE];
+  XCTAssertEqual(windowsKeyCode, 0, @"Did not return zero for invalid Mac keycode.");
+}
+
+- (void)testKeycodeConversion_LargeKeycode_ReturnsZero {
+  const unsigned short int INVALID_KEYCODE = 10000;
+  uint16_t windowsKeyCode = [[CoreTestStaticHelperMethods helper] macVirtualKeyToWindowsVirtualKey:INVALID_KEYCODE];
+  XCTAssertEqual(windowsKeyCode, 0, @"Did not return zero for invalid Mac keycode.");
+}
+
+- (void)testModifierConversion_MacShift_ReturnsKeymanShift {
+  uint32_t keymanModifierState = [[CoreTestStaticHelperMethods helper] macToKeymanModifier:NSEventModifierFlagShift];
+  XCTAssertEqual(keymanModifierState, KM_KBP_MODIFIER_SHIFT, @"Failed conversion of shift modifier from Mac to Keyman.");
+}
+
+- (void)testModifierConversion_MacOption_ReturnsKeymanAlt {
+  uint32_t keymanModifierState = [[CoreTestStaticHelperMethods helper] macToKeymanModifier:NSEventModifierFlagOption];
+  XCTAssertEqual(keymanModifierState, KM_KBP_MODIFIER_ALT, @"Failed conversion of option modifier from Mac to Keyman alt.");
+}
+
+- (void)testModifierConversion_MacControl_ReturnsKeymanControl {
+  uint32_t keymanModifierState = [[CoreTestStaticHelperMethods helper] macToKeymanModifier:NSEventModifierFlagControl];
+  XCTAssertEqual(keymanModifierState, KM_KBP_MODIFIER_CTRL, @"Failed conversion of control modifier from Mac to Keyman  control.");
+}
+
+- (void)testUnsupportedModifierConversion_MacHelpKeyModifier_ReturnsZero {
+  uint32_t keymanModifierState = [[CoreTestStaticHelperMethods helper] macToKeymanModifier:NSEventModifierFlagHelp];
+  XCTAssertEqual(keymanModifierState, 0, @"Failed conversion of Mac Help key flag from Mac to Keyman cleared modifier state.");
+}
+
+- (void)testHelperCreationPerformance {
+    // This is an example of a performance test case.
+    [self measureBlock:^{
+      CoreHelper *helper = [[CoreHelper alloc] init];
+    }];
+}
+
+@end

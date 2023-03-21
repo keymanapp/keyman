@@ -155,11 +155,11 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     NSLog(@"**SGS KME processEvent using CoreWrapper");
     // CoreWrapper returns an array of CoreAction objects
     NSArray *coreActions = [self.keymanCore processEvent:event];
-    // convert the CoreAction objects into Dictionary objects expected by the Input Method
     //TODO make this nil assignment part of the conversion method
     if ([coreActions count] == 0) {
       return nil;
     } else {
+      // convert the CoreAction objects into Dictionary objects expected by the Input Method
       return [self.coreHelper actionObjectArrayToLegacyActionMapArray:coreActions];
     }
   } else {

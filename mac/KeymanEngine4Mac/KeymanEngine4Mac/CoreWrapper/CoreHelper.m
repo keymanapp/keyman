@@ -36,7 +36,6 @@ const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
   self = [super init];
   if (self) {
     _optimizer = [[ActionArrayOptimizer alloc] init];
-    //[self setVKMapping];
     }
     return self;
 }
@@ -83,14 +82,6 @@ const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
     keymanModifiers |= KM_KBP_MODIFIER_SHIFT;
   }
   
-  if ([self isLeftControlKey:modifiers]) {
-    keymanModifiers |= KM_KBP_MODIFIER_LCTRL;
-  } else if ([self isRightControlKey:modifiers]) {
-    keymanModifiers |= KM_KBP_MODIFIER_RCTRL;
-  } else if ([self isControlKey:modifiers]) {
-    keymanModifiers |= KM_KBP_MODIFIER_CTRL;
-  }
-  
   if([self isLeftOptionKey:modifiers]) {
     keymanModifiers |= KM_KBP_MODIFIER_LALT;
   } else if([self isRightOptionKey:modifiers]) {
@@ -99,6 +90,14 @@ const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
     keymanModifiers |= KM_KBP_MODIFIER_ALT;
   }
 
+  if ([self isLeftControlKey:modifiers]) {
+    keymanModifiers |= KM_KBP_MODIFIER_LCTRL;
+  } else if ([self isRightControlKey:modifiers]) {
+    keymanModifiers |= KM_KBP_MODIFIER_RCTRL;
+  } else if ([self isControlKey:modifiers]) {
+    keymanModifiers |= KM_KBP_MODIFIER_CTRL;
+  }
+  
   NSLog(@"macToKeymanModifier result  = %u", (unsigned int)keymanModifiers);
   return keymanModifiers;
 }
