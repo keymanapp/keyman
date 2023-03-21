@@ -5,7 +5,8 @@ import { PredictionContext } from '@keymanapp/input-processor';
 
 interface EventMap {
   // target, then keyboard.
-  'targetchange': (target: OutputTarget) => void;
+  'targetchange': (target: OutputTarget) => boolean;
+  'beforekeyboardchange': (metadata: KeyboardStub, abortChange: () => void) => void;
   'keyboardchange': (kbd: {keyboard: Keyboard, metadata: KeyboardStub}) => void;
 }
 
@@ -26,6 +27,12 @@ export interface ContextManagerConfiguration {
   readonly predictionContext: PredictionContext;
 }
 
+interface PendingActivation {
+  target: OutputTarget,
+  keyboard: Promise<Keyboard>,
+  stub: KeyboardStub;
+}
+
 export abstract class ContextManagerBase extends EventEmitter<EventMap> {
   abstract initialize(): void;
 
@@ -33,6 +40,8 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
 
   private _predictionContext: PredictionContext;
   private _resetKeyState: (outputTarget?: OutputTarget) => void;
+
+  private pendingActivations: PendingActivation[] = [];
 
   get predictionContext(): PredictionContext {
     return this._predictionContext;
@@ -79,4 +88,55 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
 
   abstract get activeKeyboard(): {keyboard: Keyboard, metadata: KeyboardStub};
   abstract set activeKeyboard(kbd: {keyboard: Keyboard, metadata: KeyboardStub});
+  abstract setActiveKeyboardAsync(kbd: Promise<Keyboard>, metadata: KeyboardStub): Promise<boolean>;
+
+  /**
+   * Checks the pending keyboard-activation array for an entry corresponding to the specified
+   * OutputTarget.  If found, also removes the entry for bookkeeping purposes.
+   * @param target  The specific OutputTarget affected by the pending Keyboard activation.
+   *                May be `null`, which corresponds to the global default Keyboard.
+   * @returns `true` if pending activation is still valid, `false` otherwise.
+   */
+  private findAndPopActivation(target: OutputTarget): boolean {
+    // Array.findIndex requires Chrome 45+. :(
+    let activationIndex;
+    for(activationIndex = 0; activationIndex < this.pendingActivations.length; activationIndex++) {
+      if(this.pendingActivations[activationIndex].target == target) {
+        break;
+      }
+    }
+
+    if(activationIndex == this.pendingActivations.length) {
+      return false;
+    }
+
+    this.pendingActivations.splice(activationIndex, 1);
+    return true;
+  }
+
+  protected confirmKeyboardChange(metadata: KeyboardStub): boolean {
+    const eventReturn = {
+      continue: true
+    };
+
+    this.emit('beforekeyboardchange', metadata, () => {eventReturn.continue = false});
+
+    return eventReturn.continue;
+  }
+
+  protected async deferredKeyboardActivationValid(kbdPromise: Promise<Keyboard>, metadata: KeyboardStub, target: OutputTarget): Promise<boolean> {
+    const activation: PendingActivation = {
+      target: target,
+      keyboard: kbdPromise,
+      stub: metadata
+    };
+
+    // Invalidate existing requests for the specified target.
+    this.findAndPopActivation(target);
+    this.pendingActivations.push(activation);
+    await kbdPromise;
+
+    // The keyboard-load is complete; is the activation still desired?
+    return this.findAndPopActivation(target);
+  }
 }

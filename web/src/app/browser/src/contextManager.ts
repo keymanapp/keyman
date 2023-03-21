@@ -1,7 +1,7 @@
 import { type Keyboard, Mock, OutputTarget } from '@keymanapp/keyboard-processor';
 import { type KeyboardStub } from 'keyman/engine/package-cache';
 import {
-  ContextManager as ContextManagerBase,
+  ContextManagerBase,
   type KeyboardInterface
 } from 'keyman/engine/main';
 import { BrowserConfiguration } from './configuration.js';
@@ -57,5 +57,55 @@ export default class ContextManager extends ContextManagerBase {
       return super.insertText(kbdInterface, Ptext, PdeadKey);
     }
     return false;
+  }
+
+  /**
+   * Reflects the active 'target' upon which any `set activeKeyboard` operation will take place.
+   * When `null`, such operations will affect the global default; otherwise, such operations
+   * affect only the specified `target`.
+   */
+  private get keyboardTarget(): OutputTarget {
+    // Remove `&& false` once the inlined section below is implemented.
+    if(this.activeTarget /* has 'independent keyboard mode activated' */ && false) {
+      return this.activeTarget;
+    } else {
+      return null;
+    }
+  }
+
+  async setTargetActiveKeyboardAsync(kbd: Promise<Keyboard>, metadata: KeyboardStub, target: OutputTarget): Promise<boolean> {
+    if(!await this.deferredKeyboardActivationValid(kbd, metadata, target)) {
+      return false;
+    } else {
+      let activatingKeyboard = {
+        keyboard: await kbd,
+        metadata: metadata
+      };
+
+      if(target == this.keyboardTarget) {
+        // TODO: 'beforekeyboardchange' event
+      }
+
+      // TODO:  set THAT TARGET's active keyboard.  May or may not be active!
+
+      if(target == this.keyboardTarget) {
+        // TODO: 'keyboardchange' event
+      }
+
+      /*
+       * Alternative to the three above TODOs:
+       * if (same condition met)
+       *   this.activeKeyboard = activatingKeyboard
+       * else
+       *   // manually set it for that one control; no events.
+       *
+       */
+
+      return true;
+    }
+  }
+
+  async setActiveKeyboardAsync(kbd: Promise<Keyboard>, metadata: KeyboardStub): Promise<boolean> {
+    return this.setTargetActiveKeyboardAsync(kbd, metadata, this.keyboardTarget);
   }
 }

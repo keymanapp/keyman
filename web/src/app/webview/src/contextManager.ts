@@ -1,5 +1,5 @@
 import { type Keyboard, Mock } from '@keymanapp/keyboard-processor';
-import { type KeyboardStub } from 'keyman/engine/package-cache';
+import { KeyboardStub } from 'keyman/engine/package-cache';
 import { ContextManagerBase, ContextManagerConfiguration } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
 
@@ -53,11 +53,40 @@ export default class ContextManager extends ContextManagerBase {
 
   set activeKeyboard(kbd: {keyboard: Keyboard, metadata: KeyboardStub}) {
     const priorEntry = this._activeKeyboard;
-    this._activeKeyboard = kbd;
+
+    // Clone the stub before exposing it...
+    if(!this.confirmKeyboardChange(new KeyboardStub(kbd.metadata))) {
+      return;
+    }
+
+    // Clone the object to prevent accidental by-reference changes.
+    this._activeKeyboard = {...kbd};
 
     if(priorEntry.keyboard != kbd.keyboard || priorEntry.metadata != kbd.metadata) {
       this.emit('keyboardchange', kbd);
       this.resetContext();
+    }
+  }
+
+  async setActiveKeyboardAsync(kbd: Promise<Keyboard>, metadata: KeyboardStub): Promise<boolean> {
+    if(!this.confirmKeyboardChange) {
+      return false;
+    }
+
+    // There is only the one target, so 'default global keyboard' use is fine.
+    if(!await this.deferredKeyboardActivationValid(kbd, metadata, null)) {
+      return false;
+    } else {
+      const activatingKeyboard = {
+        keyboard: await kbd,
+        metadata: metadata
+      };
+
+      this.activeKeyboard = activatingKeyboard;
+
+      // The change may silently fail due to `set activeKeyboard`'s `confirmKeyboardChange` call.
+      return this.activeKeyboard.keyboard == activatingKeyboard.keyboard
+          && this.activeKeyboard.metadata == activatingKeyboard.metadata;
     }
   }
 }
