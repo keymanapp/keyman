@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.73 alpha 2023-03-21
+
+* refactor(android/engine): Consolidate insertText (#8438)
+* chore(common): prevent multiple npm ci runs in child scripts (#8484)
+
 ## 17.0.72 alpha 2023-03-20
 
 * chore(common): die early when --ci and --debug passed to test.sh (#8465)
