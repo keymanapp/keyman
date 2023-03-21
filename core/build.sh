@@ -121,6 +121,14 @@ builder_describe_outputs \
   build:arch                /core/build/arch/$CONFIGURATION/src/libkmnkbp0.a \
   build:wasm                /core/build/wasm/$CONFIGURATION/src/libkmnkbp0.a
 
+# Import our standard compiler defines; this is copied from
+# /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
+# allow us to reference a file outside its root
+if builder_has_action configure; then
+  mkdir -p "$THIS_SCRIPT_PATH/resources"
+  cp "$KEYMAN_ROOT/resources/build/meson/standard.meson.build" "$THIS_SCRIPT_PATH/resources/meson.build"
+fi
+
 # Iterate through all possible targets; note that targets that cannot be built
 # on the current platform have already been excluded through the archtargets
 # settings above

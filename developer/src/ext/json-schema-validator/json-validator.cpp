@@ -683,8 +683,8 @@ void json_validator::validate_object(const json &instance, const json &schema, c
 static std::size_t utf8_length(const std::string &s)
 {
 	size_t len = 0;
-	for (const unsigned char &c : s)
-		if ((c & 0xc0) != 0x80)
+	for (const  char &c : s)
+		if (((unsigned char)c & 0xc0) != 0x80)
 			len++;
 	return len;
 }
