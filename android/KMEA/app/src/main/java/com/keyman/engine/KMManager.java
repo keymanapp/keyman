@@ -158,6 +158,7 @@ public final class KMManager {
   };
 
   protected static InputMethodService IMService;
+  protected static InputConnection inputConnection;
   private static boolean debugMode = false;
   private static boolean shouldAllowSetKeyboard = true;
   private static boolean didCopyAssets = false;
@@ -458,6 +459,29 @@ public final class KMManager {
     IMService = service;
   }
   public static InputMethodService getInputMethodService() { return IMService; }
+
+  /**
+   * Get the input connection in the order:
+   * 1. Previously saved input connection
+   * 2. IMService (System keyboard)
+   * 3. KMTextView.activeView (InApp keyboard)
+   * @return InputConnection
+   */
+  protected static InputConnection getInputConnection() {
+    if (inputConnection != null) {
+      return inputConnection;
+    }
+
+    // Determine input connection
+    inputConnection = (IMService != null) ? IMService.getCurrentInputConnection() :
+      KMTextView.activeView.onCreateInputConnection(new EditorInfo());
+
+    if (inputConnection == null) {
+      KMLog.LogError(TAG, "inputConnection is null");
+    }
+
+    return inputConnection;
+  }
 
   public static boolean executeHardwareKeystroke(int code, int shift, int lstates, int eventModifiers) {
     if (SystemKeyboard != null) {
@@ -1981,7 +2005,7 @@ public final class KMManager {
       InAppKeyboardShouldIgnoreSelectionChange = false;
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (SystemKeyboard != null && SystemKeyboardWebViewClient.getKeyboardLoaded() && !SystemKeyboardShouldIgnoreSelectionChange) {
-        InputConnection ic = (IMService != null ? IMService.getCurrentInputConnection() : null);
+        InputConnection ic = getInputConnection();
         if (ic != null) {
           ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
           if (icText != null) {

@@ -104,13 +104,9 @@ public abstract class KMKeyboardJSHandler {
           return;
         }
 
-        InputConnection ic = (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) ?
-            KMTextView.activeView.onCreateInputConnection(new EditorInfo()) :
-            KMManager.getInputMethodService().getCurrentInputConnection();
+        InputConnection ic = KMManager.getInputConnection();
         if (ic == null) {
-          if (KMManager.isDebugMode()) {
-            Log.w(TAG, "insertText failed: InputConnection is null");
-          }
+          KMLog.LogError(TAG, "insertText failed: InputConnection is null");
           return;
         }
 
@@ -225,18 +221,14 @@ public abstract class KMKeyboardJSHandler {
             }
             return;
           }
-          if (KMTextView.activeView.getClass() != KMTextView.class)) {
+          if (KMTextView.activeView.getClass() != KMTextView.class) {
             return;
           }
         }
 
-        InputConnection ic = (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) ?
-          KMTextView.activeView.onCreateInputConnection(new EditorInfo()) :
-          KMManager.getInputMethodService().getCurrentInputConnection();
+        InputConnection ic = KMManager.getInputConnection();
         if (ic == null) {
-          if (KMManager.isDebugMode()) {
-            Log.w(TAG, "insertText failed: InputConnection is null");
-          }
+          KMLog.LogError(TAG, "insertText failed: InputConnection is null");
           return;
         }
 
@@ -272,8 +264,9 @@ public abstract class KMKeyboardJSHandler {
       KMTextView textView = (KMTextView)KMTextView.activeView;
       textView.keyDownUp(KeyEvent.KEYCODE_ENTER);
     } else if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      KMManager.getInputMethodService().getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyEventCode));
-      KMManager.getInputMethodService().getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyEventCode));
+      InputConnection ic = KMManager.getInputConnection();
+      ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyEventCode));
+      ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyEventCode));
     }
   }
 
