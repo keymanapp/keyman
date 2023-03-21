@@ -20,17 +20,11 @@ do_configure() {
   local target=$1
   builder_start_action configure:$target || return 0
 
-  local STANDARD_MESON_ARGS="$MESON_OPTION_keyman_core_tests"
+  local STANDARD_MESON_ARGS="$MESON_OPTION_keyman_core_tests --default-library both"
   local MESON_CROSS_FILE=
 
   if [[ -f "$THIS_SCRIPT_PATH/cross-$target.build" ]]; then
     MESON_CROSS_FILE="--cross-file cross-$target.build"
-  fi
-
-  if [[ $target =~ ^mac ]]; then
-    # On mac, build both dynamic and static libraries; win does the same in build.bat
-    # In the future, we may do this on Linux as well
-    STANDARD_MESON_ARGS="$STANDARD_MESON_ARGS --default-library both"
   fi
 
   builder_heading "======= Configuring $target ======="
@@ -174,7 +168,6 @@ cleanup_visual_studio_path() {
       _new_path="$_new_path:$p"
     fi
   done
-  echo
   PATH="${_new_path:1}"
   unset VSINSTALLDIR
 }

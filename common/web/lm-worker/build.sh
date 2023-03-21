@@ -78,12 +78,12 @@ wrap-worker-code ( ) {
 
 builder_describe \
   "Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications." \
-  "@../keyman-version" \
+  "@/common/web/keyman-version" \
   configure clean build test
 
 builder_describe_outputs \
   configure     /node_modules \
-  build         build/index.js
+  build         /common/web/lm-worker/build/index.js
 
 builder_parse "$@"
 
@@ -113,7 +113,7 @@ if builder_start_action build; then
   fi
 
   # Build worker with tsc first
-  npm run build -- $builder_verbose || builder_die "Could not build worker."
+  tsc -b $builder_verbose || builder_die "Could not build worker."
 
   # Wrap the worker code and create embedded index.js. Must be run after the
   # worker is built

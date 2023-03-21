@@ -18,14 +18,14 @@ cd "$THIS_SCRIPT_PATH"
 ################################ Main script ################################
 
 builder_describe "Builds the sourcemap-sanitizing script used for Keyman Engine for Web builds" \
-  "@../../../../../common/tools/sourcemap-path-remapper" \
+  "@/common/tools/sourcemap-path-remapper" \
   "clean" \
   "configure" \
   "build" \
 
 builder_describe_outputs \
   configure                   /node_modules \
-  build                       ../../../../build/tools/sourcemap-root/index.js
+  build                       /web/build/tools/sourcemap-root/index.js
 
 builder_parse "$@"
 
@@ -42,7 +42,7 @@ if builder_start_action clean; then
 fi
 
 if builder_start_action build; then
-  npm run tsc -- -b "$THIS_SCRIPT_PATH/tsconfig.json"
+  tsc -b "$THIS_SCRIPT_PATH/tsconfig.json"
 
   # Necessary until the Web project is converted over to ES modules.
   # Node defaults to CommonJS format otherwise.

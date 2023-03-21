@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright © 1991-2022 Unicode, Inc.
+  Copyright © 1991-2023 Unicode, Inc.
   For terms of use, see http://www.unicode.org/copyright.html
   SPDX-License-Identifier: Unicode-DFS-2016
   CLDR data files are interpreted according to the LDML specification (http://unicode.org/reports/tr35/)
@@ -33,6 +33,7 @@
       </xs:attribute>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <!-- @MATCH:any -->
   <!-- @METADATA -->
   <xs:element name="info">
@@ -42,8 +43,12 @@
       <xs:attribute name="name" use="required" type="xs:NMTOKEN"/>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
+  <!-- @MATCH:any -->
   <!-- @VALUE -->
+  <!-- @MATCH:any -->
   <!-- @METADATA -->
+  <!-- @MATCH:regex/[A-Za-z0-9][A-Za-z0-9-]* -->
   <xs:element name="repertoire">
     <xs:complexType>
       <xs:attribute name="chars" use="required"/>
@@ -63,9 +68,11 @@
       <xs:attribute name="name" use="required" type="xs:NMTOKEN"/>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <!-- @MATCH:any -->
   <!-- @VALUE -->
   <!-- @VALUE -->
+  <!-- @MATCH:regex/[A-Za-z0-9][A-Za-z0-9-]* -->
   <xs:element name="tests">
     <xs:complexType>
       <xs:sequence>
@@ -75,6 +82,8 @@
       <xs:attribute name="name" use="required" type="xs:NMTOKEN"/>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
+  <!-- @MATCH:regex/[A-Za-z0-9][A-Za-z0-9-]* -->
   <xs:element name="test">
     <xs:complexType>
       <xs:sequence>
@@ -90,13 +99,17 @@
       <xs:attribute name="name" use="required" type="xs:NMTOKEN"/>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
+  <!-- @MATCH:regex/[A-Za-z0-9][A-Za-z0-9-]* -->
   <xs:element name="startContext">
     <xs:complexType>
       <xs:attribute name="to" use="required"/>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <!-- @MATCH:any -->
   <!-- @VALUE -->
+  <!-- @ALLOWS_UESC -->
   <xs:element name="keystroke">
     <xs:complexType>
       <xs:attribute name="key" use="required" type="xs:NMTOKEN"/>
@@ -106,6 +119,7 @@
     </xs:complexType>
   </xs:element>
   <!-- @ORDERED -->
+  <!-- @TECHPREVIEW -->
   <!-- @MATCH:regex/[A-Za-z0-9][A-Za-z0-9-]* -->
   <!-- @VALUE -->
   <!-- @MATCH:any -->
@@ -120,20 +134,25 @@
     </xs:complexType>
   </xs:element>
   <!-- @ORDERED -->
+  <!-- @TECHPREVIEW -->
   <!-- @MATCH:any -->
   <!-- @VALUE -->
+  <!-- @ALLOWS_UESC -->
   <xs:element name="backspace">
     <xs:complexType/>
   </xs:element>
   <!-- @ORDERED -->
+  <!-- @TECHPREVIEW -->
   <xs:element name="check">
     <xs:complexType>
       <xs:attribute name="result" use="required"/>
     </xs:complexType>
   </xs:element>
   <!-- @ORDERED -->
+  <!-- @TECHPREVIEW -->
   <!-- @MATCH:any -->
   <!-- @VALUE -->
+  <!-- @ALLOWS_UESC -->
   <xs:element name="special" type="any"/>
   <xs:complexType name="any" mixed="true">
     <xs:sequence>
@@ -141,3 +160,4 @@
     </xs:sequence>
   </xs:complexType>
 </xs:schema>
+<!-- @TECHPREVIEW -->

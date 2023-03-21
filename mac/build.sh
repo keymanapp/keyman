@@ -11,6 +11,7 @@ KEYMAN_MAC_BASE_PATH="$KEYMAN_ROOT/mac"
 
 # Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
@@ -365,7 +366,7 @@ fi
 if $DO_KEYMANIM ; then
     if $DO_HELP ; then
         echo "Building help"
-        $(dirname "$THIS_SCRIPT")/build-help.sh html
+        build_help_html mac Keyman4MacIM/Keyman4MacIM/Help
     fi
 
     builder_heading "Building Keyman.app"

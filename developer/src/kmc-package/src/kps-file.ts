@@ -13,14 +13,14 @@
 // * Strings element is not yet checked to be correct
 //
 
-interface KpsPackage {
+export interface KpsPackage {
   /**
    * <Package> -- the root element.
    */
   package: KpsFile;
 }
 
-interface KpsFile {
+export interface KpsFile {
   system: KpsFileSystem;
   options: KpsFileOptions;
   info?: KpsFileInfo;
@@ -31,12 +31,12 @@ interface KpsFile {
   strings?: KpsFileStrings;
 }
 
-interface KpsFileSystem {
+export interface KpsFileSystem {
   keymanDeveloperVersion: string;
   fileVersion: string;
 }
 
-interface KpsFileOptions {
+export interface KpsFileOptions {
   followKeyboardVersion?: string;
   readMeFile?: string;
   graphicFile?: string;
@@ -45,7 +45,7 @@ interface KpsFileOptions {
   msiOptions?: string;
 }
 
-interface KpsFileInfo {
+export interface KpsFileInfo {
   name?: KpsFileInfoItem;
   copyright?: KpsFileInfoItem;
   author?: KpsFileInfoItem;
@@ -53,42 +53,42 @@ interface KpsFileInfo {
   version?: KpsFileInfoItem;
 }
 
-interface KpsFileInfoItem {
+export interface KpsFileInfoItem {
   _: string;
   $: { URL: string };
 }
 
-interface KpsFileContentFiles {
+export interface KpsFileContentFiles {
   file: KpsFileContentFile[] | KpsFileContentFile;
 }
 
-interface KpsFileContentFile {
+export interface KpsFileContentFile {
   name: string;
   description: string;
   copyLocation: string;
   fileType: string;
 }
 
-interface KpsFileLexicalModel {
+export interface KpsFileLexicalModel {
   name: string;
   iD: string;
   languages: KpsFileLanguages;
 }
 
-interface KpsFileLexicalModels {
+export interface KpsFileLexicalModels {
   lexicalModel: KpsFileLexicalModel[] | KpsFileLexicalModel;
 }
 
-interface KpsFileLanguages {
+export interface KpsFileLanguages {
   language: KpsFileLanguage[] | KpsFileLanguage;
 }
 
-interface KpsFileLanguage {
+export interface KpsFileLanguage {
   _: string;
   $: { ID: string }
 }
 
-interface KpsFileKeyboard {
+export interface KpsFileKeyboard {
   name: string;
   iD: string;
   version: string;
@@ -98,17 +98,17 @@ interface KpsFileKeyboard {
   languages?: KpsFileLanguages;
 }
 
-interface KpsFileKeyboards {
+export interface KpsFileKeyboards {
   keyboard: KpsFileKeyboard[] | KpsFileKeyboard;
 }
 
-interface KpsFileStartMenu {
+export interface KpsFileStartMenu {
   folder?: string;
   addUninstallEntry?: string;
   items?: KpsFileStartMenuItems;
 }
 
-interface KpsFileStartMenuItem {
+export interface KpsFileStartMenuItem {
   name: string;
   filename: string;
   arguments?: string;
@@ -116,11 +116,11 @@ interface KpsFileStartMenuItem {
   location?: string;
 }
 
-interface KpsFileStartMenuItems {
+export interface KpsFileStartMenuItems {
   item: KpsFileStartMenuItem[] | KpsFileStartMenuItem;
 }
 
-interface KpsFileStrings {
+export interface KpsFileStrings {
   //TODO: validate this structure
   string: string[] | string;
 }

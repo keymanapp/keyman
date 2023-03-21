@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { checkMessages, compileKeyboard, makePathToFixture } from './helpers/index.js';
 import { KMX } from '@keymanapp/common-types';
-import KEYMAN_VERSION from '@keymanapp/keyman-version/keyman-version.mjs';
+import KEYMAN_VERSION from '@keymanapp/keyman-version';
 
 import KMXFile = KMX.KMXFile;
 

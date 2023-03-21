@@ -18,16 +18,16 @@ cd "$THIS_SCRIPT_PATH"
 ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's test-sequence recording tool" \
-  "@../../../../../common/web/keyman-version" \
-  "@../../../../../common/web/keyboard-processor" \
-  "@../../../../../common/web/recorder" \
+  "@/common/web/keyman-version" \
+  "@/common/web/keyboard-processor" \
+  "@/common/web/recorder" \
   "clean" \
   "configure" \
   "build"
 
 builder_describe_outputs \
   configure  /node_modules \
-  build      ../../../../build/tools/testing/recorder/index.js
+  build      /web/build/tools/testing/recorder/index.js
 
 builder_parse "$@"
 
@@ -48,7 +48,7 @@ fi
 ### BUILD ACTIONS
 
 if builder_start_action build; then
-  npm run tsc -- -b $THIS_SCRIPT_PATH/tsconfig.json
+  tsc -b $THIS_SCRIPT_PATH/tsconfig.json
 
   builder_finish_action success build
 fi

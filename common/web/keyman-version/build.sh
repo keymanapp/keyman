@@ -24,11 +24,12 @@ builder_describe "Build the include script for current Keyman version" \
   clean \
   build \
   publish \
+  test \
   --dry-run
 
 builder_describe_outputs \
   configure "/node_modules" \
-  build     "build/keyman-version.mjs"
+  build     "/common/web/keyman-version/build/keyman-version.mjs"
 
 builder_parse "$@"
 
@@ -83,9 +84,10 @@ if builder_start_action build; then
 
   # Note: in a dependency build, we'll expect keyman-version to be built by tsc -b
   if builder_is_dep_build; then
-    echo "[$THIS_SCRIPT_IDENTIFIER] skipping tsc -b; will be completed by $builder_dep_parent"
+    builder_echo "skipping tsc -b; will be completed by $builder_dep_parent"
   else
-    npm run build -- $builder_verbose
+    echo 'Building @keymanapp/keyman-version'
+    tsc -b $builder_verbose
   fi
 
   builder_finish_action success build

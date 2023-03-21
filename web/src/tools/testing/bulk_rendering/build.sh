@@ -27,7 +27,7 @@ builder_describe \
 
 builder_describe_outputs \
   configure  /node_modules \
-  build      ../../../../build/tools/testing/bulk_rendering/bulk_render.js
+  build      /web/build/tools/testing/bulk_rendering/bulk_render.js
 
 builder_parse "$@"
 
