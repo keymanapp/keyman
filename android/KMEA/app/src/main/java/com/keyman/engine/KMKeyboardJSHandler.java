@@ -218,12 +218,16 @@ public abstract class KMKeyboardJSHandler {
           return;
         }
 
-        if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP &&
-            (KMTextView.activeView == null || KMTextView.activeView.getClass() != KMTextView.class)) {
-          if (KMTextView.activeView == null && KMManager.isDebugMode()) {
-            Log.w(TAG, "dispatchKey failed: activeView is null");
+        if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+          if (KMTextView.activeView == null) {
+            if (KMManager.isDebugMode()) {
+              Log.w(TAG, "dispatchKey failed: activeView is null");
+            }
+            return;
           }
-          return;
+          if (KMTextView.activeView.getClass() != KMTextView.class)) {
+            return;
+          }
         }
 
         InputConnection ic = (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) ?
