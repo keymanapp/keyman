@@ -24,6 +24,12 @@ builder_describe "$project test module" \
 
 builder_parse "$@"
 
+if ! builder_is_child_build; then
+  builder_die "FAIL: builder_is_child_build should return true but was $_builder_is_child for a child script"
+else
+  builder_echo "PASS: builder_is_child_build is true ($_builder_is_child) for the child script"
+fi
+
 function test_action() {
   local action=$1
 

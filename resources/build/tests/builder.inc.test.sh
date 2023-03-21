@@ -10,6 +10,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
+#----------------------------------------------------------------------
 # First up, test the simple case with a default :project target
 
 builder_describe - clean build
@@ -25,6 +26,7 @@ else
   builder_die "FAIL: should have matched action build for :project"
 fi
 
+#----------------------------------------------------------------------
 # Longhand builder_describe, builder_parse
 
 builder_describe_parse_short_test() {
@@ -45,6 +47,7 @@ builder_describe_parse_short_test "clean build test" ":module :tools :app" "buil
 builder_describe_parse_short_test "clean build test" ":module :tools :app" "build:app clean:module" "build:app clean:module"
 builder_describe_parse_short_test "clean build test" ":module :tools :app :project" "clean:module clean:tools clean:app clean:project build:app build:project" "clean build:app build:project"
 
+#----------------------------------------------------------------------
 # Test different default action
 
 builder_describe "-" clean build test 'default+' :module :tools :app
@@ -108,6 +111,7 @@ builder_describe \
   "--zoom,-z    Use zoom mode" \
   "--feature=FOO Enable feature foo"
 
+#----------------------------------------------------------------------
 # Test --options
 
 builder_parse_test "clean:app test:engine" "--power" clean:app test:engine --power
@@ -126,6 +130,7 @@ else
   builder_die "FAIL: --zoom option not found"
 fi
 
+#----------------------------------------------------------------------
 # Test --feature <foo>
 
 echo -e "${COLOR_BLUE}## Testing: builder_parse --feature xyzzy${COLOR_RESET}"
@@ -154,12 +159,15 @@ fi
 
 # Run tests based in separate scripts to facilitate their operation
 
+#----------------------------------------------------------------------
+
 # Due to the nature of the build-utils-traps tests, only one may be
 # specified at a time; each ends with an `exit`.
 echo -e "${COLOR_BLUE}## Running trap tests${COLOR_RESET}"
 $THIS_SCRIPT_PATH/build-utils-traps.test.sh error
 $THIS_SCRIPT_PATH/build-utils-traps.test.sh error-in-function
 $THIS_SCRIPT_PATH/build-utils-traps.test.sh incomplete
+
 echo -e "${COLOR_BLUE}## Running dependency tests${COLOR_RESET}"
 $THIS_SCRIPT_PATH/builder-deps.test.sh
 $THIS_SCRIPT_PATH/dependencies/test.sh
