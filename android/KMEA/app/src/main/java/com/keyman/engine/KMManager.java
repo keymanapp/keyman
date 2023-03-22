@@ -423,13 +423,11 @@ public final class KMManager {
       didCopyAssets = true;
     }
 
-    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      initInAppKeyboard(appContext);
-    } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      initSystemKeyboard(appContext);
-    } else {
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_UNDEFINED) {
       String msg = "Cannot initialize: Invalid keyboard type";
       KMLog.LogError(TAG, msg);
+    } else {
+      initKeyboard(appContext, keyboardType);
     }
 
     JSONUtils.initialize(new File(getPackagesDir()));
@@ -631,8 +629,8 @@ public final class KMManager {
    return params;
   }
 
-  private static void initInAppKeyboard(Context appContext) {
-    if (InAppKeyboard == null) {
+  private static void initKeyboard(Context appContext, KeyboardType keyboardType) {
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard == null) {
       InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
@@ -640,15 +638,11 @@ public final class KMManager {
       InAppKeyboard.setHorizontalScrollBarEnabled(false);
       InAppKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
       InAppKeyboard.setWebViewClient(InAppKeyboardWebViewClient);
-      InAppKeyboard.addJavascriptInterface(new KMInAppKeyboardJSHandler(appContext, InAppKeyboard), "jsInterface");
+      InAppKeyboard.addJavascriptInterface(new KMKeyboardJSHandler(appContext, InAppKeyboard), "jsInterface");
       InAppKeyboard.loadKeyboard();
 
       setEngineWebViewVersionStatus(appContext, InAppKeyboard);
-    }
-  }
-
-  private static void initSystemKeyboard(Context appContext) {
-    if (SystemKeyboard == null) {
+    } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard == null) {
       SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
@@ -656,7 +650,7 @@ public final class KMManager {
       SystemKeyboard.setHorizontalScrollBarEnabled(false);
       SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
       SystemKeyboard.setWebViewClient(SystemKeyboardWebViewClient);
-      SystemKeyboard.addJavascriptInterface(new KMSystemKeyboardJSHandler(appContext, SystemKeyboard), "jsInterface");
+      SystemKeyboard.addJavascriptInterface(new KMKeyboardJSHandler(appContext, SystemKeyboard), "jsInterface");
       SystemKeyboard.loadKeyboard();
 
       setEngineWebViewVersionStatus(appContext, SystemKeyboard);
@@ -2246,18 +2240,6 @@ public final class KMManager {
     } else {
       // clear globeKeyState
       globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
-    }
-  }
-
-  private static final class KMInAppKeyboardJSHandler extends KMKeyboardJSHandler {
-    KMInAppKeyboardJSHandler(Context context, KMKeyboard k) {
-      super(context, k);
-    }
-  }
-
-  private static final class KMSystemKeyboardJSHandler extends KMKeyboardJSHandler {
-    KMSystemKeyboardJSHandler(Context context, KMKeyboard k) {
-      super(context, k);
     }
   }
 }
