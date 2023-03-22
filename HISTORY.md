@@ -1,5 +1,26 @@
 # Keyman Version History
 
+## 17.0.72 alpha 2023-03-20
+
+* chore(common): die early when --ci and --debug passed to test.sh (#8465)
+* chore(common): Update crowdin strings for Kibaku (#8447)
+
+## 17.0.71 alpha 2023-03-18
+
+* fix(core): ldml update fr-azerty for VKEY mapping (#8434)
+
+## 17.0.70 alpha 2023-03-17
+
+* chore(android): Document builder script steps (#8449)
+
+## 17.0.69 alpha 2023-03-16
+
+* chore(web): Cleanup build echo (#8446)
+* fix(developer): lm compiler handle missing line no in errors (#8444)
+* fix(android/app): Temporarily disable Keyman browser (#8430)
+* fix(android/engine): Add builder output for configure (#8442)
+* chore(linux): Update debian changelog (#8452)
+
 ## 17.0.68 alpha 2023-03-15
 
 * chore(common): add common test build configurations (#8431)

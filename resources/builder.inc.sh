@@ -393,6 +393,7 @@ _builder_execute_child() {
   done
 
   "$script" $action \
+    --builder-child \
     ${child_options[@]} \
     $builder_verbose \
     $builder_debug \
@@ -1163,6 +1164,7 @@ _builder_parse_expanded_parameters() {
   _builder_chosen_action_targets=()
   _builder_chosen_options=()
   _builder_current_action=
+  _builder_is_child=1
 
   local n=0
 
@@ -1284,10 +1286,8 @@ _builder_parse_expanded_parameters() {
           shift
           builder_dep_parent="$1"
           ;;
-        --builder-deps-built)
-          # internal use parameter for dependency builds - path to dependency tracking file
-          shift
-          _builder_deps_built="$1"
+        --builder-child)
+          _builder_is_child=0
           ;;
         --builder-report-dependencies)
           # internal reporting function, ignores all other parameters
@@ -1327,18 +1327,21 @@ _builder_parse_expanded_parameters() {
     builder_echo setmark "dependency build, started by $builder_dep_parent"
     builder_echo grey "build.sh parameters: <${_params[@]}>"
     if [[ -z ${_builder_deps_built+x} ]]; then
-      builder_die "FATAL ERROR: Expected --builder-deps-built parameter"
+      builder_die "FATAL ERROR: Expected '_builder_deps_built' variable to be set"
+    fi
+  elif builder_is_child_build; then
+    builder_echo setmark "child build, parameters: <${_params[@]}>"
+    if [[ -z ${_builder_deps_built+x} ]]; then
+      builder_die "FATAL ERROR: Expected '_builder_deps_built' variable to be set"
     fi
   else
-    # This is a top-level invocation, not a dependency build, so we want to
-    # track which dependencies have been built, so they don't get built multiple
-    # times.
-    # TODO: consider printing expanded builder parameters instead of shorthand
+    # This is a top-level invocation, so we want to track which dependencies
+    # have been built, so they don't get built multiple times.
     builder_echo setmark "build.sh parameters: <${_params[@]}>"
     if [[ ${#builder_extra_params[@]} -gt 0 ]]; then
       builder_echo grey "build.sh extra parameters: <${builder_extra_params[@]}>"
     fi
-    _builder_deps_built=`mktemp`
+    export _builder_deps_built=`mktemp`
   fi
 
   # Now that we've successfully parsed options adhering to the _builder spec, we may activate our
@@ -1590,7 +1593,6 @@ _builder_do_build_deps() {
       $builder_verbose \
       $builder_debug \
       $_builder_build_deps \
-      --builder-deps-built "$_builder_deps_built" \
       --builder-dep-parent "$THIS_SCRIPT_IDENTIFIER" && (
       if $_builder_debug_internal; then
         builder_echo success "## Dependency $dep for $_builder_matched_action_name successfully"
@@ -1611,6 +1613,13 @@ builder_is_dep_build() {
     return 0
   fi
   return 1
+}
+
+#
+# returns `0` if we are in a child script doing a build
+#
+builder_is_child_build() {
+  return $_builder_is_child
 }
 
 #

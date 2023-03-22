@@ -17,23 +17,21 @@
 	<settings fallback="omit" transformPartial="hide" /> <!-- "hide" makes this act like a dead keyTBD -->
 
 	<vkeys>
-		<vkey from="Q" to="A" />
-		<vkey from="W" to="Z" />
-		<vkey from="A" to="Q" />
-		<vkey from="Z" to="W" />
-		<!--
-      TODO-LDML
-      <vkey from="BKQUOTE" to="QUOTE" />
-		<vkey from="MINUS" to="LBRKT" />
-		<vkey from="LBRKT" to="RBRKT" />
-		<vkey from="COLON" to="M" />
-		<vkey from="QUOTE" to="BKQUOTE" /> -->
-		<vkey from="M" to="COMMA" />
+    <vkey from="Q" to="A" />
+    <vkey from="W" to="Z" />
+    <vkey from="A" to="Q" />
+    <vkey from="Z" to="W" />
+    <vkey from="GRAVE" to="QUOTE" /> <!-- TODO-LDML: GRAVE=BKQUOTE in ldml? -->
+    <!-- <vkey from="MINUS" to="LBRACKET" /> --> <!-- TODO-LDML: missing MINUS, LBRKT=LBRACKET in ldml? -->
+    <!-- i.e., OEM_3 >>> OEM_7 -->
+    <vkey from="LBRACKET" to="RBRACKET" />  <!-- TODO-LDML: RBRKT=RBRACKET in ldml? -->
+    <!-- <vkey from="COLON" to="M" /> --> <!-- TODO-LDML: missing COLON-->
+    <vkey from="QUOTE" to="GRAVE" /> <!-- TODO-LDML: GRAVE=BKQUOTE in ldml? -->
+    <vkey from="M" to="COMMA" />
 		<vkey from="COMMA" to="PERIOD" />
 		<vkey from="PERIOD" to="SLASH" />
-		<!--
-      TODO-LDML
-      <vkey from="SLASH" to="EXCLAMATION" />  -->
+    <!-- <vkey from="SLASH" to="EXCLAMATION" />  --> <!-- TODO-LDML: missing: EXCLAMATION -->
+    <!-- i.e., OEM_2 >>> OEM_8 -->
 	</vkeys>
 
 	<displays>
