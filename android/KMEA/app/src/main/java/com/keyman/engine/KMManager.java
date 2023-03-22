@@ -158,7 +158,8 @@ public final class KMManager {
   };
 
   protected static InputMethodService IMService;
-  protected static InputConnection inputConnection;
+  protected static InputConnection inappInputConnection; // Input Connection for InApp Keyboard
+
   private static boolean debugMode = false;
   private static boolean shouldAllowSetKeyboard = true;
   private static boolean didCopyAssets = false;
@@ -461,26 +462,23 @@ public final class KMManager {
   public static InputMethodService getInputMethodService() { return IMService; }
 
   /**
-   * Get the input connection in the order:
-   * 1. Previously saved input connection
-   * 2. IMService (System keyboard)
-   * 3. KMTextView.activeView (InApp keyboard)
+   * Get the input connection based on the keyboard type.
+   * For InApp keyboard, save the connection to inappInputConnection
+   * @param {KeyboardType} keyboard
    * @return InputConnection
    */
-  protected static InputConnection getInputConnection() {
-    if (inputConnection != null) {
-      return inputConnection;
+  protected static InputConnection getInputConnection(KeyboardType keyboard) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      if (inappInputConnection == null) {
+        inappInputConnection = KMTextView.activeView.onCreateInputConnection(new EditorInfo());
+      }
+      return inappInputConnection;
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && IMService != null) {
+      return IMService.getCurrentInputConnection();
     }
 
-    // Determine input connection
-    inputConnection = (IMService != null) ? IMService.getCurrentInputConnection() :
-      KMTextView.activeView.onCreateInputConnection(new EditorInfo());
-
-    if (inputConnection == null) {
-      KMLog.LogError(TAG, "inputConnection is null");
-    }
-
-    return inputConnection;
+    KMLog.LogError(TAG, "Unable to determine input connection");
+    return null;
   }
 
   public static boolean executeHardwareKeystroke(int code, int shift, int lstates, int eventModifiers) {
@@ -2005,7 +2003,7 @@ public final class KMManager {
       InAppKeyboardShouldIgnoreSelectionChange = false;
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (SystemKeyboard != null && SystemKeyboardWebViewClient.getKeyboardLoaded() && !SystemKeyboardShouldIgnoreSelectionChange) {
-        InputConnection ic = getInputConnection();
+        InputConnection ic = getInputConnection(KeyboardType.KEYBOARD_TYPE_SYSTEM);
         if (ic != null) {
           ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
           if (icText != null) {
