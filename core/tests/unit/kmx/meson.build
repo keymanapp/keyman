@@ -15,22 +15,22 @@ else
   warns = []
 endif
 
+source_path = meson.current_source_dir()
+test_path = meson.current_build_dir()
+tests_flags = []
 
 if cpp_compiler.get_id() == 'emscripten'
-  tests_flags = ['--embed-file', join_paths(meson.current_source_dir(),'@/')]
+  # '-sMODULARIZE', '-sEXPORT_ES6',
+  tests_flags += ['-lnodefs.js', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
+
+  # tests_flags = ['--embed-file', join_paths(meson.current_source_dir(),'@/')]
   # we have to link in files from the binary folder also as the binary tests
   # use the kmx test runner.
-  tests_flags += ['--embed-file', join_paths(meson.current_build_dir(),'fixtures','binary','@')]
-  source_path = '/'
-  test_path = '/'
-else
-  tests_flags = []
-  source_path = meson.current_source_dir()
-  test_path = meson.current_build_dir()
+#  tests_flags += ['--embed-file', join_paths(meson.current_build_dir(),'fixtures','binary','@')]
 endif
 
 kmx = executable('kmx',
-    'kmx.cpp',
+    ['kmx.cpp', '../emscripten_filesystem.cpp'],
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../kmx_test_source'],
     link_args: links + tests_flags,
@@ -102,12 +102,6 @@ else
   cat_cmd = [find_program('cat', required: true)]
 endif
 
-if cpp_compiler.get_id() == 'emscripten'
-  # TODO: enable nodefs so we don't link .kmx into the test
-  # and don't need special cases for emscripten tests
-  kmcomp = disabler()
-endif
-
 test_keyboards = ''
 foreach kbd : tests
   if test_keyboards.startswith('{')
@@ -126,18 +120,6 @@ foreach kbd : tests
       }
     ]
   }'''
-  if cpp_compiler.get_id() == 'emscripten'
-    configure_file(
-      command: copy_cmd + ['@INPUT@', '@OUTPUT@'],
-      input: kbd + '.kmn',
-      output: kbd_basename + '.kmn'
-    )
-    configure_file(
-      command: copy_cmd + ['@INPUT@', '@OUTPUT@'],
-      input: kbd + '.kmx',
-      output: kbd_basename + '.kmx'
-    )
-  endif
 endforeach
 
 cfg = configuration_data()
@@ -148,69 +130,55 @@ configure_file(
   output: 'kmp.json'
 )
 
-if cpp_compiler.get_id() != 'emscripten'
-  foreach kbd : tests
-    kbd_basename = 'k_' + kbd.underscorify().to_lower()
+foreach kbd : tests
+  kbd_basename = 'k_' + kbd.underscorify().to_lower()
 
-    content = run_command(
-      cat_cmd, files(kbd + '.kmn'),
-    ).stdout().strip()
+  content = run_command(
+    cat_cmd, files(kbd + '.kmn'),
+  ).stdout().strip()
 
-    cfg = configuration_data()
-    cfg.set('keyboard', kbd)
-    cfg.set('keyboard_underscore', kbd_basename)
-    cfg.set('id1', 'id_' + kbd_basename + '_1')
-    cfg.set('id2', 'id_' + kbd_basename + '_2')
-    cfg.set('id3', 'id_' + kbd_basename + '_3')
-    cfg.set('build_dir', meson.current_build_dir())
-    cfg.set('NAME', kbd)
-    cfg.set('CONTENT', content)
+  cfg = configuration_data()
+  cfg.set('keyboard', kbd)
+  cfg.set('keyboard_underscore', kbd_basename)
+  cfg.set('id1', 'id_' + kbd_basename + '_1')
+  cfg.set('id2', 'id_' + kbd_basename + '_2')
+  cfg.set('id3', 'id_' + kbd_basename + '_3')
+  cfg.set('build_dir', meson.current_build_dir())
+  cfg.set('NAME', kbd)
+  cfg.set('CONTENT', content)
 
-    kbd_kmn = configure_file(
-      configuration: cfg,
-      input: join_paths('template', 'keyboard.kmn.in'),
-      output: kbd_basename + '.kmn'
-    )
-    kbd_kpj = configure_file(
-      configuration: cfg,
-      input: join_paths('template', 'keyboard.kpj.in'),
-      output: kbd_basename + '.kpj'
-    )
-    kbd_kps = configure_file(
-      configuration: cfg,
-      input: join_paths('template', 'keyboard.kps.in'),
-      output: kbd_basename + '.kps'
-    )
-    kbd_kmp = custom_target(kbd_basename + '.kmp',
-      input: kbd_kpj,
-      output: [kbd_basename + '.kmp', kbd_basename + '.kmx'],
-      depend_files: [kbd_kps, kbd_kmn],
-      depfile: kbd_basename + '.dep',
-      command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@'])
+  kbd_kmn = configure_file(
+    configuration: cfg,
+    input: join_paths('template', 'keyboard.kmn.in'),
+    output: kbd_basename + '.kmn'
+  )
+  kbd_kpj = configure_file(
+    configuration: cfg,
+    input: join_paths('template', 'keyboard.kpj.in'),
+    output: kbd_basename + '.kpj'
+  )
+  kbd_kps = configure_file(
+    configuration: cfg,
+    input: join_paths('template', 'keyboard.kps.in'),
+    output: kbd_basename + '.kps'
+  )
+  kbd_kmp = custom_target(kbd_basename + '.kmp',
+    input: kbd_kpj,
+    output: [kbd_basename + '.kmp', kbd_basename + '.kmx'],
+    depend_files: [kbd_kps, kbd_kmn],
+    depfile: kbd_basename + '.dep',
+    command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@'])
 
-    kbd_src = files(join_paths(test_path, kbd_basename) + '.kmn')
-    kbd_obj = join_paths(test_path, kbd_basename) + '.kmx'
-    # kbd_log = custom_target(kbd.underscorify() + '.kmx',
-    #   output: kbd + '.log',
-    #   input: kbd_src,
-    #   command: kmcomp_cmd + ['-s', '-d', '@INPUT@', kbd_obj, '@OUTPUT@']
-    # )
+  kbd_src = files(join_paths(test_path, kbd_basename) + '.kmn')
+  kbd_obj = join_paths(test_path, kbd_basename) + '.kmx'
+  # kbd_log = custom_target(kbd.underscorify() + '.kmx',
+  #   output: kbd + '.log',
+  #   input: kbd_src,
+  #   command: kmcomp_cmd + ['-s', '-d', '@INPUT@', kbd_obj, '@OUTPUT@']
+  # )
 
-    test(kbd, kmx, depends: [kbd_kmp], args: [kbd_src, kbd_obj])
-  endforeach
-else
-  foreach kbd : tests
-    if cpp_compiler.get_id() == 'emscripten'
-      kbd_basename = kbd
-    else
-      kbd_basename = 'k_' + kbd.underscorify().to_lower()
-    endif
-    kbd_src = join_paths(test_path, kbd_basename) + '.kmn'
-    kbd_obj = join_paths(test_path, kbd_basename) + '.kmx'
-
-    test(kbd, kmx, args: [kbd_src, kbd_obj])
-  endforeach
-endif
+  test(kbd, kmx, depends: [kbd_kmp], args: [kbd_src, kbd_obj])
+endforeach
 
 # binary file unit tests
 
@@ -223,48 +191,37 @@ subdir('fixtures')
 # should work for Linux, macOS, and WASM.
 test_path = source_path
 
-key_e = executable('key_list', 'kmx_key_list.cpp',
+key_e = executable('key_list', ['kmx_key_list.cpp', '../emscripten_filesystem.cpp'],
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,
                 objects: lib.extract_all_objects(recursive: false))
 test_kbd = 'kmx_key_list'
-if cpp_compiler.get_id() != 'emscripten'
-  kbd_src = files(test_kbd + '.kmn')
-  kbd_obj = join_paths(meson.current_build_dir(), test_kbd) + '.kmx'
-  kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
-    output: test_kbd + '.log',
-    input: kbd_src,
-    command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@', '--out-file', kbd_obj]
-  )
-  test('key_list', key_e,  depends: kbd_log, args: [kbd_obj] )
-else
-  kbd_obj = join_paths(test_path, test_kbd) + '.kmx'
-  test('key_list', key_e, args: [kbd_obj] )
-endif
+
+kbd_src = files(test_kbd + '.kmn')
+kbd_obj = join_paths(meson.current_build_dir(), test_kbd) + '.kmx'
+kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
+  output: test_kbd + '.log',
+  input: kbd_src,
+  command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@', '--out-file', kbd_obj]
+)
+test('key_list', key_e,  depends: kbd_log, args: [kbd_obj] )
 
 # test for imx list
 
-imx_e = executable('imx_list', 'kmx_imx.cpp',
+imx_e = executable('imx_list', ['kmx_imx.cpp', '../emscripten_filesystem.cpp'],
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,
                 objects: lib.extract_all_objects(recursive: false))
 
 test_kbd = 'kmx_imsample'
-if cpp_compiler.get_id() != 'emscripten'
-  kbd_src = files(test_kbd + '.kmn')
-  kbd_obj = join_paths(meson.current_build_dir(), test_kbd) + '.kmx'
-  kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
-    output: test_kbd + '.log',
-    input: kbd_src,
-    command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@', '--out-file', kbd_obj]
-  )
-    test('imx_list', imx_e,  depends: kbd_log, args: [kbd_obj] )
-else
-  kbd_obj = join_paths(test_path, test_kbd) + '.kmx'
-  test('imx_list', imx_e, args: [kbd_obj] )
-endif
 
-
-
+kbd_src = files(test_kbd + '.kmn')
+kbd_obj = join_paths(meson.current_build_dir(), test_kbd) + '.kmx'
+kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
+  output: test_kbd + '.log',
+  input: kbd_src,
+  command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@', '--out-file', kbd_obj]
+)
+  test('imx_list', imx_e,  depends: kbd_log, args: [kbd_obj] )
