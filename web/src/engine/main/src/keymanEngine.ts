@@ -97,10 +97,11 @@ export default class KeymanEngine<
     this.processor = new InputProcessor(config.hostDevice, worker, this.processorConfiguration());
 
     this.contextManager.configure({
-      resetKeyState: (target) => {
+      resetContext: (target) => {
         this.processor.keyboardProcessor.resetContext(target);
       },
-      predictionContext: new PredictionContext(this.processor.languageProcessor, this.processor.keyboardProcessor)
+      predictionContext: new PredictionContext(this.processor.languageProcessor, this.processor.keyboardProcessor),
+      keyboardCache: this.keyboardRequisitioner.cache
     });
 
     // TODO:  configure that context-manager!
@@ -143,11 +144,44 @@ export default class KeymanEngine<
     contextManager.on('keyboardchange', (kbd) => {
       this.refreshModel();
 
+      // Hide OSK and do not update keyboard list if using internal keyboard (desktops).
+      // Condition will not be met for touch form-factors; they force selection of a
+      // default keyboard.
+      if(kbd.keyboard == null && kbd.metadata == null) {
+        this.osk.startHide(false);
+      }
+
       if(this.osk) {
         this.osk.setNeedsLayout();
         this.osk.activeKeyboard = kbd;
+        this.osk.present();
       }
     });
+
+    contextManager.on('keyboardasyncload', (metadata) => {
+      /* Original implementation pre-modularization:
+       *
+       * > Force OSK display for CJK keyboards (keyboards using a pick list)
+       *
+       * A matching subcondition in the block below will ensure that the OSK activates pre-load
+       * for CJK keyboards.  Yes, even before a CJK picker could ever show.  We should be fine
+       * without the CJK check so long as a picker keyboard's OSK is kept activated post-load,
+       * when the picker actually needs to be kept persistently-active.
+       * `metadata` would be relevant a the CJK-check, which was based on language codes.
+       *
+       * Of course, as mobile devices don't have guaranteed physical keyboards... we need to
+       * keep the OSK visible for them, hence the actual block below.
+       */
+      if(this.config.hostDevice.touchable && this.osk?.activationModel) {
+        this.osk.activationModel.enabled = true;
+        // Also note:  the OSKView.mayDisable method returns false when hostDevice.touchable = false.
+        // The .startHide() call below will check that method before actually starting an OSK hide.
+      }
+
+      // Always (temporarily) hide the OSK when loading a new keyboard, to ensure
+      // that a failure to load doesn't leave the current OSK displayed
+      this.osk?.startHide(false);
+    })
     // #endregion
   }
 
@@ -235,111 +269,9 @@ export default class KeymanEngine<
     }
   }
 
-  async setActiveKeyboard(keyboardId: string, languageCode?: string): Promise<void> {
-    return this.activateKeyboard(keyboardId, languageCode, true);
+  async setActiveKeyboard(keyboardId: string, languageCode?: string): Promise<boolean> {
+    return this.contextManager.activateKeyboard(keyboardId, languageCode, true);
   }
-
-  protected async activateKeyboard(keyboardId: string, languageCode?: string, saveCookie?: boolean): Promise<void> {
-    saveCookie ||= false;
-
-    // TODO:  beforeKeyboardChange
-    // - this.osk.startHide(false), when needed, could be called via handler here...
-    //                                           and on 'onAsyncKeyboardLoad'
-    // Also include an 'abort' check based upon it.
-
-    this.contextManager.activeKeyboard = await this.prepareKeyboardForActivation(keyboardId, languageCode);
-
-    // TODO: keyboardChange
-    // - this.osk.present() could totally be part of the handler for the event.
-
-    this.osk.present();
-  }
-
-  /**
-   * Based on the provided keyboard id and language code, selects and (if necessary) loads the
-   * corresponding keyboard but does not activate it.
-   *
-   * This acts as a helper to `activateKeyboard`, helping to centralize and DRY out the actual
-   * activation of the requested keyboard.
-   * @param keyboardId
-   * @param languageCode
-   * @returns
-   */
-  protected async prepareKeyboardForActivation(
-    keyboardId: string,
-    languageCode?: string
-  ): Promise<{keyboard: Keyboard, metadata: KeyboardStub}> {
-    // Set default language code
-    languageCode ||= '';
-
-    // Check that the saved keyboard is currently registered
-    let requestedStub = this.keyboardRequisitioner.cache.getStub(keyboardId, languageCode);
-
-    // Mobile device addition: force selection of the first keyboard if none set
-    if(this.config.softDevice.touchable && !requestedStub) {
-      // Pick the oldest-registered stub as default.
-      requestedStub = this.keyboardRequisitioner.cache.defaultStub;
-    } else if(!requestedStub) {
-      // Hide OSK and do not update keyboard list if using internal keyboard (desktops)
-      this.osk?.startHide(false);
-
-      return Promise.resolve({
-        keyboard: null,
-        metadata: null
-      });
-    }
-
-    // Check if current keyboard matches requested keyboard, but not (necessarily) stub
-    if(keyboardId == this.contextManager.activeKeyboard.metadata.id) {
-      const keyboard = this.contextManager.activeKeyboard.keyboard;
-      // In this case, the keyboard is loaded; just update the stub.
-
-      return Promise.resolve({
-        keyboard: keyboard,
-        metadata: requestedStub
-      });
-    }
-
-    // Determine if the keyboard was previously loaded but is not active and use the prior load if so.
-    let keyboard: Keyboard;
-    if(keyboard = this.keyboardRequisitioner.cache.getKeyboardForStub(requestedStub)) {
-      return Promise.resolve({
-        keyboard: keyboard,
-        metadata: requestedStub
-      });
-    } else {
-      // async time - the keyboard has not yet been loaded.
-
-      // Original implementation:  also checked for CJK and kept OSKs activated pre-load,
-      // before the picker could ever show.  We should be fine without it so long as
-      // a picker keyboard's OSK is kept activated post-load.
-      if(this.config.hostDevice.touchable && this.osk?.activationModel) {
-        this.osk.activationModel.enabled = true;
-      }
-
-      this.osk?.startHide(false);
-
-      // TODO: Maybe make this an event of sorts?  ... which means extending EventEmitter, etc.
-      // We aren't adding a 'new' event API set quite yet, though.
-      this.onKeyboardAsyncLoadStart(requestedStub);
-
-      let keyboardPromise = this.keyboardRequisitioner.cache.fetchKeyboardForStub(requestedStub);
-
-      let promise = this.contextManager.setActiveKeyboardAsync(keyboardPromise, requestedStub);
-      return promise.then(async (stillValid) => {
-        if(!stillValid) {
-          return Promise.resolve(null);
-        }
-
-        return {
-          keyboard: await keyboardPromise,
-          metadata: requestedStub
-        };
-      });
-    }
-  }
-
-  protected onKeyboardAsyncLoadStart(requestedStub: KeyboardStub) { }
 }
 
 // Intent:  define common behaviors for both primary app types; each then subclasses & extends where needed.

@@ -134,7 +134,7 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
       throw new Error(`The registered stub for ${withoutPrefix(keyboardID)} lacks a path to the main keyboard file`);
     }
 
-    const promise = this.keyboardLoader.loadKeyboardFromPath(stub.filename);
+    const promise = this.keyboardLoader.loadKeyboardFromStub(stub);
     this.keyboardTable[keyboardID] = promise;
 
     promise.then((kbd) => {

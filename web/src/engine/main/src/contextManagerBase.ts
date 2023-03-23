@@ -1,12 +1,13 @@
 import EventEmitter from 'eventemitter3';
-import { type Keyboard, type KeyboardInterface, type OutputTarget } from '@keymanapp/keyboard-processor';
-import { type KeyboardStub } from 'keyman/engine/package-cache';
+import { DeviceSpec, ManagedPromise, type Keyboard, type KeyboardInterface, type OutputTarget } from '@keymanapp/keyboard-processor';
+import { StubAndKeyboardCache, type KeyboardStub } from 'keyman/engine/package-cache';
 import { PredictionContext } from '@keymanapp/input-processor';
 
 interface EventMap {
   // target, then keyboard.
   'targetchange': (target: OutputTarget) => boolean;
   'beforekeyboardchange': (metadata: KeyboardStub, abortChange: () => void) => void;
+  'keyboardasyncload': (metadata: KeyboardStub, onload: Promise<Error>) => void;
   'keyboardchange': (kbd: {keyboard: Keyboard, metadata: KeyboardStub}) => void;
 }
 
@@ -18,13 +19,19 @@ export interface ContextManagerConfiguration {
    *
    * Does not reset option-stores, variable-stores, etc.
    */
-  readonly resetKeyState: (outputTarget?: OutputTarget) => void;
+  readonly resetContext: (outputTarget?: OutputTarget) => void;
 
   /**
    * A predictive-state management object that interfaces the predictive-text banner
    * with the active context.
    */
   readonly predictionContext: PredictionContext;
+
+  /**
+   * The stub & keyboard curation cache holding preloaded keyboards and metadata useable
+   * to load those not yet loaded.
+   */
+  readonly keyboardCache: StubAndKeyboardCache;
 }
 
 interface PendingActivation {
@@ -34,21 +41,21 @@ interface PendingActivation {
 }
 
 export abstract class ContextManagerBase extends EventEmitter<EventMap> {
+  public static readonly TIMEOUT_THRESHOLD = 10000;
+
   abstract initialize(): void;
 
   abstract get activeTarget(): OutputTarget;
 
   private _predictionContext: PredictionContext;
-  private _resetKeyState: (outputTarget?: OutputTarget) => void;
+  protected keyboardCache: StubAndKeyboardCache;
+  private _resetContext: (outputTarget?: OutputTarget) => void;
+  private _hostDevice: DeviceSpec;
 
   private pendingActivations: PendingActivation[] = [];
 
   get predictionContext(): PredictionContext {
     return this._predictionContext;
-  }
-
-  protected get resetKeyState(): (outputTarget?: OutputTarget) => void {
-    return this._resetKeyState;
   }
 
   constructor() {
@@ -57,8 +64,9 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
 
   configure(config: ContextManagerConfiguration) {
     // TODO: Set in followup configuration method.  Part of initialization?
-    this._resetKeyState = config.resetKeyState;
+    this._resetContext = config.resetContext;
     this._predictionContext = config.predictionContext;
+    this.keyboardCache = config.keyboardCache;
   }
 
   insertText(kbdInterface: KeyboardInterface, Ptext: string, PdeadKey: number) {
@@ -82,16 +90,20 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
   }
 
   resetContext() {
-    this._resetKeyState(this.activeTarget);
+    this._resetContext(this.activeTarget);
     this.predictionContext.resetContext();
   }
 
   abstract get activeKeyboard(): {keyboard: Keyboard, metadata: KeyboardStub};
+  protected abstract get keyboardTarget(): OutputTarget;
 
-  // TODO:  should `activateKeyboard` (on KeymanEngine) be relocated to within here?
-  //        It seems to make sense, and was originally a goal.
-  abstract set activeKeyboard(kbd: {keyboard: Keyboard, metadata: KeyboardStub});
-  abstract setActiveKeyboardAsync(kbd: Promise<Keyboard>, metadata: KeyboardStub): Promise<boolean>;
+  /**
+   * Ensures that newly activated keyboards are set correctly within managed context, possibly
+   * against inactive output targets.
+   * @param kbd
+   * @param target
+   */
+  protected abstract setKeyboardActiveForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget);
 
   /**
    * Checks the pending keyboard-activation array for an entry corresponding to the specified
@@ -100,7 +112,7 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
    *                May be `null`, which corresponds to the global default Keyboard.
    * @returns `true` if pending activation is still valid, `false` otherwise.
    */
-  private findAndPopActivation(target: OutputTarget): boolean {
+  private findAndPopActivation(target: OutputTarget): PendingActivation {
     // Array.findIndex requires Chrome 45+. :(
     let activationIndex;
     for(activationIndex = 0; activationIndex < this.pendingActivations.length; activationIndex++) {
@@ -110,11 +122,10 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
     }
 
     if(activationIndex == this.pendingActivations.length) {
-      return false;
+      return null;
     }
 
-    this.pendingActivations.splice(activationIndex, 1);
-    return true;
+    return this.pendingActivations.splice(activationIndex, 1)[0];
   }
 
   protected confirmKeyboardChange(metadata: KeyboardStub): boolean {
@@ -127,7 +138,11 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
     return eventReturn.continue;
   }
 
-  protected async deferredKeyboardActivationValid(kbdPromise: Promise<Keyboard>, metadata: KeyboardStub, target: OutputTarget): Promise<boolean> {
+  protected async deferredKeyboardActivation(
+    kbdPromise: Promise<Keyboard>,
+    metadata: KeyboardStub,
+    target: OutputTarget
+  ): Promise<PendingActivation> {
     const activation: PendingActivation = {
       target: target,
       keyboard: kbdPromise,
@@ -140,6 +155,155 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
     await kbdPromise;
 
     // The keyboard-load is complete; is the activation still desired?
-    return this.findAndPopActivation(target);
+    const activationAfterAwait = this.findAndPopActivation(target);
+    if(activationAfterAwait == activation) {
+      return activation;
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Change active keyboard to keyboard selected by (internal) name and language code
+   *
+   * Test if selected keyboard already loaded, and simply update active stub if so.
+   * Otherwise, insert a script to download and insert the keyboard from the repository
+   * or user-indicated file location.
+   *
+   * TODO:  The old 'recorder' tool stubbed the old _SetActiveKeyboard method, but should now stub this
+   * instead.  Or, perhaps one of the newer internal events.
+   * @param keyboardId
+   * @param languageCode
+   * @param saveCookie
+   * @returns
+   */
+  public async activateKeyboard(keyboardId: string, languageCode?: string, saveCookie?: boolean): Promise<boolean> {
+    const activatingKeyboard = this.prepareKeyboardForActivation(keyboardId, languageCode);
+    const originalKeyboardTarget = this.keyboardTarget;
+
+    // Triggers `beforeKeyboardChange` event
+    // - this.osk.startHide(false), when needed, could be called via handler here...
+    //                                           and on 'onAsyncKeyboardLoad'
+    // Also include an 'abort' check based upon it.
+    if(!this.confirmKeyboardChange(activatingKeyboard.metadata)) {
+      return false;
+    }
+
+    const keyboard = await activatingKeyboard.keyboard;
+    if(keyboard == null && activatingKeyboard.metadata) {
+      // Cancelled - the activation was async and no longer valid.
+      return false;
+    }
+
+    this.setKeyboardActiveForTarget({
+      keyboard: keyboard,
+      metadata: activatingKeyboard.metadata
+    }, this.keyboardTarget);
+
+    // Only trigger `keyboardchange` events when they will affect the active context.
+    if(this.keyboardTarget == originalKeyboardTarget) {
+      // Perform standard context-reset ops, including processNewContextEvent.
+      this.resetContext();
+      // Will trigger KeymanEngine handler that passes keyboard to the OSK, displays it.
+      this.emit('keyboardchange', this.activeKeyboard);
+    }
+
+    return true;
+  }
+
+  /**
+   * Based on the provided keyboard id and language code, selects and (if necessary) loads the
+   * corresponding keyboard but does not activate it.
+   *
+   * This acts as a helper to `activateKeyboard`, helping to centralize and DRY out the actual
+   * activation of the requested keyboard.
+   * @param keyboardId
+   * @param languageCode
+   * @returns
+   */
+  protected prepareKeyboardForActivation(
+    keyboardId: string,
+    languageCode?: string
+  ): {keyboard: Promise<Keyboard>, metadata: KeyboardStub} {
+    // Set default language code
+    languageCode ||= '';
+
+    // Check that the saved keyboard is currently registered
+    let requestedStub = this.keyboardCache.getStub(keyboardId, languageCode);
+
+    // Mobile device addition: force selection of the first keyboard if none set
+    if(this._hostDevice.touchable && !requestedStub) {
+      // Pick the oldest-registered stub as default.
+      requestedStub = this.keyboardCache.defaultStub;
+    } else if(!requestedStub) {
+      return {
+        keyboard: Promise.resolve(null),
+        metadata: null
+      };
+    }
+
+    // Check if current keyboard matches requested keyboard, but not (necessarily) stub
+    if(keyboardId == this.activeKeyboard.metadata.id) {
+      const keyboard = this.activeKeyboard.keyboard;
+      // In this case, the keyboard is loaded; just update the stub.
+
+      return {
+        keyboard: Promise.resolve(keyboard),
+        metadata: requestedStub
+      };
+    }
+
+    // Determine if the keyboard was previously loaded but is not active; use the cached, pre-loaded version if so.
+    let keyboard: Keyboard;
+    if(keyboard = this.keyboardCache.getKeyboardForStub(requestedStub)) {
+      return {
+        keyboard: Promise.resolve(keyboard),
+        metadata: requestedStub
+      };
+    } else {
+      // It's async time - the keyboard is not preloaded within the cache.  Use the stub's data to load it.
+
+      // Provide a Promise for completion of the async load process.
+      const completionPromise = new ManagedPromise<Error>();
+      this.emit('keyboardasyncload', requestedStub, completionPromise.corePromise);
+
+      let keyboardPromise = this.keyboardCache.fetchKeyboardForStub(requestedStub);
+      let timeoutPromise = new Promise<void>((resolve, reject) => {
+        const timeoutMsg = `Sorry, the ${requestedStub.name} keyboard for ${requestedStub.langName} is not currently available.`;
+        window.setTimeout(() => reject(new Error(timeoutMsg)), ContextManagerBase.TIMEOUT_THRESHOLD);
+      });
+
+      let combinedPromise = Promise.race([keyboardPromise, timeoutPromise]);
+
+      // Ensure the async-load Promise completes properly.
+      combinedPromise.then(() => completionPromise.resolve(null));
+      combinedPromise.catch((err) => {
+        completionPromise.resolve(err);
+        throw err;
+      });
+
+      // Now the fun part:  note the original call's parameters as a pending activation.
+      let promise = this.deferredKeyboardActivation(keyboardPromise, requestedStub, this.keyboardTarget);
+      return {
+        keyboard: promise.then(async (activation) => {
+          // Is the activation we requested still pending, or was it cancelled in favor of a
+          // different activation in some manner?
+          if(!activation) {
+            // If the user chose to load a different keyboard afterward that would affect the same
+            // output target, the activation is no longer valid.
+            return Promise.resolve(null);
+          } else if(activation.target == this.keyboardTarget && !this.confirmKeyboardChange(requestedStub)) {
+            // If still valid, but it would affect the active output target, we provide another chance
+            // to cancel the keyboard change - after all, we're in an async op.
+            return Promise.resolve(null);
+          } else {
+            // If still valid but it won't affect the currently-active output target, we don't ask to verify.
+            // It wouldn't affect the active context, so a corresponding event would be too unclear / confusing.
+            return keyboardPromise;
+          }
+        }),
+        metadata: requestedStub
+      }
+    }
   }
 }

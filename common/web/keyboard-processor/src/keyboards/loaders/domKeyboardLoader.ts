@@ -28,7 +28,7 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
     this.performCacheBusting = cacheBust || false;
   }
 
-  protected loadKeyboardInternal(uri: string): Promise<Keyboard> {
+  protected loadKeyboardInternal(uri: string, id?: string): Promise<Keyboard> {
     const promise = new ManagedPromise<Keyboard>();
 
     if(this.performCacheBusting) {
@@ -38,15 +38,20 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
     try {
       const document = this.harness._jsGlobal.document;
       const script = document.createElement('script');
+      if(id) {
+        script.id = id;
+      }
       document.head.appendChild(script);
-      script.onerror = promise.reject;
+      script.onerror = () => {
+        promise.reject(new Error(KeyboardLoaderBase.missingErrorMessage(uri)));
+      }
       script.onload = () => {
         if(this.harness.loadedKeyboard) {
           const keyboard = this.harness.loadedKeyboard;
           this.harness.loadedKeyboard = null;
           promise.resolve(keyboard);
         } else {
-          promise.reject();
+          promise.reject(new Error(KeyboardLoaderBase.scriptErrorMessage(uri)));
         }
       }
 

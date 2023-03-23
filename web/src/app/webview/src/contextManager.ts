@@ -1,4 +1,4 @@
-import { type Keyboard, Mock } from '@keymanapp/keyboard-processor';
+import { type Keyboard, Mock, OutputTarget } from '@keymanapp/keyboard-processor';
 import { KeyboardStub } from 'keyman/engine/package-cache';
 import { ContextManagerBase, ContextManagerConfiguration } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
@@ -51,42 +51,50 @@ export default class ContextManager extends ContextManagerBase {
     return this._activeKeyboard;
   }
 
-  set activeKeyboard(kbd: {keyboard: Keyboard, metadata: KeyboardStub}) {
-    const priorEntry = this._activeKeyboard;
-
-    // Clone the stub before exposing it...
-    if(!this.confirmKeyboardChange(new KeyboardStub(kbd.metadata))) {
-      return;
-    }
+  setKeyboardActiveForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget) {
+    // `target` is irrelevant for `app/webview`, as it'll only ever use 'global' keyboard settings.
 
     // Clone the object to prevent accidental by-reference changes.
     this._activeKeyboard = {...kbd};
+  }
 
-    if(priorEntry.keyboard != kbd.keyboard || priorEntry.metadata != kbd.metadata) {
-      this.emit('keyboardchange', kbd);
-      this.resetContext();
+  /**
+   * Reflects the active 'target' upon which any `set activeKeyboard` operation will take place.
+   * For app/webview... there's only one target, thus only a "global default" matters.
+   */
+  protected get keyboardTarget(): Mock {
+    return null;
+  }
+
+
+  public async activateKeyboard(keyboardId: string, languageCode?: string, saveCookie?: boolean): Promise<boolean> {
+    try {
+      return await super.activateKeyboard(keyboardId, languageCode, saveCookie);
+    } catch(err) {
+      // Fallback behavior - we're embedded in a touch-device's webview, so we need to keep a keyboard visible.
+      const defaultStub = this.keyboardCache.defaultStub;
+      await this.activateKeyboard(defaultStub.id, defaultStub.langId, true).catch(() => {});
+
+      throw err; // since the consumer may want to do its own error-handling.
     }
   }
 
-  async setActiveKeyboardAsync(kbd: Promise<Keyboard>, metadata: KeyboardStub): Promise<boolean> {
-    if(!this.confirmKeyboardChange) {
-      return false;
+  protected prepareKeyboardForActivation(
+    keyboardId: string,
+    languageCode?: string
+  ): {keyboard: Promise<Keyboard>, metadata: KeyboardStub} {
+    const originalKeyboard = this.activeKeyboard;
+    const activatingKeyboard = super.prepareKeyboardForActivation(keyboardId, languageCode);
+
+    // Probably isn't necessary at this point - osk.refreshLayout() exists - but
+    // it's best to keep it around for now and verify later.
+    if(originalKeyboard.metadata.id == activatingKeyboard.metadata.id) {
+      activatingKeyboard.keyboard = activatingKeyboard.keyboard.then((kbd) => {
+        kbd.refreshLayouts()
+        return kbd;
+      });
     }
 
-    // There is only the one target, so 'default global keyboard' use is fine.
-    if(!await this.deferredKeyboardActivationValid(kbd, metadata, null)) {
-      return false;
-    } else {
-      const activatingKeyboard = {
-        keyboard: await kbd,
-        metadata: metadata
-      };
-
-      this.activeKeyboard = activatingKeyboard;
-
-      // The change may silently fail due to `set activeKeyboard`'s `confirmKeyboardChange` call.
-      return this.activeKeyboard.keyboard == activatingKeyboard.keyboard
-          && this.activeKeyboard.metadata == activatingKeyboard.metadata;
-    }
+    return activatingKeyboard;
   }
 }

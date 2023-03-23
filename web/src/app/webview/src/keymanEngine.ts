@@ -52,36 +52,6 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
     setupEmbeddedListeners(this, this.osk);
   }
 
-  protected async activateKeyboard(keyboardId: string, languageCode?: string, saveCookie?: boolean): Promise<void> {
-    saveCookie ||= false;
-
-    try {
-      await super.activateKeyboard(keyboardId, languageCode, saveCookie);
-    } catch(err) {
-      // Fallback behavior - we're embedded in a touch-device's webview, so we need to keep a keyboard visible.
-      const defaultStub = this.keyboardRequisitioner.cache.defaultStub;
-      await this.activateKeyboard(defaultStub.id, defaultStub.langId, true).catch(() => {});
-
-      throw err; // since the consumer may want to do its own error-handling.
-    }
-  }
-
-  protected async prepareKeyboardForActivation(
-    keyboardId: string,
-    languageCode?: string
-  ): Promise<{keyboard: Keyboard, metadata: KeyboardStub}> {
-    const originalKeyboard = this.contextManager.activeKeyboard;
-    const activatingKeyboard = await super.prepareKeyboardForActivation(keyboardId, languageCode);
-
-    // Probably isn't necessary at this point - osk.refreshLayout() exists - but
-    // it's best to keep it around for now and verify later.
-    if(originalKeyboard.keyboard == activatingKeyboard.keyboard) {
-      activatingKeyboard.keyboard.refreshLayouts();
-    }
-
-    return activatingKeyboard;
-  }
-
   // Functions that the old 'app/webview' equivalent had always provided to the WebView
 
   /**
