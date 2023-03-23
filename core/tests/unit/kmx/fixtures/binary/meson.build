@@ -9,7 +9,7 @@
 
 # Build all binary test keyboards
 
-if compiler.get_id() == 'emscripten'
+if cpp_compiler.get_id() == 'emscripten'
   binary_test_path = '/'
 else
   binary_test_path = meson.current_build_dir()
