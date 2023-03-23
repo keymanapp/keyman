@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.75 alpha 2023-03-23
+
+* chore(common): define BUILDER_CONFIGURATION env var (#8496)
+
 ## 17.0.74 alpha 2023-03-22
 
 * chore(windows): update sentry-native to 0.6.0 (#8464)
