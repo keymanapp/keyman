@@ -61,13 +61,6 @@ lib = library('kmcmplib',
   include_directories: inc,
   install: true)
 
-# pkg = import('pkgconfig')
-# pkg.generate(
-#     name: 'keyman_kmn_compiler',
-#     version: meson.project_version(),
-#     description: 'Keyman compiler for KMN keyboards.',
-#     libraries: lib)
-
 kmcmplib = declare_dependency(link_with: lib, include_directories: inc)
 
 
