@@ -126,7 +126,7 @@ write_download_info() {
 
   FILE_EXTENSION="${BASE_FILE##*.}"
 
-  FILE_SIZE=$(stat -f"%z" "${BASE_PATH}/${BASE_FILE}")
+  FILE_SIZE=$(/usr/bin/stat -f"%z" "${BASE_PATH}/${BASE_FILE}")
   MD5_HASH=$(md5 -q "${BASE_PATH}/${BASE_FILE}")
 
   if [[ -f "$DOWNLOAD_INFO_FILEPATH" ]]; then
