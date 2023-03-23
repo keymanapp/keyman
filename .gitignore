@@ -190,3 +190,14 @@ lcov.info
 /keyman*.buildinfo
 /keyman*.changes
 /keyman*.tar.?z
+
+#sabine
+*.kmx
+*.kvk
+*.bak
+/developer/src/test/auto/kmcomp/*.txt
+/developer/src/kmcmplib/tests
+/developer/src/kmcmplib/tests/*.txt
+/windows/src/engine/mcompilex/*.txt
+/windows/src/engine/mcompilex/*.vcxproj*
+/windows/src/engine/mcompiletest
