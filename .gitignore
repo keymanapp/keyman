@@ -201,3 +201,9 @@ lcov.info
 /windows/src/engine/mcompilex/*.txt
 /windows/src/engine/mcompilex/*.vcxproj*
 /windows/src/engine/mcompiletest
+
+#can I exclude these from git??
+/developer/src/kmcmplib/resources/meson.build
+/linux/common/core/desktop/meson.build
+/linux/common/core/desktop/wasm.defs.build
+

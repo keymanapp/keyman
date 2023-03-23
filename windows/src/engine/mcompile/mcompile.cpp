@@ -139,7 +139,7 @@ int run(int argc, wchar_t * argv[])
   //DeleteReallocatedPointers(kmxfile); :TODO
   delete kmxfile;
 
-	return 0;
+       return 0;
 }
 
 
@@ -466,11 +466,11 @@ BOOL DoConvert(LPKEYBOARD kbd, LPWSTR kbid, BOOL bDeadkeyConversion) {   // I455
 }
 
 void LogError(PWSTR fmt, ...) {
-	WCHAR fmtbuf[256];
+       WCHAR fmtbuf[256];
 
-	va_list vars;
-	va_start(vars, fmt);
-	_vsnwprintf_s(fmtbuf, _countof(fmtbuf), _TRUNCATE, fmt, vars);  // I2248   // I3547
-	fmtbuf[255] = 0;
+       va_list vars;
+       va_start(vars, fmt);
+       _vsnwprintf_s(fmtbuf, _countof(fmtbuf), _TRUNCATE, fmt, vars);  // I2248   // I3547
+       fmtbuf[255] = 0;
   _putws(fmtbuf);
 }
