@@ -2,14 +2,26 @@ package com.keyman.engine;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
+import android.view.KeyEvent;
+import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.ExtractedText;
+import android.view.inputmethod.ExtractedTextRequest;
+import android.view.inputmethod.InputConnection;
 import android.webkit.JavascriptInterface;
-import android.widget.RelativeLayout;
 
 import static android.content.Context.VIBRATOR_SERVICE;
+
+import com.keyman.engine.KMManager.KeyboardType;
+import com.keyman.engine.util.CharSequenceUtil;
+import com.keyman.engine.util.KMLog;
 
 public abstract class KMKeyboardJSHandler {
   private Context context;
@@ -64,6 +76,126 @@ public abstract class KMKeyboardJSHandler {
     }
   }
 
+  /**
+   * Inserts the selected string <i>s</i>
+   * @param dn  Number of pre-caret code points (UTF+8 characters) to delete
+   * @param s   Text to insert
+   * @param dr  Number of post-caret code points to delete.
+   */
+  @JavascriptInterface
+  public void insertText(final int dn, final String s, final int dr, final boolean executingHardwareKeystroke) {
+    Handler mainLoop = new Handler(Looper.getMainLooper());
+    mainLoop.post(new Runnable() {
+      public void run() {
+        if (k == null) {
+          KMLog.LogError(TAG, "insertText failed: Keyboard is null");
+          return;
+        }
+
+        if (k.subKeysWindow != null) {
+          return;
+        }
+
+        if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP &&
+          (KMTextView.activeView == null || KMTextView.activeView.getClass() != KMTextView.class)) {
+          if (KMTextView.activeView == null && KMManager.isDebugMode()) {
+            Log.w(TAG, "insertText failed: activeView is null");
+          }
+          return;
+        }
+
+        InputConnection ic = (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) ?
+            KMTextView.activeView.onCreateInputConnection(new EditorInfo()) :
+            KMManager.getInputMethodService().getCurrentInputConnection();
+        if (ic == null) {
+          if (KMManager.isDebugMode()) {
+            Log.w(TAG, "insertText failed: InputConnection is null");
+          }
+          return;
+        }
+
+        ic.beginBatchEdit();
+
+        int deleteLeft = dn;
+
+        // Delete any existing selected text.
+        ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
+        if (icText != null) { // This can be null if the input connection becomes invalid.
+          int start = icText.startOffset + icText.selectionStart;
+          int end = icText.startOffset + icText.selectionEnd;
+          if (end < start) {
+            // Swap start/end for backward selection
+            int temp = start;
+            start = end;
+            end = temp;
+          }
+          if (end > start) {
+            if (s.length() == 0) {
+              ic.setSelection(start, start);
+              ic.deleteSurroundingText(0, end - start);
+              ic.endBatchEdit();
+              return;
+            } else {
+              if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+                KMManager.SystemKeyboardShouldIgnoreSelectionChange = true;
+              }
+              ic.setSelection(start, start);
+              ic.deleteSurroundingText(0, end - start);
+            }
+
+            // KeymanWeb tells us how to delete the selection, but we don't
+            // want to do that twice
+            deleteLeft = 0;
+          }
+        }
+
+        if (s.length() > 0 && s.charAt(0) == '\n') {
+          keyDownUp(KeyEvent.KEYCODE_ENTER);
+          ic.endBatchEdit();
+          return;
+        }
+
+        // Perform left-deletions
+        if (deleteLeft > 0) {
+          performLeftDeletions(ic, deleteLeft);
+        }
+
+        // Perform right-deletions
+        for (int i = 0; i < dr; i++) {
+          CharSequence chars = ic.getTextAfterCursor(1, 0);
+          if (chars != null && chars.length() > 0) {
+            char c = chars.charAt(0);
+            if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+              KMManager.SystemKeyboardShouldIgnoreSelectionChange = true;
+            }
+            if (Character.isHighSurrogate(c)) {
+              ic.deleteSurroundingText(0, 2);
+            } else {
+              ic.deleteSurroundingText(0, 1);
+            }
+          }
+        }
+
+        if (s.length() > 0) {
+          if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+            KMManager.SystemKeyboardShouldIgnoreSelectionChange = true;
+          }
+          // Commit the string s. Use newCursorPosition 1 so cursor will end up after the string.
+          ic.commitText(s, 1);
+        }
+
+        k.dismissHelpBubble();
+        k.setShouldShowHelpBubble(false);
+
+        ic.endBatchEdit();
+        ViewGroup parent = (ViewGroup) k.getParent();
+        if (parent != null && KMManager.getHapticFeedback() && !executingHardwareKeystroke) {
+          parent.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+        }
+      }
+    });
+  }
+
   // Store the current keyboard chirality status from KMW in the Keyboard
   @JavascriptInterface
   public void setIsChiral(boolean isChiral) {
@@ -73,14 +205,90 @@ public abstract class KMKeyboardJSHandler {
   }
 
   @JavascriptInterface
-  public  abstract boolean dispatchKey(final int code, final int eventModifiers);
+  public abstract boolean dispatchKey(final int code, final int eventModifiers);
+
+  private void keyDownUp(int keyEventCode) {
+    if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      KMTextView textView = (KMTextView)KMTextView.activeView;
+      textView.keyDownUp(KeyEvent.KEYCODE_ENTER);
+    } else if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      KMManager.getInputMethodService().getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyEventCode));
+      KMManager.getInputMethodService().getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyEventCode));
+    }
+  }
+
+  /*
+  // Chromium up until version M81 had a bug where deleteSurroundingText deletes an entire
+  // grapheme cluster instead of one code-point. See Chromium issue #1024738
+  // https://bugs.chromium.org/p/chromium/issues/detail?id=1024738
+  //
+  // We'll retrieve up to (dn*2+16) characters before the cursor to collect enough characters
+  // for surrogate pairs + a long grapheme cluster.
+  // This buffer will be used to put back characters as-needed
+  */
+  private static void performLeftDeletions(InputConnection ic, int dn) {
+    int originalBufferLength = dn*2 + 16; // characters
+    CharSequence charsBackup = getCharacterSequence(ic, originalBufferLength);
+
+    int lastIndex = charsBackup.length()-1;
+
+    // Exit if there's no context to delete
+    if (lastIndex < 0) {
+      return;
+    }
+
+    // Count the number of characters which are surrogate pairs
+    int numPairs = CharSequenceUtil.countSurrogatePairs(charsBackup, dn);
+
+    // Chop dn+numPairs code points from the end of charsBackup
+    // subSequence indices are start(inclusive) to end(exclusive)
+    CharSequence expectedChars = charsBackup.subSequence(0, charsBackup.length() - (dn + numPairs));
+    ic.deleteSurroundingText(dn + numPairs, 0);
+    CharSequence newContext = getCharacterSequence(ic, originalBufferLength - 2*dn);
+
+    CharSequence charsToRestore = CharSequenceUtil.restoreChars(expectedChars, newContext);
+    if (charsToRestore.length() > 0) {
+      // Restore expectedChars that Chromium deleted.
+      // Use newCusorPosition 1 so cursor will be after the inserted string
+      ic.commitText(charsToRestore, 1);
+    }
+  }
 
   /**
-   * Inserts the selected string <i>s</i>
-   * @param dn  Number of pre-caret code points (UTF+8 characters) to delete
-   * @param s   Text to insert
-   * @param dr  Number of post-caret code points to delete.
+   * Get a character sequence from the InputConnection.
+   * Sometimes the WebView can split a surrogate pair at either end,
+   * so chop that and update the cursor
+   * @param ic - the InputConnection
+   * @param length - number of characters to get
+   * @return CharSequence
    */
-  @JavascriptInterface
-  public abstract void insertText(final int dn, final String s, final int dr, final boolean executingHardwareKeystroke);
+  private static CharSequence getCharacterSequence(InputConnection ic, int length) {
+    if (ic == null || length <= 0) {
+      return "";
+    }
+
+    CharSequence sequence = ic.getTextBeforeCursor(length, 0);
+    if (sequence == null || sequence.length() <= 0) {
+      return "";
+    }
+
+    // Move the cursor back if there's a split surrogate pair
+    if (Character.isHighSurrogate(sequence.charAt(sequence.length()-1))) {
+      ic.commitText("", -1);
+      sequence = ic.getTextBeforeCursor(length, 0);
+    }
+
+    if (sequence == null || sequence.length() <= 0) {
+      return "";
+    }
+
+    if (Character.isLowSurrogate(sequence.charAt(0))) {
+      // Adjust if the first char is also a split surrogate pair
+      // subSequence indices are start(inclusive) to end(exclusive)
+      sequence = sequence.subSequence(1, sequence.length());
+    }
+
+    return sequence;
+  }
+
 }

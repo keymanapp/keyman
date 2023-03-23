@@ -249,12 +249,12 @@
       "properties": {
         "form": {
           "enum": [
-            "hardware",
-            "touch"
+            "touch",
+            "us",
+            "iso",
+            "jis",
+            "abnt2"
           ],
-          "type": "string"
-        },
-        "hardware": {
           "type": "string"
         },
         "import": {
