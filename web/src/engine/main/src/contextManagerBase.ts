@@ -87,6 +87,9 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
   }
 
   abstract get activeKeyboard(): {keyboard: Keyboard, metadata: KeyboardStub};
+
+  // TODO:  should `activateKeyboard` (on KeymanEngine) be relocated to within here?
+  //        It seems to make sense, and was originally a goal.
   abstract set activeKeyboard(kbd: {keyboard: Keyboard, metadata: KeyboardStub});
   abstract setActiveKeyboardAsync(kbd: Promise<Keyboard>, metadata: KeyboardStub): Promise<boolean>;
 

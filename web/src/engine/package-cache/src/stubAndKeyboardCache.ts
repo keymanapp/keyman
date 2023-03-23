@@ -67,6 +67,35 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
     return entry instanceof Promise ? null : entry;
   }
 
+  get defaultStub(): KeyboardStub {
+    /* See the following two StackOverflow links:
+     * - https://stackoverflow.com/a/23202095
+     * - https://stackoverflow.com/a/5525820
+     *
+     * Also: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_objects/Object/values#description
+     *
+     * As keyboard IDs are never purely numeric, any sufficiently-recent browser will
+     * maintain the order in which stubs were added to this cache.
+     *
+     * Note that if a keyboard is removed, its matching stubs are also removed, so the next most-recent
+     * property will take precedence.
+     *
+     * Might possibly fail to return the oldest registered stub for the oldest of supported browsers
+     * (i.e, Android 5.0), but will work for anything decently recent.  Even then... we still supply
+     * _a_ keyboard.  Just not in a way that will seem deterministic/controllable to site designers.
+     */
+    const entries = Object.values(this.stubSetTable);
+    if(entries.length == 0) {
+      return undefined;
+    } else {
+      // Maps language codes to actual KeyboardStub entries.  So... "stub table for the oldest registered keyboard".
+      const stubTable = entries[0];
+      // First value = first registered stub for that first keyboard.
+      // Does not consider later-added stubs, but neither does removeKeyboard - removal is "all or nothing".
+      return Object.values(stubTable)[0]; // returns undefined if it does not exist.
+    }
+  }
+
   addKeyboard(keyboard: Keyboard) {
     const keyboardID = prefixed(keyboard.id);
     this.keyboardTable[keyboardID] = keyboard;
