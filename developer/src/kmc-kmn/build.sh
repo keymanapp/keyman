@@ -51,6 +51,8 @@ fi
 
 if builder_start_action build; then
   tsc --build
+  cp ../kmcmplib/build/wasm/$BUILDER_CONFIGURATION/src/wasm-host.js ./build/src/compiler/wasm-host.js
+  cp ../kmcmplib/build/wasm/$BUILDER_CONFIGURATION/src/wasm-host.wasm ./build/src/compiler/wasm-host.wasm
   builder_finish_action success build
 fi
 

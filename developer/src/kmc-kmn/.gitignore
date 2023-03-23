@@ -1,0 +1,2 @@
+src/compiler/wasm-host.js
+src/compiler/wasm-host.wasm

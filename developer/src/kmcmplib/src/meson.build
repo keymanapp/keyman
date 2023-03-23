@@ -22,7 +22,7 @@ if cpp_compiler.get_id() == 'msvc'
 endif
 
 if cpp_compiler.get_id() == 'emscripten'
-  links += ['-lnodefs.js', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
+  links += ['-lnodefs.js', '-sMODULARIZE', '-sEXPORT_ES6', '-sEXPORTED_RUNTIME_METHODS=[\'cwrap\', \'UTF8ToString\']']
 endif
 
 
@@ -61,11 +61,22 @@ lib = library('kmcmplib',
   include_directories: inc,
   install: true)
 
+# pkg = import('pkgconfig')
+# pkg.generate(
+#     name: 'keyman_kmn_compiler',
+#     version: meson.project_version(),
+#     description: 'Keyman compiler for KMN keyboards.',
+#     libraries: lib)
+
 kmcmplib = declare_dependency(link_with: lib, include_directories: inc)
 
-pkg = import('pkgconfig')
-pkg.generate(
-    name: 'keyman_kmn_compiler',
-    version: meson.project_version(),
-    description: 'Keyman compiler for KMN keyboards.',
-    libraries: lib)
+
+if cpp_compiler.get_id() == 'emscripten'
+  # Build an executable
+  host = executable('wasm-host', #'wasm-host.cpp',
+    cpp_args: defns,
+    include_directories: inc,
+    link_args: links,
+    objects: lib.extract_all_objects())
+endif
+
