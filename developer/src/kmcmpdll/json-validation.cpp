@@ -1,7 +1,7 @@
 
 #include <json-schema.hpp>
 #include <fstream>
-#include <kmcmplibapi.h>
+#include "../kmcmplib/include/kmcmplibapi.h"
 
 #include <windows.h>
 

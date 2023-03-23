@@ -47,7 +47,7 @@ extern "C" bool kmcmp_ValidateJsonFile(
 */
 
 // TODO: rename wasm-host?
-import loadWasmHost from './wasm-host.js';
+import loadWasmHost from '../import/kmcmplib/wasm-host.js';
 
 export interface CompilerOptions {
   shouldAddCompilerVersion?: boolean;
