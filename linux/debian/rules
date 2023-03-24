@@ -9,6 +9,8 @@ export PYBUILD_INSTALL_ARGS=--install-scripts=/usr/share/keyman-config/
 
 export KEYMAN_PKG_BUILD=1
 
+export XDG_DATA_HOME=$(shell mktemp -d)
+
 # xenial needs this to be explicit
 export LC_ALL=C.UTF-8
 
