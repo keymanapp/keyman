@@ -9,6 +9,14 @@ WORKDIR=$(mktemp -d)
 trap "rm -rf $WORKDIR" 0 INT QUIT ABRT PIPE TERM
 cd "$WORKDIR"
 
+if [ "$(dpkg --print-architecture)" == "s390x" ]; then
+  # libkmnkbp doesn't support big endian architectures
+  # (https://github.com/keymanapp/keyman/issues/5111), so it isn't
+  # build on s390x and we can't run the tests. Simply ignore.
+  echo "Not supported on s390x: OK"
+  exit 0
+fi
+
 # Test all include files are available
 cat <<EOF > keymantest.c
 #include <keyman/keyboardprocessor.h>
