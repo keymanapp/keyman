@@ -1,3 +1,9 @@
+keyman (16.0.139-4) unstable; urgency=medium
+
+  * debian/tests: Revert previous change and ignore s390x from autopkgtests
+
+ -- Eberhard Beilharz <eb1@sil.org>  Fri, 24 Mar 2023 16:05:07 +0100
+
 keyman (16.0.139-3) unstable; urgency=medium
 
   * debian/tests: Run autopkgtests on s390x but immediately return
