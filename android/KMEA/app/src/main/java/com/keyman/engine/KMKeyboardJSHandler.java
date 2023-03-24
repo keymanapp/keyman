@@ -96,21 +96,13 @@ public abstract class KMKeyboardJSHandler {
           return;
         }
 
-        if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP &&
-          (KMTextView.activeView == null || KMTextView.activeView.getClass() != KMTextView.class)) {
-          if (KMTextView.activeView == null && KMManager.isDebugMode()) {
-            Log.w(TAG, "insertText failed: activeView is null");
-          }
+        if (!isInappKMTextViewValid(k.keyboardType)) {
           return;
         }
 
-        InputConnection ic = (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) ?
-            KMTextView.activeView.onCreateInputConnection(new EditorInfo()) :
-            KMManager.getInputMethodService().getCurrentInputConnection();
+        InputConnection ic = KMManager.getInputConnection(k.keyboardType);
         if (ic == null) {
-          if (KMManager.isDebugMode()) {
-            Log.w(TAG, "insertText failed: InputConnection is null");
-          }
+          KMLog.LogError(TAG, "insertText failed: InputConnection is null");
           return;
         }
 
@@ -150,7 +142,7 @@ public abstract class KMKeyboardJSHandler {
         }
 
         if (s.length() > 0 && s.charAt(0) == '\n') {
-          keyDownUp(KeyEvent.KEYCODE_ENTER);
+          keyDownUp(KeyEvent.KEYCODE_ENTER, 0);
           ic.endBatchEdit();
           return;
         }
@@ -205,15 +197,59 @@ public abstract class KMKeyboardJSHandler {
   }
 
   @JavascriptInterface
-  public abstract boolean dispatchKey(final int code, final int eventModifiers);
+  public boolean dispatchKey(final int code, final int eventModifiers) {
+    Handler mainLoop = new Handler(Looper.getMainLooper());
+    mainLoop.post(new Runnable() {
+      public void run() {
+        if (k == null) {
+          KMLog.LogError(TAG, "dispatchKey failed: Keyboard is null");
+          return;
+        }
 
-  private void keyDownUp(int keyEventCode) {
+        if (k.subKeysWindow != null) {
+          return;
+        }
+
+        if (!isInappKMTextViewValid(k.keyboardType)) {
+          return;
+        }
+
+        InputConnection ic = KMManager.getInputConnection(k.keyboardType);
+        if (ic == null) {
+          KMLog.LogError(TAG, "dispatchKey failed: InputConnection is null");
+          return;
+        }
+
+        k.dismissHelpBubble();
+        k.setShouldShowHelpBubble(false);
+
+        // Handle tab or enter since KMW didn't process it
+        if (KMManager.isDebugMode()) {
+          Log.d(TAG, "dispatchKey called with code: " + code + ", eventModifiers: " + eventModifiers);
+        }
+        if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_TAB]) {
+          keyDownUp(KeyEvent.KEYCODE_TAB, eventModifiers);
+        } else if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_ENTER]) {
+          keyDownUp(KeyEvent.KEYCODE_ENTER, eventModifiers);
+        }
+      }
+    });
+    return true;
+  }
+
+  private void keyDownUp(int keyEventCode, int eventModifiers) {
     if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       KMTextView textView = (KMTextView)KMTextView.activeView;
-      textView.keyDownUp(KeyEvent.KEYCODE_ENTER);
+      if (keyEventCode == KeyEvent.KEYCODE_TAB) {
+        KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_TAB, 0, eventModifiers, 0, 0, 0);
+        textView.dispatchKeyEvent(event);
+      } else {
+        textView.keyDownUp(keyEventCode);
+      }
     } else if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      KMManager.getInputMethodService().getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyEventCode));
-      KMManager.getInputMethodService().getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyEventCode));
+      InputConnection ic = KMManager.getInputConnection(KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyEventCode));
+      ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyEventCode));
     }
   }
 
@@ -291,4 +327,25 @@ public abstract class KMKeyboardJSHandler {
     return sequence;
   }
 
+  /**
+   * If the keyboard type is KEYBOARD_TYPE_INAPP, check if the KMTextView is valid.
+   * For KEYBOARD_TYPE_SYSTEM, returns true.
+   * @param keyboardType
+   * @return boolean - false if keyboard type is INAPP and KMTextView is invalid. Otherwise true
+   */
+  private static boolean isInappKMTextViewValid(KeyboardType keyboardType) {
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      if (KMTextView.activeView == null) {
+        if (KMManager.isDebugMode()) {
+          Log.w(TAG, "activeView is null");
+        }
+        return false;
+      }
+      if (KMTextView.activeView.getClass() != KMTextView.class) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
