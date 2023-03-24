@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.76 alpha 2023-03-24
+
+* chore(linux): Run and ignore autopkgtests on s390x (#8492)
+* refactor(android/engine): Consolidate dispatchKey (#8483)
+
 ## 17.0.75 alpha 2023-03-23
 
 * chore(common): define BUILDER_CONFIGURATION env var (#8496)
