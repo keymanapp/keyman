@@ -5,14 +5,15 @@
 #
 
 
-# These tests have a k_001_tiny-test.xml file as well.
-
-tests_with_testdata = [
-  'k_001_tiny',
-  'fr-t-k0-azerty',
+# keyboards in resources/standards-data/ldml-keyboards/techpreview/3.0/
+# tests     in resources/standards-data/ldml-keyboards/techpreview/test/
+tests_from_cldr = [
+  'ja-Latn',
+  'pt-BR-k0-abnt2',
+  # 'fr-t-k0-azerty', # vkey issues
 ]
 
-tests = [
+tests_without_testdata = [
 # disabling 000 until we have updates to core or to the keyboard so that it passes
 #  'k_000_null_keyboard',
   'k_002_tinyu32',
@@ -26,16 +27,30 @@ tests = [
   'k_102_keytest',
 ]
 
+# These tests have a k_001_tiny-test.xml file as well.
+tests_with_testdata = [
+  'k_001_tiny',
+  'fr-t-k0-azerty',
+]
+
+tests =  tests_without_testdata
 tests += tests_with_testdata
+tests_needing_copy = tests # not including cldr
+
+tests += tests_from_cldr
+
 
 # Setup kmc
 
 kmc_root = join_paths(meson.source_root(),'..','developer','src','kmc')
+ldml_root = join_paths(meson.source_root(),'..','resources','standards-data','ldml-keyboards','techpreview')
+ldml_data = join_paths(ldml_root, '3.0')
+ldml_testdata = join_paths(ldml_root, 'test')
 kmc_cmd = [node, kmc_root]
 
 # Build all keyboards in output folder
 
-foreach kbd : tests
+foreach kbd : tests_needing_copy
   configure_file(
     command: copy_cmd + ['@INPUT@', '@OUTPUT@'],
     input: kbd + '.xml',
@@ -44,15 +59,34 @@ foreach kbd : tests
 
   configure_file(
     command: kmc_cmd + ['build', '@INPUT@', '--out-file', '@OUTPUT@'],
+    input: kbd + '.xml',
     output: kbd + '.kmx',
-    input: kbd + '.xml'
   )
 endforeach
 
 foreach kbd : tests_with_testdata
   configure_file(
     command: kmc_cmd + ['build-test-data', '@INPUT@', '--out-file', '@OUTPUT@'],
+    input: kbd + '-test.xml',
     output: kbd + '-test.json',
-    input: kbd + '-test.xml'
+  )
+endforeach
+
+
+foreach kbd : tests_from_cldr
+  configure_file(
+    command: copy_cmd + ['@INPUT@', '@OUTPUT@'],
+    input: join_paths(ldml_data, kbd + '.xml'),
+    output: kbd + '.xml'
+  )
+  configure_file(
+    command: kmc_cmd + ['build', '@INPUT@', '--out-file', '@OUTPUT@'],
+    input: join_paths(ldml_data, kbd + '.xml'),
+    output: kbd + '.kmx',
+  )
+  configure_file(
+    command: kmc_cmd + ['build-test-data', '@INPUT@', '--out-file', '@OUTPUT@'],
+    input: join_paths(ldml_testdata, kbd + '-test.xml'),
+    output: kbd + '-test.json',
   )
 endforeach
