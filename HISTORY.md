@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.77 alpha 2023-03-25
+
+* chore(common): use mac /usr/bin/stat rather than homebrew version (#8498)
+
 ## 17.0.76 alpha 2023-03-24
 
 * chore(linux): Run and ignore autopkgtests on s390x (#8492)
