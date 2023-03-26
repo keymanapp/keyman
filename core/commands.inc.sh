@@ -37,11 +37,11 @@ do_configure() {
   fi
 
   if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $CONFIGURATION configure $BUILD_BAT_keyman_core_tests "${builder_extra_params[@]}"
+    cmd //C build.bat $target $BUILDER_CONFIGURATION configure $BUILD_BAT_keyman_core_tests "${builder_extra_params[@]}"
   else
     pushd "$THIS_SCRIPT_PATH" > /dev/null
     # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
-    meson setup "$MESON_PATH" $MESON_CROSS_FILE --werror --buildtype $CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
+    meson setup "$MESON_PATH" $MESON_CROSS_FILE --werror --buildtype $BUILDER_CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
     popd > /dev/null
   fi
 
@@ -56,7 +56,7 @@ do_build() {
   local target=$1
   builder_start_action build:$target || return 0
   if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $CONFIGURATION build "${builder_extra_params[@]}"
+    cmd //C build.bat $target $BUILDER_CONFIGURATION build "${builder_extra_params[@]}"
   elif $MESON_LOW_VERSION; then
     pushd "$MESON_PATH" > /dev/null
     ninja
@@ -75,7 +75,7 @@ do_test() {
   local target=$1
   builder_start_action test:$target || return 0
   if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $CONFIGURATION test "${builder_extra_params[@]}"
+    cmd //C build.bat $target $BUILDER_CONFIGURATION test "${builder_extra_params[@]}"
   else
     meson test -C "$MESON_PATH" "${builder_extra_params[@]}"
   fi

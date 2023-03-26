@@ -49,6 +49,7 @@ class InstallKmpWindow(Gtk.Dialog):
 
     def __init__(self, kmpfile, viewkmp=None, language=None):
         logging.debug("InstallKmpWindow: kmpfile: %s", kmpfile)
+        self.is_error = False
         self.kmpfile = kmpfile
         self.viewwindow = viewkmp
         self.accelerators = None
@@ -67,7 +68,13 @@ class InstallKmpWindow(Gtk.Dialog):
         mainhbox = Gtk.Box()
 
         with tempfile.TemporaryDirectory() as tmpdirname:
-            extract_kmp(kmpfile, tmpdirname)
+            try:
+                extract_kmp(kmpfile, tmpdirname)
+            except InstallError as e:
+                self._handle_install_error(e, kmpfile)
+                self.is_error = True
+                return
+
             info, system, options, keyboards, files = get_metadata(tmpdirname)
             if not keyboards:
                 # Likely not a keyboard .kmp file
@@ -357,26 +364,29 @@ class InstallKmpWindow(Gtk.Dialog):
                 dialog.run()
                 dialog.destroy()
         except InstallError as e:
-            if e.status == InstallStatus.Abort:
-                message = _("Keyboard {name} could not be installed.").format(name=self.kbname) \
-                  + "\n\n" + _("Error Message:") + "\n %s" % (e.message)
-                logging.error(message)
-                message_type = Gtk.MessageType.ERROR
-            else:
-                message = _("Keyboard {name} could not be installed.").format(name=self.kbname) \
-                  + "\n\n" + _("Warning Message:") + "\n %s" % (e.message)
-                logging.warning(message)
-                message_type = Gtk.MessageType.WARNING
-            dialog = Gtk.MessageDialog(
-                self, 0, message_type,
-                Gtk.ButtonsType.OK, message)
-            dialog.run()
-            dialog.destroy()
+            self._handle_install_error(e, self.kbname)
         self.close()
 
     def on_cancel_clicked(self, button):
         logging.info("Cancel install keyboard")
         self.response(Gtk.ResponseType.CANCEL)
+
+    def _handle_install_error(self, e, kbname):
+        if e.status == InstallStatus.Abort:
+            message = _("Keyboard {name} could not be installed.").format(name=kbname) \
+                + "\n\n" + _("Error Message:") + "\n %s" % (e.message)
+            logging.error(message)
+            message_type = Gtk.MessageType.ERROR
+        else:
+            message = _("Keyboard {name} could not be installed.").format(name=kbname) \
+                + "\n\n" + _("Warning Message:") + "\n %s" % (e.message)
+            logging.warning(message)
+            message_type = Gtk.MessageType.WARNING
+        dialog = Gtk.MessageDialog(
+            self, 0, message_type,
+            Gtk.ButtonsType.OK, message)
+        dialog.run()
+        dialog.destroy()
 
 
 def main(argv):

@@ -10,92 +10,97 @@ const K = Constants.USVirtualKeyCodes;
 
 describe('keys', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
-
-  it('should compile minimal keys data', function () {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/minimal.xml', compilerTestCallbacks) as Keys;
-    assert.ok(keys);
-    assert.equal(compilerTestCallbacks.messages.length, 0);
-    assert.equal(keys.keys.length, 1);
-    assert.equal(keys.flicks.length, 1); // there's always a 'null' flick
-    assert.equal(keys.keys[0].to.value, '🪦');
-    assert.equal(keys.keys[0].id.value, 'grave');
-  });
-
-  it('should compile maximal keys data', function () {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/maximal.xml', compilerTestCallbacks) as Keys;
-    assert.ok(keys);
-    assert.equal(compilerTestCallbacks.messages.length, 0);
-    assert.equal(keys.keys.length, 4);
-
-    const [q] = keys.keys.filter(({ id }) => id.value === 'q');
-    assert.ok(q);
-    assert.isFalse(!!(q.flags & constants.keys_key_flags_gap));
-    assert.equal(q.width, 32, 'q\'s width'); // ceil(3.14159 * 10.0)
-    assert.equal(q.flicks, 'flick0'); // note this is a string, not a StrsItem
-    assert.equal(q.longPress.toString(), 'á é í');
-    assert.equal(q.longPressDefault.value, 'é');
-    assert.equal(q.multiTap.toString(), 'ä ë ï');
-
-    const [flick0] = keys.flicks.filter(({ id }) => id.value === 'flick0');
-    assert.ok(flick0);
-    assert.equal(flick0.flicks.length, 2);
-
-    const [flick0_nw_se] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('nw se'.split(' ')));
-    assert.ok(flick0_nw_se);
-    assert.equal(flick0_nw_se.to?.value, 'ç');
-
-    const [flick0_ne_sw] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('ne sw'.split(' ')));
-    assert.ok(flick0_ne_sw);
-    assert.equal(flick0_ne_sw.to?.value, 'ê');
-  });
-
-  it('should compile escaped keys data', function () {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/escaped.xml', compilerTestCallbacks) as Keys;
-    assert.ok(keys);
-    assert.equal(compilerTestCallbacks.messages.length, 0);
-    assert.equal(keys.keys.length, 4);
-
-    const [q] = keys.keys.filter(({ id }) => id.value === 'q');
-    assert.ok(q);
-    assert.isFalse(!!(q.flags & constants.keys_key_flags_gap));
-    assert.equal(q.width, 32); // ceil(3.1 * 10)
-    assert.equal(q.flicks, 'flick0'); // note this is a string, not a StrsItem
-    assert.equal(q.longPress.toString(), 'á é í');
-    assert.equal(q.longPressDefault.value, 'é');
-    assert.equal(q.multiTap.toString(), 'ä ë ï');
-
-    const [flick0] = keys.flicks.filter(({ id }) => id.value === 'flick0');
-    assert.ok(flick0);
-    assert.equal(flick0.flicks.length, 2);
-
-    const [flick0_nw_se] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('nw se'.split(' ')));
-    assert.ok(flick0_nw_se);
-    assert.equal(flick0_nw_se.to?.value, 'ç');
-
-    const [flick0_ne_sw] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('ne sw'.split(' ')));
-    assert.ok(flick0_ne_sw);
-    assert.equal(flick0_ne_sw.to?.value, 'ế');
-  });
-
-
-  it('should accept layouts with gap/switch keys', function () {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/gap-switch.xml', compilerTestCallbacks) as Keys;
-    assert.ok(keys);
-    assert.equal(compilerTestCallbacks.messages.length, 0);
-    assert.equal(keys.keys.length, 4);
-
-    const [Qgap] = keys.keys.filter(({ id }) => id.value === 'Q');
-    assert.ok(Qgap);
-    assert.isTrue(!!(Qgap.flags & constants.keys_key_flags_gap), 'Q’s gap=');
-
-    const [Wshift] = keys.keys.filter(({ id }) => id.value === 'W');
-    assert.isNotNull(Wshift);
-    assert.isFalse(!!(Wshift.flags & constants.keys_key_flags_gap));
-    assert.equal(Wshift.switch.value, 'shift');
-
-  });
-
   testCompilationCases(KeysCompiler, [
+    {
+      // should compile minimal keys data
+      subpath: 'sections/keys/minimal.xml',
+      callback(sect) {
+        const keys = <Keys> sect;
+        assert.ok(keys);
+        assert.equal(compilerTestCallbacks.messages.length, 0);
+        assert.equal(keys.keys.length, 1);
+        assert.equal(keys.flicks.length, 1); // there's always a 'null' flick
+        assert.equal(keys.keys[0].to.value, String.fromCodePoint(0x1FAA6));
+        assert.equal(keys.keys[0].id.value, 'grave');
+      },
+    },
+    {
+      subpath: 'sections/keys/maximal.xml',
+      callback(sect) {
+        const keys = <Keys> sect;
+        assert.ok(keys);
+        assert.equal(compilerTestCallbacks.messages.length, 0);
+        assert.equal(keys.keys.length, 4);
+
+        const [q] = keys.keys.filter(({ id }) => id.value === 'q');
+        assert.ok(q);
+        assert.isFalse(!!(q.flags & constants.keys_key_flags_gap));
+        assert.equal(q.width, 32, 'q\'s width'); // ceil(3.14159 * 10.0)
+        assert.equal(q.flicks, 'flick0'); // note this is a string, not a StrsItem
+        assert.equal(q.longPress.toString(), 'á é í');
+        assert.equal(q.longPressDefault.value, 'é');
+        assert.equal(q.multiTap.toString(), 'ä ë ï');
+
+        const [flick0] = keys.flicks.filter(({ id }) => id.value === 'flick0');
+        assert.ok(flick0);
+        assert.equal(flick0.flicks.length, 2);
+
+        const [flick0_nw_se] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('nw se'.split(' ')));
+        assert.ok(flick0_nw_se);
+        assert.equal(flick0_nw_se.to?.value, 'ç');
+
+        const [flick0_ne_sw] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('ne sw'.split(' ')));
+        assert.ok(flick0_ne_sw);
+        assert.equal(flick0_ne_sw.to?.value, 'ê');
+      },
+    },
+    {
+      subpath: 'sections/keys/escaped.xml',
+      callback(sect) {
+        const keys = <Keys> sect;
+        assert.ok(keys);
+        assert.equal(compilerTestCallbacks.messages.length, 0);
+        assert.equal(keys.keys.length, 4);
+
+        const [q] = keys.keys.filter(({ id }) => id.value === 'q');
+        assert.ok(q);
+        assert.isFalse(!!(q.flags & constants.keys_key_flags_gap));
+        assert.equal(q.width, 32); // ceil(3.1 * 10)
+        assert.equal(q.flicks, 'flick0'); // note this is a string, not a StrsItem
+        assert.equal(q.longPress.toString(), 'á é í');
+        assert.equal(q.longPressDefault.value, 'é');
+        assert.equal(q.multiTap.toString(), 'ä ë ï');
+
+        const [flick0] = keys.flicks.filter(({ id }) => id.value === 'flick0');
+        assert.ok(flick0);
+        assert.equal(flick0.flicks.length, 2);
+
+        const [flick0_nw_se] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('nw se'.split(' ')));
+        assert.ok(flick0_nw_se);
+        assert.equal(flick0_nw_se.to?.value, 'ç');
+
+        const [flick0_ne_sw] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('ne sw'.split(' ')));
+        assert.ok(flick0_ne_sw);
+        assert.equal(flick0_ne_sw.to?.value, 'ế');
+      },
+    },
+    {
+      subpath: 'sections/keys/gap-switch.xml',
+      callback(sect) {
+        const keys = <Keys> sect;
+        assert.equal(compilerTestCallbacks.messages.length, 0);
+        assert.equal(keys.keys.length, 4);
+
+        const [Qgap] = keys.keys.filter(({ id }) => id.value === 'Q');
+        assert.ok(Qgap);
+        assert.isTrue(!!(Qgap.flags & constants.keys_key_flags_gap), 'Q’s gap=');
+
+        const [Wshift] = keys.keys.filter(({ id }) => id.value === 'W');
+        assert.isNotNull(Wshift);
+        assert.isFalse(!!(Wshift.flags & constants.keys_key_flags_gap));
+        assert.equal(Wshift.switch.value, 'shift');
+      },
+    },
     {
       subpath: 'sections/keys/escaped2.xml',
       callback: (keys, subpath, callbacks) => {
@@ -211,14 +216,6 @@ describe('keys.kmap', function () {
       ]
     },
   ]);
-
-  it('should reject structurally invalid layers', function() {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/invalid-missing-layer.xml', compilerTestCallbacks) as Keys;
-    assert.isNull(keys);
-    assert.equal(compilerTestCallbacks.messages.length, 1);
-
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_MustBeAtLeastOneLayerElement());
-  });
 
   it('should reject layouts with too many hardware rows', function() {
     let keys = loadSectionFixture(KeysCompiler, 'sections/keys/invalid-hardware-too-many-rows.xml', compilerTestCallbacks) as Keys;

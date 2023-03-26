@@ -82,6 +82,8 @@ class ViewInstalledWindowBase(Gtk.Window):
 
     def install_file(self, kmpfile, language=None):
         installDlg = InstallKmpWindow(kmpfile, viewkmp=self, language=language)
+        if installDlg.is_error:
+            return Gtk.ResponseType.CANCEL
         result = installDlg.run()
         installDlg.destroy()
         return result

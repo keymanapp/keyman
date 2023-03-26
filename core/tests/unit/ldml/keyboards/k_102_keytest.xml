@@ -13,7 +13,7 @@
     <name value="TestKbd" />
   </names>
   <!-- only implied keys - the <keys/> element is omitted. -->
-  <layers form="hardware" hardware="us">
+  <layers form="us">
     <layer id="base">
       <row keys="a" /> <!-- number row -->
     </layer>
