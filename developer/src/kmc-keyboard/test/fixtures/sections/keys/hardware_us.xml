@@ -10,7 +10,7 @@
     <import base="cldr" path="techpreview/keys-Zyyy-punctuation.xml"/>
   </keys>
 
-  <layers form="hardware" hardware="us">
+  <layers form="us">
     <layer id="base" modifier="none">
       <row keys="grave 1 2 3 4 5 6 7 8 9 0 hyphen equal" />
       <row keys="q w e r t y u i o p open-square close-square backslash" />

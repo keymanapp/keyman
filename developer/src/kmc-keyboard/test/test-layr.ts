@@ -43,66 +43,57 @@ describe('layr', function () {
     assert.equal(row0.keys[0]?.value, 'grave');
   });
 
-  // reuse keys maximal
-  it('should compile maximal keys data', function () {
-    let layr = loadSectionFixture(LayrCompiler, 'sections/keys/maximal.xml', compilerTestCallbacks) as Layr;
-    assert.ok(layr);
-    assert.equal(compilerTestCallbacks.messages.length, 0);
-
-    assert.equal(layr.lists?.length, 2);
-
-    const listHardware = layr.lists.find(v => v.hardware === constants.layr_list_hardware_abnt2);
-    assert.ok(listHardware);
-    assert.equal(listHardware.minDeviceWidth, 0);
-    assert.equal(listHardware.layers.length, 2);
-    const hardware0 = listHardware.layers[0];
-    assert.ok(hardware0);
-    assert.equal(hardware0.id.value, 'base');
-    assert.equal(hardware0.mod, constants.keys_mod_none);
-    const hardware0row0 = hardware0.rows[0];
-    assert.ok(hardware0row0);
-    assert.equal(hardware0row0.keys.length, 2);
-    allKeysOk(hardware0row0,'Q W', 'hardware0row0');
-    const hardware1 = listHardware.layers[1];
-    assert.ok(hardware1);
-    assert.equal(hardware1.rows.length, 1);
-    assert.equal(hardware1.id.value, 'shift');
-    assert.equal(hardware1.mod, constants.keys_mod_shift);
-    const hardware1row0 = hardware1.rows[0];
-    assert.ok(hardware1row0);
-    assert.equal(hardware1row0.keys.length, 2);
-    allKeysOk(hardware1row0,'q w', 'hardware1row0');
-
-    const listTouch = layr.lists.find(v => v.hardware === constants.layr_list_hardware_touch);
-    assert.ok(listTouch);
-    assert.equal(listTouch.minDeviceWidth, 300);
-    assert.equal(listTouch.layers.length, 1);
-    const touch0 = listTouch.layers[0];
-    assert.ok(touch0);
-    assert.equal(touch0.rows.length, 1);
-    assert.equal(touch0.id.value, 'base');
-    assert.equal(touch0.mod, constants.keys_mod_none);
-    const touch0row0 = touch0.rows[0];
-    assert.ok(touch0row0);
-    assert.equal(touch0row0.keys.length, 4);
-    allKeysOk(touch0row0,'Q q W w', 'touch0row0');
-  });
   testCompilationCases(LayrCompiler, [
     {
-      subpath: 'sections/layr/invalid-invalid-hardware.xml',
-      errors: [CompilerMessages.Error_InvalidHardware({hardware: 'stenography'})],
+      subpath: 'sections/keys/maximal.xml',
+      callback(sect) {
+        const layr = <Layr> sect;
+        assert.equal(layr.lists?.length, 2);
+
+        const listHardware = layr.lists.find(v => v.hardware === constants.layr_list_hardware_iso);
+        assert.ok(listHardware);
+        assert.equal(listHardware.minDeviceWidth, 0);
+        assert.equal(listHardware.layers.length, 2);
+        const hardware0 = listHardware.layers[0];
+        assert.ok(hardware0);
+        assert.equal(hardware0.id.value, 'base');
+        assert.equal(hardware0.mod, constants.keys_mod_none);
+        const hardware0row0 = hardware0.rows[0];
+        assert.ok(hardware0row0);
+        assert.equal(hardware0row0.keys.length, 2);
+        allKeysOk(hardware0row0,'Q W', 'hardware0row0');
+        const hardware1 = listHardware.layers[1];
+        assert.ok(hardware1);
+        assert.equal(hardware1.rows.length, 1);
+        assert.equal(hardware1.id.value, 'shift');
+        assert.equal(hardware1.mod, constants.keys_mod_shift);
+        const hardware1row0 = hardware1.rows[0];
+        assert.ok(hardware1row0);
+        assert.equal(hardware1row0.keys.length, 2);
+        allKeysOk(hardware1row0,'q w', 'hardware1row0');
+
+        const listTouch = layr.lists.find(v => v.hardware === constants.layr_list_hardware_touch);
+        assert.ok(listTouch);
+        assert.equal(listTouch.minDeviceWidth, 300);
+        assert.equal(listTouch.layers.length, 1);
+        const touch0 = listTouch.layers[0];
+        assert.ok(touch0);
+        assert.equal(touch0.rows.length, 1);
+        assert.equal(touch0.id.value, 'base');
+        assert.equal(touch0.mod, constants.keys_mod_none);
+        const touch0row0 = touch0.rows[0];
+        assert.ok(touch0row0);
+        assert.equal(touch0row0.keys.length, 4);
+        allKeysOk(touch0row0,'Q q W w', 'touch0row0');
+      },
     },
     {
       subpath: 'sections/layr/invalid-missing-hardware.xml',
-      errors: [CompilerMessages.Error_MissingHardware()],
+      errors: [],
     },
     {
       subpath: 'sections/layr/invalid-multi-hardware.xml',
-      errors: [CompilerMessages.Error_MustHaveAtMostOneLayersElementPerForm({ form: 'hardware' })],
-    },
-    {
-      subpath: 'sections/layr/invalid-touch-hardware.xml',
-      errors: [CompilerMessages.Error_NoHardwareOnTouch({ hardware: 'iso' })],
+      errors: [CompilerMessages.Error_ExcessHardware({ form: 'iso' })],
     },
     {
       subpath: 'sections/layr/invalid-invalid-form.xml',
@@ -110,11 +101,19 @@ describe('layr', function () {
         instancePath: '/keyboard/layers/0/form',
         keyword: 'enum',
         message: 'must be equal to one of the allowed values',
-        params: `allowedValues="hardware,touch"`}),],
+        params: `allowedValues="touch,us,iso,jis,abnt2"`}),],
     },
     {
+      // missing layer element
       subpath: 'sections/layr/invalid-missing-layer.xml',
       errors: [CompilerMessages.Error_MustBeAtLeastOneLayerElement()],
     },
+    {
+      // missing layers element completely
+      subpath: 'sections/layr/invalid-missing-layer.xml',
+      errors: [
+        CompilerMessages.Error_MustBeAtLeastOneLayerElement(),
+      ],
+    }
   ]);
 });

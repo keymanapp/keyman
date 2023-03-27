@@ -25,6 +25,12 @@ builder_describe "parent test module" \
 
 builder_parse "$@"
 
+if builder_is_child_build; then
+  builder_die "FAIL: builder_is_child_build should be false but was $_builder_is_child for the parent script"
+else
+  builder_echo "PASS: builder_is_child_build is false ($_builder_is_child) for the parent script"
+fi
+
 # All child actions will generate files which we need to verify for test
 rm -f ./child?.*
 

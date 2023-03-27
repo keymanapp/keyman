@@ -19,47 +19,41 @@ export class LayrCompiler extends SectionCompiler {
 
   public validate() {
     let valid = true;
-    if (!this.keyboard.layers?.[0]?.layer?.length) {
-      valid = false;
-      this.callbacks.reportMessage(CompilerMessages.Error_MustBeAtLeastOneLayerElement());
-    }
+    let totalLayerCount = 0;
     let hardwareLayers = 0;
-    this.keyboard.layers.forEach((layers) => {
-      const { hardware, form } = layers;
-      // TODO-LDML: in the future >1 hardware layer may be allowed, check for duplicates
+    // let touchLayers = 0;
+    this.keyboard.layers?.forEach((layers) => {
+      const { form } = layers;
       if (form === 'touch') {
-        if (hardware) {
-          valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_NoHardwareOnTouch({hardware}));
-        }
-      } else if (form === 'hardware') {
-        hardwareLayers++;
-        if (!hardware) {
-          valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_MissingHardware());
-        } else if (!constants.layr_list_hardware_map.get(hardware)) {
-          valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_InvalidHardware({hardware}));
-        } else if (hardwareLayers > 1) { // TODO-LDML: revisit if spec changes
-          valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_MustHaveAtMostOneLayersElementPerForm({ form }));
-        }
+        // touchLayers++;
+        // multiple touch layers are OK
+        totalLayerCount += layers.layer?.length;
+        // TODO-LDML: check that widths are distinct
       } else {
-        /* c8 ignore next 7 */
-        // Should not be reached due to XML validation.
-        valid = false;
-        this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({
-          errorText: `INTERNAL ERROR: Invalid XML: Invalid form="${form}" on layers element`
-        }));
+        // hardware
+        hardwareLayers++;
+        if (hardwareLayers > 1) {
+          valid = false;
+          this.callbacks.reportMessage(CompilerMessages.Error_ExcessHardware({form}));
+        } else if (!constants.layr_list_hardware_map.get(form)) {
+          valid = false;
+          this.callbacks.reportMessage(CompilerMessages.Error_InvalidHardware({form}));
+        }
       }
       layers.layer.forEach((layer) => {
         const { modifier, id } = layer;
+        totalLayerCount++;
         if (!validModifier(modifier)) {
           this.callbacks.reportMessage(CompilerMessages.Error_InvalidModifier({ modifier, layer: id }));
           valid = false;
         }
       });
     });
+    if (totalLayerCount === 0) { // TODO-LDML: does not validate touch layers yet
+      // no layers seen anywhere
+      valid = false;
+      this.callbacks.reportMessage(CompilerMessages.Error_MustBeAtLeastOneLayerElement());
+    }
     return valid;
   }
 
@@ -67,8 +61,8 @@ export class LayrCompiler extends SectionCompiler {
     const sect = new Layr();
 
     sect.lists = this.keyboard.layers.map((layers) => {
-      const hardware = constants.layr_list_hardware_map.get(layers.hardware || 'touch');
-      // Don't need to check 'form' because it is checked in validate
+      const hardware = constants.layr_list_hardware_map.get(layers.form);
+      // Already validated in validate
       const list: LayrList = {
         hardware,
         minDeviceWidth: layers.minDeviceWidth || 0,
