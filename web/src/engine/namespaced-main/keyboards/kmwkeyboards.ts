@@ -192,25 +192,6 @@ namespace com.keyman.keyboards {
     /* TODO: why not use util.loadCookie and saveCookie?? */
 
     /**
-     * Function     saveCurrentKeyboard
-     * Scope        Private
-     * @param       {string}    PInternalName       name of keyboard
-     * @param       {string}    PLgCode             language code
-     * Description Saves current keyboard as a cookie
-     */
-    private saveCurrentKeyboard(PInternalName: string, PLgCode: string) {
-      var s = "current="+PInternalName+":"+PLgCode;
-      this.keymanweb.util.saveCookie('KeymanWeb_Keyboard',{'current':PInternalName+':'+PLgCode});
-
-      // Additionally, make sure we save the (upcoming) per-control keyboard settings.
-      // This allows us to ensure the keyboard is set correctly without waiting for focus event
-      // triggers - very helpful for automated testing.
-      if(!this.keymanweb.isEmbedded) {
-        this.keymanweb.touchAliasing._BlurKeyboardSettings(this.keymanweb.domManager.lastActiveElement, PInternalName, PLgCode);
-      }
-    }
-
-    /**
      * Restore the most recently used keyboard, if still available
      */
     restoreCurrentKeyboard() {

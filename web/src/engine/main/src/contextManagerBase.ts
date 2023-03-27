@@ -94,7 +94,6 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
   }
 
   configure(config: ContextManagerConfiguration) {
-    // TODO: Set in followup configuration method.  Part of initialization?
     this._resetContext = config.resetContext;
     this._predictionContext = config.predictionContext;
     this.keyboardCache = config.keyboardCache;
@@ -341,7 +340,11 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
       let combinedPromise = Promise.race([keyboardPromise, timeoutPromise]);
 
       // Ensure the async-load Promise completes properly.
-      combinedPromise.then(() => completionPromise.resolve(null));
+      combinedPromise.then(() => {
+        completionPromise.resolve(null);
+        // Prevent any 'unhandled Promise rejection' events that may otherwise occur from the timeout promise.
+        timeoutPromise.catch(() => {});
+      });
       combinedPromise.catch((err) => {
         completionPromise.resolve(err);
         throw err;
