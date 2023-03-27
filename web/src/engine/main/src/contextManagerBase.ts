@@ -175,6 +175,15 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
     return eventReturn.continue;
   }
 
+  /**
+   * Internally registers a pending keyboard-activation's properties, only resolving to a non-null
+   * activation if it is still the most recent keyboard-activation request that would affect the
+   * corresponding context.
+   * @param kbdPromise
+   * @param metadata
+   * @param target
+   * @returns
+   */
   protected async deferredKeyboardActivation(
     kbdPromise: Promise<Keyboard>,
     metadata: KeyboardStub,
@@ -218,17 +227,25 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
     const activatingKeyboard = this.prepareKeyboardForActivation(keyboardId, languageCode);
     const originalKeyboardTarget = this.keyboardTarget;
 
-    // Triggers `beforeKeyboardChange` event
-    // - this.osk.startHide(false), when needed, could be called via handler here...
-    //                                           and on 'onAsyncKeyboardLoad'
-    // Also include an 'abort' check based upon it.
-    if(!this.confirmKeyboardChange(activatingKeyboard.metadata)) {
+    const keyboard = await activatingKeyboard.keyboard;
+    if(keyboard == null && activatingKeyboard.metadata) {
+      // The activation was async and was cancelled - either by `beforeKeyboardChange` first-pass
+      // cancellation or because a different keyboard was requested before completion of the async load.
       return false;
     }
 
-    const keyboard = await activatingKeyboard.keyboard;
-    if(keyboard == null && activatingKeyboard.metadata) {
-      // Cancelled - the activation was async and no longer valid.
+    /*
+     * Triggers `beforeKeyboardChange` event if the current context at the time when activation is possible
+     * would be affected by the requested keyboard change.
+     * - if a keyboard was asynchronously loaded for this...
+     *   - it is possible for the context (in app/browser) to have changed to a page element in
+     *     "independent keyboard" mode (or away from one)
+     *   - This is the second `beforeKeyboardChange` check - a loaded keyboard may now be activated.
+     *
+     * If the now-current context would be unaffected by the keyboard change, we do not raise the corresponding
+     * event.
+     */
+    if(this.keyboardTarget == originalKeyboardTarget && !this.confirmKeyboardChange(activatingKeyboard.metadata)) {
       return false;
     }
 
@@ -253,7 +270,8 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
    * corresponding keyboard but does not activate it.
    *
    * This acts as a helper to `activateKeyboard`, helping to centralize and DRY out the actual
-   * activation of the requested keyboard.
+   * activation of the requested keyboard.  Note that it is a synchronous method and should stay
+   * that way, though it should return a `Promise` for the activating keyboard.
    * @param keyboardId
    * @param languageCode
    * @returns
@@ -300,6 +318,16 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
     } else {
       // It's async time - the keyboard is not preloaded within the cache.  Use the stub's data to load it.
 
+      // `beforeKeyboardChange` - first check
+      // If the user cancels here, we prevent the network request that would load the keyboard from
+      // being triggered.
+      if(!this.confirmKeyboardChange(requestedStub)) {
+        return {
+          keyboard: Promise.resolve(null),
+          metadata: requestedStub
+        }
+      }
+
       // Provide a Promise for completion of the async load process.
       const completionPromise = new ManagedPromise<Error>();
       this.emit('keyboardasyncload', requestedStub, completionPromise.corePromise);
@@ -329,13 +357,7 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
             // If the user chose to load a different keyboard afterward that would affect the same
             // output target, the activation is no longer valid.
             return Promise.resolve(null);
-          } else if(activation.target == this.keyboardTarget && !this.confirmKeyboardChange(requestedStub)) {
-            // If still valid, but it would affect the active output target, we provide another chance
-            // to cancel the keyboard change - after all, we're in an async op.
-            return Promise.resolve(null);
           } else {
-            // If still valid but it won't affect the currently-active output target, we don't ask to verify.
-            // It wouldn't affect the active context, so a corresponding event would be too unclear / confusing.
             return keyboardPromise;
           }
         }),
