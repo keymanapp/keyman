@@ -9,89 +9,14 @@
 
 (function() {
   // Declare KeymanWeb and related objects
-  var keymanweb=window['keyman'], util=keymanweb['util'],device=util.device;
+  var keymanweb=window['keyman'], util=keymanweb['util'];
   var dom = com.keyman.dom;
-
-  // Allow definition of application name
-  keymanweb.options['app']='';
 
   // Flag to control refreshing of a keyboard that is already loaded
   keymanweb.mustReloadKeyboard = true;
 
   // Skip full page initialization - skips native-mode only code
   keymanweb.isEmbedded = true;
-
-  // Set default device options
-  keymanweb.setDefaultDeviceOptions = function(opt: com.keyman.OptionType) {
-    opt['attachType'] = 'manual';
-    device.app=opt['app'];
-    device.touchable=true;
-    device.formFactor = device.app.indexOf('Tablet') >= 0 ? 'tablet' : 'phone';
-    device.browser='native';
-  };
-
-  // Get default style sheet path
-  keymanweb.getStyleSheetPath = function(ssName) {
-    return keymanweb.rootPath+ssName;
-  };
-
-  keymanweb.linkStylesheetResources = function() {
-    const keyman = keymanweb as KeymanBase;
-    let util = keyman.util;
-
-    // Install the globe-hint stylesheet.
-    util.linkStyleSheet(keymanweb.getStyleSheetPath('globe-hint.css'));
-
-    // For now, the OSK will handle linking of the main OSK stylesheet separately.
-  }
-
-  // Get KMEI, KMEA keyboard path (overrides default function, allows direct app control of paths)
-  keymanweb.getKeyboardPath = function(Lfilename, packageID) {
-    return Lfilename + "?v=" + (new Date()).getTime(); /*cache buster*/
-  };
-
-  // Establishes keyboard namespacing.
-  keymanweb.namespaceID = function(Pstub) {
-    if(typeof(Pstub['KP']) != 'undefined') {
-      // An embedded use case wants to utilize package-namespacing.
-      Pstub['KI'] = Pstub['KP'] + "::" + Pstub['KI'];
-    }
-  }
-
-  // In conjunction with the KeyboardManager's installKeyboard method and script IDs, preserves a keyboard's
-  // namespaced ID.
-  keymanweb.preserveID = function(Pk) {
-    var trueID;
-
-    // Find the currently-executing script tag; KR is called directly from each keyboard's definition script.
-    if(document.currentScript) {
-      trueID = document.currentScript.id;
-    } else {
-      var scripts = document.getElementsByTagName('script');
-      var currentScript = scripts[scripts.length-1];
-
-      trueID = currentScript.id;
-    }
-
-    // Final check that the script tag is valid and appropriate for the loading keyboard.
-    if(trueID.indexOf(Pk['KI']) != -1) {
-      Pk['KI'] = trueID;  // Take the script's version of the ID, which may include package namespacing.
-    } else {
-      console.error("Error when registering keyboard:  current SCRIPT tag's ID does not match!");
-    }
-  }
-
-    /**
-   * Force reload of resource
-   *
-   *  @param  {string}  s unmodified URL
-   *  @return {string}    modified URL
-   */
-  util.unCached = function(s) {
-    var t=(new Date().getTime());
-    s = s + '?v=' + t;
-    return s;
-  };
 
   util.wait = function() {
     // Empty stub - this function should not be implemented or used within embedded code routes.
@@ -101,16 +26,6 @@
   util.alert = function() {
     // Empty stub - this function should not be implemented or used within embedded code routes.
     console.warn("util.alert() call attempted in embedded mode!");  // Sends log message to embedding app.
-  };
-
-  /**
-   * Refresh element content after change of text (if required)
-   *
-   *  @param  {Object}  Pelem   input element
-   */
-  keymanweb.refreshElementContent = function(Pelem)
-  {
-    if('ontextchange' in keymanweb) keymanweb['ontextchange'](Pelem);
   };
 
   /**

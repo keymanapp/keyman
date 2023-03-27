@@ -315,7 +315,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
 
     // OSK initialization - create DIV and set default styles
     this._Box = createUnselectableElement('div');   // Container for OSK (Help DIV, displayed when user clicks Help icon)
-    this.kbdStyleSheetManager = new StylesheetManager(this._Box);
+    this.kbdStyleSheetManager = new StylesheetManager(this._Box, this.config.doCacheBusting || false);
     this.uiStyleSheetManager = new StylesheetManager(this._Box);
 
     // Initializes the two constant OSKComponentView fields.

@@ -8,10 +8,12 @@ import { ManagedPromise } from '@keymanapp/web-utils';
 
 export class DOMKeyboardLoader extends KeyboardLoaderBase {
   public readonly element: HTMLIFrameElement;
+  private readonly performCacheBusting: boolean;
 
   constructor()
   constructor(harness: KeyboardHarness);
-  constructor(harness?: KeyboardHarness) {
+  constructor(harness: KeyboardHarness, cacheBust?: boolean)
+  constructor(harness?: KeyboardHarness, cacheBust?: boolean) {
     if(harness && harness._jsGlobal != window) {
       // Copy the String typing over; preserve string extensions!
       harness._jsGlobal['String'] = window['String'];
@@ -22,10 +24,16 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
     } else {
       super(harness);
     }
+
+    this.performCacheBusting = cacheBust || false;
   }
 
   protected loadKeyboardInternal(uri: string): Promise<Keyboard> {
     const promise = new ManagedPromise<Keyboard>();
+
+    if(this.performCacheBusting) {
+      uri = this.cacheBust(uri);
+    }
 
     try {
       const document = this.harness._jsGlobal.document;
@@ -54,5 +62,12 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
     }
 
     return promise.corePromise;
+  }
+
+  private cacheBust(uri: string) {
+    // Our WebView version directly sets the keyboard path, and it may replace the file
+    // after KMW has loaded.  We need cache-busting to prevent the new version from
+    // being ignored.
+    return uri + "?v=" + (new Date()).getTime(); /*cache buster*/
   }
 }

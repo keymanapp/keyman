@@ -26,4 +26,11 @@ export default interface Configuration extends CommonConfiguration {
    * If set to `false`, hide animations will be disallowed.  Defaults to `true`.
    */
   allowHideAnimations?: boolean;
+
+  /**
+   * If set to 'true', will perform cache-busting behaviors for linked keyboard stylesheets.
+   *
+   * Defaults to 'false'.
+   */
+  doCacheBusting?: boolean;
 }

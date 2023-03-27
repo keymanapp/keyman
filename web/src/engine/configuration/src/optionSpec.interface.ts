@@ -23,35 +23,9 @@ export interface PathOptionSpec {
   fonts?: string;
 }
 
-export interface OptionSpec extends PathOptionSpec {
-  /**
-   * May be used to denote the name of the embedding application
-   */
-  embeddingApp?: string | undefined;
-
-  // ui?: string;
-
-  /**
-   * If set to true || "true" or if left undefined, the engine will automatically select the first available
-   * keyboard for activation.
-   *
-   * Note that keyboards specified locally are synchronously loaded while cloud keyboards are async; as a
-   * result, a locally-specified keyboard will generally be available "sooner", even if added "later".
-   */
-  setActiveOnRegister?: string | boolean; // TODO: Convert to boolean. Option loader needs to be able to receive this as a string or boolean
-
-  /**
-   * Determines the default text shown on the spacebar.  If undefined, uses `LANGUAGE_KEYBOARD`
-   */
-  spacebarText?: SpacebarText;
-}
-
-export const OptionDefaults: Required<OptionSpec> = {
-  embeddingApp: undefined,
+export const PathOptionDefaults: Required<PathOptionSpec> = {
   root: '',
   resources: '',
   keyboards: '',
-  fonts: '',
-  setActiveOnRegister: true,
-  spacebarText: SpacebarText.LANGUAGE_KEYBOARD,
+  fonts: ''
 }

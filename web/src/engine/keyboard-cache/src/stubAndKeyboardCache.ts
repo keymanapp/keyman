@@ -109,6 +109,8 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
     this.keyboardTable[keyboardID] = promise;
 
     promise.then((kbd) => {
+      // Overrides the built-in ID in case of keyboard namespacing.
+      kbd.scriptObject["KI"] = keyboardID;
       this.addKeyboard(kbd);
     }).catch((err) => {
       delete this.keyboardTable[keyboardID];

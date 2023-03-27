@@ -6,10 +6,11 @@ type FontFamilyStyleMap = {[family: string]: HTMLStyleElement};
 export class StylesheetManager {
   private fontStyleDefinitions: { [os: string]: FontFamilyStyleMap} = {};
   private linkedSheets: HTMLStyleElement[] = [];
+  private doCacheBusting: boolean;
 
   public readonly linkNode: Node;
 
-  public constructor(linkNode?: Node) {
+  public constructor(linkNode?: Node, doCacheBusting?: boolean) {
     if(!linkNode) {
       let _ElemHead=document.getElementsByTagName('HEAD');
       if(_ElemHead.length > 0) {
@@ -19,6 +20,7 @@ export class StylesheetManager {
       }
     }
     this.linkNode = linkNode;
+    this.doCacheBusting = doCacheBusting || false;
   }
 
   linkStylesheet(sheet: HTMLStyleElement) {
@@ -106,8 +108,9 @@ export class StylesheetManager {
     // Modern browsers: use WOFF, TTF and fallback finally to SVG. Don't provide EOT
     if(os == DeviceSpec.OperatingSystem.iOS) {
       if(ttf != '') {
-        // once upon a time, we did a cache-prevention thing here... but that was removed long, long ago.
-        // ttf = this.unCached(ttf);
+        if(this.doCacheBusting) {
+          ttf = this.cacheBust(ttf);
+        }
         s=s+'src:url(\''+ttf+'\') format(\'truetype\');';
       } else {
         return null;
@@ -159,6 +162,13 @@ export class StylesheetManager {
     this.linkStylesheet(sheet);
 
     return sheet;
+  }
+
+  private cacheBust(uri: string) {
+    // Our WebView version directly sets the keyboard path, and it may replace the file
+    // after KMW has loaded.  We need cache-busting to prevent the new version from
+    // being ignored.
+    return uri + "?v=" + (new Date()).getTime(); /*cache buster*/
   }
 
   /**

@@ -59,7 +59,6 @@ builder_parse "$@"
 # We can run all clean & configure actions at once without much issue.
 
 builder_run_child_actions clean
-builder_run_child_actions configure
 
 ## Clean actions
 
@@ -68,6 +67,8 @@ if builder_start_action clean; then
   rm -rf ./build
   builder_finish_action success clean
 fi
+
+builder_run_child_actions configure
 
 ## Build actions
 

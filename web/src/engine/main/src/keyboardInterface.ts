@@ -3,7 +3,7 @@ import {
   KeyboardInterface as KeyboardInterfaceBase,
   KeyboardKeymanGlobal,
 } from "@keymanapp/keyboard-processor";
-import { KeyboardStub, StubAndKeyboardCache } from 'keyman/engine/keyboard-cache';
+import { KeyboardStub, RawKeyboardStub, StubAndKeyboardCache } from 'keyman/engine/keyboard-cache';
 
 import ContextManager from './contextManager.js';
 import { VariableStoreCookieSerializer } from "./variableStoreCookieSerializer.js";
@@ -11,14 +11,17 @@ import { VariableStoreCookieSerializer } from "./variableStoreCookieSerializer.j
 export default class KeyboardInterface extends KeyboardInterfaceBase {
   private readonly contextManager: ContextManager;
   private stubAndKeyboardCache: StubAndKeyboardCache;
+  private stubNamespacer?: (stub: RawKeyboardStub) => void;
 
   constructor(
     _jsGlobal: any,
     keymanGlobal: KeyboardKeymanGlobal,
-    contextManager: ContextManager
+    contextManager: ContextManager,
+    stubNamespacer?: (stub: RawKeyboardStub) => void
   ) {
     super(_jsGlobal, keymanGlobal, new VariableStoreCookieSerializer());
     this.contextManager = contextManager;
+    this.stubNamespacer = stubNamespacer;
   }
 
   setKeyboardCache(cache: StubAndKeyboardCache) {
@@ -48,7 +51,11 @@ export default class KeyboardInterface extends KeyboardInterfaceBase {
    * @param       {Object}      Pstub     Keyboard stub object
    * @return      {?number}               1 if already registered, else null
    */
-  registerStub(Pstub): number {
+  registerStub(Pstub: RawKeyboardStub): number {
+    if(this.stubNamespacer) {
+      this.stubNamespacer(Pstub);
+    }
+
     // Other notes:  this is where app-hosted KeymanWeb receives pre-formed stubs.
     // They're specified in the "internal" format (KI, KN, KLC...)
     // (SHIFT-CTRL-F @ repo-level:  `setKeymanLanguage`)
