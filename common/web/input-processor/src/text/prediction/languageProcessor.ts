@@ -68,7 +68,7 @@ interface LanguageProcessorEventMap {
   'tryrevert': () => void,
 
   /**
-   * Is called synchronously as part of suggestion application when successful.
+   * Is called synchronously once suggestion application is successful and the context has been updated.
    *
    * @param outputTarget The `OutputTarget` representation of the context the suggestion was applied to.
    * @returns

@@ -91,9 +91,10 @@ export function loadSectionFixture(compilerClass: typeof SectionCompiler, filena
   const reader = new LDMLKeyboardXMLSourceFileReader(callbacks);
   const source = reader.load(data);
   assert.isNotNull(source);
-  assert.doesNotThrow(() => {
-    reader.validate(source, callbacks.loadLdmlKeyboardSchema());
-  });
+
+  if (!reader.validate(source, callbacks.loadLdmlKeyboardSchema())) {
+    return null; // mimic kmc behavior - bail if validate fails
+  }
 
   const compiler = new compilerClass(source, callbacks);
 

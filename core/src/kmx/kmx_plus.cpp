@@ -724,7 +724,6 @@ COMP_KMXPLUS_LIST::valid(KMX_DWORD _kmn_unused(length)) const {
     assert(false);
     return false;
   }
-  // TODO-LDML: further validation in the COMP_KMXPLUS_LIST_Helper class
   return true;
 }
 
@@ -892,7 +891,7 @@ KMX_DWORD COMP_KMXPLUS_STRS::find(const std::u16string& s) const {
   if (s.empty()) {
     return 0; // shortcut
   }
-  // TODO-LDML: You're not going to search these linearly, reinterpreting each time??!
+  // TODO-LDML: suboptimal, but currently only run from the test runner. Could be a binary search since the strings are already in codepoint order.
   for (KMX_DWORD i = 0; i<count; i++) {
     if (s == get(i)) {
       return i;

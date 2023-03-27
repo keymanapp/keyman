@@ -77,9 +77,8 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     this.langProcessor = langProcessor;
     this.kbdProcessor = kbdProcessor;
 
-    const validSuggestionState: () => boolean = () => {
-      return this.currentTarget && langProcessor.state == 'configured';
-    }
+    const validSuggestionState: () => boolean = () => 
+      this.currentTarget && langProcessor.state == 'configured';
 
     this.suggestionApplier = (suggestion) => {
       if(validSuggestionState()) {

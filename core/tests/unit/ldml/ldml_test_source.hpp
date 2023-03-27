@@ -33,7 +33,7 @@ enum ldml_action_type {
    * expected text
   */
   LDML_ACTION_CHECK_EXPECTED,
-  // TODO-LDML: gestures, etc?
+  // TODO-LDML: gestures, etc? Depends on touch.
 };
 
 struct ldml_action {

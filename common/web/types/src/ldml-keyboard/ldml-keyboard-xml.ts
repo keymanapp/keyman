@@ -108,13 +108,9 @@ export interface LKFlick {
 
 export interface LKLayers {
   /**
-   * `hardware` or `touch`
+   * `touch`, or hardware `us`, `iso`, `jis`, `abnt2`
    */
   form?: string;
-  /**
-   * `us`, `iso`, `jis`, or `abnt2`
-   */
-  hardware?: string;
   /**
    * Minimum width in millimeters
    */
