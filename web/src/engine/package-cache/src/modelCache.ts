@@ -36,7 +36,7 @@ export default class ModelManager {
     });
   }
 
-  deregister(modelId: string): ModelSpec {
+  unregister(modelId: string): ModelSpec {
     let model: ModelSpec;
 
     modelId = modelId.toLowerCase();
