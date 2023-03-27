@@ -1,3 +1,5 @@
+export { ModelSpec } from '@keymanapp/input-processor';
+
 export {
   ErrorStub,
   type KeyboardAPISpec,
@@ -11,3 +13,4 @@ export { default as StubAndKeyboardCache, toPrefixedKeyboardId, toUnprefixedKeyb
 export { default as CloudQueryEngine } from './cloud/queryEngine.js';
 export { default as CloudRequesterInterface } from './cloud/requesterInterface.js';
 export { default as KeyboardRequisitioner } from './keyboardRequisitioner.js';
+export { default as ModelCache } from './modelCache.js';

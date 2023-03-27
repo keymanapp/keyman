@@ -1,5 +1,5 @@
 import { type Keyboard, Mock } from '@keymanapp/keyboard-processor';
-import { type KeyboardStub } from 'keyman/engine/keyboard-cache';
+import { type KeyboardStub } from 'keyman/engine/package-cache';
 import { ContextManagerBase, ContextManagerConfiguration } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
 

@@ -1,7 +1,7 @@
 import { DeviceSpec } from '@keymanapp/keyboard-processor'
 import { KeymanEngine as KeymanEngineBase } from 'keyman/engine/main';
 import { AnchoredOSKView, ViewConfiguration, StaticActivator } from 'keyman/engine/osk';
-import { toPrefixedKeyboardId, toUnprefixedKeyboardId } from 'keyman/engine/keyboard-cache';
+import { toPrefixedKeyboardId, toUnprefixedKeyboardId } from 'keyman/engine/package-cache';
 
 import { WebviewConfiguration, WebviewInitOptionDefaults, WebviewInitOptionSpec } from './configuration.js';
 import ContextManager from './contextManager.js';

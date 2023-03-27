@@ -6,9 +6,9 @@ await esbuild.build({
   format: "esm",
   nodePaths: ['../../../../node_modules'],
   entryPoints: {
-    'index': '../../../build/engine/keyboard-cache/obj/index.js',
+    'index': '../../../build/engine/package-cache/obj/index.js',
   },
-  outdir: '../../../build/engine/keyboard-cache/lib/',
+  outdir: '../../../build/engine/package-cache/lib/',
   outExtension: { '.js': '.mjs' },
   tsconfig: './tsconfig.json',
   target: "es5"
@@ -20,9 +20,9 @@ await esbuild.build({
   format: "esm",
   nodePaths: ['../../../../node_modules'],
   entryPoints: {
-    'dom-cloud-requester': '../../../build/engine/keyboard-cache/obj/domCloudRequester.js',
+    'dom-cloud-requester': '../../../build/engine/package-cache/obj/domCloudRequester.js',
   },
-  outdir: '../../../build/engine/keyboard-cache/lib/',
+  outdir: '../../../build/engine/package-cache/lib/',
   outExtension: { '.js': '.mjs' },
   tsconfig: './tsconfig.json',
   target: "es5"
@@ -34,9 +34,9 @@ await esbuild.build({
   format: "esm",
   nodePaths: ['../../../../node_modules'],
   entryPoints: {
-    'node-cloud-requester': '../../../build/engine/keyboard-cache/obj/nodeCloudRequester.js',
+    'node-cloud-requester': '../../../build/engine/package-cache/obj/nodeCloudRequester.js',
   },
-  outdir: '../../../build/engine/keyboard-cache/lib/',
+  outdir: '../../../build/engine/package-cache/lib/',
   outExtension: { '.js': '.mjs' },
   platform: 'node',
   tsconfig: './tsconfig.json',

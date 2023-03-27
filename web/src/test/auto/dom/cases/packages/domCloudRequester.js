@@ -1,17 +1,11 @@
-import { assert } from 'chai';
-import sinon from 'sinon';
+const assert = chai.assert;
+import sinon from '/node_modules/sinon/pkg/sinon-esm.js';
 
-import NodeCloudRequester from 'keyman/engine/keyboard-cache/node-requester';
+import DOMCloudRequester from '/@keymanapp/keyman/build/engine/package-cache/lib/dom-cloud-requester.mjs';
 
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-describe("Mocked cloud query results in headless mode ('canary' testing)", () => {
-  function performMockedRequest(mockedResultsFile) {
-    const requester = new NodeCloudRequester(true /* mocked mode:  local files */);
+describe("Mocked cloud query results ('canary' testing)", () => {
+  function performMockedRequest(mockedResultsPath) {
+    const requester = new DOMCloudRequester(true);
 
     /*
      * We aren't actually attaching to `CloudQueryEngine`, so we need two things:
@@ -21,11 +15,12 @@ describe("Mocked cloud query results in headless mode ('canary' testing)", () =>
      */
     const mockedRegisterOwner = {
       // Query promises are stored for resolution by the registration function.
-      registerFromCloud: sinon.spy(() => mockedRegisterOwner.promise.resolve())
+      register: sinon.spy(() => mockedRegisterOwner.promise.resolve())
     };
-    requester.link(mockedRegisterOwner);
+    // Must be available via keyman.register().
+    window.keyman = mockedRegisterOwner;
 
-    const queryString = mockedResultsFile;
+    const queryString = mockedResultsPath;
     const queryHandle = requester.request(queryString).promise;
 
     // Store the query's promise for resolution by our mocked register (as seen above).
@@ -33,12 +28,12 @@ describe("Mocked cloud query results in headless mode ('canary' testing)", () =>
 
     return {
       promise: queryHandle.corePromise,
-      mockedRegister: mockedRegisterOwner.registerFromCloud
+      mockedRegister: mockedRegisterOwner.register
     };
   }
 
   it('sil_euro_latin@no,sv', async () => {
-    const query = performMockedRequest(`${__dirname}/../../resources/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
+    const query = performMockedRequest('base/web/src/test/auto/resources/query-mock-results/sil_euro_latin@no_sv.js.fixture');
     await query.promise;
 
     assert.isTrue(query.mockedRegister.called);
@@ -58,7 +53,7 @@ describe("Mocked cloud query results in headless mode ('canary' testing)", () =>
   });
 
   it('sil_cameroon_azerty', async () => {
-    const query = performMockedRequest(`${__dirname}/../../resources/query-mock-results/sil_cameroon_azerty.js.fixture`);
+    const query = performMockedRequest('base/web/src/test/auto/resources/query-mock-results/sil_cameroon_azerty.js.fixture');
     await query.promise;
 
     assert.isTrue(query.mockedRegister.called);
@@ -75,7 +70,7 @@ describe("Mocked cloud query results in headless mode ('canary' testing)", () =>
   });
 
   it('@dz', async () => {
-    const query = performMockedRequest(`${__dirname}/../../resources/query-mock-results/@dz.js.fixture`);
+    const query = performMockedRequest('base/web/src/test/auto/resources/query-mock-results/@dz.js.fixture');
     await query.promise;
 
     assert.isTrue(query.mockedRegister.called);

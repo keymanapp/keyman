@@ -2,9 +2,9 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 
 import { ManagedPromise } from '@keymanapp/web-utils';
-import { CloudQueryEngine, StubAndKeyboardCache, toPrefixedKeyboardId as prefixed } from 'keyman/engine/keyboard-cache';
+import { CloudQueryEngine, StubAndKeyboardCache, toPrefixedKeyboardId as prefixed } from 'keyman/engine/package-cache';
 import { PathConfiguration } from 'keyman/engine/paths';
-import NodeCloudRequester from 'keyman/engine/keyboard-cache/node-requester';
+import NodeCloudRequester from 'keyman/engine/package-cache/node-requester';
 
 import path from 'path';
 import { fileURLToPath } from 'url';

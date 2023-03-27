@@ -1,16 +1,16 @@
-import { DefaultRules, Keyboard, KeyboardKeymanGlobal, OutputTarget, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
+import { DefaultRules, KeyboardKeymanGlobal, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
 import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
 import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
 import { OSKView } from "keyman/engine/osk";
-import { KeyboardRequisitioner } from "keyman/engine/keyboard-cache";
+import { KeyboardRequisitioner, ModelCache, ModelSpec } from "keyman/engine/package-cache";
 
-import { EngineConfiguration, InitOptionDefaults, InitOptionSpec } from "./engineConfiguration.js";
+import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
 import KeyboardInterface from "./keyboardInterface.js";
 import { ContextManagerBase } from "./contextManagerBase.js";
 import { KeyEventHandler } from './keyEventSource.interface.js';
 import HardKeyboardBase from "./hardKeyboard.js";
 import { LegacyAPIEventEngine } from "./legacyAPIEvents.js";
-import DOMCloudRequester from "keyman/engine/keyboard-cache/dom-requester";
+import DOMCloudRequester from "keyman/engine/package-cache/dom-requester";
 
 export default class KeymanEngine<ContextManager extends ContextManagerBase, HardKeyboard extends HardKeyboardBase> implements KeyboardKeymanGlobal {
   readonly config: EngineConfiguration;
@@ -18,6 +18,7 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
   readonly interface: KeyboardInterface;
   readonly processor: InputProcessor;
   readonly keyboardRequisitioner: KeyboardRequisitioner;
+  readonly modelCache: ModelCache;
 
   private legacyAPIEvents = new LegacyAPIEventEngine();
   private _hardKeyboard: HardKeyboard;
@@ -85,8 +86,9 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
     this.interface = new KeyboardInterface(window, this, this.contextManager, config.stubNamespacer);
     const keyboardLoader = new KeyboardLoader(this.interface, config.applyCacheBusting);
     this.keyboardRequisitioner = new KeyboardRequisitioner(keyboardLoader, new DOMCloudRequester(), this.config.paths);
+    this.modelCache = new ModelCache();
 
-    const cache = this.keyboardRequisitioner.cache;
+    const kbdCache = this.keyboardRequisitioner.cache;
     this.interface.setKeyboardCache(this.keyboardRequisitioner.cache);
 
     this.processor = new InputProcessor(config.hostDevice, worker, this.processorConfiguration());
@@ -101,7 +103,7 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
     // TODO:  configure that context-manager!
 
     // #region Event handler wiring
-    cache.on('stubAdded', (stub) => {
+    kbdCache.on('stubAdded', (stub) => {
       let eventRaiser = () => {
         // The corresponding event is needed in order to update UI modules as new keyboard stubs "come online".
         this.legacyAPIEvents.emit('kmw.keyboardregistered', {
@@ -120,7 +122,7 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
       }
     });
 
-    cache.on('keyboardAdded', (keyboard) => {
+    kbdCache.on('keyboardAdded', (keyboard) => {
       let eventRaiser = () => {
         // Execute any external (UI) code needed after loading keyboard
         this.legacyAPIEvents.emit('kmw.keyboardloaded', {
@@ -136,6 +138,8 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
     });
 
     contextManager.on('keyboardchange', (kbd) => {
+      this.refreshModel();
+
       if(this.osk) {
         this.osk.activeKeyboard = kbd;
       }
@@ -189,6 +193,58 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
     };
 
     return report;
+  }
+
+  private refreshModel() {
+    const kbd = this.contextManager.activeKeyboard;
+    const model = this.modelCache.modelForLanguage(kbd.metadata.langId);
+
+    if(this.processor.activeModel != model) {
+      if(this.processor.activeModel) {
+        this.processor.languageProcessor.unloadModel();
+      }
+
+      if(model) {
+        this.processor.languageProcessor.loadModel(model);
+      }
+    }
+  }
+
+  // API methods
+
+  // 17.0: new!  Only used by apps utilizing app/webview and one app/browser test page.
+
+  /**
+   * Registers the specified lexical model within Keyman Engine.  If a keyboard with a
+   * matching language code is currently activated, it will also activate the model.
+   *
+   * @param model  An object defining model ID, associated language IDs, and either the
+   *               model's definition or a path to a file containing it.
+   */
+  addModel(model: ModelSpec) {
+    this.modelCache.register(model);
+
+    if(model.languages.indexOf(this.contextManager.activeKeyboard.metadata.langId) != -1) {
+      this.refreshModel();
+    }
+  }
+
+  // 17.0: new!  Only used by apps utilizing app/webview and one app/browser test page.
+
+  /**
+   * Unregisters any previously-registered lexical model with a matching ID from Keyman Engine.
+   * If a keyboard with a matching language code is currently activated, it will also
+   * deactivate the model.
+   *
+   * @param modelId  The ID for the model to be deregistered and forgotten by Keyman Engine.
+   */
+  removeModel(modelId: string) {
+    this.modelCache.unregister(modelId);
+
+    // Is it the active model?
+    if(this.processor.activeModel && this.processor.activeModel.id == modelId) {
+      this.processor.languageProcessor.unloadModel();
+    }
   }
 }
 
