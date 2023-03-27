@@ -345,6 +345,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
+    KMManager.onConfigurationChanged(newConfig);
     getSupportActionBar().setBackgroundDrawable(getActionBarDrawable(this));
     resizeTextView(textView.isKeyboardVisible());
     invalidateOptionsMenu();
@@ -434,9 +435,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       case R.id.action_share:
         showShareDialog();
         return true;
+      /* Disable Web Browser to investigate Google sign-in
       case R.id.action_web:
         showWebBrowser();
-        return true;
+        return true;*/
       case R.id.action_text_size:
         showTextSizeDialog();
         return true;

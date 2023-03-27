@@ -23,9 +23,13 @@ developer-tests: \
   kmcomp-x64-structures \
   kmconvert \
   kmx-file-languages \
-  lexical-model-compiler \
   model-ts-parser \
-  package-info
+  package-info \
+  kmc \
+  kmc-keyboard \
+  kmc-model \
+  kmc-model-info \
+  kmc-package
 
 # ----------------------------------------------------------------------
 
@@ -66,11 +70,6 @@ kmconvert: .virtual
   cd $(DEVELOPER_ROOT)\src\test\auto\kmconvert
   $(MAKE) $(TARGET)
 
-lexical-model-compiler: .virtual
-# TODO: move this to a test target in kmlmc
-  cd $(DEVELOPER_ROOT)\src\kmlmc
-  $(GIT_BASH_FOR_KEYMAN) build.sh -test
-
 model-ts-parser: .virtual
   rem TODO
 #  cd $(DEVELOPER_ROOT)\src\test\auto\model-ts-parser
@@ -78,6 +77,30 @@ model-ts-parser: .virtual
 
 package-info: .virtual
   cd $(DEVELOPER_ROOT)\src\test\auto\package-info
+  $(MAKE) $(TARGET)
+
+# ----------------------------------------------------------------------
+# Tests outside the test/auto folder
+# ----------------------------------------------------------------------
+
+kmc: .virtual
+  cd $(DEVELOPER_ROOT)\src\kmc
+  $(MAKE) $(TARGET)
+
+kmc-keyboard: .virtual
+  cd $(DEVELOPER_ROOT)\src\kmc-keyboard
+  $(MAKE) $(TARGET)
+
+kmc-model: .virtual
+  cd $(DEVELOPER_ROOT)\src\kmc-model
+  $(MAKE) $(TARGET)
+
+kmc-model-info: .virtual
+  cd $(DEVELOPER_ROOT)\src\kmc-model-info
+  $(MAKE) $(TARGET)
+
+kmc-package: .virtual
+  cd $(DEVELOPER_ROOT)\src\kmc-package
   $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------

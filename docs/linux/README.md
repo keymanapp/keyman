@@ -33,20 +33,19 @@ See [license information](../../linux/LICENSE.md) about licensing.
 
 - The process to build and install everything is:
 
-  - `make reconf` to create the build system and set the version
-  - `make fullbuild` to configure and build
-  - `sudo make install` to install to `/usr/local`
+  - `linux/build.sh configure` to set the version and setup the build system
+  - `linux/build.sh build` to build
+  - `sudo linux/build.sh install` to install to `/usr/local`
 
-- Some of the files must be installed to `/usr/share/` so `make install` must be run as `sudo`.
+- Some of the files must be installed to `/usr/share/` or `/usr/local/share`
+  so `linux/build.sh install` must be run as `sudo`.
 
-  To do this run `sudo make install`
+  To do this run `sudo linux/build.sh install`
 
-  - This will install to `/usr/local`
-    - and `/usr/share/ibus/component/keyman.xml` and `/usr/share/keyman/icons`
+  - This will install to `/usr/local` and
+    `/usr/local/share/ibus/component/keyman.xml` and `/usr/local/share/keyman/icons`
 
-  - If you already have the ibus-keyman package installed then it will move the file `/usr/share/ibus/component/keyman.xml` to `/usr/share/doc/ibus-keyman/`
-
-- run `sudo make uninstall` to uninstall everything and put it back again
+- run `sudo linux/build.sh uninstall` to uninstall everything and put it back again
 
 #### Tmp install
 
@@ -64,17 +63,7 @@ So
 
 - **keyboardprocessor** must be built before **ibus-keyman**
 
-For each project run `./configure && make && make install`.
-
-You may prefer to create a different directory to build in and run configure from there e.g.
-
-```bash
-mkdir ../build-ibus-keyman
-cd ../build-ibus-keyman
-../ibus-keyman/configure
-make
-make install
-```
+For each project run `./build.sh && ./build.sh install`.
 
 ## Continuous integration
 
@@ -109,37 +98,47 @@ to run the tests with X11.
 The tests can be run with the following command:
 
 ```bash
+cd linux/ibus-keyman
+./build.sh test
+```
+
+or with a script that accepts additional parameters:
+
+```bash
 cd linux/ibus-keyman/tests
-./run-tests
+scripts/run-tests
 ```
 
 The `run-tests` script accepts different arguments which can be seen with
-`./run-tests --help`.
+`scripts/run-tests --help`.
 
 ## Running Keyman for Linux
 
 ### Setting up Ibus
 
-Ibus should be running on a default install of Ubuntu
+Ibus should be running on a default install of Ubuntu.
 
-You may want to install extra packages to get other ibus input methods e.g **ibus-unikey** for VN
+You may want to install extra packages to get other ibus input methods e.g
+**ibus-unikey** for VN.
 
-Run `ibus restart` after installing any of them
+Run `ibus restart` after installing any of them.
 
 ### Getting a Keyman keyboard
 
-- After installing a Keyman keyboard usually ibus will be restarted automatically so that ibus will
-  look for the new keyboard. If for whatever reason the keyboard doesn't show up in the system
+- After installing a Keyman keyboard usually ibus will be restarted
+  automatically so that ibus will look for the new keyboard. If for
+  whatever reason the keyboard doesn't show up in the system
   keyboard list, you can manually run `ibus restart`.
 
 ### Activating a Keyman keyboard
 
-Keyman tries to activate the keyboard automatically. If you want to activate it for a different
-language, you can do so by following the steps below.
+Keyman tries to activate the keyboard automatically. If you want to activate
+it for a different language, you can do so by following the steps below.
 
 #### GNOME3 (focal and bionic default, also newer Ubuntu versions)
 
-- Click the connection/sound/shutdown section in the top right. Then the tools icon for Settings.
+- Click the connection/sound/shutdown section in the top right. Then the tools
+  icon for Settings.
 
 - In `Language and Region` click `+` to add a keyboard.
 - Click the 3 dots expander then search for "Other" and click it

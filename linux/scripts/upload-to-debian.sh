@@ -30,8 +30,8 @@ END
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -47,7 +47,7 @@ while (( $# )); do
             if [ ! $# -eq 0 ]; then
                 DEBKEYID=$1
             else
-                fail "Error: The -k argument is missing a value. Exiting."
+                builder_die "Error: The -k argument is missing a value. Exiting."
             fi;;
         -n) NOOP=: ;;
         --help) usage ; exit 0 ;;
@@ -57,11 +57,11 @@ while (( $# )); do
             if [ ! $# -eq 0 ]; then
                 REVISION=$1
             else
-                fail "Error: The --debian-revision argument is missing a value. Exiting."
+                builder_die "Error: The --debian-revision argument is missing a value. Exiting."
             fi;;
-        *) fail "Error: Unexpected argument \"$1\". Exiting." ;;
+        *) builder_die "Error: Unexpected argument \"$1\". Exiting." ;;
     esac
-    shift || fail "Error: The last argument is missing a value. Exiting."
+    shift || builder_die "Error: The last argument is missing a value. Exiting."
 done
 
 if [ -z "$DEBKEYID" ]; then
@@ -70,10 +70,10 @@ if [ -z "$DEBKEYID" ]; then
 fi
 
 if ! git diff --quiet; then
-    fail "You have changed files in your git working directory. Exiting."
+    builder_die "You have changed files in your git working directory. Exiting."
 fi
 
-echo_heading "Fetching latest changes"
+builder_heading "Fetching latest changes"
 git fetch -p origin
 stable_branch=$(git branch -r | grep origin/stable- | sort | tail -1)
 stable_branch=${stable_branch##* }
@@ -88,16 +88,16 @@ else
 fi
 
 cd "$KEYMAN_ROOT/linux"
-echo_heading "Building source package"
+builder_heading "Building source package"
 DIST=unstable DEBREVISION=$REVISION scripts/debian.sh
 cd debianpackage/
-echo_heading "Signing source package"
+builder_heading "Signing source package"
 debsign -k"$DEBKEYID" --re-sign ./*.changes
-echo_heading "Uploading packages to mentors.debian.net"
+builder_heading "Uploading packages to mentors.debian.net"
 $NOOP dput mentors ./*.changes
 cd ..
 
-echo_heading "Updating changelog"
+builder_heading "Updating changelog"
 # base changelog branch on remote stable branch
 git checkout -B chore/linux/changelog "$stable_branch"
 cp debianpackage/keyman-*/debian/changelog debian/
@@ -105,6 +105,7 @@ git add debian/changelog
 git commit -m "chore(linux): Update debian changelog"
 if [ -n "$PUSH" ]; then
     $NOOP git push --force-with-lease origin chore/linux/changelog
+    $NOOP gh pr create --draft --base "$stable_branch" --title "chore(linux): Update debian changelog" --body "@keymanapp-test-bot skip"
 fi
 
 if $ISBETA; then
@@ -117,9 +118,10 @@ git checkout -B chore/linux/cherry-pick/changelog ${CLBRANCH}
 git cherry-pick -x chore/linux/changelog
 if [ -n "$PUSH" ]; then
     $NOOP git push --force-with-lease origin chore/linux/cherry-pick/changelog
+    $NOOP gh pr create --draft --base ${CLBRANCH} --title "chore(linux): Update debian changelog 🍒" --body "@keymanapp-test-bot skip"
 fi
 
-echo_heading "Finishing"
+builder_heading "Finishing"
 if $ISBETA; then
     git checkout beta
 else

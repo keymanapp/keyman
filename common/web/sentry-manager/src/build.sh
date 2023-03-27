@@ -6,8 +6,8 @@ set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -44,10 +44,10 @@ done
 if [ $FETCH_DEPS = true ]; then
     verify_npm_setup
     # We need to build keyman-version with a script for now
-    "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
+    "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || builder_die "Could not build keyman-version"
 fi
 
-npm run tsc -- --build "$THIS_SCRIPT_PATH/tsconfig.json"
+tsc --build "$THIS_SCRIPT_PATH/tsconfig.json"
 if [ $? -ne 0 ]; then
-    fail "Compilation of package for Sentry integration with KeymanWeb failed."
+    builder_die "Compilation of package for Sentry integration with KeymanWeb failed."
 fi

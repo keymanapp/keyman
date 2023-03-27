@@ -1,0 +1,7 @@
+c Description: see b_000_zero_checksum.txt
+c keys: abc
+c expected: abc
+c context:
+
+begin Unicode > use(main)
+group(main) using keys

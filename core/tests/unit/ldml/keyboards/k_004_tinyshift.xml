@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+@@keys: [SHIFT K_BKQUOTE][K_1][K_BKQUOTE]
+@@expected: \u0037\u1790\u17B6\u0127
+
+-->
+<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
+<keyboard locale="mt" conformsTo="techpreview">
+  <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
+
+  <names>
+    <name value="TestKbd" />
+  </names>
+
+  <keys>
+    <key id="hmaqtugha" to="ħ" />
+    <key id="that" to="ថា" />
+    <key id="seven" to="7" />
+    <key id="eee" to="e" />
+  </keys>
+
+  <layers form="us">
+    <layer id="base" modifier="none">
+      <row keys="hmaqtugha that" /> <!-- number row -->
+    </layer>
+    <layer id="shift" modifier="shift">
+      <row keys="seven eee" /> <!-- number row -->
+    </layer>
+  </layers>
+</keyboard>
