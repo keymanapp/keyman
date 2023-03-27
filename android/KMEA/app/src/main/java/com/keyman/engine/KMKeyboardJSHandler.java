@@ -23,7 +23,7 @@ import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.util.CharSequenceUtil;
 import com.keyman.engine.util.KMLog;
 
-public abstract class KMKeyboardJSHandler {
+public class KMKeyboardJSHandler {
   private Context context;
   private KMKeyboard k = null;
   private static int KM_VIBRATE_DURATION = 100; // milliseconds
