@@ -66,6 +66,13 @@ interface LanguageProcessorEventMap {
   'statechange': StateChangeHandler,
   'tryaccept': TryUIHandler,
   'tryrevert': () => void,
+
+  /**
+   * Is called synchronously once suggestion application is successful and the context has been updated.
+   *
+   * @param outputTarget The `OutputTarget` representation of the context the suggestion was applied to.
+   * @returns
+   */
   'suggestionapplied': (outputTarget: OutputTarget) => boolean
 }
 
@@ -164,23 +171,23 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
     });
   }
 
-  public invalidateContext(outputTarget: OutputTarget, layerId: string) {
+  public invalidateContext(outputTarget: OutputTarget, layerId: string): Promise<Suggestion[]> {
     // Signal to any predictive text UI that the context has changed, invalidating recent predictions.
     this.emit('invalidatesuggestions', 'context');
 
     // If there's no active model, there can be no predictions.
     // We'll also be missing important data needed to even properly REQUEST the predictions.
     if(!this.currentModel || !this.configuration) {
-      return;
+      return Promise.resolve([]);
     }
 
     // Don't attempt predictions when disabled!
     // invalidateContext otherwise bypasses .predict()'s check against this.
     if(!this.isActive) {
-      return;
+      return Promise.resolve([]);
     } else if(outputTarget) {
       let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
-      this.predict_internal(transcription, true, layerId);
+      return this.predict_internal(transcription, true, layerId);
     }
   }
 

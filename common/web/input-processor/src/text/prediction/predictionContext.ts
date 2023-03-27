@@ -5,16 +5,10 @@ import { type KeyboardProcessor, type OutputTarget } from "@keymanapp/keyboard-p
 
 interface PredictionContextEventMap {
   update: (suggestions: Suggestion[]) => void;
-
 }
 
 /**
- * Maintains predictive-text state information corresponding to a specific context (and associated
- * OutputTarget).  Instances should be thrown out and replaced when the context is reset and/or the
- * active lexical model has changed.
- *
- * This should not be constructed if the `LanguageProcessor` is in an "inactive" state; if no model is
- * available, the 'lexical model' aspect of predictive context is effectively null.
+ * Maintains predictive-text state information corresponding to the current context.
  */
 export default class PredictionContext extends EventEmitter<PredictionContextEventMap> {
   // Historical note:  before 17.0, this code was intertwined with /web/source/osk/banner.ts's
@@ -37,8 +31,30 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   private doRevert: boolean = false;
   private recentRevert: boolean = false;
 
-
   private langProcessor: LanguageProcessor;
+  private kbdProcessor: KeyboardProcessor;
+
+  /**
+   * Represents the active context used when requesting and applying predictive-text operations.
+   */
+  private _currentTarget: OutputTarget;
+
+  public get currentTarget(): OutputTarget {
+    return this._currentTarget;
+  }
+
+  public setCurrentTarget(target: OutputTarget): Promise<Suggestion[]> {
+    const originalTarget = this._currentTarget;
+    this._currentTarget = target;
+
+    if(originalTarget != target) {
+      // Note:  should be triggered after the corresponding new-context event rule has been processed,
+      // as that may affect the value of layerId here.
+      return this.langProcessor.invalidateContext(target, this.kbdProcessor.layerId);
+    } else {
+      return Promise.resolve([]);
+    }
+  }
 
   private readonly suggestionApplier: (suggestion: Suggestion) => Promise<Reversion>;
   private readonly suggestionReverter: (reversion: Reversion) => void;
@@ -46,83 +62,51 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   /**
    * Handler for post-processing once a suggestion has been applied: calls
    * into the active keyboard's `begin postKeystroke` entry point.
+   *
+   * Called after the suggestion is applied but _before_ new predictions are
+   * requested based on the resulting context.
    */
-  private readonly postApplicationHandler: (target: OutputTarget) => void;
+  private readonly postApplicationHandler: () => void;
 
-  public constructor(langProcessor: LanguageProcessor, kbdProcessor: KeyboardProcessor, target: OutputTarget) {
+  public constructor(langProcessor: LanguageProcessor, kbdProcessor: KeyboardProcessor) {
     super();
 
     if(langProcessor.state == 'inactive') {
       throw new Error("Invalid state:  no predictive-text model is currently available.");
     }
-
-    if(!target) {
-      throw new Error("No text context is available to use for prediction!");
-    }
-
     this.langProcessor = langProcessor;
+    this.kbdProcessor = kbdProcessor;
+
+    const validSuggestionState: () => boolean = () => 
+      this.currentTarget && langProcessor.state == 'configured';
 
     this.suggestionApplier = (suggestion) => {
-      return langProcessor.applySuggestion(suggestion, target, () => kbdProcessor.layerId);
+      if(validSuggestionState()) {
+        return langProcessor.applySuggestion(suggestion, this.currentTarget, () => kbdProcessor.layerId);
+      }
     }
 
     this.suggestionReverter = (reversion) => {
-      langProcessor.applyReversion(reversion, target);
+      if(validSuggestionState()) {
+        langProcessor.applyReversion(reversion, this.currentTarget);
+      }
     }
 
-    // This can probably be handled by... whatever holds the PredictionContext object
-    // instead; possibly InputProcessor.  It was moved here since it's more closely-related
-    // to the old banner code that landed here, hence its current location.
-    //
-    // The "whatever holds the PredictionContext object" bit is significant, as that hasn't
-    // been fully worked out at this point of the ES module-conversion process.
-    //
-    // Note: moving this handler out of this specific class allows the constructor to
-    // drop the `kbdProcessor` parameter in favor of a lambda/closure that's just
-    // `() => kbdProcessor.layerId`.  Yay for narrower abstraction needs; that'd make
-    // unit testing way easier to lightly 'mock' in a proper manner.
-    //
-    // Should not be static, as diff constructor calls may use diff kbdProcessor instances.
-    this.postApplicationHandler = (outputTarget: OutputTarget) => {
-      if(target != outputTarget) {
-        return;
-      }
-
+    // As it's called synchronously via event-callback during `this.suggestionApplier`,
+    // `this.currentTarget` is guaranteed to remain unchanged.
+    this.postApplicationHandler = () => {
       // Tell the keyboard that the current layer has not changed
       kbdProcessor.newLayerStore.set('');
       kbdProcessor.oldLayerStore.set('');
       // Call the keyboard's entry point.
-      kbdProcessor.processPostKeystroke(kbdProcessor.contextDevice, outputTarget)
+      kbdProcessor.processPostKeystroke(kbdProcessor.contextDevice, this.currentTarget)
         // If we have a RuleBehavior as a result, run it on the target. This should
         // only change system store and variable store values.
-        ?.finalize(kbdProcessor, outputTarget, true);
+        ?.finalize(kbdProcessor, this.currentTarget, true);
     };
 
     this.connect();
-
-    this.initializeState = () => {
-      if(langProcessor.isConfigured && target) {
-        return langProcessor.predictFromTarget(target, kbdProcessor.layerId);
-      } else {
-        // if(langProcessor.state == 'active') // model is loadING, not loadED.
-        return new Promise((resolve, reject) => {
-          langProcessor.once('statechange', (state) => {
-            if(state == 'configured') {
-              resolve(langProcessor.predictFromTarget(target, kbdProcessor.layerId));
-            } else { // == 'inactive' // an error occurred; the model load failed.
-              reject(new Error("The set predictive-text model failed to load and/or configure properly."));
-            }
-            // 'active' does not occur; we got here because that was the previous value.
-          });
-        });
-      }
-    }
   }
-
-  /**
-   * Generates predictions based on the current state of the context, absent any incoming keystrokes.
-   */
-  public readonly initializeState: () => Promise<Suggestion[]>;
 
   private connect() {
     this.langProcessor.addListener('invalidatesuggestions', this.invalidateSuggestions);
@@ -160,7 +144,6 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
 
   /**
    * Function apply
-   * @param target (Optional) The OutputTarget to which the `Suggestion` ought be applied.
    * Description  Applies the predictive `Suggestion` represented by this `BannerSuggestion`.
    */
   private acceptInternal(suggestion: Suggestion): Promise<Reversion> {
