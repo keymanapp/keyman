@@ -60,7 +60,7 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action publish; then
-  . "$KEYMAN_ROOT/resources/build/npm-publish.inc.sh"
-  npm_publish
+  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+  builder_publish_to_npm
   builder_finish_action success publish
 fi
