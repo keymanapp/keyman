@@ -28,6 +28,9 @@ NSString *const Q_SAVEOPT = @"Q_SAVEOPT"; // KM_KBP_IT_PERSIST_OPT
 
 @implementation CoreAction
 
+/*
+ * Designated initializer
+ */
 -(instancetype)initWithType: (ActionType)type actionContent:(NSString*)content backspaceCount:(int)backspaceCount {
   self = [super init];
   if (self) {
