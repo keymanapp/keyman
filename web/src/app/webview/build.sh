@@ -24,7 +24,7 @@ SUBPROJECT_NAME=app/webview
 builder_describe "Builds the Keyman Engine for Web's puppetable version designed for use within WebViews." \
   "@/common/web/input-processor build" \
   "@/web/src/engine/device-detect build" \
-  "@/web/src/engine/configuration build" \
+  "@/web/src/engine/paths build" \
   "@/web/src/engine/keyboard-cache build" \
   "@/web/src/engine/osk build" \
   "@/web/src/engine/main build" \

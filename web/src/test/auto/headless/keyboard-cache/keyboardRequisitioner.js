@@ -8,7 +8,7 @@ import {
   KeyboardRequisitioner,
   toPrefixedKeyboardId as prefixed
 } from 'keyman/engine/keyboard-cache';
-import { PathConfiguration } from 'keyman/engine/configuration';
+import { PathConfiguration } from 'keyman/engine/paths';
 import NodeCloudRequester from 'keyman/engine/keyboard-cache/node-requester';
 
 import path from 'path';

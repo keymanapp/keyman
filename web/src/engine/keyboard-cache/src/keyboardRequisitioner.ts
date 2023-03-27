@@ -4,7 +4,7 @@ import {
   LanguageAPIPropertySpec,
   RawKeyboardMetadata
 } from "@keymanapp/keyboard-processor";
-import { PathConfiguration } from "keyman/engine/configuration";
+import { PathConfiguration } from "keyman/engine/paths";
 
 // TODO:  is cleanup needed here, to use local paths instead?
 import { CloudQueryEngine, type ErrorStub, KeyboardAPISpec, KeyboardStub, StubAndKeyboardCache, RawKeyboardStub, mergeAndResolveStubPromises } from "./index.js";

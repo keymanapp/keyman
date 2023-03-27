@@ -3,7 +3,7 @@ import sinon from '/node_modules/sinon/pkg/sinon-esm.js';
 
 import { KeyboardHarness, MinimalKeymanGlobal } from '/@keymanapp/keyboard-processor/build/lib/index.mjs';
 import { DOMKeyboardLoader } from '/@keymanapp/keyboard-processor/build/lib/dom-keyboard-loader.mjs';
-import { PathConfiguration } from '/@keymanapp/keyman/build/engine/configuration/lib/index.mjs';
+import { PathConfiguration } from '/@keymanapp/keyman/build/engine/paths/lib/index.mjs';
 import { KeyboardRequisitioner } from '/@keymanapp/keyman/build/engine/keyboard-cache/lib/index.mjs';
 import DOMCloudRequester from '/@keymanapp/keyman/build/engine/keyboard-cache/lib/dom-cloud-requester.mjs';
 

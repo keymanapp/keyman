@@ -1,5 +1,5 @@
 import { DeviceSpec, ManagedPromise, physicalKeyDeviceAlias, SpacebarText } from "@keymanapp/keyboard-processor";
-import { PathConfiguration, PathOptionDefaults, PathOptionSpec } from "keyman/engine/configuration";
+import { PathConfiguration, PathOptionDefaults, PathOptionSpec } from "keyman/engine/paths";
 import { Device } from "keyman/engine/device-detect";
 import { KeyboardStub } from "keyman/engine/keyboard-cache";
 

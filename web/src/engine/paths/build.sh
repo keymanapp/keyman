@@ -16,7 +16,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 cd "$THIS_SCRIPT_PATH"
 
 # Imports common Web build-script definitions & functions
-SUBPROJECT_NAME=engine/configuration
+SUBPROJECT_NAME=engine/paths
 . "$KEYMAN_ROOT/web/common.inc.sh"
 
 # ################################ Main script ################################
@@ -59,6 +59,6 @@ fi
 
 if builder_start_action test; then
   # TODO:  CI vs manual:  how the tests are reported.
-  mocha --recursive "${KEYMAN_ROOT}/web/src/test/auto/headless/configuration"
+  mocha --recursive "${KEYMAN_ROOT}/web/src/test/auto/headless/paths"
   builder_finish_action success test
 fi
