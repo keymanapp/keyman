@@ -1,25 +1,8 @@
 import { OutputTarget as OutputTargetBase } from "@keymanapp/keyboard-processor";
 import EventEmitter from 'eventemitter3';
 
-export interface BaseEventMap {
-  /**
-   * Meant to facilitate the following code that existed pre-modularization:
-   ```
-    // This class has non-integrated unit tests in which the `singleton` object doesn't exist.
-    // Thus, we need to test for this case.
-    let keyman = com.keyman['singleton'];
-
-    // Signal the necessary text changes to the embedding app, if it exists.
-    if(keyman && keyman['oninserttext'] && keyman.isEmbedded) {
-      keyman['oninserttext'](transform.deleteLeft, transform.insert, transform.deleteRight);
-    }
-   ```
-   */
-  'oninserttext': (deleteLeft: number, insert: string, deleteRight: number) => void;
-}
-
-export default abstract class OutputTarget<EventMap extends BaseEventMap = BaseEventMap> extends OutputTargetBase {
-  // JS/TS can't do multiple inheritance, so we maintain class events on a readonly field.
+export default abstract class OutputTarget<EventMap extends EventEmitter.ValidEventTypes> extends OutputTargetBase {
+  // JS/TS can't do true multiple inheritance, so we maintain class events on a readonly field.
   public readonly events: EventEmitter<EventMap, this> = new EventEmitter<EventMap, this>();
 
   /**
@@ -49,14 +32,5 @@ export default abstract class OutputTarget<EventMap extends BaseEventMap = BaseE
     if(elem && event) {
       elem.dispatchEvent(event);
     }
-  }
-
-  apply(transform: Transform) {
-    super.apply(transform);
-
-    // The TS compiler can't quite handle this typing scenario properly; the following cast
-    // allows us to work around its type inference limitations.
-    const baseEvents = (this.events as unknown as EventEmitter<BaseEventMap, this>);
-    baseEvents.emit('oninserttext', transform.deleteLeft, transform.insert, transform.deleteRight);
   }
 }

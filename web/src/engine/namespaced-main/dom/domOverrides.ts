@@ -8,6 +8,9 @@ namespace com.keyman.dom {
     return true;
   }
 
+  // TODO:  noting that we do the default behavior instantly... just make it a callback used to
+  // configure the processors.  Have them call it whenever finalizing rules... or even pass it
+  // to constructing RuleBehavior instances.
   let headlessRuleBehaviorFinalize = text.RuleBehavior.prototype.finalize;
   text.RuleBehavior.prototype.finalize = function(this: text.RuleBehavior, processor: text.KeyboardProcessor, outputTarget: text.OutputTarget, readonly: boolean) {
     let keyman = com.keyman.singleton;
@@ -24,15 +27,6 @@ namespace com.keyman.dom {
     if(ruleTransform.insert != "" || ruleTransform.deleteLeft > 0 || ruleTransform.deleteRight > 0) {
       if(outputTarget instanceof targets.OutputTarget && outputTarget.getElement() == keyman.domManager.activeElement) {
         dom.DOMEventHandlers.states.changed = true;
-      }
-    }
-
-    // KMEA and KMEI (embedded mode) use direct insertion of the character string
-    if(keyman.isEmbedded) {
-      // A special embedded callback used to setup direct callbacks to app-native code.
-      keyman['oninserttext'](ruleTransform.deleteLeft, ruleTransform.insert, ruleTransform.deleteRight);
-      if(outputTarget instanceof targets.OutputTarget) {
-        keyman.refreshElementContent(outputTarget.getElement());
       }
     }
   }

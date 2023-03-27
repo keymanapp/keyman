@@ -85,7 +85,7 @@ export default class InputProcessor {
    * @returns  {Object}                 A RuleBehavior object describing the cumulative effects of
    *                                    all matched keyboard rules
    */
-    processNewContextEvent(outputTarget: OutputTarget): RuleBehavior {
+  processNewContextEvent(outputTarget: OutputTarget): RuleBehavior {
     const ruleBehavior = this.keyboardProcessor.processNewContextEvent(this.contextDevice, outputTarget);
 
     if(ruleBehavior) {
@@ -365,13 +365,7 @@ export default class InputProcessor {
   }
 
   public resetContext(outputTarget?: OutputTarget) {
-    this.keyboardProcessor.resetContext();
+    this.keyboardProcessor.resetContext(outputTarget);
     this.languageProcessor.invalidateContext(outputTarget, this.keyboardProcessor.layerId);
-
-    // Let the keyboard do its initial group processing
-    //console.log('processNewContextEvent called from resetContext');
-    if(outputTarget) {
-      this.processNewContextEvent(outputTarget);
-    }
   }
 }

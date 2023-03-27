@@ -322,7 +322,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
     this.bannerView   = new BannerView();
     this.bannerView.events.on('bannerchange', () => this.refreshLayout());
 
-    this._bannerController = new BannerController(this.bannerView, this.hostDevice);
+    this._bannerController = new BannerController(this.bannerView, this.hostDevice, this.config.predictionContextManager);
 
     this.keyboardView = null;
 
@@ -337,7 +337,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
   }
 
   public get bannerController(): BannerController {
-    return this.bannerController;
+    return this._bannerController;
   }
 
   public get hostDevice(): DeviceSpec {

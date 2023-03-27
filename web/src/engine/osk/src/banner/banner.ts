@@ -423,8 +423,10 @@ export class SuggestionBanner extends Banner {
 
     // connect the new one!
     this._predictionContext = context;
-    context.on('update', this.onSuggestionUpdate);
-    this.onSuggestionUpdate(context.currentSuggestions);
+    if(context) {
+      context.on('update', this.onSuggestionUpdate);
+      this.onSuggestionUpdate(context.currentSuggestions);
+    }
   }
 
   public onSuggestionUpdate = (suggestions: Suggestion[]): void => {

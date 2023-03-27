@@ -5,7 +5,7 @@ import OSKViewComponent from '../components/oskViewComponent.interface.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 
 import { DeviceSpec } from '@keymanapp/web-utils';
-import type { StateChangeEnum } from '@keymanapp/input-processor';
+import type { PredictionContext, StateChangeEnum } from '@keymanapp/input-processor';
 import { createUnselectableElement } from 'keyman/engine/dom-utils';
 
 /**
@@ -158,6 +158,8 @@ export class BannerController {
   private alwaysShow: boolean;
   private imagePath?: string = "";
 
+  private predictionContext?: PredictionContext;
+
   private readonly hostDevice: DeviceSpec;
 
   public static readonly DEFAULT_OPTIONS: BannerOptions = {
@@ -165,10 +167,11 @@ export class BannerController {
     imagePath: ""
   }
 
-  constructor(bannerView: BannerView, hostDevice: DeviceSpec) {
+  constructor(bannerView: BannerView, hostDevice: DeviceSpec, predictionContext?: PredictionContext) {
     // Step 1 - establish the container element.  Must come before this.setOptions.
     this.hostDevice = hostDevice;
     this.container = bannerView;
+    this.predictionContext = predictionContext;
 
     // Initialize with the default options - any 'manually set' options come post-construction.
     // This will also automatically set the default banner in place.
@@ -281,8 +284,8 @@ export class BannerController {
       } else {
         this.setBanner('blank');
       }
-    } else if(state == 'configured') {
-      // TODO:  refresh PredictionContext once available.
+    } else if(state == 'configured' && this.activeBanner instanceof SuggestionBanner) {
+      this.activeBanner.predictionContext = this.predictionContext || null;
     }
   }
 

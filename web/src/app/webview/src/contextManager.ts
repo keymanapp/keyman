@@ -1,24 +1,63 @@
-import { Mock } from '@keymanapp/keyboard-processor';
-import { ContextManager as ContextManagerBase } from 'keyman/engine/main';
+import { type Keyboard, Mock } from '@keymanapp/keyboard-processor';
+import { type KeyboardStub } from 'keyman/engine/keyboard-cache';
+import { ContextManagerBase, ContextManagerConfiguration } from 'keyman/engine/main';
+import { WebviewConfiguration } from './configuration.js';
+
+export type OnInsertTextFunc = (deleteLeft: number, text: string, deleteRight: number) => void;
+
+class ContextHost extends Mock {
+  readonly oninserttext?: OnInsertTextFunc;
+
+  constructor(oninserttext: OnInsertTextFunc) {
+    super();
+    this.oninserttext = oninserttext;
+  }
+
+  apply(transform: Transform): void {
+    super.apply(transform);
+
+    // Signal the necessary text changes to the embedding app, if it exists.
+    if(this.oninserttext) {
+      this.oninserttext(transform.deleteLeft, transform.insert, transform.deleteRight);
+    }
+  }
+}
 
 export default class ContextManager extends ContextManagerBase {
   // Change of context?  Just replace the Mock.  Context will be ENTIRELY controlled
   // by whatever is hosting the WebView.  (Some aspects of this context replacement have
   // yet to be modularized at this time, though.)
-  private _rawContext: Mock;
+  private _rawContext: ContextHost;
+  private config: WebviewConfiguration;
 
-  constructor() {
+  private _activeKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
+
+  constructor(engineConfig: WebviewConfiguration) {
     super();
-    this._rawContext = new Mock();
+
+    this.config = engineConfig;
   }
 
   initialize(): void {
-    // There's little distinct to do on page-load for the WebView-hosted version of KMW.
-    // We don't do page integration here.  That said...
-    // TBD:  keyman.domManager.init (there probably are a few embedding-specific aspects worth note)
+    this._rawContext = new ContextHost(this.config.oninserttext);
+    this.resetContext();
   }
 
   get activeTarget(): Mock {
     return this._rawContext;
+  }
+
+  get activeKeyboard() {
+    return this._activeKeyboard;
+  }
+
+  set activeKeyboard(kbd: {keyboard: Keyboard, metadata: KeyboardStub}) {
+    const priorEntry = this._activeKeyboard;
+    this._activeKeyboard = kbd;
+
+    if(priorEntry.keyboard != kbd.keyboard || priorEntry.metadata != kbd.metadata) {
+      this.emit('keyboardchange', kbd);
+      this.resetContext();
+    }
   }
 }

@@ -6,7 +6,7 @@ import { KeyboardRequisitioner } from "keyman/engine/keyboard-cache";
 
 import { EngineConfiguration, InitOptionDefaults, InitOptionSpec } from "./engineConfiguration.js";
 import KeyboardInterface from "./keyboardInterface.js";
-import ContextManagerBase from "./contextManager.js";
+import { ContextManagerBase } from "./contextManagerBase.js";
 import { KeyEventHandler } from './keyEventSource.interface.js';
 import HardKeyboardBase from "./hardKeyboard.js";
 import { LegacyAPIEventEngine } from "./legacyAPIEvents.js";
@@ -66,6 +66,9 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
       defaultOutputRules: new DefaultRules()
     };
   };
+
+  //
+
   /**
    * @param worker  A configured WebWorker to serve as the predictive-text engine's main thread.
    *                Available in the following variants:
@@ -88,6 +91,16 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
 
     this.processor = new InputProcessor(config.hostDevice, worker, this.processorConfiguration());
 
+    this.contextManager.configure({
+      resetKeyState: (target) => {
+        this.processor.keyboardProcessor.resetContext(target);
+      },
+      predictionContext: new PredictionContext(this.processor.languageProcessor, this.processor.keyboardProcessor)
+    });
+
+    // TODO:  configure that context-manager!
+
+    // #region Event handler wiring
     cache.on('stubAdded', (stub) => {
       let eventRaiser = () => {
         // The corresponding event is needed in order to update UI modules as new keyboard stubs "come online".
@@ -121,6 +134,13 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
         this.config.deferForInitialization.then(eventRaiser);
       }
     });
+
+    contextManager.on('keyboardchange', (kbd) => {
+      if(this.osk) {
+        this.osk.activeKeyboard = kbd;
+      }
+    });
+    // #endregion
   }
 
   init(optionSpec: Required<InitOptionSpec>): void {
