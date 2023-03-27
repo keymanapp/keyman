@@ -630,31 +630,34 @@ public final class KMManager {
   }
 
   private static void initKeyboard(Context appContext, KeyboardType keyboardType) {
+    KMKeyboard keyboard = null;
+    KMKeyboardWebViewClient webViewClient = null;
+
     if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard == null) {
       InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
-      InAppKeyboard.setLayoutParams(params);
-      InAppKeyboard.setVerticalScrollBarEnabled(false);
-      InAppKeyboard.setHorizontalScrollBarEnabled(false);
-      InAppKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
-      InAppKeyboard.setWebViewClient(InAppKeyboardWebViewClient);
-      InAppKeyboard.addJavascriptInterface(new KMKeyboardJSHandler(appContext, InAppKeyboard), "jsInterface");
-      InAppKeyboard.loadKeyboard();
-
-      setEngineWebViewVersionStatus(appContext, InAppKeyboard);
+      InAppKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
+      keyboard = InAppKeyboard;
+      webViewClient = InAppKeyboardWebViewClient;
     } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard == null) {
       SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
-      SystemKeyboard.setLayoutParams(params);
-      SystemKeyboard.setVerticalScrollBarEnabled(false);
-      SystemKeyboard.setHorizontalScrollBarEnabled(false);
-      SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
-      SystemKeyboard.setWebViewClient(SystemKeyboardWebViewClient);
-      SystemKeyboard.addJavascriptInterface(new KMKeyboardJSHandler(appContext, SystemKeyboard), "jsInterface");
-      SystemKeyboard.loadKeyboard();
-
-      setEngineWebViewVersionStatus(appContext, SystemKeyboard);
+      SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
+      keyboard = SystemKeyboard;
+      webViewClient = SystemKeyboardWebViewClient;
     }
+
+    if (keyboard == null) {
+      return;
+    }
+
+    RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+    keyboard.setLayoutParams(params);
+    keyboard.setVerticalScrollBarEnabled(false);
+    keyboard.setHorizontalScrollBarEnabled(false);
+    keyboard.setWebViewClient(webViewClient);
+    keyboard.addJavascriptInterface(new KMKeyboardJSHandler(appContext, keyboard), "jsInterface");
+    keyboard.loadKeyboard();
+
+    setEngineWebViewVersionStatus(appContext, keyboard);
   }
 
   public static String getLanguagePredictionPreferenceKey(String langID) {
