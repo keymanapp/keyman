@@ -7,6 +7,7 @@ procedure main;
 implementation
 
 uses
+  sentry,
   Sentry.Client,
   System.SysUtils;
 
@@ -29,7 +30,7 @@ begin
   //o.DSN := 'https://7b1ff1dae2c8495b84f90dadcf512b84@sentry.io/4853461';
   o.Release := 'keyman-14.0.22-alpha-local';
   o.HandlerPath := 'c:\Projects\keyman\app\windows\src\ext\sentry\test\Win32\Release\crashpad_handler.exe';
-  o.DatabasePath := '.\sentry-0.4.9-db';
+  o.DatabasePath := '.\sentry-'+SENTRY_SDK_VERSION+'-db';
   Result := TSentryClient.Create(o);
 end;
 
