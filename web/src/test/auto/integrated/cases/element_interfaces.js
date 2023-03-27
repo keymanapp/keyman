@@ -323,7 +323,7 @@ if(typeof InterfaceTests == 'undefined') {
     }
     //#endregion
 
-    //#region Defines helpers related to HTMLInputElement / Input test setup.
+    //#region Defines helpers related to Mock test setup.
     InterfaceTests.Mock = {};
 
     InterfaceTests.Mock.setupElement = function() {
@@ -332,18 +332,23 @@ if(typeof InterfaceTests == 'undefined') {
 
     InterfaceTests.Mock.resetWithText = function(pair, string) {
       pair.wrapper.text = string;
-      pair.wrapper.caretIndex = 0;
+      pair.wrapper.selStart = 0;
+      pair.wrapper.selEnd = 0;
     }
 
     // Implemented for completeness and generality with other tests.
     InterfaceTests.Mock.setCaret = function(pair, index) {
-      var text = pair.wrapper.getText();
-      pair.wrapper.caretIndex = text._kmwCodeUnitToCodePoint(index);
+      InterfaceTests.Mock.setSelectionRange(pair, index, index);
     }
 
     // Implemented for completeness and generality with other tests.
     InterfaceTests.Mock.getCaret = function(pair) {
       return pair.wrapper.getDeadkeyCaret();
+    }
+
+    InterfaceTests.Mock.setSelectionRange = function(pair, start, end) {
+      let convert = (index) => pair.wrapper.text.kmwCodeUnitToCodePoint(index);
+      pair.wrapper.setSelection(convert(start), convert(end));
     }
 
     InterfaceTests.Mock.setText = function(pair, text) {
@@ -411,6 +416,36 @@ if(typeof InterfaceTests == 'undefined') {
       testObj.setSelectionRange(pair, 10, 6);
       assert.equal(pair.wrapper.getCaret(), 3, "Failed to caret's initial position for backward-selections within an SMP string");
       String.kmwEnableSupplementaryPlane(false);
+    }
+
+    InterfaceTests.Tests.getSelectedText = function(testObj) {
+      var Apple = InterfaceTests.Strings.Apple;
+      var pair = testObj.setupElement();
+
+      String.kmwEnableSupplementaryPlane(false);
+      testObj.resetWithText(pair, Apple.normal);
+      testObj.setSelectionRange(pair, 3, 5);
+      assert.equal(pair.wrapper.getSelectedText(), '45', "Failed to properly retrieve selected text");
+      pair.wrapper.invalidateSelection();
+
+      String.kmwEnableSupplementaryPlane(false);
+      testObj.resetWithText(pair, Apple.normal);
+      testObj.setSelectionRange(pair, 5, 3);
+      assert.equal(pair.wrapper.getSelectedText(), '45', "Failed to properly retrieve reverse-direction selected text");
+      pair.wrapper.invalidateSelection();
+
+      String.kmwEnableSupplementaryPlane(false);
+      testObj.resetWithText(pair, Apple.normal);
+      testObj.setSelectionRange(pair, 3, 3);
+      assert.equal(pair.wrapper.getSelectedText(), '', "No text was selected, but some was returned");
+      pair.wrapper.invalidateSelection();
+
+      String.kmwEnableSupplementaryPlane(true);
+      testObj.resetWithText(pair, Apple.smp);
+      testObj.setSelectionRange(pair, 6, 10);
+      assert.equal(pair.wrapper.getSelectedText(), Apple.smp.substring(6, 10), "Failed to properly retrieve selected SMP text");
+      String.kmwEnableSupplementaryPlane(false);
+      pair.wrapper.invalidateSelection();
     }
 
     // Corresponds to a helper method for certain classes.
@@ -1000,6 +1035,10 @@ describe('Element Input/Output Interfacing', function() {
         });
       });
 
+      it('getSelectedText', function() {
+        InterfaceTests.Tests.getSelectedText(InterfaceTests.Input);
+      });
+
       describe('getTextAfterCaret', function() {
         it('correctly returns text (no active selection)', function() {
           InterfaceTests.Tests.getTextAfterCaretNoSelection(InterfaceTests.Input);
@@ -1094,6 +1133,10 @@ describe('Element Input/Output Interfacing', function() {
         });
       });
 
+      it('getSelectedText', function() {
+        InterfaceTests.Tests.getSelectedText(InterfaceTests.Input);
+      });
+
       describe('getTextAfterCaret', function() {
         it('correctly returns text (no active selection)', function() {
           InterfaceTests.Tests.getTextAfterCaretNoSelection(InterfaceTests.TextArea);
@@ -1180,6 +1223,10 @@ describe('Element Input/Output Interfacing', function() {
         it('correctly returns text (with active selection)', function() {
           InterfaceTests.Tests.getTextBeforeCaretWithSelection(InterfaceTests.ContentEditable);
         });
+      });
+
+      it.skip('getSelectedText', function() { // Not yet properly supported.
+        InterfaceTests.Tests.getSelectedText(InterfaceTests.Input);
       });
 
       describe('getTextAfterCaret', function() {
@@ -1285,6 +1332,10 @@ describe('Element Input/Output Interfacing', function() {
         });
       });
 
+      it.skip('getSelectedText', function() { // Not yet properly supported.
+        InterfaceTests.Tests.getSelectedText(InterfaceTests.Input);
+      });
+
       describe('getTextAfterCaret', function() {
         it('correctly returns text (no active selection)', function() {
           InterfaceTests.Tests.getTextAfterCaretNoSelection(InterfaceTests.DesignIFrame);
@@ -1333,36 +1384,26 @@ describe('Element Input/Output Interfacing', function() {
     // Unique to the Mock type - element interface cloning tests.  Is element state properly copied?
     // As those require a very different setup, they're in the target_mocks.js test case file instead.
 
-    describe('Text Retrieval', function(){
-      describe('getText', function() {
-        it('correctly returns text (no active selection)', function() {
-          InterfaceTests.Tests.getTextNoSelection(InterfaceTests.Mock);
-        });
-      });
-
-      describe('getTextBeforeCaret', function() {
-        it('correctly returns text (no active selection)', function() {
-          InterfaceTests.Tests.getTextBeforeCaretNoSelection(InterfaceTests.Mock);
-        });
-      });
-
-      describe('getTextAfterCaret', function() {
-        it('correctly returns text (no active selection)', function() {
-          InterfaceTests.Tests.getTextAfterCaretNoSelection(InterfaceTests.Mock);
-        });
-      });
-    });
+    // Basic text-retrieval unit tests are now done headlessly in @keymanapp/keyboard-processor.
 
     describe('Text Mutation', function() {
       describe('deleteCharsBeforeCaret', function() {
         it("correctly deletes characters from 'context' (no active selection)", function() {
           InterfaceTests.Tests.deleteCharsBeforeCaretNoSelection(InterfaceTests.Mock);
         });
+
+        it("correctly deletes characters from 'context' (with active selection)", function() {
+          InterfaceTests.Tests.deleteCharsBeforeCaretWithSelection(InterfaceTests.Mock);
+        });
       });
 
       describe('insertTextBeforeCaret', function() {
         it("correctly replaces the element's 'context' (no active selection)", function() {
           InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.Mock);
+        });
+
+        it("correctly replaces the element's 'context' (with active selection)", function() {
+          InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.Mock);
         });
       });
 

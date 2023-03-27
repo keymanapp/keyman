@@ -142,6 +142,12 @@ export default class DesignIFrame extends OutputTarget {
     return caret.node.textContent.substr(0, caret.offset);
   }
 
+  getSelectedText(): string {
+    // TODO:  figure out the proper implementation.
+    // KMW 16 and before behavior may be maintained by just returning the empty string.
+    return '';
+  }
+
   getTextAfterCaret(): string {
     if(!this.hasSelection()) {
       return '';

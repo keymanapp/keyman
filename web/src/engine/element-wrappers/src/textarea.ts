@@ -173,6 +173,11 @@ export default class TextArea extends OutputTarget<EventMap> {
     return this.getText()._kmwSubstring(this.processedSelectionEnd);
   }
 
+  getSelectedText(): string {
+    this.getCaret();
+    return this.getText()._kmwSubstring(this.processedSelectionStart, this.processedSelectionEnd);
+  }
+
   getText(): string {
     return this.root.value;
   }

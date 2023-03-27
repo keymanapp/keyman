@@ -3,7 +3,7 @@ let assert = chai.assert;
 import { extendString, Mock } from '/@keymanapp/keyboard-processor/build/lib/index.mjs';
 import { Input } from '/@keymanapp/keyman/build/engine/element-wrappers/lib/index.mjs';
 
-import { toSupplementaryPairString, DynamicElements } from '../test_utils.js';
+import { toSupplementaryPairString, DynamicElements } from '../../test_utils.js';
 
 extendString();
 
@@ -113,7 +113,9 @@ describe('OutputTarget Mocking', function() {
         var mock = Mock.from(base);
         // The selection should appear to be automatically deleted, as any text mutation
         // by KMW would automatically erase the text anyway.
-        assert.equal(mock.getText(), MockTests.Apple.mixed.substr(0, 5));
+        assert.equal(mock.getTextBeforeCaret(), MockTests.Apple.mixed.substr(0, 5));
+        assert.equal(mock.getText(), MockTests.Apple.mixed);
+        assert.equal(mock.getSelectedText(), MockTests.Apple.mixed.substring(5));
         assert.deepEqual(mock.deadkeys(), base.deadkeys());
       });
     });

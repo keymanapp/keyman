@@ -160,6 +160,11 @@ export default class Input extends OutputTarget<EventMap> {
     return this.getText()._kmwSubstring(0, this.processedSelectionStart);
   }
 
+  getSelectedText(): string {
+    this.getCaret();
+    return this.getText()._kmwSubstring(this.processedSelectionStart, this.processedSelectionEnd);
+  }
+
   setTextBeforeCaret(text: string) {
     this.getCaret();
     let selectionLength = this.processedSelectionEnd - this.processedSelectionStart;

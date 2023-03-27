@@ -290,6 +290,11 @@ export default abstract class OutputTarget {
   abstract getTextBeforeCaret(): string;
 
   /**
+   * Gets the element's-currently selected text.
+   */
+  abstract getSelectedText(): string;
+
+  /**
    * Relative to the caret (and/or active selection), gets the element's text after the caret,
    * excluding any actively selected text that would be immediately replaced upon text entry.
    */
@@ -350,44 +355,48 @@ export default abstract class OutputTarget {
 // this needs to be in the same file as OutputTarget now.
 export class Mock extends OutputTarget {
   text: string;
-  caretIndex: number;
 
-  constructor(text?: string, caretPos?: number) {
+  selStart: number;
+  selEnd: number;
+  selForward: boolean = true;
+
+  constructor(text?: string, caretPos?: number);
+  constructor(text?: string, selStart?: number, selEnd?: number);
+  constructor(text?: string, selStart?: number, selEnd?: number) {
     super();
 
     this.text = text ? text : "";
     var defaultLength = this.text._kmwLength();
+
     // Ensures that `caretPos == 0` is handled correctly.
-    this.caretIndex = typeof caretPos == "number" ? caretPos : defaultLength;
+    this.selStart = typeof selStart == "number" ? selStart : defaultLength;
+
+    // If no selection-end is set, selection length is implied to be 0.
+    this.selEnd = typeof selEnd == "number" ? selEnd : this.selStart;
+
+    this.selForward = this.selEnd >= this.selStart;
   }
 
   // Clones the state of an existing EditableElement, creating a Mock version of its state.
-  static from(outputTarget: OutputTarget, readonly: boolean) {
+  static from(outputTarget: OutputTarget, readonly?: boolean) {
     let clone: Mock;
 
     if(outputTarget instanceof Mock) {
       // Avoids the need to run expensive kmwstring.ts / `_kmwLength()`
       // calculations when deep-copying Mock instances.
       let priorMock = outputTarget as Mock;
-      clone = new Mock(priorMock.text, priorMock.caretIndex);
+      clone = new Mock(priorMock.text, priorMock.selStart, priorMock.selEnd);
     } else {
-      // If we're 'cloning' a different OutputTarget type, we don't have a
-      // guaranteed way to more efficiently get these values; these are the
-      // best methods specified by the abstraction.
+      let text = outputTarget.getText();
+      let beforeText = outputTarget.getTextBeforeCaret();
+      let afterText = outputTarget.getTextAfterCaret();
+      let selectionStart = beforeText._kmwLength();
+      let selectionEnd = text._kmwLength() - afterText._kmwLength();
 
-      if(readonly) {
-        // for NewContext and PostOutput, we want the whole text
-        let text = outputTarget.getText();
-        let afterText = outputTarget.getTextAfterCaret();
-        let caretIndex = text._kmwLength() - afterText._kmwLength();
-        clone = new Mock(text, caretIndex);
-      } else {
-        // We choose to ignore (rather, pre-emptively remove) any actively-selected text,
-        // as since it's always removed instantly during any text mutation operations.
-        let preText = outputTarget.getTextBeforeCaret();
-        let caretIndex = preText._kmwLength();
-        clone = new Mock(preText + outputTarget.getTextAfterCaret(), caretIndex);
-      }
+      // readonly group or not, the returned Mock remains the same.
+      // New-context events should act as if the caret were at the earlier-in-context
+      // side of the selection, same as standard keyboard rules.
+      clone = new Mock(text, selectionStart, selectionEnd);
     }
 
     // Also duplicate deadkey state!  (Needed for fat-finger ops.)
@@ -397,7 +406,9 @@ export class Mock extends OutputTarget {
   }
 
   clearSelection(): void {
-    return;
+    this.text = this.getTextBeforeCaret() + this.getTextAfterCaret();
+    this.selEnd = this.selStart;
+    this.selForward = true;
   }
 
   invalidateSelection(): void {
@@ -405,8 +416,7 @@ export class Mock extends OutputTarget {
   }
 
   isSelectionEmpty(): boolean {
-    // TODO: consider if we need to maintain selection information in Mocks
-    return true;
+    return this.selStart == this.selEnd;
   }
 
   hasSelection(): boolean {
@@ -414,22 +424,31 @@ export class Mock extends OutputTarget {
   }
 
   getDeadkeyCaret(): number {
-    return this.caretIndex;
+    return this.selStart;
   }
 
-  setDeadkeyCaret(index: number) {
-    if(index < 0 || index > this.text._kmwLength()) {
-      throw new Error("Provided caret index is out of range.");
+  setSelection(start: number, end?: number) {
+    this.selStart = start;
+    this.selEnd = typeof end == 'number' ? end : start;
+
+    this.selForward = end >= start;
+    if(!this.selForward) {
+      let temp = this.selStart;
+      this.selStart = this.selEnd;
+      this.selEnd = temp;
     }
-    this.caretIndex = index;
   }
 
   getTextBeforeCaret(): string {
-    return this.text.kmwSubstr(0, this.caretIndex);
+    return this.text.kmwSubstr(0, this.selStart);
+  }
+
+  getSelectedText(): string {
+    return this.text.kmwSubstr(this.selStart, this.selEnd - this.selStart);
   }
 
   getTextAfterCaret(): string {
-    return this.text.kmwSubstr(this.caretIndex);
+    return this.text.kmwSubstr(this.selEnd);
   }
 
   getText(): string {
@@ -438,19 +457,21 @@ export class Mock extends OutputTarget {
 
   deleteCharsBeforeCaret(dn: number): void {
     if(dn >= 0) {
-      if(dn > this.caretIndex) {
-        dn = this.caretIndex;
+      if(dn > this.selStart) {
+        dn = this.selStart;
       }
       this.adjustDeadkeys(-dn);
-      this.text = this.text.kmwSubstr(0, this.caretIndex - dn) + this.getTextAfterCaret();
-      this.caretIndex -= dn;
+      this.text = this.text.kmwSubstr(0, this.selStart - dn) + this.text.kmwSubstr(this.selStart);
+      this.selStart -= dn;
+      this.selEnd -= dn;
     }
   }
 
   insertTextBeforeCaret(s: string): void {
     this.adjustDeadkeys(s._kmwLength());
-    this.text = this.getTextBeforeCaret() + s + this.getTextAfterCaret();
-    this.caretIndex += s.kmwLength();
+    this.text = this.getTextBeforeCaret() + s + this.text.kmwSubstr(this.selStart);
+    this.selStart += s.kmwLength();
+    this.selEnd += s.kmwLength();
   }
 
   handleNewlineAtCaret(): void {

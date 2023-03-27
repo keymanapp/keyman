@@ -66,7 +66,7 @@ describe("Transcriptions and Transforms", function() {
     it("handles operations with moderately long text", function() {
       var target = new Mock("The quick brown cat jumped onto the lazy dog.", 19);
       var original = Mock.from(target);
-      target.setDeadkeyCaret(30); // 19 + 11:  moves it to after "onto".
+      target.setSelection(30); // 19 + 11:  moves it to after "onto".
       target.deleteCharsBeforeCaret(14); // delete:  "cat jumped onto"
       target.insertTextBeforeCaret("fox jumped over");
 
@@ -111,7 +111,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
     it("handles deletions around the caret without text insertion", function() {
       var target = new Mock("apple", 2);
       var original = Mock.from(target);
-      target.setDeadkeyCaret(3);
+      target.setSelection(3);
       target.deleteCharsBeforeCaret(2); // "ale"
 
       /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
@@ -129,7 +129,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
         String.kmwEnableSupplementaryPlane(true);
         var target = new Mock(smpApple, 2);
         var original = Mock.from(target);
-        target.setDeadkeyCaret(3);
+        target.setSelection(3);
         target.deleteCharsBeforeCaret(2); // "ale"
 
         /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
@@ -150,7 +150,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
       // could eventually run in 'headless' mode.
       var target = new Mock("apple", 2);
       var original = Mock.from(target);
-      target.setDeadkeyCaret(3);
+      target.setSelection(3);
       target.deleteCharsBeforeCaret(2);
       target.insertTextBeforeCaret("PP"); // "aPPle"
 
@@ -167,7 +167,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
       var target = new Mock("apple", 2);
       var original = Mock.from(target);
-      target.setDeadkeyCaret(4);
+      target.setSelection(4);
       target.deleteCharsBeforeCaret(3);
       target.insertTextBeforeCaret("P"); // "aPe"
 
@@ -184,7 +184,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
       var target = new Mock("apple", 2);
       var original = Mock.from(target);
-      target.setDeadkeyCaret(4);
+      target.setSelection(4);
       target.deleteCharsBeforeCaret(3);
       target.insertTextBeforeCaret("aaaaaaaaaaaaaa"); // "aaaaaaaaaaaaaaae"
 
@@ -201,7 +201,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
       var target = new Mock("apple", 2);
       var original = Mock.from(target);
-      target.setDeadkeyCaret(5);
+      target.setSelection(5);
       target.deleteCharsBeforeCaret(4);
       target.insertTextBeforeCaret("les"); // "ales" - since we've appended a letter at the very end, the whole right-hand is indeed an insertion.
 
@@ -225,7 +225,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
         var target = new Mock(smpApple, 2);
         let smpLE = u(0x1d5c5)+u(0x1d5be);
         var original = Mock.from(target);
-        target.setDeadkeyCaret(3);
+        target.setSelection(3);
         target.deleteCharsBeforeCaret(2);
         target.insertTextBeforeCaret(smpLE); // "alele"
 
@@ -245,7 +245,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
         var target = new Mock(smpApple, 2);
         let smpB = u(0x1d5bb);
         var original = Mock.from(target);
-        target.setDeadkeyCaret(4);
+        target.setSelection(4);
         target.deleteCharsBeforeCaret(3);
         target.insertTextBeforeCaret(smpB); // "aPe"
 
@@ -262,7 +262,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
         var target = new Mock(smpApple, 2);
         var original = Mock.from(target);
-        target.setDeadkeyCaret(4);
+        target.setSelection(4);
         target.deleteCharsBeforeCaret(3);
         target.insertTextBeforeCaret("aaaaaaaaaaaaaa"); // "aaaaaaaaaaaaaaae"
 
@@ -280,7 +280,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
         var target = new Mock(smpApple, 2);
         let smpLES = u(0x1d5c5)+u(0x1d5be)+u(0x1d5cb);
         var original = Mock.from(target);
-        target.setDeadkeyCaret(5);
+        target.setSelection(5);
         target.deleteCharsBeforeCaret(4);
         target.insertTextBeforeCaret(smpLES); // "ales" - since we've appended a letter at the very end, the whole right-hand is indeed an insertion.
 
@@ -308,11 +308,11 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
       var target = new Mock("apple");
       var original = Mock.from(target);
 
-      target.setDeadkeyCaret(4);
+      target.setSelection(4);
       target.insertDeadkeyBeforeCaret(0);
-      target.setDeadkeyCaret(1);
+      target.setSelection(1);
       target.insertDeadkeyBeforeCaret(1);
-      target.setDeadkeyCaret(2);
+      target.setSelection(2);
       target.insertDeadkeyBeforeCaret(2); // 'a' dk(1) 'p' dk(2) | 'p' 'l' dk(0) 'e'
 
       var original = Mock.from(target);
@@ -320,7 +320,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
       target.hasDeadkeyMatch(0, 2);
       target.deadkeys().deleteMatched();
 
-      target.setDeadkeyCaret(3);
+      target.setSelection(3);
       target.deleteCharsBeforeCaret(2);
       target.insertTextBeforeCaret("b");
       target.insertDeadkeyBeforeCaret(3); // In effect: 'a' dk(1) 'b' dk(3) | 'l' dk(0) 'e'
