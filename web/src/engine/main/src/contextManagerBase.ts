@@ -6,8 +6,39 @@ import { PredictionContext } from '@keymanapp/input-processor';
 interface EventMap {
   // target, then keyboard.
   'targetchange': (target: OutputTarget) => boolean;
+
+  /**
+   * This event is raised whenever a keyboard change is requested.  Calling the second parameter -
+   * `abortChange` - will abort the process and prevent the change.
+   *
+   * Note that if the keyboard has not been previously loaded, this event will be raised twice.
+   * 1. Before the keyboard is loaded into Keyman Engine for Web.
+   *     - Aborting at this point will prevent the keyboard from being loaded, with no network
+   *       request for the keyboard resource being triggered.
+   * 2. Once the keyboard is loaded, but before it is activated.
+   * @param metadata     The to-be-activated keyboard's properties
+   * @param abortChange  A functor that cancels the pending keyboard change when called
+   * @returns
+   */
   'beforekeyboardchange': (metadata: KeyboardStub, abortChange: () => void) => void;
+
+  /**
+   * This event is raised whenever an activating keyboard is being loaded into Keyman Engine for
+   * the first time in the user's current session, which is an asynchronous operation.  It is called
+   * once the async request is initiated.
+   * @param metadata  The registered properties for the keyboard being asynchronously loaded
+   * @param onload    A Promise that resolves with `null` when loading successfully completes or
+   *                  with an `error` if it fails.
+   * @returns
+   */
   'keyboardasyncload': (metadata: KeyboardStub, onload: Promise<Error>) => void;
+
+  /**
+   * This event is raised whenever a keyboard is fully activated and set as the current active
+   * keyboard within Keyman Engine for Web.
+   * @param kbd
+   * @returns
+   */
   'keyboardchange': (kbd: {keyboard: Keyboard, metadata: KeyboardStub}) => void;
 }
 
@@ -128,6 +159,12 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
     return this.pendingActivations.splice(activationIndex, 1)[0];
   }
 
+  /**
+   * Triggers a `beforekeyboardchange` event that allows its consumers to cancel a change of
+   * keyboard if desired.
+   * @param metadata The keyboard properties for the potentially-activating keyboard
+   * @returns `false` if the change should be cancelled; otherwise, `true`.
+   */
   protected confirmKeyboardChange(metadata: KeyboardStub): boolean {
     const eventReturn = {
       continue: true
