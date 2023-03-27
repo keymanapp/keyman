@@ -423,13 +423,11 @@ public final class KMManager {
       didCopyAssets = true;
     }
 
-    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      initInAppKeyboard(appContext);
-    } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      initSystemKeyboard(appContext);
-    } else {
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_UNDEFINED) {
       String msg = "Cannot initialize: Invalid keyboard type";
       KMLog.LogError(TAG, msg);
+    } else {
+      initKeyboard(appContext, keyboardType);
     }
 
     JSONUtils.initialize(new File(getPackagesDir()));
@@ -631,36 +629,35 @@ public final class KMManager {
    return params;
   }
 
-  private static void initInAppKeyboard(Context appContext) {
-    if (InAppKeyboard == null) {
+  private static void initKeyboard(Context appContext, KeyboardType keyboardType) {
+    KMKeyboard keyboard = null;
+    KMKeyboardWebViewClient webViewClient = null;
+
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard == null) {
       InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
-      InAppKeyboard.setLayoutParams(params);
-      InAppKeyboard.setVerticalScrollBarEnabled(false);
-      InAppKeyboard.setHorizontalScrollBarEnabled(false);
-      InAppKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
-      InAppKeyboard.setWebViewClient(InAppKeyboardWebViewClient);
-      InAppKeyboard.addJavascriptInterface(new KMInAppKeyboardJSHandler(appContext, InAppKeyboard), "jsInterface");
-      InAppKeyboard.loadKeyboard();
-
-      setEngineWebViewVersionStatus(appContext, InAppKeyboard);
-    }
-  }
-
-  private static void initSystemKeyboard(Context appContext) {
-    if (SystemKeyboard == null) {
+      InAppKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
+      keyboard = InAppKeyboard;
+      webViewClient = InAppKeyboardWebViewClient;
+    } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard == null) {
       SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
-      SystemKeyboard.setLayoutParams(params);
-      SystemKeyboard.setVerticalScrollBarEnabled(false);
-      SystemKeyboard.setHorizontalScrollBarEnabled(false);
-      SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
-      SystemKeyboard.setWebViewClient(SystemKeyboardWebViewClient);
-      SystemKeyboard.addJavascriptInterface(new KMSystemKeyboardJSHandler(appContext, SystemKeyboard), "jsInterface");
-      SystemKeyboard.loadKeyboard();
-
-      setEngineWebViewVersionStatus(appContext, SystemKeyboard);
+      SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
+      keyboard = SystemKeyboard;
+      webViewClient = SystemKeyboardWebViewClient;
     }
+
+    if (keyboard == null) {
+      return;
+    }
+
+    RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+    keyboard.setLayoutParams(params);
+    keyboard.setVerticalScrollBarEnabled(false);
+    keyboard.setHorizontalScrollBarEnabled(false);
+    keyboard.setWebViewClient(webViewClient);
+    keyboard.addJavascriptInterface(new KMKeyboardJSHandler(appContext, keyboard), "jsInterface");
+    keyboard.loadKeyboard();
+
+    setEngineWebViewVersionStatus(appContext, keyboard);
   }
 
   public static String getLanguagePredictionPreferenceKey(String langID) {
@@ -2246,18 +2243,6 @@ public final class KMManager {
     } else {
       // clear globeKeyState
       globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
-    }
-  }
-
-  private static final class KMInAppKeyboardJSHandler extends KMKeyboardJSHandler {
-    KMInAppKeyboardJSHandler(Context context, KMKeyboard k) {
-      super(context, k);
-    }
-  }
-
-  private static final class KMSystemKeyboardJSHandler extends KMKeyboardJSHandler {
-    KMSystemKeyboardJSHandler(Context context, KMKeyboard k) {
-      super(context, k);
     }
   }
 }
