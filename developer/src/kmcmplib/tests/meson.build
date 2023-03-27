@@ -8,68 +8,64 @@ fs = import('fs')
 
 tests_flags = []
 
-input_path = meson.current_source_dir() / '../../../../core/tests/unit/kmx'
+input_path = meson.current_source_dir() / '../../../../common/test/keyboards/baseline'
 output_path = meson.current_build_dir()
 
 kmcompxtest = executable('kmcompxtest', 'kmcompxtest.cpp',
     cpp_args: defns,
     include_directories: inc,
+    name_suffix: name_suffix,
     link_args: links + tests_flags,
     objects: lib.extract_all_objects())
 
 # Test keyboards that we have in Core
 
 tests = [
-  '000 - null keyboard',
-  '001 - basic input UnicodeI',
-  '002 - basic input Unicode',
-  '003 - nul',
-  '004 - basic input (shift 2)',
-  '005 - nul with initial context',
-  '006 - vkey input (shift ctrl)',
-  '007 - vkey input (ctrl alt)',
-  '008 - vkey input (ctrl alt 2)',
-  '012 - ralt',
-  '013 - deadkeys',
-  '014 - groups and virtual keys',
-  '015 - ralt 2',
-  '017 - space mnemonic kbd',
-  '018 - nul testing',
-  '019 - multiple deadkeys',
-  '020 - deadkeys and backspace',
-
-  '021 - options',
-  '022 - options with preset',
-  '023 - options with save',
-  '024 - options with save and preset',
-  '025 - options with reset',
-
-  '026 - system stores',
-  '027 - system stores 2',
-
-  '028 - smp',
-  '029 - beep',
-
-  '030 - multiple groups',
-  '031 - caps lock',
-  '032 - caps control',
-  '033 - caps always off',
-  '034 - options double set reset',
-  '035 - options double set staged',
-  '036 - options - double reset staged',
-  '037 - options - double reset',
-  '038 - punctkeys',
-  '039 - generic ctrlalt',
-  '040 - long context',
-  '041 - long context and deadkeys',
-  '042 - long context and split deadkeys',
-  '043 - output and keystroke',
-
-  '044 - if and context',
-  '045 - deadkey and context',
-  '046 - deadkey and contextex',
-  '047 - caps always off initially on',
-  '048 - modifier keys keep context'
+  'k_000___null_keyboard',
+  'k_001___basic_input_unicodei',
+  'k_002___basic_input_unicode',
+  'k_003___nul',
+  'k_004___basic_input__shift_2_',
+  'k_005___nul_with_initial_context',
+  'k_006___vkey_input__shift_ctrl_',
+  'k_007___vkey_input__ctrl_alt_',
+  'k_008___vkey_input__ctrl_alt_2_',
+  'k_012___ralt',
+  'k_013___deadkeys',
+  'k_014___groups_and_virtual_keys',
+  'k_015___ralt_2',
+  'k_017___space_mnemonic_kbd',
+  'k_018___nul_testing',
+  'k_019___multiple_deadkeys',
+  'k_020___deadkeys_and_backspace',
+  'k_021___options',
+  'k_022___options_with_preset',
+  'k_023___options_with_save',
+  'k_024___options_with_save_and_preset',
+  'k_025___options_with_reset',
+  'k_026___system_stores',
+  'k_027___system_stores_2',
+  'k_028___smp',
+  'k_029___beep',
+  'k_030___multiple_groups',
+  'k_031___caps_lock',
+  'k_032___caps_control',
+  'k_033___caps_always_off',
+  'k_034___options_double_set_reset',
+  'k_035___options_double_set_staged',
+  'k_036___options___double_reset_staged',
+  'k_037___options___double_reset',
+  'k_038___punctkeys',
+  'k_039___generic_ctrlalt',
+  'k_040___long_context',
+  'k_041___long_context_and_deadkeys',
+  'k_042___long_context_and_split_deadkeys',
+  'k_043___output_and_keystroke',
+  'k_044___if_and_context',
+  'k_045___deadkey_and_context',
+  'k_046___deadkey_and_contextex',
+  'k_047___caps_always_off_initially_on',
+  'k_048___modifier_keys_keep_context'
 ]
 
 foreach kbd : tests

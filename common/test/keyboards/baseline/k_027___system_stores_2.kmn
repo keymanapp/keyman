@@ -1,0 +1,27 @@
+store(&NAME) '027 - system stores 2'
+c Description: Tests platform and baselayout system store rules
+c keys: [K_1][K_2][K_3][K_4][K_A][K_B]
+c expected: linux.desktop.hardware.native.fr-FR.kbdfr.dll.
+c context: 
+c option: &platform=linux desktop hardware native
+c option: &baseLayout=kbdfr.dll
+c option: &baseLayoutAlt=fr-FR
+
+store(&version) '10.0'
+
+store(digit)  '1234567890'
+store(letter) 'abcdefghij'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+platform('linux') + '1' > 'linux.'
+platform('desktop') + '2' > 'desktop.'
+platform('hardware') + '3' > 'hardware.'
+platform('native') + '4' > 'native.'
++ any(digit) > 'platform-fail.'
+
+baselayout('fr-FR') + 'a' > 'fr-FR.'
+baselayout('kbdfr.dll') + 'b' > 'kbdfr.dll.'
++ any(letter) > 'baselayout-fail.'
