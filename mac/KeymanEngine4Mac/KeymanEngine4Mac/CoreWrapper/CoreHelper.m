@@ -21,7 +21,7 @@
 #import "ActionArrayOptimizer.h"
 #import "MacVKCodes.h"
 
-// TODO move VKMap here from KMEngine
+// TODO: move VKMap here from KMEngine
 const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
 //uint32_t VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
 

@@ -513,4 +513,136 @@ NSString * names[nCombinations];
     XCTAssert([output isEqualToString:@"Z"], @"Expected output to be 'Z'.");
 }
 
+- (void)testLegacyProcessEvent_eventForFWithElNuerKmx_ReturnsCorrectCharacter {
+    KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForElNuerTests];
+    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@""];
+    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"f" charactersIgnoringModifiers:@"f" isARepeat:NO keyCode:kVK_ANSI_F];
+    NSArray *actions = [engine experimentallyProcessEventForUnitTestingOnly:event usingCore:NO];
+    XCTAssert(actions.count == 1, @"Expected one action");
+    NSDictionary *action = actions[0];
+    NSString *actionType = [[action allKeys] objectAtIndex:0];
+    XCTAssert([actionType isEqualToString:Q_STR], @"Expected Q_STR action");
+    NSString *output = [action objectForKey:actionType];
+    XCTAssert([output isEqualToString:@"ɣ"], @"Expected output to be 'ɣ'.");
+
+}
+
+- (void)testCoreProcessEvent_eventForFWithElNuerKmx_ReturnsCorrectCharacter {
+    KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForElNuerTests];
+    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@""];
+    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"f" charactersIgnoringModifiers:@"f" isARepeat:NO keyCode:kVK_ANSI_F];
+    NSArray *actions = [engine experimentallyProcessEventForUnitTestingOnly:event usingCore:YES];
+    XCTAssert(actions.count == 1, @"Expected one action");
+    NSDictionary *action = actions[0];
+    NSString *actionType = [[action allKeys] objectAtIndex:0];
+    XCTAssert([actionType isEqualToString:Q_STR], @"Expected Q_STR action");
+    NSString *output = [action objectForKey:actionType];
+    XCTAssert([output isEqualToString:@"ɣ"], @"Expected output to be 'ɣ'.");
+}
+
+- (void)testCoreProcessEvent_eventDeleteWithElNuerKmx_EmptiesContextReturnsDelete {
+    KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForElNuerTests];
+    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@"ɣ"];
+    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"\b" charactersIgnoringModifiers:@"\b" isARepeat:NO keyCode:kVK_Delete];
+    NSArray *actions = [engine experimentallyProcessEventForUnitTestingOnly:event usingCore:YES];
+    XCTAssert(actions.count == 1, @"Expected one action");
+    NSDictionary *action = actions[0];
+    NSString *actionType = [[action allKeys] objectAtIndex:0];
+    XCTAssert([actionType isEqualToString:Q_BACK], @"Expected Q_BACK action");
+    NSString *context = engine.contextBuffer;
+    XCTAssert([context isEqualToString:@""], @"Context should be empty.");
+}
+
+- (void)testLegacyProcessEvent_eventDeleteWithElNuerKmx_ReturnsEmptyActionListContextUnchanged {
+    KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForElNuerTests];
+    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@"ɣ"];
+    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"\b" charactersIgnoringModifiers:@"\b" isARepeat:NO keyCode:kVK_Delete];
+    NSArray *actions = [engine experimentallyProcessEventForUnitTestingOnly:event usingCore:NO];
+    XCTAssert(actions.count == 0, @"Expected no actions");
+    NSString *context = engine.contextBuffer;
+    XCTAssert([context isEqualToString:@"ɣ"], @"Context should be unchanged.");
+}
+
+- (void)testCoreProcessEvent_eventReturnWithElNuerKmx_ContextUnchangedReturnsReturn {
+    KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForElNuerTests];
+    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@"ɣ"];
+    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"\n" charactersIgnoringModifiers:@"\n" isARepeat:NO keyCode:kVK_Return];
+    NSArray *actions = [engine experimentallyProcessEventForUnitTestingOnly:event usingCore:YES];
+    XCTAssert(actions.count == 1, @"Expected one action");
+    NSDictionary *action = actions[0];
+    NSString *actionType = [[action allKeys] objectAtIndex:0];
+    XCTAssert([actionType isEqualToString:Q_RETURN], @"Expected Q_RETURN action");
+    NSString *context = engine.contextBuffer;
+    //XCTAssert([context isEqualToString:@""], @"Context should be empty.");
+    XCTAssert([context isEqualToString:@"ɣ"], @"Context should be unchanged.");
+}
+
+- (void)testLegacyProcessEvent_eventReturnWithElNuerKmx_ReturnsEmptyActionListContextUnchanged {
+    KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForElNuerTests];
+    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@"ɣ"];
+    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"\n" charactersIgnoringModifiers:@"\n" isARepeat:NO keyCode:kVK_Return];
+    NSArray *actions = [engine experimentallyProcessEventForUnitTestingOnly:event usingCore:NO];
+    XCTAssert(actions.count == 0, @"Expected no actions");
+    NSString *context = engine.contextBuffer;
+    XCTAssert([context isEqualToString:@"ɣ"], @"Context should be unchanged.");
+}
+
+- (void)testCoreProcessEvent_eventTabWithElNuerKmx_ContextUnchangedReturnsTab {
+    KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForElNuerTests];
+    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@"ɣ"];
+    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"\t" charactersIgnoringModifiers:@"\t" isARepeat:NO keyCode:kVK_Tab];
+    NSArray *actions = [engine experimentallyProcessEventForUnitTestingOnly:event usingCore:YES];
+    XCTAssert(actions.count == 1, @"Expected one action");
+    NSDictionary *action = actions[0];
+    NSString *actionType = [[action allKeys] objectAtIndex:0];
+    XCTAssert([actionType isEqualToString:Q_RETURN], @"Expected Q_RETURN action");
+    NSString *context = engine.contextBuffer;
+    //XCTAssert([context isEqualToString:@""], @"Context should be empty.");
+    XCTAssert([context isEqualToString:@"ɣ"], @"Context should be unchanged.");
+}
+
+- (void)testLegacyProcessEvent_eventTabWithElNuerKmx_ReturnsEmptyActionListContextUnchanged {
+    KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForElNuerTests];
+    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@"ɣ"];
+    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"\t" charactersIgnoringModifiers:@"\n" isARepeat:NO keyCode:kVK_Tab];
+    NSArray *actions = [engine experimentallyProcessEventForUnitTestingOnly:event usingCore:NO];
+    XCTAssert(actions.count == 0, @"Expected no actions");
+    NSString *context = engine.contextBuffer;
+    XCTAssert([context isEqualToString:@"ɣ"], @"Context should be unchanged.");
+}
+
+
+- (void)testCoreProcessEvent_eventSingleWithElNuerKmx_ReturnsDiacritic {
+    KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForElNuerTests];
+    NSString *context = @"ɛ";
+    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:context];
+    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"'" charactersIgnoringModifiers:@"'" isARepeat:NO keyCode:kVK_ANSI_Quote];
+    NSArray *actions = [engine experimentallyProcessEventForUnitTestingOnly:event usingCore:YES];
+    XCTAssert(actions.count == 1, @"Expected one action");
+    NSDictionary *action = actions[0];
+    NSString *actionType = [[action allKeys] objectAtIndex:0];
+    XCTAssert([actionType isEqualToString:Q_STR], @"Expected Q_STR action");
+    context = engine.contextBuffer;
+    XCTAssert([context isEqualToString:@"\u025B\u0308"], @"Context updated with diacritic.");
+}
+
+- (void)testLegacyProcessEvent_eventSingleQuoteWithElNuerKmx_ReturnsTwoActions {
+    KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForElNuerTests];
+    NSString *context = @"ɛ";
+    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:context];
+    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"'" charactersIgnoringModifiers:@"'" isARepeat:NO keyCode:kVK_ANSI_Quote];
+    NSArray *actions = [engine experimentallyProcessEventForUnitTestingOnly:event usingCore:NO];
+    XCTAssert(actions.count == 2, @"Expected two actions");
+    NSDictionary *action = actions[0];
+    NSString *actionType = [[action allKeys] objectAtIndex:0];
+    XCTAssert([actionType isEqualToString:Q_BACK], @"Expected Q_BACK action");
+    action = actions[1];
+    actionType = [[action allKeys] objectAtIndex:0];
+    NSString *characters = [action objectForKey:actionType];
+    XCTAssert([characters isEqualToString:@"\u025B\u0308"], @"Expected \u025B\u0308");
+    context = engine.contextBuffer;
+    XCTAssert([context isEqualToString:@"\u025B\u0308"], @"Context updated with diacritic.");
+}
+
+
 @end

@@ -16,6 +16,7 @@
 		2993C33429B1D92E00FB5E95 /* CoreAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32A29B1D92E00FB5E95 /* CoreAction.h */; };
 		2993C33529B1D92E00FB5E95 /* CoreHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32B29B1D92E00FB5E95 /* CoreHelper.h */; };
 		2993C33829B1DD6900FB5E95 /* libkmnkbp0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2993C33729B1DD6900FB5E95 /* libkmnkbp0.a */; };
+		299D0B1B29CAB2F500767276 /* el_nuer.kmx in Resources */ = {isa = PBXBuildFile; fileRef = 299D0B1A29CAB2F500767276 /* el_nuer.kmx */; };
 		299F9E2A29C46AFC0053E903 /* CoreHelperTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 299F9E2729C46AFB0053E903 /* CoreHelperTests.m */; };
 		299F9E2B29C46AFC0053E903 /* CoreWrapperTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 299F9E2829C46AFB0053E903 /* CoreWrapperTests.m */; };
 		299F9E2C29C46AFC0053E903 /* CoreTestStaticHelperMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 299F9E2929C46AFC0053E903 /* CoreTestStaticHelperMethods.m */; };
@@ -87,6 +88,7 @@
 		2993C32A29B1D92E00FB5E95 /* CoreAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreAction.h; sourceTree = "<group>"; };
 		2993C32B29B1D92E00FB5E95 /* CoreHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreHelper.h; sourceTree = "<group>"; };
 		2993C33729B1DD6900FB5E95 /* libkmnkbp0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libkmnkbp0.a; path = ../../core/build/mac/debug/libkmnkbp0.a; sourceTree = "<group>"; };
+		299D0B1A29CAB2F500767276 /* el_nuer.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = el_nuer.kmx; sourceTree = "<group>"; };
 		299F9E2629C46AFB0053E903 /* CoreTestStaticHelperMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreTestStaticHelperMethods.h; sourceTree = "<group>"; };
 		299F9E2729C46AFB0053E903 /* CoreHelperTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreHelperTests.m; sourceTree = "<group>"; };
 		299F9E2829C46AFB0053E903 /* CoreWrapperTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreWrapperTests.m; sourceTree = "<group>"; };
@@ -263,6 +265,7 @@
 		984C2AE21A79C98D0023F89D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				299D0B1A29CAB2F500767276 /* el_nuer.kmx */,
 				378568D222FCD93300B481B5 /* indexoffset1892.kmx */,
 				378568D022FCCF0A00B481B5 /* sil_ipa.kmx */,
 				E23380F02112C01500B90591 /* CipherMusicUnicode.kmx */,
@@ -438,6 +441,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				378568D322FCD93300B481B5 /* indexoffset1892.kmx in Resources */,
+				299D0B1B29CAB2F500767276 /* el_nuer.kmx in Resources */,
 				E2537D9A201641DA0069FEA6 /* TestMacEngine.kmx in Resources */,
 				E23380F12112C01500B90591 /* CipherMusicUnicode.kmx in Resources */,
 				378568D122FCCF0A00B481B5 /* sil_ipa.kmx in Resources */,

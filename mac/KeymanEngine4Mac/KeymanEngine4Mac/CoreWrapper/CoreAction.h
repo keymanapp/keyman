@@ -14,7 +14,7 @@
 #import "CoreHelper.h"
 
 NS_ASSUME_NONNULL_BEGIN
-enum ActionType {EndAction,
+typedef enum {EndAction,
   CharacterAction,
   MarkerAction,
   AlertAction,
@@ -23,16 +23,17 @@ enum ActionType {EndAction,
   EmitKeystrokeAction,
   InvalidateContextAction,
   CapsLockAction
-};
+} ActionType;
 
 @interface CoreAction : NSObject
-@property (readonly) enum ActionType actionType;
+@property (readonly) ActionType actionType;
 @property (strong, nonatomic, readonly) NSString *typeName;
 @property (strong, nonatomic, readonly) NSString *content;
 @property (readonly) int backspaceCount;
+-(instancetype)initWithType: (ActionType)type actionContent:(NSString*)content backspaceCount:(int)backspaceCount;
 -(instancetype)initWithActionStruct:(km_kbp_action_item*)actionStruct coreHelper:(CoreHelper*)helper;
--(instancetype)initWithString:(NSString*)content;
--(instancetype)initWithBackspaceCount:(int)count;
+-(instancetype)initCharacterAction:(NSString*)content;
+-(instancetype)initBackspaceAction:(int)count;
 -(NSDictionary*) legacyDictionaryActionForActionObject:(CoreAction*)action;
 @end
 

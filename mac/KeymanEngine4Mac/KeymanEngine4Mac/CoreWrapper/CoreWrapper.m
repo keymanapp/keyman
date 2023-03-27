@@ -63,7 +63,7 @@
         km_kbp_keyboard_dispose(self.keyboard);
         _keyboard = nil;
       }
-      //TODO use NSError instead of NSException?
+      //TODO: use NSError instead of NSException?
       @throw;
     }
   }
@@ -108,7 +108,7 @@
 -(void)createKeyboardStateUsingCore {
   km_kbp_status result = KM_KBP_STATUS_OK;
   
-  //TODO create once
+  // TODO: create once
   // create option list
   km_kbp_option_item coreEnvironment[6] = {0};
 
@@ -166,7 +166,7 @@
   km_kbp_status result = km_kbp_process_event(self.keyboardState, keyCode, modifierState, isKeyDown, KM_KBP_EVENT_FLAG_DEFAULT);
 
   if (result!=KM_KBP_STATUS_OK) {
-    //TODO raise exception?
+    // TODO: raise exception?
     NSLog(@"km_kbp_process_event() result = %u\n", result );
   }
 
@@ -245,7 +245,7 @@
   km_kbp_context_items_dispose(contextItemArray);
 }
 
-//TODO create and save as static
+//TODO: create and save as static
 +(BOOL)setupCoreEnvironment:(km_kbp_option_item *) coreOptionArray
     {
   //*coreOptionArray = malloc(6 * sizeof(km_kbp_option_item));

@@ -27,7 +27,7 @@ NSString *mockKmxFilePath = @"/a/dummy/keyboard.mock";
 CoreWrapper *mockWrapper;
 
 + (void)setUp {
-  //TODO remove when VKMap is moved to CoreHelper class
+  // TODO: remove when VKMap is moved to CoreHelper class
   // calling engine with nil kmx file so that static VKMap array is initialized
   KMEngine *engine = [[KMEngine alloc] initWithKMX:nil contextBuffer:@""];
 

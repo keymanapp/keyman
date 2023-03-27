@@ -34,6 +34,8 @@ extern DWORD VKMap[0x80];
 - (NSString *)contextBuffer;
 - (void)setStore:(DWORD)storeID withValue:(NSString *)value;
 - (NSArray *)processEvent:(NSEvent *)event;
+// TODO: remove test method
+- (NSArray *)experimentallyProcessEventForUnitTestingOnly:(NSEvent *)event usingCore:(BOOL)useCore;
 - (void)setUseVerboseLogging:(BOOL)useVerboseLogging;
 
 @end

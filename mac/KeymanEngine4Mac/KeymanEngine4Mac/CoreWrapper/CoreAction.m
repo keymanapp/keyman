@@ -27,88 +27,116 @@ NSString *const Q_SAVEOPT = @"Q_SAVEOPT"; // KM_KBP_IT_PERSIST_OPT
 */
 
 @implementation CoreAction
--(instancetype)initWithActionStruct:(km_kbp_action_item*)actionStruct coreHelper:(CoreHelper*)helper {
+
+-(instancetype)initWithType: (ActionType)type actionContent:(NSString*)content backspaceCount:(int)backspaceCount {
   self = [super init];
   if (self) {
-    switch (actionStruct->type)
+    self->_actionType = type;
+    switch (type)
     {
-      case KM_KBP_IT_END: {
-        self->_actionType = EndAction;
+      case EndAction: {
         self->_typeName = @"End";
         break;
       }
-      case KM_KBP_IT_CHAR: {
-        self->_actionType = CharacterAction;
+      case CharacterAction: {
         self->_typeName = @"Character";
-        NSLog(@"actionStruct->character decimal: %u, hex: %X", actionStruct->character, actionStruct->character);
-        
-        NSString *characterString = [helper utf32ValueToString:actionStruct->character];
-        NSLog(@"converted unicode string: '%@'", characterString);
-        self->_content = characterString;
+        self->_content = content;
         break;
       }
-      case KM_KBP_IT_MARKER: {
-        self->_actionType = MarkerAction;
+      case MarkerAction: {
         self->_typeName = @"Marker";
         break;
       }
-      case KM_KBP_IT_ALERT: {
-        self->_actionType = AlertAction;
+      case AlertAction: {
         self->_typeName = @"Alert";
         break;
       }
-      case KM_KBP_IT_BACK: {
-        self->_actionType = BackspaceAction;
+      case BackspaceAction: {
         self->_typeName = @"Backspace";
-        self->_backspaceCount = 1;
+        self->_backspaceCount = backspaceCount;
         break;
       }
-      case KM_KBP_IT_PERSIST_OPT: {
-        self->_actionType = PersistOptionAction;
+      case PersistOptionAction: {
         self->_typeName = @"Persist Option";
         break;
       }
-      case KM_KBP_IT_EMIT_KEYSTROKE: {
-        self->_actionType = EmitKeystrokeAction;
+      case EmitKeystrokeAction: {
         self->_typeName = @"Emit Keystroke";
         break;
       }
-      case KM_KBP_IT_INVALIDATE_CONTEXT: {
-        self->_actionType = InvalidateContextAction;
+      case InvalidateContextAction: {
         self->_typeName = @"Invalidate Context";
         break;
       }
-      case KM_KBP_IT_CAPSLOCK: {
-        self->_actionType = CapsLockAction;
+      case CapsLockAction: {
         self->_typeName = @"Caps Lock";
         break;
       }
       default: {
         self->_typeName = @"Unknown";
-        NSLog(@"unrecognized type of km_kbp_action_item = %u\n", actionStruct->type);
       }
     }
   }
   return self;
 }
 
--(instancetype)initWithString:(NSString*)content {
-  self = [super init];
-  if (self) {
-    self->_actionType = CharacterAction;
-    self->_typeName = @"Character";
-    self->_content = content;
+-(instancetype)initWithActionStruct:(km_kbp_action_item*)actionStruct coreHelper:(CoreHelper*)helper {
+    switch (actionStruct->type)
+    {
+      case KM_KBP_IT_END: {
+        self = [self initWithType: EndAction actionContent:@"" backspaceCount:0];
+        break;
+      }
+      case KM_KBP_IT_CHAR: {
+        NSString *characterString = [helper utf32ValueToString:actionStruct->character];
+        self = [self initWithType: CharacterAction actionContent:characterString backspaceCount:0];
+        NSLog(@"actionStruct->character decimal: %u, hex: %X", actionStruct->character, actionStruct->character);
+        NSLog(@"converted unicode string: '%@'", characterString);
+        break;
+      }
+      case KM_KBP_IT_MARKER: {
+        self = [self initWithType: MarkerAction actionContent:@"" backspaceCount:0];
+        break;
+      }
+      case KM_KBP_IT_ALERT: {
+        self = [self initWithType: AlertAction actionContent:@"" backspaceCount:0];
+        break;
+      }
+      case KM_KBP_IT_BACK: {
+        self = [self initWithType: BackspaceAction actionContent:@"" backspaceCount:1];
+        break;
+      }
+      case KM_KBP_IT_PERSIST_OPT: {
+        self = [self initWithType: PersistOptionAction actionContent:@"" backspaceCount:0];
+        break;
+      }
+      case KM_KBP_IT_EMIT_KEYSTROKE: {
+        self = [self initWithType: EmitKeystrokeAction actionContent:@"" backspaceCount:0];
+        break;
+      }
+      case KM_KBP_IT_INVALIDATE_CONTEXT: {
+        self = [self initWithType: InvalidateContextAction actionContent:@"" backspaceCount:0];
+        break;
+      }
+      case KM_KBP_IT_CAPSLOCK: {
+        self = [self initWithType: CapsLockAction actionContent:@"" backspaceCount:0];
+        break;
+      }
+      default: {
+        self->_typeName = @"Unknown";
+        NSLog(@"unrecognized type of km_kbp_action_item = %u\n", actionStruct->type);
+      }
   }
   return self;
 }
 
--(instancetype)initWithBackspaceCount:(int)count {
-  self = [super init];
-  if (self) {
-    self->_actionType = BackspaceAction;
-    self->_typeName = @"Backspace";
-    self->_backspaceCount = count;
-  }
+-(instancetype)initCharacterAction:(NSString*)content {
+  self = [self initWithType: CharacterAction actionContent:content backspaceCount:0];
+  return self;
+}
+
+-(instancetype)initBackspaceAction:(int)count {
+  self = [self initWithType: BackspaceAction actionContent:@"" backspaceCount:count];
   return self;
 }
 
@@ -151,7 +179,7 @@ NSString *const Q_SAVEOPT = @"Q_SAVEOPT"; // KM_KBP_IT_PERSIST_OPT
       actionMap = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:1], Q_BACK, nil];
       break;
     }
-    //TODO implement Persist Options
+    // TODO: implement Persist Options
     case PersistOptionAction: {
       actionMap = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:1], Q_SAVEOPT, nil];
       break;

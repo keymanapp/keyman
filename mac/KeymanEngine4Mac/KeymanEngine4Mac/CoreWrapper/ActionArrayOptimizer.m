@@ -97,7 +97,7 @@
   } else {
     // if not same time, can be combined if deleting a character
     if ((currentAction.actionType == CharacterAction) && (nextAction.actionType == BackspaceAction)) {
-      combinedAction = [self combineBackspaceAction:nextAction withBackspaceAction:currentAction];
+      combinedAction = [self combineBackspaceAction:nextAction withCharacterAction:currentAction];
     }
   }
   return combinedAction;
@@ -105,15 +105,15 @@
 
 -(CoreAction*)combineNextCharacterAction:(CoreAction*)nextAction withCurrentCharacterAction:(CoreAction*)currentAction {
   NSString *combinedString = [currentAction.content stringByAppendingString:nextAction.content];
-  return [[CoreAction alloc] initWithString:combinedString];
+  return [[CoreAction alloc] initCharacterAction:combinedString];
 }
 
 -(CoreAction*)combineBackspaceAction:(CoreAction*)nextAction withBackspaceAction:(CoreAction*)currentAction {
   int count = currentAction.backspaceCount + nextAction.backspaceCount;
-  return [[CoreAction alloc] initWithBackspaceCount:count];
+  return [[CoreAction alloc] initBackspaceAction:count];
 }
 
--(CoreAction*)combineNextBackspaceAction:(CoreAction*)nextAction withCharacterAction:(CoreAction*)currentAction {
+-(CoreAction*)combineBackspaceAction:(CoreAction*)nextAction withCharacterAction:(CoreAction*)currentAction {
   
   return nil;
 }

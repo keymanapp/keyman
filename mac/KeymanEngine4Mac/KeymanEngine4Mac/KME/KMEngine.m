@@ -91,7 +91,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 -(void)setKmx:(KMXFile*) kmxFile {
   if (_kmx!=kmxFile) {
     _kmx = kmxFile;
-    //TODO is it valid to set kmx to nil? do we then dispose of the wrapper?
+    // TODO: is it valid to set kmx to nil? do we then dispose of the wrapper?
     if (kmxFile != nil) {
       [self loadCoreWrapperFromKmxFile:kmxFile.filePath];
     }
@@ -155,10 +155,12 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     NSLog(@"**SGS KME processEvent using CoreWrapper");
     // CoreWrapper returns an array of CoreAction objects
     NSArray *coreActions = [self.keymanCore processEvent:event];
-    //TODO make this nil assignment part of the conversion method
+    // TODO: make this nil assignment part of the conversion method
     if ([coreActions count] == 0) {
       return nil;
     } else {
+      // update context from core
+     [self.tmpCtxBuf setString:self.keymanCore.context];
       // convert the CoreAction objects into Dictionary objects expected by the Input Method
       return [self.coreHelper actionObjectArrayToLegacyActionMapArray:coreActions];
     }
@@ -180,6 +182,47 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     return [[actions mutableCopy] optimise];
   }
 }
+
+/*
+ * For unit testing purposes to control whether executing against KME code or Core code
+ */
+// TODO: remove
+- (NSArray *)experimentallyProcessEventForUnitTestingOnly:(NSEvent *)event usingCore:(BOOL)useCore {
+  if (!self.kmx)
+      return nil;
+
+  if (self.keymanCore && useCore) {
+    NSLog(@"**SGS KME processEvent using CoreWrapper");
+    // CoreWrapper returns an array of CoreAction objects
+    NSArray *coreActions = [self.keymanCore processEvent:event];
+    // TODO: make this nil assignment part of the conversion method
+    if ([coreActions count] == 0) {
+      return nil;
+    } else {
+      // update context from core
+     [self.tmpCtxBuf setString:self.keymanCore.context];
+      // convert the CoreAction objects into Dictionary objects expected by the Input Method
+      return [self.coreHelper actionObjectArrayToLegacyActionMapArray:coreActions];
+    }
+  } else {
+    NSArray *actions = nil;
+    NSInteger startIndex = [[self.kmx.startGroup objectAtIndex:1] integerValue];
+    if (startIndex < 0 || startIndex >= [self.kmx.group count])
+        startIndex = [[self.kmx.startGroup objectAtIndex:0] integerValue];
+    if (startIndex < 0 || startIndex >= [self.kmx.group count])
+        return nil;
+
+    KMCompGroup *gp = [self.kmx.group objectAtIndex:startIndex];
+    actions = [self processGroup:gp event:event];
+
+    if (actions.count == 0 && _easterEggForSentry != nil) {
+        [self processPossibleEasterEggCharacterFrom:[event characters]];
+    }
+
+    return [[actions mutableCopy] optimise];
+  }
+}
+
 
 - (void) processPossibleEasterEggCharacterFrom:(NSString *)characters {
     NSUInteger len = [_easterEggForSentry length];

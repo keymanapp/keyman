@@ -22,10 +22,7 @@
 }
 
 + (NSString *)getKmxFilePathTestMacEngine {
-    //NSString *path = [[NSBundle bundleForClass:[CoreTestStaticHelperMethods class]] pathForResource:@"TestMacEngine.kmx" ofType:@"NSString"];
   NSString *path = [[NSBundle bundleForClass:[CoreTestStaticHelperMethods class]] pathForResource:@"TestMacEngine.kmx" ofType:nil];
-    //NSString *path = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"TestMacEngine.kmx"];
-    //KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:path];
     return path;
 }
 
@@ -46,6 +43,11 @@
 
 + (NSString *)getKmxFilePathForIndexOffsetTests {
   NSString *path = [[NSBundle bundleForClass:[CoreTestStaticHelperMethods class]] pathForResource:@"indexoffset1892.kmx" ofType:@"NSString"];
+  return path;
+}
+
++ (NSString *)getKmxFilePathForElNuerTests {
+  NSString *path = [[NSBundle bundleForClass:[CoreTestStaticHelperMethods class]] pathForResource:@"el_nuer.kmx" ofType:@"NSString"];
   return path;
 }
 

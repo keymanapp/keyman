@@ -16,6 +16,8 @@
 #import "keyboardprocessor.h"
 #import "KMEngine.h"  // included for VKMap
 #import "MacVKCodes.h"
+#import "CoreAction.h"
+#import "ActionArrayOptimizer.h"
 
 @interface CoreHelperTests : XCTestCase
 
@@ -23,10 +25,14 @@
 
 @implementation CoreHelperTests
 
+ActionArrayOptimizer *optimizer;
+
 + (void)setUp {
-  //TODO remove when VKMap is moved to CoreHelper class
+  // TODO: remove when VKMap is moved to CoreHelper class
   // calling engine with nil kmx file so that static VKMap array is initialized
   KMEngine *engine = [[KMEngine alloc] initWithKMX:nil contextBuffer:@""];
+  
+  optimizer  = [[ActionArrayOptimizer alloc] init];
 }
 
 - (void)tearDown {
@@ -46,15 +52,6 @@
   uint16_t windowsKeyCode = [[CoreTestStaticHelperMethods helper] macVirtualKeyToWindowsVirtualKey:MAC_S_KEYCODE];
   XCTAssertEqual(windowsKeyCode, KM_KBP_VKEY_S, @"Unexpected conversion from Mac to Windows key code.");
 }
-
-/*
-- (void)testMacUpArrowKeycodeConvertsToWindows {
-  const unsigned int MAC_UPARROW_KEYCODE = 0X7E;
-  // Mac Up Arrow key = 0X7E, Windows 'S' key = 83;
-  uint16_t windowsKeyCode = [coreHelper macVirtualKeyToWindowsVirtualKey:MAC_UPARROW_KEYCODE];
-  XCTAssertEqual(windowsKeyCode, KM_KBP_VKEY_S, @"Unexpected conversion from Mac to Windows key code.");
-}
-*/
 
 - (void)testKeycodeConversion_NegativeKeycode_ReturnsZero {
   const unsigned short int INVALID_KEYCODE = -1;
@@ -86,6 +83,52 @@
 - (void)testUnsupportedModifierConversion_MacHelpKeyModifier_ReturnsZero {
   uint32_t keymanModifierState = [[CoreTestStaticHelperMethods helper] macToKeymanModifier:NSEventModifierFlagHelp];
   XCTAssertEqual(keymanModifierState, 0, @"Failed conversion of Mac Help key flag from Mac to Keyman cleared modifier state.");
+}
+
+- (void)testOptimize_MultipleCharacterActions_CombinedToSingleAction {
+  CoreAction *characterAAction = [[CoreAction alloc] initWithType:CharacterAction actionContent:@"A" backspaceCount:0];
+  CoreAction *characterBAction = [[CoreAction alloc] initWithType:CharacterAction actionContent:@"B" backspaceCount:0];
+  CoreAction *endAction = [[CoreAction alloc] initWithType:EndAction actionContent:@"" backspaceCount:0];
+  NSArray *coreArray = @[characterAAction, characterBAction, endAction];
+  
+  NSArray *optimizedArray = [optimizer actionArrayToOptimizedActionArray:coreArray];
+  XCTAssert(optimizedArray.count == 1, @"Expected 1 action");
+  CoreAction *action = optimizedArray[0];
+  XCTAssert([action.content isEqualToString:@"AB"], @"Expected combined string.");
+}
+
+- (void)testOptimize_MultipleBackspaceActions_CombinedToSingleAction {
+  CoreAction *backspaceAction = [[CoreAction alloc] initWithType:BackspaceAction actionContent:@"" backspaceCount:1];
+  CoreAction *anotherBackspaceAction = [[CoreAction alloc] initWithType:BackspaceAction actionContent:@"" backspaceCount:1];
+  CoreAction *endAction = [[CoreAction alloc] initWithType:EndAction actionContent:@"" backspaceCount:0];
+  NSArray *coreArray = @[backspaceAction, anotherBackspaceAction, endAction];
+  
+  NSArray *optimizedArray = [optimizer actionArrayToOptimizedActionArray:coreArray];
+  XCTAssert(optimizedArray.count == 1, @"Expected 1 action");
+  CoreAction *action = optimizedArray[0];
+  XCTAssert(action.backspaceCount==2, @"Expected a backspace count of 2.");
+}
+
+- (void)testOptimize_OneBackspaceAndOneCharacterAction_RetainedWithEndActionStripped {
+  CoreAction *backspaceAction = [[CoreAction alloc] initWithType:BackspaceAction actionContent:@"" backspaceCount:1];
+  CoreAction *characterAAction = [[CoreAction alloc] initWithType:CharacterAction actionContent:@"A" backspaceCount:0];
+  CoreAction *endAction = [[CoreAction alloc] initWithType:EndAction actionContent:@"" backspaceCount:0];
+  NSArray *coreArray = @[backspaceAction, characterAAction, endAction];
+  
+  NSArray *optimizedArray = [optimizer actionArrayToOptimizedActionArray:coreArray];
+  XCTAssert(optimizedArray.count == 2, @"Expected two actions.");
+  CoreAction *action = optimizedArray[1];
+  XCTAssert([action.content isEqualToString:@"A"], @"Expected CharacterAction.");
+}
+
+- (void)testOptimize_OneCharacterAndOneBackspaceAction_CompactedToEmptyArray {
+  CoreAction *characterAAction = [[CoreAction alloc] initWithType:CharacterAction actionContent:@"A" backspaceCount:0];
+  CoreAction *backspaceAction = [[CoreAction alloc] initWithType:BackspaceAction actionContent:@"" backspaceCount:1];
+  CoreAction *endAction = [[CoreAction alloc] initWithType:EndAction actionContent:@"" backspaceCount:0];
+  NSArray *coreArray = @[characterAAction, backspaceAction, endAction];
+  
+  NSArray *optimizedArray = [optimizer actionArrayToOptimizedActionArray:coreArray];
+  XCTAssert(optimizedArray.count == 0, @"Expected empty array");
 }
 
 - (void)testHelperCreationPerformance {

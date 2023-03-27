@@ -563,7 +563,10 @@ NSRange _previousSelRange;
 }
 
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
-    // OSK key feedback from hardware keyboard is disabled
+  if (event.type == NSKeyDown) {
+    NSLog(@"***SGS handleEvent KeyDown event, keycode: %u, characters='%@'", event.keyCode, event.characters);
+  }
+   // OSK key feedback from hardware keyboard is disabled
     /*if (event.type == NSKeyDown)
      [self.AppDelegate handleKeyEvent:event];*/
 
@@ -608,7 +611,8 @@ NSRange _previousSelRange;
     }
 
     if(event.keyCode == kVK_Delete && _legacyMode && self.ignoreNextDeleteBackHighLevel) {
-        // This event was sent by Keyman and we should just
+      NSLog(@"***SGS handleEvent KVK_Delete, pass through to app");
+       // This event was sent by Keyman and we should just
         // pass it through to the app. handleDeleteBackLowLevel
         // already did anything we need with it.
         return NO; // We'll let the client app accept the Delete Back
@@ -619,9 +623,9 @@ NSRange _previousSelRange;
     [self updateContextBufferIfNeeded:sender];
 
     if ([self.AppDelegate debugMode]) {
-        NSLog(@"sender type = %@", NSStringFromClass([sender class]));
+        NSLog(@"handleEvent sender type = %@", NSStringFromClass([sender class]));
         if (_clientCanProvideSelectionInfo == Yes)
-            NSLog(@"sender selection range location = %lu", [self getSelectionRangefromClient:sender].location);
+            NSLog(@"handleEvent sender selection range location = %lu", [self getSelectionRangefromClient:sender].location);
     }
 
     BOOL handled = [self handleKeymanEngineActions:event in: sender];
