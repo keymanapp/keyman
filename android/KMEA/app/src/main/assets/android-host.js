@@ -184,7 +184,7 @@ function setBannerOptions(mayPredict) {
 
 function registerModel(model) {
   //window.console.log('registerModel: ' + model);
-  keyman.registerModel(model);
+  keyman.addModel(model);
 }
 
 function resetContext() {
