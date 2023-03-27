@@ -14,7 +14,6 @@
  *
  */
 class font_select {
-
 private:
   HFONT m_hfont;
 
@@ -76,6 +75,5 @@ public:
    */
   void restore();
 };
-
 
 #endif

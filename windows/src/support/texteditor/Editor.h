@@ -7,8 +7,7 @@
  *                   It is representive of a application not implementing the Text Services Framework (TSF).
  * Create Date:      10/03/2023
  * Authors:          rcruickshank
-*/
-
+ */
 
 #pragma once
 #ifndef _EDITOR_H

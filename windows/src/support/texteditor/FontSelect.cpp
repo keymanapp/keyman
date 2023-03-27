@@ -7,13 +7,11 @@
 #include "FontSelect.h"
 #include "commdlg.h"
 
-font_select::font_select()
-{
+font_select::font_select() {
   default_font();
 }
 
-font_select::font_select(HFONT current_font)
-{
+font_select::font_select(HFONT current_font) {
 
 	if (m_hfont != NULL) {
 		::DeleteObject(m_hfont);
@@ -25,15 +23,13 @@ font_select::font_select(HFONT current_font)
 	default_font();
 }
 
-font_select::~font_select()
-{
+font_select::~font_select() {
 	if (m_hfont != NULL) {
 		::DeleteObject(m_hfont);
   }
 }
 
-void font_select::default_font()
-{
+void font_select::default_font() {
   // Set the logical font information as "Charsis SIL" size 14
 	// A future enhancement could load default from a configuration file
 	LOGFONT log_font;
@@ -55,12 +51,11 @@ void font_select::default_font()
 	create_font(&log_font);
 }
 
-BOOL font_select::choose_font()
-{
+BOOL font_select::choose_font() {
 	CHOOSEFONT  choose_font;
 	LOGFONT log_font;
 
-	if (m_hfont != NULL){
+	if (m_hfont != NULL) {
 		GetObject(m_hfont, sizeof(log_font), &log_font);
 	}
 	// fill in the data needed for the Windows common font dialog
@@ -81,8 +76,8 @@ BOOL font_select::choose_font()
 	choose_font.nSizeMax = 0;
 
 	// get new font selection from user
-	if (::ChooseFont(&choose_font) != FALSE){
-		if (NULL != create_font(&log_font)){
+	if (::ChooseFont(&choose_font) != FALSE) {
+		if (NULL != create_font(&log_font)) {
 			return TRUE;
 		}
 	}
@@ -90,10 +85,9 @@ BOOL font_select::choose_font()
 	return FALSE;
 }
 
-HFONT font_select::create_font(LOGFONT* logfont)
-{
+HFONT font_select::create_font(LOGFONT* logfont) {
 	HFONT h_font = ::CreateFontIndirect(logfont);
-	if (h_font == NULL){
+	if (h_font == NULL) {
 		MessageBox(NULL,L"Error",L"Failed to select font\n",MB_OK);
 	}
 
@@ -105,8 +99,7 @@ HFONT font_select::create_font(LOGFONT* logfont)
 	return h_font;
 }
 
-LOGFONT font_select::get_log_font()
-{
+LOGFONT font_select::get_log_font() {
 	LOGFONT log_font;
 
 	if (m_hfont != NULL) {
@@ -115,17 +108,14 @@ LOGFONT font_select::get_log_font()
 	return log_font;
 }
 
-HFONT font_select::get_font_handle()
-{
+HFONT font_select::get_font_handle() {
 	return m_hfont;
 }
 
-void font_select::save()
-{
+void font_select::save() {
 
 }
 
-void font_select::restore()
-{
+void font_select::restore() {
 
 }
