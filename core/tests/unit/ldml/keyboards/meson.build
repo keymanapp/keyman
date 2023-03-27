@@ -8,8 +8,9 @@
 # keyboards in resources/standards-data/ldml-keyboards/techpreview/3.0/
 # tests     in resources/standards-data/ldml-keyboards/techpreview/test/
 tests_from_cldr = [
-  'ja-Latn',
-  'pt-BR-k0-abnt2',
+# TODO-LDML: These don't work on Windows yet due to path issues=> <https://github.com/keymanapp/keyman/issues/8524>
+  # 'ja-Latn',
+  # 'pt-BR-k0-abnt2',
   # 'fr-t-k0-azerty', # vkey issues
 ]
 
@@ -30,7 +31,10 @@ tests_without_testdata = [
 # These tests have a k_001_tiny-test.xml file as well.
 tests_with_testdata = [
   'k_001_tiny',
+  # TODO-LDML: fix the path issue=> <https://github.com/keymanapp/keyman/issues/8524> and move these to tests_from_cldr
   'fr-t-k0-azerty',
+  'ja-Latn',
+  'pt-BR-k0-abnt2',
 ]
 
 tests =  tests_without_testdata
@@ -38,7 +42,6 @@ tests += tests_with_testdata
 tests_needing_copy = tests # not including cldr
 
 tests += tests_from_cldr
-
 
 # Setup kmc
 
