@@ -83,6 +83,16 @@ NSString *const Q_SAVEOPT = @"Q_SAVEOPT"; // KM_KBP_IT_PERSIST_OPT
   return self;
 }
 
+/*
+ * This is implemented so that there is no path to init a CoreAction object without
+ * going through the designated initializer, initWithType. It blocks a direct call to super init which
+ * would result in uninitialized fields. This init results in a hard-coded AlertAction and
+ * should not be used.
+ */
+-(instancetype)init {
+  return [self initWithType:AlertAction actionContent:@"" backspaceCount:0];
+}
+
 -(instancetype)initWithActionStruct:(km_kbp_action_item*)actionStruct coreHelper:(CoreHelper*)helper {
     switch (actionStruct->type)
     {
