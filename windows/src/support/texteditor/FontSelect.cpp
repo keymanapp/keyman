@@ -30,7 +30,7 @@ font_select::~font_select() {
 }
 
 void font_select::default_font() {
-  // Set the logical font information as "Charsis SIL" size 14
+  // Set the logical font information as "Charis SIL" size 14
 	// A future enhancement could load default from a configuration file
 	LOGFONT log_font;
 	log_font.lfHeight = -19; // size 14
@@ -46,13 +46,13 @@ void font_select::default_font() {
 	log_font.lfClipPrecision = CLIP_STROKE_PRECIS;
 	log_font.lfQuality = DEFAULT_QUALITY;
 	log_font.lfPitchAndFamily = FF_SWISS | VARIABLE_PITCH;
-	wcscpy_s(log_font.lfFaceName, L"Charsis SIL");
+	wcscpy_s(log_font.lfFaceName, L"Charis SIL");
 
 	create_font(&log_font);
 }
 
 BOOL font_select::choose_font() {
-	CHOOSEFONT  choose_font;
+	CHOOSEFONT  choose_font = {0};
 	LOGFONT log_font;
 
 	if (m_hfont != NULL) {
@@ -61,19 +61,9 @@ BOOL font_select::choose_font() {
 	// fill in the data needed for the Windows common font dialog
 	choose_font.lStructSize = sizeof(choose_font);
 	choose_font.hwndOwner = ::GetActiveWindow();
-	choose_font.hDC = 0;
 	choose_font.lpLogFont = &log_font;
-	choose_font.iPointSize = 0;
 	choose_font.Flags = CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT;
-	choose_font.rgbColors = 0;
-	choose_font.lCustData = 0;
-	choose_font.lpfnHook = 0;
-	choose_font.lpTemplateName = NULL;
-	choose_font.hInstance = 0;
-	choose_font.lpszStyle = 0;
 	choose_font.nFontType = SCREEN_FONTTYPE;
-	choose_font.nSizeMin = 0;
-	choose_font.nSizeMax = 0;
 
 	// get new font selection from user
 	if (::ChooseFont(&choose_font) != FALSE) {
@@ -100,7 +90,7 @@ HFONT font_select::create_font(LOGFONT* logfont) {
 }
 
 LOGFONT font_select::get_log_font() {
-	LOGFONT log_font;
+	LOGFONT log_font = {0};
 
 	if (m_hfont != NULL) {
 		GetObject(m_hfont, sizeof(log_font), &log_font);
