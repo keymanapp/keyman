@@ -30,17 +30,19 @@ public:
   ~font_select();
 
   /**
-   * Set the default font for our editor. Currently hard coded to Charsis SIL
+   * Set the default font for our editor. Currently hard coded to Charis SIL
    * but could be upgraded to read from a configuration file, when implementing
    * save and restore methods.
    */
   void default_font();
   /**
-   * Create the HFONT for the current logical font of the private member m_log_font
+   * Set the HFONT of the private member m_log_font with the logical font
+   * If creation of the HFONT fails return NULL and leave the private member font
+   * untouched
    *
-   * @return HFONT
+   * @return HFONT  HFONT of logfont or NULL on failure
    */
-  HFONT create_font(LOGFONT* logfont);
+  HFONT set_font(LOGFONT* logfont);
 
   /**
    * Load the Font dialog box

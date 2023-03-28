@@ -48,7 +48,9 @@ void font_select::default_font() {
 	log_font.lfPitchAndFamily = FF_SWISS | VARIABLE_PITCH;
 	wcscpy_s(log_font.lfFaceName, L"Charis SIL");
 
-	create_font(&log_font);
+	if (set_font(&log_font) == NULL) {
+    MessageBox(NULL, L"Error", L"Failed to set default font.\n", MB_OK);
+  }
 }
 
 BOOL font_select::choose_font() {
@@ -67,7 +69,7 @@ BOOL font_select::choose_font() {
 
 	// get new font selection from user
 	if (::ChooseFont(&choose_font) != FALSE) {
-		if (NULL != create_font(&log_font)) {
+    if (set_font(&log_font) != NULL) {
 			return TRUE;
 		}
 	}
@@ -75,17 +77,16 @@ BOOL font_select::choose_font() {
 	return FALSE;
 }
 
-HFONT font_select::create_font(LOGFONT* logfont) {
+HFONT font_select::set_font(LOGFONT* logfont) {
 	HFONT h_font = ::CreateFontIndirect(logfont);
 	if (h_font == NULL) {
-		MessageBox(NULL,L"Error",L"Failed to select font\n",MB_OK);
-	}
-
-	if (m_hfont != NULL) {
-		::DeleteObject(m_hfont);
+    MessageBox(NULL, L"Error", L"Failed to create font while setting font.\n", MB_OK);
+	} else {
+    if (m_hfont != NULL) {
+      ::DeleteObject(m_hfont);
+    }
+     m_hfont = h_font;
   }
-	// store the font (or NULL if failed)
-	m_hfont = h_font;
 	return h_font;
 }
 

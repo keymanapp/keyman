@@ -155,8 +155,11 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
       break;
     case IDM_FONT:
       if (font_select_control != NULL) {
-        font_select_control->choose_font();
-        SendMessage(hWndEdit, WM_SETFONT, (LPARAM)font_select_control->get_font_handle(), TRUE);
+        if (font_select_control->choose_font()) {
+          SendMessage(hWndEdit, WM_SETFONT, (LPARAM)font_select_control->get_font_handle(), TRUE);
+        } else {
+          MessageBox(NULL, L"Warning", L"Font not updated\n", MB_OK);
+        }
       }
 
       break;
