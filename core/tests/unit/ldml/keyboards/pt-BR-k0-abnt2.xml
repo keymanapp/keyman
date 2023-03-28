@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE keyboard SYSTEM "../dtd/ldmlKeyboard.dtd">
+<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
 <keyboard locale="pt-BR-t-k0-abnt2" conformsTo="techpreview">
 	<locales>
 		<locale id="pt" />
 	</locales>
 	<version number="0.0.0" />
 	<names>
-		<!-- this is the Romaji (English) layer of the JIS keyboard -->
 		<name value="Portugese (ABNT2)" />
 	</names>
 
