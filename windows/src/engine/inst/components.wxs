@@ -101,7 +101,11 @@
       </Component>
 
       <Component Guid="{9BBD330E-F0CE-44EB-8799-BF49CB670EFC}" SharedDllRefCount="yes">
-        <File Id="keyman32_ver.dll" Name="keyman32-ver$(var.VERSION_WITH_TAG).dll" KeyPath="yes" />
+        <File Id="keyman32.dll" Name="keyman32.dll" KeyPath="yes" />
+      </Component>
+
+       <Component Guid="*" SharedDllRefCount="yes">
+        <File Id="keyman32_ver.dll" Name="keyman32-ver$(var.VERSION_WITH_TAG).dll" KeyPath="yes"  Source="..\..\..\bin\engine\keyman32-ver$(var.VERSION_WITH_TAG).dll" />
       </Component>
 
       <Component Guid="{1853C94A-0F4C-4D43-AF07-E3F27794FDC9}">
@@ -133,7 +137,7 @@
         <RegistryValue Root="HKCR" Key="Keyman.File.Diagnostics\Shell\open\Command" Type="string" Value='"[#tsysinfo.exe]" "%1"' />
       </Component>
 
-<!--       <Component Guid="{4210C15D-0121-40BE-9B09-1576C08C4A78}">
+      <!--       <Component Guid="{4210C15D-0121-40BE-9B09-1576C08C4A78}">
         <File Id="keyman64.dll" Name="keyman64.dll" KeyPath="yes" Source="..\..\..\bin\engine\keyman64.dll" />
       </Component>  -->
 

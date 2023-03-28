@@ -196,7 +196,7 @@ var
 
 {$IFNDEF WIN64}
 const
-  SKeyman32Filename = 'keyman32.dll';
+  SKeyman32Filename = 'keyman32-ver17.0.48-alpha-local.dll';
 {$ENDIF}
 
 const

@@ -1,18 +1,18 @@
 (*
   Name:             keyman32_int
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    17 Aug 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Add GetKeymanInstallPath function
                     14 Sep 2006 - mcdurdin - Retrieve Debug_Keyman32 path if assigned
                     18 Mar 2011 - mcdurdin - I2825 - Debug_Keyman32 override not working correctly
@@ -63,11 +63,11 @@ begin
   begin
     RootPath := ExtractFilePath(ParamStr(0));
   end;
-  
+
   Result := IncludeTrailingPathDelimiter(RootPath);
 
-  if not FileExists(Result + 'keyman32.dll') then
-    raise Exception.Create( 'The executable keyman32.dll could not '+
+  if not FileExists(Result + 'keyman32-ver17.0.48-alpha-local.dll') then
+    raise Exception.Create( 'The executable keyman32-ver17.0.48-alpha-local.dll could not '+
       'be found.  You should reinstall.');
 end;
 
@@ -80,17 +80,17 @@ var
 begin
   Result := False;
   FLoad := False;
-  hkeyman := GetModuleHandle('keyman32.dll');
+  hkeyman := GetModuleHandle('keyman32-ver17.0.48-alpha-local');
   if hkeyman = 0 then
   begin
     s := GetKeymanInstallPath;
-    hkeyman := LoadLibrary(PChar(s+'keyman32.dll'));
+    hkeyman := LoadLibrary(PChar(s+'keyman32-ver17.0.48-alpha-local'));
     if hkeyman = 0 then
     begin
-      KL.LogError('Keyman_Initialise: Unable to load '+s+'keyman32.dll: '+SysErrorMessage(GetLastError));
+      KL.LogError('Keyman_Initialise: Unable to load '+s+'keyman32-ver17.0.48-alpha-local: '+SysErrorMessage(GetLastError));
       Exit;
     end;
-    KL.Log('Keyman_Initialise: Loaded keyman32.dll');
+    KL.Log('Keyman_Initialise: Loaded keyman32-ver17.0.48-alpha-local');
     FLoad := True;
   end
   else
@@ -125,7 +125,7 @@ begin
     Exit;
   end;
   Result := False;
-  hkeyman := GetModuleHandle('keyman32.dll');
+  hkeyman := GetModuleHandle('keyman32-ver17.0.48-alpha-local');
   if hkeyman = 0 then Exit;
   ke := TKeyman_Exit(GetProcAddress(hkeyman, 'Keyman_Exit'));
   if not Assigned(@ke) then Exit;
@@ -141,7 +141,7 @@ var
   fk: TKeyman_ForceKeyboard;
 begin
   Result := False;
-  hkeyman := GetModuleHandle('keyman32.dll');
+  hkeyman := GetModuleHandle('keyman32-ver17.0.48-alpha-local');
   if hkeyman = 0 then
   begin
     KL.Log('Keyman_ForceKeyboard: Attempting to load keyman32.dll');
@@ -150,7 +150,7 @@ begin
       KL.LogError('Keyman_ForceKeyboard: Unable to load keyman32.dll');
       Exit;
     end;
-    hkeyman := GetModuleHandle('keyman32.dll');
+    hkeyman := GetModuleHandle('keyman32-ver17.0.48-alpha-local.dll');
     if hkeyman = 0 then Exit;
   end;
   fk := TKeyman_ForceKeyboard(GetProcAddress(hkeyman, 'Keyman_ForceKeyboard'));
@@ -170,7 +170,7 @@ var
   sfk: TKeyman_StopForcingKeyboard;
 begin
   Result := False;
-  hkeyman := GetModuleHandle('keyman32.dll');
+  hkeyman := GetModuleHandle('keyman32-ver17.0.48-alpha-local.dll');
   if hkeyman = 0 then Exit;
   sfk := TKeyman_StopForcingKeyboard(GetProcAddress(hkeyman, 'Keyman_StopForcingKeyboard'));
   if(Assigned(@sfk)) then
