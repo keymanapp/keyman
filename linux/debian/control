@@ -158,7 +158,6 @@ Package: ibus-keyman
 Architecture: amd64 arm64 armel armhf i386 mipsel mips64el ppc64el riscv64
 Depends:
  ibus (>= 1.3.7),
- sudo,
  libkmnkbp0-0 (= ${binary:Version}),
  ${misc:Depends},
  ${shlibs:Depends},
