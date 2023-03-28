@@ -106,7 +106,7 @@ Building:
 # Elevated PowerShell
 choco install android-sdk android-studio ant gradle maven
 # optionally install sdk images
-sdkmanager "system-images;android-30;google_apis;armeabi-v7a"
+sdkmanager "system-images;android-33;google_apis;armeabi-v7a"
 sdkmanager --update
 sdkmanager --licenses
 ```
@@ -176,8 +176,8 @@ You can use Windows Settings to add these environment variables permanently:
 
 **Requirements**:
 * emscripten 2.0.23+
-* node.js 14+
-* openjdk 8+
+* node.js 18+
+* [openjdk 11](https://learn.microsoft.com/en-us/java/openjdk/download#openjdk-11)+
 
 ```ps1
 # Elevated PowerShell
