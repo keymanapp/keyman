@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.79 alpha 2023-03-28
+
+* chore(linux): Revert "Run and ignore autopkgtests on s390x" (#8506)
+* docs(linux): Update minimum required Ubuntu version (#8526)
+* docs(linux): Update common questions (#8532)
+
 ## 17.0.78 alpha 2023-03-27
 
 * chore(linux): Remove python3-raven dependency (#8507)
