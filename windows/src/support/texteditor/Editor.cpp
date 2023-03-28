@@ -3,7 +3,7 @@
   Copyright:        Copyright (C) SIL International. MIT License.
 
   Create Date:      10/03/2023
-  Authors:          rcruickshank
+  Authors:          rcruickshank + MS application wizard
 
 */
 
@@ -32,8 +32,6 @@ wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR
   UNREFERENCED_PARAMETER(hPrevInstance);
   UNREFERENCED_PARAMETER(lpCmdLine);
 
-  // TODO: Place code here.
-
   // Initialize global strings
   LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
   LoadStringW(hInstance, IDC_EDITOR, szWindowClass, MAX_LOADSTRING);
@@ -45,7 +43,6 @@ wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR
   }
 
   HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_EDITOR));
-
   MSG msg;
 
   // Main message loop:
@@ -55,7 +52,6 @@ wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR
       DispatchMessage(&msg);
     }
   }
-
   return (int)msg.wParam;
 }
 
@@ -161,7 +157,6 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
           MessageBox(NULL, L"Warning", L"Font not updated\n", MB_OK);
         }
       }
-
       break;
     default:
       return DefWindowProc(hWnd, message, wParam, lParam);

@@ -36,7 +36,7 @@ public:
    */
   void default_font();
   /**
-   * Set the HFONT of the private member m_log_font with the logical font
+   * Set the HFONT of the private member m_log_font with the logical font supplied.
    * If creation of the HFONT fails return NULL and leave the private member font
    * untouched
    *
