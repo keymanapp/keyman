@@ -1,4 +1,10 @@
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include <emscripten/bind.h>
+#endif
+
+#include <cassert>
 #include <algorithm>
 #include <iostream>
 #include "filesystem.h"

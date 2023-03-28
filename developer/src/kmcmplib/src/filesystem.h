@@ -1,14 +1,6 @@
 #pragma once
 
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#include <emscripten/bind.h>
-#endif
-
 #include <stdio.h>
-#include <cassert>
-#include <iostream>
-
 #include "kmx_u16.h"
 
 // Opens files on windows and non-windows platforms. Datatypes for Filename and mode must be the same.
