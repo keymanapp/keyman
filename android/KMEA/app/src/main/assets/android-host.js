@@ -26,23 +26,17 @@ function init() {
   //window.console.log('Device type = '+device);
   //window.console.log('Keyboard height = '+oskHeight);
   keyman.init({'app':device,'fonts':'packages/',root:'./'});
-  keyman.util.setOption('attachType','manual');
   keyman.oninserttext = insertText;
-  window.showKeyboardList = showMenu;
-  window.hideKeyboard = hideKeyboard;
-  window.menuKeyUp = menuKeyUp;
+  keyman.showKeyboardList = showMenu;
+  keyman.hideKeyboard = hideKeyboard;
+  keyman.menuKeyUp = menuKeyUp;
   keyman.getOskHeight = getOskHeight;
   keyman.getOskWidth = getOskWidth;
   keyman.beepKeyboard = beepKeyboard;
-  var ta = document.getElementById('ta');
-  keyman.setActiveElement(ta);
-
-  ta.readOnly = false;
-  checkTextArea();
 
   // Tell KMW the default banner height to use
   com.keyman.osk.Banner.DEFAULT_HEIGHT =
-    Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio);
+    Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio); // TODO:  non-namespaced version of this.
 
   keyman.addEventListener('keyboardloaded', setIsChiral);
   keyman.addEventListener('keyboardchange', setIsChiral);
@@ -71,7 +65,7 @@ function setBannerHeight(h) {
     osk.banner.height = Math.ceil(h / window.devicePixelRatio);
   }
   // Refresh KMW OSK
-  keyman.correctOSKTextSize();
+  keyman.refreshOskLayout();
 }
 
 function setOskHeight(h) {
@@ -81,7 +75,7 @@ function setOskHeight(h) {
   if(keyman && keyman.core && keyman.core.activeKeyboard) {
     keyman.core.activeKeyboard.refreshLayouts();
   }
-  keyman.correctOSKTextSize();
+  keyman.refreshOskLayout();
 }
 
 function setOskWidth(w) {
@@ -111,7 +105,7 @@ function onStateChange(change) {
   //window.console.log('onStateChange change: ' + change);
 
   // Refresh KMW OSK
-  keyman.correctOSKTextSize();
+  keyman.refreshOskLayout();
 
   fragmentToggle = (fragmentToggle + 1) % 100;
   if(change != 'configured') { // doesn't change the display; only initiates suggestions.
@@ -130,15 +124,13 @@ function setIsChiral(keyboardProperties) {
 function setKeymanLanguage(k) {
   KeymanWeb.registerStub(k);
   keyman.setActiveKeyboard(k.KP + '::'+k.KI, k.KLC);
-  keyman.osk.show(true);
 }
 
 function setSpacebarText(mode) {
-  keyman.options['spacebarText'] = mode;
-  keyman.osk.show(true);
+  keyman.options['spacebarText'] = mode; // TODO - how to set this post-modularization?
 
   // Refresh KMW OSK
-  keyman.correctOSKTextSize();
+  keyman.refreshOskLayout();
 }
 
 // #6665: we need to know when the user has pressed a hardware key so we don't
@@ -164,7 +156,7 @@ function insertText(dn, s, dr) {
 }
 
 function deregisterModel(modelID) {
-  keyman.modelManager.deregister(modelID);
+  keyman.unregister(modelID);
 }
 
 function enableSuggestions(model, mayPredict, mayCorrect) {
@@ -177,9 +169,7 @@ function enableSuggestions(model, mayPredict, mayCorrect) {
 }
 
 function setBannerOptions(mayPredict) {
-  keyman.osk.banner.setOptions({
-    'mayPredict': mayPredict
-  });
+  keyman.core.languageProcessor.mayPredict = mayPredict;
 }
 
 function registerModel(model) {
@@ -199,17 +189,14 @@ function setNumericLayer() {
 }
 
 function updateKMText(text) {
-  var ta = document.getElementById('ta');
-  console_debug('updateKMText(text='+text+') ta.value='+ta.value);
-
   if(text == undefined) {
       text = '';
   }
 
-  if(ta.value != text) {
-    ta.value = text;
-    window.resetContext();
-  }
+  console_debug('updateKMText(text='+text+') context.value='+keyman.context.getText());
+
+  keyman.context.setText(text);
+  keyman.resetContext();
 }
 
 function console_debug(s) {
@@ -219,22 +206,19 @@ function console_debug(s) {
 }
 
 function updateKMSelectionRange(start, end) {
-  var ta = document.getElementById('ta');
-  console_debug('updateKMSelectionRange('+start+','+end+'): ta.selectionStart='+ta.selectionStart+' '+
-    '['+ta._KeymanWebSelectionStart+'] ta.selectionEnd='+ta.selectionEnd+' '+ta._KeymanWebSelectionEnd);
+  var context = keyman.context;
 
-  var selDirection = 'forward';
+  // console_debug('updateKMSelectionRange('+start+','+end+'): context.selStart='+ta.selectionStart+' '+
+  //   '['+ta._KeymanWebSelectionStart+'] context.selEnd='+ta.selectionEnd+' '+ta._KeymanWebSelectionEnd);
+
   if(start > end) {
     var e0 = end;
     end = start;
     start = e0;
-    selDirection = 'backward';
   }
 
-  if(ta.selectionStart != start || ta.selectionEnd != end || ta.selectionDirection != selDirection) {
-    ta.selectionStart = ta._KeymanWebSelectionStart = start;
-    ta.selectionEnd = ta._KeymanWebSelectionEnd = end;
-    ta.selectionDirection = selDirection;
+  if(context.selStart != start || context.selEnd != end) {
+    keyman.context.setSelection(start, end);
     keyman.resetContext();
   }
 }
@@ -328,7 +312,7 @@ function hideKeyboard() {
 
 function showKeyboard() {
   // Refresh KMW OSK
-  keyman.correctOSKTextSize();
+  keyman.refreshOskLayout();
 }
 
 function executePopupKey(keyID, keyText) {
@@ -337,11 +321,11 @@ function executePopupKey(keyID, keyText) {
   keyman.executePopupKey(keyID);
 }
 
-function executeHardwareKeystroke(code, shift, lstates, eventModifiers) {
+async function executeHardwareKeystroke(code, shift, lstates, eventModifiers) {
   console_debug('executeHardwareKeystroke(code='+code+',shift='+shift+',lstates='+lstates+',eventModifiers='+eventModifiers+')');
   try {
     executingHardwareKeystroke = true;
-    if (keyman.executeHardwareKeystroke(code, shift, lstates)) { // false if matched, true if not
+    if (await keyman.hardKeyboard.raiseKeyEvent(code, shift, lstates)) { // false if matched, true if not
       // KMW didn't process the key, so have the Android app dispatch the key with the original event modifiers
       window.jsInterface.dispatchKey(code, eventModifiers);
     }
@@ -370,25 +354,4 @@ function toHex(theString) {
     hexString += theHex;
   }
   return hexString;
-}
-
-/**
- * Check the WebView version and determine if the textarea that KeymanWeb uses needs to be "visible".
- * Normally, this textarea is not displayed to avoid redundant layout calculations.
- * In older WebViews on Android 5.0 though, selectionStart and selectionEnd positions fail to
- * update unless the textarea is visible.
- * Reference: Issue #5376
- */
-function checkTextArea() {
-  var uaRe = /Chrome\/([0-9]*)\./g;
-  var chromeMajorVersion = uaRe.exec(navigator.userAgent);
-  if (chromeMajorVersion && parseInt(chromeMajorVersion[1]) <= 37) {
-    var ta = document.getElementById('ta');
-    if (ta != null) {
-      ta.style.display = '';
-      ta.style.position = 'absolute';
-      ta.style.left = '-500px';
-      ta.style.top = '0px';
-    }
-  }
 }

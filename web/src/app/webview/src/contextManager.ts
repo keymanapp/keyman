@@ -21,6 +21,13 @@ class ContextHost extends Mock {
       this.oninserttext(transform.deleteLeft, transform.insert, transform.deleteRight);
     }
   }
+
+  // In app/webview, apps are expected to immediately update the selection range AFTER
+  // changing the context's text.
+  setText(text: string): void {
+    this.text = text;
+    this.setSelection(this.text._kmwLength());
+  }
 }
 
 export default class ContextManager extends ContextManagerBase {

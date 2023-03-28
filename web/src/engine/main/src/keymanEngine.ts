@@ -19,7 +19,7 @@ export default class KeymanEngine<
   readonly config: EngineConfiguration;
   readonly contextManager: ContextManager;
   readonly interface: KeyboardInterface;
-  readonly processor: InputProcessor;
+  readonly core: InputProcessor;
   readonly keyboardRequisitioner: KeyboardRequisitioner;
   readonly modelCache: ModelCache;
 
@@ -52,7 +52,7 @@ export default class KeymanEngine<
       // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
       outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
 
-      const result = this.processor.processKeyEvent(event, outputTarget);
+      const result = this.core.processKeyEvent(event, outputTarget);
       if(callback) {
         callback(result, null);
       }
@@ -94,17 +94,15 @@ export default class KeymanEngine<
     const kbdCache = this.keyboardRequisitioner.cache;
     this.interface.setKeyboardCache(this.keyboardRequisitioner.cache);
 
-    this.processor = new InputProcessor(config.hostDevice, worker, this.processorConfiguration());
+    this.core = new InputProcessor(config.hostDevice, worker, this.processorConfiguration());
 
     this.contextManager.configure({
       resetContext: (target) => {
-        this.processor.keyboardProcessor.resetContext(target);
+        this.core.keyboardProcessor.resetContext(target);
       },
-      predictionContext: new PredictionContext(this.processor.languageProcessor, this.processor.keyboardProcessor),
+      predictionContext: new PredictionContext(this.core.languageProcessor, this.core.keyboardProcessor),
       keyboardCache: this.keyboardRequisitioner.cache
     });
-
-    // TODO:  configure that context-manager!
 
     // #region Event handler wiring
     kbdCache.on('stubAdded', (stub) => {
@@ -237,13 +235,24 @@ export default class KeymanEngine<
     const kbd = this.contextManager.activeKeyboard;
     const model = this.modelCache.modelForLanguage(kbd.metadata.langId);
 
-    if(this.processor.activeModel != model) {
-      if(this.processor.activeModel) {
-        this.processor.languageProcessor.unloadModel();
+    let bannerDisplayed: boolean = false;
+
+    if(this.core.activeModel != model) {
+      if(this.core.activeModel) {
+        bannerDisplayed = true;
+        this.core.languageProcessor.unloadModel();
       }
 
+      // Semi-hacky management of banner display state.
       if(model) {
-        this.processor.languageProcessor.loadModel(model);
+        this.core.languageProcessor.loadModel(model).then(() => {
+          if(!bannerDisplayed) {
+            this.osk.bannerController.selectBanner('active');
+            this.osk.bannerController.selectBanner('configured');
+          }
+        });
+      } else if(bannerDisplayed) {
+        this.osk.bannerController.selectBanner('inactive');
       }
     }
   }
@@ -264,14 +273,63 @@ export default class KeymanEngine<
     this.modelCache.deregister(modelId);
 
     // Is it the active model?
-    if(this.processor.activeModel && this.processor.activeModel.id == modelId) {
-      this.processor.languageProcessor.unloadModel();
+    if(this.core.activeModel && this.core.activeModel.id == modelId) {
+      this.core.languageProcessor.unloadModel();
     }
   }
 
   async setActiveKeyboard(keyboardId: string, languageCode?: string): Promise<boolean> {
     return this.contextManager.activateKeyboard(keyboardId, languageCode, true);
   }
+
+  /**
+   * Function     isChiral
+   * Scope        Public
+   * @param       {string|Object=}   k0
+   * @return      {boolean}
+   * Description  Tests if the active keyboard (or optional argument) uses chiral modifiers.
+   */
+  isChiral(k0?: string | Keyboard) {
+    let kbd: Keyboard;
+    if(k0) {
+      if(typeof k0 == 'string') {
+        const kbdObj = this.keyboardRequisitioner.cache.getKeyboard(k0);
+        if(!kbdObj) {
+          throw new Error(`Keyboard '${k0}' has not been loaded.`);
+        } else {
+          k0 = kbdObj;
+        }
+      }
+
+      kbd = k0;
+    } else {
+      kbd = this.core.activeKeyboard;
+    }
+    return kbd.isChiral;
+  }
+
+  /**
+   * Function     resetContext
+   * Scope        Public
+   * Description  Reverts the OSK to the default layer, clears any processing caches and modifier states,
+   *              and clears deadkeys and prediction-processing states on the active element (if it exists)
+   */
+  resetContext() {
+    // NOTE:  16.0 KMW had a `element: HTMLElement` parameter.  It was undocumented on help.keyman.com, though,
+    //        and I'm not sure it makes sense to attempt to maintain.
+    //
+    //        I cannot find any calls that utilized the parameter within in-repo code.
+    this.contextManager.resetContext();
+  };
+
+  /**
+   * Function     setNumericLayer
+   * Scope        Public
+   * Description  Set OSK to numeric layer if it exists
+   */
+  setNumericLayer() {
+    this.core.keyboardProcessor.setNumericLayer(this.config.softDevice);
+  };
 }
 
 // Intent:  define common behaviors for both primary app types; each then subclasses & extends where needed.

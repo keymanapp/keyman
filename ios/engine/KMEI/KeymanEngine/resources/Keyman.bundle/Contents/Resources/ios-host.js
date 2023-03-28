@@ -43,14 +43,12 @@ function init() {
     // We could convert to relying on the promise, but the underlying input element
     // tends to show a bit due to the delay when we do so.
     kmw.init({'app':device,'fonts':'fonts/'});//.then(function() {
-        kmw['util']['setOption']('attachType','manual');
         kmw['oninserttext'] = insertText;
-        window['showKeyboardList'] = menuKeyDown;
-        window['hideKeyboard'] = hideKeyboard;
+        kmw['showKeyboardList'] = menuKeyDown;
+        kmw['hideKeyboard'] = hideKeyboard;
         kmw['getOskHeight'] = getOskHeight;
         kmw['getOskWidth'] = getOskWidth;
         kmw['beepKeyboard'] = beepKeyboard;
-        kmw['setActiveElement']('ta');
 
     //});
 }
@@ -81,7 +79,7 @@ function setBannerHeight(h) {
     if(h >= 0) {
     // The banner itself may not be loaded yet.  This will preemptively help set
     // its eventual display height.
-    com.keyman.osk.Banner.DEFAULT_HEIGHT = h;
+    com.keyman.osk.Banner.DEFAULT_HEIGHT = h;  // TODO:  non-namespaced version of this.
 
     if(osk.banner.activeType != 'blank') {
         osk.banner.height = h;
@@ -89,7 +87,7 @@ function setBannerHeight(h) {
     }
 
     // Refresh KMW's OSK
-    kmw.correctOSKTextSize();
+    kmw.refreshOskLayout();
     doResetContext();
 }
 
@@ -99,8 +97,7 @@ function setOskHeight(height) {
     if(kmw && kmw.core && kmw.core.activeKeyboard) {
         kmw.core.activeKeyboard.refreshLayouts();
     }
-    kmw.osk.show(true);
-    kmw.correctOSKTextSize();
+    kmw.refreshOskLayout();
     doResetContext();
 }
 
@@ -133,7 +130,7 @@ function setKeymanLanguage(stub) {
     KeymanWeb.registerStub(stub);
 
     kmw.setActiveKeyboard(stub.KP + '::' + stub.KI, stub.KLC).then(function() {
-        kmw.osk.show(true);
+        keyman.refreshOskLayout();
         doResetContext();
     });
 }
@@ -264,30 +261,34 @@ function doResetContext() {
 }
 
 function setCursorRange(pos, length) {
+    var context = keyman.context;
+
     //console.log('setCursorRange('+pos+', '+length+')');
-    var ta = document.getElementById('ta');
-    var resetContext = (ta.selectionStart != pos || ta.selectionEnd != pos + length);
-    ta.selectionStart = ta._KeymanWebSelectionStart = pos;
-    ta.selectionEnd = ta._KeymanWebSelectionEnd = pos + length;
-    if(resetContext) {
-        //console.log('  setCursorRange: resetting context');
-        doResetContext();
+
+    var start = pos;
+    var end = pos + length;
+
+    if(context.selStart != start || context.selEnd != end) {
+      keyman.context.setSelection(start, end);
+      keyman.resetContext();
     }
-    return ta.selectionEnd;
 }
 
 function setKeymanVal(text) {
     //console.log('setKeymanVal('+JSON.stringify(text)+')');
-    if(undefined == text) text = '';
-    var ta = document.getElementById('ta');
 
-    var resetContext = ta.value != text;
-    ta.value = text;
-    if(resetContext) {
-        //console.log('  setKeymanVal: resetting context');
-        doResetContext();
+    if(text == undefined) {
+        text = '';
     }
-    return ta.value;
+
+    var resetContext = keyman.context.getText() != text;
+
+    if(resetContext) {
+        keyman.context.setText(text);
+        keyman.resetContext();
+    }
+
+    return keyman.context.getText();
 }
 
 function executePopupKey(keyID, keyText) {
@@ -319,11 +320,11 @@ function enableSuggestions(model, mayPredict, mayCorrect) {
     keyman.core.languageProcessor.mayPredict = mayPredict;
     keyman.core.languageProcessor.mayCorrect = mayCorrect;
 
-    keyman.modelManager.register(model);
+    keyman.addModel(model);
 }
 
 function setSpacebarText(mode) {
-    keyman.options['spacebarText'] = mode;
-    keyman.osk.show(true);
+    keyman.options['spacebarText'] = mode;  // TODO - how to set this post-modularization?
+    keyman.refreshOskLayout();
 }
 

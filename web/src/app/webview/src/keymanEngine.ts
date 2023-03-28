@@ -55,9 +55,9 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
   // Functions that the old 'app/webview' equivalent had always provided to the WebView
 
   /**
-   * correctOSKTextSize handles rotation event -- currently rebuilds keyboard and adjusts font sizes
+   * refreshOskLayout handles rotation event -- currently rebuilds keyboard and adjusts font sizes
    */
-  correctOSKTextSize() {
+  refreshOskLayout() {
     this.osk?.refreshLayout();
   };
 
@@ -199,4 +199,9 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
   // Properties set by the WebView hosting page
   hideKeyboard?: () => void = null;
   menuKeyUp?: () => void = null;
+  showKeyboardList?: () => void = null;
+
+  get context() {
+    return this.contextManager.activeTarget;
+  }
 }
