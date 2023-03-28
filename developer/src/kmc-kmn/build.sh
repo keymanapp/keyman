@@ -16,7 +16,7 @@ cd "$THIS_SCRIPT_PATH"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-builder_describe "Build Keyman kmc kmn to kmx Compiler module" \
+builder_describe "Build Keyman Developer Compiler Module for .kmn to .kmx" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
   "@/developer/src/kmcmplib:wasm" \

@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/kmc-kmn",
-  "description": "Keyman Developer kmn keyboard compiler",
+  "description": "Keyman Developer Compiler Module for .kmn to .kmx",
   "keywords": [
     "keyboard",
     "keyman",

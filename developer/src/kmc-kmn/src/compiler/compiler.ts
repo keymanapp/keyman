@@ -1,49 +1,24 @@
-//
-// const importObject = {
-  // imports: { imported_func: (arg) => console.log(arg) },
-// };
-
-
-// type KMCMP_COMPILER_OPTIONS = {
-//   dwSize: number; // uint32_t;
-//   ShouldAddCompilerVersion: boolean; // bool
-// };
-
-//typedef int (*kmcmp_CompilerMessageProc)(int line, uint32_t dwMsgCode, char* szText, void* context);
-
-// interface kmcmplib {
-//   _kmcmp_SetCompilerOptions(options: KMCMP_COMPILER_OPTIONS): boolean;
-//   _kmcmp_CompileKeyboardFile(
-//     pszInfile: string, //char*
-//     pszOutfile: string, //char*
-//     ASaveDebug: boolean, //bool
-//     ACompilerWarningsAsErrors: boolean, //bool
-//     AWarnDeprecatedCode: boolean, //bool
-//     pMsgproc: number, //kmcmp_CompilerMessageProc
-//     AmsgprocContext: number): number; //uint32_t
-// };
-
 /*
-extern "C" uint32_t kmcmp_CompileKeyboardFileToBuffer(
-  char* pszInfile,
-  void* pfkBuffer,
-  bool ACompilerWarningsAsErrors,
-  bool AWarnDeprecatedCode,
-  kmcmp_CompilerMessageProc pMsgproc,
-  void* AmsgprocContext,
-  int Target
-);
-*/
+TODO: implement additional interfaces:
 
-/*
-typedef bool (*kmcmp_ValidateJsonMessageProc)(int64_t offset, const char* szText, void* context);
+  extern "C" uint32_t kmcmp_CompileKeyboardFileToBuffer(
+    char* pszInfile,
+    void* pfkBuffer,
+    bool ACompilerWarningsAsErrors,
+    bool AWarnDeprecatedCode,
+    kmcmp_CompilerMessageProc pMsgproc,
+    void* AmsgprocContext,
+    int Target
+  );
 
-extern "C" bool kmcmp_ValidateJsonFile(
-  std::fstream& f,
-  std::fstream& fd,
-  kmcmp_ValidateJsonMessageProc MessageProc,
-  void* context
-);
+  typedef bool (*kmcmp_ValidateJsonMessageProc)(int64_t offset, const char* szText, void* context);
+
+  extern "C" bool kmcmp_ValidateJsonFile(
+    std::fstream& f,
+    std::fstream& fd,
+    kmcmp_ValidateJsonMessageProc MessageProc,
+    void* context
+  );
 */
 
 // TODO: rename wasm-host?
