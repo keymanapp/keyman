@@ -12,11 +12,12 @@ THIS_DIR="$(dirname "$THIS_SCRIPT")"
 
 mkdir -p "$THIS_DIR/host"
 cp -R "$KEYMAN_ROOT/android/KMEA/app/src/main/assets/"* "$THIS_DIR/host/"
-cp "$KEYMAN_ROOT/web/build/app/embed/debug/keyman.js" "$THIS_DIR/host/keymanandroid.js"
-cp "$KEYMAN_ROOT/web/build/app/embed/debug/keyman.js.map" "$THIS_DIR/host/keyman.js.map"
-cp "$KEYMAN_ROOT/web/build/app/embed/debug/osk/kmwosk.css" "$THIS_DIR/host/kmwosk.css"
-cp "$KEYMAN_ROOT/web/build/app/embed/debug/osk/globe-hint.css" "$THIS_DIR/host/globe-hint.css"
-cp "$KEYMAN_ROOT/web/build/app/embed/debug/osk/keymanweb-osk.ttf" "$THIS_DIR/host/keymanweb-osk.ttf"
+cp "$KEYMAN_ROOT/web/build/app/webview/debug/index.js" "$THIS_DIR/host/keymanandroid.js"
+cp "$KEYMAN_ROOT/web/build/app/webview/debug/index.js.map" "$THIS_DIR/host/keymanandroid.js.map"
+cp "$KEYMAN_ROOT/web/build/app/resources/osk/ajax-loader.gif" "$THIS_DIR/host/ajax-loader.gif"
+cp "$KEYMAN_ROOT/web/build/app/resources/osk/kmwosk.css" "$THIS_DIR/host/kmwosk.css"
+cp "$KEYMAN_ROOT/web/build/app/resources/osk/globe-hint.css" "$THIS_DIR/host/globe-hint.css"
+cp "$KEYMAN_ROOT/web/build/app/resources/osk/keymanweb-osk.ttf" "$THIS_DIR/host/keymanweb-osk.ttf"
 
 # We shouldn't rely on a prior Android build for these files!  We can retrieve them separately.
 cp "$KEYMAN_ROOT/common/web/sentry-manager/build/index.js" "$THIS_DIR/host/keyman-sentry.js"

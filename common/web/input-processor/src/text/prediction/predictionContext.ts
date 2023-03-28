@@ -71,9 +71,6 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   public constructor(langProcessor: LanguageProcessor, kbdProcessor: KeyboardProcessor) {
     super();
 
-    if(langProcessor.state == 'inactive') {
-      throw new Error("Invalid state:  no predictive-text model is currently available.");
-    }
     this.langProcessor = langProcessor;
     this.kbdProcessor = kbdProcessor;
 

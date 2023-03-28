@@ -29,7 +29,7 @@ TEST_FLAGS="-x aR lintRelease testRelease" # Gradle test w/o build
 JUNIT_RESULTS="##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
 
 builder_describe "Builds Keyman Engine for Android." \
-  "@/web" \
+  "@/web/src/app/webview" \
   "clean" \
   "configure" \
   "build" \
@@ -73,12 +73,12 @@ if builder_start_action configure:engine; then
 
   # Copy KeymanWeb artifacts
   echo "Copying Keyman Web artifacts"
-  cp "$KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/osk/ajax-loader.gif" "$ENGINE_ASSETS/ajax-loader.gif"
-  cp "$KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/keyman.js" "$ENGINE_ASSETS/keymanandroid.js"
-  cp "$KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/keyman.js.map" "$ENGINE_ASSETS/keyman.js.map"
-  cp "$KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/osk/kmwosk.css" "$ENGINE_ASSETS/kmwosk.css"
-  cp "$KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/osk/globe-hint.css" "$ENGINE_ASSETS/globe-hint.css"
-  cp "$KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/osk/keymanweb-osk.ttf" "$ENGINE_ASSETS/keymanweb-osk.ttf"
+  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/index.js" "$ENGINE_ASSETS/keymanandroid.js"
+  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/index.js.map" "$ENGINE_ASSETS/keymanandroid.js.map"
+  cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/ajax-loader.gif" "$ENGINE_ASSETS/ajax-loader.gif"
+  cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/kmwosk.css" "$ENGINE_ASSETS/kmwosk.css"
+  cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/globe-hint.css" "$ENGINE_ASSETS/globe-hint.css"
+  cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/keymanweb-osk.ttf" "$ENGINE_ASSETS/keymanweb-osk.ttf"
 
   cp "$KEYMAN_ROOT/common/web/sentry-manager/build/index.js" "$ENGINE_ASSETS/keyman-sentry.js"
 
