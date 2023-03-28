@@ -128,10 +128,7 @@ function setKeymanLanguage(k) {
 }
 
 function setSpacebarText(mode) {
-  keyman.options['spacebarText'] = mode; // TODO - how to set this post-modularization?
-
-  // Refresh KMW OSK
-  keyman.refreshOskLayout();
+  keyman.config.spacebarText = mode;
 }
 
 // #6665: we need to know when the user has pressed a hardware key so we don't

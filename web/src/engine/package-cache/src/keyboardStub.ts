@@ -159,10 +159,13 @@ export default class KeyboardStub extends KeyboardProperties {
     this.KR ||= stub.KR;
     this.KRC ||= stub.KRC;
     this.KN ||= stub.KN;
-    this.displayName ||= stub.displayName;
     this.KF ||= stub.KF;
     this.KFont ||= stub.KFont;
     this.KOskFont ||= stub.KOskFont;
+
+    if(stub._displayName) {
+      this._displayName ||= stub._displayName;
+    }
   }
 
   public validateForCustomKeyboard(): Error {

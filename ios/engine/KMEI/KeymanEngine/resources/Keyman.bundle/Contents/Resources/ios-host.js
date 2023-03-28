@@ -321,7 +321,6 @@ function enableSuggestions(model, mayPredict, mayCorrect) {
 }
 
 function setSpacebarText(mode) {
-    keyman.options['spacebarText'] = mode;  // TODO - how to set this post-modularization?
-    keyman.refreshOskLayout();
+    keyman.config.spacebarText = mode;
 }
 

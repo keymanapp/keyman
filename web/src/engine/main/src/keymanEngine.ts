@@ -111,6 +111,12 @@ export default class KeymanEngine<
     }
 
     // #region Event handler wiring
+    this.config.on('spacebartext', () => {
+      // On change of spacebar-text mode, we currently need a layout refresh to update the
+      // spacebar's text.
+      this.osk?.refreshLayout();
+    });
+
     kbdCache.on('stubAdded', (stub) => {
       let eventRaiser = () => {
         // The corresponding event is needed in order to update UI modules as new keyboard stubs "come online".
