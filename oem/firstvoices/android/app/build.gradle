@@ -10,11 +10,6 @@ apply from: "$rootPath/version.gradle"
 android {
     compileSdkVersion 33
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
     defaultConfig {
         applicationId "com.firstvoices.keyboards"
         minSdkVersion 21
@@ -67,6 +62,12 @@ android {
     lintOptions {
         disable 'MissingTranslation'
         lintConfig file("lint.xml")
+    }
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
     }
 }
 
