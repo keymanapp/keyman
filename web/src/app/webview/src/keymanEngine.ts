@@ -45,7 +45,9 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
       activator: new StaticActivator(),
       embeddedGestureConfig: buildEmbeddedGestureConfig(this.config.softDevice),
       doCacheBusting: true,
-      predictionContextManager: this.contextManager.predictionContext
+      predictionContextManager: this.contextManager.predictionContext,
+      heightOverride: this.getOskHeight,
+      widthOverride: this.getOskWidth
     };
 
     this.osk = new AnchoredOSKView(oskConfig);
@@ -200,6 +202,8 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
   hideKeyboard?: () => void = null;
   menuKeyUp?: () => void = null;
   showKeyboardList?: () => void = null;
+  getOskHeight?: () => number = null;
+  getOskWidth?: () => number = null;
 
   get context() {
     return this.contextManager.activeTarget;

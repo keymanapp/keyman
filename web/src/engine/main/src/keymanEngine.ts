@@ -1,4 +1,4 @@
-import { DefaultRules, type Keyboard, KeyboardKeymanGlobal, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
+import { DefaultRules, type Keyboard, KeyboardKeymanGlobal, ProcessorInitOptions, OutputTarget } from "@keymanapp/keyboard-processor";
 import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
 import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
 import { OSKView } from "keyman/engine/osk";
@@ -103,6 +103,12 @@ export default class KeymanEngine<
       predictionContext: new PredictionContext(this.core.languageProcessor, this.core.keyboardProcessor),
       keyboardCache: this.keyboardRequisitioner.cache
     });
+
+    this.core.keyboardProcessor.beepHandler = (target) => {
+      if(this.doBeep) {
+        this.doBeep(target);
+      }
+    }
 
     // #region Event handler wiring
     kbdCache.on('stubAdded', (stub) => {
@@ -330,6 +336,8 @@ export default class KeymanEngine<
   setNumericLayer() {
     this.core.keyboardProcessor.setNumericLayer(this.config.softDevice);
   };
+
+  doBeep?: (target: OutputTarget) => void;
 }
 
 // Intent:  define common behaviors for both primary app types; each then subclasses & extends where needed.
