@@ -22,6 +22,7 @@ if(_debug) {
 
 var oskHeight = 0;
 var oskWidth = 0;
+var bannerHeight = 0;
 
 var sentryManager = new com.keyman.KeymanSentryManager({
     hostPlatform: "ios"
@@ -40,17 +41,18 @@ function init() {
     document.body.style.height = window.outerHeight;
 
     var kmw=window['keyman'];
-    // We could convert to relying on the promise, but the underlying input element
-    // tends to show a bit due to the delay when we do so.
-    kmw.init({'app':device,'fonts':'fonts/'});//.then(function() {
-        kmw['oninserttext'] = insertText;
-        kmw['showKeyboardList'] = menuKeyDown;
-        kmw['hideKeyboard'] = hideKeyboard;
-        kmw['getOskHeight'] = getOskHeight;
-        kmw['getOskWidth'] = getOskWidth;
-        kmw['beepKeyboard'] = beepKeyboard;
-
-    //});
+    kmw['oninserttext'] = insertText;
+    kmw['showKeyboardList'] = menuKeyDown;
+    kmw['hideKeyboard'] = hideKeyboard;
+    kmw['getOskHeight'] = getOskHeight;
+    kmw['getOskWidth'] = getOskWidth;
+    kmw['beepKeyboard'] = beepKeyboard;
+    kmw.init({'app':device,'fonts':'fonts/'}).then(function() {
+      if(bannerHeight > 0) {
+        // The OSK is not available until initialization is complete.
+        kmw.osk.bannerView.activeBannerHeight = bannerHeight;
+      }
+    });
 }
 
 function verifyLoaded() {
@@ -73,22 +75,17 @@ function setBannerImage(path) {
 }
 
 function setBannerHeight(h) {
-    var kmw = com.keyman.singleton;
-    var osk = kmw.osk;
-
-    if(h >= 0) {
+  if(h >= 0) {
     // The banner itself may not be loaded yet.  This will preemptively help set
     // its eventual display height.
-    com.keyman.osk.Banner.DEFAULT_HEIGHT = h;  // TODO:  non-namespaced version of this.
+    bannerHeight = h;
 
-    if(osk.banner.activeType != 'blank') {
-        osk.banner.height = h;
-    }
-    }
+    keyman.osk.bannerView.activeBannerHeight = h;
+  }
 
-    // Refresh KMW's OSK
-    kmw.refreshOskLayout();
-    doResetContext();
+  // Refresh KMW's OSK
+  kmw.refreshOskLayout();
+  doResetContext();
 }
 
 function setOskHeight(height) {

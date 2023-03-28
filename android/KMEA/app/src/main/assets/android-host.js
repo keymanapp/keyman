@@ -25,7 +25,6 @@ function init() {
   //document.body.style.backgroundColor="transparent";
   //window.console.log('Device type = '+device);
   //window.console.log('Keyboard height = '+oskHeight);
-  keyman.init({'app':device,'fonts':'packages/',root:'./'});
   keyman.oninserttext = insertText;
   keyman.showKeyboardList = showMenu;
   keyman.hideKeyboard = hideKeyboard;
@@ -33,10 +32,12 @@ function init() {
   keyman.getOskHeight = getOskHeight;
   keyman.getOskWidth = getOskWidth;
   keyman.beepKeyboard = beepKeyboard;
+  keyman.init({'app':device,'fonts':'packages/',root:'./'}).then(() => {
+    const bannerHeight = Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio);
 
-  // Tell KMW the default banner height to use
-  com.keyman.osk.Banner.DEFAULT_HEIGHT =
-    Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio); // TODO:  non-namespaced version of this.
+    // The OSK is not available until initialization is complete.
+    keyman.osk.bannerView.activeBannerHeight = bannerHeight;
+  });
 
   keyman.addEventListener('keyboardloaded', setIsChiral);
   keyman.addEventListener('keyboardchange', setIsChiral);

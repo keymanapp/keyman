@@ -253,6 +253,7 @@ export default class KeymanEngine<
       if(model) {
         this.core.languageProcessor.loadModel(model).then(() => {
           if(!bannerDisplayed) {
+            // Because this is what the original implementation expects to see (over time).
             this.osk.bannerController.selectBanner('active');
             this.osk.bannerController.selectBanner('configured');
           }

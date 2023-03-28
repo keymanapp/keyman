@@ -137,8 +137,10 @@ export default class BannerView implements OSKViewComponent {
   /**
    * Sets the height (in pixels) of the active 'Banner' instance.
    */
-  public set height(h: number) {
-    if (this.activeBanner) {
+  public set activeBannerHeight(h: number) {
+    this.activeBannerHeight = h;
+
+    if (this.activeBanner && !(this.activeBanner instanceof BlankBanner)) {
       this.activeBanner.height = h;
     }
   }
@@ -245,7 +247,7 @@ export class BannerController {
    *        representing the type of `Banner` to set active.
    * @param height - Optional banner height in pixels.
    */
-  public setBanner(type: BannerType, height?: number) {
+  public setBanner(type: BannerType) {
     var banner: Banner;
 
     switch(type) {
@@ -253,10 +255,10 @@ export class BannerController {
         banner = new BlankBanner();
         break;
       case 'image':
-        banner = new ImageBanner(this.imagePath, Banner.DEFAULT_HEIGHT);
+        banner = new ImageBanner(this.imagePath, this.container.activeBannerHeight);
         break;
       case 'suggestion':
-        banner = new SuggestionBanner(this.hostDevice, height);
+        banner = new SuggestionBanner(this.hostDevice, this.container.activeBannerHeight);
         break;
       default:
         throw new Error("Invalid type specified for the banner!");
