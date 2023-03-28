@@ -144,4 +144,6 @@ fullWorkerConcatenation.script = fullWorkerConcatenation.script.substring(0, ful
 fullWorkerConcatenation.script += `//# sourceMappingURL=${fullWorkerConcatenation.scriptFilename}.map`;
 
 fs.writeFileSync(`build/lib/${fullWorkerConcatenation.scriptFilename}`, fullWorkerConcatenation.script);
-fs.writeFileSync(`build/lib/${fullWorkerConcatenation.scriptFilename}.map`, convertSourceMap.fromObject(fullWorkerConcatenation.sourcemapJSON).toJSON());
+if(fullWorkerConcatenation.sourcemapJSON) {
+  fs.writeFileSync(`build/lib/${fullWorkerConcatenation.scriptFilename}.map`, convertSourceMap.fromObject(fullWorkerConcatenation.sourcemapJSON).toJSON());
+}
