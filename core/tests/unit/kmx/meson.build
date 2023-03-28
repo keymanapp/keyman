@@ -22,11 +22,6 @@ tests_flags = []
 if cpp_compiler.get_id() == 'emscripten'
   # '-sMODULARIZE', '-sEXPORT_ES6',
   tests_flags += ['-lnodefs.js', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
-
-  # tests_flags = ['--embed-file', join_paths(meson.current_source_dir(),'@/')]
-  # we have to link in files from the binary folder also as the binary tests
-  # use the kmx test runner.
-#  tests_flags += ['--embed-file', join_paths(meson.current_build_dir(),'fixtures','binary','@')]
 endif
 
 kmx = executable('kmx',
