@@ -55,7 +55,7 @@ kmc_cmd = [node, kmc_root]
 
 foreach kbd : tests_needing_copy
   configure_file(
-    command: copy_cmd + ['@INPUT@', '@OUTPUT@'],
+    copy: true,
     input: kbd + '.xml',
     output: kbd + '.xml'
   )
@@ -78,8 +78,8 @@ endforeach
 
 foreach kbd : tests_from_cldr
   configure_file(
-    command: copy_cmd + ['@INPUT@', '@OUTPUT@'],
-    input: join_paths(ldml_data, kbd + '.xml'),
+    copy: true,
+    input: ldml_data / kbd + '.xml',
     output: kbd + '.xml'
   )
   configure_file(
