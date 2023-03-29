@@ -24,7 +24,7 @@ var oskHeight = 0;
 var oskWidth = 0;
 var bannerHeight = 0;
 
-var sentryManager = new com.keyman.KeymanSentryManager({
+var sentryManager = new KeymanSentryManager({
     hostPlatform: "ios"
 });
 sentryManager.init();

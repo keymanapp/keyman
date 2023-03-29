@@ -10,10 +10,10 @@ var oskHeight = Math.ceil(window.jsInterface.getKeyboardHeight() / window.device
 var oskWidth = 0;
 var fragmentToggle = 0;
 
-// var sentryManager = new com.keyman.KeymanSentryManager({
-//   hostPlatform: "android"
-// });
-// sentryManager.init();
+var sentryManager = new KeymanSentryManager({
+  hostPlatform: "android"
+});
+sentryManager.init();
 
 window.addEventListener('load', init, false);
 

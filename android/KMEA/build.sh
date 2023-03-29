@@ -80,6 +80,7 @@ if builder_start_action configure:engine; then
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/globe-hint.css" "$ENGINE_ASSETS/globe-hint.css"
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/keymanweb-osk.ttf" "$ENGINE_ASSETS/keymanweb-osk.ttf"
 
+  cp "$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js" "$ENGINE_ASSETS/sentry.min.js"
   cp "$KEYMAN_ROOT/common/web/sentry-manager/build/index.js" "$ENGINE_ASSETS/keyman-sentry.js"
 
   echo "Copying es6-shim polyfill"

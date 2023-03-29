@@ -187,7 +187,8 @@ update_bundle ( ) {
           rm                               "$base_dir/$BUNDLE_PATH/keyman.js.map"
         fi
 
-        cp "$KEYMAN_ROOT/common/web/sentry-manager/build/index.js"                        "$base_dir/$BUNDLE_PATH/keyman-sentry.js"
+        cp "$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js" "$base_dir/$BUNDLE_PATH/sentry.min.js"
+        cp "$KEYMAN_ROOT/common/web/sentry-manager/build/index.js"   "$base_dir/$BUNDLE_PATH/keyman-sentry.js"
 
     fi
 
