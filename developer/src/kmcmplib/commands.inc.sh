@@ -31,11 +31,11 @@ do_configure() {
   fi
 
   if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $CONFIGURATION configure "${builder_extra_params[@]}"
+    cmd //C build.bat $target $BUILDER_CONFIGURATION configure "${builder_extra_params[@]}"
   else
     pushd "$THIS_SCRIPT_PATH" > /dev/null
     # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
-    meson setup "$MESON_PATH" --werror --buildtype $CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
+    meson setup "$MESON_PATH" --werror --buildtype $BUILDER_CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
     popd > /dev/null
   fi
   builder_finish_action success configure:$target
@@ -55,7 +55,7 @@ do_build() {
     # the Visual Studio build environment with vcvarsall.bat
     # TODO: if PATH is the only variable required, let's try and
     #       eliminate this difference in the build process
-    cmd //C build.bat $target $CONFIGURATION build "${builder_extra_params[@]}"
+    cmd //C build.bat $target $BUILDER_CONFIGURATION build "${builder_extra_params[@]}"
   else
     pushd "$MESON_PATH" > /dev/null
     ninja
@@ -77,7 +77,7 @@ do_test() {
   checkout_keyboards
 
   if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $CONFIGURATION test "${builder_extra_params[@]}"
+    cmd //C build.bat $target $BUILDER_CONFIGURATION test "${builder_extra_params[@]}"
   else
     pushd "$MESON_PATH" > /dev/null
     meson test "${builder_extra_params[@]}"
@@ -131,13 +131,13 @@ locate_emscripten() {
   if [[ -z ${EMSCRIPTEN_BASE+x} ]]; then
     if [[ -z ${EMCC+x} ]]; then
       local EMCC=`which emcc`
-      [[ -z $EMCC ]] && fail "locate_emscripten: Could not locate emscripten (emcc) on the path or with \$EMCC or \$EMSCRIPTEN_BASE"
+      [[ -z $EMCC ]] && builder_die "locate_emscripten: Could not locate emscripten (emcc) on the path or with \$EMCC or \$EMSCRIPTEN_BASE"
     fi
-    [[ -x $EMCC ]] || fail "locate_emscripten: Variable EMCC ($EMCC) does not point to a valid executable emcc"
+    [[ -x $EMCC ]] || builder_die "locate_emscripten: Variable EMCC ($EMCC) does not point to a valid executable emcc"
     EMSCRIPTEN_BASE="$(dirname "$EMCC")"
   fi
 
-  [[ -x ${EMSCRIPTEN_BASE}/emcc ]] || fail "locate_emscripten: Variable EMSCRIPTEN_BASE ($EMSCRIPTEN_BASE) does not point to emcc's folder"
+  [[ -x ${EMSCRIPTEN_BASE}/emcc ]] || builder_die "locate_emscripten: Variable EMSCRIPTEN_BASE ($EMSCRIPTEN_BASE) does not point to emcc's folder"
 }
 
 build_meson_cross_file_for_wasm() {

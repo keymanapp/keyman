@@ -18,7 +18,7 @@ static void loader(const json_uri &uri, json &schema)
   lf >> schema;
 }
 
-extern "C" bool kmcmp_ValidateJsonFile(std::fstream& f, std::fstream& fd, kmcmp_ValidateJsonMessageProc MessageProc, void* context) {
+EXTERN bool kmcmp_ValidateJsonFile(std::fstream& f, std::fstream& fd, kmcmp_ValidateJsonMessageProc MessageProc, void* context) {
   if (!f.good()) {
     MessageProc(-1, "Schema file could not be loaded.", context);
     return FALSE;

@@ -72,7 +72,7 @@ function run_tests() {
 
   # TODO: we are borrowing the KMX tests out of core; these should be shared in common
   # to avoid deep links like this in future
-  KMX_TEST_DIR="${TOP_SRCDIR}"/../../core/tests/unit/kmx
+  KMX_TEST_DIR="${TOP_SRCDIR}"/../../common/test/keyboards/baseline
 
   if [ ! -d "$TESTDIR" ] || ! [[ $(find "${TESTDIR}/" -name \*.kmx 2>/dev/null | wc -l) -gt 0 ]]; then
     if [[ $(find "${KMX_TEST_DIR}/" -name \*.kmx 2>/dev/null | wc -l) -gt 0 ]]; then

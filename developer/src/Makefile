@@ -69,12 +69,16 @@ server: .virtual
     cd $(DEVELOPER_ROOT)\src\server
     $(MAKE) $(TARGET)
 
-kmc: kmc-keyboard kmc-model kmc-model-info kmc-package
+kmc: kmc-keyboard kmc-kmn kmc-model kmc-model-info kmc-package
     cd $(DEVELOPER_ROOT)\src\kmc
     $(MAKE) $(TARGET)
 
 kmc-keyboard: .virtual
     cd $(DEVELOPER_ROOT)\src\kmc-keyboard
+    $(MAKE) $(TARGET)
+
+kmc-kmn: .virtual
+    cd $(DEVELOPER_ROOT)\src\kmc-kmn
     $(MAKE) $(TARGET)
 
 kmc-model: .virtual
@@ -253,7 +257,7 @@ build-tools:
 
 global-versions:
     cd $(COMMON_ROOT)
-    @if not exist $(KEYMAN_ROOT)\common\windows\cpp\include\keymanversion_build.h $(MAKE) global-versions
+    @if not exist $(KEYMAN_ROOT)\include\keymanversion_build.h $(MAKE) global-versions
     cd $(DEVELOPER_ROOT)\src
 
 build-tools-internal:

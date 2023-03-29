@@ -1,11 +1,11 @@
 
 #include <json-schema.hpp>
 #include <fstream>
+#include "../kmcmplib/include/kmcmplibapi.h"
 
 #include <windows.h>
 
 typedef bool (*kmcmp_ValidateJsonMessageProc)(int64_t offset, const char* szText, void* context);
-extern "C" bool kmcmp_ValidateJsonFile(std::fstream& f, std::fstream& fd, kmcmp_ValidateJsonMessageProc MessageProc, void* context);
 
 extern bool flag_use_new_kmcomp;
 

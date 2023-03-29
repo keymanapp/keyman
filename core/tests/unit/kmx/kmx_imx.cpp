@@ -13,10 +13,11 @@
 #include "../kmnkbd/action_items.hpp"
 #include "../test_assert.h"
 #include "../test_color.h"
+#include "../emscripten_filesystem.h"
 
 #include <map>
-#include<iostream>
-#include<sstream>
+#include <iostream>
+#include <sstream>
 
 /** This test will test the infrastructure around IMX third party librays
  *  and callback. The functions tested are:
@@ -262,7 +263,14 @@ int main(int argc, char *argv []) {
   }
   console_color::enabled = console_color::isaterminal() || arg_color;
   km::kbp::kmx::g_debug_ToConsole = TRUE;
+
+#ifdef __EMSCRIPTEN__
+  test_imx_list(get_wasm_file_path(argv[first_arg]));
+  test_queue_actions(get_wasm_file_path(argv[first_arg]));
+#else
   test_imx_list(argv[first_arg]);
   test_queue_actions(argv[first_arg]);
+#endif
+
   return 0;
 }

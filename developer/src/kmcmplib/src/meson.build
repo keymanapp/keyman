@@ -21,8 +21,15 @@ if cpp_compiler.get_id() == 'msvc'
   version_res += import('windows').compile_resources('version.rc', args:['/n','/c65001'])
 endif
 
+name_suffix = []
+
 if cpp_compiler.get_id() == 'emscripten'
-  links += ['-lnodefs.js', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
+  links += ['-lnodefs.js', '-sMODULARIZE', '-sEXPORT_ES6', '-sEXPORTED_RUNTIME_METHODS=[\'cwrap\', \'UTF8ToString\']']
+  # tests are building as ES6 so we need to declare the file extension
+  # note that meson currently struggles with the sanitycheckc_cross.exe
+  # program, because it has a hard coded extension (.exe) which is not
+  # valid for node programs in module mode.
+  name_suffix = '.mjs'
 endif
 
 
@@ -63,9 +70,13 @@ lib = library('kmcmplib',
 
 kmcmplib = declare_dependency(link_with: lib, include_directories: inc)
 
-pkg = import('pkgconfig')
-pkg.generate(
-    name: 'keyman_kmn_compiler',
-    version: meson.project_version(),
-    description: 'Keyman compiler for KMN keyboards.',
-    libraries: lib)
+
+if cpp_compiler.get_id() == 'emscripten'
+  # Build an executable
+  host = executable('wasm-host', #'wasm-host.cpp',
+    cpp_args: defns,
+    include_directories: inc,
+    link_args: links,
+    objects: lib.extract_all_objects())
+endif
+
