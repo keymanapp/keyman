@@ -61,6 +61,7 @@ interface BannerViewEventMap {
 export default class BannerView implements OSKViewComponent {
   private bannerContainer: HTMLDivElement;
   private activeBanner: Banner;
+  private _activeBannerHeight: number = Banner.DEFAULT_HEIGHT;
 
   public readonly events = new EventEmitter<BannerViewEventMap>();
 
@@ -118,6 +119,7 @@ export default class BannerView implements OSKViewComponent {
     this.activeBanner = banner;
     if(banner) {
       this.bannerContainer.appendChild(banner.getDiv());
+      banner.height = this.activeBannerHeight;
     }
 
     this.events.emit('bannerchange');
@@ -138,7 +140,7 @@ export default class BannerView implements OSKViewComponent {
    * Sets the height (in pixels) of the active 'Banner' instance.
    */
   public set activeBannerHeight(h: number) {
-    this.activeBannerHeight = h;
+    this._activeBannerHeight = h;
 
     if (this.activeBanner && !(this.activeBanner instanceof BlankBanner)) {
       this.activeBanner.height = h;

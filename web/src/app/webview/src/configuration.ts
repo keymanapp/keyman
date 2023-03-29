@@ -7,8 +7,7 @@ export class WebviewConfiguration extends EngineConfiguration {
   private _oninserttext: OnInsertTextFunc;
 
   initialize(options: Required<WebviewInitOptionSpec>) {
-    this.initialize(options);
-
+    super.initialize(options);
     this._embeddingApp = options.embeddingApp;
   }
 

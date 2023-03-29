@@ -30,11 +30,21 @@ export default class KeymanEngine extends KeymanEngineBase<ContextManager, Passt
     this.hardKeyboard = new PassthroughKeyboard(config.hardDevice);
   }
 
-  init(options: Required<WebviewInitOptionSpec>) {
+  async init(options: Required<WebviewInitOptionSpec>) {
     let device = new DeviceSpec('native', options.embeddingApp.indexOf('Tablet') >= 0 ? 'tablet' : 'phone', this.config.hostDevice.OS, true);
     this.config.hostDevice = device;
 
-    super.init({...WebviewInitOptionDefaults, ...options});
+    const totalOptions = {...WebviewInitOptionDefaults, ...options};
+    super.init(totalOptions);
+    this.config.initialize(totalOptions);
+
+    // There may be some valid mutations possible even on repeated calls?
+    // The original seems to allow it.
+
+    if(this.config.deferForInitialization.hasFinalized) {
+      // abort!  Maybe throw an error, too.
+      return Promise.resolve();
+    }
 
     this.contextManager.initialize();
 
@@ -47,11 +57,14 @@ export default class KeymanEngine extends KeymanEngineBase<ContextManager, Passt
       doCacheBusting: true,
       predictionContextManager: this.contextManager.predictionContext,
       heightOverride: this.getOskHeight,
-      widthOverride: this.getOskWidth
+      widthOverride: this.getOskWidth,
+      isEmbedded: true
     };
 
     this.osk = new AnchoredOSKView(oskConfig);
     setupEmbeddedListeners(this, this.osk);
+
+    this.config.finalizeInit();
   }
 
   // Functions that the old 'app/webview' equivalent had always provided to the WebView

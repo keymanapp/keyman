@@ -13,7 +13,7 @@ import { LegacyAPIEventEngine } from "./legacyAPIEvents.js";
 import DOMCloudRequester from "keyman/engine/package-cache/dom-requester";
 
 export default class KeymanEngine<
-  ContextManager extends ContextManagerBase,
+  ContextManager extends ContextManagerBase<any>,
   HardKeyboard extends HardKeyboardBase
 > implements KeyboardKeymanGlobal {
   readonly config: EngineConfiguration;
@@ -195,13 +195,13 @@ export default class KeymanEngine<
     // #endregion
   }
 
-  init(optionSpec: Required<InitOptionSpec>): void {
+  async init(optionSpec: Required<InitOptionSpec>){
     // There may be some valid mutations possible even on repeated calls?
     // The original seems to allow it.
 
     if(this.config.deferForInitialization.hasFinalized) {
       // abort!  Maybe throw an error, too.
-      return;
+      return Promise.resolve();
     }
 
     this.config.initialize(optionSpec);

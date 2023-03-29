@@ -107,6 +107,17 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
     return this.fetchKeyboard(stub.KI);
   }
 
+  isFetchingKeyboard(keyboardID: string): boolean {
+    if(!keyboardID) {
+      throw new Error("Keyboard ID must be specified");
+    }
+
+    keyboardID = prefixed(keyboardID);
+
+    const cachedEntry = this.keyboardTable[keyboardID];
+    return cachedEntry instanceof Promise;
+  }
+
   fetchKeyboard(keyboardID: string): Promise<Keyboard> {
     if(!keyboardID) {
       throw new Error("Keyboard ID must be specified");

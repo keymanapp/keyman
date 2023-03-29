@@ -10,10 +10,10 @@ var oskHeight = Math.ceil(window.jsInterface.getKeyboardHeight() / window.device
 var oskWidth = 0;
 var fragmentToggle = 0;
 
-var sentryManager = new com.keyman.KeymanSentryManager({
-  hostPlatform: "android"
-});
-sentryManager.init();
+// var sentryManager = new com.keyman.KeymanSentryManager({
+//   hostPlatform: "android"
+// });
+// sentryManager.init();
 
 window.addEventListener('load', init, false);
 
@@ -32,15 +32,15 @@ function init() {
   keyman.getOskHeight = getOskHeight;
   keyman.getOskWidth = getOskWidth;
   keyman.beepKeyboard = beepKeyboard;
-  keyman.init({'app':device,'fonts':'packages/',root:'./'}).then(() => {
+  keyman.init({'embeddingApp':device,'fonts':'packages/',root:'./'}).then(() => {
     const bannerHeight = Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio);
 
     // The OSK is not available until initialization is complete.
     keyman.osk.bannerView.activeBannerHeight = bannerHeight;
   });
 
-  keyman.addEventListener('keyboardloaded', setIsChiral);
-  keyman.addEventListener('keyboardchange', setIsChiral);
+  // keyman.addEventListener('keyboardloaded', setIsChiral);  // TODO:  fix + support these events.
+  // keyman.addEventListener('keyboardchange', setIsChiral);
   keyman.core.languageProcessor.on('statechange', onStateChange);
 
   document.body.addEventListener('touchend', loadDefaultKeyboard);

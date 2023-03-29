@@ -30,23 +30,20 @@ class ContextHost extends Mock {
   }
 }
 
-export default class ContextManager extends ContextManagerBase {
+export default class ContextManager extends ContextManagerBase<WebviewConfiguration> {
   // Change of context?  Just replace the Mock.  Context will be ENTIRELY controlled
   // by whatever is hosting the WebView.  (Some aspects of this context replacement have
   // yet to be modularized at this time, though.)
   private _rawContext: ContextHost;
-  private config: WebviewConfiguration;
 
   private _activeKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
 
   constructor(engineConfig: WebviewConfiguration) {
-    super();
-
-    this.config = engineConfig;
+    super(engineConfig);
   }
 
   initialize(): void {
-    this._rawContext = new ContextHost(this.config.oninserttext);
+    this._rawContext = new ContextHost(this.engineConfig.oninserttext);
     this.resetContext();
   }
 
@@ -80,9 +77,11 @@ export default class ContextManager extends ContextManagerBase {
     } catch(err) {
       // Fallback behavior - we're embedded in a touch-device's webview, so we need to keep a keyboard visible.
       const defaultStub = this.keyboardCache.defaultStub;
-      await this.activateKeyboard(defaultStub.id, defaultStub.langId, true).catch(() => {});
+      if(defaultStub.id != keyboardId || defaultStub.langId != languageCode) {
+        await this.activateKeyboard(defaultStub.id, defaultStub.langId, true).catch(() => {});
+      } // else "We already failed, so give up."
 
-      throw err; // since the consumer may want to do its own error-handling.
+      throw err; // since the consuming method / API-caller may want to do its own error-handling.
     }
   }
 
@@ -95,7 +94,7 @@ export default class ContextManager extends ContextManagerBase {
 
     // Probably isn't necessary at this point - osk.refreshLayout() exists - but
     // it's best to keep it around for now and verify later.
-    if(originalKeyboard.metadata.id == activatingKeyboard.metadata.id) {
+    if(originalKeyboard?.metadata?.id == activatingKeyboard?.metadata?.id) {
       activatingKeyboard.keyboard = activatingKeyboard.keyboard.then((kbd) => {
         kbd.refreshLayouts()
         return kbd;

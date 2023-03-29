@@ -56,7 +56,9 @@ export class EngineConfiguration extends EventEmitter<EventMap> {
 
     // Make sure this is accessible to stubs for use in generating display names!
     KeyboardProperties.spacebarTextMode = () => this.spacebarText;
+  }
 
+  finalizeInit() {
     this.deferForInitialization.resolve();
   }
 

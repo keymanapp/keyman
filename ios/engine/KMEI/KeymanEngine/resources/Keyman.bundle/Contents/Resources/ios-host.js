@@ -47,7 +47,7 @@ function init() {
     kmw['getOskHeight'] = getOskHeight;
     kmw['getOskWidth'] = getOskWidth;
     kmw['beepKeyboard'] = beepKeyboard;
-    kmw.init({'app':device,'fonts':'fonts/'}).then(function() {
+    kmw.init({'embeddingApp':device,'fonts':'fonts/'}).then(function() {
       if(bannerHeight > 0) {
         // The OSK is not available until initialization is complete.
         kmw.osk.bannerView.activeBannerHeight = bannerHeight;

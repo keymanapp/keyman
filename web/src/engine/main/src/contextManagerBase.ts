@@ -2,6 +2,7 @@ import EventEmitter from 'eventemitter3';
 import { DeviceSpec, ManagedPromise, type Keyboard, type KeyboardInterface, type OutputTarget } from '@keymanapp/keyboard-processor';
 import { StubAndKeyboardCache, type KeyboardStub } from 'keyman/engine/package-cache';
 import { PredictionContext } from '@keymanapp/input-processor';
+import { EngineConfiguration } from './engineConfiguration.js';
 
 interface EventMap {
   // target, then keyboard.
@@ -71,7 +72,7 @@ interface PendingActivation {
   stub: KeyboardStub;
 }
 
-export abstract class ContextManagerBase extends EventEmitter<EventMap> {
+export abstract class ContextManagerBase<MainConfig extends EngineConfiguration> extends EventEmitter<EventMap> {
   public static readonly TIMEOUT_THRESHOLD = 10000;
 
   abstract initialize(): void;
@@ -81,16 +82,18 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
   private _predictionContext: PredictionContext;
   protected keyboardCache: StubAndKeyboardCache;
   private _resetContext: (outputTarget?: OutputTarget) => void;
-  private _hostDevice: DeviceSpec;
 
   private pendingActivations: PendingActivation[] = [];
+  protected engineConfig: MainConfig;
 
   get predictionContext(): PredictionContext {
     return this._predictionContext;
   }
 
-  constructor() {
+  constructor(engineConfig: MainConfig) {
     super();
+
+    this.engineConfig = engineConfig;
   }
 
   configure(config: ContextManagerConfiguration) {
@@ -286,7 +289,7 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
     let requestedStub = this.keyboardCache.getStub(keyboardId, languageCode);
 
     // Mobile device addition: force selection of the first keyboard if none set
-    if(this._hostDevice.touchable && !requestedStub) {
+    if(this.engineConfig.hostDevice.touchable && !requestedStub) {
       // Pick the oldest-registered stub as default.
       requestedStub = this.keyboardCache.defaultStub;
     } else if(!requestedStub) {
@@ -297,7 +300,7 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
     }
 
     // Check if current keyboard matches requested keyboard, but not (necessarily) stub
-    if(keyboardId == this.activeKeyboard.metadata.id) {
+    if(this.activeKeyboard?.metadata && keyboardId == this.activeKeyboard.metadata.id) {
       const keyboard = this.activeKeyboard.keyboard;
       // In this case, the keyboard is loaded; just update the stub.
 
@@ -327,31 +330,35 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
         }
       }
 
-      // Provide a Promise for completion of the async load process.
-      const completionPromise = new ManagedPromise<Error>();
-      this.emit('keyboardasyncload', requestedStub, completionPromise.corePromise);
+      const defermentPromise = this.engineConfig.deferForInitialization.corePromise.then(() => {
+        // Provide a Promise for completion of the async load process.
+        const completionPromise = new ManagedPromise<Error>();
+        this.emit('keyboardasyncload', requestedStub, completionPromise.corePromise);
 
-      let keyboardPromise = this.keyboardCache.fetchKeyboardForStub(requestedStub);
-      let timeoutPromise = new Promise<void>((resolve, reject) => {
-        const timeoutMsg = `Sorry, the ${requestedStub.name} keyboard for ${requestedStub.langName} is not currently available.`;
-        window.setTimeout(() => reject(new Error(timeoutMsg)), ContextManagerBase.TIMEOUT_THRESHOLD);
-      });
+        let keyboardPromise = this.keyboardCache.fetchKeyboardForStub(requestedStub);
+        let timeoutPromise = new Promise<Keyboard>((resolve, reject) => {
+          const timeoutMsg = `Sorry, the ${requestedStub.name} keyboard for ${requestedStub.langName} is not currently available.`;
+          window.setTimeout(() => reject(new Error(timeoutMsg)), ContextManagerBase.TIMEOUT_THRESHOLD);
+        });
 
-      let combinedPromise = Promise.race([keyboardPromise, timeoutPromise]);
+        let combinedPromise = Promise.race([keyboardPromise, timeoutPromise]);
 
-      // Ensure the async-load Promise completes properly.
-      combinedPromise.then(() => {
-        completionPromise.resolve(null);
-        // Prevent any 'unhandled Promise rejection' events that may otherwise occur from the timeout promise.
-        timeoutPromise.catch(() => {});
-      });
-      combinedPromise.catch((err) => {
-        completionPromise.resolve(err);
-        throw err;
+        // Ensure the async-load Promise completes properly.
+        combinedPromise.then(() => {
+          completionPromise.resolve(null);
+          // Prevent any 'unhandled Promise rejection' events that may otherwise occur from the timeout promise.
+          timeoutPromise.catch(() => {});
+        });
+        combinedPromise.catch((err) => {
+          completionPromise.resolve(err);
+          throw err;
+        });
+
+        return combinedPromise;
       });
 
       // Now the fun part:  note the original call's parameters as a pending activation.
-      let promise = this.deferredKeyboardActivation(keyboardPromise, requestedStub, this.keyboardTarget);
+      let promise = this.deferredKeyboardActivation(defermentPromise, requestedStub, this.keyboardTarget);
       return {
         keyboard: promise.then(async (activation) => {
           // Is the activation we requested still pending, or was it cancelled in favor of a
@@ -361,7 +368,7 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
             // output target, the activation is no longer valid.
             return Promise.resolve(null);
           } else {
-            return keyboardPromise;
+            return defermentPromise;
           }
         }),
         metadata: requestedStub
