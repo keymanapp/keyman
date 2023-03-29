@@ -20,6 +20,7 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
   "@/developer/src/kmc-keyboard" \
+  "@/developer/src/kmc-kmn" \
   "@/developer/src/kmc-model" \
   "@/developer/src/kmc-model-info" \
   "@/developer/src/kmc-package" \

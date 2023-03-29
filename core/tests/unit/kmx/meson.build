@@ -89,29 +89,22 @@ tests = [
   '048 - modifier keys keep context'
 ]
 
+node = find_program('node', required: true)
+
+kmc_root = meson.current_source_dir() / '../../../../developer/src/kmc/build/src/kmc.js'
+kmc_cmd = [node, kmc_root]
+
 if build_machine.system() == 'windows'
-  kmcomp = find_program(join_paths(meson.current_source_dir(),'..','..','..','..','windows','bin','developer','kmcomp.exe'), 'kmcomp.exe', required: false)
-  kmcomp_cmd = [kmcomp]
   copy_cmd = [find_program('cmd.exe', required: true), '/c', 'copy']
   cat_cmd = [find_program('cmd.exe', required: true), '/c', 'type']
 else
-  kmcomp = find_program('kmcomp', required: false)
-  kmcomp_cmd = [kmcomp]
-  if not kmcomp.found()
-    wine = find_program('wine', required: false)
-    kmcomp = find_program('kmcomp.exe', required: false)
-    kmcomp_cmd = [wine, kmcomp]
-    if not wine.found()
-      kmcomp = disabler()
-    endif
-  endif
   copy_cmd = [find_program('cp', required: true)]
   cat_cmd = [find_program('cat', required: true)]
 endif
 
 if cpp_compiler.get_id() == 'emscripten'
-  # The .kmx files are linked in to the unit test,
-  # so kmcomp is too late here
+  # TODO: enable nodefs so we don't link .kmx into the test
+  # and don't need special cases for emscripten tests
   kmcomp = disabler()
 endif
 
@@ -133,7 +126,7 @@ foreach kbd : tests
       }
     ]
   }'''
-  if not kmcomp.found()
+  if cpp_compiler.get_id() == 'emscripten'
     configure_file(
       command: copy_cmd + ['@INPUT@', '@OUTPUT@'],
       input: kbd + '.kmn',
@@ -155,7 +148,7 @@ configure_file(
   output: 'kmp.json'
 )
 
-if kmcomp.found()
+if cpp_compiler.get_id() != 'emscripten'
   foreach kbd : tests
     kbd_basename = 'k_' + kbd.underscorify().to_lower()
 
@@ -193,7 +186,7 @@ if kmcomp.found()
       output: [kbd_basename + '.kmp', kbd_basename + '.kmx'],
       depend_files: [kbd_kps, kbd_kmn],
       depfile: kbd_basename + '.dep',
-      command: kmcomp_cmd + ['-s', '-d', '@INPUT@'])
+      command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@'])
 
     kbd_src = files(join_paths(test_path, kbd_basename) + '.kmn')
     kbd_obj = join_paths(test_path, kbd_basename) + '.kmx'
@@ -236,13 +229,13 @@ key_e = executable('key_list', 'kmx_key_list.cpp',
                 link_args: links + tests_flags,
                 objects: lib.extract_all_objects(recursive: false))
 test_kbd = 'kmx_key_list'
-if kmcomp.found()
+if cpp_compiler.get_id() != 'emscripten'
   kbd_src = files(test_kbd + '.kmn')
-  kbd_obj = join_paths(meson.current_source_dir(), test_kbd) + '.kmx'
+  kbd_obj = join_paths(meson.current_build_dir(), test_kbd) + '.kmx'
   kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
     output: test_kbd + '.log',
     input: kbd_src,
-    command: kmcomp_cmd + ['-s', '-d', '@INPUT@', kbd_obj, '@OUTPUT@']
+    command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@', '--out-file', kbd_obj]
   )
   test('key_list', key_e,  depends: kbd_log, args: [kbd_obj] )
 else
@@ -259,13 +252,13 @@ imx_e = executable('imx_list', 'kmx_imx.cpp',
                 objects: lib.extract_all_objects(recursive: false))
 
 test_kbd = 'kmx_imsample'
-if kmcomp.found()
+if cpp_compiler.get_id() != 'emscripten'
   kbd_src = files(test_kbd + '.kmn')
-  kbd_obj = join_paths(meson.current_source_dir(), test_kbd) + '.kmx'
+  kbd_obj = join_paths(meson.current_build_dir(), test_kbd) + '.kmx'
   kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
     output: test_kbd + '.log',
     input: kbd_src,
-    command: kmcomp_cmd + ['-s', '-d', '@INPUT@', kbd_obj, '@OUTPUT@']
+    command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@', '--out-file', kbd_obj]
   )
     test('imx_list', imx_e,  depends: kbd_log, args: [kbd_obj] )
 else

@@ -57,21 +57,15 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
 
 builder_parse "$@"
 
-if builder_has_option --debug; then
-  CONFIGURATION=debug
-else
-  CONFIGURATION=release
-fi
-
 builder_describe_outputs \
-  configure:x86      build/x86/$CONFIGURATION/build.ninja \
-  configure:x64      build/x64/$CONFIGURATION/build.ninja \
-  configure:arch     build/arch/$CONFIGURATION/build.ninja \
-  configure:wasm     build/wasm/$CONFIGURATION/build.ninja \
-  build:x86          build/x86/$CONFIGURATION/src/libkmcmplib.a \
-  build:x64          build/x64/$CONFIGURATION/src/libkmcmplib.a \
-  build:arch         build/arch/$CONFIGURATION/src/libkmcmplib.a \
-  build:wasm         build/wasm/$CONFIGURATION/src/libkmcmplib.a
+  configure:x86      build/x86/$BUILDER_CONFIGURATION/build.ninja \
+  configure:x64      build/x64/$BUILDER_CONFIGURATION/build.ninja \
+  configure:arch     build/arch/$BUILDER_CONFIGURATION/build.ninja \
+  configure:wasm     build/wasm/$BUILDER_CONFIGURATION/build.ninja \
+  build:x86          build/x86/$BUILDER_CONFIGURATION/src/libkmcmplib.a \
+  build:x64          build/x64/$BUILDER_CONFIGURATION/src/libkmcmplib.a \
+  build:arch         build/arch/$BUILDER_CONFIGURATION/src/libkmcmplib.a \
+  build:wasm         build/wasm/$BUILDER_CONFIGURATION/src/libkmcmplib.a
 
 TARGET_PATH="$THIS_SCRIPT_PATH/build"
 
@@ -83,7 +77,7 @@ targets=(wasm x86 x64 arch)
 do_action() {
   local action_function=do_$1
   for target in "${targets[@]}"; do
-    MESON_PATH="$TARGET_PATH/$target/$CONFIGURATION"
+    MESON_PATH="$TARGET_PATH/$target/$BUILDER_CONFIGURATION"
     $action_function $target
   done
 }

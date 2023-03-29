@@ -322,7 +322,7 @@ KMX_BOOL AddCompileError(KMX_DWORD msg)
   return FALSE;
 }
 
-extern "C" bool kmcmp_SetCompilerOptions(KMCMP_COMPILER_OPTIONS* options) {
+EXTERN bool kmcmp_SetCompilerOptions(KMCMP_COMPILER_OPTIONS* options) {
   //printf("°°-> changed to SetCompilerOptions() of kmcmplib \n");
   if(!options || options->dwSize < sizeof(KMCMP_COMPILER_OPTIONS)) {
     return FALSE;
@@ -331,7 +331,50 @@ extern "C" bool kmcmp_SetCompilerOptions(KMCMP_COMPILER_OPTIONS* options) {
   return TRUE;
 }
 
-extern "C" uint32_t kmcmp_CompileKeyboardFile(char* pszInfile,
+#ifdef __EMSCRIPTEN__
+
+/*
+  WASM interface for compiler message callback
+*/
+EM_JS(int, wasm_msgproc, (int line, int msgcode, char* text, char* context), {
+  const proc = globalThis[context];
+  if(!proc || typeof proc != 'function') {
+    console.log(`[${line}: ${msgcode}: ${UTF8ToString(text)}]`);
+    return 0;
+  } else {
+    return proc(line, msgcode, UTF8ToString(text));
+  }
+});
+
+int wasm_CompilerMessageProc(int line, uint32_t dwMsgCode, char* szText, void* context) {
+  char* msgProc = static_cast<char*>(context);
+  return wasm_msgproc(line, dwMsgCode, szText, msgProc);
+}
+
+EXTERN uint32_t kmcmp_Wasm_SetCompilerOptions(int ShouldAddCompilerVersion) {
+  KMCMP_COMPILER_OPTIONS options;
+  options.dwSize = sizeof(KMCMP_COMPILER_OPTIONS);
+  options.ShouldAddCompilerVersion = ShouldAddCompilerVersion;
+  return kmcmp_SetCompilerOptions(&options);
+}
+
+EXTERN uint32_t kmcmp_Wasm_CompileKeyboardFile(char* pszInfile,
+  char* pszOutfile, int ASaveDebug, int ACompilerWarningsAsErrors,
+	int AWarnDeprecatedCode, char* msgProc
+) {
+  return kmcmp_CompileKeyboardFile(
+    pszInfile,
+    pszOutfile,
+    ASaveDebug,
+    ACompilerWarningsAsErrors,
+    AWarnDeprecatedCode,
+    wasm_CompilerMessageProc,
+    msgProc
+  );
+}
+#endif
+
+EXTERN uint32_t kmcmp_CompileKeyboardFile(char* pszInfile,
   char* pszOutfile, bool ASaveDebug, bool ACompilerWarningsAsErrors,
 	bool AWarnDeprecatedCode, kmcmp_CompilerMessageProc pMsgproc, void* AmsgprocContext
 ) {
@@ -423,7 +466,7 @@ extern "C" uint32_t kmcmp_CompileKeyboardFile(char* pszInfile,
 
 
 
-extern "C" uint32_t kmcmp_CompileKeyboardFileToBuffer(char* pszInfile, void* pfkBuffer, bool ACompilerWarningsAsErrors, bool AWarnDeprecatedCode,
+EXTERN uint32_t kmcmp_CompileKeyboardFileToBuffer(char* pszInfile, void* pfkBuffer, bool ACompilerWarningsAsErrors, bool AWarnDeprecatedCode,
   kmcmp_CompilerMessageProc pMsgproc, void* AmsgprocContext, int Target)   // I4865   // I4866
 {
   //printf("°°-> changed to CompileKeyboardFileToBuffer() of kmcmplib \n");
