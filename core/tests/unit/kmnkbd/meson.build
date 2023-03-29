@@ -25,18 +25,15 @@ tests = [
   ['kmx_context', 'test_kmx_context.cpp'],
 ]
 
+test_path = join_paths(meson.current_build_dir(), '..', 'kmx')
+tests_flags = []
+
 if cpp_compiler.get_id() == 'emscripten'
-  tests_flags = ['--embed-file', join_paths(meson.current_source_dir(),'..','kmx','@/')]
-  source_path = '/'
-  test_path = '/'
-else
-  tests_flags = []
-  source_path = meson.current_source_dir()
-  test_path = join_paths(meson.current_source_dir(), '..', 'kmx')
+  tests_flags += ['-lnodefs.js', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
 endif
 
 foreach t : tests
-  bin = executable(t[0], t[1],
+  bin = executable(t[0], [t[1], '../emscripten_filesystem.cpp'],
     cpp_args: local_defns + defns + warns,
     include_directories: [inc, libsrc],
     link_args: links + tests_flags,

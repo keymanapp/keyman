@@ -1,6 +1,6 @@
 #pragma once
 
-// This file is transformed from keymanversion_build.in to keymanversion_build.h by mkver
+// This file is transformed from keymanversion_build.in to keymanversion_build.h by /common/include/build.sh
 
 // Legacy version number defines
 #define KEYMANVERSION	"$RELEASE"
