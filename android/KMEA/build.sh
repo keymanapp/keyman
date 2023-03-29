@@ -30,6 +30,7 @@ JUNIT_RESULTS="##teamcity[importData type='junit' path='keyman\android\KMEA\app\
 
 builder_describe "Builds Keyman Engine for Android." \
   "@/web/src/app/webview" \
+  "@/common/web/sentry-manager" \
   "clean" \
   "configure" \
   "build" \
