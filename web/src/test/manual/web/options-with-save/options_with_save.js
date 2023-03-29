@@ -1,4 +1,4 @@
-// Original source may be found within the repo at /core/tests/unit/kmx/ as #023.
+// Original source may be found within the repo at /common/test/keyboards/baseline as #023.
 if(typeof keyman === 'undefined') {
   console.log('Keyboard requires KeymanWeb 10.0 or later');
 

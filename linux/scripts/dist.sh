@@ -33,9 +33,17 @@ dch keyman --newversion "${VERSION}" --force-bad-version --nomultimaint
 dpkg-source --tar-ignore=*~ --tar-ignore=.git --tar-ignore=.gitattributes \
     --tar-ignore=.gitignore --tar-ignore=experiments --tar-ignore=debian \
     --tar-ignore=.github --tar-ignore=.vscode --tar-ignore=android \
-    --tar-ignore=common/models --tar-ignore=common/predictive-text \
-    --tar-ignore=common/resources --tar-ignore=common/schemas \
-    --tar-ignore=common/test --tar-ignore=common/web --tar-ignore=common/windows \
+    \
+    --tar-ignore=common/models \
+    --tar-ignore=common/predictive-text \
+    --tar-ignore=common/resources \
+    --tar-ignore=common/schemas \
+    --tar-ignore=common/test/keyboards/build.* \
+    --tar-ignore=common/test/predictive-text \
+    --tar-ignore=common/test/resources \
+    --tar-ignore=common/web \
+    --tar-ignore=common/windows \
+    \
     --tar-ignore=core/build \
     --tar-ignore=developer --tar-ignore=docs --tar-ignore=ios \
     --tar-ignore=linux/keyman-config/buildtools/build-langtags.py --tar-ignore=__pycache__ \
