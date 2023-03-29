@@ -258,7 +258,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
 
     // Only trigger `keyboardchange` events when they will affect the active context.
     if(this.keyboardTarget == originalKeyboardTarget) {
-      // Perform standard context-reset ops, including processNewContextEvent.
+      // Perform standard context-reset ops, including the processing of new-context events.
       this.resetContext();
       // Will trigger KeymanEngine handler that passes keyboard to the OSK, displays it.
       this.emit('keyboardchange', this.activeKeyboard);

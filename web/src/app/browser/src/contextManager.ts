@@ -38,6 +38,8 @@ export default class ContextManager extends ContextManagerBase {
     throw new Error('Method not implemented.');
   }
 
+  // on set activeTarget, make sure to also change it for this.predictionContext!
+
   get activeKeyboard() {
     return this._activeKeyboard;
   }

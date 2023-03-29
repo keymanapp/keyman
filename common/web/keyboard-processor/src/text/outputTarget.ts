@@ -10,6 +10,13 @@ import { Deadkey, DeadkeyTracker } from "./deadkeys.js";
 
 // Also relies on string-extensions provided by the web-utils package.
 
+export function isEmptyTransform(transform: Transform) {
+  if(!transform) {
+    return false;
+  }
+  return transform.insert === '' && transform.deleteLeft === 0 && (transform.deleteRight ?? 0) === 0;
+}
+
 export class TextTransform implements Transform {
   readonly insert: string;
   readonly deleteLeft: number;
@@ -22,10 +29,6 @@ export class TextTransform implements Transform {
   }
 
   public static readonly nil = new TextTransform('', 0, 0);
-
-  public isNoOp(): boolean {
-    return this.insert === '' && this.deleteLeft === 0 && this.deleteRight === 0;
-  }
 }
 
 export class Transcription {

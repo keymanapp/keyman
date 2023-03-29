@@ -25,18 +25,24 @@ function init() {
   //document.body.style.backgroundColor="transparent";
   //window.console.log('Device type = '+device);
   //window.console.log('Keyboard height = '+oskHeight);
-  keyman.oninserttext = insertText;
   keyman.showKeyboardList = showMenu;
   keyman.hideKeyboard = hideKeyboard;
   keyman.menuKeyUp = menuKeyUp;
   keyman.getOskHeight = getOskHeight;
   keyman.getOskWidth = getOskWidth;
   keyman.beepKeyboard = beepKeyboard;
-  keyman.init({'embeddingApp':device,'fonts':'packages/',root:'./'}).then(() => {
+  keyman.init({
+    'embeddingApp':device,
+    'fonts':'packages/',
+    oninserttext: insertText,
+    root:'./'
+  }).then(() => {
     const bannerHeight = Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio);
 
     // The OSK is not available until initialization is complete.
+    console.log(keyman.osk.bannerView);
     keyman.osk.bannerView.activeBannerHeight = bannerHeight;
+    keyman.osk.refreshLayout();
   });
 
   // keyman.addEventListener('keyboardloaded', setIsChiral);  // TODO:  fix + support these events.

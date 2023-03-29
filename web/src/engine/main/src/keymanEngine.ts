@@ -53,6 +53,11 @@ export default class KeymanEngine<
       outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
 
       const result = this.core.processKeyEvent(event, outputTarget);
+
+      if(result && result.transcription?.transform) {
+        this.config.onRuleFinalization(result, this.contextManager.activeTarget);
+      }
+
       if(callback) {
         callback(result, null);
       }
@@ -98,7 +103,7 @@ export default class KeymanEngine<
 
     this.contextManager.configure({
       resetContext: (target) => {
-        this.core.keyboardProcessor.resetContext(target);
+        this.core.resetContext(target);
       },
       predictionContext: new PredictionContext(this.core.languageProcessor, this.core.keyboardProcessor),
       keyboardCache: this.keyboardRequisitioner.cache
@@ -153,6 +158,7 @@ export default class KeymanEngine<
 
     contextManager.on('keyboardchange', (kbd) => {
       this.refreshModel();
+      this.core.activeKeyboard = kbd.keyboard;
 
       // Hide OSK and do not update keyboard list if using internal keyboard (desktops).
       // Condition will not be met for touch form-factors; they force selection of a
@@ -226,9 +232,11 @@ export default class KeymanEngine<
   public set osk(value: OSKView) {
     if(this._osk) {
       this._osk.off('keyEvent', this.keyEventListener);
+      this.core.keyboardProcessor.layerStore.handler = this.osk.layerChangeHandler;
     }
     this._osk = value;
     this._osk.on('keyEvent', this.keyEventListener);
+    this.core.keyboardProcessor.layerStore.handler = this.osk.layerChangeHandler;
   }
 
   public getDebugInfo(): Record<string, any> {
@@ -276,7 +284,8 @@ export default class KeymanEngine<
   addModel(model: ModelSpec) {
     this.modelCache.register(model);
 
-    if(model.languages.indexOf(this.contextManager.activeKeyboard.metadata.langId) != -1) {
+    const activeStub = this.contextManager.activeKeyboard?.metadata;
+    if(activeStub && model.languages.indexOf(activeStub.langId) != -1) {
       this.refreshModel();
     }
   }

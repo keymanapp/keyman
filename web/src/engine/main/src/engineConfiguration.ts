@@ -1,6 +1,6 @@
 import EventEmitter from "eventemitter3";
 
-import { DeviceSpec, KeyboardProperties, ManagedPromise, physicalKeyDeviceAlias, SpacebarText } from "@keymanapp/keyboard-processor";
+import { DeviceSpec, KeyboardProperties, ManagedPromise, OutputTarget, physicalKeyDeviceAlias, RuleBehavior, SpacebarText } from "@keymanapp/keyboard-processor";
 import { PathConfiguration, PathOptionDefaults, PathOptionSpec } from "keyman/engine/paths";
 import { Device } from "keyman/engine/device-detect";
 import { KeyboardStub } from "keyman/engine/package-cache";
@@ -103,6 +103,15 @@ export class EngineConfiguration extends EventEmitter<EventMap> {
       initialized: this.deferForInitialization.hasFinalized
     }
   }
+
+  /**
+   * Facilitates implementation of additional functionality for finalized keystroke-event rules
+   * after postKeystroke takes effect.  Any behaviors defined here should be considered 'readonly' in
+   * terms of context and should instead facilitate integration with the engine's host platform.
+   * @param ruleBehavior  The full effects of keystroke + postkeystroke rules from a processed keystroke.
+   * @param outputTarget  The engine's current source for context
+   */
+  onRuleFinalization(ruleBehavior: RuleBehavior, outputTarget: OutputTarget) {};
 }
 
 export interface InitOptionSpec extends PathOptionSpec {

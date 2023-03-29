@@ -41,13 +41,16 @@ function init() {
     document.body.style.height = window.outerHeight;
 
     var kmw=window['keyman'];
-    kmw['oninserttext'] = insertText;
     kmw['showKeyboardList'] = menuKeyDown;
     kmw['hideKeyboard'] = hideKeyboard;
     kmw['getOskHeight'] = getOskHeight;
     kmw['getOskWidth'] = getOskWidth;
     kmw['beepKeyboard'] = beepKeyboard;
-    kmw.init({'embeddingApp':device,'fonts':'fonts/'}).then(function() {
+    kmw.init({
+        'embeddingApp':device,
+        'fonts':'fonts/',
+        oninserttext: insertText
+    }).then(function() {
       if(bannerHeight > 0) {
         // The OSK is not available until initialization is complete.
         kmw.osk.bannerView.activeBannerHeight = bannerHeight;

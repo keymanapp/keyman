@@ -136,6 +136,10 @@ export default class BannerView implements OSKViewComponent {
     }
   }
 
+  public get activeBannerHeight(): number {
+    return this._activeBannerHeight;
+  }
+
   /**
    * Sets the height (in pixels) of the active 'Banner' instance.
    */
@@ -252,6 +256,11 @@ export class BannerController {
   public setBanner(type: BannerType) {
     var banner: Banner;
 
+    let oldBanner = this.container.banner;
+    if(oldBanner instanceof SuggestionBanner) {
+      this.predictionContext.off('update', oldBanner.onSuggestionUpdate);
+    }
+
     switch(type) {
       case 'blank':
         banner = new BlankBanner();
@@ -260,7 +269,11 @@ export class BannerController {
         banner = new ImageBanner(this.imagePath, this.container.activeBannerHeight);
         break;
       case 'suggestion':
-        banner = new SuggestionBanner(this.hostDevice, this.container.activeBannerHeight);
+        let suggestBanner = banner = new SuggestionBanner(this.hostDevice, this.container.activeBannerHeight);
+        suggestBanner.predictionContext = this.predictionContext;
+        suggestBanner.events.on('apply', (selection) => this.predictionContext.accept(selection.suggestion));
+
+        this.predictionContext.on('update', suggestBanner.onSuggestionUpdate);
         break;
       default:
         throw new Error("Invalid type specified for the banner!");
@@ -288,8 +301,6 @@ export class BannerController {
       } else {
         this.setBanner('blank');
       }
-    } else if(state == 'configured' && this.activeBanner instanceof SuggestionBanner) {
-      this.activeBanner.predictionContext = this.predictionContext || null;
     }
   }
 

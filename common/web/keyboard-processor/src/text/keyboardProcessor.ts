@@ -554,13 +554,32 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
     return false;
   }
 
+  /**
+   * Tell the currently active keyboard that a new context has been selected,
+   * e.g. by focus change, selection change, keyboard change, etc.
+   *
+   * @param    {Object}   outputTarget  The OutputTarget that has focus
+   * @returns  {Object}                 A RuleBehavior object describing the cumulative effects of
+   *                                    all matched keyboard rules
+   */
+  performNewContextEvent(outputTarget: OutputTarget): RuleBehavior {
+    const ruleBehavior = this.processNewContextEvent(this.contextDevice, outputTarget);
+
+    if(ruleBehavior) {
+      ruleBehavior.finalize(this, outputTarget, true);
+    }
+    return ruleBehavior;
+  }
+
   resetContext(target?: OutputTarget) {
     this.layerId = 'default';
     this.keyboardInterface.resetContextCache();
 
     // May be null if it's a keyboard swap.
+    // Performed before _UpdateVKShift since the op may modify the displayed layer
+    // Also updates the layer for predictions.
     if(target) {
-      this.processNewContextEvent(this.contextDevice, target);
+      this.performNewContextEvent(target);
     }
 
     if(!this.contextDevice.touchable) {

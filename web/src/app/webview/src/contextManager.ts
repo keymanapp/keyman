@@ -44,6 +44,7 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
 
   initialize(): void {
     this._rawContext = new ContextHost(this.engineConfig.oninserttext);
+    this.predictionContext.setCurrentTarget(this.activeTarget);
     this.resetContext();
   }
 

@@ -1,4 +1,4 @@
-import { DeviceSpec, Keyboard } from '@keymanapp/keyboard-processor'
+import { DeviceSpec } from '@keymanapp/keyboard-processor'
 import { KeymanEngine as KeymanEngineBase } from 'keyman/engine/main';
 import { AnchoredOSKView, ViewConfiguration, StaticActivator } from 'keyman/engine/osk';
 import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
