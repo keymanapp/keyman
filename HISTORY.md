@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.80 alpha 2023-03-29
+
+* chore(linux): Remove dependency on `sudo` (#8535)
+* chore(linux): Improve robustness of test cleanup (#8536)
+* fix(linux): Remove warning after pressing Close button (#8538)
+
 ## 17.0.79 alpha 2023-03-28
 
 * chore(linux): Revert "Run and ignore autopkgtests on s390x" (#8506)
