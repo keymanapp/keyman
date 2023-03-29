@@ -41,7 +41,7 @@ class ViewInstalledWindowBase(Gtk.Window):
 
     def on_close_clicked(self, button):
         logging.debug("Close application clicked")
-        Gtk.main_quit()
+        self.close()
 
     def on_refresh_clicked(self, button):
         logging.debug("Refresh application clicked")
