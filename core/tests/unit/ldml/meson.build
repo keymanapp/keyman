@@ -4,10 +4,14 @@
 # Authors:      Marc Durdin
 #
 
-# ICU4C is an optional dependency and used for repertoire tests
-icu4c = dependency('icu-uc', required: false)
+# ICU4C is used for repertoire tests
 
-if icu4c.found()
+icu4c = subproject('icu', default_options: [ 'default_library=static', 'cpp_std=c++17', 'warning_level=0',
+'werror=false']) # TODO-LDML: options: static, no data
+
+icu_uc = icu4c.get_variable('icuuc_dep')
+
+if icu_uc.found()
   defns += '-DHAVE_ICU4C'
 endif
 
@@ -63,7 +67,7 @@ ldml = executable('ldml',
     include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
     link_args: links + tests_flags,
     objects: lib.extract_all_objects(recursive: false),
-    dependencies: [icu4c],
+    dependencies: [icu_uc],
     )
 
 # Run tests on all keyboards (`tests` defined in keyboards/meson.build)
