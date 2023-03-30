@@ -26,6 +26,8 @@ if(process.argv.length > 2) {
   }
 }
 
+let sourcemapJSON = '';
+
 if(MINIFY) {
   await esbuild.build({
     entryPoints: [`build/lib/worker-main.polyfilled.js`],
@@ -35,11 +37,13 @@ if(MINIFY) {
     keepNames: true,
     outfile: `build/lib/worker-main.polyfilled.min.js`
   });
+
+  sourcemapJSON = convertSourcemap.fromJSON(fs.readFileSync(`build/lib/worker-main.polyfilled${MINIFY ? '.min' : ''}.js.map`)).toObject();
 }
 
 const workerConcatenation = {
   script: fs.readFileSync(`build/lib/worker-main.polyfilled${MINIFY ? '.min' : ''}.js`),
-  sourcemapJSON: convertSourcemap.fromJSON(fs.readFileSync(`build/lib/worker-main.polyfilled${MINIFY ? '.min' : ''}.js.map`)).toObject(),
+  sourcemapJSON: sourcemapJSON
 }
 
 // While it IS possible to do partial sourcemaps (without the sources, but with everything else) within the worker...
