@@ -351,7 +351,7 @@ the same result.
 This environment variable tells Gradle what version of Java to use for building Keyman for Android.
 OpenJDK 8 is used to build stable-16.0 while OpenJDK 11 is used for master.
 It's recommended to install both and set the environment variables to:
-```
+```bat
 SET JAVA_HOME_8="path to OpenJDK 8"
 SET JAVA_HOME_11="path to OpenJDK 11"
 SET JAVA_HOME="$JAVA_HOME_8"
