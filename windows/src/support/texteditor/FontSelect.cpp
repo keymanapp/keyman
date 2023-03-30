@@ -12,13 +12,21 @@ font_select::font_select() {
 }
 
 font_select::font_select(HFONT current_font) {
-  if (m_hfont != NULL) {
-    ::DeleteObject(m_hfont);
-  }
 
-  // store the font current font for the calling application
-  m_hfont = current_font;
-  // We still set the default value but can now drop back to the current font
+  // we need to clone this HFONT
+  LOGFONT log_font;
+  if (current_font != NULL) {
+    GetObject(current_font, sizeof(log_font), &log_font);
+  }
+  HFONT h_font = ::CreateFontIndirect(&log_font);
+  if (h_font == NULL) {
+    MessageBox(NULL, L"Warning", L"Failed to create font at intialisation\n", MB_OK);
+  }
+  m_hfont = h_font; // even if h_font is NULL
+
+  // We still set the default value but can now drop back to the current font.
+  // That is, if the system does not have that font installed we want the m_hfont
+  // to be the font we passed into the constructor
   default_font();
 }
 
