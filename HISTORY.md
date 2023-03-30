@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.81 alpha 2023-03-30
+
+* feat(windows): simple text editor using Edit Control (#8391)
+
 ## 17.0.80 alpha 2023-03-29
 
 * chore(linux): Remove dependency on `sudo` (#8535)
