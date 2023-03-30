@@ -154,12 +154,13 @@ update_bundle ( ) {
     if [ $DO_KMW_BUILD = true ]; then
         echo Building KeymanWeb from $KMW_ROOT
 
-        KMW_PRODUCT=web/build/app/embed/
+        KMW_PRODUCT=web/build/app/webview/
+        KMW_RESOURCES=web/build/app/resources
         if [ "$CONFIG" == "Debug" ]; then
-          KMWFLAGS="configure:embed build:embed --debug"
+          KMWFLAGS="configure:app/webview build:app/webview --debug"
           KMW_PRODUCT="$KMW_PRODUCT/debug"
         else
-          KMWFLAGS="configure:embed build:embed"
+          KMWFLAGS="configure:app/webview build:app/webview"
           KMW_PRODUCT="$KMW_PRODUCT/release"
         fi
 
@@ -177,18 +178,24 @@ update_bundle ( ) {
         fi
 
         #Copy over the relevant resources!  It's easiest to do if we navigate to the resulting folder.
-        cp "$KEYMAN_ROOT/$KMW_PRODUCT/osk/kmwosk.css"        "$base_dir/$BUNDLE_PATH/kmwosk.css"
-        cp "$KEYMAN_ROOT/$KMW_PRODUCT/osk/keymanweb-osk.ttf" "$base_dir/$BUNDLE_PATH/keymanweb-osk.ttf"
-        cp "$KEYMAN_ROOT/$KMW_PRODUCT/keyman.js"             "$base_dir/$BUNDLE_PATH/keymanios.js"
+        cp "$KEYMAN_ROOT/$KMW_RESOURCES/osk/kmwosk.css"        "$base_dir/$BUNDLE_PATH/kmwosk.css"
+        cp "$KEYMAN_ROOT/$KMW_RESOURCES/osk/keymanweb-osk.ttf" "$base_dir/$BUNDLE_PATH/keymanweb-osk.ttf"
+        cp "$KEYMAN_ROOT/$KMW_PRODUCT/index.js"             "$base_dir/$BUNDLE_PATH/keymanios.js"
 
         if [ "$CONFIG" == "Debug" ]; then
-          cp "$KEYMAN_ROOT/$KMW_PRODUCT/keyman.js.map"       "$base_dir/$BUNDLE_PATH/keyman.js.map"
-        elif [ -f "$base_dir/$BUNDLE_PATH/keyman.js.map" ]; then
+          cp "$KEYMAN_ROOT/$KMW_PRODUCT/index.js.map"       "$base_dir/$BUNDLE_PATH/index.js.map"
+        elif [ -f "$base_dir/$BUNDLE_PATH/index.js.map" ]; then
           rm                               "$base_dir/$BUNDLE_PATH/keyman.js.map"
         fi
 
+        # Linked in by dependency for builder scripts... but this script isn't builder-based yet.
+        "${KEYMAN_ROOT}/common/web/sentry-manager/build.sh"
+        if [ $? -ne 0 ]; then
+            builder_die "ERROR:  Build of KMW's error reporter for Sentry failed."
+        fi
+
         cp "$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js" "$base_dir/$BUNDLE_PATH/sentry.min.js"
-        cp "$KEYMAN_ROOT/common/web/sentry-manager/build/index.js"   "$base_dir/$BUNDLE_PATH/keyman-sentry.js"
+        cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js"   "$base_dir/$BUNDLE_PATH/keyman-sentry.js"
 
     fi
 
