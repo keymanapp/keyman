@@ -101,6 +101,8 @@ Building:
 * Ant
 * Gradle
 * Maven
+* OpenJDK 11 (for 17.0)
+* OpenJDK 8 (for stable-16.0)
 
 ```ps1
 # Elevated PowerShell
@@ -113,6 +115,9 @@ sdkmanager --licenses
 
 * Run Android Studio once after installation to install additional components
   such as emulator images and SDK updates.
+
+**Required environment variables**:
+* [`JAVA_HOME`](#java_home)
 
 Building:
 * [Building Keyman for Android](../../android/README.md)
@@ -340,6 +345,17 @@ be used to sign executables when you build a release.
 To include UserDefines.mak in the build, use the command line parameter
 `-DUSERDEFINES`. You can also set an environment variable `USERDEFINES=1` to get
 the same result.
+
+### JAVA_HOME
+
+This environment variable tells Gradle what version of Java to use for building Keyman for Android.
+OpenJDK 8 is used to build stable-16.0 while OpenJDK 11 is used for master.
+It's recommended to install both and set the environment variables to:
+```
+SET JAVA_HOME_8="path to OpenJDK 8"
+SET JAVA_HOME_11="path to OpenJDK 11"
+SET JAVA_HOME="$JAVA_HOME_8"
+```
 
 ## Optional Tools
 
