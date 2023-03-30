@@ -1,5 +1,35 @@
 # Keyman Version History
 
+## 17.0.80 alpha 2023-03-29
+
+* chore(linux): Remove dependency on `sudo` (#8535)
+* chore(linux): Improve robustness of test cleanup (#8536)
+* fix(linux): Remove warning after pressing Close button (#8538)
+
+## 17.0.79 alpha 2023-03-28
+
+* chore(linux): Revert "Run and ignore autopkgtests on s390x" (#8506)
+* docs(linux): Update minimum required Ubuntu version (#8526)
+* docs(linux): Update common questions (#8532)
+
+## 17.0.78 alpha 2023-03-27
+
+* chore(linux): Remove python3-raven dependency (#8507)
+* refactor(android/engine): Make KMKeyboardJSHandler a normal class (#8494)
+
+## 17.0.77 alpha 2023-03-25
+
+* chore(common): use mac /usr/bin/stat rather than homebrew version (#8498)
+
+## 17.0.76 alpha 2023-03-24
+
+* chore(linux): Run and ignore autopkgtests on s390x (#8492)
+* refactor(android/engine): Consolidate dispatchKey (#8483)
+
+## 17.0.75 alpha 2023-03-23
+
+* chore(common): define BUILDER_CONFIGURATION env var (#8496)
+
 ## 17.0.74 alpha 2023-03-22
 
 * chore(windows): update sentry-native to 0.6.0 (#8464)
