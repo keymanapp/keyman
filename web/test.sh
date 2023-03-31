@@ -16,10 +16,9 @@ cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
-# Temp-removed dependency:
-# "@./src/tools/testing/recorder test:engine" \
-
 builder_describe "Runs the Keyman Engine for Web unit-testing suites" \
+  "@./src/tools/testing/recorder test:engine" \
+  "@./src/engine" \
   "test+" \
   ":engine               Runs the top-level Keyman Engine for Web unit tests" \
   ":libraries            Runs all unit tests for KMW's submodules.  Currently excludes predictive-text tests" \
@@ -70,7 +69,7 @@ get_default_browser_set ( ) {
   if [[ $BUILDER_OS == mac ]]; then
       BROWSERS="--browsers Firefox,Chrome,Safari"
   elif [[ $BUILDER_OS == win ]]; then
-      BROWSERS="--browsers Firefox,Chrome"
+      BROWSERS="--browsers Firefox,Chrome,Edge"
   else
       BROWSERS="--browsers Firefox,Chrome"
   fi
@@ -94,12 +93,15 @@ if builder_start_action test:engine; then
 
   # Select the right CONFIG file.
   if builder_has_option --ci; then
-    CONFIG=CI.conf.cjs
+    CONFIG=CI.conf.js
   else
-    CONFIG=manual.conf.cjs
+    CONFIG=manual.conf.js
   fi
 
-    # Prepare the flags for the karma command.
+  # Build modernizr module
+  npm --no-color run modernizr -- -c src/test/auto/modernizr.config.json -d src/test/auto/modernizr.js
+
+  # Prepare the flags for the karma command.
   KARMA_FLAGS=
 
   if builder_is_debug_build; then
@@ -110,16 +112,11 @@ if builder_start_action test:engine; then
     KARMA_FLAGS="$KARMA_FLAGS --reporters $REPORTERS"
   fi
 
-  KARMA_EXT_FLAGS=
   if ! builder_has_option --ci; then
-    KARMA_EXT_FLAGS="$KARMA_FLAGS --browsers $BROWSERS"
+    KARMA_FLAGS="$KARMA_FLAGS --browsers $BROWSERS"
   fi
 
-  karma start $KARMA_FLAGS "${KEYMAN_ROOT}/web/src/test/auto/dom/$CONFIG"
-
-  # Build modernizr module
-  modernizr -c src/test/auto/integrated/modernizr.config.json -d src/test/auto/integrated/modernizr.js
-  karma start $KARMA_FLAGS $KARMA_EXT_FLAGS "${KEYMAN_ROOT}/web/src/test/auto/integrated/$CONFIG"
+  npm --no-color run karma -- start $KARMA_FLAGS src/test/auto/$CONFIG
 
   builder_finish_action success test:engine
 fi

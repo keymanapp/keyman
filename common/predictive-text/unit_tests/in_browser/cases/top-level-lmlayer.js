@@ -1,23 +1,22 @@
 var assert = chai.assert;
-
-import { LMLayer, Worker as WorkerBuilder }   from "../../../build/lib/web/index.mjs";
-import * as helpers from "../helpers.mjs";
+var LMLayer = com.keyman.text.prediction.LMLayer;
+var DefaultWorker = com.keyman.text.prediction.DefaultWorker;
 
 describe('LMLayer', function () {
   this.timeout(testconfig.timeouts.standard);
 
   describe('[[constructor]]', function () {
     it('should construct with a single argument', function () {
-      let lmLayer = new LMLayer(helpers.defaultCapabilities, WorkerBuilder.constructInstance(), true);
+      let lmLayer = new LMLayer(helpers.defaultCapabilities, null, true);
       assert.instanceOf(lmLayer, LMLayer);
       lmLayer.shutdown();
     });
   });
 
-  describe.skip('#asBlobURI()', function () {
+  describe('#asBlobURI()', function () {
     // #asBlobURI() requires browser APIs, hence why it cannot be tested headless in Node.
     it('should take a function and convert it into a blob function', function (done) {
-      let uri = WorkerBuilder.asBlobURI(function dummyHandler() {
+      let uri = DefaultWorker.asBlobURI(function dummyHandler() {
         // Post something weird, so we can be reasonably certain the Web Worker is...
         // well, working.
         // WARNING: Do NOT refactor this string as a variable. It **MUST** remain a string

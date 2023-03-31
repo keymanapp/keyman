@@ -1,10 +1,5 @@
-import { assert } from 'chai';
-
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-
-import { LMLayer, SourcemappedWorker as Worker } from '#./node/index.js';
-import { capabilities } from '@keymanapp/common-test-resources/model-helpers.mjs';
+var assert = require('chai').assert;
+let LMLayer = require('../../build/headless');
 
 /*
  * How to run the worlist
@@ -13,14 +8,14 @@ describe('LMLayer using the trie model', function () {
   describe('Prediction', function () {
     var EXPECTED_SUGGESTIONS = 3;
     it('will predict an empty buffer', function () {
-      var lmLayer = new LMLayer(capabilities(), Worker.constructInstance());
+      var lmLayer = new LMLayer(capabilities());
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax.
       // Not done yet, as this test case is a slightly-edited copy of the in-browser version.
       return lmLayer.loadModel(
         // We're running headlessly, so the path can be relative to the npm root directory.
-        require.resolve("@keymanapp/common-test-resources/models/simple-trie.js")
+        "unit_tests/in_browser/resources/models/simple-trie.js"
       ).then(function (_actualConfiguration) {
         return Promise.resolve();
       }).then(function () {
@@ -55,11 +50,11 @@ describe('LMLayer using the trie model', function () {
     //
     // https://community.software.sil.org/t/search-term-to-key-in-lexical-model-not-working-both-ways-by-default/3133
     it('should use the default searchTermToKey()', function () {
-      var lmLayer = new LMLayer(capabilities(), Worker.constructInstance());
+      var lmLayer = new LMLayer(capabilities());
 
       return lmLayer.loadModel(
         // We're running headlessly, so the path can be relative to the npm root directory.
-        require.resolve("@keymanapp/common-test-resources/models/naive-trie.js")
+        "unit_tests/in_browser/resources/models/naive-trie.js"
       ).then(function (_actualConfiguration) {
         return Promise.resolve();
       }).then(function () {

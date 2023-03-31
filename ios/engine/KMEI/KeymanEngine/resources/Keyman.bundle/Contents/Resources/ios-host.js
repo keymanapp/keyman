@@ -45,8 +45,8 @@ function init() {
     kmw.init({'app':device,'fonts':'fonts/'});//.then(function() {
         kmw['util']['setOption']('attachType','manual');
         kmw['oninserttext'] = insertText;
-        window['showKeyboardList'] = menuKeyDown;
-        window['hideKeyboard'] = hideKeyboard;
+        kmw['showKeyboardList'] = menuKeyDown;
+        kmw['hideKeyboard'] = hideKeyboard;
         kmw['getOskHeight'] = getOskHeight;
         kmw['getOskWidth'] = getOskWidth;
         kmw['beepKeyboard'] = beepKeyboard;
@@ -129,9 +129,9 @@ function getOskHeight() {
 var keyboardOffset = 0;
 function setKeymanLanguage(stub) {
     var kmw = window.keyman;
-
+    
     KeymanWeb.registerStub(stub);
-
+    
     kmw.setActiveKeyboard(stub.KP + '::' + stub.KI, stub.KLC).then(function() {
         kmw.osk.show(true);
         doResetContext();
@@ -316,8 +316,10 @@ function toHex(theString) {
 function enableSuggestions(model, mayPredict, mayCorrect) {
     // Set the options first so that KMW's ModelManager can properly handle model enablement states
     // the moment we actually register the new model.
-    keyman.core.languageProcessor.mayPredict = mayPredict;
-    keyman.core.languageProcessor.mayCorrect = mayCorrect;
+    keyman.osk.banner.setOptions({
+    'mayPredict': mayPredict,
+    'mayCorrect': mayCorrect
+    });
 
     keyman.modelManager.register(model);
 }

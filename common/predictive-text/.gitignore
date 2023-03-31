@@ -68,7 +68,6 @@ typings/
 **/*.js
 
 # Intentional JavaScript files.
-!build-bundler.js
 !testing/**/*.js
 !unit_tests/**/*.js
 !polyfills/**/*.js

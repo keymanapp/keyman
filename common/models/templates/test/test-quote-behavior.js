@@ -2,8 +2,8 @@
  * Unit tests for quote behaviors.
  */
 
-import { assert } from 'chai';
-import { QuoteBehavior } from '@keymanapp/models-templates';
+var assert = require('chai').assert;
+var QuoteBehavior = require('../build/index.bundled.js').models.QuoteBehavior;
 
 describe('Quote behaviors', function() {
   describe('Script directionality', function() {

@@ -1,8 +1,6 @@
 var assert = chai.assert;
-
-import { Worker as WorkerBuilder }   from "../../../build/lib/web/index.mjs";
-import { LMLayerWorkerCode } from "/base/common/web/lm-worker/build/lib/worker-main.wrapped.min.js";
-import * as helpers from "../helpers.mjs";
+var LMLayer = com.keyman.text.prediction.LMLayer;
+var DefaultWorker = com.keyman.text.prediction.DefaultWorker;
 
 describe('LMLayerWorker', function () {
   // This one makes multiple subsequent calls across the WebWorker boundary, so we should be generous here.
@@ -10,16 +8,15 @@ describe('LMLayerWorker', function () {
 
   describe('LMLayerWorkerCode', function() {
     it('should exist!', function() {
-      // assert.isFunction(LMLayerWorkerCode,
-      //   'Could not find LMLayerWorkerCode! Does embedded_worker.js exist?'
-      // );
-      assert.isString(LMLayerWorkerCode);
+      assert.isFunction(LMLayerWorkerCode,
+        'Could not find LMLayerWorkerCode! Does embedded_worker.js exist?'
+      );
     });
   });
 
   describe('Usage within a Web Worker', function () {
     it('should install itself in the worker context', function (done) {
-      let uri = WorkerBuilder.asBlobURI(LMLayerWorkerCode);
+      let uri = DefaultWorker.asBlobURI(LMLayerWorkerCode);
       let worker = new Worker(uri);
       worker.onmessage = function thisShouldBeCalled(message) {
         done();

@@ -1,11 +1,9 @@
-import { assert } from 'chai';
-import fs from 'fs';
+var assert = require('chai').assert;
+var fs = require('fs');
+let LMLayer = require('../../build/headless');
 
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-
-import { LMLayer, SourcemappedWorker as Worker } from '#./node/index.js';
-import { capabilities, iGotDistractedByHazel } from '@keymanapp/common-test-resources/model-helpers.mjs';
+// Load the LMLayerWorkerCode function into this context
+require('node:vm').runInThisContext(fs.readFileSync(__dirname + '/../../../web/lm-worker/build/index.js', 'utf-8'));
 
 /*
  * Shows off the LMLayer API, using the full prediction interface.
@@ -18,7 +16,7 @@ import { capabilities, iGotDistractedByHazel } from '@keymanapp/common-test-reso
 describe('LMLayer using dummy model', function () {
   describe('Prediction', function () {
     it('will predict future suggestions (loaded from file)', function () {
-      var lmLayer = new LMLayer(capabilities(), Worker.constructInstance());
+      var lmLayer = new LMLayer(capabilities());
 
       var stripIDs = function(suggestions) {
         suggestions.forEach(function(suggestion) {
@@ -31,7 +29,7 @@ describe('LMLayer using dummy model', function () {
       // Not done yet, as this test case is a slightly-edited copy of the in-browser version.
       return lmLayer.loadModel(
         // We're running headlessly, so the path can be relative to the npm root directory.
-        require.resolve("@keymanapp/common-test-resources/models/simple-dummy.js")
+        "unit_tests/in_browser/resources/models/simple-dummy.js"
       ).then(function (actualConfiguration) {
         return Promise.resolve();
       }).then(function () {
@@ -57,7 +55,7 @@ describe('LMLayer using dummy model', function () {
     });
 
     it('will predict future suggestions (loaded from raw source)', function () {
-      var lmLayer = new LMLayer(capabilities(), Worker.constructInstance());
+      var lmLayer = new LMLayer(capabilities());
 
       var stripIDs = function(suggestions) {
         suggestions.forEach(function(suggestion) {
@@ -66,7 +64,7 @@ describe('LMLayer using dummy model', function () {
       };
 
       // We're running headlessly, so the path can be relative to the npm root directory.
-      let modelCode = fs.readFileSync(require.resolve("@keymanapp/common-test-resources/models/simple-dummy.js")).toString();
+      let modelCode = fs.readFileSync("./unit_tests/in_browser/resources/models/simple-dummy.js").toString();
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax.
@@ -100,14 +98,14 @@ describe('LMLayer using dummy model', function () {
 
   describe('Wordbreaking', function () {
     it('will perform (default) wordbreaking and return word at caret', function () {
-      var lmLayer = new LMLayer(capabilities(), Worker.constructInstance());
+      var lmLayer = new LMLayer(capabilities());
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax.
       // Not done yet, as this test case is a slightly-edited copy of the in-browser version.
       return lmLayer.loadModel(
         // We're running headlessly, so the path can be relative to the npm root directory.
-        require.resolve("@keymanapp/common-test-resources/models/simple-dummy.js")
+        "unit_tests/in_browser/resources/models/simple-dummy.js"
       ).then(function (actualConfiguration) {
         return Promise.resolve();
       }).then(function () {

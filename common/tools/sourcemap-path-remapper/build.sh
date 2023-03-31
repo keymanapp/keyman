@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 #
-# Compiles the JS sourcemap remapper tool used by some of our TS projects when complications
-# arise with sourcemap handling.
+# Compile our sourcemap-path remapping module for use by Web builds, releases, etc.
 #
-
-# Exit on command failure and when using unset variables:
 set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
@@ -20,6 +17,9 @@ cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
+# TODO: for predictive-text, we only need :headless, perhaps we should be splitting modules?
+# TODO: remove :tools once kmlmc is a dependency for test:module
+
 builder_describe "Builds a sourcemap manipulation ES module for use in Web-related builds" \
   "clean" \
   "configure" \
@@ -31,18 +31,18 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-### CLEAN ACTIONS
-
-if builder_start_action clean; then
-  rm -rf build/
-  builder_finish_action success clean
-fi
-
 ### CONFIGURE ACTIONS
 
 if builder_start_action configure; then
   verify_npm_setup
   builder_finish_action success configure
+fi
+
+### CLEAN ACTIONS
+
+if builder_start_action clean; then
+  rm -rf build/
+  builder_finish_action success clean
 fi
 
 ### BUILD ACTIONS

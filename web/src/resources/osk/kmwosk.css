@@ -384,7 +384,6 @@ span.kmw-keytip-label {
   transform: translateY(-50%);
   top: 50%;
   position: relative;
-  z-index: 1; /* allows characters like 'g' and 'y' to overflow onto callouts */
 }
 
 div.ios div.kmw-keytip-cap,

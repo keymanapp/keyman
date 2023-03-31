@@ -91,6 +91,16 @@ if(!window['keyman']['initialized']) {
     }
 
     /**
+     * Test if caret position is determined from the active element, or
+     * from the synthesized overlay element (touch devices)
+     *
+     * @return  {boolean}
+     **/
+    keymanweb.isPositionSynthesized = function() {
+      return device.touchable;
+    }
+
+    /**
      * Use rotation events to adjust OSK and input element positions and scaling as necessary
      */
     keymanweb.handleRotationEvents=function() {

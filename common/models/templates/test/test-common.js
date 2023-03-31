@@ -2,8 +2,8 @@
  * Unit tests for common utility functions/methods.
  */
 
-import { assert } from 'chai';
-import * as models from '@keymanapp/models-templates';
+var assert = require('chai').assert;
+var models = require('../build/index.bundled.js').models;
 
 describe('Common utility functions', function() {
   // TODO:  unit tests for other common utility functions
