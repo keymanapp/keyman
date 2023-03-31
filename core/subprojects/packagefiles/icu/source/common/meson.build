@@ -204,40 +204,40 @@ common_lib = library(
   c_args: '-DU_COMMON_IMPLEMENTATION',
   cpp_args: '-DU_COMMON_IMPLEMENTATION',
   link_with: stubdata_lib,
-  dependencies: dl_dep,
+  # dependencies: dl_dep,
   version: U_ICU_VERSION,
   install: true,
 )
 
-if meson.can_run_host_binaries()
+# if meson.can_run_host_binaries()
   common_native_lib = common_lib
-else
-  common_native_lib = library(
-    '@0@-native'.format(icuuc_name),
-    sources,
-    include_directories: incdir,
-    c_args: '-DU_COMMON_IMPLEMENTATION',
-    cpp_args: '-DU_COMMON_IMPLEMENTATION',
-    link_with: stubdata_native_lib,
-    dependencies: dl_native_dep,
-    version: U_ICU_VERSION,
-    native: true,
-  )
-endif
+# else
+#   common_native_lib = library(
+#     '@0@-native'.format(icuuc_name),
+#     sources,
+#     include_directories: incdir,
+#     c_args: '-DU_COMMON_IMPLEMENTATION',
+#     cpp_args: '-DU_COMMON_IMPLEMENTATION',
+#     link_with: stubdata_native_lib,
+#     # dependencies: dl_native_dep,
+#     version: U_ICU_VERSION,
+#     native: true,
+#   )
+# endif
 
 icuuc_dep = declare_dependency(
   link_with: common_lib,
   compile_args: usage_args,
   include_directories: incdir,
-  dependencies: dl_dep,
+  # dependencies: dl_dep,
 )
 
-icuuc_native_dep = declare_dependency(
-  link_with: common_native_lib,
-  compile_args: usage_args,
-  include_directories: incdir,
-  dependencies: dl_native_dep,
-)
+# icuuc_native_dep = declare_dependency(
+#   link_with: common_native_lib,
+#   compile_args: usage_args,
+#   include_directories: incdir,
+#   dependencies: dl_native_dep,
+# )
 
 if meson.version().version_compare('>=0.54.0')
   meson.override_dependency('icu-uc', icuuc_dep)

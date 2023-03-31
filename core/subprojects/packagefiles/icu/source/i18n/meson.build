@@ -271,19 +271,19 @@ i18n_lib = library(
   install: true,
 )
 
-if meson.can_run_host_binaries()
+# if meson.can_run_host_binaries()
   i18n_native_lib = i18n_lib
-else
-  i18n_native_lib = library(
-    '@0@-native'.format(i18n_name),
-    sources,
-    dependencies: icuuc_native_dep,
-    c_args: '-DU_I18N_IMPLEMENTATION',
-    cpp_args: '-DU_I18N_IMPLEMENTATION',
-    version: U_ICU_VERSION,
-    native: true,
-  )
-endif
+# else
+#   i18n_native_lib = library(
+#     '@0@-native'.format(i18n_name),
+#     sources,
+#     dependencies: icuuc_native_dep,
+#     c_args: '-DU_I18N_IMPLEMENTATION',
+#     cpp_args: '-DU_I18N_IMPLEMENTATION',
+#     version: U_ICU_VERSION,
+#     native: true,
+#   )
+# endif
 
 i18ninc = include_directories('.')
 
@@ -293,11 +293,11 @@ icui18n_dep = declare_dependency(
   dependencies: icuuc_dep,
 )
 
-icui18n_native_dep = declare_dependency(
-  include_directories: i18ninc,
-  link_with: i18n_native_lib,
-  dependencies: icuuc_native_dep,
-)
+# icui18n_native_dep = declare_dependency(
+#   include_directories: i18ninc,
+#   link_with: i18n_native_lib,
+#   dependencies: icuuc_native_dep,
+# )
 
 if meson.version().version_compare('>=0.54.0')
   meson.override_dependency('icu-i18n', icui18n_dep)

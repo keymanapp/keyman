@@ -12,7 +12,7 @@ PACKAGE_ICU_DESCRIPTION = 'International Components for Unicode'
 PACKAGE_ICU_URL = 'http://icu-project.org'
 
 cpp = meson.get_compiler('cpp')
-cpp_native = meson.get_compiler('cpp', native: true)
+# cpp_native = meson.get_compiler('cpp', native: true)
 
 have_elf_h = cpp.has_header('elf.h')
 
@@ -27,6 +27,8 @@ endif
 # per icudefs.mk.in:
 # "U_ATTRIBUTE_DEPRECATED is defined to hide warnings about deprecated API warnings."
 add_project_arguments('-DU_ATTRIBUTE_DEPRECATED=', '-DUCONFIG_USE_LOCAL=1', language: 'c')
+
+add_project_arguments('-DU_NOEXCEPT=', language: 'c')
 
 uconfig = configuration_data()
 
@@ -57,13 +59,13 @@ if cpp.get_argument_syntax() == 'msvc'
 endif
 
 # TODO-LDML: skip this check
-if meson.version().version_compare('>= 0.62')
-  dl_dep = dependency('dl', required: false)
-  dl_native_dep = dependency('dl', required: false, native: true)
-else
-  dl_dep = cpp.find_library('dl', required: false)
-  dl_native_dep = cpp_native.find_library('dl', required: false, native: true)
-endif
+# if meson.version().version_compare('>= 0.62')
+#   dl_dep = dependency('dl', required: false)
+#   dl_native_dep = dependency('dl', required: false, native: true)
+# else
+#   dl_dep = cpp.find_library('dl', required: false)
+#   dl_native_dep = cpp_native.find_library('dl', required: false, native: true)
+# endif
 
 windows = import('windows')
 pkg = import('pkgconfig')

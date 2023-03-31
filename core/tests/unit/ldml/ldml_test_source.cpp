@@ -580,8 +580,8 @@ LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
     fillin.string = u"No key for repertoire test: ";
     fillin.string.append(chstr);
     fillin.type = LDML_ACTION_FAIL;
+    return;
   }
-  assert(key2 != nullptr);
 
   // Now, look for the _first_ candidate vkey match in the kmap.
   for (KMX_DWORD kmapIndex = 0; kmapIndex < kmxplus->key2->kmapCount; kmapIndex++) {
