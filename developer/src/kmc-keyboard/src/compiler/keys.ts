@@ -173,7 +173,8 @@ export class KeysCompiler extends SectionCompiler {
 
     const keymap = Constants.HardwareToKeymap.get(hardware);
     if (!keymap) {
-      throw Error(`TODO-LDML: ${hardware} not supported, see #8161`);
+      this.callbacks.reportMessage(CompilerMessages.Error_InvalidHardware({ form: hardware }));
+      valid = false;
     }
 
     const uniqueKeys = calculateUniqueKeys([...this.keyboard.keys?.key]);
@@ -186,7 +187,7 @@ export class KeysCompiler extends SectionCompiler {
       const keys = layer.row[y].keys.split(' ');
 
       if (keys.length > keymap[y].length) {
-        this.callbacks.reportMessage(CompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({ row: y + 1, hardware }));
+        this.callbacks.reportMessage(CompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({ row: y + 1, hardware, modifier }));
         valid = false;
       }
 

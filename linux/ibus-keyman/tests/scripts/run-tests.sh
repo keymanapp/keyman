@@ -56,7 +56,7 @@ function run_tests() {
 
   echo > "$PID_FILE"
   TEMP_DATA_DIR=$(mktemp --directory)
-  echo "rm -rf ${TEMP_DATA_DIR}" >> "$PID_FILE"
+  echo "rm -rf ${TEMP_DATA_DIR} || true" >> "$PID_FILE"
 
   COMMON_ARCH_DIR=
   [ -d "${TOP_SRCDIR}"/../../core/build/arch ] && COMMON_ARCH_DIR=${TOP_SRCDIR}/../../core/build/arch
@@ -97,7 +97,7 @@ function run_tests() {
     TMPFILE=$(mktemp)
     # mutter-Message: 18:56:15.422: Using Wayland display name 'wayland-1'
     mutter --wayland --headless --no-x11 --virtual-monitor 1024x768 &> "$TMPFILE" &
-    echo "kill -9 $!" >> "$PID_FILE"
+    echo "kill -9 $! || true" >> "$PID_FILE"
     sleep 1s
     export WAYLAND_DISPLAY
     WAYLAND_DISPLAY=$(cat "$TMPFILE" | grep "Using Wayland display" | cut -d"'" -f2)
@@ -105,15 +105,15 @@ function run_tests() {
   else
     echo "# Starting Xvfb..."
     Xvfb -screen 0 1024x768x24 :33 &> /dev/null &
-    echo "kill -9 $!" >> "$PID_FILE"
+    echo "kill -9 $! || true" >> "$PID_FILE"
     sleep 1
     echo "# Starting Xephyr..."
     DISPLAY=:33 Xephyr :32 -screen 1024x768 &> /dev/null &
-    echo "kill -9 $!" >> "$PID_FILE"
+    echo "kill -9 $! || true" >> "$PID_FILE"
     sleep 1
     echo "# Starting metacity"
     metacity --display=:32 &> /dev/null &
-    echo "kill -9 $!" >> "$PID_FILE"
+    echo "kill -9 $! || true" >> "$PID_FILE"
 
     export DISPLAY=:32
   fi
@@ -145,11 +145,11 @@ function run_tests() {
   fi
 
   ibus-daemon "${ARG_VERBOSE-}" --panel=disable ${IBUS_CONFIG-} &> /tmp/ibus-daemon.log &
-  echo "kill -9 $!" >> "$PID_FILE"
+  echo "kill -9 $! || true" >> "$PID_FILE"
   sleep 1s
 
   ../src/ibus-engine-keyman "${ARG_VERBOSE-}" &> /tmp/ibus-engine-keyman.log &
-  echo "kill -9 $!" >> "$PID_FILE"
+  echo "kill -9 $! || true" >> "$PID_FILE"
   sleep 1s
 
   echo "# Starting tests..."
