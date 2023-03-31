@@ -58,10 +58,7 @@ while [[ $# -gt 0 ]] ; do
 done
 
 # Override JAVA_HOME to OpenJDK 11
-if [ -f .build-builder ]; then
-  builder_heading "Setting JAVA_HOME to OpenJDK 11"
-  export JAVA_HOME=${JAVA_HOME_11}
-fi
+set_java_home
 
 echo
 echo "NO_DAEMON: $NO_DAEMON"
