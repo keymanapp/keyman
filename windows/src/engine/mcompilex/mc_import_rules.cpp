@@ -22,6 +22,68 @@
 #include "pch.h"
 #include <vector>
 #include <string>
+#include <iostream>
+#include <fstream>
+#include <string>
+
+
+int getfirstInt_mc(std::string& Instr) {
+  int firstOcc = Instr.find_first_of("\t");
+  std::string Firststr = Instr.substr(0, firstOcc);
+  Instr = Instr.substr(firstOcc + 1);
+  return atoi(Firststr.c_str());
+}
+
+UINT ReadTxtFile_get_VKeyMap_from_ch(UINT inchar, int shiftstate, wchar_t* txtfile) {
+  UINT S1, S2, S3, S4, S5;
+  std::string tp;
+  std::fstream TxtDll;
+  //TxtDll.open("C:/MCOMPILE____/Resultfile1.txt", std::fstream::in);
+  TxtDll.open(txtfile, std::fstream::in);
+
+  UINT Int_inchar = (UINT)inchar;
+  while (getline(TxtDll, tp)) {
+    S1 = getfirstInt_mc(tp); //kbid
+    S2 = getfirstInt_mc(tp); //VKShiftState[j]
+    S3 = getfirstInt_mc(tp); //VKMap[i]
+    S4 = getfirstInt_mc(tp); //ch
+    S5 = getfirstInt_mc(tp); //deadkey
+
+    if ((Int_inchar == S4) && ((UINT)shiftstate == S2)) {
+      TxtDll.close();
+      return S3;
+    }
+  }
+
+  TxtDll.close();
+  return 0;
+}
+
+UINT ReadTxtFile_get_ch_from_VKeyMap(UINT inchar, int shiftstate, wchar_t* txtfile) {
+  UINT S1, S2, S3, S4, S5;
+  std::string tp;
+  std::fstream TxtDll;
+  //TxtDll.open("C:/MCOMPILE____/Resultfile1.txt", std::fstream::in);
+  TxtDll.open(txtfile, std::fstream::in);
+
+  UINT Int_inchar = (UINT)inchar;
+  while (getline(TxtDll, tp)) {
+    S1 = getfirstInt_mc(tp); //kbid
+    S2 = getfirstInt_mc(tp); //VKShiftState[j]
+    S3 = getfirstInt_mc(tp); //VKMap[i]
+    S4 = getfirstInt_mc(tp); //ch
+    S5 = getfirstInt_mc(tp); //deadkey
+
+    if ((Int_inchar == S3) && ((UINT)shiftstate == S2)) {
+      TxtDll.close();
+      return S4;
+    }
+  }
+
+  TxtDll.close();
+  return 0;
+}
+
 
 enum ShiftState {
     Base = 0,                    // 0
@@ -252,6 +314,78 @@ public:
     return nkeys;
   }
 
+
+
+  bool LayoutRowNew(int MaxShiftState, LPKEY key, std::vector<DeadKey*>* deadkeys, int deadkeyBase, BOOL bDeadkeyConversion, wchar_t* txtfile) {   // I4552
+    // Get the CAPSLOCK value
+    int capslock =
+      (this->IsCapsEqualToShift() ? 1 : 0) |
+      (this->IsSGCAPS() ? 2 : 0) |
+      (this->IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
+      (this->IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
+
+    for (int ss = 0; ss <= MaxShiftState; ss++) {
+      if (ss == Menu || ss == ShftMenu) {
+        // Alt and Shift+Alt don't work, so skip them
+        continue;
+      }
+      for (int caps = 0; caps <= 1; caps++) {
+        std::wstring st = this->GetShiftState((ShiftState)ss, (caps == 1));
+        PWSTR p;
+        if (st.size() == 0) {
+          // No character assigned here
+        }
+        else if (this->m_rgfDeadKey[(int)ss][caps]) {
+          // It's a dead key, append an @ sign.
+          key->dpContext = new WCHAR[1];
+          *key->dpContext = 0;
+          key->ShiftFlags = this->GetShiftStateValue(capslock, caps, (ShiftState)ss);
+          UINT this_VK = this->VK();
+          key->Key = VKUnderlyingLayoutToVKUS(this->VK());
+
+          // here change to de from file??
+          key->Key = ReadTxtFile_get_VKeyMap_from_ch(this_VK, ss, txtfile);
+          key->Line = 0;
+
+          if (bDeadkeyConversion) {   // I4552
+            p = key->dpOutput = new WCHAR[2];
+            *p++ = st[0];
+            *p = 0;
+          }
+          else {
+            p = key->dpOutput = new WCHAR[4];
+            *p++ = UC_SENTINEL;
+            *p++ = CODE_DEADKEY;
+            *p++ = DeadKeyMap(st[0], deadkeys, deadkeyBase, &FDeadkeys);   // I4353
+            *p = 0;
+          }
+          key++;
+        }
+        else {
+          bool isvalid = true;
+          for(size_t ich = 0; ich < st.size(); ich++) {
+            if (st[ich] < 0x20 || st[ich] == 0x7F) { isvalid = false; break; }
+          }
+
+          if (isvalid) {
+            //key->Key = VKUnderlyingLayoutToVKUS(this->VK());
+            key->Key = ReadTxtFile_get_VKeyMap_from_ch(this->VK(), ss, txtfile);   //SAB
+
+            key->Line = 0;
+            key->ShiftFlags = this->GetShiftStateValue(capslock, caps, (ShiftState)ss);
+            key->dpContext = new WCHAR; *key->dpContext = 0;
+            p = key->dpOutput = new WCHAR[st.size() + 1];
+            for(size_t ich = 0; ich < st.size(); ich++)
+              *p++ = st[ich];
+            *p = 0;
+            key++;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
   bool LayoutRow(int MaxShiftState, LPKEY key, std::vector<DeadKey*> *deadkeys, int deadkeyBase, BOOL bDeadkeyConversion) {   // I4552
     // Get the CAPSLOCK value
     int capslock =
@@ -459,7 +593,8 @@ int GetMaxDeadkeyIndex(WCHAR *p) {
   return n;
 }
 
-bool ImportRules(WCHAR *kbid, LPKEYBOARD kp, std::vector<DeadkeyMapping> *FDeadkeys, BOOL bDeadkeyConversion) {   // I4353   // I4552
+// ###### This is a copy of ImportRules adapted to use a txtfile instead of kbid+kbdxx.dll ######
+bool ImportRulesTxT(WCHAR* kbid, LPKEYBOARD kp, std::vector<DeadkeyMapping>* FDeadkeys, BOOL bDeadkeyConversion, wchar_t* txtfile) {   // I4353   // I4552
   Loader loader;
 
   WCHAR inputHKL[12];
@@ -467,14 +602,14 @@ bool ImportRules(WCHAR *kbid, LPKEYBOARD kp, std::vector<DeadkeyMapping> *FDeadk
 
   int cKeyboards = GetKeyboardLayoutList(0, NULL);
   HKL *rghkl = new HKL[cKeyboards];
-  GetKeyboardLayoutList(cKeyboards, rghkl);            
+  GetKeyboardLayoutList(cKeyboards, rghkl);
   HKL hkl = LoadKeyboardLayout(inputHKL, KLF_NOTELLSHELL);
   if(hkl == NULL) {
       puts("Sorry, that keyboard does not seem to be valid.");
       delete[] rghkl;
       return false;
   }
-            
+
   BYTE lpKeyState[256];// = new KeysEx[256];
   std::vector<VirtualKey*> rgKey; //= new VirtualKey[256];
   std::vector<DeadKey*> alDead;
@@ -603,7 +738,7 @@ bool ImportRules(WCHAR *kbid, LPKEYBOARD kp, std::vector<DeadkeyMapping> *FDeadk
   // Now that we've collected the key data, we need to
   // translate it to kmx and append to the existing keyboard
   //-------------------------------------------------------------
-    
+
   int nDeadkey = 0;
 
   LPGROUP gp = new GROUP[kp->cxGroupArray+2];  // leave space for old
@@ -655,7 +790,7 @@ bool ImportRules(WCHAR *kbid, LPKEYBOARD kp, std::vector<DeadkeyMapping> *FDeadk
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->IsKeymanUsedKey() && (!rgKey[iKey]->IsEmpty())) {
       // for each item, 
-      if(rgKey[iKey]->LayoutRow(loader.MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion)) {   // I4552
+      if(rgKey[iKey]->LayoutRowNew(loader.MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion, txtfile)) {   // I4552
         nKeys+=rgKey[iKey]->GetKeyCount(loader.MaxShiftState());
       }
     }
@@ -781,3 +916,333 @@ bool ImportRules(WCHAR *kbid, LPKEYBOARD kp, std::vector<DeadkeyMapping> *FDeadk
   return true;
 }
 
+
+// ###### This ist he original ImportRules ######
+bool ImportRules(WCHAR *kbid, LPKEYBOARD kp, std::vector<DeadkeyMapping> *FDeadkeys, BOOL bDeadkeyConversion) {   // I4353   // I4552
+  Loader loader;
+  WCHAR inputHKL[12];
+  wsprintf(inputHKL, L"%08.8x", (unsigned int) wcstol(kbid, NULL, 16));
+
+  int cKeyboards = GetKeyboardLayoutList(0, NULL);
+  HKL *rghkl = new HKL[cKeyboards];
+  GetKeyboardLayoutList(cKeyboards, rghkl);
+  HKL hkl = LoadKeyboardLayout(inputHKL, KLF_NOTELLSHELL);
+  if(hkl == NULL) {
+      puts("Sorry, that keyboard does not seem to be valid.");
+      delete[] rghkl;
+      return false;
+  }
+
+  BYTE lpKeyState[256];// = new KeysEx[256];
+  std::vector<VirtualKey*> rgKey; //= new VirtualKey[256];
+  std::vector<DeadKey*> alDead;
+
+  rgKey.resize(256);
+
+  // Scroll through the Scan Code (SC) values and get the valid Virtual Key (VK)
+  // values in it. Then, store the SC in each valid VK so it can act as both a
+  // flag that the VK is valid, and it can store the SC value.
+  // for language kbid/hkl: we get array  of m_vk, m_sc odrered by m_vk
+  // for us (=0407):  sc 21 -> VK 90 (Z)
+  // for us (=0407):  sc 44 -> VK 89 (Y)
+
+  // ( but: for de (=04??):  sc 21 -> VK 89 (Y))
+  for(UINT sc = 0x01; sc <= 0x7f; sc++) {
+    VirtualKey *key = new VirtualKey(sc, hkl);
+    if(key->VK() != 0) {
+      rgKey[key->VK()] = key;
+    } else {
+      delete key;
+    }
+  }
+
+  // add the special keys that do not get added from the code above
+  for(UINT ke = VK_NUMPAD0; ke <= VK_NUMPAD9; ke++) {
+      rgKey[ke] = new VirtualKey(hkl, ke);
+  }
+  rgKey[VK_DIVIDE] = new VirtualKey(hkl, VK_DIVIDE);
+  rgKey[VK_CANCEL] = new VirtualKey(hkl, VK_CANCEL);
+  rgKey[VK_DECIMAL] = new VirtualKey(hkl, VK_DECIMAL);
+
+  // See if there is a special shift state added
+  for(UINT vk = 0; vk <= VK_OEM_CLEAR; vk++) {
+      UINT sc = MapVirtualKeyEx(vk, 0, hkl);
+      UINT vkL = MapVirtualKeyEx(sc, 1, hkl);
+      UINT vkR = MapVirtualKeyEx(sc, 3, hkl);
+      if((vkL != vkR) &&
+          (vk != vkL)) {
+          switch(vk) {
+              case VK_LCONTROL:
+              case VK_RCONTROL:
+              case VK_LSHIFT:
+              case VK_RSHIFT:
+              case VK_LMENU:
+              case VK_RMENU:
+                  break;
+
+              default:
+                  loader.Set_XxxxVk(vk);
+                  break;
+              }
+            }
+          }
+
+  for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
+    if (rgKey[iKey] != NULL) {
+      WCHAR sbBuffer[256];     // Scratchpad we use many places
+
+      for(ShiftState ss = Base; ss <= loader.MaxShiftState(); ss = (ShiftState)((int)ss + 1)) {
+        if (ss == Menu || ss == ShftMenu) {
+          // Alt and Shift+Alt don't work, so skip them
+          continue;
+        }
+
+        for(int caps = 0; caps <= 1; caps++) {
+          loader.ClearKeyboardBuffer(VK_DECIMAL, rgKey[VK_DECIMAL]->SC(), hkl);
+          ////FillKeyState(lpKeyState, ss, (caps != 0)); //http://blogs.msdn.com/michkap/archive/2006/04/18/578557.aspx
+          loader.FillKeyState(lpKeyState, ss, (caps == 0));
+          //sbBuffer = new StringBuilder(10);
+          int rc = ToUnicodeEx(rgKey[iKey]->VK(), rgKey[iKey]->SC(), lpKeyState, sbBuffer, _countof(sbBuffer), 0, hkl);
+          if (rc > 0) {
+            if (*sbBuffer == 0) {
+              // Someone defined NULL on the keyboard; let's coddle them
+              ////rgKey[iKey].SetShiftState(ss, "\u0000", false, (caps != 0));
+              rgKey[iKey]->SetShiftState(ss, L"", false, (caps == 0));
+            }
+            else {
+              if ((rc == 1) &&
+                (ss == Ctrl || ss == ShftCtrl) &&
+                (rgKey[iKey]->VK() == ((UINT)sbBuffer[0] + 0x40))) {
+                // ToUnicodeEx has an internal knowledge about those
+                // VK_A ~ VK_Z keys to produce the control characters,
+                // when the conversion rule is not provided in keyboard
+                // layout files
+                continue;
+              }
+              sbBuffer[rc] = 0;
+              //rgKey[iKey].SetShiftState(ss, sbBuffer.ToString().Substring(0, rc), false, (caps != 0));
+              rgKey[iKey]->SetShiftState(ss, sbBuffer, false, (caps == 0));
+
+            }
+          }
+          else if (rc < 0) {
+            //rgKey[iKey].SetShiftState(ss, sbBuffer.ToString().Substring(0, 1), true, (caps != 0));
+            sbBuffer[2] = 0;
+            rgKey[iKey]->SetShiftState(ss, sbBuffer, true, (caps == 0));
+
+            // It's a dead key; let's flush out whats stored in the keyboard state.
+            loader.ClearKeyboardBuffer(VK_DECIMAL, rgKey[VK_DECIMAL]->SC(), hkl);
+            DeadKey* dk = NULL;
+            for(UINT iDead = 0; iDead < alDead.size(); iDead++) {
+              dk = alDead[iDead];
+              if (dk->DeadCharacter() == rgKey[iKey]->GetShiftState(ss, caps == 0)[0]) {
+                break;
+              }
+              dk = NULL;
+            }
+            if (dk == NULL) {
+              alDead.push_back(loader.ProcessDeadKey(iKey, ss, lpKeyState, rgKey, caps == 0, hkl));
+            }
+          }
+        }
+      }
+    }
+  }
+
+  for(int i = 0; i < cKeyboards; i++) {
+    if (hkl == rghkl[i]) {
+      hkl = NULL;
+      break;
+    }
+  }
+
+  if (hkl != NULL) {
+    UnloadKeyboardLayout(hkl);
+  }
+
+
+  delete[] rghkl;
+
+  //-------------------------------------------------------------
+  // Now that we've collected the key data, we need to
+  // translate it to kmx and append to the existing keyboard
+  //-------------------------------------------------------------
+
+  int nDeadkey = 0;
+
+  LPGROUP gp = new GROUP[kp->cxGroupArray + 2];  // leave space for old
+  memcpy(gp, kp->dpGroupArray, sizeof(GROUP) * kp->cxGroupArray);
+
+  //
+  // Find the current highest deadkey index
+  //
+
+  kp->dpGroupArray = gp;
+  for(UINT i = 0; i < kp->cxGroupArray; i++, gp++) {
+    /*if(gp->fUsingKeys && gp->dpNoMatch == NULL) {   // I4550
+      WCHAR *p = gp->dpNoMatch = new WCHAR[4];
+      *p++ = UC_SENTINEL;
+      *p++ = CODE_USE;
+      *p++ = (WCHAR)(kp->cxGroupArray + 1);
+      *p = 0;
+    }*/
+    LPKEY kkp = gp->dpKeyArray;
+    for(UINT j = 0; j < gp->cxKeyArray; j++, kkp++) {
+      nDeadkey = max(nDeadkey, GetMaxDeadkeyIndex(kkp->dpContext));
+      nDeadkey = max(nDeadkey, GetMaxDeadkeyIndex(kkp->dpOutput));
+    }
+  }
+
+  kp->cxGroupArray++;
+  gp = &kp->dpGroupArray[kp->cxGroupArray-1];
+
+  UINT nKeys = 0;
+  for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
+    if ((rgKey[iKey] != NULL) && rgKey[iKey]->IsKeymanUsedKey() && (!rgKey[iKey]->IsEmpty())) {
+      nKeys += rgKey[iKey]->GetKeyCount(loader.MaxShiftState());
+    }
+  }
+
+  nDeadkey++; // ensure a 1-based index above the max deadkey value already in the keyboard
+
+  gp->fUsingKeys = TRUE;
+  gp->dpMatch = NULL;
+  gp->dpName = NULL;
+  gp->dpNoMatch = NULL;
+  gp->cxKeyArray = nKeys;
+  gp->dpKeyArray = new KEY[gp->cxKeyArray];
+  nKeys = 0;
+  //
+  // Fill in the new rules
+  //
+
+  for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
+    if ((rgKey[iKey] != NULL) && rgKey[iKey]->IsKeymanUsedKey() && (!rgKey[iKey]->IsEmpty())) {
+      // for each item,
+      if (rgKey[iKey]->LayoutRow(loader.MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion)) {   // I4552
+        nKeys += rgKey[iKey]->GetKeyCount(loader.MaxShiftState());
+      }
+    }
+  }
+
+  gp->cxKeyArray = nKeys;
+
+  //
+  // Add nomatch control to each terminating 'using keys' group   // I4550
+  //
+  LPGROUP gp2 = kp->dpGroupArray;
+  for(UINT i = 0; i < kp->cxGroupArray - 1; i++, gp2++) {
+    if (gp2->fUsingKeys && gp2->dpNoMatch == NULL) {
+      WCHAR* p = gp2->dpNoMatch = new WCHAR[4];
+      *p++ = UC_SENTINEL;
+      *p++ = CODE_USE;
+      *p++ = (WCHAR)(kp->cxGroupArray);
+      *p = 0;
+
+      //
+      // I4550 - Each place we have a nomatch > use(baselayout) (this last group), we need to add all
+      // the AltGr and ShiftAltGr combinations as rules to allow them to be matched as well.  Yes, this
+      // loop is not very efficient but it's not worthy of optimisation.
+      //
+      UINT j;
+      LPKEY kkp;
+      for(j = 0, kkp = gp->dpKeyArray; j < gp->cxKeyArray; j++, kkp++) {
+        if ((kkp->ShiftFlags & (K_CTRLFLAG | K_ALTFLAG | LCTRLFLAG | LALTFLAG | RCTRLFLAG | RALTFLAG)) != 0) {
+          //std::cout << "OLD We were in I4550 - Each place \n";
+          gp2->cxKeyArray++;
+          LPKEY kkp2 = new KEY[gp2->cxKeyArray];
+          memcpy(kkp2, gp2->dpKeyArray, sizeof(KEY) * (gp2->cxKeyArray - 1));
+          gp2->dpKeyArray = kkp2;
+          kkp2 = &kkp2[gp2->cxKeyArray - 1];
+          kkp2->dpContext = new WCHAR; *kkp2->dpContext = 0;
+          kkp2->Key = kkp->Key;
+          kkp2->ShiftFlags = kkp->ShiftFlags;
+          kkp2->Line = 0;
+          WCHAR* p = kkp2->dpOutput = new WCHAR[4];
+          *p++ = UC_SENTINEL;
+          *p++ = CODE_USE;
+          *p++ = (WCHAR)(kp->cxGroupArray);
+          *p = 0;
+        }
+      }
+    }
+  }
+
+  //
+  // If we have deadkeys, then add a new group to translate the deadkeys per the deadkey tables
+  // We only do this if not in deadkey conversion mode
+  //
+  //std::cout << "OLD alDead.size(): "<< alDead.size()<<" - Each place \n";
+  if (alDead.size() > 0 && !bDeadkeyConversion) {   // I4552
+
+    //std::cout << "OLD We were in if (alDead.size() > 0 &&... \n";
+    kp->cxGroupArray++;
+
+    WCHAR* p = gp->dpMatch = new WCHAR[4];
+    *p++ = UC_SENTINEL;
+    *p++ = CODE_USE;
+    *p++ = (WCHAR)kp->cxGroupArray;
+    *p = 0;
+
+    gp++;
+
+    gp->fUsingKeys = FALSE;
+    gp->dpMatch = NULL;
+    gp->dpName = NULL;
+    gp->dpNoMatch = NULL;
+    gp->cxKeyArray = alDead.size();
+    LPKEY kkp = gp->dpKeyArray = new KEY[alDead.size()];
+
+    LPSTORE sp = new STORE[kp->cxStoreArray + alDead.size() * 2];
+    memcpy(sp, kp->dpStoreArray, sizeof(STORE) * kp->cxStoreArray);
+
+    kp->dpStoreArray = sp;
+
+    sp = &sp[kp->cxStoreArray];
+    int nStoreBase = kp->cxStoreArray;
+    kp->cxStoreArray += alDead.size() * 2;
+
+    for(UINT i = 0; i < alDead.size(); i++) {
+      DeadKey* dk = alDead[i];
+
+      sp->dpName = NULL;
+      sp->dwSystemID = 0;
+      sp->dpString = new WCHAR[dk->Count() + 1];
+      for(int j = 0; j < dk->Count(); j++)
+        sp->dpString[j] = dk->GetBaseCharacter(j);
+      sp->dpString[dk->Count()] = 0;
+      sp++;
+
+      sp->dpName = NULL;
+      sp->dwSystemID = 0;
+      sp->dpString = new WCHAR[dk->Count() + 1];
+      for(int j = 0; j < dk->Count(); j++)
+        sp->dpString[j] = dk->GetCombinedCharacter(j);
+      sp->dpString[dk->Count()] = 0;
+      sp++;
+
+      kkp->Line = 0;
+      kkp->ShiftFlags = 0;
+      kkp->Key = 0;
+      WCHAR* p = kkp->dpContext = new WCHAR[8];
+      *p++ = UC_SENTINEL;
+      *p++ = CODE_DEADKEY;
+      *p++ = DeadKeyMap(dk->DeadCharacter(), &alDead, nDeadkey, FDeadkeys);   // I4353
+      //*p++ = nDeadkey+i;
+      *p++ = UC_SENTINEL;
+      *p++ = CODE_ANY;
+      *p++ = nStoreBase + i * 2 + 1;
+      *p = 0;
+
+      p = kkp->dpOutput = new WCHAR[5];
+      *p++ = UC_SENTINEL;
+      *p++ = CODE_INDEX;
+      *p++ = nStoreBase + i * 2 + 2;
+      *p++ = 2;
+      *p = 0;
+
+      kkp++;
+    }
+  }
+  return true;
+}

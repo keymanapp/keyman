@@ -1,4 +1,13 @@
 /*
+ToDoS
++Pathnames for txt-file
++check if file exists when reading
++zurück: kbid ersetzen mit 0407
++delete unused functions
++use same func in -d +4 and -d
+
+
+
   Name:             mcompile
   Copyright:        Copyright (C) SIL International.
   Documentation:
@@ -38,14 +47,13 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <codecvt>
-typedef std::basic_ofstream<char16_t> u16ofstream;
 
-typedef wchar_t* PWSTR;
+int getfirstInt(std::string& Instr);
+wchar_t* getfirst_Cstr(std::string& Instr);
+bool ImportRulesTxT(WCHAR* kbid, LPKEYBOARD kp, std::vector<DeadkeyMapping>* FDeadkeys, BOOL bDeadkeyConversion, wchar_t* txtfile);   // I4353   // I4327
+BOOL DoConvertTxT(LPKEYBOARD kbd, wchar_t* txtfile, PWSTR kbid, BOOL bDeadkeyConversion);
+BOOL WriteTxtFile(wchar_t* indll, PWSTR kbid, wchar_t* TxtFileName, BOOL bDeadkeyConversion);
 
-
-BOOL WriteTxtFile(wchar_t* indll, PWSTR kbid, wchar_t* TxtFile);
-BOOL DoConvertTxT(LPKEYBOARD kbd, PWSTR kbid, BOOL bDeadkeyConversion);
 BOOL DoConvert(LPKEYBOARD kbd, PWSTR kbid, BOOL bDeadkeyConversion);
 BOOL SaveKeyboard(LPKEYBOARD kbd, PWSTR filename);
 bool ImportRules(WCHAR* kbid, LPKEYBOARD kp, std::vector<DeadkeyMapping>* FDeadkeys, BOOL bDeadkeyConversion);   // I4353   // I4327
@@ -63,13 +71,16 @@ int wmain(int argc, wchar_t* argv[])
 
 int run(int argc, wchar_t* argv[])
 {
-  if (argc < 3 || (argc < 5 && wcscmp(argv[1], L"-u") != 0) || (argc < 4 && wcscmp(argv[1], L"-e") != 0)) {   // I4273
+  if (argc < 3 || (argc < 4 && wcscmp(argv[1], L"-e") != 0) || (argc < 5 && wcscmp(argv[1], L"-u") != 0)) {   // I4273
     printf(
       "Usage: mcompile -u infile.kmx outfile.kmx\n"
       "       mcompile -e kbdfile.dll kbid outfile.txt\n"
+      "       mcompile -d infile.kmx txt_file outfile.kmx\n"
       "       mcompile [-d] infile.kmx kbdfile.dll kbid outfile.kmx\n"
       "  With -u parameter, converts keyboard from ANSI to Unicode\n"
       "  With -e parameter, converts kbdfile.dll to textfile\n"
+      "  With -d parameter and 5 parameters, use textfile instead dll\n"
+      "          to convert mnemonic to positional layout \n"
       "  Otherwise, mcompile converts a Keyman mnemonic layout to a\n"
       "  positional one based on the Windows keyboard\n"
       "  layout file given by kbdfile.dll\n\n"
@@ -83,7 +94,7 @@ int run(int argc, wchar_t* argv[])
   int n = (bDeadkeyConversion ? 2 : 1);
 
   wchar_t* infile = argv[n], * indll = argv[n + 1], * kbid = argv[n + 2], * outfile = argv[n + 3];
-
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   if (wcscmp(argv[1], L"-u") == 0) {   // I4273
     wchar_t* infile = argv[2], * outfile = argv[3];
 
@@ -105,12 +116,38 @@ int run(int argc, wchar_t* argv[])
   }
 
   wprintf(L"mcompile%ls \"%ls\" \"%ls\" \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d" : L"", infile, indll, kbid, outfile);   // I4174
-
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   if (wcscmp(argv[1], L"-e") == 0) {
-    if (WriteTxtFile(indll, kbid, outfile))
-      wprintf(L"\n********************************************************\n******* Txt-file has been written successfully *********\n********************************************************\n");   // I4174
+    bDeadkeyConversion = 1;
+    if (WriteTxtFile(indll, L"0407", outfile, bDeadkeyConversion))   //  write to txt-file: outfile
     return 0;
   }
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // new call -d +  4 Paramtrs
+  // call : mcompileX.exe -d    C:\MCOMPILE____\sil_buang1.kmx    C:\MCOMPILE____\Resultfile1.txt     C:\MCOMPILE____\sil_buang_german_new1.kmx
+  //        mcompileX.exe -d    infile                            textfile                            outfile
+  if (wcscmp(argv[1], L"-d") == 0  && (argc ==5)) {
+
+    infile = argv[2];
+    wchar_t* txtfile = argv[3];
+    outfile = argv[4];
+
+    LPKEYBOARD kmxfile;
+
+    if (!LoadKeyboard(infile, &kmxfile)) {
+      LogError(L"Failed to load keyboard (%d)", GetLastError());
+      return 3;
+    }
+    if (DoConvertTxT(kmxfile, txtfile, kbid, bDeadkeyConversion)) {   // I4552
+      SaveKeyboard(kmxfile, outfile);
+    }
+
+    //DeleteReallocatedPointers(kmxfile); :TODO
+    delete kmxfile;
+
+    return 0;
+  }
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // 1. Load the keyman keyboard file
 
   // 2. For each key on the system layout, determine its output character and perform a
@@ -148,16 +185,10 @@ int run(int argc, wchar_t* argv[])
     LogError(L"Failed to load keyboard (%d)", GetLastError());
     return 3;
   }
-  /*
   if (DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552 
     SaveKeyboard(kmxfile, outfile);
   }
-  */
 
- 
-  if (DoConvertTxT(kmxfile, kbid, bDeadkeyConversion)) {   // I4552
-    SaveKeyboard(kmxfile, outfile);
-  }/**/
   //DeleteReallocatedPointers(kmxfile); :TODO
   delete kmxfile;
 
@@ -444,10 +475,24 @@ BOOL SetKeyboardToPositional(LPKEYBOARD kbd) {
   LogError(L"Keyboard is not a mnemonic layout keyboard");
   return FALSE;
 }
-
-
-BOOL WriteTxtFile(wchar_t* indll, PWSTR kbid, wchar_t* TxtFileName) {   // I4552
+//-----------------------------------------------
+BOOL WriteTxtFile(wchar_t* indll, PWSTR kbid, wchar_t* TxtFileName, BOOL bDeadkeyConversion) {   // I4552
   // Go through each of the shift states - base, shift, ctrl+alt, ctrl+alt+shift, [caps vs ncaps?] and print characters for vkUnderlying, ch, VKMap[i]
+  //const UINT VKShiftStateNew[] = { 0,1,6,7 };
+  const UINT VKShiftStateNew[] = { 0,16,9,25 };
+  /*
+  Base = 0,                    // 0
+    Shft = 1,                    // 1
+    Ctrl = 2,                    // 2
+    ShftCtrl = Shft | Ctrl,          // 3
+    Menu = 4,                    // 4 -- NOT USED
+    ShftMenu = Shft | Menu,          // 5 -- NOT USED
+    MenuCtrl = Menu | Ctrl,          // 6
+    ShftMenuCtrl = Shft | Menu | Ctrl,   // 7
+    Xxxx = 8,                    // 8
+    ShftXxxx = Shft | Xxxx,          // 9
+    */
+
 
   if (!LoadNewLibrary(indll)) {
     LogError(L"Failed to load keyboard DLL (%d)", GetLastError());
@@ -455,22 +500,28 @@ BOOL WriteTxtFile(wchar_t* indll, PWSTR kbid, wchar_t* TxtFileName) {   // I4552
 
   WCHAR DeadKey;
   std::ofstream TxTFile(TxtFileName);
-  std::cout << "\n\n";
+  TxTFile << "\n kbid  <<  VKShiftState[j] <<  US VKMap[i] <<underlying <<  DE(incl Shiftstate) ch <<  DeadKey;\n";
+  TxTFile << "\nkbid   SS   US  uly DE  ch";
 
   for (int j = 0; VKShiftState[j] != 0xFFFF; j++) {   // I4651
     // Go through each possible key on the keyboard
     TxTFile << "\n";
     for (int i = 0; VKMap[i]; i++) {   // I4651
-
       UINT vkUnderlying = VKUSToVKUnderlyingLayout(VKMap[i]);
       WCHAR ch = CharFromVK(vkUnderlying, VKShiftState[j], &DeadKey);
 
+      if (bDeadkeyConversion) {   // I4552
+        if (ch == 0xFFFF) {
+          ch = DeadKey;
+        }
+      }
+
+      // we need to do ConvertDeadkey before we write File!!
       //print to txt-file+console
-      TxTFile << VKMap[i] << "\t" << ch;
+      //TxTFile << kbid << "\t" << VKShiftState[j] << "\t" << VKMap[i] << "\t" << ch << "\t" << DeadKey;
+      TxTFile << "0407" << "\t" << VKShiftStateNew[j] << "\t" << VKMap[i] << "\t" << vkUnderlying << "\t" << ch << "\t" << DeadKey;
+      //TxTFile << "0407" << "\t" << VKShiftStateNew[j] << "\t" << VKMap[i] << "\t" << vkUnderlying << "\t" << 137 << "\t" << 142;
       (VKMap[i] == vkUnderlying) ? TxTFile << "\n" : TxTFile << "  *** \n";
-      /*
-      std::cout << "i: " << i << "\tVKMap[" << i << "] =\t" << VKMap[i] << "(" << (char)VKMap[i] << ")\t..scan.. " << " vkUnderlying: " << vkUnderlying << "(" << (char)vkUnderlying << ")\tVKShiftState: " << VKShiftState[j] << "   ch: " << (int)ch << "\t(" << (char)ch << ")";
-      (VKMap[i] == vkUnderlying) ? std::cout << "\n" : std::cout << "  *** \n";*/
     }
   }
 
@@ -483,7 +534,9 @@ BOOL WriteTxtFile(wchar_t* indll, PWSTR kbid, wchar_t* TxtFileName) {   // I4552
   return (sz1 > 0);
 }
 
-BOOL DoConvertTxT(LPKEYBOARD kbd, LPWSTR kbid, BOOL bDeadkeyConversion) {   // I4552
+
+// ###### This is a copy of DoConvert adapted to use a txtfile instead of kbid+kbdxx.dll ######
+BOOL DoConvertTxT(LPKEYBOARD kbd, wchar_t* txtfile, LPWSTR kbid, BOOL bDeadkeyConversion) {   // I4552
   WCHAR DeadKey;
 
   if (!SetKeyboardToPositional(kbd)) return FALSE;
@@ -495,76 +548,44 @@ BOOL DoConvertTxT(LPKEYBOARD kbd, LPWSTR kbid, BOOL bDeadkeyConversion) {   // I
   // For now, we get the least shifted version, which is hopefully adequate.
 
   std::fstream newfile;
-  newfile.open("C:/MCOMPILE____/Dll_as_Text_small.txt", std::fstream::in); //open a file to perform read operation using file object
-
+  newfile.open(txtfile, std::fstream::in);
+  wchar_t* S1c = L"0407";
+  wchar_t* S2c;
+  int S1, S2, S3, S4, S5;
   if (newfile.is_open()) {
-    std::string tp;
-    std::string first;
-    std::string second;
-    int firstint;
-    int secondint;
+    std::string tp, tpx;
 
     while (getline(newfile, tp)) { //read data from file txt and put it into string.tp
-      std::cout << tp << " ....>>... "; //print the data of the string
-      first = tp.substr(0, tp.find("\t")); //find name and nuber using this number
-      second = tp.substr(tp.find("\t") + 1);
-      firstint = atoi(first.c_str());
-      secondint = atoi(second.c_str());
-      WCHAR TT = secondint;
+      tpx = tp;
+      S2c = getfirst_Cstr(tpx);
 
-      WCHAR ch = secondint;
-      std::cout << secondint << "....>.. "<< ch <<"\n"; //print the ch that will be processed further
-      /*
-      if (bDeadkeyConversion) {   // I4552
-        if (ch == 0xFFFF) {
-          ch = DeadKey;
-        }
-      }
-      */
-      switch (ch) {
-      case 0x0000: break;
-        //case 0xFFFF: ConvertDeadkey(kbd, ch, 0, DeadKey); break;
-      default:     TranslateKeyboard(kbd, ch, 0, ch);
-      }
-      //std::cout << "first: " << first << " second: " << second <<"cch1_"<< cch1<<"\n";
-      int zzz = 999;
-    }
-    newfile.close(); //close the file object.
-  }
-
-
-
-
-  for (int j = 0; VKShiftState[j] != 0xFFFF; j++) {   // I4651
-    // Go through each possible key on the keyboard
-    for (int i = 0; VKMap[i]; i++) {   // I4651
-      /*
-      UINT vkUnderlying = VKUSToVKUnderlyingLayout(VKMap[i]);
-      WCHAR ch = CharFromVK(vkUnderlying, VKShiftState[j], &DeadKey);
-
-      //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
-
-
+      S1 = getfirstInt(tp);
+      S2 = getfirstInt(tp); //VKShiftState[j]
+      S3 = getfirstInt(tp); //VKMap[i]
+      S4 = getfirstInt(tp); //ch
+      S5 = getfirstInt(tp); //deadkey
+      wchar_t S1_wch = (wchar_t)S1;
+      WCHAR ch = S4;
+      DeadKey = S5;
 
       if (bDeadkeyConversion) {   // I4552
-        if (ch == 0xFFFF) {
-          ch = DeadKey;
+        if (S4 == 0xFFFF) {
+          S4 = DeadKey;
         }
       }
 
-      switch (ch) {
+      // ConvertDeadkey uses win function=> we can`t use it here
+      switch (S5) {
       case 0x0000: break;
-      case 0xFFFF: ConvertDeadkey(kbd, VKMap[i], VKShiftState[j], DeadKey); break;
-      default:     TranslateKeyboard(kbd, VKMap[i], VKShiftState[j], ch);
+      case 0xFFFF: ConvertDeadkey(kbd, ch, S2, DeadKey); break;
+      default:     TranslateKeyboard(kbd, S3, S2, S4);
       }
-      */
-      //
     }
   }
 
   ReportUnconvertedKeyboardRules(kbd);
 
-  if (!ImportRules(kbid, kbd, &FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
+  if (!ImportRulesTxT(S1c, kbd, &FDeadkeys, bDeadkeyConversion, txtfile)) {   // I4353   // I4552
     return FALSE;
   }
 
@@ -605,7 +626,6 @@ BOOL DoConvert(LPKEYBOARD kbd, LPWSTR kbid, BOOL bDeadkeyConversion) {   // I455
       default:     TranslateKeyboard(kbd, VKMap[i], VKShiftState[j], ch);
       }
 
-      //
     }
   }
 
@@ -626,4 +646,21 @@ void LogError(PWSTR fmt, ...) {
   _vsnwprintf_s(fmtbuf, _countof(fmtbuf), _TRUNCATE, fmt, vars);  // I2248   // I3547
   fmtbuf[255] = 0;
   _putws(fmtbuf);
+}
+
+
+wchar_t* getfirst_Cstr(std::string& Instr) {
+  int firstOcc = Instr.find_first_of("\t");
+  std::string Firststr = Instr.substr(0, firstOcc);
+  //Instr = Instr.substr(firstOcc + 1);
+  wchar_t *out = (wchar_t*)Firststr.c_str();
+  return (wchar_t* ) Firststr.c_str();
+}
+
+
+int getfirstInt(std::string& Instr) {
+  int firstOcc = Instr.find_first_of("\t");
+  std::string Firststr = Instr.substr(0, firstOcc);
+  Instr = Instr.substr(firstOcc + 1);
+  return atoi(Firststr.c_str());
 }
