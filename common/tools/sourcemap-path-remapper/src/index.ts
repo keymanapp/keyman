@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import convertSourceMap from 'convert-source-map'; // Transforms sourcemaps among various common formats.
+import convertSourcemap from 'convert-source-map'; // Transforms sourcemaps among various common formats.
                                                    // Base64, stringified-JSON, end-of-file comment...
 
 // Because we're compiling the main project based on its TS build outputs, and our cross-module references
@@ -16,33 +16,33 @@ export interface Mapping {
  */
 class RemappingState {
   constructor(srcmap: Object) {
-    this.sourceMap = srcmap;
+    this.sourcemap = srcmap;
     this.resetChangedSourcepathTracking();
   }
 
-  public readonly sourceMap: any;
-  private _unchangedSourcePaths: string[] = [];
+  public readonly sourcemap: any;
+  private _unchangedSourcepaths: string[] = [];
 
   public get unchangedSourcepaths() {
-    return this._unchangedSourcePaths;
+    return this._unchangedSourcepaths;
   }
 
   public resetChangedSourcepathTracking() {
-    this._unchangedSourcePaths = [...this.sourceMap.sources];
+    this._unchangedSourcepaths = [...this.sourcemap.sources];
   }
 
   /**
    * The sourcemap's `sourceRoot` property.
    */
   public get sourceRoot() {
-    return this.sourceMap.sourceRoot;
+    return this.sourcemap.sourceRoot;
   }
 
   /**
    * The sourcemap's `sourceRoot` property.
    */
   public set sourceRoot(path: string) {
-    this.sourceMap.sourceRoot = path;
+    this.sourcemap.sourceRoot = path;
   }
 
   /**
@@ -59,7 +59,7 @@ class RemappingState {
 
     const unusedTransforms = [...transforms];
 
-    const sourcePaths = this.sourceMap.sources;
+    const sourcePaths = this.sourcemap.sources;
     for(let i = 0; i < sourcePaths.length; i++) {
       for(const transform of transforms) {
         if(sourcePaths[i].match(transform.from)) {
@@ -101,7 +101,7 @@ class RemappingState {
    * @param file
    */
   public toFile(file: fs.PathLike) {
-    fs.writeFileSync(file, convertSourceMap.fromObject(this.sourceMap).toJSON());
+    fs.writeFileSync(file, convertSourcemap.fromObject(this.sourcemap).toJSON());
   }
 }
 
@@ -132,6 +132,6 @@ export default class SourcemapRemapper {
    * @returns
    */
   public static fromBuffer(buffer: Buffer) {
-    return this.fromObject(convertSourceMap.fromJSON(buffer).toObject());
+    return this.fromObject(convertSourcemap.fromJSON(buffer).toObject());
   }
 }

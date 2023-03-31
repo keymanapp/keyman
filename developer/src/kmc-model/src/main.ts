@@ -5,8 +5,6 @@ import ts from 'typescript';
 import LexicalModelCompiler from './lexical-model-compiler.js';
 import { LexicalModelSource } from './lexical-model.js';
 
-export { default as LexicalModelCompiler } from './lexical-model-compiler.js';
-
 /**
  * Compiles a model.ts file, using paths relative to its location.
  *
@@ -42,8 +40,8 @@ export function loadFromFilename(filename: string): LexicalModelSource {
   // It DOES NOT check for types!
   let compilationOutput = ts.transpile(sourceCode, {
     // Our runtime only supports ES3 with Node/CommonJS modules on Android 5.0.
-    // When we drop Android 5.0 support, we can update this to a `ScriptTarget`
-    // matrix against target version of Keyman, here and in
+    // When we drop Android 5.0 support, we can update this to a `ScriptTarget` 
+    // matrix against target version of Keyman, here and in 
     // lexical-model-compiler.ts.
     target: ts.ScriptTarget.ES3,
     module: ts.ModuleKind.CommonJS,

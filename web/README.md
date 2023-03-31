@@ -9,18 +9,19 @@ configure your build environment.
 
 The following folders contain the distribution for Keyman Engine for Web:
 
-    src                       Source code
-    src/resources/osk         OSK resources for inclusion in mobile app builds;
-                              keymanweb-osk.ttf is maintained at https://github.com/silnrsi/font-keymanweb-osk
+    source                       Source code
+    source/resources/osk         OSK resources for inclusion in mobile app builds;
+                                 keymanweb-osk.ttf is maintained at https://github.com/silnrsi/font-keymanweb-osk
+    unit_tests                   Automated testing resources
 
-    build/app/web/release     Fully-compiled KeymanWeb modules for release
-    build/app/embed/release   Fully-compiled KMEA/KMEI modules for inclusion in mobile app builds
-    build/app/web/debug       Fully-compiled but non-minified KeymanWeb modules
-    build/app/embed/debug     Fully-compiled but non-minified KMEA/KMEI modules
+    build/web/release            Fully-compiled KeymanWeb modules for release
+    build/embed/release          Fully-compiled KMEA/KMEI modules for inclusion in mobile app builds
+    build/web/debug            Fully-compiled but non-minified KeymanWeb modules 
+    build/embed/debug          Fully-compiled but non-minified KMEA/KMEI modules
 
-    src/samples               Sample pages demonstrating ways to link with KeymanWeb
-    src/test/manual           Test-case web-pages for various aspects of KeymanWeb functionality
-    src/test/auto             A Node-driven test suite for automated testing of KeymanWeb
+    samples                      Sample pages demonstrating ways to link with KeymanWeb
+    testing                      Test-case web-pages for various aspects of KeymanWeb functionality
+    unit_tests                   A Node-driven test suite for automated testing of KeymanWeb
 
 **********************************************************************
 
@@ -31,7 +32,7 @@ compile Keyman Engine for Web before viewing the pages.
 Refer to the samples for usage details.
 
 To view pages using compiled Keyman Engine for Web,
-1. cd to **keyman/web/**
+1. cd to **keyman/web/source**
 2. Run `./build.sh`
    - Use `./build.sh --help` for the script's documentation.
 
@@ -41,18 +42,18 @@ Before running unit tests on Keyman Engine for Web, first run `./build.sh`
 according to the instructions above.
 
 Once the build is complete, running `npm test` will run the unit testing suite
-on your local machine in-browser. Alternatively, see `test.sh`, which
+on your local machine in-browser. Alternatively, see `unit_tests/test.sh`, which
 the former command executes.
 
 ### Debugging Unit Tests
 1. During development, to run a specific unit test, change the `it` to
    `it.only`. You can also run all tests under a specific group with
    `describe.only`.
-2. From this directory, run `./test.sh --debug`. Alternatively, from
+2. From this directory, run `./unit_tests/test.sh -debug`. Alternatively, from
    `web/` or any `web/` subdirectory,
 
    ```
-   npm run test -- --debug
+   npm run test -- -debug
    ```
 
    The `--` part tells `npm` to funnel anything to the script as the script's

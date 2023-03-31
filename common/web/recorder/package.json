@@ -1,9 +1,7 @@
 {
   "name": "@keymanapp/recorder-core",
   "description": "Core classes used to develop KeymanWeb test cases based on keystrokes",
-  "main": "build/obj/index.js",
-  "types": "build/obj/index.d.ts",
-  "type": "module",
+  "main": "index.js",
   "scripts": {
     "tsc": "tsc",
     "clean": "tsc -b --clean src/tsconfig.json && tsc -b --clean src/nodeProctor.tsconfig.json"

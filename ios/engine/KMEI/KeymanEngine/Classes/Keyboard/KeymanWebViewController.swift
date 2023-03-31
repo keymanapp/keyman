@@ -397,7 +397,7 @@ extension KeymanWebViewController {
       webView!.evaluateJavaScript("enableSuggestions(\(stubString), \(predict), \(correct))")
       self.activeModel = predict
     } else {  // We're registering a model in the background - don't change settings.
-      webView!.evaluateJavaScript("keyman.addModel(\(stubString));", completionHandler: nil)
+      webView!.evaluateJavaScript("keyman.registerModel(\(stubString));", completionHandler: nil)
     }
 
     setBannerHeight(to: Int(InputViewController.topBarHeight))

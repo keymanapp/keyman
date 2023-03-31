@@ -1,6 +1,6 @@
 // Preprocessing of the Karma configuration's client.args parameter.
 
-var com = com || {};
+com = com || {};
 com.keyman = com.keyman || {};
 com.keyman.karma = com.keyman.karma || {};
 

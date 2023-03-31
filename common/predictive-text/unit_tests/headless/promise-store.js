@@ -1,8 +1,7 @@
-import { assert } from 'chai';
-import sinon from 'sinon';
+var assert = require('chai').assert;
+var sinon = require('sinon');
 
-import PromiseStore from '#./promise-store.js';
-import { randomToken } from '@keymanapp/common-test-resources/model-helpers.mjs';
+let PromiseStore = require('../../build/headless').PromiseStore;
 
 describe('PromiseStore', function () {
   describe('.make()', function () {

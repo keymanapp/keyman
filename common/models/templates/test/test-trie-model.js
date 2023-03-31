@@ -2,8 +2,8 @@
  * Unit tests for the Trie prediction model.
  */
 
-import { assert } from 'chai';
-import { TrieModel } from '@keymanapp/models-templates';
+var assert = require('chai').assert;
+var TrieModel = require('../build/index.bundled.js').models.TrieModel;
 
 describe('LMLayerWorker trie model for word lists', function() {
   describe('instantiation', function () {

@@ -2,9 +2,9 @@
  * Unit tests for common utility functions/methods.
  */
 
-import { assert } from 'chai';
-import * as models from "@keymanapp/models-templates";
-import * as wordBreakers from "@keymanapp/models-wordbreakers";
+var assert = require('chai').assert;
+var models = require('../build/index.bundled.js').models;
+var wordBreakers = require('@keymanapp/models-wordbreakers').wordBreakers;
 
 describe('Tokenization functions', function() {
   describe('tokenize', function() {
@@ -210,7 +210,7 @@ describe('Tokenization functions', function() {
       // Step 2: Allow shifting a defined 'constant' span without mutating the definition.
       let shiftSpan = function(span, delta) {
         // Avoid mutating the parameter!
-        let shiftedSpan = {
+        shiftedSpan = {
           text: span.text,
           start: span.start + delta,
           end: span.end + delta,

@@ -1,5 +1,5 @@
-import { assert } from 'chai';
-import { ascii as breakASCIIWords } from '@keymanapp/models-wordbreakers';
+var assert = require('chai').assert;
+var breakASCIIWords = require('../build').wordBreakers['ascii'];
 
 describe('The ASCII word breaker', function () {
   it('should break simple English sentences', function () {

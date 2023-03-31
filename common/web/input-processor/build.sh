@@ -16,11 +16,13 @@ cd "$(dirname "$THIS_SCRIPT")"
 
 ################################ Main script ################################
 
+# TODO: for predictive-text, we only need :headless, perhaps we should be splitting modules?
+# TODO: remove :tools once kmlmc is a dependency for test:module
+
 builder_describe "Builds the standalone, headless form of Keyman Engine for Web's input-processor module" \
   "@/common/web/keyman-version" \
   "@/common/web/keyboard-processor" \
   "@/common/predictive-text" \
-  "@/developer/src/kmc-model test" \
   "clean" \
   "configure" \
   "build" \
@@ -31,7 +33,10 @@ builder_describe "Builds the standalone, headless form of Keyman Engine for Web'
 
 builder_describe_outputs \
   configure          /node_modules \
-  build              /common/web/input-processor/build/lib/index.mjs \
+  configure:module   /node_modules \
+  configure:tools    /node_modules \
+  build:module       /common/web/input-processor/build/index.js \
+  build:tools        /developer/src/kmc/build/src/kmlmc.js    # TODO: remove this once kmlmc is a dependency
 
 builder_parse "$@"
 
@@ -51,25 +56,36 @@ fi
 
 ### BUILD ACTIONS
 
-if builder_start_action build; then
-  tsc -b ./tsconfig.json
-  node build-bundler.js
+if builder_start_action build:tools; then
+  # Used by test:module
+  # TODO: convert to a dependency once we have updated kmlmc to use builder script
+  pushd "$KEYMAN_ROOT/developer/src/kmc-model"
+  ./build.sh
+  popd
+  pushd "$KEYMAN_ROOT/developer/src/kmc"
+  ./build.sh
+  popd
 
-  # Declaration bundling.
-  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  builder_finish_action success build:tools
+fi
 
-  builder_finish_action success build
+if builder_start_action build:module; then
+  tsc -b src/tsconfig.json
+  builder_finish_action success build:module
 fi
 
 # TEST ACTIONS
 
-if builder_start_action test; then
+if builder_start_action test:module; then
   FLAGS=
   if builder_has_option --ci; then
     FLAGS="--reporter mocha-teamcity-reporter"
   fi
 
+  # Build the leaf-style, bundled version of input-processor for use in testing.
+  tsc -b src/tsconfig.bundled.json
+
   mocha --recursive $FLAGS ./tests/cases/
 
-  builder_finish_action success test
+  builder_finish_action success test:module
 fi
