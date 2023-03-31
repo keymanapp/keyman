@@ -92,9 +92,3 @@ if [ "$DO_FV" = true ]; then
   cd "$KEYMAN_ROOT/oem/firstvoices/android/"
   ./gradlew $DAEMON_FLAG $BUILD_FLAGS
 fi
-
-# Revert to use default OpenJDK 8
-if [ -f .build-builder ]; then
-  builder_heading "Returning JAVA_HOME to OpenJDK 8"
-  export JAVA_HOME=${JAVA_HOME_8}
-fi

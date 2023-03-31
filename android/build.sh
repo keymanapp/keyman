@@ -39,7 +39,7 @@ builder_parse "$@"
 
 # Override JAVA_HOME to OpenJDK 11
 builder_heading "Setting JAVA_HOME to OpenJDK 11"
-export JAVA_HOME=${JAVA_HOME_11}
+set_java_home
 
 # This script also responsible for cleaning up /android/upload
 builder_run_child_actions clean
@@ -51,7 +51,3 @@ if builder_start_action clean; then
 fi
 
 builder_run_child_actions configure build test publish
-
-# Revert to use default OpenJDK 8
-builder_heading "Returning JAVA_HOME to OpenJDK 8"
-export JAVA_HOME=${JAVA_HOME_8}

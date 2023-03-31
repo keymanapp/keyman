@@ -101,8 +101,7 @@ Building:
 * Ant
 * Gradle
 * Maven
-* OpenJDK 11 (for 17.0)
-* OpenJDK 8 (for stable-16.0)
+* OpenJDK 11
 
 ```ps1
 # Elevated PowerShell
@@ -118,6 +117,9 @@ sdkmanager --licenses
 
 **Required environment variables**:
 * [`JAVA_HOME`](#java_home)
+
+**Optional environment variables**:
+* [`JAVA_HOME_11`](#java_home)
 
 Building:
 * [Building Keyman for Android](../../android/README.md)
@@ -180,8 +182,8 @@ You can use Windows Settings to add these environment variables permanently:
 * KeymanWeb
 
 **Requirements**:
-* emscripten 2.0.23+
-* node.js 18+
+* emscripten 3.1.32
+* node.js 18
 * [openjdk 11](https://learn.microsoft.com/en-us/java/openjdk/download#openjdk-11)+
 
 ```ps1
@@ -349,12 +351,12 @@ the same result.
 ### JAVA_HOME
 
 This environment variable tells Gradle what version of Java to use for building Keyman for Android.
-OpenJDK 8 is used to build stable-16.0 while OpenJDK 11 is used for master.
-It's recommended to install both and set the environment variables to:
+
+**Multiple versions of Java:** If you need to build Keyman for Android 16.0 or older versions, you can set `JAVA_HOME_11` to the OpenJDK 11 path and `JAVA_HOME` to the OpenJDK 8 path. This will build both versions correctly from command line. But note that you do need to update your `JAVA_HOME` env var to the associated version before opening Android Studio and loading any Android projects. `JAVA_HOME_11` is mostly used by CI.
+
 ```bat
-SET JAVA_HOME_8="path to OpenJDK 8"
+SET JAVA_HOME="path to OpenJDK 8"
 SET JAVA_HOME_11="path to OpenJDK 11"
-SET JAVA_HOME="$JAVA_HOME_8"
 ```
 
 ## Optional Tools
