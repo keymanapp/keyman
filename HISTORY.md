@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.82 alpha 2023-03-31
+
+* feat(developer): support jis and abnt2 (#8513)
+* revert: #8549 "chore(web): merge master into feature-esmodule-web-engine (A17S9 end)  " (#8553)
+
 ## 17.0.81 alpha 2023-03-30
 
 * feat(windows): simple text editor using Edit Control (#8391)
