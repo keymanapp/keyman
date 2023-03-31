@@ -200,7 +200,7 @@ icuuc_name = '@0@icuuc@1@'.format(library_prefix, library_suffix)
 common_lib = library(
   icuuc_name,
   sources,
-  include_directories: incdir,
+  include_directories: [incdir,'../..'],
   c_args: '-DU_COMMON_IMPLEMENTATION',
   cpp_args: '-DU_COMMON_IMPLEMENTATION',
   link_with: stubdata_lib,

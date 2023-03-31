@@ -9,12 +9,12 @@ endif
 subdir('stubdata')
 subdir('common')
 subdir('i18n')
-subdir('io')
+# subdir('io')
 #subdir('layout')
 #subdir('layoutex')
 
-subdir('tools')
+# subdir('tools')
 
-subdir('data')
+# subdir('data')
 
-subdir('test')
+# subdir('test')

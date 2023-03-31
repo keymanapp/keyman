@@ -23,11 +23,32 @@ if host_machine.system() == 'windows'
   add_project_arguments('-DWIN32', '-DWIN64', '-D_MBCS', language: 'c')
 endif
 
+
 # per icudefs.mk.in:
 # "U_ATTRIBUTE_DEPRECATED is defined to hide warnings about deprecated API warnings."
-add_project_arguments('-DU_ATTRIBUTE_DEPRECATED=', language: 'cpp')
+add_project_arguments('-DU_ATTRIBUTE_DEPRECATED=', '-DUCONFIG_USE_LOCAL=1', language: 'c')
 
-# TODO-LDML: turn off more stuff here
+uconfig = configuration_data()
+
+uconfig.set('U_ENABLE_DYLOAD', 0) # no DLL
+uconfig.set('U_CHECK_DYLOAD', 0) # no DLL
+uconfig.set('UCONFIG_NO_FILE_IO', 1)
+uconfig.set('UCONFIG_NO_LEGACY_CONVERSION', 1) # turn off file based codepage conversion
+uconfig.set('UCONFIG_NO_NORMALIZATION', 1) # TODO-LDML: may want this
+uconfig.set('UCONFIG_NO_BREAK_ITERATION', 1) # TODO-LDML: may want this
+uconfig.set('UCONFIG_NO_IDNA', 1)
+uconfig.set('UCONFIG_NO_COLLATION', 1)
+uconfig.set('UCONFIG_NO_FORMATTING', 1)
+uconfig.set('UCONFIG_NO_TRANSLITERATION', 1)
+uconfig.set('UCONFIG_NO_REGULAR_EXPRESSIONS', 1) # TODO-LDML: Will probably want this for transforms #7375
+uconfig.set('UCONFIG_NO_SERVICE', 1)
+
+
+uconfig_local = configure_file(
+  configuration : uconfig,
+  # dir : 'source/common/unicode',
+  output : 'uconfig_local.h',
+)
 
 
 if cpp.get_argument_syntax() == 'msvc'
@@ -35,14 +56,14 @@ if cpp.get_argument_syntax() == 'msvc'
   add_project_arguments('/utf-8', language: 'c')
 endif
 
-# Keyman: skip dl
-# if meson.version().version_compare('>= 0.62')
-#   dl_dep = dependency('dl', required: false)
-#   dl_native_dep = dependency('dl', required: false, native: true)
-# else
-#   dl_dep = cpp.find_library('dl', required: false)
-#   dl_native_dep = cpp_native.find_library('dl', required: false, native: true)
-# endif
+# TODO-LDML: skip this check
+if meson.version().version_compare('>= 0.62')
+  dl_dep = dependency('dl', required: false)
+  dl_native_dep = dependency('dl', required: false, native: true)
+else
+  dl_dep = cpp.find_library('dl', required: false)
+  dl_native_dep = cpp_native.find_library('dl', required: false, native: true)
+endif
 
 windows = import('windows')
 pkg = import('pkgconfig')
