@@ -28,9 +28,9 @@ function init() {
   keyman.init({'app':device,'fonts':'packages/',root:'./'});
   keyman.util.setOption('attachType','manual');
   keyman.oninserttext = insertText;
-  keyman.showKeyboardList = showMenu;
-  keyman.menuKeyUp = menuKeyUp;
-  keyman.hideKeyboard = hideKeyboard;
+  window.showKeyboardList = showMenu;
+  window.hideKeyboard = hideKeyboard;
+  window.menuKeyUp = menuKeyUp;
   keyman.getOskHeight = getOskHeight;
   keyman.getOskWidth = getOskWidth;
   keyman.beepKeyboard = beepKeyboard;
@@ -170,10 +170,8 @@ function deregisterModel(modelID) {
 function enableSuggestions(model, mayPredict, mayCorrect) {
   // Set the options first so that KMW's ModelManager can properly handle model enablement states
   // the moment we actually register the new model.
-  keyman.osk.banner.setOptions({
-    'mayPredict': mayPredict,
-    'mayCorrect': mayCorrect
-  });
+  keyman.core.languageProcessor.mayPredict = mayPredict;
+  keyman.core.languageProcessor.mayCorrect = mayCorrect;
 
   registerModel(model);
 }
@@ -186,7 +184,7 @@ function setBannerOptions(mayPredict) {
 
 function registerModel(model) {
   //window.console.log('registerModel: ' + model);
-  keyman.registerModel(model);
+  keyman.addModel(model);
 }
 
 function resetContext() {

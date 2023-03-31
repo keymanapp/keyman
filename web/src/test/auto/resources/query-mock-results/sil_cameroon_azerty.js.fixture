@@ -1,0 +1,2248 @@
+keyman.register({
+    "options": {
+        "context": "keyboard",
+        "dateFormat": "standard",
+        "device": "any",
+        "keyboardBaseUri": "https://s.keyman.com/keyboard/",
+        "fontBaseUri": "https://s.keyman.com/font/deploy/",
+        "keyboardid": "sil_cameroon_azerty",
+        "keyboardVersion": "current"
+    },
+    "keyboard": [{
+        "id": "sil_cameroon_azerty",
+        "name": "Cameroon AZERTY",
+        "filename": "sil_cameroon_azerty/6.0.8/sil_cameroon_azerty-6.0.8.js",
+        "version": "6.0.8",
+        "source": "https://github.com/keymanapp/keyboards/tree/master/release/sil/sil_cameroon_azerty",
+        "devices": {
+            "phone": 2,
+            "tablet": 2,
+            "desktop": 2
+        },
+        "languages": [{
+            "id": "aal",
+            "name": "Afade",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "agq",
+            "name": "Aghem",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "muc",
+            "name": "Ajumbu",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bss",
+            "name": "Akoose",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "aku",
+            "name": "Akum",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ael",
+            "name": "Ambele",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ato",
+            "name": "Atong",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "azo",
+            "name": "Awing",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bbk",
+            "name": "Babanki",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bfj",
+            "name": "Bafanji",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bwt",
+            "name": "Bafaw-Balong",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ksf",
+            "name": "Bafia",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bfd",
+            "name": "Bafut",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bkc",
+            "name": "Baka",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bqz",
+            "name": "Bakaka",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bkh",
+            "name": "Bakoko",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "kme",
+            "name": "Bakole",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bdn",
+            "name": "Baldemu",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bqo",
+            "name": "Balo",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bbq",
+            "name": "Bamali",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bmo",
+            "name": "Bambalang",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "baw",
+            "name": "Bambili-Bambui",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bce",
+            "name": "Bamenyam",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bqt",
+            "name": "Bamukumbit",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bax",
+            "name": "Bamun",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bvm",
+            "name": "Bamunka",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bcw",
+            "name": "Bana",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bgf",
+            "name": "Bangandu",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bgj",
+            "name": "Bangolan",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "abb",
+            "name": "Bankon",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bbi",
+            "name": "Barombi",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bas",
+            "name": "Basaa",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bsi",
+            "name": "Bassossi",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bta",
+            "name": "Bata",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bnm",
+            "name": "Batanga",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "btc",
+            "name": "Bati",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bfp",
+            "name": "Beba",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "beb",
+            "name": "Bebele",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bxp",
+            "name": "Bebil",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bnz",
+            "name": "Beezen",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bby",
+            "name": "Befang",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bkw",
+            "name": "Bekwel",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "byb",
+            "name": "Bikya",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bwh",
+            "name": "Bishuo",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "brt",
+            "name": "Bitare",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bky",
+            "name": "Bokyi",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bmw",
+            "name": "Bomwali",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bvg",
+            "name": "Bonkeng",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bbx",
+            "name": "Bubia",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bdm",
+            "name": "Buduma",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bum",
+            "name": "Bulu",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bmv",
+            "name": "Bum",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bqd",
+            "name": "Bung",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bxs",
+            "name": "Busam",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bju",
+            "name": "Busuu",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bhs",
+            "name": "Buwal",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mkk",
+            "name": "Byep",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ckx",
+            "name": "Caka",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "cug",
+            "name": "cug",
+            "region": 1,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "cuv",
+            "name": "Cuvok",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "dbq",
+            "name": "Daba",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "dmm",
+            "name": "Dama",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "dek",
+            "name": "Dek",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "anv",
+            "name": "Denya",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "dur",
+            "name": "Dii",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "dii",
+            "name": "Dimbong",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "dow",
+            "name": "Doyayo",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "dua",
+            "name": "Duala",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ndu",
+            "name": "Dugun",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "dme",
+            "name": "Dugwor",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "duz",
+            "name": "Duli-Gey",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "dae",
+            "name": "Duupa",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "etu",
+            "name": "Ejagham",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ekm",
+            "name": "Elip",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "emn",
+            "name": "Eman",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ags",
+            "name": "Esimbi",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "eto",
+            "name": "Eton",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bzz",
+            "name": "Evant",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ewo",
+            "name": "Ewondo",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "fll",
+            "name": "Fali, North",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "fal",
+            "name": "Fali, South",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "fak",
+            "name": "Fang",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "fan",
+            "name": "Fang",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "fmp",
+            "name": "Fe\u2019fe\u2019",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "fub-latn",
+            "name": "Fulfulde, Adamawa",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "fuv",
+            "name": "Fulfulde, Nigerian",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "gou",
+            "name": "Gavar",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "gba",
+            "name": "Gbaya (Central African Republic)",
+            "region": 1,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "gmm",
+            "name": "Gbaya-Mbodomo",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bbj",
+            "name": "Ghom\u00e1l\u00e1\u2019",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "gid",
+            "name": "Gidar",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "kmp",
+            "name": "Gimme",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "gmn",
+            "name": "Gimnime",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "giz",
+            "name": "Giziga",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "gis",
+            "name": "Giziga, North",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "glw",
+            "name": "Glavda",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "gde",
+            "name": "Gude",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ngs",
+            "name": "Gvoko",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "gyi",
+            "name": "Gyele",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "xed",
+            "name": "Hdi",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "hij",
+            "name": "Hijuk",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "hya",
+            "name": "Hya",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bec",
+            "name": "Iceve-Maci",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ass",
+            "name": "Ipulo",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "isu",
+            "name": "Isu",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "szv",
+            "name": "Isu",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "uiv",
+            "name": "Iyive",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "jim",
+            "name": "Jimjimen",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "jia",
+            "name": "Jina",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "jbu",
+            "name": "Jukun Takum",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "kkj",
+            "name": "Kako",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "kzr",
+            "name": "Karang",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "kbn",
+            "name": "Kare",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "luw",
+            "name": "Kasabe",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "dmo",
+            "name": "Kemedzung",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "kvm",
+            "name": "Kendem",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ndb",
+            "name": "Kenswei Nsei",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ken",
+            "name": "Kenyang",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ker",
+            "name": "Kera",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "biw",
+            "name": "Kol",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "klc",
+            "name": "Kolbila",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bkm",
+            "name": "Kom",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "kmy",
+            "name": "Koma",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ozm",
+            "name": "Koonzime",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "krp",
+            "name": "Korop",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "kid",
+            "name": "Koshin",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "kfn",
+            "name": "Kuk",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "kfl",
+            "name": "Kung",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "xuo",
+            "name": "Kuo",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "kub",
+            "name": "Kutep",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bko",
+            "name": "Kwa\u2019",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "kdz",
+            "name": "Kwaja",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "kwu",
+            "name": "Kwakum",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "knp",
+            "name": "Kwanja",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "nmg",
+            "name": "Kwasio",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "lbi",
+            "name": "La\u2019bi",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "kot",
+            "name": "Lagwan",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "lmx",
+            "name": "Laimbue",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "lns",
+            "name": "Lamnso\u2019",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "lfa",
+            "name": "Lefa",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "leo",
+            "name": "Leti",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "add",
+            "name": "Lidzonka",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "lmp",
+            "name": "Limbum",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "wok",
+            "name": "Longto",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mxu",
+            "name": "Mada",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "maf",
+            "name": "Mafa",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "xmj",
+            "name": "Majera",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mcp",
+            "name": "Makaa",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mxf",
+            "name": "Malgbe",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mzd",
+            "name": "Malimba",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mcs",
+            "name": "Mambai",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mcu",
+            "name": "Mambila, Cameroon",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "myg",
+            "name": "Manta",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mcn",
+            "name": "Masana",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "msv",
+            "name": "Maslam",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mfh",
+            "name": "Matal",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "dkx",
+            "name": "Mazagway-Hidi",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "nza",
+            "name": "Mbembe, Tigon",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mbo",
+            "name": "Mbo",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mtk",
+            "name": "Mbo\u2019",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "xmb",
+            "name": "Mbonga",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bgu",
+            "name": "Mbongno",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "xmd",
+            "name": "Mbudum",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mqb",
+            "name": "Mbuko",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mlb",
+            "name": "Mbule",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mdd",
+            "name": "Mbum",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "byv",
+            "name": "Medumba",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mfj",
+            "name": "Mefele",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mfd",
+            "name": "Mendankwe-Nkwen",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "xmg",
+            "name": "Mengaka",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mct",
+            "name": "Mengisa",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mea",
+            "name": "Menka",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "meq",
+            "name": "Merey",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "iyo",
+            "name": "Mesaka",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mgo",
+            "name": "Meta\u2019",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "nfu",
+            "name": "Mfumte",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "hna",
+            "name": "Mina",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mmu",
+            "name": "Mmaala",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bfm",
+            "name": "Mmen",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mfk",
+            "name": "Mofu, North",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mif",
+            "name": "Mofu-Gudur",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bri",
+            "name": "Mokpwe",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mlw",
+            "name": "Moloko",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mru",
+            "name": "Mono",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mpi",
+            "name": "Mpade",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mcx",
+            "name": "Mpiemo",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mgg",
+            "name": "Mpumpong",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "kqx",
+            "name": "Mser",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "muo",
+            "name": "Mubako",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "boe",
+            "name": "Mundabli",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mua",
+            "name": "Mundang",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mnf",
+            "name": "Mundani",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mhk",
+            "name": "Mungaka",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mij",
+            "name": "Mungbam",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mse",
+            "name": "Musey",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mug",
+            "name": "Musgu",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "muy",
+            "name": "Muyang",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bzv",
+            "name": "Naami",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ngv",
+            "name": "Nagumi",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mff",
+            "name": "Naki",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ncr",
+            "name": "Nchane",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "nnz",
+            "name": "Nda\u2019nda\u2019",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "gke",
+            "name": "Ndai",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "nml",
+            "name": "Ndemli",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ndr",
+            "name": "Ndoola",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "nbv",
+            "name": "Ngamambo",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "sba",
+            "name": "Ngambay",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "nge",
+            "name": "Ngemba",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ngj",
+            "name": "Ngie",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "nnh",
+            "name": "Ngiemboon",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "jgo",
+            "name": "Ngomba",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "nla",
+            "name": "Ngombale",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "nsh",
+            "name": "Ngoshie",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "nwe",
+            "name": "Ngwe",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ngn",
+            "name": "Ngwo",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "nmr",
+            "name": "Nimbari",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "sgi",
+            "name": "Nizaa",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "njj",
+            "name": "Njen",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "njy",
+            "name": "Njyem",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "nkc",
+            "name": "Nkongho",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "lem",
+            "name": "Nomaande",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "nhu",
+            "name": "Noone",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "baf",
+            "name": "Nubaca",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "yas",
+            "name": "Nugunu",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "nvo",
+            "name": "Nyokon",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "nzy",
+            "name": "Nzakambay",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "nja",
+            "name": "Nzanyi",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "obl",
+            "name": "Oblo",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "oku",
+            "name": "Oku",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bdu",
+            "name": "Oroko",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ost",
+            "name": "Osatu",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "pmn",
+            "name": "Pam",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "pnz",
+            "name": "Pana",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "pbi",
+            "name": "Parkwa",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "pfe",
+            "name": "Pere",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "lme",
+            "name": "P\u00e9v\u00e9",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "wes",
+            "name": "Pidgin, Cameroon",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "pny",
+            "name": "Pinyin",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "pmm",
+            "name": "Pol",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "kvj",
+            "name": "Psikye",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ndi",
+            "name": "Samba Leko",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "asj",
+            "name": "Sari",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "swq",
+            "name": "Sharwa",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bbw",
+            "name": "Supapya",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "sox",
+            "name": "Swo",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ngy",
+            "name": "Tibea",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "tik",
+            "name": "Tikar",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "tiv",
+            "name": "Tiv",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "toz",
+            "name": "To",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "tsh",
+            "name": "Tsuvan",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bag",
+            "name": "Tuki",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "tvu",
+            "name": "Tunen",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ttf",
+            "name": "Tuotomb",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "tui",
+            "name": "Tupuri",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "twn",
+            "name": "Twendi",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "usk",
+            "name": "Usaghade",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mlr",
+            "name": "Vame",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "vem",
+            "name": "Vemgo-Mabas",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bav",
+            "name": "Vengo",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ver",
+            "name": "Verre",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "vut",
+            "name": "Vute",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "mfi",
+            "name": "Wandala",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "www",
+            "name": "Wawa",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "weh",
+            "name": "Weh",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bqm",
+            "name": "Wumboko",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "bse",
+            "name": "Wushi",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "udl",
+            "name": "Wuzlam",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "yam",
+            "name": "Yamba",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "yat",
+            "name": "Yambeta",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "yav",
+            "name": "Yangben",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "yko",
+            "name": "Yasa",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ybb",
+            "name": "Yemba",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "yei",
+            "name": "Yeni",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ybl",
+            "name": "Yukuben",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "zhw",
+            "name": "Zhoa",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "ziz",
+            "name": "Zizilivakan",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "gnd",
+            "name": "Zulgo-Gemzek",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }, {
+            "id": "zuy",
+            "name": "Zumaya",
+            "region": 2,
+            "font": {
+                "family": "AndikaAfr",
+                "source": ["AndikaAfr-R.ttf"]
+            }
+        }]
+    }]
+});
