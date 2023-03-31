@@ -54,8 +54,10 @@ uconfig_local = configure_file(
 
 
 if cpp.get_argument_syntax() == 'msvc'
-  add_project_arguments('/utf-8', language: 'cpp')
-  add_project_arguments('/utf-8', language: 'c')
+# TODO-LDML:   cl : Command line error D8016 : '/utf-8' and '/source-charset:utf-8' command-line options are incompatible
+# see note in core/meson.build
+  # add_project_arguments('/utf-8', language: 'cpp')
+  # add_project_arguments('/utf-8', language: 'c')
 endif
 
 # TODO-LDML: skip this check
