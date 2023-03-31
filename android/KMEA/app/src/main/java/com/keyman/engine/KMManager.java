@@ -158,6 +158,8 @@ public final class KMManager {
   };
 
   protected static InputMethodService IMService;
+  protected static InputConnection inappInputConnection; // Input Connection for InApp Keyboard
+
   private static boolean debugMode = false;
   private static boolean shouldAllowSetKeyboard = true;
   private static boolean didCopyAssets = false;
@@ -421,13 +423,11 @@ public final class KMManager {
       didCopyAssets = true;
     }
 
-    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      initInAppKeyboard(appContext);
-    } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      initSystemKeyboard(appContext);
-    } else {
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_UNDEFINED) {
       String msg = "Cannot initialize: Invalid keyboard type";
       KMLog.LogError(TAG, msg);
+    } else {
+      initKeyboard(appContext, keyboardType);
     }
 
     JSONUtils.initialize(new File(getPackagesDir()));
@@ -458,6 +458,26 @@ public final class KMManager {
     IMService = service;
   }
   public static InputMethodService getInputMethodService() { return IMService; }
+
+  /**
+   * Get the input connection based on the keyboard type.
+   * For InApp keyboard, save the connection to inappInputConnection
+   * @param {KeyboardType} keyboard
+   * @return InputConnection
+   */
+  protected static InputConnection getInputConnection(KeyboardType keyboard) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      if (inappInputConnection == null) {
+        inappInputConnection = KMTextView.activeView.onCreateInputConnection(new EditorInfo());
+      }
+      return inappInputConnection;
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && IMService != null) {
+      return IMService.getCurrentInputConnection();
+    }
+
+    KMLog.LogError(TAG, "Unable to determine input connection");
+    return null;
+  }
 
   public static boolean executeHardwareKeystroke(int code, int shift, int lstates, int eventModifiers) {
     if (SystemKeyboard != null) {
@@ -609,36 +629,35 @@ public final class KMManager {
    return params;
   }
 
-  private static void initInAppKeyboard(Context appContext) {
-    if (InAppKeyboard == null) {
+  private static void initKeyboard(Context appContext, KeyboardType keyboardType) {
+    KMKeyboard keyboard = null;
+    KMKeyboardWebViewClient webViewClient = null;
+
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard == null) {
       InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
-      InAppKeyboard.setLayoutParams(params);
-      InAppKeyboard.setVerticalScrollBarEnabled(false);
-      InAppKeyboard.setHorizontalScrollBarEnabled(false);
-      InAppKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
-      InAppKeyboard.setWebViewClient(InAppKeyboardWebViewClient);
-      InAppKeyboard.addJavascriptInterface(new KMInAppKeyboardJSHandler(appContext, InAppKeyboard), "jsInterface");
-      InAppKeyboard.loadKeyboard();
-
-      setEngineWebViewVersionStatus(appContext, InAppKeyboard);
-    }
-  }
-
-  private static void initSystemKeyboard(Context appContext) {
-    if (SystemKeyboard == null) {
+      InAppKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
+      keyboard = InAppKeyboard;
+      webViewClient = InAppKeyboardWebViewClient;
+    } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard == null) {
       SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
-      SystemKeyboard.setLayoutParams(params);
-      SystemKeyboard.setVerticalScrollBarEnabled(false);
-      SystemKeyboard.setHorizontalScrollBarEnabled(false);
-      SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
-      SystemKeyboard.setWebViewClient(SystemKeyboardWebViewClient);
-      SystemKeyboard.addJavascriptInterface(new KMSystemKeyboardJSHandler(appContext, SystemKeyboard), "jsInterface");
-      SystemKeyboard.loadKeyboard();
-
-      setEngineWebViewVersionStatus(appContext, SystemKeyboard);
+      SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
+      keyboard = SystemKeyboard;
+      webViewClient = SystemKeyboardWebViewClient;
     }
+
+    if (keyboard == null) {
+      return;
+    }
+
+    RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+    keyboard.setLayoutParams(params);
+    keyboard.setVerticalScrollBarEnabled(false);
+    keyboard.setHorizontalScrollBarEnabled(false);
+    keyboard.setWebViewClient(webViewClient);
+    keyboard.addJavascriptInterface(new KMKeyboardJSHandler(appContext, keyboard), "jsInterface");
+    keyboard.loadKeyboard();
+
+    setEngineWebViewVersionStatus(appContext, keyboard);
   }
 
   public static String getLanguagePredictionPreferenceKey(String langID) {
@@ -1981,7 +2000,7 @@ public final class KMManager {
       InAppKeyboardShouldIgnoreSelectionChange = false;
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (SystemKeyboard != null && SystemKeyboardWebViewClient.getKeyboardLoaded() && !SystemKeyboardShouldIgnoreSelectionChange) {
-        InputConnection ic = (IMService != null ? IMService.getCurrentInputConnection() : null);
+        InputConnection ic = getInputConnection(KeyboardType.KEYBOARD_TYPE_SYSTEM);
         if (ic != null) {
           ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
           if (icText != null) {
@@ -2224,91 +2243,6 @@ public final class KMManager {
     } else {
       // clear globeKeyState
       globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
-    }
-  }
-
-  private static final class KMInAppKeyboardJSHandler extends KMKeyboardJSHandler {
-
-    KMInAppKeyboardJSHandler(Context context, KMKeyboard k) {
-      super(context, k);
-    }
-    private static final String HANDLER_TAG = "IAK: JS Handler";
-
-    @JavascriptInterface
-    public boolean dispatchKey(final int code, final int eventModifiers) {
-      Handler mainLoop = new Handler(Looper.getMainLooper());
-      mainLoop.post(new Runnable() {
-        public void run() {
-          if (InAppKeyboard == null) {
-            KMLog.LogError(TAG, "dispatchKey failed: InAppKeyboard is null");
-            return;
-          }
-
-          if (InAppKeyboard.subKeysWindow != null || KMTextView.activeView == null || KMTextView.activeView.getClass() != KMTextView.class) {
-            if ((KMTextView.activeView == null) && isDebugMode()) {
-              Log.w(HANDLER_TAG, "dispatchKey failed: activeView is null");
-            }
-            return;
-          }
-
-          // Handle tab or enter since KMW didn't process it
-          KMTextView textView = (KMTextView) KMTextView.activeView;
-          if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_TAB]) {
-            KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_TAB, 0, eventModifiers, 0, 0, 0);
-            textView.dispatchKeyEvent(event);
-          } else if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_ENTER]) {
-            KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_ENTER, 0, eventModifiers, 0, 0, 0);
-            textView.dispatchKeyEvent(event);
-          }
-        }
-      });
-      return true;
-    }
-  }
-
-  private static final class KMSystemKeyboardJSHandler extends KMKeyboardJSHandler {
-    KMSystemKeyboardJSHandler(Context context, KMKeyboard k) {
-      super(context, k);
-    }
-    private static final String HANDLER_TAG = "SWK: JS Handler";
-
-    @JavascriptInterface
-    public boolean dispatchKey(final int code, final int eventModifiers) {
-      Handler mainLoop = new Handler(Looper.getMainLooper());
-      mainLoop.post(new Runnable() {
-        public void run() {
-          if (SystemKeyboard == null) {
-            KMLog.LogError(TAG, "dispatchKey failed: SystemKeyboard is null");
-            return;
-          }
-
-          if (SystemKeyboard.subKeysWindow != null) {
-            return;
-          }
-
-          InputConnection ic = IMService.getCurrentInputConnection();
-          if (ic == null) {
-            if (isDebugMode()) {
-              Log.w(HANDLER_TAG, "insertText failed: InputConnection is null");
-            }
-            return;
-          }
-
-          SystemKeyboard.dismissHelpBubble();
-          SystemKeyboard.setShouldShowHelpBubble(false);
-
-          // Handle tab or enter since KMW didn't process it
-          Log.d(HANDLER_TAG, "dispatchKey called with code: " + code + ", eventModifiers: " + eventModifiers);
-          if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_TAB]) {
-            KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_TAB, 0, eventModifiers, 0, 0, 0);
-            ic.sendKeyEvent(event);
-          } else if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_ENTER]) {
-            KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_ENTER, 0, eventModifiers, 0, 0, 0);
-            ic.sendKeyEvent(event);
-          }
-        }
-      });
-      return true;
     }
   }
 }
