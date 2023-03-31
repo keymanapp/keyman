@@ -74,14 +74,15 @@ if builder_start_action clean:app; then
 fi
 
 if builder_start_action configure:app; then
-  # Copy Keyman Engine for Android
-  cp "$KEYMAN_ROOT/android/KMEA/app/build/outputs/aar/keyman-engine-${CONFIG}.aar" "$KEYMAN_ROOT/android/Tests/KeyboardHarness/app/libs/keyman-engine.aar"
 
   builder_finish_action success configure:app
 fi
 
 # Building KeyboardHarness
 if builder_start_action build:app; then
+
+  # Copy Keyman Engine for Android
+  cp "$KEYMAN_ROOT/android/KMEA/app/build/outputs/aar/keyman-engine-${CONFIG}.aar" "$KEYMAN_ROOT/android/Tests/KeyboardHarness/app/libs/keyman-engine.aar"
 
   echo "BUILD_FLAGS: $BUILD_FLAGS"
   ./gradlew clean $BUILD_FLAGS
