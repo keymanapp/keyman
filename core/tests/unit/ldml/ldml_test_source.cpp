@@ -397,8 +397,10 @@ void LdmlJsonTestSource::set_key_from_id(key_event& k, const std::u16string& id)
 
   // First, find the string
   KMX_DWORD strId = kmxplus->strs->find(id);
-  assert(strId != 0);
-  if (strId == 0) { // will also get here if id is empty.
+  if (strId == 0) {
+    // will also get here if id is empty.
+    std::cerr << "ERROR: could not find string for " << id << std::endl;
+    assert(false);
     return;
   }
 

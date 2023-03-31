@@ -230,7 +230,7 @@ describe('keys.kmap', function () {
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({row: 1, hardware: 'us'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({row: 1, hardware: 'us', modifier: 'none'}));
   });
 
   it('should reject layouts with undefined keys', function() {
