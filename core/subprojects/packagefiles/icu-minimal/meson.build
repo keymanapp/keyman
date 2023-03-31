@@ -3,8 +3,8 @@ project(
   'c',
   'cpp',
   version: '72.1',
-  meson_version: '>=0.55.0',
-  default_options: 'cpp_std=c++17',
+  meson_version: '>=0.53.0',  # TODO-LDML: minimum due to Debian
+  default_options: [ 'cpp_std=c++17' ],
 )
 
 U_ICU_VERSION = meson.project_version()
@@ -23,18 +23,26 @@ if host_machine.system() == 'windows'
   add_project_arguments('-DWIN32', '-DWIN64', '-D_MBCS', language: 'c')
 endif
 
+# per icudefs.mk.in:
+# "U_ATTRIBUTE_DEPRECATED is defined to hide warnings about deprecated API warnings."
+add_project_arguments('-DU_ATTRIBUTE_DEPRECATED=', language: 'cpp')
+
+# TODO-LDML: turn off more stuff here
+
+
 if cpp.get_argument_syntax() == 'msvc'
   add_project_arguments('/utf-8', language: 'cpp')
   add_project_arguments('/utf-8', language: 'c')
 endif
 
-if meson.version().version_compare('>= 0.62')
-  dl_dep = dependency('dl', required: false)
-  dl_native_dep = dependency('dl', required: false, native: true)
-else
-  dl_dep = cpp.find_library('dl', required: false)
-  dl_native_dep = cpp_native.find_library('dl', required: false, native: true)
-endif
+# Keyman: skip dl
+# if meson.version().version_compare('>= 0.62')
+#   dl_dep = dependency('dl', required: false)
+#   dl_native_dep = dependency('dl', required: false, native: true)
+# else
+#   dl_dep = cpp.find_library('dl', required: false)
+#   dl_native_dep = cpp_native.find_library('dl', required: false, native: true)
+# endif
 
 windows = import('windows')
 pkg = import('pkgconfig')

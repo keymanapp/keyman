@@ -6,7 +6,7 @@
 
 # ICU4C is used for repertoire tests
 
-icu4c = subproject('icu', default_options: [ 'default_library=static', 'cpp_std=c++17', 'warning_level=0',
+icu4c = subproject('icu-minimal', default_options: [ 'default_library=static', 'cpp_std=c++17', 'warning_level=0',
 'werror=false']) # TODO-LDML: options: static, no data
 
 icu_uc = icu4c.get_variable('icuuc_dep')
