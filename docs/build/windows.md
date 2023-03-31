@@ -176,7 +176,7 @@ You can use Windows Settings to add these environment variables permanently:
 
 **Requirements**:
 * emscripten 2.0.23+
-* node.js 14+
+* node.js 18+
 * openjdk 8+
 
 ```ps1

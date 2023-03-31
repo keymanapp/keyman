@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <!-- Set the viewport width to match phone and tablet device widths -->
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+
+    <!-- Allow KeymanWeb to be saved to the iPhone home screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <!-- Enable IE9 Standards mode -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>Testing Page - standalone OSK</title>
+
+    <!-- Your page CSS -->
+    <link rel="stylesheet" type="text/css" href="index.css"/>
+
+    <!-- Initialization: set paths to keyboards, resources and fonts as required -->
+    <script type="module" src="setup.mjs"></script>
+
+    <script src="commands.js"></script>
+
+  </head>
+
+<!-- Sample page HTML -->
+  <body>
+    <h2>KeymanWeb OSK Module Testing</h2>
+    <p>
+      Note:  if hosted via an IIS setup, you may need to add the 'mjs' extension under
+      "MIME Types" for it to properly serve related module-based JS files.
+    </p>
+
+    <hr/>
+
+    <div id="controllers">
+      <div id="keyboard-controller" class="flex panel">
+        <div class="group">
+          <p class="category">Keyboard</p>
+          <div id="keyboard-select" class="flex">
+            <button onclick="setKeyboard('us');">US English</button>
+            <button onclick="setKeyboard('lao_2008_basic');">Lao</button>
+            <button onclick="setKeyboard('obolo_chwerty_6351');">Obolo Chwerty</button>
+          </div>
+        </div>
+        <!-- select keyboard to use -->
+        <!-- select active layer -->
+        <div class="group">
+          <p class="category">Layer</p>
+          <div id="layer-select" class="flex">
+            <button>default</button>
+            <button>shift</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="osk-selector" class="flex panel" style="flex-direction:column">
+        <div class="group">
+          <p class="category">OSK Mode</p>
+          <div id="osk-select" class="flex">
+            <button onclick="setOSK('floating');">Floating (desktop) OSK</button>
+            <button onclick="setOSK('anchored');">Anchored (touch) OSK</button>
+            <button onclick="setOSK('inline');">Inline OSK</button>
+          </div>
+        </div>
+        <div class="group">
+          <p class="category">Target Device</p>
+          <div id="device-select" class="flex">
+            <button onclick="setTargetDevice('windows');">Windows desktop</button>
+            <button onclick="setTargetDevice('aPhone');">Android phone</button>
+            <button onclick="setTargetDevice('aPad');">Android tablet</button>
+            <button onclick="setTargetDevice('iPhone');" class="selected">iPhone</button>
+            <button onclick="setTargetDevice('iPad');">iPad</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="floating-mode" class="flex panel inactive">
+        <div class="group">
+          <!-- OutputTarget selector (text vs input) -->
+          <p class="category">Active Element</p>
+          <div id="float-target" class="flex">
+            <button onclick="setTarget('text')">Textarea</button>
+            <button onclick="setTarget('input')">Input</button>
+            <button onclick="setTarget('none')">None</button>
+          </div>
+        </div>
+        <div class="group">
+          <!-- show / hide -->
+          <p class="category">Visibility</p>
+          <div id="float-show"  class="notouch flex">
+            <button onclick="showOSK(true)">Show</button>
+            <button onclick="showOSK(false)">Hide</button>
+            <button onclick="showOSK()">Toggle</button>
+          </div>
+          <div class="touch disabled">
+            Disabled (touch-based)
+          </div>
+        </div>
+      </div>
+
+      <div id="anchored-mode" class="flex panel inactive">
+        <div class="group">
+          <!-- OutputTarget selector (text vs input) -->
+          <p class="category">Active Element</p>
+          <div id="anchor-target" class="flex">
+            <button onclick="setTarget('text')">Textarea</button>
+            <button onclick="setTarget('input')">Input</button>
+            <button onclick="setTarget('none')">None</button>
+          </div>
+        </div>
+        <div class="group">
+          <!-- show / hide -->
+          <p class="category">Visibility</p>
+          <div id="anchor-show" class="flex notouch">
+            <button onclick="showOSK(true)">Show</button>
+            <button onclick="showOSK(false)">Hide</button>
+            <button onclick="showOSK()">Toggle</button>
+          </div>
+          <div class="touch disabled">
+            Disabled (touch-based)
+          </div>
+        </div>
+      </div>
+
+      <div id="inline-mode" class="flex panel inactive">
+        <div class="group">
+          <p class="category">OSK Sizing</p>
+          <div>Width: <span class='gap'></span><input id="set-width" value='800'/></div>
+          <div>Height: <span class='gap'></span><input id="set-height" value='400'/></div>
+          <button onclick="inlineSetSize()" style="width:100%; margin-top: 4px;">Apply</button>
+        </div>
+      </div>
+    </div>
+
+    <hr/>
+
+    <div id="inline-container" style="width: 80%; height: 40%"></div>
+
+    <p>Textbox target:</p>
+    <textarea id='ta1' class='test'></textarea>
+
+    <p>Input target:</p>
+    <input id='in1' class='test' value=''/>
+
+    <hr/>
+
+    <h3>Event log:</h3>
+    <textarea id="eventlog" rows="10" readonly></textarea>
+
+    <button onclick="document.getElementById('eventlog').textContent = '';">Clear</button>
+
+    <hr/>
+
+    <h3><a href="../..">Return to testing home page</a></h3>
+
+    <!-- include a blank div to enable scrolling -->
+    <div style="height:1000px"></div>
+    <p>--End of Document--</p>
+
+  </body>
+
+  <!--
+    *** DEVELOPER NOTE -- FIREFOX CONFIGURATION FOR TESTING ***
+    *
+    * If the URL bar starts with <b>file://</b>, Firefox may not load the font used
+    * to display the special characters used in the On-Screen Keyboard.
+    *
+    * To work around this Firefox bug, navigate to <b>about:config</b>
+    * and set <b>security.fileuri.strict_origin_policy</b> to <b>false</b>
+    * while testing.
+    *
+    * Firefox resolves website-based CSS URI references correctly without needing
+    * any configuration change, so this change should only be made for file-based testing.
+    *
+    ***
+  -->
+</html>
