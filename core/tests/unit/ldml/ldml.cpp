@@ -300,13 +300,19 @@ int run_all_tests(const km::kbp::path &source, const km::kbp::path &compiled) {
 
   km::tests::LdmlEmbeddedTestSource embedded_test_source;
 
+  std::vector<std::string> failures; // track failures for summary
+
   int embedded_result = embedded_test_source.load_source(source);
 
   if (embedded_result == 0) {
     // embedded loaded OK, try it
     std::cout << "TEST: " << source.name() << " (embedded)" << std::endl;
     embedded_result = run_test(source, compiled, embedded_test_source);
+    if (embedded_result != 0) {
+        failures.push_back("in-XML (@@ comment) embedded test failed");
+    }
   } else {
+    // Not an error in itself, if JSON is present.
     embedded_result = -1; // load failed
   }
 
@@ -325,6 +331,7 @@ int run_all_tests(const km::kbp::path &source, const km::kbp::path &compiled) {
       int sub_test = run_test(source, compiled, *n.second);
       if (sub_test != 0) {
         std::cout << " FAIL: " << json_path.stem() << "/" << n.first << std::endl;
+        failures.push_back(json_path.stem() + "/" + n.first);
         json_result = sub_test; // set to last failure
       } else {
         std::cout << " PASS: " << json_path.stem() << "/" << n.first << std::endl;
@@ -342,23 +349,21 @@ int run_all_tests(const km::kbp::path &source, const km::kbp::path &compiled) {
     std::cout << "Note: No json test." << std::endl;
   }
 
+  // if both are missing, that's an error in itself.
   if (embedded_result == -1 && json_result == -1) {
     // Can't both be missing.
-    std::cout << "Error: Need either embedded test (@@ directives in " << source.name() << ") or " << json_path.name() << std::endl;
-    return __LINE__;
-  } else if (embedded_result == -1) {
-    return json_result; // Return JSON if embedded missing.
-  } else if (json_result == -1) {
-    return embedded_result; // Return embedded if JSON missing
+    failures.push_back("Error: Need either embedded test (@@ directives) or json test");
   }
 
-  // we have both tests.
-  if (embedded_result == 0) {
-    return json_result; // Both passed or JSON failed
-  } else if(json_result == 0) {
-    return embedded_result; // Embedded may have failed.
+  // recap the failures
+  if (failures.size() > 0) {
+    for (const auto& f : failures) {
+      std::cerr << "failure summary: " << f << std::endl;
+    }
+    return -1;
   } else {
-    return json_result;
+    std::cout << "run_all_tests passed" << std::endl;
+    return 0;
   }
 }
 
