@@ -6,10 +6,17 @@
 
 # ICU4C is used for repertoire tests
 
-icu4c = subproject('icu-minimal', default_options: [ 'default_library=static', 'cpp_std=c++17', 'warning_level=0',
-'werror=false']) # TODO-LDML: options: static, no data
 
-icu_uc = icu4c.get_variable('icuuc_dep')
+if meson.version().version_compare('<=0.57.0') # TODO-LDML: right # here?
+  # fallback to pkg-config
+  pkgconfig = 'pkg-config'
+  icu_uc = dependency('icu-uc', required: true)
+else
+  icu4c = subproject('icu-minimal', default_options: [ 'default_library=static', 'cpp_std=c++17', 'warning_level=0',
+'werror=false']) # TODO-LDML: options: static, no data
+  icu_uc = icu4c.get_variable('icuuc_dep')
+endif
+
 
 if icu_uc.found()
   defns += '-DHAVE_ICU4C'
