@@ -33,12 +33,13 @@
 #include "ldml_test_source.hpp"
 #include "ldml_test_utils.hpp"
 
-// Optional ICU4C
 #if defined(HAVE_ICU4C)
-// ?!
+// TODO-LDML: Needed this for some compiler warnings
 #define U_FALLTHROUGH
 #include "unicode/uniset.h"
 #include "unicode/usetiter.h"
+#else
+#error icu4c is required for this test
 #endif
 
 #define assert_or_return(expr) if(!(expr)) { \
@@ -617,7 +618,7 @@ int LdmlJsonRepertoireTestSource::load(const nlohmann::json &data) {
   chars      = data["/chars"_json_pointer].get<std::string>();
   std::cout << "Loaded " << path << " = " << this->type << " || " << this->chars << std::endl;
   UErrorCode status = U_ZERO_ERROR;
-  icu::UnicodeString pattern(chars.data(), chars.length());
+  icu::UnicodeString pattern(chars.data(), (int32_t)chars.length());
   uset = std::unique_ptr<icu::UnicodeSet>(new icu::UnicodeSet(pattern, status));
   if (U_FAILURE(status)) {
     // could be a malformed syntax isue
@@ -625,14 +626,14 @@ int LdmlJsonRepertoireTestSource::load(const nlohmann::json &data) {
     return 1;
   }
   std::cout << "Got UnicodeSet of " << uset->size() << " char(s)." << std::endl;
-  #if (U_ICU_VERSION_MAJOR_NUM >= 70)
-  // TODO-LDML: function was private previously
-  if (uset->hasStrings()) {
-    // illegal unicodeset of this form:  [a b c {this_is_a_string}]
-    std::cerr << "Spec err: may not have strings. " << chars << std::endl;
-    return 1;
-  }
-  #endif
+  // #if (U_ICU_VERSION_MAJOR_NUM >= 70)
+  // // TODO-LDML: function was private previously
+  // if (uset->hasStrings()) {
+  //   // illegal unicodeset of this form:  [a b c {this_is_a_string}]
+  //   std::cerr << "Spec err: may not have strings. " << chars << std::endl;
+  //   return 1;
+  // }
+  // #endif
   iterator = std::unique_ptr<icu::UnicodeSetIterator>(new icu::UnicodeSetIterator(*uset));
 
   return 0;
