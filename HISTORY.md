@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.83 alpha 2023-04-05
+
+* fix(windows): use right instead of left alignment for popup buttons (#8561)
+
 ## 17.0.82 alpha 2023-03-31
 
 * feat(developer): support jis and abnt2 (#8513)
