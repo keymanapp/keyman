@@ -275,9 +275,33 @@ begin
   end;
 end;
 
+function GetKeyman32Name: string;
+var
+  Keyman32Name: string;
+begin
+  Keyman32Name := '';
+  with TRegistryErrorControlled.Create do  // I2890
+  try
+    RootKey := HKEY_LOCAL_MACHINE;
+    if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_Keyman32_Name) then
+        Keyman32Name := ReadString(SRegValue_Keyman32_Name);
+  finally
+    Free;
+  end;
+
+  if Keyman32Name = '' then
+  begin
+    Keyman32Name := 'keyman32.dll';
+  end;
+
+  Result := Keyman32Name;
+
+end;
+
 function GetKeymanInstallPath: string;
 var
   RootPath: string;
+  Keyman32Name: string;
 begin
   RootPath := ExtractFilePath(ParamStr(0));
   with TRegistryErrorControlled.Create do  // I2890
@@ -290,9 +314,9 @@ begin
     Free;
   end;
   Result := IncludeTrailingPathDelimiter(RootPath);
-
-  if not FileExists(Result + 'keyman32-ver17.0.48-alpha-local.dll') then
-    raise EKeymanNotInstalled.Create( 'The executable keyman32-ver17.0.48-alpha-local.dll could not '+
+  Keyman32Name := GetKeyman32Name;
+  if not FileExists(Result + Keyman32Name) then
+    raise EKeymanNotInstalled.Create( 'The executable '+Keyman32Name+' could not '+
       'be found.  You should reinstall.');
 end;
 

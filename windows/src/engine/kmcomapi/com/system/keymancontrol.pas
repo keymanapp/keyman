@@ -194,11 +194,6 @@ uses
 var
   wm_keyman: Integer = 0;
 
-{$IFNDEF WIN64}
-const
-  SKeyman32Filename = 'keyman32-ver17.0.48-alpha-local.dll';
-{$ENDIF}
-
 const
   SWnd_MasterController = 'TfrmKeyman7Main';
   SWnd_VisualKeyboard = 'TfrmVisualKeyboard';
@@ -690,6 +685,29 @@ end;
 
 procedure TKeymanControl.LoadKeyman32;
 
+    function GetKeyman32Name: string;
+    var
+      Keyman32Name: string;
+    begin
+      Keyman32Name := '';
+      with TRegistryErrorControlled.Create do  // I2890
+      try
+        RootKey := HKEY_LOCAL_MACHINE;
+        if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_Keyman32_Name) then
+            Keyman32Name := ReadString(SRegValue_Keyman32_Name);
+      finally
+        Free;
+      end;
+
+      if Keyman32Name = '' then
+      begin
+        Keyman32Name := 'keyman32.dll';
+      end;
+
+      Result := Keyman32Name;
+
+    end;
+
     function GetKeymanInstallPath: string;   // I3598
     var
       buf: array[0..260] of char;
@@ -724,13 +742,14 @@ procedure TKeymanControl.LoadKeyman32;
     end;
 var
   s: string;
+  Keyman32Name: string;
 begin
   if hlibKeyman32 = 0 then
   begin
-
-    s := GetKeymanInstallPath+SKeyman32Filename;   // I3598
+    Keyman32Name := GetKeyman32Name;
+    s := GetKeymanInstallPath+Keyman32Name;   // I3598
     if not FileExists(s) then
-      ErrorFmt(KMN_E_KeymanControl_CannotLoadKeyman32, VarArrayOf([Integer(GetLastError), 'Failed to find '+SKeyman32Filename+' at "'+s+'", '+SysErrorMessage(GetLastError)]));
+      ErrorFmt(KMN_E_KeymanControl_CannotLoadKeyman32, VarArrayOf([Integer(GetLastError), 'Failed to find '+Keyman32Name+' at "'+s+'", '+SysErrorMessage(GetLastError)]));
 
     hlibKeyman32 := LoadLibrary(PChar(s));
     if hlibKeyman32 = 0 then

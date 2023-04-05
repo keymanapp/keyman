@@ -43,7 +43,7 @@ var
   nActiveKeymanId: Integer;
   iki: Integer;
 begin
-	hKeyman := GetModuleHandle('keyman32-ver17.0.48-alpha-local.dll');
+	hKeyman := GetModuleHandle('keyman32.dll');
 	if hKeyman = 0 then
   begin
     ShowMessage('No keyman32.dll loaded');
@@ -108,7 +108,7 @@ var
 begin
   FKeyboards := TObjectList<TKeymanKeyboard>.Create;
 
-	hKeyman := GetModuleHandle('keyman32-ver17.0.48-alpha-local.dll');
+	hKeyman := GetModuleHandle('keyman32.dll');
 	if hKeyman = 0 then Exit;
   pKeyman_BuildKeyboardList := GetProcAddress(hKeyman, 'Keyman_BuildKeyboardList');
   if @pKeyman_BuildKeyboardList = nil then
@@ -143,7 +143,7 @@ var
 begin
   FKeyboards := TObjectList<TKeymanKeyboard>.Create;
 
-	hKeyman := GetModuleHandle('keyman32-ver17.0.48-alpha-local.dll');
+	hKeyman := GetModuleHandle('keyman32.dll');
 	if hKeyman = 0 then Exit;
   pKeyman_BuildKeyboardList := GetProcAddress(hKeyman, 'Keyman_BuildKeyboardList');
   if @pKeyman_BuildKeyboardList = nil then

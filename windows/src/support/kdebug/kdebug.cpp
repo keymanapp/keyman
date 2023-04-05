@@ -169,10 +169,10 @@ BOOL Keyman_Initialise(HWND hwnd, BOOL FSingleApp)
 
 	FLoad = FALSE;
 
-	hkeyman = GetModuleHandle("keyman32-ver17.0.48-alpha-local.dll");
+	hkeyman = GetModuleHandle("keyman32.dll");
 	if(!hkeyman)
 	{
-		hkeyman = LoadLibrary("c:\\keyman\\5.0\\bin\\dist\\keyman32-ver17.0.48-alpha-local.dll");
+		hkeyman = LoadLibrary("c:\\keyman\\5.0\\bin\\dist\\keyman32.dll");
 		if(!hkeyman) return FALSE;
 		FLoad = TRUE;
 	}
@@ -195,7 +195,7 @@ BOOL Keyman_Exit()
 	Keyman_ExitProc ke;
 
 	if(!FInitKeyman) return TRUE;
-	hkeyman = GetModuleHandle("keyman32-ver17.0.48-alpha-local.dll");
+	hkeyman = GetModuleHandle("keyman32.dll");
 	if(!hkeyman) return FALSE;
 
 	ke = (Keyman_ExitProc) GetProcAddress(hkeyman, "Keyman_Exit");
@@ -212,7 +212,7 @@ BOOL Keyman_ForceKeyboard(PSTR s)
 	HINSTANCE hkeyman;
 	Keyman_ForceKeyboardProc fk;
 
-	hkeyman = GetModuleHandle("keyman32-ver17.0.48-alpha-local.dll");
+	hkeyman = GetModuleHandle("keyman32.dll");
 	if(!hkeyman) return FALSE;
 
 	fk = (Keyman_ForceKeyboardProc) GetProcAddress(hkeyman, "Keyman_ForceKeyboard");
@@ -226,7 +226,7 @@ BOOL Keyman_StopForcingKeyboard()
 	HINSTANCE hkeyman;
 	Keyman_StopForcingKeyboardProc sfk;
 
-	hkeyman = GetModuleHandle("keyman32-ver17.0.48-alpha-local.dll");
+	hkeyman = GetModuleHandle("keyman32.dll");
 	if(!hkeyman) return FALSE;
 
 	sfk = (Keyman_StopForcingKeyboardProc) GetProcAddress(hkeyman, "Keyman_StopForcingKeyboard");
