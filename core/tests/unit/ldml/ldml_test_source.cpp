@@ -618,7 +618,9 @@ int LdmlJsonRepertoireTestSource::load(const nlohmann::json &data) {
   chars      = data["/chars"_json_pointer].get<std::string>();
   std::cout << "Loaded " << path << " = " << this->type << " || " << this->chars << std::endl;
   UErrorCode status = U_ZERO_ERROR;
-  icu::UnicodeString pattern(chars.data(), (int32_t)chars.length());
+  icu::StringPiece piece(chars);
+  icu::UnicodeString pattern = icu::UnicodeString::fromUTF8(piece);
+  // icu::UnicodeString pattern(chars.data(), (int32_t)chars.length());
   uset = std::unique_ptr<icu::UnicodeSet>(new icu::UnicodeSet(pattern, status));
   if (U_FAILURE(status)) {
     // could be a malformed syntax isue
@@ -635,7 +637,6 @@ int LdmlJsonRepertoireTestSource::load(const nlohmann::json &data) {
   // }
   // #endif
   iterator = std::unique_ptr<icu::UnicodeSetIterator>(new icu::UnicodeSetIterator(*uset));
-
   return 0;
 }
 #endif // HAVE_ICU4C
