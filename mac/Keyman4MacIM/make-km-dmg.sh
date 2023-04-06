@@ -174,7 +174,7 @@ displayInfo "Copying files from \"$SOURCE_KM_APP\"..."
 find "$DEST_KM_APP" -mindepth 1 -maxdepth 1
 echo "---------"
 find "$DEST_KM_APP" -mindepth 1 -maxdepth 1 -print0 | xargs -0 rm -rf
-cp -fR "$SOURCE_KM_APP/" "$DEST_KM_APP"
+cp -fR "$SOURCE_KM_APP/"* "$DEST_KM_APP/"
 
 echo "---- Listing info in /Volumes/Keyman/ ----"
 echo "DEST_KM_APP=$DEST_KM_APP"
