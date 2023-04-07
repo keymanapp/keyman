@@ -81,7 +81,7 @@ DOWNLOAD_INFO_FILEPATH="${DMG_FILEPATH}.download_info"
 if [[ ! -f "$DMG_FILEPATH" ]]; then
   builder_die "Cannot compute file size or MD5 for non-existent DMG file: $DMG_FILEPATH"
 fi
-DMG_FILE_SIZE=$(stat -f"%z" "$DMG_FILEPATH")
+DMG_FILE_SIZE=$(/usr/bin/stat -f"%z" "$DMG_FILEPATH")
 DMG_MD5=$(md5 -q "$DMG_FILEPATH")
 
 if [[ -f "$DOWNLOAD_INFO_FILEPATH" ]]; then

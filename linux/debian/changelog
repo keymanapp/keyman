@@ -1,3 +1,29 @@
+keyman (16.0.139-4) unstable; urgency=medium
+
+  * debian/tests: Revert previous change and ignore s390x from autopkgtests
+
+ -- Eberhard Beilharz <eb1@sil.org>  Fri, 24 Mar 2023 16:05:07 +0100
+
+keyman (16.0.139-3) unstable; urgency=medium
+
+  * debian/tests: Run autopkgtests on s390x but immediately return
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 22 Mar 2023 19:25:02 +0100
+
+keyman (16.0.139-2) unstable; urgency=medium
+
+  * Don't build on s390x because Keyman doesn't work on big-endian architectures
+    (upstream bug https://github.com/keymanapp/keyman/issues/5111)
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 20 Mar 2023 19:54:44 +0100
+
+keyman (16.0.139-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 16 Mar 2023 08:59:04 +0100
+
 keyman (16.0.138-4) unstable; urgency=medium
 
   * Team upload

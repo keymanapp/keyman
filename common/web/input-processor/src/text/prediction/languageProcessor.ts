@@ -2,30 +2,7 @@ import EventEmitter from "eventemitter3";
 import { LMLayer } from "@keymanapp/lexical-model-layer/web";
 import { OutputTarget, Transcription, Mock } from "@keymanapp/keyboard-processor";
 import ContextWindow from "../contextWindow.js";
-
-export interface ModelSpec {
-  /**
-   * The model's unique identifier.
-   */
-  id: string;
-
-  /**
-   * The list of supported BCP-47 language codes.  Only one language should be supported,
-   * although multiple variants based on region code (at min) may be specified.
-   */
-  languages: string[];
-
-  /**
-   * The path/URL to the file that defines the model.  If both `path` and `raw` are specified,
-   * `path` takes precedence.
-   */
-  path: string;
-
-  /**
-   * The raw JS script defining the model.  Only used if `path` is not specified.
-   */
-  code: string;
-}
+import ModelSpec from "./modelSpec.js"
 
 /**
  * Corresponds to the 'suggestionsready' LanguageProcessor event.
@@ -68,7 +45,7 @@ interface LanguageProcessorEventMap {
   'tryrevert': () => void,
 
   /**
-   * Is called synchronously as part of suggestion application when successful.
+   * Is called synchronously once suggestion application is successful and the context has been updated.
    *
    * @param outputTarget The `OutputTarget` representation of the context the suggestion was applied to.
    * @returns

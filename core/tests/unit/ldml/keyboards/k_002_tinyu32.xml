@@ -20,7 +20,7 @@
     <key id="screamcat" to="🙀" />
   </keys>
 
-  <layers form="hardware" hardware="us">
+  <layers form="us">
     <layer id="base">
       <row keys="hmaqtugha that screamcat" /> <!-- number row -->
     </layer>

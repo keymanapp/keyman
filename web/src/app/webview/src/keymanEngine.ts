@@ -31,7 +31,13 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
   }
 
   init(options: Required<WebviewInitOptionSpec>) {
-    let device = new DeviceSpec('native', options.embeddingApp.indexOf('Tablet') >= 0 ? 'tablet' : 'phone', this.config.hostDevice.OS, true);
+    let device = new DeviceSpec(
+      'native',
+      options.embeddingApp.indexOf('Tablet') >= 0 ? 'tablet' : 'phone',
+      this.config.hostDevice.OS,
+      true
+    );
+
     this.config.hostDevice = device;
 
     super.init({...WebviewInitOptionDefaults, ...options});

@@ -29,6 +29,7 @@ builder_describe "Build KMSample1 app for Android." \
   "clean" \
   "configure" \
   "build" \
+  "test" \
   ":app                   KMSample1" \
   "--ci                   Don't start the Gradle daemon. Use for CI"
 
@@ -75,6 +76,10 @@ fi
 if builder_start_action build:app; then
   ./gradlew clean $SAMPLE_FLAGS
 
-
   builder_finish_action success build:app
+fi
+
+if builder_start_action test:app; then
+  # TODO: define tests
+  builder_finish_action success test:app
 fi

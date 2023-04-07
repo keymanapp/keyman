@@ -41,7 +41,7 @@ class ViewInstalledWindowBase(Gtk.Window):
 
     def on_close_clicked(self, button):
         logging.debug("Close application clicked")
-        Gtk.main_quit()
+        self.close()
 
     def on_refresh_clicked(self, button):
         logging.debug("Refresh application clicked")
@@ -82,6 +82,8 @@ class ViewInstalledWindowBase(Gtk.Window):
 
     def install_file(self, kmpfile, language=None):
         installDlg = InstallKmpWindow(kmpfile, viewkmp=self, language=language)
+        if installDlg.is_error:
+            return Gtk.ResponseType.CANCEL
         result = installDlg.run()
         installDlg.destroy()
         return result

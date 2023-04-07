@@ -251,6 +251,14 @@ export default class KeymanEngine<
   // API methods
 
   // 17.0: new!  Only used by apps utilizing app/webview and one app/browser test page.
+
+  /**
+   * Registers the specified lexical model within Keyman Engine.  If a keyboard with a
+   * matching language code is currently activated, it will also activate the model.
+   *
+   * @param model  An object defining model ID, associated language IDs, and either the
+   *               model's definition or a path to a file containing it.
+   */
   addModel(model: ModelSpec) {
     this.modelCache.register(model);
 
@@ -260,8 +268,16 @@ export default class KeymanEngine<
   }
 
   // 17.0: new!  Only used by apps utilizing app/webview and one app/browser test page.
+
+  /**
+   * Unregisters any previously-registered lexical model with a matching ID from Keyman Engine.
+   * If a keyboard with a matching language code is currently activated, it will also
+   * deactivate the model.
+   *
+   * @param modelId  The ID for the model to be deregistered and forgotten by Keyman Engine.
+   */
   removeModel(modelId: string) {
-    this.modelCache.deregister(modelId);
+    this.modelCache.unregister(modelId);
 
     // Is it the active model?
     if(this.processor.activeModel && this.processor.activeModel.id == modelId) {

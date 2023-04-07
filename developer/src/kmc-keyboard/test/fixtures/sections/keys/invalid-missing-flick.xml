@@ -14,7 +14,7 @@
     </flicks>
   </keys>
 
-  <layers form="hardware" hardware="iso">
+  <layers form="iso">
     <layer id="base">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="Q W" />

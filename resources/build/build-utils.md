@@ -125,6 +125,10 @@ variable to ensure that we run the correct versions of npm package commands, so
 there is no need to hard-code path references or add script wrappers to
 package.json (`npm run <script>`).
 
+* `BUILDER_CONFIGURATION` will be set to `debug` if the `--debug` option is
+  passed in, or `release` otherwise, which corresponds to the output folder
+  names for many projects.
+
 Other environment variables and paths will probably be added over time.
 
 ## Split

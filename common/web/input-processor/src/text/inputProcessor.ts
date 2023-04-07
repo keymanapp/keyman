@@ -3,7 +3,8 @@
 /// <reference types="@keymanapp/models-types" />
 
 import ContextWindow from "./contextWindow.js";
-import LanguageProcessor, { type ModelSpec } from "./prediction/languageProcessor.js";
+import LanguageProcessor from "./prediction/languageProcessor.js";
+import type ModelSpec from "./prediction/modelSpec.js";
 import { globalObject, DeviceSpec } from "@keymanapp/web-utils";
 
 import {

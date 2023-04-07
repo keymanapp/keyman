@@ -398,8 +398,10 @@ void LdmlJsonTestSource::set_key_from_id(key_event& k, const std::u16string& id)
 
   // First, find the string
   KMX_DWORD strId = kmxplus->strs->find(id);
-  assert(strId != 0);
-  if (strId == 0) { // will also get here if id is empty.
+  if (strId == 0) {
+    // will also get here if id is empty.
+    std::cerr << "ERROR: could not find string for " << id << std::endl;
+    assert(false);
     return;
   }
 
@@ -528,7 +530,7 @@ int LdmlJsonTestSourceFactory::load(const km::kbp::path &compiled, const km::kbp
   // TODO-LDML: store these elsewhere?
   std::cout << "JSON: reading " << info_name << " test of " << info_keyboard << " by " << info_author << std::endl;
 
-  // TODO-LDML: repertoire test
+  // TODO-LDML: repertoire test #8435
 
   auto all_tests = data["/keyboardTest/tests"_json_pointer];
   assert_or_return((!all_tests.empty()) && (all_tests.size() > 0));

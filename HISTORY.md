@@ -1,5 +1,87 @@
 # Keyman Version History
 
+## 17.0.81 alpha 2023-03-30
+
+* feat(windows): simple text editor using Edit Control (#8391)
+
+## 17.0.80 alpha 2023-03-29
+
+* chore(linux): Remove dependency on `sudo` (#8535)
+* chore(linux): Improve robustness of test cleanup (#8536)
+* fix(linux): Remove warning after pressing Close button (#8538)
+
+## 17.0.79 alpha 2023-03-28
+
+* chore(linux): Revert "Run and ignore autopkgtests on s390x" (#8506)
+* docs(linux): Update minimum required Ubuntu version (#8526)
+* docs(linux): Update common questions (#8532)
+
+## 17.0.78 alpha 2023-03-27
+
+* chore(linux): Remove python3-raven dependency (#8507)
+* refactor(android/engine): Make KMKeyboardJSHandler a normal class (#8494)
+
+## 17.0.77 alpha 2023-03-25
+
+* chore(common): use mac /usr/bin/stat rather than homebrew version (#8498)
+
+## 17.0.76 alpha 2023-03-24
+
+* chore(linux): Run and ignore autopkgtests on s390x (#8492)
+* refactor(android/engine): Consolidate dispatchKey (#8483)
+
+## 17.0.75 alpha 2023-03-23
+
+* chore(common): define BUILDER_CONFIGURATION env var (#8496)
+
+## 17.0.74 alpha 2023-03-22
+
+* chore(windows): update sentry-native to 0.6.0 (#8464)
+* chore(linux): Prevent building on s390x (#8477)
+* fix(linux): Display error message for corrupt .kmp file (#8479)
+
+## 17.0.73 alpha 2023-03-21
+
+* refactor(android/engine): Consolidate insertText (#8438)
+* chore(common): prevent multiple npm ci runs in child scripts (#8484)
+
+## 17.0.72 alpha 2023-03-20
+
+* chore(common): die early when --ci and --debug passed to test.sh (#8465)
+* chore(common): Update crowdin strings for Kibaku (#8447)
+
+## 17.0.71 alpha 2023-03-18
+
+* fix(core): ldml update fr-azerty for VKEY mapping (#8434)
+
+## 17.0.70 alpha 2023-03-17
+
+* chore(android): Document builder script steps (#8449)
+
+## 17.0.69 alpha 2023-03-16
+
+* chore(web): Cleanup build echo (#8446)
+* fix(developer): lm compiler handle missing line no in errors (#8444)
+* fix(android/app): Temporarily disable Keyman browser (#8430)
+* fix(android/engine): Add builder output for configure (#8442)
+* chore(linux): Update debian changelog (#8452)
+
+## 17.0.68 alpha 2023-03-15
+
+* chore(common): add common test build configurations (#8431)
+* fix(common): fix broken common/web/types cases (#8426)
+* fix(developer/compilers): locks esbuild target detection for kmc building (#8437)
+*  (#8412)
+*  (#8436)
+* chore(linux): Use dependency on core in ibus-keyman/build.sh (#8423)
+
+## 17.0.67 alpha 2023-03-14
+
+* (developer):Update copyright period in License.rtf (#8425)
+* chore(common): support shorthand for build.sh (#8415)
+* chore(common): build script performance improvements (#8416)
+* chore(common): TS updates to non-sync'd packages, feature-esmodule merge conflict prevention (#8429)
+
 ## 17.0.66 alpha 2023-03-13
 
 * refactor(android): Use builder scripts (#7407)
