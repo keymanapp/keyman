@@ -24,6 +24,7 @@ builder_describe "Build the include script for current Keyman version" \
   clean \
   build \
   publish \
+  test \
   --dry-run
 
 builder_describe_outputs \

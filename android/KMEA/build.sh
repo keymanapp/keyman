@@ -50,6 +50,7 @@ if builder_is_debug_build; then
 fi
 
 builder_describe_outputs \
+  configure:engine /android/KMEA/app/src/main/assets/keymanandroid.js \
   build:engine     /android/KMEA/app/build/outputs/aar/${CONFIG}/keyman-engine.aar
 
 #### Build

@@ -68,13 +68,7 @@ if builder_start_action clean; then
   builder_finish_action success clean
 fi
 
-# Do not call child actions for configure - they all do the same thing, and it can take a while.
-
-if builder_start_action configure; then
-  verify_npm_setup
-
-  builder_finish_action success configure
-fi
+builder_run_child_actions configure
 
 ## Build actions
 

@@ -33,8 +33,4 @@ export default abstract class OutputTarget<EventMap extends EventEmitter.ValidEv
       elem.dispatchEvent(event);
     }
   }
-
-  apply(transform: Transform) {
-    super.apply(transform);
-  }
 }

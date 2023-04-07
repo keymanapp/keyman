@@ -332,18 +332,23 @@ if(typeof InterfaceTests == 'undefined') {
 
     InterfaceTests.Mock.resetWithText = function(pair, string) {
       pair.wrapper.text = string;
-      pair.wrapper.caretIndex = 0;
+      pair.wrapper.selStart = 0;
+      pair.wrapper.selEnd = 0;
     }
 
     // Implemented for completeness and generality with other tests.
     InterfaceTests.Mock.setCaret = function(pair, index) {
-      var text = pair.wrapper.getText();
-      pair.wrapper.selStart = pair.wrapper.selEnd = text._kmwCodeUnitToCodePoint(index);
+      InterfaceTests.Mock.setSelectionRange(pair, index, index);
     }
 
     // Implemented for completeness and generality with other tests.
     InterfaceTests.Mock.getCaret = function(pair) {
       return pair.wrapper.getDeadkeyCaret();
+    }
+
+    InterfaceTests.Mock.setSelectionRange = function(pair, start, end) {
+      let convert = (index) => pair.wrapper.text.kmwCodeUnitToCodePoint(index);
+      pair.wrapper.setSelection(convert(start), convert(end));
     }
 
     InterfaceTests.Mock.setText = function(pair, text) {
@@ -1379,36 +1384,26 @@ describe('Element Input/Output Interfacing', function() {
     // Unique to the Mock type - element interface cloning tests.  Is element state properly copied?
     // As those require a very different setup, they're in the target_mocks.js test case file instead.
 
-    describe('Text Retrieval', function(){
-      describe('getText', function() {
-        it('correctly returns text (no active selection)', function() {
-          InterfaceTests.Tests.getTextNoSelection(InterfaceTests.Mock);
-        });
-      });
-
-      describe('getTextBeforeCaret', function() {
-        it('correctly returns text (no active selection)', function() {
-          InterfaceTests.Tests.getTextBeforeCaretNoSelection(InterfaceTests.Mock);
-        });
-      });
-
-      describe('getTextAfterCaret', function() {
-        it('correctly returns text (no active selection)', function() {
-          InterfaceTests.Tests.getTextAfterCaretNoSelection(InterfaceTests.Mock);
-        });
-      });
-    });
+    // Basic text-retrieval unit tests are now done headlessly in @keymanapp/keyboard-processor.
 
     describe('Text Mutation', function() {
       describe('deleteCharsBeforeCaret', function() {
         it("correctly deletes characters from 'context' (no active selection)", function() {
           InterfaceTests.Tests.deleteCharsBeforeCaretNoSelection(InterfaceTests.Mock);
         });
+
+        it("correctly deletes characters from 'context' (with active selection)", function() {
+          InterfaceTests.Tests.deleteCharsBeforeCaretWithSelection(InterfaceTests.Mock);
+        });
       });
 
       describe('insertTextBeforeCaret', function() {
         it("correctly replaces the element's 'context' (no active selection)", function() {
           InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.Mock);
+        });
+
+        it("correctly replaces the element's 'context' (with active selection)", function() {
+          InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.Mock);
         });
       });
 

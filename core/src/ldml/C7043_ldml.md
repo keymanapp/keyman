@@ -491,11 +491,6 @@ For each key:
 TODO-LDML: Note that conforming to other keyman values, left versus right shift
 cannot be distinguished.
 
-TODO-LDML: Note that 'Current' LDML spec allows `shiftL`/`shiftR`, `opt`,
-and `cmd` but there is a request to drop these. These four are not represented
-here.
-
-
 ### C7043.2.16 `list`—String lists
 
 | ∆ | Bits | Name          | Description                              |
@@ -532,6 +527,5 @@ These indices are a pool of indexes into the string table.
 The strings order are significant.  There is not a 'null' string at the end of each list.
 
 ## TODO-LDML: various things that need to be completed here or fixed in-spec
-
 > * UnicodeSets
 > * spec: ABNT2 key has hex value 0xC1 (even if kbdus.dll doesn't produce that)

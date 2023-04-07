@@ -15,6 +15,14 @@ export class KeysCompiler extends SectionCompiler {
     return constants.section.keys;
   }
 
+  /**
+   *
+   * @returns just the non-touch layers.
+   */
+  public hardwareLayers() {
+    return this.keyboard.layers?.filter(({form}) => form !== 'touch');
+  }
+
   public validate() {
     let valid = true;
 
@@ -37,21 +45,22 @@ export class KeysCompiler extends SectionCompiler {
       }
     }
 
+    // the layr compiler does more extensive validation of the layer attributes.
+
     // Kmap validation
-    const theLayers = this.keyboard.layers?.[0]; // TODO-LDML: handle >1 layers. #8160
+    const hardwareLayers = this.hardwareLayers();
 
-    if(!theLayers?.layer?.length) {
-      valid = false;
-      this.callbacks.reportMessage(CompilerMessages.Error_MustBeAtLeastOneLayerElement());
-    }
-
-    if(theLayers?.form == 'hardware') {
-      for(let layer of theLayers?.layer) {
-        valid = this.validateHardwareLayerForKmap(theLayers?.hardware, layer) && valid; // note: always validate even if previously invalid results found
+    if (hardwareLayers.length >= 1) {
+      // validate all errors
+      for (let layers of hardwareLayers) {
+        for(let layer of layers.layer) {
+          valid = this.validateHardwareLayerForKmap(layers.form, layer) && valid; // note: always validate even if previously invalid results found
+        }
       }
+    } else {
+      // TODO-LDML: Touch?
     }
 
-    // TODO-LDML: some additional validation needed here?
     return valid;
   }
 
@@ -71,15 +80,17 @@ export class KeysCompiler extends SectionCompiler {
 
     // Finally, kmap
     // Use LayerMap + keys to generate compiled keys for hardware
-    const theLayers = this.keyboard.layers?.[0]; // TODO-LDML: handle >1 layers. #8160
-
-    if(theLayers?.form == 'hardware') {
+    const hardwareLayers = this.hardwareLayers();
+    if (hardwareLayers.length > 1) {
+      // validation should have already caught this
+      throw Error(`Internal error: Expected 0 or 1 hardware layer, not ${hardwareLayers.length}`);
+    } else if (hardwareLayers.length === 1) {
+      const theLayers = hardwareLayers[0];
+      const { form } = theLayers;
       for(let layer of theLayers.layer) {
-        this.compileHardwareLayerToKmap(sections, layer, sect, theLayers.hardware);
+        this.compileHardwareLayerToKmap(sections, layer, sect, form);
       }
-      return sect;
-    }
-    // TODO-LDML: generate vkey mapping for touch-only keys
+    } // else: TODO-LDML do nothing if only touch layers
 
     return sect;
   }
@@ -147,7 +158,7 @@ export class KeysCompiler extends SectionCompiler {
   /**
    * TODO-LDML: from old 'keys'
    * Validate for purpose of kmap
-   * @param hardware
+   * @param hardware the 'form' parameter
    * @param layer
    * @returns
    */
@@ -162,9 +173,8 @@ export class KeysCompiler extends SectionCompiler {
 
     const keymap = Constants.HardwareToKeymap.get(hardware);
     if (!keymap) {
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidHardware({ hardware }));
+      this.callbacks.reportMessage(CompilerMessages.Error_InvalidHardware({ form: hardware }));
       valid = false;
-      return valid; // can't do anything else here
     }
 
     const uniqueKeys = calculateUniqueKeys([...this.keyboard.keys?.key]);
@@ -177,7 +187,7 @@ export class KeysCompiler extends SectionCompiler {
       const keys = layer.row[y].keys.split(' ');
 
       if (keys.length > keymap[y].length) {
-        this.callbacks.reportMessage(CompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({ row: y + 1, hardware }));
+        this.callbacks.reportMessage(CompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({ row: y + 1, hardware, modifier }));
         valid = false;
       }
 
@@ -201,7 +211,6 @@ export class KeysCompiler extends SectionCompiler {
 
     return valid;
   }
-
 
   private compileHardwareLayerToKmap(
     sections: GlobalSections,
@@ -234,5 +243,4 @@ export class KeysCompiler extends SectionCompiler {
     }
     return sect;
   }
-
 }

@@ -7,7 +7,7 @@ TOP_SRCDIR=${G_TEST_SRCDIR:-$(realpath "$(dirname "$0")/..")}/..
 TOP_BINDIR=${G_TEST_BUILDDIR:-$(realpath "$(dirname "$0/..")")}/..
 TESTDIR=${XDG_DATA_HOME:-$HOME/.local/share}/keyman/test_kmx
 
-. "$(dirname "$0")/"/test-helper.sh
+. "$(dirname "$0")"/test-helper.sh
 
 echo > "$ENV_FILE"
 
@@ -18,7 +18,7 @@ fi
 
 echo > "$PID_FILE"
 TEMP_DATA_DIR=$(mktemp --directory)
-echo "rm -rf ${TEMP_DATA_DIR}" >> "$PID_FILE"
+echo "rm -rf ${TEMP_DATA_DIR} || true" >> "$PID_FILE"
 
 COMMON_ARCH_DIR=
 [ -d "${TOP_SRCDIR}"/../../core/build/arch ] && COMMON_ARCH_DIR=${TOP_SRCDIR}/../../core/build/arch
@@ -56,7 +56,7 @@ if [ "$DISPLAY_SERVER" == "wayland" ]; then
   TMPFILE=$(mktemp)
   # mutter-Message: 18:56:15.422: Using Wayland display name 'wayland-1'
   mutter --wayland --headless --no-x11 --virtual-monitor 1024x768 &> "$TMPFILE" &
-  echo "kill -9 $!" >> "$PID_FILE"
+  echo "kill -9 $! || true" >> "$PID_FILE"
   sleep 1s
   export WAYLAND_DISPLAY
   WAYLAND_DISPLAY=$(grep "Using Wayland display" "$TMPFILE" | cut -d"'" -f2)
@@ -65,15 +65,15 @@ if [ "$DISPLAY_SERVER" == "wayland" ]; then
 else
   echo "Starting Xvfb..."
   Xvfb -screen 0 1024x768x24 :33 &> /dev/null &
-  echo "kill -9 $!" >> "$PID_FILE"
+  echo "kill -9 $! || true" >> "$PID_FILE"
   sleep 1
   echo "Starting Xephyr..."
   DISPLAY=:33 Xephyr :32 -screen 1024x768 &> /dev/null &
-  echo "kill -9 $!" >> "$PID_FILE"
+  echo "kill -9 $! || true" >> "$PID_FILE"
   sleep 1
   echo "Starting metacity"
   metacity --display=:32 &> /dev/null &
-  echo "kill -9 $!" >> "$PID_FILE"
+  echo "kill -9 $! || true" >> "$PID_FILE"
 
   export DISPLAY=:32
   echo "export DISPLAY=\"$DISPLAY\"" >> "$ENV_FILE"
@@ -101,7 +101,7 @@ fi
   fi
 
   ibus-daemon "${ARG_VERBOSE-}" --daemonize --panel=disable ${IBUS_CONFIG-} &> /tmp/ibus-daemon.log
-  echo "kill -9 $!" >> "$PID_FILE"
+  echo "kill -9 $! || true" >> "$PID_FILE"
   sleep 1s
 
   IBUS_ADDRESS=$(ibus address)
@@ -110,5 +110,5 @@ fi
   echo "export IBUS_ADDRESS=\"$IBUS_ADDRESS\"" >> "$ENV_FILE"
 
   "${TOP_BINDIR}"/src/ibus-engine-keyman "${ARG_VERBOSE-}" &> /tmp/ibus-engine-keyman.log &
-  echo "kill -9 $!" >> "$PID_FILE"
+  echo "kill -9 $! || true" >> "$PID_FILE"
   sleep 1s

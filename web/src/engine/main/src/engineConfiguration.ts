@@ -45,9 +45,6 @@ export class EngineConfiguration extends EventEmitter<EventMap> {
     this._paths = new PathConfiguration(options, this.sourcePath);
     if(typeof options.setActiveOnRegister == 'boolean') {
       this._activateFirstKeyboard = options.setActiveOnRegister;
-    } else if (typeof options.setActiveOnRegister == 'string') {
-      let str = options.setActiveOnRegister.toLowerCase();
-      this._activateFirstKeyboard = str === 'true';
     } else {
       this._activateFirstKeyboard = true;
     }
@@ -122,7 +119,7 @@ export interface InitOptionSpec extends PathOptionSpec {
    * Note that keyboards specified locally are synchronously loaded while cloud keyboards are async; as a
    * result, a locally-specified keyboard will generally be available "sooner", even if added "later".
    */
-  setActiveOnRegister?: string | boolean; // TODO: Convert to boolean. Option loader needs to be able to receive this as a string or boolean
+  setActiveOnRegister?: boolean;
 
   /**
    * Determines the default text shown on the spacebar.  If undefined, uses `LANGUAGE_KEYBOARD`
