@@ -1,0 +1,4 @@
+[binaries]
+c = ['$EMSCRIPTEN_BASE/emcc.py']
+cpp = ['$EMSCRIPTEN_BASE/em++.py']
+ar = ['$EMSCRIPTEN_BASE/emar.py']
