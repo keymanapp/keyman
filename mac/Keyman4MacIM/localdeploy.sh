@@ -42,7 +42,7 @@ if [[ -d "$KM4MIM_INSTALL_PATH" ]]; then
     rm -Rf "$KM4MIM_INSTALL_PATH"
 fi
 echo "Copying $KM4MIM_APP_PATH to $IMLIBRARY_PATH..."
-cp -R "$KM4MIM_APP_PATH" "$IMLIBRARY_PATH"
+/bin/cp -R "$KM4MIM_APP_PATH" "$IMLIBRARY_PATH"
 
 if [[ -d "$KM4MIM_INSTALL_PATH" ]]; then
     exit 0
