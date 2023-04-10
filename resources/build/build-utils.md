@@ -191,15 +191,27 @@ a user or called by another script:
   working on code within a dependency, you are currently expected to rebuild and
   test that dependency locally.
 
-  A dependency is similar to, but not the same as, a child project. Child
+  A module dependency is similar to, but not the same as, a child project. Child
   projects live in sub-folders of the parent project, whereas generally a
   dependency will be in another folder altogether.
 
-  Dependencies can be defined for all actions and targets, or may be limited to
-  specific action and/or targets.
+  Module dependencies can be defined for all actions and targets, or may be
+  limited to specific action and/or targets.
 
-  A dependency can be on a single target within a module, instead of all targets
-  within the module.
+  A module dependency can be on a single target within a module, instead of all
+  targets within the module.
+
+  **Dependency definitions**
+
+  It can be easy to confuse different dependency types!
+
+  * An _external dependency_ is a dependency on a 3rd party component, which
+    typically needs to be downloaded during the `configure` stage of a script.
+  * An _internal dependency_ is a dependency within the current script
+    itself, such as `build` being internally dependent on `configure`.
+  * A dependency on another builder script, as described above, is called a
+    _module dependency_.
+  * _Child projects_ are not dependencies. But they can feel quite similar.
 
 The first step in your script is to describe the available parameters, using
 [`builder_describe`], for example:
@@ -259,6 +271,25 @@ include.
 
 Use the longer form of `if ...; then` rather than the shorter `[ ... ] && `
 pattern, for consistency and readability.
+
+## Standard build script actions
+
+While no build script actions are pre-defined as such, there are a set of
+standard actions that we should be using where possible. The actions should
+be defined in the build script and 'actioned' in the order listed below.
+
+* `clean`: clean all artifacts. Running `clean` should generally be similar to
+  `git clean -fdx .`; the main difference is that user-created config files such
+  as codesigning controls would be kept.
+* `configure`: install _external dependencies_, create build scripts where tools
+  require it.
+* `build`: do the build. note: if _module dependency_ artifacts must be copied
+  or transformed at any stage, this should be done in the `build` action.
+* `test`: run automated unit tests. Some e2e tests may run here, so long as they
+  have no UX impact -- i.e. we should not run e2e tests that take over the
+  system keyboard or emit key events by default.
+* `install`: install the built artifact on the local system for use.
+* `publish`: publish the built artifacts to relevant repositories.
 
 # Internal dependencies
 
