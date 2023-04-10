@@ -40,9 +40,8 @@ function init() {
     const bannerHeight = Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio);
 
     // The OSK is not available until initialization is complete.
-    console.log(keyman.osk.bannerView);
     keyman.osk.bannerView.activeBannerHeight = bannerHeight;
-    keyman.osk.refreshLayout();
+    keyman.refreshOskLayout();
   });
 
   // keyman.addEventListener('keyboardloaded', setIsChiral);  // TODO:  fix + support these events.
@@ -199,8 +198,10 @@ function updateKMText(text) {
 
   console_debug('updateKMText(text='+text+') context.value='+keyman.context.getText());
 
-  keyman.context.setText(text);
-  keyman.resetContext();
+  if(text != keyman.context.getText()) {
+    keyman.context.setText(text);
+    keyman.resetContext();
+  }
 }
 
 function console_debug(s) {

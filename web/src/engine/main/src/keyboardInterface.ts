@@ -43,7 +43,9 @@ export default class KeyboardInterface extends KeyboardInterfaceBase {
     }
 
     // Final check that the script tag is valid and appropriate for the loading keyboard.
-    if(trueID.indexOf(Pk['KI']) != -1) {
+    if(!trueID) {
+      return;
+    } else if(trueID.indexOf(Pk['KI']) != -1) {
       Pk['KI'] = trueID;  // Take the script's version of the ID, which may include package namespacing.
     } else {
       console.error("Error when registering keyboard:  current SCRIPT tag's ID does not match!");

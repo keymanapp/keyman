@@ -54,6 +54,7 @@ function init() {
       if(bannerHeight > 0) {
         // The OSK is not available until initialization is complete.
         kmw.osk.bannerView.activeBannerHeight = bannerHeight;
+        keyman.refreshOskLayout();
       }
     });
 }
@@ -74,7 +75,7 @@ function showBanner(flag) {
 
 function setBannerImage(path) {
     var kmw=window['keyman'];
-    kmw.osk.banner.setOptions({"imagePath": path});
+    kmw.osk?.banner.setOptions({"imagePath": path});
 }
 
 function setBannerHeight(h) {
@@ -83,7 +84,7 @@ function setBannerHeight(h) {
     // its eventual display height.
     bannerHeight = h;
 
-    keyman.osk.bannerView.activeBannerHeight = h;
+    keyman.osk?.bannerView.activeBannerHeight = h;
   }
 
   // Refresh KMW's OSK
@@ -281,9 +282,7 @@ function setKeymanVal(text) {
         text = '';
     }
 
-    var resetContext = keyman.context.getText() != text;
-
-    if(resetContext) {
+    if(keyman.context.getText() != text) {
         keyman.context.setText(text);
         keyman.resetContext();
     }
