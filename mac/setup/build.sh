@@ -62,10 +62,10 @@ mkdir -p "$TARGETPATH"
 rm -rf "$TARGETAPP" || true
 
 # Copy new install image to output folder
-cp -R "$SOURCEAPP" "$TARGETPATH/"
+/bin/cp -R "$SOURCEAPP" "$TARGETPATH/"
 
 # Copy Keyman.app into install image
-cp -R "$KEYMANAPP" "$TARGETAPP/Contents/MacOS/Keyman.app"
+/bin/cp -R "$KEYMANAPP" "$TARGETAPP/Contents/MacOS/Keyman.app"
 
 # Copy textinputsource into install image
 cp textinputsource/textinputsource "$TARGETAPP/Contents/MacOS/textinputsource"
