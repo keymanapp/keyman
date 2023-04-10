@@ -25,7 +25,7 @@ EXTERN bool kmcmp_SetCompilerOptions(
 
 typedef int (*kmcmp_CompilerMessageProc)(int line, uint32_t dwMsgCode, char* szText, void* context);
 
-EXTERN uint32_t kmcmp_CompileKeyboardFile(
+EXTERN bool kmcmp_CompileKeyboardFile(
   char* pszInfile,
   char* pszOutfile,
   bool ASaveDebug,
@@ -35,7 +35,12 @@ EXTERN uint32_t kmcmp_CompileKeyboardFile(
   void* AmsgprocContext
 );
 
-EXTERN uint32_t kmcmp_CompileKeyboardFileToBuffer(
+/* Compile target */
+
+#define CKF_KEYMAN    0
+#define CKF_KEYMANWEB 1
+
+EXTERN bool kmcmp_CompileKeyboardFileToBuffer(
   char* pszInfile,
   void* pfkBuffer,
   bool ACompilerWarningsAsErrors,

@@ -1,7 +1,7 @@
 /*
 TODO: implement additional interfaces:
 
-  extern "C" uint32_t kmcmp_CompileKeyboardFileToBuffer(
+  extern "C" bool kmcmp_CompileKeyboardFileToBuffer(
     char* pszInfile,
     void* pfkBuffer,
     bool ACompilerWarningsAsErrors,
