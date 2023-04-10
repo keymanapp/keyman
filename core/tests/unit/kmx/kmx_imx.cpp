@@ -11,8 +11,8 @@
 #include "path.hpp"
 #include "state.hpp"
 #include "../kmnkbd/action_items.hpp"
-#include "../test_assert.h"
-#include "../test_color.h"
+#include <test_assert.h>
+#include <test_color.h>
 #include "../emscripten_filesystem.h"
 
 #include <map>

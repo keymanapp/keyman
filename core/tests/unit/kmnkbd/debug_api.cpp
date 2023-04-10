@@ -18,7 +18,7 @@
 #include "action_items.hpp"
 #include "debug_items.hpp"
 
-#include "../test_assert.h"
+#include <test_assert.h>
 #include "../emscripten_filesystem.h"
 
 using namespace km::kbp::kmx;

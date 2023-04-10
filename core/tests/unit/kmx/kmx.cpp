@@ -24,8 +24,8 @@
 #include "state.hpp"
 #include "utfcodec.hpp"
 
-#include "../test_assert.h"
-#include "../test_color.h"
+#include <test_assert.h>
+#include <test_color.h>
 #include "../emscripten_filesystem.h"
 
 #include "kmx_test_source.hpp"
