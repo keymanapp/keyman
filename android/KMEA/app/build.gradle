@@ -16,19 +16,15 @@ android {
         // VERSION_CODE and VERSION_NAME from version.gradle but Gradle removes them for libraries
         buildConfigField "String", "KEYMAN_ENGINE_VERSION_NAME", "\""+VERSION_NAME+"\""
         buildConfigField "String", "VERSION_ENVIRONMENT", "\""+VERSION_ENVIRONMENT+"\""
+
+        // Sepcify library filename keyman-engine-$CONFIG.aar
+        setProperty("archivesBaseName", "keyman-engine")
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-        }
-    }
-
-    // Sepcify library filename $CONFIG/keyman-engine.aar
-    libraryVariants.all { variant -> 
-        variant.outputs.all {
-            outputFileName = "${variant.buildType.name}/keyman-engine.aar"
         }
     }
 
