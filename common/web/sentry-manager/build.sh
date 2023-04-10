@@ -13,7 +13,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # This script runs from its own folder
-cd "$(dirname "$THIS_SCRIPT")"
+cd "$THIS_SCRIPT_PATH"
 
 builder_describe "Builds the Sentry-reporting module used with Keyman Engine for Web" \
   "@/common/web/keyman-version" \
