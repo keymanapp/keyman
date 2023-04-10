@@ -86,6 +86,7 @@ typedef FILE_STORE *PFILE_STORE;
 
 struct FILE_KEY {
 	WCHAR   Key;            // WCHAR for consistency; only a byte used however
+	WORD    LineStoreIndex;
 	DWORD   Line;
 	DWORD   ShiftFlags;
 	PWSTR  dpOutput;		// from start of key structure

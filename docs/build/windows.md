@@ -101,18 +101,25 @@ Building:
 * Ant
 * Gradle
 * Maven
+* OpenJDK 11
 
 ```ps1
 # Elevated PowerShell
 choco install android-sdk android-studio ant gradle maven
 # optionally install sdk images
-sdkmanager "system-images;android-30;google_apis;armeabi-v7a"
+sdkmanager "system-images;android-33;google_apis;armeabi-v7a"
 sdkmanager --update
 sdkmanager --licenses
 ```
 
 * Run Android Studio once after installation to install additional components
   such as emulator images and SDK updates.
+
+**Required environment variables**:
+* [`JAVA_HOME`](#java_home)
+
+**Optional environment variables**:
+* [`JAVA_HOME_11`](#java_home)
 
 Building:
 * [Building Keyman for Android](../../android/README.md)
@@ -175,9 +182,9 @@ You can use Windows Settings to add these environment variables permanently:
 * KeymanWeb
 
 **Requirements**:
-* emscripten 2.0.23+
-* node.js 14+
-* openjdk 8+
+* emscripten 3.1.32
+* node.js 18
+* [openjdk 11](https://learn.microsoft.com/en-us/java/openjdk/download#openjdk-11)+
 
 ```ps1
 # Elevated PowerShell
@@ -340,6 +347,17 @@ be used to sign executables when you build a release.
 To include UserDefines.mak in the build, use the command line parameter
 `-DUSERDEFINES`. You can also set an environment variable `USERDEFINES=1` to get
 the same result.
+
+### JAVA_HOME
+
+This environment variable tells Gradle what version of Java to use for building Keyman for Android.
+
+**Multiple versions of Java:** If you need to build Keyman for Android 16.0 or older versions, you can set `JAVA_HOME_11` to the OpenJDK 11 path and `JAVA_HOME` to the OpenJDK 8 path. This will build both versions correctly from command line. But note that you do need to update your `JAVA_HOME` env var to the associated version before opening Android Studio and loading any Android projects. `JAVA_HOME_11` is mostly used by CI.
+
+```bat
+SET JAVA_HOME="path to OpenJDK 8"
+SET JAVA_HOME_11="path to OpenJDK 11"
+```
 
 ## Optional Tools
 

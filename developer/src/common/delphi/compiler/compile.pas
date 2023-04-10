@@ -64,7 +64,7 @@ type
 
   FILE_KEY = record
     Key: WCHAR;            // WCHAR -- actually a WORD
-    packing: WORD;
+    LineStoreIndex: WORD;
     Line: DWORD;
     ShiftFlags: DWORD;
     dpOutput: PWideChar;		// from start of key structure
@@ -174,6 +174,7 @@ type
   TCompilerOptions = record
     dwSize: DWORD;
     ShouldAddCompilerVersion: BOOL;
+    UseKmcmpLib: BOOL;
   end;
 
   COMPILER_OPTIONS = TCompilerOptions;

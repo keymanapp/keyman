@@ -9,11 +9,7 @@
 
 # Build all binary test keyboards
 
-if compiler.get_id() == 'emscripten'
-  binary_test_path = '/'
-else
-  binary_test_path = meson.current_build_dir()
-endif
+binary_test_path = meson.current_build_dir()
 
 binary_tests = [
   'b_000_zero_checksum'

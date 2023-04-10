@@ -23,7 +23,8 @@ if icu_uc.found()
   defns += '-DHAVE_ICU4C'
 endif
 
-if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang' or compiler.get_id() == 'emscripten'
+# TODO -- why are these differing from the standard.meson.build flags?
+if cpp_compiler.get_id() == 'gcc' or cpp_compiler.get_id() == 'clang' or cpp_compiler.get_id() == 'emscripten'
   warns = [
      '-Wno-missing-field-initializers',
      '-Wno-unused-parameter'
@@ -56,7 +57,7 @@ endif
 
 # Build ldml test executable
 
-if compiler.get_id() == 'emscripten'
+if cpp_compiler.get_id() == 'emscripten'
   tests_flags = ['--embed-file', join_paths(meson.current_build_dir(),'keyboards','@')]
   tests_flags += ['--embed-file', join_paths(meson.current_build_dir(),'invalid-keyboards','@')]
   test_path = '/'

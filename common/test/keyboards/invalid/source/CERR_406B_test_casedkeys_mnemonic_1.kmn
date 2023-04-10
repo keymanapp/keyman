@@ -1,0 +1,11 @@
+c Tests cased keys - invalid with mnemonic layout
+store(&NAME) 'Test &CasedKeys'
+store(&mnemoniclayout) '1'
+begin Unicode > use(main)
+
+group(main) using keys
+
+store(&CasedKeys) [K_A] [K_E] [K_I] [K_O] [K_U] [K_1] .. [K_4]
+
++ [K_A] > 'aaah'
++ [SHIFT K_A] > 'AAAH'
