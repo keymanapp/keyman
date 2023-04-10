@@ -98,3 +98,12 @@ foreach kbd : tests
   endif
 endforeach
 
+
+apitest = executable('api-test', 'api-test.cpp',
+    cpp_args: defns,
+    include_directories: inc,
+    name_suffix: name_suffix,
+    link_args: links + tests_flags,
+    objects: lib.extract_all_objects())
+
+test('api-test', apitest)
