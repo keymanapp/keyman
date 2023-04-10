@@ -52,7 +52,6 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   "build" \
   "test" \
   "${archtargets[@]}" \
-  "--debug,-d                      configuration is 'debug', not 'release'" \
   "--test=opt_tests,-t             test[s] to run (space separated)"
 
 builder_parse "$@"
