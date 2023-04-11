@@ -44,6 +44,7 @@ function init() {
 
     var kmw=window['keyman'];
     kmw['showKeyboardList'] = menuKeyDown;
+    kmw['menuKeyUp'] = menuKeyUp;
     kmw['hideKeyboard'] = hideKeyboard;
     kmw['getOskHeight'] = getOskHeight;
     kmw['getOskWidth'] = getOskWidth;
@@ -72,13 +73,13 @@ function verifyLoaded() {
 
 function showBanner(flag) {
     console.log("Setting banner display for dictionaryless keyboards to " + flag);
-    keyman.osk.banner.setOptions({'alwaysShow': flag});
+    keyman.osk.bannerController.setOptions({'alwaysShow': flag});
 }
 
 function setBannerImage(path) {
     var kmw=window['keyman'];
     if(kmw.osk) {
-        kmw.osk.banner.setOptions({"imagePath": path});
+        kmw.osk.bannerController.setOptions({"imagePath": path});
     }
 }
 
@@ -94,7 +95,7 @@ function setBannerHeight(h) {
   }
 
   // Refresh KMW's OSK
-  kmw.refreshOskLayout();
+  keyman.refreshOskLayout();
   doResetContext();
 }
 
@@ -136,7 +137,7 @@ function setKeymanLanguage(stub) {
 
     KeymanWeb.registerStub(stub);
 
-    kmw.setActiveKeyboard(stub.KP + '::' + stub.KI, stub.KLC).then(function() {
+    kmw.setActiveKeyboard(stub.KI, stub.KLC).then(function() {
         keyman.refreshOskLayout();
         doResetContext();
     });
