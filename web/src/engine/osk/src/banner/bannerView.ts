@@ -112,6 +112,7 @@ export default class BannerView implements OSKViewComponent {
         return;
       } else {
         let prevBanner = this.activeBanner;
+        this.activeBanner = banner;
         this.bannerContainer.replaceChild(banner.getDiv(), prevBanner.getDiv());
       }
     } else {
@@ -165,7 +166,6 @@ export class BannerController {
   private _activeType: BannerType;
   private _options: BannerOptions = {};
   private container: BannerView;
-  private activeBanner: Banner;
   private alwaysShow: boolean;
   private imagePath?: string = "";
 
@@ -242,7 +242,7 @@ export class BannerController {
       this._options[key] = optionSpec[key];
 
       // If no banner instance exists yet, go with a safe, blank initialization.
-      if(!this.activeBanner) {
+      if(!this.container.banner) {
         this.selectBanner('inactive');
       }
     }
