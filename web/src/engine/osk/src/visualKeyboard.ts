@@ -5,6 +5,7 @@ import {
   ActiveLayout,
   ButtonClass,
   DeviceSpec,
+  type InternalKeyboardFont,
   Keyboard,
   KeyboardProperties,
   KeyDistribution,
@@ -1544,7 +1545,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       this.styleSheet.parentNode.removeChild(this.styleSheet);
     }
 
-    var i, kfd = activeStub.textFont, ofd = activeStub.oskFont;
+    var kfd = activeStub.textFont, ofd = activeStub.oskFont;
 
     // Add and define style sheets for embedded fonts if necessary (each font-face style will only be added once)
     this.styleSheetManager.addStyleSheetForFont(kfd, this.fontRootPath, this.device.OS);
@@ -1570,14 +1571,15 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    *  @return {string}
    *
    **/
-  addFontStyle(kfd, ofd): string {
-    let s: string;
+  addFontStyle(kfd: InternalKeyboardFont, ofd: InternalKeyboardFont): string {
+    let s: string = '';
+
+    // Prefer an OSK-specific font over the general-use font.
+    let fd: InternalKeyboardFont = ofd ?? (kfd ?? null);
 
     // Set font family for OSK text
-    if (typeof (ofd) != 'undefined') {
+    if (fd) {
       s = '.kmw-key-text{\nfont-family:"' + ofd['family'].replace(/\u0022/g, '').replace(/,/g, '","') + '";\n}\n';
-    } else if (typeof (kfd) != 'undefined') {
-      s = '.kmw-key-text{\nfont-family:"' + kfd['family'].replace(/\u0022/g, '').replace(/,/g, '","') + '";\n}\n';
     }
 
     // Return the style string
