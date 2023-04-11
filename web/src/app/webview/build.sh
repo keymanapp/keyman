@@ -66,6 +66,8 @@ if builder_start_action build; then
   mkdir -p "$KEYMAN_ROOT/web/build/app/resources/osk"
   cp -r "$KEYMAN_ROOT/web/src/resources/osk/." "$KEYMAN_ROOT/web/build/app/resources/osk/"
 
+  "$KEYMAN_ROOT/web/src/test/manual/embed/android-harness/build.sh"
+
   builder_finish_action success build
 fi
 
