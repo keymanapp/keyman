@@ -1,4 +1,4 @@
-/*
+/**
  * Keyman is copyright (C) SIL International. MIT License.
  * 
  * ActionArrayOptimizer.m
@@ -53,7 +53,6 @@
       // 2. combining the previous actions caused them to cancel each other out
       nextAction = action;
     }
-    NSLog(@"%@\n", action.typeName.description);
   }
 
   if (nextAction) {

@@ -82,6 +82,8 @@ NSRange _previousSelRange;
         );
     }
 
+  NSLog(@"***SGS isClientAppLegacy for clientAppId = %@: %@", clientAppId, result?@"yes":@"no");
+
     return result;
 }
 
@@ -97,8 +99,10 @@ NSRange _previousSelRange;
             NSRange range =  NSMakeRange(0, clientAppId.length);
             
             NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern: (NSString *) legacyApp options: 0 error: &error];
-            if([regex matchesInString:clientAppId options:0 range:range]) {
-                return YES;
+            NSArray *matchesArray = [regex matchesInString:clientAppId options:0 range:range];
+            if(matchesArray.count>0) {
+              NSLog(@"isClientAppLegacy: found match for legacy app %@: ", clientAppId);
+               return YES;
             }
         }
     }
@@ -108,6 +112,7 @@ NSRange _previousSelRange;
 
 // This is the public initializer.
 - (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender {
+    NSLog(@"***SGS initWithClient clientAppId = %@", clientAppId);
     self.senderForDeleteBack = sender;
 
     BOOL legacy = [self isClientAppLegacy:clientAppId];
@@ -129,6 +134,7 @@ NSRange _previousSelRange;
 }
 
 - (void)switchToLegacyMode {
+  NSLog(@"***SGS switchToLegacyMode called");
     _legacyMode = YES;
     if ([self.AppDelegate debugMode])
         NSLog(@"Using legacy mode for this app.");
@@ -446,6 +452,9 @@ NSRange _previousSelRange;
             [self.contextBuffer appendString:output];
         }
         else if ([actionType isEqualToString:Q_BACK]) {
+            NSLog(@"***SGS handle backspace");
+            NSLog(@"self.contextBuffer %@", self.contextBuffer);
+
             [self.contextBuffer deleteLastNullChars];
             NSUInteger dk = [self.contextBuffer deleteLastDeadkeys];
             NSInteger n = [[action objectForKey:actionType] integerValue] - dk;
@@ -455,6 +464,7 @@ NSRange _previousSelRange;
             [self.contextBuffer deleteLastNChars:n];
             n -= dc;
 
+          NSLog(@"number of characters to delete %ld", (long)n);
             // n is now the number of characters to delete from the client.
             if (n > 0) {
                 deleteBackPosted = [self deleteBack:n in:sender for: event];
@@ -469,6 +479,7 @@ NSRange _previousSelRange;
             continue;
         }
         else if ([actionType isEqualToString:Q_RETURN]) {
+          NSLog(@"***SGS handleKeymanEngineActions Q_RETURN");
             return YES;
         }
         else if ([actionType isEqualToString:Q_BEEP]) {
@@ -549,6 +560,7 @@ NSRange _previousSelRange;
 // we handle here should never be passed on to Keyman Engine for transform,
 // as it will be part of the output from the transform.
 - (BOOL)handleDeleteBackLowLevel:(NSEvent *)event {
+    NSLog(@"***SGS handleDeleteBackLowLevel");
     self.ignoreNextDeleteBackHighLevel = NO;
     if(event.keyCode == kVK_Delete && _legacyMode && [self pendingBuffer].length > 0) {
         BOOL updateEngineContext = YES;
@@ -631,6 +643,7 @@ NSRange _previousSelRange;
     BOOL handled = [self handleKeymanEngineActions:event in: sender];
 
     if(handled) {
+        NSLog(@"***SGS handleEvent 'Send the final transform???'");
         // TODO: Send the final transform that we've built up
         // [self sendFinalTransformToClient: sender deleteLeft: nDeleteLeft textToInsert: strTextToInsert];
     }
@@ -689,6 +702,7 @@ NSRange _previousSelRange;
     unsigned short keyCode = event.keyCode;
     switch (keyCode) {
         case kVK_Delete:
+            NSLog(@"***SGS handleDefaultKeymanEngineActions kVK_Return");
             [self processUnhandledDeleteBack: sender updateEngineContext: &updateEngineContext];
             break;
 
@@ -708,6 +722,7 @@ NSRange _previousSelRange;
 
         case kVK_Return:
         case kVK_ANSI_KeypadEnter:
+            NSLog(@"***SGS handleDefaultKeymanEngineActions kVK_Return");
             charactersToAppend = @"\n";
             break;
 
@@ -748,6 +763,9 @@ NSRange _previousSelRange;
         NSLog(@"Attempting to back-delete %li characters.", n);
     NSRange selectedRange = [self getSelectionRangefromClient:client];
     NSInteger pos = selectedRange.location;
+  
+    NSLog(@"***SGS delete at position %ld", (long)pos);
+    NSLog(@"***SGS _legacyMode: %s", _legacyMode?"yes":"no");
     if (!_legacyMode)
         [self deleteBack:n at: pos in: client];
     if (_legacyMode)
@@ -835,7 +853,8 @@ NSRange _previousSelRange;
 }
 
 - (BOOL)deleteBackLegacy:(NSUInteger)n at:(NSUInteger) pos with:(NSRange) selectedRange for:(NSEvent *) event {
-    if (self.contextBuffer != nil && (pos == 0 || pos == NSNotFound)) {
+    NSLog(@"***SGS deleteBackLegacy");
+   if (self.contextBuffer != nil && (pos == 0 || pos == NSNotFound)) {
         pos = self.contextBuffer.length + n;
     }
 
@@ -889,6 +908,7 @@ NSRange _previousSelRange;
 }
 
 - (void)postDeleteBacks:(NSUInteger)count for:(NSEvent *) event {
+  NSLog(@"***SGS postDeleteBacks");
     _numberOfPostedDeletesToExpect = count;
 
     _sourceFromOriginalEvent = CGEventCreateSourceFromEvent([event CGEvent]);

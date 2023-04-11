@@ -310,12 +310,14 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 break;
 
             case kCGEventKeyDown:
-                // Pass back delete events through to the input method event handler
+                NSLog(@"***SGS Event tap handling key down event: %@", sysEvent.keyCode);
+               // Pass back delete events through to the input method event handler
                 // because some 'legacy' apps don't allow us to see back delete events
                 // that we have synthesized (and we need to see them, for serialization
                 // of events)
                 if(sysEvent.keyCode == kVK_Delete && appDelegate.inputController != nil) {
-                    [appDelegate.inputController handleDeleteBackLowLevel:sysEvent];
+                    NSLog(@"***SGS Event tap handling kVK_Delete.");
+                   [appDelegate.inputController handleDeleteBackLowLevel:sysEvent];
                 }
 
                 switch(sysEvent.keyCode) {
@@ -1189,8 +1191,10 @@ extern const CGKeyCode kProcessPendingBuffer;
 - (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent{
 
     CGEventRef ev = CGEventCreateKeyboardEvent (source, virtualKey, true); //down
-    if (postEvent)
-        postEvent(ev);
+    if (postEvent) {
+      NSLog(@"***SGS postKeyboardEventWithSource, keycode: %d", virtualKey);
+      postEvent(ev);
+    }
     CFRelease(ev);
     if (virtualKey != kProcessPendingBuffer) { // special 0xFF code is not a real key-press, so no "up" is needed
         ev = CGEventCreateKeyboardEvent (source, virtualKey, false); //up
