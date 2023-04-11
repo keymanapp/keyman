@@ -39,6 +39,12 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
+if builder_has_option --dry-run; then
+  DRY_RUN=--dry-run
+else
+  DRY_RUN=
+fi
+
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action clean; then
@@ -94,7 +100,6 @@ fi
 
 if builder_start_action publish; then
   . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-  builder_publish_to_npm
 
   # For now, kmc will have responsibility for publishing keyman-version and
   # common-types, as well as all the other dependent modules. In the future, we
@@ -107,6 +112,9 @@ if builder_start_action publish; then
   "$KEYMAN_ROOT/developer/src/kmc-model/build.sh" publish $DRY_RUN
   "$KEYMAN_ROOT/developer/src/kmc-model-info/build.sh" publish $DRY_RUN
   "$KEYMAN_ROOT/developer/src/kmc-package/build.sh" publish $DRY_RUN
+
+  # Finally, publish kmc
+  builder_publish_to_npm
 
   builder_finish_action success publish
 fi
