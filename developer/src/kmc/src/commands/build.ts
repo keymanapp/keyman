@@ -27,6 +27,12 @@ export function declareBuild(program: Command) {
 async function build(infile: string, options: BuildActivityOptions): Promise<boolean> {
   console.log(`Building ${infile}`);
 
+  if(!fs.existsSync(infile)) {
+    // TODO: consolidate errors
+    console.error(`File ${infile} does not exist`);
+    process.exit(2);
+  }
+
   // If infile is a directory, then we treat that as a project and build it
   if(fs.statSync(infile).isDirectory()) {
     return (new BuildProject()).build(infile, options);
@@ -41,6 +47,7 @@ async function build(infile: string, options: BuildActivityOptions): Promise<boo
     extensions += build.sourceExtension + ', ';
   }
 
+  // TODO: consolidate errors
   console.error(`Unrecognised input file ${infile}, expecting ${extensions}or project folder`);
   process.exit(2);
 }
