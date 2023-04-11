@@ -129,7 +129,7 @@ function setIsChiral(keyboardProperties) {
 
 function setKeymanLanguage(k) {
   KeymanWeb.registerStub(k);
-  keyman.setActiveKeyboard(k.KP + '::'+k.KI, k.KLC);
+  keyman.setActiveKeyboard(k.KI, k.KLC);
 }
 
 function setSpacebarText(mode) {
