@@ -8,8 +8,9 @@ if(_debug) {
         document.documentElement.appendChild(iframe);
         iframe.parentNode.removeChild(iframe);
         iframe = null;
-        if (typeof(window.webkit) != 'undefined')
+        if (typeof(window.webkit) != 'undefined') {
             window.webkit.messageHandlers.keyman.postMessage("ios-log:#iOS#" + log);
+        }
     };
     console.debug = console.log;
     console.info = console.log;
@@ -27,6 +28,7 @@ var bannerHeight = 0;
 var sentryManager = new KeymanSentryManager({
     hostPlatform: "ios"
 });
+
 sentryManager.init();
 
 window.addEventListener('load', init, false);
@@ -75,7 +77,9 @@ function showBanner(flag) {
 
 function setBannerImage(path) {
     var kmw=window['keyman'];
-    kmw.osk?.banner.setOptions({"imagePath": path});
+    if(kmw.osk) {
+        kmw.osk.banner.setOptions({"imagePath": path});
+    }
 }
 
 function setBannerHeight(h) {
@@ -84,7 +88,9 @@ function setBannerHeight(h) {
     // its eventual display height.
     bannerHeight = h;
 
-    keyman.osk?.bannerView.activeBannerHeight = h;
+    if(keyman.osk) {
+        keyman.osk.bannerView.activeBannerHeight = h;
+    }
   }
 
   // Refresh KMW's OSK

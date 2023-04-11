@@ -183,8 +183,8 @@ update_bundle ( ) {
         cp "$KEYMAN_ROOT/$KMW_PRODUCT/index.js"             "$base_dir/$BUNDLE_PATH/keymanios.js"
 
         if [ "$CONFIG" == "Debug" ]; then
-          cp "$KEYMAN_ROOT/$KMW_PRODUCT/index.js.map"       "$base_dir/$BUNDLE_PATH/index.js.map"
-        elif [ -f "$base_dir/$BUNDLE_PATH/index.js.map" ]; then
+          cp "$KEYMAN_ROOT/$KMW_PRODUCT/index.js.map"       "$base_dir/$BUNDLE_PATH/keyman.js.map"
+        elif [ -f "$base_dir/$BUNDLE_PATH/keyman.js.map" ]; then
           rm                               "$base_dir/$BUNDLE_PATH/keyman.js.map"
         fi
 

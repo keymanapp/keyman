@@ -64,7 +64,7 @@ if builder_start_action build; then
   compile $SUBPROJECT_NAME
 
   mkdir -p "$KEYMAN_ROOT/web/build/app/resources/osk"
-  cp -r "$KEYMAN_ROOT/web/src/resources/osk/" "$KEYMAN_ROOT/web/build/app/resources/"
+  cp -r "$KEYMAN_ROOT/web/src/resources/osk/." "$KEYMAN_ROOT/web/build/app/resources/osk/"
 
   builder_finish_action success build
 fi
