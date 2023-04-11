@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.85 alpha 2023-04-11
+
+* chore(developer): AddWarning and SetError cleanup (#8571)
+* fix(developer): add DRY_RUN variable to build.sh (#8576)
+* fix(ios): fixes xcode-triggered debug, run builds (#8575)
+
 ## 17.0.84 alpha 2023-04-10
 
 * epic: kmcompx - kmcmpdll cross-platform compiler (#7330)
