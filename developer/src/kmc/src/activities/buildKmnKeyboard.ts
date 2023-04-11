@@ -1,27 +1,32 @@
 import * as path from 'path';
-import { BuildCommandOptions } from '../commands/build.js';
+import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
 import { Compiler } from '@keymanapp/kmc-kmn';
 import { platform } from 'os';
 
-export async function buildKmnKeyboard(infile: string, options: BuildCommandOptions): Promise<boolean> {
+export class BuildKmnKeyboard implements BuildActivity {
+  public get name(): string { return 'Keyman keyboard'; }
+  public get sourceExtension(): string { return '.kmn'; }
+  public get compiledExtension(): string { return '.kmx'; }
+  public get description(): string { return 'Build a Keyman keyboard'; }
+  public async build(infile: string, options: BuildActivityOptions): Promise<boolean> {
+    let compiler = new Compiler();
+    if(!await compiler.init()) {
+      return false;
+    }
 
-  let compiler = new Compiler();
-  if(!await compiler.init()) {
-    return false;
+    // We need to resolve paths to absolute paths before calling kmc-kmn
+    let outfile = (options.outFile ?? infile).replace(/\.km.$/i, this.compiledExtension);
+
+    infile = getPosixAbsolutePath(infile);
+    outfile = getPosixAbsolutePath(outfile);
+
+    // TODO: Currently this only builds .kmn->.kmx, and targeting .js is as-yet unsupported
+    // TODO: Support additional options compilerWarningsAsErrors, warnDeprecatedCode
+    return compiler.run(infile, outfile, {
+      saveDebug: options.debug,
+      shouldAddCompilerVersion: options.compilerVersion,
+    });
   }
-
-  // We need to resolve paths to absolute paths before calling kmc-kmn
-  let outfile = (options.outFile ?? infile).replace(/\.km.$/i, '.kmx');
-
-  infile = getPosixAbsolutePath(infile);
-  outfile = getPosixAbsolutePath(outfile);
-
-  // TODO: Currently this only builds .kmn->.kmx, and targeting .js is as-yet unsupported
-  // TODO: Support additional options compilerWarningsAsErrors, warnDeprecatedCode
-  return compiler.run(infile, outfile, {
-    saveDebug: options.debug,
-    shouldAddCompilerVersion: options.compilerVersion,
-  });
 }
 
 function getPosixAbsolutePath(filename: string): string {
