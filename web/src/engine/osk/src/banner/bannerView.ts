@@ -114,11 +114,14 @@ export default class BannerView implements OSKViewComponent {
         let prevBanner = this.activeBanner;
         this.bannerContainer.replaceChild(banner.getDiv(), prevBanner.getDiv());
       }
+    } else {
+      this.activeBanner = banner;
+      if(banner) {
+        this.bannerContainer.appendChild(banner.getDiv());
+      }
     }
 
-    this.activeBanner = banner;
-    if(banner) {
-      this.bannerContainer.appendChild(banner.getDiv());
+    if(!(banner instanceof BlankBanner)) {
       banner.height = this.activeBannerHeight;
     }
 
