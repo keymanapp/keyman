@@ -78,6 +78,7 @@ export abstract class Banner {
 
   public appendStyleSheet() {
     // TODO: add stylesheets
+    // See VisualKeyboard's method + 'addFontStyle' for current handling.
   }
 
   /**

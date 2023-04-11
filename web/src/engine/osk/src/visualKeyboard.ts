@@ -1574,12 +1574,19 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   addFontStyle(kfd: InternalKeyboardFont, ofd: InternalKeyboardFont): string {
     let s: string = '';
 
-    // Prefer an OSK-specific font over the general-use font.
-    let fd: InternalKeyboardFont = ofd ?? (kfd ?? null);
+    let family = (fd: InternalKeyboardFont) => fd.family.replace(/\u0022/g, '').replace(/,/g, '","');
 
-    // Set font family for OSK text
-    if (fd) {
-      s = '.kmw-key-text{\nfont-family:"' + ofd['family'].replace(/\u0022/g, '').replace(/,/g, '","') + '";\n}\n';
+    // Set font family for OSK text, suggestion text
+    if (kfd || ofd) {
+      s = `
+.kmw-key-text {
+  font-family: "${family(ofd || kfd)}";
+}
+
+.kmw-suggestion-text {
+  font-family: "${family(kfd || ofd)}";
+}
+`;
     }
 
     // Return the style string
