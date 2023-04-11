@@ -55,9 +55,6 @@ function buildLdmlKeyboardToMemory(inputFilename: string, options: BuildActivity
   if (!source) {
     return [null, null, null];
   }
-  if (!k.validate(source)) {
-    return [null, null, null];
-  }
   let kmx = k.compile(source);
   if (!kmx) {
     return [null, null, null];
