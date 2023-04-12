@@ -8,13 +8,15 @@ endif
 
 subdir('stubdata')
 subdir('common')
-subdir('i18n')
-# subdir('io')
-#subdir('layout')
-#subdir('layoutex')
 
-# subdir('tools')
+# TODO-LDML: Not used now, will need for regex
+# subdir('i18n')
+
+## Note: The following subdirs are not used by Keyman (at present)
 
 # subdir('data')
-
+# subdir('io')
+# subdir('layout')
+# subdir('layoutex')
 # subdir('test')
+# subdir('tools')

@@ -7,17 +7,17 @@
 # ICU4C is used for repertoire tests
 
 
-if build_machine.system() == 'linux'
-  # use pkg-config on linux
+if target_machine.system() == 'linux'
+  # use pkg-config when targetting linux
   pkgconfig = 'pkg-config'
   icu_uc = dependency('icu-uc', required: true)
 else
   # load ICU from wrap
+  # Requires meson of about 0.57+
   icu4c = subproject('icu-minimal', default_options: [ 'default_library=static', 'cpp_std=c++17', 'warning_level=0',
 'werror=false']) # TODO-LDML: options: static, no data (these are in the meson build files)
   icu_uc = icu4c.get_variable('icuuc_dep')
 endif
-
 
 if icu_uc.found()
   defns += '-DHAVE_ICU4C'
