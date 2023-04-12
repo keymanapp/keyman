@@ -30,8 +30,8 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "clean                     cleans build/ folder" \
   "bundle                    creates a bundled version of kmc" \
   "test                      run automated tests for kmc" \
-  "pack                      create an npm package" \
-  "publish                   publish to npm" \
+  "pack                      build a local .tgz pack for testing (note: all npm modules in the repo will be packed by this script)" \
+  "publish                   publish to npm (note: all npm modules in the repo will be published by this script)" \
   "--build-path=BUILD_PATH   build directory for bundle" \
   "--dry-run,-n              don't actually publish, just dry run"
 builder_describe_outputs \

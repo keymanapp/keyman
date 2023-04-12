@@ -24,7 +24,7 @@ builder_describe "Build Keyman Developer Compiler Module for .kmn to .kmx" \
   "build" \
   "clean" \
   "test" \
-  "pack" \
+  "pack                      build a local .tgz pack for testing" \
   "publish                   publish to npm" \
   "--dry-run,-n              don't actually publish, just dry run"
 
