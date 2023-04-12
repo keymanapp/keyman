@@ -103,6 +103,7 @@ readonly PACKAGES=(
   common/web/keyman-version
   common/web/types
   common/models/types
+  core/include/ldml
   developer/src/kmc-keyboard
   developer/src/kmc-kmn
   developer/src/kmc-model

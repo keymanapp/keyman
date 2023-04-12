@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Packages the @keymanapp/models-types package.
+# Packages the @keymanapp/ldml-keyboard-constants package.
 #
 
 # Exit on command failure and when using unset variables:
@@ -16,8 +16,8 @@ cd "$THIS_SCRIPT_PATH"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-
-builder_describe "Build Keyman model types package" \
+builder_describe "Build Keyman ldml-keyboard-constants package" \
+  "@/common/web/keyman-version" \
   "clean" \
   "configure" \
   "build" \
@@ -28,7 +28,7 @@ builder_describe "Build Keyman model types package" \
 
 builder_describe_outputs \
   configure     /node_modules \
-  build         /common/models/types/build/common/models/types/tsconfig.tsbuildinfo
+  build         /core/include/ldml/build/keyboardprocessor_ldml.js
 
 builder_parse "$@"
 
@@ -56,7 +56,7 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action test; then
-  npm test
+  # no tests at this time
   builder_finish_action success test
 fi
 

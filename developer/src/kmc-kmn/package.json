@@ -12,6 +12,9 @@
   "exports": {
     ".": "./build/src/main.js"
   },
+  "files": [
+    "/build/src/"
+  ],
   "scripts": {
     "build": "tsc -b",
     "test": "cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha",
