@@ -15,7 +15,7 @@
 #include "state.hpp"
 #include "action_items.hpp"
 
-#include "../test_assert.h"
+#include <test_assert.h>
 
 #if defined(__GNUC__) || defined(__clang__)
 #define PRAGMA(X)                   _Pragma(#X)

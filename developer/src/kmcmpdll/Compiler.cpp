@@ -90,6 +90,8 @@
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
 
+#include "../kmcmplib/include/kmcmplibapi.h"
+
 int xatoi(PWSTR *p);
 int atoiW(PWSTR p);
 void safe_wcsncpy(PWSTR out, PWSTR in, int cbMax);
@@ -214,6 +216,7 @@ BOOL FSaveDebug, FCompilerWarningsAsErrors, FWarnDeprecatedCode;   // I4865   //
 BOOL FShouldAddCompilerVersion = TRUE;
 BOOL FOldCharPosMatching = FALSE, FMnemonicLayout = FALSE;
 NamedCodeConstants *CodeConstants = NULL;
+
 int BeginLine[4];
 
 /* Compile target */
@@ -288,19 +291,31 @@ BOOL AddCompileMessage(DWORD msg)
   return FALSE;
 }
 
-typedef struct _COMPILER_OPTIONS {
-  DWORD dwSize;
-  BOOL ShouldAddCompilerVersion;
-} COMPILER_OPTIONS;
-
-typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
+bool flag_use_new_kmcomp  = true;   // flag to switch to new kmcompx
 
 extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options) {
   if(!options || options->dwSize < sizeof(COMPILER_OPTIONS)) {
     return FALSE;
   }
+
+  flag_use_new_kmcomp = options->UseKmcmpLib;
+
+  //printf("\n---> started in SetCompilerOptions() of kmcmpdll\n");
+  if ( flag_use_new_kmcomp )
+  {
+    KMCMP_COMPILER_OPTIONS kmcmp_options = {0};
+    kmcmp_options.dwSize = sizeof(KMCMP_COMPILER_OPTIONS);
+    kmcmp_options.ShouldAddCompilerVersion = options->ShouldAddCompilerVersion;
+    return kmcmp_SetCompilerOptions(&kmcmp_options);
+  }
+  //printf("--->  stayed in SetCompilerOptions() of kmcmpdll\n");
+
   FShouldAddCompilerVersion = options->ShouldAddCompilerVersion;
   return TRUE;
+}
+
+int kmcmpMsgproc(int line, uint32_t dwMsgCode, char* szText, void* context) {
+  return static_cast<CompilerMessageProc>(context)(line, dwMsgCode, szText);
 }
 
 extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL ASaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc)   // I4865   // I4866
@@ -309,6 +324,15 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
   BOOL err;
   DWORD len;
   char str[260];
+
+  //printf("\n---> started in CompileKeyboardFile() of kmcmpdll\n");
+
+  if ( flag_use_new_kmcomp )
+  {
+    return kmcmp_CompileKeyboardFile(pszInfile, pszOutfile, ASaveDebug, ACompilerWarningsAsErrors,AWarnDeprecatedCode, kmcmpMsgproc, (void*) pMsgProc);
+  }
+
+  //printf("--->  stayed in CompileKeyboardFile() of kmcmpdll\n");
 
   FSaveDebug = ASaveDebug;
   FCompilerWarningsAsErrors = ACompilerWarningsAsErrors;   // I4865
@@ -330,6 +354,8 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
   msgproc = pMsgProc;
   currentLine = 0;
   nErrors = 0;
+
+  AddCompileString("NOTE: Using legacy compiler");
 
   hInfile = CreateFileA(pszInfile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
   if (hInfile == INVALID_HANDLE_VALUE) SetError(CERR_InfileNotExist);
@@ -392,6 +418,15 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PSTR pszInfile
   DWORD len;
   char str[260];
 
+  //printf("\n---> started in CompileKeyboardFileToBuffer() of kmcmpdll\n");
+  if ( flag_use_new_kmcomp )
+  {
+    return kmcmp_CompileKeyboardFileToBuffer( pszInfile, (void*) pfkBuffer,  ACompilerWarningsAsErrors,  AWarnDeprecatedCode, kmcmpMsgproc, (void*) pMsgProc, Target);
+  }
+
+  //printf("--->  stayed in CompileKeyboardFileToBuffer() of kmcmpdll\n");
+
+
   FSaveDebug = TRUE;   // I3681
   FCompilerWarningsAsErrors = ACompilerWarningsAsErrors;   // I4865
   FWarnDeprecatedCode = AWarnDeprecatedCode;   // I4866
@@ -412,6 +447,8 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PSTR pszInfile
   msgproc = pMsgProc;
   currentLine = 0;
   nErrors = 0;
+
+  AddCompileString("NOTE: Using legacy compiler");
 
   hInfile = CreateFileA(pszInfile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
   if (hInfile == INVALID_HANDLE_VALUE) SetError(CERR_InfileNotExist);
@@ -611,7 +648,6 @@ DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PWSTR p)
   if(BeginLine[BeginMode] != -1) {
     return CERR_RepeatedBegin;
   }
-
   BeginLine[BeginMode] = currentLine;
 
   if ((msg = GetRHS(fk, p, tstr, 80, (int)(INT_PTR)(p - pp), FALSE)) != CERR_None) return msg;
@@ -942,10 +978,23 @@ int cmpkeys(const void *key, const void *elem)
     {
       if (akey->Line < aelem->Line) return -1;
       if (akey->Line > aelem->Line) return 1;
-      return 0;
+      if(akey->Key == aelem->Key) {
+        if(akey->ShiftFlags == aelem->ShiftFlags) {
+          return akey->LineStoreIndex - aelem->LineStoreIndex;
+        }
+        return akey->ShiftFlags - aelem->ShiftFlags;
+      }
+      return akey->Key - aelem->Key;
     }
     if (l1 < l2) return 1;
     if (l1 > l2) return -1;
+    if(akey->Key == aelem->Key) {
+      if(akey->ShiftFlags == aelem->ShiftFlags) {
+        return akey->LineStoreIndex - aelem->LineStoreIndex;
+      }
+      return akey->ShiftFlags - aelem->ShiftFlags;
+    }
+    return akey->Key - aelem->Key;
   }
   return(char_key - char_elem); // akey->Key - aelem->Key);
 }
@@ -1728,6 +1777,7 @@ CheckOutputIsReadonly(const PFILE_KEYBOARD fk, const PWSTR output) {  // I4867
     wcscpy_s(kp->dpContext, wcslen(pklIn) + 1, pklIn);  // I3481
 
     kp->Line = currentLine;
+    kp->LineStoreIndex = 0;
 
     // Finished if we are not using keys
 
@@ -1869,6 +1919,7 @@ DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, DWORD storeIndex)
       k->ShiftFlags = 0;
     }
     k->Line = kpp->Line;
+    k->LineStoreIndex = (WORD)n;
     ExpandKp_ReplaceIndex(fk, k, keyIndex, n);
   }
 
@@ -3315,6 +3366,7 @@ DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, HANDLE hOutfile)
     offset += gp->cxKeyArray * sizeof(COMP_KEY);
     for (j = 0; j < gp->cxKeyArray; j++, kp++, fkp++)
     {
+      kp->_reserved = 0;
       kp->Key = fkp->Key;
       if (FSaveDebug) kp->Line = fkp->Line; else kp->Line = 0;
       kp->ShiftFlags = fkp->ShiftFlags;

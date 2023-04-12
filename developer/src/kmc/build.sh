@@ -17,9 +17,11 @@ cd "$THIS_SCRIPT_PATH"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 builder_describe "Build Keyman Keyboard Compiler kmc" \
+  "@/common/include" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
   "@/developer/src/kmc-keyboard" \
+  "@/developer/src/kmc-kmn" \
   "@/developer/src/kmc-model" \
   "@/developer/src/kmc-model-info" \
   "@/developer/src/kmc-package" \
@@ -36,6 +38,12 @@ builder_describe_outputs \
   build         /developer/src/kmc/build/src/kmc.js
 
 builder_parse "$@"
+
+if builder_has_option --dry-run; then
+  DRY_RUN=--dry-run
+else
+  DRY_RUN=
+fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
@@ -91,14 +99,22 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action publish; then
-  . "$KEYMAN_ROOT/resources/build/npm-publish.inc.sh"
-  npm_publish
+  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
-  # For now, kmc will have responsibility for publishing keyman-version. In
-  # the future, we should probably have a top-level npm publish script that
-  # publishes all modules for a given release version
-  # From: #7595
+  # For now, kmc will have responsibility for publishing keyman-version and
+  # common-types, as well as all the other dependent modules. In the future, we
+  # should probably have a top-level npm publish script that publishes all
+  # modules for a given release version From: #7595
   "$KEYMAN_ROOT/common/web/keyman-version/build.sh" publish $DRY_RUN
+  "$KEYMAN_ROOT/common/web/types/build.sh" publish $DRY_RUN
+  "$KEYMAN_ROOT/developer/src/kmc-keyboard/build.sh" publish $DRY_RUN
+  "$KEYMAN_ROOT/developer/src/kmc-kmn/build.sh" publish $DRY_RUN
+  "$KEYMAN_ROOT/developer/src/kmc-model/build.sh" publish $DRY_RUN
+  "$KEYMAN_ROOT/developer/src/kmc-model-info/build.sh" publish $DRY_RUN
+  "$KEYMAN_ROOT/developer/src/kmc-package/build.sh" publish $DRY_RUN
+
+  # Finally, publish kmc
+  builder_publish_to_npm
 
   builder_finish_action success publish
 fi

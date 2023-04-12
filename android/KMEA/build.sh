@@ -50,7 +50,7 @@ fi
 
 builder_describe_outputs \
   configure:engine /android/KMEA/app/src/main/assets/keymanandroid.js \
-  build:engine     /android/KMEA/app/build/outputs/aar/${CONFIG}/keyman-engine.aar
+  build:engine     /android/KMEA/app/build/outputs/aar/keyman-engine-${CONFIG}.aar
 
 #### Build
 
@@ -72,6 +72,14 @@ fi
 
 if builder_start_action configure:engine; then
 
+  builder_finish_action success configure:engine
+fi
+
+# Destinations that will need the keymanweb artifacts
+
+
+if builder_start_action build:engine; then
+
   # Copy KeymanWeb artifacts
   echo "Copying Keyman Web artifacts"
   cp "$KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/osk/ajax-loader.gif" "$ENGINE_ASSETS/ajax-loader.gif"
@@ -85,14 +93,6 @@ if builder_start_action configure:engine; then
 
   echo "Copying es6-shim polyfill"
   cp "$KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js" "$ENGINE_ASSETS/es6-shim.min.js"
-
-  builder_finish_action success configure:engine
-fi
-
-# Destinations that will need the keymanweb artifacts
-
-
-if builder_start_action build:engine; then
 
   echo "BUILD_FLAGS $BUILD_FLAGS"
   # Build without test
