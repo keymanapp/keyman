@@ -80,7 +80,7 @@ export default class ContextManager extends ContextManagerBase {
    * affect only the specified `target`.
    */
   protected get keyboardTarget(): OutputTarget {
-    // Remove `&& false` once the inlined section below is implemented.
+    // TODO: Remove `&& false` once the inlined section below is implemented.
     if(this.activeTarget /* has 'independent keyboard mode activated' */ && false) {
       return this.activeTarget;
     } else {
