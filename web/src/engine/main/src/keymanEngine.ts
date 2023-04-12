@@ -10,7 +10,7 @@ import { ContextManagerBase } from "./contextManagerBase.js";
 import { KeyEventHandler } from './keyEventSource.interface.js';
 import HardKeyboardBase from "./hardKeyboard.js";
 import { LegacyAPIEvents } from "./legacyAPIEvents.js";
-import { LegacyEventEmitter } from "./legacyEventEmitter.js";
+import { EventNames, EventListener, LegacyEventEmitter, LegacyEventMap } from "./legacyEventEmitter.js";
 import DOMCloudRequester from "keyman/engine/package-cache/dom-requester";
 
 export default class KeymanEngine<
@@ -296,11 +296,15 @@ export default class KeymanEngine<
     }
   }
 
-  // TODO: addEventListener() for legacy events
+  addEventListener<Name extends EventNames<LegacyAPIEvents>>(event: Name, listener: EventListener<LegacyAPIEvents, Name>) {
+    this.legacyAPIEvents.addEventListener(event, listener);
+  }
 
-  // TODO: removeEventListener() for legacy events
+  removeEventListener<Name extends EventNames<LegacyAPIEvents>>(event: Name, listener: EventListener<LegacyAPIEvents, Name>) {
+    this.legacyAPIEvents.removeEventListener(event, listener);
+  }
 
-  // Also technically TODO, even if not here:  similar for the OSK.
+  // Also technically TODO, even if not here:  similar two methods as above for the OSK.
 
   shutdown() {
     this.legacyAPIEvents.shutdown();

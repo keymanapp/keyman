@@ -21,7 +21,7 @@ export type LegacyEventMap = object;
 /**
  * Matches the name of any single event defined within the specified event-map definition.
  */
-type EventNames<T extends LegacyEventMap> = Exclude<keyof T, number | symbol>;
+export type EventNames<T extends LegacyEventMap> = Exclude<keyof T, number | symbol>;
 
 /**
  * Builds a type-array of the arguments for each named event, indexed by that name.
@@ -39,7 +39,7 @@ type ArgumentMap<T extends LegacyEventMap> = {
 /**
  * Provides the type signature of event listeners able to handle defined events.
  */
-type EventListener<
+export type EventListener<
     T extends LegacyEventMap,
     K extends EventNames<T>
   > = (       // argumentMap[eventName] - retrieves the specific parameter typing for the event.
