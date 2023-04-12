@@ -12,8 +12,8 @@
 #include "state.hpp"
 #include <map>
 
-#include "../test_assert.h"
-#include "../test_color.h"
+#include <test_assert.h>
+#include <test_color.h>
 #include "../emscripten_filesystem.h"
 
 using namespace km::kbp::kmx;
