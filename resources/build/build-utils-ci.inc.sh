@@ -68,8 +68,8 @@ function builder_pull_has_label() {
 # parameter, will do a dry run
 #
 # Note that `package.json` will be dirty after this command, as the `version`
-# field will be added to it. This change should not be committed to the
-# repository.
+# field will be added to it, and @keymanapp dependency versions will also be
+# modified. This change should not be committed to the repository.
 #
 # Usage:
 # ```bash
@@ -87,17 +87,39 @@ function builder_publish_to_npm() {
     dry_run=--dry-run
   fi
 
-  # We use --no-git-tag-version because our CI system controls version numbering and
-  # already tags releases. We also want to have the version of this match the
-  # release of Keyman Developer -- these two versions should be in sync. Because this
-  # is a large repo with multiple projects and build systems, it's better for us that
-  # individual build systems don't take too much ownership of git tagging. :)
+  # We use --no-git-tag-version because our CI system controls version numbering
+  # and already tags releases. We also want to have the version of this match
+  # the release of Keyman Developer -- these two versions should be in sync.
+  # Because this is a large repo with multiple projects and build systems, it's
+  # better for us that individual build systems don't take too much ownership of
+  # git tagging. :)
   npm version --allow-same-version --no-git-tag-version --no-commit-hooks "$VERSION_WITH_TAG"
 
-  # Note: In either case, npm publish MUST be given --access public to publish
-  # a package in the @keymanapp scope on the public npm package index.
+  # Update all @keymanapp/* [*]dependencies in package.json to the current
+  # version-with-tag, so that the published version has precise dependencies,
+  # and we don't accidentally end up with either older or newer deps here
+  _builder_npm_set_dependency_version
+
+  # Note: In either case, npm publish MUST be given --access public to publish a
+  # package in the @keymanapp scope on the public npm package index.
   #
   # See `npm help publish` for more details.
   echo "Publishing $dry_run npm package $THIS_SCRIPT_IDENTIFIER with tag $dist_tag"
   npm publish $dry_run --access public --tag $dist_tag
+}
+
+# Updates all @keymanapp/* [*]dependencies in package.json to the current
+# version-with-tag, so that the published version has precise dependencies, and
+# we don't accidentally end up with either older or newer deps. This overwrites
+# the local package.json, so it does need to be restored afterwards
+function _builder_npm_set_dependency_version() {
+  cat package.json | "$JQ" --arg VERSION_WITH_TAG "$VERSION_WITH_TAG" \
+    '
+      . +
+      (try { dependencies: (.dependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {}) +
+      (try { devDependencies: (.devDependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {}) +
+      (try { bundleDependencies: (.bundleDependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {}) +
+      (try { optionalDependencies: (.optionalDependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {})
+    ' > package1.json
+  mv -f package1.json package.json
 }
