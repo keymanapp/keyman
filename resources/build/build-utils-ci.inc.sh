@@ -71,12 +71,25 @@ function builder_pull_has_label() {
 # field will be added to it, and @keymanapp dependency versions will also be
 # modified. This change should not be committed to the repository.
 #
+# builder_publish_to_pack and builder_publish_to_npm are similar:
+#  * builder_publish_to_npm publishes to the public registry
+#  * builder_publish_to_pack creates a local tarball which can be used to test
+#
 # Usage:
 # ```bash
 #   builder_publish_to_npm
 # ```
 #
 function builder_publish_to_npm() {
+  _builder_publish_npm_package publish
+}
+
+function builder_publish_to_pack() {
+  _builder_publish_npm_package pack
+}
+
+function _builder_publish_npm_package() {
+  local action=$1
   local dist_tag=$TIER dry_run=
 
   if [[ $TIER == stable ]]; then
@@ -104,8 +117,15 @@ function builder_publish_to_npm() {
   # package in the @keymanapp scope on the public npm package index.
   #
   # See `npm help publish` for more details.
-  echo "Publishing $dry_run npm package $THIS_SCRIPT_IDENTIFIER with tag $dist_tag"
-  npm publish $dry_run --access public --tag $dist_tag
+  if [[ $action == pack ]]; then
+    # We can use --publish-to-pack to locally test a package
+    # before publishing to the package registry
+    echo "Packing $dry_run npm package $THIS_SCRIPT_IDENTIFIER with tag $dist_tag"
+    npm pack $dry_run --access public --tag $dist_tag
+  else # $action == publish
+    echo "Publishing $dry_run npm package $THIS_SCRIPT_IDENTIFIER with tag $dist_tag"
+    npm publish $dry_run --access public --tag $dist_tag
+  fi
 }
 
 # Updates all @keymanapp/* [*]dependencies in package.json to the current

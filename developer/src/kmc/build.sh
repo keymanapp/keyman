@@ -30,6 +30,7 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "clean                     cleans build/ folder" \
   "bundle                    creates a bundled version of kmc" \
   "test                      run automated tests for kmc" \
+  "pack                      create an npm package" \
   "publish                   publish to npm" \
   "--build-path=BUILD_PATH   build directory for bundle" \
   "--dry-run,-n              don't actually publish, just dry run"
@@ -98,6 +99,17 @@ fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
+readonly PACKAGES=(
+  common/web/keyman-version
+  common/web/types
+  common/models/types
+  developer/src/kmc-keyboard
+  developer/src/kmc-kmn
+  developer/src/kmc-model
+  developer/src/kmc-model-info
+  developer/src/kmc-package
+)
+
 if builder_start_action publish; then
   . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
@@ -105,16 +117,20 @@ if builder_start_action publish; then
   # common-types, as well as all the other dependent modules. In the future, we
   # should probably have a top-level npm publish script that publishes all
   # modules for a given release version From: #7595
-  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" publish $DRY_RUN
-  "$KEYMAN_ROOT/common/web/types/build.sh" publish $DRY_RUN
-  "$KEYMAN_ROOT/developer/src/kmc-keyboard/build.sh" publish $DRY_RUN
-  "$KEYMAN_ROOT/developer/src/kmc-kmn/build.sh" publish $DRY_RUN
-  "$KEYMAN_ROOT/developer/src/kmc-model/build.sh" publish $DRY_RUN
-  "$KEYMAN_ROOT/developer/src/kmc-model-info/build.sh" publish $DRY_RUN
-  "$KEYMAN_ROOT/developer/src/kmc-package/build.sh" publish $DRY_RUN
+  for package in "${PACKAGES[@]}"; do
+    "$KEYMAN_ROOT/$package/build.sh" publish $DRY_RUN
+  done
 
   # Finally, publish kmc
   builder_publish_to_npm
-
   builder_finish_action success publish
+elif builder_start_action pack; then
+  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+
+  for package in "${PACKAGES[@]}"; do
+    "$KEYMAN_ROOT/$package/build.sh" pack $DRY_RUN
+  done
+
+  builder_publish_to_pack
+  builder_finish_action success pack
 fi
