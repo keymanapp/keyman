@@ -31,10 +31,6 @@ namespace com.keyman {
 
     waiting: HTMLDivElement;                  // The element displayed for util.wait and util.alert.
 
-    // An object mapping event names to individual event lists.  Maps strings to arrays.
-    private events: { [name: string]: ((Object) => boolean)[];} = {};
-    private currentEvents: string[] = [];  // The event messaging call stack.
-
     private domEvents: DOMEventTracking[] = [];
 
     private embeddedFonts: any[] = [];     // Array of currently embedded font descriptor entries.  (Is it just a string?)
@@ -109,6 +105,12 @@ namespace com.keyman {
       return res;
     }
 
+    // --------------------------------------------------------------------------------
+
+    // An object mapping event names to individual event lists.  Maps strings to arrays.
+    private events: { [name: string]: ((Object) => boolean)[];} = {};
+    private currentEvents: string[] = [];  // The event messaging call stack.
+
     /**
      * Function    addEventListener
      * Scope       Private
@@ -180,6 +182,8 @@ namespace com.keyman {
       this.currentEvents.pop();
       return true;
     }
+
+    // -----------------------------------------------
 
     /**
      * Function     attachDOMEvent: Note for most browsers, adds an event to a chain, doesn't stop existing events
