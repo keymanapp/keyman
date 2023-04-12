@@ -8,19 +8,15 @@ interface EventMap {
   'targetchange': (target: OutputTarget) => boolean;
 
   /**
-   * This event is raised whenever a keyboard change is requested.  Calling the second parameter -
-   * `abortChange` - will abort the process and prevent the change.
+   * This event is raised whenever a keyboard change is requested.
    *
    * Note that if the keyboard has not been previously loaded, this event will be raised twice.
    * 1. Before the keyboard is loaded into Keyman Engine for Web.
-   *     - Aborting at this point will prevent the keyboard from being loaded, with no network
-   *       request for the keyboard resource being triggered.
    * 2. Once the keyboard is loaded, but before it is activated.
    * @param metadata     The to-be-activated keyboard's properties
-   * @param abortChange  A functor that cancels the pending keyboard change when called
    * @returns
    */
-  'beforekeyboardchange': (metadata: KeyboardStub, abortChange: () => void) => void;
+  'beforekeyboardchange': (metadata: KeyboardStub) => void;
 
   /**
    * This event is raised whenever an activating keyboard is being loaded into Keyman Engine for
@@ -159,22 +155,6 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
   }
 
   /**
-   * Triggers a `beforekeyboardchange` event that allows its consumers to cancel a change of
-   * keyboard if desired.
-   * @param metadata The keyboard properties for the potentially-activating keyboard
-   * @returns `false` if the change should be cancelled; otherwise, `true`.
-   */
-  protected confirmKeyboardChange(metadata: KeyboardStub): boolean {
-    const eventReturn = {
-      continue: true
-    };
-
-    this.emit('beforekeyboardchange', metadata, () => {eventReturn.continue = false});
-
-    return eventReturn.continue;
-  }
-
-  /**
    * Internally registers a pending keyboard-activation's properties, only resolving to a non-null
    * activation if it is still the most recent keyboard-activation request that would affect the
    * corresponding context.
@@ -239,13 +219,13 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
      * - if a keyboard was asynchronously loaded for this...
      *   - it is possible for the context (in app/browser) to have changed to a page element in
      *     "independent keyboard" mode (or away from one)
-     *   - This is the second `beforeKeyboardChange` check - a loaded keyboard may now be activated.
+     *   - This is the "second" `beforeKeyboardChange` call - a loaded keyboard may now be activated.
      *
      * If the now-current context would be unaffected by the keyboard change, we do not raise the corresponding
      * event.
      */
-    if(this.keyboardTarget == originalKeyboardTarget && !this.confirmKeyboardChange(activatingKeyboard.metadata)) {
-      return false;
+    if(this.keyboardTarget == originalKeyboardTarget) {
+      this.emit('beforekeyboardchange', activatingKeyboard.metadata);
     }
 
     this.setKeyboardActiveForTarget({
@@ -317,15 +297,8 @@ export abstract class ContextManagerBase extends EventEmitter<EventMap> {
     } else {
       // It's async time - the keyboard is not preloaded within the cache.  Use the stub's data to load it.
 
-      // `beforeKeyboardChange` - first check
-      // If the user cancels here, we prevent the network request that would load the keyboard from
-      // being triggered.
-      if(!this.confirmKeyboardChange(requestedStub)) {
-        return {
-          keyboard: Promise.resolve(null),
-          metadata: requestedStub
-        }
-      }
+      // `beforeKeyboardChange` - first call
+      this.emit('beforekeyboardchange', requestedStub);
 
       // Provide a Promise for completion of the async load process.
       const completionPromise = new ManagedPromise<Error>();
