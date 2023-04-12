@@ -225,7 +225,7 @@ extension Storage {
                      dstDir: baseDir,
                      excludeFromBackup: true)
     try Storage.copy(from: bundle,
-                     resourceName: "keymanios.js",
+                     resourceName: "keymanweb-webview.js",
                      dstDir: baseDir,
                      excludeFromBackup: true)
     try Storage.copy(from: bundle,
@@ -237,9 +237,9 @@ extension Storage {
                      dstDir: baseDir,
                      excludeFromBackup: true)
     // For debug compilations - IF we have a sourcemap file, copy that over too.
-    if bundle.url(forResource: "keyman.js.map", withExtension: nil) != nil {
+    if bundle.url(forResource: "keymanweb-webview.js.map", withExtension: nil) != nil {
       try Storage.copy(from: bundle,
-                       resourceName: "keyman.js.map",
+                       resourceName: "keymanweb-webview.js.map",
                        dstDir: baseDir,
                        excludeFromBackup: true)
     }

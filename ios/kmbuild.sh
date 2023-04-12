@@ -180,12 +180,12 @@ update_bundle ( ) {
         #Copy over the relevant resources!  It's easiest to do if we navigate to the resulting folder.
         cp "$KEYMAN_ROOT/$KMW_RESOURCES/osk/kmwosk.css"        "$base_dir/$BUNDLE_PATH/kmwosk.css"
         cp "$KEYMAN_ROOT/$KMW_RESOURCES/osk/keymanweb-osk.ttf" "$base_dir/$BUNDLE_PATH/keymanweb-osk.ttf"
-        cp "$KEYMAN_ROOT/$KMW_PRODUCT/index.js"             "$base_dir/$BUNDLE_PATH/keymanios.js"
+        cp "$KEYMAN_ROOT/$KMW_PRODUCT/keymanweb-webview.js"             "$base_dir/$BUNDLE_PATH/keymanweb-webview.js"
 
         if [ "$CONFIG" == "Debug" ]; then
-          cp "$KEYMAN_ROOT/$KMW_PRODUCT/index.js.map"       "$base_dir/$BUNDLE_PATH/keyman.js.map"
-        elif [ -f "$base_dir/$BUNDLE_PATH/keyman.js.map" ]; then
-          rm                               "$base_dir/$BUNDLE_PATH/keyman.js.map"
+          cp "$KEYMAN_ROOT/$KMW_PRODUCT/keymanweb-webview.js.map"       "$base_dir/$BUNDLE_PATH/keymanweb-webview.js.map"
+        elif [ -f "$base_dir/$BUNDLE_PATH/keymanweb-webview.js.map" ]; then
+          rm      "$base_dir/$BUNDLE_PATH/keymanweb-webview.js.map"
         fi
 
         # Linked in by dependency for builder scripts... but this script isn't builder-based yet.

@@ -45,7 +45,7 @@ fi
 
 builder_describe_outputs \
   configure   /node_modules \
-  build       /web/build/$SUBPROJECT_NAME/$config/index.js
+  build       /web/build/$SUBPROJECT_NAME/$config/keymanweb-webview.js
 
 #### Build action definitions ####
 

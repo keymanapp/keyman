@@ -26,8 +26,7 @@ export class KeymanSentryManager {
 
   static STANDARD_ALIASABLE_FILES = {
     'keymanweb.js':     'keymanweb.js',
-    'keymanandroid.js': 'keyman.js',      // Android's embedded name -> embedded compilation
-    'keymanios.js':     'keyman.js',      // iOS's embedded name -> embedded compilation
+    'keymanweb-webview.js': 'keymanweb-webview.js',
     'kmwuibutton.js':   'kmwuibutton.js',
     'kmwuifloat.js':    'kmwuifloat.js',
     'kmwuitoggle.js':   'kmwuitoggle.js',
@@ -48,8 +47,6 @@ export class KeymanSentryManager {
     if(!this.mayAlias(filename)) {
       return null;
     }
-
-    filename = KeymanSentryManager.STANDARD_ALIASABLE_FILES[filename];
 
     switch(location.protocol) {
       case 'http:':

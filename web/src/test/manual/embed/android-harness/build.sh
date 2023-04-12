@@ -39,8 +39,8 @@ fi
 if builder_start_action build; then
   mkdir -p "host/osk"
   cp -R "$KEYMAN_ROOT/android/KMEA/app/src/main/assets/"* "host/"
-  cp "$KEYMAN_ROOT/web/build/app/webview/debug/index.js" "host/keymanandroid.js"
-  cp "$KEYMAN_ROOT/web/build/app/webview/debug/index.js.map" "host/keymanandroid.js.map"
+  cp "$KEYMAN_ROOT/web/build/app/webview/debug/keymanweb-webview.js" "host/keymanweb-webview.js"
+  cp "$KEYMAN_ROOT/web/build/app/webview/debug/keymanweb-webview.js.map" "host/keymanweb-webview.js.map"
   cp "$KEYMAN_ROOT/web/build/app/resources/osk/ajax-loader.gif" "host/ajax-loader.gif"
   cp "$KEYMAN_ROOT/web/build/app/resources/osk/kmwosk.css" "host/kmwosk.css"
   cp "$KEYMAN_ROOT/web/build/app/resources/osk/globe-hint.css" "host/globe-hint.css"

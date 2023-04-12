@@ -293,8 +293,8 @@ public final class KMManager {
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
-  protected static final String KMFilename_JSEngine = "keymanandroid.js";
-  protected static final String KMFilename_JSEngine_Sourcemap = "keyman.js.map";
+  protected static final String KMFilename_JSEngine = "keymanweb-webview.js";
+  protected static final String KMFilename_JSEngine_Sourcemap = "keymanweb-webview.js.map";
   protected static final String KMFilename_JSSentry = "sentry.min.js";
   protected static final String KMFilename_JSSentryInit = "keyman-sentry.js";
   protected static final String KMFilename_AndroidHost = "android-host.js";

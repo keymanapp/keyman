@@ -38,7 +38,7 @@ await esbuild.build({
   entryPoints: {
     'index': '../../../build/app/webview/obj/debug-main.js',
   },
-  outfile: '../../../build/app/webview/debug/index.js',
+  outfile: '../../../build/app/webview/debug/keymanweb-webview.js',
   plugins: [ es5ClassAnnotationAsPurePlugin ],
   target: "es5",
   treeShaking: true,
@@ -56,7 +56,7 @@ await esbuild.build({
   entryPoints: {
     'index': '../../../build/app/webview/obj/release-main.js',
   },
-  outfile: '../../../build/app/webview/release/index.js',
+  outfile: '../../../build/app/webview/release/keymanweb-webview.js',
   plugins: [ es5ClassAnnotationAsPurePlugin ],
   target: "es5",
   treeShaking: true,

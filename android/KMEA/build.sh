@@ -50,7 +50,7 @@ if builder_is_debug_build; then
 fi
 
 builder_describe_outputs \
-  configure:engine /android/KMEA/app/src/main/assets/keymanandroid.js \
+  configure:engine /android/KMEA/app/src/main/assets/keymanweb-webview.js \
   build:engine     /android/KMEA/app/build/outputs/aar/${CONFIG}/keyman-engine.aar
 
 #### Build
@@ -75,8 +75,8 @@ if builder_start_action configure:engine; then
 
   # Copy KeymanWeb artifacts
   echo "Copying Keyman Web artifacts"
-  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/index.js" "$ENGINE_ASSETS/keymanandroid.js"
-  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/index.js.map" "$ENGINE_ASSETS/keymanandroid.js.map"
+  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/index.js" "$ENGINE_ASSETS/keymanweb-webview.js"
+  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/index.js.map" "$ENGINE_ASSETS/keymanweb-webview.js.map"
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/ajax-loader.gif" "$ENGINE_ASSETS/ajax-loader.gif"
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/kmwosk.css" "$ENGINE_ASSETS/kmwosk.css"
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/globe-hint.css" "$ENGINE_ASSETS/globe-hint.css"
