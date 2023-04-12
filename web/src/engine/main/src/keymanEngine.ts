@@ -9,7 +9,8 @@ import KeyboardInterface from "./keyboardInterface.js";
 import { ContextManagerBase } from "./contextManagerBase.js";
 import { KeyEventHandler } from './keyEventSource.interface.js';
 import HardKeyboardBase from "./hardKeyboard.js";
-import { LegacyAPIEventEngine } from "./legacyAPIEvents.js";
+import { LegacyAPIEvents } from "./legacyAPIEvents.js";
+import { LegacyEventEmitter } from "./legacyEventEmitter.js";
 import DOMCloudRequester from "keyman/engine/package-cache/dom-requester";
 
 export default class KeymanEngine<
@@ -23,7 +24,7 @@ export default class KeymanEngine<
   readonly keyboardRequisitioner: KeyboardRequisitioner;
   readonly modelCache: ModelCache;
 
-  private legacyAPIEvents = new LegacyAPIEventEngine();
+  private legacyAPIEvents = new LegacyEventEmitter<LegacyAPIEvents>();
   private _hardKeyboard: HardKeyboard;
   private _osk: OSKView;
 
@@ -125,7 +126,7 @@ export default class KeymanEngine<
     kbdCache.on('stubAdded', (stub) => {
       let eventRaiser = () => {
         // The corresponding event is needed in order to update UI modules as new keyboard stubs "come online".
-        this.legacyAPIEvents.emit('kmw.keyboardregistered', {
+        this.legacyAPIEvents.callEvent('keyboardregistered', {
           internalName: stub.KI,
           language: stub.KL,
           keyboardName: stub.KN,
@@ -144,7 +145,7 @@ export default class KeymanEngine<
     kbdCache.on('keyboardAdded', (keyboard) => {
       let eventRaiser = () => {
         // Execute any external (UI) code needed after loading keyboard
-        this.legacyAPIEvents.emit('kmw.keyboardloaded', {
+        this.legacyAPIEvents.callEvent('keyboardloaded', {
           keyboardName: keyboard.id
         });
       }
@@ -156,9 +157,21 @@ export default class KeymanEngine<
       }
     });
 
+    contextManager.on('beforekeyboardchange', (metadata) => {
+      this.legacyAPIEvents.callEvent('beforekeyboardchange', {
+        internalName: metadata.id,
+        languageCode: metadata.langId
+      });
+    });
+
     contextManager.on('keyboardchange', (kbd) => {
       this.refreshModel();
       this.core.activeKeyboard = kbd.keyboard;
+
+      this.legacyAPIEvents.callEvent('keyboardchange', {
+        internalName: kbd.metadata.id,
+        languageCode: kbd.metadata.langId
+      });
 
       // Hide OSK and do not update keyboard list if using internal keyboard (desktops).
       // Condition will not be met for touch form-factors; they force selection of a
@@ -197,7 +210,12 @@ export default class KeymanEngine<
       // Always (temporarily) hide the OSK when loading a new keyboard, to ensure
       // that a failure to load doesn't leave the current OSK displayed
       this.osk?.startHide(false);
-    })
+    });
+
+    this.keyboardRequisitioner.cache.on('keyboardAdded', (keyboard) => {
+      this.legacyAPIEvents.callEvent('keyboardloaded', { keyboardName: keyboard.id });
+    });
+    //
     // #endregion
   }
 
@@ -276,6 +294,17 @@ export default class KeymanEngine<
         this.osk.bannerController.selectBanner('inactive');
       }
     }
+  }
+
+  // TODO: addEventListener() for legacy events
+
+  // TODO: removeEventListener() for legacy events
+
+  // Also technically TODO, even if not here:  similar for the OSK.
+
+  shutdown() {
+    this.legacyAPIEvents.shutdown();
+    this.osk?.shutdown();
   }
 
   // API methods
