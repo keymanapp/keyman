@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.86 alpha 2023-04-12
+
+* docs(windows): link to wiki architecture faq page (#8584)
+
 ## 17.0.85 alpha 2023-04-11
 
 * chore(developer): AddWarning and SetError cleanup (#8571)
