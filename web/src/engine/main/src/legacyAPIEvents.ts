@@ -25,4 +25,7 @@ export interface LegacyAPIEvents extends LegacyEventMap {
     internalName: string,
     languageCode: string
   }) => boolean;
+
+  // TODO:  more of the documented API events.  Note that any remaining events not seen here
+  //        yet go unused within the mobile apps.
 }
