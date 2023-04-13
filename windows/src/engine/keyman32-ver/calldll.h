@@ -24,6 +24,12 @@ BOOL UnloadDLLs(LPINTKEYBOARDINFO lpkbi);
 BOOL DeactivateDLLs(LPINTKEYBOARDINFO lpkbi);
 BOOL ActivateDLLs(LPINTKEYBOARDINFO lpkbi);
 
+/* Before keyman32/64 started using versioned dll names the IMX keyboard framework was written
+Third party developers will have used the name "keyman32/64dll" so we need to honor that for these
+keyboards. We do this by having a proxy dll that forwards to version keyman dll opened for this process
+We only want and need to do this if there is imx keyboard */
+
+
 // TODO: 5444 This will become the only LoadDLLs function
 /**
  * Load the all the dlls used by the current keyboard

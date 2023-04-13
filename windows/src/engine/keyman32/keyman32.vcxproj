@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{7F83D46E-EB65-4E4C-97C0-0FF2C7BDD52E}</ProjectGuid>
+    <ProjectGuid>{FA6F9217-E2BB-4586-ACD3-0DFB6C13A257}</ProjectGuid>
     <RootNamespace>Keyman32</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>keyman32</ProjectName>
@@ -57,10 +57,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\rust\x86\$(Configuration);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\include;$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\include;$(IncludePath)</IncludePath>
+    <TargetName>$(ProjectName)$(VersionWithTag)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\rust\x86\$(Configuration);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\include;$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\include;$(IncludePath)</IncludePath>
+    <TargetName>$(ProjectName)$(VersionWithTag)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -82,7 +84,6 @@
       </ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AssemblerOutput>All</AssemblerOutput>
       <WarningLevel>Level4</WarningLevel>
@@ -95,7 +96,8 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>libkmnkbp0.a;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
@@ -149,7 +151,8 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>libkmnkbp0.a;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
@@ -170,20 +173,28 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="pch.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="KEYMAN32.RC">
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ResourceCompile>
+    <CustomBuild Include="keyman-debug-etw.man">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">mc %(FullPath)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compiling keyman-debug-etw</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).rc;%(Filename.h);MSG00001.bin</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">mc %(FullPath)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compiling keyman-debug-etw</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).rc;%(Filename.h);MSG00001.bin</Outputs>
+      <SubType>Designer</SubType>
+    </CustomBuild>
+    <None Include="..\..\..\..\common\resources\bitmaps\arrow.bmp" />
+    <None Include="..\..\..\..\common\resources\bitmaps\mask.bmp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="exports.h" />
     <ClInclude Include="pch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="keyman32_proxy.cpp" />
+    <ClCompile Include="pch.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

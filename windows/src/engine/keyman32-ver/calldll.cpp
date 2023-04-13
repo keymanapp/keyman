@@ -304,6 +304,16 @@ BOOL UnloadDLLs(LPINTKEYBOARDINFO lpkbi)
 
   if (Globals::get_CoreIntegration() && lpkbi->lpCoreKeyboardState) {
           km_kbp_state_imx_deregister_callback(lpkbi->lpCoreKeyboardState);
+          // Need to UnLoad the keyman32 or keyman64 dll proxy keyboard as the third-party dlls
+          // will use this rather than the versioned dll.
+          #ifdef _WIN64
+            HMODULE hModule = GetModuleHandle("keyman64.dll");
+          #else
+            HMODULE hModule = GetModuleHandle("keyman32.dll");
+          #endif
+          if (hModule){
+            FreeLibrary(hModule);
+          }
   }
 	return TRUE;
 }
@@ -688,6 +698,17 @@ LoadDLLsCore(LPINTKEYBOARDINFO lpkbi) {
     return FALSE;
   if ((!lpkbi->lpCoreKeyboard) || (!lpkbi->lpCoreKeyboard)){
     return FALSE;
+  }
+  // Need to Load the keyman32 or keyman64 dll proxy keyboard as the third-party dlls
+  // will use this rather than the versioned dll.
+  #ifdef _WIN64
+    HMODULE hModule = LoadLibrary("keyman64.dll");
+  #else
+    HMODULE hModule = LoadLibrary("keyman32.dll");
+  #endif
+  if (!hModule) {
+      SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: keyman32/64.dll not loaded");
+      return FALSE;
   }
 
   km_kbp_keyboard_imx *imx_list = lpkbi->lpIMXList;
