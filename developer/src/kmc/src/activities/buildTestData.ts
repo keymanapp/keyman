@@ -3,9 +3,9 @@ import * as path from 'path';
 import * as kmc from '@keymanapp/kmc-keyboard';
 import { CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
 import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
-import { BuildCommandOptions } from '../commands/build.js';
+import { BuildActivityOptions } from './BuildActivity.js';
 
-export function buildTestData(infile: string, options: BuildCommandOptions) {
+export function buildTestData(infile: string, options: BuildActivityOptions) {
   let compilerOptions: kmc.CompilerOptions = {
     debug: false,
     addCompilerVersion: false
