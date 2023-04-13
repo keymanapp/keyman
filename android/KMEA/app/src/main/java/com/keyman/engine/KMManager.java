@@ -784,7 +784,7 @@ public final class KMManager {
    * @param permission - The manifest permission to query
    * @return boolean - true if the manifest permission is granted
     */
-  protected static boolean hasPermission(Context context, String permission) {
+  public static boolean hasPermission(Context context, String permission) {
     // API to check permission depends on Android SDK level
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       return (context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED);

@@ -45,7 +45,7 @@
 namespace km {
 namespace tests {
 
-#include "../test_color.h"
+#include <test_color.h>
 
 
 LdmlTestSource::LdmlTestSource() {

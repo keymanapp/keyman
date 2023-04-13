@@ -20,7 +20,7 @@
       "name": "Launch kmx unit tests",
       "target": "build/arch/debug/tests/unit/kmx/kmx",
       "cwd": "${workspaceRoot}/core/",
-      "arguments": "tests/unit/kmx/033\\ -\\ caps\\ always\\ off.km{n,x}",
+      "arguments": "tests/unit/kmx/k_033___caps_always_off.km{n,x}",
       "valuesFormatting": "parseText"
     },
     {

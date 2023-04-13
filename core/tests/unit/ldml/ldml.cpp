@@ -21,8 +21,8 @@
 #include "state.hpp"
 #include "utfcodec.hpp"
 
-#include "../test_assert.h"
-#include "../test_color.h"
+#include <test_assert.h>
+#include <test_color.h>
 
 #include <kmx/kmx_xstring.h>  // for surrogate pair macros
 

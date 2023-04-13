@@ -1,0 +1,29 @@
+﻿store(&NAME) '026 - system stores'
+c Description: Tests platform and baselayout system store rules
+c keys: [K_1][K_2][K_3][K_4][K_A][K_B]
+c expected: windows.desktop.hardware.native.en-US.kbdus.dll.
+c context: 
+c (default) option: &platform=windows desktop hardware native <-- ignored by test
+c (default) option: &baseLayout=kbdus.dll <-- ignored by test
+c (default) option: &baseLayoutAlt=en-US <-- ignored by test
+
+c ***** CERR_90FeatureOnly_IfSystemStores 0x0000404F ****************
+store(&version) '3.0'
+c *******************************************************************
+
+store(digit)  '1234567890'
+store(letter) 'abcdefghij'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+platform('windows') + '1' > 'windows.'
+platform('desktop') + '2' > 'desktop.'
+platform('hardware') + '3' > 'hardware.'
+platform('native') + '4' > 'native.'
++ any(digit) > 'platform-fail.'
+
+baselayout('en-US') + 'a' > 'en-US.'
+baselayout('kbdus.dll') + 'b' > 'kbdus.dll.'
++ any(letter) > 'baselayout-fail.'

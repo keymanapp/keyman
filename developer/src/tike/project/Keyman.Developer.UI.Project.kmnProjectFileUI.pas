@@ -130,7 +130,11 @@ begin
   if not FSilent then
     frmMessages.DoShowForm;
 
-  Result := ProjectFile.CompileKeyboard;
+  Result :=
+    // Note: we do not surface the ability to exclude version information from
+    // the TIKE compiler; this must be done from kmcomp.exe.
+    ProjectFile.DoSetCompilerOptions(True, FKeymanDeveloperOptions.UseLegacyCompiler) and
+    ProjectFile.CompileKeyboard;
 
   if Result and
       TServerDebugAPI.Running and

@@ -93,8 +93,11 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
     const originalKeyboard = this.activeKeyboard;
     const activatingKeyboard = super.prepareKeyboardForActivation(keyboardId, languageCode);
 
-    // Probably isn't necessary at this point - osk.refreshLayout() exists - but
-    // it's best to keep it around for now and verify later.
+    // Erasing precomputed layout information attached to the keyboard object probably isn't
+    // necessary at this point - osk.refreshLayout() exists and automatically handles any
+    // needed recalculations itself.
+    //
+    // That said, it's best to keep it around for now and verify later.
     if(originalKeyboard?.metadata?.id == activatingKeyboard?.metadata?.id) {
       activatingKeyboard.keyboard = activatingKeyboard.keyboard.then((kbd) => {
         kbd.refreshLayouts()

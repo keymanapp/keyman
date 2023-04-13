@@ -2,7 +2,7 @@
 
 ///<reference lib="dom" />
 
-import { Keyboard, KeyboardHarness, KeyboardLoaderBase, MinimalKeymanGlobal } from '@keymanapp/keyboard-processor';
+import { Keyboard, KeyboardHarness, KeyboardLoaderBase, KeyboardLoadErrorBuilder, MinimalKeymanGlobal } from '@keymanapp/keyboard-processor';
 
 import { ManagedPromise } from '@keymanapp/web-utils';
 
@@ -28,7 +28,11 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
     this.performCacheBusting = cacheBust || false;
   }
 
-  protected loadKeyboardInternal(uri: string, id?: string): Promise<Keyboard> {
+  protected loadKeyboardInternal(
+    uri: string,
+    errorBuilder: KeyboardLoadErrorBuilder,
+    id?: string
+  ): Promise<Keyboard> {
     const promise = new ManagedPromise<Keyboard>();
 
     if(this.performCacheBusting) {
@@ -42,8 +46,8 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
         script.id = id;
       }
       document.head.appendChild(script);
-      script.onerror = () => {
-        promise.reject(new Error(KeyboardLoaderBase.missingErrorMessage(uri)));
+      script.onerror = (err) => {
+        promise.reject(errorBuilder.missingError(err));
       }
       script.onload = () => {
         if(this.harness.loadedKeyboard) {
@@ -51,7 +55,7 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
           this.harness.loadedKeyboard = null;
           promise.resolve(keyboard);
         } else {
-          promise.reject(new Error(KeyboardLoaderBase.scriptErrorMessage(uri)));
+          promise.reject(errorBuilder.scriptError());
         }
       }
 

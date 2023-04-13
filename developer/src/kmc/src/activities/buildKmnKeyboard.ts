@@ -1,54 +1,43 @@
-import { spawnSync } from 'child_process';
 import * as path from 'path';
 import { BuildCommandOptions } from '../commands/build.js';
-import { getDeveloperBinPath } from '../util/getDeveloperBinPath.js';
+import { Compiler } from '@keymanapp/kmc-kmn';
+import { platform } from 'os';
 
 export async function buildKmnKeyboard(infile: string, options: BuildCommandOptions): Promise<boolean> {
-  // We'll call out to kmcomp.exe to build a .kmn keyboard into a .kmx Note:
-  // kmcomp.exe will also build a .js if it is required, and may not actually
-  // generate a .kmx if the output target defined in the .kmn is mobile/web
-  // only. kmcomp.exe will also build the .kvk file.
-  const binRoot = getDeveloperBinPath();
-  if(binRoot == null) {
-    console.error('Could not locate Keyman Developer bin path');
+
+  let compiler = new Compiler();
+  if(!await compiler.init()) {
     return false;
   }
 
-  let args = ['-nologo'];
-  if(options.debug) {
-    args.push('-d');
-  }
+  // We need to resolve paths to absolute paths before calling kmc-kmn
+  let outfile = (options.outFile ?? infile).replace(/\.km.$/i, '.kmx');
 
-  args.push(path.win32.normalize(infile));
+  infile = getPosixAbsolutePath(infile);
+  outfile = getPosixAbsolutePath(outfile);
 
-  // .* target file name option allows us to specify .kmx output file and the
-  // .js output file will also be generated as required, in the same way as when
-  // we build a project. Note: this is a stop gap as we work to deprecate
-  // kmcomp.exe and replace it with kmcmp (cross-platform .kmx compiler in C++)
-  // + kmc-kmw (KMX->KMW transpiler in TypeScript) + kmc-kvk (KVK compiler in
-  // TypeScript).
-  let outfile = (options.outFile ?? infile).replace(/\\/g, '/');
-  // For now, we normalize to posix, and then renormalize to win32 for launching
-  // kmcomp, until we have a cross-platform alternative to use
-  outfile = path.win32.normalize(options.outFile).replace(/\.km.$/i, '.*');
-  args.push(outfile);
-
-  const kmcomp = path.join(binRoot, 'kmcomp.exe');
-
-  // We won't attempt to make this call cross-platform, yet.
-  let child = spawnSync(kmcomp, args, {
-    encoding: 'utf8'
+  // TODO: Currently this only builds .kmn->.kmx, and targeting .js is as-yet unsupported
+  // TODO: Support additional options compilerWarningsAsErrors, warnDeprecatedCode
+  return compiler.run(infile, outfile, {
+    saveDebug: options.debug,
+    shouldAddCompilerVersion: options.compilerVersion,
   });
+}
 
-  if(child.error) {
-    console.error(child.error);
-    return false;
+function getPosixAbsolutePath(filename: string): string {
+  if(platform() == 'win32') {
+    // On Win32, we need to use backslashes for path.resolve to work
+    filename = filename.replace(/\//g, '\\');
   }
 
-  console.log(child.stdout);
-  if(child.stderr) {
-    console.error(child.stderr);
-  }
+  // Resolve to a fully qualified absolute path
+  filename = path.resolve(filename);
 
-  return child.status === 0;
+  if(platform() == 'win32') {
+    // Ensure that we convert the result back to posix-style paths which is what
+    // kmc-kmn expects. On posix platforms, we assume paths have forward slashes
+    // already
+    filename = filename.replace(/\\/g, '/');
+  }
+  return filename;
 }

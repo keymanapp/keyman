@@ -113,8 +113,8 @@ describe('Headless keyboard loading', function() {
         await keyboardLoader.loadKeyboardFromPath(invalidPath);
       } catch (err) {
         missingError = err;
-        assert.equal(missingError.message, KeyboardLoaderBase.missingErrorMessage(invalidPath));
       }
+      assert.isOk(missingError);
 
       let scriptLoadError;
       try {
@@ -122,8 +122,10 @@ describe('Headless keyboard loading', function() {
       } catch (err) {
         scriptLoadError = err;
       }
+      assert.isOk(scriptLoadError);
 
-      assert.notEqual(scriptLoadError.message, KeyboardLoaderBase.scriptErrorMessage(nonKeyboardPath));
+      // The main test:  do the errors match?
+      assert.notEqual(scriptLoadError.message, missingError.message);
     });
   })
 });
