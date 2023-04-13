@@ -1,4 +1,6 @@
-if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang' or compiler.get_id() == 'emscripten'
+
+# TODO -- why are these differing from the standard.meson.build flags?
+if cpp_compiler.get_id() == 'gcc' or cpp_compiler.get_id() == 'clang' or cpp_compiler.get_id() == 'emscripten'
   warns = [
      '-Wno-missing-field-initializers',
      '-Wno-unused-parameter'

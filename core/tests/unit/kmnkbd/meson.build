@@ -4,7 +4,8 @@
 # Authors:      Tim Eves (TSE)
 #
 
-if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang' or compiler.get_id() == 'emscripten'
+# TODO -- why are these differing from the standard.meson.build flags?
+if cpp_compiler.get_id() == 'gcc' or cpp_compiler.get_id() == 'clang' or cpp_compiler.get_id() == 'emscripten'
   warns = [
      '-Wno-missing-field-initializers',
      '-Wno-unused-parameter'
@@ -13,7 +14,7 @@ else
   warns = []
 endif
 
-defns+=['-DKMN_KBP_STATIC']
+local_defns = ['-DKMN_KBP_STATIC']
 tests = [
   ['context-api', 'context_api.cpp'],
   ['keyboard-api', 'keyboard_api.cpp'],
@@ -24,19 +25,16 @@ tests = [
   ['kmx_context', 'test_kmx_context.cpp'],
 ]
 
-if compiler.get_id() == 'emscripten'
-  tests_flags = ['--embed-file', join_paths(meson.current_source_dir(),'..','kmx','@/')]
-  source_path = '/'
-  test_path = '/'
-else
-  tests_flags = []
-  source_path = meson.current_source_dir()
-  test_path = join_paths(meson.current_source_dir(), '..', 'kmx')
+test_path = join_paths(meson.current_build_dir(), '..', 'kmx')
+tests_flags = []
+
+if cpp_compiler.get_id() == 'emscripten'
+  tests_flags += ['-lnodefs.js', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
 endif
 
 foreach t : tests
-  bin = executable(t[0], t[1],
-    cpp_args: defns + warns,
+  bin = executable(t[0], [t[1], '../emscripten_filesystem.cpp'],
+    cpp_args: local_defns + defns + warns,
     include_directories: [inc, libsrc],
     link_args: links + tests_flags,
     objects: lib.extract_all_objects(recursive: false))

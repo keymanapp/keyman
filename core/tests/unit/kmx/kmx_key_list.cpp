@@ -12,8 +12,9 @@
 #include "state.hpp"
 #include <map>
 
-#include "../test_assert.h"
-#include "../test_color.h"
+#include <test_assert.h>
+#include <test_color.h>
+#include "../emscripten_filesystem.h"
 
 using namespace km::kbp::kmx;
 
@@ -107,7 +108,11 @@ int main(int argc, char *argv []) {
   }
   console_color::enabled = console_color::isaterminal() || arg_color;
 
+#ifdef __EMSCRIPTEN__
+  test_key_list(get_wasm_file_path(argv[first_arg]));
+#else
   test_key_list(argv[first_arg]);
+#endif
 
   return 0;
 }

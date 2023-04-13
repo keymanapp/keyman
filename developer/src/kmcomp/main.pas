@@ -65,7 +65,7 @@ uses
   UKeymanTargets;
 
 function CompileKeyboard(FInFile, FOutFile: string; FDebug, FWarnAsError: Boolean): Boolean; forward;   // I4706
-function KCSetCompilerOptions(const FInFile: string; FShouldAddCompilerVersion: Boolean): Boolean; forward;
+function KCSetCompilerOptions(const FInFile: string; FShouldAddCompilerVersion, FUseKmcmpLib: Boolean): Boolean; forward;
 //function CompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall; forward;
 procedure FixupPathSlashes(var path: string); forward;
 
@@ -90,6 +90,7 @@ var
   FParamDistribution: Boolean;
   FMergingValidateIds: Boolean;
   FShouldAddCompilerVersion: Boolean;
+  FUseKmcmpLib: Boolean;
   FJsonSchemaPath: string;
   FParamSourcePath: string;
   FParamHelpLink: string;
@@ -116,6 +117,7 @@ begin
   FColorMode := cmDefault;
 
   FShouldAddCompilerVersion := True;
+  FUseKmcmpLib := True;
 
   FParamInfile := '';
   FParamOutfile := '';
@@ -191,6 +193,8 @@ begin
       FColorMode := cmForceNoColor
     else if s = '-no-compiler-version' then
       FShouldAddCompilerVersion := False
+    else if s = '-use-legacy-compiler' then
+      FUseKmcmpLib := False
     else if (s = '-help') or (s = '-h') then
     begin
       // Force help
@@ -219,6 +223,8 @@ begin
     writeln(SKeymanDeveloperName + ' Compiler (32-bit)');
 {$ENDIF}
     writeln('Version ' + CKeymanVersionInfo.VersionWithTag + ', ' + GetVersionCopyright);
+    if not FUseKmcmpLib then
+      writeln('Note: using legacy compiler');
   end;
 
   if FError or (FParamInfile = '') then
@@ -228,7 +234,7 @@ begin
     writeln('');
     writeln('Usage: '+cmd+' [-s[s]] [-nologo] [-c] [-d] [-w] [-cfc] [-v[s|d]] [-source-path path] [-schema-path path] ');
     writeln('       '+spc+' [-m] infile [-m infile] [-t target] [outfile.kmx|outfile.js [error.log]]');   // I4699
-    writeln('       '+spc+' [-add-help-link path] [-color|-no-color] [-no-compiler-version]');
+    writeln('       '+spc+' [-add-help-link path] [-color|-no-color] [-no-compiler-version] [-use-legacy-compiler]');
     writeln('       '+spc+' [-extract-keyboard-info field[,field...]]');
     writeln('          infile        can be a .kmn file (Keyboard Source, .kps file (Package Source), or .kpj (project)');   // I4699   // I4825
     writeln('                        if -v specified, can also be a .keyboard_info file');
@@ -252,6 +258,7 @@ begin
     writeln('                         uses console mode to determine whether color should be used.');
     writeln;
     writeln('          -no-compiler-version   Don''t embed the compiler version stores, useful for regression tests.');
+    writeln('          -use-legacy-compiler   Use legacy compiler (will be removed in 18.0)');
     writeln;
     writeln(' JSON .keyboard_info compile targets:');
     writeln('          -v[s]    validate infile against source schema');
@@ -291,7 +298,7 @@ begin
 
     TProjectLogConsole.Create(FSilent, FFullySilent, hOutfile, FColorMode);
 
-    KCSetCompilerOptions(FParamInfile, FShouldAddCompilerVersion);
+    KCSetCompilerOptions(FParamInfile, FShouldAddCompilerVersion, FUseKmcmpLib);
 
     if FValidateRepoChanges then
       FError := not TValidateRepoChanges.Execute(FParamInfile, FParamOutfile)
@@ -317,7 +324,7 @@ begin
     ExitCode := 1;
 end;
 
-function KCSetCompilerOptions(const FInFile: string; FShouldAddCompilerVersion: Boolean): Boolean;
+function KCSetCompilerOptions(const FInFile: string; FShouldAddCompilerVersion, FUseKmcmpLib: Boolean): Boolean;
 var
   opt: TCompilerOptions;
 begin
@@ -325,6 +332,7 @@ begin
 
   opt.dwSize := sizeof(TCompilerOptions);
   opt.ShouldAddCompilerVersion := FShouldAddCompilerVersion;
+  opt.UseKmcmpLib := FUseKmcmpLib;
 
   Result := SetCompilerOptions(@opt, @CompilerMessageW);
 

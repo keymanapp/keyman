@@ -2,9 +2,9 @@
 <KeymanDeveloperProject>
   <Options>
     <BuildPath>$PROJECTPATH</BuildPath>
-    <CompilerWarningsAsErrors>false</CompilerWarningsAsErrors>
-    <WarnDeprecatedCode>false</WarnDeprecatedCode>
-    <CheckFilenameConventions>false</CheckFilenameConventions>
+    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>False</WarnDeprecatedCode>
+    <CheckFilenameConventions>False</CheckFilenameConventions>
     <ProjectType>keyboard</ProjectType>
   </Options>
   <Files>
