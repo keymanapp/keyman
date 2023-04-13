@@ -34,8 +34,6 @@
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
-    "@keymanapp/models-templates": "*",
-    "@keymanapp/models-wordbreakers": "*",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
     "@types/node": "^10.14.6",

@@ -23,6 +23,7 @@ builder_describe "Build the include script for current Keyman version" \
   configure \
   clean \
   build \
+  pack \
   publish \
   test \
   --dry-run
@@ -97,4 +98,8 @@ if builder_start_action publish; then
   . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
   builder_publish_to_npm
   builder_finish_action success publish
+elif builder_start_action pack; then
+  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+  builder_publish_to_pack
+  builder_finish_action success pack
 fi
