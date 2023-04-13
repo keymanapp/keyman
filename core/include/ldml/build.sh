@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Compiles the kmc lexical model model-info compiler.
+# Packages the @keymanapp/ldml-keyboard-constants package.
 #
 
 # Exit on command failure and when using unset variables:
@@ -16,25 +16,26 @@ cd "$THIS_SCRIPT_PATH"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-builder_describe "Build Keyman kmc Lexical Model model-info Compiler module" \
-  "@/developer/src/kmc-package" \
+builder_describe "Build Keyman ldml-keyboard-constants package" \
+  "@/common/web/keyman-version" \
+  "clean" \
   "configure" \
   "build" \
-  "clean" \
   "test" \
   "pack                      build a local .tgz pack for testing" \
   "publish                   publish to npm" \
   "--dry-run,-n              don't actually publish, just dry run"
+
 builder_describe_outputs \
   configure     /node_modules \
-  build         /developer/src/kmc-model-info/build/src/model-info-compiler.js
+  build         /core/include/ldml/build/keyboardprocessor_ldml.js
 
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action clean; then
-  rm -rf ./build/ ./tsconfig.tsbuildinfo
+  rm -rf ./build/
   builder_finish_action success clean
 fi
 
@@ -48,14 +49,14 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action build; then
-  npm run build
+  tsc --build
   builder_finish_action success build
 fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action test; then
-  #npm test - no tests as yet
+  # no tests at this time
   builder_finish_action success test
 fi
 

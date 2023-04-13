@@ -17,18 +17,19 @@ cd "$THIS_SCRIPT_PATH"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 
-builder_describe "Build Keyman kmc Package Compiler module" \
-  "@/common/web/keyman-version" \
+builder_describe "Build Keyman model types package" \
   "clean" \
   "configure" \
   "build" \
   "test" \
-  "pack" \
+  "pack                      build a local .tgz pack for testing" \
   "publish                   publish to npm" \
   "--dry-run,-n              don't actually publish, just dry run"
+
 builder_describe_outputs \
   configure     /node_modules \
   build         /common/models/types/build/common/models/types/tsconfig.tsbuildinfo
+
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------

@@ -22,7 +22,7 @@ builder_describe "Build Keyman kmc Package Compiler module" \
   "build" \
   "clean" \
   "test" \
-  "pack" \
+  "pack                      build a local .tgz pack for testing" \
   "publish                   publish to npm" \
   "--dry-run,-n              don't actually publish, just dry run"
 builder_describe_outputs \

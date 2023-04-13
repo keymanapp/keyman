@@ -23,8 +23,8 @@ builder_describe "Build the include script for current Keyman version" \
   configure \
   clean \
   build \
-  pack \
-  publish \
+  "pack                      build a local .tgz pack for testing" \
+  "publish                   publish to npm" \
   test \
   --dry-run
 
