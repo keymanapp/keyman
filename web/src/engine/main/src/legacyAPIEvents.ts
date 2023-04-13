@@ -1,4 +1,4 @@
-import { LegacyEventMap } from './legacyEventEmitter.js';
+import { LegacyEventMap } from 'keyman/engine/events';
 
 /**
  * Type definitions for KeymanWeb's documented API events.
