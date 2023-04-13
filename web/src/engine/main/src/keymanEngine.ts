@@ -10,7 +10,7 @@ import { ContextManagerBase } from "./contextManagerBase.js";
 import { KeyEventHandler } from './keyEventSource.interface.js';
 import HardKeyboardBase from "./hardKeyboard.js";
 import { LegacyAPIEvents } from "./legacyAPIEvents.js";
-import { EventNames, EventListener, LegacyEventEmitter, LegacyEventMap } from "keyman/engine/events";
+import { EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";
 import DOMCloudRequester from "keyman/engine/package-cache/dom-requester";
 
 export default class KeymanEngine<

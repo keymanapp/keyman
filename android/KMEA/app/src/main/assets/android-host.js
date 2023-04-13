@@ -44,8 +44,8 @@ function init() {
     keyman.refreshOskLayout();
   });
 
-  // keyman.addEventListener('keyboardloaded', setIsChiral);  // TODO:  fix + support these events.
-  // keyman.addEventListener('keyboardchange', setIsChiral);
+  keyman.addEventListener('keyboardloaded', setIsChiral);
+  keyman.addEventListener('keyboardchange', setIsChiral);
   keyman.core.languageProcessor.on('statechange', onStateChange);
 
   document.body.addEventListener('touchend', loadDefaultKeyboard);
