@@ -30,31 +30,38 @@ export class EmitterListenerSpy<BaseEventMap extends Object> extends EventEmitte
     super();
 
     if(emitter instanceof EventEmitter) {
-      emitter.on = this.addListenerAttachmentExtension('listenerAdded', emitter, emitter.on);
-      emitter.addListener = this.addListenerAttachmentExtension('listenerAdded', emitter, emitter.addListener);
-      emitter.off = this.addListenerAttachmentExtension('listenerRemoved', emitter, emitter.off);
-      emitter.removeListener = this.addListenerAttachmentExtension('listenerRemoved', emitter, emitter.off);
+      emitter.on = this.listenerRegistrationSpy('listenerAdded', emitter, emitter.on);
+      emitter.addListener = this.listenerRegistrationSpy('listenerAdded', emitter, emitter.addListener);
+      emitter.off = this.listenerRegistrationSpy('listenerRemoved', emitter, emitter.off);
+      emitter.removeListener = this.listenerRegistrationSpy('listenerRemoved', emitter, emitter.off);
     } else {
       // TS gets really fussy about how the legacy event typing is a bit more
       // restrictive (due to less-restricted event name types in EventEmitter)
       // It's not worth the effort to make this 100% perfect at the moment.
       //
       // @ts-ignore
-      emitter.addEventListener = this.addListenerAttachmentExtension('listenerAdded', emitter, emitter.addEventListener);
+      emitter.addEventListener = this.listenerRegistrationSpy('listenerAdded', emitter, emitter.addEventListener);
       // @ts-ignore
-      emitter.removeEventListener = this.addListenerAttachmentExtension('listenerRemoved', emitter, emitter.removeEventListener);
+      emitter.removeEventListener = this.listenerRegistrationSpy('listenerRemoved', emitter, emitter.removeEventListener);
     }
   }
 
-  // Refer to https://stackoverflow.com/a/10057969.
-  private addListenerAttachmentExtension(
+  /**
+   * Given an event emitter and one of its methods used to register or unregister associated events,
+   * this method will construct a replacement method that calls the original AND raises the specified
+   * corresponding listener event provided by this class afterward.  The replacement method
+   * should be assigned to the emitter afterward, overwriting the original version.
+   *
+   * Refer to https://stackoverflow.com/a/10057969.
+   */
+  private listenerRegistrationSpy(
     spyEventName: EventNames<EventMap<BaseEventMap>>,
     emitter: Emitter<BaseEventMap>,
     method: (
       eventName: EventNames<BaseEventMap>,
       listener: EventListener<BaseEventMap, EventNames<BaseEventMap>>,
     ) => any
-  ): (
+  ): ( // returns a method of the same signature as the original implementation.
     eventName: EventNames<BaseEventMap>,
     listener: EventListener<BaseEventMap, EventNames<BaseEventMap>>,
   ) => any {
