@@ -1,8 +1,8 @@
-import { DefaultRules, KeyboardKeymanGlobal, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
+import { DefaultRules, type Keyboard, KeyboardKeymanGlobal, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
 import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
 import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
 import { OSKView } from "keyman/engine/osk";
-import { KeyboardRequisitioner, ModelCache, ModelSpec } from "keyman/engine/package-cache";
+import { KeyboardRequisitioner, type KeyboardStub, ModelCache, ModelSpec } from "keyman/engine/package-cache";
 
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
 import KeyboardInterface from "./keyboardInterface.js";
@@ -12,7 +12,10 @@ import HardKeyboardBase from "./hardKeyboard.js";
 import { LegacyAPIEventEngine } from "./legacyAPIEvents.js";
 import DOMCloudRequester from "keyman/engine/package-cache/dom-requester";
 
-export default class KeymanEngine<ContextManager extends ContextManagerBase, HardKeyboard extends HardKeyboardBase> implements KeyboardKeymanGlobal {
+export default class KeymanEngine<
+  ContextManager extends ContextManagerBase,
+  HardKeyboard extends HardKeyboardBase
+> implements KeyboardKeymanGlobal {
   readonly config: EngineConfiguration;
   readonly contextManager: ContextManager;
   readonly interface: KeyboardInterface;
@@ -94,10 +97,11 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
     this.processor = new InputProcessor(config.hostDevice, worker, this.processorConfiguration());
 
     this.contextManager.configure({
-      resetKeyState: (target) => {
+      resetContext: (target) => {
         this.processor.keyboardProcessor.resetContext(target);
       },
-      predictionContext: new PredictionContext(this.processor.languageProcessor, this.processor.keyboardProcessor)
+      predictionContext: new PredictionContext(this.processor.languageProcessor, this.processor.keyboardProcessor),
+      keyboardCache: this.keyboardRequisitioner.cache
     });
 
     // TODO:  configure that context-manager!
@@ -140,10 +144,44 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
     contextManager.on('keyboardchange', (kbd) => {
       this.refreshModel();
 
+      // Hide OSK and do not update keyboard list if using internal keyboard (desktops).
+      // Condition will not be met for touch form-factors; they force selection of a
+      // default keyboard.
+      if(kbd.keyboard == null && kbd.metadata == null) {
+        this.osk.startHide(false);
+      }
+
       if(this.osk) {
+        this.osk.setNeedsLayout();
         this.osk.activeKeyboard = kbd;
+        this.osk.present();
       }
     });
+
+    contextManager.on('keyboardasyncload', (metadata) => {
+      /* Original implementation pre-modularization:
+       *
+       * > Force OSK display for CJK keyboards (keyboards using a pick list)
+       *
+       * A matching subcondition in the block below will ensure that the OSK activates pre-load
+       * for CJK keyboards.  Yes, even before a CJK picker could ever show.  We should be fine
+       * without the CJK check so long as a picker keyboard's OSK is kept activated post-load,
+       * when the picker actually needs to be kept persistently-active.
+       * `metadata` would be relevant a the CJK-check, which was based on language codes.
+       *
+       * Of course, as mobile devices don't have guaranteed physical keyboards... we need to
+       * keep the OSK visible for them, hence the actual block below.
+       */
+      if(this.config.hostDevice.touchable && this.osk?.activationModel) {
+        this.osk.activationModel.enabled = true;
+        // Also note:  the OSKView.mayDisable method returns false when hostDevice.touchable = false.
+        // The .startHide() call below will check that method before actually starting an OSK hide.
+      }
+
+      // Always (temporarily) hide the OSK when loading a new keyboard, to ensure
+      // that a failure to load doesn't leave the current OSK displayed
+      this.osk?.startHide(false);
+    })
     // #endregion
   }
 
@@ -245,6 +283,10 @@ export default class KeymanEngine<ContextManager extends ContextManagerBase, Har
     if(this.processor.activeModel && this.processor.activeModel.id == modelId) {
       this.processor.languageProcessor.unloadModel();
     }
+  }
+
+  async setActiveKeyboard(keyboardId: string, languageCode?: string): Promise<boolean> {
+    return this.contextManager.activateKeyboard(keyboardId, languageCode, true);
   }
 }
 

@@ -4,12 +4,13 @@ import fs from 'fs';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { KeyboardHarness, KeyboardInterface, MinimalKeymanGlobal, Mock } from '@keymanapp/keyboard-processor';
+import { KeyboardHarness, KeyboardInterface, KeyboardLoaderBase, MinimalKeymanGlobal, Mock } from '@keymanapp/keyboard-processor';
 import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-loader';
 
 describe('Headless keyboard loading', function() {
   const laoPath = require.resolve('@keymanapp/common-test-resources/keyboards/lao_2008_basic.js');
   const khmerPath = require.resolve('@keymanapp/common-test-resources/keyboards/khmer_angkor.js');
+  const nonKeyboardPath = require.resolve('@keymanapp/common-test-resources/index.mjs');
   // Common test suite setup.
 
   let device = {
@@ -100,6 +101,31 @@ describe('Headless keyboard loading', function() {
       assert.strictEqual(lao_keyboard, harness.activeKeyboard);
 
       assert.equal(khmer_keyboard.id, "Keyboard_khmer_angkor");
+    });
+
+    it('throws distinct errors', async function() {
+      const invalidPath = 'totally_invalid_path.js';
+
+      let harness = new KeyboardInterface({}, MinimalKeymanGlobal);
+      let keyboardLoader = new NodeKeyboardLoader(harness);
+      let missingError;
+      try {
+        await keyboardLoader.loadKeyboardFromPath(invalidPath);
+      } catch (err) {
+        missingError = err;
+      }
+      assert.isOk(missingError);
+
+      let scriptLoadError;
+      try {
+        await keyboardLoader.loadKeyboardFromPath(nonKeyboardPath);
+      } catch (err) {
+        scriptLoadError = err;
+      }
+      assert.isOk(scriptLoadError);
+
+      // The main test:  do the errors match?
+      assert.notEqual(scriptLoadError.message, missingError.message);
     });
   })
 });

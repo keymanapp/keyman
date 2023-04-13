@@ -40,6 +40,28 @@ describe('StubAndKeyboardCache', function () {
     assert.strictEqual(cache.findMatchingStub(new KeyboardStub('galaxie_hebrew_positional', 'he')), galaxie_stub);
   });
 
+  it('can resolve original order of added stubs', () => {
+    const cache = new StubAndKeyboardCache();
+
+    assert.isNotOk(cache.defaultStub);
+
+    // Could convert to run on all stubs, but... this should be fine as-is.
+    const khmer_angkor_stub = new KeyboardStub(JSON.parse(fs.readFileSync(require.resolve(`${rootCommonStubPath}/khmer_angkor.json`))));
+    cache.addStub(khmer_angkor_stub);
+
+    const galaxie_stub = new KeyboardStub(JSON.parse(fs.readFileSync(require.resolve(`${rootCommonStubPath}/galaxie_hebrew_positional.json`))));
+    cache.addStub(galaxie_stub);
+
+    const lao_2008_basic_stub = new KeyboardStub(JSON.parse(fs.readFileSync(require.resolve(`${rootCommonStubPath}/lao_2008_basic.json`))));
+    cache.addStub(lao_2008_basic_stub);
+
+    assert.strictEqual(cache.defaultStub, khmer_angkor_stub);
+
+    cache.forgetKeyboard(khmer_angkor_stub.id);
+
+    assert.strictEqual(cache.defaultStub, galaxie_stub);
+  });
+
   it('loads & caches `Keyboard`s, `Keyboard` promise pending resolution', async () => {
     let keyboardLoader = new NodeKeyboardLoader(new KeyboardHarness({}, MinimalKeymanGlobal));
     const cache = new StubAndKeyboardCache(keyboardLoader);

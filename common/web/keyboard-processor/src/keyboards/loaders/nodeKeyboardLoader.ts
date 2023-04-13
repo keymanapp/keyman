@@ -1,4 +1,4 @@
-import { Keyboard, KeyboardHarness, KeyboardLoaderBase, MinimalKeymanGlobal } from '@keymanapp/keyboard-processor';
+import { Keyboard, KeyboardHarness, KeyboardLoaderBase, KeyboardLoadErrorBuilder, MinimalKeymanGlobal } from '@keymanapp/keyboard-processor';
 
 import vm from 'vm';
 import fs from 'fs';
@@ -22,16 +22,22 @@ export class NodeKeyboardLoader extends KeyboardLoaderBase {
     }
   }
 
-  protected loadKeyboardInternal(uri: string): Promise<Keyboard> {
+  protected loadKeyboardInternal(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard> {
+    // `fs` does not like 'file:///'; it IS "File System" oriented, after all, and wants a path, not a URI.
+    if(uri.indexOf('file:///') == 0) {
+      uri = uri.substring('file:///'.length);
+    }
+
+    let script;
     try {
-      // `fs` does not like 'file:///'; it IS "File System" oriented, after all, and wants a path, not a URI.
-      if(uri.indexOf('file:///') == 0) {
-        uri = uri.substring('file:///'.length);
-      }
-      const script = new vm.Script(fs.readFileSync(uri).toString());
+      script = new vm.Script(fs.readFileSync(uri).toString());
+    } catch (err) {
+      return Promise.reject(errorBuilder.missingError(err));
+    }
+    try {
       script.runInContext(this.harness._jsGlobal);
     } catch (err) {
-      return Promise.reject(err);
+      return Promise.reject(errorBuilder.scriptError(err));
     }
 
     const keyboard = this.harness.loadedKeyboard;

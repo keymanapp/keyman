@@ -1,16 +1,31 @@
 import { type Keyboard, Mock, OutputTarget } from '@keymanapp/keyboard-processor';
 import { type KeyboardStub } from 'keyman/engine/package-cache';
+import { CookieSerializer } from 'keyman/engine/dom-utils';
 import {
-  ContextManager as ContextManagerBase,
+  ContextManagerBase,
   type KeyboardInterface
 } from 'keyman/engine/main';
 import { BrowserConfiguration } from './configuration.js';
 
+interface KeyboardCookie {
+  current: string;
+}
+
 export default class ContextManager extends ContextManagerBase {
   private _activeKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
   private config: BrowserConfiguration;
+  private cookieManager = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
 
   initialize(): void {
+    this.on('keyboardasyncload', (stub, completion) => {
+      // TODO:  app/browser - display the loader UI if configured?
+      // util.wait('Installing keyboard<br/>' + kbdName);
+
+      completion.then(() => {
+        // Cancel the loader UI.
+      });
+    });
+
     // TBD:  keyman.domManager.init (the page-integration parts)
     // CTRL+F: `// Exit initialization here if we're using an embedded code path.`
     // EVERYTHING after that block will likely go here - DOMManager's role always
@@ -27,7 +42,7 @@ export default class ContextManager extends ContextManagerBase {
     return this._activeKeyboard;
   }
 
-  set activeKeyboard(kbd: {keyboard: Keyboard, metadata: KeyboardStub}) {
+  setKeyboardActiveForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget) {
     throw new Error('Method not implemented.');
     // depends on the target
     // if not set with an "independent keyboard", changes the global.
@@ -57,5 +72,62 @@ export default class ContextManager extends ContextManagerBase {
       return super.insertText(kbdInterface, Ptext, PdeadKey);
     }
     return false;
+  }
+
+  /**
+   * Reflects the active 'target' upon which any `set activeKeyboard` operation will take place.
+   * When `null`, such operations will affect the global default; otherwise, such operations
+   * affect only the specified `target`.
+   */
+  protected get keyboardTarget(): OutputTarget {
+    // TODO: Remove `&& false` once the inlined section below is implemented.
+    if(this.activeTarget /* has 'independent keyboard mode activated' */ && false) {
+      return this.activeTarget;
+    } else {
+      return null;
+    }
+  }
+
+
+  public async activateKeyboard(keyboardId: string, languageCode?: string, saveCookie?: boolean): Promise<boolean> {
+    saveCookie ||= false;
+    const originalKeyboardTarget = this.keyboardTarget;
+
+    try {
+      let result = await super.activateKeyboard(keyboardId, languageCode, saveCookie);
+
+      if(saveCookie && !originalKeyboardTarget) { // if the active target uses global keyboard settings
+        this.cookieManager.save({current: `${keyboardId}:${languageCode}`});
+      }
+
+      // Only do these if the active keyboard-target still matches the original keyboard-target;
+      // otherwise, maintain what's correct for the currently active one.
+      if(originalKeyboardTarget == this.keyboardTarget) {
+        // TODO: app/browser - _SetTargDir (within its ContextManager)
+        // util.addStyleSheet(domManager.setAttachmentFontStyle(kbdStub.KF));
+        // uiManager.justActivated = true; // TODO:  Resolve without need for the cast.
+      }
+
+      return result;
+    } catch(err) {
+      // non-embedded:  if keyboard activation failed, deactivate the keyboard.
+
+      // Make sure we don't infinite-recursion should the deactivate somehow fail.
+      if(this.config.hostDevice.touchable) {
+        // Fallback behavior - if on a touch device, we need to keep a keyboard visible.
+        const defaultStub = this.keyboardCache.defaultStub;
+        await this.activateKeyboard(defaultStub.id, defaultStub.langId, true).catch(() => {});
+      } else {
+        // Fallback behavior - if on a desktop device, the user still has a physical keyboard.
+        // Just clear out the active keyboard & OSK.
+        await this.activateKeyboard('', '', false).catch(() => {});
+      }
+
+      if((this.config as BrowserConfiguration).shouldAlert) {
+        // TODO:  util.alert error report
+      }
+
+      throw err; // since the site-dev consumer may want to do their own error-handling.
+    }
   }
 }
