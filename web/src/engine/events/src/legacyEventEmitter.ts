@@ -75,7 +75,7 @@ export class LegacyEventEmitter<EventTypes extends LegacyEventMap> {
     event: T,
     func: EventListener<EventTypes, T>
   ): boolean {
-    this.removeEventListener(event, func);
+    this._removeEventListener(event, func);
     this.events[event].push(func);
     return true;
   }
@@ -88,7 +88,16 @@ export class LegacyEventEmitter<EventTypes extends LegacyEventMap> {
    * @return     {boolean}
    * Description Remove the specified function from the listeners for this event
    */
-  removeEventListener<T extends EventNames<EventTypes>> (
+  public removeEventListener<T extends EventNames<EventTypes>> (
+    event: T,
+    func: EventListener<EventTypes, T>
+  ): boolean {
+    return this._removeEventListener(event, func);
+  }
+
+  // Separate, in order to prevent `addEventListener` from sending 'listenerRemoved' events with
+  // EmitterListenerSpy.
+  private _removeEventListener<T extends EventNames<EventTypes>> (
     event: T,
     func: EventListener<EventTypes, T>
   ): boolean {
@@ -142,6 +151,11 @@ export class LegacyEventEmitter<EventTypes extends LegacyEventMap> {
     }
     this.currentEvents.pop();
     return true;
+  }
+
+  listenerCount<T extends EventNames<EventTypes>>(event: T) {
+    const listeners = this.events[event];
+    return listeners ? listeners.length : 0;
   }
 
   shutdown() {

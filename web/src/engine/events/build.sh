@@ -57,7 +57,7 @@ if builder_start_action build; then
 fi
 
 if builder_start_action test; then
-  # No HEADLESS tests yet.
+  mocha --recursive "${KEYMAN_ROOT}/web/src/test/auto/headless/events"
 
   builder_finish_action success test
 fi
