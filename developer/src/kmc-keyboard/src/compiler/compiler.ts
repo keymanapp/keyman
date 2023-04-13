@@ -113,6 +113,8 @@ export default class Compiler {
   /**
    * Validates that the LDML keyboard source file and lints. Actually just
    * compiles the keyboard and returns `true` if everything is good...
+   * No need to call this before calling compile, use this only for
+   * validating without compiling.
    * @param     source
    * @returns   true if the file validates
    */

@@ -49,9 +49,7 @@ function buildLdmlKeyboardToMemory(inputFilename: string, options: BuildCommandO
   if (!source) {
     return [null, null, null];
   }
-  if (!k.validate(source)) {
-    return [null, null, null];
-  }
+  // 'compile' will perform validation as well.
   let kmx = k.compile(source);
   if (!kmx) {
     return [null, null, null];
