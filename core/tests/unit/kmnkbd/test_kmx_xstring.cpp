@@ -19,7 +19,7 @@
 #include <string>
 #include "../../../src/kmx/kmx_xstring.h"
 #include <kmx_file.h>
-#include "../test_assert.h"
+#include <test_assert.h>
 
 using namespace km::kbp::kmx;
 using namespace std;

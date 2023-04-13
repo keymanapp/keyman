@@ -57,6 +57,9 @@ while [[ $# -gt 0 ]] ; do
   shift # past argument
 done
 
+# Override JAVA_HOME to OpenJDK 11
+set_java_home
+
 echo
 echo "NO_DAEMON: $NO_DAEMON"
 echo "DO_KMAPRO: $DO_KMAPRO"

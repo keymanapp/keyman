@@ -24,8 +24,9 @@
 #include "state.hpp"
 #include "utfcodec.hpp"
 
-#include "../test_assert.h"
-#include "../test_color.h"
+#include <test_assert.h>
+#include <test_color.h>
+#include "../emscripten_filesystem.h"
 
 #include "kmx_test_source.hpp"
 
@@ -334,5 +335,10 @@ int main(int argc, char *argv[]) {
   console_color::enabled = console_color::isaterminal() || arg_color;
 
   km::kbp::kmx::g_debug_ToConsole = TRUE;
+
+#ifdef __EMSCRIPTEN__
+  return run_test(get_wasm_file_path(argv[first_arg]), get_wasm_file_path(argv[first_arg + 1]));
+#else
   return run_test(argv[first_arg], argv[first_arg + 1]);
+#endif
 }

@@ -15,6 +15,7 @@
     "resources/build/version",
     "core/include/ldml",
     "developer/src/kmc-keyboard",
+    "developer/src/kmc-kmn",
     "developer/src/kmc-model",
     "developer/src/kmc-model-info",
     "developer/src/kmc-package",
