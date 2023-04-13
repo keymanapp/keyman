@@ -61,7 +61,8 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action test; then
-  npm test
+  tsc --build test/
+  c8 --reporter=lcov --reporter=text mocha "${builder_extra_params[@]}"
   builder_finish_action success test
 fi
 
