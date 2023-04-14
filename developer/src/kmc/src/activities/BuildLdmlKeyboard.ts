@@ -3,41 +3,47 @@ import * as fs from 'fs';
 import * as kmc from '@keymanapp/kmc-keyboard';
 import { KvkFileWriter, CompilerCallbacks } from '@keymanapp/common-types';
 import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
-import { BuildCommandOptions } from '../commands/build.js';
+import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
 
-export async function buildLdmlKeyboard(infile: string, options: BuildCommandOptions): Promise<boolean> {
-  // TODO-LDML: consider hardware vs touch -- touch-only layout will not have a .kvk
-  // Compile:
-  let [kmx,kvk,kmw] = buildLdmlKeyboardToMemory(infile, options);
-  // Output:
+export class BuildLdmlKeyboard implements BuildActivity {
+  public get name(): string { return 'LDML keyboard'; }
+  public get sourceExtension(): string { return '.xml'; }
+  public get compiledExtension(): string { return '.kmx'; }
+  public get description(): string { return 'Build a LDML keyboard'; }
+  public async build(infile: string, options: BuildActivityOptions): Promise<boolean> {
+    // TODO-LDML: consider hardware vs touch -- touch-only layout will not have a .kvk
+    // Compile:
+    let [kmx,kvk,kmw] = buildLdmlKeyboardToMemory(infile, options);
+    // Output:
 
-  const fileBaseName = options.outFile ?? infile;
-  const outFileBase = path.basename(fileBaseName, path.extname(fileBaseName));
-  const outFileDir = path.dirname(fileBaseName);
+    const fileBaseName = options.outFile ?? infile;
+    const outFileBase = path.basename(fileBaseName, path.extname(fileBaseName));
+    const outFileDir = path.dirname(fileBaseName);
 
-  if(kmx && kvk) {
-    const outFileKmx = path.join(outFileDir, outFileBase + '.kmx');
-    console.log(`Writing compiled keyboard to ${outFileKmx}`);
-    fs.writeFileSync(outFileKmx, kmx);
+    if(kmx && kvk) {
+      const outFileKmx = path.join(outFileDir, outFileBase + '.kmx');
+      console.log(`Writing compiled keyboard to ${outFileKmx}`);
+      fs.writeFileSync(outFileKmx, kmx);
 
-    const outFileKvk = path.join(outFileDir, outFileBase + '.kvk');
-    console.log(`Writing compiled visual keyboard to ${outFileKvk}`);
-    fs.writeFileSync(outFileKvk, kvk);
-  } else {
-    console.error(`An error occurred compiling ${infile}`);
-    return false;
+      const outFileKvk = path.join(outFileDir, outFileBase + '.kvk');
+      console.log(`Writing compiled visual keyboard to ${outFileKvk}`);
+      fs.writeFileSync(outFileKvk, kvk);
+    } else {
+      console.error(`An error occurred compiling ${infile}`);
+      return false;
+    }
+
+    if(kmw) {
+      const outFileKmw = path.join(outFileDir, outFileBase + '.js');
+      console.log(`Writing compiled js keyboard to ${outFileKmw}`);
+      fs.writeFileSync(outFileKmw, kmw);
+    }
+
+    return true;
   }
-
-  if(kmw) {
-    const outFileKmw = path.join(outFileDir, outFileBase + '.js');
-    console.log(`Writing compiled js keyboard to ${outFileKmw}`);
-    fs.writeFileSync(outFileKmw, kmw);
-  }
-
-  return true;
 }
 
-function buildLdmlKeyboardToMemory(inputFilename: string, options: BuildCommandOptions): [Uint8Array, Uint8Array, Uint8Array] {
+function buildLdmlKeyboardToMemory(inputFilename: string, options: BuildActivityOptions): [Uint8Array, Uint8Array, Uint8Array] {
   let compilerOptions: kmc.CompilerOptions = {
     debug: options.debug ?? false,
     addCompilerVersion: options.compilerVersion ?? true
@@ -47,9 +53,6 @@ function buildLdmlKeyboardToMemory(inputFilename: string, options: BuildCommandO
   const k = new kmc.Compiler(c, options);
   let source = k.load(inputFilename);
   if (!source) {
-    return [null, null, null];
-  }
-  if (!k.validate(source)) {
     return [null, null, null];
   }
   let kmx = k.compile(source);

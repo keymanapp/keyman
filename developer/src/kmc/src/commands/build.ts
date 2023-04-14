@@ -1,23 +1,15 @@
 import * as fs from 'fs';
 import { Command } from 'commander';
-import { buildPackage } from '../activities/buildPackage.js';
-import { buildKmnKeyboard } from '../activities/buildKmnKeyboard.js';
-import { buildLdmlKeyboard } from '../activities/buildLdmlKeyboard.js';
-import { buildModel } from '../activities/buildModel.js';
-import { buildProject } from '../activities/buildProject.js';
-
-export interface BuildCommandOptions {
-  debug?: boolean;
-  outFile?: string;
-  compilerVersion?: boolean;
-};
+import { BuildActivityOptions } from '../activities/BuildActivity.js';
+import { buildActivities } from '../activities/buildActivities.js';
+import { BuildProject } from '../activities/BuildProject.js';
 
 export function declareBuild(program: Command) {
   program
     .command('build [infile...]')
     .description('Build a source file into a final file')
     .option('-d, --debug', 'Include debug information in output')
-    .option('-o, --out-file <filename>', 'where to save the resulting .kmx file')
+    .option('-o, --out-file <filename>', 'Override the default path and filename for the output file')
     .option('--no-compiler-version', 'Exclude compiler version metadata from output')
     .action((infiles: string[], options: any) => {
       let p = [];
@@ -32,33 +24,30 @@ export function declareBuild(program: Command) {
     });
 }
 
-async function build(infile: string, options: BuildCommandOptions): Promise<boolean> {
+async function build(infile: string, options: BuildActivityOptions): Promise<boolean> {
   console.log(`Building ${infile}`);
 
-  if(infile.endsWith('.xml')) {
-    return buildLdmlKeyboard(infile, options);
+  if(!fs.existsSync(infile)) {
+    // TODO: consolidate errors
+    console.error(`File ${infile} does not exist`);
+    process.exit(2);
   }
 
-  if(infile.endsWith('.kmn')) {
-    return buildKmnKeyboard(infile, options);
-  }
-
-  if(infile.endsWith('.kps')) {
-    return buildPackage(infile, options);
-  }
-
-  if(infile.endsWith('.model.ts')) {
-    return buildModel(infile, options);
-  }
-
-  if(infile.endsWith('.kpj')) {
-    return buildProject(infile, options);
-  }
-
+  // If infile is a directory, then we treat that as a project and build it
   if(fs.statSync(infile).isDirectory()) {
-    return buildProject(infile, options);
+    return (new BuildProject()).build(infile, options);
   }
 
-  console.error(`Unrecognised input file ${infile}, expecting .xml, .kmn, .kps, .model.ts, .kpj, or project folder`);
+  // Otherwise, if it's one of our known file extensions, we build it
+  let extensions = '';
+  for(let build of buildActivities) {
+    if(infile.toLowerCase().endsWith(build.sourceExtension)) {
+      return build.build(infile, options);
+    }
+    extensions += build.sourceExtension + ', ';
+  }
+
+  // TODO: consolidate errors
+  console.error(`Unrecognised input file ${infile}, expecting ${extensions}or project folder`);
   process.exit(2);
 }

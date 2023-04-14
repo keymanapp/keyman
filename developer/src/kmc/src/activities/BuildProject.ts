@@ -1,26 +1,31 @@
+import * as path from 'path';
+import * as fs from 'fs';
 import { CompilerCallbacks, KeymanDeveloperProject, KPJFileReader } from '@keymanapp/common-types';
 import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
 import { KeymanDeveloperProjectFile } from '../../../../../common/web/types/src/kpj/keyman-developer-project.js';
-import { BuildCommandOptions } from '../commands/build.js';
-import { buildKmnKeyboard } from './buildKmnKeyboard.js';
-import * as path from 'path';
-import * as fs from 'fs';
-import { buildLdmlKeyboard } from './buildLdmlKeyboard.js';
-import { buildModel } from './buildModel.js';
-import { buildPackage } from './buildPackage.js';
+import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
+import { buildActivities } from './buildActivities.js';
 
-export async function buildProject(infile: string, options: BuildCommandOptions): Promise<boolean> {
-  let builder = new ProjectBuilder(infile, options);
-  return builder.run();
+const PROJECT_EXTENSION = '.kpj';
+
+export class BuildProject implements BuildActivity {
+  public get name(): string { return 'Project'; }
+  public get sourceExtension(): string { return PROJECT_EXTENSION; }
+  public get compiledExtension(): string { return null; }
+  public get description(): string  { return 'Build a keyboard or lexical model project'; }
+  public async build(infile: string, options: BuildActivityOptions): Promise<boolean> {
+    let builder = new ProjectBuilder(infile, options);
+    return builder.run();
+  }
 }
 
 class ProjectBuilder {
   callbacks: CompilerCallbacks = new NodeCompilerCallbacks();
   infile: string;
-  options: BuildCommandOptions;
+  options: BuildActivityOptions;
   project: KeymanDeveloperProject;
 
-  constructor(infile: string, options: BuildCommandOptions) {
+  constructor(infile: string, options: BuildActivityOptions) {
     this.infile = path.resolve(infile);
     this.options = options;
   }
@@ -37,24 +42,16 @@ class ProjectBuilder {
       return false;
     }
 
-    // Build all Keyman keyboards in the project
-    if(!await this.buildProjectTargets(buildKmnKeyboard, '.kmn', '.kmx')) {
-      return false;
-    }
+    // Go through the various file types and build them
+    for(let builder of buildActivities) {
+      if(builder.sourceExtension == PROJECT_EXTENSION) {
+        // We don't support nested projects
+        continue;
+      }
 
-    // Build all LDML keyboards in the project
-    if(!await this.buildProjectTargets(buildLdmlKeyboard, '.xml', '.kmx')) {
-      return false;
-    }
-
-    // Build all models in the project
-    if(!await this.buildProjectTargets(buildModel, '.model.ts', '.model.js')) {
-      return false;
-    }
-
-    // Build all packages in the project
-    if(!await this.buildProjectTargets(buildPackage, '.kps', '.kmp')) {
-      return false;
+      if(!await this.buildProjectTargets(builder)) {
+        return false;
+      }
     }
 
     // TODO: generate .keyboard_info from .kps + etc (and support merge of
@@ -105,35 +102,26 @@ class ProjectBuilder {
     return project;
   }
 
-  async buildProjectTargets(
-    buildTarget: (infile: string, options: BuildCommandOptions) => Promise<boolean>,
-    fileType: '.xml'|'.kmn'|'.model.ts'|'.kps',
-    outputFileType: '.kmx'|'.model.js'|'.kmp'
-  ): Promise<boolean> {
+  async buildProjectTargets(activity: BuildActivity): Promise<boolean> {
     let result = true;
     for(let file of this.project.files) {
-      if(file.fileType.toLowerCase() == fileType) {
-        result = await this.buildTarget(file, buildTarget, fileType, outputFileType) && result;
+      if(file.fileType.toLowerCase() == activity.sourceExtension) {
+        result = await this.buildTarget(file, activity) && result;
       }
     }
     return result;
   }
 
-  async buildTarget(
-    file: KeymanDeveloperProjectFile,
-    buildTarget: (infile: string, options: BuildCommandOptions) => Promise<boolean>,
-    fileType: '.xml'|'.kmn'|'.model.ts'|'.kps',
-    outputFileType: '.kmx'|'.model.js'|'.kmp'
-  ): Promise<boolean> {
+  async buildTarget(file: KeymanDeveloperProjectFile, activity: BuildActivity): Promise<boolean> {
     const options = {...this.options};
-    options.outFile = this.project.resolveOutputFilePath(this.infile, file, fileType, outputFileType);
+    options.outFile = this.project.resolveOutputFilePath(this.infile, file, activity.sourceExtension, activity.compiledExtension);
     const infile = this.project.resolveInputFilePath(this.infile, file);
     // TODO: callbacks.reportMessage, improve logging and make consistent
     console.log(`Building ${infile}\n  Output ${options.outFile}`);
 
     fs.mkdirSync(path.dirname(options.outFile), {recursive:true});
 
-    let result = await buildTarget(infile, options);
+    let result = await activity.build(infile, options);
     if(result) {
       console.log(`${path.basename(infile )} built successfully.`);
     } else {

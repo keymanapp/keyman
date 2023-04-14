@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 17.0.87 alpha 2023-04-13
+
+* refactor(developer): DRY kmc module references (#8577)
+* chore(developer): kmc-kmn should build all baseline fixtures (#8578)
+* fix(developer): kmc should not validate as well as compile keyboard (#8579)
+* fix(developer): improve 'does not exist' error message (#8580)
+* fix(common): consolidate npm publishing (#8587)
+* chore(common): add missing deps and files for npm publish (#8588)
+
 ## 17.0.86 alpha 2023-04-12
 
 * docs(windows): link to wiki architecture faq page (#8584)

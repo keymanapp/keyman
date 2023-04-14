@@ -24,6 +24,7 @@ builder_describe "Build Keyman Developer Compiler Module for .kmn to .kmx" \
   "build" \
   "clean" \
   "test" \
+  "pack                      build a local .tgz pack for testing" \
   "publish                   publish to npm" \
   "--dry-run,-n              don't actually publish, just dry run"
 
@@ -61,7 +62,8 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action test; then
-  npm test
+  tsc --build test/
+  c8 --reporter=lcov --reporter=text mocha "${builder_extra_params[@]}"
   builder_finish_action success test
 fi
 
@@ -71,4 +73,8 @@ if builder_start_action publish; then
   . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
   builder_publish_to_npm
   builder_finish_action success publish
+elif builder_start_action pack; then
+  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+  builder_publish_to_pack
+  builder_finish_action success pack
 fi
