@@ -71,11 +71,6 @@ public:
 
   BOOL DebugControlled();
 
-  // TODO: 5442 This would be better to called SaveContextWithStores or SaveContextWithKbdOptions
-  //       Will be removed with 5442 when removing window core
-  void SaveContext(AppContextWithStores *savedContext);   // I4370   // I4978
-  void RestoreContext(AppContextWithStores *savedContext);   // I4370   // I4978
-
   /**
    * Copy the member context
    *

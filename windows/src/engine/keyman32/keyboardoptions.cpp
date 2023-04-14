@@ -42,20 +42,6 @@ void LoadKeyboardOptions(LPINTKEYBOARDINFO kp)
   IntLoadKeyboardOptions(REGSZ_KeyboardOptions, kp);
 }
 
-void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp)
-{
-  if(!DebugAssert(!Globals::get_CoreIntegration(), "LoadSharedKeyboardOptions: Error called in core integration mode")) {
-    return;
-  }
-  // Called when another thread changes keyboard options and we are sharing keyboard settings
-  assert(kp != NULL);
-  assert(kp->Keyboard != NULL);
-
-  if(kp->KeyboardOptions != NULL) FreeKeyboardOptions(kp);
-
-  IntLoadKeyboardOptions(REGSZ_SharedKeyboardOptions, kp);
-}
-
 void FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
 {
   // This is a cleanup routine; we don't want to precondition all calls to it
@@ -71,81 +57,6 @@ void FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
     }
   delete kp->KeyboardOptions;
   kp->KeyboardOptions = NULL;
-}
-
-void SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead)
-{
-  if (!DebugAssert(!Globals::get_CoreIntegration(), "SetKeyboardOption: Error called in core integration mode")) {
-    return;
-  }
-  assert(kp != NULL);
-  assert(kp->Keyboard != NULL);
-  assert(kp->KeyboardOptions != NULL);
-  assert(nStoreToSet >= 0);
-  assert(nStoreToSet < (int) kp->Keyboard->cxStoreArray);
-  assert(nStoreToRead >= 0);
-  assert(nStoreToRead < (int) kp->Keyboard->cxStoreArray);
-
-  LPSTORE sp = &kp->Keyboard->dpStoreArray[nStoreToRead];
-  if(kp->KeyboardOptions[nStoreToSet].Value)
-  {
-    delete kp->KeyboardOptions[nStoreToSet].Value;
-  }
-  else
-  {
-    kp->KeyboardOptions[nStoreToSet].OriginalStore = kp->Keyboard->dpStoreArray[nStoreToSet].dpString;
-  }
-
-  kp->KeyboardOptions[nStoreToSet].Value = new WCHAR[wcslen(sp->dpString)+1];
-  wcscpy_s(kp->KeyboardOptions[nStoreToSet].Value, wcslen(sp->dpString)+1, sp->dpString);
-  kp->Keyboard->dpStoreArray[nStoreToSet].dpString = kp->KeyboardOptions[nStoreToSet].Value;
-}
-
-void ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset)
-{
-  if (!DebugAssert(!Globals::get_CoreIntegration(), "ResetKeyboardOption: Error called in core integration mode")) {
-    return;
-  }
-  assert(kp != NULL);
-  assert(kp->Keyboard != NULL);
-  assert(kp->KeyboardOptions != NULL);
-  assert(nStoreToReset >= 0);
-  assert(nStoreToReset < (int) kp->Keyboard->cxStoreArray);
-
-  if(kp->KeyboardOptions[nStoreToReset].Value)
-  {
-    kp->Keyboard->dpStoreArray[nStoreToReset].dpString = kp->KeyboardOptions[nStoreToReset].OriginalStore;
-    delete kp->KeyboardOptions[nStoreToReset].Value;
-    kp->KeyboardOptions[nStoreToReset].Value = NULL;
-
-    if(kp->Keyboard->dpStoreArray[nStoreToReset].dpName == NULL) return;
-
-    RegistryReadOnly r(HKEY_CURRENT_USER);
-    if(r.OpenKeyReadOnly(REGSZ_KeymanActiveKeyboards) && r.OpenKeyReadOnly(kp->Name) && r.OpenKeyReadOnly(REGSZ_KeyboardOptions))
-    {
-      if(r.ValueExists(kp->Keyboard->dpStoreArray[nStoreToReset].dpName))
-      {
-        WCHAR val[256];
-        if(!r.ReadString(kp->Keyboard->dpStoreArray[nStoreToReset].dpName, val, sizeof(val) / sizeof(val[0]))) return;
-        if(!val[0]) return;
-        val[255] = 0;
-        kp->KeyboardOptions[nStoreToReset].Value = new WCHAR[wcslen(val)+1];
-        wcscpy_s(kp->KeyboardOptions[nStoreToReset].Value, wcslen(val)+1, val);
-
-        kp->KeyboardOptions[nStoreToReset].OriginalStore = kp->Keyboard->dpStoreArray[nStoreToReset].dpString;
-        kp->Keyboard->dpStoreArray[nStoreToReset].dpString = kp->KeyboardOptions[nStoreToReset].Value;
-      }
-    }
-  }
-}
-
-
-void SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave)
-{
-  if (!DebugAssert(!Globals::get_CoreIntegration(), "SaveKeyboardOption: Error called in core integration mode")) {
-    return;
-  }
-  IntSaveKeyboardOption(REGSZ_KeyboardOptions, kp, nStoreToSave);
 }
 
 void SaveKeyboardOptionREGCore(LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value)

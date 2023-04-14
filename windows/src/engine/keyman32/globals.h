@@ -151,7 +151,6 @@ public:
 
   static BOOL get_debug_KeymanLog();
   static BOOL get_debug_ToConsole();
-  static BOOL get_CoreIntegration();
   static void LoadDebugSettings();
 };
 

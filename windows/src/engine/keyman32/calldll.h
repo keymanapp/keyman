@@ -30,7 +30,7 @@ BOOL ActivateDLLs(LPINTKEYBOARDINFO lpkbi);
  * @param   lpkbi  The keyboard for which to load the dlls
  * @return  BOOL  True on success
  */
-BOOL LoadDLLsCore(LPINTKEYBOARDINFO lpkbi);
+BOOL LoadDLLs(LPINTKEYBOARDINFO lpkbi);
 
 
 BOOL IsIMWindow(HWND hwnd);

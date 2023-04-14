@@ -105,17 +105,12 @@ typedef struct tagKMSTATE
 {
   BOOL NoMatches;
   MSG msg;
-  // TODO: 5442 will remove these once windows core is deprecated
-  BOOL StopOutput;
-  int LoopTimes;
-  // TODO: 5442
   WORD vkey;           // I934
   WCHAR charCode;      // I4582
   BOOL windowunicode;  // I4287
   BOOL isDown;
   LPKEYBOARD lpkb;
   km_kbp_keyboard* lpCoreKb;  //  future use with IMDLL
-  LPGROUP startgroup;         // TODO: 5442 will remove this once windows core is deprecated
 } KMSTATE;
 
 // I3616
