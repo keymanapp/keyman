@@ -150,21 +150,14 @@ final class KMKeyboard extends WebView {
 
     getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
     getSettings().setSupportZoom(false);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      getSettings().setUseWideViewPort(true);
-      getSettings().setLoadWithOverviewMode(true);
-      setWebContentsDebuggingEnabled(true);
-    }
 
-    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1)
+    getSettings().setUseWideViewPort(true);
+    getSettings().setLoadWithOverviewMode(true);
+    setWebContentsDebuggingEnabled(true);
+
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP)
       setLayerType(View.LAYER_TYPE_SOFTWARE, null); // Disable hardware acceleration for API < 17, Keyman keyboard is slower without HWA but it causes some display issues.
     // (Tested on Samsung Galaxy Nexus running Android 4.1.2)
-
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
-      // These were deprecated in API 18
-      getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
-      getSettings().setPluginState(WebSettings.PluginState.ON_DEMAND);
-    }
 
     setWebChromeClient(new WebChromeClient() {
       public boolean onConsoleMessage(ConsoleMessage cm) {

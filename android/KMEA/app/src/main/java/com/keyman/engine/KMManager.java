@@ -1473,24 +1473,9 @@ public final class KMManager {
     return KeyboardPickerActivity.addKeyboard(context, keyboardInfo);
   }
 
-  // Intend to deprecate in Keyman 15.0
+  // This API is deprecated in Keyman 17.0
   public static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
-    String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
-    String keyboardID =  keyboardInfo.get(KMManager.KMKey_KeyboardID);
-    String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
-    String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
-    String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
-    String version = keyboardInfo.get(KMManager.KMKey_KeyboardVersion);
-    String helpLink = keyboardInfo.get(KMManager.KMKey_CustomHelpLink);
-    String kmpLink = MapCompat.getOrDefault(keyboardInfo, KMManager.KMKey_KMPLink, "");
-    String font = keyboardInfo.get(KMManager.KMKey_Font);
-    String oskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-    boolean isNewKeyboard = true;
-
-    Keyboard k = new Keyboard(packageID, keyboardID, keyboardName,
-          languageID, languageName, version, helpLink, kmpLink,
-      isNewKeyboard, font, oskFont);
-    return addKeyboard(context, k);
+    return false;
   }
 
   public static boolean removeKeyboard(Context context, int position) {
@@ -1655,7 +1640,7 @@ public final class KMManager {
       if (IMService != null) {
         IMService.switchToPreviousInputMethod();
       }
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+    } else {
       // This method is added in API level 16 and deprecated in API level 28
       // Reference: https://developer.android.com/reference/android/view/inputmethod/InputMethodManager#switchToLastInputMethod(android.os.IBinder)
       InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -1668,7 +1653,7 @@ public final class KMManager {
       if (IMService != null) {
         IMService.switchToNextInputMethod(false);
       }
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+    } else {
       // This method is added in API level 16 and deprecated in API level 28
       // Reference: https://developer.android.com/reference/android/view/inputmethod/InputMethodManager.html#switchToNextInputMethod(android.os.IBinder,%20boolean)
       InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
