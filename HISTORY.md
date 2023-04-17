@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.88 alpha 2023-04-17
+
+* docs(android): Update Linux dev environment for Java 11 (#8596)
+
 ## 17.0.87 alpha 2023-04-13
 
 * refactor(developer): DRY kmc module references (#8577)
