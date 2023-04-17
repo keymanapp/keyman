@@ -48,6 +48,6 @@ async function build(infile: string, options: BuildActivityOptions): Promise<boo
   }
 
   // TODO: consolidate errors
-  console.error(`Unrecognised input file ${infile}, expecting ${extensions.join(', ')}or project folder`);
+  console.error(`Unrecognised input file ${infile}, expecting ${extensions.join(', ')}, or project folder`);
   process.exit(2);
 }
