@@ -29,8 +29,11 @@ builder_describe "Runs all tests for the language-modeling / predictive-text lay
 
 builder_parse "$@"
 
+TEST_OPTS=
 if builder_has_option --ci && builder_is_debug_build; then
   builder_die "Options --ci and --debug are incompatible."
+elif builder_has_option --ci
+  TEST_OPTS=--ci
 fi
 
 if builder_start_action configure; then
@@ -44,26 +47,14 @@ if builder_start_action test:libraries; then
   # They do not have builder-based scripts, being run directly via npm package script.
   # So, for now, we add a text header to clarify what is running at each stage, in
   # addition to fair bit of `pushd` and `popd`.
-  pushd "$KEYMAN_ROOT/common/models/wordbreakers"
   echo
   echo "### Running $(builder_term common/models/wordbreakers) tests"
-  # NPM doesn't seem to parse the post `--` part if specified via script variable.
-  # So... a simple if-else will do the job for now.
-  if builder_has_option --ci; then
-    npm run test -- -reporter mocha-teamcity-reporter
-  else
-    npm run test
-  fi
-  popd
+  "$KEYMAN_ROOT/common/models/wordbreakers/build.sh" test $TEST_OPTS
 
   pushd "$KEYMAN_ROOT/common/models/templates"
   echo
   echo "### Running $builder_term common/models/templates) tests"
-  if builder_has_option --ci; then
-    npm run test -- -reporter mocha-teamcity-reporter
-  else
-    npm run test
-  fi
+  "$KEYMAN_ROOT/common/models/templates/build.sh" test $TEST_OPTS
   popd
 
   pushd "$KEYMAN_ROOT/common/models/types"
@@ -77,7 +68,7 @@ if builder_start_action test:libraries; then
   pushd "$KEYMAN_ROOT/common/web/lm-worker"
   echo
   echo "### Running ${BUILDER_TERM_START}common/web/lm-worker${BUILDER_TERM_END} tests"
-  ./build.sh test
+  ./build.sh test $TEST_OPTS
   popd
 
   builder_finish_action success test:libraries

@@ -23,7 +23,8 @@ builder_describe "Builds the predictive-text model template implementation modul
   "clean" \
   "configure" \
   "build" \
-  "test"
+  "test" \
+  "--ci"
 
 builder_describe_outputs \
   configure          /node_modules \
@@ -58,7 +59,12 @@ if builder_start_action build; then
 fi
 
 if builder_start_action test; then
-  npm run mocha -- --require test/helpers.js --recursive test
+  FLAGS=
+  if builder_has_option --ci; then
+    FLAGS=-reporter mocha-teamcity-reporter
+  fi
+
+  npm run mocha -- $FLAGS --require test/helpers.js --recursive test
 
   builder_finish_action success test
 fi
