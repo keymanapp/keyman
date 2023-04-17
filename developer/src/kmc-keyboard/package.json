@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@keymanapp/keyman-version": "*",
+    "@keymanapp/ldml-keyboard-constants": "*",
     "ajv": "^8.11.0",
     "restructure": "git+https://github.com/keymanapp/dependency-restructure.git#49d129cf0916d082a7278bb09296fb89cecfcc50",
     "semver": "^7.3.7",
