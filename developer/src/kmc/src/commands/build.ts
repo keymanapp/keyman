@@ -39,15 +39,15 @@ async function build(infile: string, options: BuildActivityOptions): Promise<boo
   }
 
   // Otherwise, if it's one of our known file extensions, we build it
-  let extensions = '';
+  let extensions: string[] = [];
   for(let build of buildActivities) {
     if(infile.toLowerCase().endsWith(build.sourceExtension)) {
       return build.build(infile, options);
     }
-    extensions += build.sourceExtension + ', ';
+    extensions.push(build.sourceExtension);
   }
 
   // TODO: consolidate errors
-  console.error(`Unrecognised input file ${infile}, expecting ${extensions}or project folder`);
+  console.error(`Unrecognised input file ${infile}, expecting ${extensions.join(', ')}, or project folder`);
   process.exit(2);
 }
