@@ -83,16 +83,30 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
      * Might possibly fail to return the oldest registered stub for the oldest of supported browsers
      * (i.e, Android 5.0), but will work for anything decently recent.  Even then... we still supply
      * _a_ keyboard.  Just not in a way that will seem deterministic/controllable to site designers.
+     *
+     * Warning:  Object.values and Object.entries require Chrome for Android 54, which is higher than
+     * API 21's base. Object.keys only requires Chrome for Android 18, so is safe.
      */
-    const entries = Object.values(this.stubSetTable);
-    if(entries.length == 0) {
+
+    // An `Object.keys`-based helper function.  Gets the first entry of Object.values for the object.
+    // Can be written with stronger type safety... if we get very explicit with generics during calls.
+    // That'd be more verbose than desired here.
+    function getFirstValue(obj: any) {
+      const keys = Object.keys(obj);
+      if(keys.length == 0) {
+        return undefined;
+      } else {
+        return obj[keys[0]];
+      }
+    };
+
+    const stubTable = getFirstValue(this.stubSetTable) as Record<string, KeyboardStub>;
+    if(!stubTable) {
       return undefined;
     } else {
-      // Maps language codes to actual KeyboardStub entries.  So... "stub table for the oldest registered keyboard".
-      const stubTable = entries[0];
       // First value = first registered stub for that first keyboard.
       // Does not consider later-added stubs, but neither does removeKeyboard - removal is "all or nothing".
-      return Object.values(stubTable)[0]; // returns undefined if it does not exist.
+      return getFirstValue(stubTable) as KeyboardStub;
     }
   }
 

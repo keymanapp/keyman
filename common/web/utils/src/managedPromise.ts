@@ -45,7 +45,7 @@ export default class ManagedPromise<Type> {
   // Cannot actually extend the Promise class in ES5; attempt to use it will throw errors.
   // So, we just implement a Promise-like interface.
 
-  then(onfulfilled?: (value: Type) => Type | PromiseLike<Type>, onrejected?: (reason: any) => PromiseLike<never>): Promise<Type> {
+  then<TResult1 = Type, TResult2 = never>(onfulfilled?: ((value: Type) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2> {
     return this._promise.then(onfulfilled, onrejected);
   }
 

@@ -59,8 +59,13 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
         }
       }
 
-      promise.finally(() => {
+      // On the oldest mobile devices we support, Promise.finally may not actually exist.
+      // Fortunately... it's not that hard of an issue to work around.
+      // Note:  es6-shim doesn't polyfill Promise.finally!
+      promise.then(() => {
         // It is safe to remove the script once it has been run (https://stackoverflow.com/a/37393041)
+        script.remove();
+      }).catch(() => {
         script.remove();
       });
 

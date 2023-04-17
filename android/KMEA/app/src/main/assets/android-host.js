@@ -36,7 +36,7 @@ function init() {
     'fonts':'packages/',
     oninserttext: insertText,
     root:'./'
-  }).then(() => {
+  }).then(function () {  // Note:  For non-upgraded API 21, arrow functions will break the keyboard!
     const bannerHeight = Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio);
 
     // The OSK is not available until initialization is complete.
@@ -326,19 +326,24 @@ function executePopupKey(keyID, keyText) {
   keyman.executePopupKey(keyID);
 }
 
-async function executeHardwareKeystroke(code, shift, lstates, eventModifiers) {
+// Cannot make it explicitly async / await on API 21.
+function executeHardwareKeystroke(code, shift, lstates, eventModifiers) {
   console_debug('executeHardwareKeystroke(code='+code+',shift='+shift+',lstates='+lstates+',eventModifiers='+eventModifiers+')');
-  try {
-    executingHardwareKeystroke = true;
-    if (await keyman.hardKeyboard.raiseKeyEvent(code, shift, lstates)) { // false if matched, true if not
+
+  executingHardwareKeystroke = true;
+
+  // Would be cleaner if we could async / await here, which would give us a simple try-catch implementation.
+  var promise = keyman.hardKeyboard.raiseKeyEvent(code, shift, lstates);
+  promise.then(function (result) {
+    if(result) { // false if matched, true if not
       // KMW didn't process the key, so have the Android app dispatch the key with the original event modifiers
       window.jsInterface.dispatchKey(code, eventModifiers);
+      executingHardwareKeystroke = false;
     }
-    executingHardwareKeystroke = false;
-  } catch(e) {
+  }).catch(function (e) {
     window.console.log('executeHardwareKeystroke exception: '+e);
     executingHardwareKeystroke = false;
-  }
+  });
 }
 
 function popupVisible(value) {
