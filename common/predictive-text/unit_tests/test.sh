@@ -32,7 +32,7 @@ builder_parse "$@"
 TEST_OPTS=
 if builder_has_option --ci && builder_is_debug_build; then
   builder_die "Options --ci and --debug are incompatible."
-elif builder_has_option --ci
+elif builder_has_option --ci; then
   TEST_OPTS=--ci
 fi
 
