@@ -2213,7 +2213,7 @@ begin
     lexicalModel := TPackageLexicalModel.Create(Package);
     lexicalModel.Name := XmlVarToStr(ALexicalModel.ChildValues[SXML_PackageLexicalModel_Name]);
     lexicalModel.ID := XmlVarToStr(ALexicalModel.ChildValues[SXML_PackageLexicalModel_ID]);
-    lexicalModel.RTL := ANode.ChildNodes.IndexOf(SXML_PackageLexicalModel_RTL) >= 0;
+    lexicalModel.RTL := ALexicalModel.ChildNodes.IndexOf(SXML_PackageLexicalModel_RTL) >= 0;
     lexicalModel.Languages.LoadXML(ALexicalModel);
     Add(lexicalModel);
   end;
