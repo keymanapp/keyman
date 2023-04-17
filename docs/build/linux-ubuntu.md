@@ -112,8 +112,8 @@ docker run -it --rm -v $(pwd):/home/build/src/keyman -u root -w /home/build/src/
 * OpenJDK 11 (for Keyman 17.0+)
 
 
-    Run Android Studio once after installation to install additional components
-  such as emulator images and SDK updates.
+Run Android Studio once after installation to install additional components
+such as emulator images and SDK updates.
 
 **Required environment variables**:
 * [`JAVA_HOME`](#java_home)
