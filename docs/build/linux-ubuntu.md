@@ -135,14 +135,12 @@ Many dependencies are only required for specific projects.
 ### JAVA_HOME
 
 This environment variable tells Gradle what version of Java to use for building Keyman for Android.
-OpenJDK 11 is used for master.
-It's recommended to install both and set the environment variables to:
+OpenJDK 11 is used for master. It's recommended to set the environment variables to:
 ```bash
-EXPORT JAVA_HOME_11="path to OpenJDK 11"
-EXPORT JAVA_HOME="$JAVA_HOME_11"
+EXPORT JAVA_HOME="[path to OpenJDK 11]"
 ```
 
 Also edit `/etc/profile.d/jvm.sh` as sudo:
 ```bash
-EXPORT JAVA_HOME="path to OpenJDK 11"
+EXPORT JAVA_HOME="[path to OpenJDK 11]"
 ```
