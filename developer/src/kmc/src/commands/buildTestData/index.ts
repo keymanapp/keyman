@@ -3,9 +3,12 @@ import * as path from 'path';
 import * as kmc from '@keymanapp/kmc-keyboard';
 import { CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
 import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
-import { BuildActivityOptions } from '../build/BuildActivity.js';
 
-export function buildTestData(infile: string, options: BuildActivityOptions) {
+export interface BuildTestDataOptions {
+  outFile?: string;
+};
+
+export function buildTestData(infile: string, options: BuildTestDataOptions) {
   let compilerOptions: kmc.CompilerOptions = {
     debug: false,
     addCompilerVersion: false
@@ -21,9 +24,9 @@ export function buildTestData(infile: string, options: BuildActivityOptions) {
   const outFileDir = path.dirname(fileBaseName);
   const outFileJson = path.join(outFileDir, outFileBase + '.json');
   console.log(`Writing JSON test data to ${outFileJson}`);
-  fs
-  .writeFileSync(outFileJson, JSON.stringify(testData, null, '  '));
+  fs.writeFileSync(outFileJson, JSON.stringify(testData, null, '  '));
 }
+
 function loadTestData(inputFilename: string, options: kmc.CompilerOptions): LDMLKeyboardTestDataXMLSourceFile {
   const c: CompilerCallbacks = new NodeCompilerCallbacks();
   const k = new kmc.Compiler(c, options);
