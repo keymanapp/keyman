@@ -150,6 +150,11 @@ function setKeymanLanguage(stub) {
 
         let span = document.createElement('span');
         let messages = [];
+        messages.push("window.location.href: " + window.location.href);
+
+        let root = window.location.href;
+        let sPath = root.substr(0, root.lastIndexOf('/') + 1);
+        messages.push("Path config root: " + sPath);
         messages.push("OSK href: " + cssHref);
         messages.push("Sheet loaded: " + (!!oskLink.sheet));
         messages.push("Keyboard loaded: " + (!!keyman.core.activeKeyboard));
