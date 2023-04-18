@@ -61,7 +61,7 @@ fi
 if builder_start_action test; then
   FLAGS=
   if builder_has_option --ci; then
-    FLAGS=-reporter mocha-teamcity-reporter
+    FLAGS="-reporter mocha-teamcity-reporter"
   fi
 
   npm run mocha -- $FLAGS --require test/helpers.js --recursive test
