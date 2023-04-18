@@ -66,7 +66,7 @@ function verifyLoaded() {
     // During proper loads of KMW, a keyboard will be set very early on.
     // There's a chance that the keyboard is still loading, so we double-check
     // against the stub count.
-    if(!keyman.core.activeKeyboard && keyman.keyboardManager.keyboardStubs.length == 0) {
+    if(!keyman.core.activeKeyboard && !keyman.keyboardRequisitioner.cache.defaultStub) {
     location.reload();
     }
 }
