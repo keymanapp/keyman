@@ -1,4 +1,4 @@
-import { escapeRegExp } from "../util/escapeRegExp.js";
+import { escapeRegExp } from "../../util/escapeRegExp.js";
 
 export interface BuildActivityOptions {
   debug?: boolean;

@@ -2,8 +2,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as kmc from '@keymanapp/kmc-keyboard';
 import { CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
-import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
-import { BuildActivityOptions } from './BuildActivity.js';
+import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
+import { BuildActivityOptions } from '../build/BuildActivity.js';
 
 export function buildTestData(infile: string, options: BuildActivityOptions) {
   let compilerOptions: kmc.CompilerOptions = {
