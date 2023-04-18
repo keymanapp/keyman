@@ -11,6 +11,8 @@ export function declareBuild(program: Command) {
     .option('-d, --debug', 'Include debug information in output')
     .option('-o, --out-file <filename>', 'Override the default path and filename for the output file')
     .option('--no-compiler-version', 'Exclude compiler version metadata from output')
+    .option('-w, --compiler-warnings-as-errors', 'Causes warnings to fail the build')
+    .option('--no-warn-deprecated-code', 'Turn off warnings for deprecated code styles')
     .action((infiles: string[], options: any) => {
       let p = [];
       if(!infiles.length) {

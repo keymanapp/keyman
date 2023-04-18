@@ -4,6 +4,8 @@ export interface BuildActivityOptions {
   debug?: boolean;
   outFile?: string;
   compilerVersion?: boolean;
+  warnDeprecatedCode?: boolean;
+  compilerWarningsAsErrors?: boolean;
 };
 
 export abstract class BuildActivity {

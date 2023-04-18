@@ -46,7 +46,9 @@ export class BuildLdmlKeyboard extends BuildActivity {
 function buildLdmlKeyboardToMemory(inputFilename: string, options: BuildActivityOptions): [Uint8Array, Uint8Array, Uint8Array] {
   let compilerOptions: kmc.CompilerOptions = {
     debug: options.debug ?? false,
-    addCompilerVersion: options.compilerVersion ?? true
+    addCompilerVersion: options.compilerVersion ?? true,
+    // TODO: warnDeprecatedCode: options.warnDeprecatedCode,
+    // TODO: treatWarningsAsErrors: options.treatWarningsAsErrors,
   }
 
   const c: CompilerCallbacks = new NodeCompilerCallbacks();
