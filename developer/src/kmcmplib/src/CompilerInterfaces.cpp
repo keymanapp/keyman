@@ -30,7 +30,7 @@ EXTERN bool kmcmp_SetCompilerOptions(KMCMP_COMPILER_OPTIONS* options) {
   WASM interface for compiler message callback
 */
 EM_JS(int, wasm_msgproc, (int line, int msgcode, char* text, char* context), {
-  const proc = globalThis[context];
+  const proc = globalThis[UTF8ToString(context)];
   if(!proc || typeof proc != 'function') {
     console.log(`[${line}: ${msgcode}: ${UTF8ToString(text)}]`);
     return 0;
