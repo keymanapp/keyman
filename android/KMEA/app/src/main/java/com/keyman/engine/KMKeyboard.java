@@ -155,10 +155,6 @@ final class KMKeyboard extends WebView {
     getSettings().setLoadWithOverviewMode(true);
     setWebContentsDebuggingEnabled(true);
 
-    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP)
-      setLayerType(View.LAYER_TYPE_SOFTWARE, null); // Disable hardware acceleration for API < 17, Keyman keyboard is slower without HWA but it causes some display issues.
-    // (Tested on Samsung Galaxy Nexus running Android 4.1.2)
-
     setWebChromeClient(new WebChromeClient() {
       public boolean onConsoleMessage(ConsoleMessage cm) {
         String msg = KMString.format("KMW JS Log: Line %d, %s:%s", cm.lineNumber(), cm.sourceId(), cm.message());
