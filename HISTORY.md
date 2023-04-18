@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.89 alpha 2023-04-18
+
+* chore(developer): tweak build of extension list in kmc (#8597)
+* docs(ios): Add help page for Settings (#8546)
+* fix(developer): add missing dependencies (#8605)
+
 ## 17.0.88 alpha 2023-04-17
 
 * docs(android): Update Linux dev environment for Java 11 (#8596)
