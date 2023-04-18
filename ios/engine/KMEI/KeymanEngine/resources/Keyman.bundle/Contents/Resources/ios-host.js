@@ -66,8 +66,8 @@ function verifyLoaded() {
     // During proper loads of KMW, a keyboard will be set very early on.
     // There's a chance that the keyboard is still loading, so we double-check
     // against the stub count.
-    if(!keyman.core.activeKeyboard && keyman.keyboardManager.keyboardStubs.length == 0) {
-    location.reload();
+    if(!keyman.core.activeKeyboard && !keyman.keyboardRequisitioner.cache.defaultStub) {
+      location.reload();
     }
 }
 
@@ -140,6 +140,24 @@ function setKeymanLanguage(stub) {
     kmw.setActiveKeyboard(stub.KI, stub.KLC).then(function() {
         keyman.refreshOskLayout();
         doResetContext();
+    }).finally(() => {
+      // SUPER TEMP:  console.log AND raw-output the paths config object.
+      window.setTimeout(() => {
+        let pathConfig = keyman.config.paths;
+        let oskLink = keyman.osk.uiStyleSheetManager.linkedSheets[0];
+        let cssHref = oskLink.href;
+        let configStr = JSON.stringify(pathConfig, null, 2);
+
+        let span = document.createElement('span');
+        let messages = [];
+        messages.push("OSK href: " + cssHref);
+        messages.push("Sheet loaded: " + (!!oskLink.sheet));
+        messages.push("Keyboard loaded: " + (!!keyman.core.activeKeyboard));
+        messages.push("Path config: " + configStr);
+        span.innerText = messages.join("\n");
+        span.style.fontSize = '6pt';
+        document.body.appendChild(span);
+      }, 50);
     });
 }
 
