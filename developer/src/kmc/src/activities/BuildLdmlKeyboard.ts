@@ -5,7 +5,7 @@ import { KvkFileWriter, CompilerCallbacks } from '@keymanapp/common-types';
 import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
 import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
 
-export class BuildLdmlKeyboard implements BuildActivity {
+export class BuildLdmlKeyboard extends BuildActivity {
   public get name(): string { return 'LDML keyboard'; }
   public get sourceExtension(): string { return '.xml'; }
   public get compiledExtension(): string { return '.kmx'; }
