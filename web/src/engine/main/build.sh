@@ -26,6 +26,7 @@ builder_describe "Builds the Keyman Engine for Web's common top-level base class
   "@/web/src/engine/paths build" \
   "@/web/src/engine/device-detect build" \
   "@/web/src/engine/package-cache build" \
+  "@/web/src/engine/events build" \
   "@/web/src/engine/osk build" \
   "clean" \
   "configure" \
