@@ -701,13 +701,13 @@ LoadDLLsCore(LPINTKEYBOARDINFO lpkbi) {
   }
   // Need to Load the keyman32 or keyman64 dll proxy keyboard as the third-party dlls
   // will use this rather than the versioned dll.
-  #ifdef _WIN64
-    HMODULE hModule = LoadLibrary("keyman64.dll");
-  #else
-    HMODULE hModule = LoadLibrary("keyman32.dll");
-  #endif
-  if (!hModule) {
-      SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: keyman32/64.dll not loaded");
+//  #ifdef _WIN64
+//    HMODULE hModule = LoadLibrary("keyman64.dll");
+//  #else
+//    HMODULE hModule = LoadLibrary("keyman32.dll");
+//  #endif
+  if (!LoadLibrary("C:\\Program Files (x86)\\Common Files\\Keyman\\Keyman Engine\\keyman64.dll")){
+      SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: keyman64.dll not loaded with error:[%d]", GetLastError());
       return FALSE;
   }
 
