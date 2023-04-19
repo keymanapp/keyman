@@ -41,6 +41,6 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, KeyEventKeybo
    * @param       {(boolean|number)}  state  Activate (true,false)
    */
   activatingUI(state: boolean | number) {
-    this.contextManager.focusAssistant.setActivatingUI(!!state);
+    this.contextManager.focusAssistant.setMaintainingFocus(!!state);
   }
 }

@@ -19,7 +19,7 @@ export function setupOskListeners(osk: OSKView, contextManager: ContextManager) 
 
   osk.on('hideRequested', (key) => {
     if(osk) {
-      contextManager.focusAssistant.setActivatingUI(false);
+      contextManager.focusAssistant.setMaintainingFocus(false);
       osk.startHide(true);
       keyman.domManager.lastActiveElement = null;
     }

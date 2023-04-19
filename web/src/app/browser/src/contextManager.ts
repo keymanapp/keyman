@@ -69,7 +69,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       // subclass.
 
       // Required for the `sil_euro_latin` keyboard's desktop OSK/table to function properly.
-      this.focusAssistant.setActivatingUI(true);
+      this.focusAssistant.setMaintainingFocus(true);
       dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
       keyman.domManager.focusLastActiveElement();
       dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;

@@ -86,7 +86,7 @@ export class FocusAssistant {
    *
    * @param       {(boolean|number)}  state  Activate (true,false)
    */
-  setActivatingUI(state: boolean) {
+  setMaintainingFocus(state: boolean) {
     this.maintainingFocus = state ? true : false;
   }
 }
