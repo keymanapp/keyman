@@ -1655,7 +1655,7 @@ public final class KMManager {
       if (IMService != null) {
         IMService.switchToPreviousInputMethod();
       }
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+    } else {
       // This method is added in API level 16 and deprecated in API level 28
       // Reference: https://developer.android.com/reference/android/view/inputmethod/InputMethodManager#switchToLastInputMethod(android.os.IBinder)
       InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -1668,7 +1668,7 @@ public final class KMManager {
       if (IMService != null) {
         IMService.switchToNextInputMethod(false);
       }
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+    } else {
       // This method is added in API level 16 and deprecated in API level 28
       // Reference: https://developer.android.com/reference/android/view/inputmethod/InputMethodManager.html#switchToNextInputMethod(android.os.IBinder,%20boolean)
       InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
