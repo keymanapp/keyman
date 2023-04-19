@@ -25,6 +25,8 @@ title: Keyman for iPhone and iPad 17.0 Help
 
 ### [Using Keyman for iPhone and iPad](basic/)
 * [Switching Between Keyboards](basic/switching-between-keyboards)
+* [Using the Settings Screen](basic/config/)
+* [Language Settings](basic/language-settings)
 * [Installing Custom Keyboards/Dictionaries](basic/installing-custom-keyboards-dictionaries)
 * [Sharing Keyboards and Dictionaries](basic/sharing-keyboards)
 * [Using the Keyman Browser](basic/using-keyman-browser)
