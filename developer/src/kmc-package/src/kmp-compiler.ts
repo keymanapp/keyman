@@ -6,12 +6,17 @@ import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 import type { KpsFile, KpsFileContentFile, KpsFileInfo, KpsFileKeyboard, KpsFileLanguage, KpsFileLexicalModel, KpsFileOptions, KpsPackage } from './kps-file.js';
 import type { KmpJsonFile, KmpJsonFileInfo, KmpJsonFileLanguage, KmpJsonFileOptions } from './kmp-json-file.js';
+import { CompilerCallbacks } from 'common/web/types/build/src/main.js';
+import { CompilerMessages } from './messages.js';
 
 export { type KmpJsonFile } from './kmp-json-file.js';
 
 const FILEVERSION_KMP_JSON = '12.0';
 
 export default class KmpCompiler {
+
+  constructor(private callbacks: CompilerCallbacks) {
+  }
 
   public transformKpsToKmpObject(kpsString: string, kpsPath: string): KmpJsonFile {
 
@@ -234,7 +239,7 @@ export default class KmpCompiler {
       data.files = [];
     }
 
-    data.files.forEach(function(value) {
+    data.files.forEach((value) => {
       // Get the path of the file
       let filename = value.name;
 
@@ -246,7 +251,7 @@ export default class KmpCompiler {
       if(path.isAbsolute(value.name)) {
         // absolute paths are not very cross-platform compatible -- we are going to have trouble
         // with path separators and roots
-        // TODO: emit a warning
+        this.callbacks.reportMessage(CompilerMessages.Warn_AbsolutePath({filename: value.name}));
       } else {
         // Transform separators to platform separators -- kps files may use
         // either / or \, although older kps files were always \.
