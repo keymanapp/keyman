@@ -51,6 +51,17 @@
       "source-map-support/register"
     ]
   },
+  "c8": {
+    "all": true,
+    "src": [
+      "src/"
+    ],
+    "exclude-after-remap": true,
+    "exclude": [
+      "src/import/",
+      "test/"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/keymanapp/keyman.git"

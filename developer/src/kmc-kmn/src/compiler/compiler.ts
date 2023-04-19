@@ -22,7 +22,9 @@ TODO: implement additional interfaces:
 */
 
 // TODO: rename wasm-host?
+import { CompilerCallbacks } from '@keymanapp/common-types';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
+import { CompilerMessages } from './messages.js';
 
 export interface CompilerOptions {
   shouldAddCompilerVersion?: boolean;
@@ -38,46 +40,60 @@ const baseOptions: CompilerOptions = {
   warnDeprecatedCode: true
 };
 
+/**
+ * Allows multiple instances of the Compiler class, by ensuring that the
+ * 'unique' kmnCompilerCallback global will be correlated with a specific
+ * instance of the Compiler class
+ */
+let callbackProcIdentifier = 0;
+
 export class Compiler {
   wasmModule: any;
   compileKeyboardFile: any;
   setCompilerOptions: any;
+  callbackName: string;
+  callbacks: CompilerCallbacks;
+
+  constructor() {
+    this.callbackName = 'kmnCompilerCallback' + callbackProcIdentifier;
+    callbackProcIdentifier++;
+  }
 
   public async init(): Promise<boolean> {
     if(!this.wasmModule) {
       this.wasmModule = await loadWasmHost();
-      this.compileKeyboardFile = this.wasmModule.cwrap('kmcmp_Wasm_CompileKeyboardFile', 'number', ['string', 'string',
+      this.compileKeyboardFile = this.wasmModule.cwrap('kmcmp_Wasm_CompileKeyboardFile', 'boolean', ['string', 'string',
         'number', 'number', 'number', 'string']);
-      this.setCompilerOptions = this.wasmModule.cwrap('kmcmp_Wasm_SetCompilerOptions', 'number', ['number']);
+      this.setCompilerOptions = this.wasmModule.cwrap('kmcmp_Wasm_SetCompilerOptions', 'boolean', ['number']);
     }
     return this.compileKeyboardFile !== undefined && this.setCompilerOptions !== undefined;
   }
 
-  public run(infile: string, outfile: string, options?: CompilerOptions): boolean {
+  public run(infile: string, outfile: string, callbacks: CompilerCallbacks, options?: CompilerOptions): boolean {
+    this.callbacks = callbacks;
+
     if(!this.wasmModule) {
+      this.callbacks.reportMessage(CompilerMessages.Fatal_MissingWasmModule());
       return false;
     }
 
     options = {...baseOptions, ...options};
-
-    (globalThis as any).msgproc = function(line: number, code: number, msg: string): number {
-      // TODO: link into the kmc error reporting infrastructure
-      console.log(`[${line}] ${code.toString(16)}: ${msg}`);
-      return 1; // 1 == continue build
-    }
-
+    (globalThis as any)[this.callbackName] = this.compilerMessageCallback;
     // TODO: use callbacks for file access -- so kmc-kmn is entirely fs agnostic
-    let result = this.runCompiler(infile, outfile, options) == 1;
-
-    (globalThis as any).msgproc = null;
-
+    let result = this.runCompiler(infile, outfile, options);
+    delete (globalThis as any)[this.callbackName];
     return result;
   }
 
-  private runCompiler(infile: string, outfile: string, options: CompilerOptions): number {
+  private compilerMessageCallback = (line: number, code: number, msg: string): number => {
+    this.callbacks.reportMessage(CompilerMessages.mapErrorFromKmcmplib(line, code, msg));
+    return 1;
+  }
+
+  private runCompiler(infile: string, outfile: string, options: CompilerOptions): boolean {
     try {
       if(!this.setCompilerOptions(options.shouldAddCompilerVersion)) {
-        console.error('Unable to set compiler options');
+        this.callbacks.reportMessage(CompilerMessages.Fatal_UnableToSetCompilerOptions());
       }
       return this.compileKeyboardFile(
         infile,
@@ -85,11 +101,10 @@ export class Compiler {
         options.saveDebug ? 1 : 0,
         options.compilerWarningsAsErrors ? 1 : 0,
         options.warnDeprecatedCode ? 1 : 0,
-        'msgproc');
+        this.callbackName);
     } catch(e) {
-      // TODO: use sentry
-      console.error(e);
+      this.callbacks.reportMessage(CompilerMessages.Fatal_UnexpectedException({e:e}));
+      return false;
     }
-    return 0;
   }
 }

@@ -1,7 +1,7 @@
 import 'mocha';
 import {assert, expect} from 'chai';
 import { CompilerMessages } from '../src/compiler/messages.js';
-import { CompilerErrorSeverity } from '@keymanapp/common-types';
+import { CompilerErrorSeverity, compilerErrorSeverityName } from '@keymanapp/common-types';
 
 const toTitleCase = (s: string) => s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
 
@@ -24,11 +24,6 @@ describe('compiler messages', function () {
     const m = CompilerMessages as Record<string,any>;
 
     for(let key of keys) {
-      if(key == 'severityName') {
-        // any helper functions we skip here
-        continue;
-      }
-
       if(typeof m[key] == 'function') {
         const o = /^(Info|Hint|Warning|Error|Fatal)_([A-Za-z0-9_]+)$/.exec(key);
         expect(o).to.be.instanceOf(Array);
@@ -63,7 +58,7 @@ describe('compiler messages', function () {
         const o = /^(INFO|HINT|WARNING|ERROR|FATAL)_([A-Za-z0-9_]+)$/.exec(key);
         expect(o).to.be.instanceOf(Array);
 
-        const mask = CompilerMessages.severityName(m[key]);
+        const mask = compilerErrorSeverityName(m[key]);
         expect(o[1]).to.equal(mask, `Mask value for ${key} does not match`);
 
         const code = m[key] & CompilerErrorSeverity.Error_Mask;

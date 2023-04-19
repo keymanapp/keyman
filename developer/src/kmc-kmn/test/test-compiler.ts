@@ -6,6 +6,7 @@ import { Compiler } from '../src/main.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import { TestCompilerCallbacks } from './helpers.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url)).replace(/\\/g, '/');
 const baselineDir = __dirname + '/../../../../../common/test/keyboards/baseline/';
@@ -29,13 +30,14 @@ describe('Compiler class', function() {
 
   it('should compile a basic keyboard', async function() {
     const compiler = new Compiler();
+    const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init());
 
     const fixtureName = baselineDir + 'k_000___null_keyboard.kmx';
     const infile = baselineDir + 'k_000___null_keyboard.kmn';
     const outfile = __dirname + '/k_000___null_keyboard.kmx';
 
-    assert(compiler.run(infile, outfile, {saveDebug: true, shouldAddCompilerVersion: false}));
+    assert(compiler.run(infile, outfile, callbacks, {saveDebug: true, shouldAddCompilerVersion: false}));
 
     assert(fs.existsSync(outfile));
     const outfileData = fs.readFileSync(outfile);
@@ -48,6 +50,7 @@ describe('Compiler class', function() {
   // the basic keyboard test is slightly simpler to read
   it('should build all baseline fixtures', async function() {
     const compiler = new Compiler();
+    const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init());
 
     const files = fs.readdirSync(baselineDir);
@@ -57,7 +60,7 @@ describe('Compiler class', function() {
         const infile = baselineDir + file.replace(/x$/, 'n');
         const outfile = __dirname + '/' + file;
 
-        assert(compiler.run(infile, outfile, {saveDebug: true, shouldAddCompilerVersion: false}));
+        assert(compiler.run(infile, outfile, callbacks, {saveDebug: true, shouldAddCompilerVersion: false}));
 
         assert(fs.existsSync(outfile));
         const outfileData = fs.readFileSync(outfile);
