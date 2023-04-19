@@ -1,6 +1,6 @@
 import { KeymanEngine as KeymanEngineBase } from 'keyman/engine/main';
 import { Device as DeviceDetector } from 'keyman/engine/device-detect';
-import { AnchoredOSKView, FloatingOSKView, FloatingOSKViewConfiguration } from 'keyman/engine/osk';
+import { AnchoredOSKView, FloatingOSKView, FloatingOSKViewConfiguration, OSKView } from 'keyman/engine/osk';
 import { DeviceSpec, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
 
 import { BrowserConfiguration, BrowserInitOptionDefaults, BrowserInitOptionSpec } from './configuration.js';
@@ -11,6 +11,10 @@ import { FocusStateAPIObject } from './context/focusAssistant.js';
 import { setupOskListeners } from './oskConfiguration.js';
 
 export class KeymanEngine extends KeymanEngineBase<ContextManager, KeyEventKeyboard> {
+  keyEventRefocus = () => {
+    this.contextManager.refocusActiveTarget();
+  }
+
   constructor(worker: Worker, config: BrowserConfiguration) {
     super(worker, config, new ContextManager(config));
   }
@@ -48,6 +52,7 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, KeyEventKeybo
       isEmbedded: false
     };
 
+    let osk: OSKView;
     if(device.touchable) {
       this.osk = new AnchoredOSKView(oskConfig);
     } else {

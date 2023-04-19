@@ -7,7 +7,7 @@ import { KeymanEngine } from "./keymanEngine.js";
 export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextManager: ContextManager) {
   const focusAssistant = contextManager.focusAssistant;
 
-  osk.on('globeKey', (key, on) => {
+  osk.on('globeKey', (key, on) => { // K_LOPT
     if(on) {
       if(osk.hostDevice.touchable) {
         this.lgMenu = new LanguageMenu(com.keyman.singleton);
@@ -20,7 +20,7 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
     }
   });
 
-  osk.on('hideRequested', (key) => {
+  osk.on('hideRequested', (key) => { // K_ROPT
     if(osk) {
       contextManager.focusAssistant.setMaintainingFocus(false);
       osk.startHide(true);

@@ -47,6 +47,24 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     return this._activeKeyboard;
   }
 
+  refocusActiveTarget() {
+    // May also need to verify that there wasn't a recent one that may have been cleared.
+    if(!this.activeTarget) {
+      return;
+    }
+
+    this.focusAssistant.setMaintainingFocus(true);
+    dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
+
+    /*
+     * Originally, ensured activeTarget was still active...
+     * - and that the underlying element was still focused.  That part will certainly still
+     *   be relevant.
+     */
+    keyman.domManager.focusLastActiveElement();
+    dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
+  }
+
   setKeyboardActiveForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget<any>) {
     throw new Error('Method not implemented.');
     // depends on the target
@@ -69,10 +87,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       // subclass.
 
       // Required for the `sil_euro_latin` keyboard's desktop OSK/table to function properly.
-      this.focusAssistant.setMaintainingFocus(true);
-      dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
-      keyman.domManager.focusLastActiveElement();
-      dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
+      this.refocusActiveTarget();
 
       return super.insertText(kbdInterface, Ptext, PdeadKey);
     }
