@@ -167,7 +167,7 @@ public final class KMTextView extends AppCompatEditText {
   protected void onSelectionChanged(int selStart, int selEnd) {
     super.onSelectionChanged(selStart, selEnd);
     if (activeView != null && activeView.equals(this)) {
-      if (KMManager.updateSelectionRange(KMManager.KeyboardType.KEYBOARD_TYPE_INAPP, selStart, selEnd) && !KMManager.InAppKeyboardShouldIgnoreSelectionChange) {
+      if (KMManager.updateSelectionRange(KMManager.KeyboardType.KEYBOARD_TYPE_INAPP, selStart, selEnd)) {
         KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_INAPP);
       }
     }
