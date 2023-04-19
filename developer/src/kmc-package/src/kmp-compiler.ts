@@ -239,6 +239,7 @@ export default class KmpCompiler {
       data.files = [];
     }
 
+    let failed = false;
     data.files.forEach((value) => {
       // Get the path of the file
       let filename = value.name;
@@ -263,12 +264,30 @@ export default class KmpCompiler {
         filename = path.resolve(basePath, filename);
       }
       const basename = path.basename(filename);
-      let data = fs.readFileSync(filename);
+
+      if(!fs.existsSync(filename)) {
+        this.callbacks.reportMessage(CompilerMessages.Error_FileDoesNotExist({filename: filename}));
+        failed = true;
+        return;
+      }
+
+      let data;
+      try {
+        data = fs.readFileSync(filename);
+      } catch(e) {
+        this.callbacks.reportMessage(CompilerMessages.Error_FileCouldNotBeRead({filename: filename, e: e}));
+        failed = true;
+        return;
+      }
       zip.file(basename, data);
 
       // Remove path data from files before JSON save
       value.name = basename;
     });
+
+    if(failed) {
+      return null;
+    }
 
     zip.file(kmpJsonFileName, JSON.stringify(data, null, 2));
 

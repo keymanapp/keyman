@@ -139,14 +139,11 @@ describe('KmpCompiler', function () {
       kmpJson = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
     });
 
-    assert.doesNotThrow(async () => {
-      //assert.isNull( TODO: this should fail to build because of missing files. but that will come
-        await kmpCompiler.buildKmpFile(kpsPath, kmpJson)
-      //);
-    });
+    await assert.isNull(kmpCompiler.buildKmpFile(kpsPath, kmpJson));
 
-    assert.lengthOf(callbacks.messages, 1);
+    assert.lengthOf(callbacks.messages, 2);
     assert.deepEqual(callbacks.messages[0].code, CompilerMessages.WARN_AbsolutePath);
+    assert.deepEqual(callbacks.messages[1].code, CompilerMessages.ERROR_FileDoesNotExist); //TODO: this should be a file-missing-error
   });
 
 });
