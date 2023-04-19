@@ -8,6 +8,7 @@ import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { type KmpJsonFile } from '../src/kmp-json-file.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
+import { CompilerMessages } from '../src/messages.js';
 
 
 describe('KmpCompiler', function () {
@@ -120,6 +121,32 @@ describe('KmpCompiler', function () {
 
     let kmpJsonData = JSON.parse(await jszip.file('kmp.json').async('string'));
     assert.deepEqual(kmpJsonData, kmpJsonFixture);
+  });
+
+  it('should warn on absolute paths', async function() {
+    this.timeout(10000); // building a zip file can sometimes be slow
+
+    callbacks.clear();
+
+    // const kmpPath = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    const kpsPath = makePathToFixture('absolute_path', 'source', 'absolute_path.kps');
+    const kmpCompiler = new KmpCompiler(callbacks);
+    const source = fs.readFileSync(kpsPath, 'utf-8');
+
+    let kmpJson: KmpJsonFile = null;
+
+    assert.doesNotThrow(() => {
+      kmpJson = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
+    });
+
+    assert.doesNotThrow(async () => {
+      //assert.isNull( TODO: this should fail to build because of missing files. but that will come
+        await kmpCompiler.buildKmpFile(kpsPath, kmpJson)
+      //);
+    });
+
+    assert.lengthOf(callbacks.messages, 1);
+    assert.deepEqual(callbacks.messages[0].code, CompilerMessages.WARN_AbsolutePath);
   });
 
 });
