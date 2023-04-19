@@ -55,7 +55,6 @@ private:
   BOOL m_BaseKeyboardUsesAltGr;   // I4592
   UINT ShiftToTSFShift(UINT ShiftFlags);
   BOOL MapUSCharToVK(UINT *puKey, UINT *puShiftFlags);
-  BOOL MapKeyRule(KEY *pKey, TF_PRESERVEDKEY *pPreservedKey);
   BOOL MapKeyRuleCore(km_kbp_keyboard_key *pKeyRule, TF_PRESERVEDKEY *pPreservedKey);
   BOOL IsMatchingKey(PreservedKey *pKey, PreservedKey *pKeys, size_t cKeys);
 };
@@ -196,43 +195,6 @@ UINT PreservedKeyMap::ShiftToTSFShift(UINT ShiftFlags)
     }
   }
   return res;
-}
-
-BOOL PreservedKeyMap::MapKeyRule(KEY *pKey, TF_PRESERVEDKEY *pPreservedKey)
-{
-  UINT ShiftFlags;
-  UINT Key;
-
-  Key = pKey->Key;
-  ShiftFlags = pKey->ShiftFlags;
-
-  if(Key == VK_BACK || Key == VK_RETURN || Key == VK_TAB)   // I4575
-  {
-    //
-    // We never map backspace, return or tab because these are the only supported virtual key outputs,
-    // and result in recursion.  Sadly, this is an imperfect solution forced upon us by preserved key
-    // limitations.
-    //
-    // Other virtual key output will be blocked with this version.
-    return FALSE;
-  }
-
-  if (Key > 255) {
-    //
-    // Touch-defined keys have a value > 255, but these should never be preserved
-    //
-    return FALSE;
-  }
-
-  if(ShiftFlags == 0)
-  {
-    if(!MapUSCharToVK(&Key, &ShiftFlags)) return FALSE;
-  }
-
-  pPreservedKey->uVKey = (UINT) USVKToScanCodeToLayoutVK( (WORD) Key);   // I3762
-  pPreservedKey->uModifiers = ShiftToTSFShift(ShiftFlags);
-
-  return TRUE;
 }
 
 BOOL

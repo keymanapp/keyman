@@ -119,7 +119,6 @@ Process_Event_Core(PKEYMAN64THREADDATA _td) {
   return TRUE;
 }
 
-
 /*
 *	BOOL ProcessHook();
 *
@@ -251,45 +250,6 @@ BOOL ProcessHook()
 	return !fOutputKeystroke;
 }
 
-BOOL IsMatchingBaseLayout(PWCHAR layoutName)  // I3432
-{
-  BOOL bEqual = _wcsicmp(layoutName, Globals::get_BaseKeyboardName()) == 0 ||   // I4583
-                _wcsicmp(layoutName, Globals::get_BaseKeyboardNameAlt()) == 0;   // I4583
-
-  return bEqual;
-}
-
-BOOL IsMatchingPlatformString(PWCHAR platform)  // I3432
-{
-  return
-    _wcsicmp(platform, L"windows") == 0 ||
-    _wcsicmp(platform, L"desktop") == 0 ||
-    _wcsicmp(platform, L"hardware") == 0 ||
-    _wcsicmp(platform, L"native") == 0;
-}
-
-BOOL IsMatchingPlatform(LPSTORE s)  // I3432
-{
-  PWCHAR t = new WCHAR[wcslen(s->dpString)+1];
-  wcscpy_s(t, wcslen(s->dpString)+1, s->dpString);
-  PWCHAR context = NULL;
-  PWCHAR platform = wcstok_s(t, L" ", &context);
-  while(platform != NULL)
-  {
-    if(!IsMatchingPlatformString(platform))
-    {
-      s->dwSystemID = TSS_PLATFORM_NOMATCH;
-      delete[] t;
-      return FALSE;
-    }
-    platform = wcstok_s(NULL, L" ", &context);
-  }
-
-  s->dwSystemID = TSS_PLATFORM_MATCH;
-  delete[] t;
-  return TRUE;
-}
-
 PWSTR strtowstr(PSTR in)
 {
     PWSTR result;
@@ -301,7 +261,6 @@ PWSTR strtowstr(PSTR in)
     result[len] = 0;
     return result;
 }
-
 
 PSTR wstrtostr(PCWSTR in)
 {
