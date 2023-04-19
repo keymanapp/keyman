@@ -453,15 +453,6 @@ namespace com.keyman.dom {
     }
 
     /**
-     * Close OSK and remove simulated caret on losing focus
-     */
-    cancelInput(): void {
-      this.keyman.domManager.activeElement = null;
-      this.keyman.domManager.lastActiveElement = null;
-      this.keyman.osk.hideNow();
-    };
-
-    /**
      * Handle the touch end event for an input element
      */
     dragEnd: (e: TouchEvent) => void = function(this: DOMTouchHandlers, e: TouchEvent) {

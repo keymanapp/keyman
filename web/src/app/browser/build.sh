@@ -26,6 +26,7 @@ builder_describe "Builds the Keyman Engine for Web's website-integrating version
   "@/web/src/engine/device-detect build" \
   "@/web/src/engine/paths build" \
   "@/web/src/engine/package-cache build" \
+  "@/web/src/engine/events build" \
   "@/web/src/engine/osk build" \
   "@/web/src/engine/element-wrappers build" \
   "@/web/src/engine/main build" \
