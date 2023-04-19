@@ -1177,7 +1177,7 @@ namespace com.keyman.dom {
         return;
       }
 
-      this.keyman.uiManager.justActivated = true;
+      focusAssistant.justActivated = true;
 
       const target = Utils.getOutputTarget(lastElem);
       target.focus();
@@ -1213,7 +1213,7 @@ namespace com.keyman.dom {
     set activeElement(Pelem: HTMLElement) {
       DOMEventHandlers.states._activeElement = Pelem;
 
-      var isActivating = this.keyman.uiManager.isActivating;
+      var isActivating = focusAssistant.isActivating;
 
       // Hide the OSK when the control is blurred, unless the UI is being temporarily selected
       const osk = this.keyman.osk;

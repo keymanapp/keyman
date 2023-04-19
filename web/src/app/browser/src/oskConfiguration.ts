@@ -19,7 +19,7 @@ export function setupEmbeddedListeners(osk: OSKView) {
 
   osk.on('hideRequested', (key) => {
     if(osk) {
-      keyman.uiManager.setActivatingUI(false);
+      focusAssistant.setActivatingUI(false);
       osk.startHide(true);
       keyman.domManager.lastActiveElement = null;
     }

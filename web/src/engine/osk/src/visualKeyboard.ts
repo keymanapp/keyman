@@ -104,7 +104,7 @@ interface EventMap {
       outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
 
       if(!keyman.isEmbedded) {
-        keyman.uiManager.setActivatingUI(true);
+        focusAssistant.setActivatingUI(true);
         com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
         keyman.domManager.focusLastActiveElement();
         com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
@@ -113,7 +113,7 @@ interface EventMap {
       let retVal = !!keyman.core.processKeyEvent(Lkc, outputTarget);
 
       // Now that processing is done, we can do a bit of post-processing, too.
-      keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
+      focusAssistant.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
       return retVal;
     } else {
       return true;

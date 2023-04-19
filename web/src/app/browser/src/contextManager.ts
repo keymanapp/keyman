@@ -6,15 +6,17 @@ import {
   type KeyboardInterface
 } from 'keyman/engine/main';
 import { BrowserConfiguration } from './configuration.js';
+import { FocusAssistant } from './context/focusAssistant.js';
 
 interface KeyboardCookie {
   current: string;
 }
 
-export default class ContextManager extends ContextManagerBase {
+export default class ContextManager extends ContextManagerBase<BrowserConfiguration> {
   private _activeKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
   private config: BrowserConfiguration;
   private cookieManager = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
+  readonly focusAssistant = new FocusAssistant();
 
   initialize(): void {
     this.on('keyboardasyncload', (stub, completion) => {
@@ -58,7 +60,7 @@ export default class ContextManager extends ContextManagerBase {
     if(outputTarget != null) {
       // Intent:  this class will be responsible for maintaining the active context... so
       // `this` itself will be responsible for _IgnoreNextSelChange and focusLastActiveElement.
-      // Still trying to work out the uiManager bit, since the OSK does need to interact with that.
+      // Still trying to work out the uiManager / focusAssistant bit, since the OSK does need to interact with that.
       // Keep the rest of the comment below post-modularization, though:
       //
       // While not yet fully connected, ContextManager and its subclasses will be responsible for maintaining
@@ -66,7 +68,7 @@ export default class ContextManager extends ContextManagerBase {
       // subclass.
 
       // Required for the `sil_euro_latin` keyboard's desktop OSK/table to function properly.
-      keyman.uiManager.setActivatingUI(true);
+      focusAssistant.setActivatingUI(true);
       dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
       keyman.domManager.focusLastActiveElement();
       dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
@@ -107,7 +109,7 @@ export default class ContextManager extends ContextManagerBase {
       if(originalKeyboardTarget == this.keyboardTarget) {
         // TODO: app/browser - _SetTargDir (within its ContextManager)
         // util.addStyleSheet(domManager.setAttachmentFontStyle(kbdStub.KF));
-        // uiManager.justActivated = true; // TODO:  Resolve without need for the cast.
+        // focusAssistant.justActivated = true; // TODO:  Resolve without need for the cast.
       }
 
       return result;

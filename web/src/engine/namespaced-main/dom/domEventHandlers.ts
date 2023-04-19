@@ -97,7 +97,7 @@ namespace com.keyman.dom {
       this.keyman.domManager.lastActiveElement = Ltarg;
       this.keyman.domManager.activeElement = Ltarg;  // I3363 (Build 301)
 
-      if(this.keyman.uiManager.justActivated) {
+      if(focusAssistant.justActivated) {
         this._BlurKeyboardSettings(Ltarg);
       } else {
         this._FocusKeyboardSettings(Ltarg, priorElement ? false : true);
@@ -186,9 +186,9 @@ namespace com.keyman.dom {
       /* If the KeymanWeb UI is active as a user changes controls, all UI-based effects should be restrained to this control in case
       * the user is manually specifying languages on a per-control basis.
       */
-      this.keyman.uiManager.justActivated = false;
+      focusAssistant.justActivated = false;
 
-      var isActivating = this.keyman.uiManager.isActivating;
+      var isActivating = focusAssistant.isActivating;
       let activeKeyboard = com.keyman.singleton.core.activeKeyboard;
       if(!isActivating && activeKeyboard) {
         activeKeyboard.notify(0, Utils.getOutputTarget(Ltarg as HTMLElement), 0);  // I2187
@@ -275,7 +275,6 @@ namespace com.keyman.dom {
      */
     _CommonFocusHelper(target: HTMLElement): boolean {
       let keyman = com.keyman.singleton;
-      var uiManager = this.keyman.uiManager;
 
       if(target.ownerDocument && target instanceof target.ownerDocument.defaultView.HTMLIFrameElement) {
         if(!this.keyman.domManager._IsEditableIframe(target, 1)) {
@@ -295,7 +294,7 @@ namespace com.keyman.dom {
       }
 
       let activeKeyboard = keyman.core.activeKeyboard;
-      if(!uiManager.justActivated) {
+      if(!focusAssistant.justActivated) {
         if(target && outputTarget) {
           outputTarget.deadkeys().clear();
         }
@@ -305,10 +304,10 @@ namespace com.keyman.dom {
         }
       }
 
-      if(!uiManager.justActivated && DOMEventHandlers.states._SelectionControl != target) {
-        uiManager.isActivating = false;
+      if(!focusAssistant.justActivated && DOMEventHandlers.states._SelectionControl != target) {
+        focusAssistant.isActivating = false;
       }
-      uiManager.justActivated = false;
+      focusAssistant.justActivated = false;
 
       DOMEventHandlers.states._SelectionControl = target;
 
