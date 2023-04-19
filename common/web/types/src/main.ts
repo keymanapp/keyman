@@ -8,6 +8,8 @@ export { default as KMXPlusBuilder}  from './kmx/kmx-plus-builder/kmx-plus-build
 export { default as KvkFileReader } from './kvk/kvk-file-reader.js';
 export { default as KvksFileReader } from './kvk/kvks-file-reader.js';
 export { default as KvkFileWriter } from './kvk/kvk-file-writer.js';
+export * as KvkFile from './kvk/kvk-file.js';
+export * as KvksFile from './kvk/kvk-file.js';
 
 export * as LDMLKeyboard from './ldml-keyboard/ldml-keyboard-xml.js';
 export { LDMLKeyboardTestDataXMLSourceFile } from './ldml-keyboard/ldml-keyboard-testdata-xml.js';

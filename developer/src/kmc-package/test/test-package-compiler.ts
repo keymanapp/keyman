@@ -123,6 +123,8 @@ describe('KmpCompiler', function () {
     assert.deepEqual(kmpJsonData, kmpJsonFixture);
   });
 
+  /* Testing Warnings */
+
   it('should warn on absolute paths', async function() {
     this.timeout(10000); // building a zip file can sometimes be slow
 
@@ -143,7 +145,49 @@ describe('KmpCompiler', function () {
 
     assert.lengthOf(callbacks.messages, 2);
     assert.deepEqual(callbacks.messages[0].code, CompilerMessages.WARN_AbsolutePath);
-    assert.deepEqual(callbacks.messages[1].code, CompilerMessages.ERROR_FileDoesNotExist); //TODO: this should be a file-missing-error
+    assert.deepEqual(callbacks.messages[1].code, CompilerMessages.ERROR_FileDoesNotExist);
   });
 
+  it('should warn if a non-binary kvk file is included', async function() {
+    this.timeout(10000); // building a zip file can sometimes be slow
+
+    callbacks.clear();
+
+    // const kmpPath = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    const kpsPath = makePathToFixture('xml_kvk_file', 'source', 'xml_kvk_file.kps');
+    const kmpCompiler = new KmpCompiler(callbacks);
+    const source = fs.readFileSync(kpsPath, 'utf-8');
+
+    let kmpJson: KmpJsonFile = null;
+
+    assert.doesNotThrow(() => {
+      kmpJson = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
+    });
+
+    await assert.isNotNull(kmpCompiler.buildKmpFile(kpsPath, kmpJson));
+
+    assert.lengthOf(callbacks.messages, 1);
+    assert.deepEqual(callbacks.messages[0].code, CompilerMessages.WARN_FileIsNotABinaryKvkFile);
+  });
+
+  it('should not warn if a binary kvk file is included', async function() {
+    this.timeout(10000); // building a zip file can sometimes be slow
+
+    callbacks.clear();
+
+    // const kmpPath = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    const kpsPath = makePathToFixture('binary_kvk_file', 'source', 'binary_kvk_file.kps');
+    const kmpCompiler = new KmpCompiler(callbacks);
+    const source = fs.readFileSync(kpsPath, 'utf-8');
+
+    let kmpJson: KmpJsonFile = null;
+
+    assert.doesNotThrow(() => {
+      kmpJson = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
+    });
+
+    await assert.isNotNull(kmpCompiler.buildKmpFile(kpsPath, kmpJson));
+
+    assert.lengthOf(callbacks.messages, 0);
+  });
 });
