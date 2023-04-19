@@ -62,7 +62,8 @@
     "exclude-after-remap": true,
     "exclude": [
       "test/",
-      "tools/"
+      "tools/",
+      "src/lexical-model.ts"
     ]
   },
   "repository": {
