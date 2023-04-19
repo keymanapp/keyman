@@ -10,6 +10,44 @@
  */
 
 function Keyboard_chirality() {
+  // Refer to $KEYMAN_ROOT/common/web/keyboard-processor/src/text/codes.ts, same method name.
+  // May be moved within common/web/types at some point in the future.
+  var getModifierState = function(layerId) {
+    var modifier=0;
+    if(layerId.indexOf('shift') >= 0) {
+      modifier |= Codes.modifierCodes['SHIFT'];
+    }
+
+    // The chiral checks must not be directly exclusive due each other to visual OSK feedback.
+    var ctrlMatched=false;
+    if(layerId.indexOf('leftctrl') >= 0) {
+      modifier |= Codes.modifierCodes['LCTRL'];
+      ctrlMatched=true;
+    }
+    if(layerId.indexOf('rightctrl') >= 0) {
+      modifier |= Codes.modifierCodes['RCTRL'];
+      ctrlMatched=true;
+    }
+    if(layerId.indexOf('ctrl')  >= 0 && !ctrlMatched) {
+      modifier |= Codes.modifierCodes['CTRL'];
+    }
+
+    var altMatched=false;
+    if(layerId.indexOf('leftalt') >= 0) {
+      modifier |= Codes.modifierCodes['LALT'];
+      altMatched=true;
+    }
+    if(layerId.indexOf('rightalt') >= 0) {
+      modifier |= Codes.modifierCodes['RALT'];
+      altMatched=true;
+    }
+    if(layerId.indexOf('alt')  >= 0 && !altMatched) {
+      modifier |= Codes.modifierCodes['ALT'];
+    }
+
+    return modifier;
+  }
+
   this.KI = "Keyboard_chirality";
   this.KN = "Development Chirality Test Keyboard";
   this.KMBM = 0x001F;
@@ -54,7 +92,7 @@ function Keyboard_chirality() {
     for(var i = 0; i < layers.length; i++) {
       // Obtain the modifier code to match for the selected layer.
       // The following uses a non-public property potentially subject to change in the future.
-      var modCode = Constants.modifierCodes['VIRTUAL_KEY'] | com.keyman.text.KeyboardProcessor.getModifierState(layers[i]);
+      var modCode = Constants.modifierCodes['VIRTUAL_KEY'] | getModifierState(layers[i]);
       var layer = layers[i];
 
       for(var key=0; key < kls[layer].length; key++) {
