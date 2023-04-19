@@ -10,6 +10,7 @@ import KmpCompiler from '@keymanapp/kmc-package';
 import { ModelInfoOptions as ModelInfoOptions, writeMergedModelMetadataFile } from '@keymanapp/kmc-model-info';
 import { SysExits } from './util/sysexits.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
+import { NodeCompilerCallbacks } from './util/NodeCompilerCallbacks.js';
 
 let inputFilename: string;
 const program = new Command();
@@ -45,8 +46,9 @@ let jsFilename = program.opts().jsFilename ? program.opts().jsFilename : path.jo
 // Load .kps source data
 //
 
+const callbacks = new NodeCompilerCallbacks();
 let kpsString: string = fs.readFileSync(kpsFilename, 'utf8');
-let kmpCompiler = new KmpCompiler();
+let kmpCompiler = new KmpCompiler(callbacks);
 let kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsString, kpsFilename);
 
 //
