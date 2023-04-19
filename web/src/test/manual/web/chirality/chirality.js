@@ -23,7 +23,7 @@ function Keyboard_chirality() {
              'leftalt': new Array("",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "", "", "",  "", "", "ɛ", "ɽ", "ʈ", "ɥ", "ʊ", "",  "ɔ", "",  "",  "",  "",   "", "", "", "æ", "",  "ɖ", "",   "", "ɦ", "ʝ", "",  "ɭ", "",  "",   "", "", "", "", "", "", "ʐ", "",  "ɕ", "", "",  "ɳ", "",  "",  "",  "",  "", "", "", "", "", ""),
             'rightalt': new Array("",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "", "", "", "ʠ", "ɰ", "ɜ", "ɾ", "ƭ", "",  "ʌ", "",  "ø", "ƥ", "",  "",  "",   "", "", "", "ɐ", "σ", "ɗ", "",  "ɠ", "ħ", "ʄ", "ƙ", "ɮ", "",  "",   "", "", "", "", "", "", "ʑ", "",  "ƈ", "",  "ɓ", "ŋ", "ɱ", "",  "",  "",  "", "", "", "", "", ""),
        'leftalt-shift': new Array("",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "", "", "", "ʢ", "",  "œ", "ɻ", "",  "",  "",  "ᵻ", "ɞ", "",  "",  "",  "",   "", "", "", "",  "",  "",  "",  "",  "",  "",  "",  "ʎ", "",  "",   "", "", "", "", "", "", "",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "", "", "", "", "", ""),
-      'rightalt-shift': new Array("",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "", "", "", "",  "",  "ɶ", "ʁ", "",  "",  "ᵾ", "ᵼ", "ɤ", "",  "",  "",  "",   "", "", "", "ᴂ", "",  "",  "",  "ʛ", "ɧ", "",  "",  "ɺ", "",  "",   "", "", "", "", "", "", "",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "", "", "", "", "", "")   
+      'rightalt-shift': new Array("",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "", "", "", "",  "",  "ɶ", "ʁ", "",  "",  "ᵾ", "ᵼ", "ɤ", "",  "",  "",  "",   "", "", "", "ᴂ", "",  "",  "",  "ʛ", "ɧ", "",  "",  "ɺ", "",  "",   "", "", "", "", "", "", "",  "",  "",  "",  "",  "",  "",  "",  "",  "",  "", "", "", "", "", "")
       }
   };
   this.KH = '';
@@ -37,30 +37,29 @@ function Keyboard_chirality() {
       "K_COLON","K_QUOTE","K_*","K_*","K_*","K_*","K_*","K_oE2",
       "K_Z","K_X","K_C","K_V","K_B","K_N","K_M","K_COMMA","K_PERIOD",
       "K_SLASH","K_*","K_*","K_*","K_*","K_*","K_SPACE"];
-  
+
   this.gs = function (t, e) {
       return this.g0(t, e);
   };
   this.g0 = function (t, e) {
     var k = KeymanWeb, r = 0, m = 0;
-    var core = keyman.core;
-    var Constants = com.keyman.text.Codes;
-    
+    var Constants = keyman.osk;  // Holds anchor points for relevant Codes properties.
+
     // Handwritten time!
     var kls = this.KV.KLS;
-    
+
     var layers = ['default', 'shift', 'leftctrl', 'leftctrl-shift', 'leftalt', 'rightalt', 'leftalt-shift', 'rightalt-shift'];
-    
+
     // Maps keystrokes by base key-codes and array into the key symbols displayed in KLS.
     for(var i = 0; i < layers.length; i++) {
       // Obtain the modifier code to match for the selected layer.
       // The following uses a non-public property potentially subject to change in the future.
       var modCode = Constants.modifierCodes['VIRTUAL_KEY'] | com.keyman.text.KeyboardProcessor.getModifierState(layers[i]);
       var layer = layers[i];
-      
+
       for(var key=0; key < kls[layer].length; key++) {
         var keySymbol = this.dfltCodes[key];
-        
+
         if(keySymbol == "K_*") {
           continue;
         } else if(kls[layer][key] != '') {
@@ -76,7 +75,7 @@ function Keyboard_chirality() {
         }
       }
     }
-    
+
     return r;
   };
 }
