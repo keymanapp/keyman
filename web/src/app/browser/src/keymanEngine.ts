@@ -26,6 +26,8 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, KeyEventKeybo
    * Description  Return object with activation state of UI:
    *                activationPending (bool):   KMW being activated
    *                activated         (bool):   KMW active
+   *
+   * See https://help.keyman.com/DEVELOPER/ENGINE/WEB/16.0/reference/core/getUIState
    */
   getUIState(): FocusStateAPIObject {
     return this.contextManager.focusAssistant.getUIState();
@@ -33,6 +35,8 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, KeyEventKeybo
 
   /**
    * Set or clear the IsActivatingKeymanWebUI flag (exposed function)
+   *
+   * See https://help.keyman.com/DEVELOPER/ENGINE/WEB/16.0/reference/core/activatingUI
    *
    * @param       {(boolean|number)}  state  Activate (true,false)
    */
