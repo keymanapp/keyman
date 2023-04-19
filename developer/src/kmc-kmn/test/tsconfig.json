@@ -9,16 +9,17 @@
       "allowSyntheticDefaultImports": true, // for chai
       "paths": {
         "@keymanapp/common-types": ["../../../../common/web/types/src/main"],
+        "@keymanapp/developer-test-helpers": ["../../common/web/test-helpers/index"],
       },
     },
   "include": [
-      "**/test-*.ts",
-      "./helpers.ts"
+      "**/test-*.ts"
   ],
   "references": [
       { "path": "../../../../common/web/keyman-version/tsconfig.esm.json" },
       { "path": "../../../../common/web/types/" },
       { "path": "../../../../common/tools/hextobin/" },
+      { "path": "../../common/web/test-helpers/" },
       { "path": "../" }
     ]
 }

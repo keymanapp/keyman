@@ -6,7 +6,7 @@ import { Compiler } from '../src/main.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
-import { TestCompilerCallbacks } from './helpers.js';
+import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 const __dirname = dirname(fileURLToPath(import.meta.url)).replace(/\\/g, '/');
 const baselineDir = __dirname + '/../../../../../common/test/keyboards/baseline/';
