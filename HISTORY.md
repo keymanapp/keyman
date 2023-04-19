@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.90 alpha 2023-04-19
+
+* chore(android/engine): Cleanup old SDK calls (#8612)
+* fix(developer): package editor no longer loses RTL flag for LMs (#8606)
+
 ## 17.0.89 alpha 2023-04-18
 
 * chore(developer): tweak build of extension list in kmc (#8597)
