@@ -17,8 +17,8 @@ import { FloatingOSKCookie, FloatingOSKCookieSerializer } from './floatingOskCoo
    Copyright 2017 SIL International
 ***/
 
-interface FloatingOSKViewConfiguration extends Configuration {
-  activator: TwoStateActivator<HTMLElement>;
+export interface FloatingOSKViewConfiguration extends Configuration {
+  activator?: TwoStateActivator<HTMLElement>;
 }
 
 export default class FloatingOSKView extends OSKView {
