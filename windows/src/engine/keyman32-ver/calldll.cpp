@@ -699,6 +699,30 @@ LoadDLLsCore(LPINTKEYBOARDINFO lpkbi) {
   if ((!lpkbi->lpCoreKeyboard) || (!lpkbi->lpCoreKeyboard)){
     return FALSE;
   }
+
+  char versioned_filename[260];
+  char test_library_name[260];
+  char proxy_modulename[260];
+
+  #ifdef _WIN64
+    char keyman_name[] = "keyman64.dll";
+  #else
+    char keyman_name[] = "keyman32.dll";
+  #endif
+
+  //GetModuleFileName(GetModuleHandle(LIBRARY_NAME), buf, 260);
+
+		GetModuleFileName(g_hInstance, test_library_name, 260);
+
+    char *p = strrchr(versioned_filename, '\\'); // find last occurrence of '\'
+    if (p != NULL) {
+        int64_t len = p - versioned_filename + 1;
+        strncpy(proxy_modulename, versioned_filename, (size_t)len);
+        strncat(proxy_modulename, keyman_name, 13);
+    }
+
+   SendDebugMessageFormat(
+        0, sdmKeyboard, 0, "Testing methods to get library name test lib name:[%s], versioned_filename:[%s]", test_library_name, versioned_filename);
   // Need to Load the keyman32 or keyman64 dll proxy keyboard as the third-party dlls
   // will use this rather than the versioned dll.
 //  #ifdef _WIN64
@@ -706,8 +730,10 @@ LoadDLLsCore(LPINTKEYBOARDINFO lpkbi) {
 //  #else
 //    HMODULE hModule = LoadLibrary("keyman32.dll");
 //  #endif
-  if (!LoadLibrary("C:\\Program Files (x86)\\Common Files\\Keyman\\Keyman Engine\\keyman64.dll")){
-      SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: keyman64.dll not loaded with error:[%d]", GetLastError());
+
+
+  if (!LoadLibrary(proxy_modulename)) {
+     SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: [%s] not loaded with error:[%d]", proxy_modulename, GetLastError());
       return FALSE;
   }
 

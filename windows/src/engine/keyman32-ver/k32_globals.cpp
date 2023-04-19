@@ -402,13 +402,13 @@ BOOL Globals::InitSettings() {
   }
 
  // Read Keyman Root path will combine with above in the future just quickly hack in.
-  if (reg.OpenKeyReadOnly(REGSZ_KeymanLM) &&
-      reg.ValueExists(REGSZ_RootPath)) {
+  // if (reg.OpenKeyReadOnly(REGSZ_KeymanLM) &&
+  //     reg.ValueExists(REGSZ_RootPath)) {
 
-    if(reg.ReadString(REGSZ_RootPath, f_KMEngine_Rootpath, sizeof(f_KMEngine_Rootpath) / sizeof(f_KMEngine_Rootpath[0])))
-    reg.CloseKey();
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "Globals::InitSettings - KMEngine_Rootpath is  %s" , f_KMEngine_Rootpath);
-  }
+  //   if(reg.ReadString(REGSZ_RootPath, f_KMEngine_Rootpath, sizeof(f_KMEngine_Rootpath) / sizeof(f_KMEngine_Rootpath[0])))
+  //   reg.CloseKey();
+  //   SendDebugMessageFormat(0, sdmAIDefault, 0, "Globals::InitSettings - KMEngine_Rootpath is  %s" , f_KMEngine_Rootpath);
+  // }
 
   return TRUE;
 }
