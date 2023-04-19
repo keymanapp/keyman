@@ -50,5 +50,7 @@ export default class PassthroughKeyboard extends HardKeyboard {
     } catch (err) {
       promise.reject(err);
     }
+
+    return promise.corePromise;
   }
 }
