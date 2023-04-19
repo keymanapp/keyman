@@ -1,9 +1,9 @@
 import { type KeyElement, OSKView, VisualKeyboard } from "keyman/engine/osk";
 import { getAbsoluteX, getAbsoluteY } from "keyman/engine/dom-utils";
 import { DeviceSpec } from "@keymanapp/keyboard-processor";
-import { type EmbeddedGestureConfig } from "keyman/engine/osk";
+import ContextManager from "./contextManager.js";
 
-export function setupEmbeddedListeners(osk: OSKView) {
+export function setupOskListeners(osk: OSKView, contextManager: ContextManager) {
   osk.on('globeKey', (key, on) => {
     if(on) {
       if(osk.hostDevice.touchable) {
@@ -19,16 +19,16 @@ export function setupEmbeddedListeners(osk: OSKView) {
 
   osk.on('hideRequested', (key) => {
     if(osk) {
-      focusAssistant.setActivatingUI(false);
+      contextManager.focusAssistant.setActivatingUI(false);
       osk.startHide(true);
       keyman.domManager.lastActiveElement = null;
     }
   });
 
-  osk.on('onhide', () => {
+  osk.on('onhide', (hiddenByUser) => {
     // If hidden by the UI, be sure to restore the focus
-    if(hiddenByUser && this.activeTarget) {
-      this.activeTarget?.focus();
+    if(hiddenByUser) {
+      contextManager.activeTarget?.focus();
     }
   });
 }

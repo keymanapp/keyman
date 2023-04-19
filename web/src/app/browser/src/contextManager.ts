@@ -1,6 +1,7 @@
-import { type Keyboard, Mock, OutputTarget } from '@keymanapp/keyboard-processor';
+import { type Keyboard, Mock } from '@keymanapp/keyboard-processor';
 import { type KeyboardStub } from 'keyman/engine/package-cache';
 import { CookieSerializer } from 'keyman/engine/dom-utils';
+import { OutputTarget } from 'keyman/engine/element-wrappers';
 import {
   ContextManagerBase,
   type KeyboardInterface
@@ -35,7 +36,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     throw new Error('Method not implemented.');
   }
 
-  get activeTarget(): OutputTarget {
+  get activeTarget(): OutputTarget<any> {
     // TBD:  basically DOMManager's .activeElement.
     throw new Error('Method not implemented.');
   }
@@ -46,7 +47,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     return this._activeKeyboard;
   }
 
-  setKeyboardActiveForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget) {
+  setKeyboardActiveForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget<any>) {
     throw new Error('Method not implemented.');
     // depends on the target
     // if not set with an "independent keyboard", changes the global.
@@ -83,7 +84,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    * When `null`, such operations will affect the global default; otherwise, such operations
    * affect only the specified `target`.
    */
-  protected get keyboardTarget(): OutputTarget {
+  protected get keyboardTarget(): OutputTarget<any> {
     // TODO: Remove `&& false` once the inlined section below is implemented.
     if(this.activeTarget /* has 'independent keyboard mode activated' */ && false) {
       return this.activeTarget;
