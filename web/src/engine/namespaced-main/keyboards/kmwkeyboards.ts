@@ -358,7 +358,7 @@ namespace com.keyman.keyboards {
         }
         // This is likely to be triggered by a UI call of some sort, and we need to treat
         // this call as such to properly maintain the globalKeyboard setting.
-        focusAssistant.justActivated = true;
+        focusAssistant.restoringFocus = true;
       }
 
       if(anyRemoved) {

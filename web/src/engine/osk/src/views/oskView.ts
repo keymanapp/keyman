@@ -154,12 +154,12 @@ export interface EventMap {
    ```
   // On event start
   let keymanweb = com.keyman.singleton;
-  focusAssistant.justActivated = true;
+  focusAssistant.restoringFocus = true;
 
   // On promise resolution
   keymanweb.domManager.focusLastActiveElement();
 
-  focusAssistant.justActivated = false;
+  focusAssistant.restoringFocus = false;
   focusAssistant.setActivatingUI(false);
 
   // Alternate case using the same event:
@@ -181,12 +181,12 @@ export interface EventMap {
    ```
    // On event start
    let keymanweb = com.keyman.singleton;
-   focusAssistant.justActivated = true;
+   focusAssistant.restoringFocus = true;
 
    // On promise resolution
    keymanweb.domManager.focusLastActiveElement();
 
-   focusAssistant.justActivated = false;
+   focusAssistant.restoringFocus = false;
    focusAssistant.setActivatingUI(false);
    ```
    */

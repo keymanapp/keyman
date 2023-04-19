@@ -68,7 +68,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       // subclass.
 
       // Required for the `sil_euro_latin` keyboard's desktop OSK/table to function properly.
-      focusAssistant.setActivatingUI(true);
+      this.focusAssistant.setActivatingUI(true);
       dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
       keyman.domManager.focusLastActiveElement();
       dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
@@ -109,7 +109,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       if(originalKeyboardTarget == this.keyboardTarget) {
         // TODO: app/browser - _SetTargDir (within its ContextManager)
         // util.addStyleSheet(domManager.setAttachmentFontStyle(kbdStub.KF));
-        // focusAssistant.justActivated = true; // TODO:  Resolve without need for the cast.
+       this.focusAssistant.restoringFocus = true;
       }
 
       return result;

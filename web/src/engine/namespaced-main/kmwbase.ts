@@ -186,7 +186,7 @@ namespace com.keyman {
      * Will also trigger OSK shift state / layer reset.
      **/
     pageFocusHandler = () => {
-      if(!focusAssistant.isActivating && this.osk?.vkbd) {
+      if(!focusAssistant.maintainingFocus && this.osk?.vkbd) {
         this.core.resetContext(null);
       }
       return false;

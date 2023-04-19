@@ -44,7 +44,8 @@ export class FocusAssistant {
    * While the flag is active, the context-management system should not deactivate an OutputTarget upon
    * its element's loss of focus within the page unless setting a different OutputTarget as active.
    */
-  isActivating: boolean = false;    // ActivatingKeymanWebUI - Does the OSK have active focus / an active interaction?
+  // Formerly `isActivating`.
+  maintainingFocus: boolean = false;    // ActivatingKeymanWebUI - Does the OSK have active focus / an active interaction?
 
   /*
    * Long-term idea here:  as (aside from OSK title/resize bar interactions) it's always used to actively
@@ -62,7 +63,8 @@ export class FocusAssistant {
    * This is most commonly utilized whenever a keyboard is newly activated, generally due to
    * user interaction to select the new keyboard.
    */
-  justActivated: boolean = false;   // JustActivatedKeymanWebUI - focussing back to control after KeymanWeb UI interaction
+  // Formerly `justActivated`.
+  restoringFocus: boolean = false;   // JustActivatedKeymanWebUI - focussing back to control after KeymanWeb UI interaction
 
   constructor() {
   }
@@ -76,7 +78,7 @@ export class FocusAssistant {
    *                activated         (bool):   KMW active
    */
   getUIState(): FocusStateAPIObject {
-    return new FocusStateAPIObject(this.isActivating, this.justActivated);
+    return new FocusStateAPIObject(this.maintainingFocus, this.restoringFocus);
   }
 
   /**
@@ -85,6 +87,6 @@ export class FocusAssistant {
    * @param       {(boolean|number)}  state  Activate (true,false)
    */
   setActivatingUI(state: boolean) {
-    this.isActivating = state ? true : false;
+    this.maintainingFocus = state ? true : false;
   }
 }

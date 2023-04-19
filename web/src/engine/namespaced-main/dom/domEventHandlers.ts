@@ -97,7 +97,7 @@ namespace com.keyman.dom {
       this.keyman.domManager.lastActiveElement = Ltarg;
       this.keyman.domManager.activeElement = Ltarg;  // I3363 (Build 301)
 
-      if(focusAssistant.justActivated) {
+      if(focusAssistant.restoringFocus) {
         this._BlurKeyboardSettings(Ltarg);
       } else {
         this._FocusKeyboardSettings(Ltarg, priorElement ? false : true);
@@ -186,15 +186,15 @@ namespace com.keyman.dom {
       /* If the KeymanWeb UI is active as a user changes controls, all UI-based effects should be restrained to this control in case
       * the user is manually specifying languages on a per-control basis.
       */
-      focusAssistant.justActivated = false;
+      focusAssistant.restoringFocus = false;
 
-      var isActivating = focusAssistant.isActivating;
+      var maintainingFocus = focusAssistant.maintainingFocus;
       let activeKeyboard = com.keyman.singleton.core.activeKeyboard;
-      if(!isActivating && activeKeyboard) {
+      if(!maintainingFocus && activeKeyboard) {
         activeKeyboard.notify(0, Utils.getOutputTarget(Ltarg as HTMLElement), 0);  // I2187
       }
 
-      this.doControlBlurred(Ltarg, e, isActivating);
+      this.doControlBlurred(Ltarg, e, maintainingFocus);
 
       this.doChangeEvent(Ltarg);
       this.keyman['resetContext']();
@@ -294,7 +294,7 @@ namespace com.keyman.dom {
       }
 
       let activeKeyboard = keyman.core.activeKeyboard;
-      if(!focusAssistant.justActivated) {
+      if(!focusAssistant.restoringFocus) {
         if(target && outputTarget) {
           outputTarget.deadkeys().clear();
         }
@@ -304,10 +304,10 @@ namespace com.keyman.dom {
         }
       }
 
-      if(!focusAssistant.justActivated && DOMEventHandlers.states._SelectionControl != target) {
-        focusAssistant.isActivating = false;
+      if(!focusAssistant.restoringFocus && DOMEventHandlers.states._SelectionControl != target) {
+        focusAssistant.maintainingFocus = false;
       }
-      focusAssistant.justActivated = false;
+      focusAssistant.restoringFocus = false;
 
       DOMEventHandlers.states._SelectionControl = target;
 
