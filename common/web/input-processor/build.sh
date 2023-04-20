@@ -8,22 +8,20 @@ set -eu
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+
 # This script runs from its own folder
-cd "$(dirname "$THIS_SCRIPT")"
+cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
-
-# TODO: for predictive-text, we only need :headless, perhaps we should be splitting modules?
-# TODO: remove :tools once kmlmc is a dependency for test:module
 
 builder_describe "Builds the standalone, headless form of Keyman Engine for Web's input-processor module" \
   "@/common/web/keyman-version" \
   "@/common/web/keyboard-processor" \
   "@/common/predictive-text" \
-  "@/developer/src/kmc-model test:module" \
+  "@/developer/src/kmc-model test" \
   "clean" \
   "configure" \
   "build" \
@@ -53,7 +51,7 @@ fi
 ### BUILD ACTIONS
 
 if builder_start_action build; then
-  tsc -b src/tsconfig.json
+  tsc --build src/tsconfig.json
   builder_finish_action success build
 fi
 
