@@ -152,6 +152,7 @@ public class KMKeyboardJSHandler {
         // Perform left-deletions
         if (deleteLeft > 0) {
           if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+            KMManager.InAppKeyboardShouldIgnoreTextChange = true;
             KMManager.InAppKeyboardShouldIgnoreSelectionChange = true;
           }
           performLeftDeletions(ic, deleteLeft);
