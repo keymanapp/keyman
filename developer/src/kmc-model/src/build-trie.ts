@@ -1,5 +1,6 @@
 import { readFileSync } from "fs";
-import { log, KeymanCompilerError } from "./model-compiler-errors.js";
+import { ModelCompilerError, ModelCompilerMessages } from "./model-compiler-errors.js";
+import { callbacks } from "./compiler-callbacks.js";
 
 // Supports LF or CRLF line terminators.
 const NEWLINE_SEPARATOR = /\u000d?\u000a/;
@@ -23,7 +24,7 @@ export type WordList = {[wordform: string]: number};
  */
 export function createTrieDataStructure(filenames: string[], searchTermToKey?: (wf: string) => string): string {
   if (typeof searchTermToKey !== "function") {
-    throw new TypeError("searchTermToKey must be explicitly specified")
+    throw new ModelCompilerError(ModelCompilerMessages.Error_SearchTermToKeyMustBeExplicitlySpecified());
   }
   // Make one big word list out of all of the filenames provided.
   let wordlist: WordList = {};
@@ -88,9 +89,13 @@ export function parseWordListFromContents(wordlist: WordList, contents: string):
 function _parseWordList(wordlist: WordList, source:  WordListSource): void {
   const TAB = "\t";
 
+  ModelCompilerMessages.filename = source.name;
+
   let wordsSeenInThisFile = new Set<string>();
 
   for (let [lineno, line] of source.lines()) {
+    ModelCompilerMessages.line = lineno;
+
     // Remove the byte-order mark (BOM) from the beginning of the string.
     // Because `contents` can be the concatenation of several files, we have to remove
     // the BOM from every possible start of file -- i.e., beginning of every line.
@@ -109,11 +114,7 @@ function _parseWordList(wordlist: WordList, source:  WordListSource): void {
     wordform = wordform.normalize('NFC');
     if (original !== wordform) {
       // Mixed normalization forms are yucky! Warn about it.
-      log(
-        KeymanCompilerError.CWARN_MixedNormalizationForms,
-        `“${wordform}” is not in Unicode NFC. Automatically converting to NFC.`,
-        {filename: source.name, lineno}
-      )
+      callbacks.reportMessage(ModelCompilerMessages.Warn_MixedNormalizationForms({wordform: wordform}));
     }
 
     wordform = wordform.trim()
@@ -131,16 +132,15 @@ function _parseWordList(wordlist: WordList, source:  WordListSource): void {
     if (wordsSeenInThisFile.has(wordform)) {
       // The same word seen across multiple files is fine,
       // but a word seen multiple times in one file is a problem!
-      log(
-        KeymanCompilerError.CWARN_DuplicateWordInSameFile,
-        `duplicate word “${wordform}” found in same file; summing counts`,
-        {filename: source.name, lineno}
-      )
+      callbacks.reportMessage(ModelCompilerMessages.Warn_DuplicateWordInSameFile({wordform: wordform}));
     }
     wordsSeenInThisFile.add(wordform);
 
     wordlist[wordform] = (isNaN(wordlist[wordform]) ? 0 : wordlist[wordform] || 0) + count;
   }
+
+  ModelCompilerMessages.filename = undefined;
+  ModelCompilerMessages.line = undefined;
 }
 
 type LineNoAndText = [number, string];
@@ -473,7 +473,7 @@ namespace Trie {
     }
 
     if(isNaN(val)) {
-      console.error("Unexpected NaN has appeared!");
+      throw new Error("Unexpected NaN has appeared!");
     }
     return val;
   }
@@ -503,7 +503,7 @@ function detectEncoding(filename: string): 'utf8' | 'utf16le' {
   } else if (buffer[0] == 0xFE && buffer[1] == 0xFF) {
     // Big Endian, is NOT supported because Node does not support it (???)
     // See: https://stackoverflow.com/a/14551669/6626414
-    throw new Error('UTF-16BE is unsupported')
+    throw new ModelCompilerError(ModelCompilerMessages.Error_UTF16BEUnsupported());
   } else {
     // Assume its in UTF-8, with or without a BOM.
     return 'utf8';

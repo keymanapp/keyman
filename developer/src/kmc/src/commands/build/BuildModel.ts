@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
 import { compileModel } from '@keymanapp/kmc-model';
+import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 
 export class BuildModel extends BuildActivity {
   public get name(): string { return 'Lexical model'; }
@@ -11,9 +12,11 @@ export class BuildModel extends BuildActivity {
     let outputFilename: string = this.getOutputFilename(infile, options);
     let code = null;
 
+    const callbacks = new NodeCompilerCallbacks();
+
     // Compile:
     try {
-      code = compileModel(infile);
+      code = compileModel(infile, callbacks);
     } catch(e) {
       console.error(e);
       return false;

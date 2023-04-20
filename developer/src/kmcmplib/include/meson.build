@@ -17,7 +17,7 @@ configure_file(
   output: 'keyman_version.h',
 )
 
-inc = include_directories( # '.', is_system: true)
+inc = include_directories(
   '.',
   '../../common/include',
   '../../../../common/include',

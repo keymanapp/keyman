@@ -25,6 +25,9 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
       }
     }
   }
+  hasMessage(code: number): boolean {
+    return this.messages.find((item) => item.code == code) === undefined ? false : true;
+  }
   reportMessage(event: CompilerEvent): void {
     // console.log(event.message);
     this.messages.push(event);
