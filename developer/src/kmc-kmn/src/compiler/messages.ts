@@ -8,7 +8,7 @@ const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
 /**
- * LogLevel comes from comperr.h, for legacy compiler error messages
+ * LogLevel comes from kmn_compiler_errors.h, for legacy compiler error messages
  */
 const enum LogLevel {
   LEVEL_MASK = 0xF000,
@@ -32,14 +32,14 @@ const LogLevelToSeverity: Record<number,number> = {
 }
 
 /*
-  The messages in this class share the namespace with messages from comperr.h
+  The messages in this class share the namespace with messages from kmn_compiler_errors.h
   and the below ranges are reserved.
 */
 export class CompilerMessages {
-  static RANGE_KMN_COMPILER_MIN    = 0x0001; // from comperr.h
-  static RANGE_KMN_COMPILER_MAX    = 0x07FF; // from comperr.h
-  static RANGE_LEXICAL_MODEL_MIN   = 0x0800; // from comperr.h, deprecated -- this range will not be used in future versions
-  static RANGE_LEXICAL_MODEL_MAX   = 0x08FF; // from comperr.h, deprecated -- this range will not be used in future versions
+  static RANGE_KMN_COMPILER_MIN    = 0x0001; // from kmn_compiler_errors.h
+  static RANGE_KMN_COMPILER_MAX    = 0x07FF; // from kmn_compiler_errors.h
+  static RANGE_LEXICAL_MODEL_MIN   = 0x0800; // from kmn_compiler_errors.h, deprecated -- this range will not be used in future versions
+  static RANGE_LEXICAL_MODEL_MAX   = 0x08FF; // from kmn_compiler_errors.h, deprecated -- this range will not be used in future versions
   static RANGE_CompilerMessage_Min = 0x1000; // All compiler messages listed here must be >= this value
 
   static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException, `Unexpected exception: ${(o.e ?? 'unknown error').toString()}\n\nCall stack:\n${(o.e instanceof Error ? o.e.stack : (new Error()).stack)}`);
