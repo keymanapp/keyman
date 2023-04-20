@@ -6,7 +6,7 @@ import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 import type { KpsFile, KpsFileContentFile, KpsFileInfo, KpsFileKeyboard, KpsFileLanguage, KpsFileLexicalModel, KpsFileOptions, KpsPackage } from './kps-file.js';
 import type { KmpJsonFile, KmpJsonFileInfo, KmpJsonFileLanguage, KmpJsonFileOptions } from './kmp-json-file.js';
-import { CompilerCallbacks } from 'common/web/types/build/src/main.js';
+import { CompilerCallbacks, KvkFile } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
 
 export { type KmpJsonFile } from './kmp-json-file.js';
@@ -279,6 +279,9 @@ export default class KmpCompiler {
         failed = true;
         return;
       }
+
+      this.warnIfKvkFileIsNotBinary(filename, data);
+
       zip.file(basename, data);
 
       // Remove path data from files before JSON save
@@ -293,5 +296,16 @@ export default class KmpCompiler {
 
     // Generate kmp file
     return zip.generateAsync({type: 'binarystring', compression:'DEFLATE'});
+  }
+
+  /**
+   * Legacy .kmp compiler would transform xml-format .kvk files into a binary .kvk file; now
+   * we want that to remain the responsibility of the keyboard compiler, so we'll warn the
+   * few users who are still doing this
+   */
+  private warnIfKvkFileIsNotBinary(filename: string, data: Buffer) {
+    if(filename.match(/\.kvk$/) && data.compare(Buffer.from(KvkFile.KVK_HEADER_IDENTIFIER_BYTES), 0, 3, 0, 3) != 0) {
+      this.callbacks.reportMessage(CompilerMessages.Warn_FileIsNotABinaryKvkFile({filename: filename}));
+    }
   }
 }
