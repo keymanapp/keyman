@@ -19,8 +19,6 @@
 */
 #include "pch.h"
 
-void IntSaveKeyboardOption(LPCSTR key, LPINTKEYBOARDINFO kp, int nStoreToSave);
-BOOL IntLoadKeyboardOptions(LPCSTR key, LPINTKEYBOARDINFO kp);
 BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* const state);
 void IntSaveKeyboardOptionREGCore(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value);
 
@@ -35,28 +33,6 @@ static km_kbp_cp* CloneKMKBPCPFromWSTR(LPWSTR buf) {
   km_kbp_cp* clone = new km_kbp_cp[wcslen(buf) + 1];
   wcscpy_s(reinterpret_cast<LPWSTR>(clone), wcslen(buf) + 1, buf);
   return clone;
-}
-
-void LoadKeyboardOptions(LPINTKEYBOARDINFO kp)
-{   // I3594
-  IntLoadKeyboardOptions(REGSZ_KeyboardOptions, kp);
-}
-
-void FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
-{
-  // This is a cleanup routine; we don't want to precondition all calls to it
-  // so we do not assert
-  if (kp == NULL || kp->Keyboard == NULL || kp->KeyboardOptions == NULL)
-    return;
-
-  for(DWORD i = 0; i < kp->Keyboard->cxStoreArray; i++)
-    if(kp->KeyboardOptions[i].Value)
-    {
-      kp->Keyboard->dpStoreArray[i].dpString = kp->KeyboardOptions[i].OriginalStore;
-      delete kp->KeyboardOptions[i].Value;
-    }
-  delete kp->KeyboardOptions;
-  kp->KeyboardOptions = NULL;
 }
 
 void SaveKeyboardOptionREGCore(LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value)
@@ -75,66 +51,6 @@ void IntSaveKeyboardOptionREGCore(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR k
   if (r.OpenKey(REGSZ_KeymanActiveKeyboards, TRUE) && r.OpenKey(kp->Name, TRUE) && r.OpenKey(REGKey, TRUE))
   {
     r.WriteString(key, value);
-  }
-}
-
-BOOL IntLoadKeyboardOptions(LPCSTR key, LPINTKEYBOARDINFO kp)
-{
-  assert(key != NULL);
-  assert(kp != NULL);
-  assert(kp->Keyboard != NULL);
-  assert(kp->KeyboardOptions == NULL);
-
-  kp->KeyboardOptions = new INTKEYBOARDOPTIONS[kp->Keyboard->cxStoreArray];
-  memset(kp->KeyboardOptions, 0, sizeof(INTKEYBOARDOPTIONS) * kp->Keyboard->cxStoreArray);
-  RegistryReadOnly r(HKEY_CURRENT_USER);
-  if(r.OpenKeyReadOnly(REGSZ_KeymanActiveKeyboards) && r.OpenKeyReadOnly(kp->Name) && r.OpenKeyReadOnly(key))
-  {
-    WCHAR buf[256];
-    int n = 0;
-    while(r.GetValueNames(buf, sizeof(buf) / sizeof(buf[0]), n))
-    {
-      buf[255] = 0;
-      WCHAR val[256];
-      if(r.ReadString(buf, val, sizeof(val) / sizeof(val[0])) && val[0])
-      {
-        val[255] = 0;
-        for(DWORD i = 0; i < kp->Keyboard->cxStoreArray; i++)
-        {
-          if(kp->Keyboard->dpStoreArray[i].dpName != NULL && _wcsicmp(kp->Keyboard->dpStoreArray[i].dpName, buf) == 0)
-          {
-            kp->KeyboardOptions[i].Value = new WCHAR[wcslen(val)+1];
-            wcscpy_s(kp->KeyboardOptions[i].Value, wcslen(val)+1, val);
-
-            kp->KeyboardOptions[i].OriginalStore = kp->Keyboard->dpStoreArray[i].dpString;
-            kp->Keyboard->dpStoreArray[i].dpString = kp->KeyboardOptions[i].Value;
-
-            break;
-          }
-        }
-      }
-      n++;
-    }
-    return TRUE;
-  }
-  return FALSE;
-}
-
-void IntSaveKeyboardOption(LPCSTR key, LPINTKEYBOARDINFO kp, int nStoreToSave)
-{
-  assert(key != NULL);
-  assert(kp != NULL);
-  assert(kp->Keyboard != NULL);
-  assert(kp->KeyboardOptions != NULL);
-  assert(nStoreToSave >= 0);
-  assert(nStoreToSave < (int) kp->Keyboard->cxStoreArray);
-
-  if(kp->Keyboard->dpStoreArray[nStoreToSave].dpName == NULL) return;
-
-  RegistryFullAccess r(HKEY_CURRENT_USER);
-  if(r.OpenKey(REGSZ_KeymanActiveKeyboards, TRUE) && r.OpenKey(kp->Name, TRUE) && r.OpenKey(key, TRUE))
-  {
-    r.WriteString(kp->Keyboard->dpStoreArray[nStoreToSave].dpName, kp->Keyboard->dpStoreArray[nStoreToSave].dpString);
   }
 }
 

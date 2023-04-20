@@ -178,15 +178,6 @@ public:
 
 };
 
-class AppContextWithStores : public AppContext   // I4978
-{
-public:
-  AppContextWithStores(int nKeyboardOptions);
-  ~AppContextWithStores();
-  DWORD nKeyboardOptions;
-  LPINTKEYBOARDOPTIONS KeyboardOptions;
-};
-
 class AppIntegration:public AppActionQueue
 {
 protected:

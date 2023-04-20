@@ -366,19 +366,6 @@ void AITIP::ReadContext() {
   }
 }
 
-AppContextWithStores::AppContextWithStores(int nKeyboardOptions) : AppContext() {   // I4978
-  this->nKeyboardOptions = nKeyboardOptions;
-  KeyboardOptions = new INTKEYBOARDOPTIONS[nKeyboardOptions];
-  memset(KeyboardOptions, 0, sizeof(INTKEYBOARDOPTIONS) * nKeyboardOptions);
-}
-
-AppContextWithStores::~AppContextWithStores() {   // I4978
-  for(DWORD i = 0; i < nKeyboardOptions; i++) {
-    if(KeyboardOptions[i].Value) delete KeyboardOptions[i].Value;
-  }
-  delete KeyboardOptions;
-}
-
 void AITIP::CopyContext(AppContext *savedContext) {
   savedContext->CopyFrom(context);
 }

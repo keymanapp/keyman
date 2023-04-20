@@ -641,7 +641,6 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_StopForcingKeyboard()
 		if(!DeactivateDLLs(_td->lpActiveKeyboard)) return FALSE;  // I3173   // I3525
 		if(!UnloadDLLs(_td->lpActiveKeyboard)) return FALSE;  // I3173   // I3525
 		_td->ForceFileName[0] = 0;
-    FreeKeyboardOptions(_td->lpActiveKeyboard);
 		ReleaseKeyboardMemory(_td->lpActiveKeyboard->Keyboard);
     ReleaseStateMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboardState);
     ReleaseKeyboardMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboard);
@@ -1031,7 +1030,6 @@ void ReleaseKeyboards(BOOL Lock)
 	for(int i = 0; i < _td->nKeyboards; i++)
 	{
 		if(Lock) UnloadDLLs(&_td->lpKeyboards[i]);
-    FreeKeyboardOptions(&_td->lpKeyboards[i]);
 		ReleaseKeyboardMemory(_td->lpKeyboards[i].Keyboard);
     ReleaseStateMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboardState);
     ReleaseKeyboardMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboard);

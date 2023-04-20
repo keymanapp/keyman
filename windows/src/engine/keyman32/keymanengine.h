@@ -85,7 +85,6 @@ typedef struct tagINTKEYBOARDINFO
   DWORD      nIMDLLs;
   LPIMDLL    IMDLLs;
   int        __filler2; // makes same as KEYBOARDINFO
-  LPINTKEYBOARDOPTIONS KeyboardOptions;
   int        nProfiles;
   LPINTKEYBOARDPROFILE Profiles;
   km_kbp_keyboard* lpCoreKeyboard;

@@ -16,12 +16,6 @@
   History:          25 May 2010 - mcdurdin - I1632 - Keyboard Options
 */
 
-void LoadKeyboardOptions(LPINTKEYBOARDINFO kp);
-void FreeKeyboardOptions(LPINTKEYBOARDINFO kp);
-void SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead);
-void ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset);
-void SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave);
-void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp);
 /**
  * Updates the supplied Keyboard processor options list from the keyboard processor pointed
  * to by the state pointer.
