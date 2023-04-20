@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 17.0.91 alpha 2023-04-20
+
+* fix(developer): kmc-kmn would abort build on warnings (#8617)
+* fix(developer): kmc no longer emits double file extension for models (#8618)
+* refactor(developer): move build activities (#8622)
+* feat(developer): add warning options to kmc (#8623)
+* feat(developer): use new message infrastructure in kmc-kmn (#8625)
+* refactor(developer): move shared test helpers into common (#8626)
+* feat(developer): add CompilerMessages support to kmc-package (#8627)
+* feat(developer): warn if .kps file includes a non-binary .kvk file (#8628)
+* chore(web): sets kmc-model as dependency of input-processor test action (#8629)
+* fix(android/engine): Fix resetContext calls when selection changes (#8611)
+
 ## 17.0.90 alpha 2023-04-19
 
 * chore(android/engine): Cleanup old SDK calls (#8612)
