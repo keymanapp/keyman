@@ -25,6 +25,8 @@ export class BuildKmnKeyboard extends BuildActivity {
     return compiler.run(infile, outfile, {
       saveDebug: options.debug,
       shouldAddCompilerVersion: options.compilerVersion,
+      warnDeprecatedCode: options.warnDeprecatedCode,
+      compilerWarningsAsErrors: options.compilerWarningsAsErrors,
     });
   }
 }
