@@ -1,6 +1,9 @@
 import * as fs from 'fs';
-import * as path from 'path';
 import { CompilerEvent, CompilerCallbacks } from '@keymanapp/common-types';
+
+// TODO: schemas are only used by kmc-keyboard for now, so this works at this
+// time, but it's a little fragile if we need them elsewhere in the future
+const SCHEMA_BASE = '../../../../kmc-keyboard/build/src/';
 
 /**
  * A CompilerCallbacks implementation for testing
@@ -27,15 +30,15 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
     this.messages.push(event);
   }
   loadLdmlKeyboardSchema(): Buffer {
-    return fs.readFileSync(new URL(path.join('..', '..', 'src', 'ldml-keyboard.schema.json'), import.meta.url));
+    return fs.readFileSync(new URL(SCHEMA_BASE + 'ldml-keyboard.schema.json', import.meta.url));
   }
   loadKvksJsonSchema(): Buffer {
-    return fs.readFileSync(new URL(path.join('..', '..', 'src', 'kvks.schema.json'), import.meta.url));
+    return fs.readFileSync(new URL(SCHEMA_BASE + 'kvks.schema.json', import.meta.url));
   }
   loadKpjJsonSchema(): Buffer {
-    return fs.readFileSync(new URL(path.join('..', '..', 'src', 'kpj.schema.json'), import.meta.url));
+    return fs.readFileSync(new URL(SCHEMA_BASE + 'kpj.schema.json', import.meta.url));
   }
   loadLdmlKeyboardTestSchema(): Buffer {
-    return fs.readFileSync(new URL(path.join('..', '..', 'src', 'ldml-keyboardtest.schema.json'), import.meta.url));
+    return fs.readFileSync(new URL(SCHEMA_BASE + 'ldml-keyboardtest.schema.json', import.meta.url));
   }
 };
