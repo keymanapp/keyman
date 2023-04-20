@@ -60,9 +60,10 @@ export class Compiler {
 
     options = {...baseOptions, ...options};
 
-    (globalThis as any).msgproc = function(line: number, code: number, msg: string) {
+    (globalThis as any).msgproc = function(line: number, code: number, msg: string): number {
       // TODO: link into the kmc error reporting infrastructure
-      console.log(`[${line}] ${code}: ${msg}`);
+      console.log(`[${line}] ${code.toString(16)}: ${msg}`);
+      return 1; // 1 == continue build
     }
 
     // TODO: use callbacks for file access -- so kmc-kmn is entirely fs agnostic
@@ -83,7 +84,8 @@ export class Compiler {
         outfile,
         options.saveDebug ? 1 : 0,
         options.compilerWarningsAsErrors ? 1 : 0,
-        options.warnDeprecatedCode ? 1 : 0, 'msgproc');
+        options.warnDeprecatedCode ? 1 : 0,
+        'msgproc');
     } catch(e) {
       // TODO: use sentry
       console.error(e);
