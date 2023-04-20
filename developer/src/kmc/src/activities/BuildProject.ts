@@ -8,7 +8,7 @@ import { buildActivities } from './buildActivities.js';
 
 const PROJECT_EXTENSION = '.kpj';
 
-export class BuildProject implements BuildActivity {
+export class BuildProject extends BuildActivity {
   public get name(): string { return 'Project'; }
   public get sourceExtension(): string { return PROJECT_EXTENSION; }
   public get compiledExtension(): string { return null; }
