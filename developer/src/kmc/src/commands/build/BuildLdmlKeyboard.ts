@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as kmc from '@keymanapp/kmc-keyboard';
 import { KvkFileWriter, CompilerCallbacks } from '@keymanapp/common-types';
-import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
+import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
 
 export class BuildLdmlKeyboard extends BuildActivity {

@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import { Command } from 'commander';
-import { BuildActivityOptions } from '../activities/BuildActivity.js';
-import { buildActivities } from '../activities/buildActivities.js';
-import { BuildProject } from '../activities/BuildProject.js';
+import { BuildActivityOptions } from './build/BuildActivity.js';
+import { buildActivities } from './build/buildActivities.js';
+import { BuildProject } from './build/BuildProject.js';
 
 export function declareBuild(program: Command) {
   program
