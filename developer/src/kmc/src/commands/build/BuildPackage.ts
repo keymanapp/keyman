@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
 import KmpCompiler from '@keymanapp/kmc-package';
 import { CompilerCallbacks } from '@keymanapp/common-types';
-import { NodeCompilerCallbacks } from 'src/util/NodeCompilerCallbacks.js';
+import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 
 export class BuildPackage extends BuildActivity {
   public get name(): string { return 'Package'; }
