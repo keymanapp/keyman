@@ -446,13 +446,6 @@ namespace com.keyman.dom {
     }
 
     /**
-     * Handle the touch end event for an input element
-     */
-    dragEnd: (e: TouchEvent) => void = function(this: DOMTouchHandlers, e: TouchEvent) {
-      e.stopPropagation();
-    }.bind(this);
-
-    /**
      * Scroll the document body vertically to bring the active input into view
      *
      * @param       {Object}      e        input field object being focussed
