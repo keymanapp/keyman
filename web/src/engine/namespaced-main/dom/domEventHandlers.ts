@@ -441,12 +441,6 @@ namespace com.keyman.dom {
    * Defines numerous functions for handling and modeling touch-based aliases.
    */
   export class DOMTouchHandlers extends DOMEventHandlers {
-    firstTouch: {
-      x: number;
-      y: number;
-    };
-
-
     constructor(keyman: KeymanBase) {
       super(keyman);
     }
@@ -456,7 +450,6 @@ namespace com.keyman.dom {
      */
     dragEnd: (e: TouchEvent) => void = function(this: DOMTouchHandlers, e: TouchEvent) {
       e.stopPropagation();
-      this.firstTouch = null;
     }.bind(this);
 
     /**
