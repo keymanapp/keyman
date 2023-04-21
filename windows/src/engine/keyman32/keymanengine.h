@@ -81,7 +81,6 @@ typedef struct tagINTKEYBOARDINFO
   DWORD      __filler_Hotkey;
   DWORD      __filler; // makes same as KEYBOARDINFO   // I4462
   char       Name[256];
-  LPKEYBOARD Keyboard;
   DWORD      nIMDLLs;
   LPIMDLL    IMDLLs;
   int        __filler2; // makes same as KEYBOARDINFO
@@ -123,7 +122,6 @@ LRESULT CALLBACK kmnLowLevelKeyboardProc(   // I4124
   _In_  LPARAM lParam
 );
 
-BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd);
 BOOL ReleaseStateMemoryCore(km_kbp_state** state);
 BOOL ReleaseKeyboardMemoryCore(km_kbp_keyboard** kbd);
 

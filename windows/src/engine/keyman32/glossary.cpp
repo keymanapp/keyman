@@ -167,30 +167,31 @@ WORD HKLToLayoutID(HKL hkl)
 	return HIWORD(hkl) & 0x0FFF;
 }
 
-DWORD EthnologueCodeToKeymanID(DWORD EthCode)
-{
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return KEYMANID_NONKEYMAN;
-
-	for(int i = 0; i < _td->nKeyboards; i++)
-	{
-		if(!_td->lpKeyboards[i].Keyboard && !LoadlpKeyboard(i))
-		{
-			SendDebugMessageFormat(0,sdmGlobal,0,
-				"EthnologueCodeToKeymanID: Unable to load keyboard %s", _td->lpKeyboards[i].Name);
-			return KEYMANID_NONKEYMAN;
-		}
-
-		PWSTR ps = GetSystemStore(_td->lpKeyboards[i].Keyboard, TSS_ETHNOLOGUECODE);
-		if(ps)
-		{
-			SendDebugMessageFormat(0,sdmGlobal,0,"EthnologueCodeToKeymanID: %s %ws %x", _td->lpKeyboards[i].Name, ps, EthnologueStringCodeToDWord(ps));
-			if(EthnologueStringCodeToDWord(ps) == EthCode) return _td->lpKeyboards[i].KeymanID;
-		}
-	}
-
-	return KEYMANID_NONKEYMAN;
-}
+// TODO: Make this use the core
+//DWORD EthnologueCodeToKeymanID(DWORD EthCode)
+//{
+//  PKEYMAN64THREADDATA _td = ThreadGlobals();
+//  if(!_td) return KEYMANID_NONKEYMAN;
+//
+//	for(int i = 0; i < _td->nKeyboards; i++)
+//	{
+//		if(!_td->lpKeyboards[i].Keyboard && !LoadlpKeyboard(i))
+//		{
+//			SendDebugMessageFormat(0,sdmGlobal,0,
+//				"EthnologueCodeToKeymanID: Unable to load keyboard %s", _td->lpKeyboards[i].Name);
+//			return KEYMANID_NONKEYMAN;
+//		}
+//
+//		PWSTR ps = GetSystemStore(_td->lpKeyboards[i].Keyboard, TSS_ETHNOLOGUECODE);
+//		if(ps)
+//		{
+//			SendDebugMessageFormat(0,sdmGlobal,0,"EthnologueCodeToKeymanID: %s %ws %x", _td->lpKeyboards[i].Name, ps, EthnologueStringCodeToDWord(ps));
+//			if(EthnologueStringCodeToDWord(ps) == EthCode) return _td->lpKeyboards[i].KeymanID;
+//		}
+//	}
+//
+//	return KEYMANID_NONKEYMAN;
+//}
 
 DWORD EthnologueStringCodeToDWord(PWSTR EthCode)
 {

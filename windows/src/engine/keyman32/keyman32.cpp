@@ -558,10 +558,7 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
 
 	_td->lpActiveKeyboard = new INTKEYBOARDINFO;
   memset(_td->lpActiveKeyboard, 0, sizeof(INTKEYBOARDINFO));    // I2437 - Crash unloading keyboard due to keyboard options not init
-	/*_td->lpActiveKeyboard->KeymanID = 0;
-	_td->lpActiveKeyboard->nIMDLLs = 0;
-	_td->lpActiveKeyboard->IMDLLs = NULL;
-  _td->lpActiveKeyboard->KeyboardOptions = NULL;*/
+
   _splitpath_s(FileName, NULL, 0, NULL, 0, _td->lpActiveKeyboard->Name, sizeof(_td->lpActiveKeyboard->Name), NULL, 0);
 
   PWCHAR keyboardPath   = strtowstr(_td->ForceFileName);
@@ -595,7 +592,10 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
     goto fail;
   }
 
-  ResetCapsLock();
+  // TODO: #5882 Add km_kbp_event to reset keyboard action sent to keyman core
+  // (only the core knows the caps rules such CAPS_ALWAYS_OFF)
+  // so it can then respond with a possible reset
+
   err_status = km_kbp_keyboard_get_imx_list(_td->lpActiveKeyboard->lpCoreKeyboard, &_td->lpActiveKeyboard->lpIMXList);
   if (err_status != KM_KBP_STATUS_OK) {
     SendDebugMessageFormat(0, sdmLoad, 0, "Keyman_ForceKeyboard Core: km_kbp_keyboard_get_imx_list failed with error status [%d]", err_status);
@@ -641,7 +641,6 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_StopForcingKeyboard()
 		if(!DeactivateDLLs(_td->lpActiveKeyboard)) return FALSE;  // I3173   // I3525
 		if(!UnloadDLLs(_td->lpActiveKeyboard)) return FALSE;  // I3173   // I3525
 		_td->ForceFileName[0] = 0;
-		ReleaseKeyboardMemory(_td->lpActiveKeyboard->Keyboard);
     ReleaseStateMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboardState);
     ReleaseKeyboardMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboard);
     RefreshPreservedKeys(FALSE);
@@ -996,8 +995,6 @@ void RefreshKeyboards(BOOL Initialising)
       RefreshKeyboardProfiles(kp, FALSE); // Read standard profiles
       RefreshKeyboardProfiles(kp, TRUE);  // Read transient profiles
 
-			kp->Keyboard = NULL;
-
 			SendDebugMessageFormat(0,sdmGlobal,0,"RefreshKeyboards: Added keyboard %s, %d",
 				kp->Name, kp->KeymanID);
 			i++;
@@ -1030,7 +1027,6 @@ void ReleaseKeyboards(BOOL Lock)
 	for(int i = 0; i < _td->nKeyboards; i++)
 	{
 		if(Lock) UnloadDLLs(&_td->lpKeyboards[i]);
-		ReleaseKeyboardMemory(_td->lpKeyboards[i].Keyboard);
     ReleaseStateMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboardState);
     ReleaseKeyboardMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboard);
     if(_td->lpKeyboards[i].Profiles) delete _td->lpKeyboards[i].Profiles;   // I3581

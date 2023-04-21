@@ -101,7 +101,8 @@ BOOL SelectKeyboard(DWORD KeymanID)
         SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SelectKeyboardCore: NewKeymanID: %x", _td->ActiveKeymanID);
 
         if (_td->app) _td->app->ResetContext();
-        ResetCapsLock();
+
+        // TODO: #5882 tell the core with km_kbp_event so it can reset the capslock state
 
         SelectApplicationIntegration();   // I4287
         if (_td->app && !_td->app->IsWindowHandled(hwnd)) _td->app->HandleWindow(hwnd);

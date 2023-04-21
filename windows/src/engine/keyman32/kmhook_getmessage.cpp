@@ -271,7 +271,6 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 	if(_td->lpActiveKeyboard)
 	{
-		_td->state.lpkb = _td->lpActiveKeyboard->Keyboard;
     _td->state.lpCoreKb = _td->lpActiveKeyboard->lpCoreKeyboard;
 	}
    // I4412
@@ -369,7 +368,6 @@ void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam)
       hwnd = GetFocus();
 
 		  if(_td->lpActiveKeyboard) {
-			  _td->state.lpkb = _td->lpActiveKeyboard->Keyboard;
         _td->state.lpCoreKb = _td->lpActiveKeyboard->lpCoreKeyboard;
 		  }
 

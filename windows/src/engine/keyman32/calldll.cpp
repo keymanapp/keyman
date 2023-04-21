@@ -253,26 +253,6 @@ BOOL DeactivateDLLs(LPINTKEYBOARDINFO lpkbi)
 	return TRUE;
 }
 
-void CallDLL(LPINTKEYBOARDINFO lpkbi, DWORD storenum)
-{
-	//SendDebugMessageFormat(0, sdmKeyboard, 0, "CallDll: Enter");
-  if (!lpkbi->Keyboard) return;
-  if(storenum >= lpkbi->Keyboard->cxStoreArray) return;
-
-	LPSTORE s = &lpkbi->Keyboard->dpStoreArray[storenum];
-	if(s->dwSystemID != TSS_CALLDEFINITION) return;
-	if(s->dpString == NULL) return;
-	LPIMDLLHOOK imdh = (LPIMDLLHOOK) s->dpString;
-
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return;
-
-  if(_td->TIPFUpdateable) {   // I4452
-	  (*imdh->function)(_td->state.msg.hwnd, _td->state.vkey, _td->state.charCode, Globals::get_ShiftState());
-  }
-	//SendDebugMessageFormat(0, sdmKeyboard, 0, "CallDll: Exit");
-}
-
 // The callback function called by the Core Keyboardprocessor
 extern "C" uint8_t IM_CallBackCore(km_kbp_state *km_state, uint32_t UniqueStoreNo, void *callbackObject) {
   //SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: Enter");

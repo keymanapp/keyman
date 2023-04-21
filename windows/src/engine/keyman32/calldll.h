@@ -35,8 +35,6 @@ BOOL LoadDLLs(LPINTKEYBOARDINFO lpkbi);
 
 BOOL IsIMWindow(HWND hwnd);
 
-void CallDLL(LPINTKEYBOARDINFO lpkbi, DWORD storenum);
-
 // Callback function used by the core processor to call out to 3rd Party Library functions
 extern "C" uint8_t IM_CallBackCore(km_kbp_state *km_state, uint32_t UniqueStoreNo, void *callbackObject);
 
