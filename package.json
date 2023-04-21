@@ -13,6 +13,7 @@
     "resources/gosh",
     "resources/build/version",
     "core/include/ldml",
+    "developer/src/common/web/test-helpers",
     "developer/src/kmc-keyboard",
     "developer/src/kmc-kmn",
     "developer/src/kmc-model",
@@ -31,6 +32,7 @@
     "@keymanapp/hextobin": "file:common/tools/hextobin",
     "@keymanapp/keyman-version": "file:common/web/keyman-version",
     "@keymanapp/common-types": "file:common/web/types",
-    "@keymanapp/ldml-keyboard-constants": "file:core/include/ldml"
+    "@keymanapp/ldml-keyboard-constants": "file:core/include/ldml",
+    "@keymanapp/developer-test-helpers": "file:developer/src/common/web/test-helpers"
   }
 }

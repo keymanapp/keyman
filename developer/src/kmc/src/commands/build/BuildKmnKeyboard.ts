@@ -2,8 +2,9 @@ import * as path from 'path';
 import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
 import { Compiler } from '@keymanapp/kmc-kmn';
 import { platform } from 'os';
+import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 
-export class BuildKmnKeyboard implements BuildActivity {
+export class BuildKmnKeyboard extends BuildActivity {
   public get name(): string { return 'Keyman keyboard'; }
   public get sourceExtension(): string { return '.kmn'; }
   public get compiledExtension(): string { return '.kmx'; }
@@ -14,17 +15,22 @@ export class BuildKmnKeyboard implements BuildActivity {
       return false;
     }
 
+    const callbacks = new NodeCompilerCallbacks();
+
     // We need to resolve paths to absolute paths before calling kmc-kmn
-    let outfile = (options.outFile ?? infile).replace(/\.km.$/i, this.compiledExtension);
+    let outfile = this.getOutputFilename(infile, options);
 
     infile = getPosixAbsolutePath(infile);
     outfile = getPosixAbsolutePath(outfile);
 
     // TODO: Currently this only builds .kmn->.kmx, and targeting .js is as-yet unsupported
     // TODO: Support additional options compilerWarningsAsErrors, warnDeprecatedCode
-    return compiler.run(infile, outfile, {
+    return compiler.run(infile, outfile, callbacks,
+    {
       saveDebug: options.debug,
       shouldAddCompilerVersion: options.compilerVersion,
+      warnDeprecatedCode: options.warnDeprecatedCode,
+      compilerWarningsAsErrors: options.compilerWarningsAsErrors,
     });
   }
 }

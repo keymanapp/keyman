@@ -1,5 +1,5 @@
 
 #include "km_types.h"
-#include <comperr.h>
+#include <kmn_compiler_errors.h>
 
 KMX_CHAR *GetCompilerErrorString(KMX_DWORD code) ;

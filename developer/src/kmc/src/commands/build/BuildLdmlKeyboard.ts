@@ -2,10 +2,10 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as kmc from '@keymanapp/kmc-keyboard';
 import { KvkFileWriter, CompilerCallbacks } from '@keymanapp/common-types';
-import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
+import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
 
-export class BuildLdmlKeyboard implements BuildActivity {
+export class BuildLdmlKeyboard extends BuildActivity {
   public get name(): string { return 'LDML keyboard'; }
   public get sourceExtension(): string { return '.xml'; }
   public get compiledExtension(): string { return '.kmx'; }
@@ -46,7 +46,9 @@ export class BuildLdmlKeyboard implements BuildActivity {
 function buildLdmlKeyboardToMemory(inputFilename: string, options: BuildActivityOptions): [Uint8Array, Uint8Array, Uint8Array] {
   let compilerOptions: kmc.CompilerOptions = {
     debug: options.debug ?? false,
-    addCompilerVersion: options.compilerVersion ?? true
+    addCompilerVersion: options.compilerVersion ?? true,
+    // TODO: warnDeprecatedCode: options.warnDeprecatedCode,
+    // TODO: treatWarningsAsErrors: options.treatWarningsAsErrors,
   }
 
   const c: CompilerCallbacks = new NodeCompilerCallbacks();

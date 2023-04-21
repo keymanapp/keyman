@@ -1,6 +1,5 @@
 import * as fs from 'fs';
-import * as kmc from '@keymanapp/kmc-keyboard';
-import { CompilerCallbacks, CompilerEvent } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerEvent, compilerErrorSeverityName } from '@keymanapp/common-types';
 
 /**
  * Concrete implementation for CLI use
@@ -18,9 +17,16 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       }
     }
   }
+
   reportMessage(event: CompilerEvent): void {
-    console.log(kmc.CompilerMessages.severityName(event.code) + ' ' + event.code.toString(16) + ': ' + event.message);
+    const code = event.code.toString(16);
+    if(event.line) {
+      console.log(`${compilerErrorSeverityName(event.code)} ${code} [${event.line}]: ${event.message}`);
+    } else {
+      console.log(`${compilerErrorSeverityName(event.code)} ${code}: ${event.message}`);
+    }
   }
+
   loadLdmlKeyboardSchema(): Buffer {
     let schemaPath = new URL('ldml-keyboard.schema.json', import.meta.url);
     return fs.readFileSync(schemaPath);

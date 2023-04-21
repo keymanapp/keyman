@@ -6,12 +6,17 @@ import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 import type { KpsFile, KpsFileContentFile, KpsFileInfo, KpsFileKeyboard, KpsFileLanguage, KpsFileLexicalModel, KpsFileOptions, KpsPackage } from './kps-file.js';
 import type { KmpJsonFile, KmpJsonFileInfo, KmpJsonFileLanguage, KmpJsonFileOptions } from './kmp-json-file.js';
+import { CompilerCallbacks, KvkFile } from '@keymanapp/common-types';
+import { CompilerMessages } from './messages.js';
 
 export { type KmpJsonFile } from './kmp-json-file.js';
 
 const FILEVERSION_KMP_JSON = '12.0';
 
 export default class KmpCompiler {
+
+  constructor(private callbacks: CompilerCallbacks) {
+  }
 
   public transformKpsToKmpObject(kpsString: string, kpsPath: string): KmpJsonFile {
 
@@ -234,7 +239,8 @@ export default class KmpCompiler {
       data.files = [];
     }
 
-    data.files.forEach(function(value) {
+    let failed = false;
+    data.files.forEach((value) => {
       // Get the path of the file
       let filename = value.name;
 
@@ -246,7 +252,7 @@ export default class KmpCompiler {
       if(path.isAbsolute(value.name)) {
         // absolute paths are not very cross-platform compatible -- we are going to have trouble
         // with path separators and roots
-        // TODO: emit a warning
+        this.callbacks.reportMessage(CompilerMessages.Warn_AbsolutePath({filename: value.name}));
       } else {
         // Transform separators to platform separators -- kps files may use
         // either / or \, although older kps files were always \.
@@ -258,16 +264,48 @@ export default class KmpCompiler {
         filename = path.resolve(basePath, filename);
       }
       const basename = path.basename(filename);
-      let data = fs.readFileSync(filename);
+
+      if(!fs.existsSync(filename)) {
+        this.callbacks.reportMessage(CompilerMessages.Error_FileDoesNotExist({filename: filename}));
+        failed = true;
+        return;
+      }
+
+      let data;
+      try {
+        data = fs.readFileSync(filename);
+      } catch(e) {
+        this.callbacks.reportMessage(CompilerMessages.Error_FileCouldNotBeRead({filename: filename, e: e}));
+        failed = true;
+        return;
+      }
+
+      this.warnIfKvkFileIsNotBinary(filename, data);
+
       zip.file(basename, data);
 
       // Remove path data from files before JSON save
       value.name = basename;
     });
 
+    if(failed) {
+      return null;
+    }
+
     zip.file(kmpJsonFileName, JSON.stringify(data, null, 2));
 
     // Generate kmp file
     return zip.generateAsync({type: 'binarystring', compression:'DEFLATE'});
+  }
+
+  /**
+   * Legacy .kmp compiler would transform xml-format .kvk files into a binary .kvk file; now
+   * we want that to remain the responsibility of the keyboard compiler, so we'll warn the
+   * few users who are still doing this
+   */
+  private warnIfKvkFileIsNotBinary(filename: string, data: Buffer) {
+    if(filename.match(/\.kvk$/) && data.compare(Buffer.from(KvkFile.KVK_HEADER_IDENTIFIER_BYTES), 0, 3, 0, 3) != 0) {
+      this.callbacks.reportMessage(CompilerMessages.Warn_FileIsNotABinaryKvkFile({filename: filename}));
+    }
   }
 }

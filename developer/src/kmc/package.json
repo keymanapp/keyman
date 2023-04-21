@@ -40,6 +40,7 @@
     "@keymanapp/keyman-version": "*",
     "@keymanapp/common-types": "*",
     "@keymanapp/kmc-keyboard": "*",
+    "@keymanapp/kmc-kmn": "*",
     "@keymanapp/kmc-model": "*",
     "@keymanapp/kmc-model-info": "*",
     "@keymanapp/kmc-package": "*",
@@ -66,6 +67,16 @@
     "spec": "build/test/**/test-*.js",
     "require": [
       "source-map-support/register"
+    ]
+  },
+  "c8": {
+    "all": true,
+    "src": [
+      "src/"
+    ],
+    "exclude-after-remap": true,
+    "exclude": [
+      "test/"
     ]
   },
   "repository": {

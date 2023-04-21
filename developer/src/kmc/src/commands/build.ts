@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import { Command } from 'commander';
-import { BuildActivityOptions } from '../activities/BuildActivity.js';
-import { buildActivities } from '../activities/buildActivities.js';
-import { BuildProject } from '../activities/BuildProject.js';
+import { BuildActivityOptions } from './build/BuildActivity.js';
+import { buildActivities } from './build/buildActivities.js';
+import { BuildProject } from './build/BuildProject.js';
 
 export function declareBuild(program: Command) {
   program
@@ -11,6 +11,8 @@ export function declareBuild(program: Command) {
     .option('-d, --debug', 'Include debug information in output')
     .option('-o, --out-file <filename>', 'Override the default path and filename for the output file')
     .option('--no-compiler-version', 'Exclude compiler version metadata from output')
+    .option('-w, --compiler-warnings-as-errors', 'Causes warnings to fail the build')
+    .option('--no-warn-deprecated-code', 'Turn off warnings for deprecated code styles')
     .action((infiles: string[], options: any) => {
       let p = [];
       if(!infiles.length) {
@@ -39,15 +41,15 @@ async function build(infile: string, options: BuildActivityOptions): Promise<boo
   }
 
   // Otherwise, if it's one of our known file extensions, we build it
-  let extensions = '';
+  let extensions: string[] = [];
   for(let build of buildActivities) {
     if(infile.toLowerCase().endsWith(build.sourceExtension)) {
       return build.build(infile, options);
     }
-    extensions += build.sourceExtension + ', ';
+    extensions.push(build.sourceExtension);
   }
 
   // TODO: consolidate errors
-  console.error(`Unrecognised input file ${infile}, expecting ${extensions}or project folder`);
+  console.error(`Unrecognised input file ${infile}, expecting ${extensions.join(', ')}, or project folder`);
   process.exit(2);
 }

@@ -1,14 +1,14 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import { CompilerCallbacks, KeymanDeveloperProject, KPJFileReader } from '@keymanapp/common-types';
-import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
-import { KeymanDeveloperProjectFile } from '../../../../../common/web/types/src/kpj/keyman-developer-project.js';
+import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
+import { KeymanDeveloperProjectFile } from '../../../../../../common/web/types/src/kpj/keyman-developer-project.js';
 import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
 import { buildActivities } from './buildActivities.js';
 
 const PROJECT_EXTENSION = '.kpj';
 
-export class BuildProject implements BuildActivity {
+export class BuildProject extends BuildActivity {
   public get name(): string { return 'Project'; }
   public get sourceExtension(): string { return PROJECT_EXTENSION; }
   public get compiledExtension(): string { return null; }

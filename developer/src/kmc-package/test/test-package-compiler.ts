@@ -7,6 +7,9 @@ import {makePathToFixture} from './helpers/index.js';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { type KmpJsonFile } from '../src/kmp-json-file.js';
+import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
+import { CompilerMessages } from '../src/messages.js';
+
 
 describe('KmpCompiler', function () {
   const MODELS : string[] = [
@@ -14,7 +17,8 @@ describe('KmpCompiler', function () {
     'withfolders.qaa.sencoten',
   ];
 
-  let kmpCompiler = new KmpCompiler();
+  const callbacks = new TestCompilerCallbacks();
+  let kmpCompiler = new KmpCompiler(callbacks);
 
   for (let modelID of MODELS) {
     const kpsPath = modelID.includes('withfolders') ?
@@ -78,11 +82,12 @@ describe('KmpCompiler', function () {
   }
 
   it('should generates a valid .kmp (zip) file', async function() {
-    // const kmpPath = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    this.timeout(10000); // building a zip file can sometimes be slow
+
     const kpsPath = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
     const kmpJsonRefPath = makePathToFixture('khmer_angkor', 'ref', 'kmp.json');
 
-    const kmpCompiler = new KmpCompiler();
+    const kmpCompiler = new KmpCompiler(callbacks);
     const source = fs.readFileSync(kpsPath, 'utf-8');
     const kmpJsonFixture: KmpJsonFile = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
 
@@ -117,4 +122,68 @@ describe('KmpCompiler', function () {
     assert.deepEqual(kmpJsonData, kmpJsonFixture);
   });
 
+  /* Testing Warnings */
+
+  it('should warn on absolute paths', async function() {
+    this.timeout(10000); // building a zip file can sometimes be slow
+
+    callbacks.clear();
+
+    const kpsPath = makePathToFixture('absolute_path', 'source', 'absolute_path.kps');
+    const kmpCompiler = new KmpCompiler(callbacks);
+    const source = fs.readFileSync(kpsPath, 'utf-8');
+
+    let kmpJson: KmpJsonFile = null;
+
+    assert.doesNotThrow(() => {
+      kmpJson = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
+    });
+
+    await assert.isNull(kmpCompiler.buildKmpFile(kpsPath, kmpJson));
+
+    assert.lengthOf(callbacks.messages, 2);
+    assert.deepEqual(callbacks.messages[0].code, CompilerMessages.WARN_AbsolutePath);
+    assert.deepEqual(callbacks.messages[1].code, CompilerMessages.ERROR_FileDoesNotExist);
+  });
+
+  it('should warn if a non-binary kvk file is included', async function() {
+    this.timeout(10000); // building a zip file can sometimes be slow
+
+    callbacks.clear();
+
+    const kpsPath = makePathToFixture('xml_kvk_file', 'source', 'xml_kvk_file.kps');
+    const kmpCompiler = new KmpCompiler(callbacks);
+    const source = fs.readFileSync(kpsPath, 'utf-8');
+
+    let kmpJson: KmpJsonFile = null;
+
+    assert.doesNotThrow(() => {
+      kmpJson = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
+    });
+
+    await assert.isNotNull(kmpCompiler.buildKmpFile(kpsPath, kmpJson));
+
+    assert.lengthOf(callbacks.messages, 1);
+    assert.deepEqual(callbacks.messages[0].code, CompilerMessages.WARN_FileIsNotABinaryKvkFile);
+  });
+
+  it('should not warn if a binary kvk file is included', async function() {
+    this.timeout(10000); // building a zip file can sometimes be slow
+
+    callbacks.clear();
+
+    const kpsPath = makePathToFixture('binary_kvk_file', 'source', 'binary_kvk_file.kps');
+    const kmpCompiler = new KmpCompiler(callbacks);
+    const source = fs.readFileSync(kpsPath, 'utf-8');
+
+    let kmpJson: KmpJsonFile = null;
+
+    assert.doesNotThrow(() => {
+      kmpJson = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
+    });
+
+    await assert.isNotNull(kmpCompiler.buildKmpFile(kpsPath, kmpJson));
+
+    assert.lengthOf(callbacks.messages, 0);
+  });
 });

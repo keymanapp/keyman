@@ -15,7 +15,7 @@
 #include <vector>
 #include <string>
 #include <kmcmplibapi.h>
-#include "../src/comperr.h"
+#include <kmn_compiler_errors.h>
 #include "../src/compfile.h"
 #include <test_assert.h>
 
