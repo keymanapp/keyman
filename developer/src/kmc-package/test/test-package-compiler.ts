@@ -186,4 +186,19 @@ describe('KmpCompiler', function () {
 
     assert.lengthOf(callbacks.messages, 0);
   });
+
+  it('should error if "FollowKeyboardVersion" is set for model packages', async function() {
+    this.timeout(10000);
+
+    callbacks.clear();
+
+    const kpsPath = makePathToFixture('invalid', 'followkeyboardversion.qaa.sencoten.model.kps');
+    const kmpCompiler = new KmpCompiler(callbacks);
+    const source = fs.readFileSync(kpsPath, 'utf-8');
+
+    kmpCompiler.transformKpsToKmpObject(source, kpsPath);
+
+    assert.lengthOf(callbacks.messages, 1);
+    assert.isTrue(callbacks.hasMessage(CompilerMessages.ERROR_FollowKeyboardVersionNotAllowedForModelPackages));
+  });
 });
