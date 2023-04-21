@@ -46,6 +46,7 @@ export function createTrieDataStructure(filenames: string[], searchTermToKey?: (
  * @param filename filename of the word list
  */
 export function parseWordListFromFilename(wordlist: WordList, filename: string): void {
+  ModelCompilerMessages.filename = filename;
   _parseWordList(wordlist, new WordListFromFilename(filename));
 }
 
@@ -57,6 +58,7 @@ export function parseWordListFromFilename(wordlist: WordList, filename: string):
  * @param filename filename of the word list
  */
 export function parseWordListFromContents(wordlist: WordList, contents: string): void {
+  ModelCompilerMessages.filename = undefined;
   _parseWordList(wordlist, new WordListFromMemory(contents));
 }
 
@@ -88,8 +90,6 @@ export function parseWordListFromContents(wordlist: WordList, contents: string):
  */
 function _parseWordList(wordlist: WordList, source:  WordListSource): void {
   const TAB = "\t";
-
-  ModelCompilerMessages.filename = source.name;
 
   let wordsSeenInThisFile = new Set<string>();
 
@@ -138,9 +138,6 @@ function _parseWordList(wordlist: WordList, source:  WordListSource): void {
 
     wordlist[wordform] = (isNaN(wordlist[wordform]) ? 0 : wordlist[wordform] || 0) + count;
   }
-
-  ModelCompilerMessages.filename = undefined;
-  ModelCompilerMessages.line = undefined;
 }
 
 type LineNoAndText = [number, string];
