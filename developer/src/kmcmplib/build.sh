@@ -52,6 +52,7 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   "build" \
   "test" \
   "${archtargets[@]}" \
+  "--full-test                     also run expensive tests that rely on keyboards repo" \
   "--test=opt_tests,-t             test[s] to run (space separated)"
 
 builder_parse "$@"
@@ -81,7 +82,9 @@ do_action() {
   done
 }
 
-locate_keyboards_repo
+if builder_has_option --full-test; then
+  locate_keyboards_repo
+fi
 
 # Note, we have a 'global' clean and also a per-arch clean
 if builder_start_action clean; then
@@ -102,11 +105,13 @@ if builder_start_action configure; then
   # We have to checkout the keyboards repo in a 'configure' action because
   # otherwise meson will not get the right list of keyboard source files,
   # even though we only use it in the 'test' action
-  checkout_keyboards
+  if builder_has_option --full-test; then
+    checkout_keyboards
+  fi
+
   builder_finish_action success configure
 fi
 
 do_action configure
-
 do_action build
 do_action test
