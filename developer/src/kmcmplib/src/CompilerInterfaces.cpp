@@ -1,7 +1,7 @@
 #include "pch.h"
 
 #include <kmcmplibapi.h>
-#include <comperr.h>
+#include <kmn_compiler_errors.h>
 #include "kmcmplib.h"
 #include "filesystem.h"
 #include "CheckFilenameConsistency.h"

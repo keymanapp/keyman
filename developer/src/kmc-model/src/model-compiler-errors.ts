@@ -39,7 +39,7 @@ export enum KeymanCompilerError {
   CERR_HINT_LM = LogLevel.CERR_HINT | CERR_LEXICAL_MODEL_MIN,
     /* Place all LM compiler hints here! */
 
-  /* Errors that are not specific to the lexical model compiler, from comperr.h: */
+  /* Errors that are not specific to the lexical model compiler, from kmn_compiler_errors.h: */
   CWARN_TooManyErrorsOrWarnings = 0x20A7,
 }
 

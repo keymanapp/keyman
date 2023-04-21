@@ -20,7 +20,7 @@ uses
   VisualKeyboard;
 
 const
-  CWARN_KVKFileIsInSourceFormat = $000020A2; // from comperr.h
+  CWARN_KVKFileIsInSourceFormat = $000020A2; // from kmn_compiler_errors.h
 
 (**
   Compiles the visual keyboard from xml to binary, and/or copies to destination folder

@@ -1,18 +1,18 @@
 /*
   Name:             NamedCodeConstants
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      19 Jul 2011
 
   Modified Date:    13 Dec 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          19 Jul 2011 - mcdurdin - I2993 - Named code constants cause a warning 0x208D to appear
                     24 Oct 2012 - mcdurdin - I3481 - V9.0 - Eliminate unsafe calls in C++
                     06 Feb 2012 - mcdurdin - I3056 - If file was not found in first search folder, named code constants failed to compile
@@ -22,7 +22,7 @@
 */
 
 #include "pch.h"
-#include <comperr.h>
+#include <kmn_compiler_errors.h>
 #include "NamedCodeConstants.h"
 #include "CheckFilenameConsistency.h"
 #include "kmcmpdll.h"
@@ -139,7 +139,7 @@ BOOL NamedCodeConstants::IntLoadFile(const char *filename)
   }
 
   fclose(fp);
- 
+
   return TRUE;
 }
 
@@ -262,17 +262,17 @@ int IsHangulSyllable(const wchar_t *codename, int *code)
 
   int i, LIndex, VIndex, TIndex;
 
-    /* Find initial */ 
+    /* Find initial */
 
-  int ch = towupper(*codename); 
+  int ch = towupper(*codename);
   if(strchr("GNDRMBSJCKTPH", ch))
   {
-    /* Has an initial syllable */ 
+    /* Has an initial syllable */
     int fdouble = towupper(*(codename+1)) == ch;
 
     LIndex = -1;
     for(i = 0; i < HangulLCount; i++)
-      if(Hangul_JAMO_L_TABLE[i][0] == ch && 
+      if(Hangul_JAMO_L_TABLE[i][0] == ch &&
         (!fdouble || (Hangul_JAMO_L_TABLE[i][1] == ch && fdouble)))
       {
         LIndex = i;
@@ -282,9 +282,9 @@ int IsHangulSyllable(const wchar_t *codename, int *code)
     codename++;
     if(fdouble) codename++;
   }
-  else LIndex = 11; /* no initial */ 
+  else LIndex = 11; /* no initial */
 
-    /* Find vowel */ 
+    /* Find vowel */
 
   wchar_t V[4] = L"";
   V[0] = *codename;
@@ -299,16 +299,16 @@ int IsHangulSyllable(const wchar_t *codename, int *code)
 
   codename += wcslen(V);
 
-  /* Find final */ 
+  /* Find final */
 
   TIndex = -1;
-    
+
   for(i = 0; i < HangulTCount; i++)
   if(!_wcsicmp(Hangul_JAMO_T_TABLE[i], codename)) { TIndex = i; break; }
 
   if(TIndex == -1) return 0;
 
-  /* Composition */ 
+  /* Composition */
 
   *code = (HangulSBase + (LIndex * HangulVCount + VIndex) * HangulTCount) + TIndex;
 

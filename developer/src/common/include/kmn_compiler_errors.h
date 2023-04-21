@@ -20,8 +20,8 @@
                     22 Jul 2020 - eddieantonio - Add lexical model range https://github.com/keymanapp/keyman/pull/3385
 */
    // I4061
-#ifndef _COMPERR_H
-#define _COMPERR_H
+#ifndef _kmn_compiler_errors_h
+#define _kmn_compiler_errors_h
 
 // Note: these are not be a bitmask
 #define CERR_FATAL                                         0x00008000
@@ -230,4 +230,4 @@
 #define CERR_BufferOverflow                                0x000080C0
 #define CERR_Break                                         0x000080C1
 
-#endif  // _COMPERR_H
+#endif  // _kmn_compiler_errors_h

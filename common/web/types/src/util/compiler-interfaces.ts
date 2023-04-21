@@ -48,7 +48,7 @@ export enum CompilerErrorNamespace {
   CommonTypes = 0x1000,
   /**
    * kmc-kmn errors between 0x2000…0x2FFF; these map to
-   * the base codes found in comperr.h, exclusive severity flags
+   * the base codes found in kmn_compiler_errors.h, exclusive severity flags
    */
   KmnCompiler = 0x2000,
   /**
