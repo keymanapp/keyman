@@ -3,7 +3,7 @@ project(
   'c',
   'cpp',
   version: '72.1',
-  meson_version: '>=0.53.0',
+  meson_version: '>=0.57.0',  # TODO-LDML: Too high for debian
   default_options: [ 'cpp_std=c++17' ],
 )
 
