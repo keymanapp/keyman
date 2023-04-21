@@ -13,36 +13,40 @@ function Keyboard_chirality() {
   // Refer to $KEYMAN_ROOT/common/web/keyboard-processor/src/text/codes.ts, same method name.
   // May be moved within common/web/types at some point in the future.
   var getModifierState = function(layerId) {
+    // Refer to C:\keymanapp\keyman\common\web\keyboard-processor\src\keyboards\keyboardHarness.ts,
+    // `MinimalKeyboardHarness`.
+    let osk = keyman.osk;  // Codes endpoint, as part of the standard keyboard harness.
+
     var modifier=0;
     if(layerId.indexOf('shift') >= 0) {
-      modifier |= Codes.modifierCodes['SHIFT'];
+      modifier |= osk.modifierCodes['SHIFT'];
     }
 
     // The chiral checks must not be directly exclusive due each other to visual OSK feedback.
     var ctrlMatched=false;
     if(layerId.indexOf('leftctrl') >= 0) {
-      modifier |= Codes.modifierCodes['LCTRL'];
+      modifier |= osk.modifierCodes['LCTRL'];
       ctrlMatched=true;
     }
     if(layerId.indexOf('rightctrl') >= 0) {
-      modifier |= Codes.modifierCodes['RCTRL'];
+      modifier |= osk.modifierCodes['RCTRL'];
       ctrlMatched=true;
     }
     if(layerId.indexOf('ctrl')  >= 0 && !ctrlMatched) {
-      modifier |= Codes.modifierCodes['CTRL'];
+      modifier |= osk.modifierCodes['CTRL'];
     }
 
     var altMatched=false;
     if(layerId.indexOf('leftalt') >= 0) {
-      modifier |= Codes.modifierCodes['LALT'];
+      modifier |= osk.modifierCodes['LALT'];
       altMatched=true;
     }
     if(layerId.indexOf('rightalt') >= 0) {
-      modifier |= Codes.modifierCodes['RALT'];
+      modifier |= osk.modifierCodes['RALT'];
       altMatched=true;
     }
     if(layerId.indexOf('alt')  >= 0 && !altMatched) {
-      modifier |= Codes.modifierCodes['ALT'];
+      modifier |= osk.modifierCodes['ALT'];
     }
 
     return modifier;
@@ -81,6 +85,9 @@ function Keyboard_chirality() {
   };
   this.g0 = function (t, e) {
     var k = KeymanWeb, r = 0, m = 0;
+
+    // Refer to C:\keymanapp\keyman\common\web\keyboard-processor\src\keyboards\keyboardHarness.ts,
+    // `MinimalKeyboardHarness`.
     var Constants = keyman.osk;  // Holds anchor points for relevant Codes properties.
 
     // Handwritten time!
