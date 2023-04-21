@@ -2,25 +2,9 @@ import EventEmitter from 'eventemitter3';
 
 import { DeviceSpec } from "@keymanapp/keyboard-processor";
 import { nestedInstanceOf, wrapElement } from "keyman/engine/element-wrappers";
-import { getAbsoluteX, getAbsoluteY } from "keyman/engine/dom-utils";
+import { arrayFromNodeList, getAbsoluteX, getAbsoluteY } from "keyman/engine/dom-utils";
 
 import { AttachmentInfo } from "./attachmentInfo.js";
-
-/**
- * Function     arrayFromNodeList
- * Scope        Public
- * @param       {Object}    nl a node list, as returned from getElementsBy_____ methods.
- * Description  Transforms a node list into an array.   *
- * @return      {Array<Element>}
- */
-function arrayFromNodeList(nl: NodeList|HTMLCollectionOf<Element>): HTMLElement[] {
-  let res: (HTMLElement)[] = [];
-  for(let i=0; i < nl.length; i++) {
-    // Typing says we could get Node instances; it's up to use to use this method responsibly.
-    res.push(nl[i] as HTMLElement);
-  }
-  return res;
-}
 
 // Extends the standard DOM definition for HTMLElement with our custom property underlying KMW element attachment.
 declare global {
@@ -32,6 +16,8 @@ declare global {
   }
 }
 
+// Used for the `.sortedList` property - that is, for ordering valid input elements based
+// upon their location within the page.
 type SortableInput = {
   ip: HTMLInputElement | HTMLTextAreaElement,
   x: number,
@@ -153,6 +139,10 @@ interface EventMap {
  * to the top-level `document.body` element in order to get started - this should
  * be passed into the _SetupDocument method.  (Named so for legacy, pre-modularization
  * reasons.)
+ *
+ * Note:  part of this class's design is to facilitate unit testing for the core
+ * attachment algorithm - for validating the logic that determines which elements
+ * gain attachment.
  */
 export class AttachmentEngine extends EventEmitter<EventMap> {
   readonly device: DeviceSpec;
