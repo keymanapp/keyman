@@ -2,6 +2,7 @@
  * Abstract interface for compiler error and warning messages
  */
 export interface CompilerEvent {
+  filename?: string;
   line?: number;
   code: number;
   message: string;
