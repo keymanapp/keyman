@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import { CompilerEvent, CompilerCallbacks, CompilerSchema } from '@keymanapp/common-types';
+export { verifyCompilerMessagesObject } from './verifyCompilerMessagesObject.js';
 
 // TODO: schemas are only used by kmc-keyboard for now, so this works at this
 // time, but it's a little fragile if we need them elsewhere in the future
