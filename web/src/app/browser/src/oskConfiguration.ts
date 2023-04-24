@@ -1,6 +1,5 @@
 import { type KeyElement, OSKView, VisualKeyboard } from "keyman/engine/osk";
-import { getAbsoluteX, getAbsoluteY } from "keyman/engine/dom-utils";
-import { DeviceSpec } from "@keymanapp/keyboard-processor";
+import { KEYMAN_VERSION } from "@keymanapp/keyman-version";
 import ContextManager from "./contextManager.js";
 import { KeymanEngine } from "./keymanEngine.js";
 
@@ -22,9 +21,8 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
 
   osk.on('hideRequested', (key) => { // K_ROPT
     if(osk) {
-      contextManager.focusAssistant.setMaintainingFocus(false);
       osk.startHide(true);
-      keyman.domManager.lastActiveElement = null;
+      contextManager.clearActiveTarget();
     }
   });
 
@@ -36,7 +34,7 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
   });
 
   osk.on('showBuild', () => {
-    internalAlert('KeymanWeb Version '+keymanweb['version']+'.'+keymanweb['build']+'<br /><br />'
+    internalAlert('KeymanWeb Version ' + KEYMAN_VERSION.VERSION + '<br /><br />'
         +'<span style="font-size:0.8em">Copyright &copy; 2021 SIL International</span>');
   });
 
@@ -45,7 +43,7 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
 
     await promise;
 
-    keymanweb.domManager.focusLastActiveElement();
+    contextManager.restoreLastActiveTarget();
 
     focusAssistant.restoringFocus = false;
     focusAssistant.setMaintainingFocus(false);
@@ -55,7 +53,7 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
     focusAssistant.restoringFocus = true;
 
     await promise;
-    keymanweb.domManager.focusLastActiveElement();
+    contextManager.restoreLastActiveTarget();
 
     focusAssistant.restoringFocus = false;
     focusAssistant.setMaintainingFocus(false);

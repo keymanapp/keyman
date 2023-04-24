@@ -140,6 +140,13 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     return this.mostRecentTarget;
   }
 
+  public clearActiveTarget() {
+    this.focusAssistant.maintainingFocus = false;
+    this.focusAssistant.restoringFocus = false;
+
+    this.setActiveTarget(null);
+  }
+
   private setActiveTarget(target: OutputTarget<any>) {
     const previousTarget = this.mostRecentTarget;
 
@@ -382,9 +389,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     let activeKeyboard = this.activeKeyboard.keyboard;
     if(!focusAssistant.restoringFocus) {
-      if(outputTarget) {
-        outputTarget.deadkeys().clear();
-      }
+      outputTarget?.deadkeys().clear();
 
       if(activeKeyboard) {
         activeKeyboard.notify(0, outputTarget, 1);  // I2187
