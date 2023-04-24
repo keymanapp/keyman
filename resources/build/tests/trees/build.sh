@@ -32,7 +32,7 @@ else
 fi
 
 # All child actions will generate files which we need to verify for test
-rm -f ./child?.*
+rm -f ./child?.* ./dep.clean ./dep.configure ./dep.build
 
 function test_present() {
   local target=$1
@@ -45,7 +45,7 @@ function test_present() {
     if [ ! -f $target.$action ]; then
       builder_die "$CROSS FAIL: ./$target.$action to be present"
     else
-      echo "$CHECK PASS: ./$target.$action found as expected"
+      echo -e "$CHECK PASS: ./$target.$action found as expected"
     fi
   fi
 }
