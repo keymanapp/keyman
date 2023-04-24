@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 17.0.93 alpha 2023-04-24
+
+* feat(common): kmx file reader (#8641)
+* feat(developer): support FollowKeyboardVersion in kmc-package (#8642)
+* chore(common): Update crowdin strings for Simplified Chinese (#8653)
+* fix(common): builder - pass deps flags to child scripts (#8654)
+* feat(developer): use CompilerEvent for messages in all of kmc (#8651)
+* chore(developer): fixup deps for kmc modules (#8652)
+* feat(core): ldml repertoire test, initial ICU integration (#8441)
+
 ## 17.0.92 alpha 2023-04-21
 
 * fix(developer): kmc-package path reference (#8634)
