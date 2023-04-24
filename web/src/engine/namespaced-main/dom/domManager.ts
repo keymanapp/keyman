@@ -175,31 +175,6 @@ namespace com.keyman.dom {
 
     /**** The block above is referenced by modular code seen in `attachmentEngine.ts`. */
 
-    /**
-     * Set target element text direction (LTR or RTL), but only if the element is empty
-     *
-     * If the element base directionality is changed after it contains content, unless all the text
-     * has the same directionality, text runs will be re-ordered which is confusing and causes
-     * incorrect caret positioning
-     *
-     * @param       {Object}      Ptarg      Target element
-     */
-    _SetTargDir(Ptarg: HTMLElement) {
-      let activeKeyboard = com.keyman.singleton.core.activeKeyboard;
-      var elDir=(activeKeyboard && activeKeyboard.isRTL) ? 'rtl' : 'ltr';
-
-      if(Ptarg) {
-        if(Ptarg instanceof Ptarg.ownerDocument.defaultView.HTMLInputElement
-            || Ptarg instanceof Ptarg.ownerDocument.defaultView.HTMLTextAreaElement) {
-          if((Ptarg as HTMLInputElement|HTMLTextAreaElement).value.length == 0) {
-            Ptarg.dir=elDir;
-          }
-        } else if(typeof Ptarg.textContent == "string" && Ptarg.textContent.length == 0) { // As with contenteditable DIVs, for example.
-          Ptarg.dir=elDir;
-        }
-      }
-    }
-
     /* ------------- Page and document-level management events ------------------ */
 
     _WindowLoad: (e: Event) => void = function(e: Event) {
@@ -232,55 +207,6 @@ namespace com.keyman.dom {
     }.bind(this);
 
     /* ------ Defines independent, per-control keyboard setting behavior for the API. ------ */
-
-    /**
-     * Function     setKeyboardForControl
-     * Scope        Public
-     * @param       {Element}    Pelem    Control element
-     * @param       {string|null=}    Pkbd     Keyboard (Clears the set keyboard if set to null.)
-     * @param       {string|null=}     Plc      Language Code
-     * Description  Set default keyboard for the control
-     */
-    setKeyboardForControl(Pelem: HTMLElement, Pkbd?: string, Plc?: string) {
-      if(!Pelem) {
-        return;
-      }
-
-      /* pass null for kbd to specify no default, or '' to specify the default system keyboard. */
-      if(Pkbd !== null && Pkbd !== undefined) {
-        var index = Pkbd.indexOf("Keyboard_");
-        if(index < 0 && Pkbd != '') {
-          Pkbd = "Keyboard_" + Pkbd;
-        }
-      } else {
-        Plc = null;
-      }
-
-      if(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
-        console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
-        return;
-      }
-
-      if(!this.isAttached(Pelem)) {
-        console.error("KeymanWeb is not attached to element " + Pelem);
-        return;
-      } else {
-        Pelem._kmwAttachment.keyboard = Pkbd;
-        Pelem._kmwAttachment.languageCode = Plc;
-
-        // If Pelem is the focused element/active control, we should set the keyboard in place now.
-
-        var lastElem = this.lastActiveElement;
-        if(lastElem && (lastElem == Pelem)) {
-
-          if(Pkbd != null && Plc != null) { // Second part necessary for Closure.
-            this.keyman.keyboardManager.setActiveKeyboard(Pkbd, Plc);
-          } else {
-            this.keyman.keyboardManager.setActiveKeyboard(this.keyman.globalKeyboard, this.keyman.globalLanguageCode);
-          }
-        }
-      }
-    }
 
     /**
      * Function     getKeyboardForControl
@@ -317,44 +243,6 @@ namespace com.keyman.dom {
     }
 
     /* ------ End independent, per-control keyboard setting behavior definitions. ------ */
-
-    /**
-     * Set focus to last active target element (browser-dependent)
-     */
-    focusLastActiveElement() {
-      var lastElem = this.lastActiveElement;
-      if(!lastElem) {
-        return;
-      }
-
-      focusAssistant.restoringFocus = true;
-
-      const target = Utils.getOutputTarget(lastElem);
-      target.focus();
-    }
-
-    /**
-     * Get the last active target element *before* KMW activated (I1297)
-     *
-     * @return      {Element}
-     */
-    get lastActiveElement(): HTMLElement {
-      return DOMEventHandlers.states._lastActiveElement;
-    }
-
-    set lastActiveElement(Pelem: HTMLElement) {
-      DOMEventHandlers.states._lastActiveElement = Pelem;
-
-      const osk = this.keyman.osk;
-      if(osk) {
-        if(this.lastActiveElement == null && this.activeElement == null) {
-          // Assigning to the property does have side-effects.
-          // If the property is already unset, it's best to not unset it again.
-          osk.activeTarget = null;
-          this.keyman.osk.hideNow(); // originally from a different one, seemed to serve the same role?
-        }
-      }
-    }
 
     get activeElement(): HTMLElement {
       return DOMEventHandlers.states._activeElement;

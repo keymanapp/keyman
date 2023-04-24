@@ -132,7 +132,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
    * @param kbd
    * @param target
    */
-  protected abstract setKeyboardActiveForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget);
+  protected abstract activateKeyboardForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget);
 
   /**
    * Checks the pending keyboard-activation array for an entry corresponding to the specified
@@ -231,7 +231,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
       this.emit('beforekeyboardchange', activatingKeyboard.metadata);
     }
 
-    this.setKeyboardActiveForTarget({
+    this.activateKeyboardForTarget({
       keyboard: keyboard,
       metadata: activatingKeyboard.metadata
     }, this.keyboardTarget);
