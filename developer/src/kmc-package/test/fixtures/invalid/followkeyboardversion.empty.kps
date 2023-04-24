@@ -10,20 +10,15 @@
     <GraphicFile></GraphicFile>
     <MSIFileName></MSIFileName>
     <MSIOptions></MSIOptions>
+    <FollowKeyboardVersion/>
   </Options>
   <StartMenu>
     <Folder></Folder>
     <Items/>
   </StartMenu>
   <Info>
-    <Name URL="">Binary KVK File</Name>
+    <Name URL="">FollowKeyboardVersion with no keyboards</Name>
   </Info>
   <Files>
-    <File>
-      <Name>binary_kvk_file.kvk</Name>
-      <Description>File binary_kvk_file.kvk</Description>
-      <CopyLocation>0</CopyLocation>
-      <FileType>.kvk</FileType>
-    </File>
   </Files>
 </Package>

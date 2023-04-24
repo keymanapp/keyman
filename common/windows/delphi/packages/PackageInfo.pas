@@ -459,7 +459,6 @@ const
   SXML_PackageLexicalModel = 'LexicalModel';
   SXML_PackageLexicalModel_Name = 'Name';
   SXML_PackageLexicalModel_ID = 'ID';
-  SXML_PackageLexicalModel_Version = 'Version';
   SXML_PackageLexicalModel_RTL = 'RTL';
   SXML_PackageLexicalModel_Languages = 'Languages';
 
