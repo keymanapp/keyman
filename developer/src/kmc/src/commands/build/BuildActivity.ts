@@ -1,3 +1,4 @@
+import { CompilerCallbacks } from "@keymanapp/common-types";
 import { escapeRegExp } from "../../util/escapeRegExp.js";
 
 export interface BuildActivityOptions {
@@ -13,7 +14,7 @@ export abstract class BuildActivity {
   public abstract get sourceExtension(): string;
   public abstract get compiledExtension(): string;
   public abstract get description(): string;
-  public abstract build(infile: string, options: BuildActivityOptions): Promise<boolean>;
+  public abstract build(infile: string, callbacks: CompilerCallbacks, options: BuildActivityOptions): Promise<boolean>;
   protected getOutputFilename(infile: string, options: BuildActivityOptions): string {
     return options.outFile ?
       options.outFile :

@@ -8,7 +8,7 @@ import { Command } from 'commander';
 import KmpCompiler from '@keymanapp/kmc-package';
 import { SysExits } from './util/sysexits.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
-import { NodeCompilerCallbacks } from './util/NodeCompilerCallbacks.js';
+import { NodeCompilerCallbacks } from './messages/NodeCompilerCallbacks.js';
 
 let inputFilename: string;
 const program = new Command();

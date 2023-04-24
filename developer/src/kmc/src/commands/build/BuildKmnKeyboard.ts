@@ -2,20 +2,18 @@ import * as path from 'path';
 import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
 import { Compiler } from '@keymanapp/kmc-kmn';
 import { platform } from 'os';
-import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
+import { CompilerCallbacks } from '@keymanapp/common-types';
 
 export class BuildKmnKeyboard extends BuildActivity {
   public get name(): string { return 'Keyman keyboard'; }
   public get sourceExtension(): string { return '.kmn'; }
   public get compiledExtension(): string { return '.kmx'; }
   public get description(): string { return 'Build a Keyman keyboard'; }
-  public async build(infile: string, options: BuildActivityOptions): Promise<boolean> {
+  public async build(infile: string, callbacks: CompilerCallbacks, options: BuildActivityOptions): Promise<boolean> {
     let compiler = new Compiler();
     if(!await compiler.init()) {
       return false;
     }
-
-    const callbacks = new NodeCompilerCallbacks();
 
     // We need to resolve paths to absolute paths before calling kmc-kmn
     let outfile = this.getOutputFilename(infile, options);

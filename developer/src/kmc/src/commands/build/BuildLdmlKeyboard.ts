@@ -2,7 +2,6 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as kmc from '@keymanapp/kmc-keyboard';
 import { KvkFileWriter, CompilerCallbacks } from '@keymanapp/common-types';
-import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
 
 export class BuildLdmlKeyboard extends BuildActivity {
@@ -10,10 +9,10 @@ export class BuildLdmlKeyboard extends BuildActivity {
   public get sourceExtension(): string { return '.xml'; }
   public get compiledExtension(): string { return '.kmx'; }
   public get description(): string { return 'Build a LDML keyboard'; }
-  public async build(infile: string, options: BuildActivityOptions): Promise<boolean> {
+  public async build(infile: string, callbacks: CompilerCallbacks, options: BuildActivityOptions): Promise<boolean> {
     // TODO-LDML: consider hardware vs touch -- touch-only layout will not have a .kvk
     // Compile:
-    let [kmx,kvk,kmw] = buildLdmlKeyboardToMemory(infile, options);
+    let [kmx,kvk,kmw] = buildLdmlKeyboardToMemory(infile, callbacks, options);
     // Output:
 
     const fileBaseName = options.outFile ?? infile;
@@ -43,7 +42,7 @@ export class BuildLdmlKeyboard extends BuildActivity {
   }
 }
 
-function buildLdmlKeyboardToMemory(inputFilename: string, options: BuildActivityOptions): [Uint8Array, Uint8Array, Uint8Array] {
+function buildLdmlKeyboardToMemory(inputFilename: string, callbacks: CompilerCallbacks, options: BuildActivityOptions): [Uint8Array, Uint8Array, Uint8Array] {
   let compilerOptions: kmc.CompilerOptions = {
     debug: options.debug ?? false,
     addCompilerVersion: options.compilerVersion ?? true,
@@ -51,8 +50,7 @@ function buildLdmlKeyboardToMemory(inputFilename: string, options: BuildActivity
     // TODO: treatWarningsAsErrors: options.treatWarningsAsErrors,
   }
 
-  const c: CompilerCallbacks = new NodeCompilerCallbacks();
-  const k = new kmc.Compiler(c, options);
+  const k = new kmc.Compiler(callbacks, options);
   let source = k.load(inputFilename);
   if (!source) {
     return [null, null, null];
