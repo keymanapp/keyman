@@ -2,15 +2,13 @@ import * as fs from 'fs';
 import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
 import KmpCompiler from '@keymanapp/kmc-package';
 import { CompilerCallbacks } from '@keymanapp/common-types';
-import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 
 export class BuildPackage extends BuildActivity {
   public get name(): string { return 'Package'; }
   public get sourceExtension(): string { return '.kps'; }
   public get compiledExtension(): string { return '.kmp'; }
   public get description(): string  { return 'Build a Keyman package'; }
-  public async build(infile: string, options: BuildActivityOptions): Promise<boolean> {
-    const c: CompilerCallbacks = new NodeCompilerCallbacks();
+  public async build(infile: string, callbacks: CompilerCallbacks, options: BuildActivityOptions): Promise<boolean> {
 
     const outfile = this.getOutputFilename(infile, options);
 
@@ -19,7 +17,7 @@ export class BuildPackage extends BuildActivity {
     //
 
     const kpsString: string = fs.readFileSync(infile, 'utf8');
-    const kmpCompiler = new KmpCompiler(c);
+    const kmpCompiler = new KmpCompiler(callbacks);
     const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsString, infile);
     if(!kmpJsonData) {
       return false;

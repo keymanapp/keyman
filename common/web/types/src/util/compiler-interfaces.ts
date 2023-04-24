@@ -66,6 +66,13 @@ export enum CompilerErrorNamespace {
   Infrastructure = 0x5000,
 };
 
+export type CompilerSchema =
+  'ldml-keyboard' |
+  'ldml-keyboardtest' |
+  'kvks' |
+  'kpj';
+  // | 'keyman-touch-layout.clean'; TODO this has the wrong name pattern, .spec.json instead of .schema.json
+
 /**
  * Abstract interface for callbacks, to abstract out file i/o
  */
@@ -76,11 +83,9 @@ export interface CompilerCallbacks {
    * @param filename
    */
   loadFile(baseFilename: string, filename: string | URL): Buffer;
-  loadLdmlKeyboardSchema(): Buffer;
-  loadLdmlKeyboardTestSchema(): Buffer;
+  loadSchema(schema: CompilerSchema): Buffer;
   reportMessage(event: CompilerEvent): void;
-  loadKvksJsonSchema(): Buffer;
-  loadKpjJsonSchema(): Buffer;
+  debug(msg: string): void;
 };
 
 /**

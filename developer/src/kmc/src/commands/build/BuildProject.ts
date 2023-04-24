@@ -1,10 +1,10 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import { CompilerCallbacks, KeymanDeveloperProject, KPJFileReader } from '@keymanapp/common-types';
-import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 import { KeymanDeveloperProjectFile } from '../../../../../../common/web/types/src/kpj/keyman-developer-project.js';
 import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
 import { buildActivities } from './buildActivities.js';
+import { InfrastructureMessages } from 'src/messages/messages.js';
 
 const PROJECT_EXTENSION = '.kpj';
 
@@ -13,27 +13,27 @@ export class BuildProject extends BuildActivity {
   public get sourceExtension(): string { return PROJECT_EXTENSION; }
   public get compiledExtension(): string { return null; }
   public get description(): string  { return 'Build a keyboard or lexical model project'; }
-  public async build(infile: string, options: BuildActivityOptions): Promise<boolean> {
-    let builder = new ProjectBuilder(infile, options);
+  public async build(infile: string, callbacks: CompilerCallbacks, options: BuildActivityOptions): Promise<boolean> {
+    let builder = new ProjectBuilder(infile, callbacks, options);
     return builder.run();
   }
 }
 
 class ProjectBuilder {
-  callbacks: CompilerCallbacks = new NodeCompilerCallbacks();
+  callbacks: CompilerCallbacks;
   infile: string;
   options: BuildActivityOptions;
   project: KeymanDeveloperProject;
 
-  constructor(infile: string, options: BuildActivityOptions) {
+  constructor(infile: string, callbacks: CompilerCallbacks, options: BuildActivityOptions) {
     this.infile = path.resolve(infile);
+    this.callbacks = callbacks;
     this.options = options;
   }
 
   async run(): Promise<boolean> {
     if(this.options.outFile) {
-      // TODO: callbacks.reportMessage
-      console.error('--out-file should not be specified for project builds');
+      this.callbacks.reportMessage(InfrastructureMessages.Error_OutFileNotValidForProjects());
       return false;
     }
 
@@ -90,7 +90,7 @@ class ProjectBuilder {
     const kpjData = this.callbacks.loadFile(null, this.infile);
     const reader = new KPJFileReader();
     const kpj = reader.read(kpjData);
-    const schema = this.callbacks.loadKpjJsonSchema();
+    const schema = this.callbacks.loadSchema('kpj');
     try {
       reader.validate(kpj, schema);
     } catch(e) {
@@ -121,7 +121,7 @@ class ProjectBuilder {
 
     fs.mkdirSync(path.dirname(options.outFile), {recursive:true});
 
-    let result = await activity.build(infile, options);
+    let result = await activity.build(infile, this.callbacks, options);
     if(result) {
       console.log(`${path.basename(infile )} built successfully.`);
     } else {

@@ -3,6 +3,8 @@ import { Command } from 'commander';
 import { BuildActivityOptions } from './build/BuildActivity.js';
 import { buildActivities } from './build/buildActivities.js';
 import { BuildProject } from './build/BuildProject.js';
+import { NodeCompilerCallbacks } from 'src/messages/NodeCompilerCallbacks.js';
+import { InfrastructureMessages } from 'src/messages/messages.js';
 
 export function declareBuild(program: Command) {
   program
@@ -13,43 +15,59 @@ export function declareBuild(program: Command) {
     .option('--no-compiler-version', 'Exclude compiler version metadata from output')
     .option('-w, --compiler-warnings-as-errors', 'Causes warnings to fail the build')
     .option('--no-warn-deprecated-code', 'Turn off warnings for deprecated code styles')
-    .action((infiles: string[], options: any) => {
-      let p = [];
-      if(!infiles.length) {
-        console.debug('Assuming infile == .');
-        p.push(build('.', options));
+    .action(async (filenames: string[], options: any) => {
+      if(!filenames.length) {
+        // If there are no filenames provided, then we are building the current
+        // folder ('.') as a project-style build
+        filenames.push('.');
       }
-      for(let infile of infiles) {
-        p.push(build(infile, options));
+
+      for(let filename of filenames) {
+        if(!await build(filename, options)) {
+          // Once a file fails to build, we bail on subsequent builds
+          // TODO: is this the most appropriate semantics?
+          process.exit(1);
+        }
       }
-      return Promise.all(p).then();
     });
 }
 
-async function build(infile: string, options: BuildActivityOptions): Promise<boolean> {
-  console.log(`Building ${infile}`);
+async function build(filename: string, options: BuildActivityOptions): Promise<boolean> {
+  let callbacks = new NodeCompilerCallbacks();
 
-  if(!fs.existsSync(infile)) {
-    // TODO: consolidate errors
-    console.error(`File ${infile} does not exist`);
-    process.exit(2);
-  }
+  try {
+    callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename}));
 
-  // If infile is a directory, then we treat that as a project and build it
-  if(fs.statSync(infile).isDirectory()) {
-    return (new BuildProject()).build(infile, options);
-  }
-
-  // Otherwise, if it's one of our known file extensions, we build it
-  let extensions: string[] = [];
-  for(let build of buildActivities) {
-    if(infile.toLowerCase().endsWith(build.sourceExtension)) {
-      return build.build(infile, options);
+    if(!fs.existsSync(filename)) {
+      callbacks.reportMessage(InfrastructureMessages.Error_FileDoesNotExist({filename}));
+      return false;
     }
-    extensions.push(build.sourceExtension);
-  }
 
-  // TODO: consolidate errors
-  console.error(`Unrecognised input file ${infile}, expecting ${extensions.join(', ')}, or project folder`);
-  process.exit(2);
+    let builder = null;
+
+    // If infile is a directory, then we treat that as a project and build it
+    if(fs.statSync(filename).isDirectory()) {
+      builder = new BuildProject();
+    } else {
+      // Otherwise, if it's one of our known file extensions, we build it
+      let extensions: string[] = [];
+      builder = buildActivities.find(build => { extensions.push(build.sourceExtension); return filename.toLowerCase().endsWith(build.sourceExtension) });
+      if(!builder) {
+        callbacks.reportMessage(InfrastructureMessages.Error_FileTypeNotRecognized({filename, extensions: extensions.join(', ')}));
+        return false;
+      }
+    }
+
+    let result = await builder.build(filename, callbacks, options);
+    if(result) {
+      callbacks.reportMessage(InfrastructureMessages.Info_FileBuiltSuccessfully({filename}));
+    } else {
+      callbacks.reportMessage(InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename}));
+    }
+
+    return result;
+  } catch(e) {
+    callbacks.reportMessage(InfrastructureMessages.Fatal_UnexpectedException({e}));
+    return false;
+  }
 }

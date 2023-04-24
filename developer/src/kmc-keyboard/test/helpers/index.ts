@@ -54,7 +54,7 @@ export function loadSectionFixture(compilerClass: typeof SectionCompiler, filena
   const source = reader.load(data);
   assert.isNotNull(source);
 
-  if (!reader.validate(source, callbacks.loadLdmlKeyboardSchema())) {
+  if (!reader.validate(source, callbacks.loadSchema('ldml-keyboard'))) {
     return null; // mimic kmc behavior - bail if validate fails
   }
 

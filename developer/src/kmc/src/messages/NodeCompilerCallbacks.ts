@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { CompilerCallbacks, CompilerEvent, compilerErrorSeverityName } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerSchema, CompilerEvent, compilerErrorSeverityName } from '@keymanapp/common-types';
 
 /**
  * Concrete implementation for CLI use
@@ -27,20 +27,12 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     }
   }
 
-  loadLdmlKeyboardSchema(): Buffer {
-    let schemaPath = new URL('ldml-keyboard.schema.json', import.meta.url);
-    return fs.readFileSync(schemaPath);
+  debug(msg: string) {
+    console.debug(msg);
   }
-  loadLdmlKeyboardTestSchema(): Buffer {
-    let schemaPath = new URL('ldml-keyboardtest.schema.json', import.meta.url);
-    return fs.readFileSync(schemaPath);
-  }
-  loadKvksJsonSchema(): Buffer {
-    let schemaPath = new URL('kvks.schema.json', import.meta.url);
-    return fs.readFileSync(schemaPath);
-  }
-  loadKpjJsonSchema(): Buffer {
-    let schemaPath = new URL('kpj.schema.json', import.meta.url);
+
+  loadSchema(schema: CompilerSchema) {
+    let schemaPath = new URL(schema + '.schema.json', import.meta.url);
     return fs.readFileSync(schemaPath);
   }
 }
