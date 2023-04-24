@@ -15,6 +15,7 @@ cd "$THIS_SCRIPT_PATH"
 project=child1
 
 builder_describe "$project test module" \
+  "@../dep" \
   clean \
   configure \
   build \

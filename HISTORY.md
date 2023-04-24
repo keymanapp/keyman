@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.92 alpha 2023-04-21
+
+* fix(developer): kmc-package path reference (#8634)
+* chore(developer): only run keyboards-repo tests for a full-test (#8635)
+* refactor(developer): move comperr.h to kmn_compiler_errors.h (#8636)
+* refactor(developer): kmc-model to use `CompilerEvent` (#8637)
+
 ## 17.0.91 alpha 2023-04-20
 
 * fix(developer): kmc-kmn would abort build on warnings (#8617)

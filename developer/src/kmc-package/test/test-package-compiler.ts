@@ -122,7 +122,9 @@ describe('KmpCompiler', function () {
     assert.deepEqual(kmpJsonData, kmpJsonFixture);
   });
 
-  /* Testing Warnings */
+  /*
+   * Testing Warnings and Errors
+   */
 
   it('should warn on absolute paths', async function() {
     this.timeout(10000); // building a zip file can sometimes be slow
@@ -146,44 +148,71 @@ describe('KmpCompiler', function () {
     assert.deepEqual(callbacks.messages[1].code, CompilerMessages.ERROR_FileDoesNotExist);
   });
 
-  it('should warn if a non-binary kvk file is included', async function() {
-    this.timeout(10000); // building a zip file can sometimes be slow
+  //
+  // Message tests
+  //
+
+  function testForMessage(context: Mocha.Context, fixture: string[], messageId?: number) {
+    context.timeout(10000);
 
     callbacks.clear();
 
-    const kpsPath = makePathToFixture('xml_kvk_file', 'source', 'xml_kvk_file.kps');
+    const kpsPath = makePathToFixture(...fixture);
     const kmpCompiler = new KmpCompiler(callbacks);
     const source = fs.readFileSync(kpsPath, 'utf-8');
 
-    let kmpJson: KmpJsonFile = null;
+    let kmpJson = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
+    if(kmpJson && callbacks.messages.length == 0) {
+      // We'll try building the package if we have not yet received any messages
+      kmpCompiler.buildKmpFile(kpsPath, kmpJson)
+    }
 
-    assert.doesNotThrow(() => {
-      kmpJson = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
-    });
+    if(messageId) {
+      assert.lengthOf(callbacks.messages, 1);
+      assert.isTrue(callbacks.hasMessage(messageId));
+    } else {
+      assert.lengthOf(callbacks.messages, 0);
+    }
+  }
 
-    await assert.isNotNull(kmpCompiler.buildKmpFile(kpsPath, kmpJson));
+  // WARN_FileIsNotABinaryKvkFile
 
-    assert.lengthOf(callbacks.messages, 1);
-    assert.deepEqual(callbacks.messages[0].code, CompilerMessages.WARN_FileIsNotABinaryKvkFile);
+  it('should generate WARN_FileIsNotABinaryKvkFile if a non-binary kvk file is included', async function() {
+    testForMessage(this, ['xml_kvk_file', 'source', 'xml_kvk_file.kps'], CompilerMessages.WARN_FileIsNotABinaryKvkFile);
   });
 
   it('should not warn if a binary kvk file is included', async function() {
-    this.timeout(10000); // building a zip file can sometimes be slow
-
-    callbacks.clear();
-
-    const kpsPath = makePathToFixture('binary_kvk_file', 'source', 'binary_kvk_file.kps');
-    const kmpCompiler = new KmpCompiler(callbacks);
-    const source = fs.readFileSync(kpsPath, 'utf-8');
-
-    let kmpJson: KmpJsonFile = null;
-
-    assert.doesNotThrow(() => {
-      kmpJson = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
-    });
-
-    await assert.isNotNull(kmpCompiler.buildKmpFile(kpsPath, kmpJson));
-
-    assert.lengthOf(callbacks.messages, 0);
+    testForMessage(this, ['binary_kvk_file', 'source', 'binary_kvk_file.kps']);
   });
+
+  // ERROR_FollowKeyboardVersionNotAllowedForModelPackages
+
+  it('should generate ERROR_FollowKeyboardVersionNotAllowedForModelPackages if <FollowKeyboardVersion> is set for model packages', async function() {
+    testForMessage(this, ['invalid', 'followkeyboardversion.qaa.sencoten.model.kps'], CompilerMessages.ERROR_FollowKeyboardVersionNotAllowedForModelPackages);
+  });
+
+  // WARN_FollowKeyboardVersionButNoKeyboards
+
+  it('should generate WARN_FollowKeyboardVersionButNoKeyboards if <FollowKeyboardVersion> is set for a package with no keyboards or models', async function() {
+    testForMessage(this, ['invalid', 'followkeyboardversion.empty.kps'], CompilerMessages.WARN_FollowKeyboardVersionButNoKeyboards);
+  });
+
+  // ERROR_KeyboardFileNotFound
+
+  it('should generate ERROR_KeyboardFileNotFound if a <Keyboard> is listed in a package but not found in <Files>', async function() {
+    testForMessage(this, ['invalid', 'keyboardfilenotfound.kps'], CompilerMessages.ERROR_KeyboardFileNotFound);
+  });
+
+  // ERROR_KeyboardFileNotValid
+
+  it('should generate ERROR_KeyboardFileNotValid if a .kmx is not valid in <Files>', async function() {
+    testForMessage(this, ['invalid', 'keyboardfilenotvalid.kps'], CompilerMessages.ERROR_KeyboardFileNotValid);
+  });
+
+  // WARN_KeyboardFileHasNoKeyboardVersion
+
+  it('should generate WARN_KeyboardFileHasNoKeyboardVersion if <FollowKeyboardVersion> is set but keyboard has no version', async function() {
+    testForMessage(this, ['invalid', 'nokeyboardversion.kps'], CompilerMessages.WARN_KeyboardFileHasNoKeyboardVersion);
+  });
+
 });

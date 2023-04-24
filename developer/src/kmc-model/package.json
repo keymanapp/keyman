@@ -47,7 +47,8 @@
     "chalk": "^2.4.2",
     "esbuild": "^0.15.7",
     "mocha": "^10.0.0",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "@keymanapp/developer-test-helpers": "*"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",

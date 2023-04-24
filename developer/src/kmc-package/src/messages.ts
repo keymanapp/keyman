@@ -26,5 +26,27 @@ export class CompilerMessages {
     `File ${o.filename} does not appear to be a valid binary .kvk file; this may be an old package that includes an xml-format .kvk file. `+
     `You must update the package to include the compiled .kvk file in the package.`);
   static WARN_FileIsNotABinaryKvkFile = SevWarn | 0x0005;
+
+  static Error_FollowKeyboardVersionNotAllowedForModelPackages = () => m(this.ERROR_FollowKeyboardVersionNotAllowedForModelPackages,
+    `FollowKeyboardVersion is not allowed in model packages`);
+  static ERROR_FollowKeyboardVersionNotAllowedForModelPackages = SevError | 0x0006;
+
+  static Warn_FollowKeyboardVersionButNoKeyboards = () => m(this.WARN_FollowKeyboardVersionButNoKeyboards,
+    `FollowKeyboardVersion is set, but the package contains no keyboards`);
+  static WARN_FollowKeyboardVersionButNoKeyboards = SevWarn | 0x0007;
+
+  static Error_KeyboardFileNotFound = (o:{id:string}) => m(this.ERROR_KeyboardFileNotFound,
+    `Keyboard ${o.id} was listed in <Keyboards> but a corresponding .kmx file was not found in <Files>`);
+  static ERROR_KeyboardFileNotFound = SevError | 0x0008;
+
+  static Error_KeyboardFileNotValid = (o:{filename:string}) => m(this.ERROR_KeyboardFileNotValid,
+    `Keyboard file ${o.filename} is not a valid .kmx file`);
+  static ERROR_KeyboardFileNotValid = SevError | 0x0009;
+
+  static Warn_KeyboardFileHasNoKeyboardVersion = (o:{filename:string}) => m(this.WARN_KeyboardFileHasNoKeyboardVersion,
+    `Keyboard file ${o.filename} has no &KeyboardVersion store`);
+  static WARN_KeyboardFileHasNoKeyboardVersion = SevWarn | 0x000A;
+
+
 }
 

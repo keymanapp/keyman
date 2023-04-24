@@ -66,7 +66,7 @@ export default class Compiler {
       return null;
     }
     try {
-      if (!reader.validate(source, this.callbacks.loadLdmlKeyboardSchema())) {
+      if (!reader.validate(source, this.callbacks.loadSchema('ldml-keyboard'))) {
         return null;
       }
     } catch(e) {
@@ -98,7 +98,7 @@ export default class Compiler {
       // TODO-LDML: The unboxed data doesn't match the schema anymore. Skipping validation, for now.
 
       // try {
-      //   if (!reader.validate(source, this.callbacks.loadLdmlKeyboardTestSchema())) {
+      //   if (!reader.validate(source, this.callbacks.loadSchema('ldml-keyboard-test'))) {
       //     return null;
       //   }
       // } catch(e) {
