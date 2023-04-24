@@ -66,6 +66,32 @@ export class FocusAssistant {
   // Formerly `justActivated`.
   restoringFocus: boolean = false;   // JustActivatedKeymanWebUI - focussing back to control after KeymanWeb UI interaction
 
+  /**
+   * JH (2023-04-24): given how it's used within the KMW engine, this seems extremely similar in purpose to
+   * `restoringFocus` - it's set before calling an element's focus method to prevent focus-handlers from causing
+   * unwanted side-effects.  The ONE critical detail:  KSF / `saveFocus` will block a single check, not waiting for
+   * control flow restoration before clearing, where the other matching cases will block 100 (maybe to prevent
+   * some sort of event softlock?).
+   *
+   * So, it's like the `saveFocus` variant immediately clears the flag once checked, while others are intended
+   * to only clear the flag once control returns to the method that triggered a focus op.
+   *
+   * A future refactor should be able to merge the two, though it's worth noting that there are early checks for
+   * this, but _not_ `restoringFocus`, in the context-management control-blur event handler.  So, it's not 100%
+   * super-straightforward, but a refactor should be manageable all the same.
+   */
+  _IgnoreNextSelChange = 0;
+
+  /**
+   * JH (2023-04-24): Set only by the OutputTarget `forceScroll` method, which deliberately blurs and
+   * then refocuses the same element in order to force a browser-default page scroll to keep the element
+   * visible.
+   *
+   * While it feels like this should be possible to merge with the other class fields in some form... it
+   * doesn't seem as safe to do on first glance.
+   */
+  _IgnoreBlurFocus: boolean = false;
+
   constructor() {
   }
 

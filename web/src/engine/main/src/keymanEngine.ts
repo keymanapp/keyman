@@ -19,7 +19,7 @@ export default class KeymanEngine<
 > implements KeyboardKeymanGlobal {
   readonly config: EngineConfiguration;
   readonly contextManager: ContextManager;
-  readonly interface: KeyboardInterface;
+  readonly interface: KeyboardInterface<ContextManager>;
   readonly core: InputProcessor;
   readonly keyboardRequisitioner: KeyboardRequisitioner;
   readonly modelCache: ModelCache;

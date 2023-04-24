@@ -54,71 +54,6 @@ namespace com.keyman.dom {
 
     // Universal DOM event handlers (both desktop + touch)
 
-    //TODO: add more complete description of what ControlFocus really does
-    /**
-     * Respond to KeymanWeb-aware input element receiving focus
-     */
-    _ControlFocus: (e: FocusEvent) => boolean = function(this: DOMEventHandlers, e: FocusEvent): boolean {
-      var Ltarg: HTMLElement;
-
-      Ltarg = this.keyman.util.eventTarget(e) as HTMLElement;
-      if (Ltarg == null) {
-        return true;
-      }
-
-      if(Ltarg['body']) {
-        Ltarg = Ltarg['body']; // Occurs in Firefox for design-mode iframes.
-      }
-
-      // Or if not a remappable input field
-      if(Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLInputElement) {
-        var et=Ltarg.type.toLowerCase();
-        if(!(et == 'text' || et == 'search')) {
-          return true;
-        }
-      }
-
-      // We condition on 'priorElement' below as a check to allow KMW to set a default active keyboard.
-      var priorElement = DOMEventHandlers.states._lastActiveElement;
-
-      if (Ltarg.nodeType == 3) { // defeat Safari bug
-        Ltarg = Ltarg.parentNode as HTMLElement;
-      }
-
-      var LfocusTarg = Ltarg;
-
-      if(Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLIFrameElement) { //**TODO: check case reference
-        this.keyman.domManager._AttachToIframe(Ltarg as HTMLIFrameElement);
-        Ltarg=Ltarg.contentWindow.document.body;
-      }
-
-      // Must set before _Blur / _Focus to avoid infinite recursion due to complications
-      // in setActiveKeyboard behavior with managed keyboard settings.
-      this.keyman.domManager.lastActiveElement = Ltarg;
-      this.keyman.domManager.activeElement = Ltarg;  // I3363 (Build 301)
-
-      if(focusAssistant.restoringFocus) {
-        this._BlurKeyboardSettings(Ltarg);
-      } else {
-        this._FocusKeyboardSettings(Ltarg, priorElement ? false : true);
-      }
-
-      // Always do the common focus stuff, instantly returning if we're in an editable iframe.
-      if(this._CommonFocusHelper(Ltarg)) {
-        return true;
-      };
-
-      // Set element directionality (but only if element is empty)
-      if(Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLElement) {
-        this.keyman.domManager._SetTargDir(Ltarg);
-      }
-
-      //Execute external (UI) code needed on focus if required
-      this.doControlFocused(LfocusTarg, this.keyman.domManager.lastActiveElement);
-
-      return true;
-    }.bind(this);
-
     /**
      * Function     doControlFocused
      * Scope        Private
@@ -136,73 +71,6 @@ namespace com.keyman.dom {
     }
 
     /**
-     * Respond to KMW losing focus on event
-     */
-    _ControlBlur: (e: FocusEvent) => boolean = function(this: DOMEventHandlers, e: FocusEvent): boolean {
-      let Ltarg = this.keyman.util.eventTarget(e) as HTMLElement;
-      if (Ltarg == null) {
-        return true;
-      }
-
-      if(Ltarg['body']) {
-        Ltarg = Ltarg['body']; // Occurs in Firefox for design-mode iframes.
-      }
-
-      if(DOMEventHandlers.states._IgnoreNextSelChange) {
-        // If a keyboard calls saveFocus() (KSF), then ignore the
-        // next selection change
-        DOMEventHandlers.states._IgnoreNextSelChange--;
-        e.cancelBubble = true;
-        e.stopPropagation();
-        return true;
-      }
-
-      if(DOMEventHandlers.states._IgnoreBlurFocus) {
-        // Prevent triggering other blur-handling events (as possible)
-        e.cancelBubble = true;
-        e.stopPropagation();
-        return true;
-      }
-
-      if (Ltarg.nodeType == 3) { // defeat Safari bug
-        Ltarg = Ltarg.parentNode as HTMLElement;
-      }
-
-      if(Ltarg.ownerDocument) {
-        if(Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLIFrameElement) {
-          Ltarg=Ltarg.contentWindow.frameElement as HTMLElement;
-        }
-      }
-
-      ////keymanweb._SelectionControl = null;
-      if(this.keyman.domManager.lastActiveElement) {
-        this._BlurKeyboardSettings(this.keyman.domManager.lastActiveElement);
-      }
-
-      // Now that we've handled all prior-element maintenance, update the active and 'last-active element'.
-      this.keyman.domManager.activeElement = null; // I3363 (Build 301)
-      this.keyman.domManager.lastActiveElement = Ltarg;
-
-      /* If the KeymanWeb UI is active as a user changes controls, all UI-based effects should be restrained to this control in case
-      * the user is manually specifying languages on a per-control basis.
-      */
-      focusAssistant.restoringFocus = false;
-
-      let maintainingFocus = focusAssistant.maintainingFocus;
-      let activeKeyboard = com.keyman.singleton.core.activeKeyboard;
-      if(!maintainingFocus && activeKeyboard) {
-        activeKeyboard.notify(0, Utils.getOutputTarget(Ltarg as HTMLElement), 0);  // I2187
-      }
-
-      this.doControlBlurred(Ltarg, e, maintainingFocus);
-
-      this.doChangeEvent(Ltarg);
-      this.keyman['resetContext']();
-
-      return true;
-    }.bind(this);
-
-    /**
      * Function     doControlBlurred
      * Scope        Private
      * @param       {Object}            _target       element losing focus
@@ -218,6 +86,15 @@ namespace com.keyman.dom {
       p['isActivating']=_isActivating;
 
       return this.keyman.util.callEvent('kmw.controlblurred',p);
+    }
+
+    doChangeEvent(_target: HTMLElement) {
+      if(DOMEventHandlers.states.changed) {
+        let event = new Event('change', {"bubbles": true, "cancelable": false});
+        _target.dispatchEvent(event);
+      }
+
+      DOMEventHandlers.states.changed = false;
     }
 
     /**
@@ -249,15 +126,6 @@ namespace com.keyman.dom {
 
       return PreProcessor.keyDown(e);
     }.bind(this);
-
-    doChangeEvent(_target: HTMLElement) {
-      if(DOMEventHandlers.states.changed) {
-        let event = new Event('change', {"bubbles": true, "cancelable": false});
-        _target.dispatchEvent(event);
-      }
-
-      DOMEventHandlers.states.changed = false;
-    }
 
     _Click: (e: MouseEvent) => boolean = function(this: DOMEventHandlers, e: MouseEvent): boolean {
       let target = e.target as HTMLElement;

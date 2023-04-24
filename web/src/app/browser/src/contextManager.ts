@@ -14,6 +14,41 @@ interface KeyboardCookie {
   current: string;
 }
 
+/**
+ * Given a DOM event related to an KMW-attached element, this function determines
+ * the corresponding OutputTarget.
+ * @param e
+ * @returns
+ */
+function eventOutputTarget(e: Event) {
+  // Step 1:  given the event target...
+  let Ltarg: HTMLElement = e?.target as HTMLElement;
+  if (Ltarg == null) {
+    return null;
+  }
+  // ... determine the element expected to hold the KMW attachment object based on
+  // its typing, properties, etc.
+
+  // if(Ltarg['body']) {
+  //   Ltarg = Ltarg['body']; // Occurs in Firefox for design-mode iframes.
+  // }
+
+  if (Ltarg.nodeType == 3) { // defeat Safari bug
+    Ltarg = Ltarg.parentNode as HTMLElement;
+  }
+
+  // Verify that the element does correspond to a remappable input field
+  if(nestedInstanceOf(Ltarg, "HTMLInputElement")) {
+    const et=(Ltarg as HTMLInputElement).type.toLowerCase();
+    if(!(et == 'text' || et == 'search')) {
+      return null;
+    }
+  }
+
+  // Step 2:  With the most likely host element determined, obtain the corresponding OutputTarget
+  // instance.
+  return Ltarg._kmwAttachment.interface;
+}
 
 /**
  * Set target element text direction (LTR or RTL), but only if the element is empty
@@ -85,7 +120,8 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   }
 
   get activeTarget(): OutputTarget<any> {
-    return this.currentTarget;
+    const maintainingFocus = this.focusAssistant.maintainingFocus;
+    return this.currentTarget || (maintainingFocus ? this.mostRecentTarget : null);
   }
 
   get lastActiveTarget(): OutputTarget<any> {
@@ -122,7 +158,6 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       _SetTargDir(Ltarg, this.activeKeyboard.keyboard);
     }
 
-    //Execute external (UI) code needed on focus if required
     this.emit('targetchange', target);
   }
 
@@ -143,7 +178,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     this.focusAssistant.restoringFocus = false;
   }
 
-  insertText(kbdInterface: KeyboardInterface, Ptext: string, PdeadKey: number) {
+  insertText(kbdInterface: KeyboardInterface<ContextManager>, Ptext: string, PdeadKey: number) {
     // Find the correct output target to manipulate.  The user has likely be interacting with a
     // 'help page' keyboard, like desktop `sil_euro_latin`, and active browser focus on the
     // original context element may have been lost.
@@ -360,46 +395,96 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     return false;
   }
 
+
+
   /**
    * Respond to KeymanWeb-aware input element receiving focus
    */
-  _ControlFocus(e: FocusEvent): boolean {
-    let Ltarg: HTMLElement = e?.target as HTMLElement;
-    if (Ltarg == null) {
-      return true;
-    }
-
-    // if(Ltarg['body']) {
-    //   Ltarg = Ltarg['body']; // Occurs in Firefox for design-mode iframes.
-    // }
-
-    if (Ltarg.nodeType == 3) { // defeat Safari bug
-      Ltarg = Ltarg.parentNode as HTMLElement;
-    }
-
-    // Or if not a remappable input field
-    if(nestedInstanceOf(Ltarg, "HTMLInputElement")) {
-      const et=(Ltarg as HTMLInputElement).type.toLowerCase();
-      if(!(et == 'text' || et == 'search')) {
-        return true;
-      }
-    }
-
-    const target = Ltarg._kmwAttachment.interface;
+  _ControlFocus = (e: FocusEvent): boolean => {
+    // Step 1: determine the corresponding OutputTarget instance.
+    const target = eventOutputTarget(e);
     if(!target) {
       // Probably should also make a warning or error?
       return true;
     }
 
+    // ???? ?: ensure it's properly active?
     // if(target instanceof DesignIFrame) { //**TODO: check case reference
-    //   // Should already have been done...
+    //   // But... the following should already have been done during attachment...
     //   // attachmentEngine._AttachToIframe(Ltarg as HTMLIFrameElement);
     //   target.docRoot
-    //   Ltarg=Ltarg.contentWindow.document.body;
+    //   Ltarg=Ltarg.contentWindow.document.body; // And we only care about Ltarg b/c of finding the OutputTarget.
     // }
 
+    // Step 2:  Make it active.
     this.setActiveTarget(target);
 
+    // Step 3:  related events
+
+    // //Execute external (UI) code needed on focus if required
+    // this.doControlFocused(LfocusTarg, this.keyman.domManager.lastActiveElement);
+
+    return true;
+  }
+
+  /**
+   * Respond to KMW losing focus on event
+   */
+  _ControlBlur = (e: FocusEvent): boolean => {
+    // Step 0:  if we're in a state where loss-of-focus should be outright-ignored, bypass the handler entirely.
+    if(this.focusAssistant._IgnoreNextSelChange) {
+
+      // If a keyboard calls saveFocus() (KSF), then ignore the
+      // next selection change
+      this.focusAssistant._IgnoreNextSelChange--;
+      e.cancelBubble = true;
+      e.stopPropagation();
+      return true;
+    }
+
+    if(this.focusAssistant._IgnoreBlurFocus) {
+      // Prevent triggering other blur-handling events (as possible)
+      e.cancelBubble = true;
+      e.stopPropagation();
+      return true;
+    }
+
+    // Step 1: determine the corresponding OutputTarget instance.
+    let Ltarg = eventOutputTarget(e);
+    if (Ltarg == null) {
+      return true;
+    }
+
+    // Step 2:  persist the keyboard setting for the deactivating context.
+
+    ////keymanweb._SelectionControl = null;
+    if(this.lastActiveTarget) {
+      // There's no harm in saving them at this stage, even if we're still in the `maintainingFocus` state.
+      this._BlurKeyboardSettings(this.lastActiveTarget.getElement());
+    }
+
+    // Step 3: Now that we've handled all prior-element maintenance, update the active and 'last-active element'.
+    // (The "context target" state fields)
+    this.currentTarget = null; // I3363 (Build 301)
+    this.mostRecentTarget = Ltarg;
+
+    // Step 4: any and all related events
+    /* If the KeymanWeb UI is active as a user changes controls, all UI-based effects
+     * should be restrained to this control in case the user is manually specifying
+     * languages on a per-control basis.
+     */
+    this.focusAssistant.restoringFocus = false;
+
+    let activeKeyboard = this.activeKeyboard;
+    const maintainingFocus = this.focusAssistant.maintainingFocus;
+    if(!maintainingFocus && activeKeyboard) {
+      activeKeyboard.keyboard.notify(0, Ltarg, 0);  // I2187
+    }
+
+    // TODO:  these related events.
+    // this.doControlBlurred(Ltarg, e, maintainingFocus);
+    // this.doChangeEvent(Ltarg);
+    this.resetContext();
     return true;
   }
 }
