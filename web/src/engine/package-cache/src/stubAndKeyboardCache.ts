@@ -232,4 +232,19 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
       delete this.keyboardTable[id];
     }
   }
+
+  getStubList(): KeyboardStub[] {
+    let arr: KeyboardStub[] = [];
+
+    const kbdIds = Object.keys(this.stubSetTable);
+    for(let kbdId in kbdIds) {
+      let row = this.stubSetTable[kbdId];
+      const langIds = Object.keys(row);
+      for(let langId in langIds) {
+        arr.push(row[langId]);
+      }
+    }
+
+    return arr;
+  }
 }

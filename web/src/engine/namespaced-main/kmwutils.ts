@@ -117,17 +117,6 @@ namespace com.keyman {
       return false;
     }
 
-    // Found a bit of magic formatting that allows dynamic return typing for a specified element tag!
-    _CreateElement<E extends "p"|"style"|"script"|"div"|"canvas"|"span">(nodeName:E) {
-      const e = document.createElement<E>(nodeName);
-
-      e.style.MozUserSelect="none";
-      e.style.KhtmlUserSelect="none";
-      e.style.UserSelect="none";
-      e.style.WebkitUserSelect="none";
-      return e;
-    }
-
         /**
      * Function     _CancelMouse
      * Scope        Private
@@ -144,30 +133,6 @@ namespace com.keyman {
       } // I2409 - Avoid focus loss for visual keyboard events
 
       return false;
-    }
-
-    createElement = this._CreateElement;
-
-    /**
-     * Get browser-independent computed style value for element
-     *
-     * @param       {Element}     e             HTML element
-     * @param       {string}      s             CSS style name
-     * @return      {*}
-     */
-    getStyleValue(e:HTMLElement, s:string) {
-      // Build 349: error trap added, since on iOS, getPropertyValue may fail
-      // and crash in some cases, possibly if passed a text node
-      try
-      {
-        if(e && (typeof(window.getComputedStyle) != 'undefined')) {
-            return window.getComputedStyle(e,'').getPropertyValue(s);
-        }
-      }
-      catch(ex){}
-
-      // Return empty string if unable to get style value
-      return '';
     }
 
     /**
@@ -228,48 +193,6 @@ namespace com.keyman {
         return (Math.abs(orientation/90) == 1);
       } else {
         return false;
-      }
-    }
-
-    /**
-     * Get viewport scale factor for this document
-     *
-     * @return      {number}
-     */
-    getViewportScale(): number {
-      // This can sometimes fail with some browsers if called before document defined,
-      // so catch the exception
-      try {
-        // For emulation of iOS on a desktop device, use a default value
-        if(this.device.formFactor == 'desktop') {
-          return 1;
-        }
-
-        // Get viewport width
-        var viewportWidth = document.documentElement.clientWidth;
-
-        // Return a default value if screen width is greater than the viewport width (not fullscreen).
-        if(screen.width > viewportWidth) {
-          return 1;
-        }
-
-        // Get the orientation corrected screen width
-        var screenWidth = screen.width;
-        if(this.landscapeView()) {
-          // Take larger of the two dimensions
-          if(screen.width < screen.height) {
-            screenWidth = screen.height;
-          }
-        } else {
-          // Take smaller of the two dimensions
-          if(screen.width > screen.height) {
-            screenWidth = screen.height;
-          }
-        }
-        // Calculate viewport scale
-        return Math.round(100*screenWidth / viewportWidth)/100;
-      } catch(ex) {
-        return 1;
       }
     }
 
