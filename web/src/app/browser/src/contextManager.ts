@@ -17,6 +17,42 @@ interface KeyboardCookie {
 }
 
 /**
+ * Given a DOM event related to an KMW-attached element, this function determines
+ * the corresponding OutputTarget.
+ * @param e
+ * @returns
+ */
+function eventOutputTarget(e: Event) {
+  // Step 1:  given the event target...
+  let Ltarg: HTMLElement = e?.target as HTMLElement;
+  if (Ltarg == null) {
+    return null;
+  }
+  // ... determine the element expected to hold the KMW attachment object based on
+  // its typing, properties, etc.
+
+  // if(Ltarg['body']) {
+  //   Ltarg = Ltarg['body']; // Occurs in Firefox for design-mode iframes.
+  // }
+
+  if (Ltarg.nodeType == 3) { // defeat Safari bug
+    Ltarg = Ltarg.parentNode as HTMLElement;
+  }
+
+  // Verify that the element does correspond to a remappable input field
+  if(nestedInstanceOf(Ltarg, "HTMLInputElement")) {
+    const et=(Ltarg as HTMLInputElement).type.toLowerCase();
+    if(!(et == 'text' || et == 'search')) {
+      return null;
+    }
+  }
+
+  // Step 2:  With the most likely host element determined, obtain the corresponding OutputTarget
+  // instance.
+  return Ltarg._kmwAttachment.interface;
+}
+
+/**
  * Set target element text direction (LTR or RTL), but only if the element is empty
  *
  * If the element base directionality is changed after it contains content, unless all the text
@@ -414,6 +450,8 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       activeControl: previousTarget?.getElement()
     });
 
+    // this.doControlFocused(LfocusTarg, this.keyman.domManager.lastActiveElement);
+
     return true;
   }
 
@@ -440,8 +478,8 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
 
     // Step 1: determine the corresponding OutputTarget instance.
-    let target = eventOutputTarget(e);
-    if (target == null) {
+    let Ltarg = eventOutputTarget(e);
+    if (Ltarg == null) {
       return true;
     }
 
@@ -455,9 +493,8 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     // Step 3: Now that we've handled all prior-element maintenance, update the active and 'last-active element'.
     // (The "context target" state fields)
-    const previousTarget = this.activeTarget;
     this.currentTarget = null; // I3363 (Build 301)
-    this.mostRecentTarget = target;
+    this.mostRecentTarget = Ltarg;
 
     // Step 4: any and all related events
     /* If the KeymanWeb UI is active as a user changes controls, all UI-based effects
@@ -469,20 +506,12 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     let activeKeyboard = this.activeKeyboard;
     const maintainingFocus = this.focusAssistant.maintainingFocus;
     if(!maintainingFocus && activeKeyboard) {
-      activeKeyboard.keyboard.notify(0, target, 0);  // I2187
-    }
-    if(previousTarget && !this.activeTarget) {
-      this.emit('targetchange', null);
+      activeKeyboard.keyboard.notify(0, Ltarg, 0);  // I2187
     }
 
-    this.apiEvents.callEvent('controlblurred', {
-      target: target.getElement(),
-      event: e,
-      isActivating: maintainingFocus
-    });
-
-    // Is not an "API event"; it models a native browser event instead.
-    this.doChangeEvent(target);
+    // TODO:  these related events.
+    // this.doControlBlurred(Ltarg, e, maintainingFocus);
+    // this.doChangeEvent(Ltarg);
     this.resetContext();
     return true;
   }
