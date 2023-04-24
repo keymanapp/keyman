@@ -4,7 +4,7 @@ import { CompilerCallbacks, KeymanDeveloperProject, KPJFileReader } from '@keyma
 import { KeymanDeveloperProjectFile } from '../../../../../../common/web/types/src/kpj/keyman-developer-project.js';
 import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
 import { buildActivities } from './buildActivities.js';
-import { InfrastructureMessages } from 'src/messages/messages.js';
+import { InfrastructureMessages } from '../../messages/messages.js';
 
 const PROJECT_EXTENSION = '.kpj';
 

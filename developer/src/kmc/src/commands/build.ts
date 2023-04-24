@@ -3,8 +3,8 @@ import { Command } from 'commander';
 import { BuildActivityOptions } from './build/BuildActivity.js';
 import { buildActivities } from './build/buildActivities.js';
 import { BuildProject } from './build/BuildProject.js';
-import { NodeCompilerCallbacks } from 'src/messages/NodeCompilerCallbacks.js';
-import { InfrastructureMessages } from 'src/messages/messages.js';
+import { NodeCompilerCallbacks } from '../messages/NodeCompilerCallbacks.js';
+import { InfrastructureMessages } from '../messages/messages.js';
 
 export function declareBuild(program: Command) {
   program

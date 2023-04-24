@@ -32,7 +32,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   }
 
   loadSchema(schema: CompilerSchema) {
-    let schemaPath = new URL(schema + '.schema.json', import.meta.url);
+    let schemaPath = new URL('../util/' + schema + '.schema.json', import.meta.url);
     return fs.readFileSync(schemaPath);
   }
 }
