@@ -24,7 +24,7 @@ export default class KeymanEngine<
   readonly keyboardRequisitioner: KeyboardRequisitioner;
   readonly modelCache: ModelCache;
 
-  private legacyAPIEvents = new LegacyEventEmitter<LegacyAPIEvents>();
+  protected legacyAPIEvents = new LegacyEventEmitter<LegacyAPIEvents>();
   private _hardKeyboard: HardKeyboard;
   private _osk: OSKView;
 

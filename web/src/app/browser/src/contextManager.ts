@@ -2,10 +2,12 @@ import { type Keyboard, Mock } from '@keymanapp/keyboard-processor';
 import { type KeyboardStub } from 'keyman/engine/package-cache';
 import { CookieSerializer } from 'keyman/engine/dom-utils';
 import { PageContextAttachment } from 'keyman/engine/attachment';
+import { LegacyEventEmitter } from 'keyman/engine/events';
 import { DesignIFrame, OutputTarget, nestedInstanceOf } from 'keyman/engine/element-wrappers';
 import {
   ContextManagerBase,
-  type KeyboardInterface
+  type KeyboardInterface,
+  LegacyAPIEvents
 } from 'keyman/engine/main';
 import { BrowserConfiguration } from './configuration.js';
 import { FocusAssistant } from './context/focusAssistant.js';
@@ -101,6 +103,16 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   private currentTarget: OutputTarget<any>;
 
   private globalKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
+
+  private _eventsObj: () => LegacyEventEmitter<LegacyAPIEvents>;
+
+  constructor(engineConfig: BrowserConfiguration, eventsClosure: () => LegacyEventEmitter<LegacyAPIEvents>) {
+    super(engineConfig);
+  }
+
+  get apiEvents(): LegacyEventEmitter<LegacyAPIEvents> {
+    return this._eventsObj();
+  }
 
   initialize(): void {
     this.on('keyboardasyncload', (stub, completion) => {
@@ -416,13 +428,19 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     //   Ltarg=Ltarg.contentWindow.document.body; // And we only care about Ltarg b/c of finding the OutputTarget.
     // }
 
-    // Step 2:  Make it active.
+    // Save it for the event in step 3... but now, before we mutate the field's value!
+    const previousTarget = this.lastActiveTarget;
+
+    // Step 2:  Make the newly-focused control the active control, and thus the active context.
     this.setActiveTarget(target);
 
     // Step 3:  related events
 
     // //Execute external (UI) code needed on focus if required
-    // this.doControlFocused(LfocusTarg, this.keyman.domManager.lastActiveElement);
+    this.apiEvents.callEvent('controlfocused', {
+      target: target.getElement(),
+      activeControl: previousTarget.getElement()
+    });
 
     return true;
   }
@@ -450,8 +468,8 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
 
     // Step 1: determine the corresponding OutputTarget instance.
-    let Ltarg = eventOutputTarget(e);
-    if (Ltarg == null) {
+    let target = eventOutputTarget(e);
+    if (target == null) {
       return true;
     }
 
@@ -465,8 +483,9 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     // Step 3: Now that we've handled all prior-element maintenance, update the active and 'last-active element'.
     // (The "context target" state fields)
+    const previousTarget = this.activeTarget;
     this.currentTarget = null; // I3363 (Build 301)
-    this.mostRecentTarget = Ltarg;
+    this.mostRecentTarget = target;
 
     // Step 4: any and all related events
     /* If the KeymanWeb UI is active as a user changes controls, all UI-based effects
@@ -478,13 +497,30 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     let activeKeyboard = this.activeKeyboard;
     const maintainingFocus = this.focusAssistant.maintainingFocus;
     if(!maintainingFocus && activeKeyboard) {
-      activeKeyboard.keyboard.notify(0, Ltarg, 0);  // I2187
+      activeKeyboard.keyboard.notify(0, target, 0);  // I2187
+    }
+    if(previousTarget && !this.activeTarget) {
+      this.emit('targetchange', null);
     }
 
-    // TODO:  these related events.
-    // this.doControlBlurred(Ltarg, e, maintainingFocus);
-    // this.doChangeEvent(Ltarg);
+    this.apiEvents.callEvent('controlblurred', {
+      target: target.getElement(),
+      event: e,
+      isActivating: maintainingFocus
+    });
+
+    // Is not an "API event"; it models a native browser event instead.
+    this.doChangeEvent(target);
     this.resetContext();
     return true;
+  }
+
+  doChangeEvent(target: OutputTarget<any>) {
+    if(target.changed) {
+      let event = new Event('change', {"bubbles": true, "cancelable": false});
+      target.getElement().dispatchEvent(event);
+    }
+
+    target.changed = false;
   }
 }

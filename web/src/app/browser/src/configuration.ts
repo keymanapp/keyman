@@ -40,7 +40,7 @@ export class BrowserConfiguration extends EngineConfiguration {
     const ruleTransform = ruleBehavior.transcription.transform;
     if(!isEmptyTransform(ruleTransform)) {
       if(outputTarget instanceof DOMOutputTarget) {
-        dom.DOMEventHandlers.states.changed = true;
+        outputTarget.changed = true;
       }
     }
   }

@@ -55,49 +55,6 @@ namespace com.keyman.dom {
     // Universal DOM event handlers (both desktop + touch)
 
     /**
-     * Function     doControlFocused
-     * Scope        Private
-     * @param       {Object}            _target         element gaining focus
-     * @param       {Object}            _activeControl  currently active control
-     * @return      {boolean}
-     * Description  Execute external (UI) code needed on focus
-     */
-    doControlFocused(_target: HTMLElement, _activeControl: HTMLElement): boolean {
-      var p={};
-      p['target']=_target;
-      p['activeControl']=_activeControl;
-
-      return this.keyman.util.callEvent('kmw.controlfocused',p);
-    }
-
-    /**
-     * Function     doControlBlurred
-     * Scope        Private
-     * @param       {Object}            _target       element losing focus
-     * @param       {Event}             _event        event object
-     * @param       {(boolean|number)}  _isActivating activation state
-     * @return      {boolean}
-     * Description  Execute external (UI) code needed on blur
-     */
-    doControlBlurred(_target: HTMLElement, _event: Event, _isActivating: boolean|number): boolean {
-      var p={};
-      p['target']=_target;
-      p['event']=_event;
-      p['isActivating']=_isActivating;
-
-      return this.keyman.util.callEvent('kmw.controlblurred',p);
-    }
-
-    doChangeEvent(_target: HTMLElement) {
-      if(DOMEventHandlers.states.changed) {
-        let event = new Event('change', {"bubbles": true, "cancelable": false});
-        _target.dispatchEvent(event);
-      }
-
-      DOMEventHandlers.states.changed = false;
-    }
-
-    /**
      * Function     _KeyDown
      * Scope        Private
      * Description  Processes keydown event and passes data to keyboard.

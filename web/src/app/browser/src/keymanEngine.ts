@@ -17,8 +17,10 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, KeyEventKeybo
     this.contextManager.restoreLastActiveTarget();
   }
 
-  constructor(worker: Worker, config: BrowserConfiguration) {
-    super(worker, config, new ContextManager(config));
+  constructor(worker: Worker, sourceUri: string) {
+    const config = new BrowserConfiguration(sourceUri);  // currently set to perform device auto-detect.
+
+    super(worker, config, new ContextManager(config, () => this.legacyAPIEvents));
 
     // Scrolls the document-body to ensure that a focused element remains visible after the OSK appears.
     this.contextManager.on('targetchange', (target: OutputTarget<any>) => {
