@@ -6,7 +6,7 @@ set -u
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../../../resources/build/build-utils.sh"
 # . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 THIS_DIR="$(dirname "$THIS_SCRIPT")"
@@ -48,6 +48,8 @@ while [[ $# -gt 0 ]] ; do
   esac
   shift
 done
+
+cd "$THIS_DIR"
 
 if $CLEAN; then
   if ! $QUIET; then
