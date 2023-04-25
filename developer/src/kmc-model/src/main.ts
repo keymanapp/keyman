@@ -6,7 +6,7 @@ import { setCompilerCallbacks } from './compiler-callbacks.js';
 
 import LexicalModelCompiler from './lexical-model-compiler.js';
 import { LexicalModelSource } from './lexical-model.js';
-import { ModelCompilerError, ModelCompilerMessages } from './model-compiler-errors.js';
+import { ModelCompilerError, ModelCompilerMessageContext, ModelCompilerMessages } from './model-compiler-errors.js';
 
 /**
  * Compiles a model.ts file, using paths relative to its location.
@@ -71,7 +71,7 @@ export function loadFromFilename(filename: string, callbacks: CompilerCallbacks)
   module(moduleExports);
 
   if (!moduleExports['__esModule'] || !moduleExports['default']) {
-    ModelCompilerMessages.filename = filename;
+    ModelCompilerMessageContext.filename = filename;
     throw new ModelCompilerError(ModelCompilerMessages.Error_NoDefaultExport());
   }
 

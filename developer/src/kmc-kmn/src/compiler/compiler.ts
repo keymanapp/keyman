@@ -24,7 +24,7 @@ TODO: implement additional interfaces:
 // TODO: rename wasm-host?
 import { CompilerCallbacks } from '@keymanapp/common-types';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
-import { CompilerMessages } from './messages.js';
+import { CompilerMessages, mapErrorFromKmcmplib } from './messages.js';
 
 export interface CompilerOptions {
   shouldAddCompilerVersion?: boolean;
@@ -86,7 +86,7 @@ export class Compiler {
   }
 
   private compilerMessageCallback = (line: number, code: number, msg: string): number => {
-    this.callbacks.reportMessage(CompilerMessages.mapErrorFromKmcmplib(line, code, msg));
+    this.callbacks.reportMessage(mapErrorFromKmcmplib(line, code, msg));
     return 1;
   }
 

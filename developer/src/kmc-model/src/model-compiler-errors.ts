@@ -8,16 +8,19 @@ const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
 const m = (code: number, message: string) : CompilerEvent => { return {
-  line: ModelCompilerMessages.line,
-  filename: ModelCompilerMessages.filename,
+  line: ModelCompilerMessageContext.line,
+  filename: ModelCompilerMessageContext.filename,
   code,
   message
 } };
 
-export class ModelCompilerMessages {
+export class ModelCompilerMessageContext {
   // Context added to all messages
   static line: number;
   static filename: string;
+}
+
+export class ModelCompilerMessages {
 
   static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException,
     `Unexpected exception: ${(o.e ?? 'unknown error').toString()}\n\nCall stack:\n${(o.e instanceof Error ? o.e.stack : (new Error()).stack)}`);
@@ -29,7 +32,7 @@ export class ModelCompilerMessages {
 
   static Warn_DuplicateWordInSameFile = (o:{wordform: string}) => m(this.WARN_DuplicateWordInSameFile,
     `duplicate word “${o.wordform}” found in same file; summing counts`);
-  static WARN_DuplicateWordInSameFile = SevFatal | 0x0003;
+  static WARN_DuplicateWordInSameFile = SevWarn | 0x0003;
 
   static Error_UnimplementedModelFormat = (o:{format: string}) => m(this.ERROR_UnimplementedModelFormat,
     `Unimplemented model format: ${o.format}`);

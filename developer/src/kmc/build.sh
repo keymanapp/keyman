@@ -51,19 +51,21 @@ fi
 if builder_start_action clean; then
   rm -rf ./build/ ./tsconfig.tsbuildinfo
   builder_finish_action success clean
-else
+fi
+
+function copy_schemas() {
   # We need the schema file at runtime and bundled, so always copy it for all actions except `clean`
   mkdir -p "$THIS_SCRIPT_PATH/build/src/util/"
   cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json" "$THIS_SCRIPT_PATH/build/src/util/"
   cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboardtest.schema.json" "$THIS_SCRIPT_PATH/build/src/util/"
   cp "$KEYMAN_ROOT/common/schemas/kvks/kvks.schema.json" "$THIS_SCRIPT_PATH/build/src/util/"
   cp "$KEYMAN_ROOT/common/schemas/kpj/kpj.schema.json" "$THIS_SCRIPT_PATH/build/src/util/"
-fi
-
+}
 
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action configure; then
+  copy_schemas
   verify_npm_setup
   builder_finish_action success configure
 fi
@@ -71,6 +73,7 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action build; then
+  copy_schemas
   npm run build
   builder_finish_action success build
 fi
@@ -78,13 +81,18 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action test; then
-  # npm test -- no tests as yet
+  copy_schemas
+  npm test
+  # TODO: enable c8 (disabled because no coverage at present)
+  #     && c8 --reporter=lcov --reporter=text mocha
   builder_finish_action success test
 fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action bundle; then
+  copy_schemas
+
   if ! builder_has_option --build-path; then
     builder_finish_action "Parameter --build-path is required" bundle
     exit 64

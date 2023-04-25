@@ -31,17 +31,19 @@ const LogLevelToSeverity: Record<number,number> = {
   [LogLevel.CERR_INFO]:    SevInfo
 }
 
+export const enum KmnCompilerMessageRanges {
+  RANGE_KMN_COMPILER_MIN    = 0x0001, // from kmn_compiler_errors.h
+  RANGE_KMN_COMPILER_MAX    = 0x07FF, // from kmn_compiler_errors.h
+  RANGE_LEXICAL_MODEL_MIN   = 0x0800, // from kmn_compiler_errors.h, deprecated -- this range will not be used in future versions
+  RANGE_LEXICAL_MODEL_MAX   = 0x08FF, // from kmn_compiler_errors.h, deprecated -- this range will not be used in future versions
+  RANGE_CompilerMessage_Min = 0x1000, // All compiler messages listed here must be >= this value
+}
+
 /*
   The messages in this class share the namespace with messages from kmn_compiler_errors.h
   and the below ranges are reserved.
 */
 export class CompilerMessages {
-  static RANGE_KMN_COMPILER_MIN    = 0x0001; // from kmn_compiler_errors.h
-  static RANGE_KMN_COMPILER_MAX    = 0x07FF; // from kmn_compiler_errors.h
-  static RANGE_LEXICAL_MODEL_MIN   = 0x0800; // from kmn_compiler_errors.h, deprecated -- this range will not be used in future versions
-  static RANGE_LEXICAL_MODEL_MAX   = 0x08FF; // from kmn_compiler_errors.h, deprecated -- this range will not be used in future versions
-  static RANGE_CompilerMessage_Min = 0x1000; // All compiler messages listed here must be >= this value
-
   static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException, `Unexpected exception: ${(o.e ?? 'unknown error').toString()}\n\nCall stack:\n${(o.e instanceof Error ? o.e.stack : (new Error()).stack)}`);
   static FATAL_UnexpectedException = SevFatal | 0x1000;
 
@@ -50,16 +52,15 @@ export class CompilerMessages {
 
   static Fatal_UnableToSetCompilerOptions = () => m(this.FATAL_UnableToSetCompilerOptions, `Unable to set compiler options`);
   static FATAL_UnableToSetCompilerOptions = SevFatal | 0x1002;
-
-  static mapErrorFromKmcmplib = (line: number, code: number, msg: string): CompilerEvent => {
-    const severity = LogLevelToSeverity[code & LogLevel.LEVEL_MASK];
-    const baseCode = code & LogLevel.CODE_MASK;
-    const event: CompilerEvent = {
-      line: line,
-      code: severity | CompilerErrorNamespace.KmnCompiler | baseCode,
-      message: msg
-    };
-    return event;
-  };
 }
 
+export function mapErrorFromKmcmplib(line: number, code: number, msg: string): CompilerEvent {
+  const severity = LogLevelToSeverity[code & LogLevel.LEVEL_MASK];
+  const baseCode = code & LogLevel.CODE_MASK;
+  const event: CompilerEvent = {
+    line: line,
+    code: severity | CompilerErrorNamespace.KmnCompiler | baseCode,
+    message: msg
+  };
+  return event;
+};
