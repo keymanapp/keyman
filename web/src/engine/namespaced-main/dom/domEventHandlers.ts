@@ -84,18 +84,6 @@ namespace com.keyman.dom {
       return PreProcessor.keyDown(e);
     }.bind(this);
 
-    _Click: (e: MouseEvent) => boolean = function(this: DOMEventHandlers, e: MouseEvent): boolean {
-      let target = e.target as HTMLElement;
-      if(target && target['base']) {
-        target = target['base'];
-      }
-
-      //console.log('processNewContextEvent called from click');
-      com.keyman.singleton.core.processNewContextEvent(dom.Utils.getOutputTarget(target));
-
-      return true;
-    }.bind(this);
-
     /**
      * Function     _KeyPress
      * Scope        Private

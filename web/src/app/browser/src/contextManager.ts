@@ -2,7 +2,7 @@ import { type Keyboard, Mock } from '@keymanapp/keyboard-processor';
 import { type KeyboardStub } from 'keyman/engine/package-cache';
 import { CookieSerializer } from 'keyman/engine/dom-utils';
 import { eventOutputTarget, PageContextAttachment } from 'keyman/engine/attachment';
-import { LegacyEventEmitter } from 'keyman/engine/events';
+import { DomEventTracker, LegacyEventEmitter } from 'keyman/engine/events';
 import { DesignIFrame, OutputTarget, nestedInstanceOf } from 'keyman/engine/element-wrappers';
 import {
   ContextManagerBase,
@@ -53,6 +53,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   private globalKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
 
   private _eventsObj: () => LegacyEventEmitter<LegacyAPIEvents>;
+  private domEventTracker = new DomEventTracker();
 
   constructor(engineConfig: BrowserConfiguration, eventsClosure: () => LegacyEventEmitter<LegacyAPIEvents>) {
     super(engineConfig);
@@ -61,13 +62,6 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     this.page = new PageContextAttachment(window.document, {
       hostDevice: this.config.hostDevice
-    });
-
-    this.engineConfig.deferForInitialization.then(() => {
-      // TODO: set up attachment-listeners here that can add necessary event-hooks
-      // for focus management here!
-
-      this.page.install(this.engineConfig.attachType == 'manual');
     });
   }
 
@@ -85,11 +79,89 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       });
     });
 
-    // TBD:  keyman.domManager.init (the page-integration parts)
-    // CTRL+F: `// Exit initialization here if we're using an embedded code path.`
-    // EVERYTHING after that block will likely go here - DOMManager's role always
-    // was context-management and the facilitation thereof.
-    throw new Error('Method not implemented.');
+    this.engineConfig.deferForInitialization.then(() => {
+      const device = this.engineConfig.hostDevice;
+      const eventTracker = this.domEventTracker;
+
+      const noPropagation = (event: Event) => event.stopPropagation()
+
+      // For any elements being attached, or being enabled after having been disabled...
+      this.page.on('enabled', (elem) => {
+        if(!(elem._kmwAttachment.interface instanceof DesignIFrame)) {
+          // For anything attached but (design-mode) iframes...
+
+          // This block:  has to do with maintaining focus.
+          if(device.touchable) {
+            // Remove any handlers for "NonKMWTouch" elements, since we're enabling it here.
+            this.domEventTracker.detachDOMEvent(elem, 'touchstart', this.nonKMWTouchHandler);
+
+            // Prevent base-page touch handlers from causing a defocus when interacting
+            // with attached input elements.
+            this.domEventTracker.attachDOMEvent(elem, 'touchmove', noPropagation, false);
+            this.domEventTracker.attachDOMEvent(elem, 'touchend', noPropagation, false);
+          }
+
+          // This block:  has to do with maintaining focus.
+          this.domEventTracker.attachDOMEvent(elem,'focus', this._ControlFocus);
+          this.domEventTracker.attachDOMEvent(elem,'blur', this._ControlBlur);
+          this.domEventTracker.attachDOMEvent(elem,'click', this._Click);
+        } else {
+          // For design-mode iframes:
+
+          // This block:  has to do with maintaining focus.
+          var Lelem=(elem as HTMLIFrameElement).contentWindow.document;
+          // I2404 - Attach to IFRAMEs child objects, only editable IFRAMEs here
+          if(device.browser == 'firefox') {
+            this.domEventTracker.attachDOMEvent(Lelem,'focus', this._ControlFocus);
+            this.domEventTracker.attachDOMEvent(Lelem,'blur', this._ControlBlur);
+          } else { // Chrome, Safari
+            this.domEventTracker.attachDOMEvent(Lelem.body,'focus', this._ControlFocus);
+            this.domEventTracker.attachDOMEvent(Lelem.body,'blur', this._ControlBlur);
+          }
+        }
+      });
+
+      // For any elements being detached, disabled, or deliberately not being attached (b/c nonKMWTouchHandler)...
+      this.page.on('disabled', (elem) => {
+        if(!(elem._kmwAttachment.interface instanceof DesignIFrame)) {
+          // For anything attached but (design-mode) iframes...
+
+          // This block:  has to do with maintaining focus.
+          if(device.touchable) {
+            this.domEventTracker.attachDOMEvent(elem, 'touchstart', this.nonKMWTouchHandler, false);
+
+            // does not detach the touch-handlers added in 'enabled'?
+          }
+
+          // This block:  has to do with maintaining focus.
+          this.domEventTracker.detachDOMEvent(elem,'focus', this._ControlFocus);
+          this.domEventTracker.detachDOMEvent(elem,'blur', this._ControlBlur);
+          this.domEventTracker.detachDOMEvent(elem,'click', this._Click);
+
+          // This block:  has to do with maintaining focus (and consequences)
+          var lastElem = this.mostRecentTarget.getElement();
+          if(lastElem == elem) {
+            this.forgetActiveTarget(); // should already auto-hide the OSK while at it via event.
+          }
+        } else {
+          // For design-mode iframes:
+
+          // This block:  has to do with maintaining focus.
+          let Lelem = (elem as HTMLIFrameElement).contentWindow.document;
+          // Mozilla      // I2404 - Attach to  IFRAMEs child objects, only editable IFRAMEs here
+          if(device.browser == 'firefox') {
+            // Firefox won't handle these events on Lelem.body - only directly on Lelem (the doc) instead.
+            this.domEventTracker.detachDOMEvent(Lelem,'focus', this._ControlFocus);
+            this.domEventTracker.detachDOMEvent(Lelem,'blur', this._ControlBlur);
+          } else { // Chrome, Safari
+            this.domEventTracker.detachDOMEvent(Lelem.body,'focus', this._ControlFocus);
+            this.domEventTracker.detachDOMEvent(Lelem.body,'blur', this._ControlBlur);
+          }
+        }
+      });
+
+      this.page.install(this.engineConfig.attachType == 'manual');
+    });
   }
 
   get activeTarget(): OutputTarget<any> {
@@ -265,7 +337,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       if(originalKeyboardTarget == this.keyboardTarget) {
         _SetTargDir(this.currentTarget?.getElement(), this.keyboardCache.getKeyboard(keyboardId));
         // util.addStyleSheet(domManager.setAttachmentFontStyle(kbdStub.KF));
-       this.focusAssistant.restoringFocus = true;
+        this.focusAssistant.restoringFocus = true;
       }
 
       return result;
@@ -494,5 +566,27 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
 
     target.changed = false;
+  }
+
+  _Click: (e: MouseEvent) => boolean = (e: MouseEvent) => {
+    this.resetContext();
+    return true;
+  };
+
+  /**
+   * Function     nonKMWTouchHandler
+   * Scope        Private
+   * Description  A handler for KMW-touch-disabled elements when operating on touch devices.
+   */
+  nonKMWTouchHandler = (x: Event) => {
+    this.focusAssistant.focusing=false;
+    clearTimeout(this.focusAssistant.focusTimer);
+    this.forgetActiveTarget();
+    // this.keyman.osk.hideNow(); // TODO:  is more aggressive than the default - how to migrate this tidbit?
+  };
+
+  shutdown() {
+    this.page.shutdown();
+    this.domEventTracker.shutdown();
   }
 }

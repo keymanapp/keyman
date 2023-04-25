@@ -92,6 +92,16 @@ export class FocusAssistant {
    */
   _IgnoreBlurFocus: boolean = false;
 
+  /**
+   * Is used as a time-delayed async `restoringFocus` or `maintainingFocus` - could be modeled decently as a Promise.
+   * Probably more the latter, as it's a touch-OSK interaction like the other `maintainingFocus` cases.
+   */
+  focusing: boolean;
+  /**
+   * Manages the time-delay aspect of `focusing` state.
+   */
+  focusTimer: number;
+
   constructor() {
   }
 
@@ -114,5 +124,13 @@ export class FocusAssistant {
    */
   setMaintainingFocus(state: boolean) {
     this.maintainingFocus = state ? true : false;
+  }
+
+  setFocusTimer(): void {
+    this.focusing=true;
+
+    this.focusTimer = window.setTimeout(function() {
+      this.focusing=false;
+    }.bind(this), 50)
   }
 }
