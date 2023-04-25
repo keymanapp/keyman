@@ -124,7 +124,7 @@ fi
 if [ ${#TARGETS[@]} == 0 ]; then
   for d in "$THIS_DIR/"*/; do
     d="$(basename "$d")"
-    if [ "$d" != "invalid" ] || [ "$d" == "issue" ]; then
+    if [ "$d" != "invalid" ] && [ "$d" != "issue" ]; then
       TARGETS+=("$d")
     fi
   done
