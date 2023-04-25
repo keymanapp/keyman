@@ -619,12 +619,7 @@ namespace com.keyman.dom {
       }
       // Initialize browser interface
 
-      if(this.keyman.options['attachType'] != 'manual') {
-        this._SetupDocument(document.documentElement);
-      }
-
-      // Create an ordered list of all input and textarea fields
-      this.listInputs();
+      // Modular form:  pageContextAttachment.install()
 
       // Initialize the OSK and set default OSK styles
       // Note that this should *never* be called before the OSK has been initialized.

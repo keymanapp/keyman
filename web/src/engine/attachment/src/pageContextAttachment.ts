@@ -237,10 +237,16 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
    * eligible to serve as context for Keyman keyboard input.
    */
   install(manualAttach: boolean) {
-    // Do before _SetupDocument!
+    // This field gets referenced by any non-design iframes detected during _SetupDocument.
+    // Thus, we must initialize it now.
     this.manualAttach = manualAttach;
 
-    this._SetupDocument(document.documentElement);
+    if(!this.manualAttach) {
+      this._SetupDocument(document.documentElement);
+
+      // Create an ordered list of all input and textarea fields
+      this.listInputs();
+    }
 
     // KMW 16.0 and before:  these were only ever established for the top-level doc, and so for
     // 17.0 we'll keep it that way initially.
