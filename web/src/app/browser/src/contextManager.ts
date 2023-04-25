@@ -83,8 +83,17 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   readonly focusAssistant = new FocusAssistant();
   readonly page: PageContextAttachment;
 
-  constructor(engineConfig: BrowserConfiguration) {
+  private mostRecentTarget: OutputTarget<any>;
+  private currentTarget: OutputTarget<any>;
+
+  private globalKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
+
+  private _eventsObj: () => LegacyEventEmitter<LegacyAPIEvents>;
+
+  constructor(engineConfig: BrowserConfiguration, eventsClosure: () => LegacyEventEmitter<LegacyAPIEvents>) {
     super(engineConfig);
+
+    this._eventsObj = eventsClosure;
 
     this.page = new PageContextAttachment(window.document, {
       hostDevice: this.config.hostDevice,
@@ -97,17 +106,6 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
       this.page.install(this.engineConfig.attachType == 'manual');
     });
-  }
-
-  private mostRecentTarget: OutputTarget<any>;
-  private currentTarget: OutputTarget<any>;
-
-  private globalKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
-
-  private _eventsObj: () => LegacyEventEmitter<LegacyAPIEvents>;
-
-  constructor(engineConfig: BrowserConfiguration, eventsClosure: () => LegacyEventEmitter<LegacyAPIEvents>) {
-    super(engineConfig);
   }
 
   get apiEvents(): LegacyEventEmitter<LegacyAPIEvents> {
