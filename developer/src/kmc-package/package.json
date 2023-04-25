@@ -16,7 +16,8 @@
   ],
   "scripts": {
     "build": "tsc -b",
-    "test": "cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha",
+    "lint": "eslint .",
+    "test": "npm run lint && cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha",
     "coverage": "npm test",
     "prepublishOnly": "npm run build"
   },
