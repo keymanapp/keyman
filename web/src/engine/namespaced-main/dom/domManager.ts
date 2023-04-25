@@ -454,43 +454,6 @@ namespace com.keyman.dom {
     }
 
     /**
-     * Move focus to next (or previous) input or text area element on TAB
-     *   Uses list of actual input elements
-     *
-     *   Note that activeElement() on touch devices returns the DIV that overlays
-     *   the input element, not the element itself.
-     *
-     * @param      {number|boolean}  bBack     Direction to move (0 or 1)
-     */
-    moveToNext(bBack: number|boolean) {
-      var i,t=this.sortedInputs, activeBase = this.activeElement;
-      var touchable = this.keyman.util.device.touchable;
-
-      if(t.length == 0) {
-        return;
-      }
-
-      // For touchable devices, get the base element of the DIV
-      if(touchable) {
-        activeBase=activeBase.base;
-      }
-
-      // Identify the active element in the list of inputs ordered by position
-      for(i=0; i<t.length; i++) {
-        if(t[i] == activeBase) break;
-      }
-
-      // Find the next (or previous) element in the list
-      i = bBack ? i-1 : i+1;
-      // Treat the list as circular, wrapping the index if necessary.
-      i = i >= t.length ? i-t.length : i;
-      i = i < 0 ? i+t.length : i;
-
-      // Move to the selected element
-      t[i].focus();
-    }
-
-    /**
      * Move focus to user-specified element
      *
      *  @param  {string|Object}   e   element or element id

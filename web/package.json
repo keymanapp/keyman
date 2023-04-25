@@ -2,6 +2,14 @@
   "name": "keyman",
   "description": "Facilitates text input in any language.",
   "exports": {
+    "./engine/attachment": {
+      "types": "./build/engine/attachment/obj/index.d.ts",
+      "import": "./build/engine/attachment/obj/index.js"
+    },
+    "./engine/attachment/lib": {
+      "types": "./build/engine/attachment/obj/index.d.ts",
+      "import": "./build/engine/attachment/lib/index.mjs"
+    },
     "./engine/paths": {
       "types": "./build/engine/paths/obj/index.d.ts",
       "import": "./build/engine/paths/obj/index.js"

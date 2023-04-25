@@ -137,11 +137,6 @@ export interface PageAttachmentOptions {
   hostDevice: DeviceSpec;
 
   /**
-   * The KMW init() option, as set for the page.
-   */
-  attachType: 'manual' | 'auto';
-
-  /**
    * Should only be set to `true` for the top-level page.  Should be `false` for
    * any pages embedded in another page via iframe.
    */
@@ -199,6 +194,8 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     return this._sortedInputs;
   }
 
+  private manualAttach: boolean;
+
   /**
    * Tracks the attachment MutationObserver.
    */
@@ -239,7 +236,10 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
    * Call this method **once**, when the page is fully loaded, to attach to all page elements
    * eligible to serve as context for Keyman keyboard input.
    */
-  install() {
+  install(manualAttach: boolean) {
+    // Do before _SetupDocument!
+    this.manualAttach = manualAttach;
+
     this._SetupDocument(document.documentElement);
 
     // KMW 16.0 and before:  these were only ever established for the top-level doc, and so for
@@ -247,7 +247,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     //
     // That said, for future consideration:  enable it within iframe-internal documents too.
     if(this.options.isTopLevel) {
-      this.initMutationObservers(this.document, this.options.attachType == 'manual');
+      this.initMutationObservers(this.document, manualAttach);
     }
   }
 
@@ -558,7 +558,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
             embeddedPageAttachment.on('enabled', (elem) => this.emit('enabled', elem));
             embeddedPageAttachment.on('disabled', (elem) => this.emit('disabled', elem));
 
-            embeddedPageAttachment.install();
+            embeddedPageAttachment.install(this.manualAttach);
           }
         }
       }
@@ -735,6 +735,44 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
 
     // Return the sorted element list
     this._sortedInputs=tList;
+  }
+
+  /**
+   * Move focus to next (or previous) input or text area element on TAB
+   *   Uses list of actual input elements
+   *
+   *   Note that activeElement() on touch devices returns the DIV that overlays
+   *   the input element, not the element itself.
+   *
+   * @param      {number|boolean}  bBack     Direction to move (0 or 1)
+   */
+  findNeighboringInput(activeBase: HTMLElement, bBack: number|boolean) {
+    var i,t=this.sortedInputs;
+
+    if(t.length == 0) {
+      return null;
+    }
+
+    // Identify the active element in the list of inputs ordered by position
+    for(i=0; i<t.length; i++) {
+      if(t[i] == activeBase) {
+        break;
+      }
+    }
+
+    // If the array is empty or does not hold the element, reverse by one so that
+    // either the last (bBack: true) or the first (bBack: false) element is selected.
+    if(i == t.length && !bBack) { // otherwise, ... "or the second".
+      i--;
+    }
+
+    // Find the next (or previous) element in the list
+    i = bBack ? i-1 : i+1;
+    // Treat the list as circular, wrapping the index if necessary.
+    i = i >= t.length ? i-t.length : i;
+    i = i < 0 ? i+t.length : i;
+
+    return t[i];
   }
 
 

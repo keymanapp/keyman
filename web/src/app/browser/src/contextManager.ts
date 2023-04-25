@@ -2,6 +2,7 @@ import { type Keyboard, Mock } from '@keymanapp/keyboard-processor';
 import { type KeyboardStub } from 'keyman/engine/package-cache';
 import { CookieSerializer } from 'keyman/engine/dom-utils';
 import { OutputTarget } from 'keyman/engine/element-wrappers';
+import { PageContextAttachment } from 'keyman/engine/attachment';
 import {
   ContextManagerBase,
   type KeyboardInterface
@@ -18,6 +19,23 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   private config: BrowserConfiguration;
   private cookieManager = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
   readonly focusAssistant = new FocusAssistant();
+  readonly page: PageContextAttachment;
+
+  constructor(engineConfig: BrowserConfiguration) {
+    super(engineConfig);
+
+    this.page = new PageContextAttachment(window.document, {
+      hostDevice: this.config.hostDevice,
+      isTopLevel: true
+    });
+
+    this.engineConfig.deferForInitialization.then(() => {
+      // TODO: set up attachment-listeners here that can add necessary event-hooks
+      // for focus management here!
+
+      this.page.install(this.engineConfig.attachType == 'manual');
+    });
+  }
 
   initialize(): void {
     this.on('keyboardasyncload', (stub, completion) => {
