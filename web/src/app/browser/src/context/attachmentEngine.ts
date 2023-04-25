@@ -616,8 +616,8 @@ export class AttachmentEngine extends EventEmitter<EventMap> {
   // TODO: email and url types should perhaps use default keyboard only
   listInputs() {
     let eList: SortableInput[]=[];
-    let t1=document.getElementsByTagName<'input'>('input');
-    let t2=document.getElementsByTagName<'textarea'>('textarea');
+    let t1=document.getElementsByTagName('input');
+    let t2=document.getElementsByTagName('textarea');
 
     for(let i=0; i<t1.length; i++) {
       switch(t1[i].type) {
