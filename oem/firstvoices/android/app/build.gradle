@@ -9,6 +9,7 @@ apply from: "$rootPath/version.gradle"
 
 android {
     compileSdkVersion 33
+    namespace="com.firstvoices.keyboards"
 
     defaultConfig {
         applicationId "com.firstvoices.keyboards"
