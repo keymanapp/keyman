@@ -1,7 +1,7 @@
 import { type Keyboard, Mock } from '@keymanapp/keyboard-processor';
 import { type KeyboardStub } from 'keyman/engine/package-cache';
 import { CookieSerializer } from 'keyman/engine/dom-utils';
-import { PageContextAttachment } from 'keyman/engine/attachment';
+import { eventOutputTarget, PageContextAttachment } from 'keyman/engine/attachment';
 import { LegacyEventEmitter } from 'keyman/engine/events';
 import { DesignIFrame, OutputTarget, nestedInstanceOf } from 'keyman/engine/element-wrappers';
 import {
@@ -14,42 +14,6 @@ import { FocusAssistant } from './context/focusAssistant.js';
 
 interface KeyboardCookie {
   current: string;
-}
-
-/**
- * Given a DOM event related to an KMW-attached element, this function determines
- * the corresponding OutputTarget.
- * @param e
- * @returns
- */
-function eventOutputTarget(e: Event) {
-  // Step 1:  given the event target...
-  let Ltarg: HTMLElement = e?.target as HTMLElement;
-  if (Ltarg == null) {
-    return null;
-  }
-  // ... determine the element expected to hold the KMW attachment object based on
-  // its typing, properties, etc.
-
-  // if(Ltarg['body']) {
-  //   Ltarg = Ltarg['body']; // Occurs in Firefox for design-mode iframes.
-  // }
-
-  if (Ltarg.nodeType == 3) { // defeat Safari bug
-    Ltarg = Ltarg.parentNode as HTMLElement;
-  }
-
-  // Verify that the element does correspond to a remappable input field
-  if(nestedInstanceOf(Ltarg, "HTMLInputElement")) {
-    const et=(Ltarg as HTMLInputElement).type.toLowerCase();
-    if(!(et == 'text' || et == 'search')) {
-      return null;
-    }
-  }
-
-  // Step 2:  With the most likely host element determined, obtain the corresponding OutputTarget
-  // instance.
-  return Ltarg._kmwAttachment.interface;
 }
 
 /**
