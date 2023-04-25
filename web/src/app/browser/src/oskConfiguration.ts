@@ -22,7 +22,7 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
   osk.on('hideRequested', (key) => { // K_ROPT
     if(osk) {
       osk.startHide(true);
-      contextManager.clearActiveTarget();
+      contextManager.forgetActiveTarget();
     }
   });
 

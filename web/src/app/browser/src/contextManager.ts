@@ -140,7 +140,12 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     return this.mostRecentTarget;
   }
 
-  public clearActiveTarget() {
+  public deactivateCurrentTarget() {
+    this.currentTarget = null;
+    // TODO: Not in original, pre-modularized form... but should probably also _ControlBlur?
+  }
+
+  public forgetActiveTarget() {
     this.focusAssistant.maintainingFocus = false;
     this.focusAssistant.restoringFocus = false;
 
