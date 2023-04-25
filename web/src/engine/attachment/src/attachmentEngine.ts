@@ -145,8 +145,19 @@ interface EventMap {
  * gain attachment.
  */
 export class AttachmentEngine extends EventEmitter<EventMap> {
+  // Note:  we only seem to rely on `device.touchable` within this class?  None of the other properties.
   readonly device: DeviceSpec;
-  readonly inputList: HTMLElement[] = [];
+
+  // Only used for `shutdown`; order doesn't matter.
+  private _inputList: HTMLElement[] = [];
+
+  public get inputList(): HTMLElement[] {
+    return this._inputList;
+  }
+
+  // Useful for `moveToNext` operations:  order matters.
+  // Note that it only includes `input` and `textarea` elements of the top-level document!
+  // Anything in embedded iframes is ignored for this.
   private _sortedInputs: HTMLElement[] = [];
 
   public get sortedInputs(): ReadonlyArray<HTMLElement> {
