@@ -273,6 +273,7 @@ _builder_expand_shorthand() {
   shift
   local count=0
   local result=
+  local string=
   for e; do
     if [[ $e == $item ]]; then
       # Exact match trumps substring matches
@@ -282,11 +283,10 @@ _builder_expand_shorthand() {
     if [[ $e == "$item"* ]]; then
       count=$((count+1))
       if [[ $count == 2 ]]; then
-        printf "$result"
-        printf ", $e"
+        string="$result, $e"
         result=$item
       elif [[ $count -gt 2 ]]; then
-        printf ", $e"
+        string="$string, $e"
       else
         result=$e
       fi
@@ -296,7 +296,7 @@ _builder_expand_shorthand() {
   if [[ $count -lt 2 ]]; then
     echo $result
   else
-    echo
+    echo $string
   fi
   return $count
 }
