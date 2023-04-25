@@ -155,12 +155,9 @@ export interface PageAttachmentOptions {
  */
 
 /**
- * Given a fully-loaded page's `window.document`, this class is responsible for Keyman Engine for Web's
+ * This class is responsible for Keyman Engine for Web's
  * "attachment" mechanism, which is used to hook into page elements to determine
  * the user's active context and to receive any keystrokes said context receives.
- *
- * Precondition: the provided `Document` instance corresponds to a fully loaded,
- * `.readyState == "complete"` page.
  */
 export class PageContextAttachment extends EventEmitter<EventMap> {
   // Note:  we only seem to rely on `device.touchable` within this class?  None of the other properties.
@@ -219,6 +216,12 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
 
   // Fields & properties done; now for the 'meat'.
 
+  /**
+   * Prepares the page context-attachment instance for the corresponding document.
+   * Does not actually attach until `.attach()` is called.
+   * @param document
+   * @param options
+   */
   constructor(document: Document, options: PageAttachmentOptions) {
     if(!document) {
       throw new Error("Cannot attach to a null/undefined document");
@@ -227,15 +230,24 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     super();
     this.options = options;
     this.document = document;
+  }
 
+  // Note:  `install()` must be separate from construction - otherwise, there's no time
+  // interval available to attach event handlers before the attachment process begins.
+
+  /*
+   * Call this method **once**, when the page is fully loaded, to attach to all page elements
+   * eligible to serve as context for Keyman keyboard input.
+   */
+  install() {
     this._SetupDocument(document.documentElement);
 
     // KMW 16.0 and before:  these were only ever established for the top-level doc, and so for
     // 17.0 we'll keep it that way initially.
     //
     // That said, for future consideration:  enable it within iframe-internal documents too.
-    if(options.isTopLevel) {
-      this.initMutationObservers(this.document, options.attachType == 'manual');
+    if(this.options.isTopLevel) {
+      this.initMutationObservers(this.document, this.options.attachType == 'manual');
     }
   }
 
@@ -545,6 +557,8 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
             // Forward any attached elements from the embedded page as if we attached them directly.
             embeddedPageAttachment.on('enabled', (elem) => this.emit('enabled', elem));
             embeddedPageAttachment.on('disabled', (elem) => this.emit('disabled', elem));
+
+            embeddedPageAttachment.install();
           }
         }
       }
