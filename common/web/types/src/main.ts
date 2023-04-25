@@ -28,3 +28,5 @@ export { TouchLayoutFileWriter, TouchLayoutFileWriterOptions } from './keyman-to
 export * as KPJ from './kpj/kpj-file.js';
 export { KPJFileReader } from './kpj/kpj-file-reader.js';
 export { KeymanDeveloperProject } from './kpj/keyman-developer-project.js';
+
+export * as util from './util/util.js';

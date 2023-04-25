@@ -66,3 +66,19 @@ export function unescapeString(s: string): string {
 
   return s;
 }
+
+/**
+ * This function operates similarly to Node's path.basename(); unlike
+ * path.basename(), it currently requires the ext parameter.
+ * @param name a pathname, which should end in ext, e.g. "/tmp/file.xml" or "C:\temp\file.xml"
+ * @param ext  a file extension. including initial period, such as ".xml"
+ * @returns the base name without path or extension
+ */
+export function basename(name: string, ext: string) {
+  const basenameRegexp = new RegExp("([\\/\\\\]|^)([^\\/\\\\]+)\\"+ext+"$", "i");
+  const m = name.match(basenameRegexp);
+  if(!m) {
+    return null;
+  }
+  return m[2];
+}
