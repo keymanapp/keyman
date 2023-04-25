@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.94 alpha 2023-04-25
+
+* fix(android/engine): Update InApp input connection (#8647)
+* chore(common): Move the_99 test fixture keyboard (#8660)
+* chore(android): Move namespace to Gradle files (#8667)
+
 ## 17.0.93 alpha 2023-04-24
 
 * feat(common): kmx file reader (#8641)
