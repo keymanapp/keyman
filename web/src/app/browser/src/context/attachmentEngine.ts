@@ -807,10 +807,9 @@ export class AttachmentEngine extends EventEmitter<EventMap> {
       if(!this.keyman.util.device.touchable) {
         this.listInputs();
       } else if(this.keyman.util.device.touchable) {   // If something was added or removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
-        var domManager = this;
-        window.setTimeout(function() {
-          domManager.listInputs();
-        }.bind(this), 1);
+        window.setTimeout(() => {
+          this.listInputs();
+        }, 1);
       }
     }
   }.bind(this);
