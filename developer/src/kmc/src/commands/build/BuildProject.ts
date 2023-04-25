@@ -94,8 +94,7 @@ class ProjectBuilder {
     try {
       reader.validate(kpj, schema);
     } catch(e) {
-      // TODO: callbacks.reportMessage
-      console.error(e);
+      this.callbacks.reportMessage(InfrastructureMessages.Error_InvalidProjectFile({message: (e??'').toString()}));
       return null;
     }
     const project = reader.transform(this.infile, kpj);
@@ -116,16 +115,15 @@ class ProjectBuilder {
     const options = {...this.options};
     options.outFile = this.project.resolveOutputFilePath(this.infile, file, activity.sourceExtension, activity.compiledExtension);
     const infile = this.project.resolveInputFilePath(this.infile, file);
-    // TODO: callbacks.reportMessage, improve logging and make consistent
-    console.log(`Building ${infile}\n  Output ${options.outFile}`);
+    this.callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename: infile}));
 
     fs.mkdirSync(path.dirname(options.outFile), {recursive:true});
 
     let result = await activity.build(infile, this.callbacks, options);
     if(result) {
-      console.log(`${path.basename(infile )} built successfully.`);
+      this.callbacks.reportMessage(InfrastructureMessages.Info_FileBuiltSuccessfully({filename: path.basename(infile)}));
     } else {
-      console.log(`${path.basename(infile)} failed to build.`);
+      this.callbacks.reportMessage(InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename: path.basename(infile)}));
     }
     return result;
   }

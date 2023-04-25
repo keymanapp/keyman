@@ -35,5 +35,9 @@ export class InfrastructureMessages {
   static Info_FileNotBuiltSuccessfully = (o:{filename:string}) => m(this.INFO_FileNotBuiltSuccessfully,
     `${o.filename} failed to build.`);
   static INFO_FileNotBuiltSuccessfully = SevInfo | 0x0007;
+
+  static Error_InvalidProjectFile = (o:{message:string}) => m(this.ERROR_InvalidProjectFile,
+    `Project file is not valid: ${o.message}`);
+  static ERROR_InvalidProjectFile = SevError | 0x0008;
 }
 

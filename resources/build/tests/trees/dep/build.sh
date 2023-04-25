@@ -12,23 +12,19 @@ cd "$THIS_SCRIPT_PATH"
 
 # Test builder_describe_outputs and dependencies
 
-project=child1
+project=dep
 
 builder_describe "$project test module" \
-  "@../dep" \
   clean \
   configure \
-  build \
-  test \
-  install \
-  error
+  build
 
 builder_parse "$@"
 
-if ! builder_is_child_build; then
-  builder_die "FAIL: builder_is_child_build should return true but was $_builder_is_child for a child script"
+if builder_is_child_build; then
+  builder_die "FAIL: builder_is_child_build should return false but was $_builder_is_child for a dependency script"
 else
-  builder_echo "PASS: builder_is_child_build is true ($_builder_is_child) for the child script"
+  builder_echo "PASS: builder_is_child_build is false ($_builder_is_child) for the dependency script"
 fi
 
 function test_action() {
@@ -43,9 +39,3 @@ function test_action() {
 test_action clean
 test_action configure
 test_action build
-test_action test
-test_action install
-
-if builder_start_action error; then
-  builder_die "This error action is supposed to die"
-fi

@@ -394,6 +394,7 @@ _builder_execute_child() {
 
   "$script" $action \
     --builder-child \
+    $_builder_build_deps \
     ${child_options[@]} \
     $builder_verbose \
     $builder_debug \

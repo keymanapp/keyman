@@ -1,5 +1,35 @@
 # Keyman Version History
 
+## 17.0.93 alpha 2023-04-24
+
+* feat(common): kmx file reader (#8641)
+* feat(developer): support FollowKeyboardVersion in kmc-package (#8642)
+* chore(common): Update crowdin strings for Simplified Chinese (#8653)
+* fix(common): builder - pass deps flags to child scripts (#8654)
+* feat(developer): use CompilerEvent for messages in all of kmc (#8651)
+* chore(developer): fixup deps for kmc modules (#8652)
+* feat(core): ldml repertoire test, initial ICU integration (#8441)
+
+## 17.0.92 alpha 2023-04-21
+
+* fix(developer): kmc-package path reference (#8634)
+* chore(developer): only run keyboards-repo tests for a full-test (#8635)
+* refactor(developer): move comperr.h to kmn_compiler_errors.h (#8636)
+* refactor(developer): kmc-model to use `CompilerEvent` (#8637)
+
+## 17.0.91 alpha 2023-04-20
+
+* fix(developer): kmc-kmn would abort build on warnings (#8617)
+* fix(developer): kmc no longer emits double file extension for models (#8618)
+* refactor(developer): move build activities (#8622)
+* feat(developer): add warning options to kmc (#8623)
+* feat(developer): use new message infrastructure in kmc-kmn (#8625)
+* refactor(developer): move shared test helpers into common (#8626)
+* feat(developer): add CompilerMessages support to kmc-package (#8627)
+* feat(developer): warn if .kps file includes a non-binary .kvk file (#8628)
+* chore(web): sets kmc-model as dependency of input-processor test action (#8629)
+* fix(android/engine): Fix resetContext calls when selection changes (#8611)
+
 ## 17.0.90 alpha 2023-04-19
 
 * chore(android/engine): Cleanup old SDK calls (#8612)
