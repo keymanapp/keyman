@@ -130,34 +130,72 @@ interface EventMap {
   'disabled': (obj: HTMLElement) => void;
 }
 
-/**
- * Given a page `Document`, this class is responsible for Keyman Engine for Web's
- * "attachment" mechanism, which is used to hook into page elements to determine
- * the user's active context and to receive any keystrokes said context receives.
- *
- * In its current form, note that this engine requires an initial reference
- * to the top-level `document.body` element in order to get started - this should
- * be passed into the _SetupDocument method.  (Named so for legacy, pre-modularization
- * reasons.)
- *
+export interface PageAttachmentOptions {
+  /**
+   * The DeviceSpec metadata for the actual device hosting the active webpage.
+   */
+  hostDevice: DeviceSpec;
+
+  /**
+   * The KMW init() option, as set for the page.
+   */
+  attachType: 'manual' | 'auto';
+
+  /**
+   * Should only be set to `true` for the top-level page.  Should be `false` for
+   * any pages embedded in another page via iframe.
+   */
+  isTopLevel: boolean;
+}
+
+/*
  * Note:  part of this class's design is to facilitate unit testing for the core
  * attachment algorithm - for validating the logic that determines which elements
  * gain attachment.
  */
-export class AttachmentEngine extends EventEmitter<EventMap> {
+
+/**
+ * Given a fully-loaded page's `window.document`, this class is responsible for Keyman Engine for Web's
+ * "attachment" mechanism, which is used to hook into page elements to determine
+ * the user's active context and to receive any keystrokes said context receives.
+ *
+ * Precondition: the provided `Document` instance corresponds to a fully loaded,
+ * `.readyState == "complete"` page.
+ */
+export class PageContextAttachment extends EventEmitter<EventMap> {
   // Note:  we only seem to rely on `device.touchable` within this class?  None of the other properties.
-  readonly device: DeviceSpec;
+  private readonly options: PageAttachmentOptions;
+
+  public get device(): DeviceSpec {
+    return this.options.hostDevice;
+  }
+
+  public readonly document: Document;
+
+  public get window(): Window {
+    return this.document.defaultView;
+  }
+
+  private embeddedPageContexts: PageContextAttachment[] = [];
 
   // Only used for `shutdown`; order doesn't matter.
   private _inputList: HTMLElement[] = [];
 
   public get inputList(): HTMLElement[] {
-    return this._inputList;
+    let embeddedInputs = this.embeddedPageContexts.map(
+      // Gets the input list for any pages embedded via iframe
+      (embeddedPage) => embeddedPage.inputList
+    ).reduce(
+      // Flattens the resulting arrays into a 1D array.
+      (flattenedInputList, pageInputList) => flattenedInputList.concat(pageInputList), []
+    );
+
+    return [...this._inputList, ...embeddedInputs];
   }
 
   // Useful for `moveToNext` operations:  order matters.
   // Note that it only includes `input` and `textarea` elements of the top-level document!
-  // Anything in embedded iframes is ignored for this.
+  // Anything in embedded iframes was always ignored for this.
   private _sortedInputs: HTMLElement[] = [];
 
   public get sortedInputs(): ReadonlyArray<HTMLElement> {
@@ -179,24 +217,26 @@ export class AttachmentEngine extends EventEmitter<EventMap> {
    */
   private inputModeObserver: MutationObserver;
 
-  constructor(device: DeviceSpec) {
+  // Fields & properties done; now for the 'meat'.
+
+  constructor(document: Document, options: PageAttachmentOptions) {
+    if(!document) {
+      throw new Error("Cannot attach to a null/undefined document");
+    }
+
     super();
-    this.device = device;
-  }
+    this.options = options;
+    this.document = document;
 
-  init() {
-    this.inputModeObserver = new MutationObserver(this._InputModeObserverCore);
-    this.enableInputModeObserver();
-  }
+    this._SetupDocument(document.documentElement);
 
-  enableInputModeObserver() {
-    const observationTarget = document.querySelector('body');
-    const observationConfig = { subtree: true, attributes: true, attributeFilter: ['inputmode'] };
-    this.inputModeObserver?.observe(observationTarget, observationConfig);
-  }
-
-  disableInputModeObserver() {
-    this.inputModeObserver?.disconnect();
+    // KMW 16.0 and before:  these were only ever established for the top-level doc, and so for
+    // 17.0 we'll keep it that way initially.
+    //
+    // That said, for future consideration:  enable it within iframe-internal documents too.
+    if(options.isTopLevel) {
+      this.initMutationObservers(this.document, options.attachType == 'manual');
+    }
   }
 
   /**
@@ -485,7 +525,7 @@ export class AttachmentEngine extends EventEmitter<EventMap> {
      */
   _AttachToIframe(Pelem: HTMLIFrameElement) {
     try {
-      var Lelem=Pelem.contentWindow.document;
+      const Lelem=Pelem.contentWindow.document;
       /* editable Iframe */
       if(Lelem) {
         if(Lelem.designMode.toLowerCase() == 'on') {
@@ -493,13 +533,22 @@ export class AttachmentEngine extends EventEmitter<EventMap> {
           this.setupElementAttachment(Pelem);
           Lelem.body._kmwAttachment = Pelem._kmwAttachment;
         } else {
-          // Lelem is the IFrame's internal document; set 'er up!
-          this._SetupDocument(Lelem.body);	   // I2404 - Manage IE events in IFRAMEs
+          // If already attached, do not attempt to attach again.
+          if(this.embeddedPageContexts.filter((context) => context.document == Lelem).length == 0) {
+            // Lelem is the IFrame's internal document; set 'er up!
+            let embeddedPageAttachment = new PageContextAttachment(Lelem, {
+              ...this.options,
+              isTopLevel: false
+            });
+
+            this.embeddedPageContexts.push(embeddedPageAttachment);
+            // Forward any attached elements from the embedded page as if we attached them directly.
+            embeddedPageAttachment.on('enabled', (elem) => this.emit('enabled', elem));
+            embeddedPageAttachment.on('disabled', (elem) => this.emit('disabled', elem));
+          }
         }
       }
-    }
-    catch(err)
-    {
+    } catch(err) {
       // do not attempt to attach to the iframe as it is from another domain - XSS denied!
     }
   }
@@ -512,7 +561,7 @@ export class AttachmentEngine extends EventEmitter<EventMap> {
    */
   _DetachFromIframe(Pelem: HTMLIFrameElement) {
     try {
-      var Lelem=Pelem.contentWindow.document;
+      const Lelem=Pelem.contentWindow.document;
       /* editable Iframe */
       if(Lelem) {
         if(Lelem.designMode.toLowerCase() == 'on') {
@@ -520,13 +569,20 @@ export class AttachmentEngine extends EventEmitter<EventMap> {
           this.clearElementAttachment(Pelem);
           Lelem.body._kmwAttachment = null; // is an extra step needed for this case.
         } else {
-          // Lelem is the IFrame's internal document; set 'er up!
-          this._ClearDocument(Lelem.body);	   // I2404 - Manage IE events in IFRAMEs
+          // If already attached, do not attempt to attach again.
+          for(let i=0; i < this.embeddedPageContexts.length; i++) {
+            if(this.embeddedPageContexts[i].document == Lelem) {
+              // Pops the entry from the array and maintains a reference to it.
+              const embeddedPageAttachment = this.embeddedPageContexts.splice(i, 1)[0];
+
+              embeddedPageAttachment._ClearDocument(Lelem.body); // I2404 - Manage IE events in IFRAMEs
+              // The events defined in _AttachToIframe will still forward during `shutdown`.
+              embeddedPageAttachment.shutdown();
+            }
+          }
         }
       }
-    }
-    catch(err)
-    {
+    } catch(err) {
       // do not attempt to attach to the iframe as it is from another domain - XSS denied!
     }
   }
@@ -724,7 +780,7 @@ export class AttachmentEngine extends EventEmitter<EventMap> {
    * @param       {Element}     Pelem - the root element of a document, including IFrame documents.
    * Description  Used to automatically attach KMW to editable controls, regardless of control path.
    */
-  _SetupDocument(Pelem: HTMLElement) { // I1961
+  private _SetupDocument(Pelem: HTMLElement) { // I1961
     let possibleInputs = this._GetDocumentEditables(Pelem);
 
     for(var Li = 0; Li < possibleInputs.length; Li++) {
@@ -740,7 +796,7 @@ export class AttachmentEngine extends EventEmitter<EventMap> {
    * Description  Used to automatically detach KMW from editable controls, regardless of control path.
    *              Mostly used to clear out all controls of a detached IFrame.
    */
-  _ClearDocument(Pelem: HTMLElement) { // I1961
+  private _ClearDocument(Pelem: HTMLElement) { // I1961
     let possibleInputs = this._GetDocumentEditables(Pelem);
 
     for(var Li = 0; Li < possibleInputs.length; Li++) {
@@ -750,7 +806,7 @@ export class AttachmentEngine extends EventEmitter<EventMap> {
   }
 
 
-  _EnablementMutationObserverCore = function(mutations: MutationRecord[]) {
+  _EnablementMutationObserverCore = (mutations: MutationRecord[]) => {
     for(var i=0; i < mutations.length; i++) {
       var mutation = mutations[i];
 
@@ -759,9 +815,9 @@ export class AttachmentEngine extends EventEmitter<EventMap> {
       var disabledAfter = (mutation.target as HTMLElement).className.indexOf('kmw-disabled') >= 0;
 
       if(disabledBefore && !disabledAfter) {
-        this._EnableControl(mutation.target);
+        this._EnableControl(mutation.target as HTMLElement);
       } else if(!disabledBefore && disabledAfter) {
-        this._DisableControl(mutation.target);
+        this._DisableControl(mutation.target as HTMLElement);
       }
 
       // 'readonly' triggers on whether or not the attribute exists, not its value.
@@ -774,28 +830,28 @@ export class AttachmentEngine extends EventEmitter<EventMap> {
           var readonlyAfter = elem.readOnly;
 
           if(readonlyBefore && !readonlyAfter) {
-            this._EnableControl(mutation.target);
+            this._EnableControl(mutation.target as HTMLElement);
           } else if(!readonlyBefore && readonlyAfter) {
-            this._DisableControl(mutation.target);
+            this._DisableControl(mutation.target as HTMLElement);
           }
         }
       }
     }
-  }.bind(this);
+  };
 
-  _AutoAttachObserverCore = function(mutations: MutationRecord[]) {
+  _AutoAttachObserverCore = (mutations: MutationRecord[]) => {
     var inputElementAdditions = [];
     var inputElementRemovals = [];
 
     for(var i=0; i < mutations.length; i++) {
-      var mutation = mutations[i];
+      let mutation = mutations[i];
 
       for(var j=0; j < mutation.addedNodes.length; j++) {
-        inputElementAdditions = inputElementAdditions.concat(this._GetDocumentEditables(mutation.addedNodes[j]));
+        inputElementAdditions = inputElementAdditions.concat(this._GetDocumentEditables(mutation.addedNodes[j] as HTMLElement));
       }
 
       for(j = 0; j < mutation.removedNodes.length; j++) {
-        inputElementRemovals = inputElementRemovals.concat(this._GetDocumentEditables(mutation.removedNodes[j]));
+        inputElementRemovals = inputElementRemovals.concat(this._GetDocumentEditables(mutation.removedNodes[j] as HTMLElement));
       }
     }
 
@@ -815,15 +871,15 @@ export class AttachmentEngine extends EventEmitter<EventMap> {
       * if any have actually occurred.
       */
     if(inputElementAdditions.length || inputElementRemovals.length) {
-      if(!this.keyman.util.device.touchable) {
+      if(!this.device.touchable) {
         this.listInputs();
-      } else if(this.keyman.util.device.touchable) {   // If something was added or removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
+      } else if(this.device.touchable) {   // If something was added or removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
         window.setTimeout(() => {
           this.listInputs();
         }, 1);
       }
     }
-  }.bind(this);
+  };
 
   /**
    * Function     _MutationAdditionObserved
@@ -932,13 +988,35 @@ export class AttachmentEngine extends EventEmitter<EventMap> {
       observationConfig = { subtree: true, attributes: true, attributeOldValue: true, attributeFilter: ['class', 'readonly']};
       this.enablementObserver = new MutationObserver(this._EnablementMutationObserverCore);
       this.enablementObserver.observe(observationTarget, observationConfig);
+
+      this.inputModeObserver = new MutationObserver(this._InputModeObserverCore);
+      this.enableInputModeObserver();
     } else {
       console.warn("Your browser is outdated and does not support MutationObservers, a web feature " +
         "needed by KeymanWeb to support dynamically-added elements.");
     }
   }
 
+  enableInputModeObserver() {
+    const observationTarget = document.querySelector('body');
+    const observationConfig = { subtree: true, attributes: true, attributeFilter: ['inputmode'] };
+    this.inputModeObserver?.observe(observationTarget, observationConfig);
+  }
+
+  disableInputModeObserver() {
+    this.inputModeObserver?.disconnect();
+  }
+
   shutdown() {
+    // Embedded pages first - that way, each page can handle its own inputs, rather than having
+    // the top-level instance handle all attached elements.
+    // (inputList enumerates child pages, too!)
+    this.embeddedPageContexts.forEach((embeddedPage) => {
+      try {
+        embeddedPage.shutdown();
+      } catch (e) {}
+    });
+
     try {
       if(this.enablementObserver) {
         this.enablementObserver.disconnect();

@@ -22,6 +22,7 @@ SUBPROJECT_NAME=engine/attachment
 # ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web (KMW) attachment engine." \
+  "@/web/src/engine/dom-utils" \
   "@/web/src/engine/element-wrappers" \
   "clean" \
   "configure" \
