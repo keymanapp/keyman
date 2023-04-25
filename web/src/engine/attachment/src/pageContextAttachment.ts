@@ -698,6 +698,48 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     }
   }
 
+
+  /**
+   * Function     disableControl
+   * Scope        Public
+   * @param       {Element}      Pelem       Element to be disabled
+   * Description  Disables a KMW control element
+   */
+  disableControl(Pelem: HTMLElement) {
+    if(!this.isAttached(Pelem)) {
+      console.warn("KeymanWeb is not attached to element " + Pelem);
+    }
+
+    var cn = Pelem.className;
+    if(cn.indexOf('kmw-disabled') < 0) { // if not already explicitly disabled...
+      Pelem.className = cn ? cn + ' kmw-disabled' : 'kmw-disabled';
+    }
+
+    // The rest is triggered within MutationObserver code.
+    // See _EnablementMutationObserverCore.
+  }
+
+  /**
+   * Function     enableControl
+   * Scope        Public
+   * @param       {Element}      Pelem       Element to be disabled
+   * Description  Disables a KMW control element
+   */
+  enableControl(Pelem: HTMLElement) {
+    if(!this.isAttached(Pelem)) {
+      console.warn("KeymanWeb is not attached to element " + Pelem);
+    }
+
+    var cn = Pelem.className;
+    var tagIndex = cn.indexOf('kmw-disabled');
+    if(tagIndex >= 0) { // if already explicitly disabled...
+      Pelem.className = cn.replace('kmw-disabled', '').trim();
+    }
+
+    // The rest is triggered within MutationObserver code.
+    // See _EnablementMutationObserverCore.
+  }
+
   // Create an ordered list of all text and search input elements and textarea elements
   // except any tagged with class 'kmw-disabled'
   // TODO: email and url types should perhaps use default keyboard only
@@ -987,47 +1029,6 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
 
     this.disableInputElement(Pelem); // Remove all KMW event hooks, styling.
     this.clearElementAttachment(element);  // Memory management & auto de-attachment upon removal.
-  }
-
-  /**
-   * Function     disableControl
-   * Scope        Public
-   * @param       {Element}      Pelem       Element to be disabled
-   * Description  Disables a KMW control element
-   */
-  disableControl(Pelem: HTMLElement) {
-    if(!this.isAttached(Pelem)) {
-      console.warn("KeymanWeb is not attached to element " + Pelem);
-    }
-
-    var cn = Pelem.className;
-    if(cn.indexOf('kmw-disabled') < 0) { // if not already explicitly disabled...
-      Pelem.className = cn ? cn + ' kmw-disabled' : 'kmw-disabled';
-    }
-
-    // The rest is triggered within MutationObserver code.
-    // See _EnablementMutationObserverCore.
-  }
-
-  /**
-   * Function     enableControl
-   * Scope        Public
-   * @param       {Element}      Pelem       Element to be disabled
-   * Description  Disables a KMW control element
-   */
-  enableControl(Pelem: HTMLElement) {
-    if(!this.isAttached(Pelem)) {
-      console.warn("KeymanWeb is not attached to element " + Pelem);
-    }
-
-    var cn = Pelem.className;
-    var tagIndex = cn.indexOf('kmw-disabled');
-    if(tagIndex >= 0) { // if already explicitly disabled...
-      Pelem.className = cn.replace('kmw-disabled', '').trim();
-    }
-
-    // The rest is triggered within MutationObserver code.
-    // See _EnablementMutationObserverCore.
   }
 
   // To be called by the object responsible for webpage-integration.
