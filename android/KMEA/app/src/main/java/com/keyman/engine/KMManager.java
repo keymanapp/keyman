@@ -158,7 +158,6 @@ public final class KMManager {
   };
 
   protected static InputMethodService IMService;
-  protected static InputConnection inappInputConnection; // Input Connection for InApp Keyboard
 
   private static boolean debugMode = false;
   private static boolean shouldAllowSetKeyboard = true;
@@ -461,16 +460,12 @@ public final class KMManager {
 
   /**
    * Get the input connection based on the keyboard type.
-   * For InApp keyboard, save the connection to inappInputConnection
    * @param {KeyboardType} keyboard
    * @return InputConnection
    */
   protected static InputConnection getInputConnection(KeyboardType keyboard) {
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      if (inappInputConnection == null) {
-        inappInputConnection = KMTextView.activeView.onCreateInputConnection(new EditorInfo());
-      }
-      return inappInputConnection;
+      return KMTextView.activeView.onCreateInputConnection(new EditorInfo());
     } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && IMService != null) {
       return IMService.getCurrentInputConnection();
     }
