@@ -49,6 +49,8 @@ while [[ $# -gt 0 ]] ; do
   shift
 done
 
+cd "$THIS_DIR"
+
 if $CLEAN; then
   if ! $QUIET; then
     echo Cleaning the_99.kmp from build/
