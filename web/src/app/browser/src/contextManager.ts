@@ -63,13 +63,6 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     this.page = new PageContextAttachment(window.document, {
       hostDevice: this.config.hostDevice
     });
-
-    this.engineConfig.deferForInitialization.then(() => {
-      // TODO: set up attachment-listeners here that can add necessary event-hooks
-      // for focus management here!
-
-      this.page.install(this.engineConfig.attachType == 'manual');
-    });
   }
 
   get apiEvents(): LegacyEventEmitter<LegacyAPIEvents> {
@@ -88,6 +81,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     this.engineConfig.deferForInitialization.then(() => {
       const device = this.engineConfig.hostDevice;
+
       const noPropagation = (event: Event) => event.stopPropagation()
 
       // For any elements being attached, or being enabled after having been disabled...
