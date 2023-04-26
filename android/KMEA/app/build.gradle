@@ -49,16 +49,6 @@ android {
             }
             systemProperty 'kmeaTestMode', 'true'
             workingDir = "../" // Defaults to the `app` subdirectory, which is different from Android Studio's default.
-
-            //Avoid Warning: an illegal reflective access operation has occurred
-            //Change argument jdk.module.illegalAccess=warn for detailed information which module needs to be opened
-            //Problem is caused by robolectric: see https://github.com/robolectric/robolectric/issues/4776
-            if(JavaVersion.current().isJava9Compatible()){
-                jvmArgs ('-Djdk.module.illegalAccess=permit')
-                jvmArgs('--add-opens', 'java.base/java.lang=ALL-UNNAMED')
-                jvmArgs('--add-opens', 'java.base/java.lang.reflect=ALL-UNNAMED')
-            }
-
         }
     }
 }
