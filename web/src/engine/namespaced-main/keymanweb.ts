@@ -117,10 +117,6 @@ if(!window['keyman']['initialized']) {
 
     util.attachDOMEvent(document, 'keyup', keymanweb.hotkeyManager._Process, false);
 
-    // We need to track this handler, as it causes... interesting... interactions during testing in certain browsers.
-    util.attachDOMEvent(window, 'focus', keymanweb.pageFocusHandler, false);  // I775
-    util.attachDOMEvent(window, 'blur', keymanweb.pageFocusHandler, false);   // I775
-
     // Initialize supplementary plane string extensions
     String.kmwEnableSupplementaryPlane(true);
 

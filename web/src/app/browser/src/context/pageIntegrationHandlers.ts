@@ -41,7 +41,7 @@ export class PageIntegrationHandlers {
     return this.engine.contextManager.focusAssistant;
   }
 
-  private suppressFocusCheck: (e: Event) => boolean = (e) => {
+  private suppressFocusCheck: (e: FocusEvent) => boolean = (e) => {
     if(this.focusAssistant._IgnoreBlurFocus) {
       // Prevent triggering other blur-handling events (as possible)
       e.stopPropagation();
@@ -49,6 +49,18 @@ export class PageIntegrationHandlers {
     }
     // But DO perform default event behavior (actually blurring & focusing the affected element)
     return true;
+  }
+
+  /**
+   * Reset context when entering or exiting the active element.
+   * Will also trigger OSK shift state / layer reset.
+   **/
+  private pageFocusHandler: (e: FocusEvent) => boolean = () => {
+    if(!this.focusAssistant.maintainingFocus && this.engine.osk?.vkbd) {
+      this.engine.contextManager.deactivateCurrentTarget();
+      this.engine.contextManager.resetContext();
+    }
+    return false;
   }
 
   // Sets up page-default touch-based handling for activation-state management.
@@ -124,6 +136,9 @@ export class PageIntegrationHandlers {
     const device = this.engine.config.hostDevice;
     const docBody = this.window.document.body;
 
+    eventTracker.attachDOMEvent(this.window, 'focus', this.pageFocusHandler, false);
+    eventTracker.attachDOMEvent(this.window, 'blur', this.pageFocusHandler, false);
+
     /*
      * To prevent propagation of focus & blur events from the input-scroll workaround,
      * we attach top-level capturing listeners to the focus & blur events.  They prevent propagation
@@ -146,6 +161,9 @@ export class PageIntegrationHandlers {
     const docBody = this.window.document.body;
 
     // See `attachHandlers` for the purpose behind all handlers listed here.
+
+    eventTracker.detachDOMEvent(this.window, 'focus', this.pageFocusHandler, false);
+    eventTracker.detachDOMEvent(this.window, 'blur', this.pageFocusHandler, false);
 
     eventTracker.detachDOMEvent(docBody, 'focus', this.suppressFocusCheck, true);
     eventTracker.detachDOMEvent(docBody, 'blur', this.suppressFocusCheck, true);
