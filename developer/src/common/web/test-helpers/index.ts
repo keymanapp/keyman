@@ -1,5 +1,6 @@
 import * as fs from 'fs';
-import { CompilerEvent, CompilerCallbacks, CompilerSchema } from '@keymanapp/common-types';
+import * as path from 'path';
+import { CompilerEvent, CompilerCallbacks, CompilerSchema, CompilerPathCallbacks, CompilerFileSystemCallbacks } from '@keymanapp/common-types';
 export { verifyCompilerMessagesObject } from './verifyCompilerMessagesObject.js';
 
 // TODO: schemas are only used by kmc-keyboard for now, so this works at this
@@ -24,8 +25,7 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
 
   /* CompilerCallbacks */
 
-  loadFile(baseFilename: string, filename: string | URL): Buffer {
-    // TODO: translate filename based on the baseFilename
+  loadFile(filename: string | URL): Buffer {
     try {
       return fs.readFileSync(filename);
     } catch(e) {
@@ -36,6 +36,31 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
       }
     }
   }
+
+  get path(): CompilerPathCallbacks {
+    return path;
+  }
+
+  get fs(): CompilerFileSystemCallbacks {
+    return fs;
+  }
+
+  resolveFilename(baseFilename: string, filename: string): string {
+    const basePath = path.dirname(baseFilename);
+    // Transform separators to platform separators -- we are agnostic
+    // in our use here but path prefers files may use
+    // either / or \, although older kps files were always \.
+    if(path.sep == '/') {
+      filename = filename.replace(/\\/g, '/');
+    } else {
+      filename = filename.replace(/\//g, '\\');
+    }
+    if(!path.isAbsolute(filename)) {
+      filename = path.resolve(basePath, filename);
+    }
+    return filename;
+  }
+
   reportMessage(event: CompilerEvent): void {
     // console.log(event.message);
     this.messages.push(event);

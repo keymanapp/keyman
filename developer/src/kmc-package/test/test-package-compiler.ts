@@ -37,11 +37,10 @@ describe('KmpCompiler', function () {
     // Test just the transform from kps to kmp.json
     //
     it(`should transform ${modelID}.model.kps to kmp.json`, function () {
-      let source = fs.readFileSync(kpsPath, 'utf-8');
       let kmpJson: KmpJsonFile;
 
       assert.doesNotThrow(() => {
-        kmpJson = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
+        kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
       });
 
       // Test that the kmp.json data is identical
@@ -55,10 +54,9 @@ describe('KmpCompiler', function () {
       //fs.writeFileSync(kmpJsonPath, JSON.stringify(kmpJson), 'utf-8');
     });
     it(`should build a full .kmp for ${modelID}`, async function() {
-      const source = fs.readFileSync(kpsPath, 'utf-8');
       const zip = JSZip();
       // Build kmp.json in memory
-      const kmpJson: KmpJsonFile = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
+      const kmpJson: KmpJsonFile = kmpCompiler.transformKpsToKmpObject(kpsPath);
       // Build file.kmp in memory
       const promise = kmpCompiler.buildKmpFile(kpsPath, kmpJson);
       promise.then(data => {
@@ -88,7 +86,6 @@ describe('KmpCompiler', function () {
     const kmpJsonRefPath = makePathToFixture('khmer_angkor', 'ref', 'kmp.json');
 
     const kmpCompiler = new KmpCompiler(callbacks);
-    const source = fs.readFileSync(kpsPath, 'utf-8');
     const kmpJsonFixture: KmpJsonFile = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
 
     // We override the fixture version so that we can compare with the compiler output
@@ -96,7 +93,7 @@ describe('KmpCompiler', function () {
 
     let kmpJson = null;
     assert.doesNotThrow(() => {
-      kmpJson = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
+      kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
     });
 
     const kmpData = await kmpCompiler.buildKmpFile(kpsPath, kmpJson);
@@ -133,12 +130,11 @@ describe('KmpCompiler', function () {
 
     const kpsPath = makePathToFixture('absolute_path', 'source', 'absolute_path.kps');
     const kmpCompiler = new KmpCompiler(callbacks);
-    const source = fs.readFileSync(kpsPath, 'utf-8');
 
     let kmpJson: KmpJsonFile = null;
 
     assert.doesNotThrow(() => {
-      kmpJson = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
+      kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
     });
 
     await assert.isNull(kmpCompiler.buildKmpFile(kpsPath, kmpJson));
@@ -159,9 +155,8 @@ describe('KmpCompiler', function () {
 
     const kpsPath = makePathToFixture(...fixture);
     const kmpCompiler = new KmpCompiler(callbacks);
-    const source = fs.readFileSync(kpsPath, 'utf-8');
 
-    let kmpJson = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
+    let kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
     if(kmpJson && callbacks.messages.length == 0) {
       // We'll try building the package if we have not yet received any messages
       kmpCompiler.buildKmpFile(kpsPath, kmpJson)

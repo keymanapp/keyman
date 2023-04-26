@@ -27,7 +27,7 @@ describe('KeymanWebCompiler', function() {
     assert.isTrue(valid, 'k.validate should not have failed');
 
     // Actual test: compile to javascript
-    const jsCompiler = new KeymanWebCompiler({debug: true});
+    const jsCompiler = new KeymanWebCompiler(compilerTestCallbacks, {debug: true});
     const output = jsCompiler.compile('basic.xml', source);
     assert.isNotNull(output);
 
@@ -36,7 +36,7 @@ describe('KeymanWebCompiler', function() {
     assert.strictEqual(output, outputFixture);
 
     // Second test: compile to javascript without debug formatting
-    const jsCompilerNoDebug = new KeymanWebCompiler({debug: false});
+    const jsCompilerNoDebug = new KeymanWebCompiler(compilerTestCallbacks, {debug: false});
     const outputNoDebug = jsCompilerNoDebug.compile('basic.xml', source);
     assert.isNotNull(outputNoDebug);
 

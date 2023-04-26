@@ -2,52 +2,10 @@ import 'mocha';
 import {assert} from 'chai';
 import { loadFile, makePathToFixture, loadSchema } from '../helpers/index.js';
 import LDMLKeyboardXMLSourceFileReader from '../../src/ldml-keyboard/ldml-keyboard-xml-reader.js';
-import { CompilerCallbacks, CompilerEvent, CompilerSchema } from '../../src/util/compiler-interfaces.js';
+import { CompilerEvent } from '../../src/util/compiler-interfaces.js';
 import { LDMLKeyboardXMLSourceFile } from '../../src/ldml-keyboard/ldml-keyboard-xml.js';
 import { LDMLKeyboardTestDataXMLSourceFile } from '../ldml-keyboard/ldml-keyboard-testdata-xml.js';
-
-// This is related to developer/src/kmc-keyboard/test/helpers/index.ts but has a slightly different API surface
-// as this runs at a lower level than the compiler.
-
-/**
- * A CompilerCallbacks implementation for testing
- */
-class TestCompilerCallbacks implements CompilerCallbacks {
-  loadSchema(schema: CompilerSchema): Buffer {
-    switch(schema) {
-      case 'kpj':
-        throw new Error('loadKpjJsonSchema not implemented.'); // not needed for this test
-      case 'kvks':
-        throw new Error('loadKvksJsonSchema not implemented.');
-      case 'ldml-keyboard':
-        return loadSchema(schema);
-      case 'ldml-keyboardtest':
-        return loadSchema(schema);
-    }
-  }
-  clear() {
-    this.messages = [];
-  }
-  debug(msg: string): void {
-    console.debug(msg);
-  }
-  messages: CompilerEvent[] = [];
-  loadFile(baseFilename: string, filename: string | URL): Buffer {
-    try {
-      return loadFile(baseFilename, filename);
-    } catch(e) {
-      if (e.code === 'ENOENT') {
-        return null;
-      } else {
-        throw e;
-      }
-    }
-  }
-  reportMessage(event: CompilerEvent): void {
-    // console.log(event.message);
-    this.messages.push(event);
-  }
-}
+import { TestCompilerCallbacks } from './TestCompilerCallbacks.js';
 
 export interface CompilationCase {
   /**
@@ -121,7 +79,7 @@ export function testReaderCases(cases : CompilationCase[]) {
     it(testHeading, function () {
       callbacks.clear();
 
-      const data = loadFile(testcase.subpath, makePathToFixture(testcase.subpath));
+      const data = loadFile(makePathToFixture(testcase.subpath));
       assert.ok(data, `reading ${testcase.subpath}`);
       const source = reader.load(data);
       if (!testcase.loadfail) {
@@ -172,7 +130,7 @@ export function testTestdataReaderCases(cases : TestDataCase[]) {
     it(testHeading, function () {
       callbacks.clear();
 
-      const data = loadFile(testcase.subpath, makePathToFixture(testcase.subpath));
+      const data = loadFile(makePathToFixture(testcase.subpath));
       assert.ok(data, `reading ${testcase.subpath}`);
       const source = reader.loadTestData(data);
       if (!testcase.loadfail) {

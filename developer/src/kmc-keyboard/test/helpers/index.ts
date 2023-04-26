@@ -47,7 +47,7 @@ afterEach(function() {
 export function loadSectionFixture(compilerClass: typeof SectionCompiler, filename: string, callbacks: TestCompilerCallbacks): Section {
   callbacks.messages = [];
   const inputFilename = makePathToFixture(filename);
-  const data = callbacks.loadFile(inputFilename, inputFilename);
+  const data = callbacks.loadFile(inputFilename);
   assert.isNotNull(data);
 
   const reader = new LDMLKeyboardXMLSourceFileReader(callbacks);

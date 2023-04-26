@@ -81,14 +81,14 @@ class ProjectBuilder {
 
   loadDefaultProjectFromFolder() {
     // The folder does not contain a .kpj, so construct a default 2.0 .kpj
-    const project = new KeymanDeveloperProject('2.0');
+    const project = new KeymanDeveloperProject('2.0', this.callbacks);
     project.populateFiles(this.infile);
     return project;
   }
 
   loadProjectFromFile(): KeymanDeveloperProject {
-    const kpjData = this.callbacks.loadFile(null, this.infile);
-    const reader = new KPJFileReader();
+    const kpjData = this.callbacks.loadFile(this.infile);
+    const reader = new KPJFileReader(this.callbacks);
     const kpj = reader.read(kpjData);
     const schema = this.callbacks.loadSchema('kpj');
     try {
@@ -113,8 +113,8 @@ class ProjectBuilder {
 
   async buildTarget(file: KeymanDeveloperProjectFile, activity: BuildActivity): Promise<boolean> {
     const options = {...this.options};
-    options.outFile = this.project.resolveOutputFilePath(this.infile, file, activity.sourceExtension, activity.compiledExtension);
-    const infile = this.project.resolveInputFilePath(this.infile, file);
+    options.outFile = this.project.resolveOutputFilePath(file, activity.sourceExtension, activity.compiledExtension);
+    const infile = this.project.resolveInputFilePath(file);
     this.callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename: infile}));
 
     fs.mkdirSync(path.dirname(options.outFile), {recursive:true});

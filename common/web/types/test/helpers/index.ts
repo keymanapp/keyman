@@ -19,11 +19,26 @@ export function loadKeymanTouchLayoutCleanJsonSchema(): Buffer {
   return fs.readFileSync(new URL(path.join('..', '..', 'src', 'keyman-touch-layout.clean.spec.json'), import.meta.url));
 }
 
-export function loadFile(baseFilename: string, filename: string | URL): Buffer {
-  // TODO: translate filename based on the baseFilename
+export function loadFile(filename: string | URL): Buffer {
   return fs.readFileSync(filename);
 }
 
 export function loadSchema(schema: CompilerSchema): Buffer {
   return fs.readFileSync(new URL(path.join('..', '..', 'src', schema + '.schema.json'), import.meta.url));
+}
+
+export function resolveFilename(baseFilename: string, filename: string) {
+  const basePath = path.dirname(baseFilename);
+  // Transform separators to platform separators -- we are agnostic
+  // in our use here but path prefers files may use
+  // either / or \, although older kps files were always \.
+  if(path.sep == '/') {
+    filename = filename.replace(/\\/g, '/');
+  } else {
+    filename = filename.replace(/\//g, '\\');
+  }
+  if(!path.isAbsolute(filename)) {
+    filename = path.resolve(basePath, filename);
+  }
+  return filename;
 }

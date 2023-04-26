@@ -78,7 +78,7 @@ function buildLdmlKeyboardToMemory(inputFilename: string, callbacks: CompilerCal
   // const tlcompiler = new kmc.TouchLayoutCompiler();
   // const tl = tlcompiler.compile(source);
   // const tlwriter = new TouchLayoutFileWriter();
-  const kmwcompiler = new kmc.KeymanWebCompiler(compilerOptions);
+  const kmwcompiler = new kmc.KeymanWebCompiler(callbacks, compilerOptions);
   const kmw_string = kmwcompiler.compile(inputFilename, source);
   const encoder = new TextEncoder();
   const kmw_binary = encoder.encode(kmw_string);
