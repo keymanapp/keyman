@@ -102,7 +102,7 @@ BOOL SelectKeyboard(DWORD KeymanID)
 
         if (_td->app) _td->app->ResetContext();
 
-        // TODO: #5882 tell the core with km_kbp_event so it can reset the capslock state
+        // TODO: #5822 tell the core with km_kbp_event so it can reset the capslock state
 
         SelectApplicationIntegration();   // I4287
         if (_td->app && !_td->app->IsWindowHandled(hwnd)) _td->app->HandleWindow(hwnd);

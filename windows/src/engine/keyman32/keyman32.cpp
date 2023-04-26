@@ -591,9 +591,10 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
     goto fail;
   }
 
-  // TODO: #5882 Add km_kbp_event to reset keyboard action sent to keyman core
+  // TODO: #5822 Add km_kbp_event to reset keyboard action sent to keyman core
   // (only the core knows the caps rules such CAPS_ALWAYS_OFF)
-  // so it can then respond with a possible reset
+  // so it can then respond with a possible reset. Currently this sorts itself out
+  // the first keystroke pressed after switching to a new keyboard.
 
   err_status = km_kbp_keyboard_get_imx_list(_td->lpActiveKeyboard->lpCoreKeyboard, &_td->lpActiveKeyboard->lpIMXList);
   if (err_status != KM_KBP_STATUS_OK) {
@@ -609,7 +610,6 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
   LoadKeyboardOptionsREGCore(_td->lpActiveKeyboard, _td->lpActiveKeyboard->lpCoreKeyboardState);
   RefreshPreservedKeys(TRUE);
   return TRUE;
-    // happy to use while(!done) pattern
 fail:
 
 	delete _td->lpActiveKeyboard;
