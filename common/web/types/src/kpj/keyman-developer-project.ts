@@ -8,23 +8,20 @@ export class KeymanDeveloperProject {
   options: KeymanDeveloperProjectOptions;
   files: KeymanDeveloperProjectFile[];
   projectPath: string = '';
-  projectFilename: string = '';
 
-  constructor(version: KeymanDeveloperProjectVersion, private callbacks: CompilerCallbacks) {
+  constructor(private projectFilename: string, version: KeymanDeveloperProjectVersion, private callbacks: CompilerCallbacks) {
+    this.projectPath = this.callbacks.path.dirname(this.projectFilename);
     this.options = new KeymanDeveloperProjectOptions(version);
     this.files = [];
-
   }
   /**
    * Adds .kmn, .xml, .kps to project based on options.sourcePath
    * @param projectFilename Full path to project.kpj (even if the file doesn't exist)
    */
-  populateFiles(projectFilename: string) {
+  populateFiles() {
     if(this.options.version != '2.0') {
       throw new Error('populateFiles can only be called on a v2.0 project');
     }
-    this.projectFilename = projectFilename;
-    this.projectPath = this.callbacks.path.dirname(this.projectFilename);
     let sourcePath = this.resolveProjectPath(this.options.sourcePath);
     let files = this.callbacks.fs.readdirSync(sourcePath);
     for(let filename of files) {

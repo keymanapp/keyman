@@ -6,7 +6,7 @@ import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
 import { buildActivities } from './buildActivities.js';
 import { InfrastructureMessages } from '../../messages/messages.js';
 
-const PROJECT_EXTENSION = '.kpj';
+export const PROJECT_EXTENSION = '.kpj';
 
 export class BuildProject extends BuildActivity {
   public get name(): string { return 'Project'; }
@@ -81,8 +81,8 @@ class ProjectBuilder {
 
   loadDefaultProjectFromFolder() {
     // The folder does not contain a .kpj, so construct a default 2.0 .kpj
-    const project = new KeymanDeveloperProject('2.0', this.callbacks);
-    project.populateFiles(this.infile);
+    const project = new KeymanDeveloperProject(this.infile, '2.0', this.callbacks);
+    project.populateFiles();
     return project;
   }
 

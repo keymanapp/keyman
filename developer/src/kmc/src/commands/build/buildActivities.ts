@@ -3,7 +3,6 @@ import { BuildKmnKeyboard } from './BuildKmnKeyboard.js';
 import { BuildLdmlKeyboard } from './BuildLdmlKeyboard.js';
 import { BuildModel } from './BuildModel.js';
 import { BuildPackage } from './BuildPackage.js';
-import { BuildProject } from './BuildProject.js';
 
 // These builders are listed in the order that files need to be built in
 // projects. Packages depend on .kmn, .xml and .model.ts file types
@@ -11,6 +10,9 @@ export const buildActivities: BuildActivity[] = [
   new BuildKmnKeyboard(),
   new BuildLdmlKeyboard(),
   new BuildModel(),
-  new BuildPackage(),
-  new BuildProject()
+  new BuildPackage()
 ];
+
+// Note: BuildProject is not listed here to avoid circular references,
+// because it depends on the other activities here. This means that
+// BuildProject must be separately checked.

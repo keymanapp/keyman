@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { Command } from 'commander';
 import { BuildActivityOptions } from './build/BuildActivity.js';
 import { buildActivities } from './build/buildActivities.js';
-import { BuildProject } from './build/BuildProject.js';
+import { BuildProject, PROJECT_EXTENSION } from './build/BuildProject.js';
 import { NodeCompilerCallbacks } from '../messages/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/messages.js';
 
@@ -46,12 +46,15 @@ async function build(filename: string, options: BuildActivityOptions): Promise<b
     let builder = null;
 
     // If infile is a directory, then we treat that as a project and build it
-    if(fs.statSync(filename).isDirectory()) {
+    if(fs.statSync(filename).isDirectory() || filename.toLowerCase().endsWith(PROJECT_EXTENSION)) {
       builder = new BuildProject();
     } else {
       // Otherwise, if it's one of our known file extensions, we build it
       let extensions: string[] = [];
-      builder = buildActivities.find(build => { extensions.push(build.sourceExtension); return filename.toLowerCase().endsWith(build.sourceExtension) });
+      builder = buildActivities.find(build => {
+        extensions.push(build.sourceExtension);
+        return filename.toLowerCase().endsWith(build.sourceExtension);
+      });
       if(!builder) {
         callbacks.reportMessage(InfrastructureMessages.Error_FileTypeNotRecognized({filename, extensions: extensions.join(', ')}));
         return false;
