@@ -499,70 +499,6 @@ namespace com.keyman.dom {
         ds.width='100%';
         ds.height=(screen.width/2)+'px';
         document.body.appendChild(dTrailer);
-
-        // Sets up page-default touch-based handling for activation-state management.
-        // These always trigger for the page, wherever a touch may occur. Does not
-        // prevent element-specific or OSK-key-specific handling from triggering.
-        const _this = this;
-        this.touchStartActivationHandler=function(e) {
-          _this.deactivateOnRelease=true;
-          _this.touchY=e.touches[0].screenY;
-
-          // On Chrome, scrolling up or down causes the URL bar to be shown or hidden
-          // according to whether or not the document is at the top of the screen.
-          // But when doing that, each OSK row top and height gets modified by Chrome
-          // looking very ugly.  It would be best to hide the OSK then show it again
-          // when the user scroll finishes, but Chrome has no way to reliably report
-          // the touch end event after a move. c.f. http://code.google.com/p/chromium/issues/detail?id=152913
-          // The best compromise behaviour is simply to hide the OSK whenever any
-          // non-input and non-OSK element is touched.
-          _this.deactivateOnScroll=false;
-          if(device.OS == 'Android' && navigator.userAgent.indexOf('Chrome') > 0) {
-            // _this.deactivateOnScroll has the inverse of the 'true' default,
-            // but that fact actually facilitates the following conditional logic.
-            if(typeof(osk._Box) == 'undefined') return false;
-            if(typeof(osk._Box.style) == 'undefined') return false;
-
-            // The following tests are needed to prevent the OSK from being hidden during normal input!
-            let p=(e.target as HTMLElement).parentElement;
-            if(typeof(p) != 'undefined' && p != null) {
-              if(p.className.indexOf('kmw-key-') >= 0) return false;
-              if(typeof(p.parentElement) != 'undefined' && p.parentElement != null) {
-                p=p.parentElement;
-                if(p.className.indexOf('kmw-key-') >= 0) return false;
-              }
-            }
-
-            _this.deactivateOnScroll = true;
-          }
-          return false;
-        };
-        this.touchMoveActivationHandler = function(e) {
-          if(_this.deactivateOnScroll) {  // Android / Chrone case.
-            DOMEventHandlers.states.focusing = false;
-            _this.activeElement = null;
-          }
-
-          const y = e.touches[0].screenY;
-          const y0 = _this.touchY;
-          if(y-y0 > 5 || y0-y < 5) {
-            _this.deactivateOnRelease = false;
-          }
-          return false;
-        };
-        this.touchEndActivationHandler = function() {
-          // Should not hide OSK if simply closing the language menu (30/4/15)
-          // or if the focusing timer (setFocusTimer) is still active.
-          if(_this.deactivateOnRelease && !osk['lgList'] && !DOMEventHandlers.states.focusing) {
-            _this.activeElement = null;
-          }
-          _this.deactivateOnRelease=false;
-          return false;
-        };
-
-        this.keyman.util.attachDOMEvent(document.body, 'touchstart', this.touchStartActivationHandler,false);
-        this.keyman.util.attachDOMEvent(document.body, 'touchmove',  this.touchMoveActivationHandler, false);
-        this.keyman.util.attachDOMEvent(document.body, 'touchend',   this.touchEndActivationHandler,  false);
       }
 
       //document.body.appendChild(keymanweb._StyleBlock);
@@ -571,14 +507,6 @@ namespace com.keyman.dom {
       this.keyman.keyboardManager.restoreCurrentKeyboard();
 
       // Set exposed initialization flag to 2 to indicate deferred initialization also complete
-
-      /* To prevent propagation of focus & blur events from the input-scroll workaround,
-       * we attach top-level capturing listeners to the focus & blur events.  They prevent propagation
-       * but NOT default behavior, allowing the scroll to complete while preventing nearly all
-       * possible event 'noise' that could result from the workaround.
-       */
-      this.keyman.util.attachDOMEvent(document.body, 'focus', DOMManager.suppressFocusCheck, true);
-      this.keyman.util.attachDOMEvent(document.body, 'blur', DOMManager.suppressFocusCheck, true);
 
       this.keyman.setInitialized(2);
       return Promise.resolve();
@@ -647,16 +575,6 @@ namespace com.keyman.dom {
       } else {
         window.setTimeout(this.initializeUI.bind(this),1000);
       }
-    }
-
-    static suppressFocusCheck(e: Event) {
-      if(DOMEventHandlers.states._IgnoreBlurFocus) {
-        // Prevent triggering other blur-handling events (as possible)
-        e.stopPropagation();
-        e.cancelBubble = true;
-      }
-      // But DO perform default event behavior (actually blurring & focusing the affected element)
-      return true;
     }
   }
 }
