@@ -159,37 +159,6 @@ namespace com.keyman.dom {
       this._BeepObjects = [];
     }
 
-    /* ------------- Page and document-level management events ------------------ */
-
-    _WindowLoad: (e: Event) => void = function(e: Event) {
-      //keymanweb.completeInitialization();
-      // Always return to top of page after a page reload
-      document.body.scrollTop=0;
-      if(typeof document.documentElement != 'undefined') {
-        document.documentElement.scrollTop=0;
-      }
-    }.bind(this);
-
-    /**
-     * Function     _WindowUnload
-     * Scope        Private
-     * Description  Remove handlers before detaching KMW window
-     */
-    _WindowUnload: () => void = function(this: DOMManager) {
-      // Allow the UI to release its own resources
-      this.keyman.uiManager.doUnload();
-
-      // Allow the OSK to release its own resources
-      if(this.keyman.osk) {
-        this.keyman.osk.shutdown();
-        if(this.keyman.osk['_Unload']) {
-          this.keyman.osk['_Unload'](); // I3363 (Build 301)
-        }
-      }
-
-      this.lastActiveElement = null;
-    }.bind(this);
-
     /* ------ Defines independent, per-control keyboard setting behavior for the API. ------ */
 
     /**

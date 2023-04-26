@@ -131,6 +131,26 @@ export class PageIntegrationHandlers {
     return false;
   };
 
+
+  private _WindowLoad: (e: Event) => void = () => {
+    // Always return to top of page after a page reload
+    document.body.scrollTop=0;
+    if(typeof document.documentElement != 'undefined') {
+      document.documentElement.scrollTop=0;
+    }
+  }
+
+  /**
+   * Function     _WindowUnload
+   * Scope        Private
+   * Description  Remove handlers before detaching KMW window
+   */
+  private _WindowUnload: () => void = () => {
+    // Future note:  should restrict this to anything for the corresponding document if on a
+    // child iframe, not the whole engine.
+    this.engine.shutdown();
+  }
+
   private attachHandlers() {
     const eventTracker = this.domEventTracker;
     const device = this.engine.config.hostDevice;
@@ -153,6 +173,12 @@ export class PageIntegrationHandlers {
       eventTracker.attachDOMEvent(docBody, 'touchmove',  this.touchMoveActivationHandler, false);
       eventTracker.attachDOMEvent(docBody, 'touchend',   this.touchEndActivationHandler,  false);
     }
+
+    eventTracker.attachDOMEvent(window, 'load',   this._WindowLoad,  false);
+    eventTracker.attachDOMEvent(window, 'unload', this._WindowUnload,false);
+
+    // TODO:  Hotkey module stuff.  Is not yet modularized.
+    // eventTracker.attachDOMEvent(document, 'keyup', this.engine.hotkeyManager._Process, false);
   }
 
   public shutdown() {
@@ -173,5 +199,11 @@ export class PageIntegrationHandlers {
       eventTracker.detachDOMEvent(docBody, 'touchmove',  this.touchMoveActivationHandler, false);
       eventTracker.detachDOMEvent(docBody, 'touchend',   this.touchEndActivationHandler,  false);
     }
+
+    eventTracker.detachDOMEvent(window, 'load',   this._WindowLoad,  false);
+    eventTracker.detachDOMEvent(window, 'unload', this._WindowUnload,false);
+
+    // TODO:  Hotkey module stuff.
+    // eventTracker.detachDOMEvent(document, 'keyup', this.engine.hotkeyManager._Process, false);
   }
 }
