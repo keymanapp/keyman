@@ -11,13 +11,16 @@ import DefaultBrowserRules from './defaultBrowserRules.js';
 import HardwareEventKeyboard from './hardwareEventKeyboard.js';
 import { FocusStateAPIObject } from './context/focusAssistant.js';
 import { PageIntegrationHandlers } from './context/pageIntegrationHandlers.js';
+import { LanguageMenu } from './languageMenu.js';
 import { setupOskListeners } from './oskConfiguration.js';
 
 export class KeymanEngine extends KeymanEngineBase<ContextManager, HardwareEventKeyboard> {
+  touchLanguageMenu?: LanguageMenu;
+  private pageIntegration: PageIntegrationHandlers;
+
   keyEventRefocus = () => {
     this.contextManager.restoreLastActiveTarget();
   }
-  private pageIntegration: PageIntegrationHandlers;
 
   constructor(worker: Worker, sourceUri: string) {
     const config = new BrowserConfiguration(sourceUri);  // currently set to perform device auto-detect.

@@ -563,19 +563,20 @@ export class LanguageMenu {
   hide() {
     let osk = this.keyman.osk;
 
-    let languageMenu = this;
     if(this.lgList) {
       osk.vkbd.highlightKey(osk.vkbd.lgKey,false);
       this.lgList.style.visibility='hidden';
 
-      window.setTimeout(function(){
+      window.setTimeout(() => {
         // In case of extremely rapid keyboard swaps, this event may trigger more than once -
         // the shim's on-touch event can trigger after a keyboard has been selected!
-        if(languageMenu.shim.parentElement) {
-          document.body.removeChild(languageMenu.shim);
-          document.body.removeChild(languageMenu.lgList);
+        if(this.shim.parentElement) {
+          document.body.removeChild(this.shim);
+          document.body.removeChild(this.lgList);
         }
       },500);
     }
+
+    this.keyman.touchLanguageMenu = null;
   }
 }

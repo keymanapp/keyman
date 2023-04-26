@@ -124,7 +124,7 @@ export class PageIntegrationHandlers {
   private touchEndActivationHandler: (e: TouchEvent) => boolean = (e) => {
     // Should not hide OSK if simply closing the language menu (30/4/15)
     // or if the focusing timer (focusAssistant.setFocusTimer) is still active.
-    if(this.deactivateOnRelease && !osk['lgList'] && !this.focusAssistant.focusing) {
+    if(this.deactivateOnRelease && !this.engine.touchLanguageMenu && !this.focusAssistant.focusing) {
       this.engine.contextManager.deactivateCurrentTarget();
     }
     this.deactivateOnRelease=false;

@@ -10,8 +10,8 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
   osk.on('globeKey', (key, on) => { // K_LOPT
     if(on) {
       if(osk.hostDevice.touchable) {
-        this.lgMenu = new LanguageMenu(engine);
-        this.lgMenu.show();
+        engine.touchLanguageMenu = new LanguageMenu(engine);
+        engine.touchLanguageMenu.show();
       }
     }
 

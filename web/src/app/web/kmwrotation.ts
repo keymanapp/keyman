@@ -40,7 +40,10 @@ namespace com.keyman {
 
     resolve() {
       var osk = this.keyman.osk;
-      osk.hideLanguageMenu();
+
+      // `keyman: KeymanEngine` (modularized app/browser)
+      this.keyman.lgMenu?.hide();
+      this.keyman.lgMenu = null;
 
       osk.setNeedsLayout();
       if(this.oskVisible) {

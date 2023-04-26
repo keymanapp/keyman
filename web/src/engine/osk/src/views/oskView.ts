@@ -1169,11 +1169,6 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
     * one at a time.
     */
 
-  // hideLanguageMenu() {
-  //   this.lgMenu?.hide();
-  //   this.lgMenu = null;
-  // }
-
   // OSK state fields & events
   //
   // These are relatively stable and may be preserved as they are.
