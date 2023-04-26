@@ -46,7 +46,6 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   private cookieManager = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
   readonly focusAssistant = new FocusAssistant();
   readonly page: PageContextAttachment;
-
   private mostRecentTarget: OutputTarget<any>;
   private currentTarget: OutputTarget<any>;
 

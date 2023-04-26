@@ -10,12 +10,14 @@ import ContextManager from './contextManager.js';
 import DefaultBrowserRules from './defaultBrowserRules.js';
 import KeyEventKeyboard from './keyEventKeyboard.js';
 import { FocusStateAPIObject } from './context/focusAssistant.js';
+import { PageIntegrationHandlers } from './context/pageIntegrationHandlers.js';
 import { setupOskListeners } from './oskConfiguration.js';
 
 export class KeymanEngine extends KeymanEngineBase<ContextManager, KeyEventKeyboard> {
   keyEventRefocus = () => {
     this.contextManager.restoreLastActiveTarget();
   }
+  private pageIntegration: PageIntegrationHandlers;
 
   constructor(worker: Worker, sourceUri: string) {
     const config = new BrowserConfiguration(sourceUri);  // currently set to perform device auto-detect.
@@ -92,6 +94,7 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, KeyEventKeybo
     }
 
     setupOskListeners(this, this.osk, this.contextManager);
+    this.pageIntegration = new PageIntegrationHandlers(window, this);
 
     this.config.finalizeInit();
   }
@@ -150,5 +153,11 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, KeyEventKeybo
     }
 
     this.contextManager.setKeyboardForTarget(Pelem._kmwAttachment.interface, Pkbd, Plc);
+  }
+
+  shutdown() {
+    this.pageIntegration.shutdown();
+    this.contextManager.shutdown();
+    this.osk?.shutdown();
   }
 }
