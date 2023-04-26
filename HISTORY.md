@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.95 alpha 2023-04-26
+
+* refactor(android/engine): Move currentBanner to KMKeyboard (#8671)
+* chore(android/engine): Remove jvm args (#8675)
+* fix(developer): kmc: fix jis/abnt2 scan codes (#8670)
+
 ## 17.0.94 alpha 2023-04-25
 
 * fix(android/engine): Update InApp input connection (#8647)
