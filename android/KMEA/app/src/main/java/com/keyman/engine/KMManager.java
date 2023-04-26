@@ -190,22 +190,6 @@ public final class KMManager {
   public final static String predictionPrefSuffix = ".mayPredict";
   public final static String correctionPrefSuffix = ".mayCorrect";
 
-  /**
-   * Banner state value: "blank" - no banner available.
-   */
-  protected static final String KM_BANNER_STATE_BLANK = "blank";
-  /**
-   * Banner state value: "suggestion" - dictionary suggestions are shown.
-   */
-  protected static final String KM_BANNER_STATE_SUGGESTION = "suggestion";
-
-  //TODO: should be part of kmkeyboard
-  /**
-   * Current banner state.
-   */
-  protected static String currentBanner = KM_BANNER_STATE_BLANK;
-
-
   // Special override for when the keyboard may have haptic feedback when typing.
   // haptic feedback disabled for hardware keystrokes
   private static boolean mayHaveHapticFeedback = false;
@@ -1852,7 +1836,9 @@ public final class KMManager {
 
   public static int getBannerHeight(Context context) {
     int bannerHeight = 0;
-    if (currentBanner.equals(KM_BANNER_STATE_SUGGESTION)) {
+    if (InAppKeyboard != null && InAppKeyboard.currentBanner().equals(KMKeyboard.KM_BANNER_STATE_SUGGESTION)) {
+      bannerHeight = (int) context.getResources().getDimension(R.dimen.banner_height);
+    } else if (SystemKeyboard != null && SystemKeyboard.currentBanner().equals(KMKeyboard.KM_BANNER_STATE_SUGGESTION)) {
       bannerHeight = (int) context.getResources().getDimension(R.dimen.banner_height);
     }
     return bannerHeight;
@@ -2168,9 +2154,14 @@ public final class KMManager {
 
   private static void toggleSuggestionBanner(String languageID, boolean inappKeyboardChanged, boolean systemKeyboardChanged) {
     //reset banner state if new language has no lexical model
-    if (currentBanner.equals(KMManager.KM_BANNER_STATE_SUGGESTION)
+    if (InAppKeyboard != null && InAppKeyboard.currentBanner().equals(KMKeyboard.KM_BANNER_STATE_SUGGESTION)
       && getAssociatedLexicalModel(languageID)==null) {
-      currentBanner = KMManager.KM_BANNER_STATE_BLANK;
+      InAppKeyboard.setCurrentBanner(KMKeyboard.KM_BANNER_STATE_BLANK);
+    }
+
+    if (SystemKeyboard != null && SystemKeyboard.currentBanner().equals(KMKeyboard.KM_BANNER_STATE_SUGGESTION)
+      && getAssociatedLexicalModel(languageID)==null) {
+      SystemKeyboard.setCurrentBanner(KMKeyboard.KM_BANNER_STATE_BLANK);
     }
 
     if(inappKeyboardChanged) {

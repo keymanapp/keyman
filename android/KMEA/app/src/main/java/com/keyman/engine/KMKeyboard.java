@@ -76,6 +76,21 @@ final class KMKeyboard extends WebView {
   protected ArrayList<String> javascriptAfterLoad = new ArrayList<String>();
 
   private static String currentKeyboard = null;
+
+  /**
+   * Banner state value: "blank" - no banner available.
+   */
+  protected static final String KM_BANNER_STATE_BLANK = "blank";
+  /**
+   * Banner state value: "suggestion" - dictionary suggestions are shown.
+   */
+  protected static final String KM_BANNER_STATE_SUGGESTION = "suggestion";
+
+  /**
+   * Current banner state.
+   */
+  protected static String currentBanner = KM_BANNER_STATE_BLANK;
+
   private static String txtFont = "";
   private static String oskFont = null;
   private static String keyboardRoot = "";
@@ -400,6 +415,12 @@ final class KMKeyboard extends WebView {
   public static String currentKeyboard() {
     return currentKeyboard;
   }
+
+  public static void setCurrentBanner(String banner) {
+    currentBanner = banner;
+  }
+
+  public static String currentBanner() { return currentBanner; }
 
   /**
    * Return the full path to the display text font. Usually used for creating a Typeface font
