@@ -159,6 +159,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
         }
       });
 
+      // This fires the events we just registered for.
       this.page.install(this.engineConfig.attachType == 'manual');
     });
   }

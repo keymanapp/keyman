@@ -8,12 +8,12 @@ import { DeviceSpec, ProcessorInitOptions, extendString } from "@keymanapp/keybo
 import { BrowserConfiguration, BrowserInitOptionDefaults, BrowserInitOptionSpec } from './configuration.js';
 import ContextManager from './contextManager.js';
 import DefaultBrowserRules from './defaultBrowserRules.js';
-import KeyEventKeyboard from './keyEventKeyboard.js';
+import HardwareEventKeyboard from './hardwareEventKeyboard.js';
 import { FocusStateAPIObject } from './context/focusAssistant.js';
 import { PageIntegrationHandlers } from './context/pageIntegrationHandlers.js';
 import { setupOskListeners } from './oskConfiguration.js';
 
-export class KeymanEngine extends KeymanEngineBase<ContextManager, KeyEventKeyboard> {
+export class KeymanEngine extends KeymanEngineBase<ContextManager, HardwareEventKeyboard> {
   keyEventRefocus = () => {
     this.contextManager.restoreLastActiveTarget();
   }
@@ -23,6 +23,7 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, KeyEventKeybo
     const config = new BrowserConfiguration(sourceUri);  // currently set to perform device auto-detect.
 
     super(worker, config, new ContextManager(config, () => this.legacyAPIEvents));
+    this.hardKeyboard = new HardwareEventKeyboard(config.hardDevice, this.contextManager);
 
     // Scrolls the document-body to ensure that a focused element remains visible after the OSK appears.
     this.contextManager.on('targetchange', (target: OutputTarget<any>) => {
