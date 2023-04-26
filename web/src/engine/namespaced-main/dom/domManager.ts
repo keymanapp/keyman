@@ -411,6 +411,8 @@ namespace com.keyman.dom {
       this.keyman.setInitialized(1);
 
       // Finish keymanweb and initialize the OSK once all necessary resources are available
+      // OSK type selection is already modularized... but the ordering related to the parts
+      // afterward, which are not yet modularized, may be important.
       if(device.touchable) {
         this.keyman.osk = new com.keyman.osk.AnchoredOSKView(device.coreSpec);
       } else {
@@ -426,12 +428,6 @@ namespace com.keyman.dom {
 
       // Initialize the desktop UI
       this.initializeUI();
-
-      // Exit initialization here if we're using an embedded code path.
-      if(this.keyman.isEmbedded) {
-        this.keyman.keyboardManager.setDefaultKeyboard();
-        return Promise.resolve();
-      }
 
       // Determine the default font for mapped elements
       this.keyman.appliedFont=this.keyman.baseFont=this.getBaseFont();
@@ -476,6 +472,9 @@ namespace com.keyman.dom {
       this.keyman.keyboardManager.restoreCurrentKeyboard();
 
       // Set exposed initialization flag to 2 to indicate deferred initialization also complete
+
+      // Other initialization details after this point have already been modularized:
+      // within app/browser KeymanEngine.init, see `setupOskListeners` call and after.
 
       this.keyman.setInitialized(2);
       return Promise.resolve();

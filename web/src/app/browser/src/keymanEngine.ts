@@ -94,6 +94,9 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, KeyEventKeybo
     }
 
     setupOskListeners(this, this.osk, this.contextManager);
+
+    // Automatically performs related handler setup & maintains references
+    // needed for related cleanup / shutdown.
     this.pageIntegration = new PageIntegrationHandlers(window, this);
 
     // Initialize supplementary plane string extensions
