@@ -28,8 +28,8 @@ export interface KeyEventSpec {
   Lstates: number;
   LmodifierChange?: boolean;
   Lmodifiers: number;
-  LisVirtualKey: boolean;
-  vkCode: number;
+  LisVirtualKey?: boolean;
+  vkCode?: number;
   kName: string;
   kLayer?: string;   // The key's layer property
   kbdLayer?: string; // The virtual keyboard's active layer
@@ -70,8 +70,8 @@ export default class KeyEvent implements KeyEventSpec {
   Lstates: number;
   LmodifierChange?: boolean;
   Lmodifiers: number;
-  LisVirtualKey: boolean;
-  vkCode: number;
+  LisVirtualKey?: boolean;
+  vkCode?: number;
   kName: string;
   kLayer?: string;   // The key's layer property
   kbdLayer?: string; // The virtual keyboard's active layer

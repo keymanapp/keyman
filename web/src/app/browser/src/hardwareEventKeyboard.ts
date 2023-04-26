@@ -1,4 +1,4 @@
-import { DeviceSpec, KeyEvent, Keyboard, ManagedPromise } from '@keymanapp/keyboard-processor';
+import { Codes, DeviceSpec, KeyEvent, KeyEventSpec, KeyMapping, Keyboard, KeyboardProcessor, ManagedPromise } from '@keymanapp/keyboard-processor';
 
 import { HardKeyboard } from 'keyman/engine/main';
 import { eventOutputTarget } from 'keyman/engine/attachment';
@@ -8,14 +8,21 @@ import { nestedInstanceOf } from '../../../../build/engine/element-wrappers/obj/
 
 export default class HardwareEventKeyboard extends HardKeyboard {
   private readonly hardDevice: DeviceSpec;
+
+  // Needed properties & methods:
+  // - `modStateFlags`
+  // - `baseLayout`
+  // - `doModifierPress()` - for modifier updates on key-up.
+  private readonly processor: KeyboardProcessor;
   private readonly contextManager: ContextManager;
 
   private swallowKeypress: boolean = false;
 
-  constructor(hardDevice: DeviceSpec, contextManager: ContextManager) {
+  constructor(hardDevice: DeviceSpec, processor: KeyboardProcessor, contextManager: ContextManager) {
     super();
     this.hardDevice = hardDevice;
     this.contextManager = contextManager;
+    this.processor = processor;
 
     const page = contextManager.page;
 
@@ -55,7 +62,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
       return true;
     }
 
-    return PreProcessor.keyDown(e);
+    return this.keyDown(e);
   }
 
   /**
@@ -69,7 +76,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
       return true;
     }
 
-    return PreProcessor.keyPress(e);
+    return this.keyPress(e);
   }
 
   /**
@@ -79,7 +86,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
    */
   _KeyUp: (e: KeyboardEvent) => boolean = (e) => {
     const target = eventOutputTarget(e);
-    var Levent = PreProcessor._GetKeyEventProperties(e, false);
+    var Levent = this._GetKeyEventProperties(e, false);
     if(Levent == null) {
       return true;
     }
@@ -108,8 +115,304 @@ export default class HardwareEventKeyboard extends HardKeyboard {
       }
     }
 
-    return PreProcessor.keyUp(e);
+    return this.keyUp(e);
   }
 
+  /**
+   * Function     _GetEventKeyCode
+   * Scope        Private
+   * @param       {Event}       e         Event object
+   * Description  Finds the key code represented by the event.
+   */
+  private _GetEventKeyCode(e: KeyboardEvent) {
+    if (e.keyCode) {
+      return e.keyCode;
+    } else if (e.which) {
+      return e.which;
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Function     _GetKeyEventProperties
+   * Scope        Private
+   * @param       {Event}       e         Event object
+   * @param       {boolean=}    keyState  true if call results from a keyDown event, false if keyUp, undefined if keyPress
+   * @return      {Object.<string,*>}     KMW keyboard event object:
+   * Description  Get object with target element, key code, shift state, virtual key state
+   *                Lcode=keyCode
+   *                Lmodifiers=shiftState
+   *                LisVirtualKeyCode e.g. ctrl/alt key
+   *                LisVirtualKey     e.g. Virtual key or non-keypress event
+   */
+  private _GetKeyEventProperties(e: KeyboardEvent, keyState?: boolean): KeyEvent {
+    if(e.cancelBubble === true) {
+      return null; // I2457 - Facebook meta-event generation mess -- two events generated for a keydown in Facebook contentEditable divs
+    }
+
+    let Lcode = this._GetEventKeyCode(e);
+    if (Lcode == null) {
+      return null;
+    }
+
+    // Stage 1 - track the true state of the keyboard's modifiers.
+    var prevModState = this.processor.modStateFlags, curModState = 0x0000;
+    var ctrlEvent = false, altEvent = false;
+
+    let keyCodes = Codes.keyCodes;
+    switch(Lcode) {
+      case keyCodes['K_CTRL']:      // The 3 shorter "K_*CTRL" entries exist in some legacy keyboards.
+      case keyCodes['K_LCTRL']:
+      case keyCodes['K_RCTRL']:
+      case keyCodes['K_CONTROL']:
+      case keyCodes['K_LCONTROL']:
+      case keyCodes['K_RCONTROL']:
+        ctrlEvent = true;
+        break;
+      case keyCodes['K_LMENU']:     // The 2 "K_*MENU" entries exist in some legacy keyboards.
+      case keyCodes['K_RMENU']:
+      case keyCodes['K_ALT']:
+      case keyCodes['K_LALT']:
+      case keyCodes['K_RALT']:
+        altEvent = true;
+        break;
+    }
+
+    /**
+     * Two separate conditions exist that should trigger chiral modifier detection.  Examples below use CTRL but also work for ALT.
+     *
+     * 1.  The user literally just pressed CTRL, so the event has a valid `location` property we can utilize.
+     *     Problem: its layer isn't presently activated within the OSK.
+     *
+     * 2.  CTRL has been held a while, so the OSK layer is valid, but the key event doesn't tell us the chirality of the active CTRL press.
+     *     Bonus issue:  RAlt simulation may cause erasure of this location property, but it should ONLY be empty if pressed in this case.
+     *     We default to the 'left' variants since they're more likely to exist and cause less issues with RAlt simulation handling.
+     *
+     * In either case, `e.getModifierState("Control")` is set to true, but as a result does nothing to tell us which case is active.
+     *
+     * `e.location != 0` if true matches condition 1 and matches condition 2 if false.
+     */
+
+    curModState |= (e.getModifierState("Shift") ? 0x10 : 0);
+
+    let modifierCodes = Codes.modifierCodes;
+    if(e.getModifierState("Control")) {
+      curModState |= ((e.location != 0 && ctrlEvent) ?
+        (e.location == 1 ? modifierCodes['LCTRL'] : modifierCodes['RCTRL']) : // Condition 1
+        prevModState & 0x0003);                                                       // Condition 2
+    }
+    if(e.getModifierState("Alt")) {
+      curModState |= ((e.location != 0 && altEvent) ?
+        (e.location == 1 ? modifierCodes['LALT'] : modifierCodes['RALT']) :   // Condition 1
+        prevModState & 0x000C);                                                       // Condition 2
+    }
+
+    // Stage 2 - detect state key information.  It can be looked up per keypress with no issue.
+    let Lstates = 0;
+
+    Lstates |= e.getModifierState('CapsLock') ? modifierCodes['CAPS'] : modifierCodes['NO_CAPS'];
+    Lstates |= e.getModifierState('NumLock') ? modifierCodes['NUM_LOCK'] : modifierCodes['NO_NUM_LOCK'];
+    Lstates |= (e.getModifierState('ScrollLock'))
+      ? modifierCodes['SCROLL_LOCK'] : modifierCodes['NO_SCROLL_LOCK'];
+
+    // We need these states to be tracked as well for proper OSK updates.
+    curModState |= Lstates;
+
+    // Stage 3 - Set our modifier state tracking variable and perform basic AltGr-related management.
+    const LmodifierChange = this.processor.modStateFlags != curModState;
+    this.processor.modStateFlags = curModState;
+
+    // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
+    let altGrMask = modifierCodes['RALT'] | modifierCodes['LCTRL'];
+    if((prevModState & altGrMask) == altGrMask && (curModState & altGrMask) != altGrMask) {
+      // We just released AltGr - make sure it's all released.
+      curModState &= ~ altGrMask;
+    }
+    // Perform basic filtering for Windows-based ALT_GR emulation on European keyboards.
+    if(curModState & modifierCodes['RALT']) {
+      curModState &= ~modifierCodes['LCTRL'];
+    }
+
+    let modifierBitmasks = Codes.modifierBitmasks;
+    // Stage 4 - map the modifier set to the appropriate keystroke's modifiers.
+    const activeKeyboard = this.activeKeyboard;
+    let Lmodifiers: number;
+    if(activeKeyboard && activeKeyboard.isChiral) {
+      Lmodifiers = curModState & modifierBitmasks.CHIRAL;
+
+      // Note for future - embedding a kill switch here would facilitate disabling AltGr / Right-alt simulation.
+      if(activeKeyboard.emulatesAltGr && (Lmodifiers & modifierBitmasks['ALT_GR_SIM']) == modifierBitmasks['ALT_GR_SIM']) {
+        Lmodifiers ^= modifierBitmasks['ALT_GR_SIM'];
+        Lmodifiers |= modifierCodes['RALT'];
+      }
+    } else {
+      // No need to sim AltGr here; we don't need chiral ALTs.
+      Lmodifiers =
+        (curModState & 0x10) | // SHIFT
+        ((curModState & (modifierCodes['LCTRL'] | modifierCodes['RCTRL'])) ? 0x20 : 0) |
+        ((curModState & (modifierCodes['LALT'] | modifierCodes['RALT']))   ? 0x40 : 0);
+    }
+
+
+    /* Tweak the modifiers if an OS meta key is detected; this will allow meta-key-based
+      * hotkeys to bypass Keyman processing.  We do this AFTER the chiral modifier filtering
+      * because some keyboards specify their own modifierBitmask, which won't include it.
+      * We don't currently use that reference in this method, but that may change in the future.
+      */
+    Lmodifiers |= (e.metaKey ? modifierCodes['META']: 0);
+
+    // Physically-typed keys require use of a 'desktop' form factor and thus are based on a virtual "physical" Device.
+
+    // Perform any browser-specific key remapping before other remaps and mnemonic transforms.
+    // (See https://github.com/keymanapp/keyman/issues/1125.)
+    if(this.hardDevice.browser == DeviceSpec.Browser.Firefox) {
+    // Browser key identifiers are not completely consistent; Firefox has a few (for US punctuation)
+    // that differ from the norm.  Refer to https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode.
+      if(KeyMapping.browserMap.FF['k'+Lcode]) {
+        Lcode = KeyMapping.browserMap.FF['k'+Lcode];
+      }
+    }
+
+    // We now have enough properties to properly specify a KeyEvent object.
+    let s = new KeyEvent({
+      device: this.hardDevice,
+      kName: '',
+      Lcode: Lcode,
+      Lmodifiers: Lmodifiers,
+      Lstates: Lstates,
+      LmodifierChange: LmodifierChange,
+      // This is based on a KeyboardEvent, so it's not considered 'synthetic' within web-core.
+      isSynthetic: false
+    });
+
+    // Mnemonic handling.
+    if(activeKeyboard && activeKeyboard.isMnemonic) {
+      // The following will never set a code corresponding to a modifier key, so it's fine to do this,
+      // which may change the value of Lcode, here.
+
+      s.setMnemonicCode(e.getModifierState("Shift"), e.getModifierState("CapsLock"));
+    }
+    // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
+    let LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (Lmodifiers & 0x6F) != 0));
+    s.LisVirtualKey = LisVirtualKeyCode || e.type != 'keypress';
+
+    // Other minor physical-keyboard adjustments
+    if(activeKeyboard && !activeKeyboard.isMnemonic) {
+      // Positional Layout
+
+      /* 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard */
+      var Lbase = KeyMapping.languageMap[this.processor.baseLayout];
+      if(Lbase && Lbase['k'+s.Lcode]) {
+        s.Lcode=Lbase['k'+s.Lcode];
+      }
+      /* 13/03/2007 MCD: Swedish: End mapping of keystroke to US keyboard */
+
+      if(!activeKeyboard.definesPositionalOrMnemonic && !(s.Lmodifiers & 0x60)) {
+        // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
+        s = new KeyEvent({
+          Lcode: KeyMapping._USKeyCodeToCharCode(s),
+          Lmodifiers: 0,
+          LisVirtualKey: false,
+          vkCode: s.Lcode, // Helps to merge OSK and physical keystroke control paths.
+          Lstates: s.Lstates,
+          kName: '',
+          device: this.hardDevice,
+          isSynthetic: false
+        });
+      }
+    }
+
+    return new KeyEvent(s);
+  }
+
+  /**
+   * Function     keyDown
+   * Scope        Public
+   * Description  Processes keydown event and passes data to keyboard.
+   *
+   * Note that the test-case oriented 'recorder' stubs this method to facilitate keystroke
+   * recording for use in test cases.  If changing this function, please ensure the recorder is
+   * not affected.
+   */
+  private keyDown(e: KeyboardEvent): boolean {
+    this.swallowKeypress = false;
+
+    // Get event properties
+    var Levent = this._GetKeyEventProperties(e, true);
+    if(Levent == null) {
+      return true;
+    }
+
+    let outputTarget = eventOutputTarget(e);
+    const ruleBehavior = core.processKeyEvent(Levent, outputTarget);
+    const LeventMatched = ruleBehavior && !ruleBehavior.triggerKeyDefault;
+
+    if(LeventMatched) {
+      if(e  &&  e.preventDefault) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      this.swallowKeypress = !!Levent.Lcode;
+      // Don't swallow backspaces on keypresses; this allows physical BKSP presses to repeat.
+      if(Levent.Lcode == 8) {
+        this.swallowKeypress = false;
+      }
+    } else {
+      this.swallowKeypress = false;
+    }
+
+    return !LeventMatched;
+  }
+
+  // KeyUp basically exists for two purposes:
+  // 1)  To detect browser form submissions (handled in kmwdomevents.ts)
+  // 2)  To detect modifier state changes.
+  private keyUp(e: KeyboardEvent): boolean {
+    var Levent = this._GetKeyEventProperties(e, false);
+    if(Levent == null) {
+      return true;
+    }
+
+    let outputTarget = eventOutputTarget(e);
+    return this.processor.doModifierPress(Levent, outputTarget, false);
+  }
+
+  private keyPress(e: KeyboardEvent): boolean {
+    var Levent = this._GetKeyEventProperties(e);
+    if(Levent == null || Levent.LisVirtualKey) {
+      return true;
+    }
+
+    // _Debug('KeyPress code='+Levent.Lcode+'; Ltarg='+Levent.Ltarg.tagName+'; LisVirtualKey='+Levent.LisVirtualKey+'; _KeyPressToSwallow='+keymanweb._KeyPressToSwallow+'; keyCode='+(e?e.keyCode:'nothing'));
+
+    /* I732 START - 13/03/2007 MCD: Swedish: Start positional keyboard layout code: prevent keystroke */
+    if(!this.activeKeyboard.isMnemonic) {
+      if(!this.swallowKeypress) {
+        return true;
+      }
+      if(Levent.Lcode < 0x20 || (this.hardDevice.browser == DeviceSpec.Browser.Safari && (Levent.Lcode > 0xF700  &&  Levent.Lcode < 0xF900))) {
+        return true;
+      }
+
+      return false;
+    }
+    /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */
+
+    // Only reached if it's a mnemonic keyboard.
+    let outputTarget = eventOutputTarget(e);
+    if(this.swallowKeypress || processor.keyboardInterface.processKeystroke(outputTarget, Levent)) {
+      this.swallowKeypress = false;
+      if(e && e.preventDefault) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      return false;
+    }
+
+    this.swallowKeypress = false;
+    return true;
+  }
   // TODO:  actually implement
 }

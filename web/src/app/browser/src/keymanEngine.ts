@@ -23,7 +23,7 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, HardwareEvent
     const config = new BrowserConfiguration(sourceUri);  // currently set to perform device auto-detect.
 
     super(worker, config, new ContextManager(config, () => this.legacyAPIEvents));
-    this.hardKeyboard = new HardwareEventKeyboard(config.hardDevice, this.contextManager);
+    this.hardKeyboard = new HardwareEventKeyboard(config.hardDevice, this.core.keyboardProcessor, this.contextManager);
 
     // Scrolls the document-body to ensure that a focused element remains visible after the OSK appears.
     this.contextManager.on('targetchange', (target: OutputTarget<any>) => {
