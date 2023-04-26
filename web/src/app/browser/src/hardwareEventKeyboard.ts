@@ -1,10 +1,12 @@
-import { Codes, DeviceSpec, KeyEvent, KeyMapping, Keyboard, KeyboardProcessor, ManagedPromise } from '@keymanapp/keyboard-processor';
+import { Codes, DeviceSpec, KeyEvent, KeyMapping, Keyboard, KeyboardProcessor } from '@keymanapp/keyboard-processor';
 
 import { HardKeyboard } from 'keyman/engine/main';
-import { eventOutputTarget } from 'keyman/engine/attachment';
+import { DomEventTracker } from 'keyman/engine/events';
+import { eventOutputTarget, outputTargetForElement } from 'keyman/engine/attachment';
 
 import ContextManager from './contextManager.js';
 import { nestedInstanceOf } from '../../../../build/engine/element-wrappers/obj/utils.js';
+import DesignIFrame from '../../../../build/engine/element-wrappers/obj/designIFrame.js';
 
 type KeyboardState = {
   activeKeyboard: Keyboard,
@@ -234,6 +236,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
   // - `doModifierPress()` - for modifier updates on key-up.
   private readonly processor: KeyboardProcessor;
   private readonly contextManager: ContextManager;
+  private domEventTracker = new DomEventTracker();
 
   private swallowKeypress: boolean = false;
 
@@ -245,12 +248,37 @@ export default class HardwareEventKeyboard extends HardKeyboard {
 
     const page = contextManager.page;
 
-    page.on('enabled', (elem) => {
+    const eventTracker = this.domEventTracker;
 
+    page.on('enabled', (Pelem) => {
+      const target = outputTargetForElement(Pelem);
+
+      if(!(target instanceof DesignIFrame)) {
+        // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
+        eventTracker.attachDOMEvent(Pelem, 'keypress', this._KeyPress);
+        eventTracker.attachDOMEvent(Pelem, 'keydown', this._KeyDown);
+        eventTracker.attachDOMEvent(Pelem, 'keyup', this._KeyUp);
+      } else {
+        const Lelem = target.getElement().contentDocument;
+        eventTracker.attachDOMEvent(Lelem.body,'keydown', this._KeyDown);
+        eventTracker.attachDOMEvent(Lelem.body,'keypress', this._KeyPress);
+        eventTracker.attachDOMEvent(Lelem.body,'keyup', this._KeyUp);
+      }
     });
 
-    page.off('disabled', (elem) => {
+    page.off('disabled', (Pelem) => {
+      const target = outputTargetForElement(Pelem);
 
+      if(!(target instanceof DesignIFrame)) {
+        eventTracker.detachDOMEvent(Pelem, 'keypress', this._KeyPress);
+        eventTracker.detachDOMEvent(Pelem, 'keydown', this._KeyDown);
+        eventTracker.detachDOMEvent(Pelem, 'keyup', this._KeyUp);
+      } else {
+        const Lelem = target.getElement().contentDocument;
+        eventTracker.detachDOMEvent(Lelem.body,'keydown', this._KeyDown);
+        eventTracker.detachDOMEvent(Lelem.body,'keypress', this._KeyPress);
+        eventTracker.detachDOMEvent(Lelem.body,'keyup', this._KeyUp);
+      }
     });
   }
 
@@ -440,19 +468,21 @@ export default class HardwareEventKeyboard extends HardKeyboard {
      *
      * END FIXME / comment
      */
-    let resultCapture: { keystrokeValid?: boolean } = {};
+    let resultCapture: { preventDefaultKeystroke?: boolean } = {};
 
-    // Should only be run if `keystrokeValid` is required by the following conditional block.
-    // If it isn't - that is, swallowKeypress == true, we swallow the keypress instead
-    // by _not_ evaluating it during this pass.
+    // Should only be run if `preventDefaultKeystroke` is required by the following conditional
+    // block.  If it isn't - that is, swallowKeypress == true, we want to swallow that keypress
+    // interpretation as well by _not_ evaluating it during this pass.
     if(!this.swallowKeypress) {
       // is synchronous
       this.emit('keyEvent', Levent, (result, error) => {
-        resultCapture.keystrokeValid = !!result;
+        resultCapture.preventDefaultKeystroke = !!result;
       })
     }
 
-    if(this.swallowKeypress || resultCapture.keystrokeValid) {
+    // If we actively prevented a keystroke or if we processed one successfully,
+    // prevent the browser from producing its default text output for the event.
+    if(this.swallowKeypress || resultCapture.preventDefaultKeystroke) {
       this.swallowKeypress = false;
       if(e && e.preventDefault) {
         e.preventDefault();
@@ -463,5 +493,9 @@ export default class HardwareEventKeyboard extends HardKeyboard {
 
     this.swallowKeypress = false;
     return true;
+  }
+
+  shutdown() {
+    this.domEventTracker.shutdown();
   }
 }

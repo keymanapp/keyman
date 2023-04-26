@@ -25,42 +25,14 @@ type SortableInput = {
 };
 
 interface EventMap {
-  /***
-   * For anything attached but (design-mode) iframes...
-    ```
-    // This block:  has to do with keystroke processing.
-    // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
-    Pelem.onkeypress = this.getHandlers(Pelem)._KeyPress;
-    Pelem.onkeydown = this.getHandlers(Pelem)._KeyDown;
-    Pelem.onkeyup = this.getHandlers(Pelem)._KeyUp;
-    ```
-   *
-   * For design-mode iframes:
-    ```
-    // This block:  has to do with keystroke processing.
-    util.attachDOMEvent(Lelem.body,'keydown', this.getHandlers(Pelem)._KeyDown);
-    util.attachDOMEvent(Lelem.body,'keypress', this.getHandlers(Pelem)._KeyPress);
-    util.attachDOMEvent(Lelem.body,'keyup', this.getHandlers(Pelem)._KeyUp);
-    ```
+  /**
+   * For any elements being attached or being re-enabled after having been disabled.
    */
   'enabled': (obj: HTMLElement) => void;
 
-  /***
-   * For anything attached but (design-mode) iframes...
-    ```
-    // This block:  has to do with keystroke processing.
-    Pelem.onkeypress = null;
-    Pelem.onkeydown = null;
-    Pelem.onkeyup = null;
-    ```
-   *
-   * For design-mode iframes:
-    ```
-    // This block:  has to do with keystroke processing.
-    util.detachDOMEvent(Lelem.body,'keydown', this.getHandlers(Pelem)._KeyDown);
-    util.detachDOMEvent(Lelem.body,'keypress', this.getHandlers(Pelem)._KeyPress);
-    util.detachDOMEvent(Lelem.body,'keyup', this.getHandlers(Pelem)._KeyUp);
-    ```
+  /**
+   * For any elements being detached, disabled, or selectively not being attached due
+   * being pre-marked for a disabled state.
    */
   'disabled': (obj: HTMLElement) => void;
 }

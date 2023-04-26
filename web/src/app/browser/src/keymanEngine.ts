@@ -174,5 +174,6 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, HardwareEvent
     this.contextManager.shutdown();
     this.osk?.shutdown();
     this.core.languageProcessor.shutdown();
+    this.hardKeyboard.shutdown();
   }
 }
