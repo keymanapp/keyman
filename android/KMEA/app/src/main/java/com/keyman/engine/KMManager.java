@@ -175,10 +175,6 @@ public final class KMManager {
 
   private static KMManager.SpacebarText spacebarText = KMManager.SpacebarText.LANGUAGE_KEYBOARD; // must match default given in kmwbase.ts
 
-  protected static boolean InAppKeyboardShouldIgnoreTextChange = false;
-  protected static boolean InAppKeyboardShouldIgnoreSelectionChange = false;
-  protected static boolean SystemKeyboardShouldIgnoreTextChange = false;
-  protected static boolean SystemKeyboardShouldIgnoreSelectionChange = false;
   protected static KMKeyboard InAppKeyboard = null;
   protected static KMKeyboard SystemKeyboard = null;
   protected static KMKeyboardWebViewClient InAppKeyboardWebViewClient = null;
@@ -1329,12 +1325,12 @@ public final class KMManager {
     boolean mayCorrect = prefs.getBoolean(getLanguageCorrectionPreferenceKey(languageID), true);
 
     RelativeLayout.LayoutParams params;
-    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboardShouldIgnoreTextChange && modelFileExists) {
+    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
-    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboardShouldIgnoreTextChange && modelFileExists) {
+    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
@@ -1942,11 +1938,11 @@ public final class KMManager {
 
   public static void setNumericLayer(KeyboardType kbType) {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboardShouldIgnoreTextChange) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreTextChange()) {
         InAppKeyboard.loadJavascript("setNumericLayer()");
       }
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboardShouldIgnoreTextChange) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreTextChange()) {
         SystemKeyboard.loadJavascript("setNumericLayer()");
       }
     }
@@ -1960,19 +1956,19 @@ public final class KMManager {
     }
 
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboardShouldIgnoreTextChange) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreTextChange()) {
         InAppKeyboard.loadJavascript(KMString.format("updateKMText('%s')", kmText));
         result = true;
       }
 
-      InAppKeyboardShouldIgnoreTextChange = false;
+      InAppKeyboard.setShouldIgnoreTextChange(false);
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboardShouldIgnoreTextChange) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreTextChange()) {
         SystemKeyboard.loadJavascript(KMString.format("updateKMText('%s')", kmText));
         result = true;
       }
 
-      SystemKeyboardShouldIgnoreTextChange = false;
+      SystemKeyboard.setShouldIgnoreTextChange(false);
     }
 
     return result;
@@ -1981,14 +1977,14 @@ public final class KMManager {
   public static boolean updateSelectionRange(KeyboardType kbType, int selStart, int selEnd) {
     boolean result = false;
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboardShouldIgnoreSelectionChange) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreSelectionChange()) {
         InAppKeyboard.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
         result = true;
       }
 
-      InAppKeyboardShouldIgnoreSelectionChange = false;
+      InAppKeyboard.setShouldIgnoreSelectionChange(false);
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboardShouldIgnoreSelectionChange) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreSelectionChange()) {
         InputConnection ic = getInputConnection(KeyboardType.KEYBOARD_TYPE_SYSTEM);
         if (ic != null) {
           ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
@@ -2001,7 +1997,7 @@ public final class KMManager {
         result = true;
       }
 
-      SystemKeyboardShouldIgnoreSelectionChange = false;
+      SystemKeyboard.setShouldIgnoreSelectionChange(false);
     }
 
     return result;
