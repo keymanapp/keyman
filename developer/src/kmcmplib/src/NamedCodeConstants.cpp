@@ -108,12 +108,21 @@ void NamedCodeConstants::AddCode_IncludedCodes(int n, const KMX_WCHAR *p)
 
 //  int __cdecl sort_entries(const void *elem1, const void *elem2) moved into namespace further up
 
+char *kmc_strupr(char *s) {
+  char *p = s;
+  while (*p) {
+    *p = ::toupper(*p);
+    p++;
+  }
+  return s;
+}
+
 KMX_BOOL NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
 {
   const int str_size = 256;
   FILE *fp = NULL;
 
-  if (CheckFilenameConsistency(filename, FALSE) != NULL) {
+  if (CheckFilenameConsistency(filename, FALSE) != 0) {
     return FALSE;
   }
 
@@ -134,11 +143,11 @@ KMX_BOOL NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
     {
       if(first && *p == (KMX_CHAR)0xEF && *(p+1) == (KMX_CHAR)0xBB && *(p+2) == (KMX_CHAR)0xBF) p += 3;  // I3056 UTF-8   // I3512
       first = FALSE;
-      strupr(q);  // I3481   // I3641
-      int n = strtol(p, NULL, 16);
+      kmc_strupr(q);  // I3481   // I3641
+      long n = strtol(p, NULL, 16);
       if (*q != '<') {
         PKMX_WCHAR q0 =  strtowstr(q);
-        AddCode_IncludedCodes(n, q0);
+        AddCode_IncludedCodes((int)n, q0);
         delete[] q0;
       }
     }

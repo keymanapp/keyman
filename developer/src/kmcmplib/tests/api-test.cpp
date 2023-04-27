@@ -54,8 +54,11 @@ void setup() {
 
 void test_kmcmp_CompileKeyboardFile() {
   char kmn_file[L_tmpnam], kmx_file[L_tmpnam];
-  tmpnam(kmn_file);
-  tmpnam(kmx_file);
+  strncpy(kmn_file, "test_kmcmp_CompileKeyboardFile.kmn", L_tmpnam);
+  strncpy(kmx_file, "test_kmcmp_CompileKeyboardFile.kmx", L_tmpnam);
+
+  puts(kmn_file);
+  puts(kmx_file);
 
   // Create an empty file
   FILE *fp = fopen(kmn_file, "w");
@@ -67,12 +70,13 @@ void test_kmcmp_CompileKeyboardFile() {
   assert(error_vec[0] == CERR_CannotReadInfile);
 
   unlink(kmn_file);
+  unlink(kmx_file);
 }
 
 void test_kmcmp_CompileKeyboardFileToBuffer() {
   char kmn_file[L_tmpnam], kmx_file[L_tmpnam];
-  tmpnam(kmn_file);
-  tmpnam(kmx_file);
+  strncpy(kmn_file, "test_kmcmp_CompileKeyboardFileToBuffer.kmn", L_tmpnam);
+  strncpy(kmx_file, "test_kmcmp_CompileKeyboardFileToBuffer.kmx", L_tmpnam);
 
   // Create an empty file
   FILE *fp = fopen(kmn_file, "w");
@@ -86,4 +90,5 @@ void test_kmcmp_CompileKeyboardFileToBuffer() {
   assert(error_vec[0] == CERR_CannotReadInfile);
 
   unlink(kmn_file);
+  unlink(kmx_file);
 }
