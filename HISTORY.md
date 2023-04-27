@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 17.0.96 alpha 2023-04-27
+
+* chore(android): Update QRGen version for Java 11 (#8673)
+* refactor(android/engine): Move toggleSuggestionBanner to KMKeyboard (#8679)
+* refactor(android/engine): Use isKeyboardLoaded() on a consistent basis (#8680)
+* chore(developer): test message correctness in compiler modules (#8664)
+* chore(developer): add eslint devDependency for kmc (#8665)
+* chore(developer): kmc-keyboard should not use any node-specific modules (#8666)
+* fix(common): builder parse multi-param order (#8668)
+* refactor(developer): use callbacks to avoid direct fs access in kmc-package (#8674)
+* refactor(android/engine): Move shouldIgnore booleans to KMKeyboard (#8682)
+* chore(linux): Build for Ubuntu 23.04 Lunar as well (#8683)
+
 ## 17.0.95 alpha 2023-04-26
 
 * refactor(android/engine): Move currentBanner to KMKeyboard (#8671)
