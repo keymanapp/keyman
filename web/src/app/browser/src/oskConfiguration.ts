@@ -35,7 +35,7 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
   });
 
   osk.on('showBuild', () => {
-    internalAlert('KeymanWeb Version ' + KEYMAN_VERSION.VERSION + '<br /><br />'
+    engine.config.signalUser?.alert('KeymanWeb Version ' + KEYMAN_VERSION.VERSION + '<br /><br />'
         +'<span style="font-size:0.8em">Copyright &copy; 2021 SIL International</span>');
   });
 

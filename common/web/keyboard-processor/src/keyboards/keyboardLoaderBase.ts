@@ -18,11 +18,22 @@ export interface KeyboardLoadErrorBuilder {
   missingError(err: Error);
 }
 
-const buildAndFinalizeError = (msg: string, err?: Error): ErrorWithCause => {
-  const builtError: ErrorWithCause = new Error(msg);
-  builtError.cause = err;
+export class KeyboardScriptError extends Error {
+  public readonly cause;
 
-  return builtError;
+  constructor(msg: string, cause?: Error) {
+    super(msg);
+    this.cause = cause;
+  }
+}
+
+export class KeyboardMissingError extends Error {
+  public readonly cause;
+
+  constructor(msg: string, cause?: Error) {
+    super(msg);
+    this.cause = cause;
+  }
 }
 
 class UriBasedErrorBuilder implements KeyboardLoadErrorBuilder {
@@ -34,12 +45,12 @@ class UriBasedErrorBuilder implements KeyboardLoadErrorBuilder {
 
   missingError(err: Error) {
     const msg = `Cannot find the keyboard at ${this.uri}.`;
-    return buildAndFinalizeError(msg, err);
+    return new KeyboardMissingError(msg, err);
   }
 
   scriptError(err: Error) {
     const msg = `Error registering the keyboard script at ${this.uri}; it may contain an error.`;
-    return buildAndFinalizeError(msg, err);
+    return new KeyboardScriptError(msg, err);
   }
 }
 
@@ -53,13 +64,13 @@ class StubBasedErrorBuilder implements KeyboardLoadErrorBuilder {
   missingError(err: Error) {
     const stub = this.stub;
     const msg = `Cannot find the ${stub.name} keyboard for ${stub.langName} at ${stub.filename}.`;
-    return buildAndFinalizeError(msg, err);
+    return new KeyboardMissingError(msg, err);
   }
 
   scriptError(err: Error) {
     const stub = this.stub;
     const msg = `Error registering the ${stub.name} keyboard for ${stub.langName}; keyboard script at ${stub.filename} may contain an error.`;
-    return buildAndFinalizeError(msg, err);
+    return new KeyboardScriptError(msg, err);
   }
 }
 
