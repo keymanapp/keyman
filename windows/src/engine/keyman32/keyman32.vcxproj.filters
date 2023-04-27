@@ -15,6 +15,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="addins.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="appint\aiTIP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -159,6 +162,9 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="addins.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="appint\aiTIP.h">
       <Filter>Header Files</Filter>
     </ClInclude>

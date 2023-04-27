@@ -277,6 +277,7 @@ BOOL AIWin2000Unicode::PostKeys()
 		  break;
 	  case QIT_BACK:
 		  if(Queue[n].dwData & BK_DEADKEY) break;
+		  if(Addin_ProcessBackspace(hwnd)) break;
 
       pInputs[i].type = INPUT_KEYBOARD;
       pInputs[i].ki.wVk = VK_BACK;
