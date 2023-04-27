@@ -161,7 +161,7 @@ dependencies {
     // Add dependency for generating QR Codes
     // (Even though it's embedded in KMEA, because we're manually copying keyman-engine.aar,
     // we "lose" it in the dependency management)
-    implementation ('com.github.kenglxn.QRGen:android:2.7.0') {
+    implementation ('com.github.kenglxn.QRGen:android:3.0.1') {
         transitive = true
     }
 }

@@ -68,8 +68,7 @@ dependencies {
     testImplementation 'org.robolectric:robolectric:4.8.1'
 
     // Generate QR Codes
-    // 3.0.1 requires Java 11
-    implementation ('com.github.kenglxn.QRGen:android:2.7.0') {
+    implementation ('com.github.kenglxn.QRGen:android:3.0.1') {
         transitive = true
     }
 }
