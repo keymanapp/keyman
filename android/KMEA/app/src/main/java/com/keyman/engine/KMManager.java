@@ -661,12 +661,12 @@ public final class KMManager {
 
   public static boolean isKeyboardLoaded(KeyboardType type) {
     if (type == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      if (InAppKeyboardWebViewClient != null) {
+      if (InAppKeyboard != null && InAppKeyboardWebViewClient != null) {
         return InAppKeyboardWebViewClient.getKeyboardLoaded();
       }
       return false;
     } else if (type == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      if (SystemKeyboardWebViewClient != null) {
+      if (SystemKeyboard != null && SystemKeyboardWebViewClient != null) {
         return SystemKeyboardWebViewClient.getKeyboardLoaded();
       }
       return false;
@@ -1329,12 +1329,12 @@ public final class KMManager {
     boolean mayCorrect = prefs.getBoolean(getLanguageCorrectionPreferenceKey(languageID), true);
 
     RelativeLayout.LayoutParams params;
-    if (InAppKeyboard != null && InAppKeyboardWebViewClient.getKeyboardLoaded() && !InAppKeyboardShouldIgnoreTextChange && modelFileExists) {
+    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboardShouldIgnoreTextChange && modelFileExists) {
       params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
-    if (SystemKeyboard != null && SystemKeyboardWebViewClient.getKeyboardLoaded() && !SystemKeyboardShouldIgnoreTextChange && modelFileExists) {
+    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboardShouldIgnoreTextChange && modelFileExists) {
       params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
@@ -1499,11 +1499,13 @@ public final class KMManager {
     boolean result1 = false;
     boolean result2 = false;
 
-    if (InAppKeyboard != null && InAppKeyboardWebViewClient.getKeyboardLoaded())
+    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
       result1 = InAppKeyboard.setKeyboard(packageID, keyboardID, languageID);
+    }
 
-    if (SystemKeyboard != null && SystemKeyboardWebViewClient.getKeyboardLoaded())
+    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
       result2 = SystemKeyboard.setKeyboard(packageID, keyboardID, languageID);
+    }
 
     return (result1 || result2);
   }
@@ -1519,12 +1521,12 @@ public final class KMManager {
       associatedLexicalModel = getAssociatedLexicalModel(languageID);
     }
 
-    if (InAppKeyboard != null && InAppKeyboardWebViewClient.getKeyboardLoaded() && keyboardInfo != null) {
+    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && keyboardInfo != null) {
       result1 = InAppKeyboard.setKeyboard(keyboardInfo);
       InAppKeyboard.toggleSuggestionBanner(associatedLexicalModel, result1);
     }
 
-    if (SystemKeyboard != null && SystemKeyboardWebViewClient.getKeyboardLoaded() && keyboardInfo != null) {
+    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && keyboardInfo != null) {
       result2 = SystemKeyboard.setKeyboard(keyboardInfo);
       SystemKeyboard.toggleSuggestionBanner(associatedLexicalModel, result2);
     }
@@ -1547,13 +1549,11 @@ public final class KMManager {
     boolean result2 = false;
 
     HashMap<String, String> associatedLexicalModel = getAssociatedLexicalModel(languageID);
-    if (InAppKeyboard != null && InAppKeyboardWebViewClient.getKeyboardLoaded())
-    {
+    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
       result1 = InAppKeyboard.prepareKeyboardSwitch(packageID, keyboardID, languageID,keyboardName);
       InAppKeyboard.toggleSuggestionBanner(associatedLexicalModel, result1);
     }
-    if (SystemKeyboard != null && SystemKeyboardWebViewClient.getKeyboardLoaded())
-    {
+    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
       result2 = SystemKeyboard.prepareKeyboardSwitch(packageID, keyboardID, languageID,keyboardName);
       SystemKeyboard.toggleSuggestionBanner(associatedLexicalModel, result2);
     }
@@ -1567,11 +1567,13 @@ public final class KMManager {
     boolean result1 = false;
     boolean result2 = false;
 
-    if (InAppKeyboard != null && (InAppKeyboardWebViewClient.getKeyboardLoaded() || isTestMode()))
+    if (InAppKeyboard != null && (InAppKeyboardWebViewClient.getKeyboardLoaded() || isTestMode())) {
       result1 = InAppKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+    }
 
-    if (SystemKeyboard != null && SystemKeyboardWebViewClient.getKeyboardLoaded())
+    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
       result2 = SystemKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+    }
 
     registerAssociatedLexicalModel(languageID);
 
@@ -1610,11 +1612,11 @@ public final class KMManager {
   }
 
   public static void clearKeyboardCache() {
-    if (InAppKeyboard != null && InAppKeyboardWebViewClient.getKeyboardLoaded()) {
+    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
       InAppKeyboard.clearCache(true);
       InAppKeyboard.loadKeyboard();
     }
-    if (SystemKeyboard != null && SystemKeyboardWebViewClient.getKeyboardLoaded()) {
+    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
       SystemKeyboard.clearCache(true);
       SystemKeyboard.loadKeyboard();
     }
@@ -1864,12 +1866,12 @@ public final class KMManager {
   }
 
   public static void applyKeyboardHeight(Context context, int height) {
-    if (InAppKeyboard != null && InAppKeyboardWebViewClient.getKeyboardLoaded()) {
+    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
       InAppKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
     }
-    if (SystemKeyboard != null && SystemKeyboardWebViewClient.getKeyboardLoaded()) {
+    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
       SystemKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
@@ -1940,11 +1942,11 @@ public final class KMManager {
 
   public static void setNumericLayer(KeyboardType kbType) {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      if (InAppKeyboard != null && InAppKeyboardWebViewClient.getKeyboardLoaded() && !InAppKeyboardShouldIgnoreTextChange) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboardShouldIgnoreTextChange) {
         InAppKeyboard.loadJavascript("setNumericLayer()");
       }
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      if (SystemKeyboard != null && SystemKeyboardWebViewClient.getKeyboardLoaded() && !SystemKeyboardShouldIgnoreTextChange) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboardShouldIgnoreTextChange) {
         SystemKeyboard.loadJavascript("setNumericLayer()");
       }
     }
@@ -1958,14 +1960,14 @@ public final class KMManager {
     }
 
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      if (InAppKeyboard != null && InAppKeyboardWebViewClient.getKeyboardLoaded() && !InAppKeyboardShouldIgnoreTextChange) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboardShouldIgnoreTextChange) {
         InAppKeyboard.loadJavascript(KMString.format("updateKMText('%s')", kmText));
         result = true;
       }
 
       InAppKeyboardShouldIgnoreTextChange = false;
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      if (SystemKeyboard != null && SystemKeyboardWebViewClient.getKeyboardLoaded() && !SystemKeyboardShouldIgnoreTextChange) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboardShouldIgnoreTextChange) {
         SystemKeyboard.loadJavascript(KMString.format("updateKMText('%s')", kmText));
         result = true;
       }
@@ -1979,14 +1981,14 @@ public final class KMManager {
   public static boolean updateSelectionRange(KeyboardType kbType, int selStart, int selEnd) {
     boolean result = false;
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      if (InAppKeyboard != null && InAppKeyboardWebViewClient.getKeyboardLoaded() && !InAppKeyboardShouldIgnoreSelectionChange) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboardShouldIgnoreSelectionChange) {
         InAppKeyboard.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
         result = true;
       }
 
       InAppKeyboardShouldIgnoreSelectionChange = false;
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      if (SystemKeyboard != null && SystemKeyboardWebViewClient.getKeyboardLoaded() && !SystemKeyboardShouldIgnoreSelectionChange) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboardShouldIgnoreSelectionChange) {
         InputConnection ic = getInputConnection(KeyboardType.KEYBOARD_TYPE_SYSTEM);
         if (ic != null) {
           ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
@@ -2007,11 +2009,11 @@ public final class KMManager {
 
   public static void resetContext(KeyboardType kbType) {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      if (InAppKeyboard != null && InAppKeyboardWebViewClient.getKeyboardLoaded()) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
         InAppKeyboard.loadJavascript("resetContext()");
       }
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      if (SystemKeyboard != null && SystemKeyboardWebViewClient.getKeyboardLoaded()) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
         SystemKeyboard.loadJavascript("resetContext()");
       }
     }
