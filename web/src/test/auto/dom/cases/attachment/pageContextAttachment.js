@@ -64,5 +64,18 @@ describe.only('KMW element-attachment logic', function () {
     // Note:  anything with iframes (design or not) requires an extra timeout for the internal doc to load.
 
     assert.sameOrderedMembers(attached.map((elem) => elem.id), ['input', 'textarea']);
+
+    // Reset - make sure they're compatible with `kmw-disabled`, too!
+    fixture.cleanup();
+    attached.splice(0, attached.length);
+
+    fixture.load("input-and-disabled-text.html");
+
+    // This gives the mutation observers a moment to 'kick in' and is required for test success.
+    await Promise.resolve();
+
+    // Note:  anything with iframes (design or not) requires an extra timeout for the internal doc to load.
+
+    assert.sameOrderedMembers(attached.map((elem) => elem.id), ['input']);
   });
 });
