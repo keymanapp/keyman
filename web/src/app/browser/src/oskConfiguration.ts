@@ -1,7 +1,7 @@
 import { type KeyElement, OSKView, VisualKeyboard } from "keyman/engine/osk";
 import { KEYMAN_VERSION } from "@keymanapp/keyman-version";
 import ContextManager from "./contextManager.js";
-import { KeymanEngine } from "./keymanEngine.js";
+import KeymanEngine from "./keymanEngine.js";
 import { LanguageMenu } from "./languageMenu.js";
 
 export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextManager: ContextManager) {

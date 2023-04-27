@@ -1,6 +1,6 @@
 import { DomEventTracker } from 'keyman/engine/events';
 
-import { KeymanEngine } from "../keymanEngine.js";
+import KeymanEngine from "../keymanEngine.js";
 import { FocusAssistant } from './focusAssistant.js';
 
 // Note:  in the future, it'd probably be best to have an instance per iframe window as

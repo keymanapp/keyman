@@ -2,7 +2,7 @@
 import { getAbsoluteX, landscapeView } from "keyman/engine/dom-utils";
 import { KeyboardStub } from "keyman/engine/package-cache";
 
-import { KeymanEngine } from "./keymanEngine.js";
+import KeymanEngine from "./keymanEngine.js";
 import * as util from "./utils/index.js";
 
 // Used by 'native'-mode KMW only - the Android and iOS embedding apps implement their own menus.

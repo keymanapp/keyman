@@ -14,7 +14,7 @@ import { PageIntegrationHandlers } from './context/pageIntegrationHandlers.js';
 import { LanguageMenu } from './languageMenu.js';
 import { setupOskListeners } from './oskConfiguration.js';
 
-export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {
+export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {
   touchLanguageMenu?: LanguageMenu;
   private pageIntegration: PageIntegrationHandlers;
 
