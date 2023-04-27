@@ -16,7 +16,7 @@
     "bundle-kmlmc": "esbuild build/src/kmlmc.js --bundle --platform=node --target=es2022 > build/cjs-src/kmlmc.cjs",
     "bundle-kmlmi": "esbuild build/src/kmlmi.js --bundle --platform=node --target=es2022 > build/cjs-src/kmlmi.cjs",
     "bundle-kmlmp": "esbuild build/src/kmlmp.js --bundle --platform=node --target=es2022 > build/cjs-src/kmlmp.cjs",
-    "test": "cd test && tsc -b && cd .. && mocha",
+    "test": "eslint . && cd test && tsc -b && cd .. && mocha",
     "prepublishOnly": "npm run build"
   },
   "type": "module",

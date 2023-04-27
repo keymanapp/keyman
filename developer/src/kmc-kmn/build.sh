@@ -64,6 +64,7 @@ fi
 
 if builder_start_action test; then
   tsc --build test/
+  npm run lint
   c8 --reporter=lcov --reporter=text mocha "${builder_extra_params[@]}"
   builder_finish_action success test
 fi
