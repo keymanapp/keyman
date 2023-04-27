@@ -1511,19 +1511,25 @@ public final class KMManager {
   public static boolean setKeyboard(Keyboard keyboardInfo) {
     boolean result1 = false;
     boolean result2 = false;
+    HashMap<String, String> associatedLexicalModel = null;
+    String languageID = null;
+
+    if (keyboardInfo != null) {
+      languageID = keyboardInfo.getLanguageID();
+      associatedLexicalModel = getAssociatedLexicalModel(languageID);
+    }
 
     if (InAppKeyboard != null && InAppKeyboardWebViewClient.getKeyboardLoaded() && keyboardInfo != null) {
       result1 = InAppKeyboard.setKeyboard(keyboardInfo);
+      InAppKeyboard.toggleSuggestionBanner(associatedLexicalModel, result1);
     }
 
-    if (SystemKeyboard != null && SystemKeyboardWebViewClient.getKeyboardLoaded() && keyboardInfo != null)
+    if (SystemKeyboard != null && SystemKeyboardWebViewClient.getKeyboardLoaded() && keyboardInfo != null) {
       result2 = SystemKeyboard.setKeyboard(keyboardInfo);
-
-    if (keyboardInfo != null) {
-      String languageID = keyboardInfo.getLanguageID();
-      toggleSuggestionBanner(languageID, result1, result2);
-      registerAssociatedLexicalModel(languageID);
+      SystemKeyboard.toggleSuggestionBanner(associatedLexicalModel, result2);
     }
+
+    registerAssociatedLexicalModel(languageID);
 
     return (result1 || result2);
   }
@@ -1537,21 +1543,21 @@ public final class KMManager {
    * @return the success result
    */
   public static boolean prepareKeyboardSwitch(String packageID, String keyboardID, String languageID, String keyboardName) {
-
-
     boolean result1 = false;
     boolean result2 = false;
 
+    HashMap<String, String> associatedLexicalModel = getAssociatedLexicalModel(languageID);
     if (InAppKeyboard != null && InAppKeyboardWebViewClient.getKeyboardLoaded())
     {
       result1 = InAppKeyboard.prepareKeyboardSwitch(packageID, keyboardID, languageID,keyboardName);
+      InAppKeyboard.toggleSuggestionBanner(associatedLexicalModel, result1);
     }
     if (SystemKeyboard != null && SystemKeyboardWebViewClient.getKeyboardLoaded())
     {
       result2 = SystemKeyboard.prepareKeyboardSwitch(packageID, keyboardID, languageID,keyboardName);
+      SystemKeyboard.toggleSuggestionBanner(associatedLexicalModel, result2);
     }
 
-    toggleSuggestionBanner(languageID, result1, result2);
     registerAssociatedLexicalModel(languageID);
 
     return (result1 || result2);
@@ -2150,26 +2156,6 @@ public final class KMManager {
 
   public static void setGlobeKeyState(GlobeKeyState state) {
     globeKeyState = state;
-  }
-
-  private static void toggleSuggestionBanner(String languageID, boolean inappKeyboardChanged, boolean systemKeyboardChanged) {
-    //reset banner state if new language has no lexical model
-    if (InAppKeyboard != null && InAppKeyboard.currentBanner().equals(KMKeyboard.KM_BANNER_STATE_SUGGESTION)
-      && getAssociatedLexicalModel(languageID)==null) {
-      InAppKeyboard.setCurrentBanner(KMKeyboard.KM_BANNER_STATE_BLANK);
-    }
-
-    if (SystemKeyboard != null && SystemKeyboard.currentBanner().equals(KMKeyboard.KM_BANNER_STATE_SUGGESTION)
-      && getAssociatedLexicalModel(languageID)==null) {
-      SystemKeyboard.setCurrentBanner(KMKeyboard.KM_BANNER_STATE_BLANK);
-    }
-
-    if(inappKeyboardChanged) {
-      InAppKeyboard.setLayoutParams(getKeyboardLayoutParams());
-    }
-    if(systemKeyboardChanged) {
-      SystemKeyboard.setLayoutParams(getKeyboardLayoutParams());
-    }
   }
 
   /**

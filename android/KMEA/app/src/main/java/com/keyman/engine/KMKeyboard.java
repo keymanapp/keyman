@@ -422,6 +422,18 @@ final class KMKeyboard extends WebView {
 
   public static String currentBanner() { return currentBanner; }
 
+  protected void toggleSuggestionBanner(HashMap<String, String> associatedLexicalModel, boolean keyboardChanged) {
+    //reset banner state if new language has no lexical model
+    if (currentBanner != null && currentBanner.equals(KM_BANNER_STATE_SUGGESTION)
+        && associatedLexicalModel == null) {
+      setCurrentBanner(KMKeyboard.KM_BANNER_STATE_BLANK);
+    }
+
+    if(keyboardChanged) {
+      setLayoutParams(KMManager.getKeyboardLayoutParams());
+    }
+  }
+
   /**
    * Return the full path to the display text font. Usually used for creating a Typeface font
    * @return String
