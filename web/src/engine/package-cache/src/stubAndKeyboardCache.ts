@@ -242,10 +242,10 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
     let arr: KeyboardStub[] = [];
 
     const kbdIds = Object.keys(this.stubSetTable);
-    for(let kbdId in kbdIds) {
+    for(let kbdId of kbdIds) {
       let row = this.stubSetTable[kbdId];
       const langIds = Object.keys(row);
-      for(let langId in langIds) {
+      for(let langId of langIds) {
         arr.push(row[langId]);
       }
     }
