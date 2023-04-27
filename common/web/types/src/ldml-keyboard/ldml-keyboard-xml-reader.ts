@@ -24,8 +24,7 @@ export default class LDMLKeyboardXMLSourceFileReader {
   readImportFile(version: string, subpath: string): Buffer {
     // TODO-LDML: sanitize input string
     let importPath = new URL(`../import/${version}/${subpath}`, import.meta.url);
-    // TODO-LDML: support baseFileName?
-    return this.callbacks.loadFile(importPath.pathname, importPath);
+    return this.callbacks.loadFile(importPath);
   }
 
   /**

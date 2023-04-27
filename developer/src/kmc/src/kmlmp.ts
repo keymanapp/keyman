@@ -36,9 +36,8 @@ let outputFilename: string = program.opts().outFile ? program.opts().outFile : i
 //
 
 const callbacks = new NodeCompilerCallbacks();
-let kpsString: string = fs.readFileSync(inputFilename, 'utf8');
 let kmpCompiler = new KmpCompiler(callbacks);
-let kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsString, inputFilename);
+let kmpJsonData = kmpCompiler.transformKpsToKmpObject(inputFilename);
 
 //
 // Build the .kmp package file

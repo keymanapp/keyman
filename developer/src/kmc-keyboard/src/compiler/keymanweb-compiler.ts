@@ -1,4 +1,4 @@
-import { util, VisualKeyboard, LDMLKeyboard, TouchLayoutFileWriter } from "@keymanapp/common-types";
+import { CompilerCallbacks, VisualKeyboard, LDMLKeyboard, TouchLayoutFileWriter } from "@keymanapp/common-types";
 import CompilerOptions from "./compiler-options.js";
 import { TouchLayoutCompiler } from "./touch-layout-compiler.js";
 import VisualKeyboardCompiler from "./visual-keyboard-compiler.js";
@@ -13,7 +13,7 @@ export class KeymanWebCompiler {
   private readonly nl: string;
   private readonly tab: string;
 
-  constructor(options?: KeymanWebCompilerOptions) {
+  constructor(private callbacks: CompilerCallbacks, options?: KeymanWebCompilerOptions) {
     this.options = { ...options };
     this.nl = this.options.debug ? "\n" : '';
     this.tab = this.options.debug ? "  " : '';
@@ -43,7 +43,7 @@ export class KeymanWebCompiler {
   }
 
   private cleanName(name: string): string {
-    let result = util.basename(name, '.xml');
+    let result = this.callbacks.path.basename(name, '.xml');
     if(!result) {
       throw new Error(`Invalid file name ${name}`);
     }

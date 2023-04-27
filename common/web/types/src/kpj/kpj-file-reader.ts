@@ -4,8 +4,13 @@ import { default as AjvModule } from 'ajv';
 const Ajv = AjvModule.default; // The actual expected Ajv type.
 import { boxXmlArray } from '../util/util.js';
 import { KeymanDeveloperProject, KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from './keyman-developer-project.js';
+import { CompilerCallbacks } from '../util/compiler-interfaces.js';
 
 export class KPJFileReader {
+  constructor(private callbacks: CompilerCallbacks) {
+
+  }
+
   public read(file: Uint8Array): KPJFile {
     let data: KPJFile;
 
@@ -37,12 +42,12 @@ export class KPJFileReader {
     return def;
   }
 
-  public transform(projectPath: string, source: KPJFile): KeymanDeveloperProject {
+  public transform(projectFilename: string, source: KPJFile): KeymanDeveloperProject {
     // NOTE: at this point, the xml should have been validated
     // and matched the schema result so we can assume the source
     // is a valid shape
     let project = source.KeymanDeveloperProject;
-    let result: KeymanDeveloperProject = new KeymanDeveloperProject(project.Options?.Version || "1.0");
+    let result: KeymanDeveloperProject = new KeymanDeveloperProject(projectFilename, project.Options?.Version || "1.0", this.callbacks);
     if(result.options.version == '2.0') {
       result.options.buildPath = (project.Options?.BuildPath || result.options.buildPath).replace(/\\/g, '/');
       result.options.sourcePath = (project.Options?.SourcePath || result.options.sourcePath).replace(/\\/g, '/');
@@ -60,7 +65,7 @@ export class KPJFileReader {
     if(result.options.version == '1.0') {
       this.transformFilesVersion10(project, result);
     } else {
-      result.populateFiles(projectPath);
+      result.populateFiles();
     }
 
     return result;

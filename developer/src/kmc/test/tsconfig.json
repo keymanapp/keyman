@@ -13,6 +13,7 @@
   },
   "include": [
     "**/test-*.ts",
+    "./helpers/index.ts",
   ],
   "references": [
     { "path": "../../../../common/web/types/" },

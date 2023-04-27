@@ -1,12 +1,14 @@
 import * as fs from 'fs';
-import { CompilerCallbacks, CompilerSchema, CompilerEvent, compilerErrorSeverityName } from '@keymanapp/common-types';
+import * as path from 'path';
+import { CompilerCallbacks, CompilerSchema, CompilerEvent, compilerErrorSeverityName, CompilerPathCallbacks, CompilerFileSystemCallbacks } from '@keymanapp/common-types';
 
 /**
  * Concrete implementation for CLI use
  */
+
 export class NodeCompilerCallbacks implements CompilerCallbacks {
-  loadFile(baseFilename: string, filename: string | URL): Buffer {
-    // TODO: translate filename based on the baseFilename
+  // TODO: REMOVE!
+  loadFile(filename: string | URL): Buffer {
     try {
       return fs.readFileSync(filename);
     } catch (e) {
@@ -16,6 +18,14 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
         throw e;
       }
     }
+  }
+
+  get path(): CompilerPathCallbacks {
+    return path;
+  }
+
+  get fs(): CompilerFileSystemCallbacks {
+    return fs;
   }
 
   reportMessage(event: CompilerEvent): void {
@@ -35,4 +45,25 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     let schemaPath = new URL('../util/' + schema + '.schema.json', import.meta.url);
     return fs.readFileSync(schemaPath);
   }
+
+  fileExists(filename: string) {
+    return fs.existsSync(filename);
+  }
+
+  resolveFilename(baseFilename: string, filename: string) {
+    const basePath = path.dirname(baseFilename);
+    // Transform separators to platform separators -- we are agnostic
+    // in our use here but path prefers files may use
+    // either / or \, although older kps files were always \.
+    if(path.sep == '/') {
+      filename = filename.replace(/\\/g, '/');
+    } else {
+      filename = filename.replace(/\//g, '\\');
+    }
+    if(!path.isAbsolute(filename)) {
+      filename = path.resolve(basePath, filename);
+    }
+    return filename;
+  }
+
 }

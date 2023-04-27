@@ -16,9 +16,8 @@ export class BuildPackage extends BuildActivity {
     // Load .kps source data
     //
 
-    const kpsString: string = fs.readFileSync(infile, 'utf8');
     const kmpCompiler = new KmpCompiler(callbacks);
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsString, infile);
+    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(infile);
     if(!kmpJsonData) {
       return false;
     }
