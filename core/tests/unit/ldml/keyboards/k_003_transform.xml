@@ -18,10 +18,10 @@ Note: keys should start with [K_A][K_B][K_C] not [K_Y] when transforms are funct
   </names>
 
   <keys>
-    <key id="backslash" to="\u{005c}"/>
-    <key id="bquote" to="`"/>
-    <key id="equals" to="="/>
-    <key id="hyphen" to="-"/>
+    <key id="backslash" to="\u{005c}" />
+    <key id="bquote" to="`" />
+    <key id="equals" to="=" />
+    <key id="hyphen" to="-" />
   </keys>
 
   <layers form="us">
@@ -35,10 +35,12 @@ Note: keys should start with [K_A][K_B][K_C] not [K_Y] when transforms are funct
   </layers>
 
   <transforms type="simple">
-    <transform from="ab" to="x" />
-    <transform from="abc" to="y" />
-    <transform from="abef" to="z" />
-    <transform from="bc" to="m" />
-    <transform from="beq" to="n" />
+    <transformGroup>
+      <transform from="ab" to="x" />
+      <transform from="abc" to="y" />
+      <transform from="abef" to="z" />
+      <transform from="bc" to="m" />
+      <transform from="beq" to="n" />
+    </transformGroup>
   </transforms>
 </keyboard>
