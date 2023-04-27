@@ -418,7 +418,7 @@
     "special": {
       "$ref": "#/definitions/any"
     },
-    "string": {
+    "stringVariable": {
       "additionalProperties": false,
       "properties": {
         "id": {
@@ -552,7 +552,7 @@
         },
         "string": {
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/stringVariable"
           },
           "type": "array"
         },
