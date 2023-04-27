@@ -41,8 +41,7 @@ export default class KeymanEngine extends KeymanEngineBase<WebviewConfiguration,
     this.config.hostDevice = device;
 
     const totalOptions = {...WebviewInitOptionDefaults, ...options};
-    super.init(totalOptions);
-    this.config.initialize(totalOptions);
+    await super.init(totalOptions);
 
     // There may be some valid mutations possible even on repeated calls?
     // The original seems to allow it.

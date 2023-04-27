@@ -1,10 +1,9 @@
-import { KeyboardKeymanGlobal } from '@keymanapp/keyboard-processor';
-import { StubAndKeyboardCache } from 'keyman/engine/package-cache';
 import { type OutputTarget } from 'keyman/engine/element-wrappers';
 import { FloatingOSKView, OSKView } from 'keyman/engine/osk';
 import { KeyboardInterface as KeyboardInterfaceBase } from 'keyman/engine/main';
 
 import ContextManager from './contextManager.js';
+import KeymanEngine from './keymanEngine.js';
 
 export default class KeyboardInterface extends KeyboardInterfaceBase<ContextManager> {
   // TBD:  allowing it to be set and/or the retrieval mechanism.
@@ -15,10 +14,9 @@ export default class KeyboardInterface extends KeyboardInterfaceBase<ContextMana
 
   constructor(
     _jsGlobal: any,
-    keymanGlobal: KeyboardKeymanGlobal,
-    contextManager: ContextManager,
+    engine: KeymanEngine,
   ) {
-    super(_jsGlobal, keymanGlobal, contextManager);
+    super(_jsGlobal, engine);
 
     // Nothing else to do here... quite yet.  Things may not stay that way, though.
   }
@@ -30,18 +28,18 @@ export default class KeyboardInterface extends KeyboardInterfaceBase<ContextMana
    * Description  Save keyboard focus
    */
   saveFocus(): void {
-    this.contextManager.focusAssistant._IgnoreNextSelChange = 1;
+    this.engine.contextManager.focusAssistant._IgnoreNextSelChange = 1;
   }
 
   /**
    * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
    */
   getLastActiveElement(): OutputTarget<any> {
-    return this.contextManager.lastActiveTarget;
+    return this.engine.contextManager.lastActiveTarget;
   }
 
   focusLastActiveElement(): void {
-    this.contextManager.restoreLastActiveTarget();
+    this.engine.contextManager.restoreLastActiveTarget();
   }
 
   //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard

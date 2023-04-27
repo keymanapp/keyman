@@ -2,7 +2,8 @@ import { KeymanEngine as KeymanEngineBase } from 'keyman/engine/main';
 import { Device as DeviceDetector } from 'keyman/engine/device-detect';
 import { getAbsoluteY } from 'keyman/engine/dom-utils';
 import { OutputTarget } from 'keyman/engine/element-wrappers';
-import { AnchoredOSKView, FloatingOSKView, FloatingOSKViewConfiguration, OSKView } from 'keyman/engine/osk';
+import { AnchoredOSKView, FloatingOSKView, FloatingOSKViewConfiguration, OSKView, TwoStateActivator } from 'keyman/engine/osk';
+import { ErrorStub, KeyboardStub } from 'keyman/engine/package-cache';
 import { DeviceSpec, ProcessorInitOptions, extendString } from "@keymanapp/keyboard-processor";
 
 import { BrowserConfiguration, BrowserInitOptionDefaults, BrowserInitOptionSpec } from './configuration.js';
@@ -13,6 +14,7 @@ import { FocusStateAPIObject } from './context/focusAssistant.js';
 import { PageIntegrationHandlers } from './context/pageIntegrationHandlers.js';
 import { LanguageMenu } from './languageMenu.js';
 import { setupOskListeners } from './oskConfiguration.js';
+import { whenDocumentReady } from './utils/documentReady.js';
 
 export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {
   touchLanguageMenu?: LanguageMenu;
@@ -30,12 +32,15 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
 
     // Scrolls the document-body to ensure that a focused element remains visible after the OSK appears.
     this.contextManager.on('targetchange', (target: OutputTarget<any>) => {
+      const e = target?.getElement();
+      (this.osk.activationModel as TwoStateActivator<HTMLElement>).activationTrigger = e;
+
       if(this.config.hostDevice.touchable) {
         if(!target || !this.osk) {
           return;
         }
 
-        const e = target.getElement();
+        const e = target?.getElement();
 
         // Get the absolute position of the caret
         const y = getAbsoluteY(e);
@@ -71,18 +76,24 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     this.config.hostDevice = device;
 
     const totalOptions = {...BrowserInitOptionDefaults, ...options};
-    super.init(totalOptions);
-    this.config.initialize(totalOptions);
+    await super.init(totalOptions);
 
-    // There may be some valid mutations possible even on repeated calls?
-    // The original seems to allow it.
+    // Must wait for document load for further initialization.
+    await whenDocumentReady();
 
+    // Deferred keyboard loading + shortcutting if a different init call on the engine has
+    // already fully resolved.
     if(this.config.deferForInitialization.hasFinalized) {
       // abort!  Maybe throw an error, too.
       return Promise.resolve();
     }
 
-    this.contextManager.initialize();
+    // There may be some valid mutations possible even on repeated calls?
+    // The original seems to allow it.
+
+    this.config.initialize(totalOptions);  // will init alertHost, which requires document.body
+
+    this.contextManager.initialize();  // will seek to attach to the page, which requires document.body
     const oskConfig: FloatingOSKViewConfiguration = {
       hostDevice: this.config.hostDevice,
       pathConfig: this.config.paths,
@@ -106,6 +117,10 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // Initialize supplementary plane string extensions
     String.kmwEnableSupplementaryPlane(true);
     this.config.finalizeInit();
+  }
+
+  get register() {
+    return this.keyboardRequisitioner.cloudQueryEngine.registerFromCloud;
   }
 
   /**
@@ -163,6 +178,51 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
 
     this.contextManager.setKeyboardForTarget(Pelem._kmwAttachment.interface, Pkbd, Plc);
   }
+
+  /**
+   * Exposed function to load keyboards by name. One or more arguments may be used
+   *
+   * @param {any[]} args keyboard name string or keyboard metadata JSON object
+   * @returns {Promise<(KeyboardStub|ErrorStub)[]>} Promise of added keyboard/error stubs
+   *
+   */
+  addKeyboards(...args: any[]) :
+      Promise<(KeyboardStub|ErrorStub)[]> {
+    if (!args || !args[0] || args[0].length == 0) {
+      // Get the cloud keyboard catalog
+      return this.keyboardRequisitioner.fetchCloudCatalog().catch((errVal) => {
+        console.error(errVal[0].error);
+        return errVal;
+      });
+    } else {
+      let x: (string|KeyboardStub)[] = [];
+      if (Array.isArray(args[0])) {
+        args[0].forEach(a =>
+          x.push(a));
+      } else if (Array.isArray(args)) {
+        args.forEach(a =>
+          x.push(a));
+      } else {
+        x.push(args);
+      }
+      return this.keyboardRequisitioner.addKeyboardArray(x);
+    }
+  }
+
+  /**
+   *  Add default keyboards for given language(s)
+   *
+   *  @param  {string|string[]}   arg    Language name (multiple arguments allowed)
+   *  @returns {Promise<(KeyboardStub|ErrorStub)[]>} Promise of added keyboard/error stubs
+   **/
+  ['addKeyboardsForLanguage'](arg: string[]|string) : Promise<(KeyboardStub|ErrorStub)[]> {
+    if (typeof arg === 'string') {
+      return this.keyboardRequisitioner.addLanguageKeyboards(arg.split(',').map(item => item.trim()));
+    } else {
+      return this.keyboardRequisitioner.addLanguageKeyboards(arg);
+    }
+  }
+
 
   /**
    * Detaches all KMW event handlers attached by this instance of the engine and releases

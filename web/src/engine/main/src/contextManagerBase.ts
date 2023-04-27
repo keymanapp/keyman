@@ -231,10 +231,15 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
       this.emit('beforekeyboardchange', activatingKeyboard.metadata);
     }
 
-    this.activateKeyboardForTarget({
-      keyboard: keyboard,
-      metadata: activatingKeyboard.metadata
-    }, this.keyboardTarget);
+    let kbdStubPair: { keyboard: Keyboard, metadata: KeyboardStub } = null;
+    if(keyboard) {
+      kbdStubPair = {
+        keyboard: keyboard,
+        metadata: activatingKeyboard.metadata
+      };
+    }
+
+    this.activateKeyboardForTarget(kbdStubPair, this.keyboardTarget);
 
     // Only trigger `keyboardchange` events when they will affect the active context.
     if(this.keyboardTarget == originalKeyboardTarget) {
@@ -266,7 +271,12 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     languageCode ||= '';
 
     // Check that the saved keyboard is currently registered
-    let requestedStub = this.keyboardCache.getStub(keyboardId, languageCode);
+    let requestedStub = null;
+    if(keyboardId) {
+      requestedStub = this.keyboardCache.getStub(keyboardId, languageCode);
+    } else {
+      languageCode == '';
+    }
 
     // Mobile device addition: force selection of the first keyboard if none set
     if(this.engineConfig.hostDevice.touchable && !requestedStub) {

@@ -58,6 +58,9 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
   }
 
   getKeyboard(keyboardID: string): Keyboard {
+    if(!keyboardID) {
+      return null;
+    }
     const entry = this.keyboardTable[prefixed(keyboardID)];
 
     // Unit testing may 'trip up' in the DOM, as bundled versions of a class from one bundled
@@ -198,7 +201,9 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
       keyboardID = arg0;
     }
 
-    keyboardID = prefixed(keyboardID);
+    if(keyboardID) {
+      keyboardID = prefixed(keyboardID);
+    }
 
     const stubTable = this.stubSetTable[keyboardID] ?? {};
 

@@ -728,10 +728,10 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
     this._Box.appendChild(this.banner.element);
 
     if(this.bannerView.banner) {
-      this.banner.banner.configureForKeyboard(this.keyboardData.keyboard, this.keyboardData.metadata);
+      this.banner.banner.configureForKeyboard(this.keyboardData?.keyboard, this.keyboardData?.metadata);
     }
 
-    let kbdView: KeyboardView = this.keyboardView = this._GenerateKeyboardView(this.keyboardData.keyboard, this.keyboardData.metadata);
+    let kbdView: KeyboardView = this.keyboardView = this._GenerateKeyboardView(this.keyboardData?.keyboard, this.keyboardData?.metadata);
     this._Box.appendChild(kbdView.element);
     kbdView.postInsert();
 

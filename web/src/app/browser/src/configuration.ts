@@ -3,6 +3,7 @@ import { EngineConfiguration, InitOptionSpec, InitOptionDefaults } from "keyman/
 import { OutputTarget as DOMOutputTarget } from 'keyman/engine/element-wrappers';
 import { isEmptyTransform, OutputTarget, RuleBehavior } from '@keymanapp/keyboard-processor';
 import { AlertHost } from "./utils/alertHost.js";
+import { whenDocumentReady } from "./utils/documentReady.js";
 
 export class BrowserConfiguration extends EngineConfiguration {
   private _ui: string;
@@ -11,13 +12,18 @@ export class BrowserConfiguration extends EngineConfiguration {
   private alertHost?: AlertHost;
 
   initialize(options: Required<BrowserInitOptionSpec>) {
-    this.initialize(options);
+    super.initialize(options);
 
     this._ui = options.ui;
     this._attachType = options.attachType;
-    if(options.useAlerts) {
-      this.alertHost = new AlertHost();
-    }
+    whenDocumentReady().then(() => {
+      if(options.useAlerts && !this.alertHost) {
+        this.alertHost = new AlertHost();
+      } else if(!options.useAlerts && this.alertHost) {
+        this.alertHost.shutdown();
+        this.alertHost = null;
+      }
+    });
   }
 
   get attachType() {

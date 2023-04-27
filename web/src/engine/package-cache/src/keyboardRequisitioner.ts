@@ -272,6 +272,16 @@ export default class KeyboardRequisitioner {
     });
   }
 
+  async fetchCloudCatalog() {
+    try {
+      const stubs = await this.cloudQueryEngine.keymanCloudRequest('', false);
+      stubs.forEach((stub) => this.cache.addStub(stub));
+      return stubs;
+    } catch(error) {
+      return Promise.reject([{error: error}]);
+    }
+  }
+
   /**
    * Display warning if language name unavailable to add keyboard
    * @param {string} languageName
