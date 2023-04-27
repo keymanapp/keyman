@@ -336,99 +336,9 @@ namespace com.keyman {
       }
     }
 
-    /**
-     * Customized alert.
-     *
-     * @param     {string}        s       alert text
-     * @param     {function()=}   fn      function to call when alert dismissed
-     */
-    alert(s: string, fn?: () => void): void {
-      var bg = this.waiting, nn=bg.firstChild.childNodes;
-      (nn[0] as HTMLElement).style.display='block';
-      (nn[1] as HTMLElement).className='kmw-alert-text';
-      (nn[1] as HTMLElement).innerHTML=s;
-      (nn[2] as HTMLElement).style.display='none';
-      bg.style.display='block';
-      bg.dismiss = arguments.length > 1 ? fn : null;
-    }
-
-    // Stub definition to be fleshed out depending upon native/embedded mode.
-    wait(s: string|boolean): void {
-
-    }
-
-    /**
-     * Customized internal alert. This is enabled/disabled by the option flag 'useAlerts'
-     *
-     * @param     {string}        s       alert text
-     * @param     {function()=}   fn      function to call when alert dismissed
-     */
-     internalAlert(s: string, fn?: () => void): void {
-       if (this.keyman.options.useAlerts) {
-         this.alert(s, fn);
-       }
-     }
-
-    /**
-     *  Prepare the background and keyboard loading wait message box
-     *  Should not be called before options are defined during initialization
-     **/
-    prepareWait(): void {
-      var bg: HTMLDivElement = <HTMLDivElement>document.createElement('DIV'),
-          lb=document.createElement('DIV'),
-          lt=document.createElement('DIV'),
-          gr=document.createElement('DIV'),
-          bx=document.createElement('DIV');
-
-      bg.className='kmw-wait-background';
-      lb.className='kmw-wait-box';
-      bg.dismiss=null;
-      lt.className='kmw-wait-text';
-      gr.className='kmw-wait-graphic';
-      bx.className='kmw-alert-close';
-
-      // Close alert if anywhere in box is touched, since close box is too small on mobiles
-      lb.onmousedown=lb.onclick=function(e) {
-        // Ignore if waiting, only handle for alert
-        if(bx.style.display == 'block') {
-          bg.style.display='none';
-          if(bg.dismiss) {
-            bg.dismiss();
-          }
-        }
-      };
-
-      lb.addEventListener('touchstart', lb.onclick, false);
-      bg.onmousedown=bg.onclick=function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-      }
-      bg.addEventListener('touchstart', bg.onclick, false);
-      lb.appendChild(bx);
-      lb.appendChild(lt);
-      lb.appendChild(gr);
-      bg.appendChild(lb);
-      document.body.appendChild(bg);
-      this.waiting=bg;
-    }
-
     shutdown() {
       // Remove all event-handler references rooted in KMW events.
       this.events = {};
-
-      // Remove all events linking to elements of the original, unaltered page.
-      // This should sever any still-existing page ties to this instance of KMW,
-      // allowing browser GC to do its thing.
-      for(let event of this.domEvents) {
-        this.detachDOMEvent(event.Pelem, event.Peventname, event.Phandler, event.PuseCapture);
-      }
-
-      // alt / modularized form for the above:  given `eventTracker: DomEventTracker`, call
-      // `eventTracker.shutdown()`.
-
-      // Remove any KMW-added DOM element clutter.
-      this.waiting.parentNode.removeChild(this.waiting);
     }
 
     /**

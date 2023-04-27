@@ -14,10 +14,11 @@ import { EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/eve
 import DOMCloudRequester from "keyman/engine/package-cache/dom-requester";
 
 export default class KeymanEngine<
+  Configuration extends EngineConfiguration,
   ContextManager extends ContextManagerBase<any>,
   HardKeyboard extends HardKeyboardBase
 > implements KeyboardKeymanGlobal {
-  readonly config: EngineConfiguration;
+  readonly config: Configuration;
   readonly contextManager: ContextManager;
   readonly interface: KeyboardInterface<ContextManager>;
   readonly core: InputProcessor;
@@ -92,7 +93,7 @@ export default class KeymanEngine<
    * @param config
    * @param contextManager
    */
-  constructor(worker: Worker, config: EngineConfiguration, contextManager: ContextManager) {
+  constructor(worker: Worker, config: Configuration, contextManager: ContextManager) {
     this.config = config;
     this.contextManager = contextManager;
 
