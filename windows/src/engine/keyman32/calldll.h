@@ -19,18 +19,15 @@
 #ifndef __CALLDLL_H
 #define __CALLDLL_H
 
-BOOL LoadDLLs(LPINTKEYBOARDINFO lpkbi);
-BOOL UnloadDLLs(LPINTKEYBOARDINFO lpkbi);
-BOOL DeactivateDLLs(LPINTKEYBOARDINFO lpkbi);
-BOOL ActivateDLLs(LPINTKEYBOARDINFO lpkbi);
-
-// TODO: 5444 This will become the only LoadDLLs function
 /**
  * Load the all the dlls used by the current keyboard
  * @param   lpkbi  The keyboard for which to load the dlls
  * @return  BOOL  True on success
  */
 BOOL LoadDLLs(LPINTKEYBOARDINFO lpkbi);
+BOOL UnloadDLLs(LPINTKEYBOARDINFO lpkbi);
+BOOL DeactivateDLLs(LPINTKEYBOARDINFO lpkbi);
+BOOL ActivateDLLs(LPINTKEYBOARDINFO lpkbi);
 
 
 BOOL IsIMWindow(HWND hwnd);
