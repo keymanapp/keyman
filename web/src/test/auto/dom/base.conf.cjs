@@ -60,6 +60,8 @@ module.exports = {
 
     {pattern: 'common/test/resources/fixtures/**/*.html', watched: true}, // HTML structures useful for testing.
     {pattern: 'common/test/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
+    {pattern: 'web/src/test/auto/resources/fixtures/**/*.html', watched: true, served: true},
+
     {pattern: 'web/build/app/web/debug/**/*.css', watched: false, served: true, included: false}, // OSK resources
     {pattern: 'web/build/app/web/debug/**/*.gif', watched: false, served: true, included: false}, // OSK resources
     {pattern: 'web/build/app/web/debug/**/*.png', watched: false, served: true, included: false}, // OSK resources
@@ -97,12 +99,12 @@ module.exports = {
   // preprocess matching files before serving them to the browser
   // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
   preprocessors: {
-    'common/test/resources/fixtures/**/*.html'	: ['html2js'],
+    'web/src/test/auto/resources/fixtures/**/*.html' : ['html2js'],
     'common/test/resources/json/**/*.json' : ['json_fixtures']
   },
 
   html2JsPreprocessor: {
-    stripPrefix: 'common/test/resources/'
+    stripPrefix: 'web/src/test/auto/resources/'
   },
 
   // Settings to properly configure how JSON fixtures are automatically loaded by Karma.
