@@ -37,7 +37,6 @@ export class AlertHost {
 
   private dismiss?: () => void;
   private pending: boolean = false;
-  private signaledServerUnavailable: boolean = false;
 
   // Formerly known as `this.waiting` when within `keyman.util`.
   public get rootElement(): HTMLDivElement {
@@ -97,9 +96,8 @@ export class AlertHost {
   wait(s?: string) {
     // Keyboards loaded with page are initialized before the page is ready,
     // so cannot use the wait indicator (and don't need it, anyway)
-    // Do not display if a blocking cloud server error has occurred (to prevent multiple errors)
     const bg = this.bg;
-    if(typeof(bg) == 'undefined' || bg == null || this.signaledServerUnavailable) {
+    if(typeof(bg) == 'undefined' || bg == null) {
       return;
     }
 
