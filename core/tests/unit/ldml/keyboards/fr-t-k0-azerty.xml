@@ -14,7 +14,7 @@
 		<name value="French Test AZERTY" />
 	</names>
 
-	<settings fallback="omit" transformPartial="hide" /> <!-- "hide" makes this act like a dead keyTBD -->
+	<settings fallback="omit" /> <!-- "hide" makes this act like a dead keyTBD -->
 
 	<vkeys>
     <vkey from="Q" to="A" />
