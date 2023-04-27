@@ -72,6 +72,9 @@ final class KMKeyboard extends WebView {
   private String keyboardName;
   private String keyboardVersion;
 
+  private boolean shouldIgnoreTextChange = false;
+  private boolean shouldIgnoreSelectionChange = false;
+
   protected KeyboardType keyboardType = KeyboardType.KEYBOARD_TYPE_UNDEFINED;
   protected ArrayList<String> javascriptAfterLoad = new ArrayList<String>();
 
@@ -147,6 +150,11 @@ final class KMKeyboard extends WebView {
   public void setShouldShowHelpBubble(boolean flag) {
     this._shouldShowHelpBubble = flag;
   }
+
+  protected boolean shouldIgnoreTextChange() { return shouldIgnoreTextChange; }
+  protected void setShouldIgnoreTextChange(boolean ignore) { this.shouldIgnoreTextChange = ignore; }
+  protected boolean shouldIgnoreSelectionChange() { return shouldIgnoreSelectionChange; }
+  protected void setShouldIgnoreSelectionChange(boolean ignore) { this.shouldIgnoreSelectionChange = ignore; }
 
   @SuppressWarnings("deprecation")
   @SuppressLint("SetJavaScriptEnabled")
