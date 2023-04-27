@@ -1,5 +1,5 @@
 import 'mocha';
-import { CompilerMessages } from '../src/compiler/messages.js';
+import { CompilerMessages } from '../src/messages.js';
 import { verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
 
 describe('CompilerMessages', function () {

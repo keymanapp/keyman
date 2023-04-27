@@ -17,6 +17,7 @@
   ],
   "references": [
       { "path": "../" },
+      { "path": "../../../../common/web/types" },
       { "path": "../../../../common/web/keyman-version/tsconfig.esm.json" },
       { "path": "../../common/web/test-helpers/" },
     ]

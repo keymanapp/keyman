@@ -30,7 +30,8 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "dependencies": {
-    "jszip": "^3.7.0"
+    "jszip": "^3.7.0",
+    "@keymanapp/common-types": "*"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",

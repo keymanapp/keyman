@@ -3,9 +3,6 @@
  * compiled files to produce a comprehensive .model_info file.
  */
 
-/// <reference path="../../kmc-package/src/kmp-json-file.ts" />
-/// <reference path="./model-info-file.ts" />
-
 import * as fs from "fs";
 import * as path from "path";
 import { minKeymanVersion } from "./min-keyman-version.js";

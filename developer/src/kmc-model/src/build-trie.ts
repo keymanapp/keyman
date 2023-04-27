@@ -1,5 +1,5 @@
 import { readFileSync } from "fs";
-import { ModelCompilerError, ModelCompilerMessages } from "./model-compiler-errors.js";
+import { ModelCompilerError, ModelCompilerMessageContext, ModelCompilerMessages } from "./model-compiler-errors.js";
 import { callbacks } from "./compiler-callbacks.js";
 
 // Supports LF or CRLF line terminators.
@@ -46,7 +46,7 @@ export function createTrieDataStructure(filenames: string[], searchTermToKey?: (
  * @param filename filename of the word list
  */
 export function parseWordListFromFilename(wordlist: WordList, filename: string): void {
-  ModelCompilerMessages.filename = filename;
+  ModelCompilerMessageContext.filename = filename;
   _parseWordList(wordlist, new WordListFromFilename(filename));
 }
 
@@ -58,7 +58,7 @@ export function parseWordListFromFilename(wordlist: WordList, filename: string):
  * @param filename filename of the word list
  */
 export function parseWordListFromContents(wordlist: WordList, contents: string): void {
-  ModelCompilerMessages.filename = undefined;
+  ModelCompilerMessageContext.filename = undefined;
   _parseWordList(wordlist, new WordListFromMemory(contents));
 }
 
@@ -94,7 +94,7 @@ function _parseWordList(wordlist: WordList, source:  WordListSource): void {
   let wordsSeenInThisFile = new Set<string>();
 
   for (let [lineno, line] of source.lines()) {
-    ModelCompilerMessages.line = lineno;
+    ModelCompilerMessageContext.line = lineno;
 
     // Remove the byte-order mark (BOM) from the beginning of the string.
     // Because `contents` can be the concatenation of several files, we have to remove
