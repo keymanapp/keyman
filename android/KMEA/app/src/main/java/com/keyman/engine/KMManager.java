@@ -1978,6 +1978,13 @@ public final class KMManager {
     boolean result = false;
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreSelectionChange()) {
+        InputConnection ic = getInputConnection(KeyboardType.KEYBOARD_TYPE_INAPP);
+        if (ic != null) {
+          ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
+          if (icText != null) {
+            updateText(kbType, icText.text.toString());
+          }
+        }
         InAppKeyboard.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
         result = true;
       }
@@ -1992,7 +1999,6 @@ public final class KMManager {
             updateText(kbType, icText.text.toString());
           }
         }
-
         SystemKeyboard.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
         result = true;
       }
