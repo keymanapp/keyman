@@ -422,23 +422,15 @@ final class KMKeyboard extends WebView {
 
   public static String currentBanner() { return currentBanner; }
 
-  private static void toggleSuggestionBanner(String languageID, boolean inappKeyboardChanged, boolean systemKeyboardChanged) {
+  protected void toggleSuggestionBanner(HashMap<String, String> associatedLexicalModel, boolean keyboardChanged) {
     //reset banner state if new language has no lexical model
-    if (InAppKeyboard != null && InAppKeyboard.currentBanner().equals(KMKeyboard.KM_BANNER_STATE_SUGGESTION)
-      && getAssociatedLexicalModel(languageID)==null) {
-      InAppKeyboard.setCurrentBanner(KMKeyboard.KM_BANNER_STATE_BLANK);
+    if (currentBanner != null && currentBanner.equals(KM_BANNER_STATE_SUGGESTION)
+        && associatedLexicalModel == null) {
+      setCurrentBanner(KMKeyboard.KM_BANNER_STATE_BLANK);
     }
 
-    if (SystemKeyboard != null && SystemKeyboard.currentBanner().equals(KMKeyboard.KM_BANNER_STATE_SUGGESTION)
-      && getAssociatedLexicalModel(languageID)==null) {
-      SystemKeyboard.setCurrentBanner(KMKeyboard.KM_BANNER_STATE_BLANK);
-    }
-
-    if(inappKeyboardChanged) {
-      InAppKeyboard.setLayoutParams(getKeyboardLayoutParams());
-    }
-    if(systemKeyboardChanged) {
-      SystemKeyboard.setLayoutParams(getKeyboardLayoutParams());
+    if(keyboardChanged) {
+      setLayoutParams(KMManager.getKeyboardLayoutParams());
     }
   }
 
