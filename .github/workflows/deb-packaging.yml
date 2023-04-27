@@ -102,7 +102,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [focal, jammy, kinetic, lunar]
+        dist: [focal, jammy, kinetic]
         arch: [amd64]
 
     runs-on: ubuntu-latest
