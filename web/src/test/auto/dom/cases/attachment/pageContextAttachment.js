@@ -587,7 +587,7 @@ describe.only('KMW element-attachment logic', function () {
       attacher.shutdown();
     });
 
-    it('tricky layout with absolute positioning', function () {
+    it('five inputs with absolute positioning', function () {
       fixture.load("wild-absolute-positioning.html");
 
       const attacher = this.attacher;
@@ -615,6 +615,58 @@ describe.only('KMW element-attachment logic', function () {
         "input3-bottom-left",
         "input5-bottom-right"
       ]);
+      attacher.shutdown();
+    });
+
+    it('seven inputs with absolute positioning, two added dynamically', async function () {
+      fixture.load("wild-absolute-positioning.html");
+
+      const attacher = this.attacher;
+      let attached = [];
+
+      attacher.on('enabled', (elem) => attached.push(elem));
+      attacher.install(false);
+
+      // Numerals:  the order of their definition within the HTML fixture.
+      // Directionals:  the actual positioning on the page.
+      const elements = [
+        "input1-middle",
+        "input2-top-right",
+        "input3-bottom-left",
+        "input4-top-left",
+        "input5-bottom-right"
+      ];
+
+      assert.sameMembers(attached.map((elem) => elem.id), elements);
+      // Top to bottom, left to right.
+      assert.sameOrderedMembers(attacher.sortedInputs.map((elem) => elem.id), [
+        "input4-top-left",
+        "input2-top-right",
+        "input1-middle",
+        "input3-bottom-left",
+        "input5-bottom-right"
+      ]);
+
+      fixture.load("wild-absolute-positioning-extras.html", /* append = */ true );
+
+      // Let the MutationObservers handle things
+      await Promise.resolve();
+
+      elements.push("input6-middle-left");
+      elements.push("input7-top-middle");
+
+      assert.sameMembers(attached.map((elem) => elem.id), elements);
+      // Top to bottom, left to right.
+      assert.sameOrderedMembers(attacher.sortedInputs.map((elem) => elem.id), [
+        "input4-top-left",
+        "input7-top-middle",
+        "input2-top-right",
+        "input6-middle-left",
+        "input1-middle",
+        "input3-bottom-left",
+        "input5-bottom-right"
+      ]);
+
       attacher.shutdown();
     });
   });
