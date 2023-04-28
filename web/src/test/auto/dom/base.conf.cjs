@@ -60,7 +60,8 @@ module.exports = {
 
     {pattern: 'common/test/resources/fixtures/**/*.html', watched: true}, // HTML structures useful for testing.
     {pattern: 'common/test/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
-    {pattern: 'web/src/test/auto/resources/fixtures/**/*.html', watched: true, served: true},
+    {pattern: 'web/src/test/auto/resources/fixtures/**/*.html', watched: true, served: true}, // Fixtures for use in engine/attachment tests
+    {pattern: 'web/src/test/auto/resources/html/**/*.html', watched: true, served: true}, // Generally, pages for hosting in iframe fixtures.
 
     {pattern: 'web/build/app/web/debug/**/*.css', watched: false, served: true, included: false}, // OSK resources
     {pattern: 'web/build/app/web/debug/**/*.gif', watched: false, served: true, included: false}, // OSK resources
@@ -88,7 +89,8 @@ module.exports = {
     "/node_modules/": "/base/node_modules/",
     "/@keymanapp/web-utils/": "/base/common/web/utils/",
     "/@keymanapp/keyman/": "/base/web/",
-    "/@keymanapp/keyboard-processor/": "/base/common/web/keyboard-processor/"
+    "/@keymanapp/keyboard-processor/": "/base/common/web/keyboard-processor/",
+    "/html/": "/base/web/src/test/auto/resources/html/"
   },
 
 

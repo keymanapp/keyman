@@ -12,6 +12,21 @@ let STANDARD_OPTIONS = {
   }
 };
 
+function promiseForIframeLoad(iframe) {
+  // Chrome makes this first case tricky - it initializes all iframes with a 'complete' about:blank
+  // before loading the actual href.  (https://stackoverflow.com/a/36155560)
+  if(iframe.contentDocument
+    && iframe.contentDocument.readyState === 'complete'
+    && iframe.contentDocument.body.innerHTML) {
+    return Promise.resolve();
+  } else {
+    return new Promise((resolve, reject) => {
+      iframe.addEventListener('load', resolve);
+      iframe.addEventListener('error', reject);
+    });
+  }
+}
+
 describe.only('KMW element-attachment logic', function () {
   this.timeout(__karma__.config.args.find((arg) => arg.type == "timeouts").standard);
 
@@ -88,6 +103,23 @@ describe.only('KMW element-attachment logic', function () {
 
         assert.sameOrderedMembers(attached.map((elem) => elem.id), ['editable']);
         assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['editable']);
+        attacher.shutdown();
+      });
+
+      it('simple iframe with input', async function () {
+        fixture.load("simple-iframe-with-input.html");
+
+        // Note:  iframes require additional time to resolve.
+        await promiseForIframeLoad(document.getElementById('iframe'));
+
+        const attacher = this.attacher;
+        let attached = [];
+
+        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.install(false);
+
+        assert.sameOrderedMembers(attached.map((elem) => elem.id), ['iframe-input']);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['iframe-input']);
         attacher.shutdown();
       });
     });
