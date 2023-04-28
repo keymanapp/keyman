@@ -191,10 +191,6 @@ sources = files(
   # 'wintz.cpp',
 )
 
-# if host_machine.system() == 'windows'
-#   sources += windows.compile_resources('common.rc', include_directories: incdir)
-# endif
-
 icuuc_name = '@0@icuuc@1@'.format(library_prefix, library_suffix)
 
 common_lib = static_library(
@@ -225,6 +221,7 @@ uconfig.set('UCONFIG_NO_TRANSLITERATION', 1)
 uconfig.set('UCONFIG_NO_REGULAR_EXPRESSIONS', 1) # TODO-LDML: Will probably want this for transforms #7375
 uconfig.set('UCONFIG_NO_SERVICE', 1)
 
+# This next one is custom to this patch:
 uconfig.set('UCONFIG_NO_PROPERTIES', 1)
 
 uconfig_local = configure_file(
@@ -233,39 +230,12 @@ uconfig_local = configure_file(
 )
 
 
-# if meson.can_run_host_binaries()
-  # common_native_lib = common_lib
-# else
-#   common_native_lib = library(
-#     '@0@-native'.format(icuuc_name),
-#     sources,
-#     include_directories: incdir,
-#     c_args: '-DU_COMMON_IMPLEMENTATION',
-#     cpp_args: '-DU_COMMON_IMPLEMENTATION',
-#     link_with: stubdata_native_lib,
-#     # dependencies: dl_native_dep,
-#     version: U_ICU_VERSION,
-#     native: true,
-#   )
-# endif
-
 icuuc_dep = declare_dependency(
   link_with: common_lib,
   compile_args: usage_args,
   include_directories: incdir,
   # dependencies: stubdata_dep,
 )
-
-# icuuc_native_dep = declare_dependency(
-#   link_with: common_native_lib,
-#   compile_args: usage_args,
-#   include_directories: incdir,
-#   dependencies: dl_native_dep,
-# )
-
-# if meson.version().version_compare('>=0.54.0')
-#   meson.override_dependency('icu-uc', icuuc_dep)
-# endif
 
 headers = files(
   'unicode/appendable.h',
@@ -368,15 +338,3 @@ headers = files(
   'unicode/uvernum.h',
   'unicode/uversion.h',
 )
-
-# install_headers(
-#   headers,
-#   subdir: 'unicode',
-# )
-
-# pkg.generate(
-#   common_lib,
-#   name: 'icu-uc',
-#   description: '@0@: Common and Data libraries'.format(PACKAGE_ICU_DESCRIPTION),
-#   url: PACKAGE_ICU_URL,
-# )
