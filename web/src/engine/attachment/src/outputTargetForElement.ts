@@ -24,9 +24,9 @@ export function outputTargetForElement(Ltarg: HTMLElement) {
   // ... determine the element expected to hold the KMW attachment object based on
   // its typing, properties, etc.
 
-  // if(Ltarg['body']) {
-  //   Ltarg = Ltarg['body']; // Occurs in Firefox for design-mode iframes.
-  // }
+  if(Ltarg['body']) {
+    Ltarg = Ltarg['body']; // Occurs in Firefox for design-mode iframes.
+  }
 
   if (Ltarg.nodeType == 3) { // defeat Safari bug
     Ltarg = Ltarg.parentNode as HTMLElement;
