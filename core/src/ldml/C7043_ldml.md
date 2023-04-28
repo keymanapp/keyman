@@ -60,9 +60,9 @@ This list is in sorted order based on the `sect` identifier.
 
 ### C7043.2.2 `bksp`—Backspace transform
 
-See [C7043.2.11](#c7043211-tran-finl-and-bksptransforms).
+See [C7043.2.11](#c7043211-tran-and-bksptransforms).
 
-### C7043.2.3 `elem`—Transform and Reorder element strings
+### C7043.2.3 `elem`—Transform, Variable, and Reorder element strings
 
 | ∆ | Bits | Name     | Description                              |
 |---|------|----------|------------------------------------------|
@@ -103,11 +103,9 @@ Each element string is made up of elements with the following item structure:
   For transforms, only `flags.unicode_set` will be used. The remaining flags are
   used for reorders, `from` attribute only.
 
-### C7043.2.4 `finl`—Final transform
+### C7043.2.4 Removed: `finl`
 
-See [C7043.2.11](#c7043211-tran-finl-and-bksptransforms).
-
-### C7043.2.5 Removed: `keys`
+### C7043.2.5 Removed: old-format `keys`
 
 _this section has been merged into the new `keys.kmap`_
 
@@ -174,24 +172,9 @@ For each name in `count`:
 Names are stored in source file order, and the semantic meaning of each name is
 not defined here.
 
-### C7043.2.9 `ordr`—Reorders
+### C7043.2.9 Removed: `ordr`
 
-| ∆ | Bits | Name     | Description                              |
-|---|------|----------|------------------------------------------|
-| 0 |  32  | ident    | `ordr`                                   |
-| 4 |  32  | size     | int: Length of section                   |
-| 8 |  32  | count    | int: Number of reorders                  |
-
-For each reorder item:
-
-| ∆ | Bits | Name     | Description                                              |
-|---|------|----------|----------------------------------------------------------|
-|16+|  32  | elements | elem: string of elements, index into `elem` section      |
-|20+|  32  | before   | elem: look-behind required match, index into `elem`      |
-
-- `elements`: index into the `elem` section, coding `from`, `order`, `tertiary`,
-  `tertiary_base`, and `prebase` properties.
-- `before`: follows `transform/@before`
+_Reorder entries are now a subtable of `tran`/`bksp`, see [`tran`/`bksp`](#c70432112-tranreorders-subtable)_
 
 ### C7043.2.10 `strs`—Strings
 
@@ -227,41 +210,72 @@ A distinction between zero-length string and optional should be avoided (e.g.
 the difference between "" and null in Javascript). If this is truly required, a
 separate flag field must be used to denote the difference.
 
-### C7043.2.11 `tran`, `finl`, and `bksp`—Transforms
+### C7043.2.11 `tran`, and `bksp`—Transforms
 
-All three of these tables have the same format. and differ only in their
-identity. The simple transform table has the ident `tran`; the final transform
-table has the ident `finl`, and the backspaces table has the ident `bksp`.
+These tables represent the `<transforms>` element.
 
-
-| ∆ | Bits | Name     | Description                              |
-|---|------|----------|------------------------------------------|
-| 0 |  32  | ident    | `tran` / `finl` / `bksp`                 |
-| 4 |  32  | size     | int: Length of section                   |
-| 8 |  32  | count    | int: Number of transforms                |
+Both of these tables have the same format. and differ only in their
+identity. The `simple` transform table has the ident `tran`
+and the `backspace` table has the ident `bksp`.
 
 
-The transforms are sorted in binary order based on the `from` field.
+| ∆ | Bits | Name           | Description                              |
+|---|------|----------------|------------------------------------------|
+| 0 |  32  | ident          | `tran` / `bksp`                          |
+| 4 |  32  | size           | int: Length of section                   |
+| 8 |  32  | groupCount     | int: Number of transformGroups           |
+| 8 |  32  | transformCount | int: Number of transforms                |
+| 8 |  32  | reorderCount   | int: Number of reorders                  |
+|12+|  -   | groups         | transformGroup subtable                  |
+| - |  -   | transforms     | transforms subtable                      |
+| - |  -   | reorders       | reorders subtable                        |
 
-For each transform:
+The transformGroups are in file order.
+
+Each transformGroup is either a `transform` group or a `reorder` group.
+
+### C7043.2.11.1 `tran.groups` subtable
+
+For each transformGroup:
 
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|
-|16+|  32  | from    | elem: combination of characters          |
-|20+|  32  | to      | str: output text                         |
-|24+|  32  | before  | elem: look-behind text (0 = omitted)     |
-|28+|  32  | flags   | int: per-transform flags                 |
+| 0+|  32  | type    | int: type of transformgroup              |
+| 4+|  32  | count   | int: number of items in this group       |
+| 8+|  32  | index   | int: index into subtable                 |
+
+- `type`: one of the following:
+
+  - `0`: `transform` elements beginning at 'index'
+  - `1`: `reorder` elements beginning at 'index'
+
+The transforms are sorted in binary order based on the `from` field.
+
+### C7043.2.11.1 `tran.transforms` subtable
+
+For each transform in the subtable:
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+| 0+|  32  | from    | elem: combination of characters          |
+| 4+|  32  | to      | str: output text                         |
 
 - `from`: the source text, index into `elem` section.
 - `to`: sequence of Unicode codepoints that replace `from`. May be the null
   string for `bksp` entries.
-- `before`: optional look-behind text occurring before `from`, index into `elem`
-  section
-- `flags`: a 32-bit bitfield defined as below:
 
-  | Bit position | Meaning  |  Description         |
-  |--------------|----------|----------------------|
-  |       0      | error    | 1: `error="fail"`    |
+### C7043.2.11.2 `tran.reorders` subtable
+
+For each reorder item:
+
+| ∆ | Bits | Name     | Description                                              |
+|---|------|----------|----------------------------------------------------------|
+| 0+|  32  | elements | elem: string of elements, index into `elem` section      |
+| 4+|  32  | before   | elem: look-behind required match, index into `elem`      |
+
+- `elements`: index into the `elem` section, coding `from`, `order`, `tertiary`,
+  `tertiaryBase`, and `preBase` properties.
+- `before`: follows `reorder/@before`
 
 ### C7043.2.12 `vkey`—VKey Map
 
