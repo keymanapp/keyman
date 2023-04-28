@@ -28,7 +28,7 @@ function promiseForIframeLoad(iframe) {
   }
 }
 
-describe.only('KMW element-attachment logic', function () {
+describe('KMW element-attachment logic', function () {
   this.timeout(__karma__.config.args.find((arg) => arg.type == "timeouts").standard);
 
   describe('attachMode: auto', () => {
