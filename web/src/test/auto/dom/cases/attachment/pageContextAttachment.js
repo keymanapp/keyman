@@ -27,99 +27,161 @@ describe.only('KMW element-attachment logic', function () {
       this.attacher = null;
     });
 
-    it('simple arrangement:  input and textarea', function () {
-      fixture.load("input-and-text.html");
-      const attacher = this.attacher;
-      let attached = [];
+    describe('for static elements', function () {
 
-      attacher.on('enabled', (elem) => attached.push(elem));
-      attacher.install(false);
+      it('input and textarea', function () {
+        fixture.load("input-and-text.html");
+        const attacher = this.attacher;
+        let attached = [];
 
-      assert.sameOrderedMembers(attached.map((elem) => elem.id), ['input', 'textarea']);
-      assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['input', 'textarea']);
-      attacher.shutdown();
+        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.install(false);
+
+        assert.sameOrderedMembers(attached.map((elem) => elem.id), ['input', 'textarea']);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['input', 'textarea']);
+        attacher.shutdown();
+      });
+
+      it('input and (kmw-disabled) textarea', function () {
+        fixture.load("input-and-disabled-text.html");
+        const attacher = this.attacher;
+        let attached = [];
+        let detached = [];
+
+        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.on('disabled', (elem) => detached.push(elem));
+        attacher.install(false);
+
+        assert.sameOrderedMembers(attached.map((elem) => elem.id), ['input']);
+        assert.sameOrderedMembers(detached.map((elem) => elem.id), ['textarea']);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['input']);
+        attacher.shutdown();
+      });
+
+      it('detachment:  from auto-attached control', function () {
+        fixture.load("input-and-text.html");
+        const attacher = this.attacher;
+        let attached = [];
+
+        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.install(false);
+
+        assert.sameOrderedMembers(attached.map((elem) => elem.id), ['input', 'textarea']);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['input', 'textarea']);
+
+        let detached = [];
+        attacher.on('disabled', (elem) => detached.push(elem));
+        attacher.detachFromControl(attached[1]);
+
+        assert.sameOrderedMembers(detached, [attached[1]]);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['input']);
+        attacher.shutdown();
+      });
+
+      it('content-editable div', function () {
+        fixture.load("simple-editable-div.html");
+        const attacher = this.attacher;
+        let attached = [];
+
+        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.install(false);
+
+        assert.sameOrderedMembers(attached.map((elem) => elem.id), ['editable']);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['editable']);
+        attacher.shutdown();
+      });
     });
 
-    it('simple arrangement:  input and (kmw-disabled) textarea', function () {
-      fixture.load("input-and-disabled-text.html");
-      const attacher = this.attacher;
-      let attached = [];
-      let detached = [];
+    describe('for dynamic elements, main document only', function() {
+      it('input and textarea', async function () {
+        const attacher = this.attacher;
+        let attached = [];
 
-      attacher.on('enabled', (elem) => attached.push(elem));
-      attacher.on('disabled', (elem) => detached.push(elem));
-      attacher.install(false);
+        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.install(false);
 
-      assert.sameOrderedMembers(attached.map((elem) => elem.id), ['input']);
-      assert.sameOrderedMembers(detached.map((elem) => elem.id), ['textarea']);
-      assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['input']);
-      attacher.shutdown();
-    });
+        assert.sameOrderedMembers(attached.map((elem) => elem.id), []);
 
-    it('direct (manual) disablement of control', function () {
-      fixture.load("input-and-text.html");
-      const attacher = this.attacher;
-      let attached = [];
+        fixture.load("input-and-text.html");
 
-      attacher.on('enabled', (elem) => attached.push(elem));
-      attacher.install(false);
+        // This gives the mutation observers a moment to 'kick in' and is required for test success.
+        await Promise.resolve();
 
-      assert.sameOrderedMembers(attached.map((elem) => elem.id), ['input', 'textarea']);
-      assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['input', 'textarea']);
+        // Note:  anything with iframes (design or not) requires an extra timeout for the internal doc to load.
 
-      let detached = [];
-      attacher.on('disabled', (elem) => detached.push(elem));
-      attacher.detachFromControl(attached[1]);
+        assert.sameOrderedMembers(attached.map((elem) => elem.id), ['input', 'textarea']);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['input', 'textarea']);
 
-      assert.sameOrderedMembers(detached, [attached[1]]);
-      assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['input']);
-      attacher.shutdown();
-    });
+        attacher.shutdown();
+      });
 
-    it('dynamically added & removed elements (main document)', async function () {
-      const attacher = this.attacher;
-      let attached = [];
+      it('input and kmw-disabled textarea', async function () {
+        const attacher = this.attacher;
+        let attached = [];
 
-      attacher.on('enabled', (elem) => attached.push(elem));
-      attacher.install(false);
+        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.install(false);
 
-      assert.sameOrderedMembers(attached.map((elem) => elem.id), []);
+        assert.sameOrderedMembers(attached.map((elem) => elem.id), []);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), []);
 
-      fixture.load("input-and-text.html");
+        // Okay, detachment test components done - now for the alternative attachment.
 
-      // This gives the mutation observers a moment to 'kick in' and is required for test success.
-      await Promise.resolve();
+        fixture.load("input-and-disabled-text.html");
 
-      // Note:  anything with iframes (design or not) requires an extra timeout for the internal doc to load.
+        // This gives the mutation observers a moment to 'kick in' and is required for test success.
+        await Promise.resolve();
 
-      assert.sameOrderedMembers(attached.map((elem) => elem.id), ['input', 'textarea']);
-      assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['input', 'textarea']);
+        // Note:  anything with iframes (design or not) requires an extra timeout for the internal doc to load.
 
-      // Reset - make sure they're compatible with `kmw-disabled`, too!
-      attached.splice(0, attached.length);
+        assert.sameOrderedMembers(attached.map((elem) => elem.id), ['input']);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['input']);
+        attacher.shutdown();
+      });
 
-      // Also, this reset:  we'll be detaching from existing elements.  Test that too!
-      let detached = [];
-      attacher.on('disabled', (elem) => detached.push(elem));
-      fixture.cleanup();
+      it('detachment: input and textarea', async function () {
+        fixture.load("input-and-text.html");
+        const attacher = this.attacher;
+        let attached = [];
 
-      await Promise.resolve();
+        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.install(false);
 
-      assert.sameOrderedMembers(detached.map((elem) => elem.id), ['input', 'textarea']);
-      assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), []);
+        assert.sameOrderedMembers(attached.map((elem) => elem.id), ['input', 'textarea']);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['input', 'textarea']);
 
-      // Okay, detachment test components done - now for the alternative attachment.
+        // Now the fun part.
+        let detached = [];
+        attacher.on('disabled', (elem) => detached.push(elem));
 
-      fixture.load("input-and-disabled-text.html");
+        fixture.cleanup("input-and-text.html");
 
-      // This gives the mutation observers a moment to 'kick in' and is required for test success.
-      await Promise.resolve();
+        // This gives the mutation observers a moment to 'kick in' and is required for test success.
+        await Promise.resolve();
 
-      // Note:  anything with iframes (design or not) requires an extra timeout for the internal doc to load.
+        assert.sameOrderedMembers(detached.map((elem) => elem.id), ['input', 'textarea']);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), []);
 
-      assert.sameOrderedMembers(attached.map((elem) => elem.id), ['input']);
-      assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['input']);
-      attacher.shutdown();
+        attacher.shutdown();
+      });
+
+      it('content-editable div', async function () {
+        const attacher = this.attacher;
+        let attached = [];
+
+        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.install(false);
+        assert.sameOrderedMembers(attached.map((elem) => elem.id), []);
+
+        fixture.load("simple-editable-div.html");
+
+        // This gives the mutation observers a moment to 'kick in' and is required for test success.
+        await Promise.resolve();
+
+        assert.sameOrderedMembers(attached.map((elem) => elem.id), ['editable']);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['editable']);
+        attacher.shutdown();
+      });
     });
   });
 
@@ -135,7 +197,7 @@ describe.only('KMW element-attachment logic', function () {
       this.attacher = null;
     });
 
-    it('simple arrangement:  input and textarea', function () {
+    it('input and textarea', function () {
       fixture.load("input-and-text.html");
       const attacher = this.attacher;
 
@@ -159,7 +221,7 @@ describe.only('KMW element-attachment logic', function () {
       attacher.shutdown();
     });
 
-    it('simple arrangement:  input and (kmw-disabled) textarea', function () {
+    it('input and (kmw-disabled) textarea', function () {
       fixture.load("input-and-disabled-text.html");
       const attacher = this.attacher;
 
