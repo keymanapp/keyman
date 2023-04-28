@@ -28,7 +28,7 @@ function promiseForIframeLoad(iframe) {
   }
 }
 
-describe('KMW element-attachment logic', function () {
+describe.only('KMW element-attachment logic', function () {
   this.timeout(__karma__.config.args.find((arg) => arg.type == "timeouts").standard);
 
   describe('attachMode: auto', () => {
@@ -210,11 +210,16 @@ describe('KMW element-attachment logic', function () {
         // Note:  iframes require additional time to resolve.
         await promiseForIframeLoad(document.getElementById('iframe'));
 
+        // Give the design-mode iframe a bit of time to set itself up properly.
+        // Note: it is thus important that whatever sends the `install` command has also
+        // alloted a brief window of time like this as well.
+        await timedPromise(20);
+
         attacher.on('enabled', (elem) => attached.push(elem));
         attacher.install(false);
 
-        assert.sameMembers(attached.map((elem) => elem.id), ['iframe-input', 'editable', 'input', 'textarea']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['iframe-input', 'editable', 'input', 'textarea']);
+        assert.sameMembers(attached.map((elem) => elem.id), ['iframe-input', 'design-iframe', 'editable', 'input', 'textarea']);
+        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['iframe-input', 'design-iframe', 'editable', 'input', 'textarea']);
         attacher.shutdown();
       });
 
@@ -436,8 +441,8 @@ describe('KMW element-attachment logic', function () {
         // have a chance to resolve before we attach.  Currently: 10ms.
         await timedPromise(20);
 
-        assert.sameMembers(attached.map((elem) => elem.id), ['iframe-input', 'editable', 'input', 'textarea']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['iframe-input', 'editable', 'input', 'textarea']);
+        assert.sameMembers(attached.map((elem) => elem.id), ['iframe-input', 'design-iframe', 'editable', 'input', 'textarea']);
+        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['iframe-input', 'design-iframe', 'editable', 'input', 'textarea']);
         attacher.shutdown();
       });
 
@@ -576,10 +581,12 @@ describe('KMW element-attachment logic', function () {
       // Note:  iframes require additional time to resolve.
       await promiseForIframeLoad(document.getElementById('iframe'));
 
+      await timedPromise(20); // for the design-iframe to set itself into design-mode.
+
       attacher.on('enabled', (elem) => attached.push(elem));
       attacher.install(false);
 
-      assert.sameMembers(attached.map((elem) => elem.id), ['iframe-input', 'editable', 'input', 'textarea']);
+      assert.sameMembers(attached.map((elem) => elem.id), ['iframe-input', 'design-iframe', 'editable', 'input', 'textarea']);
 
       // At this time, `.sortedInputs` never includes iframe-embedded elements, design-iframes,
       // or content-editables.  (This matches KMW 16.0 + before behavior.)
