@@ -77,20 +77,20 @@ if builder_start_action error; then
 
   # The `|| true` disables any trap shenanigans.
   # Needed to capture the log messages.
-  output_logs=`$THIS_SCRIPT_PATH/trap-test-builds.sh raise-build-error` || true
+  output_logs=`$THIS_SCRIPT_PATH/trap-test-builds.test.sh raise-build-error` || true
 
   trap error-test-matcher err exit
 
   # Relies on the `trap` - no further commands outside the handler will be processed.
   # Also emits the log messages (but we can't capture them here)
-  $THIS_SCRIPT_PATH/trap-test-builds.sh raise-build-error
+  $THIS_SCRIPT_PATH/trap-test-builds.test.sh raise-build-error
 
   # In case the expected error isn't emitted.  Will emit the report-failure.
   error-test-matcher
 fi
 
 function-with-error() {
-  $THIS_SCRIPT_PATH/trap-test-builds.sh raise-build-error
+  $THIS_SCRIPT_PATH/trap-test-builds.test.sh raise-build-error
 }
 
 # Note:  if this test is run, no other ones after it may execute!
@@ -164,12 +164,12 @@ if builder_start_action incomplete; then
   echo "$HR"
 
   # The `|| true` disables any trap shenanigans.
-  output_logs=`$THIS_SCRIPT_PATH/trap-test-builds.sh unreported-action` || true
+  output_logs=`$THIS_SCRIPT_PATH/trap-test-builds.test.sh unreported-action` || true
 
   trap warning-test-matcher err
 
   # Relies on the `trap` - no further commands outside the handler will be processed.
-  $THIS_SCRIPT_PATH/trap-test-builds.sh unreported-action
+  $THIS_SCRIPT_PATH/trap-test-builds.test.sh unreported-action
 
   warning-test-matcher
 fi

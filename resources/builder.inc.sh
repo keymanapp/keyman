@@ -1346,11 +1346,10 @@ _builder_parse_expanded_parameters() {
   fi
 
   if builder_is_debug_build; then
-    readonly BUILDER_CONFIGURATION=debug
+    BUILDER_CONFIGURATION=debug
   else
-    readonly BUILDER_CONFIGURATION=release
+    BUILDER_CONFIGURATION=release
   fi
-
 
   # Now that we've successfully parsed options adhering to the _builder spec, we may activate our
   # action_failure and action_hanging traps.  (We don't want them active on scripts not yet using
