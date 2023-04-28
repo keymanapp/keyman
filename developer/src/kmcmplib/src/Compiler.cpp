@@ -106,11 +106,12 @@
 #define PRIMARYLANGID(lgid)    ((uint16_t)(lgid) & 0x3ff)
 #define SUBLANGID(lgid)        ((uint16_t)(lgid) >> 10)
 
+#define COMPILE_ERROR_MAX_LEN (SZMAX_ERRORTEXT + 1 + 280)
 
 using namespace kmcmp;
 
-  char ErrExtraLIB[256];
-  KMX_WCHAR ErrExtraW[256];
+  char ErrExtraLIB[ERR_EXTRA_LIB_LEN];
+  KMX_WCHAR ErrExtraW[ERR_EXTRA_W_LEN];
   KMX_BOOL AWarnDeprecatedCode_GLOBAL_LIB;
 
 namespace kmcmp{
@@ -265,7 +266,7 @@ KMX_BOOL kmcmp::AddCompileWarning(PKMX_CHAR buf)
 
 KMX_BOOL AddCompileError(KMX_DWORD msg)
 {
-  KMX_CHAR szText[SZMAX_ERRORTEXT + 1 + 280];
+  KMX_CHAR szText[COMPILE_ERROR_MAX_LEN];
   KMX_CHAR* szTextp = NULL;
 
   if (msg & CERR_FATAL)
@@ -282,19 +283,18 @@ KMX_BOOL AddCompileError(KMX_DWORD msg)
 
   if (szTextp) {
     strcpy(szText, szTextp);
-  }
-  else {
-    snprintf(szText, 793, "Unknown error %x", msg);
+  } else {
+    snprintf(szText, COMPILE_ERROR_MAX_LEN, "Unknown error %x", msg);
   }
 
   if (kmcmp::ErrChr > 0) {
     char *szTextNull = strchr(szText, 0);
-    snprintf(szTextNull, 793-(szTextNull-szText), " character offset: %d", kmcmp::ErrChr);
+    snprintf(szTextNull, COMPILE_ERROR_MAX_LEN-(szTextNull-szText), " character offset: %d", kmcmp::ErrChr);
   }
 
   if (*ErrExtraLIB) {
     char *szTextNull = strchr(szText, 0);
-    snprintf(szTextNull, 793-(szTextNull-szText), "%s", ErrExtraLIB);
+    snprintf(szTextNull, COMPILE_ERROR_MAX_LEN-(szTextNull-szText), "%s", ErrExtraLIB);
   }
 
   ErrChr = 0;  *ErrExtraLIB =0;
@@ -1273,7 +1273,7 @@ KMX_BOOL CheckContextStatementPositions(PKMX_WCHAR context) {
 /**
  *  Checks if a use() statement is followed by other content in the output of a rule
  */
-KMX_DWORD CheckUseStatementsInOutput(const PFILE_GROUP /*gp*/,PKMX_WCHAR output) {
+KMX_DWORD CheckUseStatementsInOutput(PKMX_WCHAR output) {
   KMX_BOOL hasUse = FALSE;
   PKMX_WCHAR p;
   for (p = output; *p; p = incxstr(p)) {
@@ -1407,7 +1407,7 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
   if ((msg = CheckStatementOffsets(fk, gp, pklIn, pklOut, pklKey)) != CERR_None) return msg;
 
   // Test that use() statements are not followed by other content
-  if ((msg = CheckUseStatementsInOutput(gp, pklOut)) != CERR_None) {
+  if ((msg = CheckUseStatementsInOutput(pklOut)) != CERR_None) {
     return msg;   // I4867
   }
 
@@ -1721,20 +1721,20 @@ KMX_BOOL StrValidChrs(PKMX_WCHAR q, KMX_WCHAR const * chrs)
 }
 
 KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
-  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode
+  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isUnicode
 );
 
 KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
-  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode
+  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int /*isVKey*/, int isUnicode
 ) {
   PKMX_WCHAR tstr = new KMX_WCHAR[max];    // I2432 - Allocate buffers each line -- slightly slower but safer than keeping a single buffer - GetXString is re-entrant with if()
-  KMX_DWORD err = GetXStringImpl(tstr, fk, str, token, output, max, offset, newp, isVKey, isUnicode);
+  KMX_DWORD err = GetXStringImpl(tstr, fk, str, token, output, max, offset, newp, isUnicode);
   delete[] tstr;
   return err;
 }
 
 KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
-  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int /*isVKey*/, int isUnicode
+  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isUnicode
 ) {
   KMX_DWORD err;
   PKMX_WCHAR p = str, q, r;
@@ -1797,7 +1797,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 99:
       if (tokenFound) break;
       {
-        snprintf(ErrExtraLIB, 256, "token: %c",(int)*p);
+        snprintf(ErrExtraLIB, ERR_EXTRA_LIB_LEN, "token: %c",(int)*p);
       }
       return CERR_InvalidToken;
     case 0:
