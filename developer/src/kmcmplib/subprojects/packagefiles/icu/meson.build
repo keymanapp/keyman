@@ -11,10 +11,10 @@ U_ICU_VERSION = meson.project_version()
 PACKAGE_ICU_DESCRIPTION = 'International Components for Unicode'
 PACKAGE_ICU_URL = 'http://icu-project.org'
 
-cpp = meson.get_compiler('cpp')
+# cpp = meson.get_compiler('cpp')
 # cpp_native = meson.get_compiler('cpp', native: true)
 
-have_elf_h = cpp.has_header('elf.h')
+# have_elf_h = cpp.has_header('elf.h')
 
 if host_machine.system() == 'windows'
   add_project_arguments('-DU_PLATFORM_USES_ONLY_WIN32_API', language: 'cpp')

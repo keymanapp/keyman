@@ -82,6 +82,7 @@ if cpp_compiler.get_id() == 'emscripten'
     cpp_args: defns,
     include_directories: inc,
     link_args: links,
-    objects: lib.extract_all_objects())
+    objects: lib.extract_all_objects(),
+    dependencies: icuuc_dep)
 endif
 
