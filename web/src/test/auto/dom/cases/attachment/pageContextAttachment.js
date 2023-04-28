@@ -556,7 +556,7 @@ describe.only('KMW element-attachment logic', function () {
     });
   });
 
-  describe("sortedList: tests for expected ordering", () => {
+  describe(".sortedList: KMW-managed tab-to-next ordering", () => {
     beforeEach(function() {
       this.attacher = new PageContextAttachment(window.document, STANDARD_OPTIONS);
       fixture.setBase('fixtures');
@@ -671,7 +671,7 @@ describe.only('KMW element-attachment logic', function () {
     });
   });
 
-  describe(".inputMode interactions", () => {
+  describe("<element>.inputMode interactions", () => {
     beforeEach(function() {
       this.attacher = new PageContextAttachment(window.document, {
         hostDevice: {
