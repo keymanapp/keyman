@@ -201,6 +201,14 @@ describe.only('KMW element-attachment logic', function () {
 
         attacher.shutdown();
       });
+
+      it.skip('todo: complex page with a bit of everything', async function () {
+
+      });
+
+      it.skip('todo: complex: nested iframe', async function() {
+
+      });
     });
 
     describe('for dynamic elements, main document only', function() {
@@ -449,4 +457,16 @@ describe.only('KMW element-attachment logic', function () {
       attacher.shutdown();
     });
   });
+
+  describe.skip("sortedList: tests for expected ordering", () => {
+    it('todo: straightforward, standard layout', () => {});
+
+    it('todo: tricky layout with absolute positioning', () => {});
+  });
+
+  describe.skip("maintenance of site-intended .inputMode", () => {
+    it('todo: save, restore property (no intermediate mutation)', () => {});
+
+    it('todo: save, restore property (with intermediate mutation)', () => {});
+  })
 });
