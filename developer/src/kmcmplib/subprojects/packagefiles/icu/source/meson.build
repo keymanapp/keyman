@@ -1,10 +1,10 @@
-incdir = include_directories('..', 'common')
+incdir = include_directories('common')
 
-if host_machine.system() == 'windows'
-  icudata_name = '@0@icudt@1@'.format(library_prefix, library_suffix)
-else
+# if host_machine.system() == 'windows'
+#   icudata_name = '@0@icudt@1@'.format(library_prefix, library_suffix)
+# else
   icudata_name = '@0@icudata@1@'.format(library_prefix, library_suffix)
-endif
+# endif
 
 subdir('stubdata')
 subdir('common')
