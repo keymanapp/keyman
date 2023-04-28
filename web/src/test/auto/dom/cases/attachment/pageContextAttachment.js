@@ -4,7 +4,7 @@ import timedPromise from '../../timedPromise.mjs';
 let assert = chai.assert;
 
 let STANDARD_OPTIONS = {
-  isTopLevel: true,
+  owner: null,
   hostDevice: {
     formFactor: 'desktop',
     OS: 'windows',
@@ -671,9 +671,80 @@ describe.only('KMW element-attachment logic', function () {
     });
   });
 
-  describe.skip("maintenance of site-intended .inputMode", () => {
-    it('todo: save, restore property (no intermediate mutation)', () => {});
+  describe(".inputMode interactions", () => {
+    beforeEach(function() {
+      this.attacher = new PageContextAttachment(window.document, {
+        hostDevice: {
+          formFactor: 'phone',
+          OS: 'android',
+          browser: 'chrome',
+          // Special inputMode handling is only activated for touch devices.
+          // Yay for being able to "mock" it!
+          touchable: true
+        }
+      });
+      fixture.setBase('fixtures');
+    });
 
-    it('todo: save, restore property (with intermediate mutation)', () => {});
+    afterEach(function() {
+      fixture.cleanup();
+      this.attacher?.shutdown();
+      this.attacher = null;
+    });
+
+    it('maintains original intents: numeric, none, (kmw-disabled) email', function () {
+      fixture.load("inputs-numeric-none-disabled_email.html");
+      const attacher = this.attacher;
+      attacher.install(false);
+
+      // The base 'attachment' behavior is already handled within the "attachment: auto" section.
+      const inputNumeric = document.getElementById('numeric-input');
+      const inputNone = document.getElementById('none-input');
+      const inputEmail = document.getElementById('email-input');
+
+      assert.equal(inputNumeric.inputMode, 'none');  // it's attached.
+      assert.equal(inputNone.inputMode,    'none');  // is also attached, was originally the same.
+      assert.equal(inputEmail.inputMode,   'email'); // is not attached/enabled, so it shouldn't be altered.
+
+      attacher.detachFromControl(inputNumeric);
+      attacher.detachFromControl(inputNone);
+
+      // The original, pre-attachment setting
+      assert.equal(inputNumeric.inputMode, 'numeric');
+      assert.equal(inputNone.inputMode, 'none');
+
+      attacher.shutdown();
+    });
+
+    it('updates mutated intents: numeric => email', async function() {
+      fixture.load("inputs-numeric-none-disabled_email.html");
+      const attacher = this.attacher;
+      attacher.install(false);
+
+      // The base 'attachment' behavior is already handled within the "attachment: auto" section.
+      const inputNumeric = document.getElementById('numeric-input');
+      assert.equal(inputNumeric.inputMode, 'none');  // it's attached.
+
+      attacher.detachFromControl(inputNumeric);
+
+      // The original, pre-attachment setting - prove the original value.
+      assert.equal(inputNumeric.inputMode, 'numeric');
+
+      attacher.attachToControl(inputNumeric);
+      // Restore the test setup
+      assert.equal(inputNumeric.inputMode, 'none');
+
+      inputNumeric.inputMode = 'email';
+
+      // Verify that KMW resets `inputMode` back to 'none' (b/c touch devices)
+      await Promise.resolve();
+      assert.equal(inputNumeric.inputMode, 'none');
+
+      // But, upon detachment...
+      attacher.detachFromControl(inputNumeric);
+      assert.equal(inputNumeric.inputMode, 'email'); // The value assigned during attachment.
+
+      attacher.shutdown();
+    });
   })
 });
