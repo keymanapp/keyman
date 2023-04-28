@@ -556,10 +556,67 @@ describe.only('KMW element-attachment logic', function () {
     });
   });
 
-  describe.skip("sortedList: tests for expected ordering", () => {
-    it('todo: straightforward, standard layout', () => {});
+  describe("sortedList: tests for expected ordering", () => {
+    beforeEach(function() {
+      this.attacher = new PageContextAttachment(window.document, STANDARD_OPTIONS);
+      fixture.setBase('fixtures');
+    });
 
-    it('todo: tricky layout with absolute positioning', () => {});
+    afterEach(function() {
+      fixture.cleanup();
+      this.attacher?.shutdown();
+      this.attacher = null;
+    });
+
+    it('straightforward, standard layout', async function () {
+      fixture.load("a-bit-of-everything.html");
+      const attacher = this.attacher;
+      let attached = [];
+
+      // Note:  iframes require additional time to resolve.
+      await promiseForIframeLoad(document.getElementById('iframe'));
+
+      attacher.on('enabled', (elem) => attached.push(elem));
+      attacher.install(false);
+
+      assert.sameMembers(attached.map((elem) => elem.id), ['iframe-input', 'editable', 'input', 'textarea']);
+
+      // At this time, `.sortedInputs` never includes iframe-embedded elements, design-iframes,
+      // or content-editables.  (This matches KMW 16.0 + before behavior.)
+      assert.sameOrderedMembers(attacher.sortedInputs.map((elem) => elem.id), ['input', 'textarea']);
+      attacher.shutdown();
+    });
+
+    it('tricky layout with absolute positioning', function () {
+      fixture.load("wild-absolute-positioning.html");
+
+      const attacher = this.attacher;
+      let attached = [];
+
+      attacher.on('enabled', (elem) => attached.push(elem));
+      attacher.install(false);
+
+      // Numerals:  the order of their definition within the HTML fixture.
+      // Directionals:  the actual positioning on the page.
+      const elements = [
+        "input1-middle",
+        "input2-top-right",
+        "input3-bottom-left",
+        "input4-top-left",
+        "input5-bottom-right"
+      ];
+
+      assert.sameMembers(attached.map((elem) => elem.id), elements);
+      // Top to bottom, left to right.
+      assert.sameOrderedMembers(attacher.sortedInputs.map((elem) => elem.id), [
+        "input4-top-left",
+        "input2-top-right",
+        "input1-middle",
+        "input3-bottom-left",
+        "input5-bottom-right"
+      ]);
+      attacher.shutdown();
+    });
   });
 
   describe.skip("maintenance of site-intended .inputMode", () => {
