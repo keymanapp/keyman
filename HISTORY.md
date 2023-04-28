@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.97 alpha 2023-04-28
+
+* docs(windows): Add verify vs build tools (#8676)
+*  (#8686)
+
 ## 17.0.96 alpha 2023-04-27
 
 * chore(android): Update QRGen version for Java 11 (#8673)
