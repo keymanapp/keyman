@@ -1,4 +1,5 @@
 import { PageContextAttachment } from '/@keymanapp/keyman/build/engine/attachment/lib/index.mjs';
+import timedPromise from '../../timedPromise.mjs';
 
 let assert = chai.assert;
 
@@ -122,6 +123,23 @@ describe.only('KMW element-attachment logic', function () {
         assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['iframe-input']);
         attacher.shutdown();
       });
+
+      it('design-mode iframe', async function () {
+        fixture.load("simple-design-iframe.html");
+
+        // Note:  iframes require additional time to resolve.
+        await promiseForIframeLoad(document.getElementById('iframe'));
+
+        const attacher = this.attacher;
+        let attached = [];
+
+        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.install(false);
+
+        assert.sameOrderedMembers(attached.map((elem) => elem.id), ['iframe']);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['iframe']);
+        attacher.shutdown();
+      });
     });
 
     describe('for dynamic elements, main document only', function() {
@@ -212,6 +230,48 @@ describe.only('KMW element-attachment logic', function () {
 
         assert.sameOrderedMembers(attached.map((elem) => elem.id), ['editable']);
         assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['editable']);
+        attacher.shutdown();
+      });
+
+      it('simple iframe with input', async function () {
+        const attacher = this.attacher;
+        let attached = [];
+
+        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.install(false);
+
+        fixture.load("simple-iframe-with-input.html");
+
+        // Note:  iframes require additional time to resolve.
+        await promiseForIframeLoad(document.getElementById('iframe'));
+
+        // Our mutation observers delay slightly here to ensure that any doc-internal handlers
+        // have a chance to resolve before we attach.  Currently: 10ms.
+        await timedPromise(20);
+
+        assert.sameOrderedMembers(attached.map((elem) => elem.id), ['iframe-input']);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['iframe-input']);
+        attacher.shutdown();
+      });
+
+      it('design-mode iframe', async function () {
+        const attacher = this.attacher;
+        let attached = [];
+
+        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.install(false);
+
+        fixture.load("simple-design-iframe.html");
+
+        // Note:  iframes require additional time to resolve.
+        await promiseForIframeLoad(document.getElementById('iframe'));
+
+        // Our mutation observers delay slightly here to ensure that any doc-internal handlers
+        // have a chance to resolve before we attach.  Currently: 10ms.
+        await timedPromise(20);
+
+        assert.sameOrderedMembers(attached.map((elem) => elem.id), ['iframe']);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['iframe']);
         attacher.shutdown();
       });
     });
