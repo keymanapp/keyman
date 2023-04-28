@@ -159,23 +159,6 @@ namespace com.keyman.dom {
       this._BeepObjects = [];
     }
 
-    /**
-     * Function     getHandlers
-     * Scope        Private
-     * @param       {Element}   Pelem  An input, textarea, or touch-alias element from the page.
-     * @returns     {Object}
-     */
-    getHandlers(Pelem: HTMLElement): DOMEventHandlers {
-      var _attachObj = Pelem.base ? Pelem.base._kmwAttachment : Pelem._kmwAttachment;
-
-      if(_attachObj) {
-        return _attachObj.touchEnabled ? this.touchHandlers : this.nonTouchHandlers;
-      } else {
-        // Best guess solution.
-        return this.keyman.touchAliasing;
-      }
-    }
-
     /**** The block below is referenced by modular code seen in `attachmentEngine.ts`. */
 
     /**

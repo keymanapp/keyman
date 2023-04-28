@@ -691,6 +691,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
       // Is it already disabled?
       if(!this.isKMWDisabled(Pelem)) {
         this._DisableControl(Pelem);
+        this.emit('disabled', Pelem);
       }
     }
 
