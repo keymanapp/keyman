@@ -107,6 +107,24 @@ describe.only('KMW element-attachment logic', function () {
         attacher.shutdown();
       });
 
+      it('detachment: content-editable div', function () {
+        fixture.load("simple-editable-div.html");
+
+        const attacher = this.attacher;
+        let detached = [];
+        attacher.on('disabled', (elem) => {
+          detached.push(elem)
+        });
+
+        attacher.install(false);
+
+        attacher.detachFromControl(document.getElementById('editable'));
+
+        assert.sameOrderedMembers(detached.map((elem) => elem.id), ['editable']);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), []);
+        attacher.shutdown();
+      });
+
       it('simple iframe with input', async function () {
         fixture.load("simple-iframe-with-input.html");
 
@@ -124,6 +142,28 @@ describe.only('KMW element-attachment logic', function () {
         attacher.shutdown();
       });
 
+      it('detachment: simple iframe with input', async function () {
+        fixture.load("simple-iframe-with-input.html");
+
+        // Note:  iframes require additional time to resolve.
+        await promiseForIframeLoad(document.getElementById('iframe'));
+
+        const attacher = this.attacher;
+        let detached = [];
+        attacher.on('disabled', (elem) => {
+          detached.push(elem)
+        });
+
+        attacher.install(false);
+
+        attacher.detachFromControl(document.getElementById('iframe'));
+
+        assert.sameOrderedMembers(detached.map((elem) => elem.id), ['iframe-input']);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), []);
+
+        attacher.shutdown();
+      });
+
       it('design-mode iframe', async function () {
         fixture.load("simple-design-iframe.html");
 
@@ -138,6 +178,27 @@ describe.only('KMW element-attachment logic', function () {
 
         assert.sameOrderedMembers(attached.map((elem) => elem.id), ['iframe']);
         assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['iframe']);
+        attacher.shutdown();
+      });
+
+      it('detachment: design-mode iframe', async function () {
+        fixture.load("simple-design-iframe.html");
+
+        // Note:  iframes require additional time to resolve.
+        await promiseForIframeLoad(document.getElementById('iframe'));
+
+        const attacher = this.attacher;
+        let detached = [];
+        attacher.on('disabled', (elem) => {
+          detached.push(elem)
+        });
+
+        attacher.install(false);
+        attacher.detachFromControl(document.getElementById('iframe'));
+
+        assert.sameOrderedMembers(detached.map((elem) => elem.id), ['iframe']);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), []);
+
         attacher.shutdown();
       });
     });
@@ -254,6 +315,30 @@ describe.only('KMW element-attachment logic', function () {
         attacher.shutdown();
       });
 
+      it('detachment: simple iframe with input', async function () {
+        fixture.load("simple-iframe-with-input.html");
+
+        // Note:  iframes require additional time to resolve.
+        await promiseForIframeLoad(document.getElementById('iframe'));
+
+        const attacher = this.attacher;
+        let detached = [];
+        attacher.on('disabled', (elem) => {
+          detached.push(elem)
+        });
+
+        attacher.install(false);
+
+        fixture.cleanup();
+
+        await Promise.resolve();
+
+        assert.sameOrderedMembers(detached.map((elem) => elem.id), ['iframe-input']);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), []);
+
+        attacher.shutdown();
+      });
+
       it('design-mode iframe', async function () {
         const attacher = this.attacher;
         let attached = [];
@@ -272,6 +357,30 @@ describe.only('KMW element-attachment logic', function () {
 
         assert.sameOrderedMembers(attached.map((elem) => elem.id), ['iframe']);
         assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), ['iframe']);
+        attacher.shutdown();
+      });
+
+      it('detachment: design iframe', async function () {
+        fixture.load("simple-design-iframe.html");
+
+        // Note:  iframes require additional time to resolve.
+        await promiseForIframeLoad(document.getElementById('iframe'));
+
+        const attacher = this.attacher;
+        let detached = [];
+        attacher.on('disabled', (elem) => {
+          detached.push(elem)
+        });
+
+        attacher.install(false);
+
+        fixture.cleanup();
+
+        await Promise.resolve();
+
+        assert.sameOrderedMembers(detached.map((elem) => elem.id), ['iframe']);
+        assert.sameOrderedMembers(attacher.inputList.map((elem) => elem.id), []);
+
         attacher.shutdown();
       });
     });
