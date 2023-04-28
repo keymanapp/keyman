@@ -17,4 +17,5 @@ builder_parse "$@"
 
 if builder_start_action test; then
   ./build/test/test.sh
+  builder_finish_action success test
 fi
