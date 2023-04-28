@@ -255,7 +255,7 @@ choco install openjdk
   * Verify required build tools are installed
     * Run `Visual Studio Installer` 
     * Check the `Individual components` tab 
-    * Verify `MSVC v142 - VS 2019 c++ x64/x86 build tools (Latest)` is installed if not install it.
+    * Verify `MSVC v142 - VS 2019 c++ x64/x86 build tools (Latest)` is installed. If not, install it.
 
   Recommended: configure Visual Studio to use two-space tab stops:
   1. Open the options dialog: Tools > Options.
