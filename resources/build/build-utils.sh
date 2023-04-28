@@ -30,7 +30,7 @@
 #
 
 # Exit on command failure and when using unset variables:
-set -eu
+# TODO #8693: set -eu
 
 #
 # Prevents 'clear' on exit of mingw64 bash shell
