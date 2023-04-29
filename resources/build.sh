@@ -7,7 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 cd "$THIS_SCRIPT_PATH"
 
-builder_describe "Keyman resources module" configure build test
+builder_describe "Keyman resources module" clean configure build test
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
