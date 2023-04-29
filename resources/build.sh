@@ -12,8 +12,8 @@ builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
-# configure and build are no-ops for resources/ folder; currently only have a
-# test for builder.inc.sh
+# clean, configure, and build are no-ops for resources/ folder; currently
+# only have a test for builder.inc.sh
 
 if builder_start_action test; then
   ./build/test/test.sh
