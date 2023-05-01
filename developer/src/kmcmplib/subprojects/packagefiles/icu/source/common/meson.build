@@ -188,7 +188,7 @@ sources = files(
   'uvector.cpp',
   'uvectr32.cpp',
   'uvectr64.cpp',
-  # 'wintz.cpp',
+  'wintz.cpp',
 )
 
 icuuc_name = '@0@icuuc@1@'.format(library_prefix, library_suffix)
