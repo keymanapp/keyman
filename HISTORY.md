@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.98 alpha 2023-05-02
+
+* chore(common): run common and resources tests (#8692)
+
 ## 17.0.97 alpha 2023-04-28
 
 * docs(windows): Add verify vs build tools (#8676)
