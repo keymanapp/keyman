@@ -58,7 +58,7 @@ if builder_start_action test:libraries; then
 
   pushd "$KEYMAN_ROOT/common/models/templates"
   echo
-  echo "### Running $builder_term common/models/templates) tests"
+  echo "### Running $(builder_term common/models/templates) tests"
   if builder_has_option --ci; then
     npm run test -- -reporter mocha-teamcity-reporter
   else
