@@ -17,7 +17,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 BASEDIR=$(pwd)
 
-if [ "$1" == "origdist" ]; then
+if [[ ! -z ${1+x} ]] && [ "$1" == "origdist" ]; then
     create_origdist=1
     shift
 fi
