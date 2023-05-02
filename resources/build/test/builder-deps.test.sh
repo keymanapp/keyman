@@ -28,7 +28,7 @@ builder_describe \
   :bar
 
 builder_describe_outputs \
-  configure  builder.inc.test.sh \
+  configure  test.sh \
   build      non-existing-file \
   test       non-existing-file
 
@@ -38,7 +38,7 @@ function test_dep_should_build() {
   local at="$1"
   local dep="$2"
 
-  if ! _builder_should_build_dep "$at" "resources/build/tests/$dep"; then
+  if ! _builder_should_build_dep "$at" "resources/build/test/$dep"; then
     builder_die "FAIL: expecting to build dependency $dep for $at"
   else
     echo "PASS: will build dependency $dep for $at"
@@ -49,7 +49,7 @@ function test_dep_should_not_build() {
   local at="$1"
   local dep="$2"
 
-  if _builder_should_build_dep "$at" "resources/build/tests/$dep"; then
+  if _builder_should_build_dep "$at" "resources/build/test/$dep"; then
     builder_die "FAIL: not expecting to build dependency $dep for $at"
   else
     echo "PASS: will not build dependency $dep for $at"
