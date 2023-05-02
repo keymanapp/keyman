@@ -81,8 +81,6 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     this.engineConfig.deferForInitialization.then(() => {
       const device = this.engineConfig.hostDevice;
-      const eventTracker = this.domEventTracker;
-
       const noPropagation = (event: Event) => event.stopPropagation()
 
       // For any elements being attached, or being enabled after having been disabled...
@@ -137,12 +135,6 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
           this.domEventTracker.detachDOMEvent(elem,'focus', this._ControlFocus);
           this.domEventTracker.detachDOMEvent(elem,'blur', this._ControlBlur);
           this.domEventTracker.detachDOMEvent(elem,'click', this._Click);
-
-          // This block:  has to do with maintaining focus (and consequences)
-          var lastElem = this.mostRecentTarget.getElement();
-          if(lastElem == elem) {
-            this.forgetActiveTarget(); // should already auto-hide the OSK while at it via event.
-          }
         } else {
           // For design-mode iframes:
 
@@ -157,6 +149,12 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
             this.domEventTracker.detachDOMEvent(Lelem.body,'focus', this._ControlFocus);
             this.domEventTracker.detachDOMEvent(Lelem.body,'blur', this._ControlBlur);
           }
+        }
+
+        // This block:  has to do with maintaining focus (and consequences)
+        var lastElem = this.mostRecentTarget.getElement();
+        if(lastElem == elem) {
+          this.forgetActiveTarget(); // should already auto-hide the OSK while at it via event.
         }
       });
 
