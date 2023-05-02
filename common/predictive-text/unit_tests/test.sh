@@ -68,7 +68,7 @@ if builder_start_action test:libraries; then
 
   pushd "$KEYMAN_ROOT/common/models/types"
   echo
-  echo "### Running $builder_term common/models/types) tests"
+  echo "### Running $(builder_term common/models/types) tests"
   # Is not mocha-based; it's TSC-based instead, as we're just ensuring that the .d.ts
   # file is a proper TS declaration file.
   npm run test
@@ -100,7 +100,7 @@ if [[ $VERSION_ENVIRONMENT == test ]] && builder_has_action test :browser; then
   if builder_pull_get_details; then
     if ! ([[ $builder_pull_title =~ \(web\) ]] || builder_pull_has_label test-browserstack); then
 
-      echo "Auto-skipping $builder_term test:browser) for unrelated CI test build"
+      echo "Auto-skipping $(builder_term test:browser) for unrelated CI test build"
       exit 0
     fi
   fi
