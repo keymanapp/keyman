@@ -362,24 +362,24 @@ void json_validator::validate(const json &instance, const json &schema_, const s
 	} combine_logic = none;
 
 	{
-		const auto &attr2 = schema->find("allOf");
-		if (attr2 != schema->end()) {
+		const auto &attr = schema->find("allOf");
+		if (attr != schema->end()) {
 			combine_logic = allOf;
-			combined_schemas = &attr2.value();
+			combined_schemas = &attr.value();
 		}
 	}
 	{
-		const auto &attr2 = schema->find("anyOf");
-		if (attr2 != schema->end()) {
+		const auto &attr = schema->find("anyOf");
+		if (attr != schema->end()) {
 			combine_logic = anyOf;
-			combined_schemas = &attr2.value();
+			combined_schemas = &attr.value();
 		}
 	}
 	{
-		const auto &attr2 = schema->find("oneOf");
-		if (attr2 != schema->end()) {
+		const auto &attr = schema->find("oneOf");
+		if (attr != schema->end()) {
 			combine_logic = oneOf;
-			combined_schemas = &attr2.value();
+			combined_schemas = &attr.value();
 		}
 	}
 
