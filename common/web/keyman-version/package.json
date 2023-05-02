@@ -9,6 +9,9 @@
     },
     "./build/version.inc.cjs": "./build/version.inc.cjs"
   },
+  "files": [
+    "/build/"
+  ],
   "scripts": {
     "build": "echo 'Building @keymanapp/keyman-version' && tsc -b",
     "clean": "tsc -b --clean",

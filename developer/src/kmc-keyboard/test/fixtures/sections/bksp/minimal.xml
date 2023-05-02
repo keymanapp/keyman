@@ -9,6 +9,8 @@
   <keys />
 
   <transforms type="backspace">
-    <transform from="្ម" to="" />
+    <transformGroup>
+      <transform from="្ម" to="" />
+    </transformGroup>
   </transforms>
 </keyboard>

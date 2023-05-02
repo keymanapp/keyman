@@ -1,6 +1,4 @@
-import { VisualKeyboard, LDMLKeyboard, TouchLayoutFileWriter } from "@keymanapp/common-types";
-
-import * as path from 'path';
+import { CompilerCallbacks, VisualKeyboard, LDMLKeyboard, TouchLayoutFileWriter } from "@keymanapp/common-types";
 import CompilerOptions from "./compiler-options.js";
 import { TouchLayoutCompiler } from "./touch-layout-compiler.js";
 import VisualKeyboardCompiler from "./visual-keyboard-compiler.js";
@@ -15,7 +13,7 @@ export class KeymanWebCompiler {
   private readonly nl: string;
   private readonly tab: string;
 
-  constructor(options?: KeymanWebCompilerOptions) {
+  constructor(private callbacks: CompilerCallbacks, options?: KeymanWebCompilerOptions) {
     this.options = { ...options };
     this.nl = this.options.debug ? "\n" : '';
     this.tab = this.options.debug ? "  " : '';
@@ -45,10 +43,11 @@ export class KeymanWebCompiler {
   }
 
   private cleanName(name: string): string {
-    let result = path.basename(name, '.xml').toLowerCase();
-    if(!result.length) {
+    let result = this.callbacks.path.basename(name, '.xml');
+    if(!result) {
       throw new Error(`Invalid file name ${name}`);
     }
+
     result = result.replaceAll(/[^a-z0-9]/g, '_');
     if(result.match(/^[0-9]/)) {
       // Can't have a digit as initial

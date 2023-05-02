@@ -2,7 +2,7 @@
 #include "pch.h"
 
 #include "compfile.h"
-#include <comperr.h>
+#include <kmn_compiler_errors.h>
 #include "kmcmplib.h"
 #include <xstring.h>
 #include "kmx_u16.h"
