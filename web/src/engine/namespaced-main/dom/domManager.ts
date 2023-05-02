@@ -159,22 +159,6 @@ namespace com.keyman.dom {
       this._BeepObjects = [];
     }
 
-    /**** The block below is referenced by modular code seen in `attachmentEngine.ts`. */
-
-    /**
-     * Function     nonKMWTouchHandler
-     * Scope        Private
-     * Description  A handler for KMW-touch-disabled elements when operating on touch devices.
-     */
-    nonKMWTouchHandler = function(x) {
-      DOMEventHandlers.states.focusing=false;
-      clearTimeout(DOMEventHandlers.states.focusTimer);
-      this.keyman.osk.hideNow();
-    }.bind(this);
-
-
-    /**** The block above is referenced by modular code seen in `attachmentEngine.ts`. */
-
     /* ------------- Page and document-level management events ------------------ */
 
     _WindowLoad: (e: Event) => void = function(e: Event) {
