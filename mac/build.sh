@@ -132,6 +132,7 @@ QUIET=false
 NOTARIZE=false
 SKIP_BUILD=false
 UPLOAD_SENTRY=false
+QUIET_FLAG=
 
 # Import local environment variables for build
 if [[ -f $(dirname "$THIS_SCRIPT")/localenv.sh ]]; then
@@ -259,6 +260,7 @@ displayInfo "" \
     "BUILD_ACTIONS: $BUILD_ACTIONS" \
     "TEST_ACTION: $TEST_ACTION" \
     "UPLOAD_SENTRY: $UPLOAD_SENTRY" \
+    "QUIET_FLAG: $QUIET_FLAG" \
     ""
 
 ### Validate notarization environment variables ###
