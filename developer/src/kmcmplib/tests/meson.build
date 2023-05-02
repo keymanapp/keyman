@@ -16,7 +16,8 @@ kmcompxtest = executable('kmcompxtest', 'kmcompxtest.cpp',
     include_directories: inc,
     name_suffix: name_suffix,
     link_args: links + tests_flags,
-    link_with: lib,
+    objects: lib.extract_all_objects(),
+    dependencies: icuuc_dep,
   )
 
 # Test keyboards that we have in Core
@@ -111,7 +112,8 @@ apitest = executable('api-test', 'api-test.cpp',
     include_directories: inc,
     name_suffix: name_suffix,
     link_args: links + tests_flags,
-    link_with: lib,
+    objects: lib.extract_all_objects(),
+    dependencies: icuuc_dep,
   )
 
 test('api-test', apitest)
@@ -121,7 +123,8 @@ usetapitest = executable('uset-api-test', 'uset-api-test.cpp',
     include_directories: inc,
     name_suffix: name_suffix,
     link_args: links + tests_flags,
-    link_with: lib,
+    objects: lib.extract_all_objects(),
+    dependencies: icuuc_dep,
   )
 
 test('uset-api-test', usetapitest)
