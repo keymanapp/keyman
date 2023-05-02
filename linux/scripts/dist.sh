@@ -61,7 +61,7 @@ echo "3.0 (quilt)" > debian/source/format
 cd "$BASEDIR"
 
 # create orig.tar.gz
-if [ -n "$create_origdist" ]; then
+if [ ! -z "${create_origdist+x}" ]; then
     cd dist
     pkgvers="keyman-$VERSION"
     tar xfz keyman-"${VERSION}".tar.gz
