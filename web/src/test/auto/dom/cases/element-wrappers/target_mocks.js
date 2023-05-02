@@ -79,7 +79,7 @@ describe('OutputTarget Mocking', function() {
   });
 
   beforeEach(function() {
-    fixture.load("robustAttachment.html");
+    fixture.load("dynamic-element-container.html");
   })
 
   afterEach(function() {
