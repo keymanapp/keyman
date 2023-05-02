@@ -8,6 +8,7 @@ import { Command } from 'commander';
 import KmpCompiler from '@keymanapp/kmc-package';
 import { SysExits } from './util/sysexits.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
+import { NodeCompilerCallbacks } from './messages/NodeCompilerCallbacks.js';
 
 let inputFilename: string;
 const program = new Command();
@@ -34,9 +35,9 @@ let outputFilename: string = program.opts().outFile ? program.opts().outFile : i
 // Load .kps source data
 //
 
-let kpsString: string = fs.readFileSync(inputFilename, 'utf8');
-let kmpCompiler = new KmpCompiler();
-let kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsString, inputFilename);
+const callbacks = new NodeCompilerCallbacks();
+let kmpCompiler = new KmpCompiler(callbacks);
+let kmpJsonData = kmpCompiler.transformKpsToKmpObject(inputFilename);
 
 //
 // Build the .kmp package file

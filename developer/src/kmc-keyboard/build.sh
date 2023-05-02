@@ -19,11 +19,13 @@ cd "$THIS_SCRIPT_PATH"
 builder_describe "Build Keyman kmc Keyboard Compiler module" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
+  "@/developer/src/common/web/test-helpers" \
   "configure" \
   "build" \
   "clean" \
   "test" \
   "build-fixtures            builds test fixtures for manual examination" \
+  "pack                      build a local .tgz pack for testing" \
   "publish                   publish to npm" \
   "--dry-run,-n              don't actually publish, just dry run"
 builder_describe_outputs \
@@ -77,7 +79,7 @@ if builder_start_action build-fixtures; then
 
   # Build basic.kmx and emit its checksum
   mkdir -p ./build/test/fixtures
-  node ../kmc ./test/fixtures/basic.xml --no-compiler-version --debug --out-file ./build/test/fixtures/basic-xml.kmx
+  node ../kmc build ./test/fixtures/basic.xml --no-compiler-version --debug --out-file ./build/test/fixtures/basic-xml.kmx
   printf "${COLOR_GREY}Checksum for basic-xml.kmx: ${COLOR_PURPLE}%s${COLOR_RESET}\n" \
     "$(xxd -g 1 -l 12 ./build/test/fixtures/basic-xml.kmx | cut -d' ' -f 10-13)"
 
@@ -102,4 +104,9 @@ if builder_start_action publish; then
   . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
   builder_publish_to_npm
   builder_finish_action success publish
+elif builder_start_action pack; then
+  copy_schemas
+  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+  builder_publish_to_pack
+  builder_finish_action success pack
 fi

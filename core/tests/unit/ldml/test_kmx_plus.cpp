@@ -2,8 +2,12 @@
 #include "kmx/kmx_plus.h"
 #include "kmx/kmx_xstring.h"
 #include "../../../src/ldml/ldml_vkeys.hpp"
-#include "ldml_test_source.hpp"
 #include <iostream>
+#include "ldml_test_utils.hpp"
+
+// needed for streaming operators
+#include "utfcodec.hpp"
+
 
 using namespace km::kbp::kmx;
 
@@ -62,7 +66,7 @@ int test_ldml_vkeys() {
 #define ADD_VKEY(k, m) { \
   const char* str = k "-" #m ; \
   PKMX_WCHAR wstr = km::kbp::kmx::strtowstr(const_cast<PKMX_CHAR>(str)); \
-  vk.add(km::tests::LdmlTestSource::get_vk(k), m, wstr); \
+  vk.add(km::tests::get_vk(k), m, wstr); \
   delete [] wstr; \
 }
 
@@ -81,61 +85,60 @@ int test_ldml_vkeys() {
   ADD_VKEY("K_E", K_ALTFLAG|RCTRLFLAG);
 
 #undef ADD_VKEY
-
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_A"), 0), u"K_A-0");
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_A"), LCTRLFLAG), u"K_A-LCTRLFLAG");
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_A"), RCTRLFLAG), u"K_A-RCTRLFLAG");
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_A"), LALTFLAG), u"K_A-LALTFLAG");
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_A"), RALTFLAG), u"K_A-RALTFLAG");
 
   // now try either-side keys :should get the same result with either or both
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_B"), LCTRLFLAG), u"K_B-K_CTRLFLAG");
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_B"), RCTRLFLAG), u"K_B-K_CTRLFLAG");
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_B"), LCTRLFLAG|RCTRLFLAG), u"K_B-K_CTRLFLAG");
 
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_B"), LALTFLAG), u"K_B-K_ALTFLAG");
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_B"), RALTFLAG), u"K_B-K_ALTFLAG");
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_B"), LALTFLAG|RALTFLAG), u"K_B-K_ALTFLAG");
 
   // OOOkay now try BOTH side
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_C"), LCTRLFLAG|LALTFLAG), u"K_C-K_ALTFLAG|K_CTRLFLAG");
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_C"), LCTRLFLAG|RALTFLAG), u"K_C-K_ALTFLAG|K_CTRLFLAG");
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_C"), RCTRLFLAG|LALTFLAG), u"K_C-K_ALTFLAG|K_CTRLFLAG");
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_C"), RCTRLFLAG|RALTFLAG), u"K_C-K_ALTFLAG|K_CTRLFLAG");
 
   // OOOkay now try either alt
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_D"), LCTRLFLAG|LALTFLAG), u"K_D-LALTFLAG|K_CTRLFLAG");
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_D"), LCTRLFLAG|RALTFLAG), u"K_D-RALTFLAG|K_CTRLFLAG");
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_D"), RCTRLFLAG|LALTFLAG), u"K_D-LALTFLAG|K_CTRLFLAG");
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_D"), RCTRLFLAG|RALTFLAG), u"K_D-RALTFLAG|K_CTRLFLAG");
 
   // OOOkay now try either ctrl
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_E"), LCTRLFLAG|LALTFLAG), u"K_E-K_ALTFLAG|LCTRLFLAG");
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_E"), LCTRLFLAG|RALTFLAG), u"K_E-K_ALTFLAG|LCTRLFLAG");
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_E"), RCTRLFLAG|LALTFLAG), u"K_E-K_ALTFLAG|RCTRLFLAG");
-  assert_equal(vk.lookup(km::tests::LdmlTestSource::get_vk(
+  assert_equal(vk.lookup(km::tests::get_vk(
     "K_E"), RCTRLFLAG|RALTFLAG), u"K_E-K_ALTFLAG|RCTRLFLAG");
 
   return EXIT_SUCCESS;

@@ -8,7 +8,9 @@
 
   <keys />
 
-  <transforms type="final">
-    <transform from="xx" to="x" error="fail" />
+  <transforms type="simple">
+    <transformGroup>
+      <transform from="xx" to="x" />
+    </transformGroup>
   </transforms>
 </keyboard>

@@ -10,7 +10,7 @@
     <name value="meta-maximal" />
   </names>
 
-  <settings fallback="omit" transformFailure="omit" transformPartial="hide" />
+  <settings fallback="omit" />
 
   <keys />
 </keyboard>

@@ -74,7 +74,10 @@ do_test() {
 
   # Works on a local clone of keyboards repository, to avoid clobbering
   # user's existing keyboards repo, if present
-  checkout_keyboards
+
+  if builder_has_option --full-test; then
+    checkout_keyboards
+  fi
 
   if [[ $target =~ ^(x86|x64)$ ]]; then
     cmd //C build.bat $target $BUILDER_CONFIGURATION test "${builder_extra_params[@]}"

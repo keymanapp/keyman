@@ -69,7 +69,7 @@
 #include <kmcmplibapi.h>
 
 #include "compfile.h"
-#include <comperr.h>
+#include <kmn_compiler_errors.h>
 #include "../../../../common/windows/cpp/include/vkeys.h"
 #include <cuchar>
 #include "versioning.h"

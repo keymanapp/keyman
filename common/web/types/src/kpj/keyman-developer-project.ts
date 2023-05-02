@@ -2,53 +2,53 @@
 // Version 1.0 of Keyman Developer Project .kpj file
 //
 
-import * as path from 'path';
-import * as fs from 'fs';
+import { CompilerCallbacks } from '../util/compiler-interfaces.js';
 
 export class KeymanDeveloperProject {
   options: KeymanDeveloperProjectOptions;
   files: KeymanDeveloperProjectFile[];
-  constructor(version: KeymanDeveloperProjectVersion) {
+  projectPath: string = '';
+
+  constructor(private projectFilename: string, version: KeymanDeveloperProjectVersion, private callbacks: CompilerCallbacks) {
+    this.projectPath = this.callbacks.path.dirname(this.projectFilename);
     this.options = new KeymanDeveloperProjectOptions(version);
     this.files = [];
   }
   /**
    * Adds .kmn, .xml, .kps to project based on options.sourcePath
-   * @param projectPath Full path to project.kpj (even if the file doesn't exist)
+   * @param projectFilename Full path to project.kpj (even if the file doesn't exist)
    */
-  populateFiles(projectPath: string) {
+  populateFiles() {
     if(this.options.version != '2.0') {
       throw new Error('populateFiles can only be called on a v2.0 project');
     }
-
-    let sourcePath = this.resolveProjectPath(projectPath, this.options.sourcePath);
-    let files = fs.readdirSync(sourcePath);
+    let sourcePath = this.resolveProjectPath(this.options.sourcePath);
+    let files = this.callbacks.fs.readdirSync(sourcePath);
     for(let filename of files) {
-      let fullPath = path.join(sourcePath, filename);
+      let fullPath = this.callbacks.path.join(sourcePath, filename);
       if(filename.match(/\.xml$/i)) {
-        if(!fs.readFileSync(fullPath, 'utf-8').match(/ldmlKeyboard\.dtd/)) {
+        if(!this.callbacks.fs.readFileSync(fullPath, 'utf-8').match(/ldmlKeyboard\.dtd/)) {
           // Skip this .xml because we assume it isn't really a keyboard .xml
           continue;
         }
       }
       if(filename.match(/\.(kmn|kps|xml|model\.ts)$/i)) {
-        let file = new KeymanDeveloperProjectFile20(fullPath);
+        let file = new KeymanDeveloperProjectFile20(fullPath, this.callbacks);
         this.files.push(file);
       }
     }
   }
 
-  resolveProjectPath(projectPath: string, p: string): string {
+  private resolveProjectPath(p: string): string {
     // Replace placeholders in the target path
-    return p.replace('$PROJECTPATH', path.dirname(projectPath));
+    return p.replace('$PROJECTPATH', this.projectPath);
   }
 
-  resolveInputFilePath(projectPath: string, file: KeymanDeveloperProjectFile): string {
-    let p = path.dirname(projectPath);
-    return path.normalize(path.resolve(p, file.filePath));
+  resolveInputFilePath(file: KeymanDeveloperProjectFile): string {
+    return this.callbacks.resolveFilename(this.projectFilename, file.filePath);
   }
 
-  resolveOutputFilePath(projectPath: string, file: KeymanDeveloperProjectFile, sourceExt: string, targetExt: string): string {
+  resolveOutputFilePath(file: KeymanDeveloperProjectFile, sourceExt: string, targetExt: string): string {
     // Roughly corresponds to Delphi TProject.GetTargetFileName
     let p = this.options.version == '1.0' ?
       this.options.buildPath || '$SOURCEPATH' :
@@ -58,13 +58,13 @@ export class KeymanDeveloperProject {
     if(this.options.version == '1.0') {
       // TODO: do we need to support $VERSION?
       // $SOURCEPATH only supported in 1.0 projects
-      p = p.replace('$SOURCEPATH', path.dirname(this.resolveInputFilePath(projectPath, file)));
+      p = p.replace('$SOURCEPATH', this.callbacks.path.dirname(this.resolveInputFilePath(file)));
     }
 
-    p = this.resolveProjectPath(projectPath, p);
+    p = this.resolveProjectPath(p);
 
     let f = file.filename.replace(new RegExp(`\\${sourceExt}$`, 'i'), targetExt);
-    return path.normalize(path.join(p, f));
+    return this.callbacks.path.normalize(this.callbacks.path.join(p, f));
   }
 
 };
@@ -130,14 +130,14 @@ export class KeymanDeveloperProjectFile20 {
   readonly filename: string;
   readonly filePath: string;
   readonly fileType: string; // file extension of filename, but .model.ts is technically not the ext because of 2 periods
-  constructor(filePath: string) {
-    this.filename = path.basename(filePath);
+  constructor(filePath: string, private callbacks: CompilerCallbacks) {
+    this.filename = this.callbacks.path.basename(filePath);
     this.filePath = filePath;
     if(this.filename.match(/\.model\.ts$/)) {
       // .model.ts is a bit of a hassle...
       this.fileType = '.model.ts';
     } else {
-      this.fileType = path.extname(this.filename);
+      this.fileType = this.callbacks.path.extname(this.filename);
     }
   }
 };

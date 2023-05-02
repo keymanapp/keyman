@@ -1,11 +1,12 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import * as xml2js from 'xml2js';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 import type { KpsFile, KpsFileContentFile, KpsFileInfo, KpsFileKeyboard, KpsFileLanguage, KpsFileLexicalModel, KpsFileOptions, KpsPackage } from './kps-file.js';
 import type { KmpJsonFile, KmpJsonFileInfo, KmpJsonFileLanguage, KmpJsonFileOptions } from './kmp-json-file.js';
+import { CompilerCallbacks, KvkFile } from '@keymanapp/common-types';
+import { CompilerMessages } from './messages.js';
+import { KMX, KmxFileReader } from '@keymanapp/common-types';
 
 export { type KmpJsonFile } from './kmp-json-file.js';
 
@@ -13,17 +14,20 @@ const FILEVERSION_KMP_JSON = '12.0';
 
 export default class KmpCompiler {
 
-  public transformKpsToKmpObject(kpsString: string, kpsPath: string): KmpJsonFile {
+  constructor(private callbacks: CompilerCallbacks) {
+  }
 
+  public transformKpsToKmpObject(kpsFilename: string): KmpJsonFile {
     // Load the KPS data from XML as JS structured data.
+    const data = this.callbacks.fs.readFileSync(kpsFilename, 'utf-8');
 
-    let kpsPackage = (() => {
+    const kpsPackage = (() => {
         let a: KpsPackage;
         let parser = new xml2js.Parser({
           tagNameProcessors: [xml2js.processors.firstCharLowerCase],
           explicitArray: false
         });
-        parser.parseString(kpsString, (e: unknown, r: unknown) => { a = r as KpsPackage });
+        parser.parseString(data, (e: unknown, r: unknown) => { a = r as KpsPackage });
         return a;
     })();
 
@@ -61,9 +65,11 @@ export default class KmpCompiler {
       ['msiOptions', 'msiOptions'],
       ['readMeFile', 'readmeFile']
     ];
-    for (let [src,dst] of keys) {
-      if (kps.options[src]) {
-        kmp.options[dst] = kps.options[src];
+    if(kps.options) {
+      for (let [src,dst] of keys) {
+        if (kps.options[src]) {
+          kmp.options[dst] = kps.options[src];
+        }
       }
     }
 
@@ -73,14 +79,6 @@ export default class KmpCompiler {
 
     if(kps.info) {
       kmp.info = this.kpsInfoToKmpInfo(kps.info);
-    }
-
-    // FollowKeyboardVersion support
-
-    if(kps.options?.followKeyboardVersion !== undefined) {
-      kmp.info.version = {
-        description: this.extractKeyboardVersionFromKmx(kpsPath, kps)
-      };
     }
 
     //
@@ -112,8 +110,8 @@ export default class KmpCompiler {
     if(kps.keyboards && kps.keyboards.keyboard) {
       kmp.keyboards = this.arrayWrap(kps.keyboards.keyboard).map((keyboard: KpsFileKeyboard) => {
         return {
-          displayFont: keyboard.displayFont ? path.basename(keyboard.displayFont.replaceAll('\\', '/')) : undefined,
-          oskFont: keyboard.oSKFont ? path.basename(keyboard.oSKFont.replaceAll('\\', '/')) : undefined,
+          displayFont: keyboard.displayFont ? this.callbacks.path.basename(keyboard.displayFont) : undefined,
+          oskFont: keyboard.oSKFont ? this.callbacks.path.basename(keyboard.oSKFont) : undefined,
           name:keyboard.name,
           id:keyboard.iD,
           version:keyboard.version,
@@ -130,6 +128,17 @@ export default class KmpCompiler {
       kmp.lexicalModels = this.arrayWrap(kps.lexicalModels.lexicalModel).map((model: KpsFileLexicalModel) => {
         return { name:model.name, id:model.iD, languages: this.kpsLanguagesToKmpLanguages(this.arrayWrap(model.languages.language) as KpsFileLanguage[]) }
       });
+    }
+
+    //
+    // FollowKeyboardVersion support
+    //
+
+    if(kps.options?.followKeyboardVersion !== undefined) {
+      kmp.info.version = {
+        description: this.extractKeyboardVersionFromKmx(kpsFilename, kmp)
+      };
+      // TODO: compare the extracted version with other keyboards in the package
     }
 
     //
@@ -190,18 +199,66 @@ export default class KmpCompiler {
     return language.map((element) => { return { name: element._, id: element.$.ID } });
   };
 
-  private extractKeyboardVersionFromKmx(kpsPath: string, kps: KpsFile) {
-    // TODO-LDML: #7340 this is incomplete; we need to read from first .kmx
-    // When we do this, we'll need to update fixtures to have the correct
-    // version string also
-    if(!kps.keyboards || !kps.keyboards.keyboard) {
-      // We don't read from the kps metadata because we want the keyboard
-      // version data here;
-      // TODO: currently model files don't support follow-version?
-      return '0.0.0';
+  private extractKeyboardVersionFromKmx(kpsFilename: string, kmp: KmpJsonFile) {
+    // The DEFAULT_VERSION used to be '1.0', but we now use '0.0' to allow
+    // pre-release 0.x keyboards to be considered later than a keyboard without
+    // any version metadata at all.
+    const DEFAULT_VERSION = '0.0';
+
+    // Note: there is often version metadata in the .kps <Keyboard> element, but
+    // we don't read from the metadata because we want to ensure we have the
+    // most up-to-date keyboard version data here, from the compiled keyboard.
+
+    // Lexical model packages do not allow FollowKeyboardVersion
+    if(kmp.lexicalModels && kmp.lexicalModels.length) {
+      this.callbacks.reportMessage(CompilerMessages.Error_FollowKeyboardVersionNotAllowedForModelPackages());
+      return DEFAULT_VERSION;
     }
-    let k: KpsFileKeyboard[] = this.arrayWrap(kps.keyboards.keyboard);
-    return k?.[0]?.version ?? '0.0.0';
+
+    if(!kmp.keyboards || !kmp.keyboards.length) {
+      this.callbacks.reportMessage(CompilerMessages.Warn_FollowKeyboardVersionButNoKeyboards());
+      return DEFAULT_VERSION;
+    }
+
+    // Reset the keyboard version to the default in the kmp.json metadata, for
+    // warning/failure code paths in this file
+    kmp.keyboards[0].version = DEFAULT_VERSION;
+
+    const file = kmp.files.find(file => this.callbacks.path.basename(file.name, '.kmx') == kmp.keyboards[0].id);
+    if(!file) {
+      this.callbacks.reportMessage(CompilerMessages.Error_KeyboardFileNotFound({id:kmp.keyboards[0].id}));
+      return DEFAULT_VERSION;
+    }
+
+    const filename = this.callbacks.resolveFilename(kpsFilename, file.name);
+    if(!this.callbacks.fs.existsSync(filename)) {
+      // The zip phase will emit an error later if the file is missing, so
+      // we can just bail cleanly here
+      // console.debug(`The file ${filename} was not found`);
+      return DEFAULT_VERSION;
+    }
+
+    //
+    // load the .kmx and extract the version number
+    //
+    const kmxFileData = this.callbacks.loadFile(filename);
+    const kmxReader: KmxFileReader = new KmxFileReader();
+    const kmx: KMX.KEYBOARD = kmxReader.read(kmxFileData);
+    if(!kmx) {
+      // The file couldn't be read, it might be invalid or locked
+      this.callbacks.reportMessage(CompilerMessages.Error_KeyboardFileNotValid({filename}));
+      return DEFAULT_VERSION;
+    }
+
+    const store = kmx.stores.find(store => store.dwSystemID == KMX.KMXFile.TSS_KEYBOARDVERSION);
+    if(!store) {
+      // We have no version number store, so use default version
+      this.callbacks.reportMessage(CompilerMessages.Warn_KeyboardFileHasNoKeyboardVersion({filename}));
+      return DEFAULT_VERSION;
+    }
+
+    kmp.keyboards[0].version = store.dpString;
+    return store.dpString;
   }
 
   private stripUndefined(o: any) {
@@ -226,15 +283,14 @@ export default class KmpCompiler {
 
     const kmpJsonFileName = 'kmp.json';
 
-    const basePath = path.dirname(kpsFilename);
-
     // Make a copy of kmpJsonData, as we mutate paths for writing
     const data: KmpJsonFile = JSON.parse(JSON.stringify(kmpJsonData));
     if(!data.files) {
       data.files = [];
     }
 
-    data.files.forEach(function(value) {
+    let failed = false;
+    data.files.forEach((value) => {
       // Get the path of the file
       let filename = value.name;
 
@@ -243,31 +299,56 @@ export default class KmpCompiler {
         return;
       }
 
-      if(path.isAbsolute(value.name)) {
-        // absolute paths are not very cross-platform compatible -- we are going to have trouble
-        // with path separators and roots
-        // TODO: emit a warning
-      } else {
-        // Transform separators to platform separators -- kps files may use
-        // either / or \, although older kps files were always \.
-        if(path.sep == '/') {
-          filename = filename.replace(/\\/g, '/');
-        } else {
-          filename = filename.replace(/\//g, '\\');
-        }
-        filename = path.resolve(basePath, filename);
+      if(this.callbacks.path.isAbsolute(filename)) {
+        // absolute paths are not portable to other computers
+        this.callbacks.reportMessage(CompilerMessages.Warn_AbsolutePath({filename: filename}));
       }
-      const basename = path.basename(filename);
-      let data = fs.readFileSync(filename);
-      zip.file(basename, data);
+
+      filename = this.callbacks.resolveFilename(kpsFilename, filename);
+      const basename = this.callbacks.path.basename(filename);
+
+      if(!this.callbacks.fs.existsSync(filename)) {
+        this.callbacks.reportMessage(CompilerMessages.Error_FileDoesNotExist({filename: filename}));
+        failed = true;
+        return;
+      }
+
+      let memberFileData;
+      try {
+        memberFileData = this.callbacks.loadFile(filename);
+      } catch(e) {
+        this.callbacks.reportMessage(CompilerMessages.Error_FileCouldNotBeRead({filename: filename, e: e}));
+        failed = true;
+        return;
+      }
+
+      this.warnIfKvkFileIsNotBinary(filename, memberFileData);
+
+      zip.file(basename, memberFileData);
 
       // Remove path data from files before JSON save
       value.name = basename;
     });
 
+    if(failed) {
+      return null;
+    }
+
     zip.file(kmpJsonFileName, JSON.stringify(data, null, 2));
 
     // Generate kmp file
     return zip.generateAsync({type: 'binarystring', compression:'DEFLATE'});
+  }
+
+  /**
+   * Legacy .kmp compiler would transform xml-format .kvk files into a binary .kvk file; now
+   * we want that to remain the responsibility of the keyboard compiler, so we'll warn the
+   * few users who are still doing this
+   */
+  private warnIfKvkFileIsNotBinary(filename: string, data: Buffer) {
+    // TODO: Buffer is not available on web
+    if(filename.match(/\.kvk$/) && data.compare(Buffer.from(KvkFile.KVK_HEADER_IDENTIFIER_BYTES), 0, 3, 0, 3) != 0) {
+      this.callbacks.reportMessage(CompilerMessages.Warn_FileIsNotABinaryKvkFile({filename: filename}));
+    }
   }
 }

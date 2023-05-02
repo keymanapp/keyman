@@ -273,6 +273,7 @@ _builder_expand_shorthand() {
   shift
   local count=0
   local result=
+  local string=
   for e; do
     if [[ $e == $item ]]; then
       # Exact match trumps substring matches
@@ -282,11 +283,10 @@ _builder_expand_shorthand() {
     if [[ $e == "$item"* ]]; then
       count=$((count+1))
       if [[ $count == 2 ]]; then
-        printf "$result"
-        printf ", $e"
+        string="$result, $e"
         result=$item
       elif [[ $count -gt 2 ]]; then
-        printf ", $e"
+        string="$string, $e"
       else
         result=$e
       fi
@@ -296,7 +296,7 @@ _builder_expand_shorthand() {
   if [[ $count -lt 2 ]]; then
     echo $result
   else
-    echo
+    echo $string
   fi
   return $count
 }
@@ -394,6 +394,7 @@ _builder_execute_child() {
 
   "$script" $action \
     --builder-child \
+    $_builder_build_deps \
     ${child_options[@]} \
     $builder_verbose \
     $builder_debug \
@@ -1370,11 +1371,10 @@ _builder_parse_expanded_parameters() {
   fi
 
   if builder_is_debug_build; then
-    readonly BUILDER_CONFIGURATION=debug
+    BUILDER_CONFIGURATION=debug
   else
-    readonly BUILDER_CONFIGURATION=release
+    BUILDER_CONFIGURATION=release
   fi
-
 
   # Now that we've successfully parsed options adhering to the _builder spec, we may activate our
   # action_failure and action_hanging traps.  (We don't want them active on scripts not yet using

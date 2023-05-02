@@ -89,8 +89,8 @@ export interface KpsFileLanguage {
 }
 
 export interface KpsFileKeyboard {
-  name: string;
-  iD: string;
+  name: string;     /// the descriptive name of the keyboard
+  iD: string;       /// the keyboard identifier, equal to the basename of the keyboard file sans extension
   version: string;
   oSKFont?: string;
   displayFont?: string;

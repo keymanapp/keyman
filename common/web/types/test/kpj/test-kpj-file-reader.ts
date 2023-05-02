@@ -1,20 +1,23 @@
 import * as fs from 'fs';
 import 'mocha';
 import {assert} from 'chai';
-import { loadKpjJsonSchema, makePathToFixture } from '../helpers/index.js';
+import { loadSchema, makePathToFixture } from '../helpers/index.js';
 import { KPJFileReader } from "../../src/kpj/kpj-file-reader.js";
 import { KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from '../../src/kpj/keyman-developer-project.js';
+import { TestCompilerCallbacks } from '../helpers/TestCompilerCallbacks.js';
+
+const callbacks = new TestCompilerCallbacks();
 
 describe('kpj-file-reader', function () {
   it('kpj-file-reader should read a valid file', function() {
     const kpjPath = 'khmer_angkor.kpj';
     const path = makePathToFixture('kpj', kpjPath);
     const input = fs.readFileSync(path);
-    const reader = new KPJFileReader();
+    const reader = new KPJFileReader(callbacks);
     const kpj = reader.read(input);
     console.dir(kpj);
     assert.doesNotThrow(() => {
-      reader.validate(kpj, loadKpjJsonSchema());
+      reader.validate(kpj, loadSchema('kpj'));
     });
     assert.equal(kpj.KeymanDeveloperProject.Options.BuildPath, '$PROJECTPATH\\build');
     assert.equal(kpj.KeymanDeveloperProject.Options.CheckFilenameConventions, 'False');
