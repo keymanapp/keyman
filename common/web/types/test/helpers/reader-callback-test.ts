@@ -1,50 +1,11 @@
 import 'mocha';
 import {assert} from 'chai';
-import {loadLdmlKeyboardSchema, loadFile, makePathToFixture, loadLdmlKeyboardTestDataSchema} from '../helpers/index.js';
+import { loadFile, makePathToFixture, loadSchema } from '../helpers/index.js';
 import LDMLKeyboardXMLSourceFileReader from '../../src/ldml-keyboard/ldml-keyboard-xml-reader.js';
-import { CompilerCallbacks, CompilerEvent } from '../../src/util/compiler-interfaces.js';
+import { CompilerEvent } from '../../src/util/compiler-interfaces.js';
 import { LDMLKeyboardXMLSourceFile } from '../../src/ldml-keyboard/ldml-keyboard-xml.js';
 import { LDMLKeyboardTestDataXMLSourceFile } from '../ldml-keyboard/ldml-keyboard-testdata-xml.js';
-
-// This is related to developer/src/kmc-keyboard/test/helpers/index.ts but has a slightly different API surface
-// as this runs at a lower level than the compiler.
-
-/**
- * A CompilerCallbacks implementation for testing
- */
-class TestCompilerCallbacks implements CompilerCallbacks {
-  loadKpjJsonSchema(): Buffer {
-    throw new Error('loadKpjJsonSchema not implemented.'); // not needed for this test
-  }
-  loadLdmlKeyboardTestSchema(): Buffer {
-    return loadLdmlKeyboardTestDataSchema();
-  }
-  loadLdmlKeyboardSchema(): Buffer {
-    return loadLdmlKeyboardSchema();
-  }
-  loadKvksJsonSchema(): Buffer {
-    throw new Error('loadKvksJsonSchema not implemented.');
-  }
-  clear() {
-    this.messages = [];
-  }
-  messages: CompilerEvent[] = [];
-  loadFile(baseFilename: string, filename: string | URL): Buffer {
-    try {
-      return loadFile(baseFilename, filename);
-    } catch(e) {
-      if (e.code === 'ENOENT') {
-        return null;
-      } else {
-        throw e;
-      }
-    }
-  }
-  reportMessage(event: CompilerEvent): void {
-    // console.log(event.message);
-    this.messages.push(event);
-  }
-}
+import { TestCompilerCallbacks } from './TestCompilerCallbacks.js';
 
 export interface CompilationCase {
   /**
@@ -118,7 +79,7 @@ export function testReaderCases(cases : CompilationCase[]) {
     it(testHeading, function () {
       callbacks.clear();
 
-      const data = loadFile(testcase.subpath, makePathToFixture(testcase.subpath));
+      const data = loadFile(makePathToFixture(testcase.subpath));
       assert.ok(data, `reading ${testcase.subpath}`);
       const source = reader.load(data);
       if (!testcase.loadfail) {
@@ -128,9 +89,9 @@ export function testReaderCases(cases : CompilationCase[]) {
       }
       // special case for an expected exception
       if (testcase.throws) {
-        assert.throws(() => reader.validate(source, loadLdmlKeyboardSchema()), testcase.throws);
+        assert.throws(() => reader.validate(source, loadSchema('ldml-keyboard')), testcase.throws);
       } else {
-        assert.doesNotThrow(() => reader.validate(source, loadLdmlKeyboardSchema()), `validating ${testcase.subpath}`);
+        assert.doesNotThrow(() => reader.validate(source, loadSchema('ldml-keyboard')), `validating ${testcase.subpath}`);
         // if we expected errors or warnings, show them
         if (testcase.errors) {
           assert.includeDeepMembers(callbacks.messages, testcase.errors, 'expected errors to be included');
@@ -169,7 +130,7 @@ export function testTestdataReaderCases(cases : TestDataCase[]) {
     it(testHeading, function () {
       callbacks.clear();
 
-      const data = loadFile(testcase.subpath, makePathToFixture(testcase.subpath));
+      const data = loadFile(makePathToFixture(testcase.subpath));
       assert.ok(data, `reading ${testcase.subpath}`);
       const source = reader.loadTestData(data);
       if (!testcase.loadfail) {

@@ -894,7 +894,8 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
       topContainer: this._Box,
       styleSheetManager: this.kbdStyleSheetManager,
       pathConfig: this.config.pathConfig,
-      embeddedGestureConfig: this.config.embeddedGestureConfig
+      embeddedGestureConfig: this.config.embeddedGestureConfig,
+      isEmbedded: this.config.isEmbedded
     });
 
     vkbd.on('keyEvent', (keyEvent) => this.emit('keyEvent', keyEvent));

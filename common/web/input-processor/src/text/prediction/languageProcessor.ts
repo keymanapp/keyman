@@ -13,7 +13,7 @@ export type StateChangeEnum = 'active'|'configured'|'inactive';
 /**
  * Corresponds to the 'statechange' LanguageProcessor event.
  */
-export type StateChangeHandler = (state: StateChangeEnum) => boolean;
+export type StateChangeHandler = (state: StateChangeEnum) => any;
 
 /**
  * Covers 'tryaccept' events.

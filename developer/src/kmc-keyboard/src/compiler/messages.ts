@@ -89,18 +89,5 @@ export class CompilerMessages {
   static Error_MissingFlicks = (o:{flicks: string, id: string}) => m(this.ERROR_MissingFlicks,
     `key id=${o.id} refers to missing flicks=${o.flicks}`);
   static ERROR_MissingFlicks = SevError | 0x0015;
-
-  static severityName(code: number): string {
-    let severity = code & CompilerErrorSeverity.Severity_Mask;
-    switch(severity) {
-      case CompilerErrorSeverity.Info: return 'INFO';
-      case CompilerErrorSeverity.Hint: return 'HINT';
-      case CompilerErrorSeverity.Warn: return 'WARN';
-      case CompilerErrorSeverity.Error: return 'ERROR';
-      case CompilerErrorSeverity.Fatal: return 'FATAL';
-      /* istanbul ignore next */
-      default: return 'UNKNOWN';
-    }
-  }
 }
 

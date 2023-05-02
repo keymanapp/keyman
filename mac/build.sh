@@ -109,9 +109,6 @@ KMIM_WORKSPACE_PATH="$KM4MIM_BASE_PATH/$IM_NAME.xcworkspace"
 # APP_BUNDLE_PATH=$APP_RESOURCES/Keyman.bundle
 # APP_BUILD_PATH=keyman/Keyman/build/
 
-
-KME4M_OUTPUT_FOLDER=$KME4M_BUILD_PATH/libKeyman
-
 ### PROCESS COMMAND-LINE ARGUMENTS ###
 
 # Default is debug build of Engine and (code-signed) Input Method

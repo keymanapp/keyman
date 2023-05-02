@@ -21,7 +21,7 @@
 
   <displays>
     <!-- values chosen to reuse strings -->
-    <display to="a" display="^"/>
+    <display to="a" display="^" />
     <displayOptions baseCharacter="e" />
   </displays>
 
@@ -36,21 +36,26 @@
     </layer>
   </layers>
 
-  <transforms type="simple">
-    <transform from="^a" to="â" />
-  </transforms>
+  <variables>
+    <string id="vst" value="abc"/>
+    <set id="vse" value="a b c"/>
+    <unicodeSet id="vus" value="[abc]"/>
+  </variables>
 
-  <transforms type="final">
-    <transform from="^^" to="^" error="fail" />
+  <transforms type="simple">
+    <transformGroup>
+      <transform from="^a" to="â" />
+    </transformGroup>
+
+    <transformGroup>
+      <!-- Northern Thai example from spec, lightly edited -->
+      <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
+    </transformGroup>
   </transforms>
 
   <transforms type="backspace">
-    <transform from="^e" />
+    <transformGroup>
+      <transform from="^e" />
+    </transformGroup>
   </transforms>
-
-  <reorders>
-    <!-- Northern Thai example from spec, lightly edited -->
-    <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
-  </reorders>
-
 </keyboard>

@@ -22,7 +22,8 @@ See [license information](../../linux/LICENSE.md) about licensing.
     python3-magic python3-numpy python3-pil python3-pip python3-qrcode \
     python3-requests python3-requests-cache python3 python3-gi dconf-cli \
     dconf-editor cargo python3-dbus gir1.2-webkit2-4.0 ibus libglib2.0-bin \
-    liblocale-gettext-perl xvfb xserver-xephyr metacity mutter
+    liblocale-gettext-perl xvfb xserver-xephyr metacity mutter \
+    libicu-dev pkg-config
   ```
 
 ## Compiling from Command Line

@@ -41,6 +41,7 @@ working on ‘layr’, using ‘disp’ as a model from https://github.com/keyma
 - `common/web/types/src/kmx/kmx-plus.ts`
     - Also update class KMXPlusFile to include the actual binary format (coordinate with `kmx_plus.h`)
 - E/C `common/web/types/src/ldml-keyboard/ldml-keyboard-xml-reader.ts` if there’s any changing to the boxing needed
+    - By the way, you might get errors such as “Error validating LDML XML file: /keyboard/transforms/0: additionalProperties: must NOT have additional properties additionalProperty="transform"” if the boxing functions don't match the schema. `boxArrays()` might be trying to add empty objects/arrays that aren't (anymore) legal per schema
 
 ## In-memory data: Phase 2
 
