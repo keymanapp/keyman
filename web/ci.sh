@@ -38,6 +38,10 @@ builder_parse "$@"
 
 ####
 
+TIER=`cat ../TIER.md`
+BUILD_NUMBER=`cat ../VERSION.md`
+S_KEYMAN_COM=../../s.keyman.com
+
 if builder_start_action build; then
   # Build step:  since CI builds start (and should start) from scratch, run the following
   # three actions:

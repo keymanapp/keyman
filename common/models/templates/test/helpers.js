@@ -1,5 +1,5 @@
-const path = require('path');
-const assert = require('assert');
+import path from 'path';
+import { assert } from 'chai';
 
 var _ = global;
 
@@ -9,7 +9,12 @@ var _ = global;
 
 // Ensure that we can successfully load the module & apply kmwLength, as it's
 // needed for some of the unit tests.
-require('../build/index.bundled.js');
+
+// Verify that the KMW string extensions are loaded via side-effect.
+import * as models from '@keymanapp/models-templates/lib';
+
+import { createRequire } from "module";
+import { fileURLToPath } from 'url';
 
 assert.ok('💩'.kmwLength);
 
@@ -17,6 +22,13 @@ assert.ok('💩'.kmwLength);
  * Load JSON fixtures from a well-known place.
  */
 _.jsonFixture = function (name) {
+  // The most straight-forward way... is to use CommonJS-style require to load JSON.
+  // Fortunately, Node provides the tools needed to recreate it.
+  const require = createRequire(import.meta.url);
+
+  // ES-module mode also leaves out `__dirname`, so we rebuild that too.
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
   return require(path.join(__dirname, 'fixtures', `${name}.json`));
 }
 

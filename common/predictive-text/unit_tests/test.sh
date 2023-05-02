@@ -15,7 +15,7 @@ cd "$THIS_SCRIPT_PATH"
 ################################ Main script ################################
 
 # Defaults
-FLAGS="--require ./unit_tests/helpers"
+FLAGS=""
 
 builder_describe "Runs all tests for the language-modeling / predictive-text layer module" \
   "configure" \
@@ -74,6 +74,12 @@ if builder_start_action test:libraries; then
   npm run test
   popd
 
+  pushd "$KEYMAN_ROOT/common/web/lm-worker"
+  echo
+  echo "### Running ${BUILDER_TERM_START}common/web/lm-worker${BUILDER_TERM_END} tests"
+  ./build.sh test
+  popd
+
   builder_finish_action success test:libraries
 fi
 
@@ -122,13 +128,13 @@ if builder_start_action test:browser; then
 
   if builder_has_option --ci; then
     KARMA_FLAGS="$KARMA_FLAGS --reporters teamcity,BrowserStack"
-    KARMA_CONFIG="CI.conf.js"
+    KARMA_CONFIG="CI.conf.cjs"
     KARMA_INFO_LEVEL="--log-level=debug"
   else
-    KARMA_CONFIG="manual.conf.js"
+    KARMA_CONFIG="manual.conf.cjs"
     if builder_is_debug_build; then
       KARMA_FLAGS="$KARMA_FLAGS --no-single-run"
-      KARMA_CONFIG="manual.conf.js"
+      KARMA_CONFIG="manual.conf.cjs"
       KARMA_INFO_LEVEL="--log-level=debug"
 
       echo
@@ -137,7 +143,7 @@ if builder_start_action test:browser; then
     fi
   fi
 
-  if [[ KARMA_CONFIG == "manual.conf.js" ]]; then
+  if [[ KARMA_CONFIG == "manual.conf.cjs" ]]; then
     get_browser_set_for_OS
   else
     BROWSERS=

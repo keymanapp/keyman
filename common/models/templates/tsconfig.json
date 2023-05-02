@@ -1,16 +1,26 @@
 {
   "extends": "../../../tsconfig-base.json",
   "compilerOptions": {
+    "allowJs": false,
     "declaration": true,
-    "module": "none",
-    "outFile": "./build/index.js",
+    "module": "es6",
+    "moduleResolution": "node16",
     "sourceMap": true,
+    "sourceRoot": "/common/models/templates/src",
+    "inlineSources": true,
+    "strict": true,
     "lib": ["es6"],
+    "types": ["node"],
     "target": "es5",
+    "baseUrl": "./",
+    "outDir": "build/obj",
+    "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
   },
   "references": [
+    { "path": "../types" },
     { "path": "../../web/utils" },
-    { "path": "../types" }
+    { "path": "../../models/wordbreakers" }
   ],
   "include": [
 	"src/**/*.ts"
