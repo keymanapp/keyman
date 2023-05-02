@@ -62,3 +62,19 @@ await esbuild.build({
   treeShaking: true,
   tsconfig: './tsconfig.json'
 });
+
+await esbuild.build({
+  bundle: true,
+  sourcemap: true,
+  minify: false,
+  format: "esm",
+  nodePaths: ['../../../../node_modules'],
+  entryPoints: {
+    'index': '../../../build/app/browser/obj/test-index.js',
+  },
+  outfile: '../../../build/app/browser/lib/index.mjs',
+  plugins: [ es5ClassAnnotationAsPurePlugin ],
+  target: "es5",
+  treeShaking: true,
+  tsconfig: './tsconfig.json'
+});
