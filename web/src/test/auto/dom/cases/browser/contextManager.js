@@ -82,6 +82,21 @@ function upgradeFocus(elem) {
   }
 }
 
+async function blockConsoleAndAwait(asyncClosure) {
+  const originalConsole = window.console;
+  window.console = {
+    log: sinon.fake(),
+    warn: sinon.fake(),
+    error: sinon.fake()
+  }
+
+  try {
+    await asyncClosure();
+  } finally {
+    window.console = originalConsole;
+  }
+}
+
 describe.only('app/browser:  ContextManager', function () {
   this.timeout(__karma__.config.args.find((arg) => arg.type == "timeouts").standard);
 
@@ -96,7 +111,22 @@ describe.only('app/browser:  ContextManager', function () {
    */
   let keyboardCache;
 
+  let originalConsole;
+
+  before(() => {
+    originalConsole = window.console;
+  });
+
+  after(() => {
+    window.console = originalConsole;
+  })
+
   beforeEach(async () => {
+    // const console = window.console = {};
+    // console.log = () => {};
+    // console.warn = () => {};
+    // console.error = () => {};
+
     // Loads a common fixture and ensures all relevant elements are attached.
     fixture.setBase('fixtures');
     fixture.load("a-bit-of-everything.html");
@@ -144,8 +174,15 @@ describe.only('app/browser:  ContextManager', function () {
   });
 
   afterEach(() => {
+    // Since certain user tests change this.
+    contextManager.engineConfig.hostDevice.touchable = false;
+
     // The main reason we set `ContextManager` in `beforeEach` - to make cleanup after
-    // each test round much simpler to maintain.
+    // each test round much simpler to maintain.  If not reset, the unit test stuff can
+    // collapse due to side-effects - certain elements only attach if `touchable == false`.
+    //
+    // ... I could probably just use an input element and textarea element fixture for those
+    // tests and be fine, rather than the full gamut.
     contextManager?.shutdown();
     contextManager = null;
     keyboardCache = null;
@@ -376,7 +413,7 @@ describe.only('app/browser:  ContextManager', function () {
       assert.isNotOk(contextManager.keyboardTarget);
     });
 
-    it('activate: without .activeTarget, null -> null', async () => {
+    it('activate: without .activeTarget, null -> null (desktop)', async () => {
       const beforekeyboardchange = sinon.fake();
       const keyboardchange = sinon.fake();
       const keyboardasyncload = sinon.fake();
@@ -393,6 +430,27 @@ describe.only('app/browser:  ContextManager', function () {
       assert.isTrue(keyboardchange.calledOnce);
       assert.isTrue(keyboardasyncload.notCalled);
       assert.equal(keyboardchange.firstCall.args[0], null);
+    });
+
+    it('activate: without .activeTarget, null -> null (touch)', async () => {
+      const beforekeyboardchange = sinon.fake();
+      const keyboardchange = sinon.fake();
+      const keyboardasyncload = sinon.fake();
+      contextManager.on('beforekeyboardchange', beforekeyboardchange);
+      contextManager.on('keyboardchange', keyboardchange);
+      contextManager.on('keyboardasyncload', keyboardasyncload);
+
+      // Hacky override - activate touch mode.
+      contextManager.engineConfig.hostDevice.touchable = true;
+
+      await contextManager.activateKeyboard('', '');
+      // When no keyboard is set, the keyboard-metadata pair object itself should be null.
+      assert.equal(contextManager.activeKeyboard?.metadata?.id, 'khmer_angkor');
+
+      assert.isTrue(beforekeyboardchange.calledTwice); // khmer_angkor is dynamically loaded.
+      assert.isTrue(keyboardchange.calledOnce);
+      assert.isTrue(keyboardasyncload.calledOnce); // Again, dynamically loaded.
+      assert.equal(keyboardchange.firstCall.args[0].metadata.id, 'khmer_angkor');
     });
 
     it('activate: without .activeTarget, preloaded keyboard', async () => {
@@ -442,18 +500,45 @@ describe.only('app/browser:  ContextManager', function () {
     });
 
     it('activate: without .activeTarget, missing definition (desktop)', async () => {
+      const beforekeyboardchange = sinon.fake();
+      const keyboardchange = sinon.fake();
+      const keyboardasyncload = sinon.fake();
+      contextManager.on('beforekeyboardchange', beforekeyboardchange);
+      contextManager.on('keyboardasyncload', keyboardasyncload);
+      contextManager.on('keyboardchange', keyboardchange);
+
       // Setup
       keyboardCache.addKeyboard(KEYBOARDS.lao_2008_basic.keyboard);
       await contextManager.activateKeyboard('lao_2008_basic', 'lo');
 
       // Actual test
-      await contextManager.activateKeyboard('not_defined', 'n/a');
+      try {
+        await blockConsoleAndAwait(() => contextManager.activateKeyboard('not_defined', 'n/a'));
+        assert.fail();
+      } catch (err) {
+        // Good, an error surfaced.
+        // Could make assertions about the error?
+      }
 
       // Fallback behavior:  deactivate the keyboard entirely (if on desktop)
       assert.equal(contextManager.activeKeyboard, null);
+
+      // The two requests - initial setup, then to the default keyboard.  No attempts
+      // are made for the erroneous keyboard because no matching stub could be found.
+
+      assert.isTrue(beforekeyboardchange.calledTwice); // Requested twice.
+      assert.isTrue(keyboardchange.calledTwice); // Actually does change the keyboard twice
+      assert.isTrue(keyboardasyncload.notCalled);
     });
 
     it('activate: without .activeTarget, missing definition (touch)', async () => {
+      const beforekeyboardchange = sinon.fake();
+      const keyboardchange = sinon.fake();
+      const keyboardasyncload = sinon.fake();
+      contextManager.on('beforekeyboardchange', beforekeyboardchange);
+      contextManager.on('keyboardasyncload', keyboardasyncload);
+      contextManager.on('keyboardchange', keyboardchange);
+
       // Hacky override - activate touch mode.
       contextManager.engineConfig.hostDevice.touchable = true;
 
@@ -462,10 +547,23 @@ describe.only('app/browser:  ContextManager', function () {
       await contextManager.activateKeyboard('lao_2008_basic', 'lo');
 
       // Actual test
-      await contextManager.activateKeyboard('not_defined', 'n/a');
+      try {
+        await blockConsoleAndAwait(() => contextManager.activateKeyboard('not_defined', 'n/a'));
+        assert.fail();
+      } catch (err) {
+        // Good, an error surfaced.
+        // Could make assertions about the error?
+      }
 
       // Fallback behavior:  activate the first registered stub (if on touch)
-      assert.equal(contextManager.activeKeyboard.metadata.id, 'khmer_angkor');
+      assert.equal(contextManager.activeKeyboard?.metadata.id, 'khmer_angkor');
+
+      // The two requests - initial setup, then to the default keyboard.  No attempts
+      // are made for the erroneous keyboard because no matching stub could be found.
+
+      assert.isTrue(beforekeyboardchange.calledThrice); // Requested three times - the latter two for `khmer_angkor` b/c async.
+      assert.isTrue(keyboardchange.calledTwice); // Actually does change the keyboard twice
+      assert.isTrue(keyboardasyncload.calledOnce);
     });
 
     it('reactivate: re-requests the already-active keyboard', async () => {

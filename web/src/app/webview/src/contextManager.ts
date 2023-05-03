@@ -71,15 +71,26 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
     return null;
   }
 
+  protected getFallbackCodes(): KeyboardStub {
+    // Fallback behavior - we're embedded in a touch-device's webview, so we need to keep a keyboard visible.
+    return this.keyboardCache.defaultStub;
+  }
 
   public async activateKeyboard(keyboardId: string, languageCode?: string, saveCookie?: boolean): Promise<boolean> {
+    // If the default keyboard is requested, load that.  May vary based on form-factor, which is
+    // part of what .getFallbackCodes() handles.
+    if(!keyboardId) {
+      keyboardId = this.getFallbackCodes().id;
+      languageCode = this.getFallbackCodes().langId;
+    }
+
     try {
       return await super.activateKeyboard(keyboardId, languageCode, saveCookie);
     } catch(err) {
       // Fallback behavior - we're embedded in a touch-device's webview, so we need to keep a keyboard visible.
-      const defaultStub = this.keyboardCache.defaultStub;
-      if(defaultStub.id != keyboardId || defaultStub.langId != languageCode) {
-        await this.activateKeyboard(defaultStub.id, defaultStub.langId, true).catch(() => {});
+      const fallbackCodes = this.getFallbackCodes();
+      if(fallbackCodes.id != keyboardId) {
+        await this.activateKeyboard(fallbackCodes.id, fallbackCodes.langId, true).catch(() => {});
       } // else "We already failed, so give up."
 
       throw err; // since the consuming method / API-caller may want to do its own error-handling.

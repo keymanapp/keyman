@@ -338,9 +338,31 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
   }
 
+  protected getFallbackCodes() {
+    if(this.engineConfig.hostDevice.touchable) {
+      // Fallback behavior - if on a touch device, we need to keep a keyboard visible.
+      return this.keyboardCache.defaultStub;
+    } else {
+      // Fallback behavior - if on a desktop device, the user still has a physical keyboard.
+      // Just clear out the active keyboard & OSK.
+      return {
+        id: '',
+        langId: ''
+      };
+    }
+  }
+
   public async activateKeyboard(keyboardId: string, languageCode?: string, saveCookie?: boolean): Promise<boolean> {
     saveCookie ||= false;
     const originalKeyboardTarget = this.keyboardTarget;
+
+    // Must do here b/c of fallback behavior stuff defined below.
+    // If the default keyboard is requested, load that.  May vary based on form-factor, which is
+    // part of what .getFallbackCodes() handles.
+    if(!keyboardId) {
+      keyboardId = this.getFallbackCodes().id;
+      languageCode = this.getFallbackCodes().langId;
+    }
 
     try {
       let result = await super.activateKeyboard(keyboardId, languageCode, saveCookie);
@@ -365,17 +387,10 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
       const fallback = async () => {
         // Make sure we don't infinite-recursion should the deactivate somehow fail.
-        if(this.engineConfig.hostDevice.touchable) {
-          // Fallback behavior - if on a touch device, we need to keep a keyboard visible.
-          const defaultStub = this.keyboardCache.defaultStub;
-          if(defaultStub.id != keyboardId || defaultStub.langId != languageCode) {
-            await this.activateKeyboard(defaultStub.id, defaultStub.langId, true).catch(() => {});
-          } // else "We already failed, so give up."
-        } else {
-          // Fallback behavior - if on a desktop device, the user still has a physical keyboard.
-          // Just clear out the active keyboard & OSK.
-          await this.activateKeyboard('', '', false).catch(() => {});
-        }
+        const fallbackCodes = this.getFallbackCodes();
+        if((fallbackCodes.id != keyboardId)) {
+          await this.activateKeyboard(fallbackCodes.id, fallbackCodes.langId, true).catch(() => {});
+        } // else "We already failed, so give up."
       }
 
       this.engineConfig.signalUser?.wait(); // clear the wait message box, either way.
@@ -394,9 +409,10 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       }
 
       if(this.engineConfig.signalUser) {
+        // TODO:  have it return a Promise that resolves on completion of `fallback`.
         this.engineConfig.signalUser?.alert(message, fallback);
       } else {
-        fallback();
+        await fallback();
       }
 
       throw err; // since the site-dev consumer may want to do their own error-handling.

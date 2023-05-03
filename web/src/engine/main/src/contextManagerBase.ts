@@ -191,6 +191,11 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     }
   }
 
+  protected abstract getFallbackCodes(): {
+    id: string,
+    langId: string
+  };
+
   /**
    * Change active keyboard to keyboard selected by (internal) name and language code
    *
@@ -206,7 +211,11 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
    * @returns
    */
   public async activateKeyboard(keyboardId: string, languageCode?: string, saveCookie?: boolean): Promise<boolean> {
+    // TODO:  relocate default keyboard behavior here once we can also move core error handling for
+    // unfound stubs here.
+
     const activatingKeyboard = this.prepareKeyboardForActivation(keyboardId, languageCode);
+
     const originalKeyboardTarget = this.keyboardTarget;
 
     const keyboard = await activatingKeyboard.keyboard;
@@ -278,15 +287,15 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
       languageCode == '';
     }
 
-    // Mobile device addition: force selection of the first keyboard if none set
-    if(this.engineConfig.hostDevice.touchable && !requestedStub) {
-      // Pick the oldest-registered stub as default.
-      requestedStub = this.keyboardCache.defaultStub;
-    } else if(!requestedStub) {
-      return {
-        keyboard: Promise.resolve(null),
-        metadata: null
-      };
+    if(!requestedStub) {
+      if(keyboardId) {
+        throw new Error("No matching stub has been registered.");
+      } else {
+        return {
+          keyboard: Promise.resolve(null),
+          metadata: null
+        }
+      }
     }
 
     // Check if current keyboard matches requested keyboard, but not (necessarily) stub
