@@ -469,6 +469,13 @@ describe.only('app/browser:  ContextManager', function () {
     });
 
     it('reactivate: re-requests the already-active keyboard', async () => {
+      const beforekeyboardchange = sinon.fake();
+      const keyboardchange = sinon.fake();
+      const keyboardasyncload = sinon.fake();
+      contextManager.on('beforekeyboardchange', beforekeyboardchange);
+      contextManager.on('keyboardasyncload', keyboardasyncload);
+      contextManager.on('keyboardchange', keyboardchange);
+
       // Setup
       keyboardCache.addKeyboard(KEYBOARDS.lao_2008_basic.keyboard);
       await contextManager.activateKeyboard('lao_2008_basic', 'lo');
@@ -477,7 +484,13 @@ describe.only('app/browser:  ContextManager', function () {
       await contextManager.activateKeyboard('lao_2008_basic', 'lo');
 
       assert.equal(contextManager.activeKeyboard.metadata.id, 'lao_2008_basic');
-      assert.isTrue(true);
+
+      // Even though it's to effectively the same keyboard, we reload it (in case its stub
+      // has been replaced)
+      assert.isTrue(beforekeyboardchange.calledTwice);
+      assert.isTrue(keyboardchange.calledTwice);
+      assert.isTrue(keyboardasyncload.notCalled);
+      assert.deepEqual(keyboardchange.secondCall.args[0], keyboardchange.firstCall.args[0]);
     });
   });
 });
