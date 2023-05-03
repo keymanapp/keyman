@@ -3,6 +3,7 @@ import { LegacyEventEmitter } from '/@keymanapp/keyman/build/engine/events/lib/i
 import { StubAndKeyboardCache } from '/@keymanapp/keyman/build/engine/package-cache/lib/index.mjs';
 
 import timedPromise from '../../timedPromise.mjs';
+import sinon from '/node_modules/sinon/pkg/sinon-esm.js';
 
 const assert = chai.assert;
 
@@ -109,79 +110,121 @@ describe.only('app/browser:  ContextManager', function () {
     });
 
     it('change: null -> input', () => {
+      const targetchange = sinon.fake();
+      contextManager.on('targetchange', targetchange);
+
       const input = document.getElementById('input');
       dispatchFocus('focus', input);
 
-      // todo:  set stub for changedtarget, verify
+      assert.equal(contextManager.activeTarget?.getElement(), input, ".activeTarget not updated when element gained focus");
 
-      assert.equal(contextManager.activeTarget?.getElement(), input);
+      // Check our expectations re: the `targetchange` event.
+      assert.isTrue(targetchange.calledOnce, 'targetchange event not raised');
+      const outputTarget = targetchange.firstCall.args[0]; // Should be an `Input` instance.
+      assert.equal(outputTarget.getElement(), input, '.activeTarget does not match the newly-focused element');
     });
 
     it('change: input -> null', () => {
       // Setup:  from prior test
+      const targetchange = sinon.fake();
+      contextManager.on('targetchange', targetchange);
+
       const input = document.getElementById('input');
       dispatchFocus('focus', input);
       assert.equal(contextManager.activeTarget?.getElement(), input);
 
       // actual test
       dispatchFocus('blur', input);
-      assert.equal(contextManager.activeTarget?.getElement(), undefined);
+      assert.equal(contextManager.activeTarget, null, '.activeTarget not updated when element lost focus');
+
+      // Check our expectations re: the `targetchange` event.
+      assert.isTrue(targetchange.calledTwice, 'targetchange event not raised');
+      const outputTarget = targetchange.secondCall.args[0]; // Should be null, since we lost focus.
+      assert.equal(outputTarget, null, 'targetchange event did not indicate clearing of .activeTarget');
     });
 
     it('change: input -> textarea', () => {
+      // Setup:  from prior test
+      const targetchange = sinon.fake();
+      contextManager.on('targetchange', targetchange);
+
       const input = document.getElementById('input');
       dispatchFocus('focus', input);
 
       dispatchFocus('blur', input);
       assert.equal(contextManager.activeTarget?.getElement(), null);
 
+      // And now the new stuff.
       const textarea = document.getElementById('textarea');
       dispatchFocus('focus', textarea);
 
-      // todo:  set stub for changedtarget, verify
+      assert.equal(contextManager.activeTarget?.getElement(), textarea, ".activeTarget not updated when element gained focus");
 
-      assert.equal(contextManager.activeTarget?.getElement(), textarea);
+      // Check our expectations re: the `targetchange` event.
+      assert.isTrue(targetchange.calledThrice, 'targetchange event not raised');
+      const outputTarget = targetchange.thirdCall.args[0]; // Should be an `Input` instance.
+      assert.equal(outputTarget.getElement(), textarea, '.activeTarget does not match the newly-focused element');
     });
 
     it('restoration: input (no flags set)', () => {
+      const targetchange = sinon.fake();
+      contextManager.on('targetchange', targetchange);
+
       const input = document.getElementById('input');
-      dispatchFocus('focus', input);
-      dispatchFocus('blur', input);
+      dispatchFocus('focus', input); // 1
+      dispatchFocus('blur', input);  // 2
 
       assert.equal(contextManager.activeTarget?.getElement(), null);
 
-      contextManager.restoreLastActiveTarget();
+      contextManager.restoreLastActiveTarget(); // 3
 
       assert.equal(contextManager.activeTarget?.getElement(), input);
 
-      // todo:  set stub for changedtarget, verify
+      assert.isTrue(targetchange.calledThrice);
     });
 
     it('restoration: input (`maintaining`)', () => {
+      const targetchange = sinon.fake();
+      contextManager.on('targetchange', targetchange);
+
       const input = document.getElementById('input');
-      dispatchFocus('focus', input);
+      dispatchFocus('focus', input); // 1
 
       contextManager.focusAssistant.maintainingFocus = true;
-      dispatchFocus('blur', input);
+      dispatchFocus('blur', input); // ignored
+
+      // assert.isTrue(targetchange.calledOnce, 'targetchange called on blur during maintaining state');
 
       // b/c is 'maintained'
       assert.equal(contextManager.activeTarget?.getElement(), input);
 
-      // THIS block (of 3 lines) should probably be its own, separate test.
-      contextManager.focusAssistant.maintainingFocus = false;
-      assert.equal(contextManager.activeTarget?.getElement(), null);
-      contextManager.focusAssistant.maintainingFocus = true;
-      // end THIS block.
-
       contextManager.restoreLastActiveTarget();
-      contextManager.focusAssistant.maintainingFocus = true;
-      // TODO:  assert that no event was fired - we never changed target.
-      // - yes, even if using THIS block... but that's more a longstanding bug there.
 
       assert.equal(contextManager.activeTarget?.getElement(), input);
 
-      // todo:  set stub for changedtarget, verify
-      //
+      // Since we never 'lost' focus due to the 'maintaining' state, we should only
+      // have the initial 'targetchange' raise.
+      // assert.isTrue(targetchange.calledOnce, 'targetchange called during restoration of maintained state');
+    });
+
+    it('loss: input (on clear of `maintaining`)', () => {
+      const targetchange = sinon.fake();
+      contextManager.on('targetchange', targetchange);
+
+      const input = document.getElementById('input');
+      dispatchFocus('focus', input); // 1
+
+      contextManager.focusAssistant.maintainingFocus = true;
+      dispatchFocus('blur', input); // ignored
+
+      // b/c is 'maintained'
+      assert.equal(contextManager.activeTarget?.getElement(), input);
+
+      contextManager.focusAssistant.maintainingFocus = false;
+      assert.equal(contextManager.activeTarget?.getElement(), null);
+      contextManager.focusAssistant.maintainingFocus = true;
+
+      // assert.isTrue(targetchange.calledTwice);
     });
 
     it('restoration: input (`restoring`)', () => {
