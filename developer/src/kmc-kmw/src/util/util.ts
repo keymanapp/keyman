@@ -1,4 +1,4 @@
-import { STORE, GROUP, KEYBOARD, KMXFile } from "../../../../../common/web/types/src/kmx/kmx.js";
+import { KMX } from "@keymanapp/common-types";
 
 /**
  * Verifies that value is an item in the enumeration.
@@ -13,11 +13,11 @@ export interface TSentinelRecord {
 
   Any?: {
     StoreIndex: number;
-    Store: STORE;
+    Store: KMX.STORE;
   };
   Index?: {
     StoreIndex: number;
-    Store: STORE;
+    Store: KMX.STORE;
     Index: number;
   };
   DeadKey?: {
@@ -25,127 +25,168 @@ export interface TSentinelRecord {
   };
   Use?: {
     GroupIndex: number;
-    Group: GROUP;
+    Group: KMX.GROUP;
   };
   Call?: {
     StoreIndex: number;
-    Store: STORE;
+    Store: KMX.STORE;
   };
   ContextEx?: {
     Index: number;
   };
   IfOpt?: {
     StoreIndex1: number;
-    Store1: STORE;
+    Store1: KMX.STORE;
     StoreIndex2: number;
-    Store2: STORE;
+    Store2: KMX.STORE;
     IsNot: number;
   };
   IfSystemStore?: {
     dwSystemID: number;
-    SystemStore: STORE;
+    SystemStore: KMX.STORE;
     StoreIndex: number;
-    Store: STORE;
+    Store: KMX.STORE;
     IsNot: number;
   };
   SetOpt?: {
     StoreIndex1: number;
-    Store1: STORE;
+    Store1: KMX.STORE;
     StoreIndex2: number;
-    Store2: STORE;
+    Store2: KMX.STORE;
   };
   SetSystemStore?: {
     dwSystemID: number;
-    SystemStore: STORE;
+    SystemStore: KMX.STORE;
     StoreIndex: number;
-    Store: STORE;
+    Store: KMX.STORE;
   };
   ResetOpt?: {
     StoreIndex: number;
-    Store: STORE;
+    Store: KMX.STORE;
   };
   SaveOpt?: {
     StoreIndex: number;
-    Store: STORE;
+    Store: KMX.STORE;
   };
   ChrVal?: number;
 };
 
 
-export function ExpandSentinel(fk: KEYBOARD, pwsz: string, x: number): TSentinelRecord {
+export function ExpandSentinel(fk: KMX.KEYBOARD, pwsz: string, x: number): TSentinelRecord {
   let result: TSentinelRecord = {
     IsSentinel: false
   };
-  if(pwsz.charCodeAt(x) == KMXFile.UC_SENTINEL) {
+  if(pwsz.charCodeAt(x) == KMX.KMXFile.UC_SENTINEL) {
     result.IsSentinel = true;
     x++;
     result.Code = pwsz.charCodeAt(x);
     x++;
     switch(result.Code) {
-    case KMXFile.CODE_ANY:
-    case KMXFile.CODE_NOTANY:      // I3981
-      result.Any.StoreIndex = pwsz.charCodeAt(x) - 1;
-      result.Any.Store = fk.stores[result.Any.StoreIndex];
+    case KMX.KMXFile.CODE_ANY:
+    case KMX.KMXFile.CODE_NOTANY:      // I3981
+      let anyIdx = pwsz.charCodeAt(x) - 1;
+      result.Any = {
+        StoreIndex: anyIdx,
+        Store: fk.stores[anyIdx]
+      }
       break;
-    case KMXFile.CODE_INDEX:
-      result.Index.StoreIndex = pwsz.charCodeAt(x) - 1;
-      result.Index.Store = fk.stores[result.Index.StoreIndex];
+    case KMX.KMXFile.CODE_INDEX:
+      let indexIdx = pwsz.charCodeAt(x) - 1;
       x++;
-      result.Index.Index = pwsz.charCodeAt(x);
+      result.Index = {
+        StoreIndex: indexIdx,
+        Store: fk.stores[indexIdx],
+        Index: pwsz.charCodeAt(x) - 1
+      }
       break;
-    case KMXFile.CODE_DEADKEY:
-      result.DeadKey.DeadKey = pwsz.charCodeAt(x) - 1;
+    case KMX.KMXFile.CODE_DEADKEY:
+      result.DeadKey = { DeadKey: pwsz.charCodeAt(x) - 1 };
       break;
-    case KMXFile.CODE_USE:
-      result.Use.GroupIndex = pwsz.charCodeAt(x) - 1;
-      result.Use.Group = fk.groups[result.Use.GroupIndex];
+    case KMX.KMXFile.CODE_USE:
+      let useIdx =  pwsz.charCodeAt(x) - 1;
+      result.Use = {
+        GroupIndex: useIdx,
+        Group: fk.groups[useIdx]
+      };
       break;
-    case KMXFile.CODE_CALL:
-      result.Call.StoreIndex = pwsz.charCodeAt(x) - 1;
-      result.Call.Store = fk.stores[result.Call.StoreIndex];
+    case KMX.KMXFile.CODE_CALL:
+      let callIdx = pwsz.charCodeAt(x) - 1;
+      result.Call = {
+        StoreIndex: callIdx,
+        Store: fk.stores[callIdx]
+      }
       break;
-    case KMXFile.CODE_CONTEXTEX:
-      result.ContextEx.Index = pwsz.charCodeAt(x);
+    case KMX.KMXFile.CODE_CONTEXTEX:
+      result.ContextEx = { Index: pwsz.charCodeAt(x) - 1 };
       break;
-    case KMXFile.CODE_SETOPT:    // I3429
-      result.SetOpt.StoreIndex1 = pwsz.charCodeAt(x) - 1;
-      result.SetOpt.Store1 = fk.stores[result.SetOpt.StoreIndex1];
+    case KMX.KMXFile.CODE_SETOPT:    // I3429
+      let setIdx1 = pwsz.charCodeAt(x) - 1;
       x++;
-      result.SetOpt.StoreIndex2 = pwsz.charCodeAt(x) - 1;
-      result.SetOpt.Store2 = fk.stores[result.SetOpt.StoreIndex2];
+      let setIdx2 = pwsz.charCodeAt(x) - 1;
+      result.SetOpt = {
+        StoreIndex1: setIdx1,
+        Store1: fk.stores[setIdx1],
+        StoreIndex2: setIdx2,
+        Store2: fk.stores[setIdx2]
+      };
       break;
-    case KMXFile.CODE_SETSYSTEMSTORE:  // I3437
-      result.SetSystemStore.dwSystemID = pwsz.charCodeAt(x) - 1;
-      result.SetSystemStore.SystemStore = fk.stores.find(s => s.dwSystemID == result.SetSystemStore.dwSystemID) || null;
+    case KMX.KMXFile.CODE_SETSYSTEMSTORE:  // I3437
+      let setsIdx1 = pwsz.charCodeAt(x) - 1;
       x++;
-      result.SetSystemStore.StoreIndex = pwsz.charCodeAt(x) - 1;
-      result.SetSystemStore.Store = fk.stores[result.SetSystemStore.StoreIndex];
+      let setsIdx2 = pwsz.charCodeAt(x) - 1;
+      result.SetSystemStore = {
+        dwSystemID: setsIdx1,
+        SystemStore: fk.stores.find(s => s.dwSystemID == setsIdx1) || null,
+        StoreIndex: setsIdx2,
+        Store: fk.stores[setsIdx2]
+      };
       break;
-    case KMXFile.CODE_RESETOPT:  // I3429
-      result.ResetOpt.StoreIndex = pwsz.charCodeAt(x) - 1;
-      result.ResetOpt.Store = fk.stores[result.ResetOpt.StoreIndex];
+    case KMX.KMXFile.CODE_RESETOPT:  // I3429
+      result.ResetOpt = {
+          StoreIndex: pwsz.charCodeAt(x) - 1,
+          Store: fk.stores[result.ResetOpt.StoreIndex]
+      };
       break;
-    case KMXFile.CODE_SAVEOPT:  // I3429
-      result.SaveOpt.StoreIndex = pwsz.charCodeAt(x) - 1;
-      result.SaveOpt.Store = fk.stores[result.SaveOpt.StoreIndex];
+    case KMX.KMXFile.CODE_SAVEOPT:  // I3429
+      result.SaveOpt = {
+        StoreIndex: pwsz.charCodeAt(x) - 1,
+        Store: fk.stores[result.SaveOpt.StoreIndex]
+      };
       break;
-    case KMXFile.CODE_IFOPT:  // I3429
-      result.IfOpt.StoreIndex1 = pwsz.charCodeAt(x) - 1;
-      result.IfOpt.Store1 = fk.stores[result.IfOpt.StoreIndex1];
+    case KMX.KMXFile.CODE_IFOPT:  // I3429
+      let ifIdx1 = pwsz.charCodeAt(x) - 1;
       x++;
-      result.IfOpt.IsNot = pwsz.charCodeAt(x) - 1;  // I3429
+      let ifNot = pwsz.charCodeAt(x) - 1;
       x++;
-      result.IfOpt.StoreIndex2 = pwsz.charCodeAt(x) - 1;
-      result.IfOpt.Store2 = fk.stores[result.IfOpt.StoreIndex2];
+      let ifIdx2 = pwsz.charCodeAt(x) - 1;
+      result.IfOpt = {
+        StoreIndex1: ifIdx1,
+        Store1: fk.stores[ifIdx1],
+        IsNot: ifNot,  // I3429
+        StoreIndex2: ifIdx2,
+        Store2: fk.stores[ifIdx2]
+      };
       break;
-    case KMXFile.CODE_IFSYSTEMSTORE:  // I3430
-      result.IfSystemStore.dwSystemID = pwsz.charCodeAt(x) - 1;
-      result.IfSystemStore.SystemStore = fk.stores.find(s => s.dwSystemID == result.IfSystemStore.dwSystemID) || null;
+    case KMX.KMXFile.CODE_IFSYSTEMSTORE:  // I3430
+      let ifsSystemID = pwsz.charCodeAt(x) - 1;
       x++;
-      result.IfSystemStore.IsNot = pwsz.charCodeAt(x) - 1;  // I3430
+      let ifsNot = pwsz.charCodeAt(x) - 1;
       x++;
-      result.IfSystemStore.StoreIndex = pwsz.charCodeAt(x) - 1;
-      result.IfSystemStore.Store = fk.stores[result.IfSystemStore.StoreIndex];
+      let ifsIdx2 = pwsz.charCodeAt(x) - 1;
+      result.IfSystemStore = {
+        dwSystemID: ifsSystemID,
+        SystemStore: fk.stores.find(s => s.dwSystemID == ifsSystemID) || null,
+        IsNot: ifsNot,
+        StoreIndex: ifsIdx2,
+        Store: fk.stores[ifsIdx2]
+      };
+      break;
+    case KMX.KMXFile.CODE_NUL:
+    case KMX.KMXFile.CODE_CONTEXT:
+    case KMX.KMXFile.CODE_RETURN:
+    case KMX.KMXFile.CODE_BEEP:
+    case KMX.KMXFile.CODE_EXTENDED:
+      // No additional detail needed, or outside scope
       break;
     default:
       throw new Error(`Unrecognized system store value ${result.Code}`);
@@ -167,7 +208,7 @@ export function incxstr(p: string, x: number): number {
   }
 
   let ch = p.charCodeAt(x);
-  if(ch != KMXFile.UC_SENTINEL) {
+  if(ch != KMX.KMXFile.UC_SENTINEL) {
 		if(ch >= 0xD800 && ch <= 0xDBFF) {
       x++;
       if(x == p.length) {
@@ -190,27 +231,28 @@ export function incxstr(p: string, x: number): number {
   }
 
   switch(p.charCodeAt(x)) {
-    case KMXFile.CODE_ANY:      x += 2; break;
-    case KMXFile.CODE_INDEX:    x += 3; break;
-    case KMXFile.CODE_USE:      x += 2; break;
-    case KMXFile.CODE_DEADKEY:  x += 2; break;
-    case KMXFile.CODE_EXTENDED:
+    case KMX.KMXFile.CODE_ANY:      x += 2; break;
+    case KMX.KMXFile.CODE_INDEX:    x += 3; break;
+    case KMX.KMXFile.CODE_USE:      x += 2; break;
+    case KMX.KMXFile.CODE_DEADKEY:  x += 2; break;
+    case KMX.KMXFile.CODE_EXTENDED:
       x += 3;
-      while(x <= p.length && p.charCodeAt(x) != KMXFile.UC_SENTINEL_EXTENDEDEND) {
+      while(x <= p.length && p.charCodeAt(x) != KMX.KMXFile.UC_SENTINEL_EXTENDEDEND) {
         x++;
       }
+      x++;
       break;
-    case KMXFile.CODE_CALL:     x += 2; break;
-    case KMXFile.CODE_CONTEXTEX: x += 2; break;
-    case KMXFile.CODE_NOTANY:   x += 2; break;
+    case KMX.KMXFile.CODE_CALL:     x += 2; break;
+    case KMX.KMXFile.CODE_CONTEXTEX: x += 2; break;
+    case KMX.KMXFile.CODE_NOTANY:   x += 2; break;
 
-    case KMXFile.CODE_CLEARCONTEXT: x += 2; break;
-    case KMXFile.CODE_IFOPT:    x += 4; break;
-    case KMXFile.CODE_IFSYSTEMSTORE: x += 4; break;
-    case KMXFile.CODE_SETOPT:   x += 3; break;
-    case KMXFile.CODE_SETSYSTEMSTORE: x += 3; break;
-    case KMXFile.CODE_RESETOPT: x += 2; break;
-    case KMXFile.CODE_SAVEOPT:  x += 2; break;
+    case KMX.KMXFile.CODE_CLEARCONTEXT: x += 2; break;
+    case KMX.KMXFile.CODE_IFOPT:    x += 4; break;
+    case KMX.KMXFile.CODE_IFSYSTEMSTORE: x += 4; break;
+    case KMX.KMXFile.CODE_SETOPT:   x += 3; break;
+    case KMX.KMXFile.CODE_SETSYSTEMSTORE: x += 3; break;
+    case KMX.KMXFile.CODE_RESETOPT: x += 2; break;
+    case KMX.KMXFile.CODE_SAVEOPT:  x += 2; break;
 
     default: x++;
   }
@@ -234,12 +276,12 @@ export function xstrlen(p: string): number {
 export function xstrlen_printing(p: string): number {
   let result = 0, x = 0;
   while(x < p.length) {
-    if(x + 1 < p.length && p.charCodeAt(x) == KMXFile.UC_SENTINEL) {
+    if(x + 1 < p.length && p.charCodeAt(x) == KMX.KMXFile.UC_SENTINEL) {
       switch(p.charCodeAt(x+1)) {
-        case KMXFile.CODE_DEADKEY:
-        case KMXFile.CODE_NUL:
-        case KMXFile.CODE_IFOPT:
-        case KMXFile.CODE_IFSYSTEMSTORE:
+        case KMX.KMXFile.CODE_DEADKEY:
+        case KMX.KMXFile.CODE_NUL:
+        case KMX.KMXFile.CODE_IFOPT:
+        case KMX.KMXFile.CODE_IFSYSTEMSTORE:
           result--;
           break;
       }

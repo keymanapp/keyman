@@ -1,4 +1,4 @@
-import { FCompilerWarningsAsErrors } from "./compiler-globals.js";
+import { callbacks, FCompilerWarningsAsErrors } from "./compiler-globals.js";
 
 export let FError = false;
 
@@ -10,7 +10,8 @@ export function ReportError(line: number, msgcode: number, text: string) {  // I
   if (msgcode & flag) {
     FError = true;
   }
-  FCallback(line, msgcode, text);  // I3310
+  // TODO: these Codes Are All Wrong But We'll  Fix It Soon
+  callbacks.reportMessage({code: msgcode, message: text, line});  // I3310
 }
 
 export const

@@ -16,9 +16,9 @@
   },
   "include": [
     "src/**/*.ts"
-  ],
+, "src/compiler/__keymanweb-compiler.ts.tmp"  ],
   "references": [
-    { "path": "../../../common/web/keyman-version/tsconfig.esm.json" },
+    // { "path": "../../../common/web/keyman-version/tsconfig.esm.json" },
     { "path": "../../../common/web/types/" },
     { "path": "../../../core/include/ldml/"},
   ]
