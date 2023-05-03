@@ -222,8 +222,6 @@ DWORD HKLToKeyboardID(HKL hkl);
 WORD HKLToLanguageID(HKL hkl);
 WORD HKLToLayoutNumber(HKL hkl);
 WORD HKLToLayoutID(HKL hkl);
-DWORD EthnologueCodeToKeymanID(DWORD EthCode);
-DWORD EthnologueStringCodeToDWord(PWSTR EthCode);
 
 PWSTR  GetSystemStore(LPKEYBOARD kb, DWORD SystemID);
 
