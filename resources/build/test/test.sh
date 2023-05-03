@@ -10,6 +10,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
+cd "$THIS_SCRIPT_PATH"
+
 #----------------------------------------------------------------------
 # First up, test the simple case with a default :project target
 
@@ -169,8 +171,9 @@ $THIS_SCRIPT_PATH/build-utils-traps.test.sh error-in-function
 $THIS_SCRIPT_PATH/build-utils-traps.test.sh incomplete
 
 echo -e "${COLOR_BLUE}## Running dependency tests${COLOR_RESET}"
-$THIS_SCRIPT_PATH/builder-deps.test.sh
-$THIS_SCRIPT_PATH/dependencies/test.sh
+"$THIS_SCRIPT_PATH/builder-deps.test.sh"
+"$THIS_SCRIPT_PATH/dependencies/test.sh"
+"$THIS_SCRIPT_PATH/trees/test.sh"
 
 echo -e "${COLOR_BLUE}## End external tests${COLOR_RESET}"
 echo

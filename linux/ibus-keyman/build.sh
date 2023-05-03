@@ -33,6 +33,8 @@ else
 fi
 MESON_PATH="../build/$(uname -m)/$MESON_TARGET"
 
+cd "$THIS_SCRIPT_PATH"
+
 builder_describe_outputs \
   configure "${MESON_PATH}/build.ninja" \
   build "${MESON_PATH}/src/ibus-engine-keyman" \
@@ -51,25 +53,25 @@ if builder_start_action configure; then
 fi
 
 if builder_start_action build; then
-  cd "$MESON_PATH"
+  cd "$THIS_SCRIPT_PATH/$MESON_PATH"
   ninja
   builder_finish_action success build
 fi
 
 if builder_start_action test; then
-  cd "$MESON_PATH"
+  cd "$THIS_SCRIPT_PATH/$MESON_PATH"
   meson test --print-errorlogs $builder_verbose
   builder_finish_action success test
 fi
 
 if builder_start_action install; then
-  cd "$MESON_PATH"
+  cd "$THIS_SCRIPT_PATH/$MESON_PATH"
   ninja install
   builder_finish_action success install
 fi
 
 if builder_start_action uninstall; then
-  cd "$MESON_PATH"
+  cd "$THIS_SCRIPT_PATH/$MESON_PATH"
   ninja uninstall
   builder_finish_action success uninstall
 fi
