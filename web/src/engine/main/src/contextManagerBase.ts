@@ -313,7 +313,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
       // `beforeKeyboardChange` - first call
       this.emit('beforekeyboardchange', requestedStub);
 
-      const defermentPromise = this.engineConfig.deferForInitialization.corePromise.then(() => {
+      const defermentPromise = this.engineConfig.deferForInitialization.then(() => {
         // Provide a Promise for completion of the async load process.
         const completionPromise = new ManagedPromise<Error>();
         this.emit('keyboardasyncload', requestedStub, completionPromise.corePromise);
