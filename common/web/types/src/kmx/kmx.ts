@@ -8,15 +8,15 @@ import * as r from 'restructure';
 // kmx-builder will transform these to the corresponding COMP_xxxx
 
 export class KEYBOARD {
-  fileVersion?: number;  // dwFileVersion
-  keyboardVersion?: number;  // version
+  fileVersion?: number;  // dwFileVersion (TSS_FILEVERSION)
+  keyboardVersion?: string;  // version (TSS_KEYBOARDVERSION)
 
-  startGroup?: {
+  startGroup: {
     ansi: number;
     unicode: number;
-    newContext: number;
-    postKeystroke: number;
-  };
+    newContext: number;   // TSS_BEGIN_NEWCONTEXT
+    postKeystroke: number;  // TSS_BEGIN_POSTKEYSTROKE
+  } = {ansi:0xFFFFFFFF, unicode:0xFFFFFFFF, newContext:0xFFFFFFFF, postKeystroke:0xFFFFFFFF};
 
   flags?: number;
   hotkey?: number;
@@ -34,7 +34,7 @@ export class STORE {
 
 export class GROUP {
   dpName: string;
-  keys: KEY[];
+  keys: KEY[] = [];
   dpMatch: string;
   dpNoMatch: string;
   fUsingKeys: boolean;
@@ -332,6 +332,21 @@ export class KMXFile {
   public static readonly ISVIRTUALKEY   = 0x4000;    // It is a Virtual Key Sequence
   public static readonly VIRTUALCHARKEY = 0x8000;    // Keyman 6.0: Virtual Key Cap Sequence NOT YET
 
+  public static readonly MASK_MODIFIER_CHIRAL = KMXFile.LCTRLFLAG | KMXFile.RCTRLFLAG | KMXFile.LALTFLAG | KMXFile.RALTFLAG;
+  public static readonly MASK_MODIFIER_SHIFT = KMXFile.K_SHIFTFLAG;
+  public static readonly MASK_MODIFIER_NONCHIRAL = KMXFile.K_CTRLFLAG | KMXFile.K_ALTFLAG;
+
+  public static readonly MASK_STATEKEY = KMXFile.CAPITALFLAG | KMXFile.NOTCAPITALFLAG |
+                                         KMXFile.NUMLOCKFLAG | KMXFile.NOTNUMLOCKFLAG |
+                                         KMXFile.SCROLLFLAG | KMXFile.NOTSCROLLFLAG;
+  public static readonly MASK_KEYTYPE  = KMXFile.ISVIRTUALKEY | KMXFile.VIRTUALCHARKEY;
+
+  public static readonly MASK_MODIFIER = KMXFile.MASK_MODIFIER_CHIRAL | KMXFile.MASK_MODIFIER_SHIFT | KMXFile.MASK_MODIFIER_NONCHIRAL;
+
+  public static readonly MASK_KEYS = KMXFile.MASK_MODIFIER | KMXFile.MASK_STATEKEY;
+  public static readonly KMX_MASK_VALID    = KMXFile.MASK_KEYS | KMXFile.MASK_KEYTYPE;
+
+
   public static readonly K_MODIFIERFLAG    = 0x007F;
   public static readonly K_NOTMODIFIERFLAG = 0xFF00;   // I4548
 
@@ -347,10 +362,7 @@ export class KMXFile {
 
   /* In-memory representation of the keyboard */
 
-  public keyboard: KEYBOARD = {
-    groups: [],
-    stores: []
-  };
+  public keyboard: KEYBOARD = new KEYBOARD();
 
   constructor() {
 

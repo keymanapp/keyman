@@ -10,3 +10,5 @@ export default interface CompilerCallbacks {
   loadKvksJsonSchema(): Buffer;
   reportMessage(event: CompilerEvent): void;
 };
+
+// TODO: eliminate this

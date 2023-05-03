@@ -1,2 +1,2 @@
 
-export { KeymanWebCompiler } from './compiler/keymanweb-compiler.js';
+export { WriteCompiledKeyboard } from './compiler/write-compiled-keyboard.js';

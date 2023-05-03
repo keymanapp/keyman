@@ -11,3 +11,5 @@ export default interface CompilerOptions {
    */
   addCompilerVersion: boolean;
 };
+
+// TODO: we have a shared CompilerOptions intf, eliminate this

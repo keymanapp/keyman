@@ -13,6 +13,7 @@
   },
   "scripts": {
     "build": "tsc -b",
+    "tsc": "tsc",
     "test": "cd test && tsc -b && cd .. && c8 mocha",
     "prepublishOnly": "npm run build"
   },
@@ -22,7 +23,7 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "dependencies": {
-    "@keymanapp/keyman-version": "*",
+    "@keymanapp/common-types": "*",
     "ajv": "^8.11.0",
     "restructure": "git+https://github.com/keymanapp/dependency-restructure.git#49d129cf0916d082a7278bb09296fb89cecfcc50",
     "semver": "^7.3.7",
@@ -39,7 +40,8 @@
     "chalk": "^2.4.2",
     "mocha": "^8.4.0",
     "ts-node": "^9.1.1",
-    "typescript": "4.6.3"
+    "typescript": "^4.9.5",
+    "@keymanapp/kmc-kmn": "*"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",
