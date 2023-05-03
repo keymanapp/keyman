@@ -254,7 +254,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 	if(mp->message == WM_UNICHAR)
 	{
-		return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+		// Do Nothing  TODO: Remove WM_UNICHAR
 	}
 
 	/*
