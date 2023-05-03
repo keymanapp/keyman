@@ -191,6 +191,11 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     this.focusAssistant.maintainingFocus = false;
     this.focusAssistant.restoringFocus = false;
 
+    const priorTarget = this.activeTarget || this.lastActiveTarget;
+    if(priorTarget) {
+      this._BlurKeyboardSettings(priorTarget.getElement());
+    }
+
     this.setActiveTarget(null);
   }
 
@@ -207,7 +212,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     if(this.focusAssistant.restoringFocus) {
       this._BlurKeyboardSettings(target.getElement());
-    } else {
+    } else if(target) {
       this._FocusKeyboardSettings(target.getElement(), !hadRecentElement);
     }
 
@@ -217,11 +222,11 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     };
 
     // Set element directionality (but only if element is empty)
-    let Ltarg = target.getElement();
+    let Ltarg = target?.getElement();
     if(target instanceof DesignIFrame) {
       Ltarg = target.docRoot;
     }
-    if(Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLElement) {
+    if(Ltarg && Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLElement) {
       _SetTargDir(Ltarg, this.activeKeyboard?.keyboard);
     }
 
@@ -562,7 +567,12 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     // (The "context target" state fields)
     const previousTarget = this.activeTarget;
     this.currentTarget = null; // I3363 (Build 301)
-    this.mostRecentTarget = target;
+
+    // After a .forgetActiveTarget call occurs before _ControlBlur is called on the corresponding element,
+    // we should avoid accidentally 'remembering' it here.
+    if(previousTarget || this.lastActiveTarget) {
+      this.mostRecentTarget = target;
+    }
 
     // Step 4: any and all related events
     /* If the KeymanWeb UI is active as a user changes controls, all UI-based effects

@@ -184,6 +184,38 @@ describe.only('app/browser:  ContextManager', function () {
       assert.equal(contextManager.activeTarget?.getElement(), input);
     });
 
+    it('forget: input', () => {
+      const targetchange = sinon.fake();
+      contextManager.on('targetchange', targetchange);
+
+      const input = document.getElementById('input');
+      dispatchFocus('focus', input);
+      assert.isTrue(targetchange.calledOnce);
+
+      contextManager.focusAssistant.maintainingFocus = true;
+      contextManager.focusAssistant.restoringFocus = true;
+      contextManager.forgetActiveTarget();
+      // The 'forget' operation is **aggressive**.  Perma-forget.
+      assert.isNotOk(contextManager.lastActiveTarget);
+
+      assert.isTrue(targetchange.calledTwice);
+      assert.equal(contextManager.activeTarget?.getElement(), null);
+      // Again, the 'forget' operation is **aggressive**.  Clears all focus-maintenance states.
+      // After all, there's no longer any prior target to maintain or restore - it's forgotten.
+      assert.equal(contextManager.focusAssistant.maintainingFocus, false);
+      assert.equal(contextManager.focusAssistant.restoringFocus, false);
+
+      dispatchFocus('blur', input); // Should be 100% ignored
+      assert.isTrue(targetchange.calledTwice); // there should be no effect.
+      assert.equal(contextManager.activeTarget?.getElement(), null);
+      // If we aren't careful, we can accidentally 'unforget' the element here!
+      assert.isNotOk(contextManager.lastActiveTarget, "post-forget target blur restored .lastActiveTarget");
+
+      contextManager.restoreLastActiveTarget();
+      assert.isTrue(targetchange.calledTwice); // there should be no effect.
+      assert.equal(contextManager.activeTarget?.getElement(), null);
+    });
+
     it('restoration: input (`maintaining`)', () => {
       const targetchange = sinon.fake();
       contextManager.on('targetchange', targetchange);
