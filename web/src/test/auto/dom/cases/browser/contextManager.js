@@ -104,11 +104,11 @@ describe.only('app/browser:  ContextManager', function () {
   });
 
   describe('focus management', () => {
-    it('initializes with no target active', () => {
+    it('initial state: null', () => {
       assert.isNotOk(contextManager.activeTarget);
     });
 
-    it('no active -> input.focus()', () => {
+    it('change: null -> input', () => {
       const input = document.getElementById('input');
       dispatchFocus('focus', input);
 
@@ -117,7 +117,18 @@ describe.only('app/browser:  ContextManager', function () {
       assert.equal(contextManager.activeTarget?.getElement(), input);
     });
 
-    it('input.focus() -> input.blur() -> textarea.focus()', () => {
+    it('change: input -> null', () => {
+      // Setup:  from prior test
+      const input = document.getElementById('input');
+      dispatchFocus('focus', input);
+      assert.equal(contextManager.activeTarget?.getElement(), input);
+
+      // actual test
+      dispatchFocus('blur', input);
+      assert.equal(contextManager.activeTarget?.getElement(), undefined);
+    });
+
+    it('change: input -> textarea', () => {
       const input = document.getElementById('input');
       dispatchFocus('focus', input);
 
@@ -132,7 +143,7 @@ describe.only('app/browser:  ContextManager', function () {
       assert.equal(contextManager.activeTarget?.getElement(), textarea);
     });
 
-    it('input.focus() -> input.blur() [no focus maintenance] -> restore => input', () => {
+    it('restoration: input (no flags set)', () => {
       const input = document.getElementById('input');
       dispatchFocus('focus', input);
       dispatchFocus('blur', input);
@@ -146,7 +157,7 @@ describe.only('app/browser:  ContextManager', function () {
       // todo:  set stub for changedtarget, verify
     });
 
-    it('input.focus() -> input.blur() [w/ focus maintenance] -> restore => input', () => {
+    it('restoration: input (`maintaining`)', () => {
       const input = document.getElementById('input');
       dispatchFocus('focus', input);
 
@@ -173,7 +184,7 @@ describe.only('app/browser:  ContextManager', function () {
       //
     });
 
-    it('input.blur() [w/ focus maintenance] -> restore [w/ restoring] => input', () => {
+    it('restoration: input (`restoring`)', () => {
       const input = document.getElementById('input');
       dispatchFocus('focus', input);
 
