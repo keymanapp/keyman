@@ -61,6 +61,13 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     this.page = new PageContextAttachment(window.document, {
       hostDevice: this.engineConfig.hostDevice
     });
+
+    this.focusAssistant.on('maintainingend', () => {
+      // Basically, if the maintaining state were the reason we still had an `activeTarget`...
+      if(!this.activeTarget && this.mostRecentTarget) {
+        this.emit('targetchange', this.activeTarget);
+      }
+    });
   }
 
   get apiEvents(): LegacyEventEmitter<LegacyAPIEvents> {
@@ -163,6 +170,10 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   }
 
   get activeTarget(): OutputTarget<any> {
+    /*
+     * Assumption:  the maintainingFocus flag may only be set when there is a current target.
+     * This is not enforced proactively at present, but the assumption should hold.  (2023-05-03)
+     */
     const maintainingFocus = this.focusAssistant.maintainingFocus;
     return this.currentTarget || (maintainingFocus ? this.mostRecentTarget : null);
   }
@@ -185,6 +196,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
   private setActiveTarget(target: OutputTarget<any>) {
     const previousTarget = this.mostRecentTarget;
+    const originalTarget = this.activeTarget; // may differ, depending on focus state.
 
     // We condition on 'priorElement' below as a check to allow KMW to set a default active keyboard.
     let hadRecentElement = !!previousTarget;
@@ -213,7 +225,9 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       _SetTargDir(Ltarg, this.activeKeyboard?.keyboard);
     }
 
-    this.emit('targetchange', target);
+    if(target != originalTarget) {
+      this.emit('targetchange', target);
+    }
   }
 
   // on set activeTarget, make sure to also change it for this.predictionContext!

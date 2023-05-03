@@ -171,16 +171,17 @@ describe.only('app/browser:  ContextManager', function () {
       contextManager.on('targetchange', targetchange);
 
       const input = document.getElementById('input');
-      dispatchFocus('focus', input); // 1
-      dispatchFocus('blur', input);  // 2
+      dispatchFocus('focus', input);
+      assert.isTrue(targetchange.calledOnce);
+      dispatchFocus('blur', input);
+      assert.isTrue(targetchange.calledTwice);
 
       assert.equal(contextManager.activeTarget?.getElement(), null);
 
-      contextManager.restoreLastActiveTarget(); // 3
+      contextManager.restoreLastActiveTarget();
+      assert.isTrue(targetchange.calledThrice);
 
       assert.equal(contextManager.activeTarget?.getElement(), input);
-
-      assert.isTrue(targetchange.calledThrice);
     });
 
     it('restoration: input (`maintaining`)', () => {
@@ -188,14 +189,15 @@ describe.only('app/browser:  ContextManager', function () {
       contextManager.on('targetchange', targetchange);
 
       const input = document.getElementById('input');
-      dispatchFocus('focus', input); // 1
+      dispatchFocus('focus', input);
+      assert.isTrue(targetchange.calledOnce);
 
       contextManager.focusAssistant.maintainingFocus = true;
       dispatchFocus('blur', input); // ignored
-
-      // assert.isTrue(targetchange.calledOnce, 'targetchange called on blur during maintaining state');
+      assert.isTrue(targetchange.calledOnce);
 
       // b/c is 'maintained'
+      assert.isTrue(targetchange.calledOnce, 'targetchange called on blur during maintaining state');
       assert.equal(contextManager.activeTarget?.getElement(), input);
 
       contextManager.restoreLastActiveTarget();
@@ -204,7 +206,7 @@ describe.only('app/browser:  ContextManager', function () {
 
       // Since we never 'lost' focus due to the 'maintaining' state, we should only
       // have the initial 'targetchange' raise.
-      // assert.isTrue(targetchange.calledOnce, 'targetchange called during restoration of maintained state');
+      assert.isTrue(targetchange.calledOnce, 'targetchange called during restoration of maintained state');
     });
 
     it('loss: input (on clear of `maintaining`)', () => {
@@ -212,41 +214,44 @@ describe.only('app/browser:  ContextManager', function () {
       contextManager.on('targetchange', targetchange);
 
       const input = document.getElementById('input');
-      dispatchFocus('focus', input); // 1
+      dispatchFocus('focus', input);
+      assert.isTrue(targetchange.calledOnce);
 
       contextManager.focusAssistant.maintainingFocus = true;
       dispatchFocus('blur', input); // ignored
 
       // b/c is 'maintained'
+      assert.isTrue(targetchange.calledOnce);
       assert.equal(contextManager.activeTarget?.getElement(), input);
 
       contextManager.focusAssistant.maintainingFocus = false;
-      assert.equal(contextManager.activeTarget?.getElement(), null);
-      contextManager.focusAssistant.maintainingFocus = true;
+      assert.isTrue(targetchange.calledTwice);
 
-      // assert.isTrue(targetchange.calledTwice);
+      assert.equal(contextManager.activeTarget?.getElement(), null);
     });
 
     it('restoration: input (`restoring`)', () => {
+      const targetchange = sinon.fake();
+      contextManager.on('targetchange', targetchange);
+
       const input = document.getElementById('input');
-      dispatchFocus('focus', input);
+      dispatchFocus('focus', input); // 1
+      assert.isTrue(targetchange.calledOnce);
 
       contextManager.focusAssistant.maintainingFocus = true;
       dispatchFocus('blur', input);
+      assert.isTrue(targetchange.calledOnce); // 'maintaining' state
       assert.equal(contextManager.activeTarget?.getElement(), input);
 
       contextManager.focusAssistant.maintainingFocus = false;
+      assert.isTrue(targetchange.calledTwice);
       assert.equal(contextManager.activeTarget?.getElement(), null);
 
       contextManager.focusAssistant.restoringFocus = true;
-      // Original implementation assumes `.focus()` will work normally.  This often
-      // doesn't work nicely during unit tests, though.
       contextManager.restoreLastActiveTarget();
+      assert.isTrue(targetchange.calledThrice);
 
       assert.equal(contextManager.activeTarget?.getElement(), input);
-
-      // todo:  set stub for changedtarget, verify
-      // Verify that no 'changedtarget' event happens for the `restore` call.
     });
   });
 

@@ -1,3 +1,5 @@
+import EventEmitter from "eventemitter3";
+
 /**
  * The return object documented for
  * https://help.keyman.com/developer/engine/web/16.0/reference/core/getUIState.
@@ -22,13 +24,23 @@ export class FocusStateAPIObject {
   }
 }
 
+interface EventMap {
+  /**
+   * Called immediately after the `maintainingFocus` flag is cleared.
+   * @returns
+   */
+  'maintainingend': () => void;
+}
+
 // Formerly handled under "UIManager".
 /**
  * This class provides fields and methods useful for assisting context management.  Control focus (and
  * thus, activation of the corresponding OutputTarget) should not be lost to non-context components of
  * KMW, such as the OSK or a keyboard selector.
  */
-export class FocusAssistant {
+export class FocusAssistant extends EventEmitter<EventMap> {
+  private _maintainingFocus: boolean = false;  // ActivatingKeymanWebUI - Does the OSK have active focus / an active interaction?
+
   /*
    * Long-term idea here: about all of the relevant OSK events that would interact with this have "enter" and
    * "leave" variants - we could take a stack of `Promise`s.  On a `Promise` fulfillment, remove it from the
@@ -43,9 +55,24 @@ export class FocusAssistant {
    *
    * While the flag is active, the context-management system should not deactivate an OutputTarget upon
    * its element's loss of focus within the page unless setting a different OutputTarget as active.
+   *
+   * TODO: (potential) Future enhancement - this should not be possible to set if there is no currently-active
+   * context target to maintain.
    */
   // Formerly `isActivating`.
-  maintainingFocus: boolean = false;    // ActivatingKeymanWebUI - Does the OSK have active focus / an active interaction?
+  public get maintainingFocus(): boolean {
+    return this._maintainingFocus;
+  }
+
+  public set maintainingFocus(value: boolean) {
+    const priorValue = this._maintainingFocus;
+    this._maintainingFocus = value;
+
+    // Needed to properly update .activeTarget upon loss of maintaining-focus state.
+    if(priorValue && !value) {
+      this.emit('maintainingend');
+    }
+  }
 
   /*
    * Long-term idea here:  as (aside from OSK title/resize bar interactions) it's always used to actively
@@ -101,9 +128,6 @@ export class FocusAssistant {
    * Manages the time-delay aspect of `focusing` state.
    */
   focusTimer: number;
-
-  constructor() {
-  }
 
   /**
    * Function     getUIState
