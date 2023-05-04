@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.100 alpha 2023-05-04
+
+*  (#8690)
+*  (#8691)
+
 ## 17.0.99 alpha 2023-05-03
 
 * chore(linux): Fix build script (#8705)
