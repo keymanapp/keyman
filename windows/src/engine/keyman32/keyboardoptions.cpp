@@ -19,7 +19,7 @@
 */
 #include "pch.h"
 
-BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* const state);
+BOOL IntLoadKeyboardOptionsRegistrytoCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* const state);
 void IntSaveKeyboardOptionCoretoRegistry(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value);
 
 static km_kbp_cp* CloneKMKBPCP(const km_kbp_cp* cp) {
@@ -57,10 +57,10 @@ void IntSaveKeyboardOptionCoretoRegistry(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LP
 void LoadKeyboardOptionsRegistrytoCore(LPINTKEYBOARDINFO kp, km_kbp_state* const state)
 {
   SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadKeyboardOptionsRegistrytoCore: Enter");
-  IntLoadKeyboardOptionsCore(REGSZ_KeyboardOptions, kp, state);
+  IntLoadKeyboardOptionsRegistrytoCore(REGSZ_KeyboardOptions, kp, state);
 }
 
-BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* const state)
+BOOL IntLoadKeyboardOptionsRegistrytoCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* const state)
 {
   assert(key != NULL);
   assert(kp != NULL);
