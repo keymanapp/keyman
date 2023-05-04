@@ -27,6 +27,7 @@ export interface LKKeyboard {
   displays?: LKDisplays;
   layers?: LKLayers[];
   vkeys?: LKVkeys;
+  variables?: LKVariables;
   transforms?: LKTransforms[];
   reorders?: LKReorders;
 };
@@ -136,6 +137,24 @@ export interface LKVkey {
   from?: string;
   to?: string;
 };
+
+export interface LKVariables {
+  string?: LKString[];
+  set?: LKSet[];
+  unicodeSet?: LKUnicodeSet[];
+};
+
+/**
+ * Shared interface for all three variable types
+ */
+interface Variable {
+  id?: string;
+  value?: string;
+};
+
+interface LKString extends Variable {};
+interface LKSet extends Variable {};
+interface LKUnicodeSet extends Variable {};
 
 export interface LKTransforms {
   type?: "simple" | "final";

@@ -151,6 +151,35 @@ export class Strs extends Section {
   }
 };
 
+/**
+ * 'vars'? maybe?
+ * TODO-LDML: This is at least an in-memory section for the variable table.
+ * See LKVariables
+ */
+export class Vars extends Section {
+  // strings: StringVarItem[] = []; // ≠ StrsItem
+  // sets: SetVarItem[] = [];
+  unicodeSets: UnicodeSetItem[] = [];
+};
+
+/**
+ * Common base for variable sections
+ * See Variable
+ */
+class VarsItem extends Section {
+  id: StrsItem;
+  value: StrsItem;
+};
+
+export class UnicodeSetItem extends VarsItem {
+  /**
+   * Pairs of [start,end] in a single array.
+   */
+  ranges: number[];
+
+
+};
+
 // 'tran'
 
 export enum TranItemFlags {
