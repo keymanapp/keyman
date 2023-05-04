@@ -607,7 +607,7 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
 
   LoadDLLs(_td->lpActiveKeyboard);
   ActivateDLLs(_td->lpActiveKeyboard);
-  LoadKeyboardOptionsREGCore(_td->lpActiveKeyboard, _td->lpActiveKeyboard->lpCoreKeyboardState);
+  LoadKeyboardOptionsRegistrytoCore(_td->lpActiveKeyboard, _td->lpActiveKeyboard->lpCoreKeyboardState);
   RefreshPreservedKeys(TRUE);
   return TRUE;
 fail:

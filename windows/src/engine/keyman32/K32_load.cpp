@@ -130,7 +130,7 @@ BOOL LoadlpKeyboard(int i)
 
   LoadDLLs(&_td->lpKeyboards[i]);
 
-  LoadKeyboardOptionsREGCore(&_td->lpKeyboards[i], _td->lpKeyboards[i].lpCoreKeyboardState);
+  LoadKeyboardOptionsRegistrytoCore(&_td->lpKeyboards[i], _td->lpKeyboards[i].lpCoreKeyboardState);
 
   return TRUE;
 }

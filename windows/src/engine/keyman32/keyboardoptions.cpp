@@ -20,7 +20,7 @@
 #include "pch.h"
 
 BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* const state);
-void IntSaveKeyboardOptionREGCore(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value);
+void IntSaveKeyboardOptionCoretoRegistry(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value);
 
 static km_kbp_cp* CloneKMKBPCP(const km_kbp_cp* cp) {
   LPCWSTR buf      = reinterpret_cast<LPCWSTR>(cp);
@@ -35,12 +35,12 @@ static km_kbp_cp* CloneKMKBPCPFromWSTR(LPWSTR buf) {
   return clone;
 }
 
-void SaveKeyboardOptionREGCore(LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value)
+void SaveKeyboardOptionCoretoRegistry(LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value)
 {
-  IntSaveKeyboardOptionREGCore(REGSZ_KeyboardOptions, kp, key, value);
+  IntSaveKeyboardOptionCoretoRegistry(REGSZ_KeyboardOptions, kp, key, value);
 }
 
-void IntSaveKeyboardOptionREGCore(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value)
+void IntSaveKeyboardOptionCoretoRegistry(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value)
 {
   assert(REGKey != NULL);
   assert(kp != NULL);
@@ -54,9 +54,9 @@ void IntSaveKeyboardOptionREGCore(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR k
   }
 }
 
-void LoadKeyboardOptionsREGCore(LPINTKEYBOARDINFO kp, km_kbp_state* const state)
+void LoadKeyboardOptionsRegistrytoCore(LPINTKEYBOARDINFO kp, km_kbp_state* const state)
 {
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadKeyboardOptionsREGCore: Enter");
+  SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadKeyboardOptionsRegistrytoCore: Enter");
   IntLoadKeyboardOptionsCore(REGSZ_KeyboardOptions, kp, state);
 }
 
@@ -70,7 +70,7 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
   km_kbp_status err_status = km_kbp_keyboard_get_attrs(kp->lpCoreKeyboard, &keyboardAttrs);
   if (err_status != KM_KBP_STATUS_OK) {
     SendDebugMessageFormat(
-        0, sdmKeyboard, 0, "LoadKeyboardOptionsREGCore: km_kbp_keyboard_get_attrs failed with error status [%d]", err_status);
+        0, sdmKeyboard, 0, "LoadKeyboardOptionsRegistrytoCore: km_kbp_keyboard_get_attrs failed with error status [%d]", err_status);
     return FALSE;
   }
 
@@ -102,7 +102,7 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
   err_status = km_kbp_state_options_update(state, keyboardOpts);
   if (err_status != KM_KBP_STATUS_OK) {
     SendDebugMessageFormat(
-        0, sdmKeyboard, 0, "LoadKeyboardOptionsREGCore: km_kbp_state_options_update failed with error status [%d]", err_status);
+        0, sdmKeyboard, 0, "LoadKeyboardOptionsRegistrytoCore: km_kbp_state_options_update failed with error status [%d]", err_status);
   }
   for (int i = 0; i < n; i++) {
     delete[] keyboardOpts[i].value;
