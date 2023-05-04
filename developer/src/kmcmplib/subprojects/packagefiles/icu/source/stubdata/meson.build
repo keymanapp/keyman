@@ -2,14 +2,19 @@ sources = files(
   'stubdata.cpp',
 )
 
-stubdata_lib = library(
+stubdata_lib = static_library(
   icudata_name,
   sources,
-  c_args: '-DSTUBDATA_BUILD',
-  cpp_args: '-DSTUBDATA_BUILD',
+  c_args: ['-DSTUBDATA_BUILD'] + usage_args,
+  cpp_args:[ '-DSTUBDATA_BUILD' ]+ usage_args,
   include_directories: incdir,
-  version: U_ICU_VERSION,
+  # version: U_ICU_VERSION,
 )
+
+stubdata_dep = declare_dependency(
+  link_with: stubdata_lib,
+)
+
 
 # if meson.can_run_host_binaries()
   stubdata_native_lib = stubdata_lib
