@@ -160,9 +160,11 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
       return nil;
     } else {
       // update context from core
-     [self.tmpCtxBuf setString:self.keymanCore.context];
+      [self.tmpCtxBuf setString:self.keymanCore.context];
+      return coreActions;
+      // TODO: delete this commented out code and use CoreAction array
       // convert the CoreAction objects into Dictionary objects expected by the Input Method
-      return [self.coreHelper actionObjectArrayToLegacyActionMapArray:coreActions];
+      // return [self.coreHelper actionObjectArrayToLegacyActionMapArray:coreActions];
     }
   } else {
     NSArray *actions = nil;

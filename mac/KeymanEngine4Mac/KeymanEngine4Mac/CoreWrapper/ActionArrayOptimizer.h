@@ -14,7 +14,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ActionArrayOptimizer : NSObject
--(NSArray*)actionArrayToOptimizedActionArray:(NSArray*)actionArray;
+-(NSArray*)optimizeForLegacyArray:(NSArray*)actionArray;
+-(NSArray*)optimize:(NSArray*)actionArray;
 @end
 
 NS_ASSUME_NONNULL_END

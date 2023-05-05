@@ -91,7 +91,7 @@ ActionArrayOptimizer *optimizer;
   CoreAction *endAction = [[CoreAction alloc] initWithType:EndAction actionContent:@"" backspaceCount:0];
   NSArray *coreArray = @[characterAAction, characterBAction, endAction];
   
-  NSArray *optimizedArray = [optimizer actionArrayToOptimizedActionArray:coreArray];
+  NSArray *optimizedArray = [optimizer optimizeForLegacyArray:coreArray];
   XCTAssert(optimizedArray.count == 1, @"Expected 1 action");
   CoreAction *action = optimizedArray[0];
   XCTAssert([action.content isEqualToString:@"AB"], @"Expected combined string.");
@@ -103,7 +103,7 @@ ActionArrayOptimizer *optimizer;
   CoreAction *endAction = [[CoreAction alloc] initWithType:EndAction actionContent:@"" backspaceCount:0];
   NSArray *coreArray = @[backspaceAction, anotherBackspaceAction, endAction];
   
-  NSArray *optimizedArray = [optimizer actionArrayToOptimizedActionArray:coreArray];
+  NSArray *optimizedArray = [optimizer optimizeForLegacyArray:coreArray];
   XCTAssert(optimizedArray.count == 1, @"Expected 1 action");
   CoreAction *action = optimizedArray[0];
   XCTAssert(action.backspaceCount==2, @"Expected a backspace count of 2.");
@@ -115,7 +115,7 @@ ActionArrayOptimizer *optimizer;
   CoreAction *endAction = [[CoreAction alloc] initWithType:EndAction actionContent:@"" backspaceCount:0];
   NSArray *coreArray = @[backspaceAction, characterAAction, endAction];
   
-  NSArray *optimizedArray = [optimizer actionArrayToOptimizedActionArray:coreArray];
+  NSArray *optimizedArray = [optimizer optimizeForLegacyArray:coreArray];
   XCTAssert(optimizedArray.count == 2, @"Expected two actions.");
   CoreAction *action = optimizedArray[1];
   XCTAssert([action.content isEqualToString:@"A"], @"Expected CharacterAction.");
@@ -127,7 +127,7 @@ ActionArrayOptimizer *optimizer;
   CoreAction *endAction = [[CoreAction alloc] initWithType:EndAction actionContent:@"" backspaceCount:0];
   NSArray *coreArray = @[characterAAction, backspaceAction, endAction];
   
-  NSArray *optimizedArray = [optimizer actionArrayToOptimizedActionArray:coreArray];
+  NSArray *optimizedArray = [optimizer optimizeForLegacyArray:coreArray];
   XCTAssert(optimizedArray.count == 0, @"Expected empty array");
 }
 

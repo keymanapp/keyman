@@ -138,9 +138,11 @@
   unsigned short macKeyCode = event.keyCode;
   NSEventModifierFlags modifiers = event.modifierFlags;
 
-  return [self processMacVirtualKey:macKeyCode
+  NSArray* actions = [self processMacVirtualKey:macKeyCode
                       withModifiers:modifiers
                         withKeyDown:YES];
+  
+  return [self.coreHelper optimizeActionArray:actions];
 }
 
 -(NSArray*)processMacVirtualKey:(unsigned short)macKeyCode
@@ -186,12 +188,66 @@
 
   for (int i = 0; i < actionCount; i++) {
     km_kbp_action_item action = actionList[i];
-    CoreAction *event = [[CoreAction alloc] initWithActionStruct:&action coreHelper:self.coreHelper];
-    [eventArray insertObject:event atIndex:i];
+    CoreAction *coreAction = [self createCoreActionForActionStruct:&action];
+    [eventArray insertObject:coreAction atIndex:i];
   }
   
   return eventArray;
 }
+
+-(CoreAction*)createCoreActionForActionStruct:(km_kbp_action_item*)actionStruct {
+  CoreAction* action = nil;
+    switch (actionStruct->type)
+    {
+      case KM_KBP_IT_END: {
+        action = [[CoreAction alloc] initWithType: EndAction actionContent:@"" backspaceCount:0];
+        break;
+      }
+      case KM_KBP_IT_CHAR: {
+        NSString *characterString = [self.coreHelper utf32ValueToString:actionStruct->character];
+        action = [[CoreAction alloc] initWithType: CharacterAction actionContent:characterString backspaceCount:0];
+        NSLog(@"actionStruct->character decimal: %u, hex: %X", actionStruct->character, actionStruct->character);
+        NSLog(@"converted unicode string: '%@'", characterString);
+        break;
+      }
+      case KM_KBP_IT_MARKER: {
+        action = [[CoreAction alloc] initWithType: MarkerAction actionContent:@"" backspaceCount:0];
+        break;
+      }
+      case KM_KBP_IT_ALERT: {
+        action = [[CoreAction alloc] initWithType: AlertAction actionContent:@"" backspaceCount:0];
+        break;
+      }
+      case KM_KBP_IT_BACK: {
+        action = [[CoreAction alloc] initWithType: BackspaceAction actionContent:@"" backspaceCount:1];
+        km_kbp_backspace_item item = actionStruct->backspace;
+        NSLog(@"converted backspace, expected value =%lu, expected type =%u", item.expected_value, item.expected_type);
+
+        break;
+      }
+      case KM_KBP_IT_PERSIST_OPT: {
+        action = [[CoreAction alloc] initWithType: PersistOptionAction actionContent:@"" backspaceCount:0];
+        break;
+      }
+      case KM_KBP_IT_EMIT_KEYSTROKE: {
+        action = [[CoreAction alloc] initWithType: EmitKeystrokeAction actionContent:@"" backspaceCount:0];
+        break;
+      }
+      case KM_KBP_IT_INVALIDATE_CONTEXT: {
+        action = [[CoreAction alloc] initWithType: InvalidateContextAction actionContent:@"" backspaceCount:0];
+        break;
+      }
+      case KM_KBP_IT_CAPSLOCK: {
+        action = [[CoreAction alloc] initWithType: CapsLockAction actionContent:@"" backspaceCount:0];
+        break;
+      }
+      default: {
+        NSLog(@"unrecognized type of km_kbp_action_item = %u\n", actionStruct->type);
+      }
+  }
+  return action;
+}
+
 
 -(NSString *)getContextAsStringUsingCore {
   km_kbp_context * context =  km_kbp_state_context(self.keyboardState);

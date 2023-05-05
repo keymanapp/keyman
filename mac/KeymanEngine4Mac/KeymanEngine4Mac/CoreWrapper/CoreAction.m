@@ -93,6 +93,7 @@ NSString *const Q_SAVEOPT = @"Q_SAVEOPT"; // KM_KBP_IT_PERSIST_OPT
   return [self initWithType:AlertAction actionContent:@"" backspaceCount:0];
 }
 
+/*
 -(instancetype)initWithActionStruct:(km_kbp_action_item*)actionStruct coreHelper:(CoreHelper*)helper {
     switch (actionStruct->type)
     {
@@ -142,6 +143,7 @@ NSString *const Q_SAVEOPT = @"Q_SAVEOPT"; // KM_KBP_IT_PERSIST_OPT
   }
   return self;
 }
+*/
 
 -(instancetype)initCharacterAction:(NSString*)content {
   self = [self initWithType: CharacterAction actionContent:content backspaceCount:0];
@@ -155,10 +157,11 @@ NSString *const Q_SAVEOPT = @"Q_SAVEOPT"; // KM_KBP_IT_PERSIST_OPT
 
 -(NSString *)description
 {
-  NSString *actionDescription = @"";
+  NSMutableString *actionDescription = [NSMutableString stringWithString:self.typeName];
   if (self.actionType == CharacterAction) {
     const unichar unicodeChar = [_content characterAtIndex:0];
-    actionDescription = [[NSString alloc] initWithFormat:@"%u / 0x%X : '%@'", unicodeChar, unicodeChar, _content];
+    [actionDescription appendString: @", content = "];
+    [actionDescription appendString: [[NSString alloc] initWithFormat:@"%u / 0x%X : '%@'", unicodeChar, unicodeChar, _content]];
   }
   return actionDescription;
 }

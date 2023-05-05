@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 -(unsigned short) macVirtualKeyToWindowsVirtualKey:(unsigned short) keyCode;
 -(UInt32)macToKeymanModifier:(NSEventModifierFlags)modifiers;
 -(NSArray*)actionObjectArrayToLegacyActionMapArray:(NSArray*)actionArray;
+-(NSArray*)optimizeActionArray:(NSArray*)actionArray;
 -(NSString*)utf32ValueToString:(UInt32)scalarValue;
 @end
 

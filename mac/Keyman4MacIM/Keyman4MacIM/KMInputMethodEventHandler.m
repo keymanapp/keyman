@@ -7,8 +7,19 @@
 //
 #import "KMInputMethodEventHandler.h"
 #import "KMInputMethodEventHandlerProtected.h"
+#import <KeymanEngine4Mac/KeymanEngine4Mac.h>
 #include <Carbon/Carbon.h> /* For kVK_ constants. */
+#include "KeySender.h"
+#import "KMCoreActionHandler.h"
+//TODO: remove debug call to PrivacyConsent
+#include "PrivacyConsent.h"
+
 @import Sentry;
+
+@interface KMInputMethodEventHandler ()
+@property (nonatomic, retain) KeySender* keySender;
+@property int generatedBackspaceCount;
+@end
 
 @implementation KMInputMethodEventHandler
 
@@ -114,7 +125,9 @@ NSRange _previousSelRange;
 - (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender {
     NSLog(@"***SGS initWithClient clientAppId = %@", clientAppId);
     self.senderForDeleteBack = sender;
-
+    _keySender = [[KeySender alloc] init];
+    _generatedBackspaceCount = 0;
+  
     BOOL legacy = [self isClientAppLegacy:clientAppId];
 
     // In Xcode, if Keyman is the active IM and is in "debugMode" and "English plus Spanish" is 
@@ -354,146 +367,168 @@ NSRange _previousSelRange;
         [self updateContextBuffer:client];
 }
 
-- (BOOL) handleKeymanEngineActions:(NSEvent *)event in:(id) sender {
-    BOOL deleteBackPosted = NO;
-    NSArray *actions = nil;
-    if (![self willDeleteNullChar]) {
-        if (self.AppDelegate.lowLevelEventTap != nil) {
-            NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.AppDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:event.context characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
-            actions = [self.kme processEvent:eventWithOriginalModifierFlags];
-        }
-        else {
-            // Depending on the client app and the keyboard, using the passed-in event as it is should work okay.
-            // Keyboards that depend on chirality support will not work. And command-key actions that change the
-            // context might go undetected in some apps, resulting in errant behavior for subsequent typing.
-            actions = [self.kme processEvent:event];
-        }
-        if (actions.count == 0) {
-            if (_easterEggForSentry != nil) {
-                NSString * kmxName = [[self.kme.kmx filePath] lastPathComponent];
-                NSLog(@"Sentry - KMX name: %@", kmxName);
-                if ([kmxName isEqualToString:kEasterEggKmxName]) {
-                    NSUInteger len = [_easterEggForSentry length];
-                    NSLog(@"Sentry - Processing character(s): %@", [event characters]);
-                    if ([[event characters] characterAtIndex:0] == [kEasterEggText characterAtIndex:len]) {
-                        NSString *characterToAdd = [kEasterEggText substringWithRange:NSMakeRange(len, 1)];
-                        NSLog(@"Sentry - Adding character to Easter Egg code string: %@", characterToAdd);
-                        [_easterEggForSentry appendString:characterToAdd];
-                        if ([_easterEggForSentry isEqualToString:kEasterEggText]) {
-                            NSLog(@"Sentry - Forcing crash now");
-                            [SentrySDK crash];
-                        }
-                    }
-                    else if (len > 0) {
-                        NSLog(@"Sentry - Clearing Easter Egg code string.");
-                        [_easterEggForSentry setString:@""];
-                    }
-                }
-            }
-            return NO;
-        }
-    }
-    else {
-        if ([self.AppDelegate debugMode]) {
-            NSLog(@"willDeleteNullChar = true");
-        }
-        return NO;
-    }
+- (BOOL) handleEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
+  NSArray *actions = nil;
 
+  if ([self willDeleteNullChar]) {
     if ([self.AppDelegate debugMode]) {
-        NSLog(@"actions = %@", actions);
+        NSLog(@"willDeleteNullChar = true");
     }
-    for (NSDictionary *action in actions) {
-        NSString *actionType = [[action allKeys] objectAtIndex:0];
-        if ([self.AppDelegate debugMode]) {
-            NSLog(@"Handling %@ action...", actionType);
-            NSLog(@"contextBuffer = \"%@\"", self.contextBuffer.length?[self.contextBuffer codeString]:@"{empty}");
-        }
-
-        if ([actionType isEqualToString:Q_STR]) {
-            NSString *output = [action objectForKey:actionType];
-            if ([self.AppDelegate debugMode])
-                NSLog(@"output = %@", output);
-            if (deleteBackPosted)
-            {
-                [self appendPendingBuffer:output];
-                if ([self.AppDelegate debugMode])
-                    NSLog(@"pendingBuffer = %@", [self pendingBuffer]);
-            }
-            else {
-                NSUInteger nc = [self.contextBuffer deleteLastNullChars];
-                // Each null in the context buffer presumably corresponds to a space we inserted when
-                // processing the Q_BACK, which we now need to replace with the text we're inserting.
-                if (nc > 0) {
-                    NSUInteger pos = [self getSelectionRangefromClient:sender].location;
-                    if ([self.AppDelegate debugMode]) {
-                        NSLog(@"nc = %lu", nc);
-                        NSLog(@"pos = %lu", pos);
-                    }
-                    if (pos >= nc && pos != NSNotFound) {
-                        if ([self.AppDelegate debugMode]) {
-                            NSLog(@"Replacement index = %lu", pos - nc);
-                            NSLog(@"Replacement length = %lu", nc);
-                        }
-                        [sender insertText:output replacementRange:NSMakeRange(pos - nc, nc)];
-                        _previousSelRange.location += output.length - nc;
-                        _previousSelRange.length = 0;
-                    }
-                }
-                else {
-                    [self replaceExistingSelectionIn:sender with:output];
-                }
-            }
-
-            // Even if the characters to insert are pending, we want to append them to the context buffer now.
-            // Waiting until they are inserted would probably be safe, but on the off-chance that the engine
-            // generates additional actions beyond this current one, we want to be sure that the context reflects
-            // the state as it *will* be when all the posted/pending events have been processed.
-            [self.contextBuffer appendString:output];
-        }
-        else if ([actionType isEqualToString:Q_BACK]) {
-            NSLog(@"***SGS handle backspace");
-            NSLog(@"self.contextBuffer %@", self.contextBuffer);
-
-            [self.contextBuffer deleteLastNullChars];
-            NSUInteger dk = [self.contextBuffer deleteLastDeadkeys];
-            NSInteger n = [[action objectForKey:actionType] integerValue] - dk;
-            NSUInteger dc = [[self.contextBuffer lastNChars:n] deadKeyCount];
-            // n is now the number of characters to delete from the context buffer
-            // (which could include deadkeys the client doesn't know about).
-            [self.contextBuffer deleteLastNChars:n];
-            n -= dc;
-
-          NSLog(@"number of characters to delete %ld", (long)n);
-            // n is now the number of characters to delete from the client.
-            if (n > 0) {
-                deleteBackPosted = [self deleteBack:n in:sender for: event];
-            }
-        }
-        else if ([actionType isEqualToString:Q_DEADKEY]) {
-            [self.contextBuffer deleteLastNullChars];
-            NSUInteger x = [[action objectForKey:actionType] unsignedIntegerValue];
-            [self.contextBuffer appendDeadkey:x];
-        }
-        else if ([actionType isEqualToString:Q_NUL]) {
-            continue;
-        }
-        else if ([actionType isEqualToString:Q_RETURN]) {
-          NSLog(@"***SGS handleKeymanEngineActions Q_RETURN");
-            return YES;
-        }
-        else if ([actionType isEqualToString:Q_BEEP]) {
-            [[NSSound soundNamed:@"Tink"] play];
-        }
-        else if ([actionType isEqualToString:Q_SAVEOPT]) {
-            NSDictionary *save = [action objectForKey:actionType];
-            NSNumber *storeKey = [save allKeys][0];
-            NSString *value = [save objectForKey:storeKey];
-            [self.AppDelegate saveStore:storeKey withValue:value];
-        }
+    return NO;
+  }
+  else {
+    actions = [self processEventWithKeymanEngine:event in:sender];
+    if (actions.count == 0) {
+      [self checkEventForSentryEasterEgg:event withActions:actions];
+      return NO;
     }
-    return YES;
+  }
+  
+  //TODO: remove support for old non-core actions after this code functions correctly
+  if ([self containsKeymanCoreActions:actions]) {
+    return [self applyKeymanCoreActions:actions event:event client:sender];
+  } else {
+    [self applyKeymanEngineActions:actions event:event in:sender];
+  }
+  return YES;
 }
+
+-(void)applyKeymanEngineActions:(NSArray*)actions event: (NSEvent *)event in:(id) sender  {
+  BOOL deleteBackPosted = NO;
+  
+  for (NSDictionary *action in actions) {
+      NSString *actionType = [[action allKeys] objectAtIndex:0];
+      if ([self.AppDelegate debugMode]) {
+          NSLog(@"Handling %@ action...", actionType);
+          NSLog(@"contextBuffer = \"%@\"", self.contextBuffer.length?[self.contextBuffer codeString]:@"{empty}");
+      }
+
+      if ([actionType isEqualToString:Q_STR]) {
+          NSString *output = [action objectForKey:actionType];
+          if ([self.AppDelegate debugMode])
+              NSLog(@"output = %@", output);
+          if (deleteBackPosted)
+          {
+              [self appendPendingBuffer:output];
+              if ([self.AppDelegate debugMode])
+                  NSLog(@"pendingBuffer = %@", [self pendingBuffer]);
+          }
+          else {
+              NSUInteger nc = [self.contextBuffer deleteLastNullChars];
+              // Each null in the context buffer presumably corresponds to a space we inserted when
+              // processing the Q_BACK, which we now need to replace with the text we're inserting.
+              if (nc > 0) {
+                  NSUInteger pos = [self getSelectionRangefromClient:sender].location;
+                  if ([self.AppDelegate debugMode]) {
+                      NSLog(@"nc = %lu", nc);
+                      NSLog(@"pos = %lu", pos);
+                  }
+                  if (pos >= nc && pos != NSNotFound) {
+                      if ([self.AppDelegate debugMode]) {
+                          NSLog(@"Replacement index = %lu", pos - nc);
+                          NSLog(@"Replacement length = %lu", nc);
+                      }
+                      [sender insertText:output replacementRange:NSMakeRange(pos - nc, nc)];
+                      _previousSelRange.location += output.length - nc;
+                      _previousSelRange.length = 0;
+                  }
+              }
+              else {
+                  [self replaceExistingSelectionIn:sender with:output];
+              }
+          }
+
+          // Even if the characters to insert are pending, we want to append them to the context buffer now.
+          // Waiting until they are inserted would probably be safe, but on the off-chance that the engine
+          // generates additional actions beyond this current one, we want to be sure that the context reflects
+          // the state as it *will* be when all the posted/pending events have been processed.
+          [self.contextBuffer appendString:output];
+      }
+      else if ([actionType isEqualToString:Q_BACK]) {
+          NSLog(@"***SGS handle backspace");
+          NSLog(@"self.contextBuffer %@", self.contextBuffer);
+
+          [self.contextBuffer deleteLastNullChars];
+          NSUInteger dk = [self.contextBuffer deleteLastDeadkeys];
+          NSInteger n = [[action objectForKey:actionType] integerValue] - dk;
+          NSUInteger dc = [[self.contextBuffer lastNChars:n] deadKeyCount];
+          // n is now the number of characters to delete from the context buffer
+          // (which could include deadkeys the client doesn't know about).
+          [self.contextBuffer deleteLastNChars:n];
+          n -= dc;
+
+        NSLog(@"number of characters to delete %ld", (long)n);
+          // n is now the number of characters to delete from the client.
+          if (n > 0) {
+              deleteBackPosted = [self deleteBack:n in:sender for: event];
+          }
+      }
+      else if ([actionType isEqualToString:Q_DEADKEY]) {
+          [self.contextBuffer deleteLastNullChars];
+          NSUInteger x = [[action objectForKey:actionType] unsignedIntegerValue];
+          [self.contextBuffer appendDeadkey:x];
+      }
+      else if ([actionType isEqualToString:Q_NUL]) {
+          continue;
+      }
+      else if ([actionType isEqualToString:Q_RETURN]) {
+        NSLog(@"***SGS handleKeymanEngineActions Q_RETURN");
+      }
+      else if ([actionType isEqualToString:Q_BEEP]) {
+          [[NSSound soundNamed:@"Tink"] play];
+      }
+      else if ([actionType isEqualToString:Q_SAVEOPT]) {
+          NSDictionary *save = [action objectForKey:actionType];
+          NSNumber *storeKey = [save allKeys][0];
+          NSString *value = [save objectForKey:storeKey];
+          [self.AppDelegate saveStore:storeKey withValue:value];
+      }
+  }
+}
+
+- (NSArray*) processEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
+  NSArray* actions = nil;
+  NSLog(@"***SGS processEventWithKeymanEngine, AppDelegate.currentModifierFlags = %lu, event.modifiers = %lu", (unsigned long)self.AppDelegate.currentModifierFlags, (unsigned long)event.modifierFlags);
+  if (self.AppDelegate.lowLevelEventTap != nil) {
+      NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.AppDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:event.context characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
+    actions = [self.kme processEvent:eventWithOriginalModifierFlags];
+  }
+  else {
+      // Depending on the client app and the keyboard, using the passed-in event as it is should work okay.
+      // Keyboards that depend on chirality support will not work. And command-key actions that change the
+      // context might go undetected in some apps, resulting in errant behavior for subsequent typing.
+    actions = [self.kme processEvent:event];
+  }
+  if ([self.AppDelegate debugMode]) {
+      NSLog(@"processEventWithKeymanEngine, actions = %@", actions);
+  }
+  return actions;
+}
+
+- (void)checkEventForSentryEasterEgg:(NSEvent *)event withActions:(NSArray *)actions {
+  if (_easterEggForSentry != nil) {
+      NSString * kmxName = [[self.kme.kmx filePath] lastPathComponent];
+      NSLog(@"Sentry - KMX name: %@", kmxName);
+      if ([kmxName isEqualToString:kEasterEggKmxName]) {
+          NSUInteger len = [_easterEggForSentry length];
+          NSLog(@"Sentry - Processing character(s): %@", [event characters]);
+          if ([[event characters] characterAtIndex:0] == [kEasterEggText characterAtIndex:len]) {
+              NSString *characterToAdd = [kEasterEggText substringWithRange:NSMakeRange(len, 1)];
+              NSLog(@"Sentry - Adding character to Easter Egg code string: %@", characterToAdd);
+              [_easterEggForSentry appendString:characterToAdd];
+              if ([_easterEggForSentry isEqualToString:kEasterEggText]) {
+                  NSLog(@"Sentry - Forcing crash now");
+                  [SentrySDK crash];
+              }
+          }
+          else if (len > 0) {
+              NSLog(@"Sentry - Clearing Easter Egg code string.");
+              [_easterEggForSentry setString:@""];
+          }
+      }
+  }
+}
+
 
 - (void)processUnhandledDeleteBack:(id)client updateEngineContext:(BOOL *)updateEngineContext {
     if ([self.AppDelegate debugMode]) {
@@ -574,10 +609,7 @@ NSRange _previousSelRange;
     return self.ignoreNextDeleteBackHighLevel;
 }
 
-- (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
-  if (event.type == NSKeyDown) {
-    NSLog(@"***SGS handleEvent KeyDown event, keycode: %u, characters='%@'", event.keyCode, event.characters);
-  }
+- (BOOL)legacyHandleEvent:(NSEvent *)event client:(id)sender {
    // OSK key feedback from hardware keyboard is disabled
     /*if (event.type == NSKeyDown)
      [self.AppDelegate handleKeyEvent:event];*/
@@ -623,7 +655,6 @@ NSRange _previousSelRange;
     }
 
     if(event.keyCode == kVK_Delete && _legacyMode && self.ignoreNextDeleteBackHighLevel) {
-      NSLog(@"***SGS handleEvent KVK_Delete, pass through to app");
        // This event was sent by Keyman and we should just
         // pass it through to the app. handleDeleteBackLowLevel
         // already did anything we need with it.
@@ -640,10 +671,9 @@ NSRange _previousSelRange;
             NSLog(@"handleEvent sender selection range location = %lu", [self getSelectionRangefromClient:sender].location);
     }
 
-    BOOL handled = [self handleKeymanEngineActions:event in: sender];
+    BOOL handled = [self handleEventWithKeymanEngine:event in: sender];
 
     if(handled) {
-        NSLog(@"***SGS handleEvent 'Send the final transform???'");
         // TODO: Send the final transform that we've built up
         // [self sendFinalTransformToClient: sender deleteLeft: nDeleteLeft textToInsert: strTextToInsert];
     }
@@ -891,24 +921,7 @@ NSRange _previousSelRange;
     return NO;
 }
 
-- (void)sendEvent:(NSEvent *)event {
-    ProcessSerialNumber psn;
-    GetFrontProcess(&psn);
-
-    CGEventSourceRef source = CGEventCreateSourceFromEvent([event CGEvent]);
-    CGEventRef keyDownEvent = CGEventCreateKeyboardEvent(source, event.keyCode, true);
-    CGEventRef keyUpEvent = CGEventCreateKeyboardEvent(source, event.keyCode, false);
-
-    CGEventPostToPSN(&psn, keyDownEvent);
-    CGEventPostToPSN(&psn, keyUpEvent);
-
-    CFRelease(source);
-    CFRelease(keyDownEvent);
-    CFRelease(keyUpEvent);
-}
-
 - (void)postDeleteBacks:(NSUInteger)count for:(NSEvent *) event {
-  NSLog(@"***SGS postDeleteBacks");
     _numberOfPostedDeletesToExpect = count;
 
     _sourceFromOriginalEvent = CGEventCreateSourceFromEvent([event CGEvent]);
@@ -944,6 +957,146 @@ NSRange _previousSelRange;
     [self.AppDelegate postKeyboardEventWithSource:source code:code postCallback:^(CGEventRef eventToPost) {
         CGEventPostToPSN((ProcessSerialNumberPtr)&psn, eventToPost);
     }];
+}
+
+//MARK: Core-related key processing
+// replacement handleEvent implementation for core event processing
+- (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
+  if (event.type == NSKeyDown) {
+    NSRange selectionRange = [sender selectedRange];
+    NSRange contextRange = NSMakeRange(0, selectionRange.location);
+    NSAttributedString *context = [sender attributedSubstringFromRange:contextRange];
+    NSLog(@"***SGS handleEvent KeyDown event, keycode: %u, characters='%@', context='%@', context.start=%lu, context.end=%lu", event.keyCode, event.characters, context, (unsigned long)contextRange.location, (unsigned long)contextRange.length);
+
+    /*
+    if(event.keyCode == 0xFF && self.generatedBackspaceCount > 0) {
+      NSLog(@"***SGS handleEvent 0xFF, changed event.keycode to 0x51, reducing generatedBackspaceCount to %d ", self.generatedBackspaceCount);
+      return YES;
+    }
+    */
+    if(event.keyCode == kVK_Delete && self.generatedBackspaceCount > 0) {
+      self.generatedBackspaceCount--;
+      NSLog(@"***SGS handleEvent KVK_Delete, reducing generatedBackspaceCount to %d ", self.generatedBackspaceCount);
+      return NO;
+    }
+  }
+    if (event.type == NSEventTypeFlagsChanged) {
+        // We mark the context as out of date only for the Command keys
+        switch([event keyCode]) {
+            case kVK_RightCommand:
+            case kVK_Command:
+                _contextOutOfDate = YES;
+                break;
+            case kVK_Shift:
+            case kVK_RightShift:
+            case kVK_CapsLock:
+            case kVK_Option:
+            case kVK_RightOption:
+            case kVK_Control:
+            case kVK_RightControl:
+                break;
+        }
+        return NO;
+    }
+
+    if ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand) {
+        [self handleCommand:event];
+        return NO; // We let the client app handle all Command-key events.
+    }
+
+    BOOL handled = [self handleEventWithKeymanEngine:event in: sender];
+    if (event.type == NSKeyDown) {
+      NSLog(@"***SGS event, keycode: %u, characters='%@' handled by KeymanEngine: %@", event.keyCode, event.characters, handled?@"yes":@"no");
+    }
+
+    return handled;
+}
+
+
+-(BOOL)containsKeymanCoreActions:(NSArray*)actions {
+  BOOL containsCoreActions = NO;
+  
+  if (actions.count > 0) {
+    id object = [actions objectAtIndex:0];
+    containsCoreActions = [object isKindOfClass:[CoreAction class]];
+    NSLog(@"containsKeymanCoreActions returning %@", containsCoreActions?@"Yes":@"No");
+  }
+  return containsCoreActions;
+
+}
+
+/*
+ * Returns YES if we have applied an event to the client.
+ * If NO, then (passthrough case) we are instructing the OS to apply the original event.
+ * If any of the returned actions result in a change to the client, then return YES.
+ * Changes to the client may be executed with insertText or by generating a KeyDown event.
+ * For a CharacterAction, return YES after applying the character to the client.
+ * For a BackspaceAction:
+ * -return NO if this is the only action (besides End)
+ * -return YES after generating a backspace event
+ */
+-(BOOL)applyKeymanCoreActions:(NSArray*)actions event: (NSEvent*)event client:(id) client {
+  BOOL handledEvent = NO;
+
+  NSLog(@"***SGS applyKeymanCoreActions invoked, actions.count = %lu ", (unsigned long)actions.count);
+  NSLog(@"event = %@", event);
+  NSLog(@"client = %@", client);
+  
+  KMCoreActionHandler *actionHandler = [[KMCoreActionHandler alloc] initWithActions:(NSArray*)actions event: (NSEvent *)event client:(id) client];
+  handledEvent = actionHandler.handleActions;
+
+  if (actionHandler.backspaceEventsToGenerate > 0) {
+    [self sendBackspaceEvents: event client:client count:actionHandler.backspaceEventsToGenerate];
+  }
+ 
+  if (actionHandler.textToInsert.length > 0) {
+    [self insertText:actionHandler.textToInsert backspaceCount:actionHandler.backspacesToInsert actions:actions event:event client:client];
+  }
+ 
+  if (actionHandler.textEventsToGenerate.length > 0) {
+    [self sendProcessBufferEvent: event client:client output:actionHandler.textEventsToGenerate];
+  }
+  
+  return handledEvent;
+}
+
+-(BOOL)insertText:(NSString*)text backspaceCount:(int)replacementCount actions: (NSArray*)actions event: (NSEvent*)event client:(id) client {
+  NSRange selectionRange = [client selectedRange];
+  NSRange contextRange = NSMakeRange(0, selectionRange.location);
+  NSAttributedString *context = [client attributedSubstringFromRange:contextRange];
+  NSLog(@"***SGS applyCharacterActions, replacementCount=%d, selectionRange.location=%lu", replacementCount, selectionRange.location);
+
+  NSRange replacementRange;
+  if (replacementCount > 0) {
+    replacementRange = NSMakeRange(selectionRange.location-replacementCount, replacementCount);
+  } else {
+    replacementRange = NSMakeRange(NSNotFound, NSNotFound);
+  }
+  NSLog(@"***SGS applyCharacterActions, insertText %@ in replacementRange.start=%lu, replacementRange.length=%lu", text, (unsigned long)replacementRange.location, (unsigned long)replacementRange.length);
+  
+  [client insertText:text replacementRange:replacementRange];
+  return YES;
+}
+
+-(void)sendBackspaceEvents: (NSEvent *)event client:(id) client count:(int) count  {
+  NSLog(@"generateBackspaceEvents count %d", count);
+  
+  NSLog(@"generateBackspaceEvents, hasAccessibility = %@", [PrivacyConsent.shared checkAccessibility]?@"Yes":@"NO!");
+
+  for (int i = 0; i < count; i++)
+  {
+    self.generatedBackspaceCount++;
+    [self.keySender sendBackspaceforSourceEvent:event];
+  }
+}
+
+// TODO:delete if all clients support insertText
+-(void)sendProcessBufferEvent: (NSEvent *)event client:(id) client output:(NSString*)text  {
+  NSLog(@"generateCharacterEvents for output = %@", text);
+  
+  NSLog(@"generateCharacterEvents, hasAccessibility = %@", [PrivacyConsent.shared checkAccessibility]?@"Yes":@"NO!");
+
+  [self.keySender sendProcessBufferEvent:event];
 }
 
 @end

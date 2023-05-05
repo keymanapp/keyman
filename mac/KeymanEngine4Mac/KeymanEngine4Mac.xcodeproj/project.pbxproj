@@ -11,10 +11,10 @@
 		2993C32D29B1D92E00FB5E95 /* ActionArrayOptimizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 2993C32329B1D92E00FB5E95 /* ActionArrayOptimizer.m */; };
 		2993C32E29B1D92E00FB5E95 /* CoreWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 2993C32429B1D92E00FB5E95 /* CoreWrapper.m */; };
 		2993C32F29B1D92E00FB5E95 /* CoreHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 2993C32529B1D92E00FB5E95 /* CoreHelper.m */; };
-		2993C33229B1D92E00FB5E95 /* CoreWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32829B1D92E00FB5E95 /* CoreWrapper.h */; };
-		2993C33329B1D92E00FB5E95 /* ActionArrayOptimizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32929B1D92E00FB5E95 /* ActionArrayOptimizer.h */; };
-		2993C33429B1D92E00FB5E95 /* CoreAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32A29B1D92E00FB5E95 /* CoreAction.h */; };
-		2993C33529B1D92E00FB5E95 /* CoreHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32B29B1D92E00FB5E95 /* CoreHelper.h */; };
+		2993C33229B1D92E00FB5E95 /* CoreWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32829B1D92E00FB5E95 /* CoreWrapper.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2993C33329B1D92E00FB5E95 /* ActionArrayOptimizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32929B1D92E00FB5E95 /* ActionArrayOptimizer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2993C33429B1D92E00FB5E95 /* CoreAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32A29B1D92E00FB5E95 /* CoreAction.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2993C33529B1D92E00FB5E95 /* CoreHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32B29B1D92E00FB5E95 /* CoreHelper.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2993C33829B1DD6900FB5E95 /* libkmnkbp0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2993C33729B1DD6900FB5E95 /* libkmnkbp0.a */; };
 		299D0B1B29CAB2F500767276 /* el_nuer.kmx in Resources */ = {isa = PBXBuildFile; fileRef = 299D0B1A29CAB2F500767276 /* el_nuer.kmx */; };
 		299F9E2A29C46AFC0053E903 /* CoreHelperTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 299F9E2729C46AFB0053E903 /* CoreHelperTests.m */; };
@@ -639,7 +639,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(PROJECT_DIR)/../../core/**",
-					"$(PROJECT_DIR)/../../common/include\n$(PROJECT_DIR)/../../common/include\n$(PROJECT_DIR)/../../common/include\n$(PROJECT_DIR)/../../common/include",
+					"$(PROJECT_DIR)/../../common/include",
 				);
 				INSTALL_PATH = "";
 				"LIBRARY_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../core/build/mac/release";

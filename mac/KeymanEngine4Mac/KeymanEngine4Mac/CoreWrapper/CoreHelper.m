@@ -62,7 +62,7 @@ const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
 -(NSArray*)actionObjectArrayToLegacyActionMapArray:(NSArray*)actionArray {
 
   // legacy code expects the map array to be optimized, so we can do that before converting to NSDictionary
-  NSArray *optimizedArray = [self.optimizer actionArrayToOptimizedActionArray:actionArray];
+  NSArray *optimizedArray = [self.optimizer optimizeForLegacyArray:actionArray];
   
   NSMutableArray *mapArray = [[NSMutableArray alloc] init];
   for (CoreAction *action in optimizedArray) {
@@ -74,6 +74,13 @@ const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
   }
   
   return mapArray;
+}
+
+-(NSArray*)optimizeActionArray:(NSArray*)actionArray {
+  NSLog(@"unoptimized actions array: %@", actionArray);
+  NSArray* optimizedActionArray = [self.optimizer optimize:actionArray];
+  NSLog(@"optimized actions array: %@", optimizedActionArray);
+  return optimizedActionArray;
 }
 
 -(UInt32)macToKeymanModifier:(NSEventModifierFlags)modifiers {

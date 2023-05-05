@@ -10,13 +10,23 @@
  * of a key and reduces them to the minimal representation. For example, a character
  * that causes a re-ordering of the context may cause the character to be deleted.
  * Instead of emitting it twice and deleting it once, just emit it once.
+ *
+ * There are two approaches to optimizing represented here. One,
+ * optimizeForLegacyArray:actionArray, matches the optimization that happened in
+ * the legacy code.
+ * The second, optimize:actionArray, is designed to worked with the changes that took
+ * place after moving key processing to Keyman Core.
  */
 
 #import "ActionArrayOptimizer.h"
 
 @implementation ActionArrayOptimizer
 
--(NSArray*)actionArrayToOptimizedActionArray:(NSArray*)actionArray {
+/*
+ * This optimizes the array of CoreAction objects according to the state
+ * expected by the legacy Input Method code.
+ */
+-(NSArray*)optimizeForLegacyArray:(NSArray*)actionArray {
   
   NSMutableArray *optimizedArray = [[NSMutableArray alloc] init];
   CoreAction *nextAction = nil;
@@ -63,6 +73,39 @@
   return optimizedArray;
 }
 
+/*
+ * This optimizes the array of CoreAction objects to best simplify
+ * output by the Input Method based on its use of Keyman Core.
+ */
+-(NSArray*)optimize:(NSArray*)actionArray {
+  
+  NSMutableArray *optimizedArray = [[NSMutableArray alloc] init];
+  
+  /*
+    loop through actions in order
+    if we find an EndAction, do not save to optimizedArray
+    if we find a BackspaceAction, then remove the last action if it is a CharacterAction
+    and do not save the BackspaceAction to optimizedArray
+    otherwise, simply copy to optimizedArray
+  */
+  for (CoreAction *action in [actionArray objectEnumerator])
+  {
+    if ([self checkForUnnecessaryAction:action]) {
+      continue;
+    } else if ((action.actionType==BackspaceAction) && (optimizedArray.count > 0)) {
+      CoreAction *lastAction = optimizedArray.lastObject;
+      if (lastAction.actionType==CharacterAction) {
+        [optimizedArray removeLastObject];
+        continue;
+      }
+    }
+    
+    [optimizedArray insertObject:action atIndex:optimizedArray.count];
+  }
+
+  return optimizedArray;
+}
+
 /* returns YES if the actions can either be combined or eliminate each other */
 -(BOOL)canCombineNextAction:(CoreAction*)nextAction withCurrentAction:(CoreAction*)currentAction {
   BOOL canCombine = NO;
@@ -72,9 +115,14 @@
     canCombine = ((nextAction.actionType == CharacterAction) || (nextAction.actionType == BackspaceAction));
   } else {
     // if not same type, can be combined if deleting a character
-    canCombine = ((currentAction.actionType == CharacterAction) && (nextAction.actionType == BackspaceAction));
+    canCombine = [self canEliminateActions:nextAction withCurrentAction:currentAction];
   }
   return canCombine;
+}
+
+/* returns YES if the actions eliminate each other */
+-(BOOL)canEliminateActions:(CoreAction*)nextAction withCurrentAction:(CoreAction*)currentAction {
+  return ((currentAction.actionType == CharacterAction) && (nextAction.actionType == BackspaceAction));
 }
 
 /* returns YES if the action is unnecessary and should be removed */
@@ -94,10 +142,18 @@
       combinedAction = [self combineBackspaceAction:nextAction withBackspaceAction:currentAction];
     }
   } else {
-    // if not same time, can be combined if deleting a character
+    // if not same type, can be combined if deleting a character
     if ((currentAction.actionType == CharacterAction) && (nextAction.actionType == BackspaceAction)) {
       combinedAction = [self combineBackspaceAction:nextAction withCharacterAction:currentAction];
     }
+  }
+  return combinedAction;
+}
+
+-(CoreAction*)eliminateActions:(CoreAction*)nextAction withCurrentAction:(CoreAction*)currentAction {
+  CoreAction* combinedAction = nil;
+  if ((currentAction.actionType == CharacterAction) && (nextAction.actionType == BackspaceAction)) {
+    combinedAction = [self combineBackspaceAction:nextAction withCharacterAction:currentAction];
   }
   return combinedAction;
 }
