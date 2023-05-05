@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.101 alpha 2023-05-05
+
+* chore(common): `set -eu` in build-utils.sh (#8698)
+* fix(android/app): Resize OSK when resuming app from background (#8704)
+
 ## 17.0.100 alpha 2023-05-04
 
 *  (#8690)
