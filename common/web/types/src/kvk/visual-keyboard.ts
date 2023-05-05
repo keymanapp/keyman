@@ -26,6 +26,7 @@ export class VisualKeyboardFont {
   name?: string;
   size?: number;
   color?: number; // unused
+  style?: string; // TODO: figure out style vs color issues
 };
 
 export { BUILDER_KVK_KEY_FLAGS as VisualKeyboardKeyFlags } from "./kvk-file.js";

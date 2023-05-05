@@ -334,7 +334,7 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFileEx(PSTR pszInfile, PSTR
 
   if ( flag_use_new_kmcomp )
   {
-    return kmcmp_CompileKeyboardFile(pszInfile, pszOutfile, ASaveDebug, ACompilerWarningsAsErrors,AWarnDeprecatedCode, kmcmpMsgproc, (void*) pMsgProc);
+    return kmcmp_CompileKeyboardFile(pszInfile, pszOutfile, ASaveDebug, ACompilerWarningsAsErrors,AWarnDeprecatedCode, kmcmpMsgproc, (void*) pMsgProc, Target);
   }
 
   //printf("--->  stayed in CompileKeyboardFile() of kmcmpdll\n");

@@ -5,6 +5,7 @@ import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { Compiler } from '@keymanapp/kmc-kmn';
 import { KMX, KmxFileReader } from '@keymanapp/common-types';
 import { WriteCompiledKeyboard } from '../src/compiler/write-compiled-keyboard.js';
+import { extractTouchLayout } from './util.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url)).replace(/\\/g, '/');
 const fixturesDir = __dirname + '/../../test/fixtures/';
@@ -28,7 +29,8 @@ if(!await kmxCompiler.init()) {
 // TODO: runToMemory, add option to kmxCompiler to store debug-data for conversion to .js (e.g. store metadata, group readonly metadata, etc)
 if(!kmxCompiler.run(infile, outfile, callbacks, {
   shouldAddCompilerVersion: false,
-  saveDebug: true
+  saveDebug: true,
+  target: 'js'
 })) {
   callbacks.printMessages();
   process.exit(1);
@@ -37,12 +39,16 @@ if(!kmxCompiler.run(infile, outfile, callbacks, {
 const reader = new KmxFileReader();
 const keyboard: KMX.KEYBOARD = reader.read(callbacks.loadFile(outfile));
 
-const js = WriteCompiledKeyboard(callbacks, 'khmer_angkor', keyboard, true);
+const js = WriteCompiledKeyboard(callbacks, infile, outfile, 'khmer_angkor', keyboard, true);
 
 callbacks.printMessages();
 
 const fjs = fs.readFileSync(fixtureName, 'utf8');
-if(fjs !== js) {
+
+const expected = extractTouchLayout(fjs);
+const actual = extractTouchLayout(js);
+
+if(expected.js !== actual.js) {
   fs.writeFileSync(testOutfile, js);
   console.error('JS not equal');
   process.exit(1);

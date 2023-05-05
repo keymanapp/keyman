@@ -8,6 +8,7 @@ import fs from 'fs';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { Compiler } from '@keymanapp/kmc-kmn';
 import { KMX, KmxFileReader } from '@keymanapp/common-types';
+import { extractTouchLayout } from './util.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url)).replace(/\\/g, '/');
 const fixturesDir = __dirname + '/../../test/fixtures/';
@@ -37,19 +38,28 @@ describe('Compiler class', function() {
     const kmxCompiler = new Compiler();
     assert.isTrue(await kmxCompiler.init());
 
-    // TODO: runToMemory, add option to kmxCompiler to store debug-data for conversion to .js (e.g. store metadata, group readonly metadata, etc)
-    assert.isTrue(kmxCompiler.run(infile, outfile, callbacks));
+    // TODO: runToMemory, add option to kmxCompiler to store debug-data for conversion to .js (e.g. store metadata, group readonly metadata, visual keyboard source filename, etc)
+    assert.isTrue(kmxCompiler.run(infile, outfile, callbacks, {
+      shouldAddCompilerVersion: false,
+      saveDebug: true,
+      target: 'js'
+    }));
 
     const reader = new KmxFileReader();
     const keyboard: KMX.KEYBOARD = reader.read(callbacks.loadFile(outfile));
 
-    const js = WriteCompiledKeyboard(callbacks, 'khmer_angkor', keyboard, true);
-    // const js = compiler.compile('khmer_angkor', keyboard);
+    const js = WriteCompiledKeyboard(callbacks, infile, outfile, 'khmer_angkor', keyboard, true);
 
     const fjs = fs.readFileSync(fixtureName, 'utf8');
-    if(fjs !== js) {
-      fs.writeFileSync(testOutfile, js);
-      assert.fail('JS not equal');
-    }
+
+    const expected = extractTouchLayout(fjs);
+    const actual = extractTouchLayout(js);
+
+    fs.writeFileSync(testOutfile + '.strip.js', actual.js);
+    fs.writeFileSync(fixtureName + '.strip.js', expected.js);
+    fs.writeFileSync(testOutfile, js);
+
+    assert.deepEqual(actual.js, expected.js);
+    assert.deepEqual(JSON.parse(actual.touchLayout), JSON.parse(expected.touchLayout));
   });
 });

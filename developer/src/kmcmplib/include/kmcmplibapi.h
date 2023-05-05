@@ -32,7 +32,8 @@ EXTERN bool kmcmp_CompileKeyboardFile(
   bool ACompilerWarningsAsErrors,
 	bool AWarnDeprecatedCode,
   kmcmp_CompilerMessageProc pMsgproc,
-  void* AmsgprocContext
+  void* AmsgprocContext,
+  int target // CKF_KEYMAN || CKF_KEYMANWEB
 );
 
 /* Compile target */

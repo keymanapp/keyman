@@ -31,13 +31,15 @@ export interface CompilerOptions {
   saveDebug?: boolean;
   compilerWarningsAsErrors?: boolean;
 	warnDeprecatedCode?: boolean;
+  target?: 'kmx' | 'js';
 };
 
 const baseOptions: CompilerOptions = {
   shouldAddCompilerVersion: true,
   saveDebug: true,
   compilerWarningsAsErrors: false,
-  warnDeprecatedCode: true
+  warnDeprecatedCode: true,
+  target: 'kmx'
 };
 
 /**
@@ -106,7 +108,7 @@ export class KmnCompiler {
         this.callbacks.reportMessage(CompilerMessages.Fatal_MissingWasmModule({e}));
         return false;
       }
-    }
+
     return this.verifyInitialized();
   }
 
@@ -145,6 +147,9 @@ export class KmnCompiler {
   }
 
   private runCompiler(infile: string, outfile: string, options: CompilerOptions): boolean {
+    const CKF_KEYMAN = 0;
+    const CKF_KEYMANWEB = 1;
+
     try {
       if (!this.wasm.setCompilerOptions(options.shouldAddCompilerVersion ? 1 : 0)) {
         this.callbacks.reportMessage(CompilerMessages.Fatal_UnableToSetCompilerOptions());
@@ -155,7 +160,8 @@ export class KmnCompiler {
         options.saveDebug ? 1 : 0,
         options.compilerWarningsAsErrors ? 1 : 0,
         options.warnDeprecatedCode ? 1 : 0,
-        this.callbackName);
+        this.callbackName,
+        options.target == 'js' ? CKF_KEYMANWEB : CKF_KEYMAN);
     } catch(e) {
       this.callbacks.reportMessage(CompilerMessages.Fatal_UnexpectedException({e:e}));
       return false;

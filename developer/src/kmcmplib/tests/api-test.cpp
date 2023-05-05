@@ -62,7 +62,7 @@ void test_kmcmp_CompileKeyboardFile() {
   fclose(fp);
 
   // It should fail when a zero-byte file is passed in
-  assert(!kmcmp_CompileKeyboardFile(kmn_file, kmx_file, true, false, true, msgproc, nullptr));
+  assert(!kmcmp_CompileKeyboardFile(kmn_file, kmx_file, true, false, true, msgproc, nullptr, CKF_KEYMAN));
   assert(error_vec.size() == 1);
   assert(error_vec[0] == CERR_CannotReadInfile);
 

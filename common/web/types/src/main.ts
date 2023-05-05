@@ -7,7 +7,7 @@ export { KmxFileReader } from './kmx/kmx-file-reader.js';
 export * as VisualKeyboard from './kvk/visual-keyboard.js';
 export { default as KMXPlusBuilder}  from './kmx/kmx-plus-builder/kmx-plus-builder.js';
 export { default as KvkFileReader } from './kvk/kvk-file-reader.js';
-export { default as KvksFileReader } from './kvk/kvks-file-reader.js';
+export { default as KvksFileReader, KVKSParseError } from './kvk/kvks-file-reader.js';
 export { default as KvkFileWriter } from './kvk/kvk-file-writer.js';
 export * as KvkFile from './kvk/kvk-file.js';
 export * as KvksFile from './kvk/kvk-file.js';

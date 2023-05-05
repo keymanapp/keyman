@@ -1,10 +1,13 @@
-import { KMX, CompilerCallbacks } from "@keymanapp/common-types";
+import { KVKSParseError, VisualKeyboard } from "@keymanapp/common-types";
+import { KMX, CompilerCallbacks, KvkFileReader, KvksFileReader } from "@keymanapp/common-types";
 import { ExpandSentinel, incxstr, xstrlen } from "../util/util.js";
 // import { KEY, KEYBOARD, KMX.KMXFile, STORE } from "../../../../../common/web/types/src/kmx/kmx.js";
 import { options, nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater } from "./compiler-globals.js";
 import CompilerOptions from "./compiler-options.js";
 import { JavaScript_ContextMatch, JavaScript_KeyAsString, JavaScript_Name, JavaScript_OutputString, JavaScript_Rules, JavaScript_Shift, JavaScript_ShiftAsString, JavaScript_Store, zeroPadHex } from './javascript-strings.js';
 import { CERR_InvalidBegin, CWARN_DontMixChiralAndNonChiralModifiers, ReportError } from "./messages.js";
+import { ValidateLayoutFile } from "./validate-layout-file.js";
+import { VisualKeyboardFromFile } from "./visual-keyboard-compiler.js";
 
 export let FFix183_LadderLength: number = 100; // TODO: option
 
@@ -12,7 +15,7 @@ function requote(s: string): string {
   return "'" + s.replaceAll(/(['\\])/, "\\$1") + "'";
 }
 
-function RequotedString(s: string, RequoteSingleQuotes: boolean = false): string {
+export function RequotedString(s: string, RequoteSingleQuotes: boolean = false): string {
   // TODO: use a JSON encode
   let i: number = 0;
   while(i < s.length) {
@@ -35,12 +38,12 @@ function RequotedString(s: string, RequoteSingleQuotes: boolean = false): string
   return s;
 }
 
-export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, name: string, keyboard: KMX.KEYBOARD, FDebug: boolean = false): string {
+export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: string, kmxfile: string, name: string, keyboard: KMX.KEYBOARD, FDebug: boolean = false): string {
   let opts: CompilerOptions = {
     addCompilerVersion: false,
     debug: FDebug
   };
-  setupGlobals(callbacks, opts, FDebug?'  ':'', FDebug?'\n':'', keyboard);
+  setupGlobals(callbacks, opts, FDebug?'  ':'', FDebug?'\r\n':'', keyboard);
 
   // let fgp: GROUP;
 
@@ -172,26 +175,17 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, name: string
   }
 
   if (sLayoutFile != '') {  // I3483
-    // TODO: Load sLayoutFile from file
-    /*try
-      with TStringList.Create do
-      try
-        LoadFromFile(ExtractFilePath(FInFile) + sLayoutFile, TEncoding.UTF8);
-        sLayoutFile := Text;
-        if not ValidateLayoutFile(sLayoutFile, sVKDictionary) then   // I4060
-        begin
-          sLayoutFile := '';
-        end;
-      finally
-        Free;
-      end;
-    except
-      on E:EFOpenError do   // I3683
-      begin
-        ReportError(0, CWARN_TouchLayoutFileMissing, E.Message);   // I4061
-        sLayoutFile := '';
-      end;
-    end;*/
+    let path = callbacks.resolveFilename(kmnfile, sLayoutFile);
+
+    let result = ValidateLayoutFile(keyboard, options.debug, path, sVKDictionary);
+    if(!result.result) {
+      sLayoutFile = '';
+      // TODO: error
+      // ReportError(0, CWARN_TouchLayoutFileInvalid, 'Touch layout file is not valid');
+    } else {
+      // TODO: reusing the same variable here is ugly
+      sLayoutFile = result.output;
+    }
   }
 
   // Default to hide underlying layout characters. This is overridden by touch
@@ -200,22 +194,34 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, name: string
   let fDisplayUnderlying = false;
 
   if (sVisualKeyboard != '') {
-    //TODO: Load sVisualKeyboard from file
-    /*
-    try
-      // The Keyman .kmx compiler will change the value of this store from a
-      // .kvks to a .kvk during the build. Earlier in the build, the visual keyboard
-      // would have been compiled, so we need to account for that and use that file.
+    // TODO: stop reusing sVisualKeyboard for both filename and content
+    let path = callbacks.resolveFilename(kmnfile, sVisualKeyboard);
 
-      sVisualKeyboard := VisualKeyboardFromFile(ExtractFilePath(FOutFile) + sVisualKeyboard, fDisplayUnderlying);
-    except
-      on E:EFOpenError do   // I3947
-      begin
-        ReportError(0, CWARN_VisualKeyboardFileMissing, E.Message);   // I4061
-        sVisualKeyboard := 'null';
-      end;
-    end;
-    */
+    let kvk: VisualKeyboard.VisualKeyboard;
+    if(path.match(/\.kvks$/i)) {
+      let reader = new KvksFileReader();
+      let source = reader.read(callbacks.loadFile(path));
+      reader.validate(source, callbacks.loadSchema("kvks")); // TODO: handle exceptions
+      let errors: KVKSParseError[];
+      kvk = reader.transform(source, errors);
+      // TODO: log errors
+    }
+    else {
+      // Note: very old keyboard sources may still have .kvk as an xml
+      // file, but we'll treat that as an error rather than silently
+      // falling back to KvksFileReader
+      let reader = new KvkFileReader();
+      kvk = reader.read(callbacks.loadFile(path));
+    }
+
+    let result = VisualKeyboardFromFile(kvk, options.debug);
+    if(!result.result) {
+      // TODO: error
+      sVisualKeyboard = 'null';
+    }
+    else {
+      sVisualKeyboard = result.result;
+    }
   }
   else {
     sVisualKeyboard = 'null';
@@ -236,7 +242,7 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, name: string
     // Following line caches the Keyman major version
     `${FTabStop}this._v=(typeof keyman!="undefined"&&typeof keyman.version=="string")?parseInt(keyman.version,10):9;${nl}` +
     `${FTabStop}this.KI="${sName}";${nl}` +
-    `${FTabStop}this.KN="${RequotedString(sFullName)}";${nl}`, nl,
+    `${FTabStop}this.KN="${RequotedString(sFullName)}";${nl}` +
     `${FTabStop}this.KMINVER="${(keyboard.fileVersion & KMX.KMXFile.VERSION_MASK_MAJOR) >> 8}.${keyboard.fileVersion & KMX.KMXFile.VERSION_MASK_MINOR}";${nl}` +
     `${FTabStop}this.KV=${sVisualKeyboard};${nl}` +
     `${FTabStop}this.KDU=${fDisplayUnderlying?'1':'0'};${nl}` +
