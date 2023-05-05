@@ -8,12 +8,16 @@
     { "path": "./core/include/ldml/tsconfig.json" },
 
     //{ "path": "./developer/src/kmc/test/tsconfig.json" },
+    { "path": "./developer/src/common/web/test-helpers/tsconfig.json" },
+
     { "path": "./developer/src/kmc/tsconfig.json" },
 
     { "path": "./developer/src/kmc-keyboard/test/tsconfig.json" },
     { "path": "./developer/src/kmc-keyboard/tsconfig.json" },
     { "path": "./developer/src/kmc-kmn/test/tsconfig.json" },
     { "path": "./developer/src/kmc-kmn/tsconfig.json" },
+    { "path": "./developer/src/kmc-kmw/test/tsconfig.json" },
+    { "path": "./developer/src/kmc-kmw/tsconfig.json" },
     { "path": "./developer/src/kmc-model/test/tsconfig.json" },
     { "path": "./developer/src/kmc-model/tsconfig.json" },
     //{ "path": "./developer/src/kmc-model-info/test/tsconfig.json" },
