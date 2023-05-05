@@ -336,7 +336,7 @@ extension KeymanWebViewController {
   }
 
   func deregisterLexicalModel(_ lexicalModel: InstallableLexicalModel) {
-    webView!.evaluateJavaScript("keyman.modelManager.deregister(\"\(lexicalModel.id)\")")
+    webView!.evaluateJavaScript("keyman.removeModel(\"\(lexicalModel.id)\")")
   }
 
   func registerLexicalModel(_ lexicalModel: InstallableLexicalModel) throws {
