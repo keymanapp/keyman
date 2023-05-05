@@ -257,12 +257,20 @@ For each transform in the subtable:
 
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|
-| 0+|  32  | from    | elem: combination of characters          |
-| 4+|  32  | to      | str: output text                         |
+| 0+|  32  | from    | str: processed regex of from= side       |
+| 4+|  32  | to      | str: output pattern                      |
+| 8+|  32  | mapFrom | elem: If not 0, elem of set var for $1   |
+| 8+|  32  | mapTo   | elem: If not 0, elem of set var for $1   |
 
 - `from`: the source text, index into `elem` section.
 - `to`: sequence of Unicode codepoints that replace `from`. May be the null
   string for `bksp` entries.
+- `mapFrom` and `mapTo` work as a pair. If present, implementation must:
+  - use `from` as the regex to match against
+  - search `mapFrom` for the value of captured group 1 ($1)
+  - replace the entire matched `from` regex with the same indexed value in `mapTo`
+  - `to` will be null in this case
+  - Debugging note: The variables table can be searched for matching `elem` pointers.
 
 ### C7043.2.11.2 `tran.reorders` subtable
 
@@ -540,6 +548,31 @@ representing a 0-length string.
 These indices are a pool of indexes into the string table.
 The strings order are significant.  There is not a 'null' string at the end of each list.
 
+### C7043.2.17 `vars`—Variables
+
+| ∆ | Bits | Name          | Description                              |
+|---|------|---------------|------------------------------------------|
+| 0 |  32  | ident         | `vars`                                   |
+| 4 |  32  | size          | int: Length of section                   |
+| 8 |  32  | markers       | list: Index to marker list, or 0         |
+|12 |  32  | varCount      | int: Total number of variable elements   |
+| - | var  | varEntries    | variables sub-table                      |
+
+#### C7043.2.17.1 `vars.varEntries` subtable
+
+For each variable,
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+| 0+|  32  | type    | int: Type of variable                    |
+| 4+|  32  | id      | str: Variable's id                       |
+| 8+|  32  | value   | str: Value in string form                |
+|12+|  32  | elem    | elem: Set as array                       |
+
+- `type` is per below:
+  -  0 : string
+  -  1 : set
+  -  2 : unicodeSet
+
 ## TODO-LDML: various things that need to be completed here or fixed in-spec
-> * UnicodeSets
 > * spec: ABNT2 key has hex value 0xC1 (even if kbdus.dll doesn't produce that)
