@@ -1042,11 +1042,20 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
         pp2[4] = 0;
       }
 
-      delete[] sp->dpString;
-      sp->dpString = q;
+      if(CompileTarget == CKF_KEYMAN) {
+        // When we compile to kmx, we want to save this info into
+        // the .kmx, but for KMW, we need the original source file
+        // for the KMW compiler process
+        delete[] sp->dpString;
+        sp->dpString = q;
+      }
 
-      if ((msg = CheckFilenameConsistency( (sp->dpString), FALSE)) != CERR_None) {
+      if ((msg = CheckFilenameConsistency(q, FALSE)) != CERR_None) {
         return msg;
+      }
+
+      if(CompileTarget == CKF_KEYMANWEB) {
+        delete[] q;
       }
     }
     break;

@@ -31,13 +31,15 @@ export interface CompilerOptions {
   saveDebug?: boolean;
   compilerWarningsAsErrors?: boolean;
 	warnDeprecatedCode?: boolean;
+  target?: 'kmx' | 'js';
 };
 
 const baseOptions: CompilerOptions = {
   shouldAddCompilerVersion: true,
   saveDebug: true,
   compilerWarningsAsErrors: false,
-  warnDeprecatedCode: true
+  warnDeprecatedCode: true,
+  target: 'kmx'
 };
 
 /**
@@ -63,7 +65,7 @@ export class Compiler {
     if(!this.wasmModule) {
       this.wasmModule = await loadWasmHost();
       this.compileKeyboardFile = this.wasmModule.cwrap('kmcmp_Wasm_CompileKeyboardFile', 'boolean', ['string', 'string',
-        'number', 'number', 'number', 'string']);
+        'number', 'number', 'number', 'string', 'number']);
       this.setCompilerOptions = this.wasmModule.cwrap('kmcmp_Wasm_SetCompilerOptions', 'boolean', ['number']);
     }
     return this.compileKeyboardFile !== undefined && this.setCompilerOptions !== undefined;
@@ -91,6 +93,9 @@ export class Compiler {
   }
 
   private runCompiler(infile: string, outfile: string, options: CompilerOptions): boolean {
+    const CKF_KEYMAN = 0;
+    const CKF_KEYMANWEB = 1;
+
     try {
       if(!this.setCompilerOptions(options.shouldAddCompilerVersion)) {
         this.callbacks.reportMessage(CompilerMessages.Fatal_UnableToSetCompilerOptions());
@@ -101,7 +106,8 @@ export class Compiler {
         options.saveDebug ? 1 : 0,
         options.compilerWarningsAsErrors ? 1 : 0,
         options.warnDeprecatedCode ? 1 : 0,
-        this.callbackName);
+        this.callbackName,
+        options.target == 'js' ? CKF_KEYMANWEB : CKF_KEYMAN);
     } catch(e) {
       this.callbacks.reportMessage(CompilerMessages.Fatal_UnexpectedException({e:e}));
       return false;

@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@keymanapp/common-types": "*",
+    "@keymanapp/kmc-kmn": "*",
     "ajv": "^8.11.0",
     "restructure": "git+https://github.com/keymanapp/dependency-restructure.git#49d129cf0916d082a7278bb09296fb89cecfcc50",
     "semver": "^7.3.7",
@@ -40,8 +41,7 @@
     "chalk": "^2.4.2",
     "mocha": "^8.4.0",
     "ts-node": "^9.1.1",
-    "typescript": "^4.9.5",
-    "@keymanapp/kmc-kmn": "*"
+    "typescript": "^4.9.5"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",

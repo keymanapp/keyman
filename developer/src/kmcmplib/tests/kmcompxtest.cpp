@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
     return __LINE__;
   }
 
-  if(kmcmp_CompileKeyboardFile(kmn_file, kmx_file, true, false, true, msgproc, nullptr)) {
+  if(kmcmp_CompileKeyboardFile(kmn_file, kmx_file, true, false, true, msgproc, nullptr, CKF_KEYMAN)) {
     char* testname = strrchr( (char*) kmn_file, '/') + 1;
     if(strncmp(testname, pfirst5, 5) == 0){
       return __LINE__;  // exit code: CERR_ in Name + no Error found

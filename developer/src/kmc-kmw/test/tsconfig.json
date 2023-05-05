@@ -14,7 +14,8 @@
       },
     },
   "include": [
-      "**/test-*.ts"
+      "**/test-*.ts",
+      "util.ts"
   ],
   "references": [
       { "path": "../../../../common/web/types/" },

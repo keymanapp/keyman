@@ -53,7 +53,7 @@ EXTERN bool kmcmp_Wasm_SetCompilerOptions(int ShouldAddCompilerVersion) {
 
 EXTERN bool kmcmp_Wasm_CompileKeyboardFile(char* pszInfile,
   char* pszOutfile, int ASaveDebug, int ACompilerWarningsAsErrors,
-	int AWarnDeprecatedCode, char* msgProc
+	int AWarnDeprecatedCode, char* msgProc, int target
 ) {
   return kmcmp_CompileKeyboardFile(
     pszInfile,
@@ -62,14 +62,15 @@ EXTERN bool kmcmp_Wasm_CompileKeyboardFile(char* pszInfile,
     ACompilerWarningsAsErrors,
     AWarnDeprecatedCode,
     wasm_CompilerMessageProc,
-    msgProc
+    msgProc,
+    target
   );
 }
 #endif
 
 EXTERN bool kmcmp_CompileKeyboardFile(char* pszInfile,
   char* pszOutfile, bool ASaveDebug, bool ACompilerWarningsAsErrors,
-	bool AWarnDeprecatedCode, kmcmp_CompilerMessageProc pMsgproc, void* AmsgprocContext
+	bool AWarnDeprecatedCode, kmcmp_CompilerMessageProc pMsgproc, void* AmsgprocContext, int Target
 ) {
   FILE* fp_in = NULL;
   FILE* fp_out = NULL;
@@ -81,7 +82,7 @@ EXTERN bool kmcmp_CompileKeyboardFile(char* pszInfile,
   kmcmp::FCompilerWarningsAsErrors = ACompilerWarningsAsErrors;   // I4865
   AWarnDeprecatedCode_GLOBAL_LIB = AWarnDeprecatedCode;
 
-  kmcmp::CompileTarget = CKF_KEYMAN;
+  kmcmp::CompileTarget = Target;
 
   if (!pMsgproc || !pszInfile || !pszOutfile) SetError(CERR_BadCallParams);
 

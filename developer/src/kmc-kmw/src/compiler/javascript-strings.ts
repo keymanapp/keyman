@@ -324,7 +324,7 @@ export function JavaScript_ShiftAsString(fkp: KMX.KEY, FMnemonic: boolean): stri
   return ' '+FormatModifierAsBitflags(JavaScript_Shift(fkp, FMnemonic));
 }
 
-const VKeyNames = [ // from vkeys.h
+export const VKeyNames = [ // from vkeys.h
 // Key Codes
 "K_?00",				// &H0
 "K_LBUTTON",			// &H1
@@ -671,7 +671,7 @@ function FormatKeyForErrorMessage(fkp: KMX.KEY, FMnemonic: boolean): string {
   return result;
 }
 
-function JavaScript_Key(fkp: KMX.KEY, FMnemonic: boolean): number {
+export function JavaScript_Key(fkp: KMX.KEY, FMnemonic: boolean): number {
   let Result: number;
   if(!FMnemonic) {
     if(fkp.ShiftFlags & KMX.KMXFile.ISVIRTUALKEY) {

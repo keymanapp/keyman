@@ -5,21 +5,18 @@
     "outDir": "build/src/",
     "rootDir": "src/",
     "baseUrl": ".",
-    "allowSyntheticDefaultImports": true, // for ajv
-
     "paths": {
-      // "@keymanapp/keyman-version": ["../../../common/web/keyman-version/keyman-version.mts"],
       "@keymanapp/common-types": ["../../../common/web/types/src/main"],
-      // "@keymanapp/": ["core/include/ldml/ldml-keyboard-constants"],
+      "@keymanapp/kmc-kmn": ["../kmc-kmn/src/main"],
     },
 
   },
   "include": [
     "src/**/*.ts"
-, "src/compiler/__keymanweb-compiler.ts.tmp"  ],
+  ],
   "references": [
-    // { "path": "../../../common/web/keyman-version/tsconfig.esm.json" },
     { "path": "../../../common/web/types/" },
+    { "path": "../kmc-kmn/" },
     { "path": "../../../core/include/ldml/"},
   ]
 }

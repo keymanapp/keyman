@@ -9,14 +9,13 @@ import * as r from 'restructure';
 
 export class KEYBOARD {
   fileVersion?: number;  // dwFileVersion (TSS_FILEVERSION)
-  keyboardVersion?: string;  // version (TSS_KEYBOARDVERSION)
 
   startGroup: {
-    ansi: number;
-    unicode: number;
-    newContext: number;   // TSS_BEGIN_NEWCONTEXT
-    postKeystroke: number;  // TSS_BEGIN_POSTKEYSTROKE
-  } = {ansi:0xFFFFFFFF, unicode:0xFFFFFFFF, newContext:0xFFFFFFFF, postKeystroke:0xFFFFFFFF};
+    ansi: number;           // from COMP_KEYBOARD
+    unicode: number;        // from COMP_KEYBOARD
+    newContext: number;     // from TSS_BEGIN_NEWCONTEXT store
+    postKeystroke: number;  // from TSS_BEGIN_POSTKEYSTROKE store
+  } = {ansi:-1, unicode:-1, newContext:-1, postKeystroke:-1};
 
   flags?: number;
   hotkey?: number;
@@ -24,6 +23,13 @@ export class KEYBOARD {
   //bitmap:
   groups: GROUP[] = [];
   stores: STORE[] = [];
+
+  // Following values are extracted from stores[] but are
+  // informative only
+
+  keyboardVersion?: string;  // version (TSS_KEYBOARDVERSION)
+  isMnemonic: boolean;        // TSS_MNEMONICLAYOUT store
+
 };
 
 export class STORE {
