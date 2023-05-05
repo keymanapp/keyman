@@ -214,6 +214,11 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     // TODO:  relocate default keyboard behavior here once we can also move core error handling for
     // unfound stubs here.
 
+    // If there was a previous activation attempt set and still active for the specified keyboard target,
+    // cancel it.  For exmaple, if the user selects a preloaded keyboard after having tried to select one
+    // still async-loading, we should go with the later setting - the preloaded one.
+    this.findAndPopActivation(this.keyboardTarget);
+
     const activatingKeyboard = this.prepareKeyboardForActivation(keyboardId, languageCode);
 
     const originalKeyboardTarget = this.keyboardTarget;

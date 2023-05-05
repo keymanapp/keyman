@@ -457,7 +457,8 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     if(attachment.keyboard != null) {
       this.activateKeyboard(attachment.keyboard, attachment.languageCode, true);
-    } else if(!blockGlobalChange) {
+    } else if(!blockGlobalChange && (global?.metadata != this._activeKeyboard?.metadata)) {
+      // TODO:  can we drop `!blockGlobalChange` in favor of the latter check?
       this.activateKeyboard(global?.metadata.id, global?.metadata.langId, true);
     }
   }

@@ -97,6 +97,27 @@ async function blockConsoleAndAwait(asyncClosure) {
   }
 }
 
+async function withDelayedFetching(keyboardLoader, time, closure) {
+  time || 0;
+  if(time < 0) {
+    time = 0;
+  }
+
+  const originalLoad = keyboardLoader.loadKeyboardInternal;
+
+  const fetchIntercept = async (...args) => {
+    const retVal = originalLoad.call(keyboardLoader, ...args);
+    keyboardLoader.loadKeyboardInternal = originalLoad;
+
+    await timedPromise(time);
+
+    return retVal;
+  }
+
+  keyboardLoader.loadKeyboardInternal = fetchIntercept;
+  await closure();
+}
+
 describe.only('app/browser:  ContextManager', function () {
   this.timeout(__karma__.config.args.find((arg) => arg.type == "timeouts").standard);
 
@@ -110,6 +131,12 @@ describe.only('app/browser:  ContextManager', function () {
    * current test's `contextManager`.
    */
   let keyboardCache;
+
+  /**
+   * Holds the test-specific instance of the keyboard loader used by the current
+   * test's `keyboardCache`.
+   */
+  let keyboardLoader;
 
   let originalConsole;
 
@@ -150,7 +177,7 @@ describe.only('app/browser:  ContextManager', function () {
     }, () => new LegacyEventEmitter());
 
     // Needed for the keyboard tests later.
-    const keyboardLoader = new DOMKeyboardLoader(new KeyboardHarness(window, MinimalKeymanGlobal));
+    keyboardLoader = new DOMKeyboardLoader(new KeyboardHarness(window, MinimalKeymanGlobal));
     keyboardCache = new StubAndKeyboardCache(keyboardLoader);
 
     contextManager.configure({
@@ -374,6 +401,8 @@ describe.only('app/browser:  ContextManager', function () {
     });
   });
 
+
+
   // ------------------------- Second suite: keyboard-related tests --------------------------
   describe('keyboard management', () => {
     let apiStubs;
@@ -413,182 +442,312 @@ describe.only('app/browser:  ContextManager', function () {
       assert.isNotOk(contextManager.keyboardTarget);
     });
 
-    it('activate: without .activeTarget, null -> null (desktop)', async () => {
-      const beforekeyboardchange = sinon.fake();
-      const keyboardchange = sinon.fake();
-      const keyboardasyncload = sinon.fake();
-      contextManager.on('beforekeyboardchange', beforekeyboardchange);
-      contextManager.on('keyboardchange', keyboardchange);
-      contextManager.on('keyboardasyncload', keyboardasyncload);
+    describe('global-keyboard mode only' , () => {
+      it('activate: without .activeTarget, null -> null (desktop)', async () => {
+        const beforekeyboardchange = sinon.fake();
+        const keyboardchange = sinon.fake();
+        const keyboardasyncload = sinon.fake();
+        contextManager.on('beforekeyboardchange', beforekeyboardchange);
+        contextManager.on('keyboardchange', keyboardchange);
+        contextManager.on('keyboardasyncload', keyboardasyncload);
 
-      await contextManager.activateKeyboard('', '');
-      // When no keyboard is set, the keyboard-metadata pair object itself should be null.
-      assert.equal(contextManager.activeKeyboard, null);
-      // Even though it's to effectively the same keyboard, we reload it (in case its stub
-      // has been replaced)
-      assert.isTrue(beforekeyboardchange.calledOnce);
-      assert.isTrue(keyboardchange.calledOnce);
-      assert.isTrue(keyboardasyncload.notCalled);
-      assert.equal(keyboardchange.firstCall.args[0], null);
-    });
+        await contextManager.activateKeyboard('', '');
+        // When no keyboard is set, the keyboard-metadata pair object itself should be null.
+        assert.equal(contextManager.activeKeyboard, null);
+        // Even though it's to effectively the same keyboard, we reload it (in case its stub
+        // has been replaced)
+        assert.isTrue(beforekeyboardchange.calledOnce);
+        assert.isTrue(keyboardchange.calledOnce);
+        assert.isTrue(keyboardasyncload.notCalled);
+        assert.equal(keyboardchange.firstCall.args[0], null);
+      });
 
-    it('activate: without .activeTarget, null -> null (touch)', async () => {
-      const beforekeyboardchange = sinon.fake();
-      const keyboardchange = sinon.fake();
-      const keyboardasyncload = sinon.fake();
-      contextManager.on('beforekeyboardchange', beforekeyboardchange);
-      contextManager.on('keyboardchange', keyboardchange);
-      contextManager.on('keyboardasyncload', keyboardasyncload);
+      it('activate: without .activeTarget, null -> null (touch)', async () => {
+        const beforekeyboardchange = sinon.fake();
+        const keyboardchange = sinon.fake();
+        const keyboardasyncload = sinon.fake();
+        contextManager.on('beforekeyboardchange', beforekeyboardchange);
+        contextManager.on('keyboardchange', keyboardchange);
+        contextManager.on('keyboardasyncload', keyboardasyncload);
 
-      // Hacky override - activate touch mode.
-      contextManager.engineConfig.hostDevice.touchable = true;
+        // Hacky override - activate touch mode.
+        contextManager.engineConfig.hostDevice.touchable = true;
 
-      await contextManager.activateKeyboard('', '');
-      // When no keyboard is set, the keyboard-metadata pair object itself should be null.
-      assert.equal(contextManager.activeKeyboard?.metadata?.id, 'khmer_angkor');
+        await contextManager.activateKeyboard('', '');
+        // When no keyboard is set, the keyboard-metadata pair object itself should be null.
+        assert.equal(contextManager.activeKeyboard?.metadata?.id, 'khmer_angkor');
 
-      assert.isTrue(beforekeyboardchange.calledTwice); // khmer_angkor is dynamically loaded.
-      assert.isTrue(keyboardchange.calledOnce);
-      assert.isTrue(keyboardasyncload.calledOnce); // Again, dynamically loaded.
-      assert.equal(keyboardchange.firstCall.args[0].metadata.id, 'khmer_angkor');
-    });
+        assert.isTrue(beforekeyboardchange.calledTwice); // khmer_angkor is dynamically loaded.
+        assert.isTrue(keyboardchange.calledOnce);
+        assert.isTrue(keyboardasyncload.calledOnce); // Again, dynamically loaded.
+        assert.equal(keyboardchange.firstCall.args[0].metadata.id, 'khmer_angkor');
+      });
 
-    it('activate: without .activeTarget, preloaded keyboard', async () => {
-      const beforekeyboardchange = sinon.fake();
-      const keyboardchange = sinon.fake();
-      const keyboardasyncload = sinon.fake();
-      contextManager.on('beforekeyboardchange', beforekeyboardchange);
-      contextManager.on('keyboardchange', keyboardchange);
-      contextManager.on('keyboardasyncload', keyboardasyncload);
+      it('activate: without .activeTarget, preloaded keyboard', async () => {
+        const beforekeyboardchange = sinon.fake();
+        const keyboardchange = sinon.fake();
+        const keyboardasyncload = sinon.fake();
+        contextManager.on('beforekeyboardchange', beforekeyboardchange);
+        contextManager.on('keyboardchange', keyboardchange);
+        contextManager.on('keyboardasyncload', keyboardasyncload);
 
-      keyboardCache.addKeyboard(KEYBOARDS.khmer_angkor.keyboard);
+        keyboardCache.addKeyboard(KEYBOARDS.khmer_angkor.keyboard);
 
-      await contextManager.activateKeyboard('khmer_angkor', 'km');
-      // The instance itself may differ, but the .keyboard and .metadata entries will
-      // be matching instances thanks to preloading.
-      assert.deepEqual(contextManager.activeKeyboard, KEYBOARDS.khmer_angkor);
+        await contextManager.activateKeyboard('khmer_angkor', 'km');
+        // The instance itself may differ, but the .keyboard and .metadata entries will
+        // be matching instances thanks to preloading.
+        assert.deepEqual(contextManager.activeKeyboard, KEYBOARDS.khmer_angkor);
 
-      assert.isTrue(beforekeyboardchange.calledOnce);
-      assert.isTrue(keyboardchange.calledOnce);
-      assert.isTrue(keyboardasyncload.notCalled);
-      assert.deepEqual(keyboardchange.firstCall.args[0], KEYBOARDS.khmer_angkor);
-      assert.strictEqual(keyboardchange.firstCall.args[0], contextManager.activeKeyboard);
-    });
+        assert.isTrue(beforekeyboardchange.calledOnce);
+        assert.isTrue(keyboardchange.calledOnce);
+        assert.isTrue(keyboardasyncload.notCalled);
+        assert.deepEqual(keyboardchange.firstCall.args[0], KEYBOARDS.khmer_angkor);
+        assert.strictEqual(keyboardchange.firstCall.args[0], contextManager.activeKeyboard);
+      });
 
-    it('activate: without .activeTarget, loads keyboard', async () => {
-      const beforekeyboardchange = sinon.fake();
-      const keyboardchange = sinon.fake();
-      const keyboardasyncload = sinon.fake();
-      contextManager.on('beforekeyboardchange', beforekeyboardchange);
-      contextManager.on('keyboardasyncload', keyboardasyncload);
-      contextManager.on('keyboardchange', keyboardchange);
+      it('activate: without .activeTarget, loads keyboard', async () => {
+        const beforekeyboardchange = sinon.fake();
+        const keyboardchange = sinon.fake();
+        const keyboardasyncload = sinon.fake();
+        contextManager.on('beforekeyboardchange', beforekeyboardchange);
+        contextManager.on('keyboardasyncload', keyboardasyncload);
+        contextManager.on('keyboardchange', keyboardchange);
 
-      // No preloading - `contextManager` should be able to handle it so long as
-      // a matching stub already exists.
-      await contextManager.activateKeyboard('khmer_angkor', 'km');
+        // No preloading - `contextManager` should be able to handle it so long as
+        // a matching stub already exists.
+        await contextManager.activateKeyboard('khmer_angkor', 'km');
 
-      // The instance itself may differ, but the .keyboard and .metadata entries will
-      // be matching instances thanks to preloading.
-      assert.isTrue(beforekeyboardchange.calledTwice); // Matches pre-modularized KMW behavior.
-      assert.isTrue(keyboardchange.calledOnce);
-      assert.isTrue(keyboardasyncload.calledOnce);
-      assert.equal(contextManager.activeKeyboard.metadata.id, 'khmer_angkor');
-      assert.equal(contextManager.activeKeyboard.keyboard.id, prefixed('khmer_angkor'));
-      assert.equal(contextManager.activeKeyboard.metadata.langId, 'km');
+        // The instance itself may differ, but the .keyboard and .metadata entries will
+        // be matching instances thanks to preloading.
+        assert.isTrue(beforekeyboardchange.calledTwice); // Matches pre-modularized KMW behavior.
+        assert.isTrue(keyboardchange.calledOnce);
+        assert.isTrue(keyboardasyncload.calledOnce);
+        assert.equal(contextManager.activeKeyboard.metadata.id, 'khmer_angkor');
+        assert.equal(contextManager.activeKeyboard.keyboard.id, prefixed('khmer_angkor'));
+        assert.equal(contextManager.activeKeyboard.metadata.langId, 'km');
 
-      await assertPromiseResolved(keyboardasyncload.firstCall.args[1]);
-    });
+        await assertPromiseResolved(keyboardasyncload.firstCall.args[1]);
+      });
 
-    it('activate: without .activeTarget, missing definition (desktop)', async () => {
-      const beforekeyboardchange = sinon.fake();
-      const keyboardchange = sinon.fake();
-      const keyboardasyncload = sinon.fake();
-      contextManager.on('beforekeyboardchange', beforekeyboardchange);
-      contextManager.on('keyboardasyncload', keyboardasyncload);
-      contextManager.on('keyboardchange', keyboardchange);
+      it('activate: without .activeTarget, missing definition (desktop)', async () => {
+        const beforekeyboardchange = sinon.fake();
+        const keyboardchange = sinon.fake();
+        const keyboardasyncload = sinon.fake();
+        contextManager.on('beforekeyboardchange', beforekeyboardchange);
+        contextManager.on('keyboardasyncload', keyboardasyncload);
+        contextManager.on('keyboardchange', keyboardchange);
 
-      // Setup
-      keyboardCache.addKeyboard(KEYBOARDS.lao_2008_basic.keyboard);
-      await contextManager.activateKeyboard('lao_2008_basic', 'lo');
+        // Setup
+        keyboardCache.addKeyboard(KEYBOARDS.lao_2008_basic.keyboard);
+        await contextManager.activateKeyboard('lao_2008_basic', 'lo');
 
-      // Actual test
-      try {
-        await blockConsoleAndAwait(() => contextManager.activateKeyboard('not_defined', 'n/a'));
-        assert.fail();
-      } catch (err) {
-        // Good, an error surfaced.
-        // Could make assertions about the error?
-      }
+        // Actual test
+        try {
+          await blockConsoleAndAwait(() => contextManager.activateKeyboard('not_defined', 'n/a'));
+          assert.fail();
+        } catch (err) {
+          // Good, an error surfaced.
+          // Could make assertions about the error?
+        }
 
-      // Fallback behavior:  deactivate the keyboard entirely (if on desktop)
-      assert.equal(contextManager.activeKeyboard, null);
+        // Fallback behavior:  deactivate the keyboard entirely (if on desktop)
+        assert.equal(contextManager.activeKeyboard, null);
 
-      // The two requests - initial setup, then to the default keyboard.  No attempts
-      // are made for the erroneous keyboard because no matching stub could be found.
+        // The two requests - initial setup, then to the default keyboard.  No attempts
+        // are made for the erroneous keyboard because no matching stub could be found.
 
-      assert.isTrue(beforekeyboardchange.calledTwice); // Requested twice.
-      assert.isTrue(keyboardchange.calledTwice); // Actually does change the keyboard twice
-      assert.isTrue(keyboardasyncload.notCalled);
-    });
+        assert.isTrue(beforekeyboardchange.calledTwice); // Requested twice.
+        assert.isTrue(keyboardchange.calledTwice); // Actually does change the keyboard twice
+        assert.isTrue(keyboardasyncload.notCalled);
+      });
 
-    it('activate: without .activeTarget, missing definition (touch)', async () => {
-      const beforekeyboardchange = sinon.fake();
-      const keyboardchange = sinon.fake();
-      const keyboardasyncload = sinon.fake();
-      contextManager.on('beforekeyboardchange', beforekeyboardchange);
-      contextManager.on('keyboardasyncload', keyboardasyncload);
-      contextManager.on('keyboardchange', keyboardchange);
+      it('activate: without .activeTarget, missing definition (touch)', async () => {
+        const beforekeyboardchange = sinon.fake();
+        const keyboardchange = sinon.fake();
+        const keyboardasyncload = sinon.fake();
+        contextManager.on('beforekeyboardchange', beforekeyboardchange);
+        contextManager.on('keyboardasyncload', keyboardasyncload);
+        contextManager.on('keyboardchange', keyboardchange);
 
-      // Hacky override - activate touch mode.
-      contextManager.engineConfig.hostDevice.touchable = true;
+        // Hacky override - activate touch mode.
+        contextManager.engineConfig.hostDevice.touchable = true;
 
-      // Setup
-      keyboardCache.addKeyboard(KEYBOARDS.lao_2008_basic.keyboard);
-      await contextManager.activateKeyboard('lao_2008_basic', 'lo');
+        // Setup
+        keyboardCache.addKeyboard(KEYBOARDS.lao_2008_basic.keyboard);
+        await contextManager.activateKeyboard('lao_2008_basic', 'lo');
 
-      // Actual test
-      try {
-        await blockConsoleAndAwait(() => contextManager.activateKeyboard('not_defined', 'n/a'));
-        assert.fail();
-      } catch (err) {
-        // Good, an error surfaced.
-        // Could make assertions about the error?
-      }
+        // Actual test
+        try {
+          await blockConsoleAndAwait(() => contextManager.activateKeyboard('not_defined', 'n/a'));
+          assert.fail();
+        } catch (err) {
+          // Good, an error surfaced.
+          // Could make assertions about the error?
+        }
 
-      // Fallback behavior:  activate the first registered stub (if on touch)
-      assert.equal(contextManager.activeKeyboard?.metadata.id, 'khmer_angkor');
+        // Fallback behavior:  activate the first registered stub (if on touch)
+        assert.equal(contextManager.activeKeyboard?.metadata.id, 'khmer_angkor');
 
-      // The two requests - initial setup, then to the default keyboard.  No attempts
-      // are made for the erroneous keyboard because no matching stub could be found.
+        // The two requests - initial setup, then to the default keyboard.  No attempts
+        // are made for the erroneous keyboard because no matching stub could be found.
 
-      assert.isTrue(beforekeyboardchange.calledThrice); // Requested three times - the latter two for `khmer_angkor` b/c async.
-      assert.isTrue(keyboardchange.calledTwice); // Actually does change the keyboard twice
-      assert.isTrue(keyboardasyncload.calledOnce);
-    });
+        assert.isTrue(beforekeyboardchange.calledThrice); // Requested three times - the latter two for `khmer_angkor` b/c async.
+        assert.isTrue(keyboardchange.calledTwice); // Actually does change the keyboard twice
+        assert.isTrue(keyboardasyncload.calledOnce);
+      });
 
-    it('reactivate: re-requests the already-active keyboard', async () => {
-      const beforekeyboardchange = sinon.fake();
-      const keyboardchange = sinon.fake();
-      const keyboardasyncload = sinon.fake();
-      contextManager.on('beforekeyboardchange', beforekeyboardchange);
-      contextManager.on('keyboardasyncload', keyboardasyncload);
-      contextManager.on('keyboardchange', keyboardchange);
+      it('reactivate: re-requests the already-active keyboard', async () => {
+        const beforekeyboardchange = sinon.fake();
+        const keyboardchange = sinon.fake();
+        const keyboardasyncload = sinon.fake();
+        contextManager.on('beforekeyboardchange', beforekeyboardchange);
+        contextManager.on('keyboardasyncload', keyboardasyncload);
+        contextManager.on('keyboardchange', keyboardchange);
 
-      // Setup
-      keyboardCache.addKeyboard(KEYBOARDS.lao_2008_basic.keyboard);
-      await contextManager.activateKeyboard('lao_2008_basic', 'lo');
+        // Setup
+        keyboardCache.addKeyboard(KEYBOARDS.lao_2008_basic.keyboard);
+        await contextManager.activateKeyboard('lao_2008_basic', 'lo');
 
-      // Actual test
-      await contextManager.activateKeyboard('lao_2008_basic', 'lo');
+        // Actual test
+        await contextManager.activateKeyboard('lao_2008_basic', 'lo');
 
-      assert.equal(contextManager.activeKeyboard.metadata.id, 'lao_2008_basic');
+        assert.equal(contextManager.activeKeyboard.metadata.id, 'lao_2008_basic');
 
-      // Even though it's to effectively the same keyboard, we reload it (in case its stub
-      // has been replaced)
-      assert.isTrue(beforekeyboardchange.calledTwice);
-      assert.isTrue(keyboardchange.calledTwice);
-      assert.isTrue(keyboardasyncload.notCalled);
-      assert.deepEqual(keyboardchange.secondCall.args[0], keyboardchange.firstCall.args[0]);
+        // Even though it's to effectively the same keyboard, we reload it (in case its stub
+        // has been replaced)
+        assert.isTrue(beforekeyboardchange.calledTwice);
+        assert.isTrue(keyboardchange.calledTwice);
+        assert.isTrue(keyboardasyncload.notCalled);
+        assert.deepEqual(keyboardchange.secondCall.args[0], keyboardchange.firstCall.args[0]);
+      });
+
+      it('focus gained during activation', async () => {
+        const beforekeyboardchange = sinon.fake();
+        const keyboardchange = sinon.fake();
+        const keyboardasyncload = sinon.fake();
+        contextManager.on('beforekeyboardchange', beforekeyboardchange);
+        contextManager.on('keyboardasyncload', keyboardasyncload);
+        contextManager.on('keyboardchange', keyboardchange);
+
+        const fetchPromise = contextManager.activateKeyboard('khmer_angkor', 'km');
+
+        // Before we sync up, we shift the active context target.
+        // Fortunately, this operation is synchronous... so no race conditions here.
+        //
+        // As there was no prior element to consider, this change of focus does not attempt
+        // to re-apply existing settings in the midst of the prior line's activation.
+        const input = document.getElementById('input');
+        dispatchFocus('focus', input);
+
+        await fetchPromise;
+
+        // The instance itself may differ, but the .keyboard and .metadata entries will
+        // be matching instances thanks to preloading.
+        assert.isTrue(beforekeyboardchange.calledTwice); // Matches pre-modularized KMW behavior.
+        assert.isTrue(keyboardchange.calledOnce);
+        assert.isTrue(keyboardasyncload.calledOnce);
+        assert.equal(contextManager.activeKeyboard.metadata.id, 'khmer_angkor');
+        assert.equal(contextManager.activeKeyboard.keyboard.id, prefixed('khmer_angkor'));
+        assert.equal(contextManager.activeKeyboard.metadata.langId, 'km');
+
+        await assertPromiseResolved(keyboardasyncload.firstCall.args[1]);
+      });
+
+      it('focus changed fully after keyboard activation', async () => {
+        // We activate a keyboard before proceeding.
+        await contextManager.activateKeyboard('khmer_angkor', 'km');
+
+        const textarea = document.getElementById('textarea');
+        dispatchFocus('focus', textarea);
+
+        const beforekeyboardchange = sinon.fake();
+        const keyboardchange = sinon.fake();
+        const keyboardasyncload = sinon.fake();
+        contextManager.on('beforekeyboardchange', beforekeyboardchange);
+        contextManager.on('keyboardasyncload', keyboardasyncload);
+        contextManager.on('keyboardchange', keyboardchange);
+
+        // Before we sync up, we shift the active context target.
+        // Fortunately, this operation is synchronous... so no race conditions here.
+        //
+        // Since a prior context was active, KMW will reapply the "current" (before
+        // activation) keyboard during the focus change (b/c _FocusKeyboardSettings).
+        const input = document.getElementById('input');
+        dispatchFocus('blur', textarea);
+        dispatchFocus('focus', input);
+
+        // Allows the _FocusKeyboardSettings trigger to resolve.
+        await timedPromise(25);
+
+        // No need to 'keyboardchange' when the same keyboard is kept active.
+        assert.isTrue(beforekeyboardchange.notCalled);
+        assert.isTrue(keyboardchange.notCalled);
+        assert.isTrue(keyboardasyncload.notCalled);
+      });
+
+      it('focus changed during activation', async () => {
+        const textarea = document.getElementById('textarea');
+        dispatchFocus('focus', textarea);
+
+        const beforekeyboardchange = sinon.fake();
+        const keyboardchange = sinon.fake();
+        const keyboardasyncload = sinon.fake();
+        contextManager.on('beforekeyboardchange', beforekeyboardchange);
+        contextManager.on('keyboardasyncload', keyboardasyncload);
+        contextManager.on('keyboardchange', keyboardchange);
+
+        // Adds a delay to the activate keyboard call, to help prevent race conditions below.
+        const fetchPromise = withDelayedFetching(keyboardLoader, 25, () => contextManager.activateKeyboard('khmer_angkor', 'km'));
+
+        /*
+         * There's a resolved-promise .then() before the `keyboardasyncload` event can fire;
+         * in the main engine, this is used to defer until the engine is initialized
+         * sufficiently enough to proceed.
+         */
+        await Promise.resolve();
+
+        assert.isTrue(beforekeyboardchange.calledOnce); // Matches pre-modularized KMW behavior.
+        assert.isTrue(keyboardchange.notCalled);
+        // Is triggered via Promise.then() - it's how the main engine ensures actual load
+        // attempts are deferred until after engine init.
+        assert.isTrue(keyboardasyncload.calledOnce);
+
+        // Before we sync up, we shift the active context target.
+        //
+        // Since a prior context was active, KMW will reapply the "current" (before
+        // activation) keyboard during the focus change (b/c _FocusKeyboardSettings).
+        // Which triggers a separate `activateKeyboard` call... which can fortunately
+        // resolve-near instantly.
+        //
+        // Therefore, we must prevent race conditions on resolution order...
+        // hence the `withDelayedFetching` method.
+        const input = document.getElementById('input');
+        dispatchFocus('blur', textarea);
+        dispatchFocus('focus', input);
+
+        await timedPromise(10);
+
+        // No need to 'keyboardchange' when the same keyboard is kept active.
+        assert.isTrue(beforekeyboardchange.calledOnce);
+        assert.isTrue(keyboardchange.notCalled);
+        // Is triggered via Promise.then() - it's how the main engine ensures actual load
+        // attempts are deferred until after engine init.
+        assert.isTrue(keyboardasyncload.calledOnce);
+
+        // And now we let all the async stuff resolve.
+        await fetchPromise;
+
+        // The instance itself may differ, but the .keyboard and .metadata entries will
+        // be matching instances thanks to preloading.
+        assert.isTrue(beforekeyboardchange.calledTwice); // +1:  after async load completed.
+        assert.isTrue(keyboardchange.calledOnce);        // +1:  after async load completed.
+        assert.isTrue(keyboardasyncload.calledOnce);
+        assert.equal(contextManager.activeKeyboard.metadata.id, 'khmer_angkor');
+        assert.equal(contextManager.activeKeyboard.keyboard.id, prefixed('khmer_angkor'));
+        assert.equal(contextManager.activeKeyboard.metadata.langId, 'km');
+
+        await assertPromiseResolved(keyboardasyncload.firstCall.args[1]);
+      });
     });
   });
 });
