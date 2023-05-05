@@ -325,6 +325,10 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     let attachment = target.getElement()._kmwAttachment;
 
+    // Catches if the target is already in independent-mode, even if it's being cancelled
+    // during this call.
+    const wasPriorTarget = this.keyboardTarget == target;
+
     if(!attachment) {
       return;
     } else {
@@ -332,8 +336,16 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       attachment.keyboard = kbdId || null;
       attachment.languageCode = langId || null;
 
-      if(this.keyboardTarget == target) {
-        this.activateKeyboard(attachment.keyboard, attachment.languageCode, true);
+      // If it has just entered independent-keyboard mode, we need the second check.
+      if(wasPriorTarget || this.keyboardTarget == target) {
+        const globalKbd = this.globalKeyboard.metadata;
+
+        // The `||` bits below - in case we're cancelling independent-keyboard mode.
+        this.activateKeyboard(
+          attachment.keyboard || globalKbd.id,
+          attachment.languageCode || globalKbd.langId,
+          true
+        );
       }
     }
   }
@@ -378,7 +390,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       if(originalKeyboardTarget == this.keyboardTarget) {
         _SetTargDir(this.currentTarget?.getElement(), this.keyboardCache.getKeyboard(keyboardId));
         // util.addStyleSheet(domManager.setAttachmentFontStyle(kbdStub.KF));
-        this.focusAssistant.restoringFocus = true;
+        this.restoreLastActiveTarget();
       }
 
       return result;

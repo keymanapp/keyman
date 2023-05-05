@@ -1,4 +1,8 @@
 import { ContextManager } from '/@keymanapp/keyman/build/app/browser/lib/index.mjs';
+import {
+  eventOutputTarget,
+  outputTargetForElement
+} from '/@keymanapp/keyman/build/engine/attachment/lib/index.mjs';
 import { LegacyEventEmitter } from '/@keymanapp/keyman/build/engine/events/lib/index.mjs';
 import { StubAndKeyboardCache, toPrefixedKeyboardId as prefixed } from '/@keymanapp/keyman/build/engine/package-cache/lib/index.mjs';
 
@@ -655,6 +659,7 @@ describe.only('app/browser:  ContextManager', function () {
 
       it('focus changed fully after keyboard activation', async () => {
         // We activate a keyboard before proceeding.
+        keyboardCache.addKeyboard(KEYBOARDS.khmer_angkor.keyboard);
         await contextManager.activateKeyboard('khmer_angkor', 'km');
 
         const textarea = document.getElementById('textarea');
@@ -748,6 +753,250 @@ describe.only('app/browser:  ContextManager', function () {
 
         await assertPromiseResolved(keyboardasyncload.firstCall.args[1]);
       });
+    });
+
+    describe('independent-keyboard mode', () => {
+      //const  =
+
+      it('mode activation', async () => {
+        keyboardCache.addKeyboard(KEYBOARDS.khmer_angkor.keyboard);
+        keyboardCache.addKeyboard(KEYBOARDS.lao_2008_basic.keyboard);
+
+        // We activate a keyboard before proceeding.
+        await contextManager.activateKeyboard('khmer_angkor', 'km');
+
+        const beforekeyboardchange = sinon.fake();
+        const keyboardchange = sinon.fake();
+        const keyboardasyncload = sinon.fake();
+        contextManager.on('beforekeyboardchange', beforekeyboardchange);
+        contextManager.on('keyboardasyncload', keyboardasyncload);
+        contextManager.on('keyboardchange', keyboardchange);
+
+        const textarea = document.getElementById('textarea');
+        const target = outputTargetForElement(textarea);
+        contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
+
+        // As we haven't yet focused the affected target, no keyboard-change events should have triggered yet.
+        assert.equal(contextManager.keyboardTarget, null);
+        assert.isTrue(beforekeyboardchange.notCalled);
+        assert.isTrue(keyboardchange.notCalled);
+        assert.isTrue(keyboardasyncload.notCalled);
+        assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.khmer_angkor.metadata);
+
+        dispatchFocus('focus', textarea);
+
+        // Allows any _FocusKeyboardSettings stuff trigger to resolve.
+        await timedPromise(10);
+
+        // No need to 'keyboardchange' when the same keyboard is kept active.
+        assert.equal(contextManager.keyboardTarget, target);
+        assert.isTrue(beforekeyboardchange.calledOnce);
+        assert.isTrue(keyboardchange.calledOnce);
+        assert.isTrue(keyboardasyncload.notCalled);
+        assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.lao_2008_basic.metadata);
+
+        // Spin off into separate test!
+
+        const input = document.getElementById('input');
+        dispatchFocus('blur', textarea);
+        dispatchFocus('focus', input);
+
+        // Allows any _FocusKeyboardSettings stuff trigger to resolve.
+        await timedPromise(10);
+
+        assert.equal(contextManager.keyboardTarget, null);
+        assert.isTrue(beforekeyboardchange.calledTwice);
+        assert.isTrue(keyboardchange.calledTwice);
+        assert.isTrue(keyboardasyncload.notCalled);
+        assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.khmer_angkor.metadata);
+      });
+
+      it('focus change away, to global-mode target', async () => {
+        keyboardCache.addKeyboard(KEYBOARDS.khmer_angkor.keyboard);
+        keyboardCache.addKeyboard(KEYBOARDS.lao_2008_basic.keyboard);
+
+        // We activate a keyboard before proceeding.
+        await contextManager.activateKeyboard('khmer_angkor', 'km');
+
+        const textarea = document.getElementById('textarea');
+        const target = outputTargetForElement(textarea);
+        contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
+        dispatchFocus('focus', textarea);
+
+        // Allows any _FocusKeyboardSettings stuff trigger to resolve.
+        await timedPromise(10);
+
+        // Actual test:  transitioning focus from an independent-mode target
+        // to a global-mode target.
+
+        const beforekeyboardchange = sinon.fake();
+        const keyboardchange = sinon.fake();
+        const keyboardasyncload = sinon.fake();
+        contextManager.on('beforekeyboardchange', beforekeyboardchange);
+        contextManager.on('keyboardasyncload', keyboardasyncload);
+        contextManager.on('keyboardchange', keyboardchange);
+
+        const input = document.getElementById('input');
+        dispatchFocus('blur', textarea);
+        dispatchFocus('focus', input);
+
+        // Allows any _FocusKeyboardSettings stuff trigger to resolve.
+        await timedPromise(10);
+
+        assert.equal(contextManager.keyboardTarget, null);
+        assert.isTrue(beforekeyboardchange.calledOnce);
+        assert.isTrue(keyboardchange.calledOnce);
+        assert.isTrue(keyboardasyncload.notCalled);
+        assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.khmer_angkor.metadata);
+      });
+
+      it('mode deactivation (target inactive)', async () => {
+        // Written under the assumption that prior tests in the set pass.
+
+        keyboardCache.addKeyboard(KEYBOARDS.khmer_angkor.keyboard);
+        keyboardCache.addKeyboard(KEYBOARDS.lao_2008_basic.keyboard);
+
+        // We activate a keyboard before proceeding.
+        await contextManager.activateKeyboard('khmer_angkor', 'km');
+
+        const textarea = document.getElementById('textarea');
+        const target = outputTargetForElement(textarea);
+        contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
+        dispatchFocus('focus', textarea);
+
+        // Allows any _FocusKeyboardSettings stuff trigger to resolve.
+        await timedPromise(10);
+
+        // Transition away to a different element.
+        const input = document.getElementById('input');
+        dispatchFocus('blur', textarea);
+        dispatchFocus('focus', input);
+
+        // Allows any _FocusKeyboardSettings stuff trigger to resolve.
+        await timedPromise(10);
+
+        // Actual test:  transitioning focus from an independent-mode target
+        // to a global-mode target.
+        contextManager.setKeyboardForTarget(target, '', '');
+
+        const beforekeyboardchange = sinon.fake();
+        const keyboardchange = sinon.fake();
+        const keyboardasyncload = sinon.fake();
+        contextManager.on('beforekeyboardchange', beforekeyboardchange);
+        contextManager.on('keyboardasyncload', keyboardasyncload);
+        contextManager.on('keyboardchange', keyboardchange);
+
+        dispatchFocus('blur', input);
+        dispatchFocus('focus', textarea);
+
+        // Allows any _FocusKeyboardSettings stuff trigger to resolve.
+        await timedPromise(10);
+
+        assert.equal(contextManager.keyboardTarget, null);
+        assert.isTrue(beforekeyboardchange.notCalled);
+        assert.isTrue(keyboardchange.notCalled);
+        assert.isTrue(keyboardasyncload.notCalled);
+        assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.khmer_angkor.metadata);
+      });
+
+      it('mode deactivation (target active)', async () => {
+        // Written under the assumption that prior tests in the set pass.
+
+        keyboardCache.addKeyboard(KEYBOARDS.khmer_angkor.keyboard);
+        keyboardCache.addKeyboard(KEYBOARDS.lao_2008_basic.keyboard);
+
+        // We activate a keyboard before proceeding.
+        await contextManager.activateKeyboard('khmer_angkor', 'km');
+
+        const textarea = document.getElementById('textarea');
+        const target = outputTargetForElement(textarea);
+        contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
+        dispatchFocus('focus', textarea);
+
+        // Allows any _FocusKeyboardSettings stuff trigger to resolve.
+        await timedPromise(10);
+
+        const beforekeyboardchange = sinon.fake();
+        const keyboardchange = sinon.fake();
+        const keyboardasyncload = sinon.fake();
+        contextManager.on('beforekeyboardchange', beforekeyboardchange);
+        contextManager.on('keyboardasyncload', keyboardasyncload);
+        contextManager.on('keyboardchange', keyboardchange);
+
+        // Actual test:  transitioning focus from an independent-mode target
+        // to a global-mode target.
+        contextManager.setKeyboardForTarget(target, '', '');
+
+        // Allow the indirect keyboard-change operation to resolve.
+        await timedPromise(10);
+
+        assert.equal(contextManager.keyboardTarget, null);
+        assert.isTrue(beforekeyboardchange.calledOnce);
+        assert.isTrue(keyboardchange.calledOnce);
+        assert.isTrue(keyboardasyncload.notCalled);
+        assert.strictEqual(contextManager.activeKeyboard?.metadata, KEYBOARDS.khmer_angkor.metadata);
+      });
+
+      it('change of target\'s set keyboard', async () => {
+        keyboardCache.addKeyboard(KEYBOARDS.khmer_angkor.keyboard);
+        keyboardCache.addKeyboard(KEYBOARDS.lao_2008_basic.keyboard);
+        keyboardCache.addKeyboard(KEYBOARDS.test_chirality.keyboard);
+
+        // We activate a keyboard before proceeding.
+        await contextManager.activateKeyboard('khmer_angkor', 'km');
+
+        const textarea = document.getElementById('textarea');
+        const target = outputTargetForElement(textarea);
+        contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
+        dispatchFocus('focus', textarea);
+
+        // Allows any _FocusKeyboardSettings stuff trigger to resolve.
+        await timedPromise(10);
+
+        // Actual test:  transitioning focus from an independent-mode target
+        // to a global-mode target.
+
+        const beforekeyboardchange = sinon.fake();
+        const keyboardchange = sinon.fake();
+        const keyboardasyncload = sinon.fake();
+        contextManager.on('beforekeyboardchange', beforekeyboardchange);
+        contextManager.on('keyboardasyncload', keyboardasyncload);
+        contextManager.on('keyboardchange', keyboardchange);
+
+        await contextManager.activateKeyboard('test_chirality', 'en');
+
+        // Aspect 1:  the current keyboard has changed
+        assert.equal(contextManager.keyboardTarget, target);
+        assert.isTrue(beforekeyboardchange.calledOnce);
+        assert.isTrue(keyboardchange.calledOnce);
+        assert.isTrue(keyboardasyncload.notCalled);
+        assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.test_chirality.metadata);
+
+        const input = document.getElementById('input');
+        dispatchFocus('blur', textarea);
+        dispatchFocus('focus', input);
+
+        // Allows any _FocusKeyboardSettings stuff trigger to resolve.
+        await timedPromise(10);
+
+        // Aspect 2: ... without affecting the global keyboard's setting.
+        assert.equal(contextManager.keyboardTarget, null);
+        assert.isTrue(beforekeyboardchange.calledTwice);
+        assert.isTrue(keyboardchange.calledTwice);
+        assert.isTrue(keyboardasyncload.notCalled);
+        assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.khmer_angkor.metadata);
+      });
+
+      // To ensure that upon async load, the global keyboard isn't affected.
+      // That is, blurring an independent-mode, focusing a global-mode, after activating on
+      // the independent mode
+      //
+      // A TODO for the future; gotta triage it for now.
+      it.skip('focus changed during activation', async () => {});
+
+      // A general TODO for the future - setting off three async activations before the first completes
+      // should have #3 and ONLY #3 report successful loading / `keyboardchange`.
+      it.skip('cancels pending activations if replaced', async () => {});
     });
   });
 });
