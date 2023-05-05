@@ -224,9 +224,9 @@ and the `backspace` table has the ident `bksp`.
 | 0 |  32  | ident          | `tran` / `bksp`                          |
 | 4 |  32  | size           | int: Length of section                   |
 | 8 |  32  | groupCount     | int: Number of transformGroups           |
-| 8 |  32  | transformCount | int: Number of transforms                |
-| 8 |  32  | reorderCount   | int: Number of reorders                  |
-|12+|  -   | groups         | transformGroup subtable                  |
+|12 |  32  | transformCount | int: Number of transforms                |
+|16 |  32  | reorderCount   | int: Number of reorders                  |
+|20+|  -   | groups         | transformGroup subtable                  |
 | - |  -   | transforms     | transforms subtable                      |
 | - |  -   | reorders       | reorders subtable                        |
 

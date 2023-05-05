@@ -35,9 +35,9 @@ export type SectionIdent =
   'loca' |
   'meta' |
   'name' |
-  'ordr' |
   'strs' |
   'tran' |
+  'vars' |
   'vkey';
 
 
@@ -453,19 +453,6 @@ class Constants {
   readonly length_name_item = 4;
 
   /* ------------------------------------------------------------------
-    * ordr section
-      ------------------------------------------------------------------ */
-
-  /**
-   * Minimum length of the 'ordr' section, not including entries
-   */
-  readonly length_ordr = 12;
-  /**
-   *  Length of each item in the 'ordr' section variable part
-   */
-  readonly length_ordr_item = 8;
-
-  /* ------------------------------------------------------------------
     * strs section
       ------------------------------------------------------------------ */
 
@@ -485,15 +472,33 @@ class Constants {
   /**
    * Minimum length of the 'tran' section, not including entries
    */
-  readonly length_tran = 12;
+  readonly length_tran = 20;
   /**
-   *  Length of each item in the 'tran' section variable part
+   *  Length of each transform group item
    */
-  readonly length_tran_item = 16;
+  readonly length_tran_group = 12;
+  /**
+   *  Length of each transform item
+   */
+  readonly length_tran_transform = 16;
+  /**
+   *  Length of each reorder subtable item
+   */
+  readonly length_tran_reorder = 8;
+
   /**
    * bitwise or value for error="fail" in transform
    */
   readonly tran_flags_error = 0x0001;
+
+  /**
+   * this group is full of <transform> items
+   */
+  readonly tran_group_type_transform = 0;
+  /**
+   * this group is full of <reorder> items
+   */
+  readonly tran_group_type_reorder = 1;
 
   /* ------------------------------------------------------------------
     * vkey section
@@ -507,6 +512,32 @@ class Constants {
    *  Length of each item in the 'vkey' section variable part
    */
   readonly length_vkey_item = 8;
+
+  /* ------------------------------------------------------------------
+   * vars section
+   * ------------------------------------------------------------------ */
+
+  /**
+   * Minimum length of the 'vars' section not including variable parts
+   */
+  readonly length_vars = 16;
+  /**
+   *  Length of each item in the 'vars' section variable part
+   */
+  readonly length_vars_item = 16;
+
+  /**
+   * String variable
+   */
+  readonly vars_entry_type_string = 0;
+  /**
+   * Set variable
+   */
+  readonly vars_entry_type_set = 1;
+  /**
+   * unicodeSet variable
+   */
+  readonly vars_entry_type_unicodeSet = 2;
 
   /**
    * All section IDs.
@@ -523,10 +554,10 @@ class Constants {
       loca: 'loca',
       meta: 'meta',
       name: 'name',
-      ordr: 'ordr',
       sect: 'sect',
       strs: 'strs',
       tran: 'tran',
+      vars: 'vars',
       vkey: 'vkey',
   };
 
@@ -552,7 +583,7 @@ class Constants {
    * @returns string such as 'sect'
    */
   str_section_id(hex:number) : string {
-    let chars : string[] = [];
+    const chars : string[] = [];
     for (let i = 3; i>=0; i--) {
       chars.push(String.fromCharCode(hex & 0xFF));
       hex >>= 8;

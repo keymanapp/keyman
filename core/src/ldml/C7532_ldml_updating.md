@@ -10,8 +10,8 @@ working on ‘layr’, using ‘disp’ as a model from https://github.com/keyma
 ## Constants and Scaffolding
 
 - *Edit/Commit*: `core/include/ldml/keyboardprocessor_ldml.ts`
-    - update `SectionIdent` and keep in order
-    - update `SectionMap` and keep in order
+    - update `SectionIdent` and keep in order: `'layr' |`
+    - update `Constants.section` (near the end of the file) and keep in order: `'layr': 'layr',`
     - add a comment block in order `layr section`
         - add `length_layr` with the nonvariable length
         - add a `length_layr_*` for each subitem
