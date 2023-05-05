@@ -53,6 +53,7 @@ export class Compiler {
   setCompilerOptions: any;
   callbackName: string;
   callbacks: CompilerCallbacks;
+  _parseUnicodeSet: any;
 
   constructor() {
     this.callbackName = 'kmnCompilerCallback' + callbackProcIdentifier;
@@ -65,8 +66,11 @@ export class Compiler {
       this.compileKeyboardFile = this.wasmModule.cwrap('kmcmp_Wasm_CompileKeyboardFile', 'boolean', ['string', 'string',
         'number', 'number', 'number', 'string']);
       this.setCompilerOptions = this.wasmModule.cwrap('kmcmp_Wasm_SetCompilerOptions', 'boolean', ['number']);
+      this._parseUnicodeSet = this.wasmModule.cwrap('kmcmp_Wasm_ParseUnicodeSet', 'number', [ 'string', 'number', 'number']);
     }
-    return this.compileKeyboardFile !== undefined && this.setCompilerOptions !== undefined;
+    return this.compileKeyboardFile !== undefined
+        && this.setCompilerOptions  !== undefined
+        && this._parseUnicodeSet    !== undefined;
   }
 
   public run(infile: string, outfile: string, callbacks: CompilerCallbacks, options?: CompilerOptions): boolean {
@@ -106,5 +110,73 @@ export class Compiler {
       this.callbacks.reportMessage(CompilerMessages.Fatal_UnexpectedException({e:e}));
       return false;
     }
+  }
+
+  /**
+   *
+   * @param pattern UnicodeSet pattern such as `[a-z]`
+   * @param bufferSize guess as to the buffer size
+   * @returns UnicodeSet accessor object
+   */
+  public async parseUnicodeSet(pattern: string, bufferSize: number) : Promise<UnicodeSet> {
+    if (!bufferSize) {
+      bufferSize = 100;
+    }
+
+    const initOk = await this.init();
+    if (!initOk) {
+      throw Error(`WASM machinery didn't start up properly`);
+    }
+    // Module seems to be the usual name for it
+    const Module = this.wasmModule;
+    const buf = Module.asm.malloc(bufferSize * 2 * Module.HEAPU32.BYTES_PER_ELEMENT);
+    const rc = this._parseUnicodeSet(pattern, buf, bufferSize);
+    if (rc < 0) {
+      throw new UnicodeSetError(rc);
+    } else { // rc ≥0
+      const ranges = [];
+      const startu = (buf / Module.HEAPU32.BYTES_PER_ELEMENT);
+      for (let i = 0; i < rc; i++) {
+        const low = Module.HEAPU32[startu + (i * 2) + 0];
+        const high = Module.HEAPU32[startu + (i * 2) + 1];
+        ranges.push([low, high]);
+      }
+      return new UnicodeSet(pattern, ranges);
+    }
+  }
+}
+
+export class UnicodeSetError extends Error {
+  code: number;
+  constructor(code:number) {
+    super();
+    this.code = code;
+    this.message = `UnicodeSet error: ${code}`;
+  }
+}
+
+// from kmcmplib.h
+export const KMCMP_USET_OK = 0;
+export const KMCMP_ERROR_SYNTAX_ERR = -1;
+export const KMCMP_ERROR_HAS_STRINGS = -2;
+export const KMCMP_ERROR_UNSUPPORTED_PROPERTY = -3;
+export const KMCMP_ERROR_UNSUPPORTED = -4;
+export const KMCMP_FATAL_OUT_OF_RANGE = -5;
+
+/**
+ * Represents a parsed UnicodeSet
+ */
+export class UnicodeSet {
+  pattern: string;
+  ranges: number[][];
+  constructor(pattern: string, ranges: number[][]) {
+    this.pattern = pattern;
+    this.ranges = ranges;
+  }
+  /**
+   * Number of ranges
+   */
+  get length() : number {
+    return this.ranges.length;
   }
 }
