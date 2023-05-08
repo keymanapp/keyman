@@ -33,7 +33,7 @@ function generate_kmpjson() {
         "description": "0.0"
       },
       "copyright": {
-        "description": "\u00A9 2018-2023 SIL International"
+        "description": "\u00A9 2018-${THISYEAR} SIL International"
       },
       "author": {
         "description": ""
