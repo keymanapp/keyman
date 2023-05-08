@@ -15,6 +15,7 @@ function generate_kmpjson() {
   TESTDIR="$1"
   pushd "$TESTDIR" > /dev/null || exit
   KMPFILE="${TESTDIR}/kmp.json"
+  THISYEAR=$(date "+%Y")
   cat <<-EOF > "$KMPFILE"
   {
     "system": {
