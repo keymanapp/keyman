@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -eu
 TESTDIR=${XDG_DATA_HOME:-$HOME/.local/share}/keyman/test_kmx
 
 . "$(dirname "$0")"/test-helper.sh
