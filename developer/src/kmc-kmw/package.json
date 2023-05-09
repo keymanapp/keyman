@@ -14,7 +14,7 @@
   "scripts": {
     "build": "tsc -b",
     "tsc": "tsc",
-    "test": "cd test && tsc -b && cd .. && c8 mocha",
+    "test": "cd test && tsc -b && cd .. && mocha",
     "prepublishOnly": "npm run build"
   },
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
