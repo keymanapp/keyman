@@ -319,6 +319,29 @@ describe('app/browser:  ContextManager', function () {
       assert.equal(outputTarget, null, 'targetchange event did not indicate clearing of .activeTarget');
     });
 
+    it('change: input disabled, -> null', async () => {
+      // Setup:  from prior test
+      const targetchange = sinon.fake();
+      contextManager.on('targetchange', targetchange);
+
+      const input = document.getElementById('input');
+      dispatchFocus('focus', input);
+      assert.equal(contextManager.activeTarget?.getElement(), input);
+
+      // actual test
+      contextManager.page.disableControl(input);
+
+      // Relies on a MutationObserver (for 'kmw-disabled' CSS class name checks) to resolve
+      await timedPromise(10);
+
+      assert.equal(contextManager.activeTarget, null, '.activeTarget not updated when element KMW-disabled');
+
+      // Check our expectations re: the `targetchange` event.
+      assert.isTrue(targetchange.calledTwice, 'targetchange event not raised');
+      const outputTarget = targetchange.secondCall.args[0]; // Should be null, since we lost focus.
+      assert.equal(outputTarget, null, 'targetchange event did not indicate clearing of .activeTarget');
+    });
+
     it('change: input -> textarea', () => {
       // Setup:  from prior test
       const targetchange = sinon.fake();
