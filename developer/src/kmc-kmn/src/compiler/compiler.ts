@@ -94,7 +94,8 @@ export class Compiler {
 
   private runCompiler(infile: string, outfile: string, options: CompilerOptions): boolean {
     const CKF_KEYMAN = 0;
-    const CKF_KEYMANWEB = 1;
+    // const CKF_KEYMANWEB = 1; // not used -- legacy compiler only
+    const CKF_KEYMANWEB_MODERN = 2;
 
     try {
       if(!this.setCompilerOptions(options.shouldAddCompilerVersion)) {
@@ -107,7 +108,7 @@ export class Compiler {
         options.compilerWarningsAsErrors ? 1 : 0,
         options.warnDeprecatedCode ? 1 : 0,
         this.callbackName,
-        options.target == 'js' ? CKF_KEYMANWEB : CKF_KEYMAN);
+        options.target == 'js' ? CKF_KEYMANWEB_MODERN : CKF_KEYMAN);
     } catch(e) {
       this.callbacks.reportMessage(CompilerMessages.Fatal_UnexpectedException({e:e}));
       return false;
