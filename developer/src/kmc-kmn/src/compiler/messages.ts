@@ -55,6 +55,18 @@ export class CompilerMessages {
 
   static Fatal_CallbacksNotSet = () => m(this.FATAL_CallbacksNotSet, `Callbacks were not set with init`);
   static FATAL_CallbacksNotSet = SevFatal | 0x1003;
+
+  static Fatal_UnicodeSetOutOfRange = () => m(this.FATAL_UnicodeSetOutOfRange, `UnicodeSet buffer was too small`);
+  static FATAL_UnicodeSetOutOfRange = SevFatal | 0x1004;
+
+  static Error_UnicodeSetHasStrings = () => m(this.ERROR_UnicodeSetHasStrings, `UnicodeSet contains strings, not allowed`);
+  static ERROR_UnicodeSetHasStrings = SevError | 0x1005;
+
+  static Error_UnicodeSetHasProperties = () => m(this.ERROR_UnicodeSetHasProperties, `UnicodeSet contains properties, not allowed`);
+  static ERROR_UnicodeSetHasProperties = SevError | 0x1006;
+
+  static Error_UnicodeSetSyntaxError = () => m(this.ERROR_UnicodeSetSyntaxError, `UnicodeSet had a Syntax Error while parsing`);
+  static ERROR_UnicodeSetSyntaxError = SevError | 0x1007;
 }
 
 export function mapErrorFromKmcmplib(line: number, code: number, msg: string): CompilerEvent {

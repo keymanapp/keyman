@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { Compiler } from '../src/main.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { KMCMP_ERROR_HAS_STRINGS, KMCMP_ERROR_SYNTAX_ERR, KMCMP_ERROR_UNSUPPORTED_PROPERTY, KMCMP_FATAL_OUT_OF_RANGE, UnicodeSetError } from '../src/compiler/compiler.js';
+import { CompilerMessages } from '../src/compiler/messages.js';
 
 describe('Compiler UnicodeSet function', function() {
   it('should start', async function() {
@@ -20,7 +20,7 @@ describe('Compiler UnicodeSet function', function() {
     assert(compiler.verifyInitted());
 
     const pat = "[abc]";
-    const set = await compiler.parseUnicodeSet(pat, 23);
+    const set = compiler.parseUnicodeSet(pat, 23);
 
     assert(set.length === 1);
     assert(set.ranges[0][0] === 'a'.charCodeAt(0));
@@ -48,19 +48,17 @@ describe('Compiler UnicodeSet function', function() {
     assert(compiler.verifyInitted());
     // map from string to failing error
     const failures = {
-      '[:Adlm:]': KMCMP_ERROR_UNSUPPORTED_PROPERTY, // what it saye
-      '[acegik]': KMCMP_FATAL_OUT_OF_RANGE, // 6 ranges, allocated 1
-      '[[\\p{Mn}]&[A-Z]]': KMCMP_ERROR_UNSUPPORTED_PROPERTY,
-      '[abc{def}]': KMCMP_ERROR_HAS_STRINGS,
-      '[[]': KMCMP_ERROR_SYNTAX_ERR,
+      '[:Adlm:]': CompilerMessages.ERROR_UnicodeSetHasProperties, // what it saye
+      '[acegik]': CompilerMessages.FATAL_UnicodeSetOutOfRange, // 6 ranges, allocated 1
+      '[[\\p{Mn}]&[A-Z]]': CompilerMessages.ERROR_UnicodeSetHasProperties,
+      '[abc{def}]': CompilerMessages.ERROR_UnicodeSetHasStrings,
+      '[[]': CompilerMessages.ERROR_UnicodeSetSyntaxError,
     };
     for(const [pat, rc] of Object.entries(failures)) {
-      try {
-        compiler.parseUnicodeSet(pat, 1);
-      } catch (e) {
-        assert(e instanceof UnicodeSetError);
-        assert.equal(e.code, rc);
-      }
+      callbacks.clear();
+      assert.notOk(compiler.parseUnicodeSet(pat, 1));
+      assert.equal(callbacks.messages.length, 1);
+      assert.equal(callbacks.messages[0].code, rc);
     }
   });
 });

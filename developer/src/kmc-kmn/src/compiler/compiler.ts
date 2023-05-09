@@ -22,7 +22,7 @@ TODO: implement additional interfaces:
 */
 
 // TODO: rename wasm-host?
-import { CompilerCallbacks } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerEvent } from '@keymanapp/common-types';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
 import { CompilerMessages, mapErrorFromKmcmplib } from './messages.js';
 
@@ -157,16 +157,13 @@ export class Compiler {
     }
 
     if (!bufferSize) {
-      bufferSize = 100;
+      bufferSize = 100; // TODO-LDML: Preflight mode? Reuse buffer?
     }
-
-    // Module seems to be the usual name for it
     const Module = this.wasmModule;
     const buf = Module.asm.malloc(bufferSize * 2 * Module.HEAPU32.BYTES_PER_ELEMENT);
+    // TODO-LDML: Catch OOM
     const rc = this.wasm.parseUnicodeSet(pattern, buf, bufferSize);
-    if (rc < 0) {
-      throw new UnicodeSetError(rc);
-    } else { // rc ≥0
+    if (rc >= 0) {
       const ranges = [];
       const startu = (buf / Module.HEAPU32.BYTES_PER_ELEMENT);
       for (let i = 0; i < rc; i++) {
@@ -174,27 +171,43 @@ export class Compiler {
         const high = Module.HEAPU32[startu + (i * 2) + 1];
         ranges.push([low, high]);
       }
+      // TODO-LDML: no free??
+      // Module.asm.free(buf);
       return new UnicodeSet(pattern, ranges);
+    } else {
+      // translate error
+      // TODO-LDML: no free??
+      // Module.asm.free(buf);
+      this.callbacks.reportMessage(getUnicodeSetError(rc));
+      return null;
     }
   }
 }
 
-export class UnicodeSetError extends Error {
-  code: number;
-  constructor(code:number) {
-    super();
-    this.code = code;
-    this.message = `UnicodeSet error: ${code}`;
+/**
+ * translate UnicodeSet return code into a compiler event
+ * @param rc parseUnicodeSet error code
+ * @returns the compiler event
+ */
+function getUnicodeSetError(rc: number) : CompilerEvent  {
+  // from kmcmplib.h
+  const KMCMP_ERROR_SYNTAX_ERR = -1;
+  const KMCMP_ERROR_HAS_STRINGS = -2;
+  const KMCMP_ERROR_UNSUPPORTED_PROPERTY = -3;
+  const KMCMP_FATAL_OUT_OF_RANGE = -4;
+  switch(rc) {
+    case KMCMP_ERROR_SYNTAX_ERR:
+       return CompilerMessages.Error_UnicodeSetSyntaxError();
+    case KMCMP_ERROR_HAS_STRINGS:
+    return CompilerMessages.Error_UnicodeSetHasStrings();
+    case KMCMP_ERROR_UNSUPPORTED_PROPERTY:
+       return CompilerMessages.Error_UnicodeSetHasProperties();
+    case KMCMP_FATAL_OUT_OF_RANGE:
+      return CompilerMessages.Fatal_UnicodeSetOutOfRange();
+    default:
+      return CompilerMessages.Fatal_UnexpectedException({e: `Unexpected UnicodeSet error code ${rc}`});
   }
 }
-
-// from kmcmplib.h
-export const KMCMP_USET_OK = 0;
-export const KMCMP_ERROR_SYNTAX_ERR = -1;
-export const KMCMP_ERROR_HAS_STRINGS = -2;
-export const KMCMP_ERROR_UNSUPPORTED_PROPERTY = -3;
-export const KMCMP_ERROR_UNSUPPORTED = -4;
-export const KMCMP_FATAL_OUT_OF_RANGE = -5;
 
 /**
  * Represents a parsed UnicodeSet
@@ -207,5 +220,9 @@ export class UnicodeSet {
    */
   get length() : number {
     return this.ranges.length;
+  }
+
+  toString() : string {
+    return this.pattern;
   }
 }
