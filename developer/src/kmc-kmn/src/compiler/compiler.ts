@@ -47,7 +47,7 @@ const baseOptions: CompilerOptions = {
  */
 let callbackProcIdentifier = 0;
 
-export class Compiler {
+export class KmnCompiler {
   wasmModule: any;
   compileKeyboardFile: any;
   setCompilerOptions: any;

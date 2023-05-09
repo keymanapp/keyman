@@ -1,6 +1,6 @@
 
 
-export default interface CompilerOptions {
+export interface CompilerOptions {
   /**
    * Add debug information to the .kmx file when compiling
    */

@@ -50,7 +50,7 @@ function buildLdmlKeyboardToMemory(inputFilename: string, callbacks: CompilerCal
     // TODO: treatWarningsAsErrors: options.treatWarningsAsErrors,
   }
 
-  const k = new kmc.Compiler(callbacks, options);
+  const k = new kmc.LdmlKeyboardCompiler(callbacks, options);
   let source = k.load(inputFilename);
   if (!source) {
     return [null, null, null];
@@ -68,7 +68,7 @@ function buildLdmlKeyboardToMemory(inputFilename: string, callbacks: CompilerCal
   const builder = new kmc.KMXBuilder(kmx, options.debug);
   const kmx_binary = builder.compile();
 
-  const vkcompiler = new kmc.VisualKeyboardCompiler();
+  const vkcompiler = new kmc.LdmlKeyboardVisualKeyboardCompiler();
   const vk = vkcompiler.compile(source);
   const writer = new KvkFileWriter();
   const kvk_binary = writer.write(vk);
