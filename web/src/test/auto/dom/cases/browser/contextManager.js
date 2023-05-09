@@ -987,11 +987,22 @@ describe.only('app/browser:  ContextManager', function () {
         assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.khmer_angkor.metadata);
       });
 
-      // To ensure that upon async load, the global keyboard isn't affected.
-      // That is, blurring an independent-mode, focusing a global-mode, after activating on
-      // the independent mode
-      //
-      // A TODO for the future; gotta triage it for now.
+      /*
+       * TODO: A test to ensure that upon async load, the global keyboard isn't affected.
+       * That is, blurring an independent-mode, focusing a global-mode, after activating on
+       * the independent mode.
+       *
+       * In pseudocode, the test should:
+       *
+       * 1. Have a global keyboard set
+       * 2. Have an independent-mode control set + have it focused
+       * 3. Start an async change-of-keyboard with the control from #2 focused
+       * 4. Change control to one in global-mode.
+       * 5. Let promise fulfill
+       * 6. Verify that the original global keyboard is still active and that the
+       *    control from #4 is still the activeTarget
+       * 7. Swap to the control from #2, verify that it uses the newly-set keyboard.
+       */
       it.skip('focus changed during activation', async () => {});
 
       // A general TODO for the future - setting off three async activations before the first completes
