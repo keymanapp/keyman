@@ -33,13 +33,14 @@ EXTERN bool kmcmp_CompileKeyboardFile(
 	bool AWarnDeprecatedCode,
   kmcmp_CompilerMessageProc pMsgproc,
   void* AmsgprocContext,
-  int target // CKF_KEYMAN || CKF_KEYMANWEB
+  int target // CKF_KEYMAN || CKF_KEYMANWEB || CKF_KEYMANWEB_MODERN
 );
 
 /* Compile target */
 
 #define CKF_KEYMAN    0
-#define CKF_KEYMANWEB 1
+#define CKF_KEYMANWEB 1         // For legacy kmcomp compiler, to be deprecated and removed
+#define CKF_KEYMANWEB_MODERN 2  // For Typescript kmc-kmw compiler
 
 EXTERN bool kmcmp_CompileKeyboardFileToBuffer(
   char* pszInfile,

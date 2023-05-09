@@ -141,6 +141,7 @@ type
 const
   CKF_KEYMAN = 0;
   CKF_KEYMANWEB = 1;
+  // CKF_KEYMANWEB_MODERN = 2; // used only by Typescript-based compiler
 
 const
   CERR_FATAL   = $00008000;
