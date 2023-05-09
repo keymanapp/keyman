@@ -142,22 +142,7 @@ describe('app/browser:  ContextManager', function () {
    */
   let keyboardLoader;
 
-  let originalConsole;
-
-  before(() => {
-    originalConsole = window.console;
-  });
-
-  after(() => {
-    window.console = originalConsole;
-  })
-
   beforeEach(async () => {
-    // const console = window.console = {};
-    // console.log = () => {};
-    // console.warn = () => {};
-    // console.error = () => {};
-
     // Loads a common fixture and ensures all relevant elements are attached.
     fixture.setBase('fixtures');
     fixture.load("a-bit-of-everything.html");
