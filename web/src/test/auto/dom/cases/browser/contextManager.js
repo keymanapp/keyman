@@ -242,6 +242,64 @@ describe.only('app/browser:  ContextManager', function () {
       assert.equal(outputTarget.getElement(), input, '.activeTarget does not match the newly-focused element');
     });
 
+    it('change: null -> textarea', () => {
+      const targetchange = sinon.fake();
+      contextManager.on('targetchange', targetchange);
+
+      const textarea = document.getElementById('textarea');
+      // Assumes we're testing with Chrome, not Firefox - the latter needs to be
+      // against the contentDocument, not its .body, I think.
+      dispatchFocus('focus', textarea);
+
+      assert.equal(contextManager.activeTarget?.getElement(), textarea, ".activeTarget not updated when element gained focus");
+
+      // Check our expectations re: the `targetchange` event.
+      assert.isTrue(targetchange.calledOnce, 'targetchange event not raised');
+      const outputTarget = targetchange.firstCall.args[0]; // Should be an `Input` instance.
+      assert.equal(outputTarget.getElement(), textarea, '.activeTarget does not match the newly-focused element');
+    });
+
+    it('change: null -> designIframe', () => {
+      const targetchange = sinon.fake();
+      contextManager.on('targetchange', targetchange);
+
+      const iframe = document.getElementById('design-iframe');
+
+      // Assumes we're testing with Chrome, not Firefox - the latter needs to be
+      // against the contentDocument, not its .body, I think.
+      //
+      // Either way, note that focus is handled specially for design-iframes, thus
+      // we need slightly different focus-dispatch here.
+      //
+      // Possible future improvement:  OutputTarget.focusElement (property)?
+      // Though that may be affected by the Chrome vs Firefox bit noted above.
+      dispatchFocus('focus', iframe.contentDocument.body);
+
+      assert.equal(contextManager.activeTarget?.getElement(), iframe, ".activeTarget not updated when element gained focus");
+
+      // Check our expectations re: the `targetchange` event.
+      assert.isTrue(targetchange.calledOnce, 'targetchange event not raised');
+      const outputTarget = targetchange.firstCall.args[0]; // Should be an `Input` instance.
+      assert.equal(outputTarget.getElement(), iframe, '.activeTarget does not match the newly-focused element');
+    });
+
+    it('change: null -> contentEditable', () => {
+      const targetchange = sinon.fake();
+      contextManager.on('targetchange', targetchange);
+
+      const editable = document.getElementById('editable');
+      // Assumes we're testing with Chrome, not Firefox - the latter needs to be
+      // against the contentDocument, not its .body, I think.
+      dispatchFocus('focus', editable);
+
+      assert.equal(contextManager.activeTarget?.getElement(), editable, ".activeTarget not updated when element gained focus");
+
+      // Check our expectations re: the `targetchange` event.
+      assert.isTrue(targetchange.calledOnce, 'targetchange event not raised');
+      const outputTarget = targetchange.firstCall.args[0]; // Should be an `Input` instance.
+      assert.equal(outputTarget.getElement(), editable, '.activeTarget does not match the newly-focused element');
+    });
+
     it('change: input -> null', () => {
       // Setup:  from prior test
       const targetchange = sinon.fake();
@@ -1007,7 +1065,7 @@ describe.only('app/browser:  ContextManager', function () {
 
       // A general TODO for the future - setting off three async activations before the first completes
       // should have #3 and ONLY #3 report successful loading / `keyboardchange`.
-      it.skip('cancels pending activations if replaced', async () => {});
+      it.skip('cancels pending activations when replaced', async () => {});
     });
   });
 });
