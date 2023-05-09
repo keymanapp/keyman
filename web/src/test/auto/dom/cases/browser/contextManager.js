@@ -122,7 +122,7 @@ async function withDelayedFetching(keyboardLoader, time, closure) {
   await closure();
 }
 
-describe.only('app/browser:  ContextManager', function () {
+describe('app/browser:  ContextManager', function () {
   this.timeout(__karma__.config.args.find((arg) => arg.type == "timeouts").standard);
 
   /**
@@ -816,8 +816,6 @@ describe.only('app/browser:  ContextManager', function () {
     });
 
     describe('independent-keyboard mode', () => {
-      //const  =
-
       it('mode activation', async () => {
         keyboardCache.addKeyboard(KEYBOARDS.khmer_angkor.keyboard);
         keyboardCache.addKeyboard(KEYBOARDS.lao_2008_basic.keyboard);
