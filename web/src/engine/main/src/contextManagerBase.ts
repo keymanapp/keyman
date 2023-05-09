@@ -187,6 +187,8 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     if(activationAfterAwait == activation) {
       return activation;
     } else {
+      // Restore the popped element; it doesn't match the current activation attempt.
+      this.pendingActivations.push(activationAfterAwait);
       return null;
     }
   }

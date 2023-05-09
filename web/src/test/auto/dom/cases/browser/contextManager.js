@@ -1133,9 +1133,91 @@ describe.only('app/browser:  ContextManager', function () {
         assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.test_chirality.metadata);
       });
 
-      // A general TODO for the future - setting off three async activations before the first completes
-      // should have #3 and ONLY #3 report successful loading / `keyboardchange`.
-      it.skip('cancels pending activations when replaced', async () => {});
+      it('cancels pending activations when replaced', async () => {
+        /*
+         * This delay serves two purposes:
+         * 1. Ensures that the keyboards have delayed aspects to their operation
+         * 2. Is long enough that even OS-triggered context-switching effects should
+         *    not prevent said 'delayed aspects'.
+         *    - Race-condition prevention re: the two separate fetch requests.
+         */
+        const FETCH_DELAY = 200; // ms
+
+        // Only pre-load the 'base' global + initial-set keyboard.
+        keyboardCache.addKeyboard(KEYBOARDS.khmer_angkor.keyboard);
+
+        // We activate the global keyboard before proceeding.
+        await contextManager.activateKeyboard('khmer_angkor', 'km');
+
+        const textarea = document.getElementById('textarea');
+        const target = outputTargetForElement(textarea);
+        // Matches the current global keyboard, but still sets it to independent-mode.
+        contextManager.setKeyboardForTarget(target, 'khmer_angkor', 'km');
+        dispatchFocus('focus', textarea);
+
+        // Allows any _FocusKeyboardSettings stuff trigger to resolve.
+        await timedPromise(10);
+
+        // Actual test:  transitioning focus from an independent-mode target
+        // to a global-mode target.
+
+        const beforekeyboardchange = sinon.fake();
+        const keyboardchange = sinon.fake();
+        const keyboardasyncload = sinon.fake();
+        contextManager.on('beforekeyboardchange', beforekeyboardchange);
+        contextManager.on('keyboardasyncload', keyboardasyncload);
+        contextManager.on('keyboardchange', keyboardchange);
+
+        // Time to start the first load request:
+        const firstActivation = withDelayedFetching(keyboardLoader, FETCH_DELAY, () => {
+          return contextManager.activateKeyboard('lao_2008_basic', 'lo');
+          //return contextManager.activateKeyboard('test_chirality', 'en');
+        }); // We're simulating the delay on the loading of the keyboard script itself.
+
+        await Promise.resolve();
+
+        // Aspect 1:  the current keyboard has not yet changed
+        assert.equal(contextManager.keyboardTarget, target);
+        assert.isTrue(beforekeyboardchange.calledOnce);  // +1
+        assert.isTrue(keyboardchange.notCalled);         // is delayed 50 ms, so not yet.
+        assert.isTrue(keyboardasyncload.calledOnce);     // The async load has already started.
+                                                         // There's just artificial loading delay, is all.
+        assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.khmer_angkor.metadata);
+
+
+        // So, how are things handled if we fire off a SECOND load request before the first finishes?
+        const secondActivation = withDelayedFetching(keyboardLoader, FETCH_DELAY, () => {
+          return contextManager.activateKeyboard('test_chirality', 'en');
+        }); // We're simulating the delay on the loading of the keyboard script itself.
+
+        // Note that the two activation calls are only separated by a single await Promise.resolve();
+        // there should be no notable time interval between the two attempts, thus no opportunity for
+        // the first to resolve before the second has started.
+        //
+        // Ideally, we could go with a much shorter fetch delay, but we should play it safe here in case
+        // of OS context switching.
+
+        await Promise.resolve();
+
+        // Aspect 2:  the current keyboard STILL has not yet changed - still delayed.
+        assert.equal(contextManager.keyboardTarget, target);
+        assert.isTrue(beforekeyboardchange.calledTwice);  // +1
+        assert.isTrue(keyboardchange.notCalled);          // both should still be delayed.
+        assert.isTrue(keyboardasyncload.calledTwice);      // The async load has already started.
+                                                          // There's just artificial loading delay, is all.
+        assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.khmer_angkor.metadata);
+
+        // Since we don't want any assertions subject to race conditions.
+        await Promise.all([firstActivation, secondActivation]);
+
+        // Critical bit: the `lao` activation should appear to have auto-canceled; this is because
+        // when its keyboard loaded, we'd already requested the `test_chirality` keyboard.
+        assert.equal(contextManager.keyboardTarget, target);
+        assert.isTrue(beforekeyboardchange.calledThrice);  // +1
+        assert.isTrue(keyboardchange.calledOnce);          // There should be no attempt to swap to the lao kbd.
+        assert.isTrue(keyboardasyncload.calledTwice);
+        assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.test_chirality.metadata);
+      });
     });
   });
 });
