@@ -1,31 +1,23 @@
 import 'mocha';
-import sinon from 'sinon';
-import chai, { assert } from 'chai';
-import sinonChai from 'sinon-chai';
+import { assert } from 'chai';
 import { Compiler } from '../src/main.js';
+import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { KMCMP_ERROR_HAS_STRINGS, KMCMP_ERROR_SYNTAX_ERR, KMCMP_ERROR_UNSUPPORTED_PROPERTY, KMCMP_FATAL_OUT_OF_RANGE, UnicodeSetError } from '../src/compiler/compiler.js';
-chai.use(sinonChai);
 
-describe('Compiler class', function() {
-  let consoleLog: any;
-
-  beforeEach(function() {
-    consoleLog = sinon.spy(console, 'log');
-  });
-
-  afterEach(function() {
-    consoleLog.restore();
-  });
-
+describe('Compiler UnicodeSet function', function() {
   it('should start', async function() {
     const compiler = new Compiler();
-    assert(await compiler.init());
+    const callbacks = new TestCompilerCallbacks();
+    assert(await compiler.init(callbacks));
+    assert(compiler.verifyInitted());
   });
 
   it('should compile a basic uset', async function() {
     const compiler = new Compiler();
     // const callbacks = new TestCompilerCallbacks();
-    assert(await compiler.init());
+    const callbacks = new TestCompilerCallbacks();
+    assert(await compiler.init(callbacks));
+    assert(compiler.verifyInitted());
 
     const pat = "[abc]";
     const set = await compiler.parseUnicodeSet(pat, 23);
@@ -36,10 +28,12 @@ describe('Compiler class', function() {
   });
   it('should compile a more complex uset', async function() {
     const compiler = new Compiler();
-    assert(await compiler.init());
+    const callbacks = new TestCompilerCallbacks();
+    assert(await compiler.init(callbacks));
+    assert(compiler.verifyInitted());
 
     const pat = "[[🙀A-C]-[CB]]";
-    const set = await compiler.parseUnicodeSet(pat, 23);
+    const set = compiler.parseUnicodeSet(pat, 23);
 
     assert.equal(set.length, 2);
     assert.equal(set.ranges[0][0], 'A'.charCodeAt(0));
@@ -49,7 +43,9 @@ describe('Compiler class', function() {
   });
   it('should fail in various ways', async function() {
     const compiler = new Compiler();
-    assert(await compiler.init());
+    const callbacks = new TestCompilerCallbacks();
+    assert(await compiler.init(callbacks));
+    assert(compiler.verifyInitted());
     // map from string to failing error
     const failures = {
       '[:Adlm:]': KMCMP_ERROR_UNSUPPORTED_PROPERTY, // what it saye
@@ -60,7 +56,7 @@ describe('Compiler class', function() {
     };
     for(const [pat, rc] of Object.entries(failures)) {
       try {
-        await compiler.parseUnicodeSet(pat, 1);
+        compiler.parseUnicodeSet(pat, 1);
       } catch (e) {
         assert(e instanceof UnicodeSetError);
         assert.equal(e.code, rc);

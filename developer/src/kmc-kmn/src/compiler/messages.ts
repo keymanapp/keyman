@@ -47,11 +47,14 @@ export class CompilerMessages {
   static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException, `Unexpected exception: ${(o.e ?? 'unknown error').toString()}\n\nCall stack:\n${(o.e instanceof Error ? o.e.stack : (new Error()).stack)}`);
   static FATAL_UnexpectedException = SevFatal | 0x1000;
 
-  static Fatal_MissingWasmModule = () => m(this.FATAL_MissingWasmModule, `Could not instanatiate WASM compiler module`);
+  static Fatal_MissingWasmModule = () => m(this.FATAL_MissingWasmModule, `Could not instantiate WASM compiler module or not initted`);
   static FATAL_MissingWasmModule = SevFatal | 0x1001;
 
   static Fatal_UnableToSetCompilerOptions = () => m(this.FATAL_UnableToSetCompilerOptions, `Unable to set compiler options`);
   static FATAL_UnableToSetCompilerOptions = SevFatal | 0x1002;
+
+  static Fatal_CallbacksNotSet = () => m(this.FATAL_CallbacksNotSet, `Callbacks were not set with init`);
+  static FATAL_CallbacksNotSet = SevFatal | 0x1003;
 }
 
 export function mapErrorFromKmcmplib(line: number, code: number, msg: string): CompilerEvent {

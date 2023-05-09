@@ -23,21 +23,36 @@ describe('Compiler class', function() {
     consoleLog.restore();
   });
 
+  it('should throw on failure', async function() {
+    const compiler = new Compiler();
+    const callbacks : any = null; // ERROR
+    try {
+      await compiler.init(callbacks)
+      assert.fail('Expected exception');
+    } catch(e) {
+      assert.ok(e);
+    }
+    assert.throws(() => compiler.verifyInitted());
+  });
+
   it('should start', async function() {
     const compiler = new Compiler();
-    assert(await compiler.init());
+    const callbacks = new TestCompilerCallbacks();
+    assert(await compiler.init(callbacks));
+    assert(compiler.verifyInitted());
   });
 
   it('should compile a basic keyboard', async function() {
     const compiler = new Compiler();
     const callbacks = new TestCompilerCallbacks();
-    assert(await compiler.init());
+    assert(await compiler.init(callbacks));
+    assert(compiler.verifyInitted());
 
     const fixtureName = baselineDir + 'k_000___null_keyboard.kmx';
     const infile = baselineDir + 'k_000___null_keyboard.kmn';
     const outfile = __dirname + '/k_000___null_keyboard.kmx';
 
-    assert(compiler.run(infile, outfile, callbacks, {saveDebug: true, shouldAddCompilerVersion: false}));
+    assert(compiler.run(infile, outfile, {saveDebug: true, shouldAddCompilerVersion: false}));
 
     assert(fs.existsSync(outfile));
     const outfileData = fs.readFileSync(outfile);
@@ -51,7 +66,8 @@ describe('Compiler class', function() {
   it('should build all baseline fixtures', async function() {
     const compiler = new Compiler();
     const callbacks = new TestCompilerCallbacks();
-    assert(await compiler.init());
+    assert(await compiler.init(callbacks));
+    assert(compiler.verifyInitted());
 
     const files = fs.readdirSync(baselineDir);
     for(let file of files) {
@@ -60,7 +76,7 @@ describe('Compiler class', function() {
         const infile = baselineDir + file.replace(/x$/, 'n');
         const outfile = __dirname + '/' + file;
 
-        assert(compiler.run(infile, outfile, callbacks, {saveDebug: true, shouldAddCompilerVersion: false}));
+        assert(compiler.run(infile, outfile, {saveDebug: true, shouldAddCompilerVersion: false}));
 
         assert(fs.existsSync(outfile));
         const outfileData = fs.readFileSync(outfile);
@@ -69,6 +85,5 @@ describe('Compiler class', function() {
         assert.deepEqual(outfileData, fixtureData);
       }
     }
-
   });
 });

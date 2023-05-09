@@ -47,37 +47,70 @@ const baseOptions: CompilerOptions = {
  */
 let callbackProcIdentifier = 0;
 
+/**
+ * The wrapped functions
+ */
+class WrappedWasmFuncs {
+  compileKeyboardFile?: (a0: string, a1: string, a2: number, a3: number, a4: number, a5: string) => boolean;
+  parseUnicodeSet?: (a0: string, a1: number, a2: number) => number;
+  setCompilerOptions?: (shouldAddCompilerVersion: number) => boolean;
+
+  constructor(wasmModule: any) {
+    this.compileKeyboardFile = wasmModule.cwrap('kmcmp_Wasm_CompileKeyboardFile', 'boolean', ['string', 'string', 'number', 'number', 'number', 'string']);
+    this.parseUnicodeSet = wasmModule.cwrap('kmcmp_Wasm_ParseUnicodeSet', 'number', ['string', 'number', 'number']);
+    this.setCompilerOptions = wasmModule.cwrap('kmcmp_Wasm_SetCompilerOptions', 'boolean', ['number']);
+  }
+
+  /**
+   * @returns true if the functions are setup ok
+   */
+  get ok(): boolean {
+    return this.parseUnicodeSet !== undefined
+      && this.setCompilerOptions !== undefined
+      && this.compileKeyboardFile !== undefined;
+  }
+};
+
 export class Compiler {
   wasmModule: any;
-  compileKeyboardFile: any;
-  setCompilerOptions: any;
   callbackName: string;
   callbacks: CompilerCallbacks;
-  _parseUnicodeSet: any;
+  wasm: WrappedWasmFuncs;
 
   constructor() {
     this.callbackName = 'kmnCompilerCallback' + callbackProcIdentifier;
     callbackProcIdentifier++;
   }
 
-  public async init(): Promise<boolean> {
+  public async init(callbacks: CompilerCallbacks): Promise<boolean> {
+    if(!this.callbacks) {
+      this.callbacks = callbacks;
+    }
     if(!this.wasmModule) {
       this.wasmModule = await loadWasmHost();
-      this.compileKeyboardFile = this.wasmModule.cwrap('kmcmp_Wasm_CompileKeyboardFile', 'boolean', ['string', 'string',
-        'number', 'number', 'number', 'string']);
-      this.setCompilerOptions = this.wasmModule.cwrap('kmcmp_Wasm_SetCompilerOptions', 'boolean', ['number']);
-      this._parseUnicodeSet = this.wasmModule.cwrap('kmcmp_Wasm_ParseUnicodeSet', 'number', [ 'string', 'number', 'number']);
+      this.wasm = new WrappedWasmFuncs(this.wasmModule);
     }
-    return this.compileKeyboardFile !== undefined
-        && this.setCompilerOptions  !== undefined
-        && this._parseUnicodeSet    !== undefined;
+    return this.verifyInitted();
   }
 
-  public run(infile: string, outfile: string, callbacks: CompilerCallbacks, options?: CompilerOptions): boolean {
-    this.callbacks = callbacks;
-
-    if(!this.wasmModule) {
+  /**
+   * Verify that wasm is spun up OK.
+   * @returns true if OK
+   */
+  public verifyInitted() : boolean {
+    if(!this.callbacks) {
+      // Can't report a message here.
+      throw Error('Must call Compiler.init(callbacks) before proceeding');
+    }
+    if(!this.wasmModule || !this.wasm.ok) { // fail if wasm not loaded or function not found
       this.callbacks.reportMessage(CompilerMessages.Fatal_MissingWasmModule());
+      return false;
+    }
+    return true;
+  }
+
+  public run(infile: string, outfile: string, options?: CompilerOptions): boolean {
+    if(!this.verifyInitted()) {
       return false;
     }
 
@@ -96,10 +129,10 @@ export class Compiler {
 
   private runCompiler(infile: string, outfile: string, options: CompilerOptions): boolean {
     try {
-      if(!this.setCompilerOptions(options.shouldAddCompilerVersion)) {
+      if (!this.wasm.setCompilerOptions(options.shouldAddCompilerVersion ? 1 : 0)) {
         this.callbacks.reportMessage(CompilerMessages.Fatal_UnableToSetCompilerOptions());
       }
-      return this.compileKeyboardFile(
+      return this.wasm.compileKeyboardFile(
         infile,
         outfile,
         options.saveDebug ? 1 : 0,
@@ -116,21 +149,21 @@ export class Compiler {
    *
    * @param pattern UnicodeSet pattern such as `[a-z]`
    * @param bufferSize guess as to the buffer size
-   * @returns UnicodeSet accessor object
+   * @returns UnicodeSet accessor object, or null on failure
    */
-  public async parseUnicodeSet(pattern: string, bufferSize: number) : Promise<UnicodeSet> {
+  public parseUnicodeSet(pattern: string, bufferSize: number) : UnicodeSet | null {
+    if(!this.verifyInitted()) {
+      return null;
+    }
+
     if (!bufferSize) {
       bufferSize = 100;
     }
 
-    const initOk = await this.init();
-    if (!initOk) {
-      throw Error(`WASM machinery didn't start up properly`);
-    }
     // Module seems to be the usual name for it
     const Module = this.wasmModule;
     const buf = Module.asm.malloc(bufferSize * 2 * Module.HEAPU32.BYTES_PER_ELEMENT);
-    const rc = this._parseUnicodeSet(pattern, buf, bufferSize);
+    const rc = this.wasm.parseUnicodeSet(pattern, buf, bufferSize);
     if (rc < 0) {
       throw new UnicodeSetError(rc);
     } else { // rc ≥0
@@ -167,11 +200,7 @@ export const KMCMP_FATAL_OUT_OF_RANGE = -5;
  * Represents a parsed UnicodeSet
  */
 export class UnicodeSet {
-  pattern: string;
-  ranges: number[][];
-  constructor(pattern: string, ranges: number[][]) {
-    this.pattern = pattern;
-    this.ranges = ranges;
+  constructor(public pattern: string, public ranges: number[][]) {
   }
   /**
    * Number of ranges
