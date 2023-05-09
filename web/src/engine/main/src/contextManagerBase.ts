@@ -253,7 +253,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
       };
     }
 
-    this.activateKeyboardForTarget(kbdStubPair, this.keyboardTarget);
+    this.activateKeyboardForTarget(kbdStubPair, originalKeyboardTarget);
 
     // Only trigger `keyboardchange` events when they will affect the active context.
     if(this.keyboardTarget == originalKeyboardTarget) {

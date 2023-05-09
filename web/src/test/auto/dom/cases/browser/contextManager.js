@@ -760,7 +760,9 @@ describe.only('app/browser:  ContextManager', function () {
         contextManager.on('keyboardchange', keyboardchange);
 
         // Adds a delay to the activate keyboard call, to help prevent race conditions below.
-        const fetchPromise = withDelayedFetching(keyboardLoader, 25, () => contextManager.activateKeyboard('khmer_angkor', 'km'));
+        const fetchPromise = withDelayedFetching(keyboardLoader, 25, () => {
+          return contextManager.activateKeyboard('khmer_angkor', 'km')
+        });
 
         /*
          * There's a resolved-promise .then() before the `keyboardasyncload` event can fire;
@@ -1045,23 +1047,91 @@ describe.only('app/browser:  ContextManager', function () {
         assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.khmer_angkor.metadata);
       });
 
-      /*
-       * TODO: A test to ensure that upon async load, the global keyboard isn't affected.
-       * That is, blurring an independent-mode, focusing a global-mode, after activating on
-       * the independent mode.
-       *
-       * In pseudocode, the test should:
-       *
-       * 1. Have a global keyboard set
-       * 2. Have an independent-mode control set + have it focused
-       * 3. Start an async change-of-keyboard with the control from #2 focused
-       * 4. Change control to one in global-mode.
-       * 5. Let promise fulfill
-       * 6. Verify that the original global keyboard is still active and that the
-       *    control from #4 is still the activeTarget
-       * 7. Swap to the control from #2, verify that it uses the newly-set keyboard.
-       */
-      it.skip('focus changed during activation', async () => {});
+      it('focus changed during activation on independent-mode target', async () => {
+        // Only pre-load the 'base' global keyboard.
+        keyboardCache.addKeyboard(KEYBOARDS.khmer_angkor.keyboard);
+        keyboardCache.addKeyboard(KEYBOARDS.lao_2008_basic.keyboard);
+
+        // We activate the global keyboard before proceeding.
+        await contextManager.activateKeyboard('khmer_angkor', 'km');
+
+        const textarea = document.getElementById('textarea');
+        const target = outputTargetForElement(textarea);
+        contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
+        dispatchFocus('focus', textarea);
+
+        // Allows any _FocusKeyboardSettings stuff trigger to resolve.
+        await timedPromise(10);
+
+        // Actual test:  transitioning focus from an independent-mode target
+        // to a global-mode target.
+
+        const beforekeyboardchange = sinon.fake();
+        const keyboardchange = sinon.fake();
+        const keyboardasyncload = sinon.fake();
+        contextManager.on('beforekeyboardchange', beforekeyboardchange);
+        contextManager.on('keyboardasyncload', keyboardasyncload);
+        contextManager.on('keyboardchange', keyboardchange);
+
+        // Core of the test:  We're changing the active keyboard for an independent-mode target.
+        const asyncLoad = withDelayedFetching(keyboardLoader, 50, () => {
+          return contextManager.activateKeyboard('test_chirality', 'en');
+        }); // We're simulating a 50 ms delay on the loading of the keyboard script itself.
+
+        await Promise.resolve();
+
+        // Aspect 1:  the current keyboard has not yet changed
+        assert.equal(contextManager.keyboardTarget, target);
+        assert.isTrue(beforekeyboardchange.calledOnce);  // +1
+        assert.isTrue(keyboardchange.notCalled);         // is delayed 50 ms, so not yet.
+        assert.isTrue(keyboardasyncload.calledOnce);     // The async load has already started.
+                                                         // There's just artificial loading delay, is all.
+        assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.lao_2008_basic.metadata);
+
+        // Aspect 2: swap to a global-mode target, verify expectations.
+        const input = document.getElementById('input');
+        dispatchFocus('blur', textarea);
+        dispatchFocus('focus', input);
+
+        // Allows any _FocusKeyboardSettings stuff trigger to resolve.
+        await timedPromise(10);
+
+        assert.equal(contextManager.keyboardTarget, null);
+        assert.isTrue(beforekeyboardchange.calledTwice);  // +1: re-activating the global keyboard
+        assert.isTrue(keyboardchange.calledOnce);         // +1: same
+        assert.isTrue(keyboardasyncload.calledOnce);
+        assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.khmer_angkor.metadata);
+
+        // Aspect 3:  Sync up - without the original, independent-mode target selected.
+        await asyncLoad;
+
+        // ...and verify that the active keyboard has not changed, since the target for
+        // activation is not itself active.
+        assert.equal(contextManager.keyboardTarget, null);
+        assert.isTrue(beforekeyboardchange.calledTwice);  // +1: re-activating the global keyboard
+        assert.isTrue(keyboardchange.calledOnce);         // +1: same
+        assert.isTrue(keyboardasyncload.calledOnce);
+        assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.khmer_angkor.metadata);
+
+        // BUT the async load component should be resolved.
+        await assertPromiseResolved(keyboardasyncload.firstCall.args[1], 0);
+
+        // Aspect 4:  swap BACK to the async-loading keyboard's OutputTarget, which should
+        // now be fully set to the keyboard that had been requested for activation upon it.
+        dispatchFocus('blur', input);
+        dispatchFocus('focus', textarea);
+
+        // Allows any _FocusKeyboardSettings stuff trigger to resolve.
+        await timedPromise(10);
+
+        // And, final expectations:
+        assert.equal(contextManager.keyboardTarget, target);
+        assert.isTrue(beforekeyboardchange.calledThrice);  // +1: activating the independent-mode kbd
+        assert.isTrue(keyboardchange.calledTwice);         // +1: same
+        assert.isTrue(keyboardasyncload.calledOnce);
+        // Is the new keyboard, rather than the original one.
+        assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.test_chirality.metadata);
+      });
 
       // A general TODO for the future - setting off three async activations before the first completes
       // should have #3 and ONLY #3 report successful loading / `keyboardchange`.
