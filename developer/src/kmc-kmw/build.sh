@@ -61,6 +61,7 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action test; then
+  # TODO: add c8 for coverage
   npm test
   builder_finish_action success test
 fi
