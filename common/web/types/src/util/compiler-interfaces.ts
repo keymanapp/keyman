@@ -19,9 +19,12 @@ export enum CompilerErrorSeverity {
   Error_Mask =    0x0FFFFF,
 };
 
+export function compilerErrorSeverity(code: number): number {
+  return code & CompilerErrorSeverity.Severity_Mask;
+}
+
 export function compilerErrorSeverityName(code: number): string {
-  let severity = code & CompilerErrorSeverity.Severity_Mask;
-  switch(severity) {
+  switch(compilerErrorSeverity(code)) {
     case CompilerErrorSeverity.Info: return 'INFO';
     case CompilerErrorSeverity.Hint: return 'HINT';
     case CompilerErrorSeverity.Warn: return 'WARN';
@@ -110,6 +113,7 @@ export interface CompilerCallbacks {
    * TODO: accept only string
    * TODO: never return falsy, just throw if not found?
    * TODO: Buffer is Node-only.
+   * TODO: rename to readFile, consolidate with fs.readFileSync?
    * @param baseFilename
    * @param filename
    */

@@ -1,13 +1,28 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { CompilerCallbacks, CompilerSchema, CompilerEvent, compilerErrorSeverityName, CompilerPathCallbacks, CompilerFileSystemCallbacks } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerSchema, CompilerEvent, compilerErrorSeverityName, CompilerPathCallbacks, CompilerFileSystemCallbacks, CompilerErrorSeverity, compilerErrorSeverity } from '@keymanapp/common-types';
 
 /**
  * Concrete implementation for CLI use
  */
 
+interface NodeCompilerCallbacksOptions {
+  quiet?: boolean;
+}
+
+const defaultOptions: NodeCompilerCallbacksOptions = {
+  quiet: false
+};
+
 export class NodeCompilerCallbacks implements CompilerCallbacks {
-  // TODO: REMOVE!
+  private options: NodeCompilerCallbacksOptions;
+  private events: CompilerEvent[] = [];
+
+  constructor(options?: NodeCompilerCallbacksOptions) {
+    this.options = {...defaultOptions, ...options};
+  }
+
+  // TODO: consolidate with this.fs.readFileSync
   loadFile(filename: string | URL): Buffer {
     try {
       return fs.readFileSync(filename);
@@ -29,6 +44,12 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   }
 
   reportMessage(event: CompilerEvent): void {
+    this.events.push(event);
+    if(this.options.quiet && compilerErrorSeverity(event.code) < CompilerErrorSeverity.Error) {
+      // We'll only print errors if we are in 'quiet' mode
+      return;
+    }
+
     const code = event.code.toString(16);
     if(event.line) {
       console.log(`${compilerErrorSeverityName(event.code)} ${code} [${event.line}]: ${event.message}`);
@@ -38,7 +59,9 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   }
 
   debug(msg: string) {
-    console.debug(msg);
+    if(!this.options.quiet) {
+      console.debug(msg);
+    }
   }
 
   loadSchema(schema: CompilerSchema) {
