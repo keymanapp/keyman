@@ -413,7 +413,7 @@ if $DO_KEYMANIM ; then
 
         if which sentry-cli >/dev/null; then
             cd "$KM4MIM_BASE_PATH"
-            sentry-cli upload-dif "build/${CONFIGURATION}"
+            sentry-cli upload-dif "build/$CONFIG"
         else
             builder_die "Error: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases"
         fi

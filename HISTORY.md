@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.102 alpha 2023-05-08
+
+* chore(linux): Build for Lunar on all platforms (#8713)
+* fix(linux): Fix linux tests (#8510)
+* chore(linux): Fix uploading to launchpad (#8720)
+
 ## 17.0.101 alpha 2023-05-05
 
 * chore(common): `set -eu` in build-utils.sh (#8698)
