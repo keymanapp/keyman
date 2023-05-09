@@ -5,6 +5,7 @@ set -eu
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+# shellcheck source=resources/build/build-utils.sh
 . "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
@@ -15,6 +16,7 @@ cd "$THIS_SCRIPT_PATH"
 builder_describe \
   "Build Keyman for Linux." \
   ":engine=ibus-keyman       ibus-keyman" \
+  ":config=keyman-config     keyman-config" \
   "clean" \
   "configure" \
   "build" \
