@@ -5,7 +5,7 @@ import {
   PhysicalInputEventSpec
 } from "@keymanapp/recorder-core";
 
-import type { KeymanEngine } from 'keyman/app/browser';
+import { type KeymanEngine } from 'keyman/app/browser';
 
 declare var keyman: KeymanEngine;
 

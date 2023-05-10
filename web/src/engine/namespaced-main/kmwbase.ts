@@ -275,46 +275,6 @@ namespace com.keyman {
     }
 
     /**
-     * Call back from cloud for adding keyboard metadata
-     *
-     * @param {Object}    x   metadata object
-     **/
-    ['register'](x) {
-      this.keyboardManager.register(x);
-    }
-
-    /**
-     * Build 362: removeKeyboards() remove keyboard from list of available keyboards
-     *
-     * @param {string}  x      keyboard name string
-     * @param {boolean} force  When true, also drops the cached keyboard object
-     *
-     */
-    ['removeKeyboards'](x, force?) {
-      return this.keyboardManager.removeKeyboards(x);
-    }
-
-    /**
-     * Allow to change active keyboard by (internal) keyboard name
-     *
-     * @param       {string}    PInternalName   Internal name
-     * @param       {string}    PLgCode         Language code
-     */
-    ['setActiveKeyboard'](PInternalName: string, PLgCode: string): Promise<void> {
-      return this.keyboardManager.setActiveKeyboard(PInternalName,PLgCode);
-    }
-
-    /**
-     * Function     getActiveKeyboard
-     * Scope        Public
-     * @return      {string}      Name of active keyboard
-     * Description  Return internal name of currently active keyboard
-     */
-    ['getActiveKeyboard'](): string {
-      return this.keyboardManager.getActiveKeyboardName();
-    }
-
-    /**
      * Function    getActiveLanguage
      * Scope       Public
      * @param      {boolean=}        true to retrieve full language name, false/undefined to retrieve code.
@@ -343,36 +303,6 @@ namespace com.keyman {
       }
 
       return kbd && kbd.isCJK;
-    }
-
-    /**
-     * Get keyboard meta data for the selected keyboard and language
-     *
-     * @param       {string}    PInternalName     Internal name of keyboard
-     * @param       {string=}   PlgCode           language code
-     * @return      {Object}                      Details of named keyboard
-     *
-     **/
-    ['getKeyboard'](PInternalName: string, PlgCode?: string) {
-      var Ln, Lrn;
-
-      var kbdList = this.keyboardManager.getDetailedKeyboards();
-
-      for(Ln=0; Ln < kbdList.length; Ln++) {
-        Lrn = kbdList[Ln];
-
-        if(Lrn['InternalName'] == PInternalName || Lrn['InternalName'] == "Keyboard_" + PInternalName) {
-          if(arguments.length < 2) {
-            return Lrn;
-          }
-
-          if(Lrn['LanguageCode'] == PlgCode) {
-            return Lrn;
-          }
-        }
-      }
-
-      return null;
     }
 
     /**
@@ -450,32 +380,6 @@ namespace com.keyman {
      */
     ['getLanguageForControl'](Pelem) {
       this.domManager.getLanguageForControl(Pelem);
-    }
-
-    /**
-     * Set focus to last active target element (browser-dependent)
-     */
-    ['focusLastActiveElement']() {
-      this.domManager.focusLastActiveElement();
-    }
-
-    /**
-     * Get the last active target element *before* KMW activated (I1297)
-     *
-     * @return      {Object}
-     */
-    ['getLastActiveElement']() {
-      return this.domManager.lastActiveElement;
-    }
-
-    /**
-     *  Set the active input element directly optionally setting focus
-     *
-     *  @param  {Object|string} e         element id or element
-     *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123)
-     **/
-    ['setActiveElement'](e: string|HTMLElement, setFocus: boolean) {
-      return this.domManager.setActiveElement(e, setFocus);
     }
 
     /**

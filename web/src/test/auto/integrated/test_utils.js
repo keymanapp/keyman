@@ -1,6 +1,7 @@
 // // KeymanWeb test suite - processing of the Karma configuration's client.args parameter.
 
 import Device from '/@keymanapp/keyman/build/engine/device-detect/lib/index.mjs';
+import * as KMWRecorder from '/@keymanapp/keyman/build/tools/testing/recorder/lib/index.mjs';
 
 export let DEVICE_DETECT_FAILURE = false;
 
@@ -23,8 +24,8 @@ export function setupKMW(kmwOptions, timeout) {
 
     var kmwOptions = {
       attachType:'auto',
-      root:'/build/app/browser',
-      resources:'/build/resources'
+      root:'/',
+      resources:'/build/app/resources'
     };
 
     if(ui) {
@@ -138,45 +139,54 @@ export function teardownKMW() {
   }
 }
 
-// var loadKeyboardStub = function(stub, timeout, params) {
-//   var kbdName = "Keyboard_" + stub.id;
+export async function loadKeyboardStub(stub, timeout, params) {
+  var kbdName = "Keyboard_" + stub.id;
 
-//   keyman.addKeyboards(stub);
-//   if(!params || !params.passive) {
-//     return keyman.setActiveKeyboard(kbdName, stub.languages.id);
-//   } else if(keyman.getActiveKeyboard() != kbdName) {
-//     return setupScript(stub.filename, timeout, (ele) => {
-//       fixture.el.appendChild(ele);
-//     });
-//   } else {
-//     return Promise.resolve();
-//   }
-// }
+  // Returning an "error stub" does not actually throw an error.  Makes
+  // picking up on related errors in unit-test dev a bit trickier, but
+  // we can manually throw the error from here.
+  let result = await keyman.addKeyboards(stub);
+  for(let i=0; i < result.length; i++) {
+    if(result[i].error) {
+      throw result[i].error;
+    }
+  }
 
-// var loadKeyboardFromJSON = function(jsonPath, timeout, params) {
-//   var stub = fixture.load(jsonPath, true);
+  if(!params || !params.passive) {
+    return keyman.setActiveKeyboard(kbdName, stub.languages.id);
+  } else if(keyman.getActiveKeyboard() != kbdName) {
+    return setupScript(stub.filename, timeout, (ele) => {
+      fixture.el.appendChild(ele);
+    });
+  } else {
+    return Promise.resolve();
+  }
+}
 
-//   return loadKeyboardStub(stub, timeout, params);
-// }
+export async function loadKeyboardFromJSON(jsonPath, timeout, params) {
+  var stub = fixture.load(jsonPath, true);
 
-// function runLoadedKeyboardTest(testDef, device, usingOSK, assertCallback) {
-//   var inputElem = document.getElementById('singleton');
+  return loadKeyboardStub(stub, timeout, params);
+}
 
-//   let proctor = new KMWRecorder.BrowserProctor(inputElem, device, usingOSK, assertCallback);
-//   testDef.test(proctor);
-// }
+function runLoadedKeyboardTest(testDef, device, usingOSK, assertCallback) {
+  var inputElem = document.getElementById('singleton');
 
-// function runKeyboardTestFromJSON(jsonPath, params, assertCallback, timeout) {
-//   var testSpec = new KMWRecorder.KeyboardTest(fixture.load(jsonPath, true));
-//   let device = new com.keyman.Device();
-//   device.detect();
+  let proctor = new KMWRecorder.BrowserProctor(inputElem, device, usingOSK, assertCallback);
+  testDef.test(proctor);
+}
 
-//   return loadKeyboardStub(testSpec.keyboard, timeout).then(() => {
-//     runLoadedKeyboardTest(testSpec, device.coreSpec, params.usingOSK, assertCallback);
-//   }).finally(() => {
-//     keyman.removeKeyboards(testSpec.keyboard.id);
-//   });
-// }
+export function runKeyboardTestFromJSON(jsonPath, params, assertCallback, timeout) {
+  var testSpec = new KMWRecorder.KeyboardTest(fixture.load(jsonPath, true));
+  let device = new Device();
+  device.detect();
+
+  return loadKeyboardStub(testSpec.keyboard, timeout).then(() => {
+    runLoadedKeyboardTest(testSpec, device.coreSpec, params.usingOSK, assertCallback);
+  }).finally(() => {
+    keyman.removeKeyboards(testSpec.keyboard.id);
+  });
+}
 
 // function retrieveAndReset(Pelem) {
 //   let val = Pelem.value;
