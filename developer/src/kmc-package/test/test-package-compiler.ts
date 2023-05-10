@@ -225,9 +225,15 @@ describe('KmpCompiler', function () {
     testForMessage(this, ['invalid', 'ERROR_PackageCannotContainBothModelsAndKeyboards.kps'], CompilerMessages.ERROR_PackageCannotContainBothModelsAndKeyboards);
   });
 
-  // WARN_PackageShouldNotRepeatLanguages
+  // WARN_PackageShouldNotRepeatLanguages (models)
 
   it('should generate WARN_PackageShouldNotRepeatLanguages if model has same language repeated', async function() {
+    testForMessage(this, ['invalid', 'WARN_PackageShouldNotRepeatLanguages.model.kps'], CompilerMessages.WARN_PackageShouldNotRepeatLanguages);
+  });
+
+  // WARN_PackageShouldNotRepeatLanguages (keyboards)
+
+  it('should generate WARN_PackageShouldNotRepeatLanguages if keyboard has same language repeated', async function() {
     testForMessage(this, ['invalid', 'WARN_PackageShouldNotRepeatLanguages.kps'], CompilerMessages.WARN_PackageShouldNotRepeatLanguages);
   });
 

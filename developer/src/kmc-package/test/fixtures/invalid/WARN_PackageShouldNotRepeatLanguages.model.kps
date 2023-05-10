@@ -12,22 +12,22 @@
   </Info>
   <Files>
     <File>
-      <Name>nokeyboardversion.kmx</Name>
-      <Description>Keyboard Khmer Angkor</Description>
+      <Name>example.qaa.sencoten.model.js</Name>
+      <Description>Lexical model example.qaa.sencoten.model.js</Description>
       <CopyLocation>0</CopyLocation>
-      <FileType>.kmx</FileType>
+      <FileType>.model.js</FileType>
     </File>
   </Files>
-  <Keyboards>
-    <Keyboard>
-      <Name>Khmer Angkor</Name>
-      <ID>nokeyboardversion</ID>
-      <Version>1.3</Version>
+  <LexicalModels>
+    <LexicalModel>
+      <Name>SENĆOŦEN dictionary</Name>
+      <ID>example.qaa.sencoten</ID>
       <Languages>
+        <Language ID="qaa">North Straits Salish</Language>
         <!-- WARN_PackageShouldNotRepeatLanguages -->
-        <Language ID="km">Central Khmer (Khmer, Cambodia)</Language>
-        <Language ID="KM">Khmer</Language>
+        <Language ID="QAA">Salish Again</Language>
+        <Language ID="qaa-Latn">SENĆOŦEN</Language>
       </Languages>
-    </Keyboard>
-  </Keyboards>
+    </LexicalModel>
+  </LexicalModels>
 </Package>

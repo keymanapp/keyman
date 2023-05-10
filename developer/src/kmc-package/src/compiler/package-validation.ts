@@ -7,6 +7,9 @@ export class PackageValidation {
   }
 
   public validate(kmpJson: KmpJsonFile.KmpJsonFile) {
+    if(!this.checkKeyboards(kmpJson)) {
+      return false;
+    }
     if(!this.checkLexicalModels(kmpJson)) {
       return false;
     }
@@ -34,6 +37,16 @@ export class PackageValidation {
     if(kmpJson.lexicalModels) {
       for(let model of kmpJson.lexicalModels) {
         this.checkForDuplicatedLanguages('model', model.id, model.languages);
+      }
+    }
+
+    return true;
+  }
+
+  private checkKeyboards(kmpJson: KmpJsonFile.KmpJsonFile): boolean {
+    if(kmpJson.keyboards) {
+      for(let keyboard of kmpJson.keyboards) {
+        this.checkForDuplicatedLanguages('keyboard', keyboard.id, keyboard.languages);
       }
     }
 
