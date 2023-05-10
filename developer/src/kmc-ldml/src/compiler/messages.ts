@@ -1,10 +1,10 @@
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m } from "@keymanapp/common-types";
 
-const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.KeyboardCompiler;
-const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.KeyboardCompiler;
+const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
+const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
 // const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.KeyboardCompiler;
-const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.KeyboardCompiler;
-const SevFatal = CompilerErrorSeverity.Fatal | CompilerErrorNamespace.KeyboardCompiler;
+const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.LdmlKeyboardCompiler;
+const SevFatal = CompilerErrorSeverity.Fatal | CompilerErrorNamespace.LdmlKeyboardCompiler;
 
 export class CompilerMessages {
   static Error_InvalidNormalization = (o:{form: string}) => m(this.ERROR_InvalidNormalization, `Invalid normalization form '${o.form}`);

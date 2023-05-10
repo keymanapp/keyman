@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as kmc from '@keymanapp/kmc-keyboard';
+import * as kmc from '@keymanapp/kmc-ldml';
 import { CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
 import { NodeCompilerCallbacks } from '../../messages/NodeCompilerCallbacks.js';
 
