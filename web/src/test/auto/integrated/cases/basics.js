@@ -1,36 +1,38 @@
-// var assert = chai.assert;
+var assert = chai.assert;
 
-// describe('Basic KeymanWeb', function() {
-//   this.timeout(testconfig.timeouts.standard);
+import { DEVICE_DETECT_FAILURE, setupKMW, teardownKMW } from "../test_utils.js";
 
-//   before(function() {
-//     // These tests require use of KMW's device-detection functionality.
-//     assert.isFalse(com.keyman.karma.DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
-//   })
+describe('Basic KeymanWeb', function() {
+  this.timeout(testconfig.timeouts.standard);
 
-//   beforeEach(function() {
-//     this.timeout(testconfig.timeouts.scriptLoad);
+  before(function() {
+    // These tests require use of KMW's device-detection functionality.
+    assert.isFalse(DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
+  })
 
-//     fixture.setBase('fixtures');
-//     fixture.load("singleInput.html");
-//     return setupKMW(null, testconfig.timeouts.scriptLoad);
-//   });
+  beforeEach(function() {
+    this.timeout(testconfig.timeouts.scriptLoad);
 
-//   afterEach(function() {
-//     fixture.cleanup();
-//     teardownKMW();
-//   });
+    fixture.setBase('fixtures');
+    fixture.load("singleInput.html");
+    return setupKMW(null, testconfig.timeouts.scriptLoad);
+  });
 
-//   describe('Initialization', function() {
-//     it('KMW should attach to the input element.', function() {
-//       var singleton = document.getElementById('singleton');
-//       assert.isTrue(keyman.isAttached(singleton), "KeymanWeb did not automatically attach to the element!");
-//     });
-//     it('KMW\'s initialization variable should indicate completion.', function() {
-//       assert(keyman.initialized == 2, 'Keyman indicates incomplete initialization!');
-//     });
-//   });
-// });
+  afterEach(function() {
+    fixture.cleanup();
+    teardownKMW();
+  });
+
+  describe('Initialization', function() {
+    it('KMW should attach to the input element.', function() {
+      var singleton = document.getElementById('singleton');
+      assert.isTrue(keyman.isAttached(singleton), "KeymanWeb did not automatically attach to the element!");
+    });
+    it('KMW\'s initialization variable should indicate completion.', function() {
+      assert(keyman.initialized == 2, 'Keyman indicates incomplete initialization!');
+    });
+  });
+});
 
 // Modernizr.on('touchevents', function(result) {
 //   if(!result) {

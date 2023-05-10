@@ -325,10 +325,6 @@ namespace com.keyman {
       return this.keyboardManager.getActiveLanguage(fullName);
     }
 
-    ['isAttached'](x: HTMLElement): boolean {
-      return this.domManager.isAttached(x);
-    }
-
     /**
      * Function    isCJK
      * Scope       Public

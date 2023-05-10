@@ -95,6 +95,8 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
 
     this._initialized = 1;
 
+    this._initialized = 1;
+
     // Must wait for document load for further initialization.
     await whenDocumentReady();
 
@@ -180,8 +182,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
       return;
     }
 
-    // Should use `isAttached` method once available.
-    if(!Pelem._kmwAttachment) {
+    if(!this.isAttached(Pelem)) {
       console.error("KeymanWeb is not attached to element " + Pelem);
       return;
     }
@@ -195,6 +196,10 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     }
 
     this.contextManager.setKeyboardForTarget(Pelem._kmwAttachment.interface, Pkbd, Plc);
+  }
+
+  isAttached(x: HTMLElement): boolean {
+    return this.contextManager.page.isAttached(x);
   }
 
   /**
