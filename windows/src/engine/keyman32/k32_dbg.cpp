@@ -194,7 +194,6 @@ char *msgnames[] = {
 "WM_SYSCHAR",
 "WM_SYSDEADCHAR",
 "WM_x108",
-"WM_UNICHAR"
 };
 
 void DebugMessage(LPMSG msg, WPARAM wParam)  // I2908
@@ -215,16 +214,6 @@ void DebugMessage(LPMSG msg, WPARAM wParam)  // I2908
       PtrToInt(msg->hwnd),
       msgnames[msg->message-WM_KEYDOWN],
       Debug_VirtualKey((WORD) msg->wParam),
-      (unsigned int) msg->lParam,
-      wParam,
-      (int) msg->time,
-      (unsigned int) GetMessageExtraInfo());
-	else if(msg->message >= WM_KEYDOWN && msg->message <= WM_UNICHAR)
-    wsprintf(ds, "DebugMessage(%x, %s, wParam: '%c' (U+%04X), lParam: %X) [message flags: %x time: %d extra: %x]",
-      PtrToInt(msg->hwnd),
-      msgnames[msg->message-WM_KEYDOWN],
-      msg->wParam,
-      msg->wParam,
       (unsigned int) msg->lParam,
       wParam,
       (int) msg->time,
