@@ -267,7 +267,7 @@ fi
 Each step is run separately, is started with [`builder_start_action`], and
 finishes with [`builder_finish_action`]. If a build step is complex, it may be
 worthwhile splitting it into a separate function or even a separate script
-include.
+include. See also [`builder_run_action`].
 
 Use the longer form of `if ...; then` rather than the shorter `[ ... ] && `
 pattern, for consistency and readability.
@@ -303,10 +303,10 @@ have described outputs for them, and the outputs do not exist, and the
 dependency is required for one of the targets specified on the command line.
 
 The build order of dependencies is determined by the order in which
-`builder_start_action` is called in the script for each action.
+[`builder_start_action`] is called in the script for each action.
 
 You can also define your own internal dependencies with
-`builder_describe_internal_dependency`. This allows you to define dependencies
+[`builder_describe_internal_dependency`]. This allows you to define dependencies
 across targets. Use this judiciously; for example, Keyman Core uses this to
 build both x86_64 and arm64 targets, and test only the appropriate architecture
 on macOS.
@@ -343,7 +343,7 @@ npm test -- $builder_debug
 ## `builder_describe` function
 
 Describes a build script, defines available parameters and their meanings. Use
-together with `builder_parse` to process input parameters.
+together with [`builder_parse`] to process input parameters.
 
 ### Usage
 
@@ -391,7 +391,7 @@ builder_describe "Sample script" :engine ":proxy  the proxy module"
 ```
 
 There are several predefined targets. These will not be available to users of
-your script unless you include them in the `builder_describe` call, but when
+your script unless you include them in the [`builder_describe`] call, but when
 used, they have default descriptions, which can be used instead of adding your
 own in the call:
   * `:project`: `"this project"`
@@ -515,15 +515,46 @@ builder_describe_internal_dependency \
 ```
 
 **Note:** actions and targets must be fully specified, and this _must_ be called
-before either builder_describe_outputs or builder_parse in order for
+before either [`builder_describe_outputs`] or [`builder_parse`] in order for
 dependencies to be resolved.
+
+--------------------------------------------------------------------------------
+
+## `builder_describe_outputs` function
+
+Defines an output file or folder expected to be present after successful
+completion of an action for a target. Used to skip actions for dependency
+builds. If `:target` is not provided, assumes `:project`.
+
+Relative paths are relative to script folder; absolute paths are relative to
+repository root, not filesystem root.
+
+### Usage
+
+```bash
+  builder_describe_outputs action:target filename [...]
+```
+
+### Parameters
+
+* 1: `action[:target]`   action and/or target associated with file
+* 2: `filename`          name of file or folder to check
+* 3+: ... repeat previous arguments for additional outputs
+
+### Example
+
+```bash
+  builder_describe_outputs \
+    "configure" "/node_modules" \
+    "build"     "build/index.js"
+```
 
 --------------------------------------------------------------------------------
 
 ## `builder_display_usage` function
 
 Prints the help for the script, constructed from the [`builder_describe`]
-parameters, so must be called after `builder_describe`.
+parameters, so must be called after [`builder_describe`].
 
 ### Usage
 
@@ -600,7 +631,7 @@ white for top-level builds and child builds.
 
 ## `builder_echo_debug` function
 
-Wraps the `builder_echo` command with debug mode and a `[DEBUG]` prefix.
+Wraps the [`builder_echo`] command with debug mode and a `[DEBUG]` prefix.
 
 ### Usage
 
@@ -666,6 +697,7 @@ fi
 These last two parameters can optionally be space separated.
 
 ### Description
+
 In normal circumstances, `builder_finish_action` will then print a corresponding
 message:
 
@@ -752,7 +784,7 @@ fi
 ### Description
 
 The `--debug` standard option is currently handled differently to other options.
-It should never be declared in `builder_describe`, because it is always
+It should never be declared in [`builder_describe`], because it is always
 available anyway.
 
 `--debug` is automatically passed to child scripts and dependency scripts.
@@ -776,6 +808,46 @@ builder_parse "$@"
 Generally, you will always pass `"$@"` as the parameter for this call, to pass
 all the command line parameters from the script invocation, with automatically
 correct quoting and escaping.
+
+--------------------------------------------------------------------------------
+
+## `builder_run_action` function
+
+Wraps [`builder_start_action'] and [`builder_finish`] commands in a shorthand
+style for single-command actions. Can be used together with a local function for
+multi-command actions. Do be aware that this pseudo-closure style cannot be
+mixed with operators such as `<`, `>`, `&&`, `;`, `()` and so on.
+
+### Usage
+
+```bash
+  builder_run_action action[:target] command [command-params...]
+```
+
+### Parameters
+
+* 1: `action[:target]`   name of action, and optionally also target, if target
+                         excluded starts for all defined targets
+* 2: command             command to run if action is started
+* 3...: command-params   parameters for command
+
+### Example
+
+The following example shows a sensible pattern to use when you have a single
+multi-command action and other single-command actions. If most of your actions
+are multi-command, you may choose to use this approach, or stick with the
+longhand form.
+
+```bash
+  function do_build() {
+    mkdir -p build/cjs-src
+    npm run build
+  }
+
+  builder_run_action clean        rm -rf ./build/ ./tsconfig.tsbuildinfo
+  builder_run_action configure    verify_npm_setup
+  builder_run_action build        do_build
+```
 
 --------------------------------------------------------------------------------
 
@@ -937,6 +1009,8 @@ Note: it is recommended that you use `$(builder_term text)` instead of
 
 [standard builder parameters]: #standard-builder-parameters
 [`builder_describe`]: #builderdescribe-function
+[`builder_describe_outputs`]: #builderdescribeoutputs-function
+[`builder_describe_internal_dependency`]: #builderdescribeinternaldependency-function
 [`builder_display_usage`]: #builderdisplayusage-function
 [`$builder_extra_params`]: #builderextraparams-variable
 [`builder_finish_action`]: #builderfinishaction-function
@@ -947,6 +1021,7 @@ Note: it is recommended that you use `$(builder_term text)` instead of
 [`builder_use_color`]: #builderusecolor-function
 [`$builder_verbose`]: #builderverbose-variable
 [formatting variables]: #formatting-variables
+[`builder_run_action`]: #builderrunaction-function
 [`builder_run_child_actions`]: #builderrunchildactions-function
 [`builder_echo`]: #builderecho-function
 [`builder_die`]: #builderdie-function
