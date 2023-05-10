@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.104 alpha 2023-05-10
+
+* chore(developer): rename kmc-keyboard to kmc-ldml (#8725)
+* chore(linux): bring kmp.json for unit test up to spec (#8732)
+* feat(common): add `builder_run_action` shorthand function (#8742)
+
 ## 17.0.103 alpha 2023-05-09
 
 * fix(mac): `$CONFIG` not `$CONFIGURATION` in build path (#8724)
