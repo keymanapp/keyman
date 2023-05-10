@@ -1,7 +1,7 @@
 var RESOURCE_PATH_PREFIX;
 
-function loadKeyboards() {
-  RESOURCE_PATH_PREFIX = "";
+export function getResourcePathPrefix() {
+  let RESOURCE_PATH_PREFIX = "";
 
   if(location.protocol == "file:") {
     // Note:  won't actually work, as it'll be blocked by CORS / same-origin policy when
@@ -26,6 +26,12 @@ function loadKeyboards() {
     }
   }
 
+  return RESOURCE_PATH_PREFIX;
+}
+
+window.loadKeyboards = () => {
+  RESOURCE_PATH_PREFIX = getResourcePathPrefix();
+
   var filePrefix = RESOURCE_PATH_PREFIX + "/resources/json/keyboards/";
 
   // Existing unit_test stubs at the time of writing:
@@ -42,8 +48,10 @@ function loadKeyboards() {
   loadExistingStubs(preloadFiles);
 }
 
+window.loadKeyboards = loadKeyboards;
+
 // Script to allow a user to add any keyboard to the keyboard menu
-function addKeyboard(n) {
+window.addKeyboard = (n) => {
   var sKbd;
   switch(n) {
     case 1:
@@ -71,7 +79,7 @@ function addKeyboard(n) {
 }
 
 // Add keyboard on Enter (as well as pressing button)
-function clickOnEnter(e,id) {
+window.clickOnEnter = (e,id) => {
   e = e || window.event;
   if(e.keyCode == 13) addKeyboard(id);
 }
