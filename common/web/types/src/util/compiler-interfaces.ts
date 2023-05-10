@@ -36,13 +36,13 @@ export function compilerErrorSeverityName(code: number): string {
  * Defines the error code ranges for various compilers. Once defined, these
  * ranges must not be changed as external modules may depend on specific error
  * codes. Individual errors are defined at a compiler level, for example,
- * kmn-keyboard/src/compiler/messages.ts.
+ * kmc-ldml/src/compiler/messages.ts.
  */
 export enum CompilerErrorNamespace {
   /**
-   * kmc-keyboard errors between 0x0000…0x0FFF
+   * kmc-ldml errors between 0x0000…0x0FFF
    */
-  KeyboardCompiler = 0x0000,
+  LdmlKeyboardCompiler = 0x0000,
   /**
    * common/web/types errors between 0x1000…0x1FFF
    */

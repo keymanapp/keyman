@@ -46,11 +46,11 @@ working on ‘layr’, using ‘disp’ as a model from https://github.com/keyma
 ## In-memory data: Phase 2
 
 - first the compiler tests
-    - add a section in `developer/src/kmc-keyboard/test/fixtures/sections` if needed
-    - add a test case such as `developer/src/kmc-keyboard/test/test-key2.ts`
+    - add a section in `developer/src/kmc-ldml/test/fixtures/sections` if needed
+    - add a test case such as `developer/src/kmc-ldml/test/test-key2.ts`
 - add a compiler
-    - `developer/src/kmc-keyboard/compiler/key2.ts`
-    - link it in to `developer/src/kmc-keyboard/src/compiler/compiler.ts`
+    - `developer/src/kmc-ldml/compiler/key2.ts`
+    - link it in to `developer/src/kmc-ldml/src/compiler/compiler.ts`
         - add the import
         - add to `SECTION_COMPILERS`
 
@@ -68,10 +68,10 @@ working on ‘layr’, using ‘disp’ as a model from https://github.com/keyma
         - Also note that restructure will happily ignore (write zeros for) any fields where the BUILDER_* fields don't match the COMP_PLUS_* fields.
 
 - update basic.xml and basic.txt
-    - Tweak `eveloper/src/kmc-keyboard/test/fixtures/basic.xml` as needed
-    - You can use `developer/src/kmc-keyboard/build.sh build-fixtures` which will generate these. The two .kmx files are supposed to match: if not, fix `basic.txt` or fix other bugs.
-        - `developer/src/kmc-keyboard/build/test/fixtures/basic-txt.kmx` - KMX generated from basic.txt.
-        - `developer/src/kmc-keyboard/build/test/fixtures/basic-xml.kmx` - KMX generated from basic.xml.
-        - `developer/src/kmc-keyboard/build/test/fixtures/basic-xml.kvk` - KVK generated from basic.xml.
+    - Tweak `eveloper/src/kmc-ldml/test/fixtures/basic.xml` as needed
+    - You can use `developer/src/kmc-ldml/build.sh build-fixtures` which will generate these. The two .kmx files are supposed to match: if not, fix `basic.txt` or fix other bugs.
+        - `developer/src/kmc-ldml/build/test/fixtures/basic-txt.kmx` - KMX generated from basic.txt.
+        - `developer/src/kmc-ldml/build/test/fixtures/basic-xml.kmx` - KMX generated from basic.xml.
+        - `developer/src/kmc-ldml/build/test/fixtures/basic-xml.kvk` - KVK generated from basic.xml.
 
 ## more to come

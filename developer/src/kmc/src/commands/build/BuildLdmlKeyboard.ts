@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import * as kmc from '@keymanapp/kmc-keyboard';
+import * as kmc from '@keymanapp/kmc-ldml';
 import { KvkFileWriter, CompilerCallbacks } from '@keymanapp/common-types';
 import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
 
