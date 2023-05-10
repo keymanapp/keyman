@@ -1,15 +1,17 @@
 import 'mocha';
 import * as fs from 'fs';
-import {assert} from 'chai';
-
-import KmpCompiler from '../src/kmp-compiler.js';
-import {makePathToFixture} from './helpers/index.js';
+import { assert } from 'chai';
 import JSZip from 'jszip';
+
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { KmpJsonFile } from '@keymanapp/common-types';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { CompilerMessages } from '../src/messages.js';
 
+import { makePathToFixture } from './helpers/index.js';
+
+import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
+import { PackageValidation } from '../src/compiler/package-validation.js';
+import { CompilerMessages } from '../src/compiler/messages.js';
 
 describe('KmpCompiler', function () {
   const MODELS : string[] = [
@@ -158,9 +160,16 @@ describe('KmpCompiler', function () {
 
     let kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
     if(kmpJson && callbacks.messages.length == 0) {
+      const validator = new PackageValidation(callbacks);
+      validator.validate(kmpJson); // we'll ignore return value and rely on the messages
+    }
+
+    if(kmpJson && callbacks.messages.length == 0) {
       // We'll try building the package if we have not yet received any messages
       kmpCompiler.buildKmpFile(kpsPath, kmpJson)
     }
+
+    //TODO: callbacks.printMessages(); after #8711 is merged
 
     if(messageId) {
       assert.lengthOf(callbacks.messages, 1);
@@ -208,6 +217,18 @@ describe('KmpCompiler', function () {
 
   it('should generate WARN_KeyboardFileHasNoKeyboardVersion if <FollowKeyboardVersion> is set but keyboard has no version', async function() {
     testForMessage(this, ['invalid', 'nokeyboardversion.kps'], CompilerMessages.WARN_KeyboardFileHasNoKeyboardVersion);
+  });
+
+  // ERROR_PackageCannotContainBothModelsAndKeyboards
+
+  it('should generate ERROR_PackageCannotContainBothModelsAndKeyboards if package has both keyboards and models', async function() {
+    testForMessage(this, ['invalid', 'ERROR_PackageCannotContainBothModelsAndKeyboards.kps'], CompilerMessages.ERROR_PackageCannotContainBothModelsAndKeyboards);
+  });
+
+  // WARN_PackageShouldNotRepeatLanguages
+
+  it('should generate WARN_PackageShouldNotRepeatLanguages if model has same language repeated', async function() {
+    testForMessage(this, ['invalid', 'WARN_PackageShouldNotRepeatLanguages.kps'], CompilerMessages.WARN_PackageShouldNotRepeatLanguages);
   });
 
 });

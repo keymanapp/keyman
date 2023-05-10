@@ -47,6 +47,12 @@ export class CompilerMessages {
     `Keyboard file ${o.filename} has no &KeyboardVersion store`);
   static WARN_KeyboardFileHasNoKeyboardVersion = SevWarn | 0x000A;
 
+  static Error_PackageCannotContainBothModelsAndKeyboards = () => m(this.ERROR_PackageCannotContainBothModelsAndKeyboards,
+    `The package contains both lexical models and keyboards, which is not permitted.`);
+  static ERROR_PackageCannotContainBothModelsAndKeyboards = SevError | 0x000B;
 
+  static Warn_PackageShouldNotRepeatLanguages = (o:{resourceType: string, id: string, tag: string}) => m(this.WARN_PackageShouldNotRepeatLanguages,
+    `The ${o.resourceType} ${o.id} has a repeated language "${o.tag}".`);
+  static WARN_PackageShouldNotRepeatLanguages = SevWarn | 0x000C;
 }
 

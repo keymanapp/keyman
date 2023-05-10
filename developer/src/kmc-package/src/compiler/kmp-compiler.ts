@@ -8,7 +8,7 @@ import { KmpJsonFile, KpsFile, KMX, KmxFileReader } from '@keymanapp/common-type
 
 const FILEVERSION_KMP_JSON = '12.0';
 
-export default class KmpCompiler {
+export class KmpCompiler {
 
   constructor(private callbacks: CompilerCallbacks) {
   }
