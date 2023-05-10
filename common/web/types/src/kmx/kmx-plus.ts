@@ -14,9 +14,10 @@ export class Section {
 
 export class GlobalSections {
   // These sections are used by other sections during compilation
-  strs: Strs;
   elem: Elem;
   list: List;
+  strs: Strs;
+  vars: Vars;
 }
 
 // 'sect'
@@ -81,17 +82,6 @@ export class Name extends Section {
   names: StrsItem[] = [];
 };
 
-// 'ordr'
-
-export class OrdrItem {
-  elements: ElementString;
-  before: ElementString;
-};
-
-export class Ordr extends Section {
-  items: OrdrItem[] = [];
-};
-
 // 'strs'
 
 /**
@@ -152,13 +142,12 @@ export class Strs extends Section {
 };
 
 /**
- * 'vars'? maybe?
- * TODO-LDML: This is at least an in-memory section for the variable table.
  * See LKVariables
  */
 export class Vars extends Section {
-  // strings: StringVarItem[] = []; // ≠ StrsItem
-  // sets: SetVarItem[] = [];
+  markers: ListItem;
+  strings: StringVarItem[] = []; // ≠ StrsItem
+  sets: SetVarItem[] = [];
   unicodeSets: UnicodeSetItem[] = [];
 };
 
@@ -175,51 +164,57 @@ export class UnicodeSetItem extends VarsItem {
   /**
    * Pairs of [start,end] in a single array.
    */
-  ranges: number[];
+  _ranges: number[];
+};
 
+export class SetVarItem extends VarsItem {
+  _items: string;
+};
 
+export class StringVarItem extends VarsItem {
+  // no added fields
 };
 
 // 'tran'
 
-export enum TranItemFlags {
-  none = 0,
-  error = constants.tran_flags_error,
-};
-
-export class TranItem extends Section {
+export class TranTransform {
   from: ElementString;
   to: StrsItem;
+  mapFrom: StrsItem; // var name
+  mapTo: StrsItem; // var name
+}
+
+export class TranGroup {
+  type: number; // tran_group_type_transform | tran_group_type_reorder
+  transforms: TranTransform[] = [];
+  reorders: TranReorder[] = [];
+}
+
+export class TranReorder {
+  elements: ElementString;
   before: ElementString;
-  flags: TranItemFlags;
 };
 
+
+
 export class Tran extends Section {
-  items: TranItem[] = [];
+  groups: TranGroup[] = [];
   get id() {
     return constants.section.tran;
   }
 };
 
-// alias types for 'bksp', 'finl'
+// alias types for 'bksp'
 
 export class Bksp extends Tran {
   override get id() {
     return constants.section.bksp;
   }
 };
-export class BkspItem extends TranItem {};
-export type BkspItemFlags = TranItemFlags;
-export const BkspItemFlags = TranItemFlags;
-
-export class Finl extends Tran {
-  override get id() {
-    return constants.section.finl;
-  }
-};
-export class FinlItem extends TranItem {};
-export type FinlItemFlags = TranItemFlags;
-export const FinlItemFlags = TranItemFlags;
+// TODO-LDML #7377
+// export class BkspItem extends TranItem {};
+// export type BkspItemFlags = TranItemFlags;
+// export const BkspItemFlags = TranItemFlags;
 
 // 'vkey'
 
@@ -375,16 +370,15 @@ export interface KMXPlusData {
     bksp?: Bksp;
     disp?: Disp;
     elem?: Elem; // elem is ignored in-memory
-    finl?: Finl;
     keys?: Keys;
     layr?: Layr;
     list?: List; // list is ignored in-memory
     loca?: Loca;
     meta?: Meta;
     name?: Name;
-    ordr?: Ordr;
     strs?: Strs; // strs is ignored in-memory
     tran?: Tran;
+    vars?: Vars;
     vkey?: Vkey;
 };
 
@@ -405,10 +399,6 @@ export class KMXPlusFile extends KMXFile {
   public readonly COMP_PLUS_ELEM_ELEMENT: any;
   public readonly COMP_PLUS_ELEM_STRING: any;
   public readonly COMP_PLUS_ELEM: any;
-
-  // COMP_PLUS_FINL == COMP_PLUS_TRAN
-  public readonly COMP_PLUS_FINL_ITEM: any;
-  public readonly COMP_PLUS_FINL: any;
 
   // COMP_PLUS_KEYS is now COMP_PLUS_KEYS_KMAP
 
@@ -436,9 +426,6 @@ export class KMXPlusFile extends KMXFile {
   public readonly COMP_PLUS_NAME_ITEM: any;
   public readonly COMP_PLUS_NAME: any;
 
-  public readonly COMP_PLUS_ORDR_ITEM: any;
-  public readonly COMP_PLUS_ORDR: any;
-
   public readonly COMP_PLUS_STRS_ITEM: any;
   public readonly COMP_PLUS_STRS: any;
 
@@ -447,6 +434,8 @@ export class KMXPlusFile extends KMXFile {
 
   public readonly COMP_PLUS_VKEY_ITEM: any;
   public readonly COMP_PLUS_VKEY: any;
+
+  public readonly COMP_PLUS_VARS: any;
 
   /* File in-memory data */
 
@@ -652,17 +641,17 @@ export class KMXPlusFile extends KMXFile {
 
     // 'ordr'
 
-    this.COMP_PLUS_ORDR_ITEM = new r.Struct({
-      elements: r.uint32le, //elem
-      before: r.uint32le //elem
-    });
+    // this.COMP_PLUS_ORDR_ITEM = new r.Struct({
+    //   elements: r.uint32le, //elem
+    //   before: r.uint32le //elem
+    // });
 
-    this.COMP_PLUS_ORDR = new r.Struct({
-      ident: r.uint32le,
-      size: r.uint32le,
-      count: r.uint32le,
-      items: new r.Array(this.COMP_PLUS_ORDR_ITEM, 'count')
-    });
+    // this.COMP_PLUS_ORDR = new r.Struct({
+    //   ident: r.uint32le,
+    //   size: r.uint32le,
+    //   count: r.uint32le,
+    //   items: new r.Array(this.COMP_PLUS_ORDR_ITEM, 'count')
+    // });
 
     // 'strs'
 
@@ -714,8 +703,8 @@ export class KMXPlusFile extends KMXFile {
     // Aliases
 
     this.COMP_PLUS_BKSP_ITEM = this.COMP_PLUS_TRAN_ITEM;
-    this.COMP_PLUS_FINL_ITEM = this.COMP_PLUS_TRAN_ITEM;
+    // this.COMP_PLUS_FINL_ITEM = this.COMP_PLUS_TRAN_ITEM;
     this.COMP_PLUS_BKSP = this.COMP_PLUS_TRAN;
-    this.COMP_PLUS_FINL = this.COMP_PLUS_TRAN;
+    // this.COMP_PLUS_FINL = this.COMP_PLUS_TRAN;
   }
 }

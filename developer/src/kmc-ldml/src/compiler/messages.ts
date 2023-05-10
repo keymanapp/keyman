@@ -89,5 +89,9 @@ export class CompilerMessages {
   static Error_MissingFlicks = (o:{flicks: string, id: string}) => m(this.ERROR_MissingFlicks,
     `key id=${o.id} refers to missing flicks=${o.flicks}`);
   static ERROR_MissingFlicks = SevError | 0x0015;
+
+  static Error_DuplicateVariable = (o:{ids: string}) => m(this.ERROR_DuplicateVariable,
+      `duplicate variable id=${o.ids}`);
+  static ERROR_DuplicateVariable = SevError | 0x0016;
 }
 

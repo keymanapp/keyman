@@ -147,7 +147,7 @@ export interface LKVariables {
 /**
  * Shared interface for all three variable types
  */
-interface Variable {
+export interface Variable {
   id?: string;
   value?: string;
 };

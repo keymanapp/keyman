@@ -28,7 +28,6 @@ export type SectionIdent =
   'bksp' |
   'disp' |
   'elem' |
-  'finl' |
   'keys' |
   'layr' |
   'list' |
@@ -547,7 +546,6 @@ class Constants {
       bksp: 'bksp',
       disp: 'disp',
       elem: 'elem',
-      finl: 'finl',
       keys: 'keys',
       layr: 'layr',
       list: 'list',

@@ -2,21 +2,19 @@ import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus, LDMLKeyboard, CompilerCallbacks } from '@keymanapp/common-types';
 import { SectionCompiler } from "./section-compiler.js";
 
-import Finl = KMXPlus.Finl;
-import FinlItem = KMXPlus.FinlItem;
 import Bksp = KMXPlus.Bksp;
-import BkspItem = KMXPlus.BkspItem;
+// import BkspItem = KMXPlus.BkspItem;
 import GlobalSections = KMXPlus.GlobalSections;
 import Tran = KMXPlus.Tran;
-import TranItem = KMXPlus.TranItem;
-import TranItemFlags = KMXPlus.TranItemFlags;
+// import TranItem = KMXPlus.TranItem;
+// import TranItemFlags = KMXPlus.TranItemFlags;
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
-import LKTransform = LDMLKeyboard.LKTransform;
+// import LKTransform = LDMLKeyboard.LKTransform;
 import LKTransforms = LDMLKeyboard.LKTransforms;
 
 type TransformCompilerType = 'simple' | 'final' | 'backspace';
 
-class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran, TranItemBase extends TranItem> extends SectionCompiler {
+class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran/*, TranItemBase extends TranItem*/> extends SectionCompiler {
 
   protected type: T;
 
@@ -31,31 +29,32 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran, 
     return valid;
   }
 
-  protected newTranItem(): TranItemBase {
-    return null;
-  }
+  // protected newTranItem(): TranItemBase {
+  //   return null;
+  // }
 
   protected newTran(): TranBase {
     return null;
   }
 
-  private compileTransform(sections: GlobalSections, transform: LKTransform): TranItemBase {
-    let result = this.newTranItem();
-    result.from = sections.elem.allocElementString(sections.strs, transform.from);
-    result.to = sections.strs.allocAndUnescapeString(transform.to);
-    result.before = sections.elem.allocElementString(sections.strs, transform.before);
-    result.flags = transform.error == 'fail' ? TranItemFlags.error : TranItemFlags.none;
-    return result;
-  }
+  // private compileTransform(sections: GlobalSections, transform: LKTransform) : any {
+  //   let result = null;
+  //   // let result = this.newTranItem();
+  //   // result.from = sections.elem.allocElementString(sections.strs, transform.from);
+  //   // result.to = sections.strs.allocAndUnescapeString(transform.to);
+  //   // result.before = sections.elem.allocElementString(sections.strs, transform.before);
+  //   // result.flags = transform.error == 'fail' ? TranItemFlags.error : TranItemFlags.none;
+  //   return result;
+  // }
 
-  private compileTransforms(sections: GlobalSections, transforms: LKTransforms): TranBase {
+  private compileTransforms(sections: GlobalSections, transforms: LKTransforms): any {
     let result = this.newTran();
 
-    if(transforms?.transform) {
-      for(let transform of transforms.transform) {
-        result.items.push(this.compileTransform(sections, transform));
-      }
-    }
+    // if(transforms?.transform) {
+    //   for(let transform of transforms.transform) {
+    //     result.items.push(this.compileTransform(sections, transform));
+    //   }
+    // }
 
     return result;
   }
@@ -70,14 +69,14 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran, 
   }
 }
 
-export class TranCompiler extends TransformCompiler<'simple', Tran, TranItem> {
+export class TranCompiler extends TransformCompiler<'simple', Tran /*, TranItem*/> {
   constructor(source: LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
     super(source, callbacks);
     this.type = 'simple';
   }
-  protected newTranItem(): TranItem {
-    return new TranItem();
-  }
+  // protected newTranItem(): TranItem {
+  //   return new TranItem();
+  // }
   protected newTran(): Tran {
     return new Tran();
   }
@@ -86,30 +85,16 @@ export class TranCompiler extends TransformCompiler<'simple', Tran, TranItem> {
   }
 };
 
-export class FinlCompiler extends TransformCompiler<'final', Finl, FinlItem> {
-  constructor(source: LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
-    super(source, callbacks);
-    this.type = 'final';
-  }
-  protected newTranItem(): FinlItem {
-    return new FinlItem();
-  }
-  protected newTran(): Finl {
-    return new Finl();
-  }
-  public get id() {
-    return constants.section.finl;
-  }
-};
 
-export class BkspCompiler extends TransformCompiler<'backspace', Bksp, BkspItem> {
+export class BkspCompiler extends TransformCompiler<'backspace', Bksp /*, BkspItem*/> {
   constructor(source: LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
     super(source, callbacks);
     this.type = 'backspace';
   }
-  protected newTranItem(): BkspItem {
-    return new BkspItem();
-  }
+
+  // protected newTranItem(): BkspItem {
+  //   return new BkspItem();
+  // }
   protected newTran(): Bksp {
     return new Bksp();
   }

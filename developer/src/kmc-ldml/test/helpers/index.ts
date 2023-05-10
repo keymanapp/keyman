@@ -68,9 +68,11 @@ export function loadSectionFixture(compilerClass: typeof SectionCompiler, filena
     strs: new Strs(),
     elem: null,
     list: null,
+    vars: null,
   };
   globalSections.elem = new Elem(globalSections.strs);
   globalSections.list = new List(globalSections.strs);
+  globalSections.vars = null; // new Vars(globalSections.strs);
 
   return compiler.compile(globalSections);
 }

@@ -1,15 +1,17 @@
 import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus, CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
 import CompilerOptions from './compiler-options.js';
 import { CompilerMessages } from './messages.js';
-import { BkspCompiler, FinlCompiler, TranCompiler } from './tran.js';
+import { BkspCompiler, TranCompiler } from './tran.js';
 import { DispCompiler } from './disp.js';
 import { KeysCompiler } from './keys.js';
 import { LayrCompiler } from './layr.js';
 import { LocaCompiler } from './loca.js';
 import { MetaCompiler } from './meta.js';
 import { NameCompiler } from './name.js';
-import { OrdrCompiler } from './ordr.js';
+// import { OrdrCompiler } from './ordr.js';
 import { VkeyCompiler } from './vkey.js';
+import { VarsCompiler } from './vars.js';
+
 
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 import KMXPlusFile = KMXPlus.KMXPlusFile;
@@ -17,14 +19,14 @@ import KMXPlusFile = KMXPlus.KMXPlusFile;
 const SECTION_COMPILERS = [
   BkspCompiler,
   DispCompiler,
-  FinlCompiler,
   KeysCompiler,
   LayrCompiler,
   LocaCompiler,
   MetaCompiler,
   NameCompiler,
-  OrdrCompiler,
+  // OrdrCompiler,
   TranCompiler,
+  VarsCompiler,
   VkeyCompiler,
 ];
 
@@ -144,7 +146,7 @@ export default class Compiler {
         // errors for the keyboard developer.
         continue;
       }
-      const sect = section.compile({strs: kmx.kmxplus.strs, elem: kmx.kmxplus.elem, list: kmx.kmxplus.list});
+      const sect = section.compile({strs: kmx.kmxplus.strs, elem: kmx.kmxplus.elem, list: kmx.kmxplus.list, vars: kmx.kmxplus.vars});
 
       /* istanbul ignore if */
       if(!sect) {

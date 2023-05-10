@@ -96,8 +96,6 @@
 #define LDML_SECTIONNAME_DISP             "disp"
 #define LDML_SECTIONID_ELEM 0x6D656C65 /* "elem" */
 #define LDML_SECTIONNAME_ELEM             "elem"
-#define LDML_SECTIONID_FINL 0x6C6E6966 /* "finl" */
-#define LDML_SECTIONNAME_FINL             "finl"
 #define LDML_SECTIONID_KEYS 0x7379656B /* "keys" */
 #define LDML_SECTIONNAME_KEYS             "keys"
 #define LDML_SECTIONID_LAYR 0x7279616C /* "layr" */
