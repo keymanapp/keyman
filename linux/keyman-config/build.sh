@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -27,31 +25,9 @@ cd "$THIS_SCRIPT_PATH"
 builder_describe_outputs \
   build "keyman_config/standards/lang_tags_map.py"
 
-if builder_start_action clean; then
-  make clean
-  builder_finish_action success clean
-fi
-
-if builder_start_action configure; then
-  builder_finish_action success configure
-fi
-
-if builder_start_action build; then
-  make
-  builder_finish_action success build
-fi
-
-if builder_start_action test; then
-  ./run-tests.sh
-  builder_finish_action success test
-fi
-
-if builder_start_action install; then
-  make install
-  builder_finish_action success install
-fi
-
-if builder_start_action uninstall; then
-  make uninstall
-  builder_finish_action success uninstall
-fi
+builder_run_action clean      make clean
+builder_run_action configure  # nothing to do
+builder_run_action build      make
+builder_run_action test       ./run-tests.sh
+builder_run_action install    make install
+builder_run_action uninstall  make uninstall
