@@ -3,6 +3,7 @@ import { assert } from 'chai';
 import { Compiler } from '../src/main.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { CompilerMessages } from '../src/compiler/messages.js';
+import { compilerErrorFormatCode } from '@keymanapp/common-types';
 
 describe('Compiler UnicodeSet function', function() {
   it('should start', async function() {
@@ -54,11 +55,13 @@ describe('Compiler UnicodeSet function', function() {
       '[abc{def}]': CompilerMessages.ERROR_UnicodeSetHasStrings,
       '[[]': CompilerMessages.ERROR_UnicodeSetSyntaxError,
     };
-    for(const [pat, rc] of Object.entries(failures)) {
+    for(const [pat, expected] of Object.entries(failures)) {
       callbacks.clear();
       assert.notOk(compiler.parseUnicodeSet(pat, 1));
       assert.equal(callbacks.messages.length, 1);
-      assert.equal(callbacks.messages[0].code, rc);
+      const firstMessage = callbacks.messages[0];
+      const code = firstMessage.code;
+      assert.equal(code, expected, `${compilerErrorFormatCode(code)}≠${compilerErrorFormatCode(expected)} got ${firstMessage.message} for ${pat}`);
     }
   });
 });
