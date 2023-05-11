@@ -4,10 +4,10 @@ import { getAbsoluteY } from 'keyman/engine/dom-utils';
 import { OutputTarget } from 'keyman/engine/element-wrappers';
 import { AnchoredOSKView, FloatingOSKView, FloatingOSKViewConfiguration, OSKView, TwoStateActivator } from 'keyman/engine/osk';
 import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId as prefixed } from 'keyman/engine/package-cache';
-import { DeviceSpec, type Keyboard, ProcessorInitOptions, extendString } from "@keymanapp/keyboard-processor";
+import { DeviceSpec, Keyboard, ProcessorInitOptions, extendString } from "@keymanapp/keyboard-processor";
 
 import { BrowserConfiguration, BrowserInitOptionDefaults, BrowserInitOptionSpec } from './configuration.js';
-import ContextManager from './contextManager.js';
+import { default as ContextManager } from './contextManager.js';
 import DefaultBrowserRules from './defaultBrowserRules.js';
 import HardwareEventKeyboard from './hardwareEventKeyboard.js';
 import { FocusStateAPIObject } from './context/focusAssistant.js';
@@ -17,11 +17,17 @@ import { setupOskListeners } from './oskConfiguration.js';
 import { whenDocumentReady } from './utils/documentReady.js';
 import { outputTargetForElement } from '../../../../build/engine/attachment/obj/outputTargetForElement.js';
 
+import { UtilApiEndpoint} from './utilApiEndpoint.js';
+import { UIModule } from './uiModuleInterface.js';
+
 export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {
   touchLanguageMenu?: LanguageMenu;
   private pageIntegration: PageIntegrationHandlers;
 
   private _initialized: number = 0;
+  readonly _util: UtilApiEndpoint;
+
+  private _ui: UIModule;
 
   keyEventRefocus = () => {
     this.contextManager.restoreLastActiveTarget();
@@ -31,6 +37,8 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     const config = new BrowserConfiguration(sourceUri);  // currently set to perform device auto-detect.
 
     super(worker, config, new ContextManager(config, () => this.legacyAPIEvents));
+    this._util = new UtilApiEndpoint(config);
+
     this.hardKeyboard = new HardwareEventKeyboard(config.hardDevice, this.core.keyboardProcessor, this.contextManager);
 
     // Scrolls the document-body to ensure that a focused element remains visible after the OSK appears.
@@ -65,8 +73,27 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     });
   }
 
+  public get util() {
+    return this._util;
+  }
+
   public get initialized() {
     return this._initialized;
+  }
+
+  public get ui() {
+    return this._ui;
+  }
+
+  public set ui(module: UIModule) {
+    if(this._ui) {
+      this._ui.shutdown();
+    }
+
+    this._ui = module;
+    if(this.config.deferForInitialization.hasResolved) {
+      module.initialize();
+    }
   }
 
   protected processorConfiguration(): ProcessorInitOptions {
@@ -130,6 +157,11 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // Initialize supplementary plane string extensions
     String.kmwEnableSupplementaryPlane(true);
     this.config.finalizeInit();
+
+    if(this.ui) {
+      this.ui.initialize();
+    }
+
     this._initialized = 2;
   }
 
@@ -252,22 +284,43 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *
    */
   private _GetKeyboardDetail = function(Lstub: KeyboardStub, Lkbd: Keyboard) { // I2078 - Full keyboard detail
-    var Lr={};
-    Lr['Name'] = Lstub['KN'];
-    Lr['InternalName'] =  Lstub['KI'];
-    Lr['LanguageName'] = Lstub['KL'];  // I1300 - Add support for language names
-    Lr['LanguageCode'] = Lstub['KLC']; // I1702 - Add support for language codes, region names, region codes, country names and country codes
-    Lr['RegionName'] = Lstub['KR'];
-    Lr['RegionCode'] = Lstub['KRC'];
-    Lr['CountryName'] = Lstub['KC'];
-    Lr['CountryCode'] = Lstub['KCC'];
-    Lr['KeyboardID'] = Lstub['KD'];
-    Lr['Font'] = Lstub['KFont'];
-    Lr['OskFont'] = Lstub['KOskFont'];
-    Lr['HasLoaded'] = !!Lkbd;
+    let Lr = {
+      Name: Lstub.KN,
+      InternalName: Lstub.KI,
+      LanguageName: Lstub.KL,  // I1300 - Add support for language names
+      LanguageCode: Lstub.KLC, // I1702 - Add support for language codes, region names, region codes, country names and country codes
+      RegionName: Lstub.KR,
+      RegionCode: Lstub.KRC,
+      CountryName: Lstub['KC'] as string,
+      CountryCode: Lstub['KCC'] as string,
+      KeyboardID: Lstub['KD'] as string,
+      Font: Lstub.KFont,
+      OskFont: Lstub.KOskFont,
+      HasLoaded: !!Lkbd,
+      IsRTL: Lkbd ? Lkbd.isRTL : null
+    };
 
-    Lr['IsRTL'] = Lkbd ? Lkbd.isRTL : null;
     return Lr;
+  }
+
+  /**
+   * Function    isCJK
+   * Scope       Public
+   * @param      {Object=}  k0
+   * @return     {boolean}
+   * Description Tests if active keyboard (or specified keyboard script object, as optional argument)
+   *             uses a pick list (Chinese, Japanese, Korean, etc.)
+   *             (This function accepts either keyboard structure.)
+   */
+  isCJK(k0? /* keyboard script object */) {
+    let kbd: Keyboard;
+    if(k0) {
+      kbd = new Keyboard(k0);
+    } else {
+      kbd = this.core.activeKeyboard;
+    }
+
+    return kbd && kbd.isCJK;
   }
 
   /**
@@ -292,7 +345,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *
    */
   getKeyboards() {
-    const Lr = [];
+    const Lr: ReturnType<KeymanEngine['_GetKeyboardDetail']>[] = [];
 
     const cache = this.keyboardRequisitioner.cache;
     const keyboardStubs = cache.getStubList()
@@ -328,6 +381,16 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     return true;
   }
 
+  /**
+   * Gets the cookie for the name and language code of the most recently active keyboard
+   *
+   *  Defaults to US English, but this needs to be user-set in later revision (TODO)
+   *
+   * @return      {string}          InternalName:LanguageCode
+   **/
+  getSavedKeyboard(): string {
+    return this.contextManager.getSavedKeyboard();
+  }
 
   /**
    * Set focus to last active target element (browser-dependent)

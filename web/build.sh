@@ -103,6 +103,9 @@ builder_run_child_actions build:app/webview
 # Uses literally everything `engine/` above
 builder_run_child_actions build:app/browser
 
+# Uses app/browser above for engine type-defs
+builder_run_child_actions build:app/ui
+
 builder_run_child_actions test
 
 if builder_has_action build:app/browser; then

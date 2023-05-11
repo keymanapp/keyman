@@ -12,6 +12,11 @@ export class BrowserConfiguration extends EngineConfiguration {
   private alertHost?: AlertHost;
   private _options: Required<BrowserInitOptionSpec>;
 
+  /**
+   * Needed for the util function getOptions.
+   */
+  private _options: Required<BrowserInitOptionSpec>;
+
   initialize(options: Required<BrowserInitOptionSpec>) {
     if(this._options) {
       // Preserve old options, but replace with any newly-set ones if specified.
@@ -21,6 +26,7 @@ export class BrowserConfiguration extends EngineConfiguration {
       this._options = {...options};
     }
     super.initialize(options);
+    this._options = options;
 
     this._ui = options.ui;
     this._attachType = options.attachType;
@@ -35,6 +41,10 @@ export class BrowserConfiguration extends EngineConfiguration {
         this.alertHost = null;
       }
     });
+  }
+
+  get options() {
+    return this._options;
   }
 
   get attachType() {

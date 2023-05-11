@@ -286,47 +286,6 @@ namespace com.keyman {
     }
 
     /**
-     * Function    isCJK
-     * Scope       Public
-     * @param      {Object=}  k0
-     * @return     {boolean}
-     * Description Tests if active keyboard (or specified keyboard script object, as optional argument)
-     *             uses a pick list (Chinese, Japanese, Korean, etc.)
-     *             (This function accepts either keyboard structure.)
-     */
-    ['isCJK'](k0?) {
-      var kbd: keyboards.Keyboard;
-      if(k0) {
-        kbd = new keyboards.Keyboard(k0);
-      } else {
-        kbd = this.core.activeKeyboard;
-      }
-
-      return kbd && kbd.isCJK;
-    }
-
-    /**
-     * Gets the cookie for the name and language code of the most recently active keyboard
-     *
-     *  Defaults to US English, but this needs to be user-set in later revision (TODO)
-     *
-     * @return      {string}          InternalName:LanguageCode
-     */
-    ['getSavedKeyboard']() {
-      return this.keyboardManager.getSavedKeyboard();
-    }
-
-    /**
-     * Function     Initialization
-     * Scope        Public
-     * @param       {Object}  arg     object array of user-defined properties
-     * Description  KMW window initialization
-     */
-    ['init'](arg): Promise<any> {
-      return this.domManager.init(arg);
-    }
-
-    /**
      * Function     disableControl
      * Scope        Public
      * @param       {Element}      Pelem       Element to be disabled

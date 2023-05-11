@@ -72,24 +72,6 @@ namespace com.keyman {
     // -----------------------------------------------
 
     /**
-     * Function     getOption
-     * Scope        Public
-     * @param       {string}    optionName  Name of option
-     * @param       {*=}        dflt        Default value of option
-     * @return      {*}
-     * Description  Returns value of named option
-     */
-    getOption(optionName:string, dflt:any): any {
-      if(optionName in this.keyman.options) {
-        return this.keyman.options[optionName];
-      } else if(arguments.length > 1) {
-        return dflt;
-      } else {
-        return '';
-      }
-    }
-
-    /**
      * More reliable way of identifying  element class
      * @param   {Object}  e HTML element
      * @param   {string}  name  class name
@@ -155,13 +137,6 @@ namespace com.keyman {
       } else {
         return 0;
       }
-    }
-
-    /**
-     * Expose the touchable state for UIs - will disable external UIs entirely
-     **/
-    isTouchDevice(): boolean {
-      return this.device.touchable;
     }
 
     /**
