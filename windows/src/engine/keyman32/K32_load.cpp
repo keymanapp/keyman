@@ -45,12 +45,6 @@ BOOL GetKeyboardFileName(LPSTR kbname, LPSTR buf, int nbuf)
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
-  if(_td->ForceFileName[0])
-  {
-    strncpy_s(buf, nbuf, _td->ForceFileName, nbuf - 1);
-    buf[nbuf-1] = 0;
-    return TRUE;
-  }
 
   int n = 0;
   RegistryReadOnly *reg = Reg_GetKeymanInstalledKeyboard(kbname);

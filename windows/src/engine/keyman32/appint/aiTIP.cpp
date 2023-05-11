@@ -595,7 +595,6 @@ BOOL AITIP::QueueDebugInformation(int ItemType, LPGROUP Group, LPKEY Rule, PWSTR
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return TRUE;
-  if(!_td->ForceFileName[0]) return TRUE;
 
 	SendDebugMessageFormat(0, sdmAIDefault, 0, "AIDebugger::QueueDebugInformation ItemType=%d", ItemType);
 	AIDEBUGINFO di;
@@ -619,20 +618,4 @@ BOOL AITIP::QueueDebugInformation(int ItemType, LPGROUP Group, LPKEY Rule, PWSTR
 		SendMessage(GetDebugControlWindow(), WM_KEYMANDEBUG_RULEMATCH, ItemType, (LPARAM) &di);
 
 	return TRUE;
-}
-
-typedef BOOL(WINAPI *PREFRESHPRESERVEDKEYSFUNC)(BOOL Activating);
-
-void RefreshPreservedKeys(BOOL Activating) {
-#ifdef _WIN64
-  HMODULE hModule = GetModuleHandle("kmtip64");
-#else
-  HMODULE hModule = GetModuleHandle("kmtip");
-#endif
-  if (hModule != NULL) {
-    PREFRESHPRESERVEDKEYSFUNC pRefreshPreservedKeys = (PREFRESHPRESERVEDKEYSFUNC)GetProcAddress(hModule, "RefreshPreservedKeys");
-    if (pRefreshPreservedKeys) {
-      pRefreshPreservedKeys(Activating);
-    }
-  }
 }

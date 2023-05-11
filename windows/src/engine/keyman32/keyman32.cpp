@@ -529,19 +529,6 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_RestartEngine()
   return TRUE;
 }
 
-/*******************************************************************************************/
-/*                                                                                         */
-/* Keyman Keyboard Override Functions                                                      */
-/*                                                                                         */
-/*******************************************************************************************/
-
-
-
-void RefreshPreservedKeys(BOOL Activating);
-
-
-
-
 //---------------------------------------------------------------------------------------------------------
 //
 // Utility guff functions
@@ -914,7 +901,11 @@ void ReleaseKeyboards(BOOL Lock)
 	if(!_td || !_td->lpKeyboards) return;
 
 
-  if(Lock) if(_td->lpActiveKeyboard && !_td->ForceFileName[0]) DeactivateDLLs(_td->lpActiveKeyboard);
+  if(Lock) {
+    if(_td->lpActiveKeyboard) {
+      DeactivateDLLs(_td->lpActiveKeyboard);
+    }
+  }
 
 	for(int i = 0; i < _td->nKeyboards; i++)
 	{
@@ -928,7 +919,6 @@ void ReleaseKeyboards(BOOL Lock)
 	delete _td->lpKeyboards;
 
 	_td->lpKeyboards = NULL;
-	if(!_td->ForceFileName[0]) _td->lpActiveKeyboard = NULL;
 }
 
 /**
