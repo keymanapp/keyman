@@ -65,5 +65,10 @@ export class CompilerMessages {
     `The package file ${o.filename} does not follow the recommended keyboard filename conventions. The name should be all lower case, `+
     `include only alphanumeric characters and underscore (_), and not start with a digit.`);
   static WARN_PackageNameDoesNotFollowKeyboardConventions = SevWarn | 0x000E;
+
+  static Warn_FileInPackageDoesNotFollowFilenameConventions = (o:{filename: string}) => m(this.WARN_FileInPackageDoesNotFollowFilenameConventions,
+    `The file ${o.filename} does not follow the recommended filename conventions. The extension should be all lower case, `+
+    `and the filename should include only alphanumeric characters, -, _, + and .`);
+  static WARN_FileInPackageDoesNotFollowFilenameConventions = SevWarn | 0x000F;
 }
 
