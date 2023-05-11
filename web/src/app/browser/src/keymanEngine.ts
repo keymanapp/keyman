@@ -19,6 +19,7 @@ import { outputTargetForElement } from '../../../../build/engine/attachment/obj/
 
 import { UtilApiEndpoint} from './utilApiEndpoint.js';
 import { UIModule } from './uiModuleInterface.js';
+import { HotkeyManager } from './hotkeyManager.js';
 
 export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {
   touchLanguageMenu?: LanguageMenu;
@@ -28,6 +29,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
   readonly _util: UtilApiEndpoint;
 
   private _ui: UIModule;
+  hotkeyManager: HotkeyManager = new HotkeyManager();
 
   keyEventRefocus = () => {
     this.contextManager.restoreLastActiveTarget();
@@ -134,6 +136,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     await super.init(totalOptions);
 
     this.contextManager.initialize();  // will seek to attach to the page, which requires document.body
+
     const oskConfig: FloatingOSKViewConfiguration = {
       hostDevice: this.config.hostDevice,
       pathConfig: this.config.paths,
@@ -429,6 +432,30 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
       throw new Error(`KMW is not attached to the specified element (id: ${e.id}).`);
     }
     this.contextManager.setActiveTarget(target, setFocus);
+  }
+
+
+  /**
+   * Function     addHotkey
+   * Scope        Public
+   * @param       {number}            keyCode
+   * @param       {number}            shiftState
+   * @param       {function(Object)}  handler
+   * Description  Add hot key handler to array of document-level hotkeys triggered by key up event
+   */
+  addHotKey(keyCode: number, shiftState: number, handler: () => void) {
+    this.hotkeyManager.addHotKey(keyCode, shiftState, handler);
+  }
+
+  /**
+   * Function     removeHotkey
+   * Scope        Public
+   * @param       {number}        keyCode
+   * @param       {number}        shiftState
+   * Description  Remove a hot key handler from array of document-level hotkeys triggered by key up event
+   */
+  removeHotKey(keyCode: number, shiftState: number) {
+    this.hotkeyManager.removeHotkey(keyCode, shiftState);
   }
 
   /**

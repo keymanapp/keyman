@@ -159,21 +159,25 @@ if(!keyman?.ui?.name) {
       /**
        * Toggle the on screen keyboard display - KMW button control event
        **/
-      switchOsk() {
+      readonly switchOsk = () => {
         // Check that user control of OSK is allowed
         if((keymanweb.getActiveKeyboard() == '') || keymanweb.isCJK()) {
           return;
         }
 
         if(keymanweb.osk) {
-          keymanweb.osk.show(!keymanweb.osk.isEnabled());
+          const newState = !keymanweb.osk.isEnabled();
+          keymanweb.osk.show(newState);
+
+          // Also, indicate that the OSK is intentionally hidden.
+          this.oskButton._setSelected(newState);
         }
       }
 
       /**
        * Toggle a single keyboard on or off - KMW button control event
        **/
-      switchSingleKbd() {
+      readonly switchSingleKbd = () => {
         const _v = keymanweb.getActiveKeyboard() == '';
         let nLastKbd=0, kbdName='', lgCode='';
 
@@ -202,7 +206,7 @@ if(!keyman?.ui?.name) {
       /**
        * Switch to the next keyboard in the list - KMW button control event
        **/
-      switchNextKbd() {
+      readonly switchNextKbd = () => {
         let _v = (keymanweb.getActiveKeyboard() == '');
         let kbdName='', lgCode='';
 
@@ -727,9 +731,14 @@ if(!keyman?.ui?.name) {
     // Actually assign our UI module to the active Keyman engine.
     const ui = keymanweb.ui = new ToggleUI();
 
-    // keymanweb['addHotKey'](191,0x20, ui.switchSingleKbd);
-    // keymanweb['addHotKey'](191,0x30, ui.switchNextKbd);
-    // keymanweb['addHotKey'](191,0x40, ui.switchOsk);
+    // CTRL-K_SLASH:  toggles to and from default keyboard
+    keymanweb.addHotKey(191, 0x20, ui.switchSingleKbd);
+
+    // SHIFT-CTRL-K_SLASH:  cycles among available keyboards in sequence
+    keymanweb.addHotKey(191, 0x30, ui.switchNextKbd);
+
+    // ALT-K_SLASH:  Hides the OSK
+    keymanweb.addHotKey(191, 0x40, ui.switchOsk);
 
     // // Initialize after KMW is fully initialized
     // keymanweb['addEventListener']('loaduserinterface', ui.initialize);

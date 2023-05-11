@@ -351,29 +351,6 @@ namespace com.keyman {
       this.domManager.moveToElement(e);
     }
 
-    /**
-     * Function     addHotkey
-     * Scope        Public
-     * @param       {number}            keyCode
-     * @param       {number}            shiftState
-     * @param       {function(Object)}  handler
-     * Description  Add hot key handler to array of document-level hotkeys triggered by key up event
-     */
-    ['addHotKey'](keyCode: number, shiftState: number, handler: () => void) {
-      this.hotkeyManager.addHotKey(keyCode, shiftState, handler);
-    }
-
-    /**
-     * Function     removeHotkey
-     * Scope        Public
-     * @param       {number}        keyCode
-     * @param       {number}        shiftState
-     * Description  Remove a hot key handler from array of document-level hotkeys triggered by key up event
-     */
-    ['removeHotKey'](keyCode: number, shiftState: number) {
-      this.hotkeyManager.removeHotkey(keyCode, shiftState);
-    }
-
     // Functions that might be added later
     ['beepKeyboard']: () => void;
     /**

@@ -177,8 +177,7 @@ export class PageIntegrationHandlers {
     eventTracker.attachDOMEvent(window, 'load',   this._WindowLoad,  false);
     eventTracker.attachDOMEvent(window, 'unload', this._WindowUnload,false);
 
-    // TODO:  Hotkey module stuff.  Is not yet modularized.
-    // eventTracker.attachDOMEvent(document, 'keyup', this.engine.hotkeyManager._Process, false);
+    eventTracker.attachDOMEvent(document, 'keyup', this.engine.hotkeyManager._Process, false);
   }
 
   public shutdown() {
@@ -203,7 +202,6 @@ export class PageIntegrationHandlers {
     eventTracker.detachDOMEvent(window, 'load',   this._WindowLoad,  false);
     eventTracker.detachDOMEvent(window, 'unload', this._WindowUnload,false);
 
-    // TODO:  Hotkey module stuff.
-    // eventTracker.detachDOMEvent(document, 'keyup', this.engine.hotkeyManager._Process, false);
+    eventTracker.detachDOMEvent(document, 'keyup', this.engine.hotkeyManager._Process, false);
   }
 }
