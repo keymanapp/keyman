@@ -392,6 +392,24 @@ export default class KeymanEngine<
   }
 
   /**
+   * Function    getActiveLanguage
+   * Scope       Public
+   * @param      {boolean=}        true to retrieve full language name, false/undefined to retrieve code.
+   * @return     {string}         language code
+   * Description Return language code for currently selected language
+   */
+  getActiveLanguage(fullName?: boolean): string {
+    // In short... the activeStub.
+    const metadata = this.contextManager.activeKeyboard?.metadata;
+
+    if(!fullName) {
+      return metadata.langId ?? '';
+    } else {
+      return metadata.langName ?? '';
+    }
+  }
+
+  /**
    * Function     isChiral
    * Scope        Public
    * @param       {string|Object=}   k0

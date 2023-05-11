@@ -6,6 +6,7 @@ import {
   getAbsoluteY,
   StylesheetManager
  } from "keyman/engine/dom-utils";
+import { DomEventTracker } from "keyman/engine/events";
 import { BrowserConfiguration, BrowserInitOptionSpec } from "./configuration.js";
 
 /**
@@ -109,26 +110,38 @@ export class UtilApiEndpoint {
     return styleSheet;
   }
 
-    /**
-     * Remove a stylesheet element
-     *
-     * @param       {Object}        s             style sheet reference
-     * @return      {boolean}                     false if element is not a style sheet
-     **/
-    removeStyleSheet(s: HTMLStyleElement) {
-      return this.stylesheetManager.unlink(s);
-    }
+  /**
+   * Remove a stylesheet element
+   *
+   * @param       {Object}        s             style sheet reference
+   * @return      {boolean}                     false if element is not a style sheet
+   **/
+  removeStyleSheet(s: HTMLStyleElement) {
+    return this.stylesheetManager.unlink(s);
+  }
 
-    /**
-     * Add a reference to an external stylesheet file
-     *
-     * @param   {string}  s   path to stylesheet file
-     */
-    linkStyleSheet(s: string): void {
-      this.stylesheetManager.linkExternalSheet(s);
-    }
+  /**
+   * Add a reference to an external stylesheet file
+   *
+   * @param   {string}  s   path to stylesheet file
+   */
+  linkStyleSheet(s: string): void {
+    this.stylesheetManager.linkExternalSheet(s);
+  }
 
   shutdown() {
     this.stylesheetManager?.unlinkAll();
   }
+
+  // Possible alternative:  https://www.npmjs.com/package/language-tags
+  // This would necessitate linking in a npm module into compiled KeymanWeb, though.
+  getLanguageCodes(lgCode: string): string[] {
+    if(lgCode.indexOf('-')==-1) {
+      return [lgCode];
+    } else {
+      return lgCode.split('-');
+    }
+  }
+
+  readonly DomEventTracker = DomEventTracker;
 }

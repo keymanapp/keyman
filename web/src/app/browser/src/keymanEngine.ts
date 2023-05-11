@@ -315,10 +315,15 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *             uses a pick list (Chinese, Japanese, Korean, etc.)
    *             (This function accepts either keyboard structure.)
    */
-  isCJK(k0? /* keyboard script object */) {
+  isCJK(k0? /* keyboard script object | return-type of _GetKeyboardDetail [b/c Toolbar UI]*/) {
     let kbd: Keyboard;
     if(k0) {
-      kbd = new Keyboard(k0);
+      let kbdDetail = k0 as ReturnType<KeymanEngine['_GetKeyboardDetail']>;
+      if(kbdDetail.KeyboardID){
+        kbd = this.keyboardRequisitioner.cache.getKeyboard(k0.KeyboardID);
+      } else {
+        kbd = new Keyboard(k0);
+      }
     } else {
       kbd = this.core.activeKeyboard;
     }
