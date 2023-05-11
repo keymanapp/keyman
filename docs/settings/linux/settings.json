@@ -107,4 +107,5 @@
     "--external-sources --source-path=resources/build/"
   ],
   "C_Cpp.errorSquiggles": "EnabledIfIncludesResolve",
+  "shellcheck.useWorkspaceRootAsCwd": false
 }

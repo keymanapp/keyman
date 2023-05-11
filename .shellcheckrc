@@ -1,2 +1,5 @@
 external-sources=true
-source-path=resources/build/
+
+# If you get SC1091 for sourced files, add the following setting to
+# your .vscode/settings.json file:
+# "shellcheck.useWorkspaceRootAsCwd": false
