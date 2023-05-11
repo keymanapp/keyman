@@ -1,6 +1,6 @@
 /***
-   KeymanWeb 11.0
-   Copyright 2019 SIL International
+   KeymanWeb 17.0
+   Copyright 2019-2023 SIL International
 ***/
 
 import type { KeymanEngine, KeyboardCookie, UIModule } from 'keyman/app/browser';
@@ -36,8 +36,6 @@ if(!keyman?.ui?.name) {
 
   try {
     // Declare KeymanWeb, OnScreen Keyboard and Util objects
-    //var keymanweb=window['keyman'],util=keymanweb['util'];
-
     const keymanweb = keyman;
     //var dbg=keymanweb['debug'];
     const util = keymanweb.util;
@@ -56,8 +54,8 @@ if(!keyman?.ui?.name) {
        * The top-level element of the Toggle UI module.
        */
       controller: HTMLDivElement = null;
-      oskButton = null;
-      kbdButton = null;
+      oskButton = null;  // inner class - Button, as defined within the .button method
+      kbdButton = null;  // likewise.
       controllerHovered = false;
 
       keyboards: KeyboardMenuEntry[] = [];
@@ -66,9 +64,13 @@ if(!keyman?.ui?.name) {
        */
       lastActiveKeyboard = -1;
 
-      selectedMenuItem = null;
+      selectedMenuItem: HTMLAnchorElement = null;
       updateList = true;
-      updateTimer = null;
+
+      /**
+       * The numeric handle for an active window.setTimeout call.
+       */
+      updateTimer: number = null;
 
       keyboardMenu: HTMLUListElement;
 
@@ -240,8 +242,8 @@ if(!keyman?.ui?.name) {
        * Create a button object for KeymanWeb UI buttons
        *
        * @constructor
-       * @param       {string}    _src
-       * @param       {string}    _caption
+       * @param       {string}    _src         Image source
+       * @param       {string}    _caption     Alt text
        * @param       {boolean}   _selected
        * @return      {Object}
        *
@@ -249,7 +251,14 @@ if(!keyman?.ui?.name) {
        *                             // and the like are defined on individual instances later.
        *                             // It thinks they're always null.
        **/
-      button(_src, _caption, _selected) {
+      button(_src: string, _caption: string, _selected: boolean) {
+        /**
+         * Only ui.controllerHovered is referenced here:  it'd be easy enough to toggle it via closure
+         * and extract this inner class into its own definition outside of `class ToggleUI`.
+         *
+         * This would also give the main class type inference for its related fields and their
+         * uses.
+         */
         const ui = this;
 
         class Button {
@@ -259,7 +268,7 @@ if(!keyman?.ui?.name) {
           _onmouseout = null;
           _down = false;
           _over = false;
-          _selected = _selected;
+          _selected: boolean;
 
           /**
            * The top-level element of the button.
@@ -350,7 +359,9 @@ if(!keyman?.ui?.name) {
             return this._down;
           };
 
-          constructor() {
+          constructor(/* TODO: put wrapping method's params HERE instead upon class-extraction */) {
+            this._selected = _selected;
+
             let imgPath=util.getOption('resources') + 'ui/toggle/';
             let _elemImg = util.createUnselectableElement('img');
             this._elem = util.createUnselectableElement('div');
@@ -584,7 +595,8 @@ if(!keyman?.ui?.name) {
             this.selectedMenuItem.className='';
           }
           _k.className='selected';
-          this.selectedMenuItem=_k;
+          // The keyboard's entry in the keyboard-list drop-down is an <a> element.
+          this.selectedMenuItem=_k as HTMLAnchorElement;
         }
 
         // Occurs for desktop form-factors when no keyboard (aka the sys default) is active.
@@ -757,12 +769,12 @@ if(!keyman?.ui?.name) {
      * Set a timer to update the UI keyboard list on timeout after each keyboard is registered,
      * thus updating only once when only if multiple keyboards are registered together
      */
-    keymanweb['addEventListener']('keyboardregistered', function(p) {
+    keymanweb.addEventListener('keyboardregistered', function(p) {
       ui.updateList = true;
       if(ui.updateTimer) {
         clearTimeout(ui.updateTimer);
       }
-      ui.updateTimer = setTimeout(ui.updateKeyboardList, 200);
+      ui.updateTimer = window.setTimeout(ui.updateKeyboardList, 200);
     });
 
 
@@ -771,7 +783,7 @@ if(!keyman?.ui?.name) {
      *
      * Update menu selection and control OSK display appropriately
      */
-    keymanweb['addEventListener']('keyboardchange', function(p) {
+    keymanweb.addEventListener('keyboardchange', function(p) {
       ui.updateMenu(p.internalName, p.languageCode);
     });
 
