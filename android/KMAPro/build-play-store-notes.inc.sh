@@ -2,12 +2,11 @@
 
 # Assumption: parent script that sources this already has START STANDARD BUILD SCRIPT INCLUDE
 
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
-
 ################################ Main script ################################
 
 function generateReleaseNotes() {
+  pushd "$KEYMAN_ROOT/android/KMAPro/"
+
   #
   # Copy release notes for Gradle Play Publisher to upload
   # Reference: https://github.com/Triple-T/gradle-play-publisher#uploading-release-notes
@@ -31,7 +30,9 @@ function generateReleaseNotes() {
     builder_warn "Warning: whatsnew.md empty so using default release note: '$FILTERED_LINES'"
   fi
 
-  IFS=$'\n'      # Change IFS to new line
+  # Change IFS to new line
+  local old_IFS="${IFS}"
+  IFS=$'\n'      
   for line in $FILTERED_LINES
   do
     local CHARS_IN_RELEASE_NOTES=$( wc -m < $PLAY_RELEASE_NOTES )
@@ -46,4 +47,8 @@ function generateReleaseNotes() {
       break
     fi
   done
+
+  # Restore IFS
+  IFS=${old_IFS}
+  popd
 }
