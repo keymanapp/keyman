@@ -3,7 +3,6 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-# shellcheck source=resources/build/build-utils.sh
 . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
@@ -23,7 +22,7 @@ builder_parse "$@"
 cd "$THIS_SCRIPT_PATH"
 
 builder_describe_outputs \
-  build "keyman_config/standards/lang_tags_map.py"
+  build "/linux/keyman-config/keyman_config/standards/lang_tags_map.py"
 
 builder_run_action clean      make clean
 builder_run_action configure  # nothing to do
