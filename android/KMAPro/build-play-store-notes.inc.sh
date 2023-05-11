@@ -35,20 +35,20 @@ function generateReleaseNotes() {
   IFS=$'\n'      
   for line in $FILTERED_LINES
   do
-    local CHARS_IN_RELEASE_NOTES=$( wc -m < $PLAY_RELEASE_NOTES )
+    local CHARS_IN_RELEASE_NOTES=$( wc -m < "$PLAY_RELEASE_NOTES" )
     local CHARS_IN_CURRENT_LINE=$( wc -m <<< $line )
     if (( CHARS_IN_RELEASE_NOTES + CHARS_IN_CURRENT_LINE + 1 < 450 )); then
       # Copy line to Play Store release notes
-      echo "$line" >> $PLAY_RELEASE_NOTES
+      echo "$line" >> "$PLAY_RELEASE_NOTES"
     else
       # 450 chars reached
       builder_warn "Warning: Play Store release notes approaching 500 character limit"
-      echo "$DEFAULT_RELEASE_NOTE" >> $PLAY_RELEASE_NOTES
+      echo "$DEFAULT_RELEASE_NOTE" >> "$PLAY_RELEASE_NOTES"
       break
     fi
   done
 
   # Restore IFS
-  IFS=${old_IFS}
+  IFS="${old_IFS}"
   popd
 }
