@@ -194,6 +194,7 @@ char *msgnames[] = {
 "WM_SYSCHAR",
 "WM_SYSDEADCHAR",
 "WM_x108",
+"WM_UNICHAR"
 };
 
 void DebugMessage(LPMSG msg, WPARAM wParam)  // I2908

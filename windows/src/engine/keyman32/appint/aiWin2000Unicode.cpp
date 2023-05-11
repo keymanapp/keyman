@@ -43,7 +43,6 @@
 #include "pch.h"   // I4128   // I4287
 #include "serialkeyeventclient.h"
 
-#define KEYMAN_MOREPOST	"WM_KMMOREPOST"
 
 AIWin2000Unicode::AIWin2000Unicode()
 {
