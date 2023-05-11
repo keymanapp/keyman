@@ -44,7 +44,7 @@ afterEach(function() {
 });
 
 
-export function loadSectionFixture(compilerClass: typeof SectionCompiler, filename: string, callbacks: TestCompilerCallbacks): Section {
+export async function loadSectionFixture(compilerClass: typeof SectionCompiler, filename: string, callbacks: TestCompilerCallbacks): Promise<Section> {
   callbacks.messages = [];
   const inputFilename = makePathToFixture(filename);
   const data = callbacks.loadFile(inputFilename);
@@ -59,6 +59,8 @@ export function loadSectionFixture(compilerClass: typeof SectionCompiler, filena
   }
 
   const compiler = new compilerClass(source, callbacks);
+
+  assert.ok(await compiler.init(), `${compiler.id} failed init()`);
 
   if(!compiler.validate()) {
     return null;
@@ -83,7 +85,7 @@ export function loadTestdata(inputFilename: string, options: CompilerOptions) : 
   return source;
 }
 
-export function compileKeyboard(inputFilename: string, options: CompilerOptions): KMXPlusFile {
+export async function compileKeyboard(inputFilename: string, options: CompilerOptions): Promise<KMXPlusFile> {
   const k = new Compiler(compilerTestCallbacks, options);
   const source = k.load(inputFilename);
   checkMessages();
@@ -93,7 +95,7 @@ export function compileKeyboard(inputFilename: string, options: CompilerOptions)
   checkMessages();
   assert.isTrue(valid, 'k.validate should not have failed');
 
-  const kmx = k.compile(source);
+  const kmx = await k.compile(source);
   checkMessages();
   assert.isNotNull(kmx, 'k.compile should not have returned null');
 
@@ -164,14 +166,14 @@ export function testCompilationCases(compiler: typeof SectionCompiler, cases : C
     const expectFailure = testcase.throws || !!(testcase.errors); // if true, we expect this to fail
     const testHeading = expectFailure ? `should fail to compile: ${testcase.subpath}`:
                                         `should compile: ${testcase.subpath}`;
-    it(testHeading, function () {
+    it(testHeading, async function () {
       callbacks.clear();
       // special case for an expected exception
       if (testcase.throws) {
-        assert.throws(() => loadSectionFixture(compiler, testcase.subpath, callbacks), testcase.throws, 'expected exception from compilation');
+        assert.throws(async () => await loadSectionFixture(compiler, testcase.subpath, callbacks), testcase.throws, 'expected exception from compilation');
         return;
       }
-      let section = loadSectionFixture(compiler, testcase.subpath, callbacks);
+      let section = await loadSectionFixture(compiler, testcase.subpath, callbacks);
       if (expectFailure) {
         assert.isNull(section, 'expected compilation result to be null, but got something');
       } else {

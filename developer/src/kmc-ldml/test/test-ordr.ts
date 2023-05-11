@@ -10,7 +10,7 @@
 //   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
 //   it('should compile minimal ordr data', function() {
-//     let ordr = loadSectionFixture(OrdrCompiler, 'sections/ordr/minimal.xml', compilerTestCallbacks) as Ordr;
+//     let ordr = await loadSectionFixture(OrdrCompiler, 'sections/ordr/minimal.xml', compilerTestCallbacks) as Ordr;
 //     assert.lengthOf(compilerTestCallbacks.messages, 0);
 
 //     it.skip('TODO-LDML rewriting this #7377', () => {

@@ -10,8 +10,8 @@ import Bksp = KMXPlus.Bksp;
 describe('bksp', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
-  it('should compile minimal bksp data', function() {
-    let bksp = loadSectionFixture(BkspCompiler, 'sections/bksp/minimal.xml', compilerTestCallbacks) as Bksp;
+  it('should compile minimal bksp data', async function() {
+    let bksp = await loadSectionFixture(BkspCompiler, 'sections/bksp/minimal.xml', compilerTestCallbacks) as Bksp;
     assert.lengthOf(compilerTestCallbacks.messages, 0);
 
     it.skip('TODO-LDML rewriting this #7377', () => {

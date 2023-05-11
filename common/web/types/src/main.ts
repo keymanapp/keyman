@@ -1,4 +1,3 @@
-
 export * as KMX from './kmx/kmx.js';
 export * as KMXPlus from './kmx/kmx-plus.js';
 export { default as KMXBuilder } from './kmx/kmx-builder.js';
@@ -15,6 +14,7 @@ export * as KvksFile from './kvk/kvk-file.js';
 export * as LDMLKeyboard from './ldml-keyboard/ldml-keyboard-xml.js';
 export { LDMLKeyboardTestDataXMLSourceFile } from './ldml-keyboard/ldml-keyboard-testdata-xml.js';
 export { default as LDMLKeyboardXMLSourceFileReader } from './ldml-keyboard/ldml-keyboard-xml-reader.js';
+export { UnicodeSetParser, UnicodeSet } from './ldml-keyboard/unicodeset-parser-api.js';
 
 export * as Constants from './consts/virtual-key-constants.js';
 

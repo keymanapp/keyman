@@ -93,5 +93,10 @@ export class CompilerMessages {
   static Error_DuplicateVariable = (o:{ids: string}) => m(this.ERROR_DuplicateVariable,
       `duplicate variable id=${o.ids}`);
   static ERROR_DuplicateVariable = SevError | 0x0016;
+
+  static Fatal_SectionInitFailed = (o:{sect: string}) =>
+  m(this.FATAL_SectionInitFailed, `The compiler for '${o.sect}' failed to initialize.`);
+  static FATAL_SectionInitFailed = SevFatal | 0x0017;
+
 }
 

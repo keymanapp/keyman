@@ -11,7 +11,7 @@
 //   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
 //   it('should compile minimal finl data', function() {
-//     let finl = loadSectionFixture(FinlCompiler, 'sections/finl/minimal.xml', compilerTestCallbacks) as Finl;
+//     let finl = await loadSectionFixture(FinlCompiler, 'sections/finl/minimal.xml', compilerTestCallbacks) as Finl;
 //     assert.lengthOf(compilerTestCallbacks.messages, 0);
 
 //     it.skip('TODO-LDML rewriting this #7377', () => {

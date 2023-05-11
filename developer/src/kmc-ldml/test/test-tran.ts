@@ -10,8 +10,8 @@ import Tran = KMXPlus.Tran;
 describe('tran', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
-  it('should compile minimal tran data', function() {
-    let tran = loadSectionFixture(TranCompiler, 'sections/tran/minimal.xml', compilerTestCallbacks) as Tran;
+  it('should compile minimal tran data', async function() {
+    let tran = await loadSectionFixture(TranCompiler, 'sections/tran/minimal.xml', compilerTestCallbacks) as Tran;
     assert.ok(tran);
     assert.lengthOf(compilerTestCallbacks.messages, 0);
     // it.skip('TODO-LDML rewriting this #7377', () => {

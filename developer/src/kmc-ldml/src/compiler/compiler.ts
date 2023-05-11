@@ -128,7 +128,7 @@ export default class Compiler {
    * @param   source  in-memory representation of LDML keyboard xml file
    * @returns         KMXPlusFile intermediate file
    */
-  public compile(source: LDMLKeyboardXMLSourceFile): KMXPlusFile {
+  public async compile(source: LDMLKeyboardXMLSourceFile): Promise<KMXPlus.KMXPlusFile> {
     const sections = this.buildSections(source);
     let passed = true;
 
@@ -140,6 +140,11 @@ export default class Compiler {
     kmx.kmxplus.list = new KMXPlus.List(kmx.kmxplus.strs);
 
     for(let section of sections) {
+      if (!await section.init()) {
+        passed = false;
+        this.callbacks.reportMessage(CompilerMessages.Fatal_SectionInitFailed({sect:section.id}));
+        continue;
+      }
       if(!section.validate()) {
         passed = false;
         // We'll keep validating other sections anyway, so we get a full set of

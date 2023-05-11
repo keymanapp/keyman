@@ -4,6 +4,7 @@ import { ElementString } from './element-string.js';
 import { ListItem } from './string-list.js';
 import { unescapeString } from '../util/util.js';
 import { KMXFile } from './kmx.js';
+import { UnicodeSetParser, UnicodeSet } from '@keymanapp/common-types';
 
 // Implementation of file structures from /core/src/ldml/C7043_ldml.md
 // Writer in kmx-builder.ts
@@ -158,20 +159,38 @@ export class Vars extends Section {
 class VarsItem extends Section {
   id: StrsItem;
   value: StrsItem;
+
+  constructor(id: string, value: string, sections: GlobalSections) {
+    super();
+    this.id = sections.strs.allocString(id);
+    this.value = sections.strs.allocAndUnescapeString(value);
+  }
 };
 
 export class UnicodeSetItem extends VarsItem {
-  /**
-   * Pairs of [start,end] in a single array.
-   */
-  _ranges: number[];
+  constructor(id: string, value: string, sections: GlobalSections, usetparser: UnicodeSetParser) {
+    super(id, value, sections);
+    // TODO-LDML: parse subvariables
+    // TODO-LDML: buffer size
+    this._unicodeSet = usetparser.parseUnicodeSet(value, 100);
+    // _unicodeSet may be null, indicating this is invalid.
+    // A message will have been set in that case.
+  }
+  _unicodeSet?: UnicodeSet;
 };
 
 export class SetVarItem extends VarsItem {
+  constructor(id: string, value: string, sections: GlobalSections) {
+    super(id, value, sections);
+    this._items = null; // TODO-LDML
+  }
   _items: string;
 };
 
 export class StringVarItem extends VarsItem {
+  constructor(id: string, value: string, sections: GlobalSections) {
+    super(id, value, sections);
+  }
   // no added fields
 };
 

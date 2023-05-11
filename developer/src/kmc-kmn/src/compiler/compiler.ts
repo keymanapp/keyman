@@ -23,6 +23,7 @@ TODO: implement additional interfaces:
 
 // TODO: rename wasm-host?
 import { CompilerCallbacks, CompilerEvent } from '@keymanapp/common-types';
+import { UnicodeSetParser, UnicodeSet } from '@keymanapp/common-types';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
 import { CompilerMessages, mapErrorFromKmcmplib } from './messages.js';
 
@@ -87,7 +88,7 @@ class WasmWrapper {
   }
 };
 
-export class Compiler {
+export class Compiler implements UnicodeSetParser {
   callbackName: string;
   callbacks: CompilerCallbacks;
   wasm: WasmWrapper;
@@ -208,7 +209,7 @@ export class Compiler {
  * @param rc parseUnicodeSet error code
  * @returns the compiler event
  */
-function getUnicodeSetError(rc: number) : CompilerEvent  {
+function getUnicodeSetError(rc: number) : CompilerEvent {
   // from kmcmplib.h
   const KMCMP_ERROR_SYNTAX_ERR = -1;
   const KMCMP_ERROR_HAS_STRINGS = -2;
@@ -228,20 +229,3 @@ function getUnicodeSetError(rc: number) : CompilerEvent  {
   }
 }
 
-/**
- * Represents a parsed UnicodeSet
- */
-export class UnicodeSet {
-  constructor(public pattern: string, public ranges: number[][]) {
-  }
-  /**
-   * Number of ranges
-   */
-  get length() : number {
-    return this.ranges.length;
-  }
-
-  toString() : string {
-    return this.pattern;
-  }
-}
