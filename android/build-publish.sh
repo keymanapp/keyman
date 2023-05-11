@@ -75,7 +75,6 @@ echo "BUILD_FLAGS $BUILD_FLAGS"
 if [ "$DO_KMAPRO" = true ]; then
   # Copy Release Notes
   generateReleaseNotes
-  exit
   ./gradlew $DAEMON_FLAG $BUILD_FLAGS
 fi
 
