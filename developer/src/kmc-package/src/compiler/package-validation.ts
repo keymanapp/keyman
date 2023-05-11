@@ -7,6 +7,9 @@ export class PackageValidation {
   }
 
   public validate(kmpJson: KmpJsonFile.KmpJsonFile) {
+    if(!this.checkForModelsAndKeyboardsInSamePackage(kmpJson)) {
+      return false;
+    }
     if(!this.checkKeyboards(kmpJson)) {
       return false;
     }
@@ -28,12 +31,16 @@ export class PackageValidation {
     }
   }
 
-  private checkLexicalModels(kmpJson: KmpJsonFile.KmpJsonFile): boolean {
+  private checkForModelsAndKeyboardsInSamePackage(kmpJson: KmpJsonFile.KmpJsonFile): boolean {
     if(kmpJson.lexicalModels?.length > 0 && kmpJson.keyboards?.length > 0) {
       this.callbacks.reportMessage(CompilerMessages.Error_PackageCannotContainBothModelsAndKeyboards());
       return false;
     }
 
+    return true;
+  }
+
+  private checkLexicalModels(kmpJson: KmpJsonFile.KmpJsonFile): boolean {
     if(kmpJson.lexicalModels) {
       for(let model of kmpJson.lexicalModels) {
         this.checkForDuplicatedLanguages('model', model.id, model.languages);
