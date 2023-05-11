@@ -35,6 +35,9 @@ export class PackageValidation {
     if(!this.checkContentFiles(kmpJson)) {
       return false;
     }
+    if(!this.checkPackageInfo(kmpJson)) {
+      return false;
+    }
     return true;
   }
 
@@ -111,6 +114,15 @@ export class PackageValidation {
     const base = filename.substring(0, filename.length-ext.length);
     if(!CONTENT_FILE_BASENAME_PATTERN.test(base) || !CONTENT_FILE_EXTENSION_PATTERN.test(ext)) {
       this.callbacks.reportMessage(CompilerMessages.Warn_FileInPackageDoesNotFollowFilenameConventions({filename}));
+    }
+
+    return true;
+  }
+
+  private checkPackageInfo(file: KmpJsonFile.KmpJsonFile) {
+    if(!file.info || !file.info.name || !file.info.name.description.trim()) {
+      this.callbacks.reportMessage(CompilerMessages.Error_PackageNameCannotBeBlank());
+      return false;
     }
 
     return true;

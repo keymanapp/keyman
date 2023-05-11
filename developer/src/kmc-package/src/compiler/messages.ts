@@ -70,5 +70,9 @@ export class CompilerMessages {
     `The file ${o.filename} does not follow the recommended filename conventions. The extension should be all lower case, `+
     `and the filename should include only alphanumeric characters, -, _, + and .`);
   static WARN_FileInPackageDoesNotFollowFilenameConventions = SevWarn | 0x000F;
+
+  static Error_PackageNameCannotBeBlank = () => m(this.ERROR_PackageNameCannotBeBlank,
+    `Package name cannot be an empty string.`);
+  static ERROR_PackageNameCannotBeBlank = SevError | 0x0010;
 }
 

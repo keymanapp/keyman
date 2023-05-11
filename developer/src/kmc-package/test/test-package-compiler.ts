@@ -256,4 +256,12 @@ describe('KmpCompiler', function () {
     testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions_2.kps'], CompilerMessages.WARN_FileInPackageDoesNotFollowFilenameConventions);
   });
 
+  // ERROR_PackageNameCannotBeBlank
+
+  it('should generate ERROR_PackageNameCannotBeBlank if package info has empty name', async function() {
+    testForMessage(this, ['invalid', 'error_package_name_cannot_be_blank.kps'], CompilerMessages.ERROR_PackageNameCannotBeBlank); // blank field
+    testForMessage(this, ['invalid', 'error_package_name_cannot_be_blank_2.kps'], CompilerMessages.ERROR_PackageNameCannotBeBlank); // missing field
+    testForMessage(this, ['invalid', 'error_package_name_cannot_be_blank_3.kps'], CompilerMessages.ERROR_PackageNameCannotBeBlank); // missing info section
+  });
+
 });
