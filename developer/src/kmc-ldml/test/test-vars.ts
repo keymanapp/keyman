@@ -23,12 +23,22 @@ describe('vars', function () {
         const set0 = vars.sets[0];
         assert.equal(set0.id.value, "upper");
         assert.equal(set0.value.value, "A B C D E FF");
+        assert.sameDeepMembers(
+          Array.from(set0.items.values()).map(e => e.value.value),
+          ["A", "B", "C", "D", "E", "FF"]);
         const string0 = vars.strings[0];
         assert.equal(string0.id.value, "y");
         assert.equal(string0.value.value, "yes");
         const unicodeSet0 = vars.unicodeSets[0];
         assert.equal(unicodeSet0.id.value, "consonants");
         assert.equal(unicodeSet0.value.value, "[कसतनमह]");
+        assert.sameDeepMembers(unicodeSet0.unicodeSet.ranges, [
+          ['क'.codePointAt(0),'क'.codePointAt(0)], // range of 1
+          ['त'.codePointAt(0),'त'.codePointAt(0)], // range of 1
+          ['न'.codePointAt(0),'न'.codePointAt(0)], // range of 1
+          ['म'.codePointAt(0),'म'.codePointAt(0)], // range of 1
+          ['स'.codePointAt(0),'ह'.codePointAt(0)], // range of 2
+        ]);
       },
     },
     {

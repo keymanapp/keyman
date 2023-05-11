@@ -35,7 +35,7 @@ export class Elem extends Section {
     super();
     this.strings.push(new ElementString(strs, '')); // C7043: null element string
   }
-  allocElementString(strs: Strs, source: string, order?: string, tertiary?: string, tertiary_base?: string, prebase?: string): ElementString {
+  allocElementString(strs: Strs, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string): ElementString {
     let s = new ElementString(strs, source, order, tertiary, tertiary_base, prebase);
     let result = this.strings.find(item => item.isEqual(s));
     if(result === undefined) {
@@ -191,24 +191,24 @@ export class UnicodeSetItem extends VarsItem {
     super(id, value, sections);
     // TODO-LDML: parse subvariables
     // TODO-LDML: buffer size
-    this._unicodeSet = usetparser.parseUnicodeSet(value, 100);
+    this.unicodeSet = usetparser.parseUnicodeSet(value, 100);
     // _unicodeSet may be null, indicating this is invalid.
     // A message will have been set in that case.
   }
-  _unicodeSet?: UnicodeSet;
+  unicodeSet?: UnicodeSet;
   valid() : boolean {
-    return !!this._unicodeSet;
+    return !!this.unicodeSet;
   }
 };
 
 export class SetVarItem extends VarsItem {
   constructor(id: string, value: string, sections: GlobalSections) {
     super(id, value, sections);
-    this._items = value.split(' '); // TODO-LDML
+    this.items = sections.elem.allocElementString(sections.strs, value.split(/\s+/)); // TODO-LDML
   }
-  _items: string[];
+  items: ElementString;
   valid() : boolean {
-    return !!this._items;
+    return !!this.items;
   }
 };
 
@@ -238,8 +238,6 @@ export class TranReorder {
   elements: ElementString;
   before: ElementString;
 };
-
-
 
 export class Tran extends Section {
   groups: TranGroup[] = [];
