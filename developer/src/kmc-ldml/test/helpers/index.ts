@@ -19,6 +19,7 @@ import GlobalSections = KMXPlus.GlobalSections;
 import Section = KMXPlus.Section;
 import Strs = KMXPlus.Strs;
 import List = KMXPlus.List;
+// import Vars = KMXPlus.Vars;
 
 /**
  * Builds a path to the fixture with the given path components.
@@ -70,11 +71,10 @@ export async function loadSectionFixture(compilerClass: typeof SectionCompiler, 
     strs: new Strs(),
     elem: null,
     list: null,
-    vars: null,
+    vars: null, // ?
   };
   globalSections.elem = new Elem(globalSections.strs);
   globalSections.list = new List(globalSections.strs);
-  globalSections.vars = null; // new Vars(globalSections.strs);
 
   return compiler.compile(globalSections);
 }
@@ -175,7 +175,7 @@ export function testCompilationCases(compiler: typeof SectionCompiler, cases : C
       }
       let section = await loadSectionFixture(compiler, testcase.subpath, callbacks);
       if (expectFailure) {
-        assert.isNull(section, 'expected compilation result to be null, but got something');
+        assert.isNull(section, 'expected compilation result failure (null)');
       } else {
         assert.isNotNull(section, `expected successful compilation, but got null and ${JSON.stringify(callbacks.messages)}`);
       }

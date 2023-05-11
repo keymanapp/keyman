@@ -1,7 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
 import { VarsCompiler } from '../src/compiler/vars.js';
-// import { CompilerMessages } from '../src/compiler/messages.js';
+import { CompilerMessages } from '../src/compiler/messages.js';
+import { CompilerMessages as KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 import { /*compilerTestCallbacks, loadSectionFixture,*/testCompilationCases } from './helpers/index.js';
 import { KMXPlus /*, CommonTypesMessages*/ } from '@keymanapp/common-types';
 // import { constants } from '@keymanapp/ldml-keyboard-constants';
@@ -32,11 +33,39 @@ describe('vars', function () {
     },
     {
       subpath: 'sections/vars/dup0.xml',
-      errors: [],
+      errors: [
+        CompilerMessages.Error_DuplicateVariable({ids: 'y'})
+      ],
     },
     {
       subpath: 'sections/vars/dup1.xml',
-      errors: [],
+      errors: [
+        CompilerMessages.Error_DuplicateVariable({ids: 'upper, y'})
+      ],
+    },
+    {
+      subpath: 'sections/vars/fail-uset-props1.xml',
+      errors: [
+        KmnCompilerMessages.Error_UnicodeSetHasProperties()
+      ],
+    },
+    {
+      subpath: 'sections/vars/fail-uset-props2.xml',
+      errors: [
+        KmnCompilerMessages.Error_UnicodeSetHasProperties()
+      ],
+    },
+    {
+      subpath: 'sections/vars/fail-uset-strings.xml',
+      errors: [
+        KmnCompilerMessages.Error_UnicodeSetHasStrings()
+      ],
+    },
+    {
+      subpath: 'sections/vars/fail-uset-syntax.xml',
+      errors: [
+        KmnCompilerMessages.Error_UnicodeSetSyntaxError()
+      ],
     },
   ]);
 });

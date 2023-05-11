@@ -54,7 +54,7 @@ export class VarsCompiler extends SectionCompiler {
     // one report if any dups
     if (dups.size > 0) {
       this.callbacks.reportMessage(CompilerMessages.Error_DuplicateVariable({
-        ids: Array.of(dups.values()).join(', ')
+        ids: Array.from(dups.values()).sort().join(', ')
       }));
       valid = false;
     }
@@ -80,6 +80,10 @@ export class VarsCompiler extends SectionCompiler {
       variables?.unicodeSet?.map(({ id, value }) =>
         new UnicodeSetItem(id, value, sections, this.usetparser));
 
-    return result;
+    if (!result.valid()) {
+      return null;
+    } else {
+      return result;
+    }
   }
 }

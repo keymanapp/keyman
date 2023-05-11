@@ -150,6 +150,21 @@ export class Vars extends Section {
   strings: StringVarItem[] = []; // ≠ StrsItem
   sets: SetVarItem[] = [];
   unicodeSets: UnicodeSetItem[] = [];
+
+  /**
+   *
+   * @returns false if any invalid variables
+   */
+  valid() : boolean {
+    for (const t of [this.sets, this.strings, this.unicodeSets]) {
+      for (const i of t) {
+        if (!i.valid()) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
 };
 
 /**
@@ -165,6 +180,10 @@ class VarsItem extends Section {
     this.id = sections.strs.allocString(id);
     this.value = sections.strs.allocAndUnescapeString(value);
   }
+
+  valid() : boolean {
+    return true;
+  }
 };
 
 export class UnicodeSetItem extends VarsItem {
@@ -177,14 +196,20 @@ export class UnicodeSetItem extends VarsItem {
     // A message will have been set in that case.
   }
   _unicodeSet?: UnicodeSet;
+  valid() : boolean {
+    return !!this._unicodeSet;
+  }
 };
 
 export class SetVarItem extends VarsItem {
   constructor(id: string, value: string, sections: GlobalSections) {
     super(id, value, sections);
-    this._items = null; // TODO-LDML
+    this._items = value.split(' '); // TODO-LDML
   }
-  _items: string;
+  _items: string[];
+  valid() : boolean {
+    return !!this._items;
+  }
 };
 
 export class StringVarItem extends VarsItem {

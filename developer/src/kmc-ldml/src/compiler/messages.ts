@@ -91,7 +91,7 @@ export class CompilerMessages {
   static ERROR_MissingFlicks = SevError | 0x0015;
 
   static Error_DuplicateVariable = (o:{ids: string}) => m(this.ERROR_DuplicateVariable,
-      `duplicate variable id=${o.ids}`);
+      `duplicate variables: id=${o.ids}`);
   static ERROR_DuplicateVariable = SevError | 0x0016;
 
   static Fatal_SectionInitFailed = (o:{sect: string}) =>
