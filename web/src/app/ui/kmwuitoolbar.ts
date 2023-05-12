@@ -5,7 +5,6 @@
 
 import type { KeymanEngine, KeyboardCookie, UIModule } from 'keyman/app/browser';
 import { type StylesheetManager } from 'keyman/engine/dom-utils';
-import { type DomEventTracker } from 'keyman/engine/events';
 
 declare var keyman: KeymanEngine
 
@@ -181,8 +180,6 @@ if(!keyman?.ui?.name) {
         as: 'Asia',
         oc: 'Oceania'
       };
-
-      private eventTracker: DomEventTracker;
 
       /**
        * Create some of the controls but don't insert them into the document yet
@@ -385,8 +382,7 @@ if(!keyman?.ui?.name) {
         this.startTimer = window.setTimeout(this.addKeyboardsToMap, 0);
 
         // Ensure that popups are hidden by clicking elsewhere on document
-        this.eventTracker = new util.DomEventTracker();
-        this.eventTracker.attachDOMEvent(document.body,'click', this.hideAllPopups, false);
+        util.attachDOMEvent(document.body,'click', this.hideAllPopups, false);
 
         // Set Europe to be the default region
         this.selectedRegion = 'eu';
@@ -406,10 +402,6 @@ if(!keyman?.ui?.name) {
         root = this._insertedElem;
         if(root) {
           root.parentNode.removeChild(root);
-        }
-
-        if(this.eventTracker) {
-          this.eventTracker.shutdown();
         }
       }
 

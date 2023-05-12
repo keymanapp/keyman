@@ -477,5 +477,6 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     this.osk?.shutdown();
     this.core.languageProcessor.shutdown();
     this.hardKeyboard.shutdown();
+    this.util.shutdown(); // For tracked dom events, stylesheets.
   }
 }

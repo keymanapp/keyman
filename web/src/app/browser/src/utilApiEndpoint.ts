@@ -24,10 +24,12 @@ export function createUnselectableElement<E extends keyof HTMLElementTagNameMap>
 export class UtilApiEndpoint {
   readonly config: BrowserConfiguration;
   private readonly stylesheetManager: StylesheetManager;
+  private readonly domEventTracker: DomEventTracker;
 
   constructor(config: BrowserConfiguration) {
     this.config = config;
     this.stylesheetManager = new StylesheetManager(document.body, config.applyCacheBusting);
+    this.domEventTracker = new DomEventTracker();
   }
 
   readonly getAbsoluteX = getAbsoluteX;
@@ -129,10 +131,6 @@ export class UtilApiEndpoint {
     this.stylesheetManager.linkExternalSheet(s);
   }
 
-  shutdown() {
-    this.stylesheetManager?.unlinkAll();
-  }
-
   // Possible alternative:  https://www.npmjs.com/package/language-tags
   // This would necessitate linking in a npm module into compiled KeymanWeb, though.
   getLanguageCodes(lgCode: string): string[] {
@@ -143,5 +141,72 @@ export class UtilApiEndpoint {
     }
   }
 
-  readonly DomEventTracker = DomEventTracker;
+  /**
+   * Function     attachDOMEvent: Note for most browsers, adds an event to a chain, doesn't stop existing events
+   * Scope        Public
+   * @param       {Object}    Pelem       Element (or IFrame-internal Document) to which event is being attached
+   * @param       {string}    Peventname  Name of event without 'on' prefix
+   * @param       {function(Object)}  Phandler    Event handler for event
+   * @param       {boolean=}  PuseCapture True only if event to be handled on way to target element
+   * Description  Attaches event handler to element DOM event
+   */
+  attachDOMEvent<K extends keyof WindowEventMap>(
+    Pelem: Window,
+    Peventname: K,
+    Phandler: (ev: WindowEventMap[K]) => any,
+    PuseCapture?: boolean
+  ): void;
+  attachDOMEvent<K extends keyof DocumentEventMap>(
+    Pelem: Document,
+    Peventname: K,
+    Phandler: (ev: DocumentEventMap[K]) => any,
+    PuseCapture?: boolean
+  ): void;
+  attachDOMEvent<K extends keyof HTMLElementEventMap>(
+    Pelem: HTMLElement,
+    Peventname: K,
+    Phandler: (ev: HTMLElementEventMap[K]) => any,
+    PuseCapture?: boolean
+  ): void;
+  attachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
+    // TS can't quite track the type inference forwarding here.
+    this.domEventTracker.attachDOMEvent(Pelem as any, Peventname as any, Phandler, PuseCapture);
+  }
+
+  /**
+   * Function     detachDOMEvent
+   * Scope        Public
+   * @param       {Object}    Pelem       Element from which event is being detached
+   * @param       {string}    Peventname  Name of event without 'on' prefix
+   * @param       {function(Object)}  Phandler    Event handler for event
+   * @param       {boolean=}  PuseCapture True if event was being handled on way to target element
+   * Description Detaches event handler from element [to prevent memory leaks]
+   */
+  detachDOMEvent<K extends keyof WindowEventMap>(
+    Pelem: Window,
+    Peventname: K,
+    Phandler: (ev: WindowEventMap[K]) => any,
+    PuseCapture?: boolean
+  ): void;
+  detachDOMEvent<K extends keyof DocumentEventMap>(
+    Pelem: Document,
+    Peventname: K,
+    Phandler: (ev: DocumentEventMap[K]) => any,
+    PuseCapture?: boolean
+  ): void;
+  detachDOMEvent<K extends keyof HTMLElementEventMap>(
+    Pelem: HTMLElement,
+    Peventname: K,
+    Phandler: (ev: HTMLElementEventMap[K]) => any,
+    PuseCapture?: boolean
+  ): void;
+  detachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
+    // TS can't quite track the type inference forwarding here.
+    this.domEventTracker.detachDOMEvent(Pelem as any, Peventname as any, Phandler, PuseCapture);
+  }
+
+  shutdown() {
+    this.stylesheetManager?.unlinkAll();
+    this.domEventTracker?.shutdown();
+  }
 }
