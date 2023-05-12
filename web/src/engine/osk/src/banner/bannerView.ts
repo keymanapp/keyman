@@ -296,7 +296,7 @@ export class BannerController {
    */
   selectBanner(state: StateChangeEnum) {
     // Only display a SuggestionBanner when LanguageProcessor states it is active.
-    if(state == 'active') {
+    if(state == 'active' || state == 'configured') {
       this.setBanner('suggestion');
     } else if(state == 'inactive') {
       if(this.alwaysShow) {

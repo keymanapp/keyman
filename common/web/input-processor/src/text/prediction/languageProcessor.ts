@@ -415,9 +415,19 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
       // If it there was one and we've reached this point, we're globally
       // deactivating, so we're fine.
       if(this.activeModel) {
+        // If someone toggles predictions on and off without changing the model, it is possible
+        // that the model is already configured!
         let state: StateChangeEnum = flag ? 'active' : 'inactive';
+
+        // We always signal the 'active' state here, even if 'configured', b/c of an
+        // anti-banner-flicker optimization in the Android app.
         this._state = state;
         this.emit('statechange', state);
+
+        if(this.isConfigured) {
+          this._state = 'configured';
+          this.emit('statechange', 'configured');
+        }
       }
     }
   }
