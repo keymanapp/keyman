@@ -1,6 +1,6 @@
 
 export { LdmlKeyboardCompiler } from './compiler/compiler.js';
-export { LdmlKeyboardKeymanWebCompiler as KeymanWebCompiler } from './compiler/keymanweb-compiler.js';
+export { LdmlKeyboardKeymanWebCompiler } from './compiler/keymanweb-compiler.js';
 export { LdmlKeyboardVisualKeyboardCompiler } from './compiler/visual-keyboard-compiler.js';
 export { TouchLayoutCompiler } from './compiler/touch-layout-compiler.js';
 export { CompilerOptions } from './compiler/compiler-options.js';
