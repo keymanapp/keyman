@@ -41,16 +41,33 @@ export class PackageValidation {
     return true;
   }
 
-  private checkForDuplicatedLanguages(resourceType: 'keyboard'|'model', id: string, languages: KmpJsonFile.KmpJsonFileLanguage[]): void {
-    let tags: {[index:string]: boolean} = {};
+  private checkForDuplicatedOrNonMinimalLanguages(resourceType: 'keyboard'|'model', id: string, languages: KmpJsonFile.KmpJsonFileLanguage[]): boolean {
+    let minimalTags: {[tag: string]: string} = {};
+
     for(let lang of languages) {
-      const langTag = lang.id.toLowerCase();
-      if(tags[langTag]) {
-        this.callbacks.reportMessage(CompilerMessages.Warn_PackageShouldNotRepeatLanguages({resourceType:resourceType, id:id, tag:lang.id}));
-      } else {
-        tags[langTag] = true;
+      let locale;
+      try {
+        locale = new Intl.Locale(lang.id);
+      } catch(e: any) {
+        this.callbacks.reportMessage(CompilerMessages.Error_LanguageTagIsNotValid({resourceType, id, lang: lang.id, e}));
+        return false;
+      }
+
+      const minimalTag = locale.minimize().toString();
+
+      if(minimalTag.toLowerCase() !== lang.id.toLowerCase()) {
+        this.callbacks.reportMessage(CompilerMessages.Warn_LanguageTagIsNotMinimal({resourceType, id, actual: lang.id, expected: minimalTag}));
+      }
+
+      if(minimalTags[minimalTag]) {
+        this.callbacks.reportMessage(CompilerMessages.Warn_PackageShouldNotRepeatLanguages({resourceType, id, minimalTag, firstTag: lang.id, secondTag: minimalTags[minimalTag]}));
+      }
+      else {
+        minimalTags[minimalTag] = lang.id;
       }
     }
+
+    return true;
   }
 
   private checkForModelsAndKeyboardsInSamePackage(kmpJson: KmpJsonFile.KmpJsonFile): boolean {
@@ -74,7 +91,9 @@ export class PackageValidation {
     }
 
     for(let model of kmpJson.lexicalModels) {
-      this.checkForDuplicatedLanguages('model', model.id, model.languages);
+      if(!this.checkForDuplicatedOrNonMinimalLanguages('model', model.id, model.languages)) {
+        return false;
+      }
     }
 
     return true;
@@ -92,7 +111,9 @@ export class PackageValidation {
     }
 
     for(let keyboard of kmpJson.keyboards) {
-      this.checkForDuplicatedLanguages('keyboard', keyboard.id, keyboard.languages);
+      if(!this.checkForDuplicatedOrNonMinimalLanguages('keyboard', keyboard.id, keyboard.languages)) {
+        return false;
+      }
     }
 
     return true;

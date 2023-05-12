@@ -51,8 +51,8 @@ export class CompilerMessages {
     `The package contains both lexical models and keyboards, which is not permitted.`);
   static ERROR_PackageCannotContainBothModelsAndKeyboards = SevError | 0x000B;
 
-  static Warn_PackageShouldNotRepeatLanguages = (o:{resourceType: string, id: string, tag: string}) => m(this.WARN_PackageShouldNotRepeatLanguages,
-    `The ${o.resourceType} ${o.id} has a repeated language "${o.tag}".`);
+  static Warn_PackageShouldNotRepeatLanguages = (o:{resourceType: string, id: string, minimalTag: string, firstTag: string, secondTag: string}) => m(this.WARN_PackageShouldNotRepeatLanguages,
+    `Two language tags in ${o.resourceType} ${o.id}, '${o.firstTag}' and '${o.secondTag}', reduce to the same minimal tag '${o.minimalTag}'.`);
   static WARN_PackageShouldNotRepeatLanguages = SevWarn | 0x000C;
 
   static Warn_PackageNameDoesNotFollowLexicalModelConventions = (o:{filename: string}) => m(this.WARN_PackageNameDoesNotFollowLexicalModelConventions,
@@ -86,5 +86,13 @@ export class CompilerMessages {
   static Warn_KeyboardVersionsDoNotMatchPackageVersion = (o: {keyboard:string, keyboardVersion: string, packageVersion: string}) => m(this.WARN_KeyboardVersionsDoNotMatchPackageVersion,
     `Keyboard ${o.keyboard} version ${o.keyboardVersion} does not match package version ${o.packageVersion}.`);
   static WARN_KeyboardVersionsDoNotMatchPackageVersion = SevWarn | 0x0013;
-  }
+
+  static Error_LanguageTagIsNotValid = (o: {resourceType: string, id:string, lang:string, e:any}) => m(this.ERROR_LanguageTagIsNotValid,
+    `Language tag '${o.lang}' in ${o.resourceType} ${o.id} is invalid.`);
+  static ERROR_LanguageTagIsNotValid = SevError | 0x0014;
+
+  static Warn_LanguageTagIsNotMinimal = (o: {resourceType: string, id:string, actual:string, expected:string}) => m(this.WARN_LanguageTagIsNotMinimal,
+    `Language tag '${o.actual}' in ${o.resourceType} ${o.id} is not minimal, and should be '${o.expected}'.`);
+  static WARN_LanguageTagIsNotMinimal = SevWarn | 0x0015;
+}
 
