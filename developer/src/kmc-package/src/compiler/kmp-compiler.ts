@@ -105,16 +105,16 @@ export class KmpCompiler {
     //
 
     if(kps.keyboards && kps.keyboards.keyboard) {
-      kmp.keyboards = this.arrayWrap(kps.keyboards.keyboard).map((keyboard: KpsFile.KpsFileKeyboard) => {
-        return {
-          displayFont: keyboard.displayFont ? this.callbacks.path.basename(keyboard.displayFont) : undefined,
-          oskFont: keyboard.oSKFont ? this.callbacks.path.basename(keyboard.oSKFont) : undefined,
-          name:keyboard.name,
-          id:keyboard.iD,
-          version:keyboard.version,
-          languages: this.kpsLanguagesToKmpLanguages(this.arrayWrap(keyboard.languages.language) as KpsFile.KpsFileLanguage[])
-        };
-      });
+      kmp.keyboards = this.arrayWrap(kps.keyboards.keyboard).map((keyboard: KpsFile.KpsFileKeyboard) => ({
+        displayFont: keyboard.displayFont ? this.callbacks.path.basename(keyboard.displayFont) : undefined,
+        oskFont: keyboard.oSKFont ? this.callbacks.path.basename(keyboard.oSKFont) : undefined,
+        name:keyboard.name,
+        id:keyboard.iD,
+        version:keyboard.version,
+        languages: keyboard.languages ?
+          this.kpsLanguagesToKmpLanguages(this.arrayWrap(keyboard.languages.language) as KpsFile.KpsFileLanguage[]) :
+          []
+      }));
     }
 
     //
@@ -122,9 +122,12 @@ export class KmpCompiler {
     //
 
     if(kps.lexicalModels && kps.lexicalModels.lexicalModel) {
-      kmp.lexicalModels = this.arrayWrap(kps.lexicalModels.lexicalModel).map((model: KpsFile.KpsFileLexicalModel) => {
-        return { name:model.name, id:model.iD, languages: this.kpsLanguagesToKmpLanguages(this.arrayWrap(model.languages.language) as KpsFile.KpsFileLanguage[]) }
-      });
+      kmp.lexicalModels = this.arrayWrap(kps.lexicalModels.lexicalModel).map((model: KpsFile.KpsFileLexicalModel) => ({
+        name:model.name,
+        id:model.iD,
+        languages: model.languages ?
+          this.kpsLanguagesToKmpLanguages(this.arrayWrap(model.languages.language) as KpsFile.KpsFileLanguage[]) : []
+      }));
     }
 
     //

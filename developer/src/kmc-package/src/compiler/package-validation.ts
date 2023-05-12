@@ -44,6 +44,11 @@ export class PackageValidation {
   private checkForDuplicatedOrNonMinimalLanguages(resourceType: 'keyboard'|'model', id: string, languages: KmpJsonFile.KmpJsonFileLanguage[]): boolean {
     let minimalTags: {[tag: string]: string} = {};
 
+    if(languages.length == 0) {
+      this.callbacks.reportMessage(CompilerMessages.Error_MustHaveAtLeastOneLanguage({resourceType, id}));
+      return false;
+    }
+
     for(let lang of languages) {
       let locale;
       try {
