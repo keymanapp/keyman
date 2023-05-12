@@ -13,7 +13,14 @@
   <Files>
     <File>
       <!-- extension should not have capitals -->
-      <Name>my_special-keyboard.KMX</Name>
+      <Name>my_file.PDF</Name>
+      <Description>My Documentation</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.PDF</FileType>
+    </File>
+    <File>
+      <!-- extension should not have capitals -->
+      <Name>khmer_angkor.kmx</Name>
       <Description>Keyboard my special keyboard</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
@@ -22,7 +29,7 @@
   <Keyboards>
     <Keyboard>
       <Name>Khmer Angkor</Name>
-      <ID>nokeyboardversion</ID>
+      <ID>khmer_angkor</ID>
       <Version>1.3</Version>
       <Languages>
         <Language ID="km">Central Khmer (Khmer, Cambodia)</Language>

@@ -22,7 +22,7 @@
   <Keyboards>
     <Keyboard>
       <Name>Khmer Angkor</Name>
-      <ID>nokeyboardversion</ID>
+      <ID>my special keyboard</ID>
       <Version>1.3</Version>
       <Languages>
         <Language ID="km">Central Khmer (Khmer, Cambodia)</Language>

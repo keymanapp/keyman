@@ -13,6 +13,8 @@ import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
 import { PackageValidation } from '../src/compiler/package-validation.js';
 import { CompilerMessages } from '../src/compiler/messages.js';
 
+const debug = false;
+
 describe('KmpCompiler', function () {
   const MODELS : string[] = [
     'example.qaa.sencoten',
@@ -141,6 +143,8 @@ describe('KmpCompiler', function () {
 
     await assert.isNull(kmpCompiler.buildKmpFile(kpsPath, kmpJson));
 
+    if(debug) callbacks.printMessages();
+
     assert.lengthOf(callbacks.messages, 2);
     assert.deepEqual(callbacks.messages[0].code, CompilerMessages.WARN_AbsolutePath);
     assert.deepEqual(callbacks.messages[1].code, CompilerMessages.ERROR_FileDoesNotExist);
@@ -169,7 +173,7 @@ describe('KmpCompiler', function () {
       kmpCompiler.buildKmpFile(kpsPath, kmpJson)
     }
 
-    //TODO: callbacks.printMessages(); after #8711 is merged
+    if(debug) callbacks.printMessages();
 
     if(messageId) {
       assert.lengthOf(callbacks.messages, 1);
@@ -195,16 +199,16 @@ describe('KmpCompiler', function () {
     testForMessage(this, ['invalid', 'followkeyboardversion.qaa.sencoten.model.kps'], CompilerMessages.ERROR_FollowKeyboardVersionNotAllowedForModelPackages);
   });
 
-  // WARN_FollowKeyboardVersionButNoKeyboards
+  // ERROR_FollowKeyboardVersionButNoKeyboards
 
-  it('should generate WARN_FollowKeyboardVersionButNoKeyboards if <FollowKeyboardVersion> is set for a package with no keyboards or models', async function() {
-    testForMessage(this, ['invalid', 'followkeyboardversion.empty.kps'], CompilerMessages.WARN_FollowKeyboardVersionButNoKeyboards);
+  it('should generate ERROR_FollowKeyboardVersionButNoKeyboards if <FollowKeyboardVersion> is set for a package with no keyboards', async function() {
+    testForMessage(this, ['invalid', 'followkeyboardversion.empty.kps'], CompilerMessages.ERROR_FollowKeyboardVersionButNoKeyboards);
   });
 
-  // ERROR_KeyboardFileNotFound
+  // ERROR_KeyboardContentFileNotFound
 
-  it('should generate ERROR_KeyboardFileNotFound if a <Keyboard> is listed in a package but not found in <Files>', async function() {
-    testForMessage(this, ['invalid', 'keyboardfilenotfound.kps'], CompilerMessages.ERROR_KeyboardFileNotFound);
+  it('should generate ERROR_KeyboardContentFileNotFound if a <Keyboard> is listed in a package but not found in <Files>', async function() {
+    testForMessage(this, ['invalid', 'keyboardcontentfilenotfound.kps'], CompilerMessages.ERROR_KeyboardContentFileNotFound);
   });
 
   // ERROR_KeyboardFileNotValid
@@ -262,6 +266,12 @@ describe('KmpCompiler', function () {
     testForMessage(this, ['invalid', 'error_package_name_cannot_be_blank.kps'], CompilerMessages.ERROR_PackageNameCannotBeBlank); // blank field
     testForMessage(this, ['invalid', 'error_package_name_cannot_be_blank_2.kps'], CompilerMessages.ERROR_PackageNameCannotBeBlank); // missing field
     testForMessage(this, ['invalid', 'error_package_name_cannot_be_blank_3.kps'], CompilerMessages.ERROR_PackageNameCannotBeBlank); // missing info section
+  });
+
+  // ERROR_KeyboardFileNotFound
+
+  it('should generate ERROR_KeyboardFileNotFound if a <Keyboard> is listed in a package but not found in <Files>', async function() {
+    testForMessage(this, ['invalid', 'keyboardfilenotfound.kps'], CompilerMessages.ERROR_KeyboardFileNotFound);
   });
 
 });

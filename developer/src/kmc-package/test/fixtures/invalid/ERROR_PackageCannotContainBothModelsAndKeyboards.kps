@@ -13,7 +13,7 @@
   </Info>
   <Files>
     <File>
-      <Name>nokeyboardversion.kmx</Name>
+      <Name>khmer_angkor.kmx</Name>
       <Description>Keyboard Khmer Angkor</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
@@ -39,7 +39,7 @@
   <Keyboards>
     <Keyboard>
       <Name>Khmer Angkor</Name>
-      <ID>nokeyboardversion</ID>
+      <ID>khmer_angkor</ID>
       <Version>1.3</Version>
       <Languages>
         <Language ID="km">Central Khmer (Khmer, Cambodia)</Language>

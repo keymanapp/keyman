@@ -31,13 +31,13 @@ export class CompilerMessages {
     `FollowKeyboardVersion is not allowed in model packages`);
   static ERROR_FollowKeyboardVersionNotAllowedForModelPackages = SevError | 0x0006;
 
-  static Warn_FollowKeyboardVersionButNoKeyboards = () => m(this.WARN_FollowKeyboardVersionButNoKeyboards,
+  static Error_FollowKeyboardVersionButNoKeyboards = () => m(this.ERROR_FollowKeyboardVersionButNoKeyboards,
     `FollowKeyboardVersion is set, but the package contains no keyboards`);
-  static WARN_FollowKeyboardVersionButNoKeyboards = SevWarn | 0x0007;
+  static ERROR_FollowKeyboardVersionButNoKeyboards = SevError | 0x0007;
 
-  static Error_KeyboardFileNotFound = (o:{id:string}) => m(this.ERROR_KeyboardFileNotFound,
+  static Error_KeyboardContentFileNotFound = (o:{id:string}) => m(this.ERROR_KeyboardContentFileNotFound,
     `Keyboard ${o.id} was listed in <Keyboards> but a corresponding .kmx file was not found in <Files>`);
-  static ERROR_KeyboardFileNotFound = SevError | 0x0008;
+  static ERROR_KeyboardContentFileNotFound = SevError | 0x0008;
 
   static Error_KeyboardFileNotValid = (o:{filename:string}) => m(this.ERROR_KeyboardFileNotValid,
     `Keyboard file ${o.filename} is not a valid .kmx file`);
@@ -74,5 +74,9 @@ export class CompilerMessages {
   static Error_PackageNameCannotBeBlank = () => m(this.ERROR_PackageNameCannotBeBlank,
     `Package name cannot be an empty string.`);
   static ERROR_PackageNameCannotBeBlank = SevError | 0x0010;
+
+  static Error_KeyboardFileNotFound = (o:{filename:string}) => m(this.ERROR_KeyboardFileNotFound,
+    `Keyboard file ${o.filename} was not found. Has it been compiled?`);
+  static ERROR_KeyboardFileNotFound = SevError | 0x0011;
 }
 

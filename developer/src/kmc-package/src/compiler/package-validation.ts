@@ -41,7 +41,7 @@ export class PackageValidation {
     return true;
   }
 
-  private checkForDuplicatedLanguages(resourceType: 'keyboard'|'model', id: string, languages: KmpJsonFile.KmpJsonFileLanguage[]) {
+  private checkForDuplicatedLanguages(resourceType: 'keyboard'|'model', id: string, languages: KmpJsonFile.KmpJsonFileLanguage[]): void {
     let tags: {[index:string]: boolean} = {};
     for(let lang of languages) {
       const langTag = lang.id.toLowerCase();
