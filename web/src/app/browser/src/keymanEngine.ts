@@ -82,7 +82,8 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     this.config.hostDevice = device;
 
     const totalOptions = {...BrowserInitOptionDefaults, ...options};
-    await super.init(totalOptions);
+    // Set any incoming options, overriding previous entries.
+    this.config.initialize(totalOptions);
 
     this._initialized = 1;
 
@@ -99,7 +100,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // There may be some valid mutations possible even on repeated calls?
     // The original seems to allow it.
 
-    this.config.initialize(totalOptions);  // will init alertHost, which requires document.body
+    await super.init(totalOptions);
 
     this.contextManager.initialize();  // will seek to attach to the page, which requires document.body
     const oskConfig: FloatingOSKViewConfiguration = {

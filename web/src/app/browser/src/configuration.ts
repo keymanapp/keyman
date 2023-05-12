@@ -12,15 +12,23 @@ export class BrowserConfiguration extends EngineConfiguration {
   private alertHost?: AlertHost;
 
   initialize(options: Required<BrowserInitOptionSpec>) {
+    if(this._options) {
+      // Preserve old options, but replace with any newly-set ones if specified.
+      // If specified, even as 'undefined' or 'null', it will still override.
+      this._options = {...this._options, ...options};
+    }
     super.initialize(options);
 
     this._ui = options.ui;
     this._attachType = options.attachType;
+
     whenDocumentReady().then(() => {
       if(options.useAlerts && !this.alertHost) {
-        this.alertHost = new AlertHost();
+        if(!this.alertHost) {
+          this.alertHost = new AlertHost();
+        }
       } else if(!options.useAlerts && this.alertHost) {
-        this.alertHost.shutdown();
+        this.alertHost?.shutdown();
         this.alertHost = null;
       }
     });
