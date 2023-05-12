@@ -1213,7 +1213,7 @@ namespace com.keyman.dom {
     set activeElement(Pelem: HTMLElement) {
       DOMEventHandlers.states._activeElement = Pelem;
 
-      var maintainingFocus = focusAssistant.maintainingFocus;
+      let maintainingFocus = focusAssistant.maintainingFocus;
 
       // Hide the OSK when the control is blurred, unless the UI is being temporarily selected
       const osk = this.keyman.osk;

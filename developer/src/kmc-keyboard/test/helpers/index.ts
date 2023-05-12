@@ -3,15 +3,15 @@
  */
 import 'mocha';
 import * as path from 'path';
-import * as fs from 'fs';
 import { fileURLToPath } from 'url';
 import { SectionCompiler } from '../../src/compiler/section-compiler.js';
-import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
+import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
 import Compiler from '../../src/compiler/compiler.js';
 import { assert } from 'chai';
 import KMXPlusMetadataCompiler from '../../src/compiler/metadata-compiler.js';
 import CompilerOptions from '../../src/compiler/compiler-options.js';
 import VisualKeyboardCompiler from '../../src/compiler/visual-keyboard-compiler.js';
+import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 import KMXPlusFile = KMXPlus.KMXPlusFile;
 import Elem = KMXPlus.Elem;
@@ -31,44 +31,6 @@ export function makePathToFixture(...components: string[]): string {
   return fileURLToPath(new URL(path.join('..', '..', '..', 'test', 'fixtures', ...components), import.meta.url));
 }
 
-/**
- * A CompilerCallbacks implementation for testing
- */
-class TestCompilerCallbacks implements CompilerCallbacks {
-  clear() {
-    this.messages = [];
-  }
-  messages: CompilerEvent[] = [];
-  loadFile(baseFilename: string, filename: string | URL): Buffer {
-    // TODO: translate filename based on the baseFilename
-    try {
-      return fs.readFileSync(filename);
-    } catch(e) {
-      if (e.code === 'ENOENT') {
-        return null;
-      } else {
-        throw e;
-      }
-    }
-  }
-  reportMessage(event: CompilerEvent): void {
-    // console.log(event.message);
-    this.messages.push(event);
-  }
-  loadLdmlKeyboardSchema(): Buffer {
-    return fs.readFileSync(new URL(path.join('..', '..', 'src', 'ldml-keyboard.schema.json'), import.meta.url));
-  }
-  loadKvksJsonSchema(): Buffer {
-    return fs.readFileSync(new URL(path.join('..', '..', 'src', 'kvks.schema.json'), import.meta.url));
-  }
-  loadKpjJsonSchema(): Buffer {
-    return fs.readFileSync(new URL(path.join('..', '..', 'src', 'kpj.schema.json'), import.meta.url));
-  }
-  loadLdmlKeyboardTestSchema(): Buffer {
-    return fs.readFileSync(new URL(path.join('..', '..', 'src', 'ldml-keyboardtest.schema.json'), import.meta.url));
-  }
-};
-
 export const compilerTestCallbacks = new TestCompilerCallbacks();
 
 beforeEach(function() {
@@ -85,14 +47,14 @@ afterEach(function() {
 export function loadSectionFixture(compilerClass: typeof SectionCompiler, filename: string, callbacks: TestCompilerCallbacks): Section {
   callbacks.messages = [];
   const inputFilename = makePathToFixture(filename);
-  const data = callbacks.loadFile(inputFilename, inputFilename);
+  const data = callbacks.loadFile(inputFilename);
   assert.isNotNull(data);
 
   const reader = new LDMLKeyboardXMLSourceFileReader(callbacks);
   const source = reader.load(data);
   assert.isNotNull(source);
 
-  if (!reader.validate(source, callbacks.loadLdmlKeyboardSchema())) {
+  if (!reader.validate(source, callbacks.loadSchema('ldml-keyboard'))) {
     return null; // mimic kmc behavior - bail if validate fails
   }
 

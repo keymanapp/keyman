@@ -7,6 +7,7 @@ apply from: "$rootPath/version.gradle"
 
 android {
     compileSdkVersion 33
+    namespace="com.keyman.android.tests.keyboardHarness"
 
     // Don't compress kmp files so they can be copied via AssetManager
     aaptOptions {

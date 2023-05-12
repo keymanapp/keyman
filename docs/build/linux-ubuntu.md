@@ -6,8 +6,8 @@ On Linux, you can build the following projects:
 
 * [Keyman for Linux](#keyman-for-linux)
 * [Keyman Core](#keyman-core) (Linux only) (aka core)
-<!-- TODO: document how to build for Android, Web, Core-Wasm and Common/Web on Linux. See TC build agent for details. -->
-* Keyman for Android
+* [Keyman for Android](#keyman-for-android)
+<!-- TODO: document how to build for Web, Core-Wasm and Common/Web on Linux. See TC build agent for details. -->
 * Keyman Core (wasm targets)
 * Common/Web
 * KeymanWeb
@@ -98,4 +98,49 @@ cd keymanapp/keyman
 docker run -it --rm -v $(pwd):/home/build/src/keyman -u root -w /home/build/src/keyman keymanapp/keyman-linux-builder:latest bash -c "cd linux && make reconf && make fullbuild && make install"
 ```
 
+## Keyman for Android
 
+**Dependencies**:
+* [Base](#base-dependencies)
+* [Web](./windows#web-dependencies)
+
+**Additional requirements**:
+* Android SDK
+* [Android Studio](https://developer.android.com/studio/install#linux)
+* Gradle
+* Maven
+* OpenJDK 11 (for Keyman 17.0+)
+
+
+Run Android Studio once after installation to install additional components
+such as emulator images and SDK updates.
+
+**Required environment variables**:
+* [`JAVA_HOME`](#java_home)
+
+Building:
+* [Building Keyman for Android](../../android/README.md)
+
+## Prerequisites
+
+Many dependencies are only required for specific projects.
+
+### Base Dependencies
+
+**Environment variables**:
+
+
+## Notes on Environment Variables
+
+### JAVA_HOME
+
+This environment variable tells Gradle what version of Java to use for building Keyman for Android.
+OpenJDK 11 is used for master. It's recommended to set the environment variables to:
+```bash
+EXPORT JAVA_HOME="[path to OpenJDK 11]"
+```
+
+Also edit `/etc/profile.d/jvm.sh` as sudo:
+```bash
+EXPORT JAVA_HOME="[path to OpenJDK 11]"
+```

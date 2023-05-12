@@ -1,6 +1,7 @@
 # Keyman Engine for Windows
 
 There are a number of build artifacts that make up the Keyman Engine. This is a brief description of each artifact's purpose.
+For FAQs on the architecture see the [Keyman Wiki](https://github.com/keymanapp/keyman/wiki/Keyman-Windows-FAQs).
 
 ## inst - keymanengine.msm
 

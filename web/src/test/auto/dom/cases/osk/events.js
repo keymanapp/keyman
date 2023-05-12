@@ -62,12 +62,11 @@ describe('OSK events', function () {
     let hideStub = sinon.fake();
     let legacyHideStub = sinon.fake();
     osk.once('onhide', hideStub);
-    osk.once('legacyevent', legacyHideStub);
+    osk.legacyEvents.addEventListener('hide', legacyHideStub);
 
     osk.activationModel.enabled = false;
     assert.isTrue(hideStub.calledOnce);
     assert.isTrue(legacyHideStub.calledOnce);
-    assert.equal(legacyHideStub.firstCall.args[0], 'osk.hide');
 
     // Show the OSK + check for related event
     let showStub = sinon.fake();

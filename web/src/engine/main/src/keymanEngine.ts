@@ -106,6 +106,12 @@ export default class KeymanEngine<
     this.interface.setKeyboardCache(this.keyboardRequisitioner.cache);
 
     this.core = new InputProcessor(config.hostDevice, worker, this.processorConfiguration());
+    this.core.languageProcessor.on('statechange', (state) => {
+      // The banner controller cannot directly trigger a layout-refresh at this time,
+      // so we handle that here.
+      this.osk.bannerController.selectBanner(state);
+      this.osk.refreshLayout();
+    });
 
     this.contextManager.configure({
       resetContext: (target) => {
@@ -274,31 +280,26 @@ export default class KeymanEngine<
     return report;
   }
 
-  private refreshModel() {
+  // Returned Promise:  gives the model-spec object.  Only resolves when any model loading or unloading
+  // is fully complete.
+  private refreshModel(): Promise<ModelSpec> {
     const kbd = this.contextManager.activeKeyboard;
     const model = this.modelCache.modelForLanguage(kbd.metadata.langId);
 
-    let bannerDisplayed: boolean = false;
-
     if(this.core.activeModel != model) {
       if(this.core.activeModel) {
-        bannerDisplayed = true;
         this.core.languageProcessor.unloadModel();
       }
 
       // Semi-hacky management of banner display state.
       if(model) {
-        this.core.languageProcessor.loadModel(model).then(() => {
-          if(!bannerDisplayed) {
-            // Because this is what the original implementation expects to see (over time).
-            this.osk.bannerController.selectBanner('active');
-            this.osk.bannerController.selectBanner('configured');
-          }
+        return this.core.languageProcessor.loadModel(model).then(() => {
+          return model;
         });
-      } else if(bannerDisplayed) {
-        this.osk.bannerController.selectBanner('inactive');
       }
     }
+
+    return Promise.resolve(model);
   }
 
   addEventListener<Name extends EventNames<LegacyAPIEvents>>(event: Name, listener: EventListener<LegacyAPIEvents, Name>) {
@@ -319,6 +320,7 @@ export default class KeymanEngine<
   // API methods
 
   // 17.0: new!  Only used by apps utilizing app/webview and one app/browser test page.
+  // Is not part of our 'published' API.
 
   /**
    * Registers the specified lexical model within Keyman Engine.  If a keyboard with a
@@ -327,12 +329,14 @@ export default class KeymanEngine<
    * @param model  An object defining model ID, associated language IDs, and either the
    *               model's definition or a path to a file containing it.
    */
-  addModel(model: ModelSpec) {
+  addModel(model: ModelSpec): Promise<void> {
     this.modelCache.register(model);
 
     const activeStub = this.contextManager.activeKeyboard?.metadata;
     if(activeStub && model.languages.indexOf(activeStub.langId) != -1) {
-      this.refreshModel();
+      return this.refreshModel().then(() => { return; });
+    } else {
+      return Promise.resolve();
     }
   }
 

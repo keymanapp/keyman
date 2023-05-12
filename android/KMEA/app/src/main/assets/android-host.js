@@ -159,7 +159,7 @@ function insertText(dn, s, dr) {
 }
 
 function deregisterModel(modelID) {
-  keyman.unregister(modelID);
+  keyman.removeModel(modelID);
 }
 
 function enableSuggestions(model, mayPredict, mayCorrect) {

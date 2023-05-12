@@ -95,8 +95,8 @@ block(sect)                         #  struct COMP_KMXPLUS_SECT {
   #    KMX_DWORD offset;         // 0014+ Section offset relative to dpKMXPlus of section
 
 block(sectitems)
-  62 6b 73 70
-  diff(sect,bksp)
+  # 62 6b 73 70
+  # diff(sect,bksp)
 
   64 69 73 70
   diff(sect,disp)
@@ -104,8 +104,8 @@ block(sectitems)
   65 6c 65 6d
   diff(sect,elem)
 
-  66 69 6e 6c
-  diff(sect,finl)
+  # 66 69 6e 6c
+  # diff(sect,finl)
 
   6b 65 79 73
   diff(sect,keys)
@@ -125,14 +125,14 @@ block(sectitems)
   6e 61 6d 65
   diff(sect,name)
 
-  6f 72 64 72
-  diff(sect,ordr)
+  # 6f 72 64 72
+  # diff(sect,ordr)
 
   73 74 72 73
   diff(sect,strs)
 
-  74 72 61 6e
-  diff(sect,tran)
+  # 74 72 61 6e
+  # diff(sect,tran)
 
   76 6b 65 79
   diff(sect,vkey)
@@ -143,18 +143,18 @@ block(endsect)
 # bksp
 # ----------------------------------------------------------------------------------------------------
 
-block(bksp)
-  62 6b 73 70
-  sizeof(bksp)
-  01 00 00 00                       #   KMX_DWORD count;          // 0008 number of entries
-                                    # };
+# block(bksp)
+#   62 6b 73 70
+#   sizeof(bksp)
+#   01 00 00 00                       #   KMX_DWORD count;          // 0008 number of entries
+#                                     # };
 
-                                    # struct COMP_KMXPLUS_TRAN_ENTRY {
-  index(elemNull,elemBkspFrom)      #    KMXPLUS_ELEM from;
-  00 00 00 00                       #    KMXPLUS_STR to;
-  00 00 00 00                       #    KMXPLUS_ELEM before;
-  00 00 00 00                       #    KMX_DWORD flags;
-                                    # };
+#                                     # struct COMP_KMXPLUS_TRAN_ENTRY {
+#   index(elemNull,elemBkspFrom)      #    KMXPLUS_ELEM from;
+#   00 00 00 00                       #    KMXPLUS_STR to;
+#   00 00 00 00                       #    KMXPLUS_ELEM before;
+#   00 00 00 00                       #    KMX_DWORD flags;
+#                                     # };
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -187,54 +187,54 @@ block(elem)                         # struct COMP_KMXPLUS_ELEM {
   00 00 00 00                       #    KMX_DWORD offset;                 // 0010+ offset from this blob
   sizeof(elemNull,8)                #    KMX_DWORD length;                 // 0014+ str length (ELEMENT units)
 
-  diff(elem,elemFinlFrom)           #    KMX_DWORD offset;                 // 0010+ offset from this blob
-  sizeof(elemFinlFrom,8)            #    KMX_DWORD length;                 // 0014+ str length (ELEMENT units)
+  # diff(elem,elemFinlFrom)           #    KMX_DWORD offset;                 // 0010+ offset from this blob
+  # sizeof(elemFinlFrom,8)            #    KMX_DWORD length;                 // 0014+ str length (ELEMENT units)
 
-  diff(elem,elemTranFrom)           #    KMX_DWORD offset;                 // 0010+ offset from this blob
-  sizeof(elemTranFrom,8)            #    KMX_DWORD length;                 // 0014+ str length (ELEMENT units)
+  # diff(elem,elemTranFrom)           #    KMX_DWORD offset;                 // 0010+ offset from this blob
+  # sizeof(elemTranFrom,8)            #    KMX_DWORD length;                 // 0014+ str length (ELEMENT units)
 
-  diff(elem,elemBkspFrom)           #    KMX_DWORD offset;                 // 0010+ offset from this blob
-  sizeof(elemBkspFrom,8)            #    KMX_DWORD length;                 // 0014+ str length (ELEMENT units)
+  # diff(elem,elemBkspFrom)           #    KMX_DWORD offset;                 // 0010+ offset from this blob
+  # sizeof(elemBkspFrom,8)            #    KMX_DWORD length;                 // 0014+ str length (ELEMENT units)
 
-  diff(elem,elemOrdrFrom)           #    KMX_DWORD offset;                 // 0010+ offset from this blob
-  sizeof(elemOrdrFrom,8)            #    KMX_DWORD length;                 // 0014+ str length (ELEMENT units)
+  # diff(elem,elemOrdrFrom)           #    KMX_DWORD offset;                 // 0010+ offset from this blob
+  # sizeof(elemOrdrFrom,8)            #    KMX_DWORD length;                 // 0014+ str length (ELEMENT units)
 
-  diff(elem,elemOrdrBefore)         #    KMX_DWORD offset;                 // 0010+ offset from this blob
-  sizeof(elemOrdrBefore,8)          #    KMX_DWORD length;                 // 0014+ str length (ELEMENT units)
+  # diff(elem,elemOrdrBefore)         #    KMX_DWORD offset;                 // 0010+ offset from this blob
+  # sizeof(elemOrdrBefore,8)          #    KMX_DWORD length;                 // 0014+ str length (ELEMENT units)
 
 
 block(elemNull)
 
-block(elemFinlFrom)
-  index(strNull,strElemTranFrom1,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
-  01 00 00 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
-  index(strNull,strElemTranFrom1,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
-  01 00 00 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
+# block(elemFinlFrom)
+#   index(strNull,strElemTranFrom1,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
+#   01 00 00 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
+#   index(strNull,strElemTranFrom1,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
+#   01 00 00 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
 
-block(elemTranFrom)
-  index(strNull,strElemTranFrom1,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
-  01 00 00 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
-  index(strNull,strElemTranFrom2,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
-  01 00 00 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
+# block(elemTranFrom)
+#   index(strNull,strElemTranFrom1,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
+#   01 00 00 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
+#   index(strNull,strElemTranFrom2,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
+#   01 00 00 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
 
-block(elemBkspFrom)
-  index(strNull,strElemTranFrom1,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
-  01 00 00 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
-  index(strNull,strElemBkspFrom2,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
-  01 00 00 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
+# block(elemBkspFrom)
+#   index(strNull,strElemTranFrom1,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
+#   01 00 00 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
+#   index(strNull,strElemBkspFrom2,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
+#   01 00 00 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
 
-block(elemOrdrFrom)
-  # <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
-  index(strNull,strElemOrdrFrom1,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
-  01 00 0A 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
-  index(strNull,strElemOrdrFrom2,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
-  01 00 37 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
-  index(strNull,strElemOrdrFrom3,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
-  01 00 0A 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
+# block(elemOrdrFrom)
+#   # <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
+#   index(strNull,strElemOrdrFrom1,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
+#   01 00 0A 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
+#   index(strNull,strElemOrdrFrom2,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
+#   01 00 37 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
+#   index(strNull,strElemOrdrFrom3,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
+#   01 00 0A 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
 
-block(elemOrdrBefore)
-  index(strNull,strElemOrdrBefore,2) #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
-  01 00 00 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
+# block(elemOrdrBefore)
+#   index(strNull,strElemOrdrBefore,2) #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
+#   01 00 00 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
 
 block(endelem)
 
@@ -242,18 +242,18 @@ block(endelem)
 # finl
 # ----------------------------------------------------------------------------------------------------
 
-block(finl)
-  66 69 6e 6c
-  sizeof(finl)
-  01 00 00 00                       #   KMX_DWORD count;          // 0008 number of entries
-                                    # };
+# block(finl)
+#   66 69 6e 6c
+#   sizeof(finl)
+#   01 00 00 00                       #   KMX_DWORD count;          // 0008 number of entries
+#                                     # };
 
-                                    # struct COMP_KMXPLUS_TRAN_ENTRY {
-  index(elemNull,elemFinlFrom)      #    KMXPLUS_ELEM from;
-  index(strNull,strElemTranFrom1,2) #    KMXPLUS_STR to;
-  00 00 00 00                       #    KMXPLUS_ELEM before;
-  01 00 00 00                       #    KMX_DWORD flags;
-                                    # };
+#                                     # struct COMP_KMXPLUS_TRAN_ENTRY {
+#   index(elemNull,elemFinlFrom)      #    KMXPLUS_ELEM from;
+#   index(strNull,strElemTranFrom1,2) #    KMXPLUS_STR to;
+#   00 00 00 00                       #    KMXPLUS_ELEM before;
+#   01 00 00 00                       #    KMX_DWORD flags;
+#                                     # };
 # ----------------------------------------------------------------------------------------------------
 # keys
 # ----------------------------------------------------------------------------------------------------
@@ -400,14 +400,14 @@ block(name)                         # struct COMP_KMXPLUS_META {
 # ordr
 # ----------------------------------------------------------------------------------------------------
 
-block(ordr)
-  6f 72 64 72                       #    KMX_DWORD header.ident;   // 0000 Section name - ordr
-  sizeof(ordr)                      #    KMX_DWORD header.size;    // 0004 Section length
-  01 00 00 00                       #    KMX_DWORD count;          // 0008 count of str entries
-                                    # };
+# block(ordr)
+#   6f 72 64 72                       #    KMX_DWORD header.ident;   // 0000 Section name - ordr
+#   sizeof(ordr)                      #    KMX_DWORD header.size;    // 0004 Section length
+#   01 00 00 00                       #    KMX_DWORD count;          // 0008 count of str entries
+#                                     # };
 
-  index(elemNull,elemOrdrFrom)      #    KMXPLUS_ELEM elements;
-  index(elemNull,elemOrdrBefore)    #    KMXPLUS_ELEM before;
+#   index(elemNull,elemOrdrFrom)      #    KMXPLUS_ELEM elements;
+#   index(elemNull,elemOrdrBefore)    #    KMXPLUS_ELEM before;
 
 # ----------------------------------------------------------------------------------------------------
 # strs
@@ -437,13 +437,13 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strAuthor)     sizeof(strAuthor,2)
   diff(strs,strConformsTo) sizeof(strConformsTo,2)
   diff(strs,strThat)   sizeof(strThat,2)
-  diff(strs,strTranTo)          sizeof(strTranTo,2)
+  # diff(strs,strTranTo)          sizeof(strTranTo,2)
   diff(strs,strKey1)       sizeof(strKey1,2)
   diff(strs,strKeys)       sizeof(strKeys,2)
-  diff(strs,strElemOrdrFrom3)   sizeof(strElemOrdrFrom3,2)
-  diff(strs,strElemOrdrFrom1)   sizeof(strElemOrdrFrom1,2)
-  diff(strs,strElemOrdrBefore)  sizeof(strElemOrdrBefore,2)
-  diff(strs,strElemOrdrFrom2)   sizeof(strElemOrdrFrom2,2)
+  # diff(strs,strElemOrdrFrom3)   sizeof(strElemOrdrFrom3,2)
+  # diff(strs,strElemOrdrFrom1)   sizeof(strElemOrdrFrom1,2)
+  # diff(strs,strElemOrdrBefore)  sizeof(strElemOrdrBefore,2)
+  # diff(strs,strElemOrdrFrom2)   sizeof(strElemOrdrFrom2,2)
   diff(strs,strIndicator)  sizeof(strIndicator,2)
 
 
@@ -465,14 +465,14 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strConformsTo)       74 00 65 00 63 00 68 00 70 00 72 00 65 00 76 00
                              69 00 65 00 77 00 block(x) 00 00                         # 'techpreview'
   block(strThat)             74 00 68 00 61 00 74 00 block(x) 00 00                     # 'that'
-  block(strTranTo)           E2 00 block(x) 00 00                                       # 'â'
+  # block(strTranTo)           E2 00 block(x) 00 00                                       # 'â'
   block(strKey1)             27 01 block(x) 00 00                                     # 'ħ'
   block(strKeys)             90 17 b6 17 block(x) 00 00                               # 'ថា'
   # <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
-  block(strElemOrdrFrom3)    45 1a block(x) 00 00                                       # 'ᩅ'
-  block(strElemOrdrFrom1)    60 1a block(x) 00 00                                       # '᩠'
-  block(strElemOrdrBefore)   6b 1a block(x) 00 00                                       # 'ᩫ'
-  block(strElemOrdrFrom2)    75 1a block(x) 00 00                                       # '᩵'
+  # block(strElemOrdrFrom3)    45 1a block(x) 00 00                                       # 'ᩅ'
+  # block(strElemOrdrFrom1)    60 1a block(x) 00 00                                       # '᩠'
+  # block(strElemOrdrBefore)   6b 1a block(x) 00 00                                       # 'ᩫ'
+  # block(strElemOrdrFrom2)    75 1a block(x) 00 00                                       # '᩵'
   block(strIndicator)        3d d8 40 de block(x) 00 00                               # '🙀'
 
 
@@ -484,18 +484,18 @@ block(endstrs)                      # end of strs block
 # tran
 # ----------------------------------------------------------------------------------------------------
 
-block(tran)                         # struct COMP_KMXPLUS_TRAN {
-  74 72 61 6e                       #   KMX_DWORD header.ident;   // 0000 Section name - tran
-  sizeof(tran)                      #   KMX_DWORD header.size;    // 0004 Section length
-  01 00 00 00                       #   KMX_DWORD count;          // 0008 number of entries
-                                    # };
+# block(tran)                         # struct COMP_KMXPLUS_TRAN {
+#   74 72 61 6e                       #   KMX_DWORD header.ident;   // 0000 Section name - tran
+#   sizeof(tran)                      #   KMX_DWORD header.size;    // 0004 Section length
+#   01 00 00 00                       #   KMX_DWORD count;          // 0008 number of entries
+#                                     # };
 
-                                    # struct COMP_KMXPLUS_TRAN_ENTRY {
-  index(elemNull,elemTranFrom)      #    KMXPLUS_ELEM from;
-  index(strNull,strTranTo,2)        #    KMXPLUS_STR to;
-  00 00 00 00                       #    KMXPLUS_ELEM before;
-  00 00 00 00                       #    KMX_DWORD flags;
-                                    # };
+#                                     # struct COMP_KMXPLUS_TRAN_ENTRY {
+#   index(elemNull,elemTranFrom)      #    KMXPLUS_ELEM from;
+#   index(strNull,strTranTo,2)        #    KMXPLUS_STR to;
+#   00 00 00 00                       #    KMXPLUS_ELEM before;
+#   00 00 00 00                       #    KMX_DWORD flags;
+#                                     # };
 
 block(vkey)                         # struct COMP_KMXPLUS_VKEY {
   76 6b 65 79                       #   KMX_DWORD header.ident;   // 0000 Section name - vkey

@@ -8,11 +8,12 @@ set -eu
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+
 # This script runs from its own folder
-cd "$(dirname "$THIS_SCRIPT")"
+cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
@@ -25,8 +26,6 @@ builder_describe "Builds the standalone, headless form of Keyman Engine for Web'
   "configure" \
   "build" \
   "test" \
-  ":module     A headless, Node-oriented version of the module useful for unit tests" \
-  ":tools      Related tools useful for development and testing of this module" \
   "--ci        Sets $(builder_term test) action to use CI-based test configurations & reporting"
 
 builder_describe_outputs \

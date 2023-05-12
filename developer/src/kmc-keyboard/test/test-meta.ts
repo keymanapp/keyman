@@ -33,7 +33,7 @@ describe('meta', function () {
     assert.equal(meta.normalization.value, 'NFC');
     assert.equal(meta.indicator.value, 'QW');
     assert.equal(meta.version.value, "1.2.3");
-    assert.equal(meta.settings, KeyboardSettings.fallback | KeyboardSettings.transformFailure | KeyboardSettings.transformPartial);
+    assert.equal(meta.settings, KeyboardSettings.fallback);
   });
 
   it('should reject invalid normalization', function() {

@@ -55,7 +55,7 @@ export default class Compiler {
    */
   public load(filename: string): LDMLKeyboardXMLSourceFile | null {
     const reader = new LDMLKeyboardXMLSourceFileReader(this.callbacks);
-    const data = this.callbacks.loadFile(filename, filename);
+    const data = this.callbacks.loadFile(filename);
     if(!data) {
       this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to read XML file'}));
       return null;
@@ -66,7 +66,7 @@ export default class Compiler {
       return null;
     }
     try {
-      if (!reader.validate(source, this.callbacks.loadLdmlKeyboardSchema())) {
+      if (!reader.validate(source, this.callbacks.loadSchema('ldml-keyboard'))) {
         return null;
       }
     } catch(e) {
@@ -85,7 +85,7 @@ export default class Compiler {
    */
     public loadTestData(filename: string): LDMLKeyboardTestDataXMLSourceFile | null {
       const reader = new LDMLKeyboardXMLSourceFileReader(this.callbacks);
-      const data = this.callbacks.loadFile(filename, filename);
+      const data = this.callbacks.loadFile(filename);
       if(!data) {
         this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to read XML file'}));
         return null;
@@ -98,7 +98,7 @@ export default class Compiler {
       // TODO-LDML: The unboxed data doesn't match the schema anymore. Skipping validation, for now.
 
       // try {
-      //   if (!reader.validate(source, this.callbacks.loadLdmlKeyboardTestSchema())) {
+      //   if (!reader.validate(source, this.callbacks.loadSchema('ldml-keyboard-test'))) {
       //     return null;
       //   }
       // } catch(e) {

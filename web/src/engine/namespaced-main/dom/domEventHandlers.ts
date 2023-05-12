@@ -188,7 +188,7 @@ namespace com.keyman.dom {
       */
       focusAssistant.restoringFocus = false;
 
-      var maintainingFocus = focusAssistant.maintainingFocus;
+      let maintainingFocus = focusAssistant.maintainingFocus;
       let activeKeyboard = com.keyman.singleton.core.activeKeyboard;
       if(!maintainingFocus && activeKeyboard) {
         activeKeyboard.notify(0, Utils.getOutputTarget(Ltarg as HTMLElement), 0);  // I2187

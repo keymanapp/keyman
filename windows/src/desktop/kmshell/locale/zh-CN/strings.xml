@@ -47,7 +47,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 16.0.47 -->
-  <string name="SKAddremove" comment="Add or Remove languages button opens a dialog window">Add/remove language...</string>
+  <string name="SKAddremove" comment="Add or Remove languages button opens a dialog window">添加/移除语言……</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.330.0 -->
@@ -191,7 +191,7 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 16.0.47 -->
-  <string name="S_Languages_Addremove" comment="Title for dialog to add or remove languages for keyboard layout">Add/remove language</string>
+  <string name="S_Languages_Addremove" comment="Title for dialog to add or remove languages for keyboard layout">添加/移除语言</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->

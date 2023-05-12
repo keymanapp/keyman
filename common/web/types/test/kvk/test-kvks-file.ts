@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import 'mocha';
-import { loadKvksJsonSchema, makePathToFixture } from '../helpers/index.js';
+import { loadSchema, makePathToFixture } from '../helpers/index.js';
 import KvksFileReader, { KVKSParseError } from "../../src/kvk/kvks-file-reader.js";
 import KvksFileWriter from "../../src/kvk/kvks-file-writer.js";
 import { verify_khmer_angkor } from './test-kvk-utils.js';
@@ -14,7 +14,7 @@ describe('kvks-file-reader', function() {
     const reader = new KvksFileReader();
     const kvks = reader.read(input);
     assert.doesNotThrow(() => {
-      reader.validate(kvks, loadKvksJsonSchema());
+      reader.validate(kvks, loadSchema('kvks'));
     });
     const errors: KVKSParseError[] = [];
     const vk = reader.transform(kvks, errors);
