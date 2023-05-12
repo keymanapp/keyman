@@ -1,12 +1,12 @@
 import { KMX, KMXPlus } from '@keymanapp/common-types';
-import CompilerOptions from "./compiler-options.js";
+import { CompilerOptions } from "./compiler-options.js";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 import KMXPlusData = KMXPlus.KMXPlusData;
 import KMXFile = KMX.KMXFile;
 import KEYBOARD = KMX.KEYBOARD;
 
-export default class KMXPlusMetadataCompiler {
+export class KMXPlusMetadataCompiler {
   /**
    * Look for metadata fields in the KMXPlus data and copy them
    * through to the relevant KMX stores
