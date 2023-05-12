@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 17.0.106 alpha 2023-05-12
+
+* chore(developer): move package formats to common/web/types (#8729)
+* feat(developer): add package validation (#8740)
+* feat(developer): add validation of package filenames (#8751)
+* feat(developer): validate content file names in packages (#8755)
+* feat(developer): validate package name in compiler (#8757)
+* chore(developer): rename Compiler and related classes (#8726)
+* feat(developer): uset api from wasm! (#8716)
+
 ## 17.0.105 alpha 2023-05-11
 
 * chore(common): Update crowdin strings for Amharic (#8748)
