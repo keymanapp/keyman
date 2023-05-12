@@ -5,8 +5,8 @@
 
 import * as path from 'path';
 import { Command } from 'commander';
-import KmpCompiler from '@keymanapp/kmc-package';
-import { ModelInfoOptions as ModelInfoOptions, writeMergedModelMetadataFile } from '@keymanapp/kmc-model-info';
+import { KmpCompiler, PackageValidation } from '@keymanapp/kmc-package';
+import { ModelInfoOptions, writeMergedModelMetadataFile } from '@keymanapp/kmc-model-info';
 import { SysExits } from './util/sysexits.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { NodeCompilerCallbacks } from './messages/NodeCompilerCallbacks.js';
@@ -48,6 +48,15 @@ let jsFilename = program.opts().jsFilename ? program.opts().jsFilename : path.jo
 const callbacks = new NodeCompilerCallbacks();
 let kmpCompiler = new KmpCompiler(callbacks);
 let kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
+
+//
+// Validate the package file
+//
+
+const validation = new PackageValidation(callbacks);
+if(!validation.validate(kmpJsonData)) {
+  process.exit(1);
+}
 
 //
 // Write out the merged .model_info file
