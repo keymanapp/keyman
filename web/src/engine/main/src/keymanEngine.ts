@@ -305,8 +305,6 @@ export default class KeymanEngine<
     this.legacyAPIEvents.removeEventListener(event, listener);
   }
 
-  // Also technically TODO, even if not here:  similar two methods as above for the OSK.
-
   shutdown() {
     this.legacyAPIEvents.shutdown();
     this.osk?.shutdown();
