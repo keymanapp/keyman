@@ -2,7 +2,7 @@ import 'mocha';
 import sinon from 'sinon';
 import chai, { assert } from 'chai';
 import sinonChai from 'sinon-chai';
-import { Compiler } from '../src/main.js';
+import { KmnCompiler } from '../src/main.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
@@ -15,6 +15,7 @@ chai.use(sinonChai);
 describe('Compiler class', function() {
   let consoleLog: any;
 
+  // TODO: do we need this?
   beforeEach(function() {
     consoleLog = sinon.spy(console, 'log');
   });
@@ -36,17 +37,17 @@ describe('Compiler class', function() {
   });
 
   it('should start', async function() {
-    const compiler = new Compiler();
+    const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks));
-    assert(compiler.verifyInitted());
+    assert(compiler.verifyInitialized());
   });
 
   it('should compile a basic keyboard', async function() {
-    const compiler = new Compiler();
+    const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks));
-    assert(compiler.verifyInitted());
+    assert(compiler.verifyInitialized());
 
     const fixtureName = baselineDir + 'k_000___null_keyboard.kmx';
     const infile = baselineDir + 'k_000___null_keyboard.kmn';
@@ -64,10 +65,10 @@ describe('Compiler class', function() {
   // Note, above test case is essentially a subset of this one, but will leave both because
   // the basic keyboard test is slightly simpler to read
   it('should build all baseline fixtures', async function() {
-    const compiler = new Compiler();
+    const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks));
-    assert(compiler.verifyInitted());
+    assert(compiler.verifyInitialized());
 
     const files = fs.readdirSync(baselineDir);
     for(let file of files) {

@@ -8,8 +8,7 @@
   ],
   "type": "module",
   "exports": {
-    ".": "./build/src/kmp-compiler.js",
-    "./kmp-json-file": "./build/src/kmp-json-file.js"
+    ".": "./build/src/main.js"
   },
   "files": [
     "/build/src/"

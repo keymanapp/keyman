@@ -1,15 +1,17 @@
 import 'mocha';
 import * as fs from 'fs';
-import {assert} from 'chai';
-
-import KmpCompiler from '../src/kmp-compiler.js';
-import {makePathToFixture} from './helpers/index.js';
+import { assert } from 'chai';
 import JSZip from 'jszip';
-import KEYMAN_VERSION from "@keymanapp/keyman-version";
-import { type KmpJsonFile } from '../src/kmp-json-file.js';
-import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { CompilerMessages } from '../src/messages.js';
 
+import KEYMAN_VERSION from "@keymanapp/keyman-version";
+import { KmpJsonFile } from '@keymanapp/common-types';
+import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
+
+import { makePathToFixture } from './helpers/index.js';
+
+import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
+import { PackageValidation } from '../src/compiler/package-validation.js';
+import { CompilerMessages } from '../src/compiler/messages.js';
 
 describe('KmpCompiler', function () {
   const MODELS : string[] = [
@@ -37,7 +39,7 @@ describe('KmpCompiler', function () {
     // Test just the transform from kps to kmp.json
     //
     it(`should transform ${modelID}.model.kps to kmp.json`, function () {
-      let kmpJson: KmpJsonFile;
+      let kmpJson: KmpJsonFile.KmpJsonFile;
 
       assert.doesNotThrow(() => {
         kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
@@ -56,7 +58,7 @@ describe('KmpCompiler', function () {
     it(`should build a full .kmp for ${modelID}`, async function() {
       const zip = JSZip();
       // Build kmp.json in memory
-      const kmpJson: KmpJsonFile = kmpCompiler.transformKpsToKmpObject(kpsPath);
+      const kmpJson: KmpJsonFile.KmpJsonFile = kmpCompiler.transformKpsToKmpObject(kpsPath);
       // Build file.kmp in memory
       const promise = kmpCompiler.buildKmpFile(kpsPath, kmpJson);
       promise.then(data => {
@@ -86,7 +88,7 @@ describe('KmpCompiler', function () {
     const kmpJsonRefPath = makePathToFixture('khmer_angkor', 'ref', 'kmp.json');
 
     const kmpCompiler = new KmpCompiler(callbacks);
-    const kmpJsonFixture: KmpJsonFile = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
+    const kmpJsonFixture: KmpJsonFile.KmpJsonFile = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
 
     // We override the fixture version so that we can compare with the compiler output
     kmpJsonFixture.system.keymanDeveloperVersion = KEYMAN_VERSION.VERSION;
@@ -131,7 +133,7 @@ describe('KmpCompiler', function () {
     const kpsPath = makePathToFixture('absolute_path', 'source', 'absolute_path.kps');
     const kmpCompiler = new KmpCompiler(callbacks);
 
-    let kmpJson: KmpJsonFile = null;
+    let kmpJson: KmpJsonFile.KmpJsonFile = null;
 
     assert.doesNotThrow(() => {
       kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
@@ -158,9 +160,16 @@ describe('KmpCompiler', function () {
 
     let kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
     if(kmpJson && callbacks.messages.length == 0) {
+      const validator = new PackageValidation(callbacks);
+      validator.validate(kpsPath, kmpJson); // we'll ignore return value and rely on the messages
+    }
+
+    if(kmpJson && callbacks.messages.length == 0) {
       // We'll try building the package if we have not yet received any messages
       kmpCompiler.buildKmpFile(kpsPath, kmpJson)
     }
+
+    //TODO: callbacks.printMessages(); after #8711 is merged
 
     if(messageId) {
       assert.lengthOf(callbacks.messages, 1);
@@ -208,6 +217,51 @@ describe('KmpCompiler', function () {
 
   it('should generate WARN_KeyboardFileHasNoKeyboardVersion if <FollowKeyboardVersion> is set but keyboard has no version', async function() {
     testForMessage(this, ['invalid', 'nokeyboardversion.kps'], CompilerMessages.WARN_KeyboardFileHasNoKeyboardVersion);
+  });
+
+  // ERROR_PackageCannotContainBothModelsAndKeyboards
+
+  it('should generate ERROR_PackageCannotContainBothModelsAndKeyboards if package has both keyboards and models', async function() {
+    testForMessage(this, ['invalid', 'ERROR_PackageCannotContainBothModelsAndKeyboards.kps'], CompilerMessages.ERROR_PackageCannotContainBothModelsAndKeyboards);
+  });
+
+  // WARN_PackageShouldNotRepeatLanguages (models)
+
+  it('should generate WARN_PackageShouldNotRepeatLanguages if model has same language repeated', async function() {
+    testForMessage(this, ['invalid', 'keyman.en.warn_package_should_not_repeat_languages.model.kps'], CompilerMessages.WARN_PackageShouldNotRepeatLanguages);
+  });
+
+  // WARN_PackageShouldNotRepeatLanguages (keyboards)
+
+  it('should generate WARN_PackageShouldNotRepeatLanguages if keyboard has same language repeated', async function() {
+    testForMessage(this, ['invalid', 'warn_package_should_not_repeat_languages.kps'], CompilerMessages.WARN_PackageShouldNotRepeatLanguages);
+  });
+
+  // WARN_PackageNameDoesNotFollowLexicalModelConventions
+
+  it('should generate WARN_PackageNameDoesNotFollowLexicalModelConventions if filename has wrong conventions', async function() {
+    testForMessage(this, ['invalid', 'WARN_PackageNameDoesNotFollowLexicalModelConventions.kps'], CompilerMessages.WARN_PackageNameDoesNotFollowLexicalModelConventions);
+  });
+
+  // WARN_PackageNameDoesNotFollowKeyboardConventions
+
+  it('should generate WARN_PackageNameDoesNotFollowKeyboardConventions if filename has wrong conventions', async function() {
+    testForMessage(this, ['invalid', 'WARN_PackageNameDoesNotFollowKeyboardConventions.kps'], CompilerMessages.WARN_PackageNameDoesNotFollowKeyboardConventions);
+  });
+
+  // WARN_FileInPackageDoesNotFollowFilenameConventions
+
+  it('should generate WARN_FileInPackageDoesNotFollowFilenameConventions if content filename has wrong conventions', async function() {
+    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions.kps'], CompilerMessages.WARN_FileInPackageDoesNotFollowFilenameConventions);
+    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions_2.kps'], CompilerMessages.WARN_FileInPackageDoesNotFollowFilenameConventions);
+  });
+
+  // ERROR_PackageNameCannotBeBlank
+
+  it('should generate ERROR_PackageNameCannotBeBlank if package info has empty name', async function() {
+    testForMessage(this, ['invalid', 'error_package_name_cannot_be_blank.kps'], CompilerMessages.ERROR_PackageNameCannotBeBlank); // blank field
+    testForMessage(this, ['invalid', 'error_package_name_cannot_be_blank_2.kps'], CompilerMessages.ERROR_PackageNameCannotBeBlank); // missing field
+    testForMessage(this, ['invalid', 'error_package_name_cannot_be_blank_3.kps'], CompilerMessages.ERROR_PackageNameCannotBeBlank); // missing info section
   });
 
 });

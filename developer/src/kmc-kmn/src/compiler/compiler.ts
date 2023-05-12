@@ -87,7 +87,7 @@ class WasmWrapper {
   }
 };
 
-export class Compiler {
+export class KmnCompiler {
   callbackName: string;
   callbacks: CompilerCallbacks;
   wasm: WasmWrapper;
