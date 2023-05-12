@@ -15,8 +15,12 @@ export class PackageVersionValidation {
    * @returns
    */
   public validateAndUpdateVersions(kpsFilename: string, kps: KpsFile.KpsFile, kmp: KmpJsonFile.KmpJsonFile) {
-    if(!this.checkFollowKeyboardVersion(kps, kmp)) {
-      return false;
+    const followKeyboardVersion = kps.options?.followKeyboardVersion !== undefined;
+
+    if(followKeyboardVersion) {
+      if(!this.checkFollowKeyboardVersion(kps, kmp)) {
+        return false;
+      }
     }
 
     let result = true;
@@ -26,23 +30,40 @@ export class PackageVersionValidation {
       return true;
     }
 
+    // We now know we have at least one keyboard in the package
+
     for(let keyboard of kmp.keyboards) {
       result = this.updateKeyboardVersionFromKmx(kpsFilename, kmp, keyboard) && result;
+      if(result) {
+        if(kmp.keyboards[0].version !== keyboard.version) {
+          this.callbacks.reportMessage(CompilerMessages.Warn_KeyboardVersionsDoNotMatch({
+            keyboard:keyboard.id,
+            version:keyboard.version,
+            firstKeyboard:kmp.keyboards[0].id,
+            firstVersion:kmp.keyboards[0].version
+          }));
+        }
+      }
     }
 
-    if(result && kps.options?.followKeyboardVersion !== undefined) {
-      // We know we have at least one keyboard because of earlier checkFollowKyeboardVersion check
-      kmp.info.version.description = kmp.keyboards[0].version;
+    if(result) {
+      if(followKeyboardVersion) {
+        kmp.info.version.description = kmp.keyboards[0].version;
+      }
+      else if(kmp.info.version?.description != kmp.keyboards[0].version) {
+        // Only need to compare against first keyboard as we compare keyboards above
+        this.callbacks.reportMessage(CompilerMessages.Warn_KeyboardVersionsDoNotMatchPackageVersion({
+          keyboard: kmp.keyboards[0].id,
+          keyboardVersion: kmp.keyboards[0].version,
+          packageVersion: kmp.info.version.description
+        }));
+      }
     }
 
     return result;
   }
 
   private checkFollowKeyboardVersion(kps: KpsFile.KpsFile, kmp: KmpJsonFile.KmpJsonFile) {
-    if(kps.options?.followKeyboardVersion === undefined) {
-      return true;
-    }
-
     // Lexical model packages do not allow FollowKeyboardVersion
     if(kmp.lexicalModels && kmp.lexicalModels.length) {
       this.callbacks.reportMessage(CompilerMessages.Error_FollowKeyboardVersionNotAllowedForModelPackages());

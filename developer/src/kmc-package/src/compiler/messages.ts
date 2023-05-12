@@ -78,5 +78,13 @@ export class CompilerMessages {
   static Error_KeyboardFileNotFound = (o:{filename:string}) => m(this.ERROR_KeyboardFileNotFound,
     `Keyboard file ${o.filename} was not found. Has it been compiled?`);
   static ERROR_KeyboardFileNotFound = SevError | 0x0011;
-}
+
+  static Warn_KeyboardVersionsDoNotMatch = (o: {keyboard:string, version:string, firstKeyboard:string, firstVersion:string}) => m(this.WARN_KeyboardVersionsDoNotMatch,
+    `Keyboard ${o.keyboard} version ${o.version} does not match keyboard ${o.firstKeyboard} version ${o.firstVersion}.`);
+  static WARN_KeyboardVersionsDoNotMatch = SevWarn | 0x0012;
+
+  static Warn_KeyboardVersionsDoNotMatchPackageVersion = (o: {keyboard:string, keyboardVersion: string, packageVersion: string}) => m(this.WARN_KeyboardVersionsDoNotMatchPackageVersion,
+    `Keyboard ${o.keyboard} version ${o.keyboardVersion} does not match package version ${o.packageVersion}.`);
+  static WARN_KeyboardVersionsDoNotMatchPackageVersion = SevWarn | 0x0013;
+  }
 

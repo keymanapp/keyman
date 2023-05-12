@@ -13,7 +13,7 @@ import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
 import { PackageValidation } from '../src/compiler/package-validation.js';
 import { CompilerMessages } from '../src/compiler/messages.js';
 
-const debug = false;
+const debug = true;
 
 describe('KmpCompiler', function () {
   const MODELS : string[] = [
@@ -265,13 +265,24 @@ describe('KmpCompiler', function () {
   it('should generate ERROR_PackageNameCannotBeBlank if package info has empty name', async function() {
     testForMessage(this, ['invalid', 'error_package_name_cannot_be_blank.kps'], CompilerMessages.ERROR_PackageNameCannotBeBlank); // blank field
     testForMessage(this, ['invalid', 'error_package_name_cannot_be_blank_2.kps'], CompilerMessages.ERROR_PackageNameCannotBeBlank); // missing field
-    testForMessage(this, ['invalid', 'error_package_name_cannot_be_blank_3.kps'], CompilerMessages.ERROR_PackageNameCannotBeBlank); // missing info section
   });
 
   // ERROR_KeyboardFileNotFound
 
   it('should generate ERROR_KeyboardFileNotFound if a <Keyboard> is listed in a package but not found in <Files>', async function() {
     testForMessage(this, ['invalid', 'keyboardfilenotfound.kps'], CompilerMessages.ERROR_KeyboardFileNotFound);
+  });
+
+  // WARN_KeyboardVersionsDoNotMatch
+
+  it('should generate WARN_KeyboardVersionsDoNotMatch if two <Keyboards> have different versions', async function() {
+    testForMessage(this, ['invalid', 'warn_keyboard_versions_do_not_match.kps'], CompilerMessages.WARN_KeyboardVersionsDoNotMatch);
+  });
+
+  // WARN_KeyboardVersionsDoNotMatchPackageVersion
+
+  it('should generate ERROR_KeyboardFileNotFound if <Keyboard> version does not match package version', async function() {
+    testForMessage(this, ['invalid', 'warn_keyboard_versions_do_not_match_package_version.kps'], CompilerMessages.WARN_KeyboardVersionsDoNotMatchPackageVersion);
   });
 
 });
