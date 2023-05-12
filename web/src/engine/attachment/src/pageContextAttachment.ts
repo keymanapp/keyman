@@ -595,6 +595,11 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
           // Remove the reference to our prior attachment data!
           this.clearElementAttachment(Pelem);
           Lelem.body._kmwAttachment = null; // is an extra step needed for this case.
+
+          let index = this._inputList.indexOf(Pelem);
+          if(index != -1) {
+            this._inputList.splice(index, 1);
+          }
         } else {
           // If already attached, do not attempt to attach again.
           for(let i=0; i < this.embeddedPageContexts.length; i++) {
@@ -605,6 +610,10 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
               embeddedPageAttachment._ClearDocument(Lelem.body); // I2404 - Manage IE events in IFRAMEs
               // The events defined in _AttachToIframe will still forward during `shutdown`.
               embeddedPageAttachment.shutdown();
+
+              // Also, remove child attachment-engine, too.
+              this.embeddedPageContexts.splice(i, 1);
+              break;
             }
           }
         }
@@ -973,8 +982,9 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     }
 
     for(k = 0; k < inputElementRemovals.length; k++) {
-      if(this.isKMWInput(inputElementRemovals[k])) { // Apply standard element filtering!
-        this._MutationRemovalObserved(inputElementRemovals[k]);
+      const elem = inputElementRemovals[k];
+      if(this.isKMWInput(elem)) {
+        this._MutationRemovalObserved(elem);
       }
     }
 

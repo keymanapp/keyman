@@ -17,14 +17,6 @@ export class AttachmentInfo {
   languageCode:   string;
 
   /**
-   * Tracks if the control has an aliased control for touch functionality.
-   *
-   * Future note - could be changed to track the DOMEventHandler instance used by this control;
-   *               this may be useful for an eventual hybrid touch/non-touch implementation.
-   */
-  touchEnabled:   boolean;
-
-  /**
    * Tracks the inputmode originally set by the webpage.
    */
   inputMode?: string;
@@ -32,6 +24,5 @@ export class AttachmentInfo {
   constructor(eleInterface: OutputTarget<any>, kbd: string, touch?: boolean) {
     this.interface = eleInterface;
     this.keyboard = kbd;
-    this.touchEnabled = touch || false;
   }
 }
