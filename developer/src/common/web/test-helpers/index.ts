@@ -3,9 +3,9 @@ import * as path from 'path';
 import { CompilerEvent, CompilerCallbacks, CompilerSchema, CompilerPathCallbacks, CompilerFileSystemCallbacks } from '@keymanapp/common-types';
 export { verifyCompilerMessagesObject } from './verifyCompilerMessagesObject.js';
 
-// TODO: schemas are only used by kmc-keyboard for now, so this works at this
+// TODO: schemas are only used by kmc-ldml for now, so this works at this
 // time, but it's a little fragile if we need them elsewhere in the future
-const SCHEMA_BASE = '../../../../kmc-keyboard/build/src/';
+const SCHEMA_BASE = '../../../../kmc-ldml/build/src/';
 
 /**
  * A CompilerCallbacks implementation for testing

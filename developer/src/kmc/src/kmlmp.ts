@@ -3,9 +3,11 @@
  * kmlmp - Keyman Lexical Model Package Compiler
  */
 
+// Note: this is a deprecated package and will be removed in Keyman 18.0
+
 import * as fs from 'fs';
 import { Command } from 'commander';
-import KmpCompiler from '@keymanapp/kmc-package';
+import { PackageValidation, KmpCompiler } from '@keymanapp/kmc-package';
 import { SysExits } from './util/sysexits.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { NodeCompilerCallbacks } from './messages/NodeCompilerCallbacks.js';
@@ -15,7 +17,7 @@ const program = new Command();
 
 /* Arguments */
 program
-  .description('Compiles Keyman lexical model packages')
+  .description('Compiles Keyman lexical model packages\nDeprecated: use <kmc build> instead; will be removed in v18')
   .version(KEYMAN_VERSION.VERSION_WITH_TAG)
   .arguments('<infile>')
   .action(infile => inputFilename = infile)
@@ -38,6 +40,18 @@ let outputFilename: string = program.opts().outFile ? program.opts().outFile : i
 const callbacks = new NodeCompilerCallbacks();
 let kmpCompiler = new KmpCompiler(callbacks);
 let kmpJsonData = kmpCompiler.transformKpsToKmpObject(inputFilename);
+if(!kmpJsonData) {
+  process.exit(1);
+}
+
+//
+// Validate the package file
+//
+
+const validation = new PackageValidation(callbacks);
+if(!validation.validate(inputFilename, kmpJsonData)) {
+  process.exit(1);
+}
 
 //
 // Build the .kmp package file

@@ -31,8 +31,7 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "dependencies": {
-    "@keymanapp/keyman-version": "*",
-    "@keymanapp/kmc-package": "*",
+    "@keymanapp/common-types": "*",
     "@keymanapp/models-types": "*"
   },
   "devDependencies": {

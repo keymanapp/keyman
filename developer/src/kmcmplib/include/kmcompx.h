@@ -31,7 +31,7 @@ typedef KMX_WCHAR*  PKMX_WCHAR ;
 #include <type_traits>
 
 template < typename T, size_t N >
-size_t _countof( T ( & arr )[ N ] )
+size_t _countof( T ( & /*arr*/ )[ N ] )
 {
     return std::extent< T[ N ] >::value;
 }
