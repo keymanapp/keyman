@@ -2,11 +2,10 @@ import { Codes, DeviceSpec, KeyEvent, KeyMapping, Keyboard, KeyboardProcessor } 
 
 import { HardKeyboard } from 'keyman/engine/main';
 import { DomEventTracker } from 'keyman/engine/events';
+import { DesignIFrame, nestedInstanceOf } from 'keyman/engine/element-wrappers';
 import { eventOutputTarget, outputTargetForElement } from 'keyman/engine/attachment';
 
 import ContextManager from './contextManager.js';
-import { nestedInstanceOf } from '../../../../build/engine/element-wrappers/obj/utils.js';
-import DesignIFrame from '../../../../build/engine/element-wrappers/obj/designIFrame.js';
 
 type KeyboardState = {
   activeKeyboard: Keyboard,
