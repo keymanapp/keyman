@@ -6,7 +6,7 @@ import KmpCompiler from '../src/kmp-compiler.js';
 import {makePathToFixture} from './helpers/index.js';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
-import { type KmpJsonFile } from '../src/kmp-json-file.js';
+import { KmpJsonFile } from '@keymanapp/common-types';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { CompilerMessages } from '../src/messages.js';
 
@@ -37,7 +37,7 @@ describe('KmpCompiler', function () {
     // Test just the transform from kps to kmp.json
     //
     it(`should transform ${modelID}.model.kps to kmp.json`, function () {
-      let kmpJson: KmpJsonFile;
+      let kmpJson: KmpJsonFile.KmpJsonFile;
 
       assert.doesNotThrow(() => {
         kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
@@ -56,7 +56,7 @@ describe('KmpCompiler', function () {
     it(`should build a full .kmp for ${modelID}`, async function() {
       const zip = JSZip();
       // Build kmp.json in memory
-      const kmpJson: KmpJsonFile = kmpCompiler.transformKpsToKmpObject(kpsPath);
+      const kmpJson: KmpJsonFile.KmpJsonFile = kmpCompiler.transformKpsToKmpObject(kpsPath);
       // Build file.kmp in memory
       const promise = kmpCompiler.buildKmpFile(kpsPath, kmpJson);
       promise.then(data => {
@@ -86,7 +86,7 @@ describe('KmpCompiler', function () {
     const kmpJsonRefPath = makePathToFixture('khmer_angkor', 'ref', 'kmp.json');
 
     const kmpCompiler = new KmpCompiler(callbacks);
-    const kmpJsonFixture: KmpJsonFile = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
+    const kmpJsonFixture: KmpJsonFile.KmpJsonFile = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
 
     // We override the fixture version so that we can compare with the compiler output
     kmpJsonFixture.system.keymanDeveloperVersion = KEYMAN_VERSION.VERSION;
@@ -131,7 +131,7 @@ describe('KmpCompiler', function () {
     const kpsPath = makePathToFixture('absolute_path', 'source', 'absolute_path.kps');
     const kmpCompiler = new KmpCompiler(callbacks);
 
-    let kmpJson: KmpJsonFile = null;
+    let kmpJson: KmpJsonFile.KmpJsonFile = null;
 
     assert.doesNotThrow(() => {
       kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);

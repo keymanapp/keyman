@@ -29,4 +29,8 @@ export * as KPJ from './kpj/kpj-file.js';
 export { KPJFileReader } from './kpj/kpj-file-reader.js';
 export { KeymanDeveloperProject } from './kpj/keyman-developer-project.js';
 
+export * as KpsFile from './package/kps-file.js';
+export * as KmpJsonFile from './package/kmp-json-file.js';
+
 export * as util from './util/util.js';
+
