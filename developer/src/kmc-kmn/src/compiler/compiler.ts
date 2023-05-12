@@ -169,7 +169,7 @@ export class KmnCompiler {
    * @returns UnicodeSet accessor object, or null on failure
    */
   public parseUnicodeSet(pattern: string, bufferSize: number) : UnicodeSet | null {
-    if(!this.verifyInitted()) {
+    if(!this.verifyInitialized()) {
       return null;
     }
 

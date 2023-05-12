@@ -25,7 +25,7 @@ describe('Compiler class', function() {
   });
 
   it('should throw on failure', async function() {
-    const compiler = new Compiler();
+    const compiler = new KmnCompiler();
     const callbacks : any = null; // ERROR
     try {
       await compiler.init(callbacks)
@@ -33,7 +33,7 @@ describe('Compiler class', function() {
     } catch(e) {
       assert.ok(e);
     }
-    assert.throws(() => compiler.verifyInitted());
+    assert.throws(() => compiler.verifyInitialized());
   });
 
   it('should start', async function() {
