@@ -129,7 +129,7 @@ export class PackageVersionValidation {
     const store = kmx.stores.find(store => store.dwSystemID == KMX.KMXFile.TSS_KEYBOARDVERSION);
     if(!store) {
       // We have no version number store, so use default version
-      this.callbacks.reportMessage(CompilerMessages.Warn_KeyboardFileHasNoKeyboardVersion({filename}));
+      this.callbacks.reportMessage(CompilerMessages.Info_KeyboardFileHasNoKeyboardVersion({filename}));
       return true;
     }
 

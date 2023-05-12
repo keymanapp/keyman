@@ -217,10 +217,10 @@ describe('KmpCompiler', function () {
     testForMessage(this, ['invalid', 'keyboardfilenotvalid.kps'], CompilerMessages.ERROR_KeyboardFileNotValid);
   });
 
-  // WARN_KeyboardFileHasNoKeyboardVersion
+  // INFO_KeyboardFileHasNoKeyboardVersion
 
-  it('should generate WARN_KeyboardFileHasNoKeyboardVersion if <FollowKeyboardVersion> is set but keyboard has no version', async function() {
-    testForMessage(this, ['invalid', 'nokeyboardversion.kps'], CompilerMessages.WARN_KeyboardFileHasNoKeyboardVersion);
+  it('should generate INFO_KeyboardFileHasNoKeyboardVersion if <FollowKeyboardVersion> is set but keyboard has no version', async function() {
+    testForMessage(this, ['invalid', 'nokeyboardversion.kps'], CompilerMessages.INFO_KeyboardFileHasNoKeyboardVersion);
   });
 
   // ERROR_PackageCannotContainBothModelsAndKeyboards
