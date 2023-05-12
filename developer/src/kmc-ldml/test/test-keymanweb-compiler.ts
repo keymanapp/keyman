@@ -5,7 +5,7 @@ import { LdmlKeyboardKeymanWebCompiler } from '../src/compiler/keymanweb-compile
 import { LdmlKeyboardCompiler } from '../src/compiler/compiler.js';
 import * as fs from 'fs';
 
-describe('KeymanWebCompiler', function() {
+describe('LdmlKeyboardKeymanWebCompiler', function() {
 
   it('should build a .js file', async function() {
     // Let's build basic.xml
