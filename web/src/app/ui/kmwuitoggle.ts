@@ -5,7 +5,6 @@
 
 import type { KeymanEngine, KeyboardCookie, UIModule } from 'keyman/app/browser';
 import type { FloatingOSKViewCookie } from 'keyman/engine/osk';
-import type { StylesheetManager } from 'keyman/engine/dom-utils';
 
 declare var keyman: KeymanEngine
 
@@ -73,8 +72,6 @@ if(!keyman?.ui?.name) {
       updateTimer: number = null;
 
       keyboardMenu: HTMLUListElement;
-
-      stylesheetManager: StylesheetManager;
 
       /**
        * Update the KeymanWeb user interface when an input element is focused or blurred
@@ -460,8 +457,10 @@ if(!keyman?.ui?.name) {
         this.updateKeyboardList();
         this.registerEvents();
 
-        this.stylesheetManager = new util.StylesheetManager(this.controller);
-        this.stylesheetManager.linkStylesheet(util.createStylesheet(this.stylingCSS));
+        // Future improvement:  have the UI modules track their own stylesheets as part of their
+        // element hierarchy.  engine/dom-utils has a spun-off StylesheetManager class that's
+        // perfect for this.
+        util.addStyleSheet(this.stylingCSS);
       }
 
       shutdown() {
@@ -469,10 +468,6 @@ if(!keyman?.ui?.name) {
 
         if(root) {
           root.parentNode.removeChild(root);
-        }
-
-        if(this.stylesheetManager) {
-          this.stylesheetManager.unlinkAll();
         }
       }
 

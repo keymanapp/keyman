@@ -16,9 +16,11 @@ export function createUnselectableElement<E extends keyof HTMLElementTagNameMap>
 
 export class UtilApiEndpoint {
   readonly config: BrowserConfiguration;
+  private readonly stylesheetManager: StylesheetManager;
 
   constructor(config: BrowserConfiguration) {
     this.config = config;
+    this.stylesheetManager = new StylesheetManager(document.body, config.applyCacheBusting);
   }
 
   readonly getAbsoluteX = getAbsoluteX;
@@ -82,7 +84,39 @@ export class UtilApiEndpoint {
     cookie.save(cv, encodeURIComponent);
   }
 
-  readonly createStylesheet = createStyleSheet;
+  /**
+   * Add a stylesheet to a page programmatically, for use by the OSK, the UI or the page creator
+   *
+   * @param       {string}        s             style string
+   * @return      {Object}                      returns the object reference
+   **/
+  addStyleSheet(s: string): HTMLStyleElement {
+    const styleSheet = createStyleSheet(s);
+    this.stylesheetManager.linkStylesheet(styleSheet);
 
-  readonly StylesheetManager = StylesheetManager;
+    return styleSheet;
+  }
+
+    /**
+     * Remove a stylesheet element
+     *
+     * @param       {Object}        s             style sheet reference
+     * @return      {boolean}                     false if element is not a style sheet
+     **/
+    removeStyleSheet(s: HTMLStyleElement) {
+      return this.stylesheetManager.unlink(s);
+    }
+
+    /**
+     * Add a reference to an external stylesheet file
+     *
+     * @param   {string}  s   path to stylesheet file
+     */
+    linkStyleSheet(s: string): void {
+      this.stylesheetManager.linkExternalSheet(s);
+    }
+
+  shutdown() {
+    this.stylesheetManager?.unlinkAll();
+  }
 }
