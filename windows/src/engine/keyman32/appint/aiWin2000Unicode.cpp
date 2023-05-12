@@ -166,17 +166,6 @@ BOOL AIWin2000Unicode::QueueAction(int ItemType, DWORD dwData)
 	return result;
 }
 
-BOOL AIWin2000Unicode::QueueDebugInformation(int ItemType, LPGROUP Group, LPKEY Rule, PWSTR fcontext, PWSTR foutput, DWORD_PTR dwExtraFlags)
-{
-  UNREFERENCED_PARAMETER(ItemType);
-  UNREFERENCED_PARAMETER(Group);
-  UNREFERENCED_PARAMETER(Rule);
-  UNREFERENCED_PARAMETER(fcontext);
-  UNREFERENCED_PARAMETER(foutput);
-  UNREFERENCED_PARAMETER(dwExtraFlags);
-	return TRUE;
-}
-
 // I1512 - SendInput with VK_PACKET for greater robustness
 
 BOOL AIWin2000Unicode::PostKeys()

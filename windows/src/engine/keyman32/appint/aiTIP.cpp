@@ -590,32 +590,3 @@ void FillStoreOffsets(AIDEBUGINFO *di)
 		}
 	di->StoreOffsets[n] = 0xFFFF;
 }
-
-BOOL AITIP::QueueDebugInformation(int ItemType, LPGROUP Group, LPKEY Rule, PWSTR fcontext, PWSTR foutput, DWORD_PTR dwExtraFlags)
-{
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return TRUE;
-
-	SendDebugMessageFormat(0, sdmAIDefault, 0, "AIDebugger::QueueDebugInformation ItemType=%d", ItemType);
-	AIDEBUGINFO di;
-	di.cbSize = sizeof(AIDEBUGINFO);
-	di.ItemType = ItemType;		// int
-	di.Context = fcontext;		// PWSTR
-	di.Rule = Rule;				// LPKEY
-	di.Group = Group;			// LPGROUP
-	di.Output = foutput;		// PWSTR
-	di.Flags = dwExtraFlags;	// DWORD
-
-	if(di.Rule) FillStoreOffsets(&di);
-
-	// data required
-	// keystroke
-	// context for rule
-	// if rule, then output of rule
-	// match positions for all stores in rule
-
-	if(DebugControlled())
-		SendMessage(GetDebugControlWindow(), WM_KEYMANDEBUG_RULEMATCH, ItemType, (LPARAM) &di);
-
-	return TRUE;
-}
