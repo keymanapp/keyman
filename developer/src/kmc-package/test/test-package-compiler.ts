@@ -249,4 +249,11 @@ describe('KmpCompiler', function () {
     testForMessage(this, ['invalid', 'WARN_PackageNameDoesNotFollowKeyboardConventions.kps'], CompilerMessages.WARN_PackageNameDoesNotFollowKeyboardConventions);
   });
 
+  // WARN_FileInPackageDoesNotFollowFilenameConventions
+
+  it('should generate WARN_FileInPackageDoesNotFollowFilenameConventions if content filename has wrong conventions', async function() {
+    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions.kps'], CompilerMessages.WARN_FileInPackageDoesNotFollowFilenameConventions);
+    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions_2.kps'], CompilerMessages.WARN_FileInPackageDoesNotFollowFilenameConventions);
+  });
+
 });

@@ -13,6 +13,10 @@ const MODEL_ID_PATTERN_PACKAGE = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a
 // const MODEL_ID_PATTERN_TS      = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.ts$/;
 // const MODEL_ID_PATTERN_PROJECT = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.kpj$/;
 
+// "Content files" within the package should adhere to these pattern:
+const CONTENT_FILE_BASENAME_PATTERN = /^[a-z0-9_+.-]+$/;
+const CONTENT_FILE_EXTENSION_PATTERN = /^\.[a-z0-9_]+$/;
+
 export class PackageValidation {
 
   constructor(private callbacks: CompilerCallbacks) {
@@ -26,6 +30,9 @@ export class PackageValidation {
       return false;
     }
     if(!this.checkLexicalModels(filename, kmpJson)) {
+      return false;
+    }
+    if(!this.checkContentFiles(kmpJson)) {
       return false;
     }
     return true;
@@ -83,6 +90,27 @@ export class PackageValidation {
 
     for(let keyboard of kmpJson.keyboards) {
       this.checkForDuplicatedLanguages('keyboard', keyboard.id, keyboard.languages);
+    }
+
+    return true;
+  }
+
+  private checkContentFiles(kmpJson: KmpJsonFile.KmpJsonFile): boolean {
+    for(let file of kmpJson.files) {
+      if(!this.checkContentFile(file)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  private checkContentFile(file: KmpJsonFile.KmpJsonFileContentFile): boolean {
+    const filename = this.callbacks.path.basename(file.name);
+    const ext = this.callbacks.path.extname(filename);
+    const base = filename.substring(0, filename.length-ext.length);
+    if(!CONTENT_FILE_BASENAME_PATTERN.test(base) || !CONTENT_FILE_EXTENSION_PATTERN.test(ext)) {
+      this.callbacks.reportMessage(CompilerMessages.Warn_FileInPackageDoesNotFollowFilenameConventions({filename}));
     }
 
     return true;
