@@ -15,9 +15,11 @@ set -eu
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+# shellcheck source=resources/build/build-utils.sh
 . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+# shellcheck source=linux/scripts/package-build.inc.sh
 . "$(dirname "$THIS_SCRIPT")/package-build.inc.sh"
 
 checkPrerequisites
@@ -53,7 +55,7 @@ for proj in ${projects:-}; do
     done
     cd ..
     for dist in ${distributions}; do
-        dput "${SIM}" ${ppa} "${proj}_${version}-${packageversion}~${dist}_source.changes"
+        dput ${SIM} ${ppa} "${proj}_${version}-${packageversion}~${dist}_source.changes"
     done
     cd "${BASEDIR}"
 done

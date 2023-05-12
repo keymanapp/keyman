@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
-#
-# Compiles the kmc lexical model model-info compiler.
-#
-
-# Exit on command failure and when using unset variables:
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -17,14 +10,16 @@ cd "$THIS_SCRIPT_PATH"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 builder_describe "Build Keyman kmc Lexical Model model-info Compiler module" \
-  "@/developer/src/kmc-package" \
+  "@/common/web/types" \
+  "@/common/models/types" \
+  "clean" \
   "configure" \
   "build" \
-  "clean" \
   "test" \
   "pack                      build a local .tgz pack for testing" \
   "publish                   publish to npm" \
   "--dry-run,-n              don't actually publish, just dry run"
+
 builder_describe_outputs \
   configure     /node_modules \
   build         /developer/src/kmc-model-info/build/src/model-info-compiler.js

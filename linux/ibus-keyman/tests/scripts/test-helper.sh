@@ -15,15 +15,11 @@ function generate_kmpjson() {
   TESTDIR="$1"
   pushd "$TESTDIR" > /dev/null || exit
   KMPFILE="${TESTDIR}/kmp.json"
-  THISYEAR=$(date "+%Y")
   cat <<-EOF > "$KMPFILE"
   {
     "system": {
       "keymanDeveloperVersion": "10.0.1099.0",
       "fileVersion": "7.0"
-    },
-    "options": {
-      "readmeFile": "kmx.cpp"
     },
     "info": {
       "name": {
@@ -31,12 +27,6 @@ function generate_kmpjson() {
       },
       "version": {
         "description": "0.0"
-      },
-      "copyright": {
-        "description": "\u00A9 2018-${THISYEAR} SIL International"
-      },
-      "author": {
-        "description": ""
       }
     },
     "files": [
@@ -44,6 +34,19 @@ function generate_kmpjson() {
         "name": "kmp.json",
         "description": "Package information (JSON)"
       }
+EOF
+  for f in k_*.kmx; do
+    keyboard=$(basename "$f")
+    keyboard="${keyboard%.*}"
+    echo "      ," >> "$KMPFILE"
+    cat <<-EOF >> "$KMPFILE"
+      {
+        "name": "$keyboard",
+        "description": "$keyboard"
+      }
+EOF
+  done
+  cat <<-EOF >> "$KMPFILE"
     ],
     "keyboards": [
 EOF
@@ -54,7 +57,7 @@ EOF
     if $FIRST; then
       FIRST=false
     else
-      echo "," >> "$KMPFILE"
+      echo "    ," >> "$KMPFILE"
     fi
     cat <<-EOF >> "$KMPFILE"
     {
@@ -70,7 +73,7 @@ EOF
     }
 EOF
   done
-  echo "]" >> "$KMPFILE"
+  echo "  ]" >> "$KMPFILE"
   echo "}" >> "$KMPFILE"
   popd > /dev/null || exit
 }

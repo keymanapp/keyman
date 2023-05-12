@@ -1,5 +1,22 @@
 # Keyman Version History
 
+## 17.0.105 alpha 2023-05-11
+
+* chore(common): Update crowdin strings for Amharic (#8748)
+* chore(android/app): Cleanup build-play-store-notes script (#8749)
+* chore(linux): Add build.sh for keyman-config (#8733)
+
+## 17.0.104 alpha 2023-05-10
+
+* chore(developer): rename kmc-keyboard to kmc-ldml (#8725)
+* chore(linux): bring kmp.json for unit test up to spec (#8732)
+* feat(common): add `builder_run_action` shorthand function (#8742)
+
+## 17.0.103 alpha 2023-05-09
+
+* fix(mac): `$CONFIG` not `$CONFIGURATION` in build path (#8724)
+* chore(linux): Fix another problem uploading to launchpad (#8727)
+
 ## 17.0.102 alpha 2023-05-08
 
 * chore(linux): Build for Lunar on all platforms (#8713)

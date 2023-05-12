@@ -9,6 +9,7 @@ TOP_BINDIR=${G_TEST_BUILDDIR:-$(realpath "$(dirname "$0/..")")}/..
 TESTBASEDIR=${XDG_DATA_HOME:-$HOME/.local/share}/keyman
 TESTDIR=${TESTBASEDIR}/test_kmx
 
+# shellcheck source=linux/ibus-keyman/tests/scripts/test-helper.sh
 . "$(dirname "$0")"/test-helper.sh
 
 echo > "$ENV_FILE"

@@ -47,6 +47,32 @@ export class CompilerMessages {
     `Keyboard file ${o.filename} has no &KeyboardVersion store`);
   static WARN_KeyboardFileHasNoKeyboardVersion = SevWarn | 0x000A;
 
+  static Error_PackageCannotContainBothModelsAndKeyboards = () => m(this.ERROR_PackageCannotContainBothModelsAndKeyboards,
+    `The package contains both lexical models and keyboards, which is not permitted.`);
+  static ERROR_PackageCannotContainBothModelsAndKeyboards = SevError | 0x000B;
 
+  static Warn_PackageShouldNotRepeatLanguages = (o:{resourceType: string, id: string, tag: string}) => m(this.WARN_PackageShouldNotRepeatLanguages,
+    `The ${o.resourceType} ${o.id} has a repeated language "${o.tag}".`);
+  static WARN_PackageShouldNotRepeatLanguages = SevWarn | 0x000C;
+
+  static Warn_PackageNameDoesNotFollowLexicalModelConventions = (o:{filename: string}) => m(this.WARN_PackageNameDoesNotFollowLexicalModelConventions,
+    `The package file ${o.filename} does not follow the recommended model filename conventions. The name should be all lower case, `+
+    `include only alphanumeric characters and underscore (_), not start with a digit, and should have the structure `+
+    `<author>.<bcp47>.<uniq>.model.kps.`);
+  static WARN_PackageNameDoesNotFollowLexicalModelConventions = SevWarn | 0x000D;
+
+  static Warn_PackageNameDoesNotFollowKeyboardConventions = (o:{filename: string}) => m(this.WARN_PackageNameDoesNotFollowKeyboardConventions,
+    `The package file ${o.filename} does not follow the recommended keyboard filename conventions. The name should be all lower case, `+
+    `include only alphanumeric characters and underscore (_), and not start with a digit.`);
+  static WARN_PackageNameDoesNotFollowKeyboardConventions = SevWarn | 0x000E;
+
+  static Warn_FileInPackageDoesNotFollowFilenameConventions = (o:{filename: string}) => m(this.WARN_FileInPackageDoesNotFollowFilenameConventions,
+    `The file ${o.filename} does not follow the recommended filename conventions. The extension should be all lower case, `+
+    `and the filename should include only alphanumeric characters, -, _, + and .`);
+  static WARN_FileInPackageDoesNotFollowFilenameConventions = SevWarn | 0x000F;
+
+  static Error_PackageNameCannotBeBlank = () => m(this.ERROR_PackageNameCannotBeBlank,
+    `Package name cannot be an empty string.`);
+  static ERROR_PackageNameCannotBeBlank = SevError | 0x0010;
 }
 
