@@ -14,7 +14,7 @@
 		<name value="French Test AZERTY" />
 	</names>
 
-	<settings fallback="omit" transformPartial="hide" /> <!-- "hide" makes this act like a dead keyTBD -->
+	<settings fallback="omit" /> <!-- "hide" makes this act like a dead keyTBD -->
 
 	<vkeys>
     <vkey from="Q" to="A" />
@@ -148,47 +148,50 @@
 		</layer>
 	</layers>
 
-	<transforms type="simple">
-		<transform from="` " to="`" />
-		<transform from="`a" to="à" />
-		<transform from="`A" to="À" />
-		<transform from="`e" to="è" />
-		<transform from="`E" to="È" />
-		<transform from="`i" to="ì" />
-		<transform from="`I" to="Ì" />
-		<transform from="`o" to="ò" />
-		<transform from="`O" to="Ò" />
-		<transform from="`u" to="ù" />
-		<transform from="`U" to="Ù" />
-		<transform from="^ " to="^" />
-		<transform from="^a" to="â" />
-		<transform from="^A" to=" " />
-		<transform from="^e" to="ê" />
-		<transform from="^E" to="Ê" />
-		<transform from="^i" to="î" />
-		<transform from="^I" to="Î" />
-		<transform from="^o" to="ô" />
-		<transform from="^O" to="Ô" />
-		<transform from="^u" to="û" />
-		<transform from="^U" to="Û" />
-		<transform from="¨ " to="¨" />
-		<transform from="¨a" to="ä" />
-		<transform from="¨A" to="Ä" />
-		<transform from="¨e" to="ë" />
-		<transform from="¨E" to="Ë" />
-		<transform from="¨i" to="ï" />
-		<transform from="¨I" to="Ï" />
-		<transform from="¨o" to="ö" />
-		<transform from="¨O" to="Ö" />
-		<transform from="¨u" to="ü" />
-		<transform from="¨U" to="Ü" />
-		<transform from="¨y" to="ÿ" />
-		<transform from="~ " to="~" />
-		<transform from="~a" to="ã" />
-		<transform from="~A" to="Ã" />
-		<transform from="~n" to="ñ" />
-		<transform from="~N" to="Ñ" />
-		<transform from="~o" to="õ" />
-		<transform from="~O" to="Õ" />
+  <transforms type="simple">
+    <transformGroup>
+      <transform from="` " to="`" />
+      <transform from="`a" to="à" />
+      <transform from="`A" to="À" />
+      <transform from="`e" to="è" />
+      <transform from="`E" to="È" />
+      <transform from="`i" to="ì" />
+      <transform from="`I" to="Ì" />
+      <transform from="`o" to="ò" />
+      <transform from="`O" to="Ò" />
+      <transform from="`u" to="ù" />
+      <transform from="`U" to="Ù" />
+      <transform from="^ " to="^" />
+      <transform from="^a" to="â" />
+      <transform from="^A" to=" " />
+      <transform from="^e" to="ê" />
+      <transform from="^E" to="Ê" />
+      <transform from="^i" to="î" />
+      <transform from="^I" to="Î" />
+      <transform from="^o" to="ô" />
+      <transform from="^O" to="Ô" />
+      <transform from="^u" to="û" />
+      <transform from="^U" to="Û" />
+      <transform from="¨ " to="¨" />
+      <transform from="¨a" to="ä" />
+      <transform from="¨A" to="Ä" />
+      <transform from="¨e" to="ë" />
+      <transform from="¨E" to="Ë" />
+      <transform from="¨i" to="ï" />
+      <transform from="¨I" to="Ï" />
+      <transform from="¨o" to="ö" />
+      <transform from="¨O" to="Ö" />
+      <transform from="¨u" to="ü" />
+      <transform from="¨U" to="Ü" />
+      <transform from="¨y" to="ÿ" />
+      <transform from="~ " to="~" />
+      <transform from="~a" to="ã" />
+      <transform from="~A" to="Ã" />
+      <transform from="~n" to="ñ" />
+      <transform from="~N" to="Ñ" />
+      <transform from="~o" to="õ" />
+      <transform from="~O" to="Õ" />
+    </transformGroup>
 	</transforms>
+
 </keyboard>

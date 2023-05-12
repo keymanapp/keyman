@@ -12,6 +12,8 @@
     "src/**/*.ts"
   ],
   "references": [
-    { "path": "../kmc-package" }  // can we eliminate this in future?
+    { "path": "../kmc-package" }, // can we eliminate this in future?
+    { "path": "../../../common/web/keyman-version"},
+    { "path": "../../../common/models/types" },
   ]
 }

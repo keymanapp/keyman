@@ -506,10 +506,17 @@ public:
   /**
    * Search for a key by string id.
    * @param strID id to search for
-   * @param index on exit, index of item if found. Undefined otherwise.
+   * @param index on entry, id to start with such as 0. On exit, index of item if found. Undefined otherwise.
    * @return pointer to key or nullptr
    */
   const COMP_KMXPLUS_KEYS_KEY *findKeyByStringId(KMX_DWORD strId, KMX_DWORD &index) const;
+  /**
+   * Search for a key by 'to' string id
+   * @param strID id to search for
+   * @param index on entry, id to start with such as 0. On exit, index of item if found. Undefined otherwise.
+   * @return pointer to key or nullptr
+   */
+  const COMP_KMXPLUS_KEYS_KEY *findKeyByStringTo(KMX_DWORD strId, KMX_DWORD &index) const;
 
 private:
   const COMP_KMXPLUS_KEYS *key2;

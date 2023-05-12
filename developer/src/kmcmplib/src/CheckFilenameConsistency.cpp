@@ -2,7 +2,7 @@
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING 1
 #include "pch.h"
 #include "compfile.h"
-#include <comperr.h>
+#include <kmn_compiler_errors.h>
 #include "kmcmplib.h"
 #include <string>
 #include "CheckFilenameConsistency.h"
@@ -74,7 +74,7 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   } else {
     u16ncpy(Name, Filename, _countof(Name));  // I3481
   }
-  
+
 #ifndef _MSC_VER
   // Filename consistency only needs to be checked on Windows, because other
   // platforms are going to fail if the filename is inconsistent anyway!

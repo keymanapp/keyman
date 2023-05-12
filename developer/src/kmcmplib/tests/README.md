@@ -1,5 +1,8 @@
 # Unit tests for kmcmplib
 
+**Note:** the keyboards repository tests only run if --full-test is passed to
+build.sh.
+
 kmcmplib tests include building all keyboards in the keyboards repository and
 comparing against a 'known good' legacy compiler set. This is trickier than it
 sounds because the legacy compiler only runs under Windows/WINE and we don't

@@ -670,8 +670,18 @@ COMP_KMXPLUS_KEYS_Helper::getKeys(KMX_DWORD i) const {
 
 const COMP_KMXPLUS_KEYS_KEY*
 COMP_KMXPLUS_KEYS_Helper::findKeyByStringId(KMX_DWORD strId, KMX_DWORD &i) const {
-  for (i = 0; i < key2->keyCount; i++) {
+  for (; i < key2->keyCount; i++) {
     if (keys[i].id == strId) {
+      return &keys[i];
+    }
+  }
+  return nullptr;
+}
+
+const COMP_KMXPLUS_KEYS_KEY*
+COMP_KMXPLUS_KEYS_Helper::findKeyByStringTo(KMX_DWORD strId, KMX_DWORD &i) const {
+  for (; i < key2->keyCount; i++) {
+    if (keys[i].to == strId) {
       return &keys[i];
     }
   }

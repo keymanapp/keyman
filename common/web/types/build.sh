@@ -22,6 +22,7 @@ builder_describe "Build Keyman common file types module" \
   "build" \
   "clean" \
   "test" \
+  "pack                      build a local .tgz pack for testing" \
   "publish                   publish to npm" \
   "--dry-run,-n              don't actually publish, just dry run"
 builder_describe_outputs \
@@ -35,7 +36,9 @@ builder_parse "$@"
 if builder_start_action clean; then
   rm -rf ./build/ ./tsconfig.tsbuildinfo
   builder_finish_action success clean
-else
+fi
+
+function copy_schemas() {
   # We need the schema files at runtime and bundled, so always copy it for all actions except `clean`
   mkdir -p "$THIS_SCRIPT_PATH/build/src/"
   cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json" "$THIS_SCRIPT_PATH/build/src/"
@@ -54,7 +57,7 @@ else
     # TODO-LDML: When these are copied, the DOCTYPE will break due to the wrong path. We don't use the DTD so it should be OK.
     cp "$CLDR_INFO_PATH" "$CLDR_PATH/import/"*.xml "$THIS_SCRIPT_PATH/build/src/import/$CLDR_VER/"
   done
-fi
+}
 
 #-------------------------------------------------------------------------------------------------------------------
 
@@ -66,6 +69,7 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action build; then
+  copy_schemas
   npm run build
   builder_finish_action success build
 fi
@@ -73,6 +77,7 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action test; then
+  copy_schemas
   npm test
   builder_finish_action success test
 fi
@@ -80,7 +85,13 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action publish; then
+  copy_schemas
   . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
   builder_publish_to_npm
   builder_finish_action success publish
+elif builder_start_action pack; then
+  copy_schemas
+  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+  builder_publish_to_pack
+  builder_finish_action success pack
 fi

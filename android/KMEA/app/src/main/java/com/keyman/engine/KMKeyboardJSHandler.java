@@ -128,9 +128,7 @@ public class KMKeyboardJSHandler {
               ic.endBatchEdit();
               return;
             } else {
-              if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-                KMManager.SystemKeyboardShouldIgnoreSelectionChange = true;
-              }
+              k.setShouldIgnoreSelectionChange(true);
               ic.setSelection(start, start);
               ic.deleteSurroundingText(0, end - start);
             }
@@ -149,6 +147,10 @@ public class KMKeyboardJSHandler {
 
         // Perform left-deletions
         if (deleteLeft > 0) {
+          if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+            k.setShouldIgnoreTextChange(true);
+            k.setShouldIgnoreSelectionChange(true);
+          }
           performLeftDeletions(ic, deleteLeft);
         }
 
@@ -157,9 +159,7 @@ public class KMKeyboardJSHandler {
           CharSequence chars = ic.getTextAfterCursor(1, 0);
           if (chars != null && chars.length() > 0) {
             char c = chars.charAt(0);
-            if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-              KMManager.SystemKeyboardShouldIgnoreSelectionChange = true;
-            }
+            k.setShouldIgnoreSelectionChange(true);
             if (Character.isHighSurrogate(c)) {
               ic.deleteSurroundingText(0, 2);
             } else {
@@ -169,9 +169,7 @@ public class KMKeyboardJSHandler {
         }
 
         if (s.length() > 0) {
-          if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-            KMManager.SystemKeyboardShouldIgnoreSelectionChange = true;
-          }
+          k.setShouldIgnoreSelectionChange(true);
           // Commit the string s. Use newCursorPosition 1 so cursor will end up after the string.
           ic.commitText(s, 1);
         }

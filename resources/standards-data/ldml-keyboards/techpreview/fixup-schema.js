@@ -57,6 +57,27 @@ if (data.title.endsWith('ldmlKeyboard.xsd')) {
     singleToArray(data?.definitions?.keys?.properties?.key);
     singleToArray(data?.definitions?.keys?.properties?.flicks);
     arrayToSingle(data?.definitions?.displays?.properties?.displayOptions);
+
+    // So we have a little problem where the element 'string' becomes the schema built in type 'string'
+    // may be a bug. anyway, fix it
+    if (data.definitions["string"]) {
+      // if we have the problematic case
+      const oldName = "string";
+      const newName = "stringVariable";
+      // move the definition
+      data.definitions[newName] = data.definitions[oldName]
+      delete data.definitions[oldName]
+      // move the reference
+      const item = data.definitions.variables.properties[oldName];
+      // Note: not renaming the property, just the type
+      if (item?.items?.type !== oldName) {
+        // sanity check!
+        throw `Couldn’t fixup type, at this location expected to find ${oldName}`;
+      }
+      // Change from a type to a ref
+      delete item.items.type;
+      item.items['$ref'] = `#/definitions/${newName}`;
+    }
 }
 
 // Write stuff

@@ -3,13 +3,13 @@
  * kmlmi - Keyman Lexical Model model_info Compiler
  */
 
-import * as fs from 'fs';
 import * as path from 'path';
 import { Command } from 'commander';
 import KmpCompiler from '@keymanapp/kmc-package';
 import { ModelInfoOptions as ModelInfoOptions, writeMergedModelMetadataFile } from '@keymanapp/kmc-model-info';
 import { SysExits } from './util/sysexits.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
+import { NodeCompilerCallbacks } from './messages/NodeCompilerCallbacks.js';
 
 let inputFilename: string;
 const program = new Command();
@@ -45,9 +45,9 @@ let jsFilename = program.opts().jsFilename ? program.opts().jsFilename : path.jo
 // Load .kps source data
 //
 
-let kpsString: string = fs.readFileSync(kpsFilename, 'utf8');
-let kmpCompiler = new KmpCompiler();
-let kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsString, kpsFilename);
+const callbacks = new NodeCompilerCallbacks();
+let kmpCompiler = new KmpCompiler(callbacks);
+let kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
 
 //
 // Write out the merged .model_info file
