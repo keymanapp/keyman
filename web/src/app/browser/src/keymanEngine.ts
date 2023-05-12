@@ -404,7 +404,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * Set focus to last active target element (browser-dependent)
    */
   focusLastActiveElement() {
-    this.contextManager.lastActiveTarget.focus();
+    this.contextManager.lastActiveTarget?.focus();
   }
 
   /**
@@ -413,7 +413,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * @return      {Object}
    */
   getLastActiveElement() {
-    return this.contextManager.lastActiveTarget.getElement();
+    return this.contextManager.lastActiveTarget?.getElement();
   }
 
   /**

@@ -1373,8 +1373,8 @@ if(!keyman?.ui?.name) {
         } else {
           // If language list and keyboard list have not yet been saved as a cookie,
           // initialize to the current (default) language and keyboard, if set by KMW
-          var kbName=keymanweb.getActiveKeyboard(),
-              lgName=keymanweb.getActiveLanguage();
+          let kbName=keymanweb.getActiveKeyboard();
+          let lgName=keymanweb.getActiveLanguage();
           if(lgName != '' && kbName != '') {
             var lg = this.languages[lgName];
             if(lg != null) {

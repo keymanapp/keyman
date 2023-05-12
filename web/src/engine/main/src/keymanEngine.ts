@@ -403,9 +403,9 @@ export default class KeymanEngine<
     const metadata = this.contextManager.activeKeyboard?.metadata;
 
     if(!fullName) {
-      return metadata.langId ?? '';
+      return metadata?.langId ?? '';
     } else {
-      return metadata.langName ?? '';
+      return metadata?.langName ?? '';
     }
   }
 
