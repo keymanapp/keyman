@@ -71,11 +71,11 @@ class WasmWrapper {
     this.parseUnicodeSet = this.Module.cwrap('kmcmp_Wasm_ParseUnicodeSet', 'number', ['string', 'number', 'number']);
     this.setCompilerOptions = this.Module.cwrap('kmcmp_Wasm_SetCompilerOptions', 'boolean', ['number']);
 
-    if (this.parseUnicodeSet == undefined
-      || this.setCompilerOptions == undefined
-      || this.compileKeyboardFile == undefined) {
+    if (this.parseUnicodeSet === undefined
+      || this.setCompilerOptions === undefined
+      || this.compileKeyboardFile === undefined) {
         throw Error(`some wasm functions did not load properly.`);
-      }
+    }
   }
 
   /**
@@ -98,9 +98,7 @@ export class Compiler {
   }
 
   public async init(callbacks: CompilerCallbacks): Promise<boolean> {
-    if(!this.callbacks) {
-      this.callbacks = callbacks;
-    }
+    this.callbacks = callbacks;
     if(!this.wasm) {
       try {
         this.wasm = await WasmWrapper.load();
@@ -109,14 +107,14 @@ export class Compiler {
         return false;
       }
     }
-    return this.verifyInitted();
+    return this.verifyInitialized();
   }
 
   /**
    * Verify that wasm is spun up OK.
    * @returns true if OK
    */
-  public verifyInitted() : boolean {
+  public verifyInitialized() : boolean {
     if(!this.callbacks) {
       // Can't report a message here.
       throw Error('Must call Compiler.init(callbacks) before proceeding');
@@ -129,7 +127,7 @@ export class Compiler {
   }
 
   public run(infile: string, outfile: string, options?: CompilerOptions): boolean {
-    if(!this.verifyInitted()) {
+    if(!this.verifyInitialized()) {
       return false;
     }
 

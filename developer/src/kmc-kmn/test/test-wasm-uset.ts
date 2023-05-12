@@ -15,7 +15,6 @@ describe('Compiler UnicodeSet function', function() {
 
   it('should compile a basic uset', async function() {
     const compiler = new Compiler();
-    // const callbacks = new TestCompilerCallbacks();
     const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks));
     assert(compiler.verifyInitted());
