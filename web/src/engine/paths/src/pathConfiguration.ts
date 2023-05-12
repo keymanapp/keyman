@@ -11,10 +11,10 @@ const addDelimiter = (p: string) => {
 }
 
 export default class PathConfiguration implements OSKResourcePathConfiguration {
-  readonly root: string;
-  readonly resources: string;
-  readonly keyboards: string;
-  readonly sourcePath: string;
+  private readonly sourcePath: string;
+  private _root: string;
+  private _resources: string;
+  private _keyboards: string;
 
   // May get its initial value from the Keyman Cloud API after a query if not
   // otherwise specified.
@@ -38,26 +38,31 @@ export default class PathConfiguration implements OSKResourcePathConfiguration {
   constructor(pathSpec: Required<PathOptionSpec>, sourcePath: string) {
     sourcePath = addDelimiter(sourcePath);
     this.sourcePath = sourcePath;
-    const _rootPath = sourcePath.replace(/(https?:\/\/)([^\/]*)(.*)/,'$1$2/');
     this.protocol = sourcePath.replace(/(.{3,5}:)(.*)/,'$1');
 
+    this.updateFromOptions(pathSpec);
+  }
+
+  updateFromOptions(pathSpec: Required<PathOptionSpec>) {
+    const _rootPath = this.sourcePath.replace(/(https?:\/\/)([^\/]*)(.*)/,'$1$2/');
+
     // Get default paths and device options
-    this.root = _rootPath;
+    this._root = _rootPath;
     if(pathSpec.root != '') {
-      this.root = this.fixPath(pathSpec.root);
+      this._root = this.fixPath(pathSpec.root);
     } else {
-      this.root = this.fixPath(_rootPath);
+      this._root = this.fixPath(_rootPath);
     }
 
     // Resources are located with respect to the engine by default
     let resources = pathSpec.resources; // avoid mutating the parameter!
     if(resources == '') {
-      resources = sourcePath;
+      resources = this.sourcePath;
     }
 
     // Convert resource, keyboard and font paths to absolute URLs
-    this.resources = this.fixPath(resources);
-    this.keyboards = this.fixPath(pathSpec.keyboards);
+    this._resources = this.fixPath(resources);
+    this._keyboards = this.fixPath(pathSpec.keyboards);
     this._fonts = this.fixPath(pathSpec.fonts);
   }
 
@@ -93,7 +98,19 @@ export default class PathConfiguration implements OSKResourcePathConfiguration {
     return this._fonts;
   }
 
-  set fonts(str: string) {
-    this._fonts = this.fixPath(str);
+  updateFontPath(path: string) {
+    this._fonts = this.fixPath(path);
+  }
+
+  get root(): string {
+    return this._root;
+  }
+
+  get resources(): string {
+    return this._resources;
+  }
+
+  get keyboards(): string {
+    return this._keyboards;
   }
 }

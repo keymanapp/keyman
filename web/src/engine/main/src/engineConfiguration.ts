@@ -42,7 +42,12 @@ export class EngineConfiguration extends EventEmitter<EventMap> {
   }
 
   initialize(options: Required<InitOptionSpec>) {
-    this._paths = new PathConfiguration(options, this.sourcePath);
+    if(!this._paths) {
+      this._paths = new PathConfiguration(options, this.sourcePath);
+    } else {
+      this._paths.updateFromOptions(options);
+    }
+
     if(typeof options.setActiveOnRegister == 'boolean') {
       this._activateFirstKeyboard = options.setActiveOnRegister;
     } else {
