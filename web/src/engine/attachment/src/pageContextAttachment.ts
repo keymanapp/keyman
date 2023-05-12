@@ -291,7 +291,6 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
       }
 
       x._kmwAttachment = new AttachmentInfo(eleInterface, null, this.device.touchable);
-      this.emit('enabled', x);
     }
   }
 
@@ -303,9 +302,6 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
    *              Does not establish input hooks, which are instead handled during enablement.
    */
   clearElementAttachment(x: HTMLElement) {
-    if(this.isAttached(x)) {
-      this.emit('disabled', x);
-    }
     // We need to clear the object when de-attaching; helps prevent memory leaks.
     x._kmwAttachment = null;
   }
@@ -336,7 +332,11 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
             }
             return true;
           }
-        } // else nothing?
+        } else {
+          // If the element is being wholesale-deleted, the contentWindow may be gone...
+          // but a previously-placed attachment object may yet remain.
+          return !!x._kmwAttachment;
+        }
       }
       catch(err) {
         /* Do not attempt to access iframes outside this site */
@@ -405,6 +405,8 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
 
         Pelem.classList.add('keymanweb-font');
         this._inputList.push(Pelem);
+
+        this.emit('enabled', Pelem);
       }
     }
   };
@@ -447,6 +449,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
       if(index > -1) {
         this._inputList.splice(index, 1);
       }
+      this.emit('disabled', Pelem);
     }
 
     return;
@@ -557,6 +560,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
           Lelem.body._kmwAttachment = Pelem._kmwAttachment;
 
           this._inputList.push(Pelem);
+          this.emit('enabled', Pelem);
         } else {
           // If already attached, do not attempt to attach again.
           if(this.embeddedPageContexts.filter((context) => context.document == Lelem).length == 0) {
@@ -587,19 +591,25 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
    * Description  Detaches KeymanWeb from an IFrame
    */
   _DetachFromIframe(Pelem: HTMLIFrameElement) {
+    const detachFromDesignIframe = () => {
+      this.clearElementAttachment(Pelem);
+
+      let index = this._inputList.indexOf(Pelem);
+      if(index != -1) {
+        this._inputList.splice(index, 1);
+      }
+      this.emit('disabled', Pelem);
+    }
+
     try {
       const Lelem=Pelem.contentWindow.document;
       /* editable Iframe */
       if(Lelem) {
         if(Lelem.designMode.toLowerCase() == 'on') {
           // Remove the reference to our prior attachment data!
-          this.clearElementAttachment(Pelem);
           Lelem.body._kmwAttachment = null; // is an extra step needed for this case.
 
-          let index = this._inputList.indexOf(Pelem);
-          if(index != -1) {
-            this._inputList.splice(index, 1);
-          }
+          detachFromDesignIframe();
         } else {
           // If already attached, do not attempt to attach again.
           for(let i=0; i < this.embeddedPageContexts.length; i++) {
@@ -619,7 +629,14 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
         }
       }
     } catch(err) {
-      // do not attempt to attach to the iframe as it is from another domain - XSS denied!
+      // If we were previously attached but the content doc/window have been unloaded,
+      // we can at least address attachment via the attachment object.
+      if(Pelem._kmwAttachment) {
+        detachFromDesignIframe();
+      }
+
+      // Otherwise, do not attempt to attach to/detach from the iframe;
+      // as it's likely from another domain - XSS denied!
     }
   }
 
