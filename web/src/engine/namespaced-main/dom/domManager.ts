@@ -480,53 +480,6 @@ namespace com.keyman.dom {
       return Promise.resolve();
     }.bind(this);
 
-  /**
-   *  Add or replace the style sheet used to set the font for input elements
-   *
-   *  @param  {Object}  kfd   KFont font descriptor
-   *  @return {string}
-   *
-   **/
-  setAttachmentFontStyle(keyboardFontDescriptor /* : KeyboardFont */): string {
-    let kfd = keyboardFontDescriptor;
-
-    // Get name of font to be applied
-    var fontName = this.keyman.baseFont;
-    if (typeof (kfd) != 'undefined' && typeof (kfd['family']) != 'undefined') {
-      fontName = kfd['family']; // If we have a font set by the keyboard, prioritize that over the base font.
-    }
-
-    // Unquote font name in base font (if quoted)
-    fontName = fontName.replace(/\u0022/g, '');
-
-    // Set font family chain for mapped elements and remove any double quotes
-    // font-family:  maintains the base font as a fallback.
-    var rx = new RegExp('\\s?' + fontName + ',?'), fontFamily = this.keyman.appliedFont.replace(/\u0022/g, '');
-
-    // Remove base font name from chain if present
-    fontFamily = fontFamily.replace(rx, '');
-    fontFamily = fontFamily.replace(/,$/, '');
-
-    // Then replace it at the head of the chain
-    if (fontFamily == '') {
-      fontFamily = fontName;
-    } else {
-      fontFamily = fontName + ',' + fontFamily;
-    }
-
-    // Re-insert quotes around individual font names
-    fontFamily = '"' + fontFamily.replace(/\,\s?/g, '","') + '"';
-
-    // Add to the stylesheet, quoted, and with !important to override any explicit style
-    var s = '.keymanweb-font{\nfont-family:' + fontFamily + ' !important;\n}\n';
-
-    // Store the current font chain (with quote-delimited font names)
-    this.keyman.appliedFont = fontFamily;
-
-    // Return the style string
-    return s;
-  }
-
     /**
      * Initialize the desktop user interface as soon as it is ready
      */

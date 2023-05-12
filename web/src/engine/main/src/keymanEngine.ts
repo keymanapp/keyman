@@ -125,8 +125,8 @@ export default class KeymanEngine<
       this.core.activeKeyboard = kbd?.keyboard;
 
       this.legacyAPIEvents.callEvent('keyboardchange', {
-        internalName: kbd?.metadata.id,
-        languageCode: kbd?.metadata.langId
+        internalName: kbd?.metadata.id ?? '',
+        languageCode: kbd?.metadata.langId ?? ''
       });
 
       // Hide OSK and do not update keyboard list if using internal keyboard (desktops).
