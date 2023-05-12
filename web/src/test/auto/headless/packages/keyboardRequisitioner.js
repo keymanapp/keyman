@@ -333,4 +333,13 @@ describe("KeyboardRequisitioner", () => {
     assert.strictEqual(cache.getKeyboardForStub(stub), khmer_angkor);
     assert.isOk(khmer_angkor);
   });
+
+  // TODO: unit tests for these.
+  describe.skip('fetchCloudStubs', () => {
+    it('fetches stubs for all supported cloud keyboards', () => {});
+
+    it('caches all fetched cloud stubs upon completion', () => {});
+
+    it('returns an error stub if unable to access the Cloud API', () => {});
+  });
 });
