@@ -1,4 +1,4 @@
-// import { constants } from "@keymanapp/ldml-keyboard-constants";
+import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus, LDMLKeyboard, CompilerCallbacks } from '@keymanapp/common-types';
 import { UnicodeSetParser } from '@keymanapp/common-types';
 import { Compiler } from  '@keymanapp/kmc-kmn';
@@ -15,6 +15,10 @@ import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 import { CompilerMessages } from "./messages.js";
 
 export class VarsCompiler extends SectionCompiler {
+  public get id() {
+    return constants.section.vars;
+  }
+
   usetparser : UnicodeSetParser = null;
 
   public async init() : Promise<boolean> {
@@ -63,7 +67,6 @@ export class VarsCompiler extends SectionCompiler {
 
   public compile(sections: GlobalSections): Vars {
     const result =  new Vars();
-    // TODO-LDML: need kmc-kmn compiler or uset
 
     const variables = this.keyboard?.variables;
 

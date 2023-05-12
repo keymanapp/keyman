@@ -71,7 +71,6 @@ export async function loadSectionFixture(compilerClass: typeof SectionCompiler, 
     strs: new Strs(),
     elem: null,
     list: null,
-    vars: null, // ?
   };
   globalSections.elem = new Elem(globalSections.strs);
   globalSections.list = new List(globalSections.strs);

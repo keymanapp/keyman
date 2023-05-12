@@ -18,7 +18,6 @@ export class GlobalSections {
   elem: Elem;
   list: List;
   strs: Strs;
-  vars: Vars;
 }
 
 // 'sect'
@@ -146,6 +145,9 @@ export class Strs extends Section {
  * See LKVariables
  */
 export class Vars extends Section {
+  totalCount() : number {
+    return this.strings.length + this.sets.length + this.unicodeSets.length;
+  }
   markers: ListItem;
   strings: StringVarItem[] = []; // ≠ StrsItem
   sets: SetVarItem[] = [];
@@ -478,6 +480,7 @@ export class KMXPlusFile extends KMXFile {
   public readonly COMP_PLUS_VKEY: any;
 
   public readonly COMP_PLUS_VARS: any;
+  public readonly COMP_PLUS_VARS_ITEM: any;
 
   /* File in-memory data */
 
@@ -485,8 +488,6 @@ export class KMXPlusFile extends KMXFile {
 
   constructor() {
     super();
-
-
     // Binary-correct structures matching kmx_plus.h
 
     // 'sect'
@@ -726,6 +727,23 @@ export class KMXPlusFile extends KMXFile {
       size: r.uint32le,
       count: r.uint32le,
       items: new r.Array(this.COMP_PLUS_TRAN_ITEM, 'count')
+    });
+
+    // 'vars'
+
+    this.COMP_PLUS_VARS_ITEM = new r.Struct({
+      type: r.uint32le,
+      id: r.uint32le, // str
+      value: r.uint32le, // str
+      elem: r.uint32le, // elem TODO-LDML
+    });
+
+    this.COMP_PLUS_VARS = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      markers: r.uint32le, // list TODO-LDML
+      varCount: r.uint32le,
+      varEntries: new r.Array(this.COMP_PLUS_VARS_ITEM, 'varCount'),
     });
 
     // 'vkey'

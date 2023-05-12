@@ -8,7 +8,6 @@ import { LayrCompiler } from './layr.js';
 import { LocaCompiler } from './loca.js';
 import { MetaCompiler } from './meta.js';
 import { NameCompiler } from './name.js';
-// import { OrdrCompiler } from './ordr.js';
 import { VkeyCompiler } from './vkey.js';
 import { VarsCompiler } from './vars.js';
 
@@ -16,6 +15,9 @@ import { VarsCompiler } from './vars.js';
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 import KMXPlusFile = KMXPlus.KMXPlusFile;
 
+/**
+ * Does not include strs, elem, list - see GlobalSections
+ */
 const SECTION_COMPILERS = [
   BkspCompiler,
   DispCompiler,
@@ -24,7 +26,6 @@ const SECTION_COMPILERS = [
   LocaCompiler,
   MetaCompiler,
   NameCompiler,
-  // OrdrCompiler,
   TranCompiler,
   VarsCompiler,
   VkeyCompiler,
@@ -134,7 +135,7 @@ export default class Compiler {
 
     const kmx = new KMXPlusFile();
 
-    // These two sections are required by other sections
+    // These sections are required by other sections
     kmx.kmxplus.strs = new KMXPlus.Strs();
     kmx.kmxplus.elem = new KMXPlus.Elem(kmx.kmxplus.strs);
     kmx.kmxplus.list = new KMXPlus.List(kmx.kmxplus.strs);
@@ -151,7 +152,7 @@ export default class Compiler {
         // errors for the keyboard developer.
         continue;
       }
-      const sect = section.compile({strs: kmx.kmxplus.strs, elem: kmx.kmxplus.elem, list: kmx.kmxplus.list, vars: kmx.kmxplus.vars});
+      const sect = section.compile({strs: kmx.kmxplus.strs, elem: kmx.kmxplus.elem, list: kmx.kmxplus.list});
 
       /* istanbul ignore if */
       if(!sect) {

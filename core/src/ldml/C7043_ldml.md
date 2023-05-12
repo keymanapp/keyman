@@ -574,5 +574,7 @@ For each variable,
   -  1 : set
   -  2 : unicodeSet
 
+Items are sorted by id
+
 ## TODO-LDML: various things that need to be completed here or fixed in-spec
 > * spec: ABNT2 key has hex value 0xC1 (even if kbdus.dll doesn't produce that)
