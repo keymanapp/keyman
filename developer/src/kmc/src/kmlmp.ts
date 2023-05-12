@@ -49,7 +49,7 @@ if(!kmpJsonData) {
 //
 
 const validation = new PackageValidation(callbacks);
-if(!validation.validate(kmpJsonData)) {
+if(!validation.validate(inputFilename, kmpJsonData)) {
   process.exit(1);
 }
 

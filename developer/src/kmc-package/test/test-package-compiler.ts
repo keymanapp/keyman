@@ -161,7 +161,7 @@ describe('KmpCompiler', function () {
     let kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
     if(kmpJson && callbacks.messages.length == 0) {
       const validator = new PackageValidation(callbacks);
-      validator.validate(kmpJson); // we'll ignore return value and rely on the messages
+      validator.validate(kpsPath, kmpJson); // we'll ignore return value and rely on the messages
     }
 
     if(kmpJson && callbacks.messages.length == 0) {
@@ -228,13 +228,25 @@ describe('KmpCompiler', function () {
   // WARN_PackageShouldNotRepeatLanguages (models)
 
   it('should generate WARN_PackageShouldNotRepeatLanguages if model has same language repeated', async function() {
-    testForMessage(this, ['invalid', 'WARN_PackageShouldNotRepeatLanguages.model.kps'], CompilerMessages.WARN_PackageShouldNotRepeatLanguages);
+    testForMessage(this, ['invalid', 'keyman.en.warn_package_should_not_repeat_languages.model.kps'], CompilerMessages.WARN_PackageShouldNotRepeatLanguages);
   });
 
   // WARN_PackageShouldNotRepeatLanguages (keyboards)
 
   it('should generate WARN_PackageShouldNotRepeatLanguages if keyboard has same language repeated', async function() {
-    testForMessage(this, ['invalid', 'WARN_PackageShouldNotRepeatLanguages.kps'], CompilerMessages.WARN_PackageShouldNotRepeatLanguages);
+    testForMessage(this, ['invalid', 'warn_package_should_not_repeat_languages.kps'], CompilerMessages.WARN_PackageShouldNotRepeatLanguages);
+  });
+
+  // WARN_PackageNameDoesNotFollowLexicalModelConventions
+
+  it('should generate WARN_PackageNameDoesNotFollowLexicalModelConventions if filename has wrong conventions', async function() {
+    testForMessage(this, ['invalid', 'WARN_PackageNameDoesNotFollowLexicalModelConventions.kps'], CompilerMessages.WARN_PackageNameDoesNotFollowLexicalModelConventions);
+  });
+
+  // WARN_PackageNameDoesNotFollowKeyboardConventions
+
+  it('should generate WARN_PackageNameDoesNotFollowKeyboardConventions if filename has wrong conventions', async function() {
+    testForMessage(this, ['invalid', 'WARN_PackageNameDoesNotFollowKeyboardConventions.kps'], CompilerMessages.WARN_PackageNameDoesNotFollowKeyboardConventions);
   });
 
 });

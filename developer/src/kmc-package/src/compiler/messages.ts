@@ -54,5 +54,16 @@ export class CompilerMessages {
   static Warn_PackageShouldNotRepeatLanguages = (o:{resourceType: string, id: string, tag: string}) => m(this.WARN_PackageShouldNotRepeatLanguages,
     `The ${o.resourceType} ${o.id} has a repeated language "${o.tag}".`);
   static WARN_PackageShouldNotRepeatLanguages = SevWarn | 0x000C;
+
+  static Warn_PackageNameDoesNotFollowLexicalModelConventions = (o:{filename: string}) => m(this.WARN_PackageNameDoesNotFollowLexicalModelConventions,
+    `The package file ${o.filename} does not follow the recommended model filename conventions. The name should be all lower case, `+
+    `include only alphanumeric characters and underscore (_), not start with a digit, and should have the structure `+
+    `<author>.<bcp47>.<uniq>.model.kps.`);
+  static WARN_PackageNameDoesNotFollowLexicalModelConventions = SevWarn | 0x000D;
+
+  static Warn_PackageNameDoesNotFollowKeyboardConventions = (o:{filename: string}) => m(this.WARN_PackageNameDoesNotFollowKeyboardConventions,
+    `The package file ${o.filename} does not follow the recommended keyboard filename conventions. The name should be all lower case, `+
+    `include only alphanumeric characters and underscore (_), and not start with a digit.`);
+  static WARN_PackageNameDoesNotFollowKeyboardConventions = SevWarn | 0x000E;
 }
 

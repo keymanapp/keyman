@@ -54,7 +54,7 @@ let kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
 //
 
 const validation = new PackageValidation(callbacks);
-if(!validation.validate(kmpJsonData)) {
+if(!validation.validate(kpsFilename, kmpJsonData)) {
   process.exit(1);
 }
 
