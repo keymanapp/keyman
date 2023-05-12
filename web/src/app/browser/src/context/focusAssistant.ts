@@ -1,6 +1,6 @@
 /**
  * The return object documented for
- * https://help.keyman.com/DEVELOPER/ENGINE/WEB/16.0/reference/core/getUIState.
+ * https://help.keyman.com/developer/engine/web/16.0/reference/core/getUIState.
  *
  * As it has long been documented in this format, property names should not be adjusted!
  */
