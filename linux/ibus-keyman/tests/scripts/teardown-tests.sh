@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -eu
-PID_FILE=$1
 
-echo "Shutting down processes..."
-bash "$PID_FILE" > /dev/null 2>&1
-rm "$PID_FILE"
-echo "Finished shutdown of processes."
+. "$(dirname "$0")/test-helper.sh"
+
+cleanup "$1"

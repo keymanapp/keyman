@@ -9,10 +9,10 @@ project('ibus-keyman', 'c', 'cpp',
 cc = meson.get_compiler('c')
 conf = configuration_data()
 
-ibus =        dependency('ibus-1.0',             version: '>= 1.2.0')
-gtk =         dependency('gtk+-3.0',             version: '>= 2.4')
-x11 =         dependency('x11',                  version: '>= 1.6')
-json_glib =   dependency('json-glib-1.0',        version: '>= 1.0')
+ibus =           dependency('ibus-1.0',             version: '>= 1.2.0')
+gtk =            dependency('gtk+-3.0',             version: '>= 2.4')
+json_glib =      dependency('json-glib-1.0',        version: '>= 1.0')
+systemd  =       dependency('libsystemd')
 
 core_dir = meson.current_source_dir() / '../../core'
 common_dir = meson.current_source_dir() / '../../common'
