@@ -303,4 +303,18 @@ describe('KmpCompiler', function () {
     testForMessage(this, ['invalid', 'keyman.en.error_must_have_at_least_one_language.model.kps'],
       CompilerMessages.ERROR_MustHaveAtLeastOneLanguage);
   });
+
+  // WARN_RedistFileShouldNotBeInPackage
+
+  it('should generate WARN_RedistFileShouldNotBeInPackage if package contains a redist file', async function() {
+    testForMessage(this, ['invalid', 'warn_redist_file_should_not_be_in_package.kps'],
+      CompilerMessages.WARN_RedistFileShouldNotBeInPackage);
+  });
+
+  // WARN_DocFileDangerous
+
+  it('should generate WARN_DocFileDangerous if package contains a .doc file', async function() {
+    testForMessage(this, ['invalid', 'warn_doc_file_dangerous.kps'],
+      CompilerMessages.WARN_DocFileDangerous);
+  });
 });
