@@ -82,6 +82,16 @@ export class PackageValidation {
       return false;
     }
 
+    if(!kmpJson.lexicalModels?.length && !kmpJson.keyboards?.length) {
+      // Note: we require at least 1 keyboard or model in the package. This may
+      // change in the future if we start to use packages to distribute, e.g.
+      // localizations or themes.
+      this.callbacks.reportMessage(CompilerMessages.Error_PackageMustContainAPackageOrAKeyboard());
+      return false;
+    }
+
+
+
     return true;
   }
 

@@ -317,4 +317,11 @@ describe('KmpCompiler', function () {
     testForMessage(this, ['invalid', 'warn_doc_file_dangerous.kps'],
       CompilerMessages.WARN_DocFileDangerous);
   });
+
+  // ERROR_PackageMustContainAPackageOrAKeyboard
+
+  it('should generate ERROR_PackageMustContainAPackageOrAKeyboard if package contains a .doc file', async function() {
+    testForMessage(this, ['invalid', 'error_package_must_contain_a_package_or_a_keyboard.kps'],
+      CompilerMessages.ERROR_PackageMustContainAPackageOrAKeyboard);
+  });
 });
