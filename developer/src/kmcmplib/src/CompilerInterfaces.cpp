@@ -144,9 +144,16 @@ EXTERN bool kmcmp_CompileKeyboardFile(char* pszInfile,
   bool result = CompileKeyboardHandle(fp_in, &fk);
   if(result) {
     KMX_DWORD msg;
-    if ((msg = WriteCompiledKeyboard(&fk, fp_out)) != CERR_None) {
+    KMX_BYTE* data = nullptr;
+    size_t dataSize = 0;
+    if ((msg = WriteCompiledKeyboard(&fk, &data, dataSize)) != CERR_None) {
       result = FALSE;
       AddCompileError(msg);
+    } else {
+      if(fwrite(data, 1, dataSize, fp_out) != dataSize) {
+        AddCompileError(CERR_UnableToWriteFully);
+      }
+      delete[] data;
     }
   } else {
     AddCompileError(CERR_InvalidValue);
