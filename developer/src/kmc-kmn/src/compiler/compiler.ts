@@ -108,6 +108,7 @@ export class KmnCompiler {
         this.callbacks.reportMessage(CompilerMessages.Fatal_MissingWasmModule({e}));
         return false;
       }
+    }
 
     return this.verifyInitialized();
   }
