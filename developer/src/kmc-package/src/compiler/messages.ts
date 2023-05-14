@@ -109,6 +109,6 @@ export class CompilerMessages {
 
   static Error_PackageMustContainAModelOrAKeyboard = () => m(this.ERROR_PackageMustContainAModelOrAKeyboard,
     `Package must contain a lexical model or a keyboard.`);
-  static ERROR_PackageMustContainAPackageOrAKeyboard = SevError | 0x0019;
+  static ERROR_PackageMustContainAModelOrAKeyboard = SevError | 0x0019;
 }
 

@@ -86,7 +86,7 @@ export class PackageValidation {
       // Note: we require at least 1 keyboard or model in the package. This may
       // change in the future if we start to use packages to distribute, e.g.
       // localizations or themes.
-      this.callbacks.reportMessage(CompilerMessages.Error_PackageMustContainAPackageOrAKeyboard());
+      this.callbacks.reportMessage(CompilerMessages.Error_PackageMustContainAModelOrAKeyboard());
       return false;
     }
 

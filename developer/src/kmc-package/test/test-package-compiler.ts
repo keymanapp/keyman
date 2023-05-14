@@ -320,8 +320,8 @@ describe('KmpCompiler', function () {
 
   // ERROR_PackageMustContainAPackageOrAKeyboard
 
-  it('should generate ERROR_PackageMustContainAPackageOrAKeyboard if package contains a .doc file', async function() {
-    testForMessage(this, ['invalid', 'error_package_must_contain_a_package_or_a_keyboard.kps'],
-      CompilerMessages.ERROR_PackageMustContainAPackageOrAKeyboard);
+  it('should generate ERROR_PackageMustContainAModelOrAKeyboard if package contains a .doc file', async function() {
+    testForMessage(this, ['invalid', 'error_package_must_contain_a_model_or_a_keyboard.kps'],
+      CompilerMessages.ERROR_PackageMustContainAModelOrAKeyboard);
   });
 });
