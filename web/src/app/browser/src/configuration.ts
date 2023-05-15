@@ -10,12 +10,15 @@ export class BrowserConfiguration extends EngineConfiguration {
   private _attachType: string;
 
   private alertHost?: AlertHost;
+  private _options: Required<BrowserInitOptionSpec>;
 
   initialize(options: Required<BrowserInitOptionSpec>) {
     if(this._options) {
       // Preserve old options, but replace with any newly-set ones if specified.
       // If specified, even as 'undefined' or 'null', it will still override.
       this._options = {...this._options, ...options};
+    } else {
+      this._options = {...options};
     }
     super.initialize(options);
 
