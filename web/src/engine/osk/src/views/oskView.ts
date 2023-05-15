@@ -80,7 +80,7 @@ export interface EventMap {
       outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
 
       if(!keyman.isEmbedded) { // To be done:  handled through ContextManager
-        keyman.uiManager.setActivatingUI(true);
+        focusAssistant.setMaintainingFocus(true);
         com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
         keyman.domManager.focusLastActiveElement();
         com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
@@ -90,7 +90,7 @@ export interface EventMap {
 
       // Now that processing is done, we can do a bit of post-processing, too.
       // To be done:  handled through ContextManager
-      keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
+      focusAssistant.setMaintainingFocus(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
       return retVal;
     } else {
       return true;
@@ -154,13 +154,13 @@ export interface EventMap {
    ```
   // On event start
   let keymanweb = com.keyman.singleton;
-  keymanweb.uiManager.justActivated = true;
+  focusAssistant.restoringFocus = true;
 
   // On promise resolution
   keymanweb.domManager.focusLastActiveElement();
 
-  keymanweb.uiManager.justActivated = false;
-  keymanweb.uiManager.setActivatingUI(false);
+  focusAssistant.restoringFocus = false;
+  focusAssistant.setMaintainingFocus(false);
 
   // Alternate case using the same event:
   if(isVisible && activeTarget) {
@@ -181,13 +181,13 @@ export interface EventMap {
    ```
    // On event start
    let keymanweb = com.keyman.singleton;
-   keymanweb.uiManager.justActivated = true;
+   focusAssistant.restoringFocus = true;
 
    // On promise resolution
    keymanweb.domManager.focusLastActiveElement();
 
-   keymanweb.uiManager.justActivated = false;
-   keymanweb.uiManager.setActivatingUI(false);
+   focusAssistant.restoringFocus = false;
+   focusAssistant.setMaintainingFocus(false);
    ```
    */
   resizeMove: (promise: Promise<void>) => void;
@@ -203,10 +203,10 @@ export interface EventMap {
    * Former handling, before this was an event:
    ```
    // On event start
-   keymanweb.uiManager.setActivatingUI(true);
+   focusAssistant.setMaintainingFocus(true);
 
    // On promise resolution
-   // noop // did not bother with `setActivatingUI(false)`.  Possible bug?
+   // noop // did not bother with `setMaintainingFocus(false)`.  Possible bug?
    ```
    */
   pointerInteraction: (promise: Promise<void>) => void;
@@ -380,7 +380,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
     this._Box.onmouseleave = this._VKbdMouseLeave = (e) => {
       this.mouseEnterPromise.resolve();
       this.mouseEnterPromise = null;
-      // com.keyman.singleton.uiManager.setActivatingUI(false);
+      // focusAssistant.setMaintainingFocus(false);
     };
   }
 

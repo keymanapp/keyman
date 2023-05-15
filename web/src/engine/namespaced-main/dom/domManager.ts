@@ -1177,7 +1177,7 @@ namespace com.keyman.dom {
         return;
       }
 
-      this.keyman.uiManager.justActivated = true;
+      focusAssistant.restoringFocus = true;
 
       const target = Utils.getOutputTarget(lastElem);
       target.focus();
@@ -1213,7 +1213,7 @@ namespace com.keyman.dom {
     set activeElement(Pelem: HTMLElement) {
       DOMEventHandlers.states._activeElement = Pelem;
 
-      var isActivating = this.keyman.uiManager.isActivating;
+      let maintainingFocus = focusAssistant.maintainingFocus;
 
       // Hide the OSK when the control is blurred, unless the UI is being temporarily selected
       const osk = this.keyman.osk;
@@ -1221,7 +1221,7 @@ namespace com.keyman.dom {
 
       if(osk) {
         const target = Pelem?._kmwAttachment?.interface || null;
-        if(osk && osk.activationModel instanceof TwoStateActivator && (target || !isActivating)) {
+        if(osk && osk.activationModel instanceof TwoStateActivator && (target || !maintainingFocus)) {
           // Do not unset the field if the UI is activated.
           osk.activationCondition = target;
         }

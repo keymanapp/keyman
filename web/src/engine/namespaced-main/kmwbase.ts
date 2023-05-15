@@ -86,7 +86,7 @@ namespace com.keyman {
     keyboardManager: keyboards.KeyboardManager;
     domManager: dom.DOMManager;
     hotkeyManager: HotkeyManager;
-    uiManager: UIManager;
+    uiManager: UIManager; // half has been modularized as `focusAssistant`.
     core: text.InputProcessor;
     modelManager: text.prediction.ModelManager;
 
@@ -186,7 +186,7 @@ namespace com.keyman {
      * Will also trigger OSK shift state / layer reset.
      **/
     pageFocusHandler = () => {
-      if(!this.uiManager.isActivating && this.osk?.vkbd) {
+      if(!focusAssistant.maintainingFocus && this.osk?.vkbd) {
         this.core.resetContext(null);
       }
       return false;
@@ -547,27 +547,6 @@ namespace com.keyman {
      */
     ['removeHotKey'](keyCode: number, shiftState: number) {
       this.hotkeyManager.removeHotkey(keyCode, shiftState);
-    }
-
-    /**
-     * Function     getUIState
-     * Scope        Public
-     * @return      {Object.<string,(boolean|number)>}
-     * Description  Return object with activation state of UI:
-     *                activationPending (bool):   KMW being activated
-     *                activated         (bool):   KMW active
-     */
-    ['getUIState'](): UIState {
-      return this.uiManager.getUIState();
-    }
-
-    /**
-     * Set or clear the IsActivatingKeymanWebUI flag (exposed function)
-     *
-     * @param       {(boolean|number)}  state  Activate (true,false)
-     */
-    ['activatingUI'](state: boolean) {
-      this.uiManager.setActivatingUI(state);
     }
 
     // Functions that might be added later
