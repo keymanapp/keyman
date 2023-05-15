@@ -20,6 +20,8 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
   touchLanguageMenu?: LanguageMenu;
   private pageIntegration: PageIntegrationHandlers;
 
+  private _initialized: number = 0;
+
   keyEventRefocus = () => {
     this.contextManager.restoreLastActiveTarget();
   }
@@ -62,6 +64,10 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     });
   }
 
+  public get initialized() {
+    return this._initialized;
+  }
+
   protected processorConfiguration(): ProcessorInitOptions {
     return {
       keyboardInterface: this.interface,
@@ -77,6 +83,8 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
 
     const totalOptions = {...BrowserInitOptionDefaults, ...options};
     await super.init(totalOptions);
+
+    this._initialized = 1;
 
     // Must wait for document load for further initialization.
     await whenDocumentReady();
@@ -117,6 +125,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // Initialize supplementary plane string extensions
     String.kmwEnableSupplementaryPlane(true);
     this.config.finalizeInit();
+    this._initialized = 2;
   }
 
   get register() {
