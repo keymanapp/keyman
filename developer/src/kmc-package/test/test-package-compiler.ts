@@ -226,7 +226,7 @@ describe('KmpCompiler', function () {
   // ERROR_PackageCannotContainBothModelsAndKeyboards
 
   it('should generate ERROR_PackageCannotContainBothModelsAndKeyboards if package has both keyboards and models', async function() {
-    testForMessage(this, ['invalid', 'ERROR_PackageCannotContainBothModelsAndKeyboards.kps'], CompilerMessages.ERROR_PackageCannotContainBothModelsAndKeyboards);
+    testForMessage(this, ['invalid', 'error_package_cannot_contain_both_models_and_keyboards.kps'], CompilerMessages.ERROR_PackageCannotContainBothModelsAndKeyboards);
   });
 
   // WARN_PackageShouldNotRepeatLanguages (models)
