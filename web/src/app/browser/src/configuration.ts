@@ -10,7 +10,6 @@ export class BrowserConfiguration extends EngineConfiguration {
   private _attachType: string;
 
   private alertHost?: AlertHost;
-  private _options: Required<BrowserInitOptionSpec>;
 
   /**
    * Needed for the util function getOptions.
