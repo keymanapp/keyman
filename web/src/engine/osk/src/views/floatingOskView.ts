@@ -1,7 +1,8 @@
 import { Codes, DeviceSpec, ManagedPromise, Version } from '@keymanapp/keyboard-processor';
 import { getAbsoluteX, getAbsoluteY, landscapeView } from 'keyman/engine/dom-utils';
+import { EmitterListenerSpy } from 'keyman/engine/events';
 
-import OSKView, { OSKPos, OSKRect } from './oskView.js';
+import OSKView, { EventMap, OSKPos, OSKRect } from './oskView.js';
 import TitleBar from '../components/titleBar.js';
 import ResizeBar from '../components/resizeBar.js';
 
@@ -52,11 +53,11 @@ export default class FloatingOSKView extends OSKView {
     this.titleBar = new TitleBar(this.titleDragHandler);
     this.titleBar.on('help', () => {
       this.emit('showHelp');
-      this.emit('legacyevent', 'osk.helpclick', {});
+      this.legacyEvents.callEvent('helpclick', {});
     });
     this.titleBar.on('config', () => {
       this.emit('showConfig');
-      this.emit('legacyevent', 'osk.configclick', {});
+      this.legacyEvents.callEvent('configclick', {});
     });
     this.titleBar.on('close', () => this.startHide(true));
     this.titleBar.on('unpin', () => this.restorePosition(true));
@@ -65,6 +66,31 @@ export default class FloatingOSKView extends OSKView {
     this.resizeBar.on('showBuild', () => this.emit('showBuild'));
 
     this.headerView = this.titleBar;
+
+    const onListenedEvent = (eventName: keyof EventMap) => {
+      // As the following title bar buttons (for desktop / FloatingOSKView) do nothing unless a site
+      // designer uses these events, we disable / hide them unless an event-handler is attached.
+      let titleBar = this.headerView;
+      if(titleBar && titleBar instanceof TitleBar) {
+        switch(eventName) {
+          case 'showConfig':
+            titleBar.configEnabled = this.listenerCount('showConfig') + this.legacyEvents.listenerCount('configclick') > 0;
+            break;
+          case 'showHelp':
+            titleBar.helpEnabled = this.listenerCount('showHelp') + this.legacyEvents.listenerCount('helpclick') > 0;
+            break;
+          default:
+            return;
+        }
+      }
+    }
+
+    const listenerSpyNew = new EmitterListenerSpy(this);
+    const listenerSpyOld = new EmitterListenerSpy(this.legacyEvents);
+    for(let listenerSpy of [listenerSpyNew, listenerSpyOld]) {
+      listenerSpy.on('listenerAdded', onListenedEvent);
+      listenerSpy.on('listenerRemoved', onListenedEvent);
+    }
 
     this.loadPersistedLayout();
   }
@@ -330,7 +356,7 @@ export default class FloatingOSKView extends OSKView {
    *
    */
   doResizeMove(p?) {
-    this.emit('legacyevent', 'osk.resizemove', p);
+    this.legacyEvents.callEvent('resizemove', p);
   }
 
   /**

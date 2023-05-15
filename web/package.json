@@ -26,6 +26,10 @@
       "types": "./build/engine/element-wrappers/lib/index.d.ts",
       "import": "./build/engine/element-wrappers/lib/index.mjs"
     },
+    "./engine/events": {
+      "types": "./build/engine/events/obj/index.d.ts",
+      "import": "./build/engine/events/obj/index.js"
+    },
     "./engine/package-cache": {
       "types": "./build/engine/package-cache/obj/index.d.ts",
       "import": "./build/engine/package-cache/obj/index.js",

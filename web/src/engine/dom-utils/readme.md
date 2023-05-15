@@ -1,4 +1,4 @@
-## engine/element-wrappers
+## engine/dom-utils
 
 This submodule provides a subset of the main engine's Web-oriented code that's used to facilitate DOM-based
 layout interactions; it is used in the following scenarios:

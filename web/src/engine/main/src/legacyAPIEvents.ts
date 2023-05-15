@@ -1,18 +1,31 @@
-import EventEmitter from "eventemitter3";
+import { LegacyEventMap } from 'keyman/engine/events';
 
-interface LegacyAPIEvents {
-  'kmw.keyboardregistered': (p: {} | {
+/**
+ * Type definitions for KeymanWeb's documented API events.
+ */
+export interface LegacyAPIEvents extends LegacyEventMap {
+  'keyboardregistered': (p: {} | {
     internalName: string,
     language: string,
     keyboardName: string,
     languageCode: string,
     package?: string
-  }) => void;
+  }) => boolean;
 
-  'kmw.keyboardloaded': (p: {
+  'keyboardloaded': (p: {
     keyboardName: string
-  }) => void;
-}
+  }) => boolean;
 
-export class LegacyAPIEventEngine extends EventEmitter<LegacyAPIEvents> {
+  'beforekeyboardchange': (p: {
+    internalName: string,
+    languageCode: string
+  }) => boolean;
+
+  'keyboardchange': (p: {
+    internalName: string,
+    languageCode: string
+  }) => boolean;
+
+  // TODO:  more of the documented API events.  Note that any remaining events not seen here
+  //        yet go unused within the mobile apps.
 }

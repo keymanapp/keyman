@@ -16,31 +16,24 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 cd "$THIS_SCRIPT_PATH"
 
 # Imports common Web build-script definitions & functions
-SUBPROJECT_NAME=app/browser
+SUBPROJECT_NAME=engine/events
 . "$KEYMAN_ROOT/web/common.inc.sh"
 
 # ################################ Main script ################################
 
-builder_describe "Builds the Keyman Engine for Web's website-integrating version for use in non-puppeted browsers." \
-  "@/common/web/input-processor build" \
-  "@/web/src/engine/device-detect build" \
-  "@/web/src/engine/paths build" \
-  "@/web/src/engine/package-cache build" \
-  "@/web/src/engine/events build" \
-  "@/web/src/engine/osk build" \
-  "@/web/src/engine/element-wrappers build" \
-  "@/web/src/engine/main build" \
+builder_describe "Builds specialized event-related modules utilized by Keyman Engine for Web." \
+  "@/common/web/utils" \
   "clean" \
   "configure" \
   "build" \
   "test"
 
-# Possible TODO?s
+# Possible TODO?
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
 
 builder_describe_outputs \
   configure   /node_modules \
-  build       /web/build/$SUBPROJECT_NAME/lib/index.js
+  build       /web/build/$SUBPROJECT_NAME/obj/index.js
 
 builder_parse "$@"
 
@@ -64,6 +57,7 @@ if builder_start_action build; then
 fi
 
 if builder_start_action test; then
-  # No headless tests of yet.
+  mocha --recursive "${KEYMAN_ROOT}/web/src/test/auto/headless/events"
+
   builder_finish_action success test
 fi

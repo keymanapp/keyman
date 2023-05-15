@@ -1,4 +1,4 @@
-import EventEmitter, { ArgumentMap } from 'eventemitter3';
+import EventEmitter from 'eventemitter3';
 
 import BannerView, { BannerController } from '../banner/bannerView.js';
 import OSKViewComponent from '../components/oskViewComponent.interface.js';
@@ -21,8 +21,8 @@ import {
   type SystemStoreMutationHandler
 } from '@keymanapp/keyboard-processor';
 import { createUnselectableElement, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
+import { LegacyEventEmitter } from 'keyman/engine/events';
 
-import TitleBar from '../components/titleBar.js';
 import Configuration from '../config/viewConfiguration.js';
 import Activator, { StaticActivator } from './activator.js';
 import TouchEventPromiseMap from './touchEventPromiseMap.js';
@@ -40,15 +40,24 @@ export type OSKRect = {
   'nomove'?: boolean
 };
 
+/**
+ * Definition for OSK events documented at
+ * https://help.keyman.com/DEVELOPER/ENGINE/WEB/16.0/reference/events/.
+ */
 export interface LegacyOSKEventMap {
-  'osk.configclick'(obj: {});
-  'osk.helpclick'(obj: {});
-  'osk.resizemove'(obj: {});
-  'osk.show'(obj: {});
-  'osk.hide'(obj: {});
+  'configclick'(obj: {});
+  'helpclick'(obj: {});
+  'resizemove'(obj: {});
+  'show'(obj: {});
+  'hide'(obj: {});
 }
 
-interface EventMap {
+/**
+ * For now, these will serve as undocumented, internal events.  We need a proper
+ * design round and discussion before we consider promoting them to long-term,
+ * documented official API events.
+ */
+export interface EventMap {
   /**
    * Designed to pass key events off to any consuming modules/libraries.
    *
@@ -90,20 +99,8 @@ interface EventMap {
    */
   'keyEvent': (event: KeyEvent) => void,
 
-  /**
-   * Allows passing data needed for legacy-style events as specified by our published Keyman Engine for Web API.
-   *
-   * @param eventName The full name of the event ('osk.' + specific event)
-   * @param args The event's argument object.
-   */
-  legacyevent<T extends keyof LegacyOSKEventMap>(eventName: T, arg: {});
-  // TSC fell over when trying to emit via this definition.  VS code worked decently well with it, though!  :(
-  //legacyevent<T extends keyof LegacyOSKEventMap>(eventName: T, ...args: ArgumentMap<LegacyOSKEventMap>[Extract<T, keyof LegacyOSKEventMap>]): void;
-
   onshow(): void;
-  /**
-   *
-   */
+
   onhide(hiddenByUser: boolean): void;
 
   /**
@@ -217,6 +214,7 @@ interface EventMap {
 
 export default abstract class OSKView extends EventEmitter<EventMap> implements MinimalCodesInterface {
   _Box: HTMLDivElement;
+  readonly legacyEvents = new LegacyEventEmitter<LegacyOSKEventMap>();
 
   // #region Key code definition aliases for legacy keyboards (that expect window['keyman']['osk'].___)
   get keyCodes() {
@@ -1321,7 +1319,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
    */
   doShow(p) {
     // Newer style 'doShow' emitted from .present by default.
-    this.emit('legacyevent', 'osk.show', p);
+    this.legacyEvents.callEvent('show', p);
   }
 
   /**
@@ -1336,7 +1334,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
 
     const p={};
     p['HiddenByUser']=hiddenByUser;
-    this.emit('legacyevent', 'osk.hide', p);
+    this.legacyEvents.callEvent('hide', p);
   }
 
   /**
@@ -1347,42 +1345,11 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
    * @return      {boolean}
    * Description  Wrapper function to add and identify OSK-specific event handlers
    */
-  addEventListener<T extends keyof LegacyOSKEventMap>(event: T, fn: (arg: {}) => void): void {
-  // addEventListener<T extends keyof LegacyOSKEventMap>(event: T, fn: (...args: ArgumentMap<LegacyOSKEventMap>[Extract<T, keyof LegacyOSKEventMap>]) => void): void {
-    // might be a bit too much for the type system to fully infer due to the nested event maps.
-    this.emit('legacyevent', event, fn);
-
-    //return com.keyman.singleton.util.addEventListener('osk.'+event, func);
+  addEventListener<T extends keyof LegacyOSKEventMap>(event: T, fn: (arg: {}) => boolean): void {
+    this.legacyEvents.addEventListener(event, fn);
   }
 
-  // Allows interception of attaching event handlers.
-  on<T extends keyof EventMap>(event: T, fn: (...args: ArgumentMap<EventMap>[Extract<T, keyof EventMap>]) => void, context?: any): this {
-    super.on(event, fn, context);
-    this.onListenedEvent(event);
-    return this;
-  }
-
-  once<T extends keyof EventMap>(event: T, fn: (...args: ArgumentMap<EventMap>[Extract<T, keyof EventMap>]) => void, context?: any): this {
-    super.once(event, fn, context);
-    this.onListenedEvent(event);
-    return this;
-  }
-
-  private onListenedEvent(eventName: keyof EventMap) {
-    // As the following title bar buttons (for desktop / FloatingOSKView) do nothing unless
-    // a site designer uses these events, we disable / hide them until an event is attached.
-    let titleBar = this.headerView;
-    if(titleBar && titleBar instanceof TitleBar) {
-      switch(eventName) {
-        case 'showConfig':
-          titleBar.configEnabled = true;
-          break;
-        case 'showHelp':
-          titleBar.helpEnabled = true;
-          break;
-        default:
-          return;
-      }
-    }
+  removeEventListener<T extends keyof LegacyOSKEventMap>(event: T, fn: (arg: {}) => boolean): void {
+    this.legacyEvents.removeEventListener(event, fn);
   }
 }
