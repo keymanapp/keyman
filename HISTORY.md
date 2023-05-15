@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.107 alpha 2023-05-15
+
+* chore(linux): Fix installation build step on TC (#8784)
+* refactor(android/engine): Consolidate updateSelection (#8739)
+
 ## 17.0.106 alpha 2023-05-12
 
 * chore(developer): move package formats to common/web/types (#8729)
