@@ -24,6 +24,7 @@
     <WebSite URL="https://keyman.com/keyboards/khmer_angkor">https://keyman.com/keyboards/khmer_angkor</WebSite>
   </Info>
   <Files>
+    <!-- missing .kmx triggers this warning -->
     <File>
       <Name>..\build\khmer_angkor.js</Name>
       <Description>File khmer_angkor.js</Description>

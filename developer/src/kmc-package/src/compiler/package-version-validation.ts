@@ -8,7 +8,7 @@ export class PackageVersionValidation {
   /**
    * Verifies version information in corresponding keyboards and updates kmpJson
    * metadata as the version information can be out of sync in the .kps file
-   * after update a contained keyboard.
+   * after updating a contained keyboard.
    * @param kpsFilename
    * @param kps
    * @param kmp
@@ -23,12 +23,12 @@ export class PackageVersionValidation {
       }
     }
 
-    let result = true;
-
     if(!kmp.keyboards) {
-      // Lexical model packages don't have version metadata
+      // Lexical models don't have version metadata; only their packages.
       return true;
     }
+
+    let result = true;
 
     // We now know we have at least one keyboard in the package
 
