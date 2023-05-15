@@ -63,39 +63,6 @@ export interface EventMap {
    *
    * Note:  the following code block was originally used to integrate with the keyboard & input
    * processors, but it requires entanglement with components external to this OSK module.
-   *
-   ```
-    let keyman = com.keyman.singleton;
-    var Lelem = keyman.domManager.lastActiveElement;
-
-    if(Lelem != null) {
-      // Handle any DOM state management related to click inputs.   // To be done:  handled through ContextManager
-      let outputTarget = dom.Utils.getOutputTarget(Lelem);
-      keyman.domManager.initActiveElement(Lelem);
-
-      // Clear any cached codepoint data; we can rebuild it if it's unchanged.     // Handled!
-      outputTarget.invalidateSelection();
-      // Deadkey matching continues to be troublesome.
-      // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
-      outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
-
-      if(!keyman.isEmbedded) { // To be done:  handled through ContextManager
-        focusAssistant.setMaintainingFocus(true);
-        com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
-        keyman.domManager.focusLastActiveElement();
-        com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
-      }
-
-      let retVal = !!keyman.core.processKeyEvent(Lkc, outputTarget);              // Handled!
-
-      // Now that processing is done, we can do a bit of post-processing, too.
-      // To be done:  handled through ContextManager
-      focusAssistant.setMaintainingFocus(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
-      return retVal;
-    } else {
-      return true;
-    }
-   ```
    */
   'keyEvent': (event: KeyEvent) => void,
 
@@ -130,18 +97,6 @@ export interface EventMap {
 
   /**
    * Signals the special command to display the engine's version + build number.
-   *
-   * The eventual handler should be of the following form:
-   *
-   ```
-  showBuild() {
-    let keymanweb = com.keyman.singleton;
-
-    keymanweb.util.internalAlert('KeymanWeb Version '+keymanweb['version']+'.'+keymanweb['build']+'<br /><br />'
-        +'<span style="font-size:0.8em">Copyright &copy; 2021 SIL International</span>');
-  }
-   ```
-   *
    */
   showBuild: () => void;
 
@@ -150,24 +105,8 @@ export interface EventMap {
    *
    * The provided Promise will resolve once the drag operation is complete.
    *
-   * Former handling, before this was an event:
-   ```
-  // On event start
-  let keymanweb = com.keyman.singleton;
-  focusAssistant.restoringFocus = true;
-
-  // On promise resolution
-  keymanweb.domManager.focusLastActiveElement();
-
-  focusAssistant.restoringFocus = false;
-  focusAssistant.setMaintainingFocus(false);
-
-  // Alternate case using the same event:
-  if(isVisible && activeTarget) {
-    this.activeTarget.focus();  // I2036 - OSK does not unpin to correct location
-  }
-  // If too tough to disambiguate, can always make a separate event.
-   ```
+   * Note that position-restoration (unpinning the OSK) is treated as a drag-move
+   * event.  It resolves near-instantly.
    */
   dragMove: (promise: Promise<void>) => void;
 
@@ -175,20 +114,6 @@ export interface EventMap {
    * Signals that the OSK is being resized via a drag operation (on a resize 'handle').
    *
    * The provided Promise will resolve once the resize operation is complete.
-   *
-   *
-   * Former handling, before this was an event:
-   ```
-   // On event start
-   let keymanweb = com.keyman.singleton;
-   focusAssistant.restoringFocus = true;
-
-   // On promise resolution
-   keymanweb.domManager.focusLastActiveElement();
-
-   focusAssistant.restoringFocus = false;
-   focusAssistant.setMaintainingFocus(false);
-   ```
    */
   resizeMove: (promise: Promise<void>) => void;
 
@@ -199,15 +124,6 @@ export interface EventMap {
    * The provided `Promise` will resolve once the corresponding interaction is complete.
    * Note that for touch events, more than one touchpoint may coexist, each with its own
    * corresponding call of this event and corresponding `Promise`.
-   *
-   * Former handling, before this was an event:
-   ```
-   // On event start
-   focusAssistant.setMaintainingFocus(true);
-
-   // On promise resolution
-   // noop // did not bother with `setMaintainingFocus(false)`.  Possible bug?
-   ```
    */
   pointerInteraction: (promise: Promise<void>) => void;
 }

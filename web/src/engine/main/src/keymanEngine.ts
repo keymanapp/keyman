@@ -28,6 +28,8 @@ export default class KeymanEngine<
   private _hardKeyboard: HardKeyboard;
   private _osk: OSKView;
 
+  protected keyEventRefocus?: () => void;
+
   private keyEventListener: KeyEventHandler = (event, callback) => {
     const outputTarget = this.contextManager.activeTarget;
 
@@ -42,8 +44,11 @@ export default class KeymanEngine<
       if(this.osk?.vkbd?.keyPending) {
         this.osk.vkbd.keyPending = null;
       }
-    } else {
-      // Do anything needed to guarantee that the outputTarget stays active (`browser`: maintains focus).
+    } else if(this.keyEventRefocus) { // && event.isSynthetic // as in, is from the OSK.
+      // Do anything needed to guarantee that the outputTarget stays active (`app/browser`: maintains focus).
+      // (Interaction with the OSK may have de-focused the element providing active context;
+      // we want to restore it in case the user swaps back to the hardware keyboard afterward.)
+      this.keyEventRefocus();
     }
 
     try {

@@ -2,9 +2,12 @@ import { type KeyElement, OSKView, VisualKeyboard } from "keyman/engine/osk";
 import { getAbsoluteX, getAbsoluteY } from "keyman/engine/dom-utils";
 import { DeviceSpec } from "@keymanapp/keyboard-processor";
 import ContextManager from "./contextManager.js";
+import { KeymanEngine } from "./keymanEngine.js";
 
-export function setupOskListeners(osk: OSKView, contextManager: ContextManager) {
-  osk.on('globeKey', (key, on) => {
+export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextManager: ContextManager) {
+  const focusAssistant = contextManager.focusAssistant;
+
+  osk.on('globeKey', (key, on) => { // K_LOPT
     if(on) {
       if(osk.hostDevice.touchable) {
         this.lgMenu = new LanguageMenu(com.keyman.singleton);
@@ -17,7 +20,7 @@ export function setupOskListeners(osk: OSKView, contextManager: ContextManager) 
     }
   });
 
-  osk.on('hideRequested', (key) => {
+  osk.on('hideRequested', (key) => { // K_ROPT
     if(osk) {
       contextManager.focusAssistant.setMaintainingFocus(false);
       osk.startHide(true);
@@ -30,5 +33,39 @@ export function setupOskListeners(osk: OSKView, contextManager: ContextManager) 
     if(hiddenByUser) {
       contextManager.activeTarget?.focus();
     }
+  });
+
+  osk.on('showBuild', () => {
+    internalAlert('KeymanWeb Version '+keymanweb['version']+'.'+keymanweb['build']+'<br /><br />'
+        +'<span style="font-size:0.8em">Copyright &copy; 2021 SIL International</span>');
+  });
+
+  osk.on('dragMove', async (promise) => {
+    focusAssistant.restoringFocus = true;
+
+    await promise;
+
+    keymanweb.domManager.focusLastActiveElement();
+
+    focusAssistant.restoringFocus = false;
+    focusAssistant.setMaintainingFocus(false);
+  });
+
+  osk.on('resizeMove', async (promise) => {
+    focusAssistant.restoringFocus = true;
+
+    await promise;
+    keymanweb.domManager.focusLastActiveElement();
+
+    focusAssistant.restoringFocus = false;
+    focusAssistant.setMaintainingFocus(false);
+  });
+
+  osk.on('pointerInteraction', async (promise) => {
+   // On event start
+   focusAssistant.setMaintainingFocus(true);
+
+   // The original did nothing when the pointer left the OSK's bounds.  Possible bug?
+   // await promise;  // should we wish to change that.
   });
 }
