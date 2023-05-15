@@ -1087,10 +1087,13 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     switch(n) {
       case 0:
         fs=fsDefault;
+        break;
       case 1:
         fs = getComputedStyle(ipInput[0]).fontFamily || '';
+        break;
       case 2:
         fs = getComputedStyle(ipTextArea[0]).fontFamily || '';
+        break;
     }
     if(typeof(fs) == 'undefined' || fs == 'monospace') {
       fs=fsDefault;
