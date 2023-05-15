@@ -51,16 +51,16 @@ describe('Keyboard Properties', function() {
     // Without a configured SpacebarText value, will display the keyboard name.
     assert.equal(propObject.displayName, propObject.name);
 
-    propObject.spacebarTextMode = SpacebarText.BLANK;
+    KeyboardProperties.spacebarTextMode = SpacebarText.BLANK;
     assert.equal(propObject.displayName, '');
 
-    propObject.spacebarTextMode = SpacebarText.KEYBOARD;
+    KeyboardProperties.spacebarTextMode = SpacebarText.KEYBOARD;
     assert.equal(propObject.displayName, propObject.name);
 
-    propObject.spacebarTextMode = SpacebarText.LANGUAGE;
+    KeyboardProperties.spacebarTextMode = SpacebarText.LANGUAGE;
     assert.equal(propObject.displayName, propObject.langName);
 
-    propObject.spacebarTextMode = SpacebarText.LANGUAGE_KEYBOARD;
+    KeyboardProperties.spacebarTextMode = SpacebarText.LANGUAGE_KEYBOARD;
     assert.isTrue(propObject.displayName.includes(propObject.langName) && propObject.displayName.includes(propObject.name));
   });
 

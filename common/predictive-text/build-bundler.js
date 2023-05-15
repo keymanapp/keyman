@@ -36,22 +36,3 @@ await esbuild.build({
 //   tsconfig: 'tsconfig.json',
 //   target: "es5"
 // });
-
-const dtsBundleCommand1 = spawn('npx dts-bundle-generator --project src/web/tsconfig.json -o build/lib/web/index.d.ts src/web/index.ts', {
-  shell: true
-});
-
-dtsBundleCommand1.stdout.on('data', data =>   console.log(data.toString()));
-dtsBundleCommand1.stderr.on('data', data => console.error(data.toString()));
-
-// Forces synchronicity; done mostly so that the logs don't get jumbled up.
-await new Promise((resolve, reject) => {
-  dtsBundleCommand1.on('exit', () => {
-    if(dtsBundleCommand1.exitCode != 0) {
-      reject();
-      process.exit(dtsBundleCommand1.exitCode);
-    }
-    resolve();
-  });
-});
-

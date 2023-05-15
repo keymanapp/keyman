@@ -1,6 +1,6 @@
 import EventEmitter from "eventemitter3";
 import type LanguageProcessor from "./languageProcessor.js";
-import { type ReadySuggestions, type InvalidateSourceEnum } from './languageProcessor.js';
+import { type ReadySuggestions, type InvalidateSourceEnum, StateChangeEnum, StateChangeHandler } from './languageProcessor.js';
 import { type KeyboardProcessor, type OutputTarget } from "@keymanapp/keyboard-processor";
 
 interface PredictionContextEventMap {
@@ -71,13 +71,10 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   public constructor(langProcessor: LanguageProcessor, kbdProcessor: KeyboardProcessor) {
     super();
 
-    if(langProcessor.state == 'inactive') {
-      throw new Error("Invalid state:  no predictive-text model is currently available.");
-    }
     this.langProcessor = langProcessor;
     this.kbdProcessor = kbdProcessor;
 
-    const validSuggestionState: () => boolean = () => 
+    const validSuggestionState: () => boolean = () =>
       this.currentTarget && langProcessor.state == 'configured';
 
     this.suggestionApplier = (suggestion) => {
@@ -113,6 +110,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     this.langProcessor.addListener('suggestionsready', this.updateSuggestions);
     this.langProcessor.addListener('tryaccept', this.doTryAccept);
     this.langProcessor.addListener('tryrevert', this.doTryRevert);
+    this.langProcessor.addListener('statechange', this.onModelStateChange);
 
     this.langProcessor.addListener('suggestionapplied', this.postApplicationHandler);
   }
@@ -122,6 +120,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     this.langProcessor.removeListener('suggestionsready', this.updateSuggestions);
     this.langProcessor.removeListener('tryaccept', this.doTryAccept);
     this.langProcessor.removeListener('tryrevert', this.doTryRevert);
+    this.langProcessor.removeListener('statechange', this.onModelStateChange);
 
     this.langProcessor.removeListener('suggestionapplied', this.postApplicationHandler);
     this.clearSuggestions();
@@ -346,6 +345,16 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
       return this.langProcessor.invalidateContext(target, this.kbdProcessor.layerId);
     } else {
       return Promise.resolve([]);
+    }
+  }
+
+  private onModelStateChange: StateChangeHandler = (state) => {
+    // Either way, the model has changed; either state marks the completion of such a transition.
+    // The 'active' state displays the banner while a model loads... but its predictions are
+    // only possible once fully 'configured'.  They may appear to 'blink on' after a small delay
+    // as a result.
+    if(state == 'configured' || state == 'inactive') {
+      this.resetContext();
     }
   }
 }

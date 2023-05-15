@@ -6,13 +6,13 @@ import { type EmbeddedGestureConfig } from "keyman/engine/osk";
 import { GlobeHint } from './osk/globeHint.js';
 import { KeyTip } from './osk/keytip.js';
 import { PendingLongpress } from './osk/pendingLongpress.js';
-import { type KeymanEngine } from "./keymanEngine.js";
+import type KeymanEngine from "./keymanEngine.js";
 
 export function setupEmbeddedListeners(engine: KeymanEngine, osk: OSKView) {
   osk.on('globeKey', (key, on) => {
     if(on) {
-      if(typeof window['showKeyboardList'] == 'function') { // OSKView event: shouldShowLanguageMenu
-        window['showKeyboardList']();                       // Is connected to VisualKeyboard event: globeKey
+      if(typeof engine.showKeyboardList == 'function') { // OSKView event: shouldShowLanguageMenu
+        engine.showKeyboardList();                       // Is connected to VisualKeyboard event: globeKey
       }
     } else if(osk.vkbd) {
       if(osk.vkbd.menuEvent) {

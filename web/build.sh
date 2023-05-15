@@ -96,6 +96,14 @@ builder_run_child_actions build:app/webview
 # Is not yet compilable due to unmodularized components.
 # builder_run_child_actions build:app/browser
 
+if builder_has_action build:app/browser; then
+  builder_die "Modularization work is not yet complete; builds dependent on this will fail."
+fi
+
+if builder_has_action build:app/ui; then
+  builder_die "Modularization work is not yet complete; builds dependent on this will fail."
+fi
+
 builder_run_child_actions test
 
 if builder_start_action test; then
@@ -103,5 +111,3 @@ if builder_start_action test; then
 
   builder_finish_action success test
 fi
-
-builder_die "Modularization work is not yet complete; builds dependent on this will fail."

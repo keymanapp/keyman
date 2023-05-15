@@ -21,7 +21,8 @@ builder_describe "Builds the predictive-text wordbreaker implementation module" 
   "clean" \
   "configure" \
   "build" \
-  "test"
+  "test" \
+  "--ci"
 
 builder_describe_outputs \
   configure          /node_modules \
@@ -56,7 +57,11 @@ if builder_start_action build; then
 fi
 
 if builder_start_action test; then
-  npm run mocha
+  if builder_has_option --ci; then
+    npm run mocha -- -reporter mocha-teamcity-reporter
+  else
+    npm run mocha
+  fi
 
   builder_finish_action success test
 fi

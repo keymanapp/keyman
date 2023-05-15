@@ -78,6 +78,7 @@ export abstract class Banner {
 
   public appendStyleSheet() {
     // TODO: add stylesheets
+    // See VisualKeyboard's method + 'addFontStyle' for current handling.
   }
 
   /**
@@ -374,7 +375,14 @@ export class SuggestionBanner extends Banner {
   public configureForKeyboard(keyboard: Keyboard, keyboardProperties: KeyboardProperties) {
     const rtl = keyboard.isRTL;
 
-    this.getDiv().replaceChildren();
+    // Removes all previous children.  (.replaceChildren requires Chrome for Android 86.)
+    // Instantly replaces all children with an empty text node, bypassing the need to actually
+    // parse incoming HTML.
+    //
+    // Just in case, alternative approaches: https://stackoverflow.com/a/3955238
+    this.getDiv().textContent = '';
+
+    // Builds new children to match needed RTL properties.
     this.buildInternals(rtl);
 
     this.options.forEach((option) => option.matchKeyboardProperties(keyboardProperties));

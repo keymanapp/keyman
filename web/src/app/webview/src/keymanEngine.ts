@@ -1,4 +1,4 @@
-import { DeviceSpec, Keyboard } from '@keymanapp/keyboard-processor'
+import { DeviceSpec } from '@keymanapp/keyboard-processor'
 import { KeymanEngine as KeymanEngineBase } from 'keyman/engine/main';
 import { AnchoredOSKView, ViewConfiguration, StaticActivator } from 'keyman/engine/osk';
 import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
@@ -10,7 +10,7 @@ import PassthroughKeyboard from './passthroughKeyboard.js';
 import { buildEmbeddedGestureConfig, setupEmbeddedListeners } from './oskConfiguration.js';
 import { SubkeyDelegator } from './osk/subkeyDelegator.js';
 
-export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKeyboard> {
+export default class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKeyboard> {
   // Ideally, we would be able to auto-detect `sourceUri`: https://stackoverflow.com/a/60244278.
   // But it's too new of a feature to utilize... and also expects to be in a module, when this may
   // be compiled down to an IIFE.
@@ -30,7 +30,7 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
     this.hardKeyboard = new PassthroughKeyboard(config.hardDevice);
   }
 
-  init(options: Required<WebviewInitOptionSpec>) {
+  async init(options: Required<WebviewInitOptionSpec>) {
     let device = new DeviceSpec(
       'native',
       options.embeddingApp.indexOf('Tablet') >= 0 ? 'tablet' : 'phone',
@@ -40,7 +40,17 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
 
     this.config.hostDevice = device;
 
-    super.init({...WebviewInitOptionDefaults, ...options});
+    const totalOptions = {...WebviewInitOptionDefaults, ...options};
+    super.init(totalOptions);
+    this.config.initialize(totalOptions);
+
+    // There may be some valid mutations possible even on repeated calls?
+    // The original seems to allow it.
+
+    if(this.config.deferForInitialization.hasFinalized) {
+      // abort!  Maybe throw an error, too.
+      return Promise.resolve();
+    }
 
     this.contextManager.initialize();
 
@@ -51,19 +61,24 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
       activator: new StaticActivator(),
       embeddedGestureConfig: buildEmbeddedGestureConfig(this.config.softDevice),
       doCacheBusting: true,
-      predictionContextManager: this.contextManager.predictionContext
+      predictionContextManager: this.contextManager.predictionContext,
+      heightOverride: this.getOskHeight,
+      widthOverride: this.getOskWidth,
+      isEmbedded: true
     };
 
     this.osk = new AnchoredOSKView(oskConfig);
     setupEmbeddedListeners(this, this.osk);
+
+    this.config.finalizeInit();
   }
 
   // Functions that the old 'app/webview' equivalent had always provided to the WebView
 
   /**
-   * correctOSKTextSize handles rotation event -- currently rebuilds keyboard and adjusts font sizes
+   * refreshOskLayout handles rotation event -- currently rebuilds keyboard and adjusts font sizes
    */
-  correctOSKTextSize() {
+  refreshOskLayout() {
     this.osk?.refreshLayout();
   };
 
@@ -205,4 +220,11 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, PassthroughKe
   // Properties set by the WebView hosting page
   hideKeyboard?: () => void = null;
   menuKeyUp?: () => void = null;
+  showKeyboardList?: () => void = null;
+  getOskHeight?: () => number = null;
+  getOskWidth?: () => number = null;
+
+  get context() {
+    return this.contextManager.activeTarget;
+  }
 }

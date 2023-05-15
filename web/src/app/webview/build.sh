@@ -36,11 +36,16 @@ builder_describe "Builds the Keyman Engine for Web's puppetable version designed
 # Possible TODO?s
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
 
+builder_parse "$@"
+
+config=release
+if builder_is_debug_build; then
+  config=debug
+fi
+
 builder_describe_outputs \
   configure   /node_modules \
-  build       /web/build/$SUBPROJECT_NAME/lib/index.js
-
-builder_parse "$@"
+  build       /web/build/$SUBPROJECT_NAME/$config/keymanweb-webview.js
 
 #### Build action definitions ####
 
@@ -57,6 +62,11 @@ fi
 
 if builder_start_action build; then
   compile $SUBPROJECT_NAME
+
+  mkdir -p "$KEYMAN_ROOT/web/build/app/resources/osk"
+  cp -R "$KEYMAN_ROOT/web/src/resources/osk/." "$KEYMAN_ROOT/web/build/app/resources/osk/"
+
+  "$KEYMAN_ROOT/web/src/test/manual/embed/android-harness/build.sh"
 
   builder_finish_action success build
 fi

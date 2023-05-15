@@ -61,6 +61,7 @@ interface BannerViewEventMap {
 export default class BannerView implements OSKViewComponent {
   private bannerContainer: HTMLDivElement;
   private activeBanner: Banner;
+  private _activeBannerHeight: number = Banner.DEFAULT_HEIGHT;
 
   public readonly events = new EventEmitter<BannerViewEventMap>();
 
@@ -111,13 +112,18 @@ export default class BannerView implements OSKViewComponent {
         return;
       } else {
         let prevBanner = this.activeBanner;
+        this.activeBanner = banner;
         this.bannerContainer.replaceChild(banner.getDiv(), prevBanner.getDiv());
+      }
+    } else {
+      this.activeBanner = banner;
+      if(banner) {
+        this.bannerContainer.appendChild(banner.getDiv());
       }
     }
 
-    this.activeBanner = banner;
-    if(banner) {
-      this.bannerContainer.appendChild(banner.getDiv());
+    if(!(banner instanceof BlankBanner)) {
+      banner.height = this.activeBannerHeight;
     }
 
     this.events.emit('bannerchange');
@@ -134,11 +140,17 @@ export default class BannerView implements OSKViewComponent {
     }
   }
 
+  public get activeBannerHeight(): number {
+    return this._activeBannerHeight;
+  }
+
   /**
    * Sets the height (in pixels) of the active 'Banner' instance.
    */
-  public set height(h: number) {
-    if (this.activeBanner) {
+  public set activeBannerHeight(h: number) {
+    this._activeBannerHeight = h;
+
+    if (this.activeBanner && !(this.activeBanner instanceof BlankBanner)) {
       this.activeBanner.height = h;
     }
   }
@@ -154,7 +166,6 @@ export class BannerController {
   private _activeType: BannerType;
   private _options: BannerOptions = {};
   private container: BannerView;
-  private activeBanner: Banner;
   private alwaysShow: boolean;
   private imagePath?: string = "";
 
@@ -231,7 +242,7 @@ export class BannerController {
       this._options[key] = optionSpec[key];
 
       // If no banner instance exists yet, go with a safe, blank initialization.
-      if(!this.activeBanner) {
+      if(!this.container.banner) {
         this.selectBanner('inactive');
       }
     }
@@ -245,18 +256,27 @@ export class BannerController {
    *        representing the type of `Banner` to set active.
    * @param height - Optional banner height in pixels.
    */
-  public setBanner(type: BannerType, height?: number) {
+  public setBanner(type: BannerType) {
     var banner: Banner;
+
+    let oldBanner = this.container.banner;
+    if(oldBanner instanceof SuggestionBanner) {
+      this.predictionContext.off('update', oldBanner.onSuggestionUpdate);
+    }
 
     switch(type) {
       case 'blank':
         banner = new BlankBanner();
         break;
       case 'image':
-        banner = new ImageBanner(this.imagePath, Banner.DEFAULT_HEIGHT);
+        banner = new ImageBanner(this.imagePath, this.container.activeBannerHeight);
         break;
       case 'suggestion':
-        banner = new SuggestionBanner(this.hostDevice, height);
+        let suggestBanner = banner = new SuggestionBanner(this.hostDevice, this.container.activeBannerHeight);
+        suggestBanner.predictionContext = this.predictionContext;
+        suggestBanner.events.on('apply', (selection) => this.predictionContext.accept(selection.suggestion));
+
+        this.predictionContext.on('update', suggestBanner.onSuggestionUpdate);
         break;
       default:
         throw new Error("Invalid type specified for the banner!");
@@ -276,7 +296,7 @@ export class BannerController {
    */
   selectBanner(state: StateChangeEnum) {
     // Only display a SuggestionBanner when LanguageProcessor states it is active.
-    if(state == 'active') {
+    if(state == 'active' || state == 'configured') {
       this.setBanner('suggestion');
     } else if(state == 'inactive') {
       if(this.alwaysShow) {
@@ -284,8 +304,6 @@ export class BannerController {
       } else {
         this.setBanner('blank');
       }
-    } else if(state == 'configured' && this.activeBanner instanceof SuggestionBanner) {
-      this.activeBanner.predictionContext = this.predictionContext || null;
     }
   }
 

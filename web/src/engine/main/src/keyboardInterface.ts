@@ -3,20 +3,20 @@ import {
   KeyboardInterface as KeyboardInterfaceBase,
   KeyboardKeymanGlobal,
 } from "@keymanapp/keyboard-processor";
-import { KeyboardStub, RawKeyboardStub, StubAndKeyboardCache } from 'keyman/engine/package-cache';
+import { KeyboardStub, RawKeyboardStub, StubAndKeyboardCache, toUnprefixedKeyboardId as unprefixed } from 'keyman/engine/package-cache';
 
 import { ContextManagerBase } from './contextManagerBase.js';
 import { VariableStoreCookieSerializer } from "./variableStoreCookieSerializer.js";
 
 export default class KeyboardInterface extends KeyboardInterfaceBase {
-  private readonly contextManager: ContextManagerBase;
+  private readonly contextManager: ContextManagerBase<any>;
   private stubAndKeyboardCache: StubAndKeyboardCache;
   private stubNamespacer?: (stub: RawKeyboardStub) => void;
 
   constructor(
     _jsGlobal: any,
     keymanGlobal: KeyboardKeymanGlobal,
-    contextManager: ContextManagerBase,
+    contextManager: ContextManagerBase<any>,
     stubNamespacer?: (stub: RawKeyboardStub) => void
   ) {
     super(_jsGlobal, keymanGlobal, new VariableStoreCookieSerializer());
@@ -28,16 +28,41 @@ export default class KeyboardInterface extends KeyboardInterfaceBase {
     this.stubAndKeyboardCache = cache;
   }
 
+  // Preserves a keyboard's ID, even if namespaced, via script tag tagging.
+  preserveID(Pk: any /** a `Keyboard`'s `scriptObject` entry */) {
+    var trueID;
+
+    // Find the currently-executing script tag; KR is called directly from each keyboard's definition script.
+    if(document.currentScript) {
+      trueID = document.currentScript.id;
+    } else {
+      var scripts = document.getElementsByTagName('script');
+      var currentScript = scripts[scripts.length-1];
+
+      trueID = currentScript.id;
+    }
+
+    // Final check that the script tag is valid and appropriate for the loading keyboard.
+    if(!trueID) {
+      return;
+    } else if(trueID.indexOf(unprefixed(Pk['KI'])) != -1) {
+      Pk['KI'] = trueID;  // Take the script's version of the ID, which may include package namespacing.
+    } else {
+      console.error("Error when registering keyboard:  current SCRIPT tag's ID does not match!");
+    }
+  }
+
   registerKeyboard(Pk): void {
     // Among other things, sets Pk as a newly-active Keyboard.
     super.registerKeyboard(Pk);
     const registeredKeyboard = this.loadedKeyboard;
 
-    const cacheEntry = this.stubAndKeyboardCache.getKeyboard(registeredKeyboard.id);
-    if(!(cacheEntry instanceof Promise)) {
+    this.preserveID(Pk);
+
+    if(!this.stubAndKeyboardCache.isFetchingKeyboard(registeredKeyboard.id)) {
       // Deliberate keyboard pre-loading via direct script-tag link on the page.
       // Just load the keyboard and reset the harness's keyboard-receiver field.
-      this.stubAndKeyboardCache.addKeyboard(new Keyboard(Pk));
+      this.stubAndKeyboardCache.addKeyboard(registeredKeyboard);
       this.loadedKeyboard = null;
     }
   }

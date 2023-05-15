@@ -386,32 +386,6 @@ namespace com.keyman {
     }
 
     /**
-     * Function     isChiral
-     * Scope        Public
-     * @param       {string|Object=}   k0
-     * @return      {boolean}
-     * Description  Tests if the active keyboard (or optional argument) uses chiral modifiers.
-     */
-    ['isChiral'](k0?) {
-      var kbd: keyboards.Keyboard;
-      if(k0) {
-        if(typeof k0 == 'string') {
-          const kbdObj = this.keyboardManager.keyboards.find((kbd) => kbd['KI'] == k0);
-          if(!kbdObj) {
-            throw new Error(`Keyboard '${k0}' has not been loaded.`);
-          } else {
-            k0 = kbdObj;
-          }
-        }
-
-        kbd = new keyboards.Keyboard(k0);
-      } else {
-        kbd = this.core.activeKeyboard;
-      }
-      return kbd.isChiral;
-    }
-
-    /**
      * Get keyboard meta data for the selected keyboard and language
      *
      * @param       {string}    PInternalName     Internal name of keyboard
@@ -471,59 +445,6 @@ namespace com.keyman {
     ['init'](arg): Promise<any> {
       return this.domManager.init(arg);
     }
-
-    /**
-     * Function     resetContext
-     * Scope        Public
-     * @param       {Object} e      The element whose context should be cleared.  If null, the currently-active element will be chosen.
-     * Description  Reverts the OSK to the default layer, clears any processing caches and modifier states,
-     *              and clears deadkeys and prediction-processing states on the active element (if it exists)
-     */
-    ['resetContext'](e?: HTMLElement) {
-      let elem = e;
-      if(!elem) {
-        elem = this.domManager.activeElement;
-      }
-
-      let outputTarget = dom.Utils.getOutputTarget(elem);
-      if(outputTarget) {
-        outputTarget.resetContext();
-      }
-
-      // Reset the predictive-text context while we're at it.
-
-      let bannerController = this.osk.bannerController;
-      // import for relevant types should be available from @keymanapp/input-processor.
-      this.core.languageProcessor.on('statechange', (state: StateChangeEnum) => {
-        let currentType = bannerController.activeType;
-        bannerController.selectBanner(state);
-
-        if(this.osk.banner instanceof SuggestionBanner) {
-          // Similar instruction will be needed on resetContext() calls!
-          this.osk.banner.predictionContext = new PredictionContext(this.core.languageProcessor, this.core.keyboardProcessor, outputTarget);
-        }
-
-        // Register a listener for model change events so that we can hot-swap the banner as needed.
-        // Handled here b/c banner changes may trigger a need to re-layout the OSK.
-
-        if(currentType != bannerController.activeType) {
-          this.refreshLayout();
-        }
-
-        return true;
-      });
-
-      this.core.resetContext(outputTarget);
-    };
-
-    /**
-     * Function     setNumericLayer
-     * Scope        Public
-     * Description  Set OSK to numeric layer if it exists
-     */
-    ['setNumericLayer']() {
-      this.core.keyboardProcessor.setNumericLayer(this.util.device.coreSpec);
-    };
 
     /**
      * Function     disableControl

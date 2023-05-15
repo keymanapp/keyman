@@ -1,9 +1,15 @@
-import { DeviceSpec, ManagedPromise, physicalKeyDeviceAlias, SpacebarText } from "@keymanapp/keyboard-processor";
+import EventEmitter from "eventemitter3";
+
+import { DeviceSpec, KeyboardProperties, ManagedPromise, OutputTarget, physicalKeyDeviceAlias, RuleBehavior, SpacebarText } from "@keymanapp/keyboard-processor";
 import { PathConfiguration, PathOptionDefaults, PathOptionSpec } from "keyman/engine/paths";
 import { Device } from "keyman/engine/device-detect";
 import { KeyboardStub } from "keyman/engine/package-cache";
 
-export class EngineConfiguration {
+interface EventMap {
+  'spacebartext': (mode: SpacebarText) => void;
+}
+
+export class EngineConfiguration extends EventEmitter<EventMap> {
   // The app/webview path replaces this during init, but we expect to have something set for this
   // during engine construction, which occurs earlier.  So no `readonly`, sadly.
   //
@@ -14,13 +20,15 @@ export class EngineConfiguration {
 
   private _paths: PathConfiguration;
   private _activateFirstKeyboard: boolean;
-  private _defaultSpacebarText: SpacebarText;
+  private _spacebarText: SpacebarText;
   private _stubNamespacer?: (KeyboardStub) => void;
 
   public applyCacheBusting: boolean = false;
 
   // sourcePath:  see `var sPath =` in kmwbase.ts.  It is not obtainable headlessly.
   constructor(sourcePath: string, device?: DeviceSpec) {
+    super();
+
     if(!device) {
       const deviceDetector = new Device();
       deviceDetector.detect();
@@ -41,8 +49,13 @@ export class EngineConfiguration {
       this._activateFirstKeyboard = true;
     }
 
-    this._defaultSpacebarText = options.spacebarText;
+    this._spacebarText = options.spacebarText;
 
+    // Make sure this is accessible to stubs for use in generating display names!
+    KeyboardProperties.spacebarTextMode = () => this.spacebarText;
+  }
+
+  finalizeInit() {
     this.deferForInitialization.resolve();
   }
 
@@ -54,8 +67,15 @@ export class EngineConfiguration {
     return this._activateFirstKeyboard;
   }
 
-  get defaultSpacebarText() {
-    return this._defaultSpacebarText;
+  get spacebarText() {
+    return this._spacebarText;
+  }
+
+  set spacebarText(value: SpacebarText) {
+    if(this._spacebarText != value) {
+      this._spacebarText = value;
+      this.emit('spacebartext', value);
+    }
   }
 
   get softDevice(): DeviceSpec {
@@ -80,6 +100,15 @@ export class EngineConfiguration {
       initialized: this.deferForInitialization.hasFinalized
     }
   }
+
+  /**
+   * Facilitates implementation of additional functionality for finalized keystroke-event rules
+   * after postKeystroke takes effect.  Any behaviors defined here should be considered 'readonly' in
+   * terms of context and should instead facilitate integration with the engine's host platform.
+   * @param ruleBehavior  The full effects of keystroke + postkeystroke rules from a processed keystroke.
+   * @param outputTarget  The engine's current source for context
+   */
+  onRuleFinalization(ruleBehavior: RuleBehavior, outputTarget: OutputTarget) {};
 }
 
 export interface InitOptionSpec extends PathOptionSpec {

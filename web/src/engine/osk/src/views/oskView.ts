@@ -294,7 +294,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
   private mouseEnterPromise?: ManagedPromise<void>;
   private touchEventPromiseManager = new TouchEventPromiseMap();
 
-  private static readonly STYLESHEET_FILES = ['osk/kmwosk.css', 'osk/globe-hint.css'];
+  private static readonly STYLESHEET_FILES = ['kmwosk.css', 'globe-hint.css'];
 
   constructor(configuration: Configuration) {
     super();
@@ -790,10 +790,16 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
     // Instantly resets the OSK container, erasing / delinking the previously-loaded keyboard.
     this._Box.innerHTML = '';
 
+    // Temp-hack:  embedded products prefer their stylesheet, etc linkages without the /osk path component.
+    let subpath = 'osk/';
+    if(this.config.isEmbedded) {
+      subpath = '';
+    }
+
     // Install the default OSK stylesheet - but don't have it managed by the keyboard-specific stylesheet manager.
     // We wish to maintain kmwosk.css whenever keyboard-specific styles are reset/removed.
     for(let sheetFile of OSKView.STYLESHEET_FILES) {
-      const sheetHref = `${this.config.pathConfig.resources}/${sheetFile}`;
+      const sheetHref = `${this.config.pathConfig.resources}/${subpath}${sheetFile}`;
       this.uiStyleSheetManager.linkExternalSheet(sheetHref);
     }
 
@@ -890,7 +896,8 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
       topContainer: this._Box,
       styleSheetManager: this.kbdStyleSheetManager,
       pathConfig: this.config.pathConfig,
-      embeddedGestureConfig: this.config.embeddedGestureConfig
+      embeddedGestureConfig: this.config.embeddedGestureConfig,
+      isEmbedded: this.config.isEmbedded
     });
 
     vkbd.on('keyEvent', (keyEvent) => this.emit('keyEvent', keyEvent));

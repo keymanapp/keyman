@@ -29,7 +29,7 @@ builder_describe \
   "Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications." \
   "@/common/web/keyman-version" \
   "@/common/tools/sourcemap-path-remapper" \
-  configure clean build test
+  configure clean build test --ci
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -47,6 +47,8 @@ fi
 
 if builder_start_action clean; then
   npm run clean
+  rm -rf ./build
+
   builder_finish_action success clean
 fi
 

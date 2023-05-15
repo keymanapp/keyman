@@ -118,11 +118,23 @@ export default class KeyboardProperties implements KeyboardInternalPropertySpec 
   KOskFont: InternalKeyboardFont;
   _displayName?: string;
 
-  public spacebarTextMode: SpacebarText;
+  private static spacebarTextModeSrc: SpacebarText | (() => SpacebarText) = SpacebarText.KEYBOARD;
+
+  public static get spacebarTextMode(): SpacebarText {
+    if(typeof this.spacebarTextModeSrc == 'string') {
+      return this.spacebarTextModeSrc;
+    } else {
+      return this.spacebarTextModeSrc();
+    }
+  }
+
+  public static set spacebarTextMode(source: typeof KeyboardProperties.spacebarTextModeSrc) {
+    this.spacebarTextModeSrc = source;
+  }
 
   public constructor(metadataObj: MetadataObj, fontPath?: string);
   public constructor(keyboardId: string, languageCode: string);
-  public constructor(arg1: MetadataObj | string, arg2?: string | SpacebarText) {
+  public constructor(arg1: MetadataObj | string, arg2?: string) {
     if(!(typeof arg1 == 'string')) {
       if(arg1['KI'] || arg1['KL'] || arg1['KLC'] || arg1['KFont'] || arg1['KOskFont']) {
         const other = arg1 as KeyboardInternalPropertySpec;
@@ -151,7 +163,7 @@ export default class KeyboardProperties implements KeyboardInternalPropertySpec 
     }
   }
 
-  public static fromMultilanguageAPIStub(apiStub: KeyboardAPIPropertyMultilangSpec, spacebarTextMode?: SpacebarText): KeyboardProperties[] {
+  public static fromMultilanguageAPIStub(apiStub: KeyboardAPIPropertyMultilangSpec): KeyboardProperties[] {
     let stubs: KeyboardProperties[] = [];
 
     apiStub.languages ||= apiStub.language;
@@ -163,7 +175,7 @@ export default class KeyboardProperties implements KeyboardInternalPropertySpec 
         languages: langSpec
       };
 
-      stubs.push(new KeyboardProperties(stub, spacebarTextMode));
+      stubs.push(new KeyboardProperties(stub));
     }
 
     return stubs;
@@ -194,7 +206,7 @@ export default class KeyboardProperties implements KeyboardInternalPropertySpec 
     const kbdName = this.KN;
     const lgName = this.KL;
 
-    switch (this.spacebarTextMode) {
+    switch (KeyboardProperties.spacebarTextMode) {
       case SpacebarText.KEYBOARD:
         return kbdName;
       case SpacebarText.LANGUAGE:
@@ -234,8 +246,8 @@ export default class KeyboardProperties implements KeyboardInternalPropertySpec 
       }
     }
 
-    if(this.displayName === undefined || (this.spacebarTextMode != SpacebarText.BLANK && !this.displayName)) {
-      return new Error("A display name is missing for this keyboard and cannot be generated.")
+    if(this.displayName === undefined || (KeyboardProperties.spacebarTextMode != SpacebarText.BLANK && !this.displayName)) {
+      return new Error("A display name is missing for this keyboard and cannot be generated under current settings.")
     }
 
     return null;

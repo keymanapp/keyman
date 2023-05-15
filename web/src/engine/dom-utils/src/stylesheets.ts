@@ -41,7 +41,7 @@ export class StylesheetManager {
       return;
     }
 
-    if(typeof(fd.files == 'undefined')) {
+    if(typeof(fd.files) == 'undefined') {
       return;
     }
 

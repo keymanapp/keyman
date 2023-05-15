@@ -38,6 +38,8 @@ export default class ContextManager extends ContextManagerBase {
     throw new Error('Method not implemented.');
   }
 
+  // on set activeTarget, make sure to also change it for this.predictionContext!
+
   get activeKeyboard() {
     return this._activeKeyboard;
   }
@@ -116,7 +118,9 @@ export default class ContextManager extends ContextManagerBase {
       if(this.config.hostDevice.touchable) {
         // Fallback behavior - if on a touch device, we need to keep a keyboard visible.
         const defaultStub = this.keyboardCache.defaultStub;
-        await this.activateKeyboard(defaultStub.id, defaultStub.langId, true).catch(() => {});
+        if(defaultStub.id != keyboardId || defaultStub.langId != languageCode) {
+          await this.activateKeyboard(defaultStub.id, defaultStub.langId, true).catch(() => {});
+        } // else "We already failed, so give up."
       } else {
         // Fallback behavior - if on a desktop device, the user still has a physical keyboard.
         // Just clear out the active keyboard & OSK.

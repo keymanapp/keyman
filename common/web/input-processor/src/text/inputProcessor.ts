@@ -10,6 +10,7 @@ import { globalObject, DeviceSpec } from "@keymanapp/web-utils";
 import {
   type Alternate,
   Codes,
+  isEmptyTransform,
   type Keyboard,
   KeyboardInterface,
   KeyboardProcessor,
@@ -76,23 +77,6 @@ export default class InputProcessor {
 
   public get activeModel(): ModelSpec {
     return this.languageProcessor.activeModel;
-  }
-
-  /**
-   * Tell the currently active keyboard that a new context has been selected,
-   * e.g. by focus change, selection change, keyboard change, etc.
-   *
-   * @param    {Object}   outputTarget  The OutputTarget that has focus
-   * @returns  {Object}                 A RuleBehavior object describing the cumulative effects of
-   *                                    all matched keyboard rules
-   */
-  processNewContextEvent(outputTarget: OutputTarget): RuleBehavior {
-    const ruleBehavior = this.keyboardProcessor.processNewContextEvent(this.contextDevice, outputTarget);
-
-    if(ruleBehavior) {
-      ruleBehavior.finalize(this.keyboardProcessor, outputTarget, true);
-    }
-    return ruleBehavior;
   }
 
   /**
@@ -202,7 +186,8 @@ export default class InputProcessor {
     // 4.  The key ALSO signals a layer shift.
     // If any of the four above conditions aren't met - no problem!
     // So it's a pretty niche scenario.
-    if((ruleBehavior?.transcription?.transform as TextTransform)?.isNoOp() && keyEvent.kNextLayer) {
+
+    if(isEmptyTransform(ruleBehavior?.transcription?.transform) && keyEvent.kNextLayer) {
       isOnlyLayerSwitchKey = true;
     }
 
@@ -366,7 +351,9 @@ export default class InputProcessor {
   }
 
   public resetContext(outputTarget?: OutputTarget) {
+    // Also handles new-context events, which may modify the layer
     this.keyboardProcessor.resetContext(outputTarget);
+    // With the layer now set, we trigger new predictions.
     this.languageProcessor.invalidateContext(outputTarget, this.keyboardProcessor.layerId);
   }
 }
