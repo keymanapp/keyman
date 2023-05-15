@@ -64,7 +64,8 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
    // On event start
    focusAssistant.setMaintainingFocus(true);
 
-   // The original did nothing when the pointer left the OSK's bounds.  Possible bug?
-   // await promise;  // should we wish to change that.
+   await promise;
+
+   focusAssistant.setMaintainingFocus(false);
   });
 }
