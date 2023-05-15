@@ -5,6 +5,10 @@ import {
   PhysicalInputEventSpec
 } from "@keymanapp/recorder-core";
 
+import type { KeymanEngine } from 'keyman/app/browser';
+
+declare var keyman: KeymanEngine;
+
 export class BrowserDriver {
   static readonly physicalEventClass: string = "KeyboardEvent";
   static readonly physicalEventType: string = "keydown";
@@ -58,7 +62,7 @@ export class BrowserDriver {
     // To be safe, we replicate the MouseEvent similarly to the keystroke event.
     var downEvent;
     var upEvent;
-    if((window['keyman'] as any).util.device.touchable) {
+    if(keyman.config.hostDevice.touchable) {
       downEvent = new Event(BrowserDriver.oskDownTouchType);
       upEvent = new Event(BrowserDriver.oskUpTouchType);
       downEvent['touches'] = [{"target": oskKeyElement}];

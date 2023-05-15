@@ -146,7 +146,7 @@ export class Scribe extends EventEmitter {
   }
 
   resetInputRecord() {
-    window['keyman'].resetContext();
+    keyman.resetContext();
     this.currentSequence = new RecordedKeystrokeSequence();
 
     this.emit('record-reset', null);

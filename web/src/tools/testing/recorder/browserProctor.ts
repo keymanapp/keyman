@@ -6,6 +6,10 @@ import { type DeviceSpec } from "@keymanapp/web-utils";
 
 import { type OutputTarget } from "@keymanapp/keyboard-processor";
 
+import { type KeymanEngine } from 'keyman/app/browser';
+
+declare var keyman: KeymanEngine;
+
 import {
   InputEventSpec,
   InputEventSpecSequence,
@@ -22,10 +26,10 @@ type AssertCallback = (s1: any, s2: any, msg?: string) => void;
 
 function resetElement(ele: HTMLElement): void {
   if(ele instanceof HTMLInputElement || ele instanceof HTMLTextAreaElement) {
-    (window['keyman'] as any).resetContext();
+    keyman.resetContext();
     ele.value = "";
   } else {
-    (window['keyman'] as any).resetContext();
+    keyman.resetContext();
     ele.textContent = "";
   }
 }
