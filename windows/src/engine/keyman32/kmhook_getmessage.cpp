@@ -249,15 +249,6 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 	}
 
 	/*
-	 Handle WM_UNICHAR messages for RichEdit control -- should we test RichEdit version?
-	*/
-
-	if(mp->message == WM_UNICHAR)
-	{
-		// Do Nothing  TODO: Remove WM_UNICHAR
-	}
-
-	/*
 	 Handle wm_keyman_control_internal messages
 	*/
 
