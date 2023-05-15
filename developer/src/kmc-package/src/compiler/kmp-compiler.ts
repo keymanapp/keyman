@@ -2,36 +2,32 @@ import * as xml2js from 'xml2js';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
-import type { KpsFile, KpsFileContentFile, KpsFileInfo, KpsFileKeyboard, KpsFileLanguage, KpsFileLexicalModel, KpsFileOptions, KpsPackage } from './kps-file.js';
-import type { KmpJsonFile, KmpJsonFileInfo, KmpJsonFileLanguage, KmpJsonFileOptions } from './kmp-json-file.js';
 import { CompilerCallbacks, KvkFile } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
-import { KMX, KmxFileReader } from '@keymanapp/common-types';
-
-export { type KmpJsonFile } from './kmp-json-file.js';
+import { KmpJsonFile, KpsFile, KMX, KmxFileReader } from '@keymanapp/common-types';
 
 const FILEVERSION_KMP_JSON = '12.0';
 
-export default class KmpCompiler {
+export class KmpCompiler {
 
   constructor(private callbacks: CompilerCallbacks) {
   }
 
-  public transformKpsToKmpObject(kpsFilename: string): KmpJsonFile {
+  public transformKpsToKmpObject(kpsFilename: string): KmpJsonFile.KmpJsonFile {
     // Load the KPS data from XML as JS structured data.
     const data = this.callbacks.fs.readFileSync(kpsFilename, 'utf-8');
 
     const kpsPackage = (() => {
-        let a: KpsPackage;
+        let a: KpsFile.KpsPackage;
         let parser = new xml2js.Parser({
           tagNameProcessors: [xml2js.processors.firstCharLowerCase],
           explicitArray: false
         });
-        parser.parseString(data, (e: unknown, r: unknown) => { a = r as KpsPackage });
+        parser.parseString(data, (e: unknown, r: unknown) => { a = r as KpsFile.KpsPackage });
         return a;
     })();
 
-    let kps: KpsFile = kpsPackage.package;
+    let kps: KpsFile.KpsFile = kpsPackage.package;
 
     //
     // To convert to kmp.json, we need to:
@@ -46,7 +42,7 @@ export default class KmpCompiler {
 
     // Start to construct the kmp.json file from the .kps file
 
-    let kmp: KmpJsonFile = {
+    let kmp: KmpJsonFile.KmpJsonFile = {
       system: {
         fileVersion: FILEVERSION_KMP_JSON,
         keymanDeveloperVersion: KEYMAN_VERSION.VERSION
@@ -58,7 +54,7 @@ export default class KmpCompiler {
     // Fill in additional fields
     //
 
-    let keys: [keyof KpsFileOptions, keyof KmpJsonFileOptions][] = [
+    let keys: [keyof KpsFile.KpsFileOptions, keyof KmpJsonFile.KmpJsonFileOptions][] = [
       ['executeProgram','executeProgram'],
       ['graphicFile', 'graphicFile'],
       ['msiFileName','msiFilename'],
@@ -86,7 +82,7 @@ export default class KmpCompiler {
     //
 
     if(kps.files && kps.files.file) {
-      kmp.files = this.arrayWrap(kps.files.file).map((file: KpsFileContentFile) => {
+      kmp.files = this.arrayWrap(kps.files.file).map((file: KpsFile.KpsFileContentFile) => {
         return {
           name: file.name,
           description: file.description,
@@ -108,14 +104,14 @@ export default class KmpCompiler {
     //
 
     if(kps.keyboards && kps.keyboards.keyboard) {
-      kmp.keyboards = this.arrayWrap(kps.keyboards.keyboard).map((keyboard: KpsFileKeyboard) => {
+      kmp.keyboards = this.arrayWrap(kps.keyboards.keyboard).map((keyboard: KpsFile.KpsFileKeyboard) => {
         return {
           displayFont: keyboard.displayFont ? this.callbacks.path.basename(keyboard.displayFont) : undefined,
           oskFont: keyboard.oSKFont ? this.callbacks.path.basename(keyboard.oSKFont) : undefined,
           name:keyboard.name,
           id:keyboard.iD,
           version:keyboard.version,
-          languages: this.kpsLanguagesToKmpLanguages(this.arrayWrap(keyboard.languages.language) as KpsFileLanguage[])
+          languages: this.kpsLanguagesToKmpLanguages(this.arrayWrap(keyboard.languages.language) as KpsFile.KpsFileLanguage[])
         };
       });
     }
@@ -125,8 +121,8 @@ export default class KmpCompiler {
     //
 
     if(kps.lexicalModels && kps.lexicalModels.lexicalModel) {
-      kmp.lexicalModels = this.arrayWrap(kps.lexicalModels.lexicalModel).map((model: KpsFileLexicalModel) => {
-        return { name:model.name, id:model.iD, languages: this.kpsLanguagesToKmpLanguages(this.arrayWrap(model.languages.language) as KpsFileLanguage[]) }
+      kmp.lexicalModels = this.arrayWrap(kps.lexicalModels.lexicalModel).map((model: KpsFile.KpsFileLexicalModel) => {
+        return { name:model.name, id:model.iD, languages: this.kpsLanguagesToKmpLanguages(this.arrayWrap(model.languages.language) as KpsFile.KpsFileLanguage[]) }
       });
     }
 
@@ -160,17 +156,17 @@ export default class KmpCompiler {
       kmp.strings = this.arrayWrap(kps.strings.string);
     }
 
-    kmp = this.stripUndefined(kmp) as KmpJsonFile;
+    kmp = this.stripUndefined(kmp) as KmpJsonFile.KmpJsonFile;
 
     return kmp;
   }
 
     // Helper functions
 
-  private kpsInfoToKmpInfo(info: KpsFileInfo): KmpJsonFileInfo {
-    let ni: KmpJsonFileInfo = {};
+  private kpsInfoToKmpInfo(info: KpsFile.KpsFileInfo): KmpJsonFile.KmpJsonFileInfo {
+    let ni: KmpJsonFile.KmpJsonFileInfo = {};
 
-    const keys: [(keyof KpsFileInfo), (keyof KmpJsonFileInfo)][] = [
+    const keys: [(keyof KpsFile.KpsFileInfo), (keyof KmpJsonFile.KmpJsonFileInfo)][] = [
       ['author','author'],
       ['copyright','copyright'],
       ['name','name'],
@@ -195,11 +191,11 @@ export default class KmpCompiler {
     return [a];
   };
 
-  private kpsLanguagesToKmpLanguages(language: KpsFileLanguage[]): KmpJsonFileLanguage[] {
+  private kpsLanguagesToKmpLanguages(language: KpsFile.KpsFileLanguage[]): KmpJsonFile.KmpJsonFileLanguage[] {
     return language.map((element) => { return { name: element._, id: element.$.ID } });
   };
 
-  private extractKeyboardVersionFromKmx(kpsFilename: string, kmp: KmpJsonFile) {
+  private extractKeyboardVersionFromKmx(kpsFilename: string, kmp: KmpJsonFile.KmpJsonFile) {
     // The DEFAULT_VERSION used to be '1.0', but we now use '0.0' to allow
     // pre-release 0.x keyboards to be considered later than a keyboard without
     // any version metadata at all.
@@ -278,13 +274,13 @@ export default class KmpCompiler {
    * @param kpsFilename - Filename of the kps, not read, used only for calculating relative paths
    * @param kmpJsonData - The kmp.json Object
    */
-  public buildKmpFile(kpsFilename: string, kmpJsonData: KmpJsonFile): Promise<string> {
+  public buildKmpFile(kpsFilename: string, kmpJsonData: KmpJsonFile.KmpJsonFile): Promise<string> {
     const zip = JSZip();
 
     const kmpJsonFileName = 'kmp.json';
 
     // Make a copy of kmpJsonData, as we mutate paths for writing
-    const data: KmpJsonFile = JSON.parse(JSON.stringify(kmpJsonData));
+    const data: KmpJsonFile.KmpJsonFile = JSON.parse(JSON.stringify(kmpJsonData));
     if(!data.files) {
       data.files = [];
     }

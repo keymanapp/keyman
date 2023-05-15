@@ -32,6 +32,8 @@ if cpp_compiler.get_id() == 'emscripten'
   name_suffix = '.mjs'
 endif
 
+icu = subproject('icu-for-uset', default_options: [ 'default_library=static', 'cpp_std=c++17', 'warning_level=0', 'werror=false'])
+icuuc_dep = icu.get_variable('icuuc_dep')
 
 lib = library('kmcmplib',
   'CasedKeys.cpp',
@@ -53,6 +55,7 @@ lib = library('kmcmplib',
   'UnreachableRules.cpp',
   'kmx_u16.cpp',
   'CompMsg.cpp',
+  'uset-api.cpp',
 
   '../../../../common/windows/cpp/src/ConvertUTF.c',
   '../../../../common/windows/cpp/src/crc32.cpp',
@@ -67,7 +70,8 @@ lib = library('kmcmplib',
   link_args: links,
   version: meson.project_version(),
   include_directories: inc,
-  install: true)
+  install: true,
+  dependencies: icuuc_dep)
 
 kmcmplib = declare_dependency(link_with: lib, include_directories: inc)
 
@@ -78,6 +82,7 @@ if cpp_compiler.get_id() == 'emscripten'
     cpp_args: defns,
     include_directories: inc,
     link_args: links,
-    objects: lib.extract_all_objects())
+    objects: lib.extract_all_objects(),
+    dependencies: icuuc_dep)
 endif
 

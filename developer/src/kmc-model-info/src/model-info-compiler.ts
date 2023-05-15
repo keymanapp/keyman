@@ -7,14 +7,14 @@ import * as fs from "fs";
 import * as path from "path";
 import { minKeymanVersion } from "./min-keyman-version.js";
 import { ModelInfoFile } from "./model-info-file.js";
-import { type KmpJsonFile } from "@keymanapp/kmc-package";
+import { KmpJsonFile } from "@keymanapp/common-types";
 
 export class ModelInfoOptions {
   /** The identifier for the model */
   model_id: string;
 
   /** The data from the .kps file, transformed to kmp.json */
-  kmpJsonData: KmpJsonFile;
+  kmpJsonData: KmpJsonFile.KmpJsonFile;
 
   /** The path in the keymanapp/lexical-models repo where this model may be found (optional) */
   sourcePath?: string;

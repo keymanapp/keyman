@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
-import KmpCompiler from '@keymanapp/kmc-package';
 import { CompilerCallbacks } from '@keymanapp/common-types';
+import { KmpCompiler, PackageValidation } from '@keymanapp/kmc-package';
 
 export class BuildPackage extends BuildActivity {
   public get name(): string { return 'Package'; }
@@ -19,6 +19,15 @@ export class BuildPackage extends BuildActivity {
     const kmpCompiler = new KmpCompiler(callbacks);
     const kmpJsonData = kmpCompiler.transformKpsToKmpObject(infile);
     if(!kmpJsonData) {
+      return false;
+    }
+
+    //
+    // Validate the package file
+    //
+
+    const validation = new PackageValidation(callbacks);
+    if(!validation.validate(infile, kmpJsonData)) {
       return false;
     }
 

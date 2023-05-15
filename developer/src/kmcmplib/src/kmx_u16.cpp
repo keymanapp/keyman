@@ -275,12 +275,12 @@ double u16tof( KMX_WCHAR* str)
 	char digit;
 
 	PKMX_WCHAR q = (PKMX_WCHAR)u16chr(str, '.');
-	int pos_dot = q-str  ;
+	size_t pos_dot = q-str  ;
 
 	if (pos_dot < 0)
 		pos_dot = u16len(str);
 
-	for (int i = 0; i < u16len(str); i++)
+	for (size_t i = 0; i < u16len(str); i++)
 	{
 		digit = static_cast<char>(towupper(*str));
 
