@@ -524,6 +524,49 @@ builder_has_action() {
 }
 
 #
+# Wraps builder_start_action and builder_finish action for single-command
+# actions. Can be used together with a local function for multi-command actions.
+# Do be aware that this pseudo-closure style cannot be mixed with operators such
+# as `<`, `>`, `&&`, `;`, `()` and so on.
+#
+# ### Usage
+#
+# ```bash
+#   builder_run_action action[:target] command [command-params...]
+# ```
+#
+# ### Parameters
+#
+# * 1: `action[:target]`   name of action, and optionally also target, if target
+#                          excluded starts for all defined targets
+# * 2: command             command to run if action is started
+# * 3...: command-params   parameters for command
+#
+# ### Example
+#
+# ```bash
+#   function do_build() {
+#     mkdir -p build/cjs-src
+#     npm run build
+#   }
+#
+#   builder_run_action clean        rm -rf ./build/ ./tsconfig.tsbuildinfo
+#   builder_run_action configure    verify_npm_setup
+#   builder_run_action build        do_build
+# ```
+#
+function builder_run_action() {
+  local action=$1
+  shift
+  echo "builder_run_action $action $@"
+  if builder_start_action $action; then
+    ($@)
+    builder_finish_action success $action
+  fi
+  return 0
+}
+
+#
 # Returns `0` if the user has asked to perform action on target on the command
 # line, and then starts the action. Should be paired with
 # `builder_finish_action`.

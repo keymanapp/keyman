@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -eu
 PID_FILE=$1
 
 echo "Shutting down processes..."

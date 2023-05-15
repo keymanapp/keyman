@@ -27,8 +27,10 @@ extern kmcmp_CompilerMessageProc msgproc;
 extern void* msgprocContext;
 
 extern KMX_BOOL AWarnDeprecatedCode_GLOBAL_LIB;
-extern char ErrExtraLIB[256];
-extern KMX_WCHAR ErrExtraW[256];
+#define ERR_EXTRA_LIB_LEN 256
+#define ERR_EXTRA_W_LEN 256
+extern char ErrExtraLIB[ERR_EXTRA_LIB_LEN];
+extern KMX_WCHAR ErrExtraW[ERR_EXTRA_W_LEN];
 KMX_BOOL AddCompileError(KMX_DWORD msg);
 
 /// Use AddWarningBool for functions that return bool or KMX_BOOL
