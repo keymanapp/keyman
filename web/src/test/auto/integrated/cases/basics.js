@@ -128,31 +128,31 @@ Modernizr.on('touchevents', function(result) {
 //       })
 //     });
 
-//     describe('Basic Toolbar UI', function() {
+    describe('Basic Toolbar UI', function() {
 
-//       beforeEach(function() {
-//         this.timeout(testconfig.timeouts.uiLoad);
-//         fixture.setBase('fixtures');
-//         fixture.load('singleInput.html');
+      beforeEach(function() {
+        this.timeout(testconfig.timeouts.uiLoad);
+        fixture.setBase('fixtures');
+        fixture.load('singleInput.html');
 
-//         // Loads two scripts in parallel, but just in case, 2x timeout.
-//         return setupKMW('toolbar', testconfig.timeouts.uiLoad);
-//       });
+        // Loads two scripts in parallel, but just in case, 2x timeout.
+        return setupKMW('toolbar', testconfig.timeouts.uiLoad);
+      });
 
-//       afterEach(function() {
-//         fixture.cleanup();
-//         teardownKMW();
-//       });
+      afterEach(function() {
+        fixture.cleanup();
+        teardownKMW();
+      });
 
-//       it('The Toolbar UI initializes correctly.', function() {
-//         assert(keyman.ui.init, 'Initialization flag is set to false!');
+      it('The Toolbar UI initializes correctly.', function() {
+        assert(keyman.ui.init, 'Initialization flag is set to false!');
 
-//         var kwc = document.getElementById('KeymanWebControl');
-//         assert.isNotNull(kwc, 'Toolbar DIV was not added to the page!');
+        var kwc = document.getElementById('KeymanWebControl');
+        assert.isNotNull(kwc, 'Toolbar DIV was not added to the page!');
 
-//         var toolbar = document.getElementById('kmw_controls');
-//         assert.isNotNull(toolbar, 'The main toolbar element was not added to the page!');
-//       })
-//     });
+        var toolbar = document.getElementById('kmw_controls');
+        assert.isNotNull(toolbar, 'The main toolbar element was not added to the page!');
+      })
+    });
   }
 });

@@ -132,7 +132,7 @@ if(!keyman?.ui?.name) {
        * during initialization and insert it.  That reference is stored here so that we may
        * remove it later if/when `.shutdown()` is called.
        */
-      _insertedElem: HTMLDivElement;
+      _insertedElem: HTMLElement;
 
       /**
        * associative-array of objects { id: <langid>, name: <name>, keyboards: <array of KeymanWeb keyboards> }
@@ -226,7 +226,7 @@ if(!keyman?.ui?.name) {
           if(document.body == null) {
             return;
           } else {
-            let e = document.createElement('div');
+            e = document.createElement('div');
             e.id = 'KeymanWebControl';
             document.body.insertBefore(e, document.body.firstChild);
             this._insertedElem = e;
@@ -394,7 +394,7 @@ if(!keyman?.ui?.name) {
       }
 
       shutdown() {
-        let root = this.toolbarNode;
+        let root: HTMLElement = this.toolbarNode;
         if(root) {
           root.parentNode.removeChild(root);
         }
