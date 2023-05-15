@@ -14,18 +14,6 @@
 #import "CoreAction.h"
 #import "KMEngine.h"  // included for Q_STR etc.
 
-/*
-// constants for compatibility with Keyman for Mac action representation
-NSString *const Q_STR = @"Q_STR";         // KM_KBP_IT_CHAR
-NSString *const Q_BACK = @"Q_BACK";       // KM_KBP_IT_BACK
-NSString *const Q_DEADKEY = @"Q_DEADKEY"; // KM_KBP_IT_MARKER
-NSString *const Q_NUL = @"Q_NUL";         // KM_KBP_IT_END?
-NSString *const Q_BEEP = @"Q_BEEP";       // KM_KBP_IT_ALERT
-NSString *const Q_RETURN = @"Q_RETURN";   // KM_KBP_IT_EMIT_KEYSTROKE?
-NSString *const Q_SAVEOPT = @"Q_SAVEOPT"; // KM_KBP_IT_PERSIST_OPT
-// none defined for KM_KBP_IT_INVALIDATE_CONTEXT, KM_KBP_IT_CAPSLOCK
-*/
-
 @implementation CoreAction
 
 /*
@@ -93,58 +81,6 @@ NSString *const Q_SAVEOPT = @"Q_SAVEOPT"; // KM_KBP_IT_PERSIST_OPT
   return [self initWithType:AlertAction actionContent:@"" backspaceCount:0];
 }
 
-/*
--(instancetype)initWithActionStruct:(km_kbp_action_item*)actionStruct coreHelper:(CoreHelper*)helper {
-    switch (actionStruct->type)
-    {
-      case KM_KBP_IT_END: {
-        self = [self initWithType: EndAction actionContent:@"" backspaceCount:0];
-        break;
-      }
-      case KM_KBP_IT_CHAR: {
-        NSString *characterString = [helper utf32ValueToString:actionStruct->character];
-        self = [self initWithType: CharacterAction actionContent:characterString backspaceCount:0];
-        NSLog(@"actionStruct->character decimal: %u, hex: %X", actionStruct->character, actionStruct->character);
-        NSLog(@"converted unicode string: '%@'", characterString);
-        break;
-      }
-      case KM_KBP_IT_MARKER: {
-        self = [self initWithType: MarkerAction actionContent:@"" backspaceCount:0];
-        break;
-      }
-      case KM_KBP_IT_ALERT: {
-        self = [self initWithType: AlertAction actionContent:@"" backspaceCount:0];
-        break;
-      }
-      case KM_KBP_IT_BACK: {
-        self = [self initWithType: BackspaceAction actionContent:@"" backspaceCount:1];
-        break;
-      }
-      case KM_KBP_IT_PERSIST_OPT: {
-        self = [self initWithType: PersistOptionAction actionContent:@"" backspaceCount:0];
-        break;
-      }
-      case KM_KBP_IT_EMIT_KEYSTROKE: {
-        self = [self initWithType: EmitKeystrokeAction actionContent:@"" backspaceCount:0];
-        break;
-      }
-      case KM_KBP_IT_INVALIDATE_CONTEXT: {
-        self = [self initWithType: InvalidateContextAction actionContent:@"" backspaceCount:0];
-        break;
-      }
-      case KM_KBP_IT_CAPSLOCK: {
-        self = [self initWithType: CapsLockAction actionContent:@"" backspaceCount:0];
-        break;
-      }
-      default: {
-        self->_typeName = @"Unknown";
-        NSLog(@"unrecognized type of km_kbp_action_item = %u\n", actionStruct->type);
-      }
-  }
-  return self;
-}
-*/
-
 -(instancetype)initCharacterAction:(NSString*)content {
   self = [self initWithType: CharacterAction actionContent:content backspaceCount:0];
   return self;
@@ -169,7 +105,7 @@ NSString *const Q_SAVEOPT = @"Q_SAVEOPT"; // KM_KBP_IT_PERSIST_OPT
 /*
  The legacy Keyman for Mac code represents each action returned from Keyman
  Engine as an NSDictionary. CoreWrapper returns CoreAction objects. This method
- converts a CoreAction object as an array of NSDictionary objects. This allows
+ converts a CoreAction object to an array of NSDictionary objects. This allows
  us to replace the key processing code in Keyman Engine with Keyman Core and
  CoreWrapper without rewriting the Keyman Input Method code consuming the
  actions.
@@ -214,7 +150,6 @@ NSString *const Q_SAVEOPT = @"Q_SAVEOPT"; // KM_KBP_IT_PERSIST_OPT
 
   return actionMap;
 }
-
 
 @end
 
