@@ -219,6 +219,16 @@ void DebugMessage(LPMSG msg, WPARAM wParam)  // I2908
       wParam,
       (int) msg->time,
       (unsigned int) GetMessageExtraInfo());
+	else if(msg->message >= WM_KEYDOWN && msg->message <= WM_UNICHAR)
+    wsprintf(ds, "DebugMessage(%x, %s, wParam: '%c' (U+%04X), lParam: %X) [message flags: %x time: %d extra: %x]",
+      PtrToInt(msg->hwnd),
+      msgnames[msg->message-WM_KEYDOWN],
+      msg->wParam,
+      msg->wParam,
+      (unsigned int) msg->lParam,
+      wParam,
+      (int) msg->time,
+      (unsigned int) GetMessageExtraInfo());
 	else
     wsprintf(ds, "%x: %d: wParam: %d, lParam: %X [message flags: %x time: %d]", PtrToInt(msg->hwnd), msg->message, msg->wParam, (unsigned int) msg->lParam, wParam, (int) msg->time);
 
