@@ -34,42 +34,44 @@ describe('Basic KeymanWeb', function() {
   });
 });
 
-// Modernizr.on('touchevents', function(result) {
-//   if(!result) {
-//     describe('Basic Toggle UI', function() {
-//       this.timeout(testconfig.timeouts.scriptLoad);
+Modernizr.on('touchevents', function(result) {
+  // Warning:  desktop Chrome gives `result == true`!
+  // It _does_ at least prevent a problem on mobile-app platforms, though.
+  if(!result) {
+    describe('Basic Toggle UI', function() {
+      this.timeout(testconfig.timeouts.scriptLoad);
 
-//       beforeEach(function() {
-//         this.timeout(testconfig.timeouts.uiLoad);
-//         fixture.setBase('fixtures');
-//         fixture.load('singleInput.html');
+      beforeEach(function() {
+        this.timeout(testconfig.timeouts.uiLoad);
+        fixture.setBase('fixtures');
+        fixture.load('singleInput.html');
 
-//         // Loads two scripts in parallel, but just in case, 2x timeout.
-//         return setupKMW('toggle', testconfig.timeouts.uiLoad);
-//       });
+        // Loads two scripts in parallel, but just in case, 2x timeout.
+        return setupKMW('toggle', testconfig.timeouts.uiLoad);
+      });
 
-//       afterEach(function() {
-//         fixture.cleanup();
-//         teardownKMW();
-//       });
+      afterEach(function() {
+        fixture.cleanup();
+        teardownKMW();
+      });
 
-//       it('The Toggle UI initializes correctly.', function() {
-//         assert(keyman.ui.initialized, 'Initialization flag is set to false!');
+      it('The Toggle UI initializes correctly.', function() {
+        assert(keyman.ui.initialized, 'Initialization flag is set to false!');
 
-//         assert.isNotNull(keyman.ui.controller, 'Failed to create the controller element!');
+        assert.isNotNull(keyman.ui.controller, 'Failed to create the controller element!');
 
-//         var divs = document.getElementsByTagName("div");
-//         var match = false;
+        var divs = document.getElementsByTagName("div");
+        var match = false;
 
-//         for(var i=0; i < divs.length; i++) {
-//           if(divs[i] == keyman.ui.controller) {
-//             match = true;
-//           }
-//         }
+        for(var i=0; i < divs.length; i++) {
+          if(divs[i] == keyman.ui.controller) {
+            match = true;
+          }
+        }
 
-//         assert(match, 'Controller element has not been added to the page!');
-//       })
-//     });
+        assert(match, 'Controller element has not been added to the page!');
+      })
+    });
 
 //     describe('Basic Button UI', function() {
 
@@ -152,5 +154,5 @@ describe('Basic KeymanWeb', function() {
 //         assert.isNotNull(toolbar, 'The main toolbar element was not added to the page!');
 //       })
 //     });
-//   }
-// });
+  }
+});
