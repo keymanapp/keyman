@@ -25,8 +25,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     super(engineConfig);
 
     this.page = new PageContextAttachment(window.document, {
-      hostDevice: this.config.hostDevice,
-      isTopLevel: true
+      hostDevice: this.config.hostDevice
     });
 
     this.engineConfig.deferForInitialization.then(() => {
