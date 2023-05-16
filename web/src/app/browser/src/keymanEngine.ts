@@ -145,9 +145,10 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, KeyEventKeybo
     if(Pkbd) {
       stub = this.keyboardRequisitioner.cache.getStub(Pkbd, Plc);
       if(!stub) {
-        return;
+        throw new Error(`No keyboard has been registered with id ${Pkbd} and language code ${Plc}.`);
       }
     }
-    this.contextManager.setKeyboardForTarget(Pelem._kmwAttachment.interface, stub);
+
+    this.contextManager.setKeyboardForTarget(Pelem._kmwAttachment.interface, Pkbd, Plc);
   }
 }
