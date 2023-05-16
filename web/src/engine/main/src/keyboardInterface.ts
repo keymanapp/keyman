@@ -104,6 +104,9 @@ export default class KeyboardInterface<ContextManagerType extends ContextManager
     // the context manager to resolve said issue.
     this.engine.contextManager.insertText(this, Ptext, PdeadKey);
   }
+
+  // Short-hand name: necessary to do it this way due to assignment style.
+  KT = this.insertText;
 }
 
 (function() {
