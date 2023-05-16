@@ -7,7 +7,7 @@ TESTDIR=${TESTBASEDIR}/test_kmx
 PID_FILE=/tmp/ibus-keyman-test-pids
 ENV_FILE=/tmp/keyman-env.txt
 
-. "$(dirname "$0")"/test-helper.sh
+. "$(dirname "$0")"/test-helper.inc.sh
 
 local_cleanup() {
   cleanup "$PID_FILE"

@@ -145,7 +145,8 @@ function setup() {
       echo "ERROR: mutter doesn't support running headless. Can't run Wayland tests."
       exit 7
     fi
-    echo "Running on Wayland..."
+    echo "Running on Wayland:"
+    echo "Starting mutter..."
     TMPFILE=$(mktemp)
     # mutter-Message: 18:56:15.422: Using Wayland display name 'wayland-1'
     mutter --wayland --headless --no-x11 --virtual-monitor 1024x768 &> "$TMPFILE" &
@@ -156,6 +157,7 @@ function setup() {
     rm "$TMPFILE"
     echo "export WAYLAND_DISPLAY=\"$WAYLAND_DISPLAY\"" >> "$ENV_FILE"
   else
+    echo "Running on X11:"
     echo "Starting Xvfb..."
     Xvfb -screen 0 1024x768x24 :33 &> /dev/null &
     echo "kill -9 $! || true" >> "$PID_FILE"
