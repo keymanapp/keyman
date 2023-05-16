@@ -156,16 +156,6 @@ BOOL ProcessHook()
         Debug_VirtualKey(_td->state.vkey), getcontext_debug());
     }
 
-		AIDEBUGKEYINFO keyinfo;
-		keyinfo.shiftFlags = Globals::get_ShiftState();
-		keyinfo.VirtualKey = _td->state.vkey;
-		keyinfo.Character = _td->state.charCode;
-		keyinfo.DeadKeyCharacter = 0;   // I4582
-		keyinfo.IsUp = !_td->state.isDown;
-		if(_td->app->IsUnicode())
-			_td->app->QueueDebugInformation(QID_BEGIN_UNICODE, NULL, NULL, NULL, NULL, (DWORD_PTR) &keyinfo);
-		else
-			_td->app->QueueDebugInformation(QID_BEGIN_ANSI, NULL, NULL, NULL, NULL, (DWORD_PTR) &keyinfo);
 	}
 
   // For applications not using the TSF kmtip calls this function twice for each keystroke,
@@ -246,7 +236,6 @@ BOOL ProcessHook()
   // PWSTR contextBuf = _td->app->ContextBufMax(MAXCONTEXT);
   // SendDebugMessageFormat(0, sdmAIDefault, 0, "Kmprocess::ProcessHook After cxt=%s", Debug_UnicodeString(contextBuf, 1));
 
-	_td->app->QueueDebugInformation(QID_END, NULL, NULL, NULL, NULL, 0);
 	return !fOutputKeystroke;
 }
 

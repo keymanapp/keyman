@@ -71,11 +71,6 @@ BOOL SelectKeyboard(DWORD KeymanID)
 
   __try
   {
-    if (_td->ForceFileName[0])
-    {
-      SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SelectKeyboard: Ignored due to ForceFile");
-      return FALSE;	// Keyboard file is force-loaded
-    }
 
     KMHideIM();
 

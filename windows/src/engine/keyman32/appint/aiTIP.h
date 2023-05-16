@@ -101,7 +101,6 @@ public:
 	/* Queue and sending functions */
 
 	virtual BOOL SendActions();   // I4196
-	virtual BOOL QueueDebugInformation(int ItemType, LPGROUP Group, LPKEY Rule, PWSTR fcontext, PWSTR foutput, DWORD_PTR dwExtraFlags);
 
 	/* TIP interactions */
 

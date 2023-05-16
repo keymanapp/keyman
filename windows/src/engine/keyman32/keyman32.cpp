@@ -528,127 +528,6 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_RestartEngine()
   return TRUE;
 }
 
-/*******************************************************************************************/
-/*                                                                                         */
-/* Keyman Keyboard Override Functions                                                      */
-/*                                                                                         */
-/*******************************************************************************************/
-
-extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_StopForcingKeyboard();
-
-void RefreshPreservedKeys(BOOL Activating);
-
-extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName)
-{
-	SendDebugMessageFormat(0,sdmGlobal,0,"Keyman_ForceKeyboard: ENTER %s", FileName);
-
-  Keyman_StopForcingKeyboard();		// 7.0.219.0
-
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return FALSE;
-
-  strncpy(_td->ForceFileName, FileName, MAX_PATH - 1);
-	_td->ForceFileName[MAX_PATH-1] = 0;
-
-	if(_td->lpActiveKeyboard)
-	{
-		DeactivateDLLs(_td->lpActiveKeyboard);
-	}
-
-	_td->lpActiveKeyboard = new INTKEYBOARDINFO;
-  memset(_td->lpActiveKeyboard, 0, sizeof(INTKEYBOARDINFO));    // I2437 - Crash unloading keyboard due to keyboard options not init
-
-  _splitpath_s(FileName, NULL, 0, NULL, 0, _td->lpActiveKeyboard->Name, sizeof(_td->lpActiveKeyboard->Name), NULL, 0);
-
-  PWCHAR keyboardPath   = strtowstr(_td->ForceFileName);
-  km_kbp_status err_status = km_kbp_keyboard_load(keyboardPath, &_td->lpActiveKeyboard->lpCoreKeyboard);
-  if (err_status != KM_KBP_STATUS_OK) {
-    SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_ForceKeyboard: km_kbp_keyboard_load failed for %ls with error status [%d]", keyboardPath, err_status);
-    delete keyboardPath;
-
-    goto fail;
-  }
-  delete keyboardPath;
-  SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_ForceKeyboard: %s OK", FileName);
-
-  km_kbp_option_item *core_environment = nullptr;
-
-  if(!SetupCoreEnvironment(&core_environment)) {
-    SendDebugMessageFormat(0, sdmLoad, 0, "Keyman_ForceKeyboard: Unable to set environment options for keyboard %s", FileName);
-    goto fail;
-  }
-
-  err_status =
-      km_kbp_state_create(_td->lpActiveKeyboard->lpCoreKeyboard, core_environment, &_td->lpActiveKeyboard->lpCoreKeyboardState);
-
-  DeleteCoreEnvironment(core_environment);
-
-  if (err_status != KM_KBP_STATUS_OK) {
-    SendDebugMessageFormat(
-        0, sdmGlobal, 0, "Keyman_ForceKeyboard Core: km_kbp_state_create failed with error status [%d]", err_status);
-    // Dispose of the keyboard to leave us in a consitent state
-    ReleaseKeyboardMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboard);
-    goto fail;
-  }
-
-  // TODO: #5822 Add km_kbp_event to reset keyboard action sent to keyman core
-  // (only the core knows the caps rules such CAPS_ALWAYS_OFF)
-  // so it can then respond with a possible reset. Currently this sorts itself out
-  // the first keystroke pressed after switching to a new keyboard.
-
-  err_status = km_kbp_keyboard_get_imx_list(_td->lpActiveKeyboard->lpCoreKeyboard, &_td->lpActiveKeyboard->lpIMXList);
-  if (err_status != KM_KBP_STATUS_OK) {
-    SendDebugMessageFormat(0, sdmLoad, 0, "Keyman_ForceKeyboard Core: km_kbp_keyboard_get_imx_list failed with error status [%d]", err_status);
-    // Dispose of the keyboard to leave us in a consistent state
-    ReleaseStateMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboardState);
-    ReleaseKeyboardMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboard);
-    goto fail;
-  }
-
-  LoadDLLs(_td->lpActiveKeyboard);
-  ActivateDLLs(_td->lpActiveKeyboard);
-  LoadKeyboardOptionsRegistrytoCore(_td->lpActiveKeyboard, _td->lpActiveKeyboard->lpCoreKeyboardState);
-  RefreshPreservedKeys(TRUE);
-  return TRUE;
-fail:
-
-	delete _td->lpActiveKeyboard;
-	_td->lpActiveKeyboard = NULL;
-
-	_td->ForceFileName[0] = 0;
-	return FALSE;
-}
-
-extern "C" BOOL _declspec(dllexport) WINAPI Keyman_StopForcingKeyboard()
-{
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td)
-  {
-    SetLastError(ERROR_KEYMAN_THREAD_DATA_NOT_READY); // I3173   // I3525
-    return FALSE;
-  }
-
-  if(!_td->lpActiveKeyboard)
-  {
-    SetLastError(ERROR_KEYMAN_KEYBOARD_NOT_ACTIVE); // I3173   // I3525
-    return FALSE;
-  }
-	SendDebugMessageFormat(0,sdmGlobal,0,"Keyman_StopForcingKeyboard");
-	if(_td->ForceFileName[0])
-	{
-		SendDebugMessageFormat(0,sdmGlobal,0,"Keyman_StopForcingKeyboard: Stopping forcing");
-		if(!DeactivateDLLs(_td->lpActiveKeyboard)) return FALSE;  // I3173   // I3525
-		if(!UnloadDLLs(_td->lpActiveKeyboard)) return FALSE;  // I3173   // I3525
-		_td->ForceFileName[0] = 0;
-    ReleaseStateMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboardState);
-    ReleaseKeyboardMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboard);
-    RefreshPreservedKeys(FALSE);
-    delete _td->lpActiveKeyboard;
-		_td->lpActiveKeyboard = NULL;
-	}
-	return TRUE;
-}
-
 //---------------------------------------------------------------------------------------------------------
 //
 // Utility guff functions
@@ -1019,7 +898,11 @@ void ReleaseKeyboards(BOOL Lock)
 	if(!_td || !_td->lpKeyboards) return;
 
 
-  if(Lock) if(_td->lpActiveKeyboard && !_td->ForceFileName[0]) DeactivateDLLs(_td->lpActiveKeyboard);
+  if(Lock) {
+    if(_td->lpActiveKeyboard) {
+      DeactivateDLLs(_td->lpActiveKeyboard);
+    }
+  }
 
 	for(int i = 0; i < _td->nKeyboards; i++)
 	{
@@ -1033,7 +916,6 @@ void ReleaseKeyboards(BOOL Lock)
 	delete _td->lpKeyboards;
 
 	_td->lpKeyboards = NULL;
-	if(!_td->ForceFileName[0]) _td->lpActiveKeyboard = NULL;
 }
 
 /**

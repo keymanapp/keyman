@@ -215,8 +215,6 @@ typedef struct tagKEYMAN64THREADDATA
 	  FInitialised,
     FInitialising;
 
-  char ForceFileName[MAX_PATH];
-
   DWORD ActiveKeymanID;
 
   /* TIP Globals */
