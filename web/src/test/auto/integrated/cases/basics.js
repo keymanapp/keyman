@@ -73,26 +73,26 @@ Modernizr.on('touchevents', function(result) {
       })
     });
 
-//     describe('Basic Button UI', function() {
+    describe('Basic Button UI', function() {
 
-//       beforeEach(function() {
-//         this.timeout(testconfig.timeouts.uiLoad);
-//         fixture.setBase('fixtures');
-//         fixture.load('singleInput.html');
+      beforeEach(function() {
+        this.timeout(testconfig.timeouts.uiLoad);
+        fixture.setBase('fixtures');
+        fixture.load('singleInput.html');
 
-//         // Loads two scripts in parallel, but just in case, 2x timeout.
-//         return setupKMW('button', testconfig.timeouts.uiLoad);
-//       });
+        // Loads two scripts in parallel, but just in case, 2x timeout.
+        return setupKMW('button', testconfig.timeouts.uiLoad);
+      });
 
-//       afterEach(function() {
-//         fixture.cleanup();
-//         teardownKMW();
-//       });
+      afterEach(function() {
+        fixture.cleanup();
+        teardownKMW();
+      });
 
-//       it('The Button UI initializes correctly.', function() {
-//         assert(keyman.ui.init, 'Initialization flag is set to false!');
-//       })
-//     });
+      it('The Button UI initializes correctly.', function() {
+        assert(keyman.ui.init, 'Initialization flag is set to false!');
+      })
+    });
 
 //     describe('Basic Float UI', function() {
 
