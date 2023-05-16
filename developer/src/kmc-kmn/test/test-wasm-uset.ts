@@ -1,24 +1,23 @@
 import 'mocha';
 import { assert } from 'chai';
-import { Compiler } from '../src/main.js';
+import { KmnCompiler } from '../src/main.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { CompilerMessages } from '../src/compiler/messages.js';
 import { compilerErrorFormatCode } from '@keymanapp/common-types';
 
 describe('Compiler UnicodeSet function', function() {
   it('should start', async function() {
-    const compiler = new Compiler();
+    const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks));
-    assert(compiler.verifyInitted());
+    assert(compiler.verifyInitialized());
   });
 
   it('should compile a basic uset', async function() {
-    const compiler = new Compiler();
-    // const callbacks = new TestCompilerCallbacks();
+    const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks));
-    assert(compiler.verifyInitted());
+    assert(compiler.verifyInitialized());
 
     const pat = "[abc]";
     const set = compiler.parseUnicodeSet(pat, 23);
@@ -28,10 +27,10 @@ describe('Compiler UnicodeSet function', function() {
     assert(set.ranges[0][1] === 'c'.charCodeAt(0));
   });
   it('should compile a more complex uset', async function() {
-    const compiler = new Compiler();
+    const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks));
-    assert(compiler.verifyInitted());
+    assert(compiler.verifyInitialized());
 
     const pat = "[[🙀A-C]-[CB]]";
     const set = compiler.parseUnicodeSet(pat, 23);
@@ -43,10 +42,10 @@ describe('Compiler UnicodeSet function', function() {
     assert.equal(set.ranges[1][1], 0x1F640);
   });
   it('should fail in various ways', async function() {
-    const compiler = new Compiler();
+    const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks));
-    assert(compiler.verifyInitted());
+    assert(compiler.verifyInitialized());
     // map from string to failing error
     const failures = {
       '[:Adlm:]': CompilerMessages.ERROR_UnicodeSetHasProperties, // what it saye

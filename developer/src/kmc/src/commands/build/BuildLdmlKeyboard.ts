@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import * as kmc from '@keymanapp/kmc-ldml';
+import * as kmcLdml from '@keymanapp/kmc-ldml';
 import { KvkFileWriter, CompilerCallbacks } from '@keymanapp/common-types';
 import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
 
@@ -43,14 +43,14 @@ export class BuildLdmlKeyboard extends BuildActivity {
 }
 
 async function buildLdmlKeyboardToMemory(inputFilename: string, callbacks: CompilerCallbacks, options: BuildActivityOptions): Promise<[Uint8Array, Uint8Array, Uint8Array]> {
-  let compilerOptions: kmc.CompilerOptions = {
+  let compilerOptions: kmcLdml.CompilerOptions = {
     debug: options.debug ?? false,
     addCompilerVersion: options.compilerVersion ?? true,
     // TODO: warnDeprecatedCode: options.warnDeprecatedCode,
     // TODO: treatWarningsAsErrors: options.treatWarningsAsErrors,
   }
 
-  const k = new kmc.Compiler(callbacks, options);
+  const k = new kmcLdml.LdmlKeyboardCompiler(callbacks, options);
   let source = k.load(inputFilename);
   if (!source) {
     return [null, null, null];
@@ -62,13 +62,13 @@ async function buildLdmlKeyboardToMemory(inputFilename: string, callbacks: Compi
 
   // In order for the KMX file to be loaded by non-KMXPlus components, it is helpful
   // to duplicate some of the metadata
-  kmc.KMXPlusMetadataCompiler.addKmxMetadata(kmx.kmxplus, kmx.keyboard, compilerOptions);
+  kmcLdml.KMXPlusMetadataCompiler.addKmxMetadata(kmx.kmxplus, kmx.keyboard, compilerOptions);
 
   // Use the builder to generate the binary output file
-  const builder = new kmc.KMXBuilder(kmx, options.debug);
+  const builder = new kmcLdml.KMXBuilder(kmx, options.debug);
   const kmx_binary = builder.compile();
 
-  const vkcompiler = new kmc.VisualKeyboardCompiler();
+  const vkcompiler = new kmcLdml.LdmlKeyboardVisualKeyboardCompiler();
   const vk = vkcompiler.compile(source);
   const writer = new KvkFileWriter();
   const kvk_binary = writer.write(vk);
@@ -78,7 +78,7 @@ async function buildLdmlKeyboardToMemory(inputFilename: string, callbacks: Compi
   // const tlcompiler = new kmc.TouchLayoutCompiler();
   // const tl = tlcompiler.compile(source);
   // const tlwriter = new TouchLayoutFileWriter();
-  const kmwcompiler = new kmc.KeymanWebCompiler(callbacks, compilerOptions);
+  const kmwcompiler = new kmcLdml.LdmlKeyboardKeymanWebCompiler(callbacks, compilerOptions);
   const kmw_string = kmwcompiler.compile(inputFilename, source);
   const encoder = new TextEncoder();
   const kmw_binary = encoder.encode(kmw_string);

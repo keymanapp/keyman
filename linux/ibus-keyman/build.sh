@@ -37,8 +37,7 @@ cd "$THIS_SCRIPT_PATH"
 
 builder_describe_outputs \
   configure "${MESON_PATH}/build.ninja" \
-  build "${MESON_PATH}/src/ibus-engine-keyman" \
-  build "${MESON_PATH}/tests/ibus-keyman-tests"
+  build "${MESON_PATH}/src/ibus-engine-keyman"
 
 if builder_start_action clean; then
   rm -rf "$THIS_SCRIPT_PATH/../build/"
