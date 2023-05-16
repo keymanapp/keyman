@@ -332,7 +332,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     if(attachment.keyboard != null) {
       this.activateKeyboard(attachment.keyboard, attachment.languageCode, true);
     } else if(!blockGlobalChange) {
-      this.activateKeyboard(global.metadata.id, global.metadata.langId, true);
+      this.activateKeyboard(global?.metadata.id, global?.metadata.langId, true);
     }
   }
 
