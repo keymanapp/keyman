@@ -1,5 +1,6 @@
 import { KmpJsonFile, CompilerCallbacks } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
+import { keymanEngineForWindowsFiles, keymanForWindowsInstallerFiles, keymanForWindowsRedistFiles } from './redist-files.js';
 
 // const SLexicalModelExtension = '.model.js';
 
@@ -142,6 +143,23 @@ export class PackageValidation {
       this.callbacks.reportMessage(CompilerMessages.Warn_FileInPackageDoesNotFollowFilenameConventions({filename}));
     }
 
+    if(!this.checkIfContentFileIsDangerous(file)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private checkIfContentFileIsDangerous(file: KmpJsonFile.KmpJsonFileContentFile): boolean {
+    let filename = this.callbacks.path.basename(file.name).toLowerCase();
+    if(keymanForWindowsInstallerFiles.includes(filename) ||
+        keymanForWindowsRedistFiles.includes(filename) ||
+        keymanEngineForWindowsFiles.includes(filename)) {
+      this.callbacks.reportMessage(CompilerMessages.Warn_RedistFileShouldNotBeInPackage({filename}));
+    }
+    if(filename.match(/\.doc(x?)$/)) {
+      this.callbacks.reportMessage(CompilerMessages.Warn_DocFileDangerous({filename}));
+    }
     return true;
   }
 

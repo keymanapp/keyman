@@ -98,5 +98,13 @@ export class CompilerMessages {
   static Error_MustHaveAtLeastOneLanguage = (o:{resourceType:string, id:string}) => m(this.ERROR_MustHaveAtLeastOneLanguage,
     `The ${o.resourceType} ${o.id} must have at least one language specified.`);
   static ERROR_MustHaveAtLeastOneLanguage = SevError | 0x0016;
+
+  static Warn_RedistFileShouldNotBeInPackage = (o:{filename:string}) => m(this.WARN_RedistFileShouldNotBeInPackage,
+    `The Keyman system file '${o.filename}' should not be compiled into the package.`);
+  static WARN_RedistFileShouldNotBeInPackage = SevWarn | 0x0017;
+
+  static Warn_DocFileDangerous = (o:{filename:string}) => m(this.WARN_DocFileDangerous,
+    `Microsoft Word .doc or .docx files ('${o.filename}') are not portable. You should instead use HTML or PDF format.`);
+  static WARN_DocFileDangerous = SevWarn | 0x0018;
 }
 
