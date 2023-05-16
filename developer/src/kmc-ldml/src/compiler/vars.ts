@@ -1,7 +1,7 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus, LDMLKeyboard, CompilerCallbacks } from '@keymanapp/common-types';
 import { UnicodeSetParser } from '@keymanapp/common-types';
-import { Compiler } from  '@keymanapp/kmc-kmn';
+import { KmnCompiler } from  '@keymanapp/kmc-kmn';
 import { SectionCompiler } from "./section-compiler.js";
 import Vars = KMXPlus.Vars;
 import StringVarItem = KMXPlus.StringVarItem;
@@ -22,7 +22,7 @@ export class VarsCompiler extends SectionCompiler {
   usetparser : UnicodeSetParser = null;
 
   public async init() : Promise<boolean> {
-    const compiler = new Compiler();
+    const compiler = new KmnCompiler();
     const ok = await compiler.init(this.callbacks);
     if (ok) {
       this.usetparser = compiler;
