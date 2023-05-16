@@ -19,8 +19,8 @@
 */
 #include "pch.h"
 
-BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* const state);
-void IntSaveKeyboardOptionREGCore(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value);
+BOOL IntLoadKeyboardOptionsRegistrytoCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* const state);
+void IntSaveKeyboardOptionCoretoRegistry(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value);
 
 static km_kbp_cp* CloneKMKBPCP(const km_kbp_cp* cp) {
   LPCWSTR buf      = reinterpret_cast<LPCWSTR>(cp);
@@ -35,12 +35,12 @@ static km_kbp_cp* CloneKMKBPCPFromWSTR(LPWSTR buf) {
   return clone;
 }
 
-void SaveKeyboardOptionREGCore(LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value)
+void SaveKeyboardOptionCoretoRegistry(LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value)
 {
-  IntSaveKeyboardOptionREGCore(REGSZ_KeyboardOptions, kp, key, value);
+  IntSaveKeyboardOptionCoretoRegistry(REGSZ_KeyboardOptions, kp, key, value);
 }
 
-void IntSaveKeyboardOptionREGCore(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value)
+void IntSaveKeyboardOptionCoretoRegistry(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value)
 {
   assert(REGKey != NULL);
   assert(kp != NULL);
@@ -54,13 +54,13 @@ void IntSaveKeyboardOptionREGCore(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR k
   }
 }
 
-void LoadKeyboardOptionsREGCore(LPINTKEYBOARDINFO kp, km_kbp_state* const state)
+void LoadKeyboardOptionsRegistrytoCore(LPINTKEYBOARDINFO kp, km_kbp_state* const state)
 {
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadKeyboardOptionsREGCore: Enter");
-  IntLoadKeyboardOptionsCore(REGSZ_KeyboardOptions, kp, state);
+  SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadKeyboardOptionsRegistrytoCore: Enter");
+  IntLoadKeyboardOptionsRegistrytoCore(REGSZ_KeyboardOptions, kp, state);
 }
 
-BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* const state)
+BOOL IntLoadKeyboardOptionsRegistrytoCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* const state)
 {
   assert(key != NULL);
   assert(kp != NULL);
@@ -70,7 +70,7 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
   km_kbp_status err_status = km_kbp_keyboard_get_attrs(kp->lpCoreKeyboard, &keyboardAttrs);
   if (err_status != KM_KBP_STATUS_OK) {
     SendDebugMessageFormat(
-        0, sdmKeyboard, 0, "LoadKeyboardOptionsREGCore: km_kbp_keyboard_get_attrs failed with error status [%d]", err_status);
+        0, sdmKeyboard, 0, "LoadKeyboardOptionsRegistrytoCore: km_kbp_keyboard_get_attrs failed with error status [%d]", err_status);
     return FALSE;
   }
 
@@ -102,97 +102,11 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
   err_status = km_kbp_state_options_update(state, keyboardOpts);
   if (err_status != KM_KBP_STATUS_OK) {
     SendDebugMessageFormat(
-        0, sdmKeyboard, 0, "LoadKeyboardOptionsREGCore: km_kbp_state_options_update failed with error status [%d]", err_status);
+        0, sdmKeyboard, 0, "LoadKeyboardOptionsRegistrytoCore: km_kbp_state_options_update failed with error status [%d]", err_status);
   }
   for (int i = 0; i < n; i++) {
     delete[] keyboardOpts[i].value;
   }
   delete[] keyboardOpts;
   return TRUE;
-}
-
-BOOL
-UpdateKeyboardOptionsCore(
-  km_kbp_state* const lpCoreKeyboardState,
-  km_kbp_option_item *lpCoreKeyboardOptions) {
-
-  int listSize = (int)km_kbp_options_list_size(lpCoreKeyboardOptions);
-  // Create a option list based on this size look up each key and store the return value in it.
-  // then at the end return this options list.
-  BOOL changed = FALSE;
-  km_kbp_cp const* retValue = nullptr;
-  for (int i = 0; i < listSize; i++) {
-    km_kbp_status err_status = km_kbp_state_option_lookup(lpCoreKeyboardState, lpCoreKeyboardOptions[i].scope, lpCoreKeyboardOptions[i].key,
-        &retValue);
-    if (err_status != KM_KBP_STATUS_OK) {
-      SendDebugMessageFormat(
-          0, sdmKeyboard, 0, "UpdateKeyboardOptionsCore: km_kbp_state_option_lookup failed with error status [%d]", err_status);
-      continue;
-    }
-    // compare to see if changed
-    if (wcscmp(reinterpret_cast<LPCWSTR>(retValue), reinterpret_cast<LPCWSTR>(lpCoreKeyboardOptions[i].value)) != 0) {
-      delete lpCoreKeyboardOptions[i].value;
-      lpCoreKeyboardOptions[i].value = CloneKMKBPCP(retValue);
-      changed = TRUE;
-    }
-  }
-  return changed;
-}
-
-km_kbp_option_item*
-SaveKeyboardOptionsCore(LPINTKEYBOARDINFO kp) {
-
-   // Get the list of default options to determine size of list
-  const km_kbp_keyboard_attrs* keyboardAttrs;
-  km_kbp_status err_status = km_kbp_keyboard_get_attrs(kp->lpCoreKeyboard, &keyboardAttrs);
-  if (err_status != KM_KBP_STATUS_OK) {
-    SendDebugMessageFormat(
-        0, sdmKeyboard, 0, "SaveKeyboardOptionsCore: km_kbp_keyboard_get_attrs failed with error status [%d]", err_status);
-    return nullptr;
-  }
-  int listSize = (int)km_kbp_options_list_size(keyboardAttrs->default_options);
-  km_kbp_option_item* savedKeyboardOpts = new km_kbp_option_item[listSize + 1];
-  km_kbp_cp const* retValue = nullptr;
-
-  km_kbp_option_item const* kbDefaultOpts = keyboardAttrs->default_options;
-  for (int i = 0; i < listSize; i++, ++kbDefaultOpts) {
-    if (kbDefaultOpts->scope != KM_KBP_OPT_KEYBOARD)
-      continue;
-    err_status =
-        km_kbp_state_option_lookup(kp->lpCoreKeyboardState, KM_KBP_OPT_KEYBOARD, kbDefaultOpts->key, &retValue);
-    if (err_status != KM_KBP_STATUS_OK) {
-      SendDebugMessageFormat(
-          0, sdmKeyboard, 0, "SaveKeyboardOptionsCore: km_kbp_state_option_lookup failed with error status [%d]", err_status);
-      continue;
-    }
-    savedKeyboardOpts[i].key   = CloneKMKBPCP(kbDefaultOpts->key);
-    savedKeyboardOpts[i].value = CloneKMKBPCP(retValue);
-    savedKeyboardOpts[i].scope = KM_KBP_OPT_KEYBOARD;
-  }
-  savedKeyboardOpts[listSize] = KM_KBP_OPTIONS_END;
-  return savedKeyboardOpts;
-}
-
-BOOL
-RestoreKeyboardOptionsCore(
-  km_kbp_state* const lpCoreKeyboardState,
-  km_kbp_option_item* lpCoreKeyboardOptions) {
-  km_kbp_status err_status = km_kbp_state_options_update(lpCoreKeyboardState, lpCoreKeyboardOptions);
-  if (err_status != KM_KBP_STATUS_OK) {
-    SendDebugMessageFormat(
-        0, sdmKeyboard, 0, "RestoreKeyboardOptionsCore: km_kbp_state_options_update failed with error status [%d]", err_status);
-    return FALSE;
-  }
-  return TRUE;
-}
-
-void
-DisposeKeyboardOptionsCore(km_kbp_option_item** lpCoreKeyboardOptions) {
-  size_t listSize          = km_kbp_options_list_size(*lpCoreKeyboardOptions);
-  for (int i = 0; i < (int)listSize; i++) {
-    delete[] (*lpCoreKeyboardOptions)[i].key;
-    delete[] (*lpCoreKeyboardOptions)[i].value;
-  }
-  delete[] *lpCoreKeyboardOptions;
-  *lpCoreKeyboardOptions = NULL;
 }

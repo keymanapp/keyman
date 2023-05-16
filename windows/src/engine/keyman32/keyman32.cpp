@@ -492,7 +492,6 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Exit(void)
   *Globals::Keyman_Shutdown() = TRUE;
 
   ReleaseKeyboards(TRUE);
-  Addin_Release();
 
   if(!Globals::get_Keyman_Initialised())
   {
@@ -803,8 +802,6 @@ void RefreshKeyboards(BOOL Initialising)
   _td->FInRefreshKeyboards = TRUE;
 
   // Can happen when multiple top-level windows for one process
-
-	Addin_Refresh();
 
 	SendDebugMessageFormat(0,sdmGlobal,0,"---ENTER RefreshKeyboards---");
 	//FInRefreshKeyboards = TRUE;

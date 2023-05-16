@@ -243,7 +243,6 @@ void keybd_shift(LPINPUT pInputs, int* n, BOOL isReset, LPBYTE const kbd);
 #include "keystate.h"
 
 #include "calldll.h"
-#include "addins.h"
 #include "keymancontrol.h"
 #include "keyboardoptions.h"
 #include "kmprocessactions.h"

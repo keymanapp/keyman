@@ -249,19 +249,6 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 	}
 
 	/*
-	 Handle WM_UNICHAR messages for RichEdit control -- should we test RichEdit version?
-	*/
-
-	if(mp->message == WM_UNICHAR && Addin_ShouldProcessUnichar(mp->hwnd))
-	{
-		if(Addin_ProcessUnichar(mp->hwnd, (DWORD) mp->wParam))
-		{
-			mp->message = 0;
-			return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
-		}
-	}
-
-	/*
 	 Handle wm_keyman_control_internal messages
 	*/
 
@@ -379,7 +366,6 @@ void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam)
 		  {
         if(_td->app) _td->app->ResetQueue();
 	  	  GetCapsAndNumlockState();
-  		  Addin_FocusChanged(hwnd);
 	  	  UpdateActiveWindows();
       }
     }

@@ -49,13 +49,13 @@ public:
    * @param   cPreservedKeys  number of preserved keys in pPreservedKeys - or the size pPreservedKeys needs to be
    * @return  BOOL  return TRUE on success
    */
-  BOOL MapKeyboardCore(km_kbp_keyboard *pKeyboard, PreservedKey **pPreservedKeys, size_t *cPreservedKeys);
+  BOOL MapKeyboard(km_kbp_keyboard *pKeyboard, PreservedKey **pPreservedKeys, size_t *cPreservedKeys);
 
 private:
   BOOL m_BaseKeyboardUsesAltGr;   // I4592
   UINT ShiftToTSFShift(UINT ShiftFlags);
   BOOL MapUSCharToVK(UINT *puKey, UINT *puShiftFlags);
-  BOOL MapKeyRuleCore(km_kbp_keyboard_key *pKeyRule, TF_PRESERVEDKEY *pPreservedKey);
+  BOOL MapKeyRule(km_kbp_keyboard_key *pKeyRule, TF_PRESERVEDKEY *pPreservedKey);
   BOOL IsMatchingKey(PreservedKey *pKey, PreservedKey *pKeys, size_t cKeys);
 };
 
@@ -198,7 +198,7 @@ UINT PreservedKeyMap::ShiftToTSFShift(UINT ShiftFlags)
 }
 
 BOOL
-PreservedKeyMap::MapKeyRuleCore(km_kbp_keyboard_key *pKeyRule, TF_PRESERVEDKEY *pPreservedKey) {
+PreservedKeyMap::MapKeyRule(km_kbp_keyboard_key *pKeyRule, TF_PRESERVEDKEY *pPreservedKey) {
   UINT ShiftFlags;
   UINT Key;
 
@@ -242,7 +242,7 @@ BOOL PreservedKeyMap::IsMatchingKey(PreservedKey *pKey, PreservedKey *pKeys, siz
 }
 
 BOOL
-PreservedKeyMap::MapKeyboardCore(km_kbp_keyboard *pKeyboard, PreservedKey **pPreservedKeys, size_t *cPreservedKeys) {
+PreservedKeyMap::MapKeyboard(km_kbp_keyboard *pKeyboard, PreservedKey **pPreservedKeys, size_t *cPreservedKeys) {
   size_t cKeys = 0, cRules = 0, n = 0;
   DWORD i;
 
@@ -297,7 +297,7 @@ PreservedKeyMap::MapKeyboardCore(km_kbp_keyboard *pKeyboard, PreservedKey **pPre
 
   for (i = 0; i < cRules; i++) {
     // If we have a key rule for the key, we should preserve it
-    if (MapKeyRuleCore(&kb_key_list[i], &pKeys[n].key)) {
+    if (MapKeyRule(&kb_key_list[i], &pKeys[n].key)) {
       // Don't attempt to add the same preserved key twice. Bad things happen
       if (!IsMatchingKey(&pKeys[n], pKeys, n)) {
         CoCreateGuid(&pKeys[n].guid);
@@ -341,5 +341,5 @@ extern "C" __declspec(dllexport) BOOL WINAPI GetKeyboardPreservedKeys(PreservedK
     return FALSE;
   }
   // use api to get key rules
-  return pkm.MapKeyboardCore(_td->lpActiveKeyboard->lpCoreKeyboard, pPreservedKeys, cPreservedKeys);
+  return pkm.MapKeyboard(_td->lpActiveKeyboard->lpCoreKeyboard, pPreservedKeys, cPreservedKeys);
 }
