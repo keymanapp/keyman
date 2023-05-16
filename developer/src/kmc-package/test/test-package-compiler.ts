@@ -281,8 +281,19 @@ describe('KmpCompiler', function () {
 
   // WARN_KeyboardVersionsDoNotMatchPackageVersion
 
-  it('should generate ERROR_KeyboardFileNotFound if <Keyboard> version does not match package version', async function() {
+  it('should generate WARN_KeyboardVersionsDoNotMatchPackageVersion if <Keyboard> version does not match package version', async function() {
     testForMessage(this, ['invalid', 'warn_keyboard_versions_do_not_match_package_version.kps'], CompilerMessages.WARN_KeyboardVersionsDoNotMatchPackageVersion);
   });
 
+  // ERROR_LanguageTagIsNotValid
+
+  it('should generate ERROR_LanguageTagIsNotValid if keyboard has an invalid language tag', async function() {
+    testForMessage(this, ['invalid', 'error_language_tag_is_not_valid.kps'], CompilerMessages.ERROR_LanguageTagIsNotValid);
+  });
+
+  // WARN_LanguageTagIsNotMinimal
+
+  it('should generate WARN_LanguageTagIsNotMinimal if keyboard has a non-minimal language tag', async function() {
+    testForMessage(this, ['invalid', 'warn_language_tag_is_not_minimal.kps'], CompilerMessages.WARN_LanguageTagIsNotMinimal);
+  });
 });
