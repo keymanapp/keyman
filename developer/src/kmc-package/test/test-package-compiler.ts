@@ -296,4 +296,11 @@ describe('KmpCompiler', function () {
   it('should generate WARN_LanguageTagIsNotMinimal if keyboard has a non-minimal language tag', async function() {
     testForMessage(this, ['invalid', 'warn_language_tag_is_not_minimal.kps'], CompilerMessages.WARN_LanguageTagIsNotMinimal);
   });
+
+  // ERROR_MustHaveAtLeastOneLanguage
+
+  it('should generate ERROR_MustHaveAtLeastOneLanguage if model or keyboard has zero language tags', async function() {
+    testForMessage(this, ['invalid', 'keyman.en.error_must_have_at_least_one_language.model.kps'],
+      CompilerMessages.ERROR_MustHaveAtLeastOneLanguage);
+  });
 });

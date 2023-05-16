@@ -94,5 +94,9 @@ export class CompilerMessages {
   static Warn_LanguageTagIsNotMinimal = (o: {resourceType: string, id:string, actual:string, expected:string}) => m(this.WARN_LanguageTagIsNotMinimal,
     `Language tag '${o.actual}' in ${o.resourceType} ${o.id} is not minimal, and should be '${o.expected}'.`);
   static WARN_LanguageTagIsNotMinimal = SevWarn | 0x0015;
+
+  static Error_MustHaveAtLeastOneLanguage = (o:{resourceType:string, id:string}) => m(this.ERROR_MustHaveAtLeastOneLanguage,
+    `The ${o.resourceType} ${o.id} must have at least one language specified.`);
+  static ERROR_MustHaveAtLeastOneLanguage = SevError | 0x0016;
 }
 
