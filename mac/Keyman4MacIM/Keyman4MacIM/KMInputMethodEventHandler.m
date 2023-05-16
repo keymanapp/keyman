@@ -9,6 +9,7 @@
 #import "KMInputMethodEventHandlerProtected.h"
 #import <KeymanEngine4Mac/KeymanEngine4Mac.h>
 #include <Carbon/Carbon.h> /* For kVK_ constants. */
+#include "KMContext.h"
 #include "KeySender.h"
 #import "KMCoreActionHandler.h"
 //TODO: remove debug call to PrivacyConsent
@@ -17,6 +18,7 @@
 @import Sentry;
 
 @interface KMInputMethodEventHandler ()
+@property KMContext *context;
 @property (nonatomic, retain) KeySender* keySender;
 @property int generatedBackspaceCount;
 @end
@@ -126,6 +128,7 @@ NSRange _previousSelRange;
     NSLog(@"***SGS initWithClient clientAppId = %@", clientAppId);
     self.senderForDeleteBack = sender;
     _keySender = [[KeySender alloc] init];
+    _context = [[KMContext alloc] init];
     _generatedBackspaceCount = 0;
   
     BOOL legacy = [self isClientAppLegacy:clientAppId];

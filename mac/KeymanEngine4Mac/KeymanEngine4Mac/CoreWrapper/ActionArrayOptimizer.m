@@ -2,7 +2,7 @@
  * Keyman is copyright (C) SIL International. MIT License.
  * 
  * ActionArrayOptimizer.m
- * CoreTesterApp
+ * Keyman
  * 
  * Created by Shawn Schantz on 2023-02-23.
  * 

@@ -2,7 +2,7 @@
  * Keyman is copyright (C) SIL International. MIT License.
  * 
  * CoreAction.h
- * CoreTesterApp
+ * Keyman
  * 
  * Created by Shawn Schantz on 2023-02-21.
  * 

@@ -2,7 +2,7 @@
  * Keyman is copyright (C) SIL International. MIT License.
  * 
  * CoreWrapper.h
- * CoreTester
+ * Keyman
  * 
  * Created by Shawn Schantz on 2022-12-12.
  */

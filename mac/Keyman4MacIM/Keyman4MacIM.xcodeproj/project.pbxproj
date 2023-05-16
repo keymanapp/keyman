@@ -21,6 +21,7 @@
 		299ABD7129ECE75B00AA5948 /* KeySender.m in Sources */ = {isa = PBXBuildFile; fileRef = 299ABD6F29ECE75B00AA5948 /* KeySender.m */; };
 		299B5E2029126CA20070841D /* keyman-icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 299B5E1E29126CA20070841D /* keyman-icon@2x.png */; };
 		299B5E2129126CA20070841D /* keyman-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 299B5E1F29126CA20070841D /* keyman-icon.png */; };
+		29A983C72A136A7100078B43 /* KMContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 29A983C62A136A7100078B43 /* KMContext.m */; };
 		29B42A572728339900EDD5D3 /* KMInfoWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 29B42A592728339900EDD5D3 /* KMInfoWindowController.xib */; };
 		29B42A602728343B00EDD5D3 /* KMKeyboardHelpWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 29B42A622728343B00EDD5D3 /* KMKeyboardHelpWindowController.xib */; };
 		37A245C12565DFA6000BBF92 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37A245C02565DFA6000BBF92 /* Assets.xcassets */; };
@@ -200,6 +201,8 @@
 		29A4730827E9D6D700DE07C7 /* ha */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ha; path = ha.lproj/KMKeyboardHelpWindowController.strings; sourceTree = "<group>"; };
 		29A4730927E9D6D700DE07C7 /* ha */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ha; path = ha.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		29A4730A27E9D84B00DE07C7 /* ha */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ha; path = ha.lproj/Localizable.strings; sourceTree = "<group>"; };
+		29A983C52A136A7000078B43 /* KMContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMContext.h; sourceTree = "<group>"; };
+		29A983C62A136A7100078B43 /* KMContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMContext.m; sourceTree = "<group>"; };
 		29B27FF229062FF50036917E /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/KMAboutWindowController.strings; sourceTree = "<group>"; };
 		29B27FF329062FF50036917E /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/preferences.strings; sourceTree = "<group>"; };
 		29B27FF429062FF50036917E /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/KMInfoWindowController.strings; sourceTree = "<group>"; };
@@ -560,6 +563,8 @@
 				E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */,
 				2996D63829F2719F00DF4D56 /* KMCoreActionHandler.h */,
 				2996D63929F2719F00DF4D56 /* KMCoreActionHandler.m */,
+				29A983C52A136A7000078B43 /* KMContext.h */,
+				29A983C62A136A7100078B43 /* KMContext.m */,
 				E24C79EC1FFFEA6B00D8E46F /* KMInputMethodEventHandlerProtected.h */,
 				E22020F920050D6300B74FAC /* KMInputMethodBrowserClientEventHandlerProtected.h */,
 				E24C79EB1FFFCE3000D8E46F /* KMInputMethodBrowserClientEventHandler.h */,
@@ -988,6 +993,7 @@
 				9836B3721AE5F11D00780482 /* unzip.c in Sources */,
 				296FE2FC275DD21600F46898 /* KMPackageReader.m in Sources */,
 				9832472E1A9EABC70010B90C /* KMConfigColumn1CellView.m in Sources */,
+				29A983C72A136A7100078B43 /* KMContext.m in Sources */,
 				E22020F6200506F300B74FAC /* KMInputMethodSafariClientEventHandler.m in Sources */,
 				E24C79EA1FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m in Sources */,
 				297A501928DF4D360074EB1B /* PrivacyConsent.m in Sources */,
