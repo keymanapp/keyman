@@ -8,9 +8,9 @@ build:
     $(MSBUILD) editor.vcxproj $(MSBUILD_BUILD) /p:Platform=x86
 		$(MSBUILD) editor.vcxproj $(MSBUILD_BUILD) /p:Platform=x64
     $(COPY) $(WIN32_TARGET_PATH)\editor32.exe $(PROGRAM)\support
-    $(COPY) $(WIN32_TARGET_PATH)\editor32.pdb $(PROGRAM)\support
+    $(COPY) $(WIN32_TARGET_PATH)\editor32.pdb $(DEBUGPATH)\support
 		$(COPY) $(X64_TARGET_PATH)\editor64.exe $(PROGRAM)\support
-    $(COPY) $(X64_TARGET_PATH)\editor64.pdb $(PROGRAM)\support
+    $(COPY) $(X64_TARGET_PATH)\editor64.pdb $(DEBUGPATH)\support
 
 clean: def-clean
     $(MSBUILD) $(MSBUILD_CLEAN) editor.sln
