@@ -60,8 +60,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     this._eventsObj = eventsClosure;
 
     this.page = new PageContextAttachment(window.document, {
-      hostDevice: this.config.hostDevice,
-      isTopLevel: true
+      hostDevice: this.config.hostDevice
     });
 
     this.engineConfig.deferForInitialization.then(() => {
@@ -141,7 +140,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       Ltarg = target.docRoot;
     }
     if(Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLElement) {
-      _SetTargDir(Ltarg, this.activeKeyboard.keyboard);
+      _SetTargDir(Ltarg, this.activeKeyboard?.keyboard);
     }
 
     this.emit('targetchange', target);
@@ -191,7 +190,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     let target = this.currentTarget || this.mostRecentTarget;
     let attachmentInfo = target?.getElement()._kmwAttachment;
 
-    if(attachmentInfo?.keyboard) {
+    if(attachmentInfo?.keyboard || attachmentInfo?.keyboard === '') {
       return target;
     } else {
       return null;
@@ -207,8 +206,11 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       this.globalKeyboard = kbd;
     } else {
       // if set with an "independent keyboard", changes only the active target's keyboard.
-      attachment.keyboard = kbd.metadata.id;
-      attachment.languageCode = kbd.metadata.langId;
+      //
+      // This method is not called on the pathway to shift a control back to 'global keyboard' mode;
+      // only after.
+      attachment.keyboard = kbd?.metadata.id ?? '';
+      attachment.languageCode = kbd?.metadata.langId ?? '';
     }
 
     if(this.keyboardTarget == target) {
@@ -226,7 +228,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    * @param target
    * @param metadata
    */
-  public setKeyboardForTarget(target: OutputTarget<any>, metadata: KeyboardStub) {
+  public setKeyboardForTarget(target: OutputTarget<any>, kbdId: string, langId: string) {
     if(target instanceof DesignIFrame) {
       console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
       return;
@@ -237,8 +239,9 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     if(!attachment) {
       return;
     } else {
-      attachment.keyboard = metadata.id;
-      attachment.languageCode = metadata.langId;
+      // If directly set
+      attachment.keyboard = kbdId || null;
+      attachment.languageCode = langId || null;
 
       if(this.keyboardTarget == target) {
         this.activateKeyboard(attachment.keyboard, attachment.languageCode, true);
@@ -260,7 +263,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       // Only do these if the active keyboard-target still matches the original keyboard-target;
       // otherwise, maintain what's correct for the currently active one.
       if(originalKeyboardTarget == this.keyboardTarget) {
-        // TODO: app/browser - _SetTargDir (within its ContextManager)
+        _SetTargDir(this.currentTarget?.getElement(), this.keyboardCache.getKeyboard(keyboardId));
         // util.addStyleSheet(domManager.setAttachmentFontStyle(kbdStub.KF));
        this.focusAssistant.restoringFocus = true;
       }
@@ -299,7 +302,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    */
   _BlurKeyboardSettings(lastElem: HTMLElement, PInternalName?: string, PLgCode?: string) {
     var keyboardID = this.activeKeyboard ? this.activeKeyboard.keyboard.id : '';
-    var langCode = this.activeKeyboard.metadata.langId;
+    var langCode = this.activeKeyboard?.metadata.langId;
 
     if(PInternalName !== undefined && PLgCode !== undefined) {
       keyboardID = PInternalName;
@@ -354,13 +357,10 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     // const outputTarget = dom.Utils.getOutputTarget(target);
 
-    let activeKeyboard = this.activeKeyboard.keyboard;
+    let activeKeyboard = this.activeKeyboard?.keyboard;
     if(!focusAssistant.restoringFocus) {
       outputTarget?.deadkeys().clear();
-
-      if(activeKeyboard) {
-        activeKeyboard.notify(0, outputTarget, 1);  // I2187
-      }
+      activeKeyboard?.notify(0, outputTarget, 1);  // I2187
     }
 
     //if(!focusAssistant.restoringFocus && DOMEventHandlers.states._SelectionControl != target) {
@@ -411,7 +411,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     // //Execute external (UI) code needed on focus if required
     this.apiEvents.callEvent('controlfocused', {
       target: target.getElement(),
-      activeControl: previousTarget.getElement()
+      activeControl: previousTarget?.getElement()
     });
 
     return true;
