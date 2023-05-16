@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 17.0.108 alpha 2023-05-16
+
+* feat(windows): add text editor to the support makefile (#8750)
+* feat(developer): verify keyboard versions in kmc-package (#8769)
+* feat(developer): verify bcp47 tags are valid and minimal in kmc-package (#8778)
+* feat(developer): verify at least one language in package (#8783)
+* chore(developer): verify file types of content files in package (#8792)
+* chore(developer): verify that package has at least a model or keyboard (#8793)
+* chore(ios): Changes required for XCode 14.3 (#8746)
+
 ## 17.0.107 alpha 2023-05-15
 
 * chore(linux): Fix installation build step on TC (#8784)
