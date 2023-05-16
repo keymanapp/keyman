@@ -121,7 +121,8 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
       // For any elements being detached, disabled, or deliberately not being attached (b/c nonKMWTouchHandler)...
       this.page.on('disabled', (elem) => {
-        if(!(elem._kmwAttachment.interface instanceof DesignIFrame)) {
+        // Note:  we may not actually be attached at this point.
+        if(!(nestedInstanceOf(elem, "HTMLIFrameElement"))) {
           // For anything attached but (design-mode) iframes...
 
           // This block:  has to do with maintaining focus.
@@ -152,8 +153,8 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
         }
 
         // This block:  has to do with maintaining focus (and consequences)
-        var lastElem = this.mostRecentTarget.getElement();
-        if(lastElem == elem) {
+        var lastElem = this.mostRecentTarget?.getElement();
+        if(lastElem && lastElem == elem) {
           this.forgetActiveTarget(); // should already auto-hide the OSK while at it via event.
         }
       });
