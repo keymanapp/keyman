@@ -55,7 +55,7 @@ export class PackageVersionValidation {
         this.callbacks.reportMessage(CompilerMessages.Warn_KeyboardVersionsDoNotMatchPackageVersion({
           keyboard: kmp.keyboards[0].id,
           keyboardVersion: kmp.keyboards[0].version,
-          packageVersion: kmp.info.version.description
+          packageVersion: kmp.info.version?.description
         }));
       }
     }

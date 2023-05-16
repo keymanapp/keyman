@@ -106,5 +106,9 @@ export class CompilerMessages {
   static Warn_DocFileDangerous = (o:{filename:string}) => m(this.WARN_DocFileDangerous,
     `Microsoft Word .doc or .docx files ('${o.filename}') are not portable. You should instead use HTML or PDF format.`);
   static WARN_DocFileDangerous = SevWarn | 0x0018;
+
+  static Error_PackageMustContainAModelOrAKeyboard = () => m(this.ERROR_PackageMustContainAModelOrAKeyboard,
+    `Package must contain a lexical model or a keyboard.`);
+  static ERROR_PackageMustContainAModelOrAKeyboard = SevError | 0x0019;
 }
 
