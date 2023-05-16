@@ -7,7 +7,16 @@ import {
 import { PathConfiguration } from "keyman/engine/paths";
 
 // TODO:  is cleanup needed here, to use local paths instead?
-import { CloudQueryEngine, type ErrorStub, KeyboardAPISpec, KeyboardStub, StubAndKeyboardCache, RawKeyboardStub, mergeAndResolveStubPromises } from "./index.js";
+import {
+  CloudQueryEngine,
+  type ErrorStub,
+  KeyboardAPISpec,
+  KeyboardStub,
+  StubAndKeyboardCache,
+  RawKeyboardStub,
+  mergeAndResolveStubPromises,
+  toUnprefixedKeyboardId as unprefixed
+ } from "./index.js";
 import { default as CloudRequesterInterface } from "./cloud/requesterInterface.js";
 
 class CloudRequestEntry {
@@ -158,7 +167,8 @@ export default class KeyboardRequisitioner {
       }
 
       // Requests not of string form never specify a specific version.
-      const querySpec = toQuerySpecs(incomplete.id, incomplete.langId);
+      // If an 'incomplete stub', we may have prefixed the keyboard ID - undo that!
+      const querySpec = toQuerySpecs(unprefixed(incomplete.id), incomplete.langId);
       if(isUniqueRequest(this.cache, cloudList, querySpec)) {
         cloudList.push(querySpec);
       }
@@ -262,8 +272,17 @@ export default class KeyboardRequisitioner {
       return Promise.reject(errorStubs);
     }
 
-    return this.cloudQueryEngine.keymanCloudRequest('&keyboardid='+cmd, false).then((result) => {
-      return mergeAndResolveStubPromises(result, errorStubs);
+    return this.cloudQueryEngine.keymanCloudRequest('&keyboardid='+cmd, false).then(async (result) => {
+      const results = await mergeAndResolveStubPromises(result, errorStubs);
+
+      for(let result of results) {
+        // If not an error stub...
+        if(typeof result['error'] == 'undefined') {
+          this.cache.addStub(result as KeyboardStub);
+        }
+      }
+
+      return results;
     }, (err) => {
       console.error(err);
       let stub: ErrorStub = {error: err};
