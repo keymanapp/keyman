@@ -30,7 +30,7 @@ let es5ClassAnnotationAsPurePlugin = {
   }
 }
 
-const modules = ['kmwuibutton', 'kmwuitoggle', 'kmwuitoolbar'];
+const modules = ['kmwuibutton', 'kmwuifloat', 'kmwuitoggle', 'kmwuitoolbar'];
 
 for(let module of modules) {
   await esbuild.build({

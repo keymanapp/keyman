@@ -8,6 +8,7 @@ import {
  } from "keyman/engine/dom-utils";
 import { DomEventTracker } from "keyman/engine/events";
 import { BrowserConfiguration, BrowserInitOptionSpec } from "./configuration.js";
+import { getStyleValue } from "./utils/getStyleValue.js";
 
 /**
  * Calls document.createElement for the specified node type and also applies
@@ -204,6 +205,8 @@ export class UtilApiEndpoint {
     // TS can't quite track the type inference forwarding here.
     this.domEventTracker.detachDOMEvent(Pelem as any, Peventname as any, Phandler, PuseCapture);
   }
+
+  getStyleValue = getStyleValue;
 
   shutdown() {
     this.stylesheetManager?.unlinkAll();

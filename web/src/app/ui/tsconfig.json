@@ -10,7 +10,7 @@
   "extends": "../../tsconfig.base.json",
   "files": [
 		"kmwuibutton.ts",
-		// "kmwuifloat.ts",
+		"kmwuifloat.ts",
 		"kmwuitoggle.ts",
 		"kmwuitoolbar.ts"
   ],
