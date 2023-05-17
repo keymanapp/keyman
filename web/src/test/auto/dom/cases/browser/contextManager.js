@@ -232,8 +232,6 @@ describe('app/browser:  ContextManager', function () {
       contextManager.on('targetchange', targetchange);
 
       const textarea = document.getElementById('textarea');
-      // Assumes we're testing with Chrome, not Firefox - the latter needs to be
-      // against the contentDocument, not its .body, I think.
       dispatchFocus('focus', textarea);
 
       assert.equal(contextManager.activeTarget?.getElement(), textarea, ".activeTarget not updated when element gained focus");
@@ -273,8 +271,6 @@ describe('app/browser:  ContextManager', function () {
       contextManager.on('targetchange', targetchange);
 
       const editable = document.getElementById('editable');
-      // Assumes we're testing with Chrome, not Firefox - the latter needs to be
-      // against the contentDocument, not its .body, I think.
       dispatchFocus('focus', editable);
 
       assert.equal(contextManager.activeTarget?.getElement(), editable, ".activeTarget not updated when element gained focus");
