@@ -95,7 +95,7 @@ if(!keyman?.ui?.name) {
         if(focusing) {
           this.controller.style.display = 'block';
         } else {
-          if(!(keymanweb['getUIState']()['activationPending']) && !this.controllerHovered) {
+          if(!(keymanweb.getUIState().activationPending) && !this.controllerHovered) {
             this.controller.style.display = 'none';
           }
         }
@@ -104,8 +104,8 @@ if(!keyman?.ui?.name) {
         let w: number, h: number;
 
         const p = util.getAbsolute(someElement);
-        let x = p['x'];
-        let y = p['y'];
+        let x = p.x;
+        let y = p.y;
 
         var ownerDoc = someElement.ownerDocument;
         if(ownerDoc.designMode == 'on' && ownerDoc.defaultView && ownerDoc.defaultView.frameElement) {
@@ -220,12 +220,12 @@ if(!keyman?.ui?.name) {
           this.lastActiveKeyboard = 0;
         } else {
           if(this.lastActiveKeyboard == this.keyboards.length-1) {
-            keymanweb['setActiveKeyboard']('');
+            keymanweb.setActiveKeyboard('');
             _v = false;
           } else {
             kbdName = this.keyboards[++this.lastActiveKeyboard]._InternalName;
             lgCode = this.keyboards[this.lastActiveKeyboard]._LanguageCode;
-            keymanweb['setActiveKeyboard'](kbdName,lgCode);
+            keymanweb.setActiveKeyboard(kbdName,lgCode);
             _v = true;
           }
         }
@@ -415,7 +415,7 @@ if(!keyman?.ui?.name) {
         const v1=util.loadCookie<KeyboardCookie>('KeymanWeb_Keyboard');
         let kbdEnabledOnLoad=false;
         if(typeof(v1.current) != 'undefined') {
-          kbdEnabledOnLoad = (v1['current'].indexOf('---') < 0);
+          kbdEnabledOnLoad = (v1.current.indexOf('---') < 0);
         }
 
         this.kbdButton = this.button('kmw_logo_16.gif', 'Use Web Keyboard', kbdEnabledOnLoad);
@@ -477,7 +477,7 @@ if(!keyman?.ui?.name) {
        * Description  Rebuild the UI and keyboard list
        **/
       readonly updateKeyboardList = () => {
-        if(!(keymanweb['initialized'] || this.initialized)) {
+        if(!(keymanweb.initialized || this.initialized)) {
           return; //TODO: may want to restart the timer??
         }
 
@@ -513,8 +513,8 @@ if(!keyman?.ui?.name) {
           this.kbdButton.getElem().id = 'kmwico';
           this.kbdButton.getElem().style.width = '24px';
 
-          var Lki=_kbds[0]['InternalName'];
-          var Lklc=_kbds[0]['LanguageCode'];
+          var Lki=_kbds[0].InternalName;
+          var Lklc=_kbds[0].LanguageCode;
           this.controller.style.background = 'url('+imgPath+'kmwcontroller2.gif)';
           this.keyboards.push({_InternalName: Lki, _LanguageCode: Lklc, _Index: 0});
           this.kbdButton._onclick = this.switchSingleKbd;
@@ -531,7 +531,7 @@ if(!keyman?.ui?.name) {
         }
 
         // Highlight the last active keyboard
-        var sk=keymanweb['getSavedKeyboard']().split(':');
+        var sk=keymanweb.getSavedKeyboard().split(':');
         this.updateMenu(sk[0],sk[1]);
       }
 
@@ -720,7 +720,7 @@ if(!keyman?.ui?.name) {
 
           _a1.href="#";
           _a1.onclick = ((x) => { return () => this.selectKbd(x); })(this.keyboards.length-1);
-          _a1.id='KMWSel_'+_kbds[_kbd]['InternalName']+'$'+_n;
+          _a1.id='KMWSel_'+_kbds[_kbd].InternalName+'$'+_n;
 
           _li1.appendChild(_a1);
           this.keyboardMenu.appendChild(_li1);
