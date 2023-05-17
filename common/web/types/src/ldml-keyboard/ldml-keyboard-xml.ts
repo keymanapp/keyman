@@ -29,7 +29,6 @@ export interface LKKeyboard {
   vkeys?: LKVkeys;
   variables?: LKVariables;
   transforms?: LKTransforms[];
-  reorders?: LKReorders;
 };
 
 /**
@@ -157,8 +156,8 @@ interface LKSet extends Variable {};
 interface LKUnicodeSet extends Variable {};
 
 export interface LKTransforms {
-  type?: "simple" | "final";
-  transform: LKTransform[];
+  type?: "simple" | "backspace";
+  transformGroup?: LKTransformGroup[];
 };
 
 export interface LKTransform {
@@ -168,7 +167,14 @@ export interface LKTransform {
   error?: "fail";
 };
 
-export interface LKReorders {
+export interface LKTransformGroup {
+
+};
+
+export interface LKTransformTransformGroup extends LKTransformGroup {
+  transform: LKTransform[];
+};
+export interface LKReorderGroup extends LKTransformGroup {
   reorder: LKReorder[];
 };
 

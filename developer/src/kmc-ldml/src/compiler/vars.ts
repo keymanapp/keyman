@@ -10,8 +10,6 @@ import UnicodeSetItem = KMXPlus.UnicodeSetItem;
 import GlobalSections = KMXPlus.GlobalSections;
 
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
-// import LKTransform = LDMLKeyboard.LKTransform;
-// import LKTransforms = LDMLKeyboard.LKTransforms;
 import { CompilerMessages } from "./messages.js";
 
 export class VarsCompiler extends SectionCompiler {

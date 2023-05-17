@@ -206,7 +206,7 @@ export class UnicodeSetItem extends VarsItem {
 export class SetVarItem extends VarsItem {
   constructor(id: string, value: string, sections: GlobalSections) {
     super(id, value, sections);
-    this.items = sections.elem.allocElementString(sections.strs, value.split(/\s+/)); // TODO-LDML
+    this.items = sections.elem.allocElementString(sections.strs, value.trim().split(/\s+/)); // TODO-LDML
   }
   items: ElementString;
   valid() : boolean {
