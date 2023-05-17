@@ -71,7 +71,7 @@ BOOL GetKeyboardFileName(LPSTR kbname, LPSTR buf, int nbuf)
 
 BOOL LoadlpKeyboard(int i)
 {
-  SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboard: Enter ---");
+  SendDebugMessageFormat(0, sdmLoad, 0, "%s: Enter ---", __FUNCTION__);
 
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return FALSE;
