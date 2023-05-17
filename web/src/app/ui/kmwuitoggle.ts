@@ -53,8 +53,8 @@ if(!keyman?.ui?.name) {
        * The top-level element of the Toggle UI module.
        */
       controller: HTMLDivElement = null;
-      oskButton = null;  // inner class - Button, as defined within the .button method
-      kbdButton = null;  // likewise.
+      oskButton: ReturnType<ToggleUI['button']> = null;  // inner class - Button, as defined within the .button method
+      kbdButton: ReturnType<ToggleUI['button']> = null;  // likewise.
       controllerHovered = false;
 
       keyboards: KeyboardMenuEntry[] = [];
