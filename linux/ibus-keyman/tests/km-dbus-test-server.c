@@ -59,9 +59,9 @@ static const sd_bus_vtable exit_test_service_vtable[] = {
 };
 
 static const void exit_loop(sd_bus_slot *slot, sd_bus *bus) {
-  sd_bus_release_name(bus, KEYMAN_TESTSVC_BUS_NAME);
-  sd_bus_slot_unref(slot);
-  sd_bus_close_unref(bus);
+  if (bus)  sd_bus_release_name(bus, KEYMAN_TESTSVC_BUS_NAME);
+  if (slot) sd_bus_slot_unref(slot);
+  if (bus)  sd_bus_close_unref(bus);
 }
 
 static void
@@ -74,6 +74,7 @@ loop() {
 
   if (ret < 0) {
     g_error("Failed to connect to system bus: %s", strerror(-ret));
+    exit_loop(slot, bus);
     return;
   }
 
