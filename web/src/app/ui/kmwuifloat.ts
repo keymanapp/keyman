@@ -234,7 +234,7 @@ if(!keyman?.ui?.name) {
           }
 
           // Loop over installed keyboards and add to selection list
-          var Lkbds=keymanweb['getKeyboards']();
+          var Lkbds=keymanweb.getKeyboards();
 
           for(let Ln=0; Ln<Lkbds.length; Ln++) {
             let Lopt = util.createElement('option');
@@ -245,7 +245,7 @@ if(!keyman?.ui?.name) {
               // Only show the main language name if variants indicated (this is tentative)
               // e.g. Chinese rather than Chinese, Mandarin, which is in the keyboard name
               lg = lg.split(',')[0];
-              if(Lkbds[Ln]['Name'].search(lg) == -1) {
+              if(Lkbds[Ln].Name.search(lg) == -1) {
                 Lopt.innerHTML = lg+' ('+Lopt.innerHTML+')';  // I1300 - Language support
               }
             }
@@ -396,7 +396,7 @@ if(!keyman?.ui?.name) {
          * Hide OSK event handler
          */
 
-        osk['addEventListener']('hide', (hiddenByUser) => {
+        osk.addEventListener('hide', (hiddenByUser) => {
           if(this.initialized) {
             this.oskButtonState(false);
           }
@@ -558,7 +558,7 @@ if(!keyman?.ui?.name) {
       }
     }
 
-    const ui=keymanweb['ui'] = new UIFloat();
+    const ui=keymanweb.ui = new UIFloat();
 
     //TODO:  had to expose properties of params - what does that do? (focus event doesn't normally include these properties?)
     keymanweb.addEventListener('controlfocused', (params) => {

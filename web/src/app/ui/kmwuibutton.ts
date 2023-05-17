@@ -655,7 +655,7 @@ if(!keyman?.ui?.name) {
 `
     }
 
-    const ui = keymanweb['ui'] = new UIButton();
+    const ui = keymanweb.ui = new UIButton();
 
     /**
      * Keyboard registration event handler
