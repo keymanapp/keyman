@@ -25,9 +25,9 @@ install:
 
 wrap-symbols:
 		$(SYMSTORE) $(PROGRAM)\support\editor32.exe /t keyman-windows
-		$(SYMSTORE) $(PROGRAM)\support\editor32.exe /t keyman-windows
+		$(SYMSTORE) $(PROGRAM)\support\editor64.exe /t keyman-windows
 		$(SYMSTORE) $(DEBUGPATH)\support\editor32.pdb /t keyman-windows
-		$(SYMSTORE) $(DEBUGPATH)\support\editor32.pdb /t keyman-windows
+		$(SYMSTORE) $(DEBUGPATH)\support\editor64.pdb /t keyman-windows
 
 
 !include ..\..\Target.mak
