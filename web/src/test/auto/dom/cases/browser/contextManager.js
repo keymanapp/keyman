@@ -162,6 +162,12 @@ describe('app/browser:  ContextManager', function () {
       deferForInitialization: Promise.resolve(),
       hostDevice: {... TEST_PHYSICAL_DEVICE},
       attachType: 'auto',
+      // Used when setting keyboard-specific fonts to attached controls
+      paths: {
+        // We don't care if the font actually exists at the location for these tests;
+        // a simple placeholder will do.
+        'fonts': ''
+      }
       // signalUser may be relevant for some tests.
     }, () => new LegacyEventEmitter());
 
