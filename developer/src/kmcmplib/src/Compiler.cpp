@@ -69,7 +69,7 @@
 #include <kmcmplibapi.h>
 
 #include "compfile.h"
-#include <comperr.h>
+#include <kmn_compiler_errors.h>
 #include "../../../../common/windows/cpp/include/vkeys.h"
 #include <cuchar>
 #include "versioning.h"
@@ -106,11 +106,12 @@
 #define PRIMARYLANGID(lgid)    ((uint16_t)(lgid) & 0x3ff)
 #define SUBLANGID(lgid)        ((uint16_t)(lgid) >> 10)
 
+#define COMPILE_ERROR_MAX_LEN (SZMAX_ERRORTEXT + 1 + 280)
 
 using namespace kmcmp;
 
-  char ErrExtraLIB[256];
-  KMX_WCHAR ErrExtraW[256];
+  char ErrExtraLIB[ERR_EXTRA_LIB_LEN];
+  KMX_WCHAR ErrExtraW[ERR_EXTRA_W_LEN];
   KMX_BOOL AWarnDeprecatedCode_GLOBAL_LIB;
 
 namespace kmcmp{
@@ -265,7 +266,7 @@ KMX_BOOL kmcmp::AddCompileWarning(PKMX_CHAR buf)
 
 KMX_BOOL AddCompileError(KMX_DWORD msg)
 {
-  KMX_CHAR szText[SZMAX_ERRORTEXT + 1 + 280];
+  KMX_CHAR szText[COMPILE_ERROR_MAX_LEN];
   KMX_CHAR* szTextp = NULL;
 
   if (msg & CERR_FATAL)
@@ -282,16 +283,18 @@ KMX_BOOL AddCompileError(KMX_DWORD msg)
 
   if (szTextp) {
     strcpy(szText, szTextp);
-  }
-  else {
-    sprintf(szText, "Unknown error %x", msg);
+  } else {
+    snprintf(szText, COMPILE_ERROR_MAX_LEN, "Unknown error %x", msg);
   }
 
-  if (kmcmp::ErrChr > 0)
-    sprintf(strchr(szText, 0), " character offset: %d", kmcmp::ErrChr);
+  if (kmcmp::ErrChr > 0) {
+    char *szTextNull = strchr(szText, 0);
+    snprintf(szTextNull, COMPILE_ERROR_MAX_LEN-(szTextNull-szText), " character offset: %d", kmcmp::ErrChr);
+  }
 
   if (*ErrExtraLIB) {
-    sprintf(strchr(szText, 0), "%s", ErrExtraLIB);
+    char *szTextNull = strchr(szText, 0);
+    snprintf(szTextNull, COMPILE_ERROR_MAX_LEN-(szTextNull-szText), "%s", ErrExtraLIB);
   }
 
   ErrChr = 0;  *ErrExtraLIB =0;
@@ -1023,20 +1026,20 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
       // Strip path from the store, leaving bare filename only
       p = sp->dpString;
 
-      KMX_WCHAR *pp = (KMX_WCHAR*) u16rchr_slash((const PKMX_WCHAR) p);
+      KMX_WCHAR *pp2 = (KMX_WCHAR*) u16rchr_slash((const PKMX_WCHAR) p);
 
-      if (!pp) {
-        pp = p;
+      if (!pp2) {
+        pp2 = p;
       } else {
-        pp++;
+        pp2++;
       }
-      q = new KMX_WCHAR[u16len(pp) + 1];
-      u16ncpy(q, pp, u16len(pp) + 1);
+      q = new KMX_WCHAR[u16len(pp2) + 1];
+      u16ncpy(q, pp2, u16len(pp2) + 1);
 
       // Change compiled reference file extension to .kvk
-      pp = ( km_kbp_cp *) u16chr(q, 0) - 5;
-      if (pp > q && u16icmp(pp, u".kvks") == 0) {
-        pp[4] = 0;
+      pp2 = ( km_kbp_cp *) u16chr(q, 0) - 5;
+      if (pp2 > q && u16icmp(pp2, u".kvks") == 0) {
+        pp2[4] = 0;
       }
 
       delete[] sp->dpString;
@@ -1270,7 +1273,7 @@ KMX_BOOL CheckContextStatementPositions(PKMX_WCHAR context) {
 /**
  *  Checks if a use() statement is followed by other content in the output of a rule
  */
-KMX_DWORD CheckUseStatementsInOutput(const PFILE_GROUP gp,PKMX_WCHAR output) {
+KMX_DWORD CheckUseStatementsInOutput(PKMX_WCHAR output) {
   KMX_BOOL hasUse = FALSE;
   PKMX_WCHAR p;
   for (p = output; *p; p = incxstr(p)) {
@@ -1404,7 +1407,7 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
   if ((msg = CheckStatementOffsets(fk, gp, pklIn, pklOut, pklKey)) != CERR_None) return msg;
 
   // Test that use() statements are not followed by other content
-  if ((msg = CheckUseStatementsInOutput(gp, pklOut)) != CERR_None) {
+  if ((msg = CheckUseStatementsInOutput(pklOut)) != CERR_None) {
     return msg;   // I4867
   }
 
@@ -1718,20 +1721,20 @@ KMX_BOOL StrValidChrs(PKMX_WCHAR q, KMX_WCHAR const * chrs)
 }
 
 KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
-  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode
+  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isUnicode
 );
 
 KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
-  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode
+  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int /*isVKey*/, int isUnicode
 ) {
   PKMX_WCHAR tstr = new KMX_WCHAR[max];    // I2432 - Allocate buffers each line -- slightly slower but safer than keeping a single buffer - GetXString is re-entrant with if()
-  KMX_DWORD err = GetXStringImpl(tstr, fk, str, token, output, max, offset, newp, isVKey, isUnicode);
+  KMX_DWORD err = GetXStringImpl(tstr, fk, str, token, output, max, offset, newp, isUnicode);
   delete[] tstr;
   return err;
 }
 
 KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
-  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode
+  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isUnicode
 ) {
   KMX_DWORD err;
   PKMX_WCHAR p = str, q, r;
@@ -1794,7 +1797,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 99:
       if (tokenFound) break;
       {
-        sprintf(ErrExtraLIB,"token: %c",(int)*p);
+        snprintf(ErrExtraLIB, ERR_EXTRA_LIB_LEN, "token: %c",(int)*p);
       }
       return CERR_InvalidToken;
     case 0:
@@ -1966,12 +1969,12 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         if (q && *q)
         {
           VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_Contextn);
-          int n1;
-          n1 = atoiW(q);
-          if (n1 < 1 || n1 >= 0xF000) return CERR_InvalidToken;
+          int n1b;
+          n1b = atoiW(q);
+          if (n1b < 1 || n1b >= 0xF000) return CERR_InvalidToken;
           tstr[mx++] = UC_SENTINEL;
           tstr[mx++] = CODE_CONTEXTEX;
-          tstr[mx++] = n1;
+          tstr[mx++] = n1b;
           tstr[mx] = 0;
         }
         else
@@ -2523,7 +2526,7 @@ KMX_DWORD process_expansion(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, in
 
   KMX_DWORD msg;
 
-  if ((msg = GetXString(fk, q, u"", temp, _countof(temp) - 1, 0, &r, FALSE, TRUE)) != CERR_None)
+  if ((msg = GetXString(fk, q, u"", temp, (KMX_DWORD)_countof(temp) - 1, 0, &r, FALSE, TRUE)) != CERR_None)
   {
     return msg;
   }
@@ -2647,11 +2650,11 @@ KMX_DWORD process_set(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
   {
     KMX_WCHAR *context = NULL;
     KMX_WCHAR sep_eq[3] = u" =";
-    PKMX_WCHAR r = u16tok(q,  sep_eq, &context);  // I3481
+    PKMX_WCHAR r2 = u16tok(q,  sep_eq, &context);  // I3481
 
     for (i = 0; i < fk->cxStoreArray; i++)
     {
-      if (u16icmp(r, fk->dpStoreArray[i].szName) == 0) break;
+      if (u16icmp(r2, fk->dpStoreArray[i].szName) == 0) break;
     }
     if (i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
     kmcmp::CheckStoreUsage(fk, i, FALSE, TRUE, FALSE);
@@ -2856,7 +2859,7 @@ KMX_DWORD ProcessHotKey(PKMX_WCHAR p, KMX_DWORD *hk)
 void SetChecksum(PKMX_BYTE buf, PKMX_DWORD CheckSum, KMX_DWORD sz)
 {
   BuildCRCTable();
-  *CheckSum = CalculateBufferCRC(buf, sz);
+  *CheckSum = (KMX_DWORD)CalculateBufferCRC(buf, sz);
 }
 
 
@@ -3054,7 +3057,7 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
   SetChecksum(buf, &ck->dwCheckSum, (KMX_DWORD)size);
 
   KMX_DWORD dwBytesWritten = 0;
-  dwBytesWritten = fwrite(buf,1, (KMX_DWORD)size ,  fp_out);
+  dwBytesWritten = (KMX_DWORD)fwrite(buf,1, (KMX_DWORD)size ,  fp_out);
 
   if (dwBytesWritten != size) {
     delete[] buf;
@@ -3074,7 +3077,7 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
   KMX_DWORD n;
   KMX_WCHAR currentQuotes = 0;
   KMX_WCHAR str[LINESIZE + 3];
-  len = fread( str , 1 ,LINESIZE * 2,fp_in);
+  len = (KMX_DWORD)fread( str , 1 ,LINESIZE * 2,fp_in);
   if (ferror(fp_in) ) return CERR_CannotReadInfile;
   len /= 2;
   str[len] = 0; auto cur = ftell(fp_in);
@@ -3252,7 +3255,7 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
   }
 
   fseek(fp, 0, SEEK_END);
-  *FileSize = ftell(fp);
+  *FileSize = (KMX_DWORD)ftell(fp);
   fseek(fp ,0,SEEK_SET);
   if (*FileSize < 0) {
     fclose(fp);
@@ -3449,7 +3452,7 @@ FILE* UTF16TempFromUTF8(FILE* fp_in , KMX_BOOL hasPreamble)
   fwrite(&prolog,2, 1, fp_out);
 
   fseek(fp_in, 0, SEEK_END);
-  len = ftell(fp_in);
+  len = (KMX_DWORD)ftell(fp_in);
   fseek(fp_in, 0, SEEK_SET);
   if (hasPreamble) {
     fseek( fp_in,3,SEEK_SET); // Cut off UTF-8 marker
@@ -3459,7 +3462,7 @@ FILE* UTF16TempFromUTF8(FILE* fp_in , KMX_BOOL hasPreamble)
   buf = new KMX_BYTE[len + 1];  // null terminated
   outbuf = new KMX_WCHAR[len + 1];
 
-  len2= fread(buf,1,len,fp_in);
+  len2= (KMX_DWORD)fread(buf,1,len,fp_in);
   if (len2) {
     buf[len2] = 0;
     p = buf;

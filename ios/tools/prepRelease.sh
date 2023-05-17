@@ -70,17 +70,17 @@ KEYMAN_SAMPLES="samples"
 
 echo "engine dest: $KMEI_DST"
 
-echo "Zipping ${UNI_FRAMEWORK} => ${UPLOAD_DIR}/${KMEI_DST}..."
+echo "Zipping ${FRAMEWORK} => ${UPLOAD_DIR}/${KMEI_DST}..."
 cd "${KMEI_FRAMEWORK_BASE}"
-zip -qrX ${KMEI_DST} ${FRAMEWORK}
-cd $WORK_DIR
+zip -qrX "${KMEI_DST}" ${FRAMEWORK}
+cd "$WORK_DIR"
 
 echo "Copying Keyman Engine samples into ${UPLOAD_DIR}/${KMEI_DST_NAME}..."
 cp -rf "${KEYMAN_SAMPLES}" "${UPLOAD_DIR}/samples"
 cd "${UPLOAD_DIR}"
 zip -qr "${KMEI_DST_NAME}" "samples"
 rm -rf "samples"
-cd $WORK_DIR
+cd "$WORK_DIR"
 
 #
 # Keyman app

@@ -273,6 +273,7 @@ _builder_expand_shorthand() {
   shift
   local count=0
   local result=
+  local string=
   for e; do
     if [[ $e == $item ]]; then
       # Exact match trumps substring matches
@@ -282,11 +283,10 @@ _builder_expand_shorthand() {
     if [[ $e == "$item"* ]]; then
       count=$((count+1))
       if [[ $count == 2 ]]; then
-        printf "$result"
-        printf ", $e"
+        string="$result, $e"
         result=$item
       elif [[ $count -gt 2 ]]; then
-        printf ", $e"
+        string="$string, $e"
       else
         result=$e
       fi
@@ -296,7 +296,7 @@ _builder_expand_shorthand() {
   if [[ $count -lt 2 ]]; then
     echo $result
   else
-    echo
+    echo $string
   fi
   return $count
 }
@@ -394,6 +394,7 @@ _builder_execute_child() {
 
   "$script" $action \
     --builder-child \
+    $_builder_build_deps \
     ${child_options[@]} \
     $builder_verbose \
     $builder_debug \
@@ -520,6 +521,49 @@ builder_has_action() {
     _builder_matched_action=
     return 1
   fi
+}
+
+#
+# Wraps builder_start_action and builder_finish action for single-command
+# actions. Can be used together with a local function for multi-command actions.
+# Do be aware that this pseudo-closure style cannot be mixed with operators such
+# as `<`, `>`, `&&`, `;`, `()` and so on.
+#
+# ### Usage
+#
+# ```bash
+#   builder_run_action action[:target] command [command-params...]
+# ```
+#
+# ### Parameters
+#
+# * 1: `action[:target]`   name of action, and optionally also target, if target
+#                          excluded starts for all defined targets
+# * 2: command             command to run if action is started
+# * 3...: command-params   parameters for command
+#
+# ### Example
+#
+# ```bash
+#   function do_build() {
+#     mkdir -p build/cjs-src
+#     npm run build
+#   }
+#
+#   builder_run_action clean        rm -rf ./build/ ./tsconfig.tsbuildinfo
+#   builder_run_action configure    verify_npm_setup
+#   builder_run_action build        do_build
+# ```
+#
+function builder_run_action() {
+  local action=$1
+  shift
+  echo "builder_run_action $action $@"
+  if builder_start_action $action; then
+    ($@)
+    builder_finish_action success $action
+  fi
+  return 0
 }
 
 #
@@ -1345,11 +1389,10 @@ _builder_parse_expanded_parameters() {
   fi
 
   if builder_is_debug_build; then
-    readonly BUILDER_CONFIGURATION=debug
+    BUILDER_CONFIGURATION=debug
   else
-    readonly BUILDER_CONFIGURATION=release
+    BUILDER_CONFIGURATION=release
   fi
-
 
   # Now that we've successfully parsed options adhering to the _builder spec, we may activate our
   # action_failure and action_hanging traps.  (We don't want them active on scripts not yet using

@@ -29,6 +29,9 @@
 # Note: keep changes to version, tier and tag determination in sync with mkver (windows/src/buildutils/mkver)
 #
 
+# Exit on command failure and when using unset variables:
+set -eu
+
 #
 # Prevents 'clear' on exit of mingw64 bash shell
 #

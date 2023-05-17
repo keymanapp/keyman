@@ -1,7 +1,7 @@
 #include "pch.h"
 
 #include <kmcmplibapi.h>
-#include <comperr.h>
+#include <kmn_compiler_errors.h>
 #include "kmcmplib.h"
 #include "filesystem.h"
 #include "CheckFilenameConsistency.h"
@@ -30,7 +30,7 @@ EXTERN bool kmcmp_SetCompilerOptions(KMCMP_COMPILER_OPTIONS* options) {
   WASM interface for compiler message callback
 */
 EM_JS(int, wasm_msgproc, (int line, int msgcode, char* text, char* context), {
-  const proc = globalThis[context];
+  const proc = globalThis[UTF8ToString(context)];
   if(!proc || typeof proc != 'function') {
     console.log(`[${line}: ${msgcode}: ${UTF8ToString(text)}]`);
     return 0;
@@ -65,6 +65,15 @@ EXTERN bool kmcmp_Wasm_CompileKeyboardFile(char* pszInfile,
     msgProc
   );
 }
+
+EXTERN int kmcmp_Wasm_ParseUnicodeSet(char* pat,
+  uint32_t* buf, int length
+) {
+  return kmcmp_ParseUnicodeSet(
+    pat, buf, length
+  );
+}
+
 #endif
 
 EXTERN bool kmcmp_CompileKeyboardFile(char* pszInfile,

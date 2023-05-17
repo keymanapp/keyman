@@ -38,7 +38,7 @@ if builder_start_action test:libraries; then
   # No --reporter option exists yet for the headless modules.
 
   $KEYMAN_ROOT/common/web/keyboard-processor/build.sh test $HEADLESS_FLAGS
-  $KEYMAN_ROOT/common/web/input-processor/build.sh build:tools test $HEADLESS_FLAGS
+  $KEYMAN_ROOT/common/web/input-processor/build.sh test $HEADLESS_FLAGS
 
   builder_finish_action success test:libraries
 fi

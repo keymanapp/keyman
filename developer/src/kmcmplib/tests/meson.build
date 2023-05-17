@@ -16,7 +16,9 @@ kmcompxtest = executable('kmcompxtest', 'kmcompxtest.cpp',
     include_directories: inc,
     name_suffix: name_suffix,
     link_args: links + tests_flags,
-    objects: lib.extract_all_objects())
+    objects: lib.extract_all_objects(),
+    dependencies: icuuc_dep,
+  )
 
 # Test keyboards that we have in Core
 
@@ -74,36 +76,55 @@ foreach kbd : tests
   test(kbd, kmcompxtest, args: [kbd_src, kbd_obj, join_paths(input_path, kbd) + '.kmx'])
 endforeach
 
-# Test fixtures that come from keyboards repo
+# Test fixtures that come from keyboards repo -- but only for a "full" test,
+# which typically we run on CI no more than once a day, because it's expensive.
 
-keyboards_root = meson.current_source_dir() / 'keyboards'
+if get_option('full_test')
 
-if build_machine.system() == 'windows'
-  test_source = run_command('run-shell.bat', 'get-test-source.sh', keyboards_root, capture: true, check: true)
-else
-  test_source = run_command('get-test-source.sh', keyboards_root, capture: true, check: true)
+  keyboards_root = meson.current_source_dir() / 'keyboards'
+
+  if build_machine.system() == 'windows'
+    test_source = run_command('run-shell.bat', 'get-test-source.sh', keyboards_root, capture: true, check: true)
+  else
+    test_source = run_command('get-test-source.sh', keyboards_root, capture: true, check: true)
+  endif
+
+  tests = test_source.stdout().strip().split('\n')
+
+  foreach kbd : tests
+    test_basename = fs.replace_suffix(fs.name(kbd), '')
+
+    # kbd is going to be an absolute path
+    kbd_obj = output_path / test_basename + '.kmx'
+    reference_kmx = meson.current_source_dir() / 'fixtures' / test_basename + '.kmx'
+
+    if fs.is_file(reference_kmx)
+      test(test_basename, kmcompxtest, args: [kbd, kbd_obj, reference_kmx])
+    endif
+  endforeach
+
 endif
 
-tests = test_source.stdout().strip().split('\n')
-
-foreach kbd : tests
-  test_basename = fs.replace_suffix(fs.name(kbd), '')
-
-  # kbd is going to be an absolute path
-  kbd_obj = output_path / test_basename + '.kmx'
-  reference_kmx = meson.current_source_dir() / 'fixtures' / test_basename + '.kmx'
-
-  if fs.is_file(reference_kmx)
-    test(test_basename, kmcompxtest, args: [kbd, kbd_obj, reference_kmx])
-  endif
-endforeach
-
+# Test the API endpoints
 
 apitest = executable('api-test', 'api-test.cpp',
     cpp_args: defns,
     include_directories: inc,
     name_suffix: name_suffix,
     link_args: links + tests_flags,
-    objects: lib.extract_all_objects())
+    objects: lib.extract_all_objects(),
+    dependencies: icuuc_dep,
+  )
 
 test('api-test', apitest)
+
+usetapitest = executable('uset-api-test', 'uset-api-test.cpp',
+    cpp_args: defns,
+    include_directories: inc,
+    name_suffix: name_suffix,
+    link_args: links + tests_flags,
+    objects: lib.extract_all_objects(),
+    dependencies: icuuc_dep,
+  )
+
+test('uset-api-test', usetapitest)

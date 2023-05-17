@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>15.0.266.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Options>
+    <ExecuteProgram></ExecuteProgram>
+    <ReadMeFile></ReadMeFile>
+    <GraphicFile></GraphicFile>
+    <MSIFileName></MSIFileName>
+    <MSIOptions></MSIOptions>
+  </Options>
+  <StartMenu>
+    <Folder></Folder>
+    <Items/>
+  </StartMenu>
+  <Info>
+    <Name URL="">Binary KVK File</Name>
+    <Version>1.3</Version>
+  </Info>
+  <Files>
+    <File>
+      <Name>binary_kvk_file.kvk</Name>
+      <Description>File binary_kvk_file.kvk</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kvk</FileType>
+    </File>
+    <File>
+      <Name>../../invalid/khmer_angkor.kmx</Name>
+      <Description>Keyboard Khmer Angkor</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>Khmer Angkor</Name>
+      <ID>khmer_angkor</ID>
+      <Version>1.3</Version>
+      <Languages>
+        <Language ID="KM">Khmer</Language>
+      </Languages>
+    </Keyboard>
+  </Keyboards>
+</Package>

@@ -15,6 +15,7 @@ cd "$THIS_SCRIPT_PATH"
 builder_describe \
   "Build Keyman for Linux." \
   ":engine=ibus-keyman       ibus-keyman" \
+  ":config=keyman-config     keyman-config" \
   "clean" \
   "configure" \
   "build" \
