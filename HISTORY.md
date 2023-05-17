@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.109 alpha 2023-05-17
+
+* fix(windows): add wrap-symbols to Text Editor Makefile (#8819)
+* chore(linux): Make postinst script comply with Debian policy (#8810)
+* chore(windows): remove legacy core and flag  ️ (#8593)
+
 ## 17.0.108 alpha 2023-05-16
 
 * feat(windows): add text editor to the support makefile (#8750)
