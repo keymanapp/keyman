@@ -105,6 +105,10 @@ builder_run_child_actions build:app/browser
 
 builder_run_child_actions test
 
+if builder_has_action build:app/browser; then
+  builder_warn "Modularization work is not yet complete; consumers may find needed API or components to be missing"
+fi
+
 if builder_has_action build:app/ui; then
   builder_die "Modularization work is not yet complete; builds dependent on this will fail."
 fi
