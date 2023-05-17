@@ -44,18 +44,40 @@ if(!keyman?.ui?.name) {
       // User interface global and local variables
       readonly name = 'float';
 
-      KeyboardSelector = null;
+      /**
+       * The top-level element for the keyboard-selection drop menu
+       */
+      KeyboardSelector: HTMLSelectElement = null;
 
-      outerDiv = null;     // replaces DivKeymanWeb
-      innerDiv = null;     // replaces Lkdiv
-      oskButton = null;    // toggles OSK on or off
-      kbdIcon = null;      // keyboard icon within OSK button
-      selecting = false;   // control focus behaviour during selection
+      /**
+       * Container for all Float UI elements (visible when KeymanWeb is active)
+       */
+      outerDiv: HTMLDivElement = null;     // replaces DivKeymanWeb
+
+      innerDiv: HTMLDivElement = null;     // replaces Lkdiv
+
+      /**
+       * The button element allowing users to toggle the OSK on or off
+       */
+      oskButton: HTMLDivElement = null;
+
+      /**
+       * keyboard icon within the OSK button
+       */
+      kbdIcon: HTMLImageElement = null;
+
+      /**
+       * Tracks ongoing user interactions with the Float UI.  This is used to help
+       * control focus-related behaviors during selection so that KMW may more easily
+       * maintain the user's intended focus & expected context.
+       */
+      selecting = false;
+
       updateList = true;   // control keyboard list updating
-      updateTimer = null;  // prevent unnecessary list refreshing
+      updateTimer: number = 0;  // prevent unnecessary list refreshing
       floatRight = false;  // align left by default
       initialized = false; // initialization flag
-      initTimer = null;
+      initTimer: number = 0;
 
       /**
        * Display or hide the OSK from the OSK icon link
@@ -273,7 +295,7 @@ if(!keyman?.ui?.name) {
         if(kbd == '') {
           this.KeyboardSelector.selectedIndex=0;
         } else {
-          const opt=this.KeyboardSelector.getElementsByTagName('OPTION');
+          const opt=this.KeyboardSelector.getElementsByTagName('option');
           for(i=0; i<opt.length; i++) {
             let t=opt[i].value;
             if(lg == '') {
@@ -326,7 +348,7 @@ if(!keyman?.ui?.name) {
           if(this.updateTimer) {
             clearTimeout(this.updateTimer);
           }
-          this.updateTimer = setTimeout(this.updateKeyboardList, 200);
+          this.updateTimer = window.setTimeout(this.updateKeyboardList, 200);
         });
 
         /**
