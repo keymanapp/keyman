@@ -8,6 +8,12 @@ import {
  } from "keyman/engine/dom-utils";
 import { BrowserConfiguration, BrowserInitOptionSpec } from "./configuration.js";
 
+/**
+ * Calls document.createElement for the specified node type and also applies
+ * 'user-select: none' styling to the new element.
+ * @param nodeName
+ * @returns
+ */
 export function createUnselectableElement<E extends keyof HTMLElementTagNameMap>(nodeName:E) {
   const e = document.createElement<E>(nodeName);
   e.style.userSelect="none";
@@ -40,7 +46,13 @@ export class UtilApiEndpoint {
     };
   }
 
-  readonly createUnselectableElement = createUnselectableElement;
+  /**
+   * Calls document.createElement for the specified node type and also applies
+   * 'user-select: none' styling to the new element.
+   * @param nodeName
+   * @returns
+   */
+  readonly createElement = createUnselectableElement;
 
   /**
    * Function     getOption

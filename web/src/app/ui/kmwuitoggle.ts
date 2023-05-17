@@ -360,8 +360,8 @@ if(!keyman?.ui?.name) {
             this._selected = _selected;
 
             let imgPath=util.getOption('resources') + 'ui/toggle/';
-            let _elemImg = util.createUnselectableElement('img');
-            this._elem = util.createUnselectableElement('div');
+            let _elemImg = util.createElement('img');
+            this._elem = util.createElement('div');
             this._elem['_owningObject'] = this;
             _elemImg.style.display = 'block';
             _elemImg.src = imgPath + _src;
@@ -402,7 +402,7 @@ if(!keyman?.ui?.name) {
         }
 
         if(!this.initialized) { // I2403 - Allow toggle design to be loaded twice
-          this.controller = util.createUnselectableElement('div');
+          this.controller = util.createElement('div');
         } else {
           this.controller.innerHTML = '';  // I2403 - Allow toggle design to be loaded twice
         }
@@ -685,15 +685,15 @@ if(!keyman?.ui?.name) {
        **/
       createMenu() {
         if(typeof(this.keyboardMenu) == 'undefined') { // I2403 - Allow toggle design to be loaded twice
-          this.keyboardMenu = util.createUnselectableElement('ul');
+          this.keyboardMenu = util.createElement('ul');
           this.keyboardMenu.id='KeymanWeb_KbdList';
           this.keyboardMenu.className='sfunhover';
         } else {
           this.keyboardMenu.innerHTML = '';  // I2403 - Allow toggle design to be loaded twice
         }
 
-        var _li = util.createUnselectableElement('li');
-        var _a = util.createUnselectableElement('a');
+        var _li = util.createElement('li');
+        var _a = util.createElement('a');
         _a.innerHTML='(System keyboard)';
         _a.href="#";
         _a.onclick = () => {
@@ -709,8 +709,8 @@ if(!keyman?.ui?.name) {
         const _kbds=keymanweb.getKeyboards(), _added=[];
         this.keyboards = [];
         for(var _kbd = 0; _kbd < _kbds.length; _kbd++) {
-          var _li1=util.createUnselectableElement('li');
-          var _a1=util.createUnselectableElement('a');
+          var _li1=util.createElement('li');
+          var _a1=util.createElement('a');
           _a1.innerHTML=_kbds[_kbd].LanguageName + ' - ' + _kbds[_kbd].Name;
           if(!_added[_kbds[_kbd].InternalName]) _added[_kbds[_kbd].InternalName]=0;
           _added[_kbds[_kbd].InternalName]++;
