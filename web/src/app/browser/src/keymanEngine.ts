@@ -85,16 +85,9 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // // Possible condition we can add:  no change of init options after a  ***
     // // prior finalized init.
 
-    // // if an initialization has already completed.
-    // if(!this.config.deferForInitialization.hasFinalized) {
-
     this.config.hostDevice = device;
     // Set any incoming options, overriding previous entries.
     this.config.initialize(totalOptions);
-
-    // }                                                                     ***
-
-    this._initialized = 1;
 
     this._initialized = 1;
 
