@@ -24,7 +24,7 @@ install:
     echo and then run wevtutil im keyman-debug-etw.man to get the latest event tracing
 
 build:
-    $(MSBUILD) keyman32-ver.vcxproj $(MSBUILD_BUILD) "/p:VersionWithTag=$VersionWithTag;LIBRARY=keyman32-ver17.0.48-alpha-local"
+    $(MSBUILD) keyman32-ver.vcxproj $(MSBUILD_BUILD) "/p:VersionWithTag=$VersionWithTag;LIBRARY=keyman32-ver$VersionWithTag"
     $(COPY) $(WIN32_TARGET_PATH)\keyman32-ver$VersionWithTag.dll $(PROGRAM)\engine
     $(COPY) $(WIN32_TARGET_PATH)\keyman32-ver$VersionWithTag.pdb $(DEBUGPATH)\engine
 #   $(COPY) $(WIN32_TARGET_PATH)\keyman32-ver.lib $(OUTLIB) done by vcxproj

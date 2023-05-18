@@ -696,7 +696,13 @@ LoadDLLsCore(LPINTKEYBOARDINFO lpkbi) {
 
   if (!GetKeyboardFileName(lpkbi->Name, fullname, _MAX_PATH))
     return FALSE;
-  if ((!lpkbi->lpCoreKeyboard) || (!lpkbi->lpCoreKeyboard)){
+  if (!lpkbi->lpCoreKeyboard){
+    return FALSE;
+  }
+
+  km_kbp_keyboard_imx *imx_list = lpkbi->lpIMXList;
+  // return early if the list empty avoiding loading the proxy dll into memory
+  if (!imx_list->library_name) {
     return FALSE;
   }
 
@@ -712,32 +718,23 @@ LoadDLLsCore(LPINTKEYBOARDINFO lpkbi) {
 
   //GetModuleFileName(GetModuleHandle(LIBRARY_NAME), buf, 260);
 
-		GetModuleFileName(g_hInstance, test_library_name, 260);
+  GetModuleFileName(g_hInstance, versioned_filename, 260);
 
-    char *p = strrchr(versioned_filename, '\\'); // find last occurrence of '\'
-    if (p != NULL) {
-        int64_t len = p - versioned_filename + 1;
-        strncpy(proxy_modulename, versioned_filename, (size_t)len);
-        strncat(proxy_modulename, keyman_name, 13);
-    }
+  char *p = strrchr(versioned_filename, '\\'); // find last occurrence of '\'
+  if (p != NULL) {
+      int64_t len = p - versioned_filename + 1;
+      strncpy(proxy_modulename, versioned_filename, (size_t)len);
+      strncat(proxy_modulename, keyman_name, 13);
+  }
 
-   SendDebugMessageFormat(
-        0, sdmKeyboard, 0, "Testing methods to get library name test lib name:[%s], versioned_filename:[%s]", test_library_name, versioned_filename);
-  // Need to Load the keyman32 or keyman64 dll proxy keyboard as the third-party dlls
-  // will use this rather than the versioned dll.
-//  #ifdef _WIN64
-//    HMODULE hModule = LoadLibrary("keyman64.dll");
-//  #else
-//    HMODULE hModule = LoadLibrary("keyman32.dll");
-//  #endif
-
+  SendDebugMessageFormat(
+      0, sdmKeyboard, 0, "Testing methods to get library name test lib name:[%s], versioned_filename:[%s]", test_library_name, versioned_filename);
 
   if (!LoadLibrary(proxy_modulename)) {
-     SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: [%s] not loaded with error:[%d]", proxy_modulename, GetLastError());
+      SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: [%s] not loaded with error:[%d]", proxy_modulename, GetLastError());
       return FALSE;
   }
 
-  km_kbp_keyboard_imx *imx_list = lpkbi->lpIMXList;
   BOOL result = false;
   for (; imx_list->library_name; ++imx_list) {
     LPIMDLL imd = AddIMDLL(lpkbi, fullname, wstrtostr(reinterpret_cast<LPCWSTR>(imx_list->library_name)));
