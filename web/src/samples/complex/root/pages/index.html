@@ -23,7 +23,7 @@
     </style>
 
     <!-- KeymanWeb script -->
-    <script src="../../build/app/web/release/keymanweb.js"></script>
+    <script src="../js/keymanweb.js"></script>
 
     <!--
       For desktop browsers, a script for the user interface must be inserted here.
@@ -32,27 +32,65 @@
       The toolbar UI is best for any page designed to support keyboards for
       a large number of languages.
     -->
-    <script src="../../build/app/ui/release/kmwuitoggle.js"></script>
+    <script src="../js/kmwuitoggle.js"></script>
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
       var kmw=window.keyman;
       kmw.init({
-        attachType:'auto',
-        resources:''
+        root: '..',
+        // Operates from the configured root set above - the 'root' folder for this sample.
+        resources: '/resources',
+        // If no absolute or clearly-relative specifiers are set within a keyboard's specified path,
+        // KMW will look for them here - two folders up from root, which is the base sample directory.
+        keyboards: '/../../',
+        attachType:'auto'
       }).then(function() {
-        loadKeyboards();
+        // Loads keyboards from the base sample folder
+        keyman.addKeyboards({
+          id:'us',
+          name:'English',
+          languages: {
+            id:'en',
+            name:'English'
+          },
+          // Note:  no './' or '../' prefix, which would root it based on the page's location, not the configured root above.
+          filename: 'us-1.0.js'
+        });
+        // For contrast:
+        keyman.addKeyboards({
+          id:'lao_2008_basic',
+          name:'Lao Basic',
+          languages: {
+            id:'lo', name:'Lao', region:'Asia',
+          },
+          // This will be set directly relative to the page, as the path starts with relative positioning.
+          filename:('../../../lao_2008_basic-1.2.js')
+        });
+
+        // and from the cloud API
+
+        // Add more keyboards to the language menu by:
+        // 1. keyboard name ('french'),
+        // 2. keyboard name and language code ('sil_euro_latin@no,sv'),
+        // 3. or just the BCP-47 language code ('@he').
+        kmw.addKeyboards('french', 'sil_euro_latin@no,sv', '@he');
+
+        // Add a keyboard by language name.  Note that the name must be spelled
+        // correctly, or the keyboard will not be found.  (Using BCP-47 codes is
+        // usually easier.)
+        doAddKeyboardsForLanguage('Dzongkha');
       });
     </script>
 
     <!-- Add keyboard management script for local selection of keyboards to use -->
-    <script src="./samplehdr.js"></script>
+    <script src="../../../samplehdr.js"></script>
 
   </head>
 
   <!-- Sample page HTML -->
   <body>
-    <h2>KeymanWeb Sample Page - Fully Compiled/Minified Source</h2>
+    <h2>KeymanWeb Sample Page - Complex File Organization + Toggle UI</h2>
 
     <div>
     <!--
@@ -82,7 +120,7 @@
     <input type='button' id='btn3' onclick='addKeyboard(3);' value='Add' />
 
 
-    <h3><a href="../samples/index.html">Return to samples home page</a></h3>
+    <h3><a href="../../../">Return to samples home page</a></h3>
   </div>
 
   </body>

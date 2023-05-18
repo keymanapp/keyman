@@ -12,7 +12,7 @@
     <!-- Enable IE9 Standards mode -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    <title>KeymanWeb Sample Page - Unminified Source</title>
+    <title>KeymanWeb Sample Page - Fully Compiled Source</title>
 
     <!-- Your page CSS -->
     <style type='text/css'>
@@ -22,8 +22,8 @@
       #KeymanWebControl {width:50%;min-width:600px;}
     </style>
 
-    <!-- Insert unminified KeymanWeb source scripts -->
-    <script src="../../build/app/web/debug/keymanweb.js" type="application/javascript"></script>
+    <!-- KeymanWeb script -->
+    <script src="./keyman/keymanweb.js"></script>
 
     <!--
       For desktop browsers, a script for the user interface must be inserted here.
@@ -32,7 +32,7 @@
       The toolbar UI is best for any page designed to support keyboards for
       a large number of languages.
     -->
-    <script src="../../build/app/ui/debug/kmwuitoggle.js"></script>
+    <script src="./keyman/kmwuitoggle.js"></script>
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
@@ -40,18 +40,19 @@
       kmw.init({
         attachType:'auto'
       }).then(function() {
-        loadKeyboards();
+        // Loads the common keyboards from the previous folder
+        loadKeyboards(1);
       });
     </script>
 
     <!-- Add keyboard management script for local selection of keyboards to use -->
-    <script src="./samplehdr.js"></script>
+    <script src="../samplehdr.js"></script>
 
   </head>
 
-<!-- Sample page HTML -->
+  <!-- Sample page HTML -->
   <body>
-    <h2>KeymanWeb Sample Page - Unminified Source</h2>
+    <h2>KeymanWeb Sample Page - Simple Subfolder + Toggle UI</h2>
 
     <div>
     <!--
@@ -81,7 +82,7 @@
     <input type='button' id='btn3' onclick='addKeyboard(3);' value='Add' />
 
 
-    <h3><a href="../samples/index.html">Return to samples home page</a></h3>
+    <h3><a href="../">Return to samples home page</a></h3>
   </div>
 
   </body>
@@ -102,3 +103,4 @@
     ***
   -->
 </html>
+
