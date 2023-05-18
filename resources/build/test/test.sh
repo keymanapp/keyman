@@ -18,7 +18,7 @@ cd "$THIS_SCRIPT_PATH"
 builder_describe - clean build
 builder_parse "build"
 if [[ "${_builder_chosen_action_targets[@]}" != "build:project" ]]; then
-  builder_die "  Test: builder_parse, shorthand form 'build' should give us 'build:project"
+  builder_die "  Test: builder_parse, shorthand form 'build' should give us 'build:project'"
 fi
 
 if builder_start_action build; then
@@ -44,7 +44,7 @@ builder_describe_parse_short_test() {
   fi
 }
 
-builder_describe_parse_short_test "clean build test" ":module :tools :app" "build:module build:tools build:app" "build"
+builder_describe_parse_short_test "clean build test" ":module :tools :app" "build:module build:tools build:app build:project" "build"
 builder_describe_parse_short_test "clean build test" ":module :tools :app" "build:app" "build:app"
 builder_describe_parse_short_test "clean build test" ":module :tools :app" "build:app clean:module" "build:app clean:module"
 builder_describe_parse_short_test "clean build test" ":module :tools :app :project" "clean:module clean:tools clean:app clean:project build:app build:project" "clean build:app build:project"
@@ -112,6 +112,23 @@ builder_describe \
   "--power,-p   Use powerful mode" \
   "--zoom,-z    Use zoom mode" \
   "--feature=FOO Enable feature foo"
+
+#----------------------------------------------------------------------
+# Test implicit :project targets
+
+builder_parse_test "clean:app test:engine" "" clean:app test:engine
+
+if builder_has_action test:project; then
+  builder_die "FAIL: test:project should not have matched project-wide test action"
+fi
+
+builder_parse_test "clean:app test:app test:engine test:project" "" clean:app test
+
+if builder_has_action test:project; then
+  echo "PASS: test:project matched"
+else
+  builder_die: "FAIL: test:project missing for untargeted test action"
+fi
 
 #----------------------------------------------------------------------
 # Test --options
