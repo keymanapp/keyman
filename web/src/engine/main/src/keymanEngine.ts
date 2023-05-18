@@ -52,27 +52,24 @@ export default class KeymanEngine<
       this.keyEventRefocus();
     }
 
-    try {
-      // Clear any cached codepoint data; we can rebuild it if it's unchanged.
-      outputTarget.invalidateSelection();
-      // Deadkey matching continues to be troublesome.
-      // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
-      outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
+    // Clear any cached codepoint data; we can rebuild it if it's unchanged.
+    outputTarget.invalidateSelection();
+    // Deadkey matching continues to be troublesome.
+    // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
+    outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
 
-      const result = this.core.processKeyEvent(event, outputTarget);
+    const result = this.core.processKeyEvent(event, outputTarget);
 
-      if(result && result.transcription?.transform) {
-        this.config.onRuleFinalization(result, this.contextManager.activeTarget);
-      }
-
-      if(callback) {
-        callback(result, null);
-      }
-    } catch (err) {
-      if(callback) {
-        callback(null, err);
-      }
+    if(result && result.transcription?.transform) {
+      this.config.onRuleFinalization(result, this.contextManager.activeTarget);
     }
+
+    if(callback) {
+      callback(result, null);
+    }
+
+    // No try-catch here because we don't want to mask any errors that occur during keystroke
+    // processing - silent failures are far harder to diagnose.
   };
 
   // Should be overwritten as needed by engine subclasses; `browser` should set its DefaultOutput subclass in place.
