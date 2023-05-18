@@ -110,12 +110,12 @@ if builder_has_action build:app/browser; then
   builder_warn "Modularization work is not yet complete; consumers may find needed API or components to be missing"
 fi
 
-if builder_start_action test; then
+if builder_start_action test:project; then
   TEST_OPTS=
   if builder_has_option --ci; then
     TEST_OPTS=--ci
   fi
   ./test.sh $TEST_OPTS
 
-  builder_finish_action success test
+  builder_finish_action success test:project
 fi
