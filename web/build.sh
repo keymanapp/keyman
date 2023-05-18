@@ -106,9 +106,6 @@ builder_run_child_actions build:app/ui
 
 builder_run_child_actions test
 
-# FIXME!
-exit 0
-
 if builder_has_action build:app/browser; then
   builder_warn "Modularization work is not yet complete; consumers may find needed API or components to be missing"
 fi

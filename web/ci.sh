@@ -56,15 +56,17 @@ fi
 if builder_start_action test; then
   # Testing step:  run ALL unit tests, including those of the submodules.
 
-  # For only top-level build-product tests, specify the :engine target
-  # For all others, specify only the :libraries target
-  FLAGS=
-
+  OPTIONS=
   if ! builder_is_debug_build; then
-    FLAGS=--ci
+    OPTIONS=--ci
   fi
 
-  ./test.sh $FLAGS
+  # No --reporter option exists yet for the headless modules.
+
+  $KEYMAN_ROOT/common/web/keyboard-processor/build.sh test $OPTIONS
+  $KEYMAN_ROOT/common/web/input-processor/build.sh test $OPTIONS
+
+  ./build.sh test $OPTIONS
 
   builder_finish_action success test
 fi
