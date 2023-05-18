@@ -23,7 +23,7 @@
     </style>
 
     <!-- Insert uncompiled KeymanWeb source scripts -->
-    <script src="../../../../../build/app/web/debug/keymanweb.js" type="application/javascript"></script>
+    <script src="../../../../../build/app/browser/debug/keymanweb.js" type="application/javascript"></script>
 
     <!--
       For desktop browsers, a script for the user interface must be inserted here.
@@ -38,7 +38,8 @@
     <script>
       var kmw=window.keyman;
       kmw.init({
-		    attachType:'auto'
+		    attachType:'auto',
+        resources:'../../resources'
       }).then(function() {
         kmw.addKeyboards({id:'test_917',name:'test_917',languages:{id:'en',name:'English'}, filename:'test_917/build/test_917.js'});
       });

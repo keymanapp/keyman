@@ -24,7 +24,7 @@
     </style>
 
     <!-- Insert uncompiled KeymanWeb source scripts -->
-    <script src="../../../../../build/app/web/debug/keymanweb.js" type="application/javascript"></script>
+    <script src="../../../../../build/app/browser/debug/keymanweb.js" type="application/javascript"></script>
 
     <!--
       For desktop browsers, a script for the user interface must be inserted here.
@@ -59,7 +59,7 @@
         shadow.appendChild(docBase);
 
         const baseOSKStyle = document.createElement('link');
-        baseOSKStyle.href = "../../../../../build/app/web/debug/osk/kmwosk.css";
+        baseOSKStyle.href = "../../../../../build/app/browser/debug/osk/kmwosk.css";
         baseOSKStyle.rel="stylesheet";
         baseOSKStyle.type="text/css";
         shadow.appendChild(baseOSKStyle);
@@ -101,14 +101,15 @@
       }
 
       kmw.init({
-        }).then(async function() {
-          await documentKeyboard("gff_amharic", "am", "phone", "default");
-          await documentKeyboard("sil_euro_latin", "no", "phone", "shift");
-          await documentKeyboard("lao_2008_basic", "lo", "tablet", "default");
-          await documentKeyboard("lao_2008_basic", "lo", "desktop", "default");
-          await documentKeyboard("sil_cameroon_azerty", "pny", "tablet", "default");
-          await documentKeyboard("khmer_angkor", "km", "desktop", "default");
-        });
+        resources:'../../resources'
+      }).then(async function() {
+        await documentKeyboard("gff_amharic", "am", "phone", "default");
+        await documentKeyboard("sil_euro_latin", "no", "phone", "shift");
+        await documentKeyboard("lao_2008_basic", "lo", "tablet", "default");
+        await documentKeyboard("lao_2008_basic", "lo", "desktop", "default");
+        await documentKeyboard("sil_cameroon_azerty", "pny", "tablet", "default");
+        await documentKeyboard("khmer_angkor", "km", "desktop", "default");
+      });
     </script>
 
     <!-- Add keyboard management script for local selection of keyboards to use -->
