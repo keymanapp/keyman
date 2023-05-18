@@ -18,7 +18,8 @@
   "include": [ "src/**/*.ts" ],
 
   "references": [
-    { "path": "../../../../common/web/keyboard-processor" },
-    { "path": "../dom-utils" }
+    { "path": "../../../../common/web/input-processor" },
+    { "path": "../dom-utils" },
+    { "path": "../events" }
   ]
 }
