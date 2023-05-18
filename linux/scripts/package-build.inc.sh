@@ -1,14 +1,14 @@
 #!/bin/bash
 
 function checkPrerequisites() {
-    if [ "${UPLOAD}" == "yes" ]; then
+    if [ "${UPLOAD:=}" == "yes" ]; then
         SIM=""
     else
         SIM="-s"
     fi
 
     # Check the tier
-    if [[ -z "${TIER}" ]]; then
+    if [[ -z "${TIER:=}" ]]; then
         echo "TIER.md or \${TIER} must be set to (alpha, beta, stable) to use this script"
         exit 1
     fi
@@ -18,18 +18,15 @@ function checkPrerequisites() {
         exit 1
     fi
 
-    if [ "${PROJECT}" != "" ]; then
-        projects="${PROJECT}"
-    else
-        projects="keyman"
-    fi
+    # shellcheck disable=SC2034
+    projects="${PROJECT:=keyman}"
 }
 
 function downloadSource() {
     local packageDir
     packageDir=$1
 
-    if [ "${proj}" == "keyman" ]; then
+    if [ "${proj:=}" == "keyman" ]; then
        cd "${BASEDIR}" || exit
     fi
 
@@ -51,6 +48,30 @@ function downloadSource() {
     mv "${proj}"*.asc "${BASEDIR}/${packageDir}"
     rm "${proj}"*.debian.tar.xz
     cd "${BASEDIR}/${packageDir}" || exit
-    wget -N https://downloads.keyman.com/linux/${TIER}/${dirversion}/SHA256SUMS
+    wget -N "https://downloads.keyman.com/linux/${TIER}/${dirversion}/SHA256SUMS"
     sha256sum -c --ignore-missing SHA256SUMS |grep "${proj}"
+}
+
+function checkAndInstallRequirements()
+{
+	local TOINSTALL=""
+
+	for p in devscripts equivs
+	do
+		if ! dpkg -s $p >/dev/null 2>&1; then
+			TOINSTALL="$TOINSTALL $p"
+		fi
+	done
+
+	export DEBIAN_FRONTEND=noninteractive
+
+	if [ -n "$TOINSTALL" ]; then
+		sudo apt-get update
+		# shellcheck disable=SC2086
+		sudo apt-get -qy install $TOINSTALL
+	fi
+
+	sudo mk-build-deps debian/control
+	sudo apt-get -qy --allow-downgrades install ./keyman-build-deps_*.deb
+	sudo rm -f keyman-buid-deps_*
 }

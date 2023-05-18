@@ -1,0 +1,16 @@
+[host_machine]
+system = 'darwin'
+cpu_family = 'aarch64'
+cpu = 'arm64'
+endian = 'little'
+
+[binaries]
+c = ['clang', '-arch', 'arm64']
+objc = ['clang', '-arch', 'arm64']
+cpp = ['clang++', '-arch', 'arm64']
+ar = 'ar'
+ld = 'ld'
+strip = 'strip'
+lipo = 'lipo'
+ranlib = 'ranlib'
+pkgconfig = 'pkg-config'

@@ -30,13 +30,13 @@ function debug_echo() {
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$(dirname "$THIS_SCRIPT")/trigger-definitions.inc.sh"
-. "$(dirname "$THIS_SCRIPT")/trigger-builds.inc.sh"
-. "$(dirname "$THIS_SCRIPT")/jq.inc.sh"
+. "${THIS_SCRIPT%/*}/trigger-definitions.inc.sh"
+. "${THIS_SCRIPT%/*}/trigger-builds.inc.sh"
+. "${THIS_SCRIPT%/*}/jq.inc.sh"
 
 #
 # Iterate through the platforms 'array' passed in and
@@ -176,11 +176,21 @@ while IFS= read -r line; do
 done <<< "$prfiles"
 
 debug_echo "Build platforms: ${build_platforms[*]}"
-#
-# Start the test builds
-#
 
-echo ". Start test builds"
-triggerTestBuilds "`echo ${build_platforms[@]}`" "$PRNUM"
+if (( ${#build_platforms[@]} > 0)); then
+  #
+  # Start the test builds
+  #
+  echo ". Start test builds"
+  triggerTestBuilds "`echo ${build_platforms[@]}`" "$PRNUM"
+else
+  echo ". No builds to start"
+  curl --silent --write-out '\n' \
+    --request POST \
+    --header "Accept: application/vnd.github+json" \
+    --header "Authorization: token $GITHUB_TOKEN" \
+    --data '{"state":"success","description":"Skipping since no platform builds necessary","context":"Test Build (Keyman)"}' \
+    "https://api.github.com/repos/keymanapp/keyman/statuses/${BUILD_VCS_NUMBER}"
+fi
 
 exit 0

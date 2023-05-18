@@ -4,14 +4,11 @@ plugins {
 
 android {
     compileSdkVersion 33
+    namespace="com.keyman.kmsample1"
 
     // Don't compress kmp files so they can be copied via AssetManager
     aaptOptions {
         noCompress "kmp"
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     defaultConfig {

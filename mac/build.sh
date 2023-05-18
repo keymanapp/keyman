@@ -3,14 +3,15 @@
 set -e
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 KEYMAN_MAC_BASE_PATH="$KEYMAN_ROOT/mac"
 
 # Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
@@ -69,7 +70,7 @@ display_usage() {
 assertOptionsPrecedeTargets() {
     if [[ "$1" =~ ^\- ]]; then
         if $PROCESSING_TARGETS ; then
-            fail "Options must be specified before build targets"
+            builder_die "Options must be specified before build targets"
         fi
     elif ! $PROCESSING_TARGETS ; then
         PROCESSING_TARGETS=true
@@ -81,7 +82,7 @@ assertOptionsPrecedeTargets() {
 }
 
 do_clean ( ) {
-  echo_heading "Cleaning source (Carthage)"
+  builder_heading "Cleaning source (Carthage)"
 #  rm -rf $KME4M_BUILD_PATH
 #  rm -rf $APP_BUILD_PATH
   rm -rf $KEYMAN_MAC_BASE_PATH/Carthage
@@ -108,9 +109,6 @@ KMIM_WORKSPACE_PATH="$KM4MIM_BASE_PATH/$IM_NAME.xcworkspace"
 # APP_BUNDLE_PATH=$APP_RESOURCES/Keyman.bundle
 # APP_BUILD_PATH=keyman/Keyman/build/
 
-
-KME4M_OUTPUT_FOLDER=$KME4M_BUILD_PATH/libKeyman
-
 ### PROCESS COMMAND-LINE ARGUMENTS ###
 
 # Default is debug build of Engine and (code-signed) Input Method
@@ -134,6 +132,7 @@ QUIET=false
 NOTARIZE=false
 SKIP_BUILD=false
 UPLOAD_SENTRY=false
+QUIET_FLAG=
 
 # Import local environment variables for build
 if [[ -f $(dirname "$THIS_SCRIPT")/localenv.sh ]]; then
@@ -161,7 +160,7 @@ while [[ $# -gt 0 ]] ; do
                 NOTARIZE=true
                 CONFIG="Release"
             elif ! [[ "$2" =~ ^(n(one)?)$ ]]; then
-                fail "Invalid deploy option. Must be 'none', 'local', 'quicklocal' or 'preprelease'."
+                builder_die "Invalid deploy option. Must be 'none', 'local', 'quicklocal' or 'preprelease'."
             fi
             shift # past argument
             ;;
@@ -171,7 +170,7 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -config)
             if [[ "$2" == "" || "$2" =~ ^\- ]]; then
-                warn "Missing config name on command line. Using 'Debug' as default..."
+                builder_warn "Missing config name on command line. Using 'Debug' as default..."
             else
                 if $PREPRELEASE && [[ "$2" != "Release" ]]; then
                     echo "Deployment option 'preprelease' supersedes $2 configuration."
@@ -225,9 +224,9 @@ while [[ $# -gt 0 ]] ; do
             ;;
         *)
             if $PROCESSING_TARGETS ; then
-                fail "Unexpected target: $1. Run with --help for help."
+                builder_die "Unexpected target: $1. Run with --help for help."
             else
-                fail "Unexpected option: $1. Run with --help for help."
+                builder_die "Unexpected option: $1. Run with --help for help."
             fi
             ;;
     esac
@@ -261,6 +260,7 @@ displayInfo "" \
     "BUILD_ACTIONS: $BUILD_ACTIONS" \
     "TEST_ACTION: $TEST_ACTION" \
     "UPLOAD_SENTRY: $UPLOAD_SENTRY" \
+    "QUIET_FLAG: $QUIET_FLAG" \
     ""
 
 ### Validate notarization environment variables ###
@@ -268,19 +268,19 @@ displayInfo "" \
 if $LOCALDEPLOY && ! $NOTARIZE ; then
     if [ "$(spctl --status)" == "assessments enabled" ]; then
       echo
-      warn "WARNING: Notarization is disabled but SecAssessment security policy is still active. Keyman will not run correctly."
-      warn "         Disable SecAssessment with 'sudo spctl --master-disable' (or do notarized builds)"
-      fail "Re-run with '-deploy local' or disable SecAssessment."
+      builder_warn "WARNING: Notarization is disabled but SecAssessment security policy is still active. Keyman will not run correctly."
+      builder_warn "         Disable SecAssessment with 'sudo spctl --master-disable' (or do notarized builds)"
+      builder_die "Re-run with '-deploy local' or disable SecAssessment."
     fi
 fi
 
 if $PREPRELEASE || $NOTARIZE ; then
-  if [ ! $DO_CODESIGN ] || [ -z "${CERTIFICATE_ID}" ]; then
-    fail "Code signing must be configured for deployment. See build.sh -help for details."
+  if [ ! $DO_CODESIGN ] || [ -z "${CERTIFICATE_ID+x}" ]; then
+    builder_die "Code signing must be configured for deployment. See build.sh -help for details."
   fi
 
-  if [ -z "${APPSTORECONNECT_PROVIDER}" ] || [ -z "${APPSTORECONNECT_USERNAME}" ] || [ -z "${APPSTORECONNECT_PASSWORD}" ]; then
-    fail "Appstoreconnect Apple ID credentials must be configured in environment. See build.sh -help for details."
+  if [ -z "${APPSTORECONNECT_PROVIDER+x}" ] || [ -z "${APPSTORECONNECT_USERNAME+x}" ] || [ -z "${APPSTORECONNECT_PASSWORD+x}" ]; then
+    builder_die "Appstoreconnect Apple ID credentials must be configured in environment. See build.sh -help for details."
   fi
 fi
 
@@ -309,7 +309,7 @@ execBuildCommand() {
     printXCodeBuildScriptLogs
 
     if [ $ret_code != 0 ]; then
-        fail "Build of $component failed! Error: [$ret_code] when executing command: '$cmnd'"
+        builder_die "Build of $component failed! Error: [$ret_code] when executing command: '$cmnd'"
     fi
 }
 
@@ -318,7 +318,7 @@ updatePlist() {
         KM_PLIST="$1"
         APPNAME="$2"
         if [ ! -f "$KM_PLIST" ]; then
-            fail "File not found: $KM_PLIST"
+            builder_die "File not found: $KM_PLIST"
         fi
         local YEAR=`date "+%Y"`
         echo "Setting version and related fields to $VERSION_WITH_TAG in $KM_PLIST"
@@ -345,7 +345,7 @@ execCodeSign() {
         eval codesign "$@"
         ret_code=$?
         if [ $ret_code != 0 ]; then
-            fail "Unable to sign component (exit code $ret_code)"
+            builder_die "Unable to sign component (exit code $ret_code)"
         fi
     fi
     set -e
@@ -354,7 +354,7 @@ execCodeSign() {
 ### Build Keyman Engine (kmx processor) ###
 
 if $DO_KEYMANENGINE ; then
-    echo_heading "Building Keyman Engine"
+    builder_heading "Building Keyman Engine"
     execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS $TEST_ACTION -scheme $ENGINE_NAME"
     execBuildCommand "$ENGINE_NAME dSYM file" "dsymutil \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Versions/A/$ENGINE_NAME\" -o \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework.dSYM\""
     updatePlist "$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Resources/Info.plist" "Keyman Engine"
@@ -365,10 +365,10 @@ fi
 if $DO_KEYMANIM ; then
     if $DO_HELP ; then
         echo "Building help"
-        $(dirname "$THIS_SCRIPT")/build-help.sh html
+        build_help_html mac Keyman4MacIM/Keyman4MacIM/Help
     fi
 
-    echo_heading "Building Keyman.app"
+    builder_heading "Building Keyman.app"
     cd "$KM4MIM_BASE_PATH"
     if $DO_PODS ; then
         pod update
@@ -390,7 +390,7 @@ if $DO_KEYMANIM ; then
         ENTITLEMENTS_FILE=Keyman.entitlements
     fi
 
-    if [ -z "$DEVELOPMENT_TEAM" ]; then
+    if [ -z "${DEVELOPMENT_TEAM+x}" ]; then
         DEVELOPMENT_TEAM=3YE4W86L3G
     fi
 
@@ -413,9 +413,9 @@ if $DO_KEYMANIM ; then
 
         if which sentry-cli >/dev/null; then
             cd "$KM4MIM_BASE_PATH"
-            sentry-cli upload-dif "build/${CONFIGURATION}"
+            sentry-cli upload-dif "build/$CONFIG"
         else
-            fail "Error: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases"
+            builder_die "Error: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases"
         fi
     fi
 
@@ -425,7 +425,7 @@ fi
 ### Build test app ###
 
 if $DO_KEYMANTESTAPP ; then
-    echo_heading "Building test app"
+    builder_heading "Building test app"
     execBuildCommand $TESTAPP_NAME "xcodebuild -project \"$KMTESTAPP_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS"
     updatePlist "$KMTESTAPP_BASE_PATH/build/$CONFIG/$TESTAPP_NAME.app/Contents/Info.plist" "Keyman Test App"
 fi
@@ -433,9 +433,9 @@ fi
 ### Notarize the app for preprelease ###
 
 if $PREPRELEASE || $NOTARIZE; then
-  echo_heading "Notarizing app"
-  if [ "${CODESIGNING_SUPPRESSION}" != "" ] && [ -z "${CERTIFICATE_ID}" ]; then
-    fail "Notarization and signed executable is required for deployment, even locally. Specify CERTIFICATE_ID environment variable for custom certificate."
+  builder_heading "Notarizing app"
+  if [ "${CODESIGNING_SUPPRESSION}" != "" ] && [ -z "${CERTIFICATE_ID+x}" ]; then
+    builder_die "Notarization and signed executable is required for deployment, even locally. Specify CERTIFICATE_ID environment variable for custom certificate."
   else
     TARGET_PATH="$KM4MIM_BASE_PATH/build/$CONFIG"
     TARGET_APP_PATH="$TARGET_PATH/$PRODUCT_NAME.app"
@@ -445,21 +445,21 @@ if $PREPRELEASE || $NOTARIZE; then
     # Note: get-task-allow entitlement must be *off* in our release build (to do this, don't include base entitlements in project build settings)
 
     # We may need to re-run the code signing if a custom certificate has been passed in
-    if [ ! -z "${CERTIFICATE_ID}" ]; then
-      echo_heading "Signing with custom certificate (CERTIFICATE_ID environment variable)."
+    if [ ! -z "${CERTIFICATE_ID+x}" ]; then
+      builder_heading "Signing with custom certificate (CERTIFICATE_ID environment variable)."
       codesign --force --options runtime --entitlements Keyman4MacIM/Keyman.entitlements --deep --sign "${CERTIFICATE_ID}" "$TARGET_APP_PATH"
     fi
 
-    echo_heading "Zipping Keyman.app for notarization to $TARGET_ZIP_PATH"
+    builder_heading "Zipping Keyman.app for notarization to $TARGET_ZIP_PATH"
 
     /usr/bin/ditto -c -k --keepParent "$TARGET_APP_PATH" "$TARGET_ZIP_PATH"
 
-    echo_heading "Uploading Keyman.zip to Apple for notarization"
+    builder_heading "Uploading Keyman.zip to Apple for notarization"
 
     xcrun altool --notarize-app --primary-bundle-id "com.Keyman.im.zip" --asc-provider "$APPSTORECONNECT_PROVIDER" --username "$APPSTORECONNECT_USERNAME" --password @env:APPSTORECONNECT_PASSWORD --file "$TARGET_ZIP_PATH" --output-format xml > $ALTOOL_LOG_PATH || (
       ALTOOL_CODE=$?
       cat "$ALTOOL_LOG_PATH"
-      fail "altool failed with code $ALTOOL_CODE"
+      builder_die "altool failed with code $ALTOOL_CODE"
     )
     cat "$ALTOOL_LOG_PATH"
 
@@ -480,7 +480,7 @@ if $PREPRELEASE || $NOTARIZE; then
             continue;
         fi
         cat "$ALTOOL_LOG_PATH"
-        fail "altool failed with code $ALTOOL_CODE"
+        builder_die "altool failed with code $ALTOOL_CODE"
       )
       ALTOOL_STATUS=$(/usr/libexec/PlistBuddy -c "Print notarization-info:Status" "$ALTOOL_LOG_PATH")
       if [ "$ALTOOL_STATUS" == "success" ]; then
@@ -490,34 +490,34 @@ if $PREPRELEASE || $NOTARIZE; then
         cat "$ALTOOL_LOG_PATH"
         ALTOOL_LOG_URL=$(/usr/libexec/PlistBuddy -c "Print notarization-info:LogFileURL" "$ALTOOL_LOG_PATH")
         curl "$ALTOOL_LOG_URL"
-        fail "Notarization failed with $ALTOOL_STATUS; check log at $ALTOOL_LOG_PATH"
+        builder_die "Notarization failed with $ALTOOL_STATUS; check log at $ALTOOL_LOG_PATH"
       fi
     done
 
-    echo_heading "Notarization completed successfully. Review logs below for any warnings."
+    builder_heading "Notarization completed successfully. Review logs below for any warnings."
     cat "$ALTOOL_LOG_PATH"
     ALTOOL_LOG_URL=$(/usr/libexec/PlistBuddy -c "Print notarization-info:LogFileURL" "$ALTOOL_LOG_PATH")
     curl "$ALTOOL_LOG_URL"
     echo
-    echo_heading "Attempting to staple notarization to Keyman.app"
-    xcrun stapler staple "$TARGET_APP_PATH" || fail "stapler failed"
+    builder_heading "Attempting to staple notarization to Keyman.app"
+    xcrun stapler staple "$TARGET_APP_PATH" || builder_die "stapler failed"
   fi
 fi
 
 ### Deploy as requested ###
 
 if $LOCALDEPLOY ; then
-    echo_heading "Attempting local deployment with command:"
+    builder_heading "Attempting local deployment with command:"
     KM4MIM_APP_BASE_PATH="$KM4MIM_BASE_PATH/build/$CONFIG"
     displayInfo "$KM4MIM_BASE_PATH/localdeploy.sh \"$KM4MIM_APP_BASE_PATH\""
     eval "$KM4MIM_BASE_PATH/localdeploy.sh" "$KM4MIM_APP_BASE_PATH"
     if [ $? == 0 ]; then
         displayInfo "Local deployment succeeded!" ""
     else
-        fail "Local deployment failed!"
+        builder_die "Local deployment failed!"
     fi
 elif $PREPRELEASE ; then
-    echo_heading "Preparing files for release deployment..."
+    builder_heading "Preparing files for release deployment..."
     # Create the disk image
     pushd setup
     eval "./build.sh"
@@ -527,7 +527,7 @@ elif $PREPRELEASE ; then
     if [ $? == 0 ]; then
         displayInfo "Creating disk image succeeded!" ""
     else
-        fail "Creating disk image failed!"
+        builder_die "Creating disk image failed!"
     fi
 
     # Create download info
@@ -535,9 +535,9 @@ elif $PREPRELEASE ; then
     if [ $? == 0 ]; then
         displayInfo "Writing download_info file succeeded!" ""
     else
-        fail "Writing download_info file failed!"
+        builder_die "Writing download_info file failed!"
     fi
 fi
 
-echo_heading "Build Succeeded!"
+builder_heading "Build Succeeded!"
 exit 0

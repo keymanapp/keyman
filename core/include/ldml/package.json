@@ -1,0 +1,20 @@
+{
+  "name": "@keymanapp/ldml-keyboard-constants",
+  "description": "Keyman LDML keyboard constants",
+  "keywords": [
+    "keyboard",
+    "keyman",
+    "ldml",
+    "unicode"
+  ],
+  "files": [
+    "/build/keyboardprocessor_ldml.*"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "build/keyboardprocessor_ldml.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  }
+}

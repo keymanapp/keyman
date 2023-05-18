@@ -1,11 +1,9 @@
-LIBRARY   keyman32-ver17.0.48-alpha-local
+LIBRARY   keyman32-ver17.0.110-alpha-local
 
 EXPORTS
       Keyman_GetInitialised
 			Keyman_Initialise
 			Keyman_Exit
-			Keyman_ForceKeyboard
-			Keyman_StopForcingKeyboard
 			Keyman_GetLastActiveWindow
 			Keyman_GetLastFocusWindow
 			KMSetOutput

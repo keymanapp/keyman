@@ -57,9 +57,9 @@
 #define _KEYMAN64_BUILD_VERSION_H
 
 #ifdef _WIN64
-#define LIBRARY_NAME "keyman64-ver17.0.48-alpha-local.dll"
+#define LIBRARY_NAME "keyman64-ver17.0.110-alpha-local.dll"
 #else
-#define LIBRARY_NAME "keyman32-ver17.0.48-alpha-local.dll"
+#define LIBRARY_NAME "keyman32-ver17.0.110-alpha-local.dll"
 #endif
 
 

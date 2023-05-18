@@ -110,7 +110,6 @@
     </ClCompile>
     <ClCompile Include="..\..\global\cpp\VKScanCodes.cpp" />
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\xstring.cpp" />
-    <ClCompile Include="mc_crc32.cpp" />
     <ClCompile Include="mc_import_rules.cpp" />
     <ClCompile Include="mc_kmxfile.cpp" />
     <ClCompile Include="mcompile.cpp" />

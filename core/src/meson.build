@@ -4,73 +4,51 @@
 # Authors:      Tim Eves (TSE)
 #
 
-defns += ['-DKMN_KBP_EXPORTING']
 version_res = []
 
-if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
-  warns = [
-     '-Wctor-dtor-privacy',
-     '-Wdouble-promotion',
-     '-Wendif-labels',
-     '-Wno-unknown-pragmas',
-     '-Wno-missing-field-initializers',
-     '-Wnon-virtual-dtor',
-     '-Wshadow'
-  ]
-  flags = [
-    '-fvisibility=hidden',
-    '-fvisibility-inlines-hidden'
-  ]
-  links = []
+# TODO: shouldn't this be defined only for dylib and not static lib?
+defns += ['-DKMN_KBP_EXPORTING']
 
-  if compiler.get_id() == 'clang'
-    warns += [
-      '-Wimplicit-fallthrough',
-      '-Wno-double-promotion',
-      '-Wshorten-64-to-32'
-    ]
-  endif
-
-  if host_machine.system() == 'darwin'
-    warns += ['-Wno-ctor-dtor-privacy', '-Wno-non-virtual-dtor']
-  endif
-endif
-
-if compiler.get_id() == 'msvc'
-  warns = []
-  flags = []
-  defns += [
-    '-D_SCL_SECURE_NO_WARNINGS',
-    '-D_CRT_SECURE_NO_WARNINGS',
-    '-DUNICODE'
-  ]
-  links = []
-
+if cpp_compiler.get_id() == 'msvc'
+  defns += ['-DUNICODE']
   # /n = append null
   # /c65001 = utf-8 file format
   version_res += import('windows').compile_resources('version.rc', args:['/n','/c65001'])
 endif
 
-if compiler.get_id() == 'emscripten'
-  warns = []
-  flags = []
-  defns = ['-DKMN_KBP']
-  links = []
+if cpp_compiler.get_id() == 'emscripten'
+  # TODO: why do we need this defn here?
+  defns += ['-DKMN_KBP']
 endif
 
 kmx_files = files(
+  'option.cpp',
+  'keyboard.cpp',
+  'state.cpp',
+  'debuglog.cpp',
+  'km_kbp_context_api.cpp',
+  'km_kbp_keyboard_api.cpp',
+  'km_kbp_options_api.cpp',
+  'km_kbp_state_api.cpp',
+  'km_kbp_debug_api.cpp',
+  'km_kbp_processevent_api.cpp',
+  'jsonpp.cpp',
+  'ldml/ldml_processor.cpp',
+  'ldml/ldml_transforms.cpp',
+  'ldml/ldml_vkeys.cpp',
+  'mock/mock_processor.cpp',
   'kmx/kmx_consts.cpp',
   'kmx/kmx_processevent.cpp',
   'kmx/kmx_actions.cpp',
   'kmx/kmx_capslock.cpp',
   'kmx/kmx_context.cpp',
   'kmx/kmx_conversion.cpp',
-  'kmx/kmx_debug.cpp',
   'kmx/kmx_debugger.cpp',
   'kmx/kmx_environment.cpp',
   'kmx/kmx_file.cpp',
   'kmx/kmx_modifiers.cpp',
   'kmx/kmx_options.cpp',
+  'kmx/kmx_plus.cpp',
   'kmx/kmx_processor.cpp',
   'kmx/kmx_xstring.cpp',
 )
@@ -108,22 +86,6 @@ lib = library('kmnkbp0',
   include_directories: inc,
   pic: true,
   install: true)
-
-if host_machine.system() == 'linux'
-  # on Linux we need the static lib for ibus-keyman tests
-  static_library('kmnkbp0-static',
-    api_files,
-    core_files,
-    kmx_files,
-    mock_files,
-    version_res,
-    cpp_args: defns + warns + flags,
-    link_args: links,
-    include_directories: inc,
-    pic: true,
-    install: false
-  )
-endif
 
 headerdirs = [ '.', 'keyman' ] # subdirectories of ${prefix}/include to add to header path
 

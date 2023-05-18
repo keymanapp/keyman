@@ -180,7 +180,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\global\cpp\kmtip_guids.cpp" />
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\xstring.cpp" />
-    <ClCompile Include="..\keyman32-ver\addins.cpp" />
     <ClCompile Include="..\keyman32-ver\appint\aiTIP.cpp" />
     <ClCompile Include="..\keyman32-ver\appint\aiWin2000Unicode.cpp" />
     <ClCompile Include="..\keyman32-ver\appint\appint.cpp" />
@@ -282,7 +281,6 @@
   <ItemGroup>
     <ClInclude Include="..\keyman32-ver\keymanengine.h" />
     <ClInclude Include="..\..\..\include\kmtip_guids.h" />
-    <ClInclude Include="..\keyman32-ver\addins.h" />
     <ClInclude Include="..\keyman32-ver\appint\aiTIP.h" />
     <ClInclude Include="..\keyman32-ver\appint\aiWin2000Unicode.h" />
     <ClInclude Include="..\keyman32-ver\appint\appint.h" />

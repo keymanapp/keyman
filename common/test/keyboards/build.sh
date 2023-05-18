@@ -5,8 +5,8 @@ set -u
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 THIS_DIR="$(dirname "$THIS_SCRIPT")"
@@ -29,7 +29,9 @@ display_usage() {
 
   for d in "$THIS_DIR/"*/; do
     d="$(basename "$d")"
-    echo "  $d"
+    if [ "$d" != "invalid" ]; then
+      echo "  $d"
+    fi
   done
 
   echo
@@ -122,7 +124,9 @@ fi
 if [ ${#TARGETS[@]} == 0 ]; then
   for d in "$THIS_DIR/"*/; do
     d="$(basename "$d")"
-    TARGETS+=("$d")
+    if [ "$d" != "invalid" ] && [ "$d" != "issue" ]; then
+      TARGETS+=("$d")
+    fi
   done
 fi
 
@@ -191,14 +195,14 @@ for TARGET in "${TARGETS[@]}"; do
   if $CLEAN; then
     if ! $QUIET; then
       echo
-      echo_heading "Cleaning target $TARGET"
+      builder_heading "Cleaning target $TARGET"
       echo
     fi
     clean "$TARGET"
   else
     if ! $QUIET; then
       echo
-      echo_heading "Building target $TARGET"
+      builder_heading "Building target $TARGET"
       echo
     fi
     build "$TARGET"

@@ -393,6 +393,8 @@ const
   SRegValue_IDEOptAutoSaveBeforeCompiling = 'auto save before compiling'; // CU
   SRegValue_IDEOptOSKAutoSaveBeforeImporting = 'osk auto save before importing'; // CU
 
+  SRegValue_IDEOptUseLegacyCompiler = 'use legacy compiler'; // CU
+
   // Note: keeping 'web host port' reg value name to ensure settings maintained
   //       from version 14.0 and earlier of Keyman Developer. Other values are
   //       new with Keyman Developer 15.0

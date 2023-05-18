@@ -4,8 +4,8 @@ set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
@@ -38,7 +38,7 @@ if builder_start_action test:libraries; then
   # No --reporter option exists yet for the headless modules.
 
   $KEYMAN_ROOT/common/web/keyboard-processor/build.sh test $HEADLESS_FLAGS
-  $KEYMAN_ROOT/common/web/input-processor/build.sh build:tools test $HEADLESS_FLAGS
+  $KEYMAN_ROOT/common/web/input-processor/build.sh test $HEADLESS_FLAGS
 
   builder_finish_action success test:libraries
 fi
@@ -66,21 +66,9 @@ if [[ $VERSION_ENVIRONMENT == test ]]; then
 fi
 
 get_default_browser_set ( ) {
-  # Default value, since it's the most general case/configuration to detect.
-  local os_id="linux"
-
-  # Subject to change with future improvements.
-  if [[ "${OSTYPE}" = "darwin"* ]]; then
-    os_id="mac"
-  elif [[ "${OSTYPE}" = "msys" ]]; then
-    os_id="win"
-  elif [[ "${OSTYPE}" = "cygwin" ]]; then
-    os_id="win"
-  fi
-
-  if [ $os_id = "mac" ]; then
+  if [[ $BUILDER_OS == mac ]]; then
       BROWSERS="--browsers Firefox,Chrome,Safari"
-  elif [ $os_id = "win" ]; then
+  elif [[ $BUILDER_OS == win ]]; then
       BROWSERS="--browsers Firefox,Chrome,Edge"
   else
       BROWSERS="--browsers Firefox,Chrome"
@@ -88,12 +76,12 @@ get_default_browser_set ( ) {
 }
 
 if builder_start_action test:engine; then
-  if builder_has_option --ci && builder_has_option --debug; then
+  if builder_has_option --ci && builder_is_debug_build; then
     builder_die "Options --ci and --debug are incompatible."
   fi
 
-  if [[ DO_BROWSER_TEST_SUITE == false ]]; then
-    log_warning "Skipping action test:engine - this CI build does not appear to be for a Web PR."
+  if [[ $DO_BROWSER_TEST_SUITE == false ]]; then
+    builder_warn "Skipping action test:engine - this CI build does not appear to be for a Web PR."
     builder_finish_action success test:engine
     exit 0
   fi
@@ -116,7 +104,7 @@ if builder_start_action test:engine; then
   # Prepare the flags for the karma command.
   KARMA_FLAGS=
 
-  if builder_has_option --debug; then
+  if builder_is_debug_build; then
     KARMA_FLAGS="$KARMA_FLAGS --no-single-run"
   fi
 

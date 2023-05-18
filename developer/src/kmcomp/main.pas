@@ -47,6 +47,8 @@ uses
   Winapi.ActiveX,
   Winapi.Windows,
 
+  KeyboardParser,
+  kmxfileconsts,
   Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.Project.ProjectLogConsole,
   Keyman.Developer.System.ValidateRepoChanges,
@@ -59,10 +61,11 @@ uses
   CompileKeymanWeb,
   JsonExtractKeyboardInfo,
   ValidateKeyboardInfo,
-  MergeKeyboardInfo;
+  MergeKeyboardInfo,
+  UKeymanTargets;
 
 function CompileKeyboard(FInFile, FOutFile: string; FDebug, FWarnAsError: Boolean): Boolean; forward;   // I4706
-function KCSetCompilerOptions(const FInFile: string; FShouldAddCompilerVersion: Boolean): Boolean; forward;
+function KCSetCompilerOptions(const FInFile: string; FShouldAddCompilerVersion, FUseKmcmpLib: Boolean): Boolean; forward;
 //function CompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall; forward;
 procedure FixupPathSlashes(var path: string); forward;
 
@@ -87,6 +90,7 @@ var
   FParamDistribution: Boolean;
   FMergingValidateIds: Boolean;
   FShouldAddCompilerVersion: Boolean;
+  FUseKmcmpLib: Boolean;
   FJsonSchemaPath: string;
   FParamSourcePath: string;
   FParamHelpLink: string;
@@ -113,6 +117,7 @@ begin
   FColorMode := cmDefault;
 
   FShouldAddCompilerVersion := True;
+  FUseKmcmpLib := True;
 
   FParamInfile := '';
   FParamOutfile := '';
@@ -188,6 +193,8 @@ begin
       FColorMode := cmForceNoColor
     else if s = '-no-compiler-version' then
       FShouldAddCompilerVersion := False
+    else if s = '-use-legacy-compiler' then
+      FUseKmcmpLib := False
     else if (s = '-help') or (s = '-h') then
     begin
       // Force help
@@ -216,6 +223,8 @@ begin
     writeln(SKeymanDeveloperName + ' Compiler (32-bit)');
 {$ENDIF}
     writeln('Version ' + CKeymanVersionInfo.VersionWithTag + ', ' + GetVersionCopyright);
+    if not FUseKmcmpLib then
+      writeln('Note: using legacy compiler');
   end;
 
   if FError or (FParamInfile = '') then
@@ -225,7 +234,7 @@ begin
     writeln('');
     writeln('Usage: '+cmd+' [-s[s]] [-nologo] [-c] [-d] [-w] [-cfc] [-v[s|d]] [-source-path path] [-schema-path path] ');
     writeln('       '+spc+' [-m] infile [-m infile] [-t target] [outfile.kmx|outfile.js [error.log]]');   // I4699
-    writeln('       '+spc+' [-add-help-link path] [-color|-no-color] [-no-compiler-version]');
+    writeln('       '+spc+' [-add-help-link path] [-color|-no-color] [-no-compiler-version] [-use-legacy-compiler]');
     writeln('       '+spc+' [-extract-keyboard-info field[,field...]]');
     writeln('          infile        can be a .kmn file (Keyboard Source, .kps file (Package Source), or .kpj (project)');   // I4699   // I4825
     writeln('                        if -v specified, can also be a .keyboard_info file');
@@ -249,6 +258,7 @@ begin
     writeln('                         uses console mode to determine whether color should be used.');
     writeln;
     writeln('          -no-compiler-version   Don''t embed the compiler version stores, useful for regression tests.');
+    writeln('          -use-legacy-compiler   Use legacy compiler (will be removed in 18.0)');
     writeln;
     writeln(' JSON .keyboard_info compile targets:');
     writeln('          -v[s]    validate infile against source schema');
@@ -288,7 +298,7 @@ begin
 
     TProjectLogConsole.Create(FSilent, FFullySilent, hOutfile, FColorMode);
 
-    KCSetCompilerOptions(FParamInfile, FShouldAddCompilerVersion);
+    KCSetCompilerOptions(FParamInfile, FShouldAddCompilerVersion, FUseKmcmpLib);
 
     if FValidateRepoChanges then
       FError := not TValidateRepoChanges.Execute(FParamInfile, FParamOutfile)
@@ -314,7 +324,7 @@ begin
     ExitCode := 1;
 end;
 
-function KCSetCompilerOptions(const FInFile: string; FShouldAddCompilerVersion: Boolean): Boolean;
+function KCSetCompilerOptions(const FInFile: string; FShouldAddCompilerVersion, FUseKmcmpLib: Boolean): Boolean;
 var
   opt: TCompilerOptions;
 begin
@@ -322,6 +332,7 @@ begin
 
   opt.dwSize := sizeof(TCompilerOptions);
   opt.ShouldAddCompilerVersion := FShouldAddCompilerVersion;
+  opt.UseKmcmpLib := FUseKmcmpLib;
 
   Result := SetCompilerOptions(@opt, @CompilerMessageW);
 
@@ -332,28 +343,67 @@ begin
 end;
 
 function CompileKeyboard(FInFile, FOutFile: string; FDebug, FWarnAsError: Boolean): Boolean;   // I4706
+var
+  FIsJS, FIsKMX: Boolean;
+  kp: TKeyboardParser;
+  FTargets: TKeymanTargets;
 begin
-  if SameText(ExtractFileExt(FOutFile), '.js') then
+  if ExtractFileExt(FOutFile) = '.*' then
   begin
-    with TCompileKeymanWeb.Create do
+    // Load the input .kmn and determine if it targets .js and .kmx
+    kp := TKeyboardParser.Create;
     try
-      Result := Compile(nil, FInFile, FOutFile, FDebug, @CompilerMessageW);   // I3681   // I4865   // I4866
+      kp.LoadFromFile(FInFile);
+
+      // Compile targets - copied from kmnProjectFile
+      FTargets := StringToKeymanTargets(kp.GetSystemStoreValue(ssTargets));
+      if ktAny in FTargets then FTargets := AllKeymanTargets;
+      if FTargets = [] then FTargets := [ktWindows];
+
+      FIsJS := FTargets * KMWKeymanTargets <> [];
+      FIsKMX := FTargets * KMXKeymanTargets <> [];
     finally
-      Free;
+      kp.Free;
     end;
   end
   else
   begin
-    if FOutFile = '' then FOutFile := ChangeFileExt(FInFile, '.kmx');
-    Result := CompileKeyboardFile(PChar(FInFile), PChar(FOutFile), FDebug, FWarnAsError, True, @CompilerMessage) <> 0;   // I4865   // I4866
-    Result := Result and CompileVisualKeyboardFromKMX(FInFile, FOutFile);
+    FIsJS := SameText(ExtractFileExt(FOutFile), '.js');
+    FIsKMX := not FIsJS;
   end;
 
-  if TProjectLogConsole.Instance.HasWarning and FWarnAsError then Result := False;   // I4706
+  Result := True;
 
-  if Result
-    then TProjectLogConsole.Instance.Log(plsSuccess, FInFile, 'Keyboard '+FInFile+' compiled, output saved as '+FOutFile+'.', 0, 0)
-  	else TProjectLogConsole.Instance.Log(plsFailure, FInFile, 'Keyboard '+FInFile+' could not be compiled.', 0, 0);
+  if FIsJS then
+  begin
+    if FOutFile = '' then FOutFile := FInFile;
+    FOutFile := ChangeFileExt(FOutFile, '.js');
+
+    with TCompileKeymanWeb.Create do
+    try
+      Result := Result and Compile(nil, FInFile, FOutFile, FDebug, @CompilerMessageW);   // I3681   // I4865   // I4866
+    finally
+      Free;
+    end;
+
+    if TProjectLogConsole.Instance.HasWarning and FWarnAsError then Result := False;   // I4706
+    if Result
+      then TProjectLogConsole.Instance.Log(plsSuccess, FInFile, 'Keyboard '+FInFile+' compiled, output saved as '+FOutFile+'.', 0, 0)
+      else TProjectLogConsole.Instance.Log(plsFailure, FInFile, 'Keyboard '+FInFile+' could not be compiled.', 0, 0);
+  end;
+
+  if Result and FIsKMX then
+  begin
+    if FOutFile = '' then FOutFile := FInFile;
+    FOutFile := ChangeFileExt(FOutFile, '.kmx');
+    Result := Result and (CompileKeyboardFile(PChar(FInFile), PChar(FOutFile), FDebug, FWarnAsError, True, @CompilerMessage) <> 0);   // I4865   // I4866
+    Result := Result and CompileVisualKeyboardFromKMX(FInFile, FOutFile);
+
+    if TProjectLogConsole.Instance.HasWarning and FWarnAsError then Result := False;   // I4706
+    if Result
+      then TProjectLogConsole.Instance.Log(plsSuccess, FInFile, 'Keyboard '+FInFile+' compiled, output saved as '+FOutFile+'.', 0, 0)
+      else TProjectLogConsole.Instance.Log(plsFailure, FInFile, 'Keyboard '+FInFile+' could not be compiled.', 0, 0);
+  end;
 end;
 
 procedure FixupPathSlashes(var path: string);

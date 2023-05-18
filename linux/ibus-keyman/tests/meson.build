@@ -6,13 +6,9 @@ test_files = [
   'testmodule.h',
 ]
 
-kmx_dir = [
-  core_dir / 'build/arch' / get_option('buildtype') / 'tests/unit/kmx'
-]
-
 kmnkbp_tests_lib = cc.find_library(
   'libkmnkbp-tests',
-  dirs: kmx_dir
+  dirs: [ core_dir / 'build/arch' / get_option('buildtype') / 'tests/kmx_test_source' ]
 )
 
 deps = [ibus, gtk, x11, json_glib, kmnkbp_lib, kmnkbp_tests_lib]
@@ -24,7 +20,7 @@ test_env = [
 
 test_include_dirs = [
   core_include_dirs,
-  include_directories('../../../core/tests/unit/kmx'),
+  include_directories('../../../core/tests/kmx_test_source'),
   include_directories('../src'),
   include_directories('..'),
 ]
@@ -84,7 +80,7 @@ test(
 
 kmxtest_files = run_command(
   find_tests,
-  kmx_dir,
+  [ common_dir / 'test/keyboards/baseline' ],
   check: true,
 ).stdout().split('\n')
 

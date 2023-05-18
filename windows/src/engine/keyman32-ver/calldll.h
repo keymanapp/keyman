@@ -19,6 +19,11 @@
 #ifndef __CALLDLL_H
 #define __CALLDLL_H
 
+/**
+ * Load the all the dlls used by the current keyboard
+ * @param   lpkbi  The keyboard for which to load the dlls
+ * @return  BOOL  True on success
+ */
 BOOL LoadDLLs(LPINTKEYBOARDINFO lpkbi);
 BOOL UnloadDLLs(LPINTKEYBOARDINFO lpkbi);
 BOOL DeactivateDLLs(LPINTKEYBOARDINFO lpkbi);
@@ -26,22 +31,10 @@ BOOL ActivateDLLs(LPINTKEYBOARDINFO lpkbi);
 
 /* Before keyman32/64 started using versioned dll names the IMX keyboard framework was written
 Third party developers will have used the name "keyman32/64dll" so we need to honor that for these
-keyboards. We do this by having a proxy dll that forwards to version keyman dll opened for this process
+keyboards. We do this by having a proxy dll that forwards to the versioned keyman dll opened for this process
 We only want and need to do this if there is imx keyboard */
 
-
-// TODO: 5444 This will become the only LoadDLLs function
-/**
- * Load the all the dlls used by the current keyboard
- * @param   lpkbi  The keyboard for which to load the dlls
- * @return  BOOL  True on success
- */
-BOOL LoadDLLsCore(LPINTKEYBOARDINFO lpkbi);
-
-
 BOOL IsIMWindow(HWND hwnd);
-
-void CallDLL(LPINTKEYBOARDINFO lpkbi, DWORD storenum);
 
 // Callback function used by the core processor to call out to 3rd Party Library functions
 extern "C" uint8_t IM_CallBackCore(km_kbp_state *km_state, uint32_t UniqueStoreNo, void *callbackObject);

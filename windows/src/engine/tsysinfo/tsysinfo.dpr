@@ -19,7 +19,6 @@ uses
   kmxfile in '..\..\..\..\common\windows\delphi\keyboards\kmxfile.pas',
   utilkeyboard in '..\..\..\..\common\windows\delphi\keyboards\utilkeyboard.pas',
   utilfiletypes in '..\..\..\..\common\windows\delphi\general\utilfiletypes.pas',
-  CRC32 in '..\..\..\..\common\windows\delphi\general\CRC32.pas',
   KeyNames in '..\..\..\..\common\windows\delphi\general\KeyNames.pas',
   ttinfo in '..\..\..\..\common\windows\delphi\general\ttinfo.pas',
   Upload_Settings in '..\..\..\..\common\windows\delphi\general\Upload_Settings.pas',

@@ -1,27 +1,9 @@
 #!/usr/bin/env bash
 
-_shf_base_dir=$(dirname "$BASH_SOURCE")/..
-
-# Designed to determine which set of browsers should be available for local testing,
-# based upon the current system OS.
-get_builder_OS ( ) {
-  # Default value, since it's the most general case/configuration to detect.
-  os_id="linux"
-
-  # Subject to change with future improvements.
-  if [[ "${OSTYPE}" = "darwin"* ]]; then
-    os_id="mac"
-  elif [[ "${OSTYPE}" = "msys" ]]; then
-    os_id="win"
-  elif [[ "${OSTYPE}" = "cygwin" ]]; then
-    os_id="win"
-  fi
-}
-
 # Allows for a quick macOS check for those scripts requiring a macOS environment.
 verify_on_mac() {
   if [[ "${OSTYPE}" != "darwin"* ]]; then
-    fail "This build script will only run in a Mac environment."
+    builder_die "This build script will only run in a Mac environment."
     exit 1
   fi
 }
@@ -40,68 +22,9 @@ verify_project() {
   done
 
   if [ $match = false ]; then
-    fail "Invalid project specified!"
+    builder_die "Invalid project specified!"
   fi
 }
-
-# The list of valid platforms that our build scripts ought expect.
-platforms=("android" "ios" "linux" "lmlayer" "mac" "web" "desktop" "developer")
-
-# Used to validate a specified 'platform' parameter.
-verify_platform() {
-  match=false
-  for proj in ${platforms[@]}
-  do
-    if [ $proj = $1 ]; then
-      match=true
-    fi
-  done
-
-  if [ $match = false ]; then
-    fail "Invalid platform specified!"
-  fi
-}
-
-# Gets the folder containing each platform's history.md file, which is also the base folder for most of the platforms.
-# Sets $platform_folder accordingly.
-get_platform_folder() {
-  verify_platform $1
-
-  if [[ $1 = "desktop" || $1 = "developer" ]]; then
-    platform_folder="$_shf_base_dir/windows/src/$1"
-  elif [[ $1 = "lmlayer" ]]; then
-    platform_folder="common/predictive-text"
-  else
-    platform_folder="$_shf_base_dir/$1"
-  fi
-}
-
-# Note: COLOR_ and HEADING_ variables are defined in build-utils.sh
-# which is already required for scripts so these should be safe.
-# (part of TODO: consolidate these two scripts)
-
-echo_heading() {
-  echo -e "${HEADING_SETMARK}${COLOR_BLUE}$*${COLOR_RESET}"
-}
-
-log_error() {
-  echo "${COLOR_RED}$THIS_SCRIPT_NAME: $*${COLOR_RESET}" >&2
-}
-
-log_warning() {
-  echo "${COLOR_YELLOW}$THIS_SCRIPT_NAME: $*${COLOR_RESET}" >&2
-}
-
-fail() {
-    FAILURE_MSG="$1"
-    if [[ "$FAILURE_MSG" == "" ]]; then
-        FAILURE_MSG="Unknown failure"
-    fi
-    echo "${COLOR_RED}$FAILURE_MSG${COLOR_RESET}"
-    exit 1
-}
-
-warn() { echo "${COLOR_YELLOW}$*${COLOR_RESET}"; }
 
 displayInfo() {
     if [ "$QUIET" != true ]; then
@@ -114,27 +37,27 @@ displayInfo() {
 
 assertFileExists() {
     if ! [ -f $1 ]; then
-        fail "Build failed:  missing $1"
+        builder_die "Build failed:  missing $1"
     fi
 }
 
 assertDirExists() {
     if ! [ -d $1 ]; then
-        fail "Build failed:  missing $1"
+        builder_die "Build failed:  missing $1"
     fi
 }
 
 assertValidVersionNbr()
 {
     if [[ "$1" == "" || ! "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-        fail "Specified version not valid: '$1'. Version should be in the form Major.Minor.BuildCounter"
+        builder_die "Specified version not valid: '$1'. Version should be in the form Major.Minor.BuildCounter"
     fi
 }
 
 assertValidPRVersionNbr()
 {
     if [[ "$1" == "" || ! "$1" =~ ^[0-9]+\.[0-9]+\.pull\.[0-9]+$ ]]; then
-        fail "Specified version not valid: '$1'. Version should be in the form Major.Minor.pull.BuildCounter"
+        builder_die "Specified version not valid: '$1'. Version should be in the form Major.Minor.pull.BuildCounter"
     fi
 }
 
@@ -189,25 +112,25 @@ write_download_info() {
   KM_BLD_COUNTER="$((${KM_VERSION##*.}))"
 
   if [ "$KM_VERSION" = "" ]; then
-    fail "Required -version parameter not specified!"
+    builder_die "Required -version parameter not specified!"
   fi
 
   if [ "$KM_TIER" = "" ]; then
-    fail "Required -tier parameter not specified!"
+    builder_die "Required -tier parameter not specified!"
   fi
 
   DOWNLOAD_INFO_FILEPATH="${BASE_PATH}/${BASE_FILE}.download_info"
   if [[ ! -f "${BASE_PATH}/${BASE_FILE}" ]]; then
-    fail "Cannot compute file size or MD5 for non-existent DMG file: ${BASE_PATH}/${BASE_FILE}"
+    builder_die "Cannot compute file size or MD5 for non-existent DMG file: ${BASE_PATH}/${BASE_FILE}"
   fi
 
   FILE_EXTENSION="${BASE_FILE##*.}"
 
-  FILE_SIZE=$(stat -f"%z" "${BASE_PATH}/${BASE_FILE}")
+  FILE_SIZE=$(/usr/bin/stat -f"%z" "${BASE_PATH}/${BASE_FILE}")
   MD5_HASH=$(md5 -q "${BASE_PATH}/${BASE_FILE}")
 
   if [[ -f "$DOWNLOAD_INFO_FILEPATH" ]]; then
-    warn "Overwriting $DOWNLOAD_INFO_FILEPATH"
+    builder_warn "Overwriting $DOWNLOAD_INFO_FILEPATH"
   fi
 
   echo { > "$DOWNLOAD_INFO_FILEPATH"
@@ -274,7 +197,7 @@ verify_npm_setup() {
 
   # Check if Node.JS/npm is installed.
   type npm >/dev/null ||\
-    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+    builder_die "Build environment setup error detected!  Please ensure Node.js is installed!"
 
   pushd "$KEYMAN_ROOT" > /dev/null
   npm ci

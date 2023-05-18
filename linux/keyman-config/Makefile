@@ -6,7 +6,14 @@ default: clean version man langtags
 langtags:
 	cd buildtools && python3 ./build-langtags.py
 
-install: # run as sudo
+install:
+	if [ -n "${SUDO_USER}" ]; then \
+		make install-sudo; \
+	else \
+		make install-temp; \
+	fi
+
+install-sudo:  # run as sudo
 	pip3 install qrcode sentry-sdk
 	# eventually change this to: pip3 install .
 	python3 setup.py install
@@ -59,7 +66,7 @@ man:
 	./build-help.sh --man --no-reconf
 
 version_reconf:
-	cd .. && ./scripts/reconf.sh keyman-config
+	cd .. && ./scripts/reconf.sh
 
 version: version_reconf
 	$(eval VERSION := $(shell python3 -c "from keyman_config import __releaseversion__; print(__releaseversion__)"))

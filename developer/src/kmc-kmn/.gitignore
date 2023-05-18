@@ -1,0 +1,3 @@
+# WASM interfaces from kmcmplib are copied here so we can avoid having
+# to make tsc aware of debug vs release paths
+src/import/

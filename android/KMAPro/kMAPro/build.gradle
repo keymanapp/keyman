@@ -2,7 +2,7 @@ plugins {
     id 'com.android.application'
     id 'io.sentry.android.gradle'
     // https://github.com/Triple-T/gradle-play-publisher/issues/947#issuecomment-843634852
-    id 'com.github.triplet.play' version '3.7.0-agp4.2' apply false
+    id 'com.github.triplet.play' version '3.8.1' apply false
     id 'name.remal.default-plugins'
 }
 
@@ -11,14 +11,11 @@ apply from: "$rootPath/version.gradle"
 
 android {
     compileSdkVersion 33
+    namespace="com.tavultesoft.kmapro"
 
     // Don't compress kmp files so they can be copied via AssetManager
     aaptOptions {
         noCompress "kmp"
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     defaultConfig {
@@ -95,6 +92,11 @@ android {
             }
         }
         variant.resValue "string", "app_name", 'Keyman' + appSuffix;
+
+        // Adjust output name to "keyman-${VERSION_MD}.apk"
+        variant.outputs.all {
+            outputFileName = "keyman-" + VERSION_MD + ".apk"
+        }
     }
     lintOptions {
         disable 'MissingQuantity', 'MissingTranslation'
@@ -159,7 +161,7 @@ dependencies {
     // Add dependency for generating QR Codes
     // (Even though it's embedded in KMEA, because we're manually copying keyman-engine.aar,
     // we "lose" it in the dependency management)
-    implementation ('com.github.kenglxn.QRGen:android:2.7.0') {
+    implementation ('com.github.kenglxn.QRGen:android:3.0.1') {
         transitive = true
     }
 }

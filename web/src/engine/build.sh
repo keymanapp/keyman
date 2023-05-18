@@ -8,8 +8,8 @@ set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -72,18 +72,22 @@ output_path ( ) {
   fi
 }
 
+# TODO: eliminate $SOURCE variable
 SOURCE="src"
 
 # Ensures that we rely first upon the local npm-based install of Typescript.
 # (Facilitates automated setup for build agents.)
+# TODO: this should be removeable given set_keyman_standard_build_path does this in build-utils.sh (and relative paths are dodgy in $PATH!)
 PATH="../../../node_modules/.bin:$PATH"
 
+# TODO: call tsc directly -- but currently it runs from wrong folder if called directly
+# TODO: eliminate $compiler and $compilecmd variables
 compiler="npm run tsc --"
 compilecmd="$compiler"
 
 builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
-  "@../../../common/web/keyman-version build:main" \
-  "@../../../common/web/input-processor build:main" \
+  "@/common/web/keyman-version build:main" \
+  "@/common/web/input-processor build:main" \
   "clean" \
   "configure" \
   "build" \
@@ -95,13 +99,14 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
 
 builder_describe_outputs \
-  configure                  ../node_modules \
-  configure:device-detect    ../node_modules \
-  configure:element-wrappers ../node_modules \
-  configure:main             ../node_modules \
+  configure                  /node_modules \
+  configure:device-detect    /node_modules \
+  configure:element-wrappers /node_modules \
+  configure:main             /node_modules \
   build:device-detect        $(output_path $DEVICEDETECT $OUTPUT_DIR)/index.js \
   build:element-wrappers     $(output_path $ELEMENTWRAPPERS $OUTPUT_DIR)/index.js \
   build:main                 $(output_path $MAIN $OUTPUT_DIR)/keymanweb.js
+# TODO: eliminate outpath_path function and related variables and just use the plain filenames
 
 builder_parse "$@"
 
@@ -120,7 +125,7 @@ builder_parse "$@"
 # ```
 compile ( ) {
   if [ $# -lt 1 ]; then
-    fail "Scripting error: insufficient argument count!"
+    builder_die "Scripting error: insufficient argument count!"
   fi
 
   local COMPILE_TARGET=$1

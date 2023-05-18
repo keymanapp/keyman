@@ -2,8 +2,8 @@
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
@@ -23,12 +23,15 @@ builder_describe "Runs all tests for the language-modeling / predictive-text lay
   ":libraries  Runs unit tests for in-repo libraries used by this module"\
   ":headless   Runs this module's headless user tests" \
   ":browser    Runs this module's browser-based user tests" \
-  "--ci        Uses CI-based test configurations & emits CI-friendly test reports" \
-  "--debug,-d  Activates developer-friendly debug mode for unit tests where applicable"
+  "--ci        Uses CI-based test configurations & emits CI-friendly test reports"
 
 # TODO: consider dependencies? ideally this will be test.inc.sh?
 
 builder_parse "$@"
+
+if builder_has_option --ci && builder_is_debug_build; then
+  builder_die "Options --ci and --debug are incompatible."
+fi
 
 if builder_start_action configure; then
   verify_npm_setup
@@ -55,7 +58,7 @@ if builder_start_action test:libraries; then
 
   pushd "$KEYMAN_ROOT/common/models/templates"
   echo
-  echo "### Running $builder_term common/models/templates) tests"
+  echo "### Running $(builder_term common/models/templates) tests"
   if builder_has_option --ci; then
     npm run test -- -reporter mocha-teamcity-reporter
   else
@@ -65,7 +68,7 @@ if builder_start_action test:libraries; then
 
   pushd "$KEYMAN_ROOT/common/models/types"
   echo
-  echo "### Running $builder_term common/models/types) tests"
+  echo "### Running $(builder_term common/models/types) tests"
   # Is not mocha-based; it's TSC-based instead, as we're just ensuring that the .d.ts
   # file is a proper TS declaration file.
   npm run test
@@ -97,16 +100,16 @@ if [[ $VERSION_ENVIRONMENT == test ]] && builder_has_action test :browser; then
   if builder_pull_get_details; then
     if ! ([[ $builder_pull_title =~ \(web\) ]] || builder_pull_has_label test-browserstack); then
 
-      echo "Auto-skipping $builder_term test:browser) for unrelated CI test build"
+      echo "Auto-skipping $(builder_term test:browser) for unrelated CI test build"
       exit 0
     fi
   fi
 fi
 
 get_browser_set_for_OS ( ) {
-  if [ $os_id = "mac" ]; then
+  if [[ $BUILDER_OS == mac ]]; then
     BROWSERS="--browsers Firefox,Chrome,Safari"
-  elif [ $os_id = "win" ]; then
+  elif [[ $BUILDER_OS == win ]]; then
     BROWSERS="--browsers Chrome"
   else
     BROWSERS="--browsers Firefox,Chrome"
@@ -121,13 +124,9 @@ if builder_start_action test:browser; then
     KARMA_FLAGS="$KARMA_FLAGS --reporters teamcity,BrowserStack"
     KARMA_CONFIG="CI.conf.js"
     KARMA_INFO_LEVEL="--log-level=debug"
-
-    if builder_has_option --debug; then
-      echo "$(builder_term --ci) option set; ignoring $(builder_term --debug) option"
-    fi
   else
     KARMA_CONFIG="manual.conf.js"
-    if builder_has_option --debug; then
+    if builder_is_debug_build; then
       KARMA_FLAGS="$KARMA_FLAGS --no-single-run"
       KARMA_CONFIG="manual.conf.js"
       KARMA_INFO_LEVEL="--log-level=debug"
@@ -139,7 +138,6 @@ if builder_start_action test:browser; then
   fi
 
   if [[ KARMA_CONFIG == "manual.conf.js" ]]; then
-    get_builder_OS  # return:  os_id="linux"|"mac"|"win"
     get_browser_set_for_OS
   else
     BROWSERS=
