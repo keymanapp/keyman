@@ -157,6 +157,12 @@ describe('Engine - Browser Interactions', function() {
       fixture.cleanup();
     });
 
+    /**
+     * This can be surprisingly useful for catching browser-specific oddities related to keystroke
+     * and keyboard-rule processing!  Keep this test cross-browser at all costs if possible!
+     *
+     * See #8830.
+     */
     it('Simple Keypress', function() {
       var inputElem = document.getElementById('singleton');
 
