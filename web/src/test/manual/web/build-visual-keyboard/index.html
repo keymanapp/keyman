@@ -51,7 +51,7 @@
                 platform == 'phone' ? 240 : 360;
       };
 
-      let shadowfy = function(container, style) {
+      let shadowfy = function(container) {
         const docBase = container.children[0];
         container.removeChild(docBase);
 
@@ -59,12 +59,10 @@
         shadow.appendChild(docBase);
 
         const baseOSKStyle = document.createElement('link');
-        baseOSKStyle.href = "../../../../../build/app/browser/debug/osk/kmwosk.css";
+        baseOSKStyle.href = "../../../../../build/app/resources/osk/kmwosk.css";
         baseOSKStyle.rel="stylesheet";
         baseOSKStyle.type="text/css";
         shadow.appendChild(baseOSKStyle);
-
-        shadow.appendChild(style);
       }
 
       let documentKeyboard = async function(kbdid, langid, formFactor, layer) {
@@ -92,12 +90,12 @@
         // highly-controlled environment.
         await Promise.resolve();
 
-        // Grab the stylesheet element that was inserted; there should be no intervening additions,
-        // so the newly-added stylesheet element should be the last element in the <head> section.
-        const stylesheet = document.head.lastChild;
-        stylesheet.parentElement.removeChild(stylesheet);
+        // // Grab the stylesheet element that was inserted; there should be no intervening additions,
+        // // so the newly-added stylesheet element should be the last element in the <head> section.
+        // const stylesheet = keyman.osk._Box.lastChild;
+        // stylesheet.parentElement.removeChild(stylesheet);
 
-        shadowfy(container, stylesheet);
+        shadowfy(container);
       }
 
       kmw.init({
