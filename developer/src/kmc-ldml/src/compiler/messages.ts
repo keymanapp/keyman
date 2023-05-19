@@ -98,5 +98,18 @@ export class CompilerMessages {
   m(this.FATAL_SectionInitFailed, `The compiler for '${o.sect}' failed to initialize.`);
   static FATAL_SectionInitFailed = SevFatal | 0x0017;
 
+  // Not hit due to XML parsing
+  static Error_InvalidTransformsType = (o:{types: string[]}) =>
+  m(this.ERROR_InvalidTransformsType, `Invalid transforms types: '${o.types?.join(',')}'`);
+  static ERROR_InvalidTransformsType = SevError | 0x0018;
+
+  static Error_DuplicateTransformsType = (o:{types: string[]}) =>
+  m(this.ERROR_DuplicateTransformsType, `Duplicate transforms types: '${o.types?.join(',')}'`);
+  static ERROR_DuplicateTransformsType = SevError | 0x0019;
+
+  static Error_MixedTransformGroup = () =>
+  m(this.ERROR_MixedTransformGroup, `transformGroup cannot contain both reorder and transform elements`);
+  static ERROR_MixedTransformGroup = SevError | 0x001A;
+
 }
 

@@ -12,8 +12,10 @@
     <transformGroup>
       <transform from="xx" to="x"/>
     </transformGroup>
+  </transforms>
+  <transforms type="simple"> <!-- dup -->
     <transformGroup>
-      <reorder from="ខែ្ម" order="1 3 4 2" />
+      <transform from="yy" to="y"/>
     </transformGroup>
   </transforms>
 </keyboard>

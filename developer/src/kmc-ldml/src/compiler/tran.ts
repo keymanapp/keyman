@@ -11,8 +11,10 @@ import Tran = KMXPlus.Tran;
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 // import LKTransform = LDMLKeyboard.LKTransform;
 import LKTransforms = LDMLKeyboard.LKTransforms;
+import { verifyValidAndUnique } from "../util/util.js";
+import { CompilerMessages } from "./messages.js";
 
-type TransformCompilerType = 'simple' | 'final' | 'backspace';
+type TransformCompilerType = 'simple' | 'backspace';
 
 class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran/*, TranItemBase extends TranItem*/> extends SectionCompiler {
 
@@ -23,9 +25,33 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran/*
   }
 
   public validate(): boolean {
+    const reportMessage = this.callbacks.reportMessage.bind(this.callbacks);
+
     let valid = true;
-    // TODO-LDML: linting here should check for identical before+from, but this involves a double-parse which is ugly
+    // TODO-LDML: linting here should check for identical from, but this involves a double-parse which is ugly
     // TODO-LDML: unicodesets means that either we fully parse them and verify conflicting rules or the linting is imperfect
+    const transforms = this?.keyboard?.transforms;
+    if (transforms) {
+      const types : string[] = transforms.map(({type}) => type);
+      if (!verifyValidAndUnique(types,
+        types => reportMessage(CompilerMessages.Error_DuplicateTransformsType({ types })),
+        new Set(['simple', 'backspace']),
+        types => reportMessage(CompilerMessages.Error_InvalidTransformsType({ types })))) {
+        valid = false;
+      }
+
+      // check for mixed groups
+      let mixed = false;
+      transforms.forEach(({transformGroup}) => transformGroup.forEach((transformGroup) => {
+        if (transformGroup.reorder?.length && transformGroup.transform?.length) {
+          mixed = true;
+        }
+      }));
+      if (mixed) {
+        valid = false;
+        reportMessage(CompilerMessages.Error_MixedTransformGroup()); // report this once
+      }
+    }
     return valid;
   }
 

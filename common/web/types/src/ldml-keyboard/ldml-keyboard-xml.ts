@@ -163,28 +163,20 @@ export interface LKTransforms {
 export interface LKTransform {
   from?: string;
   to?: string;
-  before?: string;
-  error?: "fail";
 };
 
 export interface LKTransformGroup {
-
+  // one or the other, not both
+  transform?: LKTransform[];
+  reorder?: LKReorder[];
 };
-
-export interface LKTransformTransformGroup extends LKTransformGroup {
-  transform: LKTransform[];
-};
-export interface LKReorderGroup extends LKTransformGroup {
-  reorder: LKReorder[];
-};
-
 export interface LKReorder {
   from?: string;
   before?: string;
   order?: string;
   tertiary?: string;
-  tertiary_base?: string;
-  prebase?: string;
+  tertiaryBase?: string;
+  preBase?: string;
 };
 
 export interface LKDisplayOptions {
@@ -194,6 +186,7 @@ export interface LKDisplayOptions {
 export interface LKDisplay {
   to?: string;
   display?: string;
+  id?: string; // TODO-LDML: This comes in a near-future CLDR update
 };
 
 export interface LKDisplays {

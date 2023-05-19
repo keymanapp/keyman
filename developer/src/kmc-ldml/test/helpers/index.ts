@@ -5,7 +5,7 @@ import 'mocha';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { SectionCompiler } from '../../src/compiler/section-compiler.js';
-import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
+import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile, compilerEventFormat } from '@keymanapp/common-types';
 import { LdmlKeyboardCompiler } from '../../src/compiler/compiler.js';
 import { assert } from 'chai';
 import { KMXPlusMetadataCompiler } from '../../src/compiler/metadata-compiler.js';
@@ -49,11 +49,11 @@ export async function loadSectionFixture(compilerClass: typeof SectionCompiler, 
   callbacks.messages = [];
   const inputFilename = makePathToFixture(filename);
   const data = callbacks.loadFile(inputFilename);
-  assert.isNotNull(data);
+  assert.isNotNull(data, `Failed to read file ${inputFilename}`);
 
   const reader = new LDMLKeyboardXMLSourceFileReader(callbacks);
   const source = reader.load(data);
-  assert.isNotNull(source);
+  assert.isNotNull(source, `Failed to load XML from ${inputFilename}`);
 
   if (!reader.validate(source, callbacks.loadSchema('ldml-keyboard'))) {
     return null; // mimic kmc behavior - bail if validate fails
@@ -126,7 +126,7 @@ export function checkMessages() {
   if(compilerTestCallbacks.messages.length > 0) {
     console.log(compilerTestCallbacks.messages);
   }
-  assert.isEmpty(compilerTestCallbacks.messages);
+  assert.isEmpty(compilerTestCallbacks.messages, compilerEventFormat(compilerTestCallbacks.messages));
 }
 
 export interface CompilationCase {
@@ -137,7 +137,7 @@ export interface CompilationCase {
   /**
    * expected error messages. If falsy, expected to succeed. All must be present to pass.
    */
-  errors?: CompilerEvent[];
+  errors?: CompilerEvent[] | boolean;
   /**
    * expected warning messages. All must be present to pass.
    */
@@ -176,12 +176,12 @@ export function testCompilationCases(compiler: typeof SectionCompiler, cases : C
       if (expectFailure) {
         assert.isNull(section, 'expected compilation result failure (null)');
       } else {
-        assert.isNotNull(section, `expected successful compilation, but got null and ${JSON.stringify(callbacks.messages)}`);
+        assert.isNotNull(section, `failed with ${compilerEventFormat(callbacks.messages)}`);
       }
 
       // if we expected errors or warnings, show them
-      if (testcase.errors) {
-        assert.includeDeepMembers(callbacks.messages, testcase.errors, 'expected errors to be included');
+      if (testcase.errors && testcase.errors !== true) {
+        assert.includeDeepMembers(callbacks.messages, <CompilerEvent[]> testcase.errors, 'expected errors to be included');
       }
       if (testcase.warnings) {
         assert.includeDeepMembers(callbacks.messages, testcase.warnings, 'expected warnings to be included');

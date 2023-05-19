@@ -1,7 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
 import { TranCompiler } from '../src/compiler/tran.js';
-import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
+import { CompilerMessages } from '../src/compiler/messages.js';
+import { compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
 
 import Tran = KMXPlus.Tran;
@@ -24,5 +25,28 @@ describe('tran', function () {
     //   assert.strictEqual(tran.items[0].to.value, "x");
     // });
   });
+
+  testCompilationCases(TranCompiler, [
+    {
+      subpath: 'sections/tran/fail-invalid-type.xml',
+      errors: true, // XML error
+    },
+    {
+      subpath: 'sections/tran/fail-duplicate-type.xml',
+      errors: [
+        CompilerMessages.Error_DuplicateTransformsType({types: ['simple']})
+      ]
+    },
+    {
+      subpath: 'sections/tran/fail-invalid-duplicate-type.xml',
+      errors: true, // XML error
+    },
+    {
+      subpath: 'sections/tran/fail-mixed.xml',
+      errors: [
+        CompilerMessages.Error_MixedTransformGroup(),
+      ],
+    },
+  ]);
 });
 
