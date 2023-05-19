@@ -255,18 +255,6 @@ namespace com.keyman {
     }
 
     /**
-     * Function     setKeyboardForControl
-     * Scope        Public
-     * @param       {Element}    Pelem    Control element
-     * @param       {string|null=}    Pkbd     Keyboard (Clears the set keyboard if set to null.)
-     * @param       {string|null=}     Plc      Language Code
-     * Description  Set default keyboard for the control
-     */
-    ['setKeyboardForControl'](Pelem: HTMLElement, Pkbd?: string, Plc?: string) {
-      this.domManager.setKeyboardForControl(Pelem, Pkbd, Plc);
-    }
-
-    /**
      * Function     getKeyboardForControl
      * Scope        Public
      * @param       {Element}    Pelem    Control element
