@@ -394,8 +394,13 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     };
 
     if(this.engineConfig.hostDevice.touchable) {
-      // Fallback behavior - if on a touch device, we need to keep a keyboard visible
-      // if one is available.
+      /* Fallback behavior - if on a touch device, we need to keep a keyboard visible
+       * if one is available.
+       *
+       * When literally none are available, setting `emptyCodes` will ensure that `globalKeyboard`
+       * is unset properly and that relevant keyboard events are still generated.  (engine/main
+       * delegates 'fallback behavior' to its derived classes, so the parent class won't undo it.)
+       */
       return this.keyboardCache.defaultStub || emptyCodes;
     } else {
       // Fallback behavior - if on a desktop device, the user still has a physical keyboard.
