@@ -183,8 +183,15 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   }
 
   public deactivateCurrentTarget() {
-    this.currentTarget = null;
-    // TODO: Not in original, pre-modularized form... but should probably also _ControlBlur?
+    const priorTarget = this.activeTarget || this.lastActiveTarget;
+    if(priorTarget) {
+      this._BlurKeyboardSettings(priorTarget.getElement());
+    }
+
+    // Because of focus-maintenance effects
+    if(!this.activeTarget) {
+      this.setActiveTarget(null, true);
+    }
   }
 
   public forgetActiveTarget() {
