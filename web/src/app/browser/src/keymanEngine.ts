@@ -464,6 +464,46 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
   }
 
   /**
+   * Function     attachToControl
+   * Scope        Public
+   * @param       {Element}    Pelem       Element to which KMW will be attached
+   * Description  Attaches KMW to control (or IFrame)
+   */
+  attachToControl(Pelem: HTMLElement) {
+    this.contextManager.page.attachToControl(Pelem);
+  }
+
+  /**
+   * Function     detachFromControl
+   * Scope        Public
+   * @param       {Element}    Pelem       Element from which KMW will detach
+   * Description  Detaches KMW from a control (or IFrame)
+   */
+  detachFromControl(Pelem: HTMLElement) {
+    this.contextManager.page.detachFromControl(Pelem);
+  }
+
+  /**
+   * Function     disableControl
+   * Scope        Public
+   * @param       {Element}      Pelem       Element to be disabled
+   * Description  Disables a KMW control element
+   */
+  disableControl(Pelem: HTMLElement) {
+    this.contextManager.page.disableControl(Pelem);
+  }
+
+  /**
+   * Function     enableControl
+   * Scope        Public
+   * @param       {Element}      Pelem       Element to be disabled
+   * Description  Disables a KMW control element
+   */
+  enableControl(Pelem: HTMLMapElement) {
+    this.contextManager.page.enableControl(Pelem);
+  }
+
+  /**
    * Detaches all KMW event handlers attached by this instance of the engine and releases
    * other related resources as appropriate.
    *

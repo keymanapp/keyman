@@ -186,7 +186,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     const activationAfterAwait = this.findAndPopActivation(target);
     if(activationAfterAwait == activation) {
       return activation;
-    } else {
+    } else if(activationAfterAwait) {
       // Restore the popped element; it doesn't match the current activation attempt.
       this.pendingActivations.push(activationAfterAwait);
       return null;

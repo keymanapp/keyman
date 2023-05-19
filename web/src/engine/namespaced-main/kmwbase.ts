@@ -211,26 +211,6 @@ namespace com.keyman {
     // Base object API definitions
 
     /**
-     * Function     attachToControl
-     * Scope        Public
-     * @param       {Element}    Pelem       Element to which KMW will be attached
-     * Description  Attaches KMW to control (or IFrame)
-     */
-    ['attachToControl'](Pelem: HTMLElement) {
-      this.domManager.attachToControl(Pelem);
-    }
-
-    /**
-     * Function     detachFromControl
-     * Scope        Public
-     * @param       {Element}    Pelem       Element from which KMW will detach
-     * Description  Detaches KMW from a control (or IFrame)
-     */
-    ['detachFromControl'](Pelem: HTMLElement) {
-      this.domManager.detachFromControl(Pelem);
-    }
-
-    /**
      * Exposed function to load keyboards by name. One or more arguments may be used
      *
      * @param {any[]} args keyboard name string or keyboard metadata JSON object
@@ -272,26 +252,6 @@ namespace com.keyman {
       } else {
         return this.keyboardManager.addLanguageKeyboards(arg);
       }
-    }
-
-    /**
-     * Function     disableControl
-     * Scope        Public
-     * @param       {Element}      Pelem       Element to be disabled
-     * Description  Disables a KMW control element
-     */
-    ['disableControl'](Pelem: HTMLElement) {
-      this.domManager.disableControl(Pelem);
-    }
-
-    /**
-     * Function     enableControl
-     * Scope        Public
-     * @param       {Element}      Pelem       Element to be disabled
-     * Description  Disables a KMW control element
-     */
-    ['enableControl'](Pelem: HTMLMapElement) {
-      this.domManager.enableControl(Pelem);
     }
 
     /**
