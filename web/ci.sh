@@ -25,6 +25,7 @@ cd "$THIS_SCRIPT_PATH"
 S_KEYMAN_COM=
 
 builder_describe "Defines and implements the CI build steps for Keyman Engine for Web (KMW)." \
+  "@/web/src/tools/building/sourcemap-root prepare:s.keyman.com" \
   "build" \
   "test                         Runs all unit tests."  \
   "post-test                    Runs post-test cleanup.  Should be run even if a prior step fails." \
@@ -115,7 +116,7 @@ if builder_start_action prepare:s.keyman.com; then
   # The main build products are expected to reside at the root of this folder.
   BASE_PUBLISH_FOLDER="$S_KEYMAN_COM/kmw/engine/$VERSION"
   echo "FOLDER: $BASE_PUBLISH_FOLDER"
-  mkdir -p "$BASE_PUBLISH_FOLDER"
+  mkdir -p "$BASE_PUBLISH_FOLDER/resources"
 
   cp -Rf build/app/browser/release/* "$BASE_PUBLISH_FOLDER"
   cp -Rf build/app/resources/* "$BASE_PUBLISH_FOLDER/resources"
@@ -124,7 +125,7 @@ if builder_start_action prepare:s.keyman.com; then
   # Third phase: tweak the sourcemaps
   # We can use an alt-mode of Web's sourcemap-root tool for this.
   for sourcemap in "$BASE_PUBLISH_FOLDER/"*.map; do
-    node build/tools/building/sourcemap-root/index.mjs null "$sourcemap" --sourceRoot "https://s.keyman.com/kmw/engine/$VERSION/src"
+    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.mjs" null "$sourcemap" --sourceRoot "https://s.keyman.com/kmw/engine/$VERSION/src"
   done
 
   # Actual construction of the PR will be left to CI-config scripting for now.
