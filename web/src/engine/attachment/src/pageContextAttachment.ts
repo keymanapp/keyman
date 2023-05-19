@@ -1163,20 +1163,29 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   }
 
   shutdown() {
-    // Embedded pages first - that way, each page can handle its own inputs, rather than having
-    // the top-level instance handle all attached elements.
-    // (inputList enumerates child pages, too!)
-    this.embeddedPageContexts.forEach((embeddedPage) => {
-      try {
-        embeddedPage.shutdown();
-      } catch (e) {}
-    });
-
     try {
       this.enablementObserver?.disconnect();
       this.attachmentObserver?.disconnect();
       this.inputModeObserver?.disconnect();
       this.stylesheetManager?.unlinkAll();
+
+      /*
+       * Part of shutdown involves detaching from elements... which typically does involve
+       * restoring the original `inputMode` settings.  Remove the observer reference after
+       * disconnection to prevent any further disable-enable actions.
+       *
+       * The others aren't toggled, so they're fine to leave.
+       */
+      this.inputModeObserver = null;
+
+      // Embedded pages first - that way, each page can handle its own inputs, rather than having
+      // the top-level instance handle all attached elements.
+      // (inputList enumerates child pages, too!)
+      this.embeddedPageContexts.forEach((embeddedPage) => {
+        try {
+          embeddedPage.shutdown();
+        } catch (e) {}
+      });
 
       for(let input of this.inputList) {
         try {

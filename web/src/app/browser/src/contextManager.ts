@@ -388,16 +388,19 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   }
 
   protected getFallbackCodes() {
+    const emptyCodes = {
+      id: '',
+      langId: ''
+    };
+
     if(this.engineConfig.hostDevice.touchable) {
-      // Fallback behavior - if on a touch device, we need to keep a keyboard visible.
-      return this.keyboardCache.defaultStub;
+      // Fallback behavior - if on a touch device, we need to keep a keyboard visible
+      // if one is available.
+      return this.keyboardCache.defaultStub || emptyCodes;
     } else {
       // Fallback behavior - if on a desktop device, the user still has a physical keyboard.
       // Just clear out the active keyboard & OSK.
-      return {
-        id: '',
-        langId: ''
-      };
+      return emptyCodes;
     }
   }
 
