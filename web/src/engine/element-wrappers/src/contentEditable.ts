@@ -103,7 +103,7 @@ export default class ContentEditable extends OutputTarget<{}> {
   }
 
   getDeadkeyCaret(): number {
-    return this.getTextBeforeCaret().kmwLength();
+    return (this.getTextBeforeCaret() ?? this.getText()).kmwLength();
   }
 
   getTextBeforeCaret(): string {

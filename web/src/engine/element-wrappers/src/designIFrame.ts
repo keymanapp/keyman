@@ -125,7 +125,7 @@ export default class DesignIFrame extends OutputTarget<{}> {
   }
 
   getDeadkeyCaret(): number {
-    return this.getTextBeforeCaret().kmwLength();
+    return (this.getTextBeforeCaret() ?? this.getText()).kmwLength();
   }
 
   getTextBeforeCaret(): string {
