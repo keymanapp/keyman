@@ -47,6 +47,12 @@ describe('tran', function () {
         CompilerMessages.Error_MixedTransformGroup(),
       ],
     },
+    {
+      subpath: 'sections/tran/fail-empty.xml',
+      errors: [
+        CompilerMessages.Error_EmptyTransformGroup(),
+      ],
+    },
   ]);
 });
 

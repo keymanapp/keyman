@@ -45,8 +45,6 @@ export class Elem extends Section {
   }
 };
 
-// 'finl' -- see 'tran'
-
 // 'keys' is now `keys2.kmap`
 
 // 'loca'
@@ -248,17 +246,12 @@ export class Tran extends Section {
   }
 };
 
-// alias types for 'bksp'
-
+// alias type for 'bksp'
 export class Bksp extends Tran {
   override get id() {
     return constants.section.bksp;
   }
 };
-// TODO-LDML #7377
-// export class BkspItem extends TranItem {};
-// export type BkspItemFlags = TranItemFlags;
-// export const BkspItemFlags = TranItemFlags;
 
 // 'vkey'
 

@@ -491,11 +491,11 @@ class Constants {
   readonly tran_flags_error = 0x0001;
 
   /**
-   * this group is full of <transform> items
+   * this group is full of transform items
    */
   readonly tran_group_type_transform = 0;
   /**
-   * this group is full of <reorder> items
+   * this group is full of reorder items
    */
   readonly tran_group_type_reorder = 1;
 

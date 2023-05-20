@@ -111,5 +111,9 @@ export class CompilerMessages {
   m(this.ERROR_MixedTransformGroup, `transformGroup cannot contain both reorder and transform elements`);
   static ERROR_MixedTransformGroup = SevError | 0x001A;
 
+  static Error_EmptyTransformGroup = () =>
+  m(this.ERROR_EmptyTransformGroup, `transformGroup must have either reorder or transform elements`);
+  static ERROR_EmptyTransformGroup = SevError | 0x001B;
+
 }
 
