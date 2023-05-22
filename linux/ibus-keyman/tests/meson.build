@@ -6,7 +6,7 @@ test_files = [
 ]
 
 kmnkbp_tests_lib = cc.find_library(
-  'libkmnkbp-tests',
+  'kmnkbp-tests', # meson will prefix 'lib'
   dirs: [ core_dir / 'build/arch' / get_option('buildtype') / 'tests/kmx_test_source' ]
 )
 

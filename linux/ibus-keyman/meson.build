@@ -18,7 +18,7 @@ core_dir = meson.current_source_dir() / '../../core'
 common_dir = meson.current_source_dir() / '../../common'
 
 kmnkbp_lib = cc.find_library(
-  'libkmnkbp0',
+  'kmnkbp0', # meson will prefix 'lib'
   dirs: [ core_dir / 'build/arch' / get_option('buildtype') / 'src' ]
 )
 
