@@ -8,12 +8,12 @@
     <Name URL="">Khmer Angkor</Name>
     <Copyright URL="">© 2015-2022 SIL International</Copyright>
     <Author URL="mailto:makara_sok@sil.org">Makara Sok</Author>
-    <Version URL=""></Version>
+    <Version URL="">1.3</Version>
     <WebSite URL="https://keyman.com/keyboards/khmer_angkor">https://keyman.com/keyboards/khmer_angkor</WebSite>
   </Info>
   <Files>
     <File>
-      <Name>nokeyboardversion.kmx</Name>
+      <Name>khmer_angkor.kmx</Name>
       <Description>Keyboard Khmer Angkor</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
@@ -39,7 +39,7 @@
   <Keyboards>
     <Keyboard>
       <Name>Khmer Angkor</Name>
-      <ID>nokeyboardversion</ID>
+      <ID>khmer_angkor</ID>
       <Version>1.3</Version>
       <Languages>
         <Language ID="km">Central Khmer (Khmer, Cambodia)</Language>

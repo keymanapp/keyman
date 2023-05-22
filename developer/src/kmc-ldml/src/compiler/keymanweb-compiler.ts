@@ -1,19 +1,19 @@
 import { CompilerCallbacks, VisualKeyboard, LDMLKeyboard, TouchLayoutFileWriter } from "@keymanapp/common-types";
-import CompilerOptions from "./compiler-options.js";
+import { CompilerOptions } from "./compiler-options.js";
 import { TouchLayoutCompiler } from "./touch-layout-compiler.js";
-import VisualKeyboardCompiler from "./visual-keyboard-compiler.js";
+import { LdmlKeyboardVisualKeyboardCompiler } from "./visual-keyboard-compiler.js";
 
 const MINIMUM_KMW_VERSION = '16.0';
 
-export interface KeymanWebCompilerOptions extends CompilerOptions {
+export interface LdmlKeyboardKeymanWebCompilerOptions extends CompilerOptions {
 };
 
-export class KeymanWebCompiler {
-  private readonly options: KeymanWebCompilerOptions;
+export class LdmlKeyboardKeymanWebCompiler {
+  private readonly options: LdmlKeyboardKeymanWebCompilerOptions;
   private readonly nl: string;
   private readonly tab: string;
 
-  constructor(private callbacks: CompilerCallbacks, options?: KeymanWebCompilerOptions) {
+  constructor(private callbacks: CompilerCallbacks, options?: LdmlKeyboardKeymanWebCompilerOptions) {
     this.options = { ...options };
     this.nl = this.options.debug ? "\n" : '';
     this.tab = this.options.debug ? "  " : '';
@@ -21,7 +21,7 @@ export class KeymanWebCompiler {
 
   public compileVisualKeyboard(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile) {
     const nl = this.nl, tab = this.tab;
-    const vkc = new VisualKeyboardCompiler();
+    const vkc = new LdmlKeyboardVisualKeyboardCompiler();
     const vk: VisualKeyboard.VisualKeyboard = vkc.compile(source);
 
     let result =
