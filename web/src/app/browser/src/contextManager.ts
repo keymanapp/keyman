@@ -241,6 +241,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     // Must set before _Blur / _Focus to avoid infinite recursion due to complications
     // in setActiveKeyboard behavior with managed keyboard settings.
     this.currentTarget = this.mostRecentTarget = target; // I3363 (Build 301)
+    this.predictionContext.setCurrentTarget(target);
 
     if(this.focusAssistant.restoringFocus) {
       this._BlurKeyboardSettings(target.getElement());
@@ -274,8 +275,6 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       });
     }
   }
-
-  // on set activeTarget, make sure to also change it for this.predictionContext!
 
   get activeKeyboard() {
     return this._activeKeyboard;

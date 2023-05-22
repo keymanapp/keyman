@@ -178,8 +178,9 @@ describe('app/browser:  ContextManager', function () {
     contextManager.configure({
       keyboardCache: keyboardCache,
       predictionContext: {
-        // we're dummying this one out.
-        resetContext: () => {}
+        // we're dummying these out.
+        resetContext: () => {},
+        setCurrentTarget: () => {}
       },
       resetContext: () => {}
     });
