@@ -51,6 +51,10 @@ export default class KeymanEngine extends KeymanEngineBase<WebviewConfiguration,
       return Promise.resolve();
     }
 
+    if(this.beepKeyboard) {
+      this.core.keyboardProcessor.beepHandler = this.beepKeyboard;
+    }
+
     this.contextManager.initialize();
 
     const oskConfig: ViewConfiguration = {
@@ -217,6 +221,7 @@ export default class KeymanEngine extends KeymanEngineBase<WebviewConfiguration,
   };
 
   // Properties set by the WebView hosting page
+  beepKeyboard?: () => void = null;
   hideKeyboard?: () => void = null;
   menuKeyUp?: () => void = null;
   showKeyboardList?: () => void = null;

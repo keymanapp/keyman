@@ -104,12 +104,6 @@ export default class KeymanEngine<
       this.osk?.refreshLayout();
     });
 
-    this.core.keyboardProcessor.beepHandler = (target) => {
-      if(this.doBeep) {
-        this.doBeep(target);
-      }
-    }
-
     // The OSK does not possess a direct connection to the KeyboardProcessor's state-key
     // management object; this event + handler allow us to keep the OSK's related states
     // in sync.
@@ -454,8 +448,6 @@ export default class KeymanEngine<
   setNumericLayer() {
     this.core.keyboardProcessor.setNumericLayer(this.config.softDevice);
   };
-
-  doBeep?: (target: OutputTarget) => void;
 }
 
 // Intent:  define common behaviors for both primary app types; each then subclasses & extends where needed.
