@@ -2,7 +2,7 @@ test_files = [
   'ibusimcontext.c',
   'testfixture.cpp',
   'testmodule.c',
-  '../src/keyman-system-service-client.c',
+  '../src/KeymanSystemServiceClient.cpp',
 ]
 
 kmnkbp_tests_lib = cc.find_library(
@@ -36,16 +36,16 @@ system_service_dir = meson.current_source_dir() / '../../keyman-system-service/b
 
 dbus_test_server = executable(
   'km-dbus-test-server',
-  'km-dbus-test-server.c',
+  'KmDbusTestServer.cpp',
   dependencies: dbus_deps,
-  c_args: [
+  cpp_args: [
   '-DKEYMAN_TEST_SERVICE_PATH="' + system_service_dir + '"'
  ]
 )
 
 stop_test_server = executable(
   'stop-test-server',
-  'stop-test-server.c',
+  'StopTestServer.cpp',
   dependencies: dbus_deps,
 )
 

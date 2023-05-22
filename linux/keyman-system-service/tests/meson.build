@@ -1,6 +1,6 @@
 test_service_files = files(
-  '../src/dbus-service.c',
-  '../src/ServerMethods.cpp',
+  '../src/main.cpp',
+  '../src/KeymanSystemService.cpp',
   'KeyboardDeviceMock.cpp',
 )
 

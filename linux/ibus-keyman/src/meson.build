@@ -7,7 +7,7 @@ engine_files = files(
   'main.c',
   'engine.c',
   'keyman-service.c',
-  'keyman-system-service-client.c',
+  'KeymanSystemServiceClient.cpp',
 )
 
 include_dirs = [

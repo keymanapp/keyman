@@ -1,5 +1,5 @@
-#ifndef __KEYMAN_SYSTEM_SERVICE_CLIENT_H__
-#define __KEYMAN_SYSTEM_SERVICE_CLIENT_H__
+#ifndef __KEYMANSYSTEMSERVICECLIENT_H__
+#define __KEYMANSYSTEMSERVICECLIENT_H__
 
 #include <gio/gio.h>
 
@@ -14,4 +14,4 @@ gint32 get_capslock_indicator();
 }
 #endif
 
-#endif // __KEYMAN_SYSTEM_SERVICE_CLIENT_H__
+#endif // __KEYMANSYSTEMSERVICECLIENT_H__

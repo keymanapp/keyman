@@ -15,10 +15,10 @@
 using namespace std;
 
 KeyboardDeviceMock::KeyboardDeviceMock() {
-  this->dev            = nullptr;
-  this->fd             = -1;
-  this->hasCapsLockLed = 1;
-  this->debug          = false;
+  dev            = nullptr;
+  fd             = -1;
+  hasCapsLockLed = 1;
+  debug          = false;
 }
 
 KeyboardDeviceMock::~KeyboardDeviceMock() {
@@ -36,10 +36,10 @@ KeyboardDeviceMock::HasCapsLockLed() {
 
 void
 KeyboardDeviceMock::SetCapsLockLed(bool on) {
-  this->hasCapsLockLed = on ? 1 : 0;
+  hasCapsLockLed = on ? 1 : 0;
 }
 
 bool
 KeyboardDeviceMock::GetCapsLockLed() {
-  return this->hasCapsLockLed == 1;
+  return hasCapsLockLed == 1;
 }

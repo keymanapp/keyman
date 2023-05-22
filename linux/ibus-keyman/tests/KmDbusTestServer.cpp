@@ -1,5 +1,8 @@
-// DBus test server. The server will start and listen on a
+// DBus test server. The server will start and listen on a non-standard DBus.
+// It runs until the DBus Exit method gets called.
+#include <fstream>
 #include <gio/gio.h>
+#include <iostream>
 #include <systemd/sd-bus.h>
 
 #ifndef KEYMAN_TEST_SERVICE_PATH
@@ -11,37 +14,21 @@
 #define KEYMAN_TESTSVC_INTERFACE_NAME "com.keyman.ExitTestService.Exit"
 #define KEYMAN_TESTSVC_OBJECT_PATH "/com/keyman/ExitTestService/Exit"
 
-static GTestDBus *
-startup() {
-  GTestDBus *dbus = g_test_dbus_new(G_TEST_DBUS_NONE);
+using namespace std;
 
-  // Add the private directory with our in-tree service files.
-  g_test_dbus_add_service_dir(dbus, KEYMAN_TEST_SERVICE_PATH);
+class KmDbusTestServer
+{
+private:
+  GTestDBus *dbus;
+  sd_bus_slot *slot = NULL;
+  sd_bus *bus       = NULL;
 
-  printf("Add service dir to %s\n", KEYMAN_TEST_SERVICE_PATH);
+public:
+  KmDbusTestServer();
+  ~KmDbusTestServer();
 
-  // Start the private D-Bus daemon
-  g_test_dbus_up(dbus);
-
-  const gchar *address = g_test_dbus_get_bus_address(dbus);
-
-  printf("Test server running on: %s\n", address);
-  FILE *f = fopen("/tmp/km-test-server.env", "w");
-  if (f) {
-    // write the address to a file which can be sourced
-    fprintf(f, "export DBUS_SESSION_BUS_ADDRESS=%s\n", address);
-    fclose(f);
-  }
-
-  return dbus;
-}
-
-static void
-finish(GTestDBus *dbus) {
-  // Stop the private D-Bus daemon
-  g_test_dbus_down(dbus);
-  g_object_unref(dbus);
-}
+  void Loop();
+};
 
 static int32_t
 on_exit_method(sd_bus_message *msg, void *user_data, sd_bus_error *ret_error) {
@@ -58,23 +45,48 @@ static const sd_bus_vtable exit_test_service_vtable[] = {
   SD_BUS_VTABLE_END
 };
 
-static const void exit_loop(sd_bus_slot *slot, sd_bus *bus) {
+KmDbusTestServer::KmDbusTestServer()
+{
+  dbus  = g_test_dbus_new(G_TEST_DBUS_NONE);
+
+  // Add the private directory with our in-tree service files.
+  g_test_dbus_add_service_dir(dbus, KEYMAN_TEST_SERVICE_PATH);
+
+  std::cout << "Add service dir to " << KEYMAN_TEST_SERVICE_PATH << std::endl;
+
+  // Start the private D-Bus daemon
+  g_test_dbus_up(dbus);
+
+  const gchar *address = g_test_dbus_get_bus_address(dbus);
+
+  std::cout << "Test server running on: " << address << std::endl;
+
+  ofstream file("/tmp/km-test-server.env", ios_base::out);
+  if (file) {
+    // write the address to a file which can be sourced
+    file << "export DBUS_SESSION_BUS_ADDRESS=" << address << std::endl;
+    file.close();
+  }
+}
+
+KmDbusTestServer::~KmDbusTestServer()
+{
   if (bus)  sd_bus_release_name(bus, KEYMAN_TESTSVC_BUS_NAME);
   if (slot) sd_bus_slot_unref(slot);
   if (bus)  sd_bus_close_unref(bus);
+
+  g_test_dbus_down(dbus);
+  g_object_unref(dbus);
 }
 
-static void
-loop() {
-  sd_bus_slot *slot = NULL;
-  sd_bus *bus       = NULL;
+void KmDbusTestServer::Loop()
+{
   int ret;
 
   ret = sd_bus_open_user(&bus);
 
   if (ret < 0) {
     g_error("Failed to connect to system bus: %s", strerror(-ret));
-    exit_loop(slot, bus);
     return;
   }
 
@@ -85,7 +97,6 @@ loop() {
     KEYMAN_TESTSVC_INTERFACE_NAME, exit_test_service_vtable, &exitFlag);
   if (ret < 0) {
     g_error("Failed to issue method call: %s", strerror(-ret));
-    exit_loop(slot, bus);
     return;
   }
 
@@ -93,7 +104,6 @@ loop() {
   ret = sd_bus_request_name(bus, KEYMAN_TESTSVC_BUS_NAME, 0);
   if (ret < 0) {
     g_error("Failed to acquire service name: %s", strerror(-ret));
-    exit_loop(slot, bus);
     return;
   }
 
@@ -103,39 +113,34 @@ loop() {
     g_debug("sd_bus_process returned %d, exitFlag=%d", ret, exitFlag);
     if (ret < 0) {
       g_error("Failed to process bus: %s", strerror(-ret));
-      exit_loop(slot, bus);
       return;
     }
     if (exitFlag) {
+      // `exitFlag` can be modified by the callback function
+      // `on_exit_method` which can be called by `sd_bus_process`
       g_debug("Exiting loop");
-      exit_loop(slot, bus);
       return;
     }
 
-    if (ret > 0)  // we processed a request, try to process another one, right-away
+    if (ret > 0) {
+      // we processed a request, try to process another one, right-away
       continue;
+    }
 
     // Wait for the next request to process
     ret = sd_bus_wait(bus, (uint64_t)-1);
     g_debug("sd_bus_wait returned %d", ret);
     if (ret < 0) {
       g_error("Failed to wait on bus: %s", strerror(-ret));
-      exit_loop(slot, bus);
       return;
     }
   }
-  exit_loop(slot, bus);
 }
 
 int
 main(int argc, char *argv[]) {
-  GTestDBus *dbus;
-
-  dbus = startup();
-
-  loop();
-
-  finish(dbus);
+  KmDbusTestServer testServer;
+  testServer.Loop();
 
   return 0;
 }

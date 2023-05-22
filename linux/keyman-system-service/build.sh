@@ -22,7 +22,7 @@ builder_parse "$@"
 
 cd "$THIS_SCRIPT_PATH/"
 
-if builder_has_option --debug; then
+if builder_is_debug_build; then
   MESON_TARGET=debug
   export CPPFLAGS=-DG_MESSAGES_DEBUG
   export CFLAGS="-O0"
@@ -36,17 +36,10 @@ builder_describe_outputs \
   configure "${MESON_PATH}/build.ninja" \
   build "${MESON_PATH}/src/keyman-system-service"
 
-if builder_start_action clean; then
-  rm -rf "$THIS_SCRIPT_PATH/build/"
-  builder_finish_action success clean
-fi
+builder_run_action clean rm -rf "$THIS_SCRIPT_PATH/build/"
 
-if builder_start_action configure; then
-  cd "$THIS_SCRIPT_PATH"
-  # shellcheck disable=SC2086
-  meson setup "$MESON_PATH" --werror --buildtype $MESON_TARGET "${builder_extra_params[@]}"
-  builder_finish_action success configure
-fi
+# shellcheck disable=SC2086
+builder_run_action configure meson setup "$MESON_PATH" --werror --buildtype $MESON_TARGET "${builder_extra_params[@]}"
 
 if builder_start_action build; then
   cd "$MESON_PATH"

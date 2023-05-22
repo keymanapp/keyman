@@ -57,7 +57,7 @@ function run_tests() {
   elif [ -d "$(dirname "$0")/../../../build/$(arch)/release" ]; then
     CONFIG=release
   else
-    echo "Can't find neither ../../../build/$(arch)/debug nor ../../../build/$(arch)/release"
+    echo "Cannot find ../../../build/$(arch)/debug or ../../../build/$(arch)/release"
     exit 9
   fi
 

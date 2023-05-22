@@ -13,7 +13,7 @@
 #include "ibusimcontext.h"
 #include "keycodes.h"
 #include "keymanutil.h"
-#include "keyman-system-service-client.h"
+#include "KeymanSystemServiceClient.h"
 #include "kmx_test_source.hpp"
 #include "testmodule.h"
 

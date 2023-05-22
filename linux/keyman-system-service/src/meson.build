@@ -1,7 +1,7 @@
 service_files = files(
-  'dbus-service.c',
   'KeyboardDevice.cpp',
-  'ServerMethods.cpp',
+  'KeymanSystemService.cpp',
+  'main.cpp',
 )
 
 deps = [evdev, systemd]

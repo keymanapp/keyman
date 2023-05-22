@@ -34,7 +34,7 @@
 #include "config.h"
 #include "keymanutil.h"
 #include "keyman-service.h"
-#include "keyman-system-service-client.h"
+#include "KeymanSystemServiceClient.h"
 #include "engine.h"
 #include "keycodes.h"
 
