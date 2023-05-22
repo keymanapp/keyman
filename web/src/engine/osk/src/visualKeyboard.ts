@@ -1146,9 +1146,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
   modelKeyClick(e: KeyElement, input?: InputEventCoordinate) {
     let keyEvent = this.initKeyEvent(e, input);
-
-    // TODO:  convert into an actual event, raised by the VisualKeyboard.
-    //        Its code is intended to lie outside of the OSK-Core library/module.
     this.raiseKeyEvent(keyEvent, e);
   }
 
