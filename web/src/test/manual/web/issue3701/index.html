@@ -51,7 +51,7 @@
           languages: ['en'],
           path: (pageRef + "../prediction-mtnt/nrc.en.mtnt.model.js")
         };
-        kmw.modelManager.register(modelStub);
+        kmw.addModel(modelStub);
       });
 
       function togglePredictions() {
@@ -76,7 +76,8 @@
   <body>
     <h2>KeymanWeb Sample Page - Fat-finger Interactions with Beep Feedback</h2>
     <p>Since erroneous input should not be considered with predictions & corrections, this page
-      uses a US-style keyboard that prohibits use of the letter 'x'.
+      uses a US-style keyboard that gives error feedback on use of the letter 'x'.
+      Suggestions using 'x' should be FAR less common than normal unless each 'x' was directly typed.
     </p>
     <div>
     <!--
