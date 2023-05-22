@@ -1732,7 +1732,6 @@ builder_has_dependencies() {
 builder_has_module_been_built() {
   local module="$1"
 
-  echo "builder_has_module_been_built: $module"
 
   if [[ -z ${_builder_deps_built+x} ]]; then
     # not in a builder context, so we assume a build is needed
