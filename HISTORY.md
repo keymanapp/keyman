@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.110 alpha 2023-05-22
+
+* fix(common): ensure child builds don't rebuild dependencies unnecessarily (#8834)
+
 ## 17.0.109 alpha 2023-05-17
 
 * fix(windows): add wrap-symbols to Text Editor Makefile (#8819)
