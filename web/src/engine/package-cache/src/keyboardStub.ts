@@ -38,16 +38,22 @@ export default class KeyboardStub extends KeyboardProperties {
         this.mapRegion(apiSpec.languages);
 
         /*
-         * Detects the following patterns (at minimum):
+         * Get keyboard path (relative or absolute)
+         * KeymanWeb 2 revised keyboard location specification:
+         *  (a) absolute URL (includes ':') - load from specified URL
+         *  (b) relative URL (starts with /, ./, ../) - load with respect to current page
+         *  (c) filename only (anything else) - prepend keyboards option to URL
+         *      (e.g. default keyboards option will be set by Cloud)
+         *
+         * So, to fully interpret the following regex, it detects the following patterns (at minimum):
          * ../file (but not .../file)
          * ./file
          * /file
          * http:// (on the colon)
-         * hello:world (on the colon) - that one miiiight be less intentional, though.
+         * hello:world (on the colon) - that one miiiight be less intentional, though.  Would 'fall
+         * over' on attempted use anyway, since it's not a valid path.
          *
-         * Essentially, detects absolute paths and paths explicitly relative to the host page's URI.
-         *
-         * Alternative clearer version - '^(\.{0,2}/)|(:)'
+         * Alternative clearer version - '^(\.{0,2}/)|(:)'?
          * Unless backslashes should be able to replace dots?
          */
         let rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');

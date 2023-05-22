@@ -2,6 +2,7 @@ import { DomEventTracker } from 'keyman/engine/events';
 
 import KeymanEngine from "../keymanEngine.js";
 import { FocusAssistant } from './focusAssistant.js';
+import { RotationProcessor } from '../utils/rotationProcessor.js';
 
 // Note:  in the future, it'd probably be best to have an instance per iframe window as
 // well as the top-level window.  This was not done in or before KMW 16.0 though, so
@@ -30,11 +31,35 @@ export class PageIntegrationHandlers {
    */
   private deactivateOnScroll: boolean;
 
+  /**
+   * This component should only ever be applied to a base page:  we need the ability to add 'scroll
+   * space' on touch devices so that the OSK doesn't block the bottom.
+   */
+  private mobilePageTrailer: HTMLDivElement;
+
+  private rotationProcessor: RotationProcessor
+
   constructor(window: Window, engine: KeymanEngine) {
     this.window = window;
     this.engine = engine;
 
     this.attachHandlers();
+
+    if(engine.config.hostDevice.touchable) {
+      this.buildPageTrailer();
+
+      this.rotationProcessor = new RotationProcessor(this.engine);
+      this.rotationProcessor.init();
+    }
+  }
+
+  private buildPageTrailer() {
+    // Add a blank DIV to the bottom of the page to allow the bottom of the page to be shown
+    const dTrailer = this.mobilePageTrailer = document.createElement('div');
+    const ds=dTrailer.style;
+    ds.width='100%';
+    ds.height=(screen.width/2)+'px';  // ... interesting choice, but okay.
+    document.body.appendChild(dTrailer);
   }
 
   private get focusAssistant(): FocusAssistant {
@@ -197,6 +222,10 @@ export class PageIntegrationHandlers {
       eventTracker.detachDOMEvent(docBody, 'touchstart', this.touchStartActivationHandler,false);
       eventTracker.detachDOMEvent(docBody, 'touchmove',  this.touchMoveActivationHandler, false);
       eventTracker.detachDOMEvent(docBody, 'touchend',   this.touchEndActivationHandler,  false);
+
+      if(this.mobilePageTrailer) {
+        this.mobilePageTrailer.parentElement.removeChild(this.mobilePageTrailer);
+      }
     }
 
     eventTracker.detachDOMEvent(window, 'load',   this._WindowLoad,  false);
