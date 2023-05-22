@@ -44,17 +44,11 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":samples                  Builds all needed resources for the KMW sample-page set" \
   "--ci+                     Set to utilize CI-based test configurations & reporting."
 
-# ":app/browser              The website-integrating, browser-based version of KMW" \
-
 # Possible TODO?
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
 
 builder_describe_outputs \
   configure                      /node_modules
-
-# build:app/webview              build/app/webview/lib/index.js \
-
-  # TODO:  app/ui linkage.
 
 builder_parse "$@"
 
