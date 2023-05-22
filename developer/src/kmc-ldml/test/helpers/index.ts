@@ -6,11 +6,11 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { SectionCompiler } from '../../src/compiler/section-compiler.js';
 import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
-import Compiler from '../../src/compiler/compiler.js';
+import { LdmlKeyboardCompiler } from '../../src/compiler/compiler.js';
 import { assert } from 'chai';
-import KMXPlusMetadataCompiler from '../../src/compiler/metadata-compiler.js';
-import CompilerOptions from '../../src/compiler/compiler-options.js';
-import VisualKeyboardCompiler from '../../src/compiler/visual-keyboard-compiler.js';
+import { KMXPlusMetadataCompiler } from '../../src/compiler/metadata-compiler.js';
+import { CompilerOptions } from '../../src/compiler/compiler-options.js';
+import { LdmlKeyboardVisualKeyboardCompiler } from '../../src/compiler/visual-keyboard-compiler.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 import KMXPlusFile = KMXPlus.KMXPlusFile;
@@ -76,13 +76,13 @@ export function loadSectionFixture(compilerClass: typeof SectionCompiler, filena
 }
 
 export function loadTestdata(inputFilename: string, options: CompilerOptions) : LDMLKeyboardTestDataXMLSourceFile {
-  const k = new Compiler(compilerTestCallbacks, options);
+  const k = new LdmlKeyboardCompiler(compilerTestCallbacks, options);
   const source = k.loadTestData(inputFilename);
   return source;
 }
 
 export function compileKeyboard(inputFilename: string, options: CompilerOptions): KMXPlusFile {
-  const k = new Compiler(compilerTestCallbacks, options);
+  const k = new LdmlKeyboardCompiler(compilerTestCallbacks, options);
   const source = k.load(inputFilename);
   checkMessages();
   assert.isNotNull(source, 'k.load should not have returned null');
@@ -103,7 +103,7 @@ export function compileKeyboard(inputFilename: string, options: CompilerOptions)
 }
 
 export function compileVisualKeyboard(inputFilename: string, options: CompilerOptions): VisualKeyboard.VisualKeyboard {
-  const k = new Compiler(compilerTestCallbacks, options);
+  const k = new LdmlKeyboardCompiler(compilerTestCallbacks, options);
   const source = k.load(inputFilename);
   checkMessages();
   assert.isNotNull(source, 'k.load should not have returned null');
@@ -112,9 +112,9 @@ export function compileVisualKeyboard(inputFilename: string, options: CompilerOp
   checkMessages();
   assert.isTrue(valid, 'k.validate should not have failed');
 
-  const vk = (new VisualKeyboardCompiler()).compile(source);
+  const vk = (new LdmlKeyboardVisualKeyboardCompiler()).compile(source);
   checkMessages();
-  assert.isNotNull(vk, 'VisualKeyboardCompiler.compile should not have returned null');
+  assert.isNotNull(vk, 'LdmlKeyboardVisualKeyboardCompiler.compile should not have returned null');
 
   return vk;
 }
