@@ -165,33 +165,27 @@ EXTERN bool kmcmp_CompileKeyboardFile(char* pszInfile,
   }
 
   FILE_KEYBOARD fk;
-  bool result = CompileKeyboard(pszInfile, &fk, ASaveDebug, ACompilerWarningsAsErrors, AWarnDeprecatedCode,
-    pMsgproc, AmsgprocContext, CKF_KEYMAN);
-  if(!result) {
-    return false;
+  if(!CompileKeyboard(pszInfile, &fk, ASaveDebug, ACompilerWarningsAsErrors, AWarnDeprecatedCode,
+      pMsgproc, AmsgprocContext, CKF_KEYMAN)) {
+    // any errors will have been reported directly by CompileKeyboard
+    return FALSE;
   }
 
   FILE* fp_out = Open_File(pszOutfile, "wb");
-
   if (fp_out == NULL) {
     SetError(CERR_CannotCreateOutfile);
   }
 
-  if(result) {
-    KMX_DWORD msg;
-    KMX_BYTE* data = nullptr;
-    size_t dataSize = 0;
-    if ((msg = WriteCompiledKeyboard(&fk, &data, dataSize)) != CERR_None) {
-      result = FALSE;
-      AddCompileError(msg);
-    } else {
-      if(fwrite(data, 1, dataSize, fp_out) != dataSize) {
-        AddCompileError(CERR_UnableToWriteFully);
-      }
-      delete[] data;
-    }
+  KMX_DWORD msg;
+  KMX_BYTE* data = nullptr;
+  size_t dataSize = 0;
+  if ((msg = WriteCompiledKeyboard(&fk, &data, dataSize)) != CERR_None) {
+    AddCompileError(msg);
   } else {
-    AddCompileError(CERR_InvalidValue);
+    if(fwrite(data, 1, dataSize, fp_out) != dataSize) {
+      AddCompileError(CERR_UnableToWriteFully);
+    }
+    delete[] data;
   }
 
   fclose(fp_out);
@@ -201,7 +195,7 @@ EXTERN bool kmcmp_CompileKeyboardFile(char* pszInfile,
     return FALSE;
   }
 
-  return result;
+  return TRUE;
 }
 
 bool CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
