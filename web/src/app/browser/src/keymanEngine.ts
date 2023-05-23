@@ -177,6 +177,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
 
     if(this.ui) {
       this.ui.initialize();
+      this.legacyAPIEvents.callEvent('loaduserinterface', {});
     }
 
     this._initialized = 2;
@@ -615,6 +616,8 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     this.core.languageProcessor.shutdown();
     this.hardKeyboard.shutdown();
     this.util.shutdown(); // For tracked dom events, stylesheets.
+
+    this.legacyAPIEvents.callEvent('unloaduserinterface', {});
     this.ui?.shutdown();
   }
 }
