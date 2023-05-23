@@ -4,25 +4,6 @@
 /// <reference path="dom/utils.ts" />
 
 namespace com.keyman {
-  class DOMEventTracking {
-    Pelem: EventTarget;
-    Peventname: string;
-    Phandler: (Object) => boolean;
-    PuseCapture?: boolean
-
-    constructor(Pelem: EventTarget, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean) {
-      this.Pelem = Pelem;
-      this.Peventname = Peventname.toLowerCase();
-      this.Phandler = Phandler;
-      this.PuseCapture = PuseCapture;
-    }
-
-    equals(other: DOMEventTracking): boolean {
-      return this.Pelem == other.Pelem && this.Peventname == other.Peventname &&
-        this.Phandler == other.Phandler && this.PuseCapture == other.PuseCapture;
-    }
-  };
-
   export class Util {
     // Generalized component event registration
     device: Device;
@@ -30,8 +11,6 @@ namespace com.keyman {
     physicalDevice: Device;
 
     waiting: HTMLDivElement;                  // The element displayed for util.wait and util.alert.
-
-    private domEvents: DOMEventTracking[] = [];
 
     private embeddedFonts: any[] = [];     // Array of currently embedded font descriptor entries.  (Is it just a string?)
 
@@ -91,46 +70,6 @@ namespace com.keyman {
     }
 
     // -----------------------------------------------
-
-    /**
-     * Function     attachDOMEvent: Note for most browsers, adds an event to a chain, doesn't stop existing events
-     * Scope        Public
-     * @param       {Object}    Pelem       Element (or IFrame-internal Document) to which event is being attached
-     * @param       {string}    Peventname  Name of event without 'on' prefix
-     * @param       {function(Object)}  Phandler    Event handler for event
-     * @param       {boolean=}  PuseCapture True only if event to be handled on way to target element
-     * Description  Attaches event handler to element DOM event
-     */
-    attachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
-      this.detachDOMEvent(Pelem, Peventname, Phandler, PuseCapture);
-      Pelem.addEventListener(Peventname, Phandler, PuseCapture?true:false);
-
-      // Since we're attaching to the DOM, these events should be tracked for detachment during shutdown.
-      var event = new DOMEventTracking(Pelem, Peventname, Phandler, PuseCapture);
-      this.domEvents.push(event);
-    }
-
-    /**
-     * Function     detachDOMEvent
-     * Scope        Public
-     * @param       {Object}    Pelem       Element from which event is being detached
-     * @param       {string}    Peventname  Name of event without 'on' prefix
-     * @param       {function(Object)}  Phandler    Event handler for event
-     * @param       {boolean=}  PuseCapture True if event was being handled on way to target element
-     * Description Detaches event handler from element [to prevent memory leaks]
-     */
-    detachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
-      Pelem.removeEventListener(Peventname, Phandler, PuseCapture);
-
-      // Since we're detaching, we should drop the tracking data from the old event.
-      var event = new DOMEventTracking(Pelem, Peventname, Phandler, PuseCapture);
-      for(var i = 0; i < this.domEvents.length; i++) {
-        if(this.domEvents[i].equals(event)) {
-          this.domEvents.splice(i, 1);
-          break;
-        }
-      }
-    }
 
     /**
      * Function     getOption
@@ -593,6 +532,9 @@ namespace com.keyman {
       for(let event of this.domEvents) {
         this.detachDOMEvent(event.Pelem, event.Peventname, event.Phandler, event.PuseCapture);
       }
+
+      // alt / modularized form for the above:  given `eventTracker: DomEventTracker`, call
+      // `eventTracker.shutdown()`.
 
       // Remove any KMW-added DOM element clutter.
       this.waiting.parentNode.removeChild(this.waiting);
