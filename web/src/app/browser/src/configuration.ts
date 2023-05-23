@@ -8,7 +8,7 @@ export class BrowserConfiguration extends EngineConfiguration {
   private _ui: string;
   private _attachType: string;
 
-  private alertHost?: AlertHost;
+  private _alertHost?: AlertHost;
 
   initialize(options: Required<BrowserInitOptionSpec>) {
     this.initialize(options);
@@ -16,7 +16,7 @@ export class BrowserConfiguration extends EngineConfiguration {
     this._ui = options.ui;
     this._attachType = options.attachType;
     if(options.useAlerts) {
-      this.alertHost = new AlertHost();
+      this._alertHost = new AlertHost();
     }
   }
 
@@ -24,8 +24,8 @@ export class BrowserConfiguration extends EngineConfiguration {
     return this._attachType;
   }
 
-  get signalUser(): AlertHost | undefined {
-    return this.alertHost;
+  get alertHost(): AlertHost | undefined {
+    return this._alertHost;
   }
 
   debugReport(): Record<string, any> {
