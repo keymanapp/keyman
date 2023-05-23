@@ -59,6 +59,7 @@ const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
  Note that the CoreAction of type EndAction produced by Keyman Core is not
  expected by Keyman for Mac and is removed during this conversion.
  */
+/*
 -(NSArray*)actionObjectArrayToLegacyActionMapArray:(NSArray*)actionArray {
 
   // legacy code expects the map array to be optimized, so we can do that before converting to NSDictionary
@@ -75,6 +76,7 @@ const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
   
   return mapArray;
 }
+*/
 
 -(NSArray*)optimizeActionArray:(NSArray*)actionArray {
   NSLog(@"unoptimized actions array: %@", actionArray);

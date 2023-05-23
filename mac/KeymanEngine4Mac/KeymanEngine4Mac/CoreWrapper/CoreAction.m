@@ -6,9 +6,14 @@
  * 
  * Created by Shawn Schantz on 2023-02-21.
  * 
- * A value object representing a single action returned by Keyman Core. A list
- * of Actions are returned by Core when processing a key down event and are
- * applied by the platform code to update the context.
+ * A value object representing one or more actions returned by Keyman Core. A
+ * list of Actions is returned by Core when processing a key down event. These
+ * actions are applied by the platform code to update the context.
+ *
+ * The ActionType is a one-to-one mapping to that returned from Core but with
+ * one exception. Keyman Core defines a single Backspace action, but CoreAction
+ * defines two, one for markers and one for characters. The two backspace
+ * actions are handled much differently when being applied to the client.
  */
 
 #import "CoreAction.h"
@@ -42,8 +47,13 @@
         self->_typeName = @"Alert";
         break;
       }
-      case BackspaceAction: {
-        self->_typeName = @"Backspace";
+      case CharacterBackspaceAction: {
+        self->_typeName = @"Character Backspace";
+        self->_backspaceCount = backspaceCount;
+        break;
+      }
+      case MarkerBackspaceAction: {
+        self->_typeName = @"Marker Backspace";
         self->_backspaceCount = backspaceCount;
         break;
       }
@@ -79,27 +89,55 @@
  */
 -(instancetype)init {
   return [self initWithType:AlertAction actionContent:@"" backspaceCount:0];
+  _impactsClient = NO;
 }
 
 -(instancetype)initCharacterAction:(NSString*)content {
   self = [self initWithType: CharacterAction actionContent:content backspaceCount:0];
+  _impactsClient = YES;
   return self;
 }
 
--(instancetype)initBackspaceAction:(int)count {
-  self = [self initWithType: BackspaceAction actionContent:@"" backspaceCount:count];
+-(instancetype)initCharacterBackspaceAction:(NSString*)content {
+  self = [self initWithType: CharacterBackspaceAction actionContent:content backspaceCount:1];
+  _impactsClient = YES;
   return self;
+}
+
+-(instancetype)initMarkerBackspaceAction:(int)count {
+  self = [self initWithType: MarkerBackspaceAction actionContent:@"" backspaceCount:count];
+  return self;
+}
+
+-(BOOL)isCharacter {
+  return self.actionType==CharacterAction;
+}
+
+-(BOOL)isCharacterBackspace {
+  return self.actionType==CharacterBackspaceAction;
+}
+
+-(BOOL)isMarker {
+  return self.actionType==MarkerAction;
+}
+
+-(BOOL)isMarkerBackspace {
+  return self.actionType==MarkerBackspaceAction;
 }
 
 -(NSString *)description
 {
-  NSMutableString *actionDescription = [NSMutableString stringWithString:self.typeName];
-  if (self.actionType == CharacterAction) {
+  NSString *charString = nil;
+  BOOL hasCharacterString = (self.isCharacter) || (self.isCharacterBackspace);
+  
+  if(hasCharacterString) {
     const unichar unicodeChar = [_content characterAtIndex:0];
-    [actionDescription appendString: @", content = "];
-    [actionDescription appendString: [[NSString alloc] initWithFormat:@"%u / 0x%X : '%@'", unicodeChar, unicodeChar, _content]];
+    charString = [[NSString alloc] initWithFormat:@"%u / 0x%X : '%@'", unicodeChar, unicodeChar, _content];
+  } else {
+    charString = @"";
   }
-  return actionDescription;
+  
+  return [[NSString alloc] initWithFormat: @"%@ %@", self.typeName, charString];
 }
 
 /*
@@ -110,6 +148,7 @@
  CoreWrapper without rewriting the Keyman Input Method code consuming the
  actions.
  */
+/*
 -(NSDictionary*) legacyDictionaryActionForActionObject:(CoreAction*)action {
   NSDictionary *actionMap = nil;
   
@@ -150,6 +189,6 @@
 
   return actionMap;
 }
-
+*/
 @end
 

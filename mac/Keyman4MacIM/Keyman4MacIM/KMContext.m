@@ -8,14 +8,14 @@
  * 
  * Tracks the state of the context in the client application to the best of our ability.
  * Needed for storing and managing marker actions returned from Keyman Core.
- * Also useful for applications that do not tell us about their context through the two methods:
+ * Also useful for applications that do not tell us about their context with the APIs
  * selectedRange and attributedSubstringFromRange
  */
 
 #import "KMContext.h"
 #include <Carbon/Carbon.h> /* For kVK_ constants. */
 
-NSUInteger const MAXIMUM_CONTEXT_LENGTH = 60;         // KM_KBP_IT_CHAR
+NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
 
 @interface KMContext()
 
@@ -37,6 +37,7 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 60;         // KM_KBP_IT_CHAR
   self = [self init];
   if (self) {
     NSString *maximumContext = nil;
+    
     // copy up to MAXIMUM_CONTEXT_LENGTH from the end of the context
     NSUInteger initialLength = [initialContext length];
     if (initialLength > MAXIMUM_CONTEXT_LENGTH) {
@@ -54,6 +55,11 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 60;         // KM_KBP_IT_CHAR
   return (NSString*)_context;
 }
 
+-(BOOL)isEmpty {
+  return _context.length == 0;
+}
+
+// TODO: synch with Keyman Core context, don't just set this on its own
 -(void)clearContext {
   _context.string = @"";
 }
@@ -65,41 +71,56 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 60;         // KM_KBP_IT_CHAR
 }
 
 /**
- * Deletes the last complete unicode character in the context, if the string is not empty.
- * Checks for actual size and handles BMP values and surrogate pairs.
+ * Deletes the last complete code point in the context string, if it is not empty.
+ * NSString is UTF-16, so one code point could be composed of multiple code units.
+ * Checks for the size of the final code point to see how much needs to be deleted.
  */
--(void)deleteLastUnicodeCharacter {
+-(void)deleteLastCodePoint {
   NSUInteger contextLength = self.context.length;
+  
   if (contextLength > 0) {
     NSUInteger characterIndex = contextLength-1;
     NSRange characterRange = [self.context rangeOfComposedCharacterSequenceAtIndex:characterIndex];
-    NSLog(@"deleteLastUnicodeCharacter, index = %lu, rangeOfLastCharacter = %@\n", characterIndex, NSStringFromRange(characterRange));
+    NSLog(@"KMContext deleteLastUnicodeCharacter, index = %lu, rangeOfLastCharacter = %@\n", characterIndex, NSStringFromRange(characterRange));
     [self.context deleteCharactersInRange:characterRange];
   }
 }
 
--(void)appendString:(NSString*)string {
+-(void)replaceSubstring:(NSString*)newText count:(int)count {
+  // loop through the string and replace one a time to account for characters of different width
+  if (count > 0) {
+    int i;
+    for (i = 0; i < count; i++) {
+      [self deleteLastCodePoint];
+    }
+  }
+  if (newText.length > 0) {
+    [self addSubtring:newText];
+  }
+}
+
+-(void)addSubtring:(NSString*)string {
   [self.context appendString:string];
 }
 
 -(void)applyAction:(CoreAction*)action keyDownEvent:(nonnull NSEvent *)event {
+  NSLog(@"CachedContext applyAction: %@", action.description);
 
   switch(action.actionType) {
     case MarkerAction:
       [self appendMarker];
       break;
     case CharacterAction:
-      [self appendString:action.content];
+      [self addSubtring:action.content];
       break;
-    case BackspaceAction:
-      [self deleteLastUnicodeCharacter];
+    case CharacterBackspaceAction:
+      [self deleteLastCodePoint];
+      break;
+    case MarkerBackspaceAction:
+      [self deleteLastCodePoint];
       break;
     case EmitKeystrokeAction:
-      if(event.keyCode == kVK_Delete) {
-        [self deleteLastUnicodeCharacter];
-      } else {
-        [self appendString:event.characters];
-      }
+      [self applyUnhandledEvent:event];
       break;
     case InvalidateContextAction:
       [self clearContext];
@@ -108,6 +129,50 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 60;         // KM_KBP_IT_CHAR
       NSLog(@"CachedContext applyAction, action not applied to context %@\n", action.typeName.description);
       break;
   }
+}
+
+// TODO: see handleDefaultKeymanEngineActions
+-(void)applyUnhandledEvent:(nonnull NSEvent *)event {
+  unsigned short keyCode = event.keyCode;
+  switch (keyCode) {
+    case kVK_Delete:
+      NSLog(@"***SGS applyUnhandledEvent kVK_Delete");
+      [self deleteLastCodePoint];
+      //[self processUnhandledDeleteBack: sender updateEngineContext: &updateEngineContext];
+      break;
+    case kVK_LeftArrow:
+        // new detect location within context?
+    case kVK_RightArrow:
+    case kVK_UpArrow:
+    case kVK_DownArrow:
+    case kVK_Home:
+    case kVK_End:
+    case kVK_PageUp:
+    case kVK_PageDown:
+    {
+      [self clearContext];
+      break;
+    }
+    case kVK_Return:
+    case kVK_ANSI_KeypadEnter:
+      NSLog(@"***SGS applyUnhandledEvent kVK_Return");
+      [self addSubtring:@"\n"];
+      break;
+    default:
+      {
+        // NOTE: Although ch is usually the same as keyCode, when the option key is depressed (and
+        // perhaps in some other cases) it may not be (keyCode can be 0). Likewise, the option key
+        // can generate more than one character in event.characters.
+        unichar ch = [event.characters characterAtIndex:0];
+        if (keyCode < 0x33 || (ch >= 0x2A && ch <= 0x39)) { // Main keys, Numpad char range, normal punctuation
+          [self addSubtring:event.characters];
+        }
+        else {
+            // Other keys
+        }
+      }
+        break;
+    }
 }
 
 @end

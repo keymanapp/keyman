@@ -206,8 +206,8 @@
       case KM_KBP_IT_CHAR: {
         NSString *characterString = [self.coreHelper utf32ValueToString:actionStruct->character];
         action = [[CoreAction alloc] initWithType: CharacterAction actionContent:characterString backspaceCount:0];
-        NSLog(@"actionStruct->character decimal: %u, hex: %X", actionStruct->character, actionStruct->character);
-        NSLog(@"converted unicode string: '%@'", characterString);
+        NSLog(@"createCoreActionForActionStruct actionStruct->character decimal: %u, hex: %X", actionStruct->character, actionStruct->character);
+        NSLog(@"createCoreActionForActionStruct converted unicode string: '%@'", characterString);
         break;
       }
       case KM_KBP_IT_MARKER: {
@@ -219,10 +219,19 @@
         break;
       }
       case KM_KBP_IT_BACK: {
-        action = [[CoreAction alloc] initWithType: BackspaceAction actionContent:@"" backspaceCount:1];
-        km_kbp_backspace_item item = actionStruct->backspace;
-        NSLog(@"converted backspace, expected value =%lu, expected type =%u", item.expected_value, item.expected_type);
-
+        km_kbp_backspace_item backspace = actionStruct->backspace;
+        
+        if (backspace.expected_type == KM_KBP_BT_CHAR) {
+          NSString *charString = [self.coreHelper utf32ValueToString:backspace.expected_value];
+          NSLog(@"createCoreActionForActionStruct charString = %@", charString);
+          action = [[CoreAction alloc] initCharacterBackspaceAction:charString];
+          NSLog(@"createCoreActionForActionStruct converted character backspace, expected value =%lu, expected type =%u", backspace.expected_value, backspace.expected_type);
+        } else if(backspace.expected_type == KM_KBP_BT_MARKER) {
+          action = [[CoreAction alloc] initMarkerBackspaceAction:actionStruct->backspace.expected_value];
+          NSLog(@"createCoreActionForActionStruct converted marker backspace, expected value =%lu, expected type =%u", backspace.expected_value, backspace.expected_type);
+        } else {
+          NSLog(@"createCoreActionForActionStruct did not convert unknown backspace, expected value =%lu, expected type =%u", backspace.expected_value, backspace.expected_type);
+        }
         break;
       }
       case KM_KBP_IT_PERSIST_OPT: {
@@ -242,12 +251,11 @@
         break;
       }
       default: {
-        NSLog(@"unrecognized type of km_kbp_action_item = %u\n", actionStruct->type);
+        NSLog(@"createCoreActionForActionStruct unrecognized type of km_kbp_action_item = %u\n", actionStruct->type);
       }
   }
   return action;
 }
-
 
 -(NSString *)getContextAsStringUsingCore {
   km_kbp_context * context =  km_kbp_state_context(self.keyboardState);

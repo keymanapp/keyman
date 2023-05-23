@@ -18,7 +18,7 @@
 @import Sentry;
 
 @interface KMInputMethodEventHandler ()
-@property KMContext *context;
+@property KMContext *cachedContext; // TODO: rename after eliminating other context references
 @property (nonatomic, retain) KeySender* keySender;
 @property int generatedBackspaceCount;
 @end
@@ -128,7 +128,7 @@ NSRange _previousSelRange;
     NSLog(@"***SGS initWithClient clientAppId = %@", clientAppId);
     self.senderForDeleteBack = sender;
     _keySender = [[KeySender alloc] init];
-    _context = [[KMContext alloc] init];
+    _cachedContext = [[KMContext alloc] init];
     _generatedBackspaceCount = 0;
   
     BOOL legacy = [self isClientAppLegacy:clientAppId];
@@ -382,6 +382,7 @@ NSRange _previousSelRange;
   else {
     actions = [self processEventWithKeymanEngine:event in:sender];
     if (actions.count == 0) {
+      // TODO: this probably blows up with the wrong set of actions
       [self checkEventForSentryEasterEgg:event withActions:actions];
       return NO;
     }
@@ -392,8 +393,8 @@ NSRange _previousSelRange;
     return [self applyKeymanCoreActions:actions event:event client:sender];
   } else {
     [self applyKeymanEngineActions:actions event:event in:sender];
+    return YES;
   }
-  return YES;
 }
 
 -(void)applyKeymanEngineActions:(NSArray*)actions event: (NSEvent *)event in:(id) sender  {
@@ -735,7 +736,7 @@ NSRange _previousSelRange;
     unsigned short keyCode = event.keyCode;
     switch (keyCode) {
         case kVK_Delete:
-            NSLog(@"***SGS handleDefaultKeymanEngineActions kVK_Return");
+            NSLog(@"***SGS handleDefaultKeymanEngineActions kVK_Delete");
             [self processUnhandledDeleteBack: sender updateEngineContext: &updateEngineContext];
             break;
 
@@ -966,11 +967,9 @@ NSRange _previousSelRange;
 // replacement handleEvent implementation for core event processing
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
   if (event.type == NSKeyDown) {
-    NSRange selectionRange = [sender selectedRange];
-    NSRange contextRange = NSMakeRange(0, selectionRange.location);
-    NSAttributedString *context = [sender attributedSubstringFromRange:contextRange];
-    NSLog(@"***SGS handleEvent KeyDown event, keycode: %u, characters='%@', context='%@', context.start=%lu, context.end=%lu", event.keyCode, event.characters, context, (unsigned long)contextRange.location, (unsigned long)contextRange.length);
-
+    // TODO: only do this for NSKeyDown?
+    [self checkContext:event forClient:sender];
+    
     /*
     if(event.keyCode == 0xFF && self.generatedBackspaceCount > 0) {
       NSLog(@"***SGS handleEvent 0xFF, changed event.keycode to 0x51, reducing generatedBackspaceCount to %d ", self.generatedBackspaceCount);
@@ -1015,6 +1014,24 @@ NSRange _previousSelRange;
     return handled;
 }
 
+-(void)checkContext:(NSEvent *)event forClient:(id) client {
+  // TODO: handle cases where context cannot be loaded because selectedRange or attributedSubstringFromRange do not work -> use TextCompatibilityCheck
+  if([self.cachedContext isEmpty]) {
+    NSRange selectionRange = [client selectedRange];
+    NSRange contextRange = NSMakeRange(0, selectionRange.location);
+    NSAttributedString *attributedString = [client attributedSubstringFromRange:contextRange];
+    NSString *contextString = nil;
+    
+    if(attributedString == nil) {
+      NSLog(@"***SGS checkContext, attributedSubstringFromRange returned nil, contextRange = %@",NSStringFromRange(contextRange));
+      contextString = @"";
+    } else
+      contextString = attributedString.string;
+    
+    NSLog(@"***SGS checkContext KeyDown event, keycode: %u, characters='%@', context='%@', contextRange = %@", event.keyCode, event.characters, contextString, NSStringFromRange(contextRange));
+    [self.cachedContext addSubtring:contextString];
+  }
+}
 
 -(BOOL)containsKeymanCoreActions:(NSArray*)actions {
   BOOL containsCoreActions = NO;
@@ -1039,43 +1056,97 @@ NSRange _previousSelRange;
  * -return YES after generating a backspace event
  */
 -(BOOL)applyKeymanCoreActions:(NSArray*)actions event: (NSEvent*)event client:(id) client {
-  BOOL handledEvent = NO;
-
+  //TODO: remove lots of debug code
   NSLog(@"***SGS applyKeymanCoreActions invoked, actions.count = %lu ", (unsigned long)actions.count);
-  NSLog(@"event = %@", event);
-  NSLog(@"client = %@", client);
-  
-  KMCoreActionHandler *actionHandler = [[KMCoreActionHandler alloc] initWithActions:(NSArray*)actions event: (NSEvent *)event client:(id) client];
-  handledEvent = actionHandler.handleActions;
+  NSLog(@"event = %@, client = %@, context.currentContext = %@", event, client, self.cachedContext.currentContext);
+  NSString *contextBefore = [[NSString alloc] initWithString:self.cachedContext.currentContext];
+  NSUInteger lengthBefore = _cachedContext.currentContext.length;
+  NSUInteger realLengthBefore =
+      [_cachedContext.currentContext lengthOfBytesUsingEncoding:NSUTF32StringEncoding] / 4;
 
-  if (actionHandler.backspaceEventsToGenerate > 0) {
-    [self sendBackspaceEvents: event client:client count:actionHandler.backspaceEventsToGenerate];
-  }
- 
-  if (actionHandler.textToInsert.length > 0) {
-    [self insertText:actionHandler.textToInsert backspaceCount:actionHandler.backspacesToInsert actions:actions event:event client:client];
-  }
- 
-  if (actionHandler.textEventsToGenerate.length > 0) {
-    [self sendProcessBufferEvent: event client:client output:actionHandler.textEventsToGenerate];
-  }
   
-  return handledEvent;
+  KMCoreActionHandler *actionHandler = [[KMCoreActionHandler alloc] initWithActions:(NSArray*)actions context: self.cachedContext event: (NSEvent *)event client:(id) client];
+  KMActionHandlerResult *result = actionHandler.handleActions;
+
+  for (KMActionOperation *operation in [result.operations objectEnumerator]) {
+    if (operation.isForCompositeAction) {
+      [self executeCompositeOperation:operation keyDownEvent:event client:client];
+    } else {
+      [self executeSimpleOperation:operation keyDownEvent:event];
+    }
+  }
+
+  // TODO: remove more debug code
+  NSString *contextAfter = _cachedContext.currentContext;
+  NSUInteger lengthAfter = _cachedContext.currentContext.length;
+  NSUInteger realLengthAfter =
+      [_cachedContext.currentContext lengthOfBytesUsingEncoding:NSUTF32StringEncoding] / 4;
+
+  NSLog(@"***SGS applyActions, contextBefore = '%@', length = %lu, real length = %lu; contextAfter = '%@', length = %lu, real length = %lu", contextBefore, lengthBefore, realLengthBefore, contextAfter, lengthAfter, realLengthAfter);
+
+  return result.handledEvent;
 }
 
--(BOOL)insertText:(NSString*)text backspaceCount:(int)replacementCount actions: (NSArray*)actions event: (NSEvent*)event client:(id) client {
-  NSRange selectionRange = [client selectedRange];
-  NSRange contextRange = NSMakeRange(0, selectionRange.location);
-  NSAttributedString *context = [client attributedSubstringFromRange:contextRange];
-  NSLog(@"***SGS applyCharacterActions, replacementCount=%d, selectionRange.location=%lu", replacementCount, selectionRange.location);
+/**
+ * If we need to do something in response to a single action, then do it here.
+ * Most of the interesting work is done in executeCompositeOperation, and
+ * much of the other work is done when updating the context.
+ */
+-(void)executeSimpleOperation:(KMActionOperation*)operation keyDownEvent:(nonnull NSEvent *)event {
+  CoreAction *action = operation.action;
+  if (action != nil) {
+    
+  }
+  switch(action.actionType) {
+    case AlertAction:
+      NSBeep();
+      break;
+    case PersistOptionAction:
+      //TODO: handle this somewhere
+      break;
+    case CapsLockAction: {
+      //TODO: handle this somewhere
+      break;
+    }
+    default:
+      break;
+  }
+  [self.cachedContext applyAction:operation.action keyDownEvent:event];
+}
 
+-(void)executeCompositeOperation:(KMActionOperation*)operation keyDownEvent:(nonnull NSEvent *)event client:(id) client {
+
+  NSLog(@"***SGS KXMInputMethodHandler executeCompositeOperation, composite operation: %@", operation);
+  if ((operation.useEvents) && (operation.backspaceCount > 0)) {
+    [self sendBackspaceEvents: event client:client count:operation.backspaceCount];
+    // TODO: update context when event is handled
+  }
+ 
+  // TODO: executed delayed insert after backspace completes
+
+  if (!operation.useEvents) {
+    if (operation.textToInsert.length > 0) {
+      [self insertText:operation.textToInsert backspaceCount:operation.backspaceCount event:event client:client];
+      [self.cachedContext replaceSubstring:operation.textToInsert count:operation.backspaceCount];
+    }
+  }
+}
+
+-(BOOL)insertText:(NSString*)text backspaceCount:(int)replacementCount event: (NSEvent*)event client:(id) client {
+
+  NSLog(@"KXMInputMethodHandler insertText: %@ replacementCount: %d", text, replacementCount);
   NSRange replacementRange;
   if (replacementCount > 0) {
+    NSRange selectionRange = [client selectedRange];
+    NSRange contextRange = NSMakeRange(0, selectionRange.location);
+    NSAttributedString *context = [client attributedSubstringFromRange:contextRange];
+    NSLog(@"***SGS KXMInputMethodHandler insertText, replacementCount=%d, selectionRange.location=%lu", replacementCount, selectionRange.location);
+
     replacementRange = NSMakeRange(selectionRange.location-replacementCount, replacementCount);
-  } else {
+    NSLog(@"***SGS KXMInputMethodHandler insertText, insertText %@ in replacementRange.start=%lu, replacementRange.length=%lu", text, (unsigned long)replacementRange.location, (unsigned long)replacementRange.length);
+ } else {
     replacementRange = NSMakeRange(NSNotFound, NSNotFound);
   }
-  NSLog(@"***SGS applyCharacterActions, insertText %@ in replacementRange.start=%lu, replacementRange.length=%lu", text, (unsigned long)replacementRange.location, (unsigned long)replacementRange.length);
   
   [client insertText:text replacementRange:replacementRange];
   return YES;

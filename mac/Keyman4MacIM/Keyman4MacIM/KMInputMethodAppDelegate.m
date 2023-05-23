@@ -106,6 +106,10 @@ NSString* _keymanDataPath = nil;
                                                    forEventClass:kInternetEventClass
                                                       andEventID:kAEGetURL];
 
+  // TODO: enable low level event tap with core?
+  // turning off for now
+  self.lowLevelEventTap = nil;
+  /*
   self.lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap,
                                            kCGHeadInsertEventTap,
                                            kCGEventTapOptionListenOnly,
@@ -130,6 +134,7 @@ NSString* _keymanDataPath = nil;
   if (self.runLoopEventSrc && runLoop) {
       CFRunLoopAddSource(runLoop,  self.runLoopEventSrc, kCFRunLoopDefaultMode);
   }
+   */
 }
 
 - (KeymanVersionInfo)versionInfo {
