@@ -6,7 +6,7 @@ import { makePathToFixture } from './helpers/index.js';
 import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
 import { PackageValidation } from '../src/compiler/package-validation.js';
 
-const debug = true;
+const debug = false;
 const callbacks = new TestCompilerCallbacks();
 
 describe('CompilerMessages', function () {
@@ -188,6 +188,13 @@ describe('CompilerMessages', function () {
   it('should generate ERROR_PackageMustContainAModelOrAKeyboard if package contains a .doc file', async function() {
     testForMessage(this, ['invalid', 'error_package_must_contain_a_model_or_a_keyboard.kps'],
       CompilerMessages.ERROR_PackageMustContainAModelOrAKeyboard);
+  });
+
+  // WARN_JsKeyboardFileIsMissing
+
+  it('should generate WARN_JsKeyboardFileIsMissing if package is missing corresponding .js for a touch .kmx', async function() {
+    testForMessage(this, ['invalid', 'warn_js_keyboard_file_is_missing.kps'],
+      CompilerMessages.WARN_JsKeyboardFileIsMissing);
   });
 
 });
