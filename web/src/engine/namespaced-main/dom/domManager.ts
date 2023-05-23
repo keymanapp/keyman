@@ -77,42 +77,6 @@ namespace com.keyman.dom {
       }
     }
 
-    /* ------ Defines independent, per-control keyboard setting behavior for the API. ------ */
-
-    /**
-     * Function     getKeyboardForControl
-     * Scope        Public
-     * @param       {Element}    Pelem    Control element
-     * @return      {string|null}         The independently-managed keyboard for the control.
-     * Description  Returns the keyboard ID of the current independently-managed keyboard for this control.
-     *              If it is currently following the global keyboard setting, returns null instead.
-     */
-    getKeyboardForControl(Pelem: HTMLElement): string {
-      if(!this.isAttached(Pelem)) {
-        console.error("KeymanWeb is not attached to element " + Pelem);
-        return null;
-      } else {
-        return Pelem._kmwAttachment.keyboard;
-      }
-    }
-
-    /**
-     * Function     getLanguageForControl
-     * Scope        Public
-     * @param       {Element}    Pelem    Control element
-     * @return      {string|null}         The independently-managed keyboard for the control.
-     * Description  Returns the language code used with the current independently-managed keyboard for this control.
-     *              If it is currently following the global keyboard setting, returns null instead.
-     */
-    getLanguageForControl(Pelem: HTMLElement): string {
-      if(!this.isAttached(Pelem)) {
-        console.error("KeymanWeb is not attached to element " + Pelem);
-        return null;
-      } else {
-        return Pelem._kmwAttachment.languageCode;  // Should we have a version for the language code, too?
-      }
-    }
-
     /* ------ End independent, per-control keyboard setting behavior definitions. ------ */
 
     get activeElement(): HTMLElement {
