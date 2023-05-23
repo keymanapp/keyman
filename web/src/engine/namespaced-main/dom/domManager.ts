@@ -77,88 +77,6 @@ namespace com.keyman.dom {
       }
     }
 
-    /* ------ End independent, per-control keyboard setting behavior definitions. ------ */
-
-    get activeElement(): HTMLElement {
-      return DOMEventHandlers.states._activeElement;
-    }
-
-    set activeElement(Pelem: HTMLElement) {
-      DOMEventHandlers.states._activeElement = Pelem;
-
-      let maintainingFocus = focusAssistant.maintainingFocus;
-
-      // Hide the OSK when the control is blurred, unless the UI is being temporarily selected
-      const osk = this.keyman.osk;
-      // const device = this.keyman.util.device;
-
-      if(osk) {
-        const target = Pelem?._kmwAttachment?.interface || null;
-        if(osk && osk.activationModel instanceof TwoStateActivator && (target || !maintainingFocus)) {
-          // Do not unset the field if the UI is activated.
-          osk.activationCondition = target;
-        }
-      }
-    }
-
-    /**
-     *  Set the active input element directly optionally setting focus
-     *
-     *  @param  {Object|string} e         element id or element
-     *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123)
-     */
-    setActiveElement(e: string|HTMLElement, setFocus?: boolean) {
-      if(typeof e == "string") { // Can't instanceof string, and String is a different type.
-        e = document.getElementById(e);
-      }
-
-      if(this.keyman.isEmbedded) {
-        // If we're in embedded mode, auto-attach to the element specified by the page.
-        if(!this.isAttached(e)) {
-          this.attachToControl(e);
-        }
-        // Non-attached elements cannot be set as active.
-      } else if(!this.isAttached(e)) {
-        console.warn("Cannot set an element KMW is not attached to as the active element.");
-        return;
-      }
-
-      // If we're changing controls, don't forget to properly manage the keyboard settings!
-      // It's only an issue on 'native' (non-embedded) code paths.
-      if(!this.keyman.isEmbedded) {
-        this.keyman.touchAliasing._BlurKeyboardSettings(this.keyman.domManager.lastActiveElement);
-      }
-
-      // No need to reset context if we stay within the same element.
-      if(this.activeElement != e) {
-        this.keyman['resetContext'](e as HTMLElement);
-      }
-
-      this.activeElement = this.lastActiveElement = e;
-      if(!this.keyman.isEmbedded) {
-        this.keyman.touchAliasing._FocusKeyboardSettings(e, false);
-      }
-
-      // Allow external focusing KMEW-123
-      if(arguments.length > 1 && setFocus) {
-        this.focusLastActiveElement();
-      }
-
-      // Let the keyboard do its initial group processing
-      //console.log('processNewContextEvent [not] called from setActiveElement');
-      com.keyman.singleton.core.processNewContextEvent(dom.Utils.getOutputTarget(e));
-    }
-
-    /** Sets the active input element only if it is presently null.
-     *
-     * @param  {Element}
-     */
-    initActiveElement(Lelem: HTMLElement) {
-      if(this.activeElement == null) {
-        this.activeElement = Lelem;
-      }
-    }
-
     /* ----------------------- Editable IFrame methods ------------------- */
 
     /**
@@ -175,56 +93,6 @@ namespace com.keyman.dom {
     }
 
     /* ----------------------- Initialization methods ------------------ */
-
-    /**
-     * Get the user-specified (or default) font for the first mapped input or textarea element
-     * before applying any keymanweb styles or classes
-     *
-     *  @return   {string}
-     */
-    getBaseFont() {
-      var util = this.keyman.util;
-      var ipInput = document.getElementsByTagName<'input'>('input'),
-          ipTextArea=document.getElementsByTagName<'textarea'>('textarea'),
-          n=0,fs,fsDefault='Arial,sans-serif';
-
-      // Find the first input element (if it exists)
-      if(ipInput.length == 0 && ipTextArea.length == 0) {
-        n=0;
-      } else if(ipInput.length > 0 && ipTextArea.length == 0) {
-        n=1;
-      } else if(ipInput.length == 0 && ipTextArea.length > 0) {
-        n=2;
-      } else {
-        var firstInput = ipInput[0];
-        var firstTextArea = ipTextArea[0];
-
-        if(firstInput.offsetTop < firstTextArea.offsetTop) {
-          n=1;
-        } else if(firstInput.offsetTop > firstTextArea.offsetTop) {
-          n=2;
-        } else if(firstInput.offsetLeft < firstTextArea.offsetLeft) {
-          n=1;
-        } else if(firstInput.offsetLeft > firstTextArea.offsetLeft) {
-          n=2;
-        }
-      }
-
-      // Grab that font!
-      switch(n) {
-        case 0:
-          fs=fsDefault;
-        case 1:
-          fs=util.getStyleValue(ipInput[0],'font-family');
-        case 2:
-          fs=util.getStyleValue(ipTextArea[0],'font-family');
-      }
-      if(typeof(fs) == 'undefined' || fs == 'monospace') {
-        fs=fsDefault;
-      }
-
-      return fs;
-    }
 
     /**
      * Function     Initialization
@@ -340,23 +208,5 @@ namespace com.keyman.dom {
       this.keyman.setInitialized(2);
       return Promise.resolve();
     }.bind(this);
-
-    /**
-     * Initialize the desktop user interface as soon as it is ready
-     */
-    initializeUI() {
-      if(this.keyman.ui && this.keyman.ui['initialize'] instanceof Function) {
-        this.keyman.ui['initialize']();
-        // Display the OSK (again) if enabled, in order to set its position correctly after
-        // adding the UI to the page
-        this.keyman.osk.present();
-      } else if(this.keyman.isEmbedded) {
-        // UI modules aren't utilized in embedded mode.  There's nothing to init, so we simply
-        // return instead of waiting for a UI module that will never come.
-        return;
-      } else {
-        window.setTimeout(this.initializeUI.bind(this),1000);
-      }
-    }
   }
 }
