@@ -22,9 +22,20 @@ TODO: implement additional interfaces:
 */
 
 // TODO: rename wasm-host?
-import { CompilerCallbacks, CompilerEvent } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerEvent, KvkFileWriter, KvksFileReader } from '@keymanapp/common-types';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
 import { CompilerMessages, mapErrorFromKmcmplib } from './messages.js';
+
+export interface CompilerResultFile {
+  filename: string;
+  data: Uint8Array;
+};
+
+export interface CompilerResult {
+  kmx?: CompilerResultFile;
+  kvk?: CompilerResultFile;
+  js?: CompilerResultFile;
+};
 
 export interface CompilerOptions {
   shouldAddCompilerVersion?: boolean;
@@ -136,7 +147,19 @@ export class KmnCompiler {
     // TODO: use callbacks for file access -- so kmc-kmn is entirely fs agnostic
     let result = this.runCompiler(infile, outfile, options);
     delete (globalThis as any)[this.callbackName];
-    return result;
+    //TODO: write the file out!
+    if(result) {
+      if(result.kmx) {
+        this.callbacks.fs.writeFileSync(result.kmx.filename, result.kmx.data);
+      }
+      if(result.kvk) {
+        this.callbacks.fs.writeFileSync(result.kvk.filename, result.kvk.data);
+      }
+      if(result.js) {
+        this.callbacks.fs.writeFileSync(result.js.filename, result.js.data);
+      }
+    }
+    return !!result;
   }
 
   private compilerMessageCallback = (line: number, code: number, msg: string): number => {
@@ -144,22 +167,71 @@ export class KmnCompiler {
     return 1;
   }
 
-  private runCompiler(infile: string, outfile: string, options: CompilerOptions): boolean {
+  private runCompiler(infile: string, outfile: string, options: CompilerOptions): CompilerResult {
     try {
-      if (!this.wasm.setCompilerOptions(options.shouldAddCompilerVersion ? 1 : 0)) {
-        this.callbacks.reportMessage(CompilerMessages.Fatal_UnableToSetCompilerOptions());
+      let result: CompilerResult = {};
+      let wasm_interface = new this.wasm.Module.CompilerInterface();
+      let wasm_result = null;
+      try {
+        wasm_interface.saveDebug = options.saveDebug;
+        wasm_interface.compilerWarningsAsErrors = options.compilerWarningsAsErrors;
+        wasm_interface.warnDeprecatedCode = options.warnDeprecatedCode;
+        wasm_interface.messageCallback = this.callbackName;
+        wasm_interface.loadFileCallback = this.callbackName;
+        wasm_result = this.wasm.Module.kmcmp_compile(infile, wasm_interface);
+        if(!wasm_result.result) {
+          return null;
+        }
+
+        if(wasm_result.kvksFilename) {
+          result.kvk = this.runKvkCompiler(wasm_result.kvksFilename, infile, outfile);
+          if(!result.kvk) {
+            return null;
+          }
+        }
+
+        result.kmx = {
+          filename: outfile,
+          data: new Uint8Array(this.wasm.Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
+        };
+
+        return result;
+      } finally {
+        if(wasm_result) {
+          wasm_result.delete();
+        }
+        wasm_interface.delete();
       }
-      return this.wasm.compileKeyboardFile(
-        infile,
-        outfile,
-        options.saveDebug ? 1 : 0,
-        options.compilerWarningsAsErrors ? 1 : 0,
-        options.warnDeprecatedCode ? 1 : 0,
-        this.callbackName);
     } catch(e) {
       this.callbacks.reportMessage(CompilerMessages.Fatal_UnexpectedException({e:e}));
-      return false;
+      return null;
     }
+  }
+
+  private runKvkCompiler(kvksFilename: string, kmnFilename: string, kmxFilename: string) {
+    // The compiler detected a .kvks file, which needs to be captured
+    let reader = new KvksFileReader();
+     kvksFilename = this.callbacks.resolveFilename(kmnFilename, kvksFilename);
+    let kvks = reader.read(this.callbacks.loadFile(kvksFilename));
+    try {
+      reader.validate(kvks, this.callbacks.loadSchema('kvks'));
+    } catch(e) {
+      console.log(e);
+      // TODO: this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({e}));
+      return null;
+    }
+    let errors: any = []; //TODO: KVKSParseError[];
+    let vk = reader.transform(kvks, errors);
+    if(!vk || errors.length) {
+      console.dir(errors);
+      // TODO: this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({e}));
+      return null;
+    }
+    let writer = new KvkFileWriter();
+    return {
+      filename: this.callbacks.path.join(this.callbacks.path.dirname(kmxFilename), this.callbacks.path.basename(kvksFilename, '.kvks') + '.kvk'),
+      data: writer.write(vk)
+    };
   }
 
   /**

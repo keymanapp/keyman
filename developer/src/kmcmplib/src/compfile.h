@@ -121,6 +121,13 @@ struct FILE_VKDICTIONARY
 };
 typedef FILE_VKDICTIONARY *PFILE_VKDICTIONARY;
 
+/**
+ * Extra metadata for API consumers
+ */
+struct FILE_KEYBOARD_EXTRA {
+	std::u16string kvksFilename;	// original TSS_VISUALKEYBOARD value
+};
+
 struct FILE_KEYBOARD {
 	KMX_DWORD KeyboardID;			// as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
 
@@ -149,7 +156,9 @@ struct FILE_KEYBOARD {
 	PFILE_DEADKEY dpDeadKeyArray;	// temp - dead key array
 	KMX_DWORD cxVKDictionary;
 	PFILE_VKDICTIONARY dpVKDictionary; // temp - virtual key dictionary
-	};
+
+	FILE_KEYBOARD_EXTRA extra;
+};
 
 typedef FILE_KEYBOARD *PFILE_KEYBOARD;
 

@@ -109,6 +109,7 @@ export interface CompilerFileSystemCallbacks {
   readFileSync(path: string, options?: { encoding?: null; flag?: string; } | null): Uint8Array;
   readFileSync(path: string, options: { encoding: string; flag?: string; } | string): string;
   readFileSync(path: string, options?: { encoding?: string | null; flag?: string; } | string | null): string | Uint8Array;
+  writeFileSync(path: string, data: Uint8Array): void;
 
   existsSync(name: string): boolean;
 }
