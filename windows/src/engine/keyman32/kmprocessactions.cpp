@@ -71,7 +71,7 @@ static BOOL processPersistOpt(
       SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessHook: Saving option to registry for keyboard [%s].", activeKeyboard->Name);
       LPWSTR value = new WCHAR[sizeof(actionItem->option->value) + 1];
       wcscpy_s(value, sizeof(actionItem->option->value) + 1, reinterpret_cast<LPCWSTR>(actionItem->option->value));
-      SaveKeyboardOptionREGCore(activeKeyboard, reinterpret_cast<LPCWSTR>(actionItem->option->key), value);
+      SaveKeyboardOptionCoretoRegistry(activeKeyboard, reinterpret_cast<LPCWSTR>(actionItem->option->key), value);
     }
   }
   return TRUE;
