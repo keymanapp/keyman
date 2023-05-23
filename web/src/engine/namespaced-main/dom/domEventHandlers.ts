@@ -10,29 +10,14 @@ namespace com.keyman.dom {
 
   export class CommonDOMStates {
     _DisableInput: boolean = false;         // Should input be disabled?
-    _IgnoreNextSelChange: number = 0;       // when a visual keyboard key is mouse-down, ignore the next sel change because this stuffs up our history
-    _IgnoreBlurFocus: boolean = false;      // Used to temporarily ignore focus changes
     _Selection = null;
     _SelectionControl: any = null;   // Type behavior is as with activeElement and the like.
-
-    _activeElement: HTMLElement;
-    _lastActiveElement: HTMLElement;
-
-    focusing: boolean;
-    focusTimer: number;
 
     changed: boolean;         // Tracks if the element has been edited since gaining focus.
     swallowKeypress: boolean; // Notes if a keypress should be swallowed; used when handing mnemonics.
 
     /* ----------------------- Static event-related methods ------------------------ */
 
-    setFocusTimer(): void {
-      this.focusing=true;
-
-      this.focusTimer = window.setTimeout(function() {
-        this.focusing=false;
-      }.bind(this), 50)
-    }
   }
 
   /**
@@ -82,18 +67,6 @@ namespace com.keyman.dom {
       }
 
       return PreProcessor.keyDown(e);
-    }.bind(this);
-
-    _Click: (e: MouseEvent) => boolean = function(this: DOMEventHandlers, e: MouseEvent): boolean {
-      let target = e.target as HTMLElement;
-      if(target && target['base']) {
-        target = target['base'];
-      }
-
-      //console.log('processNewContextEvent called from click');
-      com.keyman.singleton.core.processNewContextEvent(dom.Utils.getOutputTarget(target));
-
-      return true;
     }.bind(this);
 
     /**

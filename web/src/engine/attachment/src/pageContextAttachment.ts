@@ -28,22 +28,6 @@ interface EventMap {
   /***
    * For anything attached but (design-mode) iframes...
     ```
-    // This block:  has to do with maintaining focus.
-    if(touchable) {
-      // Remove any handlers for "NonKMWTouch" elements, since we're enabling it here.
-      Pelem.removeEventListener('touchstart', this.nonKMWTouchHandler);
-
-      // Prevent base-page touch handlers from causing a defocus when interacting
-      // with attached input elements.
-      Pelem.addEventListener('touchmove', (event) => event.stopPropagation(), false);
-      Pelem.addEventListener('touchend', (event) => event.stopPropagation(), false);
-    }
-
-    // This block:  has to do with maintaining focus.
-    this.keyman.util.attachDOMEvent(Pelem,'focus', this.getHandlers(Pelem)._ControlFocus);
-    this.keyman.util.attachDOMEvent(Pelem,'blur', this.getHandlers(Pelem)._ControlBlur);
-    this.keyman.util.attachDOMEvent(Pelem,'click', this.getHandlers(Pelem)._Click);
-
     // This block:  has to do with keystroke processing.
     // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
     Pelem.onkeypress = this.getHandlers(Pelem)._KeyPress;
@@ -53,17 +37,6 @@ interface EventMap {
    *
    * For design-mode iframes:
     ```
-    // This block:  has to do with maintaining focus.
-    var Lelem=Pelem.contentWindow.document;  // where Pelem = obj, the provided element.
-    // I2404 - Attach to IFRAMEs child objects, only editable IFRAMEs here
-    if(this.device.browser == 'firefox') {
-      util.attachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
-      util.attachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
-    } else { // Chrome, Safari
-      util.attachDOMEvent(Lelem.body,'focus', this.getHandlers(Pelem)._ControlFocus);
-      util.attachDOMEvent(Lelem.body,'blur', this.getHandlers(Pelem)._ControlBlur);
-    }
-
     // This block:  has to do with keystroke processing.
     util.attachDOMEvent(Lelem.body,'keydown', this.getHandlers(Pelem)._KeyDown);
     util.attachDOMEvent(Lelem.body,'keypress', this.getHandlers(Pelem)._KeyPress);
@@ -75,52 +48,14 @@ interface EventMap {
   /***
    * For anything attached but (design-mode) iframes...
     ```
-    // This block:  has to do with maintaining focus.
-    if(touchable) {
-      this.keyman.util.attachDOMEvent(x, 'touchstart', this.nonKMWTouchHandler, false);
-
-      // does not detach the touch-handlers added in 'enabled'?
-    }
-
-    // This block:  has to do with maintaining focus.
-    this.keyman.util.detachDOMEvent(Pelem,'focus', this.getHandlers(Pelem)._ControlFocus);
-    this.keyman.util.detachDOMEvent(Pelem,'blur', this.getHandlers(Pelem)._ControlBlur);
-    this.keyman.util.detachDOMEvent(Pelem,'click', this.getHandlers(Pelem)._Click);
-
     // This block:  has to do with keystroke processing.
     Pelem.onkeypress = null;
     Pelem.onkeydown = null;
     Pelem.onkeyup = null;
     ```
-
-   * also (for anything but iframes)...
-
-    ```
-    // This block:  has to do with maintaining focus (and consequences)
-    var lastElem = this.lastActiveElement;
-    if(lastElem == Pelem) {
-      if(this.activeElement == lastElem) {
-        this.activeElement = null;
-      }
-      this.lastActiveElement = null;
-      this.keyman.osk.startHide(false);
-    }
-    ```
    *
    * For design-mode iframes:
     ```
-    // This block:  has to do with maintaining focus.
-    var Lelem=Pelem.contentWindow.document;
-    // Mozilla      // I2404 - Attach to  IFRAMEs child objects, only editable IFRAMEs here
-    if(util.device.browser == 'firefox') {
-      // Firefox won't handle these events on Lelem.body - only directly on Lelem (the doc) instead.
-      util.detachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
-      util.detachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
-    } else { // Chrome, Safari
-      util.detachDOMEvent(Lelem.body,'focus', this.getHandlers(Pelem)._ControlFocus);
-      util.detachDOMEvent(Lelem.body,'blur', this.getHandlers(Pelem)._ControlBlur);
-    }
-
     // This block:  has to do with keystroke processing.
     util.detachDOMEvent(Lelem.body,'keydown', this.getHandlers(Pelem)._KeyDown);
     util.detachDOMEvent(Lelem.body,'keypress', this.getHandlers(Pelem)._KeyPress);
