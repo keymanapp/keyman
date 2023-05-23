@@ -54,6 +54,14 @@ export class BrowserConfiguration extends EngineConfiguration {
     return this.alertHost;
   }
 
+  set signalUser(host: AlertHost) {
+    if(!host || host != this.alertHost) {
+      this.alertHost.shutdown();
+    }
+
+    this.alertHost = host;
+  }
+
   debugReport(): Record<string, any> {
     const baseReport = super.debugReport();
     baseReport.attachType = this.attachType;
