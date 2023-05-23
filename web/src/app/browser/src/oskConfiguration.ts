@@ -2,6 +2,7 @@ import { type KeyElement, OSKView, VisualKeyboard } from "keyman/engine/osk";
 import { KEYMAN_VERSION } from "@keymanapp/keyman-version";
 import ContextManager from "./contextManager.js";
 import { KeymanEngine } from "./keymanEngine.js";
+import { LanguageMenu } from "./languageMenu.js";
 
 export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextManager: ContextManager) {
   const focusAssistant = contextManager.focusAssistant;
@@ -9,8 +10,8 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
   osk.on('globeKey', (key, on) => { // K_LOPT
     if(on) {
       if(osk.hostDevice.touchable) {
-        this.lgMenu = new LanguageMenu(com.keyman.singleton);
-        this.lgMenu.show();
+        engine.touchLanguageMenu = new LanguageMenu(engine);
+        engine.touchLanguageMenu.show();
       }
     }
 
