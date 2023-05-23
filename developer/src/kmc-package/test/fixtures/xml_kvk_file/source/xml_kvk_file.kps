@@ -17,7 +17,7 @@
   </StartMenu>
   <Info>
     <Name URL="">XML KVK File</Name>
-    <Version>1.3</Version>
+    <Version>1.0</Version>
   </Info>
   <Files>
     <File>
@@ -27,17 +27,17 @@
       <FileType>.kvk</FileType>
     </File>
     <File>
-      <Name>../../invalid/khmer_angkor.kmx</Name>
-      <Description>Keyboard Khmer Angkor</Description>
+      <Name>../../invalid/basic.kmx</Name>
+      <Description>Keyboard Basic</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
     </File>
   </Files>
   <Keyboards>
     <Keyboard>
-      <Name>Khmer Angkor</Name>
-      <ID>khmer_angkor</ID>
-      <Version>1.3</Version>
+      <Name>Basic</Name>
+      <ID>basic</ID>
+      <Version>1.0</Version>
       <Languages>
         <Language ID="KM">Khmer</Language>
       </Languages>
