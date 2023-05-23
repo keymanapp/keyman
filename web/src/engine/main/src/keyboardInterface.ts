@@ -8,15 +8,15 @@ import { KeyboardStub, RawKeyboardStub, StubAndKeyboardCache, toUnprefixedKeyboa
 import { ContextManagerBase } from './contextManagerBase.js';
 import { VariableStoreCookieSerializer } from "./variableStoreCookieSerializer.js";
 
-export default class KeyboardInterface extends KeyboardInterfaceBase {
-  private readonly contextManager: ContextManagerBase<any>;
+export default class KeyboardInterface<ContextManagerType extends ContextManagerBase<any>> extends KeyboardInterfaceBase {
+  protected readonly contextManager: ContextManagerType;
   private stubAndKeyboardCache: StubAndKeyboardCache;
   private stubNamespacer?: (stub: RawKeyboardStub) => void;
 
   constructor(
     _jsGlobal: any,
     keymanGlobal: KeyboardKeymanGlobal,
-    contextManager: ContextManagerBase<any>,
+    contextManager: ContextManagerType,
     stubNamespacer?: (stub: RawKeyboardStub) => void
   ) {
     super(_jsGlobal, keymanGlobal, new VariableStoreCookieSerializer());

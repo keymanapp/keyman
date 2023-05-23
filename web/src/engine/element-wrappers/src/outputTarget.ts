@@ -6,6 +6,12 @@ export default abstract class OutputTarget<EventMap extends EventEmitter.ValidEv
   public readonly events: EventEmitter<EventMap, this> = new EventEmitter<EventMap, this>();
 
   /**
+   * A field that may be used to track whether or not the represented context has changed over an
+   * arbitrary period of time.
+   */
+  public changed = false;
+
+  /**
    * Returns the underlying element / document modeled by the wrapper.
    */
   abstract getElement(): HTMLElement;

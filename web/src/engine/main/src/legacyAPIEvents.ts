@@ -26,6 +26,23 @@ export interface LegacyAPIEvents extends LegacyEventMap {
     languageCode: string
   }) => boolean;
 
+  'controlfocused': (p: {
+    /**
+     * The element gaining focus
+     */
+    target: HTMLElement,
+    /**
+     * The previous element to have focus
+     */
+    activeControl: HTMLElement
+  }) => boolean;
+
+  'controlblurred': (p: {
+    target: HTMLElement,
+    event: FocusEvent,
+    isActivating: boolean
+  }) => boolean;
+
   // TODO:  more of the documented API events.  Note that any remaining events not seen here
   //        yet go unused within the mobile apps.
 }

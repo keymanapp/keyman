@@ -1,5 +1,7 @@
 import { KeymanEngine as KeymanEngineBase } from 'keyman/engine/main';
 import { Device as DeviceDetector } from 'keyman/engine/device-detect';
+import { getAbsoluteY } from 'keyman/engine/dom-utils';
+import { OutputTarget } from 'keyman/engine/element-wrappers';
 import { AnchoredOSKView, FloatingOSKView, FloatingOSKViewConfiguration, OSKView } from 'keyman/engine/osk';
 import { DeviceSpec, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
 
@@ -12,11 +14,39 @@ import { setupOskListeners } from './oskConfiguration.js';
 
 export class KeymanEngine extends KeymanEngineBase<ContextManager, KeyEventKeyboard> {
   keyEventRefocus = () => {
-    this.contextManager.refocusActiveTarget();
+    this.contextManager.restoreLastActiveTarget();
   }
 
-  constructor(worker: Worker, config: BrowserConfiguration) {
-    super(worker, config, new ContextManager(config));
+  constructor(worker: Worker, sourceUri: string) {
+    const config = new BrowserConfiguration(sourceUri);  // currently set to perform device auto-detect.
+
+    super(worker, config, new ContextManager(config, () => this.legacyAPIEvents));
+
+    // Scrolls the document-body to ensure that a focused element remains visible after the OSK appears.
+    this.contextManager.on('targetchange', (target: OutputTarget<any>) => {
+      if(this.config.hostDevice.touchable) {
+        if(!target || !this.osk) {
+          return;
+        }
+
+        const e = target.getElement();
+
+        // Get the absolute position of the caret
+        const y = getAbsoluteY(e);
+        const t = window.pageYOffset;
+        let dy = y-t;
+        if(y >= t) {
+          dy -= (window.innerHeight - this.osk._Box.offsetHeight - e.offsetHeight - 2);
+          if(dy < 0) {
+            dy=0;
+          }
+        }
+        // Hide OSK, then scroll, then re-anchor OSK with absolute position (on end of scroll event)
+        if(dy != 0) {
+          window.scrollTo(0, dy + t);
+        }
+      }
+    });
   }
 
   protected processorConfiguration(): ProcessorInitOptions {
@@ -87,5 +117,36 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, KeyEventKeybo
    */
   activatingUI(state: boolean | number) {
     this.contextManager.focusAssistant.setMaintainingFocus(!!state);
+  }
+
+  /**
+   * Function     setKeyboardForControl
+   * Scope        Public
+   * @param       {Element}    Pelem    Control element
+   * @param       {string|null=}    Pkbd     Keyboard (Clears the set keyboard if set to null.)
+   * @param       {string|null=}     Plc      Language Code
+   * Description  Set default keyboard for the control
+   */
+  setKeyboardForControl(Pelem: HTMLElement, Pkbd?: string, Plc?: string) {
+    if(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
+      console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
+      return;
+    }
+
+    // Should use `isAttached` method once available.
+    if(!Pelem._kmwAttachment) {
+      console.error("KeymanWeb is not attached to element " + Pelem);
+      return;
+    }
+
+    let stub = null;
+    if(Pkbd) {
+      stub = this.keyboardRequisitioner.cache.getStub(Pkbd, Plc);
+      if(!stub) {
+        throw new Error(`No keyboard has been registered with id ${Pkbd} and language code ${Plc}.`);
+      }
+    }
+
+    this.contextManager.setKeyboardForTarget(Pelem._kmwAttachment.interface, Pkbd, Plc);
   }
 }
