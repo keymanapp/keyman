@@ -176,22 +176,6 @@ namespace com.keyman {
       this['loaded'] = true;
     }
 
-    delayedInit() {
-      // Track the selected Event-handling object.
-      this.touchAliasing = this.util.device.touchable ? this.domManager.touchHandlers : this.domManager.nonTouchHandlers;
-    }
-
-    /**
-     * Reset context when entering or exiting the active element.
-     * Will also trigger OSK shift state / layer reset.
-     **/
-    pageFocusHandler = () => {
-      if(!focusAssistant.maintainingFocus && this.osk?.vkbd) {
-        this.core.resetContext(null);
-      }
-      return false;
-    }
-
     /**
      * Triggers a KeymanWeb engine shutdown to facilitate a full system reset.
      * This function is designed for use with KMW unit-testing, which reloads KMW
@@ -199,14 +183,6 @@ namespace com.keyman {
      */
     ['shutdown']() {
       // Disable page focus/blur events, which can sometimes trigger and cause parallel KMW instances in testing.
-      this.util.detachDOMEvent(window, 'focus', this.pageFocusHandler, false);
-      this.util.detachDOMEvent(window, 'blur', this.pageFocusHandler, false);
-
-      this.domManager.shutdown();
-      this.osk.shutdown();
-      this.util.shutdown();
-      this.keyboardManager.shutdown();
-      this.core.languageProcessor.shutdown();
 
       if(this.ui && this.ui.shutdown) {
         this.ui.shutdown();

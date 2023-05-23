@@ -46,7 +46,6 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   private cookieManager = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
   readonly focusAssistant = new FocusAssistant();
   readonly page: PageContextAttachment;
-
   private mostRecentTarget: OutputTarget<any>;
   private currentTarget: OutputTarget<any>;
 
@@ -81,6 +80,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     this.engineConfig.deferForInitialization.then(() => {
       const device = this.engineConfig.hostDevice;
+
       const noPropagation = (event: Event) => event.stopPropagation()
 
       // For any elements being attached, or being enabled after having been disabled...

@@ -3,19 +3,21 @@ import { Device as DeviceDetector } from 'keyman/engine/device-detect';
 import { getAbsoluteY } from 'keyman/engine/dom-utils';
 import { OutputTarget } from 'keyman/engine/element-wrappers';
 import { AnchoredOSKView, FloatingOSKView, FloatingOSKViewConfiguration, OSKView } from 'keyman/engine/osk';
-import { DeviceSpec, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
+import { DeviceSpec, ProcessorInitOptions, extendString } from "@keymanapp/keyboard-processor";
 
 import { BrowserConfiguration, BrowserInitOptionDefaults, BrowserInitOptionSpec } from './configuration.js';
 import ContextManager from './contextManager.js';
 import DefaultBrowserRules from './defaultBrowserRules.js';
 import KeyEventKeyboard from './keyEventKeyboard.js';
 import { FocusStateAPIObject } from './context/focusAssistant.js';
+import { PageIntegrationHandlers } from './context/pageIntegrationHandlers.js';
 import { setupOskListeners } from './oskConfiguration.js';
 
 export class KeymanEngine extends KeymanEngineBase<ContextManager, KeyEventKeyboard> {
   keyEventRefocus = () => {
     this.contextManager.restoreLastActiveTarget();
   }
+  private pageIntegration: PageIntegrationHandlers;
 
   constructor(worker: Worker, sourceUri: string) {
     const config = new BrowserConfiguration(sourceUri);  // currently set to perform device auto-detect.
@@ -91,6 +93,12 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, KeyEventKeybo
 
     setupOskListeners(this, this.osk, this.contextManager);
 
+    // Automatically performs related handler setup & maintains references
+    // needed for related cleanup / shutdown.
+    this.pageIntegration = new PageIntegrationHandlers(window, this);
+
+    // Initialize supplementary plane string extensions
+    String.kmwEnableSupplementaryPlane(true);
     this.config.finalizeInit();
   }
 
@@ -148,5 +156,20 @@ export class KeymanEngine extends KeymanEngineBase<ContextManager, KeyEventKeybo
     }
 
     this.contextManager.setKeyboardForTarget(Pelem._kmwAttachment.interface, Pkbd, Plc);
+  }
+
+  /**
+   * Detaches all KMW event handlers attached by this instance of the engine and releases
+   * other related resources as appropriate.
+   *
+   * The primary use of this method is to facilitate a clean transition between engine
+   * instances during integration testing.  The goal is to prevent interactions intended
+   * for the 'current' instance from being accidentally intercepted by a discarded one.
+   */
+  shutdown() {
+    this.pageIntegration.shutdown();
+    this.contextManager.shutdown();
+    this.osk?.shutdown();
+    this.core.languageProcessor.shutdown();
   }
 }

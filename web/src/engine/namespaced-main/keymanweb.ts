@@ -103,26 +103,11 @@ if(!window['keyman']['initialized']) {
     keymanweb.debugElement=null;
     var dbg=keymanweb.debug;
 
-    keymanweb.delayedInit();
-
   //TODO: find all references to next three routines and disambiguate!!
 
     // Complete page initialization only after the page is fully loaded, including any embedded fonts
     // This avoids the need to use a timer to test for the fonts
 
-    util.attachDOMEvent(window, 'load', keymanweb.domManager._WindowLoad,false);
-    util.attachDOMEvent(window, 'unload', keymanweb.domManager._WindowUnload,false);  // added fourth argument (default value)
-
     // *** I3319 Supplementary Plane modifications - end new code
-
-    util.attachDOMEvent(document, 'keyup', keymanweb.hotkeyManager._Process, false);
-
-    // We need to track this handler, as it causes... interesting... interactions during testing in certain browsers.
-    util.attachDOMEvent(window, 'focus', keymanweb.pageFocusHandler, false);  // I775
-    util.attachDOMEvent(window, 'blur', keymanweb.pageFocusHandler, false);   // I775
-
-    // Initialize supplementary plane string extensions
-    String.kmwEnableSupplementaryPlane(true);
-
   })();
 }
