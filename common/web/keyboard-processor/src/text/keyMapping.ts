@@ -4,6 +4,7 @@
 ***/
 
 import type KeyEvent from "./keyEvent.js";
+import { KeyEventSpec } from "./keyEvent.js";
 
 class KeyMap {
   [keycode: string]: number;
@@ -172,7 +173,7 @@ export default class KeyMapping {
    * @return      {number}                Character code
    * Description Translate keyboard codes to standard US layout codes
    */
-  static _USKeyCodeToCharCode(Levent: KeyEvent) {
+  static _USKeyCodeToCharCode(Levent: KeyEvent | KeyEventSpec) {
     return KeyMapping.usCharCodes[Levent.Lmodifiers & 0x10 ? 1 : 0]['k'+Levent.Lcode];
   };
 
