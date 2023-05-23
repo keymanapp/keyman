@@ -2,26 +2,30 @@ import { EngineConfiguration, InitOptionSpec, InitOptionDefaults } from "keyman/
 
 import { OutputTarget as DOMOutputTarget } from 'keyman/engine/element-wrappers';
 import { isEmptyTransform, OutputTarget, RuleBehavior } from '@keymanapp/keyboard-processor';
+import { AlertHost } from "./utils/alertHost.js";
 
 export class BrowserConfiguration extends EngineConfiguration {
   private _ui: string;
   private _attachType: string;
-  private _useAlerts: boolean;
+
+  private _alertHost?: AlertHost;
 
   initialize(options: Required<BrowserInitOptionSpec>) {
     this.initialize(options);
 
     this._ui = options.ui;
     this._attachType = options.attachType;
-    this._useAlerts = options.useAlerts;
+    if(options.useAlerts) {
+      this._alertHost = new AlertHost();
+    }
   }
 
   get attachType() {
     return this._attachType;
   }
 
-  get shouldAlert(): boolean {
-    return this._useAlerts;
+  get alertHost(): AlertHost | undefined {
+    return this._alertHost;
   }
 
   debugReport(): Record<string, any> {

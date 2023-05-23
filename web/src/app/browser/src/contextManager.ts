@@ -1,4 +1,4 @@
-import { type Keyboard, Mock } from '@keymanapp/keyboard-processor';
+import { type Keyboard, KeyboardScriptError } from '@keymanapp/keyboard-processor';
 import { type KeyboardStub } from 'keyman/engine/package-cache';
 import { CookieSerializer } from 'keyman/engine/dom-utils';
 import { eventOutputTarget, PageContextAttachment } from 'keyman/engine/attachment';
@@ -42,7 +42,6 @@ function _SetTargDir(Ptarg: HTMLElement, activeKeyboard: Keyboard) {
 
 export default class ContextManager extends ContextManagerBase<BrowserConfiguration> {
   private _activeKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
-  private config: BrowserConfiguration;
   private cookieManager = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
   readonly focusAssistant = new FocusAssistant();
   readonly page: PageContextAttachment;
@@ -60,7 +59,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     this._eventsObj = eventsClosure;
 
     this.page = new PageContextAttachment(window.document, {
-      hostDevice: this.config.hostDevice
+      hostDevice: this.engineConfig.hostDevice
     });
   }
 
@@ -70,11 +69,10 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
   initialize(): void {
     this.on('keyboardasyncload', (stub, completion) => {
-      // TODO:  app/browser - display the loader UI if configured?
-      // util.wait('Installing keyboard<br/>' + kbdName);
+      this.engineConfig.alertHost?.wait('Installing keyboard<br/>' + stub.name);
 
       completion.then(() => {
-        // Cancel the loader UI.
+        this.engineConfig.alertHost?.wait(); // cancels the wait.
       });
     });
 
@@ -328,6 +326,8 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     try {
       let result = await super.activateKeyboard(keyboardId, languageCode, saveCookie);
 
+      this.engineConfig.alertHost?.wait(); // clear any pending waits.
+
       if(saveCookie && !originalKeyboardTarget) { // if the active target uses global keyboard settings
         this.cookieManager.save({current: `${keyboardId}:${languageCode}`});
       }
@@ -344,21 +344,40 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     } catch(err) {
       // non-embedded:  if keyboard activation failed, deactivate the keyboard.
 
-      // Make sure we don't infinite-recursion should the deactivate somehow fail.
-      if(this.config.hostDevice.touchable) {
-        // Fallback behavior - if on a touch device, we need to keep a keyboard visible.
-        const defaultStub = this.keyboardCache.defaultStub;
-        if(defaultStub.id != keyboardId || defaultStub.langId != languageCode) {
-          await this.activateKeyboard(defaultStub.id, defaultStub.langId, true).catch(() => {});
-        } // else "We already failed, so give up."
-      } else {
-        // Fallback behavior - if on a desktop device, the user still has a physical keyboard.
-        // Just clear out the active keyboard & OSK.
-        await this.activateKeyboard('', '', false).catch(() => {});
+      const fallback = async () => {
+        // Make sure we don't infinite-recursion should the deactivate somehow fail.
+        if(this.engineConfig.hostDevice.touchable) {
+          // Fallback behavior - if on a touch device, we need to keep a keyboard visible.
+          const defaultStub = this.keyboardCache.defaultStub;
+          if(defaultStub.id != keyboardId || defaultStub.langId != languageCode) {
+            await this.activateKeyboard(defaultStub.id, defaultStub.langId, true).catch(() => {});
+          } // else "We already failed, so give up."
+        } else {
+          // Fallback behavior - if on a desktop device, the user still has a physical keyboard.
+          // Just clear out the active keyboard & OSK.
+          await this.activateKeyboard('', '', false).catch(() => {});
+        }
       }
 
-      if((this.config as BrowserConfiguration).shouldAlert) {
-        // TODO:  util.alert error report
+      this.engineConfig.alertHost?.wait(); // clear the wait message box, either way.
+
+      const message = (err as Error)?.message ||
+                      'Sorry, the ' + keyboardId + ' keyboard for ' + languageCode + ' is not currently available.';
+
+      if(err instanceof KeyboardScriptError) {
+        // We get signaled about error log messages if the site is connected to our Sentry error reporting
+        // system; we want to know if we have a broken keyboard that's been published.
+        console.error(err || message);
+      } else {
+        // If it's just internet connectivity or "file not found" issues, that's not worth reporting
+        // to Sentry.
+        console.warn(err || message);
+      }
+
+      if(this.engineConfig.alertHost) {
+        this.engineConfig.alertHost?.alert(message, fallback);
+      } else {
+        fallback();
       }
 
       throw err; // since the site-dev consumer may want to do their own error-handling.
