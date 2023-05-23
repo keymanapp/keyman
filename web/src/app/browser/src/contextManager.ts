@@ -553,29 +553,16 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   _CommonFocusHelper(outputTarget: OutputTarget<any>): boolean {
     const focusAssistant = this.focusAssistant;
 
-    // if(target.ownerDocument && target instanceof target.ownerDocument.defaultView.HTMLIFrameElement) {
-    //   if(!this.keyman.domManager._IsEditableIframe(target, 1)) {
-    //     DOMEventHandlers.states._DisableInput = true;
-    //     return true;
-    //   }
-    // }
-    // DOMEventHandlers.states._DisableInput = false;
-
-    // const outputTarget = dom.Utils.getOutputTarget(target);
-
     let activeKeyboard = this.activeKeyboard?.keyboard;
     if(!focusAssistant.restoringFocus) {
       outputTarget?.deadkeys().clear();
       activeKeyboard?.notify(0, outputTarget, 1);  // I2187
     }
 
-    //if(!focusAssistant.restoringFocus && DOMEventHandlers.states._SelectionControl != target) {
     if(!focusAssistant.restoringFocus && this.mostRecentTarget != outputTarget) {
       focusAssistant.maintainingFocus = false;
     }
     focusAssistant.restoringFocus = false;
-
-    //DOMEventHandlers.states._SelectionControl = target; // effectively was .mostRecentTarget, as best as I can tell.
 
     // Now that we've fully entered the new context, invalidate the context so we can generate initial predictions from it.
     // (Note that the active keyboard will have been updated by a method called before this one; the newly-focused
