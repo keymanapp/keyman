@@ -6,6 +6,6 @@ gtk = dependency('gtk+-3.0', version: '>= 2.4')
 
 keymap = executable(
   'keymap',
-  sources: ['main.cpp'],
+  sources: ['keymap.cpp'],
   dependencies: [gtk]
 )
