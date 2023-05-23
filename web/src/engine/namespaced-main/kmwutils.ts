@@ -90,21 +90,6 @@ namespace com.keyman {
       this.physicalDevice.OS = this.device.OS;
     }
 
-    /**
-     * Function     arrayFromNodeList
-     * Scope        Public
-     * @param       {Object}    nl a node list, as returned from getElementsBy_____ methods.
-     * Description  Transforms a node list into an array.   *
-     * @return      {Array<Element>}
-     */
-    arrayFromNodeList(nl: NodeList|HTMLCollectionOf<Element>): HTMLElement[] {
-      var res = [];
-      for(var i=0; i < nl.length; i++) {
-        res.push(nl[i]);
-      }
-      return res;
-    }
-
     // -----------------------------------------------
 
     /**

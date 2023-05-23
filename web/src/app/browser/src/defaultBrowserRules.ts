@@ -34,18 +34,24 @@ export default class DefaultBrowserRules extends DefaultRules {
   applyCommand(Lkc: KeyEvent, outputTarget: OutputTarget): void {
     let code = this.codeForEvent(Lkc);
 
-    const contextManager = this.contextManager;
+    const moveToNext = (back: boolean) => {
+      const contextManager = this.contextManager;
+      const activeElement = contextManager.activeTarget?.getElement();
+      const nextElement = contextManager.page.findNeighboringInput(activeElement, back);
+      nextElement.focus();
+    }
 
     switch(code) {
-      // This method will be transplanted to the specific `ContextManager` module stored above.
+      // This method will be handled between `ContextManager` and PageContextAttachment:
+      // pageContextAttachment.findNeighboringInput(contextManager.activeTarget.getElement(), <same flag>)
       case Codes.keyCodes['K_TAB']:
-        domManager.moveToNext((Lkc.Lmodifiers & Codes.modifierCodes['SHIFT']) != 0);
+        moveToNext((Lkc.Lmodifiers & Codes.modifierCodes['SHIFT']) != 0);
         break;
       case Codes.keyCodes['K_TABBACK']:
-        domManager.moveToNext(true);
+        moveToNext(true);
         break;
       case Codes.keyCodes['K_TABFWD']:
-        domManager.moveToNext(false);
+        moveToNext(false);
         break;
     }
 

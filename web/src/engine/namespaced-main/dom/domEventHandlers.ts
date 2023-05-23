@@ -441,23 +441,9 @@ namespace com.keyman.dom {
    * Defines numerous functions for handling and modeling touch-based aliases.
    */
   export class DOMTouchHandlers extends DOMEventHandlers {
-    firstTouch: {
-      x: number;
-      y: number;
-    };
-
-
     constructor(keyman: KeymanBase) {
       super(keyman);
     }
-
-    /**
-     * Handle the touch end event for an input element
-     */
-    dragEnd: (e: TouchEvent) => void = function(this: DOMTouchHandlers, e: TouchEvent) {
-      e.stopPropagation();
-      this.firstTouch = null;
-    }.bind(this);
 
     /**
      * Scroll the document body vertically to bring the active input into view

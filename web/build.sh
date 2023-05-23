@@ -30,14 +30,15 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   "build" \
   "test" \
   ":app/webview              A puppetable version of KMW designed for use in a host app's WebView" \
-  ":engine/paths             Subset used to configure KMW" \
+  ":engine/attachment        Subset used for detecting valid page contexts for use in text editing " \
   ":engine/device-detect     Subset used for device-detection " \
   ":engine/dom-utils         A common subset of function used for DOM calculations, layout, etc" \
   ":engine/events            Specialized classes utilized to support KMW API events" \
   ":engine/element-wrappers  Subset used to integrate with website elements" \
-  ":engine/package-cache     Subset used to collate keyboards and request them from the cloud" \
   ":engine/main              Builds all common code used by KMW's app/-level targets" \
-  ":engine/osk               Builds the Web OSK module"
+  ":engine/osk               Builds the Web OSK module" \
+  ":engine/package-cache     Subset used to collate keyboards and request them from the cloud" \
+  ":engine/paths             Subset used to configure KMW"
 
 # ":app/browser              The website-integrating, browser-based version of KMW" \
 
@@ -80,6 +81,9 @@ builder_run_child_actions build:engine/events
 
 # Uses engine/dom-utils
 builder_run_child_actions build:engine/osk
+
+# Uses engine/element-wrappers
+builder_run_child_actions build:engine/attachment
 
 # Uses engine/osk (due to resource-path config interface)
 builder_run_child_actions build:engine/paths
