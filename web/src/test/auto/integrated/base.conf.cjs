@@ -95,6 +95,9 @@ module.exports = {
     'common/test/resources/json/**/*.json' : ['json_fixtures']
   },
 
+  // The fixture preprocessor assumes that all fixtures will rely under a common directory,
+  // only accepting a single 'stripPrefix' string match, etc.
+  // Reference: https://github.com/karma-runner/karma-html2js-preprocessor/blob/master/lib/html2js.js
   html2JsPreprocessor: {
     stripPrefix: 'common/test/resources/'
   },

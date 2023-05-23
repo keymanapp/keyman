@@ -999,8 +999,44 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     }
 
     for(k = 0; k < inputElementRemovals.length; k++) {
+      let matched = false;
       const elem = inputElementRemovals[k];
-      if(this.isKMWInput(elem)) {
+
+      // Note:  for iframes, .contentWindow has already been deleted by this point!
+      if(elem instanceof elem.ownerDocument.defaultView.HTMLIFrameElement) {
+        // Non-design iframes
+        for(let i = 0; i < this.embeddedPageContexts.length; i++) {
+          if(this.embeddedPageContexts[i].options.owner == elem) {
+            // we can't do the standard detachment anymore, since the document and its elements
+            // have been obliterated.  BUT!  We still have our .inputList and can handle
+            // things that way!
+            this.embeddedPageContexts[i].shutdown();
+
+            // Also, remove the child attachment-engine, too.
+            this.embeddedPageContexts.splice(i, 1);
+            matched = true;
+            break;
+          }
+        }
+
+        if(!matched) {
+          // Time to check for design-mode iframe attachment...
+          for(let i = 0; i < this._inputList.length; i++) {
+            if(this._inputList[i] == elem) {
+              // We have a match!  Fortunately, this case is simpler from here.
+              this.detachFromControl(elem);
+
+              // Since the iframe itself was removed from the hierarchy, the detachment
+              // design-mode check will likely fail.  Double-check for robustness, but
+              // we'll need to tidy up our _inputList here.
+              if(this._inputList[i] == elem) {
+                this._inputList.splice(i, 1);
+              }
+              break;
+            }
+          }
+        }
+      } else if(this.isKMWInput(elem)) {
         this._MutationRemovalObserved(elem);
       }
     }
