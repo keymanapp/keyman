@@ -1952,25 +1952,11 @@ public final class KMManager {
 
   public static boolean updateText(KeyboardType kbType, String text) {
     boolean result = false;
-    String kmText = "";
-    if (text != null) {
-      kmText = text.toString().replace("\\", "\\u005C").replace("'", "\\u0027").replace("\n", "\\n");
-    }
 
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreTextChange()) {
-        InAppKeyboard.loadJavascript(KMString.format("updateKMText('%s')", kmText));
-        result = true;
-      }
-
-      InAppKeyboard.setShouldIgnoreTextChange(false);
+      return InAppKeyboard.updateText(text);
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreTextChange()) {
-        SystemKeyboard.loadJavascript(KMString.format("updateKMText('%s')", kmText));
-        result = true;
-      }
-
-      SystemKeyboard.setShouldIgnoreTextChange(false);
+      return SystemKeyboard.updateText(text);
     }
 
     return result;
@@ -1980,23 +1966,13 @@ public final class KMManager {
     boolean result = false;
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreSelectionChange()) {
-        InAppKeyboard.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
-        result = true;
+        result = InAppKeyboard.updateSelectionRange(selStart, selEnd);
       }
 
       InAppKeyboard.setShouldIgnoreSelectionChange(false);
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreSelectionChange()) {
-        InputConnection ic = getInputConnection(KeyboardType.KEYBOARD_TYPE_SYSTEM);
-        if (ic != null) {
-          ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
-          if (icText != null) {
-            updateText(kbType, icText.text.toString());
-          }
-        }
-
-        SystemKeyboard.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
-        result = true;
+        result = SystemKeyboard.updateSelectionRange(selStart, selEnd);
       }
 
       SystemKeyboard.setShouldIgnoreSelectionChange(false);

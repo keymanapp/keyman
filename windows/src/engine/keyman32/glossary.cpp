@@ -1,18 +1,18 @@
 /*
   Name:             glossary
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jul 2008
 
   Modified Date:    28 May 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jul 2008 - mcdurdin - I1498 - Fix keyboard switching for Shadow keyboards on Vista+
                     20 Jul 2008 - mcdurdin - I1546 - Fix language switch with ids >= x80000000
                     20 Jul 2008 - mcdurdin - I1545 - Fix registry leak
@@ -38,9 +38,9 @@ BOOL HKLIsIME(HKL hkl)  // I1498 - fix keyboard switching for shadow keyboards o
   if( (GetVersion() & 0xFF) >= 6 ) return FALSE;
   if( (GetVersion() & 0x8000000) == 0x8000000 || (GetVersion() & 0xFF) == 4 )
     r = GetSystemMetrics(SM_DBCSENABLED);
-  else 
+  else
     r = GetSystemMetrics(SM_IMMENABLED);
-    
+
   return r && ImmIsIME(hkl);
 }
 #pragma warning(default: 4996)
@@ -99,12 +99,12 @@ DWORD HKLToKeyboardID(HKL hkl)
 		return (DWORD) LOWORD(hkl);
   }
 
-	for(len=16, n = i = 0; RegEnumKeyEx(hkey, i, str, &len, 0, NULL, NULL, &ft) == ERROR_SUCCESS; 
-		len = 16, i++, n=0) 
+	for(len=16, n = i = 0; RegEnumKeyEx(hkey, i, str, &len, 0, NULL, NULL, &ft) == ERROR_SUCCESS;
+		len = 16, i++, n=0)
 	{
 		RegOpenKeyEx(hkey, str, NULL, KEY_READ, &hsubkey);
 		len = 16;
-		if(RegQueryValueEx(hsubkey, REGSZ_LayoutID, NULL, NULL, (LPBYTE) str2, &len) == ERROR_SUCCESS) 
+		if(RegQueryValueEx(hsubkey, REGSZ_LayoutID, NULL, NULL, (LPBYTE) str2, &len) == ERROR_SUCCESS)
 		{
 			n = strtoul(str2, NULL, 16);  // I1546
 			if(n == LayoutID)
@@ -120,7 +120,7 @@ DWORD HKLToKeyboardID(HKL hkl)
 	}
 
 	RegCloseKey(hkey);
-	
+
   //SendDebugMessageFormat(0, sdmGlobal, 0, "HKLToKeyboardID: fails[2], return LOWORD(hkl)=%x", LOWORD(hkl));
   return (DWORD) LOWORD(hkl);		// should never happen
 }
@@ -143,11 +143,11 @@ WORD HKLToLayoutNumber(HKL hkl)
 	if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, REGSZ_SystemKeyboardLayouts, NULL, KEY_READ, &hkey) != ERROR_SUCCESS)
 		return 0;
 
-	for(len=16, n = i = 0; RegEnumKeyEx(hkey, i, str, &len, 0, NULL, NULL, &ft) == ERROR_SUCCESS; len = 16, i++, n=0) 
+	for(len=16, n = i = 0; RegEnumKeyEx(hkey, i, str, &len, 0, NULL, NULL, &ft) == ERROR_SUCCESS; len = 16, i++, n=0)
 	{
 		RegOpenKeyEx(hkey, str, NULL, KEY_READ, &hsubkey);
 		len = 16;
-		if(RegQueryValueEx(hsubkey, REGSZ_LayoutID, NULL, NULL, (LPBYTE) str2, &len) == ERROR_SUCCESS) 
+		if(RegQueryValueEx(hsubkey, REGSZ_LayoutID, NULL, NULL, (LPBYTE) str2, &len) == ERROR_SUCCESS)
 		{
 			if(strtoul(str2, NULL, 16) == LayoutID) break;  // strtoul - I1546
 		}
@@ -165,38 +165,4 @@ WORD HKLToLayoutID(HKL hkl)
 	if((HIWORD(hkl) & 0xF000) != 0xF000) return 0;
 
 	return HIWORD(hkl) & 0x0FFF;
-}
-
-DWORD EthnologueCodeToKeymanID(DWORD EthCode)
-{
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return KEYMANID_NONKEYMAN;
-
-	for(int i = 0; i < _td->nKeyboards; i++)
-	{
-		if(!_td->lpKeyboards[i].Keyboard && !LoadlpKeyboard(i))
-		{
-			SendDebugMessageFormat(0,sdmGlobal,0,
-				"EthnologueCodeToKeymanID: Unable to load keyboard %s", _td->lpKeyboards[i].Name);
-			return KEYMANID_NONKEYMAN;
-		}
-
-		PWSTR ps = GetSystemStore(_td->lpKeyboards[i].Keyboard, TSS_ETHNOLOGUECODE);
-		if(ps)
-		{
-			SendDebugMessageFormat(0,sdmGlobal,0,"EthnologueCodeToKeymanID: %s %ws %x", _td->lpKeyboards[i].Name, ps, EthnologueStringCodeToDWord(ps));
-			if(EthnologueStringCodeToDWord(ps) == EthCode) return _td->lpKeyboards[i].KeymanID;
-		}
-	}
-
-	return KEYMANID_NONKEYMAN;
-}
-
-DWORD EthnologueStringCodeToDWord(PWSTR EthCode)
-{
-	if(wcslen(EthCode) < 3 || wcslen(EthCode) > 4) return (DWORD)-1;
-	return (LOBYTE(EthCode[0])) | 
-		   (LOBYTE(EthCode[1]) << 8) |
-		   (LOBYTE(EthCode[2]) << 16) |
-		   (LOBYTE(EthCode[3]) << 24);
 }

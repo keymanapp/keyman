@@ -34,24 +34,24 @@ export default class DefaultBrowserRules extends DefaultRules {
   applyCommand(Lkc: KeyEvent, outputTarget: OutputTarget): void {
     let code = this.codeForEvent(Lkc);
 
-    const contextManager = this.contextManager;
+    const moveToNext = (back: boolean) => {
+      const contextManager = this.contextManager;
+      const activeElement = contextManager.activeTarget?.getElement();
+      const nextElement = contextManager.page.findNeighboringInput(activeElement, back);
+      nextElement.focus();
+    }
 
-    let elem: HTMLElement;
     switch(code) {
       // This method will be handled between `ContextManager` and PageContextAttachment:
       // pageContextAttachment.findNeighboringInput(contextManager.activeTarget.getElement(), <same flag>)
       case Codes.keyCodes['K_TAB']:
-        const bBack = (Lkc.Lmodifiers & Codes.modifierCodes['SHIFT']) != 0;
-        elem = contextManager.page.findNeighboringInput(contextManager.activeTarget.getElement(), bBack);
-        elem.focus();
+        moveToNext((Lkc.Lmodifiers & Codes.modifierCodes['SHIFT']) != 0);
         break;
       case Codes.keyCodes['K_TABBACK']:
-        elem = contextManager.page.findNeighboringInput(contextManager.activeTarget.getElement(), true);
-        elem.focus();
+        moveToNext(true);
         break;
       case Codes.keyCodes['K_TABFWD']:
-        elem = contextManager.page.findNeighboringInput(contextManager.activeTarget.getElement(), false);
-        elem.focus();
+        moveToNext(false);
         break;
     }
 

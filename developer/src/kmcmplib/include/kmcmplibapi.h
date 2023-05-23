@@ -77,13 +77,9 @@ static const int KMCMP_ERROR_HAS_STRINGS = -2;
  */
 static const int KMCMP_ERROR_UNSUPPORTED_PROPERTY = -3;
 /**
- * Error: Invalid, other unsupported feature
- */
-static const int KMCMP_ERROR_UNSUPPORTED = -4;
-/**
  * Fatal: output buffer too small
  */
-static const int KMCMP_FATAL_OUT_OF_RANGE = -5;
+static const int KMCMP_FATAL_OUT_OF_RANGE = -4;
 
 /**
  * Function pointer to kmcmp_ParseUnicodeSet
