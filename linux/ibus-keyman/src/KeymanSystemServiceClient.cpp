@@ -1,3 +1,4 @@
+#include <cassert>
 #include <systemd/sd-bus.h>
 #include "KeymanSystemServiceClient.h"
 
@@ -40,6 +41,10 @@ KeymanSystemServiceClient::~KeymanSystemServiceClient() {
 }
 
 void KeymanSystemServiceClient::SetCapsLockIndicator(guint32 capsLock) {
+  // If Set/GetCapsLockIndicator is called more than once and previously
+  // failed, we will leak `error`.
+  assert(error == NULL);
+
   if (!bus) {
     // we already reported the error, so just return
     return;
@@ -60,6 +65,10 @@ void KeymanSystemServiceClient::SetCapsLockIndicator(guint32 capsLock) {
 }
 
 gint32 KeymanSystemServiceClient::GetCapsLockIndicator() {
+  // If Set/GetCapsLockIndicator is called more than once and previously
+  // failed, we will leak `error`.
+  assert(error == NULL);
+
   if (!bus) {
     // we already reported the error, so just return
     return -1;
