@@ -1,0 +1,5 @@
+# Service definition file for keyman-test-service
+
+[D-BUS Service]
+Name=com.keyman.SystemService1
+Exec=@installed_tests_dir@/keyman-test-service
