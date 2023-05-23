@@ -69,10 +69,10 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
   initialize(): void {
     this.on('keyboardasyncload', (stub, completion) => {
-      this.engineConfig.signalUser?.wait('Installing keyboard<br/>' + stub.name);
+      this.engineConfig.alertHost?.wait('Installing keyboard<br/>' + stub.name);
 
       completion.then(() => {
-        this.engineConfig.signalUser?.wait(); // cancels the wait.
+        this.engineConfig.alertHost?.wait(); // cancels the wait.
       });
     });
 
@@ -326,7 +326,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     try {
       let result = await super.activateKeyboard(keyboardId, languageCode, saveCookie);
 
-      this.engineConfig.signalUser?.wait(); // clear any pending waits.
+      this.engineConfig.alertHost?.wait(); // clear any pending waits.
 
       if(saveCookie && !originalKeyboardTarget) { // if the active target uses global keyboard settings
         this.cookieManager.save({current: `${keyboardId}:${languageCode}`});
@@ -359,7 +359,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
         }
       }
 
-      this.engineConfig.signalUser?.wait(); // clear the wait message box, either way.
+      this.engineConfig.alertHost?.wait(); // clear the wait message box, either way.
 
       const message = (err as Error)?.message ||
                       'Sorry, the ' + keyboardId + ' keyboard for ' + languageCode + ' is not currently available.';
@@ -374,8 +374,8 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
         console.warn(err || message);
       }
 
-      if(this.engineConfig.signalUser) {
-        this.engineConfig.signalUser?.alert(message, fallback);
+      if(this.engineConfig.alertHost) {
+        this.engineConfig.alertHost?.alert(message, fallback);
       } else {
         fallback();
       }

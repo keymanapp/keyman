@@ -19,13 +19,13 @@ import {assert, expect} from 'chai';
 const toTitleCase = (s: string) => s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
 
 export function verifyCompilerMessagesObject(source: Record<string,any>) {
-  let keys = Object.keys(source);
+  const keys = Object.keys(source);
 
   const m = source as Record<string,any>;
 
-  let codes: number[] = [];
+  const codes: number[] = [];
 
-  for(let key of keys) {
+  for(const key of keys) {
 
     // Verify each object member matches the pattern we expect
 
@@ -36,7 +36,7 @@ export function verifyCompilerMessagesObject(source: Record<string,any>) {
       const c = o[1].toUpperCase() + '_' + o[2];
       expect(m[c]).to.be.a('number', `Expected constant name ${c} to exist`);
 
-      let v = m[key]('','','','','','','','','','','','' /* ignore arguments*/);
+      const v = m[key]('','','','','','','','','','','','' /* ignore arguments*/);
       expect(v.code).to.equal(m[c], `Function ${key} returns the wrong code`);
     }
     else if(typeof m[key] == 'number') {

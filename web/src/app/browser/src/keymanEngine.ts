@@ -47,11 +47,9 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
         // Get the absolute position of the caret
         const y = getAbsoluteY(e);
         const t = window.pageYOffset;
-        let dy = 0;
-        if(y < t) {
-          dy=y-t;
-        } else {
-          dy=y-t-(window.innerHeight - this.osk._Box.offsetHeight-e.offsetHeight-2);
+        let dy = y-t;
+        if(y >= t) {
+          dy -= (window.innerHeight - this.osk._Box.offsetHeight - e.offsetHeight - 2);
           if(dy < 0) {
             dy=0;
           }

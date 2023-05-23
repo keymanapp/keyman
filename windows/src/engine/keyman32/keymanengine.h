@@ -81,11 +81,9 @@ typedef struct tagINTKEYBOARDINFO
   DWORD      __filler_Hotkey;
   DWORD      __filler; // makes same as KEYBOARDINFO   // I4462
   char       Name[256];
-  LPKEYBOARD Keyboard;
   DWORD      nIMDLLs;
   LPIMDLL    IMDLLs;
   int        __filler2; // makes same as KEYBOARDINFO
-  LPINTKEYBOARDOPTIONS KeyboardOptions;
   int        nProfiles;
   LPINTKEYBOARDPROFILE Profiles;
   km_kbp_keyboard* lpCoreKeyboard;
@@ -105,17 +103,11 @@ typedef struct tagKMSTATE
 {
   BOOL NoMatches;
   MSG msg;
-  // TODO: 5442 will remove these once windows core is deprecated
-  BOOL StopOutput;
-  int LoopTimes;
-  // TODO: 5442
   WORD vkey;           // I934
   WCHAR charCode;      // I4582
   BOOL windowunicode;  // I4287
   BOOL isDown;
-  LPKEYBOARD lpkb;
   km_kbp_keyboard* lpCoreKb;  //  future use with IMDLL
-  LPGROUP startgroup;         // TODO: 5442 will remove this once windows core is deprecated
 } KMSTATE;
 
 // I3616
@@ -129,7 +121,6 @@ LRESULT CALLBACK kmnLowLevelKeyboardProc(   // I4124
   _In_  LPARAM lParam
 );
 
-BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd);
 BOOL ReleaseStateMemoryCore(km_kbp_state** state);
 BOOL ReleaseKeyboardMemoryCore(km_kbp_keyboard** kbd);
 
@@ -230,8 +221,6 @@ DWORD HKLToKeyboardID(HKL hkl);
 WORD HKLToLanguageID(HKL hkl);
 WORD HKLToLayoutNumber(HKL hkl);
 WORD HKLToLayoutID(HKL hkl);
-DWORD EthnologueCodeToKeymanID(DWORD EthCode);
-DWORD EthnologueStringCodeToDWord(PWSTR EthCode);
 
 PWSTR  GetSystemStore(LPKEYBOARD kb, DWORD SystemID);
 
@@ -254,7 +243,6 @@ void keybd_shift(LPINPUT pInputs, int* n, BOOL isReset, LPBYTE const kbd);
 #include "keystate.h"
 
 #include "calldll.h"
-#include "addins.h"
 #include "keymancontrol.h"
 #include "keyboardoptions.h"
 #include "kmprocessactions.h"

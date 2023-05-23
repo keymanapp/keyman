@@ -65,6 +65,15 @@ EXTERN bool kmcmp_Wasm_CompileKeyboardFile(char* pszInfile,
     msgProc
   );
 }
+
+EXTERN int kmcmp_Wasm_ParseUnicodeSet(char* pat,
+  uint32_t* buf, int length
+) {
+  return kmcmp_ParseUnicodeSet(
+    pat, buf, length
+  );
+}
+
 #endif
 
 EXTERN bool kmcmp_CompileKeyboardFile(char* pszInfile,
