@@ -195,20 +195,6 @@ namespace com.keyman.dom {
       }
     }
 
-    /**
-     * Move focus to user-specified element
-     *
-     *  @param  {string|Object}   e   element or element id
-     *
-     */
-    moveToElement(e:string|HTMLElement) {
-      if(typeof(e) == "string") { // Can't instanceof string, and String is a different type.
-        e=document.getElementById(e);
-      }
-
-      e.focus();
-    }
-
     /* ----------------------- Editable IFrame methods ------------------- */
 
     /**

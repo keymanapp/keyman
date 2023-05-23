@@ -40,6 +40,8 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
   hotkeyManager: HotkeyManager = new HotkeyManager();
   private readonly beepHandler: BeepHandler;
 
+  public readonly helpURL = 'http://help.keyman.com/go';
+
   keyEventRefocus = () => {
     this.contextManager.restoreLastActiveTarget();
   }
@@ -111,7 +113,8 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
 
   protected processorConfiguration(): ProcessorInitOptions {
     return {
-      keyboardInterface: this.interface,
+      ...super.processorConfiguration(),
+      // Overrides just this component of the configuration.
       defaultOutputRules: new DefaultBrowserRules(this.contextManager)
     };
   };
@@ -237,6 +240,32 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
 
     this.contextManager.setKeyboardForTarget(Pelem._kmwAttachment.interface, Pkbd, Plc);
   }
+  /**
+   * Function     getKeyboardForControl
+   * Scope        Public
+   * @param       {Element}    Pelem    Control element
+   * @return      {string|null}         The independently-managed keyboard for the control.
+   * Description  Returns the keyboard ID of the current independently-managed keyboard for this control.
+   *              If it is currently following the global keyboard setting, returns null instead.
+   */
+  getKeyboardForControl(Pelem) {
+    const target = outputTargetForElement(Pelem);
+    return this.contextManager.getKeyboardStubForTarget(target).id;
+  }
+
+  // Is not currently published API... but it exists.
+  /**
+   * Function     getLanguageForControl
+   * Scope        Public
+   * @param       {Element}    Pelem    Control element
+   * @return      {string|null}         The independently-managed keyboard for the control.
+   * Description  Returns the language code used with the current independently-managed keyboard for this control.
+   *              If it is currently following the global keyboard setting, returns null instead.
+   */
+  getLanguageForControl(Pelem) {
+    const target = outputTargetForElement(Pelem);
+    return this.contextManager.getKeyboardStubForTarget(target).langId;
+  }
 
   isAttached(x: HTMLElement): boolean {
     return this.contextManager.page.isAttached(x);
@@ -279,7 +308,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *  @param  {string|string[]}   arg    Language name (multiple arguments allowed)
    *  @returns {Promise<(KeyboardStub|ErrorStub)[]>} Promise of added keyboard/error stubs
    **/
-  ['addKeyboardsForLanguage'](arg: string[]|string) : Promise<(KeyboardStub|ErrorStub)[]> {
+  addKeyboardsForLanguage(arg: string[]|string) : Promise<(KeyboardStub|ErrorStub)[]> {
     if (typeof arg === 'string') {
       return this.keyboardRequisitioner.addLanguageKeyboards(arg.split(',').map(item => item.trim()));
     } else {
@@ -450,6 +479,19 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     this.contextManager.setActiveTarget(target, setFocus);
   }
 
+  /**
+   * Move focus to user-specified element
+   *
+   *  @param  {string|Object}   e   element or element id
+   *
+   **/
+  moveToElement(e: string|HTMLElement) {
+    if(typeof(e) == "string") { // Can't instanceof string, and String is a different type.
+      e=document.getElementById(e);
+    }
+
+    e.focus();
+  }
 
   /**
    * Function     addHotkey

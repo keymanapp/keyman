@@ -12,6 +12,7 @@ import HardKeyboardBase from "./hardKeyboard.js";
 import { LegacyAPIEvents } from "./legacyAPIEvents.js";
 import { EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";
 import DOMCloudRequester from "keyman/engine/package-cache/dom-requester";
+import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 export default class KeymanEngine<
   Configuration extends EngineConfiguration,
@@ -74,8 +75,17 @@ export default class KeymanEngine<
 
   // Should be overwritten as needed by engine subclasses; `browser` should set its DefaultOutput subclass in place.
   protected processorConfiguration(): ProcessorInitOptions {
+    // I732 START - Support for European underlying keyboards #1
+    let baseLayout: string;
+    if(typeof(window['KeymanWeb_BaseLayout']) !== 'undefined') {
+      baseLayout = window['KeymanWeb_BaseLayout'];
+    } else {
+      baseLayout = 'us';
+    }
+
     return {
       keyboardInterface: this.interface,
+      baseLayout: baseLayout,
       defaultOutputRules: new DefaultRules()
     };
   };
@@ -246,6 +256,14 @@ export default class KeymanEngine<
     });
     //
     // #endregion
+  }
+
+  public get build(): number {
+    return Number.parseInt(KEYMAN_VERSION.VERSION_PATCH, 10);
+  }
+
+  public get version(): string {
+    return KEYMAN_VERSION.VERSION_RELEASE;
   }
 
   public get hardKeyboard(): HardKeyboard {

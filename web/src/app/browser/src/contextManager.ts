@@ -316,13 +316,19 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    */
   protected get keyboardTarget(): OutputTarget<any> {
     let target = this.currentTarget || this.mostRecentTarget;
-    let attachmentInfo = target?.getElement()._kmwAttachment;
 
-    if(attachmentInfo?.keyboard || attachmentInfo?.keyboard === '') {
+    if(this.isTargetKeyboardIndependent(target)) {
       return target;
     } else {
       return null;
     }
+  }
+
+  private isTargetKeyboardIndependent(target: OutputTarget<any>): boolean {
+    let attachmentInfo = target?.getElement()._kmwAttachment;
+
+    // If null or undefined, we're in 'global' mode.
+    return !!(attachmentInfo?.keyboard || attachmentInfo?.keyboard === '');
   }
 
   // Note:  is part of the keyboard activation process.  Not to be called directly by published API.
@@ -390,6 +396,15 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
           true
         );
       }
+    }
+  }
+
+  public getKeyboardStubForTarget(target: OutputTarget<any>) {
+    if(!this.isTargetKeyboardIndependent(target)) {
+      return this.globalKeyboard.metadata;
+    } else {
+      const attachment = target.getElement()._kmwAttachment;
+      return this.keyboardCache.getStub(attachment.keyboard, attachment.languageCode);
     }
   }
 
