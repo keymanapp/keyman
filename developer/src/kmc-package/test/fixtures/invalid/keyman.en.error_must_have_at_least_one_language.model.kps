@@ -8,25 +8,21 @@
     <Name URL="">SENĆOŦEN (Saanich Dialect) Lexical Model</Name>
     <Copyright URL="">© 2019 National Research Council Canada</Copyright>
     <Author URL="mailto:Eddie.Santos@nrc-cnrc.gc.ca">Eddie Antonio Santos</Author>
-    <Version>1.3</Version>
+    <Version>1.0.3</Version>
   </Info>
   <Files>
     <File>
-      <!-- filename should not have spaces -->
-      <Name>my special keyboard.kmx</Name>
-      <Description>Keyboard my special keyboard</Description>
+      <Name>example.qaa.sencoten.model.js</Name>
+      <Description>Lexical model example.qaa.sencoten.model.js</Description>
       <CopyLocation>0</CopyLocation>
-      <FileType>.kmx</FileType>
+      <FileType>.model.js</FileType>
     </File>
   </Files>
-  <Keyboards>
-    <Keyboard>
-      <Name>Khmer Angkor</Name>
-      <ID>my special keyboard</ID>
-      <Version>1.3</Version>
-      <Languages>
-        <Language ID="km">Central Khmer (Khmer, Cambodia)</Language>
-      </Languages>
-    </Keyboard>
-  </Keyboards>
+  <LexicalModels>
+    <LexicalModel>
+      <Name>SENĆOŦEN dictionary</Name>
+      <ID>example.qaa.sencoten</ID>
+      <!-- ERROR_LexicalModelMustHaveAtLeastOneLanguage -->
+    </LexicalModel>
+  </LexicalModels>
 </Package>

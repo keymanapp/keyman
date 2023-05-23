@@ -5,7 +5,7 @@
     <FileVersion>7.0</FileVersion>
   </System>
   <Info>
-    <!-- missing <Name/> -->
+    <Name URL="">SENĆOŦEN (Saanich Dialect) Lexical Model</Name>
     <Copyright URL="">© 2019 National Research Council Canada</Copyright>
     <Author URL="mailto:Eddie.Santos@nrc-cnrc.gc.ca">Eddie Antonio Santos</Author>
     <Version>1.3</Version>
@@ -17,6 +17,13 @@
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
     </File>
+    <!-- warn_redist_file_should_not_be_in_package -->
+    <File>
+      <Name>keyman.exe</Name>
+      <Description>Keyman Program</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.exe</FileType>
+    </File>
   </Files>
   <Keyboards>
     <Keyboard>
@@ -24,7 +31,7 @@
       <ID>khmer_angkor</ID>
       <Version>1.3</Version>
       <Languages>
-        <Language ID="km">Central Khmer (Khmer, Cambodia)</Language>
+        <Language ID="KM">Khmer</Language>
       </Languages>
     </Keyboard>
   </Keyboards>
