@@ -134,7 +134,7 @@ console.log();
 let sourceRoot = "/@keymanapp/keyman";
 console.log(`Setting sourceRoot: ${sourceRoot}`)
 remappingState.sourceRoot = sourceRoot;
-fullWorkerConcatenation.sourcemapJSON = remappingState.sourceMap;
+fullWorkerConcatenation.sourcemapJSON = remappingState.sourcemap;
 
 // End "cleaning the sourcemaps"
 
