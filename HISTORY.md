@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.111 alpha 2023-05-24
+
+* fix(android/app): Pathing for publish script (#8845)
+* chore(developer): add test for missing .js file to kmc-package (#8846)
+* feat(linux): Add dbus system service (#8509)
+* chore(linux): Add missing dependency to GHA (#8849)
+
 ## 17.0.110 alpha 2023-05-22
 
 * fix(common): ensure child builds don't rebuild dependencies unnecessarily (#8834)
