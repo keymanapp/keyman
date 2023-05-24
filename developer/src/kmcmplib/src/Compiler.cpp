@@ -1025,7 +1025,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     {
       // Store extra metadata for callers as we mutate this store during
       // compilation
-      fk->extra.kvksFilename = sp->dpString;
+      fk->extra->kvksFilename = sp->dpString;
       // Strip path from the store, leaving bare filename only
       p = sp->dpString;
 

@@ -138,7 +138,7 @@ COMPILER_RESULT kmcmp_compile(std::string pszInfile, const COMPILER_INTERFACE in
 
   r.kmx = (int) data;
   r.kmxSize = (int) dataSize;
-  r.kvksFilename = string_from_u16string(fk.extra.kvksFilename); // convert to UTF8
+  r.kvksFilename = string_from_u16string(fk.extra->kvksFilename); // convert to UTF8
 
   return r;
 }
@@ -323,7 +323,8 @@ bool CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
   fk->dpDeadKeyArray = NULL;
   fk->cxVKDictionary = 0;  // I3438
   fk->dpVKDictionary = NULL;  // I3438
-  fk->extra.kvksFilename = u"";
+  fk->extra = new FILE_KEYBOARD_EXTRA;
+  fk->extra->kvksFilename = u"";
 /*	fk->szMessage[0] = 0;
   fk->szLanguageName[0] = 0;*/
   fk->dwBitmapSize = 0;

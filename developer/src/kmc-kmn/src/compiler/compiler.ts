@@ -1,24 +1,8 @@
 /*
 TODO: implement additional interfaces:
 
-  extern "C" bool kmcmp_CompileKeyboardFileToBuffer(
-    char* pszInfile,
-    void* pfkBuffer,
-    bool ACompilerWarningsAsErrors,
-    bool AWarnDeprecatedCode,
-    kmcmp_CompilerMessageProc pMsgproc,
-    void* AmsgprocContext,
-    int Target
-  );
-
-  typedef bool (*kmcmp_ValidateJsonMessageProc)(int64_t offset, const char* szText, void* context);
-
-  extern "C" bool kmcmp_ValidateJsonFile(
-    std::fstream& f,
-    std::fstream& fd,
-    kmcmp_ValidateJsonMessageProc MessageProc,
-    void* context
-  );
+  typedef bool (*kmcmp_ValidateJsonMessageProc)();
+  extern "C" bool kmcmp_ValidateJsonFile();
 */
 
 // TODO: rename wasm-host?
