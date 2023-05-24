@@ -159,7 +159,7 @@ jobs:
 
   upload-to-llso:
     name: Upload packages to llso
-    needs: deb_signing
+    needs: [sourcepackage, deb_signing]
     runs-on: self-hosted
     environment: "deploy (linux)"
     if: github.event.client_payload.isTestBuild == 'false'
