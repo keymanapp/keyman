@@ -62,7 +62,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       hostDevice: this.engineConfig.hostDevice
     });
 
-    this.focusAssistant.on('maintainingend', () => {
+    this.focusAssistant.on('maintainingfocusend', () => {
       // Basically, if the maintaining state were the reason we still had an `activeTarget`...
       if(!this.activeTarget && this.mostRecentTarget) {
         this.emit('targetchange', this.activeTarget);
@@ -271,11 +271,13 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   }
 
   /**
-   * Reflects the active 'target' upon which any `set activeKeyboard` operation will take place.
-   * When `null`, such operations will affect the global default; otherwise, such operations
-   * affect only the specified `target`.
+   * Determines the 'target' currently used to determine which keyboard should be active.
+   * When `null`, keyboard-activation operations will affect the global default; otherwise,
+   * such operations affect only the specified `target`.
+   *
+   * This is based on the current `.activeTarget` and its related attachment metadata.
    */
-  protected get keyboardTarget(): OutputTarget<any> {
+  protected currentKeyboardSrcTarget(): OutputTarget<any> {
     let target = this.currentTarget || this.mostRecentTarget;
     let attachmentInfo = target?.getElement()._kmwAttachment;
 
@@ -302,7 +304,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       attachment.languageCode = kbd?.metadata.langId ?? '';
     }
 
-    if(this.keyboardTarget == target) {
+    if(this.currentKeyboardSrcTarget() == target) {
       this._activeKeyboard = kbd;
     }
   }
@@ -327,17 +329,19 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     // Catches if the target is already in independent-mode, even if it's being cancelled
     // during this call.
-    const wasPriorTarget = this.keyboardTarget == target;
+    const wasPriorTarget = this.currentKeyboardSrcTarget() == target;
 
     if(!attachment) {
       return;
     } else {
-      // If directly set
+      // Either establishes or cancels independent-keyboard mode by setting the
+      // associated metadata.  This will have direct effects on the results
+      // of .currentKeyboardSrcTarget().
       attachment.keyboard = kbdId || null;
       attachment.languageCode = langId || null;
 
       // If it has just entered independent-keyboard mode, we need the second check.
-      if(wasPriorTarget || this.keyboardTarget == target) {
+      if(wasPriorTarget || this.currentKeyboardSrcTarget() == target) {
         const globalKbd = this.globalKeyboard.metadata;
 
         // The `||` bits below - in case we're cancelling independent-keyboard mode.
@@ -350,7 +354,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
   }
 
-  protected getFallbackCodes() {
+  protected getFallbackStubKey() {
     if(this.engineConfig.hostDevice.touchable) {
       // Fallback behavior - if on a touch device, we need to keep a keyboard visible.
       return this.keyboardCache.defaultStub;
@@ -366,14 +370,14 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
   public async activateKeyboard(keyboardId: string, languageCode?: string, saveCookie?: boolean): Promise<boolean> {
     saveCookie ||= false;
-    const originalKeyboardTarget = this.keyboardTarget;
+    const originalKeyboardTarget = this.currentKeyboardSrcTarget();
 
     // Must do here b/c of fallback behavior stuff defined below.
     // If the default keyboard is requested, load that.  May vary based on form-factor, which is
-    // part of what .getFallbackCodes() handles.
+    // part of what .getFallbackStubKey() handles.
     if(!keyboardId) {
-      keyboardId = this.getFallbackCodes().id;
-      languageCode = this.getFallbackCodes().langId;
+      keyboardId = this.getFallbackStubKey().id;
+      languageCode = this.getFallbackStubKey().langId;
     }
 
     try {
@@ -387,7 +391,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
       // Only do these if the active keyboard-target still matches the original keyboard-target;
       // otherwise, maintain what's correct for the currently active one.
-      if(originalKeyboardTarget == this.keyboardTarget) {
+      if(originalKeyboardTarget == this.currentKeyboardSrcTarget()) {
         _SetTargDir(this.currentTarget?.getElement(), this.keyboardCache.getKeyboard(keyboardId));
         // util.addStyleSheet(domManager.setAttachmentFontStyle(kbdStub.KF));
         this.restoreLastActiveTarget();
@@ -399,7 +403,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
       const fallback = async () => {
         // Make sure we don't infinite-recursion should the deactivate somehow fail.
-        const fallbackCodes = this.getFallbackCodes();
+        const fallbackCodes = this.getFallbackStubKey();
         if((fallbackCodes.id != keyboardId)) {
           await this.activateKeyboard(fallbackCodes.id, fallbackCodes.langId, true).catch(() => {});
         } // else "We already failed, so give up."
