@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.112 alpha 2023-05-25
+
+* refactor(developer): move file write out of WriteCompiledKeyboard and CompileKeyboard merge (#8796)
+
 ## 17.0.111 alpha 2023-05-24
 
 * fix(android/app): Pathing for publish script (#8845)
