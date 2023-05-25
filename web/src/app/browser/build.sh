@@ -22,13 +22,7 @@ SUBPROJECT_NAME=app/browser
 # ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's website-integrating version for use in non-puppeted browsers." \
-  "@/common/web/input-processor build" \
-  "@/web/src/engine/device-detect build" \
-  "@/web/src/engine/paths build" \
-  "@/web/src/engine/package-cache build" \
-  "@/web/src/engine/events build" \
-  "@/web/src/engine/osk build" \
-  "@/web/src/engine/element-wrappers build" \
+  "@/web/src/engine/attachment build" \
   "@/web/src/engine/main build" \
   "clean" \
   "configure" \
@@ -38,11 +32,16 @@ builder_describe "Builds the Keyman Engine for Web's website-integrating version
 # Possible TODO?s
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
 
+builder_parse "$@"
+
+config=release
+if builder_is_debug_build; then
+  config=debug
+fi
+
 builder_describe_outputs \
   configure   /node_modules \
-  build       /web/build/$SUBPROJECT_NAME/lib/index.js
-
-builder_parse "$@"
+  build       /web/build/$SUBPROJECT_NAME/$config/keymanweb.js
 
 #### Build action definitions ####
 
@@ -59,6 +58,9 @@ fi
 
 if builder_start_action build; then
   compile $SUBPROJECT_NAME
+
+  mkdir -p "$KEYMAN_ROOT/web/build/app/resources/osk"
+  cp -R "$KEYMAN_ROOT/web/src/resources/osk/." "$KEYMAN_ROOT/web/build/app/resources/osk/"
 
   builder_finish_action success build
 fi

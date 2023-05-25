@@ -19,11 +19,11 @@ export default class KeymanEngine<
   HardKeyboard extends HardKeyboardBase
 > implements KeyboardKeymanGlobal {
   readonly config: Configuration;
-  readonly contextManager: ContextManager;
-  readonly interface: KeyboardInterface<ContextManager>;
+  contextManager: ContextManager;
+  interface: KeyboardInterface<ContextManager>;
   readonly core: InputProcessor;
-  readonly keyboardRequisitioner: KeyboardRequisitioner;
-  readonly modelCache: ModelCache;
+  keyboardRequisitioner: KeyboardRequisitioner;
+  modelCache: ModelCache;
 
   protected legacyAPIEvents = new LegacyEventEmitter<LegacyAPIEvents>();
   private _hardKeyboard: HardKeyboard;
@@ -97,22 +97,96 @@ export default class KeymanEngine<
     this.config = config;
     this.contextManager = contextManager;
 
-    // Since we're not sandboxing keyboard loads yet, we just use `window` as the jsGlobal object.
-    this.interface = new KeyboardInterface(window, this, this.contextManager, config.stubNamespacer);
-    const keyboardLoader = new KeyboardLoader(this.interface, config.applyCacheBusting);
-    this.keyboardRequisitioner = new KeyboardRequisitioner(keyboardLoader, new DOMCloudRequester(), this.config.paths);
-    this.modelCache = new ModelCache();
-
-    const kbdCache = this.keyboardRequisitioner.cache;
-    this.interface.setKeyboardCache(this.keyboardRequisitioner.cache);
-
+    this.interface = new KeyboardInterface(window, this, config.stubNamespacer);
     this.core = new InputProcessor(config.hostDevice, worker, this.processorConfiguration());
+
     this.core.languageProcessor.on('statechange', (state) => {
       // The banner controller cannot directly trigger a layout-refresh at this time,
       // so we handle that here.
-      this.osk.bannerController.selectBanner(state);
-      this.osk.refreshLayout();
+      this.osk?.bannerController.selectBanner(state);
+      this.osk?.refreshLayout();
     });
+
+    this.core.keyboardProcessor.beepHandler = (target) => {
+      if(this.doBeep) {
+        this.doBeep(target);
+      }
+    }
+
+    this.contextManager.on('beforekeyboardchange', (metadata) => {
+      this.legacyAPIEvents.callEvent('beforekeyboardchange', {
+        internalName: metadata?.id,
+        languageCode: metadata?.langId
+      });
+    });
+
+    this.contextManager.on('keyboardchange', (kbd) => {
+      this.refreshModel();
+      this.core.activeKeyboard = kbd?.keyboard;
+
+      this.legacyAPIEvents.callEvent('keyboardchange', {
+        internalName: kbd?.metadata.id,
+        languageCode: kbd?.metadata.langId
+      });
+
+      // Hide OSK and do not update keyboard list if using internal keyboard (desktops).
+      // Condition will not be met for touch form-factors; they force selection of a
+      // default keyboard.
+      if(!kbd) {
+        this.osk.startHide(false);
+      }
+
+      if(this.osk) {
+        this.osk.setNeedsLayout();
+        this.osk.activeKeyboard = kbd;
+        this.osk.present();
+      }
+    });
+
+    this.contextManager.on('keyboardasyncload', (metadata) => {
+      /* Original implementation pre-modularization:
+        *
+        * > Force OSK display for CJK keyboards (keyboards using a pick list)
+        *
+        * A matching subcondition in the block below will ensure that the OSK activates pre-load
+        * for CJK keyboards.  Yes, even before a CJK picker could ever show.  We should be fine
+        * without the CJK check so long as a picker keyboard's OSK is kept activated post-load,
+        * when the picker actually needs to be kept persistently-active.
+        * `metadata` would be relevant a the CJK-check, which was based on language codes.
+        *
+        * Of course, as mobile devices don't have guaranteed physical keyboards... we need to
+        * keep the OSK visible for them, hence the actual block below.
+        */
+      if(this.config.hostDevice.touchable && this.osk?.activationModel) {
+        this.osk.activationModel.enabled = true;
+        // Also note:  the OSKView.mayDisable method returns false when hostDevice.touchable = false.
+        // The .startHide() call below will check that method before actually starting an OSK hide.
+      }
+
+      // Always (temporarily) hide the OSK when loading a new keyboard, to ensure
+      // that a failure to load doesn't leave the current OSK displayed
+      this.osk?.startHide(false);
+    });
+  }
+
+  async init(optionSpec: Required<InitOptionSpec>){
+    // There may be some valid mutations possible even on repeated calls?
+    // The original seems to allow it.
+
+    const config = this.config;
+    if(config.deferForInitialization.hasFinalized) {
+      // abort!  Maybe throw an error, too.
+      return Promise.resolve();
+    }
+
+    config.initialize(optionSpec);
+
+    // Since we're not sandboxing keyboard loads yet, we just use `window` as the jsGlobal object.
+    // All components initialized below require a properly-configured `config.paths` or similar.
+    const keyboardLoader = new KeyboardLoader(this.interface, config.applyCacheBusting);
+    this.keyboardRequisitioner = new KeyboardRequisitioner(keyboardLoader, new DOMCloudRequester(), this.config.paths);
+    this.modelCache = new ModelCache();
+    const kbdCache = this.keyboardRequisitioner.cache;
 
     this.contextManager.configure({
       resetContext: (target) => {
@@ -121,12 +195,6 @@ export default class KeymanEngine<
       predictionContext: new PredictionContext(this.core.languageProcessor, this.core.keyboardProcessor),
       keyboardCache: this.keyboardRequisitioner.cache
     });
-
-    this.core.keyboardProcessor.beepHandler = (target) => {
-      if(this.doBeep) {
-        this.doBeep(target);
-      }
-    }
 
     // #region Event handler wiring
     this.config.on('spacebartext', () => {
@@ -145,6 +213,12 @@ export default class KeymanEngine<
           languageCode: stub.KLC,
           package: stub.KP
         });
+
+        // If this is the first stub loaded, set it as active.
+        if(this.keyboardRequisitioner.cache.defaultStub == stub) {
+          // Note:  leaving this out is super-useful for debugging issues that occur when no keyboard is active.
+          this.contextManager.activateKeyboard(stub.id, stub.langId, true);
+        }
       }
 
       if(this.config.deferForInitialization.hasFinalized) {
@@ -169,78 +243,11 @@ export default class KeymanEngine<
       }
     });
 
-    contextManager.on('beforekeyboardchange', (metadata) => {
-      this.legacyAPIEvents.callEvent('beforekeyboardchange', {
-        internalName: metadata.id,
-        languageCode: metadata.langId
-      });
-    });
-
-    contextManager.on('keyboardchange', (kbd) => {
-      this.refreshModel();
-      this.core.activeKeyboard = kbd.keyboard;
-
-      this.legacyAPIEvents.callEvent('keyboardchange', {
-        internalName: kbd.metadata.id,
-        languageCode: kbd.metadata.langId
-      });
-
-      // Hide OSK and do not update keyboard list if using internal keyboard (desktops).
-      // Condition will not be met for touch form-factors; they force selection of a
-      // default keyboard.
-      if(kbd.keyboard == null && kbd.metadata == null) {
-        this.osk.startHide(false);
-      }
-
-      if(this.osk) {
-        this.osk.setNeedsLayout();
-        this.osk.activeKeyboard = kbd;
-        this.osk.present();
-      }
-    });
-
-    contextManager.on('keyboardasyncload', (metadata) => {
-      /* Original implementation pre-modularization:
-       *
-       * > Force OSK display for CJK keyboards (keyboards using a pick list)
-       *
-       * A matching subcondition in the block below will ensure that the OSK activates pre-load
-       * for CJK keyboards.  Yes, even before a CJK picker could ever show.  We should be fine
-       * without the CJK check so long as a picker keyboard's OSK is kept activated post-load,
-       * when the picker actually needs to be kept persistently-active.
-       * `metadata` would be relevant a the CJK-check, which was based on language codes.
-       *
-       * Of course, as mobile devices don't have guaranteed physical keyboards... we need to
-       * keep the OSK visible for them, hence the actual block below.
-       */
-      if(this.config.hostDevice.touchable && this.osk?.activationModel) {
-        this.osk.activationModel.enabled = true;
-        // Also note:  the OSKView.mayDisable method returns false when hostDevice.touchable = false.
-        // The .startHide() call below will check that method before actually starting an OSK hide.
-      }
-
-      // Always (temporarily) hide the OSK when loading a new keyboard, to ensure
-      // that a failure to load doesn't leave the current OSK displayed
-      this.osk?.startHide(false);
-    });
-
     this.keyboardRequisitioner.cache.on('keyboardAdded', (keyboard) => {
       this.legacyAPIEvents.callEvent('keyboardloaded', { keyboardName: keyboard.id });
     });
     //
     // #endregion
-  }
-
-  async init(optionSpec: Required<InitOptionSpec>){
-    // There may be some valid mutations possible even on repeated calls?
-    // The original seems to allow it.
-
-    if(this.config.deferForInitialization.hasFinalized) {
-      // abort!  Maybe throw an error, too.
-      return Promise.resolve();
-    }
-
-    this.config.initialize(optionSpec);
   }
 
   public get hardKeyboard(): HardKeyboard {
@@ -285,7 +292,7 @@ export default class KeymanEngine<
   // is fully complete.
   private refreshModel(): Promise<ModelSpec> {
     const kbd = this.contextManager.activeKeyboard;
-    const model = this.modelCache.modelForLanguage(kbd.metadata.langId);
+    const model = this.modelCache.modelForLanguage(kbd?.metadata.langId);
 
     if(this.core.activeModel != model) {
       if(this.core.activeModel) {

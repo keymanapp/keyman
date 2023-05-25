@@ -1,7 +1,7 @@
 import { type KeyElement, OSKView, VisualKeyboard } from "keyman/engine/osk";
 import { KEYMAN_VERSION } from "@keymanapp/keyman-version";
 import ContextManager from "./contextManager.js";
-import { KeymanEngine } from "./keymanEngine.js";
+import KeymanEngine from "./keymanEngine.js";
 import { LanguageMenu } from "./languageMenu.js";
 
 export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextManager: ContextManager) {
@@ -64,7 +64,8 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
    // On event start
    focusAssistant.setMaintainingFocus(true);
 
-   // The original did nothing when the pointer left the OSK's bounds.  Possible bug?
-   // await promise;  // should we wish to change that.
+   await promise;
+
+   focusAssistant.setMaintainingFocus(false);
   });
 }

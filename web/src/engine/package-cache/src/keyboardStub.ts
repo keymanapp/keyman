@@ -53,7 +53,7 @@ export default class KeyboardStub extends KeyboardProperties {
         let rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');
 
         arg1 = arg1 || '';
-        if(!rx.test(this.KF)) {
+        if(this.KF && !rx.test(this.KF)) {
           this.KF = arg1 + this.KF;
         }
       } else {

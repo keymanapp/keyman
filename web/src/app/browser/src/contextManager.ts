@@ -26,7 +26,7 @@ interface KeyboardCookie {
  * @param       {Object}      Ptarg      Target element
  */
 function _SetTargDir(Ptarg: HTMLElement, activeKeyboard: Keyboard) {
-  var elDir=(activeKeyboard && activeKeyboard.isRTL) ? 'rtl' : 'ltr';
+  const elDir = activeKeyboard?.isRTL ? 'rtl' : 'ltr';
 
   if(Ptarg) {
     if(Ptarg instanceof Ptarg.ownerDocument.defaultView.HTMLInputElement
@@ -269,7 +269,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
   // Note:  is part of the keyboard activation process.  Not to be called directly by published API.
   activateKeyboardForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget<any>) {
-    let attachment = target.getElement()._kmwAttachment;
+    let attachment = target?.getElement()._kmwAttachment;
 
     if(!attachment) {
       // if not set with an "independent keyboard", changes the global.

@@ -1,31 +1,25 @@
 import {
-  Keyboard,
   KeyboardInterface as KeyboardInterfaceBase,
-  KeyboardKeymanGlobal,
 } from "@keymanapp/keyboard-processor";
-import { KeyboardStub, RawKeyboardStub, StubAndKeyboardCache, toUnprefixedKeyboardId as unprefixed } from 'keyman/engine/package-cache';
+import { KeyboardStub, RawKeyboardStub, toUnprefixedKeyboardId as unprefixed } from 'keyman/engine/package-cache';
 
 import { ContextManagerBase } from './contextManagerBase.js';
 import { VariableStoreCookieSerializer } from "./variableStoreCookieSerializer.js";
+import KeymanEngine from "./keymanEngine.js";
+import { EngineConfiguration } from "./engineConfiguration.js";
 
 export default class KeyboardInterface<ContextManagerType extends ContextManagerBase<any>> extends KeyboardInterfaceBase {
-  protected readonly contextManager: ContextManagerType;
-  private stubAndKeyboardCache: StubAndKeyboardCache;
+  protected readonly engine: KeymanEngine<EngineConfiguration, ContextManagerType, any>;
   private stubNamespacer?: (stub: RawKeyboardStub) => void;
 
   constructor(
     _jsGlobal: any,
-    keymanGlobal: KeyboardKeymanGlobal,
-    contextManager: ContextManagerType,
+    engine: KeymanEngine<any, ContextManagerType, any>,
     stubNamespacer?: (stub: RawKeyboardStub) => void
   ) {
-    super(_jsGlobal, keymanGlobal, new VariableStoreCookieSerializer());
-    this.contextManager = contextManager;
+    super(_jsGlobal, engine, new VariableStoreCookieSerializer());
+    this.engine = engine;
     this.stubNamespacer = stubNamespacer;
-  }
-
-  setKeyboardCache(cache: StubAndKeyboardCache) {
-    this.stubAndKeyboardCache = cache;
   }
 
   // Preserves a keyboard's ID, even if namespaced, via script tag tagging.
@@ -59,12 +53,14 @@ export default class KeyboardInterface<ContextManagerType extends ContextManager
 
     this.preserveID(Pk);
 
-    if(!this.stubAndKeyboardCache.isFetchingKeyboard(registeredKeyboard.id)) {
-      // Deliberate keyboard pre-loading via direct script-tag link on the page.
-      // Just load the keyboard and reset the harness's keyboard-receiver field.
-      this.stubAndKeyboardCache.addKeyboard(registeredKeyboard);
-      this.loadedKeyboard = null;
-    }
+    this.engine.config.deferForInitialization.then(() => {
+      if(!this.engine.keyboardRequisitioner.cache.isFetchingKeyboard(registeredKeyboard.id)) {
+        // Deliberate keyboard pre-loading via direct script-tag link on the page.
+        // Just load the keyboard and reset the harness's keyboard-receiver field.
+        this.engine.keyboardRequisitioner.cache.addKeyboard(registeredKeyboard);
+        this.loadedKeyboard = null;
+      }
+    });
   }
 
   /**
@@ -89,11 +85,16 @@ export default class KeyboardInterface<ContextManagerType extends ContextManager
     // https://help.keyman.com/DEVELOPER/ENGINE/WEB/2.0/guide/examples/manual-control
     // (See: referenced laokeys_load.js)
     const stub = new KeyboardStub(Pstub);
-    if(this.stubAndKeyboardCache.findMatchingStub(stub)) {
+    if(this.engine.keyboardRequisitioner?.cache.findMatchingStub(stub)) {
       return 1;
     }
 
-    this.stubAndKeyboardCache.addStub(stub);
+    if(!this.engine.config.deferForInitialization.hasFinalized) {
+      this.engine.config.deferForInitialization.then(() => this.engine.keyboardRequisitioner.cache.addStub(stub));
+    } else {
+      this.engine.keyboardRequisitioner.cache.addStub(stub);
+    }
+
     return null;
   }
 
@@ -101,8 +102,11 @@ export default class KeyboardInterface<ContextManagerType extends ContextManager
     this.resetContextCache();
     // As this function isn't provided a handle to an active outputTarget, we rely on
     // the context manager to resolve said issue.
-    this.contextManager.insertText(this, Ptext, PdeadKey);
+    this.engine.contextManager.insertText(this, Ptext, PdeadKey);
   }
+
+  // Short-hand name: necessary to do it this way due to assignment style.
+  KT = this.insertText;
 }
 
 (function() {

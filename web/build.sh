@@ -29,7 +29,9 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   "configure" \
   "build" \
   "test" \
+  ":app/browser              The form of Keyman Engine for Web for use on websites" \
   ":app/webview              A puppetable version of KMW designed for use in a host app's WebView" \
+  ":app/ui                   Builds KMW's desktop form-factor keyboard-selection UI modules" \
   ":engine/attachment        Subset used for detecting valid page contexts for use in text editing " \
   ":engine/device-detect     Subset used for device-detection " \
   ":engine/dom-utils         A common subset of function used for DOM calculations, layout, etc" \
@@ -95,22 +97,21 @@ builder_run_child_actions build:engine/package-cache
 # Uses engine/paths, engine/device-detect, engine/package-cache, & engine/osk
 builder_run_child_actions build:engine/main
 
-# Uses all but engine/element-wrappers
+# Uses all but engine/element-wrappers and engine/attachment
 builder_run_child_actions build:app/webview
 
 # Uses literally everything `engine/` above
-# Is not yet compilable due to unmodularized components.
-# builder_run_child_actions build:app/browser
+builder_run_child_actions build:app/browser
+
+builder_run_child_actions test
 
 if builder_has_action build:app/browser; then
-  builder_die "Modularization work is not yet complete; builds dependent on this will fail."
+  builder_warn "Modularization work is not yet complete; consumers may find needed API or components to be missing"
 fi
 
 if builder_has_action build:app/ui; then
   builder_die "Modularization work is not yet complete; builds dependent on this will fail."
 fi
-
-builder_run_child_actions test
 
 if builder_start_action test; then
   ./test.sh :engine
