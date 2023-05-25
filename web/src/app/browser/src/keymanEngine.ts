@@ -38,11 +38,9 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
       (this.osk.activationModel as TwoStateActivator<HTMLElement>).activationTrigger = e;
 
       if(this.config.hostDevice.touchable) {
-        if(!target || !this.osk) {
+        if(!e || !target || !this.osk) {
           return;
         }
-
-        const e = target?.getElement();
 
         // Get the absolute position of the caret
         const y = getAbsoluteY(e);
@@ -193,8 +191,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * @returns {Promise<(KeyboardStub|ErrorStub)[]>} Promise of added keyboard/error stubs
    *
    */
-  addKeyboards(...args: any[]) :
-      Promise<(KeyboardStub|ErrorStub)[]> {
+  addKeyboards(...args: (any)[]) : Promise<(KeyboardStub|ErrorStub)[]> {
     if (!args || !args[0] || args[0].length == 0) {
       // Get the cloud keyboard catalog
       return this.keyboardRequisitioner.fetchCloudCatalog().catch((errVal) => {
@@ -204,11 +201,9 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     } else {
       let x: (string|KeyboardStub)[] = [];
       if (Array.isArray(args[0])) {
-        args[0].forEach(a =>
-          x.push(a));
+        x.push(...args[0]);
       } else if (Array.isArray(args)) {
-        args.forEach(a =>
-          x.push(a));
+        x.push(...args);
       } else {
         x.push(args);
       }

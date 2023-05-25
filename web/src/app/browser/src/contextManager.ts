@@ -26,7 +26,7 @@ interface KeyboardCookie {
  * @param       {Object}      Ptarg      Target element
  */
 function _SetTargDir(Ptarg: HTMLElement, activeKeyboard: Keyboard) {
-  var elDir=(activeKeyboard && activeKeyboard?.isRTL) ? 'rtl' : 'ltr';
+  const elDir = activeKeyboard?.isRTL ? 'rtl' : 'ltr';
 
   if(Ptarg) {
     if(Ptarg instanceof Ptarg.ownerDocument.defaultView.HTMLInputElement
