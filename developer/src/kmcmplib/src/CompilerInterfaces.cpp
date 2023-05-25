@@ -76,23 +76,22 @@ EXTERN int kmcmp_Wasm_ParseUnicodeSet(char* pat,
 
 #endif
 
-EXTERN bool kmcmp_CompileKeyboardFile(char* pszInfile,
-  char* pszOutfile, bool ASaveDebug, bool ACompilerWarningsAsErrors,
-	bool AWarnDeprecatedCode, kmcmp_CompilerMessageProc pMsgproc, void* AmsgprocContext
-) {
+bool CompileKeyboard(char* pszInfile,
+  void* pfkBuffer, bool ASaveDebug, bool ACompilerWarningsAsErrors,
+	bool AWarnDeprecatedCode, kmcmp_CompilerMessageProc pMsgproc, void* AmsgprocContext,
+  int Target) {
+
   FILE* fp_in = NULL;
-  FILE* fp_out = NULL;
   KMX_CHAR str[260];
 
-  //printf("°°-> changed to CompileKeyboardFile() of kmcmplib \n");
-
-  kmcmp::FSaveDebug = ASaveDebug;
+  kmcmp::FSaveDebug = ASaveDebug;   // I3681
   kmcmp::FCompilerWarningsAsErrors = ACompilerWarningsAsErrors;   // I4865
   AWarnDeprecatedCode_GLOBAL_LIB = AWarnDeprecatedCode;
 
-  kmcmp::CompileTarget = CKF_KEYMAN;
+  kmcmp::CompileTarget = Target;
 
-  if (!pMsgproc || !pszInfile || !pszOutfile) SetError(CERR_BadCallParams);
+  if (!pMsgproc || !pszInfile || !pfkBuffer) SetError(CERR_BadCallParams);
+
 
   PKMX_STR p;
 
@@ -133,105 +132,70 @@ EXTERN bool kmcmp_CompileKeyboardFile(char* pszInfile,
     SetError(CERR_CannotCreateTempfile);
   }
 
-  fp_out = Open_File(pszOutfile, "wb");
-
-  if (fp_out == NULL) {
-    SetError(CERR_CannotCreateOutfile);
-  }
-
-  FILE_KEYBOARD fk;
   kmcmp::CodeConstants = new kmcmp::NamedCodeConstants;
-  bool result = CompileKeyboardHandle(fp_in, &fk);
-  if(result) {
-    KMX_DWORD msg;
-    if ((msg = WriteCompiledKeyboard(&fk, fp_out)) != CERR_None) {
-      result = FALSE;
-      AddCompileError(msg);
-    }
-  } else {
-    AddCompileError(CERR_InvalidValue);
-  }
-
-  fclose(fp_in);
-  fclose(fp_out);
-
+  bool result = CompileKeyboardHandle(fp_in, static_cast<PFILE_KEYBOARD>(pfkBuffer));
   delete kmcmp::CodeConstants;
 
-  if (kmcmp::nErrors > 0)
-  {
-    remove(pszOutfile);
+  fclose(fp_in);
+
+  if (kmcmp::nErrors > 0) {
     return FALSE;
   }
 
   return result;
 }
 
-
-
 EXTERN bool kmcmp_CompileKeyboardFileToBuffer(char* pszInfile, void* pfkBuffer, bool ACompilerWarningsAsErrors, bool AWarnDeprecatedCode,
   kmcmp_CompilerMessageProc pMsgproc, void* AmsgprocContext, int Target)   // I4865   // I4866
 {
-  //printf("°°-> changed to CompileKeyboardFileToBuffer() of kmcmplib \n");
-  FILE* fp_in = NULL;
-  KMX_CHAR str[260];
-
-  kmcmp::FSaveDebug = TRUE;   // I3681
-  kmcmp::FCompilerWarningsAsErrors = ACompilerWarningsAsErrors;   // I4865
-  AWarnDeprecatedCode_GLOBAL_LIB = AWarnDeprecatedCode;
-  kmcmp::CompileTarget = Target;
-
   if (!pMsgproc || !pszInfile || !pfkBuffer) {
     SetError(CERR_BadCallParams);
   }
 
-  PKMX_STR p;
+  return CompileKeyboard(pszInfile, pfkBuffer, TRUE, ACompilerWarningsAsErrors, AWarnDeprecatedCode,
+    pMsgproc, AmsgprocContext, Target);
+}
 
-  if ((p = strrchr_slash(pszInfile)) != nullptr) {
-    strncpy(kmcmp::CompileDir, pszInfile, (int)(p - pszInfile + 1));  // I3481
-    kmcmp::CompileDir[(int)(p - pszInfile + 1)] = 0;
-  }
-  else {
-    kmcmp::CompileDir[0] = 0;
-  }
-
-  msgproc = pMsgproc;
-  msgprocContext = AmsgprocContext;
-  kmcmp::currentLine = 0;
-  kmcmp::nErrors = 0;
-
-  fp_in = Open_File(pszInfile,"rb");
-
-  if (fp_in == NULL) {
-    SetError(CERR_InfileNotExist);
+EXTERN bool kmcmp_CompileKeyboardFile(char* pszInfile,
+  char* pszOutfile, bool ASaveDebug, bool ACompilerWarningsAsErrors,
+  bool AWarnDeprecatedCode, kmcmp_CompilerMessageProc pMsgproc, void* AmsgprocContext)   // I4865   // I4866
+{
+  if (!pMsgproc || !pszInfile || !pszOutfile) {
+    SetError(CERR_BadCallParams);
   }
 
-  // Transfer the file to a memory stream for processing UTF-8 or ANSI to UTF-16?
-  // What about really large files?  Transfer to a temp file...
-
-  if( !fread(str,1,3,fp_in))
-  {
-    fclose(fp_in);
-    SetError(CERR_CannotReadInfile);
-  }
-
-  fseek( fp_in,0,SEEK_SET);
-  if (str[0] == UTF8Sig[0] && str[1] == UTF8Sig[1] && str[2] == UTF8Sig[2])
-    fp_in = UTF16TempFromUTF8(fp_in, TRUE);
-  else if (str[0] == UTF16Sig[0] && str[1] == UTF16Sig[1])
-    fseek( fp_in,2,SEEK_SET);
-  else
-    fp_in = UTF16TempFromUTF8(fp_in, FALSE);
-
-  kmcmp::CodeConstants = new kmcmp::NamedCodeConstants;
-
-  bool result = CompileKeyboardHandle(fp_in, static_cast<PFILE_KEYBOARD>(pfkBuffer));
-  delete kmcmp::CodeConstants;
-  fclose(fp_in);
-
-  if (kmcmp::nErrors > 0) {
+  FILE_KEYBOARD fk;
+  if(!CompileKeyboard(pszInfile, &fk, ASaveDebug, ACompilerWarningsAsErrors, AWarnDeprecatedCode,
+      pMsgproc, AmsgprocContext, CKF_KEYMAN)) {
+    // any errors will have been reported directly by CompileKeyboard
     return FALSE;
   }
-  return result;
+
+  FILE* fp_out = Open_File(pszOutfile, "wb");
+  if (fp_out == NULL) {
+    SetError(CERR_CannotCreateOutfile);
+  }
+
+  KMX_DWORD msg;
+  KMX_BYTE* data = nullptr;
+  size_t dataSize = 0;
+  if ((msg = WriteCompiledKeyboard(&fk, &data, dataSize)) != CERR_None) {
+    AddCompileError(msg);
+  } else {
+    if(fwrite(data, 1, dataSize, fp_out) != dataSize) {
+      AddCompileError(CERR_UnableToWriteFully);
+    }
+    delete[] data;
+  }
+
+  fclose(fp_out);
+
+  if (kmcmp::nErrors > 0) {
+    remove(pszOutfile);
+    return FALSE;
+  }
+
+  return TRUE;
 }
 
 bool CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)

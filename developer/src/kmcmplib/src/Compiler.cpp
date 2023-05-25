@@ -2888,7 +2888,7 @@ KMX_BOOL kmcmp::CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsS
   return TRUE;
 }
 
-KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
+KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, KMX_BYTE**data, size_t& dataSize)
 {
   PFILE_GROUP fgp;
   PFILE_STORE fsp;
@@ -2902,6 +2902,9 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
   size_t offset;
   size_t size;
   KMX_DWORD i, j;
+
+  *data = nullptr;
+  dataSize = 0;
 
   // Calculate how much memory to allocate
 
@@ -3056,15 +3059,8 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
 
   SetChecksum(buf, &ck->dwCheckSum, (KMX_DWORD)size);
 
-  KMX_DWORD dwBytesWritten = 0;
-  dwBytesWritten = (KMX_DWORD)fwrite(buf,1, (KMX_DWORD)size ,  fp_out);
-
-  if (dwBytesWritten != size) {
-    delete[] buf;
-    return CERR_UnableToWriteFully;
-  }
-
-  delete[] buf;
+  *data = buf;
+  dataSize = size;
 
   return CERR_None;
 }
