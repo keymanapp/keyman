@@ -9,6 +9,26 @@ import esbuild from 'esbuild';
 import { spawn } from 'child_process';
 import fs from 'fs';
 
+let EMIT_FILESIZE_PROFILE = false;
+
+if(process.argv.length > 2) {
+  for(let i = 2; i < process.argv.length; i++) {
+    const arg = process.argv[i];
+
+    switch(arg) {
+      case '':
+        break;
+      case '--ci':
+        EMIT_FILESIZE_PROFILE=true
+        break;
+      // May add other options if desired in the future.
+      default:
+        console.error("Invalid command-line option set for script; only --ci is permitted.");
+        process.exit(1);
+    }
+  }
+}
+
 /*
  * Refer to https://github.com/microsoft/TypeScript/issues/13721#issuecomment-307259227 -
  * the `@class` emit comment-annotation is designed to facilitate tree-shaking for ES5-targeted
@@ -45,7 +65,7 @@ await esbuild.build({
   tsconfig: './tsconfig.json'
 });
 
-await esbuild.build({
+let result = await esbuild.build({
   bundle: true,
   sourcemap: true,
   minifyWhitespace: true,
@@ -60,8 +80,15 @@ await esbuild.build({
   plugins: [ es5ClassAnnotationAsPurePlugin ],
   target: "es5",
   treeShaking: true,
-  tsconfig: './tsconfig.json'
+  tsconfig: './tsconfig.json',
+  // Enables source-file output size profiling!
+  metafile: EMIT_FILESIZE_PROFILE
 });
+
+if(EMIT_FILESIZE_PROFILE) {
+  // Profiles the sourcecode!
+  console.log(await esbuild.analyzeMetafile(result.metafile, { verbose: true }));
+}
 
 await esbuild.build({
   bundle: true,

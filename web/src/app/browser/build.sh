@@ -41,7 +41,11 @@ builder_describe_outputs \
 #### Build action definitions ####
 
 compile_and_copy() {
-  compile $SUBPROJECT_NAME
+  local COMPILE_FLAGS=
+  if builder_has_option --ci; then
+    COMPILE_FLAGS=--ci
+  fi
+  compile $SUBPROJECT_NAME $COMPILE_FLAGS
 
   mkdir -p "$KEYMAN_ROOT/web/build/app/resources/osk"
   cp -R "$KEYMAN_ROOT/web/src/resources/osk/." "$KEYMAN_ROOT/web/build/app/resources/osk/"

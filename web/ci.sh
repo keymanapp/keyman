@@ -49,7 +49,9 @@ if builder_start_action build; then
   # - clean:      make extra-sure that no prior build products exist.
   #               - also useful when validating this script on a local dev machine!
   # - build:      then do the ACTUAL build.
-  ./build.sh configure clean build
+  # one option:
+  # - --ci:       For app/browser, outputs 'release' config filesize profiling logs
+  ./build.sh configure clean build --ci
 
   builder_finish_action success build
 fi

@@ -20,11 +20,12 @@ compile ( ) {
   fi
 
   local COMPILE_TARGET="$1"
+  local BUNDLE_FLAG="${2:-}"
 
   tsc -b "${KEYMAN_ROOT}/web/src/$COMPILE_TARGET" -v
 
   if [ -f "./build-bundler.js" ]; then
-    node "./build-bundler.js"
+    node "./build-bundler.js" "$BUNDLE_FLAG"
 
     # So... tsc does declaration-bundling on its own pretty well, at least for local development.
     tsc --emitDeclarationOnly --outFile "${KEYMAN_ROOT}/web/build/$COMPILE_TARGET/lib/index.d.ts" -p "${KEYMAN_ROOT}/web/src/$COMPILE_TARGET"
