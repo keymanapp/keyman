@@ -74,6 +74,65 @@ describe('KMW element-attachment logic', function () {
         attacher.shutdown();
       });
 
+      it('disablement: of input', async function () {
+        fixture.load("input-and-disabled-text.html");
+        const attacher = this.attacher;
+        attacher.install(false);
+
+        let detached = [];
+        attacher.on('disabled', (elem) => detached.push(elem));
+
+        attacher.disableControl(document.getElementById('input'));
+
+        // Give the MutationObservers time to trigger.
+        await timedPromise(10);
+
+        assert.sameMembers(detached.map((elem) => elem.id), ['input']);
+        assert.sameMembers(attacher.inputList.map((elem) => elem.id), []);
+        attacher.shutdown();
+      });
+
+      it('enablement: of (kmw-disabled) textarea', async function () {
+        // NOTE:  At the initial point when this test was written, KMW would not attach to
+        // any kmw-disabled elements.  You'd have to attach first, then disable to have an
+        // attached-but-disabled state.
+        //
+        // Ideally, we could pre-attach in a disabled state - using "input-and-disabled-text.html",
+        // but KMW isn't there yet.
+        fixture.load("input-and-text.html");
+        const attacher = this.attacher;
+        attacher.install(false);
+
+        // Events are only tracked after this point.
+
+        let attached = [];
+        let detached = [];
+        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.on('disabled', (elem) => detached.push(elem));
+
+        const textarea = document.getElementById('textarea');
+        attacher.disableControl(textarea);
+
+        // Give the MutationObservers time to trigger.
+        await timedPromise(10);
+
+        // Verify setup, just to be safe.
+        assert.sameMembers(detached.map((elem) => elem.id), ['textarea']);
+        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['input']);
+
+        // And, setup complete.
+
+        // So NOW we can test re-enablement.
+        attacher.enableControl(textarea);
+
+        // Give the MutationObservers time to trigger.
+        await timedPromise(10);
+
+        assert.sameMembers(attached.map((elem) => elem.id), ['textarea']);
+        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['input', 'textarea']);
+        attacher.shutdown();
+      });
+
       it('detachment:  from auto-attached control', function () {
         fixture.load("input-and-text.html");
         const attacher = this.attacher;

@@ -61,6 +61,13 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     this.page = new PageContextAttachment(window.document, {
       hostDevice: this.engineConfig.hostDevice
     });
+
+    this.focusAssistant.on('maintainingfocusend', () => {
+      // Basically, if the maintaining state were the reason we still had an `activeTarget`...
+      if(!this.activeTarget && this.mostRecentTarget) {
+        this.emit('targetchange', this.activeTarget);
+      }
+    });
   }
 
   get apiEvents(): LegacyEventEmitter<LegacyAPIEvents> {
@@ -163,6 +170,10 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   }
 
   get activeTarget(): OutputTarget<any> {
+    /*
+     * Assumption:  the maintainingFocus flag may only be set when there is a current target.
+     * This is not enforced proactively at present, but the assumption should hold.  (2023-05-03)
+     */
     const maintainingFocus = this.focusAssistant.maintainingFocus;
     return this.currentTarget || (maintainingFocus ? this.mostRecentTarget : null);
   }
@@ -180,11 +191,17 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     this.focusAssistant.maintainingFocus = false;
     this.focusAssistant.restoringFocus = false;
 
+    const priorTarget = this.activeTarget || this.lastActiveTarget;
+    if(priorTarget) {
+      this._BlurKeyboardSettings(priorTarget.getElement());
+    }
+
     this.setActiveTarget(null);
   }
 
   private setActiveTarget(target: OutputTarget<any>) {
     const previousTarget = this.mostRecentTarget;
+    const originalTarget = this.activeTarget; // may differ, depending on focus state.
 
     // We condition on 'priorElement' below as a check to allow KMW to set a default active keyboard.
     let hadRecentElement = !!previousTarget;
@@ -195,7 +212,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     if(this.focusAssistant.restoringFocus) {
       this._BlurKeyboardSettings(target.getElement());
-    } else {
+    } else if(target) {
       this._FocusKeyboardSettings(target.getElement(), !hadRecentElement);
     }
 
@@ -205,15 +222,17 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     };
 
     // Set element directionality (but only if element is empty)
-    let Ltarg = target.getElement();
+    let Ltarg = target?.getElement();
     if(target instanceof DesignIFrame) {
       Ltarg = target.docRoot;
     }
-    if(Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLElement) {
+    if(Ltarg && Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLElement) {
       _SetTargDir(Ltarg, this.activeKeyboard?.keyboard);
     }
 
-    this.emit('targetchange', target);
+    if(target != originalTarget) {
+      this.emit('targetchange', target);
+    }
   }
 
   // on set activeTarget, make sure to also change it for this.predictionContext!
@@ -252,11 +271,13 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   }
 
   /**
-   * Reflects the active 'target' upon which any `set activeKeyboard` operation will take place.
-   * When `null`, such operations will affect the global default; otherwise, such operations
-   * affect only the specified `target`.
+   * Determines the 'target' currently used to determine which keyboard should be active.
+   * When `null`, keyboard-activation operations will affect the global default; otherwise,
+   * such operations affect only the specified `target`.
+   *
+   * This is based on the current `.activeTarget` and its related attachment metadata.
    */
-  protected get keyboardTarget(): OutputTarget<any> {
+  protected currentKeyboardSrcTarget(): OutputTarget<any> {
     let target = this.currentTarget || this.mostRecentTarget;
     let attachmentInfo = target?.getElement()._kmwAttachment;
 
@@ -283,7 +304,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       attachment.languageCode = kbd?.metadata.langId ?? '';
     }
 
-    if(this.keyboardTarget == target) {
+    if(this.currentKeyboardSrcTarget() == target) {
       this._activeKeyboard = kbd;
     }
   }
@@ -306,22 +327,58 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     let attachment = target.getElement()._kmwAttachment;
 
+    // Catches if the target is already in independent-mode, even if it's being cancelled
+    // during this call.
+    const wasPriorTarget = this.currentKeyboardSrcTarget() == target;
+
     if(!attachment) {
       return;
     } else {
-      // If directly set
+      // Either establishes or cancels independent-keyboard mode by setting the
+      // associated metadata.  This will have direct effects on the results
+      // of .currentKeyboardSrcTarget().
       attachment.keyboard = kbdId || null;
       attachment.languageCode = langId || null;
 
-      if(this.keyboardTarget == target) {
-        this.activateKeyboard(attachment.keyboard, attachment.languageCode, true);
+      // If it has just entered independent-keyboard mode, we need the second check.
+      if(wasPriorTarget || this.currentKeyboardSrcTarget() == target) {
+        const globalKbd = this.globalKeyboard.metadata;
+
+        // The `||` bits below - in case we're cancelling independent-keyboard mode.
+        this.activateKeyboard(
+          attachment.keyboard || globalKbd.id,
+          attachment.languageCode || globalKbd.langId,
+          true
+        );
       }
+    }
+  }
+
+  protected getFallbackStubKey() {
+    if(this.engineConfig.hostDevice.touchable) {
+      // Fallback behavior - if on a touch device, we need to keep a keyboard visible.
+      return this.keyboardCache.defaultStub;
+    } else {
+      // Fallback behavior - if on a desktop device, the user still has a physical keyboard.
+      // Just clear out the active keyboard & OSK.
+      return {
+        id: '',
+        langId: ''
+      };
     }
   }
 
   public async activateKeyboard(keyboardId: string, languageCode?: string, saveCookie?: boolean): Promise<boolean> {
     saveCookie ||= false;
-    const originalKeyboardTarget = this.keyboardTarget;
+    const originalKeyboardTarget = this.currentKeyboardSrcTarget();
+
+    // Must do here b/c of fallback behavior stuff defined below.
+    // If the default keyboard is requested, load that.  May vary based on form-factor, which is
+    // part of what .getFallbackStubKey() handles.
+    if(!keyboardId) {
+      keyboardId = this.getFallbackStubKey().id;
+      languageCode = this.getFallbackStubKey().langId;
+    }
 
     try {
       let result = await super.activateKeyboard(keyboardId, languageCode, saveCookie);
@@ -334,10 +391,10 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
       // Only do these if the active keyboard-target still matches the original keyboard-target;
       // otherwise, maintain what's correct for the currently active one.
-      if(originalKeyboardTarget == this.keyboardTarget) {
+      if(originalKeyboardTarget == this.currentKeyboardSrcTarget()) {
         _SetTargDir(this.currentTarget?.getElement(), this.keyboardCache.getKeyboard(keyboardId));
         // util.addStyleSheet(domManager.setAttachmentFontStyle(kbdStub.KF));
-        this.focusAssistant.restoringFocus = true;
+        this.restoreLastActiveTarget();
       }
 
       return result;
@@ -346,17 +403,10 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
       const fallback = async () => {
         // Make sure we don't infinite-recursion should the deactivate somehow fail.
-        if(this.engineConfig.hostDevice.touchable) {
-          // Fallback behavior - if on a touch device, we need to keep a keyboard visible.
-          const defaultStub = this.keyboardCache.defaultStub;
-          if(defaultStub.id != keyboardId || defaultStub.langId != languageCode) {
-            await this.activateKeyboard(defaultStub.id, defaultStub.langId, true).catch(() => {});
-          } // else "We already failed, so give up."
-        } else {
-          // Fallback behavior - if on a desktop device, the user still has a physical keyboard.
-          // Just clear out the active keyboard & OSK.
-          await this.activateKeyboard('', '', false).catch(() => {});
-        }
+        const fallbackCodes = this.getFallbackStubKey();
+        if((fallbackCodes.id != keyboardId)) {
+          await this.activateKeyboard(fallbackCodes.id, fallbackCodes.langId, true).catch(() => {});
+        } // else "We already failed, so give up."
       }
 
       this.engineConfig.alertHost?.wait(); // clear the wait message box, either way.
@@ -375,9 +425,11 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       }
 
       if(this.engineConfig.alertHost) {
+        // Possible future TODO:  have it return a Promise that resolves on completion of `fallback`?
+        // Though, we're talking about dropping the 'alert' subsystem entirely at some point.
         this.engineConfig.alertHost?.alert(message, fallback);
       } else {
-        fallback();
+        await fallback();
       }
 
       throw err; // since the site-dev consumer may want to do their own error-handling.
@@ -422,7 +474,8 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     if(attachment.keyboard != null) {
       this.activateKeyboard(attachment.keyboard, attachment.languageCode, true);
-    } else if(!blockGlobalChange) {
+    } else if(!blockGlobalChange && (global?.metadata != this._activeKeyboard?.metadata)) {
+      // TODO:  can we drop `!blockGlobalChange` in favor of the latter check?
       this.activateKeyboard(global?.metadata.id, global?.metadata.langId, true);
     }
   }
@@ -548,7 +601,12 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     // (The "context target" state fields)
     const previousTarget = this.activeTarget;
     this.currentTarget = null; // I3363 (Build 301)
-    this.mostRecentTarget = target;
+
+    // After a .forgetActiveTarget call occurs before _ControlBlur is called on the corresponding element,
+    // we should avoid accidentally 'remembering' it here.
+    if(previousTarget || this.lastActiveTarget) {
+      this.mostRecentTarget = target;
+    }
 
     // Step 4: any and all related events
     /* If the KeymanWeb UI is active as a user changes controls, all UI-based effects
