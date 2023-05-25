@@ -87,7 +87,7 @@ struct FILE_STORE {
   BOOL fIsDebug;
   BOOL fIsCall;
   int line; // TODO: int vs dword, line vs Line (see FILE_KEY, FILE_GROUP)
-  };
+};
 
 typedef FILE_STORE *PFILE_STORE;
 
@@ -98,7 +98,7 @@ struct FILE_KEY {
   DWORD   ShiftFlags;
   PWSTR  dpOutput;		// from start of key structure
   PWSTR  dpContext;		// from start of key structure
-  };
+};
 typedef FILE_KEY *PFILE_KEY;
 
 struct FILE_GROUP {
@@ -114,22 +114,19 @@ struct FILE_GROUP {
 
 typedef FILE_GROUP *PFILE_GROUP;
 
-struct FILE_DEADKEY
-{
+struct FILE_DEADKEY {
   WCHAR szName[SZMAX_DEADKEYNAME];
 };
 
 typedef FILE_DEADKEY *PFILE_DEADKEY;
 
-struct FILE_VKDICTIONARY
-{
+struct FILE_VKDICTIONARY {
   WCHAR szName[SZMAX_VKDICTIONARYNAME];
 };
-
 typedef FILE_VKDICTIONARY *PFILE_VKDICTIONARY;
 
 struct FILE_KEYBOARD {
-  DWORD KeyboardID;			// as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
+  DWORD KeyboardID;			// deprecated, unused
 
   DWORD version;				// keyboard file version with VERSION keyword
 
@@ -179,7 +176,7 @@ struct COMPMSG {
   char szText[SZMAX_ERRORTEXT];
   DWORD Line;
   DWORD dwMsgCode;
-  };
+};
 
 typedef COMPMSG *PCOMPMSG;
 
@@ -193,7 +190,7 @@ struct COMPILEMESSAGES {
   char szFatalText[SZMAX_ERRORTEXT];
 
   DWORD currentLine;
-  };
+};
 
 typedef COMPILEMESSAGES *PCOMPILEMESSAGES;
 

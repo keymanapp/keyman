@@ -82,7 +82,7 @@ struct FILE_STORE {
   KMX_BOOL fIsDebug;
   KMX_BOOL fIsCall;
   int line;
-  };
+};
 
 typedef FILE_STORE *PFILE_STORE;
 
@@ -93,7 +93,7 @@ struct FILE_KEY {
   KMX_DWORD   ShiftFlags;
   PKMX_WCHAR  dpOutput;		// from start of key structure
   PKMX_WCHAR  dpContext;		// from start of key structure
-  };
+};
 typedef FILE_KEY *PFILE_KEY;
 
 struct FILE_GROUP {
@@ -108,15 +108,13 @@ struct FILE_GROUP {
 };
 typedef FILE_GROUP *PFILE_GROUP;
 
-struct FILE_DEADKEY
-{
+struct FILE_DEADKEY {
   KMX_WCHAR szName[SZMAX_DEADKEYNAME];
 };
 
 typedef FILE_DEADKEY *PFILE_DEADKEY;
 
-struct FILE_VKDICTIONARY
-{
+struct FILE_VKDICTIONARY {
   KMX_WCHAR szName[SZMAX_VKDICTIONARYNAME];
 };
 typedef FILE_VKDICTIONARY *PFILE_VKDICTIONARY;
@@ -131,7 +129,7 @@ struct FILE_KEYBOARD_EXTRA {
 typedef struct FILE_KEYBOARD_EXTRA* PFILE_KEYBOARD_EXTRA;
 
 struct FILE_KEYBOARD {
-  KMX_DWORD KeyboardID;			// as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
+  KMX_DWORD KeyboardID;			// deprecated, unused
 
   KMX_DWORD version;				// keyboard file version with VERSION keyword
 
@@ -159,7 +157,7 @@ struct FILE_KEYBOARD {
   KMX_DWORD cxVKDictionary;
   PFILE_VKDICTIONARY dpVKDictionary; // temp - virtual key dictionary
 
-	PFILE_KEYBOARD_EXTRA extra;
+  PFILE_KEYBOARD_EXTRA extra;
 };
 
 typedef FILE_KEYBOARD *PFILE_KEYBOARD;
@@ -181,7 +179,7 @@ struct COMPMSG {
   KMX_CHAR szText[SZMAX_ERRORTEXT];
   KMX_DWORD Line;
   KMX_DWORD dwMsgCode;
-  };
+};
 
 typedef COMPMSG *PCOMPMSG;
 
@@ -195,7 +193,7 @@ struct COMPILEMESSAGES {
   KMX_CHAR szFatalText[SZMAX_ERRORTEXT];
 
   KMX_DWORD currentLine;
-  };
+};
 
 typedef COMPILEMESSAGES *PCOMPILEMESSAGES;
 

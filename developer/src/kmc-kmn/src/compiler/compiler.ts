@@ -152,50 +152,48 @@ export class KmnCompiler {
   }
 
   private runCompiler(infile: string, outfile: string, options: CompilerOptions): CompilerResult {
+    let result: CompilerResult = {};
+    let wasm_interface = new this.wasm.Module.CompilerInterface();
+    let wasm_result = null;
     try {
-      let result: CompilerResult = {};
-      let wasm_interface = new this.wasm.Module.CompilerInterface();
-      let wasm_result = null;
-      try {
-        wasm_interface.saveDebug = options.saveDebug;
-        wasm_interface.compilerWarningsAsErrors = options.compilerWarningsAsErrors;
-        wasm_interface.warnDeprecatedCode = options.warnDeprecatedCode;
-        wasm_interface.messageCallback = this.callbackName;
-        wasm_interface.loadFileCallback = this.callbackName;
-        wasm_result = this.wasm.Module.kmcmp_compile(infile, wasm_interface);
-        if(!wasm_result.result) {
+      wasm_interface.saveDebug = options.saveDebug;
+      wasm_interface.compilerWarningsAsErrors = options.compilerWarningsAsErrors;
+      wasm_interface.warnDeprecatedCode = options.warnDeprecatedCode;
+      wasm_interface.messageCallback = this.callbackName;
+      wasm_interface.loadFileCallback = this.callbackName;  // TODO: this is wrong, needs to be a new callback; not yet used though
+      wasm_result = this.wasm.Module.kmcmp_compile(infile, wasm_interface);
+      if(!wasm_result.result) {
+        return null;
+      }
+
+      if(wasm_result.kvksFilename) {
+        result.kvk = this.runKvkCompiler(wasm_result.kvksFilename, infile, outfile);
+        if(!result.kvk) {
           return null;
         }
-
-        if(wasm_result.kvksFilename) {
-          result.kvk = this.runKvkCompiler(wasm_result.kvksFilename, infile, outfile);
-          if(!result.kvk) {
-            return null;
-          }
-        }
-
-        result.kmx = {
-          filename: outfile,
-          data: new Uint8Array(this.wasm.Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
-        };
-
-        return result;
-      } finally {
-        if(wasm_result) {
-          wasm_result.delete();
-        }
-        wasm_interface.delete();
       }
+
+      result.kmx = {
+        filename: outfile,
+        data: new Uint8Array(this.wasm.Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
+      };
+
+      return result;
     } catch(e) {
       this.callbacks.reportMessage(CompilerMessages.Fatal_UnexpectedException({e:e}));
       return null;
+    } finally {
+      if(wasm_result) {
+        wasm_result.delete();
+      }
+      wasm_interface.delete();
     }
   }
 
   private runKvkCompiler(kvksFilename: string, kmnFilename: string, kmxFilename: string) {
     // The compiler detected a .kvks file, which needs to be captured
     let reader = new KvksFileReader();
-     kvksFilename = this.callbacks.resolveFilename(kmnFilename, kvksFilename);
+    kvksFilename = this.callbacks.resolveFilename(kmnFilename, kvksFilename);
     let kvks = reader.read(this.callbacks.loadFile(kvksFilename));
     try {
       reader.validate(kvks, this.callbacks.loadSchema('kvks'));
