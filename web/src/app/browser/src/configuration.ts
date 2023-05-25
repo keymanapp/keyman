@@ -9,7 +9,7 @@ export class BrowserConfiguration extends EngineConfiguration {
   private _ui: string;
   private _attachType: string;
 
-  private alertHost?: AlertHost;
+  private _alertHost?: AlertHost;
   private _options: Required<BrowserInitOptionSpec>;
 
   initialize(options: Required<BrowserInitOptionSpec>) {
@@ -27,12 +27,10 @@ export class BrowserConfiguration extends EngineConfiguration {
 
     whenDocumentReady().then(() => {
       if(options.useAlerts && !this.alertHost) {
-        if(!this.alertHost) {
-          this.alertHost = new AlertHost();
-        }
+        this._alertHost = new AlertHost();
       } else if(!options.useAlerts && this.alertHost) {
-        this.alertHost?.shutdown();
-        this.alertHost = null;
+        this._alertHost?.shutdown();
+        this._alertHost = null;
       }
     });
   }
@@ -41,8 +39,8 @@ export class BrowserConfiguration extends EngineConfiguration {
     return this._attachType;
   }
 
-  get signalUser(): AlertHost | undefined {
-    return this.alertHost;
+  get alertHost(): AlertHost | undefined {
+    return this._alertHost;
   }
 
   debugReport(): Record<string, any> {

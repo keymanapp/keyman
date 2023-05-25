@@ -162,6 +162,12 @@ describe('app/browser:  ContextManager', function () {
       deferForInitialization: Promise.resolve(),
       hostDevice: {... TEST_PHYSICAL_DEVICE},
       attachType: 'auto',
+      // Used when setting keyboard-specific fonts to attached controls
+      paths: {
+        // We don't care if the font actually exists at the location for these tests;
+        // a simple placeholder will do.
+        'fonts': ''
+      }
       // signalUser may be relevant for some tests.
     }, () => new LegacyEventEmitter());
 
@@ -839,7 +845,7 @@ describe('app/browser:  ContextManager', function () {
         contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
 
         // As we haven't yet focused the affected target, no keyboard-change events should have triggered yet.
-        assert.equal(contextManager.keyboardTarget, null);
+        assert.equal(contextManager.currentKeyboardSrcTarget(), null);
         assert.isTrue(beforekeyboardchange.notCalled);
         assert.isTrue(keyboardchange.notCalled);
         assert.isTrue(keyboardasyncload.notCalled);
@@ -851,7 +857,7 @@ describe('app/browser:  ContextManager', function () {
         await timedPromise(10);
 
         // No need to 'keyboardchange' when the same keyboard is kept active.
-        assert.equal(contextManager.keyboardTarget, target);
+        assert.equal(contextManager.currentKeyboardSrcTarget(), target);
         assert.isTrue(beforekeyboardchange.calledOnce);
         assert.isTrue(keyboardchange.calledOnce);
         assert.isTrue(keyboardasyncload.notCalled);
@@ -1028,7 +1034,7 @@ describe('app/browser:  ContextManager', function () {
         await contextManager.activateKeyboard('test_chirality', 'en');
 
         // Aspect 1:  the current keyboard has changed
-        assert.equal(contextManager.keyboardTarget, target);
+        assert.equal(contextManager.currentKeyboardSrcTarget(), target);
         assert.isTrue(beforekeyboardchange.calledOnce);
         assert.isTrue(keyboardchange.calledOnce);
         assert.isTrue(keyboardasyncload.notCalled);
@@ -1042,7 +1048,7 @@ describe('app/browser:  ContextManager', function () {
         await timedPromise(10);
 
         // Aspect 2: ... without affecting the global keyboard's setting.
-        assert.equal(contextManager.keyboardTarget, null);
+        assert.equal(contextManager.currentKeyboardSrcTarget(), null);
         assert.isTrue(beforekeyboardchange.calledTwice);
         assert.isTrue(keyboardchange.calledTwice);
         assert.isTrue(keyboardasyncload.notCalled);
@@ -1083,7 +1089,7 @@ describe('app/browser:  ContextManager', function () {
         await Promise.resolve();
 
         // Aspect 1:  the current keyboard has not yet changed
-        assert.equal(contextManager.keyboardTarget, target);
+        assert.equal(contextManager.currentKeyboardSrcTarget(), target);
         assert.isTrue(beforekeyboardchange.calledOnce);  // +1
         assert.isTrue(keyboardchange.notCalled);         // is delayed 50 ms, so not yet.
         assert.isTrue(keyboardasyncload.calledOnce);     // The async load has already started.
@@ -1098,7 +1104,7 @@ describe('app/browser:  ContextManager', function () {
         // Allows any _FocusKeyboardSettings stuff trigger to resolve.
         await timedPromise(10);
 
-        assert.equal(contextManager.keyboardTarget, null);
+        assert.equal(contextManager.currentKeyboardSrcTarget(), null);
         assert.isTrue(beforekeyboardchange.calledTwice);  // +1: re-activating the global keyboard
         assert.isTrue(keyboardchange.calledOnce);         // +1: same
         assert.isTrue(keyboardasyncload.calledOnce);
@@ -1109,7 +1115,7 @@ describe('app/browser:  ContextManager', function () {
 
         // ...and verify that the active keyboard has not changed, since the target for
         // activation is not itself active.
-        assert.equal(contextManager.keyboardTarget, null);
+        assert.equal(contextManager.currentKeyboardSrcTarget(), null);
         assert.isTrue(beforekeyboardchange.calledTwice);  // +1: re-activating the global keyboard
         assert.isTrue(keyboardchange.calledOnce);         // +1: same
         assert.isTrue(keyboardasyncload.calledOnce);
@@ -1127,7 +1133,7 @@ describe('app/browser:  ContextManager', function () {
         await timedPromise(10);
 
         // And, final expectations:
-        assert.equal(contextManager.keyboardTarget, target);
+        assert.equal(contextManager.currentKeyboardSrcTarget(), target);
         assert.isTrue(beforekeyboardchange.calledThrice);  // +1: activating the independent-mode kbd
         assert.isTrue(keyboardchange.calledTwice);         // +1: same
         assert.isTrue(keyboardasyncload.calledOnce);
@@ -1179,7 +1185,7 @@ describe('app/browser:  ContextManager', function () {
         await Promise.resolve();
 
         // Aspect 1:  the current keyboard has not yet changed
-        assert.equal(contextManager.keyboardTarget, target);
+        assert.equal(contextManager.currentKeyboardSrcTarget(), target);
         assert.isTrue(beforekeyboardchange.calledOnce);  // +1
         assert.isTrue(keyboardchange.notCalled);         // is delayed 50 ms, so not yet.
         assert.isTrue(keyboardasyncload.calledOnce);     // The async load has already started.
@@ -1202,7 +1208,7 @@ describe('app/browser:  ContextManager', function () {
         await Promise.resolve();
 
         // Aspect 2:  the current keyboard STILL has not yet changed - still delayed.
-        assert.equal(contextManager.keyboardTarget, target);
+        assert.equal(contextManager.currentKeyboardSrcTarget(), target);
         assert.isTrue(beforekeyboardchange.calledTwice);  // +1
         assert.isTrue(keyboardchange.notCalled);          // both should still be delayed.
         assert.isTrue(keyboardasyncload.calledTwice);      // The async load has already started.
@@ -1214,7 +1220,7 @@ describe('app/browser:  ContextManager', function () {
 
         // Critical bit: the `lao` activation should appear to have auto-canceled; this is because
         // when its keyboard loaded, we'd already requested the `test_chirality` keyboard.
-        assert.equal(contextManager.keyboardTarget, target);
+        assert.equal(contextManager.currentKeyboardSrcTarget(), target);
         assert.isTrue(beforekeyboardchange.calledThrice);  // +1
         assert.isTrue(keyboardchange.calledOnce);          // There should be no attempt to swap to the lao kbd.
         assert.isTrue(keyboardasyncload.calledTwice);

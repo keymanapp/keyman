@@ -28,7 +28,7 @@ builder_describe "Build Keyman kmc Package Compiler module" \
   "--dry-run,-n              don't actually publish, just dry run"
 builder_describe_outputs \
   configure     /node_modules \
-  build         /developer/src/kmc-package/build/src/kmp-compiler.js
+  build         /developer/src/kmc-package/build/src/main.js
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
