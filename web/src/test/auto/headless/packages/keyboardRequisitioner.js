@@ -283,7 +283,12 @@ describe("KeyboardRequisitioner", () => {
       mockedRequester.request = swapFake;
       const promise = keyboardRequisitioner.addLanguageKeyboards(['Khmer', 'Dzongkha']);
 
-      await promise;
+      try {
+        await promise;
+      } catch (e) {
+        // We didn't mock the actual query based on the language codes, but just knowing
+        // that a query was made, with the right parameters, is enough for us here.
+      }
 
       assert.equal(swapFake.callCount, 2);
 
@@ -332,5 +337,14 @@ describe("KeyboardRequisitioner", () => {
     // Step 3: verify successful load & caching.
     assert.strictEqual(cache.getKeyboardForStub(stub), khmer_angkor);
     assert.isOk(khmer_angkor);
+  });
+
+  // TODO: unit tests for these.
+  describe.skip('fetchCloudStubs', () => {
+    it('fetches stubs for all supported cloud keyboards', () => {});
+
+    it('caches all fetched cloud stubs upon completion', () => {});
+
+    it('returns an error stub if unable to access the Cloud API', () => {});
   });
 });

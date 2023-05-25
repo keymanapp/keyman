@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { CompilerEvent, CompilerCallbacks, CompilerSchema, CompilerPathCallbacks, CompilerFileSystemCallbacks } from '@keymanapp/common-types';
+import { CompilerEvent, CompilerCallbacks, CompilerSchema, CompilerPathCallbacks, CompilerFileSystemCallbacks, compilerErrorSeverityName } from '@keymanapp/common-types';
 export { verifyCompilerMessagesObject } from './verifyCompilerMessagesObject.js';
 
 // TODO: schemas are only used by kmc-ldml for now, so this works at this
@@ -17,6 +17,17 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
 
   clear() {
     this.messages = [];
+  }
+
+  printMessages() {
+    this.messages.forEach(event => {
+      const code = event.code.toString(16);
+      if(event.line) {
+        console.log(`${compilerErrorSeverityName(event.code)} ${code} [${event.line}]: ${event.message}`);
+      } else {
+        console.log(`${compilerErrorSeverityName(event.code)} ${code}: ${event.message}`);
+      }
+    });
   }
 
   hasMessage(code: number): boolean {
