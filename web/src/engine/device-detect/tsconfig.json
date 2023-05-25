@@ -4,6 +4,7 @@
   "compilerOptions": {
     "allowJs": false,
     "declaration": true,
+    "importHelpers": true,
     "inlineSources": true,
     "allowSyntheticDefaultImports": true,
     "module": "es6",

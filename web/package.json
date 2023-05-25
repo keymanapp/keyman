@@ -108,7 +108,8 @@
     "@keymanapp/recorder-core": "*",
     "@keymanapp/web-utils": "*",
     "@types/node": "^11.9.4",
-    "eventemitter3": "^4.0.0"
+    "eventemitter3": "^4.0.0",
+    "tslib": "^2.5.2"
   },
   "type": "module"
 }

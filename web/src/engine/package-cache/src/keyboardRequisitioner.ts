@@ -214,7 +214,7 @@ export default class KeyboardRequisitioner {
         }
       }
 
-      return [...errorStubs, ...completeStubs];
+      return [].concat(errorStubs).concat(completeStubs);
     });
   }
 

@@ -103,7 +103,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
       (flattenedInputList, pageInputList) => flattenedInputList.concat(pageInputList), []
     );
 
-    return [...this._inputList, ...embeddedInputs];
+    return [].concat(this._inputList).concat(embeddedInputs);
   }
 
   // Useful for `moveToNext` operations:  order matters.

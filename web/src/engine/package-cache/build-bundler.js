@@ -1,6 +1,9 @@
 import esbuild from 'esbuild';
 
 await esbuild.build({
+  alias: {
+    'tslib': '@keymanapp/tslib'
+  },
   bundle: true,
   sourcemap: true,
   format: "esm",
@@ -15,6 +18,9 @@ await esbuild.build({
 });
 
 await esbuild.build({
+  alias: {
+    'tslib': '@keymanapp/tslib'
+  },
   bundle: true,
   sourcemap: true,
   format: "esm",
@@ -29,6 +35,9 @@ await esbuild.build({
 });
 
 await esbuild.build({
+  alias: {
+    'tslib': '@keymanapp/tslib'
+  },
   bundle: true,
   sourcemap: true,
   format: "esm",

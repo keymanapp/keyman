@@ -50,7 +50,10 @@ let es5ClassAnnotationAsPurePlugin = {
   }
 }
 
-await esbuild.build({
+const commonConfig = {
+  alias: {
+    'tslib': '@keymanapp/tslib'
+  },
   bundle: true,
   sourcemap: true,
   format: "iife",
@@ -60,14 +63,16 @@ await esbuild.build({
   },
   outfile: '../../../build/app/browser/debug/keymanweb.js',
   plugins: [ es5ClassAnnotationAsPurePlugin ],
+  pure: ['__asyncDelegator'],
   target: "es5",
   treeShaking: true,
   tsconfig: './tsconfig.json'
-});
+};
+
+await esbuild.build(commonConfig);
 
 let result = await esbuild.build({
-  bundle: true,
-  sourcemap: true,
+  ...commonConfig,
   minifyWhitespace: true,
   minifySyntax: true,
   minifyIdentifiers: true,
@@ -77,10 +82,6 @@ let result = await esbuild.build({
     'index': '../../../build/app/browser/obj/release-main.js',
   },
   outfile: '../../../build/app/browser/release/keymanweb.js',
-  plugins: [ es5ClassAnnotationAsPurePlugin ],
-  target: "es5",
-  treeShaking: true,
-  tsconfig: './tsconfig.json',
   // Enables source-file output size profiling!
   metafile: true
 });
@@ -96,17 +97,14 @@ if(EMIT_FILESIZE_PROFILE) {
 }
 
 await esbuild.build({
-  bundle: true,
-  sourcemap: true,
-  minify: false,
+  ...commonConfig,
+  alias: {
+    'tslib': '@keymanapp/tslib'
+  },
   format: "esm",
-  nodePaths: ['../../../../node_modules'],
   entryPoints: {
     'index': '../../../build/app/browser/obj/test-index.js',
   },
   outfile: '../../../build/app/browser/lib/index.mjs',
-  plugins: [ es5ClassAnnotationAsPurePlugin ],
-  target: "es5",
-  treeShaking: true,
   tsconfig: './tsconfig.json'
 });
