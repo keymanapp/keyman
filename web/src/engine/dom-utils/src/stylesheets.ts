@@ -37,7 +37,7 @@ export class StylesheetManager {
    **/
   addStyleSheetForFont(fd: KeyboardFont, fontPathRoot: string, os?: DeviceSpec.OperatingSystem) {
     // Test if a valid font descriptor
-    if(typeof(fd) == 'undefined') {
+    if(!fd) {
       return;
     }
 

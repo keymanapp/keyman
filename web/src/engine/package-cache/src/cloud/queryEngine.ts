@@ -172,7 +172,7 @@ export default class CloudQueryEngine {
     }
     else {
       // If there's no preconfigured option for font paths, uses the cloud's returned `fontPath` in its place.
-      this.pathConfig.fonts = fontPath;
+      this.pathConfig.updateFontPath(fontPath);
     }
 
     // Indicate if unable to register keyboard

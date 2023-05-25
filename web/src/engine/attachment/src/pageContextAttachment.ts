@@ -1,8 +1,14 @@
 import EventEmitter from 'eventemitter3';
 
-import { DeviceSpec } from "@keymanapp/keyboard-processor";
+import { DeviceSpec, InternalKeyboardFont } from "@keymanapp/keyboard-processor";
 import { nestedInstanceOf, wrapElement } from "keyman/engine/element-wrappers";
-import { arrayFromNodeList, getAbsoluteX, getAbsoluteY } from "keyman/engine/dom-utils";
+import {
+  arrayFromNodeList,
+  createStyleSheet,
+  getAbsoluteX,
+  getAbsoluteY,
+  StylesheetManager
+} from "keyman/engine/dom-utils";
 
 import { AttachmentInfo } from "./attachmentInfo.js";
 
@@ -70,6 +76,9 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
 
   public readonly document: Document;
   protected readonly owner: HTMLIFrameElement;
+  private baseFont: string = '';
+  private appliedFont: string = '';
+  private stylesheetManager: StylesheetManager;
 
   public get window(): Window {
     return this.document.defaultView;
@@ -143,6 +152,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     super();
     this.options = options;
     this.document = document;
+    this.stylesheetManager = new StylesheetManager(this.document.body);
   }
 
   // Note:  `install()` must be separate from construction - otherwise, there's no time
@@ -156,6 +166,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     // This field gets referenced by any non-design iframes detected during _SetupDocument.
     // Thus, we must initialize it now.
     this.manualAttach = manualAttach;
+    this.baseFont = this.getBaseFont();
 
     if(!this.manualAttach) {
       this._SetupDocument(this.document.documentElement);
@@ -1039,6 +1050,118 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     this.inputModeObserver?.disconnect();
   }
 
+  /**
+   * Get the user-specified (or default) font for the first mapped input or textarea element
+   * before applying any keymanweb styles or classes
+   *
+   *  @return   {string}
+   */
+  getBaseFont() {
+    var ipInput = document.getElementsByTagName<'input'>('input'),
+        ipTextArea=document.getElementsByTagName<'textarea'>('textarea'),
+        n=0,fs,fsDefault='Arial,sans-serif';
+
+    // Find the first input element (if it exists)
+    if(ipInput.length == 0 && ipTextArea.length == 0) {
+      n=0;
+    } else if(ipInput.length > 0 && ipTextArea.length == 0) {
+      n=1;
+    } else if(ipInput.length == 0 && ipTextArea.length > 0) {
+      n=2;
+    } else {
+      var firstInput = ipInput[0];
+      var firstTextArea = ipTextArea[0];
+
+      if(firstInput.offsetTop < firstTextArea.offsetTop) {
+        n=1;
+      } else if(firstInput.offsetTop > firstTextArea.offsetTop) {
+        n=2;
+      } else if(firstInput.offsetLeft < firstTextArea.offsetLeft) {
+        n=1;
+      } else if(firstInput.offsetLeft > firstTextArea.offsetLeft) {
+        n=2;
+      }
+    }
+
+    // Grab that font!
+    switch(n) {
+      case 0:
+        fs=fsDefault;
+        break;
+      case 1:
+        fs = getComputedStyle(ipInput[0]).fontFamily || '';
+        break;
+      case 2:
+        fs = getComputedStyle(ipTextArea[0]).fontFamily || '';
+        break;
+    }
+    if(typeof(fs) == 'undefined' || fs == 'monospace') {
+      fs=fsDefault;
+    }
+
+    return fs;
+  }
+
+  /**
+   *  Add or replace the style sheet used to set the font for input elements
+   *
+   *  @param  {Object}  kfd   KFont font descriptor
+   *  @return {string}
+   *
+   **/
+  buildAttachmentFontStyle(keyboardFontDescriptor: InternalKeyboardFont): string {
+    let kfd = keyboardFontDescriptor;
+
+    // Get name of font to be applied
+    let fontName = this.baseFont;
+    if (kfd && typeof (kfd.family) != 'undefined') {
+      fontName = kfd['family']; // If we have a font set by the keyboard, prioritize that over the base font.
+    }
+
+    // Unquote font name in base font (if quoted)
+    fontName = fontName.replace(/\u0022/g, '');
+
+    // Set font family chain for mapped elements and remove any double quotes
+    // font-family:  maintains the base font as a fallback.
+    var rx = new RegExp('\\s?' + fontName + ',?'), fontFamily = this.appliedFont.replace(/\u0022/g, '');
+
+    // Remove base font name from chain if present
+    fontFamily = fontFamily.replace(rx, '');
+    fontFamily = fontFamily.replace(/,$/, '');
+
+    // Then replace it at the head of the chain
+    if (fontFamily == '') {
+      fontFamily = fontName;
+    } else {
+      fontFamily = fontName + ',' + fontFamily;
+    }
+
+    // Re-insert quotes around individual font names
+    fontFamily = '"' + fontFamily.replace(/\,\s?/g, '","') + '"';
+
+    // Add to the stylesheet, quoted, and with !important to override any explicit style
+    let s = '.keymanweb-font{\nfont-family:' + fontFamily + ' !important;\n}\n';
+
+    // Store the current font chain (with quote-delimited font names)
+    this.appliedFont = fontFamily;
+
+    // Return the style string
+    return s;
+  }
+
+  setAttachmentFont(
+    keyboardFontDescriptor: InternalKeyboardFont,
+    fontRoot: string,
+    os: DeviceSpec.OperatingSystem
+  ) {
+    this.stylesheetManager.unlinkAll();
+    this.stylesheetManager.addStyleSheetForFont(keyboardFontDescriptor, fontRoot, os);
+    this.stylesheetManager.linkStylesheet(createStyleSheet(this.buildAttachmentFontStyle(keyboardFontDescriptor)));
+
+    // Future note:  might be worth propagating to any child documents (embedded iframes) via
+    // our child instances of this class. (via `this.embeddedPageContexts`)
+  }
+
   shutdown() {
     // Embedded pages first - that way, each page can handle its own inputs, rather than having
     // the top-level instance handle all attached elements.
@@ -1053,6 +1176,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
       this.enablementObserver?.disconnect();
       this.attachmentObserver?.disconnect();
       this.inputModeObserver?.disconnect();
+      this.stylesheetManager?.unlinkAll();
 
       for(let input of this.inputList) {
         try {

@@ -306,6 +306,10 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     if(this.currentKeyboardSrcTarget() == target) {
       this._activeKeyboard = kbd;
+
+      // Also, update with appropriate styling.
+      const activeStub = kbd?.metadata;
+      this.page.setAttachmentFont(activeStub?.KFont, this.engineConfig.paths.fonts, this.engineConfig.hostDevice.OS);
     }
   }
 
@@ -393,7 +397,8 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       // otherwise, maintain what's correct for the currently active one.
       if(originalKeyboardTarget == this.currentKeyboardSrcTarget()) {
         _SetTargDir(this.currentTarget?.getElement(), this.keyboardCache.getKeyboard(keyboardId));
-        // util.addStyleSheet(domManager.setAttachmentFontStyle(kbdStub.KF));
+        this.page.setAttachmentFont(this.activeKeyboard?.metadata?.KFont, this.engineConfig.paths.fonts, this.engineConfig.hostDevice.OS);
+
         this.restoreLastActiveTarget();
       }
 

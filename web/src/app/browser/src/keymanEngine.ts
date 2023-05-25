@@ -75,10 +75,19 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     let deviceDetector = new DeviceDetector();
     let device = deviceDetector.detect();
 
-    this.config.hostDevice = device;
-
     const totalOptions = {...BrowserInitOptionDefaults, ...options};
-    await super.init(totalOptions);
+
+    // // Possible condition we can add:  no change of init options after a  ***
+    // // prior finalized init.
+
+    // // if an initialization has already completed.
+    // if(!this.config.deferForInitialization.hasFinalized) {
+
+    this.config.hostDevice = device;
+    // Set any incoming options, overriding previous entries.
+    this.config.initialize(totalOptions);
+
+    // }                                                                     ***
 
     this._initialized = 1;
 
@@ -95,7 +104,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // There may be some valid mutations possible even on repeated calls?
     // The original seems to allow it.
 
-    this.config.initialize(totalOptions);  // will init alertHost, which requires document.body
+    await super.init(totalOptions);
 
     this.contextManager.initialize();  // will seek to attach to the page, which requires document.body
     const oskConfig: FloatingOSKViewConfiguration = {
