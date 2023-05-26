@@ -11,8 +11,6 @@
 #include "../../../../common/windows/cpp/include/ConvertUTF.h"
 #include "../../../../common/windows/cpp/include/keymanversion.h"
 
-#define SetError(err)       { if(AddCompileError(err) || (err & CERR_FATAL)) return FALSE; }
-
 bool CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk);
 bool CompileKeyboard(const char* pszInfile,
   void* pfkBuffer, bool ASaveDebug, bool ACompilerWarningsAsErrors,
@@ -182,8 +180,10 @@ bool CompileKeyboard(const char* pszInfile,
 
   kmcmp::CompileTarget = Target;
 
-  if (!pMsgproc || !pszInfile || !pfkBuffer) SetError(CERR_BadCallParams);
-
+  if (!pMsgproc || !pszInfile || !pfkBuffer) {
+    AddCompileError(CERR_BadCallParams);
+    return FALSE;
+  }
 
   PKMX_STR p;
 
@@ -203,14 +203,16 @@ bool CompileKeyboard(const char* pszInfile,
   fp_in = Open_File(pszInfile, "rb");
 
   if (fp_in == NULL) {
-    SetError(CERR_InfileNotExist);
+    AddCompileError(CERR_InfileNotExist);
+    return FALSE;
   }
 
   // Transfer the file to a memory stream for processing UTF-8 or ANSI to UTF-16?
   // What about really large files?  Transfer to a temp file...
   if (!fread(str, 1, 3, fp_in)) {
     fclose(fp_in);
-    SetError(CERR_CannotReadInfile);
+    AddCompileError(CERR_CannotReadInfile);
+    return FALSE;
   }
 
   fseek(fp_in, 0, SEEK_SET);
@@ -221,7 +223,8 @@ bool CompileKeyboard(const char* pszInfile,
   else
     fp_in = UTF16TempFromUTF8(fp_in, FALSE);
   if (fp_in == NULL) {
-    SetError(CERR_CannotCreateTempfile);
+    AddCompileError(CERR_CannotCreateTempfile);
+    return FALSE;
   }
 
   kmcmp::CodeConstants = new kmcmp::NamedCodeConstants;
@@ -241,7 +244,8 @@ EXTERN bool kmcmp_CompileKeyboardFileToBuffer(char* pszInfile, void* pfkBuffer, 
   kmcmp_CompilerMessageProc pMsgproc, void* AmsgprocContext, int Target)   // I4865   // I4866
 {
   if (!pMsgproc || !pszInfile || !pfkBuffer) {
-    SetError(CERR_BadCallParams);
+    AddCompileError(CERR_BadCallParams);
+    return FALSE;
   }
 
   return CompileKeyboard(pszInfile, pfkBuffer, TRUE, ACompilerWarningsAsErrors, AWarnDeprecatedCode,
@@ -253,7 +257,8 @@ EXTERN bool kmcmp_CompileKeyboardFile(char* pszInfile,
   bool AWarnDeprecatedCode, kmcmp_CompilerMessageProc pMsgproc, void* AmsgprocContext)   // I4865   // I4866
 {
   if (!pMsgproc || !pszInfile || !pszOutfile) {
-    SetError(CERR_BadCallParams);
+    AddCompileError(CERR_BadCallParams);
+    return FALSE;
   }
 
   FILE_KEYBOARD fk;
@@ -265,7 +270,8 @@ EXTERN bool kmcmp_CompileKeyboardFile(char* pszInfile,
 
   FILE* fp_out = Open_File(pszOutfile, "wb");
   if (fp_out == NULL) {
-    SetError(CERR_CannotCreateOutfile);
+    AddCompileError(CERR_CannotCreateOutfile);
+    return FALSE;
   }
 
   KMX_DWORD msg;
@@ -299,12 +305,14 @@ bool CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
   kmcmp::FMnemonicLayout = FALSE;
 
   if (!fk) {
-    SetError(CERR_SomewhereIGotItWrong);
+    AddCompileError(CERR_SomewhereIGotItWrong);
+    return FALSE;
   }
 
   str = new KMX_WCHAR[LINESIZE];
   if (!str) {
-    SetError(CERR_CannotAllocateMemory);
+    AddCompileError(CERR_CannotAllocateMemory);
+    return FALSE;
   }
 
   fk->KeyboardID = 0;
@@ -355,15 +363,24 @@ bool CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
     {
       case T_VERSION:
         *(p + 4) = 0;
-        if ((msg = AddStore(fk, TSS_VERSION, p)) != CERR_None) SetError(msg);
+        if ((msg = AddStore(fk, TSS_VERSION, p)) != CERR_None) {
+          AddCompileError(msg);
+          return FALSE;
+        }
         break;
 
       case T_GROUP:
-        if ((msg = ProcessGroupLine(fk, p)) != CERR_None) SetError(msg);
+        if ((msg = ProcessGroupLine(fk, p)) != CERR_None) {
+          AddCompileError(msg);
+          return FALSE;
+        }
         break;
 
       case T_STORE:
-        if ((msg = ProcessStoreLine(fk, p)) != CERR_None) SetError(msg);
+        if ((msg = ProcessStoreLine(fk, p)) != CERR_None) {
+          AddCompileError(msg);
+          return FALSE;
+        }
         break;
 
       default:
@@ -372,7 +389,8 @@ bool CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
   }
 
   if (msg != CERR_EndOfFile) {
-    SetError(msg);
+    AddCompileError(msg);
+    return FALSE;
   }
 
   fseek( fp_in,2,SEEK_SET);
@@ -387,12 +405,14 @@ bool CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
   {
     msg = ParseLine(fk, str);
     if (msg != CERR_None) {
-      SetError(msg);
+      AddCompileError(msg);
+      return FALSE;
     }
   }
 
   if (msg != CERR_EndOfFile) {
-    SetError(msg);
+    AddCompileError(msg);
+    return FALSE;
   }
 
   ProcessGroupFinish(fk);
@@ -401,15 +421,18 @@ bool CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
 
   /* Add the compiler version as a system store */
   if ((msg = kmcmp::AddCompilerVersionStore(fk)) != CERR_None) {
-    SetError(msg);
+    AddCompileError(msg);
+    return FALSE;
   }
 
   if ((msg = BuildVKDictionary(fk)) != CERR_None) {
-    SetError(msg);  // I3438
+    AddCompileError(msg);
+    return FALSE;
   }
 
   if ((msg = CheckFilenameConsistencyForCalls(fk)) != CERR_None) {
-    SetError(msg);
+    AddCompileError(msg);
+    return FALSE;
   }
 
   delete str;
