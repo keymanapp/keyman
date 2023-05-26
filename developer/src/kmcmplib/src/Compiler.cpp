@@ -784,7 +784,7 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   return CheckForDuplicateStore(fk, sp);
 }
 
-KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, KMX_WCHAR const * str, KMX_DWORD *dwStoreID)
+KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, const KMX_WCHAR * str, KMX_DWORD *dwStoreID)
 {
   PFILE_STORE sp;
   sp = new FILE_STORE[fk->cxStoreArray + 1];
@@ -1023,6 +1023,9 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   case TSS_VISUALKEYBOARD:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
     {
+      // Store extra metadata for callers as we mutate this store during
+      // compilation
+      fk->extra->kvksFilename = sp->dpString;
       // Strip path from the store, leaving bare filename only
       p = sp->dpString;
 

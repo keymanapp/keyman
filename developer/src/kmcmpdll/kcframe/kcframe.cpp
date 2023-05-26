@@ -24,6 +24,8 @@
 
 #include <compfile.h>
 
+extern "C" BOOL CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL FSaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc);   // I4865   // I4866
+
 int WINAPI msgproc(int line, DWORD dwMsgCode, LPSTR szText)
 {
 	printf("line %d  error %x  %s\n", line, (unsigned int) dwMsgCode, szText);

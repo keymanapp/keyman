@@ -14,6 +14,10 @@
 #define SetError(err)       { if(AddCompileError(err) || (err & CERR_FATAL)) return FALSE; }
 
 bool CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk);
+bool CompileKeyboard(const char* pszInfile,
+  void* pfkBuffer, bool ASaveDebug, bool ACompilerWarningsAsErrors,
+	bool AWarnDeprecatedCode, kmcmp_CompilerMessageProc pMsgproc, const void* AmsgprocContext,
+  int Target);
 
 EXTERN bool kmcmp_SetCompilerOptions(KMCMP_COMPILER_OPTIONS* options) {
   //printf("°°-> changed to SetCompilerOptions() of kmcmplib \n");
@@ -44,6 +48,7 @@ int wasm_CompilerMessageProc(int line, uint32_t dwMsgCode, char* szText, void* c
   return wasm_msgproc(line, dwMsgCode, szText, msgProc);
 }
 
+//DEPRECATED
 EXTERN bool kmcmp_Wasm_SetCompilerOptions(int ShouldAddCompilerVersion) {
   KMCMP_COMPILER_OPTIONS options;
   options.dwSize = sizeof(KMCMP_COMPILER_OPTIONS);
@@ -51,6 +56,7 @@ EXTERN bool kmcmp_Wasm_SetCompilerOptions(int ShouldAddCompilerVersion) {
   return kmcmp_SetCompilerOptions(&options);
 }
 
+//DEPRECATED
 EXTERN bool kmcmp_Wasm_CompileKeyboardFile(char* pszInfile,
   char* pszOutfile, int ASaveDebug, int ACompilerWarningsAsErrors,
 	int AWarnDeprecatedCode, char* msgProc
@@ -74,11 +80,97 @@ EXTERN int kmcmp_Wasm_ParseUnicodeSet(char* pat,
   );
 }
 
+
+struct COMPILER_INTERFACE {
+  bool saveDebug;
+  bool compilerWarningsAsErrors;
+  bool warnDeprecatedCode;
+  bool shouldAddCompilerVersion;
+  int target;                     // CKF_KEYMAN, CKF_KEYMANWEB
+  std::string messageCallback;    // int line, uint32_t dwMsgCode, char* szText
+  std::string loadFileCallback;   // char* infile, char* filenameRelativeToInfile --> buffer
+};
+
+struct COMPILER_RESULT {
+  bool result;
+  // Following are pointer offsets in heap + buffer size
+  int kmx;
+  int kmxSize;
+  // Following are compiler side-channel data, required for
+  // follow-on transform
+  std::string kvksFilename;
+  // TODO: additional data to be passed back
+};
+
+COMPILER_RESULT kmcmp_compile(std::string pszInfile, const COMPILER_INTERFACE intf) {
+  COMPILER_RESULT r = {false};
+
+  FILE_KEYBOARD fk;
+
+  // TODO: this should be included in CompileKeyboard?
+  kmcmp::FShouldAddCompilerVersion = intf.shouldAddCompilerVersion;
+
+  r.result = CompileKeyboard(
+    pszInfile.c_str(),
+    &fk,
+    intf.saveDebug,
+    intf.compilerWarningsAsErrors,
+    intf.warnDeprecatedCode,
+    wasm_CompilerMessageProc,
+    intf.messageCallback.c_str(),
+    intf.target);
+
+  if(!r.result) {
+    return r;
+  }
+
+  KMX_DWORD msg;
+  KMX_BYTE* data = nullptr;
+  size_t dataSize = 0;
+  msg = WriteCompiledKeyboard(&fk, &data, dataSize);
+  //TODO: FreeKeyboardPointers(fk);
+
+  if(msg != CERR_None) {
+    AddCompileError(msg);
+    r.result = FALSE;
+    return r;
+  }
+
+  r.kmx = (int) data;
+  r.kmxSize = (int) dataSize;
+  r.kvksFilename = string_from_u16string(fk.extra->kvksFilename); // convert to UTF8
+
+  return r;
+}
+
+EMSCRIPTEN_BINDINGS(compiler_interface) {
+  emscripten::class_<COMPILER_INTERFACE>("CompilerInterface")
+    .constructor<>()
+    .property("saveDebug", &COMPILER_INTERFACE::saveDebug)
+    .property("compilerWarningsAsErrors", &COMPILER_INTERFACE::compilerWarningsAsErrors)
+    .property("warnDeprecatedCode", &COMPILER_INTERFACE::warnDeprecatedCode)
+    .property("shouldAddCompilerVersion", &COMPILER_INTERFACE::shouldAddCompilerVersion)
+    .property("target", &COMPILER_INTERFACE::target)
+    .property("messageCallback", &COMPILER_INTERFACE::messageCallback)
+    .property("loadFileCallback", &COMPILER_INTERFACE::loadFileCallback)
+    ;
+
+  emscripten::class_<COMPILER_RESULT>("CompilerResult")
+    .constructor<>()
+    .property("result", &COMPILER_RESULT::result)
+    .property("kmx", &COMPILER_RESULT::kmx)
+    .property("kmxSize", &COMPILER_RESULT::kmxSize)
+    .property("kvksFilename", &COMPILER_RESULT::kvksFilename)
+    ;
+
+  emscripten::function("kmcmp_compile", &kmcmp_compile);
+}
+
 #endif
 
-bool CompileKeyboard(char* pszInfile,
+bool CompileKeyboard(const char* pszInfile,
   void* pfkBuffer, bool ASaveDebug, bool ACompilerWarningsAsErrors,
-	bool AWarnDeprecatedCode, kmcmp_CompilerMessageProc pMsgproc, void* AmsgprocContext,
+	bool AWarnDeprecatedCode, kmcmp_CompilerMessageProc pMsgproc, const void* AmsgprocContext,
   int Target) {
 
   FILE* fp_in = NULL;
@@ -95,7 +187,7 @@ bool CompileKeyboard(char* pszInfile,
 
   PKMX_STR p;
 
-  if ((p = strrchr_slash(pszInfile)) != nullptr)
+  if ((p = strrchr_slash((char*)pszInfile)) != nullptr)
   {
     strncpy(kmcmp::CompileDir, pszInfile, (int)(p - pszInfile + 1));  // I3481
     kmcmp::CompileDir[(int)(p - pszInfile + 1)] = 0;
@@ -104,7 +196,7 @@ bool CompileKeyboard(char* pszInfile,
     kmcmp::CompileDir[0] = 0;
 
   msgproc = pMsgproc;
-  msgprocContext = AmsgprocContext;
+  msgprocContext = (void*)AmsgprocContext;
   kmcmp::currentLine = 0;
   kmcmp::nErrors = 0;
 
@@ -231,7 +323,8 @@ bool CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
   fk->dpDeadKeyArray = NULL;
   fk->cxVKDictionary = 0;  // I3438
   fk->dpVKDictionary = NULL;  // I3438
-
+  fk->extra = new FILE_KEYBOARD_EXTRA;
+  fk->extra->kvksFilename = u"";
 /*	fk->szMessage[0] = 0;
   fk->szLanguageName[0] = 0;*/
   fk->dwBitmapSize = 0;
@@ -251,12 +344,8 @@ bool CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
   }
 
   /* Add a system store for the Keyman edition number */
-  u16sprintf(str, LINESIZE, L"%d", 0);  // I3481
-  AddStore(fk, TSS_CUSTOMKEYMANEDITION, str);
-
-  PKMX_WCHAR tbuf = strtowstr((KMX_CHAR*) "Keyman");
-  AddStore(fk, TSS_CUSTOMKEYMANEDITIONNAME, tbuf);
-  delete tbuf;
+  AddStore(fk, TSS_CUSTOMKEYMANEDITION, u"0");
+  AddStore(fk, TSS_CUSTOMKEYMANEDITIONNAME, u"Keyman");
 
   // must preprocess for group and store names -> this isn't really necessary, but never mind!
   while ((msg = ReadLine(fp_in, str, TRUE)) == CERR_None)

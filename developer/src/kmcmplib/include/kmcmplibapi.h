@@ -4,6 +4,8 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
+#include <emscripten/bind.h>
+
 #else
 #define EMSCRIPTEN_KEEPALIVE
 #endif

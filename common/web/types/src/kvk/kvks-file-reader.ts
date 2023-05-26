@@ -35,8 +35,15 @@ export default class KVKSFileReader {
 
     parser.parseString(file, (e: unknown, r: unknown) => { source = r as KVKSourceFile });
     source = this.boxArrays(source);
+    this.cleanupFlags(source);
     this.cleanupUnderscore('visualkeyboard', source.visualkeyboard);
     return source;
+  }
+
+  private cleanupFlags(source: any) {
+    if(source.visualkeyboard?.header?.flags === '') {
+      source.visualkeyboard.header.flags = {};
+    }
   }
 
   /**
