@@ -25,6 +25,7 @@ from keyman_config.keyboard_details import KeyboardDetailsView
 from keyman_config.kmpmetadata import get_fonts, parsemetadata
 from keyman_config.list_installed_kmp import get_installed_kmp
 from keyman_config.options import OptionsView
+from keyman_config.sentry_handling import SentryErrorHandling
 from keyman_config.uninstall_kmp import uninstall_kmp
 from keyman_config.welcome import WelcomeView
 
@@ -104,94 +105,7 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
     def __init__(self):
         ViewInstalledWindowBase.__init__(self)
 
-# window is split left/right hbox
-# right is ButtonBox
-#     possibly 2 ButtonBox in a vbox
-#         top one with _Remove, _About, ?_Welcome? or ?Read_Me?, _Options
-#         bottom one with _Download, _Install, Re_fresh, _Close
-# left is GtkTreeView - does it need to be inside anything else apart from the hbox?
-#     with liststore which defines columns
-#         GdkPixbuf icon
-#         gchararray name
-#         gchararray version
-#         gchararray packageID (hidden)
-#         enum? area (user, shared, system) (icon or hidden?)
-#         gchararray welcomefile (hidden) (or just use area and packageID?)
-# changing selected item in treeview changes what buttons are activated
-# on selected_item_changed signal set the data that the buttons will use in their callbacks
-# see https://developer.gnome.org/gtk3/stable/TreeWidget.html#TreeWidget
-
-        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        s = Gtk.ScrolledWindow()
-        hbox.pack_start(s, True, True, 0)
-
-        self.store = Gtk.ListStore(
-            GdkPixbuf.Pixbuf,  # icon
-            str,    # name
-            str,    # version
-            str,    # packageID
-            int,    # enum InstallLocation (KmpArea is GObject version)
-            str,    # path to welcome file if it exists or None
-            str)    # path to options file if it exists or None
-
-        # add installed keyboards to the the store e.g.
-        # treeiter = store.append([GdkPixbuf.Pixbuf.new_from_file_at_size(
-        #     "/usr/local/share/keyman/libtralo/libtralo.ico.png", 16, 16), \
-        #     "LIBTRALO", "1.6.1", \
-        #     "libtralo", KmpArea.SHARED, True])
-
-        self.refresh_installed_kmp()
-
-        self.tree = Gtk.TreeView(self.store)
-
-        renderer = Gtk.CellRendererPixbuf()
-        # i18n: column header in table displaying installed keyboards
-        column = Gtk.TreeViewColumn(_("Icon"), renderer, pixbuf=0)
-        self.tree.append_column(column)
-        renderer = Gtk.CellRendererText()
-        # i18n: column header in table displaying installed keyboards
-        column = Gtk.TreeViewColumn(_("Name"), renderer, text=1)
-        self.tree.append_column(column)
-        # i18n: column header in table displaying installed keyboards
-        column = Gtk.TreeViewColumn(_("Version"), renderer, text=2)
-        self.tree.append_column(column)
-
-        select = self.tree.get_selection()
-        select.connect("changed", self.on_tree_selection_changed)
-
-        s.add(self.tree)
-
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
-
-        bbox_top = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.VERTICAL)
-        bbox_top.set_layout(Gtk.ButtonBoxStyle.START)
-
-        self.uninstall_button = Gtk.Button.new_with_mnemonic(_("_Uninstall"))
-        self.uninstall_button.set_tooltip_text(_("Uninstall keyboard"))
-        self.uninstall_button.connect("clicked", self.on_uninstall_clicked)
-        self.uninstall_button.set_sensitive(False)
-        bbox_top.add(self.uninstall_button)
-
-        self.about_button = Gtk.Button.new_with_mnemonic(_("_About"))
-        self.about_button.set_tooltip_text(_("About keyboard"))
-        self.about_button.connect("clicked", self.on_about_clicked)
-        self.about_button.set_sensitive(False)
-        bbox_top.add(self.about_button)
-
-        self.help_button = Gtk.Button.new_with_mnemonic(_("_Help"))
-        self.help_button.set_tooltip_text(_("Help for keyboard"))
-        self.help_button.connect("clicked", self.on_help_clicked)
-        self.help_button.set_sensitive(False)
-        bbox_top.add(self.help_button)
-
-        self.options_button = Gtk.Button.new_with_mnemonic(_("_Options"))
-        self.options_button.set_tooltip_text(_("Settings for keyboard"))
-        self.options_button.connect("clicked", self.on_options_clicked)
-        self.options_button.set_sensitive(False)
-        bbox_top.add(self.options_button)
-
-        vbox.pack_start(bbox_top, False, False, 12)
-        hbox.pack_start(vbox, False, False, 12)
+        self.sentry = SentryErrorHandling()
 
         outerHbox = Gtk.HBox()
         sidebar = Gtk.StackSidebar()
@@ -204,8 +118,8 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         stack.set_vexpand(True)
         sidebar.set_stack(stack)
 
-        stack.add_titled(hbox, "KeyboardLayouts", _("Keyboard Layouts"))
-        stack.add_titled(Gtk.Label("TODO - Options"), "Options", _("Options"))
+        stack.add_titled(self.add_keyboard_layouts_widget(), "KeyboardLayouts", _("Keyboard Layouts"))
+        stack.add_titled(self.add_options_widget(), "Options", _("Options"))
 
         outmostVBox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         outmostVBox.pack_start(outerHbox, True, True, 0)
@@ -239,6 +153,101 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         bbox_hbox.pack_start(bbox_bottom, True, True, 12)
         outmostVBox.pack_end(bbox_hbox, False, True, 12)
         self.add(outmostVBox)
+
+    def add_keyboard_layouts_widget(self):
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        hbox.pack_start(scrolledWindow, True, True, 0)
+
+        self.store = Gtk.ListStore(
+            GdkPixbuf.Pixbuf,  # icon
+            str,    # name
+            str,    # version
+            str,    # packageID
+            int,    # enum InstallLocation (KmpArea is GObject version)
+            str,    # path to welcome file if it exists or None
+            str)    # path to options file if it exists or None
+
+        self.refresh_installed_kmp()
+
+        self.tree = Gtk.TreeView(self.store)
+
+        renderer = Gtk.CellRendererPixbuf()
+        # i18n: column header in table displaying installed keyboards
+        column = Gtk.TreeViewColumn(_("Icon"), renderer, pixbuf=0)
+        self.tree.append_column(column)
+        renderer = Gtk.CellRendererText()
+        # i18n: column header in table displaying installed keyboards
+        column = Gtk.TreeViewColumn(_("Name"), renderer, text=1)
+        self.tree.append_column(column)
+        # i18n: column header in table displaying installed keyboards
+        column = Gtk.TreeViewColumn(_("Version"), renderer, text=2)
+        self.tree.append_column(column)
+
+        select = self.tree.get_selection()
+        select.connect("changed", self.on_tree_selection_changed)
+
+        scrolledWindow.add(self.tree)
+
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+
+        bbox_top = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.VERTICAL)
+        bbox_top.set_layout(Gtk.ButtonBoxStyle.START)
+
+        self.uninstall_button = Gtk.Button.new_with_mnemonic(_("_Uninstall"))
+        self.uninstall_button.set_tooltip_text(_("Uninstall keyboard"))
+        self.uninstall_button.connect("clicked", self.on_uninstall_clicked)
+        self.uninstall_button.set_sensitive(False)
+        bbox_top.add(self.uninstall_button)
+
+        self.about_button = Gtk.Button.new_with_mnemonic(_("_About"))
+        self.about_button.set_tooltip_text(_("About keyboard"))
+        self.about_button.connect("clicked", self.on_about_clicked)
+        self.about_button.set_sensitive(False)
+        bbox_top.add(self.about_button)
+
+        self.help_button = Gtk.Button.new_with_mnemonic(_("_Help"))
+        self.help_button.set_tooltip_text(_("Help for keyboard"))
+        self.help_button.connect("clicked", self.on_help_clicked)
+        self.help_button.set_sensitive(False)
+        bbox_top.add(self.help_button)
+
+        self.options_button = Gtk.Button.new_with_mnemonic(_("_Options"))
+        self.options_button.set_tooltip_text(_("Settings for keyboard"))
+        self.options_button.connect("clicked", self.on_options_clicked)
+        self.options_button.set_sensitive(False)
+        bbox_top.add(self.options_button)
+
+        vbox.pack_start(bbox_top, False, False, 12)
+        hbox.pack_start(vbox, False, False, 12)
+
+        return hbox
+
+    def add_options_widget(self):
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        label = Gtk.Label(_("General"))
+        label.set_padding(5, 5)
+        label.set_halign(Gtk.Align.START)
+        vbox.pack_start(label, False, False, 10)
+
+        (enabled, reason) = self.sentry.is_sentry_enabled()
+        disabledByVariable = self.sentry.is_sentry_disabled_by_variable()
+
+        self.errorReportingButton = Gtk.CheckButton(_("Automatically report errors to keyman.com"))
+        self.errorReportingButton.set_active(enabled)
+        self.errorReportingButton.set_sensitive(not disabledByVariable)
+        self.sentry.bind_checkbutton(self.errorReportingButton)
+        vbox.pack_start(self.errorReportingButton, False, False, 0)
+
+        if disabledByVariable:
+            label = Gtk.Label(reason)
+            label.set_halign(Gtk.Align.START)
+            label.set_padding(25, 0)
+            label.set_sensitive(False)
+            vbox.pack_start(label, False, False, 0)
+
+        return vbox
 
     def addlistitems(self, installed_kmp, store, install_area):
         for kmp in sorted(installed_kmp):
