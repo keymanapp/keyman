@@ -27,9 +27,9 @@ yes | ~/Library/Android/sdk/tools/bin/sdkmanager --licenses
 
 ### Crash Reporting
 
-Keyman for Android uses [Sentry](https://sentry.io) for crash reporting at a server
-<https://sentry.keyman.com>. The analytics for Debug are associated with an
-App Bundle ID `com.tavultesoft.kmapro.debug`.
+Keyman for Android uses [Sentry](https://sentry.io) for crash reporting. The 
+analytics for Debug are associated with an App Bundle ID 
+`com.tavultesoft.kmapro.debug`.
 
 ### Compiling From Command Line
 
