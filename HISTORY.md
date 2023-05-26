@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.113 alpha 2023-05-26
+
+* docs(android): Update documentation for building Android on Linux (#8860)
+* fix(android): Fix typo in build-utils.sh (#8859)
+* refactor(developer): compiler interface part 1 for wasm (#8850)
+* chore(developer): remove SetError macro (#8856)
+
 ## 17.0.112 alpha 2023-05-25
 
 * refactor(developer): move file write out of WriteCompiledKeyboard and CompileKeyboard merge (#8796)
