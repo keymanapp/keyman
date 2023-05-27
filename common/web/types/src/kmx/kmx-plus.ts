@@ -171,7 +171,7 @@ export class Vars extends Section {
  * Common base for variable sections
  * See Variable
  */
-class VarsItem extends Section {
+export class VarsItem extends Section {
   id: StrsItem;
   value: StrsItem;
 
@@ -189,7 +189,6 @@ class VarsItem extends Section {
 export class UnicodeSetItem extends VarsItem {
   constructor(id: string, value: string, sections: GlobalSections, usetparser: UnicodeSetParser) {
     super(id, value, sections);
-    // TODO-LDML: parse subvariables
     // TODO-LDML: buffer size
     this.unicodeSet = usetparser.parseUnicodeSet(value, 100);
     // _unicodeSet may be null, indicating this is invalid.
@@ -202,9 +201,9 @@ export class UnicodeSetItem extends VarsItem {
 };
 
 export class SetVarItem extends VarsItem {
-  constructor(id: string, value: string, sections: GlobalSections) {
-    super(id, value, sections);
-    this.items = sections.elem.allocElementString(sections.strs, value.trim().split(/\s+/)); // TODO-LDML
+  constructor(id: string, value: string[], sections: GlobalSections) {
+    super(id, value.join(' '), sections);
+    this.items = sections.elem.allocElementString(sections.strs, value);
   }
   items: ElementString;
   valid() : boolean {

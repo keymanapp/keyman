@@ -151,9 +151,9 @@ export interface Variable {
   value?: string;
 };
 
-interface LKString extends Variable {};
-interface LKSet extends Variable {};
-interface LKUnicodeSet extends Variable {};
+export interface LKString extends Variable {};
+export interface LKSet extends Variable {};
+export interface LKUnicodeSet extends Variable {};
 
 export interface LKTransforms {
   type?: "simple" | "backspace";

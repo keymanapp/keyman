@@ -104,4 +104,13 @@ export class VariableParser {
   public static allCaptureSetReferences(str: string): string[] {
     return matchArray(str, this.CAPTURE_SET_REFERENCE);
   }
+
+  /**
+   * Split an input string into a proper set
+   * @param str input string
+   * @returns
+   */
+  public static setSplitter(str: string): string[] {
+    return str.trim().split(/\s+/);
+  }
 }

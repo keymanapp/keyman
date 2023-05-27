@@ -115,5 +115,16 @@ export class CompilerMessages {
   m(this.ERROR_EmptyTransformGroup, `transformGroup must have either reorder or transform elements`);
   static ERROR_EmptyTransformGroup = SevError | 0x001B;
 
+  static Error_MissingStringVariable = (o:{id: string}) =>
+  m(this.ERROR_MissingStringVariable, `Reference to undefined string variable: \${${o.id}}`);
+  static ERROR_MissingStringVariable = SevError | 0x001C;
+
+  static Error_MissingSetVariable = (o:{id: string}) =>
+  m(this.ERROR_MissingSetVariable, `Reference to undefined set variable: \$[${o.id}]`);
+  static ERROR_MissingSetVariable = SevError | 0x001D;
+
+  static Error_NeedSpacesBetweenSetVariables = (o:{item: string}) =>
+  m(this.ERROR_NeedSpacesBetweenSetVariables, `Need spaces between set variables: ${o.item}`);
+  static ERROR_NeedSpacesBetweenSetVariables = SevError | 0x001E;
 }
 

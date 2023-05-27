@@ -42,6 +42,34 @@ describe('vars', function () {
       },
     },
     {
+      subpath: 'sections/vars/maximal.xml',
+      callback(sect) {
+        const vars = <Vars> sect;
+        assert.equal(2, vars.strings?.length);
+        // assert.equal(1, vars.sets?.length);
+        // assert.equal(1, vars.unicodeSets?.length);
+        // const set0 = vars.sets[0];
+        // assert.equal(set0.id.value, "upper");
+        // assert.equal(set0.value.value, "A B C D E FF");
+        // assert.sameDeepMembers(
+        //   Array.from(set0.items.values()).map(e => e.value.value),
+        //   ["A", "B", "C", "D", "E", "FF"]);
+        const string1 = vars.strings[1];
+        assert.equal(string1.id.value, "yes");
+        assert.equal(string1.value.value, "Yes!");
+        // const unicodeSet0 = vars.unicodeSets[0];
+        // assert.equal(unicodeSet0.id.value, "consonants");
+        // assert.equal(unicodeSet0.value.value, "[कसतनमह]");
+        // assert.sameDeepMembers(unicodeSet0.unicodeSet.ranges, [
+        //   ['क'.codePointAt(0),'क'.codePointAt(0)], // range of 1
+        //   ['त'.codePointAt(0),'त'.codePointAt(0)], // range of 1
+        //   ['न'.codePointAt(0),'न'.codePointAt(0)], // range of 1
+        //   ['म'.codePointAt(0),'म'.codePointAt(0)], // range of 1
+        //   ['स'.codePointAt(0),'ह'.codePointAt(0)], // range of 2
+        // ]);
+      },
+    },
+    {
       subpath: 'sections/vars/dup0.xml',
       errors: [
         CompilerMessages.Error_DuplicateVariable({ids: 'y'})
@@ -73,6 +101,36 @@ describe('vars', function () {
     },
     {
       subpath: 'sections/vars/fail-uset-syntax.xml',
+      errors: [
+        KmnCompilerMessages.Error_UnicodeSetSyntaxError()
+      ],
+    },
+    {
+      subpath: 'sections/vars/fail-badref-0.xml',
+      errors: [
+        CompilerMessages.Error_MissingStringVariable({id: "yes"}),
+      ],
+    },
+    {
+      subpath: 'sections/vars/fail-badref-1.xml',
+      errors: [
+        CompilerMessages.Error_MissingSetVariable({id: "lower"}),
+      ],
+    },
+    {
+      subpath: 'sections/vars/fail-badref-2.xml',
+      errors: [
+        KmnCompilerMessages.Error_UnicodeSetSyntaxError()
+      ],
+    },
+    {
+      subpath: 'sections/vars/fail-badref-3.xml',
+      errors: [
+        KmnCompilerMessages.Error_UnicodeSetSyntaxError()
+      ],
+    },
+    {
+      subpath: 'sections/vars/fail-badref-4.xml',
       errors: [
         KmnCompilerMessages.Error_UnicodeSetSyntaxError()
       ],
