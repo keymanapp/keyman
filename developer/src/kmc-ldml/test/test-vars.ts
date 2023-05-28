@@ -9,6 +9,15 @@ import { KMXPlus /*, CommonTypesMessages*/ } from '@keymanapp/common-types';
 
 import Vars = KMXPlus.Vars;
 
+/**
+ * Shorthand for code point
+ * @param ch 1-character string
+ * @returns number for the codepoint
+ */
+function cp(ch : string) : number {
+  return ch.codePointAt(0);
+}
+
 describe('vars', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
@@ -23,7 +32,7 @@ describe('vars', function () {
         const set0 = vars.sets[0];
         assert.equal(set0.id.value, "upper");
         assert.equal(set0.value.value, "A B C D E FF");
-        assert.sameDeepMembers(
+        assert.sameDeepOrderedMembers(
           Array.from(set0.items.values()).map(e => e.value.value),
           ["A", "B", "C", "D", "E", "FF"]);
         const string0 = vars.strings[0];
@@ -32,41 +41,68 @@ describe('vars', function () {
         const unicodeSet0 = vars.unicodeSets[0];
         assert.equal(unicodeSet0.id.value, "consonants");
         assert.equal(unicodeSet0.value.value, "[कसतनमह]");
-        assert.sameDeepMembers(unicodeSet0.unicodeSet.ranges, [
-          ['क'.codePointAt(0),'क'.codePointAt(0)], // range of 1
-          ['त'.codePointAt(0),'त'.codePointAt(0)], // range of 1
-          ['न'.codePointAt(0),'न'.codePointAt(0)], // range of 1
-          ['म'.codePointAt(0),'म'.codePointAt(0)], // range of 1
-          ['स'.codePointAt(0),'ह'.codePointAt(0)], // range of 2
+        assert.sameDeepOrderedMembers(unicodeSet0.unicodeSet.ranges, [
+          [cp('क'), cp('क')], // range of 1
+          [cp('त'), cp('त')], // range of 1
+          [cp('न'), cp('न')], // range of 1
+          [cp('म'), cp('म')], // range of 1
+          [cp('स'), cp('ह')], // range of 2
         ]);
       },
     },
     {
       subpath: 'sections/vars/maximal.xml',
       callback(sect) {
+        // strings
         const vars = <Vars> sect;
         assert.equal(2, vars.strings?.length);
-        // assert.equal(1, vars.sets?.length);
-        // assert.equal(1, vars.unicodeSets?.length);
-        // const set0 = vars.sets[0];
-        // assert.equal(set0.id.value, "upper");
-        // assert.equal(set0.value.value, "A B C D E FF");
-        // assert.sameDeepMembers(
-        //   Array.from(set0.items.values()).map(e => e.value.value),
-        //   ["A", "B", "C", "D", "E", "FF"]);
         const string1 = vars.strings[1];
         assert.equal(string1.id.value, "yes");
         assert.equal(string1.value.value, "Yes!");
-        // const unicodeSet0 = vars.unicodeSets[0];
-        // assert.equal(unicodeSet0.id.value, "consonants");
-        // assert.equal(unicodeSet0.value.value, "[कसतनमह]");
-        // assert.sameDeepMembers(unicodeSet0.unicodeSet.ranges, [
-        //   ['क'.codePointAt(0),'क'.codePointAt(0)], // range of 1
-        //   ['त'.codePointAt(0),'त'.codePointAt(0)], // range of 1
-        //   ['न'.codePointAt(0),'न'.codePointAt(0)], // range of 1
-        //   ['म'.codePointAt(0),'म'.codePointAt(0)], // range of 1
-        //   ['स'.codePointAt(0),'ह'.codePointAt(0)], // range of 2
-        // ]);
+
+        // sets
+        assert.equal(3, vars.sets?.length);
+        assert.sameDeepOrderedMembers(
+          Array.from(vars.sets[0].items.values()).map(e => e.value.value),
+          [
+            "A", "B", "C", "D", "E", "FF", "Yes"
+          ]);
+
+        assert.sameDeepOrderedMembers(
+          Array.from(vars.sets[1].items.values()).map(e => e.value.value),
+          [
+            "a", "b", "c"
+          ]);
+
+        assert.sameDeepOrderedMembers(
+          Array.from(vars.sets[2].items.values()).map(e => e.value.value),
+          [
+            "A", "B", "C", "D", "E", "FF", "Yes", "a", "b", "c", "Z",
+          ]);
+
+        assert.equal(2, vars.unicodeSets?.length);
+        const unicodeSet0 = vars.unicodeSets[0];
+        assert.equal(unicodeSet0.id.value, "consonants");
+        assert.equal(unicodeSet0.value.value, "[कसतनमह]");
+        assert.sameDeepOrderedMembers(unicodeSet0.unicodeSet.ranges, [
+          [cp('क'), cp('क')], // range of 1
+          [cp('त'), cp('त')], // range of 1
+          [cp('न'), cp('न')], // range of 1
+          [cp('म'), cp('म')], // range of 1
+          [cp('स'), cp('ह')], // range of 2
+        ]);
+
+        const unicodeSet1 = vars.unicodeSets[1];
+        assert.equal(unicodeSet1.id.value, "mixture");
+        assert.equal(unicodeSet1.value.value, "[[abc][कसतनमह]]"); // not canonicalized, just the raw expansion
+        assert.sameDeepOrderedMembers(unicodeSet1.unicodeSet.ranges, [
+          [cp('a'), cp('c')], // range of 3
+          [cp('क'), cp('क')], // range of 1
+          [cp('त'), cp('त')], // range of 1
+          [cp('न'), cp('न')], // range of 1
+          [cp('म'), cp('म')], // range of 1
+          [cp('स'), cp('ह')], // range of 2
+        ]);
       },
     },
     {

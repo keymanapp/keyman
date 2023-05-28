@@ -171,12 +171,37 @@ export class VarsCompiler extends SectionCompiler {
     let { value } = e;
     // first substitute strings
     value = this.substituteStrings(result, value, sections);
-    result.sets.push(new SetVarItem(id, VariableParser.setSplitter(value), sections));
+    // OK to do this as a substitute, because we've already validated the set above.
+    value = this.substituteSets(result, value, sections);
+    const items : string[] = VariableParser.setSplitter(value);
+    result.sets.push(new SetVarItem(id, items, sections));
+  }
+  substituteSets(vars: KMXPlus.Vars, str: string, sections: KMXPlus.GlobalSections): string {
+    return str.replaceAll(VariableParser.SET_REFERENCE, (_entire : string, id: string) => {
+      const val = this.findVariable(vars.sets, id);
+      if (val === null) {
+        // Should have been caught during validation.
+        throw Error(`Internal Error: reference to missing set variable ${id}`);
+      }
+      return val.value.value;
+    });
   }
   addUnicodeSet(result: Vars, e: LDMLKeyboard.LKUnicodeSet, sections: GlobalSections): void {
     const { id } = e;
     let { value } = e;
+    value = this.substituteStrings(result, value, sections);
+    value = this.substituteUnicodeSets(result, value, sections);
     result.unicodeSets.push(new UnicodeSetItem(id, value, sections, this.usetparser));
+  }
+  substituteUnicodeSets(vars: KMXPlus.Vars, value: string, sections: KMXPlus.GlobalSections): string {
+    return value.replaceAll(VariableParser.SET_REFERENCE, (_entire, id) => {
+      const v = this.findVariable(vars.unicodeSets, id);
+      if (v === null) {
+        // Should have been caught during validation.
+        throw Error(`Internal Error: reference to missing UnicodeSet variable ${id}`);
+      }
+      return v.value.value; // string value
+    });
   }
   substituteStrings(vars: Vars, str: string, sections: GlobalSections): string {
     return str.replaceAll(VariableParser.STRING_REFERENCE, (_entire, id) => {
@@ -197,6 +222,7 @@ export class VarsCompiler extends SectionCompiler {
     if (v.length === 0){
       return null;
     } else if (v.length !== 1) {
+      // Should have been caught during validation
       throw Error(`Internal Error: Duplicate variable id ${id} crept into a variable list.`);
     } else {
       return v[0];
