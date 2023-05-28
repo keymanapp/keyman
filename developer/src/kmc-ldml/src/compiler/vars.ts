@@ -42,11 +42,23 @@ export class VarsCompiler extends SectionCompiler {
 
     const allStrings = new Set();
     const allSets = new Set();
+    const allUnicodeSets = new Set();
 
-    // not worrying about dups, will deal with that later
+    /**
+     * add an ID to check for duplicates
+     * @param id id
+     */
+    function addId(id : string) : void {
+      if (allIds.has(id)) {
+        dups.add(id);
+      } else {
+        allIds.add(id);
+      }
+    }
 
     // Strings
     for (const {id, value} of variables.string) {
+      addId(id);
       allStrings.add(id);
       const stringrefs = VariableParser.allStringReferences(value);
       for (const id2 of stringrefs) {
@@ -58,8 +70,9 @@ export class VarsCompiler extends SectionCompiler {
     }
     // Sets
     for (const {id, value} of variables.set) {
+      addId(id);
       allSets.add(id);
-      // For strings, we only care about illegal references, here.
+      // check for illegal references, here.
       const stringrefs = VariableParser.allStringReferences(value);
       for (const id2 of stringrefs) {
         if (!allStrings.has(id2)) {
@@ -74,33 +87,44 @@ export class VarsCompiler extends SectionCompiler {
         const setrefs = VariableParser.allSetReferences(item);
         if (setrefs.length > 1) {
           // this is the form $[seta]$[setb]
+          valid = false;
           this.callbacks.reportMessage(CompilerMessages.Error_NeedSpacesBetweenSetVariables({item}));
-        }
-        for (const id2 of setrefs) {
-          if (!allSets.has(id2)) {
-            valid = false;
-            this.callbacks.reportMessage(CompilerMessages.Error_MissingSetVariable({id: id2}));
+        } else {
+          for (const id2 of setrefs) {
+            if (!allSets.has(id2)) {
+              valid = false;
+              this.callbacks.reportMessage(CompilerMessages.Error_MissingSetVariable({id: id2}));
+            }
           }
         }
         // TODO-LDML: Are there other illegal cases here? what about "x$[set]"?
       }
     }
     // UnicodeSets
-
-    // Now check for dups
-    const allVars = [
-      variables?.string,
-      variables?.set,
-      variables?.unicodeSet];
-    for (const vars of allVars) {
-      for (const {id} of vars) {
-        if (allIds.has(id)) {
-          dups.add(id);
-        } else {
-          allIds.add(id);
+    for (const {id, value} of variables.unicodeSet) {
+      addId(id);
+      allUnicodeSets.add(id);
+      const stringrefs = VariableParser.allStringReferences(value);
+      for (const id2 of stringrefs) {
+        if (!allStrings.has(id2)) {
+          valid = false;
+          this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({id: id2}));
+        }
+      }
+      const setrefs = VariableParser.allSetReferences(value);
+      for (const id2 of setrefs) {
+        if (!allUnicodeSets.has(id2)) {
+          valid = false;
+          if (allSets.has(id2)) {
+            // $[set] in a UnicodeSet must be another UnicodeSet.
+            this.callbacks.reportMessage(CompilerMessages.Error_CantReferenceSetFromUnicodeSet({id: id2}));
+          } else {
+            this.callbacks.reportMessage(CompilerMessages.Error_MissingUnicodeSetVariable({id: id2}));
+          }
         }
       }
     }
+
     // one report if any dups
     if (dups.size > 0) {
       this.callbacks.reportMessage(CompilerMessages.Error_DuplicateVariable({

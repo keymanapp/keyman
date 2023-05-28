@@ -120,19 +120,25 @@ describe('vars', function () {
     {
       subpath: 'sections/vars/fail-badref-2.xml',
       errors: [
-        KmnCompilerMessages.Error_UnicodeSetSyntaxError()
+        CompilerMessages.Error_MissingStringVariable({ id: 'doesnotexist' })
       ],
     },
     {
       subpath: 'sections/vars/fail-badref-3.xml',
       errors: [
-        KmnCompilerMessages.Error_UnicodeSetSyntaxError()
+        CompilerMessages.Error_MissingUnicodeSetVariable({id: 'doesnotexist'})
       ],
     },
     {
       subpath: 'sections/vars/fail-badref-4.xml',
       errors: [
-        KmnCompilerMessages.Error_UnicodeSetSyntaxError()
+        CompilerMessages.Error_NeedSpacesBetweenSetVariables({item: '$[vowels]$[consonants]'})
+      ],
+    },
+    {
+      subpath: 'sections/vars/fail-badref-5.xml',
+      errors: [
+        CompilerMessages.Error_CantReferenceSetFromUnicodeSet({id: 'nonUnicodeSet'})
       ],
     },
   ]);

@@ -123,8 +123,16 @@ export class CompilerMessages {
   m(this.ERROR_MissingSetVariable, `Reference to undefined set variable: \$[${o.id}]`);
   static ERROR_MissingSetVariable = SevError | 0x001D;
 
+  static Error_MissingUnicodeSetVariable = (o:{id: string}) =>
+  m(this.ERROR_MissingUnicodeSetVariable, `Reference to undefined UnicodeSet variable: \$[${o.id}]`);
+  static ERROR_MissingUnicodeSetVariable = SevError | 0x001D;
+
   static Error_NeedSpacesBetweenSetVariables = (o:{item: string}) =>
   m(this.ERROR_NeedSpacesBetweenSetVariables, `Need spaces between set variables: ${o.item}`);
   static ERROR_NeedSpacesBetweenSetVariables = SevError | 0x001E;
+
+  static Error_CantReferenceSetFromUnicodeSet = (o:{id: string}) =>
+  m(this.ERROR_CantReferenceSetFromUnicodeSet, `Illegal use of set variable from within UnicodeSet: \$[${o.id}]`);
+  static ERROR_CantReferenceSetFromUnicodeSet = SevError | 0x001F;
 }
 
