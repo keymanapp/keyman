@@ -37,9 +37,9 @@ if(MINIFY) {
     keepNames: true,
     outfile: `build/lib/worker-main.polyfilled.min.js`
   });
-
-  sourcemapJSON = convertSourcemap.fromJSON(fs.readFileSync(`build/lib/worker-main.polyfilled${MINIFY ? '.min' : ''}.js.map`)).toObject();
 }
+
+sourcemapJSON = convertSourcemap.fromJSON(fs.readFileSync(`build/lib/worker-main.polyfilled${MINIFY ? '.min' : ''}.js.map`)).toObject();
 
 const workerConcatenation = {
   script: fs.readFileSync(`build/lib/worker-main.polyfilled${MINIFY ? '.min' : ''}.js`),

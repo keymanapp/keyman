@@ -283,7 +283,12 @@ describe("KeyboardRequisitioner", () => {
       mockedRequester.request = swapFake;
       const promise = keyboardRequisitioner.addLanguageKeyboards(['Khmer', 'Dzongkha']);
 
-      await promise;
+      try {
+        await promise;
+      } catch (e) {
+        // We didn't mock the actual query based on the language codes, but just knowing
+        // that a query was made, with the right parameters, is enough for us here.
+      }
 
       assert.equal(swapFake.callCount, 2);
 

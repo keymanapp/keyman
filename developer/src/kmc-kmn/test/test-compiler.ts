@@ -2,7 +2,7 @@ import 'mocha';
 import sinon from 'sinon';
 import chai, { assert } from 'chai';
 import sinonChai from 'sinon-chai';
-import { Compiler } from '../src/main.js';
+import { KmnCompiler } from '../src/main.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
@@ -15,6 +15,7 @@ chai.use(sinonChai);
 describe('Compiler class', function() {
   let consoleLog: any;
 
+  // TODO: do we need this?
   beforeEach(function() {
     consoleLog = sinon.spy(console, 'log');
   });
@@ -23,21 +24,36 @@ describe('Compiler class', function() {
     consoleLog.restore();
   });
 
+  it('should throw on failure', async function() {
+    const compiler = new KmnCompiler();
+    const callbacks : any = null; // ERROR
+    try {
+      await compiler.init(callbacks)
+      assert.fail('Expected exception');
+    } catch(e) {
+      assert.ok(e);
+    }
+    assert.throws(() => compiler.verifyInitialized());
+  });
+
   it('should start', async function() {
-    const compiler = new Compiler();
-    assert(await compiler.init());
+    const compiler = new KmnCompiler();
+    const callbacks = new TestCompilerCallbacks();
+    assert(await compiler.init(callbacks));
+    assert(compiler.verifyInitialized());
   });
 
   it('should compile a basic keyboard', async function() {
-    const compiler = new Compiler();
+    const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
-    assert(await compiler.init());
+    assert(await compiler.init(callbacks));
+    assert(compiler.verifyInitialized());
 
     const fixtureName = baselineDir + 'k_000___null_keyboard.kmx';
     const infile = baselineDir + 'k_000___null_keyboard.kmn';
     const outfile = __dirname + '/k_000___null_keyboard.kmx';
 
-    assert(compiler.run(infile, outfile, callbacks, {saveDebug: true, shouldAddCompilerVersion: false}));
+    assert(compiler.run(infile, outfile, {saveDebug: true, shouldAddCompilerVersion: false}));
 
     assert(fs.existsSync(outfile));
     const outfileData = fs.readFileSync(outfile);
@@ -49,9 +65,10 @@ describe('Compiler class', function() {
   // Note, above test case is essentially a subset of this one, but will leave both because
   // the basic keyboard test is slightly simpler to read
   it('should build all baseline fixtures', async function() {
-    const compiler = new Compiler();
+    const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
-    assert(await compiler.init());
+    assert(await compiler.init(callbacks));
+    assert(compiler.verifyInitialized());
 
     const files = fs.readdirSync(baselineDir);
     for(let file of files) {
@@ -60,7 +77,7 @@ describe('Compiler class', function() {
         const infile = baselineDir + file.replace(/x$/, 'n');
         const outfile = __dirname + '/' + file;
 
-        assert(compiler.run(infile, outfile, callbacks, {saveDebug: true, shouldAddCompilerVersion: false}));
+        assert(compiler.run(infile, outfile, {saveDebug: true, shouldAddCompilerVersion: false}));
 
         assert(fs.existsSync(outfile));
         const outfileData = fs.readFileSync(outfile);
@@ -69,6 +86,5 @@ describe('Compiler class', function() {
         assert.deepEqual(outfileData, fixtureData);
       }
     }
-
   });
 });
