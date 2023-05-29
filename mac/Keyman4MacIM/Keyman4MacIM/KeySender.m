@@ -90,16 +90,15 @@ const CGKeyCode kProcessBuffer = 0xFF;
 }
 
 - (void)sendBackspaceforSourceEvent:(NSEvent *)event {
-  NSLog(@"***SGS sendBackspace");
-  [self sendKeyDown:kProcessBuffer forSourceEvent:event includeKeyUp:NO];
-  //[self sendKeyDown:kVK_Delete forSourceEvent:event includeKeyUp:YES];
+  NSLog(@"***SGS sendBackspaceforSourceEvent");
+  [self sendKeyDown:kVK_Delete forSourceEvent:event includeKeyUp:YES];
 }
 
-- (void)sendProcessBufferEvent:(NSEvent *)event {
-  NSLog(@"***SGS sendEmptyBufferEvent");
+- (void)sendProcessQueuedTextEvent:(NSEvent *)event {
+  NSLog(@"***SGS sendProcessQueuedTextEvent");
   // this is not a real keycode, so we do not need a key up event
   // kProcessBuffer is used to indicate that all the backspaces have been processed
-  // and we can now proceed to inserting the buffered, transformed text to the client
+  // and we can insert the queuedText to the client
   [self sendKeyDown:kProcessBuffer forSourceEvent:event includeKeyUp:NO];
 }
 @end

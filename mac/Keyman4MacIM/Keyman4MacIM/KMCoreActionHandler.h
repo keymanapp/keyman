@@ -15,11 +15,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KMActionOperation : NSObject
 -(instancetype)initForSimpleAction:(CoreAction*)action;
--(instancetype)initForCompositeAction:(NSString*)textToInsert backspaceCount:(int)backspaces useEvents:(BOOL)useEvents;
+-(instancetype)initForCompositeAction:(NSString*)textToInsert backspaceCount:(int)backspaces;
+-(BOOL)hasTextToInsert;
+-(BOOL)hasBackspaces;
 @property (readonly) CoreAction *action;
 @property (readonly) NSString *textToInsert;
 @property (readonly) int backspaceCount;
-@property (readonly) BOOL useEvents;
 @property (readonly) BOOL isForSimpleAction;
 @property (readonly) BOOL isForCompositeAction;
 @end
@@ -29,9 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSArray *operations;
 @property (readonly) NSString *textToInsert;
 @property (readonly) int backspaceCount;
-@property (readonly) BOOL useEvents;
 
--(instancetype)initForActions:(NSArray*)actions handledEvent:(BOOL)handledEvent backspaceCount:(int) backspaces textToInsert:(NSString*) text useEvents:(BOOL)useEvents;
+-(instancetype)initForActions:(NSArray*)actions handledEvent:(BOOL)handledEvent backspaceCount:(int) backspaces textToInsert:(NSString*) text;
 @end
 
 @interface KMCoreActionHandler : NSObject

@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (void)sendKeyDown:(NSUInteger)keyCode forSourceEvent:(NSEvent *)event includeKeyUp:(BOOL)includeKeyUpEvent;
 - (void)sendBackspaceforSourceEvent:(NSEvent *)event;
-- (void)sendProcessBufferEvent:(NSEvent *)event;
+- (void)sendProcessQueuedTextEvent:(NSEvent *)event;
 
 @end
 

@@ -49,7 +49,6 @@ typedef enum {BackspacesOnly,
     _client = client;
     _context = context;
     _backspaceCount = 0;
-    _useEvents = NO;
     _emitKeystroke = NO;
   }
   return self;
@@ -176,7 +175,7 @@ typedef enum {BackspacesOnly,
  */
 -(KMActionHandlerResult*)buildResultForCharactersOnly {
   NSLog(@"***SGS buildResultForCharactersOnly");
-  return [[KMActionHandlerResult alloc] initForActions:self.actions handledEvent:YES backspaceCount:0 textToInsert:[self collectOutputText] useEvents:self.useEvents];
+  return [[KMActionHandlerResult alloc] initForActions:self.actions handledEvent:YES backspaceCount:0 textToInsert:[self collectOutputText]];
 }
 
 /**
@@ -184,7 +183,7 @@ typedef enum {BackspacesOnly,
  */
 -(KMActionHandlerResult*)buildResultForSinglePassThroughBackspaceNoText {
   NSLog(@"***SGS buildResultForSinglePassThroughBackspaceNoText");
-  return [[KMActionHandlerResult alloc] initForActions:self.actions handledEvent:NO backspaceCount:0 textToInsert:@"" useEvents:self.useEvents];
+  return [[KMActionHandlerResult alloc] initForActions:self.actions handledEvent:NO backspaceCount:0 textToInsert:@""];
 }
 
 /**
@@ -192,7 +191,7 @@ typedef enum {BackspacesOnly,
  */
 -(KMActionHandlerResult*)buildResultForMultipleBackspacesNoText {
   NSLog(@"***SGS buildResultForMultipleBackspacesNoText");
-  return [[KMActionHandlerResult alloc] initForActions:self.actions handledEvent:YES backspaceCount:self.backspaceCount textToInsert:@"" useEvents:self.useEvents];
+  return [[KMActionHandlerResult alloc] initForActions:self.actions handledEvent:YES backspaceCount:self.backspaceCount textToInsert:@""];
 }
 
 /**
@@ -201,7 +200,7 @@ typedef enum {BackspacesOnly,
 -(KMActionHandlerResult*)buildResultForBackspacesBeforeText {
   // TODO: make backspaces events if replacement does not work with insertText
   NSLog(@"***SGS buildResultForBackspacesBeforeText");
-  return [[KMActionHandlerResult alloc] initForActions:self.actions handledEvent:YES backspaceCount:self.backspaceCount textToInsert:[self collectOutputText] useEvents:self.useEvents];
+  return [[KMActionHandlerResult alloc] initForActions:self.actions handledEvent:YES backspaceCount:self.backspaceCount textToInsert:[self collectOutputText]];
 }
 
 /**
@@ -210,7 +209,7 @@ typedef enum {BackspacesOnly,
 -(KMActionHandlerResult*)buildResultForNoCharactersOrBackspaces {
   NSLog(@"***SGS buildResultForNoCharactersOrBackspaces");
   
-  return [[KMActionHandlerResult alloc] initForActions:self.actions handledEvent:NO backspaceCount:0 textToInsert:@"" useEvents:self.useEvents];
+  return [[KMActionHandlerResult alloc] initForActions:self.actions handledEvent:NO backspaceCount:0 textToInsert:@""];
 }
 
 
@@ -334,13 +333,12 @@ typedef enum {BackspacesOnly,
  */
 
 @implementation KMActionHandlerResult
--(instancetype)initForActions:(NSArray*)actions handledEvent:(BOOL)handledEvent backspaceCount:(int)backspaces textToInsert:(NSString*)text useEvents:(BOOL)useEvents {
+-(instancetype)initForActions:(NSArray*)actions handledEvent:(BOOL)handledEvent backspaceCount:(int)backspaces textToInsert:(NSString*)text {
   self = [super init];
   if (self) {
     _handledEvent = handledEvent;
     _backspaceCount = backspaces;
     _textToInsert = text;
-    _useEvents = useEvents;
     _operations = [self populateOperationListForActions:actions];
   }
   return self;
@@ -360,7 +358,7 @@ typedef enum {BackspacesOnly,
          */
         if(self.handledEvent) {
           if(!addedCompositeOperation) {
-            KMActionOperation *operation = [[KMActionOperation alloc] initForCompositeAction:self.textToInsert backspaceCount:self.backspaceCount useEvents:NO];
+            KMActionOperation *operation = [[KMActionOperation alloc] initForCompositeAction:self.textToInsert backspaceCount:self.backspaceCount];
             [operationsList addObject:operation];
             addedCompositeOperation = YES;
           }
@@ -406,20 +404,18 @@ typedef enum {BackspacesOnly,
     _action = action;
     _textToInsert = @"";
     _backspaceCount = 0;
-    _useEvents = NO;
     _isForSimpleAction = YES;
     _isForCompositeAction = NO;
   }
   return self;
 }
 
--(instancetype)initForCompositeAction:(NSString*)textToInsert backspaceCount:(int)backspaces useEvents:(BOOL)useEvents {
+-(instancetype)initForCompositeAction:(NSString*)textToInsert backspaceCount:(int)backspaces {
   self = [super init];
   if (self) {
     _action = nil;
     _textToInsert = textToInsert;
     _backspaceCount = backspaces;
-    _useEvents = useEvents;
     _isForSimpleAction = NO;
     _isForCompositeAction = YES;
   }
@@ -428,7 +424,15 @@ typedef enum {BackspacesOnly,
 
 -(NSString *)description
 {
-  return [[NSString alloc] initWithFormat: @"%@ %@ textToInsert: %@ backspaces: %d useEvents: %@", self.isForSimpleAction?@"simpleAction":@"compositeAction", self.action, self.textToInsert, self.backspaceCount, self.useEvents?@"YES":@"NO"];
+  return [[NSString alloc] initWithFormat: @"%@ %@ textToInsert: %@ backspaces: %d", self.isForSimpleAction?@"simpleAction":@"compositeAction", self.action, self.textToInsert, self.backspaceCount];
+}
+
+-(BOOL)hasTextToInsert {
+  return (self.textToInsert.length > 0);
+}
+
+-(BOOL)hasBackspaces {
+  return (self.backspaceCount > 0);
 }
 
 @end
