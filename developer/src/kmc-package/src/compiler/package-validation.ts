@@ -1,5 +1,6 @@
 import { KmpJsonFile, CompilerCallbacks } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
+import { keymanEngineForWindowsFiles, keymanForWindowsInstallerFiles, keymanForWindowsRedistFiles } from './redist-files.js';
 
 // const SLexicalModelExtension = '.model.js';
 
@@ -41,16 +42,38 @@ export class PackageValidation {
     return true;
   }
 
-  private checkForDuplicatedLanguages(resourceType: 'keyboard'|'model', id: string, languages: KmpJsonFile.KmpJsonFileLanguage[]) {
-    let tags: {[index:string]: boolean} = {};
+  private checkForDuplicatedOrNonMinimalLanguages(resourceType: 'keyboard'|'model', id: string, languages: KmpJsonFile.KmpJsonFileLanguage[]): boolean {
+    let minimalTags: {[tag: string]: string} = {};
+
+    if(languages.length == 0) {
+      this.callbacks.reportMessage(CompilerMessages.Error_MustHaveAtLeastOneLanguage({resourceType, id}));
+      return false;
+    }
+
     for(let lang of languages) {
-      const langTag = lang.id.toLowerCase();
-      if(tags[langTag]) {
-        this.callbacks.reportMessage(CompilerMessages.Warn_PackageShouldNotRepeatLanguages({resourceType:resourceType, id:id, tag:lang.id}));
-      } else {
-        tags[langTag] = true;
+      let locale;
+      try {
+        locale = new Intl.Locale(lang.id);
+      } catch(e: any) {
+        this.callbacks.reportMessage(CompilerMessages.Error_LanguageTagIsNotValid({resourceType, id, lang: lang.id, e}));
+        return false;
+      }
+
+      const minimalTag = locale.minimize().toString();
+
+      if(minimalTag.toLowerCase() !== lang.id.toLowerCase()) {
+        this.callbacks.reportMessage(CompilerMessages.Warn_LanguageTagIsNotMinimal({resourceType, id, actual: lang.id, expected: minimalTag}));
+      }
+
+      if(minimalTags[minimalTag]) {
+        this.callbacks.reportMessage(CompilerMessages.Warn_PackageShouldNotRepeatLanguages({resourceType, id, minimalTag, firstTag: lang.id, secondTag: minimalTags[minimalTag]}));
+      }
+      else {
+        minimalTags[minimalTag] = lang.id;
       }
     }
+
+    return true;
   }
 
   private checkForModelsAndKeyboardsInSamePackage(kmpJson: KmpJsonFile.KmpJsonFile): boolean {
@@ -58,6 +81,16 @@ export class PackageValidation {
       this.callbacks.reportMessage(CompilerMessages.Error_PackageCannotContainBothModelsAndKeyboards());
       return false;
     }
+
+    if(!kmpJson.lexicalModels?.length && !kmpJson.keyboards?.length) {
+      // Note: we require at least 1 keyboard or model in the package. This may
+      // change in the future if we start to use packages to distribute, e.g.
+      // localizations or themes.
+      this.callbacks.reportMessage(CompilerMessages.Error_PackageMustContainAModelOrAKeyboard());
+      return false;
+    }
+
+
 
     return true;
   }
@@ -74,7 +107,9 @@ export class PackageValidation {
     }
 
     for(let model of kmpJson.lexicalModels) {
-      this.checkForDuplicatedLanguages('model', model.id, model.languages);
+      if(!this.checkForDuplicatedOrNonMinimalLanguages('model', model.id, model.languages)) {
+        return false;
+      }
     }
 
     return true;
@@ -92,7 +127,9 @@ export class PackageValidation {
     }
 
     for(let keyboard of kmpJson.keyboards) {
-      this.checkForDuplicatedLanguages('keyboard', keyboard.id, keyboard.languages);
+      if(!this.checkForDuplicatedOrNonMinimalLanguages('keyboard', keyboard.id, keyboard.languages)) {
+        return false;
+      }
     }
 
     return true;
@@ -116,6 +153,23 @@ export class PackageValidation {
       this.callbacks.reportMessage(CompilerMessages.Warn_FileInPackageDoesNotFollowFilenameConventions({filename}));
     }
 
+    if(!this.checkIfContentFileIsDangerous(file)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private checkIfContentFileIsDangerous(file: KmpJsonFile.KmpJsonFileContentFile): boolean {
+    let filename = this.callbacks.path.basename(file.name).toLowerCase();
+    if(keymanForWindowsInstallerFiles.includes(filename) ||
+        keymanForWindowsRedistFiles.includes(filename) ||
+        keymanEngineForWindowsFiles.includes(filename)) {
+      this.callbacks.reportMessage(CompilerMessages.Warn_RedistFileShouldNotBeInPackage({filename}));
+    }
+    if(filename.match(/\.doc(x?)$/)) {
+      this.callbacks.reportMessage(CompilerMessages.Warn_DocFileDangerous({filename}));
+    }
     return true;
   }
 

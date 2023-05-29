@@ -109,12 +109,12 @@ if builder_has_action build:app/browser; then
   builder_warn "Modularization work is not yet complete; consumers may find needed API or components to be missing"
 fi
 
-if builder_has_action build:app/ui; then
-  builder_die "Modularization work is not yet complete; builds dependent on this will fail."
-fi
-
 if builder_start_action test; then
   ./test.sh :engine
 
   builder_finish_action success test
+fi
+
+if builder_has_action build:app/ui; then
+  builder_die "Modularization work is not yet complete; builds dependent on this will fail."
 fi

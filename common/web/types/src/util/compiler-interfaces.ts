@@ -33,6 +33,18 @@ export function compilerErrorSeverityName(code: number): string {
 }
 
 /**
+ * Format the error code number
+ * example: "FATAL:0x03004"
+ */
+export function compilerErrorFormatCode(code: number): string {
+  const severity = code & CompilerErrorSeverity.Severity_Mask;
+  const severityName = compilerErrorSeverityName(severity);
+  const errorCode = code & CompilerErrorSeverity.Error_Mask;
+  const errorCodeString = Number(errorCode).toString(16).padStart(5,'0');
+  return `${severityName}:0x${errorCodeString}`;
+}
+
+/**
  * Defines the error code ranges for various compilers. Once defined, these
  * ranges must not be changed as external modules may depend on specific error
  * codes. Individual errors are defined at a compiler level, for example,
@@ -137,3 +149,10 @@ export interface CompilerCallbacks {
  * @returns
  */
 export const CompilerMessageSpec = (code: number, message: string) : CompilerEvent => { return { code, message } };
+
+/**
+ * @param e Error-like
+ */
+export function compilerExceptionToString(e?: any) : string {
+  return `${(e ?? 'unknown error').toString()}\n\nCall stack:\n${(e instanceof Error ? e.stack : (new Error()).stack)}`;
+}
