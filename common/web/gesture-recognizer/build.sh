@@ -26,7 +26,7 @@ builder_describe_outputs \
   configure:module /node_modules \
   configure:tools  /node_modules \
   build:module     build/obj/index.js \
-  build:tools      build/tools/unit-test-resources.js
+  build:tools      build/tools/index.js
 
 builder_parse "$@"
 
