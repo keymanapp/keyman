@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
+set -eu
 
-TOP_SRCDIR=${top_srcdir:-$(realpath "$(dirname "$0")/..")}
-TESTDIR=${XDG_DATA_HOME:-$HOME/.local/share}/keyman/test_kmx
+TOP_SRCDIR=${top_srcdir:-$(realpath "$(dirname "$0")/../..")}
+TESTBASEDIR=${XDG_DATA_HOME:-$HOME/.local/share}/keyman
+TESTDIR=${TESTBASEDIR}/test_kmx
+PID_FILE=/tmp/ibus-keyman-test-pids
 
 . "$(dirname "$0")"/test-helper.sh
 
@@ -56,7 +59,7 @@ function run_tests() {
 
   echo > "$PID_FILE"
   TEMP_DATA_DIR=$(mktemp --directory)
-  echo "rm -rf ${TEMP_DATA_DIR}" >> "$PID_FILE"
+  echo "rm -rf ${TEMP_DATA_DIR} || true" >> "$PID_FILE"
 
   COMMON_ARCH_DIR=
   [ -d "${TOP_SRCDIR}"/../../core/build/arch ] && COMMON_ARCH_DIR=${TOP_SRCDIR}/../../core/build/arch
@@ -70,19 +73,9 @@ function run_tests() {
     exit 2
   fi
 
-  # TODO: we are borrowing the KMX tests out of core; these should be shared in common
-  # to avoid deep links like this in future
-  KMX_TEST_DIR="${TOP_SRCDIR}"/../../core/tests/unit/kmx
+  link_test_keyboards "${TOP_SRCDIR}/../../common/test/keyboards/baseline" "$TESTDIR" "$TESTBASEDIR"
 
-  if [ ! -d "$TESTDIR" ] || ! [[ $(find "${TESTDIR}/" -name \*.kmx 2>/dev/null | wc -l) -gt 0 ]]; then
-    if [[ $(find "${KMX_TEST_DIR}/" -name \*.kmx 2>/dev/null | wc -l) -gt 0 ]]; then
-      mkdir -p "$(realpath --canonicalize-missing "$TESTDIR"/..)"
-      ln -sf "$(realpath "${KMX_TEST_DIR}")" "$TESTDIR"
-    else
-      echo "Can't find kmx files in ${KMX_TEST_DIR}"
-      exit 3
-    fi
-  fi
+  generate_kmpjson "$TESTDIR"
 
   echo "# NOTE: When the tests fail check /tmp/ibus-engine-keyman.log and /tmp/ibus-daemon.log!"
   echo ""
@@ -97,23 +90,23 @@ function run_tests() {
     TMPFILE=$(mktemp)
     # mutter-Message: 18:56:15.422: Using Wayland display name 'wayland-1'
     mutter --wayland --headless --no-x11 --virtual-monitor 1024x768 &> "$TMPFILE" &
-    echo "kill -9 $!" >> "$PID_FILE"
+    echo "kill -9 $! || true" >> "$PID_FILE"
     sleep 1s
     export WAYLAND_DISPLAY
-    WAYLAND_DISPLAY=$(cat "$TMPFILE" | grep "Using Wayland display" | cut -d"'" -f2)
+    WAYLAND_DISPLAY=$(grep "Using Wayland display" "$TMPFILE" | cut -d"'" -f2)
     rm "$TMPFILE"
   else
     echo "# Starting Xvfb..."
     Xvfb -screen 0 1024x768x24 :33 &> /dev/null &
-    echo "kill -9 $!" >> "$PID_FILE"
+    echo "kill -9 $! || true" >> "$PID_FILE"
     sleep 1
     echo "# Starting Xephyr..."
     DISPLAY=:33 Xephyr :32 -screen 1024x768 &> /dev/null &
-    echo "kill -9 $!" >> "$PID_FILE"
+    echo "kill -9 $! || true" >> "$PID_FILE"
     sleep 1
     echo "# Starting metacity"
     metacity --display=:32 &> /dev/null &
-    echo "kill -9 $!" >> "$PID_FILE"
+    echo "kill -9 $! || true" >> "$PID_FILE"
 
     export DISPLAY=:32
   fi
@@ -127,6 +120,7 @@ function run_tests() {
   glib-compile-schemas "$SCHEMA_DIR"
 
   if [ $# -gt 0 ]; then
+    #shellcheck disable=SC2206
     TESTFILES=($@)
   else
     pushd "$TESTDIR" > /dev/null || exit
@@ -134,7 +128,7 @@ function run_tests() {
     popd > /dev/null || exit
   fi
 
-  export LD_LIBRARY_PATH=${COMMON_ARCH_DIR}/src:$LD_LIBRARY_PATH
+  export LD_LIBRARY_PATH=${COMMON_ARCH_DIR}/src:${LD_LIBRARY_PATH-}
 
   # Ubuntu 18.04 Bionic doesn't have ibus-memconf, and glib is not compiled with the keyfile
   # backend enabled, so we just use the default backend. Otherwise we use the keyfile
@@ -144,19 +138,34 @@ function run_tests() {
     IBUS_CONFIG=--config=/usr/libexec/ibus-memconf
   fi
 
-  ibus-daemon "${ARG_VERBOSE-}" --panel=disable ${IBUS_CONFIG-} &> /tmp/ibus-daemon.log &
-  echo "kill -9 $!" >> "$PID_FILE"
+  #shellcheck disable=SC2086
+  ibus-daemon "${ARG_VERBOSE-}" --panel=disable --address=unix:abstract="${TEMP_DATA_DIR}"/test-ibus ${IBUS_CONFIG-} &> /tmp/ibus-daemon.log &
+  echo "kill -9 $! || true" >> "$PID_FILE"
   sleep 1s
 
-  ../src/ibus-engine-keyman "${ARG_VERBOSE-}" &> /tmp/ibus-engine-keyman.log &
-  echo "kill -9 $!" >> "$PID_FILE"
+  IBUS_ADDRESS=$(ibus address)
+  export IBUS_ADDRESS
+
+  if [ -d "../../build/$(arch)/debug" ]; then
+    CONFIG=debug
+  elif [ -d "../../build/$(arch)/release" ]; then
+    CONFIG=release
+  else
+    echo "Can't find neither ../../build/$(arch)/debug nor ../../build/$(arch)/release"
+    exit 9
+  fi
+
+  "../../build/$(arch)/${CONFIG}/src/ibus-engine-keyman" "${ARG_VERBOSE-}" &> /tmp/ibus-engine-keyman.log &
+  echo "kill -9 $! || true" >> "$PID_FILE"
   sleep 1s
 
   echo "# Starting tests..."
   # Note: -k and --tap are consumed by the GLib testing framework
-  "${G_TEST_BUILDDIR:-.}"/ibus-keyman-tests "${ARG_K-}" "${ARG_TAP-}" \
-    "${ARG_VERBOSE-}" "${ARG_DEBUG-}" "${ARG_SURROUNDING_TEXT-}" "${ARG_NO_SURROUNDING_TEXT-}" \
-    --directory "$TESTDIR" --"${DISPLAY_SERVER}" "${TESTFILES[@]}"
+  #shellcheck disable=SC2068 # we want to split array elements!
+  #shellcheck disable=SC2086
+  "${G_TEST_BUILDDIR:-../../build/$(arch)/${CONFIG}/tests}/ibus-keyman-tests" ${ARG_K-} ${ARG_TAP-} \
+    ${ARG_VERBOSE-} ${ARG_DEBUG-} ${ARG_SURROUNDING_TEXT-} ${ARG_NO_SURROUNDING_TEXT-} \
+    --directory "$TESTDIR" --"${DISPLAY_SERVER}" ${TESTFILES[@]}
   echo "# Finished tests."
 
   cleanup
@@ -197,13 +206,18 @@ if [ "$USE_WAYLAND" == "0" ] && [ "$USE_X11" == "0" ]; then
   exit 6
 fi
 
+G_TEST_BUILDDIR="${G_TEST_BUILDDIR:-../../build/$(arch)/debug/tests}"
+if [ ! -f "${G_TEST_BUILDDIR}/ibus-keyman-tests" ]; then
+  G_TEST_BUILDDIR="${G_TEST_BUILDDIR:-../../build/$(arch)/release/tests}"
+fi
+
 echo > "$PID_FILE"
 trap cleanup EXIT SIGINT
 
 if [ "$USE_WAYLAND" == "1" ]; then
-  run_tests wayland "$@"
+  ( run_tests wayland "$@" )
 fi
 
 if [ "$USE_X11" == "1" ]; then
-  run_tests x11 "$@"
+  ( run_tests x11 "$@" )
 fi

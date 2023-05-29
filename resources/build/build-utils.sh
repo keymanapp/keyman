@@ -29,6 +29,9 @@
 # Note: keep changes to version, tier and tag determination in sync with mkver (windows/src/buildutils/mkver)
 #
 
+# Exit on command failure and when using unset variables:
+set -eu
+
 #
 # Prevents 'clear' on exit of mingw64 bash shell
 #
@@ -285,6 +288,15 @@ replaceVersionStrings_Mkver() {
 
 set_keyman_standard_build_path() {
   PATH="$KEYMAN_ROOT/node_modules/.bin:$PATH"
+}
+
+# For CI compatbility of building Keyman for Android 16.0 with OpenJDK 8,
+# this overrides JAVA_HOME for the builder script to use OpenJDK 11.
+set_java_home() {
+  if [[ ! -z {$JAVA_HOME_11+x} ]]; then
+    builder_echo "Setting JAVA_HOME to JAVA_HOME_11 ($JAVA_HOME_11)"
+    export JAVA_HOME="${JAVA_HOME_11}"
+  fi
 }
 
 #

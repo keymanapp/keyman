@@ -273,6 +273,7 @@ _builder_expand_shorthand() {
   shift
   local count=0
   local result=
+  local string=
   for e; do
     if [[ $e == $item ]]; then
       # Exact match trumps substring matches
@@ -282,11 +283,10 @@ _builder_expand_shorthand() {
     if [[ $e == "$item"* ]]; then
       count=$((count+1))
       if [[ $count == 2 ]]; then
-        printf "$result"
-        printf ", $e"
+        string="$result, $e"
         result=$item
       elif [[ $count -gt 2 ]]; then
-        printf ", $e"
+        string="$string, $e"
       else
         result=$e
       fi
@@ -296,7 +296,7 @@ _builder_expand_shorthand() {
   if [[ $count -lt 2 ]]; then
     echo $result
   else
-    echo
+    echo $string
   fi
   return $count
 }
@@ -393,6 +393,8 @@ _builder_execute_child() {
   done
 
   "$script" $action \
+    --builder-child \
+    $_builder_build_deps \
     ${child_options[@]} \
     $builder_verbose \
     $builder_debug \
@@ -519,6 +521,49 @@ builder_has_action() {
     _builder_matched_action=
     return 1
   fi
+}
+
+#
+# Wraps builder_start_action and builder_finish action for single-command
+# actions. Can be used together with a local function for multi-command actions.
+# Do be aware that this pseudo-closure style cannot be mixed with operators such
+# as `<`, `>`, `&&`, `;`, `()` and so on.
+#
+# ### Usage
+#
+# ```bash
+#   builder_run_action action[:target] command [command-params...]
+# ```
+#
+# ### Parameters
+#
+# * 1: `action[:target]`   name of action, and optionally also target, if target
+#                          excluded starts for all defined targets
+# * 2: command             command to run if action is started
+# * 3...: command-params   parameters for command
+#
+# ### Example
+#
+# ```bash
+#   function do_build() {
+#     mkdir -p build/cjs-src
+#     npm run build
+#   }
+#
+#   builder_run_action clean        rm -rf ./build/ ./tsconfig.tsbuildinfo
+#   builder_run_action configure    verify_npm_setup
+#   builder_run_action build        do_build
+# ```
+#
+function builder_run_action() {
+  local action=$1
+  shift
+  echo "builder_run_action $action $@"
+  if builder_start_action $action; then
+    ($@)
+    builder_finish_action success $action
+  fi
+  return 0
 }
 
 #
@@ -1163,6 +1208,7 @@ _builder_parse_expanded_parameters() {
   _builder_chosen_action_targets=()
   _builder_chosen_options=()
   _builder_current_action=
+  _builder_is_child=1
 
   local n=0
 
@@ -1284,10 +1330,8 @@ _builder_parse_expanded_parameters() {
           shift
           builder_dep_parent="$1"
           ;;
-        --builder-deps-built)
-          # internal use parameter for dependency builds - path to dependency tracking file
-          shift
-          _builder_deps_built="$1"
+        --builder-child)
+          _builder_is_child=0
           ;;
         --builder-report-dependencies)
           # internal reporting function, ignores all other parameters
@@ -1327,18 +1371,27 @@ _builder_parse_expanded_parameters() {
     builder_echo setmark "dependency build, started by $builder_dep_parent"
     builder_echo grey "build.sh parameters: <${_params[@]}>"
     if [[ -z ${_builder_deps_built+x} ]]; then
-      builder_die "FATAL ERROR: Expected --builder-deps-built parameter"
+      builder_die "FATAL ERROR: Expected '_builder_deps_built' variable to be set"
+    fi
+  elif builder_is_child_build; then
+    builder_echo setmark "child build, parameters: <${_params[@]}>"
+    if [[ -z ${_builder_deps_built+x} ]]; then
+      builder_die "FATAL ERROR: Expected '_builder_deps_built' variable to be set"
     fi
   else
-    # This is a top-level invocation, not a dependency build, so we want to
-    # track which dependencies have been built, so they don't get built multiple
-    # times.
-    # TODO: consider printing expanded builder parameters instead of shorthand
+    # This is a top-level invocation, so we want to track which dependencies
+    # have been built, so they don't get built multiple times.
     builder_echo setmark "build.sh parameters: <${_params[@]}>"
     if [[ ${#builder_extra_params[@]} -gt 0 ]]; then
       builder_echo grey "build.sh extra parameters: <${builder_extra_params[@]}>"
     fi
-    _builder_deps_built=`mktemp`
+    export _builder_deps_built=`mktemp`
+  fi
+
+  if builder_is_debug_build; then
+    BUILDER_CONFIGURATION=debug
+  else
+    BUILDER_CONFIGURATION=release
   fi
 
   # Now that we've successfully parsed options adhering to the _builder spec, we may activate our
@@ -1590,7 +1643,6 @@ _builder_do_build_deps() {
       $builder_verbose \
       $builder_debug \
       $_builder_build_deps \
-      --builder-deps-built "$_builder_deps_built" \
       --builder-dep-parent "$THIS_SCRIPT_IDENTIFIER" && (
       if $_builder_debug_internal; then
         builder_echo success "## Dependency $dep for $_builder_matched_action_name successfully"
@@ -1611,6 +1663,13 @@ builder_is_dep_build() {
     return 0
   fi
   return 1
+}
+
+#
+# returns `0` if we are in a child script doing a build
+#
+builder_is_child_build() {
+  return $_builder_is_child
 }
 
 #

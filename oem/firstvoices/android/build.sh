@@ -74,9 +74,6 @@ if builder_start_action clean; then
 fi
 
 if builder_start_action configure; then
-  # Copy Keyman Engine for Android
-  cp "$KEYMAN_ROOT/android/KMEA/app/build/outputs/aar/${CONFIG}/keyman-engine.aar" "$KEYMAN_ROOT/oem/firstvoices/android/app/libs/keyman-engine.aar"
-
   KEYBOARDS_CSV="$KEYMAN_ROOT/oem/firstvoices/keyboards.csv"
   KEYBOARDS_CSV_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/keyboards.csv"
 
@@ -90,6 +87,9 @@ if builder_start_action configure; then
 fi
 
 if builder_start_action build; then
+  # Copy Keyman Engine for Android
+  cp "$KEYMAN_ROOT/android/KMEA/app/build/outputs/aar/keyman-engine-${CONFIG}.aar" "$KEYMAN_ROOT/oem/firstvoices/android/app/libs/keyman-engine.aar"
+
   echo "BUILD_FLAGS: $BUILD_FLAGS"
   ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
 

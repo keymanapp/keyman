@@ -1,12 +1,17 @@
 import 'mocha';
 import * as fs from 'fs';
-import {assert} from 'chai';
-
-import KmpCompiler from '../src/kmp-compiler.js';
-import {makePathToFixture} from './helpers/index.js';
+import { assert } from 'chai';
 import JSZip from 'jszip';
+
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
-import { type KmpJsonFile } from '../src/kmp-json-file.js';
+import { KmpJsonFile } from '@keymanapp/common-types';
+import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
+
+import { makePathToFixture } from './helpers/index.js';
+
+import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
+import { PackageValidation } from '../src/compiler/package-validation.js';
+import { CompilerMessages } from '../src/compiler/messages.js';
 
 describe('KmpCompiler', function () {
   const MODELS : string[] = [
@@ -14,7 +19,8 @@ describe('KmpCompiler', function () {
     'withfolders.qaa.sencoten',
   ];
 
-  let kmpCompiler = new KmpCompiler();
+  const callbacks = new TestCompilerCallbacks();
+  let kmpCompiler = new KmpCompiler(callbacks);
 
   for (let modelID of MODELS) {
     const kpsPath = modelID.includes('withfolders') ?
@@ -33,11 +39,10 @@ describe('KmpCompiler', function () {
     // Test just the transform from kps to kmp.json
     //
     it(`should transform ${modelID}.model.kps to kmp.json`, function () {
-      let source = fs.readFileSync(kpsPath, 'utf-8');
-      let kmpJson: KmpJsonFile;
+      let kmpJson: KmpJsonFile.KmpJsonFile;
 
       assert.doesNotThrow(() => {
-        kmpJson = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
+        kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
       });
 
       // Test that the kmp.json data is identical
@@ -51,10 +56,9 @@ describe('KmpCompiler', function () {
       //fs.writeFileSync(kmpJsonPath, JSON.stringify(kmpJson), 'utf-8');
     });
     it(`should build a full .kmp for ${modelID}`, async function() {
-      const source = fs.readFileSync(kpsPath, 'utf-8');
       const zip = JSZip();
       // Build kmp.json in memory
-      const kmpJson: KmpJsonFile = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
+      const kmpJson: KmpJsonFile.KmpJsonFile = kmpCompiler.transformKpsToKmpObject(kpsPath);
       // Build file.kmp in memory
       const promise = kmpCompiler.buildKmpFile(kpsPath, kmpJson);
       promise.then(data => {
@@ -78,20 +82,20 @@ describe('KmpCompiler', function () {
   }
 
   it('should generates a valid .kmp (zip) file', async function() {
-    // const kmpPath = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    this.timeout(10000); // building a zip file can sometimes be slow
+
     const kpsPath = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
     const kmpJsonRefPath = makePathToFixture('khmer_angkor', 'ref', 'kmp.json');
 
-    const kmpCompiler = new KmpCompiler();
-    const source = fs.readFileSync(kpsPath, 'utf-8');
-    const kmpJsonFixture: KmpJsonFile = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
+    const kmpCompiler = new KmpCompiler(callbacks);
+    const kmpJsonFixture: KmpJsonFile.KmpJsonFile = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
 
     // We override the fixture version so that we can compare with the compiler output
     kmpJsonFixture.system.keymanDeveloperVersion = KEYMAN_VERSION.VERSION;
 
     let kmpJson = null;
     assert.doesNotThrow(() => {
-      kmpJson = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
+      kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
     });
 
     const kmpData = await kmpCompiler.buildKmpFile(kpsPath, kmpJson);
@@ -115,6 +119,149 @@ describe('KmpCompiler', function () {
 
     let kmpJsonData = JSON.parse(await jszip.file('kmp.json').async('string'));
     assert.deepEqual(kmpJsonData, kmpJsonFixture);
+  });
+
+  /*
+   * Testing Warnings and Errors
+   */
+
+  it('should warn on absolute paths', async function() {
+    this.timeout(10000); // building a zip file can sometimes be slow
+
+    callbacks.clear();
+
+    const kpsPath = makePathToFixture('absolute_path', 'source', 'absolute_path.kps');
+    const kmpCompiler = new KmpCompiler(callbacks);
+
+    let kmpJson: KmpJsonFile.KmpJsonFile = null;
+
+    assert.doesNotThrow(() => {
+      kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
+    });
+
+    await assert.isNull(kmpCompiler.buildKmpFile(kpsPath, kmpJson));
+
+    assert.lengthOf(callbacks.messages, 2);
+    assert.deepEqual(callbacks.messages[0].code, CompilerMessages.WARN_AbsolutePath);
+    assert.deepEqual(callbacks.messages[1].code, CompilerMessages.ERROR_FileDoesNotExist);
+  });
+
+  //
+  // Message tests
+  //
+
+  function testForMessage(context: Mocha.Context, fixture: string[], messageId?: number) {
+    context.timeout(10000);
+
+    callbacks.clear();
+
+    const kpsPath = makePathToFixture(...fixture);
+    const kmpCompiler = new KmpCompiler(callbacks);
+
+    let kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
+    if(kmpJson && callbacks.messages.length == 0) {
+      const validator = new PackageValidation(callbacks);
+      validator.validate(kpsPath, kmpJson); // we'll ignore return value and rely on the messages
+    }
+
+    if(kmpJson && callbacks.messages.length == 0) {
+      // We'll try building the package if we have not yet received any messages
+      kmpCompiler.buildKmpFile(kpsPath, kmpJson)
+    }
+
+    //TODO: callbacks.printMessages(); after #8711 is merged
+
+    if(messageId) {
+      assert.lengthOf(callbacks.messages, 1);
+      assert.isTrue(callbacks.hasMessage(messageId));
+    } else {
+      assert.lengthOf(callbacks.messages, 0);
+    }
+  }
+
+  // WARN_FileIsNotABinaryKvkFile
+
+  it('should generate WARN_FileIsNotABinaryKvkFile if a non-binary kvk file is included', async function() {
+    testForMessage(this, ['xml_kvk_file', 'source', 'xml_kvk_file.kps'], CompilerMessages.WARN_FileIsNotABinaryKvkFile);
+  });
+
+  it('should not warn if a binary kvk file is included', async function() {
+    testForMessage(this, ['binary_kvk_file', 'source', 'binary_kvk_file.kps']);
+  });
+
+  // ERROR_FollowKeyboardVersionNotAllowedForModelPackages
+
+  it('should generate ERROR_FollowKeyboardVersionNotAllowedForModelPackages if <FollowKeyboardVersion> is set for model packages', async function() {
+    testForMessage(this, ['invalid', 'followkeyboardversion.qaa.sencoten.model.kps'], CompilerMessages.ERROR_FollowKeyboardVersionNotAllowedForModelPackages);
+  });
+
+  // WARN_FollowKeyboardVersionButNoKeyboards
+
+  it('should generate WARN_FollowKeyboardVersionButNoKeyboards if <FollowKeyboardVersion> is set for a package with no keyboards or models', async function() {
+    testForMessage(this, ['invalid', 'followkeyboardversion.empty.kps'], CompilerMessages.WARN_FollowKeyboardVersionButNoKeyboards);
+  });
+
+  // ERROR_KeyboardFileNotFound
+
+  it('should generate ERROR_KeyboardFileNotFound if a <Keyboard> is listed in a package but not found in <Files>', async function() {
+    testForMessage(this, ['invalid', 'keyboardfilenotfound.kps'], CompilerMessages.ERROR_KeyboardFileNotFound);
+  });
+
+  // ERROR_KeyboardFileNotValid
+
+  it('should generate ERROR_KeyboardFileNotValid if a .kmx is not valid in <Files>', async function() {
+    testForMessage(this, ['invalid', 'keyboardfilenotvalid.kps'], CompilerMessages.ERROR_KeyboardFileNotValid);
+  });
+
+  // WARN_KeyboardFileHasNoKeyboardVersion
+
+  it('should generate WARN_KeyboardFileHasNoKeyboardVersion if <FollowKeyboardVersion> is set but keyboard has no version', async function() {
+    testForMessage(this, ['invalid', 'nokeyboardversion.kps'], CompilerMessages.WARN_KeyboardFileHasNoKeyboardVersion);
+  });
+
+  // ERROR_PackageCannotContainBothModelsAndKeyboards
+
+  it('should generate ERROR_PackageCannotContainBothModelsAndKeyboards if package has both keyboards and models', async function() {
+    testForMessage(this, ['invalid', 'ERROR_PackageCannotContainBothModelsAndKeyboards.kps'], CompilerMessages.ERROR_PackageCannotContainBothModelsAndKeyboards);
+  });
+
+  // WARN_PackageShouldNotRepeatLanguages (models)
+
+  it('should generate WARN_PackageShouldNotRepeatLanguages if model has same language repeated', async function() {
+    testForMessage(this, ['invalid', 'keyman.en.warn_package_should_not_repeat_languages.model.kps'], CompilerMessages.WARN_PackageShouldNotRepeatLanguages);
+  });
+
+  // WARN_PackageShouldNotRepeatLanguages (keyboards)
+
+  it('should generate WARN_PackageShouldNotRepeatLanguages if keyboard has same language repeated', async function() {
+    testForMessage(this, ['invalid', 'warn_package_should_not_repeat_languages.kps'], CompilerMessages.WARN_PackageShouldNotRepeatLanguages);
+  });
+
+  // WARN_PackageNameDoesNotFollowLexicalModelConventions
+
+  it('should generate WARN_PackageNameDoesNotFollowLexicalModelConventions if filename has wrong conventions', async function() {
+    testForMessage(this, ['invalid', 'WARN_PackageNameDoesNotFollowLexicalModelConventions.kps'], CompilerMessages.WARN_PackageNameDoesNotFollowLexicalModelConventions);
+  });
+
+  // WARN_PackageNameDoesNotFollowKeyboardConventions
+
+  it('should generate WARN_PackageNameDoesNotFollowKeyboardConventions if filename has wrong conventions', async function() {
+    testForMessage(this, ['invalid', 'WARN_PackageNameDoesNotFollowKeyboardConventions.kps'], CompilerMessages.WARN_PackageNameDoesNotFollowKeyboardConventions);
+  });
+
+  // WARN_FileInPackageDoesNotFollowFilenameConventions
+
+  it('should generate WARN_FileInPackageDoesNotFollowFilenameConventions if content filename has wrong conventions', async function() {
+    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions.kps'], CompilerMessages.WARN_FileInPackageDoesNotFollowFilenameConventions);
+    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions_2.kps'], CompilerMessages.WARN_FileInPackageDoesNotFollowFilenameConventions);
+  });
+
+  // ERROR_PackageNameCannotBeBlank
+
+  it('should generate ERROR_PackageNameCannotBeBlank if package info has empty name', async function() {
+    testForMessage(this, ['invalid', 'error_package_name_cannot_be_blank.kps'], CompilerMessages.ERROR_PackageNameCannotBeBlank); // blank field
+    testForMessage(this, ['invalid', 'error_package_name_cannot_be_blank_2.kps'], CompilerMessages.ERROR_PackageNameCannotBeBlank); // missing field
+    testForMessage(this, ['invalid', 'error_package_name_cannot_be_blank_3.kps'], CompilerMessages.ERROR_PackageNameCannotBeBlank); // missing info section
   });
 
 });

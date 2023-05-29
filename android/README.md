@@ -119,10 +119,6 @@ android {
     aaptOptions {
         noCompress "kmp"
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
 ```
 5. After the `android {}` object, include the following:
 ````gradle
@@ -142,7 +138,7 @@ dependencies {
     implementation 'androidx.preference:preference:1.2.0'
 
     // Include this if you want to have QR Codes displayed on Keyboard Info
-    implementation ('com.github.kenglxn.QRGen:android:2.7.0') {
+    implementation ('com.github.kenglxn.QRGen:android:3.0.1') {
         transitive = true
     }
 }

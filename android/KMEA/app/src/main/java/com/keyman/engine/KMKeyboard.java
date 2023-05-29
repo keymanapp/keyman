@@ -67,15 +67,33 @@ import io.sentry.SentryLevel;
 final class KMKeyboard extends WebView {
   private static final String TAG = "KMKeyboard";
   private final Context context;
-  private KeyboardType keyboardType = KeyboardType.KEYBOARD_TYPE_UNDEFINED;
   private String packageID;
   private String keyboardID;
   private String keyboardName;
   private String keyboardVersion;
 
+  private boolean shouldIgnoreTextChange = false;
+  private boolean shouldIgnoreSelectionChange = false;
+
+  protected KeyboardType keyboardType = KeyboardType.KEYBOARD_TYPE_UNDEFINED;
   protected ArrayList<String> javascriptAfterLoad = new ArrayList<String>();
 
   private static String currentKeyboard = null;
+
+  /**
+   * Banner state value: "blank" - no banner available.
+   */
+  protected static final String KM_BANNER_STATE_BLANK = "blank";
+  /**
+   * Banner state value: "suggestion" - dictionary suggestions are shown.
+   */
+  protected static final String KM_BANNER_STATE_SUGGESTION = "suggestion";
+
+  /**
+   * Current banner state.
+   */
+  protected static String currentBanner = KM_BANNER_STATE_BLANK;
+
   private static String txtFont = "";
   private static String oskFont = null;
   private static String keyboardRoot = "";
@@ -133,6 +151,11 @@ final class KMKeyboard extends WebView {
     this._shouldShowHelpBubble = flag;
   }
 
+  protected boolean shouldIgnoreTextChange() { return shouldIgnoreTextChange; }
+  protected void setShouldIgnoreTextChange(boolean ignore) { this.shouldIgnoreTextChange = ignore; }
+  protected boolean shouldIgnoreSelectionChange() { return shouldIgnoreSelectionChange; }
+  protected void setShouldIgnoreSelectionChange(boolean ignore) { this.shouldIgnoreSelectionChange = ignore; }
+
   @SuppressWarnings("deprecation")
   @SuppressLint("SetJavaScriptEnabled")
   public void initKMKeyboard(final Context context) {
@@ -150,21 +173,10 @@ final class KMKeyboard extends WebView {
 
     getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
     getSettings().setSupportZoom(false);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      getSettings().setUseWideViewPort(true);
-      getSettings().setLoadWithOverviewMode(true);
-      setWebContentsDebuggingEnabled(true);
-    }
 
-    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1)
-      setLayerType(View.LAYER_TYPE_SOFTWARE, null); // Disable hardware acceleration for API < 17, Keyman keyboard is slower without HWA but it causes some display issues.
-    // (Tested on Samsung Galaxy Nexus running Android 4.1.2)
-
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
-      // These were deprecated in API 18
-      getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
-      getSettings().setPluginState(WebSettings.PluginState.ON_DEMAND);
-    }
+    getSettings().setUseWideViewPort(true);
+    getSettings().setLoadWithOverviewMode(true);
+    setWebContentsDebuggingEnabled(true);
 
     setWebChromeClient(new WebChromeClient() {
       public boolean onConsoleMessage(ConsoleMessage cm) {
@@ -410,6 +422,24 @@ final class KMKeyboard extends WebView {
 
   public static String currentKeyboard() {
     return currentKeyboard;
+  }
+
+  public static void setCurrentBanner(String banner) {
+    currentBanner = banner;
+  }
+
+  public static String currentBanner() { return currentBanner; }
+
+  protected void toggleSuggestionBanner(HashMap<String, String> associatedLexicalModel, boolean keyboardChanged) {
+    //reset banner state if new language has no lexical model
+    if (currentBanner != null && currentBanner.equals(KM_BANNER_STATE_SUGGESTION)
+        && associatedLexicalModel == null) {
+      setCurrentBanner(KMKeyboard.KM_BANNER_STATE_BLANK);
+    }
+
+    if(keyboardChanged) {
+      setLayoutParams(KMManager.getKeyboardLayoutParams());
+    }
   }
 
   /**

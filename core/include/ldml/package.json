@@ -7,6 +7,9 @@
     "ldml",
     "unicode"
   ],
+  "files": [
+    "/build/keyboardprocessor_ldml.*"
+  ],
   "license": "MIT",
   "type": "module",
   "main": "build/keyboardprocessor_ldml.js",

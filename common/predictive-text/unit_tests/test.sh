@@ -29,6 +29,10 @@ builder_describe "Runs all tests for the language-modeling / predictive-text lay
 
 builder_parse "$@"
 
+if builder_has_option --ci && builder_is_debug_build; then
+  builder_die "Options --ci and --debug are incompatible."
+fi
+
 if builder_start_action configure; then
   verify_npm_setup
   builder_finish_action success configure
@@ -54,7 +58,7 @@ if builder_start_action test:libraries; then
 
   pushd "$KEYMAN_ROOT/common/models/templates"
   echo
-  echo "### Running $builder_term common/models/templates) tests"
+  echo "### Running $(builder_term common/models/templates) tests"
   if builder_has_option --ci; then
     npm run test -- -reporter mocha-teamcity-reporter
   else
@@ -64,7 +68,7 @@ if builder_start_action test:libraries; then
 
   pushd "$KEYMAN_ROOT/common/models/types"
   echo
-  echo "### Running $builder_term common/models/types) tests"
+  echo "### Running $(builder_term common/models/types) tests"
   # Is not mocha-based; it's TSC-based instead, as we're just ensuring that the .d.ts
   # file is a proper TS declaration file.
   npm run test
@@ -96,7 +100,7 @@ if [[ $VERSION_ENVIRONMENT == test ]] && builder_has_action test :browser; then
   if builder_pull_get_details; then
     if ! ([[ $builder_pull_title =~ \(web\) ]] || builder_pull_has_label test-browserstack); then
 
-      echo "Auto-skipping $builder_term test:browser) for unrelated CI test build"
+      echo "Auto-skipping $(builder_term test:browser) for unrelated CI test build"
       exit 0
     fi
   fi
@@ -120,10 +124,6 @@ if builder_start_action test:browser; then
     KARMA_FLAGS="$KARMA_FLAGS --reporters teamcity,BrowserStack"
     KARMA_CONFIG="CI.conf.js"
     KARMA_INFO_LEVEL="--log-level=debug"
-
-    if builder_is_debug_build; then
-      echo "$(builder_term --ci) option set; ignoring $(builder_term --debug) option"
-    fi
   else
     KARMA_CONFIG="manual.conf.js"
     if builder_is_debug_build; then

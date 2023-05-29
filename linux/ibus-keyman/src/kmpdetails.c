@@ -272,9 +272,6 @@ kmp_json_status get_keyboard_details(const char *kmp_dir, const char *id, keyboa
     }
     g_object_unref(parser);
     return JSON_OK;
-
-
-
 }
 
 kmp_json_status get_kmp_details(const char *kmp_dir, kmp_details *details)
@@ -294,7 +291,6 @@ kmp_json_status get_kmp_details(const char *kmp_dir, kmp_details *details)
         g_free(kmp_json);
         return JSON_FILE_NOT_EXISTS;
     }
-
 
     json_parser_load_from_file (parser,
         kmp_json,

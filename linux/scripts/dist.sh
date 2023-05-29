@@ -17,7 +17,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 BASEDIR=$(pwd)
 
-if [ "$1" == "origdist" ]; then
+if [[ ! -z ${1+x} ]] && [ "$1" == "origdist" ]; then
     create_origdist=1
     shift
 fi
@@ -33,9 +33,17 @@ dch keyman --newversion "${VERSION}" --force-bad-version --nomultimaint
 dpkg-source --tar-ignore=*~ --tar-ignore=.git --tar-ignore=.gitattributes \
     --tar-ignore=.gitignore --tar-ignore=experiments --tar-ignore=debian \
     --tar-ignore=.github --tar-ignore=.vscode --tar-ignore=android \
-    --tar-ignore=common/models --tar-ignore=common/predictive-text \
-    --tar-ignore=common/resources --tar-ignore=common/schemas \
-    --tar-ignore=common/test --tar-ignore=common/web --tar-ignore=common/windows \
+    \
+    --tar-ignore=common/models \
+    --tar-ignore=common/predictive-text \
+    --tar-ignore=common/resources \
+    --tar-ignore=common/schemas \
+    --tar-ignore=common/test/keyboards/build.* \
+    --tar-ignore=common/test/predictive-text \
+    --tar-ignore=common/test/resources \
+    --tar-ignore=common/web \
+    --tar-ignore=common/windows \
+    \
     --tar-ignore=core/build \
     --tar-ignore=developer --tar-ignore=docs --tar-ignore=ios \
     --tar-ignore=linux/keyman-config/buildtools/build-langtags.py --tar-ignore=__pycache__ \
@@ -53,7 +61,7 @@ echo "3.0 (quilt)" > debian/source/format
 cd "$BASEDIR"
 
 # create orig.tar.gz
-if [ -n "$create_origdist" ]; then
+if [ ! -z "${create_origdist+x}" ]; then
     cd dist
     pkgvers="keyman-$VERSION"
     tar xfz keyman-"${VERSION}".tar.gz
