@@ -109,6 +109,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   private final int minTextSize = 16;
   private final int maxTextSize = 72;
   private int textSize = minTextSize;
+  private int lastOrientation = Configuration.ORIENTATION_UNDEFINED;
   private static final String defaultKeyboardInstalled = "DefaultKeyboardInstalled";
   private static final String defaultDictionaryInstalled = "DefaultDictionaryInstalled";
   private static final String userTextKey = "UserText";
@@ -262,6 +263,14 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     super.onResume();
     KMManager.onResume();
     KMManager.hideSystemKeyboard();
+
+    // onConfigurationChanged() only triggers when device is rotated while app is in foreground
+    // This handles when device is rotated while app is in background
+    Configuration newConfig = this.getResources().getConfiguration();
+    if (newConfig != null && newConfig.orientation != lastOrientation) {
+      lastOrientation = newConfig.orientation;
+      KMManager.onConfigurationChanged(newConfig);
+    }
     resizeTextView(textView.isKeyboardVisible());
 
     KMManager.addKeyboardEventListener(this);
@@ -349,6 +358,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     getSupportActionBar().setBackgroundDrawable(getActionBarDrawable(this));
     resizeTextView(textView.isKeyboardVisible());
     invalidateOptionsMenu();
+    lastOrientation = newConfig.orientation;
   }
 
   @SuppressLint("RestrictedApi")

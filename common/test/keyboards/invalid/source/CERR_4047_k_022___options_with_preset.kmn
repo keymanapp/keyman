@@ -1,0 +1,26 @@
+﻿store(&NAME) '022 - options with preset'
+c Description: Tests basic option rules with a preset supplied
+c keys: [K_A][K_1][K_A][K_0][K_A]
+c expected: foo.foo.no foo.
+c context: 
+c option: foo=1
+c expected option: foo=0
+c saved option: foo=0
+
+c ***** CERR_80FeatureOnly 0x00004047 *******************************
+store(&VERSION) '3.0'
+c *******************************************************************
+
+store(foo) '0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+if(foo = '1') + 'a' > 'foo.'
+if(foo = '0') + 'a' > 'no foo.'
+
+c ***** CERR_80FeatureOnly 0x00004047 *******************************
++ '1' > set(foo = '1') save(foo)
++ '0' > set(foo = '0') save(foo)
+c *******************************************************************

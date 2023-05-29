@@ -17,7 +17,7 @@ versionhistory-app2:
 
 devtools-app: dirs
     cd $(COMMON_ROOT)
-    @if not exist $(KEYMAN_ROOT)\common\windows\cpp\include\keymanversion_build.h $(MAKE) global-versions
+    @if not exist $(KEYMAN_ROOT)\include\keymanversion_build.h $(MAKE) global-versions
     cd $(COMMON_ROOT)\tools\devtools
     $(MAKE)
     cd $(ROOT)\src

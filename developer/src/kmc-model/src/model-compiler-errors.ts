@@ -1,203 +1,74 @@
-// TODO: merge with kmc keyboard-compiler errors
-/**
- * Log levels.
- *
- * Note: Currently, this acts like a bit set, where the upper 4 bits of an
- * unsigned 16 bit value are the log level flags.
- *
- * Warning: even though these look like bitmasks, these flags may not be
- * combined.
- */
-export enum LogLevel {
-  CERR_FATAL = 0x8000,
-  CERR_ERROR = 0x4000,
-  CERR_WARNING = 0x2000,
-  CERR_HINT = 0x1000
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent } from "@keymanapp/common-types";
+
+const Namespace = CompilerErrorNamespace.ModelCompiler;
+// const SevInfo = CompilerErrorSeverity.Info | Namespace;
+// const SevHint = CompilerErrorSeverity.Hint | Namespace;
+const SevWarn = CompilerErrorSeverity.Warn | Namespace;
+const SevError = CompilerErrorSeverity.Error | Namespace;
+const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
+
+const m = (code: number, message: string) : CompilerEvent => { return {
+  line: ModelCompilerMessageContext.line,
+  filename: ModelCompilerMessageContext.filename,
+  code,
+  message
+} };
+
+export class ModelCompilerMessageContext {
+  // Context added to all messages
+  static line: number;
+  static filename: string;
+}
+
+export class ModelCompilerMessages {
+
+  static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException,
+    `Unexpected exception: ${(o.e ?? 'unknown error').toString()}\n\nCall stack:\n${(o.e instanceof Error ? o.e.stack : (new Error()).stack)}`);
+  static FATAL_UnexpectedException = SevFatal | 0x0001;
+
+  static Warn_MixedNormalizationForms = (o:{wordform: string}) => m(this.WARN_MixedNormalizationForms,
+    `“${o.wordform}” is not in Unicode NFC. Automatically converting to NFC.`);
+  static WARN_MixedNormalizationForms = SevWarn | 0x0002;
+
+  static Warn_DuplicateWordInSameFile = (o:{wordform: string}) => m(this.WARN_DuplicateWordInSameFile,
+    `duplicate word “${o.wordform}” found in same file; summing counts`);
+  static WARN_DuplicateWordInSameFile = SevWarn | 0x0003;
+
+  static Error_UnimplementedModelFormat = (o:{format: string}) => m(this.ERROR_UnimplementedModelFormat,
+    `Unimplemented model format: ${o.format}`);
+  static ERROR_UnimplementedModelFormat = SevError | 0x0004;
+
+  static Error_UnknownModelFormat = (o:{format: string}) => m(this.ERROR_UnknownModelFormat,
+    `Unimplemented model format: ${o.format}`);
+  static ERROR_UnknownModelFormat = SevError | 0x0005;
+
+  static Error_NoDefaultExport = () => m(this.ERROR_NoDefaultExport,
+    `Model source does have a default export. Did you remember to write \`export default source;\`?`);
+  static ERROR_NoDefaultExport = SevError | 0x0006;
+
+  static Error_SearchTermToKeyMustBeExplicitlySpecified = () => m(this.ERROR_SearchTermToKeyMustBeExplicitlySpecified,
+    "searchTermToKey must be explicitly specified");
+  static ERROR_SearchTermToKeyMustBeExplicitlySpecified = SevError | 0x0007;
+
+  static Error_UTF16BEUnsupported = () => m(this.ERROR_UTF16BEUnsupported, 'UTF-16BE is unsupported');
+  static ERROR_UTF16BEUnsupported = SevError | 0x0008;
+
+  static Error_UnknownWordBreaker = (o:{spec:string}) => m(this.ERROR_UnknownWordBreaker,
+    `Unknown word breaker: ${o.spec}`);
+  static ERROR_UnknownWordBreaker = SevError | 0x0009;
+
+  static Error_UnsupportedScriptOverride = (o:{option:string}) => m(this.ERROR_UnsupportedScriptOverride,
+    `Unsupported script override: ${o.option}`);
+  static ERROR_UnsupportedScriptOverride = SevError | 0x000A;
 };
 
 /**
- * Error codes. Use these when logging messages.
- *
- * Extends https://github.com/keymanapp/keyman/blob/99db3c0d2448f448242e6397f9d72e9a7ccee4b9/windows/src/global/inc/Comperr.h
+ * A ModelCompilerError should be thrown when an unrecoverable error occurs that
+ * would block further compilation. It will be caught in the top-most compiler
+ * API endpoint and converted into a callback message.
  */
-export enum KeymanCompilerError {
-  CERR_LEXICAL_MODEL_MIN = 0x0800,
-  CERR_LEXICAL_MODEL_MAX = 0x08FF,
-
-
-  CERR_FATAL_LM = LogLevel.CERR_FATAL | CERR_LEXICAL_MODEL_MIN,
-    /* Place all fatal LM compiler errors here! */
-
-  CERR_ERROR_LM = LogLevel.CERR_ERROR | CERR_LEXICAL_MODEL_MIN,
-    /* Place all recoverable LM compiler errors here! */
-
-  CERR_WARN_LM = LogLevel.CERR_WARNING | CERR_LEXICAL_MODEL_MIN,
-    /* Place all LM compiler warnings here! */
-  CWARN_MixedNormalizationForms = 0x2801, /* CERR_WARN_LM + 1 */
-  CWARN_DuplicateWordInSameFile = 0x2802, /* CERR_WARN_LM + 2 */
-
-  CERR_HINT_LM = LogLevel.CERR_HINT | CERR_LEXICAL_MODEL_MIN,
-    /* Place all LM compiler hints here! */
-
-  /* Errors that are not specific to the lexical model compiler, from comperr.h: */
-  CWARN_TooManyErrorsOrWarnings = 0x20A7,
-}
-
-/**
- * Human-readable titles for the various log levels.
- *
- * Taken from https://github.com/keymanapp/keyman/blob/d83cfffe511ce65b781f919e89e3693146844849/windows/src/developer/TIKE/project/Keyman.Developer.System.Project.ProjectLog.pas#L39-L46
- */
-const LOG_LEVEL_TITLE: {[level in LogLevel]: string} = {
-  [LogLevel.CERR_HINT]: 'Hint',
-  [LogLevel.CERR_WARNING]: 'Warning',
-  [LogLevel.CERR_ERROR]: 'Error',
-  [LogLevel.CERR_FATAL]: 'Fatal Error',
-};
-
-/**
- * How many errors or warnings are too many!
- */
-export const MAX_MESSAGES = 100;
-
-/**
- * Direct where log messages go.
- */
-let _logHandler: (log: LogMessage) => void = printLogs;
-
-/**
- * How many logs or warnings have been witnessed so far.
- */
-let _messagesSeen = 0;
-
-/**
- * Logs compiler messages (warnings, errors, logs).
- *
- * @param code Error code
- * @param message A helpful message!
- * @param source [optional] the filename/line number in the source that induced this error
- *
- * @see https://github.com/keymanapp/keyman/blob/99db3c0d2448f448242e6397f9d72e9a7ccee4b9/windows/src/developer/TIKE/project/Keyman.Developer.System.Project.ProjectLog.pas#L60-L77
- */
-export function log(code: KeymanCompilerError, message: string, source?: FilenameAndLineNo) {
-  // Ignore the request if there are too many messages
-  if (_messagesSeen > MAX_MESSAGES)
-    return;
-
-  let logMessage = source
-    ? new LogMessageFromSource(code, message, source)
-    : new OrdinaryLogMessage(code, message);
-
-  _logHandler(logMessage)
-  _messagesSeen++;
-
-  if (_messagesSeen > MAX_MESSAGES) {
-      _logHandler(new OrdinaryLogMessage(
-        KeymanCompilerError.CWARN_TooManyErrorsOrWarnings,
-        `More than ${MAX_MESSAGES} warnings or errors received; suppressing further messages`
-      ));
+export class ModelCompilerError extends Error {
+  constructor(public event: CompilerEvent) {
+    super(event.message);
   }
-}
-
-/**
- * Override where log messages go.
- *
- * @param fn The desired log message handler.
- */
-export function redirectLogMessagesTo(fn: (log: LogMessage) => void) {
-  _logHandler = fn;
-}
-
-/**
- * Reset the log message handler to the default.
- */
-export function resetLogMessageHandler() {
-  _logHandler = printLogs;
-  _messagesSeen = 0;
-}
-
-/**
- * Prints log messages to stdout. The default log action.
- */
-export function printLogs(log: LogMessage): void {
-  console.log(log.format());
-}
-
-/**
- * Duct tapes together a filename and a line number of a log.
- */
-interface FilenameAndLineNo {
-  readonly filename: string;
-  readonly lineno: number;
-}
-
-/**
- * A log message that knows how to format itself.
- */
-export interface LogMessage {
-  readonly code: KeymanCompilerError;
-  readonly level: LogLevel;
-  readonly message: string;
-
-  format(): string;
-}
-
-/**
- * Concrete implementation of the log message.
- */
-class OrdinaryLogMessage implements LogMessage {
-  readonly code: KeymanCompilerError;
-  readonly message: string;
-
-  constructor(code: KeymanCompilerError, message: string) {
-    this.code = code;
-    this.message = message;
-  }
-
-  get level(): LogLevel {
-    return this.code & 0xF000;
-  }
-
-  determineLogLevelTitle(): string {
-    return LOG_LEVEL_TITLE[this.level] || '';
-  }
-
-  format(): string {
-    let prefix = this.determineLogLevelTitle();
-    if (prefix)
-      prefix = `${prefix}: `;
-
-    return `${prefix}${h(this.code)} ${this.message}`
-  }
-}
-
-/**
- * A log message with a filename and line number.
- */
-class LogMessageFromSource extends OrdinaryLogMessage {
-  readonly filename: string;
-  readonly lineno: number;
-
-  constructor(code: KeymanCompilerError, message: string, source: FilenameAndLineNo) {
-    super(code, message);
-    this.filename = source.filename;
-    this.lineno = source.lineno;
-  }
-
-  format(): string {
-    let originalMessage = super.format();
-    return `${this.filename} (${this.lineno}): ${originalMessage}`;
-  }
-}
-
-/**
- * Format a number as a zero-padded 4 digit hexadecimal.
- */
-function h(n: number) {
-  let formatted = n.toString(16).toUpperCase();
-  if (formatted.length < 4) {
-    formatted = '0'.repeat(4 - formatted.length);
-  }
-
-  return formatted;
 }

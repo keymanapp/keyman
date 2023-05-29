@@ -4,7 +4,7 @@
 #include "kmx/kmx_base.h"
 #include "kmx/kmx_xstring.h"
 
-#include "../test_assert.h"
+#include <test_assert.h>
 
 using namespace km::kbp::kmx;
 

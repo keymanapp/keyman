@@ -98,4 +98,8 @@ labels:
 
   - label: 'epic-gestures'
     matcher:
-      branch: '.*epic-gestures.*' # anywhere in the branch name, e.g. feat/epic-gestures/web/... or feat/web/foo-epic-ldml
+      branch: '.*epic-gestures.*' # anywhere in the branch name, e.g. feat/epic-gestures/web/... or feat/web/foo-epic-gestures
+
+  - label: 'epic-kmcompx'
+    matcher:
+      branch: '.*epic-kmcompx.*'

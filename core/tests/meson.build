@@ -22,7 +22,7 @@ if get_option('keyman_core_tests')
   if get_option('default_library') != 'static'
     ctypes_void_p_size = ['-c', 'import ctypes; print(ctypes.sizeof(ctypes.c_void_p))']
     r = run_command(python, ctypes_void_p_size)
-    python_ctypes_compatible = r.stdout().to_int() == compiler.sizeof('void *')
+    python_ctypes_compatible = r.stdout().to_int() == cpp_compiler.sizeof('void *')
     if not python_ctypes_compatible
       message('Python ctypes is incompatible with built shared object. Disabling some tests.')
     endif

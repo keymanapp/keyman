@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Should be installed in /usr/share/dbus-1/interfaces/com.keyman.SystemService1.System.xml -->
+<!-- See https://dbus.freedesktop.org/doc/dbus-api-design.html -->
+<!DOCTYPE node PUBLIC
+  "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+  "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+  <interface name="com.keyman.SystemService1.System">
+    <!--
+      SetCapsLockIndicator:
+      @state: %FALSE = turn off the capslock indicator, %TRUE = turn it on
+
+      Set the capslock indicator.
+    -->
+    <method name="SetCapsLockIndicator">
+      <arg name="state" type="b" direction="in" />
+    </method>
+
+    <!--
+      GetCapsLockIndicator:
+      @state: %FALSE = capslock is off, %TRUE = capslock is on
+
+      Gets the state of the capslock indicator.
+    -->
+    <method name="GetCapsLockIndicator">
+      <arg name="state" type="b" direction="out" />
+    </method>
+  </interface>
+</node>

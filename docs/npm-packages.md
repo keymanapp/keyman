@@ -10,16 +10,23 @@ Packages are **never** published from a developer's machine.
 
 ## List of current published npm packages
 
-* `@keymanapp/models-types` -- located at `common/models/types`
+* `@keymanapp/common-types` -- located at `common/web/types`
+* `@keymanapp/keyman-version` -- located at `common/web/keyman-version`
 * `@keymanapp/kmc` -- located at `developer/src/kmc`
-* `@keymanapp/kmc-keyboard` -- located at `developer/src/kmc-keyboard`
+* `@keymanapp/kmc-kmn` -- located at `developer/src/kmc-kmn`
+* `@keymanapp/kmc-ldml` -- located at `developer/src/kmc-ldml`
 * `@keymanapp/kmc-model` -- located at `developer/src/kmc-model`
 * `@keymanapp/kmc-model-info` -- located at `developer/src/kmc-model-info`
 * `@keymanapp/kmc-package` -- located at `developer/src/kmc-package`
+* `@keymanapp/models-types` -- located at `common/models/types`
 
 ### Deprecated npm packages
 
+* `@keymanapp/developer-lexical-model-compiler` -- replaced by `@keymanapp/kmc`
 * `@keymanapp/lexical-model-compiler` -- replaced by `@keymanapp/kmc`
+* `@keymanapp/lexical-model-types` -- replaced by `@keymanapp/models-types`
+* `@keymanapp/lmlayer-cli` -- replaced by `@keymanapp/kmc`
+* `@keymanapp/models-wordbreakers` -- published accidentally
 
 ## For CI developers
 
@@ -89,13 +96,12 @@ For every release of **Keyman Developer**, the CI publishes a release of
 `@keymanapp/kmc`. The version number is locked with the particular version of
 Keyman Developer.
 
-### `set_npm_version`
+### `builder_publish_to_npm`
 
-This helper function sets the version in the `package.json` for the given
-package, according to the VERSION_WITH_TAG variable.
+This helper function updates version numbers and does the publish step for the
+package.json in the working directory, using the VERSION_WITH_TAG variable.
 
 ```bash
-. $KEYMAN_ROOT/resources/shellHelperFunctions.sh
-
-set_npm_version
+  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+  builder_publish_to_npm
 ```

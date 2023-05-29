@@ -37,6 +37,9 @@ builder_describe \
 
 builder_parse "$@"
 
+# Override JAVA_HOME to OpenJDK 11
+set_java_home
+
 # This script also responsible for cleaning up /android/upload
 builder_run_child_actions clean
 
