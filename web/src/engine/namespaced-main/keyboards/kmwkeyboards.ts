@@ -54,56 +54,6 @@ namespace com.keyman.keyboards {
     }
 
     /**
-     * Get an associative array of keyboard identification strings
-     *   This was defined as an array, so is kept that way, but
-     *   Javascript treats it as an object anyway
-     *
-     * @param       {Object}    Lstub      Keyboard stub object
-     * @param       {Object}    Lkbd       Keyboard script object
-     * @return      {Object}               Copy of keyboard identification strings
-     *
-     */
-    private _GetKeyboardDetail = function(Lstub: KeyboardStub, Lkbd: any /* KeyboardScriptObject */) { // I2078 - Full keyboard detail
-      var Lr={};
-      Lr['Name'] = Lstub['KN'];
-      Lr['InternalName'] =  Lstub['KI'];
-      Lr['LanguageName'] = Lstub['KL'];  // I1300 - Add support for language names
-      Lr['LanguageCode'] = Lstub['KLC']; // I1702 - Add support for language codes, region names, region codes, country names and country codes
-      Lr['RegionName'] = Lstub['KR'];
-      Lr['RegionCode'] = Lstub['KRC'];
-      Lr['CountryName'] = Lstub['KC'];
-      Lr['CountryCode'] = Lstub['KCC'];
-      Lr['KeyboardID'] = Lstub['KD'];
-      Lr['Font'] = Lstub['KFont'];
-      Lr['OskFont'] = Lstub['KOskFont'];
-      Lr['HasLoaded'] = !!Lkbd;
-
-      Lr['IsRTL'] = Lkbd ? !!Lkbd['KRTL'] : null;
-      return Lr;
-    }
-
-    /**
-     * Get array of available keyboard stubs
-     *
-     * @return   {Array}     Array of available keyboards
-     *
-     */
-    getDetailedKeyboards() {
-      var Lr = [], Ln, Lstub, Lrn;
-
-      for(Ln=0; Ln < this.keyboardStubs.length; Ln++) { // I1511 - array prototype extended
-        Lstub = this.keyboardStubs[Ln];
-
-        // In Chrome, (including on Android), Array.prototype.find() requires Chrome 45.
-        // This is a later version than the default on our oldest-supported Android devices.
-        const Lkbd = this.keyboards.find(k => k['KI'] == Lstub['KI']);
-        Lrn = this._GetKeyboardDetail(Lstub, Lkbd);  // I2078 - Full keyboard detail
-        Lr=this.keymanweb._push(Lr,Lrn); // TODO:  Resolve without need for the cast.
-      }
-      return Lr;
-    }
-
-    /**
      *  Create or update a keyboard meta-data 'stub' during keyboard registration
      *
      *  Cross-reference with https://help.keyman.com/developer/engine/web/11.0/reference/core/addKeyboards.

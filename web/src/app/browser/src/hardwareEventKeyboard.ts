@@ -223,7 +223,9 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
     }
   }
 
-  return new KeyEvent(s);
+  let processedEvent = new KeyEvent(s);
+  processedEvent.source = e;
+  return processedEvent;
 }
 
 export default class HardwareEventKeyboard extends HardKeyboard {

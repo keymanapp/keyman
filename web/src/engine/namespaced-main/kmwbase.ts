@@ -380,16 +380,6 @@ namespace com.keyman {
     }
 
     /**
-     * Get array of available keyboard stubs
-     *
-     * @return   {Array}     Array of available keyboards
-     *
-     */
-    ['getKeyboards']() {
-      return this.keyboardManager.getDetailedKeyboards();
-    }
-
-    /**
      * Gets the cookie for the name and language code of the most recently active keyboard
      *
      *  Defaults to US English, but this needs to be user-set in later revision (TODO)

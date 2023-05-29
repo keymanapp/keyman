@@ -3,7 +3,7 @@ import { Device as DeviceDetector } from 'keyman/engine/device-detect';
 import { getAbsoluteY } from 'keyman/engine/dom-utils';
 import { OutputTarget } from 'keyman/engine/element-wrappers';
 import { AnchoredOSKView, FloatingOSKView, FloatingOSKViewConfiguration, OSKView, TwoStateActivator } from 'keyman/engine/osk';
-import { ErrorStub, KeyboardStub } from 'keyman/engine/package-cache';
+import { ErrorStub, KeyboardStub, CloudQueryResult } from 'keyman/engine/package-cache';
 import { DeviceSpec, ProcessorInitOptions, extendString } from "@keymanapp/keyboard-processor";
 
 import { BrowserConfiguration, BrowserInitOptionDefaults, BrowserInitOptionSpec } from './configuration.js';
@@ -133,7 +133,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     this._initialized = 2;
   }
 
-  get register() {
+  get register(): (x: CloudQueryResult) => void {
     return this.keyboardRequisitioner.cloudQueryEngine.registerFromCloud;
   }
 
@@ -200,24 +200,24 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * @returns {Promise<(KeyboardStub|ErrorStub)[]>} Promise of added keyboard/error stubs
    *
    */
-  addKeyboards(...args: (any)[]) : Promise<(KeyboardStub|ErrorStub)[]> {
-    if (!args || !args[0] || args[0].length == 0) {
-      // Get the cloud keyboard catalog
-      return this.keyboardRequisitioner.fetchCloudCatalog().catch((errVal) => {
-        console.error(errVal[0].error);
-        return errVal;
-      });
-    } else {
-      let x: (string|KeyboardStub)[] = [];
-      if (Array.isArray(args[0])) {
-        x.push(...args[0]);
-      } else if (Array.isArray(args)) {
-        x.push(...args);
+  addKeyboards(...args: any[]): Promise<(KeyboardStub|ErrorStub)[]> {
+    return this.config.deferForInitialization.then(() => {
+      if (!args || !args[0] || args[0].length == 0) {
+        // Get the cloud keyboard catalog
+        return this.keyboardRequisitioner.fetchCloudCatalog().catch((errVal) => {
+          console.error(errVal[0].error);
+          return errVal;
+        });
       } else {
-        x.push(args);
+        let x: (string|KeyboardStub)[] = [];
+        if (Array.isArray(args[0])) {
+          x.push(...args[0]);
+        } else if (Array.isArray(args)) {
+          x.push(...args);
+        }
+        return this.keyboardRequisitioner.addKeyboardArray(x);
       }
-      return this.keyboardRequisitioner.addKeyboardArray(x);
-    }
+    })
   }
 
   /**
@@ -234,6 +234,64 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     }
   }
 
+  /**
+   * Get an associative array of keyboard identification strings
+   *   This was defined as an array, so is kept that way, but
+   *   Javascript treats it as an object anyway
+   *
+   * This is a public API function documented at
+   * https://help.keyman.com/developer/engine/web/17.0/reference/core/getKeyboard.
+   *
+   * @param       {Object}    Lstub      Keyboard stub object
+   * @param       {Object}    Lkbd       Keyboard script object
+   * @return      {Object}               Copy of keyboard identification strings
+   *
+   */
+  private _GetKeyboardDetail = function(Lstub: KeyboardStub, Lkbd: any /* KeyboardScriptObject */) { // I2078 - Full keyboard detail
+    var Lr={};
+    Lr['Name'] = Lstub['KN'];
+    Lr['InternalName'] =  Lstub['KI'];
+    Lr['LanguageName'] = Lstub['KL'];  // I1300 - Add support for language names
+    Lr['LanguageCode'] = Lstub['KLC']; // I1702 - Add support for language codes, region names, region codes, country names and country codes
+    Lr['RegionName'] = Lstub['KR'];
+    Lr['RegionCode'] = Lstub['KRC'];
+    Lr['CountryName'] = Lstub['KC'];
+    Lr['CountryCode'] = Lstub['KCC'];
+    Lr['KeyboardID'] = Lstub['KD'];
+    Lr['Font'] = Lstub['KFont'];
+    Lr['OskFont'] = Lstub['KOskFont'];
+    Lr['HasLoaded'] = !!Lkbd;
+
+    Lr['IsRTL'] = Lkbd ? !!Lkbd['KRTL'] : null;
+    return Lr;
+  }
+
+  /**
+   * Get API-friendly array of available keyboard stubs
+   *
+   * Refer to https://help.keyman.com/developer/engine/web/17.0/reference/core/getKeyboards.
+   *
+   * The type of each entry of the array corresponds to that of `getKeyboard`.
+   *
+   * @return   {Array}     Array of available keyboards
+   *
+   */
+  public getKeyboards() {
+    const Lr = [];
+
+    const cache = this.keyboardRequisitioner.cache;
+    const keyboardStubs = cache.getStubList()
+    for(let Ln=0; Ln < keyboardStubs.length; Ln++) { // I1511 - array prototype extended
+      const Lstub = keyboardStubs[Ln];
+
+      // In Chrome, (including on Android), Array.prototype.find() requires Chrome 45.
+      // This is a later version than the default on our oldest-supported Android devices.
+      const Lkbd = cache.getKeyboardForStub(Lstub);
+      const Lrn = this._GetKeyboardDetail(Lstub, Lkbd);  // I2078 - Full keyboard detail
+      Lr.push(Lrn);
+    }
+    return Lr;
+  }
 
   /**
    * Detaches all KMW event handlers attached by this instance of the engine and releases
