@@ -1,84 +1,84 @@
-/// <reference path="trackedPoint.ts" />
-/// <reference path="gestureRecognizerConfiguration.ts" />
-/// <reference path="includes/events.ts" />
-/// <reference path="trackedInput.ts" />
+import { EventEmitter } from "eventemitter3";
+import { GestureRecognizerConfiguration } from "./gestureRecognizerConfiguration.js";
+import { InputSample } from "./inputSample.js";
+import { Nonoptional } from "./nonoptional.js";
+import { TrackedPoint } from "./trackedPoint.js";
+import { TouchEventEngine } from "./touchEventEngine.js";
 
-namespace com.keyman.osk {
-  interface EventMap {
-    'pointstart': (input: TrackedPoint) => void
+interface EventMap {
+  'pointstart': (input: TrackedPoint) => void
+}
+
+export abstract class InputEventEngine extends EventEmitter<EventMap> {
+  protected readonly config: Nonoptional<GestureRecognizerConfiguration>;
+  private _activeTouchpoints: TrackedPoint[] = [];
+
+  public constructor(config: Nonoptional<GestureRecognizerConfiguration>) {
+    super();
+    this.config = config;
   }
 
-  export abstract class InputEventEngine extends EventEmitter<EventMap> {
-    protected readonly config: Nonoptional<GestureRecognizerConfiguration>;
-    private _activeTouchpoints: TrackedPoint[] = [];
+  abstract registerEventHandlers(): void;
+  abstract unregisterEventHandlers(): void;
 
-    public constructor(config: Nonoptional<GestureRecognizerConfiguration>) {
-      super();
-      this.config = config;
-    }
+  /**
+   * @param identifier The identifier number corresponding to the input sequence.
+   */
+  hasActiveTouchpoint(identifier: number) {
+    return this.getTouchpointWithId(identifier) !== undefined;
+  }
 
-    abstract registerEventHandlers();
-    abstract unregisterEventHandlers();
+  private getTouchpointWithId(identifier: number) {
+    return this._activeTouchpoints.find((point) => point.rawIdentifier == identifier);
+  }
 
-    /**
-     * @param identifier The identifier number corresponding to the input sequence.
-     */
-    hasActiveTouchpoint(identifier: number) {
-      return this.getTouchpointWithId(identifier) !== undefined;
-    }
+  public dropTouchpointWithId(identifier: number) {
+    this._activeTouchpoints = this._activeTouchpoints.filter((point) => point.rawIdentifier != identifier);
+  }
 
-    private getTouchpointWithId(identifier: number) {
-      return this._activeTouchpoints.find((point) => point.rawIdentifier == identifier);
-    }
+  protected buildSampleFor(clientX: number, clientY: number): InputSample {
+    const targetRect = this.config.targetRoot.getBoundingClientRect();
+    return {
+      clientX: clientX,
+      clientY: clientY,
+      targetX: clientX - targetRect.left,
+      targetY: clientY - targetRect.top,
+      t: performance.now()
+    };
+  }
 
-    public dropTouchpointWithId(identifier: number) {
-      this._activeTouchpoints = this._activeTouchpoints.filter((point) => point.rawIdentifier != identifier);
-    }
+  onInputStart(identifier: number, sample: InputSample, target: EventTarget) {
+    const touchpoint = new TrackedPoint(identifier, target, this instanceof TouchEventEngine);
+    touchpoint.path.extend(sample);
 
-    protected buildSampleFor(clientX, clientY): InputSample {
-      const targetRect = this.config.targetRoot.getBoundingClientRect();
-      return {
-        clientX: clientX,
-        clientY: clientY,
-        targetX: clientX - targetRect.left,
-        targetY: clientY - targetRect.top,
-        t: performance.now()
-      };
-    }
+    this._activeTouchpoints.push(touchpoint);
 
-    onInputStart(identifier: number, sample: InputSample, target: EventTarget) {
-      const touchpoint = new TrackedPoint(identifier, target, this instanceof TouchEventEngine);
-      touchpoint.path.extend(sample);
+    // External objects may desire to directly terminate handling of
+    // input sequences under specific conditions.
+    touchpoint.path.on('invalidated', () => {
+      this.dropTouchpointWithId(identifier);
+    });
 
-      this._activeTouchpoints.push(touchpoint);
+    touchpoint.path.on('complete', () => {
+      this.dropTouchpointWithId(identifier);
+    });
 
-      // External objects may desire to directly terminate handling of
-      // input sequences under specific conditions.
-      touchpoint.path.on('invalidated', () => {
-        this.dropTouchpointWithId(identifier);
-      });
+    this.emit('pointstart', touchpoint);
+  }
 
-      touchpoint.path.on('complete', () => {
-        this.dropTouchpointWithId(identifier);
-      });
+  onInputMove(identifier: number, sample: InputSample) {
+    this.getTouchpointWithId(identifier)?.path.extend(sample);
+  }
 
-      this.emit('pointstart', touchpoint);
-    }
+  onInputMoveCancel(identifier: number, sample: InputSample) {
+    const touchpoint = this.getTouchpointWithId(identifier);
+    touchpoint?.path.extend(sample);
+    touchpoint?.path.terminate(true);
+  }
 
-    onInputMove(identifier: number, sample: InputSample) {
-      this.getTouchpointWithId(identifier)?.path.extend(sample);
-    }
-
-    onInputMoveCancel(identifier: number, sample: InputSample) {
-      const touchpoint = this.getTouchpointWithId(identifier);
-      touchpoint?.path.extend(sample);
-      touchpoint?.path.terminate(true);
-    }
-
-    onInputEnd(identifier: number) {
-      // We do not add extend the path here because any 'end' event immediately
-      // follows a 'move' if it occurred simultaneously.
-      this.getTouchpointWithId(identifier)?.path.terminate(false);
-    }
+  onInputEnd(identifier: number) {
+    // We do not add extend the path here because any 'end' event immediately
+    // follows a 'move' if it occurred simultaneously.
+    this.getTouchpointWithId(identifier)?.path.terminate(false);
   }
 }

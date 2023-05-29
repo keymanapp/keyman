@@ -25,7 +25,7 @@ builder_describe "Builds the gesture-recognition model for Web-based on-screen k
 builder_describe_outputs \
   configure:module /node_modules \
   configure:tools  /node_modules \
-  build:module     build/index.js \
+  build:module     build/obj/index.js \
   build:tools      build/tools/unit-test-resources.js
 
 builder_parse "$@"
