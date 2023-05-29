@@ -227,7 +227,7 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
    *              If `false`, only forgets the metadata (stubs).
    */
   forgetKeyboard(keyboard: string | Keyboard, purge: boolean = false) {
-    let id: string = (keyboard instanceof Keyboard) ? keyboard.id : keyboard;
+    let id: string = (keyboard instanceof Keyboard) ? keyboard.id : prefixed(keyboard);
 
     if(this.stubSetTable[id]) {
       delete this.stubSetTable[id];

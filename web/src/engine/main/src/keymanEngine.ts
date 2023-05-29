@@ -113,6 +113,13 @@ export default class KeymanEngine<
       }
     }
 
+    // The OSK does not possess a direct connection to the KeyboardProcessor's state-key
+    // management object; this event + handler allow us to keep the OSK's related states
+    // in sync.
+    this.core.keyboardProcessor.on('statekeyChange', (stateKeys) => {
+      this.osk?.vkbd?.updateStateKeys(stateKeys);
+    })
+
     this.contextManager.on('beforekeyboardchange', (metadata) => {
       this.legacyAPIEvents.callEvent('beforekeyboardchange', {
         internalName: metadata?.id,
@@ -364,8 +371,24 @@ export default class KeymanEngine<
     }
   }
 
+  /**
+   * Allow to change active keyboard by (internal) keyboard name
+   *
+   * @param       {string}    PInternalName   Internal name
+   * @param       {string}    PLgCode         Language code
+   */
   async setActiveKeyboard(keyboardId: string, languageCode?: string): Promise<boolean> {
     return this.contextManager.activateKeyboard(keyboardId, languageCode, true);
+  }
+
+  /**
+   * Function     getActiveKeyboard
+   * Scope        Public
+   * @return      {string}      Name of active keyboard
+   * Description  Return internal name of currently active keyboard
+   */
+  getActiveKeyboard(): string {
+    return this.contextManager.activeKeyboard?.metadata.id ?? '';
   }
 
   /**

@@ -3,8 +3,8 @@ import { Device as DeviceDetector } from 'keyman/engine/device-detect';
 import { getAbsoluteY } from 'keyman/engine/dom-utils';
 import { OutputTarget } from 'keyman/engine/element-wrappers';
 import { AnchoredOSKView, FloatingOSKView, FloatingOSKViewConfiguration, OSKView, TwoStateActivator } from 'keyman/engine/osk';
-import { ErrorStub, KeyboardStub, CloudQueryResult } from 'keyman/engine/package-cache';
-import { DeviceSpec, ProcessorInitOptions, extendString } from "@keymanapp/keyboard-processor";
+import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId as prefixed } from 'keyman/engine/package-cache';
+import { DeviceSpec, type Keyboard, ProcessorInitOptions, extendString } from "@keymanapp/keyboard-processor";
 
 import { BrowserConfiguration, BrowserInitOptionDefaults, BrowserInitOptionSpec } from './configuration.js';
 import ContextManager from './contextManager.js';
@@ -15,6 +15,7 @@ import { PageIntegrationHandlers } from './context/pageIntegrationHandlers.js';
 import { LanguageMenu } from './languageMenu.js';
 import { setupOskListeners } from './oskConfiguration.js';
 import { whenDocumentReady } from './utils/documentReady.js';
+import { outputTargetForElement } from '../../../../build/engine/attachment/obj/outputTargetForElement.js';
 
 export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {
   touchLanguageMenu?: LanguageMenu;
@@ -80,14 +81,9 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // // Possible condition we can add:  no change of init options after a  ***
     // // prior finalized init.
 
-    // // if an initialization has already completed.
-    // if(!this.config.deferForInitialization.hasFinalized) {
-
     this.config.hostDevice = device;
     // Set any incoming options, overriding previous entries.
     this.config.initialize(totalOptions);
-
-    // }                                                                     ***
 
     this._initialized = 1;
 
@@ -176,8 +172,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
       return;
     }
 
-    // Should use `isAttached` method once available.
-    if(!Pelem._kmwAttachment) {
+    if(!this.isAttached(Pelem)) {
       console.error("KeymanWeb is not attached to element " + Pelem);
       return;
     }
@@ -191,6 +186,10 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     }
 
     this.contextManager.setKeyboardForTarget(Pelem._kmwAttachment.interface, Pkbd, Plc);
+  }
+
+  isAttached(x: HTMLElement): boolean {
+    return this.contextManager.page.isAttached(x);
   }
 
   /**
@@ -247,7 +246,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * @return      {Object}               Copy of keyboard identification strings
    *
    */
-  private _GetKeyboardDetail = function(Lstub: KeyboardStub, Lkbd: any /* KeyboardScriptObject */) { // I2078 - Full keyboard detail
+  private _GetKeyboardDetail = function(Lstub: KeyboardStub, Lkbd: Keyboard) { // I2078 - Full keyboard detail
     var Lr={};
     Lr['Name'] = Lstub['KN'];
     Lr['InternalName'] =  Lstub['KI'];
@@ -262,8 +261,23 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     Lr['OskFont'] = Lstub['KOskFont'];
     Lr['HasLoaded'] = !!Lkbd;
 
-    Lr['IsRTL'] = Lkbd ? !!Lkbd['KRTL'] : null;
+    Lr['IsRTL'] = Lkbd ? Lkbd.isRTL : null;
     return Lr;
+  }
+
+  /**
+   * Get keyboard meta data for the selected keyboard and language
+   *
+   * @param       {string}    PInternalName     Internal name of keyboard
+   * @param       {string=}   PlgCode           language code
+   * @return      {Object}                      Details of named keyboard
+   *
+   **/
+  getKeyboard(PInternalName: string, PlgCode?: string) {
+    const stub = this.keyboardRequisitioner.cache.getStub(PInternalName, PlgCode);
+    const keyboard = this.keyboardRequisitioner.cache.getKeyboardForStub(stub);
+
+    return this._GetKeyboardDetail(stub, keyboard);
   }
 
   /**
@@ -291,6 +305,66 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
       Lr.push(Lrn);
     }
     return Lr;
+  }
+
+  /**
+   * Build 362: removeKeyboards() remove keyboard from list of available keyboards
+   *
+   * @param {string}  x      keyboard name string
+   *
+   */
+  removeKeyboards(...x: string[]) {
+    for(let i=0; i < x.length; i++) {
+      // This will completely forget the keyboard, requiring an async load operation to restore it again.
+      // `true` is responsible for this & is required to pass a variable-store unit test.
+      this.keyboardRequisitioner.cache.forgetKeyboard(x[i], true);
+
+      if(this.contextManager.activeKeyboard?.metadata.id == prefixed(x[i])) {
+        this.contextManager.activateKeyboard('', '');
+      }
+    }
+
+    return true;
+  }
+
+
+  /**
+   * Set focus to last active target element (browser-dependent)
+   */
+  focusLastActiveElement() {
+    this.contextManager.lastActiveTarget.focus();
+  }
+
+  /**
+   * Get the last active target element *before* KMW activated (I1297)
+   *
+   * @return      {Object}
+   */
+  getLastActiveElement() {
+    return this.contextManager.lastActiveTarget.getElement();
+  }
+
+  /**
+   *  Set the active input element directly optionally setting focus
+   *
+   *  @param  {Object|string} e         element id or element
+   *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123)
+   **/
+  setActiveElement(e: string|HTMLElement, setFocus: boolean) {
+    if(typeof e == 'string') {
+      const id = e;
+      e = document.getElementById(e);
+
+      if(!e) {
+        throw new Error(`Could not find the specified element (id: ${id}`);
+      }
+    }
+
+    const target = outputTargetForElement(e);
+    if(!target) {
+      throw new Error(`KMW is not attached to the specified element (id: ${e.id}).`);
+    }
+    this.contextManager.setActiveTarget(target, setFocus);
   }
 
   /**

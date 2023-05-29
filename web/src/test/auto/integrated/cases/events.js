@@ -1,113 +1,118 @@
-// var assert = chai.assert;
+var assert = chai.assert;
 
-// describe('Event Management', function() {
-//   this.timeout(testconfig.timeouts.standard);
+import {
+  loadKeyboardFromJSON,
+  setupKMW,
+  teardownKMW
+} from "../test_utils.js";
+import * as KMWRecorder from '/@keymanapp/keyman/build/tools/testing/recorder/lib/index.mjs';
 
-//   before(function() {
-//     this.timeout(testconfig.timeouts.scriptLoad * 2);
-//     fixture.setBase('fixtures');
-//     fixture.load("eventTestConfig.html");
+describe('Event Management', function() {
+  this.timeout(testconfig.timeouts.standard);
 
-//     return setupKMW(null, testconfig.timeouts.scriptLoad).then(() => {
-//       // We use this keyboard since we only need minimal input functionality for these tests.
-//       // Smaller is better when dealing with net latency.
-//       return loadKeyboardFromJSON("/keyboards/test_simple_deadkeys.json", testconfig.timeouts.scriptLoad);
-//     });
-//   });
+  before(function() {
+    this.timeout(testconfig.timeouts.scriptLoad * 2);
+    fixture.setBase('fixtures');
+    fixture.load("eventTestConfig.html");
 
-//   after(function() {
-//     teardownKMW();
-//   });
+    return setupKMW(null, testconfig.timeouts.scriptLoad).then(() => {
+      // We use this keyboard since we only need minimal input functionality for these tests.
+      // Smaller is better when dealing with net latency.
+      return loadKeyboardFromJSON("/keyboards/test_simple_deadkeys.json", testconfig.timeouts.scriptLoad);
+    });
+  });
 
-//   it('Keystroke-based onChange event generation', function() {
-//     var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
-//     var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
+  after(function() {
+    teardownKMW();
+  });
 
-//     var ele = document.getElementById("input");
+  it('Keystroke-based onChange event generation', function() {
+    var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
+    var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
-//     ele.onchange = function() {
-//       ele.onchange = null;
-//     }
+    var ele = document.getElementById("input");
 
-//     // A bit of a force-hack to ensure the element is seen as active for the tests.
-//     com.keyman.dom['DOMEventHandlers'].states._lastActiveElement = ele;
-//     com.keyman.dom['DOMEventHandlers'].states._activeElement = ele;
+    ele.onchange = function() {
+      ele.onchange = null;
+    }
 
-//     let eventDriver = new KMWRecorder.BrowserDriver(ele);
-//     eventDriver.simulateEvent(event);
+    keyman.setActiveElement(ele);
 
-//     let focusEvent = new FocusEvent('blur', {relatedTarget: ele});
-//     ele.dispatchEvent(focusEvent);
+    let eventDriver = new KMWRecorder.BrowserDriver(ele);
+    eventDriver.simulateEvent(event);
 
-//     // Asserts that the handler is called.  As the handler clears itself, it will only
-//     // remain set if it hasn't been called.
-//     assert.isNull(ele.onchange, '`onchange` handler was not called');
-//   });
+    let focusEvent = new FocusEvent('blur', {relatedTarget: ele});
+    ele.dispatchEvent(focusEvent);
 
-//   it('OSK-based onChange event generation', function() {
-//     var simple_A = {"type":"osk","keyID":"default-K_A"};
-//     var event = new KMWRecorder.OSKInputEventSpec(simple_A);
+    // Asserts that the handler is called.  As the handler clears itself, it will only
+    // remain set if it hasn't been called.
+    assert.isNull(ele.onchange, '`onchange` handler was not called');
+  });
 
-//     var ele = document.getElementById("input");
+  it('OSK-based onChange event generation', function() {
+    var simple_A = {"type":"osk","keyID":"default-K_A"};
+    var event = new KMWRecorder.OSKInputEventSpec(simple_A);
 
-//     ele.onchange = function() {
-//       ele.onchange = null;
-//     }
+    var ele = document.getElementById("input");
 
-//     // A bit of a force-hack to ensure the element is seen as active for the tests.
-//     com.keyman.dom['DOMEventHandlers'].states._lastActiveElement = ele;
-//     com.keyman.dom['DOMEventHandlers'].states._activeElement = ele;
+    ele.onchange = function() {
+      ele.onchange = null;
+    }
 
-//     let eventDriver = new KMWRecorder.BrowserDriver(ele);
-//     eventDriver.simulateEvent(event);
+    keyman.setActiveElement(ele);
 
-//     let focusEvent = new FocusEvent('blur', {relatedTarget: ele});
-//     ele.dispatchEvent(focusEvent);
+    let eventDriver = new KMWRecorder.BrowserDriver(ele);
+    eventDriver.simulateEvent(event);
 
-//     // Asserts that the handler is called.  As the handler clears itself, it will only
-//     // remain set if it hasn't been called.
-//     assert.isNull(ele.onchange, '`onchange` handler was not called');
-//   });
+    let focusEvent = new FocusEvent('blur', {relatedTarget: ele});
+    ele.dispatchEvent(focusEvent);
 
-//   it('Keystroke-based onInput event generation', function() {
-//     var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
-//     var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
+    // Asserts that the handler is called.  As the handler clears itself, it will only
+    // remain set if it hasn't been called.
+    assert.isNull(ele.onchange, '`onchange` handler was not called');
+  });
 
-//     var ele = document.getElementById("input");
+  it('Keystroke-based onInput event generation', function() {
+    var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
+    var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
-//     var counterObj = {i:0};
-//     var fin = 3;
+    var ele = document.getElementById("input");
+    keyman.setActiveElement(ele);
 
-//     ele.addEventListener("input", function() {
-//       counterObj.i++;
-//     });
+    var counterObj = {i:0};
+    var fin = 3;
 
-//     let eventDriver = new KMWRecorder.BrowserDriver(ele);
-//     eventDriver.simulateEvent(event);
-//     eventDriver.simulateEvent(event);
-//     eventDriver.simulateEvent(event);
+    ele.addEventListener("input", function() {
+      counterObj.i++;
+    });
 
-//     assert.equal(counterObj.i, fin, "Event handler not called the expected number of times");
-//   });
+    let eventDriver = new KMWRecorder.BrowserDriver(ele);
+    eventDriver.simulateEvent(event);
+    eventDriver.simulateEvent(event);
+    eventDriver.simulateEvent(event);
 
-//   it('OSK-based onInput event generation', function() {
-//     var simple_A = {"type":"osk","keyID":"default-K_A"};
-//     var event = new KMWRecorder.OSKInputEventSpec(simple_A);
+    assert.equal(counterObj.i, fin, "Event handler not called the expected number of times");
+  });
 
-//     var ele = document.getElementById("input");
+  it('OSK-based onInput event generation', function() {
+    var simple_A = {"type":"osk","keyID":"default-K_A"};
+    var event = new KMWRecorder.OSKInputEventSpec(simple_A);
 
-//     var counterObj = {i:0};
-//     var fin = 3;
+    var ele = document.getElementById("input");
+    keyman.setActiveElement(ele);
 
-//     ele.addEventListener("input", function() {
-//       counterObj.i++;
-//     });
+    var counterObj = {i:0};
+    var fin = 3;
 
-//     let eventDriver = new KMWRecorder.BrowserDriver(ele);
-//     eventDriver.simulateEvent(event);
-//     eventDriver.simulateEvent(event);
-//     eventDriver.simulateEvent(event);
+    ele.addEventListener("input", function() {
+      counterObj.i++;
+    });
 
-//     assert.equal(counterObj.i, fin, "Event handler not called the expected number of times");
-//   });
-// });
+    let eventDriver = new KMWRecorder.BrowserDriver(ele);
+    eventDriver.simulateEvent(event);
+    eventDriver.simulateEvent(event);
+    eventDriver.simulateEvent(event);
+
+    assert.equal(counterObj.i, fin, "Event handler not called the expected number of times");
+  });
+});

@@ -196,10 +196,10 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       this._BlurKeyboardSettings(priorTarget.getElement());
     }
 
-    this.setActiveTarget(null);
+    this.setActiveTarget(null, true);
   }
 
-  private setActiveTarget(target: OutputTarget<any>) {
+  public setActiveTarget(target: OutputTarget<any>, sendEvents: boolean) {
     const previousTarget = this.mostRecentTarget;
     const originalTarget = this.activeTarget; // may differ, depending on focus state.
 
@@ -232,6 +232,14 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     if(target != originalTarget) {
       this.emit('targetchange', target);
+    }
+
+    if(sendEvents) {
+      // //Execute external (UI) code needed on focus if required
+      this.apiEvents.callEvent('controlfocused', {
+        target: target?.getElement() || null,
+        activeControl: previousTarget?.getElement()
+      });
     }
   }
 
@@ -553,15 +561,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     const previousTarget = this.lastActiveTarget;
 
     // Step 2:  Make the newly-focused control the active control, and thus the active context.
-    this.setActiveTarget(target);
-
-    // Step 3:  related events
-
-    // //Execute external (UI) code needed on focus if required
-    this.apiEvents.callEvent('controlfocused', {
-      target: target.getElement(),
-      activeControl: previousTarget?.getElement()
-    });
+    this.setActiveTarget(target, true);
 
     return true;
   }
