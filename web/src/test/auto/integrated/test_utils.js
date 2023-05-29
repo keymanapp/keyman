@@ -50,13 +50,13 @@ export function setupKMW(kmwOptions, timeout) {
   }
 
   let uiPromise;
-  // if(ui) {
-  //   uiPromise = setupScript('ui-source/kmwui' + ui + '.js', timeout, (scriptEle) => {
-  //     fixture.el.appendChild(scriptEle);
-  //   });
+  if(ui) {
+    uiPromise = setupScript('build/app/ui/kmwui' + ui + '.js', timeout, (scriptEle) => {
+      fixture.el.appendChild(scriptEle);
+    });
 
-  //   kmwOptions.ui=ui;
-  // }
+    kmwOptions.ui=ui;
+  }
 
   let compositePromise = kmwPromise;
   if(uiPromise) {

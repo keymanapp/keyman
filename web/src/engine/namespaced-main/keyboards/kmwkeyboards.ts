@@ -179,43 +179,6 @@ namespace com.keyman.keyboards {
     }
 
     /**
-     * Gets the cookie for the name and language code of the most recently active keyboard
-     *
-     *  Defaults to US English, but this needs to be user-set in later revision (TODO)
-     *
-     * @return      {string}          InternalName:LanguageCode
-     **/
-    getSavedKeyboard(): string {
-      var v = this.keymanweb.util.loadCookie('KeymanWeb_Keyboard');
-
-      if(typeof(v['current']) != 'string') {
-        return 'Keyboard_us:eng';
-      }
-
-      // Check that the requested keyboard is included in the available keyboard stubs
-      var n, stubs = this.keyboardStubs,kd;
-
-      for(n=0; n<stubs.length; n++) {
-        kd=stubs[n]['KI']+':'+stubs[n]['KLC'];
-        if(kd == v['current']) return kd;
-      }
-
-      // Default to US English if available (but don't assume it is first)
-      for(n=0; n<stubs.length; n++) {
-        kd=stubs[n]['KI']+':'+stubs[n]['KLC'];
-        if(kd == 'Keyboard_us:eng') return kd;
-      }
-
-      // Otherwise use the first keyboard stub
-      if(stubs.length > 0) {
-        return stubs[0]['KI']+':'+stubs[0]['KLC'];
-      }
-
-      // Or US English if no stubs loaded (should never happen)
-      return 'Keyboard_us:eng';
-    }
-
-    /**
      * Function    isCJK
      * Scope       Public
      * @param      {Object=}  k0

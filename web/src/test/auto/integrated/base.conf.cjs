@@ -75,6 +75,7 @@ module.exports = {
   proxies: {
     "/build/app/browser/": "/base/web/build/app/browser/debug/",
     "/build/app/resources/": "/base/web/build/app/resources/",
+    "/build/app/ui/": "/base/web/build/app/ui/debug/",
     "/resources/": "/base/common/test/resources/",
     "/source/recorder_InputEvents.js.map": "/base/common/tests/recorder_InputEvents.js.map",
     "/node_modules/": "/base/node_modules/",

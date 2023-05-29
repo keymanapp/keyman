@@ -195,6 +195,17 @@ export class StylesheetManager {
     this.linkStylesheet(linkElement);
   }
 
+  public unlink(stylesheet: HTMLStyleElement) {
+    const index = this.linkedSheets.indexOf(stylesheet);
+    if(index > -1) {
+      this.linkedSheets.splice(index, 1);
+      stylesheet.parentNode.removeChild(stylesheet);
+      return true;
+    }
+
+    return false;
+  }
+
   public unlinkAll() {
     for(let sheet of this.linkedSheets) {
       if(sheet.parentNode) {

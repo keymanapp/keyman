@@ -21,6 +21,7 @@ export class BrowserConfiguration extends EngineConfiguration {
       this._options = {...options};
     }
     super.initialize(options);
+    this._options = options;
 
     this._ui = options.ui;
     this._attachType = options.attachType;
@@ -33,6 +34,10 @@ export class BrowserConfiguration extends EngineConfiguration {
         this._alertHost = null;
       }
     });
+  }
+
+  get options() {
+    return this._options;
   }
 
   get attachType() {

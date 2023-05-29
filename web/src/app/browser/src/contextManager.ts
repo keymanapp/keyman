@@ -12,7 +12,7 @@ import {
 import { BrowserConfiguration } from './configuration.js';
 import { FocusAssistant } from './context/focusAssistant.js';
 
-interface KeyboardCookie {
+export interface KeyboardCookie {
   current: string;
 }
 
@@ -654,6 +654,49 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     this.resetContext();
     return true;
   };
+
+  /**
+   * Gets the cookie for the name and language code of the most recently active keyboard
+   *
+   *  Defaults to US English, but this needs to be user-set in later revision (TODO)
+   *
+   * @return      {string}          InternalName:LanguageCode
+   **/
+  getSavedKeyboard(): string {
+    const cookie = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
+    var v = cookie.load(decodeURIComponent);
+
+    if(typeof(v.current) != 'string') {
+      return 'Keyboard_us:eng';
+    }
+
+    // Check that the requested keyboard is included in the available keyboard stubs
+    const stubs = this.keyboardCache.getStubList()
+    let kd: string;
+
+    for(let n=0; n<stubs.length; n++) {
+      kd=stubs[n]['KI']+':'+stubs[n]['KLC'];
+      if(kd == v.current) {
+        return kd;
+      }
+    }
+
+    // Default to US English if available (but don't assume it is first)
+    for(let n=0; n<stubs.length; n++) {
+      kd=stubs[n]['KI']+':'+stubs[n]['KLC'];
+      if(kd == 'Keyboard_us:eng') {
+        return kd;
+      }
+    }
+
+    // Otherwise use the first keyboard stub
+    if(stubs.length > 0) {
+      return stubs[0]['KI']+':'+stubs[0]['KLC'];
+    }
+
+    // Or US English if no stubs loaded (should never happen)
+    return 'Keyboard_us:eng';
+  }
 
   /**
    * Function     nonKMWTouchHandler
