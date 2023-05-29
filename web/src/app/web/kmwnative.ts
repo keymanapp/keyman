@@ -35,40 +35,6 @@ if(!window['keyman']['initialized']) {
       }
     }
 
-  /**
-     * Customized wait display
-     *
-     * @param   {string|boolean}   s       displayed text (or false)
-     */
-    util.wait = function(s) {
-      // Keyboards loaded with page are initialized before the page is ready,
-      // so cannot use the wait indicator (and don't need it, anyway)
-      // Do not display if a blocking cloud server error has occurred (to prevent multiple errors)
-      var bg=this.waiting;
-      if(typeof(bg) == 'undefined' || bg == null || keymanweb.warned) {
-        return;
-      }
-
-      var nn=bg.firstChild.childNodes;
-      if(s) {
-        bg.pending=true;
-        window.setTimeout(function() {
-            if(bg.pending && keymanweb.options.useAlerts) {
-              window.scrollTo(0,0);
-              nn[0].style.display='none';
-              nn[1].className='kmw-wait-text'; nn[1].innerHTML=s;
-              nn[2].style.display='block';
-              bg.style.display='block';
-            }
-          },1000);
-      } else {
-        if(bg.pending) {
-          nn[1].innerHTML='';
-          bg.pending=false; bg.style.display='none';
-        }
-      }
-    }
-
     // Get default style sheet path
     keymanweb.getStyleSheetPath=function(ssName) {
       var ssPath = util['getOption']('resources')+'osk/'+ssName;
@@ -88,16 +54,6 @@ if(!window['keyman']['initialized']) {
     keymanweb.getKeyboardPath=function(Lfilename) {
       var rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');
       return (rx.test(Lfilename) ? '' : keymanweb.options['keyboards']) + Lfilename;
-    }
-
-    /**
-     * Test if caret position is determined from the active element, or
-     * from the synthesized overlay element (touch devices)
-     *
-     * @return  {boolean}
-     **/
-    keymanweb.isPositionSynthesized = function() {
-      return device.touchable;
     }
 
     /**

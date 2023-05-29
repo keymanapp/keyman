@@ -38,6 +38,9 @@ builder_parse "$@"
 
 ####
 
+TIER=`cat ../TIER.md`
+BUILD_NUMBER=`cat ../VERSION.md`
+
 if builder_start_action build; then
   # Build step:  since CI builds start (and should start) from scratch, run the following
   # three actions:
@@ -109,9 +112,11 @@ if builder_start_action prepare:s.keyman.com; then
 
   # The main build products are expected to reside at the root of this folder.
   BASE_PUBLISH_FOLDER="$S_KEYMAN_COM/kmw/engine/$VERSION"
+  echo "FOLDER: $BASE_PUBLISH_FOLDER"
   mkdir -p "$BASE_PUBLISH_FOLDER"
 
-  cp -Rf build/app/web/release/* "$BASE_PUBLISH_FOLDER"
+  cp -Rf build/app/browser/release/* "$BASE_PUBLISH_FOLDER"
+  cp -Rf build/app/resources/* "$BASE_PUBLISH_FOLDER/resources"
   cp -Rf build/app/ui/release/* "$BASE_PUBLISH_FOLDER"
 
   # Third phase: tweak the sourcemaps
@@ -156,10 +161,14 @@ if builder_start_action prepare:downloads.keyman.com; then
     fi
   fi
 
-  pushd build/app/web/release
+  pushd build/app/browser/release
   "${COMPRESS_CMD}" $COMPRESS_ADD ../../../../$ZIP *
   cd ..
   "${COMPRESS_CMD}" $COMPRESS_ADD ../../../$ZIP debug
+  popd
+
+  pushd build/app/resources
+  "${COMPRESS_CMD}" $COMPRESS_ADD ../../../$ZIP *
   popd
 
   pushd build/app/ui/release

@@ -1,6 +1,53 @@
 {
   "name": "keyman",
   "description": "Facilitates text input in any language.",
+  "exports": {
+    "./engine/attachment": {
+      "types": "./build/engine/attachment/obj/index.d.ts",
+      "import": "./build/engine/attachment/obj/index.js"
+    },
+    "./engine/paths": {
+      "types": "./build/engine/paths/obj/index.d.ts",
+      "import": "./build/engine/paths/obj/index.js"
+    },
+    "./engine/device-detect": {
+      "types": "./build/engine/device-detect/obj/index.d.ts",
+      "import": "./build/engine/device-detect/obj/index.js"
+    },
+    "./engine/dom-utils": {
+      "types": "./build/engine/dom-utils/obj/index.d.ts",
+      "import": "./build/engine/dom-utils/obj/index.js"
+    },
+    "./engine/element-wrappers": {
+      "types": "./build/engine/element-wrappers/obj/index.d.ts",
+      "import": "./build/engine/element-wrappers/obj/index.js"
+    },
+    "./engine/events": {
+      "types": "./build/engine/events/obj/index.d.ts",
+      "import": "./build/engine/events/obj/index.js"
+    },
+    "./engine/package-cache": {
+      "types": "./build/engine/package-cache/obj/index.d.ts",
+      "import": "./build/engine/package-cache/obj/index.js",
+      "require": "./build/engine/package-cache/obj/index.js"
+    },
+    "./engine/package-cache/dom-requester": {
+      "types": "./build/engine/package-cache/obj/domCloudRequester.d.ts",
+      "import": "./build/engine/package-cache/obj/domCloudRequester.js"
+    },
+    "./engine/package-cache/node-requester": {
+      "types": "./build/engine/package-cache/obj/nodeCloudRequester.d.ts",
+      "import": "./build/engine/package-cache/obj/nodeCloudRequester.js"
+    },
+    "./engine/main": {
+      "types": "./build/engine/main/obj/index.d.ts",
+      "import": "./build/engine/main/obj/index.js"
+    },
+    "./engine/osk": {
+      "types": "./build/engine/osk/obj/index.d.ts",
+      "import": "./build/engine/osk/obj/index.js"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/keymanapp/keyman.git"
@@ -59,5 +106,6 @@
     "@keymanapp/web-utils": "*",
     "@types/node": "^11.9.4",
     "eventemitter3": "^4.0.0"
-  }
+  },
+  "type": "module"
 }

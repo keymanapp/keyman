@@ -21,7 +21,7 @@
     { "path": "./developer/src/kmc-package/test/tsconfig.json" },
     { "path": "./developer/src/kmc-package/tsconfig.json" },
 
-    { "path": "./common/web/keyman-version/tsconfig.esm.json" },
+    { "path": "./common/web/keyman-version" },
     { "path": "./common/web/types/" },
   ]
 }

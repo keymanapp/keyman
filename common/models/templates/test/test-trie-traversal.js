@@ -2,8 +2,8 @@
  * Unit tests for the Trie prediction model.
  */
 
-var assert = require('chai').assert;
-var TrieModel = require('../build/index.bundled.js').models.TrieModel;
+import { assert } from 'chai';
+import { TrieModel } from '@keymanapp/models-templates';
 
 // Useful for tests related to strings with supplementary pairs.
 var smpForUnicode = function(code){
@@ -23,7 +23,7 @@ describe('Trie traversal abstractions', function() {
     let rootKeys = ['t', 'o', 'a', 'i', 'w', 'h', 'f', 'b', 'n', 'y', 's', 'm',
                     'u', 'c', 'd', 'l', 'e', 'j', 'p', 'g', 'v', 'k', 'r', 'q']
 
-    for(child of rootTraversal.children()) {
+    for(let child of rootTraversal.children()) {
       let keyIndex = rootKeys.indexOf(child.char);
       assert.notEqual(keyIndex, -1);
       rootKeys.splice(keyIndex, 1);
@@ -43,7 +43,7 @@ describe('Trie traversal abstractions', function() {
     let tSuccess = false;
     let hSuccess = false;
     let eSuccess = false;
-    for(child of rootTraversal.children()) {
+    for(let child of rootTraversal.children()) {
       if(child.char == 't') {
         tSuccess = true;
         let traversalInner1 = child.traversal();
@@ -51,7 +51,7 @@ describe('Trie traversal abstractions', function() {
         assert.isArray(child.traversal().entries);
         assert.isEmpty(child.traversal().entries);
 
-        for(tChild of traversalInner1.children()) {
+        for(let tChild of traversalInner1.children()) {
           if(tChild.char == 'h') {
             hSuccess = true;
             let traversalInner2 = tChild.traversal();
@@ -59,7 +59,7 @@ describe('Trie traversal abstractions', function() {
             assert.isEmpty(tChild.traversal().entries);
             assert.isArray(tChild.traversal().entries);
 
-            for(hChild of traversalInner2.children()) {
+            for(let hChild of traversalInner2.children()) {
               if(hChild.char == 'e') {
                 eSuccess = true;
                 let traversalInner3 = hChild.traversal();
@@ -68,7 +68,7 @@ describe('Trie traversal abstractions', function() {
                 assert.isDefined(traversalInner3.entries);
                 assert.equal(traversalInner3.entries[0], "the");
 
-                for(eChild of traversalInner3.children()) {
+                for(let eChild of traversalInner3.children()) {
                   let keyIndex = eKeys.indexOf(eChild.char);
                   assert.notEqual(keyIndex, -1, "Did not find char '" + eChild.char + "' in array!");
                   eKeys.splice(keyIndex, 1);
@@ -96,21 +96,21 @@ describe('Trie traversal abstractions', function() {
     // 't', 'r', 'o' have siblings, but these don't.
     let leafChildSequence = ['u', 'b', 'l', 'e'];
     let eSuccess = false;
-    for(child of rootTraversal.children()) {
+    for(let child of rootTraversal.children()) {
       if(child.char == 't') {
         let traversalInner1 = child.traversal();
         assert.isDefined(traversalInner1);
         assert.isArray(child.traversal().entries);
         assert.isEmpty(child.traversal().entries);
 
-        for(tChild of traversalInner1.children()) {
+        for(let tChild of traversalInner1.children()) {
           if(tChild.char == 'r') {
             let traversalInner2 = tChild.traversal();
             assert.isDefined(traversalInner2);
             assert.isArray(tChild.traversal().entries);
             assert.isEmpty(tChild.traversal().entries);
 
-            for(rChild of traversalInner2.children()) {
+            for(let rChild of traversalInner2.children()) {
               if(rChild.char == 'o') {
                 let curChild = rChild;
 
@@ -176,7 +176,7 @@ describe('Trie traversal abstractions', function() {
     let aSuccess = false;
     let pSuccess = false;
     let eSuccess = false;
-    for(child of rootTraversal.children()) {
+    for(let child of rootTraversal.children()) {
       if(child.char == smpA) {
         aSuccess = true;
         let traversalInner1 = child.traversal();
@@ -184,7 +184,7 @@ describe('Trie traversal abstractions', function() {
         assert.isArray(child.traversal().entries);
         assert.isEmpty(child.traversal().entries);
 
-        for(aChild of traversalInner1.children()) {
+        for(let aChild of traversalInner1.children()) {
           if(aChild.char == smpP) {
             pSuccess = true;
             let traversalInner2 = aChild.traversal();
@@ -192,7 +192,7 @@ describe('Trie traversal abstractions', function() {
             assert.isArray(aChild.traversal().entries);
             assert.isEmpty(aChild.traversal().entries);
 
-            for(pChild of traversalInner2.children()) {
+            for(let pChild of traversalInner2.children()) {
               let keyIndex = pKeys.indexOf(pChild.char);
               assert.notEqual(keyIndex, -1, "Did not find char '" + pChild.char + "' in array!");
               pKeys.splice(keyIndex, 1);

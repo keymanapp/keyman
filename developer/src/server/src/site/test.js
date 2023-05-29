@@ -285,7 +285,7 @@ function unloadKeyboardsAndModels() {
   const lastModel = keyman.core.activeModel;
   if(lastModel) {
     console.log('Unregistering model '+lastModel.id);
-    keyman.modelManager.deregister(lastModel.id);
+    keyman.removeModel(lastModel.id);
   }
 
   modelDropdown.removeAll();
@@ -360,7 +360,7 @@ function selectModel(modelId) {
   const lastModel = keyman.core.activeModel;
 
   if(lastModel) {
-    keyman.modelManager.deregister(lastModel.id);
+    keyman.removeModel(lastModel.id);
   }
 
   if(model) {
