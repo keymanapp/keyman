@@ -1,7 +1,7 @@
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m } from "@keymanapp/common-types";
 
 const Namespace = CompilerErrorNamespace.PackageCompiler;
-// const SevInfo = CompilerErrorSeverity.Info | Namespace;
+const SevInfo = CompilerErrorSeverity.Info | Namespace;
 // const SevHint = CompilerErrorSeverity.Hint | Namespace;
 const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
@@ -31,28 +31,28 @@ export class CompilerMessages {
     `FollowKeyboardVersion is not allowed in model packages`);
   static ERROR_FollowKeyboardVersionNotAllowedForModelPackages = SevError | 0x0006;
 
-  static Warn_FollowKeyboardVersionButNoKeyboards = () => m(this.WARN_FollowKeyboardVersionButNoKeyboards,
+  static Error_FollowKeyboardVersionButNoKeyboards = () => m(this.ERROR_FollowKeyboardVersionButNoKeyboards,
     `FollowKeyboardVersion is set, but the package contains no keyboards`);
-  static WARN_FollowKeyboardVersionButNoKeyboards = SevWarn | 0x0007;
+  static ERROR_FollowKeyboardVersionButNoKeyboards = SevError | 0x0007;
 
-  static Error_KeyboardFileNotFound = (o:{id:string}) => m(this.ERROR_KeyboardFileNotFound,
+  static Error_KeyboardContentFileNotFound = (o:{id:string}) => m(this.ERROR_KeyboardContentFileNotFound,
     `Keyboard ${o.id} was listed in <Keyboards> but a corresponding .kmx file was not found in <Files>`);
-  static ERROR_KeyboardFileNotFound = SevError | 0x0008;
+  static ERROR_KeyboardContentFileNotFound = SevError | 0x0008;
 
   static Error_KeyboardFileNotValid = (o:{filename:string}) => m(this.ERROR_KeyboardFileNotValid,
     `Keyboard file ${o.filename} is not a valid .kmx file`);
   static ERROR_KeyboardFileNotValid = SevError | 0x0009;
 
-  static Warn_KeyboardFileHasNoKeyboardVersion = (o:{filename:string}) => m(this.WARN_KeyboardFileHasNoKeyboardVersion,
-    `Keyboard file ${o.filename} has no &KeyboardVersion store`);
-  static WARN_KeyboardFileHasNoKeyboardVersion = SevWarn | 0x000A;
+  static Info_KeyboardFileHasNoKeyboardVersion = (o:{filename:string}) => m(this.INFO_KeyboardFileHasNoKeyboardVersion,
+    `Keyboard file ${o.filename} has no &KeyboardVersion store, using default '0.0'`);
+  static INFO_KeyboardFileHasNoKeyboardVersion = SevInfo | 0x000A;
 
   static Error_PackageCannotContainBothModelsAndKeyboards = () => m(this.ERROR_PackageCannotContainBothModelsAndKeyboards,
     `The package contains both lexical models and keyboards, which is not permitted.`);
   static ERROR_PackageCannotContainBothModelsAndKeyboards = SevError | 0x000B;
 
-  static Warn_PackageShouldNotRepeatLanguages = (o:{resourceType: string, id: string, tag: string}) => m(this.WARN_PackageShouldNotRepeatLanguages,
-    `The ${o.resourceType} ${o.id} has a repeated language "${o.tag}".`);
+  static Warn_PackageShouldNotRepeatLanguages = (o:{resourceType: string, id: string, minimalTag: string, firstTag: string, secondTag: string}) => m(this.WARN_PackageShouldNotRepeatLanguages,
+    `Two language tags in ${o.resourceType} ${o.id}, '${o.firstTag}' and '${o.secondTag}', reduce to the same minimal tag '${o.minimalTag}'.`);
   static WARN_PackageShouldNotRepeatLanguages = SevWarn | 0x000C;
 
   static Warn_PackageNameDoesNotFollowLexicalModelConventions = (o:{filename: string}) => m(this.WARN_PackageNameDoesNotFollowLexicalModelConventions,
@@ -74,5 +74,45 @@ export class CompilerMessages {
   static Error_PackageNameCannotBeBlank = () => m(this.ERROR_PackageNameCannotBeBlank,
     `Package name cannot be an empty string.`);
   static ERROR_PackageNameCannotBeBlank = SevError | 0x0010;
+
+  static Error_KeyboardFileNotFound = (o:{filename:string}) => m(this.ERROR_KeyboardFileNotFound,
+    `Keyboard file ${o.filename} was not found. Has it been compiled?`);
+  static ERROR_KeyboardFileNotFound = SevError | 0x0011;
+
+  static Warn_KeyboardVersionsDoNotMatch = (o: {keyboard:string, version:string, firstKeyboard:string, firstVersion:string}) => m(this.WARN_KeyboardVersionsDoNotMatch,
+    `Keyboard ${o.keyboard} version ${o.version} does not match keyboard ${o.firstKeyboard} version ${o.firstVersion}.`);
+  static WARN_KeyboardVersionsDoNotMatch = SevWarn | 0x0012;
+
+  static Warn_KeyboardVersionsDoNotMatchPackageVersion = (o: {keyboard:string, keyboardVersion: string, packageVersion: string}) => m(this.WARN_KeyboardVersionsDoNotMatchPackageVersion,
+    `Keyboard ${o.keyboard} version ${o.keyboardVersion} does not match package version ${o.packageVersion}.`);
+  static WARN_KeyboardVersionsDoNotMatchPackageVersion = SevWarn | 0x0013;
+
+  static Error_LanguageTagIsNotValid = (o: {resourceType: string, id:string, lang:string, e:any}) => m(this.ERROR_LanguageTagIsNotValid,
+    `Language tag '${o.lang}' in ${o.resourceType} ${o.id} is invalid.`);
+  static ERROR_LanguageTagIsNotValid = SevError | 0x0014;
+
+  static Warn_LanguageTagIsNotMinimal = (o: {resourceType: string, id:string, actual:string, expected:string}) => m(this.WARN_LanguageTagIsNotMinimal,
+    `Language tag '${o.actual}' in ${o.resourceType} ${o.id} is not minimal, and should be '${o.expected}'.`);
+  static WARN_LanguageTagIsNotMinimal = SevWarn | 0x0015;
+
+  static Error_MustHaveAtLeastOneLanguage = (o:{resourceType:string, id:string}) => m(this.ERROR_MustHaveAtLeastOneLanguage,
+    `The ${o.resourceType} ${o.id} must have at least one language specified.`);
+  static ERROR_MustHaveAtLeastOneLanguage = SevError | 0x0016;
+
+  static Warn_RedistFileShouldNotBeInPackage = (o:{filename:string}) => m(this.WARN_RedistFileShouldNotBeInPackage,
+    `The Keyman system file '${o.filename}' should not be compiled into the package.`);
+  static WARN_RedistFileShouldNotBeInPackage = SevWarn | 0x0017;
+
+  static Warn_DocFileDangerous = (o:{filename:string}) => m(this.WARN_DocFileDangerous,
+    `Microsoft Word .doc or .docx files ('${o.filename}') are not portable. You should instead use HTML or PDF format.`);
+  static WARN_DocFileDangerous = SevWarn | 0x0018;
+
+  static Error_PackageMustContainAModelOrAKeyboard = () => m(this.ERROR_PackageMustContainAModelOrAKeyboard,
+    `Package must contain a lexical model or a keyboard.`);
+  static ERROR_PackageMustContainAModelOrAKeyboard = SevError | 0x0019;
+
+  static Warn_JsKeyboardFileIsMissing = (o:{id: string}) => m(this.WARN_JsKeyboardFileIsMissing,
+    `Keyboard ${o.id} targets touch devices but corresponding ${o.id}.js file is not in the package.`);
+  static WARN_JsKeyboardFileIsMissing = SevWarn | 0x001A;
 }
 

@@ -784,7 +784,7 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   return CheckForDuplicateStore(fk, sp);
 }
 
-KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, KMX_WCHAR const * str, KMX_DWORD *dwStoreID)
+KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, const KMX_WCHAR * str, KMX_DWORD *dwStoreID)
 {
   PFILE_STORE sp;
   sp = new FILE_STORE[fk->cxStoreArray + 1];
@@ -1023,6 +1023,9 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   case TSS_VISUALKEYBOARD:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
     {
+      // Store extra metadata for callers as we mutate this store during
+      // compilation
+      fk->extra->kvksFilename = sp->dpString;
       // Strip path from the store, leaving bare filename only
       p = sp->dpString;
 
@@ -2888,7 +2891,7 @@ KMX_BOOL kmcmp::CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsS
   return TRUE;
 }
 
-KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
+KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, KMX_BYTE**data, size_t& dataSize)
 {
   PFILE_GROUP fgp;
   PFILE_STORE fsp;
@@ -2902,6 +2905,9 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
   size_t offset;
   size_t size;
   KMX_DWORD i, j;
+
+  *data = nullptr;
+  dataSize = 0;
 
   // Calculate how much memory to allocate
 
@@ -3056,15 +3062,8 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
 
   SetChecksum(buf, &ck->dwCheckSum, (KMX_DWORD)size);
 
-  KMX_DWORD dwBytesWritten = 0;
-  dwBytesWritten = (KMX_DWORD)fwrite(buf,1, (KMX_DWORD)size ,  fp_out);
-
-  if (dwBytesWritten != size) {
-    delete[] buf;
-    return CERR_UnableToWriteFully;
-  }
-
-  delete[] buf;
+  *data = buf;
+  dataSize = size;
 
   return CERR_None;
 }
