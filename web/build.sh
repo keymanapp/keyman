@@ -119,3 +119,7 @@ if builder_start_action test:project; then
 
   builder_finish_action success test:project
 fi
+
+if builder_has_action build:app/ui; then
+  builder_die "Modularization work is not yet complete; builds dependent on this will fail."
+fi

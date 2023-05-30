@@ -4,7 +4,8 @@ import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 import { CompilerCallbacks, KvkFile } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
-import { KmpJsonFile, KpsFile, KMX, KmxFileReader } from '@keymanapp/common-types';
+import { KmpJsonFile, KpsFile } from '@keymanapp/common-types';
+import { PackageVersionValidation } from './package-version-validation.js';
 
 const FILEVERSION_KMP_JSON = '12.0';
 
@@ -104,16 +105,16 @@ export class KmpCompiler {
     //
 
     if(kps.keyboards && kps.keyboards.keyboard) {
-      kmp.keyboards = this.arrayWrap(kps.keyboards.keyboard).map((keyboard: KpsFile.KpsFileKeyboard) => {
-        return {
-          displayFont: keyboard.displayFont ? this.callbacks.path.basename(keyboard.displayFont) : undefined,
-          oskFont: keyboard.oSKFont ? this.callbacks.path.basename(keyboard.oSKFont) : undefined,
-          name:keyboard.name,
-          id:keyboard.iD,
-          version:keyboard.version,
-          languages: this.kpsLanguagesToKmpLanguages(this.arrayWrap(keyboard.languages.language) as KpsFile.KpsFileLanguage[])
-        };
-      });
+      kmp.keyboards = this.arrayWrap(kps.keyboards.keyboard).map((keyboard: KpsFile.KpsFileKeyboard) => ({
+        displayFont: keyboard.displayFont ? this.callbacks.path.basename(keyboard.displayFont) : undefined,
+        oskFont: keyboard.oSKFont ? this.callbacks.path.basename(keyboard.oSKFont) : undefined,
+        name:keyboard.name,
+        id:keyboard.iD,
+        version:keyboard.version,
+        languages: keyboard.languages ?
+          this.kpsLanguagesToKmpLanguages(this.arrayWrap(keyboard.languages.language) as KpsFile.KpsFileLanguage[]) :
+          []
+      }));
     }
 
     //
@@ -121,20 +122,22 @@ export class KmpCompiler {
     //
 
     if(kps.lexicalModels && kps.lexicalModels.lexicalModel) {
-      kmp.lexicalModels = this.arrayWrap(kps.lexicalModels.lexicalModel).map((model: KpsFile.KpsFileLexicalModel) => {
-        return { name:model.name, id:model.iD, languages: this.kpsLanguagesToKmpLanguages(this.arrayWrap(model.languages.language) as KpsFile.KpsFileLanguage[]) }
-      });
+      kmp.lexicalModels = this.arrayWrap(kps.lexicalModels.lexicalModel).map((model: KpsFile.KpsFileLexicalModel) => ({
+        name:model.name,
+        id:model.iD,
+        languages: model.languages ?
+          this.kpsLanguagesToKmpLanguages(this.arrayWrap(model.languages.language) as KpsFile.KpsFileLanguage[]) : []
+      }));
     }
 
     //
-    // FollowKeyboardVersion support
+    // Verify version metadata; doing this in the transform
+    // while we have access to the .kps metadata, and keeping the
     //
 
-    if(kps.options?.followKeyboardVersion !== undefined) {
-      kmp.info.version = {
-        description: this.extractKeyboardVersionFromKmx(kpsFilename, kmp)
-      };
-      // TODO: compare the extracted version with other keyboards in the package
+    const versionValidator = new PackageVersionValidation(this.callbacks);
+    if(!versionValidator.validateAndUpdateVersions(kpsFilename, kps, kmp)) {
+      return null;
     }
 
     //
@@ -195,67 +198,7 @@ export class KmpCompiler {
     return language.map((element) => { return { name: element._, id: element.$.ID } });
   };
 
-  private extractKeyboardVersionFromKmx(kpsFilename: string, kmp: KmpJsonFile.KmpJsonFile) {
-    // The DEFAULT_VERSION used to be '1.0', but we now use '0.0' to allow
-    // pre-release 0.x keyboards to be considered later than a keyboard without
-    // any version metadata at all.
-    const DEFAULT_VERSION = '0.0';
 
-    // Note: there is often version metadata in the .kps <Keyboard> element, but
-    // we don't read from the metadata because we want to ensure we have the
-    // most up-to-date keyboard version data here, from the compiled keyboard.
-
-    // Lexical model packages do not allow FollowKeyboardVersion
-    if(kmp.lexicalModels && kmp.lexicalModels.length) {
-      this.callbacks.reportMessage(CompilerMessages.Error_FollowKeyboardVersionNotAllowedForModelPackages());
-      return DEFAULT_VERSION;
-    }
-
-    if(!kmp.keyboards || !kmp.keyboards.length) {
-      this.callbacks.reportMessage(CompilerMessages.Warn_FollowKeyboardVersionButNoKeyboards());
-      return DEFAULT_VERSION;
-    }
-
-    // Reset the keyboard version to the default in the kmp.json metadata, for
-    // warning/failure code paths in this file
-    kmp.keyboards[0].version = DEFAULT_VERSION;
-
-    const file = kmp.files.find(file => this.callbacks.path.basename(file.name, '.kmx') == kmp.keyboards[0].id);
-    if(!file) {
-      this.callbacks.reportMessage(CompilerMessages.Error_KeyboardFileNotFound({id:kmp.keyboards[0].id}));
-      return DEFAULT_VERSION;
-    }
-
-    const filename = this.callbacks.resolveFilename(kpsFilename, file.name);
-    if(!this.callbacks.fs.existsSync(filename)) {
-      // The zip phase will emit an error later if the file is missing, so
-      // we can just bail cleanly here
-      // console.debug(`The file ${filename} was not found`);
-      return DEFAULT_VERSION;
-    }
-
-    //
-    // load the .kmx and extract the version number
-    //
-    const kmxFileData = this.callbacks.loadFile(filename);
-    const kmxReader: KmxFileReader = new KmxFileReader();
-    const kmx: KMX.KEYBOARD = kmxReader.read(kmxFileData);
-    if(!kmx) {
-      // The file couldn't be read, it might be invalid or locked
-      this.callbacks.reportMessage(CompilerMessages.Error_KeyboardFileNotValid({filename}));
-      return DEFAULT_VERSION;
-    }
-
-    const store = kmx.stores.find(store => store.dwSystemID == KMX.KMXFile.TSS_KEYBOARDVERSION);
-    if(!store) {
-      // We have no version number store, so use default version
-      this.callbacks.reportMessage(CompilerMessages.Warn_KeyboardFileHasNoKeyboardVersion({filename}));
-      return DEFAULT_VERSION;
-    }
-
-    kmp.keyboards[0].version = store.dpString;
-    return store.dpString;
-  }
 
   private stripUndefined(o: any) {
     for(const key in o) {

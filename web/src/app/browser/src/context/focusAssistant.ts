@@ -29,7 +29,7 @@ interface EventMap {
    * Called immediately after the `maintainingFocus` flag is cleared.
    * @returns
    */
-  'maintainingend': () => void;
+  'maintainingfocusend': () => void;
 }
 
 // Formerly handled under "UIManager".
@@ -70,7 +70,7 @@ export class FocusAssistant extends EventEmitter<EventMap> {
 
     // Needed to properly update .activeTarget upon loss of maintaining-focus state.
     if(priorValue && !value) {
-      this.emit('maintainingend');
+      this.emit('maintainingfocusend');
     }
   }
 
