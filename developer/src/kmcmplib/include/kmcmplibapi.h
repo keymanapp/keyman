@@ -16,49 +16,48 @@
 #define EXTERN EMSCRIPTEN_KEEPALIVE
 #endif
 
-typedef struct _KMCMP_COMPILER_OPTIONS {
-  uint32_t dwSize;
-  bool ShouldAddCompilerVersion;
-} KMCMP_COMPILER_OPTIONS;
-
-EXTERN bool kmcmp_SetCompilerOptions(
-  KMCMP_COMPILER_OPTIONS* options
-);
-
-typedef int (*kmcmp_CompilerMessageProc)(int line, uint32_t dwMsgCode, char* szText, void* context);
-
-EXTERN bool kmcmp_CompileKeyboardFile(
-  char* pszInfile,
-  char* pszOutfile,
-  bool ASaveDebug,
-  bool ACompilerWarningsAsErrors,
-	bool AWarnDeprecatedCode,
-  kmcmp_CompilerMessageProc pMsgproc,
-  void* AmsgprocContext
-);
-
 /* Compile target */
 
 #define CKF_KEYMAN    0
 #define CKF_KEYMANWEB 1
 
-EXTERN bool kmcmp_CompileKeyboardFileToBuffer(
-  char* pszInfile,
-  void* pfkBuffer,
-  bool ACompilerWarningsAsErrors,
-  bool AWarnDeprecatedCode,
-  kmcmp_CompilerMessageProc pMsgproc,
-  void* AmsgprocContext,
-  int Target
-);
+struct KMCMP_COMPILER_OPTIONS {
+  bool saveDebug;
+  bool compilerWarningsAsErrors;
+  bool warnDeprecatedCode;
+  bool shouldAddCompilerVersion;
+  int target;                     // CKF_KEYMAN, CKF_KEYMANWEB
+};
 
-typedef bool (*kmcmp_ValidateJsonMessageProc)(int64_t offset, const char* szText, void* context);
+struct KMCMP_COMPILER_RESULT {
+  void* kmx;
+  size_t kmxSize;
+  std::string kvksFilename;
+};
 
-EXTERN bool kmcmp_ValidateJsonFile(
-  std::fstream& f,
-  std::fstream& fd,
-  kmcmp_ValidateJsonMessageProc MessageProc,
-  void* context
+// TODO: parameters in UTF-8
+typedef int (*kmcmp_CompilerMessageProc)(int line, uint32_t dwMsgCode, char* szText, void* context);
+
+// parameters in UTF-8
+// TODO typical usage:
+// if(!kmcmp_LoadFileProc("filename.ico", "/tmp/filename.kmn", nullptr, &size)) {
+//   return error;
+// }
+// buf = new unsigned char[size];
+// if(!kmcmp_LoadFileProc("filename.ico", "/tmp/filename.kmn", buf, &size)) {
+//   delete[] buf;
+//   return error;
+// }
+typedef bool (*kmcmp_LoadFileProc)(char* loadFilename, char* baseFilename, void* buffer, int* bufferSize);
+
+// Parameters in UTF-8
+EXTERN bool kmcmp_CompileKeyboard(
+  const char* pszInfile,
+  const KMCMP_COMPILER_OPTIONS& options,
+  kmcmp_CompilerMessageProc messageProc,
+  kmcmp_LoadFileProc loadFileProc,
+  const void* procContext,
+  KMCMP_COMPILER_RESULT& result
 );
 
 /**
