@@ -40,7 +40,7 @@
 
 -(NSString *)description
 {
-return [NSString stringWithFormat:@"hasSelectionAPI = %d, hasReadAPI - %d, hasInsertAPI = %d, canGetSelection = %d, canReadText = %d, canInsertText = %d, canReplaceText = %d, mustBackspaceUsingEvents = %d, clientAppId: %@, client: %@", self.hasWorkingSelectionApi, self.hasReadApi, self.hasInsertApi, [self canGetSelection], [self canReadText], [self canInsertText], [self canReplaceText], [self mustBackspaceUsingEvents], _clientApplicationId, _client];
+return [NSString stringWithFormat:@"hasSelectionAPI: %d, hasReadAPI: %d, hasInsertAPI: %d, canGetSelection: %d, canReadText: %d, canInsertText: %d, canReplaceText: %d, mustBackspaceUsingEvents: %d, clientAppId: %@, client: %@", self.hasWorkingSelectionApi, self.hasReadApi, self.hasInsertApi, [self canGetSelection], [self canReadText], [self canInsertText], [self canReplaceText], [self mustBackspaceUsingEvents], _clientApplicationId, _client];
 }
 
 /** returns true if the API selectedRange is determined to be broken because it either fails the test or is included in our hard-coded list of legacy apps */

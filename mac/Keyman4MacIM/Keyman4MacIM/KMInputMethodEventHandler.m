@@ -377,6 +377,7 @@ NSRange _previousSelRange;
 - (BOOL) handleEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
   NSArray *actions = nil;
 
+  // TODO: remove willDeleteNullChar with core code in place
   if ([self willDeleteNullChar]) {
     if ([self.AppDelegate debugMode]) {
         NSLog(@"willDeleteNullChar = true");
@@ -386,19 +387,14 @@ NSRange _previousSelRange;
   else {
     actions = [self processEventWithKeymanEngine:event in:sender];
     if (actions.count == 0) {
-      // TODO: this probably blows up with the wrong set of actions
-      [self checkEventForSentryEasterEgg:event withActions:actions];
+      [self checkEventForSentryEasterEgg:event];
       return NO;
     }
   }
   
-  //TODO: remove support for old non-core actions after this code functions correctly
-  if ([self containsKeymanCoreActions:actions]) {
-    return [self applyKeymanCoreActions:actions event:event client:sender];
-  } else {
-    [self applyKeymanEngineActions:actions event:event in:sender];
-    return YES;
-  }
+  // break from old engine implementation here:
+  // we get an array of CoreAction objects in response from engine
+  return [self applyKeymanCoreActions:actions event:event client:sender];
 }
 
 -(void)applyKeymanEngineActions:(NSArray*)actions event: (NSEvent *)event in:(id) sender  {
@@ -511,7 +507,7 @@ NSRange _previousSelRange;
   return actions;
 }
 
-- (void)checkEventForSentryEasterEgg:(NSEvent *)event withActions:(NSArray *)actions {
+- (void)checkEventForSentryEasterEgg:(NSEvent *)event {
   if (_easterEggForSentry != nil) {
       NSString * kmxName = [[self.kme.kmx filePath] lastPathComponent];
       NSLog(@"Sentry - KMX name: %@", kmxName);
@@ -972,16 +968,15 @@ NSRange _previousSelRange;
     // TODO: only do this for NSKeyDown?
     [self loadContext:event forClient:sender];
     
-    if (event.keyCode == kProcessPendingBuffer) {
-      NSLog(@"***SGS handleEvent 0xFF, handleQueuedText");
-      [self handleQueuedText: event client:sender];
+    if (event.keyCode == kKeymanEventKeyCode) {
+      [self insertQueuedText: event client:sender];
       return YES;
     }
 
     if(event.keyCode == kVK_Delete && self.generatedBackspaceCount > 0) {
       self.generatedBackspaceCount--;
       [self.cachedContext deleteLastCodePoint];
-      NSLog(@"***SGS handleEvent KVK_Delete, reducing generatedBackspaceCount to %d ", self.generatedBackspaceCount);
+      NSLog(@"handleEvent KVK_Delete, reducing generatedBackspaceCount to %d ", self.generatedBackspaceCount);
       return NO;
     }
   }
@@ -1044,6 +1039,7 @@ NSRange _previousSelRange;
   }
 }
 
+/*
 -(BOOL)containsKeymanCoreActions:(NSArray*)actions {
   BOOL containsCoreActions = NO;
   
@@ -1053,8 +1049,8 @@ NSRange _previousSelRange;
     NSLog(@"containsKeymanCoreActions returning %@", containsCoreActions?@"Yes":@"No");
   }
   return containsCoreActions;
-
 }
+*/
 
 /*
  * Returns YES if we have applied an event to the client.
@@ -1151,22 +1147,6 @@ NSRange _previousSelRange;
 }
 
 -(void)insertAndReplaceTextForOperation:(KMActionOperation*)operation client:(id) client {
-
-  /*
-  NSLog(@"KXMInputMethodHandler insertText: %@ replacementCount: %d", operation.textToInsert, operation.backspaceCount);
-  NSRange replacementRange;
-  if (operation.hasBackspaces) {
-    NSRange selectionRange = [client selectedRange];
-    NSRange contextRange = NSMakeRange(0, selectionRange.location);
-    NSAttributedString *context = [client attributedSubstringFromRange:contextRange];
-    NSLog(@"KXMInputMethodHandler insertText, replacementCount=%d, selectionRange.location=%lu", operation.backspaceCount, selectionRange.location);
-
-    replacementRange = NSMakeRange(selectionRange.location-operation.backspaceCount, operation.backspaceCount);
-    NSLog(@"KXMInputMethodHandler insertText, insertText %@ in replacementRange.start=%lu, replacementRange.length=%lu", operation.textToInsert, replacementRange.location, replacementRange.length);
- } else {
-    replacementRange = NSMakeRange(NSNotFound, NSNotFound);
-  }
-  */
   [self insertAndReplaceText:operation.textToInsert backspaceCount:operation.backspaceCount client:client];
 }
 
@@ -1177,22 +1157,39 @@ NSRange _previousSelRange;
  */
 -(void)insertAndReplaceText:(NSString *)text backspaceCount:(int) replacementCount client:(id) client {
 
-  NSLog(@"KXMInputMethodHandler insertText: %@ replacementCount: %d", text, replacementCount);
+  NSLog(@"KXMInputMethodHandler insertAndReplaceText: %@ replacementCount: %d", text, replacementCount);
+  int actualReplacementCount = 0;
   NSRange replacementRange;
+  NSRange notFoundRange = NSMakeRange(NSNotFound, NSNotFound);
+  
   if (replacementCount > 0) {
     NSRange selectionRange = [client selectedRange];
-    NSRange contextRange = NSMakeRange(0, selectionRange.location);
-    NSAttributedString *context = [client attributedSubstringFromRange:contextRange];
-    NSLog(@"KXMInputMethodHandler insertText, replacementCount=%d, selectionRange.location=%lu", replacementCount, selectionRange.location);
-
-    replacementRange = NSMakeRange(selectionRange.location-replacementCount, replacementCount);
-    NSLog(@"KXMInputMethodHandler insertText, insertText %@ in replacementRange.start=%lu, replacementRange.length=%lu", text, replacementRange.location, replacementRange.length);
- } else {
-    replacementRange = NSMakeRange(NSNotFound, NSNotFound);
+    
+    // make sure we have room to apply backspaces from current location
+    actualReplacementCount = MIN(replacementCount, (int)selectionRange.location);
+    // TODO: need to use unicode length to determine whether we have room for backspace
+    
+    // log this: it is a sign that we are out of sync
+    if (actualReplacementCount < replacementCount) {
+      NSLog(@"KXMInputMethodHandler insertAndReplaceText, replacement of %d characters limited by start of context to actual count: %d", replacementCount, actualReplacementCount);
+    }
+    
+    if (actualReplacementCount > 0) {
+      // TODO: remove this extraneous reading of context or do something useful with it
+      NSRange contextRange = NSMakeRange(0, selectionRange.location);
+      NSAttributedString *context = [client attributedSubstringFromRange:contextRange];
+      NSLog(@"KXMInputMethodHandler insertAndReplaceText, actualReplacementCount=%d, selectionRange.location=%lu", actualReplacementCount, selectionRange.location);
+      
+      replacementRange = NSMakeRange(selectionRange.location-actualReplacementCount, replacementCount);
+      NSLog(@"KXMInputMethodHandler insertAndReplaceText, insertText %@ in replacementRange.start=%lu, replacementRange.length=%lu", text, replacementRange.location, replacementRange.length);
+    } else {
+      replacementRange = notFoundRange;
+    }
+  } else {
+    replacementRange = notFoundRange;
   }
-  
   [client insertText:text replacementRange:replacementRange];
-  [self.cachedContext replaceSubstring:text count:replacementCount];
+  [self.cachedContext replaceSubstring:text count:actualReplacementCount];
 }
 
 
@@ -1209,22 +1206,13 @@ NSRange _previousSelRange;
   
   if (operation.hasTextToInsert) {
     self.queuedText = operation.textToInsert;
-    [self.keySender sendProcessQueuedTextEvent:event];
+    [self.keySender sendKeymanKeyCodeForEvent:event];
   }
 }
 
-// TODO:delete if all clients support insertText
--(void)sendProcessBufferEvent: (NSEvent *)event client:(id) client output:(NSString*)text  {
-  NSLog(@"generateCharacterEvents for output = %@", text);
-  
-  NSLog(@"generateCharacterEvents, hasAccessibility = %@", [PrivacyConsent.shared checkAccessibility]?@"Yes":@"NO!");
-
-  [self.keySender sendProcessQueuedTextEvent:event];
-}
-
--(void)handleQueuedText: (NSEvent *)event client:(id) client  {
+-(void)insertQueuedText: (NSEvent *)event client:(id) client  {
   if (self.queuedText.length> 0) {
-    NSLog(@"handleQueuedText, inserting %@", self.queuedText);
+    NSLog(@"insertQueuedText, inserting %@", self.queuedText);
     [self insertAndReplaceText:self.queuedText backspaceCount:0 client:client];
   } else {
     NSLog(@"handleQueuedText called but no text to insert");

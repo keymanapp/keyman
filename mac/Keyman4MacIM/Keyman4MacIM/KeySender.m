@@ -12,6 +12,8 @@
 #import <InputMethodKit/InputMethodKit.h>
 #import "KeySender.h"
 
+const CGKeyCode kKeymanEventKeyCode = 0xFF;
+
 @interface KeySender ()
 
 @property (readonly) CGEventSourceRef eventSource;
@@ -19,8 +21,6 @@
 @end
 
 @implementation KeySender
-
-const CGKeyCode kProcessBuffer = 0xFF;
 
 -(instancetype)init  {
   self = [super init];
@@ -90,15 +90,15 @@ const CGKeyCode kProcessBuffer = 0xFF;
 }
 
 - (void)sendBackspaceforSourceEvent:(NSEvent *)event {
-  NSLog(@"***SGS sendBackspaceforSourceEvent");
+  NSLog(@"KeySender sendBackspaceforSourceEvent");
   [self sendKeyDown:kVK_Delete forSourceEvent:event includeKeyUp:YES];
 }
 
-- (void)sendProcessQueuedTextEvent:(NSEvent *)event {
-  NSLog(@"***SGS sendProcessQueuedTextEvent");
+- (void)sendKeymanKeyCodeForEvent:(NSEvent *)event {
+  NSLog(@"KeySender sendKeymanKeyCodeForEvent");
   // this is not a real keycode, so we do not need a key up event
-  // kProcessBuffer is used to indicate that all the backspaces have been processed
+  // kKeymanEventKeyCode is used to indicate that all the backspaces have been processed
   // and we can insert the queuedText to the client
-  [self sendKeyDown:kProcessBuffer forSourceEvent:event includeKeyUp:NO];
+  [self sendKeyDown:kKeymanEventKeyCode forSourceEvent:event includeKeyUp:NO];
 }
 @end

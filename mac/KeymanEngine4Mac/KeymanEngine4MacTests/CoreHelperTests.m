@@ -98,8 +98,8 @@ ActionArrayOptimizer *optimizer;
 }
 
 - (void)testOptimize_MultipleBackspaceActions_CombinedToSingleAction {
-  CoreAction *backspaceAction = [[CoreAction alloc] initWithType:BackspaceAction actionContent:@"" backspaceCount:1];
-  CoreAction *anotherBackspaceAction = [[CoreAction alloc] initWithType:BackspaceAction actionContent:@"" backspaceCount:1];
+  CoreAction *backspaceAction = [[CoreAction alloc] initWithType:CharacterBackspaceAction actionContent:@"" backspaceCount:1];
+  CoreAction *anotherBackspaceAction = [[CoreAction alloc] initWithType:CharacterBackspaceAction actionContent:@"" backspaceCount:1];
   CoreAction *endAction = [[CoreAction alloc] initWithType:EndAction actionContent:@"" backspaceCount:0];
   NSArray *coreArray = @[backspaceAction, anotherBackspaceAction, endAction];
   
@@ -110,7 +110,7 @@ ActionArrayOptimizer *optimizer;
 }
 
 - (void)testOptimize_OneBackspaceAndOneCharacterAction_RetainedWithEndActionStripped {
-  CoreAction *backspaceAction = [[CoreAction alloc] initWithType:BackspaceAction actionContent:@"" backspaceCount:1];
+  CoreAction *backspaceAction = [[CoreAction alloc] initWithType:CharacterBackspaceAction actionContent:@"" backspaceCount:1];
   CoreAction *characterAAction = [[CoreAction alloc] initWithType:CharacterAction actionContent:@"A" backspaceCount:0];
   CoreAction *endAction = [[CoreAction alloc] initWithType:EndAction actionContent:@"" backspaceCount:0];
   NSArray *coreArray = @[backspaceAction, characterAAction, endAction];
@@ -123,7 +123,7 @@ ActionArrayOptimizer *optimizer;
 
 - (void)testOptimize_OneCharacterAndOneBackspaceAction_CompactedToEmptyArray {
   CoreAction *characterAAction = [[CoreAction alloc] initWithType:CharacterAction actionContent:@"A" backspaceCount:0];
-  CoreAction *backspaceAction = [[CoreAction alloc] initWithType:BackspaceAction actionContent:@"" backspaceCount:1];
+  CoreAction *backspaceAction = [[CoreAction alloc] initWithType:CharacterBackspaceAction actionContent:@"" backspaceCount:1];
   CoreAction *endAction = [[CoreAction alloc] initWithType:EndAction actionContent:@"" backspaceCount:0];
   NSArray *coreArray = @[characterAAction, backspaceAction, endAction];
   
