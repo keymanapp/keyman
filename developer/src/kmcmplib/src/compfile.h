@@ -197,33 +197,4 @@ struct COMPILEMESSAGES {
 
 typedef COMPILEMESSAGES *PCOMPILEMESSAGES;
 
-/*
-struct TVersion
-{
-  //int MinVersion;	// 0x0500 usually
-  //int CompilerVersion[4];
-  //int MinCompilerVersion[4];
-  int KeyboardVersion;	// 0x0500 usually
-};
-
-extern TVersion FVersionInfo;
-*/
-
-/*
-#define bstrcpy(c,d)	(LPBYTE)strcpy((LPSTR)(c),(LPSTR)(d))
-#define bstrlen(c)		strlen((LPSTR)(c))
-#define bstrcmp(c,d)	strcmp((LPSTR)(c),(LPSTR)(d))
-#define bstrncmp(c,d,n)	strncmp((LPSTR)(c),(LPSTR)(d),(n))
-#define bstrnicmp(c,d,n)	strnicmp((LPSTR)(c),(LPSTR)(d),(n))
-#define bstricmp(c,d)	stricmp((LPSTR)(c),(LPSTR)(d))
-#define bstrchr(c,ch)   (LPBYTE)strchr((LPSTR)(c),(char)ch)
-#define bstrncpy(c,d,n)	(LPBYTE)strncpy((LPSTR)(c),(LPSTR)(d),(n))
-#define bstrtok(c,d)	(LPBYTE)strtok((LPSTR)(c),(LPSTR)(d))
-#define bstrcat(c,d)	(LPBYTE)strcat((LPSTR)(c),(LPSTR)(d))
-#define bstrncat(c,d,n)	(LPBYTE)strncat((LPSTR)(c),(LPSTR)(d),(n))
-#define bstrrev(c)		(LPBYTE)strrev((LPSTR)(c))
-#define batoi(c)		atoi((LPSTR)(c))
-#define bstrtol(c,d,n)	strtol((LPSTR)(c),(LPSTR *)(d),(n))
-*/
-
 #endif	// _COMPFILE_H

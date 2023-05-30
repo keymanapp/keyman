@@ -36,7 +36,7 @@ struct KMCMP_COMPILER_RESULT {
 };
 
 // TODO: parameters in UTF-8
-typedef int (*kmcmp_CompilerMessageProc)(int line, uint32_t dwMsgCode, char* szText, void* context);
+typedef int (*kmcmp_CompilerMessageProc)(int line, uint32_t dwMsgCode, const char* szText, void* context);
 
 // parameters in UTF-8
 // TODO typical usage:
@@ -48,7 +48,7 @@ typedef int (*kmcmp_CompilerMessageProc)(int line, uint32_t dwMsgCode, char* szT
 //   delete[] buf;
 //   return error;
 // }
-typedef bool (*kmcmp_LoadFileProc)(char* loadFilename, char* baseFilename, void* buffer, int* bufferSize);
+typedef bool (*kmcmp_LoadFileProc)(const char* loadFilename, const char* baseFilename, void* buffer, int* bufferSize, void* context);
 
 // Parameters in UTF-8
 EXTERN bool kmcmp_CompileKeyboard(

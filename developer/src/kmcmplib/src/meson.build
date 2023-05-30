@@ -7,6 +7,7 @@
 # TODO: is this required? It should be Keyman Core only
 defns += ['-DKMN_KBP_EXPORTING']
 version_res = []
+lib_links = []
 
 if cpp_compiler.get_id() == 'gcc' or cpp_compiler.get_id() == 'clang'
   warns += [
@@ -24,12 +25,13 @@ endif
 name_suffix = []
 
 if cpp_compiler.get_id() == 'emscripten'
-  links += ['-lnodefs.js', '-sMODULARIZE', '-sEXPORT_ES6', '--whole-archive', '--bind', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
+  lib_links = ['--whole-archive', '--bind', '-sMODULARIZE', '-sEXPORT_ES6']
+  links += ['-lnodefs.js', '--bind', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
   # tests are building as ES6 so we need to declare the file extension
   # note that meson currently struggles with the sanitycheckc_cross.exe
   # program, because it has a hard coded extension (.exe) which is not
   # valid for node programs in module mode.
-  name_suffix = '.mjs'
+  # name_suffix = '.mjs'
 endif
 
 icu = subproject('icu-for-uset', default_options: [ 'default_library=static', 'cpp_std=c++17', 'warning_level=0', 'werror=false'])
@@ -63,7 +65,7 @@ lib = library('kmcmplib',
 
   version_res,
   cpp_args: defns + warns + flags,
-  link_args: links,
+  link_args: links + lib_links,
   version: meson.project_version(),
   include_directories: inc,
   install: true,

@@ -113,10 +113,10 @@ apitest = executable('api-test', 'api-test.cpp',
     name_suffix: name_suffix,
     link_args: links + tests_flags,
     objects: lib.extract_all_objects(),
-    dependencies: icuuc_dep,
+    dependencies: icuuc_dep
   )
 
-test('api-test', apitest)
+test('api-test', apitest, args: [output_path / 'blank_keyboard.kmx'])
 
 usetapitest = executable('uset-api-test', 'uset-api-test.cpp',
     cpp_args: defns,
