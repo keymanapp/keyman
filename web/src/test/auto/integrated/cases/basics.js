@@ -73,60 +73,60 @@ Modernizr.on('touchevents', function(result) {
       })
     });
 
-//     describe('Basic Button UI', function() {
+    describe('Basic Button UI', function() {
 
-//       beforeEach(function() {
-//         this.timeout(testconfig.timeouts.uiLoad);
-//         fixture.setBase('fixtures');
-//         fixture.load('singleInput.html');
+      beforeEach(function() {
+        this.timeout(testconfig.timeouts.uiLoad);
+        fixture.setBase('fixtures');
+        fixture.load('singleInput.html');
 
-//         // Loads two scripts in parallel, but just in case, 2x timeout.
-//         return setupKMW('button', testconfig.timeouts.uiLoad);
-//       });
+        // Loads two scripts in parallel, but just in case, 2x timeout.
+        return setupKMW('button', testconfig.timeouts.uiLoad);
+      });
 
-//       afterEach(function() {
-//         fixture.cleanup();
-//         teardownKMW();
-//       });
+      afterEach(function() {
+        fixture.cleanup();
+        teardownKMW();
+      });
 
-//       it('The Button UI initializes correctly.', function() {
-//         assert(keyman.ui.init, 'Initialization flag is set to false!');
-//       })
-//     });
+      it('The Button UI initializes correctly.', function() {
+        assert(keyman.ui.init, 'Initialization flag is set to false!');
+      })
+    });
 
-//     describe('Basic Float UI', function() {
+    describe('Basic Float UI', function() {
 
-//       beforeEach(function() {
-//         this.timeout(testconfig.timeouts.uiLoad);
-//         fixture.setBase('fixtures');
-//         fixture.load('singleInput.html');
+      beforeEach(function() {
+        this.timeout(testconfig.timeouts.uiLoad);
+        fixture.setBase('fixtures');
+        fixture.load('singleInput.html');
 
-//         // Loads two scripts in parallel, but just in case, 2x timeout.
-//         return setupKMW('float', testconfig.timeouts.uiLoad);
-//       });
+        // Loads two scripts in parallel, but just in case, 2x timeout.
+        return setupKMW('float', testconfig.timeouts.uiLoad);
+      });
 
-//       afterEach(function() {
-//         fixture.cleanup();
-//         teardownKMW();
-//       });
+      afterEach(function() {
+        fixture.cleanup();
+        teardownKMW();
+      });
 
-//       it('The Float UI initializes correctly.', function() {
-//         assert(keyman.ui.initialized, 'Initialization flag is set to false!');
+      it('The Float UI initializes correctly.', function() {
+        assert(keyman.ui.initialized, 'Initialization flag is set to false!');
 
-//         assert.isNotNull(keyman.ui.outerDiv, 'Failed to create the floating controller element!');
+        assert.isNotNull(keyman.ui.outerDiv, 'Failed to create the floating controller element!');
 
-//         var divs = document.getElementsByTagName("div");
-//         var match = false;
+        var divs = document.getElementsByTagName("div");
+        var match = false;
 
-//         for(var i=0; i < divs.length; i++) {
-//           if(divs[i] == keyman.ui.outerDiv) {
-//             match = true;
-//           }
-//         }
+        for(var i=0; i < divs.length; i++) {
+          if(divs[i] == keyman.ui.outerDiv) {
+            match = true;
+          }
+        }
 
-//         assert(match, 'Floating controller element has not been added to the page!');
-//       })
-//     });
+        assert(match, 'Floating controller element has not been added to the page!');
+      })
+    });
 
     describe('Basic Toolbar UI', function() {
 

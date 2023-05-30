@@ -19,7 +19,7 @@ module.exports = function(config) {
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    // Can't set in base.conf.js b/c of constant's definition style.
+    // Can't set in base.conf.cjs b/c of constant's definition style.
     logLevel: config.LOG_INFO
   };
 
