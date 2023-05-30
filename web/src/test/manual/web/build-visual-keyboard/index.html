@@ -24,7 +24,7 @@
     </style>
 
     <!-- Insert uncompiled KeymanWeb source scripts -->
-    <script src="../../../../../build/app/browser/debug/keymanweb.js" type="application/javascript"></script>
+    <script src="../../../../../build/publish/debug/keymanweb.js" type="application/javascript"></script>
 
     <!--
       For desktop browsers, a script for the user interface must be inserted here.
@@ -33,7 +33,7 @@
       The toolbar UI is best for any page designed to support keyboards for
       a large number of languages.
     -->
-    <script src="../../../../../build/app/ui/debug/kmwuitoggle.js"></script>
+    <script src="../../../../../build/publish/debug/kmwuitoggle.js"></script>
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
@@ -90,17 +90,10 @@
         // highly-controlled environment.
         await Promise.resolve();
 
-        // // Grab the stylesheet element that was inserted; there should be no intervening additions,
-        // // so the newly-added stylesheet element should be the last element in the <head> section.
-        // const stylesheet = keyman.osk._Box.lastChild;
-        // stylesheet.parentElement.removeChild(stylesheet);
-
         shadowfy(container);
       }
 
-      kmw.init({
-        resources:'../../resources'
-      }).then(async function() {
+      kmw.init().then(async function() {
         await documentKeyboard("gff_amharic", "am", "phone", "default");
         await documentKeyboard("sil_euro_latin", "no", "phone", "shift");
         await documentKeyboard("lao_2008_basic", "lo", "tablet", "default");
