@@ -29,7 +29,7 @@ export function buildTestData(infile: string, options: BuildTestDataOptions) {
 
 function loadTestData(inputFilename: string, options: kmc.CompilerOptions): LDMLKeyboardTestDataXMLSourceFile {
   const c: CompilerCallbacks = new NodeCompilerCallbacks();
-  const k = new kmc.Compiler(c, options);
+  const k = new kmc.LdmlKeyboardCompiler(c, options);
   let source = k.loadTestData(inputFilename);
   if (!source) {
     return null;
