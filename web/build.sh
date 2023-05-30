@@ -64,8 +64,9 @@ builder_run_child_actions clean
 
 ## Clean actions
 
-# If a full-on general clean was requested, we can nuke the entire build folder.
-builder_run_action clean:project rm -rf ./build
+###--- Future tie-in:  if #8831 gets accepted, uncomment the next two lines. ---###
+# # If a full-on general clean was requested, we can nuke the entire build folder.
+# builder_run_action clean:project rm -rf ./build
 
 builder_run_child_actions configure
 
@@ -107,14 +108,15 @@ if builder_has_action build:app/browser; then
   builder_warn "Modularization work is not yet complete; consumers may find needed API or components to be missing"
 fi
 
-if builder_start_action test:project; then
+###--- If #8831 gets accepted, change to `test:project` rather than just `test`. ---###
+if builder_start_action test; then
   TEST_OPTS=
   if builder_has_option --ci; then
     TEST_OPTS=--ci
   fi
   ./test.sh $TEST_OPTS
 
-  builder_finish_action success test:project
+  builder_finish_action success test
 fi
 
 if builder_has_action build:app/ui; then
