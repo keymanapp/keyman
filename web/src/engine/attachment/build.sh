@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
-#
-
-# set -x
-set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -10,14 +6,13 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+# Imports common Web build-script definitions & functions
+SUBPROJECT_NAME=engine/attachment
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/web/common.inc.sh"
 
 # This script runs from its own folder
 cd "$THIS_SCRIPT_PATH"
-
-# Imports common Web build-script definitions & functions
-SUBPROJECT_NAME=engine/attachment
-. "$KEYMAN_ROOT/web/common.inc.sh"
 
 # ################################ Main script ################################
 
@@ -44,6 +39,4 @@ builder_parse "$@"
 builder_run_action configure verify_npm_setup
 builder_run_action clean rm -rf "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME"
 builder_run_action build compile $SUBPROJECT_NAME
-
-# No headless tests for this child project.  Currently, DOM-based unit &
-# integrated tests are run solely by the top-level $KEYMAN_ROOT/web project.
+builder_run_action test # No headless tests
