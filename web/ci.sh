@@ -118,9 +118,9 @@ if builder_start_action prepare:s.keyman.com; then
   echo "FOLDER: $BASE_PUBLISH_FOLDER"
   mkdir -p "$BASE_PUBLISH_FOLDER/resources"
 
-  cp -Rf build/app/browser/release/* "$BASE_PUBLISH_FOLDER"
-  cp -Rf build/app/resources/* "$BASE_PUBLISH_FOLDER/resources"
-  cp -Rf build/app/ui/release/* "$BASE_PUBLISH_FOLDER"
+  # s.keyman.com - release-config only.  It's notably smaller, thus far more favorable
+  # for dynamic linking.
+  cp -Rf build/publish/release/* "$BASE_PUBLISH_FOLDER"
 
   # Third phase: tweak the sourcemaps
   # We can use an alt-mode of Web's sourcemap-root tool for this.
@@ -164,20 +164,9 @@ if builder_start_action prepare:downloads.keyman.com; then
     fi
   fi
 
-  pushd build/app/browser/release
+  pushd build/publish
+  # Zip both the 'debug' and 'release' configurations together.
   "${COMPRESS_CMD}" $COMPRESS_ADD ../../../../$ZIP *
-  cd ..
-  "${COMPRESS_CMD}" $COMPRESS_ADD ../../../$ZIP debug
-  popd
-
-  pushd build/app/resources
-  "${COMPRESS_CMD}" $COMPRESS_ADD ../../../$ZIP *
-  popd
-
-  pushd build/app/ui/release
-  "${COMPRESS_CMD}" $COMPRESS_ADD ../../../../$ZIP *
-  cd ..
-  "${COMPRESS_CMD}" $COMPRESS_ADD ../../../$ZIP debug
   popd
 
   # --- Second action artifact - the 'static' folder (hosted user testing on downloads.keyman.com) ---
