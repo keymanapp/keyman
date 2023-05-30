@@ -45,6 +45,9 @@ compile_and_copy() {
 
   mkdir -p "$KEYMAN_ROOT/web/build/app/resources/osk"
   cp -R "$KEYMAN_ROOT/web/src/resources/osk/." "$KEYMAN_ROOT/web/build/app/resources/osk/"
+
+  # Update the build/publish copy of our build artifacts
+  prepare
 }
 
 builder_run_action configure verify_npm_setup

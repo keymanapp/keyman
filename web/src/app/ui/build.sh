@@ -44,6 +44,9 @@ compile_and_copy() {
 
   mkdir -p "$KEYMAN_ROOT/web/build/app/resources/ui"
   cp -R "$KEYMAN_ROOT/web/src/resources/ui/." "$KEYMAN_ROOT/web/build/app/resources/ui/"
+
+  # Update the build/publish copy of our build artifacts
+  prepare
 }
 
 builder_run_action configure verify_npm_setup
