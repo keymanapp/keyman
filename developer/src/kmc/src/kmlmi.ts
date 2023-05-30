@@ -48,6 +48,9 @@ let jsFilename = program.opts().jsFilename ? program.opts().jsFilename : path.jo
 const callbacks = new NodeCompilerCallbacks();
 let kmpCompiler = new KmpCompiler(callbacks);
 let kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
+if(!kmpJsonData) {
+  process.exit(1);
+}
 
 //
 // Validate the package file

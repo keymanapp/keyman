@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
-#
-
-# set -x
-set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -10,14 +6,12 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+SUBPROJECT_NAME=engine/osk
+. "$KEYMAN_ROOT/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # This script runs from its own folder
 cd "$THIS_SCRIPT_PATH"
-
-# Imports common Web build-script definitions & functions
-SUBPROJECT_NAME=engine/osk
-. "$KEYMAN_ROOT/web/common.inc.sh"
 
 # ################################ Main script ################################
 

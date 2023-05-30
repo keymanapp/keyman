@@ -1,6 +1,5 @@
 keyman.init({
-  attachType: 'auto',
-  resources: '../../resources'
+  attachType: 'auto'
 });
 
 window.addEventListener('load', function() {

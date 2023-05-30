@@ -62,20 +62,16 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
       (this.osk.activationModel as TwoStateActivator<HTMLElement>).activationTrigger = e;
 
       if(this.config.hostDevice.touchable) {
-        if(!target || !this.osk) {
+        if(!e || !target || !this.osk) {
           return;
         }
-
-        const e = target?.getElement();
 
         // Get the absolute position of the caret
         const y = getAbsoluteY(e);
         const t = window.pageYOffset;
-        let dy = 0;
-        if(y < t) {
-          dy=y-t;
-        } else {
-          dy=y-t-(window.innerHeight - this.osk._Box.offsetHeight-e.offsetHeight-2);
+        let dy = y-t;
+        if(y >= t) {
+          dy -= (window.innerHeight - this.osk._Box.offsetHeight - e.offsetHeight - 2);
           if(dy < 0) {
             dy=0;
           }
@@ -304,13 +300,9 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
       } else {
         let x: (string|KeyboardStub)[] = [];
         if (Array.isArray(args[0])) {
-          args[0].forEach(a =>
-            x.push(a));
+          x.push(...args[0]);
         } else if (Array.isArray(args)) {
-          args.forEach(a =>
-            x.push(a));
-        } else {
-          x.push(args);
+          x.push(...args);
         }
         return this.keyboardRequisitioner.addKeyboardArray(x);
       }
@@ -337,6 +329,9 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * Get an associative array of keyboard identification strings
    *   This was defined as an array, so is kept that way, but
    *   Javascript treats it as an object anyway
+   *
+   * This is a public API function documented at
+   * https://help.keyman.com/developer/engine/web/17.0/reference/core/getKeyboard.
    *
    * @param       {Object}    Lstub      Keyboard stub object
    * @param       {Object}    Lkbd       Keyboard script object
@@ -406,10 +401,14 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
   /**
    * Get API-friendly array of available keyboard stubs
    *
+   * Refer to https://help.keyman.com/developer/engine/web/17.0/reference/core/getKeyboards.
+   *
+   * The type of each entry of the array corresponds to that of `getKeyboard`.
+   *
    * @return   {Array}     Array of available keyboards
    *
    */
-  getKeyboards() {
+  public getKeyboards(): ReturnType<KeymanEngine['_GetKeyboardDetail']>[] {
     const Lr: ReturnType<KeymanEngine['_GetKeyboardDetail']>[] = [];
 
     const cache = this.keyboardRequisitioner.cache;
@@ -598,7 +597,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     PKbd = PKbd || this.core.activeKeyboard;
     let Pstub = this.keyboardRequisitioner.cache.getStub(PKbd);
 
-    // help.keyman.com will (lkudingly) set this function in place to specify the desired
+    // help.keyman.com will set this function in place to specify the desired
     // dimensions for the documentation-keyboards, so we'll give it priority.  One of those
     // "temporary" (but actually permanent) solutions from yesteryear.
     //

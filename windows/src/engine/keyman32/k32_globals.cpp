@@ -288,9 +288,6 @@ static BOOL
   f_debug_KeymanLog = FALSE,
   f_debug_ToConsole = FALSE;
 
-static BOOL
-  f_CoreIntegration = TRUE;
-
 #pragma data_seg()
 /***************************************************************************/
 
@@ -365,8 +362,6 @@ BOOL Globals::get_MnemonicDeadkeyConversionMode() { return f_MnemonicDeadkeyConv
 BOOL Globals::get_debug_KeymanLog() { return f_debug_KeymanLog; }
 BOOL Globals::get_debug_ToConsole() { return f_debug_ToConsole; }
 
-BOOL Globals::get_CoreIntegration() { return f_CoreIntegration;  }
-
 void Globals::SetBaseKeyboardName(wchar_t *baseKeyboardName, wchar_t *baseKeyboardNameAlt) {   // I4583
   wcscpy_s(f_BaseKeyboardName, baseKeyboardName);
   wcscpy_s(f_BaseKeyboardNameAlt, baseKeyboardNameAlt);
@@ -385,9 +380,6 @@ void Globals::SetBaseKeyboardFlags(char *baseKeyboard, BOOL simulateAltGr, BOOL 
   be changed until Keyman is restarted.
 */
 BOOL Globals::InitSettings() {
-  /* Check for common core vs windows core */
-  f_CoreIntegration = Reg_GetDebugFlag(REGSZ_Flag_UseKeymanCore, TRUE);
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "Globals::InitSettings - Coreintegration set in '" REGSZ_Flag_UseKeymanCore "' to %x", f_CoreIntegration);
   f_vk_prefix = _VK_PREFIX_DEFAULT;
   RegistryReadOnly reg(HKEY_LOCAL_MACHINE);
   if (reg.OpenKeyReadOnly(REGSZ_KeymanLM) &&
