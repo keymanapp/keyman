@@ -124,7 +124,17 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
   }
 
   abstract get activeKeyboard(): {keyboard: Keyboard, metadata: KeyboardStub};
-  protected abstract get keyboardTarget(): OutputTarget;
+
+  /**
+   * Determines the 'target' currently used to determine which keyboard should be active.
+   * When `null`, keyboard-activation operations will affect the global default; otherwise,
+   * such operations affect only the specified `target`.
+   *
+   * This method exists to facilitate independent-keyboard mode operations for specific
+   * attached elements within the app/browser target.  For `app/webview`, this should
+   * always return a consistent value - likely, `null`.
+   */
+  protected abstract currentKeyboardSrcTarget(): OutputTarget;
 
   /**
    * Ensures that newly activated keyboards are set correctly within managed context, possibly
@@ -193,7 +203,11 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     }
   }
 
-  protected abstract getFallbackCodes(): {
+  /**
+   * Specifies the keyboard id and the language code to use when a 'default' keyboard
+   * must be selected by the engine for fallback behaviors.
+   */
+  protected abstract getFallbackStubKey(): {
     id: string,
     langId: string
   };
@@ -217,11 +231,11 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     // If there was a previous activation attempt set and still active for the specified keyboard target,
     // cancel it.  For exmaple, if the user selects a preloaded keyboard after having tried to select one
     // still async-loading, we should go with the later setting - the preloaded one.
-    this.findAndPopActivation(this.keyboardTarget);
+    this.findAndPopActivation(this.currentKeyboardSrcTarget());
 
     const activatingKeyboard = this.prepareKeyboardForActivation(keyboardId, languageCode);
 
-    const originalKeyboardTarget = this.keyboardTarget;
+    const originalKeyboardTarget = this.currentKeyboardSrcTarget();
 
     const keyboard = await activatingKeyboard.keyboard;
     if(keyboard == null && activatingKeyboard.metadata) {
@@ -241,7 +255,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
      * If the now-current context would be unaffected by the keyboard change, we do not raise the corresponding
      * event.
      */
-    if(this.keyboardTarget == originalKeyboardTarget) {
+    if(this.currentKeyboardSrcTarget() == originalKeyboardTarget) {
       this.emit('beforekeyboardchange', activatingKeyboard.metadata);
     }
 
@@ -256,7 +270,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     this.activateKeyboardForTarget(kbdStubPair, originalKeyboardTarget);
 
     // Only trigger `keyboardchange` events when they will affect the active context.
-    if(this.keyboardTarget == originalKeyboardTarget) {
+    if(this.currentKeyboardSrcTarget() == originalKeyboardTarget) {
       // Perform standard context-reset ops, including the processing of new-context events.
       this.resetContext();
       // Will trigger KeymanEngine handler that passes keyboard to the OSK, displays it.
@@ -355,7 +369,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
       });
 
       // Now the fun part:  note the original call's parameters as a pending activation.
-      let promise = this.deferredKeyboardActivation(defermentPromise, requestedStub, this.keyboardTarget);
+      let promise = this.deferredKeyboardActivation(defermentPromise, requestedStub, this.currentKeyboardSrcTarget());
       return {
         keyboard: promise.then(async (activation) => {
           // Is the activation we requested still pending, or was it cancelled in favor of a

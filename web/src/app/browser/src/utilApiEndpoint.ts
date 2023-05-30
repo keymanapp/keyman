@@ -211,8 +211,8 @@ export class UtilApiEndpoint {
   getStyleValue = getStyleValue;
 
   private get alertHost(): AlertHost {
-    if(this.config.signalUser) {
-      return this.config.signalUser;
+    if(this.config.alertHost) {
+      return this.config.alertHost;
     } else if(!this._alertHost) {
       // Lazy init:  if KMW is set to not show alerts, we try not to initialize the alert host.
       // If the .alert API is called, though, we have no choice.
