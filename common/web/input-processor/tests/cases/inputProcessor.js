@@ -7,6 +7,8 @@ const require = createRequire(import.meta.url);
 import InputProcessor from '#./text/inputProcessor.js';
 import { KeyboardInterface, MinimalKeymanGlobal, Mock } from '@keymanapp/keyboard-processor';
 import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-loader';
+
+import { Worker } from '@keymanapp/lexical-model-layer/node';
 import * as utils from '@keymanapp/web-utils';
 
 // Required initialization setup.
@@ -31,7 +33,9 @@ describe('InputProcessor', function() {
     });
 
     it('has expected default values after initialization', function () {
-      let core = new InputProcessor(device);
+      // Can construct without the second parameter; if so, the final assertion - .mayPredict
+      // will be invalidated.  (No worker, no ability to predict.)
+      let core = new InputProcessor(device, Worker.constructInstance());
 
       assert.isOk(core.keyboardProcessor);
       assert.isDefined(core.keyboardProcessor.contextDevice);

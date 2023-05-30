@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
-import { Compiler } from '@keymanapp/kmc-kmn';
+import { KmnCompiler } from '@keymanapp/kmc-kmn';
 import { platform } from 'os';
 import { CompilerCallbacks } from '@keymanapp/common-types';
 
@@ -10,8 +10,8 @@ export class BuildKmnKeyboard extends BuildActivity {
   public get compiledExtension(): string { return '.kmx'; }
   public get description(): string { return 'Build a Keyman keyboard'; }
   public async build(infile: string, callbacks: CompilerCallbacks, options: BuildActivityOptions): Promise<boolean> {
-    let compiler = new Compiler();
-    if(!await compiler.init()) {
+    let compiler = new KmnCompiler();
+    if(!await compiler.init(callbacks)) {
       return false;
     }
 
@@ -23,7 +23,7 @@ export class BuildKmnKeyboard extends BuildActivity {
 
     // TODO: Currently this only builds .kmn->.kmx, and targeting .js is as-yet unsupported
     // TODO: Support additional options compilerWarningsAsErrors, warnDeprecatedCode
-    return compiler.run(infile, outfile, callbacks,
+    return compiler.run(infile, outfile,
     {
       saveDebug: options.debug,
       shouldAddCompilerVersion: options.compilerVersion,

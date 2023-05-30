@@ -1,2 +1,2 @@
 
-export { Compiler } from './compiler/compiler.js';
+export { KmnCompiler } from './compiler/compiler.js';

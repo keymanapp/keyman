@@ -447,28 +447,6 @@ export default class HardwareEventKeyboard extends HardKeyboard {
 
     // Only reached if it's a mnemonic keyboard.
 
-    /* FIXME:  delete this comment once it's a proper PR comment or in the description!
-     *
-     * After running a _deep_ `git blame` trace on the following section, I arrived at #1525:
-     * https://github.com/keymanapp/keyman/pull/1525/files#diff-4958568b7fd00cf53893ab07e55d4e23777c2f05aa77631771ef08717ea7321bL861
-     *
-     * It turns out that there was a _slight_ difference in how _KeyPress and _KeyDown referred to
-     * the KeymanWeb keyboard-interface object... and that difference appears to have caused me to
-     * not update the corresponding line, as seen later in #2892:
-     * https://github.com/keymanapp/keyman/pull/2892/files#diff-30a24e9475a0b72843ac5c621aac9fe9f62866e1ce4a94c0022d8c204e687652R265
-     * - note that `keyDown`'s version had already been updated by this time, seemingly by #1802
-     *   during the implementation of fat-fingering for use in predictive-text.
-     * - I simply... missed that default keystroke output might matter here at the (#1802) time.
-     *   - default keystroke emulation was added during development of the same b/c it must be handled
-     *     by the engine, rather than browser, to be accessible to predictive text.
-     *
-     * My conclusion:  the pattern can be uniform for both cases, even if the default-keystroke bit
-     * could still be handled by the browser here (because no non-app/webview predictive text).  As
-     * it makes the design simpler, "can be uniform" becomes "should be uniform" here, hence the
-     * significant line change.
-     *
-     * END FIXME / comment
-     */
     let resultCapture: { preventDefaultKeystroke?: boolean } = {};
 
     // Should only be run if `preventDefaultKeystroke` is required by the following conditional
