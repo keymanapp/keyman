@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 #
 # Compile keymanweb and copy compiled javascript and resources to output/embedded folder
-#
-
-set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
