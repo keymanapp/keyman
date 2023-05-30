@@ -94,6 +94,9 @@
 #include "CasedKeys.h"
 #include <vector>
 #include <xstring.h>
+#include <codecvt>
+#include <locale>
+
 #include "CheckFilenameConsistency.h"
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
@@ -230,6 +233,8 @@ enum LinePrefixType { lptNone, lptKeymanAndKeymanWeb, lptKeymanWebOnly, lptKeyma
 /* Compile target */
 
 kmcmp_CompilerMessageProc msgproc = NULL;
+kmcmp_LoadFileProc loadfileproc = NULL;
+
 void* msgprocContext = NULL;
 
 int kmcmp::currentLine = 0;
@@ -3068,7 +3073,7 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, KMX_BYTE**data, size_t& dataS
   return CERR_None;
 }
 
-KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
+KMX_DWORD ReadLine(KMX_BYTE* infile, int sz, int& offset, PKMX_WCHAR wstr, KMX_BOOL PreProcess)
 {
   KMX_DWORD len;
   PKMX_WCHAR p;
@@ -3076,21 +3081,26 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
   KMX_DWORD n;
   KMX_WCHAR currentQuotes = 0;
   KMX_WCHAR str[LINESIZE + 3];
-  len = (KMX_DWORD)fread( str , 1 ,LINESIZE * 2,fp_in);
-  if (ferror(fp_in) ) return CERR_CannotReadInfile;
+
+  if(offset >= sz)  {
+    return CERR_EndOfFile;
+  }
+
+  len = offset + LINESIZE*2 > sz ? sz-offset : LINESIZE*2;
+  memcpy(str, infile+offset, len);
+  offset += len;
   len /= 2;
-  str[len] = 0; auto cur = ftell(fp_in);
-  fseek(fp_in, 0, SEEK_END);
-  auto fsize = ftell(fp_in);
-  fseek(fp_in, cur, SEEK_SET);
+  str[len] = 0;
 
-  if (cur == fsize)
+  if(offset == sz) {
+    // \r\n is still added here even though Linux doesn`t use \r.
+    // This is to ensure to still have a working windows-only-version
+    u16ncat(str, u"\r\n", _countof(str));  // I3481     // Always a "\r\n" to the EOF, avoids funny bugs
+  }
 
-  // \r\n is still added here even though Linux doesn`t use \r.
-  // This is to ensure to still have a working windows-only-version
-  u16ncat(str, u"\r\n", _countof(str));  // I3481     // Always a "\r\n" to the EOF, avoids funny bugs
-
-  if (len == 0) return CERR_EndOfFile;
+  if (len == 0) {
+    return CERR_EndOfFile;
+  }
 
   // neccessary to add this block for using on non-windows platforms (removes all \r for platforms that use \n instead of \r\n)
   for (p = str, n = 0; n < len; n++, p++) {
@@ -3172,9 +3182,13 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
       return (PreProcess ? CERR_None : CERR_LineTooLong);
   }
 
-  if (*p == L'\n') kmcmp::currentLine++;
+  kmcmp::currentLine++;
 
-  fseek(fp_in, -(int)(len * 2 - (int)(p - str) * 2 - 2), SEEK_CUR);
+  offset -= (int)(len * 2 - (int)(p - str) * 2 - 2);
+  if(offset >= sz) {
+    // If we've appended a \n, we can go past EOF
+    offset = sz;
+  }
 
   p--;
   while (p >= str && iswspace(*p)) p--;
@@ -3427,81 +3441,39 @@ KMX_BOOL kmcmp::IsValidCallStore(PFILE_STORE fs)
   return i == 1;
 }
 
-FILE* CreateTempFile()
-{
-  return tmpfile();
-}
-
 ///////////////////
 
-FILE* UTF16TempFromUTF8(FILE* fp_in , KMX_BOOL hasPreamble)
-{
-  FILE *fp_out = CreateTempFile();
-  if(fp_out == NULL)    // I3228   // I3510
-  {
-    fclose(fp_in);
-    return NULL;                               //return  INVALID_HANDLE_VALUE;   _S2 can I exchange that?
+bool hasPreamble(std::u16string result) {
+  return result.size() > 0 && result[0] == 0xFEFF;
+}
+
+bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int *sz16) {
+  if(sz == 0) {
+    return FALSE;
   }
 
-  PKMX_BYTE buf, p;
-  PKMX_WCHAR outbuf, poutbuf;
-  KMX_DWORD len;
-  KMX_DWORD len2;
-  KMX_WCHAR prolog = 0xFEFF;
-  fwrite(&prolog,2, 1, fp_out);
+  std::u16string result;
 
-  fseek(fp_in, 0, SEEK_END);
-  len = (KMX_DWORD)ftell(fp_in);
-  fseek(fp_in, 0, SEEK_SET);
-  if (hasPreamble) {
-    fseek( fp_in,3,SEEK_SET); // Cut off UTF-8 marker
-    len -= 3;
+  try {
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
+    result = converter.from_bytes((char*)infile, (char*)infile+sz-1);
+  } catch(std::range_error e) {
+    std::wstring_convert<std::codecvt_utf16<char16_t>, char16_t> converter;
+    result = converter.from_bytes((char*)infile, (char*)infile+sz-1);
   }
 
-  buf = new KMX_BYTE[len + 1];  // null terminated
-  outbuf = new KMX_WCHAR[len + 1];
+  if(hasPreamble(result)) {
+    *sz16 = result.size() * 2 - 1;
+    *tempfile = new KMX_BYTE[*sz16];
+    memcpy(*tempfile, result.c_str() + 2, *sz16);
 
-  len2= (KMX_DWORD)fread(buf,1,len,fp_in);
-  if (len2) {
-    buf[len2] = 0;
-    p = buf;
-    poutbuf = outbuf;
-    if (hasPreamble) {
-      // We have a preamble, so we attempt to read as UTF-8 and allow conversion errors to be filtered. This is not great for a
-      // compiler but matches existing behaviour -- in future versions we may not do lenient conversion.
-      ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], lenientConversion);
-      fwrite(outbuf, (KMX_DWORD)(poutbuf - outbuf) * 2 , 1, fp_out);
-    }
-    else {
-      // No preamble, so we attempt to read as strict UTF-8 and fall back to ANSI if that fails
-      ConversionResult cr = ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], strictConversion);
-      if (cr == sourceIllegal) {
-        // Not a valid UTF-8 file, so fall back to ANSI
-        // AddCompileError(CHINT_NonUnicodeFile);
-        // note, while this message is defined, for now we will not emit it
-        // because we don't support HINT/INFO messages yet and we don't want
-        // this to cause a blocking compile at this stage
-        // do strtowstr only when no invalid characters are found
-        if( p==0){
-          poutbuf = strtowstr((PKMX_STR)buf);
-          fwrite(poutbuf, (KMX_DWORD)u16len(poutbuf) * 2 , 1, fp_out);
-          delete[] poutbuf;
-        }
-        else
-          AddCompileError(CERR_InvalidCharacter);
-      }
-
-      else {
-        fwrite(outbuf, (KMX_DWORD)(poutbuf - outbuf) * 2 , 1, fp_out);
-      }
-    }
   }
 
-  fclose( fp_in);
-  delete[] buf;
-  delete[] outbuf;
-  fseek( fp_out,2,SEEK_SET);
-  return fp_out;
+  *sz16 = result.size() * 2;
+  *tempfile = new KMX_BYTE[*sz16];
+  memcpy(*tempfile, result.c_str(), *sz16);
+
+  return TRUE;
 }
 
 PFILE_STORE FindSystemStore(PFILE_KEYBOARD fk, KMX_DWORD dwSystemID)

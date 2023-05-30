@@ -13,6 +13,7 @@
 #include <sstream>
 #include <kmcmplibapi.h>
 #include <kmx_file.h>
+#include "../src/filesystem.h"
 
 #ifdef _MSC_VER
 #else
@@ -28,7 +29,7 @@ vector < int > error_vec;
 #define CERR_WARNING                                       0x00002000
 #define CERR_HINT                                          0x00001000
 
-int msgproc(int line, uint32_t dwMsgCode, char* szText, void* context)
+int msgproc(int line, uint32_t dwMsgCode, const char* szText, void* context)
 {
   error_vec.push_back(dwMsgCode);
   const char*t = "unknown";
@@ -40,6 +41,34 @@ int msgproc(int line, uint32_t dwMsgCode, char* szText, void* context)
   }
   printf("line %d  %s %04.4x:  %s\n", line, t, (unsigned int)dwMsgCode, szText);
 	return 1;
+}
+
+bool loadfileProc(const char* filename, const char* baseFilename, void* data, int* size, void* context) {
+  FILE* fp = Open_File(filename, "rb");
+  if(!fp) {
+    return false;
+  }
+
+  if(!data) {
+    // return size
+    if(fseek(fp, 0, SEEK_END) != 0) {
+      fclose(fp);
+      return false;
+    }
+    *size = ftell(fp);
+    if(*size == -1L) {
+      fclose(fp);
+      return false;
+    }
+  } else {
+    // return data
+    if(fread(data, 1, *size, fp) != *size) {
+      fclose(fp);
+      return false;
+    }
+  }
+  fclose(fp);
+  return true;
 }
 
 #include "../src/filesystem.h"
@@ -79,7 +108,7 @@ int main(int argc, char *argv[])
   options.shouldAddCompilerVersion = false;
   options.target = CKF_KEYMAN;
 
-  if(kmcmp_CompileKeyboard(kmn_file, options, msgproc, nullptr, nullptr, result)) {
+  if(kmcmp_CompileKeyboard(kmn_file, options, msgproc, loadfileProc, nullptr, result)) {
     char* testname = strrchr( (char*) kmn_file, '/') + 1;
     if(strncmp(testname, pfirst5, 5) == 0){
       return __LINE__;  // exit code: CERR_ in Name + no Error found
