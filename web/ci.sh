@@ -119,7 +119,7 @@ if builder_start_action prepare:s.keyman.com; then
   mkdir -p "$BASE_PUBLISH_FOLDER/resources"
 
   # s.keyman.com - release-config only.  It's notably smaller, thus far more favorable
-  # for dynamic linking.
+  # for distribution via cloud service.
   cp -Rf build/publish/release/* "$BASE_PUBLISH_FOLDER"
 
   # Third phase: tweak the sourcemaps
