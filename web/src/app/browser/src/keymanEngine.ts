@@ -310,10 +310,15 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *             uses a pick list (Chinese, Japanese, Korean, etc.)
    *             (This function accepts either keyboard structure.)
    */
-  isCJK(k0? /* keyboard script object */) {
+  isCJK(k0? /* keyboard script object | return-type of _GetKeyboardDetail [b/c Toolbar UI]*/) {
     let kbd: Keyboard;
     if(k0) {
-      kbd = new Keyboard(k0);
+      let kbdDetail = k0 as ReturnType<KeymanEngine['_GetKeyboardDetail']>;
+      if(kbdDetail.KeyboardID){
+        kbd = this.keyboardRequisitioner.cache.getKeyboard(k0.KeyboardID);
+      } else {
+        kbd = new Keyboard(k0);
+      }
     } else {
       kbd = this.core.activeKeyboard;
     }
@@ -398,7 +403,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * Set focus to last active target element (browser-dependent)
    */
   focusLastActiveElement() {
-    this.contextManager.lastActiveTarget.focus();
+    this.contextManager.lastActiveTarget?.focus();
   }
 
   /**
@@ -407,7 +412,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * @return      {Object}
    */
   getLastActiveElement() {
-    return this.contextManager.lastActiveTarget.getElement();
+    return this.contextManager.lastActiveTarget?.getElement();
   }
 
   /**
@@ -471,5 +476,6 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     this.osk?.shutdown();
     this.core.languageProcessor.shutdown();
     this.hardKeyboard.shutdown();
+    this.util.shutdown(); // For tracked dom events, stylesheets.
   }
 }

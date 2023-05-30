@@ -24,16 +24,6 @@ namespace com.keyman {
       this.keyman = keyman;
     }
 
-    // Possible alternative:  https://www.npmjs.com/package/language-tags
-    // This would necessitate linking in a npm module into compiled KeymanWeb, though.
-    ['getLanguageCodes'](lgCode: string): string[] {
-      if(lgCode.indexOf('-')==-1) {
-        return [lgCode];
-      } else {
-        return lgCode.split('-');
-      }
-    }
-
     initDevices(): void {
       this.device = new Device();
       this.physicalDevice = new Device();

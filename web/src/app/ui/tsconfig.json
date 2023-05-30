@@ -11,8 +11,8 @@
   "files": [
 		// "kmwuibutton.ts",
 		// "kmwuifloat.ts",
-		"kmwuitoggle.ts" //,
-		// "kmwuitoolbar.ts"
+		"kmwuitoggle.ts",
+		"kmwuitoolbar.ts"
   ],
 	"references": [
 		{ "path": "../browser" }

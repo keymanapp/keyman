@@ -275,17 +275,6 @@ namespace com.keyman {
     }
 
     /**
-     * Function    getActiveLanguage
-     * Scope       Public
-     * @param      {boolean=}        true to retrieve full language name, false/undefined to retrieve code.
-     * @return     {string}         language code
-     * Description Return language code for currently selected language
-     */
-    ['getActiveLanguage'](fullName?: boolean): string {
-      return this.keyboardManager.getActiveLanguage(fullName);
-    }
-
-    /**
      * Function     disableControl
      * Scope        Public
      * @param       {Element}      Pelem       Element to be disabled
