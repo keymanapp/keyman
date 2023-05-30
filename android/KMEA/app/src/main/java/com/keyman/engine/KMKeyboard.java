@@ -47,6 +47,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.ExtractedText;
+import android.view.inputmethod.ExtractedTextRequest;
+import android.view.inputmethod.InputConnection;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -139,7 +142,7 @@ final class KMKeyboard extends WebView {
   }
 
   public boolean getShouldShowHelpBubble() {
-    if(this._shouldShowHelpBubble == null) {
+    if (this._shouldShowHelpBubble == null) {
       SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
       this._shouldShowHelpBubble = prefs.getBoolean(KMManager.KMKey_ShouldShowHelpBubble, true);
     }
@@ -151,10 +154,54 @@ final class KMKeyboard extends WebView {
     this._shouldShowHelpBubble = flag;
   }
 
-  protected boolean shouldIgnoreTextChange() { return shouldIgnoreTextChange; }
-  protected void setShouldIgnoreTextChange(boolean ignore) { this.shouldIgnoreTextChange = ignore; }
-  protected boolean shouldIgnoreSelectionChange() { return shouldIgnoreSelectionChange; }
-  protected void setShouldIgnoreSelectionChange(boolean ignore) { this.shouldIgnoreSelectionChange = ignore; }
+  protected boolean shouldIgnoreTextChange() {
+    return shouldIgnoreTextChange;
+  }
+
+  protected void setShouldIgnoreTextChange(boolean ignore) {
+    this.shouldIgnoreTextChange = ignore;
+  }
+
+  protected boolean shouldIgnoreSelectionChange() {
+    return shouldIgnoreSelectionChange;
+  }
+
+  protected void setShouldIgnoreSelectionChange(boolean ignore) {
+    this.shouldIgnoreSelectionChange = ignore;
+  }
+
+  protected boolean updateText(String text) {
+    boolean result = false;
+    String kmText = "";
+    if (text != null) {
+      kmText = text.toString().replace("\\", "\\u005C").replace("'", "\\u0027").replace("\n", "\\n");
+    }
+
+    if (KMManager.isKeyboardLoaded(this.keyboardType) && !shouldIgnoreTextChange) {
+      this.loadJavascript(KMString.format("updateKMText('%s')", kmText));
+      result = true;
+    }
+
+    shouldIgnoreTextChange = false;
+    return result;
+  }
+
+  protected boolean updateSelectionRange(int selStart, int selEnd) {
+    boolean result = false;
+    InputConnection ic = KMManager.getInputConnection(this.keyboardType);
+    if (ic != null) {
+      ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
+      if (icText != null) {
+        updateText(icText.text.toString());
+      }
+    }
+    this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
+    result = true;
+
+    return result;
+  }
+
+
 
   @SuppressWarnings("deprecation")
   @SuppressLint("SetJavaScriptEnabled")

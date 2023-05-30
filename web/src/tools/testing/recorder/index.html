@@ -46,8 +46,8 @@
     }
   </style>
 
-  <script src="../../../../build/app/browser/debug/keymanweb.js" type="application/javascript"></script>
-  <script src="../../../../build/app/ui/debug/kmwuitoggle.js"></script>
+  <script src="../../../../build/publish/debug/keymanweb.js" type="application/javascript"></script>
+  <script src="../../../../build/publish/debug/kmwuitoggle.js"></script>
   <script src="recorder_KeyboardScripts.js" type="module"></script>
   <script src="recorder_ui_and_stubs.js" type="module"></script>
 
@@ -56,7 +56,6 @@
     window.addEventListener("load", function() {
       keyman.init({
         attachType: 'auto',
-        resources: '../../resources',
         keyboards: ''
       });
 

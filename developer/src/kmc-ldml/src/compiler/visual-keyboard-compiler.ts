@@ -1,6 +1,6 @@
 import { Constants, VisualKeyboard, LDMLKeyboard } from "@keymanapp/common-types";
 
-export default class VisualKeyboardCompiler {
+export class LdmlKeyboardVisualKeyboardCompiler {
   public compile(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile): VisualKeyboard.VisualKeyboard {
     let result = new VisualKeyboard.VisualKeyboard();
 

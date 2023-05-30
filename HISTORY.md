@@ -1,5 +1,36 @@
 # Keyman Version History
 
+## 17.0.109 alpha 2023-05-17
+
+* fix(windows): add wrap-symbols to Text Editor Makefile (#8819)
+* chore(linux): Make postinst script comply with Debian policy (#8810)
+* chore(windows): remove legacy core and flag  ️ (#8593)
+
+## 17.0.108 alpha 2023-05-16
+
+* feat(windows): add text editor to the support makefile (#8750)
+* feat(developer): verify keyboard versions in kmc-package (#8769)
+* feat(developer): verify bcp47 tags are valid and minimal in kmc-package (#8778)
+* feat(developer): verify at least one language in package (#8783)
+* chore(developer): verify file types of content files in package (#8792)
+* chore(developer): verify that package has at least a model or keyboard (#8793)
+* chore(ios): Changes required for XCode 14.3 (#8746)
+
+## 17.0.107 alpha 2023-05-15
+
+* chore(linux): Fix installation build step on TC (#8784)
+* refactor(android/engine): Consolidate updateSelection (#8739)
+
+## 17.0.106 alpha 2023-05-12
+
+* chore(developer): move package formats to common/web/types (#8729)
+* feat(developer): add package validation (#8740)
+* feat(developer): add validation of package filenames (#8751)
+* feat(developer): validate content file names in packages (#8755)
+* feat(developer): validate package name in compiler (#8757)
+* chore(developer): rename Compiler and related classes (#8726)
+* feat(developer): uset api from wasm! (#8716)
+
 ## 17.0.105 alpha 2023-05-11
 
 * chore(common): Update crowdin strings for Amharic (#8748)

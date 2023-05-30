@@ -2,7 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\xstring.cpp" />
-    <ClCompile Include="..\keyman32\addins.cpp" />
     <ClCompile Include="..\keyman32\appint\aiTIP.cpp" />
     <ClCompile Include="..\keyman32\appint\aiWin2000Unicode.cpp" />
     <ClCompile Include="..\keyman32\appint\appint.cpp" />
@@ -41,7 +40,6 @@
     <ClCompile Include="..\keyman32\CoreEnvironment.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\keyman32\addins.h" />
     <ClInclude Include="..\keyman32\appint\aiTIP.h" />
     <ClInclude Include="..\keyman32\appint\aiWin2000Unicode.h" />
     <ClInclude Include="..\keyman32\appint\appint.h" />

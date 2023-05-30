@@ -359,7 +359,7 @@ _builder_failure_trap() {
 # finishes.
 #
 _builder_cleanup_deps() {
-  if ! builder_is_dep_build && [[ ! -z ${_builder_deps_built+x} ]]; then
+  if ! builder_is_dep_build && ! builder_is_child_build && [[ ! -z ${_builder_deps_built+x} ]]; then
     if $_builder_debug_internal; then
       builder_echo_debug "Dependencies that were built:"
       cat "$_builder_deps_built"
@@ -558,7 +558,6 @@ builder_has_action() {
 function builder_run_action() {
   local action=$1
   shift
-  echo "builder_run_action $action $@"
   if builder_start_action $action; then
     ($@)
     builder_finish_action success $action
@@ -1303,11 +1302,6 @@ _builder_parse_expanded_parameters() {
       for e in "${_builder_targets[@]}"; do
         _builder_chosen_action_targets+=("$action$e")
       done
-
-      if ! _builder_item_in_array ":project" "${_builder_targets[@]}"; then
-        # Also include an action-target pair indicating that the non-targeted action was specified.
-        _builder_chosen_action_targets+=("$action:project")
-      fi
     elif (( has_target )); then
       # apply the default action to the selected target
 
@@ -1762,6 +1756,7 @@ builder_has_dependencies() {
 #
 builder_has_module_been_built() {
   local module="$1"
+
 
   if [[ -z ${_builder_deps_built+x} ]]; then
     # not in a builder context, so we assume a build is needed
