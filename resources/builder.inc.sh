@@ -1302,11 +1302,8 @@ _builder_parse_expanded_parameters() {
       for e in "${_builder_targets[@]}"; do
         _builder_chosen_action_targets+=("$action$e")
       done
-
-      if ! _builder_item_in_array ":project" "${_builder_targets[@]}"; then
-        # Also include an action-target pair indicating that the non-targeted action was specified.
-        _builder_chosen_action_targets+=("$action:project")
-      fi
+      # Also include an action-target pair indicating that the non-targeted action was specified.
+      _builder_chosen_action_targets+=("$action:project")
     elif (( has_target )); then
       # apply the default action to the selected target
 
