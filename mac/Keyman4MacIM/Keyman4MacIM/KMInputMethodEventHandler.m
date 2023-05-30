@@ -99,8 +99,6 @@ NSRange _previousSelRange;
         );
     }
 
-  NSLog(@"***SGS isClientAppLegacy for clientAppId = %@: %@", clientAppId, result?@"yes":@"no");
-
     return result;
 }
 
@@ -130,7 +128,7 @@ NSRange _previousSelRange;
 // This is the public initializer.
 - (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender {
     _textCompatibility = [[TextCompatibilityCheck alloc]initWithClient:sender applicationId:clientAppId];
-    NSLog(@"***SGS KMInputMethodHandler initWithClient checkClientTextCompatibility: %@", _textCompatibility);
+    NSLog(@"KMInputMethodHandler initWithClient checkClientTextCompatibility: %@", _textCompatibility);
     self.senderForDeleteBack = sender;
     _keySender = [[KeySender alloc] init];
     _cachedContext = [[KMContext alloc] init];
@@ -157,7 +155,6 @@ NSRange _previousSelRange;
 }
 
 - (void)switchToLegacyMode {
-  NSLog(@"***SGS switchToLegacyMode called");
     _legacyMode = YES;
     if ([self.AppDelegate debugMode])
         NSLog(@"Using legacy mode for this app.");
@@ -456,7 +453,6 @@ NSRange _previousSelRange;
           [self.contextBuffer appendString:output];
       }
       else if ([actionType isEqualToString:Q_BACK]) {
-          NSLog(@"***SGS handle backspace");
           NSLog(@"self.contextBuffer %@", self.contextBuffer);
 
           [self.contextBuffer deleteLastNullChars];
@@ -483,7 +479,6 @@ NSRange _previousSelRange;
           continue;
       }
       else if ([actionType isEqualToString:Q_RETURN]) {
-        NSLog(@"***SGS handleKeymanEngineActions Q_RETURN");
       }
       else if ([actionType isEqualToString:Q_BEEP]) {
           [[NSSound soundNamed:@"Tink"] play];
@@ -989,14 +984,6 @@ NSRange _previousSelRange;
       NSLog(@"***SGS handleEvent KVK_Delete, reducing generatedBackspaceCount to %d ", self.generatedBackspaceCount);
       return NO;
     }
-    
-    // TODO: remove this test code
-    if(event.keyCode == kVK_ANSI_Backslash) {
-      NSLog(@"***SGS event, keycode: %u, characters='%@' **test code**, generating backspaces events and π queuedText", event.keyCode, event.characters);
-      self.queuedText = @"π";
-      [self sendBackspaceEvents: event client:sender count:2 textIsQueued:YES];
-      return YES;
-    }
   }
     if (event.type == NSEventTypeFlagsChanged) {
         // We mark the context as out of date only for the Command keys
@@ -1139,52 +1126,56 @@ NSRange _previousSelRange;
 }
 
 -(void)executeCompositeOperation:(KMActionOperation*)operation keyDownEvent:(nonnull NSEvent *)event client:(id) client {
-  NSLog(@"***SGS KXMInputMethodHandler executeCompositeOperation, composite operation: %@", operation);
+  NSLog(@"KXMInputMethodHandler executeCompositeOperation, composite operation: %@", operation);
   
-  // text only case
-  if ((operation.hasTextToInsert) && (!operation.hasBackspaces)) {
-    NSLog(@"***SGS KXMInputMethodHandler executeCompositeOperation, text only case");
-    [self insertText:operation.textToInsert backspaceCount:0 event:event client:client];
-    [self.cachedContext addSubtring:operation.textToInsert];
+  if ((operation.isTextOnlyScenario)) {
+    NSLog(@"KXMInputMethodHandler executeCompositeOperation, text only scenario");
+    [self insertAndReplaceTextForOperation:operation client:client];
   }
       
-  // backspace only case
-  if ((!operation.hasTextToInsert) && (operation.hasBackspaces)) {
-    NSLog(@"***SGS KXMInputMethodHandler executeCompositeOperation, backspace only case");
-    [self sendBackspaceEvents: event client:client count:operation.backspaceCount textIsQueued:NO];
+  if (operation.isBackspaceOnlyScenario) {
+    NSLog(@"KXMInputMethodHandler executeCompositeOperation, backspace only scenario");
+    [self sendEventsForOperation: event actionOperation:operation];
   }
 
-  // text and backspace case
-  if ((operation.hasTextToInsert) && (operation.hasBackspaces)) {
+  if ((operation.isTextAndBackspaceScenario)) {
     if (self.textCompatibility.mustBackspaceUsingEvents) {
-      NSLog(@"***SGS KXMInputMethodHandler executeCompositeOperation, text and backspace case with events");
-     // if we have must use events, then queue text and send backspace events
-      self.queuedText = operation.textToInsert;
-     [self sendBackspaceEvents: event client:client count:operation.backspaceCount textIsQueued:YES];
+      NSLog(@"KXMInputMethodHandler executeCompositeOperation, text and backspace scenario with events");
+     [self sendEventsForOperation: event actionOperation:operation];
     } else {
-      NSLog(@"***SGS KXMInputMethodHandler executeCompositeOperation, text and backspace case with insertText API");
-      // no need to use events, handle text insert and backspaces by using replace
-      [self insertText:operation.textToInsert backspaceCount:operation.backspaceCount event:event client:client];
-      [self.cachedContext replaceSubstring:operation.textToInsert count:operation.backspaceCount];
+      NSLog(@"KXMInputMethodHandler executeCompositeOperation, text and backspace scenario with insert API");
+      // directly insert text and handle backspaces by using replace
+      [self insertAndReplaceTextForOperation:operation client:client];
     }
   }
-
-  /*
-  if ((operation.hasBackspaces) && (mustSendBackspaceEvents)) {
-    // if we have text, then queue it up for after event processing
-    self.queuedText = operation.textToInsert;
-   [self sendBackspaceEvents: event client:client count:operation.backspaceCount textIsQueued:self.queuedText.length>0];
-  } else {
-    // if we have backspaces, they can be replaced
-    if (operation.textToInsert.length > 0) {
-      [self insertText:operation.textToInsert backspaceCount:operation.backspaceCount event:event client:client];
-      [self.cachedContext replaceSubstring:operation.textToInsert count:operation.backspaceCount];
-    }
-  }
-   */
 }
 
--(BOOL)insertText:(NSString*)text backspaceCount:(int)replacementCount event: (NSEvent*)event client:(id) client {
+-(void)insertAndReplaceTextForOperation:(KMActionOperation*)operation client:(id) client {
+
+  /*
+  NSLog(@"KXMInputMethodHandler insertText: %@ replacementCount: %d", operation.textToInsert, operation.backspaceCount);
+  NSRange replacementRange;
+  if (operation.hasBackspaces) {
+    NSRange selectionRange = [client selectedRange];
+    NSRange contextRange = NSMakeRange(0, selectionRange.location);
+    NSAttributedString *context = [client attributedSubstringFromRange:contextRange];
+    NSLog(@"KXMInputMethodHandler insertText, replacementCount=%d, selectionRange.location=%lu", operation.backspaceCount, selectionRange.location);
+
+    replacementRange = NSMakeRange(selectionRange.location-operation.backspaceCount, operation.backspaceCount);
+    NSLog(@"KXMInputMethodHandler insertText, insertText %@ in replacementRange.start=%lu, replacementRange.length=%lu", operation.textToInsert, replacementRange.location, replacementRange.length);
+ } else {
+    replacementRange = NSMakeRange(NSNotFound, NSNotFound);
+  }
+  */
+  [self insertAndReplaceText:operation.textToInsert backspaceCount:operation.backspaceCount client:client];
+}
+
+/**
+ * This directly inserts text and applies backspaces for the operation by replacing existing text with the new text.
+ * Because this method depends on the selectedRange API which is not implemented correctly for some client applications,
+ * this method can only be used if approved by TextCompatibilityCheck
+ */
+-(void)insertAndReplaceText:(NSString *)text backspaceCount:(int) replacementCount client:(id) client {
 
   NSLog(@"KXMInputMethodHandler insertText: %@ replacementCount: %d", text, replacementCount);
   NSRange replacementRange;
@@ -1192,30 +1183,32 @@ NSRange _previousSelRange;
     NSRange selectionRange = [client selectedRange];
     NSRange contextRange = NSMakeRange(0, selectionRange.location);
     NSAttributedString *context = [client attributedSubstringFromRange:contextRange];
-    NSLog(@"***SGS KXMInputMethodHandler insertText, replacementCount=%d, selectionRange.location=%lu", replacementCount, selectionRange.location);
+    NSLog(@"KXMInputMethodHandler insertText, replacementCount=%d, selectionRange.location=%lu", replacementCount, selectionRange.location);
 
     replacementRange = NSMakeRange(selectionRange.location-replacementCount, replacementCount);
-    NSLog(@"***SGS KXMInputMethodHandler insertText, insertText %@ in replacementRange.start=%lu, replacementRange.length=%lu", text, (unsigned long)replacementRange.location, (unsigned long)replacementRange.length);
+    NSLog(@"KXMInputMethodHandler insertText, insertText %@ in replacementRange.start=%lu, replacementRange.length=%lu", text, replacementRange.location, replacementRange.length);
  } else {
     replacementRange = NSMakeRange(NSNotFound, NSNotFound);
   }
   
   [client insertText:text replacementRange:replacementRange];
-  return YES;
+  [self.cachedContext replaceSubstring:text count:replacementCount];
 }
 
-// TODO: rename to sendsEventsForOperation and pass text instead of text flag
--(void)sendBackspaceEvents: (NSEvent *)event client:(id) client count:(int) count textIsQueued:(BOOL)textIsQueued {
-  NSLog(@"sendBackspaceEvents count %d, hasAccessibility = %@", count, [PrivacyConsent.shared checkAccessibility]?@"Yes":@"***NO!***");
-  
-  for (int i = 0; i < count; i++)
-  {
-    self.generatedBackspaceCount++;
-    [self.keySender sendBackspaceforSourceEvent:event];
-  }
 
-  if (textIsQueued) {
-    NSLog(@"sendBackspaceEvents posting processQueuedText event %d", count);
+-(void)sendEventsForOperation: (NSEvent *)event actionOperation:(KMActionOperation*)operation {
+  NSLog(@"sendEventsForOperation backspaceCount: %d, textToInsert: %@, hasAccessibility = %@", operation.backspaceCount, operation.textToInsert, [PrivacyConsent.shared checkAccessibility]?@"YES":@"***NO!***");
+  
+  if (operation.hasBackspaces) {
+    for (int i = 0; i < operation.backspaceCount; i++)
+    {
+      self.generatedBackspaceCount++;
+      [self.keySender sendBackspaceforSourceEvent:event];
+    }
+  }
+  
+  if (operation.hasTextToInsert) {
+    self.queuedText = operation.textToInsert;
     [self.keySender sendProcessQueuedTextEvent:event];
   }
 }
@@ -1231,12 +1224,10 @@ NSRange _previousSelRange;
 
 -(void)handleQueuedText: (NSEvent *)event client:(id) client  {
   if (self.queuedText.length> 0) {
-    NSLog(@"***SGS handleQueuedText, inserting %@", self.queuedText);
-    // TODO: put context update call inside of insertText function?
-    [self insertText:self.queuedText backspaceCount:0 event:event client:client];
-    [self.cachedContext replaceSubstring:self.queuedText count:0];
+    NSLog(@"handleQueuedText, inserting %@", self.queuedText);
+    [self insertAndReplaceText:self.queuedText backspaceCount:0 client:client];
   } else {
-    NSLog(@"***SGS handleQueuedText called but no text to insert");
+    NSLog(@"handleQueuedText called but no text to insert");
   }
 }
 

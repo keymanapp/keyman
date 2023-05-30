@@ -266,6 +266,7 @@ NSString* _keymanDataPath = nil;
     _lastServerWithOSKShowing = nil;
 }
 
+/*
 CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
     KMInputMethodAppDelegate *appDelegate = [KMInputMethodAppDelegate AppDelegate];
     if (appDelegate != nil) {
@@ -376,7 +377,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         }
     }
     return event;
-}
+}*/
 
 - (NSMenu *)menu {
     return _menu;

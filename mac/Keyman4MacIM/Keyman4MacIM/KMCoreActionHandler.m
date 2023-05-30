@@ -435,4 +435,16 @@ typedef enum {BackspacesOnly,
   return (self.backspaceCount > 0);
 }
 
+-(BOOL)isBackspaceOnlyScenario {
+  return (self.hasBackspaces && !self.hasTextToInsert);
+}
+
+-(BOOL)isTextOnlyScenario {
+  return (!self.hasBackspaces && self.hasTextToInsert);
+}
+
+-(BOOL)isTextAndBackspaceScenario {
+  return (self.hasBackspaces && self.hasTextToInsert);
+}
+
 @end

@@ -45,13 +45,13 @@ return [NSString stringWithFormat:@"hasSelectionAPI = %d, hasReadAPI - %d, hasIn
 
 /** returns true if the API selectedRange is determined to be broken because it either fails the test or is included in our hard-coded list of legacy apps */
 -(BOOL) checkSelectionApi:(id) client applicationId:(NSString *)clientAppId  {
-  BOOL canGetSelection = [client respondsToSelector:@selector(selectedRange)];
+  BOOL workingSelectionApi = NO;
 
   // if the selector exists, then call the API and see if it returns a valid value
   
-  if (canGetSelection) {
+  if ([client respondsToSelector:@selector(selectedRange)]) {
     NSRange selectionRange = [self.client selectedRange];
-    NSLog(@"TextCompatibilityCheck canGetSelection, location = %lu, length = %lu", selectionRange.location, selectionRange.length);
+    NSLog(@"TextCompatibilityCheck checkSelectionApi, location = %lu, length = %lu", selectionRange.location, selectionRange.length);
 
     NSRange notFoundRange = NSMakeRange(NSNotFound, NSNotFound);
 
@@ -62,15 +62,17 @@ return [NSString stringWithFormat:@"hasSelectionAPI = %d, hasReadAPI - %d, hasIn
     } else
      */
     if (NSEqualRanges(selectionRange, notFoundRange)) {
-      canGetSelection = NO;
-      NSLog(@"checkCanGetSelection, range is NSNotFound");
+      workingSelectionApi = NO;
+      NSLog(@"TextCompatibilityCheck checkSelectionApi, range is NSNotFound");
+    } else {
+      workingSelectionApi = YES;
     }
   }
 
   // TODO: integrate with existing legacy code
   // if the selection API appears to work, it may still be broken
   // getting the selection does not work for anything in the legacy app list
-  if (canGetSelection) {
+  if (workingSelectionApi) {
     BOOL isLegacy = ([clientAppId isEqual: @"com.github.atom"] ||
                      [clientAppId isEqual: @"com.collabora.libreoffice-free"] ||
                      [clientAppId isEqual: @"org.libreoffice.script"] ||
@@ -90,9 +92,9 @@ return [NSString stringWithFormat:@"hasSelectionAPI = %d, hasReadAPI - %d, hasIn
                      [clientAppId isEqual: @"com.Keyman.test.legacyInput"]
                      /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */
                      );
-    canGetSelection = !isLegacy;
+    workingSelectionApi = !isLegacy;
   }
-  return canGetSelection;
+  return workingSelectionApi;
 }
 
 -(BOOL) canGetSelection {

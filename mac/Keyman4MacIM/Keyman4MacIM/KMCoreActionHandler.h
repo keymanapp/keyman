@@ -18,6 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
 -(instancetype)initForCompositeAction:(NSString*)textToInsert backspaceCount:(int)backspaces;
 -(BOOL)hasTextToInsert;
 -(BOOL)hasBackspaces;
+-(BOOL)isBackspaceOnlyScenario;
+-(BOOL)isTextOnlyScenario;
+-(BOOL)isTextAndBackspaceScenario;
 @property (readonly) CoreAction *action;
 @property (readonly) NSString *textToInsert;
 @property (readonly) int backspaceCount;
