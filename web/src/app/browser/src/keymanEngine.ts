@@ -535,7 +535,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     PKbd = PKbd || this.core.activeKeyboard;
     let Pstub = this.keyboardRequisitioner.cache.getStub(PKbd);
 
-    // help.keyman.com will (lkudingly) set this function in place to specify the desired
+    // help.keyman.com will set this function in place to specify the desired
     // dimensions for the documentation-keyboards, so we'll give it priority.  One of those
     // "temporary" (but actually permanent) solutions from yesteryear.
     //

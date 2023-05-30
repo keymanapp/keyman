@@ -296,46 +296,6 @@ namespace com.keyman {
      * @param {number=}  dr  Number of post-caret characters to delete
      */
     ['oninserttext']: (dn: number, s: string, dr?: number) => void;
-
-    /**
-     * Create copy of the OSK that can be used for embedding in documentation or help
-     * The currently active keyboard will be returned if PInternalName is null
-     *
-     *  @param  {string}          PInternalName   internal name of keyboard, with or without Keyboard_ prefix
-     *  @param  {number}          Pstatic         static keyboard flag  (unselectable elements)
-     *  @param  {string=}         argFormFactor   layout form factor, defaulting to 'desktop'
-     *  @param  {(string|number)=}  argLayerId    name or index of layer to show, defaulting to 'default'
-     *  @return {Object}                          DIV object with filled keyboard layer content
-     */
-    ['BuildVisualKeyboard'](PInternalName, Pstatic, argFormFactor, argLayerId): HTMLElement {
-      let PKbd: com.keyman.keyboards.Keyboard = null;
-
-      if(PInternalName != null) {
-        var p=PInternalName.toLowerCase().replace('keyboard_','');
-        var keyboardsList = this.keyboardManager.keyboards;
-
-        for(let Ln=0; Ln<keyboardsList.length; Ln++) {
-          if(p == keyboardsList[Ln]['KI'].toLowerCase().replace('keyboard_','')) {
-            // Requires the Keyboard wrapping object now.
-            PKbd = new com.keyman.keyboards.Keyboard(keyboardsList[Ln]);
-            break;
-          }
-        }
-      }
-
-      PKbd = PKbd || this.core.activeKeyboard;
-
-      // help.keyman.com will (lkudingly) set this function in place to specify the desired
-      // dimensions for the documentation-keyboards, so we'll give it priority.  One of those
-      // "temporary" (but actually permanent) solutions from yesteryear.
-      //
-      // Note that the main intended use of that function is for embedded KMW on the mobile apps...
-      // but they never call `BuildVisualKeyboard`, so it's all good.
-      const getOskHeight = this['getOskHeight'];
-      let targetHeight = (typeof getOskHeight == 'function' ? getOskHeight() : null) || this.osk.computedHeight || 200;
-
-      return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PKbd, argFormFactor, argLayerId, targetHeight);
-    }
   }
 }
 
