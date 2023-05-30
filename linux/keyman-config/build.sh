@@ -44,8 +44,12 @@ build_action() {
       version.py.in > version.py
   popd
   pushd buildtools
-  builder_echo "Create lang_tags_map.py"
-  python3 ./build-langtags.py
+  if [ -f build-langtags.py ]; then
+    builder_echo "Create lang_tags_map.py"
+    python3 ./build-langtags.py
+  else
+    builder_echo "Skip building lang_tags_map.py during package build"
+  fi
   popd
   builder_echo "Building man pages"
   ./build-help.sh --man --no-reconf
@@ -68,7 +72,7 @@ install_action() {
     mkdir -p "/tmp/keyman/$(python3 -c 'import sys;import os;pythonver="python%d.%d" % (sys.version_info[0], sys.version_info[1]);sitedir = os.path.join("lib", pythonver, "site-packages");print(sitedir)')"
     # when we no longer have to support old pip version (python > 3.6) change this to:
     # pip3 install --prefix /tmp/keyman .
-    PYTHONUSERBASE=/tmp/keyman python3 setup.py install --user
+    PYTHONUSERBASE=${DESTDIR:-/tmp/keyman} python3 setup.py install --user
   fi
 }
 
