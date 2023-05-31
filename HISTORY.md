@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.114 alpha 2023-05-31
+
+* chore(developer): replace cwrap wasm bindings (#8857)
+* chore(developer): refactor kmcmplib interfaces (#8870)
+* chore(developer): move keyboard repo fixtures (#8874)
+* chore(linux): Move build steps to build.sh (#8864)
+
 ## 17.0.113 alpha 2023-05-26
 
 * docs(android): Update documentation for building Android on Linux (#8860)
