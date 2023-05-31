@@ -346,11 +346,11 @@ int main(gint argc, gchar *argv[])
   }
 
   // write content of xkb_symbols to 3D Vector
-  // I assume we use Keyboard US intl as base
+  // I assume we use Keyboard US basic as base
   printf("-°°°°°°°° write_US_ToVector\n");
   std::string US_language    = "us";
-  const char* text_us        = "xkb_symbols \"intl\"";
-  //const char* text_us        = "xkb_symbols \"basic\"";
+  //const char* text_us        = "xkb_symbols \"intl\"";
+  const char* text_us        = "xkb_symbols \"basic\"";
 
   v_str_3D All_Vector;
   write_US_ToVector(All_Vector,US_language, text_us);
