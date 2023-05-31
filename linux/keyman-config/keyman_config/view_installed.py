@@ -166,6 +166,7 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             str,    # version
             str,    # packageID
             int,    # enum InstallLocation (KmpArea is GObject version)
+            str,    # InstallLocation path
             str,    # path to welcome file if it exists or None
             str)    # path to options file if it exists or None
 
@@ -183,6 +184,9 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         self.tree.append_column(column)
         # i18n: column header in table displaying installed keyboards
         column = Gtk.TreeViewColumn(_("Version"), renderer, text=2)
+        self.tree.append_column(column)
+        # i18n: column header in table displaying installed keyboards
+        column = Gtk.TreeViewColumn(_("Location"), renderer, text=5)
         self.tree.append_column(column)
 
         select = self.tree.get_selection()
@@ -282,6 +286,7 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
                 kmpdata['version'],
                 kmpdata['packageID'],
                 install_area,
+                get_keyman_dir(install_area).replace(os.path.expanduser('~'), '~'),
                 welcome_file,
                 options_file])
 
