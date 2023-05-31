@@ -349,7 +349,6 @@ int main(gint argc, gchar *argv[])
   // I assume we use Keyboard US basic as base
   printf("-°°°°°°°° write_US_ToVector\n");
   std::string US_language    = "us";
-  //const char* text_us        = "xkb_symbols \"intl\"";
   const char* text_us        = "xkb_symbols \"basic\"";
 
   v_str_3D All_Vector;
