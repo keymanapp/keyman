@@ -143,26 +143,38 @@ echo %BLUE%TEST: %1 %WHITE%
 if exist error.log del error.log
 "%compiler%" -no-color -nologo -ss -w tests.kpj -t "%2" > error.log
 if !ERRORLEVEL! GTR 0 (
-  type error.log
-  del error.log
   echo %RED%FAILED: expected %2 to be a valid keyboard.%WHITE% 1>&2
+  echo ---------------------------------------------------------------------------
+  echo %BLUE%## error.log%WHITE%
+  type error.log
+  echo ---------------------------------------------------------------------------
+  del error.log
   exit /b 1
 )
 
 if "!outfile!" == "" (
   findstr /L /C:%3 error.log > nul
   if !ERRORLEVEL! GTR 0 (
-    type error.log
-    del error.log
     echo %RED%FAILED: expected compile results to contain message %3.%WHITE% 1>&2
+    echo ---------------------------------------------------------------------------
+    echo %BLUE%## error.log%WHITE%
+    type error.log
+    echo ---------------------------------------------------------------------------
+    del error.log
     exit /b 1
   )
 ) else (
   fc error.log !outfile! > nul
   if !ERRORLEVEL! GTR 0 (
-    type error.log
-    del error.log
     echo %RED%FAILED: expected output in error.log did not match !outfile!.%WHITE% 1>&2
+    echo ---------------------------------------------------------------------------
+    echo %BLUE%## error.log%WHITE%
+    type error.log
+    echo ---------------------------------------------------------------------------
+    echo %BLUE%## !outfile!%WHITE%
+    type !outfile!
+    echo ---------------------------------------------------------------------------
+    del error.log
     exit /b 1
   )
 )

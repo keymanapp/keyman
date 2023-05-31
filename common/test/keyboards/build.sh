@@ -29,7 +29,9 @@ display_usage() {
 
   for d in "$THIS_DIR/"*/; do
     d="$(basename "$d")"
-    echo "  $d"
+    if [ "$d" != "invalid" ]; then
+      echo "  $d"
+    fi
   done
 
   echo
@@ -122,7 +124,9 @@ fi
 if [ ${#TARGETS[@]} == 0 ]; then
   for d in "$THIS_DIR/"*/; do
     d="$(basename "$d")"
-    TARGETS+=("$d")
+    if [ "$d" != "invalid" ] && [ "$d" != "issue" ]; then
+      TARGETS+=("$d")
+    fi
   done
 fi
 

@@ -12,6 +12,7 @@ import { ModelDefinitions } from "./model-definitions.js";
 import {decorateWithJoin} from "./join-word-breaker-decorator.js";
 import {decorateWithScriptOverrides} from "./script-overrides-decorator.js";
 import { LexicalModelSource, WordBreakerSpec, SimpleWordBreakerSpec } from "./lexical-model.js";
+import { ModelCompilerError, ModelCompilerMessages } from "./model-compiler-errors.js";
 
 export default class LexicalModelCompiler {
 
@@ -43,7 +44,7 @@ export default class LexicalModelCompiler {
         func += `LMLayerWorker.loadModel(new ${modelSource.rootClass}());\n`;
         break;
       case "fst-foma-1.0":
-        throw new ModelSourceError(`Unimplemented model format: ${modelSource.format}`);
+        throw new ModelCompilerError(ModelCompilerMessages.Error_UnimplementedModelFormat({format:modelSource.format}));
       case "trie-1.0":
         // Convert all relative path names to paths relative to the enclosing
         // directory. This way, we'll read the files relative to the model.ts
@@ -81,7 +82,7 @@ export default class LexicalModelCompiler {
         func += `}));\n`;
         break;
       default:
-        throw new ModelSourceError(`Unknown model format: ${modelSource.format}`);
+        throw new ModelCompilerError(ModelCompilerMessages.Error_UnknownModelFormat({format: modelSource.format}));
     }
 
     func += fileSuffix;
@@ -99,13 +100,7 @@ export default class LexicalModelCompiler {
     );
   };
 
-  logError(s: string) {
-    console.error(require('chalk').red(s));
-  };
 };
-
-export class ModelSourceError extends Error {
-}
 
 /**
  * Returns a JavaScript expression (as a string) that can serve as a word
@@ -170,7 +165,7 @@ function normalizeWordBreakerSpec(wordBreakerSpec: LexicalModelSource["wordBreak
   } else if (wordBreakerSpec.use) {
     return wordBreakerSpec;
   } else {
-    throw new Error(`Unknown word breaker: ${wordBreakerSpec}`);
+    throw new ModelCompilerError(ModelCompilerMessages.Error_UnknownWordBreaker({spec: wordBreakerSpec.toString()}));
   }
 }
 

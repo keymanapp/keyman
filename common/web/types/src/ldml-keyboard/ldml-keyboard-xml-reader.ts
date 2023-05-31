@@ -24,8 +24,7 @@ export default class LDMLKeyboardXMLSourceFileReader {
   readImportFile(version: string, subpath: string): Buffer {
     // TODO-LDML: sanitize input string
     let importPath = new URL(`../import/${version}/${subpath}`, import.meta.url);
-    // TODO-LDML: support baseFileName?
-    return this.callbacks.loadFile(importPath.pathname, importPath);
+    return this.callbacks.loadFile(importPath);
   }
 
   /**
@@ -69,12 +68,20 @@ export default class LDMLKeyboardXMLSourceFileReader {
         boxXmlArray(flicks, 'flick');
       }
     }
+    if(source?.keyboard?.variables) {
+      boxXmlArray(source?.keyboard?.variables, 'set');
+      boxXmlArray(source?.keyboard?.variables, 'string');
+      boxXmlArray(source?.keyboard?.variables, 'unicodeSet');
+    }
     if(source?.keyboard?.transforms) {
-      for(let transform of source.keyboard.transforms)  {
-        boxXmlArray(transform, 'transform');
+      for(let transforms of source.keyboard.transforms)  {
+        boxXmlArray(transforms, 'transformGroup');
+        for (let transformGroup of transforms.transformGroup) {
+          boxXmlArray(transformGroup, 'transform');
+          boxXmlArray(transformGroup, 'reorder');
+        }
       }
     }
-    boxXmlArray(source?.keyboard?.reorders, 'reorder');
     return this.boxImportsAndSpecials(source, 'keyboard');
   }
 

@@ -4,7 +4,7 @@
 
 !include ..\Defines.mak
 
-# We don't depend on configure here because kmc-keyboard does that already
+# We don't depend on configure here because kmc-ldml does that already
 build: .virtual
     $(GIT_BASH_FOR_KEYMAN) build.sh build
 

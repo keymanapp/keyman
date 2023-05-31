@@ -1,0 +1,11 @@
+﻿c Should fail to compile, `context` must be omitted or first statement in output
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+group(foo) readonly
+
+'a' > use(bar) context
+
+group(bar) readonly

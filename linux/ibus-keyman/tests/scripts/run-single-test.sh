@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
+set -eu
 TESTDIR=${XDG_DATA_HOME:-$HOME/.local/share}/keyman/test_kmx
 
-. "$(dirname "$0")"/test-helper.sh
+. "$(dirname "$0")"/test-helper.inc.sh
 
 if [ -v KEYMAN_PKG_BUILD ]; then
   # During package builds we skip these tests that require to start ibus because

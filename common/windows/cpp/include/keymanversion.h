@@ -1,7 +1,7 @@
 #ifndef _KEYMANVERSION_H
 #define _KEYMANVERSION_H
 
-#include "keymanversion_build.h"
+#include "../../../include/keymanversion_build.h"
 
 // We should not need to add to these hard-coded version numbers for future versions, unless
 // we have a back-compat need to refer to a specific version.

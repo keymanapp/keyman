@@ -38,7 +38,7 @@ if builder_start_action test:libraries; then
   # No --reporter option exists yet for the headless modules.
 
   $KEYMAN_ROOT/common/web/keyboard-processor/build.sh test $HEADLESS_FLAGS
-  $KEYMAN_ROOT/common/web/input-processor/build.sh build:tools test $HEADLESS_FLAGS
+  $KEYMAN_ROOT/common/web/input-processor/build.sh test $HEADLESS_FLAGS
 
   # For now, we'll also link in the gesture-recognizer unit tests here.
   builder_heading "Running gesture-recognizer test suite"

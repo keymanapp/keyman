@@ -9,8 +9,8 @@ import * as r from 'restructure';
 
 export class KEYBOARD {
   //TODO: additional header fields
-  groups: GROUP[];
-  stores: STORE[];
+  groups: GROUP[] = [];
+  stores: STORE[] = [];
 };
 
 export class STORE {
@@ -35,6 +35,64 @@ export class KEY {
   dpContext: string;
 };
 
+// These type-checking structures are here to ensure that
+// we match the structures from kmx.ts in the generator
+//
+// They are used internally when reading and writing .kmx files
+
+export interface BUILDER_COMP_KEYBOARD {
+  dwIdentifier: number;
+  dwFileVersion: number;
+  dwCheckSum: number;
+  KeyboardID: number;
+  IsRegistered: number;
+  version: number;
+
+  cxStoreArray: number;
+  cxGroupArray: number;
+
+  dpStoreArray: number;
+  dpGroupArray: number;
+
+  StartGroup_ANSI: number;
+  StartGroup_Unicode: number;
+
+  dwFlags: number;
+
+  dwHotKey: number;
+
+  dpBitmapOffset: number;
+  dwBitmapSize: number;
+};
+
+export interface BUILDER_COMP_KEYBOARD_KMXPLUSINFO {
+  dpKMXPlus: number;
+  dwKMXPlusSize: number;
+};
+
+export interface BUILDER_COMP_STORE {
+  dwSystemID: number;
+  dpName: number;
+  dpString: number;
+};
+
+export interface BUILDER_COMP_KEY {
+  Key: number;
+  _padding: number;
+  Line: number;
+  ShiftFlags: number;
+  dpOutput: number;
+  dpContext: number;
+};
+
+export interface BUILDER_COMP_GROUP {
+  dpName: number;
+  dpKeyArray: number;
+  dpMatch: number;
+  dpNoMatch: number;
+  cxKeyArray: number;
+  fUsingKeys: number;
+};
 
 export class KMXFile {
 

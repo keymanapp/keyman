@@ -1,0 +1,13 @@
+# ICU, only for UnicodeSet
+
+[wrap-file]
+directory = icu
+source_url = https://github.com/unicode-org/icu/releases/download/release-73-1/icu4c-73_1-src.tgz
+source_filename = icu4c-73_1-src.tgz
+source_hash = a457431de164b4aa7eca00ed134d00dfbf88a77c6986a10ae7774fc076bb8c45
+patch_directory = icu
+
+# Based on: wrapdb_version = 72.1-3
+
+[provide]
+icu-uc = icuuc_dep

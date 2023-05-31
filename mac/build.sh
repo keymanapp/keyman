@@ -109,9 +109,6 @@ KMIM_WORKSPACE_PATH="$KM4MIM_BASE_PATH/$IM_NAME.xcworkspace"
 # APP_BUNDLE_PATH=$APP_RESOURCES/Keyman.bundle
 # APP_BUILD_PATH=keyman/Keyman/build/
 
-
-KME4M_OUTPUT_FOLDER=$KME4M_BUILD_PATH/libKeyman
-
 ### PROCESS COMMAND-LINE ARGUMENTS ###
 
 # Default is debug build of Engine and (code-signed) Input Method
@@ -135,6 +132,7 @@ QUIET=false
 NOTARIZE=false
 SKIP_BUILD=false
 UPLOAD_SENTRY=false
+QUIET_FLAG=
 
 # Import local environment variables for build
 if [[ -f $(dirname "$THIS_SCRIPT")/localenv.sh ]]; then
@@ -262,6 +260,7 @@ displayInfo "" \
     "BUILD_ACTIONS: $BUILD_ACTIONS" \
     "TEST_ACTION: $TEST_ACTION" \
     "UPLOAD_SENTRY: $UPLOAD_SENTRY" \
+    "QUIET_FLAG: $QUIET_FLAG" \
     ""
 
 ### Validate notarization environment variables ###
@@ -276,11 +275,11 @@ if $LOCALDEPLOY && ! $NOTARIZE ; then
 fi
 
 if $PREPRELEASE || $NOTARIZE ; then
-  if [ ! $DO_CODESIGN ] || [ -z "${CERTIFICATE_ID}" ]; then
+  if [ ! $DO_CODESIGN ] || [ -z "${CERTIFICATE_ID+x}" ]; then
     builder_die "Code signing must be configured for deployment. See build.sh -help for details."
   fi
 
-  if [ -z "${APPSTORECONNECT_PROVIDER}" ] || [ -z "${APPSTORECONNECT_USERNAME}" ] || [ -z "${APPSTORECONNECT_PASSWORD}" ]; then
+  if [ -z "${APPSTORECONNECT_PROVIDER+x}" ] || [ -z "${APPSTORECONNECT_USERNAME+x}" ] || [ -z "${APPSTORECONNECT_PASSWORD+x}" ]; then
     builder_die "Appstoreconnect Apple ID credentials must be configured in environment. See build.sh -help for details."
   fi
 fi
@@ -391,7 +390,7 @@ if $DO_KEYMANIM ; then
         ENTITLEMENTS_FILE=Keyman.entitlements
     fi
 
-    if [ -z "$DEVELOPMENT_TEAM" ]; then
+    if [ -z "${DEVELOPMENT_TEAM+x}" ]; then
         DEVELOPMENT_TEAM=3YE4W86L3G
     fi
 
@@ -414,7 +413,7 @@ if $DO_KEYMANIM ; then
 
         if which sentry-cli >/dev/null; then
             cd "$KM4MIM_BASE_PATH"
-            sentry-cli upload-dif "build/${CONFIGURATION}"
+            sentry-cli upload-dif "build/$CONFIG"
         else
             builder_die "Error: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases"
         fi
@@ -435,7 +434,7 @@ fi
 
 if $PREPRELEASE || $NOTARIZE; then
   builder_heading "Notarizing app"
-  if [ "${CODESIGNING_SUPPRESSION}" != "" ] && [ -z "${CERTIFICATE_ID}" ]; then
+  if [ "${CODESIGNING_SUPPRESSION}" != "" ] && [ -z "${CERTIFICATE_ID+x}" ]; then
     builder_die "Notarization and signed executable is required for deployment, even locally. Specify CERTIFICATE_ID environment variable for custom certificate."
   else
     TARGET_PATH="$KM4MIM_BASE_PATH/build/$CONFIG"
@@ -446,7 +445,7 @@ if $PREPRELEASE || $NOTARIZE; then
     # Note: get-task-allow entitlement must be *off* in our release build (to do this, don't include base entitlements in project build settings)
 
     # We may need to re-run the code signing if a custom certificate has been passed in
-    if [ ! -z "${CERTIFICATE_ID}" ]; then
+    if [ ! -z "${CERTIFICATE_ID+x}" ]; then
       builder_heading "Signing with custom certificate (CERTIFICATE_ID environment variable)."
       codesign --force --options runtime --entitlements Keyman4MacIM/Keyman.entitlements --deep --sign "${CERTIFICATE_ID}" "$TARGET_APP_PATH"
     fi

@@ -70,7 +70,7 @@ details.
 
 node-based next generation compiler, hosts kmc, kmlmi, kmlmc, kmlmp
 
-### src/kmc-keyboard - LDML Keyboard Compiler
+### src/kmc-ldml - LDML Keyboard Compiler
 
 Next Generation keyboard compiler package - LDML keyboards only at present.
 Command line access through kmc.
