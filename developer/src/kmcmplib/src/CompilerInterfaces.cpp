@@ -3,7 +3,6 @@
 #include <kmcmplibapi.h>
 #include <kmn_compiler_errors.h>
 #include "kmcmplib.h"
-#include "filesystem.h"
 #include "CheckFilenameConsistency.h"
 #include "CheckNCapsConsistency.h"
 #include "DeprecationChecks.h"
@@ -19,7 +18,7 @@ bool CompileKeyboardHandle(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk);
   WASM interface for compiler message callback
 */
 EM_JS(int, wasm_msgproc, (int line, int msgcode, const char* text, char* context), {
-  const proc = globalThis[UTF8ToString(context)];
+  const proc = globalThis[UTF8ToString(context)].message;
   if(!proc || typeof proc != 'function') {
     console.log(`[${line}: ${msgcode}: ${UTF8ToString(text)}]`);
     return 0;
@@ -28,18 +27,27 @@ EM_JS(int, wasm_msgproc, (int line, int msgcode, const char* text, char* context
   }
 });
 
-EM_JS(bool, wasm_loadfileproc, (const char* filename, const char* baseFilename, void* buffer, int* bufferSize, char* context), {
-  const proc = globalThis[UTF8ToString(context)];
+EM_JS(int, wasm_loadfileproc, (const char* filename, const char* baseFilename, void* buffer, int bufferSize, char* context), {
+  const proc = globalThis[UTF8ToString(context)].loadFile;
   if(!proc || typeof proc != 'function') {
     return 0;
   } else {
-    return proc(UTF8ToString(filename), UTF8ToString(baseFilename), buffer, bufferSize);
+    if(buffer == 0) {
+      return proc(UTF8ToString(filename), UTF8ToString(baseFilename), 0, 0);
+    } else {
+      return proc(UTF8ToString(filename), UTF8ToString(baseFilename), buffer, bufferSize);
+    }
   }
 });
 
 bool wasm_LoadFileProc(const char* filename, const char* baseFilename, void* buffer, int* bufferSize, void* context) {
   char* msgProc = static_cast<char*>(context);
-  return wasm_loadfileproc(filename, baseFilename, buffer, bufferSize, msgProc);
+  if(buffer == nullptr) {
+    *bufferSize = wasm_loadfileproc(filename, baseFilename, 0, 0, msgProc);
+    return *bufferSize != 0;
+  } else {
+    return wasm_loadfileproc(filename, baseFilename, buffer, *bufferSize, msgProc) == 1;
+  }
 }
 
 int wasm_CompilerMessageProc(int line, uint32_t dwMsgCode, const char* szText, void* context) {
@@ -48,8 +56,7 @@ int wasm_CompilerMessageProc(int line, uint32_t dwMsgCode, const char* szText, v
 }
 
 struct WASM_COMPILER_INTERFACE {
-  std::string messageCallback;    // int line, uint32_t dwMsgCode, char* szText
-  std::string loadFileCallback;   // TODO: char* filename, char* baseFilename --> buffer
+  std::string callbacksKey;    // key of callbacks object on globalThis
 };
 
 struct WASM_COMPILER_RESULT {
@@ -76,7 +83,7 @@ WASM_COMPILER_RESULT kmcmp_wasm_compile(std::string pszInfile, const KMCMP_COMPI
     options,
     wasm_CompilerMessageProc,
     wasm_LoadFileProc,
-    intf.messageCallback.c_str(),
+    intf.callbacksKey.c_str(),
     kr
   );
 
@@ -103,8 +110,7 @@ EMSCRIPTEN_BINDINGS(compiler_interface) {
 
   emscripten::class_<WASM_COMPILER_INTERFACE>("CompilerInterface")
     .constructor<>()
-    .property("messageCallback", &WASM_COMPILER_INTERFACE::messageCallback)
-    .property("loadFileCallback", &WASM_COMPILER_INTERFACE::loadFileCallback)
+    .property("callbacksKey", &WASM_COMPILER_INTERFACE::callbacksKey)
     ;
 
   emscripten::class_<WASM_COMPILER_RESULT>("CompilerResult")
@@ -131,6 +137,8 @@ EXTERN bool kmcmp_CompileKeyboard(
 ) {
 
   FILE_KEYBOARD fk;
+  fk.extra = new FILE_KEYBOARD_EXTRA;
+  fk.extra->kmnFilename = pszInfile;
 
   kmcmp::FSaveDebug = options.saveDebug;   // I3681
   kmcmp::FCompilerWarningsAsErrors = options.compilerWarningsAsErrors;   // I4865
@@ -141,16 +149,6 @@ EXTERN bool kmcmp_CompileKeyboard(
   if (!messageProc || !loadFileProc || !pszInfile) {
     AddCompileError(CERR_BadCallParams);
     return FALSE;
-  }
-
-  PKMX_STR p;
-
-  if ((p = strrchr_slash((char*)pszInfile)) != nullptr) {
-    strncpy(kmcmp::CompileDir, pszInfile, (int)(p - pszInfile + 1));  // I3481
-    kmcmp::CompileDir[(int)(p - pszInfile + 1)] = 0;
-  }
-  else {
-    kmcmp::CompileDir[0] = 0;
   }
 
   msgproc = messageProc;
@@ -172,7 +170,7 @@ EXTERN bool kmcmp_CompileKeyboard(
     return FALSE;
   }
 
-  KMX_BYTE* infile = new KMX_BYTE[sz];
+  KMX_BYTE* infile = new KMX_BYTE[sz+1];
   if(!infile) {
     AddCompileError(CERR_CannotAllocateMemory);
     return FALSE;
@@ -182,6 +180,7 @@ EXTERN bool kmcmp_CompileKeyboard(
     AddCompileError(CERR_CannotReadInfile);
     return FALSE;
   }
+  infile[sz] = 0; // zero-terminate for safety, not technically needed but helps avoid memory bugs
 
   int offset = 0;
   if(infile[0] == (KMX_BYTE) UTF16Sig[0] && infile[1] == (KMX_BYTE) UTF16Sig[1]) {
@@ -266,7 +265,6 @@ bool CompileKeyboardHandle(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   fk->dpDeadKeyArray = NULL;
   fk->cxVKDictionary = 0;  // I3438
   fk->dpVKDictionary = NULL;  // I3438
-  fk->extra = new FILE_KEYBOARD_EXTRA;
   fk->extra->kvksFilename = u"";
 /*	fk->szMessage[0] = 0;
   fk->szLanguageName[0] = 0;*/

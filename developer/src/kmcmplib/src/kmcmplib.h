@@ -14,7 +14,6 @@ namespace kmcmp {
   extern KMX_BOOL FMnemonicLayout;
   extern KMX_BOOL FOldCharPosMatching;
   extern int CompileTarget;
-  extern KMX_CHAR CompileDir[260];  // TODO: this should not be a fixed buffer
   extern int BeginLine[4];
   extern int currentLine;
   extern NamedCodeConstants *CodeConstants;

@@ -18,53 +18,11 @@
 #include <kmn_compiler_errors.h>
 #include "../src/compfile.h"
 #include <test_assert.h>
-#include "../src/filesystem.h"
+#include "util_filesystem.h"
+#include "util_callbacks.h"
 
 void setup();
 void test_kmcmp_CompileKeyboard(char *kmn_file);
-
-std::vector<int> error_vec;
-
-int msgproc(int line, uint32_t dwMsgCode, const char* szText, void* context) {
-  error_vec.push_back(dwMsgCode);
-  const char*t = "unknown";
-  switch(dwMsgCode & 0xF000) {
-    case CERR_HINT:    t="   hint"; break;
-    case CERR_WARNING: t="warning"; break;
-    case CERR_ERROR:   t="  error"; break;
-    case CERR_FATAL:   t="  fatal"; break;
-  }
-  printf("line %d  %s %04.4x:  %s\n", line, t, (unsigned int)dwMsgCode, szText);
-	return 1;
-}
-
-bool loadfileProc(const char* filename, const char* baseFilename, void* data, int* size, void* context) {
-  FILE* fp = Open_File(filename, "rb");
-  if(!fp) {
-    return false;
-  }
-
-  if(!data) {
-    // return size
-    if(fseek(fp, 0, SEEK_END) != 0) {
-      fclose(fp);
-      return false;
-    }
-    *size = ftell(fp);
-    if(*size == -1L) {
-      fclose(fp);
-      return false;
-    }
-  } else {
-    // return data
-    if(fread(data, 1, *size, fp) != *size) {
-      fclose(fp);
-      return false;
-    }
-  }
-  fclose(fp);
-  return true;
-}
 
 int main(int argc, char *argv[]) {
   if(argc < 1) {
@@ -81,6 +39,13 @@ int main(int argc, char *argv[]) {
 void setup() {
   error_vec.clear();
 }
+
+/*
+  TODO: tests to run:
+  4. ANSI (no BOM of course)
+  8. file without blank last line (cannot compare with fixture due to bug in kmcmpdll...)
+  Hint to add: k004_ansi.kmn: Hint: 10A6 Keyman Developer has detected that the file has ANSI encoding. Consider converting this file to UTF-8
+*/
 
 void test_kmcmp_CompileKeyboard(char *kmn_file) {
   // Create an empty file

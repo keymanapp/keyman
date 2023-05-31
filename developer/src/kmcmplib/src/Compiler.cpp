@@ -101,7 +101,6 @@
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
 #include "kmx_u16.h"
-#include "filesystem.h"
 #include <CompMsg.h>
 
 /* These macros are adapted from winnt.h and legacy use only */
@@ -125,7 +124,6 @@ namespace kmcmp{
   KMX_BOOL FMnemonicLayout = FALSE;
   KMX_BOOL FOldCharPosMatching = FALSE;
   int CompileTarget;
-  KMX_CHAR CompileDir[260];  // TODO: this should not be a fixed buffer
   int BeginLine[4];
 
   KMX_BOOL IsValidCallStore(PFILE_STORE fs);
@@ -867,7 +865,6 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   int i, j;
   KMX_DWORD msg;
   PKMX_WCHAR p, q;
-  KMX_CHAR *pp;
 
   if (!pssBuf) pssBuf = new KMX_WCHAR[GLOBAL_BUFSIZE];
   PKMX_WCHAR buf = pssBuf;
@@ -917,13 +914,9 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
   case TSS_INCLUDECODES:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_NamedCodes);
-    pp = wstrtostr(sp->dpString);
-    if (!kmcmp::CodeConstants->LoadFile(pp))
-    {
-      delete[] pp;
+    if (!kmcmp::CodeConstants->LoadFile(fk, sp->dpString)) {
       return CERR_CannotLoadIncludeFile;
     }
-    delete[] pp;
     kmcmp::CodeConstants->reindex();   // I4982
     break;
 
@@ -3234,57 +3227,31 @@ KMX_BOOL IsSameToken(PKMX_WCHAR *p, KMX_WCHAR const * token)
   return FALSE;
 }
 
+static bool endsWith(const std::string& str, const std::string& suffix)
+{
+    return str.size() >= suffix.size() && 0 == str.compare(str.size()-suffix.size(), suffix.size(), suffix);
+}
+
 KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD FileSize, PKMX_BYTE *Buf)
 {
-  FILE *fp;
-  KMX_WCHAR szNewName[260];
+  auto szNameUtf8 = string_from_u16string(szName);
 
-  if (IsRelativePath(szName))
-  {
-    PKMX_WCHAR WCompileDir = strtowstr(kmcmp::CompileDir);
-    u16ncpy(szNewName, WCompileDir, _countof(szNewName));  // I3481
-    u16ncat(szNewName,szName,   _countof(szNewName ));  // I3481
-  }
-  else
-    u16ncpy(szNewName, szName, _countof(szNewName));  // I3481
-
-  fp=Open_File(szNewName, u"rb");
-
-  if ( fp == NULL)
-  {
-    // else if filename.bmp is not in the folder -> attempt to open filename.bmp.bmp !
-    if ( u16cmp(szNewName+u16len(szNewName)-4, u".bmp") )
-      u16ncat(szNewName, u".bmp", _countof(szNewName));  // I3481
-
-    fp= Open_File(szNewName, u"rb");
-
-    if ( fp == NULL)
+  if(!loadfileproc(szNameUtf8.c_str(), fk->extra->kmnFilename.c_str(), nullptr, (int*) FileSize, msgprocContext)) {
+    // Append .bmp and try again
+    if(endsWith(szNameUtf8, ".bmp")) {
       return CERR_CannotReadBitmapFile;
+    }
+    szNameUtf8.append(".bmp");
+    if(!loadfileproc(szNameUtf8.c_str(), fk->extra->kmnFilename.c_str(), nullptr, (int*) FileSize, msgprocContext)) {
+      return CERR_CannotReadBitmapFile;
+    }
   }
 
-  KMX_DWORD msg;
-  if ((msg = CheckFilenameConsistency(szNewName, FALSE)) != CERR_None) {
-    return msg;
-  }
-
-  fseek(fp, 0, SEEK_END);
-  *FileSize = (KMX_DWORD)ftell(fp);
-  fseek(fp ,0,SEEK_SET);
-  if (*FileSize < 0) {
-    fclose(fp);
-    return CERR_CannotReadBitmapFile;
-  }
-
-  if (*FileSize < 2) return CERR_CannotReadBitmapFile;
   *Buf = new KMX_BYTE[*FileSize];
-
-  if (fread(*Buf, 1, *FileSize, fp) < (size_t) *FileSize) {
-    delete[] * Buf;
-    *Buf = NULL;
+  if(!loadfileproc(szNameUtf8.c_str(), fk->extra->kmnFilename.c_str(), *Buf, (int*) FileSize, msgprocContext)) {
+    delete[] *Buf;
     return CERR_CannotReadBitmapFile;
   }
-
-  fclose(fp);
 
   /* Test for version 7.0 icon support */
   if (*((PKMX_CHAR)*Buf) != 'B' && *(((PKMX_CHAR)*Buf) + 1) != 'M') {
@@ -3447,6 +3414,8 @@ bool hasPreamble(std::u16string result) {
   return result.size() > 0 && result[0] == 0xFEFF;
 }
 
+#include "unicode/ucnv.h"
+
 bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int *sz16) {
   if(sz == 0) {
     return FALSE;
@@ -3456,22 +3425,35 @@ bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int *sz16)
 
   try {
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
-    result = converter.from_bytes((char*)infile, (char*)infile+sz-1);
+    result = converter.from_bytes((char*)infile, (char*)infile+sz);
   } catch(std::range_error e) {
-    std::wstring_convert<std::codecvt_utf16<char16_t>, char16_t> converter;
-    result = converter.from_bytes((char*)infile, (char*)infile+sz-1);
+    UErrorCode status = U_ZERO_ERROR;
+    // TODO: we need ICU data files here @srl295 plz help!
+    UConverter* conv = ucnv_open("windows-1252", &status);
+    if(U_FAILURE(status)) {
+      return FALSE;
+    }
+
+    char16_t* dest = new char16_t[sz*2];
+    ucnv_toUChars(conv, dest, sz*2, (char*)infile, sz, &status);
+    if(U_FAILURE(status)) {
+      delete[] dest;
+      return FALSE;
+    }
+
+    result = dest;
+    delete[] dest;
   }
 
   if(hasPreamble(result)) {
-    *sz16 = result.size() * 2 - 1;
+    *sz16 = result.size() * 2 - 2;
     *tempfile = new KMX_BYTE[*sz16];
-    memcpy(*tempfile, result.c_str() + 2, *sz16);
-
+    memcpy(*tempfile, result.c_str() + 1, *sz16);
+  } else {
+    *sz16 = result.size() * 2;
+    *tempfile = new KMX_BYTE[*sz16];
+    memcpy(*tempfile, result.c_str(), *sz16);
   }
-
-  *sz16 = result.size() * 2;
-  *tempfile = new KMX_BYTE[*sz16];
-  memcpy(*tempfile, result.c_str(), *sz16);
 
   return TRUE;
 }

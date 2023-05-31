@@ -25,8 +25,10 @@ endif
 name_suffix = []
 
 if cpp_compiler.get_id() == 'emscripten'
-  lib_links = ['--whole-archive', '--bind', '-sMODULARIZE', '-sEXPORT_ES6']
-  links += ['-lnodefs.js', '--bind', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
+  # wasm-exceptions supported in Node 18+, Chrome 95+, Firefox 100+, Safari 15.2+
+  flags += ['-fwasm-exceptions']
+  lib_links = ['--whole-archive', '-sMODULARIZE', '-sEXPORT_ES6']
+  links += ['-fwasm-exceptions', '--bind', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
   # tests are building as ES6 so we need to declare the file extension
   # note that meson currently struggles with the sanitycheckc_cross.exe
   # program, because it has a hard coded extension (.exe) which is not
@@ -44,7 +46,6 @@ lib = library('kmcmplib',
   'CompilerInterfaces.cpp',
   'DeprecationChecks.cpp',
   'Edition.cpp',
-  'filesystem.cpp',
   'NamedCodeConstants.cpp',
   'versioning.cpp',
   'virtualcharkeys.cpp',
@@ -79,7 +80,7 @@ if cpp_compiler.get_id() == 'emscripten'
   host = executable('wasm-host', #'wasm-host.cpp',
     cpp_args: defns,
     include_directories: inc,
-    link_args: links,
+    link_args: links + lib_links,
     objects: lib.extract_all_objects(),
     dependencies: icuuc_dep)
 endif

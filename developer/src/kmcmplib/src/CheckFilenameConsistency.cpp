@@ -7,52 +7,12 @@
 #include <string>
 #include "CheckFilenameConsistency.h"
 #include "kmx_u16.h"
-#include "filesystem.h"
 
 #ifdef _MSC_VER
 #include <io.h>
 #endif
 
-namespace kmcmp {
-  extern  KMX_CHAR CompileDir[260]; // TODO: this should not be a fixed buffer
-}
-bool IsRelativePath(KMX_CHAR const * p) {
-  // Relative path (returns TRUE):
-  //  ..\...\BITMAP.BMP
-  //  PATH\BITMAP.BMP
-  //  BITMAP.BMP
 
-  // Semi-absolute path (returns FALSE):
-  //  \...\BITMAP.BMP
-
-  // Absolute path (returns FALSE):
-  //  C:\...\BITMAP.BMP
-  //  \\SERVER\SHARE\...\BITMAP.BMP
-
-  if ((*p == '\\') || (*p == '/')) return FALSE;
-  if (*p && *(p + 1) == ':') return FALSE;
-
-  return TRUE;
-}
-
-bool IsRelativePath(KMX_WCHAR const * p) {
-  // Relative path (returns TRUE):
-  //  ..\...\BITMAP.BMP
-  //  PATH\BITMAP.BMP
-  //  BITMAP.BMP
-
-  // Semi-absolute path (returns FALSE):
-  //  \...\BITMAP.BMP
-
-  // Absolute path (returns FALSE):
-  //  C:\...\BITMAP.BMP
-  //  \\SERVER\SHARE\...\BITMAP.BMP
-
-  if ((*p == u'\\') || (*p == u'/'))return FALSE;
-  if (*p && *(p + 1) == u':') return FALSE;
-
-  return TRUE;
-}
 
 KMX_DWORD CheckFilenameConsistency( KMX_CHAR const * Filename, bool ReportMissingFile) {
   PKMX_WCHAR WFilename = strtowstr(( KMX_CHAR *)Filename);
@@ -62,6 +22,12 @@ KMX_DWORD CheckFilenameConsistency( KMX_CHAR const * Filename, bool ReportMissin
 }
 
 KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissingFile) {
+  // TODO: we no longer have filesystem access here. We could move this check to
+  // kmc itself, and make it consistent across all compilers that use the same
+  // loader callback
+  return CERR_None;
+
+#if 0
   // not ready yet: needs more attention-> common includes for non-Windows platforms
   KMX_WCHAR Name[260];  // TODO: fixed buffer sizes bad
 
@@ -115,6 +81,7 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
 #endif
 
   return CERR_None;
+#endif
 }
 
 KMX_DWORD CheckFilenameConsistencyForCalls(PFILE_KEYBOARD fk) {

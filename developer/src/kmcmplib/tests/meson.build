@@ -6,16 +6,20 @@
 
 fs = import('fs')
 
-tests_flags = []
+tests_links = []
+
+if cpp_compiler.get_id() == 'emscripten'
+  tests_links += ['-lnodefs.js']
+endif
 
 input_path = meson.current_source_dir() / '../../../../common/test/keyboards/baseline'
 output_path = meson.current_build_dir()
 
-kmcompxtest = executable('kmcompxtest', 'kmcompxtest.cpp',
-    cpp_args: defns,
+kmcompxtest = executable('kmcompxtest', ['kmcompxtest.cpp','util_filesystem.cpp','util_callbacks.cpp'],
+    cpp_args: defns + flags,
     include_directories: inc,
     name_suffix: name_suffix,
-    link_args: links + tests_flags,
+    link_args: links + tests_links,
     objects: lib.extract_all_objects(),
     dependencies: icuuc_dep,
   )
@@ -76,6 +80,25 @@ foreach kbd : tests
   test(kbd, kmcompxtest, args: [kbd_src, kbd_obj, join_paths(input_path, kbd) + '.kmx'])
 endforeach
 
+valid_keyboard_tests = [
+  'k001_utf16',
+  'k002_utf8_without_bom',
+  'k003_utf8_with_bom',
+  # 'k004_ansi', # TODO: enable ansi test when we have the icu datafiles
+  'k005_bitmap',
+  'k006_icon',
+  'k007_includecodes_r_n',
+  'k008_includecodes_n'
+]
+
+fixtures_path = meson.current_source_dir() / 'fixtures/valid-keyboards'
+
+foreach kbd : valid_keyboard_tests
+  kbd_src = join_paths(fixtures_path, kbd) + '.kmn'
+  kbd_obj = join_paths(output_path, kbd) + '.kmx'
+  test(kbd, kmcompxtest, args: [kbd_src, kbd_obj, join_paths(fixtures_path, kbd) + '.kmx'])
+endforeach
+
 # Test fixtures that come from keyboards repo -- but only for a "full" test,
 # which typically we run on CI no more than once a day, because it's expensive.
 
@@ -107,11 +130,11 @@ endif
 
 # Test the API endpoints
 
-apitest = executable('api-test', 'api-test.cpp',
-    cpp_args: defns,
+apitest = executable('api-test', ['api-test.cpp','util_filesystem.cpp','util_callbacks.cpp'],
+    cpp_args: defns + flags,
     include_directories: inc,
     name_suffix: name_suffix,
-    link_args: links + tests_flags,
+    link_args: links + tests_links,
     objects: lib.extract_all_objects(),
     dependencies: icuuc_dep
   )
@@ -119,10 +142,10 @@ apitest = executable('api-test', 'api-test.cpp',
 test('api-test', apitest, args: [output_path / 'blank_keyboard.kmx'])
 
 usetapitest = executable('uset-api-test', 'uset-api-test.cpp',
-    cpp_args: defns,
+    cpp_args: defns + flags,
     include_directories: inc,
     name_suffix: name_suffix,
-    link_args: links + tests_flags,
+    link_args: links + tests_links,
     objects: lib.extract_all_objects(),
     dependencies: icuuc_dep,
   )
