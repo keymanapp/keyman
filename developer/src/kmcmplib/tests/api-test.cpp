@@ -42,7 +42,7 @@ void setup() {
 
 /*
   TODO: tests to run:
-  4. ANSI (no BOM of course)
+  4. ANSI (no BOM of course) #8884
   8. file without blank last line (cannot compare with fixture due to bug in kmcmpdll...)
   Hint to add: k004_ansi.kmn: Hint: 10A6 Keyman Developer has detected that the file has ANSI encoding. Consider converting this file to UTF-8
 */

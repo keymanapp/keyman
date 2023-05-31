@@ -13,6 +13,9 @@
 bool CompileKeyboardHandle(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk);
 
 #ifdef __EMSCRIPTEN__
+// TODO: move emscripten wrappers into their own .cpp. Also move CompileKeyboardHandle 
+// into its own .cpp, so CompilerInterfaces.cpp has only C public API functions listed. 
+// #8889
 
 /*
   WASM interface for compiler message callback

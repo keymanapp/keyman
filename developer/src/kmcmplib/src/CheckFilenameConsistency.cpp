@@ -24,7 +24,7 @@ KMX_DWORD CheckFilenameConsistency( KMX_CHAR const * Filename, bool ReportMissin
 KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissingFile) {
   // TODO: we no longer have filesystem access here. We could move this check to
   // kmc itself, and make it consistent across all compilers that use the same
-  // loader callback
+  // loader callback -- see #8883 
   return CERR_None;
 
 #if 0

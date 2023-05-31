@@ -3428,7 +3428,7 @@ bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int *sz16)
     result = converter.from_bytes((char*)infile, (char*)infile+sz);
   } catch(std::range_error e) {
     UErrorCode status = U_ZERO_ERROR;
-    // TODO: we need ICU data files here @srl295 plz help!
+    // TODO: we need ICU data files here #8884
     UConverter* conv = ucnv_open("windows-1252", &status);
     if(U_FAILURE(status)) {
       return FALSE;

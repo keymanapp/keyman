@@ -35,7 +35,7 @@ struct KMCMP_COMPILER_RESULT {
   std::string kvksFilename;
 };
 
-// TODO: parameters in UTF-8
+// TODO: parameters in UTF-8 #8887
 typedef int (*kmcmp_CompilerMessageProc)(int line, uint32_t dwMsgCode, const char* szText, void* context);
 
 // parameters in UTF-8
