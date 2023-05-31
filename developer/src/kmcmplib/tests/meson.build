@@ -96,7 +96,7 @@ if get_option('full_test')
 
     # kbd is going to be an absolute path
     kbd_obj = output_path / test_basename + '.kmx'
-    reference_kmx = meson.current_source_dir() / 'fixtures' / test_basename + '.kmx'
+    reference_kmx = meson.current_source_dir() / 'fixtures/keyboards-repo' / test_basename + '.kmx'
 
     if fs.is_file(reference_kmx)
       test(test_basename, kmcompxtest, args: [kbd, kbd_obj, reference_kmx])
