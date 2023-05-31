@@ -109,6 +109,9 @@ const embeddedWorkerBuildOptions = {
 // Direct-use version
 await esbuild.build(embeddedWorkerBuildOptions);
 
+// ------------------------
+
+// Now to generate a filesize profile for the minified version of the worker.
 // We want a specialized bundle build here instead; no output, but minified like
 // the actual release worker.
 const minifiedProfilingOptions = {
