@@ -1,6 +1,6 @@
 #include "keymap.h"
 
-
+/*
 static void PrintKeymapForCode(GdkKeymap *keymap, guint keycode)
 {
   GdkKeymapKey *maps;
@@ -19,6 +19,7 @@ static void PrintKeymapForCode(GdkKeymap *keymap, guint keycode)
   g_free(keyvals);
   g_free(maps);
 }
+*/
 
 void write_US_ToVector( v_str_3D &vec,std::string language, const char* text) {
   std::string FullPathName = "/usr/share/X11/xkb/symbols/" + language;
@@ -256,45 +257,50 @@ void extract_difference( v_str_3D &All_Vector)
       diff =" *** ";
 
    std::cout  << All_Vector[0][k][0] << "\t " <<+(*(All_Vector[0][k][1].c_str()))<< "\t("<< All_Vector[0][k][1] <<")"<<std::setw(20-All_Vector[0][k][1].size())<<  +(*(All_Vector[0][k][2].c_str()))<< "\t("<< All_Vector[0][k][2] <<")"<<std::setw(20-All_Vector[0][k][2].size())<< "\t...\t"<< +(*(All_Vector[1][k][1].c_str()))<< "\t("<< All_Vector[1][k][1] <<")"<<std::setw(24-All_Vector[1][k][1].size())<<   +(*(All_Vector[1][k][2].c_str()))<< "\t("<< All_Vector[1][k][2] <<")"<<std::setw(20-All_Vector[1][k][2].size())<< diff <<"\n";
-    Map_File  << All_Vector[0][k][0] << "\t " <<+(*(All_Vector[0][k][1].c_str()))<< "\t("<< All_Vector[0][k][1] <<")"<<std::setw(20-All_Vector[0][k][1].size())<<  +(*(All_Vector[0][k][2].c_str()))<< "\t("<< All_Vector[0][k][2] <<")"<<std::setw(20-All_Vector[0][k][2].size())<< "\t...\t"<< +(*(All_Vector[1][k][1].c_str()))<< "\t("<< All_Vector[1][k][1] <<")"<<std::setw(24-All_Vector[1][k][1].size())<<   +(*(All_Vector[1][k][2].c_str()))<< "\t("<< All_Vector[1][k][2] <<")"<<std::setw(20-All_Vector[1][k][2].size())<< diff << "\n";
+    Map_File  << All_Vector[0][k][0] << " \t " <<+(*(All_Vector[0][k][1].c_str()))<< "\t("<< All_Vector[0][k][1] <<")"<<std::setw(20-All_Vector[0][k][1].size())<<  +(*(All_Vector[0][k][2].c_str()))<< "\t("<< All_Vector[0][k][2] <<")"<<std::setw(20-All_Vector[0][k][2].size())<< "\t...\t"<< +(*(All_Vector[1][k][1].c_str()))<< "\t("<< All_Vector[1][k][1] <<")"<<std::setw(24-All_Vector[1][k][1].size())<<   +(*(All_Vector[1][k][2].c_str()))<< "\t("<< All_Vector[1][k][2] <<")"<<std::setw(20-All_Vector[1][k][2].size())<< diff << "\n";
   }
 
   Map_File.close();
 }
 
-
 std::string get_Other_Char_FromUS( std::string in , v_str_3D &All_Vector) {
+  std::string diff;
   // find correct row of char in US
   for( int i=0; i< (int) All_Vector[0].size()-1;i++) {
     for( int j=0; j< (int)All_Vector[0][0].size()-1;j++) {
       if  ( All_Vector[0][i][j] == in ) {
-        std::cout << " get_Other_Char_FromUS in : "<< All_Vector[0][i][j] << " out: " << All_Vector[1][i][j] <<"\n";
+        if ( All_Vector[0][i][j] != All_Vector[1][i][j]) diff =" **  ";
+        std::cout << "US -> Other: "<<  std::setw(5)<<diff<<All_Vector[0][i][j] << std::setw(15-All_Vector[0][i][j].size())<< All_Vector[1][i][j] <<"\n";
         return All_Vector[1][i][j] ;
       }
     }
   }
+  std::cout << "US -> Other:      (" <<  in << ": no match)\n";
   return "-";
 }
 
 std::string get_US_Char_FromOther(std::string in , v_str_3D &All_Vector) {
+  std::string diff;
   // find correct row of char in other
   for( int i=0; i< (int)All_Vector[1].size()-1;i++) {
     for( int j=0; j< (int)All_Vector[1][0].size()-1;j++) {
       if  ( All_Vector[1][i][j] == in ) {
-        std::cout << " get_US_Char_FromOther : "<< All_Vector[1][i][j] << " out: " << All_Vector[0][i][j] <<"\n";
-        return All_Vector[0][i][j] ;
+        if ( All_Vector[0][i][j] != All_Vector[1][i][j]) diff =" **  ";
+        std::cout << "Other -> US: "<<  std::setw(5)<<diff<<All_Vector[1][i][j] << std::setw(15-All_Vector[0][i][j].size())<<  All_Vector[0][i][j] <<"\n";
+        return All_Vector[0][i][j];
+        }
       }
     }
+    std::cout << "Other -> US:      (" <<  in << ": no match)\n";
+    return "-";
   }
-  return "-";
-}
 
 std::string getKeyNrOf_USChar(std::string in , v_str_3D &All_Vector) {
   // find correct row of char in US
   for( int i=0; i< (int)All_Vector[0].size()-1;i++) {
     for( int j=0; j< (int)All_Vector[0][0].size()-1;j++) {
       if  ( All_Vector[0][i][j] == in ) {
-        std::cout << " getKeyNrOf_USChar : "<< All_Vector[0][i][j] << " out: " << All_Vector[0][i][0] <<"\n";
+        std::cout << "KeyNr of US char: \t"<< All_Vector[0][i][j] << " -> " << All_Vector[0][i][0] <<"\n";
         return All_Vector[0][i][0] ;
       }
     }
@@ -307,7 +313,7 @@ std::string getKeyNrOf_OtherChar(std::string in , v_str_3D &All_Vector) {
   for( int i=0; i< (int)All_Vector[1].size()-1;i++) {
     for( int j=0; j< (int)All_Vector[1][0].size()-1;j++) {
       if  ( All_Vector[1][i][j] == in ) {
-        std::cout << " getKeyNrOf_OtherChar : "<< All_Vector[1][i][j] << " out: " << All_Vector[1][i][0] <<"\n";
+        std::cout << "KeyNr of Other char : \t"<< All_Vector[1][i][j] << " -> " << All_Vector[1][i][0] <<"\n";
         return All_Vector[1][i][0] ;
       }
     }
@@ -328,6 +334,53 @@ bool test(v_str_3D &V) {
   return true;
 }
 
+void test_in_out(v_str_3D &All_Vector) {
+std::string diff;
+  printf("-----------------------------------------------------------------------------------------------------------------------------------------------\n");
+   //checks mapping between US and other
+  std::string a = get_Other_Char_FromUS( "z", All_Vector);
+  std::string aa = get_Other_Char_FromUS( "Z", All_Vector);
+  std::string aaa = get_Other_Char_FromUS( "y", All_Vector);
+  std::string aaaa = get_Other_Char_FromUS( "Y", All_Vector);
+
+  std::string b = get_US_Char_FromOther( "z", All_Vector);
+  std::string bb = get_US_Char_FromOther( "Z", All_Vector);
+  std::string bbb = get_US_Char_FromOther( "y", All_Vector);
+  std::string bbbb = get_US_Char_FromOther( "Y", All_Vector);
+
+  std::string c = getKeyNrOf_OtherChar( "z", All_Vector);
+  std::string cc = getKeyNrOf_OtherChar( "Z", All_Vector);
+  std::string ccc = getKeyNrOf_OtherChar( "y", All_Vector);
+  std::string cccc = getKeyNrOf_OtherChar( "Y", All_Vector);
+
+  std::string d = getKeyNrOf_USChar( "z", All_Vector);
+  std::string dd = getKeyNrOf_USChar( "Z", All_Vector);
+  std::string ddd = getKeyNrOf_USChar( "y", All_Vector);
+  std::string dddd = getKeyNrOf_USChar( "Y", All_Vector);
+
+  std::cout << "get_Other_Char_FromUS z-Z-y-Y: "  << ".." << a<< ".." <<aa<< ".." <<aaa<< ".." <<aaaa<< ".." << "\n";
+  std::cout << "get_US_Char_FromOther z-Z-y-Y: "  << ".." << b<< ".." <<bb<< ".." <<bbb<< ".." <<bbbb<< ".." << "\n";
+  std::cout << "getKeyNrOf_OtherChar z-Z-y-Y: "   << ".." << c<< ".." <<cc<< ".." <<ccc<< ".." <<cccc<< ".." << "\n";
+  std::cout << "getKeyNrOf_USChar z-Z-y-Y: "      << ".." << d<< ".." <<dd<< ".." <<ddd<< ".." <<dddd<< ".." << "\n";
+}
+
+void print_simple_map_US(v_str_3D &All_Vector, int shiftstate){
+  std::string out;
+  std::string diff;
+  printf("-----------------------------------------------------------------------------------------------------------------------------------------------\n");
+  for ( int i=0; i< (int)All_Vector[0].size();i++) {
+    out =get_Other_Char_FromUS(All_Vector[0][i][shiftstate], All_Vector);
+  }
+}
+
+void print_simple_map_Other(v_str_3D &All_Vector, int shiftstate){
+  std::string out;
+  std::string diff;
+  printf("-----------------------------------------------------------------------------------------------------------------------------------------------\n");
+  for ( int i=0; i< (int)All_Vector[0].size();i++) {
+    out = get_US_Char_FromOther(All_Vector[0][i][shiftstate], All_Vector);
+  }
+}
 //--------------------------------------
 
 int main(gint argc, gchar *argv[])
@@ -361,6 +414,9 @@ int main(gint argc, gchar *argv[])
 
   extract_difference(All_Vector);
   //test_in_out(All_Vector);
+
+  //print_simple_map_US(All_Vector,1);    // 1 = non-shift
+  //print_simple_map_Other(All_Vector,1);    // 1 = non-shift
 
   gdk_display_close(display);
 

@@ -14,7 +14,6 @@ typedef std::vector<std::string>                             v_str_1D;
 typedef std::vector<std::vector<std::string> >               v_str_2D;
 typedef std::vector<std::vector<std::vector<std::string> > > v_str_3D;
    
-int keyval_value =0;    // get first group (0: small letters)
 std::vector <int>  used_shift_state ={0,1};   // use  shiftstate :  no shift, shift 
 
 // read configuration file, split and write to 3D-Vector (Data for US on [0][ ][ ]  )
@@ -53,6 +52,12 @@ std::string get_US_Char_FromOther(std::string in , v_str_3D &All_Vector);
 std::string getKeyNrOf_USChar(std::string in , v_str_3D &All_Vector);
 // get KeyNr from Other
 std::string getKeyNrOf_OtherChar(std::string in , v_str_3D &All_Vector);
+
+// prints out a 1:1 mapping US->Other
+void print_simple_map_US(v_str_3D &All_Vector, int shiftstate);
+
+// prints out a 1:1 mapping Other->US
+void print_simple_map_Other(v_str_3D &All_Vector, int shiftstate);
 
 // test of above functions (character mapping US <-> Other; KeyNr <-> CHaracter)
 void test_in_out(v_str_3D &All_Vector);
