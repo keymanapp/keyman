@@ -120,7 +120,7 @@ export class KmnCompiler {
   }
 
   private loadFileCallback = (filename: string, baseFilename: string, buffer: number, bufferSize: number): number => {
-    // TODO: we can optimize this in future by avoiding loading the file twice
+    // TODO: we can optimize this in future by avoiding loading the file twice #8885
     let resolvedFilename = this.callbacks.resolveFilename(baseFilename, filename);
     let data = this.callbacks.loadFile(resolvedFilename);
     if(!data) {
@@ -133,7 +133,7 @@ export class KmnCompiler {
     }
 
     if(bufferSize != data.byteLength) {
-      // TODO: consider chucking a wobbly because this is a bug
+      // TODO: consider chucking a wobbly because this is a bug #8885
       /* c8 ignore next 2 */
       return 0;
     }
@@ -195,7 +195,7 @@ export class KmnCompiler {
       reader.validate(kvks, this.callbacks.loadSchema('kvks'));
     } catch(e) {
       console.log(e);
-      // TODO: also unit test
+      // TODO: also unit test #8886
       // TODO: this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({e}));
       return null;
     }
@@ -203,7 +203,7 @@ export class KmnCompiler {
     let vk = reader.transform(kvks, errors);
     if(!vk || errors.length) {
       console.dir(errors);
-      // TODO: also unit test
+      // TODO: also unit test #8886
       // TODO: this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({e}));
       return null;
     }
