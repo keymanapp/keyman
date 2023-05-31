@@ -52,6 +52,11 @@ compile_and_copy() {
 
   # Update the build/publish copy of our build artifacts
   prepare
+
+  local PROFILE_DEST="$KEYMAN_ROOT/web/build/profiling/"
+  mkdir -p "$PROFILE_DEST"
+  cp "$KEYMAN_ROOT/web/build/app/browser/filesize-profile.log"      "$PROFILE_DEST/web-engine-filesize.log"
+  cp "$KEYMAN_ROOT/common/web/lm-worker/build/filesize-profile.log" "$PROFILE_DEST/lm-worker-filesize.log"
 }
 
 builder_run_action configure verify_npm_setup

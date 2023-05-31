@@ -109,19 +109,24 @@ const embeddedWorkerBuildOptions = {
 // Direct-use version
 await esbuild.build(embeddedWorkerBuildOptions);
 
+// We want a specialized bundle build here instead; no output, but minified like
+// the actual release worker.
+const minifiedProfilingOptions = {
+  ...embeddedWorkerBuildOptions,
+  minify: true,
+  metafile: true,
+  write: false // don't actually write the file.
+}
+
+let result = await esbuild.build(minifiedProfilingOptions);
+let filesizeProfile = await esbuild.analyzeMetafile(result.metafile, { verbose: true });
+fs.writeFileSync('build/filesize-profile.log', `
+// Minified Worker filesize profile, before polyfilling
+${filesizeProfile}
+`);
+
 if(EMIT_FILESIZE_PROFILE) {
-  // We want a specialized bundle build here instead; no output, but minified like
-  // the actual worker.
-  const minifiedProfilingOptions = {
-    ...embeddedWorkerBuildOptions,
-    minify: true,
-    metafile: true,
-    write: false // don't actually write the file.
-  }
-
-  let result = await esbuild.build(minifiedProfilingOptions);
-
   console.log("Minified, pre-polyfill worker filesize profile:");
   // Profiles the sourcecode!
-  console.log(await esbuild.analyzeMetafile(result.metafile, { verbose: true }));
+  console.log(filesizeProfile);
 }

@@ -82,12 +82,17 @@ let result = await esbuild.build({
   treeShaking: true,
   tsconfig: './tsconfig.json',
   // Enables source-file output size profiling!
-  metafile: EMIT_FILESIZE_PROFILE
+  metafile: true
 });
 
+let filesizeProfile = await esbuild.analyzeMetafile(result.metafile, { verbose: true });
+fs.writeFileSync('../../../build/app/browser/filesize-profile.log', `
+// Minified Keyman Engine for Web ('app/browser' target), filesize profile
+${filesizeProfile}
+`);
 if(EMIT_FILESIZE_PROFILE) {
   // Profiles the sourcecode!
-  console.log(await esbuild.analyzeMetafile(result.metafile, { verbose: true }));
+  console.log(filesizeProfile);
 }
 
 await esbuild.build({
