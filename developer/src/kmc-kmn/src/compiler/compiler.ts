@@ -42,50 +42,10 @@ const baseOptions: CompilerOptions = {
  */
 let callbackProcIdentifier = 0;
 
-/**
- * Pointer in wasm-space
- */
-type WasmPtr = number;
-
-/**
- * The wrapped functions
- */
-class WasmWrapper {
-  Module: any;
-
-  compileKeyboardFile?: (pszInfile: string, pszOutfile: string, aSaveDebug: number, aCompilerWarningsAsErrors: number, aWarnDeprecatedCode: number, msgProc: string) => boolean;
-  parseUnicodeSet?: (pat: string, buf: WasmPtr, length: number) => number;
-  setCompilerOptions?: (shouldAddCompilerVersion: number) => boolean;
-
-  constructor(wasmModule: any) {
-    this.Module = wasmModule;
-    if (!wasmModule) {
-      throw Error(`wasm host did not load`);
-    }
-    this.compileKeyboardFile = this.Module.cwrap('kmcmp_Wasm_CompileKeyboardFile', 'boolean', ['string', 'string', 'number', 'number', 'number', 'string']);
-    this.parseUnicodeSet = this.Module.cwrap('kmcmp_Wasm_ParseUnicodeSet', 'number', ['string', 'number', 'number']);
-    this.setCompilerOptions = this.Module.cwrap('kmcmp_Wasm_SetCompilerOptions', 'boolean', ['number']);
-
-    if (this.parseUnicodeSet === undefined
-      || this.setCompilerOptions === undefined
-      || this.compileKeyboardFile === undefined) {
-        throw Error(`some wasm functions did not load properly.`);
-    }
-  }
-
-  /**
-   * Entry point into Wasm functions
-   * @returns WasmWrapper
-   */
-  public static async load() : Promise<WasmWrapper> {
-    return new WasmWrapper(await loadWasmHost());
-  }
-};
-
 export class KmnCompiler {
+  private Module: any;
   callbackName: string;
   callbacks: CompilerCallbacks;
-  wasm: WasmWrapper;
 
   constructor() {
     this.callbackName = 'kmnCompilerCallback' + callbackProcIdentifier;
@@ -94,9 +54,9 @@ export class KmnCompiler {
 
   public async init(callbacks: CompilerCallbacks): Promise<boolean> {
     this.callbacks = callbacks;
-    if(!this.wasm) {
+    if(!this.Module) {
       try {
-        this.wasm = await WasmWrapper.load();
+        this.Module = await loadWasmHost();
       } catch(e: any) {
         this.callbacks.reportMessage(CompilerMessages.Fatal_MissingWasmModule({e}));
         return false;
@@ -114,7 +74,7 @@ export class KmnCompiler {
       // Can't report a message here.
       throw Error('Must call Compiler.init(callbacks) before proceeding');
     }
-    if(!this.wasm) { // fail if wasm not loaded or function not found
+    if(!this.Module) { // fail if wasm not loaded or function not found
       this.callbacks.reportMessage(CompilerMessages.Fatal_MissingWasmModule({}));
       return false;
     }
@@ -153,7 +113,7 @@ export class KmnCompiler {
 
   private runCompiler(infile: string, outfile: string, options: CompilerOptions): CompilerResult {
     let result: CompilerResult = {};
-    let wasm_interface = new this.wasm.Module.CompilerInterface();
+    let wasm_interface = new this.Module.CompilerInterface();
     let wasm_result = null;
     try {
       wasm_interface.saveDebug = options.saveDebug;
@@ -161,7 +121,7 @@ export class KmnCompiler {
       wasm_interface.warnDeprecatedCode = options.warnDeprecatedCode;
       wasm_interface.messageCallback = this.callbackName;
       wasm_interface.loadFileCallback = this.callbackName;  // TODO: this is wrong, needs to be a new callback; not yet used though
-      wasm_result = this.wasm.Module.kmcmp_compile(infile, wasm_interface);
+      wasm_result = this.Module.kmcmp_compile(infile, wasm_interface);
       if(!wasm_result.result) {
         return null;
       }
@@ -175,7 +135,7 @@ export class KmnCompiler {
 
       result.kmx = {
         filename: outfile,
-        data: new Uint8Array(this.wasm.Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
+        data: new Uint8Array(this.Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
       };
 
       return result;
@@ -230,16 +190,15 @@ export class KmnCompiler {
     if (!bufferSize) {
       bufferSize = 100; // TODO-LDML: Preflight mode? Reuse buffer?
     }
-    const { Module } = this.wasm;
-    const buf = Module.asm.malloc(bufferSize * 2 * Module.HEAPU32.BYTES_PER_ELEMENT);
+    const buf = this.Module.asm.malloc(bufferSize * 2 * this.Module.HEAPU32.BYTES_PER_ELEMENT);
     // TODO-LDML: Catch OOM
-    const rc = this.wasm.parseUnicodeSet(pattern, buf, bufferSize);
+    const rc = this.Module.kmcmp_parseUnicodeSet(pattern, buf, bufferSize);
     if (rc >= 0) {
       const ranges = [];
-      const startu = (buf / Module.HEAPU32.BYTES_PER_ELEMENT);
+      const startu = (buf / this.Module.HEAPU32.BYTES_PER_ELEMENT);
       for (let i = 0; i < rc; i++) {
-        const low = Module.HEAPU32[startu + (i * 2) + 0];
-        const high = Module.HEAPU32[startu + (i * 2) + 1];
+        const low = this.Module.HEAPU32[startu + (i * 2) + 0];
+        const high = this.Module.HEAPU32[startu + (i * 2) + 1];
         ranges.push([low, high]);
       }
       // TODO-LDML: no free??

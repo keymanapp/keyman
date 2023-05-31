@@ -46,39 +46,6 @@ int wasm_CompilerMessageProc(int line, uint32_t dwMsgCode, char* szText, void* c
   return wasm_msgproc(line, dwMsgCode, szText, msgProc);
 }
 
-//DEPRECATED
-EXTERN bool kmcmp_Wasm_SetCompilerOptions(int ShouldAddCompilerVersion) {
-  KMCMP_COMPILER_OPTIONS options;
-  options.dwSize = sizeof(KMCMP_COMPILER_OPTIONS);
-  options.ShouldAddCompilerVersion = ShouldAddCompilerVersion;
-  return kmcmp_SetCompilerOptions(&options);
-}
-
-//DEPRECATED
-EXTERN bool kmcmp_Wasm_CompileKeyboardFile(char* pszInfile,
-  char* pszOutfile, int ASaveDebug, int ACompilerWarningsAsErrors,
-	int AWarnDeprecatedCode, char* msgProc
-) {
-  return kmcmp_CompileKeyboardFile(
-    pszInfile,
-    pszOutfile,
-    ASaveDebug,
-    ACompilerWarningsAsErrors,
-    AWarnDeprecatedCode,
-    wasm_CompilerMessageProc,
-    msgProc
-  );
-}
-
-EXTERN int kmcmp_Wasm_ParseUnicodeSet(char* pat,
-  uint32_t* buf, int length
-) {
-  return kmcmp_ParseUnicodeSet(
-    pat, buf, length
-  );
-}
-
-
 struct COMPILER_INTERFACE {
   bool saveDebug;
   bool compilerWarningsAsErrors;
@@ -162,6 +129,7 @@ EMSCRIPTEN_BINDINGS(compiler_interface) {
     ;
 
   emscripten::function("kmcmp_compile", &kmcmp_compile);
+  emscripten::function("kmcmp_parseUnicodeSet", &kmcmp_parseUnicodeSet);
 }
 
 #endif
