@@ -134,7 +134,7 @@ function _builder_write_npm_version() {
   # version-with-tag, so that the published version has precise dependencies, and
   # we don't accidentally end up with either older or newer deps. This overwrites
   # the local package.json files, so they do need to be restored afterwards
-  find /c/Projects/keyman/app -name "package.json" -not -path '*/node_modules/*' -print0 | \
+  find "$KEYMAN_ROOT" -name "package.json" -not -path '*/node_modules/*' -print0 | \
     while IFS= read -r -d '' line; do
       cat "$line" | "$JQ" --arg VERSION_WITH_TAG "$VERSION_WITH_TAG" \
         '
