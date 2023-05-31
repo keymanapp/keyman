@@ -71,14 +71,15 @@ int main(int argc, char *argv[])
   char  first5[6] = "CERR_";
   char* pfirst5 = first5;
 
-  KMCMP_COMPILER_OPTIONS kcopts;
-  kcopts.dwSize = sizeof(KMCMP_COMPILER_OPTIONS);
-  kcopts.ShouldAddCompilerVersion = false; // So we can compare against existing compiled keyboards that also don't have compiler version
-  if(!kmcmp_SetCompilerOptions(&kcopts)) {
-    return __LINE__;
-  }
+  KMCMP_COMPILER_RESULT result;
+  KMCMP_COMPILER_OPTIONS options;
+  options.saveDebug = true;
+  options.compilerWarningsAsErrors = false;
+  options.warnDeprecatedCode = true;
+  options.shouldAddCompilerVersion = false;
+  options.target = CKF_KEYMAN;
 
-  if(kmcmp_CompileKeyboardFile(kmn_file, kmx_file, true, false, true, msgproc, nullptr)) {
+  if(kmcmp_CompileKeyboard(kmn_file, options, msgproc, nullptr, nullptr, result)) {
     char* testname = strrchr( (char*) kmn_file, '/') + 1;
     if(strncmp(testname, pfirst5, 5) == 0){
       return __LINE__;  // exit code: CERR_ in Name + no Error found
@@ -87,26 +88,24 @@ int main(int argc, char *argv[])
     // On non-win32 platforms, we cannot get kmcmpdll.dll to build keyboards
     // legacy-mode, so we'll compare to a hopefully existing file that we've
     // been passed
-    FILE* fp1 = Open_File(kmx_file, "rb");
+    FILE* fp1 = Open_File(kmx_file, "wb");
     if(!fp1) return __LINE__;
+
+    // Write out for reference
+    fwrite(result.kmx, 1, result.kmxSize, fp1);
 
 
     FILE* fp2 = Open_File(reference_kmx, "rb");
     if(!fp2) return __LINE__;                      // exit code: fail if no reference kmx file in build-folder
 
-    fseek(fp1, 0, SEEK_END);
-    auto sz1 = ftell(fp1);
-    fseek(fp1, 0, SEEK_SET);
     fseek(fp2, 0, SEEK_END);
     auto sz2 = ftell(fp2);
     fseek(fp2, 0, SEEK_SET);
-    if (sz1 != sz2) return __LINE__;                //  exit code: size of kmx-file in build differs from size of kmx-file in source folder
+    if (result.kmxSize != sz2) return __LINE__;                //  exit code: size of kmx-file in build differs from size of kmx-file in source folder
 
-    char* buf1 = new char[sz1];
-    char* buf2 = new char[sz1];
-    fread(buf1, 1, sz1, fp1);
-    fread(buf2, 1, sz1, fp2);
-    return memcmp(buf1, buf2, sz1) ? __LINE__ : 0;  // exit code:  when contents of kmx-file in build differs from contents of kmx-file in source folder
+    char* buf2 = new char[result.kmxSize];
+    fread(buf2, 1, result.kmxSize, fp2);
+    return memcmp(result.kmx, buf2, result.kmxSize) ? __LINE__ : 0;  // exit code:  when contents of kmx-file in build differs from contents of kmx-file in source folder
                                                     // success:    when contents of kmx-file in build and source folder are the same
   }
   else {  /*if Errors found: check number (e.g. CERR_4061_balochi_phonetic.kmn should produce Error 4061)*/

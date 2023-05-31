@@ -114,14 +114,17 @@ export class KmnCompiler {
   private runCompiler(infile: string, outfile: string, options: CompilerOptions): CompilerResult {
     let result: CompilerResult = {};
     let wasm_interface = new this.Module.CompilerInterface();
+    let wasm_options = new this.Module.CompilerOptions();
     let wasm_result = null;
     try {
-      wasm_interface.saveDebug = options.saveDebug;
-      wasm_interface.compilerWarningsAsErrors = options.compilerWarningsAsErrors;
-      wasm_interface.warnDeprecatedCode = options.warnDeprecatedCode;
+      wasm_options.saveDebug = options.saveDebug;
+      wasm_options.compilerWarningsAsErrors = options.compilerWarningsAsErrors;
+      wasm_options.warnDeprecatedCode = options.warnDeprecatedCode;
+      wasm_options.shouldAddCompilerVersion = options.shouldAddCompilerVersion;
+      wasm_options.target = 0; //CKF_KEYMAN; TODO, support KMW
       wasm_interface.messageCallback = this.callbackName;
       wasm_interface.loadFileCallback = this.callbackName;  // TODO: this is wrong, needs to be a new callback; not yet used though
-      wasm_result = this.Module.kmcmp_compile(infile, wasm_interface);
+      wasm_result = this.Module.kmcmp_compile(infile, wasm_options, wasm_interface);
       if(!wasm_result.result) {
         return null;
       }
@@ -147,6 +150,7 @@ export class KmnCompiler {
         wasm_result.delete();
       }
       wasm_interface.delete();
+      wasm_options.delete();
     }
   }
 

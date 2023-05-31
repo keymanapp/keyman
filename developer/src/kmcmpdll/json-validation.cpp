@@ -1,13 +1,10 @@
 
 #include <json-schema.hpp>
 #include <fstream>
-#include "../kmcmplib/include/kmcmplibapi.h"
 
 #include <windows.h>
 
 typedef bool (*kmcmp_ValidateJsonMessageProc)(int64_t offset, const char* szText, void* context);
-
-extern bool flag_use_new_kmcomp;
 
 using nlohmann::json;
 using nlohmann::json_uri;
@@ -34,13 +31,6 @@ bool kmcmpMessageProc(int64_t offset, const char* szText, void* context) {
 }
 
 extern "C" BOOL __declspec(dllexport) ValidateJsonFile(PWSTR pwszSchemaFile, PWSTR pwszJsonFile, ValidateJsonMessageProc MessageProc) {
-
-  if ( flag_use_new_kmcomp )
-  {
-    std::fstream f(pwszSchemaFile);
-    std::fstream fd(pwszJsonFile);
-    return kmcmp_ValidateJsonFile(f, fd, kmcmpMessageProc, (void*)MessageProc);
-  }
 
   std::fstream f(pwszSchemaFile);
   if (!f.good()) {
