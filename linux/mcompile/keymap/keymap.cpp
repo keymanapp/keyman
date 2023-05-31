@@ -194,6 +194,7 @@ void append_other_ToVector(v_str_3D &All_Vector,GdkKeymap * keymap) {
     // get key name US stored in [0][i][0] and copy to name in other-block[1][i][0]
     All_Vector[1][i][0] = All_Vector[0][i][0];
 
+    // TODO see that nr of shift states are not out of range !!
     // write this value to 3D- Vector
     All_Vector[1][i][0+1] = GetKeyvalsFromKeymap(keymap,stoi(All_Vector[1][i][0]),0);   //shift state: unshifted:0
     All_Vector[1][i][1+1] = GetKeyvalsFromKeymap(keymap,stoi(All_Vector[1][i][0]),1);   //shift state: shifted:1
