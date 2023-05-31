@@ -13,7 +13,8 @@
 #include <sstream>
 #include <kmcmplibapi.h>
 #include <kmx_file.h>
-#include "../src/filesystem.h"
+#include "util_filesystem.h"
+#include "util_callbacks.h"
 
 #ifdef _MSC_VER
 #else
@@ -22,56 +23,10 @@
 
 using namespace std;
 
-vector < int > error_vec;
-
 #define CERR_FATAL                                         0x00008000
 #define CERR_ERROR                                         0x00004000
 #define CERR_WARNING                                       0x00002000
 #define CERR_HINT                                          0x00001000
-
-int msgproc(int line, uint32_t dwMsgCode, const char* szText, void* context)
-{
-  error_vec.push_back(dwMsgCode);
-  const char*t = "unknown";
-  switch(dwMsgCode & 0xF000) {
-    case CERR_HINT:    t="   hint"; break;
-    case CERR_WARNING: t="warning"; break;
-    case CERR_ERROR:   t="  error"; break;
-    case CERR_FATAL:   t="  fatal"; break;
-  }
-  printf("line %d  %s %04.4x:  %s\n", line, t, (unsigned int)dwMsgCode, szText);
-	return 1;
-}
-
-bool loadfileProc(const char* filename, const char* baseFilename, void* data, int* size, void* context) {
-  FILE* fp = Open_File(filename, "rb");
-  if(!fp) {
-    return false;
-  }
-
-  if(!data) {
-    // return size
-    if(fseek(fp, 0, SEEK_END) != 0) {
-      fclose(fp);
-      return false;
-    }
-    *size = ftell(fp);
-    if(*size == -1L) {
-      fclose(fp);
-      return false;
-    }
-  } else {
-    // return data
-    if(fread(data, 1, *size, fp) != *size) {
-      fclose(fp);
-      return false;
-    }
-  }
-  fclose(fp);
-  return true;
-}
-
-#include "../src/filesystem.h"
 
 int main(int argc, char *argv[])
 {

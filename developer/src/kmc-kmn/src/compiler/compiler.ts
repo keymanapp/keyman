@@ -42,13 +42,16 @@ const baseOptions: CompilerOptions = {
  */
 let callbackProcIdentifier = 0;
 
+const
+  callbackPrefix = 'kmnCompilerCallbacks_';
+
 export class KmnCompiler {
   private Module: any;
-  callbackName: string;
+  callbackID: string; // a unique numeric id added to globals with prefixed names
   callbacks: CompilerCallbacks;
 
   constructor() {
-    this.callbackName = 'kmnCompilerCallback' + callbackProcIdentifier;
+    this.callbackID = callbackPrefix + callbackProcIdentifier.toString();
     callbackProcIdentifier++;
   }
 
@@ -58,6 +61,7 @@ export class KmnCompiler {
       try {
         this.Module = await loadWasmHost();
       } catch(e: any) {
+        /* c8 ignore next 3 */
         this.callbacks.reportMessage(CompilerMessages.Fatal_MissingWasmModule({e}));
         return false;
       }
@@ -74,7 +78,9 @@ export class KmnCompiler {
       // Can't report a message here.
       throw Error('Must call Compiler.init(callbacks) before proceeding');
     }
-    if(!this.Module) { // fail if wasm not loaded or function not found
+    if(!this.Module) {
+      /* c8 ignore next 4 */
+      // fail if wasm not loaded or function not found
       this.callbacks.reportMessage(CompilerMessages.Fatal_MissingWasmModule({}));
       return false;
     }
@@ -83,15 +89,17 @@ export class KmnCompiler {
 
   public run(infile: string, outfile: string, options?: CompilerOptions): boolean {
     if(!this.verifyInitialized()) {
+      /* c8 ignore next 2 */
       return false;
     }
 
     options = {...baseOptions, ...options};
-    (globalThis as any)[this.callbackName] = this.compilerMessageCallback;
-    // TODO: use callbacks for file access -- so kmc-kmn is entirely fs agnostic
+    (globalThis as any)[this.callbackID] = {
+      message: this.compilerMessageCallback,
+      loadFile: this.loadFileCallback
+    };
     let result = this.runCompiler(infile, outfile, options);
-    delete (globalThis as any)[this.callbackName];
-    //TODO: write the file out!
+    delete (globalThis as any)[this.callbackID];
     if(result) {
       if(result.kmx) {
         this.callbacks.fs.writeFileSync(result.kmx.filename, result.kmx.data);
@@ -111,6 +119,30 @@ export class KmnCompiler {
     return 1;
   }
 
+  private loadFileCallback = (filename: string, baseFilename: string, buffer: number, bufferSize: number): number => {
+    // TODO: we can optimize this in future by avoiding loading the file twice
+    let resolvedFilename = this.callbacks.resolveFilename(baseFilename, filename);
+    let data = this.callbacks.loadFile(resolvedFilename);
+    if(!data) {
+      return 0;
+    }
+
+    if(buffer == 0) {
+      /* We need to return buffer size required */
+      return data.byteLength;
+    }
+
+    if(bufferSize != data.byteLength) {
+      // TODO: consider chucking a wobbly because this is a bug
+      /* c8 ignore next 2 */
+      return 0;
+    }
+
+    this.Module.HEAP8.set(data, buffer);
+
+    return 1;
+  }
+
   private runCompiler(infile: string, outfile: string, options: CompilerOptions): CompilerResult {
     let result: CompilerResult = {};
     let wasm_interface = new this.Module.CompilerInterface();
@@ -122,8 +154,7 @@ export class KmnCompiler {
       wasm_options.warnDeprecatedCode = options.warnDeprecatedCode;
       wasm_options.shouldAddCompilerVersion = options.shouldAddCompilerVersion;
       wasm_options.target = 0; //CKF_KEYMAN; TODO, support KMW
-      wasm_interface.messageCallback = this.callbackName;
-      wasm_interface.loadFileCallback = this.callbackName;  // TODO: this is wrong, needs to be a new callback; not yet used though
+      wasm_interface.callbacksKey = this.callbackID; // key of object on globalThis
       wasm_result = this.Module.kmcmp_compile(infile, wasm_options, wasm_interface);
       if(!wasm_result.result) {
         return null;
@@ -143,6 +174,7 @@ export class KmnCompiler {
 
       return result;
     } catch(e) {
+      /* c8 ignore next 3 */
       this.callbacks.reportMessage(CompilerMessages.Fatal_UnexpectedException({e:e}));
       return null;
     } finally {
@@ -163,6 +195,7 @@ export class KmnCompiler {
       reader.validate(kvks, this.callbacks.loadSchema('kvks'));
     } catch(e) {
       console.log(e);
+      // TODO: also unit test
       // TODO: this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({e}));
       return null;
     }
@@ -170,6 +203,7 @@ export class KmnCompiler {
     let vk = reader.transform(kvks, errors);
     if(!vk || errors.length) {
       console.dir(errors);
+      // TODO: also unit test
       // TODO: this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({e}));
       return null;
     }
@@ -188,10 +222,12 @@ export class KmnCompiler {
    */
   public parseUnicodeSet(pattern: string, bufferSize: number) : UnicodeSet | null {
     if(!this.verifyInitialized()) {
+      /* c8 ignore next 2 */
       return null;
     }
 
     if (!bufferSize) {
+      /* c8 ignore next 2 */
       bufferSize = 100; // TODO-LDML: Preflight mode? Reuse buffer?
     }
     const buf = this.Module.asm.malloc(bufferSize * 2 * this.Module.HEAPU32.BYTES_PER_ELEMENT);
@@ -239,6 +275,7 @@ function getUnicodeSetError(rc: number) : CompilerEvent  {
     case KMCMP_FATAL_OUT_OF_RANGE:
       return CompilerMessages.Fatal_UnicodeSetOutOfRange();
     default:
+      /* c8 ignore next */
       return CompilerMessages.Fatal_UnexpectedException({e: `Unexpected UnicodeSet error code ${rc}`});
   }
 }
