@@ -7,6 +7,7 @@
 # TODO: is this required? It should be Keyman Core only
 defns += ['-DKMN_KBP_EXPORTING']
 version_res = []
+lib_links = []
 
 if cpp_compiler.get_id() == 'gcc' or cpp_compiler.get_id() == 'clang'
   warns += [
@@ -24,12 +25,10 @@ endif
 name_suffix = []
 
 if cpp_compiler.get_id() == 'emscripten'
-  links += ['-lnodefs.js', '-sMODULARIZE', '-sEXPORT_ES6', '--whole-archive', '--bind', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
-  # tests are building as ES6 so we need to declare the file extension
-  # note that meson currently struggles with the sanitycheckc_cross.exe
-  # program, because it has a hard coded extension (.exe) which is not
-  # valid for node programs in module mode.
-  name_suffix = '.mjs'
+  # wasm-exceptions supported in Node 18+, Chrome 95+, Firefox 100+, Safari 15.2+
+  flags += ['-fwasm-exceptions']
+  lib_links = ['--whole-archive', '-sMODULARIZE', '-sEXPORT_ES6']
+  links += ['-fwasm-exceptions', '--bind', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
 endif
 
 icu = subproject('icu-for-uset', default_options: [ 'default_library=static', 'cpp_std=c++17', 'warning_level=0', 'werror=false'])
@@ -42,7 +41,6 @@ lib = library('kmcmplib',
   'CompilerInterfaces.cpp',
   'DeprecationChecks.cpp',
   'Edition.cpp',
-  'filesystem.cpp',
   'NamedCodeConstants.cpp',
   'versioning.cpp',
   'virtualcharkeys.cpp',
@@ -63,7 +61,7 @@ lib = library('kmcmplib',
 
   version_res,
   cpp_args: defns + warns + flags,
-  link_args: links,
+  link_args: links + lib_links,
   version: meson.project_version(),
   include_directories: inc,
   install: true,
@@ -77,7 +75,7 @@ if cpp_compiler.get_id() == 'emscripten'
   host = executable('wasm-host', #'wasm-host.cpp',
     cpp_args: defns,
     include_directories: inc,
-    link_args: links,
+    link_args: links + lib_links,
     objects: lib.extract_all_objects(),
     dependencies: icuuc_dep)
 endif

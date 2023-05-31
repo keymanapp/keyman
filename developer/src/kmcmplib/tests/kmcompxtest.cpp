@@ -13,6 +13,8 @@
 #include <sstream>
 #include <kmcmplibapi.h>
 #include <kmx_file.h>
+#include "util_filesystem.h"
+#include "util_callbacks.h"
 
 #ifdef _MSC_VER
 #else
@@ -21,28 +23,10 @@
 
 using namespace std;
 
-vector < int > error_vec;
-
 #define CERR_FATAL                                         0x00008000
 #define CERR_ERROR                                         0x00004000
 #define CERR_WARNING                                       0x00002000
 #define CERR_HINT                                          0x00001000
-
-int msgproc(int line, uint32_t dwMsgCode, char* szText, void* context)
-{
-  error_vec.push_back(dwMsgCode);
-  const char*t = "unknown";
-  switch(dwMsgCode & 0xF000) {
-    case CERR_HINT:    t="   hint"; break;
-    case CERR_WARNING: t="warning"; break;
-    case CERR_ERROR:   t="  error"; break;
-    case CERR_FATAL:   t="  fatal"; break;
-  }
-  printf("line %d  %s %04.4x:  %s\n", line, t, (unsigned int)dwMsgCode, szText);
-	return 1;
-}
-
-#include "../src/filesystem.h"
 
 int main(int argc, char *argv[])
 {
@@ -79,7 +63,7 @@ int main(int argc, char *argv[])
   options.shouldAddCompilerVersion = false;
   options.target = CKF_KEYMAN;
 
-  if(kmcmp_CompileKeyboard(kmn_file, options, msgproc, nullptr, nullptr, result)) {
+  if(kmcmp_CompileKeyboard(kmn_file, options, msgproc, loadfileProc, nullptr, result)) {
     char* testname = strrchr( (char*) kmn_file, '/') + 1;
     if(strncmp(testname, pfirst5, 5) == 0){
       return __LINE__;  // exit code: CERR_ in Name + no Error found

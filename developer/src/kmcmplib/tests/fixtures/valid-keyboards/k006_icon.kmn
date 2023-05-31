@@ -1,0 +1,12 @@
+c Description: Verifies that kmcmplib can load an icon with file extension
+
+store(&NAME) 'k006_icon'
+store(&VERSION) '9.0'
+store(&BITMAP) 'k006_icon.ico'
+
+begin unicode > use(main)
+
+group(main) using keys
+
++ [K_A] > 'a'
+'a' + [K_B] > 'ខ្មែរ'

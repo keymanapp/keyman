@@ -3,7 +3,6 @@
 #include <kmcmplibapi.h>
 #include <kmn_compiler_errors.h>
 #include "kmcmplib.h"
-#include "filesystem.h"
 #include "CheckFilenameConsistency.h"
 #include "CheckNCapsConsistency.h"
 #include "DeprecationChecks.h"
@@ -11,15 +10,18 @@
 #include "../../../../common/windows/cpp/include/ConvertUTF.h"
 #include "../../../../common/windows/cpp/include/keymanversion.h"
 
-bool CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk);
+bool CompileKeyboardHandle(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk);
 
 #ifdef __EMSCRIPTEN__
+// TODO: move emscripten wrappers into their own .cpp. Also move CompileKeyboardHandle 
+// into its own .cpp, so CompilerInterfaces.cpp has only C public API functions listed. 
+// #8889
 
 /*
   WASM interface for compiler message callback
 */
-EM_JS(int, wasm_msgproc, (int line, int msgcode, char* text, char* context), {
-  const proc = globalThis[UTF8ToString(context)];
+EM_JS(int, wasm_msgproc, (int line, int msgcode, const char* text, char* context), {
+  const proc = globalThis[UTF8ToString(context)].message;
   if(!proc || typeof proc != 'function') {
     console.log(`[${line}: ${msgcode}: ${UTF8ToString(text)}]`);
     return 0;
@@ -28,14 +30,36 @@ EM_JS(int, wasm_msgproc, (int line, int msgcode, char* text, char* context), {
   }
 });
 
-int wasm_CompilerMessageProc(int line, uint32_t dwMsgCode, char* szText, void* context) {
+EM_JS(int, wasm_loadfileproc, (const char* filename, const char* baseFilename, void* buffer, int bufferSize, char* context), {
+  const proc = globalThis[UTF8ToString(context)].loadFile;
+  if(!proc || typeof proc != 'function') {
+    return 0;
+  } else {
+    if(buffer == 0) {
+      return proc(UTF8ToString(filename), UTF8ToString(baseFilename), 0, 0);
+    } else {
+      return proc(UTF8ToString(filename), UTF8ToString(baseFilename), buffer, bufferSize);
+    }
+  }
+});
+
+bool wasm_LoadFileProc(const char* filename, const char* baseFilename, void* buffer, int* bufferSize, void* context) {
+  char* msgProc = static_cast<char*>(context);
+  if(buffer == nullptr) {
+    *bufferSize = wasm_loadfileproc(filename, baseFilename, 0, 0, msgProc);
+    return *bufferSize != 0;
+  } else {
+    return wasm_loadfileproc(filename, baseFilename, buffer, *bufferSize, msgProc) == 1;
+  }
+}
+
+int wasm_CompilerMessageProc(int line, uint32_t dwMsgCode, const char* szText, void* context) {
   char* msgProc = static_cast<char*>(context);
   return wasm_msgproc(line, dwMsgCode, szText, msgProc);
 }
 
 struct WASM_COMPILER_INTERFACE {
-  std::string messageCallback;    // int line, uint32_t dwMsgCode, char* szText
-  std::string loadFileCallback;   // TODO: char* filename, char* baseFilename --> buffer
+  std::string callbacksKey;    // key of callbacks object on globalThis
 };
 
 struct WASM_COMPILER_RESULT {
@@ -61,8 +85,8 @@ WASM_COMPILER_RESULT kmcmp_wasm_compile(std::string pszInfile, const KMCMP_COMPI
     pszInfile.c_str(),
     options,
     wasm_CompilerMessageProc,
-    nullptr, //wasm_LoadFileProc,
-    intf.messageCallback.c_str(),
+    wasm_LoadFileProc,
+    intf.callbacksKey.c_str(),
     kr
   );
 
@@ -89,8 +113,7 @@ EMSCRIPTEN_BINDINGS(compiler_interface) {
 
   emscripten::class_<WASM_COMPILER_INTERFACE>("CompilerInterface")
     .constructor<>()
-    .property("messageCallback", &WASM_COMPILER_INTERFACE::messageCallback)
-    .property("loadFileCallback", &WASM_COMPILER_INTERFACE::loadFileCallback)
+    .property("callbacksKey", &WASM_COMPILER_INTERFACE::callbacksKey)
     ;
 
   emscripten::class_<WASM_COMPILER_RESULT>("CompilerResult")
@@ -116,9 +139,9 @@ EXTERN bool kmcmp_CompileKeyboard(
   KMCMP_COMPILER_RESULT& result
 ) {
 
-  FILE* fp_in = NULL;
-  KMX_CHAR str[260];
   FILE_KEYBOARD fk;
+  fk.extra = new FILE_KEYBOARD_EXTRA;
+  fk.extra->kmnFilename = pszInfile;
 
   kmcmp::FSaveDebug = options.saveDebug;   // I3681
   kmcmp::FCompilerWarningsAsErrors = options.compilerWarningsAsErrors;   // I4865
@@ -126,59 +149,65 @@ EXTERN bool kmcmp_CompileKeyboard(
   kmcmp::FShouldAddCompilerVersion = options.shouldAddCompilerVersion;
   kmcmp::CompileTarget = options.target;
 
-  if (!messageProc || !pszInfile) { // TODO: add loadFileProc
+  if (!messageProc || !loadFileProc || !pszInfile) {
     AddCompileError(CERR_BadCallParams);
     return FALSE;
   }
 
-  PKMX_STR p;
-
-  if ((p = strrchr_slash((char*)pszInfile)) != nullptr) {
-    strncpy(kmcmp::CompileDir, pszInfile, (int)(p - pszInfile + 1));  // I3481
-    kmcmp::CompileDir[(int)(p - pszInfile + 1)] = 0;
-  }
-  else {
-    kmcmp::CompileDir[0] = 0;
-  }
-
   msgproc = messageProc;
-  //TODO: loadfileproc = loadFileProc;
+  loadfileproc = loadFileProc;
   msgprocContext = (void*)procContext;
   kmcmp::currentLine = 0;
   kmcmp::nErrors = 0;
 
-  fp_in = Open_File(pszInfile, "rb");
-
-  if (fp_in == NULL) {
+  int sz;
+  if(!loadFileProc(pszInfile, "", nullptr, &sz, msgprocContext)) {
     AddCompileError(CERR_InfileNotExist);
     return FALSE;
   }
 
-  // Transfer the file to a memory stream for processing UTF-8 or ANSI to UTF-16?
-  // What about really large files?  Transfer to a temp file...
-  if (!fread(str, 1, 3, fp_in)) {
-    fclose(fp_in);
+  if(sz < 3) {
+    // Technically, a 3 byte file can never be a valid .kmn, so we can shortcut
+    // here and avoid testing outside memory bounds for looking at BOM
     AddCompileError(CERR_CannotReadInfile);
     return FALSE;
   }
 
-  fseek(fp_in, 0, SEEK_SET);
-  if (str[0] == UTF8Sig[0] && str[1] == UTF8Sig[1] && str[2] == UTF8Sig[2])
-    fp_in = UTF16TempFromUTF8(fp_in, TRUE);
-  else if (str[0] == UTF16Sig[0] && str[1] == UTF16Sig[1])
-    fseek(fp_in, 2, SEEK_SET);
-  else
-    fp_in = UTF16TempFromUTF8(fp_in, FALSE);
-  if (fp_in == NULL) {
-    AddCompileError(CERR_CannotCreateTempfile);
+  KMX_BYTE* infile = new KMX_BYTE[sz+1];
+  if(!infile) {
+    AddCompileError(CERR_CannotAllocateMemory);
     return FALSE;
+  }
+  if(!loadFileProc(pszInfile, "", infile, &sz, msgprocContext)) {
+    delete[] infile;
+    AddCompileError(CERR_CannotReadInfile);
+    return FALSE;
+  }
+  infile[sz] = 0; // zero-terminate for safety, not technically needed but helps avoid memory bugs
+
+  int offset = 0;
+  if(infile[0] == (KMX_BYTE) UTF16Sig[0] && infile[1] == (KMX_BYTE) UTF16Sig[1]) {
+    // UTF-16 source file
+    offset = 2;
+  } else {
+    // UTF-8 source file
+    KMX_BYTE* infile16;
+    int sz16;
+    if(!UTF16TempFromUTF8(infile, sz, &infile16, &sz16)) {
+      delete[] infile;
+      AddCompileError(CERR_CannotCreateTempfile);
+      return FALSE;
+    }
+    delete[] infile;
+    infile = infile16;
+    sz = sz16;
   }
 
   kmcmp::CodeConstants = new kmcmp::NamedCodeConstants;
-  bool success = CompileKeyboardHandle(fp_in, &fk);
+  bool success = CompileKeyboardHandle(infile+offset, sz-offset, &fk);
   delete kmcmp::CodeConstants;
 
-  fclose(fp_in);
+  delete[] infile;
 
   if (kmcmp::nErrors > 0 || !success) {
     return FALSE;
@@ -204,7 +233,7 @@ EXTERN bool kmcmp_CompileKeyboard(
   return TRUE;
 }
 
-bool CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
+bool CompileKeyboardHandle(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
 {
   PKMX_WCHAR str, p;
 
@@ -239,7 +268,6 @@ bool CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
   fk->dpDeadKeyArray = NULL;
   fk->cxVKDictionary = 0;  // I3438
   fk->dpVKDictionary = NULL;  // I3438
-  fk->extra = new FILE_KEYBOARD_EXTRA;
   fk->extra->kvksFilename = u"";
 /*	fk->szMessage[0] = 0;
   fk->szLanguageName[0] = 0;*/
@@ -263,8 +291,10 @@ bool CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
   AddStore(fk, TSS_CUSTOMKEYMANEDITION, u"0");
   AddStore(fk, TSS_CUSTOMKEYMANEDITIONNAME, u"Keyman");
 
+  int offset = 0;
+
   // must preprocess for group and store names -> this isn't really necessary, but never mind!
-  while ((msg = ReadLine(fp_in, str, TRUE)) == CERR_None)
+  while ((msg = ReadLine(infile, sz, offset, str, TRUE)) == CERR_None)
   {
     p = str;
     switch (LineTokenType(&p))
@@ -301,7 +331,7 @@ bool CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
     return FALSE;
   }
 
-  fseek( fp_in,2,SEEK_SET);
+  offset = 0;
   kmcmp::currentLine = 0;
 
   /* Reindex the list of codeconstants after stores added */
@@ -309,7 +339,7 @@ bool CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
   kmcmp::CodeConstants->reindex();
 
   /* ReadLine will automatically skip over $Keyman lines, and parse wrapped lines */
-  while ((msg = ReadLine(fp_in, str, FALSE)) == CERR_None)
+  while ((msg = ReadLine(infile, sz, offset, str, FALSE)) == CERR_None)
   {
     msg = ParseLine(fk, str);
     if (msg != CERR_None) {
