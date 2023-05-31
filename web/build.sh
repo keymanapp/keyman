@@ -38,6 +38,7 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":engine/osk               Builds the Web OSK module" \
   ":engine/package-cache     Subset used to collate keyboards and request them from the cloud" \
   ":engine/paths             Subset used to configure KMW" \
+  ":samples                  Builds all needed resources for the KMW sample-page set" \
   "--ci+                     Set to utilize CI-based test configurations & reporting."
 
 # ":app/browser              The website-integrating, browser-based version of KMW" \
@@ -101,6 +102,9 @@ builder_run_child_actions build:app/browser
 
 # Uses app/browser above for engine type-defs
 builder_run_child_actions build:app/ui
+
+# Needs both app/browser and app/ui.
+builder_run_child_actions build:samples
 
 builder_run_child_actions test
 
