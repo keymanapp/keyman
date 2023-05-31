@@ -1,5 +1,3 @@
-import { SpacebarText } from "@keymanapp/keyboard-processor";
-
 export interface PathOptionSpec {
   /**
    * If defined, specifies the root path of the default location hosting KMW resources.

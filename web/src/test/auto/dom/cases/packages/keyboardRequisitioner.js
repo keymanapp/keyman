@@ -68,6 +68,7 @@ describe("KeyboardRequisitioner", function () {
     // https://api.keyman.com/cloud/4.0/keyboards?jsonp=keyman.register&languageidtype=bcp47&version=17.0&keyboardid=khmer_angkor&timerid=49.
     //
     // The edits are minimal and notated within the fixture file.
+    // Path becomes /resources/keyboards/khmer_angkor.js.
     mockQuery(keyboardRequisitioner.cloudQueryEngine, `base/web/src/test/auto/resources/query-mock-results/khmer_angkor.hand-edited.js.fixture`);
     const [stub] = await keyboardRequisitioner.addKeyboardArray(['khmer_angkor']);
     assert.strictEqual(cache.getStub(stub.KI, stub.KLC), stub);
@@ -85,9 +86,13 @@ describe("KeyboardRequisitioner", function () {
     const keyboardRequisitioner = new KeyboardRequisitioner(keyboardLoader, new DOMCloudRequester(true), pathConfig);
     const cache = keyboardRequisitioner.cache;
 
-    // Expects the keyboard at resources/keyboards/khmer_angkor.js; this should resolve to
-    // http://localhost:9876/resources/keyboards/khmer_angkor.js.
+    // Expects the keyboard at resources/keyboards/khmer_angkor.js; this would resolve to
+    // http://localhost:9876/resources/keyboards/khmer_angkor.js aased on our configured path.
     const stubJSON = fixture.load("/keyboards/khmer_angkor.json", true);
+
+    // But we can't be sure that `localhost:9876` is the actual path it will have on EVERYONE's machine.  Let's fix it.
+    // We'll make it match the path for the previous test by ensuring a '/' for absolute pathing based on server root.
+    stubJSON.filename = '/' + stubJSON.filename;
 
     // The `pathConfig` setup + internal logic should ensure that the filepath points to the correct location
     // with no additional effort required here.

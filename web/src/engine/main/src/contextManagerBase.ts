@@ -219,8 +219,6 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
    * Otherwise, insert a script to download and insert the keyboard from the repository
    * or user-indicated file location.
    *
-   * TODO:  The old 'recorder' tool stubbed the old _SetActiveKeyboard method, but should now stub this
-   * instead.  Or, perhaps one of the newer internal events.
    * @param keyboardId
    * @param languageCode
    * @param saveCookie

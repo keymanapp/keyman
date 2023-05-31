@@ -203,6 +203,31 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     const previousTarget = this.mostRecentTarget;
     const originalTarget = this.activeTarget; // may differ, depending on focus state.
 
+    if(target == originalTarget) {
+      /**
+       * If it's already active, we should cancel early.
+       *
+       * The #1 reason - we don't want .resetContext calls in this scenario.
+       * In particular, moving the caret or setting the selection range of an
+       * <input> or <textarea> in desktop Safari programmatically WILL trigger
+       * focus events!
+       *
+       * https://bugs.webkit.org/show_bug.cgi?id=224425
+       *
+       * > In WebKit, focus follows selection so if you modify selection, then the
+       *   focus will be moved there.
+       *
+       * Caret manipulation in the browser, as needed by certain keyboard text
+       * operations, IS text selection - of width zero, but still selection.
+       *
+       * At present, even if setting selection on the focused element, Safari will
+       * still trigger a focus event upon it... which can cascade here if uncaught
+       * and trigger a contextReset DURING keyboard rule processing without this
+       * guard.
+       */
+      return;
+    }
+
     // We condition on 'priorElement' below as a check to allow KMW to set a default active keyboard.
     let hadRecentElement = !!previousTarget;
 
@@ -366,17 +391,25 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
   }
 
-  protected getFallbackStubKey() {
+protected getFallbackStubKey() {
+    const emptyCodes = {
+      id: '',
+      langId: ''
+    };
+
     if(this.engineConfig.hostDevice.touchable) {
-      // Fallback behavior - if on a touch device, we need to keep a keyboard visible.
-      return this.keyboardCache.defaultStub;
+      /* Fallback behavior - if on a touch device, we need to keep a keyboard visible
+       * if one is available.
+       *
+       * When literally none are available, setting `emptyCodes` will ensure that `globalKeyboard`
+       * is unset properly and that relevant keyboard events are still generated.  (engine/main
+       * delegates 'fallback behavior' to its derived classes, so the parent class won't undo it.)
+       */
+      return this.keyboardCache.defaultStub || emptyCodes;
     } else {
       // Fallback behavior - if on a desktop device, the user still has a physical keyboard.
       // Just clear out the active keyboard & OSK.
-      return {
-        id: '',
-        langId: ''
-      };
+      return emptyCodes;
     }
   }
 

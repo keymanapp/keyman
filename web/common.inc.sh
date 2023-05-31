@@ -31,3 +31,27 @@ compile ( ) {
     tsc --emitDeclarationOnly --outFile "${KEYMAN_ROOT}/web/build/$COMPILE_TARGET/lib/index.d.ts" -p "${KEYMAN_ROOT}/web/src/$COMPILE_TARGET"
   fi
 }
+
+# Runs all headless tests corresponding to the specified target.
+# This should be called from the working directory of a child project's
+# build script.
+#
+# ### Parameters
+#
+# * 1: `product`    the folder under src/test/auto/headless containing the
+#                   child project's tests
+#
+# ### Example
+#
+# ```bash
+#   # from engine/osk
+#   test-headless osk
+# ```
+test-headless ( ) {
+  TEST_OPTS=
+  if builder_has_option --ci; then
+    TEST_OPTS="--reporter mocha-teamcity-reporter"
+  fi
+
+  mocha --recursive "${KEYMAN_ROOT}/web/src/test/auto/headless/$1" $TEST_OPTS
+}

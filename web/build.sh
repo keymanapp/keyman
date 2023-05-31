@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 #
 # Compile keymanweb and copy compiled javascript and resources to output/embedded folder
-#
-
-set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -40,7 +37,8 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":engine/main              Builds all common code used by KMW's app/-level targets" \
   ":engine/osk               Builds the Web OSK module" \
   ":engine/package-cache     Subset used to collate keyboards and request them from the cloud" \
-  ":engine/paths             Subset used to configure KMW"
+  ":engine/paths             Subset used to configure KMW" \
+  "--ci+                     Set to utilize CI-based test configurations & reporting."
 
 # ":app/browser              The website-integrating, browser-based version of KMW" \
 
@@ -66,11 +64,9 @@ builder_run_child_actions clean
 
 ## Clean actions
 
-# If a full-on general clean was requested, we can nuke the entire build folder.
-if builder_start_action clean; then
-  rm -rf ./build
-  builder_finish_action success clean
-fi
+###--- Future tie-in:  if #8831 gets accepted, uncomment the next two lines. ---###
+# # If a full-on general clean was requested, we can nuke the entire build folder.
+# builder_run_action clean:project rm -rf ./build
 
 builder_run_child_actions configure
 
@@ -112,12 +108,13 @@ if builder_has_action build:app/browser; then
   builder_warn "Modularization work is not yet complete; consumers may find needed API or components to be missing"
 fi
 
+###--- If #8831 gets accepted, change to `test:project` rather than just `test`. ---###
 if builder_start_action test; then
-  ./test.sh :engine
+  TEST_OPTS=
+  if builder_has_option --ci; then
+    TEST_OPTS=--ci
+  fi
+  ./test.sh $TEST_OPTS
 
   builder_finish_action success test
-fi
-
-if builder_has_action build:app/ui; then
-  builder_die "Modularization work is not yet complete; builds dependent on this will fail."
 fi
