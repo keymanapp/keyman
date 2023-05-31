@@ -98,9 +98,6 @@ if(EMIT_FILESIZE_PROFILE) {
 
 await esbuild.build({
   ...commonConfig,
-  alias: {
-    'tslib': '@keymanapp/tslib'
-  },
   format: "esm",
   entryPoints: {
     'index': '../../../build/app/browser/obj/test-index.js',
