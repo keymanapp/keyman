@@ -28,10 +28,7 @@ function downloadSource() {
 
     if [ "${proj:=}" == "keyman" ]; then
        cd "${BASEDIR}" || exit
-    fi
-
-    if [ "${proj}" == "keyman" ]; then
-        make clean
+        ./build.sh clean
     fi
 
     # Update tier in Debian watch files (replacing any previously set tier) and remove comment
