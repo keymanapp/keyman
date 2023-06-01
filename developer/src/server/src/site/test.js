@@ -221,7 +221,7 @@ window.onload = function() {
 
     // Create a new on screen keyboard view and tell KeymanWeb that
     // we are using the targetDevice for context input.
-    newOSK = new com.keyman.osk.InlinedOSKView(targetDevice, keyman.util.device.coreSpec);
+    newOSK = new keyman.views.InlinedOSKView(keyman, { device: targetDevice });
     keyman.core.contextDevice = targetDevice;
     keyman.osk = newOSK;
 
