@@ -129,7 +129,7 @@ if (( build_keymanweb )); then
 fi
 
 if (( copy_keymanweb )); then
-  WEB_SRC="$KEYMAN_ROOT/web/publish/debug"
+  WEB_SRC="$KEYMAN_ROOT/web/build/publish/debug"
   DST="$(dirname "$THIS_SCRIPT")/src/site/resource"
 
   rm -rf "$DST"
