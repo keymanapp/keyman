@@ -24,7 +24,6 @@
 #include "pch.h"
 #include <limits.h>
 #include "NamedCodeConstants.h"
-#include "CheckFilenameConsistency.h"
 #include <kmcmplib.h>
 #include "kmcompx.h"
 
@@ -116,10 +115,6 @@ char *kmc_strupr(char *s) {
 
 KMX_BOOL NamedCodeConstants::LoadFile(PFILE_KEYBOARD fk, const KMX_WCHAR *filename) {
   const int str_size = 256;
-
-  if (CheckFilenameConsistency(filename, FALSE) != 0) {
-    return FALSE;
-  }
 
   auto szNameUtf8 = string_from_u16string(filename);
 

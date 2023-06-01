@@ -97,7 +97,6 @@
 #include <codecvt>
 #include <locale>
 
-#include "CheckFilenameConsistency.h"
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
 #include "kmx_u16.h"
@@ -1045,10 +1044,6 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
       delete[] sp->dpString;
       sp->dpString = q;
-
-      if ((msg = CheckFilenameConsistency( (sp->dpString), FALSE)) != CERR_None) {
-        return msg;
-      }
     }
     break;
   case TSS_KMW_RTL:
@@ -1059,16 +1054,10 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   case TSS_KMW_HELPFILE:
   case TSS_KMW_EMBEDJS:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
-    if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
-       return msg;
-     }
     break;
 
   case TSS_KMW_EMBEDCSS:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyEmbedCSS);
-    if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
-       return msg;
-     }
     break;
 
   case TSS_TARGETS:   // I4504
@@ -1118,9 +1107,6 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
   case TSS_LAYOUTFILE:  // I3483
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyLayoutFile);   // I4140
-    if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
-          return msg;
-    }
     // Used by KMW compiler
     break;
 

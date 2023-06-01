@@ -1,7 +1,6 @@
 #include "pch.h"
 #include <kmn_compiler_errors.h>
 #include "kmcmplib.h"
-#include "CheckFilenameConsistency.h"
 #include "CheckNCapsConsistency.h"
 #include "DeprecationChecks.h"
 #include "versioning.h"
@@ -139,11 +138,6 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   }
 
   if ((msg = BuildVKDictionary(fk)) != CERR_None) {
-    AddCompileError(msg);
-    return FALSE;
-  }
-
-  if ((msg = CheckFilenameConsistencyForCalls(fk)) != CERR_None) {
     AddCompileError(msg);
     return FALSE;
   }
