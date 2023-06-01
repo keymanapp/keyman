@@ -30,7 +30,6 @@ typedef enum {EndAction,
 @property (strong, nonatomic, readonly) NSString *typeName;
 @property (strong, nonatomic, readonly) NSString *content;
 @property (readonly) int backspaceCount;
-@property (readonly) BOOL impactsClient;
 -(instancetype)initWithType: (ActionType)type actionContent:(NSString*)content backspaceCount:(int)backspaceCount NS_DESIGNATED_INITIALIZER;
 //must implement the designated initializer of the superclass
 -(instancetype)init;

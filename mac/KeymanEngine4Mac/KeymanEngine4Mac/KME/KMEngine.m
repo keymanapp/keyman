@@ -162,9 +162,8 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
       // update context from core
       [self.tmpCtxBuf setString:self.keymanCore.context];
       return coreActions;
-      // TODO: delete this commented out code and use CoreAction array
-      // convert the CoreAction objects into Dictionary objects expected by the Input Method
-      // return [self.coreHelper actionObjectArrayToLegacyActionMapArray:coreActions];
+      // TODO: integrate the different contexts
+      // -- probably ignore/trash tmpCtxBuf because we update local context using actions
     }
   } else {
     NSArray *actions = nil;
@@ -203,8 +202,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     } else {
       // update context from core
      [self.tmpCtxBuf setString:self.keymanCore.context];
-      // convert the CoreAction objects into Dictionary objects expected by the Input Method
-      return [self.coreHelper actionObjectArrayToLegacyActionMapArray:coreActions];
+      return coreActions;
     }
   } else {
     NSArray *actions = nil;

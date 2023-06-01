@@ -89,18 +89,15 @@
  */
 -(instancetype)init {
   return [self initWithType:AlertAction actionContent:@"" backspaceCount:0];
-  _impactsClient = NO;
 }
 
 -(instancetype)initCharacterAction:(NSString*)content {
   self = [self initWithType: CharacterAction actionContent:content backspaceCount:0];
-  _impactsClient = YES;
   return self;
 }
 
 -(instancetype)initCharacterBackspaceAction:(NSString*)content {
   self = [self initWithType: CharacterBackspaceAction actionContent:content backspaceCount:1];
-  _impactsClient = YES;
   return self;
 }
 

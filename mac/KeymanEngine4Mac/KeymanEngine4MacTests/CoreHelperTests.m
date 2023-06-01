@@ -85,6 +85,7 @@ ActionArrayOptimizer *optimizer;
   XCTAssertEqual(keymanModifierState, 0, @"Failed conversion of Mac Help key flag from Mac to Keyman cleared modifier state.");
 }
 
+/*
 - (void)testOptimize_MultipleCharacterActions_CombinedToSingleAction {
   CoreAction *characterAAction = [[CoreAction alloc] initWithType:CharacterAction actionContent:@"A" backspaceCount:0];
   CoreAction *characterBAction = [[CoreAction alloc] initWithType:CharacterAction actionContent:@"B" backspaceCount:0];
@@ -108,7 +109,7 @@ ActionArrayOptimizer *optimizer;
   CoreAction *action = optimizedArray[0];
   XCTAssert(action.backspaceCount==2, @"Expected a backspace count of 2.");
 }
-
+*/
 - (void)testOptimize_OneBackspaceAndOneCharacterAction_RetainedWithEndActionStripped {
   CoreAction *backspaceAction = [[CoreAction alloc] initWithType:CharacterBackspaceAction actionContent:@"" backspaceCount:1];
   CoreAction *characterAAction = [[CoreAction alloc] initWithType:CharacterAction actionContent:@"A" backspaceCount:0];

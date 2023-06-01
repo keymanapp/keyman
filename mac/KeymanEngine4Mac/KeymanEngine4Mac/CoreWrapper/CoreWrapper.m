@@ -207,7 +207,7 @@
         NSString *characterString = [self.coreHelper utf32ValueToString:actionStruct->character];
         action = [[CoreAction alloc] initWithType: CharacterAction actionContent:characterString backspaceCount:0];
         NSLog(@"createCoreActionForActionStruct actionStruct->character decimal: %u, hex: %X", actionStruct->character, actionStruct->character);
-        NSLog(@"createCoreActionForActionStruct converted unicode string: '%@'", characterString);
+        NSLog(@"createCoreActionForActionStruct converted unicode string: '%@' length=%lu", characterString, characterString.length);
         break;
       }
       case KM_KBP_IT_MARKER: {
