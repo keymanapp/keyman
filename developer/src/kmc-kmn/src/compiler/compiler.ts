@@ -108,12 +108,24 @@ export class KmnCompiler {
     return 1;
   }
 
+  private cachedFile: {filename: string; data: Uint8Array} = {
+    filename: null,
+    data: null
+  };
+
   private loadFileCallback = (filename: string, baseFilename: string, buffer: number, bufferSize: number): number => {
-    // TODO: we can optimize this in future by avoiding loading the file twice #8885
     let resolvedFilename = this.callbacks.resolveFilename(baseFilename, filename);
-    let data = this.callbacks.loadFile(resolvedFilename);
-    if(!data) {
-      return 0;
+    let data: Uint8Array;
+    if(this.cachedFile.filename == resolvedFilename) {
+      data = this.cachedFile.data;
+    }
+    else {
+      data = this.callbacks.loadFile(resolvedFilename);
+      if(!data) {
+        return -1;
+      }
+      this.cachedFile.filename = resolvedFilename;
+      this.cachedFile.data = data;
     }
 
     if(buffer == 0) {
@@ -123,7 +135,7 @@ export class KmnCompiler {
 
     if(bufferSize != data.byteLength) {
       /* c8 ignore next 2 */
-      throw new Error(`Second call, expected file size ${bufferSize} == ${data.byteLength}`);
+      throw new Error(`loadFileCallback: second call, expected file size ${bufferSize} == ${data.byteLength}`);
     }
 
     this.Module.HEAP8.set(data, buffer);
