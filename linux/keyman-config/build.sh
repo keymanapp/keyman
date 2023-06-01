@@ -34,14 +34,14 @@ build_man_pages() {
   TEMP_DATA_DIR=$(mktemp -d)
   SCHEMA_DIR=$TEMP_DATA_DIR/glib-2.0/schemas
   export XDG_DATA_DIRS=$TEMP_DATA_DIR:${XDG_DATA_DIRS-}
-  export GSETTINGS_SCHEMA_DIR=${SCHEMA_DIR}
+  export GSETTINGS_SCHEMA_DIR="${SCHEMA_DIR}"
   mkdir -p "$SCHEMA_DIR"
   cp ./com.keyman.gschema.xml "$SCHEMA_DIR"/
   glib-compile-schemas "$SCHEMA_DIR"
   ./build-help.sh --man --no-reconf
   export XDG_DATA_DIRS=${XDG_DATA_DIRS#*:}
   unset GSETTINGS_SCHEMA_DIR
-  rm -rf $TEMP_DATA_DIR
+  rm -rf "$TEMP_DATA_DIR"
 }
 
 build_action() {
