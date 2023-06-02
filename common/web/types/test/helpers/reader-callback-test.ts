@@ -84,7 +84,6 @@ export function testReaderCases(cases : CompilationCase[]) {
     it(testHeading, function () {
       callbacks.clear();
 
-      debugger;
       const data = loadFile(makePathToFixture(testcase.subpath));
       assert.ok(data, `reading ${testcase.subpath}`);
       const source = reader.load(data);

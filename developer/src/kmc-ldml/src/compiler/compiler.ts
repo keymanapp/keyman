@@ -30,7 +30,7 @@ const SECTION_COMPILERS = [
 
 export class LdmlKeyboardCompiler {
   private readonly callbacks: CompilerCallbacks;
-  private readonly options: CompilerOptions; // not currently used
+  private readonly options: CompilerOptions;
 
   constructor (callbacks: CompilerCallbacks, options: CompilerOptions) {
     this.options = {
