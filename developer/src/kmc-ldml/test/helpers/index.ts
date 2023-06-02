@@ -5,7 +5,7 @@ import 'mocha';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { SectionCompiler } from '../../src/compiler/section-compiler.js';
-import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile, compilerEventFormat } from '@keymanapp/common-types';
+import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile, compilerEventFormat, LDMLKeyboard } from '@keymanapp/common-types';
 import { LdmlKeyboardCompiler } from '../../src/compiler/compiler.js';
 import { assert } from 'chai';
 import { KMXPlusMetadataCompiler } from '../../src/compiler/metadata-compiler.js';
@@ -14,11 +14,10 @@ import { LdmlKeyboardVisualKeyboardCompiler } from '../../src/compiler/visual-ke
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 import KMXPlusFile = KMXPlus.KMXPlusFile;
-import Elem = KMXPlus.Elem;
+import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 import DependencySections = KMXPlus.DependencySections;
 import Section = KMXPlus.Section;
-import Strs = KMXPlus.Strs;
-import List = KMXPlus.List;
+import { ElemCompiler, ListCompiler, StrsCompiler } from '../../src/compiler/empty-compiler.js';
 // import Vars = KMXPlus.Vars;
 
 /**
@@ -45,7 +44,7 @@ afterEach(function() {
 });
 
 
-export async function loadSectionFixture(compilerClass: typeof SectionCompiler, filename: string, callbacks: TestCompilerCallbacks): Promise<Section> {
+export async function loadSectionFixture(compilerClass: typeof SectionCompiler, filename: string, callbacks: TestCompilerCallbacks, dependencies?: typeof SectionCompiler[]): Promise<Section> {
   callbacks.messages = [];
   const inputFilename = makePathToFixture(filename);
   const data = callbacks.loadFile(inputFilename);
@@ -67,14 +66,40 @@ export async function loadSectionFixture(compilerClass: typeof SectionCompiler, 
     return null;
   }
 
-  let DependencySections: DependencySections = {
-    strs: new Strs(),
-    elem: null,
-    list: null,
-  };
-  DependencySections.elem = new Elem(DependencySections.strs);
-  DependencySections.list = new List(DependencySections.strs);
-  return compiler.compile(DependencySections);
+  let sections: DependencySections = {};
+
+  // load dependencies first
+  await loadDepsFor(sections, compiler, source, callbacks, dependencies);
+
+  // make sure all dependencies are loaded
+  compiler.dependencies.forEach(dep => assert.ok(sections[dep],
+      `Required dependency '${dep}' for '${compiler.id}' was not supplied: Check the 'dependencies' argument to loadSectionFixture or testCimpilationCases`));
+
+  return compiler.compile(sections);
+}
+
+/**
+ * Recursively load dependencies. Normally they are loaded in SECTION_COMPILERS order
+ */
+async function loadDepsFor(sections: DependencySections, parentCompiler: SectionCompiler, source: LDMLKeyboardXMLSourceFile, callbacks: TestCompilerCallbacks, dependencies?: typeof SectionCompiler[]) {
+  const parentId = parentCompiler.id;
+  if (!dependencies) {
+    // default dependencies
+    dependencies = [ StrsCompiler, ListCompiler, ElemCompiler ];
+  }
+  for (const dep of dependencies) {
+    const compiler = new dep(source, callbacks);
+    assert.notEqual(compiler.id, parentId, `${parentId} depends on itself`);
+    assert.ok(await compiler.init(), `while setting up ${parentId}: ${compiler.id} failed init()`);
+    assert.ok(compiler.validate(), `while setting up ${parentId}: ${compiler.id} failed validate()`);
+
+    const sect = compiler.compile(sections);
+
+    assert.ok(sect, `while setting up ${parentId}: ${compiler.id} failed compile()`);
+    assert.notOk(sections[compiler.id], `while setting up ${parentId}: ${compiler.id} was already in the sections[] table, probably a bad dependency`);
+
+    sections[compiler.id] = sect as any;
+  }
 }
 
 export function loadTestdata(inputFilename: string, options: CompilerOptions) : LDMLKeyboardTestDataXMLSourceFile {
@@ -149,6 +174,10 @@ export interface CompilationCase {
    * if present, expect compiler to throw (use .* to match all)
    */
   throws?: RegExp;
+  /**
+   * Optional dependent sections to load.  Will be strs+list+elem if falsy.
+   */
+  dependencies?: (typeof SectionCompiler)[];
 }
 
 /**
@@ -157,7 +186,7 @@ export interface CompilationCase {
  * @param compiler argument to loadSectionFixture()
  * @param callbacks argument to loadSectionFixture()
  */
-export function testCompilationCases(compiler: typeof SectionCompiler, cases : CompilationCase[]) {
+export function testCompilationCases(compiler: typeof SectionCompiler, cases : CompilationCase[], dependencies?: (typeof SectionCompiler)[]) {
   // we need our own callbacks rather than using the global so messages don't get mixed
   const callbacks = new TestCompilerCallbacks();
   for (let testcase of cases) {
@@ -168,10 +197,10 @@ export function testCompilationCases(compiler: typeof SectionCompiler, cases : C
       callbacks.clear();
       // special case for an expected exception
       if (testcase.throws) {
-        assert.throws(async () => await loadSectionFixture(compiler, testcase.subpath, callbacks), testcase.throws, 'expected exception from compilation');
+        assert.throws(async () => await loadSectionFixture(compiler, testcase.subpath, callbacks, testcase.dependencies || dependencies), testcase.throws, 'expected exception from compilation');
         return;
       }
-      let section = await loadSectionFixture(compiler, testcase.subpath, callbacks);
+      let section = await loadSectionFixture(compiler, testcase.subpath, callbacks, testcase.dependencies || dependencies);
       if (expectFailure) {
         assert.isNull(section, 'expected compilation result failure (null)');
       } else {

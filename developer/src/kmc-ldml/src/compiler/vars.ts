@@ -1,4 +1,4 @@
-import { constants } from "@keymanapp/ldml-keyboard-constants";
+import { SectionIdent, constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus, LDMLKeyboard, CompilerCallbacks } from '@keymanapp/common-types';
 import { UnicodeSetParser } from '@keymanapp/common-types';
 import { KmnCompiler } from  '@keymanapp/kmc-kmn';
@@ -14,6 +14,16 @@ import { VariableParser } from "../util/pattern-parser.js";
 export class VarsCompiler extends SectionCompiler {
   public get id() {
     return constants.section.vars;
+  }
+
+  public get dependencies(): Set<SectionIdent> {
+    const defaults = new Set(<SectionIdent[]>[
+      constants.section.strs,
+      constants.section.list,
+      constants.section.elem
+    ]);
+    defaults.delete(this.id);
+    return defaults;
   }
 
   usetparser : UnicodeSetParser = null;

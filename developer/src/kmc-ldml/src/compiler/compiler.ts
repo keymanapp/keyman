@@ -15,6 +15,8 @@ import { StrsCompiler, ElemCompiler, ListCompiler } from './empty-compiler.js';
 
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 import KMXPlusFile = KMXPlus.KMXPlusFile;
+import DependencySections = KMXPlus.DependencySections;
+import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 
 export const SECTION_COMPILERS = [
   // These are in dependency order.
@@ -153,7 +155,21 @@ export class LdmlKeyboardCompiler {
         // errors for the keyboard developer.
         continue;
       }
-      const sect = section.compile({strs: kmx.kmxplus.strs, elem: kmx.kmxplus.elem, list: kmx.kmxplus.list, vars: kmx.kmxplus.vars});
+      // clone
+      const globalSections : DependencySections = Object.assign({}, kmx.kmxplus);
+      const dependencies = section.dependencies;
+      Object.keys(constants.section).forEach((sectstr : string) => {
+        const sectid : SectionIdent = constants.section[<SectionIdent>sectstr];
+        if (dependencies.has(sectid)) {
+          if (!kmx.kmxplus[sectid]) {
+            throw new Error(`Internal error: section ${section.id} depends on uninitialized dependency ${sectid}`);
+          }
+        } else {
+          // delete dependencies that aren't referenced
+          delete globalSections[sectid];
+        }
+      });
+      const sect = section.compile(globalSections);
 
       /* istanbul ignore if */
       if(!sect) {

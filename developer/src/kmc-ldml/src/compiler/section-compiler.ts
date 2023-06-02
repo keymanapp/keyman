@@ -1,5 +1,5 @@
 import { LDMLKeyboard, KMXPlus, CompilerCallbacks } from "@keymanapp/common-types";
-import { SectionIdent } from '@keymanapp/ldml-keyboard-constants';
+import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 
 /* istanbul ignore next */
 export class SectionCompiler {
@@ -41,8 +41,11 @@ export class SectionCompiler {
    * @returns set of dependent sections
    */
   public get dependencies(): Set<SectionIdent> {
-    const defaults = new Set(<SectionIdent[]>['elem','list','strs']);
-    defaults.delete(this.id);
+    const defaults = new Set(<SectionIdent[]>[
+      constants.section.strs,
+      constants.section.list,
+      constants.section.elem
+    ]);
     return defaults;
   }
 }

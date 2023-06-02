@@ -1,4 +1,4 @@
-import { SectionIdent } from '@keymanapp/ldml-keyboard-constants';
+import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 import { SectionCompiler } from "./section-compiler.js";
 import { LDMLKeyboard, KMXPlus, CompilerCallbacks } from "@keymanapp/common-types";
 
@@ -23,7 +23,7 @@ export abstract class EmptyCompiler extends SectionCompiler {
 
 export class StrsCompiler extends EmptyCompiler {
   constructor(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
-    super('strs', source, callbacks);
+    super(constants.section.strs, source, callbacks);
   }
   public compile(sections: KMXPlus.DependencySections): KMXPlus.Section {
     return new KMXPlus.Strs();
@@ -32,26 +32,26 @@ export class StrsCompiler extends EmptyCompiler {
 
 export class ElemCompiler extends EmptyCompiler {
   constructor(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
-    super('elem', source, callbacks);
+    super(constants.section.elem, source, callbacks);
   }
   public compile(sections: KMXPlus.DependencySections): KMXPlus.Section {
     return new KMXPlus.Elem(sections.strs);
   }
   public get dependencies(): Set<SectionIdent> {
-    const strsOnly = new Set(<SectionIdent[]>['strs']);
+    const strsOnly = new Set(<SectionIdent[]>[constants.section.strs]);
     return strsOnly;
   }
 }
 
 export class ListCompiler extends EmptyCompiler {
   constructor(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
-    super('list', source, callbacks);
+    super(constants.section.list, source, callbacks);
   }
   public compile(sections: KMXPlus.DependencySections): KMXPlus.Section {
     return new KMXPlus.List(sections.strs);
   }
   public get dependencies(): Set<SectionIdent> {
-    const strsOnly = new Set(<SectionIdent[]>['strs']);
+    const strsOnly = new Set(<SectionIdent[]>[constants.section.strs]);
     return strsOnly;
   }
 }
