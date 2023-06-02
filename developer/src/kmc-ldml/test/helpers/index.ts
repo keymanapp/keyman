@@ -73,7 +73,7 @@ export async function loadSectionFixture(compilerClass: typeof SectionCompiler, 
 
   // make sure all dependencies are loaded
   compiler.dependencies.forEach(dep => assert.ok(sections[dep],
-      `Required dependency '${dep}' for '${compiler.id}' was not supplied: Check the 'dependencies' argument to loadSectionFixture or testCimpilationCases`));
+      `Required dependency '${dep}' for '${compiler.id}' was not supplied: Check the 'dependencies' argument to loadSectionFixture or testCompilationCases`));
 
   return compiler.compile(sections);
 }

@@ -55,3 +55,8 @@ export class ListCompiler extends EmptyCompiler {
     return strsOnly;
   }
 }
+
+/**
+ * For test use. The top three compilers.
+ */
+export const BASIC_DEPENDENCIES = [ StrsCompiler, ListCompiler, ElemCompiler ];

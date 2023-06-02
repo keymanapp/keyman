@@ -1,5 +1,5 @@
-import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlus, LDMLKeyboard, CompilerCallbacks } from '@keymanapp/common-types';
+import { constants, SectionIdent } from "@keymanapp/ldml-keyboard-constants";
+import { KMXPlus, LDMLKeyboard, CompilerCallbacks, VariableParser } from '@keymanapp/common-types';
 import { SectionCompiler } from "./section-compiler.js";
 
 import Bksp = KMXPlus.Bksp;
@@ -109,14 +109,26 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
     let cookedFrom = transform.from;
     let cookedTo = transform.to;
 
-    // TODO-LDML: cook it
+    cookedFrom = sections.vars.substituteStrings(cookedFrom, sections);
+    // TODO: handle 'map' case
+    const mapFrom = VariableParser.CAPTURE_SET_REFERENCE.exec(cookedFrom);
+    const mapTo = VariableParser.MAPPED_SET_REFERENCE.exec(cookedTo || '');
+    if (mapFrom && mapTo) { // TODO-LDML: error cases
+      result.mapFrom = sections.strs.allocString(mapFrom[1]); // var name
+      result.mapTo = sections.strs.allocString(mapTo[1]); // var name
+    } else {
+      result.mapFrom = null; // TODO-LDML
+      result.mapTo = null; // TODO-LDML
+    }
 
-    result.from = sections.elem.allocElementString(sections.strs, cookedFrom);
-    result.to = sections.strs.allocAndUnescapeString(cookedTo);
+    cookedFrom = sections.vars.substituteSetRegex(cookedFrom, sections);
 
-    result.mapFrom = null; // TODO-LDML
-    result.mapTo = null; // TODO-LDML
+    if (cookedTo) {
+      cookedTo = sections.vars.substituteStrings(cookedTo, sections);
+    }
 
+    result.from = sections.strs.allocAndUnescapeString(cookedFrom); // TODO-LDML: not unescaped here, done previously
+    result.to = sections.strs.allocAndUnescapeString(cookedTo); // TODO-LDML: not unescaped here, done previously
     return result;
   }
 
@@ -144,6 +156,16 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
       }
     }
     return this.newTran(); // empty: nothing of this type found.
+  }
+  public get dependencies(): Set<SectionIdent> {
+    const defaults = new Set(<SectionIdent[]>[
+      constants.section.strs,
+      constants.section.list,
+      constants.section.elem,
+      constants.section.vars,
+    ]);
+    defaults.delete(this.id);
+    return defaults;
   }
 }
 

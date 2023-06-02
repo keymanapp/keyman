@@ -193,7 +193,7 @@ export class Vars extends Section {
       const val = this.findStringVariableValue(id);
       if (val === null) {
         // Should have been caught during validation.
-        throw Error(`Internal Error: reference to missing variable ${id}`);
+        throw Error(`Internal Error: reference to missing string variable ${id}`);
       }
       return val;
     });
@@ -201,7 +201,36 @@ export class Vars extends Section {
   findStringVariableValue(id: string): string {
     return Vars.findVariable(this.strings, id)?.value?.value; // Unwrap: Variable, StrsItem
   }
+  substituteSetRegex(str: string, sections: DependencySections): string {
+    return str.replaceAll(VariableParser.SET_REFERENCE, (_entire, id) => {
+      // try as set
+      const set = Vars.findVariable(this.sets, id);
+      if (set !== null) {
+        const { items } = set;
+        const inner = items.map(i => i.value.value).join('|');
+        return `(?:${inner})`; // TODO-LDML: need to escape here
+      }
 
+      // try as unicodeset
+      const uset = Vars.findVariable(this.unicodeSets, id);
+      if (uset !== null) {
+        const { unicodeSet } = uset;
+        const inner = unicodeSet.ranges.map(([start, end]) => {
+          const s = String.fromCodePoint(start);
+          if (start === end) {
+            return s;
+          } else {
+            const e = String.fromCodePoint(end);
+            return `${s}-${e}`;
+          }
+        }).join('');
+        return `[${inner}]`;
+      }
+
+      // else, missing
+      throw Error(`Internal Error: reference to missing set variable ${id}`);
+    });
+  }
   /**
    * Variable locator facility
    * @param array
@@ -275,7 +304,7 @@ export class StringVarItem extends VarsItem {
 // 'tran'
 
 export class TranTransform {
-  from: ElementString;
+  from: StrsItem;
   to: StrsItem;
   mapFrom: StrsItem; // var name
   mapTo: StrsItem; // var name

@@ -18,7 +18,6 @@ export class VarsCompiler extends SectionCompiler {
   public get dependencies(): Set<SectionIdent> {
     const defaults = new Set(<SectionIdent[]>[
       constants.section.strs,
-      constants.section.list,
       constants.section.elem
     ]);
     defaults.delete(this.id);
@@ -49,6 +48,8 @@ export class VarsCompiler extends SectionCompiler {
     const dups = new Set();
     const variables = this.keyboard?.variables;
 
+    if (!variables) return valid;
+
     const allStrings = new Set();
     const allSets = new Set();
     const allUnicodeSets = new Set();
@@ -66,7 +67,7 @@ export class VarsCompiler extends SectionCompiler {
     }
 
     // Strings
-    for (const {id, value} of variables.string) {
+    for (const {id, value} of variables?.string) {
       addId(id);
       allStrings.add(id);
       const stringrefs = VariableParser.allStringReferences(value);
@@ -148,6 +149,8 @@ export class VarsCompiler extends SectionCompiler {
     const result =  new Vars();
 
     const variables = this.keyboard?.variables;
+
+    if (!variables) return result; // Empty vars, to simplify other sections
 
     // we already know the variables do not conflict with each other
     // need to add these one by one, because they depend on each other.
