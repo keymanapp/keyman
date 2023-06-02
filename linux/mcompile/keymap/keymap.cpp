@@ -110,6 +110,7 @@ void Split_US_To_3D_Vector(v_str_3D &all_US,v_str_1D completeList) {
       tokens[0] = std::to_string(Keycode_);
 
       // seperate rest of the vector to its elements and push to 'states'
+      // TODO define how many/which elements=colums=shift states we use
       std::istringstream split(tokens[1]);
       tokens.pop_back();
       for (std::string each; std::getline(split, each, split_char_komma); tokens.push_back(each));
@@ -222,7 +223,7 @@ v_str_2D create_empty_2D( int dim_rows,int dim_shifts)
   return all;
 }
 
-int GetKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int keyval_value) {
+int GetKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
@@ -231,7 +232,10 @@ int GetKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int keyval_value) {
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
-  out = keyvals[keyval_value];
+  if (!(shift_state_pos < count))
+    return 0;
+
+  out = keyvals[shift_state_pos];
 
   g_free(keyvals);
   g_free(maps);

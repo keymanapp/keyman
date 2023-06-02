@@ -14,7 +14,7 @@ typedef std::vector<std::string>                             v_str_1D;
 typedef std::vector<std::vector<std::string> >               v_str_2D;
 typedef std::vector<std::vector<std::vector<std::string> > > v_str_3D;
    
-std::vector <int>  used_shift_state ={0,1};   // use  shiftstate :  no shift, shift 
+int shift_state_count = 2;  // use  shiftstate :  no shift, shift
 
 // read configuration file, split and write to 3D-Vector (Data for US on [0][ ][ ]  )
 void write_US_ToVector( v_str_3D &vec,std::string language, const char* text) ;
@@ -37,7 +37,7 @@ void append_other_ToVector(v_str_3D &All_Vector,GdkKeymap * keymap);
 v_str_2D create_empty_2D( int dim_rows,int dim_shifts);
 
 // find Keyvals to fill into 2D-Vector of Other Language
-int GetKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int keyval_value);
+int GetKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 
 
 // print both sets of characters (US and OtherLanguage) to console and file for comparison 
@@ -64,7 +64,3 @@ void test_in_out(v_str_3D &All_Vector);
 
 // testing of Vector contents ( first row of US and Other)
 bool test(v_str_3D &V);
-
-
-
-//----------------------------------
