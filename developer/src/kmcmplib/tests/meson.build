@@ -84,11 +84,12 @@ valid_keyboard_tests = [
   'k001_utf16',
   'k002_utf8_without_bom',
   'k003_utf8_with_bom',
-  # 'k004_ansi', # TODO: enable ansi test when we have the icu datafiles #8884 
+  # 'k004_ansi', # TODO: enable ansi test when we have the icu datafiles #8884
   'k005_bitmap',
   'k006_icon',
   'k007_includecodes_r_n',
-  'k008_includecodes_n'
+  'k008_includecodes_n',
+  'k009_long_lines',
 ]
 
 fixtures_path = meson.current_source_dir() / 'fixtures/valid-keyboards'
