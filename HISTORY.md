@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 17.0.116 alpha 2023-06-02
+
+* feat(linux): Add column for installation location (#8897)
+* chore(developer): verify kvks files and report errors (#8892)
+* refactor(developer): rearrange kmcmplib interface source (#8899)
+* refactor(developer): move filename consistency check to kmc (#8907)
+* chore(developer): loadFile callback error check and optimization (#8908)
+* chore(common): remove url module ref from common/web/types (#8914)
+
 ## 17.0.115 alpha 2023-06-01
 
 * refactor(developer): complete fs move out of kmcmplib (#8882)
