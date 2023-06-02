@@ -29,6 +29,21 @@ clean_action() {
     keyman_config/standards/lang_tags_map.py
 }
 
+build_man_pages() {
+  local TEMP_DATA_DIR SCHEMA_DIR
+  TEMP_DATA_DIR=$(mktemp -d)
+  SCHEMA_DIR=$TEMP_DATA_DIR/glib-2.0/schemas
+  export XDG_DATA_DIRS=$TEMP_DATA_DIR:${XDG_DATA_DIRS-}
+  export GSETTINGS_SCHEMA_DIR="${SCHEMA_DIR}"
+  mkdir -p "$SCHEMA_DIR"
+  cp ./com.keyman.gschema.xml "$SCHEMA_DIR"/
+  glib-compile-schemas "$SCHEMA_DIR"
+  ./build-help.sh --man --no-reconf
+  export XDG_DATA_DIRS=${XDG_DATA_DIRS#*:}
+  unset GSETTINGS_SCHEMA_DIR
+  rm -rf "$TEMP_DATA_DIR"
+}
+
 build_action() {
   builder_echo "Create version.py"
   pushd keyman_config
@@ -52,7 +67,7 @@ build_action() {
   fi
   popd
   builder_echo "Building man pages"
-  ./build-help.sh --man --no-reconf
+  build_man_pages
   builder_echo "Building keyman-config"
   python3 setup.py build
 }
