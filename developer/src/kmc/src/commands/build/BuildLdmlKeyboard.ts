@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as kmcLdml from '@keymanapp/kmc-ldml';
-import { KvkFileWriter, CompilerCallbacks, LDMLKeyboardXMLDefaultImportsURL } from '@keymanapp/common-types';
+import { KvkFileWriter, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader } from '@keymanapp/common-types';
 import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
 import { fileURLToPath } from 'url';
 
@@ -48,7 +48,7 @@ function buildLdmlKeyboardToMemory(inputFilename: string, callbacks: CompilerCal
     debug: options.debug ?? false,
     addCompilerVersion: options.compilerVersion ?? true,
     readerOptions: {
-      importsPath: fileURLToPath(LDMLKeyboardXMLDefaultImportsURL)
+      importsPath: fileURLToPath(LDMLKeyboardXMLSourceFileReader.defaultImportsURL)
     }
     // TODO: warnDeprecatedCode: options.warnDeprecatedCode,
     // TODO: treatWarningsAsErrors: options.treatWarningsAsErrors,

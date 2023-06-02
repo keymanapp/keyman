@@ -1,7 +1,7 @@
 import 'mocha';
 import {assert} from 'chai';
 import { loadFile, makePathToFixture, loadSchema } from '../helpers/index.js';
-import { LDMLKeyboardXMLDefaultImportsURL, LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions } from '../../src/ldml-keyboard/ldml-keyboard-xml-reader.js';
+import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions } from '../../src/ldml-keyboard/ldml-keyboard-xml-reader.js';
 import { CompilerEvent } from '../../src/util/compiler-interfaces.js';
 import { LDMLKeyboardXMLSourceFile } from '../../src/ldml-keyboard/ldml-keyboard-xml.js';
 import { LDMLKeyboardTestDataXMLSourceFile } from '../ldml-keyboard/ldml-keyboard-testdata-xml.js';
@@ -9,7 +9,7 @@ import { TestCompilerCallbacks } from './TestCompilerCallbacks.js';
 import { fileURLToPath } from 'url';
 
 const readerOptions: LDMLKeyboardXMLSourceFileReaderOptions = {
-  importsPath: fileURLToPath(LDMLKeyboardXMLDefaultImportsURL)
+  importsPath: fileURLToPath(LDMLKeyboardXMLSourceFileReader.defaultImportsURL)
 };
 
 export interface CompilationCase {

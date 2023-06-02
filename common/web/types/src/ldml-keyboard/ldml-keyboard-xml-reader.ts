@@ -18,10 +18,12 @@ export class LDMLKeyboardXMLSourceFileReaderOptions {
   importsPath: string;
 };
 
-export const LDMLKeyboardXMLDefaultImportsURL = new URL(`../import/`, import.meta.url);
-
 export class LDMLKeyboardXMLSourceFileReader {
   constructor(private options: LDMLKeyboardXMLSourceFileReaderOptions, private callbacks : CompilerCallbacks) {
+  }
+
+  static get defaultImportsURL() {
+    return new URL(`../import/`, import.meta.url);
   }
 
   readImportFile(version: string, subpath: string): Uint8Array {
