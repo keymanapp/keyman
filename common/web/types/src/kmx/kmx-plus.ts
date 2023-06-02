@@ -13,11 +13,10 @@ import { UnicodeSetParser, UnicodeSet } from '@keymanapp/common-types';
 export class Section {
 }
 
-export class GlobalSections {
-  // These sections are used by other sections during compilation
-  elem: Elem;
-  list: List;
-  strs: Strs;
+/**
+ * Sections which are needed as dependencies.
+ */
+export interface DependencySections extends KMXPlusData {
 }
 
 // 'sect'
@@ -175,7 +174,7 @@ export class VarsItem extends Section {
   id: StrsItem;
   value: StrsItem;
 
-  constructor(id: string, value: string, sections: GlobalSections) {
+  constructor(id: string, value: string, sections: DependencySections) {
     super();
     this.id = sections.strs.allocString(id);
     this.value = sections.strs.allocAndUnescapeString(value);
@@ -187,7 +186,7 @@ export class VarsItem extends Section {
 };
 
 export class UnicodeSetItem extends VarsItem {
-  constructor(id: string, value: string, sections: GlobalSections, usetparser: UnicodeSetParser) {
+  constructor(id: string, value: string, sections: DependencySections, usetparser: UnicodeSetParser) {
     super(id, value, sections);
     // TODO-LDML: buffer size
     this.unicodeSet = usetparser.parseUnicodeSet(value, 100);
@@ -201,7 +200,7 @@ export class UnicodeSetItem extends VarsItem {
 };
 
 export class SetVarItem extends VarsItem {
-  constructor(id: string, value: string[], sections: GlobalSections) {
+  constructor(id: string, value: string[], sections: DependencySections) {
     super(id, value.join(' '), sections);
     this.items = sections.elem.allocElementString(sections.strs, value);
   }
@@ -212,7 +211,7 @@ export class SetVarItem extends VarsItem {
 };
 
 export class StringVarItem extends VarsItem {
-  constructor(id: string, value: string, sections: GlobalSections) {
+  constructor(id: string, value: string, sections: DependencySections) {
     super(id, value, sections);
   }
   // no added fields

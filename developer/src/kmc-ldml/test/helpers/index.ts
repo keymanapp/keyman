@@ -15,7 +15,7 @@ import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 import KMXPlusFile = KMXPlus.KMXPlusFile;
 import Elem = KMXPlus.Elem;
-import GlobalSections = KMXPlus.GlobalSections;
+import DependencySections = KMXPlus.DependencySections;
 import Section = KMXPlus.Section;
 import Strs = KMXPlus.Strs;
 import List = KMXPlus.List;
@@ -67,15 +67,14 @@ export async function loadSectionFixture(compilerClass: typeof SectionCompiler, 
     return null;
   }
 
-  let globalSections: GlobalSections = {
+  let DependencySections: DependencySections = {
     strs: new Strs(),
     elem: null,
     list: null,
   };
-  globalSections.elem = new Elem(globalSections.strs);
-  globalSections.list = new List(globalSections.strs);
-
-  return compiler.compile(globalSections);
+  DependencySections.elem = new Elem(DependencySections.strs);
+  DependencySections.list = new List(DependencySections.strs);
+  return compiler.compile(DependencySections);
 }
 
 export function loadTestdata(inputFilename: string, options: CompilerOptions) : LDMLKeyboardTestDataXMLSourceFile {

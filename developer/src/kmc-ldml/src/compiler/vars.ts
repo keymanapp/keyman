@@ -7,7 +7,7 @@ import Vars = KMXPlus.Vars;
 import StringVarItem = KMXPlus.StringVarItem;
 import SetVarItem = KMXPlus.SetVarItem;
 import UnicodeSetItem = KMXPlus.UnicodeSetItem;
-import GlobalSections = KMXPlus.GlobalSections;
+import DependencySections = KMXPlus.DependencySections;
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 import { CompilerMessages } from "./messages.js";
 import { VariableParser } from "../util/pattern-parser.js";
@@ -135,7 +135,7 @@ export class VarsCompiler extends SectionCompiler {
     return valid;
   }
 
-  public compile(sections: GlobalSections): Vars {
+  public compile(sections: DependencySections): Vars {
     const result =  new Vars();
 
     const variables = this.keyboard?.variables;
@@ -159,14 +159,14 @@ export class VarsCompiler extends SectionCompiler {
       return result;
     }
   }
-  addString(result: Vars, e: LDMLKeyboard.LKString, sections: GlobalSections): void {
+  addString(result: Vars, e: LDMLKeyboard.LKString, sections: DependencySections): void {
     const { id } = e;
     let { value } = e;
     // fix any variables
     value = this.substituteStrings(result, value, sections);
     result.strings.push(new StringVarItem(id, value, sections));
   }
-  addSet(result: Vars, e: LDMLKeyboard.LKSet, sections: GlobalSections): void {
+  addSet(result: Vars, e: LDMLKeyboard.LKSet, sections: DependencySections): void {
     const { id } = e;
     let { value } = e;
     // first substitute strings
@@ -176,7 +176,7 @@ export class VarsCompiler extends SectionCompiler {
     const items : string[] = VariableParser.setSplitter(value);
     result.sets.push(new SetVarItem(id, items, sections));
   }
-  substituteSets(vars: KMXPlus.Vars, str: string, sections: KMXPlus.GlobalSections): string {
+  substituteSets(vars: KMXPlus.Vars, str: string, sections: KMXPlus.DependencySections): string {
     return str.replaceAll(VariableParser.SET_REFERENCE, (_entire : string, id: string) => {
       const val = this.findVariable(vars.sets, id);
       if (val === null) {
@@ -186,14 +186,14 @@ export class VarsCompiler extends SectionCompiler {
       return val.value.value;
     });
   }
-  addUnicodeSet(result: Vars, e: LDMLKeyboard.LKUnicodeSet, sections: GlobalSections): void {
+  addUnicodeSet(result: Vars, e: LDMLKeyboard.LKUnicodeSet, sections: DependencySections): void {
     const { id } = e;
     let { value } = e;
     value = this.substituteStrings(result, value, sections);
     value = this.substituteUnicodeSets(result, value, sections);
     result.unicodeSets.push(new UnicodeSetItem(id, value, sections, this.usetparser));
   }
-  substituteUnicodeSets(vars: KMXPlus.Vars, value: string, sections: KMXPlus.GlobalSections): string {
+  substituteUnicodeSets(vars: KMXPlus.Vars, value: string, sections: KMXPlus.DependencySections): string {
     return value.replaceAll(VariableParser.SET_REFERENCE, (_entire, id) => {
       const v = this.findVariable(vars.unicodeSets, id);
       if (v === null) {
@@ -203,7 +203,7 @@ export class VarsCompiler extends SectionCompiler {
       return v.value.value; // string value
     });
   }
-  substituteStrings(vars: Vars, str: string, sections: GlobalSections): string {
+  substituteStrings(vars: Vars, str: string, sections: DependencySections): string {
     return str.replaceAll(VariableParser.STRING_REFERENCE, (_entire, id) => {
       const val = this.findStringVariableValue(vars, id);
       if (val === null) {

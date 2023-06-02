@@ -28,11 +28,21 @@ export class SectionCompiler {
     return true;
   }
 
-  public compile(sections: KMXPlus.GlobalSections): KMXPlus.Section {
+  public compile(sections: KMXPlus.DependencySections): KMXPlus.Section {
     return null;
   }
 
   public validate(): boolean {
     return true;
+  }
+
+  /**
+   * Get the dependencies for this compiler.
+   * @returns set of dependent sections
+   */
+  public get dependencies(): Set<SectionIdent> {
+    const defaults = new Set(<SectionIdent[]>['elem','list','strs']);
+    defaults.delete(this.id);
+    return defaults;
   }
 }

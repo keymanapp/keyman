@@ -3,7 +3,7 @@ import { KMXPlus, LDMLKeyboard, CompilerCallbacks } from '@keymanapp/common-type
 import { SectionCompiler } from "./section-compiler.js";
 
 import Bksp = KMXPlus.Bksp;
-import GlobalSections = KMXPlus.GlobalSections;
+import DependencySections = KMXPlus.DependencySections;
 import Tran = KMXPlus.Tran;
 import TranGroup = KMXPlus.TranGroup;
 import TranReorder = KMXPlus.TranReorder;
@@ -71,7 +71,7 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
     return null;
   }
 
-  private compileTransforms(sections: GlobalSections, transforms: LKTransforms): TranBase {
+  private compileTransforms(sections: DependencySections, transforms: LKTransforms): TranBase {
     let result = this.newTran();
 
     if (transforms?.transformGroup) {
@@ -82,7 +82,7 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
     return result;
   }
 
-  private compileTransformGroup(sections: GlobalSections, transformGroup: LKTransformGroup): TranGroup {
+  private compileTransformGroup(sections: DependencySections, transformGroup: LKTransformGroup): TranGroup {
     if (transformGroup.reorder.length && transformGroup.transform.length) {
       // should have been caught by validate
       throw Error(`Internal error: transformGroup has both reorder and transform elements.`);
@@ -95,7 +95,7 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
     }
   }
 
-  private compileTransformTranGroup(sections: GlobalSections, transforms: LKTransform[]): TranGroup {
+  private compileTransformTranGroup(sections: DependencySections, transforms: LKTransform[]): TranGroup {
     const result : TranGroup = {
       type: constants.tran_group_type_transform,
       transforms: transforms.map(transform => this.compileTransform(sections, transform)),
@@ -104,7 +104,7 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
     return result;
   }
 
-  private compileTransform(sections: GlobalSections, transform: LKTransform) : TranTransform {
+  private compileTransform(sections: DependencySections, transform: LKTransform) : TranTransform {
     let result = new TranTransform();
     let cookedFrom = transform.from;
     let cookedTo = transform.to;
@@ -120,7 +120,7 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
     return result;
   }
 
-  private compileReorderTranGroup(sections: GlobalSections, reorders: LKReorder[]): TranGroup {
+  private compileReorderTranGroup(sections: DependencySections, reorders: LKReorder[]): TranGroup {
     const result : TranGroup = {
       type: constants.tran_group_type_reorder,
       transforms: [],
@@ -129,14 +129,14 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
     return result;
   }
 
-  private compileReorder(sections: GlobalSections, reorder: LKReorder): TranReorder {
+  private compileReorder(sections: DependencySections, reorder: LKReorder): TranReorder {
     let result = new TranReorder();
     result.elements = sections.elem.allocElementString(sections.strs, reorder.from, reorder.order, reorder.tertiary, reorder.tertiaryBase, reorder.preBase);
     result.before = sections.elem.allocElementString(sections.strs, reorder.before);
     return result;
   }
 
-  public compile(sections: GlobalSections): TranBase {
+  public compile(sections: DependencySections): TranBase {
     for(let t of this.keyboard.transforms) {
       if(t.type == this.type) {
         // compile only the transforms of the correct type

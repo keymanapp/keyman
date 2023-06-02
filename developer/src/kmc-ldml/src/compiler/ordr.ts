@@ -2,7 +2,7 @@
 // import { KMXPlus, LDMLKeyboard } from '@keymanapp/common-types';
 // import { SectionCompiler } from "./section-compiler.js";
 
-// import GlobalSections = KMXPlus.GlobalSections;
+// import DependencySections = KMXPlus.DependencySections;
 // // import Ordr = KMXPlus.Ordr;
 // // import OrdrItem = KMXPlus.OrdrItem;
 // import LKReorder = LDMLKeyboard.LKReorder;
@@ -22,14 +22,14 @@
 //     return valid;
 //   }
 
-//   private compileReorder(sections: GlobalSections, reorder: LKReorder): OrdrItem {
+//   private compileReorder(sections: DependencySections, reorder: LKReorder): OrdrItem {
 //     let result = new OrdrItem();
 //     result.elements = sections.elem.allocElementString(sections.strs, reorder.from, reorder.order, reorder.tertiary, reorder.tertiary_base, reorder.prebase);
 //     result.before = sections.elem.allocElementString(sections.strs, reorder.before);
 //     return result;
 //   }
 
-//   private compileReorders(sections: GlobalSections, reorders: LKReorders): Ordr {
+//   private compileReorders(sections: DependencySections, reorders: LKReorders): Ordr {
 //     let result = new Ordr();
 
 //     if(reorders?.reorder) {
@@ -41,7 +41,7 @@
 //     return result;
 //   }
 
-//   public compile(sections: GlobalSections): Ordr {
+//   public compile(sections: DependencySections): Ordr {
 //     return this.compileReorders(sections, this.keyboard.reorders);
 //   }
 // }

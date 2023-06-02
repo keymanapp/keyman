@@ -10,15 +10,22 @@ import { MetaCompiler } from './meta.js';
 import { NameCompiler } from './name.js';
 import { VkeyCompiler } from './vkey.js';
 import { VarsCompiler } from './vars.js';
+import { StrsCompiler, ElemCompiler, ListCompiler } from './empty-compiler.js';
 
 
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 import KMXPlusFile = KMXPlus.KMXPlusFile;
 
-/**
- * Does not include strs, elem, list - see GlobalSections
- */
-const SECTION_COMPILERS = [
+export const SECTION_COMPILERS = [
+  // These are in dependency order.
+
+  // First the former 'global' sections
+  StrsCompiler,
+  ListCompiler,
+  ElemCompiler,
+  // Next, Vars, which depends on others
+  VarsCompiler,
+  // Now all others:
   BkspCompiler,
   DispCompiler,
   KeysCompiler,
@@ -27,7 +34,6 @@ const SECTION_COMPILERS = [
   MetaCompiler,
   NameCompiler,
   TranCompiler,
-  VarsCompiler,
   VkeyCompiler,
 ];
 
@@ -135,11 +141,6 @@ export class LdmlKeyboardCompiler {
 
     const kmx = new KMXPlusFile();
 
-    // These sections are required by other sections
-    kmx.kmxplus.strs = new KMXPlus.Strs();
-    kmx.kmxplus.elem = new KMXPlus.Elem(kmx.kmxplus.strs);
-    kmx.kmxplus.list = new KMXPlus.List(kmx.kmxplus.strs);
-
     for(let section of sections) {
       if (!await section.init()) {
         passed = false;
@@ -152,7 +153,7 @@ export class LdmlKeyboardCompiler {
         // errors for the keyboard developer.
         continue;
       }
-      const sect = section.compile({strs: kmx.kmxplus.strs, elem: kmx.kmxplus.elem, list: kmx.kmxplus.list});
+      const sect = section.compile({strs: kmx.kmxplus.strs, elem: kmx.kmxplus.elem, list: kmx.kmxplus.list, vars: kmx.kmxplus.vars});
 
       /* istanbul ignore if */
       if(!sect) {
@@ -161,6 +162,9 @@ export class LdmlKeyboardCompiler {
         this.callbacks.reportMessage(CompilerMessages.Fatal_SectionCompilerFailed({sect:section.id}));
         passed = false;
         continue;
+      }
+      if(kmx.kmxplus[section.id]) {
+        throw new Error(`Internal error: section ${section.id} would be assigned twice`);
       }
       kmx.kmxplus[section.id] = sect as any;
     }
