@@ -33,7 +33,7 @@ bool wasm_LoadFileProc(const char* filename, const char* baseFilename, void* buf
   char* msgProc = static_cast<char*>(context);
   if(buffer == nullptr) {
     *bufferSize = wasm_loadfileproc(filename, baseFilename, 0, 0, msgProc);
-    return *bufferSize != 0;
+    return *bufferSize != -1;
   } else {
     return wasm_loadfileproc(filename, baseFilename, buffer, *bufferSize, msgProc) == 1;
   }

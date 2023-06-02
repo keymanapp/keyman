@@ -3233,6 +3233,12 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
     }
   }
 
+  if(*FileSize < 2) {
+    // Zero-byte file is invalid; 2 byte file is too, but we only really care
+    // about the prolog at this point so we don't overrun our buffer
+    return CERR_CannotReadBitmapFile;
+  }
+
   *Buf = new KMX_BYTE[*FileSize];
   if(!loadfileproc(szNameUtf8.c_str(), fk->extra->kmnFilename.c_str(), *Buf, (int*) FileSize, msgprocContext)) {
     delete[] *Buf;
