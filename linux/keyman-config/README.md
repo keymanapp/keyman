@@ -39,7 +39,7 @@ Also copy and compile the GSettings schema:
 
 ```bash
 cd keyman_config
-sudo cp com.keyman.gschema.xml /usr/share/glib-2.0/schemas
+sudo cp resources/com.keyman.gschema.xml /usr/share/glib-2.0/schemas
 sudo glib-compile-schemas /usr/share/glib-2.0/schemas
 ```
 
