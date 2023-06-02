@@ -36,7 +36,7 @@ build_man_pages() {
   export XDG_DATA_DIRS=$TEMP_DATA_DIR:${XDG_DATA_DIRS-}
   export GSETTINGS_SCHEMA_DIR="${SCHEMA_DIR}"
   mkdir -p "$SCHEMA_DIR"
-  cp ./com.keyman.gschema.xml "$SCHEMA_DIR"/
+  cp resources/com.keyman.gschema.xml "$SCHEMA_DIR"/
   glib-compile-schemas "$SCHEMA_DIR"
   ./build-help.sh --man --no-reconf
   export XDG_DATA_DIRS=${XDG_DATA_DIRS#*:}
