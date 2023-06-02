@@ -88,18 +88,7 @@ export class KmnCompiler {
   }
 
   public run(infile: string, outfile: string, options?: CompilerOptions): boolean {
-    if(!this.verifyInitialized()) {
-      /* c8 ignore next 2 */
-      return false;
-    }
-
-    options = {...baseOptions, ...options};
-    (globalThis as any)[this.callbackID] = {
-      message: this.compilerMessageCallback,
-      loadFile: this.loadFileCallback
-    };
     let result = this.runCompiler(infile, outfile, options);
-    delete (globalThis as any)[this.callbackID];
     if(result) {
       if(result.kmx) {
         this.callbacks.fs.writeFileSync(result.kmx.filename, result.kmx.data);
@@ -133,9 +122,8 @@ export class KmnCompiler {
     }
 
     if(bufferSize != data.byteLength) {
-      // TODO: consider chucking a wobbly because this is a bug #8885
       /* c8 ignore next 2 */
-      return 0;
+      throw new Error(`Second call, expected file size ${bufferSize} == ${data.byteLength}`);
     }
 
     this.Module.HEAP8.set(data, buffer);
@@ -143,7 +131,19 @@ export class KmnCompiler {
     return 1;
   }
 
-  private runCompiler(infile: string, outfile: string, options: CompilerOptions): CompilerResult {
+  public runCompiler(infile: string, outfile: string, options: CompilerOptions): CompilerResult {
+    if(!this.verifyInitialized()) {
+      /* c8 ignore next 2 */
+      return null;
+    }
+
+    options = {...baseOptions, ...options};
+
+    (globalThis as any)[this.callbackID] = {
+      message: this.compilerMessageCallback,
+      loadFile: this.loadFileCallback
+    };
+
     let result: CompilerResult = {};
     let wasm_interface = new this.Module.CompilerInterface();
     let wasm_options = new this.Module.CompilerOptions();
@@ -183,6 +183,7 @@ export class KmnCompiler {
       }
       wasm_interface.delete();
       wasm_options.delete();
+      delete (globalThis as any)[this.callbackID];
     }
   }
 
@@ -190,22 +191,19 @@ export class KmnCompiler {
     // The compiler detected a .kvks file, which needs to be captured
     let reader = new KvksFileReader();
     kvksFilename = this.callbacks.resolveFilename(kmnFilename, kvksFilename);
-    let kvks = reader.read(this.callbacks.loadFile(kvksFilename));
+    let filename = this.callbacks.path.basename(kvksFilename);
+    let kvks = null;
     try {
+      kvks = reader.read(this.callbacks.loadFile(kvksFilename));
       reader.validate(kvks, this.callbacks.loadSchema('kvks'));
     } catch(e) {
-      console.log(e);
-      // TODO: also unit test #8886
-      // TODO: this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({e}));
+      this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({filename, e}));
       return null;
     }
-    let errors: any = []; //TODO: KVKSParseError[];
-    let vk = reader.transform(kvks, errors);
-    if(!vk || errors.length) {
-      console.dir(errors);
-      // TODO: also unit test #8886
-      // TODO: this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({e}));
-      return null;
+    let invalidVkeys: string[] = [];
+    let vk = reader.transform(kvks, invalidVkeys);
+    for(let invalidVkey of invalidVkeys) {
+      this.callbacks.reportMessage(CompilerMessages.Warn_InvalidVkeyInKvksFile({filename, invalidVkey}));
     }
     let writer = new KvkFileWriter();
     return {
