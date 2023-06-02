@@ -198,8 +198,8 @@ void append_other_ToVector(v_str_3D &All_Vector,GdkKeymap * keymap) {
     // write this value to 3D- Vector
     All_Vector[1][i][0+1] = GetKeyvalsFromKeymap(keymap,stoi(All_Vector[1][i][0]),0);   //shift state: unshifted:0
     All_Vector[1][i][1+1] = GetKeyvalsFromKeymap(keymap,stoi(All_Vector[1][i][0]),1);   //shift state: shifted:1
-    All_Vector[1][i][2+1] = GetKeyvalsFromKeymap(keymap,stoi(All_Vector[1][i][0]),2);   //shift state: ?
-    All_Vector[1][i][3+1] = GetKeyvalsFromKeymap(keymap,stoi(All_Vector[1][i][0]),3);   //shift state: ?
+    //All_Vector[1][i][2+1] = GetKeyvalsFromKeymap(keymap,stoi(All_Vector[1][i][0]),2);   //shift state: ?
+    //All_Vector[1][i][3+1] = GetKeyvalsFromKeymap(keymap,stoi(All_Vector[1][i][0]),3);   //shift state: ?
 
     //printf("Keycodes US->Other:   %d(US): %s %s ---- (other):%s,  %s,  %s  \n",stoi(All_Vector[1][i][0]),All_Vector[0][i][1].c_str(),All_Vector[0][i][2].c_str(),All_Vector[1][i][1].c_str(),All_Vector[1][i][2].c_str(),All_Vector[1][i][3].c_str());  
   }
@@ -212,11 +212,13 @@ v_str_2D create_empty_2D( int dim_rows,int dim_shifts)
   v_str_2D all;
 
   for ( int i=0; i< dim_rows;i++) {
-    for ( int i=0; i< dim_shifts;i++) {
+    for ( int j=0; j< dim_shifts;j++) {
       shifts.push_back(empty);
     }
     all.push_back(shifts);
+    shifts.clear();
   }
+  //printf("+++++++ dimensions of Vector after create_empty_2D\t\t %li..%li..%li\n", all.size(), all[0].size(),all[1].size());
   return all;
 }
 
