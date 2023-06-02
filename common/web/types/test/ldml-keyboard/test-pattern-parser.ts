@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { MarkerParser, VariableParser } from '../src/util/pattern-parser.js';
+import { MarkerParser, VariableParser } from '../../src/ldml-keyboard/pattern-parser.js';
 
 describe('Test of Pattern Parsers', () => {
   describe('should test MarkerParser', () => {

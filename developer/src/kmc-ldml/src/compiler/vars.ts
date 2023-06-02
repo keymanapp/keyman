@@ -1,6 +1,6 @@
 import { SectionIdent, constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus, LDMLKeyboard, CompilerCallbacks } from '@keymanapp/common-types';
-import { UnicodeSetParser } from '@keymanapp/common-types';
+import { UnicodeSetParser, VariableParser } from '@keymanapp/common-types';
 import { KmnCompiler } from  '@keymanapp/kmc-kmn';
 import { SectionCompiler } from "./section-compiler.js";
 import Vars = KMXPlus.Vars;
@@ -10,7 +10,6 @@ import UnicodeSetItem = KMXPlus.UnicodeSetItem;
 import DependencySections = KMXPlus.DependencySections;
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 import { CompilerMessages } from "./messages.js";
-import { VariableParser } from "../util/pattern-parser.js";
 export class VarsCompiler extends SectionCompiler {
   public get id() {
     return constants.section.vars;
@@ -169,73 +168,32 @@ export class VarsCompiler extends SectionCompiler {
       return result;
     }
   }
+
+  // routines for initializing Vars remain here, in the compiler.
   addString(result: Vars, e: LDMLKeyboard.LKString, sections: DependencySections): void {
     const { id } = e;
     let { value } = e;
     // fix any variables
-    value = this.substituteStrings(result, value, sections);
+    value = result.substituteStrings(value, sections);
     result.strings.push(new StringVarItem(id, value, sections));
   }
   addSet(result: Vars, e: LDMLKeyboard.LKSet, sections: DependencySections): void {
     const { id } = e;
     let { value } = e;
     // first substitute strings
-    value = this.substituteStrings(result, value, sections);
+    value = result.substituteStrings(value, sections);
     // OK to do this as a substitute, because we've already validated the set above.
-    value = this.substituteSets(result, value, sections);
+    value = result.substituteSets(value, sections);
     const items : string[] = VariableParser.setSplitter(value);
     result.sets.push(new SetVarItem(id, items, sections));
-  }
-  substituteSets(vars: KMXPlus.Vars, str: string, sections: KMXPlus.DependencySections): string {
-    return str.replaceAll(VariableParser.SET_REFERENCE, (_entire : string, id: string) => {
-      const val = this.findVariable(vars.sets, id);
-      if (val === null) {
-        // Should have been caught during validation.
-        throw Error(`Internal Error: reference to missing set variable ${id}`);
-      }
-      return val.value.value;
-    });
   }
   addUnicodeSet(result: Vars, e: LDMLKeyboard.LKUnicodeSet, sections: DependencySections): void {
     const { id } = e;
     let { value } = e;
-    value = this.substituteStrings(result, value, sections);
-    value = this.substituteUnicodeSets(result, value, sections);
+    value = result.substituteStrings(value, sections);
+    value = result.substituteUnicodeSets(value, sections);
     result.unicodeSets.push(new UnicodeSetItem(id, value, sections, this.usetparser));
   }
-  substituteUnicodeSets(vars: KMXPlus.Vars, value: string, sections: KMXPlus.DependencySections): string {
-    return value.replaceAll(VariableParser.SET_REFERENCE, (_entire, id) => {
-      const v = this.findVariable(vars.unicodeSets, id);
-      if (v === null) {
-        // Should have been caught during validation.
-        throw Error(`Internal Error: reference to missing UnicodeSet variable ${id}`);
-      }
-      return v.value.value; // string value
-    });
-  }
-  substituteStrings(vars: Vars, str: string, sections: DependencySections): string {
-    return str.replaceAll(VariableParser.STRING_REFERENCE, (_entire, id) => {
-      const val = this.findStringVariableValue(vars, id);
-      if (val === null) {
-        // Should have been caught during validation.
-        throw Error(`Internal Error: reference to missing variable ${id}`);
-      }
-      return val;
-    });
-  }
-  findStringVariableValue(vars: Vars, id: string): string {
-    return this.findVariable(vars.strings, id)?.value?.value; // Unwrap: Variable, StrsItem
-  }
-
-  findVariable<T extends KMXPlus.VarsItem>(array: T[], id: string) : T {
-    const v : T[] = array.filter(e => e.id.value === id);
-    if (v.length === 0){
-      return null;
-    } else if (v.length !== 1) {
-      // Should have been caught during validation
-      throw Error(`Internal Error: Duplicate variable id ${id} crept into a variable list.`);
-    } else {
-      return v[0];
-    }
-  }
+  // routines for using/substituting variables have been moved to the Vars class and its
+  // properties
 }

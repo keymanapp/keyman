@@ -3,9 +3,8 @@ import { assert } from 'chai';
 import { VarsCompiler } from '../src/compiler/vars.js';
 import { CompilerMessages } from '../src/compiler/messages.js';
 import { CompilerMessages as KmnCompilerMessages } from '@keymanapp/kmc-kmn';
-import { /*compilerTestCallbacks, loadSectionFixture,*/testCompilationCases } from './helpers/index.js';
-import { KMXPlus /*, CommonTypesMessages*/ } from '@keymanapp/common-types';
-// import { constants } from '@keymanapp/ldml-keyboard-constants';
+import { testCompilationCases } from './helpers/index.js';
+import { KMXPlus } from '@keymanapp/common-types';
 
 import Vars = KMXPlus.Vars;
 

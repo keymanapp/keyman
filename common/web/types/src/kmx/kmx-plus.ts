@@ -5,6 +5,7 @@ import { ListItem } from './string-list.js';
 import { unescapeString } from '../util/util.js';
 import { KMXFile } from './kmx.js';
 import { UnicodeSetParser, UnicodeSet } from '@keymanapp/common-types';
+import { VariableParser } from '../ldml-keyboard/pattern-parser.js';
 
 // Implementation of file structures from /core/src/ldml/C7043_ldml.md
 // Writer in kmx-builder.ts
@@ -163,6 +164,60 @@ export class Vars extends Section {
       }
     }
     return true;
+  }
+
+  // utilities for making use of Vars in other sections
+
+  substituteSets(str: string, sections: DependencySections): string {
+    return str.replaceAll(VariableParser.SET_REFERENCE, (_entire : string, id: string) => {
+      const val = Vars.findVariable(this.sets, id);
+      if (val === null) {
+        // Should have been caught during validation.
+        throw Error(`Internal Error: reference to missing set variable ${id}`);
+      }
+      return val.value.value;
+    });
+  }
+  substituteUnicodeSets(value: string, sections: DependencySections): string {
+    return value.replaceAll(VariableParser.SET_REFERENCE, (_entire, id) => {
+      const v = Vars.findVariable(this.unicodeSets, id);
+      if (v === null) {
+        // Should have been caught during validation.
+        throw Error(`Internal Error: reference to missing UnicodeSet variable ${id}`);
+      }
+      return v.value.value; // string value
+    });
+  }
+  substituteStrings(str: string, sections: DependencySections): string {
+    return str.replaceAll(VariableParser.STRING_REFERENCE, (_entire, id) => {
+      const val = this.findStringVariableValue(id);
+      if (val === null) {
+        // Should have been caught during validation.
+        throw Error(`Internal Error: reference to missing variable ${id}`);
+      }
+      return val;
+    });
+  }
+  findStringVariableValue(id: string): string {
+    return Vars.findVariable(this.strings, id)?.value?.value; // Unwrap: Variable, StrsItem
+  }
+
+  /**
+   * Variable locator facility
+   * @param array
+   * @param id
+   * @returns
+   */
+  private static findVariable<T extends VarsItem>(array: T[], id: string) : T {
+    const v : T[] = array.filter(e => e.id.value === id);
+    if (v.length === 0){
+      return null;
+    } else if (v.length !== 1) {
+      // Should have been caught during validation
+      throw Error(`Internal Error: Duplicate variable id ${id} crept into a variable list.`);
+    } else {
+      return v[0];
+    }
   }
 };
 
