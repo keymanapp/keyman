@@ -7,7 +7,6 @@ import { CompilerCallbacks } from '../util/compiler-interfaces.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { CommonTypesMessages } from '../util/common-events.js';
 import { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTTests } from './ldml-keyboard-testdata-xml.js';
-import { fileURLToPath } from 'url';
 
 interface NameAndProps  {
   '$'?: any; // content
@@ -15,16 +14,20 @@ interface NameAndProps  {
   '$$'?: any; // children
 };
 
-export default class LDMLKeyboardXMLSourceFileReader {
-  callbacks: CompilerCallbacks;
+export class LDMLKeyboardXMLSourceFileReaderOptions {
+  importsPath: string;
+};
 
-  constructor(callbacks : CompilerCallbacks) {
-    this.callbacks = callbacks;
+export class LDMLKeyboardXMLSourceFileReader {
+  constructor(private options: LDMLKeyboardXMLSourceFileReaderOptions, private callbacks : CompilerCallbacks) {
+  }
+
+  static get defaultImportsURL() {
+    return new URL(`../import/`, import.meta.url);
   }
 
   readImportFile(version: string, subpath: string): Uint8Array {
-    // TODO-LDML: use this.callbacks.resolveFilename to get the actual path
-    let importPath = fileURLToPath(new URL(`../import/${version}/${subpath}`, import.meta.url));
+    const importPath = this.callbacks.resolveFilename(this.options.importsPath, `${version}/${subpath}`);
     return this.callbacks.loadFile(importPath);
   }
 
