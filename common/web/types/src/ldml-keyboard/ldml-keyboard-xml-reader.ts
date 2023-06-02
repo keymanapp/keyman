@@ -25,7 +25,7 @@ export class LDMLKeyboardXMLSourceFileReader {
   }
 
   readImportFile(version: string, subpath: string): Uint8Array {
-    const importPath = this.callbacks.resolveFilename(this.options.importsPath, `../import/${version}/${subpath}`);
+    const importPath = this.callbacks.resolveFilename(this.options.importsPath, `${version}/${subpath}`);
     return this.callbacks.loadFile(importPath);
   }
 
