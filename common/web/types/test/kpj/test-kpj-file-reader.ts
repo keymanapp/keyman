@@ -15,7 +15,6 @@ describe('kpj-file-reader', function () {
     const input = fs.readFileSync(path);
     const reader = new KPJFileReader(callbacks);
     const kpj = reader.read(input);
-    console.dir(kpj);
     assert.doesNotThrow(() => {
       reader.validate(kpj, loadSchema('kpj'));
     });
@@ -79,7 +78,6 @@ describe('kpj-file-reader', function () {
     assert.lengthOf(project.files, 2);
 
     let f: KeymanDeveloperProjectFile10 = <KeymanDeveloperProjectFile10>project.files[0];
-    console.dir(f);
     assert.equal(f.id, 'id_f347675c33d2e6b1c705c787fad4941a');
     assert.equal(f.filename, 'khmer_angkor.kmn');
     assert.equal(f.filePath, 'source/khmer_angkor.kmn');

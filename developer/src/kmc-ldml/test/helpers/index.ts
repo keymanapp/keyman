@@ -5,7 +5,7 @@ import 'mocha';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { SectionCompiler } from '../../src/compiler/section-compiler.js';
-import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
+import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboardXMLDefaultImportsURL } from '@keymanapp/common-types';
 import { LdmlKeyboardCompiler } from '../../src/compiler/compiler.js';
 import { assert } from 'chai';
 import { KMXPlusMetadataCompiler } from '../../src/compiler/metadata-compiler.js';
@@ -33,6 +33,12 @@ export function makePathToFixture(...components: string[]): string {
 
 export const compilerTestCallbacks = new TestCompilerCallbacks();
 
+export const compilerTestOptions: CompilerOptions = {
+  readerOptions: {
+    importsPath: fileURLToPath(LDMLKeyboardXMLDefaultImportsURL)
+  }
+};
+
 beforeEach(function() {
   compilerTestCallbacks.clear();
 });
@@ -43,14 +49,13 @@ afterEach(function() {
   }
 });
 
-
 export function loadSectionFixture(compilerClass: typeof SectionCompiler, filename: string, callbacks: TestCompilerCallbacks): Section {
   callbacks.messages = [];
   const inputFilename = makePathToFixture(filename);
   const data = callbacks.loadFile(inputFilename);
   assert.isNotNull(data);
 
-  const reader = new LDMLKeyboardXMLSourceFileReader(callbacks);
+  const reader = new LDMLKeyboardXMLSourceFileReader(compilerTestOptions.readerOptions, callbacks);
   const source = reader.load(data);
   assert.isNotNull(source);
 
