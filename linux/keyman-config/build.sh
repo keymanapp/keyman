@@ -72,6 +72,21 @@ build_action() {
   python3 setup.py build
 }
 
+test_action() {
+  local TEMP_DATA_DIR SCHEMA_DIR
+  TEMP_DATA_DIR=$(mktemp -d)
+  SCHEMA_DIR=$TEMP_DATA_DIR/glib-2.0/schemas
+  export XDG_DATA_DIRS=$TEMP_DATA_DIR:${XDG_DATA_DIRS-}
+  export GSETTINGS_SCHEMA_DIR="${SCHEMA_DIR}"
+  mkdir -p "$SCHEMA_DIR"
+  cp resources/com.keyman.gschema.xml "$SCHEMA_DIR"/
+  glib-compile-schemas "$SCHEMA_DIR"
+  ./run-tests.sh
+  export XDG_DATA_DIRS=${XDG_DATA_DIRS#*:}
+  unset GSETTINGS_SCHEMA_DIR
+  rm -rf "$TEMP_DATA_DIR"
+}
+
 install_action() {
   if [ -n "${SUDO_USER:-}" ]; then
     pip3 install qrcode sentry-sdk
@@ -108,6 +123,6 @@ uninstall_action() {
 builder_run_action clean      clean_action
 builder_run_action configure  # nothing to do
 builder_run_action build      build_action
-builder_run_action test       ./run-tests.sh
+builder_run_action test       test_action
 builder_run_action install    install_action
 builder_run_action uninstall  uninstall_action
