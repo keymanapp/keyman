@@ -27,8 +27,8 @@ export class KPJFileReader {
     return data as KPJFile;
   }
 
-  public validate(source: KPJFile, schemaBuffer: Buffer): void {
-    const schema = JSON.parse(schemaBuffer.toString('utf8'));
+  public validate(source: KPJFile, schemaBuffer: Uint8Array): void {
+    const schema = JSON.parse(new TextDecoder().decode(schemaBuffer));
     const ajv = new Ajv();
     if(!ajv.validate(schema, source)) {
       throw new Error(ajv.errorsText());

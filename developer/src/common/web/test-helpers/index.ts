@@ -36,7 +36,7 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
 
   /* CompilerCallbacks */
 
-  loadFile(filename: string | URL): Buffer {
+  loadFile(filename: string): Uint8Array {
     try {
       return fs.readFileSync(filename);
     } catch(e) {
@@ -77,7 +77,7 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
     this.messages.push(event);
   }
 
-  loadSchema(schema: CompilerSchema): Buffer {
+  loadSchema(schema: CompilerSchema): Uint8Array {
     return fs.readFileSync(new URL(SCHEMA_BASE + schema + '.schema.json', import.meta.url));
   }
 

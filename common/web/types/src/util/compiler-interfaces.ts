@@ -120,13 +120,11 @@ export interface CompilerFileSystemCallbacks {
 export interface CompilerCallbacks {
   /**
    * Attempt to load a file. Return falsy if not found.
-   * TODO: accept only string
    * TODO: never return falsy, just throw if not found?
-   * TODO: Buffer is Node-only.
    * @param baseFilename
    * @param filename
    */
-  loadFile(filename: string | URL): Buffer;
+  loadFile(filename: string): Uint8Array;
 
   get path(): CompilerPathCallbacks;
   get fs(): CompilerFileSystemCallbacks;
@@ -138,7 +136,7 @@ export interface CompilerCallbacks {
    */
   resolveFilename(baseFilename: string, filename: string): string;
 
-  loadSchema(schema: CompilerSchema): Buffer;
+  loadSchema(schema: CompilerSchema): Uint8Array;
   reportMessage(event: CompilerEvent): void;
   debug(msg: string): void;
 };

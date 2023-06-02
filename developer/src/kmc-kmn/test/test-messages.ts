@@ -1,4 +1,5 @@
 import 'mocha';
+import path from 'path';
 import { assert } from 'chai';
 import { CompilerMessages } from '../src/compiler/messages.js';
 import { TestCompilerCallbacks, verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
@@ -26,7 +27,7 @@ describe('CompilerMessages', function () {
     assert(compiler.verifyInitialized());
 
     const kmnPath = makePathToFixture(...fixture);
-    const outfile = callbacks.path.basename(kmnPath, '.kmn') + '.kmx';
+    const outfile = path.basename(kmnPath, '.kmn') + '.kmx';
 
     // Note: throwing away compile results (just to memory)
     compiler.runCompiler(kmnPath, outfile, {saveDebug: true, shouldAddCompilerVersion: false});
