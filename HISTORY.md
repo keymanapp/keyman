@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.117 alpha 2023-06-04
+
+* chore(developer): verify long lines compile correctly (#8915)
+
 ## 17.0.116 alpha 2023-06-02
 
 * feat(linux): Add column for installation location (#8897)
