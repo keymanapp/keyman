@@ -1,4 +1,4 @@
-import VirtualizedWorker from "./virtualizedWorker.js";
+import MappedWorker from "./mappedWorker.js";
 import unwrap from '../unwrap.js';
 
 import { LMLayerWorkerCode, LMLayerWorkerSourcemapComment } from "@keymanapp/lm-worker/worker-main.wrapped.min.js";
@@ -8,7 +8,7 @@ export default class Worker {
     let scriptStr = unwrap(LMLayerWorkerCode);
 
     scriptStr += '\n' + LMLayerWorkerSourcemapComment;
-    let worker = new VirtualizedWorker(scriptStr);
+    let worker = new MappedWorker(scriptStr);
 
     return worker as any as Worker;
   }
