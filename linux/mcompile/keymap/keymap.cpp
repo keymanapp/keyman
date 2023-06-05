@@ -22,6 +22,7 @@ static void PrintKeymapForCode(GdkKeymap *keymap, guint keycode)
 */
 
 void write_US_ToVector( v_str_3D &vec,std::string language, const char* text) {
+  // ? CHECK if ran OK-> return 0/1
   std::string FullPathName = "/usr/share/X11/xkb/symbols/" + language;
 
   const char* path = FullPathName.c_str();
@@ -44,6 +45,7 @@ void  CreateCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, 
   // in the Configuration file we find the appopriate paragraph between "xkb_symbol <text>" and the next xkb_symbol
   // and then copy all rows starting with "key <" to a v1D-Vector
 
+  // ? CHECK if ran OK-> return 0/1
   int buffer_size = 512;
   char buffer[buffer_size];
   bool print_OK   = false;
@@ -84,6 +86,7 @@ void Split_US_To_3D_Vector(v_str_3D &all_US,v_str_1D completeList) {
   // 2: seperate the name e.g. key<AD06> and the shiftstates
   // 3: push Names/Shiftstates to shift_states and then shiftstates to All_US, our 3D-Vector holding all Elements
 
+  // ? CHECK if ran OK-> return 0/1
   std::vector<char> delim{' ', '[', ']', '}', ';', '\t', '\n'};
   char split_bracel = '{';
   char split_char_komma  = ',';
@@ -107,6 +110,8 @@ void Split_US_To_3D_Vector(v_str_3D &all_US,v_str_1D completeList) {
       for (std::string each; std::getline(split1, each, split_bracel); tokens.push_back(each));
 
       // replace keys names with number (<AD06> with 29,...)
+
+      // ? CHECK if ran OK-> return 0/1
       int Keycde = replace_PosKey_with_Keycode(tokens[0]);
       tokens[0] = std::to_string(Keycde);
 
@@ -128,6 +133,8 @@ void Split_US_To_3D_Vector(v_str_3D &all_US,v_str_1D completeList) {
     }
   }
   all_US.push_back(shift_states);
+
+  // ? CHECK if ran OK, vector size is correct -> return 0/1
   //printf("### 6 Split_US_To_3D_clearVector %li..%li..%li\n", all_US.size(), all_US[0].size(),all_US[0][0].size());
 }
 
@@ -191,6 +198,7 @@ int replace_PosKey_with_Keycode(std::string  in) {
 void append_other_ToVector(v_str_3D &All_Vector,GdkKeymap * keymap) {
 
   // create a 2D vector all fill0ed with "--" and push to 3D-Vector
+  // ? CHECK if ran OK-> return 0/1
   v_str_2D Other_Vector2D = create_empty_2D(All_Vector[0].size(),All_Vector[0][0].size());
   All_Vector.push_back(Other_Vector2D);
 
@@ -206,6 +214,7 @@ void append_other_ToVector(v_str_3D &All_Vector,GdkKeymap * keymap) {
     All_Vector[1][i][1+1] = GetKeyvalsFromKeymap(keymap,stoi(All_Vector[1][i][0]),1);   //shift state: shifted:1
     //printf("Keycodes US->Other:   %d(US): %s %s ---- (other):%s,  %s,  %s  \n",stoi(All_Vector[1][i][0]),All_Vector[0][i][1].c_str(),All_Vector[0][i][2].c_str(),All_Vector[1][i][1].c_str(),All_Vector[1][i][2].c_str(),All_Vector[1][i][3].c_str());  
   }
+  // ? CHECK if ran OK, vector size is correct -> return 0/1
 }
 
 v_str_2D create_empty_2D( int dim_rows,int dim_shifts)
@@ -246,6 +255,7 @@ int GetKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) 
 
 void extract_difference( v_str_3D &All_Vector)
 {
+  // ? CHECK if ran OK-> return 0/1
   // TODO define which Folder; find better name
   std::ofstream Map_File("Map_US.txt");
   std::string diff =" ";
@@ -265,11 +275,12 @@ void extract_difference( v_str_3D &All_Vector)
       diff =" ";
     else
       diff =" *** ";
-
-   std::cout  << All_Vector[0][k][0] << "\t " <<+(*(All_Vector[0][k][1].c_str()))<< "\t("<< All_Vector[0][k][1] <<")"<<std::setw(20-All_Vector[0][k][1].size())<<  +(*(All_Vector[0][k][2].c_str()))<< "\t("<< All_Vector[0][k][2] <<")"<<std::setw(20-All_Vector[0][k][2].size())<< "\t...\t"<< +(*(All_Vector[1][k][1].c_str()))<< "\t("<< All_Vector[1][k][1] <<")"<<std::setw(24-All_Vector[1][k][1].size())<<   +(*(All_Vector[1][k][2].c_str()))<< "\t("<< All_Vector[1][k][2] <<")"<<std::setw(20-All_Vector[1][k][2].size())<< diff <<"\n";
+    // ? CHECK if index exists
+    std::cout << All_Vector[0][k][0] << "\t " <<+(*(All_Vector[0][k][1].c_str()))<< "\t("<< All_Vector[0][k][1] <<")"<<std::setw(20-All_Vector[0][k][1].size())<<  +(*(All_Vector[0][k][2].c_str()))<< "\t("<< All_Vector[0][k][2] <<")"<<std::setw(20-All_Vector[0][k][2].size())<< "\t...\t"<< +(*(All_Vector[1][k][1].c_str()))<< "\t("<< All_Vector[1][k][1] <<")"<<std::setw(24-All_Vector[1][k][1].size())<<   +(*(All_Vector[1][k][2].c_str()))<< "\t("<< All_Vector[1][k][2] <<")"<<std::setw(20-All_Vector[1][k][2].size())<< diff <<"\n";
     Map_File  << All_Vector[0][k][0] << " \t "<<+(*(All_Vector[0][k][1].c_str()))<< "\t("<< All_Vector[0][k][1] <<")"<<std::setw(20-All_Vector[0][k][1].size())<<  +(*(All_Vector[0][k][2].c_str()))<< "\t("<< All_Vector[0][k][2] <<")"<<std::setw(20-All_Vector[0][k][2].size())<< "\t...\t"<< +(*(All_Vector[1][k][1].c_str()))<< "\t("<< All_Vector[1][k][1] <<")"<<std::setw(24-All_Vector[1][k][1].size())<<   +(*(All_Vector[1][k][2].c_str()))<< "\t("<< All_Vector[1][k][2] <<")"<<std::setw(20-All_Vector[1][k][2].size())<< diff << "\n";
   }
 
+  // ? CHECK if ran OK, return 0/1
   Map_File.close();
 }
 
@@ -281,6 +292,7 @@ std::string get_Other_Char_FromUS( std::string in , v_str_3D &All_Vector) {
       if  ( All_Vector[0][i][j] == in ) {
         if ( All_Vector[0][i][j] != All_Vector[1][i][j])
           diff =" **  ";
+          // ? CHECK if Index exists
         std::cout << "US -> Other: "<<  std::setw(5)<<diff<<All_Vector[0][i][j] << std::setw(15-All_Vector[0][i][j].size())<< All_Vector[1][i][j] <<"\n";
         return All_Vector[1][i][j] ;
       }
@@ -298,6 +310,7 @@ std::string get_US_Char_FromOther(std::string in , v_str_3D &All_Vector) {
       if  ( All_Vector[1][i][j] == in ) {
         if ( All_Vector[0][i][j] != All_Vector[1][i][j])
           diff =" **  ";
+        // ? CHECK if Index exists
         std::cout << "Other -> US: "<<  std::setw(5)<<diff<<All_Vector[1][i][j] << std::setw(15-All_Vector[0][i][j].size())<<  All_Vector[0][i][j] <<"\n";
         return All_Vector[0][i][j];
         }
@@ -312,6 +325,7 @@ std::string getKeyNrOf_USChar(std::string in , v_str_3D &All_Vector) {
   for( int i=0; i< (int)All_Vector[0].size()-1;i++) {
     for( int j=0; j< (int)All_Vector[0][0].size()-1;j++) {
       if  ( All_Vector[0][i][j] == in ) {
+        // ? CHECK if index exists
         std::cout << "KeyNr of US char: \t"<< All_Vector[0][i][j] << " -> " << All_Vector[0][i][0] <<"\n";
         return All_Vector[0][i][0] ;
       }
@@ -325,6 +339,7 @@ std::string getKeyNrOf_OtherChar(std::string in , v_str_3D &All_Vector) {
   for( int i=0; i< (int)All_Vector[1].size()-1;i++) {
     for( int j=0; j< (int)All_Vector[1][0].size()-1;j++) {
       if  ( All_Vector[1][i][j] == in ) {
+        // ? CHECK if index exists
         std::cout << "KeyNr of Other char : \t"<< All_Vector[1][i][j] << " -> " << All_Vector[1][i][0] <<"\n";
         return All_Vector[1][i][0] ;
       }
@@ -334,7 +349,7 @@ std::string getKeyNrOf_OtherChar(std::string in , v_str_3D &All_Vector) {
 }
 
 bool test(v_str_3D &V) {
-
+// ? CHECK if index exists
   printf("\n+++++++++ print some characters of US and Other +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 
   for ( int k=13; k<43; k++) {
@@ -378,7 +393,7 @@ std::string diff;
 
 void print_simple_map_US(v_str_3D &All_Vector, int shiftstate){
   std::string out,diff;
-
+  // ? CHECK if ran OK-> return 0/1
   printf("-----------------------------------------------------------------------------------------------------------------------------------------------\n");
   for ( int i=0; i< (int)All_Vector[0].size();i++) {
     out =get_Other_Char_FromUS(All_Vector[0][i][shiftstate], All_Vector);
@@ -387,14 +402,13 @@ void print_simple_map_US(v_str_3D &All_Vector, int shiftstate){
 
 void print_simple_map_Other(v_str_3D &All_Vector, int shiftstate){
   std::string out, diff;
-
+  // ? CHECK if ran OK-> return 0/1
   printf("-----------------------------------------------------------------------------------------------------------------------------------------------\n");
   for ( int i=0; i< (int)All_Vector[0].size();i++) {
     out = get_US_Char_FromOther(All_Vector[0][i][shiftstate], All_Vector);
   }
 }
 //--------------------------------------
-
 int main(gint argc, gchar *argv[])
 {
   gdk_init(&argc, &argv);
@@ -427,7 +441,7 @@ int main(gint argc, gchar *argv[])
   //test_in_out(All_Vector);
 
   //print_simple_map_US(All_Vector,1);    // 1 = non-shift
-  //print_simple_map_Other(All_Vector,1);    // 1 = non-shift
+  //print_simple_map_Other(All_Vector,1); // 1 = non-shift
 
   gdk_display_close(display);
 
