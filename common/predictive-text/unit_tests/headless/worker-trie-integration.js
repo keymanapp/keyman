@@ -9,7 +9,8 @@ import { capabilities } from '@keymanapp/common-test-resources/model-helpers.mjs
 /*
  * How to run the worlist
  */
-describe('LMLayer using the trie model', function () {  let lmLayer;
+describe('LMLayer using the trie model', function () {
+  let lmLayer;
   let worker;
 
   beforeEach(function() {
