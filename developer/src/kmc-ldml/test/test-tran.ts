@@ -62,9 +62,6 @@ describe('tran', function () {
         assert.notOk(g0t2r.test('e'));
 
         assert.strictEqual(g0t3.from.value, "((?:A|B|C|D|FF|E))");
-        // const g0t3r = new RegExp(g0t2.from.value);
-        // assert.ok(g0t3r.test('FF'));
-        // assert.notOk(g0t3r.test('ff'));
         assert.equal(g0t3.mapFrom?.value, "upper");
         assert.equal(g0t3.mapTo?.value, "lower");
       }
