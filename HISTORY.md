@@ -1,5 +1,49 @@
 # Keyman Version History
 
+## 17.0.117 alpha 2023-06-04
+
+* chore(developer): verify long lines compile correctly (#8915)
+
+## 17.0.116 alpha 2023-06-02
+
+* feat(linux): Add column for installation location (#8897)
+* chore(developer): verify kvks files and report errors (#8892)
+* refactor(developer): rearrange kmcmplib interface source (#8899)
+* refactor(developer): move filename consistency check to kmc (#8907)
+* chore(developer): loadFile callback error check and optimization (#8908)
+* chore(common): remove url module ref from common/web/types (#8914)
+
+## 17.0.115 alpha 2023-06-01
+
+* refactor(developer): complete fs move out of kmcmplib (#8882)
+* fix(common): tweak pack/publish support for npm 9.5.1 and node 18.16.0 (#8894)
+* feat(linux): Implement Options page and option to disable Sentry error reporting (#7989)
+
+## 17.0.114 alpha 2023-05-31
+
+* chore(developer): replace cwrap wasm bindings (#8857)
+* chore(developer): refactor kmcmplib interfaces (#8870)
+* chore(developer): move keyboard repo fixtures (#8874)
+* chore(linux): Move build steps to build.sh (#8864)
+
+## 17.0.113 alpha 2023-05-26
+
+* docs(android): Update documentation for building Android on Linux (#8860)
+* fix(android): Fix typo in build-utils.sh (#8859)
+* refactor(developer): compiler interface part 1 for wasm (#8850)
+* chore(developer): remove SetError macro (#8856)
+
+## 17.0.112 alpha 2023-05-25
+
+* refactor(developer): move file write out of WriteCompiledKeyboard and CompileKeyboard merge (#8796)
+
+## 17.0.111 alpha 2023-05-24
+
+* fix(android/app): Pathing for publish script (#8845)
+* chore(developer): add test for missing .js file to kmc-package (#8846)
+* feat(linux): Add dbus system service (#8509)
+* chore(linux): Add missing dependency to GHA (#8849)
+
 ## 17.0.110 alpha 2023-05-22
 
 * fix(common): ensure child builds don't rebuild dependencies unnecessarily (#8834)
