@@ -170,7 +170,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
    * upon the completed async `predict`.
    *
    * @param suggestion Either a `Suggestion` or `Reversion`.
-   * @returns if `suggestion` is a `Suggestion`, will return a Promise<Reversion>`; else, `null`.
+   * @returns if `suggestion` is a `Suggestion`, will return a `Promise<Reversion>`; else, `null`.
    */
   public accept(suggestion: Suggestion): Promise<Reversion> | null {
     let _this = this;
