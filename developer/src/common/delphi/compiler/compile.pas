@@ -143,7 +143,6 @@ type
 const
   CKF_KEYMAN = 0;
   CKF_KEYMANWEB = 1;
-  // CKF_KEYMANWEB_MODERN = 2; // used only by Typescript-based compiler
 
 const
   CERR_FATAL   = $00008000;
@@ -170,7 +169,6 @@ const
 
 function CompileKeyboardFile(kmnFile, kmxFile: PChar; FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback): Integer; cdecl;   // I4865   // I4866
 function CompileKeyboardFileToBuffer(kmnFile: PChar; buf: PFILE_KEYBOARD; CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback; Target: Integer): Integer; cdecl;   // I4865   // I4866
-function CompileKeyboardFileEx(kmnFile, kmxfile: PChar; FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback; Target: Integer): Integer;   // I4865   // I4866
 function Compiler_Diagnostic(mode: Integer): Integer;
 procedure Compiler_Diagnostic_Console(mode: Integer);
 
@@ -203,16 +201,11 @@ var
   HKMCmpDll: THandle = 0;
 
 type
-  TCompileKeyboardFile = function (kmnFile, kmxFile: PAnsiChar;
-    FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL;  // I3310   // I4865   // I4866
+  TCompileKeyboardFile = function (kmnFile, kmxFile: PAnsiChar; FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL;  // I3310   // I4865   // I4866
     CallBack: TCompilerCallback): Integer; cdecl;        // TODO: K9: Convert to Unicode
 
   TCompileKeyboardFileToBuffer = function (kmnFile: PAnsiChar; buf: PFILE_KEYBOARD;  // I3310
     CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL;   // I4865   // I4866
-    CallBack: TCompilerCallback; Target: Integer): Integer; cdecl;         // TODO: K9: Convert to Unicode
-
-  TCompileKeyboardFileEx = function (kmnFile, kmxFile: PAnsiChar;
-    FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL;
     CallBack: TCompilerCallback; Target: Integer): Integer; cdecl;         // TODO: K9: Convert to Unicode
 
   TSetCompilerOptions = function (options: PCOMPILER_OPTIONS): BOOL; cdecl;
@@ -309,26 +302,6 @@ begin
   end;
 
   Result := ckf(PAnsiChar(AnsiString(kmnFile)), buf, CompilerWarningsAsErrors, WarnDeprecatedCode, Callback, Target);  // I3310   // I4865   // I4866
-end;
-
-function CompileKeyboardFileEx(kmnFile, kmxfile: PChar; FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback; Target: Integer): Integer;   // I4865   // I4866
-var
-  ckf: TCompileKeyboardFileEx;
-begin
-  //Result := 0;
-
-  if not LoadCompiler(Callback) then Exit(-1);
-
-  @ckf := GetProcAddress(HKMCmpDll, 'CompileKeyboardFileEx');
-  if not Assigned(@ckf) then
-  begin
-    Callback(0, $8000, PAnsiChar(AnsiString('Could not access the compiler.  Check that '+kmcmpdll_lib+' is in the program directory '+   // I4706
-      'and that it is not corrupt.'#13#10+'Windows error message: '+SysErrorMessage(GetLastError))));
-    Result := -1;
-    Exit;
-  end;
-
-  Result := ckf(PAnsiChar(AnsiString(kmnFile)), PAnsiChar(AnsiString(kmxfile)), FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode, Callback, Target);  // I3310   // I4865   // I4866
 end;
 
 type
