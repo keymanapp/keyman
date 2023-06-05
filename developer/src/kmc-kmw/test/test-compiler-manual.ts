@@ -2,7 +2,7 @@ import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { Compiler } from '@keymanapp/kmc-kmn';
+import { KmnCompiler } from '@keymanapp/kmc-kmn';
 import { KMX, KmxFileReader } from '@keymanapp/common-types';
 import { WriteCompiledKeyboard } from '../src/compiler/write-compiled-keyboard.js';
 import { extractTouchLayout } from './util.js';
@@ -20,14 +20,14 @@ if(fs.existsSync(testOutfile)) {
 
 const callbacks = new TestCompilerCallbacks();
 
-const kmxCompiler = new Compiler();
-if(!await kmxCompiler.init()) {
+const kmnCompiler = new KmnCompiler();
+if(!await kmnCompiler.init(callbacks)) {
   console.error('kmx compiler failed to init');
   process.exit(1);
 }
 
 // TODO: runToMemory, add option to kmxCompiler to store debug-data for conversion to .js (e.g. store metadata, group readonly metadata, etc)
-if(!kmxCompiler.run(infile, outfile, callbacks, {
+if(!kmnCompiler.run(infile, outfile, {
   shouldAddCompilerVersion: false,
   saveDebug: true,
   target: 'js'
