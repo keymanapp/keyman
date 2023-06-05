@@ -53,14 +53,13 @@ std::string getKeyNrOf_USChar(std::string in , v_str_3D &All_Vector);
 // get KeyNr from Other
 std::string getKeyNrOf_OtherChar(std::string in , v_str_3D &All_Vector);
 
+
+// for testing/debugging - may be deleted later
 // prints out a 1:1 mapping US->Other
 void print_simple_map_US(v_str_3D &All_Vector, int shiftstate);
-
 // prints out a 1:1 mapping Other->US
 void print_simple_map_Other(v_str_3D &All_Vector, int shiftstate);
-
 // test of above functions (character mapping US <-> Other; KeyNr <-> CHaracter)
 void test_in_out(v_str_3D &All_Vector);
-
 // testing of Vector contents ( first row of US and Other)
 bool test(v_str_3D &V);
