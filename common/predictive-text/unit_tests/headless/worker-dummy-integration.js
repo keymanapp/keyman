@@ -16,10 +16,23 @@ import { capabilities, iGotDistractedByHazel } from '@keymanapp/common-test-reso
  * of suggestions when loaded and return them sequentially.
  */
 describe('LMLayer using dummy model', function () {
+  let lmLayer;
+  let worker;
+
+  beforeEach(function() {
+    worker = Worker.constructInstance();
+    lmLayer = new LMLayer(capabilities(), worker);
+  });
+
+  afterEach(function () {
+    // As we're using Node worker threads here, failure to terminate them will cause the
+    // headless test run to hang after completion.
+    lmLayer.shutdown();
+    worker.terminate();  // should be covered by the former, but just in case... for CI stability.
+  });
+
   describe('Prediction', function () {
     it('will predict future suggestions (loaded from file)', function () {
-      var lmLayer = new LMLayer(capabilities(), Worker.constructInstance());
-
       var stripIDs = function(suggestions) {
         suggestions.forEach(function(suggestion) {
           delete suggestion.id;
@@ -51,14 +64,11 @@ describe('LMLayer using dummy model', function () {
       }).then(function (suggestions) {
         stripIDs(suggestions);
         assert.deepEqual(suggestions, iGotDistractedByHazel()[3]);
-        lmLayer.shutdown();
         return Promise.resolve();
       });
     });
 
     it('will predict future suggestions (loaded from raw source)', function () {
-      var lmLayer = new LMLayer(capabilities(), Worker.constructInstance());
-
       var stripIDs = function(suggestions) {
         suggestions.forEach(function(suggestion) {
           delete suggestion.id;
@@ -92,7 +102,6 @@ describe('LMLayer using dummy model', function () {
       }).then(function (suggestions) {
         stripIDs(suggestions);
         assert.deepEqual(suggestions, iGotDistractedByHazel()[3]);
-        lmLayer.shutdown();
         return Promise.resolve();
       });
     });
@@ -100,8 +109,6 @@ describe('LMLayer using dummy model', function () {
 
   describe('Wordbreaking', function () {
     it('will perform (default) wordbreaking and return word at caret', function () {
-      var lmLayer = new LMLayer(capabilities(), Worker.constructInstance());
-
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax.
       // Not done yet, as this test case is a slightly-edited copy of the in-browser version.

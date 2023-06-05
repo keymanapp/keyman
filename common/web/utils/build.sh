@@ -39,16 +39,12 @@ if builder_start_action clean; then
 fi
 
 if builder_start_action build; then
-  # Note: in a dependency build, we'll expect utils to be built by tsc -b
-  if builder_is_dep_build; then
-    builder_echo "skipping tsc -b; will be completed by $builder_dep_parent"
-  else
-    tsc --build "$THIS_SCRIPT_PATH/tsconfig.json"
-    node build-bundler.js
+  tsc --build "$THIS_SCRIPT_PATH/tsconfig.json"
+  node build-bundler.js
 
-    # So... tsc does declaration-bundling on its own pretty well, at least for local development.
-    tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
-  fi
+  # So... tsc does declaration-bundling on its own pretty well, at least for local development.
+  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+
   builder_finish_action success build
 fi
 
