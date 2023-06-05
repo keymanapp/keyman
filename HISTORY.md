@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.118 alpha 2023-06-05
+
+* chore(ios): replace fv cert (#8900)
+* fix(core): Fix compilation if hotdoc is installed (#8912)
+* feat(linux): Rename column and add tooltip (#8918)
+
 ## 17.0.117 alpha 2023-06-04
 
 * chore(developer): verify long lines compile correctly (#8915)
