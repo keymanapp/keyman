@@ -48,6 +48,17 @@ self.importScripts = importScripts;
  * Uses the Node version of Workers to provide proper, authentic separate-thread
  * 'sandboxing'.  Also intercepts and interprets certain WebWorker method signatures
  * necessary to run the WebWorker-oriented worker code.
+ *
+ * Alternatively, only after writing this did I discover this package:
+ * https://github.com/developit/web-worker.  They also ran one notable issue I did:
+ * Node 18.x, at least, does not support use of Node Blobs for construction of a
+ * Worker: https://github.com/developit/web-worker/pull/32... unlike Web Workers.
+ *
+ * So... Base64-encoded Data URLs it is.
+ *
+ * What we have here is perfectly fine for now, but if we need more complicated
+ * cross-platform Worker support in the future, it may be wise to swap to use of
+ * that package.
  */
 export default class MappedWorker extends worker.Worker implements Worker {
   constructor(scriptStr: string) {
