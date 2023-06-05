@@ -1212,7 +1212,7 @@ KMX_DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PKMX_WCHAR co
 
         // Due to a limitation in earlier versions of KeymanWeb, the minimum version
         // for context() referring to notany() is 14.0. See #917 for details.
-        if (kmcmp::CompileTarget != CKF_KEYMAN) {
+        if (kmcmp::CompileTarget == CKF_KEYMANWEB) {
           for (q = context, i = 1; *q && i < contextOffset; q = incxstr(q), i++);
           if (*q == UC_SENTINEL && *(q + 1) == CODE_NOTANY) {
             VERIFY_KEYBOARD_VERSION(fk, VERSION_140, CERR_140FeatureOnlyContextAndNotAnyWeb);
@@ -1665,7 +1665,7 @@ int LineTokenType(PKMX_WCHAR *str)
 
   /* Test KeymanWeb, Keyman and KeymanOnly prefixes */
   if (kmcmp::CompileTarget == CKF_KEYMAN && lpt == lptKeymanWebOnly) return T_BLANK;
-  if (kmcmp::CompileTarget != CKF_KEYMAN && lpt == lptKeymanOnly) return T_BLANK;
+  if (kmcmp::CompileTarget == CKF_KEYMANWEB && lpt == lptKeymanOnly) return T_BLANK;
 
   while (iswspace(*p)) p++;
 
@@ -2146,7 +2146,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       // in the web target platform, even if there are platform() rules excluding this possibility. In that (rare) situation, the keyboard developer should simply specify
       // the &version to be 9.0 or whatever to avoid this behaviour.
       if (sFlag & (LCTRLFLAG | LALTFLAG | RCTRLFLAG | RALTFLAG | CAPITALFLAG | NOTCAPITALFLAG | NUMLOCKFLAG | NOTNUMLOCKFLAG | SCROLLFLAG | NOTSCROLLFLAG) &&
-        kmcmp::CompileTarget != CKF_KEYMAN &&
+        kmcmp::CompileTarget == CKF_KEYMANWEB &&
         fk->dwFlags & KF_AUTOMATICVERSION) {
         VERIFY_KEYBOARD_VERSION(fk, VERSION_100, 0);
       }
