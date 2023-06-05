@@ -52,4 +52,18 @@ describe('CompilerMessages', function () {
     await testForMessage(this, ['invalid-keyboards', 'warn_invalid_vkey_in_kvks_file.kmn'], CompilerMessages.WARN_InvalidVkeyInKvksFile);
   });
 
+  // CERR_DuplicateGroup
+
+  it('should generate CERR_DuplicateGroup if the kmn contains two groups with the same name', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'cerr_duplicate_group.kmn'], 0x302071); //TODO: consolidate messages from kmcmplib, CompilerMessages.CERR_DuplicateGroup
+    assert.equal(callbacks.messages[0].message, "A group with this name has already been defined. Group 'ខ្មែរ' declared on line 9");
+  });
+
+  // CERR_DuplicateStore
+
+  it('should generate CERR_DuplicateStore if the kmn contains two stores with the same name', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'cerr_duplicate_store.kmn'], 0x302072); //TODO: consolidate messages from kmcmplib, CompilerMessages.CERR_DuplicateStore
+    assert.equal(callbacks.messages[0].message, "A store with this name has already been defined. Store 'ខ្មែរ' declared on line 11");
+  });
+
 });
