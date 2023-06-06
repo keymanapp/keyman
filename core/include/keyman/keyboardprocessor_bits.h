@@ -66,4 +66,5 @@
 #define USE_CHAR16_T
 #endif
 
+#include <stdint.h>
 #include <km_types.h>
