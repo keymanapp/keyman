@@ -35,7 +35,9 @@ struct KMCMP_COMPILER_RESULT {
   std::string kvksFilename;
 };
 
-// TODO: parameters in UTF-8 #8887
+/**
+ * @param szText UTF-8 string
+*/
 typedef int (*kmcmp_CompilerMessageProc)(int line, uint32_t dwMsgCode, const char* szText, void* context);
 
 // parameters in UTF-8
@@ -50,7 +52,9 @@ typedef int (*kmcmp_CompilerMessageProc)(int line, uint32_t dwMsgCode, const cha
 // }
 typedef bool (*kmcmp_LoadFileProc)(const char* loadFilename, const char* baseFilename, void* buffer, int* bufferSize, void* context);
 
-// Parameters in UTF-8
+/**
+ * @param pszInfile  UTF-8 path to file.kmn
+ */
 EXTERN bool kmcmp_CompileKeyboard(
   const char* pszInfile,
   const KMCMP_COMPILER_OPTIONS& options,

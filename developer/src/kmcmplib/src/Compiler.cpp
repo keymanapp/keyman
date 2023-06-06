@@ -111,8 +111,7 @@
 
 using namespace kmcmp;
 
-  char ErrExtraLIB[ERR_EXTRA_LIB_LEN];
-  KMX_WCHAR ErrExtraW[ERR_EXTRA_W_LEN];
+  char ErrExtraLIB[ERR_EXTRA_LIB_LEN]; // utf-8
   KMX_BOOL AWarnDeprecatedCode_GLOBAL_LIB;
 
 namespace kmcmp{
