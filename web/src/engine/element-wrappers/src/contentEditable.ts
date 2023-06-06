@@ -108,7 +108,7 @@ export default class ContentEditable extends OutputTarget<{}> {
 
   getTextBeforeCaret(): string {
     if(!this.hasSelection()) {
-      return;
+      return this.getText();
     }
 
     let caret = this.getCarets().start;

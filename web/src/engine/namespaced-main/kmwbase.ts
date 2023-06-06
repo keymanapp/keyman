@@ -211,26 +211,6 @@ namespace com.keyman {
     // Base object API definitions
 
     /**
-     * Function     attachToControl
-     * Scope        Public
-     * @param       {Element}    Pelem       Element to which KMW will be attached
-     * Description  Attaches KMW to control (or IFrame)
-     */
-    ['attachToControl'](Pelem: HTMLElement) {
-      this.domManager.attachToControl(Pelem);
-    }
-
-    /**
-     * Function     detachFromControl
-     * Scope        Public
-     * @param       {Element}    Pelem       Element from which KMW will detach
-     * Description  Detaches KMW from a control (or IFrame)
-     */
-    ['detachFromControl'](Pelem: HTMLElement) {
-      this.domManager.detachFromControl(Pelem);
-    }
-
-    /**
      * Exposed function to load keyboards by name. One or more arguments may be used
      *
      * @param {any[]} args keyboard name string or keyboard metadata JSON object
@@ -275,38 +255,6 @@ namespace com.keyman {
     }
 
     /**
-     * Function     disableControl
-     * Scope        Public
-     * @param       {Element}      Pelem       Element to be disabled
-     * Description  Disables a KMW control element
-     */
-    ['disableControl'](Pelem: HTMLElement) {
-      this.domManager.disableControl(Pelem);
-    }
-
-    /**
-     * Function     enableControl
-     * Scope        Public
-     * @param       {Element}      Pelem       Element to be disabled
-     * Description  Disables a KMW control element
-     */
-    ['enableControl'](Pelem: HTMLMapElement) {
-      this.domManager.enableControl(Pelem);
-    }
-
-    /**
-     * Function     setKeyboardForControl
-     * Scope        Public
-     * @param       {Element}    Pelem    Control element
-     * @param       {string|null=}    Pkbd     Keyboard (Clears the set keyboard if set to null.)
-     * @param       {string|null=}     Plc      Language Code
-     * Description  Set default keyboard for the control
-     */
-    ['setKeyboardForControl'](Pelem: HTMLElement, Pkbd?: string, Plc?: string) {
-      this.domManager.setKeyboardForControl(Pelem, Pkbd, Plc);
-    }
-
-    /**
      * Function     getKeyboardForControl
      * Scope        Public
      * @param       {Element}    Pelem    Control element
@@ -348,46 +296,6 @@ namespace com.keyman {
      * @param {number=}  dr  Number of post-caret characters to delete
      */
     ['oninserttext']: (dn: number, s: string, dr?: number) => void;
-
-    /**
-     * Create copy of the OSK that can be used for embedding in documentation or help
-     * The currently active keyboard will be returned if PInternalName is null
-     *
-     *  @param  {string}          PInternalName   internal name of keyboard, with or without Keyboard_ prefix
-     *  @param  {number}          Pstatic         static keyboard flag  (unselectable elements)
-     *  @param  {string=}         argFormFactor   layout form factor, defaulting to 'desktop'
-     *  @param  {(string|number)=}  argLayerId    name or index of layer to show, defaulting to 'default'
-     *  @return {Object}                          DIV object with filled keyboard layer content
-     */
-    ['BuildVisualKeyboard'](PInternalName, Pstatic, argFormFactor, argLayerId): HTMLElement {
-      let PKbd: com.keyman.keyboards.Keyboard = null;
-
-      if(PInternalName != null) {
-        var p=PInternalName.toLowerCase().replace('keyboard_','');
-        var keyboardsList = this.keyboardManager.keyboards;
-
-        for(let Ln=0; Ln<keyboardsList.length; Ln++) {
-          if(p == keyboardsList[Ln]['KI'].toLowerCase().replace('keyboard_','')) {
-            // Requires the Keyboard wrapping object now.
-            PKbd = new com.keyman.keyboards.Keyboard(keyboardsList[Ln]);
-            break;
-          }
-        }
-      }
-
-      PKbd = PKbd || this.core.activeKeyboard;
-
-      // help.keyman.com will (lkudingly) set this function in place to specify the desired
-      // dimensions for the documentation-keyboards, so we'll give it priority.  One of those
-      // "temporary" (but actually permanent) solutions from yesteryear.
-      //
-      // Note that the main intended use of that function is for embedded KMW on the mobile apps...
-      // but they never call `BuildVisualKeyboard`, so it's all good.
-      const getOskHeight = this['getOskHeight'];
-      let targetHeight = (typeof getOskHeight == 'function' ? getOskHeight() : null) || this.osk.computedHeight || 200;
-
-      return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PKbd, argFormFactor, argLayerId, targetHeight);
-    }
   }
 }
 

@@ -9,6 +9,7 @@ import {
 import { DomEventTracker } from "keyman/engine/events";
 import { BrowserConfiguration, BrowserInitOptionSpec } from "./configuration.js";
 import { getStyleValue } from "./utils/getStyleValue.js";
+import { AlertHost } from "./utils/alertHost.js";
 
 /**
  * Calls document.createElement for the specified node type and also applies
@@ -26,6 +27,7 @@ export class UtilApiEndpoint {
   readonly config: BrowserConfiguration;
   private readonly stylesheetManager: StylesheetManager;
   private readonly domEventTracker: DomEventTracker;
+  private _alertHost: AlertHost;
 
   constructor(config: BrowserConfiguration) {
     this.config = config;
@@ -208,8 +210,25 @@ export class UtilApiEndpoint {
 
   getStyleValue = getStyleValue;
 
+  private get alertHost(): AlertHost {
+    if(this.config.alertHost) {
+      return this.config.alertHost;
+    } else if(!this._alertHost) {
+      // Lazy init:  if KMW is set to not show alerts, we try not to initialize the alert host.
+      // If the .alert API is called, though, we have no choice.
+      this._alertHost = new AlertHost();
+    }
+
+    return this._alertHost;
+  }
+
+  alert(s: string, fn: () => void) {
+    this.alertHost.alert(s, fn);
+  }
+
   shutdown() {
     this.stylesheetManager?.unlinkAll();
     this.domEventTracker?.shutdown();
+    this._alertHost?.shutdown();
   }
 }

@@ -2,7 +2,14 @@ import { KeymanEngine as KeymanEngineBase } from 'keyman/engine/main';
 import { Device as DeviceDetector } from 'keyman/engine/device-detect';
 import { getAbsoluteY } from 'keyman/engine/dom-utils';
 import { OutputTarget } from 'keyman/engine/element-wrappers';
-import { AnchoredOSKView, FloatingOSKView, FloatingOSKViewConfiguration, OSKView, TwoStateActivator } from 'keyman/engine/osk';
+import {
+  AnchoredOSKView,
+  FloatingOSKView,
+  FloatingOSKViewConfiguration,
+  OSKView,
+  TwoStateActivator,
+  VisualKeyboard
+} from 'keyman/engine/osk';
 import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId as prefixed } from 'keyman/engine/package-cache';
 import { DeviceSpec, Keyboard, ProcessorInitOptions, extendString } from "@keymanapp/keyboard-processor";
 
@@ -460,6 +467,90 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    */
   removeHotKey(keyCode: number, shiftState: number) {
     this.hotkeyManager.removeHotkey(keyCode, shiftState);
+  }
+
+  /**
+   * Function     attachToControl
+   * Scope        Public
+   * @param       {Element}    Pelem       Element to which KMW will be attached
+   * Description  Attaches KMW to control (or IFrame)
+   */
+  attachToControl(Pelem: HTMLElement) {
+    this.contextManager.page.attachToControl(Pelem);
+  }
+
+  /**
+   * Function     detachFromControl
+   * Scope        Public
+   * @param       {Element}    Pelem       Element from which KMW will detach
+   * Description  Detaches KMW from a control (or IFrame)
+   */
+  detachFromControl(Pelem: HTMLElement) {
+    this.contextManager.page.detachFromControl(Pelem);
+  }
+
+  /**
+   * Function     disableControl
+   * Scope        Public
+   * @param       {Element}      Pelem       Element to be disabled
+   * Description  Disables a KMW control element
+   */
+  disableControl(Pelem: HTMLElement) {
+    this.contextManager.page.disableControl(Pelem);
+  }
+
+  /**
+   * Function     enableControl
+   * Scope        Public
+   * @param       {Element}      Pelem       Element to be disabled
+   * Description  Disables a KMW control element
+   */
+  enableControl(Pelem: HTMLMapElement) {
+    this.contextManager.page.enableControl(Pelem);
+  }
+
+  /**
+   * Create copy of the OSK that can be used for embedding in documentation or help
+   * The currently active keyboard will be returned if PInternalName is null
+   *
+   *  @param  {string}          PInternalName   internal name of keyboard, with or without Keyboard_ prefix
+   *  @param  {number}          Pstatic         static keyboard flag  (unselectable elements)
+   *  @param  {string=}         argFormFactor   layout form factor, defaulting to 'desktop'
+   *  @param  {(string|number)=}  argLayerId    name or index of layer to show, defaulting to 'default'
+   *  @return {Object}                          DIV object with filled keyboard layer content
+   */
+  BuildVisualKeyboard(
+    PInternalName: string,
+    Pstatic: number,
+    argFormFactor?: DeviceSpec.FormFactor,
+    argLayerId?: string|number
+  ): HTMLElement {
+    let PKbd: Keyboard = null;
+
+    if(PInternalName != null) {
+      PKbd = this.keyboardRequisitioner.cache.getKeyboard(PInternalName);
+    }
+
+    PKbd = PKbd || this.core.activeKeyboard;
+    let Pstub = this.keyboardRequisitioner.cache.getStub(PKbd);
+
+    // help.keyman.com will set this function in place to specify the desired
+    // dimensions for the documentation-keyboards, so we'll give it priority.  One of those
+    // "temporary" (but actually permanent) solutions from yesteryear.
+    //
+    // Note that the main intended use of that function is for embedded KMW on the mobile apps...
+    // but they never call `BuildVisualKeyboard`, so it's all good.
+    const getOskHeight = this['getOskHeight'];
+    let targetHeight = (typeof getOskHeight == 'function' ? getOskHeight() : null) || this.osk.computedHeight || 200;
+
+    return VisualKeyboard.buildDocumentationKeyboard(
+      PKbd,
+      Pstub,
+      this.config.paths.fonts,
+      argFormFactor,
+      argLayerId,
+      targetHeight
+      );
   }
 
   /**

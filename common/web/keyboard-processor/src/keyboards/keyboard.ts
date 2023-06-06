@@ -499,6 +499,15 @@ export default class Keyboard {
     // devices, the only state key in use currently is Caps Lock, which is set
     // when the 'caps' layer is active in ActiveKey::constructBaseKeyEvent.
     if(!Lkc.device.touchable) {
+      /*
+       * For desktop-style keyboards, start from a blank slate.  They have a 'default'
+       * (implicit 'NO_CAPS') layer but not a 'caps' layer.  With caps set, it just
+       * highlights the key on the 'default' layer instead.
+       *
+       * We should never set both `CAPS` and `NO_CAPS` at the same time, and
+       * same for the other modifiers.
+       */
+      Lkc.Lstates = 0;
       Lkc.Lstates |= stateKeys['K_CAPS']    ? Codes.modifierCodes['CAPS'] : Codes.modifierCodes['NO_CAPS'];
       Lkc.Lstates |= stateKeys['K_NUMLOCK'] ? Codes.modifierCodes['NUM_LOCK'] : Codes.modifierCodes['NO_NUM_LOCK'];
       Lkc.Lstates |= stateKeys['K_SCROLL']  ? Codes.modifierCodes['SCROLL_LOCK'] : Codes.modifierCodes['NO_SCROLL_LOCK'];

@@ -183,8 +183,15 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   }
 
   public deactivateCurrentTarget() {
-    this.currentTarget = null;
-    // TODO: Not in original, pre-modularized form... but should probably also _ControlBlur?
+    const priorTarget = this.activeTarget || this.lastActiveTarget;
+    if(priorTarget) {
+      this._BlurKeyboardSettings(priorTarget.getElement());
+    }
+
+    // Because of focus-maintenance effects
+    if(!this.activeTarget) {
+      this.setActiveTarget(null, true);
+    }
   }
 
   public forgetActiveTarget() {
@@ -234,6 +241,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     // Must set before _Blur / _Focus to avoid infinite recursion due to complications
     // in setActiveKeyboard behavior with managed keyboard settings.
     this.currentTarget = this.mostRecentTarget = target; // I3363 (Build 301)
+    this.predictionContext.setCurrentTarget(target);
 
     if(this.focusAssistant.restoringFocus) {
       this._BlurKeyboardSettings(target.getElement());
@@ -267,8 +275,6 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       });
     }
   }
-
-  // on set activeTarget, make sure to also change it for this.predictionContext!
 
   get activeKeyboard() {
     return this._activeKeyboard;

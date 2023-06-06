@@ -134,7 +134,7 @@ export class AlertHost {
     this.bx.style.display='block';
     this.lt.className='kmw-alert-text';
     this.lt.innerHTML=s;
-    this.bg.style.display='none';
+    this.gr.style.display='none';
     bg.style.display='block';
     this.dismiss = arguments.length > 1 ? fn : null;
   }

@@ -1146,9 +1146,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
   modelKeyClick(e: KeyElement, input?: InputEventCoordinate) {
     let keyEvent = this.initKeyEvent(e, input);
-
-    // TODO:  convert into an actual event, raised by the VisualKeyboard.
-    //        Its code is intended to lie outside of the OSK-Core library/module.
     this.raiseKeyEvent(keyEvent, e);
   }
 
@@ -1601,7 +1598,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     let layout = PKbd.layout(formFactor);
 
-    const deviceSpec = new DeviceSpec(null, device.formFactor, device.OS, device.touchable);
+    const deviceSpec = new DeviceSpec('other', device.formFactor, device.OS, device.touchable);
     let kbdObj = new VisualKeyboard({
       keyboard: PKbd,
       keyboardMetadata: kbdProperties,
@@ -1682,8 +1679,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           // it clean up its <head> stylesheet links.  This detaches the stylesheet, though.
           kbdObj.shutdown();
 
-          // Now that shutdown is done, re-attach the stylesheet.
-          stylesheetParentElement.appendChild(stylesheet);
+          // Now that shutdown is done, re-attach the stylesheet - but to the layer group.
+          kbd.appendChild(stylesheet);
         } finally {
           insertionObserver.disconnect();
         }
