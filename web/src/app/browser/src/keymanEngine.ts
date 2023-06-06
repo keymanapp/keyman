@@ -40,7 +40,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
   hotkeyManager: HotkeyManager = new HotkeyManager();
   private readonly beepHandler: BeepHandler;
 
-  public readonly helpURL = 'http://help.keyman.com/go';
+  public readonly helpURL = 'https://help.keyman.com/go';
 
   keyEventRefocus = () => {
     this.contextManager.restoreLastActiveTarget();
