@@ -38,5 +38,6 @@
     "eventemitter3": "^4.0.0"
   },
   "main": "./build/obj/index.js",
+  "types": "./build/obj/index.d.ts",
   "type": "module"
 }

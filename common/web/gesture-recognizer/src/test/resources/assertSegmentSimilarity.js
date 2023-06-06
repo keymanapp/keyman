@@ -1,8 +1,6 @@
-const assert = require('chai').assert;
+import { assert } from 'chai';
 
-const GestureRecognizer = require('../../../build/index.js');
-const com = GestureRecognizer.com;
-const PathSegmenter = com.keyman.osk.PathSegmenter;
+import { PathSegmenter, Segment } from '@keymanapp/gesture-recognizer';
 
 /**
  * Defines common assertions for loosely comparing reproduced segments to their original counterparts.
@@ -11,10 +9,10 @@ const PathSegmenter = com.keyman.osk.PathSegmenter;
  * @param {*} rawOriginal The raw version of the original Segment from JSON.parse()
  * @param {*} type The type of Segment to expect.
  */
-const assertSegmentSimilarity = (repro, rawOriginal, type) => {
+export const assertSegmentSimilarity = (repro, rawOriginal, type) => {
   // Complete our deserialization of the original segment in question - needed for
   // clearer, more direct comparisons.
-  const original = new com.keyman.osk.Segment(rawOriginal);
+  const original = new Segment(rawOriginal);
 
   assert.equal(original.type, type, "Test setup issue - unexpected type for original segment");
   assert.equal(repro.type, type, "Reproduced segment of unexpected type");
@@ -29,10 +27,3 @@ const assertSegmentSimilarity = (repro, rawOriginal, type) => {
     assert.isAtLeast(repro.peakSpeed, 0.9 * original.peakSpeed);
   }
 }
-
-(function () {
-  // Lets the function be available both in the browser and in Node.
-  if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-    module.exports = assertSegmentSimilarity;
-  }
-}());

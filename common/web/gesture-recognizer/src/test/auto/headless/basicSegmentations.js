@@ -8,7 +8,7 @@ const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 import {  PathSegmenter } from '@keymanapp/gesture-recognizer';
 import { timedPromise } from '../../../../build/tools/index.js';
 
-describe.only("Basic segmentation cases", function() {
+describe("Basic segmentation cases", function() {
   describe("Single-sample 'sequence'", function() {
     it("expected segment types", function() {
       let spy = sinon.fake();

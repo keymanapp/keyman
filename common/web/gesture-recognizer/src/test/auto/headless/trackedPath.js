@@ -1,21 +1,16 @@
-const assert = require('chai').assert;
-const sinon = require('sinon');
+import { assert } from 'chai'
+import sinon  from 'sinon';
+import fs from 'fs';
 
-const fs = require('fs');
+import { TrackedPath } from '@keymanapp/gesture-recognizer';
 
-const GestureRecognizer = require('../../../../build/index.js');
-const com = GestureRecognizer.com;
-const TrackedPath = com.keyman.osk.TrackedPath;
-
-const timedPromise = require('../../../../build/tools/unit-test-resources.js').timedPromise;
+import { HeadlessRecordingSimulator, timedPromise } from '../../../../build/tools/index.js';
 
 // For the integrated-style recording-based test.
-const Testing = require('../../../../build/tools/unit-test-resources.js');
-const HeadlessRecordingSimulator = Testing.HeadlessRecordingSimulator;
-
 const SEGMENT_TEST_JSON_FOLDER = 'src/test/resources/json/segmentation';
 
-const assertSegmentSimilarity = require('../../resources/assertSegmentSimilarity.js');
+import { assertSegmentSimilarity } from '../../resources/assertSegmentSimilarity.js'
+;
 // End of "for the integrated style..."
 
 describe("TrackedPath", function() {
