@@ -457,13 +457,6 @@ namespace com.keyman.dom {
         osk._Box.addEventListener('touchend',function(e){
           e.stopPropagation();
         }, false);
-
-        // Add a blank DIV to the bottom of the page to allow the bottom of the page to be shown
-        dTrailer=document.createElement('DIV');
-        ds=dTrailer.style;
-        ds.width='100%';
-        ds.height=(screen.width/2)+'px';
-        document.body.appendChild(dTrailer);
       }
 
       //document.body.appendChild(keymanweb._StyleBlock);
