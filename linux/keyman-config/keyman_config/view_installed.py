@@ -257,10 +257,10 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         return vbox
 
     def addlistitems(self, installed_kmp, store, install_area):
+        bmppng = ".bmp.png"  # Icon file extension
+
         for kmp in sorted(installed_kmp):
             kmpdata = installed_kmp[kmp]
-            bmppng = ".bmp.png"  # Icon file extension
-
             path = get_keyboard_dir(install_area, kmpdata['packageID'])
 
             welcome_file = os.path.join(path, "welcome.htm")
@@ -280,7 +280,7 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
                 icofile = GdkPixbuf.Pixbuf.new_from_file_at_size(icofile_name, 16, 16)
             except GError:
                 _, value, _ = sys.exc_info()
-                logging.info("Error reading icon file %s: %s" % (icofile_name, value.message))
+                logging.info(f"Error reading icon file {icofile_name}: {value.message}")
                 icofile = None
 
             store.append([
@@ -320,6 +320,7 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
     def on_tree_selection_changed(self, selection):
         model, treeiter = selection.get_selected()
         if treeiter is not None:
+            # sourcery skip: extract-method
             self.uninstall_button.set_tooltip_text(
                 _("Uninstall keyboard {package}").format(package=model[treeiter][1]))
             self.help_button.set_tooltip_text(
@@ -363,7 +364,7 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             welcome_file = model[treeiter][5]
             if welcome_file and os.path.isfile(welcome_file):
                 uri_path = pathlib.Path(welcome_file).as_uri()
-                logging.info("opening " + uri_path)
+                logging.info(f"opening {uri_path}")
                 w = WelcomeView(self, uri_path, model[treeiter][3])
                 w.run()
                 w.destroy()
@@ -376,8 +377,9 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             logging.info("Open options.htm for %s if available", model[treeiter][1])
             options_file = model[treeiter][6]
             if options_file and os.path.isfile(options_file):
+                # sourcery skip: extract-method
                 uri_path = pathlib.Path(options_file).as_uri()
-                logging.info("opening " + uri_path)
+                logging.info(f"opening {uri_path}")
                 # TODO: Determine keyboardID
                 info = {"optionurl": uri_path, "packageID": model[treeiter][3], "keyboardID": model[treeiter][3]}
                 w = OptionsView(info)
@@ -389,7 +391,7 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
     def on_uninstall_clicked(self, button):
         model, treeiter = self.tree.get_selection().get_selected()
         if treeiter is not None:
-            logging.info("Uninstall keyboard " + model[treeiter][3] + "?")
+            logging.info(f"Uninstall keyboard {model[treeiter][3]}?")
             dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO,
                                        _("Uninstall keyboard package?"))
             msg = _("Are you sure that you want to uninstall the {keyboard} keyboard?").format(
@@ -398,8 +400,7 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             kmpjson = os.path.join(kbdir, "kmp.json")
             if os.path.isfile(kmpjson):
                 info, system, options, keyboards, files = parsemetadata(kmpjson, False)
-                fonts = get_fonts(files)
-                if fonts:
+                if fonts := get_fonts(files):
                     # Fonts are optional
                     fontlist = ""
                     for font in fonts:
@@ -416,10 +417,10 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             response = dialog.run()
             dialog.destroy()
             if response == Gtk.ResponseType.YES:
-                logging.info("Uninstalling keyboard" + model[treeiter][1])
+                logging.info(f"Uninstalling keyboard{model[treeiter][1]}")
                 # can only uninstall with the gui from user area
                 msg = uninstall_kmp(model[treeiter][3])
-                if not msg == '':
+                if msg != '':
                     md = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,
                             Gtk.ButtonsType.OK, _("Uninstalling keyboard failed.\n\nError message: ") + msg)
                     md.run()
@@ -427,16 +428,18 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
                 logging.info("need to restart window after uninstalling a keyboard")
                 self.restart()
             elif response == Gtk.ResponseType.NO:
-                logging.info("Not uninstalling keyboard " + model[treeiter][1])
+                logging.info(f"Not uninstalling keyboard {model[treeiter][1]}")
 
     def on_about_clicked(self, button):
         model, treeiter = self.tree.get_selection().get_selected()
         if treeiter is not None and model[treeiter] is not None:
-            logging.info("Show keyboard details of " + model[treeiter][1])
+            logging.info(f"Show keyboard details of {model[treeiter][1]}")
             areapath = get_keyman_dir(model[treeiter][4])
             kmp = {
-                "name": model[treeiter][1], "version": model[treeiter][2],
-                "packageID": model[treeiter][3], "areapath": areapath
+              "name": model[treeiter][1],
+              "version": model[treeiter][2],
+              "packageID": model[treeiter][3],
+              "areapath": areapath
             }
             w = KeyboardDetailsView(self, kmp)
             w.run()
