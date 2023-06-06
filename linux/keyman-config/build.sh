@@ -29,19 +29,23 @@ clean_action() {
     keyman_config/standards/lang_tags_map.py
 }
 
-build_man_pages() {
+execute_with_temp_schema() {
   local TEMP_DATA_DIR SCHEMA_DIR
   TEMP_DATA_DIR=$(mktemp -d)
-  SCHEMA_DIR=$TEMP_DATA_DIR/glib-2.0/schemas
-  export XDG_DATA_DIRS=$TEMP_DATA_DIR:${XDG_DATA_DIRS-}
+  SCHEMA_DIR="${TEMP_DATA_DIR}/glib-2.0/schemas"
+  export XDG_DATA_DIRS="${TEMP_DATA_DIR}":${XDG_DATA_DIRS-}
   export GSETTINGS_SCHEMA_DIR="${SCHEMA_DIR}"
-  mkdir -p "$SCHEMA_DIR"
-  cp resources/com.keyman.gschema.xml "$SCHEMA_DIR"/
-  glib-compile-schemas "$SCHEMA_DIR"
-  ./build-help.sh --man --no-reconf
+  mkdir -p "${SCHEMA_DIR}"
+  cp resources/com.keyman.gschema.xml "${SCHEMA_DIR}"/
+  glib-compile-schemas "${SCHEMA_DIR}"
+  "$@"
   export XDG_DATA_DIRS=${XDG_DATA_DIRS#*:}
   unset GSETTINGS_SCHEMA_DIR
-  rm -rf "$TEMP_DATA_DIR"
+  rm -rf "${TEMP_DATA_DIR}"
+}
+
+build_man_pages() {
+  execute_with_temp_schema ./build-help.sh --man --no-reconf
 }
 
 build_action() {
@@ -73,18 +77,7 @@ build_action() {
 }
 
 test_action() {
-  local TEMP_DATA_DIR SCHEMA_DIR
-  TEMP_DATA_DIR=$(mktemp -d)
-  SCHEMA_DIR=$TEMP_DATA_DIR/glib-2.0/schemas
-  export XDG_DATA_DIRS=$TEMP_DATA_DIR:${XDG_DATA_DIRS-}
-  export GSETTINGS_SCHEMA_DIR="${SCHEMA_DIR}"
-  mkdir -p "$SCHEMA_DIR"
-  cp resources/com.keyman.gschema.xml "$SCHEMA_DIR"/
-  glib-compile-schemas "$SCHEMA_DIR"
-  ./run-tests.sh
-  export XDG_DATA_DIRS=${XDG_DATA_DIRS#*:}
-  unset GSETTINGS_SCHEMA_DIR
-  rm -rf "$TEMP_DATA_DIR"
+  execute_with_temp_schema ./run-tests.sh
 }
 
 install_action() {
