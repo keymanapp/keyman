@@ -57,24 +57,34 @@ export function build_tran(source_tran: Tran | Bksp, sect_strs: BUILDER_STRS, se
   };
 
   for (let group of source_tran.groups) {
-    tran.groups.push({
-      type: group.type,
-      count: group.reorders.length + group.transforms.length,
-      index: tran.groups.length,
-    });
-    for (let transform of group.transforms) {
-      tran.transforms.push({
-        from: build_strs_index(sect_strs, transform.from),
-        to: build_strs_index(sect_strs, transform.to),
-        mapFrom: build_strs_index(sect_strs, transform.mapFrom),
-        mapTo: build_strs_index(sect_strs, transform.mapTo),
+    if (group.type === constants.tran_group_type_transform) {
+      tran.groups.push({
+        type: group.type,
+        count: group.transforms.length,
+        index: tran.transforms.length, // index of first item
       });
-    }
-    for (let reorder of group.reorders) {
-      tran.reorders.push({
-        elements: build_elem_index(sect_elem, reorder.elements),
-        before: build_elem_index(sect_elem, reorder.before),
+      for (let transform of group.transforms) {
+        tran.transforms.push({
+          from: build_strs_index(sect_strs, transform.from),
+          to: build_strs_index(sect_strs, transform.to),
+          mapFrom: build_strs_index(sect_strs, transform.mapFrom),
+          mapTo: build_strs_index(sect_strs, transform.mapTo),
+        });
+      }
+    } else if (group.type === constants.tran_group_type_reorder) {
+      tran.groups.push({
+        type: group.type,
+        count: group.reorders.length,
+        index: tran.reorders.length, // index of first item
       });
+      for (let reorder of group.reorders) {
+        tran.reorders.push({
+          elements: build_elem_index(sect_elem, reorder.elements),
+          before: build_elem_index(sect_elem, reorder.before),
+        });
+      }
+    } else {
+      throw new Error(`Internal error: at transformGroup #${tran.groups.length + 1}: Unexpected transformGroup type ${group.type}`);
     }
   }
   // now set the sizes
