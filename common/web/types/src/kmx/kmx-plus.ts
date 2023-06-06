@@ -548,7 +548,9 @@ export class KMXPlusFile extends KMXFile {
   public readonly COMP_PLUS_STRS_ITEM: any;
   public readonly COMP_PLUS_STRS: any;
 
-  public readonly COMP_PLUS_TRAN_ITEM: any;
+  public readonly COMP_PLUS_TRAN_GROUP: any;
+  public readonly COMP_PLUS_TRAN_TRANSFORM: any;
+  public readonly COMP_PLUS_TRAN_REORDER: any;
   public readonly COMP_PLUS_TRAN: any;
 
   public readonly COMP_PLUS_VKEY_ITEM: any;
@@ -790,18 +792,33 @@ export class KMXPlusFile extends KMXFile {
 
     // 'tran'
 
-    this.COMP_PLUS_TRAN_ITEM = new r.Struct({
-      from: r.uint32le, //elem
+    this.COMP_PLUS_TRAN_GROUP = new r.Struct({
+      type: r.uint32le, //type of group
+      count: r.uint32le, //number of items
+      index: r.uint32le, //index into subtable
+    });
+
+    this.COMP_PLUS_TRAN_TRANSFORM = new r.Struct({
+      from: r.uint32le, //str
       to: r.uint32le, //str
+      mapFrom: r.uint32le, //elem
+      mapTo: r.uint32le //elem
+    });
+
+    this.COMP_PLUS_TRAN_REORDER = new r.Struct({
+      elements: r.uint32le, //elem
       before: r.uint32le, //elem
-      flags: r.uint32le //bitfield
     });
 
     this.COMP_PLUS_TRAN = new r.Struct({
       ident: r.uint32le,
       size: r.uint32le,
-      count: r.uint32le,
-      items: new r.Array(this.COMP_PLUS_TRAN_ITEM, 'count')
+      groupCount: r.uint32le,
+      transformCount: r.uint32le,
+      reorderCount: r.uint32le,
+      groups: new r.Array(this.COMP_PLUS_TRAN_GROUP, 'groupCount'),
+      transforms: new r.Array(this.COMP_PLUS_TRAN_TRANSFORM, 'transformCount'),
+      reorders: new r.Array(this.COMP_PLUS_TRAN_REORDER, 'reorderCount'),
     });
 
     // 'vars'
@@ -837,9 +854,6 @@ export class KMXPlusFile extends KMXFile {
 
     // Aliases
 
-    this.COMP_PLUS_BKSP_ITEM = this.COMP_PLUS_TRAN_ITEM;
-    // this.COMP_PLUS_FINL_ITEM = this.COMP_PLUS_TRAN_ITEM;
     this.COMP_PLUS_BKSP = this.COMP_PLUS_TRAN;
-    // this.COMP_PLUS_FINL = this.COMP_PLUS_TRAN;
   }
 }

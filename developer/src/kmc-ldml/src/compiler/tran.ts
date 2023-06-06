@@ -117,8 +117,8 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
       result.mapFrom = sections.strs.allocString(mapFrom[1]); // var name
       result.mapTo = sections.strs.allocString(mapTo[1]); // var name
     } else {
-      result.mapFrom = null; // TODO-LDML
-      result.mapTo = null; // TODO-LDML
+      result.mapFrom = sections.strs.allocString(''); // TODO-LDML
+      result.mapTo = sections.strs.allocString(''); // TODO-LDML
     }
 
     cookedFrom = sections.vars.substituteSetRegex(cookedFrom, sections);
