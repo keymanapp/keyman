@@ -504,8 +504,8 @@ export default class Keyboard {
        * (implicit 'NO_CAPS') layer but not a 'caps' layer.  With caps set, it just
        * highlights the key on the 'default' layer instead.
        *
-       * 'Caps' could thus be logical-ORed with 'no-caps' below by mistake.  We should
-       * never have both set at the same time under any condition.
+       * We should never set both `CAPS` and `NO_CAPS` at the same time, and
+       * same for the other modifiers.
        */
       Lkc.Lstates = 0;
       Lkc.Lstates |= stateKeys['K_CAPS']    ? Codes.modifierCodes['CAPS'] : Codes.modifierCodes['NO_CAPS'];

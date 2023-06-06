@@ -35,26 +35,32 @@ describe('InputProcessor', function() {
     it('has expected default values after initialization', function () {
       // Can construct without the second parameter; if so, the final assertion - .mayPredict
       // will be invalidated.  (No worker, no ability to predict.)
-      let core = new InputProcessor(device, Worker.constructInstance());
+      let worker = Worker.constructInstance();
 
-      assert.isOk(core.keyboardProcessor);
-      assert.isDefined(core.keyboardProcessor.contextDevice);
-      assert.isOk(core.languageProcessor);
-      assert.isOk(core.keyboardInterface);
-      assert.isUndefined(core.activeKeyboard); // No keyboard should be loaded yet.
-      assert.isUndefined(core.activeModel);    // Same for the model.
+      try {
+        let core = new InputProcessor(device, worker);
 
-      // These checks are lifted from the keyboard-processor init checks found in
-      // common/web/keyboard-processor/tests/cases/basic-init.js.
-      assert.equal('us', core.keyboardProcessor.baseLayout, 'KeyboardProcessor has unexpected base layout')
-      assert.isNotNull(global.KeymanWeb, 'KeymanWeb global was not automatically installed');
-      assert.equal('default', core.keyboardProcessor.layerId, 'Default layer is not set to "default"');
-      assert.isUndefined(core.keyboardProcessor.activeKeyboard, 'Initialized with already-active keyboard');
+        assert.isOk(core.keyboardProcessor);
+        assert.isDefined(core.keyboardProcessor.contextDevice);
+        assert.isOk(core.languageProcessor);
+        assert.isOk(core.keyboardInterface);
+        assert.isUndefined(core.activeKeyboard); // No keyboard should be loaded yet.
+        assert.isUndefined(core.activeModel);    // Same for the model.
 
-      // Lifted from languageProcessor.js - the core should not be changing these with its init.
-      assert.isUndefined(core.languageProcessor.activeModel);
-      assert.isFalse(core.languageProcessor.isActive);
-      assert.isTrue(core.languageProcessor.mayPredict);
+        // These checks are lifted from the keyboard-processor init checks found in
+        // common/web/keyboard-processor/tests/cases/basic-init.js.
+        assert.equal('us', core.keyboardProcessor.baseLayout, 'KeyboardProcessor has unexpected base layout')
+        assert.isNotNull(global.KeymanWeb, 'KeymanWeb global was not automatically installed');
+        assert.equal('default', core.keyboardProcessor.layerId, 'Default layer is not set to "default"');
+        assert.isUndefined(core.keyboardProcessor.activeKeyboard, 'Initialized with already-active keyboard');
+
+        // Lifted from languageProcessor.js - the core should not be changing these with its init.
+        assert.isUndefined(core.languageProcessor.activeModel);
+        assert.isFalse(core.languageProcessor.isActive);
+        assert.isTrue(core.languageProcessor.mayPredict);
+      } finally {
+        worker.terminate();
+      }
     });
   });
 
