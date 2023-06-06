@@ -223,7 +223,7 @@ export default class KeymanEngine<
         });
 
         // If this is the first stub loaded, set it as active.
-        if(this.keyboardRequisitioner.cache.defaultStub == stub) {
+        if(this.config.activateFirstKeyboard && this.keyboardRequisitioner.cache.defaultStub == stub) {
           // Note:  leaving this out is super-useful for debugging issues that occur when no keyboard is active.
           this.contextManager.activateKeyboard(stub.id, stub.langId, true);
         }

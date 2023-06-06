@@ -558,29 +558,16 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   _CommonFocusHelper(outputTarget: OutputTarget<any>): boolean {
     const focusAssistant = this.focusAssistant;
 
-    // if(target.ownerDocument && target instanceof target.ownerDocument.defaultView.HTMLIFrameElement) {
-    //   if(!this.keyman.domManager._IsEditableIframe(target, 1)) {
-    //     DOMEventHandlers.states._DisableInput = true;
-    //     return true;
-    //   }
-    // }
-    // DOMEventHandlers.states._DisableInput = false;
-
-    // const outputTarget = dom.Utils.getOutputTarget(target);
-
     let activeKeyboard = this.activeKeyboard?.keyboard;
     if(!focusAssistant.restoringFocus) {
       outputTarget?.deadkeys().clear();
       activeKeyboard?.notify(0, outputTarget, 1);  // I2187
     }
 
-    //if(!focusAssistant.restoringFocus && DOMEventHandlers.states._SelectionControl != target) {
     if(!focusAssistant.restoringFocus && this.mostRecentTarget != outputTarget) {
       focusAssistant.maintainingFocus = false;
     }
     focusAssistant.restoringFocus = false;
-
-    //DOMEventHandlers.states._SelectionControl = target; // effectively was .mostRecentTarget, as best as I can tell.
 
     // Now that we've fully entered the new context, invalidate the context so we can generate initial predictions from it.
     // (Note that the active keyboard will have been updated by a method called before this one; the newly-focused
@@ -710,6 +697,24 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   };
 
   /**
+   * Gets the 'saved keyboard' cookie value for the last keyboard used in the
+   * iser's previous session.
+   **/
+  getSavedKeyboardRaw(): string {
+    const cookie = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
+    var v = cookie.load(decodeURIComponent);
+
+    if(typeof(v.current) != 'string') {
+      return 'Keyboard_us:en';
+    } else if(v.current == 'Keyboard_us:eng') {
+      // 16.0 used the :eng variant!
+      return 'Keyboard_us:en';
+    } else {
+      return v.current;
+    }
+  }
+
+  /**
    * Gets the cookie for the name and language code of the most recently active keyboard
    *
    *  Defaults to US English, but this needs to be user-set in later revision (TODO)
@@ -717,12 +722,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    * @return      {string}          InternalName:LanguageCode
    **/
   getSavedKeyboard(): string {
-    const cookie = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
-    var v = cookie.load(decodeURIComponent);
-
-    if(typeof(v.current) != 'string') {
-      return 'Keyboard_us:eng';
-    }
+    let cookieValue = this.getSavedKeyboardRaw();
 
     // Check that the requested keyboard is included in the available keyboard stubs
     const stubs = this.keyboardCache.getStubList()
@@ -730,7 +730,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     for(let n=0; n<stubs.length; n++) {
       kd=stubs[n]['KI']+':'+stubs[n]['KLC'];
-      if(kd == v.current) {
+      if(kd == cookieValue) {
         return kd;
       }
     }
@@ -738,7 +738,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     // Default to US English if available (but don't assume it is first)
     for(let n=0; n<stubs.length; n++) {
       kd=stubs[n]['KI']+':'+stubs[n]['KLC'];
-      if(kd == 'Keyboard_us:eng') {
+      if(kd == 'Keyboard_us:en') {
         return kd;
       }
     }
@@ -749,7 +749,29 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
 
     // Or US English if no stubs loaded (should never happen)
-    return 'Keyboard_us:eng';
+    return 'Keyboard_us:en';
+  }
+
+  /**
+   * Restore the most recently used keyboard, if still available
+   */
+  restoreSavedKeyboard(kbd) {
+    // If no saved keyboard, defaults to US English
+    const d=kbd;
+
+    // Identify the stub with the saved keyboard
+    let t=d.split(':');
+    if(t.length < 2) {
+      t[1]='';
+    }
+
+    // Find the matching stub; if it doesn't exist, default to the first available stub.
+    let stub = this.keyboardCache.getStub(t[0], t[1]) || this.keyboardCache.defaultStub;
+
+    // Sets the default stub (as specified with the `getSavedKeyboard` call) as active.
+    if(stub) {
+      this.activateKeyboard(t[0], t[1]);
+    }
   }
 
   /**

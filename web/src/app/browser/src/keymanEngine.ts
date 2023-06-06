@@ -154,6 +154,10 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
       isEmbedded: false
     };
 
+    // Capture the saved-keyboard string now, before we load any keyboards/stubs
+    // or do anything that would mutate the value.
+    const savedKeyboardStr = this.contextManager.getSavedKeyboardRaw();
+
     let osk: OSKView;
     if(device.touchable) {
       this.osk = new AnchoredOSKView(oskConfig);
@@ -177,6 +181,16 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     }
 
     this._initialized = 2;
+
+    // Let any deferred, pre-init stubs complete registration
+    await Promise.resolve();
+
+    // Attempt to restore the user's last-used keyboard from their previous session.
+    //
+    // Note:  any cloud stubs will probably not be available yet.
+    // If we tracked cloud requests and awaited a Promise.all on pending queries,
+    // we could handle that too.
+    this.contextManager.restoreSavedKeyboard(savedKeyboardStr);
   }
 
   get register(): (x: CloudQueryResult) => void {
@@ -302,11 +316,13 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *  @returns {Promise<(KeyboardStub|ErrorStub)[]>} Promise of added keyboard/error stubs
    **/
   addKeyboardsForLanguage(arg: string[]|string) : Promise<(KeyboardStub|ErrorStub)[]> {
-    if (typeof arg === 'string') {
-      return this.keyboardRequisitioner.addLanguageKeyboards(arg.split(',').map(item => item.trim()));
-    } else {
-      return this.keyboardRequisitioner.addLanguageKeyboards(arg);
-    }
+    return this.config.deferForInitialization.then(() => {
+      if (typeof arg === 'string') {
+        return this.keyboardRequisitioner.addLanguageKeyboards(arg.split(',').map(item => item.trim()));
+      } else {
+        return this.keyboardRequisitioner.addLanguageKeyboards(arg);
+      }
+    });
   }
 
   /**
