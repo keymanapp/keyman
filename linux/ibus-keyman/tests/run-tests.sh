@@ -126,7 +126,7 @@ function run_tests() {
   export XDG_DATA_DIRS=$TEMP_DATA_DIR:$XDG_DATA_DIRS
 
   mkdir -p $SCHEMA_DIR
-  cp ${TOP_SRCDIR}/../keyman-config/com.keyman.gschema.xml $SCHEMA_DIR/
+  cp ${TOP_SRCDIR}/../keyman-config/resources/com.keyman.gschema.xml $SCHEMA_DIR/
   glib-compile-schemas $SCHEMA_DIR
 
   if [ $# -gt 0 ]; then

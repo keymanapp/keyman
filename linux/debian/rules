@@ -36,6 +36,7 @@ override_dh_auto_configure:
 	# keyman-config
 
 override_dh_auto_build:
+	cp linux/keyman-config/resources/keyman.sharedmimeinfo debian/
 	# keymankeyboardprocessor
 	cd core && ./build.sh build
 	# ibus-keyman
