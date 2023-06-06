@@ -33,6 +33,12 @@ export function makePathToFixture(...components: string[]): string {
 
 export const compilerTestCallbacks = new TestCompilerCallbacks();
 
+export const compilerTestOptions: CompilerOptions = {
+  readerOptions: {
+    importsPath: fileURLToPath(LDMLKeyboardXMLSourceFileReader.defaultImportsURL)
+  }
+};
+
 beforeEach(function() {
   compilerTestCallbacks.clear();
 });
@@ -50,7 +56,7 @@ export async function loadSectionFixture(compilerClass: typeof SectionCompiler, 
   const data = callbacks.loadFile(inputFilename);
   assert.isNotNull(data, `Failed to read file ${inputFilename}`);
 
-  const reader = new LDMLKeyboardXMLSourceFileReader(callbacks);
+  const reader = new LDMLKeyboardXMLSourceFileReader(compilerTestOptions.readerOptions, callbacks);
   const source = reader.load(data);
   assert.isNotNull(source, `Failed to load XML from ${inputFilename}`);
 

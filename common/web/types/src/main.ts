@@ -13,9 +13,9 @@ export * as KvksFile from './kvk/kvk-file.js';
 
 export * as LDMLKeyboard from './ldml-keyboard/ldml-keyboard-xml.js';
 export { LDMLKeyboardTestDataXMLSourceFile } from './ldml-keyboard/ldml-keyboard-testdata-xml.js';
-export { default as LDMLKeyboardXMLSourceFileReader } from './ldml-keyboard/ldml-keyboard-xml-reader.js';
 export { UnicodeSetParser, UnicodeSet } from './ldml-keyboard/unicodeset-parser-api.js';
 export { VariableParser, MarkerParser } from './ldml-keyboard/pattern-parser.js';
+export { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions } from './ldml-keyboard/ldml-keyboard-xml-reader.js';
 
 export * as Constants from './consts/virtual-key-constants.js';
 

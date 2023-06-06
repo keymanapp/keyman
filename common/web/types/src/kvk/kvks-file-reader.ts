@@ -7,12 +7,6 @@ import { VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKey, VisualKey
 import { USVirtualKeyCodes } from '../consts/virtual-key-constants.js';
 import { BUILDER_KVK_HEADER_VERSION } from './kvk-file.js';
 
-export enum KVKSParseErrorType { invalidVkey };
-export class KVKSParseError extends Error {
-  public type: KVKSParseErrorType;
-  public vkey: string;
-};
-
 export default class KVKSFileReader {
   public read(file: Uint8Array): KVKSourceFile {
     let source: KVKSourceFile;
@@ -33,10 +27,19 @@ export default class KVKSFileReader {
       // rather than using the version tagged on npmjs.com.
     });
 
-    parser.parseString(file, (e: unknown, r: unknown) => { source = r as KVKSourceFile });
-    source = this.boxArrays(source);
-    this.cleanupUnderscore('visualkeyboard', source.visualkeyboard);
+    parser.parseString(file, (e: unknown, r: unknown) => { if(e) { throw e }; source = r as KVKSourceFile });
+    if(source) {
+      source = this.boxArrays(source);
+      this.cleanupFlags(source);
+      this.cleanupUnderscore('visualkeyboard', source.visualkeyboard);
+    }
     return source;
+  }
+
+  private cleanupFlags(source: any) {
+    if(source.visualkeyboard?.header?.flags === '') {
+      source.visualkeyboard.header.flags = {};
+    }
   }
 
   /**
@@ -65,15 +68,15 @@ export default class KVKSFileReader {
     }
   }
 
-  public validate(source: KVKSourceFile, schemaBuffer: Buffer): void {
-    const schema = JSON.parse(schemaBuffer.toString('utf8'));
+  public validate(source: KVKSourceFile, schemaBuffer: Uint8Array): void {
+    const schema = JSON.parse(new TextDecoder().decode(schemaBuffer));
     const ajv = new Ajv();
     if(!ajv.validate(schema, source)) {
       throw new Error(ajv.errorsText());
     }
   }
 
-  public transform(source: KVKSourceFile, errors?: KVKSParseError[]): VisualKeyboard {
+  public transform(source: KVKSourceFile, invalidVkeys?: string[]): VisualKeyboard {
     // NOTE: at this point, the xml should have been validated
     // and matched the schema result so we can assume properties exist
     let result: VisualKeyboard = {
@@ -111,11 +114,8 @@ export default class KVKSFileReader {
         for(let sourceKey of layer.key) {
           let vkey = (USVirtualKeyCodes as any)[sourceKey.$?.vkey];
           if(!vkey) {
-            if(errors) {
-              let e = new KVKSParseError();
-              e.type = KVKSParseErrorType.invalidVkey;
-              e.vkey = sourceKey.$?.vkey;
-              errors.push(e);
+            if(typeof invalidVkeys !== 'undefined') {
+              invalidVkeys.push(sourceKey.$?.vkey);
             }
             continue;
           }

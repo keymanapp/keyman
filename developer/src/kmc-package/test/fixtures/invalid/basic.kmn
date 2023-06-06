@@ -1,0 +1,6 @@
+store(&name) 'basic desktop-only kmx'
+store(&keyboardversion) '1.0'
+
+begin unicode > use(main)
+
+group(main) using keys

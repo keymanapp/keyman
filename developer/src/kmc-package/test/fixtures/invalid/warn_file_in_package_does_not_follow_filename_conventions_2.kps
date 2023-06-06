@@ -8,7 +8,7 @@
     <Name URL="">SENĆOŦEN (Saanich Dialect) Lexical Model</Name>
     <Copyright URL="">© 2019 National Research Council Canada</Copyright>
     <Author URL="mailto:Eddie.Santos@nrc-cnrc.gc.ca">Eddie Antonio Santos</Author>
-    <Version>1.3</Version>
+    <Version>1.0</Version>
   </Info>
   <Files>
     <File>
@@ -20,7 +20,7 @@
     </File>
     <File>
       <!-- extension should not have capitals -->
-      <Name>khmer_angkor.kmx</Name>
+      <Name>basic.kmx</Name>
       <Description>Keyboard my special keyboard</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
@@ -29,7 +29,7 @@
   <Keyboards>
     <Keyboard>
       <Name>Khmer Angkor</Name>
-      <ID>khmer_angkor</ID>
+      <ID>basic</ID>
       <Version>1.3</Version>
       <Languages>
         <Language ID="km">Central Khmer (Khmer, Cambodia)</Language>

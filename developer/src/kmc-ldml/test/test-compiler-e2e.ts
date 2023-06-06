@@ -2,7 +2,7 @@ import 'mocha';
 import {assert} from 'chai';
 import x_hextobin from '@keymanapp/hextobin';
 import { KMXBuilder } from '@keymanapp/common-types';
-import {checkMessages, compileKeyboard, makePathToFixture} from './helpers/index.js';
+import {checkMessages, compileKeyboard, compilerTestOptions, makePathToFixture} from './helpers/index.js';
 
 const hextobin = (x_hextobin as any).default;
 
@@ -17,7 +17,7 @@ describe('compiler-tests', function() {
     const binaryFilename = makePathToFixture('basic.txt');
 
     // Compile the keyboard
-    const kmx = await compileKeyboard(inputFilename, {debug: true, addCompilerVersion: false});
+    const kmx = await compileKeyboard(inputFilename, {...compilerTestOptions, debug: true, addCompilerVersion: false});
     assert.isNotNull(kmx);
 
     // Use the builder to generate the binary output file

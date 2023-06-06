@@ -41,16 +41,14 @@ export const SECTION_COMPILERS = [
 
 export class LdmlKeyboardCompiler {
   private readonly callbacks: CompilerCallbacks;
-  // private readonly options: CompilerOptions; // not currently used
+  private readonly options: CompilerOptions;
 
-  constructor (callbacks: CompilerCallbacks, _options?: CompilerOptions) {
-    /*
+  constructor (callbacks: CompilerCallbacks, options: CompilerOptions) {
     this.options = {
       debug: false,
       addCompilerVersion: true,
       ...options
     };
-    */
     this.callbacks = callbacks;
   }
 
@@ -65,7 +63,7 @@ export class LdmlKeyboardCompiler {
    * @returns the source file, or null if invalid
    */
   public load(filename: string): LDMLKeyboardXMLSourceFile | null {
-    const reader = new LDMLKeyboardXMLSourceFileReader(this.callbacks);
+    const reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, this.callbacks);
     const data = this.callbacks.loadFile(filename);
     if(!data) {
       this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to read XML file'}));
@@ -95,7 +93,7 @@ export class LdmlKeyboardCompiler {
    * @returns the source file, or null if invalid
    */
     public loadTestData(filename: string): LDMLKeyboardTestDataXMLSourceFile | null {
-      const reader = new LDMLKeyboardXMLSourceFileReader(this.callbacks);
+      const reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, this.callbacks);
       const data = this.callbacks.loadFile(filename);
       if(!data) {
         this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to read XML file'}));
