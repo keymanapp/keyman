@@ -6,7 +6,7 @@ const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 
 import { ConstructingSegment, SegmentClassifier } from '@keymanapp/gesture-recognizer';
 
-import { TouchpathTurtle } from '../../../../build/tools/index.js';
+import { TouchpathTurtle } from '../../../../build/tools/obj/index.js';
 
 describe("Iterative Segment Construction (ConstructingSegment)", function() {
   describe("constructor()", function() {

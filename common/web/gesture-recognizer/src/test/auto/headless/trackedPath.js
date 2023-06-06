@@ -4,7 +4,7 @@ import fs from 'fs';
 
 import { TrackedPath } from '@keymanapp/gesture-recognizer';
 
-import { HeadlessRecordingSimulator, timedPromise } from '../../../../build/tools/index.js';
+import { HeadlessRecordingSimulator, timedPromise } from '../../../../build/tools/obj/index.js';
 
 // For the integrated-style recording-based test.
 const SEGMENT_TEST_JSON_FOLDER = 'src/test/resources/json/segmentation';

@@ -12,7 +12,7 @@
     "types": ["node"],
     "lib": ["DOM", "es6"],
     "baseUrl": "./",
-    "outDir": "../../../build/tools/",
+    "outDir": "../../../build/tools/obj",
     "tsBuildInfoFile": "../../../build/tools/tsconfig.tsbuildinfo",
     "rootDir": "./src"
   },

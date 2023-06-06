@@ -25,8 +25,8 @@ builder_describe "Builds the gesture-recognition model for Web-based on-screen k
 builder_describe_outputs \
   configure:module /node_modules \
   configure:tools  /node_modules \
-  build:module     build/obj/index.js \
-  build:tools      build/tools/index.js
+  build:module     build/lib/index.mjs \
+  build:tools      build/tools/lib/index.mjs
 
 builder_parse "$@"
 
@@ -47,6 +47,7 @@ fi
 if builder_start_action build:module; then
   # Build
   npm run build -- $builder_verbose
+  node build-bundler.js
   builder_finish_action success build:module
 fi
 

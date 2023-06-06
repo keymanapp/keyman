@@ -6,7 +6,7 @@ const promiseStatus       = PromiseStatusModule.promiseStatus;
 const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 
 import {  PathSegmenter } from '@keymanapp/gesture-recognizer';
-import { timedPromise } from '../../../../build/tools/index.js';
+import { timedPromise } from '../../../../build/tools/obj/index.js';
 
 describe("Basic segmentation cases", function() {
   describe("Single-sample 'sequence'", function() {

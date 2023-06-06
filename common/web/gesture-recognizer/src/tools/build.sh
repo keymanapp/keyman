@@ -76,5 +76,8 @@ fi
 
 if builder_start_action build :test-module; then
   npm run tsc -- -b "$THIS_SCRIPT_PATH/unit-test-resources/tsconfig.json"
+  cd unit-test-resources
+  node build-bundler.js
+  cd ..
   builder_finish_action success build :test-module
 fi

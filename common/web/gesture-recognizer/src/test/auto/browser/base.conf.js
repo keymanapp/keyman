@@ -36,8 +36,8 @@ module.exports = {
 
   // list of files / patterns to load in the browser
   files: [
-    'build/index.js', // The primary gesture-recognizer script.
-    {pattern: 'build/index.js.map', watched: true, served: true, included: false},
+    'build/lib/index.mjs', // The primary gesture-recognizer script.
+    {pattern: 'build/lib/index.mjs.map', watched: true, served: true, included: false, module: true},
     'build/tools/unit-test-resources.js', // The primary unit-test-resources script.
     {pattern: 'build/tools/unit-test-resources.js.map', watched: true, served: true, included: false},
 
