@@ -24,6 +24,16 @@ export default abstract class OutputTarget<EventMap extends EventEmitter.ValidEv
   }
 
   /**
+   * Denotes when the represented element is forcing a text scroll via focus manipulation.
+   * As the intent is not to change the focused element, but just to have the browser update
+   * the scroll location, standard focus handlers (for updating the active context) should
+   * not deactivate the element while this state is active.
+   */
+  isForcingScroll(): boolean {
+    return false;
+  }
+
+  /**
    * A helper method for doInputEvent; creates a simple common event and default dispatching.
    * @param elem
    */
