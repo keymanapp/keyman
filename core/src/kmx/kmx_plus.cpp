@@ -368,7 +368,9 @@ COMP_KMXPLUS_ELEM_ELEMENT::get_string() const {
 
 bool
 COMP_KMXPLUS_TRAN::valid(KMX_DWORD _kmn_unused(length)) const {
-  if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
+  if (header.size < sizeof(*this) + (sizeof(COMP_KMXPLUS_TRAN_GROUP) * groupCount) +
+                        (sizeof(COMP_KMXPLUS_TRAN_TRANSFORM) * transformCount) +
+                        (sizeof(COMP_KMXPLUS_TRAN_REORDER) * reorderCount)) {
     DebugLog("header.size < expected size");
     assert(false);
     return false;
@@ -908,6 +910,17 @@ KMX_DWORD COMP_KMXPLUS_STRS::find(const std::u16string& s) const {
     }
   }
   return 0; // not found
+}
+
+bool
+COMP_KMXPLUS_VARS::valid(KMX_DWORD _kmn_unused(length)) const {
+  if (header.size < sizeof(*this)
+      + (varCount  * sizeof(COMP_KMXPLUS_VARS_ITEM))) {
+    DebugLog("header.size < expected size");
+    assert(false);
+    return false;
+  }
+  return true;
 }
 
 

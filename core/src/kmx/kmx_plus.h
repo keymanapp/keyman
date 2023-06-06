@@ -213,29 +213,6 @@ static_assert(sizeof(struct COMP_KMXPLUS_NAME) % 0x4 == 0, "Structs prior to var
 static_assert(sizeof(struct COMP_KMXPLUS_NAME) == LDML_LENGTH_NAME, "mismatched size of section name");
 
 /* ------------------------------------------------------------------
- * ordr section
-   ------------------------------------------------------------------ */
-
-struct COMP_KMXPLUS_ORDR_ENTRY {
-    KMXPLUS_ELEM elements;
-    KMXPLUS_ELEM before;
-};
-
-struct COMP_KMXPLUS_ORDR {
-  static const KMX_DWORD IDENT = LDML_SECTIONID_ORDR;
-  COMP_KMXPLUS_HEADER header;
-  KMX_DWORD count;
-  COMP_KMXPLUS_ORDR_ENTRY entries[];
-  /**
-   * @brief True if section is valid.
-   */
-  bool valid(KMX_DWORD length) const;
-};
-
-static_assert(sizeof(struct COMP_KMXPLUS_ORDR) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");
-static_assert(sizeof(struct COMP_KMXPLUS_ORDR) == LDML_LENGTH_ORDR, "mismatched size of section ordr");
-
-/* ------------------------------------------------------------------
  * strs section
    ------------------------------------------------------------------ */
 
@@ -277,19 +254,35 @@ static_assert(sizeof(struct COMP_KMXPLUS_STRS) == LDML_LENGTH_STRS, "mismatched 
  * tran section
    ------------------------------------------------------------------ */
 
-struct COMP_KMXPLUS_TRAN_ENTRY {
-    KMXPLUS_ELEM from;
-    KMXPLUS_STR to;
-    KMXPLUS_ELEM before;
-    KMX_DWORD flags;
+
+struct COMP_KMXPLUS_TRAN_GROUP {
+    KMX_DWORD type;
+    KMX_DWORD count;
+    KMX_DWORD index;
 };
 
+struct COMP_KMXPLUS_TRAN_TRANSFORM {
+    KMXPLUS_STR from;
+    KMXPLUS_STR to;
+    KMXPLUS_ELEM mapFrom;
+    KMXPLUS_ELEM mapTo;
+};
+
+struct COMP_KMXPLUS_TRAN_REORDER {
+    KMXPLUS_ELEM elements;
+    KMXPLUS_ELEM before;
+};
 
 struct COMP_KMXPLUS_TRAN {
   static const KMX_DWORD IDENT = LDML_SECTIONID_TRAN;
   COMP_KMXPLUS_HEADER header;
-  KMX_DWORD count;
-  COMP_KMXPLUS_TRAN_ENTRY entries[];
+  KMX_DWORD groupCount;
+  KMX_DWORD transformCount;
+  KMX_DWORD reorderCount;
+  // Variable part:
+  // COMP_KMXPLUS_TRAN_GROUP groups[]
+  // COMP_KMXPLUS_TRAN_TRANSFORM transforms[]
+  // COMP_KMXPLUS_TRAN_REORDER reorders[]
   /**
    * @brief True if section is valid.
    */
@@ -298,6 +291,36 @@ struct COMP_KMXPLUS_TRAN {
 
 static_assert(sizeof(struct COMP_KMXPLUS_TRAN) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");
 static_assert(sizeof(struct COMP_KMXPLUS_TRAN) == LDML_LENGTH_TRAN, "mismatched size of section tran");
+static_assert(sizeof(struct COMP_KMXPLUS_TRAN_GROUP) == LDML_LENGTH_TRAN_GROUP, "mismatched size of tran group");
+static_assert(sizeof(struct COMP_KMXPLUS_TRAN_TRANSFORM) == LDML_LENGTH_TRAN_TRANSFORM, "mismatched size of tran transform");
+static_assert(sizeof(struct COMP_KMXPLUS_TRAN_REORDER) == LDML_LENGTH_TRAN_REORDER, "mismatched size of tran reorder");
+
+/* ------------------------------------------------------------------
+ * vkey section
+   ------------------------------------------------------------------ */
+
+struct COMP_KMXPLUS_VARS_ITEM {
+    KMX_DWORD type;
+    KMX_DWORD id;
+    KMX_DWORD value;
+    KMX_DWORD elem;
+};
+
+struct COMP_KMXPLUS_VARS {
+  static const KMX_DWORD IDENT = LDML_SECTIONID_VARS;
+  COMP_KMXPLUS_HEADER header;
+  KMX_DWORD markers;
+  KMX_DWORD varCount;
+  COMP_KMXPLUS_VARS_ITEM varEntries[];
+  /**
+   * @brief True if section is valid.
+   */
+  bool valid(KMX_DWORD length) const;
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_VARS) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");
+static_assert(sizeof(struct COMP_KMXPLUS_VARS) == LDML_LENGTH_VARS, "mismatched size of section vars");
+static_assert(sizeof(struct COMP_KMXPLUS_VARS_ITEM) == LDML_LENGTH_VARS_ITEM, "mismatched size of vars item");
 
 /* ------------------------------------------------------------------
  * vkey section
