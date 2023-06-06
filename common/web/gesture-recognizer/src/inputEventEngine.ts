@@ -1,4 +1,4 @@
-import { EventEmitter } from "eventemitter3";
+import EventEmitter from "eventemitter3";
 import { GestureRecognizerConfiguration } from "./gestureRecognizerConfiguration.js";
 import { InputSample } from "./inputSample.js";
 import { Nonoptional } from "./nonoptional.js";

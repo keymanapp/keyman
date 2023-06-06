@@ -1,4 +1,4 @@
-import { EventEmitter } from "eventemitter3";
+import EventEmitter from "eventemitter3";
 import { GestureRecognizerConfiguration } from "./gestureRecognizerConfiguration.js";
 import { MouseEventEngine } from "./mouseEventEngine.js";
 import { Mutable } from "./mutable.js";

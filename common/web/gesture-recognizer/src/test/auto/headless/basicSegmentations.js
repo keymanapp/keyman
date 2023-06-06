@@ -1,17 +1,14 @@
-const assert = require('chai').assert;
-const sinon = require('sinon');
+import { assert } from 'chai'
+import sinon  from 'sinon';
 
-const PromiseStatusModule = require('promise-status-async');
+import * as PromiseStatusModule from 'promise-status-async';
 const promiseStatus       = PromiseStatusModule.promiseStatus;
 const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 
-const GestureRecognizer = require('../../../../build/index.js');
-const com = GestureRecognizer.com;
-const PathSegmenter = com.keyman.osk.PathSegmenter;
+import {  PathSegmenter } from '@keymanapp/gesture-recognizer';
+import { timedPromise } from '../../../../build/tools/index.js';
 
-const timedPromise = require('../../../../build/tools/unit-test-resources.js').timedPromise;
-
-describe("Basic segmentation cases", function() {
+describe.only("Basic segmentation cases", function() {
   describe("Single-sample 'sequence'", function() {
     it("expected segment types", function() {
       let spy = sinon.fake();

@@ -1,4 +1,4 @@
-import { EventEmitter } from "eventemitter3";
+import EventEmitter from "eventemitter3";
 import { InputSample } from "./inputSample.js";
 import { PathSegmenter } from "./pathSegmenter.js";
 import { Segment } from "./segment.js";

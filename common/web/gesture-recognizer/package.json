@@ -37,5 +37,6 @@
   "dependencies": {
     "eventemitter3": "^4.0.0"
   },
-  "main": "./build/obj/index.js"
+  "main": "./build/obj/index.js",
+  "type": "module"
 }

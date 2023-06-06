@@ -69,7 +69,7 @@ if builder_start_action build :recorder; then
   # Thanks to https://stackoverflow.com/a/10107668 for this tidbit.
   # Searches for FIXTURE_TARGET above and replaces it with the actual fixture!
   pushd recorder >/dev/null
-  node update-index.js build/index.html
+  node update-index.cjs build/index.html
   popd >/dev/null
   builder_finish_action success build :recorder
 fi
