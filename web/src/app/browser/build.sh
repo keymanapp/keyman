@@ -41,13 +41,22 @@ builder_describe_outputs \
 #### Build action definitions ####
 
 compile_and_copy() {
-  compile $SUBPROJECT_NAME
+  local COMPILE_FLAGS=
+  if builder_has_option --ci; then
+    COMPILE_FLAGS=--ci
+  fi
+  compile $SUBPROJECT_NAME $COMPILE_FLAGS
 
   mkdir -p "$KEYMAN_ROOT/web/build/app/resources/osk"
   cp -R "$KEYMAN_ROOT/web/src/resources/osk/." "$KEYMAN_ROOT/web/build/app/resources/osk/"
 
   # Update the build/publish copy of our build artifacts
   prepare
+
+  local PROFILE_DEST="$KEYMAN_ROOT/web/build/profiling/"
+  mkdir -p "$PROFILE_DEST"
+  cp "$KEYMAN_ROOT/web/build/app/browser/filesize-profile.log"      "$PROFILE_DEST/web-engine-filesize.log"
+  cp "$KEYMAN_ROOT/common/web/lm-worker/build/filesize-profile.log" "$PROFILE_DEST/lm-worker-filesize.log"
 }
 
 builder_run_action configure verify_npm_setup

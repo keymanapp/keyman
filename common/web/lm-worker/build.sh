@@ -28,6 +28,8 @@ WORKER_OUTPUT_FILENAME=build/lib/worker-main.js
 builder_describe \
   "Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications." \
   "@/common/web/keyman-version" \
+  "@/common/models/wordbreakers" \
+  "@/common/models/templates" \
   "@/common/tools/sourcemap-path-remapper" \
   configure clean build test --ci
 
@@ -56,9 +58,13 @@ if builder_start_action build; then
   # Build worker with tsc first
   tsc -b $builder_verbose || builder_die "Could not build worker."
 
+  EXT_FLAGS=
+  if builder_has_option --ci; then
+    EXT_FLAGS=--ci
+  fi
 
   echo "Bundling worker modules"
-  node build-bundler.js
+  node build-bundler.js "$EXT_FLAGS"
 
   # Declaration bundling.
   npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/index.d.ts
