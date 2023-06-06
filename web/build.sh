@@ -102,11 +102,6 @@ builder_run_child_actions build:samples
 
 builder_run_child_actions test
 
-if builder_has_action build:app/browser; then
-  builder_warn "Modularization work is not yet complete; consumers may find needed API or components to be missing"
-fi
-
-###--- If #8831 gets accepted, change to `test:project` rather than just `test`. ---###
 if builder_start_action test; then
   TEST_OPTS=
   if builder_has_option --ci; then
