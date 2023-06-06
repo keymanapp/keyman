@@ -27,6 +27,7 @@ import { outputTargetForElement } from '../../../../build/engine/attachment/obj/
 import { UtilApiEndpoint} from './utilApiEndpoint.js';
 import { UIModule } from './uiModuleInterface.js';
 import { HotkeyManager } from './hotkeyManager.js';
+import { BeepHandler } from './beepHandler.js';
 
 export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {
   touchLanguageMenu?: LanguageMenu;
@@ -37,6 +38,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
 
   private _ui: UIModule;
   hotkeyManager: HotkeyManager = new HotkeyManager();
+  private readonly beepHandler: BeepHandler;
 
   keyEventRefocus = () => {
     this.contextManager.restoreLastActiveTarget();
@@ -47,6 +49,8 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
 
     super(worker, config, new ContextManager(config, () => this.legacyAPIEvents));
     this._util = new UtilApiEndpoint(config);
+    this.beepHandler = new BeepHandler(this.core.keyboardInterface);
+    this.core.keyboardProcessor.beepHandler = () => this.beepHandler.beep(this.contextManager.activeTarget);
 
     this.hardKeyboard = new HardwareEventKeyboard(config.hardDevice, this.core.keyboardProcessor, this.contextManager);
 

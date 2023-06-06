@@ -288,8 +288,6 @@ namespace com.keyman {
       this.domManager.moveToElement(e);
     }
 
-    // Functions that might be added later
-    ['beepKeyboard']: () => void;
     /**
      * @param {number}  dn  Number of pre-caret characters to delete
      * @param {string}  s   Text to insert
