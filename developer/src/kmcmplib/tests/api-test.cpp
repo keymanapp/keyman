@@ -18,32 +18,20 @@
 #include <kmn_compiler_errors.h>
 #include "../src/compfile.h"
 #include <test_assert.h>
+#include "util_filesystem.h"
+#include "util_callbacks.h"
 
 void setup();
-void test_kmcmp_CompileKeyboardFile();
-void test_kmcmp_CompileKeyboardFileToBuffer();
-
-std::vector<int> error_vec;
-
-int msgproc(int line, uint32_t dwMsgCode, char* szText, void* context) {
-  error_vec.push_back(dwMsgCode);
-  const char*t = "unknown";
-  switch(dwMsgCode & 0xF000) {
-    case CERR_HINT:    t="   hint"; break;
-    case CERR_WARNING: t="warning"; break;
-    case CERR_ERROR:   t="  error"; break;
-    case CERR_FATAL:   t="  fatal"; break;
-  }
-  printf("line %d  %s %04.4x:  %s\n", line, t, (unsigned int)dwMsgCode, szText);
-	return 1;
-}
+void test_kmcmp_CompileKeyboard(char *kmn_file);
 
 int main(int argc, char *argv[]) {
+  if(argc < 1) {
+    puts("Usage: api-test <full-path-to-blank_keyboard.kmn>");
+    puts("Warning: blank_keyboard will be overwritten");
+    return 1;
+  }
   setup();
-  test_kmcmp_CompileKeyboardFile();
-
-  setup();
-  test_kmcmp_CompileKeyboardFileToBuffer();
+  test_kmcmp_CompileKeyboard(argv[1]);
 
   return 0;
 }
@@ -52,36 +40,27 @@ void setup() {
   error_vec.clear();
 }
 
-void test_kmcmp_CompileKeyboardFile() {
-  char kmn_file[L_tmpnam], kmx_file[L_tmpnam];
-  tmpnam(kmn_file);
-  tmpnam(kmx_file);
+/*
+  TODO: tests to run:
+  4. ANSI (no BOM of course) #8884
+  8. file without blank last line (cannot compare with fixture due to bug in kmcmpdll...)
+  Hint to add: k004_ansi.kmn: Hint: 10A6 Keyman Developer has detected that the file has ANSI encoding. Consider converting this file to UTF-8
+*/
 
+void test_kmcmp_CompileKeyboard(char *kmn_file) {
   // Create an empty file
-  FILE *fp = fopen(kmn_file, "w");
+  FILE *fp = Open_File(kmn_file, "wb");
   fclose(fp);
 
   // It should fail when a zero-byte file is passed in
-  assert(!kmcmp_CompileKeyboardFile(kmn_file, kmx_file, true, false, true, msgproc, nullptr));
-  assert(error_vec.size() == 1);
-  assert(error_vec[0] == CERR_CannotReadInfile);
-
-  unlink(kmn_file);
-}
-
-void test_kmcmp_CompileKeyboardFileToBuffer() {
-  char kmn_file[L_tmpnam], kmx_file[L_tmpnam];
-  tmpnam(kmn_file);
-  tmpnam(kmx_file);
-
-  // Create an empty file
-  FILE *fp = fopen(kmn_file, "w");
-  fclose(fp);
-
-  FILE_KEYBOARD fk;
-
-  // It should fail when a zero-byte file is passed in
-  assert(!kmcmp_CompileKeyboardFileToBuffer(kmn_file, &fk, true, false, msgproc, nullptr, CKF_KEYMAN));
+  KMCMP_COMPILER_RESULT result;
+  KMCMP_COMPILER_OPTIONS options;
+  options.saveDebug = true;
+  options.compilerWarningsAsErrors = false;
+  options.warnDeprecatedCode = true;
+  options.shouldAddCompilerVersion = false;
+  options.target = CKF_KEYMAN;
+  assert(!kmcmp_CompileKeyboard(kmn_file, options, msgproc, loadfileProc, nullptr, result));
   assert(error_vec.size() == 1);
   assert(error_vec[0] == CERR_CannotReadInfile);
 

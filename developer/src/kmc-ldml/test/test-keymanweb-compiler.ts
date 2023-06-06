@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { checkMessages, compilerTestCallbacks, makePathToFixture } from './helpers/index.js';
+import { checkMessages, compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
 import { LdmlKeyboardKeymanWebCompiler } from '../src/compiler/keymanweb-compiler.js';
 import { LdmlKeyboardCompiler } from '../src/compiler/compiler.js';
 import * as fs from 'fs';
@@ -16,7 +16,7 @@ describe('LdmlKeyboardKeymanWebCompiler', function() {
 
     // Load input data; we'll use the LDML keyboard compiler loader to save us
     // effort here
-    const k = new LdmlKeyboardCompiler(compilerTestCallbacks, {debug: true, addCompilerVersion: false});
+    const k = new LdmlKeyboardCompiler(compilerTestCallbacks, {...compilerTestOptions, debug: true, addCompilerVersion: false});
     const source = k.load(inputFilename);
     checkMessages();
     assert.isNotNull(source, 'k.load should not have returned null');
@@ -27,7 +27,7 @@ describe('LdmlKeyboardKeymanWebCompiler', function() {
     assert.isTrue(valid, 'k.validate should not have failed');
 
     // Actual test: compile to javascript
-    const jsCompiler = new LdmlKeyboardKeymanWebCompiler(compilerTestCallbacks, {debug: true});
+    const jsCompiler = new LdmlKeyboardKeymanWebCompiler(compilerTestCallbacks, {...compilerTestOptions, debug: true});
     const output = jsCompiler.compile('basic.xml', source);
     assert.isNotNull(output);
 
@@ -36,7 +36,7 @@ describe('LdmlKeyboardKeymanWebCompiler', function() {
     assert.strictEqual(output, outputFixture);
 
     // Second test: compile to javascript without debug formatting
-    const jsCompilerNoDebug = new LdmlKeyboardKeymanWebCompiler(compilerTestCallbacks, {debug: false});
+    const jsCompilerNoDebug = new LdmlKeyboardKeymanWebCompiler(compilerTestCallbacks, {...compilerTestOptions, debug: false});
     const outputNoDebug = jsCompilerNoDebug.compile('basic.xml', source);
     assert.isNotNull(outputNoDebug);
 

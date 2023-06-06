@@ -100,25 +100,33 @@ docker run -it --rm -v $(pwd):/home/build/src/keyman -u root -w /home/build/src/
 
 ## Keyman for Android
 
-**Dependencies**:
+**Dependencies:**
+
 * [Base](#base-dependencies)
 * [Web](./windows#web-dependencies)
 
-**Additional requirements**:
+**Additional requirements:**
+
 * Android SDK
 * [Android Studio](https://developer.android.com/studio/install#linux)
 * Gradle
 * Maven
 * OpenJDK 11 (for Keyman 17.0+)
-
+* pandoc
 
 Run Android Studio once after installation to install additional components
 such as emulator images and SDK updates.
 
-**Required environment variables**:
+**Required environment variable:**
+
+* `ANDROID_HOME` pointing to Android SDK (`$HOME/Android/Sdk`)
+
+**Recommended environment variable:**
+
 * [`JAVA_HOME`](#java_home)
 
 Building:
+
 * [Building Keyman for Android](../../android/README.md)
 
 ## Prerequisites
@@ -127,20 +135,32 @@ Many dependencies are only required for specific projects.
 
 ### Base Dependencies
 
-**Environment variables**:
+**Environment variables:**
 
+* --
 
 ## Notes on Environment Variables
 
 ### JAVA_HOME
 
-This environment variable tells Gradle what version of Java to use for building Keyman for Android.
-OpenJDK 11 is used for master. It's recommended to set the environment variables to:
+This environment variable tells Gradle what version of Java to use for building
+Keyman for Android. OpenJDK 11 is used for master.
+
+It's recommended to set the environment variables to:
+
 ```bash
-EXPORT JAVA_HOME="[path to OpenJDK 11]"
+export JAVA_HOME="[path to OpenJDK 11]"
 ```
 
 Also edit `/etc/profile.d/jvm.sh` as sudo:
+
 ```bash
-EXPORT JAVA_HOME="[path to OpenJDK 11]"
+export JAVA_HOME="[path to OpenJDK 11]"
 ```
+
+**Multiple versions of Java:** If you need to build Keyman for Android 16.0 or
+older versions, you can set `JAVA_HOME_11` to the OpenJDK 11 path and
+`JAVA_HOME` to the OpenJDK 8 path. This will build both versions correctly
+from command line. But note that you do need to update your `JAVA_HOME` env
+var to the associated version before opening Android Studio and loading any
+Android projects. `JAVA_HOME_11` is mostly used by CI.
