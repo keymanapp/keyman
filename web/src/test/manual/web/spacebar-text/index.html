@@ -52,7 +52,7 @@
     }, false);
 
     function setST(t) {
-      keyman.options['spacebarText'] = t;
+      keyman.util.setOption('spacebarText', t);
       document.getElementById('ta1').focus();
       //keyman.osk.show(true); <-- this is needed if you are not triggering a re-display of
       //                           the keyboard, which the focus() call does for us here.

@@ -38,6 +38,12 @@ export class UtilApiEndpoint {
   readonly getAbsoluteX = getAbsoluteX;
   readonly getAbsoluteY = getAbsoluteY;
 
+  // These four were renamed, but we need to maintain their legacy names.
+  readonly _GetAbsoluteX = getAbsoluteX;
+  readonly _GetAbsoluteY = getAbsoluteY;
+  readonly _GetAbsolute = this.getAbsolute;
+  readonly toNzString = this.nzString;
+
   /**
    * Expose the touchable state for UIs - will disable external UIs entirely
    **/
@@ -77,6 +83,31 @@ export class UtilApiEndpoint {
       return dflt;
     } else {
       return '';
+    }
+  }
+
+  setOption(optionName: keyof BrowserInitOptionSpec, value: any): void {
+    switch(optionName) {
+      case 'attachType':
+        // 16.0 & before:  did nothing.
+        // Fixable for 17.0 with some extra work, but the changes would likely be enough to
+        // merit a focused PR.  It's not 100% straightforward.
+        break;
+      case 'ui':
+        // 16.0 & before:  relies on the Float UI to passively pick up on any changes.
+        // Only appears to be effective before the Float UI initializes.
+        break;
+      case 'useAlerts':
+        this.config.signalUser = (value ? new AlertHost() : null);
+        break;
+      case 'setActiveOnRegister':
+        this.config.activateFirstKeyboard = !!value;
+        break;
+      case 'spacebarText':
+        this.config.spacebarText = value;
+        break;
+      default:
+        throw new Error("Path-related options may not be changed after the engine has initialized.");
     }
   }
 
@@ -224,6 +255,87 @@ export class UtilApiEndpoint {
 
   alert(s: string, fn: () => void) {
     this.alertHost.alert(s, fn);
+  }
+
+  /**
+   * Function     toNzString
+   * Scope        Public
+   * @param       {*}           item         variable to test
+   * @param       {?*=}         dflt         default value
+   * @return      {*}
+   * Description  Test if a variable is null, false, empty string, or undefined, and return as string
+   */
+  nzString(item: any, dflt: string): string {
+    // // ... is this whole thing essentially just:
+    // return '' + (item || dflt || '');
+    // // ?
+
+    let dfltValue = '';
+    if(arguments.length > 1) {
+      dfltValue = dflt;
+    }
+
+    if(typeof(item) == 'undefined') {
+      return dfltValue;
+    }
+
+    if(item == null) {
+      return dfltValue;
+    }
+
+    if(item == 0 || item == '') {
+      return dfltValue;
+    }
+
+    return ''+item;
+  }
+
+  /**
+   * Function     toNumber
+   * Scope        Public
+   * @param       {string}      s            numeric string
+   * @param       {number}      dflt         default value
+   * @return      {number}
+   * Description  Return string converted to integer or default value
+   */
+  toNumber(s: string, dflt: number): number {
+    const x = parseInt(s,10);
+    return isNaN(x) ? dflt : x;
+  }
+
+  /**
+   * Function     toFloat
+   * Scope        Public
+   * @param       {string}      s            numeric string
+   * @param       {number}      dflt         default value
+   * @return      {number}
+   * Description  Return string converted to real value or default value
+   */
+  toFloat(s: string, dflt: number): number {
+    const x = parseFloat(s);
+    return isNaN(x) ? dflt : x;
+  }
+
+  /**
+   * Function     rgba
+   * Scope        Public
+   * @param       {Object}      s           element style object
+   * @param       {number}      r           red value, 0-255
+   * @param       {number}      g           green value, 0-255
+   * @param       {number}      b           blue value, 0-255
+   * @param       {number}      a           opacity value, 0-1.0
+   * @return      {string}                  background colour style string
+   * Description  Browser-independent alpha-channel management
+   */
+  rgba(s: HTMLStyleElement, r:number, g:number, b:number, a:number): string {
+    let bgColor='transparent';
+    try {
+      bgColor='rgba('+r+','+g+','+b+','+a+')';
+    } catch(ex) {
+      bgColor='rgb('+r+','+g+','+b+')';
+    }
+
+    return bgColor;
   }
 
   shutdown() {
