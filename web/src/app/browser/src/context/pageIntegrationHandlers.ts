@@ -37,7 +37,7 @@ export class PageIntegrationHandlers {
    */
   private mobilePageTrailer: HTMLDivElement;
 
-  private rotationProcessor: RotationProcessor
+  private rotationProcessor: RotationProcessor;
 
   constructor(window: Window, engine: KeymanEngine) {
     this.window = window;
@@ -223,9 +223,7 @@ export class PageIntegrationHandlers {
       eventTracker.detachDOMEvent(docBody, 'touchmove',  this.touchMoveActivationHandler, false);
       eventTracker.detachDOMEvent(docBody, 'touchend',   this.touchEndActivationHandler,  false);
 
-      if(this.mobilePageTrailer) {
-        this.mobilePageTrailer.parentElement.removeChild(this.mobilePageTrailer);
-      }
+      this.mobilePageTrailer?.parentElement.removeChild(this.mobilePageTrailer);
     }
 
     eventTracker.detachDOMEvent(window, 'load',   this._WindowLoad,  false);

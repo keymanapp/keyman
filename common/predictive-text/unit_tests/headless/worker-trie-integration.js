@@ -10,11 +10,24 @@ import { capabilities } from '@keymanapp/common-test-resources/model-helpers.mjs
  * How to run the worlist
  */
 describe('LMLayer using the trie model', function () {
+  let lmLayer;
+  let worker;
+
+  beforeEach(function() {
+    worker = Worker.constructInstance();
+    lmLayer = new LMLayer(capabilities(), worker);
+  });
+
+  afterEach(function () {
+    // As we're using Node worker threads here, failure to terminate them will cause the
+    // headless test run to hang after completion.
+    lmLayer.shutdown();
+    worker.terminate();  // should be covered by the former, but just in case... for CI stability.
+  });
+
   describe('Prediction', function () {
     var EXPECTED_SUGGESTIONS = 3;
     it('will predict an empty buffer', function () {
-      var lmLayer = new LMLayer(capabilities(), Worker.constructInstance());
-
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax.
       // Not done yet, as this test case is a slightly-edited copy of the in-browser version.
@@ -55,8 +68,6 @@ describe('LMLayer using the trie model', function () {
     //
     // https://community.software.sil.org/t/search-term-to-key-in-lexical-model-not-working-both-ways-by-default/3133
     it('should use the default searchTermToKey()', function () {
-      var lmLayer = new LMLayer(capabilities(), Worker.constructInstance());
-
       return lmLayer.loadModel(
         // We're running headlessly, so the path can be relative to the npm root directory.
         require.resolve("@keymanapp/common-test-resources/models/naive-trie.js")

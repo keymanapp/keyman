@@ -66,8 +66,18 @@ const appleDummyModel = {
 };
 
 describe("PredictionContext", () => {
-  it('receives predictions as they are generated', async () => {
-    const langProcessor = new LanguageProcessor(LMWorker.constructInstance());
+  let worker;
+
+  beforeEach(function() {
+    worker = LMWorker.constructInstance();
+  });
+
+  afterEach(function() {
+    worker.terminate();
+  });
+
+  it('receives predictions as they are generated', async function () {
+    const langProcessor = new LanguageProcessor(worker);
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const kbdProcessor = new KeyboardProcessor(deviceSpec);
@@ -107,8 +117,8 @@ describe("PredictionContext", () => {
     assert.equal(suggestions.find((obj) => obj.transform.deleteLeft != 0).displayAs, 'apps');
   });
 
-  it('sendUpdateState retrieves the most recent suggestion set', async () => {
-    const langProcessor = new LanguageProcessor(LMWorker.constructInstance());
+  it('sendUpdateState retrieves the most recent suggestion set', async function() {
+    const langProcessor = new LanguageProcessor(worker);
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const kbdProcessor = new KeyboardProcessor(deviceSpec);
@@ -133,8 +143,8 @@ describe("PredictionContext", () => {
     assert.sameOrderedMembers(suggestions, initialSuggestions);
   });
 
-  it('suggestion application logic & triggered effects', async () => {
-    const langProcessor = new LanguageProcessor(LMWorker.constructInstance());
+  it('suggestion application logic & triggered effects', async function () {
+    const langProcessor = new LanguageProcessor(worker);
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const kbdProcessor = new KeyboardProcessor(deviceSpec);
@@ -167,6 +177,15 @@ describe("PredictionContext", () => {
     const suggestionApply = suggestions.find((obj) => obj.displayAs == 'apply');
     assert.isOk(suggestionApply);
 
+    // For awaiting the suggestions generated upon applying our desired suggestion.
+    // We aren't given a direct Promise for that, but we can construct one this way.
+    let postApplySuggestions = new Promise((resolve) => {
+      predictiveContext.once('update', resolve);
+    });
+
+    // Apply the desired suggestion.  Also passively generates new, post-acceptance
+    // suggestions, but this function itself don't provide a Promise for that...
+    // hence the previous block.
     let promiseForApplyReversion = predictiveContext.accept(suggestionApply);
 
     assert.equal(updateFake.callCount, 1); // No new 'update' has been raised yet.
@@ -177,8 +196,7 @@ describe("PredictionContext", () => {
     assert.equal(textState.getText(), 'apply ');
 
     let reversion = await promiseForApplyReversion;
-    // We don't seem to need to additionally rig a wait for the triggered predict call; it
-    // always completes first.  Neat.  If test becomes unstable... yeah, rig up a wait for it.
+    await postApplySuggestions;
 
     // Check 2:  a second 'update' - post-application predictions!
     assert.equal(updateFake.callCount, 2);
@@ -193,8 +211,8 @@ describe("PredictionContext", () => {
     // All other reversion details are tested in the 'reversion application logic...' section defined below.
   });
 
-  it('reversion application logic & triggered effects', async () => {
-    const langProcessor = new LanguageProcessor(LMWorker.constructInstance());
+  it('reversion application logic & triggered effects', async function () {
+    const langProcessor = new LanguageProcessor(worker);
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const kbdProcessor = new KeyboardProcessor(deviceSpec);
@@ -222,7 +240,15 @@ describe("PredictionContext", () => {
     assert.isOk(suggestionApply);
 
     let previousTextState = Mock.from(textState);
+
+    // For awaiting the suggestions generated upon applying our desired suggestion.
+    // We aren't given a direct Promise for that, but we can construct one this way.
+    let postApplySuggestions = new Promise((resolve) => {
+      predictiveContext.once('update', resolve);
+    });
+
     let reversion = await predictiveContext.accept(suggestionApply);
+    await postApplySuggestions;
 
     // Test setup complete.
 
@@ -243,6 +269,19 @@ describe("PredictionContext", () => {
 
     // Fire away!  Time to apply the reversion.
     previousTextState = Mock.from(textState);
+
+    // Since the test uses a separate thread via Worker, make sure to set up any important event handlers
+    // before we request the reversion.
+    let updateFake = sinon.fake();
+    predictiveContext.on('update', updateFake);
+
+    // Now, in order to synchronize... we rely on a Promise.  The callback is indeed
+    // called synchronously.
+    let postRevertSuggestions = new Promise((resolve) => {
+      predictiveContext.once('update', resolve);
+    });
+
+    // And now, apply the reversion itself.
     let returnValue = predictiveContext.accept(reversion);
 
     // 'accepting' a reversion performs a rewind; there's no need for async ops here.
@@ -256,17 +295,8 @@ describe("PredictionContext", () => {
     // Note:  no space appended.
     assert.equal(textState.getText(), rewoundTextStateWithInput.getText());
 
-    // Note:  accepting a reversion will trigger a new prediction that completes
-    // asynchronously, and unfortunately... we have no handle for it.
-
-    let updateFake = sinon.fake();
-    predictiveContext.on('update', updateFake);
-
-    // Now, in order to synchronize... we rely on a Promise.  The callback is indeed
-    // called synchronously.
-    await new Promise((resolve) => {
-      predictiveContext.once('update', resolve);
-    });
+    // Re-synchronize once we've received word of the new post-reversion predictions.
+    await postRevertSuggestions;
 
     assert.equal(updateFake.callCount, 1);
     const suggestionsPostReversion = updateFake.firstCall.args[0];

@@ -8,7 +8,9 @@
     "inlineSources": true,
     "sourceMap": true,
     "sourceRoot": "keyman",
-    "target": "es5",
+    // This build-configuration only targets Node and exists solely for unit tests.
+    // Also, we need ES6 in order to properly inherit from the Node Worker-type.
+    "target": "ES6",
     "lib": ["es6"],
     "types": ["node"],
     "baseUrl": "../",

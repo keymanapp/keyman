@@ -681,7 +681,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   }
 
 
-  /**    if(!this.isAttached(Pelem)) {
+  /**
    * Function     disableControl
    * Scope        Public
    * @param       {Element}      Pelem       Element to be disabled

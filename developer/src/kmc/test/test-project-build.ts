@@ -16,9 +16,9 @@ describe('BuildProject', function () {
       debug: false,
       warnDeprecatedCode: true,
     });
-    // 5 messages == starting build, info: no keyboard version, build successful x 2
+    // 4 messages == starting build x 2, build successful x 2
     // callbacks.printMessages();
-    assert.equal(callbacks.messages.length, 5);
+    assert.equal(callbacks.messages.length, 4);
     assert.isTrue(result);
   });
 });

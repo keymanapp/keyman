@@ -126,6 +126,8 @@ type
     dpDeadKeyArray: PFILE_DEADKEY;	// temp - dead key array
     cxVKDictionary: DWORD;  // I3438
     dpVKDictionary: PFILE_VKDICTIONARY; // I3438  // temp - virtual key dictionary
+
+    extra: Pointer;
 	end;
 
   PFILE_KEYBOARD = ^FILE_KEYBOARD;
@@ -152,13 +154,13 @@ const
 const
   // kcframe --sizeof returns these values
 {$IFDEF WIN64}
-  FILE_KEYBOARD_SIZE = 2984;
+  FILE_KEYBOARD_SIZE = 2992;
   FILE_GROUP_SIZE = 200;
   FILE_STORE_SIZE = 200;
   FILE_KEY_SIZE = 32;
   FILE_DEADKEY_SIZE = 160;
 {$ELSE}
-  FILE_KEYBOARD_SIZE = 2952;
+  FILE_KEYBOARD_SIZE = 2956;
   FILE_GROUP_SIZE = 188;
   FILE_STORE_SIZE = 192;
   FILE_KEY_SIZE = 20;
@@ -174,7 +176,6 @@ type
   TCompilerOptions = record
     dwSize: DWORD;
     ShouldAddCompilerVersion: BOOL;
-    UseKmcmpLib: BOOL;
   end;
 
   COMPILER_OPTIONS = TCompilerOptions;

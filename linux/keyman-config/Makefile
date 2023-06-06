@@ -1,49 +1,19 @@
 #!/usr/bin/make
 
-default: clean version man langtags
-	python3 setup.py build
-
-langtags:
-	cd buildtools && python3 ./build-langtags.py
+default:
+	./build.sh clean build
 
 install:
-	if [ -n "${SUDO_USER}" ]; then \
-		make install-sudo; \
-	else \
-		make install-temp; \
-	fi
+	./build.sh install
 
-install-sudo:  # run as sudo
-	pip3 install qrcode sentry-sdk
-	# eventually change this to: pip3 install .
-	python3 setup.py install
-	# install icons
-	mkdir -p /usr/local/share/keyman/icons
-	cp keyman_config/icons/* /usr/local/share/keyman/icons
-	# install man pages
-	mkdir -p /usr/local/share/man/man1
-	cp ../../debian/man/*.1 /usr/local/share/man/man1
-
-install-temp:
-	mkdir -p /tmp/keyman/$(shell python3 -c 'import sys;import os;pythonver="python%d.%d" % (sys.version_info[0], sys.version_info[1]);sitedir = os.path.join("lib", pythonver, "site-packages");print(sitedir)')
-	# when we no longer have to support old pip version (python > 3.6) change this to:
-	# pip3 install --prefix /tmp/keyman .
-	PYTHONUSERBASE=/tmp/keyman python3 setup.py install --user
-
-uninstall: clean # run as sudo
-	rm -rf /usr/local/share/keyman/icons
-	rm -f /usr/local/share/man/man1/km-*.1
-	pip3 uninstall keyman_config
-	rm -f /usr/local/bin/km-config
-	rm -f /usr/local/bin/km-kvk2ldml
-	rm -f /usr/local/bin/km-package-get
-	rm -f /usr/local/bin/km-package-install
-	rm -f /usr/local/bin/km-package-list-installed
-	rm -f /usr/local/bin/km-package-uninstall
+uninstall: # run as sudo
+	./build.sh uninstall
 
 clean:
-	-rm -rf dist make_deb build keyman_config/version.py *.egg-info __pycache__ \
-		keyman_config/standards/lang_tags_map.py
+	./build.sh clean
+
+check:
+	./build.sh test
 
 devdist: version
 	python3 setup.py egg_info -b.`TZ=UTC git log -1 --pretty=format:%cd --date=format-local:%Y%m%d%H%M` sdist
@@ -93,6 +63,3 @@ $(MOFILES): %/LC_MESSAGES/keyman-config.mo: %.po
 	msgfmt -v --check --output-file=$@ $^
 
 compile-po: $(MOFILES)
-
-check:
-	./run-tests.sh

@@ -268,6 +268,7 @@ describe('KMW element-attachment logic', function () {
 
         // Note:  iframes require additional time to resolve.
         await promiseForIframeLoad(document.getElementById('iframe'));
+        await promiseForIframeLoad(document.getElementById('design-iframe'));
 
         // Give the design-mode iframe a bit of time to set itself up properly.
         // Note: it is thus important that whatever sends the `install` command has also
@@ -495,6 +496,7 @@ describe('KMW element-attachment logic', function () {
 
         // Note:  iframes require additional time to resolve.
         await promiseForIframeLoad(document.getElementById('iframe'));
+        await promiseForIframeLoad(document.getElementById('design-iframe'));
 
         // Our mutation observers delay slightly here to ensure that any doc-internal handlers
         // have a chance to resolve before we attach.  Currently: 10ms.
@@ -639,6 +641,7 @@ describe('KMW element-attachment logic', function () {
 
       // Note:  iframes require additional time to resolve.
       await promiseForIframeLoad(document.getElementById('iframe'));
+      await promiseForIframeLoad(document.getElementById('design-iframe'));
 
       await timedPromise(20); // for the design-iframe to set itself into design-mode.
 

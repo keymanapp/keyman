@@ -67,6 +67,14 @@ export class CompilerMessages {
 
   static Error_UnicodeSetSyntaxError = () => m(this.ERROR_UnicodeSetSyntaxError, `UnicodeSet had a Syntax Error while parsing`);
   static ERROR_UnicodeSetSyntaxError = SevError | 0x1007;
+
+  static Error_InvalidKvksFile = (o:{filename: string, e: any}) => m(this.ERROR_InvalidKvksFile,
+    `Error encountered parsing ${o.filename}: ${o.e}`);
+  static ERROR_InvalidKvksFile = SevError | 0x1008;
+
+  static Warn_InvalidVkeyInKvksFile = (o:{filename: string, invalidVkey: string}) => m(this.WARN_InvalidVkeyInKvksFile,
+    `Invalid virtual key ${o.invalidVkey} found in ${o.filename}`);
+  static WARN_InvalidVkeyInKvksFile = SevWarn | 0x1009;
 }
 
 export function mapErrorFromKmcmplib(line: number, code: number, msg: string): CompilerEvent {

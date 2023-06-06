@@ -9,21 +9,21 @@
     <Name URL="">SENĆOŦEN (Saanich Dialect) Lexical Model</Name>
     <Copyright URL="">© 2019 National Research Council Canada</Copyright>
     <Author URL="mailto:Eddie.Santos@nrc-cnrc.gc.ca">Eddie Antonio Santos</Author>
-    <Version>1.3</Version>
+    <Version>1.0</Version>
   </Info>
   <Files>
     <File>
-      <Name>khmer_angkor.kmx</Name>
-      <Description>Keyboard Khmer Angkor</Description>
+      <Name>basic.kmx</Name>
+      <Description>Keyboard Basic</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
     </File>
   </Files>
   <Keyboards>
     <Keyboard>
-      <Name>Khmer Angkor</Name>
-      <ID>khmer_angkor</ID>
-      <Version>1.3</Version>
+      <Name>Basic</Name>
+      <ID>basic</ID>
+      <Version>1.0</Version>
       <Languages>
         <Language ID="km">Central Khmer (Khmer, Cambodia)</Language>
       </Languages>
