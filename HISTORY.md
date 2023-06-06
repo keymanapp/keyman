@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.119 alpha 2023-06-06
+
+* chore(developer): ensure kmcmplib messages are all UTF-8 (#8927)
+* chore(linux): Fix lintian warnings (#8931)
+
 ## 17.0.118 alpha 2023-06-05
 
 * chore(ios): replace fv cert (#8900)
