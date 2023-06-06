@@ -56,12 +56,12 @@ test-headless ( ) {
 test-browser ( ) {
   KARMA_FLAGS=
   if [[ $# -eq 1  && $1 == "debug" ]]; then
-    KARMA_CONFIG="manual.conf.js"
+    KARMA_CONFIG="manual.conf.cjs"
     KARMA_FLAGS="--no-single-run"
   elif [ $REPORT_STYLE == "local" ]; then
-    KARMA_CONFIG="manual.conf.js"
+    KARMA_CONFIG="manual.conf.cjs"
   else
-    KARMA_CONFIG="CI.conf.js"
+    KARMA_CONFIG="CI.conf.cjs"
   fi
 
   npm run karma -- start src/test/auto/browser/$KARMA_CONFIG "$KARMA_FLAGS"
