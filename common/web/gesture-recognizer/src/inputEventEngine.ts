@@ -3,7 +3,6 @@ import { GestureRecognizerConfiguration } from "./gestureRecognizerConfiguration
 import { InputSample } from "./inputSample.js";
 import { Nonoptional } from "./nonoptional.js";
 import { TrackedPoint } from "./trackedPoint.js";
-import { TouchEventEngine } from "./touchEventEngine.js";
 
 interface EventMap {
   'pointstart': (input: TrackedPoint) => void
@@ -47,8 +46,8 @@ export abstract class InputEventEngine extends EventEmitter<EventMap> {
     };
   }
 
-  onInputStart(identifier: number, sample: InputSample, target: EventTarget) {
-    const touchpoint = new TrackedPoint(identifier, target, this instanceof TouchEventEngine);
+  onInputStart(identifier: number, sample: InputSample, target: EventTarget, isFromTouch: boolean) {
+    const touchpoint = new TrackedPoint(identifier, target, isFromTouch);
     touchpoint.path.extend(sample);
 
     this._activeTouchpoints.push(touchpoint);

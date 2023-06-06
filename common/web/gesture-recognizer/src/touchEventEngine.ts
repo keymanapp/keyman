@@ -104,7 +104,7 @@ export class TouchEventEngine extends InputEventEngine {
         continue;
       }
 
-      this.onInputStart(touch.identifier, sample, event.target);
+      this.onInputStart(touch.identifier, sample, event.target, true);
     }
   }
 

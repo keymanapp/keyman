@@ -109,7 +109,7 @@ export class MouseEventEngine extends InputEventEngine {
       this.disabledSafeBounds = ZoneBoundaryChecker.inputStartSafeBoundProximityCheck(sample, this.config);
     }
 
-    this.onInputStart(this.generateIdentifier(), sample, event.target);
+    this.onInputStart(this.generateIdentifier(), sample, event.target, false);
   }
 
   onMouseMove(event: MouseEvent) {
