@@ -624,8 +624,11 @@ public final class KMManager {
       return;
     }
 
-    RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
-    keyboard.setLayoutParams(params);
+    if (!isTestMode()) {
+      // Keyboard layout not needed in unit tests. #5125
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+      keyboard.setLayoutParams(params);
+    }
     keyboard.setVerticalScrollBarEnabled(false);
     keyboard.setHorizontalScrollBarEnabled(false);
     keyboard.setWebViewClient(webViewClient);
