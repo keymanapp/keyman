@@ -49,9 +49,9 @@ def _add_model():
       # Keep in sync with Model above
       GdkPixbuf.Pixbuf,  # icon
       str,    # name
-      str,    # version
-      str,    # packageID
-      int,    # enum InstallLocation (KmpArea is GObject version)
+      str,    # installed package version
+      str,    # package ID
+      int,    # enum InstallLocation
       str,    # InstallLocation area
       str,    # Tooltip with InstallLocation path
       str,    # path to welcome file if it exists or None

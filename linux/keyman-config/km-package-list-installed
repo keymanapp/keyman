@@ -12,7 +12,7 @@ def main():
     parser.add_argument('-s', "--shared", help='show keyboard packages installed in shared area', action="store_true")
     parser.add_argument('-o', "--os", help='show keyboard packages installed by the OS', action="store_true")
     parser.add_argument('-u', "--user", help='show keyboard packages installed in user area', action="store_true")
-    parser.add_argument('--version', action='version', version='%(prog)s version ' + __version__)
+    parser.add_argument('--version', action='version', version=f'%(prog)s version {__version__}')
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
     parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
 
@@ -24,17 +24,17 @@ def main():
     else:
         logging.basicConfig(format='%(levelname)s:%(message)s')
 
-    all = not args.user and not args.shared and not args.os
+    _all = not args.user and not args.shared and not args.os
     from keyman_config.list_installed_kmp import get_installed_kmp
     from keyman_config.get_kmp import get_keyman_dir, InstallLocation
-    if args.user or all:
+    if args.user or _all:
         installed_kmp = get_installed_kmp(InstallLocation.User)
         if args.verbose or args.veryverbose:
             print("--- Installed user Keyman keyboard packages (%s) ---" % (get_keyman_dir(InstallLocation.User)))
         else:
             print("--- Installed user Keyman keyboard packages ---")
         print_keyboards(installed_kmp, args.long)
-    if args.shared or all:
+    if args.shared or _all:
         installed_kmp = get_installed_kmp(InstallLocation.Shared)
         if args.verbose or args.veryverbose:
             print("--- Installed shared Keyman keyboard packages (%s) ---" %
@@ -42,7 +42,7 @@ def main():
         else:
             print("--- Installed shared Keyman keyboard packages ---")
         print_keyboards(installed_kmp, args.long)
-    if args.os or all:
+    if args.os or _all:
         installed_kmp = get_installed_kmp(InstallLocation.OS)
         if args.verbose or args.veryverbose:
             print("--- Installed OS Keyman keyboard packages (%s) ---" % (get_keyman_dir(InstallLocation.OS)))
