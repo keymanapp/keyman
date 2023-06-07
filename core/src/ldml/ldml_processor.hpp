@@ -26,7 +26,7 @@ namespace kbp {
   class ldml_processor : public abstract_processor {
   private:
     bool _valid;
-    ldml::transforms transforms;
+    std::unique_ptr<ldml::transforms> transforms, bksp_transforms;
     ldml::vkeys keys;
   public:
     ldml_processor(
