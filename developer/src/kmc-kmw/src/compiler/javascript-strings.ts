@@ -15,7 +15,7 @@ export function JavaScript_Name(i: number, pwszName: string, KeepNameForPersiste
   let FChanged: boolean = false;
   let p = pwszName;
 
-  if((pwszName == null || pwszName == undefined || pwszName == '') || (!options.debug && !KeepNameForPersistentStorage)) {   // I3659   // I3681
+  if((pwszName == null || pwszName == undefined || pwszName == '') || (!options.saveDebug && !KeepNameForPersistentStorage)) {   // I3659   // I3681
     return i.toString(10); // for uniqueness
   }
   else {
@@ -138,7 +138,7 @@ function JavaScript_Rule(FTabStops: string, FElse: string, fk: KMX.KEYBOARD, fgp
   let predicate: string = '1', linecomment: string = '', FIndent: string;
   let result = '';
 
-  if(fkp.Line > 0 && options.debug) {   // I4384
+  if(fkp.Line > 0 && options.saveDebug) {   // I4384
     linecomment = '   // Line '+fkp.Line.toString();   // I4373
   }
 
@@ -318,7 +318,7 @@ export function JavaScript_Shift(fkp: KMX.KEY, FMnemonic: boolean): number {
  *         '16656'
  */
 export function JavaScript_ShiftAsString(fkp: KMX.KEY, FMnemonic: boolean): string {
-  if(!options.debug) {
+  if(!options.saveDebug) {
     return JavaScript_Shift(fkp, FMnemonic).toString();
   }
   return ' '+FormatModifierAsBitflags(JavaScript_Shift(fkp, FMnemonic));
@@ -722,7 +722,7 @@ export function JavaScript_Key(fkp: KMX.KEY, FMnemonic: boolean): number {
 /// @return string representation of the key value, e.g. 'keyCodes.K_A /* 0x41 */' or '65'
 ///
 export function JavaScript_KeyAsString(fkp: KMX.KEY, FMnemonic: boolean): string {
-  if(options.debug) {
+  if(options.saveDebug) {
     return ' '+FormatKeyAsString(JavaScript_Key(fkp, FMnemonic));
   } else {
     return JavaScript_Key(fkp, FMnemonic).toString();

@@ -142,6 +142,16 @@ export interface CompilerCallbacks {
 };
 
 /**
+ * Abstract interface for compiler options
+ */
+export interface CompilerOptions {
+  shouldAddCompilerVersion?: boolean;
+  saveDebug?: boolean;
+  compilerWarningsAsErrors?: boolean;
+	warnDeprecatedCode?: boolean;
+};
+
+/**
  * Convenience function for constructing CompilerEvents
  * @param code
  * @param message

@@ -6,7 +6,7 @@ TODO: implement additional interfaces:
 */
 
 // TODO: rename wasm-host?
-import { CompilerCallbacks, CompilerEvent, KvkFileWriter, KvksFileReader } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerEvent, CompilerOptions, KvkFileWriter, KvksFileReader } from '@keymanapp/common-types';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
 import { CompilerMessages, mapErrorFromKmcmplib } from './messages.js';
 
@@ -21,15 +21,11 @@ export interface CompilerResult {
   js?: CompilerResultFile;
 };
 
-export interface CompilerOptions {
-  shouldAddCompilerVersion?: boolean;
-  saveDebug?: boolean;
-  compilerWarningsAsErrors?: boolean;
-	warnDeprecatedCode?: boolean;
+export interface KmnCompilerOptions extends CompilerOptions {
   target?: 'kmx' | 'js';
 };
 
-const baseOptions: CompilerOptions = {
+const baseOptions: KmnCompilerOptions = {
   shouldAddCompilerVersion: true,
   saveDebug: true,
   compilerWarningsAsErrors: false,
@@ -90,7 +86,7 @@ export class KmnCompiler {
     return true;
   }
 
-  public run(infile: string, outfile: string, options?: CompilerOptions): boolean {
+  public run(infile: string, outfile: string, options?: KmnCompilerOptions): boolean {
     let result = this.runCompiler(infile, outfile, options);
     if(result) {
       if(result.kmx) {
@@ -146,7 +142,7 @@ export class KmnCompiler {
     return 1;
   }
 
-  public runCompiler(infile: string, outfile: string, options: CompilerOptions): CompilerResult {
+  public runCompiler(infile: string, outfile: string, options: KmnCompilerOptions): CompilerResult {
     if(!this.verifyInitialized()) {
       /* c8 ignore next 2 */
       return null;
