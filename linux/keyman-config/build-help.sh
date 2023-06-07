@@ -3,11 +3,7 @@
 set -e
 set -u
 
-## START STANDARD BUILD SCRIPT INCLUDE
-# adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-## END STANDARD BUILD SCRIPT INCLUDE
-
 THIS_DIR=$(dirname "$THIS_SCRIPT")
 
 cd "${THIS_DIR}"
