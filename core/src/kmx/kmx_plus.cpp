@@ -385,10 +385,6 @@ COMP_KMXPLUS_TRAN_Helper::COMP_KMXPLUS_TRAN_Helper()
 
 bool
 COMP_KMXPLUS_TRAN_Helper::setTran(const COMP_KMXPLUS_TRAN *newTran) {
-  if (newTran != nullptr) {
-    // Only print this if not null.
-    DebugLog("tran helper: validating '%c%c%c%c' newTran=%p", DEBUG_IDENT(newTran->header.ident), newTran);
-  }
   is_valid = true;
   if (newTran == nullptr) {
     DebugLog("tran helper: invalid, newTran=%p", newTran);
@@ -397,6 +393,7 @@ COMP_KMXPLUS_TRAN_Helper::setTran(const COMP_KMXPLUS_TRAN *newTran) {
     // No assert here: just a missing layer
     return false;
   }
+  DebugLog("tran helper: validating '%c%c%c%c' newTran=%p", DEBUG_IDENT(newTran->header.ident), newTran);
   tran = newTran;
   const uint8_t *rawdata = reinterpret_cast<const uint8_t *>(tran);
   rawdata += LDML_LENGTH_TRAN;  // skip past non-dynamic portion
