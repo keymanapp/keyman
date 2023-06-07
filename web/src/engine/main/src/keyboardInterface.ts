@@ -77,14 +77,19 @@ export default class KeyboardInterface<ContextManagerType extends ContextManager
       this.stubNamespacer(Pstub);
     }
 
-    // Other notes:  this is where app-hosted KeymanWeb receives pre-formed stubs.
+    // This is where app-hosted KeymanWeb receives pre-formed stubs.
     // They're specified in the "internal" format (KI, KN, KLC...)
-    // (SHIFT-CTRL-F @ repo-level:  `setKeymanLanguage`)
+    // (SHIFT-CTRL-F @ repo-level for the mobile apps:  `setKeymanLanguage`)
+    // Keyman Developer may also use this method directly for its test-host page.
     //
     // It may also be used by documented legacy API:
     // https://help.keyman.com/DEVELOPER/ENGINE/WEB/2.0/guide/examples/manual-control
     // (See: referenced laokeys_load.js)
-    const stub = new KeyboardStub(Pstub);
+    //
+    // The mobile apps typically have fully-preconfigured paths, but Developer's
+    // test-host page does not.
+    const pathConfig = this.engine.config.paths;
+    const stub = new KeyboardStub(Pstub, pathConfig.keyboards, pathConfig.fonts);
     if(this.engine.keyboardRequisitioner?.cache.findMatchingStub(stub)) {
       return 1;
     }

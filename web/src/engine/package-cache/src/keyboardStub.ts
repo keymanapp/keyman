@@ -18,6 +18,36 @@ export type KeyboardAPISpec = (APISimpleKeyboard | APICompoundKeyboard) & {
 
 export interface RawKeyboardStub extends KeyboardStub {};
 
+/*
+ * Get keyboard path (relative or absolute)
+ * KeymanWeb 2 revised keyboard location specification:
+ *  (a) absolute URL (includes ':') - load from specified URL
+ *  (b) relative URL (starts with /, ./, ../) - load with respect to current page
+ *  (c) filename only (anything else) - prepend keyboards option to URL
+ *      (e.g. default keyboards option will be set by Cloud)
+ *
+ * So, to fully interpret the following regex, it detects the following patterns (at minimum):
+ * ../file (but not .../file)
+ * ./file
+ * /file
+ * http:// (on the colon)
+ * hello:world (on the colon) - that one miiiight be less intentional, though.  Would 'fall
+ * over' on attempted use anyway, since it's not a valid path.
+ *
+ * Alternative clearer version - '^(\.{0,2}/)|(:)'?
+ * Unless backslashes should be able to replace dots?
+ */
+const REGEX_FOR_PRECONFIGURED_PATH=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');
+
+function configureFilePathing(path: string, configurationBasePath: string) {
+  configurationBasePath = configurationBasePath || '';
+  if(path && !REGEX_FOR_PRECONFIGURED_PATH.test(path)) {
+    return configurationBasePath + path;
+  } else {
+    return path;
+  }
+}
+
 export default class KeyboardStub extends KeyboardProperties {
   KR: string;
   KRC: string;
@@ -25,7 +55,9 @@ export default class KeyboardStub extends KeyboardProperties {
 
   KP?: string;
 
-  public constructor(rawStub: RawKeyboardStub);
+  // For the first flavor of constructor, note that Developer relies on KMW's path config to complete the paths...
+  // even though supplying an 'internal'-style stub.
+  public constructor(rawStub: RawKeyboardStub, keyboardBaseUri?: string, fontBaseUri?: string);
   public constructor(apiSpec: APISimpleKeyboard & { filename: string }, keyboardBaseUri?: string, fontBaseUri?: string);
   public constructor(kbdId: string, lngId: string);
   constructor(arg0: string | RawKeyboardStub | (APISimpleKeyboard & { filename: string }), arg1?: string, arg2?: string) {
@@ -34,43 +66,19 @@ export default class KeyboardStub extends KeyboardProperties {
         let apiSpec = arg0 as APISimpleKeyboard & { filename: string };
         apiSpec.id = prefixed(apiSpec.id);
         super(apiSpec, arg2);
-        this.KF = apiSpec.filename;
+        this.KF = configureFilePathing(apiSpec.filename, arg1);
         this.mapRegion(apiSpec.languages);
-
-        /*
-         * Get keyboard path (relative or absolute)
-         * KeymanWeb 2 revised keyboard location specification:
-         *  (a) absolute URL (includes ':') - load from specified URL
-         *  (b) relative URL (starts with /, ./, ../) - load with respect to current page
-         *  (c) filename only (anything else) - prepend keyboards option to URL
-         *      (e.g. default keyboards option will be set by Cloud)
-         *
-         * So, to fully interpret the following regex, it detects the following patterns (at minimum):
-         * ../file (but not .../file)
-         * ./file
-         * /file
-         * http:// (on the colon)
-         * hello:world (on the colon) - that one miiiight be less intentional, though.  Would 'fall
-         * over' on attempted use anyway, since it's not a valid path.
-         *
-         * Alternative clearer version - '^(\.{0,2}/)|(:)'?
-         * Unless backslashes should be able to replace dots?
-         */
-        let rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');
-
-        arg1 = arg1 || '';
-        if(this.KF && !rx.test(this.KF)) {
-          this.KF = arg1 + this.KF;
-        }
       } else {
         let rawStub = arg0 as RawKeyboardStub;
         rawStub.KI = prefixed(rawStub.KI);
-        super(rawStub);
+        super(rawStub, arg2);
 
-        this.KF = rawStub.KF;
+        this.KF = configureFilePathing(rawStub.KF, arg1);
         this.KP = rawStub.KP;
         this.KR = rawStub.KR;
         this.KRC = rawStub.KRC;
+
+
         return;
       }
     } else {
