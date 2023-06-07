@@ -242,6 +242,8 @@ int GetKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) 
 
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
+  //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+  //  return 0;
 
   if (!(shift_state_pos < count))
     return 0;
@@ -408,6 +410,17 @@ void print_simple_map_Other(v_str_3D &All_Vector, int shiftstate){
     out = get_US_Char_FromOther(All_Vector[0][i][shiftstate], All_Vector);
   }
 }
+
+void test_specific_Characters(v_str_3D &All_Vector){
+  printf("-----------------------------------------------------------------------------------------------------------------------------------------------\n");
+  v_str_1D in {"a", "b", "m", "w", "x", "y", "z"};
+  std::string  out;
+  for( int i=0; i< (int) in.size()-1; i++) {
+    out = get_Other_Char_FromUS(in[i], All_Vector);
+  }
+}
+
+
 //--------------------------------------
 int main(gint argc, gchar *argv[])
 {
@@ -442,9 +455,9 @@ int main(gint argc, gchar *argv[])
 
   //print_simple_map_US(All_Vector,1);    // 1 = non-shift
   //print_simple_map_Other(All_Vector,1); // 1 = non-shift
-
+  test_specific_Characters(All_Vector);
   gdk_display_close(display);
 
-  printf("-°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°° end\n");
+  printf("°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°° end\n");
   return 0;
 }
