@@ -1,5 +1,23 @@
 # Keyman Version History
 
+## 17.0.120 alpha 2023-06-07
+
+* chore(core): look for emcc.py, not emcc (#8934)
+* chore(linux): Move some files to keyman-config (#8917)
+* fix(linux): Fix title of reference page and links (#8939)
+* fix(android/engine): Re-enable KMManager tests (#8940)
+
+## 17.0.119 alpha 2023-06-06
+
+* chore(developer): ensure kmcmplib messages are all UTF-8 (#8927)
+* chore(linux): Fix lintian warnings (#8931)
+
+## 17.0.118 alpha 2023-06-05
+
+* chore(ios): replace fv cert (#8900)
+* fix(core): Fix compilation if hotdoc is installed (#8912)
+* feat(linux): Rename column and add tooltip (#8918)
+
 ## 17.0.117 alpha 2023-06-04
 
 * chore(developer): verify long lines compile correctly (#8915)

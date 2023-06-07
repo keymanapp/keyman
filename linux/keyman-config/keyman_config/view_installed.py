@@ -19,7 +19,7 @@ from keyman_config.accelerators import bind_accelerator, init_accel
 from keyman_config.dbus_util import get_keyman_config_service
 from keyman_config.downloadkeyboard import DownloadKmpWindow
 from keyman_config.get_kmp import (InstallLocation, get_keyboard_dir,
-                                   get_keyman_dir)
+                                   get_keyman_dir, get_install_area_string)
 from keyman_config.install_window import InstallKmpWindow, find_keyman_image
 from keyman_config.keyboard_details import KeyboardDetailsView
 from keyman_config.kmpmetadata import get_fonts, parsemetadata
@@ -166,7 +166,8 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             str,    # version
             str,    # packageID
             int,    # enum InstallLocation (KmpArea is GObject version)
-            str,    # InstallLocation path
+            str,    # InstallLocation area
+            str,    # Tooltip with InstallLocation path
             str,    # path to welcome file if it exists or None
             str)    # path to options file if it exists or None
 
@@ -186,8 +187,10 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         column = Gtk.TreeViewColumn(_("Version"), renderer, text=2)
         self.tree.append_column(column)
         # i18n: column header in table displaying installed keyboards
-        column = Gtk.TreeViewColumn(_("Location"), renderer, text=5)
+        column = Gtk.TreeViewColumn(_("Area"), renderer, text=5)
         self.tree.append_column(column)
+
+        self.tree.set_tooltip_column(column=6)
 
         select = self.tree.get_selection()
         select.connect("changed", self.on_tree_selection_changed)
@@ -286,7 +289,8 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
                 kmpdata['version'],
                 kmpdata['packageID'],
                 install_area,
-                get_keyman_dir(install_area).replace(os.path.expanduser('~'), '~'),
+                get_install_area_string(install_area),
+                path.replace(os.path.expanduser('~'), '~'),
                 welcome_file,
                 options_file])
 
