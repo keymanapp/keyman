@@ -6,7 +6,8 @@ import type { FloatingOSKView } from 'keyman/engine/osk';
 
 declare var keyman: KeymanEngine;
 
-type KeyboardMap = {[id: string]: any};
+type KeyboardData = ReturnType<KeymanEngine['getKeyboard']>;
+type KeyboardMap = {[id: string]: KeyboardData};
 
 export class BatchRenderer {
   static divMaster: HTMLDivElement;
@@ -50,7 +51,7 @@ export class BatchRenderer {
   private filterKeyboards(): KeyboardMap {
     let kbds = keyman.getKeyboards();
 
-    let keyboardMap = [];
+    let keyboardMap = {};
 
     for(var i = 0; i < kbds.length; i++) {
       let id: string = kbds[i].InternalName;
@@ -94,20 +95,20 @@ export class BatchRenderer {
     return capture();
   }
 
-  createKeyboardHeader(kbd, loaded: boolean): HTMLDivElement {
+  createKeyboardHeader(kbd: KeyboardData, loaded: boolean): HTMLDivElement {
     let divHeader = document.createElement('div');
     let eleName = document.createElement('h2');
 
-    eleName.textContent = 'ID:  ' + kbd['InternalName'];
+    eleName.textContent = 'ID:  ' + kbd.InternalName;
     divHeader.appendChild(eleName);
 
     let eleDescription = document.createElement('p');
 
     if(loaded) {
 
-      eleDescription.appendChild(document.createTextNode('Name: ' + kbd['Name']));
+      eleDescription.appendChild(document.createTextNode('Name: ' + kbd.Name));
       eleDescription.appendChild(document.createElement('br'));
-      eleDescription.appendChild(document.createTextNode('Font:  ' + window['keyman'].core.activeKeyboard._legacyLayoutSpec.F));
+      eleDescription.appendChild(document.createTextNode('Font:  ' + keyman.core.activeKeyboard['_legacyLayoutSpec'].F));
 
     } else {
       eleDescription.appendChild(document.createTextNode('Unable to load this keyboard!'));
@@ -118,15 +119,14 @@ export class BatchRenderer {
     return divHeader;
   }
 
-  private processKeyboard(kbd) {
-    let p: Promise<any> = keyman.setActiveKeyboard(kbd['InternalName']);
+  private processKeyboard(kbd: KeyboardData) {
+    let p: Promise<any> = keyman.setActiveKeyboard(kbd.InternalName);
     let isMobile = keyman.config.hostDevice.formFactor != 'desktop';
 
     // Establish common keyboard header info.
     let divSummary = document.createElement('div');
     // Establishes a linkable target for this keyboard's data.
-    divSummary.id = "summary-" + kbd['InternalName'];
-
+    divSummary.id = "summary-" + kbd.InternalName;
     BatchRenderer.divMaster.insertAdjacentElement('afterbegin', divSummary);
 
     // A nice, closure-friendly reference for use in our callbacks.
@@ -194,7 +194,7 @@ export class BatchRenderer {
       // The resulting Promise will only call it's `.then()` once all of this keyboard's renders have been completed.
       return renderer.arrayPromiseIteration(renderLayer, Object.keys(layers).length);
     }).catch(function() {
-      console.log("Failed to load the \"" + kbd['InternalName'] + "\" keyboard for rendering!");
+      console.log("Failed to load the \"" + kbd.InternalName + "\" keyboard for rendering!");
       divSummary.appendChild(renderer.createKeyboardHeader(kbd, false));
       return Promise.resolve();
     });

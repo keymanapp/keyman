@@ -6,7 +6,6 @@
  */
 
 import esbuild from 'esbuild';
-import { spawn } from 'child_process';
 
 await esbuild.build({
   bundle: true,
