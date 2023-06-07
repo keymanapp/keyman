@@ -1,0 +1,7 @@
+# Files generated during unit tests that do not need to be committed but are
+# kept around for comparison if needed
+khmer_angkor.js.strip.js
+khmer_angkor.kmx
+khmer_angkor.kvk
+khmer_angkor.test.js
+khmer_angkor.test.js.strip.js
