@@ -51,12 +51,12 @@ def main():
         print_keyboards(installed_kmp, args.long)
 
 
-def print_keyboards(installed_kmp, verbose):
+def print_keyboards(installed_kmp, detailed):
     for packageID in sorted(installed_kmp):
-        print(installed_kmp[packageID]['name'] + ", version:", installed_kmp[packageID]['version'] + ", id:", packageID)
-        if verbose:
+        print(f"{installed_kmp[packageID]['name']}, version: {installed_kmp[packageID]['kmpversion']}, id: {packageID}")
+        if detailed:
             if installed_kmp[packageID]['version'] != installed_kmp[packageID]['kmpversion']:
-                print("Version mismatch. Installed keyboard package is %s. Website says it is %s."
+                print("New version of keyboard available. Installed keyboard package is %s. Website has %s."
                       % (installed_kmp[packageID]['kmpversion'], installed_kmp[packageID]['version']))
             if installed_kmp[packageID]['name'] != installed_kmp[packageID]['kmpname']:
                 print("Name mismatch. Installed keyboard package is %s. Website says it is %s."

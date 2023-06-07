@@ -131,7 +131,7 @@ def get_kmp_version(packageID):
 def _get_kmp_version_internal(packageId, location, previousVersion):
     kmp = get_installed_kmp(location)
     if packageId in kmp:
-        version = kmp[packageId]['version']
+        version = kmp[packageId]['kmpversion']
         if previousVersion and previousVersion < version or not previousVersion:
             previousVersion = version
     return previousVersion

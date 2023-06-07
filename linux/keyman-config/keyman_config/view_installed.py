@@ -312,7 +312,7 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             store.append([
               icofile,
               kmpdata['name'],
-              kmpdata['version'],
+              kmpdata['kmpversion'],
               kmpdata['packageID'],
               install_area,
               get_install_area_string(install_area),
