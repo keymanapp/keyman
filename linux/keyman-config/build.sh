@@ -44,8 +44,8 @@ execute_with_temp_schema() {
   rm -rf "${TEMP_DATA_DIR}"
 }
 
-build_man_pages() {
-  execute_with_temp_schema ./build-help.sh --man --no-reconf
+build_man_and_help_pages() {
+  execute_with_temp_schema ./build-help.sh --no-reconf
 }
 
 build_action() {
@@ -70,8 +70,8 @@ build_action() {
     builder_echo "Skip building lang_tags_map.py during package build"
   fi
   popd
-  builder_echo "Building man pages"
-  build_man_pages
+  builder_echo "Building man and help pages"
+  build_man_and_help_pages
   builder_echo "Building keyman-config"
   python3 setup.py build
 }
