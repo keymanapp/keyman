@@ -304,7 +304,7 @@ export class UtilApiEndpoint {
   }
 
   /**
-   * Function     toNumber
+   * Function     toFloat
    * Scope        Public
    * @param       {string}      s            numeric string
    * @param       {number}      dflt         default value

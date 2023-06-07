@@ -13,7 +13,8 @@
       },
     },
   "include": [
-      "**/test-*.ts"
+      "**/test-*.ts",
+      "./helpers/index.ts"
   ],
   "references": [
       { "path": "../../../../common/web/keyman-version/" },

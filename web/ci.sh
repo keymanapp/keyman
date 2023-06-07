@@ -118,7 +118,7 @@ if builder_start_action prepare:s.keyman.com; then
   # The main build products are expected to reside at the root of this folder.
   BASE_PUBLISH_FOLDER="$S_KEYMAN_COM/kmw/engine/$VERSION"
   echo "FOLDER: $BASE_PUBLISH_FOLDER"
-  mkdir -p "$BASE_PUBLISH_FOLDER/resources"
+  mkdir -p "$BASE_PUBLISH_FOLDER"
 
   # s.keyman.com - release-config only.  It's notably smaller, thus far more favorable
   # for distribution via cloud service.

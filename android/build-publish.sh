@@ -76,6 +76,7 @@ echo "BUILD_FLAGS $BUILD_FLAGS"
 if [ "$DO_KMAPRO" = true ]; then
   # Copy Release Notes
   generateReleaseNotes
+  cd "$KEYMAN_ROOT/android/KMAPro/"
   ./gradlew $DAEMON_FLAG $BUILD_FLAGS
 fi
 

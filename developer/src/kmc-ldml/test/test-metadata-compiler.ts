@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { checkMessages, compileKeyboard, makePathToFixture } from './helpers/index.js';
+import { checkMessages, compileKeyboard, compilerTestOptions, makePathToFixture } from './helpers/index.js';
 import { KMX } from '@keymanapp/common-types';
 import KEYMAN_VERSION from '@keymanapp/keyman-version';
 
@@ -13,7 +13,7 @@ describe('kmx metadata compiler', function () {
     const inputFilename = makePathToFixture('basic.xml');
 
     // Compile the keyboard
-    const kmx = compileKeyboard(inputFilename, {debug:true, addCompilerVersion:true});
+    const kmx = compileKeyboard(inputFilename, {...compilerTestOptions, debug:true, addCompilerVersion:true});
     checkMessages();
     assert.isNotNull(kmx);
 
@@ -48,7 +48,7 @@ describe('kmx metadata compiler', function () {
     const inputFilename = makePathToFixture('basic.xml');
 
     // Compile the keyboard
-    const kmx = compileKeyboard(inputFilename, {debug:true, addCompilerVersion:false});
+    const kmx = compileKeyboard(inputFilename, {...compilerTestOptions, debug:true, addCompilerVersion:false});
     checkMessages();
     assert.isNotNull(kmx);
 

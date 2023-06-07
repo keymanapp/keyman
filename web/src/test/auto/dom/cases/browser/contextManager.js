@@ -149,6 +149,7 @@ describe('app/browser:  ContextManager', function () {
 
     // Note:  iframes require additional time to resolve.
     await promiseForIframeLoad(document.getElementById('iframe'));
+    await promiseForIframeLoad(document.getElementById('design-iframe'));
 
     // Give the design-mode iframe a bit of time to set itself up properly.
     // Note: it is thus important that whatever sends the `install` command has also

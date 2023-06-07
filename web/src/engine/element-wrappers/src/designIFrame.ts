@@ -125,12 +125,12 @@ export default class DesignIFrame extends OutputTarget<{}> {
   }
 
   getDeadkeyCaret(): number {
-    return (this.getTextBeforeCaret() ?? this.getText()).kmwLength();
+    return this.getTextBeforeCaret().kmwLength();
   }
 
   getTextBeforeCaret(): string {
     if(!this.hasSelection()) {
-      return;
+      return this.getText();
     }
 
     let caret = this.getCarets().start;

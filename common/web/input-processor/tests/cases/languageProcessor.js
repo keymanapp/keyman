@@ -21,14 +21,24 @@ String.kmwEnableSupplementaryPlane(false);
 
 // Test the KeyboardProcessor interface.
 describe('LanguageProcessor', function() {
+  let worker;
+
+  beforeEach(function() {
+    worker = LMWorker.constructInstance();
+  });
+
+  afterEach(function() {
+    worker.terminate();
+  });
+
   describe('[[constructor]]', function () {
     it('should initialize without errors', function () {
-      let lp = new LanguageProcessor(LMWorker.constructInstance());
+      let lp = new LanguageProcessor(worker);
       assert.isNotNull(lp);
     });
 
     it('has expected default values after initialization', function () {
-      let languageProcessor = new LanguageProcessor(LMWorker.constructInstance());
+      let languageProcessor = new LanguageProcessor(worker);
 
       // These checks are lifted from the keyboard-processor init checks found in
       // common/web/keyboard-processor/tests/cases/basic-init.js.
@@ -70,7 +80,7 @@ describe('LanguageProcessor', function() {
       };
 
       it("successfully loads the model", function(done) {
-        let languageProcessor = new LanguageProcessor(LMWorker.constructInstance());
+        let languageProcessor = new LanguageProcessor(worker);
 
         languageProcessor.loadModel(modelSpec).then(function() {
           assert.isOk(languageProcessor.activeModel); // is only set after a successful load.
@@ -81,7 +91,7 @@ describe('LanguageProcessor', function() {
       });
 
       it("generates the expected prediction set", function(done) {
-        let languageProcessor = new LanguageProcessor(LMWorker.constructInstance());
+        let languageProcessor = new LanguageProcessor(worker);
 
         let contextSource = new Mock("li", 2);
         let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
@@ -117,7 +127,7 @@ describe('LanguageProcessor', function() {
 
         describe("does not alter casing when input is lowercased", function() {
           it("when input is fully lowercased", function(done) {
-            let languageProcessor = new LanguageProcessor(LMWorker.constructInstance());
+            let languageProcessor = new LanguageProcessor(worker);
 
             let contextSource = new Mock("li", 2);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
@@ -136,7 +146,7 @@ describe('LanguageProcessor', function() {
           });
 
           it("when input has non-initial uppercased letters", function(done) {
-            let languageProcessor = new LanguageProcessor(LMWorker.constructInstance());
+            let languageProcessor = new LanguageProcessor(worker);
 
             let contextSource = new Mock("lI", 2);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
@@ -156,7 +166,7 @@ describe('LanguageProcessor', function() {
           });
 
           it("unless the suggestion has uppercased letters", function(done) {
-            let languageProcessor = new LanguageProcessor(LMWorker.constructInstance());
+            let languageProcessor = new LanguageProcessor(worker);
 
             let contextSource = new Mock("i", 1);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
@@ -177,7 +187,7 @@ describe('LanguageProcessor', function() {
 
         describe("uppercases suggestions when input is fully capitalized ", function() {
           it("for suggestions with default casing  (== 'lower')", function(done) {
-            let languageProcessor = new LanguageProcessor(LMWorker.constructInstance());
+            let languageProcessor = new LanguageProcessor(worker);
 
             let contextSource = new Mock("LI", 2);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
@@ -197,7 +207,7 @@ describe('LanguageProcessor', function() {
           });
 
           it("for precapitalized suggestions", function(done) {
-            let languageProcessor = new LanguageProcessor(LMWorker.constructInstance());
+            let languageProcessor = new LanguageProcessor(worker);
 
             let contextSource = new Mock("I", 1);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
@@ -219,7 +229,7 @@ describe('LanguageProcessor', function() {
         describe("initial-cases suggestions when input uses initial casing ", function() {
           describe("when input is a single capitalized letter", function() {
             it("for suggestions with default casing (== 'lower')", function(done) {
-              let languageProcessor = new LanguageProcessor(LMWorker.constructInstance());
+              let languageProcessor = new LanguageProcessor(worker);
 
               let contextSource = new Mock("L", 1);
               let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
@@ -241,7 +251,7 @@ describe('LanguageProcessor', function() {
 
           describe("input length > 1", function() {
             it("for suggestions with default casing (== 'lower')", function(done) {
-              let languageProcessor = new LanguageProcessor(LMWorker.constructInstance());
+              let languageProcessor = new LanguageProcessor(worker);
 
               let contextSource = new Mock("Li", 2);
               let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
