@@ -431,7 +431,7 @@ function findBoundaries(text: string, options?: DefaultWordBreakerOptions): numb
     }
     // Do not break across certain punctuation
     // WB6: (Don't break before apostrophes in contractions)
-    const SET_ALL_MIDLETTER = [WordBreakProperty.MidLetter, ...SET_MIDNUMLETQ];
+    const SET_ALL_MIDLETTER = [WordBreakProperty.MidLetter].concat(SET_MIDNUMLETQ);
     if(state.match(null, SET_AHLETTER, SET_ALL_MIDLETTER, SET_AHLETTER)) {
       continue;
     }
@@ -474,7 +474,7 @@ function findBoundaries(text: string, options?: DefaultWordBreakerOptions): numb
     }
     // Do not break within sequences, such as 3.2, 3,456.789
     // WB11
-    const SET_ALL_MIDNUM = [WordBreakProperty.MidNum, ...SET_MIDNUMLETQ];
+    const SET_ALL_MIDNUM = [WordBreakProperty.MidNum].concat(SET_MIDNUMLETQ);
     if(state.match([WordBreakProperty.Numeric], SET_ALL_MIDNUM, [WordBreakProperty.Numeric], null)) {
       continue;
     }
@@ -488,9 +488,7 @@ function findBoundaries(text: string, options?: DefaultWordBreakerOptions): numb
     }
     // Do not break from extenders (e.g., U+202F NARROW NO-BREAK SPACE)
     // WB13a
-    const SET_NUM_KAT_LET = [WordBreakProperty.Katakana,
-                              WordBreakProperty.Numeric,
-                              ...SET_AHLETTER];
+    const SET_NUM_KAT_LET = [WordBreakProperty.Katakana, WordBreakProperty.Numeric].concat(SET_AHLETTER);
     if(state.match(null, SET_NUM_KAT_LET, [WordBreakProperty.ExtendNumLet], null)) {
       continue;
     }
