@@ -69,7 +69,7 @@ const commonConfig = {
 };
 
 // Prepare the needed setup for `tslib` treeshaking.
-const unusedHelpers = await determineNeededDowncompileHelpers(commonConfig);
+const unusedHelpers = await determineNeededDowncompileHelpers(commonConfig, /worker-main\.wrapped\.(?:min\.).js?/);
 commonConfig.plugins = [buildTslibTreeshaker(unusedHelpers), ...commonConfig.plugins];
 
 // And now... do the actual builds.

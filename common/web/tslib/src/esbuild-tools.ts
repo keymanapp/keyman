@@ -4,7 +4,7 @@ import fs from 'fs';
 // Note:  this package is intended 100% as a dev-tool, hence why esbuild is just a dev-dependency.
 
 // Component #1:  Detect all `tslib` helpers we actually want to use.
-export async function determineNeededDowncompileHelpers(config: esbuild.BuildOptions, log: boolean) {
+export async function determineNeededDowncompileHelpers(config: esbuild.BuildOptions, ignoreFilePattern?: RegExp, log?: boolean) {
   const tslibHelperNames = [
     "__extends",
     "__assign",
@@ -19,6 +19,7 @@ export async function determineNeededDowncompileHelpers(config: esbuild.BuildOpt
     "__values",
     "__read",
     "__spread",
+    "__spreadArray",
     "__spreadArrays",
     "__await",
     "__asyncGenerator",
@@ -26,9 +27,15 @@ export async function determineNeededDowncompileHelpers(config: esbuild.BuildOpt
     "__asyncValues",
     "__makeTemplateObject",
     "__importStar",
+    "__setModuleDefault", // only used by the previous entry!
     "__importDefault",
     "__classPrivateFieldGet",
-    "__classPrivateFieldSet"
+    "__classPrivateFieldSet",
+    "__classPrivateFieldIn",
+    "__runInitializers",
+    "__setFunctionName",
+    "__propKey",
+    "__esDecorate"
   ];
 
   const detectedHelpers: string[] = [];
@@ -37,18 +44,47 @@ export async function determineNeededDowncompileHelpers(config: esbuild.BuildOpt
     name: 'tslib helper use detection',
     setup(build) {
       build.onLoad({filter: /\.js$/}, async (args) => {
-        //
-        if(/tslib.js$/.test(args.path)) {
-          // Returning `undefined` makes this 'pass-through' - it doesn't prevent other
+        let source = await fs.promises.readFile(args.path, 'utf8');
+
+        let warnings: esbuild.Message[] = [];
+
+        if(/tslib.js$/.test(args.path) || ignoreFilePattern?.test(args.path)) {
+          let declarationRegex = /var (__[a-zA-Z0-9]+)/g;
+          let results = source.match(declarationRegex);
+
+          for(let result of results) {
+            let capture = result.substring(4);
+
+            if(!tslibHelperNames.find((entry) => entry == capture)) {
+              // TODO:  integrate as esbuild log message.
+              console.log("Missing? " + capture);
+
+              // Match:  `result` itself.  Grab index, build location, build message.
+              let index = source.indexOf(result);
+
+              warnings.push(buildMessage(
+                'tslib helper use detection',
+                'Probable `tslib` helper `' + capture + '` has not been validated for tree-shaking potential',
+                indexToSourceLocation(source, index, result.length, args.path)
+              ));
+            }
+          }
+
+          // Returning `undefined` for `content` makes this 'pass-through' - it doesn't prevent other
           // configured plugins from working.
-          return;
+          return {
+            warnings: warnings
+          };
         }
 
-        let source = await fs.promises.readFile(args.path, 'utf8');
 
         for(let helper of tslibHelperNames) {
           if(source.indexOf(helper) > -1 && !detectedHelpers.find((entry) => entry == helper)) {
             detectedHelpers.push(helper);
+
+            if(helper == '__importStar') {
+              detectedHelpers.push('__setModuleDefault');
+            }
           }
         }
 
@@ -92,7 +128,7 @@ export async function determineNeededDowncompileHelpers(config: esbuild.BuildOpt
   return unusedHelpers;
 }
 
-function indexToSourcePosition(source: string, index: number) {
+function indexToSourceLocation(source: string, index: number, matchLength: number, file: string): esbuild.Location {
   let priorText = source.substring(0, index);
   let lineNum = priorText.split('\n').length;
   let lastLineBreakIndex = priorText.lastIndexOf('\n');
@@ -100,9 +136,24 @@ function indexToSourcePosition(source: string, index: number) {
   let nextLineBreakIndex = source.indexOf('\n', lastLineBreakIndex+1);
 
   return {
+    file: file,
     line: lineNum,
     column: colNum,
-    lineText: source.substring(lastLineBreakIndex+1, nextLineBreakIndex)
+    lineText: source.substring(lastLineBreakIndex+1, nextLineBreakIndex),
+    namespace: '',
+    suggestion: '',
+    length: matchLength
+  }
+}
+
+function buildMessage(pluginName: string, message: string, location: esbuild.Location): esbuild.Message {
+  return {
+    id: '',
+    notes: [],
+    detail: '',
+    pluginName: pluginName,
+    text: message,
+    location: location
   }
 }
 
@@ -125,6 +176,67 @@ class TslibTreeshaker implements esbuild.Plugin {
     this.unusedHelpers = unusedHelpers;
   }
 
+  treeshakeDefinition(source: string, start: number, expectTernary: boolean, name: string, location: esbuild.Location) {
+    let scopeDepth = 0;
+    let parenDepth = 0;
+    let topLevelTernaryActive = 0;
+    let i = start;
+    let char = source.charAt(i);
+    while(char != '}' || --scopeDepth != 0 || topLevelTernaryActive) {
+      if(char == '{') {
+        scopeDepth++;
+      } else if(char == '(') {
+        parenDepth++;
+      } else if(char == ')') {
+        parenDepth--;
+      } else if(char == '?' && scopeDepth == 0) {
+        if(!expectTernary) {
+          return {
+            source: source,
+            error: buildMessage(this.name, `Unexpected conditional for definition of ${name}`, location)
+          }
+        }
+        topLevelTernaryActive++;
+      } else if(char == ':' && topLevelTernaryActive && scopeDepth == 0) {
+        topLevelTernaryActive--;
+      }
+      i++;
+
+      if(i > source.length) {
+        return {
+          source: source,
+          error: buildMessage(this.name, `Failed to determine end of definition for ${name}`, location)
+        };
+      }
+
+      char = source.charAt(i);
+    }
+    i++; // we want to erase the final '}', too.
+
+    // The functions may be wrapped with parens.
+    if(parenDepth == 1) {
+      let nextOpen = source.indexOf('(', i);
+      let nextClosed = source.indexOf(')', i);
+
+      if(nextOpen < nextClosed) {
+        return {
+          source: source,
+          error: buildMessage(this.name, `Failed to determine end of definition for ${name}`, location)
+        };
+      } else {
+        i = nextClosed + 1;
+      }
+    }
+
+    if(source.charAt(i) == ';') {
+      i++;
+    }
+
+    return {
+      source:  source.replace(source.substring(start, i), '')
+    };
+  }
+
   setup(build: esbuild.PluginBuild) {
     build.onLoad({filter: /tslib.js$/}, async (args) => {
       const trueSource = await fs.promises.readFile(args.path, 'utf8');
@@ -138,70 +250,63 @@ class TslibTreeshaker implements esbuild.Plugin {
         source = source.replace(`exporter\(\"${unusedHelper}\", ${unusedHelper}\);`, '');
 
         // Removes the actual helper function definition - obviously, the biggest filesize savings to be had here.
-        let definitionStart = source.indexOf(`${unusedHelper} = function`);
+        let matchString = `${unusedHelper} = function`;
+        let expectTernary = false;
 
-        // Emission of warnings & errors
-        if(definitionStart == -1) {
-          let matchString = `${unusedHelper} =`
-          let bestGuessIndex = trueSource.indexOf(matchString);
-          if(bestGuessIndex == -1) {
-            matchString = `var ${unusedHelper}`
-            bestGuessIndex = trueSource.indexOf(matchString);
-          }
+        // A special case - it has two different versions depending on if Object.create exists or not.
+        // This is established via a ternary conditional.  Just adds a bit to the parsing.
+        if(unusedHelper == '__createBinding') {
+          matchString = `${unusedHelper} = `;
+          expectTernary = true;
+        } else if(unusedHelper == '__setModuleDefault') {
+          matchString = `var ${unusedHelper} = `; // is inlined, not declared at top!
+          expectTernary = true;
+        }
+        let definitionStart = source.indexOf(matchString);
 
-          if(bestGuessIndex == -1) {
-            matchString = '';
-          }
+        if(definitionStart > -1) {
+          const result = this.treeshakeDefinition(
+            source,
+            definitionStart,
+            expectTernary,
+            unusedHelper,
+            indexToSourceLocation(trueSource, trueSource.indexOf(matchString), matchString.length, args.path)
+          );
 
-          let logLocation = indexToSourcePosition(trueSource, bestGuessIndex);
-
-          let location: esbuild.Location = {
-            file: args.path,
-            line: logLocation.line,
-            column: logLocation.column,
-            length: matchString.length,
-            lineText: logLocation.lineText,
-            namespace: '',
-            suggestion: ''
-          }
-
-          if(unusedHelper == '__createBinding') {
-            warnings.push({
-              id: '',
-              notes: [],
-              detail: '',
-              pluginName: this.name,
-              text: "Currently unable to force-treeshake the __createBinding tslib helper",
-              location: location
-            });
+          if(result.error) {
+            errors.push(result.error);
           } else {
-            warnings.push({
-              id: '',
-              notes: [],
-              detail: '',
-              pluginName: this.name,
-              text: "tslib has likely been updated recently; could not force-treeshake tslib helper " + unusedHelper,
-              location: location
-            });
+            source = result.source;
           }
           continue;
         }
 
-        let scopeDepth = 0;
-        let i = definitionStart;
-        let char = source.charAt(i);
-        while(char != '}' || --scopeDepth != 0) {
-          if(char == '{') {
-            scopeDepth++;
+        // If we reached this point, we couldn't treeshake the unused helper appropriately.
+        if(definitionStart == -1) {
+          // Matches the standard definition pattern's left-hand assignment component.
+          matchString = `${unusedHelper} =`
+          let bestGuessIndex = trueSource.indexOf(matchString);
+
+          if(bestGuessIndex == -1) {
+            // Failing the above, we match the declaration higher up within the file.
+            matchString = `var ${unusedHelper}`
+            bestGuessIndex = trueSource.indexOf(matchString);
           }
-          i++;
-          char = source.charAt(i);
+
+          // Failing THAT, we just give up and go start-of-file.
+          if(bestGuessIndex == -1) {
+            matchString = '';
+            bestGuessIndex = 0;
+          }
+
+          warnings.push(
+            buildMessage(
+              this.name,
+              "tslib has likely been updated recently; could not force-treeshake tslib helper " + unusedHelper,
+              indexToSourceLocation(trueSource, bestGuessIndex, matchString.length, args.path)
+            )
+          );
         }
-        i++; // we want to erase it, too.
-
-        source = source.replace(source.substring(definitionStart, i), '');
-
-        // The top-level var declaration is auto-removed by esbuild when no references to it remain.
       }
 
       return {
