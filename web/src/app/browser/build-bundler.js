@@ -6,7 +6,6 @@
  */
 
 import esbuild from 'esbuild';
-import { spawn } from 'child_process';
 import fs from 'fs';
 
 let EMIT_FILESIZE_PROFILE = false;
@@ -29,8 +28,8 @@ if(process.argv.length > 2) {
   }
 }
 
+// Component #1:  Detect all `tslib` helpers we actually want to use.
 async function determineNeededDowncompileHelpers(config, log) {
-  // Component #1:  Detect all `tslib` helpers we actually want to use.
   const tslibHelperNames = [
     "__extends",
     "__assign",
@@ -65,6 +64,8 @@ async function determineNeededDowncompileHelpers(config, log) {
       build.onLoad({filter: /\.js$/}, async (args) => {
         //
         if(/tslib.js$/.test(args.path)) {
+          // Returning `undefined` makes this 'pass-through' - it doesn't prevent other
+          // configured plugins from working.
           return;
         }
 
@@ -76,6 +77,8 @@ async function determineNeededDowncompileHelpers(config, log) {
           }
         }
 
+        // Returning `undefined` makes this 'pass-through' - it doesn't prevent other
+        // configured plugins from working.
         return;
       });
     }
@@ -84,6 +87,9 @@ async function determineNeededDowncompileHelpers(config, log) {
   // tslib tree-shake phase 1 - detecting which helpers are safe to remove.
   await esbuild.build({
     ...config,
+    // `tslibHelperDetectionPlugin` is pass-through, and so has no net effect on
+    // the build.  We just use this run to scan for any utilized `tslib` helper funcs,
+    // not to manipulate the actual source in any way.
     plugins: [ tslibHelperDetectionPlugin, ...config.plugins ],
     write: false
   });
@@ -110,6 +116,105 @@ async function determineNeededDowncompileHelpers(config, log) {
 
   return unusedHelpers;
 }
+
+// Component #2:  when we've actually determined which ones are safe to remove, this plugin
+// can remove their code.
+function configuredDowncompileTreeshakePlugin(unusedHelpers) {
+  function indexToSourcePosition(source, index) {
+    let priorText = source.substring(0, index);
+    let lineNum = priorText.split('\n').length;
+    let lastLineBreakIndex = priorText.lastIndexOf('\n');
+    let colNum = index - lastLineBreakIndex;
+    let nextLineBreakIndex = source.indexOf('\n', lastLineBreakIndex+1);
+
+    return {
+      line: lineNum,
+      column: colNum,
+      lineText: source.substring(lastLineBreakIndex+1, nextLineBreakIndex)
+    }
+  }
+
+  return {
+    name: 'tslib forced treeshaking',
+    setup(build) {
+      build.onLoad({filter: /tslib.js$/}, async (args) => {
+        const trueSource = await fs.promises.readFile(args.path, 'utf8');
+        let source = trueSource;
+
+        let warnings = [];
+        let errors = [];
+
+        for(let unusedHelper of unusedHelpers) {
+          // Removes the 'exporter' line used to actually export it from the tslib source.
+          source = source.replace(`exporter\(\"${unusedHelper}\", ${unusedHelper}\);`, '');
+
+          // Removes the actual helper function definition - obviously, the biggest filesize savings to be had here.
+          let definitionStart = source.indexOf(`${unusedHelper} = function`);
+
+          // Emission of warnings & errors
+          if(definitionStart == -1) {
+            let matchString = `${unusedHelper} =`
+            let bestGuessIndex = trueSource.indexOf(matchString);
+            if(bestGuessIndex == -1) {
+              matchString = `var ${unusedHelper}`
+              bestGuessIndex = trueSource.indexOf(matchString);
+            }
+
+            if(bestGuessIndex == -1) {
+              matchString = '';
+            }
+
+            let logLocation = indexToSourcePosition(trueSource, bestGuessIndex);
+
+            let location = {
+              file: args.path,
+              line: logLocation.line,
+              column: logLocation.column,
+              length: matchString.length,
+              lineText: logLocation.lineText
+            }
+
+            if(unusedHelper == '__createBinding') {
+              warnings.push({
+                text: "Currently unable to force-treeshake the __createBinding tslib helper",
+                location: location
+              });
+            } else {
+              warnings.push({
+                text: "tslib has likely been updated recently; could not force-treeshake tslib helper " + unusedHelper,
+                location: location
+              });
+            }
+            continue;
+          }
+
+          let scopeDepth = 0;
+          let i = definitionStart;
+          let char = source.charAt(i);
+          while(char != '}' || --scopeDepth != 0) {
+            if(char == '{') {
+              scopeDepth++;
+            }
+            i++;
+            char = source.charAt(i);
+          }
+          i++; // we want to erase it, too.
+
+          source = source.replace(source.substring(definitionStart, i), '');
+
+          // The top-level var declaration is auto-removed by esbuild when no references to it remain.
+        }
+
+        return {
+          contents: source,
+          loader: 'js',
+          warnings: warnings,
+          errors: errors
+        };
+      });
+    }
+  };
+};
 
 /*
  * Refer to https://github.com/microsoft/TypeScript/issues/13721#issuecomment-307259227 -
@@ -150,62 +255,11 @@ const commonConfig = {
   tsconfig: './tsconfig.json'
 };
 
-// tslib tree-shake phase 1 - detecting which helpers are safe to remove.
+// Prepare the needed setup for `tslib` treeshaking.
 const unusedHelpers = await determineNeededDowncompileHelpers(commonConfig);
+commonConfig.plugins = [configuredDowncompileTreeshakePlugin(unusedHelpers), ...commonConfig.plugins];
 
-// Component #2:  when we've actually determined which ones are safe to remove, this plugin
-// can remove their code.
-let tslibForcedTreeshakingPlugin = {
-  name: 'tslib helpers - forced treeshaking',
-  setup(build) {
-    build.onLoad({filter: /tslib.js$/}, async (args) => {
-      let source = await fs.promises.readFile(args.path, 'utf8');
-
-      // TODO:  transformations to eliminate the stuff we don't want.
-      for(let unusedHelper of unusedHelpers) {
-        // Removes the 'exporter' line used to actually export it from the tslib source.
-        source = source.replace(`exporter\(\"${unusedHelper}\", ${unusedHelper}\);`, '');
-
-        // Removes the actual helper function definition - obviously, the biggest filesize savings to be had here.
-        let definitionStart = source.indexOf(`${unusedHelper} = function`);
-        if(definitionStart == -1) {
-          if(unusedHelper == '__createBinding') {
-            console.warn("Currently unable to force-treeshake the __createBinding tslib helper");
-          } else {
-            console.error("tslib has likely been updated recently; could not force-treeshake tslib helper " + unusedHelper);
-          }
-          continue;
-        }
-
-        let scopeDepth = 0;
-        let i = definitionStart;
-        let char = source.charAt(i);
-        while(char != '}' || --scopeDepth != 0) {
-          if(char == '{') {
-            scopeDepth++;
-          }
-          i++;
-          char = source.charAt(i);
-        }
-        i++; // we want to erase it, too.
-
-        source = source.replace(source.substring(definitionStart, i), '');
-
-        // The top-level var declaration is auto-removed by esbuild when no references to it remain.
-
-      }
-
-      return {
-        contents: source,
-        loader: 'js'
-      };
-    });
-  }
-}
-
-commonConfig.plugins = [tslibForcedTreeshakingPlugin, ...commonConfig.plugins];
-
-// From here, the builds are configured to do phase 2 from the preprocessing data done 'til now.
+// And now... do the actual builds.
 await esbuild.build(commonConfig);
 
 let result = await esbuild.build({
