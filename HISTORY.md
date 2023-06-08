@@ -1,5 +1,130 @@
 # Keyman Version History
 
+## 17.0.120 alpha 2023-06-07
+
+* chore(core): look for emcc.py, not emcc (#8934)
+* chore(linux): Move some files to keyman-config (#8917)
+* fix(linux): Fix title of reference page and links (#8939)
+* fix(android/engine): Re-enable KMManager tests (#8940)
+
+## 17.0.119 alpha 2023-06-06
+
+* chore(developer): ensure kmcmplib messages are all UTF-8 (#8927)
+* chore(linux): Fix lintian warnings (#8931)
+
+## 17.0.118 alpha 2023-06-05
+
+* chore(ios): replace fv cert (#8900)
+* fix(core): Fix compilation if hotdoc is installed (#8912)
+* feat(linux): Rename column and add tooltip (#8918)
+
+## 17.0.117 alpha 2023-06-04
+
+* chore(developer): verify long lines compile correctly (#8915)
+
+## 17.0.116 alpha 2023-06-02
+
+* feat(linux): Add column for installation location (#8897)
+* chore(developer): verify kvks files and report errors (#8892)
+* refactor(developer): rearrange kmcmplib interface source (#8899)
+* refactor(developer): move filename consistency check to kmc (#8907)
+* chore(developer): loadFile callback error check and optimization (#8908)
+* chore(common): remove url module ref from common/web/types (#8914)
+
+## 17.0.115 alpha 2023-06-01
+
+* refactor(developer): complete fs move out of kmcmplib (#8882)
+* fix(common): tweak pack/publish support for npm 9.5.1 and node 18.16.0 (#8894)
+* feat(linux): Implement Options page and option to disable Sentry error reporting (#7989)
+
+## 17.0.114 alpha 2023-05-31
+
+* chore(developer): replace cwrap wasm bindings (#8857)
+* chore(developer): refactor kmcmplib interfaces (#8870)
+* chore(developer): move keyboard repo fixtures (#8874)
+* chore(linux): Move build steps to build.sh (#8864)
+
+## 17.0.113 alpha 2023-05-26
+
+* docs(android): Update documentation for building Android on Linux (#8860)
+* fix(android): Fix typo in build-utils.sh (#8859)
+* refactor(developer): compiler interface part 1 for wasm (#8850)
+* chore(developer): remove SetError macro (#8856)
+
+## 17.0.112 alpha 2023-05-25
+
+* refactor(developer): move file write out of WriteCompiledKeyboard and CompileKeyboard merge (#8796)
+
+## 17.0.111 alpha 2023-05-24
+
+* fix(android/app): Pathing for publish script (#8845)
+* chore(developer): add test for missing .js file to kmc-package (#8846)
+* feat(linux): Add dbus system service (#8509)
+* chore(linux): Add missing dependency to GHA (#8849)
+
+## 17.0.110 alpha 2023-05-22
+
+* fix(common): ensure child builds don't rebuild dependencies unnecessarily (#8834)
+
+## 17.0.109 alpha 2023-05-17
+
+* fix(windows): add wrap-symbols to Text Editor Makefile (#8819)
+* chore(linux): Make postinst script comply with Debian policy (#8810)
+* chore(windows): remove legacy core and flag  ️ (#8593)
+
+## 17.0.108 alpha 2023-05-16
+
+* feat(windows): add text editor to the support makefile (#8750)
+* feat(developer): verify keyboard versions in kmc-package (#8769)
+* feat(developer): verify bcp47 tags are valid and minimal in kmc-package (#8778)
+* feat(developer): verify at least one language in package (#8783)
+* chore(developer): verify file types of content files in package (#8792)
+* chore(developer): verify that package has at least a model or keyboard (#8793)
+* chore(ios): Changes required for XCode 14.3 (#8746)
+
+## 17.0.107 alpha 2023-05-15
+
+* chore(linux): Fix installation build step on TC (#8784)
+* refactor(android/engine): Consolidate updateSelection (#8739)
+
+## 17.0.106 alpha 2023-05-12
+
+* chore(developer): move package formats to common/web/types (#8729)
+* feat(developer): add package validation (#8740)
+* feat(developer): add validation of package filenames (#8751)
+* feat(developer): validate content file names in packages (#8755)
+* feat(developer): validate package name in compiler (#8757)
+* chore(developer): rename Compiler and related classes (#8726)
+* feat(developer): uset api from wasm! (#8716)
+
+## 17.0.105 alpha 2023-05-11
+
+* chore(common): Update crowdin strings for Amharic (#8748)
+* chore(android/app): Cleanup build-play-store-notes script (#8749)
+* chore(linux): Add build.sh for keyman-config (#8733)
+
+## 17.0.104 alpha 2023-05-10
+
+* chore(developer): rename kmc-keyboard to kmc-ldml (#8725)
+* chore(linux): bring kmp.json for unit test up to spec (#8732)
+* feat(common): add `builder_run_action` shorthand function (#8742)
+
+## 17.0.103 alpha 2023-05-09
+
+* fix(mac): `$CONFIG` not `$CONFIGURATION` in build path (#8724)
+* chore(linux): Fix another problem uploading to launchpad (#8727)
+
+## 17.0.102 alpha 2023-05-08
+
+* chore(linux): Build for Lunar on all platforms (#8713)
+* fix(linux): Fix linux tests (#8510)
+* chore(linux): Fix uploading to launchpad (#8720)
+
+## 17.0.101 alpha 2023-05-05
+
+* chore(common): `set -eu` in build-utils.sh (#8698)
+* fix(android/app): Resize OSK when resuming app from background (#8704)
+
 ## 17.0.100 alpha 2023-05-04
 
 *  (#8690)

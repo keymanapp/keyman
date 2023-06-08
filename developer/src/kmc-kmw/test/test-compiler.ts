@@ -6,7 +6,7 @@ import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { Compiler } from '@keymanapp/kmc-kmn';
+import { KmnCompiler } from '@keymanapp/kmc-kmn';
 import { KMX, KmxFileReader } from '@keymanapp/common-types';
 import { extractTouchLayout } from './util.js';
 
@@ -35,11 +35,11 @@ describe('Compiler class', function() {
       fs.unlinkSync(testOutfile);
     }
 
-    const kmxCompiler = new Compiler();
-    assert.isTrue(await kmxCompiler.init());
+    const kmnCompiler = new KmnCompiler();
+    assert.isTrue(await kmnCompiler.init(callbacks));
 
     // TODO: runToMemory, add option to kmxCompiler to store debug-data for conversion to .js (e.g. store metadata, group readonly metadata, visual keyboard source filename, etc)
-    assert.isTrue(kmxCompiler.run(infile, outfile, callbacks, {
+    assert.isTrue(kmnCompiler.run(infile, outfile, {
       shouldAddCompilerVersion: false,
       saveDebug: true,
       target: 'js'

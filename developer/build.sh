@@ -28,9 +28,10 @@ builder_describe \
   build \
   test \
   ":kmcmplib=src/kmcmplib                   Compiler - .kmn compiler" \
-  ":kmc-keyboard=src/kmc-keyboard           Compiler - LDML Keyboard Module" \
+  ":kmc-analyze=src/kmc-analyze             Compiler - Analysis Tools" \
   ":kmc-kmn=src/kmc-kmn                     Compiler - .kmn wrapper Keyboard Module" \
   ":kmc-kmw=src/kmc-kmw                     Compiler - .kmn Javascript Keyboard Module" \
+  ":kmc-ldml=src/kmc-ldml                   Compiler - LDML Keyboard Module" \
   ":kmc-model=src/kmc-model                 Compiler - Lexical Model Module" \
   ":kmc-model-info=src/kmc-model-info       Compiler - .model_info Module" \
   ":kmc-package=src/kmc-package             Compiler - Package Module" \

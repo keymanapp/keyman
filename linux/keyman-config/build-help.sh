@@ -3,12 +3,10 @@
 set -e
 set -u
 
-## START STANDARD BUILD SCRIPT INCLUDE
-# adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-## END STANDARD BUILD SCRIPT INCLUDE
-
 THIS_DIR=$(dirname "$THIS_SCRIPT")
+
+cd "${THIS_DIR}"
 
 function display_usage {
     echo "Usage: $0 [--man] [--md] [--no-reconf]"
@@ -50,13 +48,13 @@ while [[ $# -gt 0 ]] ; do
     shift # past the processed argument
 done
 
-if [ -z "$generate_man" -a -z "$generate_help" ]; then
+if [ -z "$generate_man" ] && [ -z "$generate_help" ]; then
     generate_man=1
     generate_help=1
 fi
 
 if [ -n "$reconfigure" ]; then
-    pushd $THIS_DIR/.. > /dev/null
+    pushd "$THIS_DIR/.." > /dev/null
     ./scripts/reconf.sh
     popd > /dev/null
 fi

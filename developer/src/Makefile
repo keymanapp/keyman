@@ -69,12 +69,12 @@ server: .virtual
     cd $(DEVELOPER_ROOT)\src\server
     $(MAKE) $(TARGET)
 
-kmc: kmc-keyboard kmc-kmn kmc-model kmc-model-info kmc-package
+kmc: kmc-ldml kmc-kmn kmc-model kmc-model-info kmc-package
     cd $(DEVELOPER_ROOT)\src\kmc
     $(MAKE) $(TARGET)
 
-kmc-keyboard: .virtual
-    cd $(DEVELOPER_ROOT)\src\kmc-keyboard
+kmc-ldml: .virtual
+    cd $(DEVELOPER_ROOT)\src\kmc-ldml
     $(MAKE) $(TARGET)
 
 kmc-kmn: .virtual

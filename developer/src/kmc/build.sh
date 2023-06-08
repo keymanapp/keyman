@@ -21,9 +21,9 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
   "@/developer/src/kmc-analyze" \
-  "@/developer/src/kmc-keyboard" \
   "@/developer/src/kmc-kmn" \
   "@/developer/src/kmc-kmw" \
+  "@/developer/src/kmc-ldml" \
   "@/developer/src/kmc-model" \
   "@/developer/src/kmc-model-info" \
   "@/developer/src/kmc-package" \
@@ -115,9 +115,9 @@ readonly PACKAGES=(
   common/models/types
   core/include/ldml
   developer/src/kmc-analyze
-  developer/src/kmc-keyboard
   developer/src/kmc-kmn
   developer/src/kmc-kmw
+  developer/src/kmc-ldml
   developer/src/kmc-model
   developer/src/kmc-model-info
   developer/src/kmc-package

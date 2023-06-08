@@ -17,6 +17,7 @@
   </StartMenu>
   <Info>
     <Name URL="">Binary KVK File</Name>
+    <Version>1.0</Version>
   </Info>
   <Files>
     <File>
@@ -25,5 +26,21 @@
       <CopyLocation>0</CopyLocation>
       <FileType>.kvk</FileType>
     </File>
+    <File>
+      <Name>../../invalid/basic.kmx</Name>
+      <Description>Keyboard Basic</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
   </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>Basic</Name>
+      <ID>basic</ID>
+      <Version>1.0</Version>
+      <Languages>
+        <Language ID="KM">Khmer</Language>
+      </Languages>
+    </Keyboard>
+  </Keyboards>
 </Package>

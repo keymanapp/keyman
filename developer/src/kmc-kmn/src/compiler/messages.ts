@@ -1,4 +1,4 @@
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec as m } from "@keymanapp/common-types";
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec as m, compilerExceptionToString as exc } from "@keymanapp/common-types";
 
 const Namespace = CompilerErrorNamespace.KmnCompiler;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
@@ -44,14 +44,37 @@ export const enum KmnCompilerMessageRanges {
   and the below ranges are reserved.
 */
 export class CompilerMessages {
-  static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException, `Unexpected exception: ${(o.e ?? 'unknown error').toString()}\n\nCall stack:\n${(o.e instanceof Error ? o.e.stack : (new Error()).stack)}`);
+  static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException, `Unexpected exception: ${exc(o.e)}`);
   static FATAL_UnexpectedException = SevFatal | 0x1000;
 
-  static Fatal_MissingWasmModule = () => m(this.FATAL_MissingWasmModule, `Could not instanatiate WASM compiler module`);
+  static Fatal_MissingWasmModule = (o:{e?: any}) => m(this.FATAL_MissingWasmModule, `Could not instantiate WASM compiler module or initialization failed: ${exc(o.e)}`);
   static FATAL_MissingWasmModule = SevFatal | 0x1001;
 
   static Fatal_UnableToSetCompilerOptions = () => m(this.FATAL_UnableToSetCompilerOptions, `Unable to set compiler options`);
   static FATAL_UnableToSetCompilerOptions = SevFatal | 0x1002;
+
+  static Fatal_CallbacksNotSet = () => m(this.FATAL_CallbacksNotSet, `Callbacks were not set with init`);
+  static FATAL_CallbacksNotSet = SevFatal | 0x1003;
+
+  static Fatal_UnicodeSetOutOfRange = () => m(this.FATAL_UnicodeSetOutOfRange, `UnicodeSet buffer was too small`);
+  static FATAL_UnicodeSetOutOfRange = SevFatal | 0x1004;
+
+  static Error_UnicodeSetHasStrings = () => m(this.ERROR_UnicodeSetHasStrings, `UnicodeSet contains strings, not allowed`);
+  static ERROR_UnicodeSetHasStrings = SevError | 0x1005;
+
+  static Error_UnicodeSetHasProperties = () => m(this.ERROR_UnicodeSetHasProperties, `UnicodeSet contains properties, not allowed`);
+  static ERROR_UnicodeSetHasProperties = SevError | 0x1006;
+
+  static Error_UnicodeSetSyntaxError = () => m(this.ERROR_UnicodeSetSyntaxError, `UnicodeSet had a Syntax Error while parsing`);
+  static ERROR_UnicodeSetSyntaxError = SevError | 0x1007;
+
+  static Error_InvalidKvksFile = (o:{filename: string, e: any}) => m(this.ERROR_InvalidKvksFile,
+    `Error encountered parsing ${o.filename}: ${o.e}`);
+  static ERROR_InvalidKvksFile = SevError | 0x1008;
+
+  static Warn_InvalidVkeyInKvksFile = (o:{filename: string, invalidVkey: string}) => m(this.WARN_InvalidVkeyInKvksFile,
+    `Invalid virtual key ${o.invalidVkey} found in ${o.filename}`);
+  static WARN_InvalidVkeyInKvksFile = SevWarn | 0x1009;
 }
 
 export function mapErrorFromKmcmplib(line: number, code: number, msg: string): CompilerEvent {

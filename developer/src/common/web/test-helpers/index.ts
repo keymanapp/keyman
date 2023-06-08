@@ -3,9 +3,9 @@ import * as path from 'path';
 import { CompilerEvent, CompilerCallbacks, CompilerSchema, CompilerPathCallbacks, CompilerFileSystemCallbacks, compilerErrorSeverityName } from '@keymanapp/common-types';
 export { verifyCompilerMessagesObject } from './verifyCompilerMessagesObject.js';
 
-// TODO: schemas are only used by kmc-keyboard for now, so this works at this
+// TODO: schemas are only used by kmc-ldml for now, so this works at this
 // time, but it's a little fragile if we need them elsewhere in the future
-const SCHEMA_BASE = '../../../../kmc-keyboard/build/src/';
+const SCHEMA_BASE = '../../../../kmc-ldml/build/src/';
 
 /**
  * A CompilerCallbacks implementation for testing
@@ -36,7 +36,7 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
 
   /* CompilerCallbacks */
 
-  loadFile(filename: string | URL): Buffer {
+  loadFile(filename: string): Uint8Array {
     try {
       return fs.readFileSync(filename);
     } catch(e) {
@@ -57,7 +57,10 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
   }
 
   resolveFilename(baseFilename: string, filename: string): string {
-    const basePath = path.dirname(baseFilename);
+    const basePath =
+      baseFilename.endsWith('/') || baseFilename.endsWith('\\') ?
+      baseFilename :
+      path.dirname(baseFilename);
     // Transform separators to platform separators -- we are agnostic
     // in our use here but path prefers files may use
     // either / or \, although older kps files were always \.
@@ -77,7 +80,7 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
     this.messages.push(event);
   }
 
-  loadSchema(schema: CompilerSchema): Buffer {
+  loadSchema(schema: CompilerSchema): Uint8Array {
     return fs.readFileSync(new URL(SCHEMA_BASE + schema + '.schema.json', import.meta.url));
   }
 

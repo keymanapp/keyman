@@ -14,11 +14,11 @@ export * as KvksFile from './kvk/kvk-file.js';
 
 export * as LDMLKeyboard from './ldml-keyboard/ldml-keyboard-xml.js';
 export { LDMLKeyboardTestDataXMLSourceFile } from './ldml-keyboard/ldml-keyboard-testdata-xml.js';
-export { default as LDMLKeyboardXMLSourceFileReader } from './ldml-keyboard/ldml-keyboard-xml-reader.js';
+export { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions } from './ldml-keyboard/ldml-keyboard-xml-reader.js';
 
 export * as Constants from './consts/virtual-key-constants.js';
 
-export { CompilerCallbacks, CompilerSchema, CompilerEvent, CompilerErrorNamespace, CompilerErrorSeverity, CompilerPathCallbacks, CompilerFileSystemCallbacks, CompilerMessageSpec, compilerErrorSeverity, compilerErrorSeverityName } from './util/compiler-interfaces.js';
+export { CompilerCallbacks, CompilerSchema, CompilerEvent, CompilerErrorNamespace, CompilerErrorSeverity, CompilerPathCallbacks, CompilerFileSystemCallbacks, CompilerMessageSpec, compilerErrorSeverityName, compilerExceptionToString, compilerErrorFormatCode } from './util/compiler-interfaces.js';
 export { CommonTypesMessages } from './util/common-events.js';
 
 export * as TouchLayout from './keyman-touch-layout/keyman-touch-layout-file.js';
@@ -29,4 +29,8 @@ export * as KPJ from './kpj/kpj-file.js';
 export { KPJFileReader } from './kpj/kpj-file-reader.js';
 export { KeymanDeveloperProject } from './kpj/keyman-developer-project.js';
 
+export * as KpsFile from './package/kps-file.js';
+export * as KmpJsonFile from './package/kmp-json-file.js';
+
 export * as util from './util/util.js';
+

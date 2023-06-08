@@ -2,11 +2,6 @@
 # CI script to publish specified app APKs to the Play Store.
 # The APKs should already have been built from a separate script
 
-# Set sensible script defaults:
-# set -e: Terminate script if a command returns an error
-set -e
-# set -u: Terminate script if an unset variable is used
-set -u
 # set -x: Debugging use, print each statement
 # set -x
 
@@ -15,6 +10,8 @@ set -u
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
+
+. "$KEYMAN_ROOT/android/KMAPro/build-play-store-notes.inc.sh"
 
 echo Publishing APKs to Play Store
 
@@ -77,10 +74,9 @@ echo "BUILD_FLAGS $BUILD_FLAGS"
 
 # Publish Keyman for Android
 if [ "$DO_KMAPRO" = true ]; then
-  cd "$KEYMAN_ROOT/android/KMAPro/"
   # Copy Release Notes
-  ./build-play-store-notes.sh
-
+  generateReleaseNotes
+  cd "$KEYMAN_ROOT/android/KMAPro/"
   ./gradlew $DAEMON_FLAG $BUILD_FLAGS
 fi
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<visualkeyboard>
+  <header>
+    <version>10.0</version>
+    <kbdname>caps_lock_layer_3620</kbdname>
+    <flags />
+  </header>
+  <encoding name="unicode" fontname="Khmer Busra Kbd" fontsize="16">
+    <layer shift="RA">
+      <!-- warn_invalid_vkey_in_kvks_file, K_FOO -->
+      <key vkey="K_FOO">ឞ</key>
+    </layer>
+  </encoding>
+</visualkeyboard>

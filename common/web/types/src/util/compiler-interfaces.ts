@@ -36,16 +36,28 @@ export function compilerErrorSeverityName(code: number): string {
 }
 
 /**
+ * Format the error code number
+ * example: "FATAL:0x03004"
+ */
+export function compilerErrorFormatCode(code: number): string {
+  const severity = code & CompilerErrorSeverity.Severity_Mask;
+  const severityName = compilerErrorSeverityName(severity);
+  const errorCode = code & CompilerErrorSeverity.Error_Mask;
+  const errorCodeString = Number(errorCode).toString(16).padStart(5,'0');
+  return `${severityName}:0x${errorCodeString}`;
+}
+
+/**
  * Defines the error code ranges for various compilers. Once defined, these
  * ranges must not be changed as external modules may depend on specific error
  * codes. Individual errors are defined at a compiler level, for example,
- * kmn-keyboard/src/compiler/messages.ts.
+ * kmc-ldml/src/compiler/messages.ts.
  */
 export enum CompilerErrorNamespace {
   /**
-   * kmc-keyboard errors between 0x0000…0x0FFF
+   * kmc-ldml errors between 0x0000…0x0FFF
    */
-  KeyboardCompiler = 0x0000,
+  LdmlKeyboardCompiler = 0x0000,
   /**
    * common/web/types errors between 0x1000…0x1FFF
    */
@@ -100,6 +112,7 @@ export interface CompilerFileSystemCallbacks {
   readFileSync(path: string, options?: { encoding?: null; flag?: string; } | null): Uint8Array;
   readFileSync(path: string, options: { encoding: string; flag?: string; } | string): string;
   readFileSync(path: string, options?: { encoding?: string | null; flag?: string; } | string | null): string | Uint8Array;
+  writeFileSync(path: string, data: Uint8Array): void;
 
   existsSync(name: string): boolean;
 }
@@ -110,14 +123,11 @@ export interface CompilerFileSystemCallbacks {
 export interface CompilerCallbacks {
   /**
    * Attempt to load a file. Return falsy if not found.
-   * TODO: accept only string
    * TODO: never return falsy, just throw if not found?
-   * TODO: Buffer is Node-only.
-   * TODO: rename to readFile, consolidate with fs.readFileSync?
    * @param baseFilename
    * @param filename
    */
-  loadFile(filename: string | URL): Buffer;
+  loadFile(filename: string): Uint8Array;
 
   get path(): CompilerPathCallbacks;
   get fs(): CompilerFileSystemCallbacks;
@@ -129,7 +139,7 @@ export interface CompilerCallbacks {
    */
   resolveFilename(baseFilename: string, filename: string): string;
 
-  loadSchema(schema: CompilerSchema): Buffer;
+  loadSchema(schema: CompilerSchema): Uint8Array;
   reportMessage(event: CompilerEvent): void;
   debug(msg: string): void;
 };
@@ -141,3 +151,10 @@ export interface CompilerCallbacks {
  * @returns
  */
 export const CompilerMessageSpec = (code: number, message: string) : CompilerEvent => { return { code, message } };
+
+/**
+ * @param e Error-like
+ */
+export function compilerExceptionToString(e?: any) : string {
+  return `${(e ?? 'unknown error').toString()}\n\nCall stack:\n${(e instanceof Error ? e.stack : (new Error()).stack)}`;
+}

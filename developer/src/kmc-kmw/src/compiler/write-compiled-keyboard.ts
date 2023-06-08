@@ -1,4 +1,4 @@
-import { KVKSParseError, VisualKeyboard } from "@keymanapp/common-types";
+import { VisualKeyboard } from "@keymanapp/common-types";
 import { KMX, CompilerCallbacks, KvkFileReader, KvksFileReader } from "@keymanapp/common-types";
 import { ExpandSentinel, incxstr, xstrlen } from "../util/util.js";
 // import { KEY, KEYBOARD, KMX.KMXFile, STORE } from "../../../../../common/web/types/src/kmx/kmx.js";
@@ -202,8 +202,7 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
       let reader = new KvksFileReader();
       let source = reader.read(callbacks.loadFile(path));
       reader.validate(source, callbacks.loadSchema("kvks")); // TODO: handle exceptions
-      let errors: KVKSParseError[];
-      kvk = reader.transform(source, errors);
+      kvk = reader.transform(source);
       // TODO: log errors
     }
     else {

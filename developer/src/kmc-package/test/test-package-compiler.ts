@@ -1,15 +1,18 @@
 import 'mocha';
 import * as fs from 'fs';
-import {assert} from 'chai';
-
-import KmpCompiler from '../src/kmp-compiler.js';
-import {makePathToFixture} from './helpers/index.js';
+import { assert } from 'chai';
 import JSZip from 'jszip';
-import KEYMAN_VERSION from "@keymanapp/keyman-version";
-import { type KmpJsonFile } from '../src/kmp-json-file.js';
-import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { CompilerMessages } from '../src/messages.js';
 
+import KEYMAN_VERSION from "@keymanapp/keyman-version";
+import { KmpJsonFile } from '@keymanapp/common-types';
+import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
+
+import { makePathToFixture } from './helpers/index.js';
+
+import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
+import { CompilerMessages } from '../src/compiler/messages.js';
+
+const debug = false;
 
 describe('KmpCompiler', function () {
   const MODELS : string[] = [
@@ -37,7 +40,7 @@ describe('KmpCompiler', function () {
     // Test just the transform from kps to kmp.json
     //
     it(`should transform ${modelID}.model.kps to kmp.json`, function () {
-      let kmpJson: KmpJsonFile;
+      let kmpJson: KmpJsonFile.KmpJsonFile;
 
       assert.doesNotThrow(() => {
         kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
@@ -56,7 +59,7 @@ describe('KmpCompiler', function () {
     it(`should build a full .kmp for ${modelID}`, async function() {
       const zip = JSZip();
       // Build kmp.json in memory
-      const kmpJson: KmpJsonFile = kmpCompiler.transformKpsToKmpObject(kpsPath);
+      const kmpJson: KmpJsonFile.KmpJsonFile = kmpCompiler.transformKpsToKmpObject(kpsPath);
       // Build file.kmp in memory
       const promise = kmpCompiler.buildKmpFile(kpsPath, kmpJson);
       promise.then(data => {
@@ -86,7 +89,7 @@ describe('KmpCompiler', function () {
     const kmpJsonRefPath = makePathToFixture('khmer_angkor', 'ref', 'kmp.json');
 
     const kmpCompiler = new KmpCompiler(callbacks);
-    const kmpJsonFixture: KmpJsonFile = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
+    const kmpJsonFixture: KmpJsonFile.KmpJsonFile = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
 
     // We override the fixture version so that we can compare with the compiler output
     kmpJsonFixture.system.keymanDeveloperVersion = KEYMAN_VERSION.VERSION;
@@ -131,7 +134,7 @@ describe('KmpCompiler', function () {
     const kpsPath = makePathToFixture('absolute_path', 'source', 'absolute_path.kps');
     const kmpCompiler = new KmpCompiler(callbacks);
 
-    let kmpJson: KmpJsonFile = null;
+    let kmpJson: KmpJsonFile.KmpJsonFile = null;
 
     assert.doesNotThrow(() => {
       kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
@@ -139,75 +142,10 @@ describe('KmpCompiler', function () {
 
     await assert.isNull(kmpCompiler.buildKmpFile(kpsPath, kmpJson));
 
+    if(debug) callbacks.printMessages();
+
     assert.lengthOf(callbacks.messages, 2);
     assert.deepEqual(callbacks.messages[0].code, CompilerMessages.WARN_AbsolutePath);
     assert.deepEqual(callbacks.messages[1].code, CompilerMessages.ERROR_FileDoesNotExist);
   });
-
-  //
-  // Message tests
-  //
-
-  function testForMessage(context: Mocha.Context, fixture: string[], messageId?: number) {
-    context.timeout(10000);
-
-    callbacks.clear();
-
-    const kpsPath = makePathToFixture(...fixture);
-    const kmpCompiler = new KmpCompiler(callbacks);
-
-    let kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
-    if(kmpJson && callbacks.messages.length == 0) {
-      // We'll try building the package if we have not yet received any messages
-      kmpCompiler.buildKmpFile(kpsPath, kmpJson)
-    }
-
-    if(messageId) {
-      assert.lengthOf(callbacks.messages, 1);
-      assert.isTrue(callbacks.hasMessage(messageId));
-    } else {
-      assert.lengthOf(callbacks.messages, 0);
-    }
-  }
-
-  // WARN_FileIsNotABinaryKvkFile
-
-  it('should generate WARN_FileIsNotABinaryKvkFile if a non-binary kvk file is included', async function() {
-    testForMessage(this, ['xml_kvk_file', 'source', 'xml_kvk_file.kps'], CompilerMessages.WARN_FileIsNotABinaryKvkFile);
-  });
-
-  it('should not warn if a binary kvk file is included', async function() {
-    testForMessage(this, ['binary_kvk_file', 'source', 'binary_kvk_file.kps']);
-  });
-
-  // ERROR_FollowKeyboardVersionNotAllowedForModelPackages
-
-  it('should generate ERROR_FollowKeyboardVersionNotAllowedForModelPackages if <FollowKeyboardVersion> is set for model packages', async function() {
-    testForMessage(this, ['invalid', 'followkeyboardversion.qaa.sencoten.model.kps'], CompilerMessages.ERROR_FollowKeyboardVersionNotAllowedForModelPackages);
-  });
-
-  // WARN_FollowKeyboardVersionButNoKeyboards
-
-  it('should generate WARN_FollowKeyboardVersionButNoKeyboards if <FollowKeyboardVersion> is set for a package with no keyboards or models', async function() {
-    testForMessage(this, ['invalid', 'followkeyboardversion.empty.kps'], CompilerMessages.WARN_FollowKeyboardVersionButNoKeyboards);
-  });
-
-  // ERROR_KeyboardFileNotFound
-
-  it('should generate ERROR_KeyboardFileNotFound if a <Keyboard> is listed in a package but not found in <Files>', async function() {
-    testForMessage(this, ['invalid', 'keyboardfilenotfound.kps'], CompilerMessages.ERROR_KeyboardFileNotFound);
-  });
-
-  // ERROR_KeyboardFileNotValid
-
-  it('should generate ERROR_KeyboardFileNotValid if a .kmx is not valid in <Files>', async function() {
-    testForMessage(this, ['invalid', 'keyboardfilenotvalid.kps'], CompilerMessages.ERROR_KeyboardFileNotValid);
-  });
-
-  // WARN_KeyboardFileHasNoKeyboardVersion
-
-  it('should generate WARN_KeyboardFileHasNoKeyboardVersion if <FollowKeyboardVersion> is set but keyboard has no version', async function() {
-    testForMessage(this, ['invalid', 'nokeyboardversion.kps'], CompilerMessages.WARN_KeyboardFileHasNoKeyboardVersion);
-  });
-
 });
