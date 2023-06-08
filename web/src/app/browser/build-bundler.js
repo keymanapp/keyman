@@ -63,7 +63,6 @@ const commonConfig = {
   },
   outfile: '../../../build/app/browser/debug/keymanweb.js',
   plugins: [ es5ClassAnnotationAsPurePlugin ],
-  pure: ['__asyncDelegator'],
   target: "es5",
   treeShaking: true,
   tsconfig: './tsconfig.json'
