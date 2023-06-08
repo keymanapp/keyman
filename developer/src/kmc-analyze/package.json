@@ -37,7 +37,7 @@
     "mocha": "^8.4.0",
     "ts-node": "^9.1.1",
     "typescript": "^4.9.5",
-    "@keymanapp/gosh": "*"
+    "@keymanapp/resources-gosh": "*"
   },
   "repository": {
     "type": "git",
