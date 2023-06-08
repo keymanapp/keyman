@@ -19,8 +19,7 @@
 /* Compile target */
 
 #define CKF_KEYMAN    0
-#define CKF_KEYMANWEB 1         // For legacy kmcomp compiler, to be deprecated and removed
-#define CKF_KEYMANWEB_MODERN 2  // For Typescript kmc-kmw compiler
+#define CKF_KEYMANWEB 1
 
 struct KMCMP_COMPILER_OPTIONS {
   bool saveDebug;
