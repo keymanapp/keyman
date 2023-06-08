@@ -124,7 +124,7 @@ fi
 
 if (( build_keymanweb )); then
   pushd "$KEYMAN_ROOT/web/"
-  ./build.sh build
+  ./build.sh build --debug
   popd
 fi
 

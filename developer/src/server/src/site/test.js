@@ -238,7 +238,7 @@ window.onload = function() {
   keyman.addEventListener('keyboardchange', function(keyboardProperties) {
     if(newOSK) {
       keyman.osk = newOSK;
-      newOSK.activeKeyboard = keyman.contextManager.activeKeyboard;
+      newOSK.activeKeyboard = keyman.contextManager.activeKeyboard;  // Private API refs on both sides
     }
     keyboardDropdown.set(keyboardProperties.internalName);
     window.sessionStorage.setItem('current-keyboard', keyboardProperties.internalName);
