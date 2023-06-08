@@ -48,7 +48,7 @@ export async function determineNeededDowncompileHelpers(config: esbuild.BuildOpt
 
         let warnings: esbuild.Message[] = [];
 
-        if(/tslib.js$/.test(args.path) || ignoreFilePattern?.test(args.path)) {
+        if(/tslib.js$/.test(args.path)) {
           let declarationRegex = /var (__[a-zA-Z0-9]+)/g;
           let results = source.match(declarationRegex);
 
@@ -74,6 +74,9 @@ export async function determineNeededDowncompileHelpers(config: esbuild.BuildOpt
           };
         }
 
+        if(ignoreFilePattern?.test(args.path)) {
+          return;
+        }
 
         for(let helper of tslibHelperNames) {
           if(source.indexOf(helper) > -1 && !detectedHelpers.find((entry) => entry == helper)) {
