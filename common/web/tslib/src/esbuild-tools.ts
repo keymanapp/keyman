@@ -56,9 +56,6 @@ export async function determineNeededDowncompileHelpers(config: esbuild.BuildOpt
             let capture = result.substring(4);
 
             if(!tslibHelperNames.find((entry) => entry == capture)) {
-              // TODO:  integrate as esbuild log message.
-              console.log("Missing? " + capture);
-
               // Match:  `result` itself.  Grab index, build location, build message.
               let index = source.indexOf(result);
 
