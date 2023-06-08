@@ -159,6 +159,7 @@ export class LdmlKeyboardCompiler {
       Object.keys(constants.section).forEach((sectstr : string) => {
         const sectid : SectionIdent = constants.section[<SectionIdent>sectstr];
         if (dependencies.has(sectid)) {
+          /* istanbul ignore if */
           if (!kmx.kmxplus[sectid]) {
             throw new Error(`Internal error: section ${section.id} depends on uninitialized dependency ${sectid}`);
           }

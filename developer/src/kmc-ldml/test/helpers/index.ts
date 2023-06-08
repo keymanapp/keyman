@@ -6,7 +6,7 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { SectionCompiler } from '../../src/compiler/section-compiler.js';
 import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile, compilerEventFormat, LDMLKeyboard } from '@keymanapp/common-types';
-import { LdmlKeyboardCompiler } from '../../src/compiler/compiler.js';
+import { LdmlKeyboardCompiler } from '../../src/main.js'; // make sure main.js compiles
 import { assert } from 'chai';
 import { KMXPlusMetadataCompiler } from '../../src/compiler/metadata-compiler.js';
 import { CompilerOptions } from '../../src/compiler/compiler-options.js';
