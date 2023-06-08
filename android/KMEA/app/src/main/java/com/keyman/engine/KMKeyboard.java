@@ -29,6 +29,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -223,8 +224,11 @@ final class KMKeyboard extends WebView {
 
     getSettings().setUseWideViewPort(true);
     getSettings().setLoadWithOverviewMode(true);
-    setWebContentsDebuggingEnabled(true);
-
+    if (0 != (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
+      // Enable debugging of WebView via adb. Not used during unit tests
+      // Refer: https://developer.chrome.com/docs/devtools/remote-debugging/webviews/#configure_webviews_for_debugging
+      setWebContentsDebuggingEnabled(true);
+    }
     setWebChromeClient(new WebChromeClient() {
       public boolean onConsoleMessage(ConsoleMessage cm) {
         String msg = KMString.format("KMW JS Log: Line %d, %s:%s", cm.lineNumber(), cm.sourceId(), cm.message());

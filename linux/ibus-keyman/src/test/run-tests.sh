@@ -53,7 +53,7 @@ SCHEMA_DIR=$TEMP_DATA_DIR/glib-2.0/schemas
 export XDG_DATA_DIRS=$TEMP_DATA_DIR:$XDG_DATA_DIRS
 
 mkdir -p "$SCHEMA_DIR"
-cp "$SRCDIR/../keyman-config/com.keyman.gschema.xml" "$SCHEMA_DIR/"
+cp "$SRCDIR/../keyman-config/resources/com.keyman.gschema.xml" "$SCHEMA_DIR/"
 glib-compile-schemas "$SCHEMA_DIR"
 
 export GSETTINGS_BACKEND=memory

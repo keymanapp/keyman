@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.120 alpha 2023-06-07
+
+* chore(core): look for emcc.py, not emcc (#8934)
+* chore(linux): Move some files to keyman-config (#8917)
+* fix(linux): Fix title of reference page and links (#8939)
+* fix(android/engine): Re-enable KMManager tests (#8940)
+
 ## 17.0.119 alpha 2023-06-06
 
 * chore(developer): ensure kmcmplib messages are all UTF-8 (#8927)

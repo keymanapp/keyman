@@ -29,19 +29,23 @@ clean_action() {
     keyman_config/standards/lang_tags_map.py
 }
 
-build_man_pages() {
+execute_with_temp_schema() {
   local TEMP_DATA_DIR SCHEMA_DIR
   TEMP_DATA_DIR=$(mktemp -d)
-  SCHEMA_DIR=$TEMP_DATA_DIR/glib-2.0/schemas
-  export XDG_DATA_DIRS=$TEMP_DATA_DIR:${XDG_DATA_DIRS-}
+  SCHEMA_DIR="${TEMP_DATA_DIR}/glib-2.0/schemas"
+  export XDG_DATA_DIRS="${TEMP_DATA_DIR}":${XDG_DATA_DIRS-}
   export GSETTINGS_SCHEMA_DIR="${SCHEMA_DIR}"
-  mkdir -p "$SCHEMA_DIR"
-  cp ./com.keyman.gschema.xml "$SCHEMA_DIR"/
-  glib-compile-schemas "$SCHEMA_DIR"
-  ./build-help.sh --man --no-reconf
+  mkdir -p "${SCHEMA_DIR}"
+  cp resources/com.keyman.gschema.xml "${SCHEMA_DIR}"/
+  glib-compile-schemas "${SCHEMA_DIR}"
+  "$@"
   export XDG_DATA_DIRS=${XDG_DATA_DIRS#*:}
   unset GSETTINGS_SCHEMA_DIR
-  rm -rf "$TEMP_DATA_DIR"
+  rm -rf "${TEMP_DATA_DIR}"
+}
+
+build_man_and_help_pages() {
+  execute_with_temp_schema ./build-help.sh --no-reconf
 }
 
 build_action() {
@@ -66,14 +70,19 @@ build_action() {
     builder_echo "Skip building lang_tags_map.py during package build"
   fi
   popd
-  builder_echo "Building man pages"
-  build_man_pages
+  builder_echo "Building man and help pages"
+  build_man_and_help_pages
   builder_echo "Building keyman-config"
   python3 setup.py build
 }
 
+test_action() {
+  execute_with_temp_schema ./run-tests.sh
+}
+
 install_action() {
   if [ -n "${SUDO_USER:-}" ]; then
+    # with sudo install into /usr/local
     pip3 install qrcode sentry-sdk
     # eventually change this to: pip3 install .
     python3 setup.py install
@@ -84,6 +93,7 @@ install_action() {
     mkdir -p /usr/local/share/man/man1
     cp ../../debian/man/*.1 /usr/local/share/man/man1
   else
+    # without sudo install into /tmp/keyman (or $DESTDIR)
     mkdir -p "/tmp/keyman/$(python3 -c 'import sys;import os;pythonver="python%d.%d" % (sys.version_info[0], sys.version_info[1]);sitedir = os.path.join("lib", pythonver, "site-packages");print(sitedir)')"
     # when we no longer have to support old pip version (python > 3.6) change this to:
     # pip3 install --prefix /tmp/keyman .
@@ -108,6 +118,6 @@ uninstall_action() {
 builder_run_action clean      clean_action
 builder_run_action configure  # nothing to do
 builder_run_action build      build_action
-builder_run_action test       ./run-tests.sh
+builder_run_action test       test_action
 builder_run_action install    install_action
 builder_run_action uninstall  uninstall_action

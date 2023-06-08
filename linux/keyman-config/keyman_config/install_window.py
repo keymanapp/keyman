@@ -78,7 +78,7 @@ class InstallKmpWindow(Gtk.Dialog):
             info, system, options, keyboards, files = get_metadata(tmpdirname)
             if not keyboards:
                 # Likely not a keyboard .kmp file
-                logging.info("%s is not a Keyman keyboard package" % kmpfile)
+                logging.info(f"{kmpfile} is not a Keyman keyboard package")
                 dialog = Gtk.MessageDialog(viewkmp, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, _(
                   "The file '{kmpfile}' is not a Keyman keyboard package!").format(kmpfile=kmpfile))
                 dialog.run()
@@ -98,8 +98,8 @@ class InstallKmpWindow(Gtk.Dialog):
                       Gtk.ButtonsType.YES_NO, _("Keyboard is installed already"))
                     dialog.format_secondary_text(
                       _("The {name} keyboard is already installed at version {version}. "
-                        "Do you want to uninstall then reinstall it?")
-                        .format(name=self.kbname, version=installed_kmp_ver))
+                        "Do you want to uninstall then reinstall it?").format(
+                          name=self.kbname, version=installed_kmp_ver))
                     response = dialog.run()
                     dialog.destroy()
                     if response == Gtk.ResponseType.YES:
@@ -132,10 +132,8 @@ class InstallKmpWindow(Gtk.Dialog):
                                 logging.debug("QUESTION dialog closed by clicking NO button")
                                 self.checkcontinue = False
                                 return
-                    except:  # noqa: E722
+                    except Exception:  # noqa: E722
                         logging.warning("Exception uninstalling an old kmp, continuing")
-                        pass
-
             image = Gtk.Image()
             if secure_lookup(options, 'graphicFile'):
                 image.set_from_file(os.path.join(tmpdirname, options['graphicFile']))
@@ -168,8 +166,7 @@ class InstallKmpWindow(Gtk.Dialog):
             label.set_selectable(True)
             grid.attach_next_to(label, label1, Gtk.PositionType.RIGHT, 1, 1)
 
-            fonts = get_fonts(files)
-            if fonts:
+            if fonts := get_fonts(files):
                 label2 = Gtk.Label()
                 # Fonts are optional
                 label2.set_text(_("Fonts:   "))
@@ -198,15 +195,13 @@ class InstallKmpWindow(Gtk.Dialog):
             grid.attach_next_to(label3, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
             prevlabel = label3
             label = Gtk.Label()
-            description = secure_lookup(info, 'version', 'description')
-            if description:
+            if description := secure_lookup(info, 'version', 'description'):
                 label.set_text(description)
             label.set_halign(Gtk.Align.START)
             label.set_selectable(True)
             grid.attach_next_to(label, label3, Gtk.PositionType.RIGHT, 1, 1)
 
-            author = secure_lookup(info, 'author')
-            if author:
+            if author := secure_lookup(info, 'author'):
                 author = author
                 label4 = Gtk.Label()
                 label4.set_text(_("Author:   "))
@@ -216,8 +211,7 @@ class InstallKmpWindow(Gtk.Dialog):
                 label = Gtk.Label()
                 if secure_lookup(author, 'url') and secure_lookup(author, 'description'):
                     label.set_markup(
-                      "<a href=\"" + author['url'] + "\" title=\"" +
-                      author['url'] + "\">" + author['description'] + "</a>")
+                      f"<a href=\"{author['url']}\" title=\"{author['url']}\">{author['description']}</a>")
                 elif secure_lookup(author, 'description'):
                     label.set_text(author['description'])
                 label.set_halign(Gtk.Align.START)
@@ -232,8 +226,9 @@ class InstallKmpWindow(Gtk.Dialog):
                 grid.attach_next_to(label5, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                 prevlabel = label5
                 label = Gtk.Label()
-                website_description = secure_lookup(info, 'website', 'description')
-                if website_description:
+                if website_description := secure_lookup(
+                    info, 'website', 'description'
+                ):
                     label.set_markup(
                       "<a href=\"" + website_description + "\">" + website_description + "</a>")
                 label.set_halign(Gtk.Align.START)
@@ -246,8 +241,9 @@ class InstallKmpWindow(Gtk.Dialog):
                 label6.set_halign(Gtk.Align.END)
                 grid.attach_next_to(label6, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                 label = Gtk.Label()
-                copyright_description = secure_lookup(info, 'copyright', 'description')
-                if copyright_description:
+                if copyright_description := secure_lookup(
+                    info, 'copyright', 'description'
+                ):
                     label.set_text(copyright_description)
                 label.set_halign(Gtk.Align.START)
                 label.set_selectable(True)
@@ -257,8 +253,7 @@ class InstallKmpWindow(Gtk.Dialog):
             webview = WebKit2.WebView()
             webview.connect("decide-policy", self.doc_policy)
 
-            readmeFile = secure_lookup(options, 'readmeFile')
-            if readmeFile:
+            if readmeFile := secure_lookup(options, 'readmeFile'):
                 self.readme = readmeFile
             else:
                 self.readme = "noreadme"
@@ -280,11 +275,11 @@ class InstallKmpWindow(Gtk.Dialog):
                         self.notebook.set_tab_pos(Gtk.PositionType.BOTTOM)
                         mainhbox.pack_start(self.notebook, True, True, 0)
                         self.notebook.append_page(
-                            self.page1,
-                            Gtk.Label(_('Details')))
+                          self.page1,
+                          Gtk.Label(_('Details')))
                         self.notebook.append_page(
-                            self.page2,
-                            Gtk.Label(_('README')))
+                          self.page2,
+                          Gtk.Label(_('README')))
                 except UnicodeDecodeError:
                     readme_added = False
             else:
@@ -311,9 +306,7 @@ class InstallKmpWindow(Gtk.Dialog):
         self.show_all()
 
     def run(self):
-        if self.checkcontinue:
-            return Gtk.Dialog.run(self)
-        return Gtk.ResponseType.CANCEL
+        return Gtk.Dialog.run(self) if self.checkcontinue else Gtk.ResponseType.CANCEL
 
     def doc_policy(self, web_view, decision, decision_type):
         logging.info("Checking policy")
@@ -333,8 +326,7 @@ class InstallKmpWindow(Gtk.Dialog):
     def on_install_clicked(self, button):
         logging.info("Installing keyboard")
         try:
-            result = install_kmp(self.kmpfile, language=self.language)
-            if result:
+            if result := install_kmp(self.kmpfile, language=self.language):
                 # If install_kmp returns a string, it is an instruction for the end user,
                 # because for fcitx they will need to take extra steps to complete
                 # installation themselves.
@@ -389,23 +381,23 @@ class InstallKmpWindow(Gtk.Dialog):
         dialog.destroy()
 
 
+def _log_error(arg):
+    logging.error(arg)
+    logging.error("install_window.py <kmpfile>")
+    sys.exit(2)
+
+
 def main(argv):
-    if len(sys.argv) != 2:
+    if len(argv) != 2:
         logging.error("install_window.py <kmpfile>")
         sys.exit(2)
 
-    name, ext = os.path.splitext(sys.argv[1])
+    _, ext = os.path.splitext(argv[1])
     if ext != ".kmp":
-        logging.error("install_window.py Input file", sys.argv[1], "is not a kmp file.")
-        logging.error("install_window.py <kmpfile>")
-        sys.exit(2)
-
-    if not os.path.isfile(sys.argv[1]):
-        logging.error("install_window.py Keyman kmp file", sys.argv[1], "not found.")
-        logging.error("install_window.py <kmpfile>")
-        sys.exit(2)
-
-    w = InstallKmpWindow(sys.argv[1])
+        _log_error(f'install_window.py Input file {argv[1]} is not a kmp file.')
+    if not os.path.isfile(argv[1]):
+        _log_error(f'install_window.py Keyman kmp file {argv[1]} not found.')
+    w = InstallKmpWindow(argv[1])
     w.run()
     w.destroy()
 
