@@ -1,8 +1,5 @@
 import 'mocha';
 import {assert} from 'chai';
-// import { isValidEnumValue, calculateUniqueKeys, allUsedKeyIdsInLayers, translateLayerAttrToModifier, validModifier, verifyValidAndUnique } from '../src/util/util.js';
-// import { constants } from "@keymanapp/ldml-keyboard-constants";
-// import { LDMLKeyboard } from '@keymanapp/common-types';
 import { SECTION_COMPILERS } from '../src/compiler/compiler.js';
 import { SectionIdent } from '@keymanapp/ldml-keyboard-constants';
 describe('test of section compiler dependencies', () => {

@@ -31,12 +31,7 @@ export class ElementString extends Array<ElemElement> {
       return;
     }
 
-    let items;
-    if (Array.isArray(source)) {
-      items = source;
-    } else {
-      items = source.split("");
-    }
+    let items = Array.isArray(source) ? source : source.split("");
 
     let orders: Array<string> = order ? order.split(" ") : [];
     if(orders.length == 1) {

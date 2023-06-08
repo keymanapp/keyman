@@ -165,11 +165,7 @@ export class VarsCompiler extends SectionCompiler {
     variables?.unicodeSet?.forEach((e) =>
       this.addUnicodeSet(result, e, sections));
 
-    if (!result.valid()) {
-      return null;
-    } else {
-      return result;
-    }
+    return result.valid() ? result : null;
   }
 
   // routines for initializing Vars remain here, in the compiler.
