@@ -14,7 +14,7 @@ export async function determineNeededDowncompileHelpers(config: esbuild.BuildOpt
     "__metadata",
     "__awaiter",
     "__generator",
-    "__exportStar",
+    "__exportStar",  // uses __createBinding
     "__createBinding",
     "__values",
     "__read",
@@ -84,6 +84,9 @@ export async function determineNeededDowncompileHelpers(config: esbuild.BuildOpt
 
             if(helper == '__importStar') {
               detectedHelpers.push('__setModuleDefault');
+              detectedHelpers.push('__createBinding');
+            } else if(helper == '__exportStar') {
+              detectedHelpers.push('__createBinding');
             }
           }
         }
