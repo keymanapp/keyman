@@ -35,7 +35,8 @@ export function declareAnalyze(program: Command) {
 }
 
 async function analyze(filenames: string[], options: AnalysisActivityOptions): Promise<boolean> {
-  let callbacks = new NodeCompilerCallbacks({quiet: options.quiet || options.outFile ? false : true});
+  // TODO: refactor this silent vs quiet and object init for NodeCompilerCallbacks i.e. {silent:...}
+  let callbacks = new NodeCompilerCallbacks(options.quiet || options.outFile ? false : true);
 
   try {
     // callbacks.reportMessage(InfrastructureMessages.Info_AnalyzingFile({filename}));
