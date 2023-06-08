@@ -3,9 +3,6 @@ import { Device as DeviceDetector } from 'keyman/engine/device-detect';
 import { getAbsoluteY } from 'keyman/engine/dom-utils';
 import { OutputTarget } from 'keyman/engine/element-wrappers';
 import {
-  AnchoredOSKView,
-  FloatingOSKView,
-  FloatingOSKViewConfiguration,
   OSKView,
   TwoStateActivator,
   VisualKeyboard
@@ -13,6 +10,7 @@ import {
 import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId as prefixed } from 'keyman/engine/package-cache';
 import { DeviceSpec, Keyboard, ProcessorInitOptions, extendString } from "@keymanapp/keyboard-processor";
 
+import * as views from './viewsAnchorpoint.js';
 import { BrowserConfiguration, BrowserInitOptionDefaults, BrowserInitOptionSpec } from './configuration.js';
 import { default as ContextManager } from './contextManager.js';
 import DefaultBrowserRules from './defaultBrowserRules.js';
@@ -88,6 +86,11 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     return this._util;
   }
 
+  public get views() {
+    // NOT this.views.  Just... `views`, the import of viewsAnchorpoint.ts
+    return views;
+  }
+
   public get initialized() {
     return this._initialized;
   }
@@ -147,22 +150,14 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
 
     this.contextManager.initialize();  // will seek to attach to the page, which requires document.body
 
-    const oskConfig: FloatingOSKViewConfiguration = {
-      hostDevice: this.config.hostDevice,
-      pathConfig: this.config.paths,
-      predictionContextManager: this.contextManager.predictionContext,
-      isEmbedded: false
-    };
-
     // Capture the saved-keyboard string now, before we load any keyboards/stubs
     // or do anything that would mutate the value.
     const savedKeyboardStr = this.contextManager.getSavedKeyboardRaw();
 
-    let osk: OSKView;
     if(device.touchable) {
-      this.osk = new AnchoredOSKView(oskConfig);
+      this.osk = new views.AnchoredOSKView(this);
     } else {
-      this.osk = new FloatingOSKView(oskConfig);
+      this.osk = new views.FloatingOSKView(this);
     }
 
     setupOskListeners(this, this.osk, this.contextManager);

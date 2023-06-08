@@ -38,6 +38,48 @@ describe("KeyboardStub", () => {
     };
   }
 
+  it('construction from internal stub format, partially configured paths', () => {
+    const rawStub = {
+      KI: 'dummy',
+      KN: 'test dummy',
+      KL: 'English',
+      KLC: 'en',
+      KF: 'dummy.js',
+      // The way font paths are currently handled feels pretty rough and unclear.
+      // Their paths aren't updated in the same way as the KF entry.
+      // So... leaving font stuff out of the test for now.
+      // (Also, Developer doesn't seem to bother specifying font files in its stubs, so it's
+      // less criitcal.)
+    };
+
+    const stub = new KeyboardStub(rawStub, 'http://localhost/keyboards/', 'http://localhost/fonts/');
+
+    assert.equal(stub.KF, 'http://localhost/keyboards/dummy.js');
+  });
+
+  it('construction from internal stub format, pre-configured paths', () => {
+    // Based on actual font pathing as hosted by the Android app.
+    const absolutePath = '/data/user/0/com.tavultesoft.kmapro.debug/app_data/packages/dummy/dummy.ttf';
+
+    const rawStub = {
+      KI: 'dummy',
+      KN: 'test dummy',
+      KL: 'English',
+      KLC: 'en',
+      KF: absolutePath,
+      // The way font paths are currently handled feels pretty rough and unclear.
+      // Their paths aren't updated in the same way as the KF entry.
+      // So... leaving font stuff out of the test for now.
+      // (Also, Developer doesn't seem to bother specifying font files in its stubs, so it's
+      // less criitcal.)
+    };
+
+    // These components... are not, but that's OK - the test is to ignore them.
+    const stub = new KeyboardStub(rawStub, 'http://localhost/keyboards/', 'http://localhost/fonts/');
+
+    assert.equal(stub.KF, absolutePath);
+  });
+
   it('merge(): barebones stub + fetched sil_euro_latin@no', async () => {
     const query = performMockedRequest(`${__dirname}/../../resources/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
     await query.promise;

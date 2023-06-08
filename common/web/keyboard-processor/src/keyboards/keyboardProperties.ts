@@ -142,6 +142,7 @@ export default class KeyboardProperties implements KeyboardInternalPropertySpec 
         this.KN = other.KN;
         this.KL = other.KL;
         this.KLC = other.KLC;
+        // Do NOT apply fontPath here; the mobile apps will have font issues if you do!
         this.KFont = other.KFont;
         this.KOskFont = other.KOskFont;
         this._displayName = (other instanceof KeyboardProperties) ? other._displayName : other.displayName;

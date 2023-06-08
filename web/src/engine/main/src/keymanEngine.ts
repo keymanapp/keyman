@@ -288,8 +288,11 @@ export default class KeymanEngine<
       this.core.keyboardProcessor.layerStore.handler = this.osk.layerChangeHandler;
     }
     this._osk = value;
-    this._osk.on('keyEvent', this.keyEventListener);
-    this.core.keyboardProcessor.layerStore.handler = this.osk.layerChangeHandler;
+    if(value) {
+      value.activeKeyboard = this.contextManager.activeKeyboard;
+      value.on('keyEvent', this.keyEventListener);
+      this.core.keyboardProcessor.layerStore.handler = value.layerChangeHandler;
+    }
   }
 
   public getDebugInfo(): Record<string, any> {
