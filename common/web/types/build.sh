@@ -78,7 +78,7 @@ fi
 
 if builder_start_action test; then
   copy_schemas
-  npm test
+  npm test -- "${builder_extra_params[@]}"
   builder_finish_action success test
 fi
 

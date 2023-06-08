@@ -26,13 +26,15 @@ export interface CompilerOptions {
   saveDebug?: boolean;
   compilerWarningsAsErrors?: boolean;
 	warnDeprecatedCode?: boolean;
+  target?: 'kmx' | 'js';
 };
 
 const baseOptions: CompilerOptions = {
   shouldAddCompilerVersion: true,
   saveDebug: true,
   compilerWarningsAsErrors: false,
-  warnDeprecatedCode: true
+  warnDeprecatedCode: true,
+  target: 'kmx'
 };
 
 /**
@@ -66,6 +68,7 @@ export class KmnCompiler {
         return false;
       }
     }
+
     return this.verifyInitialized();
   }
 

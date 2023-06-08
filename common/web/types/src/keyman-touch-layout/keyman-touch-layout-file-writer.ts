@@ -17,10 +17,17 @@ export class TouchLayoutFileWriter {
    * @param source TouchLayoutFile
    * @returns Uint8Array, the .keyman-touch-layout file
    */
-  write(source: TouchLayoutFile): Uint8Array {
-    const output = JSON.stringify(source, null, this.options?.formatted ? 2 : undefined);
+  public write(source: TouchLayoutFile): Uint8Array {
+    const output = this.toJSONString(source);
     const encoder = new TextEncoder();
     return encoder.encode(output);
+  }
+
+  /**
+   * Gets the output as a JSON string
+   */
+  public toJSONString(source: TouchLayoutFile): string {
+    return JSON.stringify(source, null, this.options?.formatted ? 2 : undefined);
   }
 
   /**
@@ -31,7 +38,11 @@ export class TouchLayoutFileWriter {
    * @param source
    * @returns string
    */
-  compile(source: TouchLayoutFile): string {
+  public compile(source: TouchLayoutFile): string {
+    return this.toJSONString(this.fixup(source));
+  }
+
+  public fixup(source: TouchLayoutFile): TouchLayoutFile {
     // Deep copy the source
     source = JSON.parse(JSON.stringify(source));
 
@@ -40,13 +51,23 @@ export class TouchLayoutFileWriter {
 
     const fixupKey = (key: TouchLayoutKey | TouchLayoutSubKey) => {
       if(Object.hasOwn(key, 'pad')) (key.pad as any) = key.pad.toString();
-      if(Object.hasOwn(key, 'sp')) (key.sp as any) = key.sp.toString();
+      if(Object.hasOwn(key, 'sp')) {
+        if(key.sp == 0) {
+          delete key.sp;
+        }
+        else {
+          (key.sp as any) = key.sp.toString();
+        }
+      }
       if(Object.hasOwn(key, 'width')) (key.width as any) = key.width.toString();
+      if(Object.hasOwn(key, 'text') && key.text === '') delete key.text;
     };
 
     const fixupPlatform = (platform: TouchLayoutPlatform) => {
       for(let layer of platform.layer) {
         for(let row of layer.row) {
+          // this matches the old spec for touch layout files
+          (row.id as any) = row.id.toString();
           for(let key of row.key) {
             fixupKey(key);
             if(key.sk) {
@@ -79,6 +100,6 @@ export class TouchLayoutFileWriter {
       fixupPlatform(source.tablet);
     }
 
-    return JSON.stringify(source, null, this.options?.formatted ? 2 : undefined);
+    return source;
   }
 };

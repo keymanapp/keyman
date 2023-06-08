@@ -24,7 +24,7 @@ function Keyboard_basic() {
         "id": "base",
         "row": [
           {
-            "id": 0,
+            "id": "0",
             "key": [
               {
                 "id": "T_hmaqtugha",

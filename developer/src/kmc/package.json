@@ -40,6 +40,7 @@
     "@keymanapp/keyman-version": "*",
     "@keymanapp/common-types": "*",
     "@keymanapp/kmc-kmn": "*",
+    "@keymanapp/kmc-kmw": "*",
     "@keymanapp/kmc-ldml": "*",
     "@keymanapp/kmc-model": "*",
     "@keymanapp/kmc-model-info": "*",
