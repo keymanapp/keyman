@@ -100,8 +100,12 @@ export default async function hextobin(inputFilename: string, outputFilename?: s
         }
         break;
       case 'diff':
-        b.refs.push({type: 'diff', blockName: t.parameters[0], blockName2: t.parameters[1], offset: b.hex.length / 2});
-        b.hex += "_".repeat(8); // always 4 bytes, placeholder will be filled in during reconciliation phase
+        // diff can also take a divisor, defaults to 1
+        {
+          const divisor = t.parameters.length > 2 ? parseInt(t.parameters[2],10) : 1;
+          b.refs.push({type: 'diff', blockName: t.parameters[0], blockName2: t.parameters[1], divisor: divisor, offset: b.hex.length / 2});
+          b.hex += "_".repeat(8); // always 4 bytes, placeholder will be filled in during reconciliation phase
+        }
         break;
       case 'index':
         // index can take a third parameter, divisor
@@ -181,7 +185,7 @@ export default async function hextobin(inputFilename: string, outputFilename?: s
                 reportError(`Could not find block ${r.blockName2} when reconciling ${b.name}`);
                 return false;
               }
-              fillBlockPlaceholder(b, r.offset, v2.offset - v.offset);
+              fillBlockPlaceholder(b, r.offset, (v2.offset - v.offset) / r.divisor);
             }
             break;
           case 'offset':
