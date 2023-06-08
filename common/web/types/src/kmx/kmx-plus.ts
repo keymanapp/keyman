@@ -759,19 +759,7 @@ export class KMXPlusFile extends KMXFile {
       items: new r.Array(this.COMP_PLUS_NAME_ITEM, 'count')
     });
 
-    // 'ordr'
-
-    // this.COMP_PLUS_ORDR_ITEM = new r.Struct({
-    //   elements: r.uint32le, //elem
-    //   before: r.uint32le //elem
-    // });
-
-    // this.COMP_PLUS_ORDR = new r.Struct({
-    //   ident: r.uint32le,
-    //   size: r.uint32le,
-    //   count: r.uint32le,
-    //   items: new r.Array(this.COMP_PLUS_ORDR_ITEM, 'count')
-    // });
+    // 'ordr' now part of 'tran'
 
     // 'strs'
 

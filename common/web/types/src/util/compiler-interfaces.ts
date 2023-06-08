@@ -53,7 +53,7 @@ export function compilerEventFormat(e : CompilerEvent | CompilerEvent[]) : strin
     return "";
   }
   if (Array.isArray(e)) {
-    return e.map(item => compilerEventFormat(item)).join(' ');
+    return e.map(item => compilerEventFormat(item)).join('\n');
   }
   const {code, message} = e;
   return `${compilerErrorFormatCode(code)}: “${message}”`;
