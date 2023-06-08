@@ -1,5 +1,4 @@
-import { KmpJsonFile, CompilerCallbacks, KpsFile, KmxFileReader, KMX } from '@keymanapp/common-types';
-import { KmxFileReaderError } from 'node_modules/@keymanapp/common-types/src/kmx/kmx-file-reader.js';
+import { KmpJsonFile, CompilerCallbacks, KpsFile, KmxFileReader, KmxFileReaderError, KMX } from '@keymanapp/common-types';
 import { KeymanTarget, TouchKeymanTargets } from './keyman-targets.js';
 import { CompilerMessages } from './messages.js';
 
