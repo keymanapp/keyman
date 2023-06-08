@@ -123,13 +123,10 @@ export function JavaScript_String(ch: number): string {  // I2242
       case 10: return '\\n';
       case 13: return '\\r';
     }
-    if(ch < 9) {
-      return '\\x0'+ch.toString(16).toUpperCase();
-    } else {
-      return '\\x'+ch.toString(16).toUpperCase();
-    }
+    return '\\x' + zeroPadHex(ch, 2);
   }
   else {
+    // Note: unpaired surrogates will be maintained
     return String.fromCodePoint(ch);
   }
 }
@@ -776,7 +773,6 @@ function CheckStoreForInvalidFunctions(fk: KMX.KEYBOARD, key: KMX.KEY, store: KM
 
 // Used when targeting versions prior to 10.0, before the introduction of FullContextMatch/KFCM.
 function JavaScript_CompositeContextValue(fk: KMX.KEYBOARD, fkp: KMX.KEY, pwsz: string): string {
-  // Reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
 // var
   // StartQuotes, Len, Cur: Integer;
   // InQuotes: Boolean;
