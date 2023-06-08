@@ -7,8 +7,8 @@
     "unicode"
   ],
   "scripts": {
-    "build": "tsc -b",
-    "test": "eslint . && cd test && tsc -b && cd .. && mocha"
+    "build": "gosh ./build.sh build",
+    "test": "gosh ./build.sh test"
   },
   "type": "module",
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
@@ -36,7 +36,8 @@
     "esbuild": "^0.15.8",
     "mocha": "^8.4.0",
     "ts-node": "^9.1.1",
-    "typescript": "^4.9.5"
+    "typescript": "^4.9.5",
+    "@keymanapp/gosh": "*"
   },
   "repository": {
     "type": "git",

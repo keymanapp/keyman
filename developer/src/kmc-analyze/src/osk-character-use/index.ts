@@ -1,5 +1,5 @@
-import { CompilerCallbacks, KeymanDeveloperProject, KMX, KmxFileReader, KPJFileReader, KvksFileReader, KVKSParseError, TouchLayout, TouchLayoutFileReader } from "@keymanapp/common-types";
-import { Compiler } from '@keymanapp/kmc-kmn';
+import { CompilerCallbacks, KeymanDeveloperProject, KMX, KmxFileReader, KPJFileReader, KvksFileReader, TouchLayout, TouchLayoutFileReader } from "@keymanapp/common-types";
+import { KmnCompiler } from '@keymanapp/kmc-kmn';
 
 export class AnalyzeOskCharacterUse {
   private _strings: string[] = [];
@@ -77,8 +77,8 @@ export class AnalyzeOskCharacterUse {
   private async analyzeKmnKeyboard(filename: string): Promise<void> {
     // let ...
 
-    const kmxCompiler = new Compiler();
-    if(!await kmxCompiler.init()) {
+    const kmxCompiler = new KmnCompiler();
+    if(!await kmxCompiler.init(this.callbacks)) {
       // TODO: error handling
       console.error('kmx compiler failed to init');
       process.exit(1);
@@ -88,7 +88,7 @@ export class AnalyzeOskCharacterUse {
     filename = filename.replace(/\\/g, '/');
 
     // TODO: runToMemory, add option to kmxCompiler to store debug-data for conversion to .js (e.g. store metadata, group readonly metadata, etc)
-    if(!kmxCompiler.run(filename, filename + '.tmp', this.callbacks, {
+    if(!kmxCompiler.run(filename, filename + '.tmp', {
       shouldAddCompilerVersion: false,
       saveDebug: false,
       target: 'js'
@@ -124,9 +124,9 @@ export class AnalyzeOskCharacterUse {
     // TODO: this.callbacks.reportMessage(...)  console.log(`Scanning visual keyboard ${filename}`);
     const reader = new KvksFileReader();
     const source = reader.read(this.callbacks.loadFile(filename));
-    let errors: KVKSParseError[] = [];
-    const vk = reader.transform(source, errors);
-    // TODO check vk, errors
+    let invalidKeys: string[] = [];
+    const vk = reader.transform(source, invalidKeys);
+    // TODO check vk, invalidKeys
     for(let key of vk.keys) {
       if(key.text) {
         strings.push(key.text);

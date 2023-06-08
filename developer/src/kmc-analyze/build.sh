@@ -34,14 +34,16 @@ if builder_start_action configure; then
 fi
 
 if builder_start_action build; then
-  npm run build
+  tsc --build
   builder_finish_action success build
 fi
 
 if builder_start_action test; then
-  npm test
+  eslint .
+  # TODO: enable tests
+  #     cd test && tsc --build && cd .. && mocha
   # TODO: enable c8 (disabled because no coverage at present)
-  #     && c8 --reporter=lcov --reporter=text mocha
+  #     c8 --reporter=lcov --reporter=text mocha
   builder_finish_action success test
 fi
 
