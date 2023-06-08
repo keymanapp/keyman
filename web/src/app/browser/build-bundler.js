@@ -70,7 +70,7 @@ let result = await esbuild.build({
   sourcemap: true,
   minifyWhitespace: true,
   minifySyntax: true,
-  minifyIdentifiers: false,
+  minifyIdentifiers: true,
   format: "iife",
   nodePaths: ['../../../../node_modules'],
   entryPoints: {
