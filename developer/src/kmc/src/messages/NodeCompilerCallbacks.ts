@@ -83,7 +83,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   }
 
   debug(msg: string) {
-    if(!this.options.quiet) {
+    if(!this.silent) {
       console.debug(msg);
     }
   }

@@ -201,8 +201,7 @@ var
   HKMCmpDll: THandle = 0;
 
 type
-  TCompileKeyboardFile = function (kmnFile, kmxFile: PAnsiChar;
-    FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL;  // I3310   // I4865   // I4866
+  TCompileKeyboardFile = function (kmnFile, kmxFile: PAnsiChar; FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL;  // I3310   // I4865   // I4866
     CallBack: TCompilerCallback): Integer; cdecl;        // TODO: K9: Convert to Unicode
 
   TCompileKeyboardFileToBuffer = function (kmnFile: PAnsiChar; buf: PFILE_KEYBOARD;  // I3310
