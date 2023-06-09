@@ -67,8 +67,10 @@ export class PageIntegrationHandlers {
   }
 
   private suppressFocusCheck: (e: FocusEvent) => boolean = (e) => {
-    if(this.focusAssistant._IgnoreBlurFocus) {
-      // Prevent triggering other blur-handling events (as possible)
+    if(this.focusAssistant.isTargetForcingScroll()) {
+      // Prevent triggering other blur-handling events (as possible) - this blur
+      // is programmatic in order to force a browser scroll-position update.
+      // All focus changes should be prevented at this time.
       e.stopPropagation();
       e.cancelBubble = true;
     }

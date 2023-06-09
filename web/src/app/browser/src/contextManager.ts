@@ -43,7 +43,7 @@ function _SetTargDir(Ptarg: HTMLElement, activeKeyboard: Keyboard) {
 export default class ContextManager extends ContextManagerBase<BrowserConfiguration> {
   private _activeKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
   private cookieManager = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
-  readonly focusAssistant = new FocusAssistant();
+  readonly focusAssistant = new FocusAssistant(() => this.activeTarget?.isForcingScroll());
   readonly page: PageContextAttachment;
   private mostRecentTarget: OutputTarget<any>;
   private currentTarget: OutputTarget<any>;
@@ -231,6 +231,11 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
        * still trigger a focus event upon it... which can cascade here if uncaught
        * and trigger a contextReset DURING keyboard rule processing without this
        * guard.
+       *
+       * The #2 reason:  the `forceScroll` method used within the Input and Textarea
+       * types whenever the selection must be programatically updated.  The blur
+       * is 'swallowed', preventing it from being dropped as 'active'. However, the
+       * corresponding focus is not swallowed... until this if-condition's check.
        */
       return;
     }
@@ -598,9 +603,6 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     //   Ltarg=Ltarg.contentWindow.document.body; // And we only care about Ltarg b/c of finding the OutputTarget.
     // }
 
-    // Save it for the event in step 3... but now, before we mutate the field's value!
-    const previousTarget = this.lastActiveTarget;
-
     // Step 2:  Make the newly-focused control the active control, and thus the active context.
     this.setActiveTarget(target, true);
 
@@ -622,7 +624,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       return true;
     }
 
-    if(this.focusAssistant._IgnoreBlurFocus) {
+    if(this.focusAssistant.isTargetForcingScroll()) {
       // Prevent triggering other blur-handling events (as possible)
       e.cancelBubble = true;
       e.stopPropagation();
