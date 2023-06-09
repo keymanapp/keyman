@@ -1,5 +1,6 @@
 import { CompilerCallbacks, KeymanDeveloperProject, KMX, KmxFileReader, KPJFileReader, KvksFileReader, TouchLayout, TouchLayoutFileReader } from "@keymanapp/common-types";
 import { KmnCompiler } from '@keymanapp/kmc-kmn';
+import { AnalyzerMessages } from "../messages.js";
 
 export class AnalyzeOskCharacterUse {
   private _strings: string[] = [];
@@ -47,7 +48,6 @@ export class AnalyzeOskCharacterUse {
   }
 
   private async analyzeProject(filename: string): Promise<void> {
-    // TODO: this.callbacks.reportMessage(...)  console.log(`Scanning project ${filename}`);
     const reader = new KPJFileReader(this.callbacks);
     const source = reader.read(this.callbacks.loadFile(filename));
     const project = reader.transform(filename, source);
@@ -64,8 +64,10 @@ export class AnalyzeOskCharacterUse {
     let kpjFile = this.callbacks.path.join(folder, this.callbacks.path.basename(folder) + '.kpj');
 
     if(this.callbacks.fs.existsSync(kpjFile)) {
+      this.callbacks.reportMessage(AnalyzerMessages.Info_ScanningFile({type:'project', name:kpjFile}));
       await this.analyzeProject(kpjFile);
     } else {
+      this.callbacks.reportMessage(AnalyzerMessages.Info_ScanningFile({type:'project folder', name:folder}));
       const project = new KeymanDeveloperProject(kpjFile, '2.0', this.callbacks);
       project.populateFiles();
       let files = project.files.map(file => this.callbacks.resolveFilename(kpjFile, file.filePath));
@@ -75,36 +77,35 @@ export class AnalyzeOskCharacterUse {
   }
 
   private async analyzeKmnKeyboard(filename: string): Promise<void> {
-    // let ...
+    this.callbacks.reportMessage(AnalyzerMessages.Info_ScanningFile({type:'keyboard source', name:filename}));
 
-    const kmxCompiler = new KmnCompiler();
-    if(!await kmxCompiler.init(this.callbacks)) {
+    const kmnCompiler = new KmnCompiler();
+    if(!await kmnCompiler.init(this.callbacks)) {
       // TODO: error handling
       console.error('kmx compiler failed to init');
       process.exit(1);
     }
 
-    // TODO: this belongs in kmxCompiler.run, or better, by fixing kmxCompiler to use callbacks.loadFile
-    filename = filename.replace(/\\/g, '/');
-
-    // TODO: runToMemory, add option to kmxCompiler to store debug-data for conversion to .js (e.g. store metadata, group readonly metadata, etc)
-    if(!kmxCompiler.run(filename, filename + '.tmp', {
+    // Note, output filename here is just to provide path data,
+    // as nothing is written to disk
+    let result = kmnCompiler.runCompiler(filename, filename + '.tmp', {
       shouldAddCompilerVersion: false,
       saveDebug: false,
       target: 'js'
-    })) {
+    });
+
+    if(!result) {
       //TODO: error handling
+      process.exit(1);
+    }
+
+    if(result.data.kvksFilename) {
+      this.addStrings(this.scanVisualKeyboard(this.callbacks.resolveFilename(filename, result.data.kvksFilename)));
     }
 
     const reader = new KmxFileReader();
-    const keyboard: KMX.KEYBOARD = reader.read(this.callbacks.loadFile(filename + '.tmp'));
-
-    const kvkStore = keyboard.stores.find(store => store.dwSystemID == KMX.KMXFile.TSS_VISUALKEYBOARD);
+    const keyboard: KMX.KEYBOARD = reader.read(result.kmx.data);
     const touchLayoutStore = keyboard.stores.find(store => store.dwSystemID == KMX.KMXFile.TSS_LAYOUTFILE);
-
-    if(kvkStore) {
-      this.addStrings(this.scanVisualKeyboard(this.callbacks.resolveFilename(filename, kvkStore.dpString)));
-    }
 
     if(touchLayoutStore) {
       this.addStrings(this.scanTouchLayout(this.callbacks.resolveFilename(filename, touchLayoutStore.dpString)));
@@ -120,8 +121,8 @@ export class AnalyzeOskCharacterUse {
   //
 
   private scanVisualKeyboard(filename: string): string[] {
+    this.callbacks.reportMessage(AnalyzerMessages.Info_ScanningFile({type:'visual keyboard', name:filename}));
     let strings: string[] = [];
-    // TODO: this.callbacks.reportMessage(...)  console.log(`Scanning visual keyboard ${filename}`);
     const reader = new KvksFileReader();
     const source = reader.read(this.callbacks.loadFile(filename));
     let invalidKeys: string[] = [];
@@ -136,8 +137,8 @@ export class AnalyzeOskCharacterUse {
   }
 
   private scanTouchLayout(filename: string): string[] {
+    this.callbacks.reportMessage(AnalyzerMessages.Info_ScanningFile({type:'touch layout', name:filename}));
     let strings: string[] = [];
-    // TODO: this.callbacks.reportMessage(...)  console.log(`Scanning touch layout ${filename}`);
     const reader = new TouchLayoutFileReader();
     const source = reader.read(this.callbacks.loadFile(filename));
     // TODO: handle errors

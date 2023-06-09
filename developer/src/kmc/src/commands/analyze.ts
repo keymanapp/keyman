@@ -40,8 +40,6 @@ async function analyze(filenames: string[], options: AnalysisActivityOptions): P
   let callbacks = new NodeCompilerCallbacks({logLevel: options.outFile ? options.logLevel : 'silent'});
 
   try {
-    // callbacks.reportMessage(InfrastructureMessages.Info_AnalyzingFile({filename}));
-
     switch(options.action) {
       case 'osk-char-use':
         return await analyzeOskCharUse(callbacks, filenames, options);

@@ -15,10 +15,15 @@ export interface CompilerResultFile {
   data: Uint8Array;
 };
 
+export interface CompilerResultMetadata {
+  kvksFilename?: string;
+};
+
 export interface CompilerResult {
   kmx?: CompilerResultFile;
   kvk?: CompilerResultFile;
   js?: CompilerResultFile;
+  data: CompilerResultMetadata;
 };
 
 export interface CompilerOptions {
@@ -159,7 +164,7 @@ export class KmnCompiler {
       loadFile: this.loadFileCallback
     };
 
-    let result: CompilerResult = {};
+    let result: CompilerResult = {data:{}};
     let wasm_interface = new this.Module.CompilerInterface();
     let wasm_options = new this.Module.CompilerOptions();
     let wasm_result = null;
@@ -175,8 +180,9 @@ export class KmnCompiler {
         return null;
       }
 
-      if(wasm_result.kvksFilename) {
-        result.kvk = this.runKvkCompiler(wasm_result.kvksFilename, infile, outfile);
+      result.data.kvksFilename = wasm_result.kvksFilename;
+      if(result.data.kvksFilename) {
+        result.kvk = this.runKvkCompiler(result.data.kvksFilename, infile, outfile);
         if(!result.kvk) {
           return null;
         }

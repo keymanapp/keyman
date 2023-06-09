@@ -79,6 +79,10 @@ export enum CompilerErrorNamespace {
    * kmc and related infrastructure errors between 0x5000…0x5FFF;
    */
   Infrastructure = 0x5000,
+  /**
+   * kmc-analyze 0x6000…0x6FFF;
+   */
+  Analyzer = 0x6000,
 };
 
 export type CompilerSchema =
