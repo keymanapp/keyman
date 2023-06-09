@@ -4,6 +4,7 @@
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
+
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
@@ -23,36 +24,17 @@ builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_start_action clean; then
-  rm -rf ./build/
-  builder_finish_action success clean
-fi
-
-if builder_start_action configure; then
-  verify_npm_setup
-  builder_finish_action success configure
-fi
-
-if builder_start_action build; then
-  tsc --build
-  builder_finish_action success build
-fi
-
-if builder_start_action test; then
+function do_test() {
   eslint .
   # TODO: enable tests
   #     cd test && tsc --build && cd .. && mocha
   # TODO: enable c8 (disabled because no coverage at present)
   #     c8 --reporter=lcov --reporter=text mocha
-  builder_finish_action success test
-fi
+}
 
-if builder_start_action publish; then
-  builder_publish_to_npm
-  builder_finish_action success publish
-fi
-
-if builder_start_action pack; then
-  builder_publish_to_pack
-  builder_finish_action success pack
-fi
+builder_run_action clean      rm -rf ./build/
+builder_run_action configure  verify_npm_setup
+builder_run_action build      tsc --build
+builder_run_action test       do_test
+builder_run_action publish    builder_publish_to_npm
+builder_run_action pack       builder_publish_to_pack
