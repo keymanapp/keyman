@@ -43,6 +43,9 @@ export interface LegacyAPIEvents extends LegacyEventMap {
     isActivating: boolean
   }) => boolean;
 
+  'loaduserinterface': (p: {}) => boolean;
+  'unloaduserinterface': (p: {}) => boolean;
+
   // TODO:  more of the documented API events.  Note that any remaining events not seen here
   //        yet go unused within the mobile apps.
 }

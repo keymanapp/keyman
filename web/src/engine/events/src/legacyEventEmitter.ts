@@ -44,7 +44,7 @@ export type EventListener<
     K extends EventNames<T>
   > = (       // argumentMap[eventName] - retrieves the specific parameter typing for the event.
         args: ArgumentMap<T>[Extract<K, keyof T>]
-      ) => boolean;
+      ) => any;
 
 /**
  * Provides fairly strong typing for all legacy KMW events.  Note that all events

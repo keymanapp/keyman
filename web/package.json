@@ -2,6 +2,10 @@
   "name": "keyman",
   "description": "Facilitates text input in any language.",
   "exports": {
+    "./app/browser": {
+      "types": "./build/app/browser/obj/test-index.d.js",
+      "import": "./build/app/browser/obj/test-index.js"
+    },
     "./engine/attachment": {
       "types": "./build/engine/attachment/obj/index.d.ts",
       "import": "./build/engine/attachment/obj/index.js"
@@ -68,7 +72,6 @@
     "@keymanapp/web-sentry-manager": "*",
     "@sentry/cli": "2.2.0",
     "chai": "^4.3.4",
-    "google-closure-compiler-java": "^20200224.0.0",
     "karma": "^6.4.1",
     "karma-browserstack-launcher": "^1.6.0",
     "karma-chai": "^0.1.0",
@@ -103,9 +106,11 @@
     "@keymanapp/lexical-model-layer": "*",
     "@keymanapp/models-types": "*",
     "@keymanapp/recorder-core": "*",
+    "@keymanapp/tslib": "*",
     "@keymanapp/web-utils": "*",
     "@types/node": "^11.9.4",
-    "eventemitter3": "^4.0.0"
+    "eventemitter3": "^4.0.0",
+    "tslib": "^2.5.2"
   },
   "type": "module"
 }

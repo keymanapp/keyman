@@ -1,8 +1,8 @@
 import { Codes, DeviceSpec, ManagedPromise, Version } from '@keymanapp/keyboard-processor';
 import { getAbsoluteX, getAbsoluteY, landscapeView } from 'keyman/engine/dom-utils';
-import { EmitterListenerSpy } from 'keyman/engine/events';
+import { EmitterListenerSpy, LegacyEventMap } from 'keyman/engine/events';
 
-import OSKView, { EventMap, OSKPos, OSKRect } from './oskView.js';
+import OSKView, { EventMap, type LegacyOSKEventMap, OSKPos, OSKRect } from './oskView.js';
 import TitleBar from '../components/titleBar.js';
 import ResizeBar from '../components/resizeBar.js';
 
@@ -67,16 +67,18 @@ export default class FloatingOSKView extends OSKView {
 
     this.headerView = this.titleBar;
 
-    const onListenedEvent = (eventName: keyof EventMap) => {
+    const onListenedEvent = (eventName: keyof EventMap | keyof LegacyOSKEventMap) => {
       // As the following title bar buttons (for desktop / FloatingOSKView) do nothing unless a site
       // designer uses these events, we disable / hide them unless an event-handler is attached.
       let titleBar = this.headerView;
       if(titleBar && titleBar instanceof TitleBar) {
         switch(eventName) {
+          case 'configclick':
           case 'showConfig':
             titleBar.configEnabled = this.listenerCount('showConfig') + this.legacyEvents.listenerCount('configclick') > 0;
             break;
           case 'showHelp':
+          case 'helpclick':
             titleBar.helpEnabled = this.listenerCount('showHelp') + this.legacyEvents.listenerCount('helpclick') > 0;
             break;
           default:

@@ -8,6 +8,9 @@ import { spawn } from 'child_process';
 // Bundles to a compact ESModule
 esbuild.buildSync({
   entryPoints: ['build/obj/index.js'],
+  alias: {
+    'tslib': '@keymanapp/tslib'
+  },
   bundle: true,
   sourcemap: true,
   //minify: true,    // No need to minify a module.
@@ -24,6 +27,9 @@ esbuild.buildSync({
 // Bundles to a compact CommonJS (classic Node) module
 esbuild.buildSync({
   entryPoints: ['build/obj/index.js'],
+  alias: {
+    'tslib': '@keymanapp/tslib'
+  },
   bundle: true,
   sourcemap: true,
   //minify: true,    // No need to minify a module.

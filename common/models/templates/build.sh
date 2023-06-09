@@ -18,8 +18,9 @@ cd "$(dirname "$THIS_SCRIPT")"
 ################################ Main script ################################
 
 builder_describe "Builds the predictive-text model template implementation module" \
-  "@../../web/keyman-version" \
-  "@../wordbreakers" \
+  "@/common/web/keyman-version" \
+  "@/common/web/tslib" \
+  "@/common/models/wordbreakers" \
   "clean" \
   "configure" \
   "build" \

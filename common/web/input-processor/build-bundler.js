@@ -11,6 +11,9 @@ import { spawn } from 'child_process';
 // Bundled ES module version
 esbuild.buildSync({
   entryPoints: ['build/obj/index.js'],
+  alias: {
+    'tslib': '@keymanapp/tslib'
+  },
   bundle: true,
   sourcemap: true,
   external: ['fs', 'vm'],
@@ -29,6 +32,9 @@ esbuild.buildSync({
 // Bundled CommonJS (classic Node) module version
 esbuild.buildSync({
   entryPoints: ['build/obj/index.js'],
+  alias: {
+    'tslib': '@keymanapp/tslib'
+  },
   bundle: true,
   sourcemap: true,
   external: ['fs', 'vm'],

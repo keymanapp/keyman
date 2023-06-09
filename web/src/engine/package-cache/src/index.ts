@@ -10,7 +10,7 @@ export {
   REGION_CODES
 } from './keyboardStub.js';
 export { default as StubAndKeyboardCache, toPrefixedKeyboardId, toUnprefixedKeyboardId } from './stubAndKeyboardCache.js';
-export { default as CloudQueryEngine } from './cloud/queryEngine.js';
+export { CloudQueryResult, default as CloudQueryEngine } from './cloud/queryEngine.js';
 export { default as CloudRequesterInterface } from './cloud/requesterInterface.js';
 export { default as KeyboardRequisitioner } from './keyboardRequisitioner.js';
 export { default as ModelCache } from './modelCache.js';

@@ -9,6 +9,9 @@ import esbuild from 'esbuild';
 import { spawn } from 'child_process';
 
 await esbuild.build({
+  alias: {
+    'tslib': '@keymanapp/tslib'
+  },
   bundle: true,
   sourcemap: true,
   format: "esm",

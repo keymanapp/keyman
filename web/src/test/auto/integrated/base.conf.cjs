@@ -57,10 +57,10 @@ module.exports = {
 
     {pattern: 'common/test/resources/fixtures/**/*.html', watched: true}, // HTML structures useful for testing.
     {pattern: 'common/test/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
-    {pattern: 'web/build/app/web/debug/**/*.css', watched: false, served: true, included: false}, // OSK resources
-    {pattern: 'web/build/app/web/debug/**/*.gif', watched: false, served: true, included: false}, // OSK resources
-    {pattern: 'web/build/app/web/debug/**/*.png', watched: false, served: true, included: false}, // OSK resources
-    {pattern: 'web/build/app/web/debug/**/*.ttf', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/build/app/resources/**/*.css', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/build/app/resources/**/*.gif', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/build/app/resources/**/*.png', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/build/app/resources/**/*.ttf', watched: false, served: true, included: false}, // OSK resources
     {pattern: 'web/build/app/web/debug/*.js', watched: true, served: true, included: false},  // The actual KMW code.
     {pattern: 'web/build/app/web/debug/*.map', watched: true, served: true, included: false}, // + sourcemaps.
     {pattern: 'web/build/app/ui/debug/*.js', watched: true, served: true, included: false},  // The actual KMW UI code.
@@ -73,8 +73,9 @@ module.exports = {
   ],
 
   proxies: {
-    "/source/": "/base/web/build/app/web/debug/",
-    "/ui-source/": "/base/web/build/app/ui/debug/",
+    "/build/app/browser/": "/base/web/build/app/browser/debug/",
+    "/build/app/resources/": "/base/web/build/app/resources/",
+    "/build/app/ui/": "/base/web/build/app/ui/debug/",
     "/resources/": "/base/common/test/resources/",
     "/source/recorder_InputEvents.js.map": "/base/common/tests/recorder_InputEvents.js.map",
     "/node_modules/": "/base/node_modules/",

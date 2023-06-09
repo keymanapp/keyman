@@ -3,11 +3,18 @@
 
   "compilerOptions": {
     "allowJs": true,
+    "module": "es6",
+    "moduleResolution": "Node16",
+    "allowSyntheticDefaultImports": true,
     "inlineSources": true,
-    "module": "none",
-    "outFile": "../../../../build/tools/testing/bulk_rendering/bulk_render.js",
     "sourceMap": true,
-    "target": "es5"
+    "sourceRoot": "keyman",
+    "baseUrl": "./",
+    "outDir": "../../../../build/tools/testing/bulk_rendering/obj/",
+    "tsBuildInfoFile": "../../../../build/tools/testing/bulk_rendering/obj/tsconfig.tsbuildinfo",
+    "target": "es5",
+    "rootDir": ".",
+    "composite": true
   },
 
   "files": [
@@ -15,9 +22,7 @@
   ],
 
 	"references": [
-    { "path": "../../../../../common/web/utils", "prepend": true },
-    { "path": "../../../../../common/web/keyman-version", "prepend": true },
-    { "path": "../../../../../common/web/lm-message-types" },
-    { "path": "../../../engine/device-detect", "prepend": true}
+    { "path": "../../../app/browser" },
+    { "path": "../../../engine/device-detect" }
 	]
 }

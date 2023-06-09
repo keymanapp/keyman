@@ -23,8 +23,8 @@
   },
   "files": [],
   "references": [
-    { "path": "app/embed" },
-    { "path": "app/web" },
+    { "path": "app/browser" },
+    { "path": "app/webview" },
     { "path": "app/ui" }
   ],
 }

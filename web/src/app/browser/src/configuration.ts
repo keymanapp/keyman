@@ -21,6 +21,7 @@ export class BrowserConfiguration extends EngineConfiguration {
       this._options = {...options};
     }
     super.initialize(options);
+    this._options = options;
 
     this._ui = options.ui;
     this._attachType = options.attachType;
@@ -35,12 +36,24 @@ export class BrowserConfiguration extends EngineConfiguration {
     });
   }
 
+  get options() {
+    return this._options;
+  }
+
   get attachType() {
     return this._attachType;
   }
 
   get alertHost(): AlertHost | undefined {
     return this._alertHost;
+  }
+
+  set signalUser(host: AlertHost) {
+    if(!host || host != this.alertHost) {
+      this.alertHost.shutdown();
+    }
+
+    this._alertHost = host;
   }
 
   debugReport(): Record<string, any> {

@@ -80,11 +80,10 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
       maxRightContextCodePoints: supportsRightDeletions ? 0 : 64
     }
 
-    if(!this.canEnable() || !predictiveTextWorker) {
+    if(!predictiveTextWorker) {
       return;
     }
 
-    // TODO:  this needs to be supplied separately - runs on Node need to refer to a different type!
     this.lmEngine = new LMLayer(capabilities, predictiveTextWorker);
   }
 
@@ -392,9 +391,9 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
     return (this.activeModel || false) && this._mayPredict;
   }
 
-  public canEnable(): boolean {
-    // Is overridden for dom-aware KMW in case of old IE versions.
-    return true;
+  canEnable(): boolean {
+    // Is not initialized if there is no worker.
+    return !!this.lmEngine;
   }
 
   public get mayPredict() {

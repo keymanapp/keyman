@@ -432,7 +432,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
    * they rely on this function to manage presentation (showing / hiding) of the OSK.
    */
   private commonCheckAndDisplay() {
-    if(this.activationModel.activate) {
+    if(this.activationModel.activate && this.activeKeyboard) {
       this.present();
     } else {
       this.startHide(false);
@@ -1256,11 +1256,11 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
    * @return      {boolean}
    * Description  Wrapper function to add and identify OSK-specific event handlers
    */
-  addEventListener<T extends keyof LegacyOSKEventMap>(event: T, fn: (arg: {}) => boolean): void {
+  addEventListener<T extends keyof LegacyOSKEventMap>(event: T, fn: (arg: {}) => any): void {
     this.legacyEvents.addEventListener(event, fn);
   }
 
-  removeEventListener<T extends keyof LegacyOSKEventMap>(event: T, fn: (arg: {}) => boolean): void {
+  removeEventListener<T extends keyof LegacyOSKEventMap>(event: T, fn: (arg: {}) => any): void {
     this.legacyEvents.removeEventListener(event, fn);
   }
 }

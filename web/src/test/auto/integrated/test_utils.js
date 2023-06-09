@@ -1,6 +1,7 @@
 // // KeymanWeb test suite - processing of the Karma configuration's client.args parameter.
 
 import Device from '/@keymanapp/keyman/build/engine/device-detect/lib/index.mjs';
+import * as KMWRecorder from '/@keymanapp/keyman/build/tools/testing/recorder/lib/index.mjs';
 
 export let DEVICE_DETECT_FAILURE = false;
 
@@ -15,168 +16,177 @@ try {
 
 // // Keyman test suite utility methods
 
-// var setupKMW = function(kmwOptions, timeout) {
-//   var ui;
+export function setupKMW(kmwOptions, timeout) {
+  let ui;
 
-//   if(typeof(kmwOptions) == 'string' || typeof(kmwOptions) == 'undefined' || kmwOptions == null) {
-//     ui = kmwOptions;
+  if(typeof(kmwOptions) == 'string' || typeof(kmwOptions) == 'undefined' || kmwOptions == null) {
+    ui = kmwOptions;
 
-//     var kmwOptions = {
-//       attachType:'auto',
-//       root:'source',
-//       resources:'../../../../source'
-//     };
+    var kmwOptions = {
+      attachType:'auto',
+      root:'/',
+      resources:'/build/app/resources'
+    };
 
-//     if(ui) {
-//       kmwOptions.ui = ui;
-//     }
-//   }
+    if(ui) {
+      kmwOptions.ui = ui;
+    }
+  }
 
-//   const kmwPromise = setupScript('source/keymanweb.js', timeout, (scriptEle) => {
-//     fixture.el.appendChild(scriptEle);
-//   });
+  const kmwPromise = setupScript('build/app/browser/keymanweb.js', timeout, (scriptEle) => {
+    fixture.el.appendChild(scriptEle);
+  });
 
-//   ui = kmwOptions.ui;
+  ui = kmwOptions.ui;
 
-//   kmwOptions.attachType = kmwOptions.attachType ? kmwOptions.attachType : 'auto';
+  kmwOptions.attachType = kmwOptions.attachType ? kmwOptions.attachType : 'auto';
 
-//   if(!kmwOptions.root) {
-//     kmwOptions.root = 'source';
-//   }
+  if(!kmwOptions.root) {
+    kmwOptions.root = '/build/app/browser';
+  }
 
-//   if(!kmwOptions.resources) {
-//     kmwOptions.resources = '../../../../source';
-//   }
+  if(!kmwOptions.resources) {
+    kmwOptions.resources = '/build/resources';
+  }
 
-//   let uiPromise;
-//   if(ui) {
-//     uiPromise = setupScript('ui-source/kmwui' + ui + '.js', timeout, (scriptEle) => {
-//       fixture.el.appendChild(scriptEle);
-//     });
+  let uiPromise;
+  if(ui) {
+    uiPromise = setupScript('build/app/ui/kmwui' + ui + '.js', timeout, (scriptEle) => {
+      fixture.el.appendChild(scriptEle);
+    });
 
-//     kmwOptions.ui=ui;
-//   }
+    kmwOptions.ui=ui;
+  }
 
-//   let compositePromise = kmwPromise;
-//   if(uiPromise) {
-//     compositePromise = Promise.all([kmwPromise, uiPromise]);
-//   }
+  let compositePromise = kmwPromise;
+  if(uiPromise) {
+    compositePromise = Promise.all([kmwPromise, uiPromise]);
+  }
 
-//   return finalPromise = compositePromise.then(() => {
-//     if(window['keyman']) {
-//       return window['keyman'].init(kmwOptions);
-//     } else {
-//       return Promise.reject();
-//     }
-//   });
-// }
+  return compositePromise.then(() => {
+    if(window['keyman']) {
+      return window['keyman'].init(kmwOptions);
+    } else {
+      return Promise.reject();
+    }
+  });
+}
 
-// /**
-//  * Produces a script element tied to a Promise for its eventual load (or failure thereof).
-//  *
-//  * The script element is only available via callback due to implementation constraints.
-//  *
-//  * @param {*} src       The source script's (relative) path on the test server.
-//  * @param {*} timeout
-//  * @param {*} functor   A callback to handle the script element.
-//  * @returns
-//  */
-// var setupScript = function(src, timeout, functor) {
-//   return new Promise((resolve, reject) => {
-//     const Lscript = document.createElement('script');
-//     let hasResolved = false;
-//     Lscript.charset="UTF-8";        // KMEW-89
-//     Lscript.type = 'text/javascript';
-//     Lscript.async = false;
+/**
+ * Produces a script element tied to a Promise for its eventual load (or failure thereof).
+ *
+ * The script element is only available via callback due to implementation constraints.
+ *
+ * @param {*} src       The source script's (relative) path on the test server.
+ * @param {*} timeout
+ * @param {*} functor   A callback to handle the script element.
+ * @returns
+ */
+export function setupScript(src, timeout, functor) {
+  return new Promise((resolve, reject) => {
+    const Lscript = document.createElement('script');
+    let hasResolved = false;
+    Lscript.charset="UTF-8";        // KMEW-89
+    Lscript.type = 'text/javascript';
+    Lscript.async = false;
 
-//     const timer = window.setTimeout(() => {
-//       reject("Script load attempt timed out.");
-//     }, timeout);
+    const timer = window.setTimeout(() => {
+      reject("Script load attempt timed out.");
+    }, timeout);
 
-//     Lscript.onload = Lscript.onreadystatechange = () => {
-//       window.clearTimeout(timer);
-//       if(!hasResolved && (Lscript.readyState === undefined || Lscript.readyState == "complete")) {
-//         hasResolved = true;
-//         resolve();
-//       }
-//     }
+    Lscript.onload = Lscript.onreadystatechange = () => {
+      window.clearTimeout(timer);
+      if(!hasResolved && (Lscript.readyState === undefined || Lscript.readyState == "complete")) {
+        hasResolved = true;
+        resolve();
+      }
+    }
 
-//     Lscript.onerror = (err) => {
-//       window.clearTimeout(timer);
-//       reject(err);
-//     }
+    Lscript.onerror = (err) => {
+      window.clearTimeout(timer);
+      reject(err);
+    }
 
-//     Lscript.src = src;
+    Lscript.src = src;
 
-//     functor(Lscript);
-//   });
-// }
+    functor(Lscript);
+  });
+}
 
-// var teardownKMW = function() {
-//   var error = null;
-//   if(keyman) { // If our setupKMW fails somehow, this guard prevents a second error report on teardown.
+export function teardownKMW() {
+  var error = null;
+  if(keyman) { // If our setupKMW fails somehow, this guard prevents a second error report on teardown.
 
-//     // We want to be SURE teardown works correctly, or we'll get lots of strange errors on other tests.
-//     // Thus, error-handling on shutdown itself.  It HAS mattered.
-//     try {
-//       keyman['shutdown']();
-//     } catch(err) {
-//       error = err;
-//     }
+    // We want to be SURE teardown works correctly, or we'll get lots of strange errors on other tests.
+    // Thus, error-handling on shutdown itself.  It HAS mattered.
+    try {
+      keyman['shutdown']();
+    } catch(err) {
+      error = err;
+    }
 
-//     try {
-//       var success = delete window["keyman"];
-//       if(!success) {
-//         window["keyman"] = undefined;
-//       }
-//     } finally {
-//       if(error) {
-//         console.log("Error during KMW shutdown!");
-//         throw error;
-//       }
-//     }
-//   }
-// }
+    try {
+      var success = delete window["keyman"];
+      if(!success) {
+        window["keyman"] = undefined;
+      }
+    } finally {
+      if(error) {
+        console.log("Error during KMW shutdown!");
+        throw error;
+      }
+    }
+  }
+}
 
-// var loadKeyboardStub = function(stub, timeout, params) {
-//   var kbdName = "Keyboard_" + stub.id;
+export async function loadKeyboardStub(stub, timeout, params) {
+  var kbdName = "Keyboard_" + stub.id;
 
-//   keyman.addKeyboards(stub);
-//   if(!params || !params.passive) {
-//     return keyman.setActiveKeyboard(kbdName, stub.languages.id);
-//   } else if(keyman.getActiveKeyboard() != kbdName) {
-//     return setupScript(stub.filename, timeout, (ele) => {
-//       fixture.el.appendChild(ele);
-//     });
-//   } else {
-//     return Promise.resolve();
-//   }
-// }
+  // Returning an "error stub" does not actually throw an error.  Makes
+  // picking up on related errors in unit-test dev a bit trickier, but
+  // we can manually throw the error from here.
+  let result = await keyman.addKeyboards(stub);
+  for(let i=0; i < result.length; i++) {
+    if(result[i].error) {
+      throw result[i].error;
+    }
+  }
 
-// var loadKeyboardFromJSON = function(jsonPath, timeout, params) {
-//   var stub = fixture.load(jsonPath, true);
+  if(!params || !params.passive) {
+    return keyman.setActiveKeyboard(kbdName, stub.languages.id);
+  } else if(keyman.getActiveKeyboard() != kbdName) {
+    return setupScript(stub.filename, timeout, (ele) => {
+      fixture.el.appendChild(ele);
+    });
+  } else {
+    return Promise.resolve();
+  }
+}
 
-//   return loadKeyboardStub(stub, timeout, params);
-// }
+export async function loadKeyboardFromJSON(jsonPath, timeout, params) {
+  var stub = fixture.load(jsonPath, true);
 
-// function runLoadedKeyboardTest(testDef, device, usingOSK, assertCallback) {
-//   var inputElem = document.getElementById('singleton');
+  return loadKeyboardStub(stub, timeout, params);
+}
 
-//   let proctor = new KMWRecorder.BrowserProctor(inputElem, device, usingOSK, assertCallback);
-//   testDef.test(proctor);
-// }
+function runLoadedKeyboardTest(testDef, device, usingOSK, assertCallback) {
+  var inputElem = document.getElementById('singleton');
 
-// function runKeyboardTestFromJSON(jsonPath, params, assertCallback, timeout) {
-//   var testSpec = new KMWRecorder.KeyboardTest(fixture.load(jsonPath, true));
-//   let device = new com.keyman.Device();
-//   device.detect();
+  let proctor = new KMWRecorder.BrowserProctor(inputElem, device, usingOSK, assertCallback);
+  testDef.test(proctor);
+}
 
-//   return loadKeyboardStub(testSpec.keyboard, timeout).then(() => {
-//     runLoadedKeyboardTest(testSpec, device.coreSpec, params.usingOSK, assertCallback);
-//   }).finally(() => {
-//     keyman.removeKeyboards(testSpec.keyboard.id);
-//   });
-// }
+export function runKeyboardTestFromJSON(jsonPath, params, assertCallback, timeout) {
+  var testSpec = new KMWRecorder.KeyboardTest(fixture.load(jsonPath, true));
+  let device = new Device();
+  device.detect();
+
+  return loadKeyboardStub(testSpec.keyboard, timeout).then(() => {
+    runLoadedKeyboardTest(testSpec, device.coreSpec, params.usingOSK, assertCallback);
+  }).finally(() => {
+    keyman.removeKeyboards(testSpec.keyboard.id);
+  });
+}
 
 // function retrieveAndReset(Pelem) {
 //   let val = Pelem.value;

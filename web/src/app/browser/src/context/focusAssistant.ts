@@ -41,6 +41,18 @@ interface EventMap {
 export class FocusAssistant extends EventEmitter<EventMap> {
   private _maintainingFocus: boolean = false;  // ActivatingKeymanWebUI - Does the OSK have active focus / an active interaction?
 
+  /**
+   * Returns `true` only when the active target has an active `forceScroll` method/state, which deliberately
+   * blurs and then refocuses the same element in order to force a browser-default page scroll to keep the
+   * element and text-caret visible.
+   */
+  readonly isTargetForcingScroll: () => boolean;
+
+  constructor(isTargetForcingScroll: () => boolean) {
+    super();
+    this.isTargetForcingScroll = isTargetForcingScroll;
+  }
+
   /*
    * Long-term idea here: about all of the relevant OSK events that would interact with this have "enter" and
    * "leave" variants - we could take a stack of `Promise`s.  On a `Promise` fulfillment, remove it from the
@@ -108,16 +120,6 @@ export class FocusAssistant extends EventEmitter<EventMap> {
    * super-straightforward, but a refactor should be manageable all the same.
    */
   _IgnoreNextSelChange = 0;
-
-  /**
-   * JH (2023-04-24): Set only by the OutputTarget `forceScroll` method, which deliberately blurs and
-   * then refocuses the same element in order to force a browser-default page scroll to keep the element
-   * visible.
-   *
-   * While it feels like this should be possible to merge with the other class fields in some form... it
-   * doesn't seem as safe to do on first glance.
-   */
-  _IgnoreBlurFocus: boolean = false;
 
   /**
    * Is used as a time-delayed async `restoringFocus` or `maintainingFocus` - could be modeled decently as a Promise.

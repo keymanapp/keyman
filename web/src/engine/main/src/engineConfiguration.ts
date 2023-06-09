@@ -19,7 +19,7 @@ export class EngineConfiguration extends EventEmitter<EventMap> {
   readonly deferForInitialization: ManagedPromise<void>;
 
   private _paths: PathConfiguration;
-  private _activateFirstKeyboard: boolean;
+  public activateFirstKeyboard: boolean;
   private _spacebarText: SpacebarText;
   private _stubNamespacer?: (KeyboardStub) => void;
 
@@ -49,9 +49,9 @@ export class EngineConfiguration extends EventEmitter<EventMap> {
     }
 
     if(typeof options.setActiveOnRegister == 'boolean') {
-      this._activateFirstKeyboard = options.setActiveOnRegister;
+      this.activateFirstKeyboard = options.setActiveOnRegister;
     } else {
-      this._activateFirstKeyboard = true;
+      this.activateFirstKeyboard = true;
     }
 
     this._spacebarText = options.spacebarText;
@@ -66,10 +66,6 @@ export class EngineConfiguration extends EventEmitter<EventMap> {
 
   get paths() {
     return this._paths;
-  }
-
-  get activateFirstKeyboard() {
-    return this._activateFirstKeyboard;
   }
 
   get spacebarText() {

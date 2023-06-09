@@ -22,7 +22,8 @@ builder_describe "Builds the Keyman Engine for Web (KMW) attachment engine." \
   "clean" \
   "configure" \
   "build" \
-  "test"
+  "test" \
+  "--ci+                     Set to utilize CI-based test configurations & reporting."
 
 # Possible TODO?
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
@@ -38,4 +39,4 @@ builder_parse "$@"
 builder_run_action configure verify_npm_setup
 builder_run_action clean rm -rf "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME"
 builder_run_action build compile $SUBPROJECT_NAME
-builder_run_action test # No headless tests; TODO (next PR): DOM tests
+builder_run_action test # No headless tests

@@ -4,7 +4,13 @@
     "id": "test_deadkeys",
     "name": "Keyman Deadkey Stress-Tester",
     "filename": "resources/keyboards/test_deadkeys.js",
-    "languages": {}
+    "languages": [
+      {
+        "id": "en",
+        "name": "English",
+        "region": "World"
+      }
+    ]
   },
   "inputTestSets": [
     {

@@ -3,6 +3,7 @@
 
   "compilerOptions": {
     "allowJs": false,
+    "importHelpers": true,
     "inlineSources": true,
     "allowSyntheticDefaultImports": true,
     "module": "es6",
@@ -18,7 +19,8 @@
   "include": [ "**/*.ts" ],
 
   "references": [
-    { "path": "../../../../common/web/keyman-version" },
-    { "path": "../../../../common/web/utils" }
+    // We want OSK to be free from the need to reference this child project for its paths definitions.
+    // There are a number of extra components here the OSK doesn't need.
+    { "path": "../osk" }
   ]
 }

@@ -3,6 +3,7 @@
 
   "compilerOptions": {
     "allowJs": true,
+    "importHelpers": true,
     "inlineSources": true,
     "allowSyntheticDefaultImports": true,
     "module": "es6",
@@ -18,8 +19,10 @@
   "include": [ "src/**/*.ts" ],
 
   "references": [
-    // { "path": "../../../../common/web/keyman-version" },
-    // { "path": "../../../../common/web/utils" },
-    { "path": "../../../../common/web/keyboard-processor" }
+    { "path": "../../../../common/web/input-processor" },
+    { "path": "../device-detect" },
+    { "path": "../osk" },
+    { "path": "../package-cache" },
+    { "path": "../paths" },
   ]
 }

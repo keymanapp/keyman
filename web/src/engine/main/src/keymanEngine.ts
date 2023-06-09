@@ -12,6 +12,7 @@ import HardKeyboardBase from "./hardKeyboard.js";
 import { LegacyAPIEvents } from "./legacyAPIEvents.js";
 import { EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";
 import DOMCloudRequester from "keyman/engine/package-cache/dom-requester";
+import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 export default class KeymanEngine<
   Configuration extends EngineConfiguration,
@@ -52,33 +53,39 @@ export default class KeymanEngine<
       this.keyEventRefocus();
     }
 
-    try {
-      // Clear any cached codepoint data; we can rebuild it if it's unchanged.
-      outputTarget.invalidateSelection();
-      // Deadkey matching continues to be troublesome.
-      // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
-      outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
+    // Clear any cached codepoint data; we can rebuild it if it's unchanged.
+    outputTarget.invalidateSelection();
+    // Deadkey matching continues to be troublesome.
+    // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
+    outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
 
-      const result = this.core.processKeyEvent(event, outputTarget);
+    const result = this.core.processKeyEvent(event, outputTarget);
 
-      if(result && result.transcription?.transform) {
-        this.config.onRuleFinalization(result, this.contextManager.activeTarget);
-      }
-
-      if(callback) {
-        callback(result, null);
-      }
-    } catch (err) {
-      if(callback) {
-        callback(null, err);
-      }
+    if(result && result.transcription?.transform) {
+      this.config.onRuleFinalization(result, this.contextManager.activeTarget);
     }
+
+    if(callback) {
+      callback(result, null);
+    }
+
+    // No try-catch here because we don't want to mask any errors that occur during keystroke
+    // processing - silent failures are far harder to diagnose.
   };
 
   // Should be overwritten as needed by engine subclasses; `browser` should set its DefaultOutput subclass in place.
   protected processorConfiguration(): ProcessorInitOptions {
+    // I732 START - Support for European underlying keyboards #1
+    let baseLayout: string;
+    if(typeof(window['KeymanWeb_BaseLayout']) !== 'undefined') {
+      baseLayout = window['KeymanWeb_BaseLayout'];
+    } else {
+      baseLayout = 'us';
+    }
+
     return {
       keyboardInterface: this.interface,
+      baseLayout: baseLayout,
       defaultOutputRules: new DefaultRules()
     };
   };
@@ -107,11 +114,12 @@ export default class KeymanEngine<
       this.osk?.refreshLayout();
     });
 
-    this.core.keyboardProcessor.beepHandler = (target) => {
-      if(this.doBeep) {
-        this.doBeep(target);
-      }
-    }
+    // The OSK does not possess a direct connection to the KeyboardProcessor's state-key
+    // management object; this event + handler allow us to keep the OSK's related states
+    // in sync.
+    this.core.keyboardProcessor.on('statekeyChange', (stateKeys) => {
+      this.osk?.vkbd?.updateStateKeys(stateKeys);
+    })
 
     this.contextManager.on('beforekeyboardchange', (metadata) => {
       this.legacyAPIEvents.callEvent('beforekeyboardchange', {
@@ -215,7 +223,7 @@ export default class KeymanEngine<
         });
 
         // If this is the first stub loaded, set it as active.
-        if(this.keyboardRequisitioner.cache.defaultStub == stub) {
+        if(this.config.activateFirstKeyboard && this.keyboardRequisitioner.cache.defaultStub == stub) {
           // Note:  leaving this out is super-useful for debugging issues that occur when no keyboard is active.
           this.contextManager.activateKeyboard(stub.id, stub.langId, true);
         }
@@ -250,6 +258,14 @@ export default class KeymanEngine<
     // #endregion
   }
 
+  public get build(): number {
+    return Number.parseInt(KEYMAN_VERSION.VERSION_PATCH, 10);
+  }
+
+  public get version(): string {
+    return KEYMAN_VERSION.VERSION_RELEASE;
+  }
+
   public get hardKeyboard(): HardKeyboard {
     return this._hardKeyboard;
   }
@@ -272,8 +288,11 @@ export default class KeymanEngine<
       this.core.keyboardProcessor.layerStore.handler = this.osk.layerChangeHandler;
     }
     this._osk = value;
-    this._osk.on('keyEvent', this.keyEventListener);
-    this.core.keyboardProcessor.layerStore.handler = this.osk.layerChangeHandler;
+    if(value) {
+      value.activeKeyboard = this.contextManager.activeKeyboard;
+      value.on('keyEvent', this.keyEventListener);
+      this.core.keyboardProcessor.layerStore.handler = value.layerChangeHandler;
+    }
   }
 
   public getDebugInfo(): Record<string, any> {
@@ -364,8 +383,42 @@ export default class KeymanEngine<
     }
   }
 
+  /**
+   * Allow to change active keyboard by (internal) keyboard name
+   *
+   * @param       {string}    PInternalName   Internal name
+   * @param       {string}    PLgCode         Language code
+   */
   async setActiveKeyboard(keyboardId: string, languageCode?: string): Promise<boolean> {
     return this.contextManager.activateKeyboard(keyboardId, languageCode, true);
+  }
+
+  /**
+   * Function     getActiveKeyboard
+   * Scope        Public
+   * @return      {string}      Name of active keyboard
+   * Description  Return internal name of currently active keyboard
+   */
+  getActiveKeyboard(): string {
+    return this.contextManager.activeKeyboard?.metadata.id ?? '';
+  }
+
+  /**
+   * Function    getActiveLanguage
+   * Scope       Public
+   * @param      {boolean=}        true to retrieve full language name, false/undefined to retrieve code.
+   * @return     {string}         language code
+   * Description Return language code for currently selected language
+   */
+  getActiveLanguage(fullName?: boolean): string {
+    // In short... the activeStub.
+    const metadata = this.contextManager.activeKeyboard?.metadata;
+
+    if(!fullName) {
+      return metadata?.langId ?? '';
+    } else {
+      return metadata?.langName ?? '';
+    }
   }
 
   /**
@@ -416,8 +469,6 @@ export default class KeymanEngine<
   setNumericLayer() {
     this.core.keyboardProcessor.setNumericLayer(this.config.softDevice);
   };
-
-  doBeep?: (target: OutputTarget) => void;
 }
 
 // Intent:  define common behaviors for both primary app types; each then subclasses & extends where needed.

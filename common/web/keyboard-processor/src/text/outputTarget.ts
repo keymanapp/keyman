@@ -390,11 +390,19 @@ export class Mock extends OutputTarget {
       let priorMock = outputTarget as Mock;
       clone = new Mock(priorMock.text, priorMock.selStart, priorMock.selEnd);
     } else {
-      let text = outputTarget.getText();
-      let beforeText = outputTarget.getTextBeforeCaret();
-      let afterText = outputTarget.getTextAfterCaret();
-      let selectionStart = beforeText._kmwLength();
-      let selectionEnd = text._kmwLength() - afterText._kmwLength();
+      const text = outputTarget.getText();
+      const textLen = text._kmwLength();
+
+      // If !hasSelection()
+      let selectionStart: number = textLen;
+      let selectionEnd: number = 0;
+
+      if(outputTarget.hasSelection()) {
+        let beforeText = outputTarget.getTextBeforeCaret();
+        let afterText = outputTarget.getTextAfterCaret();
+        selectionStart = beforeText._kmwLength();
+        selectionEnd = textLen - afterText._kmwLength();
+      }
 
       // readonly group or not, the returned Mock remains the same.
       // New-context events should act as if the caret were at the earlier-in-context

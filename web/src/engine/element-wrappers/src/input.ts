@@ -2,39 +2,6 @@ import OutputTarget from './outputTarget.js';
 
 interface EventMap  {
   /**
-   * Used to facilitate a pre-modularization utility method we wish to maintain:
-   ```
-export function forceScroll(element: HTMLInputElement | HTMLTextAreaElement) {
-  // Only executes when com.keyman.DOMEventHandlers is defined.
-  //
-  // We bypass this whenever operating in the embedded format.
-  if(com && com.keyman && com.keyman['DOMEventHandlers'] && !com.keyman['singleton']['isEmbedded']) {
-    let DOMEventHandlers = com.keyman['DOMEventHandlers'];
-
-    let selectionStart = element.selectionStart;
-    let selectionEnd = element.selectionEnd;
-
-    DOMEventHandlers.states._IgnoreBlurFocus = true;
-    //Forces scrolling; the re-focus triggers the scroll, at least.
-    element.blur();
-    element.focus();
-    DOMEventHandlers.states._IgnoreBlurFocus = false;
-
-    // On Edge, it appears that the blur/focus combination will reset the caret position
-    // under certain scenarios during unit tests.  So, we re-set it afterward.
-    element.selectionStart = selectionStart;
-    element.selectionEnd = selectionEnd;
-  }
-}
-   ```
-   * References to the event-handlers & related states objects are not available within this submodule.
-   *
-   * It is the parts between and including the _IgnoreBlurFocus references that must be
-   * implemented externally.
-   */
-  'scrollfocusrequest': (element: HTMLInputElement) => void,
-
-  /**
    * This event will be raised when a newline is received by wrapped elements not of
    * the 'search' or 'submit' types.
    *
@@ -74,22 +41,18 @@ export default class Input extends OutputTarget<EventMap> {
    */
   private processedSelectionEnd: number;
 
+  /**
+   * Set, then unset within the `forceScroll` method in order to facilitate the
+   * `isForcingScroll` flag.
+   */
+  private _activeForcedScroll: boolean;
+
   constructor(ele: HTMLInputElement) {
     super();
 
     this.root = ele;
     this._cachedSelectionStart = -1;
-
-    // Intended to facilitate reimplmentation of the old `forceScroll` as an event handler
-    // defined externally, but automatically set on class construction.
-    Input.constructorExtensions(this);
   }
-
-  /**
-   * This may be set to define additional construction behaviors to perform, such as
-   * automatically setting handlers for defined events.
-   */
-  public static constructorExtensions: (constructingInstance: Input) => void = () => {};
 
   get isSynthetic(): boolean {
     return false;
@@ -146,9 +109,37 @@ export default class Input extends OutputTarget<EventMap> {
     this.processedSelectionStart = start;
     this.processedSelectionEnd = end;
 
-    this.events.emit('scrollfocusrequest', this.root);
+    this.forceScroll();
 
     this.root.setSelectionRange(domStart, domEnd, direction);
+  }
+
+  forceScroll() {
+    // Only executes when com.keyman.DOMEventHandlers is defined.
+    //
+    // We bypass this whenever operating in the embedded format.
+    const element = this.getElement();
+
+    let selectionStart = element.selectionStart;
+    let selectionEnd = element.selectionEnd;
+
+    this._activeForcedScroll = true;
+
+    try {
+      //Forces scrolling; the re-focus triggers the scroll, at least.
+      element.blur();
+      element.focus();
+    } finally {
+      // On Edge, it appears that the blur/focus combination will reset the caret position
+      // under certain scenarios during unit tests.  So, we re-set it afterward.
+      element.selectionStart = selectionStart;
+      element.selectionEnd = selectionEnd;
+      this._activeForcedScroll = false;
+    }
+  }
+
+  isForcingScroll(): boolean {
+    return this._activeForcedScroll;
   }
 
   getSelectionDirection(): "forward" | "backward" | "none" {

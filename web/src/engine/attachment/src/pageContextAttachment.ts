@@ -103,7 +103,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
       (flattenedInputList, pageInputList) => flattenedInputList.concat(pageInputList), []
     );
 
-    return [...this._inputList, ...embeddedInputs];
+    return [].concat(this._inputList).concat(embeddedInputs);
   }
 
   // Useful for `moveToNext` operations:  order matters.
@@ -275,7 +275,27 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
    * @return      {boolean}       true if KMW is attached to the element, otherwise false.
    */
   isAttached(x: HTMLElement) {
-    return x._kmwAttachment ? true : false;
+    if(x._kmwAttachment) {
+      return true;
+    }
+
+    // A non-design IFrame is 'attached' if there is a corresponding PageContextAttachment instance.
+    // ... which could be this one!
+    if(nestedInstanceOf(x, 'HTMLIFrameElement')) {
+      const iframe = x as HTMLIFrameElement;
+      if(iframe.contentDocument == this.document) {
+        return true;
+      }
+
+      // If not this one, perhaps a child?
+      for(let child of this.embeddedPageContexts) {
+        if(child.isAttached(x)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -342,21 +362,21 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
       return;
     }
 
-    if(this.isAttached(Pelem)) {
-      const intendedInputMode = Pelem._kmwAttachment.inputMode;
-
-      this.disableInputModeObserver();
-      // restores the last-known setting before KMW forced it to 'none'.
-      // Refer to enableInputElement.
-      Pelem.inputMode = intendedInputMode;
-      this.enableInputModeObserver();
-    }
-
     // Do NOT test for pre-disabledness - we also use this to fully detach without officially 'disabling' via kmw-disabled.
     if((Pelem.ownerDocument.defaultView && Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) ||
         Pelem instanceof HTMLIFrameElement) {
       this._DetachFromIframe(Pelem);
     } else {
+      if(this.isAttached(Pelem)) {
+        const intendedInputMode = Pelem._kmwAttachment?.inputMode;
+
+        this.disableInputModeObserver();
+        // restores the last-known setting before KMW forced it to 'none'.
+        // Refer to enableInputElement.
+        Pelem.inputMode = intendedInputMode;
+        this.enableInputModeObserver();
+      }
+
       let cnIndex = Pelem.className.indexOf('keymanweb-font');
       if(cnIndex >= 0) { // See note about the alias below.
         Pelem.className = Pelem.className.replace('keymanweb-font', '').trim();
@@ -650,6 +670,13 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
       }
 
       this.listInputs();
+    } else if(nestedInstanceOf(Pelem, "HTMLIFrameElement")) {
+      // Future fix idea for this case:  when disabling a normal-iframe, keep the child instance.
+      // Just call 'shutdown' on it.  Then, re-'install' here.
+      // Current architecture unfortunately conflates 'enable' and 'detach' for iframes, though. :(
+      // Should be 'easy enough' to address if and when the time comes.
+      // But for now, this'll keep things smoothed over.
+      this._AttachToIframe(Pelem as HTMLIFrameElement);
     }
   }
 
@@ -681,7 +708,9 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
    * Description  Disables a KMW control element
    */
   enableControl(Pelem: HTMLElement) {
-    if(!this.isAttached(Pelem)) {
+    // Current architecture unfortunately conflates 'enable' and 'detach' for iframes, so a
+    // disabled iframe appears detached.
+    if(!this.isAttached(Pelem) && !nestedInstanceOf(Pelem, "HTMLIFrameElement")) {
       console.warn("KeymanWeb is not attached to element " + Pelem);
     }
 
@@ -1163,20 +1192,29 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   }
 
   shutdown() {
-    // Embedded pages first - that way, each page can handle its own inputs, rather than having
-    // the top-level instance handle all attached elements.
-    // (inputList enumerates child pages, too!)
-    this.embeddedPageContexts.forEach((embeddedPage) => {
-      try {
-        embeddedPage.shutdown();
-      } catch (e) {}
-    });
-
     try {
       this.enablementObserver?.disconnect();
       this.attachmentObserver?.disconnect();
       this.inputModeObserver?.disconnect();
       this.stylesheetManager?.unlinkAll();
+
+      /*
+       * Part of shutdown involves detaching from elements... which typically does involve
+       * restoring the original `inputMode` settings.  Remove the observer reference after
+       * disconnection to prevent any further disable-enable actions.
+       *
+       * The others aren't toggled, so they're fine to leave.
+       */
+      this.inputModeObserver = null;
+
+      // Embedded pages first - that way, each page can handle its own inputs, rather than having
+      // the top-level instance handle all attached elements.
+      // (inputList enumerates child pages, too!)
+      this.embeddedPageContexts.forEach((embeddedPage) => {
+        try {
+          embeddedPage.shutdown();
+        } catch (e) {}
+      });
 
       for(let input of this.inputList) {
         try {

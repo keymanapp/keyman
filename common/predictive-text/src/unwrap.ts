@@ -6,6 +6,6 @@
  * @param fn The function whose body will be returned.
  */
 export default function unwrap(encodedSrc: string): string {
-  let wrapper = decodeURIComponent(encodedSrc);
-  return wrapper;
+  // There used to be more to this, but now it's a pretty simple passthrough!
+  return encodedSrc;
 }

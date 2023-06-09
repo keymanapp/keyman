@@ -86,20 +86,20 @@ describe('Compiler class', function() {
     const kmxFixture = fixtureDir + '/binary/caps_lock_layer_3620.kmx';
     const kvkFixture = fixtureDir + '/binary/caps_lock_layer_3620.kvk';
 
-    const kmxfile = __dirname + '/caps_lock_layer_3620.kmx';
-    const kvkfile = __dirname + '/caps_lock_layer_3620.kvk';
+    const resultingKmxfile = __dirname + '/caps_lock_layer_3620.kmx';
+    const resultingKvkfile = __dirname + '/caps_lock_layer_3620.kvk';
 
-    assert(compiler.run(infile, kmxfile, {saveDebug: true, shouldAddCompilerVersion: false}));
+    assert(compiler.run(infile, resultingKmxfile, {saveDebug: true, shouldAddCompilerVersion: false}));
 
-    assert(fs.existsSync(kmxfile));
-    assert(fs.existsSync(kvkfile));
+    assert(fs.existsSync(resultingKmxfile));
+    assert(fs.existsSync(resultingKvkfile));
 
-    const kmxData = fs.readFileSync(kmxfile);
+    const kmxData = fs.readFileSync(resultingKmxfile);
     const kmxFixtureData = fs.readFileSync(kmxFixture);
     assert.equal(kmxData.byteLength, kmxFixtureData.byteLength);
     assert.deepEqual(kmxData, kmxFixtureData);
 
-    const kvkData = fs.readFileSync(kvkfile);
+    const kvkData = fs.readFileSync(resultingKvkfile);
     const kvkFixtureData = fs.readFileSync(kvkFixture);
     assert.equal(kvkData.byteLength, kvkFixtureData.byteLength);
     assert.deepEqual(kvkData, kvkFixtureData);

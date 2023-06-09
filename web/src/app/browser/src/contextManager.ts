@@ -12,7 +12,7 @@ import {
 import { BrowserConfiguration } from './configuration.js';
 import { FocusAssistant } from './context/focusAssistant.js';
 
-interface KeyboardCookie {
+export interface KeyboardCookie {
   current: string;
 }
 
@@ -43,7 +43,7 @@ function _SetTargDir(Ptarg: HTMLElement, activeKeyboard: Keyboard) {
 export default class ContextManager extends ContextManagerBase<BrowserConfiguration> {
   private _activeKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
   private cookieManager = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
-  readonly focusAssistant = new FocusAssistant();
+  readonly focusAssistant = new FocusAssistant(() => this.activeTarget?.isForcingScroll());
   readonly page: PageContextAttachment;
   private mostRecentTarget: OutputTarget<any>;
   private currentTarget: OutputTarget<any>;
@@ -183,8 +183,15 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   }
 
   public deactivateCurrentTarget() {
-    this.currentTarget = null;
-    // TODO: Not in original, pre-modularized form... but should probably also _ControlBlur?
+    const priorTarget = this.activeTarget || this.lastActiveTarget;
+    if(priorTarget) {
+      this._BlurKeyboardSettings(priorTarget.getElement());
+    }
+
+    // Because of focus-maintenance effects
+    if(!this.activeTarget) {
+      this.setActiveTarget(null, true);
+    }
   }
 
   public forgetActiveTarget() {
@@ -196,12 +203,42 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       this._BlurKeyboardSettings(priorTarget.getElement());
     }
 
-    this.setActiveTarget(null);
+    this.setActiveTarget(null, true);
   }
 
-  private setActiveTarget(target: OutputTarget<any>) {
+  public setActiveTarget(target: OutputTarget<any>, sendEvents: boolean) {
     const previousTarget = this.mostRecentTarget;
     const originalTarget = this.activeTarget; // may differ, depending on focus state.
+
+    if(target == originalTarget) {
+      /**
+       * If it's already active, we should cancel early.
+       *
+       * The #1 reason - we don't want .resetContext calls in this scenario.
+       * In particular, moving the caret or setting the selection range of an
+       * <input> or <textarea> in desktop Safari programmatically WILL trigger
+       * focus events!
+       *
+       * https://bugs.webkit.org/show_bug.cgi?id=224425
+       *
+       * > In WebKit, focus follows selection so if you modify selection, then the
+       *   focus will be moved there.
+       *
+       * Caret manipulation in the browser, as needed by certain keyboard text
+       * operations, IS text selection - of width zero, but still selection.
+       *
+       * At present, even if setting selection on the focused element, Safari will
+       * still trigger a focus event upon it... which can cascade here if uncaught
+       * and trigger a contextReset DURING keyboard rule processing without this
+       * guard.
+       *
+       * The #2 reason:  the `forceScroll` method used within the Input and Textarea
+       * types whenever the selection must be programatically updated.  The blur
+       * is 'swallowed', preventing it from being dropped as 'active'. However, the
+       * corresponding focus is not swallowed... until this if-condition's check.
+       */
+      return;
+    }
 
     // We condition on 'priorElement' below as a check to allow KMW to set a default active keyboard.
     let hadRecentElement = !!previousTarget;
@@ -209,6 +246,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     // Must set before _Blur / _Focus to avoid infinite recursion due to complications
     // in setActiveKeyboard behavior with managed keyboard settings.
     this.currentTarget = this.mostRecentTarget = target; // I3363 (Build 301)
+    this.predictionContext.setCurrentTarget(target);
 
     if(this.focusAssistant.restoringFocus) {
       this._BlurKeyboardSettings(target.getElement());
@@ -233,9 +271,15 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     if(target != originalTarget) {
       this.emit('targetchange', target);
     }
-  }
 
-  // on set activeTarget, make sure to also change it for this.predictionContext!
+    if(sendEvents) {
+      // //Execute external (UI) code needed on focus if required
+      this.apiEvents.callEvent('controlfocused', {
+        target: target?.getElement() || null,
+        activeControl: previousTarget?.getElement()
+      });
+    }
+  }
 
   get activeKeyboard() {
     return this._activeKeyboard;
@@ -279,13 +323,19 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    */
   protected currentKeyboardSrcTarget(): OutputTarget<any> {
     let target = this.currentTarget || this.mostRecentTarget;
-    let attachmentInfo = target?.getElement()._kmwAttachment;
 
-    if(attachmentInfo?.keyboard || attachmentInfo?.keyboard === '') {
+    if(this.isTargetKeyboardIndependent(target)) {
       return target;
     } else {
       return null;
     }
+  }
+
+  private isTargetKeyboardIndependent(target: OutputTarget<any>): boolean {
+    let attachmentInfo = target?.getElement()._kmwAttachment;
+
+    // If null or undefined, we're in 'global' mode.
+    return !!(attachmentInfo?.keyboard || attachmentInfo?.keyboard === '');
   }
 
   // Note:  is part of the keyboard activation process.  Not to be called directly by published API.
@@ -358,17 +408,34 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
   }
 
+  public getKeyboardStubForTarget(target: OutputTarget<any>) {
+    if(!this.isTargetKeyboardIndependent(target)) {
+      return this.globalKeyboard.metadata;
+    } else {
+      const attachment = target.getElement()._kmwAttachment;
+      return this.keyboardCache.getStub(attachment.keyboard, attachment.languageCode);
+    }
+  }
+
   protected getFallbackStubKey() {
+    const emptyCodes = {
+      id: '',
+      langId: ''
+    };
+
     if(this.engineConfig.hostDevice.touchable) {
-      // Fallback behavior - if on a touch device, we need to keep a keyboard visible.
-      return this.keyboardCache.defaultStub;
+      /* Fallback behavior - if on a touch device, we need to keep a keyboard visible
+       * if one is available.
+       *
+       * When literally none are available, setting `emptyCodes` will ensure that `globalKeyboard`
+       * is unset properly and that relevant keyboard events are still generated.  (engine/main
+       * delegates 'fallback behavior' to its derived classes, so the parent class won't undo it.)
+       */
+      return this.keyboardCache.defaultStub || emptyCodes;
     } else {
       // Fallback behavior - if on a desktop device, the user still has a physical keyboard.
       // Just clear out the active keyboard & OSK.
-      return {
-        id: '',
-        langId: ''
-      };
+      return emptyCodes;
     }
   }
 
@@ -496,29 +563,16 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   _CommonFocusHelper(outputTarget: OutputTarget<any>): boolean {
     const focusAssistant = this.focusAssistant;
 
-    // if(target.ownerDocument && target instanceof target.ownerDocument.defaultView.HTMLIFrameElement) {
-    //   if(!this.keyman.domManager._IsEditableIframe(target, 1)) {
-    //     DOMEventHandlers.states._DisableInput = true;
-    //     return true;
-    //   }
-    // }
-    // DOMEventHandlers.states._DisableInput = false;
-
-    // const outputTarget = dom.Utils.getOutputTarget(target);
-
     let activeKeyboard = this.activeKeyboard?.keyboard;
     if(!focusAssistant.restoringFocus) {
       outputTarget?.deadkeys().clear();
       activeKeyboard?.notify(0, outputTarget, 1);  // I2187
     }
 
-    //if(!focusAssistant.restoringFocus && DOMEventHandlers.states._SelectionControl != target) {
     if(!focusAssistant.restoringFocus && this.mostRecentTarget != outputTarget) {
       focusAssistant.maintainingFocus = false;
     }
     focusAssistant.restoringFocus = false;
-
-    //DOMEventHandlers.states._SelectionControl = target; // effectively was .mostRecentTarget, as best as I can tell.
 
     // Now that we've fully entered the new context, invalidate the context so we can generate initial predictions from it.
     // (Note that the active keyboard will have been updated by a method called before this one; the newly-focused
@@ -549,19 +603,8 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     //   Ltarg=Ltarg.contentWindow.document.body; // And we only care about Ltarg b/c of finding the OutputTarget.
     // }
 
-    // Save it for the event in step 3... but now, before we mutate the field's value!
-    const previousTarget = this.lastActiveTarget;
-
     // Step 2:  Make the newly-focused control the active control, and thus the active context.
-    this.setActiveTarget(target);
-
-    // Step 3:  related events
-
-    // //Execute external (UI) code needed on focus if required
-    this.apiEvents.callEvent('controlfocused', {
-      target: target.getElement(),
-      activeControl: previousTarget?.getElement()
-    });
+    this.setActiveTarget(target, true);
 
     return true;
   }
@@ -581,7 +624,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       return true;
     }
 
-    if(this.focusAssistant._IgnoreBlurFocus) {
+    if(this.focusAssistant.isTargetForcingScroll()) {
       // Prevent triggering other blur-handling events (as possible)
       e.cancelBubble = true;
       e.stopPropagation();
@@ -654,6 +697,84 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     this.resetContext();
     return true;
   };
+
+  /**
+   * Gets the 'saved keyboard' cookie value for the last keyboard used in the
+   * iser's previous session.
+   **/
+  getSavedKeyboardRaw(): string {
+    const cookie = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
+    var v = cookie.load(decodeURIComponent);
+
+    if(typeof(v.current) != 'string') {
+      return 'Keyboard_us:en';
+    } else if(v.current == 'Keyboard_us:eng') {
+      // 16.0 used the :eng variant!
+      return 'Keyboard_us:en';
+    } else {
+      return v.current;
+    }
+  }
+
+  /**
+   * Gets the cookie for the name and language code of the most recently active keyboard
+   *
+   *  Defaults to US English, but this needs to be user-set in later revision (TODO)
+   *
+   * @return      {string}          InternalName:LanguageCode
+   **/
+  getSavedKeyboard(): string {
+    let cookieValue = this.getSavedKeyboardRaw();
+
+    // Check that the requested keyboard is included in the available keyboard stubs
+    const stubs = this.keyboardCache.getStubList()
+    let kd: string;
+
+    for(let n=0; n<stubs.length; n++) {
+      kd=stubs[n]['KI']+':'+stubs[n]['KLC'];
+      if(kd == cookieValue) {
+        return kd;
+      }
+    }
+
+    // Default to US English if available (but don't assume it is first)
+    for(let n=0; n<stubs.length; n++) {
+      kd=stubs[n]['KI']+':'+stubs[n]['KLC'];
+      if(kd == 'Keyboard_us:en') {
+        return kd;
+      }
+    }
+
+    // Otherwise use the first keyboard stub
+    if(stubs.length > 0) {
+      return stubs[0]['KI']+':'+stubs[0]['KLC'];
+    }
+
+    // Or US English if no stubs loaded (should never happen)
+    return 'Keyboard_us:en';
+  }
+
+  /**
+   * Restore the most recently used keyboard, if still available
+   */
+  restoreSavedKeyboard(kbd) {
+    // If no saved keyboard, defaults to US English
+    const d=kbd;
+
+    // Identify the stub with the saved keyboard
+    let t=d.split(':');
+    if(t.length < 2) {
+      t[1]='';
+    }
+
+    // Find the matching stub; if it doesn't exist, default to the first available stub.
+    let stub = this.keyboardCache.getStub(t[0], t[1]) || this.keyboardCache.defaultStub;
+
+    // Sets the default stub (as specified with the `getSavedKeyboard` call) as active.
+    if(stub) {
+      this.activateKeyboard(t[0], t[1]);
+    }
+  }
 
   /**
    * Function     nonKMWTouchHandler
