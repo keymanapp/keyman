@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { TranCompiler } from '../src/compiler/tran.js';
+import { TranCompiler, BkspCompiler } from '../src/compiler/tran.js';
 import { VarsCompiler } from '../src/compiler/vars.js';
 import { BASIC_DEPENDENCIES } from '../src/compiler/empty-compiler.js';
 import { CompilerMessages } from '../src/compiler/messages.js';
@@ -8,8 +8,10 @@ import { compilerTestCallbacks, testCompilationCases } from './helpers/index.js'
 import { KMXPlus } from '@keymanapp/common-types';
 
 import Tran = KMXPlus.Tran;// for tests…
+import Bksp = KMXPlus.Bksp;// for tests…
+import { constants } from '@keymanapp/ldml-keyboard-constants';
 const tranDependencies = [ ...BASIC_DEPENDENCIES, VarsCompiler ];
-// import TranItemFlags = KMXPlus.TranItemFlags;
+const bkspDependencies = tranDependencies;
 
 describe('tran', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
@@ -92,6 +94,66 @@ describe('tran', function () {
         CompilerMessages.Error_EmptyTransformGroup(),
       ],
     },
+    // reorder test
+    {
+      subpath: 'sections/ordr/minimal.xml',
+      callback(sect) {
+        const tran = <Tran> sect;
+        assert.equal(tran.groups?.length, 1);
+        assert.equal(tran.groups[0].type, constants.tran_group_type_reorder);
+        const { reorders } = tran.groups[0];
+        assert.lengthOf(reorders, 1);
+        assert.lengthOf(reorders[0].elements, 4);
+        assert.strictEqual(reorders[0].elements[0].value.value, "ខ");
+        assert.strictEqual(reorders[0].elements[1].value.value, "ែ");
+        assert.strictEqual(reorders[0].elements[2].value.value, "្");
+        assert.strictEqual(reorders[0].elements[3].value.value, "ម");
+        assert.strictEqual(reorders[0].elements[0].order, 1);
+        assert.strictEqual(reorders[0].elements[1].order, 3);
+        assert.strictEqual(reorders[0].elements[2].order, 4);
+        assert.strictEqual(reorders[0].elements[3].order, 2);
+        assert.isEmpty(reorders[0].before);
+      }
+    },
+    // bksp non-test
+    {
+      subpath: 'sections/bksp/minimal.xml',
+      callback(sect) {
+        const bksp = <Bksp>sect;
+        assert.equal(bksp.groups?.length, 0);
+      }
+    },
+    // finl
+    {
+      subpath: 'sections/finl/minimal.xml',
+      callback(sect) {
+        const tran = <Tran>sect;
+        assert.equal(tran.groups?.length, 1);
+        assert.equal(tran.groups[0].type, constants.tran_group_type_transform);
+        const { transforms } = tran.groups[0];
+        assert.lengthOf(transforms, 1);
+        assert.strictEqual(transforms[0].from.value, "xx");
+        assert.strictEqual(transforms[0].to.value, "x");
+      }
+    },
   ], tranDependencies);
+});
+
+describe('bksp', function () {
+  this.slow(500);
+  testCompilationCases(BkspCompiler, [
+    {
+      subpath: 'sections/bksp/minimal.xml',
+      callback(sect) {
+        const bksp = <Bksp>sect;
+        assert.equal(bksp.groups?.length, 1);
+        assert.equal(bksp.groups[0].type, constants.tran_group_type_transform);
+        const { transforms } = bksp.groups[0];
+        assert.lengthOf(transforms, 1);
+        assert.strictEqual(transforms[0].from.value, "្ម");
+        assert.strictEqual(transforms[0].to.value, "");
+      }
+    },
+  ], bkspDependencies);
 });
 

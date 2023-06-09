@@ -15,13 +15,18 @@ function matchArray(str: string, match: RegExp) : string[] {
 }
 
 /**
+ * Common regex for an ID
+ */
+const COMMON_ID = /^[0-9A-Za-z_]{1,32}$/;
+
+/**
  * Class for helping with markers
  */
 export class MarkerParser {
   /**
    * A marker id has the same constraint as a key id. TODO-LDML: Needs to be reflected in the spec
    */
-  public static readonly ID = /^[0-9A-Za-z_]{1,32}$/;
+  public static readonly ID = COMMON_ID;
 
   /**
    * Special marker reference referring to any marker
@@ -55,7 +60,7 @@ export class VariableParser {
   /**
    * A marker id has the same constraint as a key id. TODO-LDML: Needs to be reflected in the spec
    */
-  public static readonly ID = /^[0-9A-Za-z_]{1,32}$/;
+  public static readonly ID = COMMON_ID;
 
   /**
    * Pattern for matching a string reference `$(str)`
