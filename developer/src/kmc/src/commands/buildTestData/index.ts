@@ -1,13 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as kmcLdml from '@keymanapp/kmc-ldml';
-import { CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboardXMLSourceFileReader } from '@keymanapp/common-types';
+import { CompilerBaseOptions, CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboardXMLSourceFileReader } from '@keymanapp/common-types';
 import { NodeCompilerCallbacks } from '../../messages/NodeCompilerCallbacks.js';
 import { fileURLToPath } from 'url';
 
-// TODO: consolidate with CompilerOptions everywhere
-export interface BuildTestDataOptions {
-  outFile?: string;
+export interface BuildTestDataOptions extends CompilerBaseOptions {
 };
 
 export function buildTestData(infile: string, options: BuildTestDataOptions) {

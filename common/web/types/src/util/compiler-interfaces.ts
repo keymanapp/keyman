@@ -151,7 +151,13 @@ export interface CompilerCallbacks {
 /**
  * Abstract interface for compiler options
  */
-export interface CompilerOptions {
+
+export interface CompilerBaseOptions {
+  logLevel?: CompilerLogLevel;
+  outFile?: string;
+}
+
+export interface CompilerOptions extends CompilerBaseOptions {
   shouldAddCompilerVersion?: boolean;
   saveDebug?: boolean;
   compilerWarningsAsErrors?: boolean;

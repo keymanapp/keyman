@@ -91,6 +91,7 @@ export class KmnCompiler {
     return true;
   }
 
+  // TODO: use outFile from options
   public run(infile: string, outfile: string, options?: KmnCompilerOptions): boolean {
     let result = this.runCompiler(infile, outfile, options);
     if(result) {
@@ -169,7 +170,7 @@ export class KmnCompiler {
       wasm_options.compilerWarningsAsErrors = options.compilerWarningsAsErrors;
       wasm_options.warnDeprecatedCode = options.warnDeprecatedCode;
       wasm_options.shouldAddCompilerVersion = options.shouldAddCompilerVersion;
-      wasm_options.target = 0; //CKF_KEYMAN; TODO, support KMW
+      wasm_options.target = options.target == 'js' ? 1 : 0; // TODO CKF_KEYMANWEB : CKF_KEYMAN;
       wasm_interface.callbacksKey = this.callbackID; // key of object on globalThis
       wasm_result = this.Module.kmcmp_compile(infile, wasm_options, wasm_interface);
       if(!wasm_result.result) {
