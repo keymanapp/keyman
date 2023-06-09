@@ -21,8 +21,8 @@ describe('layr', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
   // reuse the keys minimal file
-  it('should compile minimal keys data', function () {
-    let layr = loadSectionFixture(LayrCompiler, 'sections/keys/minimal.xml', compilerTestCallbacks) as Layr;
+  it('should compile minimal keys data', async function () {
+    let layr = await loadSectionFixture(LayrCompiler, 'sections/keys/minimal.xml', compilerTestCallbacks) as Layr;
     assert.ok(layr);
     assert.equal(compilerTestCallbacks.messages.length, 0);
 
