@@ -6,8 +6,8 @@
  */
 
 import esbuild from 'esbuild';
-import { spawn } from 'child_process';
 import fs from 'fs';
+import { determineNeededDowncompileHelpers, buildTslibTreeshaker } from '@keymanapp/tslib/esbuild-tools';
 
 /*
  * Refer to https://github.com/microsoft/TypeScript/issues/13721#issuecomment-307259227 -
@@ -92,7 +92,12 @@ await esbuild.build({
   target: "es5"
 });
 
+// The one that's actually a component of our releases.
+
 const embeddedWorkerBuildOptions = {
+  alias: {
+    'tslib': '@keymanapp/tslib'
+  },
   bundle: true,
   sourcemap: true,
   format: "iife",
@@ -105,6 +110,10 @@ const embeddedWorkerBuildOptions = {
   tsconfig: 'tsconfig.json',
   target: "es5"
 }
+
+// Prepare the needed setup for `tslib` treeshaking.
+const unusedHelpers = await determineNeededDowncompileHelpers(embeddedWorkerBuildOptions);
+embeddedWorkerBuildOptions.plugins = [buildTslibTreeshaker(unusedHelpers), ...embeddedWorkerBuildOptions.plugins];
 
 // Direct-use version
 await esbuild.build(embeddedWorkerBuildOptions);

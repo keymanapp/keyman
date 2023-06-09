@@ -6,8 +6,8 @@
  */
 
 import esbuild from 'esbuild';
-import { spawn } from 'child_process';
 import fs from 'fs';
+import { determineNeededDowncompileHelpers, buildTslibTreeshaker } from '@keymanapp/tslib/esbuild-tools';
 
 let EMIT_FILESIZE_PROFILE = false;
 
@@ -68,6 +68,11 @@ const commonConfig = {
   tsconfig: './tsconfig.json'
 };
 
+// Prepare the needed setup for `tslib` treeshaking.
+const unusedHelpers = await determineNeededDowncompileHelpers(commonConfig, /worker-main\.wrapped(?:\.min)?\.js/);
+commonConfig.plugins = [buildTslibTreeshaker(unusedHelpers), ...commonConfig.plugins];
+
+// And now... do the actual builds.
 await esbuild.build(commonConfig);
 
 let result = await esbuild.build({
