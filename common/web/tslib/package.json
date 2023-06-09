@@ -1,0 +1,18 @@
+{
+  "name": "@keymanapp/tslib",
+  "description": "An ES5 + esbuild-compatible wrapper for the 'tslib' library",
+  "main": "./build/index.js",
+  "scripts": {
+    "build": "gosh ./build.sh build",
+    "clean": "gosh ./build.sh clean"
+  },
+  "dependencies": {
+    "tslib": "^2.5.2",
+    "typescript": "^4.9.5"
+  },
+  "devDependencies": {
+    "@keymanapp/resources-gosh": "*",
+    "esbuild": "^0.15.16"
+  },
+  "type": "module"
+}

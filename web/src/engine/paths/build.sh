@@ -16,6 +16,7 @@ cd "$THIS_SCRIPT_PATH"
 # ################################ Main script ################################
 
 builder_describe "Builds configuration subclasses used by the Keyman Engine for Web (KMW)." \
+  "@/common/web/tslib" \
   "@/web/src/engine/osk build" \
   "clean" \
   "configure" \

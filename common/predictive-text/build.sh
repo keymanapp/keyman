@@ -26,6 +26,7 @@ cd "$(dirname "$THIS_SCRIPT")"
 
 builder_describe "Builds the lm-layer module" \
   "@/common/web/keyman-version" \
+  "@/common/web/tslib" \
   "@/common/web/lm-worker" \
   "clean" \
   "configure" \

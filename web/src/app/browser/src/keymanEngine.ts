@@ -295,9 +295,9 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
       } else {
         let x: (string|KeyboardStub)[] = [];
         if (Array.isArray(args[0])) {
-          x.push(...args[0]);
+          x = x.concat(args[0]);
         } else if (Array.isArray(args)) {
-          x.push(...args);
+          x = x.concat(args);
         }
         return this.keyboardRequisitioner.addKeyboardArray(x);
       }

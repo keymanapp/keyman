@@ -31,6 +31,9 @@ let es5ClassAnnotationAsPurePlugin = {
 }
 
 await esbuild.build({
+  alias: {
+    'tslib': '@keymanapp/tslib'
+  },
   bundle: true,
   sourcemap: true,
   format: "iife",
@@ -46,6 +49,9 @@ await esbuild.build({
 });
 
 await esbuild.build({
+  alias: {
+    'tslib': '@keymanapp/tslib'
+  },
   bundle: true,
   sourcemap: true,
   minifyWhitespace: true,
