@@ -1,7 +1,7 @@
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { assert } from 'chai';
 import 'mocha';
-import { BuildProject } from '../src/commands/build/BuildProject.js';
+import { BuildProject } from '../src/commands/buildClasses/BuildProject.js';
 import { makePathToFixture } from './helpers/index.js';
 
 const callbacks = new TestCompilerCallbacks();

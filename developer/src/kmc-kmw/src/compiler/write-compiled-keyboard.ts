@@ -1,9 +1,6 @@
-import { VisualKeyboard } from "@keymanapp/common-types";
-import { KMX, CompilerCallbacks, KvkFileReader, KvksFileReader } from "@keymanapp/common-types";
+import { KMX, CompilerOptions, CompilerCallbacks, KvkFileReader, KvksFileReader, VisualKeyboard } from "@keymanapp/common-types";
 import { ExpandSentinel, incxstr, xstrlen } from "../util/util.js";
-// import { KEY, KEYBOARD, KMX.KMXFile, STORE } from "../../../../../common/web/types/src/kmx/kmx.js";
 import { options, nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater } from "./compiler-globals.js";
-import CompilerOptions from "./compiler-options.js";
 import { JavaScript_ContextMatch, JavaScript_KeyAsString, JavaScript_Name, JavaScript_OutputString, JavaScript_Rules, JavaScript_Shift, JavaScript_ShiftAsString, JavaScript_Store, zeroPadHex } from './javascript-strings.js';
 import { CERR_InvalidBegin, CWARN_DontMixChiralAndNonChiralModifiers, ReportError } from "./messages.js";
 import { ValidateLayoutFile } from "./validate-layout-file.js";
@@ -40,8 +37,8 @@ export function RequotedString(s: string, RequoteSingleQuotes: boolean = false):
 
 export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: string, kmxfile: string, name: string, keyboard: KMX.KEYBOARD, FDebug: boolean = false): string {
   let opts: CompilerOptions = {
-    addCompilerVersion: false,
-    debug: FDebug
+    shouldAddCompilerVersion: false,
+    saveDebug: FDebug
   };
   setupGlobals(callbacks, opts, FDebug?'  ':'', FDebug?'\r\n':'', keyboard);
 
@@ -177,7 +174,7 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
   if (sLayoutFile != '') {  // I3483
     let path = callbacks.resolveFilename(kmnfile, sLayoutFile);
 
-    let result = ValidateLayoutFile(keyboard, options.debug, path, sVKDictionary);
+    let result = ValidateLayoutFile(keyboard, options.saveDebug, path, sVKDictionary);
     if(!result.result) {
       sLayoutFile = '';
       // TODO: error
@@ -213,7 +210,7 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
       kvk = reader.read(callbacks.loadFile(path));
     }
 
-    let result = VisualKeyboardFromFile(kvk, options.debug);
+    let result = VisualKeyboardFromFile(kvk, options.saveDebug);
     if(!result.result) {
       // TODO: error
       sVisualKeyboard = 'null';
@@ -478,7 +475,7 @@ function GetKeyboardModifierBitmask(keyboard: KMX.KEYBOARD, fMnemonic: boolean):
     ReportError(0, CWARN_DontMixChiralAndNonChiralModifiers, 'This keyboard contains Ctrl,Alt and LCtrl,LAlt,RCtrl,RAlt sets of modifiers. Use only one or the other set for web target.');
   }
 
-  if(options.debug) {
+  if(options.saveDebug) {
     return FormatModifierAsBitflags(bitMask & KMX.KMXFile.MASK_KEYS); // Exclude KMX_ISVIRTUALKEY, KMX_VIRTUALCHARKEY
   }
 
@@ -494,7 +491,7 @@ function GetKeyboardModifierBitmask(keyboard: KMX.KEYBOARD, fMnemonic: boolean):
 ///
 function JavaScript_SetupDebug() {
   if(IsKeyboardVersion10OrLater()) {
-    if(options.debug) {
+    if(options.saveDebug) {
       return 'var modCodes = keyman.osk.modifierCodes;'+nl+
              FTabStop+'var keyCodes = keyman.osk.keyCodes;'+nl;
     }

@@ -1,4 +1,4 @@
-import { KmpJsonFile, CompilerCallbacks, KpsFile, KmxFileReader, KMX } from '@keymanapp/common-types';
+import { KmpJsonFile, CompilerCallbacks, KpsFile, KmxFileReader, KmxFileReaderError, KMX } from '@keymanapp/common-types';
 import { KeymanTarget, TouchKeymanTargets } from './keyman-targets.js';
 import { CompilerMessages } from './messages.js';
 
@@ -132,11 +132,18 @@ export class PackageVersionValidation {
       return null;
     }
     const kmxReader: KmxFileReader = new KmxFileReader();
-    const kmx: KMX.KEYBOARD = kmxReader.read(kmxFileData);
-    if(!kmx) {
-      // The file couldn't be read, it might not be a .kmx file
-      this.callbacks.reportMessage(CompilerMessages.Error_KeyboardFileNotValid({filename}));
-      return null;
+    let kmx: KMX.KEYBOARD;
+    try {
+      kmx = kmxReader.read(kmxFileData);
+    } catch(e) {
+      if(e instanceof KmxFileReaderError) {
+        // The file couldn't be read, it might not be a .kmx file
+        this.callbacks.reportMessage(CompilerMessages.Error_KeyboardFileNotValid({filename, e}));
+        return null;
+      } else {
+        // Unknown error, bubble it up
+        throw e;
+      }
     }
 
     return kmx;

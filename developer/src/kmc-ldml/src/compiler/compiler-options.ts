@@ -1,5 +1,6 @@
 import { LDMLKeyboardXMLSourceFileReaderOptions } from "@keymanapp/common-types";
 
+// TODO: inherit from common-types CompilerOptions, noting alternate names for debug and addCompilerVersion!
 export interface CompilerOptions {
   /**
    * Add debug information to the .kmx file when compiling

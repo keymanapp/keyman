@@ -1,5 +1,10 @@
 import { KMXFile, BUILDER_COMP_KEYBOARD, KEYBOARD, STORE, GROUP, KEY } from "./kmx.js";
 import * as r from 'restructure';
+import { KeymanTypesError } from "../util/errors.js";
+
+export class KmxFileReaderError extends KeymanTypesError {
+
+}
 
 export class KmxFileReader {
   private readonly rString = new r.String(null, 'utf16le');
@@ -13,7 +18,17 @@ export class KmxFileReader {
     return this.rString.fromBuffer(source.slice(offset));
   }
 
-  private processSystemStore(store: STORE, result: KEYBOARD) {
+  private isValidCodeUse(s: string, keyboard: KEYBOARD): boolean {
+    return (
+      s.length == 3 &&
+      s.charCodeAt(0) == KMXFile.UC_SENTINEL &&
+      s.charCodeAt(1) == KMXFile.CODE_USE &&
+      s.charCodeAt(2) > 0 &&
+      s.charCodeAt(2) <= keyboard.groups.length
+    );
+  }
+
+  private processSystemStore(store: STORE, result: KEYBOARD): void {
     switch(store.dwSystemID) {
       case KMXFile.TSS_MNEMONIC:
         result.isMnemonic = store.dpString == '1';
@@ -22,25 +37,18 @@ export class KmxFileReader {
         result.keyboardVersion = store.dpString;
         break;
       case KMXFile.TSS_BEGIN_NEWCONTEXT:
-        if(store.dpString.length == 3 && store.dpString.charCodeAt(0) == 0xFFFF && store.dpString.charCodeAt(1) == KMXFile.CODE_USE) {
-          result.startGroup.newContext = store.dpString.charCodeAt(2) - 1;
+        if(!this.isValidCodeUse(store.dpString, result)) {
+          throw new KmxFileReaderError(`Invalid TSS_BEGIN_NEWCONTEXT system store`);
         }
-        else {
-          // TODO: error
-          return false;
-        }
+        result.startGroup.newContext = store.dpString.charCodeAt(2) - 1;
         break;
       case KMXFile.TSS_BEGIN_POSTKEYSTROKE:
-        if(store.dpString.length == 3 && store.dpString.charCodeAt(0) == 0xFFFF && store.dpString.charCodeAt(1) == KMXFile.CODE_USE) {
-          result.startGroup.postKeystroke = store.dpString.charCodeAt(2) - 1;
+        if(!this.isValidCodeUse(store.dpString, result)) {
+          throw new KmxFileReaderError(`Invalid TSS_BEGIN_POSTKEYSTROKE system store`);
         }
-        else {
-          // TODO: error
-          return false;
-        }
+        result.startGroup.postKeystroke = store.dpString.charCodeAt(2) - 1;
         break;
     }
-    return true;
   }
 
   public read(source: Uint8Array): KEYBOARD {
@@ -48,8 +56,7 @@ export class KmxFileReader {
     let kmx = new KMXFile();
     binaryKeyboard = kmx.COMP_KEYBOARD.fromBuffer(source);
     if(binaryKeyboard.dwIdentifier != KMXFile.FILEID_COMPILED) {
-      // TODO: error
-      return null;
+      throw new KmxFileReaderError(`Not a .kmx file: header does not contain FILEID_COMPILED`);
     }
 
     let result = new KEYBOARD();
@@ -59,32 +66,39 @@ export class KmxFileReader {
     result.startGroup = {
       ansi: binaryKeyboard.StartGroup_ANSI == 0xFFFFFFFF ? -1 : binaryKeyboard.StartGroup_ANSI,
       unicode: binaryKeyboard.StartGroup_Unicode == 0xFFFFFFFF ? -1 : binaryKeyboard.StartGroup_Unicode,
-      newContext: -1, //TODO
-      postKeystroke: -1 // TODO
+      newContext: -1,
+      postKeystroke: -1
     }
 
     // Informative data
+
     result.keyboardVersion = '';
     result.isMnemonic = false;
 
-    let offset = binaryKeyboard.dpStoreArray;
-    for(let i = 0; i < binaryKeyboard.cxStoreArray; i++) {
-      let binaryStore = kmx.COMP_STORE.fromBuffer(source.slice(offset));
-      let store = new STORE();
-      store.dwSystemID = binaryStore.dwSystemID;
-      store.dpName = this.readString(source, binaryStore.dpName);
-      store.dpString = this.readString(source, binaryStore.dpString);
-      result.stores.push(store);
+    this.readStores(binaryKeyboard, kmx, source, result);
+    this.readGroupsAndRules(binaryKeyboard, kmx, source, result);
 
-      if(!this.processSystemStore(store, result)) {
-        return null;
-      }
-
-      offset += KMXFile.COMP_STORE_SIZE;
+    // Process system stores once we have all stores and groups loaded
+    for(let store of result.stores) {
+      this.processSystemStore(store, result);
     }
 
-    offset = binaryKeyboard.dpGroupArray;
-    for(let i = 0; i < binaryKeyboard.cxGroupArray; i++) {
+    // TODO: KMXPlusFile
+
+    // Validate startGroup offsets
+    let gp: keyof KEYBOARD['startGroup'];
+    for(gp in result.startGroup) {
+      if(result.startGroup[gp] < -1 || result.startGroup[gp] >= result.groups.length) {
+        throw new KmxFileReaderError(`Invalid begin group reference`);
+      }
+    }
+
+    return result;
+  }
+
+  private readGroupsAndRules(binaryKeyboard: BUILDER_COMP_KEYBOARD, kmx: KMXFile, source: Uint8Array, result: KEYBOARD) {
+    let offset = binaryKeyboard.dpGroupArray;
+    for (let i = 0; i < binaryKeyboard.cxGroupArray; i++) {
       let binaryGroup = kmx.COMP_GROUP.fromBuffer(source.slice(offset));
       let group = new GROUP();
       group.dpMatch = this.readString(source, binaryGroup.dpMatch);
@@ -94,7 +108,7 @@ export class KmxFileReader {
       group.keys = [];
 
       let keyOffset = binaryGroup.dpKeyArray;
-      for(let j = 0; j < binaryGroup.cxKeyArray; j++) {
+      for (let j = 0; j < binaryGroup.cxKeyArray; j++) {
         let binaryKey = kmx.COMP_KEY.fromBuffer(source.slice(keyOffset));
         let key = new KEY();
         key.Key = binaryKey.Key;
@@ -109,18 +123,18 @@ export class KmxFileReader {
       result.groups.push(group);
       offset += KMXFile.COMP_GROUP_SIZE;
     }
+  }
 
-    // TODO: KMXPlusFile
-
-    // Validate startGroup offsets
-    let gp: keyof KEYBOARD['startGroup'];
-    for(gp in result.startGroup) {
-      if(result.startGroup[gp] < -1 || result.startGroup[gp] >= result.groups.length) {
-        // TODO: error
-        return null;
-      }
+  private readStores(binaryKeyboard: BUILDER_COMP_KEYBOARD, kmx: KMXFile, source: Uint8Array, result: KEYBOARD): void {
+    let offset = binaryKeyboard.dpStoreArray;
+    for (let i = 0; i < binaryKeyboard.cxStoreArray; i++) {
+      let binaryStore = kmx.COMP_STORE.fromBuffer(source.slice(offset));
+      let store = new STORE();
+      store.dwSystemID = binaryStore.dwSystemID;
+      store.dpName = this.readString(source, binaryStore.dpName);
+      store.dpString = this.readString(source, binaryStore.dpString);
+      result.stores.push(store);
+      offset += KMXFile.COMP_STORE_SIZE;
     }
-
-    return result;
   }
 };
