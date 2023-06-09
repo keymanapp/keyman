@@ -22,7 +22,7 @@ export { CompilerCallbacks, CompilerSchema, CompilerEvent, CompilerErrorNamespac
          CompilerErrorSeverity, CompilerPathCallbacks, CompilerFileSystemCallbacks,
          CompilerMessageSpec, compilerErrorSeverity, compilerErrorSeverityName,
          compilerExceptionToString, compilerErrorFormatCode,
-         compilerLogLevelToSeverity, CompilerLogLevel } from './util/compiler-interfaces.js';
+         compilerLogLevelToSeverity, CompilerLogLevel, ALL_COMPILER_LOG_LEVELS } from './util/compiler-interfaces.js';
 export { CommonTypesMessages } from './util/common-events.js';
 
 export * as TouchLayout from './keyman-touch-layout/keyman-touch-layout-file.js';

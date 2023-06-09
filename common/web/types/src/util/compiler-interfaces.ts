@@ -166,6 +166,7 @@ export function compilerExceptionToString(e?: any) : string {
 /**
  * Compiler logging level and correspondence to severity
  */
+/*
 export type CompilerLogLevel =
   'silent' |    /// Nothing is emitted to stdout, not even errors (fatal exceptions may still emit to stdout)
   'error'  |    /// Only errors emitted
@@ -173,6 +174,11 @@ export type CompilerLogLevel =
   'hint'   |    /// Errors + warnings + hints
   'info'   |    /// All messages: errors + warnings + hints + info
   'debug';      /// All messages: errors + warnings + hints + info, plus debug logs
+*/
+
+export const ALL_COMPILER_LOG_LEVELS = ['silent', 'error', 'warn', 'hint', 'info', 'debug'] as const;
+type CompilerLogLevelTuple = typeof ALL_COMPILER_LOG_LEVELS;
+export type CompilerLogLevel = CompilerLogLevelTuple[number];
 
 export const compilerLogLevelToSeverity: {[index in CompilerLogLevel]: number} = {
   'silent': CompilerErrorSeverity.Severity_Mask,  // effectively excludes all reporting
@@ -181,4 +187,4 @@ export const compilerLogLevelToSeverity: {[index in CompilerLogLevel]: number} =
   'hint': CompilerErrorSeverity.Hint,
   'info': CompilerErrorSeverity.Info,
   'debug': CompilerErrorSeverity.Info
-}
+};
