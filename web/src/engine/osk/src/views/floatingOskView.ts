@@ -52,11 +52,9 @@ export default class FloatingOSKView extends OSKView {
     // Add header element to OSK only for desktop browsers
     this.titleBar = new TitleBar(this.titleDragHandler);
     this.titleBar.on('help', () => {
-      this.emit('showHelp');
       this.legacyEvents.callEvent('helpclick', {});
     });
     this.titleBar.on('config', () => {
-      this.emit('showConfig');
       this.legacyEvents.callEvent('configclick', {});
     });
     this.titleBar.on('close', () => this.startHide(true));
@@ -74,12 +72,10 @@ export default class FloatingOSKView extends OSKView {
       if(titleBar && titleBar instanceof TitleBar) {
         switch(eventName) {
           case 'configclick':
-          case 'showConfig':
-            titleBar.configEnabled = this.listenerCount('showConfig') + this.legacyEvents.listenerCount('configclick') > 0;
+            titleBar.configEnabled = this.legacyEvents.listenerCount('configclick') > 0;
             break;
-          case 'showHelp':
           case 'helpclick':
-            titleBar.helpEnabled = this.listenerCount('showHelp') + this.legacyEvents.listenerCount('helpclick') > 0;
+            titleBar.helpEnabled = this.legacyEvents.listenerCount('helpclick') > 0;
             break;
           default:
             return;

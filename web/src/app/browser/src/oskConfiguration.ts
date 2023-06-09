@@ -27,9 +27,9 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
     }
   });
 
-  osk.on('onhide', (hiddenByUser) => {
+  osk.addEventListener('hide', (params) => {
     // If hidden by the UI, be sure to restore the focus
-    if(hiddenByUser) {
+    if(params?.HiddenByUser) {
       contextManager.activeTarget?.focus();
     }
   });
