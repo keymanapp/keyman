@@ -2,14 +2,15 @@ import * as fs from 'fs';
 import { Command, Option } from 'commander';
 import { NodeCompilerCallbacks } from '../messages/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/messages.js';
-import { CompilerCallbacks } from '@keymanapp/common-types';
+import { CompilerLogLevel, CompilerCallbacks } from '@keymanapp/common-types';
 import { AnalyzeOskCharacterUse } from '@keymanapp/kmc-analyze';
 
+// TODO: consolidate with CompilerOptions
 interface AnalysisActivityOptions {
   action: 'osk-char-use';
   outFile?: string;
   format: 'text' | 'markdown' | 'json';
-  quiet?: boolean;
+  logLevel: CompilerLogLevel;
 };
 
 export function declareAnalyze(program: Command) {
@@ -35,8 +36,8 @@ export function declareAnalyze(program: Command) {
 }
 
 async function analyze(filenames: string[], options: AnalysisActivityOptions): Promise<boolean> {
-  // TODO: refactor this silent vs quiet and object init for NodeCompilerCallbacks i.e. {silent:...}
-  let callbacks = new NodeCompilerCallbacks(options.quiet || options.outFile ? false : true);
+  // Note: we always use logLevel=silent if we write the output to console
+  let callbacks = new NodeCompilerCallbacks({logLevel: options.outFile ? options.logLevel : 'silent'});
 
   try {
     // callbacks.reportMessage(InfrastructureMessages.Info_AnalyzingFile({filename}));
@@ -45,7 +46,7 @@ async function analyze(filenames: string[], options: AnalysisActivityOptions): P
       case 'osk-char-use':
         return await analyzeOskCharUse(callbacks, filenames, options);
       default:
-        throw new Error('Invalid action'); // TODO: ReportMessage
+        throw new Error(`Internal error: Invalid analyze action '${options.action}'`);
     }
   } catch(e) {
     callbacks.reportMessage(InfrastructureMessages.Fatal_UnexpectedException({e}));
@@ -59,8 +60,7 @@ async function analyzeOskCharUse(callbacks: CompilerCallbacks, filenames: string
   for(let filename of filenames) {
     if(!fs.existsSync(filename)) {
       callbacks.reportMessage(InfrastructureMessages.Error_FileDoesNotExist({filename}));
-      // TODO: is this the best action here?
-      return false;
+      continue;
     }
 
     // If infile is a directory, then we treat that as a project and build it
@@ -76,9 +76,8 @@ async function analyzeOskCharUse(callbacks: CompilerCallbacks, filenames: string
   if(options.outFile) {
     fs.writeFileSync(options.outFile, output, 'utf8');
   } else {
-    // TODO: do we need an alternate way of emitting to console here?
     // TODO: when logging to console we need to be 'quiet' for everything else
-    console.log(output);
+    process.stdout.write(output + '\n');
   }
 
   return true;

@@ -4,7 +4,7 @@
  */
 
 
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { declareBuild } from './commands/build.js';
 import { declareBuildTestData } from './commands/buildTestData.js';
@@ -16,7 +16,7 @@ const program = new Command();
 program
   .description('Keyman Developer Command Line Interface')
   .version(KEYMAN_VERSION.VERSION_WITH_TAG)
-  .option('-q, --quiet', 'Suppress INFO, HINT and WARN messages');
+  .addOption(new Option('-l, --log-level <logLevel>', 'Log level').choices(['silent','error','warn','hint','info','debug']).default('info'));
 
 declareBuild(program);
 declareBuildTestData(program);

@@ -18,7 +18,11 @@ export { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions
 
 export * as Constants from './consts/virtual-key-constants.js';
 
-export { CompilerCallbacks, CompilerSchema, CompilerEvent, CompilerErrorNamespace, CompilerErrorSeverity, CompilerPathCallbacks, CompilerFileSystemCallbacks, CompilerMessageSpec, compilerErrorSeverityName, compilerExceptionToString, compilerErrorFormatCode } from './util/compiler-interfaces.js';
+export { CompilerCallbacks, CompilerSchema, CompilerEvent, CompilerErrorNamespace,
+         CompilerErrorSeverity, CompilerPathCallbacks, CompilerFileSystemCallbacks,
+         CompilerMessageSpec, compilerErrorSeverity, compilerErrorSeverityName,
+         compilerExceptionToString, compilerErrorFormatCode,
+         compilerLogLevelToSeverity, CompilerLogLevel } from './util/compiler-interfaces.js';
 export { CommonTypesMessages } from './util/common-events.js';
 
 export * as TouchLayout from './keyman-touch-layout/keyman-touch-layout-file.js';

@@ -158,3 +158,23 @@ export const CompilerMessageSpec = (code: number, message: string) : CompilerEve
 export function compilerExceptionToString(e?: any) : string {
   return `${(e ?? 'unknown error').toString()}\n\nCall stack:\n${(e instanceof Error ? e.stack : (new Error()).stack)}`;
 }
+
+/**
+ * Compiler logging level and correspondence to severity
+ */
+export type CompilerLogLevel =
+  'silent' |    /// Nothing is emitted to stdout, not even errors (fatal exceptions may still emit to stdout)
+  'error'  |    /// Only errors emitted
+  'warn'   |    /// Errors + warnings
+  'hint'   |    /// Errors + warnings + hints
+  'info'   |    /// All messages: errors + warnings + hints + info
+  'debug';      /// All messages: errors + warnings + hints + info, plus debug logs
+
+export const compilerLogLevelToSeverity: {[index in CompilerLogLevel]: number} = {
+  'silent': CompilerErrorSeverity.Severity_Mask,  // effectively excludes all reporting
+  'error': CompilerErrorSeverity.Error,
+  'warn': CompilerErrorSeverity.Warn,
+  'hint': CompilerErrorSeverity.Hint,
+  'info': CompilerErrorSeverity.Info,
+  'debug': CompilerErrorSeverity.Info
+}

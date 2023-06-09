@@ -15,6 +15,7 @@ describe('BuildProject', function () {
       compilerWarningsAsErrors: true,
       debug: false,
       warnDeprecatedCode: true,
+      logLevel: 'info'
     });
     // 4 messages == starting build x 2, build successful x 2
     // callbacks.printMessages();
