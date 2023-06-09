@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import { Command } from 'commander';
-import { BuildActivityOptions } from './build/BuildActivity.js';
-import { buildActivities } from './build/buildActivities.js';
-import { BuildProject, PROJECT_EXTENSION } from './build/BuildProject.js';
+import { BuildActivityOptions } from './buildClasses/BuildActivity.js';
+import { buildActivities } from './buildClasses/buildActivities.js';
+import { BuildProject, PROJECT_EXTENSION } from './buildClasses/BuildProject.js';
 import { NodeCompilerCallbacks } from '../messages/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/messages.js';
 
