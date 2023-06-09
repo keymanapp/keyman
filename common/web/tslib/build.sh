@@ -24,4 +24,4 @@ builder_parse "$@"
 
 builder_run_action configure verify_npm_setup
 builder_run_action clean rm -rf build/
-builder_run_action build tsc --build "$THIS_SCRIPT_PATH/tsconfig.json"
+builder_run_action build tsc --build
