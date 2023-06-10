@@ -5,6 +5,7 @@ import { BuildProject, PROJECT_EXTENSION } from './buildClasses/BuildProject.js'
 import { NodeCompilerCallbacks } from '../messages/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/messages.js';
 import { CompilerOptions } from '@keymanapp/common-types';
+import { addBaseOptions } from '../util/baseOptions.js';
 
 
 function commandOptionsToCompilerOptions(options: any): CompilerOptions {
@@ -24,9 +25,10 @@ function commandOptionsToCompilerOptions(options: any): CompilerOptions {
 }
 
 export function declareBuild(program: Command) {
-  program
+  addBaseOptions(program
     .command('build [infile...]')
     .description('Build a source file into a final file')
+  )
     .option('-d, --debug', 'Include debug information in output')
     .option('--no-compiler-version', 'Exclude compiler version metadata from output')
     .option('-w, --compiler-warnings-as-errors', 'Causes warnings to fail the build')

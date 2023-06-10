@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as kmcLdml from '@keymanapp/kmc-ldml';
-import { KvkFileWriter, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader, CompilerOptions } from '@keymanapp/common-types';
+import { KvkFileWriter, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader, CompilerOptions, defaultCompilerOptions } from '@keymanapp/common-types';
 import { BuildActivity } from './BuildActivity.js';
 import { fileURLToPath } from 'url';
 
@@ -44,15 +44,13 @@ export class BuildLdmlKeyboard extends BuildActivity {
 }
 
 function buildLdmlKeyboardToMemory(inputFilename: string, callbacks: CompilerCallbacks, options: CompilerOptions): [Uint8Array, Uint8Array, Uint8Array] {
-  let compilerOptions: kmcLdml.CompilerOptions = {
-    debug: options.saveDebug ?? false,
-    addCompilerVersion: options.shouldAddCompilerVersion ?? true,
+  let compilerOptions: kmcLdml.LdmlCompilerOptions = {
+    ...defaultCompilerOptions,
+    ...options,
     readerOptions: {
       importsPath: fileURLToPath(LDMLKeyboardXMLSourceFileReader.defaultImportsURL)
     }
-    // TODO: warnDeprecatedCode: options.warnDeprecatedCode,
-    // TODO: treatWarningsAsErrors: options.treatWarningsAsErrors,
-  }
+  };
 
   const k = new kmcLdml.LdmlKeyboardCompiler(callbacks, compilerOptions);
   let source = k.load(inputFilename);

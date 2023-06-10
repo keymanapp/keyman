@@ -153,16 +153,44 @@ export interface CompilerCallbacks {
  */
 
 export interface CompilerBaseOptions {
+  /**
+   * Reporting level to console, used by NodeCompilerCallbacks (not used in compiler modules;
+   * all messages are still reported to the internal log)
+   */
   logLevel?: CompilerLogLevel;
+  /**
+   * Optional output file for activities that generate output
+   */
   outFile?: string;
 }
 
 export interface CompilerOptions extends CompilerBaseOptions {
+  /**
+   * Add metadata about the compiler version to .kmx file when compiling
+   */
   shouldAddCompilerVersion?: boolean;
+  /**
+   * Add debug information to the .kmx file when compiling
+   */
   saveDebug?: boolean;
+  /**
+   * Upgrade any warnings produced in the compile to errors
+   */
   compilerWarningsAsErrors?: boolean;
+  /**
+   * Emit warnings if deprecated code is encountered
+   */
 	warnDeprecatedCode?: boolean;
 };
+
+export const defaultCompilerOptions: CompilerOptions = {
+  logLevel: 'info',
+  // outFile: (undefined)
+  saveDebug: false,
+  shouldAddCompilerVersion: true,
+  compilerWarningsAsErrors: false,
+  warnDeprecatedCode: true,
+}
 
 /**
  * Convenience function for constructing CompilerEvents

@@ -18,7 +18,7 @@ export { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions
 
 export * as Constants from './consts/virtual-key-constants.js';
 
-export { CompilerBaseOptions, CompilerCallbacks, CompilerOptions, CompilerSchema, CompilerEvent, CompilerErrorNamespace,
+export { defaultCompilerOptions, CompilerBaseOptions, CompilerCallbacks, CompilerOptions, CompilerSchema, CompilerEvent, CompilerErrorNamespace,
          CompilerErrorSeverity, CompilerPathCallbacks, CompilerFileSystemCallbacks,
          CompilerMessageSpec, compilerErrorSeverity, compilerErrorSeverityName,
          compilerExceptionToString, compilerErrorFormatCode,

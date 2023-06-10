@@ -4,6 +4,7 @@ import { NodeCompilerCallbacks } from '../messages/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/messages.js';
 import { CompilerBaseOptions, CompilerCallbacks } from '@keymanapp/common-types';
 import { AnalyzeOskCharacterUse } from '@keymanapp/kmc-analyze';
+import { addBaseOptions } from '../util/baseOptions.js';
 
 interface AnalysisActivityOptions extends CompilerBaseOptions {
   action: 'osk-char-use';
@@ -11,9 +12,10 @@ interface AnalysisActivityOptions extends CompilerBaseOptions {
 };
 
 export function declareAnalyze(program: Command) {
-  program
+  addBaseOptions(program
     .command('analyze [infile...]')
     .description('Analyze a source file or files')
+  )
     .addOption(new Option('-f, --format <filename>', 'Output file format').choices(['text','markdown','json']).default('text'))
     .addOption(new Option('-a, --action <action>', 'Specify the analysis to run').choices(['osk-char-use']).makeOptionMandatory())
     .action(async (filenames: string[], options: any) => {

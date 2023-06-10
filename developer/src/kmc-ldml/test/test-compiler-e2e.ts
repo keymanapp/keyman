@@ -17,7 +17,7 @@ describe('compiler-tests', function() {
     const binaryFilename = makePathToFixture('basic.txt');
 
     // Compile the keyboard
-    const kmx = compileKeyboard(inputFilename, {...compilerTestOptions, debug: true, addCompilerVersion: false});
+    const kmx = compileKeyboard(inputFilename, {...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false});
     assert.isNotNull(kmx);
 
     // Use the builder to generate the binary output file
