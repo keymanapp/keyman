@@ -18,8 +18,6 @@ export class AnalyzeOskCharacterUse {
 
   public async analyze(files: string[]) {
     for(let file of files) {
-      // TODO: refactor with helper function for file and folder types
-      // See kmc for another instance
       switch(KeymanFileTypes.sourceTypeFromFilename(file)) {
         case KeymanFileTypes.Source.VisualKeyboard:
           this.addStrings(this.scanVisualKeyboard(file));
