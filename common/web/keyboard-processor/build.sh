@@ -69,7 +69,7 @@ if builder_start_action test; then
     KARMA_CONFIG=CI.conf.cjs
   fi
 
-  mocha --recursive $MOCHA_FLAGS ./tests/node/
+  c8 mocha --recursive $MOCHA_FLAGS ./tests/node/
   karma start ./tests/dom/$KARMA_CONFIG
 
   builder_finish_action success test
