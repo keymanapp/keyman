@@ -1,8 +1,8 @@
 import { KMX, CompilerOptions, CompilerCallbacks, KvkFileReader, KvksFileReader, VisualKeyboard } from "@keymanapp/common-types";
 import { ExpandSentinel, incxstr, xstrlen } from "../util/util.js";
-import { options, nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater } from "./compiler-globals.js";
+import { options, nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater, callbacks } from "./compiler-globals.js";
 import { JavaScript_ContextMatch, JavaScript_KeyAsString, JavaScript_Name, JavaScript_OutputString, JavaScript_Rules, JavaScript_Shift, JavaScript_ShiftAsString, JavaScript_Store, zeroPadHex } from './javascript-strings.js';
-import { CERR_InvalidBegin, CWARN_DontMixChiralAndNonChiralModifiers, ReportError } from "./messages.js";
+import { KmwCompilerMessages } from "./messages.js";
 import { ValidateLayoutFile } from "./validate-layout-file.js";
 import { VisualKeyboardFromFile } from "./visual-keyboard-compiler.js";
 
@@ -40,7 +40,7 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
     shouldAddCompilerVersion: false,
     saveDebug: FDebug
   };
-  setupGlobals(callbacks, opts, FDebug?'  ':'', FDebug?'\r\n':'', keyboard);
+  setupGlobals(callbacks, opts, FDebug?'  ':'', FDebug?'\r\n':'', keyboard, kmnfile);
 
   // let fgp: GROUP;
 
@@ -177,8 +177,8 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
     let result = ValidateLayoutFile(keyboard, options.saveDebug, path, sVKDictionary);
     if(!result.result) {
       sLayoutFile = '';
-      // TODO: error
-      // ReportError(0, CWARN_TouchLayoutFileInvalid, 'Touch layout file is not valid');
+      callbacks.reportMessage(KmwCompilerMessages.Error_TouchLayoutFileInvalid());
+      return null;
     } else {
       // TODO: reusing the same variable here is ugly
       sLayoutFile = result.output;
@@ -313,7 +313,7 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
 
   // I853 - begin unicode missing causes crash
   if (keyboard.startGroup.unicode == 0xFFFFFFFF) {
-    ReportError(0, CERR_InvalidBegin, 'A "begin unicode" statement is required to compile a KeymanWeb keyboard');
+    callbacks.reportMessage(KmwCompilerMessages.Error_InvalidBegin());
     return null;
   }
 
@@ -472,7 +472,7 @@ function GetKeyboardModifierBitmask(keyboard: KMX.KEYBOARD, fMnemonic: boolean):
   }
 
   if ((bitMask & KMX.KMXFile.MASK_MODIFIER_CHIRAL) && (bitMask & KMX.KMXFile.MASK_MODIFIER_NONCHIRAL)) {
-    ReportError(0, CWARN_DontMixChiralAndNonChiralModifiers, 'This keyboard contains Ctrl,Alt and LCtrl,LAlt,RCtrl,RAlt sets of modifiers. Use only one or the other set for web target.');
+    callbacks.reportMessage(KmwCompilerMessages.Warn_DontMixChiralAndNonChiralModifiers());
   }
 
   if(options.saveDebug) {
