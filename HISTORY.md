@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.122 alpha 2023-06-12
+
+* refactor(developer): import kmcmplib errors into kmc-kmn (#8962)
+
 ## 17.0.121 alpha 2023-06-09
 
 * fix(linux): Fix disabling of buttons (#8946)
