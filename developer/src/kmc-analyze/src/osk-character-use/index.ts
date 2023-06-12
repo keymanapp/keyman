@@ -241,7 +241,7 @@ export class AnalyzeOskCharacterUse {
       return '\\' + s;
     }
 
-    // TODO: there are other chars, use a library or regex match?
+    // TODO: there are other chars, use a library or regex match? e.g. :, | https://michelf.ca/projects/php-markdown/extra/#backslash
     switch(s) {
       case '\n': return '\\\\n';
       case '\r': return '\\\\r';
