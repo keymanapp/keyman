@@ -71,9 +71,6 @@ export class AnalyzeOskCharacterUse {
       project.populateFiles();
       let files = project.files.map(file => this.callbacks.resolveFilename(kpjFile, file.filePath));
 
-      // Make sure no .kpj files are included in this list so we don't
-      // accidentally end up recursing
-      files = files.filter(file => !KeymanFileTypes.filenameIs(file, KeymanFileTypes.Source.Project));
 
       await this.analyze(files, false); // false because we don't want get into a recursive loop for projects
     }
