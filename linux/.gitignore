@@ -17,7 +17,7 @@ dist/
 upload/
 launchpad
 launchpad-*
-keyman-config/build
+build/
 keyman-config/debian/man
 keyman-config/experiments/*.txt
 keyman-config/keyman_config/version.py

@@ -239,7 +239,7 @@ You'll have to create the docker image.
   ```bash
   cd $KEYMAN_ROOT
   docker run -v $(pwd):/source -i -t -w /source --platform=linux/amd64 \
-    sillsdev/jammy keyman_*.dsc /source
+    sillsdev/jammy jammy keyman_*.dsc
   ```
 
   This will create the binary packages in `$KEYMAN_ROOT/artifacts`.

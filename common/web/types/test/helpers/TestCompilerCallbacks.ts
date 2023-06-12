@@ -42,7 +42,7 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
     return resolveFilename(baseFilename, filename);
   }
 
-  loadFile(filename: string | URL): Buffer {
+  loadFile(filename: string): Uint8Array {
     // TODO: error management, does it belong here?
     try {
       return loadFile(filename);

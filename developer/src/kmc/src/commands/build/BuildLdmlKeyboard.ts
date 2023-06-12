@@ -1,8 +1,9 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as kmcLdml from '@keymanapp/kmc-ldml';
-import { KvkFileWriter, CompilerCallbacks } from '@keymanapp/common-types';
+import { KvkFileWriter, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader } from '@keymanapp/common-types';
 import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
+import { fileURLToPath } from 'url';
 
 export class BuildLdmlKeyboard extends BuildActivity {
   public get name(): string { return 'LDML keyboard'; }
@@ -12,7 +13,7 @@ export class BuildLdmlKeyboard extends BuildActivity {
   public async build(infile: string, callbacks: CompilerCallbacks, options: BuildActivityOptions): Promise<boolean> {
     // TODO-LDML: consider hardware vs touch -- touch-only layout will not have a .kvk
     // Compile:
-    let [kmx,kvk,kmw] = buildLdmlKeyboardToMemory(infile, callbacks, options);
+    let [kmx,kvk,kmw] = await buildLdmlKeyboardToMemory(infile, callbacks, options);
     // Output:
 
     const fileBaseName = options.outFile ?? infile;
@@ -42,20 +43,23 @@ export class BuildLdmlKeyboard extends BuildActivity {
   }
 }
 
-function buildLdmlKeyboardToMemory(inputFilename: string, callbacks: CompilerCallbacks, options: BuildActivityOptions): [Uint8Array, Uint8Array, Uint8Array] {
+async function buildLdmlKeyboardToMemory(inputFilename: string, callbacks: CompilerCallbacks, options: BuildActivityOptions): Promise<[Uint8Array, Uint8Array, Uint8Array]> {
   let compilerOptions: kmcLdml.CompilerOptions = {
     debug: options.debug ?? false,
     addCompilerVersion: options.compilerVersion ?? true,
+    readerOptions: {
+      importsPath: fileURLToPath(LDMLKeyboardXMLSourceFileReader.defaultImportsURL)
+    }
     // TODO: warnDeprecatedCode: options.warnDeprecatedCode,
     // TODO: treatWarningsAsErrors: options.treatWarningsAsErrors,
   }
 
-  const k = new kmcLdml.LdmlKeyboardCompiler(callbacks, options);
+  const k = new kmcLdml.LdmlKeyboardCompiler(callbacks, compilerOptions);
   let source = k.load(inputFilename);
   if (!source) {
     return [null, null, null];
   }
-  let kmx = k.compile(source);
+  let kmx = await k.compile(source);
   if (!kmx) {
     return [null, null, null];
   }

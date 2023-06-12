@@ -4,16 +4,13 @@
 #include "unicode/uniset.h"
 #include "unicode/unistr.h"
 
-EXTERN int kmcmp_ParseUnicodeSet(
-  const char* szText,
-  uint32_t* outputBuffer,
+EXTERN int kmcmp_parseUnicodeSet(
+  const std::string text,
+  uintptr_t outputBuffer_,
   uint32_t outputBufferSize
 ) {
-  if (szText == nullptr) {
-    // null string coming in
-    return KMCMP_ERROR_SYNTAX_ERR;
-  }
-  const icu::UnicodeString str = icu::UnicodeString::fromUTF8(szText);
+  uint32_t* outputBuffer = reinterpret_cast<uint32_t*>(outputBuffer_);
+  const icu::UnicodeString str = icu::UnicodeString::fromUTF8(text.c_str());
   if (str.isBogus() || str.isEmpty()) {
     // empty string
     return KMCMP_ERROR_SYNTAX_ERR;

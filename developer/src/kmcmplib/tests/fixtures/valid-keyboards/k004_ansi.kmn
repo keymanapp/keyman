@@ -1,0 +1,13 @@
+c Description: Verifies that kmcmplib can compile an ANSI file
+c This has some high-ascii letters in cp1252 to ensure that
+c it fails to load as 'utf8 without bom'
+
+store(&NAME) 'k004_ansi'
+store(&VERSION) '9.0'
+
+begin unicode > use(main)
+
+group(main) using keys
+
++ [K_A] > 'a'
+'a' + [K_B] > 'Ра'

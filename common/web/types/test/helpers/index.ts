@@ -28,7 +28,10 @@ export function loadSchema(schema: CompilerSchema): Buffer {
 }
 
 export function resolveFilename(baseFilename: string, filename: string) {
-  const basePath = path.dirname(baseFilename);
+  const basePath =
+    baseFilename.endsWith('/') || baseFilename.endsWith('\\') ?
+    baseFilename :
+    path.dirname(baseFilename);
   // Transform separators to platform separators -- we are agnostic
   // in our use here but path prefers files may use
   // either / or \, although older kps files were always \.

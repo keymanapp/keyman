@@ -50,7 +50,8 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action test; then
-  #npm test - no tests as yet
+  npm test
+  # TODO: no unit tests yet, later add: `&& cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha`
   builder_finish_action success test
 fi
 

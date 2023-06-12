@@ -75,14 +75,16 @@
 #define LDML_LENGTH_META 0x24
 #define LDML_LENGTH_NAME 0xC
 #define LDML_LENGTH_NAME_ITEM 0x4
-#define LDML_LENGTH_ORDR 0xC
-#define LDML_LENGTH_ORDR_ITEM 0x8
 #define LDML_LENGTH_SECT 0x10
 #define LDML_LENGTH_SECT_ITEM 0x8
 #define LDML_LENGTH_STRS 0xC
 #define LDML_LENGTH_STRS_ITEM 0x8
-#define LDML_LENGTH_TRAN 0xC
-#define LDML_LENGTH_TRAN_ITEM 0x10
+#define LDML_LENGTH_TRAN 0x14
+#define LDML_LENGTH_TRAN_GROUP 0xC
+#define LDML_LENGTH_TRAN_REORDER 0x8
+#define LDML_LENGTH_TRAN_TRANSFORM 0x10
+#define LDML_LENGTH_VARS 0x10
+#define LDML_LENGTH_VARS_ITEM 0x10
 #define LDML_LENGTH_VKEY 0xC
 #define LDML_LENGTH_VKEY_ITEM 0x8
 #define LDML_META_SETTINGS_FALLBACK_OMIT 0x1
@@ -94,8 +96,6 @@
 #define LDML_SECTIONNAME_DISP             "disp"
 #define LDML_SECTIONID_ELEM 0x6D656C65 /* "elem" */
 #define LDML_SECTIONNAME_ELEM             "elem"
-#define LDML_SECTIONID_FINL 0x6C6E6966 /* "finl" */
-#define LDML_SECTIONNAME_FINL             "finl"
 #define LDML_SECTIONID_KEYS 0x7379656B /* "keys" */
 #define LDML_SECTIONNAME_KEYS             "keys"
 #define LDML_SECTIONID_LAYR 0x7279616C /* "layr" */
@@ -108,15 +108,20 @@
 #define LDML_SECTIONNAME_META             "meta"
 #define LDML_SECTIONID_NAME 0x656D616E /* "name" */
 #define LDML_SECTIONNAME_NAME             "name"
-#define LDML_SECTIONID_ORDR 0x7264726F /* "ordr" */
-#define LDML_SECTIONNAME_ORDR             "ordr"
 #define LDML_SECTIONID_SECT 0x74636573 /* "sect" */
 #define LDML_SECTIONNAME_SECT             "sect"
 #define LDML_SECTIONID_STRS 0x73727473 /* "strs" */
 #define LDML_SECTIONNAME_STRS             "strs"
 #define LDML_SECTIONID_TRAN 0x6E617274 /* "tran" */
 #define LDML_SECTIONNAME_TRAN             "tran"
+#define LDML_SECTIONID_VARS 0x73726176 /* "vars" */
+#define LDML_SECTIONNAME_VARS             "vars"
 #define LDML_SECTIONID_VKEY 0x79656B76 /* "vkey" */
 #define LDML_SECTIONNAME_VKEY             "vkey"
 #define LDML_TRAN_FLAGS_ERROR 0x1
+#define LDML_TRAN_GROUP_TYPE_REORDER 0x1
+#define LDML_TRAN_GROUP_TYPE_TRANSFORM 0x0
+#define LDML_VARS_ENTRY_TYPE_SET 0x1
+#define LDML_VARS_ENTRY_TYPE_STRING 0x0
+#define LDML_VARS_ENTRY_TYPE_UNICODESET 0x2
 #define LDML_VERSION "1.0"

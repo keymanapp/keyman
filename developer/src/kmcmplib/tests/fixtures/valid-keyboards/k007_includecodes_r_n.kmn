@@ -1,0 +1,12 @@
+c Description: Verifies that kmcmplib can load an includecodes file with \r\n line endings
+
+store(&NAME) 'k007_includecodes_r_n'
+store(&VERSION) '9.0'
+store(&includecodes) 'k007_includecodes_r_n.txt'
+
+begin unicode > use(main)
+
+group(main) using keys
+
++ [K_A] > $LOWER_A
+$LOWER_A + [K_B] > $LOWER_B
