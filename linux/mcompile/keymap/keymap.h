@@ -19,27 +19,14 @@
 
 int dummytest_keymap();
 
-/*
-#include <X11/XKBlib.h>
-#include <X11/Xlib.h>
-#include <gdk/gdk.h>
-
-#include <algorithm>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <string>
-#include <vector>
-
-#include "mc_kmxfile.h"
-#include "mc_savekeyboard.h"
 
 typedef std::vector<std::string> v_str_1D;
 typedef std::vector<std::vector<std::string> > v_str_2D;
 typedef std::vector<std::vector<std::vector<std::string> > > v_str_3D;
 
-int shift_state_count = 2;  // use  shiftstate :  no shift, shift
+static int shift_state_count = 2;  // use  shiftstate :  no shift, shift
 
+/*
 // read configuration file, split and write to 3D-Vector (Data for US on [0][ ][ ]  )
 void write_US_ToVector(v_str_3D &vec, std::string language, const char *text);
 
