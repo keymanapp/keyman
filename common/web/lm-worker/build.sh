@@ -87,7 +87,7 @@ if builder_start_action test; then
     MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
   fi
 
-  mocha --recursive $MOCHA_FLAGS ./src/test/cases/
+  c8 mocha --recursive $MOCHA_FLAGS ./src/test/cases/
 
   builder_finish_action success test
 fi
