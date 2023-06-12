@@ -50,11 +50,11 @@ fi
 ### BUILD ACTIONS
 
 if builder_start_action build; then
-  npm run tsc -- -b
+  tsc -b
   node build-bundler.js
 
   # Declaration bundling.
-  npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
 
   builder_finish_action success build
 fi
@@ -65,7 +65,7 @@ if builder_start_action test; then
     FLAGS="-reporter mocha-teamcity-reporter"
   fi
 
-  npm run mocha -- $FLAGS --require test/helpers.js --recursive test
+  c8 mocha $FLAGS --require test/helpers.js --recursive test
 
   builder_finish_action success test
 fi
