@@ -1,8 +1,8 @@
 import { TSentinelRecord, GetSuppChar, ExpandSentinel, incxstr, xstrlen, xstrlen_printing } from "../util/util.js";
 import { KMX } from "@keymanapp/common-types";
 
-import { FMnemonic, FTabStop, IsKeyboardVersion10OrLater, IsKeyboardVersion14OrLater, nl, options } from "./compiler-globals.js";
-import { CERR_NotSupportedInKeymanWebContext, CERR_NotSupportedInKeymanWebOutput, CERR_NotSupportedInKeymanWebStore, CERR_VirtualCharacterKeysNotSupportedInKeymanWeb, CERR_VirtualKeysNotValidForMnemonicLayouts, CHINT_UnreachableKeyCode, CWARN_ExtendedShiftFlagsNotSupportedInKeymanWeb, CWARN_OptionStoreNameInvalid, ReportError } from "./messages.js";
+import { callbacks, FMnemonic, FTabStop, IsKeyboardVersion10OrLater, IsKeyboardVersion14OrLater, nl, options } from "./compiler-globals.js";
+import { KmwCompilerMessages } from "./messages.js";
 import { FFix183_LadderLength, FormatModifierAsBitflags, RuleIsExcludedByPlatform } from "./write-compiled-keyboard.js";
 
 const SValidIdentifierCharSet = /[A-Za-z0-9_]/;
@@ -41,8 +41,7 @@ export function JavaScript_Name(i: number, pwszName: string, KeepNameForPersiste
     } else if(FChanged) {
       // For named option stores, we are only supporting the valid identifier
       // character set, which is a breaking change in 14.0.
-      ReportError(0, CWARN_OptionStoreNameInvalid,
-        `The option store ${pwszName} should be named with characters in the range A-Z, a-z, 0-9 and _ only.`);
+      callbacks.reportMessage(KmwCompilerMessages.Warn_OptionStoreNameInvalid({name:pwszName}));
     }
     return result;
   }
@@ -267,7 +266,7 @@ const
 export function JavaScript_Shift(fkp: KMX.KEY, FMnemonic: boolean): number {
   if (FMnemonic) {
     if (fkp.ShiftFlags & KMX.KMXFile.VIRTUALCHARKEY) {
-      ReportError(fkp.Line, CERR_VirtualCharacterKeysNotSupportedInKeymanWeb, 'Virtual character keys not currently supported in KeymanWeb');  // I1971   // I4061
+      callbacks.reportMessage(KmwCompilerMessages.Error_VirtualCharacterKeysNotSupportedInKeymanWeb());
       return 0;
     }
 
@@ -275,7 +274,7 @@ export function JavaScript_Shift(fkp: KMX.KEY, FMnemonic: boolean): number {
       // We prohibit K_ keys for mnemonic layouts. We don't block T_ and U_ keys.
       // TODO: this doesn't resolve the issue of, e.g. SHIFT+K_SPACE
       // https://github.com/keymanapp/keyman/issues/265
-      ReportError(fkp.Line, CERR_VirtualKeysNotValidForMnemonicLayouts, 'Virtual keys are not valid for mnemonic layouts');  // I1971   // I4061
+      callbacks.reportMessage(KmwCompilerMessages.Error_VirtualKeysNotValidForMnemonicLayouts());
       return 0;
     }
   }
@@ -288,13 +287,13 @@ export function JavaScript_Shift(fkp: KMX.KEY, FMnemonic: boolean): number {
 
     // Non-chiral support only and no support for state keys
     if (fkp.ShiftFlags & (KMX.KMXFile.LCTRLFLAG | KMX.KMXFile.RCTRLFLAG | KMX.KMXFile.LALTFLAG | KMX.KMXFile.RALTFLAG)) {   // I4118
-      ReportError(fkp.Line, CWARN_ExtendedShiftFlagsNotSupportedInKeymanWeb, 'Extended shift flags LALT, RALT, LCTRL, RCTRL are not supported in KeymanWeb');
+      callbacks.reportMessage(KmwCompilerMessages.Warn_ExtendedShiftFlagsNotSupportedInKeymanWeb({flags: 'LALT, RALT, LCTRL, RCTRL'}));
     }
 
     if (fkp.ShiftFlags & (
       KMX.KMXFile.CAPITALFLAG | KMX.KMXFile.NOTCAPITALFLAG | KMX.KMXFile.NUMLOCKFLAG | KMX.KMXFile.NOTNUMLOCKFLAG |
       KMX.KMXFile.SCROLLFLAG | KMX.KMXFile.NOTSCROLLFLAG)) {   // I4118
-      ReportError(fkp.Line, CWARN_ExtendedShiftFlagsNotSupportedInKeymanWeb, 'Extended shift flags CAPS and NCAPS are not supported in KeymanWeb');
+      callbacks.reportMessage(KmwCompilerMessages.Warn_ExtendedShiftFlagsNotSupportedInKeymanWeb({flags: 'CAPS and NCAPS'}));
     }
 
     return KMX.KMXFile.ISVIRTUALKEY | (fkp.ShiftFlags & (KMX.KMXFile.K_SHIFTFLAG | KMX.KMXFile.K_CTRLFLAG | KMX.KMXFile.K_ALTFLAG));
@@ -700,9 +699,7 @@ export function JavaScript_Key(fkp: KMX.KEY, FMnemonic: boolean): number {
 
   if (Result == 0 || Result >= TKeymanWebTouchStandardKey.K_LOPT) {   // I4141
     if(!FUnreachableKeys.includes(fkp)) {
-      ReportError(fkp.Line, CHINT_UnreachableKeyCode,
-        'The rule will never be matched for key '+
-        FormatKeyForErrorMessage(fkp,FMnemonic)+' because its key code is never fired.');
+      callbacks.reportMessage(KmwCompilerMessages.Hint_UnreachableKeyCode({key: FormatKeyForErrorMessage(fkp,FMnemonic)}));
       FUnreachableKeys.push(fkp);
     }
   }
@@ -765,8 +762,7 @@ function CheckStoreForInvalidFunctions(fk: KMX.KEYBOARD, key: KMX.KEY, store: KM
   // Disable the check with versions >= 10.0, since we now support deadkeys in stores.
   if (n >= 0 && !IsKeyboardVersion10OrLater) {
     rec = ExpandSentinel(fk, store.dpString, n);
-    ReportError(key.Line, CERR_NotSupportedInKeymanWebStore,
-      `${GetCodeName(rec.Code)} is not currently supported in store '${store.dpName}' when used by any or index`);
+    callbacks.reportMessage(KmwCompilerMessages.Error_NotSupportedInKeymanWebStore({code:GetCodeName(rec.Code), store:store.dpName}));
   }
 }
 
@@ -830,8 +826,7 @@ function JavaScript_CompositeContextValue(fk: KMX.KEYBOARD, fkp: KMX.KEY, pwsz: 
           `this.s${JavaScript_Name(rec.Any.StoreIndex, rec.Any.Store.dpName)})`;
         break;
       default:
-        ReportError(fkp.Line, CERR_NotSupportedInKeymanWebContext,
-          `Statement ${GetCodeName(rec.Code)} is not currently supported in context`);  // I1971   // I4061
+        callbacks.reportMessage(KmwCompilerMessages.Error_NotSupportedInKeymanWebContext({code: GetCodeName(rec.Code)}));
         Result += '/*.*/ 0 ';
       }
     }
@@ -925,7 +920,7 @@ begin*/
           `o:${rec.Index.Index}}`;   // I4611
         break;
       default:
-        ReportError(fkp.Line, CERR_NotSupportedInKeymanWebContext, `Statement ${GetCodeName(rec.Code)} is not currently supported in context`);  // I1971   // I4061
+        callbacks.reportMessage(KmwCompilerMessages.Error_NotSupportedInKeymanWebContext({code: GetCodeName(rec.Code)}));
         Result += '/*.*/ 0 ';
       }
     }
@@ -1021,7 +1016,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
         // #917: Minimum version required is 14.0: the KCXO function was only added for 14.0
         // Note that this is checked in compiler.cpp as well, so this error can probably never occur
         if(!IsKeyboardVersion14OrLater()) {
-          ReportError(fkp.Line, CERR_NotSupportedInKeymanWebContext, `Statement notany in context() match requires version 14.0+ of KeymanWeb`);  // I1971   // I4061
+          callbacks.reportMessage(KmwCompilerMessages.Error_NotAnyRequiresVersion14());
         }
         Result += nlt + `k.KCXO(${len},t,${AdjustIndex(fkp.dpContext, xstrlen(fkp.dpContext))},${AdjustIndex(fkp.dpContext, ContextIndex)});`;
         break;
@@ -1031,7 +1026,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
           // These have no output for a context emit
           break;
       default:
-        ReportError(fkp.Line, CERR_NotSupportedInKeymanWebContext, `Statement ${GetCodeName(recContext.Code)} is not currently supported in context() match`);  // I1971   // I4061
+        callbacks.reportMessage(KmwCompilerMessages.Error_NotSupportedInKeymanWebContext({code: GetCodeName(recContext.Code)}));
         Result += nlt + '/*.*/ ';   // I4611
       }
     }
@@ -1239,7 +1234,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
         len = -1;
         break;
       default:
-        ReportError(fkp ? fkp.Line : 0, CERR_NotSupportedInKeymanWebOutput, `Statement ${GetCodeName(rec.Code)} is not currently supported in output`);  // I1971   // I4061
+        callbacks.reportMessage(KmwCompilerMessages.Error_NotSupportedInKeymanWebOutput({code: GetCodeName(rec.Code)}));
         Result += '';
       }
     }

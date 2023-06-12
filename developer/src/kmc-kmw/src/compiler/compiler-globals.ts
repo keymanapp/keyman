@@ -7,13 +7,15 @@ export let fk: KMX.KEYBOARD;
 export let FMnemonic: boolean;
 export let options: CompilerOptions;
 export let callbacks: CompilerCallbacks;
+export let kmnfile: string;
 
-export function setupGlobals(_callbacks: CompilerCallbacks, _options: CompilerOptions, _tab: string, _nl: string, _keyboard: KMX.KEYBOARD) {
+export function setupGlobals(_callbacks: CompilerCallbacks, _options: CompilerOptions, _tab: string, _nl: string, _keyboard: KMX.KEYBOARD, _kmnfile: string) {
   callbacks = _callbacks;
   options = _options;
   FTabStop = _tab;
   nl = _nl;
   fk = _keyboard;
+  kmnfile = _kmnfile;
 }
 
 export function IsKeyboardVersion10OrLater(): boolean {
