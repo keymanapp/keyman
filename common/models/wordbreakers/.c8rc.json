@@ -5,7 +5,7 @@
     "node_modules/*",
     "test"
   ],
-  "exclude-after-remap": false,
+  "exclude-after-remap": true,
   "reporter": ["text", "text-summary"],
   "reports-dir": "build/coverage",
   "src": [

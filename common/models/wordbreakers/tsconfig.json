@@ -10,7 +10,6 @@
     "sourceMap": true,
     "importHelpers": true,
     "inlineSources": true,
-    "sourceRoot": "/common/models/wordbreakers/src",
     "strict": true,
     "allowJs": false,
     "baseUrl": "./",

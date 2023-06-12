@@ -31,7 +31,6 @@ builder_describe \
   "@/common/web/tslib" \
   "@/common/models/wordbreakers" \
   "@/common/models/templates" \
-  "@/common/tools/sourcemap-path-remapper" \
   configure clean build test --ci
 
 builder_describe_outputs \

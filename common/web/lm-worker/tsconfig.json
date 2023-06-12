@@ -9,7 +9,6 @@
     "importHelpers": true,
     "inlineSourceMap": true,
     "inlineSources": true,
-    "sourceRoot": "/common/web/lm-worker/src",
     "lib": ["webworker", "es6"],
     "target": "es5",
     "types": ["node"],

@@ -50,7 +50,7 @@ if(process.argv.length > 2) {
   }
 }
 
-await esbuild.build({
+const embeddedWorkerBuildOptions = {
   bundle: true,
   sourcemap: true,
   /*
@@ -61,7 +61,6 @@ await esbuild.build({
    * That said, we know how to 'nix it ourselves in post now, so... yeah.
    */
   sourcesContent: true,
-  sourceRoot: "/",
   format: "esm",
   nodePaths: ['..', '../../models'],
   entryPoints: {
@@ -73,43 +72,7 @@ await esbuild.build({
   plugins: [ es5ClassAnnotationAsPurePlugin ],
   tsconfig: 'tsconfig.json',
   target: "es5",
-});
-
-// Bundled CommonJS (classic Node) module version
-await esbuild.build({
-  bundle: true,
-  sourcemap: true,
-  format: "cjs",
-  nodePaths: ['..'],
-  entryPoints: {
-    'index': 'build/obj/index.js',
-    'worker-main': 'build/obj/worker-main.js'
-  },
-  outdir: 'build/lib',
-  outExtension: { '.js': '.cjs' },
-  plugins: [ es5ClassAnnotationAsPurePlugin ],
-  tsconfig: 'tsconfig.json',
-  target: "es5"
-});
-
-// The one that's actually a component of our releases.
-
-const embeddedWorkerBuildOptions = {
-  alias: {
-    'tslib': '@keymanapp/tslib'
-  },
-  bundle: true,
-  sourcemap: true,
-  format: "iife",
-  nodePaths: ['..'],
-  entryPoints: {
-    'worker-main': 'build/obj/worker-main.js'
-  },
-  outdir: 'build/lib',
-  plugins: [ es5ClassAnnotationAsPurePlugin ],
-  tsconfig: 'tsconfig.json',
-  target: "es5"
-}
+};
 
 // Prepare the needed setup for `tslib` treeshaking.
 const unusedHelpers = await determineNeededDowncompileHelpers(embeddedWorkerBuildOptions);
