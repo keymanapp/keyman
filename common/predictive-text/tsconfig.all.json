@@ -13,7 +13,6 @@
     "importHelpers": true,
     "inlineSources": true,
     "sourceMap": true,
-    "sourceRoot": "keyman",
     "target": "es5",
     "lib": ["es6"],
     "types": ["node"],
