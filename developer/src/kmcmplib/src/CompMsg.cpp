@@ -112,6 +112,7 @@ const struct CompilerError CompilerErrors[] = {
     { CERR_RepeatedBegin                                 , "Begin has already been set"},
 
     { CHINT_UnreachableRule                              , "This rule will never be matched as another rule takes precedence"},
+    { CHINT_NonUnicodeFile                               , "Keyman Developer has detected that the file has ANSI encoding. Consider converting this file to UTF-8"},
 
     { CWARN_TooManyWarnings                              , "Too many warnings or errors"},
     { CWARN_OldVersion                                   , "The keyboard file is an old version"},
