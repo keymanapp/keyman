@@ -198,3 +198,4 @@ lcov.info
 # /developer/src/test/auto/kmcomp/*.kvk
 # /developer/src/test/auto/kmcomp/*.kvk*
 # /developer/src/test/auto/kmcomp/*.txt
+/linux/mcompile/keymap/X_bak
