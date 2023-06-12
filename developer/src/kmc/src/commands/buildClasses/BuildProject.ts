@@ -67,7 +67,7 @@ class ProjectBuilder {
 
     if(fs.statSync(this.infile).isDirectory()) {
       // This is a project folder, look for folder-name.kpj
-      this.infile = path.join(this.infile, path.basename(this.infile) + '.kpj');
+      this.infile = path.join(this.infile, path.basename(this.infile) + KeymanFileTypes.Source.Project);
     }
 
     const project = fs.existsSync(this.infile) ?
