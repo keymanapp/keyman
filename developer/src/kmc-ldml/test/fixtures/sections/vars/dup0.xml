@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
+<keyboard locale="mt" conformsTo="techpreview">
+  <names>
+    <name value="vars-minimal" />
+  </names>
+
+  <keys />
+
+  <!-- from spec -->
+  <variables>
+    <string id="y" value="yes" /> <!-- a simple string-->
+    <string id="y" value="no" /> <!-- duplicate-->
+    <set id="upper" value="A B C D E FF" /> <!-- a set with 6 items -->
+    <unicodeSet id="consonants" value="[कसतनमह]" /> <!-- a UnicodeSet -->
+  </variables>
+
+
+</keyboard>

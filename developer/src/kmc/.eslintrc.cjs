@@ -1,5 +1,4 @@
 module.exports = {
-  //   extends: ["../../../common/web/eslint/eslintNoNodeImports.js"],
   parserOptions: {
     project: ["./tsconfig.json", "./test/tsconfig.json"],
   },

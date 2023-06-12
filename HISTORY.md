@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.121 alpha 2023-06-09
+
+* fix(linux): Fix disabling of buttons (#8946)
+* chore(developer): check for nodejs deps in kmc-kmn (#8961)
+* spec(core): spec/impl for transform and vars (#8695)
+*  (#8967)
+
 ## 17.0.120 alpha 2023-06-07
 
 * chore(core): look for emcc.py, not emcc (#8934)

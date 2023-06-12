@@ -4,7 +4,7 @@ import { KMXPlus } from '@keymanapp/common-types';
 import { CompilerMessages } from "./messages.js";
 import { SectionCompiler } from "./section-compiler.js";
 
-import GlobalSections = KMXPlus.GlobalSections;
+import DependencySections = KMXPlus.DependencySections;
 import Disp = KMXPlus.Disp;
 import DispItem = KMXPlus.DispItem;
 
@@ -32,7 +32,7 @@ export class DispCompiler extends SectionCompiler {
     return valid;
   }
 
-  public compile(sections: GlobalSections): Disp {
+  public compile(sections: DependencySections): Disp {
     let result = new Disp();
 
     // displayOptions
