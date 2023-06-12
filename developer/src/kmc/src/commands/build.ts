@@ -1,17 +1,35 @@
 import * as fs from 'fs';
 import { Command } from 'commander';
-import { BuildActivityOptions } from './buildClasses/BuildActivity.js';
 import { buildActivities } from './buildClasses/buildActivities.js';
 import { BuildProject, PROJECT_EXTENSION } from './buildClasses/BuildProject.js';
 import { NodeCompilerCallbacks } from '../messages/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/messages.js';
+import { CompilerOptions } from '@keymanapp/common-types';
+import { addBaseOptions } from '../util/baseOptions.js';
+
+
+function commandOptionsToCompilerOptions(options: any): CompilerOptions {
+  // We don't want to rename command line options to match the precise
+  // properties that we have in CompilerOptions, but nor do we want to rename
+  // CompilerOptions properties...
+  return {
+    // CompilerBaseOptions
+    outFile: options.outFile,
+    logLevel: options.logLevel,
+    // CompilerOptions
+    shouldAddCompilerVersion: options.compilerVersion,
+    saveDebug: options.debug,
+    compilerWarningsAsErrors: options.compilerWarningsAsErrors,
+    warnDeprecatedCode: options.warnDeprecatedCode,
+  }
+}
 
 export function declareBuild(program: Command) {
-  program
+  addBaseOptions(program
     .command('build [infile...]')
     .description('Build a source file into a final file')
+  )
     .option('-d, --debug', 'Include debug information in output')
-    .option('-o, --out-file <filename>', 'Override the default path and filename for the output file')
     .option('--no-compiler-version', 'Exclude compiler version metadata from output')
     .option('-w, --compiler-warnings-as-errors', 'Causes warnings to fail the build')
     .option('--no-warn-deprecated-code', 'Turn off warnings for deprecated code styles')
@@ -23,7 +41,7 @@ export function declareBuild(program: Command) {
       }
 
       for(let filename of filenames) {
-        if(!await build(filename, options)) {
+        if(!await build(filename, commandOptionsToCompilerOptions(options))) {
           // Once a file fails to build, we bail on subsequent builds
           // TODO: is this the most appropriate semantics?
           process.exit(1);
@@ -32,8 +50,8 @@ export function declareBuild(program: Command) {
     });
 }
 
-async function build(filename: string, options: BuildActivityOptions): Promise<boolean> {
-  let callbacks = new NodeCompilerCallbacks({logLevel: options.logLevel});
+async function build(filename: string, options: CompilerOptions): Promise<boolean> {
+  let callbacks = new NodeCompilerCallbacks(options);
 
   try {
     callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename}));

@@ -4,21 +4,19 @@
  */
 
 
-import { Command, Option } from 'commander';
-import KEYMAN_VERSION from "@keymanapp/keyman-version";
+import { Command } from 'commander';
 import { declareBuild } from './commands/build.js';
 import { declareBuildTestData } from './commands/buildTestData.js';
 import { declareAnalyze } from './commands/analyze.js';
-import { ALL_COMPILER_LOG_LEVELS } from '@keymanapp/common-types';
+import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 const program = new Command();
 
 /* Arguments */
+
 program
   .description('Keyman Developer Command Line Interface')
-  .version(KEYMAN_VERSION.VERSION_WITH_TAG)
-  .addOption(new Option('-l, --log-level <logLevel>', 'Log level').choices(ALL_COMPILER_LOG_LEVELS).default('info'));
-
+  .version(KEYMAN_VERSION.VERSION_WITH_TAG);
 declareBuild(program);
 declareBuildTestData(program);
 declareAnalyze(program);

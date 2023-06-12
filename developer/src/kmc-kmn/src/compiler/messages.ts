@@ -50,6 +50,7 @@ export class CompilerMessages {
   static Fatal_MissingWasmModule = (o:{e?: any}) => m(this.FATAL_MissingWasmModule, `Could not instantiate WASM compiler module or initialization failed: ${exc(o.e)}`);
   static FATAL_MissingWasmModule = SevFatal | 0x1001;
 
+  // TODO: Is this now deprecated?
   static Fatal_UnableToSetCompilerOptions = () => m(this.FATAL_UnableToSetCompilerOptions, `Unable to set compiler options`);
   static FATAL_UnableToSetCompilerOptions = SevFatal | 0x1002;
 

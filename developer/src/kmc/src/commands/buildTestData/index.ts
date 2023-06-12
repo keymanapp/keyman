@@ -1,19 +1,16 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as kmcLdml from '@keymanapp/kmc-ldml';
-import { CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboardXMLSourceFileReader } from '@keymanapp/common-types';
+import { CompilerBaseOptions, CompilerCallbacks, defaultCompilerOptions, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboardXMLSourceFileReader } from '@keymanapp/common-types';
 import { NodeCompilerCallbacks } from '../../messages/NodeCompilerCallbacks.js';
 import { fileURLToPath } from 'url';
 
-// TODO: consolidate with CompilerOptions everywhere
-export interface BuildTestDataOptions {
-  outFile?: string;
-};
-
-export function buildTestData(infile: string, options: BuildTestDataOptions) {
-  let compilerOptions: kmcLdml.CompilerOptions = {
-    debug: false,
-    addCompilerVersion: false,
+export function buildTestData(infile: string, options: CompilerBaseOptions) {
+  let compilerOptions: kmcLdml.LdmlCompilerOptions = {
+    ...defaultCompilerOptions,
+    ...options,
+    saveDebug: false,
+    shouldAddCompilerVersion: false,
     readerOptions: {
       importsPath: fileURLToPath(LDMLKeyboardXMLSourceFileReader.defaultImportsURL)
     }
@@ -32,9 +29,9 @@ export function buildTestData(infile: string, options: BuildTestDataOptions) {
   fs.writeFileSync(outFileJson, JSON.stringify(testData, null, '  '));
 }
 
-function loadTestData(inputFilename: string, options: kmcLdml.CompilerOptions): LDMLKeyboardTestDataXMLSourceFile {
-  const c: CompilerCallbacks = new NodeCompilerCallbacks({logLevel: 'info'});
-  const k = new kmcLdml.LdmlKeyboardCompiler(c, options);
+function loadTestData(inputFilename: string, options: kmcLdml.LdmlCompilerOptions): LDMLKeyboardTestDataXMLSourceFile {
+  const callbacks: CompilerCallbacks = new NodeCompilerCallbacks(options);
+  const k = new kmcLdml.LdmlKeyboardCompiler(callbacks, options);
   let source = k.loadTestData(inputFilename);
   if (!source) {
     return null;
