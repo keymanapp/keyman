@@ -42,62 +42,26 @@ const baseOptions: CompilerOptions = {
  */
 let callbackProcIdentifier = 0;
 
-/**
- * Pointer in wasm-space
- */
-type WasmPtr = number;
-
-/**
- * The wrapped functions
- */
-class WasmWrapper {
-  Module: any;
-
-  compileKeyboardFile?: (pszInfile: string, pszOutfile: string, aSaveDebug: number, aCompilerWarningsAsErrors: number, aWarnDeprecatedCode: number, msgProc: string) => boolean;
-  parseUnicodeSet?: (pat: string, buf: WasmPtr, length: number) => number;
-  setCompilerOptions?: (shouldAddCompilerVersion: number) => boolean;
-
-  constructor(wasmModule: any) {
-    this.Module = wasmModule;
-    if (!wasmModule) {
-      throw Error(`wasm host did not load`);
-    }
-    this.compileKeyboardFile = this.Module.cwrap('kmcmp_Wasm_CompileKeyboardFile', 'boolean', ['string', 'string', 'number', 'number', 'number', 'string']);
-    this.parseUnicodeSet = this.Module.cwrap('kmcmp_Wasm_ParseUnicodeSet', 'number', ['string', 'number', 'number']);
-    this.setCompilerOptions = this.Module.cwrap('kmcmp_Wasm_SetCompilerOptions', 'boolean', ['number']);
-
-    if (this.parseUnicodeSet === undefined
-      || this.setCompilerOptions === undefined
-      || this.compileKeyboardFile === undefined) {
-        throw Error(`some wasm functions did not load properly.`);
-    }
-  }
-
-  /**
-   * Entry point into Wasm functions
-   * @returns WasmWrapper
-   */
-  public static async load() : Promise<WasmWrapper> {
-    return new WasmWrapper(await loadWasmHost());
-  }
-};
+const
+  callbackPrefix = 'kmnCompilerCallbacks_';
 
 export class KmnCompiler {
-  callbackName: string;
+  private Module: any;
+  callbackID: string; // a unique numeric id added to globals with prefixed names
   callbacks: CompilerCallbacks;
-  wasm: WasmWrapper;
 
   constructor() {
-    this.callbackName = 'kmnCompilerCallback' + callbackProcIdentifier;
+    this.callbackID = callbackPrefix + callbackProcIdentifier.toString();
     callbackProcIdentifier++;
   }
 
   public async init(callbacks: CompilerCallbacks): Promise<boolean> {
     this.callbacks = callbacks;
-    if(!this.wasm) {
+    if(!this.Module) {
       try {
-        this.wasm = await WasmWrapper.load();
+        this.Module = await loadWasmHost();
       } catch(e: any) {
+        /* c8 ignore next 3 */
         this.callbacks.reportMessage(CompilerMessages.Fatal_MissingWasmModule({e}));
         return false;
       }
@@ -114,7 +78,9 @@ export class KmnCompiler {
       // Can't report a message here.
       throw Error('Must call Compiler.init(callbacks) before proceeding');
     }
-    if(!this.wasm) { // fail if wasm not loaded or function not found
+    if(!this.Module) {
+      /* c8 ignore next 4 */
+      // fail if wasm not loaded or function not found
       this.callbacks.reportMessage(CompilerMessages.Fatal_MissingWasmModule({}));
       return false;
     }
@@ -122,16 +88,7 @@ export class KmnCompiler {
   }
 
   public run(infile: string, outfile: string, options?: CompilerOptions): boolean {
-    if(!this.verifyInitialized()) {
-      return false;
-    }
-
-    options = {...baseOptions, ...options};
-    (globalThis as any)[this.callbackName] = this.compilerMessageCallback;
-    // TODO: use callbacks for file access -- so kmc-kmn is entirely fs agnostic
     let result = this.runCompiler(infile, outfile, options);
-    delete (globalThis as any)[this.callbackName];
-    //TODO: write the file out!
     if(result) {
       if(result.kmx) {
         this.callbacks.fs.writeFileSync(result.kmx.filename, result.kmx.data);
@@ -151,17 +108,66 @@ export class KmnCompiler {
     return 1;
   }
 
-  private runCompiler(infile: string, outfile: string, options: CompilerOptions): CompilerResult {
+  private cachedFile: {filename: string; data: Uint8Array} = {
+    filename: null,
+    data: null
+  };
+
+  private loadFileCallback = (filename: string, baseFilename: string, buffer: number, bufferSize: number): number => {
+    let resolvedFilename = this.callbacks.resolveFilename(baseFilename, filename);
+    let data: Uint8Array;
+    if(this.cachedFile.filename == resolvedFilename) {
+      data = this.cachedFile.data;
+    }
+    else {
+      data = this.callbacks.loadFile(resolvedFilename);
+      if(!data) {
+        return -1;
+      }
+      this.cachedFile.filename = resolvedFilename;
+      this.cachedFile.data = data;
+    }
+
+    if(buffer == 0) {
+      /* We need to return buffer size required */
+      return data.byteLength;
+    }
+
+    if(bufferSize != data.byteLength) {
+      /* c8 ignore next 2 */
+      throw new Error(`loadFileCallback: second call, expected file size ${bufferSize} == ${data.byteLength}`);
+    }
+
+    this.Module.HEAP8.set(data, buffer);
+
+    return 1;
+  }
+
+  public runCompiler(infile: string, outfile: string, options: CompilerOptions): CompilerResult {
+    if(!this.verifyInitialized()) {
+      /* c8 ignore next 2 */
+      return null;
+    }
+
+    options = {...baseOptions, ...options};
+
+    (globalThis as any)[this.callbackID] = {
+      message: this.compilerMessageCallback,
+      loadFile: this.loadFileCallback
+    };
+
     let result: CompilerResult = {};
-    let wasm_interface = new this.wasm.Module.CompilerInterface();
+    let wasm_interface = new this.Module.CompilerInterface();
+    let wasm_options = new this.Module.CompilerOptions();
     let wasm_result = null;
     try {
-      wasm_interface.saveDebug = options.saveDebug;
-      wasm_interface.compilerWarningsAsErrors = options.compilerWarningsAsErrors;
-      wasm_interface.warnDeprecatedCode = options.warnDeprecatedCode;
-      wasm_interface.messageCallback = this.callbackName;
-      wasm_interface.loadFileCallback = this.callbackName;  // TODO: this is wrong, needs to be a new callback; not yet used though
-      wasm_result = this.wasm.Module.kmcmp_compile(infile, wasm_interface);
+      wasm_options.saveDebug = options.saveDebug;
+      wasm_options.compilerWarningsAsErrors = options.compilerWarningsAsErrors;
+      wasm_options.warnDeprecatedCode = options.warnDeprecatedCode;
+      wasm_options.shouldAddCompilerVersion = options.shouldAddCompilerVersion;
+      wasm_options.target = 0; //CKF_KEYMAN; TODO, support KMW
+      wasm_interface.callbacksKey = this.callbackID; // key of object on globalThis
+      wasm_result = this.Module.kmcmp_compile(infile, wasm_options, wasm_interface);
       if(!wasm_result.result) {
         return null;
       }
@@ -175,11 +181,12 @@ export class KmnCompiler {
 
       result.kmx = {
         filename: outfile,
-        data: new Uint8Array(this.wasm.Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
+        data: new Uint8Array(this.Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
       };
 
       return result;
     } catch(e) {
+      /* c8 ignore next 3 */
       this.callbacks.reportMessage(CompilerMessages.Fatal_UnexpectedException({e:e}));
       return null;
     } finally {
@@ -187,6 +194,8 @@ export class KmnCompiler {
         wasm_result.delete();
       }
       wasm_interface.delete();
+      wasm_options.delete();
+      delete (globalThis as any)[this.callbackID];
     }
   }
 
@@ -194,20 +203,19 @@ export class KmnCompiler {
     // The compiler detected a .kvks file, which needs to be captured
     let reader = new KvksFileReader();
     kvksFilename = this.callbacks.resolveFilename(kmnFilename, kvksFilename);
-    let kvks = reader.read(this.callbacks.loadFile(kvksFilename));
+    let filename = this.callbacks.path.basename(kvksFilename);
+    let kvks = null;
     try {
+      kvks = reader.read(this.callbacks.loadFile(kvksFilename));
       reader.validate(kvks, this.callbacks.loadSchema('kvks'));
     } catch(e) {
-      console.log(e);
-      // TODO: this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({e}));
+      this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({filename, e}));
       return null;
     }
-    let errors: any = []; //TODO: KVKSParseError[];
-    let vk = reader.transform(kvks, errors);
-    if(!vk || errors.length) {
-      console.dir(errors);
-      // TODO: this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({e}));
-      return null;
+    let invalidVkeys: string[] = [];
+    let vk = reader.transform(kvks, invalidVkeys);
+    for(let invalidVkey of invalidVkeys) {
+      this.callbacks.reportMessage(CompilerMessages.Warn_InvalidVkeyInKvksFile({filename, invalidVkey}));
     }
     let writer = new KvkFileWriter();
     return {
@@ -224,22 +232,23 @@ export class KmnCompiler {
    */
   public parseUnicodeSet(pattern: string, bufferSize: number) : UnicodeSet | null {
     if(!this.verifyInitialized()) {
+      /* c8 ignore next 2 */
       return null;
     }
 
     if (!bufferSize) {
+      /* c8 ignore next 2 */
       bufferSize = 100; // TODO-LDML: Preflight mode? Reuse buffer?
     }
-    const { Module } = this.wasm;
-    const buf = Module.asm.malloc(bufferSize * 2 * Module.HEAPU32.BYTES_PER_ELEMENT);
+    const buf = this.Module.asm.malloc(bufferSize * 2 * this.Module.HEAPU32.BYTES_PER_ELEMENT);
     // TODO-LDML: Catch OOM
-    const rc = this.wasm.parseUnicodeSet(pattern, buf, bufferSize);
+    const rc = this.Module.kmcmp_parseUnicodeSet(pattern, buf, bufferSize);
     if (rc >= 0) {
       const ranges = [];
-      const startu = (buf / Module.HEAPU32.BYTES_PER_ELEMENT);
+      const startu = (buf / this.Module.HEAPU32.BYTES_PER_ELEMENT);
       for (let i = 0; i < rc; i++) {
-        const low = Module.HEAPU32[startu + (i * 2) + 0];
-        const high = Module.HEAPU32[startu + (i * 2) + 1];
+        const low = this.Module.HEAPU32[startu + (i * 2) + 0];
+        const high = this.Module.HEAPU32[startu + (i * 2) + 1];
         ranges.push([low, high]);
       }
       // TODO-LDML: no free??
@@ -276,6 +285,7 @@ function getUnicodeSetError(rc: number) : CompilerEvent  {
     case KMCMP_FATAL_OUT_OF_RANGE:
       return CompilerMessages.Fatal_UnicodeSetOutOfRange();
     default:
+      /* c8 ignore next */
       return CompilerMessages.Fatal_UnexpectedException({e: `Unexpected UnicodeSet error code ${rc}`});
   }
 }

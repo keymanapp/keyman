@@ -4,7 +4,13 @@
     "id": "test_chirality",
     "name": "KeymanWeb Chirality Tester",
     "filename": "resources/keyboards/test_chirality.js",
-    "languages": {}
+    "languages": [
+      {
+        "id": "en",
+        "name": "English",
+        "region": "World"
+      }
+    ]
   },
   "inputTestSets": [
     {

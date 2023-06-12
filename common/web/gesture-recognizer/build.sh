@@ -1,10 +1,4 @@
 #!/usr/bin/env bash
-#
-# Builds the include script for the current Keyman version.
-#
-
-# Exit on command failure and when using unset variables:
-set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -26,7 +20,7 @@ builder_describe "Builds the gesture-recognition model for Web-based on-screen k
   "test" \
   ":module" \
   ":tools  tools for testing & developing test resources for this module" \
-  "--ci    sets the --ci option for child scripts (i.e, the `test` action)"
+  "--ci    sets the --ci option for child scripts (i.e, the $(builder_term test) action)"
 
 builder_describe_outputs \
   configure:module /node_modules \
@@ -71,5 +65,5 @@ if builder_start_action test:module; then
 fi
 
 if builder_has_action test:tools && ! builder_has_action test:module; then
-  echo "The ${BUILDER_TERM_START}test:tools${BUILDER_TERM_END} action is currently a no-op."
+  echo "The $(builder_term test:tools) action is currently a no-op."
 fi

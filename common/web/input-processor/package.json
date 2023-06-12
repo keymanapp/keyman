@@ -38,5 +38,20 @@
     "@keymanapp/keyman-version": "*",
     "@keymanapp/web-utils": "*",
     "eventemitter3": "^4.0.0"
+  },
+  "type": "module",
+  "imports": {
+    "#./*.js": "./build/obj/*.js"
+  },
+  "main": "./build/obj/index.js",
+  "types": "./build/obj/index.d.ts",
+  "exports": {
+    ".": "./build/obj/index.js",
+    "./lib": {
+      "types": "./build/lib/index.d.ts",
+      "import": "./build/lib/index.mjs",
+      "require": "./build/lib/index.cjs"
+    },
+    "./obj/*.js": "./build/obj/*.js"
   }
 }

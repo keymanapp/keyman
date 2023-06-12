@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 #
 # Compile KeymanWeb's dev & test tool modules
-#
-set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -25,7 +23,7 @@ builder_describe "Builds the sourcemap-sanitizing script used for Keyman Engine 
 
 builder_describe_outputs \
   configure                   /node_modules \
-  build                       /web/build/tools/sourcemap-root/index.js
+  build                       /web/build/tools/building/sourcemap-root/index.js
 
 builder_parse "$@"
 

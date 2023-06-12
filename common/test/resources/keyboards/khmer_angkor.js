@@ -6,8 +6,8 @@ KeymanWeb.KR(new Keyboard_khmer_angkor());
 }
 function Keyboard_khmer_angkor()
 {
-  var modCodes = com.keyman.text.Codes.modifierCodes;
-  var keyCodes = com.keyman.text.Codes.keyCodes;
+  var modCodes = keyman.osk.modifierCodes;
+  var keyCodes = keyman.osk.keyCodes;
 
   this.KI="Keyboard_khmer_angkor";
   this.KN="Khmer Angkor";
@@ -2804,7 +2804,7 @@ function Keyboard_khmer_angkor()
       k.KO(-1,t,"»");
     }
     if(m) {
-    
+
       k.KDC(-1,t);
       r=this.g_normalise(t,e);
     }

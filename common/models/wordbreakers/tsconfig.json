@@ -2,14 +2,21 @@
   "extends": "../../../tsconfig-base.json",
 
   "compilerOptions": {
-    "module": "none",
+    "module": "es6",
     "lib": ["es6"],
     "target": "es5",
+    "moduleResolution": "Node16",
     "declaration": true,
     "sourceMap": true,
-    "outFile": "./build/index.js",
+    "importHelpers": true,
+    "inlineSources": true,
+    "sourceRoot": "/common/models/wordbreakers/src",
     "strict": true,
     "allowJs": false,
+    "baseUrl": "./",
+    "outDir": "build/obj",
+    "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
   },
   "references": [
     { "path": "../types" }

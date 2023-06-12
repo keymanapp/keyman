@@ -22,28 +22,21 @@ cd "$(dirname "$THIS_SCRIPT")"
 
 ################################ Main script ################################
 
-# TODO: once these modules are builder-based, reference here too:
-#  "@../models/templates" \
-#  "@../models/types" \
-#  "@../models/wordbreakers"
+#  "@../models/types" \ # is just a .d.ts, so there's nothing to actually BUILD.
 
 builder_describe "Builds the lm-layer module" \
   "@/common/web/keyman-version" \
+  "@/common/web/tslib" \
   "@/common/web/lm-worker" \
   "clean" \
   "configure" \
   "build" \
   "test" \
-  ":headless   A headless, Node-oriented version of the module useful for unit tests" \
-  ":browser    The standard version of the module for in-browser use" \
   "--ci        Sets $(builder_term test) action to use CI-based test configurations & reporting"
 
 builder_describe_outputs \
-  configure           /node_modules \
-  configure:headless  /node_modules \
-  configure:browser   /node_modules \
-  build:headless      /common/predictive-text/build/headless.js \
-  build:browser       /common/predictive-text/build/index.js
+  configure  /node_modules \
+  build      /common/predictive-text/build/lib/web/index.mjs # is built by the final step.
 
 builder_parse "$@"
 
@@ -63,18 +56,14 @@ fi
 
 ### BUILD ACTIONS
 
-# Builds the top-level JavaScript file for use in browsers
-if builder_start_action build:browser; then
-  npm run tsc -- -b ./browser.tsconfig.json
-
-  builder_finish_action success build:browser
-fi
-
 # Builds the top-level JavaScript file for use on Node
-if builder_start_action build:headless; then
-  npm run tsc -- -b ./tsconfig.json
+if builder_start_action build; then
+  npm run tsc -- -b ./tsconfig.all.json
 
-  builder_finish_action success build:headless
+  # esbuild-bundled products at this level are not intended to be used for anything but testing.
+  node build-bundler.js
+
+  builder_finish_action success build
 fi
 
 ### TEST ACTIONS
@@ -86,16 +75,10 @@ if builder_has_option --ci; then
   TEST_OPTIONS=--ci
 fi
 
-if builder_start_action test:headless; then
+if builder_start_action test; then
   # We'll test the included libraries here for now, at least until we have
   # converted their builds to builder scripts
-  ./unit_tests/test.sh test:libraries test:headless $TEST_OPTIONS
+  ./unit_tests/test.sh test:libraries test:headless test:browser $TEST_OPTIONS
 
-  builder_finish_action success test:headless
-fi
-
-if builder_start_action test:browser; then
-  ./unit_tests/test.sh test:browser $TEST_OPTIONS
-
-  builder_finish_action success test:browser
+  builder_finish_action success test
 fi

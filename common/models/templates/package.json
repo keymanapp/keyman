@@ -16,8 +16,19 @@
   ],
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "license": "MIT",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "./build/obj/index.js",
+  "types": "./build/obj/index.d.ts",
+  "exports": {
+    ".": "./build/obj/index.js",
+    "./lib": {
+      "types": "./build/lib/index.d.ts",
+      "import": "./build/lib/index.mjs",
+      "require": "./build/lib/index.cjs"
+    },
+    "./obj/*.js": "./build/obj/*.js"
+  },
+
+  "type": "module",
   "directories": {
     "test": "test"
   },
@@ -32,8 +43,9 @@
     "url": "git+https://github.com/keymanapp/keyman.git"
   },
   "scripts": {
-    "build": "tsc",
-    "pretest": "tsc -b tsconfig.bundled.json",
+    "build": "gosh ./build.sh",
+    "tsc": "tsc",
+    "mocha": "mocha",
     "test": "mocha -r test/helpers.js"
   },
   "bugs": {
@@ -47,9 +59,13 @@
     "@types/node": "^14.0.4",
     "chai": "^4.3.4",
     "mocha": "^10.0.0",
+    "mocha-teamcity-reporter": "^4.0.0",
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "@keymanapp/models-wordbreakers": "*"
+    "@keymanapp/keyman-version": "*",
+    "@keymanapp/models-types": "*",
+    "@keymanapp/models-wordbreakers": "*",
+    "@keymanapp/resources-gosh": "*"
   }
 }

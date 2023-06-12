@@ -20,6 +20,8 @@ cd "$THIS_SCRIPT_PATH"
 ################################ Main script ################################
 
 builder_describe \
+  "@/web/src/app/browser build" \
+  "@/web/src/app/ui build" \
   "Build the bulk renderer project. The bulk renderer loads all the cloud keyboards from api.keyman.com and renders each of them to a document." \
   "clean" \
   "configure     runs 'npm ci' on root folder" \
@@ -27,7 +29,7 @@ builder_describe \
 
 builder_describe_outputs \
   configure  /node_modules \
-  build      /web/build/tools/testing/bulk_rendering/bulk_render.js
+  build      /web/build/tools/testing/bulk_rendering/lib/bulk_render.js
 
 builder_parse "$@"
 
@@ -43,5 +45,6 @@ fi
 
 if builder_start_action build; then
   tsc --build "$THIS_SCRIPT_PATH/tsconfig.json" $builder_verbose
+  node build-bundler.js
   builder_finish_action success build
 fi

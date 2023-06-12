@@ -30,7 +30,7 @@ builder_describe "Builds the standalone, headless form of Keyman Engine for Web'
 
 builder_describe_outputs \
   configure          /node_modules \
-  build              /common/web/input-processor/build/index.js
+  build              /common/web/input-processor/build/lib/index.mjs \
 
 builder_parse "$@"
 
@@ -51,7 +51,12 @@ fi
 ### BUILD ACTIONS
 
 if builder_start_action build; then
-  tsc --build src/tsconfig.json
+  tsc -b ./tsconfig.json
+  node build-bundler.js
+
+  # Declaration bundling.
+  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+
   builder_finish_action success build
 fi
 
@@ -62,9 +67,6 @@ if builder_start_action test; then
   if builder_has_option --ci; then
     FLAGS="--reporter mocha-teamcity-reporter"
   fi
-
-  # Build the leaf-style, bundled version of input-processor for use in testing.
-  tsc -b src/tsconfig.bundled.json
 
   mocha --recursive $FLAGS ./tests/cases/
 
