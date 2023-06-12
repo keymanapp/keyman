@@ -98,16 +98,103 @@ type
 
     FShowErrors: Boolean;
     FDownload: TOnlineUpdateCheckDownloadParams;
+    {
+      Sets the download path and then calls the DoDownloadUpdates function. If
+      the user confirms the download (by clicking OK), the downloaded files are
+      marked to be deleted on the next system reboot. If the user cancels the
+      download, the downloaded files are deleted immediately.
 
+      @return  True  if the download was successful and the user confirmed,
+                False if the user canceled the download.
+    }
     function DownloadUpdates: Boolean;
+    {
+      Downloads updates by performing file downloads one by one, while keeping
+      track of the download progress. This function is called by passing an
+      instance of TfrmDownloadProgress as the AOwner parameter.
+
+      @params  AOwner  The owner form that initiates the download process.
+               Result  A Boolean value indicating the overall result of the
+               download process.
+
+      Notes:
+      - The function handles file downloads sequentially, one after another.
+      - In case of a download failure, a dialog is displayed to prompt the user
+        about continuing with other updates.
+      - The function assumes that the necessary download URLs and file paths
+        have been properly set before invoking this function.
+    }
     procedure DoDownloadUpdates(AOwner: TfrmDownloadProgress; var Result: Boolean);
+    {
+      Performs updates download in the background, without displaying a GUI
+      progress bar. This function is similar to DownloadUpdates, but it runs in
+      the background.
+
+      @returns  True  if all updates were successfully downloaded, False if any
+      download failed.
+    }
+
+    function DownloadUpdatesBackground: Boolean;
+    {
+      Performs updates download in the background, without displaying a GUI
+      progress bar. This procedure is similar to DownloadUpdates, but it runs in
+      the background.
+
+      @params  SavePath  The path where the downloaded files will be saved.
+               Result    A Boolean value indicating the overall result of the
+               download process.
+    }
+    procedure DoDownloadUpdatesBackground(SavePath: string; var Result: Boolean);
+    {
+      Performs an online update check, including package retrieval and version
+      query.
+
+      This function checks if a week has passed since the last update check. It
+      utilizes the kmcom API to retrieve the current packages. The function then
+      performs an HTTP request to query the remote versions of these packages.
+      The resulting information is stored in the FParams variable. Additionally,
+      the function handles the main Keyman install package.
+
+      @returns  A TOnlineUpdateCheckResult indicating the result of the update
+      check.
+    }
     function DoRun: TOnlineUpdateCheckResult;
+    {
+      Displays the Update form, which allows selection of updates to be manual
+      downloaded.
+
+      This procedure shows the Update form, which contains controls for
+      downloading and performing updates. If elevation of permissions is
+      required for certain operations, it will be handled internally. If the
+      user does not have administrative permissions, a dialog will be raised to
+      inform them to use an account with administration privileges.
+    }
     procedure ShowUpdateForm;
     procedure ShutDown;
+    { Works out the status of the downloaded }
     procedure DownloadUpdatesHTTPStatus(Sender: THTTPUploader;
       const Message: string; Position, Total: Int64); // I2855
+    {
+      Installs the packages using the kmcom API and deletes the package from the
+      specified SavePath. This procedure utilizes the kmcom API to install the
+      packages.
+    }
     procedure DoInstallKeyman;
+    {
+      Installs the Keyman file using either msiexec.exe or the setup launched in
+      a separate shell.
+
+      @params  Package  The package to be installed.
+
+      @returns True  if the installation is successful, False otherwise.
+    }
     function DoInstallPackage(Package: TOnlineUpdateCheckParamsPackage): Boolean;
+    {
+      SavePackageUpgradesToDownloadTempPath saves any new package IDs to a
+      single file in the download tempPath. This procedure saves the IDs of any
+      new packages to a file named "upgrade_packages.inf" in the download
+      tempPath.
+    }
     procedure SavePackageUpgradesToDownloadTempPath;
   public
 
@@ -136,6 +223,7 @@ procedure OnlineUpdateAdmin(OwnerForm: TCustomForm; Path: string);
 implementation
 
 uses
+  Winapi.Shlobj,
   System.WideStrUtils,
   Vcl.Dialogs,
   Winapi.ShellApi,
@@ -198,6 +286,7 @@ function TOnlineUpdateCheck.Run: TOnlineUpdateCheckResult;
 begin
   Result := DoRun;
 
+  DownloadUpdatesBackground;
   if Result in [oucShutDown, oucSuccess] then
   begin
     kmcom.Keyboards.Refresh;
@@ -338,6 +427,129 @@ begin
     then RemoveDir(ExcludeTrailingPathDelimiter(DownloadTempPath))
     else DeleteFileOnReboot(ExcludeTrailingPathDelimiter(DownloadTempPath));
 end;
+
+
+procedure TOnlineUpdateCheck.DoDownloadUpdatesBackground(SavePath: string; var Result: Boolean);
+var
+  i: Integer;
+
+    function DownloadFile(const url, savepath: string): Boolean;
+    begin
+      Result := False;
+      with THttpUploader.Create(nil) do
+      try
+        Proxy.Server := GetProxySettings.Server;
+        Proxy.Port := GetProxySettings.Port;
+        Proxy.Username := GetProxySettings.Username;
+        Proxy.Password := GetProxySettings.Password;
+        Request.Agent := API_UserAgent;
+
+        Request.SetURL(url);
+        Upload;
+        if Response.StatusCode = 200 then
+        begin
+          with TFileStream.Create(savepath, fmCreate) do
+          try
+            Write(Response.PMessageBody^, Response.MessageBodyLength);
+          finally
+            Free;
+          end;
+          Result := True;
+        end
+        else // I2742
+          // If it fails we set to false but will try the other files
+          Result := False;
+          Exit;
+      finally
+        Free;
+      end;
+    end;
+
+
+begin
+  Result := False;
+  try
+    FDownload.TotalSize := 0;
+    FDownload.TotalDownloads := 0;
+
+    for i := 0 to High(FParams.Packages) do
+      if FParams.Packages[i].Install then
+      begin
+        Inc(FDownload.TotalDownloads);
+        Inc(FDownload.TotalSize, FParams.Packages[i].DownloadSize);
+
+        FParams.Packages[i].SavePath := SavePath + FParams.Packages[i].FileName;
+      end;
+
+    if FParams.Keyman.Install then
+    begin
+      Inc(FDownload.TotalDownloads);
+      Inc(FDownload.TotalSize, FParams.Keyman.DownloadSize);
+      FParams.Keyman.SavePath := SavePath + FParams.Keyman.FileName;
+    end;
+
+    FDownload.StartPosition := 0;
+    for i := 0 to High(FParams.Packages) do
+      if FParams.Packages[i].Install then
+      begin
+        if not DownloadFile(FParams.Packages[i].DownloadURL, FParams.Packages[i].SavePath) then // I2742
+        begin
+          FParams.Packages[i].Install := False; // Download failed but install other files
+        end;
+        FDownload.StartPosition := FDownload.StartPosition + FParams.Packages[i].DownloadSize;
+      end;
+
+    if FParams.Keyman.Install then
+      if not DownloadFile(FParams.Keyman.DownloadURL, FParams.Keyman.SavePath) then  // I2742
+      begin
+        FParams.Keyman.Install := False;  // Download failed but user wants to install other files
+      end;
+    Result := True;
+  except
+    on E:EHTTPUploader do
+    begin
+      if (E.ErrorCode = 12007) or (E.ErrorCode = 12029)
+        then KL.Log(S_OnlineUpdate_UnableToContact)
+        else KL.Log(WideFormat(S_OnlineUpdate_UnableToContact_Error, [E.Message]));
+      Result := False;
+    end;
+  end;
+end;
+
+function TOnlineUpdateCheck.DownloadUpdatesBackground: Boolean;
+var
+  i: Integer;
+  DownloadBackGroundSavePath : String;
+  DownloadResult : Boolean;
+begin
+  //DownloadTempPath := IncludeTrailingPathDelimiter(CreateTempPath);
+  DownloadBackGroundSavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
+  //DownloadBackGroundSavePath :=  DownloadBackGroundSavePath + 'RCTest.txt';
+  { For now lets download all the updates. We need to take these from the user via check box form }
+
+  if FParams.Keyman.DownloadURL <> '' then
+    FParams.Keyman.Install := True;
+
+  for i := 0 to High(FParams.Packages) do
+    FParams.Packages[i].Install := True;
+
+  // Download files
+  DoDownloadUpdatesBackground(DownloadBackGroundSavePath, DownloadResult);
+  KL.Log('TOnlineUpdateCheck.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
+  ShowMessage('TOnlineUpdateCheck.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
+  // Set registry keys
+  with TRegistryErrorControlled.Create do  // I2890
+  try
+    if OpenKey(SRegKey_KeymanEngine_LM, True) then
+      WriteString(SRegValue_Install_Update, BoolToStr(True));
+  finally
+    Free;
+  end;
+  Result := DownloadResult;
+end;
+
+
+
 
 function TOnlineUpdateCheck.DoInstallPackage(Package: TOnlineUpdateCheckParamsPackage): Boolean;
 var
@@ -494,40 +706,42 @@ begin
     end;
 
   { Verify that it has been at least 7 days since last update check - only if FSilent = TRUE }
-  try
-    with TRegistryErrorControlled.Create do  // I2890
-    try
-      if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
-      begin
-        if ValueExists(SRegValue_CheckForUpdates) and not ReadBool(SRegValue_CheckForUpdates) and not FForce then
-        begin
-          Result := oucNoUpdates;
-          Exit;
-        end;
-        if ValueExists(SRegValue_LastUpdateCheckTime) and (Now - ReadDateTime(SRegValue_LastUpdateCheckTime) < 7) and FSilent and not FForce then
-        begin
-          Result := oucNoUpdates;
-          Exit;
-        end;
+ // TODO: OU This is just commented out to by pass the 7 day check for testing.
 
-        {if ValueExists(SRegValue_UpdateCheck_UseProxy) and ReadBool(SRegValue_UpdateCheck_UseProxy) then
-        begin
-          FProxyHost := ReadString(SRegValue_UpdateCheck_ProxyHost);
-          FProxyPort := StrToIntDef(ReadString(SRegValue_UpdateCheck_ProxyPort), 80);
-        end;}
-      end;
-    finally
-      Free;
-    end;
-  except
-    { we will not run the check if an error occurs reading the settings }
-    on E:Exception do
-    begin
-      Result := oucFailure;
-      FErrorMessage := E.Message;
-      Exit;
-    end;
-  end;
+//  try
+//    with TRegistryErrorControlled.Create do  // I2890
+//    try
+//      if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
+//      begin
+//        if ValueExists(SRegValue_CheckForUpdates) and not ReadBool(SRegValue_CheckForUpdates) and not FForce then
+//        begin
+//          Result := oucNoUpdates;
+//          Exit;
+//        end;
+//        if ValueExists(SRegValue_LastUpdateCheckTime) and (Now - ReadDateTime(SRegValue_LastUpdateCheckTime) < 7) and FSilent and not FForce then
+//        begin
+//          Result := oucNoUpdates;
+//          Exit;
+//        end;
+//
+//        {if ValueExists(SRegValue_UpdateCheck_UseProxy) and ReadBool(SRegValue_UpdateCheck_UseProxy) then
+//        begin
+//          FProxyHost := ReadString(SRegValue_UpdateCheck_ProxyHost);
+//          FProxyPort := StrToIntDef(ReadString(SRegValue_UpdateCheck_ProxyPort), 80);
+//        end;}
+//      end;
+//    finally
+//      Free;
+//    end;
+//  except
+//    { we will not run the check if an error occurs reading the settings }
+//    on E:Exception do
+//    begin
+//      Result := oucFailure;
+//      FErrorMessage := E.Message;
+//      Exit;
+//    end;
+//  end;
 
   Result := oucNoUpdates;
 
@@ -604,6 +818,7 @@ begin
                 FParams.Keyman.FileName := ucr.FileName;
               end;
           end;
+          { TODO: OU instead of showing a form to update it just has to go and download }
 
           if (Length(FParams.Packages) > 0) or (FParams.Keyman.DownloadURL <> '') then
           begin

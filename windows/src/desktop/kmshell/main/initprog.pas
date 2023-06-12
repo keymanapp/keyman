@@ -75,7 +75,7 @@ procedure Main(Owner: TComponent = nil);
 
 type
     TKMShellMode = (fmUndefined, fmInstall, fmView, fmUninstall, fmAbout,
-                    fmUninstallKeyboard,
+                    fmInstallBackground, fmUninstallKeyboard,
                     fmInstallTipsForPackages, fmInstallKeyboardLanguage, fmRegisterTip, fmInstallTip, fmUninstallKeyboardLanguage,   // I3624
                     fmUninstallPackage, fmRegistryAdd, fmRegistryRemove,
                     fmMain, fmHelp, fmHelpKMShell,
@@ -103,9 +103,11 @@ var
 implementation
 
 uses
+  Winapi.Shlobj,
   custinterfaces,
   DebugPaths,
   Dialogs,
+  utilexecute,
   GetOsVersion,
   help,
   HTMLHelpViewer,
@@ -141,6 +143,8 @@ uses
   UpgradeMnemonicLayout,
   utilfocusappwnd,
   utilkmshell,
+  utildir,
+  System.Types,
 
   KeyboardTIPCheck,
 
@@ -155,6 +159,15 @@ uses
 function FirstRun(FQuery, FDisablePackages, FDefaultUILanguage: string): Boolean; forward;  // I2562
 procedure ShowKeyboardWelcome(PackageName: WideString); forward;  // I2569
 procedure PrintKeyboard(KeyboardName: WideString); forward;  // I2329
+{
+  Calls the Windows shell to execute the file passed in `SavePath`
+  @param  SavePath  The full path file name to be open by the shell
+}
+procedure ExecuteInstall(SavePath: String); forward;
+{
+  Starts the install of the cached files
+}
+procedure BackgroundInstall; forward;
 
 procedure Main(Owner: TComponent = nil);
 var
@@ -229,7 +242,7 @@ begin
       else if s = '-m' then   FMode := fmMigrate
       else if s = '-i' then   FMode := fmInstall
       else if s = '-ikl' then FMode := fmInstallKeyboardLanguage   // I3624
-
+      else if s = '-background-update' then FMode := fmInstallBackground
       else if s = '-register-tip' then FMode := fmRegisterTip
       else if s = '-install-tip' then FMode := fmInstallTip
       else if s = '-install-tips-for-packages' then FMode := fmInstallTipsForPackages
@@ -426,6 +439,11 @@ begin
   begin
     ShowMessage(MsgFromId(SKOSNotSupported));
     Exit;
+  end;
+
+  if (FMode = fmInstallBackground) then
+  begin
+    BackgroundInstall();
   end;
 
   if not FSilent or (FMode = fmUpgradeMnemonicLayout) then   // I4553
@@ -648,5 +666,75 @@ begin
     end;
 end;
 
-end.
+procedure ExecuteInstall(SavePath: String);
+var
+  s: string;
+  FResult: Boolean;
+begin
+  s := LowerCase(ExtractFileExt(SavePath));
+  if s = '.msp' then
+    FResult := TUtilExecute.Shell(0, 'msiexec.exe', '', '/qb /p "'+SavePath+'" AUTOLAUNCHPRODUCT=1')  // I3349
+  else if s = '.msi' then
+    FResult := TUtilExecute.Shell(0, 'msiexec.exe', '', '/qb /i "'+SavePath+'" AUTOLAUNCHPRODUCT=1')  // I3349
+  else if s = '.exe' then
+    FResult := TUtilExecute.Shell(0, SavePath, '', '-au')  // I3349
+  else
+    Exit;
+  if not FResult then
+    KL.Log(SysErrorMessage(GetLastError));
+end;
 
+procedure BackgroundInstall;  // I2329
+var
+  Update : Boolean;
+  SavePath: String;
+  fileExt : String;
+  fileName: String;
+  fileNames: TStringDynArray;
+begin
+// check the registry value
+  Update := False;
+  with TRegistryErrorControlled.Create do  // I2890
+  try
+    RootKey := HKEY_LOCAL_MACHINE;
+    if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_Install_Update) then
+        Update := StrToBool(ReadString(SRegValue_Install_Update));
+    finally
+      Free;
+  end;
+  if Update then
+  begin
+      SavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
+      GetFileNamesInDirectory(SavePath, fileNames);
+      // for now we only want the exe all though excute install can
+      // handle msi and msp
+      for fileName in fileNames do
+      begin
+        fileExt := LowerCase(ExtractFileExt(fileName));
+        if fileExt = '.exe' then
+          break;
+      end;
+      // make sure keyman hasn't started
+      try
+        if kmcom.Control.IsKeymanRunning then
+        try
+          kmcom.Control.StopKeyman;
+        except
+          on E:Exception do
+          begin
+            KL.Log(E.Message);
+            Exit;
+          end;
+        end;
+      except
+        on E:Exception do
+        begin
+          KL.Log(E.Message);
+          Exit;
+        end;
+      end;
+      ExecuteInstall(SavePath + ExtractFileName(fileName));
+   end;
+end;
+
+end.
