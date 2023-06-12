@@ -39,13 +39,17 @@ function copy_schema() {
 
 function do_build() {
   copy_schema
-  npm run build
+  tsc --build
 }
 
 function do_test() {
-  # TODO: add c8 for coverage
   copy_schema
-  npm test
+  eslint .
+  cd test
+  tsc --build
+  cd ..
+  # TODO: add c8 for coverage
+  mocha
 }
 
 function do_publish() {

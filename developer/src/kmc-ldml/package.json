@@ -26,6 +26,7 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "dependencies": {
+    "@keymanapp/kmc-kmn": "*",
     "@keymanapp/keyman-version": "*",
     "@keymanapp/ldml-keyboard-constants": "*",
     "ajv": "^8.11.0",

@@ -2,7 +2,7 @@ import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus } from '@keymanapp/common-types';
 import { SectionCompiler } from "./section-compiler.js";
 
-import GlobalSections = KMXPlus.GlobalSections;
+import DependencySections = KMXPlus.DependencySections;
 import Name = KMXPlus.Name;
 
 export class NameCompiler extends SectionCompiler {
@@ -17,7 +17,7 @@ export class NameCompiler extends SectionCompiler {
     return valid;
   }
 
-  public compile(sections: GlobalSections): Name {
+  public compile(sections: DependencySections): Name {
     let result = new Name();
     result.names = this.keyboard.names?.name?.map(v => sections.strs.allocString(v.value)) ?? [];
     return result;

@@ -24,14 +24,14 @@ export class ElemElement {
 ;
 
 export class ElementString extends Array<ElemElement> {
-  constructor(strs: Strs, source: string, order?: string, tertiary?: string, tertiary_base?: string, prebase?: string) {
+  constructor(strs: Strs, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string) {
     super();
     //TODO-LDML: full UnicodeSet and parsing
     if(!source) {
       return;
     }
 
-    let items = source.split("");
+    let items = Array.isArray(source) ? source : source.split("");
 
     let orders: Array<string> = order ? order.split(" ") : [];
     if(orders.length == 1) {
