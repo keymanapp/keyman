@@ -63,6 +63,10 @@ const commonConfig = {
   },
   outfile: '../../../build/app/browser/debug/keymanweb.js',
   plugins: [ es5ClassAnnotationAsPurePlugin ],
+  // `esbuild`'s sourcemap output puts relative paths to the original sources from the
+  // directory of the build output.  The following keeps repo structure intact and
+  // puts our code under a common 'namespace' of sorts.
+  sourceRoot: '@keymanapp/keyman/web/build/app/browser/debug/',
   target: "es5",
   treeShaking: true,
   tsconfig: './tsconfig.json'

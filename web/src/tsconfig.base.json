@@ -8,6 +8,7 @@
     "sourceMap": true,
     "target": "es5",
     "types": ["node"],
-    "lib": ["es6", "dom"]
+    "lib": ["es6", "dom"],
+    "rootDir": "./src"
   }
 }
