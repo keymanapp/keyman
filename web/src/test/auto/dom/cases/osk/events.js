@@ -59,25 +59,21 @@ describe('OSK events', function () {
     // Setup complete.
 
     // Hide the OSK + check for related event
-    let hideStub = sinon.fake();
     let legacyHideStub = sinon.fake();
-    osk.once('onhide', hideStub);
     osk.legacyEvents.addEventListener('hide', legacyHideStub);
 
     osk.activationModel.enabled = false;
-    assert.isTrue(hideStub.calledOnce);
     assert.isTrue(legacyHideStub.calledOnce);
 
+    // The hide actually occurs on a Promise's completion.
+    // Adding the 'await' makes this clearer during test maintenance.
+    await Promise.resolve();
+
     // Show the OSK + check for related event
-    let showStub = sinon.fake();
-    // let legacyShowStub = sinon.fake();
-    osk.once('onshow', showStub);
-    // osk.once('legacyevent', legacyShowStub);
+    let legacyShowStub = sinon.fake();
+    osk.legacyEvents.addEventListener('show', legacyShowStub);
 
     osk.activationModel.enabled = true;
-    assert.isTrue(showStub.calledOnce);
-    // // Only called (at present) for "Floating" OSK views, given the event's parameterization.
-    // assert.isTrue(legacyShowStub.calledOnce);
-    // assert.equal(legacyShowStub.firstCall.args[0], 'osk.show');
+    assert.isTrue(legacyShowStub.calledOnce);
   });
 });

@@ -21,7 +21,7 @@ import {
   type SystemStoreMutationHandler
 } from '@keymanapp/keyboard-processor';
 import { createUnselectableElement, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
-import { LegacyEventEmitter } from 'keyman/engine/events';
+import { EventListener, EventNames, LegacyEventEmitter } from 'keyman/engine/events';
 
 import Configuration from '../config/viewConfiguration.js';
 import Activator, { StaticActivator } from './activator.js';
@@ -49,7 +49,9 @@ export interface LegacyOSKEventMap {
   'helpclick'(obj: {});
   'resizemove'(obj: {});
   'show'(obj: {});
-  'hide'(obj: {});
+  'hide'(obj: {
+    HiddenByUser: boolean
+  });
 }
 
 /**
@@ -66,10 +68,6 @@ export interface EventMap {
    */
   'keyEvent': (event: KeyEvent) => void,
 
-  onshow(): void;
-
-  onhide(hiddenByUser: boolean): void;
-
   /**
    * Indicates that the globe key has either been pressed (`on` == `true`)
    * or released (`on` == `false`).
@@ -82,23 +80,13 @@ export interface EventMap {
   hideRequested: (key: KeyElement) => void;
 
   /**
-   * This event is raised when the OSK's 'config' button is clicked.
-   * Adding a listener for the event will cause the 'config' button to be displayed for
-   * FloatingOSKView instances.
-   */
-  showConfig: () => void;
-
-  /**
-   * This event is raised when the OSK's 'help' button is clicked.
-   * Adding a listener for the event will cause the 'help' button to be displayed for
-   * FloatingOSKView instances.
-   */
-  showHelp: () => void;
-
-  /**
    * Signals the special command to display the engine's version + build number.
    */
   showBuild: () => void;
+
+  // While the next two are near-duplicates of the legacy event `resizemove`, these
+  // have the advantage of providing a Promise for the end of the ongoing user
+  // interaction.  We need that Promise for focus-management.
 
   /**
    * Signals that the OSK is being moved by the user via a drag operation.
@@ -116,7 +104,6 @@ export interface EventMap {
    * The provided Promise will resolve once the resize operation is complete.
    */
   resizeMove: (promise: Promise<void>) => void;
-
 
   /**
    * Signals that either the mouse or an active touchpoint is interacting with the OSK.
@@ -918,9 +905,8 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
 
     this.setDisplayPositioning();
 
-    // Do this once all properties are set; that way, consumers can safely poll
-    // for position, size, etc.
-    this.emit('onshow');
+    // Each subclass is responsible for raising the 'show' event on its own, since
+    // certain ones supply extra information in their event param object.
   }
 
   /**
@@ -1241,10 +1227,9 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
    *
    */
   doHide(hiddenByUser: boolean) {
-    this.emit('onhide', hiddenByUser);
-
-    const p={};
-    p['HiddenByUser']=hiddenByUser;
+    const p={
+      HiddenByUser: hiddenByUser
+    };
     this.legacyEvents.callEvent('hide', p);
   }
 
@@ -1256,11 +1241,17 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
    * @return      {boolean}
    * Description  Wrapper function to add and identify OSK-specific event handlers
    */
-  addEventListener<T extends keyof LegacyOSKEventMap>(event: T, fn: (arg: {}) => any): void {
+  addEventListener<T extends keyof LegacyOSKEventMap>(
+    event: T,
+    fn: EventListener<LegacyOSKEventMap, T>
+  ): void {
     this.legacyEvents.addEventListener(event, fn);
   }
 
-  removeEventListener<T extends keyof LegacyOSKEventMap>(event: T, fn: (arg: {}) => any): void {
+  removeEventListener<T extends keyof LegacyOSKEventMap>(
+    event: T,
+    fn: EventListener<LegacyOSKEventMap, T>
+  ): void {
     this.legacyEvents.removeEventListener(event, fn);
   }
 }
