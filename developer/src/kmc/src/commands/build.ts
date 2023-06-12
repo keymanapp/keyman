@@ -33,7 +33,7 @@ export function declareBuild(program: Command) {
 }
 
 async function build(filename: string, options: BuildActivityOptions): Promise<boolean> {
-  let callbacks = new NodeCompilerCallbacks();
+  let callbacks = new NodeCompilerCallbacks({logLevel: options.logLevel});
 
   try {
     callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename}));

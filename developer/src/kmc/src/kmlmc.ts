@@ -28,7 +28,7 @@ if (!inputFilename) {
   exitDueToUsageError('Must provide a lexical model source file.');
 }
 
-const callbacks = new NodeCompilerCallbacks();
+const callbacks = new NodeCompilerCallbacks({logLevel: 'info'});
 
 let code = null;
 // Compile:

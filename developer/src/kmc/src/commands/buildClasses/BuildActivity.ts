@@ -1,12 +1,14 @@
-import { CompilerCallbacks } from "@keymanapp/common-types";
+import { CompilerCallbacks, CompilerLogLevel } from "@keymanapp/common-types";
 import { escapeRegExp } from "../../util/escapeRegExp.js";
 
+// TODO: Consolidate with CompilerOptions, KmnCompilerOptions, etc.
 export interface BuildActivityOptions {
   debug?: boolean;
   outFile?: string;
   compilerVersion?: boolean;
   warnDeprecatedCode?: boolean;
   compilerWarningsAsErrors?: boolean;
+  logLevel: CompilerLogLevel;
 };
 
 export abstract class BuildActivity {

@@ -12,6 +12,8 @@
 
     { "path": "./developer/src/kmc/tsconfig.json" },
 
+    // { "path": "./developer/src/kmc-analyze/test/tsconfig.json" },
+    { "path": "./developer/src/kmc-analyze/tsconfig.json" },
     { "path": "./developer/src/kmc-kmn/test/tsconfig.json" },
     { "path": "./developer/src/kmc-kmn/tsconfig.json" },
     { "path": "./developer/src/kmc-kmw/test/tsconfig.json" },
