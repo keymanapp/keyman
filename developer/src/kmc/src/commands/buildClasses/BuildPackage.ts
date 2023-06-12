@@ -5,8 +5,8 @@ import { KmpCompiler, PackageValidation } from '@keymanapp/kmc-package';
 
 export class BuildPackage extends BuildActivity {
   public get name(): string { return 'Package'; }
-  public get sourceExtension(): KeymanFileTypes.Source { return '.kps'; }
-  public get compiledExtension(): KeymanFileTypes.Binary { return '.kmp'; }
+  public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.Package; }
+  public get compiledExtension(): KeymanFileTypes.Binary { return KeymanFileTypes.Binary.Package; }
   public get description(): string  { return 'Build a Keyman package'; }
   public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
 

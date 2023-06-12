@@ -2,8 +2,6 @@ import { KmpJsonFile, CompilerCallbacks } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
 import { keymanEngineForWindowsFiles, keymanForWindowsInstallerFiles, keymanForWindowsRedistFiles } from './redist-files.js';
 
-// const SLexicalModelExtension = '.model.js';
-
 // The keyboard ID SHOULD adhere to this pattern:
 const KEYBOARD_ID_PATTERN_PACKAGE = /^[a-z_][a-z0-9_]*\.(kps|kmp)$/;
 

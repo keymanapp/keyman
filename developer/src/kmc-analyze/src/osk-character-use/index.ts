@@ -21,22 +21,22 @@ export class AnalyzeOskCharacterUse {
       // TODO: refactor with helper function for file and folder types
       // See kmc for another instance
       switch(KeymanFileTypes.sourceTypeFromFilename(file)) {
-        case '.kvks':
+        case KeymanFileTypes.Source.VisualKeyboard:
           this.addStrings(this.scanVisualKeyboard(file));
           break;
-        case '.keyman-touch-layout':
+        case KeymanFileTypes.Source.TouchLayout:
           this.addStrings(this.scanTouchLayout(file));
           break;
-        case '.kpj':
+        case KeymanFileTypes.Source.Project:
           await this.analyzeProject(file);
           break;
-        case '.kmn':
+        case KeymanFileTypes.Source.KeymanKeyboard:
           // The cleanest way to do this is to compile the .kmn to find the .kvks
           // and .keyman-touch-layout from the &VISUALKEYBOARD and &LAYOUTFILE
           // system stores
           await this.analyzeKmnKeyboard(file);
           break;
-        case '.xml':
+        case KeymanFileTypes.Source.LdmlKeyboard:
           // TODO: await this.analyzeLdmlKeyboard(file);
           // note, will need to skip .xml files that are not ldml keyboards
           break;
@@ -61,7 +61,7 @@ export class AnalyzeOskCharacterUse {
     //       common file vs folder logic to be refactored to be a shared helper
     //       function, probably with the KpjFileReader?
 
-    let kpjFile = this.callbacks.path.join(folder, this.callbacks.path.basename(folder) + '.kpj');
+    let kpjFile = this.callbacks.path.join(folder, this.callbacks.path.basename(folder) + KeymanFileTypes.Source.Project);
 
     if(this.callbacks.fs.existsSync(kpjFile)) {
       this.callbacks.reportMessage(AnalyzerMessages.Info_ScanningFile({type:'project', name:kpjFile}));

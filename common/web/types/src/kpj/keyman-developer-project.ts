@@ -27,7 +27,7 @@ export class KeymanDeveloperProject {
     let files = this.callbacks.fs.readdirSync(sourcePath);
     for(let filename of files) {
       let fullPath = this.callbacks.path.join(sourcePath, filename);
-      if(KeymanFileTypes.filenameIs(filename, '.xml')) {
+      if(KeymanFileTypes.filenameIs(filename, KeymanFileTypes.Source.LdmlKeyboard)) {
         if(!this.callbacks.fs.readFileSync(fullPath, 'utf-8').match(/ldmlKeyboard\.dtd/)) {
           // Skip this .xml because we assume it isn't really a keyboard .xml
           continue;

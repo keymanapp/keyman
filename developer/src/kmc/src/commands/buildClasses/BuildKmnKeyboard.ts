@@ -6,8 +6,8 @@ import { BuildActivity } from './BuildActivity.js';
 
 export class BuildKmnKeyboard extends BuildActivity {
   public get name(): string { return 'Keyman keyboard'; }
-  public get sourceExtension(): KeymanFileTypes.Source { return '.kmn'; }
-  public get compiledExtension(): KeymanFileTypes.Binary { return '.kmx'; }
+  public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.KeymanKeyboard; }
+  public get compiledExtension(): KeymanFileTypes.Binary { return KeymanFileTypes.Binary.Keyboard; }
   public get description(): string { return 'Build a Keyman keyboard'; }
   public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
     let compiler = new KmnCompiler();

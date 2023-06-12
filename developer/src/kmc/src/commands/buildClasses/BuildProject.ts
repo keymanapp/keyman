@@ -6,11 +6,9 @@ import { BuildActivity } from './BuildActivity.js';
 import { buildActivities } from './buildActivities.js';
 import { InfrastructureMessages } from '../../messages/messages.js';
 
-export const PROJECT_EXTENSION = '.kpj';
-
 export class BuildProject extends BuildActivity {
   public get name(): string { return 'Project'; }
-  public get sourceExtension(): KeymanFileTypes.Source { return PROJECT_EXTENSION; }
+  public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.Project; }
   public get compiledExtension(): KeymanFileTypes.Binary { return null; }
   public get description(): string  { return 'Build a keyboard or lexical model project'; }
   public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
@@ -44,7 +42,7 @@ class ProjectBuilder {
 
     // Go through the various file types and build them
     for(let builder of buildActivities) {
-      if(builder.sourceExtension == PROJECT_EXTENSION) {
+      if(builder.sourceExtension == KeymanFileTypes.Source.Project) {
         // We don't support nested projects
         continue;
       }

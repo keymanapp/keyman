@@ -1,10 +1,10 @@
 import * as fs from 'fs';
 import { Command } from 'commander';
 import { buildActivities } from './buildClasses/buildActivities.js';
-import { BuildProject, PROJECT_EXTENSION } from './buildClasses/BuildProject.js';
+import { BuildProject } from './buildClasses/BuildProject.js';
 import { NodeCompilerCallbacks } from '../messages/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/messages.js';
-import { CompilerOptions } from '@keymanapp/common-types';
+import { CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
 import { addBaseOptions } from '../util/baseOptions.js';
 
 
@@ -64,7 +64,7 @@ async function build(filename: string, options: CompilerOptions): Promise<boolea
     let builder = null;
 
     // If infile is a directory, then we treat that as a project and build it
-    if(fs.statSync(filename).isDirectory() || filename.toLowerCase().endsWith(PROJECT_EXTENSION)) {
+    if(fs.statSync(filename).isDirectory() || KeymanFileTypes.filenameIs(filename, KeymanFileTypes.Source.Project)) {
       builder = new BuildProject();
     } else {
       // Otherwise, if it's one of our known file extensions, we build it

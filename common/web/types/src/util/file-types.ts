@@ -1,37 +1,56 @@
 
 /**
- * List of all registered source file types for Keyman. Some of these file types
- * may have multiple uses (e.g. .xml) outside Keyman.
+ * Registered source file types for Keyman. Some of these file types (e.g. .xml)
+ * may have multiple uses outside Keyman.
  */
-export const ALL_SOURCE = [
-  '.model.ts',
-  '.kpj',
-  '.kmn',
-  '.xml',
-  '.kps',
-  '.kvks',
-  '.keyman-touch-layout',
+export const enum Source {
+  Model = '.model.ts',
+  Project = '.kpj',
+  KeymanKeyboard = '.kmn',
+  LdmlKeyboard = '.xml',  // Warning, also other possible uses
+  Package = '.kps',
+  VisualKeyboard = '.kvks',
+  TouchLayout = '.keyman-touch-layout',
+};
+
+/**
+ * List of all registered source file types for Keyman. Some of these file types
+ * (e.g. .xml) may have multiple uses outside Keyman.
+ */
+export const ALL_SOURCE: ReadonlyArray<Source> = [
+  Source.Model,
+  Source.Project,
+  Source.KeymanKeyboard,
+  Source.LdmlKeyboard,
+  Source.Package,
+  Source.VisualKeyboard,
+  Source.TouchLayout,
 ] as const;
 
-type SourceFileTypeTuple = typeof ALL_SOURCE;
-export type Source = SourceFileTypeTuple[number];
-
+/**
+ * Registered binary file types for Keyman. Some of these file types (e.g. .js)
+ * may have multiple uses outside Keyman.
+ */
+export const enum Binary {
+  Model = '.model.js',
+  WebKeyboard = '.js',  // Warning, also other possible uses
+  Keyboard = '.kmx',
+  Package = '.kmp',
+  VisualKeyboard = '.kvk',
+}
 
 /**
  * List of all registered binary file types for Keyman. Some of these file types
- * may have multiple uses (e.g. .js) outside Keyman.
+ * (e.g. .js) may have multiple uses outside Keyman.
  */
-export const ALL_BINARY = [
+export const ALL_BINARY: ReadonlyArray<Binary> = [
   // Note: .model.js is first because we need to test it before .js
-  '.model.js',
-  '.js',
-  '.kmx',
-  '.kmp',
-  '.kvk',
+  Binary.Model,
+  Binary.WebKeyboard,
+  Binary.Keyboard,
+  Binary.Package,
+  Binary.VisualKeyboard,
  ] as const;
-
-type BinaryFileTypeTuple = typeof ALL_BINARY;
-export type Binary = BinaryFileTypeTuple[number];
 
 export const ALL = [...ALL_SOURCE, ...ALL_BINARY] as const;
 export type All = Source | Binary;
@@ -89,14 +108,14 @@ export function binaryTypeFromFilename(filename: string): Binary {
 
 /**
  * Returns true if filenmae has a specific file extension. Does transform
- * upp-ercased file extensions to lower-case.
+ * upper-cased file extensions to lower-case.
  * @param filename
  * @param fileType
  * @returns true if file is of type fileType
  */
 export function filenameIs(filename: string, fileType: Source | Binary) {
   // Special case for .model.js
-  if(fileType == '.js' && filenameIs(filename, '.model.js')) {
+  if(fileType == Binary.WebKeyboard && filenameIs(filename, Binary.Model)) {
     return false;
   }
   return filename.toLowerCase().endsWith(fileType);
