@@ -7,7 +7,7 @@ TODO: implement additional interfaces:
 
 // TODO: rename wasm-host?
 import { UnicodeSetParser, UnicodeSet } from '@keymanapp/common-types';
-import { CompilerCallbacks, CompilerEvent, KvkFileWriter, KvksFileReader } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerEvent, CompilerOptions, KvkFileWriter, KvksFileReader } from '@keymanapp/common-types';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
 import { CompilerMessages, mapErrorFromKmcmplib } from './messages.js';
 
@@ -16,24 +16,27 @@ export interface CompilerResultFile {
   data: Uint8Array;
 };
 
+export interface CompilerResultMetadata {
+  kvksFilename?: string;
+};
+
 export interface CompilerResult {
   kmx?: CompilerResultFile;
   kvk?: CompilerResultFile;
   js?: CompilerResultFile;
+  data: CompilerResultMetadata;
 };
 
-export interface CompilerOptions {
-  shouldAddCompilerVersion?: boolean;
-  saveDebug?: boolean;
-  compilerWarningsAsErrors?: boolean;
-	warnDeprecatedCode?: boolean;
+export interface KmnCompilerOptions extends CompilerOptions {
+  target?: 'kmx' | 'js';
 };
 
-const baseOptions: CompilerOptions = {
+const baseOptions: KmnCompilerOptions = {
   shouldAddCompilerVersion: true,
   saveDebug: true,
   compilerWarningsAsErrors: false,
-  warnDeprecatedCode: true
+  warnDeprecatedCode: true,
+  target: 'kmx'
 };
 
 /**
@@ -67,6 +70,7 @@ export class KmnCompiler implements UnicodeSetParser {
         return false;
       }
     }
+
     return this.verifyInitialized();
   }
 
@@ -88,7 +92,8 @@ export class KmnCompiler implements UnicodeSetParser {
     return true;
   }
 
-  public run(infile: string, outfile: string, options?: CompilerOptions): boolean {
+  // TODO: use outFile from options
+  public run(infile: string, outfile: string, options?: KmnCompilerOptions): boolean {
     let result = this.runCompiler(infile, outfile, options);
     if(result) {
       if(result.kmx) {
@@ -144,7 +149,7 @@ export class KmnCompiler implements UnicodeSetParser {
     return 1;
   }
 
-  public runCompiler(infile: string, outfile: string, options: CompilerOptions): CompilerResult {
+  public runCompiler(infile: string, outfile: string, options: KmnCompilerOptions): CompilerResult {
     if(!this.verifyInitialized()) {
       /* c8 ignore next 2 */
       return null;
@@ -157,7 +162,7 @@ export class KmnCompiler implements UnicodeSetParser {
       loadFile: this.loadFileCallback
     };
 
-    let result: CompilerResult = {};
+    let result: CompilerResult = {data:{}};
     let wasm_interface = new this.Module.CompilerInterface();
     let wasm_options = new this.Module.CompilerOptions();
     let wasm_result = null;
@@ -166,15 +171,16 @@ export class KmnCompiler implements UnicodeSetParser {
       wasm_options.compilerWarningsAsErrors = options.compilerWarningsAsErrors;
       wasm_options.warnDeprecatedCode = options.warnDeprecatedCode;
       wasm_options.shouldAddCompilerVersion = options.shouldAddCompilerVersion;
-      wasm_options.target = 0; //CKF_KEYMAN; TODO, support KMW
+      wasm_options.target = options.target == 'js' ? 1 : 0; // TODO CKF_KEYMANWEB : CKF_KEYMAN;
       wasm_interface.callbacksKey = this.callbackID; // key of object on globalThis
       wasm_result = this.Module.kmcmp_compile(infile, wasm_options, wasm_interface);
       if(!wasm_result.result) {
         return null;
       }
 
-      if(wasm_result.kvksFilename) {
-        result.kvk = this.runKvkCompiler(wasm_result.kvksFilename, infile, outfile);
+      result.data.kvksFilename = wasm_result.kvksFilename;
+      if(result.data.kvksFilename) {
+        result.kvk = this.runKvkCompiler(result.data.kvksFilename, infile, outfile);
         if(!result.kvk) {
           return null;
         }

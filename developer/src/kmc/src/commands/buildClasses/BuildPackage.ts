@@ -1,6 +1,6 @@
 import * as fs from 'fs';
-import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
-import { CompilerCallbacks } from '@keymanapp/common-types';
+import { BuildActivity } from './BuildActivity.js';
+import { CompilerCallbacks, CompilerOptions } from '@keymanapp/common-types';
 import { KmpCompiler, PackageValidation } from '@keymanapp/kmc-package';
 
 export class BuildPackage extends BuildActivity {
@@ -8,7 +8,7 @@ export class BuildPackage extends BuildActivity {
   public get sourceExtension(): string { return '.kps'; }
   public get compiledExtension(): string { return '.kmp'; }
   public get description(): string  { return 'Build a Keyman package'; }
-  public async build(infile: string, callbacks: CompilerCallbacks, options: BuildActivityOptions): Promise<boolean> {
+  public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
 
     const outfile = this.getOutputFilename(infile, options);
 

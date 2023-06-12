@@ -19,9 +19,12 @@ export enum CompilerErrorSeverity {
   Error_Mask =    0x0FFFFF,
 };
 
+export function compilerErrorSeverity(code: number): number {
+  return code & CompilerErrorSeverity.Severity_Mask;
+}
+
 export function compilerErrorSeverityName(code: number): string {
-  let severity = code & CompilerErrorSeverity.Severity_Mask;
-  switch(severity) {
+  switch(compilerErrorSeverity(code)) {
     case CompilerErrorSeverity.Info: return 'INFO';
     case CompilerErrorSeverity.Hint: return 'HINT';
     case CompilerErrorSeverity.Warn: return 'WARN';
@@ -91,6 +94,10 @@ export enum CompilerErrorNamespace {
    * kmc and related infrastructure errors between 0x5000…0x5FFF;
    */
   Infrastructure = 0x5000,
+  /**
+   * kmc-analyze 0x6000…0x6FFF;
+   */
+  Analyzer = 0x6000,
 };
 
 export type CompilerSchema =
@@ -157,6 +164,50 @@ export interface CompilerCallbacks {
 };
 
 /**
+ * Abstract interface for compiler options
+ */
+
+export interface CompilerBaseOptions {
+  /**
+   * Reporting level to console, used by NodeCompilerCallbacks (not used in compiler modules;
+   * all messages are still reported to the internal log)
+   */
+  logLevel?: CompilerLogLevel;
+  /**
+   * Optional output file for activities that generate output
+   */
+  outFile?: string;
+}
+
+export interface CompilerOptions extends CompilerBaseOptions {
+  /**
+   * Add metadata about the compiler version to .kmx file when compiling
+   */
+  shouldAddCompilerVersion?: boolean;
+  /**
+   * Add debug information to the .kmx file when compiling
+   */
+  saveDebug?: boolean;
+  /**
+   * Upgrade any warnings produced in the compile to errors
+   */
+  compilerWarningsAsErrors?: boolean;
+  /**
+   * Emit warnings if deprecated code is encountered
+   */
+	warnDeprecatedCode?: boolean;
+};
+
+export const defaultCompilerOptions: CompilerOptions = {
+  logLevel: 'info',
+  // outFile: (undefined)
+  saveDebug: false,
+  shouldAddCompilerVersion: true,
+  compilerWarningsAsErrors: false,
+  warnDeprecatedCode: true,
+}
+
+/**
  * Convenience function for constructing CompilerEvents
  * @param code
  * @param message
@@ -170,3 +221,28 @@ export const CompilerMessageSpec = (code: number, message: string) : CompilerEve
 export function compilerExceptionToString(e?: any) : string {
   return `${(e ?? 'unknown error').toString()}\n\nCall stack:\n${(e instanceof Error ? e.stack : (new Error()).stack)}`;
 }
+
+/**
+ * Compiler logging level and correspondence to severity
+ */
+
+export const ALL_COMPILER_LOG_LEVELS = [
+  'silent',     /// Nothing is emitted to stdout, not even errors (fatal exceptions may still emit to stdout)
+  'error',      /// Only errors emitted
+  'warn',       /// Errors + warnings
+  'hint',       /// Errors + warnings + hints
+  'info',       /// All messages: errors + warnings + hints + info
+  'debug'       /// All messages: errors + warnings + hints + info, plus debug logs
+] as const;
+
+type CompilerLogLevelTuple = typeof ALL_COMPILER_LOG_LEVELS;
+export type CompilerLogLevel = CompilerLogLevelTuple[number];
+
+export const compilerLogLevelToSeverity: {[index in CompilerLogLevel]: number} = {
+  'silent': CompilerErrorSeverity.Severity_Mask,  // effectively excludes all reporting
+  'error': CompilerErrorSeverity.Error,
+  'warn': CompilerErrorSeverity.Warn,
+  'hint': CompilerErrorSeverity.Hint,
+  'info': CompilerErrorSeverity.Info,
+  'debug': CompilerErrorSeverity.Info
+};

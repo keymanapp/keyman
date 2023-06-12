@@ -1,8 +1,8 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { CompilerCallbacks, KeymanDeveloperProject, KPJFileReader } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerOptions, KeymanDeveloperProject, KPJFileReader } from '@keymanapp/common-types';
 import { KeymanDeveloperProjectFile } from '../../../../../../common/web/types/src/kpj/keyman-developer-project.js';
-import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
+import { BuildActivity } from './BuildActivity.js';
 import { buildActivities } from './buildActivities.js';
 import { InfrastructureMessages } from '../../messages/messages.js';
 
@@ -13,7 +13,7 @@ export class BuildProject extends BuildActivity {
   public get sourceExtension(): string { return PROJECT_EXTENSION; }
   public get compiledExtension(): string { return null; }
   public get description(): string  { return 'Build a keyboard or lexical model project'; }
-  public async build(infile: string, callbacks: CompilerCallbacks, options: BuildActivityOptions): Promise<boolean> {
+  public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
     let builder = new ProjectBuilder(infile, callbacks, options);
     return builder.run();
   }
@@ -22,10 +22,10 @@ export class BuildProject extends BuildActivity {
 class ProjectBuilder {
   callbacks: CompilerCallbacks;
   infile: string;
-  options: BuildActivityOptions;
+  options: CompilerOptions;
   project: KeymanDeveloperProject;
 
-  constructor(infile: string, callbacks: CompilerCallbacks, options: BuildActivityOptions) {
+  constructor(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions) {
     this.infile = path.resolve(infile);
     this.callbacks = callbacks;
     this.options = options;

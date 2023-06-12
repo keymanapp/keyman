@@ -1,22 +1,19 @@
 import { CompilerCallbacks, VisualKeyboard, LDMLKeyboard, TouchLayoutFileWriter } from "@keymanapp/common-types";
-import { CompilerOptions } from "./compiler-options.js";
+import { LdmlCompilerOptions } from "./ldml-compiler-options.js";
 import { TouchLayoutCompiler } from "./touch-layout-compiler.js";
 import { LdmlKeyboardVisualKeyboardCompiler } from "./visual-keyboard-compiler.js";
 
 const MINIMUM_KMW_VERSION = '16.0';
 
-export interface LdmlKeyboardKeymanWebCompilerOptions extends CompilerOptions {
-};
-
 export class LdmlKeyboardKeymanWebCompiler {
-  private readonly options: LdmlKeyboardKeymanWebCompilerOptions;
+  private readonly options: LdmlCompilerOptions;
   private readonly nl: string;
   private readonly tab: string;
 
-  constructor(private callbacks: CompilerCallbacks, options?: LdmlKeyboardKeymanWebCompilerOptions) {
+  constructor(private callbacks: CompilerCallbacks, options?: LdmlCompilerOptions) {
     this.options = { ...options };
-    this.nl = this.options.debug ? "\n" : '';
-    this.tab = this.options.debug ? "  " : '';
+    this.nl = this.options.saveDebug ? "\n" : '';
+    this.tab = this.options.saveDebug ? "  " : '';
   }
 
   public compileVisualKeyboard(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile) {
@@ -38,7 +35,7 @@ export class LdmlKeyboardKeymanWebCompiler {
   public compileTouchLayout(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile) {
     const tlcompiler = new TouchLayoutCompiler();
     const layout = tlcompiler.compileToJavascript(source);
-    const writer = new TouchLayoutFileWriter({formatted: this.options.debug});
+    const writer = new TouchLayoutFileWriter({formatted: this.options.saveDebug});
     return writer.compile(layout);
   }
 

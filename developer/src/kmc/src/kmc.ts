@@ -5,19 +5,21 @@
 
 
 import { Command } from 'commander';
-import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { declareBuild } from './commands/build.js';
 import { declareBuildTestData } from './commands/buildTestData.js';
+import { declareAnalyze } from './commands/analyze.js';
+import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 const program = new Command();
 
 /* Arguments */
+
 program
   .description('Keyman Developer Command Line Interface')
   .version(KEYMAN_VERSION.VERSION_WITH_TAG);
-
 declareBuild(program);
 declareBuildTestData(program);
+declareAnalyze(program);
 
 /*
 program

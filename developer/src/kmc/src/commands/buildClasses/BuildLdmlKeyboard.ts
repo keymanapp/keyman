@@ -1,8 +1,8 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as kmcLdml from '@keymanapp/kmc-ldml';
-import { KvkFileWriter, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader } from '@keymanapp/common-types';
-import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
+import { KvkFileWriter, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader, CompilerOptions, defaultCompilerOptions } from '@keymanapp/common-types';
+import { BuildActivity } from './BuildActivity.js';
 import { fileURLToPath } from 'url';
 
 export class BuildLdmlKeyboard extends BuildActivity {
@@ -10,7 +10,7 @@ export class BuildLdmlKeyboard extends BuildActivity {
   public get sourceExtension(): string { return '.xml'; }
   public get compiledExtension(): string { return '.kmx'; }
   public get description(): string { return 'Build a LDML keyboard'; }
-  public async build(infile: string, callbacks: CompilerCallbacks, options: BuildActivityOptions): Promise<boolean> {
+  public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
     // TODO-LDML: consider hardware vs touch -- touch-only layout will not have a .kvk
     // Compile:
     let [kmx,kvk,kmw] = await buildLdmlKeyboardToMemory(infile, callbacks, options);
@@ -43,16 +43,14 @@ export class BuildLdmlKeyboard extends BuildActivity {
   }
 }
 
-async function buildLdmlKeyboardToMemory(inputFilename: string, callbacks: CompilerCallbacks, options: BuildActivityOptions): Promise<[Uint8Array, Uint8Array, Uint8Array]> {
-  let compilerOptions: kmcLdml.CompilerOptions = {
-    debug: options.debug ?? false,
-    addCompilerVersion: options.compilerVersion ?? true,
+async function buildLdmlKeyboardToMemory(inputFilename: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<[Uint8Array, Uint8Array, Uint8Array]> {
+  let compilerOptions: kmcLdml.LdmlCompilerOptions = {
+    ...defaultCompilerOptions,
+    ...options,
     readerOptions: {
       importsPath: fileURLToPath(LDMLKeyboardXMLSourceFileReader.defaultImportsURL)
     }
-    // TODO: warnDeprecatedCode: options.warnDeprecatedCode,
-    // TODO: treatWarningsAsErrors: options.treatWarningsAsErrors,
-  }
+  };
 
   const k = new kmcLdml.LdmlKeyboardCompiler(callbacks, compilerOptions);
   let source = k.load(inputFilename);
@@ -69,7 +67,7 @@ async function buildLdmlKeyboardToMemory(inputFilename: string, callbacks: Compi
   kmcLdml.KMXPlusMetadataCompiler.addKmxMetadata(kmx.kmxplus, kmx.keyboard, compilerOptions);
 
   // Use the builder to generate the binary output file
-  const builder = new kmcLdml.KMXBuilder(kmx, options.debug);
+  const builder = new kmcLdml.KMXBuilder(kmx, options.saveDebug);
   const kmx_binary = builder.compile();
 
   const vkcompiler = new kmcLdml.LdmlKeyboardVisualKeyboardCompiler();

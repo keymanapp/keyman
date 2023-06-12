@@ -14,7 +14,7 @@ describe('testdata-tests', function() {
     const jsonFilename = makePathToFixture('test-fr.json');
 
     // Compile the keyboard
-    const testData = loadTestdata(inputFilename, {...compilerTestOptions, debug: true, addCompilerVersion: false});
+    const testData = loadTestdata(inputFilename, {...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false});
     assert.isNotNull(testData);
 
     const jsonData = JSON.parse(readFileSync(jsonFilename, 'utf-8'));
