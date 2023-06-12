@@ -1,0 +1,15 @@
+#pragma once
+#include "keymap.h"
+#include "helpers.h"
+
+
+void check_avaiability_of_modules_(){
+  std::cout << "\n*********************************************************************************************\n";
+  if ( X_test == 0xFF1234 )                 std::cout << "\t\t\t\t\t\treaching helpers was OK \n";
+  if ( !dummytest_keymap() )                std::cout << "\treaching keymap was OK \n";
+  if ( !dummytest_mc_kmx_file() )           std::cout << "\treaching mc_kmx_file was OK \n";
+  if ( !dummytest_mc_Savekeyboard() )       std::cout << "reaching mc_Savekeyboard was OK \n";
+  if ( KEYMANID_NONKEYMAN == 0xFFFFFFFF )   std::cout << "\t\t\t\t\t\treaching kmx_file was OK \n";
+  if ( X_test == 0xFF1234 )                 std::cout << "\t\t\t\t\t\treaching kmx_types was OK \n";
+  std::cout << "*********************************************************************************************\n";
+}
