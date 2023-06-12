@@ -84,7 +84,7 @@ export interface EventMap {
    */
   showBuild: () => void;
 
-  // While the next two are near-duplicates of the legacy event `resizeMove`, these
+  // While the next two are near-duplicates of the legacy event `resizemove`, these
   // have the advantage of providing a Promise for the end of the ongoing user
   // interaction.  We need that Promise for focus-management.
 
