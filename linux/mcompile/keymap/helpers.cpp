@@ -12,3 +12,16 @@ void check_avaiability_of_modules_(){
   if ( X_test == 0xFF1234 )                 std::cout << "\t\t\t\t\t\treaching kmx_types was OK \n";
   std::cout << "*********************************************************************************************\n";
 }
+
+void MyCout(std::string in, bool end, std::string pre ) {
+  if (end == true)
+    std::cout << pre << " " << in << " " << "\n";
+  else
+    std::cout << pre << " " << in;
+}
+
+
+void DebugLog_S2(std::wstring  txt, std::wstring fileName) {
+
+  wprintf(txt.c_str(),  fileName);
+}
