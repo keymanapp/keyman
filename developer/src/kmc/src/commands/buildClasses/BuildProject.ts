@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { CompilerCallbacks, CompilerOptions, KeymanDeveloperProject, KPJFileReader } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerOptions, KeymanDeveloperProject, KeymanFileTypes, KPJFileReader } from '@keymanapp/common-types';
 import { KeymanDeveloperProjectFile } from '../../../../../../common/web/types/src/kpj/keyman-developer-project.js';
 import { BuildActivity } from './BuildActivity.js';
 import { buildActivities } from './buildActivities.js';
@@ -10,8 +10,8 @@ export const PROJECT_EXTENSION = '.kpj';
 
 export class BuildProject extends BuildActivity {
   public get name(): string { return 'Project'; }
-  public get sourceExtension(): string { return PROJECT_EXTENSION; }
-  public get compiledExtension(): string { return null; }
+  public get sourceExtension(): KeymanFileTypes.Source { return PROJECT_EXTENSION; }
+  public get compiledExtension(): KeymanFileTypes.Binary { return null; }
   public get description(): string  { return 'Build a keyboard or lexical model project'; }
   public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
     let builder = new ProjectBuilder(infile, callbacks, options);

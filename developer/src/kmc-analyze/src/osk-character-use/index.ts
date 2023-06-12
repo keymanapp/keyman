@@ -1,4 +1,4 @@
-import { CompilerCallbacks, KeymanDeveloperProject, KMX, KmxFileReader, KPJFileReader, KvksFileReader, TouchLayout, TouchLayoutFileReader } from "@keymanapp/common-types";
+import { CompilerCallbacks, KeymanDeveloperProject, KeymanFileTypes, KMX, KmxFileReader, KPJFileReader, KvksFileReader, TouchLayout, TouchLayoutFileReader } from "@keymanapp/common-types";
 import { KmnCompiler } from '@keymanapp/kmc-kmn';
 import { AnalyzerMessages } from "../messages.js";
 
@@ -20,29 +20,29 @@ export class AnalyzeOskCharacterUse {
     for(let file of files) {
       // TODO: refactor with helper function for file and folder types
       // See kmc for another instance
-      if(file.match(/\.kvks$/i)) {
-        this.addStrings(this.scanVisualKeyboard(file));
-      }
-      else if(file.match(/\.keyman-touch-layout$/i)) {
-        this.addStrings(this.scanTouchLayout(file));
-      }
-      else if(file.match(/\.kpj$/i)) {
-        await this.analyzeProject(file);
-        continue;
-      }
-      else if(file.match(/\.kmn$/i)) {
-        // The cleanest way to do this is to compile the .kmn to find the .kvks
-        // and .keyman-touch-layout from the &VISUALKEYBOARD and &LAYOUTFILE
-        // system stores
-        await this.analyzeKmnKeyboard(file);
-      }
-      else if(file.match(/\.xml$/i)) {
-        // TODO: await this.analyzeLdmlKeyboard(file);
-        // note, will need to skip .xml files that are not ldml keyboards
-      }
-      else {
-        // Ignore any other file types; this way we can analyze project files/folders
-        // easily also
+      switch(KeymanFileTypes.sourceTypeFromFilename(file)) {
+        case '.kvks':
+          this.addStrings(this.scanVisualKeyboard(file));
+          break;
+        case '.keyman-touch-layout':
+          this.addStrings(this.scanTouchLayout(file));
+          break;
+        case '.kpj':
+          await this.analyzeProject(file);
+          break;
+        case '.kmn':
+          // The cleanest way to do this is to compile the .kmn to find the .kvks
+          // and .keyman-touch-layout from the &VISUALKEYBOARD and &LAYOUTFILE
+          // system stores
+          await this.analyzeKmnKeyboard(file);
+          break;
+        case '.xml':
+          // TODO: await this.analyzeLdmlKeyboard(file);
+          // note, will need to skip .xml files that are not ldml keyboards
+          break;
+        default:
+          // Ignore any other file types; this way we can analyze project files/folders
+          // easily also
       }
     }
   }

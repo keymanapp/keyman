@@ -1,13 +1,13 @@
 import * as path from 'path';
 import { platform } from 'os';
 import { KmnCompiler } from '@keymanapp/kmc-kmn';
-import { CompilerOptions, CompilerCallbacks } from '@keymanapp/common-types';
+import { CompilerOptions, CompilerCallbacks, KeymanFileTypes } from '@keymanapp/common-types';
 import { BuildActivity } from './BuildActivity.js';
 
 export class BuildKmnKeyboard extends BuildActivity {
   public get name(): string { return 'Keyman keyboard'; }
-  public get sourceExtension(): string { return '.kmn'; }
-  public get compiledExtension(): string { return '.kmx'; }
+  public get sourceExtension(): KeymanFileTypes.Source { return '.kmn'; }
+  public get compiledExtension(): KeymanFileTypes.Binary { return '.kmx'; }
   public get description(): string { return 'Build a Keyman keyboard'; }
   public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
     let compiler = new KmnCompiler();

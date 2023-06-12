@@ -38,3 +38,4 @@ export * as KmpJsonFile from './package/kmp-json-file.js';
 
 export * as util from './util/util.js';
 
+export * as KeymanFileTypes from './util/file-types.js';
