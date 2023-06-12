@@ -76,10 +76,16 @@ prepare ( ) {
 #   test-headless osk
 # ```
 test-headless ( ) {
+  TEST_FOLDER=$1
+
   TEST_OPTS=
   if builder_has_option --ci; then
     TEST_OPTS="--reporter mocha-teamcity-reporter"
   fi
 
-  mocha --recursive "${KEYMAN_ROOT}/web/src/test/auto/headless/$1" $TEST_OPTS
+  if [ -e .c8rc.json ]; then
+    c8 mocha --recursive "${KEYMAN_ROOT}/web/src/test/auto/headless/$TEST_FOLDER" $TEST_OPTS
+  else
+    mocha --recursive "${KEYMAN_ROOT}/web/src/test/auto/headless/$TEST_FOLDER" $TEST_OPTS
+  fi
 }
