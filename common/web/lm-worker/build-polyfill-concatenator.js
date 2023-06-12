@@ -111,7 +111,7 @@ let remappingState = SourceMapRemapper
   .remapPaths([
     {from: /^polyfills\//, to: '/common/web/lm-worker/src/polyfills/'},
     {from: 'models/templates/build/obj/', to :'common/models/templates/src/'},
-    {from: 'models/wordbreakers/build/obj/default/default', to: 'common/models/wordbreakers/src/default/'},
+    {from: 'models/wordbreakers/build/obj/default/default', to: 'common/models/wordbreakers/src/default'},
     {from: 'models/wordbreakers/build/obj/', to: 'common/models/wordbreakers/src/'},
     {from: 'obj/models/models/', to: 'common/web/lm-worker/src/models/'},
     {from: 'obj/correction/correction/', to: 'common/web/lm-worker/src/correction/'},
