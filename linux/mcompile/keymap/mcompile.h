@@ -20,7 +20,7 @@
 
 
 #include <vector>
-#include "km_types.h"
+#include "keymap.h"
 
 void LogError(PKMX_WCHART message, ...);
 

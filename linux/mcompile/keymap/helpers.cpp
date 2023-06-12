@@ -1,4 +1,3 @@
-#pragma once
 #include "keymap.h"
 #include "helpers.h"
 

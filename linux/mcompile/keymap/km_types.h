@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
 
-#include <stdint.h>
+#define X_test  0xFF1234
 
 /*
 #if defined(_WIN32) || defined(_WIN64)

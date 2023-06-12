@@ -1,7 +1,10 @@
 #pragma once
 #include "km_types.h"
 
-KMX_DWORD TEST;
+#include <iostream>		// _S2 can be removed later
+
+int dummytest_mc_kmx_file();
+//+++++++++++++++++++++++++++++++++++
 
 #ifndef _KMXFILE_H
 #define _KMXFILE_H

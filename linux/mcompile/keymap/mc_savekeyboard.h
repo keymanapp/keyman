@@ -1,7 +1,11 @@
 #pragma once
 
 #include "km_types.h"
-KMX_DWORD TEST3;
+
+#include <iostream>
+int dummytest_mc_Savekeyboard();
+
+
 // this file is all new _S2
 
 //#include "../../../common/include/km_types.h"

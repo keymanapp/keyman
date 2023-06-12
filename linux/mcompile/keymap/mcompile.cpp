@@ -22,13 +22,150 @@
                     06 Feb 2015 - mcdurdin - I4552 - V9.0 - Add mnemonic recompile option to ignore deadkeys
                     08 Apr 2015 - mcdurdin - I4651 - V9.0 - Mnemonic layout recompiler maps AltGr+VK_BKSLASH rather than VK_OEM_102
 */
+
+#include "mcompile.h"
+#include "helpers.h"
+
+
+int main(gint argc, wchar_t *argv[])
+{  //----------------------------------------
+
+// test if all cpps are acccessible: can be removed
+check_avaiability_of_modules_();    //_S2
+
+ if(argc < 3 || (argc < 5 && wcscmp(argv[1], L"-u") != 0)) {   // I4273
+    printf(
+         "Usage: mcompile -u infile.kmx outfile.kmx\n"
+         "       mcompile [-d] infile.kmx kbdfile.dll kbid outfile.kmx\n"
+         "  With -u parameter, converts keyboard from ANSI to Unicode\n"
+         "  Otherwise, mcompile converts a Keyman mnemonic layout to a\n"
+         "  positional one based on the Windows keyboard\n"
+         "  layout file given by kbdfile.dll\n\n"
+         "  kbid should be a hexadecimal number e.g. 409 for US English\n"
+         "  -d   convert deadkeys to plain keys\n");   // I4552
+
+    return 1;
+  }
+//-----------------------------
+ /* if(wcscmp(argv[1], L"-u") == 0) {   // I4273
+    wchar_t *infile = argv[2], *outfile = argv[3];
+
+    LPKEYBOARD kmxfile;
+
+    if(!LoadKeyboard(infile, &kmxfile)) {
+      LogError(L"Failed to load keyboard (%d)", GetLastError());
+      return 3;
+    }
+
+    if(ConvertKeyboardToUnicode(kmxfile)) {
+      SaveKeyboard(kmxfile, outfile);
+    }
+
+    //DeleteReallocatedPointers(kmxfile); :TODO
+    delete[] kmxfile;
+
+    return 0;   // I4279
+  }*/
+/*//-----------------------------
+  int bDeadkeyConversion = wcscmp(argv[1], L"-d") == 0;   // I4552
+  int n = (bDeadkeyConversion ? 2 : 1);
+
+  wchar_t *infile = argv[n], *indll = argv[n+1], *kbid = argv[n+2], *outfile = argv[n+3];
+
+  wprintf(L"mcompile%ls \"%ls\" \"%ls\" \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d":L"", infile, indll, kbid, outfile);   // I4174
+
+  // 1. Load the keyman keyboard file
+
+  // 2. For each key on the system layout, determine its output character and perform a
+  //    1-1 replacement on the keyman keyboard of that character with the base VK + shift
+  //    state.  This fixup will transform the char to a vk, which will avoid any issues
+  //    with the key.
+  //
+  //  --> deadkeys we will attack after the POC
+  //
+  //  For each deadkey, we need to determine its possible outputs.  Then we generate a VK
+  //  rule for that deadkey, e.g. [K_LBRKT] > dk(c101)
+  //
+  //  Next, update each rule that references the output from that deadkey to add an extra
+  //  context deadkey at the end of the context match, e.g. 'a' dk(c101) + [K_SPACE] > 'b'.
+  //  This will require a memory layout change for the .kmx file, plus fixups on the
+  //  context+output index offsets
+  //
+  //  --> virtual character keys
+  //
+  //  [CTRL ' '] : we look at the character, and replace it in the same way, but merely
+  //  switch the shift state from the VIRTUALCHARKEY to VIRTUALKEY, without changing any
+  //  other properties of the key.
+  //
+
+  // 3. Write the new keyman keyboard file
+
+  if(!LoadNewLibrary(indll)) {
+    LogError(L"Failed to load keyboard DLL (%d)", GetLastError());
+    return 2;
+  }
+
+  LPKEYBOARD kmxfile;
+
+  if(!LoadKeyboard(infile, &kmxfile)) {
+    LogError(L"Failed to load keyboard (%d)", GetLastError());
+    return 3;
+  }
+
+  if(DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552
+    SaveKeyboard(kmxfile, outfile);
+  }
+
+  //DeleteReallocatedPointers(kmxfile); :TODO
+  delete kmxfile;
+VM
+	return 0;
+
+*/
+
+  //------------------------------------
+  //LoadKeyboard();
+  //int out = run_DoConvert_Part1_getMap(argc,argv);
+  //run_DoConvert_Part2_TranslateKeyboard();
+  //SaveKeyboard();
+printf("°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°° end\n");
+ 
+  return 0 ;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //
 // m-to-p.cpp : Defines the entry point for the console application.
 //
 // Note: this program deliberately leaks memory as it has a very short life cycle and managing the memory allocations
 // for the subcomponents of the compiled keyboard is an unnecessary optimisation. Just so you know.
 //
-
+/*
 #include "pch.h"
 #include <vector>
 
@@ -474,7 +611,7 @@ void LogError(PWSTR fmt, ...) {
 	fmtbuf[255] = 0;
   _putws(fmtbuf);
 }
-
+*/
 //---------old-------------------------------------------
 /*#include "pch.h"
 #include <vector>

@@ -1,6 +1,12 @@
 
 #include "mc_kmxfile.h"
 
+int dummytest_mc_kmx_file(){
+  std::cout<< " dummytest_mc_kmx_file    is available\t";
+  return 0;
+  }
+
+/*
 KMX_DWORD TEST2;
 
 static KMX_BOOL LoadKeyboardFile(LPKMX_STR fileName, LPKEYBOARD *lpKeyboard);
@@ -8,7 +14,7 @@ static KMX_BOOL LoadKeyboardFile(LPKMX_STR fileName, LPKEYBOARD *lpKeyboard);
 KMX_BOOL VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz);
 
 LPKEYBOARD FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
-
+*/
 /*void Err(wchar_t *s) {
 	LogError(L"LoadKeyboard: %s, last error = %d\n", s, GetLastError());
 }*/
