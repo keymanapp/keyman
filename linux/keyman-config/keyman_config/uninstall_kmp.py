@@ -79,6 +79,7 @@ def _uninstall_kmp_common(location, packageID):
     logging.info("Finished uninstalling %s keyboard: %s", where, packageID)
     return ''
 
+
 def _uninstall_keyboards_from_ibus(keyboards, packageDir):
     bus = get_ibus_bus()
     if bus or os.environ.get('SUDO_USER'):
@@ -98,12 +99,12 @@ def _uninstall_keyboards_from_gnome(keyboards, packageDir):
     # uninstall all kmx for all languages
     for kb in keyboards:
         ibus_keyboard_id = get_ibus_keyboard_id(kb, packageDir)
-        tuple = ('ibus', ibus_keyboard_id)
-        if tuple in sources:
-            sources.remove(tuple)
+        _tuple = ('ibus', ibus_keyboard_id)
+        if _tuple in sources:
+            sources.remove(_tuple)
 
-        toRemove = []
         match_id = ":%s" % get_ibus_keyboard_id(kb, packageDir, ignore_language=True)
+        toRemove = []
         for (type, id) in sources:
             if type == 'ibus' and id.endswith(match_id):
                 toRemove.append((type, id))
