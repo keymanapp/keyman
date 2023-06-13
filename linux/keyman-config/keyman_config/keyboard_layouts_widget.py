@@ -16,7 +16,7 @@ from keyman_config.get_kmp import (InstallLocation, get_keyboard_dir,
 from keyman_config.keyboard_details import KeyboardDetailsView
 from keyman_config.keyboard_layouts_model import Model
 from keyman_config.kmpmetadata import get_fonts, parsemetadata
-from keyman_config.options_view import OptionsView
+from keyman_config.keyboard_options_view import KeyboardOptionsView
 from keyman_config.uninstall_kmp import uninstall_kmp
 from keyman_config.welcome import WelcomeView
 
@@ -221,7 +221,7 @@ class KeyboardLayoutsWidget(Gtk.Box):
                 # TODO: Determine keyboardID
                 info = {"optionurl": uri_path, "packageID": model[treeiter]
                         [Model.PACKAGEID], "keyboardID": model[treeiter][Model.PACKAGEID]}
-                w = OptionsView(info)
+                w = KeyboardOptionsView(info)
                 w.resize(800, 600)
                 w.show_all()
             else:
