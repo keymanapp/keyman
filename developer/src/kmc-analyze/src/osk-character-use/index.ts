@@ -16,7 +16,7 @@ export class AnalyzeOskCharacterUse {
   // Analyze a set of files
   //
 
-  public async analyze(files: string[]) {
+  public async analyze(files: string[], analyzeProjects: boolean = true) {
     for(let file of files) {
       switch(KeymanFileTypes.sourceTypeFromFilename(file)) {
         case KeymanFileTypes.Source.VisualKeyboard:
@@ -26,7 +26,9 @@ export class AnalyzeOskCharacterUse {
           this.addStrings(this.scanTouchLayout(file));
           break;
         case KeymanFileTypes.Source.Project:
-          await this.analyzeProject(file);
+          if(analyzeProjects) {
+            await this.analyzeProject(file);
+          }
           break;
         case KeymanFileTypes.Source.KeymanKeyboard:
           // The cleanest way to do this is to compile the .kmn to find the .kvks
@@ -50,8 +52,7 @@ export class AnalyzeOskCharacterUse {
     const source = reader.read(this.callbacks.loadFile(filename));
     const project = reader.transform(filename, source);
     let files = project.files.map(file => this.callbacks.resolveFilename(filename, file.filePath));
-    // TODO: ensure no .kpj in files so we don't potentially end up in a loop
-    await this.analyze(files);
+    await this.analyze(files, false); // false because we don't want get into a recursive loop for projects
   }
 
   public async analyzeProjectFolder(folder: string) {
@@ -69,8 +70,9 @@ export class AnalyzeOskCharacterUse {
       const project = new KeymanDeveloperProject(kpjFile, '2.0', this.callbacks);
       project.populateFiles();
       let files = project.files.map(file => this.callbacks.resolveFilename(kpjFile, file.filePath));
-      // TODO: ensure no .kpj in files so we don't potentially end up in a loop
-      await this.analyze(files);
+
+
+      await this.analyze(files, false); // false because we don't want get into a recursive loop for projects
     }
   }
 
@@ -231,6 +233,7 @@ export class AnalyzeOskCharacterUse {
     return JSON.stringify(data, null, 2).split('\n');
   }
 
+  // TODO: this only works for single-character strings -- bad bad bad
   private static escapeMarkdownChar(s: string) {
     // commonmark 2.4: all punct can be escaped
     const punct = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
