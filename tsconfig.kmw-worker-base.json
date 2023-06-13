@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig-base.json",
+  "compilerOptions": {
+    "module": "es6",
+    "target": "es5",
+    "moduleResolution": "node16",
+    "allowJs": false,
+    "declaration": true,
+    "downlevelIteration": true,
+    "importHelpers": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "lib": ["es6"],
+    "types": ["node"],
+  }
+}
