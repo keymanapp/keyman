@@ -47,7 +47,7 @@ if builder_start_action clean; then
 fi
 
 if builder_start_action build; then
-  tsc --build "$THIS_SCRIPT_PATH/tsconfig.json"
+  tsc --build "$THIS_SCRIPT_PATH/tsconfig.all.json"
   node ./build-bundler.js
 
   # Declaration bundling.
