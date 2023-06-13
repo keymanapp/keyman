@@ -95,6 +95,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       assert(false);
       return;
     }
+#if 0 // TODO-LDML: needs rework
     for (KMX_DWORD i = 0; i < kplus.tran->count; i++) {
       const kmx::COMP_KMXPLUS_TRAN_ENTRY &entry = kplus.tran->entries[i];
       // 'to' is always a string, unlike keys
@@ -142,6 +143,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       // Now, add the list to the map
       transforms.add(list, tostr);
     }
+#endif // TODO-LDML
   }
   // Only valid if we reach here
   DebugLog("_valid = true");

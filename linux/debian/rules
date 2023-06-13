@@ -9,7 +9,9 @@ export PYBUILD_INSTALL_ARGS=--install-scripts=/usr/share/keyman-config/
 
 export KEYMAN_PKG_BUILD=1
 
+export HOME=$(shell mktemp -d)
 export XDG_DATA_HOME=$(shell mktemp -d)
+export XDG_CONFIG_HOME=$(shell mktemp -d)
 
 # xenial needs this to be explicit
 export LC_ALL=C.UTF-8
@@ -32,26 +34,24 @@ override_dh_auto_configure:
 		--wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc --localstatedir=/var
 	linux/keyman-system-service/build.sh configure -- \
 		--wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc --localstatedir=/var
-	# keyman-config
+	linux/keyman-config/build.sh configure
 
 override_dh_auto_build:
+	cp linux/keyman-config/resources/keyman.sharedmimeinfo debian/
 	core/build.sh --no-tests build:arch
 	linux/ibus-keyman/build.sh build
 	linux/keyman-system-service/build.sh build
-	# keyman-config
+	linux/keyman-config/build.sh build
 	cd linux/keyman-config && \
-		make man && \
 		sed -i -e "s/^__pkgversion__ = \"[^\"]*\"/__pkgversion__ = \"$(DEB_VERSION)\"/g" keyman_config/version.py && \
 		make compile-po
-	dh_auto_build --sourcedir=linux/keyman-config --buildsystem=pybuild $@
 
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 	core/build.sh --no-tests test:arch
 	linux/ibus-keyman/build.sh test
 	linux/keyman-system-service/build.sh test
-	# keyman-config
-	dh_auto_test --sourcedir=linux/keyman-config --buildsystem=pybuild $@
+	linux/keyman-config/build.sh test
 endif
 
 override_dh_auto_install:
@@ -63,6 +63,7 @@ override_dh_auto_install:
 	install -d $(CURDIR)/debian/keyman/usr/share/
 	cp -r linux/keyman-config/locale/ $(CURDIR)/debian/keyman/usr/share/
 	rm $(CURDIR)/debian/keyman/usr/share/locale/*.po*
+	# Don't call `build.sh install` - dh_auto_install does some extra smarts
 	dh_auto_install --sourcedir=linux/keyman-config --buildsystem=pybuild $@
 	# Unfortunately bash-completion 2.10 (focal) doesn't yet provide dh-sequence-bash-completion,
 	# which we could add as build-dependency, so we'll have to explicitly call

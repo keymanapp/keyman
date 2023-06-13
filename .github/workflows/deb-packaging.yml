@@ -119,8 +119,8 @@ jobs:
         platform: "${{ matrix.arch }}"
         source_dir: "artifacts/keyman-srcpkg"
         sourcepackage: "keyman_${{ needs.sourcepackage.outputs.VERSION }}-1.dsc"
-        deb_fullname: $DEBFULLNAME
-        deb_email: $DEBEMAIL
+        deb_fullname: ${{env.DEBFULLNAME}}
+        deb_email: ${{env.DEBEMAIL}}
         prerelease_tag: ${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}
 
     - name: Output resulting .deb files

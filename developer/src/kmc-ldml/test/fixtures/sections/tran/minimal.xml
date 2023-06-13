@@ -12,5 +12,8 @@
     <transformGroup>
       <transform from="xx" to="x"/>
     </transformGroup>
+    <transformGroup>
+      <reorder from="ខែ្ម" order="1 3 4 2" />
+    </transformGroup>
   </transforms>
 </keyboard>

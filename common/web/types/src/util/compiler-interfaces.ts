@@ -45,6 +45,21 @@ export function compilerErrorFormatCode(code: number): string {
 }
 
 /**
+ * @param e event or array of events
+ * @returns string
+ */
+export function compilerEventFormat(e : CompilerEvent | CompilerEvent[]) : string {
+  if (!e) {
+    return "";
+  }
+  if (Array.isArray(e)) {
+    return e.map(item => compilerEventFormat(item)).join('\n');
+  }
+  const {code, message} = e;
+  return `${compilerErrorFormatCode(code)}: “${message}”`;
+}
+
+/**
  * Defines the error code ranges for various compilers. Once defined, these
  * ranges must not be changed as external modules may depend on specific error
  * codes. Individual errors are defined at a compiler level, for example,
@@ -120,13 +135,11 @@ export interface CompilerFileSystemCallbacks {
 export interface CompilerCallbacks {
   /**
    * Attempt to load a file. Return falsy if not found.
-   * TODO: accept only string
    * TODO: never return falsy, just throw if not found?
-   * TODO: Buffer is Node-only.
    * @param baseFilename
    * @param filename
    */
-  loadFile(filename: string | URL): Buffer;
+  loadFile(filename: string): Uint8Array;
 
   get path(): CompilerPathCallbacks;
   get fs(): CompilerFileSystemCallbacks;
@@ -138,7 +151,7 @@ export interface CompilerCallbacks {
    */
   resolveFilename(baseFilename: string, filename: string): string;
 
-  loadSchema(schema: CompilerSchema): Buffer;
+  loadSchema(schema: CompilerSchema): Uint8Array;
   reportMessage(event: CompilerEvent): void;
   debug(msg: string): void;
 };

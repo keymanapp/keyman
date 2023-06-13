@@ -16,7 +16,12 @@ export class KmpCompiler {
 
   public transformKpsToKmpObject(kpsFilename: string): KmpJsonFile.KmpJsonFile {
     // Load the KPS data from XML as JS structured data.
-    const data = this.callbacks.fs.readFileSync(kpsFilename, 'utf-8');
+    const buffer = this.callbacks.loadFile(kpsFilename);
+    if(!buffer) {
+      this.callbacks.reportMessage(CompilerMessages.Error_FileDoesNotExist({filename: kpsFilename}));
+      return null;
+    }
+    const data = new TextDecoder().decode(buffer);
 
     const kpsPackage = (() => {
         let a: KpsFile.KpsPackage;
@@ -24,7 +29,8 @@ export class KmpCompiler {
           tagNameProcessors: [xml2js.processors.firstCharLowerCase],
           explicitArray: false
         });
-        parser.parseString(data, (e: unknown, r: unknown) => { a = r as KpsFile.KpsPackage });
+        // TODO: add unit test for xml errors parsing .kps file
+        parser.parseString(data, (e: unknown, r: unknown) => { if(e) throw e; a = r as KpsFile.KpsPackage });
         return a;
     })();
 
@@ -284,9 +290,20 @@ export class KmpCompiler {
    * we want that to remain the responsibility of the keyboard compiler, so we'll warn the
    * few users who are still doing this
    */
-  private warnIfKvkFileIsNotBinary(filename: string, data: Buffer) {
-    // TODO: Buffer is not available on web
-    if(filename.match(/\.kvk$/) && data.compare(Buffer.from(KvkFile.KVK_HEADER_IDENTIFIER_BYTES), 0, 3, 0, 3) != 0) {
+  private warnIfKvkFileIsNotBinary(filename: string, data: Uint8Array) {
+    if(!filename.match(/\.kvk$/)) {
+      return;
+    }
+
+    if(data.byteLength < 4) {
+      // TODO: Not a valid .kvk file; should we be reporting this?
+      return;
+    }
+
+    if(data[0] != KvkFile.KVK_HEADER_IDENTIFIER_BYTES[0] ||
+      data[1] != KvkFile.KVK_HEADER_IDENTIFIER_BYTES[1] ||
+      data[2] != KvkFile.KVK_HEADER_IDENTIFIER_BYTES[2] ||
+      data[3] != KvkFile.KVK_HEADER_IDENTIFIER_BYTES[3]) {
       this.callbacks.reportMessage(CompilerMessages.Warn_FileIsNotABinaryKvkFile({filename: filename}));
     }
   }
