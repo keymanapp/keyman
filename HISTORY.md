@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.123 alpha 2023-06-13
+
+* chore(developer): support cp1252 'ansi' keyboards (#8988)
+* fix(developer): keep kmc-kmn messages within namespace (#8999)
+* fix(linux): Fix display of installed keyboard version (#8948)
+* fix(linux): Fix creation of markdown help files for Linux (#9001)
+
 ## 17.0.122 alpha 2023-06-12
 
 * refactor(developer): import kmcmplib errors into kmc-kmn (#8962)
