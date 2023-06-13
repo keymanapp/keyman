@@ -1,13 +1,18 @@
+// As currently written, any mutual entries with tsconfig.kmw-main-base.json align perfectly.
 {
   "extends": "./tsconfig-base.json",
+
   "compilerOptions": {
     "module": "es6",
     "target": "es5",
     "moduleResolution": "node16",
     "allowJs": false,
+
     "declaration": true,
+    // To help better support legacy Android devices
     "downlevelIteration": true,
     "importHelpers": true,
+    // Needed in order to help stitch together the worker sourcemaps during the polyfill-concatenation step.
     "inlineSourceMap": true,
     "inlineSources": true,
     "lib": ["es6"]

@@ -1,3 +1,4 @@
+// As currently written, any mutual entries with tsconfig.kmw-worker-base.json align perfectly.
 {
   "extends": "./tsconfig-base.json",
 
@@ -8,10 +9,15 @@
     "allowJs": false,
     "allowSyntheticDefaultImports": true,
     "declaration": true,
+
+
     "importHelpers": true,
+
+
     "inlineSources": true,
-    "sourceMap": true,
     "lib": ["es6"],
-    "experimentalDecorators": true
+    "sourceMap": true,
+
+    "experimentalDecorators": true,
   }
 }
