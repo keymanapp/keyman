@@ -169,7 +169,7 @@
                   <!-- Use the keyboard id to ensure unique id -->
                   <xsl:attribute name='id'>qrcode-<xsl:value-of select="id" /></xsl:attribute>
                   <div class='qrcode_back'>
-                    <xsl:attribute name="onclick">return hideKeyboardLink('<xsl:value-of select="../../id" />')</xsl:attribute>
+                    <xsl:attribute name="onclick">return hideKeyboardLink('<xsl:value-of select="id" />')</xsl:attribute>
                   </div>
                   <div class='qrcode_popup'>
                     <div>
