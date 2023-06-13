@@ -27,7 +27,6 @@ export function declareAnalyze(program: Command) {
 
       if(!analyze(filenames, options)) {
         // Once a file fails to build, we bail on subsequent builds
-        // TODO: is this the most appropriate semantics?
         process.exit(1);
       }
     });
@@ -61,10 +60,14 @@ async function analyzeOskCharUse(callbacks: CompilerCallbacks, filenames: string
 
     // If infile is a directory, then we treat that as a project and build it
     if(fs.statSync(filename).isDirectory()) {
-      await analyzer.analyzeProjectFolder(filename);
+      if(!await analyzer.analyzeProjectFolder(filename)) {
+        return false;
+      }
     }
     else {
-      await analyzer.analyze([filename]);
+      if(!await analyzer.analyze([filename])) {
+        return false;
+      }
     }
   }
 

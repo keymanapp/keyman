@@ -1,5 +1,5 @@
-import { CompilerCallbacks, KeymanDeveloperProject, KeymanFileTypes, KMX, KmxFileReader, KPJFileReader, KvksFileReader, TouchLayout, TouchLayoutFileReader } from "@keymanapp/common-types";
-import { KmnCompiler } from '@keymanapp/kmc-kmn';
+import { CompilerCallbacks, KeymanDeveloperProject, KeymanFileTypes, KMX, KmxFileReader, KPJFileReader, KvksFile, KvksFileReader, TouchLayout, TouchLayoutFileReader } from "@keymanapp/common-types";
+import { KmnCompiler, CompilerMessages } from '@keymanapp/kmc-kmn';
 import { AnalyzerMessages } from "../messages.js";
 
 export class AnalyzeOskCharacterUse {
@@ -16,25 +16,39 @@ export class AnalyzeOskCharacterUse {
   // Analyze a set of files
   //
 
-  public async analyze(files: string[], analyzeProjects: boolean = true) {
+  public async analyze(files: string[], analyzeProjects: boolean = true): Promise<boolean> {
     for(let file of files) {
       switch(KeymanFileTypes.sourceTypeFromFilename(file)) {
-        case KeymanFileTypes.Source.VisualKeyboard:
-          this.addStrings(this.scanVisualKeyboard(file));
+        case KeymanFileTypes.Source.VisualKeyboard: {
+          let strings = this.scanVisualKeyboard(file);
+          if(!strings) {
+            return false;
+          }
+          this.addStrings(strings);
           break;
-        case KeymanFileTypes.Source.TouchLayout:
-          this.addStrings(this.scanTouchLayout(file));
+        }
+        case KeymanFileTypes.Source.TouchLayout: {
+          let strings = this.scanTouchLayout(file);
+          if(!strings) {
+            return false;
+          }
+          this.addStrings(strings);
           break;
+        }
         case KeymanFileTypes.Source.Project:
           if(analyzeProjects) {
-            await this.analyzeProject(file);
+            if(!await this.analyzeProject(file)) {
+              return false;
+            }
           }
           break;
         case KeymanFileTypes.Source.KeymanKeyboard:
           // The cleanest way to do this is to compile the .kmn to find the .kvks
           // and .keyman-touch-layout from the &VISUALKEYBOARD and &LAYOUTFILE
           // system stores
-          await this.analyzeKmnKeyboard(file);
+          if(!await this.analyzeKmnKeyboard(file)) {
+            return false;
+          }
           break;
         case KeymanFileTypes.Source.LdmlKeyboard:
           // TODO: await this.analyzeLdmlKeyboard(file);
@@ -45,17 +59,18 @@ export class AnalyzeOskCharacterUse {
           // easily also
       }
     }
+    return true;
   }
 
-  private async analyzeProject(filename: string): Promise<void> {
+  private async analyzeProject(filename: string): Promise<boolean> {
     const reader = new KPJFileReader(this.callbacks);
     const source = reader.read(this.callbacks.loadFile(filename));
     const project = reader.transform(filename, source);
     let files = project.files.map(file => this.callbacks.resolveFilename(filename, file.filePath));
-    await this.analyze(files, false); // false because we don't want get into a recursive loop for projects
+    return await this.analyze(files, false); // false because we don't want get into a recursive loop for projects
   }
 
-  public async analyzeProjectFolder(folder: string) {
+  public async analyzeProjectFolder(folder: string): Promise<boolean> {
     // TODO: consider reworking slightly alongside kmc build BuildProject, with
     //       common file vs folder logic to be refactored to be a shared helper
     //       function, probably with the KpjFileReader?
@@ -64,7 +79,7 @@ export class AnalyzeOskCharacterUse {
 
     if(this.callbacks.fs.existsSync(kpjFile)) {
       this.callbacks.reportMessage(AnalyzerMessages.Info_ScanningFile({type:'project', name:kpjFile}));
-      await this.analyzeProject(kpjFile);
+      return await this.analyzeProject(kpjFile);
     } else {
       this.callbacks.reportMessage(AnalyzerMessages.Info_ScanningFile({type:'project folder', name:folder}));
       const project = new KeymanDeveloperProject(kpjFile, '2.0', this.callbacks);
@@ -72,18 +87,17 @@ export class AnalyzeOskCharacterUse {
       let files = project.files.map(file => this.callbacks.resolveFilename(kpjFile, file.filePath));
 
 
-      await this.analyze(files, false); // false because we don't want get into a recursive loop for projects
+      return await this.analyze(files, false); // false because we don't want get into a recursive loop for projects
     }
   }
 
-  private async analyzeKmnKeyboard(filename: string): Promise<void> {
+  private async analyzeKmnKeyboard(filename: string): Promise<boolean> {
     this.callbacks.reportMessage(AnalyzerMessages.Info_ScanningFile({type:'keyboard source', name:filename}));
 
     const kmnCompiler = new KmnCompiler();
     if(!await kmnCompiler.init(this.callbacks)) {
-      // TODO: error handling
-      console.error('kmx compiler failed to init');
-      process.exit(1);
+      // kmnCompiler will report errors
+      return false;
     }
 
     // Note, output filename here is just to provide path data,
@@ -95,8 +109,8 @@ export class AnalyzeOskCharacterUse {
     });
 
     if(!result) {
-      //TODO: error handling
-      process.exit(1);
+      // kmnCompiler will report any errors
+      return false;
     }
 
     if(result.data.kvksFilename) {
@@ -110,6 +124,8 @@ export class AnalyzeOskCharacterUse {
     if(touchLayoutStore) {
       this.addStrings(this.scanTouchLayout(this.callbacks.resolveFilename(filename, touchLayoutStore.dpString)));
     }
+
+    return true;
   }
 
   private addStrings(strings: string[]) {
@@ -124,10 +140,19 @@ export class AnalyzeOskCharacterUse {
     this.callbacks.reportMessage(AnalyzerMessages.Info_ScanningFile({type:'visual keyboard', name:filename}));
     let strings: string[] = [];
     const reader = new KvksFileReader();
-    const source = reader.read(this.callbacks.loadFile(filename));
+    let source: KvksFile.default;
+    try {
+      source = reader.read(this.callbacks.loadFile(filename));
+    } catch(e) {
+      this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({filename, e}));
+      return null;
+    }
     let invalidKeys: string[] = [];
     const vk = reader.transform(source, invalidKeys);
-    // TODO check vk, invalidKeys
+    if(!vk) {
+      this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({filename, e:null}));
+      return null;
+    }
     for(let key of vk.keys) {
       if(key.text) {
         strings.push(key.text);
@@ -141,7 +166,7 @@ export class AnalyzeOskCharacterUse {
     let strings: string[] = [];
     const reader = new TouchLayoutFileReader();
     const source = reader.read(this.callbacks.loadFile(filename));
-    // TODO: handle errors
+
     const scanKey = (key: TouchLayout.TouchLayoutKey | TouchLayout.TouchLayoutSubKey) => {
       if(!key.text) {
         return;
