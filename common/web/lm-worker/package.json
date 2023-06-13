@@ -16,8 +16,8 @@
     "karma": "karma",
     "mocha": "mocha",
     "test": "gosh ./test/test.sh",
-    "build": "tsc -b",
-    "clean": "tsc -b --clean",
+    "build": "gosh ./build.sh",
+    "clean": "gosh ./build.sh clean",
     "tsc": "tsc",
     "c8": "c8"
   },

@@ -46,7 +46,7 @@
     "build": "gosh ./build.sh",
     "tsc": "tsc",
     "mocha": "mocha",
-    "test": "mocha -r test/helpers.js",
+    "test": "gosh ./build.sh test",
     "c8": "c8"
   },
   "bugs": {
