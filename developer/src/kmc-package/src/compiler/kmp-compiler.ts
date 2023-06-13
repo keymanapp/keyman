@@ -2,7 +2,7 @@ import * as xml2js from 'xml2js';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
-import { CompilerCallbacks, KvkFile } from '@keymanapp/common-types';
+import { CompilerCallbacks, KeymanFileTypes, KvkFile } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
 import { KmpJsonFile, KpsFile } from '@keymanapp/common-types';
 import { PackageVersionValidation } from './package-version-validation.js';
@@ -291,7 +291,7 @@ export class KmpCompiler {
    * few users who are still doing this
    */
   private warnIfKvkFileIsNotBinary(filename: string, data: Uint8Array) {
-    if(!filename.match(/\.kvk$/)) {
+    if(!KeymanFileTypes.filenameIs(filename, KeymanFileTypes.Binary.VisualKeyboard)) {
       return;
     }
 

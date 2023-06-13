@@ -1,17 +1,15 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { CompilerCallbacks, CompilerOptions, KeymanDeveloperProject, KPJFileReader } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerOptions, KeymanDeveloperProject, KeymanFileTypes, KPJFileReader } from '@keymanapp/common-types';
 import { KeymanDeveloperProjectFile } from '../../../../../../common/web/types/src/kpj/keyman-developer-project.js';
 import { BuildActivity } from './BuildActivity.js';
 import { buildActivities } from './buildActivities.js';
 import { InfrastructureMessages } from '../../messages/messages.js';
 
-export const PROJECT_EXTENSION = '.kpj';
-
 export class BuildProject extends BuildActivity {
   public get name(): string { return 'Project'; }
-  public get sourceExtension(): string { return PROJECT_EXTENSION; }
-  public get compiledExtension(): string { return null; }
+  public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.Project; }
+  public get compiledExtension(): KeymanFileTypes.Binary { return null; }
   public get description(): string  { return 'Build a keyboard or lexical model project'; }
   public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
     let builder = new ProjectBuilder(infile, callbacks, options);
@@ -44,7 +42,7 @@ class ProjectBuilder {
 
     // Go through the various file types and build them
     for(let builder of buildActivities) {
-      if(builder.sourceExtension == PROJECT_EXTENSION) {
+      if(builder.sourceExtension == KeymanFileTypes.Source.Project) {
         // We don't support nested projects
         continue;
       }
@@ -69,7 +67,7 @@ class ProjectBuilder {
 
     if(fs.statSync(this.infile).isDirectory()) {
       // This is a project folder, look for folder-name.kpj
-      this.infile = path.join(this.infile, path.basename(this.infile) + '.kpj');
+      this.infile = path.join(this.infile, path.basename(this.infile) + KeymanFileTypes.Source.Project);
     }
 
     const project = fs.existsSync(this.infile) ?

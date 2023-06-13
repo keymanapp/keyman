@@ -1,14 +1,14 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as kmcLdml from '@keymanapp/kmc-ldml';
-import { KvkFileWriter, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader, CompilerOptions, defaultCompilerOptions } from '@keymanapp/common-types';
+import { KvkFileWriter, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader, CompilerOptions, defaultCompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
 import { BuildActivity } from './BuildActivity.js';
 import { fileURLToPath } from 'url';
 
 export class BuildLdmlKeyboard extends BuildActivity {
   public get name(): string { return 'LDML keyboard'; }
-  public get sourceExtension(): string { return '.xml'; }
-  public get compiledExtension(): string { return '.kmx'; }
+  public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.LdmlKeyboard; }
+  public get compiledExtension(): KeymanFileTypes.Binary { return KeymanFileTypes.Binary.Keyboard; }
   public get description(): string { return 'Build a LDML keyboard'; }
   public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
     // TODO-LDML: consider hardware vs touch -- touch-only layout will not have a .kvk
@@ -21,11 +21,11 @@ export class BuildLdmlKeyboard extends BuildActivity {
     const outFileDir = path.dirname(fileBaseName);
 
     if(kmx && kvk) {
-      const outFileKmx = path.join(outFileDir, outFileBase + '.kmx');
+      const outFileKmx = path.join(outFileDir, outFileBase + KeymanFileTypes.Binary.Keyboard);
       console.log(`Writing compiled keyboard to ${outFileKmx}`);
       fs.writeFileSync(outFileKmx, kmx);
 
-      const outFileKvk = path.join(outFileDir, outFileBase + '.kvk');
+      const outFileKvk = path.join(outFileDir, outFileBase + KeymanFileTypes.Binary.VisualKeyboard);
       console.log(`Writing compiled visual keyboard to ${outFileKvk}`);
       fs.writeFileSync(outFileKvk, kvk);
     } else {
@@ -34,7 +34,7 @@ export class BuildLdmlKeyboard extends BuildActivity {
     }
 
     if(kmw) {
-      const outFileKmw = path.join(outFileDir, outFileBase + '.js');
+      const outFileKmw = path.join(outFileDir, outFileBase + KeymanFileTypes.Binary.WebKeyboard);
       console.log(`Writing compiled js keyboard to ${outFileKmw}`);
       fs.writeFileSync(outFileKmw, kmw);
     }

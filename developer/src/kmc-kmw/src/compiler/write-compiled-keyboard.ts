@@ -1,4 +1,4 @@
-import { KMX, CompilerOptions, CompilerCallbacks, KvkFileReader, KvksFileReader, VisualKeyboard } from "@keymanapp/common-types";
+import { KMX, CompilerOptions, CompilerCallbacks, KvkFileReader, KvksFileReader, VisualKeyboard, KeymanFileTypes } from "@keymanapp/common-types";
 import { ExpandSentinel, incxstr, xstrlen } from "../util/util.js";
 import { options, nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater, callbacks } from "./compiler-globals.js";
 import { JavaScript_ContextMatch, JavaScript_KeyAsString, JavaScript_Name, JavaScript_OutputString, JavaScript_Rules, JavaScript_Shift, JavaScript_ShiftAsString, JavaScript_Store, zeroPadHex } from './javascript-strings.js';
@@ -195,7 +195,7 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
     let path = callbacks.resolveFilename(kmnfile, sVisualKeyboard);
 
     let kvk: VisualKeyboard.VisualKeyboard;
-    if(path.match(/\.kvks$/i)) {
+    if(KeymanFileTypes.filenameIs(path, KeymanFileTypes.Source.VisualKeyboard)) {
       let reader = new KvksFileReader();
       let source = reader.read(callbacks.loadFile(path));
       reader.validate(source, callbacks.loadSchema("kvks")); // TODO: handle exceptions

@@ -7,7 +7,7 @@ TODO: implement additional interfaces:
 
 // TODO: rename wasm-host?
 import { UnicodeSetParser, UnicodeSet } from '@keymanapp/common-types';
-import { CompilerCallbacks, CompilerEvent, CompilerOptions, KvkFileWriter, KvksFileReader } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerEvent, CompilerOptions, KeymanFileTypes, KvkFileWriter, KvksFileReader } from '@keymanapp/common-types';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
 import { CompilerMessages, mapErrorFromKmcmplib } from './messages.js';
 
@@ -226,7 +226,8 @@ export class KmnCompiler implements UnicodeSetParser {
     }
     let writer = new KvkFileWriter();
     return {
-      filename: this.callbacks.path.join(this.callbacks.path.dirname(kmxFilename), this.callbacks.path.basename(kvksFilename, '.kvks') + '.kvk'),
+      filename: this.callbacks.path.join(this.callbacks.path.dirname(kmxFilename),
+        this.callbacks.path.basename(kvksFilename, KeymanFileTypes.Source.VisualKeyboard) + KeymanFileTypes.Binary.VisualKeyboard),
       data: writer.write(vk)
     };
   }

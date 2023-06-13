@@ -1,4 +1,4 @@
-import { KmpJsonFile, CompilerCallbacks, KpsFile, KmxFileReader, KmxFileReaderError, KMX } from '@keymanapp/common-types';
+import { KmpJsonFile, CompilerCallbacks, KpsFile, KmxFileReader, KmxFileReaderError, KMX, KeymanFileTypes } from '@keymanapp/common-types';
 import { KeymanTarget, TouchKeymanTargets } from './keyman-targets.js';
 import { CompilerMessages } from './messages.js';
 
@@ -109,7 +109,7 @@ export class PackageVersionValidation {
     keyboard: KmpJsonFile.KmpJsonFileKeyboard
   ): KMX.KEYBOARD {
 
-    const file = kmp.files.find(file => this.callbacks.path.basename(file.name, '.kmx') == keyboard.id);
+    const file = kmp.files.find(file => this.callbacks.path.basename(file.name, KeymanFileTypes.Binary.Keyboard) == keyboard.id);
     if(!file) {
       this.callbacks.reportMessage(CompilerMessages.Error_KeyboardContentFileNotFound({id:keyboard.id}));
       return null;
