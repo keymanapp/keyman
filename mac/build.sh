@@ -459,6 +459,7 @@ if $PREPRELEASE || $NOTARIZE; then
         --apple-id "$APPSTORECONNECT_USERNAME" \
         --team-id "$DEVELOPMENT_TEAM" \
         --password "$APPSTORECONNECT_PASSWORD" \
+        --output-format json \
         --wait \
         "$TARGET_ZIP_PATH" > "$NOTARYTOOL_LOG_PATH"
 
