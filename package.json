@@ -40,5 +40,8 @@
     "@keymanapp/common-types": "file:common/web/types",
     "@keymanapp/ldml-keyboard-constants": "file:core/include/ldml",
     "@keymanapp/developer-test-helpers": "file:developer/src/common/web/test-helpers"
+  },
+  "engines": {
+    "node": "^18.x"
   }
 }
