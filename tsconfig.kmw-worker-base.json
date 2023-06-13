@@ -10,7 +10,6 @@
     "importHelpers": true,
     "inlineSourceMap": true,
     "inlineSources": true,
-    "lib": ["es6"],
-    "types": ["node"],
+    "lib": ["es6"]
   }
 }
