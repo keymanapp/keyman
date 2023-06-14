@@ -117,7 +117,7 @@ export default class KeymanEngine<
     // The OSK does not possess a direct connection to the KeyboardProcessor's state-key
     // management object; this event + handler allow us to keep the OSK's related states
     // in sync.
-    this.core.keyboardProcessor.on('statekeyChange', (stateKeys) => {
+    this.core.keyboardProcessor.on('statekeychange', (stateKeys) => {
       this.osk?.vkbd?.updateStateKeys(stateKeys);
     })
 
@@ -211,7 +211,7 @@ export default class KeymanEngine<
       this.osk?.refreshLayout();
     });
 
-    kbdCache.on('stubAdded', (stub) => {
+    kbdCache.on('stubadded', (stub) => {
       let eventRaiser = () => {
         // The corresponding event is needed in order to update UI modules as new keyboard stubs "come online".
         this.legacyAPIEvents.callEvent('keyboardregistered', {
@@ -236,7 +236,7 @@ export default class KeymanEngine<
       }
     });
 
-    kbdCache.on('keyboardAdded', (keyboard) => {
+    kbdCache.on('keyboardadded', (keyboard) => {
       let eventRaiser = () => {
         // Execute any external (UI) code needed after loading keyboard
         this.legacyAPIEvents.callEvent('keyboardloaded', {
@@ -251,7 +251,7 @@ export default class KeymanEngine<
       }
     });
 
-    this.keyboardRequisitioner.cache.on('keyboardAdded', (keyboard) => {
+    this.keyboardRequisitioner.cache.on('keyboardadded', (keyboard) => {
       this.legacyAPIEvents.callEvent('keyboardloaded', { keyboardName: keyboard.id });
     });
     //
@@ -272,10 +272,10 @@ export default class KeymanEngine<
 
   protected set hardKeyboard(keyboard: HardKeyboard) {
     if(this._hardKeyboard) {
-      this._hardKeyboard.off('keyEvent', this.keyEventListener);
+      this._hardKeyboard.off('keyevent', this.keyEventListener);
     }
     this._hardKeyboard = keyboard;
-    keyboard.on('keyEvent', this.keyEventListener);
+    keyboard.on('keyevent', this.keyEventListener);
   }
 
   public get osk(): OSKView {
@@ -284,13 +284,13 @@ export default class KeymanEngine<
 
   public set osk(value: OSKView) {
     if(this._osk) {
-      this._osk.off('keyEvent', this.keyEventListener);
+      this._osk.off('keyevent', this.keyEventListener);
       this.core.keyboardProcessor.layerStore.handler = this.osk.layerChangeHandler;
     }
     this._osk = value;
     if(value) {
       value.activeKeyboard = this.contextManager.activeKeyboard;
-      value.on('keyEvent', this.keyEventListener);
+      value.on('keyevent', this.keyEventListener);
       this.core.keyboardProcessor.layerStore.handler = value.layerChangeHandler;
     }
   }

@@ -10,7 +10,7 @@ interface EventMap {
   /**
    * Triggered when the user inputs a special command to show the engine's current version number.
    */
-  showBuild: () => void;
+  showbuild: () => void;
 }
 
 export default class ResizeBar extends EventEmitter<EventMap, ResizeBar> implements OSKViewComponent {
@@ -66,7 +66,7 @@ export default class ResizeBar extends EventEmitter<EventMap, ResizeBar> impleme
 
     // Display build number on shift+double click
     Ltitle.addEventListener('dblclick', (e) => {
-      this.emit('showBuild');
+      this.emit('showbuild');
 
       return false;
     }, false);

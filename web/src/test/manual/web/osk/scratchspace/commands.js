@@ -97,7 +97,7 @@ function setOSK(mode) {
     keyboard = setKeyboard('us');
   }
   currentOSK.activeKeyboard = keyboard;
-  currentOSK.on('keyEvent', (event) => {
+  currentOSK.on('keyevent', (event) => {
     let eventText = JSON.stringify(event, (key, value) => {
       switch(key) {
         case 'srcKeyboard':

@@ -37,7 +37,7 @@ export interface ProcessorInitOptions {
 }
 
 interface EventMap {
-  statekeyChange: (stateKeys: typeof KeyboardProcessor.prototype.stateKeys) => void;
+  statekeychange: (stateKeys: typeof KeyboardProcessor.prototype.stateKeys) => void;
 }
 
 export default class KeyboardProcessor extends EventEmitter<EventMap> {
@@ -287,7 +287,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
       }
 
       if(stateMutation) {
-        this.emit('statekeyChange', this.stateKeys);
+        this.emit('statekeychange', this.stateKeys);
       }
     }
 
