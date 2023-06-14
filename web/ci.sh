@@ -127,7 +127,7 @@ if builder_start_action prepare:s.keyman.com; then
   # Third phase: tweak the sourcemaps
   # We can use an alt-mode of Web's sourcemap-root tool for this.
   for sourcemap in "$BASE_PUBLISH_FOLDER/"*.map; do
-    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.mjs" null "$sourcemap" --sourceRoot "https://s.keyman.com/kmw/engine/$VERSION/src"
+    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" null "$sourcemap" --sourceRoot "https://s.keyman.com/kmw/engine/$VERSION/src"
   done
 
   # Actual construction of the PR will be left to CI-config scripting for now.
