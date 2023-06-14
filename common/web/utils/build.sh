@@ -25,31 +25,24 @@ builder_describe \
 
 builder_describe_outputs \
   configure "/node_modules" \
-  build     "/common/web/utils/build/lib/index.mjs"
+  build     "/common/web/utils/build/obj/index.js"
 
 builder_parse "$@"
 
-if builder_start_action configure; then
-  verify_npm_setup
-  builder_finish_action success configure
-fi
+builder_run_action configure verify_npm_setup
+builder_run_action clean rm -rf build/
 
-if builder_start_action clean; then
-  npm run clean
-  builder_finish_action success clean
-fi
-
-if builder_start_action build; then
+do_build ( ) {
   tsc --build "$THIS_SCRIPT_PATH/tsconfig.json"
-  node build-bundler.js
 
-  # So... tsc does declaration-bundling on its own pretty well, at least for local development.
-  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  # May be useful one day, for building a mass .d.ts for KMW as a whole.
+  # # So... tsc does declaration-bundling on its own pretty well, at least for local development.
+  # tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+}
 
-  builder_finish_action success build
-fi
+builder_run_action build do_build
 
-if builder_start_action test; then
+do_test ( ) {
   builder_heading "Running web-utils test suite"
 
   FLAGS=
@@ -59,6 +52,6 @@ if builder_start_action test; then
   fi
 
   c8 mocha --recursive $FLAGS ./src/test/
+}
 
-  builder_finish_action success test
-fi
+builder_run_action test do_test

@@ -13,29 +13,14 @@ await esbuild.build({
     'tslib': '@keymanapp/tslib'
   },
   bundle: true,
-  sourcemap: true,
   format: "esm",
-  nodePaths: ['../../node_modules'],
+  sourcemap: true,
+  target: "es5",
+  external: ['fs', 'vm'],
+  // nodePaths: ['../../node_modules'],
   entryPoints: {
     'index': 'build/obj/web/index.js',
   },
-  external: ['fs', 'vm'],
   outdir: 'build/lib/web',
-  outExtension: { '.js': '.mjs' },
-  tsconfig: 'src/web/tsconfig.json',
-  target: "es5"
+  outExtension: { '.js': '.mjs' }
 });
-
-// // Direct-use version
-// esbuild.buildSync({
-//   bundle: true,
-//   sourcemap: true,
-//   format: "iife",
-//   nodePaths: ['..'],
-//   entryPoints: {
-//     'worker-main': 'build/obj/worker-main.js'
-//   },
-//   outdir: 'build/lib',
-//   tsconfig: 'tsconfig.json',
-//   target: "es5"
-// });

@@ -35,17 +35,10 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-if builder_start_action configure; then
-  verify_npm_setup
-  builder_finish_action success configure
-fi
+builder_run_action configure verify_npm_setup
+builder_run_action clean rm -rf ./build
 
-if builder_start_action clean; then
-  rm -rf ./build
-  builder_finish_action success clean
-fi
-
-if builder_start_action build; then
+do_build ( ) {
   tsc --build "$THIS_SCRIPT_PATH/tsconfig.all.json"
   node ./build-bundler.js
 
@@ -53,11 +46,11 @@ if builder_start_action build; then
   tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
   tsc --emitDeclarationOnly --outFile ./build/lib/dom-keyboard-loader.d.ts -p src/keyboards/loaders/tsconfig.dom.json
   tsc --emitDeclarationOnly --outFile ./build/lib/node-keyboard-loader.d.ts -p src/keyboards/loaders/tsconfig.node.json
+}
 
-  builder_finish_action success build
-fi
+builder_run_action build do_build
 
-if builder_start_action test; then
+do_test ( ) {
   builder_heading "Running Keyboard Processor test suite"
 
   MOCHA_FLAGS=
@@ -70,6 +63,6 @@ if builder_start_action test; then
 
   c8 mocha --recursive $MOCHA_FLAGS ./tests/node/
   karma start ./tests/dom/$KARMA_CONFIG
+}
 
-  builder_finish_action success test
-fi
+builder_run_action test do_test
