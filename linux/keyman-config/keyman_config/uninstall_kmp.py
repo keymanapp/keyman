@@ -43,26 +43,27 @@ def _uninstall_dir(what, dir):
         logging.info('No %s directory %s', what, dir)
 
 
-def _uninstall_kmp_common(location, packageID):
+def _uninstall_kmp_common(location, packageID, removeLanguages):
     kbdir = get_keyboard_dir(location, packageID)
     kbdocdir = get_keyman_doc_dir(location, packageID)
     kbfontdir = get_keyman_font_dir(location, packageID)
 
-    where = 'local'
-    if location == InstallLocation.Shared:
-        where = 'shared'
-
-    logging.info("Uninstalling %s keyboard: %s", where, packageID)
-    info, system, options, keyboards, files = get_metadata(kbdir)
-    if keyboards:
-        if is_fcitx_running():
-            _uninstall_keyboards_from_fcitx5()
-        elif is_gnome_shell():
-            _uninstall_keyboards_from_gnome(keyboards, kbdir)
-        else:
-            _uninstall_keyboards_from_ibus(keyboards, kbdir)
+    where = 'shared' if location == InstallLocation.Shared else 'local'
+    if removeLanguages:
+        logging.info(f'Uninstalling {where} keyboard: {packageID}')
     else:
-        logging.warning("could not uninstall keyboards")
+        logging.info(f'Replacing {where} keyboard: {packageID}')
+    info, system, options, keyboards, files = get_metadata(kbdir)
+    if removeLanguages:
+        if keyboards:
+            if is_fcitx_running():
+                _uninstall_keyboards_from_fcitx5()
+            elif is_gnome_shell():
+                _uninstall_keyboards_from_gnome(keyboards, kbdir)
+            else:
+                _uninstall_keyboards_from_ibus(keyboards, kbdir)
+        else:
+            logging.warning("could not uninstall keyboards")
 
     if not os.path.isdir(kbdir):
         logging.error('Keyboard directory %s for %s does not exist.', kbdir, packageID)
@@ -119,18 +120,21 @@ def _uninstall_keyboards_from_fcitx5():
     return _('Please use fcitx5-configtool to remove the keyboard from the group')
 
 
-def uninstall_kmp(packageID, sharedarea=False):
+def uninstall_kmp(packageID, sharedarea=False, removeLanguages=True):
     """
-    Uninstall a kmp
+    Uninstall a Keyman keyboard package
 
     Args:
         packageID (str): Keyboard package ID
         sharedarea (str): whether to uninstall from shared /usr/local or ~/.local
+        removeLanguages (str): if True also uninstall the languages associated with
+            the keyboard, otherwise only remove keyboard (i.e. in preparation for
+            replacing the keyboard with a newer version)
     """
     if sharedarea:
-        msg = _uninstall_kmp_common(InstallLocation.Shared, packageID)
+        msg = _uninstall_kmp_common(InstallLocation.Shared, packageID, removeLanguages)
     else:
-        msg = _uninstall_kmp_common(InstallLocation.User, packageID)
+        msg = _uninstall_kmp_common(InstallLocation.User, packageID, removeLanguages)
 
     get_keyman_config_service().keyboard_list_changed()
     return msg

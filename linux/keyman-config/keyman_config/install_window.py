@@ -154,7 +154,7 @@ class InstallKmpWindow(Gtk.Dialog):
         try:
             if response == Gtk.ResponseType.YES:
                 logging.debug("QUESTION dialog closed by clicking YES button")
-                uninstall_kmp(keyboardid)
+                uninstall_kmp(keyboardid, False, False)
                 return True
             elif response == Gtk.ResponseType.NO:
                 logging.debug("QUESTION dialog closed by clicking NO button")
