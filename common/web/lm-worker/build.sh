@@ -67,8 +67,8 @@ if builder_start_action build; then
   node build-bundler.js "$EXT_FLAGS"
 
   # Declaration bundling.
-  npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/index.d.ts
-  npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/worker-main.d.ts
+  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  tsc --emitDeclarationOnly --outFile ./build/lib/worker-main.d.ts
 
   echo "Preparing the polyfills + worker for script-embedding"
   node build-polyfill-concatenator.js
