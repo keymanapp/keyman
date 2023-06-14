@@ -3,3 +3,4 @@
  */
 
 export { AnalyzeOskCharacterUse } from './osk-character-use/index.js';
+export { AnalyzeOskRewritePua } from './osk-rewrite-pua/index.js';

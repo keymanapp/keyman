@@ -2,17 +2,18 @@ import * as fs from 'fs';
 import { Command, Option } from 'commander';
 import { NodeCompilerCallbacks } from '../messages/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/messages.js';
-import { CompilerBaseOptions, CompilerCallbacks, KeymanFileTypes } from '@keymanapp/common-types';
-import { AnalyzeOskCharacterUse } from '@keymanapp/kmc-analyze';
+import { CompilerBaseOptions, CompilerCallbacks } from '@keymanapp/common-types';
+import { AnalyzeOskCharacterUse, AnalyzeOskRewritePua } from '@keymanapp/kmc-analyze';
 import { addBaseOptions } from '../util/baseOptions.js';
-import { runProject, runProjectFolder } from '../util/projectReader.js';
+import { runOnFiles } from '../util/projectReader.js';
 
 interface AnalysisActivityOptions extends CompilerBaseOptions {
-  action: 'osk-char-use';
+  action: 'osk-char-use' | 'osk-rewrite-from-char-use';
   format: 'text' | 'markdown' | 'json';
   base?: string;
   stripDottedCircle?: boolean;
   includeCounts?: boolean;
+  mappingFile?: string;
 };
 
 export function declareAnalyze(program: Command) {
@@ -21,10 +22,14 @@ export function declareAnalyze(program: Command) {
     .description('Analyze a source file or files')
   )
     .addOption(new Option('-f, --format <filename>', 'Output file format').choices(['text','markdown','json']).default('text'))
-    .addOption(new Option('-a, --action <action>', 'Specify the analysis to run').choices(['osk-char-use']).makeOptionMandatory())
+    .addOption(new Option('-a, --action <action>', 'Specify the analysis to run').choices([
+      'osk-char-use',
+      'osk-rewrite-from-char-use',
+    ]).makeOptionMandatory())
     .option('-b, --base', 'First PUA codepoint to use, in hexadecimal', 'F100')
     .option('--include-counts', 'Include number of times each character is referenced', false)
     .option('--strip-dotted-circle', 'Strip U+25CC (dotted circle base) from results', false)
+    .option('-m, --mapping-file <filename>', 'Input mapping file (for osk-rewrite-from-char-use)')
     .action(async (filenames: string[], options: any) => {
       if(!filenames.length) {
         // If there are no filenames provided, then we are building the current
@@ -41,12 +46,14 @@ export function declareAnalyze(program: Command) {
 
 async function analyze(filenames: string[], options: AnalysisActivityOptions): Promise<boolean> {
   // Note: we always use logLevel=silent if we write the output to console
-  let callbacks = new NodeCompilerCallbacks({logLevel: options.outFile ? options.logLevel : 'silent'});
+  let callbacks = new NodeCompilerCallbacks({logLevel: options.outFile || options.action != 'osk-char-use' ? options.logLevel : 'silent'});
 
   try {
     switch(options.action) {
       case 'osk-char-use':
         return await analyzeOskCharUse(callbacks, filenames, options);
+      case 'osk-rewrite-from-char-use':
+        return await analyzeOskRewritePua(callbacks, filenames, options);
       default:
         throw new Error(`Internal error: Invalid analyze action '${options.action}'`);
     }
@@ -63,40 +70,34 @@ async function analyzeOskCharUse(callbacks: CompilerCallbacks, filenames: string
     includeCounts: options.includeCounts,
   });
 
-  async function analyzeFile(filename: string) {
-    return await analyzer.analyze(filename);
-  }
-
-  for(let filename of filenames) {
-    if(!fs.existsSync(filename)) {
-      callbacks.reportMessage(InfrastructureMessages.Error_FileDoesNotExist({filename}));
-      continue;
-    }
-
-    // If infile is a directory, then we treat that as a project and build it
-    if(fs.statSync(filename).isDirectory()) {
-      if(!await runProjectFolder(callbacks, filename, analyzeFile)) {
-        return false;
-      }
-    } else if(KeymanFileTypes.sourceTypeFromFilename(filename) == KeymanFileTypes.Source.Project) {
-      if(!await runProject(callbacks, filename, analyzeFile)) {
-        return false;
-      }
-    } else {
-      if(!await analyzeFile(filename)) {
-        return false;
-      }
-    }
+  if(!await runOnFiles(callbacks, filenames, analyzer.analyze.bind(analyzer))) {
+    return false;
   }
 
   let output = analyzer.getStrings(options.format ?? 'text').join('\n');
   if(options.outFile) {
     fs.writeFileSync(options.outFile, output, 'utf8');
   } else {
-    // TODO: when logging to console we need to be 'quiet' for everything else
     process.stdout.write(output + '\n');
   }
 
   return true;
 }
 
+async function analyzeOskRewritePua(callbacks: CompilerCallbacks, filenames: string[], options: AnalysisActivityOptions) {
+  const analyzer = new AnalyzeOskRewritePua(callbacks, {
+    stripDottedCircle: options.stripDottedCircle,
+    mappingFile: options.mappingFile,
+  });
+  const mapping: any = JSON.parse(callbacks.fs.readFileSync(options.mappingFile, 'UTF-8'));
+
+  return await runOnFiles(callbacks, filenames, async (filename: string): Promise<boolean> => {
+    if(!await analyzer.analyze(filename, mapping)) {
+      return false;
+    }
+    for(let filename of Object.keys(analyzer.data)) {
+      fs.writeFileSync(filename, analyzer.data[filename]);
+    }
+    return true;
+  });
+}

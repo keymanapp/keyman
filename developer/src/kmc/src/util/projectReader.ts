@@ -1,4 +1,6 @@
+import * as fs from 'fs';
 import { CompilerCallbacks, KeymanDeveloperProject, KeymanFileTypes, KPJFileReader } from "@keymanapp/common-types";
+import { InfrastructureMessages } from '../messages/messages.js';
 
 async function doRunProject(callbacks: CompilerCallbacks, project: KeymanDeveloperProject, basefile: string, callback: (filename:string)=>Promise<boolean>): Promise<boolean> {
   const files = project.files
@@ -31,4 +33,29 @@ export async function runProjectFolder(callbacks: CompilerCallbacks, folder: str
     project.populateFiles();
     return await doRunProject(callbacks, project, folder, callback);
   }
+}
+
+export async function runOnFiles(callbacks: CompilerCallbacks, filenames: string[], callback: (filename:string)=>Promise<boolean>): Promise<boolean> {
+  for(let filename of filenames) {
+    if(!fs.existsSync(filename)) {
+      callbacks.reportMessage(InfrastructureMessages.Error_FileDoesNotExist({filename}));
+      continue;
+    }
+
+    // If infile is a directory, then we treat that as a project and build it
+    if(fs.statSync(filename).isDirectory()) {
+      if(!await runProjectFolder(callbacks, filename, callback)) {
+        return false;
+      }
+    } else if(KeymanFileTypes.sourceTypeFromFilename(filename) == KeymanFileTypes.Source.Project) {
+      if(!await runProject(callbacks, filename, callback)) {
+        return false;
+      }
+    } else {
+      if(!await callback(filename)) {
+        return false;
+      }
+    }
+  }
+  return true;
 }

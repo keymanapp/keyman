@@ -1,25 +1,26 @@
-import { CompilerCallbacks, KeymanFileTypes, KMX, KmxFileReader, KvksFile, KvksFileReader, TouchLayout, TouchLayoutFileReader } from "@keymanapp/common-types";
-import { KmnCompiler, CompilerMessages } from '@keymanapp/kmc-kmn';
+import { CompilerCallbacks, KeymanFileTypes, KvksFile, KvksFileReader, TouchLayout, TouchLayoutFileReader } from "@keymanapp/common-types";
+import { CompilerMessages } from '@keymanapp/kmc-kmn';
+import { getOskFromKmnFile } from "../util/get-osk-from-kmn-file.js";
 import { AnalyzerMessages } from "../messages.js";
 
-interface StringRefUsage {
+export interface StringRefUsage {
   filename: string;
   count: number;
 };
 
-interface StringRef {
+export interface StringRef {
   str: string;
   usages: StringRefUsage[];
 };
 
-type StringRefUsageMap = {[index:string]: StringRefUsage[]};
-
-interface StringResult {
+export interface StringResult {
   str: string;                         // the key cap string
   unicode: string;                     // unicode code points in <str> for reference
   pua: string;                         // hexadecimal single character in PUA range
   usages: StringRefUsage[] | string[]; // files in which the string is referenced
 };
+
+type StringRefUsageMap = {[index:string]: StringRefUsage[]};
 
 export interface AnalyzeOskCharacterUseOptions {
   puaBase?: number;
@@ -92,39 +93,21 @@ export class AnalyzeOskCharacterUse {
   private async analyzeKmnKeyboard(filename: string): Promise<boolean> {
     this.callbacks.reportMessage(AnalyzerMessages.Info_ScanningFile({type:'keyboard source', name:filename}));
 
-    const kmnCompiler = new KmnCompiler();
-    if(!await kmnCompiler.init(this.callbacks)) {
-      // kmnCompiler will report errors
-      return false;
+    let osk = await getOskFromKmnFile(this.callbacks, filename);
+
+    if(osk.kvksFilename) {
+      let strings = this.scanVisualKeyboard(osk.kvksFilename);
+      if(!strings) {
+        return false;
+      }
+      this.addStrings(strings, osk.kvksFilename);
     }
-
-    // Note, output filename here is just to provide path data,
-    // as nothing is written to disk
-    let result = kmnCompiler.runCompiler(filename, filename + '.tmp', {
-      shouldAddCompilerVersion: false,
-      saveDebug: false,
-      target: 'js'
-    });
-
-    if(!result) {
-      // kmnCompiler will report any errors
-      return false;
-    }
-
-    if(result.data.kvksFilename) {
-      let kvksFilename = this.callbacks.resolveFilename(filename, result.data.kvksFilename);
-      let strings = this.scanVisualKeyboard(kvksFilename);
-      this.addStrings(strings, kvksFilename);
-    }
-
-    const reader = new KmxFileReader();
-    const keyboard: KMX.KEYBOARD = reader.read(result.kmx.data);
-    const touchLayoutStore = keyboard.stores.find(store => store.dwSystemID == KMX.KMXFile.TSS_LAYOUTFILE);
-
-    if(touchLayoutStore) {
-      let touchLayoutFilename = this.callbacks.resolveFilename(filename, touchLayoutStore.dpString);
-      let strings = this.scanTouchLayout(touchLayoutFilename);
-      this.addStrings(strings, touchLayoutFilename);
+    if(osk.touchLayoutFilename) {
+      let strings = this.scanTouchLayout(osk.touchLayoutFilename);
+      if(!strings) {
+        return false;
+      }
+      this.addStrings(strings, osk.touchLayoutFilename);
     }
 
     return true;
