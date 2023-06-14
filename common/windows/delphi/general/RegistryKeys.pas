@@ -296,6 +296,8 @@ const
 
   SRegValue_LanguageCheckDisabledItems = 'language check disabled items'; // CU
 
+  SRegValue_Install_Update = 'install update';
+
 {-------------------------------------------------------------------------------
  - Keyman Developer keys and values                                            -
  ------------------------------------------------------------------------------}
@@ -482,6 +484,7 @@ const
   SFolderRegressionTests            = SFolderKeymanDeveloper + '\Regression Tests';
 
   SFolder_CachedInstallerFiles      = SFolderKeymanRoot + '\Cached Installer Files';
+  SFolder_CachedUpdateFiles         = SFolderKeymanRoot + '\Cached Update Files';
 
   SFolderKeymanEngineDiag           = SFolderKeymanRoot + '\Diag';
 
