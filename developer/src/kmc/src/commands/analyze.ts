@@ -2,13 +2,17 @@ import * as fs from 'fs';
 import { Command, Option } from 'commander';
 import { NodeCompilerCallbacks } from '../messages/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/messages.js';
-import { CompilerBaseOptions, CompilerCallbacks } from '@keymanapp/common-types';
+import { CompilerBaseOptions, CompilerCallbacks, KeymanFileTypes } from '@keymanapp/common-types';
 import { AnalyzeOskCharacterUse } from '@keymanapp/kmc-analyze';
 import { addBaseOptions } from '../util/baseOptions.js';
+import { runProject, runProjectFolder } from '../util/projectReader.js';
 
 interface AnalysisActivityOptions extends CompilerBaseOptions {
   action: 'osk-char-use';
   format: 'text' | 'markdown' | 'json';
+  base?: string;
+  stripDottedCircle?: boolean;
+  includeCounts?: boolean;
 };
 
 export function declareAnalyze(program: Command) {
@@ -18,6 +22,9 @@ export function declareAnalyze(program: Command) {
   )
     .addOption(new Option('-f, --format <filename>', 'Output file format').choices(['text','markdown','json']).default('text'))
     .addOption(new Option('-a, --action <action>', 'Specify the analysis to run').choices(['osk-char-use']).makeOptionMandatory())
+    .option('-b, --base', 'First PUA codepoint to use, in hexadecimal', 'F100')
+    .option('--include-counts', 'Include number of times each character is referenced', false)
+    .option('--strip-dotted-circle', 'Strip U+25CC (dotted circle base) from results', false)
     .action(async (filenames: string[], options: any) => {
       if(!filenames.length) {
         // If there are no filenames provided, then we are building the current
@@ -50,7 +57,15 @@ async function analyze(filenames: string[], options: AnalysisActivityOptions): P
 }
 
 async function analyzeOskCharUse(callbacks: CompilerCallbacks, filenames: string[], options: AnalysisActivityOptions) {
-  const analyzer = new AnalyzeOskCharacterUse(callbacks);
+  const analyzer = new AnalyzeOskCharacterUse(callbacks, {
+    puaBase: parseInt(options.base, 16),
+    stripDottedCircle: options.stripDottedCircle,
+    includeCounts: options.includeCounts,
+  });
+
+  async function analyzeFile(filename: string) {
+    return await analyzer.analyze(filename);
+  }
 
   for(let filename of filenames) {
     if(!fs.existsSync(filename)) {
@@ -60,12 +75,15 @@ async function analyzeOskCharUse(callbacks: CompilerCallbacks, filenames: string
 
     // If infile is a directory, then we treat that as a project and build it
     if(fs.statSync(filename).isDirectory()) {
-      if(!await analyzer.analyzeProjectFolder(filename)) {
+      if(!await runProjectFolder(callbacks, filename, analyzeFile)) {
         return false;
       }
-    }
-    else {
-      if(!await analyzer.analyze([filename])) {
+    } else if(KeymanFileTypes.sourceTypeFromFilename(filename) == KeymanFileTypes.Source.Project) {
+      if(!await runProject(callbacks, filename, analyzeFile)) {
+        return false;
+      }
+    } else {
+      if(!await analyzeFile(filename)) {
         return false;
       }
     }
@@ -81,3 +99,4 @@ async function analyzeOskCharUse(callbacks: CompilerCallbacks, filenames: string
 
   return true;
 }
+

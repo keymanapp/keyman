@@ -1,94 +1,92 @@
-import { CompilerCallbacks, KeymanDeveloperProject, KeymanFileTypes, KMX, KmxFileReader, KPJFileReader, KvksFile, KvksFileReader, TouchLayout, TouchLayoutFileReader } from "@keymanapp/common-types";
+import { CompilerCallbacks, KeymanFileTypes, KMX, KmxFileReader, KvksFile, KvksFileReader, TouchLayout, TouchLayoutFileReader } from "@keymanapp/common-types";
 import { KmnCompiler, CompilerMessages } from '@keymanapp/kmc-kmn';
 import { AnalyzerMessages } from "../messages.js";
 
-export class AnalyzeOskCharacterUse {
-  private _strings: string[] = [];
+interface StringRefUsage {
+  filename: string;
+  count: number;
+};
 
-  constructor(private callbacks: CompilerCallbacks) {
+interface StringRef {
+  str: string;
+  usages: StringRefUsage[];
+};
+
+type StringRefUsageMap = {[index:string]: StringRefUsage[]};
+
+interface StringResult {
+  str: string;                         // the key cap string
+  unicode: string;                     // unicode code points in <str> for reference
+  pua: string;                         // hexadecimal single character in PUA range
+  usages: StringRefUsage[] | string[]; // files in which the string is referenced
+};
+
+export interface AnalyzeOskCharacterUseOptions {
+  puaBase?: number;
+  stripDottedCircle?: boolean;
+  includeCounts?: boolean;
+}
+
+const defaultOptions: AnalyzeOskCharacterUseOptions = {
+  puaBase: 0xF100,
+  stripDottedCircle: false,
+  includeCounts: false,
+}
+
+export class AnalyzeOskCharacterUse {
+  private _strings: StringRefUsageMap = {};
+  private options: AnalyzeOskCharacterUseOptions;
+
+  constructor(private callbacks: CompilerCallbacks, options?: AnalyzeOskCharacterUseOptions) {
+    this.options = {...defaultOptions, ...options};
   }
 
   public clear() {
-    this._strings = [];
+    this._strings = {};
   }
 
   //
-  // Analyze a set of files
+  // Analyze a single file
   //
 
-  public async analyze(files: string[], analyzeProjects: boolean = true): Promise<boolean> {
-    for(let file of files) {
-      switch(KeymanFileTypes.sourceTypeFromFilename(file)) {
-        case KeymanFileTypes.Source.VisualKeyboard: {
-          let strings = this.scanVisualKeyboard(file);
-          if(!strings) {
-            return false;
-          }
-          this.addStrings(strings);
-          break;
+  public async analyze(file: string): Promise<boolean> {
+    switch(KeymanFileTypes.sourceTypeFromFilename(file)) {
+      case KeymanFileTypes.Source.VisualKeyboard: {
+        let strings = this.scanVisualKeyboard(file);
+        if(!strings) {
+          return false;
         }
-        case KeymanFileTypes.Source.TouchLayout: {
-          let strings = this.scanTouchLayout(file);
-          if(!strings) {
-            return false;
-          }
-          this.addStrings(strings);
-          break;
-        }
-        case KeymanFileTypes.Source.Project:
-          if(analyzeProjects) {
-            if(!await this.analyzeProject(file)) {
-              return false;
-            }
-          }
-          break;
-        case KeymanFileTypes.Source.KeymanKeyboard:
-          // The cleanest way to do this is to compile the .kmn to find the .kvks
-          // and .keyman-touch-layout from the &VISUALKEYBOARD and &LAYOUTFILE
-          // system stores
-          if(!await this.analyzeKmnKeyboard(file)) {
-            return false;
-          }
-          break;
-        case KeymanFileTypes.Source.LdmlKeyboard:
-          // TODO: await this.analyzeLdmlKeyboard(file);
-          // note, will need to skip .xml files that are not ldml keyboards
-          break;
-        default:
-          // Ignore any other file types; this way we can analyze project files/folders
-          // easily also
+        this.addStrings(strings, file);
+        break;
       }
+      case KeymanFileTypes.Source.TouchLayout: {
+        let strings = this.scanTouchLayout(file);
+        if(!strings) {
+          return false;
+        }
+        this.addStrings(strings, file);
+        break;
+      }
+      case KeymanFileTypes.Source.Project:
+        throw new Error('Passing a project to analyze is not permitted');
+        break;
+      case KeymanFileTypes.Source.KeymanKeyboard:
+        // The cleanest way to do this is to compile the .kmn to find the .kvks
+        // and .keyman-touch-layout from the &VISUALKEYBOARD and &LAYOUTFILE
+        // system stores
+        if(!await this.analyzeKmnKeyboard(file)) {
+          return false;
+        }
+        break;
+      case KeymanFileTypes.Source.LdmlKeyboard:
+        // TODO: await this.analyzeLdmlKeyboard(file);
+        // note, will need to skip .xml files that are not ldml keyboards
+        break;
+      default:
+        // Ignore any other file types; this way we can analyze project files/folders
+        // easily also
     }
     return true;
-  }
-
-  private async analyzeProject(filename: string): Promise<boolean> {
-    const reader = new KPJFileReader(this.callbacks);
-    const source = reader.read(this.callbacks.loadFile(filename));
-    const project = reader.transform(filename, source);
-    let files = project.files.map(file => this.callbacks.resolveFilename(filename, file.filePath));
-    return await this.analyze(files, false); // false because we don't want get into a recursive loop for projects
-  }
-
-  public async analyzeProjectFolder(folder: string): Promise<boolean> {
-    // TODO: consider reworking slightly alongside kmc build BuildProject, with
-    //       common file vs folder logic to be refactored to be a shared helper
-    //       function, probably with the KpjFileReader?
-
-    let kpjFile = this.callbacks.path.join(folder, this.callbacks.path.basename(folder) + KeymanFileTypes.Source.Project);
-
-    if(this.callbacks.fs.existsSync(kpjFile)) {
-      this.callbacks.reportMessage(AnalyzerMessages.Info_ScanningFile({type:'project', name:kpjFile}));
-      return await this.analyzeProject(kpjFile);
-    } else {
-      this.callbacks.reportMessage(AnalyzerMessages.Info_ScanningFile({type:'project folder', name:folder}));
-      const project = new KeymanDeveloperProject(kpjFile, '2.0', this.callbacks);
-      project.populateFiles();
-      let files = project.files.map(file => this.callbacks.resolveFilename(kpjFile, file.filePath));
-
-
-      return await this.analyze(files, false); // false because we don't want get into a recursive loop for projects
-    }
   }
 
   private async analyzeKmnKeyboard(filename: string): Promise<boolean> {
@@ -114,7 +112,9 @@ export class AnalyzeOskCharacterUse {
     }
 
     if(result.data.kvksFilename) {
-      this.addStrings(this.scanVisualKeyboard(this.callbacks.resolveFilename(filename, result.data.kvksFilename)));
+      let kvksFilename = this.callbacks.resolveFilename(filename, result.data.kvksFilename);
+      let strings = this.scanVisualKeyboard(kvksFilename);
+      this.addStrings(strings, kvksFilename);
     }
 
     const reader = new KmxFileReader();
@@ -122,14 +122,32 @@ export class AnalyzeOskCharacterUse {
     const touchLayoutStore = keyboard.stores.find(store => store.dwSystemID == KMX.KMXFile.TSS_LAYOUTFILE);
 
     if(touchLayoutStore) {
-      this.addStrings(this.scanTouchLayout(this.callbacks.resolveFilename(filename, touchLayoutStore.dpString)));
+      let touchLayoutFilename = this.callbacks.resolveFilename(filename, touchLayoutStore.dpString);
+      let strings = this.scanTouchLayout(touchLayoutFilename);
+      this.addStrings(strings, touchLayoutFilename);
     }
 
     return true;
   }
 
-  private addStrings(strings: string[]) {
-    this._strings = this._strings.concat(...strings);
+  private addStrings(strings: string[], filename: string) {
+    // Reduce all references to get usage count per file
+    let reducedStrings: StringRef[] = [...new Set(strings)].map(e =>({
+      str:e,
+      usages: [{filename: this.callbacks.path.basename(filename), count: strings.filter(n => n===e).length }]
+    }));
+
+    // Merge result with existing found strings
+    for(let e of reducedStrings) {
+      this._strings[e.str] = [].concat(this._strings[e.str] ?? [], ...e.usages);
+    }
+  }
+
+  private cleanString(s: string): string {
+    if(this.options.stripDottedCircle) {
+      s = s.replace(/\u25cc/g, '');
+    }
+    return s.trim();
   }
 
   //
@@ -155,7 +173,7 @@ export class AnalyzeOskCharacterUse {
     }
     for(let key of vk.keys) {
       if(key.text) {
-        strings.push(key.text);
+        strings.push(this.cleanString(key.text));
       }
     }
     return strings;
@@ -175,7 +193,7 @@ export class AnalyzeOskCharacterUse {
         // Don't add '*special*' key captions
         return;
       }
-      strings.push(key.text);
+      strings.push(this.cleanString(key.text));
     }
 
     const scanPlatform = (platform: TouchLayout.TouchLayoutPlatform) => {
@@ -210,80 +228,81 @@ export class AnalyzeOskCharacterUse {
   // Results reporting
   //
 
-  public get strings(): string[] {
-    // Sort and remove duplicates
-    const strings = [...new Set(this._strings)];
-    strings.sort();
-    return strings;
+  private prepareResults(strings: StringRefUsageMap): StringResult[] {
+    let result: StringResult[] = [];
+    let pua = this.options.puaBase;
+    for(let str of Object.keys(strings)) {
+      result.push({
+        pua: pua.toString(16).toUpperCase(),
+        str,
+        unicode: AnalyzeOskCharacterUse.stringToUnicodeSequence(str, false),
+        usages: this.options.includeCounts ? strings[str] : strings[str].map(item => item.filename)
+      });
+      pua++;
+    }
+    return result;
   }
 
   public getStrings(format?: 'text'|'markdown'|'json'): string[] {
+    const final = this.prepareResults(this._strings);
     switch(format) {
       case 'markdown':
-        return AnalyzeOskCharacterUse.getStringsAsMarkdown(this.strings);
+        return AnalyzeOskCharacterUse.getStringsAsMarkdown(final);
       case 'json':
-        return AnalyzeOskCharacterUse.getStringsAsJson(this.strings);
+        return AnalyzeOskCharacterUse.getStringsAsJson(final);
       }
-    return AnalyzeOskCharacterUse.getStringsAsText(this.strings);
+    return AnalyzeOskCharacterUse.getStringsAsText(final);
   }
 
   // Following functions are static so that we can keep them pure
   // and potentially refactor into separate reporting class later
 
-  private static getStringsAsText(strings: string[]) {
+  private static getStringsAsText(strings: StringResult[]) {
+    // Text result only returns PUA, unicode sequence, and plain string
     let lines: string[] = [];
     for(let s of strings) {
-      let ux = this.stringToUnicodeSequence(s);
-      lines.push(ux + '\t' + s);
+      const ux = this.stringToUnicodeSequence(s.str);
+      lines.push('U+'+s.pua + '\t' + ux + '\t' + s.str);
     }
     return lines;
   }
 
-  private static getStringsAsMarkdown(strings: string[]) {
+  private static getStringsAsMarkdown(strings: StringResult[]) {
+    // Markdown result only returns PUA, unicode sequence, and plain string
     let lines: string[] = [];
-    lines.push('Code Points | Key Caps');
-    lines.push('------------|---------');
+    lines.push('PUA    | Code Points | Key Caps');
+    lines.push('-------|-------------|---------');
     for(let s of strings) {
-      let ux = this.stringToUnicodeSequence(s);
-      lines.push(ux + ' | ' + this.escapeMarkdownChar(s));
+      const ux = this.stringToUnicodeSequence(s.str);
+      lines.push('U+'+s.pua + ' | ' + ux + ' | ' + this.escapeMarkdownChar(s.str));
     }
     return lines;
   }
 
-  private static getStringsAsJson(strings: string[]) {
-    let data: string[] = [];
-    for(let s of strings) {
-      data.push(s);
-    }
-    return JSON.stringify(data, null, 2).split('\n');
+  private static getStringsAsJson(strings: StringResult[]) {
+    return JSON.stringify(strings, null, 2).split('\n');
   }
 
-  // TODO: this only works for single-character strings -- bad bad bad
   private static escapeMarkdownChar(s: string) {
+    // note: could replace with a common lib but too much baggage to be worth it for now
     // commonmark 2.4: all punct can be escaped
-    const punct = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
-
-    if(punct.includes(s)) {
-      return '\\' + s;
-    }
-
-    // TODO: there are other chars, use a library or regex match? e.g. :, | https://michelf.ca/projects/php-markdown/extra/#backslash
-    switch(s) {
-      case '\n': return '\\\\n';
-      case '\r': return '\\\\r';
-      case '\t': return '\\\\t';
-      case ' ':  return '&#x20;';
-      case String.fromCharCode(0xa0): return '&#xa0;';
-    }
+    // const punct = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
+    s = s.replace(/[!"#$%&'()*+,-./:;<=>?@\[\\\]^_`{|}~]/g, '\\$0');
+    // replace whitepsace
+    s = s.replace(/[\n]/g, '\\n');
+    s = s.replace(/[\r]/g, '\\r');
+    s = s.replace(/[\t]/g, '\\t');
+    s = s.replace(/ /g, '&#x20;');
+    s = s.replace(/\u00a0/g, '&#xa0;');
     return s;
   }
 
-  private static stringToUnicodeSequence(s: string): string {
+  private static stringToUnicodeSequence(s: string, addUPlusPrefix: boolean = true): string {
     let result = [];
     for(let ch of s) {
       let c = ch.codePointAt(0).toString(16).toUpperCase();
       if(c.length < 4) c = '0'.repeat(4 - c.length) + c;
-      result.push(`U+${c}`);
+      result.push((addUPlusPrefix ? 'U+' : '') + c);
     }
     return result.join(' ');
   }
