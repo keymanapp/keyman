@@ -182,7 +182,7 @@ export class Scribe extends EventEmitter {
   initHooks(recordingElement: HTMLElement) {
     let recorderScribe = this;
 
-    keyman.hardKeyboard.on('keyEvent', (e) => {
+    keyman.hardKeyboard.on('keyevent', (e) => {
       let in_output = outputTargetForElement(recordingElement);
       if(!in_output || keyman.contextManager.activeTarget != in_output) {
         return;
@@ -198,7 +198,7 @@ export class Scribe extends EventEmitter {
       }, 1);
     });
 
-    keyman.osk.on('keyEvent', (e) => {
+    keyman.osk.on('keyevent', (e) => {
       let in_output = outputTargetForElement(recordingElement);
       if(!in_output || keyman.contextManager.activeTarget != in_output) {
         return;

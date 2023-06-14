@@ -8,7 +8,7 @@ interface EventMap {
   /**
    * Designed to pass key events off to any consuming modules/libraries.
    */
-  'keyEvent': KeyEventHandler;
+  'keyevent': KeyEventHandler;
 }
 
 export default interface KeyEventSourceInterface extends EventEmitter<EventMap> { }

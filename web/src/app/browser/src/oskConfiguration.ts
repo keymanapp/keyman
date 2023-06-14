@@ -7,7 +7,7 @@ import { LanguageMenu } from "./languageMenu.js";
 export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextManager: ContextManager) {
   const focusAssistant = contextManager.focusAssistant;
 
-  osk.on('globeKey', (key, on) => { // K_LOPT
+  osk.on('globekey', (key, on) => { // K_LOPT
     if(on) {
       if(osk.hostDevice.touchable) {
         engine.touchLanguageMenu = new LanguageMenu(engine);
@@ -20,7 +20,7 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
     }
   });
 
-  osk.on('hideRequested', (key) => { // K_ROPT
+  osk.on('hiderequested', (key) => { // K_ROPT
     if(osk) {
       osk.startHide(true);
       contextManager.forgetActiveTarget();
@@ -34,12 +34,12 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
     }
   });
 
-  osk.on('showBuild', () => {
+  osk.on('showbuild', () => {
     engine.config.alertHost?.alert('KeymanWeb Version ' + KEYMAN_VERSION.VERSION + '<br /><br />'
       +'<span style="font-size:0.8em">Copyright &copy; 2007-2023 SIL International</span>');
   });
 
-  osk.on('dragMove', async (promise) => {
+  osk.on('dragmove', async (promise) => {
     focusAssistant.restoringFocus = true;
 
     await promise;
@@ -50,7 +50,7 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
     focusAssistant.setMaintainingFocus(false);
   });
 
-  osk.on('resizeMove', async (promise) => {
+  osk.on('resizemove', async (promise) => {
     focusAssistant.restoringFocus = true;
 
     await promise;
@@ -60,7 +60,7 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
     focusAssistant.setMaintainingFocus(false);
   });
 
-  osk.on('pointerInteraction', async (promise) => {
+  osk.on('pointerinteraction', async (promise) => {
    // On event start
    focusAssistant.setMaintainingFocus(true);
 
