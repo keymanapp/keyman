@@ -58,7 +58,7 @@ fi
 
 # Builds the top-level JavaScript file for use on Node
 if builder_start_action build; then
-  npm run tsc -- -b ./tsconfig.all.json
+  tsc -b ./tsconfig.all.json
 
   # esbuild-bundled products at this level are not intended to be used for anything but testing.
   node build-bundler.js
