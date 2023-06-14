@@ -3,7 +3,7 @@
   // require separate sub-tsconfigs, both of which require common references.  The multi-config
   // setup in this project and its subfolders ensure all modules can compile cleanly and in the
   // necessary compilation order.
-  "extends": "../../tsconfig.kmw-main-base.json",
+  "extends": "../web/tsconfig.kmw-main-base.json",
 
   "compilerOptions": {
     "baseUrl": "./",

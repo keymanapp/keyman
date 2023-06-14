@@ -1,4 +1,4 @@
-// As currently written, any mutual entries with tsconfig.kmw-main-base.json align perfectly.
+// As currently written, any mutual entries with /tsconfig.base.json align perfectly.
 {
   "extends": "../../tsconfig-base.json",
 

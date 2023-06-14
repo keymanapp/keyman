@@ -1,6 +1,6 @@
-// As currently written, any mutual entries with tsconfig.kmw-worker-base.json align perfectly.
+// As currently written, any mutual entries with /common/models/tsconfig.kmw-worker-base.json align perfectly.
 {
-  "extends": "./tsconfig-base.json",
+  "extends": "../tsconfig-base.json",
 
   "compilerOptions": {
     "module": "es6",
