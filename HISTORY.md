@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.124 alpha 2023-06-14
+
+* fix(windows): qr code id uses keyboard name and not package name (#9002)
+* refactor(linux): Extract widgets to separate classes and files (#9007)
+
 ## 17.0.123 alpha 2023-06-13
 
 * chore(developer): support cp1252 'ansi' keyboards (#8988)
