@@ -21,6 +21,12 @@ static void PrintKeymapForCode(GdkKeymap *keymap, guint keycode)
 }
 */
 
+
+int dummytest_keymap(){
+  std::cout<< " dummytest_keymap    is available\t";
+  return 0;
+}
+
 bool write_US_ToVector( v_str_3D &vec,std::string language, const char* text) {
   std::string FullPathName = "/usr/share/X11/xkb/symbols/" + language;
 

@@ -23,7 +23,7 @@ typedef std::vector<std::string> v_str_1D;
 typedef std::vector<std::vector<std::string> > v_str_2D;
 typedef std::vector<std::vector<std::vector<std::string> > > v_str_3D;
 
-int shift_state_count = 2;  // use  shiftstate :  no shift, shift
+static int shift_state_count = 2;  // use  shiftstate :  no shift, shift
 
 int run_DoConvert_Part1_getMap(gint argc, gchar *argv[]);
 
