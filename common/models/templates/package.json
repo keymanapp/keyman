@@ -44,10 +44,7 @@
   },
   "scripts": {
     "build": "gosh ./build.sh",
-    "tsc": "tsc",
-    "mocha": "mocha",
-    "test": "gosh ./build.sh test",
-    "c8": "c8"
+    "test": "gosh ./build.sh test"
   },
   "bugs": {
     "url": "https://github.com/keymanapp/keyman/issues"

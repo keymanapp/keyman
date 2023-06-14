@@ -19,10 +19,7 @@
   },
   "scripts": {
     "build": "gosh ./build.sh",
-    "c8": "c8",
-    "clean": "tsc -b --clean",
-    "mocha": "mocha",
-    "tsc": "tsc"
+    "clean": "gosh ./build.sh clean"
   },
   "repository": {
     "type": "git",

@@ -12,8 +12,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-set_keyman_standard_build_path
-
 # This script runs from its own folder
 cd "$THIS_SCRIPT_PATH"
 

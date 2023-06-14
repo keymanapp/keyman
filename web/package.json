@@ -93,13 +93,7 @@
     "typescript": "^4.9.5"
   },
   "scripts": {
-    "c8": "c8",
-    "tsc": "tsc",
-    "test": "gosh ./test.sh",
-    "karma": "karma",
-    "mocha": "mocha",
-    "modernizr": "modernizr",
-    "sentry-cli": "sentry-cli"
+    "test": "gosh ./test.sh"
   },
   "dependencies": {
     "@keymanapp/input-processor": "*",
