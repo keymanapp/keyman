@@ -29,43 +29,31 @@ builder_describe "Builds the predictive-text model template implementation modul
 
 builder_describe_outputs \
   configure          /node_modules \
-  build              build/lib/index.mjs
+  build              build/obj/index.js
 
 builder_parse "$@"
 
-### CONFIGURE ACTIONS
-
-if builder_start_action configure; then
-  verify_npm_setup
-  builder_finish_action success configure
-fi
-
-### CLEAN ACTIONS
-
-if builder_start_action clean; then
-  rm -rf build/
-  builder_finish_action success clean
-fi
+builder_run_action configure verify_npm_setup
+builder_run_action clean rm -rf build/
 
 ### BUILD ACTIONS
 
-if builder_start_action build; then
+do_build ( ) {
   tsc -b
-  node build-bundler.js
 
   # Declaration bundling.
   tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+}
 
-  builder_finish_action success build
-fi
+builder_run_action build do_build
 
-if builder_start_action test; then
+do_test ( ) {
   FLAGS=
   if builder_has_option --ci; then
     FLAGS="-reporter mocha-teamcity-reporter"
   fi
 
   c8 mocha $FLAGS --require test/helpers.js --recursive test
+}
 
-  builder_finish_action success test
-fi
+builder_run_action test do_test

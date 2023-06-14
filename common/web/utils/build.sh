@@ -36,8 +36,8 @@ do_build ( ) {
   tsc --build "$THIS_SCRIPT_PATH/tsconfig.json"
 
   # May be useful one day, for building a mass .d.ts for KMW as a whole.
-  # # So... tsc does declaration-bundling on its own pretty well, at least for local development.
-  # tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  # So... tsc does declaration-bundling on its own pretty well, at least for local development.
+  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
 }
 
 builder_run_action build do_build
