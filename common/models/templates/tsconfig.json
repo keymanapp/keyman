@@ -1,5 +1,5 @@
 {
-  "extends": "../../../tsconfig.kmw-worker-base.json",
+  "extends": "../tsconfig.kmw-worker-base.json",
   "compilerOptions": {
     "strict": true,
     "baseUrl": "./",
