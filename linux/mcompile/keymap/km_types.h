@@ -39,6 +39,8 @@ typedef km_kbp_cp  KMX_WCHAR;    // wc,   16-bit UNICODE character
 
 typedef wchar_t    WCHAR;               // _S2 needs to be removed/ wchart-> char16
 typedef WCHAR      KMX_WCHART;          // _S2 needs to be removed/ wchart-> char16
+
+typedef char16_t   KMX_WCHAR;           // _S2
 typedef KMX_WCHAR* PKMX_WCHAR;          // _S2
 typedef wchar_t*   PWSTR;               // _S2 needs to be removed/ wchart-> char16
 typedef PWSTR      PKMX_WCHART;         // _S2 needs to be removed/ wchart-> char16
