@@ -13,13 +13,9 @@
   },
   "type": "module",
   "scripts": {
-    "karma": "karma",
-    "mocha": "mocha",
-    "test": "gosh ./test/test.sh",
+    "test": "gosh ./build.sh test",
     "build": "gosh ./build.sh",
-    "clean": "gosh ./build.sh clean",
-    "tsc": "tsc",
-    "c8": "c8"
+    "clean": "gosh ./build.sh clean"
   },
   "license": "MIT",
   "devDependencies": {

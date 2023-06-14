@@ -15,11 +15,6 @@ cd "$THIS_SCRIPT_PATH"
 
 # ################################ Main script ################################
 
-# Ensures that we rely first upon the local npm-based install of Typescript.
-# (Facilitates automated setup for build agents.)
-# TODO: this should be removeable given set_keyman_standard_build_path does this in build-utils.sh (and relative paths are dodgy in $PATH!)
-PATH="../node_modules/.bin:$PATH"
-
 builder_set_child_base src
 builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   "clean" \

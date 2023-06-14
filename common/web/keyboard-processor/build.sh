@@ -41,7 +41,6 @@ if builder_start_action configure; then
 fi
 
 if builder_start_action clean; then
-  npm run clean
   rm -rf ./build
   builder_finish_action success clean
 fi
