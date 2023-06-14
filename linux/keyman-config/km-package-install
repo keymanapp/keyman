@@ -126,6 +126,8 @@ def main():
     parser.add_argument('--version', action='version', version='%(prog)s version ' + __version__)
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
     parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
+    parser.add_argument('--force', action='store_true', help='force installation of keyboard even if it is ' +
+                        'a downgrade to an older version of the keyboard')
 
     args = parser.parse_args()
     if args.verbose:
@@ -177,31 +179,30 @@ def main():
     elif args.package:
         if args.shared:
             if get_kmp_version_user(args.package):
-                print("km-package-install: Warning: Keyboard %s is also installed for the current user."
-                      % args.package)
-            installed_kmp_v = get_kmp_version_shared(args.package)
+                print(f"km-package-install: Warning: Keyboard {args.package} is also installed for the current user.")
+            installed_kmp_ver = get_kmp_version_shared(args.package)
         else:
             if get_kmp_version_shared(args.package):
-                print("km-package-install: Warning: Keyboard %s is already installed in the shared area."
-                      % args.package)
-            installed_kmp_v = get_kmp_version_user(args.package)
+                print(f"km-package-install: Warning: Keyboard {args.package} is already installed in the shared area.")
+            installed_kmp_ver = get_kmp_version_user(args.package)
         kbdata = get_keyboard_data(args.package)
         if not kbdata:
             logging.error("km-package-install: error: Could not download keyboard data for %s", args.package)
             sys.exit(3)
-        kbdata_v = secure_lookup(kbdata, 'version')
-        if installed_kmp_v and kbdata_v:
-            kbdata_version = parse_version(kbdata_v)
-            installed_kmp_ver = parse_version(installed_kmp_v)
-            if kbdata_version == installed_kmp_ver:
-                print("km-package-install: Version %s of the %s keyboard package is already installed."
-                      % (installed_kmp_ver, args.package))
-                sys.exit(1)
-            elif kbdata_version > installed_kmp_ver:
-                print("km-package-install: A newer version of %s keyboard package is available. Uninstalling old "
-                      "version %s then downloading and installing new version %s."
-                      % (args.package, installed_kmp_ver, kbdata_version))
-                uninstall_kmp(args.package, args.shared)
+        kbdata_version = secure_lookup(kbdata, 'version')
+        if installed_kmp_ver and kbdata_version:
+            if parse_version(installed_kmp_ver) > parse_version(kbdata_version):
+                if args.force:
+                    logging.warning(f'km-package-install: warning: The {args.package} keyboard ' +
+                                    f'is already installed with a newer version {installed_kmp_ver}. ' +
+                                    f'Downgrading to version {kbdata_version}.')
+                else:
+                    logging.error(f'km-package-install: error: The {args.package} keyboard is ' +
+                                  f'already installed with a newer version {installed_kmp_ver}. ' +
+                                  f'Not installing version {kbdata_version}. Use `--force` to downgrade.')
+                    sys.exit(1)
+        if args.force:
+            uninstall_kmp(args.package, args.shared, False)
 
         kmpfile = get_kmp(args.package)
         if kmpfile:
