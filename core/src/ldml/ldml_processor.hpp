@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <memory>
 #include <keyman/keyboardprocessor.h>
 #include "processor.hpp"
 #include "option.hpp"
