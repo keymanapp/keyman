@@ -527,7 +527,8 @@ void run_DoConvert_Part2_TranslateKeyboard() {std::cout << "#### TranslateKeyboa
 void SaveKeyboard() {std::cout << "#### SaveKeyboard not implemented yet ! \n";}
 //--------------------------------------
 
-int main(gint argc, gchar *argv[])
+//int main(gint argc, gchar *argv[])    // this is for use of single keymap
+int main_keymap(gint argc, gchar *argv[])   // this is for use of keymap together with mcompile
 {
   LoadKeyboard();
   int out = run_DoConvert_Part1_getMap(argc,argv);
