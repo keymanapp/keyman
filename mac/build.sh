@@ -462,9 +462,15 @@ if $PREPRELEASE || $NOTARIZE; then
         --output-format json \
         --wait \
         "$TARGET_ZIP_PATH" > "$NOTARYTOOL_LOG_PATH"
+    # notarytool output: {"status":"Accepted","id":"ca62bba0-6c49-43c2-90d8-83a8ef306e0f","message":"Processing complete"}
 
     cat "$NOTARYTOOL_LOG_PATH"
-    NOTARYTOOL_SUBMISSION_ID=`cat "$NOTARYTOOL_LOG_PATH"`
+    NOTARYTOOL_STATUS=`cat "$NOTARYTOOL_LOG_PATH" | jq -r .status`
+    NOTARYTOOL_SUBMISSION_ID=`cat "$NOTARYTOOL_LOG_PATH" | jq -r .id`
+    if [[ "$NOTARYTOOL_STATUS" != Accepted ]]; then
+        # We won't assume notarytool returns an error code if status != Accepted
+        builder_die "Notarization failed with $NOTARYTOOL_STATUS"
+    fi
 
     builder_heading "Notarization completed successfully. Review logs below for any warnings."
 
