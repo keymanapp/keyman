@@ -18,22 +18,6 @@
 
 
 int dummytest_keymap();
-// In ths program we use a 3D-Vector  Vector[language][Keys][Shiftstates]
-#pragma once
-
-#include <X11/XKBlib.h>
-#include <X11/Xlib.h>
-#include <gdk/gdk.h>
-
-#include <algorithm>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <string>
-#include <vector>
-
-#include "mc_kmxfile.h"
-#include "mc_savekeyboard.h"
 
 typedef std::vector<std::string> v_str_1D;
 typedef std::vector<std::vector<std::string> > v_str_2D;
