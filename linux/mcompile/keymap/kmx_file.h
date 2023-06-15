@@ -4,6 +4,8 @@
 */
 
 #pragma once
+#ifndef KMX_FILE_H
+#define KMX_FILE_H
 
 #include <km_types.h>
 
@@ -382,3 +384,4 @@ static_assert(sizeof(COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOARD m
 } // namespace kbp
 } // namespace km
 #endif
+#endif /*KMX_FILE_H*/

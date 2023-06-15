@@ -19,6 +19,8 @@
 
 
 
+#ifndef MCOMPILE_H
+#define MCOMPILE_H
 #include <vector>
 #include "keymap.h"
 
@@ -49,3 +51,5 @@ struct DeadkeyMapping {   // I4353
 
 extern std::vector<DeadkeyMapping> FDeadkeys;   // I4353
 */
+
+#endif /*MCOMPILE_H*/

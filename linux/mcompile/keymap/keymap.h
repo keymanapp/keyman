@@ -1,5 +1,7 @@
 // In ths program we use a 3D-Vector  Vector[language][Keys][Shiftstates]
 #pragma once
+#ifndef KEYMAP_H
+#define KEYMAP_H
 
 #include <X11/XKBlib.h>
 #include <X11/Xlib.h>
@@ -15,6 +17,7 @@
 #include "kmx_file.h"
 #include "mc_savekeyboard.h"
 #include "helpers.h"
+#include "u16.h"
 
 
 int dummytest_keymap();
@@ -142,3 +145,5 @@ void test_in_out(v_str_3D &All_Vector);
 bool test(v_str_3D &V);
 // writing out mapping of some characters: a,b,m,w,x,y,z
 void test_specific_Characters(v_str_3D &All_Vector);*/
+
+# endif /*KEYMAP_H*/

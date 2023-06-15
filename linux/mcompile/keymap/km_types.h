@@ -1,4 +1,7 @@
 #pragma once
+#ifndef KM_TYPES
+#define KM_TYPES
+
 #include <stdint.h>
 
 #define X_test  0xFF1234
@@ -88,3 +91,5 @@ typedef  wchar_t KMX_UCHAR;
 #endif
 
 typedef KMX_UCHAR* KMX_PUCHAR;
+
+#endif /*KM_TYPES*/

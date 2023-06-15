@@ -1,5 +1,9 @@
 #pragma once
+#ifndef MC_KMXFILE_H
+#define MC_KMXFILE_H
+
 #include "km_types.h"
+#include "kmx_file.h"
 
 #include <iostream>		// _S2 can be removed later
 
@@ -148,3 +152,5 @@ BOOL LoadKeyboard(LPWSTR fileName, LPKEYBOARD *lpKeyboard);
 #endif
 */
 
+
+#endif /*MC_KMXFILE_H*/
