@@ -40,7 +40,7 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-function do_build ( ) {
+function do_build() {
   # Builds the top-level JavaScript file for use on Node
   tsc -b ./tsconfig.all.json
 
@@ -50,7 +50,7 @@ function do_build ( ) {
 
 # Note - the actual test setup is done in a separate test script, but it's easy
 # enough to route the calls through.
-function do_test ( ) {
+function do_test() {
   local TEST_OPTIONS=
   if builder_has_option --ci; then
     TEST_OPTIONS=--ci

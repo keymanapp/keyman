@@ -30,14 +30,14 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-function do_build ( ) {
+function do_build() {
   tsc -b
 
   # Declaration bundling.
   tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
 }
 
-function do_test ( ) {
+function do_test() {
   if builder_has_option --ci; then
     c8 mocha -reporter mocha-teamcity-reporter
   else

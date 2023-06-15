@@ -39,7 +39,7 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-function do_build ( ) {
+function do_build() {
   # Build worker with tsc first
   tsc -b $builder_verbose || builder_die "Could not build worker."
   node build-bundler.js
@@ -60,7 +60,7 @@ function do_build ( ) {
   node build-wrap-and-minify.js --minify
 }
 
-function do_test ( ) {
+function do_test() {
   local MOCHA_FLAGS=
 
   if builder_has_option --ci; then

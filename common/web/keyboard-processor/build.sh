@@ -35,7 +35,7 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-function do_build ( ) {
+function do_build() {
   tsc --build "$THIS_SCRIPT_PATH/tsconfig.all.json"
   node ./build-bundler.js
 
@@ -45,7 +45,7 @@ function do_build ( ) {
   tsc --emitDeclarationOnly --outFile ./build/lib/node-keyboard-loader.d.ts -p src/keyboards/loaders/tsconfig.node.json
 }
 
-function do_test ( ) {
+function do_test() {
   local MOCHA_FLAGS=
   local KARMA_CONFIG=manual.conf.cjs
   if builder_has_option --ci; then

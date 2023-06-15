@@ -29,7 +29,7 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-function do_build ( ) {
+function do_build() {
   tsc --build "$THIS_SCRIPT_PATH/tsconfig.json"
 
   # May be useful one day, for building a mass .d.ts for KMW as a whole.
@@ -37,7 +37,7 @@ function do_build ( ) {
   tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
 }
 
-function do_test ( ) {
+function do_test() {
   builder_heading "Running web-utils test suite"
 
   local FLAGS=

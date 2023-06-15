@@ -14,7 +14,7 @@
 # ```bash
 #   compile engine/main
 # ```
-compile() {
+function compile() {
   if [ $# -lt 1 ]; then
     builder_die "Scripting error: insufficient argument count!"
   fi
@@ -32,7 +32,7 @@ compile() {
   fi
 }
 
-function _copy_dir_if_exists ( ) {
+function _copy_dir_if_exists() {
   local SRC=$1
   local DST=$2
 
@@ -43,7 +43,7 @@ function _copy_dir_if_exists ( ) {
 
 # Copies top-level build artifacts into common 'debug' and 'release' config folders
 # for use in publishing.
-function prepare ( ) {
+function prepare() {
   local CHILD_BUILD_ROOT="$KEYMAN_ROOT/web/build/app"
   local PUBLISH_BUILD_ROOT="$KEYMAN_ROOT/web/build/publish"
 
@@ -75,7 +75,7 @@ function prepare ( ) {
 #   # from engine/osk
 #   test-headless osk
 # ```
-function test-headless ( ) {
+function test-headless() {
   TEST_FOLDER=$1
 
   TEST_OPTS=

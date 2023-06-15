@@ -34,7 +34,7 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-function do_build ( ) {
+function do_build() {
   tsc -b ./tsconfig.json
   node build-bundler.js
 
@@ -42,7 +42,7 @@ function do_build ( ) {
   tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
 }
 
-function do_test ( ) {
+function do_test() {
   local FLAGS=
   if builder_has_option --ci; then
     FLAGS="--reporter mocha-teamcity-reporter"
