@@ -943,10 +943,9 @@ COMP_KMXPLUS_LIST_Helper::getIndex(KMX_DWORD i) const {
 // ---- constructor
 
 kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
-    : loca(nullptr), meta(nullptr),
-      sect(nullptr), strs(nullptr), vkey(nullptr), valid(false) {
-
-  DebugLog("kmx_plus(): Got a COMP_KEYBOARD at %p\n", keyboard);
+    : bksp(nullptr), disp(nullptr), elem(nullptr), key2(nullptr), layr(nullptr), list(nullptr), loca(nullptr), meta(nullptr),
+      sect(nullptr), strs(nullptr), tran(nullptr), vars(nullptr), vkey(nullptr), valid(false) {
+  DebugLog("kmx_plus: Got a COMP_KEYBOARD at %p\n", keyboard);
   if (!(keyboard->dwFlags & KF_KMXPLUS)) {
     DebugLog("Err: flags COMP_KEYBOARD.dwFlags did not have KF_KMXPLUS set");
     valid = false;
@@ -989,6 +988,7 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     meta = section_from_sect<COMP_KMXPLUS_META>(sect);
     strs = section_from_sect<COMP_KMXPLUS_STRS>(sect);
     tran = section_from_sect<COMP_KMXPLUS_TRAN>(sect);
+    vars = section_from_sect<COMP_KMXPLUS_VARS>(sect);
     vkey = section_from_sect<COMP_KMXPLUS_VKEY>(sect);
 
     // calculate and validate the dynamic parts
