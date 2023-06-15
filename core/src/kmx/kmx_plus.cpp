@@ -250,7 +250,6 @@ COMP_KMXPLUS_STRS::valid(KMX_DWORD _kmn_unused(length)) const {
     return false;
   }
   for (KMX_DWORD i=0; i<count; i++) {
-    DebugLog("#0x%X: ...", i);
     KMX_DWORD offset = entries[i].offset;
     KMX_DWORD length = entries[i].length;
     if(offset+((length+1)*2) > header.size) {
@@ -266,7 +265,7 @@ COMP_KMXPLUS_STRS::valid(KMX_DWORD _kmn_unused(length)) const {
       return false;
     }
     // TODO-LDML: validate valid UTF-16LE?
-    DebugLog("#0x%X: '%s'", i, Debug_UnicodeString(start));
+    DebugLog("strs #0x%X: '%s'", i, Debug_UnicodeString(start));
   }
   return true;
 }
@@ -758,11 +757,12 @@ COMP_KMXPLUS_KEYS_Helper::setKeys(const COMP_KMXPLUS_KEYS *newKeys) {
     // now the kmap
     DebugLog(" kmap count: #0x%X", key2->kmapCount);
     for (KMX_DWORD i = 0; i < key2->kmapCount; i++) {
-      DebugLog(" #0x%d\n", i);
+      // These are pretty noisy, drop them from the log
+      // DebugLog(" #0x%d\n", i);
       auto &entry = kmap[i];
-      DebugLog("  vkey\t0x%X", entry.vkey);
-      DebugLog("  mod\t0x%X", entry.mod);
-      DebugLog("  key\t#0x%X", entry.key);
+      // DebugLog("  vkey\t0x%X", entry.vkey);
+      // DebugLog("  mod\t0x%X", entry.mod);
+      // DebugLog("  key\t#0x%X", entry.key);
       if (!LDML_IS_VALID_MODIFIER_BITS(entry.mod)) {
         DebugLog("Invalid modifier value");
         assert(false);
