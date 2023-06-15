@@ -169,7 +169,7 @@ bool foundCharacterInList(std::string tok) {
   v_str_1D Keysyms { "24","25","26","27","28","29","30","31","32","33","38","39","40","41","42","43","44","45","46","47","52","53","54","55","56","57","58"};
 
   for ( int i =0; i< (int) Keysyms.size();i++) {
-    std::cout << "foundCharacterInList" << i <<"\n";
+    //std::cout << "foundCharacterInList" << i <<"\n";
     if( tok == Keysyms[i]) {
       return true;
       }
@@ -530,11 +530,15 @@ void SaveKeyboard() {std::cout << "#### SaveKeyboard not implemented yet ! \n";}
 //int main(gint argc, gchar *argv[])    // this is for use of single keymap
 int main_keymap(gint argc, gchar *argv[])   // this is for use of keymap together with mcompile
 {
+  check_avaiability_of_modules_();
   LoadKeyboard();
+  std::cout << "############################################################################################### end LoadKeyboard \n";
+
   int out = run_DoConvert_Part1_getMap(argc,argv);
   run_DoConvert_Part2_TranslateKeyboard();
   SaveKeyboard();
 
+  std::cout << "################################################################################################################################### end keymap \n";
   return out ;
 }
 // old ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
