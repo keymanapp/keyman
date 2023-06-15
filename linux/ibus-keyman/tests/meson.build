@@ -10,7 +10,7 @@ kmnkbp_tests_lib = cc.find_library(
   dirs: [ core_dir / 'build/arch' / get_option('buildtype') / 'tests/kmx_test_source' ]
 )
 
-test_deps = [ibus, gtk, json_glib, kmnkbp_lib, kmnkbp_tests_lib, systemd]
+test_deps = [gtk, ibus, icu, json_glib, kmnkbp_lib, kmnkbp_tests_lib, systemd]
 dbus_deps = [gtk, systemd]
 
 test_env = [
