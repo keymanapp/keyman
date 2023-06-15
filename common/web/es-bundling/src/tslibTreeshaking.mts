@@ -1,5 +1,5 @@
 import esbuild from 'esbuild';
-import fs from 'fs';
+import * as fs from 'fs';
 
 // Note:  this package is intended 100% as a dev-tool, hence why esbuild is just a dev-dependency.
 
@@ -42,7 +42,7 @@ export async function determineNeededDowncompileHelpers(config: esbuild.BuildOpt
 
   let tslibHelperDetectionPlugin = {
     name: 'tslib helper use detection',
-    setup(build) {
+    setup(build: esbuild.PluginBuild) {
       build.onLoad({filter: /\.js$/}, async (args) => {
         let source = await fs.promises.readFile(args.path, 'utf8');
 
@@ -51,6 +51,14 @@ export async function determineNeededDowncompileHelpers(config: esbuild.BuildOpt
         if(/tslib.js$/.test(args.path)) {
           let declarationRegex = /var (__[a-zA-Z0-9]+)/g;
           let results = source.match(declarationRegex);
+
+          if(!results) {
+            return buildMessage(
+              'tslib helper use detection',
+              "tslib's definition pattern has shifted dramatically!  tslib helper-definition detector maintenance is needed.",
+              indexToSourceLocation('', 0, 0, args.path)
+            );
+          }
 
           for(let result of results) {
             let capture = result.substring(4);
@@ -75,7 +83,7 @@ export async function determineNeededDowncompileHelpers(config: esbuild.BuildOpt
         }
 
         if(ignoreFilePattern?.test(args.path)) {
-          return;
+          return {};
         }
 
         for(let helper of tslibHelperNames) {
@@ -91,9 +99,9 @@ export async function determineNeededDowncompileHelpers(config: esbuild.BuildOpt
           }
         }
 
-        // Returning `undefined` makes this 'pass-through' - it doesn't prevent other
+        // Returning an empty object makes this 'pass-through' - it doesn't prevent other
         // configured plugins from working.
-        return;
+        return {};
       });
     }
   }
@@ -325,3 +333,18 @@ class TslibTreeshaker implements esbuild.Plugin {
 export function buildTslibTreeshaker(unusedHelpers: string[]) {
   return wrapClassPlugin(new TslibTreeshaker(unusedHelpers));
 };
+
+/**
+ * Runs a non-output build of the build configuration to prepare the ability to treeshake unused
+ * `tslib` downcompile helper functions and adds a fully-configured plugin to the configuration
+ * once completed.
+ * @param esbuildConfig
+ * @returns The same build-configuration instance passed in
+ */
+export async function prepareTslibTreeshaking(esbuildConfig: esbuild.BuildOptions, ignoreFilePattern?: RegExp, log?: boolean) {
+  // Prepare the needed setup for `tslib` treeshaking.
+  const unusedHelpers = await determineNeededDowncompileHelpers(esbuildConfig, ignoreFilePattern, log);
+  esbuildConfig.plugins = [buildTslibTreeshaker(unusedHelpers), ...esbuildConfig.plugins];
+
+  return esbuildConfig;
+}

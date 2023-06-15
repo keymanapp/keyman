@@ -7,7 +7,7 @@
 
 import esbuild from 'esbuild';
 import fs from 'fs';
-import { determineNeededDowncompileHelpers, buildTslibTreeshaker } from '@keymanapp/tslib/esbuild-tools';
+import { bundleObjEntryPointsAsLib, esmConfiguration, prepareTslibTreeshaking } from '../../../../common/web/es-bundling/build/index.mjs';
 
 let EMIT_FILESIZE_PROFILE = false;
 
@@ -72,9 +72,7 @@ const commonConfig = {
   tsconfig: './tsconfig.json'
 };
 
-// Prepare the needed setup for `tslib` treeshaking.
-const unusedHelpers = await determineNeededDowncompileHelpers(commonConfig, /worker-main\.wrapped(?:\.min)?\.js/);
-commonConfig.plugins = [buildTslibTreeshaker(unusedHelpers), ...commonConfig.plugins];
+await prepareTslibTreeshaking(commonConfig, /worker-main\.wrapped(?:\.min)?\.js/);
 
 // And now... do the actual builds.
 await esbuild.build(commonConfig);

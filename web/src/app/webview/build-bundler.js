@@ -52,6 +52,8 @@ await esbuild.build({
   tsconfig: './tsconfig.json'
 });
 
+// TODO: add tslib treeshaking.
+
 await esbuild.build({
   alias: {
     'tslib': '@keymanapp/tslib'

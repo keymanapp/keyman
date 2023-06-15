@@ -6,10 +6,9 @@
  */
 
 import esbuild from 'esbuild';
-import { esmConfiguration, bundleObjEntryPointsAsLib } from '../es-bundling/build/index.mjs';
+import { bundleObjEntryPointsAsLib, esmConfiguration, prepareTslibTreeshaking } from '../es-bundling/build/index.mjs';
 
 import fs from 'fs';
-import { determineNeededDowncompileHelpers, buildTslibTreeshaker } from '@keymanapp/tslib/esbuild-tools';
 
 let EMIT_FILESIZE_PROFILE = false;
 
@@ -31,15 +30,14 @@ if(process.argv.length > 2) {
   }
 }
 
-/** @type {esbuild.BuildOptions} */
-const embeddedWorkerBuildOptions = {
+const embeddedWorkerBuildOptions = await prepareTslibTreeshaking({
   ...esmConfiguration,
+  // To be explicit, in comparison to the other build below.  Even if our other
+  // configs change their default, we should not minify for THIS build; we'll
+  // have a separate minify pass later, after concatenating our polyfills.
+  minify: false,
   ...bundleObjEntryPointsAsLib('build/obj/index.js', 'build/obj/worker-main.js')
-};
-
-// Prepare the needed setup for `tslib` treeshaking.
-const unusedHelpers = await determineNeededDowncompileHelpers(embeddedWorkerBuildOptions);
-embeddedWorkerBuildOptions.plugins = [buildTslibTreeshaker(unusedHelpers), ...embeddedWorkerBuildOptions.plugins];
+});
 
 // Direct-use version
 await esbuild.build(embeddedWorkerBuildOptions);
