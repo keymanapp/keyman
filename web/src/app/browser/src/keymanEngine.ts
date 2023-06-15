@@ -26,6 +26,7 @@ import { UtilApiEndpoint} from './utilApiEndpoint.js';
 import { UIModule } from './uiModuleInterface.js';
 import { HotkeyManager } from './hotkeyManager.js';
 import { BeepHandler } from './beepHandler.js';
+import KeyboardInterface from './keyboardInterface.js';
 
 export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {
   touchLanguageMenu?: LanguageMenu;
@@ -113,6 +114,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
   protected processorConfiguration(): ProcessorInitOptions {
     return {
       ...super.processorConfiguration(),
+      keyboardInterface: this.interface || new KeyboardInterface(window, this),
       // Overrides just this component of the configuration.
       defaultOutputRules: new DefaultBrowserRules(this.contextManager)
     };

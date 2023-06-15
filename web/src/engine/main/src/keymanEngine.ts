@@ -84,7 +84,8 @@ export default class KeymanEngine<
     }
 
     return {
-      keyboardInterface: this.interface,
+      keyboardInterface: this.interface ||
+        new KeyboardInterface<ContextManager>(window, this, this.config.stubNamespacer),
       baseLayout: baseLayout,
       defaultOutputRules: new DefaultRules()
     };
@@ -104,8 +105,9 @@ export default class KeymanEngine<
     this.config = config;
     this.contextManager = contextManager;
 
-    this.interface = new KeyboardInterface(window, this, config.stubNamespacer);
-    this.core = new InputProcessor(config.hostDevice, worker, this.processorConfiguration());
+    const processorConfiguration = this.processorConfiguration();
+    this.interface = processorConfiguration.keyboardInterface as KeyboardInterface<ContextManager>;
+    this.core = new InputProcessor(config.hostDevice, worker, processorConfiguration);
 
     this.core.languageProcessor.on('statechange', (state) => {
       // The banner controller cannot directly trigger a layout-refresh at this time,
