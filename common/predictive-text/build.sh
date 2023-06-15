@@ -40,10 +40,7 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-builder_run_action configure verify_npm_setup
-builder_run_action clean rm -rf build/
-
-do_build ( ) {
+function do_build ( ) {
   # Builds the top-level JavaScript file for use on Node
   tsc -b ./tsconfig.all.json
 
@@ -51,12 +48,10 @@ do_build ( ) {
   node build-bundler.js
 }
 
-builder_run_action build do_build
-
 # Note - the actual test setup is done in a separate test script, but it's easy
 # enough to route the calls through.
-do_test ( ) {
-  TEST_OPTIONS=
+function do_test ( ) {
+  local TEST_OPTIONS=
   if builder_has_option --ci; then
     TEST_OPTIONS=--ci
   fi
@@ -66,4 +61,7 @@ do_test ( ) {
   ./unit_tests/test.sh test:libraries test:headless test:browser $TEST_OPTIONS
 }
 
-builder_run_action test do_test
+builder_run_action configure  verify_npm_setup
+builder_run_action clean      rm -rf build/
+builder_run_action build      do_build
+builder_run_action test       do_test

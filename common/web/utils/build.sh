@@ -29,10 +29,7 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-builder_run_action configure verify_npm_setup
-builder_run_action clean rm -rf build/
-
-do_build ( ) {
+function do_build ( ) {
   tsc --build "$THIS_SCRIPT_PATH/tsconfig.json"
 
   # May be useful one day, for building a mass .d.ts for KMW as a whole.
@@ -40,12 +37,10 @@ do_build ( ) {
   tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
 }
 
-builder_run_action build do_build
-
-do_test ( ) {
+function do_test ( ) {
   builder_heading "Running web-utils test suite"
 
-  FLAGS=
+  local FLAGS=
   if builder_has_option --ci; then
     echo "Replacing user-friendly test reports with CI-friendly versions."
     FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
@@ -54,4 +49,7 @@ do_test ( ) {
   c8 mocha --recursive $FLAGS ./src/test/
 }
 
-builder_run_action test do_test
+builder_run_action configure  verify_npm_setup
+builder_run_action clean      rm -rf build/
+builder_run_action build      do_build
+builder_run_action test       do_test

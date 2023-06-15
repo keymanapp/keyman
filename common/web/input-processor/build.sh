@@ -34,10 +34,7 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-builder_run_action configure verify_npm_setup
-builder_run_action clean rm -rf build/
-
-do_build ( ) {
+function do_build ( ) {
   tsc -b ./tsconfig.json
   node build-bundler.js
 
@@ -45,10 +42,8 @@ do_build ( ) {
   tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
 }
 
-builder_run_action build do_build
-
-do_test ( ) {
-  FLAGS=
+function do_test ( ) {
+  local FLAGS=
   if builder_has_option --ci; then
     FLAGS="--reporter mocha-teamcity-reporter"
   fi
@@ -56,4 +51,7 @@ do_test ( ) {
   mocha --recursive $FLAGS ./tests/cases/
 }
 
-builder_run_action do_test
+builder_run_action configure  verify_npm_setup
+builder_run_action clean      rm -rf build/
+builder_run_action build      do_build
+builder_run_action test       do_test

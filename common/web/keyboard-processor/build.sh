@@ -35,10 +35,7 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-builder_run_action configure verify_npm_setup
-builder_run_action clean rm -rf ./build
-
-do_build ( ) {
+function do_build ( ) {
   tsc --build "$THIS_SCRIPT_PATH/tsconfig.all.json"
   node ./build-bundler.js
 
@@ -48,13 +45,9 @@ do_build ( ) {
   tsc --emitDeclarationOnly --outFile ./build/lib/node-keyboard-loader.d.ts -p src/keyboards/loaders/tsconfig.node.json
 }
 
-builder_run_action build do_build
-
-do_test ( ) {
-  builder_heading "Running Keyboard Processor test suite"
-
-  MOCHA_FLAGS=
-  KARMA_CONFIG=manual.conf.cjs
+function do_test ( ) {
+  local MOCHA_FLAGS=
+  local KARMA_CONFIG=manual.conf.cjs
   if builder_has_option --ci; then
     echo "Replacing user-friendly test reports with CI-friendly versions."
     MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
@@ -65,4 +58,7 @@ do_test ( ) {
   karma start ./tests/dom/$KARMA_CONFIG
 }
 
-builder_run_action test do_test
+builder_run_action configure  verify_npm_setup
+builder_run_action clean      rm -rf ./build
+builder_run_action build      do_build
+builder_run_action test       do_test
