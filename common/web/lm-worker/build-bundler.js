@@ -6,29 +6,10 @@
  */
 
 import esbuild from 'esbuild';
+import { esmConfiguration, bundleObjEntryPointsAsLib } from '../es-bundling/build/index.mjs';
+
 import fs from 'fs';
 import { determineNeededDowncompileHelpers, buildTslibTreeshaker } from '@keymanapp/tslib/esbuild-tools';
-
-/*
- * Refer to https://github.com/microsoft/TypeScript/issues/13721#issuecomment-307259227 -
- * the `@class` emit comment-annotation is designed to facilitate tree-shaking for ES5-targeted
- * down-level emits.  `esbuild` doesn't look for it by default... but we can override that with
- * this plugin.
- */
-let es5ClassAnnotationAsPurePlugin = {
-  name: '@class -> __PURE__',
-  setup(build) {
-    build.onLoad({filter: /\.js$/ }, async (args) => {
-      let source = await fs.promises.readFile(args.path, 'utf8');
-      return {
-        // Marks any classes compiled by TS (as per the /** @class */ annotation)
-        // as __PURE__ in order to facilitate tree-shaking.
-        contents: source.replace('/** @class */', '/* @__PURE__ */ /** @class */'),
-        loader: 'js'
-      }
-    });
-  }
-}
 
 let EMIT_FILESIZE_PROFILE = false;
 
@@ -50,28 +31,10 @@ if(process.argv.length > 2) {
   }
 }
 
+/** @type {esbuild.BuildOptions} */
 const embeddedWorkerBuildOptions = {
-  bundle: true,
-  sourcemap: true,
-  /*
-   * https://esbuild.github.io/api/#sources-content would theoretically allow us to strip the source
-   * while still keeping info useful for stack-tracing... but it doesn't pass through the sourcemap
-   * concatenation setup.
-   *
-   * That said, we know how to 'nix it ourselves in post now, so... yeah.
-   */
-  sourcesContent: true,
-  format: "esm",
-  nodePaths: ['..', '../../models'],
-  entryPoints: {
-    'index': 'build/obj/index.js',
-    'worker-main': 'build/obj/worker-main.js'
-  },
-  outdir: 'build/lib',
-  outExtension: { '.js': '.mjs' },
-  plugins: [ es5ClassAnnotationAsPurePlugin ],
-  tsconfig: 'tsconfig.json',
-  target: "es5",
+  ...esmConfiguration,
+  ...bundleObjEntryPointsAsLib('build/obj/index.js', 'build/obj/worker-main.js')
 };
 
 // Prepare the needed setup for `tslib` treeshaking.

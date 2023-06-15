@@ -1,18 +1,10 @@
 import esbuild from 'esbuild';
+import { esmConfiguration } from '../web/es-bundling/build/index.mjs';
 
 await esbuild.build({
-  alias: {
-    'tslib': '@keymanapp/tslib'
-  },
-  bundle: true,
-  format: "esm",
-  sourcemap: true,
-  target: "es5",
-  external: ['fs', 'vm'],
-  // nodePaths: ['../../node_modules'],
+  ...esmConfiguration,
   entryPoints: {
     'index': 'build/obj/web/index.js',
   },
-  outdir: 'build/lib/web',
-  outExtension: { '.js': '.mjs' }
+  outdir: 'build/lib/web' // We want to preserve the subdirectory for this one.
 });
