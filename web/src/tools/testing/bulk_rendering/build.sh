@@ -29,12 +29,11 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-builder_run_action configure verify_npm_setup
-builder_run_action clean rm -rf ../../../../build/tools/testing/bulk_rendering
-
-do_build ( ) {
+function do_build ( ) {
   tsc --build "$THIS_SCRIPT_PATH/tsconfig.json" $builder_verbose
   node build-bundler.js
 }
 
-builder_run_action build do_build
+builder_run_action configure  verify_npm_setup
+builder_run_action clean      rm -rf ../../../../build/tools/testing/bulk_rendering
+builder_run_action build      do_build

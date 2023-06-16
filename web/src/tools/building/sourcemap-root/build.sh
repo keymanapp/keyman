@@ -29,6 +29,6 @@ builder_parse "$@"
 
 ### CONFIGURE ACTIONS
 
-builder_run_action configure verify_npm_setup
-builder_run_action clean rm -rf ../../../../build/tools/building/sourcemap-root
-builder_run_action build tsc -b "$THIS_SCRIPT_PATH/tsconfig.json"
+builder_run_action configure  verify_npm_setup
+builder_run_action clean      rm -rf ../../../../build/tools/building/sourcemap-root
+builder_run_action build      tsc --build tsconfig.json
