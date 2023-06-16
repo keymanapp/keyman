@@ -21,7 +21,8 @@ builder_describe \
   "Compiles the web-oriented utility function module." \
   "@/common/web/recorder  test" \
   "@/common/web/keyman-version" \
-  "@/common/web/tslib" \
+  "@/common/web/es-bundling" \
+  "@/common/web/es-bundling" \
   "@/common/web/utils" \
   configure \
   clean \

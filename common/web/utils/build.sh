@@ -19,7 +19,7 @@ cd "$THIS_SCRIPT_PATH"
 builder_describe \
   "Compiles the web-oriented utility function module." \
   "@/common/web/keyman-version" \
-  "@/common/web/tslib" \
+  "@/common/web/es-bundling" \
   clean configure build test \
   "--ci    For use with action ${BUILDER_TERM_START}test${BUILDER_TERM_END} - emits CI-friendly test reports"
 

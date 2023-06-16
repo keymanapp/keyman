@@ -32,11 +32,12 @@ if(process.argv.length > 2) {
 
 const embeddedWorkerBuildOptions = await prepareTslibTreeshaking({
   ...esmConfiguration,
+  ...bundleObjEntryPoints('lib', 'build/obj/index.js', 'build/obj/worker-main.js'),
   // To be explicit, in comparison to the other build below.  Even if our other
   // configs change their default, we should not minify for THIS build; we'll
   // have a separate minify pass later, after concatenating our polyfills.
-  minify: false,
-  ...bundleObjEntryPoints('lib', 'build/obj/index.js', 'build/obj/worker-main.js')
+  minify: false
+  // No treeshaking at the moment (in case it treeshakes out certain model templates!)
 });
 
 // Direct-use version
