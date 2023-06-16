@@ -7,7 +7,7 @@
 
 import esbuild from 'esbuild';
 import fs from 'fs';
-import { bundleObjEntryPoints, esmConfiguration, prepareTslibTreeshaking } from '../../../../common/web/es-bundling/build/index.mjs';
+import { esmConfiguration, iifeConfiguration, prepareTslibTreeshaking } from '../../../../common/web/es-bundling/build/index.mjs';
 
 let EMIT_FILESIZE_PROFILE = false;
 
@@ -29,47 +29,16 @@ if(process.argv.length > 2) {
   }
 }
 
-/*
- * Refer to https://github.com/microsoft/TypeScript/issues/13721#issuecomment-307259227 -
- * the `@class` emit comment-annotation is designed to facilitate tree-shaking for ES5-targeted
- * down-level emits.  `esbuild` doesn't look for it by default... but we can override that with
- * this plugin.
- */
-let es5ClassAnnotationAsPurePlugin = {
-  name: '@class -> __PURE__',
-  setup(build) {
-    build.onLoad({filter: /\.js$/ }, async (args) => {
-      let source = await fs.promises.readFile(args.path, 'utf8');
-      return {
-        // Marks any classes compiled by TS (as per the /** @class */ annotation)
-        // as __PURE__ in order to facilitate tree-shaking.
-        contents: source.replace('/** @class */', '/* @__PURE__ */ /** @class */'),
-        loader: 'js'
-      }
-    });
-  }
-}
-
 const commonConfig = {
-  alias: {
-    'tslib': '@keymanapp/tslib'
-  },
-  bundle: true,
-  sourcemap: true,
-  format: "iife",
-  nodePaths: ['../../../../node_modules'],
+  ...iifeConfiguration,
   entryPoints: {
     'index': '../../../build/app/browser/obj/debug-main.js',
   },
   outfile: '../../../build/app/browser/debug/keymanweb.js',
-  plugins: [ es5ClassAnnotationAsPurePlugin ],
   // `esbuild`'s sourcemap output puts relative paths to the original sources from the
   // directory of the build output.  The following keeps repo structure intact and
   // puts our code under a common 'namespace' of sorts.
-  sourceRoot: '@keymanapp/keyman/web/build/app/browser/debug/',
-  target: "es5",
-  treeShaking: true,
-  tsconfig: './tsconfig.json'
+  sourceRoot: '@keymanapp/keyman/web/build/app/browser/debug/'
 };
 
 await prepareTslibTreeshaking(commonConfig, /worker-main\.wrapped(?:\.min)?\.js/);
@@ -79,17 +48,13 @@ await esbuild.build(commonConfig);
 
 let result = await esbuild.build({
   ...commonConfig,
-  minifyWhitespace: true,
-  minifySyntax: true,
-  minifyIdentifiers: true,
-  format: "iife",
-  nodePaths: ['../../../../node_modules'],
   entryPoints: {
     'index': '../../../build/app/browser/obj/release-main.js',
   },
-  outfile: '../../../build/app/browser/release/keymanweb.js',
   // Enables source-file output size profiling!
-  metafile: true
+  metafile: true,
+  minify: true,
+  outfile: '../../../build/app/browser/release/keymanweb.js',
 });
 
 let filesizeProfile = await esbuild.analyzeMetafile(result.metafile, { verbose: true });
@@ -103,11 +68,9 @@ if(EMIT_FILESIZE_PROFILE) {
 }
 
 await esbuild.build({
-  ...commonConfig,
-  format: "esm",
+  ...esmConfiguration,
   entryPoints: {
     'index': '../../../build/app/browser/obj/test-index.js',
   },
-  outfile: '../../../build/app/browser/lib/index.mjs',
-  tsconfig: './tsconfig.json'
+  outfile: '../../../build/app/browser/lib/index.mjs'
 });

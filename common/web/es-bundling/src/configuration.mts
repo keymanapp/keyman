@@ -6,12 +6,19 @@ export const esmConfiguration: esbuild.BuildOptions = {
     'tslib': '@keymanapp/tslib'
   },
   bundle: true,
+  format: "esm",
   outExtension: { '.js': '.mjs'},
   plugins: [ pluginForDowncompiledClassTreeshaking ],
   sourcemap: true,
   sourcesContent: true,
-  format: "esm",
   target: "es5"
+};
+
+export const iifeConfiguration: esbuild.BuildOptions = {
+  ...esmConfiguration,
+  format: 'iife',
+  outExtension: { '.js': '.js'},
+  treeShaking: true
 };
 
 export function objRoot(entryPath: string) {
