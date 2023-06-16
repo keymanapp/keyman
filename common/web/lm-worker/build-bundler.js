@@ -6,7 +6,7 @@
  */
 
 import esbuild from 'esbuild';
-import { bundleObjEntryPointsAsLib, esmConfiguration, prepareTslibTreeshaking } from '../es-bundling/build/index.mjs';
+import { bundleObjEntryPoints, esmConfiguration, prepareTslibTreeshaking } from '../es-bundling/build/index.mjs';
 
 import fs from 'fs';
 
@@ -36,7 +36,7 @@ const embeddedWorkerBuildOptions = await prepareTslibTreeshaking({
   // configs change their default, we should not minify for THIS build; we'll
   // have a separate minify pass later, after concatenating our polyfills.
   minify: false,
-  ...bundleObjEntryPointsAsLib('build/obj/index.js', 'build/obj/worker-main.js')
+  ...bundleObjEntryPoints('lib', 'build/obj/index.js', 'build/obj/worker-main.js')
 });
 
 // Direct-use version

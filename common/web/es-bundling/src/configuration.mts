@@ -14,30 +14,37 @@ export const esmConfiguration: esbuild.BuildOptions = {
   target: "es5"
 };
 
-export function objToLibRoot(entryPath: string) {
+export function objRoot(entryPath: string) {
   const OBJ_REGEX = /^(.+)\/obj\//;
   const match = entryPath.match(OBJ_REGEX);
 
-  return `${match[1]}/lib/`;
+  return `${match[1]}`;
 }
 
 /**
- * Given the KMW build output convention of raw TS output in build/obj or a subdirectory thereof,
- * with bundled output in build/lib directly, this produces the standard input-to-bundled-output
- * mapping for `esbuild`'s configuration settings.
+ * Given the KMW build output convention of raw TS output within a subfolder of `build` named `obj`,
+ * this configures esbuild to use the specified entry points for bundling and to have their output
+ * bundle locations rooted within a specified sibling folder to their "source" `obj` subfolder.
+ *
+ * Examples:
+ * 1. 'lib', 'build/obj/index.js' => 'build/lib/index.js'
+ * 2. 'debug', 'build/app/ui/obj/kmwuitoggle.js' => 'build/app/browser/debug/kmwuitoggle.js'
  *
  * @param path
+ * @configFolder
  * @returns
  */
-export function bundleObjEntryPointsAsLib(...path: string[]): esbuild.BuildOptions {
+export function bundleObjEntryPoints(configFolder: 'lib' | 'debug' | 'release', ...path: string[]): esbuild.BuildOptions {
   if(!path.length) {
     throw new Error("Must specify at least one entry point.");
   }
 
-  let mappedRoot = objToLibRoot(path[0]);
-  if(path.map((entry) => objToLibRoot(entry)).find((mappedEntry) => mappedEntry != mappedRoot)) {
+  let mappedRoot = objRoot(path[0]);
+  if(path.map((entry) => objRoot(entry)).find((mappedEntry) => mappedEntry != mappedRoot)) {
     throw new Error("The specified entry points map to different roots, therefore mapping is not 'standard'.");
   }
+
+  mappedRoot = `${mappedRoot}/${configFolder}/`
 
   return {
     entryPoints: path,

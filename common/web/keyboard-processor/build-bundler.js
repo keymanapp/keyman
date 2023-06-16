@@ -1,11 +1,11 @@
 import esbuild from 'esbuild';
-import { esmConfiguration, bundleObjEntryPointsAsLib } from '../es-bundling/build/index.mjs';
+import { esmConfiguration, bundleObjEntryPoints } from '../es-bundling/build/index.mjs';
 import * as fs from 'fs';
 
 // Bundled ES module version
 await esbuild.build({
   ...esmConfiguration,
-  ...bundleObjEntryPointsAsLib('build/obj/index.js', 'build/obj/keyboards/loaders/dom-keyboard-loader.js')
+  ...bundleObjEntryPoints('lib', 'build/obj/index.js', 'build/obj/keyboards/loaders/dom-keyboard-loader.js')
 });
 
 // Sadly, esbuild aims to preserve the relative path between entry points... we want it directly
@@ -19,6 +19,6 @@ fs.rmSync('build/lib/keyboards', { recursive: true, force: true });
 // The node-based keyboard loader needs an extra parameter due to Node-built-in imports:
 await esbuild.build({
   ...esmConfiguration,
-  ...bundleObjEntryPointsAsLib('build/obj/keyboards/loaders/node-keyboard-loader.js'),
+  ...bundleObjEntryPoints('lib', 'build/obj/keyboards/loaders/node-keyboard-loader.js'),
   platform: "node"
 });

@@ -7,7 +7,7 @@
 
 import esbuild from 'esbuild';
 import fs from 'fs';
-import { bundleObjEntryPointsAsLib, esmConfiguration, prepareTslibTreeshaking } from '../../../../common/web/es-bundling/build/index.mjs';
+import { bundleObjEntryPoints, esmConfiguration, prepareTslibTreeshaking } from '../../../../common/web/es-bundling/build/index.mjs';
 
 let EMIT_FILESIZE_PROFILE = false;
 
