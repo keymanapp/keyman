@@ -64,7 +64,7 @@ if [[ $VERSION_ENVIRONMENT == test ]]; then
   fi
 fi
 
-get_default_browser_set ( ) {
+function get_default_browser_set() {
   if [[ $BUILDER_OS == mac ]]; then
     BROWSERS="--browsers Firefox,Chrome,Safari"
   elif [[ $BUILDER_OS == win ]]; then
