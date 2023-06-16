@@ -1,8 +1,8 @@
-import { DefaultRules, type Keyboard, KeyboardKeymanGlobal, ProcessorInitOptions, OutputTarget } from "@keymanapp/keyboard-processor";
+import { type Keyboard, KeyboardKeymanGlobal, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
 import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
 import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
 import { OSKView } from "keyman/engine/osk";
-import { KeyboardRequisitioner, type KeyboardStub, ModelCache, ModelSpec } from "keyman/engine/package-cache";
+import { KeyboardRequisitioner, ModelCache, ModelSpec } from "keyman/engine/package-cache";
 
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
 import KeyboardInterface from "./keyboardInterface.js";
@@ -13,6 +13,19 @@ import { LegacyAPIEvents } from "./legacyAPIEvents.js";
 import { EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";
 import DOMCloudRequester from "keyman/engine/package-cache/dom-requester";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
+
+// From https://stackoverflow.com/a/69328045
+type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
+// Sets two parts non-optional at this level, while they were at lower levels.
+type ProcessorConfiguration = WithRequired<WithRequired<ProcessorInitOptions, 'keyboardInterface'>, 'defaultOutputRules'>;
+
+function determineBaseLayout(): string {
+  if(typeof(window['KeymanWeb_BaseLayout']) !== 'undefined') {
+    return window['KeymanWeb_BaseLayout'];
+  } else {
+    return 'us';
+  }
+}
 
 export default class KeymanEngine<
   Configuration extends EngineConfiguration,
@@ -73,26 +86,6 @@ export default class KeymanEngine<
     // processing - silent failures are far harder to diagnose.
   };
 
-  // Should be overwritten as needed by engine subclasses; `browser` should set its DefaultOutput subclass in place.
-  protected processorConfiguration(): ProcessorInitOptions {
-    // I732 START - Support for European underlying keyboards #1
-    let baseLayout: string;
-    if(typeof(window['KeymanWeb_BaseLayout']) !== 'undefined') {
-      baseLayout = window['KeymanWeb_BaseLayout'];
-    } else {
-      baseLayout = 'us';
-    }
-
-    return {
-      keyboardInterface: this.interface ||
-        new KeyboardInterface<ContextManager>(window, this, this.config.stubNamespacer),
-      baseLayout: baseLayout,
-      defaultOutputRules: new DefaultRules()
-    };
-  };
-
-  //
-
   /**
    * @param worker  A configured WebWorker to serve as the predictive-text engine's main thread.
    *                Available in the following variants:
@@ -100,12 +93,21 @@ export default class KeymanEngine<
    *                - non-sourcemapped + minified (release)
    * @param config
    * @param contextManager
+   * @param processorConfigInitializer A one-time use closure used to initialize certain critical components reliant
+   *                                   upon the class instance, configured by the derived class, but needed during
+   *                                   the superclass constructor.
    */
-  constructor(worker: Worker, config: Configuration, contextManager: ContextManager) {
+  constructor(
+    worker: Worker,
+    config: Configuration,
+    contextManager: ContextManager,
+    processorConfigInitializer: (engine: KeymanEngine<Configuration, ContextManager, HardKeyboard>) => ProcessorConfiguration
+  ) {
     this.config = config;
     this.contextManager = contextManager;
 
-    const processorConfiguration = this.processorConfiguration();
+    const processorConfiguration = processorConfigInitializer(this);
+    processorConfiguration.baseLayout = determineBaseLayout();
     this.interface = processorConfiguration.keyboardInterface as KeyboardInterface<ContextManager>;
     this.core = new InputProcessor(config.hostDevice, worker, processorConfiguration);
 
