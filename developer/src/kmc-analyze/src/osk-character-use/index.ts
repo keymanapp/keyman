@@ -1,26 +1,10 @@
-import { CompilerCallbacks, KeymanFileTypes, KvksFile, KvksFileReader, TouchLayout, TouchLayoutFileReader } from "@keymanapp/common-types";
+import { CompilerCallbacks, KeymanFileTypes, KvksFile, KvksFileReader, Osk, TouchLayout, TouchLayoutFileReader } from "@keymanapp/common-types";
 import { CompilerMessages } from '@keymanapp/kmc-kmn';
 import { getOskFromKmnFile } from "../util/get-osk-from-kmn-file.js";
 import { AnalyzerMessages } from "../messages.js";
 
-export interface StringRefUsage {
-  filename: string;
-  count: number;
-};
 
-export interface StringRef {
-  str: string;
-  usages: StringRefUsage[];
-};
-
-export interface StringResult {
-  str: string;                         // the key cap string
-  unicode: string;                     // unicode code points in <str> for reference
-  pua: string;                         // hexadecimal single character in PUA range
-  usages: StringRefUsage[] | string[]; // files in which the string is referenced
-};
-
-type StringRefUsageMap = {[index:string]: StringRefUsage[]};
+type StringRefUsageMap = {[index:string]: Osk.StringRefUsage[]};
 
 export interface AnalyzeOskCharacterUseOptions {
   puaBase?: number;
@@ -115,7 +99,7 @@ export class AnalyzeOskCharacterUse {
 
   private addStrings(strings: string[], filename: string) {
     // Reduce all references to get usage count per file
-    let reducedStrings: StringRef[] = [...new Set(strings)].map(e =>({
+    let reducedStrings: Osk.StringRef[] = [...new Set(strings)].map(e =>({
       str:e,
       usages: [{filename: this.callbacks.path.basename(filename), count: strings.filter(n => n===e).length }]
     }));
@@ -211,8 +195,8 @@ export class AnalyzeOskCharacterUse {
   // Results reporting
   //
 
-  private prepareResults(strings: StringRefUsageMap): StringResult[] {
-    let result: StringResult[] = [];
+  private prepareResults(strings: StringRefUsageMap): Osk.StringResult[] {
+    let result: Osk.StringResult[] = [];
     let pua = this.options.puaBase;
     for(let str of Object.keys(strings)) {
       result.push({
@@ -226,12 +210,12 @@ export class AnalyzeOskCharacterUse {
     return result;
   }
 
-  public getStrings(format?: 'text'|'markdown'|'json'): string[] {
+  public getStrings(format?: '.txt'|'.md'|'.json'): string[] {
     const final = this.prepareResults(this._strings);
     switch(format) {
-      case 'markdown':
+      case '.md':
         return AnalyzeOskCharacterUse.getStringsAsMarkdown(final);
-      case 'json':
+      case '.json':
         return AnalyzeOskCharacterUse.getStringsAsJson(final);
       }
     return AnalyzeOskCharacterUse.getStringsAsText(final);
@@ -240,7 +224,7 @@ export class AnalyzeOskCharacterUse {
   // Following functions are static so that we can keep them pure
   // and potentially refactor into separate reporting class later
 
-  private static getStringsAsText(strings: StringResult[]) {
+  private static getStringsAsText(strings: Osk.StringResult[]) {
     // Text result only returns PUA, unicode sequence, and plain string
     let lines: string[] = [];
     for(let s of strings) {
@@ -250,7 +234,7 @@ export class AnalyzeOskCharacterUse {
     return lines;
   }
 
-  private static getStringsAsMarkdown(strings: StringResult[]) {
+  private static getStringsAsMarkdown(strings: Osk.StringResult[]) {
     // Markdown result only returns PUA, unicode sequence, and plain string
     let lines: string[] = [];
     lines.push('PUA    | Code Points | Key Caps');
@@ -262,7 +246,7 @@ export class AnalyzeOskCharacterUse {
     return lines;
   }
 
-  private static getStringsAsJson(strings: StringResult[]) {
+  private static getStringsAsJson(strings: Osk.StringResult[]) {
     return JSON.stringify(strings, null, 2).split('\n');
   }
 

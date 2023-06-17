@@ -8,15 +8,14 @@ import { Command } from 'commander';
 import { declareBuild } from './commands/build.js';
 import { declareBuildTestData } from './commands/buildTestData.js';
 import { declareAnalyze } from './commands/analyze.js';
-import KEYMAN_VERSION from "@keymanapp/keyman-version";
+import { BaseOptions } from './util/baseOptions.js';
 
 const program = new Command();
 
 /* Arguments */
 
-program
-  .description('Keyman Developer Command Line Interface')
-  .version(KEYMAN_VERSION.VERSION_WITH_TAG);
+BaseOptions.addVersion(program)
+  .description('Keyman Developer Command Line Interface');
 declareBuild(program);
 declareBuildTestData(program);
 declareAnalyze(program);

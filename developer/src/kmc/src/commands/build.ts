@@ -5,7 +5,7 @@ import { BuildProject } from './buildClasses/BuildProject.js';
 import { NodeCompilerCallbacks } from '../messages/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/messages.js';
 import { CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
-import { addBaseOptions } from '../util/baseOptions.js';
+import { BaseOptions } from '../util/baseOptions.js';
 
 
 function commandOptionsToCompilerOptions(options: any): CompilerOptions {
@@ -25,7 +25,7 @@ function commandOptionsToCompilerOptions(options: any): CompilerOptions {
 }
 
 export function declareBuild(program: Command) {
-  addBaseOptions(program
+  BaseOptions.addAll(program
     .command('build [infile...]')
     .description('Build a source file into a final file')
   )

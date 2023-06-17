@@ -1,15 +1,19 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import { Command, Option } from 'commander';
 import { NodeCompilerCallbacks } from '../messages/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/messages.js';
-import { CompilerBaseOptions, CompilerCallbacks } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerLogLevel } from '@keymanapp/common-types';
 import { AnalyzeOskCharacterUse, AnalyzeOskRewritePua } from '@keymanapp/kmc-analyze';
-import { addBaseOptions } from '../util/baseOptions.js';
+import { BaseOptions } from '../util/baseOptions.js';
 import { runOnFiles } from '../util/projectReader.js';
 
-interface AnalysisActivityOptions extends CompilerBaseOptions {
-  action: 'osk-char-use' | 'osk-rewrite-from-char-use';
-  format: 'text' | 'markdown' | 'json';
+interface AnalysisActivityOptions /* not inheriting from CompilerBaseOptions */ {
+  /**
+   * Reporting level to console, used by NodeCompilerCallbacks (not used in compiler modules;
+   * all messages are still reported to the internal log)
+   */
+  logLevel?: CompilerLogLevel;
   base?: string;
   stripDottedCircle?: boolean;
   includeCounts?: boolean;
@@ -17,19 +21,22 @@ interface AnalysisActivityOptions extends CompilerBaseOptions {
 };
 
 export function declareAnalyze(program: Command) {
-  addBaseOptions(program
-    .command('analyze [infile...]')
-    .description('Analyze a source file or files')
-  )
-    .addOption(new Option('-f, --format <filename>', 'Output file format').choices(['text','markdown','json']).default('text'))
-    .addOption(new Option('-a, --action <action>', 'Specify the analysis to run').choices([
-      'osk-char-use',
-      'osk-rewrite-from-char-use',
-    ]).makeOptionMandatory())
-    .option('-b, --base', 'First PUA codepoint to use, in hexadecimal', 'F100')
+  let command = program.command('analyze [infile...]');
+  BaseOptions.addVersion(command);
+  declareOskCharUse(command);
+  declareOskRewrite(command);
+}
+
+function declareOskCharUse(command: Command) {
+  let subCommand = command.command('osk-char-use');
+  BaseOptions.addVersion(subCommand);
+  BaseOptions.addLogLevel(subCommand);
+  subCommand
+    .description('Analyze On Screen Keyboards for character usage')
+    .option('-b, --base', 'First PUA codepoint to use, in hexadecimal (default F100)', 'F100')
     .option('--include-counts', 'Include number of times each character is referenced', false)
     .option('--strip-dotted-circle', 'Strip U+25CC (dotted circle base) from results', false)
-    .option('-m, --mapping-file <filename>', 'Input mapping file (for osk-rewrite-from-char-use)')
+    .addOption(new Option('-m, --mapping-file <filename>', 'Result file to write to (.json, .md, or .txt)').makeOptionMandatory())
     .action(async (filenames: string[], options: any) => {
       if(!filenames.length) {
         // If there are no filenames provided, then we are building the current
@@ -37,26 +44,38 @@ export function declareAnalyze(program: Command) {
         filenames.push('.');
       }
 
-      if(!analyze(filenames, options)) {
+      if(!await analyze(analyzeOskCharUse, filenames, options)) {
+        // Once a file fails to build, we bail on subsequent builds
+        process.exit(1);
+      }
+    });
+
+}
+
+function declareOskRewrite(command: Command) {
+  let subCommand = command.command('osk-rewrite-from-char-use');
+  subCommand
+    .description('Rewrite On Screen Keyboard files from source mapping; given file.ext, output is written to file-pua.ext')
+    .addOption(new Option('-m, --mapping-file <filename>', 'JSON mapping file to read from').makeOptionMandatory())
+    .action(async (filenames: string[], options: any) => {
+      if(!filenames.length) {
+        // If there are no filenames provided, then we are building the current
+        // folder ('.') as a project-style build
+        filenames.push('.');
+      }
+
+      if(!await analyze(analyzeOskRewritePua, filenames, options)) {
         // Once a file fails to build, we bail on subsequent builds
         process.exit(1);
       }
     });
 }
 
-async function analyze(filenames: string[], options: AnalysisActivityOptions): Promise<boolean> {
-  // Note: we always use logLevel=silent if we write the output to console
-  let callbacks = new NodeCompilerCallbacks({logLevel: options.outFile || options.action != 'osk-char-use' ? options.logLevel : 'silent'});
-
+async function analyze(action: (callbacks: CompilerCallbacks, filenames: string[], options: AnalysisActivityOptions)=>Promise<boolean>,
+    filenames: string[], options: AnalysisActivityOptions): Promise<boolean> {
+  let callbacks = new NodeCompilerCallbacks({logLevel: options.logLevel});
   try {
-    switch(options.action) {
-      case 'osk-char-use':
-        return await analyzeOskCharUse(callbacks, filenames, options);
-      case 'osk-rewrite-from-char-use':
-        return await analyzeOskRewritePua(callbacks, filenames, options);
-      default:
-        throw new Error(`Internal error: Invalid analyze action '${options.action}'`);
-    }
+    return await action(callbacks, filenames, options);
   } catch(e) {
     callbacks.reportMessage(InfrastructureMessages.Fatal_UnexpectedException({e}));
     return false;
@@ -64,6 +83,12 @@ async function analyze(filenames: string[], options: AnalysisActivityOptions): P
 }
 
 async function analyzeOskCharUse(callbacks: CompilerCallbacks, filenames: string[], options: AnalysisActivityOptions) {
+  const format = path.extname(options.mappingFile);
+  if(format != '.txt' && format != '.json' && format != '.md') {
+    callbacks.reportMessage(InfrastructureMessages.Error_UnknownFileFormat({format}));
+    return false;
+  }
+
   const analyzer = new AnalyzeOskCharacterUse(callbacks, {
     puaBase: parseInt(options.base, 16),
     stripDottedCircle: options.stripDottedCircle,
@@ -74,29 +99,24 @@ async function analyzeOskCharUse(callbacks: CompilerCallbacks, filenames: string
     return false;
   }
 
-  let output = analyzer.getStrings(options.format ?? 'text').join('\n');
-  if(options.outFile) {
-    fs.writeFileSync(options.outFile, output, 'utf8');
-  } else {
-    process.stdout.write(output + '\n');
-  }
-
+  const output = analyzer.getStrings(format).join('\n');
+  fs.writeFileSync(options.mappingFile, output, 'utf8');
   return true;
 }
 
 async function analyzeOskRewritePua(callbacks: CompilerCallbacks, filenames: string[], options: AnalysisActivityOptions) {
-  const analyzer = new AnalyzeOskRewritePua(callbacks, {
-    stripDottedCircle: options.stripDottedCircle,
-    mappingFile: options.mappingFile,
-  });
+  const analyzer = new AnalyzeOskRewritePua(callbacks);
   const mapping: any = JSON.parse(callbacks.fs.readFileSync(options.mappingFile, 'UTF-8'));
 
   return await runOnFiles(callbacks, filenames, async (filename: string): Promise<boolean> => {
     if(!await analyzer.analyze(filename, mapping)) {
       return false;
     }
-    for(let filename of Object.keys(analyzer.data)) {
-      fs.writeFileSync(filename, analyzer.data[filename]);
+    const mappedFilenames = Object.keys(analyzer.data);
+    for(let filename of mappedFilenames) {
+      const ext = path.extname(filename);
+      const outputFilename = filename.substring(0, filename.length - ext.length) + '-pua' + ext;
+      fs.writeFileSync(outputFilename, analyzer.data[filename]);
     }
     return true;
   });
