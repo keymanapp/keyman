@@ -94,10 +94,10 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
     }
   }
 
-  // load transforms
+  // load bksp transforms
   if (kplus.bksp != nullptr && kplus.bksp->groupCount > 0) {
     bksp_transforms.reset(km::kbp::ldml::load_transform_groups(kplus, kplus.bksp, kplus.bkspHelper));
-    if (!transforms) {
+    if (!bksp_transforms) {
       DebugLog("Failed to load bksp transforms");
       return; // failed to load
     }
@@ -214,7 +214,14 @@ ldml_processor::process_event(
           }
         }
         if (last_char == 0UL) {
-          // couldn't find the last char
+          /*
+            We couldn't find a character at end of context (context is empty),
+            so we'll pass the backspace keystroke on to the app to process; the
+            app might want to use backspace to move between contexts or delete 
+            a text box, etc. Or it might be a legacy app and we've had our caret
+            dumped in somewhere unknown, so we will have to depend on the app to
+            be sensible about backspacing because we know nothing.
+          */
           state->actions().push_backspace(KM_KBP_BT_UNKNOWN);
         } else {
           state->actions().push_backspace(KM_KBP_BT_CHAR, last_char);
@@ -286,9 +293,6 @@ ldml_processor::process_event(
             state->context().push_character(outstr32[i]);
             state->actions().push_character(outstr32[i]);
           }
-          // Add a marker so we don't retransform this text.
-          state->context().push_marker(0x0);
-          state->actions().push_marker(0x0);
         }
       }
     }

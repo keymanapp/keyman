@@ -89,15 +89,11 @@ transforms::apply(const std::u16string &input, std::u16string &output) {
       } // else: didn't match prior to the existing output, so don't expand 'match'
 
       // now update 'output'
-      if (subOutput.length() >= output.length()) {
+      if (subOutput.length() >= output.length() || subMatched > output.length()) {
         output = subOutput; // simple: all output
       } else {
-        if (subMatched <= output.length()) {
-          output.resize(output.length() - subMatched);
-          output.append(subOutput);
-        } else {
-          output = subOutput;
-        }
+        output.resize(output.length() - subMatched);
+        output.append(subOutput);
       }
     }
   }

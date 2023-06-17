@@ -90,6 +90,7 @@ int test_transforms() {
     {
       std::u16string src(u"ta");
       bool res = tr.apply(src);
+      // ta --> tbb --> tccc --> tcd --> e
       zassert_string_equal(src, std::u16string(u"e"));
       zassert_equal(res, true);
     }
