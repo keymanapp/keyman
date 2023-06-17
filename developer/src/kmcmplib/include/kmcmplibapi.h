@@ -33,6 +33,7 @@ struct KMCMP_COMPILER_RESULT {
   void* kmx;
   size_t kmxSize;
   std::string kvksFilename;
+  std::string displayMapFilename;
 };
 
 /**

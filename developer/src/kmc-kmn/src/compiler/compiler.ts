@@ -6,7 +6,7 @@ TODO: implement additional interfaces:
 */
 
 // TODO: rename wasm-host?
-import { UnicodeSetParser, UnicodeSet } from '@keymanapp/common-types';
+import { UnicodeSetParser, UnicodeSet, Osk } from '@keymanapp/common-types';
 import { CompilerCallbacks, CompilerEvent, CompilerOptions, KeymanFileTypes, KvkFileWriter, KvksFileReader } from '@keymanapp/common-types';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
 import { CompilerMessages, mapErrorFromKmcmplib } from './messages.js';
@@ -18,6 +18,7 @@ export interface CompilerResultFile {
 
 export interface CompilerResultMetadata {
   kvksFilename?: string;
+  displayMapFilename?: string;
 };
 
 export interface CompilerResult {
@@ -179,8 +180,9 @@ export class KmnCompiler implements UnicodeSetParser {
       }
 
       result.data.kvksFilename = wasm_result.kvksFilename;
+      result.data.displayMapFilename = wasm_result.displayMapFilename;
       if(result.data.kvksFilename) {
-        result.kvk = this.runKvkCompiler(result.data.kvksFilename, infile, outfile);
+        result.kvk = this.runKvkCompiler(result.data.kvksFilename, infile, outfile, result.data.displayMapFilename);
         if(!result.kvk) {
           return null;
         }
@@ -206,7 +208,7 @@ export class KmnCompiler implements UnicodeSetParser {
     }
   }
 
-  private runKvkCompiler(kvksFilename: string, kmnFilename: string, kmxFilename: string) {
+  private runKvkCompiler(kvksFilename: string, kmnFilename: string, kmxFilename: string, displayMapFilename?: string) {
     // The compiler detected a .kvks file, which needs to be captured
     let reader = new KvksFileReader();
     kvksFilename = this.callbacks.resolveFilename(kmnFilename, kvksFilename);
@@ -224,6 +226,26 @@ export class KmnCompiler implements UnicodeSetParser {
     for(let invalidVkey of invalidVkeys) {
       this.callbacks.reportMessage(CompilerMessages.Warn_InvalidVkeyInKvksFile({filename, invalidVkey}));
     }
+
+    if(displayMapFilename) {
+      // Remap using the osk-char-use-rewriter
+      let mapping: any;
+
+      displayMapFilename = this.callbacks.resolveFilename(kmnFilename, displayMapFilename);
+      try {
+        // Expected file format: displaymap.schema.json
+        // TODO: verify with schema
+        let data = this.callbacks.loadFile(displayMapFilename);
+        mapping = JSON.parse(new TextDecoder().decode(data));
+      } catch(e) {
+        this.callbacks.reportMessage(CompilerMessages.Error_InvalidDisplayMapFile({filename, e}));
+        return null;
+      }
+
+      let pua = Osk.parseMapping(mapping);
+      Osk.remapVisualKeyboard(vk, pua);
+    }
+
     let writer = new KvkFileWriter();
     return {
       filename: this.callbacks.path.join(this.callbacks.path.dirname(kmxFilename),

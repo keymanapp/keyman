@@ -210,6 +210,25 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
       kvk = reader.read(callbacks.loadFile(path));
     }
 
+    // TODO: support &displayMap:
+
+    /*if(keyboard.extra.displayMapFilename) {
+      // Remap using the osk-char-use-rewriter
+      let mapping: any;
+
+      displayMapFilename = this.callbacks.resolveFilename(kmnFilename, displayMapFilename);
+      try {
+        let data = this.callbacks.loadFile(displayMapFilename);
+        mapping = JSON.parse(new TextDecoder().decode(data));
+      } catch(e) {
+        // TODO: this.callbacks.reportMessage(CompilerMessages.Error_InvalidDisplayMapFile({filename, e}));
+        return null;
+      }
+
+      let pua = Osk.parseMapping(mapping);
+      Osk.remapVisualKeyboard(vk, pua);
+    }*/
+
     let result = VisualKeyboardFromFile(kvk, options.saveDebug);
     if(!result.result) {
       // TODO: error

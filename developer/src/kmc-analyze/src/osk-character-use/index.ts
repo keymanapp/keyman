@@ -247,7 +247,9 @@ export class AnalyzeOskCharacterUse {
   }
 
   private static getStringsAsJson(strings: Osk.StringResult[]) {
-    return JSON.stringify(strings, null, 2).split('\n');
+    // For future expansion, we wrap the array in a 'map' property
+    let map = { "map": strings };
+    return JSON.stringify(map, null, 2).split('\n');
   }
 
   private static escapeMarkdownChar(s: string) {

@@ -219,6 +219,9 @@ const KMX_WCHAR * StoreTokens[TSS__MAX + 2] = {
   SSN__PREFIX u"", // TSS_BEGIN_POSTKEYSTROKE
   SSN__PREFIX u"NEWLAYER",
   SSN__PREFIX u"OLDLAYER",
+
+  // Keyman 17.0+
+  SSN__PREFIX u"DISPLAYMAP",  // TSS_DISPLAYMAP (compile-time usage only)
   NULL
 };
 
@@ -1128,6 +1131,13 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
   case TSS_NEWLAYER:
   case TSS_OLDLAYER:
+    break;
+
+  case TSS_DISPLAYMAP:
+    // This store is allowed in older versions of Keyman, as it is a
+    // compile-time only feature. Implemented only in kmc-kmn/kmc-kmw, not in
+    // the legacy compilers.
+    fk->extra->displayMapFilename = sp->dpString;
     break;
 
   default:

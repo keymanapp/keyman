@@ -26,18 +26,19 @@ if(!await kmnCompiler.init(callbacks)) {
   process.exit(1);
 }
 
-// TODO: runToMemory, add option to kmxCompiler to store debug-data for conversion to .js (e.g. store metadata, group readonly metadata, etc)
-if(!kmnCompiler.run(infile, outfile, {
+let result = kmnCompiler.runCompiler(infile, outfile, {
   shouldAddCompilerVersion: false,
-  saveDebug: true,
+  saveDebug: true,  // TODO: we should probably use passed debug flag
   target: 'js'
-})) {
+});
+
+if(!result) {
   callbacks.printMessages();
   process.exit(1);
 }
 
 const reader = new KmxFileReader();
-const keyboard: KMX.KEYBOARD = reader.read(callbacks.loadFile(outfile));
+const keyboard: KMX.KEYBOARD = reader.read(result.kmx.data);
 
 const js = WriteCompiledKeyboard(callbacks, infile, outfile, 'khmer_angkor', keyboard, true);
 

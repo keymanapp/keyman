@@ -39,14 +39,16 @@ describe('Compiler class', function() {
     assert.isTrue(await kmnCompiler.init(callbacks));
 
     // TODO: runToMemory, add option to kmxCompiler to store debug-data for conversion to .js (e.g. store metadata, group readonly metadata, visual keyboard source filename, etc)
-    assert.isTrue(kmnCompiler.run(infile, outfile, {
+    let result = kmnCompiler.runCompiler(infile, outfile, {
       shouldAddCompilerVersion: false,
-      saveDebug: true,
+      saveDebug: true,  // TODO: we should probably use passed debug flag
       target: 'js'
-    }));
+    });
+
+    assert.isNotNull(result);
 
     const reader = new KmxFileReader();
-    const keyboard: KMX.KEYBOARD = reader.read(callbacks.loadFile(outfile));
+    const keyboard: KMX.KEYBOARD = reader.read(result.kmx.data);
 
     const js = WriteCompiledKeyboard(callbacks, infile, outfile, 'khmer_angkor', keyboard, true);
 
