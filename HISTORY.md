@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.125 alpha 2023-06-17
+
+* fix(android/samples): Cleanup Sample/Tests apk's (#9030)
+* chore(common): Bump crowdin github action to 1.3.2 (#9029)
+
 ## 17.0.124 alpha 2023-06-14
 
 * fix(windows): qr code id uses keyboard name and not package name (#9002)
