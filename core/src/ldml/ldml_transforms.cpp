@@ -68,10 +68,11 @@ transforms::apply(const std::u16string &input, std::u16string &output) {
     // break out once there's a match
     // TODO-LDML: reorders
     // Assume it's a non reorder group
-    for (auto transform = group->begin(); transform < group->end(); transform++) {
+    size_t subMatched = 0;
+    for (auto transform = group->begin(); (subMatched == 0) && (transform < group->end()); transform++) {
       // TODO-LDML: non regex implementation
       // is the match area too short?
-      size_t subMatched = transform->match(updatedInput);
+      subMatched = transform->match(updatedInput);
       if (subMatched == 0)
         continue;                                                       // no match
 
@@ -95,6 +96,7 @@ transforms::apply(const std::u16string &input, std::u16string &output) {
         output.resize(output.length() - subMatched);
         output.append(subOutput);
       }
+      // will fall through to next group
     }
   }
   // TODO-LDML: optimization (mentioned above) to contract 'matched' if possible.
