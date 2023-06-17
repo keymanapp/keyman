@@ -36,13 +36,15 @@ builder_describe "Build KMSample2 app for Android." \
 # parse before describe_outputs to check debug flags
 builder_parse "$@"
 
+ARTIFACT="app-release-unsigned.apk"
+
 if builder_is_debug_build; then
   builder_heading "### Debug config ####"
   CONFIG="debug"
   SAMPLE_FLAGS="assembleDebug"
+  ARTIFACT="app-$CONFIG.apk"
 fi
 
-ARTIFACT="app-$CONFIG.apk"
 
 
 builder_describe_outputs \
