@@ -23,6 +23,10 @@ export function createUnselectableElement<E extends keyof HTMLElementTagNameMap>
   return e;
 }
 
+/**
+ * Defines the base object for the long-standing `keyman.util` API methods, maintaining
+ * their long-standing names and signatures.
+ */
 export class UtilApiEndpoint {
   readonly config: BrowserConfiguration;
   private readonly stylesheetManager: StylesheetManager;
@@ -35,23 +39,39 @@ export class UtilApiEndpoint {
     this.domEventTracker = new DomEventTracker();
   }
 
-  readonly getAbsoluteX = getAbsoluteX;
-  readonly getAbsoluteY = getAbsoluteY;
+  /**
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/util/getAbsoluteX
+   */
+  public readonly getAbsoluteX = getAbsoluteX;
+
+  /**
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/util/getAbsoluteY
+   */
+  public readonly getAbsoluteY = getAbsoluteY;
 
   // These four were renamed, but we need to maintain their legacy names.
   readonly _GetAbsoluteX = getAbsoluteX;
   readonly _GetAbsoluteY = getAbsoluteY;
   readonly _GetAbsolute = this.getAbsolute;
-  readonly toNzString = this.nzString;
+
+  /**
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/util/toNzString
+   */
+  public readonly toNzString = this.nzString;
 
   /**
    * Expose the touchable state for UIs - will disable external UIs entirely
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/util/isTouchDevice
    **/
-  isTouchDevice(): boolean {
+  public isTouchDevice(): boolean {
     return this.config.hostDevice.touchable;
   }
 
-  getAbsolute(elem: HTMLElement): { x: number, y: number } {
+  /**
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/util/getAbsolute
+   */
+  public getAbsolute(elem: HTMLElement): { x: number, y: number } {
     return {
       x: getAbsoluteX(elem),
       y: getAbsoluteY(elem)
@@ -63,8 +83,10 @@ export class UtilApiEndpoint {
    * 'user-select: none' styling to the new element.
    * @param nodeName
    * @returns
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/util/createElement
    */
-  readonly createElement = createUnselectableElement;
+  public readonly createElement = createUnselectableElement;
 
   /**
    * Function     getOption
@@ -73,8 +95,10 @@ export class UtilApiEndpoint {
    * @param       {*=}        dflt        Default value of option
    * @return      {*}
    * Description  Returns value of named option
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/util/getOption
    */
-  getOption(optionName: keyof BrowserInitOptionSpec, dflt?:any): any {
+  public getOption(optionName: keyof BrowserInitOptionSpec, dflt?:any): any {
     if(optionName in this.config.paths) {
       return this.config.paths[optionName];
     } else if(optionName in this.config.options) {
@@ -86,7 +110,12 @@ export class UtilApiEndpoint {
     }
   }
 
-  setOption(optionName: keyof BrowserInitOptionSpec, value: any): void {
+  /**
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/util/setOption
+   *
+   * Note:  the 'attachType' and 'ui' options currently cannot be changed via this method.
+   */
+  public setOption(optionName: keyof BrowserInitOptionSpec, value: any): void {
     switch(optionName) {
       case 'attachType':
         // 16.0 & before:  did nothing.
@@ -116,8 +145,10 @@ export class UtilApiEndpoint {
    *
    * @param       {string=}       cn        cookie name (optional)
    * @return      {Object}                  array of names and strings, or array of variables and values
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/util/loadCookie
    */
-  loadCookie<CookieType extends Record<keyof CookieType, string | number | boolean>>(cn?: string) {
+  public loadCookie<CookieType extends Record<keyof CookieType, string | number | boolean>>(cn?: string) {
     const cookie = new CookieSerializer<CookieType>(cn);
     return cookie.load(decodeURIComponent);
   }
@@ -127,8 +158,10 @@ export class UtilApiEndpoint {
    *
    * @param       {string}      cn            name of cookie
    * @param       {Object}      cv            object with array of named arguments and values
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/util/saveCookie
    */
-  saveCookie<CookieType extends Record<keyof CookieType, string | number | boolean>>(cn: string, cv: CookieType) {
+  public saveCookie<CookieType extends Record<keyof CookieType, string | number | boolean>>(cn: string, cv: CookieType) {
     const cookie = new CookieSerializer<CookieType>(cn);
     cookie.save(cv, encodeURIComponent);
   }
@@ -138,8 +171,10 @@ export class UtilApiEndpoint {
    *
    * @param       {string}        s             style string
    * @return      {Object}                      returns the object reference
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/util/addStyleSheet
    **/
-  addStyleSheet(s: string): HTMLStyleElement {
+  public addStyleSheet(s: string): HTMLStyleElement {
     const styleSheet = createStyleSheet(s);
     this.stylesheetManager.linkStylesheet(styleSheet);
 
@@ -151,8 +186,10 @@ export class UtilApiEndpoint {
    *
    * @param       {Object}        s             style sheet reference
    * @return      {boolean}                     false if element is not a style sheet
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/util/removeStyleSheet
    **/
-  removeStyleSheet(s: HTMLStyleElement) {
+  public removeStyleSheet(s: HTMLStyleElement) {
     return this.stylesheetManager.unlink(s);
   }
 
@@ -160,8 +197,10 @@ export class UtilApiEndpoint {
    * Add a reference to an external stylesheet file
    *
    * @param   {string}  s   path to stylesheet file
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/util/linkStyleSheet
    */
-  linkStyleSheet(s: string): void {
+  public linkStyleSheet(s: string): void {
     this.stylesheetManager.linkExternalSheet(s);
   }
 
@@ -183,6 +222,8 @@ export class UtilApiEndpoint {
    * @param       {function(Object)}  Phandler    Event handler for event
    * @param       {boolean=}  PuseCapture True only if event to be handled on way to target element
    * Description  Attaches event handler to element DOM event
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/util/attachDOMEvent
    */
   attachDOMEvent<K extends keyof WindowEventMap>(
     Pelem: Window,
@@ -202,7 +243,7 @@ export class UtilApiEndpoint {
     Phandler: (ev: HTMLElementEventMap[K]) => any,
     PuseCapture?: boolean
   ): void;
-  attachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
+  public attachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
     // TS can't quite track the type inference forwarding here.
     this.domEventTracker.attachDOMEvent(Pelem as any, Peventname as any, Phandler, PuseCapture);
   }
@@ -215,6 +256,8 @@ export class UtilApiEndpoint {
    * @param       {function(Object)}  Phandler    Event handler for event
    * @param       {boolean=}  PuseCapture True if event was being handled on way to target element
    * Description Detaches event handler from element [to prevent memory leaks]
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/util/detachDOMEvent
    */
   detachDOMEvent<K extends keyof WindowEventMap>(
     Pelem: Window,
@@ -234,7 +277,7 @@ export class UtilApiEndpoint {
     Phandler: (ev: HTMLElementEventMap[K]) => any,
     PuseCapture?: boolean
   ): void;
-  detachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
+  public detachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
     // TS can't quite track the type inference forwarding here.
     this.domEventTracker.detachDOMEvent(Pelem as any, Peventname as any, Phandler, PuseCapture);
   }
@@ -253,7 +296,10 @@ export class UtilApiEndpoint {
     return this._alertHost;
   }
 
-  alert(s: string, fn: () => void) {
+  /**
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/util/alert.
+   */
+  public alert(s: string, fn: () => void) {
     this.alertHost.alert(s, fn);
   }
 
@@ -265,7 +311,7 @@ export class UtilApiEndpoint {
    * @return      {*}
    * Description  Test if a variable is null, false, empty string, or undefined, and return as string
    */
-  nzString(item: any, dflt: string): string {
+  public nzString(item: any, dflt: string): string {
     // // ... is this whole thing essentially just:
     // return '' + (item || dflt || '');
     // // ?
@@ -297,8 +343,10 @@ export class UtilApiEndpoint {
    * @param       {number}      dflt         default value
    * @return      {number}
    * Description  Return string converted to integer or default value
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/util/toNumber
    */
-  toNumber(s: string, dflt: number): number {
+  public toNumber(s: string, dflt: number): number {
     const x = parseInt(s,10);
     return isNaN(x) ? dflt : x;
   }
@@ -310,8 +358,10 @@ export class UtilApiEndpoint {
    * @param       {number}      dflt         default value
    * @return      {number}
    * Description  Return string converted to real value or default value
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/util/toFloat
    */
-  toFloat(s: string, dflt: number): number {
+  public toFloat(s: string, dflt: number): number {
     const x = parseFloat(s);
     return isNaN(x) ? dflt : x;
   }
@@ -326,8 +376,10 @@ export class UtilApiEndpoint {
    * @param       {number}      a           opacity value, 0-1.0
    * @return      {string}                  background colour style string
    * Description  Browser-independent alpha-channel management
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/util/rgba
    */
-  rgba(s: HTMLStyleElement, r:number, g:number, b:number, a:number): string {
+  public rgba(s: HTMLStyleElement, r:number, g:number, b:number, a:number): string {
     let bgColor='transparent';
     try {
       bgColor='rgba('+r+','+g+','+b+','+a+')';
