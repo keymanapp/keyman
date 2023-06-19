@@ -65,6 +65,7 @@ int test_transforms() {
     // setup
     {
       transform_group st;
+      st.emplace_back(std::u16string(u"za"), std::u16string(u"c"));
       st.emplace_back(std::u16string(u"a"), std::u16string(u"bb"));
       tr.addTransformGroup(st);
     }
@@ -90,8 +91,17 @@ int test_transforms() {
     {
       std::u16string src(u"ta");
       bool res = tr.apply(src);
-      // ta --> tbb --> tccc --> tcd --> e
+      // pipe (|) symbol shows where the 'output' is delineated
+      // t|a --> t|bb --> t|ccc --> t|cd --> |e
       zassert_string_equal(src, std::u16string(u"e"));
+      zassert_equal(res, true);
+    }
+    {
+      std::u16string src(u"qza");
+      bool res = tr.apply(src);
+      // pipe (|) symbol shows where the 'output' is delineated
+      // q|za -> q|c
+      zassert_string_equal(src, std::u16string(u"qc"));
       zassert_equal(res, true);
     }
     {
@@ -105,6 +115,23 @@ int test_transforms() {
       bool res = tr.apply(src);
       zassert_string_equal(src, std::u16string(u"tb"));
       zassert_equal(res, false);
+    }
+  }
+
+  std::cout << __FILE__ << ":" << __LINE__ << " - hindi example " << std::endl;
+
+  {
+    transforms tr;
+    {
+      transform_group st;
+      st.emplace_back(std::u16string(u"िह"), std::u16string(u"हि"));
+      tr.addTransformGroup(st);
+    }
+    {
+      std::u16string src(u"िह");
+      bool res = tr.apply(src);
+      zassert_string_equal(src, std::u16string(u"हि"));
+      zassert_equal(res, true);
     }
   }
 
