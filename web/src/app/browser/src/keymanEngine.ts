@@ -633,8 +633,12 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *  @param  {string=}         argFormFactor   layout form factor, defaulting to 'desktop'
    *  @param  {(string|number)=}  argLayerId    name or index of layer to show, defaulting to 'default'
    *  @return {Object}                          DIV object with filled keyboard layer content
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/osk/BuildVisualKeyboard
+   *
+   * (May be moved to https://help.keyman.com/developer/engine/web/17.0/reference/core/BuildVisualKeyboard)
    */
-  BuildVisualKeyboard(
+  public BuildVisualKeyboard(
     PInternalName: string,
     Pstatic: number,
     argFormFactor?: DeviceSpec.FormFactor,

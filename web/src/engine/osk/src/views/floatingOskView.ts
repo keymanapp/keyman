@@ -144,8 +144,10 @@ export default class FloatingOSKView extends OSKView {
    * @param       {boolean?}      keepDefaultPosition  If true, does not reset the default x,y set by `setRect`.
    *                                                   If false or omitted, resets the default x,y as well.
    * Description  Move OSK back to default position, floating under active input element
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/osk/restorePosition
    */
-  ['restorePosition']: (keepDefaultPosition?: boolean) => void = function(this: FloatingOSKView, keepDefaultPosition?: boolean) {
+  public restorePosition: (keepDefaultPosition?: boolean) => void = function(this: FloatingOSKView, keepDefaultPosition?: boolean) {
     let isVisible = this._Visible;
 
     let dragPromise = new ManagedPromise<void>();
@@ -362,8 +364,10 @@ export default class FloatingOSKView extends OSKView {
    * and (optionally) override user repositioning or sizing
    *
    * @param       {Object.<string,number>}   p  Array object with position and size of OSK container
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/osk/setRect
   **/
-  ['setRect'](p: OSKRect) {
+  public setRect(p: OSKRect) {
     if(this._Box == null || this.targetDevice.formFactor != 'desktop') {
       return;
     }
@@ -451,9 +455,11 @@ export default class FloatingOSKView extends OSKView {
    * Function     setPos
    * Scope        Private
    * @param       {Object.<string,number>}    p     Array object with OSK left, top
-   * Description  Set position of OSK window, but limit to screen, and ignore if  a touch input device
+   * Description  Set position of OSK window, but limit to screen
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/osk/setPos
    */
-  ['setPos'](p: OSKPos) {
+  public setPos(p: OSKPos) {
     if(typeof(this._Box) == 'undefined') {
       return; // I3363 (Build 301)
     }
@@ -581,8 +587,10 @@ export default class FloatingOSKView extends OSKView {
    * Scope        Public
    * @return      {(boolean|number)}          true if user located
    * Description  Test if OSK window has been repositioned by user
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/osk/userLocated
    */
-  ['userLocated']() {
+  public userLocated() {
     return this.userPositioned;
   }
 
