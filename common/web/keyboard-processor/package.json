@@ -57,8 +57,7 @@
     },
     "./lib": {
       "types": "./build/lib/index.d.ts",
-      "import": "./build/lib/index.mjs",
-      "require": "./build/lib/index.cjs"
+      "import": "./build/lib/index.mjs"
     },
     "./lib/node-keyboard-loader": {
       "types": "./build/lib/node-keyboard-loader.d.ts",

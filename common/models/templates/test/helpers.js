@@ -7,15 +7,12 @@ var _ = global;
 // TODO: then mocha invocation is as follows:
 // TODO:     mocha -r @keymanapp/models-test-helpers test/
 
-// Ensure that we can successfully load the module & apply kmwLength, as it's
-// needed for some of the unit tests.
-
-// Verify that the KMW string extensions are loaded via side-effect.
-import * as models from '@keymanapp/models-templates/lib';
+import { extendString } from '@keymanapp/web-utils';
 
 import { createRequire } from "module";
 import { fileURLToPath } from 'url';
 
+extendString();
 assert.ok('💩'.kmwLength);
 
 /**

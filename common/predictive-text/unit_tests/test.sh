@@ -139,7 +139,7 @@ if builder_start_action test:browser; then
   else
     BROWSERS=
   fi
-  karma start $KARMA_INFO_LEVEL $KARMA_FLAGS $BROWSERS in_browser/$KARMA_CONFIG
+  karma start $KARMA_INFO_LEVEL $KARMA_FLAGS $BROWSERS ./in_browser/$KARMA_CONFIG
 
   builder_finish_action success test:browser
 fi

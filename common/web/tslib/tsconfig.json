@@ -1,17 +1,11 @@
 {
-  "extends": "../../../tsconfig-base.json",
+  "extends": "../tsconfig.kmw-main-base.json",
   "compilerOptions": {
     "allowJs": true,
-    "module": "es6",
-    "moduleResolution": "Node",
-    "allowSyntheticDefaultImports": true,
-    "inlineSources": true,
-    "sourceMap": true,
-    "declaration": true,
-    "target": "es5",
+    "importHelpers": false,  // This project exists to help define the helpers for the other KMW components.
     "tsBuildInfoFile": "./build/tsconfig.tsbuildinfo",
-    "types": ["node"],
     "lib": ["es6", "DOM"],  // The latter is b/c esbuild expects the type.
+
     "baseUrl": "./src",
     "outDir": "./build/",
     "rootDir": "./src"
