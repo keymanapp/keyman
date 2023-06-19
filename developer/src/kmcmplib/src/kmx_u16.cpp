@@ -224,7 +224,7 @@ int   u16ncmp(const KMX_WCHAR *p, const KMX_WCHAR *q, size_t count) {
   return 0;
 }
 
-KMX_WCHAR * u16tok(KMX_WCHAR *p,  KMX_WCHAR ch,  KMX_WCHAR **ctx) {
+KMX_WCHAR * u16tok(KMX_WCHAR *p, const KMX_WCHAR ch,  KMX_WCHAR **ctx) {
   if (!p) {
     p = *ctx;
     if (!p) return NULL;
@@ -246,7 +246,7 @@ KMX_WCHAR * u16tok(KMX_WCHAR *p,  KMX_WCHAR ch,  KMX_WCHAR **ctx) {
   return p;
 }
 
-KMX_WCHAR * u16tok(KMX_WCHAR* p,  KMX_WCHAR* delim, KMX_WCHAR** ctx) {
+KMX_WCHAR * u16tok(KMX_WCHAR* p, const KMX_WCHAR* delim, KMX_WCHAR** ctx) {
 	if (!p) {
 		p = *ctx;
 		if (!p) return NULL;

@@ -1,4 +1,4 @@
-import { KMX, CompilerOptions, CompilerCallbacks, KvkFileReader, KvksFileReader, VisualKeyboard, KeymanFileTypes } from "@keymanapp/common-types";
+import { KMX, CompilerOptions, CompilerCallbacks, KvkFileReader, VisualKeyboard, KmxFileReader, Osk } from "@keymanapp/common-types";
 import { ExpandSentinel, incxstr, xstrlen } from "../util/util.js";
 import { options, nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater, callbacks } from "./compiler-globals.js";
 import { JavaScript_ContextMatch, JavaScript_KeyAsString, JavaScript_Name, JavaScript_OutputString, JavaScript_Rules, JavaScript_Shift, JavaScript_ShiftAsString, JavaScript_Store, zeroPadHex } from './javascript-strings.js';
@@ -35,11 +35,14 @@ export function RequotedString(s: string, RequoteSingleQuotes: boolean = false):
   return s;
 }
 
-export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: string, kmxfile: string, name: string, keyboard: KMX.KEYBOARD, FDebug: boolean = false): string {
+export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: string, keyboardData: Uint8Array, kvkData: Uint8Array, displayMap: Osk.PuaMap, FDebug: boolean = false): string {
   let opts: CompilerOptions = {
     shouldAddCompilerVersion: false,
     saveDebug: FDebug
   };
+  const reader = new KmxFileReader();
+  const keyboard: KMX.KEYBOARD = reader.read(keyboardData);
+
   setupGlobals(callbacks, opts, FDebug?'  ':'', FDebug?'\r\n':'', keyboard, kmnfile);
 
   // let fgp: GROUP;
@@ -108,7 +111,7 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
     }
   }
 
-  const sName = 'Keyboard_'+name; //TODO: verify --> GetKeymanWebCompiledNameFromFileName(FInFile);
+  const sName = 'Keyboard_'+getKeymanWebCompiledNameFromFileName(kmnfile);
 
   if (sHelpFile != '') {
     sHelp = '';
@@ -174,7 +177,7 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
   if (sLayoutFile != '') {  // I3483
     let path = callbacks.resolveFilename(kmnfile, sLayoutFile);
 
-    let result = ValidateLayoutFile(keyboard, options.saveDebug, path, sVKDictionary);
+    let result = ValidateLayoutFile(keyboard, options.saveDebug, path, sVKDictionary, displayMap);
     if(!result.result) {
       sLayoutFile = '';
       callbacks.reportMessage(KmwCompilerMessages.Error_TouchLayoutFileInvalid());
@@ -192,43 +195,8 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
 
   if (sVisualKeyboard != '') {
     // TODO: stop reusing sVisualKeyboard for both filename and content
-    let path = callbacks.resolveFilename(kmnfile, sVisualKeyboard);
-
-    let kvk: VisualKeyboard.VisualKeyboard;
-    if(KeymanFileTypes.filenameIs(path, KeymanFileTypes.Source.VisualKeyboard)) {
-      let reader = new KvksFileReader();
-      let source = reader.read(callbacks.loadFile(path));
-      reader.validate(source, callbacks.loadSchema("kvks")); // TODO: handle exceptions
-      kvk = reader.transform(source);
-      // TODO: log errors
-    }
-    else {
-      // Note: very old keyboard sources may still have .kvk as an xml
-      // file, but we'll treat that as an error rather than silently
-      // falling back to KvksFileReader
-      let reader = new KvkFileReader();
-      kvk = reader.read(callbacks.loadFile(path));
-    }
-
-    // TODO: support &displayMap:
-
-    /*if(keyboard.extra.displayMapFilename) {
-      // Remap using the osk-char-use-rewriter
-      let mapping: any;
-
-      displayMapFilename = this.callbacks.resolveFilename(kmnFilename, displayMapFilename);
-      try {
-        let data = this.callbacks.loadFile(displayMapFilename);
-        mapping = JSON.parse(new TextDecoder().decode(data));
-      } catch(e) {
-        // TODO: this.callbacks.reportMessage(CompilerMessages.Error_InvalidDisplayMapFile({filename, e}));
-        return null;
-      }
-
-      let pua = Osk.parseMapping(mapping);
-      Osk.remapVisualKeyboard(vk, pua);
-    }*/
-
+    let reader = new KvkFileReader();
+    let kvk: VisualKeyboard.VisualKeyboard = reader.read(kvkData);
     let result = VisualKeyboardFromFile(kvk, options.saveDebug);
     if(!result.result) {
       // TODO: error
@@ -678,4 +646,36 @@ export function FormatModifierAsBitflags(FBitMask: number): string {
     result = '0x'+zeroPadHex(FBitMask, 4);
   }
   return result;
+}
+
+function cleanKeyboardID(name: string): string {
+  name = name.toLowerCase();
+  if(name.length == 0) {
+    return name;
+  }
+  if(name[0].match(/\d/)) {
+    name = '_' + name;
+  }
+
+  let result = '';
+  for(let i = 0; i < name.length; i++) {
+    if(!name[i].match(/[a-z0-9_]/)) {
+      result += '_';
+    } else {
+      result += name[i];
+    }
+  }
+  return result;
+}
+
+function getKeymanWebCompiledNameFromFileName(filename: string): string {
+  let m = /([^/\\]+)$/.exec(filename);
+  if(!m) {
+    return null;
+  }
+  m = /^(.+?)(\.[^.]+)?$/.exec(m[1]);
+  if(!m) {
+    return null;
+  }
+  return cleanKeyboardID(m[1]);
 }

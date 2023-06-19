@@ -10,15 +10,25 @@ import { UnicodeSetParser, UnicodeSet, Osk } from '@keymanapp/common-types';
 import { CompilerCallbacks, CompilerEvent, CompilerOptions, KeymanFileTypes, KvkFileWriter, KvksFileReader } from '@keymanapp/common-types';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
 import { CompilerMessages, mapErrorFromKmcmplib } from './messages.js';
+import { WriteCompiledKeyboard } from '@keymanapp/kmc-kmw';
 
 export interface CompilerResultFile {
   filename: string;
   data: Uint8Array;
 };
 
+export const COMPILETARGETS_KMX =   0x01;
+export const COMPILETARGETS_JS =    0x02;
+export const COMPILETARGETS__MASK = 0x03;
+
 export interface CompilerResultMetadata {
+  /**
+   * A bitmask, consisting of COMPILETARGETS_KMX and/or COMPILETARGETS_JS
+   */
+  targets: number;
   kvksFilename?: string;
   displayMapFilename?: string;
+  displayMap?: Osk.PuaMap;
 };
 
 export interface CompilerResult {
@@ -29,7 +39,6 @@ export interface CompilerResult {
 };
 
 export interface KmnCompilerOptions extends CompilerOptions {
-  target?: 'kmx' | 'js';
 };
 
 const baseOptions: KmnCompilerOptions = {
@@ -37,7 +46,6 @@ const baseOptions: KmnCompilerOptions = {
   saveDebug: true,
   compilerWarningsAsErrors: false,
   warnDeprecatedCode: true,
-  target: 'kmx'
 };
 
 /**
@@ -163,7 +171,7 @@ export class KmnCompiler implements UnicodeSetParser {
       loadFile: this.loadFileCallback
     };
 
-    let result: CompilerResult = {data:{}};
+    let result: CompilerResult = {data:{targets:0}};
     let wasm_interface = new this.Module.CompilerInterface();
     let wasm_options = new this.Module.CompilerOptions();
     let wasm_result = null;
@@ -172,26 +180,60 @@ export class KmnCompiler implements UnicodeSetParser {
       wasm_options.compilerWarningsAsErrors = options.compilerWarningsAsErrors;
       wasm_options.warnDeprecatedCode = options.warnDeprecatedCode;
       wasm_options.shouldAddCompilerVersion = options.shouldAddCompilerVersion;
-      wasm_options.target = options.target == 'js' ? 1 : 0; // TODO CKF_KEYMANWEB : CKF_KEYMAN;
+      wasm_options.target = 0; // CKF_KEYMAN; TODO use COMPILETARGETS_KMX
       wasm_interface.callbacksKey = this.callbackID; // key of object on globalThis
       wasm_result = this.Module.kmcmp_compile(infile, wasm_options, wasm_interface);
       if(!wasm_result.result) {
         return null;
       }
 
+      if(wasm_result.targets & COMPILETARGETS_KMX) {
+        result.kmx = {
+          filename: outfile,
+          data: new Uint8Array(this.Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
+        };
+      }
+
+      //
+      // Visual Keyboard transform
+      //
+
       result.data.kvksFilename = wasm_result.kvksFilename;
       result.data.displayMapFilename = wasm_result.displayMapFilename;
+      result.data.displayMap = null;
+
+      if(wasm_result.displayMapFilename) {
+        result.data.displayMap = this.loadDisplayMapping(infile, result.data.displayMapFilename)
+      }
+
       if(result.data.kvksFilename) {
-        result.kvk = this.runKvkCompiler(result.data.kvksFilename, infile, outfile, result.data.displayMapFilename);
+        result.kvk = this.runKvkCompiler(result.data.kvksFilename, infile, outfile, result.data.displayMap);
         if(!result.kvk) {
           return null;
         }
       }
 
-      result.kmx = {
-        filename: outfile,
-        data: new Uint8Array(this.Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
-      };
+      //
+      // KeymanWeb compiler
+      //
+
+      if(wasm_result.targets & COMPILETARGETS_JS) {
+        wasm_options.target = 1; // CKF_KEYMANWEB TODO use COMPILETARGETS_JS
+        wasm_result = this.Module.kmcmp_compile(infile, wasm_options, wasm_interface);
+        if(!wasm_result.result) {
+          return null;
+        }
+
+        let web_kmx = {
+          filename: outfile,
+          data: new Uint8Array(this.Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
+        };
+
+        result.js = this.runWebCompiler(infile, outfile, web_kmx.data, result.kvk?.data, result.data.displayMap, options);
+        if(!result.js) {
+          return null;
+        }
+      }
 
       return result;
     } catch(e) {
@@ -208,7 +250,27 @@ export class KmnCompiler implements UnicodeSetParser {
     }
   }
 
-  private runKvkCompiler(kvksFilename: string, kmnFilename: string, kmxFilename: string, displayMapFilename?: string) {
+  private runWebCompiler(
+    kmnFilename: string,
+    kmxFilename: string,
+    web_kmx: Uint8Array,
+    kvk: Uint8Array,
+    displayMap: Osk.PuaMap,
+    options: CompilerOptions
+  ): CompilerResultFile {
+    const data = WriteCompiledKeyboard(this.callbacks, kmnFilename, web_kmx, kvk, displayMap, options.saveDebug);
+    if(!data) {
+      return null;
+    }
+
+    return {
+      filename: this.callbacks.path.join(this.callbacks.path.dirname(kmxFilename),
+        this.callbacks.path.basename(kmnFilename, KeymanFileTypes.Source.KeymanKeyboard) + KeymanFileTypes.Binary.WebKeyboard),
+      data: new TextEncoder().encode(data)
+    };
+  }
+
+  private runKvkCompiler(kvksFilename: string, kmnFilename: string, kmxFilename: string, displayMap?: Osk.PuaMap) {
     // The compiler detected a .kvks file, which needs to be captured
     let reader = new KvksFileReader();
     kvksFilename = this.callbacks.resolveFilename(kmnFilename, kvksFilename);
@@ -227,23 +289,9 @@ export class KmnCompiler implements UnicodeSetParser {
       this.callbacks.reportMessage(CompilerMessages.Warn_InvalidVkeyInKvksFile({filename, invalidVkey}));
     }
 
-    if(displayMapFilename) {
+    if(displayMap) {
       // Remap using the osk-char-use-rewriter
-      let mapping: any;
-
-      displayMapFilename = this.callbacks.resolveFilename(kmnFilename, displayMapFilename);
-      try {
-        // Expected file format: displaymap.schema.json
-        // TODO: verify with schema
-        let data = this.callbacks.loadFile(displayMapFilename);
-        mapping = JSON.parse(new TextDecoder().decode(data));
-      } catch(e) {
-        this.callbacks.reportMessage(CompilerMessages.Error_InvalidDisplayMapFile({filename, e}));
-        return null;
-      }
-
-      let pua = Osk.parseMapping(mapping);
-      Osk.remapVisualKeyboard(vk, pua);
+      Osk.remapVisualKeyboard(vk, displayMap);
     }
 
     let writer = new KvkFileWriter();
@@ -252,6 +300,24 @@ export class KmnCompiler implements UnicodeSetParser {
         this.callbacks.path.basename(kvksFilename, KeymanFileTypes.Source.VisualKeyboard) + KeymanFileTypes.Binary.VisualKeyboard),
       data: writer.write(vk)
     };
+  }
+
+  private loadDisplayMapping(kmnFilename:string, displayMapFilename: string): Osk.PuaMap {
+    // Remap using the osk-char-use-rewriter
+    let mapping: any;
+
+    displayMapFilename = this.callbacks.resolveFilename(kmnFilename, displayMapFilename);
+    try {
+      // Expected file format: displaymap.schema.json
+      // TODO: verify with schema
+      let data = this.callbacks.loadFile(displayMapFilename);
+      mapping = JSON.parse(new TextDecoder().decode(data));
+    } catch(e) {
+      this.callbacks.reportMessage(CompilerMessages.Error_InvalidDisplayMapFile({filename: displayMapFilename, e}));
+      return null;
+    }
+
+    return Osk.parseMapping(mapping);
   }
 
   /**

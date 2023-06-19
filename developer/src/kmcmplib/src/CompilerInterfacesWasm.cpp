@@ -55,17 +55,20 @@ struct WASM_COMPILER_RESULT {
   int kmxSize;
   // Following are compiler side-channel data, required for
   // follow-on transform
+  int targets; /* COMPILETARGETS_KMX | COMPILETARGETS_JS */
   std::string kvksFilename;
   std::string displayMapFilename;
   // TODO: additional data to be passed back
 };
 
 WASM_COMPILER_RESULT kmcmp_wasm_compile(std::string pszInfile, const KMCMP_COMPILER_OPTIONS options, const WASM_COMPILER_INTERFACE intf) {
-  WASM_COMPILER_RESULT r = {false};
+  WASM_COMPILER_RESULT r;
   KMCMP_COMPILER_RESULT kr;
 
+  r.result = false;
   r.kmx = 0;
   r.kmxSize = 0;
+  r.targets = 0;
   r.kvksFilename = "";
   r.displayMapFilename = "";
 
@@ -84,6 +87,7 @@ WASM_COMPILER_RESULT kmcmp_wasm_compile(std::string pszInfile, const KMCMP_COMPI
     r.kmxSize = (int) kr.kmxSize;
     r.kvksFilename = kr.kvksFilename;
     r.displayMapFilename = kr.displayMapFilename;
+    r.targets = kr.targets;
   }
 
   return r;
@@ -110,6 +114,7 @@ EMSCRIPTEN_BINDINGS(compiler_interface) {
     .property("result", &WASM_COMPILER_RESULT::result)
     .property("kmx", &WASM_COMPILER_RESULT::kmx)
     .property("kmxSize", &WASM_COMPILER_RESULT::kmxSize)
+    .property("targets", &WASM_COMPILER_RESULT::targets)
     .property("kvksFilename", &WASM_COMPILER_RESULT::kvksFilename)
     .property("displayMapFilename", &WASM_COMPILER_RESULT::displayMapFilename)
     ;

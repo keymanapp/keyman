@@ -1,4 +1,4 @@
-import { KMX, TouchLayout, TouchLayoutFileReader, TouchLayoutFileWriter } from "@keymanapp/common-types";
+import { KMX, Osk, TouchLayout, TouchLayoutFileReader, TouchLayoutFileWriter } from "@keymanapp/common-types";
 import { callbacks, IsKeyboardVersion14OrLater, IsKeyboardVersion15OrLater } from "./compiler-globals.js";
 import { JavaScript_Key, VKeyNames } from "./javascript-strings.js";
 
@@ -191,7 +191,7 @@ function TransformSpecialKeys14(FDebug: boolean, sLayoutFile: string): string {
   return sLayoutFile;
 }
 
-export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFile: string, sVKDictionary: string): VLFOutput {   // I4060   // I4139
+export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFile: string, sVKDictionary: string, displayMap: Osk.PuaMap): VLFOutput {   // I4060   // I4139
 
 /*
 var
@@ -263,6 +263,11 @@ var
         // TODO: ReportError(0, CWARN_TouchLayoutMissingRequiredKeys, 'Layer "'+FLayer.Id+'" on platform "'+FPlatform.Name+'" is missing the required key(s) '+RequiredKeysToString(CRequiredKeys-FRequiredKeys)+'.');
       }
     }
+  }
+
+  // Transform the layout keys with displayMap
+  if(displayMap) {
+    Osk.remapTouchLayout(data, displayMap);
   }
 
   // If not debugging, then this strips out formatting for a big saving in file size

@@ -8,6 +8,7 @@
     "allowJs": true,
     "paths": {
       "@keymanapp/common-types": ["../../../common/web/types/src/main"],
+      "@keymanapp/kmc-kmw": ["../kmc-kmw/src/main"],
     },
 
   },
@@ -18,5 +19,6 @@
   "references": [
     { "path": "../../../common/web/keyman-version/tsconfig.esm.json" },
     { "path": "../../../common/web/types/" },
+    { "path": "../kmc-kmw/" },
   ]
 }

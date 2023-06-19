@@ -19,7 +19,6 @@ export async function getOskFromKmnFile(callbacks: CompilerCallbacks, filename: 
   let result = kmnCompiler.runCompiler(filename, filename + '.tmp', {
     shouldAddCompilerVersion: false,
     saveDebug: false,
-    target: 'js'
   });
 
   if(!result) {

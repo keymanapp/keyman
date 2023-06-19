@@ -123,6 +123,7 @@ typedef FILE_VKDICTIONARY *PFILE_VKDICTIONARY;
  * Extra metadata for API consumers
  */
 struct FILE_KEYBOARD_EXTRA {
+  int targets;
   std::string kmnFilename; // utf-8
   std::u16string kvksFilename;	// utf-16, original TSS_VISUALKEYBOARD value
   std::u16string displayMapFilename;	// utf-16, original TSS_DISPLAY_MAP value

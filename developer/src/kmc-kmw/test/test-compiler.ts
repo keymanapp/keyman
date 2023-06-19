@@ -7,7 +7,6 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { KmnCompiler } from '@keymanapp/kmc-kmn';
-import { KMX, KmxFileReader } from '@keymanapp/common-types';
 import { extractTouchLayout } from './util.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url)).replace(/\\/g, '/');
@@ -42,15 +41,11 @@ describe('Compiler class', function() {
     let result = kmnCompiler.runCompiler(infile, outfile, {
       shouldAddCompilerVersion: false,
       saveDebug: true,  // TODO: we should probably use passed debug flag
-      target: 'js'
     });
 
     assert.isNotNull(result);
 
-    const reader = new KmxFileReader();
-    const keyboard: KMX.KEYBOARD = reader.read(result.kmx.data);
-
-    const js = WriteCompiledKeyboard(callbacks, infile, outfile, 'khmer_angkor', keyboard, true);
+    const js = WriteCompiledKeyboard(callbacks, infile, result.kmx?.data, result.kvk?.data, null, true);
 
     const fjs = fs.readFileSync(fixtureName, 'utf8');
 

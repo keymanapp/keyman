@@ -3,7 +3,6 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { KmnCompiler } from '@keymanapp/kmc-kmn';
-import { KMX, KmxFileReader } from '@keymanapp/common-types';
 import { WriteCompiledKeyboard } from '../src/compiler/write-compiled-keyboard.js';
 import { extractTouchLayout } from './util.js';
 
@@ -26,10 +25,11 @@ if(!await kmnCompiler.init(callbacks)) {
   process.exit(1);
 }
 
+// TODO: this needs rewrite due to circular deps
+
 let result = kmnCompiler.runCompiler(infile, outfile, {
   shouldAddCompilerVersion: false,
   saveDebug: true,  // TODO: we should probably use passed debug flag
-  target: 'js'
 });
 
 if(!result) {
@@ -37,10 +37,7 @@ if(!result) {
   process.exit(1);
 }
 
-const reader = new KmxFileReader();
-const keyboard: KMX.KEYBOARD = reader.read(result.kmx.data);
-
-const js = WriteCompiledKeyboard(callbacks, infile, outfile, 'khmer_angkor', keyboard, true);
+const js = WriteCompiledKeyboard(callbacks, infile, result.kmx.data, result.kvk.data, null, true);
 
 callbacks.printMessages();
 
