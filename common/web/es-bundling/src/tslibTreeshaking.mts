@@ -40,8 +40,9 @@ export async function determineNeededDowncompileHelpers(config: esbuild.BuildOpt
 
   const detectedHelpers: string[] = [];
 
+  const pluginName = 'es-bundling:  tslib helper use detection'
   let tslibHelperDetectionPlugin = {
-    name: 'tslib helper use detection',
+    name: pluginName,
     setup(build: esbuild.PluginBuild) {
       build.onLoad({filter: /\.js$/}, async (args) => {
         let source = await fs.promises.readFile(args.path, 'utf8');
@@ -54,7 +55,7 @@ export async function determineNeededDowncompileHelpers(config: esbuild.BuildOpt
 
           if(!results) {
             return buildMessage(
-              'tslib helper use detection',
+              pluginName,
               "tslib's definition pattern has shifted dramatically!  tslib helper-definition detector maintenance is needed.",
               indexToSourceLocation('', 0, 0, args.path)
             );
@@ -68,7 +69,7 @@ export async function determineNeededDowncompileHelpers(config: esbuild.BuildOpt
               let index = source.indexOf(result);
 
               warnings.push(buildMessage(
-                'tslib helper use detection',
+                pluginName,
                 'Probable `tslib` helper `' + capture + '` has not been validated for tree-shaking potential',
                 indexToSourceLocation(source, index, result.length, args.path)
               ));

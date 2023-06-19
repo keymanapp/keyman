@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
-#
-# Compile KeymanWeb's 'keyboard-processor' module, one of the components of Web's 'core' module.
-#
-set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary

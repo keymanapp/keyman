@@ -22,7 +22,6 @@ builder_describe \
   "@/common/web/recorder  test" \
   "@/common/web/keyman-version" \
   "@/common/web/es-bundling" \
-  "@/common/web/es-bundling" \
   "@/common/web/utils" \
   configure \
   clean \

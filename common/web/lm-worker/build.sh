@@ -29,7 +29,6 @@ builder_describe \
   "Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications." \
   "@/common/web/keyman-version" \
   "@/common/web/es-bundling" \
-  "@/common/web/es-bundling" \
   "@/common/models/wordbreakers" \
   "@/common/models/templates" \
   configure clean build test --ci
