@@ -81,7 +81,7 @@ codesign --force --options runtime --deep --sign "${CERTIFICATE_ID}" "$TARGETAPP
 
 TARGET_ZIP_PATH="$TARGETPATH/Install Keyman.zip"
 TARGET_APP_PATH="$TARGETAPP"
-ALTOOL_LOG_PATH="$TARGETPATH/altool.log"
+NOTARYTOOL_LOG_PATH="$TARGETPATH/notarytool.log"
 
 echo_heading "Zipping Install Keyman.app for notarization to $TARGET_ZIP_PATH"
 
@@ -89,34 +89,31 @@ echo_heading "Zipping Install Keyman.app for notarization to $TARGET_ZIP_PATH"
 
 echo_heading "Uploading Install Keyman.zip to Apple for notarization"
 
-xcrun altool --notarize-app --primary-bundle-id "com.Keyman.install.zip" --asc-provider "$APPSTORECONNECT_PROVIDER" --username "$APPSTORECONNECT_USERNAME" --password @env:APPSTORECONNECT_PASSWORD --file "$TARGET_ZIP_PATH" --output-format xml > $ALTOOL_LOG_PATH || fail "altool failed"
-cat "$ALTOOL_LOG_PATH"
+xcrun notarytool submit \
+    --apple-id "$APPSTORECONNECT_USERNAME" \
+    --team-id "$DEVELOPMENT_TEAM" \
+    --password "$APPSTORECONNECT_PASSWORD" \
+    --output-format json \
+    --wait \
+    "$TARGET_ZIP_PATH" > "$NOTARYTOOL_LOG_PATH"
+# notarytool output: {"status":"Accepted","id":"ca62bba0-6c49-43c2-90d8-83a8ef306e0f","message":"Processing complete"}
 
-ALTOOL_UUID=$(/usr/libexec/PlistBuddy -c "Print notarization-upload:RequestUUID" "$ALTOOL_LOG_PATH")
-ALTOOL_FINISHED=0
+cat "$NOTARYTOOL_LOG_PATH"
+NOTARYTOOL_STATUS=`cat "$NOTARYTOOL_LOG_PATH" | jq -r .status`
+NOTARYTOOL_SUBMISSION_ID=`cat "$NOTARYTOOL_LOG_PATH" | jq -r .id`
+if [[ "$NOTARYTOOL_STATUS" != Accepted ]]; then
+    # We won't assume notarytool returns an error code if status != Accepted
+    builder_die "Notarization failed with $NOTARYTOOL_STATUS"
+fi
 
-while [ $ALTOOL_FINISHED -eq 0 ]
-do
-    # We'll sleep 30 seconds before checking status, to give the altool server time to process the archive
-    echo "Waiting 30 seconds for status"
-    sleep 30
-    xcrun altool --notarization-info "$ALTOOL_UUID" --username "$APPSTORECONNECT_USERNAME" --password @env:APPSTORECONNECT_PASSWORD --output-format xml > "$ALTOOL_LOG_PATH" || fail "altool failed"
-    ALTOOL_STATUS=$(/usr/libexec/PlistBuddy -c "Print notarization-info:Status" "$ALTOOL_LOG_PATH")
-    if [ "$ALTOOL_STATUS" == "success" ]; then
-    ALTOOL_FINISHED=1
-    elif [ "$ALTOOL_STATUS" != "in progress" ]; then
-    # Probably failing with 'invalid'
-    cat "$ALTOOL_LOG_PATH"
-    ALTOOL_LOG_URL=$(/usr/libexec/PlistBuddy -c "Print notarization-info:LogFileURL" "$ALTOOL_LOG_PATH")
-    curl "$ALTOOL_LOG_URL"
-    fail "Notarization failed with $ALTOOL_STATUS; check log at $ALTOOL_LOG_PATH"
-    fi
-done
+builder_heading "Notarization completed successfully. Review logs below for any warnings."
 
-echo_heading "Notarization completed successfully. Review logs below for any warnings."
-cat "$ALTOOL_LOG_PATH"
-ALTOOL_LOG_URL=$(/usr/libexec/PlistBuddy -c "Print notarization-info:LogFileURL" "$ALTOOL_LOG_PATH")
-curl "$ALTOOL_LOG_URL"
+xcrun notarytool log \
+      --apple-id "$APPSTORECONNECT_USERNAME" \
+      --team-id "$DEVELOPMENT_TEAM" \
+      --password "$APPSTORECONNECT_PASSWORD" \
+      "$NOTARYTOOL_SUBMISSION_ID"
+
 echo
 echo_heading "Attempting to staple notarization to Install Keyman.app"
 xcrun stapler staple "$TARGET_APP_PATH" || fail "stapler failed"
