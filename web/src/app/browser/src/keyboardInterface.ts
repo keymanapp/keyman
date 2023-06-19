@@ -15,10 +15,6 @@ export default class KeyboardInterface extends KeyboardInterfaceBase<ContextMana
     // Nothing else to do here... quite yet.  Things may not stay that way, though.
   }
 
-  public get osk() {
-    return this.engine.osk;
-  }
-
   // *** The following are quite useful for website-integrating KMW, but not needed for the embedded form. ***
 
   /**
@@ -43,12 +39,12 @@ export default class KeyboardInterface extends KeyboardInterfaceBase<ContextMana
 
   //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard
   hideHelp(): void {
-    const osk = this.osk;
+    const osk = this.engine.osk;
     osk.startHide(true);
   }
 
   showHelp(Px: number, Py: number): void {
-    const osk = this.osk;
+    const osk = this.engine.osk;
 
     if(osk instanceof FloatingOSKView) {
       osk.presentAtPosition(Px,Py);
@@ -58,7 +54,7 @@ export default class KeyboardInterface extends KeyboardInterfaceBase<ContextMana
   }
 
   showPinnedHelp(): void {
-    const osk = this.osk;
+    const osk = this.engine.osk;
 
     if(osk instanceof FloatingOSKView) {
       // An old KMW bug previously auto-unset the affected field when this function was
