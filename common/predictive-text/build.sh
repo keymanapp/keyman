@@ -40,45 +40,28 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-### CONFIGURE ACTIONS
-
-if builder_start_action configure; then
-  verify_npm_setup
-  builder_finish_action success configure
-fi
-
-### CLEAN ACTIONS
-
-if builder_start_action clean; then
-  rm -rf build/
-  builder_finish_action success clean
-fi
-
-### BUILD ACTIONS
-
-# Builds the top-level JavaScript file for use on Node
-if builder_start_action build; then
+function do_build() {
+  # Builds the top-level JavaScript file for use on Node
   tsc -b ./tsconfig.all.json
 
   # esbuild-bundled products at this level are not intended to be used for anything but testing.
   node build-bundler.js
+}
 
-  builder_finish_action success build
-fi
-
-### TEST ACTIONS
 # Note - the actual test setup is done in a separate test script, but it's easy
 # enough to route the calls through.
+function do_test() {
+  local TEST_OPTIONS=
+  if builder_has_option --ci; then
+    TEST_OPTIONS=--ci
+  fi
 
-TEST_OPTIONS=
-if builder_has_option --ci; then
-  TEST_OPTIONS=--ci
-fi
-
-if builder_start_action test; then
-  # We'll test the included libraries here for now, at least until we have
-  # converted their builds to builder scripts
+  # We'll test the included libraries here for now.  At some point, we may wish
+  # to establish a ci.sh script for predictive-text to handle this instead.
   ./unit_tests/test.sh test:libraries test:headless test:browser $TEST_OPTIONS
+}
 
-  builder_finish_action success test
-fi
+builder_run_action configure  verify_npm_setup
+builder_run_action clean      rm -rf build/
+builder_run_action build      do_build
+builder_run_action test       do_test
