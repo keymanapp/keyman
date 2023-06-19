@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.126 alpha 2023-06-19
+
+* chore(mac): move from altool to notarytool (#9010)
+
 ## 17.0.125 alpha 2023-06-17
 
 * fix(android/samples): Cleanup Sample/Tests apk's (#9030)
