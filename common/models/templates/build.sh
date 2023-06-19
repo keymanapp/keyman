@@ -19,7 +19,7 @@ cd "$(dirname "$THIS_SCRIPT")"
 
 builder_describe "Builds the predictive-text model template implementation module" \
   "@/common/web/keyman-version" \
-  "@/common/web/tslib" \
+  "@/common/web/es-bundling" \
   "@/common/models/wordbreakers" \
   "clean" \
   "configure" \

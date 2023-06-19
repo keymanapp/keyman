@@ -1,19 +1,7 @@
 import esbuild from 'esbuild';
+import { esmConfiguration, bundleObjEntryPoints } from '../../../../common/web/es-bundling/build/index.mjs';
 
 await esbuild.build({
-  alias: {
-    'tslib': '@keymanapp/tslib'
-  },
-  bundle: true,
-  sourcemap: true,
-  format: "esm",
-  nodePaths: ['../../../../node_modules'],
-  entryPoints: {
-    'index': '../../../build/engine/osk/obj/index.js',
-  },
-  external: ['fs', 'vm'],
-  outdir: '../../../build/engine/osk/lib/',
-  outExtension: { '.js': '.mjs' },
-  tsconfig: './tsconfig.json',
-  target: "es5"
+  ...esmConfiguration,
+  ...bundleObjEntryPoints('lib', '../../../build/engine/osk/obj/index.js')
 });

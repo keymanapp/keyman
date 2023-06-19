@@ -28,7 +28,7 @@ WORKER_OUTPUT_FILENAME=build/lib/worker-main.js
 builder_describe \
   "Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications." \
   "@/common/web/keyman-version" \
-  "@/common/web/tslib" \
+  "@/common/web/es-bundling" \
   "@/common/models/wordbreakers" \
   "@/common/models/templates" \
   configure clean build test --ci

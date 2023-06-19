@@ -6,73 +6,33 @@
  */
 
 import esbuild from 'esbuild';
+import { iifeConfiguration, prepareTslibTreeshaking  } from '../../../../common/web/es-bundling/build/index.mjs';
 
-import fs from 'fs';
-
-/*
- * Refer to https://github.com/microsoft/TypeScript/issues/13721#issuecomment-307259227 -
- * the `@class` emit comment-annotation is designed to facilitate tree-shaking for ES5-targeted
- * down-level emits.  `esbuild` doesn't look for it by default... but we can override that with
- * this plugin.
- */
-let es5ClassAnnotationAsPurePlugin = {
-  name: '@class -> __PURE__',
-  setup(build) {
-    build.onLoad({filter: /\.js$/ }, async (args) => {
-      let source = await fs.promises.readFile(args.path, 'utf8');
-      return {
-        // Marks any classes compiled by TS (as per the /** @class */ annotation)
-        // as __PURE__ in order to facilitate tree-shaking.
-        contents: source.replace('/** @class */', '/* @__PURE__ */ /** @class */'),
-        loader: 'js'
-      }
-    });
-  }
-}
-
-await esbuild.build({
-  alias: {
-    'tslib': '@keymanapp/tslib'
-  },
-  bundle: true,
-  sourcemap: true,
-  format: "iife",
-  nodePaths: ['../../../../node_modules'],
+const commonConfig = {
+  ...iifeConfiguration,
   entryPoints: {
     'index': '../../../build/app/webview/obj/debug-main.js',
   },
   outfile: '../../../build/app/webview/debug/keymanweb-webview.js',
-  plugins: [ es5ClassAnnotationAsPurePlugin ],
   // `esbuild`'s sourcemap output puts relative paths to the original sources from the
   // directory of the build output.  The following keeps repo structure intact and
   // puts our code under a common 'namespace' of sorts.
-  sourceRoot: '@keymanapp/keyman/web/build/app/webview/debug/',
-  target: "es5",
-  treeShaking: true,
-  tsconfig: './tsconfig.json'
-});
+  sourceRoot: '@keymanapp/keyman/web/build/app/webview/debug/'
+};
+
+await prepareTslibTreeshaking(commonConfig, /worker-main\.wrapped(?:\.min)?\.js/);
+
+await esbuild.build(commonConfig);
 
 await esbuild.build({
-  alias: {
-    'tslib': '@keymanapp/tslib'
-  },
-  bundle: true,
-  sourcemap: true,
-  minifyWhitespace: true,
-  minifySyntax: true,
-  minifyIdentifiers: false,
-  format: "iife",
-  nodePaths: ['../../../../node_modules'],
+  ...commonConfig,
   entryPoints: {
     'index': '../../../build/app/webview/obj/release-main.js',
   },
+  minify: true,
   outfile: '../../../build/app/webview/release/keymanweb-webview.js',
-  plugins: [ es5ClassAnnotationAsPurePlugin ],
   // `esbuild`'s sourcemap output puts relative paths to the original sources from the
   // directory of the build output.  The following keeps repo structure intact and
   // puts our code under a common 'namespace' of sorts.
-  sourceRoot: '@keymanapp/keyman/web/build/app/webview/debug/',
-  target: "es5",
-  treeShaking: true,
-  tsconfig: './tsconfig.json'
+  sourceRoot: '@keymanapp/keyman/web/build/app/webview/debug/'
 });
