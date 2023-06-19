@@ -1066,7 +1066,6 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
   case TSS_TARGETS:   // I4504
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyTargets);
-    // TODO: set targets = COMPILETARGETS_KMX | COMPILETARGETS_JS based on actual targets!
     fk->extra->targets = GetCompileTargetsFromTargetsStore(sp->dpString);
     break;
 
