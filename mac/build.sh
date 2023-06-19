@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-set -e
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
@@ -11,6 +9,8 @@ KEYMAN_MAC_BASE_PATH="$KEYMAN_ROOT/mac"
 
 # Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
+. "$KEYMAN_ROOT/mac/mac-utils.inc.sh"
 
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
@@ -389,10 +389,6 @@ if $DO_KEYMANIM ; then
         ENTITLEMENTS_FILE=Keyman.entitlements
     fi
 
-    if [ -z "$DEVELOPMENT_TEAM" ]; then
-        DEVELOPMENT_TEAM=3YE4W86L3G
-    fi
-
     # We need to re-sign the app after updating the plist file
     if $DO_CODESIGN ; then
         execCodeSign --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/Sentry.framework"
@@ -439,7 +435,6 @@ if $PREPRELEASE || $NOTARIZE; then
     TARGET_PATH="$KM4MIM_BASE_PATH/build/$CONFIG"
     TARGET_APP_PATH="$TARGET_PATH/$PRODUCT_NAME.app"
     TARGET_ZIP_PATH="$TARGET_PATH/$PRODUCT_NAME.zip"
-    NOTARYTOOL_LOG_PATH="$TARGET_PATH/notarytool.log"
 
     # Note: get-task-allow entitlement must be *off* in our release build (to do this, don't include base entitlements in project build settings)
 
@@ -453,32 +448,8 @@ if $PREPRELEASE || $NOTARIZE; then
 
     /usr/bin/ditto -c -k --keepParent "$TARGET_APP_PATH" "$TARGET_ZIP_PATH"
 
-    echo_heading "Uploading Keyman.zip to Apple for notarization"
-
-    xcrun notarytool submit \
-        --apple-id "$APPSTORECONNECT_USERNAME" \
-        --team-id "$DEVELOPMENT_TEAM" \
-        --password "$APPSTORECONNECT_PASSWORD" \
-        --output-format json \
-        --wait \
-        "$TARGET_ZIP_PATH" > "$NOTARYTOOL_LOG_PATH"
-    # notarytool output: {"status":"Accepted","id":"ca62bba0-6c49-43c2-90d8-83a8ef306e0f","message":"Processing complete"}
-
-    cat "$NOTARYTOOL_LOG_PATH"
-    NOTARYTOOL_STATUS=`cat "$NOTARYTOOL_LOG_PATH" | jq -r .status`
-    NOTARYTOOL_SUBMISSION_ID=`cat "$NOTARYTOOL_LOG_PATH" | jq -r .id`
-    if [[ "$NOTARYTOOL_STATUS" != Accepted ]]; then
-        # We won't assume notarytool returns an error code if status != Accepted
-        builder_die "Notarization failed with $NOTARYTOOL_STATUS"
-    fi
-
-    builder_heading "Notarization completed successfully. Review logs below for any warnings."
-
-    xcrun notarytool log \
-        --apple-id "$APPSTORECONNECT_USERNAME" \
-        --team-id "$DEVELOPMENT_TEAM" \
-        --password "$APPSTORECONNECT_PASSWORD" \
-        "$NOTARYTOOL_SUBMISSION_ID"
+    builder_heading "Uploading Keyman.zip to Apple for notarization"
+    mac_notarize "$TARGET_PATH" "$TARGET_ZIP_PATH"
 
     echo
     echo_heading "Attempting to staple notarization to Keyman.app"
