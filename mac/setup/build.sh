@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
-
-set -e
-set -u
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -11,6 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/mac/mac-utils.inc.sh"
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac
@@ -81,40 +78,14 @@ codesign --force --options runtime --deep --sign "${CERTIFICATE_ID}" "$TARGETAPP
 
 TARGET_ZIP_PATH="$TARGETPATH/Install Keyman.zip"
 TARGET_APP_PATH="$TARGETAPP"
-NOTARYTOOL_LOG_PATH="$TARGETPATH/notarytool.log"
 
 builder_heading "Zipping Install Keyman.app for notarization to $TARGET_ZIP_PATH"
 
 /usr/bin/ditto -c -k --keepParent "$TARGET_APP_PATH" "$TARGET_ZIP_PATH"
 
 builder_heading "Uploading Install Keyman.zip to Apple for notarization"
+mac_notarize "$TARGETPATH" "$TARGET_ZIP_PATH"
 
-xcrun notarytool submit \
-    --apple-id "$APPSTORECONNECT_USERNAME" \
-    --team-id "$DEVELOPMENT_TEAM" \
-    --password "$APPSTORECONNECT_PASSWORD" \
-    --output-format json \
-    --wait \
-    "$TARGET_ZIP_PATH" > "$NOTARYTOOL_LOG_PATH"
-# notarytool output: {"status":"Accepted","id":"ca62bba0-6c49-43c2-90d8-83a8ef306e0f","message":"Processing complete"}
-
-cat "$NOTARYTOOL_LOG_PATH"
-NOTARYTOOL_STATUS=`cat "$NOTARYTOOL_LOG_PATH" | jq -r .status`
-NOTARYTOOL_SUBMISSION_ID=`cat "$NOTARYTOOL_LOG_PATH" | jq -r .id`
-if [[ "$NOTARYTOOL_STATUS" != Accepted ]]; then
-    # We won't assume notarytool returns an error code if status != Accepted
-    builder_die "Notarization failed with $NOTARYTOOL_STATUS"
-fi
-
-builder_heading "Notarization completed successfully. Review logs below for any warnings."
-
-xcrun notarytool log \
-      --apple-id "$APPSTORECONNECT_USERNAME" \
-      --team-id "$DEVELOPMENT_TEAM" \
-      --password "$APPSTORECONNECT_PASSWORD" \
-      "$NOTARYTOOL_SUBMISSION_ID"
-
-echo
 builder_heading "Attempting to staple notarization to Install Keyman.app"
 xcrun stapler staple "$TARGET_APP_PATH" || builder_die "stapler failed"
 
