@@ -34,13 +34,12 @@ public:
   /**
    * @returns length if it's a match
   */
-  size_t match(const std::u16string &input);
-
+  size_t match(const std::u16string &input) const;
 
   /**
    * @returns output string
   */
-  std::u16string apply(const std::u16string &input, size_t matchLen);
+  std::u16string apply(const std::u16string &input, size_t matchLen) const;
 
 private:
   const std::u16string fFrom;  // TODO-LDML: regex
@@ -53,9 +52,25 @@ private:
 typedef std::deque<std::u16string> string_list;
 
 /**
- * map from transform list to string
+ * a group of <transform> entries - a <transformGroup>
  */
-typedef std::deque<transform_entry> transform_group;
+class transform_group : public std::deque<transform_entry> {
+  public:
+    transform_group();
+
+    /**
+     * Find the first match in the group
+     * @param input input string to match
+     * @param subMatched on output, the matched length
+     * @returns alias to transform_entry or nullptr
+    */
+    const transform_entry *match(const std::u16string &input, size_t &subMatched) const;
+};
+
+/**
+ * A list of groups
+*/
+typedef std::deque<transform_group> transform_group_list;
 
 /**
  * This represents an entire <transforms> element
@@ -63,7 +78,7 @@ typedef std::deque<transform_entry> transform_group;
 class transforms {
 
 private:
-  std::deque<transform_group> transform_groups;
+  transform_group_list transform_groups;
 
 public:
   transforms();
@@ -87,15 +102,17 @@ public:
    * @return true if str was altered
   */
   bool apply(std::u16string &str);
+
+public:
+  static transforms *
+  load(
+    const kmx::kmx_plus &kplus,
+    const kbp::kmx::COMP_KMXPLUS_TRAN *tran,
+    const kbp::kmx::COMP_KMXPLUS_TRAN_Helper &tranHelper);
 };
 /**
  * Loader for transform groups (from tran or bksp)
  */
-transforms *load_transform_groups(
-    const kmx::kmx_plus &kplus,
-    const kbp::kmx::COMP_KMXPLUS_TRAN *tran,
-    const kbp::kmx::COMP_KMXPLUS_TRAN_Helper &tranHelper);
-
 }  // namespace ldml
 }  // namespace kbp
 }  // namespace km

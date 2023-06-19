@@ -21,7 +21,7 @@ transform_entry::transform_entry(const std::u16string &from, const std::u16strin
 }
 
 size_t
-transform_entry::match(const std::u16string &input) {
+transform_entry::match(const std::u16string &input) const {
   if (input.length() < fFrom.length()) {
     return 0;
   }
@@ -34,7 +34,7 @@ transform_entry::match(const std::u16string &input) {
 }
 
 std::u16string
-transform_entry::apply(const std::u16string &/*input*/, size_t /*matchLen*/) {
+transform_entry::apply(const std::u16string &/*input*/, size_t /*matchLen*/) const {
   return fTo;
 }
 
@@ -44,6 +44,25 @@ transforms::transforms() : transform_groups() {
 void
 transforms::addTransformGroup(const transform_group &s) {
   transform_groups.push_back(s);
+}
+
+transform_group::transform_group() {
+}
+
+/**
+ * return the first transform match in this group
+ */
+const transform_entry *
+transform_group::match(const std::u16string &input, size_t &subMatched) const {
+  for (auto transform = begin(); (subMatched == 0) && (transform < end()); transform++) {
+    // TODO-LDML: non regex implementation
+    // is the match area too short?
+    subMatched = transform->match(input);
+    if (subMatched != 0) {
+      return &(*transform);  // return alias to transform
+    }
+  }
+  return nullptr;
 }
 
 size_t
@@ -69,12 +88,12 @@ transforms::apply(const std::u16string &input, std::u16string &output) {
     // TODO-LDML: reorders
     // Assume it's a non reorder group
     size_t subMatched = 0;
-    for (auto transform = group->begin(); (subMatched == 0) && (transform < group->end()); transform++) {
-      // TODO-LDML: non regex implementation
-      // is the match area too short?
-      subMatched = transform->match(updatedInput);
-      if (subMatched == 0)
-        continue;                                                       // no match
+
+    // find the first match in this group (if present)
+    auto transform = group->match(updatedInput, subMatched);
+
+    if (transform != nullptr) {
+      // apply
 
       // get the updated sub output
       std::u16string subOutput = transform->apply(updatedInput, subMatched);
@@ -96,8 +115,7 @@ transforms::apply(const std::u16string &input, std::u16string &output) {
         output.resize(output.length() - subMatched);
         output.append(subOutput);
       }
-      // will fall through to next group
-    }
+    } // else: continue to next group
   }
   // TODO-LDML: optimization (mentioned above) to contract 'matched' if possible.
   // could also handle from="x" to="x"
@@ -121,7 +139,7 @@ transforms::apply(std::u16string & str) {
 // Loader
 
 transforms *
-load_transform_groups(const kmx::kmx_plus &kplus,
+transforms::load(const kmx::kmx_plus &kplus,
                       const kbp::kmx::COMP_KMXPLUS_TRAN *tran,
                       const kbp::kmx::COMP_KMXPLUS_TRAN_Helper &tranHelper) {
   if (tran == nullptr) {

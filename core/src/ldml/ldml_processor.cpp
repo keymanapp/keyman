@@ -87,7 +87,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
 
   // load transforms
   if (kplus.tran != nullptr && kplus.tran->groupCount > 0) {
-    transforms.reset(km::kbp::ldml::load_transform_groups(kplus, kplus.tran, kplus.tranHelper));
+    transforms.reset(km::kbp::ldml::transforms::load(kplus, kplus.tran, kplus.tranHelper));
     if (!transforms) {
       DebugLog("Failed to load tran transforms");
       return; // failed to load
@@ -96,7 +96,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
 
   // load bksp transforms
   if (kplus.bksp != nullptr && kplus.bksp->groupCount > 0) {
-    bksp_transforms.reset(km::kbp::ldml::load_transform_groups(kplus, kplus.bksp, kplus.bkspHelper));
+    bksp_transforms.reset(km::kbp::ldml::transforms::load(kplus, kplus.bksp, kplus.bkspHelper));
     if (!bksp_transforms) {
       DebugLog("Failed to load bksp transforms");
       return; // failed to load
@@ -217,7 +217,7 @@ ldml_processor::process_event(
           /*
             We couldn't find a character at end of context (context is empty),
             so we'll pass the backspace keystroke on to the app to process; the
-            app might want to use backspace to move between contexts or delete 
+            app might want to use backspace to move between contexts or delete
             a text box, etc. Or it might be a legacy app and we've had our caret
             dumped in somewhere unknown, so we will have to depend on the app to
             be sensible about backspacing because we know nothing.
