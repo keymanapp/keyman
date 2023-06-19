@@ -177,7 +177,7 @@ export default class KeymanEngine<
     });
   }
 
-  async init(optionSpec: Required<InitOptionSpec>){
+  public async init(optionSpec: Required<InitOptionSpec>){
     // There may be some valid mutations possible even on repeated calls?
     // The original seems to allow it.
 
@@ -258,10 +258,20 @@ export default class KeymanEngine<
     // #endregion
   }
 
+  /**
+   * Public API:  Denotes the 'patch' component of the version of the current engine.
+   *
+   * https://help.keyman.com/developer/engine/web/17.0/reference/core/build
+   */
   public get build(): number {
     return Number.parseInt(KEYMAN_VERSION.VERSION_PATCH, 10);
   }
 
+  /**
+   * Public API:  Denotes the major & minor components of the version of the current engine.
+   *
+   * https://help.keyman.com/developer/engine/web/17.0/reference/core/version
+   */
   public get version(): string {
     return KEYMAN_VERSION.VERSION_RELEASE;
   }
@@ -329,11 +339,24 @@ export default class KeymanEngine<
     return Promise.resolve(model);
   }
 
-  addEventListener<Name extends EventNames<LegacyAPIEvents>>(event: Name, listener: EventListener<LegacyAPIEvents, Name>) {
+  /**
+   * Public API:  Allows external JS code to subscribe to Keyman Engine events documented at
+   * https://help.keyman.com/developer/engine/web/17.0/reference/events.  Note that any OSK-related
+   * events should instead register on `keyman.osk.addEventListener`, not on this method.
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/addEventListener
+   */
+  public addEventListener<Name extends EventNames<LegacyAPIEvents>>(event: Name, listener: EventListener<LegacyAPIEvents, Name>) {
     this.legacyAPIEvents.addEventListener(event, listener);
   }
 
-  removeEventListener<Name extends EventNames<LegacyAPIEvents>>(event: Name, listener: EventListener<LegacyAPIEvents, Name>) {
+  /**
+   * Public API:  Allows external JS code to unsubscribe from Keyman Engine events documented at
+   * https://help.keyman.com/developer/engine/web/17.0/reference/events.
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/removeEventListener
+   */
+  public removeEventListener<Name extends EventNames<LegacyAPIEvents>>(event: Name, listener: EventListener<LegacyAPIEvents, Name>) {
     this.legacyAPIEvents.removeEventListener(event, listener);
   }
 
@@ -388,8 +411,10 @@ export default class KeymanEngine<
    *
    * @param       {string}    PInternalName   Internal name
    * @param       {string}    PLgCode         Language code
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/setActiveKeyboard
    */
-  async setActiveKeyboard(keyboardId: string, languageCode?: string): Promise<boolean> {
+  public async setActiveKeyboard(keyboardId: string, languageCode?: string): Promise<boolean> {
     return this.contextManager.activateKeyboard(keyboardId, languageCode, true);
   }
 
@@ -398,8 +423,10 @@ export default class KeymanEngine<
    * Scope        Public
    * @return      {string}      Name of active keyboard
    * Description  Return internal name of currently active keyboard
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/getActiveKeyboard
    */
-  getActiveKeyboard(): string {
+  public getActiveKeyboard(): string {
     return this.contextManager.activeKeyboard?.metadata.id ?? '';
   }
 
@@ -409,8 +436,10 @@ export default class KeymanEngine<
    * @param      {boolean=}        true to retrieve full language name, false/undefined to retrieve code.
    * @return     {string}         language code
    * Description Return language code for currently selected language
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/getActiveLanguage
    */
-  getActiveLanguage(fullName?: boolean): string {
+  public getActiveLanguage(fullName?: boolean): string {
     // In short... the activeStub.
     const metadata = this.contextManager.activeKeyboard?.metadata;
 
@@ -427,8 +456,10 @@ export default class KeymanEngine<
    * @param       {string|Object=}   k0
    * @return      {boolean}
    * Description  Tests if the active keyboard (or optional argument) uses chiral modifiers.
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/isChiral
    */
-  isChiral(k0?: string | Keyboard) {
+  public isChiral(k0?: string | Keyboard) {
     let kbd: Keyboard;
     if(k0) {
       if(typeof k0 == 'string') {
@@ -452,12 +483,10 @@ export default class KeymanEngine<
    * Scope        Public
    * Description  Reverts the OSK to the default layer, clears any processing caches and modifier states,
    *              and clears deadkeys and prediction-processing states on the active element (if it exists)
+   *
+   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/resetContext
    */
-  resetContext() {
-    // NOTE:  16.0 KMW had a `element: HTMLElement` parameter.  It was undocumented on help.keyman.com, though,
-    //        and I'm not sure it makes sense to attempt to maintain.
-    //
-    //        I cannot find any calls that utilized the parameter within in-repo code.
+  public resetContext() {
     this.contextManager.resetContext();
   };
 
