@@ -6,12 +6,6 @@ import ContextManager from './contextManager.js';
 import KeymanEngine from './keymanEngine.js';
 
 export default class KeyboardInterface extends KeyboardInterfaceBase<ContextManager> {
-  // TBD:  allowing it to be set and/or the retrieval mechanism.
-  //       Note that the OSK is constructed notably later, after page load + during full engine init.
-  //       So, the actual instance will not be available at construction-time.
-  private osk: OSKView; // Or some way to retrieve it.
-
-
   constructor(
     _jsGlobal: any,
     engine: KeymanEngine,
@@ -20,6 +14,7 @@ export default class KeyboardInterface extends KeyboardInterfaceBase<ContextMana
 
     // Nothing else to do here... quite yet.  Things may not stay that way, though.
   }
+
   // *** The following are quite useful for website-integrating KMW, but not needed for the embedded form. ***
 
   /**
@@ -44,12 +39,12 @@ export default class KeyboardInterface extends KeyboardInterfaceBase<ContextMana
 
   //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard
   hideHelp(): void {
-    const osk = this.osk;
+    const osk = this.engine.osk;
     osk.startHide(true);
   }
 
   showHelp(Px: number, Py: number): void {
-    const osk = this.osk;
+    const osk = this.engine.osk;
 
     if(osk instanceof FloatingOSKView) {
       osk.presentAtPosition(Px,Py);
@@ -59,7 +54,7 @@ export default class KeyboardInterface extends KeyboardInterfaceBase<ContextMana
   }
 
   showPinnedHelp(): void {
-    const osk = this.osk;
+    const osk = this.engine.osk;
 
     if(osk instanceof FloatingOSKView) {
       // An old KMW bug previously auto-unset the affected field when this function was

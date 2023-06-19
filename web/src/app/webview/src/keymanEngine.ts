@@ -1,5 +1,5 @@
-import { DeviceSpec } from '@keymanapp/keyboard-processor'
-import { KeymanEngine as KeymanEngineBase } from 'keyman/engine/main';
+import { DefaultRules, DeviceSpec } from '@keymanapp/keyboard-processor'
+import { KeymanEngine as KeymanEngineBase, KeyboardInterface } from 'keyman/engine/main';
 import { AnchoredOSKView, ViewConfiguration, StaticActivator } from 'keyman/engine/osk';
 import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
 import { type KeyboardStub, toPrefixedKeyboardId, toUnprefixedKeyboardId } from 'keyman/engine/package-cache';
@@ -25,7 +25,14 @@ export default class KeymanEngine extends KeymanEngineBase<WebviewConfiguration,
       }
     }
 
-    super(worker, config, new ContextManager(config));
+    super(worker, config, new ContextManager(config), (engine) => {
+      return {
+        // The `engine` parameter cannot be supplied with the constructing instance before calling
+        // `super`, hence the 'fun' rigging to supply it _from_ `super` via this closure.
+        keyboardInterface: new KeyboardInterface(window, engine, config.stubNamespacer),
+        defaultOutputRules: new DefaultRules()
+      };
+    });
 
     this.hardKeyboard = new PassthroughKeyboard(config.hardDevice);
   }

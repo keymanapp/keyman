@@ -389,7 +389,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
     }
 
     // Is synchronous.
-    this.emit('keyEvent', Levent, (ruleBehavior, error) => {
+    this.emit('keyevent', Levent, (ruleBehavior, error) => {
       resultCapture.LeventMatched = ruleBehavior && !ruleBehavior.triggerKeyDefault;
 
       if(resultCapture.LeventMatched) {
@@ -454,7 +454,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
     // interpretation as well by _not_ evaluating it during this pass.
     if(!this.swallowKeypress) {
       // is synchronous
-      this.emit('keyEvent', Levent, (result, error) => {
+      this.emit('keyevent', Levent, (result, error) => {
         resultCapture.preventDefaultKeystroke = !!result;
       })
     }

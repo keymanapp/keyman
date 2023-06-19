@@ -21,7 +21,7 @@ import {
   type SystemStoreMutationHandler
 } from '@keymanapp/keyboard-processor';
 import { createUnselectableElement, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
-import { LegacyEventEmitter } from 'keyman/engine/events';
+import { EventListener, EventNames, LegacyEventEmitter } from 'keyman/engine/events';
 
 import Configuration from '../config/viewConfiguration.js';
 import Activator, { StaticActivator } from './activator.js';
@@ -49,7 +49,9 @@ export interface LegacyOSKEventMap {
   'helpclick'(obj: {});
   'resizemove'(obj: {});
   'show'(obj: {});
-  'hide'(obj: {});
+  'hide'(obj: {
+    HiddenByUser: boolean
+  });
 }
 
 /**
@@ -64,41 +66,27 @@ export interface EventMap {
    * Note:  the following code block was originally used to integrate with the keyboard & input
    * processors, but it requires entanglement with components external to this OSK module.
    */
-  'keyEvent': (event: KeyEvent) => void,
-
-  onshow(): void;
-
-  onhide(hiddenByUser: boolean): void;
+  'keyevent': (event: KeyEvent) => void,
 
   /**
    * Indicates that the globe key has either been pressed (`on` == `true`)
    * or released (`on` == `false`).
    */
-  globeKey: (e: KeyElement, on: boolean) => void;
+  globekey: (e: KeyElement, on: boolean) => void;
 
   /**
    * A virtual keystroke corresponding to a "hide" command has been received.
    */
-  hideRequested: (key: KeyElement) => void;
-
-  /**
-   * This event is raised when the OSK's 'config' button is clicked.
-   * Adding a listener for the event will cause the 'config' button to be displayed for
-   * FloatingOSKView instances.
-   */
-  showConfig: () => void;
-
-  /**
-   * This event is raised when the OSK's 'help' button is clicked.
-   * Adding a listener for the event will cause the 'help' button to be displayed for
-   * FloatingOSKView instances.
-   */
-  showHelp: () => void;
+  hiderequested: (key: KeyElement) => void;
 
   /**
    * Signals the special command to display the engine's version + build number.
    */
-  showBuild: () => void;
+  showbuild: () => void;
+
+  // While the next two are near-duplicates of the legacy event `resizemove`, these
+  // have the advantage of providing a Promise for the end of the ongoing user
+  // interaction.  We need that Promise for focus-management.
 
   /**
    * Signals that the OSK is being moved by the user via a drag operation.
@@ -108,15 +96,14 @@ export interface EventMap {
    * Note that position-restoration (unpinning the OSK) is treated as a drag-move
    * event.  It resolves near-instantly.
    */
-  dragMove: (promise: Promise<void>) => void;
+  dragmove: (promise: Promise<void>) => void;
 
   /**
    * Signals that the OSK is being resized via a drag operation (on a resize 'handle').
    *
    * The provided Promise will resolve once the resize operation is complete.
    */
-  resizeMove: (promise: Promise<void>) => void;
-
+  resizemove: (promise: Promise<void>) => void;
 
   /**
    * Signals that either the mouse or an active touchpoint is interacting with the OSK.
@@ -125,7 +112,7 @@ export interface EventMap {
    * Note that for touch events, more than one touchpoint may coexist, each with its own
    * corresponding call of this event and corresponding `Promise`.
    */
-  pointerInteraction: (promise: Promise<void>) => void;
+  pointerinteraction: (promise: Promise<void>) => void;
 }
 
 export default abstract class OSKView extends EventEmitter<EventMap> implements MinimalCodesInterface {
@@ -290,7 +277,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
       }
 
       this.mouseEnterPromise = new ManagedPromise<void>();
-      this.emit('pointerInteraction', this.mouseEnterPromise.corePromise);
+      this.emit('pointerinteraction', this.mouseEnterPromise.corePromise);
     };
 
     this._Box.onmouseleave = this._VKbdMouseLeave = (e) => {
@@ -323,7 +310,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
     this._boxBaseTouchStart = (e) => {
       for(let i = 0; i < e.changedTouches.length; i++) {
         let promise = this.touchEventPromiseManager.promiseForTouchpoint(e.changedTouches[i].identifier);
-        this.emit('pointerInteraction', promise.corePromise);
+        this.emit('pointerinteraction', promise.corePromise);
       }
 
       this.touchEventPromiseManager.maintainTouches(e.touches);
@@ -814,11 +801,11 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
       isEmbedded: this.config.isEmbedded
     });
 
-    vkbd.on('keyEvent', (keyEvent) => this.emit('keyEvent', keyEvent));
-    vkbd.on('globeKey', (keyElement, on) => this.emit('globeKey', keyElement, on));
-    vkbd.on('hideRequested', (keyElement) => {
+    vkbd.on('keyevent', (keyEvent) => this.emit('keyevent', keyEvent));
+    vkbd.on('globekey', (keyElement, on) => this.emit('globekey', keyElement, on));
+    vkbd.on('hiderequested', (keyElement) => {
       this.doHide(true);
-      this.emit('hideRequested', keyElement);
+      this.emit('hiderequested', keyElement);
     });
 
     // Set box class - OS and keyboard added for Build 360
@@ -918,9 +905,8 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
 
     this.setDisplayPositioning();
 
-    // Do this once all properties are set; that way, consumers can safely poll
-    // for position, size, etc.
-    this.emit('onshow');
+    // Each subclass is responsible for raising the 'show' event on its own, since
+    // certain ones supply extra information in their event param object.
   }
 
   /**
@@ -1241,10 +1227,9 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
    *
    */
   doHide(hiddenByUser: boolean) {
-    this.emit('onhide', hiddenByUser);
-
-    const p={};
-    p['HiddenByUser']=hiddenByUser;
+    const p={
+      HiddenByUser: hiddenByUser
+    };
     this.legacyEvents.callEvent('hide', p);
   }
 
@@ -1256,11 +1241,17 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
    * @return      {boolean}
    * Description  Wrapper function to add and identify OSK-specific event handlers
    */
-  addEventListener<T extends keyof LegacyOSKEventMap>(event: T, fn: (arg: {}) => any): void {
+  addEventListener<T extends keyof LegacyOSKEventMap>(
+    event: T,
+    fn: EventListener<LegacyOSKEventMap, T>
+  ): void {
     this.legacyEvents.addEventListener(event, fn);
   }
 
-  removeEventListener<T extends keyof LegacyOSKEventMap>(event: T, fn: (arg: {}) => any): void {
+  removeEventListener<T extends keyof LegacyOSKEventMap>(
+    event: T,
+    fn: EventListener<LegacyOSKEventMap, T>
+  ): void {
     this.legacyEvents.removeEventListener(event, fn);
   }
 }

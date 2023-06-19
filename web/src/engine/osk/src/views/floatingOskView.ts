@@ -45,25 +45,23 @@ export default class FloatingOSKView extends OSKView {
 
     super(config);
 
-    this.typedActivationModel.on('triggerChange', () => this.setDisplayPositioning());
+    this.typedActivationModel.on('triggerchange', () => this.setDisplayPositioning());
 
     document.body.appendChild(this._Box);
 
     // Add header element to OSK only for desktop browsers
     this.titleBar = new TitleBar(this.titleDragHandler);
     this.titleBar.on('help', () => {
-      this.emit('showHelp');
       this.legacyEvents.callEvent('helpclick', {});
     });
     this.titleBar.on('config', () => {
-      this.emit('showConfig');
       this.legacyEvents.callEvent('configclick', {});
     });
     this.titleBar.on('close', () => this.startHide(true));
     this.titleBar.on('unpin', () => this.restorePosition(true));
 
     this.resizeBar = new ResizeBar(this.resizeDragHandler);
-    this.resizeBar.on('showBuild', () => this.emit('showBuild'));
+    this.resizeBar.on('showbuild', () => this.emit('showbuild'));
 
     this.headerView = this.titleBar;
 
@@ -74,12 +72,10 @@ export default class FloatingOSKView extends OSKView {
       if(titleBar && titleBar instanceof TitleBar) {
         switch(eventName) {
           case 'configclick':
-          case 'showConfig':
-            titleBar.configEnabled = this.listenerCount('showConfig') + this.legacyEvents.listenerCount('configclick') > 0;
+            titleBar.configEnabled = this.legacyEvents.listenerCount('configclick') > 0;
             break;
-          case 'showHelp':
           case 'helpclick':
-            titleBar.helpEnabled = this.listenerCount('showHelp') + this.legacyEvents.listenerCount('helpclick') > 0;
+            titleBar.helpEnabled = this.legacyEvents.listenerCount('helpclick') > 0;
             break;
           default:
             return;
@@ -90,8 +86,8 @@ export default class FloatingOSKView extends OSKView {
     const listenerSpyNew = new EmitterListenerSpy(this);
     const listenerSpyOld = new EmitterListenerSpy(this.legacyEvents);
     for(let listenerSpy of [listenerSpyNew, listenerSpyOld]) {
-      listenerSpy.on('listenerAdded', onListenedEvent);
-      listenerSpy.on('listenerRemoved', onListenedEvent);
+      listenerSpy.on('listeneradded', onListenedEvent);
+      listenerSpy.on('listenerremoved', onListenedEvent);
     }
 
     this.loadPersistedLayout();
@@ -153,7 +149,7 @@ export default class FloatingOSKView extends OSKView {
     let isVisible = this._Visible;
 
     let dragPromise = new ManagedPromise<void>();
-    this.emit('dragMove', dragPromise.corePromise);
+    this.emit('dragmove', dragPromise.corePromise);
 
     this.loadPersistedLayout();
     this.userPositioned=false;
@@ -652,7 +648,7 @@ export default class FloatingOSKView extends OSKView {
         }
 
         this.dragPromise = new ManagedPromise<void>();
-        _this.emit('dragMove', this.dragPromise.corePromise);
+        _this.emit('dragmove', this.dragPromise.corePromise);
       }
 
       onDragMove(cumulativeX: number, cumulativeY: number) {
@@ -715,7 +711,7 @@ export default class FloatingOSKView extends OSKView {
         }
 
         this.dragPromise = new ManagedPromise<void>();
-        _this.emit('resizeMove', this.dragPromise.corePromise);
+        _this.emit('resizemove', this.dragPromise.corePromise);
       }
 
       onDragMove(cumulativeX: number, cumulativeY: number) {

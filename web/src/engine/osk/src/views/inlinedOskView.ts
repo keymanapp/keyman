@@ -116,6 +116,12 @@ export default class InlinedOSKView extends OSKView {
     return; // I3363 (Build 301)
   }
 
+  public present() {
+    super.present();
+
+    this.legacyEvents.callEvent('show', {});
+  }
+
   protected setDisplayPositioning() {
     // no-op; an inlined OSK cannot control its own positioning.
   }

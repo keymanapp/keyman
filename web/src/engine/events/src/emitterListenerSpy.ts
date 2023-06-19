@@ -9,14 +9,14 @@ interface EventMap<BaseEventMap extends Object> {
    * EventEmitter being spied upon.
    * @param eventName
    */
-  listenerAdded(eventName: EventNames<BaseEventMap>);
+  listeneradded(eventName: EventNames<BaseEventMap>);
 
   /**
    * Indicates that a listener for the named event has been unregistered from the
    * EventEmitter being spied upon.
    * @param eventName
    */
-  listenerRemoved(eventName: EventNames<BaseEventMap>);
+  listenerremoved(eventName: EventNames<BaseEventMap>);
 }
 
 type Emitter<BaseEventMap extends Object> = EventEmitter<BaseEventMap> | LegacyEventEmitter<BaseEventMap>;
@@ -30,19 +30,19 @@ export class EmitterListenerSpy<BaseEventMap extends Object> extends EventEmitte
     super();
 
     if(emitter instanceof EventEmitter) {
-      emitter.on = this.listenerRegistrationSpy('listenerAdded', emitter, emitter.on);
-      emitter.addListener = this.listenerRegistrationSpy('listenerAdded', emitter, emitter.addListener);
-      emitter.off = this.listenerRegistrationSpy('listenerRemoved', emitter, emitter.off);
-      emitter.removeListener = this.listenerRegistrationSpy('listenerRemoved', emitter, emitter.off);
+      emitter.on = this.listenerRegistrationSpy('listeneradded', emitter, emitter.on);
+      emitter.addListener = this.listenerRegistrationSpy('listeneradded', emitter, emitter.addListener);
+      emitter.off = this.listenerRegistrationSpy('listenerremoved', emitter, emitter.off);
+      emitter.removeListener = this.listenerRegistrationSpy('listenerremoved', emitter, emitter.off);
     } else {
       // TS gets really fussy about how the legacy event typing is a bit more
       // restrictive (due to less-restricted event name types in EventEmitter)
       // It's not worth the effort to make this 100% perfect at the moment.
       //
       // @ts-ignore
-      emitter.addEventListener = this.listenerRegistrationSpy('listenerAdded', emitter, emitter.addEventListener);
+      emitter.addEventListener = this.listenerRegistrationSpy('listeneradded', emitter, emitter.addEventListener);
       // @ts-ignore
-      emitter.removeEventListener = this.listenerRegistrationSpy('listenerRemoved', emitter, emitter.removeEventListener);
+      emitter.removeEventListener = this.listenerRegistrationSpy('listenerremoved', emitter, emitter.removeEventListener);
     }
   }
 
@@ -82,7 +82,7 @@ export class EmitterListenerSpy<BaseEventMap extends Object> extends EventEmitte
 
 // const emitter = new LegacyEventEmitter<TestMap>;  // or `new EventEmitter<TestMap>`.
 // const emitterSpy = new EmitterListenerSpy<TestMap>(emitter);
-// emitterSpy.on('listenerAdded', (eventName) => {
+// emitterSpy.on('listeneradded', (eventName) => {
 //   // eventName = 'c'; // will error; there is no event 'c' in the event map.
 //   if(eventName == 'a') {
 //     // stuff

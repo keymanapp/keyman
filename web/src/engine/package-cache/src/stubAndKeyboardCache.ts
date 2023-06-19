@@ -1,6 +1,5 @@
 import { Keyboard, KeyboardLoaderBase as KeyboardLoader } from "@keymanapp/keyboard-processor";
 import EventEmitter from "eventemitter3";
-import { type PathConfiguration } from "keyman/engine/paths";
 
 import KeyboardStub from "./keyboardStub.js";
 
@@ -34,12 +33,12 @@ interface EventMap {
    * to denote the first added stub to facilitate auto-activation of the first
    * keyboard to be registered.
    */
-  stubAdded: (stub: KeyboardStub) => void;
+  stubadded: (stub: KeyboardStub) => void;
 
   /**
    * Indicates that the specified Keyboard has just been added to the cache.
    */
-  keyboardAdded: (keyboard: Keyboard) => void;
+  keyboardadded: (keyboard: Keyboard) => void;
 }
 
 export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
@@ -117,7 +116,7 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
     const keyboardID = prefixed(keyboard.id);
     this.keyboardTable[keyboardID] = keyboard;
 
-    this.emit('keyboardAdded', keyboard);
+    this.emit('keyboardadded', keyboard);
   }
 
   fetchKeyboardForStub(stub: KeyboardStub) : Promise<Keyboard> {
@@ -182,7 +181,7 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
     const stubTable = this.stubSetTable[keyboardID] = this.stubSetTable[keyboardID] ?? {};
     stubTable[stub.KLC] = stub;
 
-    this.emit('stubAdded', stub);
+    this.emit('stubadded', stub);
   }
 
   findMatchingStub(stub: KeyboardStub) {
