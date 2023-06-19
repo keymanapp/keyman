@@ -81,7 +81,7 @@ if builder_start_action test:headless; then
     MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
   fi
 
-  npm run mocha -- --recursive $MOCHA_FLAGS ./unit_tests/headless/*.js ./unit_tests/headless/**/*.js
+  mocha --recursive $MOCHA_FLAGS ./headless/*.js ./headless/**/*.js
 
   builder_finish_action success test:headless
 fi
@@ -139,7 +139,7 @@ if builder_start_action test:browser; then
   else
     BROWSERS=
   fi
-  npm run karma -- start $KARMA_INFO_LEVEL $KARMA_FLAGS $BROWSERS unit_tests/in_browser/$KARMA_CONFIG
+  karma start $KARMA_INFO_LEVEL $KARMA_FLAGS $BROWSERS in_browser/$KARMA_CONFIG
 
   builder_finish_action success test:browser
 fi

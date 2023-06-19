@@ -47,20 +47,20 @@ fi
 ### BUILD ACTIONS
 
 if builder_start_action build; then
-  npm run tsc -- -b
+  tsc -b
   node build-bundler.js
 
   # Declaration bundling.
-  npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
 
   builder_finish_action success build
 fi
 
 if builder_start_action test; then
   if builder_has_option --ci; then
-    npm run mocha -- -reporter mocha-teamcity-reporter
+    c8 mocha -reporter mocha-teamcity-reporter
   else
-    npm run mocha
+    c8 mocha
   fi
 
   builder_finish_action success test

@@ -31,7 +31,6 @@ builder_describe \
   "@/common/web/tslib" \
   "@/common/models/wordbreakers" \
   "@/common/models/templates" \
-  "@/common/tools/sourcemap-path-remapper" \
   configure clean build test --ci
 
 builder_describe_outputs \
@@ -68,8 +67,8 @@ if builder_start_action build; then
   node build-bundler.js "$EXT_FLAGS"
 
   # Declaration bundling.
-  npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/index.d.ts
-  npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/worker-main.d.ts
+  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  tsc --emitDeclarationOnly --outFile ./build/lib/worker-main.d.ts
 
   echo "Preparing the polyfills + worker for script-embedding"
   node build-polyfill-concatenator.js
@@ -87,7 +86,7 @@ if builder_start_action test; then
     MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
   fi
 
-  mocha --recursive $MOCHA_FLAGS ./src/test/cases/
+  c8 mocha --recursive $MOCHA_FLAGS ./src/test/cases/
 
   builder_finish_action success test
 fi

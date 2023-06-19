@@ -6,7 +6,6 @@
  */
 
 import esbuild from 'esbuild';
-import { spawn } from 'child_process';
 
 // Bundled ES module version
 esbuild.buildSync({

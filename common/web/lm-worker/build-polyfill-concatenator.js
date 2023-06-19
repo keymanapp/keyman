@@ -1,7 +1,5 @@
 import fs from 'fs';
 
-import SourceMapRemapper from '@keymanapp/sourcemap-path-remapper';
-
 import SourceMapCombiner from 'combine-source-map';
 import convertSourceMap from 'convert-source-map'; // Transforms sourcemaps among various common formats.
                                                    // Base64, stringified-JSON, end-of-file comment...
@@ -78,68 +76,36 @@ let separatorFile = {
 
 let sourceFileSet = [
   // Needed for Android / Chromium browser pre-41.
-  loadPolyfill('../../../node_modules/string.prototype.codepointat/codepointat.js', 'polyfills/string.codepointat.js'),
+  loadPolyfill('../../../node_modules/string.prototype.codepointat/codepointat.js', 'src/polyfills/string.codepointat.js'),
   // Needed for Android / Chromium browser pre-45.
-  loadPolyfill('src/polyfills/array.fill.js', 'polyfills/array.fill.js'),
+  loadPolyfill('src/polyfills/array.fill.js', 'src/polyfills/array.fill.js'),
   // Needed for Android / Chromium browser pre-45.
-  loadPolyfill('src/polyfills/array.findIndex.js', 'polyfills/array.findIndex.js'),
+  loadPolyfill('src/polyfills/array.findIndex.js', 'src/polyfills/array.findIndex.js'),
   // Needed for Android / Chromium browser pre-45.
-  loadPolyfill('src/polyfills/array.from.js', 'polyfills/array.from.js'),
+  loadPolyfill('src/polyfills/array.from.js', 'src/polyfills/array.from.js'),
   // Needed for Android / Chromium browser pre-47.
-  loadPolyfill('src/polyfills/array.includes.js', 'polyfills/array.includes.js'),
+  loadPolyfill('src/polyfills/array.includes.js', 'src/polyfills/array.includes.js'),
   // For Object.values, for iteration over object-based associate arrays.
   // Needed for Android / Chromium browser pre-54.
-  loadPolyfill('src/polyfills/object.values.js', 'polyfills/object.values.js'),
+  loadPolyfill('src/polyfills/object.values.js', 'src/polyfills/object.values.js'),
   // Needed to support Symbol.iterator, as used by the correction algorithm.
   // Needed for Android / Chromium browser pre-43.
-  loadPolyfill('src/polyfills/symbol-es6.min.js', 'polyfills/symbol-es6.min.js'),
-  loadCompiledModuleFilePair('build/lib/worker-main.mjs', 'worker-main.mjs'),
+  loadPolyfill('src/polyfills/symbol-es6.min.js', 'src/polyfills/symbol-es6.min.js'),
+  loadCompiledModuleFilePair('build/lib/worker-main.mjs', 'build/lib/worker-main.mjs')
 ];
 
 let fullWorkerConcatenation = concatScriptsAndSourcemaps(sourceFileSet, "worker-main.polyfilled.js", separatorFile);
 
 // New stage:  cleaning the sourcemaps
-console.log();
 
-// Because we're compiling the main project based on its TS build outputs, and our cross-module references
-// also link to build outputs, we need to clean up the sourcemap-paths.  Also, the individual module sourcemaps'
-// paths result in unwanted extra pathing that needs to be cleaned up (models/models, correction/correction, etc)
-console.log("Pass 2:  cleaning sourcemap source paths");
-
-let remappingState = SourceMapRemapper
-  .fromObject(fullWorkerConcatenation.sourcemapJSON)
-  .remapPaths([
-    {from: /^polyfills\//, to: '/common/web/lm-worker/src/polyfills/'},
-    {from: 'models/templates/build/obj/', to :'common/models/templates/src/'},
-    {from: 'models/wordbreakers/build/obj/default/default', to: 'common/models/wordbreakers/src/default/'},
-    {from: 'models/wordbreakers/build/obj/', to: 'common/models/wordbreakers/src/'},
-    {from: 'obj/models/models/', to: 'common/web/lm-worker/src/models/'},
-    {from: 'obj/correction/correction/', to: 'common/web/lm-worker/src/correction/'},
-    {from: 'obj/', to: 'common/web/lm-worker/src/'},
-    {from: /^\/utils\/src\//, to: '/common/web/utils/src/'},
-    {from: '/keyman-version/', to: '/common/web/keyman-version/'},
-    // {from: /^\//, to: ''} // To avoid the later minification pass mangling the paths.
-  ], (from, to) => console.log(`- ${from} => ${to}`));
-
-if(remappingState.unchangedSourcepaths.length > 0) {
-  console.log();
-  console.log("Not mapped:");
-
-  for(let path of remappingState.unchangedSourcepaths) {
-    console.log(`- ${path}`);
-  }
-}
-
-console.log();
-let sourceRoot = "/@keymanapp/keyman";
-console.log(`Setting sourceRoot: ${sourceRoot}`)
-remappingState.sourceRoot = sourceRoot;
-fullWorkerConcatenation.sourcemapJSON = remappingState.sourceMap;
+// Sources are being passed into the sourcemap concatenator via our working directory.
+let sourceRoot = '@keymanapp/keyman/common/web/lm-worker/';
+fullWorkerConcatenation.sourcemapJSON.sourceRoot = sourceRoot;
 
 // End "cleaning the sourcemaps"
 
 console.log();
-console.log("Pass 3:  Output intermediate state and perform minification");
+console.log("Pass 2:  Output intermediate state and perform minification");
 
 // IMPORTANT: Remove file-end sourcemap ref comment and replace it!
 fullWorkerConcatenation.script = fullWorkerConcatenation.script.substring(0, fullWorkerConcatenation.script.lastIndexOf('//# sourceMappingURL'));

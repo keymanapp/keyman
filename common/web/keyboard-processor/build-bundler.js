@@ -6,7 +6,6 @@
  */
 
 import esbuild from 'esbuild';
-import { spawn } from 'child_process';
 
 /** @type {esbuild.BuildOptions} */
 const commonConfig = {

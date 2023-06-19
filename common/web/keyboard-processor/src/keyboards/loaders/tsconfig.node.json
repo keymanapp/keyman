@@ -8,7 +8,6 @@
     "declaration": true,
     "inlineSources": true,
     "sourceMap": true,
-    "sourceRoot": "keyman/",
     "target": "es5",
     "types": ["node"],
     "lib": ["es6"],

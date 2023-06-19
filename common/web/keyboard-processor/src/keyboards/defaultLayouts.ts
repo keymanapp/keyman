@@ -548,6 +548,7 @@ export class Layouts {
   }
 
   // Defines the default visual layout for a keyboard.
+  /* c8 ignore start */
   static dfltLayout: LayoutSpec = {
       "desktop":
       {
@@ -847,4 +848,5 @@ export class Layouts {
           ]
       }
   };
+  /* c8 ignore end */
 }
