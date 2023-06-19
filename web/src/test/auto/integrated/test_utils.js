@@ -74,10 +74,13 @@ export function setupKMW(kmwOptions, timeout) {
  *
  * @param {*} src       The source script's (relative) path on the test server.
  * @param {*} timeout
- * @param {*} functor   A callback to handle the script element.
  * @returns
  */
-export function setupScript(src, timeout, attemptCount, existingTimer) {
+export function setupScript(src, timeout) {
+  return setupScriptInternal(src, timeout);
+}
+
+function setupScriptInternal(src, timeout, attemptCount, existingTimer) {
   attemptCount = attemptCount || 1;
   if(attemptCount > 1) {
     console.log("Re-attempting load of script '" + src + "': retry #" + attemptCount);
