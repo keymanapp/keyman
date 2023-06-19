@@ -39,32 +39,15 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-# TODO: build if out-of-date if test is specified
-# TODO: configure if npm has not been run, and build is specified
-
-if builder_start_action configure; then
-  verify_npm_setup
-  builder_finish_action success configure
-fi
-
-if builder_start_action clean; then
-  npm run clean
-  rm -rf ./build
-
-  builder_finish_action success clean
-fi
-
-if builder_start_action build; then
+function do_build() {
   # Build worker with tsc first
   tsc -b $builder_verbose || builder_die "Could not build worker."
+  node build-bundler.js
 
   EXT_FLAGS=
   if builder_has_option --ci; then
     EXT_FLAGS=--ci
   fi
-
-  echo "Bundling worker modules"
-  node build-bundler.js "$EXT_FLAGS"
 
   # Declaration bundling.
   tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
@@ -75,18 +58,19 @@ if builder_start_action build; then
 
   node build-wrap-and-minify.js --debug
   node build-wrap-and-minify.js --minify
+}
 
-  builder_finish_action success build
-fi
-
-if builder_start_action test; then
-  MOCHA_FLAGS=
+function do_test() {
+  local MOCHA_FLAGS=
 
   if builder_has_option --ci; then
     MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
   fi
 
   c8 mocha --recursive $MOCHA_FLAGS ./src/test/cases/
+}
 
-  builder_finish_action success test
-fi
+builder_run_action configure  verify_npm_setup
+builder_run_action clean      rm -rf build/
+builder_run_action build      do_build
+builder_run_action test       do_test

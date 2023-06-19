@@ -6,15 +6,6 @@
     ".": {
       "types": "./build/obj/index.d.ts",
       "import": "./build/obj/index.js"
-    },
-    "./lib": {
-      "types": "./build/lib/index.d.ts",
-      "import": "./build/lib/index.mjs",
-      "require": "./build/lib/index.cjs"
-    },
-    "./obj/*.js": {
-      "types": "./build/obj/*.js.map",
-      "import": "./build/obj/*.js"
     }
   },
   "scripts": {
