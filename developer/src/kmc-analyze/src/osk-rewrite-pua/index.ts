@@ -18,7 +18,7 @@ export class AnalyzeOskRewritePua {
   //
 
   public async analyze(file: string, mapping: Osk.StringResult[]): Promise<boolean> {
-    let map: Osk.PuaMap = Osk.parseMapping(mapping);
+    let map: Osk.PuaMap = Osk.parseMapping(mapping, this.callbacks.loadSchema('displaymap'));
 
     switch(KeymanFileTypes.sourceTypeFromFilename(file)) {
       case KeymanFileTypes.Source.VisualKeyboard:

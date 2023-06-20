@@ -110,7 +110,8 @@ export type CompilerSchema =
   'ldml-keyboard' |
   'ldml-keyboardtest' |
   'kvks' |
-  'kpj';
+  'kpj' |
+  'displaymap';
   // | 'keyman-touch-layout.clean'; TODO this has the wrong name pattern, .spec.json instead of .schema.json
 
 /**

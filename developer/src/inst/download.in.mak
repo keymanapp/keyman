@@ -134,4 +134,5 @@ copy-schemas:
     copy $(KEYMAN_ROOT)\common\schemas\keyboard_info\keyboard_info.distribution.json $(DEVELOPER_ROOT)\bin
     copy $(KEYMAN_ROOT)\common\schemas\keyman-touch-layout\keyman-touch-layout.spec.json $(DEVELOPER_ROOT)\bin
     copy $(KEYMAN_ROOT)\common\schemas\keyman-touch-layout\keyman-touch-layout.clean.spec.json $(DEVELOPER_ROOT)\bin
+    copy $(KEYMAN_ROOT)\common\schemas\displaymap\displaymap.schema.json $(DEVELOPER_ROOT)\bin
 
