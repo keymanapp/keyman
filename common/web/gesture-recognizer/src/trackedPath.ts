@@ -77,7 +77,7 @@ export class TrackedPath extends EventEmitter<EventMap> {
     super();
 
     if(jsonObj) {
-      this.samples = [...jsonObj.coords.map((obj) => ({...obj} as InputSample))];
+      this.samples = [].concat(jsonObj.coords.map((obj) => ({...obj} as InputSample)));
       // If we're reconstructing this from a JSON.parse, it's a previously-recorded,
       // completed path.
       this._isComplete = true;
@@ -196,12 +196,12 @@ export class TrackedPath extends EventEmitter<EventMap> {
     let jsonClone: JSONTrackedPath = {
       // Replicate array and its entries, but with certain fields of each entry missing.
       // No .clientX, no .clientY.
-      coords: [...this.samples.map((obj) => ({
+      coords: [].concat(this.samples.map((obj) => ({
         targetX: obj.targetX,
         targetY: obj.targetY,
         t:       obj.t
-      }))],
-      segments: [...this.segments],
+      }))),
+      segments: [].concat(this.segments),
       wasCancelled: this.wasCancelled
     }
 

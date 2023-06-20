@@ -45,7 +45,7 @@ export class HeadlessRecordingSimulator {
     }, lastSegment.lastCoord.t - testObj.originalSamples[0].t);
 
     // Wrap it all together with a nice little bow.
-    testObj.compositePromise = Promise.all([...testObj.samplePromises, testObj.endPromise]).catch((reason) => {
+    testObj.compositePromise = Promise.all([testObj.endPromise].concat(testObj.samplePromises)).catch((reason) => {
       // Because we use a `setInterval` internally, we need cleanup if things go wrong.
       config.endSequence();
       throw reason;

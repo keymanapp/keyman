@@ -808,7 +808,7 @@ export class PathSegmenter {
 
     // Step 2a:  detect which direction gives the best improvement in segmentation potential.
     const criteria = [leftSplit.segRating, currentSplit.segRating, rightSplit.segRating];
-    let sortedCriteria = [...criteria].sort();
+    let sortedCriteria = [].concat(criteria).sort();
 
     const delta = criteria.indexOf(sortedCriteria[2])-1;  // -1 if 'left' is best, 1 if 'right' is best.
 

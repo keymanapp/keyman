@@ -36,7 +36,7 @@ export class TouchpathTurtle {
     this.currentSample = obj.currentSample;
     this.currentStats  = new CumulativePathStats(obj.currentStats);
     this.currentChop   = new CumulativePathStats(obj.currentChop);
-    this._pathSegments = [...obj._pathSegments];
+    this._pathSegments = [].concat(obj._pathSegments);
   }
 
   get pathComponents(): readonly Subsegmentation[] {

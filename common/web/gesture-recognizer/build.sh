@@ -14,6 +14,7 @@ cd "$(dirname "$THIS_SCRIPT")"
 ################################ Main script ################################
 
 builder_describe "Builds the gesture-recognition model for Web-based on-screen keyboards" \
+  "@/common/web/es-bundling build" \
   "clean" \
   "configure" \
   "build" \
