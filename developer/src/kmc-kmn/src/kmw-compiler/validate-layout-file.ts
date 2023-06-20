@@ -48,7 +48,6 @@ function KeyIdType(FId: string): TKeyIdType {   // I4142
   return TKeyIdType.Key_Invalid;
 }
 
-// TODO lifecycle
 
 function CheckKey(FPlatform: TouchLayout.TouchLayoutPlatform,
   FId: string, FText: string, FNextLayer: string, FKeyType: TouchLayout.TouchLayoutKeySp,
