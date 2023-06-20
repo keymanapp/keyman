@@ -1,6 +1,7 @@
 import { KMX, Osk, TouchLayout, TouchLayoutFileReader, TouchLayoutFileWriter } from "@keymanapp/common-types";
 import { callbacks, IsKeyboardVersion14OrLater, IsKeyboardVersion15OrLater } from "./compiler-globals.js";
 import { JavaScript_Key, VKeyNames } from "./javascript-strings.js";
+import { TRequiredKey, CRequiredKeys, CSpecialText10, CSpecialText14, CSpecialText14ZWNJ, CSpecialText14Map } from "./constants.js";
 
 
 interface VLFOutput {
@@ -45,35 +46,6 @@ function KeyIdType(FId: string): TKeyIdType {   // I4142
   }
   return TKeyIdType.Key_Invalid;
 }
-
-enum TRequiredKey { K_LOPT, K_BKSP, K_ENTER };   // I4447
-
-const
-  CRequiredKeys: TRequiredKey[] = [TRequiredKey.K_LOPT, TRequiredKey.K_BKSP, TRequiredKey.K_ENTER];   // I4447
-
-  // See also builder.js: specialCharacters; web/source/osk/oskKey.ts: specialCharacters
-const
-  CSpecialText10: string =
-    '*Shift*\0*Enter*\0*Tab*\0*BkSp*\0*Menu*\0*Hide*\0*Alt*\0*Ctrl*\0*Caps*\0'+
-    '*ABC*\0*abc*\0*123*\0*Symbol*\0*Currency*\0*Shifted*\0*AltGr*\0*TabLeft*',
-
-  // these names were added in Keyman 14
-  CSpecialText14: string =
-    '*LTREnter*\0*LTRBkSp*\0*RTLEnter*\0*RTLBkSp*\0*ShiftLock*\0*ShiftedLock*\0*ZWNJ*\0*ZWNJiOS*\0*ZWNJAndroid*',
-  CSpecialText14ZWNJ: string =
-    '*ZWNJ*\0*ZWNJiOS*\0*ZWNJAndroid*',
-
-  CSpecialText14Map: string[][] = [
-    ['*LTREnter*',    '*Enter*'],
-    ['*LTRBkSp*',     '*BkSp*'],
-    ['*RTLEnter*',    '*Enter*'],
-    ['*RTLBkSp*',     '*BkSp*'],
-    ['*ShiftLock*',   '*Shift*'],
-    ['*ShiftedLock*', '*Shifted*'],
-    ['*ZWNJ*',        '<|>'],
-    ['*ZWNJiOS*',     '<|>'],
-    ['*ZWNJAndroid*', '<|>']
-  ];
 
 // TODO lifecycle
 
