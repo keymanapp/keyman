@@ -8,6 +8,7 @@ export { default as KMXPlusBuilder}  from './kmx/kmx-plus-builder/kmx-plus-build
 export { default as KvkFileReader } from './kvk/kvk-file-reader.js';
 export { default as KvksFileReader } from './kvk/kvks-file-reader.js';
 export { default as KvkFileWriter } from './kvk/kvk-file-writer.js';
+export { default as KvksFileWriter } from './kvk/kvks-file-writer.js';
 export * as KvkFile from './kvk/kvk-file.js';
 export * as KvksFile from './kvk/kvks-file.js';
 
@@ -40,3 +41,5 @@ export * as KmpJsonFile from './package/kmp-json-file.js';
 export * as util from './util/util.js';
 
 export * as KeymanFileTypes from './util/file-types.js';
+
+export * as Osk from './osk/osk.js';

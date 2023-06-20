@@ -43,5 +43,9 @@ export class InfrastructureMessages {
   static Hint_FilenameHasDifferingCase = (o:{reference:string, filename:string}) => m(this.HINT_FilenameHasDifferingCase,
     `File ${o.filename} differs in case from reference ${o.reference}; this will fail on platforms with case-sensitive filesystems.`);
   static HINT_FilenameHasDifferingCase = SevHint | 0x0009;
+
+  static Error_UnknownFileFormat = (o:{format:string}) => m(this.ERROR_UnknownFileFormat,
+    `Unknown file format ${o.format}; only Markdown (.md), JSON (.json), and Text (.txt) are supported.`);
+  static ERROR_UnknownFileFormat = SevError | 0x000A;
 }
 
