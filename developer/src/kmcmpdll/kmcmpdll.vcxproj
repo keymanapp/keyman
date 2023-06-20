@@ -87,23 +87,27 @@
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\developer\src\ext\json;$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\developer\src\common\include;$(KEYMAN_ROOT)\developer\src\ext\json;$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator</IncludePath>
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\developer\src\ext\json;$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\developer\src\common\include;$(KEYMAN_ROOT)\developer\src\ext\json;$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator</IncludePath>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName).x64</TargetName>
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\developer\src\ext\json;$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\developer\src\common\include;$(KEYMAN_ROOT)\developer\src\ext\json;$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\developer\src\ext\json;$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\developer\src\common\include;$(KEYMAN_ROOT)\developer\src\ext\json;$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator</IncludePath>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName).x64</TargetName>
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -289,7 +293,7 @@
     <ClInclude Include="$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator\json-schema.hpp" />
     <ClInclude Include="$(KEYMAN_ROOT)\developer\src\ext\json\json.hpp" />
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\vkeys.h" />
-    <ClInclude Include="comperr.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\developer\src\common\include\kmn_compiler_errors.h" />
     <ClInclude Include="compfile.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\legacy_kmx_file.h" />
     <ClInclude Include="CasedKeys.h" />

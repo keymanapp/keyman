@@ -95,12 +95,16 @@ namespace km {
                        std::u16string const & key,
                        std::u16string const & value)
     {
-      auto i = _options.find(char16_t(scope) + key);
-      if (i == _options.end()) return option();
-
-      i->second = value;
+      auto result = _options.emplace(char16_t(scope) + key, value);
+      if ( !result.second && result.first == _options.end()) {
+         return option();
+      }
+      // key already existed so just update the value
+      if(!result.second) {
+        result.first->second = value;
+      }
       persisted_store()[key] = value;
-      return option(scope, key, i->second);
+      return option(scope, key, result.first->second);
     }
 
     km_kbp_status
@@ -131,7 +135,8 @@ namespace km {
       km_kbp_state *state,
       km_kbp_virtual_key vk,
       uint16_t modifier_state,
-      uint8_t is_key_down
+      uint8_t is_key_down,
+      uint16_t /* event_flags */
     ) {
       assert(state);
       if (!state)

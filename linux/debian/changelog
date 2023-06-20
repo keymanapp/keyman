@@ -1,3 +1,89 @@
+keyman (16.0.139-4) unstable; urgency=medium
+
+  * debian/tests: Revert previous change and ignore s390x from autopkgtests
+
+ -- Eberhard Beilharz <eb1@sil.org>  Fri, 24 Mar 2023 16:05:07 +0100
+
+keyman (16.0.139-3) unstable; urgency=medium
+
+  * debian/tests: Run autopkgtests on s390x but immediately return
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 22 Mar 2023 19:25:02 +0100
+
+keyman (16.0.139-2) unstable; urgency=medium
+
+  * Don't build on s390x because Keyman doesn't work on big-endian architectures
+    (upstream bug https://github.com/keymanapp/keyman/issues/5111)
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 20 Mar 2023 19:54:44 +0100
+
+keyman (16.0.139-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 16 Mar 2023 08:59:04 +0100
+
+keyman (16.0.138-4) unstable; urgency=medium
+
+  * Team upload
+  * debian/tests/control: Don't run autopkgtest on s390x
+
+ -- Gunnar Hjalmarsson <gunnarhj@ubuntu.com>  Sat, 11 Feb 2023 18:39:13 +0100
+
+keyman (16.0.138-3) unstable; urgency=medium
+
+  * debian/tests/test-build: Fix autopkgtests
+
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 09 Feb 2023 12:18:47 +0100
+
+keyman (16.0.138-2) unstable; urgency=medium
+
+  * Team upload
+  * debian/tests/control: Added missing autopkgtest dependency on
+    pkg-config (closes: #1030815).
+
+ -- Gunnar Hjalmarsson <gunnarhj@debian.org>  Tue, 07 Feb 2023 20:34:35 +0100
+
+keyman (16.0.138-1) unstable; urgency=medium
+
+  [ Jelmer Vernooĳ ]
+  * Include packaging path in Vcs-Git header.
+
+  [ Eberhard Beilharz ]
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 02 Feb 2023 10:53:17 +0100
+
+keyman (15.0.274-1) unstable; urgency=medium
+
+  * New upstream release
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 01 Dec 2022 20:41:32 +0100
+
+keyman (15.0.273-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 28 Nov 2022 12:31:29 +0100
+
+keyman (15.0.272-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 10 Nov 2022 17:37:24 +0100
+
+keyman (15.0.271-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 19 Oct 2022 16:15:33 +0200
+
 keyman (15.0.270-1) unstable; urgency=medium
 
   * New upstream release.

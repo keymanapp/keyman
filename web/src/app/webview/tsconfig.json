@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.dom.json",
+
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "../../../build/app/webview/obj/",
+    "rootDir": "./src",
+    "tsBuildInfoFile": "../../../build/app/webview/obj/tsconfig.tsbuildinfo"
+  },
+
+  "include": [ "**/*.ts" ],
+
+  "references": [
+    { "path": "../../engine/main" }
+  ]
+}

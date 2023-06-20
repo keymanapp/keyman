@@ -55,7 +55,7 @@
         <Directory Id="KeymanRoot" Name="Keyman">
           <Directory Id="KEYMANDEV" Name="Keyman Developer">
             <Directory Id="INSTALLDIR" Name="." FileSource="..\bin\">
-              <Directory Id="dir_sentry_0.4.9" Name="sentry-0.4.9" />
+              <Directory Id="dir_sentry_0.6.0" Name="sentry-0.6.0" />
               <Directory Id="dirNode" Name="node.js" />
               <Directory Id="dirProjects" Name="Projects" />
             </Directory>
@@ -75,18 +75,6 @@
         <Directory Id="App_KeymanRoot" Name="Keyman" >
           <Directory Id="App_KeymanDev" Name="Keyman Developer">
             <Directory Id="App_KeymanDev_Databases" Name="Databases" />
-          </Directory>
-        </Directory>
-      </Directory>
-
-      <Directory Id="PersonalFolder" Name="Documents">
-        <Directory Id="KMDevSamples" Name="Keyman Developer">
-          <Directory Id="Samples" Name="Samples">
-            <!-- TODO: start sourcing samples from keyboards repository. European keyboard sample here is very outdated -->
-            <Directory Id="Samples_IMSample" Name="imsample"  />
-            <Directory Id="Samples_Keyboards" Name="Keyboards">
-              <Directory Id="Samples_Keyboards_European" Name="European" />
-            </Directory>
           </Directory>
         </Directory>
       </Directory>
@@ -223,7 +211,7 @@
     </ComponentGroup>
 
     <!-- Sentry -->
-    <ComponentGroup Id="KeymanDevSentryComponents" Directory="dir_sentry_0.4.9" Source="..\..\..\common\windows\delphi\ext\sentry">
+    <ComponentGroup Id="KeymanDevSentryComponents" Directory="dir_sentry_0.6.0" Source="..\..\bin\">
       <Component>
         <File Id="sentry.dll" KeyPath="yes" />
       </Component>
@@ -276,6 +264,10 @@
       <Component Directory="INSTALLDIR">
         <File Name='kmlmp.cmd' KeyPath="yes" Source="node\kmlmp.cmd" />
       </Component>
+
+      <Component Directory="INSTALLDIR">
+        <File Name='kmc.cmd' KeyPath="yes" Source="node\kmc.cmd" />
+      </Component>
     </ComponentGroup>
 
     <ComponentGroup Id="AppData">
@@ -290,66 +282,6 @@
       </Component>
     </ComponentGroup>
 
-    <ComponentGroup Id="Samples">
-      <Component Guid="{BC44DD9F-F91B-4DB8-B792-CA5744FE5990}" Directory="Samples">
-        <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\Samples" Type="string" Name="Readme" Value="" />
-        <File Name="readme.txt" Source="..\samples\readme.txt" />
-        <RemoveFolder Id="Samples" On="uninstall" />
-        <RemoveFolder Id="KMDevSamples" Directory="KMDevSamples" On="uninstall" />
-      </Component>
-
-      <Component Directory="Samples">
-        <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\Samples" Type="string" Name="Link" Value="" />
-        <CreateFolder>
-          <Shortcut Id="startmenuSamples" Directory="ProgramMenuDir" Name="Samples"
-            WorkingDirectory='INSTALLDIR' Icon="samples.ico" IconIndex="0" />
-        </CreateFolder>
-      </Component>
-
-      <Component Guid="{003288A1-C6BE-4EE0-A91A-AD9C82A6DEE1}" Directory="Samples_IMSample">
-        <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\Samples" Type="string" Name="IMSample" Value="" />
-        <File Name="imsample.dll" Source="..\..\bin\imsample.dll" />
-        <File Name="imdllref.rtf" Source="..\samples\imsample\" />
-        <File Name="imlib.cpp" Source="..\samples\imsample\" />
-        <File Name="imlib.h" Source="..\samples\imsample\" />
-        <File Name="imsample.cpp" Source="..\samples\imsample\" />
-        <File Name="imsample.def" Source="..\samples\imsample\" />
-        <File Name="IMSample.sln" Source="..\samples\imsample\" />
-        <File Name="IMSample.vcxproj" Source="..\samples\imsample\" />
-        <File Name="imsample.kmn" Source="..\samples\imsample\" />
-        <File Name="IMSample.txt" Source="..\samples\imsample\" />
-        <File Name="Makefile" Source="..\samples\imsample\" />
-        <File Name="version.rc" Source="..\samples\imsample\" />
-        <RemoveFolder Id="Samples_IMSample" On="uninstall" />
-      </Component>
-
-      <Component Guid="{1B6F5A52-1E05-4A1D-8D53-77D8EB293439}" Directory="Samples_Keyboards">
-        <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\Samples" Type="string" Name="Keyboards" Value="" />
-        <File Id="enhlao.bmp" Name="enhlao.bmp" Source="..\\samples\Examples\" />
-        <File Id="enhlao.kmn" Name="enhlao.kmn" Source="..\samples\Examples\" />
-        <File Id="Examples.kpj" Name="Examples.kpj" Source="..\samples\Examples\" />
-        <File Id="ipamenu.kmn" Name="ipamenu.kmn" Source="..\samples\Examples\" />
-        <File Id="nepali.kmn" Name="nepali.kmn" Source="..\samples\Examples\" />
-        <File Id="qfrench.ico" Name="qfrench.ico" Source="..\samples\Examples\" />
-        <File Id="qfrench.kmn" Name="qfrench.kmn" Source="..\samples\Examples\" />
-        <File Id="sk_readme.txt" Name="readme.txt" Source="..\samples\Examples\" />
-        <RemoveFolder Id="Samples_Keyboards" On="uninstall" />
-      </Component>
-
-      <Component Guid="{4B72D2E9-D8F4-4C41-81DF-CBDF0CE9C97F}" Directory="Samples_Keyboards_European">
-        <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\Samples" Type="string" Name="European" Value="" />
-        <File Id="ske_european.bmp" Name="european.bmp" Source="..\samples\Examples\European\" />
-        <File Id="ske_european.kmn" Name="european.kmn" Source="..\\samples\Examples\European\" />
-        <File Id="ske_european.kps" Name="european.kps" Source="..\samples\Examples\European\" />
-        <File Id="ske_readme.html" Name="readme.html" Source="..\samples\Examples\European\" />
-        <File Id="ske_welcome.htm" Name="welcome.htm" Source="..\samples\Examples\European\" />
-        <File Id="ske_european.html" Name="european.html" Source="..\samples\Examples\European\" />
-        <File Id="ske_european_js_2.txt" Name="european_js_2.txt" Source="..\samples\Examples\European\" />
-        <File Id="ske_latin.ico" Name="latin.ico" Source="..\samples\Examples\European\" />
-        <RemoveFolder Id="Samples_Keyboards_European" On="uninstall" />
-      </Component>
-    </ComponentGroup>
-
     <Feature Id="featProgram" Title="Keyman Developer Program" Description="Required program files for Keyman Developer"
              Display="expand" Level="1" ConfigurableDirectory="INSTALLDIR" Absent="disallow">
 
@@ -359,15 +291,10 @@
       <ComponentGroupRef Id="XML" />
       <ComponentGroupRef Id="CEF" />
       <ComponentGroupRef Id="Templates" />
-      <ComponentGroupRef Id="ModelCompiler" />
+      <ComponentGroupRef Id="kmc" />
       <ComponentGroupRef Id="Node" />
       <ComponentGroupRef Id="KeymanDevSentryComponents" />
       <ComponentGroupRef Id="Server" />
-    </Feature>
-
-    <Feature Id="featSamples" Title="Sample Files" Description="Example keyboards, packages and products"
-             Display="expand" Level="1" Absent="allow">
-      <ComponentGroupRef Id="Samples" />
     </Feature>
 
     <Media Id="1" EmbedCab="yes" CompressionLevel="high" Cabinet="Data1.cab" VolumeLabel="DISK1" />
@@ -375,7 +302,6 @@
     <UIRef Id="WixUI_FeatureTree"/>
 
     <Icon Id="TIKE.ico" SourceFile="..\images\KeymanDeveloper90.ico" />
-    <Icon Id="samples.ico" SourceFile="..\images\samples.ico" />
 
     <CustomAction Id='AlreadyUpdated' Error='[ProductName] has already been updated to $(var.VERSION) or newer.' />
     <CustomAction Id='NoDowngrade' Error='A later version of [ProductName] is already installed.' />

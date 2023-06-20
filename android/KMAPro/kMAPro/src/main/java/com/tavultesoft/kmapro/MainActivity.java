@@ -18,29 +18,29 @@ import java.util.List;
 import java.util.Map;
 
 import com.keyman.android.CheckInstallReferrer;
-import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.KMHelpFileActivity;
-import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KMManager.KeyboardType;
-import com.tavultesoft.kmea.KmpInstallMode;
-import com.tavultesoft.kmea.KMTextView;
-import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
-import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
-import com.tavultesoft.kmea.cloud.CloudApiTypes;
-import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
-import com.tavultesoft.kmea.cloud.impl.CloudLexicalModelMetaDataDownloadCallback;
-import com.tavultesoft.kmea.data.CloudRepository;
-import com.tavultesoft.kmea.data.Dataset;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.data.LexicalModel;
-import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.DownloadFileUtils;
+import com.keyman.engine.BaseActivity;
+import com.keyman.engine.KMHelpFileActivity;
+import com.keyman.engine.KMKeyboardDownloaderActivity;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.KMManager.KeyboardType;
+import com.keyman.engine.KmpInstallMode;
+import com.keyman.engine.KMTextView;
+import com.keyman.engine.KeyboardEventHandler.OnKeyboardDownloadEventListener;
+import com.keyman.engine.KeyboardEventHandler.OnKeyboardEventListener;
+import com.keyman.engine.cloud.CloudApiTypes;
+import com.keyman.engine.cloud.CloudDownloadMgr;
+import com.keyman.engine.cloud.impl.CloudLexicalModelMetaDataDownloadCallback;
+import com.keyman.engine.data.CloudRepository;
+import com.keyman.engine.data.Dataset;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.data.LexicalModel;
+import com.keyman.engine.util.FileUtils;
+import com.keyman.engine.util.DownloadFileUtils;
 import com.keyman.android.DownloadIntentService;
-import com.tavultesoft.kmea.util.KMLog;
-import com.tavultesoft.kmea.util.KMPLink;
-import com.tavultesoft.kmea.util.KMString;
-import com.tavultesoft.kmea.util.WebViewUtils.EngineWebViewVersionStatus;
+import com.keyman.engine.util.KMLog;
+import com.keyman.engine.util.KMPLink;
+import com.keyman.engine.util.KMString;
+import com.keyman.engine.util.WebViewUtils.EngineWebViewVersionStatus;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -109,6 +109,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   private final int minTextSize = 16;
   private final int maxTextSize = 72;
   private int textSize = minTextSize;
+  private int lastOrientation = Configuration.ORIENTATION_UNDEFINED;
   private static final String defaultKeyboardInstalled = "DefaultKeyboardInstalled";
   private static final String defaultDictionaryInstalled = "DefaultDictionaryInstalled";
   private static final String userTextKey = "UserText";
@@ -131,7 +132,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     checkSendCrashReport();
     if (KMManager.getMaySendCrashReport()) {
       SentryAndroid.init(context, options -> {
-        options.setRelease("release-" + com.tavultesoft.kmapro.BuildConfig.VERSION_NAME);
+        options.setRelease(com.tavultesoft.kmapro.BuildConfig.VERSION_GIT_TAG);
         options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.VERSION_ENVIRONMENT);
       });
     }
@@ -262,6 +263,14 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     super.onResume();
     KMManager.onResume();
     KMManager.hideSystemKeyboard();
+
+    // onConfigurationChanged() only triggers when device is rotated while app is in foreground
+    // This handles when device is rotated while app is in background
+    Configuration newConfig = this.getResources().getConfiguration();
+    if (newConfig != null && newConfig.orientation != lastOrientation) {
+      lastOrientation = newConfig.orientation;
+      KMManager.onConfigurationChanged(newConfig);
+    }
     resizeTextView(textView.isKeyboardVisible());
 
     KMManager.addKeyboardEventListener(this);
@@ -345,14 +354,17 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
+    KMManager.onConfigurationChanged(newConfig);
     getSupportActionBar().setBackgroundDrawable(getActionBarDrawable(this));
     resizeTextView(textView.isKeyboardVisible());
     invalidateOptionsMenu();
+    lastOrientation = newConfig.orientation;
   }
 
   @SuppressLint("RestrictedApi")
   @Override
   public boolean onPrepareOptionsMenu(final Menu menu) {
+    this.menu = menu;
     final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
     if (_overflowMenuItem != null) {
       MenuItem updateKeyboards = this.menu.findItem(R.id.action_update_keyboards);
@@ -372,8 +384,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     }
 
     final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
-    if (_keyboardupdate != null) {
-      updateUpdateCountIndicator(_keyboardupdate, anUpdateCount, true);
+    if (_keyboardupdate != null && anUpdateCount > 0) {
+      _keyboardupdate.setVisible(true);
     }
   }
 
@@ -433,9 +445,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       case R.id.action_share:
         showShareDialog();
         return true;
+      /* Disable Web Browser to investigate Google sign-in
       case R.id.action_web:
         showWebBrowser();
-        return true;
+        return true;*/
       case R.id.action_text_size:
         showTextSizeDialog();
         return true;
@@ -450,6 +463,13 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         return true;
       case R.id.action_update_keyboards:
         KMManager.getUpdateTool().executeOpenUpdates();
+        // Dismiss icon
+        updateUpdateCountIndicator(0);
+        final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
+        if (_keyboardupdate != null && _keyboardupdate.isVisible()) {
+          _keyboardupdate.setVisible(false);
+        }
+
         return true;
       default:
         return super.onOptionsItemSelected(item);

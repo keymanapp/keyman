@@ -7,6 +7,10 @@
         <item quantity="other">Papan tombol</item>
     </plurals>
     <!-- Context: Title for list -->
+    <plurals name="title_other_input_methods">
+        <item quantity="other">Other Input Methods</item>
+    </plurals>
+    <!-- Context: Title for list -->
     <string name="title_add_keyboard" comment="Add a new keyboard">Tambah papan tombol baru</string>
     <!-- Context: Title for list -->
     <string name="title_languages_settings" comment="List of installed languages">Bahasa yang terpasang</string>
@@ -20,8 +24,12 @@
     <string name="label_cancel" comment="Button to cancel an action">Batal</string>
     <!-- Context: Button label -->
     <string name="label_close" comment="Close a dialog">Tutup</string>
-    <!-- Context: Button label -->
+    <!-- Context: Button label. Removed in Keyman 15 -->
     <string name="label_close_keyman" comment="Close the Keyman application">Tutup Keyman</string>
+    <!-- Context: Button label -->
+    <string name="label_forward" comment="Button to go forward">Forward</string>
+    <!-- Context: Button label -->
+    <string name="label_next_input_method" comment="Switch to next input method (replaces label_close_keyman)">Next Input Method</string>
     <!-- Context: Button label -->
     <string name="label_download" comment="Button to confirm downloading an item">Unduh</string>
     <!-- Context: Button label -->
@@ -34,6 +42,8 @@
     <string name="label_ok" comment="Button to acknowledge a dialog">OK</string>
     <!-- Context: Button label -->
     <string name="label_update" comment="Dialog button to update a resource">Perbarui</string>
+    <!-- Context: No internet for updates -->
+    <string name="no_internet_connection" comment="Internet connection missing">No internet connection</string>
     <!-- Context: Keyboard Updates -->
     <string name="cannot_connect" comment="Error message when network connection fails">Tidak dapat terhubung ke peladen Keyman!</string>
     <!-- Context: Keyboard Updates -->
@@ -68,8 +78,11 @@
     <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">Butuh FileProvider library untuk menampilkan berkas bantuan: %1$s</string>
     <!-- Context: Fatal keyboard error. Will load default keyboard -->
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">Terjadi masalah dengan papan tombol %1$s:%2$s untuk bahasa %3$s. Papan tombol diubah ke setelah baku.</string>
+    <!-- Context: Fatal keyboard error.  -->
+    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      Error in keyboard %1$s:%2$s for %3$s language.</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Mengecek kamus yang terkait untuk diunduh</string>
+    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Cannot connect to Keyman server to check for associated dictionary to download</string>
     <!-- Context: Model Updates -->
     <string name="confirm_download_model" comment="Confirmation to download a dictionary update">Apakah Anda ingin mengunduh versi terbaru dari daftar kata (kamus) ini?</string>
     <!-- Context: No associated dictionary found -->
@@ -112,16 +125,24 @@
     <string name="uninstall_model" comment="Label to uninstall a dictionary">Copot daftar kata (kamus)</string>
     <!-- Context: Model Info -->
     <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">Apakah Anda ingin menghapus daftar kata (kamus) ini?</string>
+    <!-- Context: Model Deleted -->
+    <string name="model_deleted" comment="Notification when a dictionary is deleted">Dictionary deleted</string>
     <!-- Context: Language Settings Keyboard install strings -->
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">Papan tombol %1$s terpasang</string>
+    <!-- Context: Language Settings Keyboard uninstall strings -->
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Keyboard deleted</string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Aktifkan koreksi kata</string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_predictions" comment="Enable predictions from the suggestion banner">Aktifkan prediksi kata</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Daftar kata (kamus)</string>
+    <plurals name="model_count">
+        <item quantity="other">Dictionaries</item>
+    </plurals>
     <!-- Context: Language Settings menu substring - Check for available dictionary -->
     <string name="check_available_model" comment="Check for available dictionary">Cek daftar kata (kamus) yang tersedia</string>
+    <string name="check_model_online" comment="Check for dictionaries online">Check for dictionaries online</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_info_header" comment="Dictionary name">Daftar kata (kamus): %1$s</string>
     <!-- Context: Language Settings menu strings -->
@@ -142,4 +163,6 @@
     <!-- Context: Shared preferences name -->
     <!-- Context: Other strings -->
     <string name="help_bubble_text">Tekan di sini untuk mengubah papan tombol</string>
+    <!-- Context: anywhere -->
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
 </resources>

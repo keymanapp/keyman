@@ -304,9 +304,12 @@ type
     procedure mnuToolsClick(Sender: TObject);
     procedure mnuToolsDebugTestsCompilerExceptionTestClick(Sender: TObject);
     procedure mnuToolsDebugTestsShowDebuggerEventsPanelClick(Sender: TObject);
+    procedure ApplicationEvents1Message(var Msg: tagMSG; var Handled: Boolean);
 
   private
     AppStorage: TJvAppRegistryStorage;
+
+    FControlDown: Boolean;
 
     FCharMapSettings: TCharMapSettings;
     FDropTarget: TDropTarget;
@@ -320,6 +323,7 @@ type
     FFirstShow: Boolean;
     FIsClosing: Boolean;
     FCanClose: Boolean;
+    FHasDoneCloseCleanup: Boolean;
 
     //procedure ChildWindowsChange(Sender: TObject);
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FORMSHOWN;
@@ -358,6 +362,7 @@ type
     procedure CEFShutdownComplete(Sender: TObject);
     procedure ActivateActiveChild;
     function OpenModelEditor(FFileName: string): TfrmTikeEditor;
+    procedure DoCloseCleanup;
 
   protected
     procedure WndProc(var Message: TMessage); override;
@@ -595,9 +600,19 @@ begin
 end;
 
 procedure TfrmKeymanDeveloper.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  DoCloseCleanup;
+  Action := caFree;
+end;
+
+procedure TfrmKeymanDeveloper.DoCloseCleanup;
 var
   i: Integer;
 begin
+  if FHasDoneCloseCleanup then
+    Exit;
+  FHasDoneCloseCleanup := True;
+
   for i := FChildWindows.Count - 1 downto 0 do
   begin
     FChildWindows[i].Visible := False;
@@ -627,8 +642,6 @@ begin
   finally
     Free;
   end;
-
-  Action := caFree;
 
   FreeAndNil(frmCharacterMapDock);
   FreeAndNil(frmCharacterIdentifier);   // I4807
@@ -675,7 +688,9 @@ end;
 
 procedure TfrmKeymanDeveloper.FormDestroy(Sender: TObject);
 begin
-//  OutputDebugString(PChar('TfrmKeymanDeveloper.FormDestroy'));
+  DoCloseCleanup;
+
+  //  OutputDebugString(PChar('TfrmKeymanDeveloper.FormDestroy'));
   UnhookWindowsHookEx(hInputLangChangeHook);
 
   FreeAndNil(FCharMapSettings);
@@ -824,6 +839,25 @@ begin
       mHHelp.HelpTopic(s);
   end;
   Result := True;
+end;
+
+procedure TfrmKeymanDeveloper.ApplicationEvents1Message(var Msg: tagMSG;
+  var Handled: Boolean);
+var
+  state: Boolean;
+begin
+  Handled := False;
+  if (Msg.message = WM_KEYDOWN) or (Msg.message = WM_SYSKEYDOWN) or
+    (Msg.message = WM_KEYUP) or (Msg.message = WM_SYSKEYUP) then
+  begin
+    state := (Msg.message = WM_KEYDOWN) and (Msg.wParam = VK_CONTROL) and
+      (GetKeyState(VK_SHIFT) >= 0) and (GetKeyState(VK_MENU) >= 0);
+    if not state and FControlDown and Assigned(ActiveEditor) and (Msg.wParam = VK_CONTROL) then
+    begin
+      ActiveEditor.ControlKeyPressedAndReleased;
+    end;
+    FControlDown := state;
+  end;
 end;
 
 procedure TfrmKeymanDeveloper.AppOnActivate(Sender: TObject);
@@ -1171,13 +1205,11 @@ end;
 function TfrmKeymanDeveloper.OpenKMNEditor(FFileName: string): TfrmTikeEditor;
 begin
   Result := OpenEditor(FFileName, TfrmKeymanWizard);
-    //else Result := OpenEditor(FFileName, TfrmEditor);
 end;
 
 function TfrmKeymanDeveloper.OpenTSVEditor(FFileName: string): TfrmTikeEditor;
 begin
   Result := OpenEditor(FFileName, TfrmWordlistEditor);
-    //else Result := OpenEditor(FFileName, TfrmEditor);
 end;
 
 function TfrmKeymanDeveloper.OpenModelEditor(FFileName: string): TfrmTikeEditor;
@@ -1213,7 +1245,7 @@ begin
   for i := 0 to FChildWindows.Count - 1 do
     if FChildWindows[i] is TfrmTikeEditor then
       with FChildWindows[i] as TfrmTikeEditor do
-        if SameFileName(FileName, FFileName) then   // I4749
+        if SameFileName(FileName, FFileName) or HasSubFilename(FFileName) then   // I4749
         begin
           Result := Self.FChildWindows[i] as TfrmTikeEditor;
           ShowChild(Result);

@@ -6,8 +6,8 @@ set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -17,65 +17,48 @@ cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
-# Ensures color var use in `builder_describe`'s argument respects the specified
-# --color/--no-color option.
-builder_check_color "$@"
-
 builder_describe \
   "Compiles the web-oriented utility function module." \
+  "@/common/web/recorder  test" \
+  "@/common/web/keyman-version" \
+  "@/common/web/es-bundling" \
+  "@/common/web/utils" \
   configure \
   clean \
   build \
   test \
-  "--ci    For use with action ${BUILDER_TERM_START}test${BUILDER_TERM_END} - emits CI-friendly test reports"
+  "--ci    For use with action $(builder_term test) - emits CI-friendly test reports"
+
+builder_describe_outputs \
+  configure     /node_modules \
+  build         /common/web/keyboard-processor/build/lib/index.mjs
 
 builder_parse "$@"
 
-# START - Script parameter configuration
-REPORT_STYLE=local  # Default setting.
+function do_build() {
+  tsc --build "$THIS_SCRIPT_PATH/tsconfig.all.json"
+  node ./build-bundler.js
 
-if builder_has_option --ci; then
-  REPORT_STYLE=ci
+  # Declaration bundling.
+  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  tsc --emitDeclarationOnly --outFile ./build/lib/dom-keyboard-loader.d.ts -p src/keyboards/loaders/tsconfig.dom.json
+  tsc --emitDeclarationOnly --outFile ./build/lib/node-keyboard-loader.d.ts -p src/keyboards/loaders/tsconfig.node.json
+}
 
-  echo "Replacing user-friendly test reports with CI-friendly versions."
-fi
-
-# END - Script parameter configuration
-
-if builder_start_action configure; then
-  verify_npm_setup
-
-  "$KEYMAN_ROOT/common/web/keyman-version/build.sh"
-
-  builder_finish_action success configure
-fi
-
-if builder_start_action clean; then
-  npm run clean
-  builder_finish_action success clean
-fi
-
-if builder_start_action build; then
-  npm run tsc -- --build "$THIS_SCRIPT_PATH/src/tsconfig.json"
-  builder_finish_action success build
-fi
-
-if builder_start_action test; then
-  # Build test dependency
-  pushd "$KEYMAN_ROOT/common/web/recorder"
-  ./build.sh
-  popd
-
-  npm run tsc -- --build "$THIS_SCRIPT_PATH/src/tsconfig.bundled.json"
-
-  echo_heading "Running Keyboard Processor test suite"
-
-  FLAGS=
-  if [ $REPORT_STYLE == ci ]; then
-    FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
+function do_test() {
+  local MOCHA_FLAGS=
+  local KARMA_CONFIG=manual.conf.cjs
+  if builder_has_option --ci; then
+    echo "Replacing user-friendly test reports with CI-friendly versions."
+    MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
+    KARMA_CONFIG=CI.conf.cjs
   fi
 
-  npm run mocha -- --recursive $FLAGS ./tests/cases/
+  c8 mocha --recursive $MOCHA_FLAGS ./tests/node/
+  karma start ./tests/dom/$KARMA_CONFIG
+}
 
-  builder_finish_action success test
-fi
+builder_run_action configure  verify_npm_setup
+builder_run_action clean      rm -rf ./build
+builder_run_action build      do_build
+builder_run_action test       do_test

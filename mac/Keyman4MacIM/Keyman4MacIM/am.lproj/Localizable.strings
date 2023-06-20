@@ -25,6 +25,12 @@
 /* Message displayed to inform user that .kmp file could not be read/unzipped  */
 "message-keyboard-file-unreadable" = "የኪይማኑን ፋይል ማንበብ አልቻልኩም። '%@'";
 
+/* Message displayed in Configuration window when keyboard cannot be loaded */
+"message-error-loading-keyboard" = "(የፊደል ገበታ ስህተቶችን መጫን)";
+
+/* Message displayed in Configuration window when keyboard metadata cannot be loaded */
+"message-error-unknown-metadata" = "ያልታወቀ";
+
 /* Button text to acknowledge that .kmp file could not be read  */
 "button-keyboard-file-unreadable" = "ይሁን";
 
@@ -42,3 +48,24 @@
 
 /* Button text keyboard download complete  */
 "button-download-complete" = "አልቋል";
+
+/* keyboards label in the Package Information window */
+"keyboards-label" = "የፊደል ገበታዎች:";
+
+/* fonts label in the Package Information window */
+"fonts-label" = "ፎንቶች፦";
+
+/* package version label in the Package Information window */
+"package-version-label" = "ስሪት፦";
+
+/* author label in the Package Information window */
+"author-label" = "አዘጋጅ፦";
+
+/* website label in the Package Information window */
+"website-label" = "ድረ ገጽ፦";
+
+/* copyright label in the Package Information window */
+"copyright-label" = "የባለቤትነት መብት፦";
+
+/* message displayed to alert user to need grant accessibility permission */
+"privacy-alert-text" = "ኪይማን በአግባቡ ለመስራት የተደራሽነት ባህሪያትን ይፈልጋል፦ \n\nበስርዓት ምርጫዎች፣ ደህንነት እና ግላዊነት ውስጥ መዳረሻ ፍቀድ። \nስርዓት እንደገና አስጀምር።";

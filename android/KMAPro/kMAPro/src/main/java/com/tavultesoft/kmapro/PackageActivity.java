@@ -18,14 +18,14 @@ import android.widget.Toast;
 
 import com.stepstone.stepper.StepperLayout;
 import com.stepstone.stepper.VerificationError;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KeyboardEventHandler;
-import com.tavultesoft.kmea.KmpInstallMode;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.packages.PackageProcessor;
-import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
-import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.KMLog;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.KeyboardEventHandler;
+import com.keyman.engine.KmpInstallMode;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.packages.PackageProcessor;
+import com.keyman.engine.packages.LexicalModelPackageProcessor;
+import com.keyman.engine.util.FileUtils;
+import com.keyman.engine.util.KMLog;
 
 import org.json.JSONObject;
 
@@ -59,17 +59,20 @@ public class PackageActivity extends AppCompatActivity implements
 
     final Context context = this;
     Bundle bundle = getIntent().getExtras();
-    if (bundle != null) {
-      kmpFile = new File(bundle.getString("kmpFile"));
-      if (!kmpFile.exists()) {
-        showErrorToast(kmpFile.getAbsolutePath() + " not found. Unable to extract");
-        return;
-      }
-      installMode = KmpInstallMode.fromString(bundle.getString("installMode"));
-      languageID = bundle.getString("language", null);
-      if (languageID != null && !languageID.isEmpty()) {
-        languageList.add(languageID);
-      }
+    if (bundle == null) {
+      showErrorToast("No bundle for PackageActivity");
+      return;
+    }
+
+    kmpFile = new File(bundle.getString("kmpFile"));
+    if (!kmpFile.exists()) {
+      showErrorToast(kmpFile.getAbsolutePath() + " not found. Unable to extract");
+      return;
+    }
+    installMode = KmpInstallMode.fromString(bundle.getString("installMode"));
+    languageID = bundle.getString("language", null);
+    if (languageID != null && !languageID.isEmpty()) {
+      languageList.add(languageID);
     }
 
     File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);

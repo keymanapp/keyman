@@ -20,27 +20,33 @@ package com.keyman.android;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.RemoteException;
 import android.util.Log;
+import java.lang.IllegalArgumentException;
 
 import com.android.installreferrer.api.InstallReferrerClient;
 import com.android.installreferrer.api.InstallReferrerStateListener;
 import com.android.installreferrer.api.ReferrerDetails;
 import com.tavultesoft.kmapro.MainActivity;
 import com.tavultesoft.kmapro.R;
-import com.tavultesoft.kmea.KmpInstallMode;
-import com.tavultesoft.kmea.util.KMLog;
-import com.tavultesoft.kmea.util.KMString;
+import com.keyman.engine.KmpInstallMode;
+import com.keyman.engine.util.KMLog;
+import com.keyman.engine.util.KMString;
+import com.keyman.engine.util.VersionUtils;
 
 public class CheckInstallReferrer {
   private static final String TAG = "CheckInstallReferrer";
   private static final String hasGooglePlayInstallReferrerBeenCheckedKey =
     "HasGooglePlayInstallReferrerBeenChecked";
+  private static final String GOOGLE_PLAY = "com.android.vending";
 
   /**
    * Contact Google Play Install Referrer API to find out if the Keyman site gave us a default
    * keyboard to install.
+   * Limitation: Only contact API if Keyman was installed from Google Play store
    * @param mainActivity  TODO: refactor downloadKMP so we don't need backrefs like this
    * @param context
    */
@@ -58,6 +64,36 @@ public class CheckInstallReferrer {
     SharedPreferences.Editor editor = prefs.edit();
     editor.putBoolean(hasGooglePlayInstallReferrerBeenCheckedKey, true);
     editor.commit();
+
+    // local environment or test builds are nearly always side loaded
+    if (VersionUtils.isLocalBuild() || VersionUtils.isTestBuild()) {
+      return;
+    }
+
+    // Determine if Keyman installed from Google Play store
+    String installerInfo = null;
+    try {
+      PackageManager packageManager = context.getPackageManager();
+      String packageName = context.getPackageName();
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        installerInfo = packageManager.getInstallSourceInfo(packageName).getInstallingPackageName();
+      } else {
+        installerInfo = packageManager.getInstallerPackageName(packageName);
+      }
+    } catch (PackageManager.NameNotFoundException|IllegalArgumentException e) {
+      KMLog.LogException(TAG, "Error determining packageManager", e);
+      return;
+    }
+
+    if (installerInfo == null) {
+      // Side loaded so just return
+      return;
+    }
+    
+    if (!installerInfo.equalsIgnoreCase(GOOGLE_PLAY)) {
+      KMLog.LogInfo(TAG, "Skipping install referrer. Installed from " + installerInfo);
+      return;
+    }
 
     Log.i(TAG, "Started checkGooglePlayInstallReferrer");
 

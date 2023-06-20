@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <!-- Set the viewport width to match phone and tablet device widths -->
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+
+    <!-- Allow KeymanWeb to be saved to the iPhone home screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <!-- Enable IE9 Standards mode -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>KeymanWeb Sample Page - Uncompiled Source</title>
+
+    <!-- Your page CSS -->
+    <style type='text/css'>
+      body {font-family: Tahoma,helvetica;}
+      h3 {font-size: 1em;font-weight:normal;color: darkred; margin-bottom: 4px}
+      .test {font-size: 1.5em; width:80%; min-height:30px; border: 1px solid gray;}
+      #KeymanWebControl {width:50%;min-width:600px;}
+    </style>
+
+    <!-- Insert uncompiled KeymanWeb source scripts -->
+    <script src="../../../../../build/publish/debug/keymanweb.js" type="application/javascript"></script>
+
+    <!--
+      For desktop browsers, a script for the user interface must be inserted here.
+
+      Standard UIs are toggle, button, float and toolbar.
+      The toolbar UI is best for any page designed to support keyboards for
+      a large number of languages.
+    -->
+    <script src="../../../../../build/publish/debug/kmwuitoggle.js"></script>
+
+    <!-- Initialization: set paths to keyboards, resources and fonts as required -->
+    <script>
+      // Thank you to https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
+      const attachType = (new URLSearchParams(window.location.search)).get("mode");
+      var attachText = attachType ? attachType : "default";
+
+      var kmw=window.keyman;
+      kmw.init({
+        attachType: attachType ? attachType : ''
+      });
+    </script>
+
+    <!-- Add keyboard management script for local selection of keyboards to use -->
+	<script src="../commonHeader.js"></script>
+    <script src="./utilities.js"></script>
+
+	<script>
+
+	</script>
+  </head>
+
+<!-- Sample page HTML -->
+  <body onload='loadKeyboards(1);'>
+    <h2>KeymanWeb Sample Page - Attachment API Testing</h2>
+	<p>This page is designed to stress-test the new attachment/enablement API model and its functions.</p>
+	<p id="modeSelect">You are currently testing under the <em id="mode"> </em> attachment mode.  Two other modes are available:
+	<a id="attach_auto" href="./index.html?mode=auto">Auto</a> <a id="attach_manual" href="./index.html?mode=manual">Manual</a>
+	<a id="attach_default" href="./index.html">Default</a><p>
+	<p>Be sure to reference the developer console for additional feedback.  </p>
+	</p>Note that the 'attachment' state reported is managed by this page and not reported from KeymanWeb itself;
+	take it as a guide at best.  (Especially if on a touch device.)</p>
+	<script>
+		document.getElementById("mode").textContent = attachText;
+		var redundantLink = document.getElementById("attach_" + attachText);
+		document.getElementById("modeSelect").removeChild(redundantLink);
+	</script>
+	<input type='button' id='btnInput' onclick='addInput();' value='Create Inputs.' />
+	<input type="button" id='btnText' onClick='addText();' value='Create Textarea.' />
+	<input type='button' id='btnIFrame' onclick='addIFrame();' value='Create IFrame.' />
+  <input type='button' id='btnDesignIFrame' onclick='addDesignIFrame();' value='Create design-mode IFrame.' />
+	<input type='button' id='btnEditable' onclick='addEditable();' value='Create editable DIV.' />
+	<hr/>
+    <div>
+    <!--
+      The following DIV is used to position the Button or Toolbar User Interfaces on the page.
+      If omitted, those User Interfaces will appear at the top of the document body.
+      (It is ignored by other User Interfaces.)
+    -->
+    <div id='KeymanWebControl'></div>
+
+    <div id='DynamicInputs'><h3>Inputs:</h3></div>
+		<div id='DynamicTextareas'><h3>Textareas:</h3></div>
+		<div id='DynamicIFrames'><h3>IFrames:</h3>
+			<p><em>Note:</em> The iframe section does not support <code>setKeyboardForControl</code>.</p>
+		</div>
+    <div id='DynamicDesignFrames'><h3>Design-mode IFrames:</h3>
+			<p><em>Note:</em> The iframe section should not actually attach/enable for touch devices
+			and does not support <code>setKeyboardForControl</code>.</p>
+		</div>
+		<div id='DynamicEditables'><h3><code>contenteditable</code> Elements:</h3></div>
+  </div>
+	<hr/>
+   <h3><a href="../index.html">Return to testing home page</a></h3>
+  </body>
+
+  <!--
+    *** DEVELOPER NOTE -- FIREFOX CONFIGURATION FOR TESTING ***
+    *
+    * If the URL bar starts with <b>file://</b>, Firefox may not load the font used
+    * to display the special characters used in the On-Screen Keyboard.
+    *
+    * To work around this Firefox bug, navigate to <b>about:config</b>
+    * and set <b>security.fileuri.strict_origin_policy</b> to <b>false</b>
+    * while testing.
+    *
+    * Firefox resolves website-based CSS URI references correctly without needing
+    * any configuration change, so this change should only be made for file-based testing.
+    *
+    ***
+  -->
+</html>

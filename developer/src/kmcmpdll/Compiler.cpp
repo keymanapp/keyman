@@ -67,7 +67,7 @@
 #include "pch.h"
 
 #include <compfile.h>
-#include <comperr.h>
+#include <kmn_compiler_errors.h>
 #include "../../../common/windows/cpp/include/vkeys.h"
 #include <versioning.h>
 #include <kmcmpdll.h>
@@ -215,6 +215,8 @@ BOOL FShouldAddCompilerVersion = TRUE;
 BOOL FOldCharPosMatching = FALSE, FMnemonicLayout = FALSE;
 NamedCodeConstants *CodeConstants = NULL;
 
+int BeginLine[4];
+
 /* Compile target */
 
 int CompileTarget;
@@ -287,17 +289,11 @@ BOOL AddCompileMessage(DWORD msg)
   return FALSE;
 }
 
-typedef struct _COMPILER_OPTIONS {
-  DWORD dwSize;
-  BOOL ShouldAddCompilerVersion;
-} COMPILER_OPTIONS;
-
-typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
-
 extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options) {
   if(!options || options->dwSize < sizeof(COMPILER_OPTIONS)) {
     return FALSE;
   }
+
   FShouldAddCompilerVersion = options->ShouldAddCompilerVersion;
   return TRUE;
 }
@@ -329,6 +325,8 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
   msgproc = pMsgProc;
   currentLine = 0;
   nErrors = 0;
+
+  AddCompileString("NOTE: Using legacy compiler");
 
   hInfile = CreateFileA(pszInfile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
   if (hInfile == INVALID_HANDLE_VALUE) SetError(CERR_InfileNotExist);
@@ -412,6 +410,8 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PSTR pszInfile
   currentLine = 0;
   nErrors = 0;
 
+  AddCompileString("NOTE: Using legacy compiler");
+
   hInfile = CreateFileA(pszInfile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
   if (hInfile == INVALID_HANDLE_VALUE) SetError(CERR_InfileNotExist);
 
@@ -493,6 +493,11 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
   fk->dwBitmapSize = 0;
   fk->dwHotKey = 0;
 
+  BeginLine[BEGIN_ANSI] = -1;
+  BeginLine[BEGIN_UNICODE] = -1;
+  BeginLine[BEGIN_NEWCONTEXT] = -1;
+  BeginLine[BEGIN_POSTKEYSTROKE] = -1;
+
   /* Add a store for the Keyman 6.0 copyright information string */
 
   if(FShouldAddCompilerVersion) {
@@ -515,7 +520,6 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
   // must preprocess for group and store names -> this isn't really necessary, but never mind!
   while ((msg = ReadLine(hInfile, str, TRUE)) == CERR_None)
   {
-    if (GetAsyncKeyState(VK_ESCAPE) < 0) SetError(CERR_Break);
     p = str;
     switch (LineTokenType(&p))
     {
@@ -549,7 +553,6 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
   /* ReadLine will automatically skip over $Keyman lines, and parse wrapped lines */
   while ((msg = ReadLine(hInfile, str, FALSE)) == CERR_None)
   {
-    if (GetAsyncKeyState(VK_ESCAPE) < 0) SetError(CERR_Break);
     msg = ParseLine(fk, str);
     if (msg != CERR_None) SetError(msg);
   }
@@ -603,6 +606,11 @@ DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PWSTR p)
   else if (_wcsnicmp(p, L"postKeystroke", 13) == 0) BeginMode = BEGIN_POSTKEYSTROKE;
   else if (*p != '>') return CERR_InvalidToken;
   else BeginMode = BEGIN_ANSI;
+
+  if(BeginLine[BeginMode] != -1) {
+    return CERR_RepeatedBegin;
+  }
+  BeginLine[BeginMode] = currentLine;
 
   if ((msg = GetRHS(fk, p, tstr, 80, (int)(INT_PTR)(p - pp), FALSE)) != CERR_None) return msg;
 
@@ -671,7 +679,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
     break;	// The line has already been processed
 
   case T_BEGIN:
-    // after a begin can be "Unicode" or "ANSI" or nothing (=ANSI)
+    // after a begin can be "Unicode", "ANSI", "NewContext", "PostKeystroke", or nothing (=ANSI)
     if ((msg = ProcessBeginLine(fk, p)) != CERR_None) return msg;
     break;
 
@@ -932,10 +940,23 @@ int cmpkeys(const void *key, const void *elem)
     {
       if (akey->Line < aelem->Line) return -1;
       if (akey->Line > aelem->Line) return 1;
-      return 0;
+      if(akey->Key == aelem->Key) {
+        if(akey->ShiftFlags == aelem->ShiftFlags) {
+          return akey->LineStoreIndex - aelem->LineStoreIndex;
+        }
+        return akey->ShiftFlags - aelem->ShiftFlags;
+      }
+      return akey->Key - aelem->Key;
     }
     if (l1 < l2) return 1;
     if (l1 > l2) return -1;
+    if(akey->Key == aelem->Key) {
+      if(akey->ShiftFlags == aelem->ShiftFlags) {
+        return akey->LineStoreIndex - aelem->LineStoreIndex;
+      }
+      return akey->ShiftFlags - aelem->ShiftFlags;
+    }
+    return akey->Key - aelem->Key;
   }
   return(char_key - char_elem); // akey->Key - aelem->Key);
 }
@@ -1265,6 +1286,7 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
     else if (wcsncmp(p, L"10.0", 4) == 0)  fk->version = VERSION_100;
     else if (wcsncmp(p, L"14.0", 4) == 0)  fk->version = VERSION_140; // Adds support for #917 -- context() with notany() for KeymanWeb
     else if (wcsncmp(p, L"15.0", 4) == 0)  fk->version = VERSION_150; // Adds support for U_xxxx_yyyy #2858
+    else if (wcsncmp(p, L"16.0", 4) == 0)  fk->version = VERSION_160; // KMXPlus
     else return CERR_InvalidVersion;
 
     if (fk->version < VERSION_60) FOldCharPosMatching = TRUE;
@@ -1717,6 +1739,7 @@ CheckOutputIsReadonly(const PFILE_KEYBOARD fk, const PWSTR output) {  // I4867
     wcscpy_s(kp->dpContext, wcslen(pklIn) + 1, pklIn);  // I3481
 
     kp->Line = currentLine;
+    kp->LineStoreIndex = 0;
 
     // Finished if we are not using keys
 
@@ -1858,6 +1881,7 @@ DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, DWORD storeIndex)
       k->ShiftFlags = 0;
     }
     k->Line = kpp->Line;
+    k->LineStoreIndex = (WORD)n;
     ExpandKp_ReplaceIndex(fk, k, keyIndex, n);
   }
 
@@ -3304,6 +3328,7 @@ DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, HANDLE hOutfile)
     offset += gp->cxKeyArray * sizeof(COMP_KEY);
     for (j = 0; j < gp->cxKeyArray; j++, kp++, fkp++)
     {
+      kp->_reserved = 0;
       kp->Key = fkp->Key;
       if (FSaveDebug) kp->Line = fkp->Line; else kp->Line = 0;
       kp->ShiftFlags = fkp->ShiftFlags;
@@ -3326,7 +3351,12 @@ DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, HANDLE hOutfile)
     return CERR_SomewhereIGotItWrong;
   }
 
-  SetChecksum(buf, &ck->dwCheckSum, (DWORD)size);
+  if (ck->dwFileVersion < VERSION_160) {
+    SetChecksum(buf, &ck->dwCheckSum, (DWORD)size);
+  }
+  else {
+    ck->dwCheckSum = 0; // checksum is deprecated for 16.0+
+  }
 
   DWORD dwBytesWritten = 0;
   WriteFile(hOutfile, buf, (DWORD)size, &dwBytesWritten, NULL);

@@ -9,8 +9,8 @@ set -u
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # This script runs from its own folder
@@ -19,6 +19,7 @@ cd "$(dirname "$THIS_SCRIPT")"
 # Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
+. "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac
@@ -116,7 +117,7 @@ done
 # Extended path definitions
 KMEI_RESOURCES=engine/KMEI/KeymanEngine/resources
 BUNDLE_PATH=$KMEI_RESOURCES/Keyman.bundle/contents/resources
-KMW_SOURCE=../web/source
+KMW_ROOT=../web
 
 DEFAULT_KBD_ID="sil_euro_latin"
 DEFAULT_LM_ID="nrc.en.mtnt"
@@ -137,7 +138,7 @@ if [ $CLEAN_ONLY = true ]; then
 fi
 
 echo
-echo "KMW_SOURCE: $KMW_SOURCE"
+echo "KMW_ROOT: $KMW_ROOT"
 echo "DO_KMW_BUILD: $DO_KMW_BUILD"
 echo "DO_KMP_DOWNLOADS: $DO_KMP_DOWNLOADS"
 echo "CONFIGURATION: $CONFIG"
@@ -148,61 +149,67 @@ update_bundle ( ) {
         mkdir -p "$BUNDLE_PATH"
     fi
 
-    base_dir="$(pwd)"
+    local base_dir="$(pwd)"
 
     if [ $DO_KMW_BUILD = true ]; then
-        echo Building KeymanWeb from $KMW_SOURCE
+        echo Building KeymanWeb from $KMW_ROOT
 
-        cd $KMW_SOURCE
-
+        KMW_PRODUCT=web/build/app/webview/
+        KMW_RESOURCES=web/build/app/resources
         if [ "$CONFIG" == "Debug" ]; then
-          KMWFLAGS="-debug_embedded"
+          KMWFLAGS="configure:app/webview build:app/webview --debug"
+          KMW_PRODUCT="$KMW_PRODUCT/debug"
         else
-          KMWFLAGS="-embed"
+          KMWFLAGS="configure:app/webview build:app/webview"
+          KMW_PRODUCT="$KMW_PRODUCT/release"
         fi
 
         # Local development optimization - cross-target Sentry uploading when requested
         # by developer.  As it's not CI, the Web artifacts won't exist otherwise...
         # unless the developer manually runs the correct build configuration accordingly.
         if [[ $VERSION_ENVIRONMENT == "local" ]] && [[ $UPLOAD_SENTRY == true ]]; then
+          # TODO:  handle the -upload-sentry in its eventual new form
           KMWFLAGS="$KMWFLAGS -upload-sentry"
         fi
 
-        ./build.sh $KMWFLAGS
+        "$KEYMAN_ROOT/web/build.sh" $KMWFLAGS
         if [ $? -ne 0 ]; then
-            fail "ERROR:  KeymanWeb's build.sh failed."
+            builder_die "ERROR:  KeymanWeb's build.sh failed."
         fi
 
         #Copy over the relevant resources!  It's easiest to do if we navigate to the resulting folder.
-        cd ../release/embedded
-        cp resources/osk/kmwosk.css        "$base_dir/$BUNDLE_PATH/kmwosk.css"
-        cp resources/osk/keymanweb-osk.ttf "$base_dir/$BUNDLE_PATH/keymanweb-osk.ttf"
-        cp keyman.js                       "$base_dir/$BUNDLE_PATH/keymanios.js"
+        cp "$KEYMAN_ROOT/$KMW_RESOURCES/osk/kmwosk.css"        "$base_dir/$BUNDLE_PATH/kmwosk.css"
+        cp "$KEYMAN_ROOT/$KMW_RESOURCES/osk/keymanweb-osk.ttf" "$base_dir/$BUNDLE_PATH/keymanweb-osk.ttf"
+        cp "$KEYMAN_ROOT/$KMW_PRODUCT/keymanweb-webview.js"             "$base_dir/$BUNDLE_PATH/keymanweb-webview.js"
 
         if [ "$CONFIG" == "Debug" ]; then
-          cp keyman.js.map                 "$base_dir/$BUNDLE_PATH/keyman.js.map"
-        elif [ -f "$base_dir/$BUNDLE_PATH/keyman.js.map" ]; then
-          rm                               "$base_dir/$BUNDLE_PATH/keyman.js.map"
+          cp "$KEYMAN_ROOT/$KMW_PRODUCT/keymanweb-webview.js.map"       "$base_dir/$BUNDLE_PATH/keymanweb-webview.js.map"
+        elif [ -f "$base_dir/$BUNDLE_PATH/keymanweb-webview.js.map" ]; then
+          rm      "$base_dir/$BUNDLE_PATH/keymanweb-webview.js.map"
         fi
 
-        cd "$KEYMAN_ROOT/common/web/sentry-manager/build"
+        # Linked in by dependency for builder scripts... but this script isn't builder-based yet.
+        "${KEYMAN_ROOT}/common/web/sentry-manager/build.sh"
+        if [ $? -ne 0 ]; then
+            builder_die "ERROR:  Build of KMW's error reporter for Sentry failed."
+        fi
 
-        cp index.js                        "$base_dir/$BUNDLE_PATH/keyman-sentry.js"
+        cp "$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js" "$base_dir/$BUNDLE_PATH/sentry.min.js"
+        cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js"   "$base_dir/$BUNDLE_PATH/keyman-sentry.js"
 
-        cd "$base_dir"
     fi
 
     # Our default resources are part of the bundle, so let's check on them.
     if [ ! -f "$base_dir/$BUNDLE_PATH/$DEFAULT_KBD_ID.kmp" ]; then
       DO_KMP_DOWNLOADS=true
-      warn "OVERRIDE:  Performing -download-resources run, as the keyboard package is missing!"
+      builder_warn "OVERRIDE:  Performing -download-resources run, as the keyboard package is missing!"
     elif [ ! -f "$base_dir/$BUNDLE_PATH/$DEFAULT_LM_ID.model.kmp" ]; then
       DO_KMP_DOWNLOADS=true
-      warn "OVERRIDE:  Performing -download-resources run, as the lexical model package is missing!"
+      builder_warn "OVERRIDE:  Performing -download-resources run, as the lexical model package is missing!"
     fi
 
     if [ $DO_KMP_DOWNLOADS = true ]; then
-      echo_heading "Downloading up-to-date packages for default resources"
+      builder_heading "Downloading up-to-date packages for default resources"
 
       downloadKeyboardPackage "$DEFAULT_KBD_ID" "$base_dir/$BUNDLE_PATH/$DEFAULT_KBD_ID.kmp"
       downloadModelPackage "$DEFAULT_LM_ID" "$base_dir/$BUNDLE_PATH/$DEFAULT_LM_ID.model.kmp"
@@ -220,17 +227,11 @@ if [ $DO_CARTHAGE = true ]; then
   echo
   echo "Load dependencies with Carthage"
 
-  carthage checkout || fail "Carthage dependency loading failed"
-
-  # Carthage sometimes picks the wrong .xcworkspace if two are available in a dependency's repo.
-  # Easiest way to override it - delete the wrong one (or just its scheme)
-
-  # Deleted workspace - a test for proper deployment to CocoaPods.  Doesn't matter here.
-  rm -r ./Carthage/Checkouts/DeviceKit/CocoaPodsVerification/ || fail "Carthage dependency loading failed"
+  carthage checkout || builder_die "Carthage dependency loading failed"
 
   # --no-use-binaries: due to https://github.com/Carthage/Carthage/issues/3134,
   # which affects the sentry-cocoa dependency.
-  carthage build --use-xcframeworks --no-use-binaries --platform iOS || fail "Carthage dependency loading failed"
+  carthage build --use-xcframeworks --no-use-binaries --platform iOS || builder_die "Carthage dependency loading failed"
 fi
 
 echo
@@ -259,7 +260,7 @@ echo "KMEI build complete."
 if [ $DO_KEYMANAPP = true ]; then
   echo ""
   echo "Building offline help."
-  ./build-help.sh html
+  build_help_html ios keyman/Keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources
 
   echo ""
   echo "Building Keyman app."

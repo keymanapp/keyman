@@ -10,6 +10,13 @@
         <item quantity="other">Keyboards</item>
     </plurals>
     <!-- Context: Title for list -->
+    <plurals name="title_other_input_methods">
+        <item quantity="one">Darb gadey hana dassasan</item>
+        <item quantity="two">Durub gadey hana dassasan</item>
+        <item quantity="few">Durub gadey hana dassasan</item>
+        <item quantity="other">Durub gadey hana dassasan</item>
+    </plurals>
+    <!-- Context: Title for list -->
     <string name="title_add_keyboard" comment="Add a new keyboard">Zyd Keyboard jadid</string>
     <!-- Context: Title for list -->
     <string name="title_languages_settings" comment="List of installed languages">Luggat al dakhalo</string>
@@ -23,7 +30,7 @@
     <string name="label_cancel" comment="Button to cancel an action">Halla</string>
     <!-- Context: Button label -->
     <string name="label_close" comment="Close a dialog">Sidda</string>
-    <!-- Context: Button label -->
+    <!-- Context: Button label. Removed in Keyman 15 -->
     <string name="label_close_keyman" comment="Close the Keyman application">Siddal Keyman</string>
     <!-- Context: Button label -->
     <string name="label_forward" comment="Button to go forward">Giddam</string>
@@ -41,6 +48,8 @@
     <string name="label_ok" comment="Button to acknowledge a dialog">Zayn</string>
     <!-- Context: Button label -->
     <string name="label_update" comment="Dialog button to update a resource">Jadidiye</string>
+    <!-- Context: No internet for updates -->
+    <string name="no_internet_connection" comment="Internet connection missing">No internet connection</string>
     <!-- Context: Keyboard Updates -->
     <string name="cannot_connect" comment="Error message when network connection fails">Ma gudur wassal server hana Keyman!</string>
     <!-- Context: Keyboard Updates -->
@@ -79,6 +88,7 @@
     <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">Mushkila fyl keyboard %1$s:%2$s layl %3$s lugga.</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Shafiyan kakkad abu kalimat shaba da ley dassasana</string>
+    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Cannot connect to Keyman server to check for associated dictionary to download</string>
     <!-- Context: Model Updates -->
     <string name="confirm_download_model" comment="Confirmation to download a dictionary update">Tador tadis kakkad abu kalimat aljudad wah?</string>
     <!-- Context: No associated dictionary found -->
@@ -121,16 +131,27 @@
     <string name="uninstall_model" comment="Label to uninstall a dictionary">Sulal kakkad hanal kalimat</string>
     <!-- Context: Model Info -->
     <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">Tador tachunnal kakkad hanal kalimat da wah?</string>
+    <!-- Context: Model Deleted -->
+    <string name="model_deleted" comment="Notification when a dictionary is deleted">Dictionary deleted</string>
     <!-- Context: Language Settings Keyboard install strings -->
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">%1$s al keyboard dakhal</string>
+    <!-- Context: Language Settings Keyboard uninstall strings -->
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Keyboard deleted</string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Abdal miwasa</string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_predictions" comment="Enable predictions from the suggestion banner">Dyssal zan</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Kakkad hana kalimat</string>
+    <plurals name="model_count">
+        <item quantity="one">Dictionary</item>
+        <item quantity="two">Dictionaries</item>
+        <item quantity="few">Dictionaries</item>
+        <item quantity="other">Dictionaries</item>
+    </plurals>
     <!-- Context: Language Settings menu substring - Check for available dictionary -->
     <string name="check_available_model" comment="Check for available dictionary">Shyf kakkad hana kalimat alfi</string>
+    <string name="check_model_online" comment="Check for dictionaries online">Check for dictionaries online</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_info_header" comment="Dictionary name">Kakkad hana kalimat: %1$s</string>
     <!-- Context: Language Settings menu strings -->
@@ -154,4 +175,6 @@
     <!-- Context: Shared preferences name -->
     <!-- Context: Other strings -->
     <string name="help_bubble_text">Assural bikan da ley badalanal keyboard</string>
+    <!-- Context: anywhere -->
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
 </resources>

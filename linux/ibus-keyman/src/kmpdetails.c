@@ -235,7 +235,6 @@ kmp_json_status get_keyboard_details(const char *kmp_dir, const char *id, keyboa
     JsonParser *parser;
     JsonObject *object;
     JsonNode *root;
-    const gchar *value = NULL;
     gchar *json_file;
     GError *error = NULL;
 
@@ -273,19 +272,15 @@ kmp_json_status get_keyboard_details(const char *kmp_dir, const char *id, keyboa
     }
     g_object_unref(parser);
     return JSON_OK;
-
-
-
 }
 
 kmp_json_status get_kmp_details(const char *kmp_dir, kmp_details *details)
 {
     JsonParser *parser;
-    JsonNode *root, *member_node;
+    JsonNode *root;
     JsonObject *root_object, *object;
     JsonArray *array;
     JsonNode *kmp_system, *kmp_info, *kmp_options, *kmp_files, *kmp_keyboards;
-    const gchar *value = NULL;
     gchar *kmp_json;
     GError *error = NULL;
 
@@ -296,7 +291,6 @@ kmp_json_status get_kmp_details(const char *kmp_dir, kmp_details *details)
         g_free(kmp_json);
         return JSON_FILE_NOT_EXISTS;
     }
-
 
     json_parser_load_from_file (parser,
         kmp_json,

@@ -76,8 +76,9 @@ class KMPKeyboard: Codable, KMPResource {
     var installableKeyboards : [InstallableKeyboard] = []
 
     for language in self.languages {
-      let keyboard = InstallableKeyboard(from: self, packageID: packageId!, lgCode: language.languageId)!
-      installableKeyboards.append( keyboard )
+      if let keyboard = InstallableKeyboard(from: self, packageID: packageId!, lgCode: language.languageId) {
+        installableKeyboards.append( keyboard )
+      }
     }
 
     return installableKeyboards

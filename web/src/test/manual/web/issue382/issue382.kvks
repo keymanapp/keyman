@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<visualkeyboard>
+  <header>
+    <version>10.0</version>
+    <kbdname>issue382</kbdname>
+    <flags/>
+  </header>
+  <encoding name="unicode" fontname="Arial" fontsize="-12">
+    <layer shift="">
+      <key vkey="K_K">Keyman</key>
+    </layer>
+  </encoding>
+</visualkeyboard>

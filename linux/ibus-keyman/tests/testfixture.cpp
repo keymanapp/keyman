@@ -13,16 +13,9 @@
 #include "ibusimcontext.h"
 #include "keycodes.h"
 #include "keymanutil.h"
+#include "KeymanSystemServiceClient.h"
 #include "kmx_test_source.hpp"
 #include "testmodule.h"
-
-#ifdef GDK_WINDOWING_X11
-#include <X11/XKBlib.h>
-#include <gdk/gdkx.h>
-#endif
-#ifdef GDK_WINDOWING_WAYLAND
-#include <gdk/gdkwayland.h>
-#endif
 
 typedef struct {
   IBusBus *bus;
@@ -42,12 +35,7 @@ static gboolean use_wayland   = FALSE;
 static GdkWindow *window      = NULL;
 static GMainLoop *thread_loop = NULL;
 static GTypeModule *module    = NULL;
-#ifdef GDK_WINDOWING_X11
-static Display *display = NULL;
-#endif
-#ifdef GDK_WINDOWING_WAYLAND
-static GdkWaylandDisplay *wldisplay = NULL;
-#endif
+gboolean testing              = TRUE;
 
 static void
 module_register(GTypeModule *module) {
@@ -68,18 +56,6 @@ ibus_keyman_tests_fixture_set_up(IBusKeymanTestsFixture *fixture, gconstpointer 
     g_signal_connect(widget, "destroy", G_CALLBACK(destroy), NULL);
     window = gtk_widget_get_window(widget);
   }
-
-  GdkDisplay *gdkDisplay = gdk_display_get_default();
-#ifdef GDK_WINDOWING_X11
-  if (!use_wayland && !display && GDK_IS_X11_DISPLAY(gdkDisplay)) {
-    display = GDK_DISPLAY_XDISPLAY(gdkDisplay);
-  }
-#endif
-#ifdef GDK_WINDOWING_WAYLAND
-  if (use_wayland && !wldisplay && GDK_IS_WAYLAND_DISPLAY(gdkDisplay)) {
-    wldisplay = GDK_WAYLAND_DISPLAY(gdkDisplay);
-  }
-#endif
 
   if (!loaded) {
     ibus_init();
@@ -114,35 +90,12 @@ ibus_keyman_tests_fixture_tear_down(IBusKeymanTestsFixture *fixture, gconstpoint
 
 static void
 set_caps_lock_state(IBusKeymanTestsFixture *fixture, bool caps_lock_on) {
-#ifdef GDK_WINDOWING_X11
-  if (!use_wayland && display) {
-    XkbLockModifiers(display, XkbUseCoreKbd, LockMask, caps_lock_on ? LockMask : 0);
-    XSync(display, False);
-  }
-#endif
-#ifdef GDK_WINDOWING_WAYLAND
-  if (use_wayland && wldisplay) {
-    // TODO
-  }
-#endif
+  set_capslock_indicator((guint32)caps_lock_on);
 }
 
 static bool
 get_caps_lock_state(IBusKeymanTestsFixture *fixture) {
-#ifdef GDK_WINDOWING_X11
-  if (!use_wayland && display) {
-    XKeyboardState state;
-    XGetKeyboardControl(display, &state);
-    return state.led_mask & 1;
-  }
-#endif
-#ifdef GDK_WINDOWING_WAYLAND
-  if (use_wayland && wldisplay) {
-    // TODO
-  }
-#endif
-
-  return false;
+  return get_capslock_indicator();
 }
 
 static void
@@ -184,7 +137,7 @@ string_format(const std::string &format, Args... args) {
 }
 
 static unsigned short vk_to_keycode(unsigned short vk) {
-  for (int i = 0; i < sizeof(keycode_to_vk); i++) {
+  for (int i = 0; i < (int)sizeof(keycode_to_vk); i++) {
     if (keycode_to_vk[i] == vk)
       return i;
   }
@@ -493,23 +446,6 @@ main(int argc, char *argv[]) {
     return 2;
   }
 
-  if (!argWayland && !argX11) {
-    GdkDisplay *gdkDisplay = gdk_display_get_default();
-#ifdef GDK_WINDOWING_WAYLAND
-    if (GDK_IS_WAYLAND_DISPLAY(gdkDisplay)) {
-      argWayland = true;
-    } else
-#endif
-#ifdef GDK_WINDOWING_X11
-    if (GDK_IS_X11_DISPLAY(gdkDisplay)) {
-      argX11 = true;
-    } else
-#endif
-    {
-      g_error("Neither X11 nor Wayland display!");
-    }
-  }
-
   use_wayland     = argWayland;
   int nTests      = argc - iArg;
   char **tests    = &argv[iArg];
@@ -531,6 +467,7 @@ main(int argc, char *argv[]) {
     if (runSurroundingTextTests) {
       add_test(directory, filename->str, TRUE, skipReason, use_wayland);
     }
+
     if (runNoSurroundingTextTests) {
       add_test(directory, filename->str, FALSE, skipReason, use_wayland);
     }
@@ -540,20 +477,6 @@ main(int argc, char *argv[]) {
 
   // Run tests
   int retVal = g_test_run();
-
-  // Cleanup
-#ifdef GDK_WINDOWING_X11
-  if (!use_wayland && display) {
-    XCloseDisplay(display);
-    display = NULL;
-  }
-#endif
-#ifdef GDK_WINDOWING_WAYLAND
-  if (use_wayland) {
-    // REVIEW: do we have to call something for cleanup?
-    wldisplay = NULL;
-  }
-#endif
 
   test_module_unuse(module);
   return retVal;

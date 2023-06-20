@@ -1,5 +1,1079 @@
 # Keyman Version History
 
+## 17.0.118 alpha 2023-06-05
+
+* chore(ios): replace fv cert (#8900)
+* fix(core): Fix compilation if hotdoc is installed (#8912)
+* feat(linux): Rename column and add tooltip (#8918)
+
+## 17.0.117 alpha 2023-06-04
+
+* chore(developer): verify long lines compile correctly (#8915)
+
+## 17.0.116 alpha 2023-06-02
+
+* feat(linux): Add column for installation location (#8897)
+* chore(developer): verify kvks files and report errors (#8892)
+* refactor(developer): rearrange kmcmplib interface source (#8899)
+* refactor(developer): move filename consistency check to kmc (#8907)
+* chore(developer): loadFile callback error check and optimization (#8908)
+* chore(common): remove url module ref from common/web/types (#8914)
+
+## 17.0.115 alpha 2023-06-01
+
+* refactor(developer): complete fs move out of kmcmplib (#8882)
+* fix(common): tweak pack/publish support for npm 9.5.1 and node 18.16.0 (#8894)
+* feat(linux): Implement Options page and option to disable Sentry error reporting (#7989)
+
+## 17.0.114 alpha 2023-05-31
+
+* chore(developer): replace cwrap wasm bindings (#8857)
+* chore(developer): refactor kmcmplib interfaces (#8870)
+* chore(developer): move keyboard repo fixtures (#8874)
+* chore(linux): Move build steps to build.sh (#8864)
+
+## 17.0.113 alpha 2023-05-26
+
+* docs(android): Update documentation for building Android on Linux (#8860)
+* fix(android): Fix typo in build-utils.sh (#8859)
+* refactor(developer): compiler interface part 1 for wasm (#8850)
+* chore(developer): remove SetError macro (#8856)
+
+## 17.0.112 alpha 2023-05-25
+
+* refactor(developer): move file write out of WriteCompiledKeyboard and CompileKeyboard merge (#8796)
+
+## 17.0.111 alpha 2023-05-24
+
+* fix(android/app): Pathing for publish script (#8845)
+* chore(developer): add test for missing .js file to kmc-package (#8846)
+* feat(linux): Add dbus system service (#8509)
+* chore(linux): Add missing dependency to GHA (#8849)
+
+## 17.0.110 alpha 2023-05-22
+
+* fix(common): ensure child builds don't rebuild dependencies unnecessarily (#8834)
+
+## 17.0.109 alpha 2023-05-17
+
+* fix(windows): add wrap-symbols to Text Editor Makefile (#8819)
+* chore(linux): Make postinst script comply with Debian policy (#8810)
+* chore(windows): remove legacy core and flag  ️ (#8593)
+
+## 17.0.108 alpha 2023-05-16
+
+* feat(windows): add text editor to the support makefile (#8750)
+* feat(developer): verify keyboard versions in kmc-package (#8769)
+* feat(developer): verify bcp47 tags are valid and minimal in kmc-package (#8778)
+* feat(developer): verify at least one language in package (#8783)
+* chore(developer): verify file types of content files in package (#8792)
+* chore(developer): verify that package has at least a model or keyboard (#8793)
+* chore(ios): Changes required for XCode 14.3 (#8746)
+
+## 17.0.107 alpha 2023-05-15
+
+* chore(linux): Fix installation build step on TC (#8784)
+* refactor(android/engine): Consolidate updateSelection (#8739)
+
+## 17.0.106 alpha 2023-05-12
+
+* chore(developer): move package formats to common/web/types (#8729)
+* feat(developer): add package validation (#8740)
+* feat(developer): add validation of package filenames (#8751)
+* feat(developer): validate content file names in packages (#8755)
+* feat(developer): validate package name in compiler (#8757)
+* chore(developer): rename Compiler and related classes (#8726)
+* feat(developer): uset api from wasm! (#8716)
+
+## 17.0.105 alpha 2023-05-11
+
+* chore(common): Update crowdin strings for Amharic (#8748)
+* chore(android/app): Cleanup build-play-store-notes script (#8749)
+* chore(linux): Add build.sh for keyman-config (#8733)
+
+## 17.0.104 alpha 2023-05-10
+
+* chore(developer): rename kmc-keyboard to kmc-ldml (#8725)
+* chore(linux): bring kmp.json for unit test up to spec (#8732)
+* feat(common): add `builder_run_action` shorthand function (#8742)
+
+## 17.0.103 alpha 2023-05-09
+
+* fix(mac): `$CONFIG` not `$CONFIGURATION` in build path (#8724)
+* chore(linux): Fix another problem uploading to launchpad (#8727)
+
+## 17.0.102 alpha 2023-05-08
+
+* chore(linux): Build for Lunar on all platforms (#8713)
+* fix(linux): Fix linux tests (#8510)
+* chore(linux): Fix uploading to launchpad (#8720)
+
+## 17.0.101 alpha 2023-05-05
+
+* chore(common): `set -eu` in build-utils.sh (#8698)
+* fix(android/app): Resize OSK when resuming app from background (#8704)
+
+## 17.0.100 alpha 2023-05-04
+
+*  (#8690)
+*  (#8691)
+
+## 17.0.99 alpha 2023-05-03
+
+* chore(linux): Fix build script (#8705)
+
+## 17.0.98 alpha 2023-05-02
+
+* chore(common): run common and resources tests (#8692)
+
+## 17.0.97 alpha 2023-04-28
+
+* docs(windows): Add verify vs build tools (#8676)
+*  (#8686)
+
+## 17.0.96 alpha 2023-04-27
+
+* chore(android): Update QRGen version for Java 11 (#8673)
+* refactor(android/engine): Move toggleSuggestionBanner to KMKeyboard (#8679)
+* refactor(android/engine): Use isKeyboardLoaded() on a consistent basis (#8680)
+* chore(developer): test message correctness in compiler modules (#8664)
+* chore(developer): add eslint devDependency for kmc (#8665)
+* chore(developer): kmc-keyboard should not use any node-specific modules (#8666)
+* fix(common): builder parse multi-param order (#8668)
+* refactor(developer): use callbacks to avoid direct fs access in kmc-package (#8674)
+* refactor(android/engine): Move shouldIgnore booleans to KMKeyboard (#8682)
+* chore(linux): Build for Ubuntu 23.04 Lunar as well (#8683)
+
+## 17.0.95 alpha 2023-04-26
+
+* refactor(android/engine): Move currentBanner to KMKeyboard (#8671)
+* chore(android/engine): Remove jvm args (#8675)
+* fix(developer): kmc: fix jis/abnt2 scan codes (#8670)
+
+## 17.0.94 alpha 2023-04-25
+
+* fix(android/engine): Update InApp input connection (#8647)
+* chore(common): Move the_99 test fixture keyboard (#8660)
+* chore(android): Move namespace to Gradle files (#8667)
+
+## 17.0.93 alpha 2023-04-24
+
+* feat(common): kmx file reader (#8641)
+* feat(developer): support FollowKeyboardVersion in kmc-package (#8642)
+* chore(common): Update crowdin strings for Simplified Chinese (#8653)
+* fix(common): builder - pass deps flags to child scripts (#8654)
+* feat(developer): use CompilerEvent for messages in all of kmc (#8651)
+* chore(developer): fixup deps for kmc modules (#8652)
+* feat(core): ldml repertoire test, initial ICU integration (#8441)
+
+## 17.0.92 alpha 2023-04-21
+
+* fix(developer): kmc-package path reference (#8634)
+* chore(developer): only run keyboards-repo tests for a full-test (#8635)
+* refactor(developer): move comperr.h to kmn_compiler_errors.h (#8636)
+* refactor(developer): kmc-model to use `CompilerEvent` (#8637)
+
+## 17.0.91 alpha 2023-04-20
+
+* fix(developer): kmc-kmn would abort build on warnings (#8617)
+* fix(developer): kmc no longer emits double file extension for models (#8618)
+* refactor(developer): move build activities (#8622)
+* feat(developer): add warning options to kmc (#8623)
+* feat(developer): use new message infrastructure in kmc-kmn (#8625)
+* refactor(developer): move shared test helpers into common (#8626)
+* feat(developer): add CompilerMessages support to kmc-package (#8627)
+* feat(developer): warn if .kps file includes a non-binary .kvk file (#8628)
+* chore(web): sets kmc-model as dependency of input-processor test action (#8629)
+* fix(android/engine): Fix resetContext calls when selection changes (#8611)
+
+## 17.0.90 alpha 2023-04-19
+
+* chore(android/engine): Cleanup old SDK calls (#8612)
+* fix(developer): package editor no longer loses RTL flag for LMs (#8606)
+
+## 17.0.89 alpha 2023-04-18
+
+* chore(developer): tweak build of extension list in kmc (#8597)
+* docs(ios): Add help page for Settings (#8546)
+* fix(developer): add missing dependencies (#8605)
+
+## 17.0.88 alpha 2023-04-17
+
+* docs(android): Update Linux dev environment for Java 11 (#8596)
+
+## 17.0.87 alpha 2023-04-13
+
+* refactor(developer): DRY kmc module references (#8577)
+* chore(developer): kmc-kmn should build all baseline fixtures (#8578)
+* fix(developer): kmc should not validate as well as compile keyboard (#8579)
+* fix(developer): improve 'does not exist' error message (#8580)
+* fix(common): consolidate npm publishing (#8587)
+* chore(common): add missing deps and files for npm publish (#8588)
+
+## 17.0.86 alpha 2023-04-12
+
+* docs(windows): link to wiki architecture faq page (#8584)
+
+## 17.0.85 alpha 2023-04-11
+
+* chore(developer): AddWarning and SetError cleanup (#8571)
+* fix(developer): add DRY_RUN variable to build.sh (#8576)
+* fix(ios): fixes xcode-triggered debug, run builds (#8575)
+
+## 17.0.84 alpha 2023-04-10
+
+* epic: kmcompx - kmcmpdll cross-platform compiler (#7330)
+* chore(android): Update projects to use Java 11 (#8543)
+* docs: clarify dependency meanings in build-utils (#8567)
+* fix(mac): fix corrupt installer (#8565)
+
+## 17.0.83 alpha 2023-04-05
+
+* fix(windows): use right instead of left alignment for popup buttons (#8561)
+
+## 17.0.82 alpha 2023-03-31
+
+* feat(developer): support jis and abnt2 (#8513)
+* revert: #8549 "chore(web): merge master into feature-esmodule-web-engine (A17S9 end)  " (#8553)
+
+## 17.0.81 alpha 2023-03-30
+
+* feat(windows): simple text editor using Edit Control (#8391)
+
+## 17.0.80 alpha 2023-03-29
+
+* chore(linux): Remove dependency on `sudo` (#8535)
+* chore(linux): Improve robustness of test cleanup (#8536)
+* fix(linux): Remove warning after pressing Close button (#8538)
+
+## 17.0.79 alpha 2023-03-28
+
+* chore(linux): Revert "Run and ignore autopkgtests on s390x" (#8506)
+* docs(linux): Update minimum required Ubuntu version (#8526)
+* docs(linux): Update common questions (#8532)
+
+## 17.0.78 alpha 2023-03-27
+
+* chore(linux): Remove python3-raven dependency (#8507)
+* refactor(android/engine): Make KMKeyboardJSHandler a normal class (#8494)
+
+## 17.0.77 alpha 2023-03-25
+
+* chore(common): use mac /usr/bin/stat rather than homebrew version (#8498)
+
+## 17.0.76 alpha 2023-03-24
+
+* chore(linux): Run and ignore autopkgtests on s390x (#8492)
+* refactor(android/engine): Consolidate dispatchKey (#8483)
+
+## 17.0.75 alpha 2023-03-23
+
+* chore(common): define BUILDER_CONFIGURATION env var (#8496)
+
+## 17.0.74 alpha 2023-03-22
+
+* chore(windows): update sentry-native to 0.6.0 (#8464)
+* chore(linux): Prevent building on s390x (#8477)
+* fix(linux): Display error message for corrupt .kmp file (#8479)
+
+## 17.0.73 alpha 2023-03-21
+
+* refactor(android/engine): Consolidate insertText (#8438)
+* chore(common): prevent multiple npm ci runs in child scripts (#8484)
+
+## 17.0.72 alpha 2023-03-20
+
+* chore(common): die early when --ci and --debug passed to test.sh (#8465)
+* chore(common): Update crowdin strings for Kibaku (#8447)
+
+## 17.0.71 alpha 2023-03-18
+
+* fix(core): ldml update fr-azerty for VKEY mapping (#8434)
+
+## 17.0.70 alpha 2023-03-17
+
+* chore(android): Document builder script steps (#8449)
+
+## 17.0.69 alpha 2023-03-16
+
+* chore(web): Cleanup build echo (#8446)
+* fix(developer): lm compiler handle missing line no in errors (#8444)
+* fix(android/app): Temporarily disable Keyman browser (#8430)
+* fix(android/engine): Add builder output for configure (#8442)
+* chore(linux): Update debian changelog (#8452)
+
+## 17.0.68 alpha 2023-03-15
+
+* chore(common): add common test build configurations (#8431)
+* fix(common): fix broken common/web/types cases (#8426)
+* fix(developer/compilers): locks esbuild target detection for kmc building (#8437)
+*  (#8412)
+*  (#8436)
+* chore(linux): Use dependency on core in ibus-keyman/build.sh (#8423)
+
+## 17.0.67 alpha 2023-03-14
+
+* (developer):Update copyright period in License.rtf (#8425)
+* chore(common): support shorthand for build.sh (#8415)
+* chore(common): build script performance improvements (#8416)
+* chore(common): TS updates to non-sync'd packages, feature-esmodule merge conflict prevention (#8429)
+
+## 17.0.66 alpha 2023-03-13
+
+* refactor(android): Use builder scripts (#7407)
+
+## 17.0.65 alpha 2023-03-12
+
+* refactor(core): consolidate wasm defs (#8409)
+
+## 17.0.64 alpha 2023-03-10
+
+* feat(common): support single target for a dependency (#8404)
+* chore(core): breadth-first build (#8400)
+* refactor(common): Make build-help into helper functions (#8386)
+
+## 17.0.63 alpha 2023-03-09
+
+* fix(web): --no-minify, not --skip-minify (#8394)
+* chore(core): Remove obsolete `--target-path` option (#8376)
+
+## 17.0.62 alpha 2023-03-08
+
+* chore(linux): Remove debug output from packaging GHA (#8372)
+* chore: merge feature-ldml to master, again (#8377)
+* chore(common): cleanup build.inc.sh echo (#8344)
+* chore(common): remove vswhere (#8357)
+* feat(linux): Add DBus method `SendText` (#8039)
+* chore(core): Create both dynamic and static libs on Linux (#8375)
+* chore(common): clean up `--debug` usage in build scripts (#8382)
+* feat(common): builder.inc.sh inheritable options (#8384)
+
+## 17.0.61 alpha 2023-03-03
+
+* fix(android/app): Another attempt at fixing OSK rotation (#8353)
+
+## 17.0.60 alpha 2023-03-02
+
+* fix(android/engine): Fix various OSK bugs due to refactor (#8349)
+* feat(core): Build both architectures for mac and generate a 'fat' library for them (#8342)
+* fix(common): fixup npm publish (#8350)
+* chore(linux): More GHA debugging (#8354)
+
+## 17.0.59 alpha 2023-03-01
+
+* fix(common): builder: skip dependency build for clean action (#8341)
+* chore(web): fixup dependencies in web build script (#8332)
+* chore(linux): More debug output (#8345)
+
+## 17.0.58 alpha 2023-02-28
+
+* chore(common): fix child build error handling (#8327)
+* chore(linux): Improve and fix packaging GHA (#8328)
+* fix(linux): Fix ibus-keyman/build.sh (#8329)
+* epic: LDML keyboard support (#7054)
+* fix(linux): Fix debian postinst script (#8294)
+
+## 17.0.57 alpha 2023-02-26
+
+* chore(android/app): Revert #8291 (#8314)
+
+## 17.0.56 alpha 2023-02-24
+
+* fix(linux): Fix upload in packaging GHA (#8308)
+* feat(common): adds warning if described output does not exist (#8304)
+* chore(linux): Improve detecting presence of test files (#8313)
+
+## 17.0.55 alpha 2023-02-23
+
+* chore(docs): update docs due to Mac Ventura (#8277)
+* chore: remove greadlink from standard script prolog (#8288)
+* chore: use builtin instead of dirname for perf (#8289)
+* chore(common): stats script for planning (#7861)
+
+## 17.0.54 alpha 2023-02-22
+
+* fix(ios): allow duplicate languages in kmp file (#8125)
+* fix(linux): Fix paths in upload action of packaging GHA (#8285)
+* fix(android/app): Fix OSK width when rotating (#8291)
+
+## 17.0.53 alpha 2023-02-21
+
+* chore(windows): Remove old Kannada setup strings (#8257)
+* fix(linux): Collect consecutive backspaces (#8274)
+* chore(linux): Improve deb-packaging GHA (#8281)
+* chore(linux): Cleanup GHA (#8282)
+
+## 17.0.52 alpha 2023-02-20
+
+* fix(windows): use min-width allow to expand (#8215)
+* chore(web): minor cleanup of web/build.sh (#8254)
+* fix(web): `--no-minify`, not `--skip-minify` (#8264)
+* chore(web): Actually skip browser-stack for non-web builds (#8266)
+* chore: cleanup some of shellHelperFunctions.sh (#8260)
+* chore: consolidate script helper functions (#8261)
+* chore(linux): Output results of API verification on stderr (#8241)
+* chore(linux): Create draft PR after updating changelog (#8242)
+* fix(linux): Checkout before  running apt-install (#8247)
+* fix(linux): Fix bug in deb-packaging script (#8273)
+* chore(developer): update bundled node to 18.14.1 LTS (#8268)
+* chore(developer): ignore Esc key when compiling (#8263)
+* docs: builder.inc.sh improved documentation around dependencies (#8173)
+* chore(linux): Add build.sh to ibus-keyman  ️ (#8112)
+
+## 17.0.51 alpha 2023-02-18
+
+* chore(common): Update Fula strings for Sprint A17S6 (#8245)
+
+## 17.0.50 alpha 2023-02-16
+
+* feat(common): parent-child scripts for builder (#8198)
+* fix(linux): Another iteration to fix packaging GHA (#8230)
+* chore(common): updates Web & Web-related dependencies (#8196)
+* fix(linux): Fix syntax for skipping upload in packaging GHA (#8236)
+
+## 17.0.49 alpha 2023-02-15
+
+* feat(linux): Pass PR# in the event type (#8221)
+* feat(linux): Implement uploading of packages in packaging GHA (#8223)
+* fix(linux): Fix GHA package build (#8225)
+* fix(linux): Another fix for GHA package build (#8228)
+
+## 17.0.48 alpha 2023-02-14
+
+* fix(developer): Select BCP47 Code dialog inconsistencies (#8179)
+* chore(common): automatically apply _builder_check_color (#8197)
+* docs(linux): Update packaging documentation (#8202)
+* chore(common): Report status if no platform needs build (#8210)
+* chore(linux): Exclude autopkg tests on s390x (#8218)
+* fix(linux): Fix path to symbols file in packaging GHA (#8209)
+
+## 17.0.47 alpha 2023-02-10
+
+* fix(linux): Fix autopkgtests (#8201)
+* fix(linux): Fix Verify-API step of GHA (#8199)
+
+## 17.0.46 alpha 2023-02-09
+
+* fix(windows): add remove lang id uses correct keyboard id (#8186)
+* chore(common): add `builder_term` function (#8187)
+* chore(common): builder internal dependencies (#8188)
+* chore(linux): Update changelog from Debian (#8192)
+* feat(linux): Add debian packaging GHA (#7911)
+
+## 17.0.45 alpha 2023-02-08
+
+* chore(ios): update certificate (#8176)
+* fix(linux): Fix autopkgtests (#8181)
+* chore(common): Cleanup Kannada locale (#8182)
+* chore(windows): Fix Portuguese UI language name (#8184)
+
+## 17.0.44 alpha 2023-02-07
+
+* chore(linux): Set test-helper script executable (#8178)
+* chore(linux): Update debian changelog (#8156)
+
+## 17.0.43 alpha 2023-02-06
+
+* chore(linux): Build with meson instead of autotools  ️ (#8111)
+
+## 17.0.42 alpha 2023-02-03
+
+* chore(deps): bump http-cache-semantics from 4.1.0 to 4.1.1 (#8144)
+* feat(developer): check for duplicated language codes in package editor and compiler (#8151)
+* chore: Fail TC build if triggering Jenkins build fails (#8152)
+* chore(linux): Fix lintian warnings (#8154)
+* chore(core): Update meson version (#7882)
+* refactor(android/engine): Consolidate Keyboard picker intent (#8163)
+
+## 17.0.41 alpha 2023-02-02
+
+* chore(web): main web build & test script rework to our common script format + nomenclature (#7474)
+* change(web): conversion to standard filesystem layout:  source -> src, intermediate + release -> build (#7513)
+* change(web): conversion to standard filesystem layout:  testing -> src/test/manual, unit_tests -> src/test/auto (#7515)
+* change(web): conversion to standard filesystem layout:  tools -> src/tools (#7556)
+* chore(web): updates build product references, extracts CI test-build scripts (#7831)
+* feat(common): TS-based sourcemap remapping tool (#7894)
+* feat(web): implements shell scripting for CI release-build configurations (#8001)
+
+## 17.0.40 alpha 2023-02-01
+
+* chore(developer): kmcmpdll debug src path (#8127)
+* chore(common): Merge end of beta from Sprint A17S5 (#8135)
+* refactor(android): Change com.tavultesoft.kmea package to com.keyman.engine (#7981)
+* refactor(android/engine): Split KMInAppKeyboardWebViewClient to new class (#7983)
+* refactor(android/engine): Refactor KMSystemKeyboardWebViewClient (#7993)
+
+## 17.0.39 alpha 2023-01-31
+
+* feat(windows): add additional registry keys to report (#8126)
+
+## 17.0.38 alpha 2023-01-30
+
+* chore(deps): bump ua-parser-js from 0.7.31 to 0.7.33 (#8109)
+* fix(linux): Fix CI build (#8121)
+
+## 17.0.37 alpha 2023-01-27
+
+* chore(linux): Fix warnings (#8103)
+* chore(linux): Remove legacy projects (#8102)
+* Specify the path to the Debian package in the Vcs-Git header (#8104)
+
+## 17.0.36 alpha 2023-01-26
+
+* chore(common): Add crowdin strings for Kannada (#8074)
+
+## 17.0.35 alpha 2023-01-25
+
+* chore(common): revise tag variable name to VERSION_GIT_TAG (#8063)
+* chore(common): Add crowdin strings for Czech (#8070)
+* feat(linux): Improve uninstallation (#8011)
+
+## 17.0.34 alpha 2023-01-24
+
+* chore: merge beta to alpha, end of A17S4 (#8065)
+
+## 17.0.33 alpha 2023-01-23
+
+* chore: Xcode 14.2 update (#8015)
+
+## 17.0.32 alpha 2023-01-20
+
+* fix(ios): use mobile mode for keyboard download pages (#8042)
+* docs(common/resources): Update configure step in Docker readme (#8034)
+* fix(linux): JSON File missing after installation (#8040)
+
+## 17.0.31 alpha 2023-01-19
+
+* chore: git tag with release@semver (#8035)
+* fix(linux): Properly set context after changing IP (#8026)
+* chore(linux): use faster zero-length string check (#8037)
+* chore(linux): log failures to `km_kbp_context_clear(context)` (#8036)
+* chore(linux): Update recommended extension (#8038)
+
+## 17.0.30 alpha 2023-01-17
+
+* chore(linux): Fix vertical alignment of label (#8016)
+* fix(common): update sentry release identifiers to support semver (#8031)
+
+## 17.0.29 alpha 2023-01-16
+
+* fix(linux): Fix crash (un-)installing shared keyboard (#8020)
+* chore(linux): Don't report KeyboardInterrupt to Sentry (#8021)
+* chore(linux): Update sample settings (#8018)
+* feat(linux): Enhance tab completion in km-package-install (#8005)
+
+## 17.0.28 alpha 2023-01-12
+
+* feat(linux): Display error messages in the UI (#8006)
+* bug(linux): Empty keyboard after failed installation (#8008)
+
+## 17.0.27 alpha 2023-01-11
+
+* chore(linux): Refactor completion script (#8002)
+
+## 17.0.26 alpha 2023-01-10
+
+* feat(linux): Add Back button to "Download Keyman Keyboards" dialog (#7994)
+* feat(linux): List fonts in the uninstall confirmation dialog (#7995)
+
+## 17.0.25 alpha 2023-01-09
+
+* chore(linux): Remove unnecessary variable (#7988)
+
+## 17.0.24 alpha 2023-01-06
+
+* chore(common/resources): Add Docker readme (#7980)
+
+## 17.0.23 alpha 2023-01-03
+
+* fix(linux): add IBUS_HAS_PREFILTER ifdef to linux/ibus-keyman/tests (#7958)
+* docs(linux): document fullbuild using docker (#7960)
+
+## 17.0.22 alpha 2023-01-02
+
+* chore: merge beta to master (A17S2) (#7948)
+* chore(linux): Remove unused JENKINS parameter (#7920)
+
+## 17.0.21 alpha 2022-12-21
+
+* fix(windows): shutdown fix masked modal result (#7933)
+
+## 17.0.20 alpha 2022-12-19
+
+* chore(android/samples): Remove Sentry dependencies (#7901)
+* chore: Revert "chore(common): Fix shellcheck warnings" (#7925)
+
+## 17.0.19 alpha 2022-12-17
+
+* fix(linux): Fix dependency of ibus-keyman (#7918)
+
+## 17.0.18 alpha 2022-12-16
+
+* chore(common): Fix shellcheck warnings (#7910)
+
+## 17.0.17 alpha 2022-12-15
+
+* chore: merge beta to master (#7885)
+* chore(android): Update Gradle dependencies; targetSDKVersion to 33 (#7897)
+
+## 17.0.16 alpha 2022-12-11
+
+* refactor(linux): Update ibusimcontext.c (#7813)
+
+## 17.0.15 alpha 2022-12-08
+
+* chore(linux): Update vscode settings for Linux (#7876)
+
+## 17.0.14 alpha 2022-12-07
+
+* docs(linux): Move Linux documentation (#7868)
+* chore(linux): Remove building for Bionic (#7873)
+* chore(linux): Remove some shellcheck warnings (#7874)
+
+## 17.0.13 alpha 2022-11-29
+
+* fix(windows): lower case filenames for projects (#7837)
+* refactor(linux): Refactor setting keyboard options (#7804)
+
+## 17.0.12 alpha 2022-11-25
+
+* chore(common): Merge beta from Sprint B16S2 to master (#7815)
+
+## 17.0.11 alpha 2022-11-24
+
+* refactor(linux): Use consts instead of strings (#7803)
+
+## 17.0.10 alpha 2022-11-21
+
+* fix: automatically merge changes to history back to master (#7777)
+* chore: cleanup history (#7776)
+
+## 17.0.9 alpha 2022-11-18
+
+* chore: github issue template config.yml (#7751)
+* chore(windows): tweak sentry client for cross-module messages (#7752)
+* chore(android): Update Target SDK Version to 31 (#7761)
+
+## 17.0.8 alpha 2022-11-17
+
+* fix(android): bump version_code major calculation (#7736)
+
+## 17.0.7 alpha 2022-11-13
+
+* chore: fix TIER.md for master (#7704)
+
+## 17.0.6 alpha 2022-11-12
+
+* chore: merge beta to master B16S1 (#7693)
+* chore(deps): bump minimatch from 3.0.4 to 3.1.2 (#7675)
+
+## 17.0.5 alpha 2022-11-11
+
+* chore(linux): Update debian changelog (#7681)
+
+## 17.0.4 alpha 2022-11-10
+
+* chore(deps): bump socket.io-parser from 4.0.4 to 4.0.5 (#7672)
+
+## 17.0.3 alpha 2022-11-09
+
+* fix(windows): Cleanup CEF more correctly in shutdown (#7661)
+
+## 17.0.2 alpha 2022-11-01
+
+* fix(android): Handle empty Play Store release notes (#7581)
+
+## 17.0.1 alpha 2022-10-31
+
+* fix(ios): iPad was not recognised as tablet device (#7563)
+* feat(windows): configuration UI polish (#7206)
+* chore: move to 17.0-alpha (#7577)
+* chore: Move to 17.0 alpha
+
+## 16.0.136 beta 2023-01-31
+
+* chore(common): Update crowdin strings for Shuwa (Latin) (#8097)
+* chore(common): Check in crowdin for Russian (#8072)
+* chore(common): Check in crowdin for Ukrainian (#8073)
+* chore(common): Add crowdin for Swedish (#8071)
+* chore(common): Add crowdin strings for Czech (#8095)
+
+## 16.0.135 beta 2023-01-30
+
+* chore(linux): Include packaging path in Vcs-Git header (#8110)
+
+## 16.0.134 beta 2023-01-25
+
+* chore(common): Add crowdin strings for Kannada (#7970)
+
+## 16.0.133 beta 2023-01-19
+
+* fix(linux): Properly set context after changing IP (#8025)
+
+## 16.0.132 beta 2023-01-18
+
+* docs(windows): update screenshots and documentation for Keyman for Windows config (#8014)
+
+## 16.0.131 beta 2023-01-16
+
+* chore(linux): Don't report KeyboardInterrupt to Sentry (#8022)
+* fix(linux): Fix crash (un-)installing shared keyboard (#8019)
+
+## 16.0.130 beta 2023-01-09
+
+* fix(windows): kmshell -ikl install language and enable keyboard (#7856)
+
+## 16.0.129 beta 2023-01-06
+
+* fix(android/engine): Add utility for localized strings (#7976)
+
+## 16.0.128 beta 2022-12-22
+
+* fix(developer): force ES3 code generation for LMs (#7927)
+
+## 16.0.127 beta 2022-12-21
+
+* fix(oem/fv/android): Fix keyboard version title (again) (#7941)
+* fix(oem/fv/android): Add view permission of online help (#7909)
+* fix(windows): modifer event is always serialized (#7935)
+
+## 16.0.126 beta 2022-12-21
+
+* fix(windows): shutdown fix masked modal result (#7932)
+
+## 16.0.125 beta 2022-12-19
+
+* fix(windows): no languages warning source changed (#7900)
+
+## 16.0.124 beta 2022-12-18
+
+* fix(oem/fv/android): Cleanup version title (#7908)
+
+## 16.0.123 beta 2022-12-17
+
+* fix(linux): Fix dependency of ibus-keyman (#7917)
+
+## 16.0.122 beta 2022-12-14
+
+* fix(windows): modify disable keyboard display (#7898)
+* fix(developer): invalid charmap cell selection when updating to empty search result (#7887)
+
+## 16.0.121 beta 2022-12-11
+
+* chore(linux): Fix `make install` (#7886)
+
+## 16.0.120 beta 2022-12-07
+
+* chore(linux): Improve package build (#7875)
+
+## 16.0.119 beta 2022-12-05
+
+* chore: Change platform advocates (#7867)
+
+## 16.0.118 beta 2022-12-04
+
+* chore(linux): Update debian changelog (#7860)
+
+## 16.0.117 beta 2022-12-01
+
+* fix(developer): OnlineUpdate crash on shutdown (#7830)
+* fix(developer): EncodeURL was not handling spaces (#7820)
+
+## 16.0.116 beta 2022-11-30
+
+* fix(android/app): Toggle keyboard update notifications for landscape and tablets (#7832)
+* fix(android/engine): Append languageID for keyboard updates (#7807)
+* fix(android/engine): Use FLAG_IMMUTABLE for PendingIntent for Android S+ (#7844)
+
+## 16.0.115 beta 2022-11-29
+
+* fix(windows): Cleanup CEF more correctly in shutdown (#7825)
+* fix(windows): lower case filenames for projects (#7836)
+* chore(linux): Update debian changelog (#7835)
+* chore(linux): Fix upload-to-debian script (#7833)
+
+## 16.0.114 beta 2022-11-28
+
+* fix(mac): Caps processing was not consistent with core (#7795)
+* fix(web): locks page scroll when scrolling lang menu (#7790)
+
+## 16.0.113 beta 2022-11-26
+
+* docs(android/app): Add note of haptic feedback to whatsnew (#7817)
+* fix(developer): remove missing files from MRU list (#7821)
+
+## 16.0.112 beta 2022-11-25
+
+* fix: test builds should always run latest changes (#7806)
+* fix(web): unit test breakages (#7797)
+
+## 16.0.111 beta 2022-11-24
+
+* fix(android/engine): Make it easier to test keyboard updates (#7781)
+
+## 16.0.110 beta 2022-11-23
+
+* fix(linux): Revert "fix(linux): Fix a warning" (#7783)
+* fix: automatically merge changes to history back to master (#7780)
+* chore(common): Update whatsnew for 16.0 (#7789)
+* fix(web): inferred key text + spacebar caption scaling (#7741)
+* feat(web): re-implementation of introductory globe-key help bubble (#7612)
+* fix(android/engine): Fix logic error for updateKMP (#7799)
+* fix(linux): Allow to build without patched ibus version (#7792)
+* chore(linux): Update autotools configuration (#7793)
+* docs(ios): Update help documentation about Install and Allow Full Access (#7791)
+* fix(android/engine): Update versions of matching package and keyboard ID (#7740)
+
+## 16.0.109 beta 2022-11-22
+
+* fix(windows): arrow keys need to select next/prev item in options tab (#7756)
+* fix(windows): buttons should be in list in Options tab (#7757)
+* fix(android/engine): Add null check on kmp filename (#7787)
+* fix(ios): make text size of in-app editor consistent with slider (#7782)
+* fix(android/engine): Check if kmp.json is null (#7788)
+* fix(mac): Enable right-alt/option key mapping (#7762)
+* feat(linux): Add symbols file (#7742)
+
+## 16.0.108 beta 2022-11-21
+
+* fix(windows): backout ms button style for add lang pop up (#7765)
+* fix(android/app): Only check Install Referrer API with Play Store installs (#7766)
+* fix(windows): Fix text selectable configuration (#7758)
+* feat(common/models): directional quote insensitivity (#7767)
+* chore(windows): remove unused options from locales and UI (#7760)
+* fix(developer): cast to prevent ERangeError for failed http reqs in CEF (#7775)
+* chore(android): Update Target SDK Version to 31 (#7768)
+
+## 16.0.107 beta 2022-11-18
+
+* fix(windows): Download Keyboard blue footer (#7755)
+* fix(windows): tweak elevate icon in Config dialog (#7754)
+* fix(web): documentation keyboard style application + layout (#7694)
+* fix(windows): fix checkbox and hint help button styles (#7764)
+* chore(common): Update crowin strings for Fulfulde (#7715)
+* fix(linux): Fix installation if shared kbd already installed (#7730)
+* fix(linux): Fix a warning (#7746)
+* chore(common): Update crowdin strings for Simplified Chinese (#7713)
+
+## 16.0.106 beta 2022-11-17
+
+* chore(windows): set platform core env explicitly (#7689)
+* fix(android): bump version_code major calculation (#7735)
+* fix(android/engine): Remove duplicate file suffix when installing .kmp (#7720)
+* fix(linux): Ignore dbus exception when testing for fcitx (#7732)
+* fix(linux): Fix lintian warnings (#7733)
+* feat(linux): Add optional bcp47 parameter to km-package-install (#7731)
+
+## 16.0.105 beta 2022-11-16
+
+* chore(windows): add unit test for SetupCoreEnvironment (#7714)
+* docs(linux): Add example for keyman:// URL format (#7726)
+* fix(linux): set DEB_VERSION (#7727)
+* fix(linux): Don't crash if `und` is specified without `fonipa` (#7728)
+
+## 16.0.104 beta 2022-11-15
+
+* chore(android/engine): Add more logging for keyboard restart (#7719)
+
+## 16.0.103 beta 2022-11-14
+
+* fix(windows): click in 1 pixel high box in Language Switch window caused crash (#7699)
+* chore(windows): add sentry traces for unsolved crashes (#7703)
+* fix(windows): handle timeout in downloads (#7709)
+* chore(windows): Add safecall for internal CustomisationStorage API interface (#7707)
+* chore(windows): include debug info in keyman build (#7710)
+* fix(windows): check if permissions for thread to access file (#7207)
+* refactor(linux): Use consts instead of strings (#7686)
+
+## 16.0.102 beta 2022-11-12
+
+* fix(windows): make sure IdStackWindows finalizes after Vcl.Forms (#7692)
+* fix(android/app): Append tier to app name (#7674)
+* chore(android/app): Remove debugging info on build.gradle (#7700)
+
+## 16.0.101 beta 2022-11-11
+
+* fix(windows): Improve shutdown robustness (#7677)
+* fix(windows): base layout support in Keyman Core (#7667)
+* fix(developer): URL parameters should be UTF-8 (#7631)
+* fix(android/engine): Use IME package name if query permission denied (#7668)
+* fix(linux): Fix keyboard icon in system tray (#7678)
+* chore(linux): Update debian changelog :cherries: (#7682)
+* chore(linux): Update Debian standards version (#7683)
+
+## 16.0.100 beta 2022-11-10
+
+* chore(linux): Update whatsnew (#7660)
+* chore: Update history-and-versioning to match history (#7669)
+* chore(linux): Update debian changelog (#7492)
+* chore(android/engine): Don't show Toast errors on stable tier (#7676)
+* fix(web): Add additional checks on className.indexOf (#7662)
+
+## 16.0.99 beta 2022-11-09
+
+* fix(web): Add polyfill for Array.includes() (#7646)
+* fix(web): Add polyfill for Array.findIndex() (#7652)
+* fix(developer): handle edge cases for app sources (#7654)
+* fix(developer): handle shutdown cleanup more cleanly (#7655)
+* fix(developer): handle crash reports without Keyman Engine installed (#7657)
+* fix(developer): handle unpaired surrogate (#7659)
+* fix(core): `save()` should be on internal kmx action queue (#7644)
+* fix(core): emit keystroke was writing to wrong queue (#7650)
+
+## 16.0.98 beta 2022-11-08
+
+* fix(android/engine): Check temporary kmp file is valid (#7620)
+* fix(developer): set keyman.osk immediately after switching device type (#7624)
+* fix(developer): update monaco editor to 0.15.6 (#7626)
+* chore(developer): tidy up compile hints (#7633)
+* fix(developer): handle EEncodingError loading text file (#7635)
+* fix(developer): prevent exception in charmap when unable to focus (#7640)
+* fix(developer): disable Keyboard|Compile if no project loaded (#7642)
+* fix(web): Handle undefined keyId in multi-tap (#7648)
+* fix(developer): kmlmc has runtime dependency on keyman-version (#7651)
+* fix(web): avoid reset for touch system keyboard (#7638)
+* fix(developer): improve support for inferred key cap text (#7617)
+
+## 16.0.97 beta 2022-11-04
+
+* fix(android/app): Don't show "Get Started" after setting Keyman as default system keyboard (#7587)
+* fix(windows): include debug info in kmshell build (#7600)
+* fix(developer): tweak captions for consistency (#7607)
+* fix(mac): replace white background keyman system menu icon with transparent one (#7610)
+
+## 16.0.96 beta 2022-11-03
+
+* fix(developer): Make Details and Build tabs scrollable (#7593)
+* fix(developer): support gif preview images in Package Editor (#7594)
+* fix(developer): handle high-bit-set HKL correctly (#7601)
+* fix(android/app): Add check if bundle to PackageActivity is null (#7603)
+* fix(common): always define dry_run variable (#7604)
+* feat(web): Custom layer targets for Shift double-tap (#7608)
+* fix(android/engine): Handle parsing empty JSONArray as JSONObject (#7611)
+
+## 16.0.95 beta 2022-11-02
+
+* fix(developer): Use US base layout for debugger (#7531)
+* fix(developer): ensure kmlmp handles paths (#7580)
+* fix(developer): prevent repeated `begin` statements (#7583)
+* fix(developer): remove ancient samples (#7586)
+* fix(developer): generate a default icon for basic keyboard projects (#7584)
+* fix(developer): avoid reformatting unchanged system stores (#7585)
+* fix(developer): publish `@keymanapp/keyman-version` to npm (#7595)
+
+## 16.0.94 beta 2022-10-31
+
+* fix(ios): iPad was not recognised as tablet device (#7563)
+* feat(windows): configuration UI polish (#7206)
+
+## 16.0.93 beta 2022-11-01
+
+* chore: move to 16.0 beta
+
+## 16.0.92 alpha 2022-10-31
+
+* fix(android/engine): Add FLAG_ACTIVITY_NEW_TASK flag for resource update (#7572)
+* change(common/models): prevent integration test flakiness due to prediction-search timeouts (#7571)
+* chore: make git pre-commit hook executable (#7573)
+* fix(web): bulk renderer update (#7516)
+
+## 16.0.91 alpha 2022-10-28
+
+* fix(developer): handle LControl being set by Windows when AltGr pressed (#7530)
+* chore(windows): convert `wm_keyman_keyevent` and `wm_keyman_modifierevent` to private `WM_USER` messages (#7546)
+* chore(common): Update help references from 15.0 to 16.0 (#7558)
+* fix(core): remove `KMN_API` from callback spec (#7520)
+* fix(developer): exclude `nocaps` from layer id modifier components (#7553)
+* fix(web): model language ids now case-insensitive (#7557)
+* fix(android/engine): Dismiss subkeys when hiding keyboard (#7555)
+
+## 16.0.90 alpha 2022-10-27
+
+* chore(common): update configure-repo.sh to include pre-commit hook (#7545)
+* chore(common): Add crowdin strings for Dutch (#7498)
+
+## 16.0.89 alpha 2022-10-26
+
+* fix(core): Add missing include files (#7504)
+* fix(linux): Improve setting context (#7084)
+* feat(windows): Change "None" to "No Hotkey" matching new config (#7539)
+* feat(web): keyboard layout spec now allows numeric width, pad, sp (#7486)
+* chore(common): update actions to node16 (#7525)
+* chore(web): KMW dev-tools reorganization, cleanup, script updates (#7463)
+* fix(web): allow `isChiral()` to accept string name parameter of keyboard (#7544)
+* fix(web): ensures keyboard does not change underneath OSK keystroke (#7543)
+
+## 16.0.88 alpha 2022-10-25
+
+* fix(common): ignore deps when formatting help (#7514)
+* refactor(linux): Comment unused methods (#7501)
+* chore(linux): Rename internal method to `commit_string` (#7502)
+* chore(linux): call `reset_context` instead of `...focus_in` (#7503)
+* chore(common): Update crowdin strings for Amharic (#7522)
+* chore(android): Update help whatsnew for 16.0 (#7507)
+* chore(common): Update existing crowdin strings for 16.0 (#7524)
+
+## 16.0.87 alpha 2022-10-24
+
+* fix(web): touch-platform language menu initial scrolling + index scrolling (#7488)
+
+## 16.0.86 alpha 2022-10-21
+
+* fix(developer): Handle invalid graphics in icon editor (#7431)
+* chore(common): move to new GitHub issue form templates (#7470)
+* change(web): removes unused config, help buttons from OSK (#7484)
+* fix(windows): ensure all modifier events go to serialized queue (#7449)
+* chore(common): automatically run internal dependencies on builder (#7464)
+* fix(mac): Prompt for required permissions at start time (#7354)
+
+## 16.0.85 alpha 2022-10-20
+
+* chore(android/engine): Remove help bubble tool tip (#7473)
+* fix(linux): Fix upload script (#7494)
+* docs(linux): Update sample vscode settings (#7491)
+* fix(android/engine): Dismiss key preview and subkeys on globe action (#7472)
+* chore(linux): Improve debug output (#7499)
+
+## 16.0.84 alpha 2022-10-19
+
+* fix(developer): Handle hints and warnings cleanly (#7372)
+* fix(developer): Ctrl key to select key was conflicting with shortcuts (#7430)
+* modify(android/engine): Stop logging if keyboard index not found (#7415)
+* chore(android/engine): Update Keyman references in android-host.js (#7466)
+
+## 16.0.83 alpha 2022-10-18
+
+* docs(linux): Update readmes (#7468)
+
+## 16.0.82 alpha 2022-10-17
+
+* change(web): now utilizes 'inputMode="none"' on supported touch devices (#7343)
+* chore(web): drops alignInputs, hideInputs (#7360)
+* fix(web): better element inputmode management (#7395)
+* chore(common): `--debug` standard flag for builder (#7462)
+* fix(ios):  Allow Full Access enabled to fix ios 16  invisible keyboard (#7459)
+
+## 16.0.81 alpha 2022-10-16
+
+* fix(developer): manual attachment for kmw in server (#7457)
+
+## 16.0.80 alpha 2022-10-14
+
+* feat(common): builder script dependency and legacy script report (#7453)
+* chore(linux): Adjust Linux specific files in `.gitignore` (#7451)
+
+## 16.0.79 alpha 2022-10-13
+
+* chore(common/models, web): more script updates (#7392)
+* feat(common): builder dependency support (#7438)
+* chore(common): further tweaks to builder scripts (#7439)
+
+## 16.0.78 alpha 2022-10-12
+
+* fix(linux): Fix reordering of output (#7079)
+* fix(linux): Fix make install (#7434)
+* chore(linux): Add Node.js to the docker container (#7435)
+
 ## 16.0.77 alpha 2022-10-10
 
 * fix(web): possible error on change of context to a contextEditable (#7359)
@@ -219,7 +1293,7 @@
 
 ## 16.0.38 alpha 2022-07-26
 
-* feat(developer): add hint support to Touch Layout Editor and schema (#6936)
+* feat(developer): Rework Touch Layout Editor to support flick and multitap (#6884)
 * fix(developer): improve error message for multi-part key ids on <15.0 (#6989)
 * fix(android): rework longpress movement trigger (#6984)
 * chore(linux): Update changelog (#6988)
@@ -245,6 +1319,7 @@
 ## 16.0.34 alpha 2022-07-15
 
 * fix(developer): set contextDevice in web debugger  ️ (#6906)
+* fix(web): postkeystroke processing should ignore key-event source ️ (#6901)
 * fix(web): layer-setting ops should not trigger for hardware keystroke processing  ️ (#6902)
 * fix(developer): kmdecomp virtual character key output (#6940)
 * fix(developer): crash on exit when checking for updates (#6941)
@@ -254,6 +1329,7 @@
 ## 16.0.33 alpha 2022-07-14
 
 * feat(developer): Option to skip embed of compiler version (#6920)
+* feat(developer): compiler regression support (build kmcomp-$version.zip during release build) (#6918)
 * chore(ios): updates core internals for the in-app browser (#6838)
 
 ## 16.0.32 alpha 2022-07-13
@@ -284,6 +1360,7 @@
 ## 16.0.26 alpha 2022-07-06
 
 * fix(developer): Show full version number (#6866)
+* chore(developer): rename developer/js to developer/kmlmc (#6630)
 * feat(developer): .keyman-touch-layout schema for 15.0 (#6856)
 * feat(developer): add flick and multitap to touch layout schema and doc (#6877)
 * fix(linux): Fix post-install script (#6894)
@@ -1181,6 +2258,7 @@
 ## 15.0.132 alpha 2021-10-15
 
 * feat(windows): manual keyboard caps tests (#5808)
+* feat(windows): Change caps to work with common core processor (#5803)
 
 ## 15.0.131 alpha 2021-10-13
 
@@ -1198,7 +2276,7 @@
 
 ## 15.0.128 alpha 2021-10-07
 
-* fix(ios): move sentry settings responsibility to build agent  ‍ ️ (#5805)
+* fix(ios): move sentry settings responsibility to build agent (#5805)
 
 ## 15.0.127 alpha 2021-10-06
 
@@ -1354,14 +2432,14 @@
 
 ## 15.0.101 alpha 2021-08-23
 
-* refactor(web): overhaul of OSK key layout calcs + styling, merges desktop & touch logic 📐 (#5462)
+* refactor(web): overhaul of OSK key layout calcs + styling, merges desktop & touch logic (#5462)
 * fix(android): keyboard's black bar bug (#5521)
-* refactor(web): prep work for mouse-based use of touch events 👆  (#5506)
-* refactor(web): mouse-based use of touch handlers 👆  (#5530)
+* refactor(web): prep work for mouse-based use of touch events (#5506)
+* refactor(web): mouse-based use of touch handlers (#5530)
 
 ## 15.0.100 alpha 2021-08-22
 
-* fix(linux): Fix uploading to launchpad for legacy projects 📦 (#5612)
+* fix(linux): Fix uploading to launchpad for legacy projects (#5612)
 
 ## 15.0.99 alpha 2021-08-21
 
@@ -1371,18 +2449,18 @@
 
 * fix(windows): Ignore Access Denied error creating task (#4365)
 * fix(web): Have util.wait check useAlerts option (#5538)
-* fix(developer): debugger cleanup 🐞 (#5588)
-* chore(developer): debug deadkey 1-based values 🐞 (#5592)
-* chore(developer): refactor forcekeyboard in debug 🐞 (#5593)
-* fix(developer): get Test Mode working again 🐞 (#5594)
-* chore(developer): hide debug events panel 🐞 (#5595)
+* fix(developer): debugger cleanup (#5588)
+* chore(developer): debug deadkey 1-based values (#5592)
+* chore(developer): refactor forcekeyboard in debug (#5593)
+* fix(developer): get Test Mode working again (#5594)
+* chore(developer): hide debug events panel (#5595)
 * fix(common/core/web): behavior with unmatched final group (#5553)
 * fix(ios): iOS 13 and 14 only - stuck settings toggles (#5548)
-* fix(linux): Fix lost context after pressing K_SHIFT 🚧 (#5601)
+* fix(linux): Fix lost context after pressing K_SHIFT (#5601)
 
 ## 15.0.97 alpha 2021-08-19
 
-* fix(linux): Fix uploading to launchpad 📦 (#5607)
+* fix(linux): Fix uploading to launchpad (#5607)
 
 ## 15.0.96 alpha 2021-08-19
 
@@ -2552,7 +3630,7 @@
 * fix(windows): invalid character in text content opening help (#4330)
 * fix(windows): align title to top in Install Keyboard (#4331)
 * chore(windows/resources): Cherry-pick 14.0 help from #4109 (#4335)
-* fix(ios): renew distribution certificate 🍒 (#4344)
+* fix(ios): renew distribution certificate (#4344)
 * fix(ios): reloads keyboard after package updates (#4347)
 * fix(ios): fixes accidental logo / cancel button overlap during package installation (#4332)
 * fix(ios): resolves rough edges with installation view transitions (#4338)
@@ -2646,7 +3724,7 @@
 
 * fix(developer): make touch layout editor source view fonts consistent (#4198)
 * fix(developer): Respect tab editor option (#4200)
-* fix(web): Solving kmwosk color inconsistency 🍒 (#4187)
+* fix(web): Solving kmwosk color inconsistency (#4187)
 
 ## 14.0.215 beta 2020-12-22
 
@@ -3053,7 +4131,7 @@
 ## 14.0.156 alpha 2020-10-08
 
 * chore(windows): Move to Windows SDK 10.0.17763.0 (#3654)
-* fix(windows): Some registry keys could have incorrect permissions 🍒 (#3668)
+* fix(windows): Some registry keys could have incorrect permissions (#3668)
 * fix(developer): ci uses repo tier and version (#3670)
 * fix(windows): update CI for publishing desktop help (#3671)
 * fix(web): ci uses repo tier and version (#3672)
@@ -3977,7 +5055,7 @@
 * feat(developer): always save options (#2731)
 * feat(common/resources): Support git worktree when configuring local hooks (#2722)
 * docs(linux): Add linux packaging documentation (#2720)
-* fix(developer): insert from charmap into touch editor 🍒 (#2737)
+* fix(developer): insert from charmap into touch editor (#2737)
 * fix(developer): debugger breaking smp with bksp (#2739)
 * feat(ios): Adds keyboard-scale unit tests, fixes unknown-device bug (#2695)
 
@@ -4014,7 +5092,7 @@
 * fix(linux): Fix tier used in debian watch files (#2664)
 * fix(ios): Engine demo fix (#2662)
 * docs(ios): Updates offline help for new 13.0 content (#2671)
-* fix(developer): upgrade removes preferences 🍒 (#2672)
+* fix(developer): upgrade removes preferences (#2672)
 * fix(developer): upgrade removes preferences (#2668)
 * chore(common/resources): Rename trigger-definitions.sh to *.config (#2665)
 
@@ -4027,12 +5105,12 @@
 * fix(common): Update configure-repo.sh to ln commit-msg-defs (#2652)
 * change(web): Testing resources update (#2651)
 * fix(android): Add ability to reinitialize `CloudDownloadMgr` (#2635)
-* chore: merge beta changes to master 🍒 (#2659)
+* chore: merge beta changes to master (#2659)
 * fix(mac): invalid build script params removed (#2660)
 
 ## 14.0.10 alpha 2020-02-14
 
-* fix(common/core): buffer overrun in context api 🍒 (#2616)
+* fix(common/core): buffer overrun in context api (#2616)
 * fix(web): patches Float and Toggle UI issues (#2622)
 * change(web): build.sh recompilation of LMLayer only performed when needed (#2623)
 * fix(ios): Fixes in-app use of KMSample2 (#2626)
@@ -4058,7 +5136,7 @@
 * fix(common/resources): refactor trigger of test builds (#2611)
 * fix(ios): fixes installation of default resources and updates them (#2578)
 * chore(android): Update default nrc.en.mtnt.model to 0.1.4 (#2608)
-* chore(common/resources): add build scripts for beta tests 🍒 (#2612)
+* chore(common/resources): add build scripts for beta tests (#2612)
 * fix(common/resources): don't include build-utils.sh (#2615)
 * fix(common/resources): Fix setting context when >= 64 characters (#2607)
 * fix(ios): Icon image change on light/dark mode transition (#2593)

@@ -1,0 +1,104 @@
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <!-- Set the viewport width to match phone and tablet device widths -->
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+
+    <!-- Allow KeymanWeb to be saved to the iPhone home screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <link rel="stylesheet" href="pageStyle.css">
+    <link rel="stylesheet" href="gestureHost.css">
+
+    <script src="hostConfiguration.mjs" type="module"></script>
+
+    <title>Gesture Recognizer - Demo Host Page</title>
+  </head>
+  <body>
+    <div class="main">
+      <p class="center">
+        <h2 style="text-align:center">Gesture Recognizer - Demo Host Page</h2>
+      </p>
+      <p class="center">
+        The area below represents a simulated page with its corresponding screen, page, and gesture-reception area.
+      </p>
+      <p class="center">
+        Click or touch anywhere within the beige area to test gesture-recognizer behavior.
+      </p>
+
+      <!-- Start the self-adjusting layout region -->
+      <div id="main-ux" class="flex">
+        <div id="demo-and-legend">
+          <!-- CSS classes for demo configuration should only be applied here, to `demoContainer`. -->
+          <div id="demo-container" class="screen2 bounds1 full safe-loose">
+            <div id='faux-viewport' class="faux-screen">
+              <div class="faux-screen-border"></div>
+              <div id="safe-zone" class="safe-zone">
+                <div id="padded-safe-zone" class="safe-proximity"></div>
+              </div>
+              <div id="faux-page">
+                <div class="receiver-host">
+                  <div id="target-root" class="main-receiver">
+                    <div id="roaming-bounds"></div>
+                  </div>
+                  <div id="simmed-shim"></div>
+                </div>
+              </div>
+            </div>
+            <p></p>
+          </div>
+          <!-- end `demoContainer` -->
+          <div class="legend">
+            <div><div class="block bounds-legend"></div><p>         - represents screen boundaries</p></div>
+            <div><div class="block receiver-legend"></div><p>       - the primary gesture receiver</p></div>
+            <div><div class="block roaming-legend"></div><p>        - permitted "roaming" zone</p></div>
+            <div><div class="block shim-legend"></div><p>           - "subkey menu" backdrop</p></div>
+            <div><div class="block safe-zone-legend"></div><p>      - "safe zone" border</p></div>
+            <div><div class="block safe-proximity-legend"></div><p> - "safe-zone proximity" border</p></div>
+          </div>
+        </div>
+        <div id="menu-container">
+          <form name="config">
+            <fieldset>
+              <h4 class="radio-header">Screen & Layout Style</h4>
+              <label class="block"><input type="radio" value="screen2" name="screen" checked="checked">Mobile phone page</label>
+              <label class="block"><input type="radio" value="screen4" name="screen">WebView-embedded emulation</label>
+              <label class="block"><input type="radio" value="screen3" name="screen">Desktop mid-page floater</label>
+              <label class="block"><input type="radio" value="screen1" name="screen">Desktop bottom-right floater</label>
+            </fieldset>
+            <fieldset>
+              <h4 class="radio-header">Legal Roaming Behavior</h4>
+              <label class="block"><input id="topOnlyRadio" type="radio" value="bounds1" name="bounds" checked="checked">Top-overflow only</label>
+              <label class="block"><input type="radio" value="bounds2" name="bounds">Loose omni-directional</label>
+              <label class="block"><input id="popupRadio" type="radio" value="bounds4" name="bounds">Expanded popup-key range</label>
+              <label class="block"><input type="radio" value="bounds3" name="bounds">None</label>
+            </fieldset>
+            <fieldset>
+              <h4 class="radio-header">Receiver Form</h4>
+              <label class="block"><input type="radio" value="full" name="receiver" checked="checked">On-screen keyboard</label>
+              <label class="block"><input type="radio" value="popup" name="receiver">Subkey menu (right-aligned)</label>
+            </fieldset>
+            <fieldset>
+              <h4 class="radio-header">Safe Zone mode</h4>
+              <label class="block"><input type="radio" value="safe-default" name="safeZone">Module-default</label>
+              <label class="block"><input type="radio" value="safe-loose" name="safeZone" checked="checked">Double-spaced</label>
+              <label class="block"><input type="radio" value="safe-generous" name="safeZone">Very generous</label>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+      <!-- End the self-adjusting layout region -->
+      <hr>
+      <div id="logging-zone" class="flex">
+        <div id="logging-host">
+          <textarea id="event-log" readonly rows="6"></textarea>
+        </div>
+        <div id="logging-controls">
+          <input id="log-clear-button" type="button" value="Reset logs">
+        </div>
+      </div>
+      <h3 class="center"><a href="../">Return to testing home page</a></h3>
+    </div>
+  </body>
+</html>

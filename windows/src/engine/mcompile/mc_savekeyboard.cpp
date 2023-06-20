@@ -1,11 +1,11 @@
 
 #include "pch.h"
 
-// These four errors are copied from comperr.h, because WriteCompiledKeyboard is
+// These four errors are copied from kmn_compiler_errors.h, because WriteCompiledKeyboard is
 // a clone of the compiler's equivalent function. However, the functions
 // diverge, as mc_savekeyboard.cpp's version is copying from an existing
 // compiled keyboard. The error codes have been kept consistent with those in
-// comperr.h.
+// kmn_compiler_errors.h
 #define CERR_None                                          0x00000000
 #define CERR_CannotAllocateMemory                          0x00008004
 #define CERR_UnableToWriteFully                            0x00008007
@@ -31,12 +31,6 @@ BOOL SaveKeyboard(LPKEYBOARD kbd, PWSTR filename) {
   }
 
   return TRUE;
-}
-
-void SetChecksum(LPBYTE buf, LPDWORD CheckSum, DWORD sz)
-{
-	BuildCRCTable();
-	*CheckSum = CalculateBufferCRC(buf, sz);
 }
 
 DWORD WriteCompiledKeyboard(LPKEYBOARD fk, HANDLE hOutfile, BOOL FSaveDebug)
@@ -93,7 +87,7 @@ DWORD WriteCompiledKeyboard(LPKEYBOARD fk, HANDLE hOutfile, BOOL FSaveDebug)
 	ck->dwIdentifier = FILEID_COMPILED;
 
   ck->dwFileVersion = fk->dwFileVersion;
-	ck->dwCheckSum = 0;		// do checksum afterwards.
+	ck->dwCheckSum = 0; // No checksum in 16.0, see #7276
 	ck->KeyboardID = fk->xxkbdlayout;
   ck->IsRegistered = fk->IsRegistered;
 	ck->cxStoreArray = fk->cxStoreArray;
@@ -206,8 +200,6 @@ DWORD WriteCompiledKeyboard(LPKEYBOARD fk, HANDLE hOutfile, BOOL FSaveDebug)
     delete[] buf;
     return CERR_SomewhereIGotItWrong;
   }
-
-	SetChecksum(buf, &ck->dwCheckSum, size);
 
 	WriteFile(hOutfile, buf, size, &offset, NULL);
 

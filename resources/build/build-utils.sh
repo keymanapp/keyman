@@ -10,45 +10,45 @@
 #   TIER:             Current tier, one of "alpha", "beta" or "stable"
 #   VERSION_TAG:      Tier + Pull Request + Location of build [-alpha|-beta][-test[-1234]][-local]
 #   VERSION_WITH_TAG: e.g. "14.0.1-alpha-test-1234" or "14.0.5-beta-local" or "14.0.1-alpha-test"
+#   VERSION_GIT_TAG:  Git tag for the release, "release@$VERSION_WITH_TAG", e.g. "release@14.0.1-alpha-test-1234"
 #   KEYMAN_ROOT:      fully resolved root path of Keyman repository
 #   VERSION_ENVIRONMENT: One of: local, test, alpha, beta, stable
 #   UPLOAD_SENTRY:    true - if VERSION_ENVIRONMENT is one of alpha, beta, stable
 #                     false - if local, test.  Indicates if debug artifacts should be uploaded to Sentry
+#   BUILDER_OS:       win|mac|linux -- current build environment
 #
 # On macOS, this script requires coreutils (`brew install coreutils`)
 #
 # Here is how to include this script reliably, cross-platform:
 #    ## START STANDARD BUILD SCRIPT INCLUDE
 #    # adjust relative paths as necessary
-#    THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-#    . "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
+#    THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+#    . "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
 #    # END STANDARD BUILD SCRIPT INCLUDE
 #
 # Note: keep changes to version, tier and tag determination in sync with mkver (windows/src/buildutils/mkver)
 #
+
+# Exit on command failure and when using unset variables:
+set -eu
 
 #
 # Prevents 'clear' on exit of mingw64 bash shell
 #
 SHLVL=0
 
-function die() {
-  # TODO: consolidate this with fail() from shellHelperFunctions.sh
-  builder_die "$*"
-}
-
 function findKeymanRoot() {
-    # See https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
-    # None of the answers are 100% correct for cross-platform
-    # On macOS, requires coreutils (`brew install coreutils`)
-    local SCRIPT=$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")
-    KEYMAN_ROOT=$(dirname $(dirname $(dirname "$SCRIPT")))
-    readonly KEYMAN_ROOT
+  # We don't need readlink here because our standard script prolog does a
+  # readlink -f already so we will have already escaped from any symlinks
+  # But we still need to canonicalize paths to remove ../../..
+  KEYMAN_ROOT="${BASH_SOURCE[0]%/*/*/*}"
+  KEYMAN_ROOT="$( cd "$KEYMAN_ROOT" && echo "$PWD" )"
+  readonly KEYMAN_ROOT
 }
 
 function findVersion() {
     local VERSION_MD="$KEYMAN_ROOT/VERSION.md"
-    VERSION=`cat $VERSION_MD | tr -d "[:space:]"`
+    VERSION=$(builder_trim $(<"$VERSION_MD"))
     [[ "$VERSION" =~ ^([[:digit:]]+)\.([[:digit:]]+)\.([[:digit:]]+)$ ]] && {
         VERSION_MAJOR="${BASH_REMATCH[1]}"
         VERSION_MINOR="${BASH_REMATCH[2]}"
@@ -95,6 +95,7 @@ function findVersion() {
     fi
 
     VERSION_WITH_TAG="$VERSION$VERSION_TAG"
+    VERSION_GIT_TAG="release@$VERSION_WITH_TAG"
 
     readonly VERSION
     readonly VERSION_MAJOR
@@ -105,6 +106,7 @@ function findVersion() {
     readonly VERSION_TAG
     readonly VERSION_WITH_TAG
     readonly VERSION_ENVIRONMENT
+    readonly VERSION_GIT_TAG
 
     # Export version strings so places like version.gradle can access them
     export VERSION
@@ -116,15 +118,16 @@ function findVersion() {
     export VERSION_TAG
     export VERSION_WITH_TAG
     export VERSION_ENVIRONMENT
+    export VERSION_GIT_TAG
 }
 
 function findTier() {
-    local TIER_MD="$KEYMAN_ROOT/TIER.md"
-    TIER=`cat $TIER_MD | tr -d "[:space:]"`
-    [[ "$TIER" =~ ^(alpha|beta|stable)$ ]] || {
-        echo "Invalid TIER.md file: expected alpha, beta or stable."
-        exit 1;
-    }
+  local TIER_MD="$KEYMAN_ROOT/TIER.md"
+  TIER=$(builder_trim $(<"$TIER_MD"))
+  [[ "$TIER" =~ ^(alpha|beta|stable)$ ]] || {
+      echo "Invalid TIER.md file: expected alpha, beta or stable."
+      exit 1;
+  }
 }
 
 function printBuildNumberForTeamCity() {
@@ -152,6 +155,7 @@ function printVersionUtilsDebug() {
     echo "TIER:                $TIER"
     echo "VERSION_TAG:         $VERSION_TAG"
     echo "VERSION_WITH_TAG:    $VERSION_WITH_TAG"
+    echo "VERSION_GIT_TAG:     $VERSION_GIT_TAG"
     echo "VERSION_ENVIRONMENT: $VERSION_ENVIRONMENT"
 }
 
@@ -170,11 +174,13 @@ function findShouldSentryRelease() {
 }
 
 findKeymanRoot
-findTier
-findVersion
 
 # Source builder_script
 . "$KEYMAN_ROOT/resources/builder.inc.sh"
+
+findTier
+findVersion
+
 # printVersionUtilsDebug
 printBuildNumberForTeamCity
 
@@ -232,6 +238,7 @@ replaceVersionStrings() {
     s/\$TIER/$TIER/g;
     s/\$VERSION_TAG/$VERSION_TAG/g;
     s/\$VERSION_WITH_TAG/$VERSION_WITH_TAG/g;
+    s/\$VERSION_GIT_TAG/$VERSION_GIT_TAG/g;
     s/\$VERSION_ENVIRONMENT/$VERSION_ENVIRONMENT/g;
     s/\$VERSION/$VERSION/g;
     " "$infile" > "$outfile"
@@ -243,6 +250,9 @@ replaceVersionStrings_Mkver() {
   local infile=$1
   local outfile=$2
 
+  # Note that $VERSION differs between the two functions!
+  # We should be deprecating all the mkver strings
+
   sed "
     s/\$VersionWin/$VERSION_WIN/g;
     s/\$VersionRelease/$VERSION_RELEASE/g;
@@ -252,6 +262,7 @@ replaceVersionStrings_Mkver() {
     s/\$Tier/$TIER/g;
     s/\$Tag/$VERSION_TAG/g;
     s/\$VersionWithTag/$VERSION_WITH_TAG/g;
+    s/\$VersionGitTag/$VERSION_GIT_TAG/g;
     s/\$VersionRc/$VERSION_MAJOR,$VERSION_MINOR,$VERSION_PATCH,0/g;
     s/\$Environment/$VERSION_ENVIRONMENT/g;
     s/\$Version/$VERSION/g;
@@ -260,11 +271,32 @@ replaceVersionStrings_Mkver() {
     s/\$RELEASE_MAJOR/$VERSION_MAJOR/g;
     s/\$RELEASE_MINOR/$VERSION_MINOR/g;
     s/\$RELEASE/$VERSION_RELEASE/g;
+
+    s/\$VERSION_WIN/$VERSION_WIN/g;
+    s/\$VERSION_RELEASE/$VERSION_RELEASE/g;
+    s/\$VERSION_MAJOR/$VERSION_MAJOR/g;
+    s/\$VERSION_MINOR/$VERSION_MINOR/g;
+    s/\$VERSION_PATCH/$VERSION_PATCH/g;
+    s/\$TIER/$TIER/g;
+    s/\$VERSION_TAG/$VERSION_TAG/g;
+    s/\$VERSION_WITH_TAG/$VERSION_WITH_TAG/g;
+    s/\$VERSION_GIT_TAG/$VERSION_GIT_TAG/g;
+    s/\$VERSION_ENVIRONMENT/$VERSION_ENVIRONMENT/g;
+
     " "$infile" > "$outfile"
 }
 
 set_keyman_standard_build_path() {
   PATH="$KEYMAN_ROOT/node_modules/.bin:$PATH"
+}
+
+# For CI compatbility of building Keyman for Android 16.0 with OpenJDK 8,
+# this overrides JAVA_HOME for the builder script to use OpenJDK 11.
+set_java_home() {
+  if [[ ! -z ${JAVA_HOME_11+x} ]]; then
+    builder_echo "Setting JAVA_HOME to JAVA_HOME_11 ($JAVA_HOME_11)"
+    export JAVA_HOME="${JAVA_HOME_11}"
+  fi
 }
 
 #
@@ -313,6 +345,33 @@ run_xcodebuild() {
 
   printXCodeBuildScriptLogs
   if [ $ret_code != 0 ]; then
-    fail "Build failed! Error: [$ret_code] when executing command: 'xcodebuild $cmnd'"
+    builder_die "Build failed! Error: [$ret_code] when executing command: 'xcodebuild $cmnd'"
   fi
 }
+
+
+# Sets the BUILDER_OS environment variable to linux|mac|win
+#
+_builder_get_operating_system() {
+  declare -g BUILDER_OS
+  # Default value, since it's the most general case/configuration to detect.
+  BUILDER_OS=linux
+
+  # Subject to change with future improvements.
+  if [[ $OSTYPE == darwin* ]]; then
+    BUILDER_OS=mac
+  elif [[ $OSTYPE == msys ]]; then
+    BUILDER_OS=win
+  elif [[ $OSTYPE == cygwin ]]; then
+    BUILDER_OS=win
+  fi
+  readonly BUILDER_OS
+}
+
+_builder_get_operating_system
+
+#
+# We always want to use tools out of node_modules/.bin to guarantee that we get the
+# correct version
+#
+set_keyman_standard_build_path

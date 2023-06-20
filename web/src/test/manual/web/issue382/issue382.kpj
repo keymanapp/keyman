@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath></BuildPath>
+    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>True</WarnDeprecatedCode>
+    <CheckFilenameConventions>False</CheckFilenameConventions>
+    <ProjectType>keyboard</ProjectType>
+  </Options>
+  <Files>
+    <File>
+      <ID>id_d6d0aefd0ac869e89e3e93e50e54f856</ID>
+      <Filename>issue382.kmn</Filename>
+      <Filepath>issue382.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Keycap Scaling Test</Name>
+      </Details>
+    </File>
+  </Files>
+</KeymanDeveloperProject>

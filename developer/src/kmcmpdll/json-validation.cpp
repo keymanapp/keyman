@@ -4,6 +4,8 @@
 
 #include <windows.h>
 
+typedef bool (*kmcmp_ValidateJsonMessageProc)(int64_t offset, const char* szText, void* context);
+
 using nlohmann::json;
 using nlohmann::json_uri;
 using nlohmann::json_schema_draft4::json_validator;
@@ -24,7 +26,12 @@ static void loader(const json_uri &uri, json &schema)
   }
 }
 
+bool kmcmpMessageProc(int64_t offset, const char* szText, void* context) {
+  return ((ValidateJsonMessageProc)context)(offset, szText);
+}
+
 extern "C" BOOL __declspec(dllexport) ValidateJsonFile(PWSTR pwszSchemaFile, PWSTR pwszJsonFile, ValidateJsonMessageProc MessageProc) {
+
   std::fstream f(pwszSchemaFile);
   if (!f.good()) {
     MessageProc(-1, "Schema file could not be loaded.");

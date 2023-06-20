@@ -22,6 +22,7 @@
 #import "KMPackageReader.h"
 #import "KMPackageInfo.h"
 #import "KMKeyboardInfo.h"
+#import "PrivacyConsent.h"
 @import Sentry;
 
 /** NSUserDefaults keys */
@@ -87,38 +88,48 @@ NSString* _keymanDataPath = nil;
 #else
         _debugMode = self.useVerboseLogging;
 #endif
-        [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
-                                                           andSelector:@selector(handleURLEvent:withReplyEvent:)
-                                                         forEventClass:kInternetEventClass
-                                                            andEventID:kAEGetURL];
 
-        self.lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap,
-                                                 kCGHeadInsertEventTap,
-                                                 kCGEventTapOptionListenOnly,
-                                                 CGEventMaskBit(kCGEventFlagsChanged) |
-                                                 CGEventMaskBit(kCGEventLeftMouseDown) |
-                                                 CGEventMaskBit(kCGEventLeftMouseUp) |
-                                                 CGEventMaskBit(kCGEventKeyDown),
-                                                 (CGEventTapCallBack)eventTapFunction,
-                                                 nil);
-
-        if (!self.lowLevelEventTap) {
-            NSLog(@"Can't tap into low level events!");
-        }
-        else {
-            CFRelease(self.lowLevelEventTap);
-        }
-
-        self.runLoopEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, self.lowLevelEventTap, 0);
-
-        CFRunLoopRef runLoop = CFRunLoopGetCurrent();
-
-        if (self.runLoopEventSrc && runLoop) {
-            CFRunLoopAddSource(runLoop,  self.runLoopEventSrc, kCFRunLoopDefaultMode);
-        }
+      // first notify user and request access to Accessibility/PostEvent permissions
+      // pass block as completion handler to complete init with initCompletion
+      [PrivacyConsent.shared requestPrivacyAccess:^void (void){
+        [self initCompletion];
+      }];
     }
 
     return self;
+}
+
+- (void)initCompletion {
+  NSLog(@"initCompletionHandler method invoked");
+  [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
+                                                     andSelector:@selector(handleURLEvent:withReplyEvent:)
+                                                   forEventClass:kInternetEventClass
+                                                      andEventID:kAEGetURL];
+
+  self.lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap,
+                                           kCGHeadInsertEventTap,
+                                           kCGEventTapOptionListenOnly,
+                                           CGEventMaskBit(kCGEventFlagsChanged) |
+                                           CGEventMaskBit(kCGEventLeftMouseDown) |
+                                           CGEventMaskBit(kCGEventLeftMouseUp) |
+                                           CGEventMaskBit(kCGEventKeyDown),
+                                           (CGEventTapCallBack)eventTapFunction,
+                                           nil);
+
+  if (!self.lowLevelEventTap) {
+      NSLog(@"Can't tap into low level events!");
+  }
+  else {
+      CFRelease(self.lowLevelEventTap);
+  }
+
+  self.runLoopEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, self.lowLevelEventTap, 0);
+
+  CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+
+  if (self.runLoopEventSrc && runLoop) {
+      CFRunLoopAddSource(runLoop,  self.runLoopEventSrc, kCFRunLoopDefaultMode);
+  }
 }
 
 - (KeymanVersionInfo)versionInfo {
@@ -130,6 +141,7 @@ NSString* _keymanDataPath = nil;
     result.tier = [keymanInfo objectForKey:@"Tier"];
     result.versionRelease = [keymanInfo objectForKey:@"VersionRelease"];
     result.versionWithTag = [keymanInfo objectForKey:@"VersionWithTag"];
+    result.versionGitTag = [keymanInfo objectForKey:@"VersionGitTag"];
     // if([result.tier isEqualToString:@"stable"]) {  // #7227 disabling:
     result.keymanCom = @"keyman.com";
     result.helpKeymanCom = @"help.keyman.com";
@@ -147,7 +159,7 @@ NSString* _keymanDataPath = nil;
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{ @"NSApplicationCrashOnExceptions": @YES }];
 
     KeymanVersionInfo keymanVersionInfo = [self versionInfo];
-    NSString *releaseName = [NSString stringWithFormat:@"release-%@", keymanVersionInfo.versionWithTag];
+    NSString *releaseName = [NSString stringWithFormat:@"%@", keymanVersionInfo.versionGitTag];
 
     [SentrySDK startWithConfigureOptions:^(SentryOptions *options) {
         options.dsn = @"https://960f8b8e574c46e3be385d60ce8e1fea@o1005580.ingest.sentry.io/5983522";

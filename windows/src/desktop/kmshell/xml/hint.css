@@ -1,18 +1,18 @@
-* { 
-  font-size: 13.3px; 
+* {
+  font-size: 13.3px;
 }
 
 body {
-  padding: 0px; 
-  margin: 0px; 
-  overflow: hidden; 
-  background: white; 
-  border: none; 
+  padding: 0px;
+  margin: 0px;
+  overflow: hidden;
+  background: white;
+  border: none;
 }
 
-html { 
-  padding: 0px; 
-  margin: 0px; 
+html {
+  padding: 0px;
+  margin: 0px;
   overflow: hidden;
 }
 
@@ -53,7 +53,7 @@ html {
 
 #header {
   background: white;
-  top: 8px; 
+  top: 8px;
   left: 0;
   width: 100%;
   position: absolute;
@@ -72,17 +72,17 @@ html {
 
 #icon {
   position: absolute;
-  left: 0; 
+  left: 0;
   top: 16px;
   margin: 0 15px;
 }
 
-#exiticon { 
+#exiticon {
   float: left
 }
 
 #title {
-  left: 80px; 
+  left: 80px;
   top: 20px;
   position: absolute;
   font-size: 21.3px;
@@ -92,7 +92,7 @@ html {
 
 #hint {
   position: absolute;
-  left: 0; 
+  left: 0;
   top: 64px;
   font-size: 14.7px;
   padding: 20px;
@@ -107,10 +107,10 @@ html {
 
 #buttons {
   float: right;
-  padding: 10px;
+  padding: 8px 10px 8px 10px;
 }
 
 #buttons input {
-  width: 80px; 
+  width: 80px;
   margin: 0 4px;
 }

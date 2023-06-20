@@ -1,9 +1,9 @@
 /* vim:set et sts=4: */
 
 /*
- * KMFL Input Method for IBUS (The Input Bus)
+ * Keyman Input Method for IBUS (The Input Bus)
  *
- * Copyright (C) 2018 SIL International
+ * Copyright (C) 2018-2023 SIL International
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,22 +28,23 @@
 
 #include <gio/gio.h>
 
+#include "engine.h"
 #include "keyman-service.h"
 
 struct _KeymanServicePrivate
 {
     guint          owner_id;
     GDBusNodeInfo *ispec;
+    IBusEngine    *engine;
 
     gchar *          name;
     gchar *          ldmlfile;
 };
 
-enum
-{
-    PROP_0,
-    PROP_NAME,
-    PROP_LDMLFILE
+enum {
+  PROP_0,
+  PROP_NAME,
+  PROP_LDMLFILE
 };
 
 static const gchar introspection_xml[] =
@@ -51,6 +52,9 @@ static const gchar introspection_xml[] =
     "  <interface name='com.Keyman'>"
     "    <property type='s' name='LDMLFile' access='read'/>"
     "    <property type='s' name='Name' access='read'/>"
+    "    <method name='SendText'>"
+    "        <arg type='s' name='text' direction='in' />"
+    "    </method>"
     "  </interface>"
     "</node>";
 
@@ -194,6 +198,32 @@ km_service_class_init (KeymanServiceClass *klass)
                                                           G_PARAM_STATIC_STRINGS));
 }
 
+static void
+handle_method_call(
+    GDBusConnection *connection,
+    const gchar *sender,
+    const gchar *object_path,
+    const gchar *interface_name,
+    const gchar *method_name,
+    GVariant *parameters,
+    GDBusMethodInvocation *invocation,
+    gpointer user_data)
+{
+    KeymanService *service = KM_SERVICE(user_data);
+
+    gsize sz;
+    if (g_strcmp0(method_name, "SendText") == 0) {
+        GVariant *param = g_variant_get_child_value(parameters, 0);
+        gchar *text     = g_variant_dup_string(param, &sz);
+
+        km_service_send_text(service, text);
+        g_dbus_method_invocation_return_value(invocation, NULL);
+
+        g_free(text);
+        g_variant_unref(param);
+    }
+}
+
 static GVariant *
 handle_get_property (GDBusConnection *connection,
                      const gchar     *sender,
@@ -240,9 +270,9 @@ handle_set_property (GDBusConnection *connection,
 
 static const GDBusInterfaceVTable interface_vtable =
 {
-    (GDBusInterfaceMethodCallFunc) NULL,
-    (GDBusInterfaceGetPropertyFunc) handle_get_property,
-    (GDBusInterfaceSetPropertyFunc) handle_set_property
+    (GDBusInterfaceMethodCallFunc)handle_method_call,
+    (GDBusInterfaceGetPropertyFunc)handle_get_property,
+    (GDBusInterfaceSetPropertyFunc)handle_set_property
 };
 
 static void
@@ -290,9 +320,7 @@ km_service_bus_acquired (GDBusConnection *connection,
                          gpointer         data)
 {
     KeymanService *service = data;
-
-    if (service->priv->ispec)
-    {
+    if (service->priv->ispec) {
         GError *error = NULL;
 
         g_dbus_connection_register_object (connection,
@@ -312,7 +340,7 @@ km_service_bus_acquired (GDBusConnection *connection,
 }
 
 KeymanService *
-km_service_get_default (void)
+km_service_get_default(IBusEngine *engine)
 {
     static KeymanService *service = NULL;
 
@@ -324,9 +352,13 @@ km_service_get_default (void)
     // }
     if (!service)
     {
-        service = g_object_new (KM_TYPE_SERVICE, NULL);
+        service = g_object_new(KM_TYPE_SERVICE, NULL);
         g_object_add_weak_pointer (G_OBJECT (service), (gpointer *) &service);
     }
+
+    KeymanServicePrivate *priv = KM_SERVICE(service)->priv;
+    priv->engine = engine;
+
     return service;
 }
 
@@ -373,3 +405,14 @@ km_service_set_ldmlfile (KeymanService       *service,
 
 //     return service->priv->ldmlfile;
 // }
+
+void
+km_service_send_text(KeymanService *service, const gchar *text) {
+    g_return_if_fail(KM_IS_SERVICE(service));
+
+    // engine will be NULL unless a keyman keyboard is active
+    if (!service->priv->engine)
+        return;
+
+    ibus_keyman_set_text(service->priv->engine, text);
+}

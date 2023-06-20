@@ -1,22 +1,18 @@
-const assert = require('chai').assert;
-const sinon = require('sinon');
+import { assert } from 'chai';
+import sinon from 'sinon';
+import fs from 'fs';
 
-const fs = require('fs');
-
-const PromiseStatusModule = require('promise-status-async');
+import * as PromiseStatusModule from 'promise-status-async';
 const promiseStatus       = PromiseStatusModule.promiseStatus;
 const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 
-const GestureRecognizer = require('../../../../build/index.js');
-const com = GestureRecognizer.com;
-const PathSegmenter = com.keyman.osk.PathSegmenter;
+import { PathSegmenter } from '@keymanapp/gesture-recognizer';
 
-const Testing = require('../../../../build/tools/unit-test-resources.js');
-const HeadlessRecordingSimulator = Testing.HeadlessRecordingSimulator;
+import { HeadlessRecordingSimulator } from '../../../../build/tools/obj/index.js';
 
-const SEGMENT_TEST_JSON_FOLDER = 'src/test/resources/json/segmentation';
+const SEGMENT_TEST_JSON_FOLDER = './resources/json/segmentation';
 
-const assertSegmentSimilarity = require('../../resources/assertSegmentSimilarity.js');
+import { assertSegmentSimilarity } from '../../resources/assertSegmentSimilarity.js';
 
 const spySegmentArrayReducer = (spy) => spy.getCalls().reduce((arr, call) => arr.concat(call.args[0]), []);
 

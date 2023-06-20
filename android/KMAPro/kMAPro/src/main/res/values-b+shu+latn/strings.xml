@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <!-- app_name removed in 16.0 beta. Set in build.gradle -->
   <!-- Context: Menu Action -->
   <string name="action_share" comment="Menu action to send text content to another app">Gassuma</string>
   <!-- Context: Menu Action -->
@@ -83,6 +84,8 @@
   <string name="spacebar_caption_hint_language_keyboard" comment="Spacebar caption hint - language + keyboard">Lugga bey keyboard faougal spacebar</string>
   <!-- Context: Keyman Settings menu / Spacebar caption hint -->
   <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">Ya eiwari shaykula faougal spacebar</string>
+  <!-- Context: Keyman Settings menu / Haptic feedback -->
+  <string name="haptic_feedback" comment="haptic feedback on key press">Vibrate when typing</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner" comment="text suggestions banner">Matakula waral banner</string>
   <!-- Context: Keyman Settings menu -->
@@ -153,4 +156,8 @@
   <string name="no_associated_languages" comment="Notification when a keyboard package doesn't contain languages">Keyboard package ma leya lugga almulamma beya ley dassasana</string>
   <!-- Context: KMP Package strings -->
   <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">Mafi/mi nadif metadata fyl package</string>
+  <!-- Context: KMP Package strings -->
+  <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">    Keyboard requires a newer version of Keyman</string>
+  <!-- Context: anywhere -->
+  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
 </resources>

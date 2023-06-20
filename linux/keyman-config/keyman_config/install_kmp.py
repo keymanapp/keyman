@@ -74,13 +74,12 @@ class InstallKmp():
         packageID, ext = os.path.splitext(os.path.basename(inputfile))
         return packageID.lower()
 
-    def install_kmp_shared(self, inputfile, online=False, language=None):
+    def install_kmp_shared(self, inputfile, language=None):
         """
         Install a kmp file to /usr/local/share/keyman
 
         Args:
             inputfile (str): path to kmp file
-            online (bool, default=False): whether to attempt to get online keyboard data
         """
         self._check_keyman_dir(
           '/usr/local/share',
@@ -95,24 +94,24 @@ class InstallKmp():
           _("You do not have permissions to install the font files to the shared font area "
             "/usr/local/share/fonts"))
 
-        return self._install_kmp(inputfile, online, language, InstallLocation.Shared)
+        return self._install_kmp(inputfile, language, InstallLocation.Shared)
 
-    def install_kmp_user(self, inputfile, online=False, language=None):
-        return self._install_kmp(inputfile, online, language, InstallLocation.User)
+    def install_kmp_user(self, inputfile, language=None):
+        return self._install_kmp(inputfile, language, InstallLocation.User)
 
-    def _install_kmp(self, inputfile, online, language, area):
+    def _install_kmp(self, inputfile, language, area):
         self.packageID = self._extract_package_id(inputfile)
         self.packageDir = get_keyboard_dir(area, self.packageID)
         self.kmpdocdir = get_keyman_doc_dir(area, self.packageID)
         self.kmpfontdir = get_keyman_font_dir(area, self.packageID)
 
-        if not self._safeMakeDirs(self.packageDir):
-            return
-
         if not os.path.isfile(inputfile):
             message = _("File {kmpfile} doesn't exist").format(kmpfile=inputfile)
             logging.error("install_kmp.py: %s", message)
             raise InstallError(InstallStatus.Abort, message)
+
+        if not self._safeMakeDirs(self.packageDir):
+            return
 
         extract_kmp(inputfile, self.packageDir)
 
@@ -136,11 +135,10 @@ class InstallKmp():
                 raise InstallError(InstallStatus.Abort, message)
         if keyboards:
             logging.info("Installing %s", secure_lookup(info, 'name', 'description'))
-            if online:
-                process_keyboard_data(self.packageID, self.packageDir)
-                for kb in keyboards:
-                    if kb['id'] != self.packageID:
-                        process_keyboard_data(kb['id'], self.packageDir)
+            process_keyboard_data(self.packageID, self.packageDir)
+            for kb in keyboards:
+                if kb['id'] != self.packageID:
+                    process_keyboard_data(kb['id'], self.packageDir)
 
             if files is None:
                 return self.install_keyboards(keyboards, self.packageDir, language)
@@ -175,7 +173,7 @@ class InstallKmp():
                                  f['name'])
                     checkandsaveico(fpath)
                 elif ftype == KMFileTypes.KM_SOURCE:
-                    # TODO for the moment just leave it for ibus-kmfl to ignore if it doesn't load
+                    # TODO for the moment just leave it for ibus-keyman to ignore if it doesn't load
                     pass
                 elif ftype == KMFileTypes.KM_KMX:
                     # Sanitize keyboard filename if not lower case
@@ -283,8 +281,11 @@ class InstallKmp():
 
 
 def extract_kmp(kmpfile, directory):
-    with zipfile.ZipFile(kmpfile, "r") as zip_ref:
-        zip_ref.extractall(directory)
+    try:
+        with zipfile.ZipFile(kmpfile, "r") as zip_ref:
+            zip_ref.extractall(directory)
+    except zipfile.BadZipFile as e:
+        raise InstallError(InstallStatus.Abort, e)
 
 
 def process_keyboard_data(keyboardID, packageDir) -> None:
@@ -309,21 +310,20 @@ def process_keyboard_data(keyboardID, packageDir) -> None:
     # 	raise InstallError(InstallStatus.Abort, message)
 
 
-def install_kmp(inputfile, online=False, sharedarea=False, language=None):
+def install_kmp(inputfile, sharedarea=False, language=None):
     """
     Install a kmp file
 
     Args:
         inputfile (str): path to kmp file
-        online(bool, default=False): whether to attempt to get online keyboard data
         sharedarea(bool, default=False): whether install kmp to shared area or user directory
         language(str, default=None): language to install keyboard for
         has_ui(bool, default=True): whether we're displaying a window or running UI less from the command line
     """
     if sharedarea:
-        return_value = InstallKmp().install_kmp_shared(inputfile, online, language)
+        return_value = InstallKmp().install_kmp_shared(inputfile, language)
     else:
-        return_value = InstallKmp().install_kmp_user(inputfile, online, language)
+        return_value = InstallKmp().install_kmp_user(inputfile, language)
 
     get_keyman_config_service().keyboard_list_changed()
     return return_value

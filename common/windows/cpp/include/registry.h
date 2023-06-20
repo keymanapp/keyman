@@ -129,9 +129,6 @@
 
 #define REGSZ_Flag_UseCachedHotkeyModifierState "Flag_UseCachedHotkeyModifierState"
 
-/* REGSZ_Flag_UseKeymanCore DWORD: Turns on the common core - instead of windows core */
-#define REGSZ_Flag_UseKeymanCore "Flag_UseKeymanCore"
-
 /* DWORD: Enable/disable deep TSF integration, default enabled; 0 = disabled, 1 = enabled, 2 = default */
 
 #define REGSZ_DeepTSFIntegration  "deep tsf integration"

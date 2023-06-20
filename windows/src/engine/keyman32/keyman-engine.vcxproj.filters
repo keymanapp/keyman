@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="addins.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="appint\aiTIP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -133,6 +130,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="kmprocessactions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CoreEnvironment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

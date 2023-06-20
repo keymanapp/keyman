@@ -9,7 +9,6 @@ uses
   kmxfileconsts in '..\..\..\..\common\windows\delphi\keyboards\kmxfileconsts.pas',
   kmxfileutils in '..\..\..\..\common\windows\delphi\keyboards\kmxfileutils.pas',
   Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
-  CRC32 in '..\..\..\..\common\windows\delphi\general\CRC32.pas',
   KeyNames in '..\..\..\..\common\windows\delphi\general\KeyNames.pas',
   utildir in '..\..\..\..\common\windows\delphi\general\utildir.pas',
   utilfiletypes in '..\..\..\..\common\windows\delphi\general\utilfiletypes.pas',

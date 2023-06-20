@@ -1,0 +1,18 @@
+{
+  "extends": "../kmc/tsconfig.kmc-base.json",
+
+  "compilerOptions": {
+    "outDir": "build/src/",
+    "rootDir": "src/",
+    "baseUrl": ".",
+    "paths": {
+    }
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "references": [
+    { "path": "../../../common/web/types" },
+    { "path": "../../../common/models/types" },
+  ]
+}

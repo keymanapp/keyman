@@ -1,8 +1,0 @@
-﻿store(&NAME) 'Keycap Scaling Test'
-store(&TARGETS) 'windows web mobile desktop tablet'
-store(&VISUALKEYBOARD) 'issue382.kvks'
-store(&LAYOUTFILE) 'issue382-layout.js'
-begin Unicode > use(main)
-
-group(main) using keys
-+ [K_K] > 'Keyman'

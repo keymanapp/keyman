@@ -2,8 +2,8 @@
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # Include our resource functions; they're pretty useful!
@@ -154,7 +154,7 @@ if [ $DO_UPDATE = true ]; then
     fi
 
     # Copy resources.
-    cp -Rf "$KEYMAN_ENGINE_FRAMEWORK_SRC" "$KEYMAN_ENGINE_FRAMEWORK_DST"
+    /bin/cp -Rf "$KEYMAN_ENGINE_FRAMEWORK_SRC" "$KEYMAN_ENGINE_FRAMEWORK_DST"
 fi
 
 # First things first - update our dependencies.
@@ -163,17 +163,11 @@ if [ $DO_CARTHAGE = true ]; then
   echo
   echo "Load dependencies with Carthage"
 
-  carthage checkout || fail "Carthage dependency loading failed"
-
-  # Carthage sometimes picks the wrong .xcworkspace if two are available in a dependency's repo.
-  # Easiest way to override it - delete the wrong one (or just its scheme)
-
-  # Deleted workspace - a test for proper deployment to CocoaPods.  Doesn't matter here.
-  rm -r ./Carthage/Checkouts/DeviceKit/CocoaPodsVerification/ || fail "Carthage dependency loading failed"
+  carthage checkout || builder_die "Carthage dependency loading failed"
 
   # --no-use-binaries: due to https://github.com/Carthage/Carthage/issues/3134,
   # which affects the sentry-cocoa dependency.
-  carthage build --use-xcframeworks --no-use-binaries --platform iOS || fail "Carthage dependency loading failed"
+  carthage build --use-xcframeworks --no-use-binaries --platform iOS || builder_die "Carthage dependency loading failed"
 fi
 
 #

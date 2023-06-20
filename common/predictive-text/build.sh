@@ -11,8 +11,8 @@ set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -20,92 +20,48 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
 
-# Exit status on invalid usage.
-EX_USAGE=64
-
-LMLAYER_OUTPUT=build
-
-# Builds the top-level JavaScript file for use in browsers (the second stage of compilation)
-build-browser () {
-  npm run tsc -- -b ./browser.tsconfig.json || fail "Could not build top-level browser-targeted JavaScript file."
-}
-
-# Builds the top-level JavaScript file for use on Node (the second stage of compilation)
-build-headless () {
-  npm run tsc -- -b ./tsconfig.json || fail "Could not build top-level node-targeted JavaScript file."
-}
-
-# A nice, extensible method for -clean operations.  Add to this as necessary.
-clean ( ) {
-  if [ -d $LMLAYER_OUTPUT ]; then
-    rm -rf "$LMLAYER_OUTPUT" || fail "Failed to erase the prior build."
-  fi
-}
-
-display_usage ( ) {
-  echo "Usage: $0 [-clean] [-skip-package-install | -S] [-test | -tdd]"
-  echo "       $0 -help"
-  echo
-  echo "  -clean                 to erase pre-existing build products before a re-build"
-  echo "  -help                  displays this screen and exits"
-  echo "  -skip-package-install  (or -S) skips dependency updates"
-  echo "  -tdd                   skips dependency updates, builds, then runs unit tests only"
-  echo "  -test                  runs unit and integration tests after building"
-}
-
 ################################ Main script ################################
 
-run_tests=0
-fetch_deps=true
-unit_tests_only=0
+#  "@../models/types" \ # is just a .d.ts, so there's nothing to actually BUILD.
 
-# Process command-line arguments
-while [[ $# -gt 0 ]] ; do
-  key="$1"
-  case $key in
-    -clean)
-      clean
-      ;;
-    -help|-h)
-      display_usage
-      exit
-      ;;
-    -skip-package-install|-S)
-      fetch_deps=false
-      ;;
-    -test)
-      run_tests=1
-      ;;
-    -tdd)
-      run_tests=1
-      fetch_deps=false
-      unit_tests_only=1
-      ;;
-    *)
-      echo "$0: invalid option: $key"
-      display_usage
-      exit $EX_USAGE
-  esac
-  shift # past the processed argument
-done
+builder_describe "Builds the lm-layer module" \
+  "@/common/web/keyman-version" \
+  "@/common/web/es-bundling" \
+  "@/common/web/lm-worker" \
+  "clean" \
+  "configure" \
+  "build" \
+  "test" \
+  "--ci        Sets $(builder_term test) action to use CI-based test configurations & reporting"
 
-# Check if Node.JS/npm is installed.
-verify_npm_setup $fetch_deps
+builder_describe_outputs \
+  configure  /node_modules \
+  build      /common/predictive-text/build/lib/web/index.mjs # is built by the final step.
 
-if $fetch_deps; then
-  # We need to build keyman-version and lm-worker with a script for now
-  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
-  "$KEYMAN_ROOT/common/web/lm-worker/build.sh" || fail "Could not build lm-worker"
-fi
+builder_parse "$@"
 
-build-browser || fail "Browser-oriented compilation failed."
-build-headless || fail "Headless compilation failed."
-echo "Typescript compilation successful."
+function do_build() {
+  # Builds the top-level JavaScript file for use on Node
+  tsc -b ./tsconfig.all.json
 
-if (( run_tests )); then
-  if (( unit_tests_only )); then
-    npm run test -- -headless || fail "Unit tests failed"
-  else
-    npm test || fail "Tests failed"
+  # esbuild-bundled products at this level are not intended to be used for anything but testing.
+  node build-bundler.js
+}
+
+# Note - the actual test setup is done in a separate test script, but it's easy
+# enough to route the calls through.
+function do_test() {
+  local TEST_OPTIONS=
+  if builder_has_option --ci; then
+    TEST_OPTIONS=--ci
   fi
-fi
+
+  # We'll test the included libraries here for now.  At some point, we may wish
+  # to establish a ci.sh script for predictive-text to handle this instead.
+  ./unit_tests/test.sh test:libraries test:headless test:browser $TEST_OPTIONS
+}
+
+builder_run_action configure  verify_npm_setup
+builder_run_action clean      rm -rf build/
+builder_run_action build      do_build
+builder_run_action test       do_test

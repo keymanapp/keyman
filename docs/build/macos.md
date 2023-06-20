@@ -59,13 +59,14 @@ These dependencies are also listed below if you'd prefer to install manually.
   echo 'eval "$(pyenv init --path)"' >> ~/.bash_profile
   ```
 
-  On M1 only (as greadlink is not on the path otherwise in XCode):
+  On macOS, you will need to adjust your PATH so that coreutils’ `realpath` takes precedence over the BSD one:
 
   ```shell
-  sudo ln -s /opt/homebrew/bin/greadlink /usr/local/bin/greadlink
+  # Credit: brew info coreutils
+  PATH="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
   ```
 
-* Web: node.js, emscripten, openjdk 8
+* Web: node.js 18+, emscripten, openjdk 8
 
   ```shell
   brew install node emscripten openjdk@8

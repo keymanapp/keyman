@@ -1,0 +1,287 @@
+name: "Ubuntu packaging"
+on:
+  repository_dispatch:
+    types: ['deb-release-packaging:*', 'deb-pr-packaging:*']
+env:
+  COLOR_GREEN: "\e[32m"
+  GH_TOKEN: ${{ github.token }}
+  STATUS_CONTEXT: 'Debian Packaging'
+  DEBFULLNAME: 'Keyman GHA packager'
+  DEBEMAIL: 'support@keyman.com'
+
+jobs:
+  sourcepackage:
+    name: Build source package
+    runs-on: ubuntu-22.04
+    outputs:
+      VERSION: ${{ steps.version_step.outputs.VERSION }}
+      PRERELEASE_TAG: ${{ steps.prerelease_tag.outputs.PRERELEASE_TAG }}
+      GIT_SHA: ${{ steps.set_status.outputs.GIT_SHA }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c #v3.3.0
+      with:
+        ref: '${{ github.event.client_payload.ref }}'
+
+    - name: Set pending status on PR builds
+      id: set_status
+      if: github.event.client_payload.isTestBuild == 'true'
+      shell: bash
+      run: |
+        GIT_SHA="${{ github.event.client_payload.sha }}"
+        echo "GIT_SHA=$GIT_SHA" >> $GITHUB_OUTPUT
+        gh api \
+          --method POST \
+          -H "Accept: application/vnd.github+json" \
+          /repos/$GITHUB_REPOSITORY/statuses/$GIT_SHA \
+          -f state='pending' \
+          -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+          -f description='Debian packaging started' \
+          -f context="$STATUS_CONTEXT"
+
+    - name: Install devscripts
+      uses: ./.github/actions/apt-install
+      with:
+        packages: devscripts equivs
+
+    - name: Install dependencies
+      run: |
+        cd linux
+        ./scripts/deb-packaging.sh --gha dependencies
+
+    - name: Build source package
+      run: |
+        TIER=$(cat TIER.md)
+        export TIER
+        echo "TIER=$TIER" >> $GITHUB_ENV
+        cd linux
+        ./scripts/deb-packaging.sh --gha source
+
+    - name: Set version as output parameter
+      id: version_step
+      shell: bash
+      run: |
+        THIS_SCRIPT="$GITHUB_WORKSPACE/.github/workflows/deb-packaging.yml"
+        . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Set prerelease tag as output parameter
+      id: prerelease_tag
+      shell: bash
+      run: |
+        if [ "${{ github.event.client_payload.isTestBuild }}" == "true" ]; then
+          PRERELEASE_TAG="~${{ github.event.client_payload.branch }}-$GITHUB_RUN_NUMBER.$GITHUB_RUN_ATTEMPT"
+        else
+          PRERELEASE_TAG=""
+        fi
+        echo "PRERELEASE_TAG=$PRERELEASE_TAG" >> $GITHUB_OUTPUT
+
+    - name: Output which branch or PR we're building plus name of .dsc file
+      run: |
+        if [ "${{ github.event.client_payload.isTestBuild }}" == "true" ]; then
+          echo ":checkered_flag: **Test build of version ${{ steps.version_step.outputs.VERSION }} for ${{ github.event.client_payload.branch }}**" >> $GITHUB_STEP_SUMMARY
+        else
+          echo ":ship: **Release build of ${{ github.event.client_payload.branch }} branch (${{ github.event.client_payload.ref}}), version ${{ steps.version_step.outputs.VERSION }}**" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo ":gift: Generated source package:" >> $GITHUB_STEP_SUMMARY
+        echo "- $(find . -name keyman_\*.dsc)" >> $GITHUB_STEP_SUMMARY
+
+    - name: Store source package
+      uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+      with:
+        name: keyman-srcpkg
+        path: |
+          keyman_*
+          debian/***/*
+      if: always()
+
+  binary_packages:
+    name: Build binary packages
+    needs: sourcepackage
+    strategy:
+      fail-fast: true
+      matrix:
+        dist: [focal, jammy, kinetic, lunar]
+        arch: [amd64]
+
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Artifacts
+      uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
+      with:
+        path: artifacts
+
+    - name: Build
+      uses: sillsdev/gha-ubuntu-packaging@5b56c86ee78598308d864edc55a1d06b4ba36f92 # v0.3
+      with:
+        dist: "${{ matrix.dist }}"
+        platform: "${{ matrix.arch }}"
+        source_dir: "artifacts/keyman-srcpkg"
+        sourcepackage: "keyman_${{ needs.sourcepackage.outputs.VERSION }}-1.dsc"
+        deb_fullname: ${{env.DEBFULLNAME}}
+        deb_email: ${{env.DEBEMAIL}}
+        prerelease_tag: ${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}
+
+    - name: Output resulting .deb files
+      run: |
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        echo "$(find artifacts/ -name \*.deb)" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+
+    - name: Store binary packages
+      uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+      with:
+        name: keyman-binarypkgs
+        path: |
+          artifacts/*
+          !artifacts/keyman-srcpkg/
+      if: always()
+
+  deb_signing:
+    name: Sign source and binary packages
+    needs: [sourcepackage, binary_packages]
+    runs-on: ubuntu-latest
+    environment: "deploy (linux)"
+    if: github.event.client_payload.isTestBuild == 'false'
+
+    steps:
+      - name: Sign packages
+        uses: sillsdev/gha-deb-signing@c85704766bdf6056e03ea2b2e761c33ed0acc187 # v0.5
+        with:
+          src-pkg-path: "artifacts/keyman-srcpkg"
+          src-pkg-name: "keyman_${{ needs.sourcepackage.outputs.VERSION }}-1_source.changes"
+          bin-pkg-path: "artifacts/keyman-binarypkgs"
+          bin-pkg-name: "keyman_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+"
+          artifacts-name: "keyman-signedpkgs"
+          gpg-signing-key: "${{ secrets.GPG_SIGNING_KEY }}"
+          debsign-keyid: "${{ secrets.DEBSIGN_KEYID }}"
+
+  upload-to-llso:
+    name: Upload packages to llso
+    needs: [sourcepackage, deb_signing]
+    runs-on: self-hosted
+    environment: "deploy (linux)"
+    if: github.event.client_payload.isTestBuild == 'false'
+
+    steps:
+    - name: Install dput
+      run: |
+        export DEBIAN_FRONTEND=noninteractive
+        export DEBIAN_PRIORITY=critical
+        export DEBCONF_NOWARNINGS=yes
+        sudo apt-get update
+        sudo apt-get install -q -y dput
+
+    - name: Setup .dput.cf
+      run: |
+        echo "${{vars.ENV_DPUT_CONFIG}}" > ~/.dput.cf
+
+    - name: Configure GPG Key
+      shell: bash
+      run: |
+        echo -e "::group::\e[32mConfigure GPG key"
+        echo -n "${{ secrets.GPG_SIGNING_KEY }}" | base64 --decode | gpg --import
+        echo "${{ secrets.DEBSIGN_KEYID }}:6:" | gpg --import-ownertrust
+        echo "::endgroup::"
+
+    - name: Download Artifacts
+      uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
+      with:
+        name: keyman-signedpkgs
+
+    - name: Upload
+      run: |
+        case ${{ github.event.client_payload.branch }} in
+          stable-*)  destination='' ;;
+          beta)      destination='-proposed' ;;
+          *)         destination='-experimental' ;;
+        esac
+
+        echo -e "::group::${COLOR_GREEN}Upload source package"
+        cd keyman-srcpkg
+
+        dput -U llso:ubuntu/jammy${destination} *_source.changes
+        echo "::endgroup::"
+
+        echo -e "::group::${COLOR_GREEN}Uploading binary packages"
+        cd ../keyman-binarypkgs
+        pattern="keyman_${{ needs.sourcepackage.outputs.VERSION }}.+\+(.*)[0-9]_[^.]+.changes"
+        for f in *.changes; do
+          if [[ $f =~ $pattern ]]; then
+            dist=${BASH_REMATCH[1]}
+            dput -U llso:ubuntu/${dist}${destination} $f
+          fi
+        done
+        echo "::endgroup::"
+
+  api_verification:
+    name: Verify API for libkmnkbp0.so
+    needs: [sourcepackage, binary_packages]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c #v3.3.0
+      with:
+        ref: '${{ github.event.client_payload.ref }}'
+
+    - name: Download Artifacts
+      uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
+      with:
+        path: artifacts
+
+    - name: Install devscripts
+      uses: ./.github/actions/apt-install
+      with:
+        packages: devscripts equivs
+
+    - name: Verify API
+      run: |
+        cd linux
+        SRC_PKG="${GITHUB_WORKSPACE}/artifacts/keyman-srcpkg/keyman_${{ needs.sourcepackage.outputs.VERSION }}-1.debian.tar.xz" \
+        BIN_PKG="${GITHUB_WORKSPACE}/artifacts/keyman-binarypkgs/libkmnkbp0-0_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" \
+        PKG_VERSION="${{ needs.sourcepackage.outputs.VERSION }}" \
+        ./scripts/deb-packaging.sh --gha verify 2>> $GITHUB_STEP_SUMMARY
+
+    - name: Archive .symbols file
+      uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+      with:
+        name: libkmnkbp0-0.symbols
+        path: linux/debian/libkmnkbp0-0.symbols
+      if: always()
+
+  set_status:
+    name: Set result status on PR builds
+    needs: [sourcepackage, binary_packages, api_verification]
+    runs-on: ubuntu-latest
+    if: ${{ always() && github.event.client_payload.isTestBuild == 'true' }}
+    steps:
+    - name: Set success
+      if: needs.sourcepackage.result == 'success' && needs.binary_packages.result == 'success' && needs.api_verification.result == 'success'
+      run: |
+        echo "RESULT=success" >> $GITHUB_ENV
+        echo "MSG=Package build succeeded" >> $GITHUB_ENV
+
+    - name: Set cancelled
+      if: needs.sourcepackage.result == 'cancelled' || needs.binary_packages.result == 'cancelled' || needs.api_verification.result == 'cancelled'
+      run: |
+        echo "RESULT=error" >> $GITHUB_ENV
+        echo "MSG=Package build cancelled" >> $GITHUB_ENV
+
+    - name: Set failure
+      if: needs.sourcepackage.result == 'failure' || needs.binary_packages.result == 'failure' || needs.api_verification.result == 'failure'
+      run: |
+        echo "RESULT=failure" >> $GITHUB_ENV
+        echo "MSG=Package build failed" >> $GITHUB_ENV
+
+    - name: Set final status
+      run: |
+        gh api \
+          --method POST \
+          -H "Accept: application/vnd.github+json" \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ needs.sourcepackage.outputs.GIT_SHA }} \
+          -f state="$RESULT" \
+          -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+          -f description="$MSG" \
+          -f context="$STATUS_CONTEXT"

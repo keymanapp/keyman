@@ -23,12 +23,39 @@ type
       AResponseInfo: TIdHTTPResponseInfo);
   end;
 
+function CrackUTF8ZeroExtendedString(CommandType: THTTPCommandType; const p: string): string;
+
 implementation
 
 uses
   IdGlobalProtocols,
 
   System.SysUtils;
+
+function CrackUTF8ZeroExtendedString(CommandType: THTTPCommandType; const p: string): string;
+var
+  s: RawByteString;
+  i: Integer;
+begin
+  if CommandType = hcPOST then
+  begin
+    // POSTed data is decoded correctly
+    Exit(p);
+  end;
+
+  // Indy's UTF8 handling of URLs is *completely* broken.
+  // We may need to check this with updated versions of Delphi
+{$IFNDEF VER330}
+  ERROR! Check if this is still needed with Delphi update
+{$ENDIF}
+
+  SetLength(s, p.Length);
+  for i := 1 to p.Length do
+  begin
+    s[i] := AnsiChar(Ord(p[i]));
+  end;
+  Result := UTF8ToString(s);
+end;
 
 { TBaseHttpResponder }
 

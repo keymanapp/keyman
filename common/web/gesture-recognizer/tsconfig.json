@@ -1,25 +1,12 @@
 {
-  "extends": "../../../tsconfig-base.json",
+  "extends": "../tsconfig.kmw-main-base.json",
   "compilerOptions": {
-    "allowJs": true,
-    "module": "none",
-    "outDir": "build/",
-    "declaration": true,
-    "inlineSources": true,
-    "sourceMap": true,
-    "sourceRoot": "keyman/",
-    "target": "es5",
-    "types": ["node"],
-    "lib": ["DOM", "es6"],
-    "outFile": "build/index.js"
+    "baseUrl": "./",
+    "lib": [ "dom", "es6" ],
+    "outDir": "./build/obj/",
+    "rootDir": "./src",
+    "tsBuildInfoFile": "./build/obj/tsconfig.tsbuildinfo"
   },
-  "references": [
-    // { "path": "../../keyman-version" },
-    // { "path": "../../utils" },
-  ],
   "include": ["./src/**/*.ts"],
-  "exclude": ["./src/tools/**/*.ts"],
-  "files": [
-    "../../../node_modules/eventemitter3/index.js"
-  ]
+  "exclude": ["./src/tools/**/*.ts"]
 }

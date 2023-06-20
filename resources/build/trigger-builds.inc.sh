@@ -21,20 +21,25 @@ function triggerBuilds() {
         local job=${build%_Jenkins}
         echo Triggering Jenkins build "$job" "$base" "true"
         triggerJenkinsBuild "$job" "$base" "true"
+      elif [ "${build:(-7)}" == "_GitHub" ]; then
+        local job=${build%_GitHub}
+        echo Triggering GitHub action build "$job" "$base"
+        triggerGitHubActionsBuild false "$job" "$base"
       else
-        echo Triggering TeamCity build $build $TEAMCITY_VCS_ID $base
-        triggerTeamCityBuild $build $TEAMCITY_VCS_ID $base
+        echo Triggering TeamCity build false $build $TEAMCITY_VCS_ID $base
+        triggerTeamCityBuild false $build $TEAMCITY_VCS_ID $base
       fi
     done
   done
 }
 
 function triggerTeamCityBuild() {
-  local TEAMCITY_BUILDTYPE="$1"
-  local TEAMCITY_VCS_ID="$2"
+  local isTestBuild="$1"
+  local TEAMCITY_BUILDTYPE="$2"
+  local TEAMCITY_VCS_ID="$3"
 
-  if [[ $# -gt 2 ]]; then
-    local TEAMCITY_BRANCH_NAME="$3"
+  if [[ $# -gt 3 ]]; then
+    local TEAMCITY_BRANCH_NAME="$4"
     #debug echo "  Triggering build for: $TEAMCITY_BRANCH_NAME"
     TEAMCITY_BRANCH_NAME="branchName='$TEAMCITY_BRANCH_NAME' defaultBranch='false'"
   else
@@ -44,7 +49,13 @@ function triggerTeamCityBuild() {
   local GIT_OID=`git rev-parse HEAD`
   local TEAMCITY_SERVER=https://build.palaso.org
 
-  local command="<build $TEAMCITY_BRANCH_NAME><buildType id='$TEAMCITY_BUILDTYPE' /><lastChanges><change vcsRootInstance='$TEAMCITY_VCS_ID' locator='version:$GIT_OID'/></lastChanges></build>"
+  local command
+
+  if $isTestBuild; then
+    command="<build $TEAMCITY_BRANCH_NAME><buildType id='$TEAMCITY_BUILDTYPE' /></build>"
+  else
+    command="<build $TEAMCITY_BRANCH_NAME><buildType id='$TEAMCITY_BUILDTYPE' /><lastChanges><change vcsRootInstance='$TEAMCITY_VCS_ID' locator='version:$GIT_OID'/></lastChanges></build>"
+  fi
   echo "TeamCity Build Command: $command"
 
   # adjust indentation for output of curl
@@ -63,7 +74,6 @@ function triggerJenkinsBuild() {
   local JENKINS_BRANCH="${2:-master}"
 
   local JENKINS_SERVER=https://jenkins.lsdev.sil.org
-  local GIT_TAG="release-$VERSION_WITH_TAG"
 
   local FORCE=""
   if [ "${3:-false}" == "true" ]; then
@@ -73,7 +83,7 @@ function triggerJenkinsBuild() {
   local TAG=""
   # This will only be true if we created and pushed a tag
   if [ "${action:-""}" == "commit" ]; then
-    TAG=", \"tag\": \"$GIT_TAG\", \"tag2\": \"$GIT_TAG\""
+    TAG=", \"tag\": \"$VERSION_GIT_TAG\", \"tag2\": \"$VERSION_GIT_TAG\""
   fi
 
   if [[ $JENKINS_BRANCH != stable-* ]] && [[ $JENKINS_BRANCH =~ [0-9]+ ]]; then
@@ -90,6 +100,7 @@ function triggerJenkinsBuild() {
   if echo "$OUTPUT" | grep -q "\"triggered\":true"; then
     echo -n "     job triggered: "
   else
+    echo "##teamcity[buildProblem description='Triggering Jenkins build failed']"
     echo -n "     triggering failed: "
   fi
 
@@ -112,4 +123,48 @@ function triggerJenkinsBuild() {
 
     echo
   fi
+}
+
+function triggerGitHubActionsBuild() {
+  local IS_TEST_BUILD="$1"
+  local GITHUB_ACTION="$2"
+  local GIT_BRANCH="${3:-master}"
+  local GIT_REF GIT_SHA
+
+  local GITHUB_SERVER=https://api.github.com/repos/keymanapp/keyman/dispatches
+
+  if [ "${action:-""}" == "commit" ]; then
+    # This will only be true if we created and pushed a tag
+    GIT_REF="refs/tags/release@$VERSION_WITH_TAG"
+    GIT_SHA="$(git rev-parse "${GIT_REF}")"
+    GIT_EVENT_TYPE="${GITHUB_ACTION}: release@${VERSION_WITH_TAG}"
+  elif [[ $GIT_BRANCH != stable-* ]] && [[ $GIT_BRANCH =~ [0-9]+ ]]; then
+    GIT_REF="refs/pull/${GIT_BRANCH}/merge"
+    GIT_SHA="$(git rev-parse "refs/pull/${GIT_BRANCH}/head")"
+    GIT_EVENT_TYPE="${GITHUB_ACTION}: PR #${GIT_BRANCH}"
+    GIT_BRANCH="PR-${GIT_BRANCH}"
+  else
+    GIT_REF="refs/heads/${GIT_BRANCH}"
+    GIT_SHA="$(git rev-parse "${GIT_REF}")"
+    GIT_EVENT_TYPE="${GITHUB_ACTION}: ${GIT_BRANCH}"
+  fi
+
+  local DATA="{\"event_type\": \"$GIT_EVENT_TYPE\", \
+      \"client_payload\": { \
+        \"ref\": \"$GIT_REF\", \
+        \"sha\": \"$GIT_SHA\", \
+        \"branch\": \"$GIT_BRANCH\", \
+        \"isTestBuild\": \"$IS_TEST_BUILD\" \
+    }}"
+
+  echo "GitHub Action Data: $DATA"
+
+  # adjust indentation for output of curl
+  echo -n "     "
+  curl --silent --write-out '\n' \
+    --request POST \
+    --header "Accept: application/vnd.github+json" \
+    --header "Authorization: token $GITHUB_TOKEN" \
+    --data "$DATA" \
+    $GITHUB_SERVER
 }

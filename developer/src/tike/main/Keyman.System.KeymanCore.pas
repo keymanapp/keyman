@@ -201,6 +201,11 @@ type
 
   pkm_kbp_action_item = ^km_kbp_action_item;
 
+// These types are used only for debugging convenience
+type
+  km_kbp_action_item_array = array[0..100] of km_kbp_action_item;
+  pkm_kbp_action_item_array = ^km_kbp_action_item_array;
+
 function km_kbp_options_list_size(
   opts: pkm_kbp_option_item
 ): Integer; cdecl; external kmnkbp0 delayed;
@@ -307,8 +312,13 @@ km_kbp_process_event(
   state: pkm_kbp_state;
   vk: km_kbp_virtual_key;
   modifier_state: uint16_t;
-  is_key_down: uint8_t
+  is_key_down: uint8_t;
+  event_flags: uint16_t
 ): km_kbp_status; cdecl; external kmnkbp0 delayed;
+
+const
+  KM_KBP_EVENT_FLAG_DEFAULT = 0; // default value: hardware
+  KM_KBP_EVENT_FLAG_TOUCH = 1; // set if the event is touch, otherwise hardware
 
 
 // keyboardprocessor_vkeys.h

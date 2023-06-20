@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.dom.json",
+
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "../../../build/engine/main/obj/",
+    "tsBuildInfoFile": "../../../build/engine/main/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
+  },
+
+  "include": [ "src/**/*.ts" ],
+
+  "references": [
+    { "path": "../../../../common/web/input-processor" },
+    { "path": "../device-detect" },
+    { "path": "../osk" },
+    { "path": "../package-cache" },
+    { "path": "../paths" },
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "extends": "../kmc/tsconfig.kmc-base.json",
+
+  "compilerOptions": {
+    "outDir": "build/src/",
+    "rootDir": "src/",
+    "baseUrl": ".",
+    "allowSyntheticDefaultImports": true,
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "references": [
+    { "path": "../../../common/web/keyman-version" },
+    { "path": "../../../common/models/types" },
+    { "path": "../../../common/web/types" },
+  ]
+}

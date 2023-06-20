@@ -19,11 +19,13 @@ from keyman_config.accelerators import bind_accelerator, init_accel
 from keyman_config.dbus_util import get_keyman_config_service
 from keyman_config.downloadkeyboard import DownloadKmpWindow
 from keyman_config.get_kmp import (InstallLocation, get_keyboard_dir,
-                                   get_keyman_dir)
+                                   get_keyman_dir, get_install_area_string)
 from keyman_config.install_window import InstallKmpWindow, find_keyman_image
 from keyman_config.keyboard_details import KeyboardDetailsView
+from keyman_config.kmpmetadata import get_fonts, parsemetadata
 from keyman_config.list_installed_kmp import get_installed_kmp
 from keyman_config.options import OptionsView
+from keyman_config.sentry_handling import SentryErrorHandling
 from keyman_config.uninstall_kmp import uninstall_kmp
 from keyman_config.welcome import WelcomeView
 
@@ -40,7 +42,7 @@ class ViewInstalledWindowBase(Gtk.Window):
 
     def on_close_clicked(self, button):
         logging.debug("Close application clicked")
-        Gtk.main_quit()
+        self.close()
 
     def on_refresh_clicked(self, button):
         logging.debug("Refresh application clicked")
@@ -81,6 +83,8 @@ class ViewInstalledWindowBase(Gtk.Window):
 
     def install_file(self, kmpfile, language=None):
         installDlg = InstallKmpWindow(kmpfile, viewkmp=self, language=language)
+        if installDlg.is_error:
+            return Gtk.ResponseType.CANCEL
         result = installDlg.run()
         installDlg.destroy()
         return result
@@ -91,7 +95,7 @@ class ViewInstalledWindowBase(Gtk.Window):
             self.close()
 
     def run(self):
-        self.resize(576, 324)
+        self.resize(776, 424)
         self.connect("destroy", Gtk.main_quit)
         self.show_all()
         Gtk.main()
@@ -101,26 +105,60 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
     def __init__(self):
         ViewInstalledWindowBase.__init__(self)
 
-# window is split left/right hbox
-# right is ButtonBox
-#     possibly 2 ButtonBox in a vbox
-#         top one with _Remove, _About, ?_Welcome? or ?Read_Me?, _Options
-#         bottom one with _Download, _Install, Re_fresh, _Close
-# left is GtkTreeView - does it need to be inside anything else apart from the hbox?
-#     with liststore which defines columns
-#         GdkPixbuf icon
-#         gchararray name
-#         gchararray version
-#         gchararray packageID (hidden)
-#         enum? area (user, shared, system) (icon or hidden?)
-#         gchararray welcomefile (hidden) (or just use area and packageID?)
-# changing selected item in treeview changes what buttons are activated
-# on selected_item_changed signal set the data that the buttons will use in their callbacks
-# see https://developer.gnome.org/gtk3/stable/TreeWidget.html#TreeWidget
+        self.sentry = SentryErrorHandling()
 
+        outerHbox = Gtk.HBox()
+        sidebar = Gtk.StackSidebar()
+        stack = Gtk.Stack()
+
+        outerHbox.pack_start(sidebar, False, False, 0)
+        outerHbox.pack_end(Gtk.Separator(), False, False, 0)
+        outerHbox.pack_end(stack, True, True, 0)
+        stack.set_hexpand(True)
+        stack.set_vexpand(True)
+        sidebar.set_stack(stack)
+
+        stack.add_titled(self.add_keyboard_layouts_widget(), "KeyboardLayouts", _("Keyboard Layouts"))
+        stack.add_titled(self.add_options_widget(), "Options", _("Options"))
+
+        outmostVBox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        outmostVBox.pack_start(outerHbox, True, True, 0)
+
+        bbox_bottom = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.HORIZONTAL)
+        bbox_bottom.set_layout(Gtk.ButtonBoxStyle.START)
+
+        button = Gtk.Button.new_with_mnemonic(_("_Install keyboard..."))
+        button.set_tooltip_text(_("Install a keyboard from a file"))
+        button.connect("clicked", self.on_installfile_clicked)
+        bbox_bottom.add(button)
+
+        button = Gtk.Button.new_with_mnemonic(_("_Download keyboard..."))
+        button.set_tooltip_text(_("Download and install a keyboard from the Keyman website"))
+        button.connect("clicked", self.on_download_clicked)
+        bbox_bottom.add(button)
+
+        button = Gtk.Button.new_with_mnemonic(_("_Refresh"))
+        button.set_tooltip_text(_("Refresh keyboard list"))
+        button.connect("clicked", self.on_refresh_clicked)
+        bbox_bottom.add(button)
+
+        button = Gtk.Button.new_with_mnemonic(_("_Close"))
+        button.set_tooltip_text(_("Close window"))
+        button.connect("clicked", self.on_close_clicked)
+        bind_accelerator(self.accelerators, button, '<Control>q')
+        bind_accelerator(self.accelerators, button, '<Control>w')
+        bbox_bottom.add(button)
+
+        bbox_hbox = Gtk.HBox(spacing=12)
+        bbox_hbox.pack_start(bbox_bottom, True, True, 12)
+        outmostVBox.pack_end(bbox_hbox, False, True, 12)
+        self.add(outmostVBox)
+
+    def add_keyboard_layouts_widget(self):
         hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        s = Gtk.ScrolledWindow()
-        hbox.pack_start(s, True, True, 0)
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        hbox.pack_start(scrolledWindow, True, True, 0)
 
         self.store = Gtk.ListStore(
             GdkPixbuf.Pixbuf,  # icon
@@ -128,14 +166,10 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             str,    # version
             str,    # packageID
             int,    # enum InstallLocation (KmpArea is GObject version)
+            str,    # InstallLocation area
+            str,    # Tooltip with InstallLocation path
             str,    # path to welcome file if it exists or None
             str)    # path to options file if it exists or None
-
-        # add installed keyboards to the the store e.g.
-        # treeiter = store.append([GdkPixbuf.Pixbuf.new_from_file_at_size(
-        #     "/usr/local/share/keyman/libtralo/libtralo.ico.png", 16, 16), \
-        #     "LIBTRALO", "1.6.1", \
-        #     "libtralo", KmpArea.SHARED, True])
 
         self.refresh_installed_kmp()
 
@@ -152,11 +186,16 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         # i18n: column header in table displaying installed keyboards
         column = Gtk.TreeViewColumn(_("Version"), renderer, text=2)
         self.tree.append_column(column)
+        # i18n: column header in table displaying installed keyboards
+        column = Gtk.TreeViewColumn(_("Area"), renderer, text=5)
+        self.tree.append_column(column)
+
+        self.tree.set_tooltip_column(column=6)
 
         select = self.tree.get_selection()
         select.connect("changed", self.on_tree_selection_changed)
 
-        s.add(self.tree)
+        scrolledWindow.add(self.tree)
 
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
 
@@ -188,36 +227,34 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         bbox_top.add(self.options_button)
 
         vbox.pack_start(bbox_top, False, False, 12)
-
-        bbox_bottom = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.VERTICAL)
-        bbox_bottom.set_layout(Gtk.ButtonBoxStyle.END)
-
-        button = Gtk.Button.new_with_mnemonic(_("_Refresh"))
-        button.set_tooltip_text(_("Refresh keyboard list"))
-        button.connect("clicked", self.on_refresh_clicked)
-        bbox_bottom.add(button)
-
-        button = Gtk.Button.new_with_mnemonic(_("_Download"))
-        button.set_tooltip_text(_("Download and install a keyboard from the Keyman website"))
-        button.connect("clicked", self.on_download_clicked)
-        bbox_bottom.add(button)
-
-        button = Gtk.Button.new_with_mnemonic(_("_Install"))
-        button.set_tooltip_text(_("Install a keyboard from a file"))
-        button.connect("clicked", self.on_installfile_clicked)
-        bbox_bottom.add(button)
-
-        button = Gtk.Button.new_with_mnemonic(_("_Close"))
-        button.set_tooltip_text(_("Close window"))
-        button.connect("clicked", self.on_close_clicked)
-        bind_accelerator(self.accelerators, button, '<Control>q')
-        bind_accelerator(self.accelerators, button, '<Control>w')
-        bbox_bottom.add(button)
-
-        vbox.pack_end(bbox_bottom, False, False, 12)
-
         hbox.pack_start(vbox, False, False, 12)
-        self.add(hbox)
+
+        return hbox
+
+    def add_options_widget(self):
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        label = Gtk.Label(_("General"))
+        label.set_padding(5, 5)
+        label.set_halign(Gtk.Align.START)
+        vbox.pack_start(label, False, False, 10)
+
+        (enabled, reason) = self.sentry.is_sentry_enabled()
+        disabledByVariable = self.sentry.is_sentry_disabled_by_variable()
+
+        self.errorReportingButton = Gtk.CheckButton(_("Automatically report errors to keyman.com"))
+        self.errorReportingButton.set_active(enabled)
+        self.errorReportingButton.set_sensitive(not disabledByVariable)
+        self.sentry.bind_checkbutton(self.errorReportingButton)
+        vbox.pack_start(self.errorReportingButton, False, False, 0)
+
+        if disabledByVariable:
+            label = Gtk.Label(reason)
+            label.set_halign(Gtk.Align.START)
+            label.set_padding(25, 0)
+            label.set_sensitive(False)
+            vbox.pack_start(label, False, False, 0)
+
+        return vbox
 
     def addlistitems(self, installed_kmp, store, install_area):
         for kmp in sorted(installed_kmp):
@@ -252,6 +289,8 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
                 kmpdata['version'],
                 kmpdata['packageID'],
                 install_area,
+                get_install_area_string(install_area),
+                path.replace(os.path.expanduser('~'), '~'),
                 welcome_file,
                 options_file])
 
@@ -351,18 +390,40 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         model, treeiter = self.tree.get_selection().get_selected()
         if treeiter is not None:
             logging.info("Uninstall keyboard " + model[treeiter][3] + "?")
-            dialog = Gtk.MessageDialog(
-                self, 0, Gtk.MessageType.QUESTION,
-                Gtk.ButtonsType.YES_NO, _("Uninstall keyboard package?"))
-            dialog.format_secondary_text(
-                _("Are you sure that you want to uninstall the {keyboard} keyboard and its fonts?")
-                .format(keyboard=model[treeiter][1]))
+            dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO,
+                                       _("Uninstall keyboard package?"))
+            msg = _("Are you sure that you want to uninstall the {keyboard} keyboard?").format(
+              keyboard=model[treeiter][1])
+            kbdir = get_keyboard_dir(InstallLocation.User, model[treeiter][3])
+            kmpjson = os.path.join(kbdir, "kmp.json")
+            if os.path.isfile(kmpjson):
+                info, system, options, keyboards, files = parsemetadata(kmpjson, False)
+                fonts = get_fonts(files)
+                if fonts:
+                    # Fonts are optional
+                    fontlist = ""
+                    for font in fonts:
+                        if 'description' in font:
+                            if fontlist != "":
+                                fontlist = fontlist + "\n"
+                            if font['description'][:5] == "Font ":
+                                fontdesc = font['description'][5:]
+                            else:
+                                fontdesc = font['description']
+                            fontlist = fontlist + fontdesc
+                    msg += "\n\n" + _("The following fonts will also be uninstalled:\n") + fontlist
+            dialog.format_secondary_text(msg)
             response = dialog.run()
             dialog.destroy()
             if response == Gtk.ResponseType.YES:
                 logging.info("Uninstalling keyboard" + model[treeiter][1])
                 # can only uninstall with the gui from user area
-                uninstall_kmp(model[treeiter][3])
+                msg = uninstall_kmp(model[treeiter][3])
+                if not msg == '':
+                    md = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,
+                            Gtk.ButtonsType.OK, _("Uninstalling keyboard failed.\n\nError message: ") + msg)
+                    md.run()
+                    md.destroy()
                 logging.info("need to restart window after uninstalling a keyboard")
                 self.restart()
             elif response == Gtk.ResponseType.NO:

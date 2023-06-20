@@ -9,6 +9,7 @@ import requests
 import requests_cache
 from gi.repository import GObject
 
+from keyman_config import _
 from keyman_config import KeymanApiUrl, KeymanDownloadsUrl
 from keyman_config.deprecated_decorator import deprecated
 
@@ -18,6 +19,16 @@ class InstallLocation(GObject.GEnum):
     Shared = 2
     User = 3
     Unknown = 99
+
+
+def get_install_area_string(area):
+    if area == InstallLocation.OS:
+        return _('System')
+    elif area == InstallLocation.Shared:
+        return _('Shared')
+    elif area == InstallLocation.User:
+        return _('User')
+    return _('Unknown')
 
 
 def get_package_download_data(packageID, weekCache=False):
@@ -74,7 +85,10 @@ def get_keyboard_data(keyboardID, weekCache=False):
     os.chdir(cache_dir)
     requests_cache.install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
     now = time.ctime(int(time.time()))
-    response = requests.get(api_url)
+    try:
+        response = requests.get(api_url)
+    except requests.exceptions.RequestException as e:  # This is the correct syntax
+        return None
     logging.debug('Time: {0} / Used Cache: {1}'.format(now, response.from_cache))
     os.chdir(current_dir)
     requests_cache.uninstall_cache()

@@ -3,9 +3,9 @@
 #
 
 !ifdef NODELPHI
-TARGETS=build-tools kmcmpdll kmanalyze kmdecomp server kmlmc
+TARGETS=build-tools kmcmplib kmcmpdll kmanalyze kmdecomp server kmc
 !else
-TARGETS=build-tools kmcmpdll kmcomp kmanalyze kmconvert tike samples setup inst kmdecomp server kmlmc
+TARGETS=build-tools kmcmplib kmcmpdll kmcomp kmanalyze kmconvert tike samples setup inst kmdecomp server kmc
 !endif
 
 EXCLUDEPATHDEFINES=1
@@ -29,7 +29,11 @@ imsample: .virtual
     cd $(DEVELOPER_ROOT)\src\imsample
     $(MAKE) $(TARGET)
 
-kmcmpdll: .virtual
+kmcmplib: global-versions .virtual
+    cd $(DEVELOPER_ROOT)\src\kmcmplib
+    $(MAKE) $(TARGET)
+
+kmcmpdll: kmcmplib .virtual
     cd $(DEVELOPER_ROOT)\src\kmcmpdll
     $(MAKE) $(TARGET)
 
@@ -65,8 +69,28 @@ server: .virtual
     cd $(DEVELOPER_ROOT)\src\server
     $(MAKE) $(TARGET)
 
-kmlmc: .virtual
-    cd $(DEVELOPER_ROOT)\src\kmlmc
+kmc: kmc-ldml kmc-kmn kmc-model kmc-model-info kmc-package
+    cd $(DEVELOPER_ROOT)\src\kmc
+    $(MAKE) $(TARGET)
+
+kmc-ldml: .virtual
+    cd $(DEVELOPER_ROOT)\src\kmc-ldml
+    $(MAKE) $(TARGET)
+
+kmc-kmn: .virtual
+    cd $(DEVELOPER_ROOT)\src\kmc-kmn
+    $(MAKE) $(TARGET)
+
+kmc-model: .virtual
+    cd $(DEVELOPER_ROOT)\src\kmc-model
+    $(MAKE) $(TARGET)
+
+kmc-model-info: .virtual
+    cd $(DEVELOPER_ROOT)\src\kmc-model-info
+    $(MAKE) $(TARGET)
+
+kmc-package: .virtual
+    cd $(DEVELOPER_ROOT)\src\kmc-package
     $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------
@@ -233,7 +257,7 @@ build-tools:
 
 global-versions:
     cd $(COMMON_ROOT)
-    @if not exist $(KEYMAN_ROOT)\common\windows\cpp\include\keymanversion_build.h $(MAKE) global-versions
+    @if not exist $(KEYMAN_ROOT)\include\keymanversion_build.h $(MAKE) global-versions
     cd $(DEVELOPER_ROOT)\src
 
 build-tools-internal:

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Context: Title for list -->
+    <plurals name="title_keyboards">
+        <item quantity="one">Keyboard</item>
+        <item quantity="other">Tangentbord</item>
+    </plurals>
+    <!-- Context: Title for list -->
+    <plurals name="title_other_input_methods">
+        <item quantity="one">Annan inmatningsmetod</item>
+        <item quantity="other">Andra inmatningsmetoder</item>
+    </plurals>
+    <!-- Context: Title for list -->
+    <string name="title_add_keyboard" comment="Add a new keyboard">Lägg till nytt tangentbord</string>
+    <!-- Context: Title for list -->
+    <string name="title_languages_settings" comment="List of installed languages">Installerade språk</string>
+    <!-- Context: Title for list -->
+    <string name="title_language_settings" comment="Keyman Settings for a language">%1$s Inställningar</string>
+    <!-- Context: Button label -->
+    <string name="label_add" comment="Button to add an item">Lägg till</string>
+    <!-- Context: Button label -->
+    <string name="label_back" comment="Button to go back">Tillbaka</string>
+    <!-- Context: Button label -->
+    <string name="label_cancel" comment="Button to cancel an action">Avbryt</string>
+    <!-- Context: Button label -->
+    <string name="label_close" comment="Close a dialog">Stäng</string>
+    <!-- Context: Button label. Removed in Keyman 15 -->
+    <string name="label_close_keyman" comment="Close the Keyman application">Stäng Keyman</string>
+    <!-- Context: Button label -->
+    <string name="label_forward" comment="Button to go forward">Framåt</string>
+    <!-- Context: Button label -->
+    <string name="label_next_input_method" comment="Switch to next input method (replaces label_close_keyman)">Nästa inmatningsmetod</string>
+    <!-- Context: Button label -->
+    <string name="label_download" comment="Button to confirm downloading an item">Hämta</string>
+    <!-- Context: Button label -->
+    <string name="label_install" comment="Confirmation to install a package">Installera</string>
+    <!-- Context: Button label -->
+    <string name="label_later" comment="Do an action at a later time">Senare</string>
+    <!-- Context: Button label -->
+    <string name="label_next" comment="Go to the next screen">Nästa</string>
+    <!-- Context: Button label -->
+    <string name="label_ok" comment="Button to acknowledge a dialog">Ok</string>
+    <!-- Context: Button label -->
+    <string name="label_update" comment="Dialog button to update a resource">Uppdatera</string>
+    <!-- Context: No internet for updates -->
+    <string name="no_internet_connection" comment="Internet connection missing">No internet connection</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="cannot_connect" comment="Error message when network connection fails">Kan inte ansluta till Keyman-servern!</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_delete_keyboard" comment="Confirmation to delete a keyboard">Vill du ta bort det här tangentbordet?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_download_keyboard" comment="Confirmation to download a keyboard update">Vill du ladda ner den senaste versionen av detta tangentbord?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_update" comment="Confirmation to update several resources">Vill du uppdatera tangentbord och ordböcker nu?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_updates_channel">Uppdateringar av resurs</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_updates_available" comment="Notification when resource updates are available">Uppdateringar av resurs tillgängliga</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="update_available" comment="Currently installed version of a resource with an available update">%1$s (Uppdatering tillgänglig)</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_update_message" comment="language name: keyboard name">      Uppdateringar tillgängliga för tangentbord %1$s: %2$s </string>
+    <!-- Context: Keyboard Updates -->
+    <string name="dictionary_update_message">Uppdateringar tillgängliga för ordbok %1$s: %2$s </string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version" comment="Label for keyboard version">Tangentbord version</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="help_link" comment="Label for help link">Hjälp länk</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="uninstall_keyboard" comment="Label for uninstalling keyboard">Avinstallera tangentbordet</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_picker_new_keyboard" comment="Mark a language name that's newly installed in keyboard list">[new] %1$s</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_qr_code" comment="QR Code description">      Skanna koden för att ladda detta\ntangentbord på en annan enhet</string>
+    <!-- Context: Keyboard Help welcome.htm title -->
+    <string name="welcome_package" comment="Title to welcome.htm page (name and version)">Välkommen till %1$s</string>
+    <!-- Context: Keyboard app doesn't include FileProvider library needed to view help file -->
+    <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">      Filleverantörsbibliotek behövs för att visa hjälpfilen: %1$s</string>
+    <!-- Context: Fatal keyboard error. Will load default keyboard -->
+    <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">      Kritiskt tangentbordsfel med %1$s:%2$s för %3$s språk. Laddar standardtangentbordet.</string>
+    <!-- Context: Fatal keyboard error.  -->
+    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      Fel i tangentbordet %1$s:%2$s för %3$s språk.</string>
+    <!-- Context: Query for associated dictionary -->
+    <string name="query_associated_model" comment="Check if there's an available dictionary to download">Söker efter tillhörande ordbok att ladda ner</string>
+    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Cannot connect to Keyman server to check for associated dictionary to download</string>
+    <!-- Context: Model Updates -->
+    <string name="confirm_download_model" comment="Confirmation to download a dictionary update">Vill du ladda ner den senaste versionen av denna ordbok?</string>
+    <!-- Context: No associated dictionary found -->
+    <string name="no_associated_model" comment="Confirmation there's no available dictionary to download">Ingen ordbok att ladda ner</string>
+    <!-- Context: Model Updates -->
+    <string name="catalog_unavailable" comment="Notification that the cloud resource catalog can't be updated">Resurskatalogen är inte tillgänglig</string>
+    <!-- Context: Background download messages-->
+    <string name="catalog_download_start_in_background" comment="Notification that the resource catalog update will begin">Kataloguppdatering startad i bakgrunden</string>
+    <!-- Context: Background download messages-->
+    <string name="catalog_download_is_running_in_background" comment="Notification that the resource catalog update is still downloading">      Katalogen laddas fortfarande ner; försök igen om ett ögonblick!</string>
+    <!-- Context: Background download messages-->
+    <string name="progress_message_checking_resource_is_running" comment="Progress notification that the check for a resource is still running ">Söker efter resurs</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_start_in_background" comment="Notification that a keyboard download has started">Nedladdning av tangentbord startat i bakgrunden</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_is_running_in_background" comment="Notification that a keyboard download is still running">Det valda tangentbordet laddas redan ner; försök igen om ett ögonblick!</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_finished" comment="Notification that a keyboard download has finished">Tangentbords nedladdning är klar!</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_start_in_background" comment="Notification that a dictionary download has started">Nedladdning av ordbok startad i bakgrunden</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">Den valda ordboken laddas redan ner; försök igen om en stund!</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">Nedladdning av ordbok är klar.</string>
+    <!-- Context: Background download messages -->
+    <string name="download_failed" comment="Notification that a download failed">Nedladdning misslyckades</string>
+    <!-- Context: Background download messages -->
+    <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">Det gick inte att hämta den hämtade filen</string>
+    <!-- Context: General Updates -->
+    <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">Det gick inte att komma åt servern!</string>
+    <!-- Context: General Updates -->
+    <string name="update_check_current" comment="Notification that all resources are up to date">"Alla resurser är uppdaterade!"</string>
+    <!-- Context: General Updates -->
+    <string name="update_failed" comment="Notification that a resource update failed">En eller flera resurser kunde inte uppdateras!</string>
+    <!-- Context: General Updates -->
+    <string name="update_success" comment="Notification that a resource update successfully updated">Resurser har uppdaterats!</string>
+    <!-- Context: Model Info -->
+    <string name="model_version" comment="Title for a dictionary version">Ordbok version</string>
+    <!-- Context: Model Info -->
+    <string name="uninstall_model" comment="Label to uninstall a dictionary">Avinstallera ordbok</string>
+    <!-- Context: Model Info -->
+    <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">Vill du ta bort denna ordbok?</string>
+    <!-- Context: Model Deleted -->
+    <string name="model_deleted" comment="Notification when a dictionary is deleted">Dictionary deleted</string>
+    <!-- Context: Language Settings Keyboard install strings -->
+    <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">%1$s tangentbord installerat</string>
+    <!-- Context: Language Settings Keyboard uninstall strings -->
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Keyboard deleted</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Aktivera korrigeringar</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="enable_predictions" comment="Enable predictions from the suggestion banner">Aktivera förutsägelser</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_label">Ordbok</string>
+    <plurals name="model_count">
+        <item quantity="one">Dictionary</item>
+        <item quantity="other">Dictionaries</item>
+    </plurals>
+    <!-- Context: Language Settings menu substring - Check for available dictionary -->
+    <string name="check_available_model" comment="Check for available dictionary">Sök efter tillgänglig ordbok</string>
+    <string name="check_model_online" comment="Check for dictionaries online">Check for dictionaries online</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_info_header" comment="Dictionary name">Ordbok: %1$s</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_picker_header" comment="Dictionaries for a specified language">%1$s ordböcker</string>
+    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_install_toast" comment="Notification when a dictionary is installed">Ordbok installerad</string>
+    <!-- Context: Language Settings menu strings -->
+    <plurals name="keyboard_count">
+        <item quantity="one">(%1$d tangentbord)</item>
+        <item quantity="other">(%1$d tangentbord)</item>
+    </plurals>
+    <!-- Context: "Change Display Language" menu -->
+    <string name="default_locale" comment="Use the device's current locale">Standard språk</string>
+    <!-- Context: Content descriptions -->
+    <!-- Context: Content descriptions -->
+    <!-- Context: Popup menu labels -->
+    <string name="label_delete" comment="Confirmation to delete an item">Radera</string>
+    <!-- Context: Shared preferences name -->
+    <!-- Context: Other strings -->
+    <string name="help_bubble_text">Tryck här för att ändra tangentbordet</string>
+    <!-- Context: anywhere -->
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+</resources>

@@ -337,6 +337,8 @@ type
     procedure SaveJSON(ARoot: TJSONObject); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
     procedure SaveXML(ARoot: IXMLNode); virtual;
+    function ContainsID(const id: string): Boolean;
+    function IndexOfID(const id: string): Integer;
   end;
 
   TPackageLexicalModel = class(TPackageBaseObject)
@@ -457,7 +459,6 @@ const
   SXML_PackageLexicalModel = 'LexicalModel';
   SXML_PackageLexicalModel_Name = 'Name';
   SXML_PackageLexicalModel_ID = 'ID';
-  SXML_PackageLexicalModel_Version = 'Version';
   SXML_PackageLexicalModel_RTL = 'RTL';
   SXML_PackageLexicalModel_Languages = 'Languages';
 
@@ -2211,7 +2212,7 @@ begin
     lexicalModel := TPackageLexicalModel.Create(Package);
     lexicalModel.Name := XmlVarToStr(ALexicalModel.ChildValues[SXML_PackageLexicalModel_Name]);
     lexicalModel.ID := XmlVarToStr(ALexicalModel.ChildValues[SXML_PackageLexicalModel_ID]);
-    lexicalModel.RTL := ANode.ChildNodes.IndexOf(SXML_PackageLexicalModel_RTL) >= 0;
+    lexicalModel.RTL := ALexicalModel.ChildNodes.IndexOf(SXML_PackageLexicalModel_RTL) >= 0;
     lexicalModel.Languages.LoadXML(ALexicalModel);
     Add(lexicalModel);
   end;
@@ -2261,6 +2262,21 @@ begin
 end;
 
 { TPackageKeyboardLanguageList }
+
+function TPackageKeyboardLanguageList.ContainsID(const id: string): Boolean;
+begin
+  Result := IndexOfID(id) >= 0;
+end;
+
+function TPackageKeyboardLanguageList.IndexOfID(const id: string): Integer;
+var
+  i: Integer;
+begin
+  for i := 0 to Count - 1 do
+    if SameText(Items[i].ID, id) then
+      Exit(i);
+  Result := -1;
+end;
 
 procedure TPackageKeyboardLanguageList.LoadJSON(ARoot: TJSONObject);
 var

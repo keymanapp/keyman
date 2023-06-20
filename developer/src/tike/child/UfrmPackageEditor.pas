@@ -91,7 +91,6 @@ type
     memoFileDetails: TMemo;
     cmdOpenFile: TButton;
     cmdOpenContainingFolder: TButton;
-    Panel2: TPanel;
     lblKMPImageFile: TLabel;
     lblKMPImageSize: TLabel;
     lblReadme: TLabel;
@@ -104,6 +103,8 @@ type
     lblStep2a: TLabel;
     lblPackageDetails: TLabel;
     lblPackageRequiredInformation: TLabel;
+    sbDetails: TScrollBox;
+    sbCompile: TScrollBox;
     lblVersionHint: TLabel;
     cbReadMe: TComboBox;
     editInfoName: TEdit;
@@ -132,7 +133,6 @@ type
     editStartMenuDescription: TEdit;
     editStartMenuParameters: TEdit;
     cbStartMenuProgram: TComboBox;
-    Panel4: TPanel;
     Label13: TLabel;
     lblCompilePackage: TLabel;
     pageKeyboards: TTabSheet;
@@ -269,6 +269,8 @@ type
     procedure cmdOpenProjectFolderClick(Sender: TObject);
     procedure cmdSendURLsToEmailClick(Sender: TObject);
     procedure cmdCopyDebuggerLinkClick(Sender: TObject);
+    procedure sbDetailsMouseWheel(Sender: TObject; Shift: TShiftState;
+      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -312,8 +314,7 @@ type
     procedure EnableLexicalModelTabControls;
     procedure ShowEditLanguageForm(grid: TStringGrid;
       langs: TPackageKeyboardLanguageList; lang: TPackageKeyboardLanguage);
-    function ShowAddLanguageForm(grid: TStringGrid;
-      langs: TPackageKeyboardLanguageList): Boolean;
+    procedure ShowAddLanguageForm(grid: TStringGrid; langs: TPackageKeyboardLanguageList);
     procedure RefreshLexicalModelList;
     procedure UpdateQRCode;
 
@@ -345,6 +346,7 @@ implementation
 
 uses
   Vcl.Clipbrd,
+  Vcl.Imaging.GifImg,
 
   Keyman.Developer.System.HelpTopics,
 
@@ -1346,9 +1348,13 @@ end;
 
 procedure TfrmPackageEditor.UpdateImagePreviews;
 var
-  filename: WideString;
+  filename, msg: string;
+  p: TPicture;
 begin
   filename := '';
+
+  lblKMPImageSize.Caption := '(Unknown image format)';
+  imgKMPSample.Picture := nil;
 
   if cbKMPImageFile.ItemIndex > 0 then
     filename := (cbKMPImageFile.Items.Objects[cbKMPImageFile.ItemIndex] as TPackageContentFile).FileName;
@@ -1356,18 +1362,37 @@ begin
   if filename <> '' then
   begin
     try
-      imgKMPSample.Picture.LoadFromFile(filename);
-      lblKMPImageSize.Caption := Format('Image size: (%d x %d)',
-        [imgKMPSample.Picture.Bitmap.Width, imgKMPSample.Picture.Bitmap.Height]);
+      p := TPicture.Create;
+      try
+        p.LoadFromFile(filename);
+        if (p.Width = 0) or (p.Height = 0) then
+          Exit;
+
+        imgKMPSample.Picture.Bitmap.SetSize(p.Width, p.Height);
+        imgKMPSample.Picture.Bitmap.PixelFormat := pf24bit;
+        imgKMPSample.Picture.Bitmap.Canvas.StretchDraw(imgKMPSample.ClientRect, p.Graphic);
+
+        msg := Format('Image size: (%d x %d)', [p.Width, p.Height]);
+
+        // Check dimensions and aspect ratio
+        if Round(100 * p.Width / p.Height) <> 56 then
+        begin
+          msg := msg + ' WARNING: image has wrong aspect ratio; should be 140 x 250 pixels';
+        end
+        else if (p.Width <> 140) or (p.Height <> 250) then
+        begin
+          msg := msg + ' WARNING: image should be 140 x 250 pixels';
+        end;
+      finally
+        p.Free;
+      end;
+
+      lblKMPImageSize.Caption := msg;
+
     except
       imgKMPSample.Picture := nil;
       lblKMPImageSize.Caption := '(Unknown image format)';
     end;
-  end
-  else
-  begin
-    imgKMPSample.Picture := nil;
-    lblKMPImageSize.Caption := '(No image)';
   end;
 end;
 
@@ -1598,6 +1623,8 @@ procedure TfrmPackageEditor.EnableControls;
 begin
   EnableStartMenuControls;
   EnableDetailsTabControls;
+  EnableKeyboardTabControls;
+  EnableLexicalModelTabControls;
   EnableCompileTabControls;
 end;
 
@@ -1660,35 +1687,16 @@ end;
 procedure TfrmPackageEditor.cmdKeyboardAddLanguageClick(Sender: TObject);
 var
   k: TPackageKeyboard;
-  lang: TPackageKeyboardLanguage;
-  frm: TfrmSelectBCP47Language;
 begin
   k := SelectedKeyboard;
   Assert(Assigned(k));
-
-  frm := TfrmSelectBCP47Language.Create(Application.MainForm);
-  try
-    if frm.ShowModal = mrOk then
-    begin
-      lang := TPackageKeyboardLanguage.Create(pack);
-      lang.ID := frm.LanguageID;
-      lang.Name := frm.LanguageName;
-      k.Languages.Add(lang);
-      RefreshKeyboardLanguageList(k);
-      gridKeyboardLanguages.Row := gridKeyboardLanguages.RowCount - 1;
-      gridKeyboardLanguagesClick(gridKeyboardLanguages);
-      Modified := True;
-    end;
-  finally
-    frm.Free;
-  end;
+  ShowAddLanguageForm(gridKeyboardLanguages, k.Languages);
 end;
 
 procedure TfrmPackageEditor.cmdKeyboardEditLanguageClick(Sender: TObject);
 var
   k: TPackageKeyboard;
   lang: TPackageKeyboardLanguage;
-  frm: TfrmSelectBCP47Language;
 begin
   k := SelectedKeyboard;
   Assert(Assigned(k));
@@ -1696,20 +1704,7 @@ begin
   lang := SelectedKeyboardLanguage;
   Assert(Assigned(lang));
 
-  frm := TfrmSelectBCP47Language.Create(Application.MainForm);
-  try
-    frm.LanguageID := lang.ID;
-    frm.LanguageName := lang.Name;
-    if frm.ShowModal = mrOk then
-    begin
-      lang.ID := frm.LanguageID;
-      lang.Name := frm.LanguageName;
-      RefreshKeyboardLanguageList(k);
-      Modified := True;
-    end;
-  finally
-    frm.Free;
-  end;
+  ShowEditLanguageForm(gridKeyboardLanguages, k.Languages, lang);
 end;
 
 procedure TfrmPackageEditor.cmdKeyboardRemoveLanguageClick(Sender: TObject);
@@ -1754,6 +1749,14 @@ begin
   panBuildMobile.Visible := FHasMobileTarget;
 end;
 
+procedure TfrmPackageEditor.sbDetailsMouseWheel(Sender: TObject;
+  Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint;
+  var Handled: Boolean);
+begin
+  (Sender as TScrollBox).VertScrollBar.Position := (Sender as TScrollBox).VertScrollBar.Position - WheelDelta div 2;
+  Handled := True;
+end;
+
 {-------------------------------------------------------------------------------
  - Lexical Models and Keyboards - language list shared functions
  -------------------------------------------------------------------------------}
@@ -1785,16 +1788,25 @@ begin
   end;
 end;
 
-function TfrmPackageEditor.ShowAddLanguageForm(grid: TStringGrid; langs: TPackageKeyboardLanguageList): Boolean;
+procedure TfrmPackageEditor.ShowAddLanguageForm(grid: TStringGrid; langs: TPackageKeyboardLanguageList);
 var
   lang: TPackageKeyboardLanguage;
   frm: TfrmSelectBCP47Language;
+  n: Integer;
 begin
-  Result := False;
   frm := TfrmSelectBCP47Language.Create(Application.MainForm);
   try
     if frm.ShowModal = mrOk then
     begin
+      n := langs.IndexOfID(frm.LanguageID);
+      if n >= 0 then
+      begin
+        // Duplicate - we won't re-add the item, just select the existing item
+        grid.Row := n + 1;
+        EnableControls;
+        Exit;
+      end;
+
       lang := TPackageKeyboardLanguage.Create(pack);
       lang.ID := frm.LanguageID;
       lang.Name := frm.LanguageName;
@@ -1802,7 +1814,7 @@ begin
       RefreshLanguageList(grid, langs);
       grid.Row := grid.RowCount - 1;
       Modified := True;
-      Result := True;
+      EnableControls;
     end;
   finally
     frm.Free;
@@ -1812,6 +1824,7 @@ end;
 procedure TfrmPackageEditor.ShowEditLanguageForm(grid: TStringGrid; langs: TPackageKeyboardLanguageList; lang: TPackageKeyboardLanguage);
 var
   frm: TfrmSelectBCP47Language;
+  n: Integer;
 begin
   frm := TfrmSelectBCP47Language.Create(Application.MainForm);
   try
@@ -1819,9 +1832,30 @@ begin
     frm.LanguageName := lang.Name;
     if frm.ShowModal = mrOk then
     begin
+      if not SameText(frm.LanguageID, lang.ID) then
+      begin
+        // If the id has changed, check for duplicates
+        n := langs.IndexOfID(frm.LanguageID);
+        if n >= 0 then
+        begin
+          // Duplicate - we will delete the edited one and select the existing
+          // one
+          langs.Remove(lang);
+          RefreshLanguageList(grid, langs);
+
+          // The index may have changed, search again
+          n := langs.IndexOfID(frm.LanguageID);
+          grid.Row := n + 1;
+          EnableControls;
+          Modified := True;
+          Exit;
+        end;
+      end;
+
       lang.ID := frm.LanguageID;
       lang.Name := frm.LanguageName;
       RefreshLanguageList(grid, langs);
+      EnableControls;
       Modified := True;
     end;
   finally
@@ -1971,10 +2005,7 @@ var
 begin
   lm := SelectedLexicalModel;
   Assert(Assigned(lm));
-
-  if ShowAddLanguageForm(gridLexicalModelLanguages, lm.Languages) then
-    gridLexicalModelLanguagesClick(gridLexicalModelLanguages);
-  EnableLexicalModelTabControls;
+  ShowAddLanguageForm(gridLexicalModelLanguages, lm.Languages);
 end;
 
 procedure TfrmPackageEditor.cmdLexicalModelLanguageEditClick(Sender: TObject);

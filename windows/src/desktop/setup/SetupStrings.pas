@@ -101,7 +101,9 @@ type
     ssDownloadingTitle,
     ssDownloadingText,
 
-    ssOffline
+    ssOffline,
+    ssOffline2,
+    ssOffline3
   );
 
 implementation

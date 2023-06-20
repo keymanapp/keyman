@@ -27,7 +27,7 @@ from keyman_config.get_kmp import (InstallLocation, get_keyboard_dir,
 from keyman_config.install_kmp import (InstallError, InstallStatus,
                                        extract_kmp, get_metadata, install_kmp)
 from keyman_config.kmpmetadata import get_fonts
-from keyman_config.list_installed_kmp import get_kmp_version
+from keyman_config.list_installed_kmp import get_kmp_version_user
 from keyman_config.uninstall_kmp import uninstall_kmp
 from keyman_config.welcome import WelcomeView
 
@@ -47,15 +47,15 @@ def find_keyman_image(image_file):
 
 class InstallKmpWindow(Gtk.Dialog):
 
-    def __init__(self, kmpfile, online=False, viewkmp=None, language=None):
+    def __init__(self, kmpfile, viewkmp=None, language=None):
         logging.debug("InstallKmpWindow: kmpfile: %s", kmpfile)
+        self.is_error = False
         self.kmpfile = kmpfile
-        self.online = online
         self.viewwindow = viewkmp
         self.accelerators = None
         self.language = language
         keyboardid = os.path.basename(os.path.splitext(kmpfile)[0])
-        installed_kmp_ver = get_kmp_version(keyboardid)
+        installed_kmp_ver = get_kmp_version_user(keyboardid)
         if installed_kmp_ver:
             logging.info("installed kmp version %s", installed_kmp_ver)
 
@@ -68,7 +68,13 @@ class InstallKmpWindow(Gtk.Dialog):
         mainhbox = Gtk.Box()
 
         with tempfile.TemporaryDirectory() as tmpdirname:
-            extract_kmp(kmpfile, tmpdirname)
+            try:
+                extract_kmp(kmpfile, tmpdirname)
+            except InstallError as e:
+                self._handle_install_error(e, kmpfile)
+                self.is_error = True
+                return
+
             info, system, options, keyboards, files = get_metadata(tmpdirname)
             if not keyboards:
                 # Likely not a keyboard .kmp file
@@ -327,7 +333,7 @@ class InstallKmpWindow(Gtk.Dialog):
     def on_install_clicked(self, button):
         logging.info("Installing keyboard")
         try:
-            result = install_kmp(self.kmpfile, self.online, language=self.language)
+            result = install_kmp(self.kmpfile, language=self.language)
             if result:
                 # If install_kmp returns a string, it is an instruction for the end user,
                 # because for fcitx they will need to take extra steps to complete
@@ -358,26 +364,29 @@ class InstallKmpWindow(Gtk.Dialog):
                 dialog.run()
                 dialog.destroy()
         except InstallError as e:
-            if e.status == InstallStatus.Abort:
-                message = _("Keyboard {name} could not be installed.").format(name=self.kbname) \
-                  + "\n\n" + _("Error Message:") + "\n %s" % (e.message)
-                logging.error(message)
-                message_type = Gtk.MessageType.ERROR
-            else:
-                message = _("Keyboard {name} could not be installed.").format(name=self.kbname) \
-                  + "\n\n" + _("Warning Message:") + "\n %s" % (e.message)
-                logging.warning(message)
-                message_type = Gtk.MessageType.WARNING
-            dialog = Gtk.MessageDialog(
-                self, 0, message_type,
-                Gtk.ButtonsType.OK, message)
-            dialog.run()
-            dialog.destroy()
+            self._handle_install_error(e, self.kbname)
         self.close()
 
     def on_cancel_clicked(self, button):
         logging.info("Cancel install keyboard")
         self.response(Gtk.ResponseType.CANCEL)
+
+    def _handle_install_error(self, e, kbname):
+        if e.status == InstallStatus.Abort:
+            message = _("Keyboard {name} could not be installed.").format(name=kbname) \
+                + "\n\n" + _("Error Message:") + "\n %s" % (e.message)
+            logging.error(message)
+            message_type = Gtk.MessageType.ERROR
+        else:
+            message = _("Keyboard {name} could not be installed.").format(name=kbname) \
+                + "\n\n" + _("Warning Message:") + "\n %s" % (e.message)
+            logging.warning(message)
+            message_type = Gtk.MessageType.WARNING
+        dialog = Gtk.MessageDialog(
+            self, 0, message_type,
+            Gtk.ButtonsType.OK, message)
+        dialog.run()
+        dialog.destroy()
 
 
 def main(argv):

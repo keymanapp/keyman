@@ -152,11 +152,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func applicationDidEnterBackground(_ application: UIApplication) {
     _overlayWindow = nil
     FontManager.shared.unregisterCustomFonts()
-    let userData = AppDelegate.activeUserDefaults()
-    // TODO: Have viewController save its data
-    userData.set(viewController?.textView?.text, forKey: userTextKey)
-    userData.set(viewController?.textSize.description, forKey: userTextSizeKey)
-    userData.synchronize()
+    
+    viewController?.saveTextSettings()
   }
 
   func applicationWillEnterForeground(_ application: UIApplication) {

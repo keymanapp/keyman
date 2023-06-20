@@ -1,0 +1,71 @@
+/* Message displayed to confirm delete of the Keyman keyboard selected by the user from the keyboard list  */
+"message-confirm-delete-keyboard" = "您确定要删除键盘'%@'吗？";
+
+/* Delete keyboard confirmation info indicating that the delete action cannot be undone  */
+"info-cannot-undo-delete-keyboard" = "此操作无法撤销。";
+
+/* Button text to cancel delete of the specified installed Keyman keyboard  */
+"button-cancel-delete-keyboard" = "取消";
+
+/* Button text to confirm delete of the specified installed Keyman keyboard  */
+"button-delete-keyboard" = "删除";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"message-confirm-install-keyboard" = "是否安装 Keyman 键盘？";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"info-install-keyboard-filename" = "您想要 Keyman 从文件'%@'安装键盘吗？";
+
+/* Button text to cancel installation of the double-clicked Keyman file  */
+"button-cancel-install-keyboard" = "取消";
+
+/* Button text to confirm installation of the double-clicked Keyman file  */
+"button-install-keyboard" = "安装";
+
+/* Message displayed to inform user that .kmp file could not be read/unzipped  */
+"message-keyboard-file-unreadable" = "无法读取 Keyman 文件 '%@'。";
+
+/* Message displayed in Configuration window when keyboard cannot be loaded */
+"message-error-loading-keyboard" = "（加载键盘时出错）";
+
+/* Message displayed in Configuration window when keyboard metadata cannot be loaded */
+"message-error-unknown-metadata" = "未知";
+
+/* Button text to acknowledge that .kmp file could not be read  */
+"button-keyboard-file-unreadable" = "确定";
+
+/* label text to identify Keyman version */
+"version-label-text" = "版本 %@";
+
+/* Status text for keyboard downloading  */
+"message-keyboard-downloading" = "正在下载...";
+
+/* Status text for keyboard download complete  */
+"message-keyboard-download-complete" = "下载完成。";
+
+/* Button text to cancel downloading keyboard  */
+"button-cancel-downloading" = "取消";
+
+/* Button text keyboard download complete  */
+"button-download-complete" = "完成";
+
+/* keyboards label in the Package Information window */
+"keyboards-label" = "键盘：";
+
+/* fonts label in the Package Information window */
+"fonts-label" = "字体：";
+
+/* package version label in the Package Information window */
+"package-version-label" = "软件包版本：";
+
+/* author label in the Package Information window */
+"author-label" = "作者：";
+
+/* website label in the Package Information window */
+"website-label" = "网站：";
+
+/* copyright label in the Package Information window */
+"copyright-label" = "版权：";
+
+/* message displayed to alert user to need grant accessibility permission */
+"privacy-alert-text" = "Keyman 需要以下辅助功能以正常工作：\n\n在系统首选项、安全和隐私中授予访问权限。\n重新启动系统。";

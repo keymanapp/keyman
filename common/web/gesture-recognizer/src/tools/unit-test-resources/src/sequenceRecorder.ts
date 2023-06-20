@@ -1,62 +1,64 @@
-namespace Testing {
-  /** Designed for use with the recorder test-page.  Its recordings will be
-   *  used by other classes in this project, and sometimes even for unit-test
-   *  verification itself.
+import { TrackedInput } from "@keymanapp/gesture-recognizer";
+import { HostFixtureLayoutController } from "./hostFixtureLayoutController.js";
+import { RecordedCoordSequenceSet } from "./inputRecording.js";
+
+/** Designed for use with the recorder test-page.  Its recordings will be
+ *  used by other classes in this project, and sometimes even for unit-test
+ *  verification itself.
+ */
+
+type WrappedInputSequence = TrackedInput;
+
+export class SequenceRecorder {
+  controller: HostFixtureLayoutController;
+  records:  {[identifier: string]: TrackedInput} = {};
+
+  /**
+   * Tracks the order in which each sequence was first detected.
    */
+  startOrder: string[] = [];
 
-  type WrappedInputSequence = com.keyman.osk.TrackedInput;
+  constructor(controller: HostFixtureLayoutController) {
+    this.controller = controller;
+    controller.on(HostFixtureLayoutController.CONFIG_CHANGED_EVENT, () => {
+      this.clear();
+    });
 
-  export class SequenceRecorder {
-    controller: HostFixtureLayoutController;
-    records:  {[identifier: string]: com.keyman.osk.TrackedInput} = {};
+    this._attachRecognizerHooks();
+  }
 
-    /**
-     * Tracks the order in which each sequence was first detected.
-     */
-    startOrder: string[] = [];
+  public get count(): number {
+    return this.startOrder.length;
+  }
 
-    constructor(controller: HostFixtureLayoutController) {
-      this.controller = controller;
-      controller.on(HostFixtureLayoutController.CONFIG_CHANGED_EVENT, () => {
-        this.clear();
-      });
+  private _attachRecognizerHooks() {
+    this.controller.recognizer.on('inputstart', (wrappedSequence: WrappedInputSequence) => {
+      const id = wrappedSequence.touchpoints[0].identifier;
+      this.records[id]  = wrappedSequence;
 
-      this._attachRecognizerHooks();
+      this.startOrder.push(id);
+    });
+  }
+
+  public recordingsToJSON() {
+    let arr = [];
+
+    // Ensure a deterministic ordering for the recording's sequences.
+    // This facilitates copmarison checks needed for unit testing.
+    for(let entry of this.startOrder) {
+      arr.push(this.records[entry].toJSON());
     }
 
-    public get count(): number {
-      return this.startOrder.length;
+    let jsonOut: RecordedCoordSequenceSet = {
+      inputs: arr,
+      config: this.controller.layoutConfiguration
     }
 
-    private _attachRecognizerHooks() {
-      this.controller.recognizer.on('inputstart', (wrappedSequence: WrappedInputSequence) => {
-        const id = wrappedSequence.touchpoints[0].identifier;
-        this.records[id]  = wrappedSequence;
+    return JSON.stringify(jsonOut, null, 2);
+  }
 
-        this.startOrder.push(id);
-      });
-    }
-
-    public recordingsToJSON() {
-      let arr = [];
-
-      // Ensure a deterministic ordering for the recording's sequences.
-      // This facilitates copmarison checks needed for unit testing.
-      for(let entry of this.startOrder) {
-        arr.push(this.records[entry].toJSON());
-      }
-
-      let jsonOut: RecordedCoordSequenceSet = {
-        inputs: arr,
-        config: this.controller.layoutConfiguration
-      }
-
-      return JSON.stringify(jsonOut, null, 2);
-    }
-
-    public clear() {
-      this.records = {};
-      this.startOrder = [];
-    }
+  public clear() {
+    this.records = {};
+    this.startOrder = [];
   }
 }

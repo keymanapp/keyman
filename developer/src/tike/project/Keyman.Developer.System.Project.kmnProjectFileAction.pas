@@ -19,6 +19,8 @@ type
   public
     function CompileKeyboard: Boolean;
     function Clean: Boolean;
+    function DoSetCompilerOptions(addVersion,
+      useLegacyCompiler: Boolean): Boolean;
   end;
 
 implementation
@@ -104,6 +106,22 @@ begin
       Log(plsWarning, Format(TKeyboardUtils.SKeyboardNameDoesNotFollowConventions_Message, [ExtractFileName(KVKFileName)]), CERR_WARNING, 0);
     end;
   end;
+end;
+
+function TkmnProjectFileAction.DoSetCompilerOptions(addVersion: Boolean; useLegacyCompiler: Boolean): Boolean;
+var
+  options: COMPILER_OPTIONS;
+begin
+  TProject.CompilerMessageFile := Self;
+  options.dwSize := sizeof(COMPILER_OPTIONS);
+  options.ShouldAddCompilerVersion := addVersion;
+  // TODO: useLegacyCompiler means we switch to kmcmpdll vs kmc
+  if not SetCompilerOptions(@options, ProjectCompilerMessage) then
+  begin
+    Log(plsFatal, 'Unable to set compiler options', CERR_FATAL, 0);
+    Exit(False);
+  end;
+  Result := True;
 end;
 
 function TkmnProjectFileAction.CompileKeyboard: Boolean;

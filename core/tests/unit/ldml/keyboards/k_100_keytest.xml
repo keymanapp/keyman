@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+@@keys: [K_BKQUOTE]
+@@expected: \u0061
+-->
+
+<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
+<keyboard locale="en" conformsTo="techpreview">
+  <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
+
+  <names>
+    <name value="TestKbd" />
+  </names>
+
+  <keys>
+    <!-- tests that gap="true" (with no to=) is OK -->
+    <key id="gap" gap="true" />
+  </keys>
+
+  <layers form="us">
+    <layer id="base">
+      <row keys="a gap"/>
+    </layer>
+  </layers>
+</keyboard>

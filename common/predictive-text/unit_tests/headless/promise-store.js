@@ -1,7 +1,8 @@
-var assert = require('chai').assert;
-var sinon = require('sinon');
+import { assert } from 'chai';
+import sinon from 'sinon';
 
-let PromiseStore = require('../../build').PromiseStore;
+import PromiseStore from '#./promise-store.js';
+import { randomToken } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
 describe('PromiseStore', function () {
   describe('.make()', function () {
@@ -19,13 +20,13 @@ describe('PromiseStore', function () {
 
     it('should reject the promise when a token is reused', function () {
       var promises = new PromiseStore();
-      
+
       var reusedToken = randomToken();
       // These two fakes are to ensure the original is called.
       var originalResolve;
       var overwrittenResolve;
-      
-      
+
+
       // Add a promise, and an unrelated promise.
       new Promise(function (resolve, reject) {
         originalResolve = sinon.fake(resolve);

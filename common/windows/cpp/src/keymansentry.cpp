@@ -32,7 +32,7 @@ int keyman_sentry_init(bool is_keyman_developer, const char *logger) {
 
   // Set the sentry-db-directory to a writeable location
 
-  char szPath[MAX_PATH + 64]; // sufficient length for sentry-0.4.9-db etc
+  char szPath[MAX_PATH + 64]; // sufficient length for sentry-0.6.0-db etc
 
   LPITEMIDLIST pidl;
   if (SUCCEEDED(SHGetFolderLocation(0, CSIDL_LOCAL_APPDATA, NULL, 0, &pidl))) {
@@ -43,13 +43,13 @@ int keyman_sentry_init(bool is_keyman_developer, const char *logger) {
         *p = 0;
       }
 
-      strcat_s(szPath, "sentry-0.4.9-db");
+      strcat_s(szPath, "sentry-" SENTRY_SDK_VERSION "-db");
       sentry_options_set_database_path(options, szPath);
     }
     ILFree(pidl);
   }
 
-  sentry_options_set_release(options, "release-" KEYMAN_VersionWithTag); // matches git tag
+  sentry_options_set_release(options, KEYMAN_VersionGitTag); // matches git tag
   sentry_options_set_environment(options, KEYMAN_Environment); // stable, beta, alpha, test, local
 
   // We don't currently need to set this, because it will be same path
@@ -132,7 +132,7 @@ sentry_value_t CaptureStackTrace(PVOID TopAddr, DWORD FramesToSkip) {
 void keyman_sentry_report_exception(DWORD ExceptionCode, PVOID ExceptionAddress) {
   sentry_value_t event;
   const int FRAMES_TO_SKIP = 0;
-
+  sentry_uuid_t uuid = { 0 };
   char message[64];
   wsprintfA(message, "Exception %x at %p", (unsigned int) ExceptionCode, ExceptionAddress);
 
@@ -159,18 +159,22 @@ void keyman_sentry_report_exception(DWORD ExceptionCode, PVOID ExceptionAddress)
       sentry_value_set_by_key(event, "threads", threads);
     }
 
-    sentry_capture_event(event);
+    uuid = sentry_capture_event(event);
   }
 
   fputs(message, stderr);
   fputs("\n", stderr);
   if(g_report_exceptions) {
     fputs("This error has been automatically reported to the Keyman team.\n", stderr);
+    char uuid_string[37];
+    sentry_uuid_as_string(&uuid, uuid_string);
+    fprintf(stderr, "Sentry uuid: %s\n", uuid_string);
   }
 }
 
-void keyman_sentry_report_message(keyman_sentry_level_t level, const char *message, bool includeStack) {
+sentry_uuid_t keyman_sentry_report_message(keyman_sentry_level_t level, const char *message, bool includeStack) {
   const int FRAMES_TO_SKIP = 0;
+  sentry_uuid_t uuid = { 0 };
 
   if ((g_report_exceptions && (level == SENTRY_LEVEL_ERROR || level == SENTRY_LEVEL_DEBUG)) || g_report_messages) {
     sentry_value_t event;
@@ -190,12 +194,15 @@ void keyman_sentry_report_message(keyman_sentry_level_t level, const char *messa
       }
     }
 
-    sentry_capture_event(event);
+    uuid = sentry_capture_event(event);
   }
+
+  return uuid;
 }
 
 /* Wrappers for main, wmain */
 
+#define SENTRY_USE_LOCAL_FILTER
 #ifdef SENTRY_USE_LOCAL_FILTER
 LPTOP_LEVEL_EXCEPTION_FILTER LastFilter;
 
@@ -236,6 +243,11 @@ int keyman_sentry_main(bool is_keyman_developer, const char *logger, int argc, c
     keyman_sentry_test_crash();
   }
 
+  if (argc > 1 && !strcmp(argv[1], "-sentry-client-test-message")) {
+    // Undocumented test parameter
+    keyman_sentry_test_message();
+  }
+
   int res = run(argc, argv);
 
   keyman_sentry_shutdown();
@@ -253,6 +265,11 @@ int keyman_sentry_wmain(bool is_keyman_developer, const char *logger, int argc, 
     keyman_sentry_test_crash();
   }
 
+  if (argc > 1 && !wcscmp(argv[1], L"-sentry-client-test-message")) {
+    // Undocumented test parameter
+    keyman_sentry_test_message();
+  }
+
   int res = run(argc, argv);
 
   keyman_sentry_shutdown();
@@ -260,9 +277,19 @@ int keyman_sentry_wmain(bool is_keyman_developer, const char *logger, int argc, 
   return res;
 }
 
+void keyman_sentry_test_message() {
+  fputs("Testing Sentry reporting:\n", stderr);
+  auto uuid = keyman_sentry_report_message(KEYMAN_SENTRY_LEVEL_INFO, "Testing Sentry message reporting", true);
+  char uuid_string[37];
+  sentry_uuid_as_string(&uuid, uuid_string);
+  fprintf(stderr, "Sentry uuid: %s\n", uuid_string);
+  exit(0);
+}
 void keyman_sentry_test_crash() {
-  fputs("Testing exception reporting:\n", stderr);
+  fputs("Testing Sentry exception reporting:\n", stderr);
   RaiseException(0x0EA0BEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
+  fputs("Should not have gotten here\n", stderr);
+  exit(1);
 }
 
 /* Delay load sentry.dll from our subdirectory: #5166 */
@@ -274,12 +301,12 @@ void keyman_sentry_test_crash() {
 #else
 #define SENTRY_DLL SENTRY_BASE_DLL
 #endif
-#define SENTRY_INSTALL_PATH "sentry-0.4.9\\" SENTRY_DLL
+#define SENTRY_INSTALL_PATH "sentry-" SENTRY_SDK_VERSION "\\" SENTRY_DLL
 #define SENTRY_DEV_PATH "common\\windows\\delphi\\ext\\sentry\\" SENTRY_DLL
 #define ENV_KEYMAN_ROOT "KEYMAN_ROOT"
 
 HMODULE LoadSentryLibrary() {
-  //MAX_PATH + 64 chars leaves space for "\sentry-0.4.9\sentry.x64.dll"
+  //MAX_PATH + 64 chars leaves space for "\sentry-0.6.0\sentry.x64.dll"
   char buf[MAX_PATH + 64], keyman_root[MAX_PATH + 64];
 
   int nsize = GetModuleFileNameA(0, buf, MAX_PATH);

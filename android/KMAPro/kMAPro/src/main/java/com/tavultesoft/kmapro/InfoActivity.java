@@ -4,7 +4,7 @@
 
 package com.tavultesoft.kmapro;
 
-import com.tavultesoft.kmea.BaseActivity;
+import com.keyman.engine.BaseActivity;
 
 import android.content.Context;
 import android.graphics.Bitmap;

@@ -8,8 +8,8 @@ set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 EX_USAGE=64
 
@@ -20,7 +20,7 @@ pushd "$(dirname "$THIS_SCRIPT")"
 
 # Build the main script.
 build () {
-  npm run build || fail "Could not build top-level JavaScript file."
+  npm run build || builder_die "Could not build top-level JavaScript file."
 }
 
 display_usage ( ) {
@@ -93,7 +93,7 @@ done
 
 # Check if Node.JS/npm is installed.
 type npm >/dev/null ||\
-    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+    builder_die "Build environment setup error detected!  Please ensure Node.js is installed!"
 
 if (( install_dependencies )) ; then
   verify_npm_setup
@@ -123,21 +123,21 @@ fi
 # ----------------------------------------
 
 if (( build_keymanweb )); then
-  pushd "$KEYMAN_ROOT/web/source"
-  ./build.sh -no_minify
+  pushd "$KEYMAN_ROOT/web/"
+  ./build.sh build --debug
   popd
 fi
 
 if (( copy_keymanweb )); then
-  SRC="$KEYMAN_ROOT/web/release/unminified"
+  WEB_SRC="$KEYMAN_ROOT/web/build/publish/debug"
   DST="$(dirname "$THIS_SCRIPT")/src/site/resource"
 
   rm -rf "$DST"
   mkdir -p "$DST/osk"
   mkdir -p "$DST/ui"
-  cp "$SRC/web/"*.js "$SRC/web/"*.js.map "$DST/"
-  cp -R "$SRC/web/osk/"* "$DST/osk/"
-  cp -R "$SRC/web/ui/"* "$DST/ui/"
+  cp "$WEB_SRC/"*.js "$WEB_SRC/"*.js.map "$DST/"
+  cp -R "$WEB_SRC/osk/"* "$DST/osk/"
+  cp -R "$WEB_SRC/ui/"* "$DST/ui/"
   cp "$KEYMAN_ROOT/web/LICENSE" "$DST/"
   cp "$KEYMAN_ROOT/web/README.md" "$DST/"
 fi
@@ -146,7 +146,7 @@ fi
 # Build the project
 # ----------------------------------------
 
-npm run build || fail "Compilation failed."
+npm run build || builder_die "Compilation failed."
 echo "Typescript compilation successful."
 
 # ----------------------------------------
@@ -154,7 +154,7 @@ echo "Typescript compilation successful."
 # ----------------------------------------
 
 if (( run_tests )); then
-  npm test || fail "Tests failed"
+  npm test || builder_die "Tests failed"
 fi
 
 # ----------------------------------------

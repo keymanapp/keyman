@@ -34,6 +34,7 @@ type
     class procedure Validate(Force: Boolean = False);
 
     class procedure ReportHandledException(E: Exception; const Message: string = ''; IncludeStack: Boolean = True);
+    class procedure ReportMessage(const Message: string; IncludeStack: Boolean = True);
 
     class procedure Breadcrumb(const BreadcrumbType, Message: string; const Category: string = ''; const Level: string = 'info');
 
@@ -131,6 +132,7 @@ var
   AppID, ProjectName: string;
 {$IF NOT DEFINED(CONSOLE)}
   ApplicationTitle, CommandLine: string;
+  tsysinfopath, enginepath: string;
 {$ENDIF}
 begin
   if EventType = scetException then
@@ -181,12 +183,20 @@ begin
         StringReplace(Message, '"', '""', [rfReplaceAll])
       ]);
 
-      if not TUtilExecute.Shell(0, TKeymanPaths.KeymanEngineInstallPath('tsysinfo.exe'),  // I3349
-          TKeymanPaths.KeymanEngineInstallPath(''), CommandLine) then
+      try
+        tsysinfopath := TKeymanPaths.KeymanEngineInstallPath('tsysinfo.exe');
+        enginepath := TKeymanPaths.KeymanEngineInstallPath('');
+      except
+        on E:EKeymanPath do
+        begin
+          tsysinfopath := '';
+          enginepath := '';
+        end;
+      end;
+      if (tsysinfopath = '') or not TUtilExecute.Shell(0, tsysinfopath, enginepath, CommandLine) then
       begin
 {$IF NOT DEFINED(SENTRY_NOVCL)}
-        MessageDlg(Application.Title+' has had a fatal error.  An additional error was encountered '+
-          'starting the exception manager ('+SysErrorMessage(GetLastError)+'). '+
+        MessageDlg(Application.Title+' has had a fatal error '+EventID+'. '+
           'This error has been automatically reported to the Keyman team.', mtError, [mbOK], 0);
 {$ENDIF}
       end;
@@ -218,6 +228,14 @@ begin
     text := Format('%s: %s%s', [E.ClassName, text, E.Message]);
 
   Client.MessageEvent(TSentryLevel.SENTRY_LEVEL_WARNING, text, IncludeStack);
+end;
+
+class procedure TKeymanSentryClient.ReportMessage(const Message: string; IncludeStack: Boolean);
+begin
+  if not Enabled then
+    Exit;
+
+  Client.MessageEvent(TSentryLevel.SENTRY_LEVEL_WARNING, Message, IncludeStack);
 end;
 
 procedure TKeymanSentryClient.ReportRemoteErrors(const childEventID: string);
@@ -323,7 +341,7 @@ begin
 
   // Note: system proxy is used automatically if no proxy is defined
 
-  o.Release := 'release-'+CKeymanVersionInfo.VersionWithTag; // matches git tag
+  o.Release := CKeymanVersionInfo.VersionGitTag; // matches git tag
   o.Environment := CKeymanVersionInfo.Environment; // stable, beta, alpha, test, local
 
   if kscfCaptureExceptions in FFlags
@@ -357,7 +375,7 @@ begin
   end;
 
   o.HandlerPath := ExtractFilePath(path) + 'crashpad_handler.exe';
-  o.DatabasePath := TKeymanPaths.ErrorLogPath + 'sentry-0.4.9-db';
+  o.DatabasePath := TKeymanPaths.ErrorLogPath + 'sentry-'+SENTRY_SDK_VERSION+'-db';
 
   FClient := SentryClientClass.Create(o, ALogger, f);
   FClient.OnAfterEvent := ClientAfterEvent;

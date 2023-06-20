@@ -1,5 +1,5 @@
 #include <windows.h>
-#include "comperr.h"
+#include "kmn_compiler_errors.h"
 
 #include "version.rc"
 
@@ -91,12 +91,6 @@ END
 STRINGTABLE
 BEGIN
     CERR_InvalidSystemStore "Invalid system store name found"
-    CERR_CallIsProfessionalFeature
-                            "Call() is only available in Keyman Developer Professional"
-    CERR_IncludeCodesIsProfessionalFeature
-                            "&IncludeCodes is only available in Keyman Developer Professional"
-    CERR_MnemonicLayoutIsProfessionalFeature
-                            "&MnemonicLayout is only available in Keyman Developer Professional"
     CERR_60FeatureOnly_VirtualCharKey
                             "Virtual character keys require VERSION 6.0"
     CERR_VersionAlreadyIncluded
@@ -254,4 +248,5 @@ BEGIN
     CERR_PostKeystrokeGroupMustBeReadonly              "Group used in begin postKeystroke must be readonly"
     CERR_DuplicateGroup                                "A group with this name has already been defined."
     CERR_DuplicateStore                                "A store with this name has already been defined."
+    CERR_RepeatedBegin                                 "This begin statement has already been defined."
 END

@@ -36,12 +36,14 @@ static IBusFactory *factory = NULL;
 static gboolean xml = FALSE;
 static gboolean ibus = FALSE;
 static gboolean verbose = FALSE;
+gboolean testing = FALSE;
 
 static const GOptionEntry entries[] =
 {
     { "xml", 'x', 0, G_OPTION_ARG_NONE, &xml, "generate xml for engines", NULL },
     { "ibus", 'i', 0, G_OPTION_ARG_NONE, &ibus, "component is executed by ibus", NULL },
     { "verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, "verbose", NULL },
+    { "testing", 0, 0, G_OPTION_ARG_NONE, &testing, "component is executed by integration testing", NULL},
     { NULL },
 };
 
@@ -51,7 +53,7 @@ ibus_disconnected_cb (IBusBus  *bus,
                       gpointer  user_data)
 {
     g_debug ("bus disconnected");
-    KeymanService *service = km_service_get_default();
+    KeymanService *service = km_service_get_default(NULL);
     g_clear_object(&service);
 
     ibus_quit ();
@@ -92,7 +94,7 @@ start_component (void)
     }
 
     g_object_unref (component);
-    km_service_get_default(); // initialise dbus service
+    km_service_get_default(NULL); // initialise dbus service
 
     ibus_main ();
 }

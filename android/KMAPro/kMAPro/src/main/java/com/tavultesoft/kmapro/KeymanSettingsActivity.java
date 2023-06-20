@@ -2,7 +2,7 @@ package com.tavultesoft.kmapro;
 
 import android.os.Bundle;
 
-import com.tavultesoft.kmea.BaseActivity;
+import com.keyman.engine.BaseActivity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;

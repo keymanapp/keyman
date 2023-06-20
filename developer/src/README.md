@@ -27,10 +27,10 @@ Building and signing of the installation archive keymandeveloper.msi.
 
 ### src/inst/node
 
-Contains a minimal distribution of node.js intended just for compiling lexical
-models. If more dependencies are required, then the developer will be expected
-to install node.js themselves; this gets users going without requiring a large
-installer or a full node.js install.
+Contains a minimal distribution of node.js intended just for running kmc. If
+more dependencies are required, then the developer will be expected to install
+node.js themselves; this gets users going without requiring a large installer or
+a full node.js install.
 
 ## src/kmanalyze - kmanalyze.exe
 
@@ -66,27 +66,33 @@ Unsupported utility decompiles a Keyman .kmx keyboard. It will produce a .kmn
 source file and optionally a .ico or .bmp image. see kmdecomp/kmdecomp.md for
 details.
 
-## src/kmlmc
+## src/kmc
 
-node-based compilers for lexical models
+node-based next generation compiler, hosts kmc, kmlmi, kmlmc, kmlmp
 
-### src/kmlmc/kmlmc - Lexical Model Compiler
+### src/kmc-ldml - LDML Keyboard Compiler
+
+Next Generation keyboard compiler package - LDML keyboards only at present.
+Command line access through kmc.
+
+### src/kmc-model - Lexical Model Compiler
 
 The Lexical Model Compiler, kmlmc, runs on nodeJS on all supported desktop
-platforms.
+platforms. Command line access through kmc/kmlmc.
 
-### src/kmlmc/kmlmp - Package Compiler
+### src/kmc-package - Package Compiler
 
 The package compiler is broadly compatible with the kmcomp .kps package
 compiler. However at this stage it is only tested with lexical models, and use
 with keyboards (either .js or .kmx) is not tested or supported. It is likely in
 the future that the kmcomp .kps compiler will be deprecated in favour of this
-one.
+one. Command line access through kmc/kmlmp.
 
-### src/kmlmc/kmlmi - Model Info Compiler
+### src/kmc-model-info - Model Info Compiler
 
-Merges .model_info files for use on the Keyman Cloud lexical model repository
-at https://github.com/keymanapp/lexical-models.
+Merges .model_info files for use on the Keyman Cloud lexical model repository at
+https://github.com/keymanapp/lexical-models. Command line access through
+kmc/kmlmi.
 
 ## src/samples
 

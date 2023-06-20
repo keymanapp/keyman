@@ -1,0 +1,22 @@
+{
+  "extends": "../tsconfig.kmw-main-base.json",
+
+  "compilerOptions": {
+    "types": ["node"],
+    "baseUrl": "./",
+    "outDir": "build/obj/",
+    "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
+  },
+
+  "include": [
+    "src/**/*.ts"
+  ],
+
+  "references": [
+    { "path": "../keyman-version" },
+    { "path": "../utils/" },
+    { "path": "../keyboard-processor/" },
+    { "path": "../lm-message-types" }
+  ],
+}

@@ -254,20 +254,6 @@ extension KeymanWebViewController {
     webView!.evaluateJavaScript("doResetContext();", completionHandler: nil)
   }
 
-  func setDeviceType(_ idiom: UIUserInterfaceIdiom) {
-    let type: String
-    switch idiom {
-    case .phone:
-      type = "AppleMobile"
-    case .pad:
-      type = "AppleTablet"
-    default:
-      SentryManager.captureAndLog("Unexpected interface idiom: \(idiom)", logLevel: .severe)
-      return
-    }
-    webView!.evaluateJavaScript("setDeviceType('\(type)');", completionHandler: nil)
-  }
-
   private func fontObject(from font: Font?, keyboard: InstallableKeyboard, isOsk: Bool) -> [String: Any]? {
     guard let font = font else {
       return nil
@@ -350,7 +336,7 @@ extension KeymanWebViewController {
   }
 
   func deregisterLexicalModel(_ lexicalModel: InstallableLexicalModel) {
-    webView!.evaluateJavaScript("keyman.modelManager.deregister(\"\(lexicalModel.id)\")")
+    webView!.evaluateJavaScript("keyman.removeModel(\"\(lexicalModel.id)\")")
   }
 
   func registerLexicalModel(_ lexicalModel: InstallableLexicalModel) throws {
@@ -411,7 +397,7 @@ extension KeymanWebViewController {
       webView!.evaluateJavaScript("enableSuggestions(\(stubString), \(predict), \(correct))")
       self.activeModel = predict
     } else {  // We're registering a model in the background - don't change settings.
-      webView!.evaluateJavaScript("keyman.registerModel(\(stubString));", completionHandler: nil)
+      webView!.evaluateJavaScript("keyman.addModel(\(stubString));", completionHandler: nil)
     }
 
     setBannerHeight(to: Int(InputViewController.topBarHeight))
@@ -660,8 +646,6 @@ extension KeymanWebViewController: KeymanWebDelegate {
     if let cursorRange = self.currentCursorRange {
       self.setCursorRange(cursorRange)
     }
-
-    setDeviceType(UIDevice.current.userInterfaceIdiom)
 
     var newKb = Manager.shared.currentKeyboard
 

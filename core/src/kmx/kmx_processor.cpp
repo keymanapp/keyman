@@ -139,7 +139,7 @@ kmx_processor::queue_action(
   }
   case KM_KBP_IT_PERSIST_OPT:
   case KM_KBP_IT_CAPSLOCK:
-    DebugLog("kmx_processor::queue_action: Warning handling of action type [%d] not implented \n", action_item->type);
+    DebugLog("kmx_processor::queue_action: Warning handling of action type [%d] not implemented\n", action_item->type);
     return false;
     break;
   case KM_KBP_IT_EMIT_KEYSTROKE:
@@ -164,6 +164,22 @@ kmx_processor::internal_process_queued_actions(km_kbp_state *state) {
     switch (a.ItemType) {
     case QIT_CAPSLOCK:
       state->actions().push_capslock(a.dwData);
+      break;
+    case QIT_SAVEOPT:
+      {
+        // NOTE: `save(foo='1') save(foo='0')` will do `save(foo='0')` twice as
+        // dpString would have been overwritten on the second save() call before
+        // this queue reprocessing happens. This is not an issue from a process
+        // point-of-view because the event result data is only guaranteed on
+        // exit of process_event.
+        auto const & rStoreToSave = _kmx.GetKeyboard()->Keyboard->dpStoreArray[a.dwData];
+        state->processor().persisted_store()[rStoreToSave.dpName] = rStoreToSave.dpString;
+        state->actions().push_persist(
+          option{KM_KBP_OPT_KEYBOARD, rStoreToSave.dpName, rStoreToSave.dpString});
+      }
+      break;
+    case QIT_EMIT_KEYSTROKE:
+      state->actions().push_emit_keystroke();
       break;
     case QIT_VKEYDOWN:
     case QIT_VKEYUP:
@@ -233,7 +249,8 @@ kmx_processor::process_event(
   km_kbp_state *state,
   km_kbp_virtual_key vk,
   uint16_t modifier_state,
-  uint8_t is_key_down
+  uint8_t is_key_down,
+  uint16_t /* event_flags */
 ) {
   // Construct a context buffer from the items
   std::u16string ctxt;
@@ -241,11 +258,10 @@ kmx_processor::process_event(
   for (auto c = cp.begin(); c != cp.end(); c++) {
     switch (c->type) {
     case KM_KBP_CT_CHAR:
-      if (Uni_IsSMP(c->character)) {
-        ctxt += Uni_UTF32ToSurrogate1(c->character);
-        ctxt += Uni_UTF32ToSurrogate2(c->character);
-      } else {
-        ctxt += (km_kbp_cp)c->character;
+      {
+        km::kbp::kmx::char16_single buf;
+        const int len = km::kbp::kmx::Utf32CharToUtf16(c->character, buf);
+        ctxt.append(buf.ch, len);
       }
       break;
     case KM_KBP_CT_MARKER:
@@ -263,7 +279,7 @@ kmx_processor::process_event(
 
   if (!_kmx.ProcessEvent(state, vk, modifier_state, is_key_down)) {
     // We need to output the default keystroke
-    state->actions().push_emit_keystroke();
+    _kmx.GetActions()->QueueAction(QIT_EMIT_KEYSTROKE, 0);
   }
 
   return internal_process_queued_actions(state);

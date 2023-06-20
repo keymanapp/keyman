@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.dom.json",
+
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "../../../build/engine/element-wrappers/obj/",
+    "tsBuildInfoFile": "../../../build/engine/element-wrappers/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
+  },
+
+  "include": [ "src/**/*.ts" ],
+
+  "references": [
+    { "path": "../../../../common/web/keyboard-processor" }
+  ]
+}

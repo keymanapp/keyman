@@ -14,14 +14,16 @@ setup(
              'km-package-uninstall',
              'km-package-list-installed'],
 
+    zip_safe=False,  # don't install a zip
+
     install_requires=[
         'lxml', 'numpy', 'Pillow', 'requests', 'requests-cache',
         'python-magic', 'qrcode', 'sentry-sdk'
     ],
 
     # metadata to display on PyPI
-    author="Daniel Glassey",
-    author_email="wdg@debian.org",
+    author="Keyman team",
+    author_email="support@keyman.com",
     description="Keyman for Linux configuration",
     license="MIT",
     keywords="keyman, keyman-config, keyboard",

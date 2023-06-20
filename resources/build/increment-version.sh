@@ -18,13 +18,13 @@ set -u
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$(dirname "$THIS_SCRIPT")/trigger-definitions.inc.sh"
-. "$(dirname "$THIS_SCRIPT")/trigger-builds.inc.sh"
-. "$(dirname "$THIS_SCRIPT")/sentry-control.inc.sh"
+. "${THIS_SCRIPT%/*}/trigger-definitions.inc.sh"
+. "${THIS_SCRIPT%/*}/trigger-builds.inc.sh"
+. "${THIS_SCRIPT%/*}/sentry-control.inc.sh"
 
 gitbranch=`git branch --show-current`
 
@@ -126,7 +126,7 @@ if [ "$action" == "commit" ]; then
   pushd "$KEYMAN_ROOT" > /dev/null
   message="auto: increment $base version to $NEWVERSION"
   branch="auto/version-$base-$NEWVERSION"
-  git tag -a "release-$VERSION_WITH_TAG" -m "Keyman release $VERSION_WITH_TAG"
+  git tag -a "$VERSION_GIT_TAG" -m "Keyman release $VERSION_WITH_TAG"
   git checkout -b "$branch"
   git add VERSION.md HISTORY.md
 
@@ -143,7 +143,7 @@ if [ "$action" == "commit" ]; then
   popd > /dev/null
 
   #
-  # Trigger builds for the previous version on TeamCity and Jenkins
+  # Trigger builds for the previous version on TeamCity, Jenkins and GitHub
   #
 
   triggerBuilds
@@ -155,6 +155,37 @@ if [ "$action" == "commit" ]; then
   cd "$KEYMAN_ROOT"
   git checkout "$branch"
   hub pull-request -f --no-edit -b $base -l auto
+
+  #
+  # If we are on a stable-x.y branch, then we also want to merge changes to
+  # HISTORY.md to master. We don't want to do this for beta or alpha builds;
+  # beta changes will be merged to master periodically anyway.
+  #
+  if [[ "$base" =~ ^stable-[0-9]+\.[0-9]+$ ]]; then
+    git switch master
+
+    # In order to avoid potential git conflicts, we run the history collater
+    # again on the master HISTORY.md. Note that the script always exits 1 to
+    # indicate it hasn't updated VERSION.md. We could tweak that in the future.
+    node resources/build/version/lib/index.js history --no-write-github-comment -t "$GITHUB_TOKEN" -b "$base" || true
+
+    # If HISTORY.md has been updated, then we want to create a branch and push
+    # it for review
+    if git status --porcelain=v1 | grep -q HISTORY.md; then
+      # TODO: once we are sure this is stable, rename this to
+      # "$branch-master-history" to get automatic merges with "auto/..." branch
+      # name
+      git switch -c "chore/version-$base-$NEWVERSION-master-history" master
+      git add HISTORY.md
+      git commit -m "$message (history cherry-pick to master)"
+      # TODO: once we are sure this is stable, add `-l auto` to get the "auto:"
+      # label
+      hub pull-request -f --no-edit -b master
+    fi
+
+    # Return to our best working branch
+    git switch "$branch"
+  fi
 
   #
   # Done

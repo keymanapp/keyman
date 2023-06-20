@@ -4,64 +4,28 @@
 # Authors:      Tim Eves (TSE)
 #
 
-defns += ['-DKMN_KBP_EXPORTING']
 version_res = []
 
-if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
-  warns = [
-     '-Wctor-dtor-privacy',
-     '-Wdouble-promotion',
-     '-Wendif-labels',
-     '-Wno-unknown-pragmas',
-     '-Wno-missing-field-initializers',
-     '-Wnon-virtual-dtor',
-     '-Wshadow'
-  ]
-  flags = [
-    '-fvisibility=hidden',
-    '-fvisibility-inlines-hidden'
-  ]
-  links = []
+# TODO: shouldn't this be defined only for dylib and not static lib?
+defns += ['-DKMN_KBP_EXPORTING']
 
-  if compiler.get_id() == 'clang'
-    warns += [
-      '-Wimplicit-fallthrough',
-      '-Wno-double-promotion',
-      '-Wshorten-64-to-32'
-    ]
-  endif
-
-  if host_machine.system() == 'darwin'
-    warns += ['-Wno-ctor-dtor-privacy', '-Wno-non-virtual-dtor']
-  endif
-endif
-
-if compiler.get_id() == 'msvc'
-  warns = []
-  flags = []
-  defns += [
-    '-D_SCL_SECURE_NO_WARNINGS',
-    '-D_CRT_SECURE_NO_WARNINGS',
-    '-DUNICODE'
-  ]
-  links = []
-
+if cpp_compiler.get_id() == 'msvc'
+  defns += ['-DUNICODE']
   # /n = append null
   # /c65001 = utf-8 file format
   version_res += import('windows').compile_resources('version.rc', args:['/n','/c65001'])
 endif
 
-if compiler.get_id() == 'emscripten'
-  warns = []
-  flags = []
-  defns = ['-DKMN_KBP']
-  links = []
+if cpp_compiler.get_id() == 'emscripten'
+  # TODO: why do we need this defn here?
+  defns += ['-DKMN_KBP']
 endif
 
-lib = library('kmnkbp0',
+kmx_files = files(
   'option.cpp',
   'keyboard.cpp',
   'state.cpp',
+  'debuglog.cpp',
   'km_kbp_context_api.cpp',
   'km_kbp_keyboard_api.cpp',
   'km_kbp_options_api.cpp',
@@ -69,6 +33,9 @@ lib = library('kmnkbp0',
   'km_kbp_debug_api.cpp',
   'km_kbp_processevent_api.cpp',
   'jsonpp.cpp',
+  'ldml/ldml_processor.cpp',
+  'ldml/ldml_transforms.cpp',
+  'ldml/ldml_vkeys.cpp',
   'mock/mock_processor.cpp',
   'kmx/kmx_consts.cpp',
   'kmx/kmx_processevent.cpp',
@@ -76,21 +43,51 @@ lib = library('kmnkbp0',
   'kmx/kmx_capslock.cpp',
   'kmx/kmx_context.cpp',
   'kmx/kmx_conversion.cpp',
-  'kmx/kmx_debug.cpp',
   'kmx/kmx_debugger.cpp',
   'kmx/kmx_environment.cpp',
   'kmx/kmx_file.cpp',
   'kmx/kmx_modifiers.cpp',
   'kmx/kmx_options.cpp',
+  'kmx/kmx_plus.cpp',
   'kmx/kmx_processor.cpp',
   'kmx/kmx_xstring.cpp',
+)
+
+api_files = files(
+  'km_kbp_context_api.cpp',
+  'km_kbp_keyboard_api.cpp',
+  'km_kbp_options_api.cpp',
+  'km_kbp_state_api.cpp',
+  'km_kbp_debug_api.cpp',
+  'km_kbp_processevent_api.cpp',
+)
+
+core_files = files(
+  'option.cpp',
+  'keyboard.cpp',
+  'state.cpp',
+  'jsonpp.cpp',
   'utfcodec.cpp',
+)
+
+mock_files = files(
+  'mock/mock_processor.cpp',
+)
+
+lib = library('kmnkbp0',
+  api_files,
+  core_files,
+  kmx_files,
+  mock_files,
   version_res,
   cpp_args: defns + warns + flags,
   link_args: links,
   version: lib_version,
   include_directories: inc,
+  pic: true,
   install: true)
+
+headerdirs = [ '.', 'keyman' ] # subdirectories of ${prefix}/include to add to header path
 
 kmnkbp = declare_dependency(link_with: lib, include_directories: inc)
 
@@ -99,4 +96,5 @@ pkg.generate(
     name: 'keyman_kmn_processor',
     version: meson.project_version(),
     description: 'Keyman processor for KMN keyboards.',
+    subdirs: headerdirs,
     libraries: lib)
