@@ -65,42 +65,70 @@ transform_group::match(const std::u16string &input, size_t &subMatched) const {
   return nullptr;
 }
 
+/**
+ * Apply this entire transform set to the input.
+ * Example: input "abc" -> output="xyz", return=2:  replace last two chars "bc" with "xyz", so final output = "abxyz";
+ * @param input input string, will match at end: unmodified
+ * @param output on output: if return>0, contains text to replace
+ * @return match length: number of chars at end of input string to modify.  0 if no match.
+*/
 size_t
 transforms::apply(const std::u16string &input, std::u16string &output) {
+  /**
+   * Example:
+   * Group0:   za -> c, a -> bb
+   * Group1:   bb -> ccc
+   * Group2:   cc -> d
+   * Group3:   tcd -> e
+   *
+   * Initial condition: matched = subMatched = 0. updatedInput = input = 'ta', output = ''
+   *
+   * Group0:  matches 'a',  subMatched=1, output='bb', updatedInput='tbb', matched=1
+   *  Initial match. subMatched=1 which is > the previous output.length,
+   *  so matched += (1-0) == 1
+   *
+   * Group1:  matches 'bb', subMatched=2, output='ccc', updatedInput='tccc', matched=1
+   *  Although the transform group matched 2 chars ('bb'), the match in the original is 1
+   *  This time subMatched=2 but previous output.length was 2, so matched remains at 1
+   *  In other words, we didn't match outside of the existing match boundary.
+   *
+   * Group2:  matches 'cc', subMatched=2, output='cd', updatedInput='tcd', matched=1
+   *  subMatched <= previous output.length, so no change to mathed
+   *
+   * Group3:  matches 'tcd', subMatched=3, output='e', updatedInput='e', matched=2
+   *  Now subMatched=3, but previous output ('cd').length is only 2.
+   *  In other words, we matched before the previous output's start - we matched the 't' also
+   *  or this reason, matched+=(3-2) == 1.  So matched is now 2.
+   */
+
   /**
    * Accumulate the maximum matched size of the end of 'input' here.
    * It will be replaced with 'output'.
    * Matched can increment.
-   * TODO-LDML:  As an optimization, we could decrement 'matched' for every char of output
-   * which is already in input. Example (regex example):
-   * - str = "xxyyzz";
-   * - s/zz$/z/ -> match=2, output='z'
-   * - s/z$/zz/ -> match=2, output='zz'
-   *      (but could contract to match=0, output='' as already present)
-   * - s/zz$/zw/ -> match=2, output='zw'
-   *      (but could contract to match=1, output='w')
    */
   size_t matched              = 0;
-  std::u16string updatedInput = input;  // modified input
+  /** modified copy of input */
+  std::u16string updatedInput = input;
   for (auto group = transform_groups.begin(); group < transform_groups.end(); group++) {
     // for each transform group
     // break out once there's a match
     // TODO-LDML: reorders
     // Assume it's a non reorder group
+    /** Length of match within this group*/
     size_t subMatched = 0;
 
     // find the first match in this group (if present)
     auto transform = group->match(updatedInput, subMatched);
 
     if (transform != nullptr) {
-      // apply
+      // now apply the found transform
 
-      // get the updated sub output
+      // update subOutput (string) and subMatched
       std::u16string subOutput = transform->apply(updatedInput, subMatched);
 
       // remove the matched part of the updatedInput
-      updatedInput.resize(updatedInput.length() - subMatched);
-      updatedInput.append(subOutput);  // which could be empty
+      updatedInput.resize(updatedInput.length() - subMatched); // chop of the subMatched part at end
+      updatedInput.append(subOutput);  // subOutput could be empty such as in backspace transform
 
       if (subMatched > output.size()) {
         // including first time through
@@ -110,15 +138,27 @@ transforms::apply(const std::u16string &input, std::u16string &output) {
 
       // now update 'output'
       if (subOutput.length() >= output.length() || subMatched > output.length()) {
-        output = subOutput; // simple: all output
+        output = subOutput; // replace all output
       } else {
+        // replace output with new output
         output.resize(output.length() - subMatched);
         output.append(subOutput);
       }
     } // else: continue to next group
   }
-  // TODO-LDML: optimization (mentioned above) to contract 'matched' if possible.
-  // could also handle from="x" to="x"
+  /**
+   * TODO-LDML: optimization to contract 'matched' if possible.
+   * We could decrement 'matched' for every char of output
+   * which is already in input. Example (regex example):
+   * - str = "xxyyzz";
+   * - s/zz$/z/ -> match=2, output='z'
+   * - s/z$/zz/ -> match=2, output='zz'
+   *      (but could contract to match=0, output='' as already present)
+   * - s/zz$/zw/ -> match=2, output='zw'
+   *      (but could contract to match=1, output='w')
+   *
+   * could also handle from="x" to="x" as match=0
+   */
   return matched;
 }
 
