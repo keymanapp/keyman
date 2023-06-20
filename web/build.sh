@@ -132,7 +132,3 @@ if builder_start_action build:engine/gestures; then
 
   builder_finish_action success build:engine/gestures;
 fi
-
-if builder_has_action build:app/ui; then
-  builder_die "Modularization work is not yet complete; builds dependent on this will fail."
-fi
