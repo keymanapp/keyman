@@ -25,7 +25,7 @@ builder_parse "$@"
 builder_describe_outputs \
   configure            /node_modules \
   build:fixture        /common/web/gesture-recognizer/build/tools/host-fixture.mjs \
-  build:recorder       /common/web/gesture-recognizer/src/tools/recorder/build/recorder.js \
+  build:recorder       /common/web/gesture-recognizer/src/tools/recorder/build/recorder.mjs \
   build:test-module    /common/web/gesture-recognizer/build/tools/lib/index.mjs
 
 # TODO: build if out-of-date if test is specified
@@ -62,7 +62,7 @@ if builder_start_action build :recorder; then
     mkdir -p recorder/build
   fi
   cp recorder/src/pageStyle.css    recorder/build/pageStyle.css
-  cp recorder/src/recorder.js      recorder/build/recorder.js
+  cp recorder/src/recorder.mjs     recorder/build/recorder.mjs
 
   cp host-fixture/gestureHost.css  recorder/build/gestureHost.css
 

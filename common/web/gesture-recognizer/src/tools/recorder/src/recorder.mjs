@@ -1,6 +1,13 @@
 // This script allows user-interactive use of the user-testing oriented unit-test-resource objects.
 
-const controller = new Testing.HostFixtureLayoutController();
+import {
+  FixtureLayoutConfiguration,
+  HostFixtureLayoutController,
+  InputSequenceSimulator,
+  SequenceRecorder
+} from '../../../../build/tools/lib/index.mjs';
+
+const controller = new HostFixtureLayoutController();
 let loadPromise = controller.connect();
 let recorder;
 
@@ -13,7 +20,7 @@ function presentSavableJSON(text) {
 }
 
 loadPromise.then((recognizer) => {
-  recorder = new Testing.SequenceRecorder(controller);
+  recorder = new SequenceRecorder(controller);
   updateConfig();
 
   // DOM-oriented logging setup.
@@ -27,7 +34,7 @@ loadPromise.then((recognizer) => {
     recorder.clear();
   }
 
-  controller.on(Testing.HostFixtureLayoutController.CONFIG_CHANGED_EVENT, () => {
+  controller.on(HostFixtureLayoutController.CONFIG_CHANGED_EVENT, () => {
     logElement.value = '';
   });
 
@@ -63,15 +70,15 @@ window.addEventListener('load', function(ev) {
   let receiverGroup = document.config.receiver;
   let safeGroup = document.config.safeZone;
 
-  for(entry of layoutGroup) {
+  for(let entry of layoutGroup) {
     entry.addEventListener('change', updateConfig);
   }
 
-  for(entry of boundsGroup) {
+  for(let entry of boundsGroup) {
     entry.addEventListener('change', updateConfig);
   }
 
-  for(entry of receiverGroup) {
+  for(let entry of receiverGroup) {
     if(entry.value == 'full') {
       entry.addEventListener('change', function() {
         let topRange = document.getElementById('topOnlyRadio');
@@ -89,7 +96,7 @@ window.addEventListener('load', function(ev) {
 
   document.addEventListener('scroll', updateAlignment);
 
-  for(entry of safeGroup) {
+  for(let entry of safeGroup) {
     entry.addEventListener('change', updateConfig);
   }
 
@@ -115,7 +122,7 @@ function updateConfig() {
   let receiver = document.config.receiver;
   let safe = document.config.safeZone;
 
-  let layoutSpec = new Testing.FixtureLayoutConfiguration(
+  let layoutSpec = new FixtureLayoutConfiguration(
     layout.value,
     bounds.value,
     receiver.value,
