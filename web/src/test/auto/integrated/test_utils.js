@@ -130,7 +130,7 @@ function setupScriptInternal(src, timeout, attemptCount, existingTimer) {
       // we don't exceed the timeout as a result!
       if(attemptCount <= 3) {
         window.setTimeout(() => {
-          let retryPromise = setupScript(src, timeout, attemptCount + 1, existingTimer);
+          let retryPromise = setupScriptInternal(src, timeout, attemptCount + 1, existingTimer);
           retryPromise.then(resolve).catch(reject);
         }, 20);
       } else {
