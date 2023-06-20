@@ -10,7 +10,7 @@ import { PathSegmenter } from '@keymanapp/gesture-recognizer';
 
 import { HeadlessRecordingSimulator } from '../../../../build/tools/obj/index.js';
 
-const SEGMENT_TEST_JSON_FOLDER = 'src/test/resources/json/segmentation';
+const SEGMENT_TEST_JSON_FOLDER = './resources/json/segmentation';
 
 import { assertSegmentSimilarity } from '../../resources/assertSegmentSimilarity.js';
 

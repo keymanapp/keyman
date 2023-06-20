@@ -1,10 +1,4 @@
 #!/usr/bin/env bash
-#
-# Builds the include script for the current Keyman version.
-#
-
-# Exit on command failure and when using unset variables:
-set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -27,6 +21,12 @@ builder_describe "Testing-oriented tools for the Gesture Recognizer module of we
   ":test-module   The TS library used to interface with the main gesture-recognizer module for tests"
 
 builder_parse "$@"
+
+builder_describe_outputs \
+  configure            /node_modules \
+  build:fixture        /common/web/gesture-recognizer/build/tools/host-fixture.mjs \
+  build:recorder       /common/web/gesture-recognizer/src/tools/recorder/build/recorder.js \
+  build:test-module    /common/web/gesture-recognizer/build/tools/lib/index.mjs
 
 # TODO: build if out-of-date if test is specified
 # TODO: configure if npm has not been run, and build is specified
@@ -75,7 +75,7 @@ if builder_start_action build :recorder; then
 fi
 
 if builder_start_action build :test-module; then
-  npm run tsc -- -b "$THIS_SCRIPT_PATH/unit-test-resources/tsconfig.json"
+  tsc -b "$THIS_SCRIPT_PATH/unit-test-resources/tsconfig.json"
   cd unit-test-resources
   node build-bundler.js
   cd ..
