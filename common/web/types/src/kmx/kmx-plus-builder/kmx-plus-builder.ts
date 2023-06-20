@@ -13,6 +13,7 @@ import { BUILDER_META, build_meta } from './build-meta.js';
 import { BUILDER_NAME, build_name } from './build-name.js';
 import { BUILDER_STRS, build_strs } from './build-strs.js';
 import { BUILDER_TRAN, build_tran } from './build-tran.js';
+import { BUILDER_USET, build_uset } from './build-uset.js';
 import { BUILDER_VARS, build_vars } from './build-vars.js';
 import { BUILDER_VKEY, build_vkey } from './build-vkey.js';
 
@@ -33,6 +34,7 @@ type SectionBuilders = {
   name?: BUILDER_NAME;
   strs?: BUILDER_STRS;
   tran?: BUILDER_TRAN;
+  uset?: BUILDER_USET;
   vars?: BUILDER_VARS;
   vkey?: BUILDER_VKEY;
 };
@@ -83,6 +85,7 @@ export default class KMXPlusBuilder {
     this.sect.strs = build_strs(this.file.kmxplus.strs);
     this.sect.list = build_list(this.file.kmxplus.list, this.sect.strs);
     this.sect.elem = build_elem(this.file.kmxplus.elem, this.sect.strs);
+    this.sect.uset = build_uset(this.file.kmxplus, this.sect.strs);
 
     const build_bksp = build_tran;
 
@@ -131,6 +134,7 @@ export default class KMXPlusBuilder {
     offset = this.finalize_sect_item(this.sect.name, offset);
     offset = this.finalize_sect_item(this.sect.strs, offset);
     offset = this.finalize_sect_item(this.sect.tran, offset);
+    offset = this.finalize_sect_item(this.sect.uset, offset);
     offset = this.finalize_sect_item(this.sect.vars, offset);
     offset = this.finalize_sect_item(this.sect.vkey, offset);
 
