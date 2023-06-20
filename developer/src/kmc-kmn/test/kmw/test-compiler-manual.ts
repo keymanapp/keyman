@@ -25,7 +25,6 @@ if(!await kmnCompiler.init(callbacks)) {
   process.exit(1);
 }
 
-// TODO: this needs rewrite due to circular deps
 
 let result = kmnCompiler.runCompiler(infile, outfile, {
   shouldAddCompilerVersion: false,
