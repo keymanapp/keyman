@@ -2,12 +2,12 @@ import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { KmnCompiler } from '@keymanapp/kmc-kmn';
-import { WriteCompiledKeyboard } from '../src/compiler/write-compiled-keyboard.js';
+import { KmnCompiler } from '../../src/compiler/compiler.js';
+import { WriteCompiledKeyboard } from '../../src/kmw-compiler/write-compiled-keyboard.js';
 import { extractTouchLayout } from './util.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url)).replace(/\\/g, '/');
-const fixturesDir = __dirname + '/../../test/fixtures/';
+const fixturesDir = __dirname + '/../../../test/fixtures/kmw/';
 const fixtureName = fixturesDir + 'khmer_angkor.js';
 const infile = fixturesDir + 'khmer_angkor.kmn';
 const outfile = fixturesDir + 'khmer_angkor.kmx'; // intermediate outfile

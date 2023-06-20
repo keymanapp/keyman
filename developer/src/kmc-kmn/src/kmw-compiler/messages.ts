@@ -1,4 +1,4 @@
-import { KmnCompilerMessages } from "@keymanapp/kmc-kmn";
+import { KmnCompilerMessages } from "../compiler/messages.js";
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m } from "@keymanapp/common-types";
 
 const Namespace = CompilerErrorNamespace.KmwCompiler;
@@ -12,10 +12,10 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
   // Note: for legacy reasons, KMWCompilerMessages extends from
   // KMNCompilerMessages as they share the same error codes. This can be a
   // little confusing because kmcmplib still builds its own error message
-  // strings, not kmc-kmn, whereas the kmc-kmw messages are defined here.
-  // However, as the kmc-kmw module may be going away at some point, it's
-  // probably not worth the splitting of all KMW-specific error messages out of
-  // the KmnCompilerMessages space.
+  // strings, not kmc-kmn, whereas the kmw messages are defined here. However,
+  // as the kmw module may be going away at some point, it's probably not worth
+  // the splitting of all KMW-specific error messages out of the
+  // KmnCompilerMessages space.
 
   static Error_InvalidBegin = () => m(this.ERROR_InvalidBegin,
     `A "begin unicode" statement is required to compile a KeymanWeb keyboard`);
@@ -40,7 +40,8 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
   static Error_NotSupportedInKeymanWebOutput = (o:{code:string}) => m(this.ERROR_NotSupportedInKeymanWebOutput,
     `Statement ${o.code} is not currently supported in output`);
 
-  // Following messages are kmc-kmw only, so use KmwCompiler error namespace
+  // Following messages are kmw-compiler only, so use KmwCompiler error namespace
+
   static Error_NotAnyRequiresVersion14 = () => m(this.ERROR_NotAnyRequiresVersion14,
     `Statement notany in context() match requires version 14.0+ of KeymanWeb`);
   static ERROR_NotAnyRequiresVersion14 = SevError | 0x0001;

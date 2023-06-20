@@ -19,7 +19,6 @@ cd "$THIS_SCRIPT_PATH"
 builder_describe "Build Keyman Developer Compiler Module for .kmn to .kmx" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
-  "@/developer/src/kmc-kmw" \
   "@/developer/src/common/web/test-helpers" \
   "@/developer/src/kmcmplib:wasm" \
   "configure" \

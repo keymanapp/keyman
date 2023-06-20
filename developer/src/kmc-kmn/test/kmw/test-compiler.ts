@@ -1,16 +1,16 @@
 import 'mocha';
 import { assert } from 'chai';
 // import sinonChai from 'sinon-chai';
-import { WriteCompiledKeyboard } from '../src/compiler/write-compiled-keyboard.js';
+import { WriteCompiledKeyboard } from '../../src/kmw-compiler/write-compiled-keyboard.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { KmnCompiler } from '@keymanapp/kmc-kmn';
+import { KmnCompiler } from '../../src/compiler/compiler.js';
 import { extractTouchLayout } from './util.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url)).replace(/\\/g, '/');
-const fixturesDir = __dirname + '/../../test/fixtures/';
+const fixturesDir = __dirname + '/../../../test/fixtures/kmw/';
 //const baselineDir = __dirname + '/../../../../../common/test/keyboards/baseline/';
 // chai.use(sinonChai);
 

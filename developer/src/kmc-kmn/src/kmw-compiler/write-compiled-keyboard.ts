@@ -1,5 +1,5 @@
 import { KMX, CompilerOptions, CompilerCallbacks, KvkFileReader, VisualKeyboard, KmxFileReader, Osk } from "@keymanapp/common-types";
-import { ExpandSentinel, incxstr, xstrlen } from "../util/util.js";
+import { ExpandSentinel, incxstr, xstrlen } from "./util.js";
 import { options, nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater, callbacks } from "./compiler-globals.js";
 import { JavaScript_ContextMatch, JavaScript_KeyAsString, JavaScript_Name, JavaScript_OutputString, JavaScript_Rules, JavaScript_Shift, JavaScript_ShiftAsString, JavaScript_Store, zeroPadHex } from './javascript-strings.js';
 import { KmwCompilerMessages } from "./messages.js";
@@ -58,7 +58,7 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
       sEmbedJS: string = "", sEmbedCSS: string = "";
   let sVisualKeyboard: string = "", sFullName: string = "";
   let sBegin_NewContext: string = "", sBegin_PostKeystroke: string = "";
-  let sLayoutFile: string = "", sVKDictionary: string;
+  let sLayoutFile: string = "", sVKDictionary: string = "";
   let linecomment: string;  // I3438
   // let HasRules: boolean;
   let sModifierBitmask: string;

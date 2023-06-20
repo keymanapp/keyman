@@ -10,7 +10,7 @@ import { UnicodeSetParser, UnicodeSet, Osk } from '@keymanapp/common-types';
 import { CompilerCallbacks, CompilerEvent, CompilerOptions, KeymanFileTypes, KvkFileWriter, KvksFileReader } from '@keymanapp/common-types';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
 import { CompilerMessages, mapErrorFromKmcmplib } from './messages.js';
-import { WriteCompiledKeyboard } from '@keymanapp/kmc-kmw';
+import { WriteCompiledKeyboard } from '../kmw-compiler/write-compiled-keyboard.js';
 
 export interface CompilerResultFile {
   filename: string;

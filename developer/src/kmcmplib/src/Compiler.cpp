@@ -1138,7 +1138,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
   case TSS_DISPLAYMAP:
     // This store is allowed in older versions of Keyman, as it is a
-    // compile-time only feature. Implemented only in kmc-kmn/kmc-kmw, not in
+    // compile-time only feature. Implemented only in kmc-kmn, not in
     // the legacy compilers.
     fk->extra->displayMapFilename = sp->dpString;
     break;
