@@ -39,7 +39,7 @@ adjustments to the generated font.
 
 ## Standard conventions for use of displayMaps
 
-In the Keyman keyboards repository, the PUA range used should start at `U+9100`.
+In the Keyman keyboards repository, the PUA range used should start at `U+F100`.
 
 `&displayMap` JSON files should be named `Kbd<script>.json` where `<script>` is
 a [4 letter script subtag][4], for example `KbdKhmr.json`, and the corresponding
