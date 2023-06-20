@@ -701,6 +701,11 @@ export class PathSegmenter {
     this.steppedCumulativeStats.push(extendedStats);
 
     this.performSubsegmentation();
+
+    if(this.segmentsToEmit.length > 0) {
+      this.segmentForwarder(this.segmentsToEmit);
+      this.segmentsToEmit = [];
+    }
   }
 
   // The "reported via event" aspect mentioned below is necessary because this may be

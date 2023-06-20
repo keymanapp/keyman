@@ -94,7 +94,7 @@ export class TouchpathTurtle extends EventEmitter<EventMap> {
     }
 
     // Angle is measured clockwise from the DOM's <0, -1>.
-    let angle = angleInDegrees * Math.PI / 180;
+    let angle = (90 - angleInDegrees) * Math.PI / 180;
     let xDistance = Math.cos(angle) * distance;
     let yDistance = -Math.sin(angle) * distance;
 
@@ -112,7 +112,7 @@ export class TouchpathTurtle extends EventEmitter<EventMap> {
       currentSample = {
         targetX: currentSample.targetX + xTickDist,
         targetY: currentSample.targetY + yTickDist,
-        t: currentSample.t + timeDelta
+        t: startSample.t + timeDelta
       };
 
       this.currentChop = currentStats;
