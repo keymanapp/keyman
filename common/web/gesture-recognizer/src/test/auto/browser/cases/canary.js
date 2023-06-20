@@ -1,11 +1,6 @@
 var assert = chai.assert;
 
 import {
-  MouseEventEngine,
-  TouchEventEngine
-} from '../../../../../build/lib/index.mjs';
-
-import {
   FixtureLayoutConfiguration,
   HostFixtureLayoutController,
   InputSequenceSimulator
@@ -83,16 +78,11 @@ describe("'Canary' checks", function() {
       }
 
       // Ensure that the expected handler is called.
-      let proto = TouchEventEngine.prototype;
-      let trueHandler = proto.onTouchStart;
-      let fakeHandler = proto.onTouchStart = sinon.fake();
+      let fakeHandler = sinon.fake();
+      this.controller.recognizer.on('inputstart', fakeHandler)
       fireEvent();
-      try {
-        assert.isTrue(fakeHandler.called, "Unit test attempt failed:  handler was not called successfully.");
-      } finally {
-        // Restore the true implementation.
-        proto.onTouchStart = trueHandler;
-      }
+
+      assert.isTrue(fakeHandler.called, "Unit test attempt failed:  handler was not called successfully.");
     });
 
     it("InputSequenceSimulator.replayMouseSample", function() {
@@ -107,16 +97,11 @@ describe("'Canary' checks", function() {
       }
 
       // Ensure that the expected handler is called.
-      let proto = MouseEventEngine.prototype;
-      let trueHandler = proto.onMouseStart;
-      let fakeHandler = proto.onMouseStart = sinon.fake();
+      let fakeHandler = sinon.fake();
+      this.controller.recognizer.on('inputstart', fakeHandler)
       fireEvent();
-      try {
-        assert.isTrue(fakeHandler.called, "Unit test attempt failed:  handler was not called successfully.");
-      } finally {
-        // Restore the true implementation.
-        proto.onMouseStart = trueHandler;
-      }
+
+      assert.isTrue(fakeHandler.called, "Unit test attempt failed:  handler was not called successfully.");
     });
   });
 });
