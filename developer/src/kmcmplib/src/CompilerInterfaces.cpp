@@ -104,6 +104,7 @@ EXTERN bool kmcmp_CompileKeyboard(
   result.kmx = data;
   result.kmxSize = dataSize;
   result.kvksFilename = string_from_u16string(fk.extra->kvksFilename); // convert to UTF8
+  result.displayMapFilename = string_from_u16string(fk.extra->displayMapFilename); // convert to UTF8
 
   return TRUE;
 }

@@ -77,6 +77,10 @@ export class CompilerMessages {
   static Warn_InvalidVkeyInKvksFile = (o:{filename: string, invalidVkey: string}) => m(this.WARN_InvalidVkeyInKvksFile,
     `Invalid virtual key ${o.invalidVkey} found in ${o.filename}`);
   static WARN_InvalidVkeyInKvksFile = SevWarn | 0x1009;
+
+  static Error_InvalidDisplayMapFile = (o:{filename: string, e: any}) => m(this.ERROR_InvalidDisplayMapFile,
+    `Error encountered parsing display map ${o.filename}: ${o.e}`);
+  static ERROR_InvalidDisplayMapFile = SevError | 0x100A;
 };
 
 /**

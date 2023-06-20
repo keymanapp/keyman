@@ -125,6 +125,7 @@ typedef FILE_VKDICTIONARY *PFILE_VKDICTIONARY;
 struct FILE_KEYBOARD_EXTRA {
   std::string kmnFilename; // utf-8
   std::u16string kvksFilename;	// utf-16, original TSS_VISUALKEYBOARD value
+  std::u16string displayMapFilename;	// utf-16, original TSS_DISPLAY_MAP value
 };
 
 typedef struct FILE_KEYBOARD_EXTRA* PFILE_KEYBOARD_EXTRA;

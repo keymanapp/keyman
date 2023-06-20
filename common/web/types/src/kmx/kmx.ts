@@ -250,7 +250,13 @@ export class KMXFile {
 
   public static readonly TSS__KEYMAN_150_MAX =     43;
 
-  public static readonly TSS__MAX =                43;
+  /* Keyman 17.0 system stores */
+
+  public static readonly TSS_DISPLAYMAP =          44;
+
+  public static readonly TSS__KEYMAN_170_MAX =     44;
+
+  public static readonly TSS__MAX =                44;
 
 
   public static readonly UC_SENTINEL =       0xFFFF;

@@ -56,6 +56,7 @@ struct WASM_COMPILER_RESULT {
   // Following are compiler side-channel data, required for
   // follow-on transform
   std::string kvksFilename;
+  std::string displayMapFilename;
   // TODO: additional data to be passed back
 };
 
@@ -66,6 +67,7 @@ WASM_COMPILER_RESULT kmcmp_wasm_compile(std::string pszInfile, const KMCMP_COMPI
   r.kmx = 0;
   r.kmxSize = 0;
   r.kvksFilename = "";
+  r.displayMapFilename = "";
 
   r.result = kmcmp_CompileKeyboard(
     pszInfile.c_str(),
@@ -81,6 +83,7 @@ WASM_COMPILER_RESULT kmcmp_wasm_compile(std::string pszInfile, const KMCMP_COMPI
     r.kmx = (int) kr.kmx;
     r.kmxSize = (int) kr.kmxSize;
     r.kvksFilename = kr.kvksFilename;
+    r.displayMapFilename = kr.displayMapFilename;
   }
 
   return r;
@@ -108,6 +111,7 @@ EMSCRIPTEN_BINDINGS(compiler_interface) {
     .property("kmx", &WASM_COMPILER_RESULT::kmx)
     .property("kmxSize", &WASM_COMPILER_RESULT::kmxSize)
     .property("kvksFilename", &WASM_COMPILER_RESULT::kvksFilename)
+    .property("displayMapFilename", &WASM_COMPILER_RESULT::displayMapFilename)
     ;
 
   emscripten::function("kmcmp_compile", &kmcmp_wasm_compile);

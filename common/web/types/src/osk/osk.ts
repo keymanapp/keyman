@@ -20,9 +20,9 @@ export interface StringResult {
 
 export type PuaMap = {[index:string]: string};
 
-export function parseMapping(mapping: StringResult[]) {
+export function parseMapping(mapping: any) {
   let map: PuaMap = {};
-  for (let item of mapping) {
+  for (let item of mapping.map) {
     map[item.str] = String.fromCharCode(parseInt(item.pua, 16));
   }
   return map;
