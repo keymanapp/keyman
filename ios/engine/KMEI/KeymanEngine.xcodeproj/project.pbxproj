@@ -308,12 +308,12 @@
 		2949146F2738DA6700400732 /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/ResourceInfoView.strings"; sourceTree = "<group>"; };
 		294914702738DD7400400732 /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		294914712738DD9700400732 /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "ff-NG"; path = "ff-NG.lproj/Localizable.stringsdict"; sourceTree = "<group>"; };
-		298566B929802892004ACA95 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
-		298566BA298028A8004ACA95 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Localizable.strings; sourceTree = "<group>"; };
-		298566BB298028AC004ACA95 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = cs; path = cs.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		297810FE297FAEDF007C886D /* kn */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = kn; path = kn.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
 		297810FF297FAEF8007C886D /* kn */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = kn; path = kn.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29781100297FAF06007C886D /* kn */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = kn; path = kn.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		298566B929802892004ACA95 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
+		298566BA298028A8004ACA95 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Localizable.strings; sourceTree = "<group>"; };
+		298566BB298028AC004ACA95 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = cs; path = cs.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		298566C52980C5BB004ACA95 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
 		298566C62980C5C7004ACA95 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Localizable.strings; sourceTree = "<group>"; };
 		298566C72980C5CC004ACA95 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = sv; path = sv.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
@@ -528,6 +528,9 @@
 		CEF888D123FE6ADF00667693 /* Simple 10.0 Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "Simple 10.0 Migration.bundle"; sourceTree = "<group>"; };
 		CEF888D423FE786C00667693 /* KeyboardScaleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardScaleTests.swift; sourceTree = "<group>"; };
 		CEF9367724D3B0B20031C70D /* PackageInstallView_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PackageInstallView_iPhone.xib; sourceTree = "<group>"; };
+		CEFFECD52A417F1300D58C36 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
+		CEFFECD62A417F2900D58C36 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEFFECD72A417F2E00D58C36 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = es; path = es.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		F243887E14BBD43000A3E055 /* KeymanEngineDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeymanEngineDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F27FCAEE157FD59100FBBA20 /* Keyman-iphoneos.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Keyman-iphoneos.xcconfig"; sourceTree = "<group>"; };
 		F27FCAEF157FD59100FBBA20 /* Keyman-iphonesimulator.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Keyman-iphonesimulator.xcconfig"; sourceTree = "<group>"; };
@@ -1215,6 +1218,7 @@
 				sv,
 				uk,
 				ru,
+				es,
 			);
 			mainGroup = F243887314BBD43000A3E055;
 			productRefGroup = F243887F14BBD43000A3E055 /* Products */;
@@ -1613,6 +1617,7 @@
 				298566C72980C5CC004ACA95 /* sv */,
 				298566D32980D39F004ACA95 /* uk */,
 				298566DF2980E48C004ACA95 /* ru */,
+				CEFFECD72A417F2E00D58C36 /* es */,
 			);
 			name = Localizable.stringsdict;
 			sourceTree = "<group>";
@@ -1636,10 +1641,11 @@
 				29BFA76B28294813009FCCC3 /* pl */,
 				29B27FF029062D100036917E /* nl */,
 				298566BA298028A8004ACA95 /* cs */,
-				297810FF297FAEF8007C886D /* kn */,				
+				297810FF297FAEF8007C886D /* kn */,
 				298566C62980C5C7004ACA95 /* sv */,
 				298566D22980D39A004ACA95 /* uk */,
 				298566DE2980E486004ACA95 /* ru */,
+				CEFFECD62A417F2900D58C36 /* es */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1668,6 +1674,7 @@
 				298566C52980C5BB004ACA95 /* sv */,
 				298566D12980D390004ACA95 /* uk */,
 				298566DD2980E477004ACA95 /* ru */,
+				CEFFECD52A417F1300D58C36 /* es */,
 			);
 			name = ResourceInfoView.xib;
 			sourceTree = "<group>";
