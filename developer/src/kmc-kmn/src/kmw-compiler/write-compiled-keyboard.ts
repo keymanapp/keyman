@@ -1,12 +1,10 @@
 import { KMX, CompilerOptions, CompilerCallbacks, KvkFileReader, VisualKeyboard, KmxFileReader, Osk } from "@keymanapp/common-types";
 import { ExpandSentinel, incxstr, xstrlen } from "./util.js";
-import { options, nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater, callbacks } from "./compiler-globals.js";
+import { options, nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater, callbacks, FFix183_LadderLength } from "./compiler-globals.js";
 import { JavaScript_ContextMatch, JavaScript_KeyAsString, JavaScript_Name, JavaScript_OutputString, JavaScript_Rules, JavaScript_Shift, JavaScript_ShiftAsString, JavaScript_Store, zeroPadHex } from './javascript-strings.js';
 import { KmwCompilerMessages } from "./messages.js";
 import { ValidateLayoutFile } from "./validate-layout-file.js";
 import { VisualKeyboardFromFile } from "./visual-keyboard-compiler.js";
-
-export let FFix183_LadderLength: number = 100; // TODO: option
 
 function requote(s: string): string {
   return "'" + s.replaceAll(/(['\\])/, "\\$1") + "'";

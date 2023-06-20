@@ -62,3 +62,8 @@ export const
     0x90, //VK_NUMLOCK,   // &H90
     0x91  //VK_SCROLL   // &H91
   ];
+
+/**
+ * The character set that we allow for identifiers for JavaScript
+ */
+export const SValidIdentifierCharSet = /[A-Za-z0-9_]/;

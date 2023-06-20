@@ -1,7 +1,8 @@
 import { KMX, Osk, TouchLayout, TouchLayoutFileReader, TouchLayoutFileWriter } from "@keymanapp/common-types";
 import { callbacks, IsKeyboardVersion14OrLater, IsKeyboardVersion15OrLater } from "./compiler-globals.js";
-import { JavaScript_Key, VKeyNames } from "./javascript-strings.js";
+import { JavaScript_Key } from "./javascript-strings.js";
 import { TRequiredKey, CRequiredKeys, CSpecialText10, CSpecialText14, CSpecialText14ZWNJ, CSpecialText14Map } from "./constants.js";
+import { VKeyNames } from "./keymanweb-key-codes.js";
 
 
 interface VLFOutput {
