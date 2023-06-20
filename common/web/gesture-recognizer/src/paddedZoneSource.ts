@@ -26,7 +26,7 @@ export class PaddedZoneSource implements RecognitionZoneSource {
    * @param rootZoneSource The root zone source object/element to be 'padded'
    * @param edgePadding A set of 1 to 4 numbers defining padding per the standard CSS border & padding spec style.
    */
-  public constructor(...edgePadding: number[])
+  public constructor(edgePadding: number[]);
   /**
    * Provides a dynamic 'padded' recognition zone based upon offsetting from the borders
    * of another defined zone.
@@ -42,11 +42,11 @@ export class PaddedZoneSource implements RecognitionZoneSource {
    * @param rootZoneSource The root zone source object/element to be 'padded'
    * @param edgePadding A set of 1 to 4 numbers defining padding per the standard CSS border & padding spec style.
    */
-  public constructor(rootZoneSource: RecognitionZoneSource, ...edgePadding: number[]);
-  public constructor(rootZoneSource: RecognitionZoneSource | number, ...edgePadding: number[]) {
+  public constructor(rootZoneSource: RecognitionZoneSource, edgePadding?: number[]);
+  public constructor(rootZoneSource: RecognitionZoneSource | number[], edgePadding?: number[]) {
     // Disambiguate which constructor style was intended.
-    if(typeof rootZoneSource == 'number') {
-      edgePadding = [rootZoneSource, ...edgePadding];
+    if(Array.isArray(rootZoneSource)) {
+      edgePadding = rootZoneSource;
       rootZoneSource = new ViewportZoneSource();
     }
 

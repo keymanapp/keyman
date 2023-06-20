@@ -29,7 +29,7 @@ export class GestureRecognizer extends EventEmitter<EventMap> {
 
     processingConfig.inputStartBounds = processingConfig.inputStartBounds ?? processingConfig.targetRoot;
     processingConfig.maxRoamingBounds = processingConfig.maxRoamingBounds ?? processingConfig.targetRoot;
-    processingConfig.safeBounds       = processingConfig.safeBounds       ?? new PaddedZoneSource(2);
+    processingConfig.safeBounds       = processingConfig.safeBounds       ?? new PaddedZoneSource([2]);
 
     if(!config.paddedSafeBounds) {
       let paddingArray = config.safeBoundPadding;
@@ -38,7 +38,7 @@ export class GestureRecognizer extends EventEmitter<EventMap> {
       }
       paddingArray = paddingArray ?? [3];
 
-      processingConfig.paddedSafeBounds = new PaddedZoneSource(processingConfig.safeBounds, ...paddingArray as number[]);
+      processingConfig.paddedSafeBounds = new PaddedZoneSource(processingConfig.safeBounds, paddingArray);
     } else {
       // processingConfig.paddedSafeBounds is already set via the spread operator above.
       delete processingConfig.safeBoundPadding;

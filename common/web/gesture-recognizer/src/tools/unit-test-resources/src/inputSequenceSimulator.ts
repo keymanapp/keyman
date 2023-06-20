@@ -93,7 +93,7 @@ export class InputSequenceSimulator {
 
     let touchEventDict: TouchEventInit = {
       bubbles: true,
-      touches: [touch, ...otherTouches],
+      touches: [touch].concat(otherTouches),
       changedTouches: [touch],
     }
 
@@ -225,7 +225,7 @@ export class InputSequenceSimulator {
 
       const sample = touchpoint.path.coords[indexInSequence];
       if(touchpoint.isFromTouch) {
-        let otherTouches = [...sequenceTouches];
+        let otherTouches = [].concat(sequenceTouches);
         otherTouches.splice(selectedSequence, 1);
         // Now that we've removed the entry for the current touchpoint, filter out any null entries.
         otherTouches = otherTouches.filter((val) => !!val);
