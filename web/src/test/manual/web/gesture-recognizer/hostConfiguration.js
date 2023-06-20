@@ -1,5 +1,7 @@
 // -- BEGIN:  Code for controlling the layout-simulation elements --
 
+import { GestureRecognizer } from '../../../../../build/engine/gesture-recognizer/index.js';
+
 function updateConfig() {
   let layout = document.config.screen;
   let bounds = document.config.bounds;
@@ -64,7 +66,7 @@ window.addEventListener('load', function() {
     paddedSafeBounds: document.getElementById('padded-safe-zone')
   };
 
-  recognizer = new com.keyman.osk.GestureRecognizer(recognizerConfig);
+  recognizer = new GestureRecognizer(recognizerConfig);
 
   let recordingArr = [];
   let logElement = document.getElementById('event-log');
