@@ -1,6 +1,6 @@
 // -- BEGIN:  Code for controlling the layout-simulation elements --
 
-import { GestureRecognizer } from '../../../../../build/engine/gesture-recognizer/index.js';
+import { GestureRecognizer } from '../../../../../build/engine/gesture-recognizer/lib/index.mjs';
 
 function updateConfig() {
   let layout = document.config.screen;
@@ -18,15 +18,15 @@ window.addEventListener('load', function(ev) {
   let receiverGroup = document.config.receiver;
   let safeGroup = document.config.safeZone;
 
-  for(entry of layoutGroup) {
+  for(let entry of layoutGroup) {
     entry.addEventListener('change', updateConfig);
   }
 
-  for(entry of boundsGroup) {
+  for(let entry of boundsGroup) {
     entry.addEventListener('change', updateConfig);
   }
 
-  for(entry of receiverGroup) {
+  for(let entry of receiverGroup) {
     if(entry.value == 'full') {
       entry.addEventListener('change', function() {
         let topRange = document.getElementById('topOnlyRadio');
@@ -42,7 +42,7 @@ window.addEventListener('load', function(ev) {
     }
   }
 
-  for(entry of safeGroup) {
+  for(let entry of safeGroup) {
     entry.addEventListener('change', updateConfig);
   }
 
@@ -83,7 +83,7 @@ window.addEventListener('load', function() {
     let touchpoint = input.touchpoints[0];
     recordingArr.push(touchpoint);
 
-    objectPrinter = function() {
+    const objectPrinter = function() {
       logElement.value = JSON.stringify(recordingArr, null, 2);
     }
 
