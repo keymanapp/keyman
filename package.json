@@ -22,7 +22,6 @@
     "developer/src/common/web/test-helpers",
     "developer/src/kmc-analyze",
     "developer/src/kmc-kmn",
-    "developer/src/kmc-kmw",
     "developer/src/kmc-ldml",
     "developer/src/kmc-model",
     "developer/src/kmc-model-info",

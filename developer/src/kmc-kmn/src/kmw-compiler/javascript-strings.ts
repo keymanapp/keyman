@@ -1,4 +1,4 @@
-import { TSentinelRecord, GetSuppChar, ExpandSentinel, incxstr, xstrlen, xstrlen_printing } from "../util/util.js";
+import { TSentinelRecord, GetSuppChar, ExpandSentinel, incxstr, xstrlen, xstrlen_printing } from "./util.js";
 import { KMX } from "@keymanapp/common-types";
 
 import { callbacks, FMnemonic, FTabStop, IsKeyboardVersion10OrLater, IsKeyboardVersion14OrLater, nl, options } from "./compiler-globals.js";

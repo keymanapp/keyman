@@ -2,13 +2,12 @@ import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { KmnCompiler } from '@keymanapp/kmc-kmn';
-import { KMX, KmxFileReader } from '@keymanapp/common-types';
-import { WriteCompiledKeyboard } from '../src/compiler/write-compiled-keyboard.js';
+import { KmnCompiler } from '../../src/compiler/compiler.js';
+import { WriteCompiledKeyboard } from '../../src/kmw-compiler/write-compiled-keyboard.js';
 import { extractTouchLayout } from './util.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url)).replace(/\\/g, '/');
-const fixturesDir = __dirname + '/../../test/fixtures/';
+const fixturesDir = __dirname + '/../../../test/fixtures/kmw/';
 const fixtureName = fixturesDir + 'khmer_angkor.js';
 const infile = fixturesDir + 'khmer_angkor.kmn';
 const outfile = fixturesDir + 'khmer_angkor.kmx'; // intermediate outfile
@@ -26,10 +25,10 @@ if(!await kmnCompiler.init(callbacks)) {
   process.exit(1);
 }
 
+
 let result = kmnCompiler.runCompiler(infile, outfile, {
   shouldAddCompilerVersion: false,
   saveDebug: true,  // TODO: we should probably use passed debug flag
-  target: 'js'
 });
 
 if(!result) {
@@ -37,10 +36,7 @@ if(!result) {
   process.exit(1);
 }
 
-const reader = new KmxFileReader();
-const keyboard: KMX.KEYBOARD = reader.read(result.kmx.data);
-
-const js = WriteCompiledKeyboard(callbacks, infile, outfile, 'khmer_angkor', keyboard, true);
+const js = WriteCompiledKeyboard(callbacks, infile, result.kmx.data, result.kvk.data, null, true);
 
 callbacks.printMessages();
 

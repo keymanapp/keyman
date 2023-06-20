@@ -42,6 +42,7 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   fk->dpDeadKeyArray = NULL;
   fk->cxVKDictionary = 0;  // I3438
   fk->dpVKDictionary = NULL;  // I3438
+  fk->extra->targets = COMPILETARGETS_KMX;
   fk->extra->kvksFilename = u"";
   fk->extra->displayMapFilename = u"";
 /*	fk->szMessage[0] = 0;
