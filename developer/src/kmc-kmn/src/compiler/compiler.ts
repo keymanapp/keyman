@@ -304,20 +304,17 @@ export class KmnCompiler implements UnicodeSetParser {
 
   private loadDisplayMapping(kmnFilename:string, displayMapFilename: string): Osk.PuaMap {
     // Remap using the osk-char-use-rewriter
-    let mapping: any;
-
     displayMapFilename = this.callbacks.resolveFilename(kmnFilename, displayMapFilename);
     try {
       // Expected file format: displaymap.schema.json
-      // TODO: verify with schema
-      let data = this.callbacks.loadFile(displayMapFilename);
-      mapping = JSON.parse(new TextDecoder().decode(data));
+      const data = this.callbacks.loadFile(displayMapFilename);
+      const schema = this.callbacks.loadSchema('displaymap');
+      const mapping = JSON.parse(new TextDecoder().decode(data));
+      return Osk.parseMapping(mapping, schema);
     } catch(e) {
       this.callbacks.reportMessage(CompilerMessages.Error_InvalidDisplayMapFile({filename: displayMapFilename, e}));
       return null;
     }
-
-    return Osk.parseMapping(mapping);
   }
 
   /**
