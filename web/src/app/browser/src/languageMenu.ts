@@ -43,7 +43,7 @@ export class LanguageMenu {
         if(sX > spaceBar.offsetLeft && sX < spaceBar.offsetLeft+spaceBar.offsetWidth &&
            sY > spaceBar.offsetTop && sY < spaceBar.offsetTop+spaceBar.offsetHeight
         ) {
-          this.keyman.osk.emit('showBuild');
+          this.keyman.osk.emit('showbuild');
         }
       }
     },false);

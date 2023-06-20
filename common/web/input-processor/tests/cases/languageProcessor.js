@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import LanguageProcessor from '#./text/prediction/languageProcessor.js';
+import { LanguageProcessor } from '@keymanapp/input-processor';
 import { SourcemappedWorker as LMWorker } from "@keymanapp/lexical-model-layer/node";
 import { Mock } from '@keymanapp/keyboard-processor';
 

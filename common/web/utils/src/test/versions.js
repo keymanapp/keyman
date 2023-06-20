@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import Version from '../../build/obj/version.js';
+import { Version } from '@keymanapp/web-utils';
 
 describe('Version Logic', function() {
   it('Should provide a default, fallback value when nothing is specified', function() {

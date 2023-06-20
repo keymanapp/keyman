@@ -29,22 +29,6 @@ builder_parse "$@"
 
 ### CONFIGURE ACTIONS
 
-if builder_start_action configure; then
-  verify_npm_setup
-  builder_finish_action success configure
-fi
-
-if builder_start_action clean; then
-  rm -rf ../../../../build/tools/building/sourcemap-root
-  builder_finish_action success clean
-fi
-
-if builder_start_action build; then
-  tsc -b "$THIS_SCRIPT_PATH/tsconfig.json"
-
-  # Necessary until the Web project is converted over to ES modules.
-  # Node defaults to CommonJS format otherwise.
-  cp ../../../../build/tools/building/sourcemap-root/index.js ../../../../build/tools/building/sourcemap-root/index.mjs
-
-  builder_finish_action success build
-fi
+builder_run_action configure  verify_npm_setup
+builder_run_action clean      rm -rf ../../../../build/tools/building/sourcemap-root
+builder_run_action build      tsc --build tsconfig.json

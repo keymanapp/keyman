@@ -15,8 +15,8 @@ describe("EmitterListenerSpy", () => {
     const fakeAddListener = sinon.fake();
     const fakeRemoveListener = sinon.fake();
 
-    emitterSpy.on('listenerAdded', fakeAddListener);
-    emitterSpy.on('listenerRemoved', fakeRemoveListener);
+    emitterSpy.on('listeneradded', fakeAddListener);
+    emitterSpy.on('listenerremoved', fakeRemoveListener);
     emitter.on('event', fakeEventHandler);
 
     assert.isTrue(fakeAddListener.calledOnce);
@@ -35,8 +35,8 @@ describe("EmitterListenerSpy", () => {
     const fakeAddListener = sinon.fake();
     const fakeRemoveListener = sinon.fake();
 
-    emitterSpy.on('listenerAdded', fakeAddListener);
-    emitterSpy.on('listenerRemoved', fakeRemoveListener);
+    emitterSpy.on('listeneradded', fakeAddListener);
+    emitterSpy.on('listenerremoved', fakeRemoveListener);
     emitter.addEventListener('event', fakeEventHandler);
 
     assert.isTrue(fakeAddListener.calledOnce);

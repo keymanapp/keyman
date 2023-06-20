@@ -1,7 +1,7 @@
 import Activator from './activator.js';
 
 interface TriggerEventMap<Type> {
-  triggerChange: (trigger: Type) => void;
+  triggerchange: (trigger: Type) => void;
 }
 
 export default class TwoStateActivator<Type> extends Activator<TriggerEventMap<Type>> {
@@ -40,7 +40,7 @@ export default class TwoStateActivator<Type> extends Activator<TriggerEventMap<T
 
     this.checkState(oldState);
     if(oldValue != value) {
-      this.emit('triggerChange', value);
+      this.emit('triggerchange', value);
     }
   }
 

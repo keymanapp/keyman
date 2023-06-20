@@ -25,10 +25,7 @@
   },
   "type": "module",
   "scripts": {
-    "karma": "karma",
-    "mocha": "mocha",
-    "test": "gosh ./unit_tests/test.sh",
-    "tsc": "tsc"
+    "test": "gosh ./unit_tests/test.sh"
   },
   "repository": {
     "type": "git",

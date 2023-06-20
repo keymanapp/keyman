@@ -14,7 +14,7 @@
 # ```bash
 #   compile engine/main
 # ```
-compile ( ) {
+function compile() {
   if [ $# -lt 1 ]; then
     builder_die "Scripting error: insufficient argument count!"
   fi
@@ -32,7 +32,7 @@ compile ( ) {
   fi
 }
 
-_copy_dir_if_exists ( ) {
+function _copy_dir_if_exists() {
   local SRC=$1
   local DST=$2
 
@@ -43,7 +43,7 @@ _copy_dir_if_exists ( ) {
 
 # Copies top-level build artifacts into common 'debug' and 'release' config folders
 # for use in publishing.
-prepare ( ) {
+function prepare() {
   local CHILD_BUILD_ROOT="$KEYMAN_ROOT/web/build/app"
   local PUBLISH_BUILD_ROOT="$KEYMAN_ROOT/web/build/publish"
 
@@ -75,11 +75,17 @@ prepare ( ) {
 #   # from engine/osk
 #   test-headless osk
 # ```
-test-headless ( ) {
+function test-headless() {
+  TEST_FOLDER=$1
+
   TEST_OPTS=
   if builder_has_option --ci; then
     TEST_OPTS="--reporter mocha-teamcity-reporter"
   fi
 
-  mocha --recursive "${KEYMAN_ROOT}/web/src/test/auto/headless/$1" $TEST_OPTS
+  if [ -e .c8rc.json ]; then
+    c8 mocha --recursive "${KEYMAN_ROOT}/web/src/test/auto/headless/$TEST_FOLDER" $TEST_OPTS
+  else
+    mocha --recursive "${KEYMAN_ROOT}/web/src/test/auto/headless/$TEST_FOLDER" $TEST_OPTS
+  fi
 }

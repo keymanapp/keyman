@@ -88,11 +88,11 @@ interface EventMap {
    * Note:  the following code block was originally used to integrate with the keyboard & input
    * processors, but it requires entanglement with components external to this OSK module.
    */
-  'keyEvent': (event: KeyEvent) => void,
+  'keyevent': (event: KeyEvent) => void,
 
-  'hideRequested': (keyElement: KeyElement) => void,
+  'hiderequested': (keyElement: KeyElement) => void,
 
-  'globeKey': (keyElement: KeyElement, on: boolean) => void
+  'globekey': (keyElement: KeyElement, on: boolean) => void
 }
 
 export default class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardView {
@@ -1861,10 +1861,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
   optionKey(e: KeyElement, keyName: string, keyDown: boolean) {
     if (keyName.indexOf('K_LOPT') >= 0) {
-      this.emit('globeKey', e, keyDown);
+      this.emit('globekey', e, keyDown);
     } else if (keyName.indexOf('K_ROPT') >= 0) {
       if (keyDown) {
-        this.emit('hideRequested', e);
+        this.emit('hiderequested', e);
       }
     }
   };
@@ -1949,6 +1949,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return true;
     }
 
-    this.emit('keyEvent', keyEvent);
+    this.emit('keyevent', keyEvent);
   }
 }

@@ -1,73 +1,24 @@
-/*
- * Note:  while this file is not meant to exist long-term, it provides a nice
- * low-level proof-of-concept for esbuild bundling of the various Web submodules.
- *
- * Add some extra code at the end of src/index.ts and run it to verify successful bundling!
- */
-
 import esbuild from 'esbuild';
-import { spawn } from 'child_process';
-
-/** @type {esbuild.BuildOptions} */
-const commonConfig = {
-  alias: {
-    'tslib': '@keymanapp/tslib'
-  },
-  bundle: true,
-  sourcemap: true,
-  format: "esm",
-  // Sets 'common/web' as a root folder for module resolution;
-  // this allows the keyman-version and utils imports to resolve.
-  //
-  // We also need to point it at the nested build output folder to resolve in-project
-  // imports when compiled - esbuild doesn't seem to pick up on the shifted base.
-  nodePaths: ['..', "build/obj"]
-};
+import { esmConfiguration, bundleObjEntryPoints } from '../es-bundling/build/index.mjs';
+import * as fs from 'fs';
 
 // Bundled ES module version
-esbuild.buildSync({
-  alias: {
-    'tslib': '@keymanapp/tslib'
-  },
-  entryPoints: ['build/obj/index.js'],
-  outfile: "build/lib/index.mjs",
-  format: "esm",
-  ...commonConfig
+await esbuild.build({
+  ...esmConfiguration,
+  ...bundleObjEntryPoints('lib', 'build/obj/index.js', 'build/obj/keyboards/loaders/dom-keyboard-loader.js')
 });
 
-// Bundled CommonJS (classic Node) module version
-esbuild.buildSync({
-  alias: {
-    'tslib': '@keymanapp/tslib'
-  },
-  entryPoints: ['build/obj/index.js'],
-  outfile: 'build/lib/index.cjs',
-  bundle: true,
-  sourcemap: true,
-  platform: "node",
-  format: "cjs",
-  ...commonConfig
-});
-
-
-esbuild.buildSync({
-  alias: {
-    'tslib': '@keymanapp/tslib'
-  },
-  entryPoints: ['build/obj/keyboards/loaders/dom-keyboard-loader.js'],
-  outfile: 'build/lib/dom-keyboard-loader.mjs',
-  format: "esm",
-  ...commonConfig
-});
+// Sadly, esbuild aims to preserve the relative path between entry points... we want it directly
+// in /build/lib, not in a buried subfolder.  (This matters most for explicitly DOM libs like this
+// one, since we can't do import path resolution in DOM tests like we can for headless tests.)
+//
+// Alternatively, we can just build it separately like the node-oriented one.
+fs.renameSync('build/lib/keyboards/loaders/dom-keyboard-loader.mjs', 'build/lib/dom-keyboard-loader.mjs');
+fs.rmSync('build/lib/keyboards', { recursive: true, force: true });
 
 // The node-based keyboard loader needs an extra parameter due to Node-built-in imports:
-esbuild.buildSync({
-  alias: {
-    'tslib': '@keymanapp/tslib'
-  },
-  entryPoints: ['build/obj/keyboards/loaders/node-keyboard-loader.js'],
-  outfile: 'build/lib/node-keyboard-loader.mjs',
-  format: "esm",
-  platform: "node",
-  ...commonConfig
+await esbuild.build({
+  ...esmConfiguration,
+  ...bundleObjEntryPoints('lib', 'build/obj/keyboards/loaders/node-keyboard-loader.js'),
+  platform: "node"
 });
