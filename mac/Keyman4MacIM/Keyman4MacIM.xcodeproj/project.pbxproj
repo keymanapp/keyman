@@ -83,7 +83,6 @@
 		E23380FB21407AA100B90591 /* SILInBlue76.png in Resources */ = {isa = PBXBuildFile; fileRef = E23380FA21407AA100B90591 /* SILInBlue76.png */; };
 		E240F599202DED740000067D /* KMPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = E240F598202DED740000067D /* KMPackage.m */; };
 		E24C79EA1FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E24C79E91FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m */; };
-		E2585A7D20DD68BA00CBB994 /* KMInputMethodEventHandlerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E2585A7C20DD68BA00CBB994 /* KMInputMethodEventHandlerTests.m */; };
 		E2585A7F20DD6C3C00CBB994 /* KMMethodEventHandlerTests.kmx in Resources */ = {isa = PBXBuildFile; fileRef = E2585A7E20DD6C3C00CBB994 /* KMMethodEventHandlerTests.kmx */; };
 		E2585A8120DD7CF100CBB994 /* TestAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E2585A8020DD7CF100CBB994 /* TestAppDelegate.m */; };
 		E27BA9D32020D8BF00D273E7 /* SimpleTest.kmx in Resources */ = {isa = PBXBuildFile; fileRef = E27BA9D22020D8BF00D273E7 /* SimpleTest.kmx */; };
@@ -369,7 +368,6 @@
 		E24C79E91FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMInputMethodBrowserClientEventHandler.m; sourceTree = "<group>"; };
 		E24C79EB1FFFCE3000D8E46F /* KMInputMethodBrowserClientEventHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMInputMethodBrowserClientEventHandler.h; sourceTree = "<group>"; };
 		E24C79EC1FFFEA6B00D8E46F /* KMInputMethodEventHandlerProtected.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMInputMethodEventHandlerProtected.h; sourceTree = "<group>"; };
-		E2585A7C20DD68BA00CBB994 /* KMInputMethodEventHandlerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMInputMethodEventHandlerTests.m; sourceTree = "<group>"; };
 		E2585A7E20DD6C3C00CBB994 /* KMMethodEventHandlerTests.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = KMMethodEventHandlerTests.kmx; sourceTree = "<group>"; };
 		E2585A8020DD7CF100CBB994 /* TestAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestAppDelegate.m; sourceTree = "<group>"; };
 		E2585A8220DD7D3F00CBB994 /* TestAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestAppDelegate.h; sourceTree = "<group>"; };
@@ -698,7 +696,6 @@
 				E2585A7E20DD6C3C00CBB994 /* KMMethodEventHandlerTests.kmx */,
 				E27BA9D22020D8BF00D273E7 /* SimpleTest.kmx */,
 				E29F22F3201A59B1005EA234 /* KMInputMethodBrowserClientEventHandlerTests.m */,
-				E2585A7C20DD68BA00CBB994 /* KMInputMethodEventHandlerTests.m */,
 				E29F22F5201A59B2005EA234 /* Info.plist */,
 				E2585A8220DD7D3F00CBB994 /* TestAppDelegate.h */,
 				E2585A8020DD7CF100CBB994 /* TestAppDelegate.m */,
@@ -1036,7 +1033,6 @@
 				E2D5529D20DD8E0200D77CFB /* LegacyTestClient.m in Sources */,
 				E29F22F4201A59B1005EA234 /* KMInputMethodBrowserClientEventHandlerTests.m in Sources */,
 				E28914D52024E3DF0048E71E /* KMInputMethodBrowserClientEventHandler.m in Sources */,
-				E2585A7D20DD68BA00CBB994 /* KMInputMethodEventHandlerTests.m in Sources */,
 				E21176A020E18C5200F8065D /* AppleCompliantTestClient.m in Sources */,
 				E2585A8120DD7CF100CBB994 /* TestAppDelegate.m in Sources */,
 				E28914D62024E4010048E71E /* KMInputMethodEventHandler.m in Sources */,
