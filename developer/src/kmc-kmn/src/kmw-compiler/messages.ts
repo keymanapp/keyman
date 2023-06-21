@@ -19,8 +19,8 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
 
   static Error_InvalidBegin = () => m(this.ERROR_InvalidBegin,
     `A "begin unicode" statement is required to compile a KeymanWeb keyboard`);
-  static Error_TouchLayoutFileInvalid = () => m(this.ERROR_InvalidTouchLayoutFile,
-    `Touch layout file is not valid`);
+  static Error_TouchLayoutFileInvalid = (o:{filename:string}) => m(this.ERROR_InvalidTouchLayoutFile,
+    `Touch layout file ${o.filename} is not valid`);
   static Warn_DontMixChiralAndNonChiralModifiers = () => m(this.WARN_DontMixChiralAndNonChiralModifiers,
     `This keyboard contains Ctrl,Alt and LCtrl,LAlt,RCtrl,RAlt sets of modifiers. Use only one or the other set for web target.`);
   static Warn_OptionStoreNameInvalid = (o:{name:string}) => m(this.WARN_OptionStoreNameInvalid,
@@ -39,6 +39,10 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
     `Statement ${o.code} is not currently supported in context`);
   static Error_NotSupportedInKeymanWebOutput = (o:{code:string}) => m(this.ERROR_NotSupportedInKeymanWebOutput,
     `Statement ${o.code} is not currently supported in output`);
+  static Warn_HelpFileMissing = (o:{filename: string, e:any}) => m(this.WARN_HelpFileMissing,
+    `File ${o.filename} could not be loaded: ${(o.e??'').toString()}`);
+  static Warn_EmbedJsFileMissing = (o:{filename: string, e:any}) => m(this.WARN_EmbedJsFileMissing,
+    `File ${o.filename} could not be loaded: ${(o.e??'').toString()}`);
 
   // Following messages are kmw-compiler only, so use KmwCompiler error namespace
 
