@@ -20,7 +20,7 @@ export default class KvkFileWriter {
     /**
      * The visual keyboard text color is included in .kvk files but is never
      * defined in .kvks files. Thus, it is always written by the legacy .kvk
-     * binary writer VisualKeyboardSaverBinary.pas as TColor.clWindowText (-8),
+     * binary writer VisualKeyboardSaverBinary.pas as TColor.clWindowText (SystemColor | 8),
      * or in DWORD form 0xFF000008, and we maintain this value for consistency
      * here.
      */
