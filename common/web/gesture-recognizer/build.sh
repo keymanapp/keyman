@@ -47,7 +47,7 @@ fi
 
 if builder_start_action build:module; then
   # Build
-  tsc $builder_verbose
+  tsc --build $builder_verbose
   node build-bundler.js
   builder_finish_action success build:module
 fi
