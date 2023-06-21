@@ -33,9 +33,7 @@ export function setupKMW(kmwOptions, timeout) {
     }
   }
 
-  const kmwPromise = setupScript('build/app/browser/keymanweb.js', timeout, (scriptEle) => {
-    fixture.el.appendChild(scriptEle);
-  });
+  const kmwPromise = setupScript('build/app/browser/keymanweb.js', timeout);
 
   ui = kmwOptions.ui;
 
@@ -51,10 +49,7 @@ export function setupKMW(kmwOptions, timeout) {
 
   let uiPromise;
   if(ui) {
-    uiPromise = setupScript('build/app/ui/kmwui' + ui + '.js', timeout, (scriptEle) => {
-      fixture.el.appendChild(scriptEle);
-    });
-
+    uiPromise = setupScript('build/app/ui/kmwui' + ui + '.js', timeout);
     kmwOptions.ui=ui;
   }
 
@@ -79,44 +74,83 @@ export function setupKMW(kmwOptions, timeout) {
  *
  * @param {*} src       The source script's (relative) path on the test server.
  * @param {*} timeout
- * @param {*} functor   A callback to handle the script element.
  * @returns
  */
-export function setupScript(src, timeout, functor) {
-  return new Promise((resolve, reject) => {
+export function setupScript(src, timeout) {
+  return setupScriptInternal(src, timeout);
+}
+
+function setupScriptInternal(src, timeout, attemptCount, existingTimer) {
+  attemptCount = attemptCount || 1;
+  if(attemptCount > 1) {
+    console.log("Re-attempting load of script '" + src + "': retry #" + attemptCount);
+  }
+
+  let promise = new Promise((resolve, reject) => {
     const Lscript = document.createElement('script');
     let hasResolved = false;
     Lscript.charset="UTF-8";        // KMEW-89
     Lscript.type = 'text/javascript';
     Lscript.async = false;
 
-    const timer = window.setTimeout(() => {
-      reject("Script load attempt timed out.");
+    const timer = existingTimer !== undefined ? existingTimer : window.setTimeout(() => {
+      // May have already been removed if there was an error -> repeat attempt.
+      Lscript.parentElement?.removeChild(Lscript);
+      hasResolved = true;
+      reject(new Error("Script load attempt for '" + src + "' timed out."));
     }, timeout);
 
     Lscript.onload = Lscript.onreadystatechange = () => {
+      Lscript.parentElement.removeChild(Lscript);
       window.clearTimeout(timer);
       if(!hasResolved && (Lscript.readyState === undefined || Lscript.readyState == "complete")) {
         hasResolved = true;
+
+        if(attemptCount > 1) {
+          console.log("Successfully loaded '" + src + "' after " + attemptCount + " attempts");
+        }
         resolve();
       }
     }
 
     Lscript.onerror = (err) => {
-      window.clearTimeout(timer);
-      reject(err);
+      // Cleanup the noisy script tag
+      Lscript.parentElement.removeChild(Lscript);
+
+      if(hasResolved) {
+        return;
+      }
+
+      // WARNING: err here is a very basic event object that doesn't actually give us useful info.
+
+      // One common side-effect of BrowserStack instability is that this event will be raised.
+      // Sadly, it's hard to know _why_ it's raised due to the point above - no useful info shows
+      // up in the logs, and often only one attempt fails.  But that may be key - _often only ONE
+      // attempt_ fails.  Therefore... let's enact a multi-retry on the script-load, so long as
+      // we don't exceed the timeout as a result!
+      if(attemptCount <= 3) {
+        window.setTimeout(() => {
+          let retryPromise = setupScriptInternal(src, timeout, attemptCount + 1, existingTimer);
+          retryPromise.then(resolve).catch(reject);
+        }, 20);
+      } else {
+        window.clearTimeout(timer);
+        reject(new Error("KMW script '" + src + "' loading failed with an unknown error."));
+      }
     }
 
     Lscript.src = src;
-
-    functor(Lscript);
+    fixture.el.appendChild(Lscript);
   });
+
+  return promise;
 }
 
 export function teardownKMW() {
   var error = null;
-  if(keyman) { // If our setupKMW fails somehow, this guard prevents a second error report on teardown.
 
+  // If our setupKMW fails somehow, this guard prevents a second error report on teardown.
+  if(window.keyman) {
     // We want to be SURE teardown works correctly, or we'll get lots of strange errors on other tests.
     // Thus, error-handling on shutdown itself.  It HAS mattered.
     try {
@@ -155,9 +189,7 @@ export async function loadKeyboardStub(stub, timeout, params) {
   if(!params || !params.passive) {
     return keyman.setActiveKeyboard(kbdName, stub.languages.id);
   } else if(keyman.getActiveKeyboard() != kbdName) {
-    return setupScript(stub.filename, timeout, (ele) => {
-      fixture.el.appendChild(ele);
-    });
+    return setupScript(stub.filename, timeout);
   } else {
     return Promise.resolve();
   }
@@ -324,18 +356,4 @@ if(typeof(DynamicElements) == 'undefined') {
       assertion();
     }
   }
-
-  // // Is utilized only by the attachmentAPI test case, but it was originally defined as part of the same
-  // // object as the rest of DynamicElements, which is useful for numerous test cases.
-  // DynamicElements.init = function() {
-  //   var s_key_json = {"type": "key", "key":"s", "code":"KeyS","keyCode":83,"modifierSet":0,"location":0};
-  //   DynamicElements.keyCommand = new KMWRecorder.PhysicalInputEventSpec(s_key_json);
-
-  //   DynamicElements.enabledLaoOutput = "ຫ";
-  //   DynamicElements.enabledKhmerOutput = "ស";
-  //   // Simulated JavaScript events do not produce text output.
-  //   DynamicElements.disabledOutput = "";
-  // }
-
-  // DynamicElements.init();
 }
