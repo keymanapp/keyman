@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.127 alpha 2023-06-21
+
+* feat(core): implementation of non-regex components of tran (#9019)
+* chore: enable common ci for web (#9047)
+
 ## 17.0.126 alpha 2023-06-19
 
 * chore(mac): move from altool to notarytool (#9010)
