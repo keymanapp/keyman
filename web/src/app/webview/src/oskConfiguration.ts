@@ -9,7 +9,7 @@ import { PendingLongpress } from './osk/pendingLongpress.js';
 import type KeymanEngine from "./keymanEngine.js";
 
 export function setupEmbeddedListeners(engine: KeymanEngine, osk: OSKView) {
-  osk.on('globeKey', (key, on) => {
+  osk.on('globekey', (key, on) => {
     if(on) {
       if(typeof engine.showKeyboardList == 'function') { // OSKView event: shouldShowLanguageMenu
         engine.showKeyboardList();                       // Is connected to VisualKeyboard event: globeKey
@@ -29,7 +29,7 @@ export function setupEmbeddedListeners(engine: KeymanEngine, osk: OSKView) {
     }
   });
 
-  osk.on('hideRequested', (key) => {
+  osk.on('hiderequested', (key) => {
     if(osk.vkbd) {
       osk.vkbd.highlightKey(key, false);
     }

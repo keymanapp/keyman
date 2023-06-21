@@ -8,7 +8,7 @@ import {
   VisualKeyboard
 } from 'keyman/engine/osk';
 import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId as prefixed } from 'keyman/engine/package-cache';
-import { DeviceSpec, Keyboard, ProcessorInitOptions, extendString } from "@keymanapp/keyboard-processor";
+import { DeviceSpec, Keyboard, extendString } from "@keymanapp/keyboard-processor";
 
 import * as views from './viewsAnchorpoint.js';
 import { BrowserConfiguration, BrowserInitOptionDefaults, BrowserInitOptionSpec } from './configuration.js';
@@ -26,6 +26,7 @@ import { UtilApiEndpoint} from './utilApiEndpoint.js';
 import { UIModule } from './uiModuleInterface.js';
 import { HotkeyManager } from './hotkeyManager.js';
 import { BeepHandler } from './beepHandler.js';
+import KeyboardInterface from './keyboardInterface.js';
 
 export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {
   touchLanguageMenu?: LanguageMenu;
@@ -52,7 +53,15 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
   constructor(worker: Worker, sourceUri: string) {
     const config = new BrowserConfiguration(sourceUri);  // currently set to perform device auto-detect.
 
-    super(worker, config, new ContextManager(config, () => this.legacyAPIEvents));
+    super(worker, config, new ContextManager(config, () => this.legacyAPIEvents), (engine: KeymanEngine) => {
+      return {
+        // The `engine` parameter cannot be supplied with the constructing instance before calling
+        // `super`, hence the 'fun' rigging to supply it _from_ `super` via this closure.
+        keyboardInterface: new KeyboardInterface(window, engine),
+        defaultOutputRules: new DefaultBrowserRules(engine.contextManager)
+      };
+    });
+
     this._util = new UtilApiEndpoint(config);
     this.beepHandler = new BeepHandler(this.core.keyboardInterface);
     this.core.keyboardProcessor.beepHandler = () => this.beepHandler.beep(this.contextManager.activeTarget);
@@ -117,14 +126,6 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
       module.initialize();
     }
   }
-
-  protected processorConfiguration(): ProcessorInitOptions {
-    return {
-      ...super.processorConfiguration(),
-      // Overrides just this component of the configuration.
-      defaultOutputRules: new DefaultBrowserRules(this.contextManager)
-    };
-  };
 
   /**
    * Function     Initialization

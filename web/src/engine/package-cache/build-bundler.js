@@ -1,53 +1,24 @@
 import esbuild from 'esbuild';
+import { esmConfiguration, bundleObjEntryPoints } from '../../../../common/web/es-bundling/build/index.mjs';
 
 await esbuild.build({
-  alias: {
-    'tslib': '@keymanapp/tslib'
-  },
-  bundle: true,
-  sourcemap: true,
-  format: "esm",
-  nodePaths: ['../../../../node_modules'],
-  entryPoints: {
-    'index': '../../../build/engine/package-cache/obj/index.js',
-  },
-  outdir: '../../../build/engine/package-cache/lib/',
-  outExtension: { '.js': '.mjs' },
-  tsconfig: './tsconfig.json',
-  target: "es5"
+  ...esmConfiguration,
+  ...bundleObjEntryPoints('lib', '../../../build/engine/package-cache/obj/index.js')
 });
 
 await esbuild.build({
-  alias: {
-    'tslib': '@keymanapp/tslib'
-  },
-  bundle: true,
-  sourcemap: true,
-  format: "esm",
-  nodePaths: ['../../../../node_modules'],
+  ...esmConfiguration,
   entryPoints: {
     'dom-cloud-requester': '../../../build/engine/package-cache/obj/domCloudRequester.js',
   },
   outdir: '../../../build/engine/package-cache/lib/',
-  outExtension: { '.js': '.mjs' },
-  tsconfig: './tsconfig.json',
-  target: "es5"
 });
 
 await esbuild.build({
-  alias: {
-    'tslib': '@keymanapp/tslib'
-  },
-  bundle: true,
-  sourcemap: true,
-  format: "esm",
-  nodePaths: ['../../../../node_modules'],
+  ...esmConfiguration,
   entryPoints: {
     'node-cloud-requester': '../../../build/engine/package-cache/obj/nodeCloudRequester.js',
   },
   outdir: '../../../build/engine/package-cache/lib/',
-  outExtension: { '.js': '.mjs' },
-  platform: 'node',
-  tsconfig: './tsconfig.json',
-  target: "es5"
+  platform: 'node'
 });

@@ -40,11 +40,7 @@
   },
   "scripts": {
     "build": "gosh ./build.sh",
-    "tsc": "tsc",
-    "prepublish": "npm run build",
-    "pretest": "npm run build",
-    "test": "mocha",
-    "mocha": "mocha"
+    "test": "gosh ./build.sh test"
   },
   "bugs": {
     "url": "https://github.com/keymanapp/keyman/issues"
@@ -54,6 +50,7 @@
     "@keymanapp/resources-gosh": "*",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
+    "c8": "^7.12.0",
     "chai": "^4.3.4",
     "mocha": "^10.0.0",
     "mocha-teamcity-reporter": "^4.0.0",

@@ -95,7 +95,7 @@ describe("Activators", () => {
       const activateStub = sinon.fake();
       const triggerStub = sinon.fake();
       activator.on('activate', activateStub);
-      activator.on('triggerChange', triggerStub);
+      activator.on('triggerchange', triggerStub);
 
       activator.activationTrigger = "foo"; // using a string, just 'cause.
 
@@ -154,7 +154,7 @@ describe("Activators", () => {
     it("'triggerchange' event generation", () => {
       const activator = new TwoStateActivator();
       const stub = sinon.fake();
-      activator.on('triggerChange', stub);
+      activator.on('triggerchange', stub);
 
       activator.enabled = false;
 
@@ -219,7 +219,7 @@ describe("Activators", () => {
     it("'activationTrigger' as object", () => {
       const activator = new TwoStateActivator();
       const stub = sinon.fake();
-      activator.on('triggerChange', stub);
+      activator.on('triggerchange', stub);
 
       const object = {a: {b: {c: "def"}, g: "hi"}, jk: ["l"]};
 

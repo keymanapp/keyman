@@ -40,7 +40,7 @@ export default class PassthroughKeyboard extends HardKeyboard {
     const promise = new ManagedPromise<Boolean>();
 
     try {
-      this.emit('keyEvent', Lkc, (result, error) => {
+      this.emit('keyevent', Lkc, (result, error) => {
         if(error) {
           promise.reject(error);
         } else {

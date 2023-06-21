@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import ManagedPromise from '../../build/obj/managedPromise.js';
+import { ManagedPromise } from '@keymanapp/web-utils';
 
 describe("ManagedPromise", () => {
   it('<void> resolution', async () => {

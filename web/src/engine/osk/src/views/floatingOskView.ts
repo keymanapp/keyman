@@ -45,7 +45,7 @@ export default class FloatingOSKView extends OSKView {
 
     super(config);
 
-    this.typedActivationModel.on('triggerChange', () => this.setDisplayPositioning());
+    this.typedActivationModel.on('triggerchange', () => this.setDisplayPositioning());
 
     document.body.appendChild(this._Box);
 
@@ -61,7 +61,7 @@ export default class FloatingOSKView extends OSKView {
     this.titleBar.on('unpin', () => this.restorePosition(true));
 
     this.resizeBar = new ResizeBar(this.resizeDragHandler);
-    this.resizeBar.on('showBuild', () => this.emit('showBuild'));
+    this.resizeBar.on('showbuild', () => this.emit('showbuild'));
 
     this.headerView = this.titleBar;
 
@@ -86,8 +86,8 @@ export default class FloatingOSKView extends OSKView {
     const listenerSpyNew = new EmitterListenerSpy(this);
     const listenerSpyOld = new EmitterListenerSpy(this.legacyEvents);
     for(let listenerSpy of [listenerSpyNew, listenerSpyOld]) {
-      listenerSpy.on('listenerAdded', onListenedEvent);
-      listenerSpy.on('listenerRemoved', onListenedEvent);
+      listenerSpy.on('listeneradded', onListenedEvent);
+      listenerSpy.on('listenerremoved', onListenedEvent);
     }
 
     this.loadPersistedLayout();
@@ -151,7 +151,7 @@ export default class FloatingOSKView extends OSKView {
     let isVisible = this._Visible;
 
     let dragPromise = new ManagedPromise<void>();
-    this.emit('dragMove', dragPromise.corePromise);
+    this.emit('dragmove', dragPromise.corePromise);
 
     this.loadPersistedLayout();
     this.userPositioned=false;
@@ -656,7 +656,7 @@ export default class FloatingOSKView extends OSKView {
         }
 
         this.dragPromise = new ManagedPromise<void>();
-        _this.emit('dragMove', this.dragPromise.corePromise);
+        _this.emit('dragmove', this.dragPromise.corePromise);
       }
 
       onDragMove(cumulativeX: number, cumulativeY: number) {
@@ -719,7 +719,7 @@ export default class FloatingOSKView extends OSKView {
         }
 
         this.dragPromise = new ManagedPromise<void>();
-        _this.emit('resizeMove', this.dragPromise.corePromise);
+        _this.emit('resizemove', this.dragPromise.corePromise);
       }
 
       onDragMove(cumulativeX: number, cumulativeY: number) {

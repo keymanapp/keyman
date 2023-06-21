@@ -1,8 +1,8 @@
-import { DefaultRules, type Keyboard, KeyboardKeymanGlobal, ProcessorInitOptions, OutputTarget } from "@keymanapp/keyboard-processor";
+import { type Keyboard, KeyboardKeymanGlobal, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
 import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
 import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
 import { OSKView } from "keyman/engine/osk";
-import { KeyboardRequisitioner, type KeyboardStub, ModelCache, ModelSpec } from "keyman/engine/package-cache";
+import { KeyboardRequisitioner, ModelCache, ModelSpec } from "keyman/engine/package-cache";
 
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
 import KeyboardInterface from "./keyboardInterface.js";
@@ -13,6 +13,19 @@ import { LegacyAPIEvents } from "./legacyAPIEvents.js";
 import { EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";
 import DOMCloudRequester from "keyman/engine/package-cache/dom-requester";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
+
+// From https://stackoverflow.com/a/69328045
+type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
+// Sets two parts non-optional at this level, while they were at lower levels.
+type ProcessorConfiguration = WithRequired<WithRequired<ProcessorInitOptions, 'keyboardInterface'>, 'defaultOutputRules'>;
+
+function determineBaseLayout(): string {
+  if(typeof(window['KeymanWeb_BaseLayout']) !== 'undefined') {
+    return window['KeymanWeb_BaseLayout'];
+  } else {
+    return 'us';
+  }
+}
 
 export default class KeymanEngine<
   Configuration extends EngineConfiguration,
@@ -73,25 +86,6 @@ export default class KeymanEngine<
     // processing - silent failures are far harder to diagnose.
   };
 
-  // Should be overwritten as needed by engine subclasses; `browser` should set its DefaultOutput subclass in place.
-  protected processorConfiguration(): ProcessorInitOptions {
-    // I732 START - Support for European underlying keyboards #1
-    let baseLayout: string;
-    if(typeof(window['KeymanWeb_BaseLayout']) !== 'undefined') {
-      baseLayout = window['KeymanWeb_BaseLayout'];
-    } else {
-      baseLayout = 'us';
-    }
-
-    return {
-      keyboardInterface: this.interface,
-      baseLayout: baseLayout,
-      defaultOutputRules: new DefaultRules()
-    };
-  };
-
-  //
-
   /**
    * @param worker  A configured WebWorker to serve as the predictive-text engine's main thread.
    *                Available in the following variants:
@@ -99,13 +93,23 @@ export default class KeymanEngine<
    *                - non-sourcemapped + minified (release)
    * @param config
    * @param contextManager
+   * @param processorConfigInitializer A one-time use closure used to initialize certain critical components reliant
+   *                                   upon the class instance, configured by the derived class, but needed during
+   *                                   the superclass constructor.
    */
-  constructor(worker: Worker, config: Configuration, contextManager: ContextManager) {
+  constructor(
+    worker: Worker,
+    config: Configuration,
+    contextManager: ContextManager,
+    processorConfigInitializer: (engine: KeymanEngine<Configuration, ContextManager, HardKeyboard>) => ProcessorConfiguration
+  ) {
     this.config = config;
     this.contextManager = contextManager;
 
-    this.interface = new KeyboardInterface(window, this, config.stubNamespacer);
-    this.core = new InputProcessor(config.hostDevice, worker, this.processorConfiguration());
+    const processorConfiguration = processorConfigInitializer(this);
+    processorConfiguration.baseLayout = determineBaseLayout();
+    this.interface = processorConfiguration.keyboardInterface as KeyboardInterface<ContextManager>;
+    this.core = new InputProcessor(config.hostDevice, worker, processorConfiguration);
 
     this.core.languageProcessor.on('statechange', (state) => {
       // The banner controller cannot directly trigger a layout-refresh at this time,
@@ -117,7 +121,7 @@ export default class KeymanEngine<
     // The OSK does not possess a direct connection to the KeyboardProcessor's state-key
     // management object; this event + handler allow us to keep the OSK's related states
     // in sync.
-    this.core.keyboardProcessor.on('statekeyChange', (stateKeys) => {
+    this.core.keyboardProcessor.on('statekeychange', (stateKeys) => {
       this.osk?.vkbd?.updateStateKeys(stateKeys);
     })
 
@@ -211,7 +215,7 @@ export default class KeymanEngine<
       this.osk?.refreshLayout();
     });
 
-    kbdCache.on('stubAdded', (stub) => {
+    kbdCache.on('stubadded', (stub) => {
       let eventRaiser = () => {
         // The corresponding event is needed in order to update UI modules as new keyboard stubs "come online".
         this.legacyAPIEvents.callEvent('keyboardregistered', {
@@ -236,7 +240,7 @@ export default class KeymanEngine<
       }
     });
 
-    kbdCache.on('keyboardAdded', (keyboard) => {
+    kbdCache.on('keyboardadded', (keyboard) => {
       let eventRaiser = () => {
         // Execute any external (UI) code needed after loading keyboard
         this.legacyAPIEvents.callEvent('keyboardloaded', {
@@ -251,7 +255,7 @@ export default class KeymanEngine<
       }
     });
 
-    this.keyboardRequisitioner.cache.on('keyboardAdded', (keyboard) => {
+    this.keyboardRequisitioner.cache.on('keyboardadded', (keyboard) => {
       this.legacyAPIEvents.callEvent('keyboardloaded', { keyboardName: keyboard.id });
     });
     //
@@ -282,10 +286,10 @@ export default class KeymanEngine<
 
   protected set hardKeyboard(keyboard: HardKeyboard) {
     if(this._hardKeyboard) {
-      this._hardKeyboard.off('keyEvent', this.keyEventListener);
+      this._hardKeyboard.off('keyevent', this.keyEventListener);
     }
     this._hardKeyboard = keyboard;
-    keyboard.on('keyEvent', this.keyEventListener);
+    keyboard.on('keyevent', this.keyEventListener);
   }
 
   public get osk(): OSKView {
@@ -294,13 +298,13 @@ export default class KeymanEngine<
 
   public set osk(value: OSKView) {
     if(this._osk) {
-      this._osk.off('keyEvent', this.keyEventListener);
+      this._osk.off('keyevent', this.keyEventListener);
       this.core.keyboardProcessor.layerStore.handler = this.osk.layerChangeHandler;
     }
     this._osk = value;
     if(value) {
       value.activeKeyboard = this.contextManager.activeKeyboard;
-      value.on('keyEvent', this.keyEventListener);
+      value.on('keyevent', this.keyEventListener);
       this.core.keyboardProcessor.layerStore.handler = value.layerChangeHandler;
     }
   }
