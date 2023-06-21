@@ -53,24 +53,12 @@ struct WASM_COMPILER_RESULT {
   // Following are pointer offsets in heap + buffer size
   int kmx;
   int kmxSize;
-  // Following are compiler side-channel data, required for
-  // follow-on transform
-  int targets; /* COMPILETARGETS_KMX | COMPILETARGETS_JS */
-  std::string kvksFilename;
-  std::string displayMapFilename;
-  // TODO: additional data to be passed back
+  KMCMP_COMPILER_RESULT_EXTRA extra;
 };
 
 WASM_COMPILER_RESULT kmcmp_wasm_compile(std::string pszInfile, const KMCMP_COMPILER_OPTIONS options, const WASM_COMPILER_INTERFACE intf) {
-  WASM_COMPILER_RESULT r;
+  WASM_COMPILER_RESULT r = {false};
   KMCMP_COMPILER_RESULT kr;
-
-  r.result = false;
-  r.kmx = 0;
-  r.kmxSize = 0;
-  r.targets = 0;
-  r.kvksFilename = "";
-  r.displayMapFilename = "";
 
   r.result = kmcmp_CompileKeyboard(
     pszInfile.c_str(),
@@ -85,9 +73,7 @@ WASM_COMPILER_RESULT kmcmp_wasm_compile(std::string pszInfile, const KMCMP_COMPI
     // TODO: additional data as required by kmc_kmw
     r.kmx = (int) kr.kmx;
     r.kmxSize = (int) kr.kmxSize;
-    r.kvksFilename = kr.kvksFilename;
-    r.displayMapFilename = kr.displayMapFilename;
-    r.targets = kr.targets;
+    r.extra = kr.extra;
   }
 
   return r;
@@ -114,9 +100,15 @@ EMSCRIPTEN_BINDINGS(compiler_interface) {
     .property("result", &WASM_COMPILER_RESULT::result)
     .property("kmx", &WASM_COMPILER_RESULT::kmx)
     .property("kmxSize", &WASM_COMPILER_RESULT::kmxSize)
-    .property("targets", &WASM_COMPILER_RESULT::targets)
-    .property("kvksFilename", &WASM_COMPILER_RESULT::kvksFilename)
-    .property("displayMapFilename", &WASM_COMPILER_RESULT::displayMapFilename)
+    .property("extra", &WASM_COMPILER_RESULT::extra)
+    ;
+
+  emscripten::class_<KMCMP_COMPILER_RESULT_EXTRA>("CompilerResultExtra")
+    .constructor<>()
+    .property("targets", &KMCMP_COMPILER_RESULT_EXTRA::targets)
+    .property("kmnFilename", &KMCMP_COMPILER_RESULT_EXTRA::kmnFilename)
+    .property("kvksFilename", &KMCMP_COMPILER_RESULT_EXTRA::kvksFilename)
+    .property("displayMapFilename", &KMCMP_COMPILER_RESULT_EXTRA::displayMapFilename)
     ;
 
   emscripten::function("kmcmp_compile", &kmcmp_wasm_compile);

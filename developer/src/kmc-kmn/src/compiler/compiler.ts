@@ -21,21 +21,24 @@ export const COMPILETARGETS_KMX =   0x01;
 export const COMPILETARGETS_JS =    0x02;
 export const COMPILETARGETS__MASK = 0x03;
 
-export interface CompilerResultMetadata {
+/**
+ * Data in CompilerResultMetadata comes from kmcmplib
+ */
+export interface CompilerResultExtra {
   /**
    * A bitmask, consisting of COMPILETARGETS_KMX and/or COMPILETARGETS_JS
    */
   targets: number;
   kvksFilename?: string;
   displayMapFilename?: string;
-  displayMap?: Osk.PuaMap;
 };
 
 export interface CompilerResult {
   kmx?: CompilerResultFile;
   kvk?: CompilerResultFile;
   js?: CompilerResultFile;
-  data: CompilerResultMetadata;
+  extra: CompilerResultExtra;
+  displayMap?: Osk.PuaMap;
 };
 
 export interface KmnCompilerOptions extends CompilerOptions {
@@ -173,7 +176,6 @@ export class KmnCompiler implements UnicodeSetParser {
       loadFile: this.loadFileCallback
     };
 
-    let result: CompilerResult = {data:{targets:0}};
     let wasm_interface = new Module.CompilerInterface();
     let wasm_options = new Module.CompilerOptions();
     let wasm_result = null;
@@ -189,7 +191,17 @@ export class KmnCompiler implements UnicodeSetParser {
         return null;
       }
 
-      if(wasm_result.targets & COMPILETARGETS_KMX) {
+      const result: CompilerResult = {
+        // We cannot Object.assign or {...} on a wasm-defined object, so...
+        extra: {
+          targets: wasm_result.extra.targets,
+          displayMapFilename: wasm_result.extra.displayMapFilename,
+          kvksFilename: wasm_result.extra.kvksFilename,
+        },
+        displayMap: null
+      };
+
+      if(result.extra.targets & COMPILETARGETS_KMX) {
         result.kmx = {
           filename: outfile,
           data: new Uint8Array(Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
@@ -200,16 +212,13 @@ export class KmnCompiler implements UnicodeSetParser {
       // Visual Keyboard transform
       //
 
-      result.data.kvksFilename = wasm_result.kvksFilename;
-      result.data.displayMapFilename = wasm_result.displayMapFilename;
-      result.data.displayMap = null;
 
-      if(wasm_result.displayMapFilename) {
-        result.data.displayMap = this.loadDisplayMapping(infile, result.data.displayMapFilename)
+      if(result.extra.displayMapFilename) {
+        result.displayMap = this.loadDisplayMapping(infile, result.extra.displayMapFilename)
       }
 
-      if(result.data.kvksFilename) {
-        result.kvk = this.runKvkCompiler(result.data.kvksFilename, infile, outfile, result.data.displayMap);
+      if(result.extra.kvksFilename) {
+        result.kvk = this.runKvkCompiler(result.extra.kvksFilename, infile, outfile, result.displayMap);
         if(!result.kvk) {
           return null;
         }
@@ -219,19 +228,24 @@ export class KmnCompiler implements UnicodeSetParser {
       // KeymanWeb compiler
       //
 
-      if(wasm_result.targets & COMPILETARGETS_JS) {
+      if(wasm_result.extra.targets & COMPILETARGETS_JS) {
         wasm_options.target = 1; // CKF_KEYMANWEB TODO use COMPILETARGETS_JS
         wasm_result = Module.kmcmp_compile(infile, wasm_options, wasm_interface);
         if(!wasm_result.result) {
           return null;
         }
-
-        let web_kmx = {
-          filename: outfile,
-          data: new Uint8Array(Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
+        const kmw_result: CompilerResult = {
+          extra: {
+            // We cannot Object.assign or {...} on a wasm-defined object, so...
+            targets: wasm_result.extra.targets,
+            displayMapFilename: wasm_result.extra.displayMapFilename,
+            kvksFilename: wasm_result.extra.kvksFilename,
+          },
+          displayMap: result.displayMap // we can safely re-use the kmx compile displayMap
         };
 
-        result.js = this.runWebCompiler(infile, outfile, web_kmx.data, result.kvk?.data, result.data.displayMap, options);
+        let web_kmx = new Uint8Array(Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
+        result.js = this.runWebCompiler(infile, outfile, web_kmx, result.kvk?.data, kmw_result, options);
         if(!result.js) {
           return null;
         }
@@ -257,10 +271,10 @@ export class KmnCompiler implements UnicodeSetParser {
     kmxFilename: string,
     web_kmx: Uint8Array,
     kvk: Uint8Array,
-    displayMap: Osk.PuaMap,
+    kmxResult: CompilerResult,
     options: CompilerOptions
   ): CompilerResultFile {
-    const data = WriteCompiledKeyboard(this.callbacks, kmnFilename, web_kmx, kvk, displayMap, options.saveDebug);
+    const data = WriteCompiledKeyboard(this.callbacks, kmnFilename, web_kmx, kvk, kmxResult, options.saveDebug);
     if(!data) {
       return null;
     }

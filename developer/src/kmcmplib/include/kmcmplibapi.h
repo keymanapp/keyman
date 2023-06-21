@@ -34,12 +34,17 @@ struct KMCMP_COMPILER_OPTIONS {
 #define COMPILETARGETS_JS      0x02
 #define COMPILETARGETS__MASK   0x03
 
+struct KMCMP_COMPILER_RESULT_EXTRA {
+  int targets; /// COMPILETARGETS__MASK = COMPILETARGETS_KMX | COMPILETARGETS_JS
+  std::string kmnFilename;
+  std::string kvksFilename;
+  std::string displayMapFilename;
+};
+
 struct KMCMP_COMPILER_RESULT {
   void* kmx;
   size_t kmxSize;
-  int targets; /// COMPILETARGETS__MASK = COMPILETARGETS_KMX | COMPILETARGETS_JS
-  std::string kvksFilename;
-  std::string displayMapFilename;
+  struct KMCMP_COMPILER_RESULT_EXTRA extra;
 };
 
 /**

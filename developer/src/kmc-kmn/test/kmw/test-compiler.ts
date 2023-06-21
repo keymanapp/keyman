@@ -1,7 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
 // import sinonChai from 'sinon-chai';
-import { WriteCompiledKeyboard } from '../../src/kmw-compiler/write-compiled-keyboard.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
@@ -37,7 +36,6 @@ describe('Compiler class', function() {
     const kmnCompiler = new KmnCompiler();
     assert.isTrue(await kmnCompiler.init(callbacks));
 
-    // TODO: runToMemory, add option to kmxCompiler to store debug-data for conversion to .js (e.g. store metadata, group readonly metadata, visual keyboard source filename, etc)
     let result = kmnCompiler.runCompiler(infile, outfile, {
       shouldAddCompilerVersion: false,
       saveDebug: true,  // TODO: we should probably use passed debug flag
@@ -45,7 +43,7 @@ describe('Compiler class', function() {
 
     assert.isNotNull(result);
 
-    const js = WriteCompiledKeyboard(callbacks, infile, result.kmx?.data, result.kvk?.data, null, true);
+    const js = new TextDecoder().decode(result.js.data);
 
     const fjs = fs.readFileSync(fixtureName, 'utf8');
 
