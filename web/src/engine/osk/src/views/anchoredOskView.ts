@@ -241,4 +241,9 @@ export default class AnchoredOSKView extends OSKView {
       Ls.borderTop='1px solid gray';
     }
   }
+
+  public present() {
+    super.present();
+    this.legacyEvents.callEvent('show', {});
+  }
 }

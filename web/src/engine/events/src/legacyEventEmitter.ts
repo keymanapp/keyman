@@ -95,7 +95,7 @@ export class LegacyEventEmitter<EventTypes extends LegacyEventMap> {
     return this._removeEventListener(event, func);
   }
 
-  // Separate, in order to prevent `addEventListener` from sending 'listenerRemoved' events with
+  // Separate, in order to prevent `addEventListener` from sending 'listenerremoved' events with
   // EmitterListenerSpy.
   private _removeEventListener<T extends EventNames<EventTypes>> (
     event: T,

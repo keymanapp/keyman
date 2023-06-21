@@ -6,7 +6,7 @@ interface EventMap {
   /**
    * Designed to pass key events off to any consuming modules/libraries.
    */
-  'keyEvent': (event: KeyEvent, callback?: (result: RuleBehavior, error?: Error) => void) => void
+  'keyevent': (event: KeyEvent, callback?: (result: RuleBehavior, error?: Error) => void) => void
 }
 
 export default class HardKeyboard extends EventEmitter<EventMap> implements KeyEventSourceInterface { }

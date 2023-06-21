@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
-#
-
-# set -x
-set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary

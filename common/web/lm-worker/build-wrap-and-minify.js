@@ -33,7 +33,7 @@ if(MINIFY) {
     entryPoints: [`build/lib/worker-main.polyfilled.js`],
     sourcemap: 'external',
     sourcesContent: DEBUG,
-    minify: MINIFY,
+    minify: true,
     keepNames: true,
     outfile: `build/lib/worker-main.polyfilled.min.js`
   });

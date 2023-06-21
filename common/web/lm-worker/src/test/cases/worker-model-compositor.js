@@ -4,7 +4,7 @@
 
 import ModelCompositor from '#./model-compositor.js';
 import * as models from '#./models/index.js';
-import * as wordBreakers from '@keymanapp/models-wordbreakers/lib';
+import * as wordBreakers from '@keymanapp/models-wordbreakers';
 
 import { assert } from 'chai';
 

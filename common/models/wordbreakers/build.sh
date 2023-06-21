@@ -26,42 +26,26 @@ builder_describe "Builds the predictive-text wordbreaker implementation module" 
 
 builder_describe_outputs \
   configure          /node_modules \
-  build              build/lib/index.mjs
+  build              build/obj/index.js
 
 builder_parse "$@"
 
-### CONFIGURE ACTIONS
-
-if builder_start_action configure; then
-  verify_npm_setup
-  builder_finish_action success configure
-fi
-
-### CLEAN ACTIONS
-
-if builder_start_action clean; then
-  rm -rf build/
-  builder_finish_action success clean
-fi
-
-### BUILD ACTIONS
-
-if builder_start_action build; then
-  npm run tsc -- -b
-  node build-bundler.js
+function do_build() {
+  tsc -b
 
   # Declaration bundling.
-  npm run tsc -- --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+}
 
-  builder_finish_action success build
-fi
-
-if builder_start_action test; then
+function do_test() {
   if builder_has_option --ci; then
-    npm run mocha -- -reporter mocha-teamcity-reporter
+    c8 mocha -reporter mocha-teamcity-reporter
   else
-    npm run mocha
+    c8 mocha
   fi
+}
 
-  builder_finish_action success test
-fi
+builder_run_action configure  verify_npm_setup
+builder_run_action clean      rm -rf build/
+builder_run_action build      do_build
+builder_run_action test       do_test

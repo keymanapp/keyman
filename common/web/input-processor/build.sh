@@ -34,41 +34,24 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-### CONFIGURE ACTIONS
-
-if builder_start_action configure; then
-  verify_npm_setup
-  builder_finish_action success configure
-fi
-
-### CLEAN ACTIONS
-
-if builder_start_action clean; then
-  rm -rf build/
-  builder_finish_action success clean
-fi
-
-### BUILD ACTIONS
-
-if builder_start_action build; then
+function do_build() {
   tsc -b ./tsconfig.json
   node build-bundler.js
 
   # Declaration bundling.
   tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+}
 
-  builder_finish_action success build
-fi
-
-# TEST ACTIONS
-
-if builder_start_action test; then
-  FLAGS=
+function do_test() {
+  local FLAGS=
   if builder_has_option --ci; then
     FLAGS="--reporter mocha-teamcity-reporter"
   fi
 
   mocha --recursive $FLAGS ./tests/cases/
+}
 
-  builder_finish_action success test
-fi
+builder_run_action configure  verify_npm_setup
+builder_run_action clean      rm -rf build/
+builder_run_action build      do_build
+builder_run_action test       do_test
