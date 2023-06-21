@@ -1133,7 +1133,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
    * @return      {Object.<string,number>}   Array object with position and size of OSK container
    * Description  Get rectangle containing KMW Virtual Keyboard
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/osk/getRect
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/osk/getRect
    */
   public getRect(): OSKRect {		// I2405
     var p: OSKRect = {};
@@ -1168,7 +1168,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
    * @return      {boolean|number}    True if KMW OSK enabled
    * Description  Test if KMW OSK is enabled
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/osk/isEnabled
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/osk/isEnabled
    */
   public isEnabled(): boolean {
     return this.displayIfActive;
@@ -1181,7 +1181,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
    * Description  Test if KMW OSK is actually visible
    * Note that this will usually return false after any UI event that results in (temporary) loss of input focus
    *
-   * https://help.keyman.com/developer/engine/web/17.0/reference/osk/isVisible
+   * https://help.keyman.com/developer/engine/web/current-version/reference/osk/isVisible
    */
   public isVisible(): boolean {
     return this._Visible;
@@ -1192,7 +1192,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
    * Scope        Public
    * Description  Prevent display of OSK window on focus
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/osk/hide
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/osk/hide
    */
   public hide() {
     this.activationModel.enabled = false;
@@ -1205,7 +1205,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
    * Scope        Public
    * @param       {(boolean|number)=}      bShow     True to display, False to hide, omitted to toggle
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/osk/show
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/osk/show
    */
   public show(bShow?: boolean) {
     if(arguments.length > 0) {
@@ -1250,7 +1250,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
    * @param       {function(Object)}  func      event handler
    * Description  Wrapper function to add and identify OSK-specific event handlers
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/osk/addEventListener
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/osk/addEventListener
    */
   public addEventListener<T extends keyof LegacyOSKEventMap>(
     event: T,
@@ -1266,7 +1266,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
    * @param       {function(Object)}  func      event handler
    * Description  Wrapper function to remove previously-added OSK-specific event handlers
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/osk/removeEventListener
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/osk/removeEventListener
    */
   public removeEventListener<T extends keyof LegacyOSKEventMap>(
     event: T,

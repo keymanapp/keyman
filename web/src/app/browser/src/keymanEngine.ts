@@ -41,7 +41,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
   /**
    * Provides a quick link to the base help page for Keyman keyboards.
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/helpURL
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/helpURL
    */
   public readonly helpURL = 'https://help.keyman.com/go';
 
@@ -97,7 +97,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
   }
 
   /**
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/initialized
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/initialized
    */
   public get initialized() {
     return this._initialized;
@@ -251,7 +251,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * @param       {string|null=}     Plc      Language Code
    * Description  Set default keyboard for the control
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/setKeyboardForControl
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/setKeyboardForControl
    */
   public setKeyboardForControl(Pelem: HTMLElement, Pkbd?: string, Plc?: string) {
     if(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
@@ -282,7 +282,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * Description  Returns the keyboard ID of the current independently-managed keyboard for this control.
    *              If it is currently following the global keyboard setting, returns null instead.
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/getKeyboardForControl
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboardForControl
    */
   public getKeyboardForControl(Pelem) {
     const target = outputTargetForElement(Pelem);
@@ -313,7 +313,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * @param {any[]} args keyboard name string or keyboard metadata JSON object
    * @returns {Promise<(KeyboardStub|ErrorStub)[]>} Promise of added keyboard/error stubs
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/addKeyboards
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/addKeyboards
    */
   public addKeyboards(...args: any[]): Promise<(KeyboardStub|ErrorStub)[]> {
     return this.config.deferForInitialization.then(() => {
@@ -341,7 +341,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *  @param  {string|string[]}   arg    Language name (multiple arguments allowed)
    *  @returns {Promise<(KeyboardStub|ErrorStub)[]>} Promise of added keyboard/error stubs
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/addKeyboardsForLanguage
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/addKeyboardsForLanguage
    **/
   public addKeyboardsForLanguage(arg: string[]|string) : Promise<(KeyboardStub|ErrorStub)[]> {
     return this.config.deferForInitialization.then(() => {
@@ -395,7 +395,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *             uses a pick list (Chinese, Japanese, Korean, etc.)
    *             (This function accepts either keyboard structure.)
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/isCJK
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/isCJK
    */
   public isCJK(k0? /* keyboard script object | return-type of _GetKeyboardDetail [b/c Toolbar UI]*/) {
     let kbd: Keyboard;
@@ -420,7 +420,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * @param       {string=}   PlgCode           language code
    * @return      {Object}                      Details of named keyboard
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/getKeyboard
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboard
    **/
   public getKeyboard(PInternalName: string, PlgCode?: string) {
     const stub = this.keyboardRequisitioner.cache.getStub(PInternalName, PlgCode);
@@ -438,7 +438,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *
    * @return   {Array}     Array of available keyboards
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/getKeyboards
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboards
    */
   public getKeyboards(): ReturnType<KeymanEngine['_GetKeyboardDetail']>[] {
     const Lr: ReturnType<KeymanEngine['_GetKeyboardDetail']>[] = [];
@@ -462,7 +462,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *
    * @param {string}  x      keyboard name string
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/removeKeyboards
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/removeKeyboards
    */
   public removeKeyboards(...x: string[]) {
     for(let i=0; i < x.length; i++) {
@@ -485,7 +485,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *
    * @return      {string}          InternalName:LanguageCode
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/getSavedKeyboard
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getSavedKeyboard
    **/
   public getSavedKeyboard(): string {
     return this.contextManager.getSavedKeyboard();
@@ -494,7 +494,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
   /**
    * Set focus to last active target element (browser-dependent)
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/focusLastActiveElement
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/focusLastActiveElement
    */
   public focusLastActiveElement() {
     this.contextManager.lastActiveTarget?.focus();
@@ -505,7 +505,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *
    * @return      {Object}
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/getLastActiveElement
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getLastActiveElement
    */
   public getLastActiveElement() {
     return this.contextManager.lastActiveTarget?.getElement();
@@ -539,7 +539,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *
    *  @param  {string|Object}   e   element or element id
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/moveToElement
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/moveToElement
    **/
   public moveToElement(e: string|HTMLElement) {
     if(typeof(e) == "string") { // Can't instanceof string, and String is a different type.
@@ -557,7 +557,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * @param       {function(Object)}  handler
    * Description  Add hot key handler to array of document-level hotkeys triggered by key up event
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/addHotKey
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/addHotKey
    */
   public addHotKey(keyCode: number, shiftState: number, handler: () => void) {
     this.hotkeyManager.addHotKey(keyCode, shiftState, handler);
@@ -570,7 +570,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * @param       {number}        shiftState
    * Description  Remove a hot key handler from array of document-level hotkeys triggered by key up event
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/removeHotKey
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/removeHotKey
    */
   public removeHotKey(keyCode: number, shiftState: number) {
     this.hotkeyManager.removeHotkey(keyCode, shiftState);
@@ -582,7 +582,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * @param       {Element}    Pelem       Element to which KMW will be attached
    * Description  Attaches KMW to control (or IFrame)
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/attachToControl
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/attachToControl
    */
   public attachToControl(Pelem: HTMLElement) {
     this.contextManager.page.attachToControl(Pelem);
@@ -594,7 +594,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * @param       {Element}    Pelem       Element from which KMW will detach
    * Description  Detaches KMW from a control (or IFrame)
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/detachFromControl
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/detachFromControl
    */
   public detachFromControl(Pelem: HTMLElement) {
     this.contextManager.page.detachFromControl(Pelem);
@@ -606,7 +606,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * @param       {Element}      Pelem       Element to be disabled
    * Description  Disables a KMW control element
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/disableControl
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/disableControl
    */
   public disableControl(Pelem: HTMLElement) {
     this.contextManager.page.disableControl(Pelem);
@@ -618,7 +618,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * @param       {Element}      Pelem       Element to be disabled
    * Description  Disables a KMW control element
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/enableControl
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/enableControl
    */
   public enableControl(Pelem: HTMLMapElement) {
     this.contextManager.page.enableControl(Pelem);
@@ -634,9 +634,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *  @param  {(string|number)=}  argLayerId    name or index of layer to show, defaulting to 'default'
    *  @return {Object}                          DIV object with filled keyboard layer content
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/osk/BuildVisualKeyboard
-   *
-   * (May be moved to https://help.keyman.com/developer/engine/web/17.0/reference/core/BuildVisualKeyboard)
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/osk/BuildVisualKeyboard
    */
   public BuildVisualKeyboard(
     PInternalName: string,

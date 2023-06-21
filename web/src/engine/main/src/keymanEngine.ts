@@ -261,7 +261,7 @@ export default class KeymanEngine<
   /**
    * Public API:  Denotes the 'patch' component of the version of the current engine.
    *
-   * https://help.keyman.com/developer/engine/web/17.0/reference/core/build
+   * https://help.keyman.com/developer/engine/web/current-version/reference/core/build
    */
   public get build(): number {
     return Number.parseInt(KEYMAN_VERSION.VERSION_PATCH, 10);
@@ -270,7 +270,7 @@ export default class KeymanEngine<
   /**
    * Public API:  Denotes the major & minor components of the version of the current engine.
    *
-   * https://help.keyman.com/developer/engine/web/17.0/reference/core/version
+   * https://help.keyman.com/developer/engine/web/current-version/reference/core/version
    */
   public get version(): string {
     return KEYMAN_VERSION.VERSION_RELEASE;
@@ -340,21 +340,21 @@ export default class KeymanEngine<
   }
 
   /**
-   * Public API:  Allows external JS code to subscribe to Keyman Engine events documented at
-   * https://help.keyman.com/developer/engine/web/17.0/reference/events.  Note that any OSK-related
+   * Subscribe to Keyman Engine events documented at
+   * https://help.keyman.com/developer/engine/web/current-version/reference/events.  Note that any OSK-related
    * events should instead register on `keyman.osk.addEventListener`, not on this method.
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/addEventListener
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/addEventListener
    */
   public addEventListener<Name extends EventNames<LegacyAPIEvents>>(event: Name, listener: EventListener<LegacyAPIEvents, Name>) {
     this.legacyAPIEvents.addEventListener(event, listener);
   }
 
   /**
-   * Public API:  Allows external JS code to unsubscribe from Keyman Engine events documented at
-   * https://help.keyman.com/developer/engine/web/17.0/reference/events.
+   * Public API: Unsubscribe from Keyman Engine events documented at
+   * https://help.keyman.com/developer/engine/web/current-version/reference/events.
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/removeEventListener
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/removeEventListener
    */
   public removeEventListener<Name extends EventNames<LegacyAPIEvents>>(event: Name, listener: EventListener<LegacyAPIEvents, Name>) {
     this.legacyAPIEvents.removeEventListener(event, listener);
@@ -412,7 +412,7 @@ export default class KeymanEngine<
    * @param       {string}    PInternalName   Internal name
    * @param       {string}    PLgCode         Language code
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/setActiveKeyboard
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/setActiveKeyboard
    */
   public async setActiveKeyboard(keyboardId: string, languageCode?: string): Promise<boolean> {
     return this.contextManager.activateKeyboard(keyboardId, languageCode, true);
@@ -424,7 +424,7 @@ export default class KeymanEngine<
    * @return      {string}      Name of active keyboard
    * Description  Return internal name of currently active keyboard
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/getActiveKeyboard
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getActiveKeyboard
    */
   public getActiveKeyboard(): string {
     return this.contextManager.activeKeyboard?.metadata.id ?? '';
@@ -437,7 +437,7 @@ export default class KeymanEngine<
    * @return     {string}         language code
    * Description Return language code for currently selected language
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/getActiveLanguage
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getActiveLanguage
    */
   public getActiveLanguage(fullName?: boolean): string {
     // In short... the activeStub.
@@ -457,7 +457,7 @@ export default class KeymanEngine<
    * @return      {boolean}
    * Description  Tests if the active keyboard (or optional argument) uses chiral modifiers.
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/isChiral
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/isChiral
    */
   public isChiral(k0?: string | Keyboard) {
     let kbd: Keyboard;
@@ -484,7 +484,7 @@ export default class KeymanEngine<
    * Description  Reverts the OSK to the default layer, clears any processing caches and modifier states,
    *              and clears deadkeys and prediction-processing states on the active element (if it exists)
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/core/resetContext
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/resetContext
    */
   public resetContext() {
     this.contextManager.resetContext();

@@ -145,7 +145,7 @@ export default class FloatingOSKView extends OSKView {
    *                                                   If false or omitted, resets the default x,y as well.
    * Description  Move OSK back to default position, floating under active input element
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/osk/restorePosition
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/osk/restorePosition
    */
   public restorePosition: (keepDefaultPosition?: boolean) => void = function(this: FloatingOSKView, keepDefaultPosition?: boolean) {
     let isVisible = this._Visible;
@@ -365,7 +365,7 @@ export default class FloatingOSKView extends OSKView {
    *
    * @param       {Object.<string,number>}   p  Array object with position and size of OSK container
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/osk/setRect
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/osk/setRect
   **/
   public setRect(p: OSKRect) {
     if(this._Box == null || this.targetDevice.formFactor != 'desktop') {
@@ -457,7 +457,7 @@ export default class FloatingOSKView extends OSKView {
    * @param       {Object.<string,number>}    p     Array object with OSK left, top
    * Description  Set position of OSK window, but limit to screen
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/osk/setPos
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/osk/setPos
    */
   public setPos(p: OSKPos) {
     if(typeof(this._Box) == 'undefined') {
@@ -588,7 +588,7 @@ export default class FloatingOSKView extends OSKView {
    * @return      {(boolean|number)}          true if user located
    * Description  Test if OSK window has been repositioned by user
    *
-   * See https://help.keyman.com/developer/engine/web/17.0/reference/osk/userLocated
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/osk/userLocated
    */
   public userLocated() {
     return this.userPositioned;
