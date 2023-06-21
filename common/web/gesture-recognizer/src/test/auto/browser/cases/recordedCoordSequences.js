@@ -1,6 +1,11 @@
 var assert = chai.assert;
 var expect = chai.expect;
 
+import {
+  HostFixtureLayoutController,
+  InputSequenceSimulator
+} from '../../../../../build/tools/lib/index.mjs';
+
 describe("Layer one - DOM -> InputSequence", function() {
   this.timeout(testconfig.timeouts.standard);
 
@@ -10,7 +15,7 @@ describe("Layer one - DOM -> InputSequence", function() {
 
   beforeEach(function(done) {
     fixture.load('host-fixture.html');
-    this.controller = new Testing.HostFixtureLayoutController();
+    this.controller = new HostFixtureLayoutController();
     this.controller.connect().then(() => done());
   });
 
@@ -33,7 +38,7 @@ describe("Layer one - DOM -> InputSequence", function() {
     let replayAndCompare = function(testObj) {
       let resultPromise;
 
-      let playbackEngine = new Testing.InputSequenceSimulator(this.controller);
+      let playbackEngine = new InputSequenceSimulator(this.controller);
       resultPromise = playbackEngine.replayAsync(testObj);
 
       // replayAsync sets up timeouts against the `clock` object.

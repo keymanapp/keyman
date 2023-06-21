@@ -14,6 +14,7 @@ cd "$(dirname "$THIS_SCRIPT")"
 ################################ Main script ################################
 
 builder_describe "Builds the gesture-recognition model for Web-based on-screen keyboards" \
+  "@/common/web/es-bundling build" \
   "clean" \
   "configure" \
   "build" \
@@ -25,8 +26,8 @@ builder_describe "Builds the gesture-recognition model for Web-based on-screen k
 builder_describe_outputs \
   configure:module /node_modules \
   configure:tools  /node_modules \
-  build:module     build/index.js \
-  build:tools      build/tools/unit-test-resources.js
+  build:module     /common/web/gesture-recognizer/build/lib/index.mjs \
+  build:tools      /common/web/gesture-recognizer/build/tools/lib/index.mjs
 
 builder_parse "$@"
 
@@ -46,7 +47,8 @@ fi
 
 if builder_start_action build:module; then
   # Build
-  npm run build -- $builder_verbose
+  tsc --build $builder_verbose
+  node build-bundler.js
   builder_finish_action success build:module
 fi
 

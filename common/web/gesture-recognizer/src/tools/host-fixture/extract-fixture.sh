@@ -9,6 +9,6 @@ set -eu
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 cd $(dirname "$THIS_SCRIPT")
 
-# On Windows, `node extractor.js` cannot be directly piped; that requires `node.exe`.
+# On Windows, `node extractor.cjs` cannot be directly piped; that requires `node.exe`.
 # But that doesn't make sense on other platforms, so... wrapper script.
-node extractor.js
+node extractor.cjs

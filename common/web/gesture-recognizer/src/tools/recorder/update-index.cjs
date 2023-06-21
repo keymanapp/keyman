@@ -12,7 +12,7 @@ fs.readFile('src/index.html', 'utf8', function(err, text) {
   }
 
   // Runs the fixture-extractor script, receives the fixture's raw HTML.
-  let buf = child_process.execSync("node extractor.js", {cwd: "../host-fixture", windowsHide: true, shell: true}).toString();
+  let buf = child_process.execSync("node extractor.cjs", {cwd: "../host-fixture", windowsHide: true, shell: true}).toString();
 
   let INSERTION_POINT = "            <!--INSERT_FIXTURE-->" + os.EOL;
   text = text.replace(INSERTION_POINT, buf);

@@ -1,17 +1,12 @@
-const assert = require('chai').assert;
+import { assert } from 'chai';
 
-const PromiseStatusModule = require('promise-status-async');
+import * as PromiseStatusModule from 'promise-status-async';
 const promiseStatus       = PromiseStatusModule.promiseStatus;
 const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 
-const GestureRecognizer = require('../../../../build/index.js');
-const com = GestureRecognizer.com;
-global.com = com; // TouchpathTurtle has issues without this at present.
+import { ConstructingSegment, SegmentClassifier } from '@keymanapp/gesture-recognizer';
 
-const ConstructingSegment = com.keyman.osk.ConstructingSegment;
-const SegmentClassifier   = com.keyman.osk.SegmentClassifier;
-
-const TouchpathTurtle     = require('../../../../build/tools/unit-test-resources.js').TouchpathTurtle;
+import { TouchpathTurtle } from '../../../../build/tools/obj/index.js';
 
 describe("Iterative Segment Construction (ConstructingSegment)", function() {
   describe("constructor()", function() {

@@ -117,17 +117,15 @@ fi
 if builder_start_action build:engine/gestures; then
   # Definition of global compile constants
 
-  GESTURE_RECOGNIZER_BUILD="$KEYMAN_ROOT/common/web/gesture-recognizer/build/."
-  GESTURE_RECOGNIZER_TARGET="$KEYMAN_ROOT/web/build/engine/gesture-recognizer/"
+  GESTURE_RECOGNIZER_BUILD="$KEYMAN_ROOT/common/web/gesture-recognizer/build/lib/."
+  GESTURE_RECOGNIZER_TARGET="$KEYMAN_ROOT/web/build/engine/gesture-recognizer/lib/"
 
   # Copy gesture-recognizer build artifacts into web-space for CI testing
-  if [ -f $GESTURE_RECOGNIZER_TARGET ]; then
-    # Note:  make sure this doesn't break once KeymanWeb actually uses the module!
-    if ! [ -d $GESTURE_RECOGNIZER_TARGET ]; then
-        mkdir -p $GESTURE_RECOGNIZER_TARGET
-    fi
-    cp -a $GESTURE_RECOGNIZER_BUILD $GESTURE_RECOGNIZER_TARGET
+  # Note:  make sure this doesn't break once KeymanWeb actually uses the module!
+  if ! [ -d $GESTURE_RECOGNIZER_TARGET ]; then
+      mkdir -p $GESTURE_RECOGNIZER_TARGET
   fi
+  cp -a $GESTURE_RECOGNIZER_BUILD $GESTURE_RECOGNIZER_TARGET
 
   # Which could then have a parallel script for `prediction-mtnt` that downloads + extracts
   # the current MTNT model.

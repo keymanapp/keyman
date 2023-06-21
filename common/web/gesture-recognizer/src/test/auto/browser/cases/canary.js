@@ -1,5 +1,11 @@
 var assert = chai.assert;
 
+import {
+  FixtureLayoutConfiguration,
+  HostFixtureLayoutController,
+  InputSequenceSimulator
+} from '../../../../../build/tools/lib/index.mjs';
+
 describe("'Canary' checks", function() {
   this.timeout(testconfig.timeouts.standard);
 
@@ -24,7 +30,7 @@ describe("'Canary' checks", function() {
     assert.isNotNull(jsonObject);
     assert.isDefined(jsonObject);
 
-    let config = new Testing.FixtureLayoutConfiguration(jsonObject.config);
+    let config = new FixtureLayoutConfiguration(jsonObject.config);
     assert.equal(config.deviceStyle, 'screen4');
   });
 
@@ -32,10 +38,10 @@ describe("'Canary' checks", function() {
     let targetRoot = fixture.load('host-fixture.html')[0];
     let jsonObject = window['__json__'].canaryRecording;
 
-    let controller = new Testing.HostFixtureLayoutController();
+    let controller = new HostFixtureLayoutController();
     // Note:  this is set BEFORE the controller is configured (in the following line).
     // The class is designed to support this.
-    controller.layoutConfiguration = new Testing.FixtureLayoutConfiguration(jsonObject.config);
+    controller.layoutConfiguration = new FixtureLayoutConfiguration(jsonObject.config);
     controller.connect().then(() => {
       assert.isTrue(targetRoot.className.indexOf('screen4') > -1, "Could not apply configuration spec from recorded JSON!");
       done();
@@ -49,7 +55,7 @@ describe("'Canary' checks", function() {
   describe('event simulation', function() {
     beforeEach(function(done) {
       fixture.load('host-fixture.html');
-      this.controller = new Testing.HostFixtureLayoutController();
+      this.controller = new HostFixtureLayoutController();
       this.controller.connect().then(() => done());
     });
 
@@ -59,8 +65,8 @@ describe("'Canary' checks", function() {
     });
 
     it("InputSequenceSimulator.replayTouchSample", function() {
-      let playbackEngine = new Testing.InputSequenceSimulator(this.controller);
-      let layout = new Testing.FixtureLayoutConfiguration("screen2", "bounds1", "full", "safe-loose");
+      let playbackEngine = new InputSequenceSimulator(this.controller);
+      let layout = new FixtureLayoutConfiguration("screen2", "bounds1", "full", "safe-loose");
       this.controller.layoutConfiguration = layout;
 
       let fireEvent = () => {
@@ -72,21 +78,16 @@ describe("'Canary' checks", function() {
       }
 
       // Ensure that the expected handler is called.
-      let proto = com.keyman.osk.TouchEventEngine.prototype;
-      let trueHandler = proto.onTouchStart;
-      let fakeHandler = proto.onTouchStart = sinon.fake();
+      let fakeHandler = sinon.fake();
+      this.controller.recognizer.on('inputstart', fakeHandler)
       fireEvent();
-      try {
-        assert.isTrue(fakeHandler.called, "Unit test attempt failed:  handler was not called successfully.");
-      } finally {
-        // Restore the true implementation.
-        proto.onTouchStart = trueHandler;
-      }
+
+      assert.isTrue(fakeHandler.called, "Unit test attempt failed:  handler was not called successfully.");
     });
 
     it("InputSequenceSimulator.replayMouseSample", function() {
-      let playbackEngine = new Testing.InputSequenceSimulator(this.controller);
-      let layout = new Testing.FixtureLayoutConfiguration("screen2", "bounds1", "full", "safe-loose");
+      let playbackEngine = new InputSequenceSimulator(this.controller);
+      let layout = new FixtureLayoutConfiguration("screen2", "bounds1", "full", "safe-loose");
       this.controller.layoutConfiguration = layout;
 
       let fireEvent = () => {
@@ -96,16 +97,11 @@ describe("'Canary' checks", function() {
       }
 
       // Ensure that the expected handler is called.
-      let proto = com.keyman.osk.MouseEventEngine.prototype;
-      let trueHandler = proto.onMouseStart;
-      let fakeHandler = proto.onMouseStart = sinon.fake();
+      let fakeHandler = sinon.fake();
+      this.controller.recognizer.on('inputstart', fakeHandler)
       fireEvent();
-      try {
-        assert.isTrue(fakeHandler.called, "Unit test attempt failed:  handler was not called successfully.");
-      } finally {
-        // Restore the true implementation.
-        proto.onMouseStart = trueHandler;
-      }
+
+      assert.isTrue(fakeHandler.called, "Unit test attempt failed:  handler was not called successfully.");
     });
   });
 });

@@ -36,16 +36,17 @@ module.exports = {
 
   // list of files / patterns to load in the browser
   files: [
-    'build/index.js', // The primary gesture-recognizer script.
-    {pattern: 'build/index.js.map', watched: true, served: true, included: false},
-    'build/tools/unit-test-resources.js', // The primary unit-test-resources script.
-    {pattern: 'build/tools/unit-test-resources.js.map', watched: true, served: true, included: false},
+    { pattern: 'build/lib/index.mjs', type: 'module' }, // The primary gesture-recognizer script.
+    { pattern: 'build/lib/index.mjs.map', watched: true, served: true, included: false },
+
+    { pattern: 'build/tools/lib/index.mjs', type: 'module' }, // The primary unit-test-resources script.
+    { pattern: 'build/tools/lib/index.js.map', watched: true, served: true, included: false },
 
     '../../../node_modules/sinon/pkg/sinon.js',
 
     '../../../common/test/resources/timeout-adapter.js', // Handles timeout configuration for local vs BrowserStack-based testing
 
-    'src/test/auto/browser/cases/**/*.js', // Where the tests actually reside.
+    { pattern: 'src/test/auto/browser/cases/**/*.js', type: 'module' }, // Where the tests actually reside.
 
     'build/tools/host-fixture.html', // The primary test fixture's build output location
     'build/tools/gestureHost.css', // The primary test fixture's backing CSS stylesheet.  Note:  Karma will auto-link it!

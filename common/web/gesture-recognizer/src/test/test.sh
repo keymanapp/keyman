@@ -1,10 +1,4 @@
 #!/usr/bin/env bash
-#
-# Builds the include script for the current Keyman version.
-#
-
-# Exit on command failure and when using unset variables:
-set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -50,21 +44,21 @@ test-headless ( ) {
     MOCHA_FLAGS="--reporter mocha-teamcity-reporter"
   fi
 
-  npm run mocha -- --recursive $MOCHA_FLAGS ./src/test/auto/headless/
+  mocha --recursive $MOCHA_FLAGS ./auto/headless/
 }
 
 test-browser ( ) {
   KARMA_FLAGS=
   if [[ $# -eq 1  && $1 == "debug" ]]; then
-    KARMA_CONFIG="manual.conf.js"
+    KARMA_CONFIG="manual.conf.cjs"
     KARMA_FLAGS="--no-single-run"
   elif [ $REPORT_STYLE == "local" ]; then
-    KARMA_CONFIG="manual.conf.js"
+    KARMA_CONFIG="manual.conf.cjs"
   else
-    KARMA_CONFIG="CI.conf.js"
+    KARMA_CONFIG="CI.conf.cjs"
   fi
 
-  npm run karma -- start src/test/auto/browser/$KARMA_CONFIG "$KARMA_FLAGS"
+  karma start auto/browser/$KARMA_CONFIG "$KARMA_FLAGS"
 }
 
 if builder_start_action test:headless; then

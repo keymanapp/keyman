@@ -1,5 +1,11 @@
 var assert = chai.assert;
-var expect = chai.expect;
+
+import {
+  FixtureLayoutConfiguration,
+  HostFixtureLayoutController,
+  InputSequenceSimulator,
+  SequenceRecorder
+} from '../../../../../build/tools/lib/index.mjs';
 
 describe("Layer one - DOM -> InputSequence", function() {
   this.timeout(testconfig.timeouts.standard);
@@ -10,7 +16,7 @@ describe("Layer one - DOM -> InputSequence", function() {
 
   beforeEach(function(done) {
     fixture.load('host-fixture.html');
-    this.controller = new Testing.HostFixtureLayoutController();
+    this.controller = new HostFixtureLayoutController();
     this.controller.connect().then(() => done());
   });
 
@@ -21,9 +27,9 @@ describe("Layer one - DOM -> InputSequence", function() {
 
   describe('other tests', function() {
     it("starts in roaming zone are ignored", function() {
-      let playbackEngine = new Testing.InputSequenceSimulator(this.controller);
-      let recorder = new Testing.SequenceRecorder(this.controller);
-      let layout = new Testing.FixtureLayoutConfiguration("screen2", "bounds1", "full", "safe-loose");
+      let playbackEngine = new InputSequenceSimulator(this.controller);
+      let recorder = new SequenceRecorder(this.controller);
+      let layout = new FixtureLayoutConfiguration("screen2", "bounds1", "full", "safe-loose");
       this.controller.layoutConfiguration = layout;
 
       let fireEvent = () => {
@@ -36,26 +42,28 @@ describe("Layer one - DOM -> InputSequence", function() {
       }
 
       // This test is invalidated if the handler itself isn't called.  So... let's verify that!
-      // Not quite covered by the canary cases b/c of the distinct targetElement.
-      let proto = com.keyman.osk.TouchEventEngine.prototype;
-      let trueHandler = proto.onTouchStart;
-      let fakeHandler = proto.onTouchStart = sinon.fake();
+      // This requires white-box inspection of the actual handler control-flow, and we must do
+      let touchEngine = this.controller.recognizer.touchEngine;
+      let trueHandler = touchEngine.onTouchStart;
+      let fakeHandler = touchEngine.onTouchStart = sinon.fake();
       fireEvent();
       try {
         assert.isTrue(fakeHandler.called, "Unit test attempt failed:  handler was not called successfully.");
       } finally {
         // Restore the true implementation.
-        proto.onTouchStart = trueHandler;
+        touchEngine.onTouchStart = trueHandler;
       }
 
+      // Now that we've put the true handler back in place, re-fire the event.  (We intercepted the
+      // first 'fire' for the validation check above.)
       fireEvent();
       assert.equal(recorder.count, 0, "Input starting in roaming area was not ignored!");
     });
 
     it("ignores target-external events", function() {
-      let playbackEngine = new Testing.InputSequenceSimulator(this.controller);
-      let recorder = new Testing.SequenceRecorder(this.controller);
-      let layout = new Testing.FixtureLayoutConfiguration("screen2", "bounds1", "full", "safe-loose");
+      let playbackEngine = new InputSequenceSimulator(this.controller);
+      let recorder = new SequenceRecorder(this.controller);
+      let layout = new FixtureLayoutConfiguration("screen2", "bounds1", "full", "safe-loose");
       this.controller.layoutConfiguration = layout;
 
       let fireEvent = () => {
@@ -67,17 +75,19 @@ describe("Layer one - DOM -> InputSequence", function() {
 
       // This test is invalidated if the handler itself isn't called.  So... let's verify that!
       // Not quite covered by the canary cases b/c of the distinct targetElement.
-      let proto = com.keyman.osk.MouseEventEngine.prototype;
-      let trueHandler = proto.onMouseStart;
-      let fakeHandler = proto.onMouseStart = sinon.fake();
+      let mouseEngine = this.controller.recognizer.mouseEngine;
+      let trueHandler = mouseEngine.onMouseStart;
+      let fakeHandler = mouseEngine.onMouseStart = sinon.fake();
       fireEvent();
       try {
         assert.isTrue(fakeHandler.called, "Unit test attempt failed:  handler was not called successfully.");
       } finally {
         // Restore the true implementation.
-        proto.onMouseStart = trueHandler;
+        mouseEngine.onMouseStart = trueHandler;
       }
 
+      // Now that we've put the true handler back in place, re-fire the event.  (We intercepted the
+      // first 'fire' for the validation check above.)
       fireEvent();
       assert.equal(recorder.count, 0, "Input starting outside the main receiver element's hierarchy was not ignored!");
     });

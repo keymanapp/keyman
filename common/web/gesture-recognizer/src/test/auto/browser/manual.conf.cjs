@@ -1,5 +1,5 @@
 module.exports = function(config) {
-  var base = require("./base.conf.js");
+  var base = require("./base.conf.cjs");
 
   var specifics = {
     // test results reporter to use

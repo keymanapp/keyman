@@ -1,8 +1,6 @@
-const assert = require('chai').assert;
+import { assert } from 'chai';
 
-const GestureRecognizer = require('../../../../build/index.js');
-const com = GestureRecognizer.com;
-const CumulativePathStats = com.keyman.osk.CumulativePathStats;
+import { CumulativePathStats } from '@keymanapp/gesture-recognizer';
 
 describe("CumulativePathStats", function() {
   it("Basic accumulation (perfect correlation)", function() {
