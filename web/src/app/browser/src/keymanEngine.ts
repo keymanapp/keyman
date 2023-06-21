@@ -359,7 +359,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *   Javascript treats it as an object anyway
    *
    * This is a public API function documented at
-   * https://help.keyman.com/developer/engine/web/17.0/reference/core/getKeyboard.
+   * https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboard.
    *
    * @param       {Object}    Lstub      Keyboard stub object
    * @param       {Object}    Lkbd       Keyboard script object
@@ -432,7 +432,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
   /**
    * Get API-friendly array of available keyboard stubs
    *
-   * Refer to https://help.keyman.com/developer/engine/web/17.0/reference/core/getKeyboards.
+   * Refer to https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboards.
    *
    * The type of each entry of the array corresponds to that of `getKeyboard`.
    *
