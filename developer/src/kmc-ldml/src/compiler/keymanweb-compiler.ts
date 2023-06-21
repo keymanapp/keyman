@@ -22,7 +22,7 @@ export class LdmlKeyboardKeymanWebCompiler {
     const vk: VisualKeyboard.VisualKeyboard = vkc.compile(source);
 
     let result =
-      `{F: '${vk.header.unicodeFont.size}pt ${JSON.stringify(vk.header.unicodeFont.name)}', `+
+      `{F: ' 1em ${JSON.stringify(vk.header.unicodeFont.name)}', `+
       `K102: ${vk.header.flags & VisualKeyboard.VisualKeyboardHeaderFlags.kvkh102 ? 1 : 0}};${nl}` + // TODO-LDML: escape ' and " in font name correctly
       `${tab}this.KV.KLS={${nl}` +
       `${tab}${tab}TODO_LDML: ${vk.keys.length}${nl}` +

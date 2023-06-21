@@ -9,11 +9,9 @@ interface VKFFResult {
 }
 
 export function VisualKeyboardFromFile(visualKeyboard: VisualKeyboard.VisualKeyboard, debug: boolean): VKFFResult {
-  let fbold = ''; // TODO 'bold ' if visualKeyboard.header.unicodeFont.style
-  let fitalic = ''; // TODO 'italic ' if visualKeyboard.header.unicodeFont.style
   let f102 = visualKeyboard.header.flags & KvkFile.BUILDER_KVK_HEADER_FLAGS.kvkh102 ? '1' : '0';
 
-  let result = `{F:'${fbold}${fitalic} 1em "${RequotedString(visualKeyboard.header.unicodeFont.name)}"',K102:${f102}}` +
+  let result = `{F:' 1em "${RequotedString(visualKeyboard.header.unicodeFont.name)}"',K102:${f102}}` +
     `;` + VisualKeyboardToKLS(visualKeyboard) +
     ';' + BuildBKFromKLS(debug);
 
