@@ -62,7 +62,8 @@ return [NSString stringWithFormat:@"hasSelectionAPI: %d, hasReadAPI: %d, hasInse
     } else
      */
     if (NSEqualRanges(selectionRange, notFoundRange)) {
-      workingSelectionApi = NO;
+      workingSelectionApi = YES;
+      // no current selection, but API is working
       NSLog(@"TextCompatibilityCheck checkSelectionApi, range is NSNotFound");
     } else {
       workingSelectionApi = YES;

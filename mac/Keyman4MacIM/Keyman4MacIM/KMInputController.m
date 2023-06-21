@@ -81,8 +81,7 @@ NSMutableArray *servers;
         NSRunningApplication *currApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
         NSString *clientAppId = [currApp bundleIdentifier];
         if ([self.AppDelegate debugMode]) {
-            NSLog(@"New active app %@", clientAppId);
-            NSLog(@"sender %@", sender);
+            NSLog(@"activateServer, new active app: '%@', sender %@", clientAppId, sender);
         }
  
       // TODO: uncomment? commented the browser cases to see how they work with core code
