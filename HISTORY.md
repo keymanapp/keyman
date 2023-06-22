@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.128 alpha 2023-06-22
+
+*  (#9061)
+* docs(windows): add more steps for clarity (#9063)
+
 ## 17.0.127 alpha 2023-06-21
 
 * feat(core): implementation of non-regex components of tran (#9019)
