@@ -1,6 +1,5 @@
 import EventEmitter from "eventemitter3";
 import { InputSample } from "./inputSample.js";
-import { Segment } from "./segment.js";
 import { CumulativePathStats } from "./cumulativePathStats.js";
 
 /**
@@ -15,7 +14,6 @@ interface EventMap {
   'step': (sample: InputSample) => void,
   'complete': () => void,
   'invalidated': () => void
-  'segmentation': (segment: Segment) => void
 }
 
 /**
