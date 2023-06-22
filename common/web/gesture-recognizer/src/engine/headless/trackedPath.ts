@@ -1,7 +1,7 @@
 import EventEmitter from "eventemitter3";
 import { InputSample } from "./inputSample.js";
-import { PathSegmenter } from "./subsegmentation/pathSegmenter.js";
 import { Segment } from "./segment.js";
+import { CumulativePathStats } from "./cumulativePathStats.js";
 
 /**
  * Documents the expected typing of serialized versions of the `TrackedPoint` class.
@@ -9,7 +9,6 @@ import { Segment } from "./segment.js";
 export type JSONTrackedPath = {
   coords: InputSample[]; // ensures type match with public class property.
   wasCancelled?: boolean;
-  segments: Segment[];
 }
 
 interface EventMap {
@@ -44,25 +43,14 @@ interface EventMap {
  *   - Will precede resolution Promise fulfillment on the `Segment` provided by
  *     the most recently-preceding 'segmentation' event.
  *     - And possibly recognition Promise fulfillment.
- *
- * `'segmentation'`:  a new segmentation boundary has been identified for the
- * ongoing touchpath.
- *   - Provides one parameter - a new `Segment` instance representing the
- *     still-in-construction part of the touchpath until this event is
- *     raised again. (That would indicate a new segmentation boundary
- *     marking the end of the first event's returned `Segment`.)
  */
 export class TrackedPath extends EventEmitter<EventMap> {
   private samples: InputSample[] = [];
-  private _segments: Segment[] = [];
-
-  private readonly segmenter: PathSegmenter;
 
   private _isComplete: boolean = false;
   private wasCancelled?: boolean;
 
-  // private _segments: Segment[];
-  // public get segments(): readonly Segment[] { return this._segments; }
+  private stats: CumulativePathStats;
 
   /**
    * Initializes an empty path intended for tracking a newly-activated touchpoint.
@@ -84,17 +72,7 @@ export class TrackedPath extends EventEmitter<EventMap> {
       this.wasCancelled = jsonObj.wasCancelled;
     }
 
-    // Keep this as the _final_ statement in the constructor.  `PathSegmenter` will
-    // need a reference to this instance, even if only via closure.
-    // (Most likely; not yet done.) Kinda awkward, but it's useful for compartmentalization.
-    // - DO use 'via closure.'  That allows us to have the segment passing done via
-    // `private` method.
-    const segmentStartClosure = (segment: Segment) => {
-      this._segments.push(segment);
-      this.emit('segmentation', segment);
-    }
-
-    this.segmenter = new PathSegmenter(PathSegmenter.DEFAULT_CONFIG, segmentStartClosure);
+    this.stats = new CumulativePathStats();
   }
 
   /**
@@ -117,9 +95,8 @@ export class TrackedPath extends EventEmitter<EventMap> {
     // The tracked path should emit InputSample events before Segment events and
     // resolution of Segment Promises.
     this.samples.push(sample);
+    this.stats = this.stats.extend(sample);
     this.emit('step', sample);
-
-    this.segmenter.add(sample);
   }
 
   /**
@@ -138,8 +115,6 @@ export class TrackedPath extends EventEmitter<EventMap> {
       this.emit('invalidated');
     }
 
-    this.segmenter.close();
-
     // If not cancelling, signal completion after finishing segments.
     if(!cancel) {
       this.emit('complete');
@@ -157,38 +132,6 @@ export class TrackedPath extends EventEmitter<EventMap> {
   }
 
   /**
-   * Returns the segmented form of the touchpath over its lifetime thus far.  It is
-   * possible for certain parts of the path to go unrepresented if they are detected as
-   * insignificant.
-   *
-   * Also of note:  for the common case, the final coordinate of one Segment will usually
-   * be the initial point of the following Segment.  Usually, but not always.  This is
-   * the only overlap that may occur.
-   *
-   * Note:  segment events and updates will always occur in the following order:
-   *
-   * 1. A segment's role is 'recognized' - its classification becomes known.
-   * 2. The segment is 'resolved' - the segment is marked as completed.
-   * 3. The next segment is added to this field, with on('segmentation') is raised
-   *    for it.
-   *
-   * Note that it is possible for a segment to be 'recognized' and even 'resolved'
-   * before its event is raised (thus, before it is added here) under some scenarios.
-   * In particular, 'start' and 'end'-type segments are always 'recognized' and
-   * 'resolved'.
-   *
-   * While the touchpath is active, there is a very high chance that the final
-   * segment listed will not be resolved.  There will also be a distinct chance
-   * that it is not yet recognized.
-   *
-   * The first Segment should always be a 'start', while the final Segment - once
-   * _all_ input for the ongoing touchpath is complete - will be an 'end'.
-   */
-  public get segments(): readonly Segment[] {
-    return this._segments;
-  }
-
-  /**
    * Creates a serialization-friendly version of this instance for use by
    * `JSON.stringify`.
    */
@@ -201,7 +144,6 @@ export class TrackedPath extends EventEmitter<EventMap> {
         targetY: obj.targetY,
         t:       obj.t
       }))),
-      segments: [].concat(this.segments),
       wasCancelled: this.wasCancelled
     }
 

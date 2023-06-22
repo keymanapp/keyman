@@ -1,20 +1,10 @@
 import { assert } from 'chai'
 import sinon  from 'sinon';
-import fs from 'fs';
-import path from 'path';
-import url from 'url';
 
 import { TrackedPath } from '@keymanapp/gesture-recognizer';
 
-import { HeadlessRecordingSimulator, timedPromise } from '../../../../build/tools/obj/index.js';
+import { timedPromise } from '../../../../build/tools/obj/index.js';
 
-// Ensures that the resources are resolved relative to this script, not to the cwd when the test
-// runner was launched.
-const scriptFolder = path.dirname(url.fileURLToPath(import.meta.url));
-const SEGMENT_TEST_JSON_FOLDER = path.resolve(`${scriptFolder}/../../resources/json/segmentation`);
-
-import { assertSegmentSimilarity } from '../../resources/assertSegmentSimilarity.js'
-;
 // End of "for the integrated style..."
 
 describe("TrackedPath", function() {
@@ -22,49 +12,6 @@ describe("TrackedPath", function() {
   // let testJSONtext = fs.readFileSync('src/test/resources/json/canaryRecording.json');
 
   describe("Single-sample 'sequence'", function() {
-    // A near-duplicate of the "Segmentation" -> "Single-sample 'sequence'" test.
-    // Acts as a mild 'integration' test of the segmentation engine + the public-facing
-    // TrackedPath events it advertises.
-    it("'segmentation' - expected segment types", function() {
-      let spy = sinon.fake();
-
-      const touchpath = new TrackedPath();
-      touchpath.on('segmentation', spy);
-
-      const sample = {
-        targetX: 1,
-        targetY: 1,
-        t: 100
-      };
-
-      // Expected sequence:
-      // 1:  on `segmenter.add(sample)`:
-      //     a. 'start' segment
-      //     b.  unrecognized (null-type) segment.
-      // 2: on `segmenter.close()`:
-      //     b. 'end' segment
-
-      touchpath.extend(sample);
-      try {
-        assert.isTrue(spy.calledTwice, "'segmentation' event was not raised exactly twice before the .close().");
-      } finally {
-        touchpath.terminate(false); // false = "not cancelled"
-      }
-      assert.isTrue(spy.calledThrice, "'segmentation' event was not raised exactly once after the .close().");
-
-      for(let i=0; i < 3; i++) {
-        assert.equal(spy.args[i].length, 1, "'segmentation' event was raised with an unexpected number of arguments");
-      }
-
-      assert.equal(spy.firstCall.args[0].type, 'start', "First event should provide a 'start'-type segment.");
-      assert.equal(spy.secondCall.args[0].type, undefined, "Second event's segment should not be classified.");
-      assert.equal(spy.thirdCall.args[0].type, 'end', "Third event should provide an 'end'-type segment.");
-
-      assert.deepEqual(touchpath.coords, [sample]);
-      assert.deepEqual(touchpath.segments, spy.getCalls().map((call) => call.args[0]),
-        "The touchpath's segment array does not match the `Segment`s from raised events.");
-    });
-
     it("'step', 'complete' events", function() {
       const spyEventStep        = sinon.fake();
       const spyEventComplete    = sinon.fake();
@@ -134,13 +81,11 @@ describe("TrackedPath", function() {
       const spyEventStep         = sinon.fake();
       const spyEventComplete     = sinon.fake();
       const spyEventInvalidated  = sinon.fake();
-      const spyEventSegmentation = sinon.fake();
 
       const touchpath = new TrackedPath();
       touchpath.on('step', spyEventStep);
       touchpath.on('complete', spyEventComplete);
       touchpath.on('invalidated', spyEventInvalidated);
-      touchpath.on('segmentation', spyEventSegmentation);
 
       const sample = {
         targetX: 1,
@@ -151,28 +96,18 @@ describe("TrackedPath", function() {
       touchpath.extend(sample);
       touchpath.terminate(false); // false = "not cancelled"
 
-      assert(spyEventStep.firstCall.calledBefore(spyEventSegmentation.firstCall),
-        "'step' should be raised before 'segmentation'");
-      assert(spyEventSegmentation.thirdCall.calledBefore(spyEventComplete.firstCall),
-        "all 'segmentation' events should be raised before 'complete'");
-
-      const spy = spyEventSegmentation;
       assert.deepEqual(touchpath.coords, [sample]);
-      spy.call
-      assert.deepEqual(touchpath.segments, spy.getCalls().map((call) => call.args[0]));
     });
 
     it("event ordering - 'invalidated'", function() {
       const spyEventStep         = sinon.fake();
       const spyEventComplete     = sinon.fake();
       const spyEventInvalidated  = sinon.fake();
-      const spyEventSegmentation = sinon.fake();
 
       const touchpath = new TrackedPath();
       touchpath.on('step', spyEventStep);
       touchpath.on('complete', spyEventComplete);
       touchpath.on('invalidated', spyEventInvalidated);
-      touchpath.on('segmentation', spyEventSegmentation);
 
       const sample = {
         targetX: 1,
@@ -183,17 +118,7 @@ describe("TrackedPath", function() {
       touchpath.extend(sample);
       touchpath.terminate(true); // false = "not cancelled"
 
-      assert(spyEventStep.firstCall.calledBefore(spyEventSegmentation.firstCall),
-        "'step' should be raised before 'segmentation'");
-      assert(spyEventSegmentation.secondCall.calledBefore(spyEventInvalidated.firstCall),
-        "first 'segmentation' event ('start' segment) not raised before cancellation");
-      assert(spyEventSegmentation.thirdCall.calledAfter(spyEventInvalidated.firstCall),
-        "Cancellation event not raised before cancelled segment completion");
-
-      // Even though the touchpath was 'cancelled', we should still see the segments that finished processing.
-      const spy = spyEventSegmentation;
       assert.deepEqual(touchpath.coords, [sample]);
-      assert.deepEqual(touchpath.segments, spy.getCalls().map((call) => call.args[0]));
     });
   });
 
@@ -211,13 +136,11 @@ describe("TrackedPath", function() {
       const spyEventStep         = sinon.fake();
       const spyEventComplete     = sinon.fake();
       const spyEventInvalidated  = sinon.fake();
-      const spyEventSegmentation = sinon.fake();
 
       const touchpath = new TrackedPath();
       touchpath.on('step', spyEventStep);
       touchpath.on('complete', spyEventComplete);
       touchpath.on('invalidated', spyEventInvalidated);
-      touchpath.on('segmentation', spyEventSegmentation);
 
       const startSample = {
         targetX: 1,
@@ -247,8 +170,6 @@ describe("TrackedPath", function() {
       }).then(() => {
         // The main test assertions.
         assert.deepEqual(touchpath.coords, [startSample, endSample]);
-        assert.deepEqual(touchpath.segments, spyEventSegmentation.getCalls().map((call) => call.args[0]));
-        assert.deepEqual(spyEventSegmentation.getCalls().map((call) => call.args[0].type), ['start', 'hold', 'end']);
       });
 
       const finalPromise = segmentationEndPromise.catch((reason) => {
@@ -278,43 +199,5 @@ describe("TrackedPath", function() {
       // suddenly restored during investigation can cause some very confusing behavior.
       this.fakeClock.restore();
     })
-
-    // A near-duplication of the recordedSegments.js version, but integrated with TrackedPath.
-    it("flick_ne_se.json", async function() {
-      let testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/flick_ne_se.json`);
-      let jsonObj = JSON.parse(testJSONtext);
-
-      // Prepare some of the basic setup.
-      let spy = sinon.fake();
-      const trackedPath = new TrackedPath();
-      trackedPath.on('segmentation', spy);
-
-      //(PathSegmenter.DEFAULT_CONFIG, spy);
-
-      const configObj = {
-        replaySample: (sample) => trackedPath.extend(sample),
-        endSequence:  () => trackedPath.terminate(false)
-      }
-
-      const testObj = HeadlessRecordingSimulator.prepareTest(jsonObj, configObj);
-
-      await this.fakeClock.runAllAsync();
-      await testObj.compositePromise;
-
-      // Any post-sequence tests to run.
-      const originalSegments = testObj.originalSegments;
-      const originalSegmentTypeSequence = originalSegments.map((segment) => segment.type);
-
-      const reproedSegments = spy.getCalls().map((call) => call.args[0]);
-      const reproedSegmentTypeSequence  = reproedSegments.map((segment) => segment.type);
-
-      assert.sameOrderedMembers(reproedSegmentTypeSequence, originalSegmentTypeSequence);
-
-      assertSegmentSimilarity(reproedSegments[1], originalSegments[1], 'hold');  // ~820ms
-      assertSegmentSimilarity(reproedSegments[2], originalSegments[2], 'move');  // 'ne'
-      assertSegmentSimilarity(reproedSegments[3], originalSegments[3], 'hold');  // ~580ms
-      assertSegmentSimilarity(reproedSegments[4], originalSegments[4], 'move');  // 'se'
-      assertSegmentSimilarity(reproedSegments[5], originalSegments[5], 'hold');  // ~300ms
-    });
   });
 });
