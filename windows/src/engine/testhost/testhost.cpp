@@ -300,7 +300,7 @@ Fail(PCWSTR message) {
   std::wstring buf;
   DWORD dwError = GetLastError();
   if (dwError == ERROR_SUCCESS) {
-    buf = std::wstring(message); // Don't append "The operation completed successfully."
+    buf = std::wstring(message) + L": no error code was returned"; // Don't append "The operation completed successfully."
   } else if (FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, dwError, 0, err.data(), bufferLength, nullptr) != 0) {
     std::wstring errb(err.data());
     buf = std::wstring(message) + L":" + err.data() + L"[" + std::to_wstring(dwError) + L"]";
