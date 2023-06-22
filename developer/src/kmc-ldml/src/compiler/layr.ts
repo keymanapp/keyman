@@ -5,7 +5,7 @@ import { SectionCompiler } from "./section-compiler.js";
 import { translateLayerAttrToModifier, validModifier } from '../util/util.js';
 
 
-import GlobalSections = KMXPlus.GlobalSections;
+import DependencySections = KMXPlus.DependencySections;
 import Layr = KMXPlus.Layr;
 import LayrEntry = KMXPlus.LayrEntry;
 import LayrList = KMXPlus.LayrList;
@@ -57,7 +57,7 @@ export class LayrCompiler extends SectionCompiler {
     return valid;
   }
 
-  public compile(sections: GlobalSections): Layr {
+  public compile(sections: DependencySections): Layr {
     const sect = new Layr();
 
     sect.lists = this.keyboard.layers.map((layers) => {

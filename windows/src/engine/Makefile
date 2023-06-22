@@ -28,6 +28,10 @@ keymanmc: .virtual
     cd $(ROOT)\src\engine\keymanmc
     $(MAKE) $(TARGET)
 
+keyman32: .virtual
+    cd $(ROOT)\src\engine\keyman32
+    $(MAKE) $(TARGET)
+
 keyman32-ver: .virtual
     cd $(ROOT)\src\engine\keyman32-ver
     $(MAKE) $(TARGET)
@@ -42,6 +46,10 @@ tsysinfo: tsysinfox64
 
 keymanx64: .virtual
     cd $(ROOT)\src\engine\keymanx64
+    $(MAKE) $(TARGET)
+
+keyman64: .virtual
+    cd $(ROOT)\src\engine\keyman64
     $(MAKE) $(TARGET)
 
 keyman64-ver: .virtual

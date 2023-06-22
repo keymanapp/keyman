@@ -151,9 +151,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="keyman-debug-etw.rc">
-      <Filter>Source Files</Filter>
-    </ResourceCompile>
     <ResourceCompile Include="KEYMAN32-VER.RC">
       <Filter>Source Files</Filter>
     </ResourceCompile>
@@ -246,8 +243,5 @@
     <ClInclude Include="..\..\..\include\kmtip_guids.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="keyman-debug-etw.man" />
   </ItemGroup>
 </Project>

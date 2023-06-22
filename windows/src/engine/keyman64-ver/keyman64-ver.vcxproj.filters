@@ -74,10 +74,6 @@
     <ClInclude Include="..\..\..\include\kmtip_guids.h" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\keyman32-ver\keyman-debug-etw.man" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="..\keyman32-ver\keyman-debug-etw.rc" />
     <ResourceCompile Include="Keyman64-ver.RC" />
   </ItemGroup>
   <ItemGroup>

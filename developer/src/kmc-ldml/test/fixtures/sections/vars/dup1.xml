@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
+<keyboard locale="mt" conformsTo="techpreview">
+  <names>
+    <name value="vars-minimal" />
+  </names>
+
+  <keys />
+
+  <!-- from spec -->
+  <variables>
+    <string id="y" value="yes" /> <!-- ERROR: duplicate -->
+    <string id="upper" value="UPPERCASE" /> <!-- ERROR: duplicate -->
+    <set id="upper" value="A B C D E FF" /> <!-- ERROR: duplicate -->
+    <set id="y" value="Y E S" /> <!-- ERROR: duplicate -->
+    <unicodeSet id="consonants" value="[कसतनमह]" /> <!-- a UnicodeSet -->
+    <unicodeSet id="y" value="[y e s]" />  <!-- ERROR: duplicate -->
+  </variables>
+
+</keyboard>

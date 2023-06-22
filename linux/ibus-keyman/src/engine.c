@@ -3,7 +3,7 @@
 /*
  * Keyman Input Method for IBUS (The Input Bus)
  *
- * Copyright (C) 2009-2022 SIL International
+ * Copyright (C) 2009-2023 SIL International
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,21 +28,13 @@
 #include <gdk/gdk.h>
 #include <gio/gio.h>
 
-#ifdef GDK_WINDOWING_X11
-#include <gdk/gdkx.h>
-#include <X11/XKBlib.h>
-#endif
-
-#ifdef GDK_WINDOWING_WAYLAND
-#include <gdk/gdkwayland.h>
-#endif
-
 #include <keyman/keyboardprocessor.h>
 #include <keyman/keyboardprocessor_consts.h>
 
 #include "config.h"
 #include "keymanutil.h"
 #include "keyman-service.h"
+#include "KeymanSystemServiceClient.h"
 #include "engine.h"
 #include "keycodes.h"
 
@@ -90,12 +82,6 @@ struct _IBusKeymanEngine {
   IBusLookupTable *table;
   IBusProperty    *status_prop;
   IBusPropList    *prop_list;
-#ifdef GDK_WINDOWING_X11
-  Display         *xdisplay;
-#endif
-#ifdef GDK_WINDOWING_WAYLAND
-  GdkWaylandDisplay *wldisplay;
-#endif
 
   commit_queue_item commit_queue[MAX_QUEUE_SIZE];
   commit_queue_item *commit_item;
@@ -311,29 +297,6 @@ ibus_keyman_engine_init(IBusKeymanEngine *keyman) {
   ibus_prop_list_append(keyman->prop_list, keyman->status_prop);
 
   keyman->state = NULL;
-#ifdef GDK_WINDOWING_X11
-  keyman->xdisplay = NULL;
-#endif
-#ifdef GDK_WINDOWING_WAYLAND
-  keyman->wldisplay = NULL;
-#endif
-
-  GdkDisplay *gdkDisplay = gdk_display_get_default();
-#ifdef GDK_WINDOWING_X11
-  if (GDK_IS_X11_DISPLAY(gdkDisplay)) {
-    g_debug("Using X11");
-    keyman->xdisplay = GDK_DISPLAY_XDISPLAY(gdkDisplay);
-  } else
-#endif
-#ifdef GDK_WINDOWING_WAYLAND
-  if (GDK_IS_WAYLAND_DISPLAY(gdkDisplay)) {
-    g_debug("Using Wayland");
-    keyman->wldisplay = GDK_WAYLAND_DISPLAY(gdkDisplay);
-  } else
-#endif
-  {
-    g_error("unsupported GDK backend");
-  }
 }
 
 static km_kbp_cp* get_base_layout()
@@ -752,19 +715,7 @@ process_capslock_action(
 ) {
   g_message("%s: %s caps-lock", __FUNCTION__, action_item->capsLock ? "Enable" : "Disable");
 
-#ifdef GDK_WINDOWING_X11
-  if (keyman->xdisplay) {
-    XkbLockModifiers(keyman->xdisplay, XkbUseCoreKbd, LockMask, action_item->capsLock ? LockMask : 0);
-
-    XSync(keyman->xdisplay, False);
-  }
-#endif
-#ifdef GDK_WINDOWING_WAYLAND
-  // TODO
-  if (keyman->wldisplay) {
-
-  }
-#endif
+  set_capslock_indicator(action_item->capsLock);
   return TRUE;
 }
 

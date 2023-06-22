@@ -1,44 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{2dc5904b-4033-47e6-88ac-ebe442c06c2e}</UniqueIdentifier>
-      <Extensions>cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{27baf0f2-3926-4720-b5f9-045e47cd975c}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{088a2b68-c9db-41f4-9f45-37fdf758931e}</UniqueIdentifier>
-      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
-    </Filter>
+    <ClCompile Include="keyman32_proxy.cpp" />
+    <ClCompile Include="pch.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\common\resources\bitmaps\arrow.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\..\..\..\common\resources\bitmaps\mask.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
+    <ClInclude Include="exports.h" />
+    <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="keyman-debug-etw.man" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="exports.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <None Include="..\..\..\..\common\resources\bitmaps\arrow.bmp" />
+    <None Include="..\..\..\..\common\resources\bitmaps\mask.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="keyman32_proxy.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ResourceCompile Include="keyman-debug-etw.rc" />
   </ItemGroup>
 </Project>

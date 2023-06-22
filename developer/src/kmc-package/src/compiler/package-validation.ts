@@ -130,6 +130,8 @@ export class PackageValidation {
       if(!this.checkForDuplicatedOrNonMinimalLanguages('keyboard', keyboard.id, keyboard.languages)) {
         return false;
       }
+      // Note: package-version-validation verifies that there is a corresponding
+      // content file for each keyboard
     }
 
     return true;

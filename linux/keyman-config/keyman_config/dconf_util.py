@@ -2,25 +2,25 @@
 
 from gi.repository import Gio
 
-# DConf path destkop/ibus/keyman/options
-DCONF_BASE = "com.keyman.options"
+# GSettings path destkop/ibus/keyman/options
+GSETTINGS_BASE = "com.keyman.options"
 
-# Utilities to get and set Keyman options in DConf:
+# Utilities to get and set Keyman options in GSettings:
 # /desktop/ibus/keyman/options/packageID/keyboardID/options
 
 
 def get_child_schema(info):
-    settings = Gio.Settings.new(DCONF_BASE)
+    settings = Gio.Settings.new(GSETTINGS_BASE)
     path = settings.get_property('path')
     if not path.endswith('/'):
         path += '/'
     path += info['packageID'] + '/' + info['keyboardID'] + '/'
-    return Gio.Settings(DCONF_BASE + '.child', path)
+    return Gio.Settings(GSETTINGS_BASE + '.child', path)
 
 
 def get_option(info):
     """
-    Get the Keyman keyboard options from DConf
+    Get the Keyman keyboard options from GSettings
     Convert from list of comma-separated strings into dictionary
 
     Args:
@@ -41,7 +41,7 @@ def get_option(info):
 
 def set_option(info, options):
     """
-    Store the Keyman keyboard options in DConf as a list of strings
+    Store the Keyman keyboard options in GSettings as a list of strings
 
     Args:
         info: dictionary

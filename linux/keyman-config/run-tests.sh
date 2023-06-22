@@ -1,6 +1,9 @@
 #!/bin/bash
 PYTHONPATH=.:$PYTHONPATH
 
+XDG_CONFIG_HOME=$(mktemp --directory)
+export XDG_CONFIG_HOME
+
 if [ -n "$TEAMCITY_VERSION" ]; then
     if ! pip3 list --format=columns | grep -q teamcity-messages; then
         pip3 install teamcity-messages
@@ -9,3 +12,5 @@ if [ -n "$TEAMCITY_VERSION" ]; then
 else
     python3 -m unittest discover -v -s tests -p test_*.py
 fi
+
+rm -rf "$XDG_CONFIG_HOME"

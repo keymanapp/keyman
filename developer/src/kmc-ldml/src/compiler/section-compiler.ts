@@ -1,8 +1,17 @@
 import { LDMLKeyboard, KMXPlus, CompilerCallbacks } from "@keymanapp/common-types";
-import { SectionIdent } from '@keymanapp/ldml-keyboard-constants';
+import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 
 /* istanbul ignore next */
 export class SectionCompiler {
+  /**
+   * Opportunity for async initialization.
+   * @returns true when OK. On false, causes a message to happen.
+   */
+  public async init() : Promise<boolean> {
+    // nothing to do here
+    return true;
+  }
+
   protected readonly keyboard: LDMLKeyboard.LKKeyboard;
   protected readonly callbacks: CompilerCallbacks;
 
@@ -19,11 +28,24 @@ export class SectionCompiler {
     return true;
   }
 
-  public compile(sections: KMXPlus.GlobalSections): KMXPlus.Section {
+  public compile(sections: KMXPlus.DependencySections): KMXPlus.Section {
     return null;
   }
 
   public validate(): boolean {
     return true;
+  }
+
+  /**
+   * Get the dependencies for this compiler.
+   * @returns set of dependent sections
+   */
+  public get dependencies(): Set<SectionIdent> {
+    const defaults = new Set(<SectionIdent[]>[
+      constants.section.strs,
+      constants.section.list,
+      constants.section.elem
+    ]);
+    return defaults;
   }
 }

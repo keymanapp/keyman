@@ -56,6 +56,48 @@ export function allUsedKeyIdsInLayers(layersList : LDMLKeyboard.LKLayers[] | nul
 }
 
 /**
+ * Helper function for validating child elements. Written for the convenience of message passing functions.
+ *
+ * @param values array of values to check
+ * @param onDuplicate callback with array of duplicate values, deduped
+ * @param allowed optional set of valid values
+ * @param onInvalid callback with array of invalid values, deduped
+ * @returns true if all OK
+ */
+export function verifyValidAndUnique(
+  values: string[],
+  onDuplicate: (duplicates: string[]) => void,
+  allowed?: Set<string>,
+  onInvalid?: (invalids: string[]) => void)
+  : boolean {
+  const dups: string[] = [];
+  const invalids: string[] = [];
+  const seen = new Set<string>();
+  for (const value of values) {
+    if (allowed && !allowed.has(value)) {
+      invalids.push(value);
+    }
+    if (seen.has(value)) {
+      dups.push(value);
+    } else {
+      seen.add(value);
+    }
+  }
+
+  function dedupedSortedArray(values: string[]) : string[] {
+    return Array.from(new Set(values)).sort();
+  }
+
+  if (dups.length > 0 && onDuplicate) {
+    onDuplicate(dedupedSortedArray(dups));
+  }
+  if (invalids.length > 0 && onInvalid) {
+    onInvalid(dedupedSortedArray(invalids));
+  }
+  return (!dups.length && !invalids.length);
+}
+
+/**
  * Determine modifier from layer info
  * @param layer layer obj
  * @returns modifier
