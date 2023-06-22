@@ -250,7 +250,7 @@
 
       <Component Id="etw" Guid="{2AA8D519-C9B7-4995-9496-D87DD2EF2B7D}">
         <!-- The file id needs to be short to avoid an overflow in the XmlFile table during link time -->
-        <File Id="etw" Name="keyman-debug-etw.man" KeyPath="yes" Source="..\keyman32-ver\keyman-debug-etw.man">
+        <File Id="etw" Name="keyman-debug-etw.man" KeyPath="yes" Source="..\keyman32\keyman-debug-etw.man">
           <util:EventManifest MessageFile="[#keyman32.dll]" ResourceFile="[#keyman32.dll]" />
         </File>
       </Component>
