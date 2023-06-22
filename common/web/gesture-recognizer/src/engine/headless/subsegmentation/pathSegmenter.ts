@@ -1,8 +1,8 @@
 import { ConstructingSegment } from "./constructingSegment.js";
-import { CumulativePathStats, PathCoordAxis, sigMinus } from "./cumulativePathStats.js";
-import { InputSample } from "./inputSample.js";
-import { Segment, SegmentImplementation } from "./segment.js";
-import { SegmentClass, SegmentClassifier, SegmentClassifierConfig } from "./segmentClassifier.js";
+import { CumulativePathStats, PathCoordAxis, sigMinus } from "../cumulativePathStats.js";
+import { InputSample } from "../inputSample.js";
+import { Segment, SegmentImplementation } from "../segment.js";
+import { SegmentClass, SegmentClassifier, SegmentClassifierConfig } from "../segmentClassifier.js";
 
 // Mostly used here to compare the sum-squared error components of segmented regressions
 // to the sum-squared "modeled" components of their overall variance.  Those are the two

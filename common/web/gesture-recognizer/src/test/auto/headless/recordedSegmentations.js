@@ -1,6 +1,8 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 import fs from 'fs';
+import path from 'path';
+import url from 'url';
 
 import * as PromiseStatusModule from 'promise-status-async';
 const promiseStatus       = PromiseStatusModule.promiseStatus;
@@ -10,7 +12,10 @@ import { PathSegmenter } from '@keymanapp/gesture-recognizer';
 
 import { HeadlessRecordingSimulator } from '../../../../build/tools/obj/index.js';
 
-const SEGMENT_TEST_JSON_FOLDER = './resources/json/segmentation';
+// Ensures that the resources are resolved relative to this script, not to the cwd when the test
+// runner was launched.
+const scriptFolder = path.dirname(url.fileURLToPath(import.meta.url));
+const SEGMENT_TEST_JSON_FOLDER = path.resolve(`${scriptFolder}/../../resources/json/segmentation`);
 
 import { assertSegmentSimilarity } from '../../resources/assertSegmentSimilarity.js';
 

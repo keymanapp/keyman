@@ -1,7 +1,7 @@
-import { SegmentClassifier } from "./segmentClassifier.js";
-import { CumulativePathStats } from "./cumulativePathStats.js";
+import { SegmentClassifier } from "../segmentClassifier.js";
+import { CumulativePathStats } from "../cumulativePathStats.js";
 import { SegmentationSplit, Subsegmentation } from "./pathSegmenter.js";
-import { SegmentImplementation } from "./segment.js";
+import { SegmentImplementation } from "../segment.js";
 import { SubsegmentCompatibilityAnalyzer } from "./subsegmentCompatibilityAnalyzer.js";
 
 /**

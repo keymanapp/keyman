@@ -1,9 +1,9 @@
 import EventEmitter from "eventemitter3";
-import { GestureRecognizerConfiguration } from "./gestureRecognizerConfiguration.js";
+import { GestureRecognizerConfiguration } from "./configuration/gestureRecognizerConfiguration.js";
 import { MouseEventEngine } from "./mouseEventEngine.js";
 import { Mutable } from "./mutable.js";
 import { Nonoptional } from "./nonoptional.js";
-import { PaddedZoneSource } from "./paddedZoneSource.js";
+import { PaddedZoneSource } from "./configuration/paddedZoneSource.js";
 import { TouchEventEngine } from "./touchEventEngine.js";
 import { TrackedInput } from "./trackedInput.js";
 import { TrackedPoint } from "./trackedPoint.js";

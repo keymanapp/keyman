@@ -1,4 +1,4 @@
-import { JSONTrackedPath, TrackedPath } from "./trackedPath.js";
+import { JSONTrackedPath, TrackedPath } from "./headless/trackedPath.js";
 
 /**
  * Documents the expected typing of serialized versions of the `TrackedPoint` class.
