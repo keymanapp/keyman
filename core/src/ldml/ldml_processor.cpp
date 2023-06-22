@@ -225,8 +225,8 @@ ldml_processor::process_event(
           state->actions().push_backspace(KM_KBP_BT_UNKNOWN);
         } else {
           state->actions().push_backspace(KM_KBP_BT_CHAR, last_char);
+          state->context().pop_back();
         }
-        state->context().pop_back();
       }
       break;
     default:
