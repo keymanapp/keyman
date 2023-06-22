@@ -261,6 +261,8 @@ ldml_processor::process_event(
         const std::u16string str = keys.lookup(vk, modifier_state);
         if (str.empty()) {
           // not found
+          state->actions().push_invalidate_context();
+          state->actions().push_emit_keystroke();
           break; // ----- commit and exit
         }
         // found the correct string - push it into the context and actions
