@@ -26,8 +26,8 @@ export async function getOskFromKmnFile(callbacks: CompilerCallbacks, filename: 
     return null;
   }
 
-  if(result.data.kvksFilename) {
-    kvksFilename = callbacks.resolveFilename(filename, result.data.kvksFilename);
+  if(result.extra.kvksFilename) {
+    kvksFilename = callbacks.resolveFilename(filename, result.extra.kvksFilename);
   }
 
   const reader = new KmxFileReader();
