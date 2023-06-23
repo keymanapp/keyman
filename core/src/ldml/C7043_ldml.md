@@ -578,7 +578,14 @@ TODO-LDML: note that at present, unicodeSet variables are not stored using the `
 
 Items are sorted by id
 
-### C7043.2.18 `uset` Unicode Sets
+### C7043.2.18 `uset` UnicodeSets table
+
+This table contains serialized [UnicodeSet](http://www.unicode.org/reports/tr35/#Unicode_Sets)s,
+together with their original patterns.  Each UnicodeSet is converted into an array of ranges.
+Per the Keyboard spec, sets with multi-character strings are not allowed.
+
+For example, `[a-c q]` would be converted into the two ranges (U+0061-U+0063) and (U+0071-U+0071),
+the latter being the single codepoint `q`.
 
 | ∆ | Bits | Name          | Description                              |
 |---|------|---------------|------------------------------------------|
@@ -591,13 +598,17 @@ Items are sorted by id
 
 #### `uset.usets` sub-table
 
-Each represents a UnicodeSet
+Each entry in this subtable represents a UnicodeSet, and is referenced by
+index by other tables.
 
 | ∆ | Bits | Name    | Description                         |
 |---|------|---------|------------------------------------ |
 | 0+|  32  | range   | int: Index into 'ranges' subtable   |
 | 4+|  32  | count   | int: Number of ranges in this set   |
 | 8+|  32  | pattern | str: UnicodeSet as string           |
+
+The usets are sorted in order of their pattern string's binary
+order.
 
 #### `uset.ranges` sub-table
 
@@ -608,6 +619,8 @@ Each represents a UnicodeSet
 | 0+|  32  | start   | int: UTF-32 char start              |
 | 4+|  32  | end     | int: UTF-32 char end                |
 
+`start` is always <= `end`. `start` and `end` may be equal if a single codepoint
+is represented.
 
 ## TODO-LDML: various things that need to be completed here or fixed in-spec
 > * spec: ABNT2 key has hex value 0xC1 (even if kbdus.dll doesn't produce that)

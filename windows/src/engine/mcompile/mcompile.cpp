@@ -38,6 +38,7 @@
 
 BOOL DoConvert(LPKEYBOARD kbd, PWSTR kbid, BOOL bDeadkeyConversion);
 BOOL SaveKeyboard(LPKEYBOARD kbd, PWSTR filename);
+BOOL CopyKeyboard(PWSTR source, PWSTR target);
 bool ImportRules(WCHAR *kbid, LPKEYBOARD kp, std::vector<DeadkeyMapping> *FDeadkeys, BOOL bDeadkeyConversion);   // I4353   // I4327
 BOOL ConvertKeyboardToUnicode(LPKEYBOARD kbd);   // I4273
 int run(int argc, wchar_t * argv[]);
@@ -74,6 +75,11 @@ int run(int argc, wchar_t * argv[])
 
     if(!LoadKeyboard(infile, &kmxfile)) {
       LogError(L"Failed to load keyboard (%d)", GetLastError());
+      return 3;
+    }
+
+    if (kmxfile->dwFlags & KF_KMXPLUS) {
+      LogError(L"Error: Don't use the -u option with KMXPlus files.");
       return 3;
     }
 
@@ -132,8 +138,15 @@ int run(int argc, wchar_t * argv[])
     return 3;
   }
 
-  if(DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552
-    SaveKeyboard(kmxfile, outfile);
+  if (kmxfile->dwFlags & KF_KMXPLUS) {
+    if(!CopyKeyboard(infile, outfile)) {
+      LogError(L"Failed to copy KMXPlus keyboard file (%d)", GetLastError());
+      return 3;
+    }
+  } else {
+    if(DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552
+      SaveKeyboard(kmxfile, outfile);
+    }
   }
 
   //DeleteReallocatedPointers(kmxfile); :TODO
@@ -473,4 +486,9 @@ void LogError(PWSTR fmt, ...) {
 	_vsnwprintf_s(fmtbuf, _countof(fmtbuf), _TRUNCATE, fmt, vars);  // I2248   // I3547
 	fmtbuf[255] = 0;
   _putws(fmtbuf);
+}
+
+BOOL CopyKeyboard(PWSTR source, PWSTR target)
+{
+  return CopyFile(source, target, FALSE /* bFailIfExists */); // overwrite file if it exists
 }

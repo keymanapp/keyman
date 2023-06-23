@@ -1,5 +1,23 @@
 # Keyman Version History
 
+## 17.0.129 alpha 2023-06-23
+
+* chore(common): Update crowdin strings for Spanish (es-ES and es-419) (#9040)
+* chore(android/app): Address some pre-launch accessibility report warnings (#9070)
+* fix(windows): support kmxplus in mcompile (#9071)
+* fix(core): fix ldml transforms (#9072)
+* feat(common,developer,core): add uset section (#9049)
+
+## 17.0.128 alpha 2023-06-22
+
+*  (#9061)
+* docs(windows): add more steps for clarity (#9063)
+
+## 17.0.127 alpha 2023-06-21
+
+* feat(core): implementation of non-regex components of tran (#9019)
+* chore: enable common ci for web (#9047)
+
 ## 17.0.126 alpha 2023-06-19
 
 * chore(mac): move from altool to notarytool (#9010)
