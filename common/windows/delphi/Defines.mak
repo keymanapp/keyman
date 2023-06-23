@@ -177,9 +177,21 @@ WIXPATH="c:\program files (x86)\WiX Toolset v3.11\bin"
 WIXCANDLE=$(WIXPATH)\candle.exe -wx -nologo
 
 !IFDEF LINT
-WIXLIGHT=$(WIXPATH)\light.exe -wx -nologo
+WIXLIGHTLINT=
 !ELSE
 # we suppress ICE82 because it reports spurious errors with merge module keymanengine to do with duplicate sequence numbers.  Safely ignored.
+WIXLIGHTLINT= -sice:ICE82 -sice:ICE80
+!ENDIF
+
+!IFDEF DEBUG
+# for debug builds, we turn off compression because it is so hideously slow
+WIXLIGHTCOMPRESSION=-dcl:none
+!ELSE
+WIXLIGHTCOMPRESSION=
+!ENDIF
+
+WIXLIGHT=$(WIXPATH)\light.exe -wx -nologo $(WIXLIGHTLINT) $(WIXLIGHTCOMPRESSION)
+!ELSE
 WIXLIGHT=$(WIXPATH)\light.exe -wx -nologo -sice:ICE82 -sice:ICE80
 !ENDIF
 
