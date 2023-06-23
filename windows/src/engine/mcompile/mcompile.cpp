@@ -490,5 +490,5 @@ void LogError(PWSTR fmt, ...) {
 
 BOOL CopyKeyboard(PWSTR source, PWSTR target)
 {
-  return CopyFileW(source, target, FALSE /*overwrite*/);
+  return CopyFile(source, target, FALSE /* bFailIfExists */); // overwrite file if it exists
 }
