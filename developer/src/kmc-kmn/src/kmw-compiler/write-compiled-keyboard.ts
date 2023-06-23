@@ -53,10 +53,10 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
 
   let vMnemonic: number = 0;
   let /*s: string,*/ sRTL: string = "", sHelp: string = "''", sHelpFile: string = "",
-      sEmbedJS: string = "", sEmbedCSS: string = "";
+      sEmbedJSFilename: string = "", sEmbedCSSFilename: string = "";
   let sVisualKeyboardFilename: string = "", sFullName: string = "";
   let sBegin_NewContext: string = "", sBegin_PostKeystroke: string = "";
-  let sLayoutFile: string = "", sVKDictionary: string = "";
+  let sLayoutFilename: string = "", sVKDictionary: string = "";
   let linecomment: string;  // I3438
   // let HasRules: boolean;
   let sModifierBitmask: string;
@@ -84,10 +84,10 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
       sVisualKeyboardFilename = fsp.dpString;
     }
     else if (fsp.dpName == 'EmbedJS' || fsp.dwSystemID == KMX.KMXFile.TSS_KMW_EMBEDJS) {
-      sEmbedJS = fsp.dpString;
+      sEmbedJSFilename = fsp.dpString;
     }
     else if (fsp.dpName == 'EmbedCSS' || fsp.dwSystemID == KMX.KMXFile.TSS_KMW_EMBEDCSS) {   // I4368
-      sEmbedCSS = fsp.dpString;
+      sEmbedCSSFilename = fsp.dpString;
     }
     else if (fsp.dpName == 'RTL' || fsp.dwSystemID == KMX.KMXFile.TSS_KMW_RTL) {
       sRTL = fsp.dpString == '1' ? FTabStop+'this.KRTL=1;'+nl : '';   // I3681
@@ -99,7 +99,7 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
       sVKDictionary = fsp.dpString;
     }
     else if (fsp.dwSystemID == KMX.KMXFile.TSS_LAYOUTFILE) {  // I3483
-      sLayoutFile = fsp.dpString;
+      sLayoutFilename = fsp.dpString;
     }
     else if (fsp.dwSystemID == KMX.KMXFile.TSS_BEGIN_NEWCONTEXT) {
       sBegin_NewContext = fsp.dpString;
@@ -113,75 +113,52 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
 
   if (sHelpFile != '') {
     sHelp = '';
-    //TODO: load sHelpFile from file
-    /*with TStringList.Create do
-    try
-      try
-        LoadFromFile(ExtractFilePath(FInFile) + sHelpFile, TEncoding.UTF8);  // I3337
-        for n := 0 to Count - 1 do
-          sHelp := sHelp + Strings[n] + ' ';
-      except
-        on E:EFOpenError do
-        begin
-          ReportError(0, CWARN_HelpFileMissing, E.Message);  // I1971   // I4061
-          sHelp := '';
-        end;
-      end;
-    finally
-      Free;
-    end;*/
-
-    sHelp = requote(sHelp);
+    sHelpFile = callbacks.resolveFilename(kmnfile, sHelpFile);
+    try {
+      const data = callbacks.loadFile(sHelpFile);
+      sHelp = new TextDecoder().decode(data).replace(/[\r\n]/g, ' ');
+      sHelp = requote(sHelp);
+    } catch(e) {
+      callbacks.reportMessage(KmwCompilerMessages.Warn_HelpFileMissing({filename: sHelpFile, e}));
+      sHelp = '';
+    }
   }
 
-  if (sEmbedJS != '') {
-    //TODO: load sEmbedJS from file
-    /*try
-      with TStringList.Create do
-      try
-        LoadFromFile(ExtractFilePath(FInFile) + sEmbedJS, TEncoding.UTF8);  // I3337
-        sEmbedJS := Text;
-      finally
-        Free;
-      end;
-    except
-      on E:EFOpenError do   // I3683
-      begin
-        ReportError(0, CWARN_EmbedJsFileMissing, E.Message);   // I4061
-        sEmbedJS := '';
-      end;
-    end;*/
+  let sEmbedJS = '';
+  if (sEmbedJSFilename != '') {
+    sEmbedJSFilename = callbacks.resolveFilename(kmnfile, sEmbedJSFilename);
+    try {
+      const data = callbacks.loadFile(sEmbedJSFilename);
+      sEmbedJS = new TextDecoder().decode(data);
+    } catch(e) {
+      callbacks.reportMessage(KmwCompilerMessages.Warn_EmbedJsFileMissing({filename: sEmbedJSFilename, e}));
+      sEmbedJS = '';
+    }
   }
 
-  if (sEmbedCSS != '') {   // I4368
-    //TODO: load sEmbedCSS from file
-    /*try
-      with TStringList.Create do
-      try
-        LoadFromFile(ExtractFilePath(FInFile) + sEmbedCSS, TEncoding.UTF8);  // I3337
-        sEmbedCSS := Text;
-      finally
-        Free;
-      end;
-    except
-      on E:EFOpenError do   // I3683
-      begin
-        ReportError(0, CWARN_EmbedJsFileMissing, E.Message);   // I4061
-        sEmbedCSS := '';
-      end;
-    end;*/
+  let sEmbedCSS = '';
+  if (sEmbedCSSFilename != '') {   // I4368
+    sEmbedCSSFilename = callbacks.resolveFilename(kmnfile, sEmbedCSSFilename);
+    try {
+      const data = callbacks.loadFile(sEmbedCSSFilename);
+      sEmbedCSS = new TextDecoder().decode(data);
+    } catch(e) {
+      // TODO(lowpri): rename error constant to Warn_EmbedFileMissing
+      callbacks.reportMessage(KmwCompilerMessages.Warn_EmbedJsFileMissing({filename: sEmbedCSSFilename, e}));
+      sEmbedCSS = '';
+    }
   }
 
-  if (sLayoutFile != '') {  // I3483
-    let path = callbacks.resolveFilename(kmnfile, sLayoutFile);
+  let sLayoutFile = '';
+  if (sLayoutFilename != '') {  // I3483
+    sLayoutFilename = callbacks.resolveFilename(kmnfile, sLayoutFilename);
 
-    let result = ValidateLayoutFile(keyboard, options.saveDebug, path, sVKDictionary, displayMap);
+    let result = ValidateLayoutFile(keyboard, options.saveDebug, sLayoutFilename, sVKDictionary, displayMap);
     if(!result.result) {
       sLayoutFile = '';
-      callbacks.reportMessage(KmwCompilerMessages.Error_TouchLayoutFileInvalid());
+      callbacks.reportMessage(KmwCompilerMessages.Error_TouchLayoutFileInvalid({filename:sLayoutFilename}));
       return null;
     } else {
-      // TODO: reusing the same variable here is ugly
       sLayoutFile = result.output;
     }
   }
