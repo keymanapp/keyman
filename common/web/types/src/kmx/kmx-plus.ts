@@ -2,7 +2,7 @@ import { constants } from '@keymanapp/ldml-keyboard-constants';
 import * as r from 'restructure';
 import { ElementString } from './element-string.js';
 import { ListItem } from './string-list.js';
-import { unescapeString } from '../util/util.js';
+import { isOneChar, toOneChar, unescapeString } from '../util/util.js';
 import { KMXFile } from './kmx.js';
 import { UnicodeSetParser, UnicodeSet } from '@keymanapp/common-types';
 import { VariableParser } from '../ldml-keyboard/pattern-parser.js';
@@ -111,11 +111,6 @@ export class StrsItem {
     return 0;
   }
 
-  /** True if this string *could* be a UTF-32 single char */
-  static isOneChar(value: string) : boolean {
-    return (value.split('').length) == 1;
-  }
-
   get isOneChar() {
     return this.char !== undefined;
   }
@@ -126,10 +121,10 @@ export class StrsItem {
  */
 export class CharStrsItem extends StrsItem {
   constructor(value: string) {
-    if (!StrsItem.isOneChar(value)) {
+    if (!isOneChar(value)) {
       throw RangeError(`not a 1-char string`);
     }
-    super(value, value.charCodeAt(0));
+    super(value, toOneChar(value));
   }
 };
 
@@ -161,7 +156,7 @@ export class Strs extends Section {
     }
 
     // if it's a single char, don't push it into the list
-    if (singleOk && StrsItem.isOneChar(s)) {
+    if (singleOk && isOneChar(s)) {
       return new CharStrsItem(s);
     }
 
