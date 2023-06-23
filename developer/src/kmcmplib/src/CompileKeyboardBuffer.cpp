@@ -50,6 +50,7 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   fk->extra->kvksFilename = "";
   fk->extra->displayMapFilename = "";
   fk->extra->stores.clear();
+  fk->extra->groups.clear();
 /*	fk->szMessage[0] = 0;
   fk->szLanguageName[0] = 0;*/
   fk->dwBitmapSize = 0;
@@ -183,6 +184,14 @@ namespace kmcmp {
         (store->fIsCall ? STORETYPE_CALL : 0);
       extraStore.name = string_from_u16string(store->szName);
       fk->extra->stores.push_back(extraStore);
+    }
+
+    PFILE_GROUP group = fk->dpGroupArray;
+    for(int i = 0; i < fk->cxGroupArray; i++, group++) {
+      KMCMP_COMPILER_RESULT_EXTRA_GROUP extraGroup;
+      extraGroup.isReadOnly = group->fReadOnly;
+      extraGroup.name = string_from_u16string(group->szName);
+      fk->extra->groups.push_back(extraGroup);
     }
   }
 }

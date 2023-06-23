@@ -1,7 +1,7 @@
 import { TSentinelRecord, GetSuppChar, ExpandSentinel, incxstr, xstrlen, xstrlen_printing } from "./util.js";
 import { KMX } from "@keymanapp/common-types";
 
-import { callbacks, FCallFunctions, FFix183_LadderLength, FMnemonic, FTabStop, FUnreachableKeys, IsKeyboardVersion10OrLater, IsKeyboardVersion14OrLater, nl, options } from "./compiler-globals.js";
+import { callbacks, FCallFunctions, FFix183_LadderLength, FMnemonic, FTabStop, FUnreachableKeys, IsKeyboardVersion10OrLater, IsKeyboardVersion14OrLater, kmxResult, nl, options } from "./compiler-globals.js";
 import { KmwCompilerMessages } from "./messages.js";
 import { FormatModifierAsBitflags, RuleIsExcludedByPlatform } from "./write-compiled-keyboard.js";
 import { KMXCodeNames, SValidIdentifierCharSet, UnreachableKeyCodes, USEnglishShift, USEnglishUnshift, USEnglishValues } from "./constants.js";
@@ -620,8 +620,8 @@ begin*/
 }
 
 function isGroupReadOnly(fk: KMX.KEYBOARD, fgp: KMX.GROUP) {
-  // TODO: export group + store metadata in debug store, use that
-  return false;
+  const index = fk.groups.indexOf(fgp);
+  return kmxResult.extra.groups[index].isReadOnly;
 }
 
 function CallFunctionName(s: string): string {
