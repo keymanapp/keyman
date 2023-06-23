@@ -1,22 +1,19 @@
-import { CompilerCallbacks, VisualKeyboard, LDMLKeyboard, TouchLayoutFileWriter } from "@keymanapp/common-types";
-import { CompilerOptions } from "./compiler-options.js";
+import { CompilerCallbacks, VisualKeyboard, LDMLKeyboard, TouchLayoutFileWriter, KeymanFileTypes } from "@keymanapp/common-types";
+import { LdmlCompilerOptions } from "./ldml-compiler-options.js";
 import { TouchLayoutCompiler } from "./touch-layout-compiler.js";
 import { LdmlKeyboardVisualKeyboardCompiler } from "./visual-keyboard-compiler.js";
 
 const MINIMUM_KMW_VERSION = '16.0';
 
-export interface LdmlKeyboardKeymanWebCompilerOptions extends CompilerOptions {
-};
-
 export class LdmlKeyboardKeymanWebCompiler {
-  private readonly options: LdmlKeyboardKeymanWebCompilerOptions;
+  private readonly options: LdmlCompilerOptions;
   private readonly nl: string;
   private readonly tab: string;
 
-  constructor(private callbacks: CompilerCallbacks, options?: LdmlKeyboardKeymanWebCompilerOptions) {
+  constructor(private callbacks: CompilerCallbacks, options?: LdmlCompilerOptions) {
     this.options = { ...options };
-    this.nl = this.options.debug ? "\n" : '';
-    this.tab = this.options.debug ? "  " : '';
+    this.nl = this.options.saveDebug ? "\n" : '';
+    this.tab = this.options.saveDebug ? "  " : '';
   }
 
   public compileVisualKeyboard(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile) {
@@ -25,7 +22,7 @@ export class LdmlKeyboardKeymanWebCompiler {
     const vk: VisualKeyboard.VisualKeyboard = vkc.compile(source);
 
     let result =
-      `{F: '${vk.header.unicodeFont.size}pt ${JSON.stringify(vk.header.unicodeFont.name)}', `+
+      `{F: ' 1em ${JSON.stringify(vk.header.unicodeFont.name)}', `+
       `K102: ${vk.header.flags & VisualKeyboard.VisualKeyboardHeaderFlags.kvkh102 ? 1 : 0}};${nl}` + // TODO-LDML: escape ' and " in font name correctly
       `${tab}this.KV.KLS={${nl}` +
       `${tab}${tab}TODO_LDML: ${vk.keys.length}${nl}` +
@@ -38,12 +35,12 @@ export class LdmlKeyboardKeymanWebCompiler {
   public compileTouchLayout(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile) {
     const tlcompiler = new TouchLayoutCompiler();
     const layout = tlcompiler.compileToJavascript(source);
-    const writer = new TouchLayoutFileWriter({formatted: this.options.debug});
+    const writer = new TouchLayoutFileWriter({formatted: this.options.saveDebug});
     return writer.compile(layout);
   }
 
   private cleanName(name: string): string {
-    let result = this.callbacks.path.basename(name, '.xml');
+    let result = this.callbacks.path.basename(name, KeymanFileTypes.Source.LdmlKeyboard);
     if(!result) {
       throw new Error(`Invalid file name ${name}`);
     }

@@ -1,15 +1,15 @@
 import * as path from 'path';
-import { BuildActivity, BuildActivityOptions } from './BuildActivity.js';
-import { KmnCompiler } from '@keymanapp/kmc-kmn';
 import { platform } from 'os';
-import { CompilerCallbacks } from '@keymanapp/common-types';
+import { KmnCompiler } from '@keymanapp/kmc-kmn';
+import { CompilerOptions, CompilerCallbacks, KeymanFileTypes } from '@keymanapp/common-types';
+import { BuildActivity } from './BuildActivity.js';
 
 export class BuildKmnKeyboard extends BuildActivity {
   public get name(): string { return 'Keyman keyboard'; }
-  public get sourceExtension(): string { return '.kmn'; }
-  public get compiledExtension(): string { return '.kmx'; }
+  public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.KeymanKeyboard; }
+  public get compiledExtension(): KeymanFileTypes.Binary { return KeymanFileTypes.Binary.Keyboard; }
   public get description(): string { return 'Build a Keyman keyboard'; }
-  public async build(infile: string, callbacks: CompilerCallbacks, options: BuildActivityOptions): Promise<boolean> {
+  public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
     let compiler = new KmnCompiler();
     if(!await compiler.init(callbacks)) {
       return false;
@@ -22,14 +22,8 @@ export class BuildKmnKeyboard extends BuildActivity {
     outfile = getPosixAbsolutePath(outfile);
 
     // TODO: Currently this only builds .kmn->.kmx, and targeting .js is as-yet unsupported
-    // TODO: Support additional options compilerWarningsAsErrors, warnDeprecatedCode
-    return compiler.run(infile, outfile,
-    {
-      saveDebug: options.debug,
-      shouldAddCompilerVersion: options.compilerVersion,
-      warnDeprecatedCode: options.warnDeprecatedCode,
-      compilerWarningsAsErrors: options.compilerWarningsAsErrors,
-    });
+    // TODO: outfile should be set in options only?
+    return compiler.run(infile, outfile, options);
   }
 }
 

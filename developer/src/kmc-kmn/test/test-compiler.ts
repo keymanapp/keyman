@@ -78,8 +78,8 @@ describe('Compiler class', function() {
   it('should compile a keyboard with visual keyboard', async function() {
     const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
-    assert(await compiler.init(callbacks));
-    assert(compiler.verifyInitialized());
+    assert.isTrue(await compiler.init(callbacks));
+    assert.isTrue(compiler.verifyInitialized());
 
     const fixtureDir = keyboardsDir + 'caps_lock_layer_3620/'
     const infile = fixtureDir + 'source/caps_lock_layer_3620.kmn';
@@ -89,10 +89,10 @@ describe('Compiler class', function() {
     const resultingKmxfile = __dirname + '/caps_lock_layer_3620.kmx';
     const resultingKvkfile = __dirname + '/caps_lock_layer_3620.kvk';
 
-    assert(compiler.run(infile, resultingKmxfile, {saveDebug: true, shouldAddCompilerVersion: false}));
+    assert.isTrue(compiler.run(infile, resultingKmxfile, {saveDebug: true, shouldAddCompilerVersion: false}));
 
-    assert(fs.existsSync(resultingKmxfile));
-    assert(fs.existsSync(resultingKvkfile));
+    assert.isTrue(fs.existsSync(resultingKmxfile));
+    assert.isTrue(fs.existsSync(resultingKvkfile));
 
     const kmxData = fs.readFileSync(resultingKmxfile);
     const kmxFixtureData = fs.readFileSync(kmxFixture);

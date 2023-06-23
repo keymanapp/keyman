@@ -39,6 +39,7 @@
   "dependencies": {
     "@keymanapp/keyman-version": "*",
     "@keymanapp/common-types": "*",
+    "@keymanapp/kmc-analyze": "*",
     "@keymanapp/kmc-kmn": "*",
     "@keymanapp/kmc-ldml": "*",
     "@keymanapp/kmc-model": "*",

@@ -274,6 +274,8 @@ begin
             try
               with TKPInstallVisualKeyboard.Create(Context) do
               try
+                // TODO: we should probably try and do this by the keyboard install instead so
+                // that we can deprecate the associatedKeyboard field in .kvk
                 Execute(FTempOutPath + inf.Files[i].FileName, '');
               finally
                 Free;

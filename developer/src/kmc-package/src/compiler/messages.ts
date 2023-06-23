@@ -39,8 +39,8 @@ export class CompilerMessages {
     `Keyboard ${o.id} was listed in <Keyboards> but a corresponding .kmx file was not found in <Files>`);
   static ERROR_KeyboardContentFileNotFound = SevError | 0x0008;
 
-  static Error_KeyboardFileNotValid = (o:{filename:string}) => m(this.ERROR_KeyboardFileNotValid,
-    `Keyboard file ${o.filename} is not a valid .kmx file`);
+  static Error_KeyboardFileNotValid = (o:{filename:string, e:any}) => m(this.ERROR_KeyboardFileNotValid,
+    `Keyboard file ${o.filename} is not a valid .kmx file: ${(o.e ?? 'unknown error').toString()}`);
   static ERROR_KeyboardFileNotValid = SevError | 0x0009;
 
   static Info_KeyboardFileHasNoKeyboardVersion = (o:{filename:string}) => m(this.INFO_KeyboardFileHasNoKeyboardVersion,

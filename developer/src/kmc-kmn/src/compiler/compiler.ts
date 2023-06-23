@@ -6,34 +6,49 @@ TODO: implement additional interfaces:
 */
 
 // TODO: rename wasm-host?
-import { UnicodeSetParser, UnicodeSet } from '@keymanapp/common-types';
-import { CompilerCallbacks, CompilerEvent, KvkFileWriter, KvksFileReader } from '@keymanapp/common-types';
+import { UnicodeSetParser, UnicodeSet, Osk } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerEvent, CompilerOptions, KeymanFileTypes, KvkFileWriter, KvksFileReader } from '@keymanapp/common-types';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
 import { CompilerMessages, mapErrorFromKmcmplib } from './messages.js';
+import { WriteCompiledKeyboard } from '../kmw-compiler/write-compiled-keyboard.js';
 
 export interface CompilerResultFile {
   filename: string;
   data: Uint8Array;
 };
 
+export const COMPILETARGETS_KMX =   0x01;
+export const COMPILETARGETS_JS =    0x02;
+export const COMPILETARGETS__MASK = 0x03;
+
+/**
+ * Data in CompilerResultExtra comes from kmcmplib
+ */
+export interface CompilerResultExtra {
+  /**
+   * A bitmask, consisting of COMPILETARGETS_KMX and/or COMPILETARGETS_JS
+   */
+  targets: number;
+  kvksFilename?: string;
+  displayMapFilename?: string;
+};
+
 export interface CompilerResult {
   kmx?: CompilerResultFile;
   kvk?: CompilerResultFile;
   js?: CompilerResultFile;
+  extra: CompilerResultExtra;
+  displayMap?: Osk.PuaMap;
 };
 
-export interface CompilerOptions {
-  shouldAddCompilerVersion?: boolean;
-  saveDebug?: boolean;
-  compilerWarningsAsErrors?: boolean;
-	warnDeprecatedCode?: boolean;
+export interface KmnCompilerOptions extends CompilerOptions {
 };
 
-const baseOptions: CompilerOptions = {
+const baseOptions: KmnCompilerOptions = {
   shouldAddCompilerVersion: true,
   saveDebug: true,
   compilerWarningsAsErrors: false,
-  warnDeprecatedCode: true
+  warnDeprecatedCode: true,
 };
 
 /**
@@ -46,8 +61,10 @@ let callbackProcIdentifier = 0;
 const
   callbackPrefix = 'kmnCompilerCallbacks_';
 
+let
+  Module: any;
+
 export class KmnCompiler implements UnicodeSetParser {
-  private Module: any;
   callbackID: string; // a unique numeric id added to globals with prefixed names
   callbacks: CompilerCallbacks;
 
@@ -58,15 +75,16 @@ export class KmnCompiler implements UnicodeSetParser {
 
   public async init(callbacks: CompilerCallbacks): Promise<boolean> {
     this.callbacks = callbacks;
-    if(!this.Module) {
+    if(!Module) {
       try {
-        this.Module = await loadWasmHost();
+        Module = await loadWasmHost();
       } catch(e: any) {
         /* c8 ignore next 3 */
         this.callbacks.reportMessage(CompilerMessages.Fatal_MissingWasmModule({e}));
         return false;
       }
     }
+
     return this.verifyInitialized();
   }
 
@@ -79,7 +97,7 @@ export class KmnCompiler implements UnicodeSetParser {
       // Can't report a message here.
       throw Error('Must call Compiler.init(callbacks) before proceeding');
     }
-    if(!this.Module) {
+    if(!Module) {
       /* c8 ignore next 4 */
       // fail if wasm not loaded or function not found
       this.callbacks.reportMessage(CompilerMessages.Fatal_MissingWasmModule({}));
@@ -88,7 +106,8 @@ export class KmnCompiler implements UnicodeSetParser {
     return true;
   }
 
-  public run(infile: string, outfile: string, options?: CompilerOptions): boolean {
+  // TODO: use outFile from options
+  public run(infile: string, outfile: string, options?: KmnCompilerOptions): boolean {
     let result = this.runCompiler(infile, outfile, options);
     if(result) {
       if(result.kmx) {
@@ -139,12 +158,12 @@ export class KmnCompiler implements UnicodeSetParser {
       throw new Error(`loadFileCallback: second call, expected file size ${bufferSize} == ${data.byteLength}`);
     }
 
-    this.Module.HEAP8.set(data, buffer);
+    Module.HEAP8.set(data, buffer);
 
     return 1;
   }
 
-  public runCompiler(infile: string, outfile: string, options: CompilerOptions): CompilerResult {
+  public runCompiler(infile: string, outfile: string, options: KmnCompilerOptions): CompilerResult {
     if(!this.verifyInitialized()) {
       /* c8 ignore next 2 */
       return null;
@@ -157,33 +176,80 @@ export class KmnCompiler implements UnicodeSetParser {
       loadFile: this.loadFileCallback
     };
 
-    let result: CompilerResult = {};
-    let wasm_interface = new this.Module.CompilerInterface();
-    let wasm_options = new this.Module.CompilerOptions();
+    let wasm_interface = new Module.CompilerInterface();
+    let wasm_options = new Module.CompilerOptions();
     let wasm_result = null;
     try {
       wasm_options.saveDebug = options.saveDebug;
       wasm_options.compilerWarningsAsErrors = options.compilerWarningsAsErrors;
       wasm_options.warnDeprecatedCode = options.warnDeprecatedCode;
       wasm_options.shouldAddCompilerVersion = options.shouldAddCompilerVersion;
-      wasm_options.target = 0; //CKF_KEYMAN; TODO, support KMW
+      wasm_options.target = 0; // CKF_KEYMAN; TODO use COMPILETARGETS_KMX
       wasm_interface.callbacksKey = this.callbackID; // key of object on globalThis
-      wasm_result = this.Module.kmcmp_compile(infile, wasm_options, wasm_interface);
+      wasm_result = Module.kmcmp_compile(infile, wasm_options, wasm_interface);
       if(!wasm_result.result) {
         return null;
       }
 
-      if(wasm_result.kvksFilename) {
-        result.kvk = this.runKvkCompiler(wasm_result.kvksFilename, infile, outfile);
+      const result: CompilerResult = {
+        // We cannot Object.assign or {...} on a wasm-defined object, so...
+        extra: {
+          targets: wasm_result.extra.targets,
+          displayMapFilename: wasm_result.extra.displayMapFilename,
+          kvksFilename: wasm_result.extra.kvksFilename,
+        },
+        displayMap: null
+      };
+
+      if(result.extra.targets & COMPILETARGETS_KMX) {
+        result.kmx = {
+          filename: outfile,
+          data: new Uint8Array(Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
+        };
+      }
+
+      //
+      // Visual Keyboard transform
+      //
+
+
+      if(result.extra.displayMapFilename) {
+        result.displayMap = this.loadDisplayMapping(infile, result.extra.displayMapFilename)
+      }
+
+      if(result.extra.kvksFilename) {
+        result.kvk = this.runKvkCompiler(result.extra.kvksFilename, infile, outfile, result.displayMap);
         if(!result.kvk) {
           return null;
         }
       }
 
-      result.kmx = {
-        filename: outfile,
-        data: new Uint8Array(this.Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
-      };
+      //
+      // KeymanWeb compiler
+      //
+
+      if(wasm_result.extra.targets & COMPILETARGETS_JS) {
+        wasm_options.target = 1; // CKF_KEYMANWEB TODO use COMPILETARGETS_JS
+        wasm_result = Module.kmcmp_compile(infile, wasm_options, wasm_interface);
+        if(!wasm_result.result) {
+          return null;
+        }
+        const kmw_result: CompilerResult = {
+          extra: {
+            // We cannot Object.assign or {...} on a wasm-defined object, so...
+            targets: wasm_result.extra.targets,
+            displayMapFilename: wasm_result.extra.displayMapFilename,
+            kvksFilename: wasm_result.extra.kvksFilename,
+          },
+          displayMap: result.displayMap // we can safely re-use the kmx compile displayMap
+        };
+
+        let web_kmx = new Uint8Array(Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
+        result.js = this.runWebCompiler(infile, outfile, web_kmx, result.kvk?.data, kmw_result, options);
+        if(!result.js) {
+          return null;
+        }
+      }
 
       return result;
     } catch(e) {
@@ -200,7 +266,31 @@ export class KmnCompiler implements UnicodeSetParser {
     }
   }
 
-  private runKvkCompiler(kvksFilename: string, kmnFilename: string, kmxFilename: string) {
+  private runWebCompiler(
+    kmnFilename: string,
+    kmxFilename: string,
+    web_kmx: Uint8Array,
+    kvk: Uint8Array,
+    kmxResult: CompilerResult,
+    options: CompilerOptions
+  ): CompilerResultFile {
+    const data = WriteCompiledKeyboard(this.callbacks, kmnFilename, web_kmx, kvk, kmxResult, options.saveDebug);
+    if(!data) {
+      return null;
+    }
+
+    return {
+      filename: this.callbacks.path.join(this.callbacks.path.dirname(kmxFilename),
+      this.keyboardIdFromKmnFilename(kmnFilename) + KeymanFileTypes.Binary.WebKeyboard),
+      data: new TextEncoder().encode(data)
+    };
+  }
+
+  private keyboardIdFromKmnFilename(kmnFilename: string): string {
+    return this.callbacks.path.basename(kmnFilename, KeymanFileTypes.Source.KeymanKeyboard);
+  }
+
+  private runKvkCompiler(kvksFilename: string, kmnFilename: string, kmxFilename: string, displayMap?: Osk.PuaMap) {
     // The compiler detected a .kvks file, which needs to be captured
     let reader = new KvksFileReader();
     kvksFilename = this.callbacks.resolveFilename(kmnFilename, kvksFilename);
@@ -218,11 +308,37 @@ export class KmnCompiler implements UnicodeSetParser {
     for(let invalidVkey of invalidVkeys) {
       this.callbacks.reportMessage(CompilerMessages.Warn_InvalidVkeyInKvksFile({filename, invalidVkey}));
     }
+
+    // Make sure that we maintain the correspondence between source keyboard and
+    // .kvk. Appears to be used currently only by Windows package installer.
+    vk.header.associatedKeyboard = this.keyboardIdFromKmnFilename(kmnFilename);
+
+    if(displayMap) {
+      // Remap using the osk-char-use-rewriter
+      Osk.remapVisualKeyboard(vk, displayMap);
+    }
+
     let writer = new KvkFileWriter();
     return {
-      filename: this.callbacks.path.join(this.callbacks.path.dirname(kmxFilename), this.callbacks.path.basename(kvksFilename, '.kvks') + '.kvk'),
+      filename: this.callbacks.path.join(this.callbacks.path.dirname(kmxFilename),
+        this.callbacks.path.basename(kvksFilename, KeymanFileTypes.Source.VisualKeyboard) + KeymanFileTypes.Binary.VisualKeyboard),
       data: writer.write(vk)
     };
+  }
+
+  private loadDisplayMapping(kmnFilename:string, displayMapFilename: string): Osk.PuaMap {
+    // Remap using the osk-char-use-rewriter
+    displayMapFilename = this.callbacks.resolveFilename(kmnFilename, displayMapFilename);
+    try {
+      // Expected file format: displaymap.schema.json
+      const data = this.callbacks.loadFile(displayMapFilename);
+      const schema = this.callbacks.loadSchema('displaymap');
+      const mapping = JSON.parse(new TextDecoder().decode(data));
+      return Osk.parseMapping(mapping, schema);
+    } catch(e) {
+      this.callbacks.reportMessage(CompilerMessages.Error_InvalidDisplayMapFile({filename: displayMapFilename, e}));
+      return null;
+    }
   }
 
   /**
@@ -241,15 +357,15 @@ export class KmnCompiler implements UnicodeSetParser {
       /* c8 ignore next 2 */
       bufferSize = 100; // TODO-LDML: Preflight mode? Reuse buffer?
     }
-    const buf = this.Module.asm.malloc(bufferSize * 2 * this.Module.HEAPU32.BYTES_PER_ELEMENT);
+    const buf = Module.asm.malloc(bufferSize * 2 * Module.HEAPU32.BYTES_PER_ELEMENT);
     // TODO-LDML: Catch OOM
-    const rc = this.Module.kmcmp_parseUnicodeSet(pattern, buf, bufferSize);
+    const rc = Module.kmcmp_parseUnicodeSet(pattern, buf, bufferSize);
     if (rc >= 0) {
       const ranges = [];
-      const startu = (buf / this.Module.HEAPU32.BYTES_PER_ELEMENT);
+      const startu = (buf / Module.HEAPU32.BYTES_PER_ELEMENT);
       for (let i = 0; i < rc; i++) {
-        const low = this.Module.HEAPU32[startu + (i * 2) + 0];
-        const high = this.Module.HEAPU32[startu + (i * 2) + 1];
+        const low = Module.HEAPU32[startu + (i * 2) + 0];
+        const high = Module.HEAPU32[startu + (i * 2) + 1];
         ranges.push([low, high]);
       }
       // TODO-LDML: no free??

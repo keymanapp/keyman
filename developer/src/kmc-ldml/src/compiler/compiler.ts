@@ -1,5 +1,5 @@
-import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus, CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
-import { CompilerOptions } from './compiler-options.js';
+import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus, CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile, defaultCompilerOptions } from '@keymanapp/common-types';
+import { LdmlCompilerOptions } from './ldml-compiler-options.js';
 import { CompilerMessages } from './messages.js';
 import { BkspCompiler, TranCompiler } from './tran.js';
 import { DispCompiler } from './disp.js';
@@ -41,12 +41,11 @@ export const SECTION_COMPILERS = [
 
 export class LdmlKeyboardCompiler {
   private readonly callbacks: CompilerCallbacks;
-  private readonly options: CompilerOptions;
+  private readonly options: LdmlCompilerOptions;
 
-  constructor (callbacks: CompilerCallbacks, options: CompilerOptions) {
+  constructor (callbacks: CompilerCallbacks, options: LdmlCompilerOptions) {
     this.options = {
-      debug: false,
-      addCompilerVersion: true,
+      ...defaultCompilerOptions,
       ...options
     };
     this.callbacks = callbacks;

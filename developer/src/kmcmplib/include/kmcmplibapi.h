@@ -18,6 +18,7 @@
 
 /* Compile target */
 
+// TODO: deprecate these
 #define CKF_KEYMAN    0
 #define CKF_KEYMANWEB 1
 
@@ -29,10 +30,21 @@ struct KMCMP_COMPILER_OPTIONS {
   int target;                     // CKF_KEYMAN, CKF_KEYMANWEB
 };
 
+#define COMPILETARGETS_KMX     0x01
+#define COMPILETARGETS_JS      0x02
+#define COMPILETARGETS__MASK   0x03
+
+struct KMCMP_COMPILER_RESULT_EXTRA {
+  int targets; /// COMPILETARGETS__MASK = COMPILETARGETS_KMX | COMPILETARGETS_JS
+  std::string kmnFilename;
+  std::string kvksFilename;
+  std::string displayMapFilename;
+};
+
 struct KMCMP_COMPILER_RESULT {
   void* kmx;
   size_t kmxSize;
-  std::string kvksFilename;
+  struct KMCMP_COMPILER_RESULT_EXTRA extra;
 };
 
 /**
