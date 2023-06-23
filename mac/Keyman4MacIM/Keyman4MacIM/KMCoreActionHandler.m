@@ -30,8 +30,7 @@ typedef enum {BackspacesOnly,
 } ClientTextOutputPattern;
 
 @property (readonly) NSArray *actions;
-@property (readonly) NSEvent *event;
-@property (readonly) id client;
+@property (readonly) unsigned short keyCode;        /* device-independent key number */
 @property (readonly) KMContext *context;
 @property (readonly) ClientTextOutputPattern pattern;
 @property int backspaceCount;
@@ -41,12 +40,11 @@ typedef enum {BackspacesOnly,
 
 @implementation KMCoreActionHandler
 
--(instancetype)initWithActions:(NSArray*)actions context: (KMContext *)context event: (NSEvent *)event client:(id) client  {
+-(instancetype)initWithActions:(NSArray*)actions context: (KMContext *)context keyCode: (unsigned short)keyCode  {
   self = [super init];
   if (self) {
     _actions = actions;
-    _event = event;
-    _client = client;
+    _keyCode = keyCode;
     _context = context;
     _backspaceCount = 0;
     _emitKeystroke = NO;
@@ -110,7 +108,7 @@ typedef enum {BackspacesOnly,
 
 -(BOOL)isSinglePassThroughBackspace {
   BOOL isPassThrough =
-  (self.event.keyCode == kVK_Delete)
+  (self.keyCode == kVK_Delete)
   && (self.pattern == BackspacesOnly)
   && (self.backspaceCount == 1);
   return isPassThrough;
@@ -223,97 +221,6 @@ typedef enum {BackspacesOnly,
   return output;
 }
 
--(BOOL)applyCharacterActions:(int)replacementCount  {
-  NSString *outputText = [self collectOutputText];
-  NSRange selectionRange = [self.client selectedRange];
-  NSRange contextRange = NSMakeRange(0, selectionRange.location);
-  NSAttributedString *context = [self.client attributedSubstringFromRange:contextRange];
-  NSLog(@"***SGS applyCharacterActions, replacementCount=%d, selectionRange.location=%lu", replacementCount, selectionRange.location);
-
-  NSRange replacementRange;
-  if (replacementCount > 0) {
-    replacementRange = NSMakeRange(selectionRange.location-replacementCount, replacementCount);
-  } else {
-    replacementRange = NSMakeRange(NSNotFound, NSNotFound);
-  }
-  NSLog(@"***SGS applyCharacterActions, insertText %@ in replacementRange.start=%lu, replacementRange.length=%lu", outputText, (unsigned long)replacementRange.location, (unsigned long)replacementRange.length);
-  
-  [self.client insertText:outputText replacementRange:replacementRange];
-  return YES;
-}
-
--(BOOL)applyInvalidateContextAction:(CoreAction*)action event: (NSEvent *)event client:(id) client  {
-  NSLog(@"applyInvalidateContextAction for action %@", action.content);
-  return NO;
-}
-
--(BOOL)applyEmitKeystrokeAction:(CoreAction*)action event: (NSEvent *)event client:(id) client  {
-  NSLog(@"applyEmitKeystrokeAction for event with keycode: %hu", event.keyCode);
-    
-  // For other events that the Keyman engine does not have rules, just apply context changes
-  // and let client handle the event
-  NSString* charactersToAppend = nil;
-  BOOL updateEngineContext = YES;
-  unsigned short keyCode = event.keyCode;
-  switch (keyCode) {
-      case kVK_Delete:
-          NSLog(@"***SGS applyEmitKeystrokeAction kVK_Return");
-          // [self processUnhandledDeleteBack: sender updateEngineContext: &updateEngineContext];
-          //[self.keySender sendBackspace:1];
-          break;
-
-      case kVK_LeftArrow:
-      case kVK_RightArrow:
-      case kVK_UpArrow:
-      case kVK_DownArrow:
-      case kVK_Home:
-      case kVK_End:
-      case kVK_PageUp:
-      case kVK_PageDown:
-          //_contextOutOfDate = YES;
-          //updateEngineContext = NO;
-          break;
-
-      case kVK_Return:
-      case kVK_ANSI_KeypadEnter:
-          NSLog(@"***SGS applyEmitKeystrokeAction kVK_Return not handled");
-          //charactersToAppend = @"\n";
-          //[client insertText:charactersToAppend replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
-         break;
-
-      default:
-          {
-              // NOTE: Although ch is usually the same as keyCode, when the option key is depressed (and
-              // perhaps in some other cases) it may not be (keyCode can be 0). Likewise, the option key
-              // can generate more than one character in event.characters.
-              unichar ch = [event.characters characterAtIndex:0];
-              if (keyCode < 0x33 || (ch >= 0x2A && ch <= 0x39)) { // Main keys, Numpad char range, normal punctuation
-                  charactersToAppend = event.characters;
-              }
-              else {
-                  // Other keys
-              }
-          }
-          break;
-  }
-  /*
-  if (charactersToAppend != nil) {
-      if ([self.AppDelegate debugMode]) {
-          NSLog(@"Adding \"%@\" to context buffer", charactersToAppend);
-      }
-      [self.contextBuffer appendString:charactersToAppend];
-      if (_legacyMode) {
-          _previousSelRange.location += charactersToAppend.length;
-          _previousSelRange.length = 0;
-      }
-  }
-
-  if (updateEngineContext) {
-      [self.kme setContextBuffer:self.contextBuffer];
-  }
-   */
-  return NO;
-}
 @end
 
 /**

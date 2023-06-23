@@ -38,7 +38,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface KMCoreActionHandler : NSObject
+-(instancetype)initWithActions:(NSArray*)actions context: (KMContext *)context keyCode: (unsigned short)keyCode;
+/*
 -(instancetype)initWithActions:(NSArray*)actions context: (KMContext *)context event: (NSEvent *)event client:(id) client;
+ */
 -(KMActionHandlerResult*)handleActions;
 @end
 

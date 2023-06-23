@@ -1072,7 +1072,7 @@ NSRange _previousSelRange;
       [_cachedContext.currentContext lengthOfBytesUsingEncoding:NSUTF32StringEncoding] / 4;
 
   
-  KMCoreActionHandler *actionHandler = [[KMCoreActionHandler alloc] initWithActions:(NSArray*)actions context: self.cachedContext event: (NSEvent *)event client:(id) client];
+  KMCoreActionHandler *actionHandler = [[KMCoreActionHandler alloc] initWithActions:(NSArray*)actions context: self.cachedContext keyCode: event.keyCode];
   KMActionHandlerResult *result = actionHandler.handleActions;
 
   for (KMActionOperation *operation in [result.operations objectEnumerator]) {
