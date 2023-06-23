@@ -359,7 +359,7 @@ COMP_KMXPLUS_ELEM::getElementList(KMX_DWORD elementNumber, KMX_DWORD &length) co
 
 std::u16string
 COMP_KMXPLUS_ELEM_ELEMENT::get_string() const {
-  assert(!(flags & LDML_ELEM_FLAGS_UNICODE_SET)); // should not be called.
+  assert((flags & LDML_ELEM_FLAGS_TYPE) == LDML_ELEM_FLAGS_TYPE_CHAR); // should only be called on char
   char16_single buf;
   const int len = Utf32CharToUtf16(element, buf);
   return std::u16string(buf.ch, len);
