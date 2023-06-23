@@ -79,6 +79,9 @@ WASM_COMPILER_RESULT kmcmp_wasm_compile(std::string pszInfile, const KMCMP_COMPI
   return r;
 }
 
+// This little bit of magic gives us implicit bindings for any `std::vector`,
+// so long as we bind `emscripten::value_object<T>`, and comes from:
+// https://github.com/emscripten-core/emscripten/issues/11070#issuecomment-717675128
 namespace emscripten {
 namespace internal {
 

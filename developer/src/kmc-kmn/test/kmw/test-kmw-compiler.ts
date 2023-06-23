@@ -52,10 +52,8 @@ describe('KeymanWeb Compiler', function() {
 
   it('should translate every "character style" key correctly', async function() {
     //
-    // This is enough to verify that the option store is set appropriately with
-    // KLOAD because the fixture has that code present:
-    //
-    //    this.s_foo_6=KeymanWeb.KLOAD(this.KI,"foo","0");
+    // This is enough to verify that every character style key is encoded in the
+    // same way as the fixture.
     //
     run_test_keyboard(kmnCompiler, 'test_keychars');
   });
