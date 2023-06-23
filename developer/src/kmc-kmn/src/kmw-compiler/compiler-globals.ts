@@ -8,6 +8,9 @@ export let FMnemonic: boolean;
 export let options: CompilerOptions;
 export let callbacks: CompilerCallbacks;
 export let kmnfile: string;
+export let FUnreachableKeys: KMX.KEY[];
+export let FCallFunctions: string[];
+export let FFix183_LadderLength: number;
 
 export function setupGlobals(_callbacks: CompilerCallbacks, _options: CompilerOptions, _tab: string, _nl: string, _keyboard: KMX.KEYBOARD, _kmnfile: string) {
   callbacks = _callbacks;
@@ -16,6 +19,9 @@ export function setupGlobals(_callbacks: CompilerCallbacks, _options: CompilerOp
   nl = _nl;
   fk = _keyboard;
   kmnfile = _kmnfile;
+  FUnreachableKeys = [];
+  FCallFunctions = [];
+  FFix183_LadderLength = 100; // TODO: option
 }
 
 export function IsKeyboardVersion10OrLater(): boolean {
