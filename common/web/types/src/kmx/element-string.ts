@@ -56,11 +56,17 @@ export class ElementString extends Array<ElemElement> {
 
     for(let i = 0; i < items.length; i++) {
       let elem = new ElemElement();
-      elem.value = strs.allocString(items[i]);
-      // TODO-LDML: UnicodeSet
+      elem.value = strs.allocString(items[i], true);
+      let typeFlag = 0;
+      if (elem.value.isOneChar) {
+        typeFlag |= constants.elem_flags_type_char;
+      } else {
+        typeFlag |= constants.elem_flags_type_str;
+      } // TODO-LDML: UnicodeSet
       elem.order = orders.length ? parseInt(orders[i], 10) : 0;
       elem.tertiary = tertiaries.length ? parseInt(tertiaries[i], 10) : 0;
       elem.flags = ElemElementFlags.none |
+        (ElemElementFlags.type & typeFlag) |
         (tertiary_bases?.[i] == '1' /* TODO-LDML: or 'true'? */ ? ElemElementFlags.tertiary_base : 0) |
         (prebases?.[i] == '1' /* TODO-LDML: or 'true'? */ ? ElemElementFlags.prebase : 0);
       this.push(elem);

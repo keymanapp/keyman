@@ -50,7 +50,6 @@ export function build_elem(source_elem: Elem, sect_strs: BUILDER_STRS): BUILDER_
     strings: [], // finalized below
   };
 
-  // TODO: consider padding
   result.strings = source_elem.strings.map(item => {
     let res: BUILDER_ELEM_STRING = {
       offset: 0, // finalized below
@@ -61,16 +60,9 @@ export function build_elem(source_elem: Elem, sect_strs: BUILDER_STRS): BUILDER_
 
     res.items = item.map(v => {
       let element = build_strs_index(sect_strs, v.value); // TODO-LDML: UnicodeSet
-      let typeFlag;
-      if (v.value.isOneChar) {
-        typeFlag = constants.elem_flags_type_char;
-      } else {
-        typeFlag = constants.elem_flags_type_str;
-      } // TODO-LDML: UnicodeSet
       return {
         element,
-        flags: typeFlag |
-              v.flags |                                                             //
+        flags: v.flags |                                                             //
               ((v.order ?? 0) << constants.elem_flags_order_bitshift) |             // -128 to +127; used only by reorder element values
               ((v.tertiary ?? 0) << constants.elem_flags_tertiary_bitshift),        // -128 to +127; used only by reorder element values
         _value: v.value.value

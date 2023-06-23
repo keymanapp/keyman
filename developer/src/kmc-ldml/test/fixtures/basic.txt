@@ -213,25 +213,25 @@ block(elem)                         # struct COMP_KMXPLUS_ELEM {
 block(elemNull)
 
 block(elemSet)
-  index(strNull,strA,2)    #    KMX_DWORD element;
-  01 00 00 00              #    KMX_DWORD flags;
-  index(strNull,strB,2)    #    KMX_DWORD element;
-  01 00 00 00              #    KMX_DWORD flags;
-  index(strNull,strC,2)    #    KMX_DWORD element;
-  01 00 00 00              #    KMX_DWORD flags;
+  61 00 00 00              #    KMX_DWORD element; 'a'
+  00 00 00 00              #    KMX_DWORD flags;
+  62 00 00 00              #    KMX_DWORD element; 'b'
+  00 00 00 00              #    KMX_DWORD flags;
+  63 00 00 00              #    KMX_DWORD element; 'c'
+  00 00 00 00              #    KMX_DWORD flags;
 
 block(elemOrdrFrom)
   # <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
-  index(strNull,strElemOrdrFrom1,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
-  01 00 0A 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
-  index(strNull,strElemOrdrFrom2,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
-  01 00 37 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
-  index(strNull,strElemOrdrFrom3,2)  #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
-  01 00 0A 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
+  60 1a 00 00                        #    KMX_DWORD element;   '᩠'             // str: output string or UTF-32LE codepoint
+  00 00 0A 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
+  75 1a 00 00                        #    KMX_DWORD element;   '᩵'             // str: output string or UTF-32LE codepoint
+  00 00 37 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
+  45 1A 00 00                        #    KMX_DWORD element;   'ᩅ'          // str: output string or UTF-32LE codepoint
+  00 00 0A 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
 
 block(elemOrdrBefore)
-  index(strNull,strElemOrdrBefore,2) #    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
-  01 00 00 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
+  6b 1a 00 00                        #    KMX_DWORD element;   'ᩫ'              // str: output string or UTF-32LE codepoint
+  00 00 00 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
 
 block(endelem)
 
@@ -402,9 +402,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strA)   sizeof(strA,2)
   diff(strs,strSet)   sizeof(strSet,2)
   diff(strs,strSet2)   sizeof(strSet2,2)
-  diff(strs,strB)   sizeof(strB,2)
   diff(strs,strBase)   sizeof(strBase,2)
-  diff(strs,strC)   sizeof(strC,2)
   diff(strs,strElemBkspFrom2) sizeof(strElemBkspFrom2,2)
   diff(strs,strHmaqtugha) sizeof(strHmaqtugha,2)
   diff(strs,strLocale)     sizeof(strLocale,2)
@@ -417,10 +415,6 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strVus)   sizeof(strVus,2)
   diff(strs,strTranTo)          sizeof(strTranTo,2)
   diff(strs,strKeys)       sizeof(strKeys,2)
-  diff(strs,strElemOrdrFrom3)   sizeof(strElemOrdrFrom3,2)
-  diff(strs,strElemOrdrFrom1)   sizeof(strElemOrdrFrom1,2)
-  diff(strs,strElemOrdrBefore)  sizeof(strElemOrdrBefore,2)
-  diff(strs,strElemOrdrFrom2)   sizeof(strElemOrdrFrom2,2)
   diff(strs,strIndicator)  sizeof(strIndicator,2)
 
 
@@ -440,9 +434,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strSet)              61 00 20 00 62 00 20 00 63 00 block(x) 00 00               # 'a b c'
 #str #0A
   block(strSet2)             61 00 62 00 63 00 block(x) 00 00                           # 'abc'
-  block(strB)                62 00 block(x) 00 00                                       # 'b'
   block(strBase)             62 00 61 00 73 00 65 00 block(x) 00 00                     # 'base'
-  block(strC)                63 00 block(x) 00 00                                       # 'c'
   block(strElemBkspFrom2)    65 00 block(x) 00 00                                       # 'e'
   block(strHmaqtugha)        68 00 6d 00 61 00 71 00 74 00 75 00 67 00 68 00 61 00 block(x) 00 00   # 'hmaqtugha'
 #str #10
@@ -459,10 +451,6 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
 #str #1a
   block(strKeys)             90 17 b6 17 block(x) 00 00                               # 'ថា'
   # <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
-  block(strElemOrdrFrom3)    45 1a block(x) 00 00                                       # 'ᩅ'
-  block(strElemOrdrFrom1)    60 1a block(x) 00 00                                       # '᩠'
-  block(strElemOrdrBefore)   6b 1a block(x) 00 00                                       # 'ᩫ'
-  block(strElemOrdrFrom2)    75 1a block(x) 00 00                                       # '᩵'
   block(strIndicator)        3d d8 40 de block(x) 00 00                               # '🙀'
 
 
