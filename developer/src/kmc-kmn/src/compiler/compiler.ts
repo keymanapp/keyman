@@ -17,6 +17,22 @@ export interface CompilerResultFile {
   data: Uint8Array;
 };
 
+//
+// Matches kmcmplibapi.h definitions
+//
+
+export const STORETYPE_STORE       = 0x01;
+export const STORETYPE_RESERVED    = 0x02;
+export const STORETYPE_OPTION      = 0x04;
+export const STORETYPE_DEBUG       = 0x08;
+export const STORETYPE_CALL        = 0x10;
+export const STORETYPE__MASK       = 0x1F;
+
+export interface CompilerResultExtraStore {
+  storeType: number; // STORETYPE__MASK
+  name: string;      // when debug=false, the .kmx will not have store names
+};
+
 export const COMPILETARGETS_KMX =   0x01;
 export const COMPILETARGETS_JS =    0x02;
 export const COMPILETARGETS__MASK = 0x03;
@@ -31,7 +47,12 @@ export interface CompilerResultExtra {
   targets: number;
   kvksFilename?: string;
   displayMapFilename?: string;
+  stores?: CompilerResultExtraStore[];
 };
+
+//
+// Internal in-memory result from a successful compilation
+//
 
 export interface CompilerResult {
   kmx?: CompilerResultFile;
@@ -163,6 +184,24 @@ export class KmnCompiler implements UnicodeSetParser {
     return 1;
   }
 
+  private copyWasmResult(wasm_result: any): CompilerResult {
+    let result: CompilerResult = {
+      // We cannot Object.assign or {...} on a wasm-defined object, so...
+      extra: {
+        targets: wasm_result.extra.targets,
+        displayMapFilename: wasm_result.extra.displayMapFilename,
+        kvksFilename: wasm_result.extra.kvksFilename,
+        stores: []
+      },
+      displayMap: null
+    };
+    for(let store of wasm_result.extra.stores) {
+      result.extra.stores.push({storeType: store.storeType, name: store.name});
+    }
+
+    return result;
+  }
+
   public runCompiler(infile: string, outfile: string, options: KmnCompilerOptions): CompilerResult {
     if(!this.verifyInitialized()) {
       /* c8 ignore next 2 */
@@ -191,15 +230,7 @@ export class KmnCompiler implements UnicodeSetParser {
         return null;
       }
 
-      const result: CompilerResult = {
-        // We cannot Object.assign or {...} on a wasm-defined object, so...
-        extra: {
-          targets: wasm_result.extra.targets,
-          displayMapFilename: wasm_result.extra.displayMapFilename,
-          kvksFilename: wasm_result.extra.kvksFilename,
-        },
-        displayMap: null
-      };
+      const result: CompilerResult = this.copyWasmResult(wasm_result);
 
       if(result.extra.targets & COMPILETARGETS_KMX) {
         result.kmx = {
@@ -234,15 +265,8 @@ export class KmnCompiler implements UnicodeSetParser {
         if(!wasm_result.result) {
           return null;
         }
-        const kmw_result: CompilerResult = {
-          extra: {
-            // We cannot Object.assign or {...} on a wasm-defined object, so...
-            targets: wasm_result.extra.targets,
-            displayMapFilename: wasm_result.extra.displayMapFilename,
-            kvksFilename: wasm_result.extra.kvksFilename,
-          },
-          displayMap: result.displayMap // we can safely re-use the kmx compile displayMap
-        };
+        const kmw_result: CompilerResult = this.copyWasmResult(wasm_result);
+        kmw_result.displayMap = result.displayMap; // we can safely re-use the kmx compile displayMap
 
         let web_kmx = new Uint8Array(Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
         result.js = this.runWebCompiler(infile, outfile, web_kmx, result.kvk?.data, kmw_result, options);

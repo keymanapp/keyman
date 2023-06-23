@@ -79,6 +79,35 @@ WASM_COMPILER_RESULT kmcmp_wasm_compile(std::string pszInfile, const KMCMP_COMPI
   return r;
 }
 
+namespace emscripten {
+namespace internal {
+
+template <typename T, typename Allocator>
+struct BindingType<std::vector<T, Allocator>> {
+    using ValBinding = BindingType<val>;
+    using WireType = ValBinding::WireType;
+
+    static WireType toWireType(const std::vector<T, Allocator> &vec) {
+        return ValBinding::toWireType(val::array(vec));
+    }
+
+    static std::vector<T, Allocator> fromWireType(WireType value) {
+        return vecFromJSArray<T>(ValBinding::fromWireType(value));
+    }
+};
+
+template <typename T>
+struct TypeID<T,
+              typename std::enable_if_t<std::is_same<
+                  typename Canonicalized<T>::type,
+                  std::vector<typename Canonicalized<T>::type::value_type,
+                              typename Canonicalized<T>::type::allocator_type>>::value>> {
+    static constexpr TYPEID get() { return TypeID<val>::get(); }
+};
+
+}  // namespace internal
+}  // namespace emscripten
+
 EMSCRIPTEN_BINDINGS(compiler_interface) {
 
   emscripten::class_<KMCMP_COMPILER_OPTIONS>("CompilerOptions")
@@ -109,6 +138,12 @@ EMSCRIPTEN_BINDINGS(compiler_interface) {
     .property("kmnFilename", &KMCMP_COMPILER_RESULT_EXTRA::kmnFilename)
     .property("kvksFilename", &KMCMP_COMPILER_RESULT_EXTRA::kvksFilename)
     .property("displayMapFilename", &KMCMP_COMPILER_RESULT_EXTRA::displayMapFilename)
+    .property("stores", &KMCMP_COMPILER_RESULT_EXTRA::stores)
+    ;
+
+  emscripten::value_object<KMCMP_COMPILER_RESULT_EXTRA_STORE>("CompilerResultExtraStore")
+    .field("storeType", &KMCMP_COMPILER_RESULT_EXTRA_STORE::storeType)
+    .field("name", &KMCMP_COMPILER_RESULT_EXTRA_STORE::name)
     ;
 
   emscripten::function("kmcmp_compile", &kmcmp_wasm_compile);
