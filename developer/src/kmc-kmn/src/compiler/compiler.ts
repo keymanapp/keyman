@@ -58,8 +58,10 @@ let callbackProcIdentifier = 0;
 const
   callbackPrefix = 'kmnCompilerCallbacks_';
 
+let
+  Module: any;
+
 export class KmnCompiler implements UnicodeSetParser {
-  private Module: any;
   callbackID: string; // a unique numeric id added to globals with prefixed names
   callbacks: CompilerCallbacks;
 
@@ -70,9 +72,9 @@ export class KmnCompiler implements UnicodeSetParser {
 
   public async init(callbacks: CompilerCallbacks): Promise<boolean> {
     this.callbacks = callbacks;
-    if(!this.Module) {
+    if(!Module) {
       try {
-        this.Module = await loadWasmHost();
+        Module = await loadWasmHost();
       } catch(e: any) {
         /* c8 ignore next 3 */
         this.callbacks.reportMessage(CompilerMessages.Fatal_MissingWasmModule({e}));
@@ -92,7 +94,7 @@ export class KmnCompiler implements UnicodeSetParser {
       // Can't report a message here.
       throw Error('Must call Compiler.init(callbacks) before proceeding');
     }
-    if(!this.Module) {
+    if(!Module) {
       /* c8 ignore next 4 */
       // fail if wasm not loaded or function not found
       this.callbacks.reportMessage(CompilerMessages.Fatal_MissingWasmModule({}));
@@ -153,7 +155,7 @@ export class KmnCompiler implements UnicodeSetParser {
       throw new Error(`loadFileCallback: second call, expected file size ${bufferSize} == ${data.byteLength}`);
     }
 
-    this.Module.HEAP8.set(data, buffer);
+    Module.HEAP8.set(data, buffer);
 
     return 1;
   }
@@ -172,8 +174,8 @@ export class KmnCompiler implements UnicodeSetParser {
     };
 
     let result: CompilerResult = {data:{targets:0}};
-    let wasm_interface = new this.Module.CompilerInterface();
-    let wasm_options = new this.Module.CompilerOptions();
+    let wasm_interface = new Module.CompilerInterface();
+    let wasm_options = new Module.CompilerOptions();
     let wasm_result = null;
     try {
       wasm_options.saveDebug = options.saveDebug;
@@ -182,7 +184,7 @@ export class KmnCompiler implements UnicodeSetParser {
       wasm_options.shouldAddCompilerVersion = options.shouldAddCompilerVersion;
       wasm_options.target = 0; // CKF_KEYMAN; TODO use COMPILETARGETS_KMX
       wasm_interface.callbacksKey = this.callbackID; // key of object on globalThis
-      wasm_result = this.Module.kmcmp_compile(infile, wasm_options, wasm_interface);
+      wasm_result = Module.kmcmp_compile(infile, wasm_options, wasm_interface);
       if(!wasm_result.result) {
         return null;
       }
@@ -190,7 +192,7 @@ export class KmnCompiler implements UnicodeSetParser {
       if(wasm_result.targets & COMPILETARGETS_KMX) {
         result.kmx = {
           filename: outfile,
-          data: new Uint8Array(this.Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
+          data: new Uint8Array(Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
         };
       }
 
@@ -219,14 +221,14 @@ export class KmnCompiler implements UnicodeSetParser {
 
       if(wasm_result.targets & COMPILETARGETS_JS) {
         wasm_options.target = 1; // CKF_KEYMANWEB TODO use COMPILETARGETS_JS
-        wasm_result = this.Module.kmcmp_compile(infile, wasm_options, wasm_interface);
+        wasm_result = Module.kmcmp_compile(infile, wasm_options, wasm_interface);
         if(!wasm_result.result) {
           return null;
         }
 
         let web_kmx = {
           filename: outfile,
-          data: new Uint8Array(this.Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
+          data: new Uint8Array(Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
         };
 
         result.js = this.runWebCompiler(infile, outfile, web_kmx.data, result.kvk?.data, result.data.displayMap, options);
@@ -341,15 +343,15 @@ export class KmnCompiler implements UnicodeSetParser {
       /* c8 ignore next 2 */
       bufferSize = 100; // TODO-LDML: Preflight mode? Reuse buffer?
     }
-    const buf = this.Module.asm.malloc(bufferSize * 2 * this.Module.HEAPU32.BYTES_PER_ELEMENT);
+    const buf = Module.asm.malloc(bufferSize * 2 * Module.HEAPU32.BYTES_PER_ELEMENT);
     // TODO-LDML: Catch OOM
-    const rc = this.Module.kmcmp_parseUnicodeSet(pattern, buf, bufferSize);
+    const rc = Module.kmcmp_parseUnicodeSet(pattern, buf, bufferSize);
     if (rc >= 0) {
       const ranges = [];
-      const startu = (buf / this.Module.HEAPU32.BYTES_PER_ELEMENT);
+      const startu = (buf / Module.HEAPU32.BYTES_PER_ELEMENT);
       for (let i = 0; i < rc; i++) {
-        const low = this.Module.HEAPU32[startu + (i * 2) + 0];
-        const high = this.Module.HEAPU32[startu + (i * 2) + 1];
+        const low = Module.HEAPU32[startu + (i * 2) + 0];
+        const high = Module.HEAPU32[startu + (i * 2) + 1];
         ranges.push([low, high]);
       }
       // TODO-LDML: no free??
