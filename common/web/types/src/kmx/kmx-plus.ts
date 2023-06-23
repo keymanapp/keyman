@@ -331,6 +331,9 @@ export class Tran extends Section {
 export class UsetItem {
   constructor(public uset: UnicodeSet, public str: StrsItem) {
   }
+  compareTo(other: UsetItem) : number {
+    return this.str.compareTo(other.str);
+  }
 };
 
 export class Uset extends Section {

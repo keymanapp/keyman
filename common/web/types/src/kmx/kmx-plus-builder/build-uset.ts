@@ -31,18 +31,15 @@ export function build_uset(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS ) : BUI
     return null;
   }
 
-  // collect all patterns, sorted
-  const patterns = kmxplus.uset.usets.map(s => s.uset.pattern).sort();
+  // uset items in pattern order
+  const items = [...kmxplus.uset.usets]
+    .sort((a,b) => a.compareTo(b));
 
   const ranges : BUILDER_USET_RANGE[] = [];
 
   const usets : BUILDER_USET_USET[] = [];
 
-  // collect all sets
-  // in pattern order
-  patterns.forEach(pattern => {
-    // find the set
-    const set = kmxplus?.uset?.usets.find(s => s.uset.pattern == pattern);
+  items.forEach(set => {
     usets.push({
       range: ranges.length, // index
       count: set.uset.length,
