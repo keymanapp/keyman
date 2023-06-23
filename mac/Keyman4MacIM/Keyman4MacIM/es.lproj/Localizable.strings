@@ -1,8 +1,8 @@
 /* Message displayed to confirm delete of the Keyman keyboard selected by the user from the keyboard list  */
-"message-confirm-delete-keyboard" = "¿Estás seguro de que deseas eliminar el teclado '%@'?";
+"message-confirm-delete-keyboard" = "¿Seguro que quieres borrar el '%@' del teclado?";
 
 /* Delete keyboard confirmation info indicating that the delete action cannot be undone  */
-"info-cannot-undo-delete-keyboard" = "No puedes deshacer esta acción.";
+"info-cannot-undo-delete-keyboard" = "No puede deshacer esta acción.";
 
 /* Button text to cancel delete of the specified installed Keyman keyboard  */
 "button-cancel-delete-keyboard" = "Cancelar";
@@ -11,10 +11,10 @@
 "button-delete-keyboard" = "Eliminar";
 
 /* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
-"message-confirm-install-keyboard" = "¿Instalar teclado de Keyman?";
+"message-confirm-install-keyboard" = "¿Instalar teclado Keyman?";
 
 /* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
-"info-install-keyboard-filename" = "¿Desea que Keyman instale el teclado desde el archivo '%@'?";
+"info-install-keyboard-filename" = "¿Quiere que Keyman instale el teclado desde el fichero '%@'?";
 
 /* Button text to cancel installation of the double-clicked Keyman file  */
 "button-cancel-install-keyboard" = "Cancelar";
@@ -23,7 +23,7 @@
 "button-install-keyboard" = "Instalar";
 
 /* Message displayed to inform user that .kmp file could not be read/unzipped  */
-"message-keyboard-file-unreadable" = "No se pudo leer el archivo de Keyman '%@'.";
+"message-keyboard-file-unreadable" = "No se ha podido leer el archivo Keyman '%@'.";
 
 /* Message displayed in Configuration window when keyboard cannot be loaded */
 "message-error-loading-keyboard" = "(error al cargar el teclado)";
@@ -35,19 +35,19 @@
 "button-keyboard-file-unreadable" = "Aceptar";
 
 /* label text to identify Keyman version */
-"version-label-text" = "Versión: %@";
+"version-label-text" = "Versión %@";
 
 /* Status text for keyboard downloading  */
 "message-keyboard-downloading" = "Descargando...";
 
 /* Status text for keyboard download complete  */
-"message-keyboard-download-complete" = "Descarga finalizada.";
+"message-keyboard-download-complete" = "دانلود کامل شد.";
 
 /* Button text to cancel downloading keyboard  */
 "button-cancel-downloading" = "Cancelar";
 
 /* Button text keyboard download complete  */
-"button-download-complete" = "Hecho";
+"button-download-complete" = "Listo";
 
 /* keyboards label in the Package Information window */
 "keyboards-label" = "Teclados:";
@@ -62,10 +62,10 @@
 "author-label" = "Autor:";
 
 /* website label in the Package Information window */
-"website-label" = "Página web:";
+"website-label" = "Sitio Web:";
 
 /* copyright label in the Package Information window */
 "copyright-label" = "Derechos de autor:";
 
 /* message displayed to alert user to need grant accessibility permission */
-"privacy-alert-text" = "Para funcionar correctamente, Keyman requiere funciones de accesibilidad:\n\nPermitir el acceso en Preferencias del Sistema, Seguridad y Privacidad.\nReinicie el sistema.";
+"privacy-alert-text" = "Para funcionar correctamente, Keyman requiere las siguientes características de accesibilidad:\nel acceso en Preferencias del Sistema, Seguridad y Privacidad.\nel reinicio del sistema.";

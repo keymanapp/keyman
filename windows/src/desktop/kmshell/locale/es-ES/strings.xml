@@ -19,7 +19,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKButtonYes" comment="Yes button in message boxes">&amp;Sí</string>
+  <string name="SKButtonYes" comment="Yes button in message boxes">&amp;Si</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -51,15 +51,15 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.330.0 -->
-  <string name="SKBalloonClickToSelectKeyboard" comment="Balloon that shows when Keyman icon is first shown during the tutorial">Haz clic en este icono para seleccionar un teclado</string>
+  <string name="SKBalloonClickToSelectKeyboard" comment="Balloon that shows when Keyman icon is first shown during the tutorial">Haga clic en este icono para seleccionar un teclado</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.330.0 -->
-  <string name="SKBalloonOSKClosed" comment="Balloon that shows when OSK is closed">Keyman sigue activado. Haz clic en este ícono para usar el teclado de tu idioma en cualquier momento</string>
+  <string name="SKBalloonOSKClosed" comment="Balloon that shows when OSK is closed">Haga clic en este icono para utilizar el teclado de su idioma en cualquier momento</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 14.0.234 -->
-  <string name="SKBalloonKeymanIsRunning" comment="Balloon that shows when user tries to start Keyman but it is already running">Keyman ya se está ejecutando. Haz clic en el ícono de Keyman en el área de notificaciones del sistema para usar el teclado de tu idioma</string>
+  <string name="SKBalloonKeymanIsRunning" comment="Balloon that shows when user tries to start Keyman but it is already running">Keyman ya se está ejecutando. Haga clic en el icono de Keyman en el área de notificación del sistema para utilizar el teclado de su idioma</string>
   <!-- Context: Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -75,7 +75,7 @@
   <!-- Context: Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 16.0.47.0 -->
-  <string name="S_Caption_Enable" comment="Configuration dialog link to Enable Keyboard">Activar</string>
+  <string name="S_Caption_Enable" comment="Configuration dialog link to Enable Keyboard">Habilitar</string>
   <!-- Context: Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 16.0.47.0 -->
@@ -83,15 +83,15 @@
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Keyboards" comment="Keyboard Layouts tab name">Distribuciones de teclado</string>
+  <string name="S_Keyboards" comment="Keyboard Layouts tab name">Diseños de teclado</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Keyboards_AccessChar" comment="Direct access to the Keyboard Layouts tab using alt+">D</string>
+  <string name="S_Keyboards_AccessChar" comment="Direct access to the Keyboard Layouts tab using alt+">K</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Options" comment="Options tab name">Opciones</string>
+  <string name="S_Options" comment="Options tab name">Optiones</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -99,11 +99,11 @@
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkeys" comment="Hotkeys tab name">Atajos de teclado</string>
+  <string name="S_Hotkeys" comment="Hotkeys tab name">Teclas rápidas</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkeys_AccessChar" comment="Direct access to the Hotkeys tab using alt+">A</string>
+  <string name="S_Hotkeys_AccessChar" comment="Direct access to the Hotkeys tab using alt+">H</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -115,15 +115,15 @@
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.493.0 -->
-  <string name="S_KeepInTouch" comment="Keep in touch tab name">Redes sociales</string>
+  <string name="S_KeepInTouch" comment="Keep in touch tab name">Mantener en contacto</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.492.0 -->
-  <string name="S_KeepInTouch_AccessChar" comment="Direct access to the Keep in Touch tab using alt+">R</string>
+  <string name="S_KeepInTouch_AccessChar" comment="Direct access to the Keep in Touch tab using alt+">T</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_Filename" comment="Keyboard download window, etc. - term for filename">Nombre del archivo:</string>
+  <string name="S_Caption_Filename" comment="Keyboard download window, etc. - term for filename">Nombre de archivo:</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -139,7 +139,7 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_Website" comment="Keyboard download window, etc. - term for website">Página web:</string>
+  <string name="S_Caption_Website" comment="Keyboard download window, etc. - term for website">Página Web:</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -151,11 +151,11 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_Keyboards" comment="Keyboard download window, etc. - term for keyboard layouts">Distribuciones de Teclado:</string>
+  <string name="S_Caption_Keyboards" comment="Keyboard download window, etc. - term for keyboard layouts">Diseños de teclado:</string>
   <!-- Context: Keyboard Install Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 14.0 -->
-  <string name="S_Caption_Keyboard" comment="Keyboard install dialog - term for a single keyboard layout">Distribución de teclado:</string>
+  <string name="S_Caption_Keyboard" comment="Keyboard install dialog - term for a single keyboard layout">Diseño del teclado:</string>
   <!-- Context: Keyboard Install Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 14.0 -->
@@ -167,7 +167,7 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_LayoutType" comment="Keyboard download window, etc. - term for keyboard layout type (keyboard layout types include Fixed and Mnemonic)">Tipo de distribución:</string>
+  <string name="S_Caption_LayoutType" comment="Keyboard download window, etc. - term for keyboard layout type (keyboard layout types include Fixed and Mnemonic)">Tipo de diseño:</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -175,7 +175,7 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_LayoutType_Mnemonic" comment="Keyboard download window, etc. - term for the mnemonic keyboard layout type">Mapeado según la distribución de Windows (Mnemónico)</string>
+  <string name="S_LayoutType_Mnemonic" comment="Keyboard download window, etc. - term for the mnemonic keyboard layout type">Mapeado al diseño de Windows (Mnemónico)</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.420.0 -->
@@ -227,11 +227,11 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_Copyright" comment="Keyboard download window, etc. - term for copyright">Derechos de autor:</string>
+  <string name="S_Caption_Copyright" comment="Keyboard download window, etc. - term for copyright">Derechos de Autor:</string>
   <!-- Context: Configuration Dialog - Footer -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 14.0 -->
-  <string name="S_Footer_ChangesImmediate" comment="Short-term (14.0) message explaining why Ok and Cancel buttons are no longer present">Los cambios se aplican automáticamente</string>
+  <string name="S_Footer_ChangesImmediate" comment="Short-term (14.0) message explaining why Ok and Cancel buttons are no longer present">Los cambios se aplican inmediatamente</string>
   <!-- Context: Configuration Dialog - Footer -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -247,12 +247,12 @@
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Keyboards_NoKeyboardsInstalled" comment="Keyboard Layouts - notice of no keyboard layouts installed">No tienes ningún teclado instalado. Haz clic en el botón Descargar teclado para instalar una distribución de teclado desde la página web de Keyman.</string>
+  <string name="S_Keyboards_NoKeyboardsInstalled" comment="Keyboard Layouts - notice of no keyboard layouts installed">Ningún teclado está instalado. Haga clic en el botón Descargar Teclado para instalar uno desde el sitio Web de Keyman.</string>
   <!-- Parameters: %1$s = keyboard layout name -->
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- Introduced: 7.1.251.0 -->
   <!-- String Type: PlainText -->
-  <string name="SKUninstallRequireAdmin" comment="Keyboard Layouts - notice of ineligibility to uninstall a keyboard">Solo puedes desinstalar el teclado \'%1$s\' si eres un administrador</string>
+  <string name="SKUninstallRequireAdmin" comment="Keyboard Layouts - notice of ineligibility to uninstall a keyboard">Sólo puede desinstalar el teclado \'%1$s\' si es un administrador</string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 13.0.40.0 -->
@@ -260,7 +260,7 @@
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 13.0.40.0 -->
-  <string name="S_Keyboard_Share_QRCode" comment="Keyboard Layouts - caption explaining QRCode, plus prefix to link to share">Escanea este código para cargar este teclado en otro dispositivo o </string>
+  <string name="S_Keyboard_Share_QRCode" comment="Keyboard Layouts - caption explaining QRCode, plus prefix to link to share">Escanee este código para cargar este teclado en otro dispositivo o </string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 13.0.40.0 -->
@@ -284,11 +284,11 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="kogAdvanced" comment="Options section - Advanced">Avanzadas</string>
+  <string name="kogAdvanced" comment="Options section - Advanced">Avanzado</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koKeyboardHotkeysAreToggle" comment="General options - hotkeys toggle on AND off a keyboard layout">Los atajos de teclado activan o desactivan el teclado</string>
+  <string name="koKeyboardHotkeysAreToggle" comment="General options - hotkeys toggle on AND off a keyboard layout">Las Teclas Rápidas alterna la activación del teclado</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -296,7 +296,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 9.0.480.0 -->
-  <string name="koDeadkeyConversion" comment="Advanced options - Base keyboard deadkeys are treated as normal keys">Tratar las teclas muertas de hardware como teclas simples</string>
+  <string name="koDeadkeyConversion" comment="Advanced options - Base keyboard deadkeys are treated as normal keys">Tratar teclas muertas de hardware como claves simples</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.244.0 -->
@@ -312,7 +312,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koStartWithWindows" comment="Startup options - Start Keyman with Windows start">Iniciar cuando inicie Windows</string>
+  <string name="koStartWithWindows" comment="Startup options - Start Keyman with Windows start">Empezar cuando inicie Windows</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -324,31 +324,31 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">Buscar actualizaciones automáticamente en keyman.com cada semana</string>
+  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">Comprobar automáticamente por actualizaciones semanales en keyman.com</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
-  <string name="koTestKeymanFunctioning" comment="Startup options - test for conflicting apps when Product starts">Comprobar si hay aplicaciones conflictivas cuando inicie Keyman</string>
+  <string name="koTestKeymanFunctioning" comment="Startup options - test for conflicting apps when Product starts">Comprobar por aplicaciones conflictivas cuando Keyman inicie</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
-  <string name="koReleaseShiftKeysAfterKeyPress" comment="OSK options - Releases shift/ctrl/alt on OSK after key press">Desactivar Shift/Ctrl/Alt en el teclado en pantalla cuando se presione una tecla</string>
+  <string name="koReleaseShiftKeysAfterKeyPress" comment="OSK options - Releases shift/ctrl/alt on OSK after key press">Liberar Shift/Ctrl/Alt en Teclado En Pantalla cuando se presione una tecla</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.244.0 -->
-  <string name="koAutoOpenOSK" comment="OSK options - auto-open OSK">Mostrar siempre la ventana de teclado en pantalla cuando se seleccione el teclado de Keyman</string>
+  <string name="koAutoOpenOSK" comment="OSK options - auto-open OSK">Mostrar siempre la ventana Teclado En Pantalla cuando se selecciona el teclado Keyman</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.244.0 -->
-  <string name="koAutoSwitchOSKPages" comment="OSK options - when a keyboard is activated, switch to most appropriate page in OSK">Cambiar automáticamente a Teclado en pantalla/Ayuda según corresponda cuando se selecciona un teclado</string>
+  <string name="koAutoSwitchOSKPages" comment="OSK options - when a keyboard is activated, switch to most appropriate page in OSK">Cambiar al Teclado En Pantalla apropiado/Ayuda automáticamente cuando se selecciona un teclado</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">Depurar</string>
+  <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">Depuración</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.445.0 -->
-  <string name="S_Button_BaseKeyboard" comment="Options tab - base keyboard button">Teclado de base...</string>
+  <string name="S_Button_BaseKeyboard" comment="Options tab - base keyboard button">Teclado base...</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.241.0 -->
@@ -361,19 +361,19 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set">(sin atajo de teclado)</string>
+  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set">(sin tecla rápida)</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_TurnKeymanOff" comment="Hotkey - Turn Product Off">Desactivar Keyman</string>
+  <string name="S_Hotkey_TurnKeymanOff" comment="Hotkey - Turn Product Off">Apagar Keyman</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_OpenKeyboardMenu" comment="Hotkey - Open Keyman system tray menu">Abrir menú del teclado</string>
+  <string name="S_Hotkey_OpenKeyboardMenu" comment="Hotkey - Open Keyman system tray menu">Abrir Menú Teclado</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_ShowOnScreenKeyboard" comment="Hotkey - show keyboard in OSK">Mostrar el panel de teclado en pantalla</string>
+  <string name="S_Hotkey_ShowOnScreenKeyboard" comment="Hotkey - show keyboard in OSK">Mostrar el panel de Teclado En Pantalla</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -381,35 +381,35 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.275.0 -->
-  <string name="S_Hotkey_ShowFontHelper" comment="Hotkey - show font helper in OSK">Mostrar el panel de ayuda para fuentes</string>
+  <string name="S_Hotkey_ShowFontHelper" comment="Hotkey - show font helper in OSK">Mostrar el panel de ayuda de fuentes</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.275.0 -->
-  <string name="S_Hotkey_ShowCharacterMap" comment="Hotkey - show character map in OSK">Mostrar el panel de mapa de caracteres</string>
+  <string name="S_Hotkey_ShowCharacterMap" comment="Hotkey - show character map in OSK">Mostrar el panel de Mapa de Caracteres</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.275.0 -->
-  <string name="S_Hotkey_OpenTextEditor" comment="Hotkey - open text editor">Abrir el editor de texto</string>
+  <string name="S_Hotkey_OpenTextEditor" comment="Hotkey - open text editor">Abrir editor de texto</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_Hotkey_SwitchLanguage" comment="Hotkey - switch language window">Abrir menú de cambio de idioma</string>
+  <string name="S_Hotkey_SwitchLanguage" comment="Hotkey - switch language window">Abrir Cambiar Idioma</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.274.0 -->
-  <string name="S_Hotkey_Control_Title" comment="Hotkey - Control Title">Atajos de teclado generales</string>
+  <string name="S_Hotkey_Control_Title" comment="Hotkey - Control Title">Teclas rápidas generales</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.274.0 -->
-  <string name="S_Hotkey_Keyboard_Title" comment="Hotkey - Keyboard Title">Distribuciones de teclado</string>
+  <string name="S_Hotkey_Keyboard_Title" comment="Hotkey - Keyboard Title">Diseños de Teclados</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.465.0 -->
-  <string name="S_Support_ContactInstructions_Free" comment="">Si tienes algún problema usando Keyman, sólo haz una pregunta en el Foro de la comunidad de Keyman.</string>
+  <string name="S_Support_ContactInstructions_Free" comment="">Si tiene algún problema usando Keyman, sólo haz una pregunta en el Foro de la Comunidad de Keyman.</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.465.0 -->
-  <string name="S_Button_CommunitySupport" comment="">Abrir Foro de la comunidad de Keyman</string>
+  <string name="S_Button_CommunitySupport" comment="">Abrir Foro de la Comunidad Keyman</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 11.0.1500.0 -->
@@ -417,7 +417,7 @@
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Support_Copyright" comment="Support - Product Copyright">Derechos de autor © SIL International. Todos los derechos reservados.</string>
+  <string name="S_Support_Copyright" comment="Support - Product Copyright">Copyright © SIL Internacional. Todos los derechos reservados.</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -441,7 +441,7 @@
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Button_SettingsManager" comment="Options button - access to the Settings Manager">Configuración de sistema de Keyman...</string>
+  <string name="S_Button_SettingsManager" comment="Options button - access to the Settings Manager">Configuración del sistema Keyman...</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -449,7 +449,7 @@
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_DownloadKeyboard_Title" comment="Download keyboard layout from keyman.com dialog title">Descargar teclado desde keyman.com</string>
+  <string name="S_DownloadKeyboard_Title" comment="Download keyboard layout from keyman.com dialog title">Descargar teclado de keyman.com</string>
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -458,7 +458,7 @@
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 14.0 -->
-  <string name="S_DownloadKeyboard_DownloadError" comment="Message shown when there is an error downloading the keyboard package">No se pudo descargar el teclado, error %2$d: %1$s</string>
+  <string name="S_DownloadKeyboard_DownloadError" comment="Message shown when there is an error downloading the keyboard package">No se puede descargar el teclado, error %2$d: %1$s</string>
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 14.0 -->
@@ -466,7 +466,7 @@
   <!-- Context: Install Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_InstallKeyboard_Title" comment="Install keyboard/package dialog title">Instalar teclado/paquete</string>
+  <string name="S_InstallKeyboard_Title" comment="Install keyboard/package dialog title">Instalar Teclado/Paquete</string>
   <!-- Context: Install Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -474,7 +474,7 @@
   <!-- Context: Install Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_InstallKeyboard_Tab_Readme" comment="Install keyboard/package - readme">Léame</string>
+  <string name="S_InstallKeyboard_Tab_Readme" comment="Install keyboard/package - readme">Leeme</string>
   <!-- Context: Install Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -482,7 +482,7 @@
   <!-- Context: Proxy Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_ProxyConfiguration_Title" comment="Proxy configuration dialog title">Configuración de servidor proxy</string>
+  <string name="S_ProxyConfiguration_Title" comment="Proxy configuration dialog title">Configuración del Servidor Proxy</string>
   <!-- Context: Proxy Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -494,7 +494,7 @@
   <!-- Context: Proxy Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_ProxyConfiguration_Username" comment="Proxy dialog - fillable-field username">Usuario: </string>
+  <string name="S_ProxyConfiguration_Username" comment="Proxy dialog - fillable-field username">Nombre de usuario: </string>
   <!-- Context: Proxy Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -502,55 +502,55 @@
   <!-- Context: Base Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.445.0 -->
-  <string name="S_BaseKeyboard_Title" comment="Base keyboard dialog title">Establece el teclado de base</string>
+  <string name="S_BaseKeyboard_Title" comment="Base keyboard dialog title">Establezca el Teclado base</string>
   <!-- Context: Base Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.445.0 -->
-  <string name="S_BaseKeyboard_Text" comment="Base keyboard dialog description">Selecciona el teclado de base con alfabeto latino que usas en Windows. Los teclados de Keyman se adaptarán automáticamente a tu distribución de teclado preferida.</string>
+  <string name="S_BaseKeyboard_Text" comment="Base keyboard dialog description">Seleccione el teclado base de la escritura latina que usa en Windows. Los teclados Keyman se adaptarán automáticamente a su distribución de teclado preferido.</string>
   <!-- Context: Hotkey Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKChangeHotkeyTitle" comment="Change Hotkey dialog title">Cambiar atajo de teclado</string>
+  <string name="SKChangeHotkeyTitle" comment="Change Hotkey dialog title">Cambiar tecla rápida</string>
   <!-- Parameters: %1$s = Name of keyboard -->
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 7.0.241.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKSetHotkey_Language" comment="Hotkey dialog - message when setting hotkey for a language">Selecciona un atajo de teclado estándar o elige \"Personalizar\" y mantén pulsado Ctrl, Shift y/o Alt y escribe el atajo de teclado deseado para el idioma %1$s:</string>
+  <string name="SKSetHotkey_Language" comment="Hotkey dialog - message when setting hotkey for a language">Seleccione una tecla de acceso rápido estándar o elija \"Personalizada\" y mantenga pulsadas las teclas Ctrl, Mayús y/o Alt y escriba la tecla de acceso rápido que desee para el idioma %1$s:</string>
   <!-- Context: Hotkey Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKSetHotkey_Interface" comment="Hotkey dialog - message displayed when changing a hotkey for a product feature (e.g. show menu or show on screen keyboard)">Selecciona un atajo de teclado estándar o elige \"Personalizar\" y mantén pulsado Ctrl, Shift y/o Alt y escribe el atajo de teclado deseado:</string>
+  <string name="SKSetHotkey_Interface" comment="Hotkey dialog - message displayed when changing a hotkey for a product feature (e.g. show menu or show on screen keyboard)">Seleccione una tecla de acceso rápido estándar o elija \"Personalizada\" y mantenga pulsadas las teclas Ctrl, Mayús y/o Alt y escriba la tecla de acceso rápido que desee:</string>
   <!-- Parameters: %1$s = Hotkey -->
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnsafeHotkey" comment="Hotkey dialog - warning of hotkey conflict with standard keyboard use">El atajo de teclado %1$s entrará en conflicto con el uso normal del teclado. Deberías usar al menos Ctrl o Alt. ¿Deseas cambiar esto ahora\?</string>
+  <string name="SKUnsafeHotkey" comment="Hotkey dialog - warning of hotkey conflict with standard keyboard use">La tecla de acceso rápido %1$s entrará en conflicto con el uso normal del teclado.  Deberías usar al menos Ctrl o Alt.  ¿Quiere cambiar esto ahora?</string>
   <!-- Parameters: %1$s = Hotkey, %2$s = Conflicting keyboard -->
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKHotkeyConflicts_Keyboard" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another keyboard">El atajo de teclado %1$s entra en conflicto con el atajo de teclado seleccionado para el teclado %2$s. Si continúas, se eliminará el atajo de teclado para el teclado %2$s. ¿Continuar\?</string>
+  <string name="SKHotkeyConflicts_Keyboard" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another keyboard">La tecla de acceso rápido %1$s entra en conflicto con la tecla de acceso rápido seleccionada para el teclado %2$s.  Si continúa, se borrará la tecla de acceso directo para el teclado %2$s.  ¿Continuar?</string>
   <!-- Parameters: %1$s = Hotkey -->
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 14.0.117 -->
   <!-- String Type: FormatString -->
-  <string name="SKHotkeyConflicts_Interface" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another interface hotkey">El atajo de teclado %1$s entra en conflicto con otro atajo de teclado. Si continúas, se eliminará el otro atajo. ¿Continuar\?</string>
+  <string name="SKHotkeyConflicts_Interface" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another interface hotkey">La tecla de acceso rápido %1$s entra en conflicto con otra tecla de acceso rápido.  Si continúa, se borrará la otra tecla de acceso rápido.  ¿Continuar?</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Update_Title" comment="Update dialog title, where Keyman = product name">Componentes de Keyman actualizados disponibles</string>
+  <string name="S_Update_Title" comment="Update dialog title, where Keyman = product name">Keyman actualizado - Componentes disponibles</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Update_NewVersionAvailable" comment="Update dialog - updates available text">Hay actualizaciones de Keyman disponibles</string>
+  <string name="S_Update_NewVersionAvailable" comment="Update dialog - updates available text">Hay actualizaciones disponibles para Keyman</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.255.0 -->
-  <string name="S_Update_NewVersionPrompt" comment="Update dialog - prompt to select updates">Selecciona las actualizaciones que deseas instalar:</string>
+  <string name="S_Update_NewVersionPrompt" comment="Update dialog - prompt to select updates">Seleccione las actualizaciones que desea instalar:</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Update_DownloadFrom" comment="Update dialog - download information">Puedes descargar la nueva versión desde:</string>
+  <string name="S_Update_DownloadFrom" comment="Update dialog - download information">Puede descargar la nueva versión desde:</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -584,12 +584,12 @@
   <!-- Context: Online Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKUpdate_UnableToContact" comment="Update dialog - unable to access keyman.com warning">No se puede contactar con keyman.com: asegúrate de tener una conexión a Internet activa y vuelve a intentarlo.</string>
+  <string name="SKUpdate_UnableToContact" comment="Update dialog - unable to access keyman.com warning">No se puede contactar con el sitio Web de keyman.com: asegúrese de tener una conexión a Internet activa y vuelva a intentarlo.</string>
   <!-- Parameters: %1$s = Error message -->
   <!-- Context: Online Update Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUpdate_UnableToContact_Error" comment="Update dialog - unable to access keyman.com error message">No se puede contactar con keyman.com: asegúrate de tener una conexión a Internet activa y vuelve a intentarlo. El error recibido fue: %1$s</string>
+  <string name="SKUpdate_UnableToContact_Error" comment="Update dialog - unable to access keyman.com error message">No se puede contactar con keyman.com - por favor asegúrese de que tiene una conexión activa a Internet e intente de nuevo. El error recibido fue: %1$s</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
@@ -597,7 +597,7 @@
   <!-- Context: Online Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
-  <string name="SKUpdate_IconText" comment="Update icon - text">Haz clic en este ícono para descargar e instalar las actualizaciones</string>
+  <string name="SKUpdate_IconText" comment="Update icon - text">Haga clic en este ícono para descargar e instalar actualizaciones</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
@@ -605,7 +605,7 @@
   <!-- Context: Online Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
-  <string name="SKUpdate_IconMenuExit" comment="Update icon - exit menu item">Sa&amp;lir de la búsqueda de actualizaciones en línea</string>
+  <string name="SKUpdate_IconMenuExit" comment="Update icon - exit menu item">Salir verificar actualizaciones en línea</string>
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.288.0 -->
@@ -621,11 +621,11 @@
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_Splash_Configuration" comment="Keyman Configuration link">Configuración</string>
+  <string name="S_Splash_Configuration" comment="Keyman Configuration link">COnfiguración</string>
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.341.0 -->
-  <string name="S_Splash_ShowAtStartup" comment="Show at Startup toggle">Mostrar esta pantalla al inicio</string>
+  <string name="S_Splash_ShowAtStartup" comment="Show at Startup toggle">Muestre esta pantalla al inicio</string>
   <!-- Context: _LanguageInfo -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.278.0 -->
@@ -637,19 +637,19 @@
   <!-- Context: _LanguageInfo -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.525.0 -->
-  <string name="S_ContributeUILanguagesMenu" comment="Link to contribute to language UI">Ayuda a traducir la interfaz de usuario...</string>
+  <string name="S_ContributeUILanguagesMenu" comment="Link to contribute to language UI">Ayuda a traducir una interfaz de usuario...</string>
   <!-- Context: _LanguageInfo -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKUILanguageName" comment="User interface language name in the UI language">Español - Latinoamérica</string>
+  <string name="SKUILanguageName" comment="User interface language name in the UI language">Español</string>
   <!-- Context: _LanguageInfo -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKUILanguageNameWithEnglish" comment="UI language name in the UI language with the English name in parentheses  (this message is used when the user gets stuck in a strange UI language)">Español (Spanish - Latin America)</string>
+  <string name="SKUILanguageNameWithEnglish" comment="UI language name in the UI language with the English name in parentheses  (this message is used when the user gets stuck in a strange UI language)">Español</string>
   <!-- Context: _LanguageInfo -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKLanguageCode" comment="The language code for the current translation">es-419</string>
+  <string name="SKLanguageCode" comment="The language code for the current translation">en</string>
   <!-- Context: _LanguageInfo -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -661,11 +661,11 @@
   <!-- Context: Hints -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.244.0 -->
-  <string name="S_Button_ResetHints" comment="Hint - options tab button to reset hints">Restablecer sugerencias</string>
+  <string name="S_Button_ResetHints" comment="Hint - options tab button to reset hints">Reset Consejos</string>
   <!-- Context: Hints -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.244.0 -->
-  <string name="SKHintsReset" comment="Hint - options tab dialog confirming reset of hints">Todos los mensajes de sugerencias se han restablecido y se mostrarán nuevamente.</string>
+  <string name="SKHintsReset" comment="Hint - options tab dialog confirming reset of hints">Todos los mensajes de sugerencia se han restablecido y se mostrarán de nuevo.</string>
   <!-- Context: Hints -->
   <!-- Introduced: 7.0.244.0 -->
   <!-- String Type: HintTitle -->
@@ -675,17 +675,17 @@
   <!-- Introduced: 7.0.244.0 -->
   <!-- String Type: Hint -->
   <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
-  <string name="Hint_KH_EXITPRODUCT" comment="Hint - asks for confirmation, explains the difference between de-activating a keyboard layout and closing Product">¿Estás seguro de que deseas salir de Keyman\? Tus teclados de Keyman seguirán apareciendo en los idiomas de Windows, pero no funcionarán hasta que reinicies Keyman.</string>
+  <string name="Hint_KH_EXITPRODUCT" comment="Hint - asks for confirmation, explains the difference between de-activating a keyboard layout and closing Product">¿Está seguro que desea salir de Keyman\? Los teclados de Keyman seguirán listados en los idiomas de Windows, pero no serán funcionales hasta que reinicie Keyman.</string>
   <!-- Context: Hints -->
   <!-- Introduced: 7.0.244.0 -->
   <!-- String Type: HintTitle -->
   <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
-  <string name="HintTitle_KH_CLOSEOSK" comment="Hint - dialog title upon closing the OSK">Teclado en pantalla cerrado</string>
+  <string name="HintTitle_KH_CLOSEOSK" comment="Hint - dialog title upon closing the OSK">Teclado de pantalla cerrado</string>
   <!-- Context: Hints -->
   <!-- Introduced: 7.0.244.0 -->
   <!-- String Type: Hint -->
   <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
-  <string name="Hint_KH_CLOSEOSK" comment="Hint - explains that Product is still running and informs how to reopen OSK">Has cerrado el Teclado en pantalla. Keyman está activado. Puedes abrir el Teclado en pantalla en cualquier momento haciendo clic en el ícono de Keyman y seleccionando \"Teclado en pantalla\"</string>
+  <string name="Hint_KH_CLOSEOSK" comment="Hint - explains that Product is still running and informs how to reopen OSK">Has cerrado el teclado en pantalla. Keyman todavía se está ejecutando. Puede abrir el teclado en pantalla en cualquier momento haciendo clic en el icono de Keyman y seleccionando \"Teclado en pantalla\"</string>
   <!-- Context: Hints -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 10.0.836.0 -->
@@ -697,11 +697,11 @@
   <!-- Context: Help Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Help_Product" comment="Help - help contents link title">Contenido de ayuda</string>
+  <string name="S_Help_Product" comment="Help - help contents link title">Contenido de Ayuda</string>
   <!-- Context: Help Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Help_Keyboard_Prefix" comment="Help - text preceding keyboard name">Ayuda para \"</string>
+  <string name="S_Help_Keyboard_Prefix" comment="Help - text preceding keyboard name">Ayuda en \"</string>
   <!-- Context: Help Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -713,7 +713,7 @@
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Toolbar_ViewFontHelper" comment="Toolbar help - View Font Helper pop-up text">Ver ayuda para fuentes</string>
+  <string name="S_Toolbar_ViewFontHelper" comment="Toolbar help - View Font Helper pop-up text">Ver ayuda de fuentes</string>
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -725,35 +725,35 @@
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Toolbar_OpenHelp" comment="Toolbar help - Open help pop-up text">Abrir ayuda</string>
+  <string name="S_Toolbar_OpenHelp" comment="Toolbar help - Open help pop-up text">Abrir Ayuda</string>
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Toolbar_CloseOnScreenKeyboard" comment="Toolbar help - Close OSK pop-up text">Cerrar el teclado en pantalla</string>
+  <string name="S_Toolbar_CloseOnScreenKeyboard" comment="Toolbar help - Close OSK pop-up text">Cerrar teclado en pantalla</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_SwitchKeymanOff" comment="Systray item - Switch Keyman Off [&amp; precedes alt + access-character]">&amp;Desactivar Keyman</string>
+  <string name="S_Menu_SwitchKeymanOff" comment="Systray item - Switch Keyman Off [&amp; precedes alt + access-character]">Interruptor Keyman &amp;Off</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_OnScreenKeyboard" comment="Systray item - OSK [&amp; precedes alt + access-character]">Teclado en &amp;Pantalla</string>
+  <string name="S_Menu_OnScreenKeyboard" comment="Systray item - OSK [&amp; precedes alt + access-character]">Teclado en pantalla</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_FontHelper" comment="Systray item - Font Helper [&amp; precedes alt + access-character]">Ayuda para &amp;fuentes</string>
+  <string name="S_Menu_FontHelper" comment="Systray item - Font Helper [&amp; precedes alt + access-character]">&amp;Ayuda de fuentes</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_CharacterMap" comment="Systray item - Character Map [&amp; precedes alt + access-character]">Mapa de &amp;caracteres</string>
+  <string name="S_Menu_CharacterMap" comment="Systray item - Character Map [&amp; precedes alt + access-character]">Carácter &amp;Mapa</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_TextEditor" comment="Systray item - Text Editor [&amp; precedes alt + access-character]">Editor de &amp;texto...</string>
+  <string name="S_Menu_TextEditor" comment="Systray item - Text Editor [&amp; precedes alt + access-character]">&amp;Editor de texto...</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_Configuration" comment="Systray item - Configuration [&amp; precedes alt + access-character]">Confi&amp;guración...</string>
+  <string name="S_Menu_Configuration" comment="Systray item - Configuration [&amp; precedes alt + access-character]">&amp;Configuración...</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -761,11 +761,11 @@
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_Exit" comment="Systray item - Exit [&amp; precedes alt + access-character]">Sa&amp;lir</string>
+  <string name="S_Menu_Exit" comment="Systray item - Exit [&amp; precedes alt + access-character]">Salir</string>
   <!-- Context: On Screen Keyboard Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_OSKContext_FadeWhenInactive" comment="OSK right-click menu - fade OSK when mouse is elsewhere">Atenuar cuando esté inactivo</string>
+  <string name="S_OSKContext_FadeWhenInactive" comment="OSK right-click menu - fade OSK when mouse is elsewhere">Fade When Inactivo</string>
   <!-- Context: On Screen Keyboard Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -773,7 +773,7 @@
   <!-- Context: On Screen Keyboard Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_OSKContext_SaveAsWebPage" comment="OSK right-click menu - save diagram of active keyboard layout as a web page">Guardar como página web...</string>
+  <string name="S_OSKContext_SaveAsWebPage" comment="OSK right-click menu - save diagram of active keyboard layout as a web page">Guardar como página Web...</string>
   <!-- Context: On Screen Keyboard Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -795,27 +795,27 @@
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKPackageAlreadyInstalled" comment="Notice during package installation that a package with the same name is already installed.">Ya está instalado un paquete con el nombre %1$s. ¿Deseas desinstalarlo e instalar el nuevo\?</string>
+  <string name="SKPackageAlreadyInstalled" comment="Notice during package installation that a package with the same name is already installed.">Ya está instalado un paquete con el nombre %1$s. ¿Desea desinstalarlo e instalar el nuevo\?</string>
   <!-- Parameters: %1$s = Keyboard name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKKeyboardAlreadyInstalled" comment="Notice during keyboard layout installation that a keyboard layout with the same name is already installed.">Ya está instalado un teclado con el nombre \"%1$s\". Si continúas, se desinstalará antes de que se instale el nuevo. ¿Continuar\?</string>
+  <string name="SKKeyboardAlreadyInstalled" comment="Notice during keyboard layout installation that a keyboard layout with the same name is already installed.">Un teclado con el nombre \'%1$s\' ya está instalado. Si continúa, se desinstalará antes de que el nuevo esté instalado. ¿Continuar\?</string>
   <!-- Parameters: %1$s = Keyboard name, %2$s = Package name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKKeyboardPartOfPackage" comment="Notice of need to uninstall an entire package">El teclado \'%1$s\' es parte del paquete \'%2$s\'. Debes desinstalar el paquete completo. ¿Continuar\?</string>
+  <string name="SKKeyboardPartOfPackage" comment="Notice of need to uninstall an entire package">El teclado \'%1$s\' es parte del paquete \'%2$s\'. Debe desinstalar el paquete completo. ¿Continuar\?</string>
   <!-- PArameters: %1$s = BCP 47 code -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 14.0.211 -->
   <!-- String Type: FormatString -->
-  <string name="SKInstallLanguageTransientLimit" comment="Message shown when Keyman is unable to install a Windows language for a keyboard">No se puede instalar el idioma del teclado; Windows tiene un límite de 4 idiomas \"transitorios\" personalizados, y puede que hayas alcanzado este límite.</string>
+  <string name="SKInstallLanguageTransientLimit" comment="Message shown when Keyman is unable to install a Windows language for a keyboard">No se puede instalar el idioma del teclado; Windows tiene un límite de 4 idiomas personalizados \"transitorios\", y es posible que haya alcanzado este límite.</string>
   <!-- Parameters: %1$s = Package Name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKPackageDoesNotIncludeWelcome" comment="Notice of lack of introductory help">El paquete o teclado \'%1$s\' no incluye ayuda introductoria.</string>
+  <string name="SKPackageDoesNotIncludeWelcome" comment="Notice of lack of introductory help">El paquete o teclado \'%1$s\' no incluye ninguna ayuda introductoria.</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -831,7 +831,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKANSIEncoding" comment="Keyboard with an ANSI or Codepage encoding">Página de códigos</string>
+  <string name="SKANSIEncoding" comment="Keyboard with an ANSI or Codepage encoding">Codepage</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -844,17 +844,17 @@
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUninstallOnScreenKeyboard" comment="Request for confirmation to uninstall OSK for a keyboard layout">¿Estás seguro de que deseas eliminar el teclado en pantalla instalado para %1$s\?</string>
+  <string name="SKUninstallOnScreenKeyboard" comment="Request for confirmation to uninstall OSK for a keyboard layout">¿Está seguro que desea eliminar el teclado en pantalla instalado para %1$s\?</string>
   <!-- Parameters: %1$s = Keyboard name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.239.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUninstallKeyboard" comment="Request for confirmation to uninstall keyboard layout">¿Estás seguro de que deseas desinstalar el teclado %1$s\?</string>
+  <string name="SKUninstallKeyboard" comment="Request for confirmation to uninstall keyboard layout">¿Está seguro que desea desinstalar el teclado %1$s\?</string>
   <!-- Parameters: %1$s = Package name, %2$s: Fonts list -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.239.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUninstallPackage" comment="Request for confirmation to uninstall a package">¿Estás seguro de que deseas desinstalar el paquete %1$s\?\n\n%2$s</string>
+  <string name="SKUninstallPackage" comment="Request for confirmation to uninstall a package">¿Está seguro que desea desinstalar el paquete %1$s\?\n\n%2$s</string>
   <!-- Parameters: %1$s = Fonts list -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.1.270.0 -->
@@ -863,47 +863,47 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKUnicodeData_Build" comment="Request to build Unicode Character Map database">El mapa de caracteres contiene una base de datos de caracteres que debe ser compilada antes de poder ser utilizada. ¿Compilar ahora\?</string>
+  <string name="SKUnicodeData_Build" comment="Request to build Unicode Character Map database">El Mapa de Personajes tiene una base de datos de personajes que hay que construir antes de poder utilizarlo.  ¿Construirlo ahora?</string>
   <!-- Parameters: %1$s = Error detail string -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnicodeData_DatabaseCouldNotBeDeleted" comment="Error deleting Unicode Character Map database">No se pudo eliminar la base de datos de caracteres Unicode para la recopilación. Detalles del error: %1$s</string>
+  <string name="SKUnicodeData_DatabaseCouldNotBeDeleted" comment="Error deleting Unicode Character Map database">No se ha podido eliminar la base de datos de caracteres Unicode para reconstruirla.  Los detalles del error son: %1$s</string>
   <!-- Parameters: %1$s = Error details -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnicodeData_CouldNotCreateDatabase" comment="Error creating Unicode Character Map database">No se pudo crear la base de datos de caracteres Unicode y quedó deshabilitada. Los detalles del error: %1$s</string>
+  <string name="SKUnicodeData_CouldNotCreateDatabase" comment="Error creating Unicode Character Map database">No se ha podido crear la base de datos de caracteres Unicode y se ha desactivado.  Los detalles del error son: %1$s</string>
   <!-- Parameters: %1$s = Error message -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnicodeData_DatabaseLoadFailedRebuild" comment="Error loading Unicode Character Map database. Request to rebuild.">La base de datos de caracteres Unicode no se cargó correctamente (%1$s). ¿Desea recompilarla?</string>
+  <string name="SKUnicodeData_DatabaseLoadFailedRebuild" comment="Error loading Unicode Character Map database. Request to rebuild.">La base de datos de caracteres Unicode no se ha cargado correctamente (%1$s).  Reconstrúyala ahora?</string>
   <!-- Parameters: %1$s: error message -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.241.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKCannotStartProduct" comment="Error from Keyman failing to start keyman.exe due to an access denied or file not found">Keyman no pudo iniciarse. Antes de continuar, verifique su configuración de seguridad para asegurarse de que el programa keyman.exe tiene permitido iniciar. El error obtenido fue:\n\n\"%1$s\"\n\n¿Deseas intentar iniciar Keyman nuevamente ahora\?</string>
+  <string name="SKCannotStartProduct" comment="Error from Keyman failing to start keyman.exe due to an access denied or file not found">Keyman no pudo iniciarse. Por favor, compruebe su configuración de seguridad para asegurarse de que el programa keyman.exe tiene permitido iniciar antes de continuar. El error devuelto fue:\n\n\"%1$s\"\n\n¿Desea iniciar Keyman de nuevo ahora\?</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">La información de depuración de Keyman se almacenará en un archivo log llamado %LOCALAPPDATA%\Keyman\Diag\system#.etl (donde # es un número). Debes salir de Keyman antes de intentar eliminar este archivo.\n\n\ADVERTENCIA: este archivo puede crecer muy rápidamente. Habilitar la depuración puede ralentizar su sistema y sólo deberías hacerlo si te lo aconseja el soporte técnico.\n\nADVERTENCIA DE PRIVACIDAD: ten en cuenta que el archivo log de depuración registra todas las teclas que escribes. Sólo debes activar el log de depuración durante una sesión de depuración o diagnóstico.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">La información de depuración de Keyman se almacenará en un archivo de registro llamado %LOCALAPPDATA%\Keyman\Diag\system#.etl (donde # es un número). Debe salir de Keyman antes de intentar borrar este archivo.\n\n ADVERTENCIA: Este archivo puede crecer muy rápidamente.  La activación de la depuración puede ralentizar el sistema y sólo debe hacerse si así lo aconseja el servicio de asistencia técnica.\n\nADVERTENCIA DE PRIVACIDAD: Tenga en cuenta que el archivo de registro de depuración registra todas las pulsaciones de teclas que se realizan.  Sólo debe activar el registro de depuración durante una sesión de depuración o diagnóstico.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_OSK_FontHelper_PleaseWait" comment="OSK Font helper message">Espera mientras buscamos fuentes relacionadas para el teclado %1$s</string>
+  <string name="S_OSK_FontHelper_PleaseWait" comment="OSK Font helper message">Espere mientras busca fuentes relacionadas para teclado %1$s</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_OSK_FontHelper_NonUnicode" comment="OSK Font helper non-Unicode keyboard">El teclado %1$s no es un teclado Unicode. Las fuentes no se pueden ubicar automáticamente. Revisa la documentación del teclado para obtener información sobre las fuentes.</string>
+  <string name="S_OSK_FontHelper_NonUnicode" comment="OSK Font helper non-Unicode keyboard">El teclado %1$s no es un teclado Unicode. Las fuentes no se pueden localizar automáticamente.  Consulte la documentación del teclado para obtener información sobre las fuentes.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_OSK_FontHelper_NoKeyboards" comment="OSK Font helper no keyboards">No hay distribuciones de teclado instaladas o cargadas actualmente.</string>
+  <string name="S_OSK_FontHelper_NoKeyboards" comment="OSK Font helper no keyboards">Actualmente no hay ninguna distribución de teclado instalada o cargada.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_OSK_FontHelper_ChooseKeyboard" comment="OSK Font helper choose keyboard">Selecciona un teclado de Keyman para encontrar fuentes relacionadas.</string>
+  <string name="S_OSK_FontHelper_ChooseKeyboard" comment="OSK Font helper choose keyboard">Seleccione un teclado Keyman para encontrar fuentes relacionadas.</string>
   <!-- Context: Text Editor -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 10.0.836.0 -->
