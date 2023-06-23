@@ -22,7 +22,7 @@ export const COMPILETARGETS_JS =    0x02;
 export const COMPILETARGETS__MASK = 0x03;
 
 /**
- * Data in CompilerResultMetadata comes from kmcmplib
+ * Data in CompilerResultExtra comes from kmcmplib
  */
 export interface CompilerResultExtra {
   /**
