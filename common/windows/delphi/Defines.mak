@@ -191,9 +191,6 @@ WIXLIGHTCOMPRESSION=
 !ENDIF
 
 WIXLIGHT=$(WIXPATH)\light.exe -wx -nologo $(WIXLIGHTLINT) $(WIXLIGHTCOMPRESSION)
-!ELSE
-WIXLIGHT=$(WIXPATH)\light.exe -wx -nologo -sice:ICE82 -sice:ICE80
-!ENDIF
 
 WIXLIT=$(WIXPATH)\lit.exe -wx -nologo
 WIXHEAT=$(WIXPATH)\heat.exe
