@@ -87,13 +87,20 @@ export class Name extends Section {
  * into the string table at finalization.
  */
 export class StrsItem {
+  /** string value */
   readonly value: string;
-  constructor(value: string) {
+  /** char value if this is a single-char placeholder item (CharStrsItem) */
+  readonly char?: number;
+
+  constructor(value: string, char?: number) {
     this.value = value;
+    this.char = char;
   }
+
   compareTo(o: StrsItem): number {
     return StrsItem.binaryStringCompare(this.value, o.value);
   }
+
   static binaryStringCompare(a: string, b: string): number {
     // https://tc39.es/ecma262/multipage/abstract-operations.html#sec-islessthan
     if(typeof a != 'string' || typeof b != 'string') {
@@ -103,6 +110,27 @@ export class StrsItem {
     if(a > b) return 1;
     return 0;
   }
+
+  /** True if this string *could* be a UTF-32 single char */
+  static isOneChar(value: string) : boolean {
+    return (value.split('').length) == 1;
+  }
+
+  get isOneChar() {
+    return this.char !== undefined;
+  }
+};
+
+/**
+ * A StrsItem for a single char. Used as a placeholder and hint to the builder
+ */
+export class CharStrsItem extends StrsItem {
+  constructor(value: string) {
+    if (!StrsItem.isOneChar(value)) {
+      throw RangeError(`not a 1-char string`);
+    }
+    super(value, value.charCodeAt(0));
+  }
 };
 
 export class Strs extends Section {
@@ -110,17 +138,19 @@ export class Strs extends Section {
   /**
    * Allocate a StrsItem given the string, unescaping if necessary.
    * @param s escaped string
+   * @param singleOk if true, allocate a CharStrsItem (not in strs table) if single-char capable.
    * @returns
    */
-  allocAndUnescapeString(s?: string): StrsItem {
-    return this.allocString(unescapeString(s));
+  allocAndUnescapeString(s?: string, singleOk?: boolean): StrsItem {
+    return this.allocString(unescapeString(s), singleOk);
   }
   /**
    * Allocate a StrsItem given the string.
    * @param s string
+   * @param singleOk if true, allocate a CharStrsItem (not in strs table) if single-char capable.
    * @returns
    */
-  allocString(s?: string): StrsItem {
+  allocString(s?: string, singleOk?: boolean): StrsItem {
     if(s === undefined || s === null) {
       // undefined or null are always equivalent to empty string, see C7043
       s = '';
@@ -128,6 +158,11 @@ export class Strs extends Section {
 
     if(typeof s !== 'string') {
       throw new Error('alloc_string: s must be a string, undefined, or null.');
+    }
+
+    // if it's a single char, don't push it into the list
+    if (singleOk && StrsItem.isOneChar(s)) {
+      return new CharStrsItem(s);
     }
 
     let result = this.strings.find(item => item.value === s);

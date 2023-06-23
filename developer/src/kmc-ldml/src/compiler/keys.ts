@@ -102,8 +102,8 @@ export class KeysCompiler extends SectionCompiler {
       for (let lkflick of lkflicks.flick) {
         let flags = 0;
         // TODO-LDML: single char
-        const to = sections.strs.allocAndUnescapeString(lkflick.to);
-        flags |= constants.keys_flick_flags_extend;
+        const to = sections.strs.allocAndUnescapeString(lkflick.to, true);
+        flags |= to.isOneChar ? constants.keys_flick_flags_extend : 0;
         let directions : ListItem = sections.list.allocListFromSpaces(sections.strs, lkflick.directions);
         flicks.flicks.push({
           directions,
@@ -138,8 +138,8 @@ export class KeysCompiler extends SectionCompiler {
       const longPressDefault = sections.strs.allocAndUnescapeString(key.longPressDefault);
       const multiTap: ListItem = sections.list.allocListFromEscapedSpaces(sections.strs, key.multiTap);
       const keySwitch = sections.strs.allocString(key.switch); // 'switch' is a reserved word
-      flags |= constants.keys_key_flags_extend;
-      const to = sections.strs.allocAndUnescapeString(key.to); // TODO-LDML: single char
+      const to = sections.strs.allocAndUnescapeString(key.to, true); // TODO-LDML: single char
+      flags |= to.isOneChar ? constants.keys_key_flags_extend : 0;
       const width = Math.ceil((key.width || 1) * 10.0);  // default, width=1
       sect.keys.push({
         flags,
