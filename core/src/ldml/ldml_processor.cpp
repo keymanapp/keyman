@@ -239,7 +239,7 @@ ldml_processor::process_event(
         // Construct a context buffer of all the KM_KBP_BT_CHAR items
         // Extract the context into 'ctxt' for transforms to process
         if (!!transforms) {
-          // if no transfors, no reason to do this extraction
+          // if no transforms, no reason to do this extraction
           auto &cp = state->context();
           // We're only interested in as much of the context as is a KM_KBP_BT_CHAR.
           uint8_t last_type = KM_KBP_BT_UNKNOWN;
