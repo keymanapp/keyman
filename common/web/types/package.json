@@ -57,5 +57,22 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/keymanapp/keyman.git"
+  },
+  "c8": {
+    "all": true,
+    "src": ["src/"],
+    "exclude-after-remap": true,
+    "exclude": [
+      "src/kmx/kmx-plus-builder/",
+      "src/kmx/kmx-plus.ts",
+      "src/kmx/kmx-builder.ts",
+      "src/kmx/element-string.ts",
+      "src/kmx/string-list.ts",
+      "src/ldml-keyboard/ldml-keyboard-testdata-xml.ts",
+      "src/ldml-keyboard/unicodeset-parser-api.ts",
+      "src/keyman-touch-layout/keyman-touch-layout-file-writer.ts",
+      "src/osk/osk.ts",
+      "test/"
+    ]
   }
 }
