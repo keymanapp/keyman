@@ -248,8 +248,8 @@ block(keys)                         # struct COMP_KMXPLUS_KEYS {
   02 00 00 00                       #   KMX_DWORD kmapCount;          // 0008 number of kmap
   # keys
   # (#0000) hmaqtugha
-  index(strNull,strKey1,2)          #   KMXPLUS_STR 'U+0127'
-  01 00 00 00                       #   KMX_DWORD (flags: extend)
+  27 01 00 00                       #   UTF-32    'U+0127'
+  00 00 00 00                       #   KMX_DWORD (flags: none)
   index(strNull,strHmaqtugha,2)     #   KMXPLUS_STR 'hmaqtugha'
   00 00 00 00                       #   KMXPLUS_STR switch
   0A 00 00 00                       #   KMX_DWORD width*10
@@ -416,7 +416,6 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strVst)   sizeof(strVst,2)
   diff(strs,strVus)   sizeof(strVus,2)
   diff(strs,strTranTo)          sizeof(strTranTo,2)
-  diff(strs,strKey1)       sizeof(strKey1,2)
   diff(strs,strKeys)       sizeof(strKeys,2)
   diff(strs,strElemOrdrFrom3)   sizeof(strElemOrdrFrom3,2)
   diff(strs,strElemOrdrFrom1)   sizeof(strElemOrdrFrom1,2)
@@ -457,7 +456,6 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strVst)              76 00 73 00 74 00 block(x) 00 00                     # 'vst'
   block(strVus)              76 00 75 00 73 00 block(x) 00 00                     # 'vus'
   block(strTranTo)           E2 00 block(x) 00 00                                       # 'â'
-  block(strKey1)             27 01 block(x) 00 00                                     # 'ħ'
 #str #1a
   block(strKeys)             90 17 b6 17 block(x) 00 00                               # 'ថា'
   # <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
