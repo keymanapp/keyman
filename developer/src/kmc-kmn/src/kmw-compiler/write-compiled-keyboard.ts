@@ -1,4 +1,4 @@
-import { KMX, CompilerOptions, CompilerCallbacks, KvkFileReader, VisualKeyboard, KmxFileReader, Osk } from "@keymanapp/common-types";
+import { KMX, CompilerOptions, CompilerCallbacks, KvkFileReader, VisualKeyboard, KmxFileReader, Osk, KvkFile } from "@keymanapp/common-types";
 import { ExpandSentinel, incxstr, xstrlen } from "./util.js";
 import { options, nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater, callbacks, FFix183_LadderLength } from "./compiler-globals.js";
 import { JavaScript_ContextMatch, JavaScript_KeyAsString, JavaScript_Name, JavaScript_OutputString, JavaScript_Rules, JavaScript_Shift, JavaScript_ShiftAsString, JavaScript_Store, zeroPadHex } from './javascript-strings.js';
@@ -54,7 +54,7 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
   let vMnemonic: number = 0;
   let /*s: string,*/ sRTL: string = "", sHelp: string = "''", sHelpFile: string = "",
       sEmbedJS: string = "", sEmbedCSS: string = "";
-  let sVisualKeyboard: string = "", sFullName: string = "";
+  let sVisualKeyboardFilename: string = "", sFullName: string = "";
   let sBegin_NewContext: string = "", sBegin_PostKeystroke: string = "";
   let sLayoutFile: string = "", sVKDictionary: string = "";
   let linecomment: string;  // I3438
@@ -81,7 +81,7 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
       sHelp = '"'+RequotedString(fsp.dpString)+'"';
     }
     else if (fsp.dpName == 'VisualKeyboard' || fsp.dwSystemID == KMX.KMXFile.TSS_VISUALKEYBOARD) {
-      sVisualKeyboard = fsp.dpString;
+      sVisualKeyboardFilename = fsp.dpString;
     }
     else if (fsp.dpName == 'EmbedJS' || fsp.dwSystemID == KMX.KMXFile.TSS_KMW_EMBEDJS) {
       sEmbedJS = fsp.dpString;
@@ -190,24 +190,14 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
   // layout platform.displayUnderlying property or, if that is not present for
   // the given platform, by the OSK property.
   let fDisplayUnderlying = false;
+  let sVisualKeyboard = 'null'; // 'null' as a string is correct
 
-  if (sVisualKeyboard != '') {
-    // TODO: stop reusing sVisualKeyboard for both filename and content
-    let reader = new KvkFileReader();
-    let kvk: VisualKeyboard.VisualKeyboard = reader.read(kvkData);
-    let result = VisualKeyboardFromFile(kvk, options.saveDebug);
-    if(!result.result) {
-      // TODO: error
-      sVisualKeyboard = 'null';
-    }
-    else {
-      sVisualKeyboard = result.result;
-    }
+  if (sVisualKeyboardFilename != '') {
+    const reader = new KvkFileReader();
+    const kvk: VisualKeyboard.VisualKeyboard = reader.read(kvkData);
+    fDisplayUnderlying = !!(kvk.header.flags & KvkFile.BUILDER_KVK_HEADER_FLAGS.kvkhDisplayUnderlying);
+    sVisualKeyboard = VisualKeyboardFromFile(kvk, options.saveDebug);
   }
-  else {
-    sVisualKeyboard = 'null';
-  }
-
 
   const fMnemonic = vMnemonic == 1;
 

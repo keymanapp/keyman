@@ -3,23 +3,11 @@ import { FTabStop, nl } from "./compiler-globals.js";
 import { CKeymanWebKeyCodes } from "./keymanweb-key-codes.js";
 import { RequotedString } from "./write-compiled-keyboard.js";
 
-interface VKFFResult {
-  result: string;
-  displayUnderling: boolean;
-}
-
-export function VisualKeyboardFromFile(visualKeyboard: VisualKeyboard.VisualKeyboard, debug: boolean): VKFFResult {
-  let f102 = visualKeyboard.header.flags & KvkFile.BUILDER_KVK_HEADER_FLAGS.kvkh102 ? '1' : '0';
-
-  let result = `{F:' 1em "${RequotedString(visualKeyboard.header.unicodeFont.name)}"',K102:${f102}}` +
+export function VisualKeyboardFromFile(visualKeyboard: VisualKeyboard.VisualKeyboard, debug: boolean): string {
+  const f102 = visualKeyboard.header.flags & KvkFile.BUILDER_KVK_HEADER_FLAGS.kvkh102 ? '1' : '0';
+  return `{F:' 1em "${RequotedString(visualKeyboard.header.unicodeFont.name)}"',K102:${f102}}` +
     `;` + VisualKeyboardToKLS(visualKeyboard) +
     ';' + BuildBKFromKLS(debug);
-
-  return {
-    result: result,
-    // TODO: this can go in caller, later
-    displayUnderling: !!(visualKeyboard.header.flags & KvkFile.BUILDER_KVK_HEADER_FLAGS.kvkhDisplayUnderlying)
-  }
 }
 
 function WideQuote(s: string): string {
