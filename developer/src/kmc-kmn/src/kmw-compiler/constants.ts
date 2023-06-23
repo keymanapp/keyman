@@ -10,7 +10,9 @@ export const
   CSpecialText10: string = '*Shift*\0*Enter*\0*Tab*\0*BkSp*\0*Menu*\0*Hide*\0*Alt*\0*Ctrl*\0*Caps*\0' +
     '*ABC*\0*abc*\0*123*\0*Symbol*\0*Currency*\0*Shifted*\0*AltGr*\0*TabLeft*',
   // these names were added in Keyman 14
-  CSpecialText14: string = '*LTREnter*\0*LTRBkSp*\0*RTLEnter*\0*RTLBkSp*\0*ShiftLock*\0*ShiftedLock*\0*ZWNJ*\0*ZWNJiOS*\0*ZWNJAndroid*', CSpecialText14ZWNJ: string = '*ZWNJ*\0*ZWNJiOS*\0*ZWNJAndroid*', CSpecialText14Map: string[][] = [
+  CSpecialText14: string = '*LTREnter*\0*LTRBkSp*\0*RTLEnter*\0*RTLBkSp*\0*ShiftLock*\0*ShiftedLock*\0*ZWNJ*\0*ZWNJiOS*\0*ZWNJAndroid*',
+  CSpecialText14ZWNJ: string = '*ZWNJ*\0*ZWNJiOS*\0*ZWNJAndroid*',
+  CSpecialText14Map: string[][] = [
     ['*LTREnter*', '*Enter*'],
     ['*LTRBkSp*', '*BkSp*'],
     ['*RTLEnter*', '*Enter*'],
