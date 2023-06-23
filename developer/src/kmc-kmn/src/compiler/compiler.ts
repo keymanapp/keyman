@@ -265,9 +265,13 @@ export class KmnCompiler implements UnicodeSetParser {
 
     return {
       filename: this.callbacks.path.join(this.callbacks.path.dirname(kmxFilename),
-        this.callbacks.path.basename(kmnFilename, KeymanFileTypes.Source.KeymanKeyboard) + KeymanFileTypes.Binary.WebKeyboard),
+      this.keyboardIdFromKmnFilename(kmnFilename) + KeymanFileTypes.Binary.WebKeyboard),
       data: new TextEncoder().encode(data)
     };
+  }
+
+  private keyboardIdFromKmnFilename(kmnFilename: string): string {
+    return this.callbacks.path.basename(kmnFilename, KeymanFileTypes.Source.KeymanKeyboard);
   }
 
   private runKvkCompiler(kvksFilename: string, kmnFilename: string, kmxFilename: string, displayMap?: Osk.PuaMap) {
@@ -288,6 +292,10 @@ export class KmnCompiler implements UnicodeSetParser {
     for(let invalidVkey of invalidVkeys) {
       this.callbacks.reportMessage(CompilerMessages.Warn_InvalidVkeyInKvksFile({filename, invalidVkey}));
     }
+
+    // Make sure that we maintain the correspondence between source keyboard and
+    // .kvk. Appears to be used currently only by Windows package installer.
+    vk.header.associatedKeyboard = this.keyboardIdFromKmnFilename(kmnFilename);
 
     if(displayMap) {
       // Remap using the osk-char-use-rewriter

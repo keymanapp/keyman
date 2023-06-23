@@ -3,7 +3,7 @@ import KVKSourceFile from './kvks-file.js';
 import { default as AjvModule } from 'ajv';
 const Ajv = AjvModule.default; // The actual expected Ajv type.
 import { boxXmlArray } from '../util/util.js';
-import { VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKey, VisualKeyboardKeyFlags, VisualKeyboardLegalShiftStates, VisualKeyboardShiftState } from './visual-keyboard.js';
+import { DEFAULT_KVK_FONT, VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKey, VisualKeyboardKeyFlags, VisualKeyboardLegalShiftStates, VisualKeyboardShiftState } from './visual-keyboard.js';
 import { USVirtualKeyCodes } from '../consts/virtual-key-constants.js';
 import { BUILDER_KVK_HEADER_VERSION } from './kvk-file.js';
 
@@ -79,12 +79,13 @@ export default class KVKSFileReader {
   public transform(source: KVKSourceFile, invalidVkeys?: string[]): VisualKeyboard {
     // NOTE: at this point, the xml should have been validated
     // and matched the schema result so we can assume properties exist
+
     let result: VisualKeyboard = {
       header: {
         version: BUILDER_KVK_HEADER_VERSION,
         flags: 0,
-        ansiFont: { name: "Arial", size: -12, color: 0xFF000008 }, // TODO-LDML: consider defaults
-        unicodeFont: { name: "Arial", size: -12, color: 0xFF000008 }, // TODO-LDML: consider defaults
+        ansiFont: {...DEFAULT_KVK_FONT},
+        unicodeFont: {...DEFAULT_KVK_FONT},
         associatedKeyboard: source.visualkeyboard?.header?.kbdname,
         underlyingLayout: source.visualkeyboard?.header?.layout,
       },
@@ -107,8 +108,8 @@ export default class KVKSFileReader {
     for(let encoding of source.visualkeyboard.encoding) {
       let isUnicode = (encoding.$?.name == 'unicode'),
         font = isUnicode ? result.header.unicodeFont : result.header.ansiFont;
-      font.name = encoding.$?.fontname;
-      font.size = parseInt(encoding.$?.fontsize,10);
+      font.name = encoding.$?.fontname ?? DEFAULT_KVK_FONT.name;
+      font.size = parseInt(encoding.$?.fontsize ?? DEFAULT_KVK_FONT.size.toString(), 10);
       for(let layer of encoding.layer) {
         let shift = this.kvksShiftToKvkShift(layer.$?.shift);
         for(let sourceKey of layer.key) {

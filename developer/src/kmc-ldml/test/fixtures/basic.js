@@ -7,7 +7,7 @@ function Keyboard_basic() {
   this.KI="Keyboard_basic";
   this.KN={"value":"TestKbd"};
   this.KMINVER="16.0";
-  this.KV={F: '10pt "Arial"', K102: 0};
+  this.KV={F: ' 1em "Arial"', K102: 0};
   this.KV.KLS={
     TODO_LDML: 2
   };
