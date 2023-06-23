@@ -1026,7 +1026,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     {
       // Store extra metadata for callers as we mutate this store during
       // compilation
-      fk->extra->kvksFilename = sp->dpString;
+      fk->extra->kvksFilename = string_from_u16string(sp->dpString);
       // Strip path from the store, leaving bare filename only
       p = sp->dpString;
 
@@ -1140,7 +1140,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     // This store is allowed in older versions of Keyman, as it is a
     // compile-time only feature. Implemented only in kmc-kmn, not in
     // the legacy compilers.
-    fk->extra->displayMapFilename = sp->dpString;
+    fk->extra->displayMapFilename = string_from_u16string(sp->dpString);
     break;
 
   default:

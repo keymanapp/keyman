@@ -1,10 +1,11 @@
-import { KMX, CompilerOptions, CompilerCallbacks, KvkFileReader, VisualKeyboard, KmxFileReader, Osk, KvkFile } from "@keymanapp/common-types";
+import { KMX, CompilerOptions, CompilerCallbacks, KvkFileReader, VisualKeyboard, KmxFileReader, KvkFile } from "@keymanapp/common-types";
 import { ExpandSentinel, incxstr, xstrlen } from "./util.js";
 import { options, nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater, callbacks, FFix183_LadderLength } from "./compiler-globals.js";
 import { JavaScript_ContextMatch, JavaScript_KeyAsString, JavaScript_Name, JavaScript_OutputString, JavaScript_Rules, JavaScript_Shift, JavaScript_ShiftAsString, JavaScript_Store, zeroPadHex } from './javascript-strings.js';
 import { KmwCompilerMessages } from "./messages.js";
 import { ValidateLayoutFile } from "./validate-layout-file.js";
 import { VisualKeyboardFromFile } from "./visual-keyboard-compiler.js";
+import { CompilerResult } from "src/compiler/compiler.js";
 
 function requote(s: string): string {
   return "'" + s.replaceAll(/(['\\])/, "\\$1") + "'";
@@ -33,7 +34,7 @@ export function RequotedString(s: string, RequoteSingleQuotes: boolean = false):
   return s;
 }
 
-export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: string, keyboardData: Uint8Array, kvkData: Uint8Array, displayMap: Osk.PuaMap, FDebug: boolean = false): string {
+export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: string, keyboardData: Uint8Array, kvkData: Uint8Array, kmxResult: CompilerResult, FDebug: boolean = false): string {
   let opts: CompilerOptions = {
     shouldAddCompilerVersion: false,
     saveDebug: FDebug
@@ -153,7 +154,7 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
   if (sLayoutFilename != '') {  // I3483
     sLayoutFilename = callbacks.resolveFilename(kmnfile, sLayoutFilename);
 
-    let result = ValidateLayoutFile(keyboard, options.saveDebug, sLayoutFilename, sVKDictionary, displayMap);
+    let result = ValidateLayoutFile(keyboard, options.saveDebug, sLayoutFilename, sVKDictionary, kmxResult.displayMap);
     if(!result.result) {
       sLayoutFile = '';
       callbacks.reportMessage(KmwCompilerMessages.Error_TouchLayoutFileInvalid({filename:sLayoutFilename}));

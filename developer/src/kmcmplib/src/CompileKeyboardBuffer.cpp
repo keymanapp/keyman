@@ -43,8 +43,8 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   fk->cxVKDictionary = 0;  // I3438
   fk->dpVKDictionary = NULL;  // I3438
   fk->extra->targets = COMPILETARGETS_KMX;
-  fk->extra->kvksFilename = u"";
-  fk->extra->displayMapFilename = u"";
+  fk->extra->kvksFilename = "";
+  fk->extra->displayMapFilename = "";
 /*	fk->szMessage[0] = 0;
   fk->szLanguageName[0] = 0;*/
   fk->dwBitmapSize = 0;
