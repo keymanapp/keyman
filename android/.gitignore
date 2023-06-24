@@ -13,6 +13,7 @@ sentry.properties
 # User-specific stuff:
 **/.idea/libraries/
 **/.idea/dictionaries
+**/.idea/shelf/
 **/.idea/**/*.xml
 **/*.iml
 

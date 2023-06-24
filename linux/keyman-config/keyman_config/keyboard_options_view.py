@@ -17,7 +17,7 @@ from keyman_config.accelerators import init_accel
 from keyman_config.dconf_util import get_option, set_option
 
 
-class OptionsView(Gtk.Window):
+class KeyboardOptionsView(Gtk.Window):
 
     def __init__(self, info):
         self.accelerators = None
@@ -25,7 +25,7 @@ class OptionsView(Gtk.Window):
         self.packageID = info["packageID"]
         self.keyboardID = info["keyboardID"]
         kbtitle = _("{packageId} Settings").format(packageId=self.packageID)
-        Gtk.Window.__init__(self, title=kbtitle)
+        super().__init__(title=kbtitle)
         init_accel(self)
 
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)

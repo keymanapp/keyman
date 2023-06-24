@@ -3,8 +3,8 @@
 <!--
 from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-keyboards.md#element-transform
 
-@@keys: [K_Q][K_U][K_BKQUOTE][K_E]
-@@expected: qu\u00ea
+@@keys: [K_T][K_A][K_B][K_BKSP]
+@@expected: t
 
 -->
 <!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">

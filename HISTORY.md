@@ -1,5 +1,40 @@
 # Keyman Version History
 
+## 17.0.128 alpha 2023-06-22
+
+*  (#9061)
+* docs(windows): add more steps for clarity (#9063)
+
+## 17.0.127 alpha 2023-06-21
+
+* feat(core): implementation of non-regex components of tran (#9019)
+* chore: enable common ci for web (#9047)
+
+## 17.0.126 alpha 2023-06-19
+
+* chore(mac): move from altool to notarytool (#9010)
+
+## 17.0.125 alpha 2023-06-17
+
+* fix(android/samples): Cleanup Sample/Tests apk's (#9030)
+* chore(common): Bump crowdin github action to 1.3.2 (#9029)
+
+## 17.0.124 alpha 2023-06-14
+
+* fix(windows): qr code id uses keyboard name and not package name (#9002)
+* refactor(linux): Extract widgets to separate classes and files (#9007)
+
+## 17.0.123 alpha 2023-06-13
+
+* chore(developer): support cp1252 'ansi' keyboards (#8988)
+* fix(developer): keep kmc-kmn messages within namespace (#8999)
+* fix(linux): Fix display of installed keyboard version (#8948)
+* fix(linux): Fix creation of markdown help files for Linux (#9001)
+
+## 17.0.122 alpha 2023-06-12
+
+* refactor(developer): import kmcmplib errors into kmc-kmn (#8962)
+
 ## 17.0.121 alpha 2023-06-09
 
 * fix(linux): Fix disabling of buttons (#8946)
