@@ -17,10 +17,15 @@ watch_web='common/models|common/predictive-text|common/web|core'
 watch_windows='common|core|web'
 watch_developer='common|core|web'
 
+# Note, currently common_web build is a no-op because we rely on running the web
+# tests on all three of our build platforms as seen below
 watch_common_web='common/web'
-watch_common_windows='common/windows'
-watch_common_mac='common/mac'
-watch_common_linux='common/linux'
+# Currently, we run web tests on all three of our build platforms, to ensure
+# that they work in all our environments. So we need to include common/web in
+# the matches for these
+watch_common_windows='common/windows|common/web'
+watch_common_mac='common/mac|common/web'
+watch_common_linux='common/linux|common/web'
 
 #
 # Available build configurations and VCS identifiers; identifiers are somewhat inconsistent due
