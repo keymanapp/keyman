@@ -29,7 +29,7 @@
     "@keymanapp/keyman-version": "*",
     "ajv": "^8.11.0",
     "restructure": "git+https://github.com/keymanapp/dependency-restructure.git#49d129cf0916d082a7278bb09296fb89cecfcc50",
-    "semver": "^7.3.7",
+    "semver": "^7.5.2",
     "xml2js": "git+https://github.com/keymanapp/dependency-node-xml2js#535fe732dc408d697e0f847c944cc45f0baf0829"
   },
   "devDependencies": {
