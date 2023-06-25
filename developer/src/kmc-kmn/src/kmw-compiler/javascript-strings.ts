@@ -62,8 +62,8 @@ export function JavaScript_Store(fk: KMX.KEYBOARD, line: number, pwsz: string): 
         result += JavaScript_String(ch);  // I2242
       }
 
-      // TODO: problems with supp chars
-      pwsz = pwsz.substring(1);
+      const stringStartsWithSurrogatePair = (s:string) => /^[\uD800-\uDBFF][\uDC00-\uDFFF]/.test(s);
+      pwsz = pwsz.substring(stringStartsWithSurrogatePair(pwsz) ? 2 : 1);
     }
     result += '"';
   }
@@ -386,15 +386,15 @@ export function JavaScript_Key(fkp: KMX.KEY, FMnemonic: boolean): number {
   return Result;
 }
 
-///
-/// Returns a Javascript representation of a key value, either as a constant (debug mode)
-/// or as an integer.
-///
-/// @param fkp         Pointer to key record
-/// @param FMnemonic   True if the keyboard is a mnemonic layout
-///
-/// @return string representation of the key value, e.g. 'keyCodes.K_A /* 0x41 */' or '65'
-///
+/**
+ * Returns a Javascript representation of a key value, either as a constant (debug mode)
+ * or as an integer.
+ *
+ * @param fkp         Pointer to key record
+ * @param FMnemonic   True if the keyboard is a mnemonic layout
+ *
+ * @return string representation of the key value, e.g. 'keyCodes.K_A /* 0x41 * /' or '65'
+ */
 export function JavaScript_KeyAsString(fkp: KMX.KEY, FMnemonic: boolean): string {
   if(options.saveDebug) {
     return ' '+FormatKeyAsString(JavaScript_Key(fkp, FMnemonic));
@@ -439,11 +439,6 @@ function CheckStoreForInvalidFunctions(fk: KMX.KEYBOARD, key: KMX.KEY, store: KM
 
 // Used when targeting versions prior to 10.0, before the introduction of FullContextMatch/KFCM.
 function JavaScript_CompositeContextValue(fk: KMX.KEYBOARD, fkp: KMX.KEY, pwsz: string): string {
-// var
-  // StartQuotes, Len, Cur: Integer;
-  // InQuotes: Boolean;
-  // rec: TSentinelRecord;
-
   let Result = '';
 
   let InQuotes = false;
@@ -527,11 +522,6 @@ function JavaScript_CompositeContextValue(fk: KMX.KEYBOARD, fkp: KMX.KEY, pwsz: 
 
 // Used when targeting versions >= 10.0, after the introduction of FullContextMatch/KFCM.
 function JavaScript_FullContextValue(fk: KMX.KEYBOARD, fkp: KMX.KEY, pwsz: string): string {
-/*var
-  Len: Integer;
-  rec: TSentinelRecord;
-  FullContext, Suffix: string;
-begin*/
   let Result = '';
   let FullContext = '';
   let Suffix = '';
@@ -634,14 +624,6 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
   let InQuotes = false;
   let len = 0;
   const nlt = nl + FTabStops;   // I3681
-
-/*var
-  i, n, len: Integer;
-  InQuotes: Boolean;
-  rec: TSentinelRecord;
-  pwszcontext,pwsz: PWideChar;
-  Index: Integer;   // I3910
-  nlt: string;*/
 
   const AdjustIndex = function(pwszContext: string, Index: number): number {   // I3910
     let Result = Index;
