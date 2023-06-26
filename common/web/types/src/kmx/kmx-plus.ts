@@ -93,6 +93,14 @@ export class StrsItem {
   readonly char?: number;
 
   constructor(value: string, char?: number) {
+    if (char !== undefined) {
+      if (!isOneChar(value)) {
+        throw new Error(`StrsItem: ${value} is not a single char`);
+      }
+      if (char !== toOneChar(value)) {
+        throw new Error(`StrsItem: ${char} is not the right codepoint for ${value}`);
+      }
+    }
     this.value = value;
     this.char = char;
   }
