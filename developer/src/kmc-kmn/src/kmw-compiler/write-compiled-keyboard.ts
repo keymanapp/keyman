@@ -49,7 +49,7 @@ export function WriteCompiledKeyboard(
   const reader = new KmxFileReader();
   const keyboard: KMX.KEYBOARD = reader.read(keyboardData);
 
-  setupGlobals(callbacks, opts, FDebug?'  ':'', FDebug?'\r\n':'', keyboard, kmnfile);
+  setupGlobals(callbacks, opts, FDebug?'  ':'', FDebug?'\r\n':'', kmxResult, keyboard, kmnfile);
 
   // let fgp: GROUP;
 
@@ -376,7 +376,10 @@ export function WriteCompiledKeyboard(
       else {
         result +=
           `${FTabStop+FTabStop}if(!m) {${nl}`+
-          `${FTabStop+FTabStop+FTabStop}${JavaScript_OutputString(keyboard, FTabStop + FTabStop + FTabStop, null, fgp.dpNoMatch, fgp)}${nl}`+
+          `${FTabStop+FTabStop}${JavaScript_OutputString(keyboard, FTabStop + FTabStop + FTabStop, null, fgp.dpNoMatch, fgp)}${nl}`+
+          // TODO: add FTabStop to line above, once we have 100% identical match
+          //       to legacy compiler, but because legacy compiler missed this
+          //       tabstop we'll leave it out here for now
           `${FTabStop+FTabStop}}${nl}`;
       }
     }

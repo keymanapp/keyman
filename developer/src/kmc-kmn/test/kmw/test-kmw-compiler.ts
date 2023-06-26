@@ -57,6 +57,10 @@ describe('KeymanWeb Compiler', function() {
     //
     run_test_keyboard(kmnCompiler, 'test_keychars');
   });
+
+  it('should handle readonly groups', async function() {
+    run_test_keyboard(kmnCompiler, 'test_readonly_groups');
+  });
 });
 
 
@@ -78,15 +82,16 @@ function run_test_keyboard(kmnCompiler: KmnCompiler, id: string): { result: Comp
   };
   value.actual = parseWebTestResult(value.actualCode);
   value.expected = parseWebTestResult(value.expectedCode);
-  assert.deepEqual(value.actual.js, value.expected.js);
-  assert.deepEqual(JSON.parse(value.actual.touchLayout), JSON.parse(value.expected.touchLayout));
 
   if(debug) {
     // This is mostly to allow us to verify that parseWebTestResult is doing what we want
-    fs.writeFileSync(filenames.binary + '.strip.js', value.actual.js);
-    fs.writeFileSync(filenames.fixture + '.strip.js', value.expected.js);
+    // fs.writeFileSync(filenames.binary + '.strip.js', value.actual.js);
+    // fs.writeFileSync(filenames.fixture + '.strip.js', value.expected.js);
     fs.writeFileSync(filenames.binary, value.actualCode);
   }
+
+  assert.deepEqual(value.actual.js, value.expected.js);
+  assert.deepEqual(JSON.parse(value.actual.touchLayout), JSON.parse(value.expected.touchLayout));
 
   return value;
 }

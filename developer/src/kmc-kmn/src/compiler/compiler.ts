@@ -33,6 +33,11 @@ export interface CompilerResultExtraStore {
   name: string;      // when debug=false, the .kmx will not have store names
 };
 
+export interface CompilerResultExtraGroup {
+  isReadOnly: boolean;
+  name: string;
+};
+
 export const COMPILETARGETS_KMX =   0x01;
 export const COMPILETARGETS_JS =    0x02;
 export const COMPILETARGETS__MASK = 0x03;
@@ -47,7 +52,8 @@ export interface CompilerResultExtra {
   targets: number;
   kvksFilename?: string;
   displayMapFilename?: string;
-  stores?: CompilerResultExtraStore[];
+  stores: CompilerResultExtraStore[];
+  groups: CompilerResultExtraGroup[];
 };
 
 //
@@ -191,12 +197,16 @@ export class KmnCompiler implements UnicodeSetParser {
         targets: wasm_result.extra.targets,
         displayMapFilename: wasm_result.extra.displayMapFilename,
         kvksFilename: wasm_result.extra.kvksFilename,
-        stores: []
+        stores: [],
+        groups: [],
       },
       displayMap: null
     };
     for(let store of wasm_result.extra.stores) {
       result.extra.stores.push({storeType: store.storeType, name: store.name});
+    }
+    for(let group of wasm_result.extra.groups) {
+      result.extra.groups.push({isReadOnly: group.isReadOnly, name: group.name});
     }
 
     return result;

@@ -142,11 +142,17 @@ EMSCRIPTEN_BINDINGS(compiler_interface) {
     .property("kvksFilename", &KMCMP_COMPILER_RESULT_EXTRA::kvksFilename)
     .property("displayMapFilename", &KMCMP_COMPILER_RESULT_EXTRA::displayMapFilename)
     .property("stores", &KMCMP_COMPILER_RESULT_EXTRA::stores)
+    .property("groups", &KMCMP_COMPILER_RESULT_EXTRA::groups)
     ;
 
   emscripten::value_object<KMCMP_COMPILER_RESULT_EXTRA_STORE>("CompilerResultExtraStore")
     .field("storeType", &KMCMP_COMPILER_RESULT_EXTRA_STORE::storeType)
     .field("name", &KMCMP_COMPILER_RESULT_EXTRA_STORE::name)
+    ;
+
+  emscripten::value_object<KMCMP_COMPILER_RESULT_EXTRA_GROUP>("CompilerResultExtraGroup")
+    .field("isReadOnly", &KMCMP_COMPILER_RESULT_EXTRA_GROUP::isReadOnly)
+    .field("name", &KMCMP_COMPILER_RESULT_EXTRA_GROUP::name)
     ;
 
   emscripten::function("kmcmp_compile", &kmcmp_wasm_compile);

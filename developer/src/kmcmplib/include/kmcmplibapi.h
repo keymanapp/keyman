@@ -47,6 +47,11 @@ struct KMCMP_COMPILER_RESULT_EXTRA_STORE {
   std::string name; // when debug=false, the .kmx will not have store names
 };
 
+struct KMCMP_COMPILER_RESULT_EXTRA_GROUP {
+  bool isReadOnly;
+  std::string name;
+};
+
 #define COMPILETARGETS_KMX     0x01
 #define COMPILETARGETS_JS      0x02
 #define COMPILETARGETS__MASK   0x03
@@ -57,6 +62,7 @@ struct KMCMP_COMPILER_RESULT_EXTRA {
   std::string kvksFilename;
   std::string displayMapFilename;
   std::vector<KMCMP_COMPILER_RESULT_EXTRA_STORE> stores;
+  std::vector<KMCMP_COMPILER_RESULT_EXTRA_GROUP> groups;
 };
 
 struct KMCMP_COMPILER_RESULT {
