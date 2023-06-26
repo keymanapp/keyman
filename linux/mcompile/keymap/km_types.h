@@ -49,6 +49,7 @@ typedef wchar_t*   PWSTR;               // _S2 needs to be removed/ wchart-> cha
 typedef PWSTR      PKMX_WCHART;         // _S2 needs to be removed/ wchart-> char16
 
 typedef wchar_t*   LPKMX_WCHART;        // _S2 needs to be removed/ wchart-> char16
+typedef const wchar_t*  PCKMX_WCHART;   // _S2 needs to be removed/?
 
 typedef char*      LPSTR;               // _S2 needs to be removed?
 typedef LPSTR      LPKMX_STR;           // _S2 needs to be removed?
@@ -65,6 +66,8 @@ typedef char       KMX_CHAR;            // _S2 needs to be removed/?
 typedef char*      PKMX_STR;            // _S2 needs to be removed/?
 
 typedef KMX_CHAR*  PKMX_CHAR;           // _S2 needs to be removed/?
+
+
 
 typedef uint32_t   KMX_UINT;
 

@@ -12,6 +12,8 @@
 
 int dummytest_u16();
 
+wchar_t* wchart_from_char( char* c) ;
+
 std::string string_from_wstring(std::wstring const str);
 std::wstring wstring_from_string(std::string const str);
 std::u16string u16string_from_string(std::string const str);

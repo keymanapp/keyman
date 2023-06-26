@@ -12,6 +12,13 @@ int dummytest_u16(){
   return 0;
 }
 
+//const wchar_t* <- const char*
+wchar_t* wchart_from_char( char* c) {
+  std::string str(c);
+  std::wstring wstr = wstring_from_string(str);
+   wchar_t* wc =  (wchar_t*) wstr.c_str();
+}
+
 //String <- wstring
 std::string string_from_wstring(std::wstring const str) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
