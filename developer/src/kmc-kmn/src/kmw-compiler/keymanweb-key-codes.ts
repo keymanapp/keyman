@@ -820,3 +820,28 @@ export const enum
     K_TABBACK = 50011,
     K_TABFWD = 50012
   };
+
+  export const KeymanWebTouchStandardKeyNames: string[] = [
+    'K_LOPT',
+    'K_ROPT',
+    'K_NUMERALS',
+    'K_SYMBOLS',
+    'K_CURRENCIES',
+    'K_UPPER',
+    'K_LOWER',
+    'K_ALPHA',
+    'K_SHIFTED',
+    'K_ALTGR',
+    'K_TABBACK',
+    'K_TABFWD',
+  ];
+
+/**
+ * Used only by KMW
+ */
+export const KMWAdditionalKeyNames: string[] = [
+  'K_LCONTROL',
+  'K_RCONTROL',
+  'K_LALT',
+  'K_RALT',
+];
