@@ -1,5 +1,5 @@
 
-interface ETLResult {
+export interface ETLResult {
   js: string;
   touchLayout: string;
 }
@@ -7,7 +7,10 @@ interface ETLResult {
 export function extractTouchLayout(js: string): ETLResult|null  {
   let m = /KVKL=(?<kvkl>.+?);[\r\n]/ds.exec(js);
   if(!m) {
-    return null;
+    return {
+      js: js,
+      touchLayout: 'null'
+    };
   }
 
   let kvkl = (<any>m).indices.groups.kvkl;

@@ -5,7 +5,7 @@ import { JavaScript_ContextMatch, JavaScript_KeyAsString, JavaScript_Name, JavaS
 import { KmwCompilerMessages } from "./messages.js";
 import { ValidateLayoutFile } from "./validate-layout-file.js";
 import { VisualKeyboardFromFile } from "./visual-keyboard-compiler.js";
-import { CompilerResult } from "src/compiler/compiler.js";
+import { CompilerResult, STORETYPE_DEBUG, STORETYPE_OPTION, STORETYPE_RESERVED } from "../compiler/compiler.js";
 
 function requote(s: string): string {
   return "'" + s.replaceAll(/(['\\])/, "\\$1") + "'";
@@ -34,7 +34,14 @@ export function RequotedString(s: string, RequoteSingleQuotes: boolean = false):
   return s;
 }
 
-export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: string, keyboardData: Uint8Array, kvkData: Uint8Array, kmxResult: CompilerResult, FDebug: boolean = false): string {
+export function WriteCompiledKeyboard(
+  callbacks: CompilerCallbacks,
+  kmnfile: string,
+  keyboardData: Uint8Array,
+  kvkData: Uint8Array,
+  kmxResult: CompilerResult,
+  FDebug: boolean = false
+): string {
   let opts: CompilerOptions = {
     shouldAddCompilerVersion: false,
     saveDebug: FDebug
@@ -217,18 +224,10 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
     result += `${FTabStop}this.KCSS="${RequotedString(sEmbedCSS)}";${nl}`;
   }
 
-  function isDebugStore(fsp: KMX.STORE) {
-    return fsp.dwSystemID == KMX.KMXFile.TSS_DEBUG_LINE;
-  }
-
-  function isReservedStore(fsp: KMX.STORE) {
-    return fsp.dwSystemID != KMX.KMXFile.TSS_NONE;
-  }
-
-  function isOptionStore(fsp: KMX.STORE) {
-    // TODO: how do we determine this, see CheckStoreUsage()
-    return false;
-  }
+  const isStoreType = (index:number, type: number) => !!(kmxResult.extra.stores[index].storeType & type);
+  const isDebugStore = (index: number) => isStoreType(index, STORETYPE_DEBUG);
+  const isReservedStore = (index: number) => isStoreType(index, STORETYPE_RESERVED);
+  const isOptionStore = (index: number) => isStoreType(index, STORETYPE_OPTION);
 
 	// Write the stores out
   FOptionStores = '';
@@ -236,7 +235,7 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
     let fsp = keyboard.stores[i];
     // I3438 - Save all system stores to the keyboard, for now   // I3684
 
-    if (!isDebugStore(fsp)) { // and not (fsp.dwSystemID in [TSS_BITMAP, TSS_NAME, TSS_VERSION, TSS_CUSTOMKEYMANEDITION, TSS_CUSTOMKEYMANEDITIONNAME, TSS_KEYMANCOPYRIGHT]) then
+    if (!isDebugStore(i)) { // and not (fsp.dwSystemID in [TSS_BITMAP, TSS_NAME, TSS_VERSION, TSS_CUSTOMKEYMANEDITION, TSS_CUSTOMKEYMANEDITIONNAME, TSS_KEYMANCOPYRIGHT]) then
       if (fsp.dwSystemID == KMX.KMXFile.TSS_COMPARISON) {
         result += `${FTabStop}this.s${JavaScript_Name(i, fsp.dpName)}=${JavaScript_Store(keyboard, 0/*fsp.line*/, fsp.dpString)};${nl}`;
       }
@@ -245,14 +244,14 @@ export function WriteCompiledKeyboard(callbacks: CompilerCallbacks, kmnfile: str
       }
       //else if fsp.dwSystemID = TSS_VKDICTIONARY then // I3438, required for vkdictionary
       //  Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.line, fsp.dpString), nl])
-      else if (isOptionStore(fsp) && !isReservedStore(fsp)) {
+      else if (isOptionStore(i) && !isReservedStore(i)) {
         result += `${FTabStop}this.s${JavaScript_Name(i,fsp.dpName)}=KeymanWeb.KLOAD(this.KI,"${JavaScript_Name(i,fsp.dpName,true)}",`+
           `${JavaScript_Store(keyboard, 0/*fsp.line*/, fsp.dpString)});${nl}`;
 
         if (FOptionStores != '') {
           FOptionStores += ',';
         }
-        FOptionStores += `'s${JavaScript_Name(i, fsp.dpName)}`;
+        FOptionStores += `'s${JavaScript_Name(i, fsp.dpName)}'`;
       }
       else if (fsp.dwSystemID == KMX.KMXFile.TSS_NONE /* aka not fsp.fIsReserved */) {
         result += `${FTabStop}this.s${JavaScript_Name(i, fsp.dpName)}=${JavaScript_Store(keyboard, 0/*fsp.line*/, fsp.dpString)};${nl}`;   // I3681

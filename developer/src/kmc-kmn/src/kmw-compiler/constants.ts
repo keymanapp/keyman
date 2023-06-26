@@ -39,8 +39,8 @@ KMXCodeNames: string[] = [
 
 export const
   USEnglishUnshift: string = ' `'        + '1234567890' + '-' +  '='  + 'qwertyuiop' + '['  + ']'  + '\\'  + 'asdfghjkl' + ';'  + '\'' + 'zxcvbnm' + ','  + '.'  + '/',
-  USEnglishShift: string   = 0xFF + '~'  + '!@#$%^&*()' + '_' +  '+'  + 'QWERTYUIOP' + '{'  + '}'  + '|'   + 'ASDFGHJKL' + ':'  + '"'  + 'ZXCVBNM' + '<'  + '>'  + '?',
-  USEnglishValues: string  = 0x20 + 0xc0 + '1234567890' + 0xbd + 0xbb + 'QWERTYUIOP' + 0xdb + 0xdd + 0xdc  + 'ASDFGHJKL' + 0xba + 0xde + 'ZXCVBNM' + 0xbc + 0xbe + 0xbf,
+  USEnglishShift: string   = '\u00FF' + '~'  + '!@#$%^&*()' + '_' +  '+'  + 'QWERTYUIOP' + '{'  + '}'  + '|'   + 'ASDFGHJKL' + ':'  + '"'  + 'ZXCVBNM' + '<'  + '>'  + '?',
+  USEnglishValues: string  = '\u0020' + '\u00c0' + '1234567890' + '\u00bd' + '\u00bb' + 'QWERTYUIOP' + '\u00db' + '\u00dd' + '\u00dc'  + 'ASDFGHJKL' + '\u00ba' + '\u00de' + 'ZXCVBNM' + '\u00bc' + '\u00be' + '\u00bf',
   UnreachableKeyCodes: number[] = [  // I4141
     0x00,    // &H0
     0x01, //VK_LBUTTON,   // &H1
