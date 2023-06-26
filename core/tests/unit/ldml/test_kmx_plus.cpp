@@ -26,11 +26,11 @@ int test_COMP_KMXPLUS_KEYS_KEY() {
   COMP_KMXPLUS_ELEM_ELEMENT elems[2] = {
       {
           0x00000127,  // to = U+0127 = 295
-          0x00000000   // flags: !LDML_ELEM_FLAGS_UNICODE_SET
+          0x00000000   // flags: CHAR
       },
       {
           0x0001F640,  // to
-          0x00000000   // flags: !LDML_ELEM_FLAGS_UNICODE_SET
+          0x00000000   // flags: CHAR
       }};
   std::u16string s0 = e[0].get_string();
   assert_equal(s0.length(), 1);

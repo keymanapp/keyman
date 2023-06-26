@@ -53,7 +53,7 @@ if [[ "${SUDOINSTALL}" == "yes" ]]; then
 		exit 1
 	fi
 	echo "doing sudo glib-compile-schemas for keyman-config"
-	cp com.keyman.gschema.xml /usr/share/glib-2.0/schemas/
+	cp resources/com.keyman.gschema.xml /usr/share/glib-2.0/schemas/
 	glib-compile-schemas /usr/share/glib-2.0/schemas/
 	echo "doing sudo install of keyman-config"
 	./build.sh install

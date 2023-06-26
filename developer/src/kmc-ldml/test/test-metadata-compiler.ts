@@ -9,11 +9,11 @@ import KMXFile = KMX.KMXFile;
 describe('kmx metadata compiler', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
-  it('should compile metadata with debug and compiler version', function() {
+  it('should compile metadata with debug and compiler version', async function() {
     const inputFilename = makePathToFixture('basic.xml');
 
     // Compile the keyboard
-    const kmx = compileKeyboard(inputFilename, {...compilerTestOptions, debug:true, addCompilerVersion:true});
+    const kmx = await compileKeyboard(inputFilename, {...compilerTestOptions, debug:true, addCompilerVersion:true});
     checkMessages();
     assert.isNotNull(kmx);
 
@@ -44,11 +44,11 @@ describe('kmx metadata compiler', function () {
     assert.equal(kmx.keyboard.stores[3].dwSystemID, KMXFile.TSS_TARGETS);
   });
 
-  it('should compile metadata with no compiler version', function() {
+  it('should compile metadata with no compiler version', async function() {
     const inputFilename = makePathToFixture('basic.xml');
 
     // Compile the keyboard
-    const kmx = compileKeyboard(inputFilename, {...compilerTestOptions, debug:true, addCompilerVersion:false});
+    const kmx = await compileKeyboard(inputFilename, {...compilerTestOptions, debug:true, addCompilerVersion:false});
     checkMessages();
     assert.isNotNull(kmx);
 

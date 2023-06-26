@@ -191,7 +191,7 @@ Depends:
   libevdev2,
   ${misc:Depends},
   ${shlibs:Depends},
-Description: Keyman system service
+Description: System service for Keyman
  Originally created in 1993 to type Lao on Windows, Keyman is now a free and
  open source keyboarding platform which allows anyone to write a keyboard
  layout for their language. Keyman is available for many platforms, including

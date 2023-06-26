@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <!-- app_name removed in 16.0 beta. Set in build.gradle -->
   <!-- Context: Menu Action -->
   <string name="action_share" comment="Menu action to send text content to another app">Compartir</string>
   <!-- Context: Menu Action -->
@@ -25,6 +26,7 @@
   <!-- Context: Textfield prompt (&#8230; is the ellipsis character "...") -->
   <string name="textview_hint" comment="Prompt to start typing">Comienza a escribir aquí&#8230;</string>
   <!-- Context: Splash screen (version/copyright info currently disabled -->
+  <string name="splash_blank" translatable="false" comment="Blank text while version info on splash page is disabled"></string>
   <!-- Context: Splash screen (version/copyright info currently disabled -->
   <!-- Context: Text Size dialog -->
   <string name="text_size" comment="Current text size (number)">Tamaño del texto: %1$d</string>
@@ -82,7 +84,7 @@
   <!-- Context: Keyman Settings menu / Spacebar caption hint -->
   <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">No mostrar leyenda en la barra espaciadora</string>
   <!-- Context: Keyman Settings menu / Haptic feedback -->
-  <string name="haptic_feedback" comment="haptic feedback on key press">Vibrate when typing</string>
+  <string name="haptic_feedback" comment="haptic feedback on key press">Vibrar al escribir</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner" comment="text suggestions banner">Mostrar siempre el banner</string>
   <!-- Context: Keyman Settings menu -->
@@ -156,5 +158,5 @@
   <!-- Context: KMP Package strings -->
   <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">    El teclado requiere una versión más reciente de Keyman</string>
   <!-- Context: anywhere -->
-  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">No se puede iniciar el navegador web</string>
 </resources>

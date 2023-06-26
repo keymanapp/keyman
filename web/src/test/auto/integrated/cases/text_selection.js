@@ -68,7 +68,7 @@ describe('Text Selection', function() {
 
       after(function() {
         fixture.cleanup();
-        keyman.removeKeyboards('web_context_tests');
+        window.keyman?.removeKeyboards('web_context_tests');
         teardownKMW();
       });
 
