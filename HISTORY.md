@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.130 alpha 2023-06-26
+
+* chore(deps): bump semver from 7.3.8 to 7.5.2 (#9085)
+* epic: conversion of Keyman Engine for Web to ES modules (#8560)
+
 ## 17.0.129 alpha 2023-06-23
 
 * chore(common): Update crowdin strings for Spanish (es-ES and es-419) (#9040)
