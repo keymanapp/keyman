@@ -1,5 +1,67 @@
 # Keyman Version History
 
+## 17.0.129 alpha 2023-06-23
+
+* chore(common): Update crowdin strings for Spanish (es-ES and es-419) (#9040)
+* chore(android/app): Address some pre-launch accessibility report warnings (#9070)
+* fix(windows): support kmxplus in mcompile (#9071)
+* fix(core): fix ldml transforms (#9072)
+* feat(common,developer,core): add uset section (#9049)
+
+## 17.0.128 alpha 2023-06-22
+
+*  (#9061)
+* docs(windows): add more steps for clarity (#9063)
+
+## 17.0.127 alpha 2023-06-21
+
+* feat(core): implementation of non-regex components of tran (#9019)
+* chore: enable common ci for web (#9047)
+
+## 17.0.126 alpha 2023-06-19
+
+* chore(mac): move from altool to notarytool (#9010)
+
+## 17.0.125 alpha 2023-06-17
+
+* fix(android/samples): Cleanup Sample/Tests apk's (#9030)
+* chore(common): Bump crowdin github action to 1.3.2 (#9029)
+
+## 17.0.124 alpha 2023-06-14
+
+* fix(windows): qr code id uses keyboard name and not package name (#9002)
+* refactor(linux): Extract widgets to separate classes and files (#9007)
+
+## 17.0.123 alpha 2023-06-13
+
+* chore(developer): support cp1252 'ansi' keyboards (#8988)
+* fix(developer): keep kmc-kmn messages within namespace (#8999)
+* fix(linux): Fix display of installed keyboard version (#8948)
+* fix(linux): Fix creation of markdown help files for Linux (#9001)
+
+## 17.0.122 alpha 2023-06-12
+
+* refactor(developer): import kmcmplib errors into kmc-kmn (#8962)
+
+## 17.0.121 alpha 2023-06-09
+
+* fix(linux): Fix disabling of buttons (#8946)
+* chore(developer): check for nodejs deps in kmc-kmn (#8961)
+* spec(core): spec/impl for transform and vars (#8695)
+*  (#8967)
+
+## 17.0.120 alpha 2023-06-07
+
+* chore(core): look for emcc.py, not emcc (#8934)
+* chore(linux): Move some files to keyman-config (#8917)
+* fix(linux): Fix title of reference page and links (#8939)
+* fix(android/engine): Re-enable KMManager tests (#8940)
+
+## 17.0.119 alpha 2023-06-06
+
+* chore(developer): ensure kmcmplib messages are all UTF-8 (#8927)
+* chore(linux): Fix lintian warnings (#8931)
+
 ## 17.0.118 alpha 2023-06-05
 
 * chore(ios): replace fv cert (#8900)

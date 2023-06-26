@@ -183,7 +183,7 @@ function setup() {
   echo "export GSETTINGS_SCHEMA_DIR=\"$SCHEMA_DIR\"" >> "$ENV_FILE"
 
   mkdir -p "$SCHEMA_DIR"
-  cp "${TOP_SRCDIR}"/../keyman-config/com.keyman.gschema.xml "$SCHEMA_DIR"/
+  cp "${TOP_SRCDIR}"/../keyman-config/resources/com.keyman.gschema.xml "$SCHEMA_DIR"/
   glib-compile-schemas "$SCHEMA_DIR"
 
   export LD_LIBRARY_PATH=${COMMON_ARCH_DIR}/src:${LD_LIBRARY_PATH-}

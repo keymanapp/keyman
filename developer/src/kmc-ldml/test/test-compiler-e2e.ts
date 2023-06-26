@@ -17,7 +17,7 @@ describe('compiler-tests', function() {
     const binaryFilename = makePathToFixture('basic.txt');
 
     // Compile the keyboard
-    const kmx = compileKeyboard(inputFilename, {...compilerTestOptions, debug: true, addCompilerVersion: false});
+    const kmx = await compileKeyboard(inputFilename, {...compilerTestOptions, debug: true, addCompilerVersion: false});
     assert.isNotNull(kmx);
 
     // Use the builder to generate the binary output file
@@ -28,6 +28,7 @@ describe('compiler-tests', function() {
 
     // Compare output
     let expected = await hextobin(binaryFilename, undefined, {silent:true});
+
     assert.deepEqual<Uint8Array>(code, expected);
   });
 });

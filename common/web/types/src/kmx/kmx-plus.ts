@@ -4,6 +4,8 @@ import { ElementString } from './element-string.js';
 import { ListItem } from './string-list.js';
 import { unescapeString } from '../util/util.js';
 import { KMXFile } from './kmx.js';
+import { UnicodeSetParser, UnicodeSet } from '@keymanapp/common-types';
+import { VariableParser } from '../ldml-keyboard/pattern-parser.js';
 
 // Implementation of file structures from /core/src/ldml/C7043_ldml.md
 // Writer in kmx-builder.ts
@@ -12,11 +14,10 @@ import { KMXFile } from './kmx.js';
 export class Section {
 }
 
-export class GlobalSections {
-  // These sections are used by other sections during compilation
-  strs: Strs;
-  elem: Elem;
-  list: List;
+/**
+ * Sections which are needed as dependencies.
+ */
+export interface DependencySections extends KMXPlusData {
 }
 
 // 'sect'
@@ -33,7 +34,7 @@ export class Elem extends Section {
     super();
     this.strings.push(new ElementString(strs, '')); // C7043: null element string
   }
-  allocElementString(strs: Strs, source: string, order?: string, tertiary?: string, tertiary_base?: string, prebase?: string): ElementString {
+  allocElementString(strs: Strs, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string): ElementString {
     let s = new ElementString(strs, source, order, tertiary, tertiary_base, prebase);
     let result = this.strings.find(item => item.isEqual(s));
     if(result === undefined) {
@@ -43,8 +44,6 @@ export class Elem extends Section {
     return result;
   }
 };
-
-// 'finl' -- see 'tran'
 
 // 'keys' is now `keys2.kmap`
 
@@ -79,17 +78,6 @@ export class Meta extends Section {
 
 export class Name extends Section {
   names: StrsItem[] = [];
-};
-
-// 'ordr'
-
-export class OrdrItem {
-  elements: ElementString;
-  before: ElementString;
-};
-
-export class Ordr extends Section {
-  items: OrdrItem[] = [];
 };
 
 // 'strs'
@@ -151,46 +139,222 @@ export class Strs extends Section {
   }
 };
 
-// 'tran'
+/**
+ * See LKVariables
+ */
+export class Vars extends Section {
+  totalCount() : number {
+    return this.strings.length + this.sets.length + this.unicodeSets.length;
+  }
+  markers: ListItem;
+  strings: StringVarItem[] = []; // ≠ StrsItem
+  sets: SetVarItem[] = [];
+  unicodeSets: UnicodeSetItem[] = [];
 
-export enum TranItemFlags {
-  none = 0,
-  error = constants.tran_flags_error,
+  /**
+   *
+   * @returns false if any invalid variables
+   */
+  valid() : boolean {
+    for (const t of [this.sets, this.strings, this.unicodeSets]) {
+      for (const i of t) {
+        if (!i.valid()) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  // utilities for making use of Vars in other sections
+
+  substituteSets(str: string, sections: DependencySections): string {
+    return str.replaceAll(VariableParser.SET_REFERENCE, (_entire : string, id: string) => {
+      const val = Vars.findVariable(this.sets, id);
+      if (val === null) {
+        // Should have been caught during validation.
+        throw Error(`Internal Error: reference to missing set variable ${id}`);
+      }
+      return val.value.value;
+    });
+  }
+  substituteUnicodeSets(value: string, sections: DependencySections): string {
+    return value.replaceAll(VariableParser.SET_REFERENCE, (_entire, id) => {
+      const v = Vars.findVariable(this.unicodeSets, id);
+      if (v === null) {
+        // Should have been caught during validation.
+        throw Error(`Internal Error: reference to missing UnicodeSet variable ${id}`);
+      }
+      return v.value.value; // string value
+    });
+  }
+  substituteStrings(str: string, sections: DependencySections): string {
+    return str.replaceAll(VariableParser.STRING_REFERENCE, (_entire, id) => {
+      const val = this.findStringVariableValue(id);
+      if (val === null) {
+        // Should have been caught during validation.
+        throw Error(`Internal Error: reference to missing string variable ${id}`);
+      }
+      return val;
+    });
+  }
+  findStringVariableValue(id: string): string {
+    return Vars.findVariable(this.strings, id)?.value?.value; // Unwrap: Variable, StrsItem
+  }
+  substituteSetRegex(str: string, sections: DependencySections): string {
+    return str.replaceAll(VariableParser.SET_REFERENCE, (_entire, id) => {
+      // try as set
+      const set = Vars.findVariable(this.sets, id);
+      if (set !== null) {
+        const { items } = set;
+        const inner = items.map(i => i.value.value).join('|');
+        return `(?:${inner})`; // TODO-LDML: need to escape here
+      }
+
+      // try as unicodeset
+      const uset = Vars.findVariable(this.unicodeSets, id);
+      if (uset !== null) {
+        const { unicodeSet } = uset;
+        const inner = unicodeSet.ranges.map(([start, end]) => {
+          const s = String.fromCodePoint(start);
+          if (start === end) {
+            return s;
+          } else {
+            const e = String.fromCodePoint(end);
+            return `${s}-${e}`;
+          }
+        }).join('');
+        return `[${inner}]`;
+      }
+
+      // else, missing
+      throw Error(`Internal Error: reference to missing set variable ${id}`);
+    });
+  }
+  /**
+   * Variable locator facility
+   * @param array
+   * @param id
+   * @returns
+   */
+  private static findVariable<T extends VarsItem>(array: T[], id: string) : T {
+    const v : T[] = array.filter(e => e.id.value === id);
+    if (v.length === 0){
+      return null;
+    } else if (v.length !== 1) {
+      // Should have been caught during validation
+      throw Error(`Internal Error: Duplicate variable id ${id} crept into a variable list.`);
+    } else {
+      return v[0];
+    }
+  }
 };
 
-export class TranItem extends Section {
-  from: ElementString;
+/**
+ * Common base for variable sections
+ * See Variable
+ */
+export class VarsItem extends Section {
+  id: StrsItem;
+  value: StrsItem;
+
+  constructor(id: string, value: string, sections: DependencySections) {
+    super();
+    this.id = sections.strs.allocString(id);
+    this.value = sections.strs.allocAndUnescapeString(value);
+  }
+
+  valid() : boolean {
+    return true;
+  }
+};
+
+export class UnicodeSetItem extends VarsItem {
+  constructor(id: string, value: string, sections: DependencySections, usetparser: UnicodeSetParser) {
+    super(id, value, sections);
+    // TODO-LDML: buffer size
+    this.unicodeSet = usetparser.parseUnicodeSet(value, 100);
+    // _unicodeSet may be null, indicating this is invalid.
+    // A message will have been set in that case.
+  }
+  unicodeSet?: UnicodeSet;
+  valid() : boolean {
+    return !!this.unicodeSet;
+  }
+};
+
+export class SetVarItem extends VarsItem {
+  constructor(id: string, value: string[], sections: DependencySections) {
+    super(id, value.join(' '), sections);
+    this.items = sections.elem.allocElementString(sections.strs, value);
+  }
+  items: ElementString;
+  valid() : boolean {
+    return !!this.items;
+  }
+};
+
+export class StringVarItem extends VarsItem {
+  constructor(id: string, value: string, sections: DependencySections) {
+    super(id, value, sections);
+  }
+  // no added fields
+};
+
+// 'tran'
+
+export class TranTransform {
+  from: StrsItem;
   to: StrsItem;
+  mapFrom: StrsItem; // var name
+  mapTo: StrsItem; // var name
+}
+
+export class TranGroup {
+  type: number; // tran_group_type_transform | tran_group_type_reorder
+  transforms: TranTransform[] = [];
+  reorders: TranReorder[] = [];
+}
+
+export class TranReorder {
+  elements: ElementString;
   before: ElementString;
-  flags: TranItemFlags;
 };
 
 export class Tran extends Section {
-  items: TranItem[] = [];
+  groups: TranGroup[] = [];
   get id() {
     return constants.section.tran;
   }
 };
 
-// alias types for 'bksp', 'finl'
+export class UsetItem {
+  constructor(public uset: UnicodeSet, public str: StrsItem) {
+  }
+  compareTo(other: UsetItem) : number {
+    return this.str.compareTo(other.str);
+  }
+};
 
+export class Uset extends Section {
+  usets: UsetItem[] = [];
+  allocUset(set: UnicodeSet, sections: DependencySections) : UsetItem {
+    // match the same pattern
+    let result = this.usets.find(s => set.pattern == s.uset.pattern);
+    if (result === undefined) {
+      result = new UsetItem(set, sections.strs.allocString(set.pattern));
+      this.usets.push(result);
+    }
+    return result;
+  }
+};
+
+// alias type for 'bksp'
 export class Bksp extends Tran {
   override get id() {
     return constants.section.bksp;
   }
 };
-export class BkspItem extends TranItem {};
-export type BkspItemFlags = TranItemFlags;
-export const BkspItemFlags = TranItemFlags;
-
-export class Finl extends Tran {
-  override get id() {
-    return constants.section.finl;
-  }
-};
-export class FinlItem extends TranItem {};
-export type FinlItemFlags = TranItemFlags;
-export const FinlItemFlags = TranItemFlags;
 
 // 'vkey'
 
@@ -346,16 +510,16 @@ export interface KMXPlusData {
     bksp?: Bksp;
     disp?: Disp;
     elem?: Elem; // elem is ignored in-memory
-    finl?: Finl;
     keys?: Keys;
     layr?: Layr;
     list?: List; // list is ignored in-memory
     loca?: Loca;
     meta?: Meta;
     name?: Name;
-    ordr?: Ordr;
     strs?: Strs; // strs is ignored in-memory
     tran?: Tran;
+    uset?: Uset; // uset is ignored in-memory
+    vars?: Vars;
     vkey?: Vkey;
 };
 
@@ -376,10 +540,6 @@ export class KMXPlusFile extends KMXFile {
   public readonly COMP_PLUS_ELEM_ELEMENT: any;
   public readonly COMP_PLUS_ELEM_STRING: any;
   public readonly COMP_PLUS_ELEM: any;
-
-  // COMP_PLUS_FINL == COMP_PLUS_TRAN
-  public readonly COMP_PLUS_FINL_ITEM: any;
-  public readonly COMP_PLUS_FINL: any;
 
   // COMP_PLUS_KEYS is now COMP_PLUS_KEYS_KMAP
 
@@ -407,17 +567,23 @@ export class KMXPlusFile extends KMXFile {
   public readonly COMP_PLUS_NAME_ITEM: any;
   public readonly COMP_PLUS_NAME: any;
 
-  public readonly COMP_PLUS_ORDR_ITEM: any;
-  public readonly COMP_PLUS_ORDR: any;
-
   public readonly COMP_PLUS_STRS_ITEM: any;
   public readonly COMP_PLUS_STRS: any;
 
-  public readonly COMP_PLUS_TRAN_ITEM: any;
+  public readonly COMP_PLUS_TRAN_GROUP: any;
+  public readonly COMP_PLUS_TRAN_TRANSFORM: any;
+  public readonly COMP_PLUS_TRAN_REORDER: any;
   public readonly COMP_PLUS_TRAN: any;
+
+  public readonly COMP_PLUS_USET_USET: any;
+  public readonly COMP_PLUS_USET_RANGE: any;
+  public readonly COMP_PLUS_USET: any;
 
   public readonly COMP_PLUS_VKEY_ITEM: any;
   public readonly COMP_PLUS_VKEY: any;
+
+  public readonly COMP_PLUS_VARS: any;
+  public readonly COMP_PLUS_VARS_ITEM: any;
 
   /* File in-memory data */
 
@@ -425,8 +591,6 @@ export class KMXPlusFile extends KMXFile {
 
   constructor() {
     super();
-
-
     // Binary-correct structures matching kmx_plus.h
 
     // 'sect'
@@ -621,19 +785,7 @@ export class KMXPlusFile extends KMXFile {
       items: new r.Array(this.COMP_PLUS_NAME_ITEM, 'count')
     });
 
-    // 'ordr'
-
-    this.COMP_PLUS_ORDR_ITEM = new r.Struct({
-      elements: r.uint32le, //elem
-      before: r.uint32le //elem
-    });
-
-    this.COMP_PLUS_ORDR = new r.Struct({
-      ident: r.uint32le,
-      size: r.uint32le,
-      count: r.uint32le,
-      items: new r.Array(this.COMP_PLUS_ORDR_ITEM, 'count')
-    });
+    // 'ordr' now part of 'tran'
 
     // 'strs'
 
@@ -654,18 +806,71 @@ export class KMXPlusFile extends KMXFile {
 
     // 'tran'
 
-    this.COMP_PLUS_TRAN_ITEM = new r.Struct({
-      from: r.uint32le, //elem
+    this.COMP_PLUS_TRAN_GROUP = new r.Struct({
+      type: r.uint32le, //type of group
+      count: r.uint32le, //number of items
+      index: r.uint32le, //index into subtable
+    });
+
+    this.COMP_PLUS_TRAN_TRANSFORM = new r.Struct({
+      from: r.uint32le, //str
       to: r.uint32le, //str
+      mapFrom: r.uint32le, //elem
+      mapTo: r.uint32le //elem
+    });
+
+    this.COMP_PLUS_TRAN_REORDER = new r.Struct({
+      elements: r.uint32le, //elem
       before: r.uint32le, //elem
-      flags: r.uint32le //bitfield
     });
 
     this.COMP_PLUS_TRAN = new r.Struct({
       ident: r.uint32le,
       size: r.uint32le,
+      groupCount: r.uint32le,
+      transformCount: r.uint32le,
+      reorderCount: r.uint32le,
+      groups: new r.Array(this.COMP_PLUS_TRAN_GROUP, 'groupCount'),
+      transforms: new r.Array(this.COMP_PLUS_TRAN_TRANSFORM, 'transformCount'),
+      reorders: new r.Array(this.COMP_PLUS_TRAN_REORDER, 'reorderCount'),
+    });
+
+    // 'uset'
+    this.COMP_PLUS_USET_USET = new r.Struct({
+      range: r.uint32le,
       count: r.uint32le,
-      items: new r.Array(this.COMP_PLUS_TRAN_ITEM, 'count')
+      pattern: r.uint32le, // str
+    });
+
+    this.COMP_PLUS_USET_RANGE = new r.Struct({
+      start: r.uint32le,
+      end: r.uint32le,
+    });
+
+    this.COMP_PLUS_USET = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      usetCount: r.uint32le,
+      rangeCount: r.uint32le,
+      usets: new r.Array(this.COMP_PLUS_USET_USET, 'usetCount'),
+      ranges: new r.Array(this.COMP_PLUS_USET_RANGE, 'rangeCount'),
+    });
+
+    // 'vars'
+
+    this.COMP_PLUS_VARS_ITEM = new r.Struct({
+      type: r.uint32le,
+      id: r.uint32le, // str
+      value: r.uint32le, // str
+      elem: r.uint32le, // elem TODO-LDML
+    });
+
+    this.COMP_PLUS_VARS = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      markers: r.uint32le, // list TODO-LDML
+      varCount: r.uint32le,
+      varEntries: new r.Array(this.COMP_PLUS_VARS_ITEM, 'varCount'),
     });
 
     // 'vkey'
@@ -684,9 +889,6 @@ export class KMXPlusFile extends KMXFile {
 
     // Aliases
 
-    this.COMP_PLUS_BKSP_ITEM = this.COMP_PLUS_TRAN_ITEM;
-    this.COMP_PLUS_FINL_ITEM = this.COMP_PLUS_TRAN_ITEM;
     this.COMP_PLUS_BKSP = this.COMP_PLUS_TRAN;
-    this.COMP_PLUS_FINL = this.COMP_PLUS_TRAN;
   }
 }
