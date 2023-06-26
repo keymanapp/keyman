@@ -148,6 +148,7 @@ EMSCRIPTEN_BINDINGS(compiler_interface) {
   emscripten::value_object<KMCMP_COMPILER_RESULT_EXTRA_STORE>("CompilerResultExtraStore")
     .field("storeType", &KMCMP_COMPILER_RESULT_EXTRA_STORE::storeType)
     .field("name", &KMCMP_COMPILER_RESULT_EXTRA_STORE::name)
+    .field("line", &KMCMP_COMPILER_RESULT_EXTRA_STORE::line)
     ;
 
   emscripten::value_object<KMCMP_COMPILER_RESULT_EXTRA_GROUP>("CompilerResultExtraGroup")

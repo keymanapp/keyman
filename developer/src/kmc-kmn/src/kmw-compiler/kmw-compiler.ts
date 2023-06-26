@@ -51,26 +51,16 @@ export function WriteCompiledKeyboard(
 
   setupGlobals(callbacks, opts, FDebug?'  ':'', FDebug?'\r\n':'', kmxResult, keyboard, kmnfile);
 
-  // let fgp: GROUP;
-
-  // let fsp: STORE;
-	// let fkp: KEY;
-
-  // let j: number;
-  // let n: number;
-
   let vMnemonic: number = 0;
-  let /*s: string,*/ sRTL: string = "", sHelp: string = "''", sHelpFile: string = "",
+  let sRTL: string = "", sHelp: string = "''", sHelpFile: string = "",
       sEmbedJSFilename: string = "", sEmbedCSSFilename: string = "";
   let sVisualKeyboardFilename: string = "", sFullName: string = "";
   let sBegin_NewContext: string = "", sBegin_PostKeystroke: string = "";
   let sLayoutFilename: string = "", sVKDictionary: string = "";
   let linecomment: string;  // I3438
-  // let HasRules: boolean;
   let sModifierBitmask: string;
   let FOptionStores: string;
   let FKeyboardVersion = "1.0";
-  // let rec: TSentinelRecord;
 
   let result = "";
 	// Locate the name of the keyboard
@@ -228,6 +218,7 @@ export function WriteCompiledKeyboard(
   const isDebugStore = (index: number) => isStoreType(index, STORETYPE_DEBUG);
   const isReservedStore = (index: number) => isStoreType(index, STORETYPE_RESERVED);
   const isOptionStore = (index: number) => isStoreType(index, STORETYPE_OPTION);
+  const getStoreLine = (index: number) => kmxResult.extra.stores[index].line;
 
 	// Write the stores out
   FOptionStores = '';
@@ -235,26 +226,24 @@ export function WriteCompiledKeyboard(
     let fsp = keyboard.stores[i];
     // I3438 - Save all system stores to the keyboard, for now   // I3684
 
-    if (!isDebugStore(i)) { // and not (fsp.dwSystemID in [TSS_BITMAP, TSS_NAME, TSS_VERSION, TSS_CUSTOMKEYMANEDITION, TSS_CUSTOMKEYMANEDITIONNAME, TSS_KEYMANCOPYRIGHT]) then
+    if (!isDebugStore(i)) {
       if (fsp.dwSystemID == KMX.KMXFile.TSS_COMPARISON) {
-        result += `${FTabStop}this.s${JavaScript_Name(i, fsp.dpName)}=${JavaScript_Store(keyboard, 0/*fsp.line*/, fsp.dpString)};${nl}`;
+        result += `${FTabStop}this.s${JavaScript_Name(i, fsp.dpName)}=${JavaScript_Store(keyboard, getStoreLine(i), fsp.dpString)};${nl}`;
       }
       else if (fsp.dwSystemID == KMX.KMXFile.TSS_COMPILEDVERSION) {
-        result += `${FTabStop}this.KVER=${JavaScript_Store(keyboard, 0/*fsp.line*/, fsp.dpString)};${nl}`;
+        result += `${FTabStop}this.KVER=${JavaScript_Store(keyboard, getStoreLine(i), fsp.dpString)};${nl}`;
       }
-      //else if fsp.dwSystemID = TSS_VKDICTIONARY then // I3438, required for vkdictionary
-      //  Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.line, fsp.dpString), nl])
       else if (isOptionStore(i) && !isReservedStore(i)) {
         result += `${FTabStop}this.s${JavaScript_Name(i,fsp.dpName)}=KeymanWeb.KLOAD(this.KI,"${JavaScript_Name(i,fsp.dpName,true)}",`+
-          `${JavaScript_Store(keyboard, 0/*fsp.line*/, fsp.dpString)});${nl}`;
+          `${JavaScript_Store(keyboard, getStoreLine(i), fsp.dpString)});${nl}`;
 
         if (FOptionStores != '') {
           FOptionStores += ',';
         }
         FOptionStores += `'s${JavaScript_Name(i, fsp.dpName)}'`;
       }
-      else if (fsp.dwSystemID == KMX.KMXFile.TSS_NONE /* aka not fsp.fIsReserved */) {
-        result += `${FTabStop}this.s${JavaScript_Name(i, fsp.dpName)}=${JavaScript_Store(keyboard, 0/*fsp.line*/, fsp.dpString)};${nl}`;   // I3681
+      else if (fsp.dwSystemID == KMX.KMXFile.TSS_NONE /* aka !isReservedStore(i) */) {
+        result += `${FTabStop}this.s${JavaScript_Name(i, fsp.dpName)}=${JavaScript_Store(keyboard, getStoreLine(i), fsp.dpString)};${nl}`;   // I3681
       }
     }
   }
