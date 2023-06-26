@@ -153,7 +153,13 @@ namespace kmx {
 
 #define TSS__KEYMAN_150_MAX  43
 
-#define TSS__MAX        43
+/* Keyman 17.0 system stores */
+
+#define TSS_DISPLAYMAP       44
+
+#define TSS__KEYMAN_170_MAX  44
+
+#define TSS__MAX        44
 
 /* wm_keyman_control_internal message control codes */
 

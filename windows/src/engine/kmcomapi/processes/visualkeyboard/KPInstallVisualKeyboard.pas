@@ -1,18 +1,18 @@
 (*
   Name:             KPInstallVisualKeyboard
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      3 May 2011
 
   Modified Date:    3 Feb 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          03 May 2011 - mcdurdin - I2890 - Record diagnostic data when encountering registry errors
                     03 Feb 2015 - mcdurdin - I4574 - V9.0 - If any files are read-only, they need the read-only flag removed on install
 *)
@@ -53,6 +53,8 @@ begin
   try
     LoadFromFile(FileName);
 
+    // TODO: Enforce passing in a KeyboardName so that we never use
+    // AssociatedKeyboard any more
     if KeyboardName = '' then
       KeyboardName := Header.AssociatedKeyboard;
 

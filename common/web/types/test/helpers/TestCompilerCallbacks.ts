@@ -19,6 +19,8 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
         return loadSchema(schema);
       case 'ldml-keyboardtest':
         return loadSchema(schema);
+      case 'displaymap':
+        throw new Error('loadDisplayMapSchema not implemented.'); // not needed for this test
     }
   }
   clear() {

@@ -45,7 +45,7 @@ let jsFilename = program.opts().jsFilename ? program.opts().jsFilename : path.jo
 // Load .kps source data
 //
 
-const callbacks = new NodeCompilerCallbacks();
+const callbacks = new NodeCompilerCallbacks({logLevel: 'info'});
 let kmpCompiler = new KmpCompiler(callbacks);
 let kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
 if(!kmpJsonData) {
