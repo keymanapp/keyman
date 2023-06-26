@@ -1,6 +1,6 @@
 import { KMX, CompilerOptions, CompilerCallbacks, KvkFileReader, VisualKeyboard, KmxFileReader, KvkFile } from "@keymanapp/common-types";
 import { ExpandSentinel, incxstr, xstrlen } from "./util.js";
-import { options, nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater, callbacks, FFix183_LadderLength } from "./compiler-globals.js";
+import { options, nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater, callbacks, FFix183_LadderLength, FCallFunctions, fk } from "./compiler-globals.js";
 import { JavaScript_ContextMatch, JavaScript_KeyAsString, JavaScript_Name, JavaScript_OutputString, JavaScript_Rules, JavaScript_Shift, JavaScript_ShiftAsString, JavaScript_Store, zeroPadHex } from './javascript-strings.js';
 import { KmwCompilerMessages } from "./messages.js";
 import { ValidateLayoutFile } from "./validate-layout-file.js";
@@ -51,26 +51,16 @@ export function WriteCompiledKeyboard(
 
   setupGlobals(callbacks, opts, FDebug?'  ':'', FDebug?'\r\n':'', kmxResult, keyboard, kmnfile);
 
-  // let fgp: GROUP;
-
-  // let fsp: STORE;
-	// let fkp: KEY;
-
-  // let j: number;
-  // let n: number;
-
   let vMnemonic: number = 0;
-  let /*s: string,*/ sRTL: string = "", sHelp: string = "''", sHelpFile: string = "",
+  let sRTL: string = "", sHelp: string = "''", sHelpFile: string = "",
       sEmbedJSFilename: string = "", sEmbedCSSFilename: string = "";
   let sVisualKeyboardFilename: string = "", sFullName: string = "";
   let sBegin_NewContext: string = "", sBegin_PostKeystroke: string = "";
   let sLayoutFilename: string = "", sVKDictionary: string = "";
   let linecomment: string;  // I3438
-  // let HasRules: boolean;
   let sModifierBitmask: string;
   let FOptionStores: string;
   let FKeyboardVersion = "1.0";
-  // let rec: TSentinelRecord;
 
   let result = "";
 	// Locate the name of the keyboard
@@ -228,6 +218,7 @@ export function WriteCompiledKeyboard(
   const isDebugStore = (index: number) => isStoreType(index, STORETYPE_DEBUG);
   const isReservedStore = (index: number) => isStoreType(index, STORETYPE_RESERVED);
   const isOptionStore = (index: number) => isStoreType(index, STORETYPE_OPTION);
+  const getStoreLine = (index: number) => kmxResult.extra.stores[index].line;
 
 	// Write the stores out
   FOptionStores = '';
@@ -235,26 +226,24 @@ export function WriteCompiledKeyboard(
     let fsp = keyboard.stores[i];
     // I3438 - Save all system stores to the keyboard, for now   // I3684
 
-    if (!isDebugStore(i)) { // and not (fsp.dwSystemID in [TSS_BITMAP, TSS_NAME, TSS_VERSION, TSS_CUSTOMKEYMANEDITION, TSS_CUSTOMKEYMANEDITIONNAME, TSS_KEYMANCOPYRIGHT]) then
+    if (!isDebugStore(i)) {
       if (fsp.dwSystemID == KMX.KMXFile.TSS_COMPARISON) {
-        result += `${FTabStop}this.s${JavaScript_Name(i, fsp.dpName)}=${JavaScript_Store(keyboard, 0/*fsp.line*/, fsp.dpString)};${nl}`;
+        result += `${FTabStop}this.s${JavaScript_Name(i, fsp.dpName)}=${JavaScript_Store(keyboard, getStoreLine(i), fsp.dpString)};${nl}`;
       }
       else if (fsp.dwSystemID == KMX.KMXFile.TSS_COMPILEDVERSION) {
-        result += `${FTabStop}this.KVER=${JavaScript_Store(keyboard, 0/*fsp.line*/, fsp.dpString)};${nl}`;
+        result += `${FTabStop}this.KVER=${JavaScript_Store(keyboard, getStoreLine(i), fsp.dpString)};${nl}`;
       }
-      //else if fsp.dwSystemID = TSS_VKDICTIONARY then // I3438, required for vkdictionary
-      //  Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.line, fsp.dpString), nl])
       else if (isOptionStore(i) && !isReservedStore(i)) {
         result += `${FTabStop}this.s${JavaScript_Name(i,fsp.dpName)}=KeymanWeb.KLOAD(this.KI,"${JavaScript_Name(i,fsp.dpName,true)}",`+
-          `${JavaScript_Store(keyboard, 0/*fsp.line*/, fsp.dpString)});${nl}`;
+          `${JavaScript_Store(keyboard, getStoreLine(i), fsp.dpString)});${nl}`;
 
         if (FOptionStores != '') {
           FOptionStores += ',';
         }
         FOptionStores += `'s${JavaScript_Name(i, fsp.dpName)}'`;
       }
-      else if (fsp.dwSystemID == KMX.KMXFile.TSS_NONE /* aka not fsp.fIsReserved */) {
-        result += `${FTabStop}this.s${JavaScript_Name(i, fsp.dpName)}=${JavaScript_Store(keyboard, 0/*fsp.line*/, fsp.dpString)};${nl}`;   // I3681
+      else if (fsp.dwSystemID == KMX.KMXFile.TSS_NONE /* aka !isReservedStore(i) */) {
+        result += `${FTabStop}this.s${JavaScript_Name(i, fsp.dpName)}=${JavaScript_Store(keyboard, getStoreLine(i), fsp.dpString)};${nl}`;   // I3681
       }
     }
   }
@@ -388,22 +377,16 @@ export function WriteCompiledKeyboard(
       `${FTabStop}};${nl}`;
   }
 
-/* TODO
-  for(let n = 0 to FCallFunctions.Count - 1 do
-  begin
-    s := ExtractFilePath(FInFile) + FCallFunctions[n] + '.call_js';
-    if FileExists(s) then
-      with TStringList.Create do
-      try
-        LoadFromFile(s, TEncoding.UTF8);  // I3337
-        Result := Result + Format('%sthis.c%d=function(t,e){%s};%s', [FTabstop, n, Trim(Text), nl]);   // I3681
-      finally
-        Free;
-      end
-    else
-      Result := Result + Format('%sthis.c%d=function(t,e){alert("call(%s) not defined");};%s', [FTabstop, n, FCallFunctions[n], nl]);   // I3681
-  end;
-*/
+  for(let n = 0; n < FCallFunctions.length; n++) {
+    const s = callbacks.resolveFilename(kmnfile, callbacks.path.basename(kmnfile, '.kmn') + FCallFunctions[n] + '.call_js');
+    if(callbacks.fs.existsSync(s)) {
+      const data = new TextDecoder().decode(callbacks.loadFile(s));
+      result += `${FTabStop}this.c${n}=function(t,e){${data.trim()}};${nl}`;
+    } else {
+      result += `${FTabStop}this.c${n}=function(t,e){alert("call(${FCallFunctions[n]}) not defined");};${nl}`;
+    }
+  }
+
   result += sEmbedJS + '}' + nl;   // I3681
   return result;
 }
@@ -472,58 +455,25 @@ function JavaScript_SetupEpilog() {
 }
 
 function HasSupplementaryPlaneChars() {
-  return false; // TODO
-/*  function StringHasSuppChars(p: PWideChar): Boolean;
-  begin
-    if not Assigned(p) then
-      Exit(False);
+  const suppChar = /[\uD800-\uDBFF][\uDC00-\uDFFF]/;
 
-    while p^ <> #0 do
-    begin
-      if Char.IsSurrogate(p, 0) then
-        Exit(True);
-      p := incxstr(p);
-    end;
+  for(let sp of fk.stores) {
+    if(suppChar.test(sp.dpString)) {
+      return true;
+    }
+  }
 
-    Result := False;
-  end;
-
-var
-  I: number;
-  fsp: PFILE_STORE;
-  fgp: PFILE_GROUP;
-  j: number;
-  fkp: PFILE_KEY;
-begin
-  fsp := fk.dpStoreArray;
-  for i := 0 to number(fk.cxStoreArray) - 1 do
-  begin
-    if StringHasSuppChars(fsp.dpString) then
-      Exit(True);
-    Inc(fsp);
-  end;
-
-  fgp := fk.dpGroupArray;
-  for i := 0 to number(fk.cxGroupArray) - 1 do
-  begin
-    fkp := fgp.dpKeyArray;
-    for j := 0 to number(fgp.cxKeyArray) - 1 do
-    begin
-      if StringHasSuppChars(fkp.dpContext) or
-         StringHasSuppChars(fkp.dpOutput) then
-        Exit(True);
-      Inc(fkp);
-    end;
-
-    if StringHasSuppChars(fgp.dpMatch) or
-       StringHasSuppChars(fgp.dpNoMatch) then
-      Exit(True);
-
-    Inc(fgp);
-  end;
-
-  Result := False;
-end;*/
+  for(let gp of fk.groups) {
+    for(let kp of gp.keys) {
+      if(suppChar.test(kp.dpContext) || suppChar.test(kp.dpOutput)) {
+        return true;
+      }
+    }
+    if(suppChar.test(gp.dpMatch) || suppChar.test(gp.dpNoMatch)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 export function RuleIsExcludedByPlatform(keyboard: KMX.KEYBOARD, fkp: KMX.KEY): boolean {

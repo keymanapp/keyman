@@ -45,6 +45,7 @@ struct KMCMP_COMPILER_OPTIONS {
 struct KMCMP_COMPILER_RESULT_EXTRA_STORE {
   int storeType;    // STORETYPE__MASK
   std::string name; // when debug=false, the .kmx will not have store names
+  int line;         // source line number where store is defined
 };
 
 struct KMCMP_COMPILER_RESULT_EXTRA_GROUP {

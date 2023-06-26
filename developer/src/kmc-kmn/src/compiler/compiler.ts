@@ -10,7 +10,7 @@ import { UnicodeSetParser, UnicodeSet, Osk } from '@keymanapp/common-types';
 import { CompilerCallbacks, CompilerEvent, CompilerOptions, KeymanFileTypes, KvkFileWriter, KvksFileReader } from '@keymanapp/common-types';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
 import { CompilerMessages, mapErrorFromKmcmplib } from './messages.js';
-import { WriteCompiledKeyboard } from '../kmw-compiler/write-compiled-keyboard.js';
+import { WriteCompiledKeyboard } from '../kmw-compiler/kmw-compiler.js';
 
 export interface CompilerResultFile {
   filename: string;
@@ -31,6 +31,7 @@ export const STORETYPE__MASK       = 0x1F;
 export interface CompilerResultExtraStore {
   storeType: number; // STORETYPE__MASK
   name: string;      // when debug=false, the .kmx will not have store names
+  line: number;      // source line number where store is defined
 };
 
 export interface CompilerResultExtraGroup {
@@ -203,7 +204,7 @@ export class KmnCompiler implements UnicodeSetParser {
       displayMap: null
     };
     for(let store of wasm_result.extra.stores) {
-      result.extra.stores.push({storeType: store.storeType, name: store.name});
+      result.extra.stores.push({storeType: store.storeType, name: store.name, line: store.line});
     }
     for(let group of wasm_result.extra.groups) {
       result.extra.groups.push({isReadOnly: group.isReadOnly, name: group.name});

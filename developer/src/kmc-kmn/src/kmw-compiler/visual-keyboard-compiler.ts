@@ -1,7 +1,7 @@
 import { KMX, KvkFile, VisualKeyboard } from "@keymanapp/common-types";
 import { FTabStop, nl } from "./compiler-globals.js";
 import { CKeymanWebKeyCodes } from "./keymanweb-key-codes.js";
-import { RequotedString } from "./write-compiled-keyboard.js";
+import { RequotedString } from "./kmw-compiler.js";
 
 export function VisualKeyboardFromFile(visualKeyboard: VisualKeyboard.VisualKeyboard, debug: boolean): string {
   const f102 = visualKeyboard.header.flags & KvkFile.BUILDER_KVK_HEADER_FLAGS.kvkh102 ? '1' : '0';

@@ -183,6 +183,7 @@ namespace kmcmp {
         (store->fIsDebug ? STORETYPE_DEBUG : 0) |
         (store->fIsCall ? STORETYPE_CALL : 0);
       extraStore.name = string_from_u16string(store->szName);
+      extraStore.line = store->line;
       fk->extra->stores.push_back(extraStore);
     }
 
