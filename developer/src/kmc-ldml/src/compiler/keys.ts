@@ -3,7 +3,7 @@ import { LDMLKeyboard, KMXPlus, Constants } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
 import { SectionCompiler } from "./section-compiler.js";
 
-import GlobalSections = KMXPlus.GlobalSections;
+import DependencySections = KMXPlus.DependencySections;
 import Keys = KMXPlus.Keys;
 import ListItem = KMXPlus.ListItem;
 import KeysFlicks = KMXPlus.KeysFlicks;
@@ -64,7 +64,7 @@ export class KeysCompiler extends SectionCompiler {
     return valid;
   }
 
-  public compile(sections: GlobalSections): Keys {
+  public compile(sections: DependencySections): Keys {
     if (!this.keyboard?.keys?.key && !this.keyboard?.keys?.flicks) {
       // short-circuit if no keys or flicks
       return null;
@@ -95,7 +95,7 @@ export class KeysCompiler extends SectionCompiler {
     return sect;
   }
 
-  public loadFlicks(sections: GlobalSections, sect: Keys) {
+  public loadFlicks(sections: DependencySections, sect: Keys) {
     for (let lkflicks of this.keyboard.keys.flicks) {
       let flicks: KeysFlicks = new KeysFlicks(sections.strs.allocString(lkflicks.id));
 
@@ -116,7 +116,7 @@ export class KeysCompiler extends SectionCompiler {
     }
   }
 
-  public loadKeys(sections: GlobalSections, sect: Keys) {
+  public loadKeys(sections: DependencySections, sect: Keys) {
     const usedKeys = allUsedKeyIdsInLayers(this.keyboard?.layers);
     const uniqueKeys = calculateUniqueKeys([...this.keyboard.keys?.key]);
 
@@ -213,7 +213,7 @@ export class KeysCompiler extends SectionCompiler {
   }
 
   private compileHardwareLayerToKmap(
-    sections: GlobalSections,
+    sections: DependencySections,
     layer: LDMLKeyboard.LKLayer,
     sect: Keys,
     hardware: string,
