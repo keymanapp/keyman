@@ -1,31 +1,16 @@
 {
-  "extends": "../../../../tsconfig-base.json",
+  "extends": "../../tsconfig.dom.json",
 
   "compilerOptions": {
-    "allowJs": true,
-    "inlineSources": true,
-    "module": "none",
-    "outFile": "../../../build/engine/element-wrappers/obj/index.js",
-    "sourceMap": true,
-    "target": "es5"
+    "baseUrl": "./",
+    "outDir": "../../../build/engine/element-wrappers/obj/",
+    "tsBuildInfoFile": "../../../build/engine/element-wrappers/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
   },
 
-  "files": [
-    "../main/dom/targets/wrapElement.ts",
-    "../main/dom/targets/input.ts",
-    "../main/dom/targets/textarea.ts",
-    "../main/dom/targets/contentEditable.ts",
-    "../main/dom/targets/designIFrame.ts",
-    "../main/dom/targets/outputTarget.ts",
-    "../main/kmwexthtml.ts",
-    "../main/dom/utils.ts",
-    "../main/kmwtypedefs.ts",
-    "../../../../node_modules/eventemitter3/index.js"
-  ],
+  "include": [ "src/**/*.ts" ],
 
   "references": [
-    { "path": "../../../../common/web/keyman-version" },
-    { "path": "../../../../common/web/utils" },
-    { "path": "../../../../common/web/keyboard-processor/src" }
+    { "path": "../../../../common/web/keyboard-processor" }
   ]
 }

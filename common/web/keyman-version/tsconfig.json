@@ -4,15 +4,15 @@
   "compilerOptions": {
     "allowJs": false,
     "declaration": true,
-    "module": "none",
-    "outFile": "./build/index.js",
+    "module": "es6",
     "sourceMap": true,
+    "outDir": "./build",
     "lib": ["es6"],
     "target": "es5",
     "downlevelIteration": true,
+    "rootDir": "."
   },
   "include": [
-    "index.ts",
     "version.inc.ts"
   ]
 }

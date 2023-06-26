@@ -1,48 +1,54 @@
-var assert = require('chai').assert;
-var fs = require("fs");
-var vm = require("vm");
+import { assert } from 'chai';
+
+import { LanguageProcessor } from '@keymanapp/input-processor';
+import { SourcemappedWorker as LMWorker } from "@keymanapp/lexical-model-layer/node";
+import { Mock } from '@keymanapp/keyboard-processor';
 
 /*
  * Unit tests for the Dummy prediction model.
  */
 
-// TODO: this relies on esbuild output for lexical-model-compiler; later should use import
-var LexicalModelCompiler = require('../../../../../developer/src/kmc-model/build/cjs-src/lexical-model-compiler.cjs').default;
-var path = require('path');
-
-let InputProcessor = require('../../build/index.bundled.js');
+import { LexicalModelCompiler } from '@keymanapp/kmc-model';
+import { fileURLToPath } from 'url';
+import path from 'path';
 
 // Required initialization setup.
-global.com = InputProcessor.com; // exports all keyboard-processor namespacing.
 global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
                     // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.
 
 // Initialize supplementary plane string extensions
 String.kmwEnableSupplementaryPlane(false);
 
-let LanguageProcessor = com.keyman.text.prediction.LanguageProcessor;
-
 // Test the KeyboardProcessor interface.
 describe('LanguageProcessor', function() {
+  let worker;
+
+  beforeEach(function() {
+    worker = LMWorker.constructInstance();
+  });
+
+  afterEach(function() {
+    worker.terminate();
+  });
+
   describe('[[constructor]]', function () {
     it('should initialize without errors', function () {
-      let lp = new LanguageProcessor();
+      let lp = new LanguageProcessor(worker);
       assert.isNotNull(lp);
     });
 
     it('has expected default values after initialization', function () {
-      let languageProcessor = new LanguageProcessor();
+      let languageProcessor = new LanguageProcessor(worker);
 
       // These checks are lifted from the keyboard-processor init checks found in
       // common/web/keyboard-processor/tests/cases/basic-init.js.
-      assert.isUndefined(languageProcessor.lmEngine);
+      assert.isDefined(languageProcessor.lmEngine);
       assert.isUndefined(languageProcessor.activeModel);
       assert.isFalse(languageProcessor.isActive);
       assert.isTrue(languageProcessor.mayPredict);
 
       // Some aspects of initialization must wait until after construction and overall
       // load of the core.  See /web/source/kmwbase.ts, in the final IIFE.
-      languageProcessor.init();
       assert.isOk(languageProcessor.lmEngine);
     });
   });
@@ -50,6 +56,11 @@ describe('LanguageProcessor', function() {
   describe('.predict', function() {
     let compiler = new LexicalModelCompiler();
     const MODEL_ID = 'example.qaa.trivial';
+
+    // ES-module mode leaves out `__dirname`, so we rebuild it using other components.
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
     const PATH = path.join(__dirname, '../../../../../developer/src/kmc-model/test/fixtures', MODEL_ID);
 
     describe('using angle brackets for quotes', function() {
@@ -69,8 +80,7 @@ describe('LanguageProcessor', function() {
       };
 
       it("successfully loads the model", function(done) {
-        let languageProcessor = new LanguageProcessor();
-        languageProcessor.init();
+        let languageProcessor = new LanguageProcessor(worker);
 
         languageProcessor.loadModel(modelSpec).then(function() {
           assert.isOk(languageProcessor.activeModel); // is only set after a successful load.
@@ -81,10 +91,9 @@ describe('LanguageProcessor', function() {
       });
 
       it("generates the expected prediction set", function(done) {
-        let languageProcessor = new LanguageProcessor();
-        languageProcessor.init();
+        let languageProcessor = new LanguageProcessor(worker);
 
-        let contextSource = new com.keyman.text.Mock("li", 2);
+        let contextSource = new Mock("li", 2);
         let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
         languageProcessor.loadModel(modelSpec).then(function() {
@@ -118,10 +127,9 @@ describe('LanguageProcessor', function() {
 
         describe("does not alter casing when input is lowercased", function() {
           it("when input is fully lowercased", function(done) {
-            let languageProcessor = new LanguageProcessor();
-            languageProcessor.init();
+            let languageProcessor = new LanguageProcessor(worker);
 
-            let contextSource = new com.keyman.text.Mock("li", 2);
+            let contextSource = new Mock("li", 2);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
             languageProcessor.loadModel(modelSpec).then(function() {
@@ -138,10 +146,9 @@ describe('LanguageProcessor', function() {
           });
 
           it("when input has non-initial uppercased letters", function(done) {
-            let languageProcessor = new LanguageProcessor();
-            languageProcessor.init();
+            let languageProcessor = new LanguageProcessor(worker);
 
-            let contextSource = new com.keyman.text.Mock("lI", 2);
+            let contextSource = new Mock("lI", 2);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
             languageProcessor.loadModel(modelSpec).then(function() {
@@ -159,10 +166,9 @@ describe('LanguageProcessor', function() {
           });
 
           it("unless the suggestion has uppercased letters", function(done) {
-            let languageProcessor = new LanguageProcessor();
-            languageProcessor.init();
+            let languageProcessor = new LanguageProcessor(worker);
 
-            let contextSource = new com.keyman.text.Mock("i", 1);
+            let contextSource = new Mock("i", 1);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
             languageProcessor.loadModel(modelSpec).then(function() {
@@ -181,10 +187,9 @@ describe('LanguageProcessor', function() {
 
         describe("uppercases suggestions when input is fully capitalized ", function() {
           it("for suggestions with default casing  (== 'lower')", function(done) {
-            let languageProcessor = new LanguageProcessor();
-            languageProcessor.init();
+            let languageProcessor = new LanguageProcessor(worker);
 
-            let contextSource = new com.keyman.text.Mock("LI", 2);
+            let contextSource = new Mock("LI", 2);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
             languageProcessor.loadModel(modelSpec).then(function() {
@@ -202,10 +207,9 @@ describe('LanguageProcessor', function() {
           });
 
           it("for precapitalized suggestions", function(done) {
-            let languageProcessor = new LanguageProcessor();
-            languageProcessor.init();
+            let languageProcessor = new LanguageProcessor(worker);
 
-            let contextSource = new com.keyman.text.Mock("I", 1);
+            let contextSource = new Mock("I", 1);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
             languageProcessor.loadModel(modelSpec).then(function() {
@@ -225,10 +229,9 @@ describe('LanguageProcessor', function() {
         describe("initial-cases suggestions when input uses initial casing ", function() {
           describe("when input is a single capitalized letter", function() {
             it("for suggestions with default casing (== 'lower')", function(done) {
-              let languageProcessor = new LanguageProcessor();
-              languageProcessor.init();
+              let languageProcessor = new LanguageProcessor(worker);
 
-              let contextSource = new com.keyman.text.Mock("L", 1);
+              let contextSource = new Mock("L", 1);
               let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
               languageProcessor.loadModel(modelSpec).then(function() {
@@ -248,10 +251,9 @@ describe('LanguageProcessor', function() {
 
           describe("input length > 1", function() {
             it("for suggestions with default casing (== 'lower')", function(done) {
-              let languageProcessor = new LanguageProcessor();
-              languageProcessor.init();
+              let languageProcessor = new LanguageProcessor(worker);
 
-              let contextSource = new com.keyman.text.Mock("Li", 2);
+              let contextSource = new Mock("Li", 2);
               let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
               languageProcessor.loadModel(modelSpec).then(function() {

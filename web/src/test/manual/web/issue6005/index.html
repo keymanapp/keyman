@@ -23,7 +23,7 @@
     </style>
 
     <!-- Insert uncompiled KeymanWeb source scripts -->
-    <script src="../../../../../build/app/web/debug/keymanweb.js" type="application/javascript"></script>
+    <script src="../../../../../build/publish/debug/keymanweb.js" type="application/javascript"></script>
 
     <!--
       For desktop browsers, a script for the user interface must be inserted here.
@@ -32,7 +32,7 @@
       The toolbar UI is best for any page designed to support keyboards for
       a large number of languages.
     -->
-    <script src="../../../../../build/app/ui/debug/kmwuitoggle.js"></script>
+    <script src="../../../../../build/publish/debug/kmwuitoggle.js"></script>
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
@@ -46,29 +46,26 @@
         'attachType': 'auto'
       }).then(function() {
         // if mobile device, activate pred text.
-        if(kmw.util.device.touchable) {
-          //keyman.osk.banner.setOptions({'mayPredict': true});
-
+        if(kmw.util.isTouchDevice()) {
           var pageRef = (window.location.protocol == 'file:')
             ? window.location.href.substr(0, window.location.href.lastIndexOf('/')+1)
             : window.location.href;
 
-          // Slice off any 'path' after the testing/ folder.
-          // This may vary depending on how the file is hosted / served;
-          // going relative may be tricky when served via our CI test-host setup.
-          pageRef = pageRef.substr(0, pageRef.lastIndexOf('testing/') + 'testing/'.length);
+          // Determine the path to the prediction-mtnt manual-test folder so we
+          // can utilize its model, rather than duplicating it here.
+          pageRef = pageRef.substr(0, pageRef.lastIndexOf('test/manual/web/') + 'test/manual/web/'.length);
 
           // also register appropriate models.
           var modelStub1 = {'id': 'nrc.en.mtnt',
             languages: ['en'],
             path: (pageRef + "prediction-mtnt/nrc.en.mtnt.model.js")
           };
-          kmw.modelManager.register(modelStub1);
+          kmw.addModel(modelStub1);
           var modelStub2 = {'id': 'nrc.en.mtnt',
             languages: ['pny-latn'],  // yep.  Total cheat for the sake of testing.
             path: (pageRef + "prediction-mtnt/nrc.en.mtnt.model.js")
           };
-          kmw.modelManager.register(modelStub2);
+          kmw.addModel(modelStub2);
         }
       });
       kmw.addKeyboards('sil_euro_latin@en',
@@ -93,6 +90,10 @@
        altered without the <i>final</i> group having a matching rule.
       See <a href="https://github.com/keymanapp/keyman/pulls/6473">PR #6473</a>
       for additional details.
+    </p>
+    <p>
+      If not already obvious, this is designed for use on mobile devices or
+      with touch-device emulation via your browser's Developer mode.
     </p>
     <p>
       About the "Unmatched Vowel Rule" test keyboard:  this keyboard will only allow up to two
