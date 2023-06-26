@@ -23,6 +23,7 @@ TODO include deadkeys
 TODO mcompile.cpp: open mcompile -u - option
 TODO replace GetLastError with SetError/AddCompileError/AddCompileWarning
 TODO u16.h u16.cpp include fron folder of kmx_u16.h
+TOTO use wchar_t* as cmd-lne-par in main
 TODO ...
 
 //---------------------------

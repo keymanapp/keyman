@@ -9,6 +9,8 @@
 
 int dummytest_helpers();
 void  check_avaiability_of_modules_();
+void  check_avaiability_of_modules_mc();
+void  check_avaiability_of_modules_WC();
 
 // My std::cout : writes pre-in  ;  1 for end of line
 void MyCout(std::string in, bool end, std::string pre = "");
