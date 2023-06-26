@@ -43,10 +43,31 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
     `File ${o.filename} could not be loaded: ${(o.e??'').toString()}`);
   static Warn_EmbedJsFileMissing = (o:{filename: string, e:any}) => m(this.WARN_EmbedJsFileMissing,
     `File ${o.filename} could not be loaded: ${(o.e??'').toString()}`);
-
+  static Warn_TouchLayoutMissingLayer = (o:{keyId:string, platformName:string, layerId:string, nextLayer:string}) => m(this.WARN_TouchLayoutMissingLayer,
+    `Key "${o.keyId}" on platform "${o.platformName}", layer "${o.layerId}", references a missing layer "${o.nextLayer}"`);
+  static Warn_TouchLayoutUnidentifiedKey = (o:{layerId:string}) => m(this.WARN_TouchLayoutUnidentifiedKey,
+    `A key on layer "${o.layerId}" has no identifier.`);
+  static Error_TouchLayoutInvalidIdentifier = (o:{keyId:string, platformName: string, layerId:string}) => m(this.ERROR_TouchLayoutInvalidIdentifier,
+    `Key "${o.keyId}" on "${o.platformName}", layer "${o.layerId}" has an invalid identifier.`);
+  static Warn_TouchLayoutCustomKeyNotDefined = (o:{keyId:string, platformName:string, layerId:string}) => m(this.WARN_TouchLayoutCustomKeyNotDefined,
+    `Key "${o.keyId}" on platform "${o.platformName}", layer "${o.layerId}", is a custom key but has no corresponding rule in the source.`);
+  static Warn_TouchLayoutSpecialLabelOnNormalKey = (o:{keyId:string, platformName:string, layerId:string, label:string}) => m(this.WARN_TouchLayoutSpecialLabelOnNormalKey,
+    `Key "${o.keyId}" on platform "${o.platformName}", layer "${o.layerId}" does not have the key type "Special" or "Special (active)" but has the label "${o.label}". This feature is only supported in Keyman 14 or later`);
+  static Error_InvalidKeyCode = (o:{keyId: string}) => m(this.ERROR_InvalidKeyCode,
+    `Invalid key identifier "${o.keyId}"`);
+  static Error_InvalidTouchLayoutFile = (o:{msg: string}) => m(this.ERROR_InvalidTouchLayoutFile,
+    `Invalid touch layout file: ${o.msg}`);
+  static Warn_TouchLayoutFontShouldBeSameForAllPlatforms = () => m(this.WARN_TouchLayoutFontShouldBeSameForAllPlatforms,
+    `The touch layout font should be the same for all platforms.`);
+  static Warn_TouchLayoutMissingRequiredKeys = (o:{layerId:string, platformName:string, missingKeys:string}) => m(this.WARN_TouchLayoutMissingRequiredKeys,
+    `Layer "${o.layerId}" on platform "${o.platformName}" is missing the required key(s) '${o.missingKeys}.`);
   // Following messages are kmw-compiler only, so use KmwCompiler error namespace
 
   static Error_NotAnyRequiresVersion14 = () => m(this.ERROR_NotAnyRequiresVersion14,
     `Statement notany in context() match requires version 14.0+ of KeymanWeb`);
   static ERROR_NotAnyRequiresVersion14 = SevError | 0x0001;
+
+  static Error_TouchLayoutIdentifierRequires15 = (o:{keyId:string, platformName:string, layerId:string}) => m(this.ERROR_TouchLayoutIdentifierRequires15,
+    `Key "${o.keyId}" on "${o.platformName}", layer "${o.layerId}" has a multi-part identifier which requires version 15.0 or newer.`);
+  static ERROR_TouchLayoutIdentifierRequires15 = SevError | 0x0002;
 };
