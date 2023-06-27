@@ -69,6 +69,12 @@ function CheckKey(
   FRequiredKeys: TRequiredKey[],
   FDictionary: string[]
 ): boolean {   // I4119
+  //
+  // Coerce missing ID and Text to empty strings for additional tests
+  //
+
+  FId = FId ?? '';
+  FText = FText ?? '';
 
   //
   // Check that each touch layer has K_LOPT, [K_ROPT,] K_BKSP, K_ENTER
