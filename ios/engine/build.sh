@@ -37,7 +37,7 @@ builder_describe_outputs \
   build         /ios/build/Build/Products/Release/KeymanEngine.xcframework
 
 # Base definitions (must be before do_clean call)
-DERIVED_DATA=build
+DERIVED_DATA="$KEYMAN_ROOT/ios/build"
 BUILD_PATH=$DERIVED_DATA/Build/Products
 
 # Extended path definitions

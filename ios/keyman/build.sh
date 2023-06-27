@@ -35,7 +35,7 @@ builder_describe_outputs \
   build     /ios/build/Build/Products/Release-iphoneos/Keyman.xcarchive
 
 # Base definitions (must be before do_clean call)
-DERIVED_DATA=build
+DERIVED_DATA="$KEYMAN_ROOT/ios/build"
 BUILD_PATH=$DERIVED_DATA/Build/Products
 
 # Needed before `configure` action
