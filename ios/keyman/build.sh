@@ -101,7 +101,7 @@ function build_app() {
     # Do NOT use the _EXT variant here; there's no scheme to ref, which will lead
     # Xcode to generate a build error.
     run_xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH \
-                -exportOptionsPlist exportAppStore.plist \
+                -exportOptionsPlist ../exportAppStore.plist \
                 -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
   fi
 
