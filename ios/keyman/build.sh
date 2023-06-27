@@ -51,7 +51,7 @@ ARCHIVE_PATH=$BUILD_PATH/${CONFIG}-iphoneos/Keyman.xcarchive
 KEYMAN_XCFRAMEWORK=$BUILD_PATH/$CONFIG/KeymanEngine.xcframework
 
 XCODEFLAGS="-quiet -configuration $CONFIG"
-XCODEFLAGS_EXT="$XCODEFLAGS -derivedDataPath $DERIVED_DATA -workspace keymanios.xcworkspace"
+XCODEFLAGS_EXT="$XCODEFLAGS -derivedDataPath $DERIVED_DATA -workspace ../keymanios.xcworkspace"
 
 CODE_SIGN=
 if builder_has_option --debug; then
