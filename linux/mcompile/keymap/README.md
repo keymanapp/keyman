@@ -23,9 +23,13 @@ TODO include deadkeys
 TODO mcompile.cpp: open mcompile -u - option
 TODO replace GetLastError with SetError/AddCompileError/AddCompileWarning
 TODO u16.h u16.cpp include fron folder of kmx_u16.h
-TOTO use wchar_t* as cmd-lne-par in main
+TOTO use wchar_t* as cmd-lne-par in main ??
+TOTO changes inside VerifyKeyboard()
+TOTO changes inside FixupKeyboard()
+TODO check if I can use files from some other keyman path instead of a copy in keymap ( e.g. filesystem.h exists elsewhere)
 TODO ...
 
 //---------------------------
 TOASK is using string OK, or do we use char, wchar?
 TOASK a-z, A_Z or more keys? ...
+TOASK main/wmain? will we use wchar_t Filenames on Linux?

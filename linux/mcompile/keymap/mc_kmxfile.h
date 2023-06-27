@@ -4,6 +4,7 @@
 
 #include "km_types.h"
 #include "kmx_file.h"
+#include "filesystem.h"
 
 #include <iostream>		// _S2 can be removed later
 
@@ -73,7 +74,8 @@ typedef struct tagKEYBOARD {
 	//HBITMAP	hBitmap;		// handle to the bitmap in the file;
 } KEYBOARD, *LPKEYBOARD;
 
-KMX_BOOL LoadKeyboard(LPKMX_WCHART fileName, LPKEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
+KMX_BOOL LoadKeyboard(PCKMX_WCHART fileName, LPKEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
+KMX_BOOL LoadKeyboard(char* fileName, LPKEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
 
 #endif
 

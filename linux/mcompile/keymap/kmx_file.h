@@ -9,6 +9,9 @@
 
 #include <km_types.h>
 
+//_S2 what is this and do we need it???
+#define UNREFERENCED_PARAMETER(P)   (P)
+
 #ifdef KMN_KBP
 // TODO: move this to a common namespace keyman::common::kmx_file or similar in the future
 namespace km {

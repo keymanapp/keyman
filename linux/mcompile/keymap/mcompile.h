@@ -24,6 +24,7 @@
 #include <vector>
 #include "keymap.h"
 
+//int run(int argc, wchar_t* argv[]); //_S2 Do we need that?
 void LogError(PKMX_WCHART message, ...);
 
 

@@ -21,19 +21,33 @@
                     31 Dec 2014 - mcdurdin - I4549 - V9.0 - Mnemonic layout recompiler does not translate Lctrl Ralt for deadkeys correctly
                     06 Feb 2015 - mcdurdin - I4552 - V9.0 - Add mnemonic recompile option to ignore deadkeys
                     08 Apr 2015 - mcdurdin - I4651 - V9.0 - Mnemonic layout recompiler maps AltGr+VK_BKSLASH rather than VK_OEM_102
+
+This is a copy of win/src/eng/mcompile.cpp
+there are 2 options to run mcompile
+    -u ( which will be done later)
+    -d ( which will be done here )
+
+mcompile -d runs 4 important steps:
+    -LoadKeyboard();                                    -> started to exchange for being cross platform  ( old version is to the right )
+    -int out = run_DoConvert_Part1_getMap(argc,argv);   -> there is a version for getting the mapping (keymap.cpp) but it uses string. At the end we will need to se char16_t
+    -run_DoConvert_Part2_TranslateKeyboard();           ->
+    -SaveKeyboard();                                    ->
+
 */
+
+// run with       ./mcompile -d in.kmx bla.dll 0407 out.kmx
+//./mcompile -d /Projects/keyman/keyman/linux/mcompile/keymap/anii.kmx bla.dll 0407 /Projects/keyman/keyman/linux/mcompile/keymap/anii_out.kmx
 
 #include "mcompile.h"
 #include "helpers.h"
 
-
-int main(gint argc, wchar_t *argv[])
+int main(int argc, char *argv[])
 {  //----------------------------------------
-
 // test if all cpps are acccessible: can be removed
-check_avaiability_of_modules_();    //_S2
+//check_avaiability_of_modules_();    //_S2
 
- if(argc < 3 || (argc < 5 && wcscmp(argv[1], L"-u") != 0)) {   // I4273
+ /* //in case we use wmain(...wchar_t*)
+   if(argc < 3 || (argc < 5 && wcscmp(argv[1], L"-u") != 0)) {   // I4273// I4273
     printf(
          "Usage: mcompile -u infile.kmx outfile.kmx\n"
          "       mcompile [-d] infile.kmx kbdfile.dll kbid outfile.kmx\n"
@@ -46,7 +60,23 @@ check_avaiability_of_modules_();    //_S2
 
     return 1;
   }
-//-----------------------------
+  */
+
+ //in case we use main(...char*)
+ if(argc < 3 || (argc < 5 && strcmp(argv[1], "-u") != 0)) {   // I4273
+    printf(
+         "Usage: mcompile -u infile.kmx outfile.kmx\n"
+         "       mcompile [-d] infile.kmx kbdfile.dll kbid outfile.kmx\n"
+         "  With -u parameter, converts keyboard from ANSI to Unicode\n"
+         "  Otherwise, mcompile converts a Keyman mnemonic layout to a\n"
+         "  positional one based on the Windows keyboard\n"
+         "  layout file given by kbdfile.dll\n\n"
+         "  kbid should be a hexadecimal number e.g. 409 for US English\n"
+         "  -d   convert deadkeys to plain keys\n");   // I4552
+
+    return 1;
+  }
+//--------u option will be done later----------------------
  /* if(wcscmp(argv[1], L"-u") == 0) {   // I4273
     wchar_t *infile = argv[2], *outfile = argv[3];
 
@@ -66,15 +96,32 @@ check_avaiability_of_modules_();    //_S2
 
     return 0;   // I4279
   }*/
-/*//-----------------------------
+//-----------------------------
+
+std::cout<<"*********************************************************************************************";
+
+
+/* //in case we use wmain(...wchar_t*)
   int bDeadkeyConversion = wcscmp(argv[1], L"-d") == 0;   // I4552
   int n = (bDeadkeyConversion ? 2 : 1);
+*/
 
-  wchar_t *infile = argv[n], *indll = argv[n+1], *kbid = argv[n+2], *outfile = argv[n+3];
+  //in case we use main(...char*) and proceed with char
+  int bDeadkeyConversion = strcmp(argv[1], "-d") == 0;   // I4552
+  int n = (bDeadkeyConversion ? 2 : 1);
+  char *infile = argv[n], *indll = argv[n+1], *kbid = argv[n+2], *outfile  = argv[n+3];
+  printf("mcompile%s \"%s\" \"%s\" \"%s\" \"%s\"\n", bDeadkeyConversion ? " -d":"", infile, indll, kbid, outfile);   // I4174
 
+
+/* //in case we use main(...char*) and proceed with wchar_t
+  int bDeadkeyConversion = strcmp(argv[1], "-d") == 0;   // I4552
+  int n = (bDeadkeyConversion ? 2 : 1);
+  char *infile_c = argv[n], *indll_c  = argv[n+1], *kbid_c = argv[n+2], *outfile_c  = argv[n+3];
+  wchar_t *infile = wchart_from_char(infile_c) ,  *indll = wchart_from_char(indll_c) ,  *kbid = wchart_from_char(kbid_c) ,  *outfile = wchart_from_char(outfile_c) ;
   wprintf(L"mcompile%ls \"%ls\" \"%ls\" \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d":L"", infile, indll, kbid, outfile);   // I4174
+*/
 
-  // 1. Load the keyman keyboard file
+/*  // 1. Load the keyman keyboard file
 
   // 2. For each key on the system layout, determine its output character and perform a
   //    1-1 replacement on the keyman keyboard of that character with the base VK + shift
@@ -99,26 +146,34 @@ check_avaiability_of_modules_();    //_S2
   //
 
   // 3. Write the new keyman keyboard file
-
-  if(!LoadNewLibrary(indll)) {
-    LogError(L"Failed to load keyboard DLL (%d)", GetLastError());
-    return 2;
-  }
+*/
 
   LPKEYBOARD kmxfile;
 
-  if(!LoadKeyboard(infile, &kmxfile)) {
-    LogError(L"Failed to load keyboard (%d)", GetLastError());
+  if (!LoadKeyboard(infile, &kmxfile)) {
+    std::cout << "TODO: Replace: Failed to load keyboard , GetLastError())\n";          //LogError(L"Failed to load keyboard (%d)", GetLastError());
     return 3;
   }
 
-  if(DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552
+/* QUESTIONS / TODO
+status: mcompile.cpp: Replacement of LogError
+status mc_kmx-file.cpp:
+  find replacement: DebugLog
+  find replacement: VerifyKeyboard
+  wchar<->char
+  char16_t<->wchar_t
+*/
+
+
+std::cout << " ++ UP TO HERE IN STEP 1 +++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+
+/*  if(DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552
     SaveKeyboard(kmxfile, outfile);
   }
 
   //DeleteReallocatedPointers(kmxfile); :TODO
   delete kmxfile;
-VM
+
 	return 0;
 
 */
@@ -132,8 +187,6 @@ printf("°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
  
   return 0 ;
 }
-
-
 
 
 
@@ -602,16 +655,19 @@ BOOL DoConvert(LPKEYBOARD kbd, LPWSTR kbid, BOOL bDeadkeyConversion) {   // I455
   return TRUE;
 }
 
+*/
+
+//TODO adapt for cross-platform
 void LogError(PWSTR fmt, ...) {
-	WCHAR fmtbuf[256];
+	/*WCHAR fmtbuf[256];
 
 	va_list vars;
 	va_start(vars, fmt);
 	_vsnwprintf_s(fmtbuf, _countof(fmtbuf), _TRUNCATE, fmt, vars);  // I2248   // I3547
 	fmtbuf[255] = 0;
-  _putws(fmtbuf);
+  _putws(fmtbuf);*/
 }
-*/
+
 //---------old-------------------------------------------
 /*#include "pch.h"
 #include <vector>
