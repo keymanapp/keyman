@@ -1,0 +1,18 @@
+// Is not `extend`ed by any tsconfigs; this is solely to build all app/ targets.
+// Doesn't bundle them, though, so there are limits to the usefulness of this file.
+{
+  "extends": "../tsconfig.base.json",
+
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "../build",
+    "tsBuildInfoFile": "../build/tsconfig.all.tsbuildinfo",
+    "rootDir": "./"
+  },
+  "files": [],
+  "references": [
+    { "path": "app/browser" },
+    { "path": "app/webview" },
+    { "path": "app/ui" }
+  ],
+}

@@ -93,7 +93,7 @@ struct COMP_KMXPLUS_ELEM_ELEMENT {
     KMX_DWORD element;                // str: output string or UTF-32LE codepoint
     KMX_DWORD flags;                  // flag and order values
     /**
-     * @brief Get the 'to' as a string, if flags&LDML_ELEM_FLAGS_UNICODE_SET is not set
+     * @brief Get the 'to' as a string, if flags&LDML_ELEM_FLAGS_TYPE = CHAR
      *
      * @return std::u16string
      */

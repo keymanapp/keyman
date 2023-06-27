@@ -27,9 +27,7 @@
     "typescript": "^4.9.5"
   },
   "scripts": {
-    "tsc": "tsc",
-    "test": "gosh ./test.sh",
-    "mocha": "mocha"
+    "test": "gosh ./test.sh"
   },
   "dependencies": {
     "@keymanapp/keyboard-processor": "*",
@@ -38,5 +36,16 @@
     "@keymanapp/keyman-version": "*",
     "@keymanapp/web-utils": "*",
     "eventemitter3": "^4.0.0"
+  },
+  "type": "module",
+  "main": "./build/obj/index.js",
+  "types": "./build/obj/index.d.ts",
+  "exports": {
+    ".": "./build/obj/index.js",
+    "./lib": {
+      "types": "./build/lib/index.d.ts",
+      "import": "./build/lib/index.mjs"
+    },
+    "./obj/*.js": "./build/obj/*.js"
   }
 }

@@ -1,16 +1,17 @@
 import { constants } from '@keymanapp/ldml-keyboard-constants';
-import { Strs, StrsItem } from './kmx-plus.js';
+import { Strs, StrsItem, UsetItem } from './kmx-plus.js';
 
 export enum ElemElementFlags {
   none = 0,
-  unicode_set = constants.elem_flags_unicode_set,
+  type = constants.elem_flags_type,
   tertiary_base = constants.elem_flags_tertiary_base,
   prebase = constants.elem_flags_prebase
 }
 ;
 
 export class ElemElement {
-  value: StrsItem; // UnicodeSet or UCS32LE character
+  value?: StrsItem; // UnicodeSet or UCS32LE character
+  uset?: UsetItem;
   order: number; // -128 to +127; used only by reorder element values
   tertiary: number; // -128 to +127; used only by reorder element values
   flags: ElemElementFlags;
@@ -56,6 +57,7 @@ export class ElementString extends Array<ElemElement> {
     for(let i = 0; i < items.length; i++) {
       let elem = new ElemElement();
       elem.value = strs.allocString(items[i]);
+      // TODO-LDML: UnicodeSet
       elem.order = orders.length ? parseInt(orders[i], 10) : 0;
       elem.tertiary = tertiaries.length ? parseInt(tertiaries[i], 10) : 0;
       elem.flags = ElemElementFlags.none |

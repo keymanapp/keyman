@@ -1,29 +1,20 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.dom.json",
 
-	"compilerOptions": {
-		"outFile": "../../../build/engine/main/obj/keymanweb.js"
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "../../../build/engine/main/obj/",
+    "tsBuildInfoFile": "../../../build/engine/main/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
   },
 
-	"include": [
-    "./*.ts",
-    "./**/*.ts"
-  ],
-
-  "files": [
-		"kmwbase.ts",
-		"keymanweb.ts",
-		"kmwinit.ts",
-		"kmwapi.ts"
-  ],
+  "include": [ "src/**/*.ts" ],
 
   "references": [
-    { "path": "../../../../common/web/keyman-version"},
-    { "path": "../../../../common/web/utils"},
-    { "path": "../../../../common/predictive-text/browser.tsconfig.json"},
-    { "path": "../../../../common/web/input-processor/src"},
-    { "path": "../../../../common/web/keyboard-processor/src"},
-    { "path": "../../../../common/web/lm-message-types" },
-		{ "path": "../device-detect" }
-	]
+    { "path": "../../../../common/web/input-processor" },
+    { "path": "../device-detect" },
+    { "path": "../osk" },
+    { "path": "../package-cache" },
+    { "path": "../paths" },
+  ]
 }

@@ -56,6 +56,19 @@ export class ListCompiler extends EmptyCompiler {
   }
 }
 
+export class UsetCompiler extends EmptyCompiler {
+  constructor(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
+    super(constants.section.uset, source, callbacks);
+  }
+  public compile(sections: KMXPlus.DependencySections): KMXPlus.Section {
+    return new KMXPlus.List(sections.strs);
+  }
+  public get dependencies(): Set<SectionIdent> {
+    const strsOnly = new Set(<SectionIdent[]>[constants.section.strs]);
+    return strsOnly;
+  }
+}
+
 /**
  * For test use. The top three compilers.
  */

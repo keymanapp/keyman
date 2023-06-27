@@ -328,6 +328,27 @@ export class Tran extends Section {
   }
 };
 
+export class UsetItem {
+  constructor(public uset: UnicodeSet, public str: StrsItem) {
+  }
+  compareTo(other: UsetItem) : number {
+    return this.str.compareTo(other.str);
+  }
+};
+
+export class Uset extends Section {
+  usets: UsetItem[] = [];
+  allocUset(set: UnicodeSet, sections: DependencySections) : UsetItem {
+    // match the same pattern
+    let result = this.usets.find(s => set.pattern == s.uset.pattern);
+    if (result === undefined) {
+      result = new UsetItem(set, sections.strs.allocString(set.pattern));
+      this.usets.push(result);
+    }
+    return result;
+  }
+};
+
 // alias type for 'bksp'
 export class Bksp extends Tran {
   override get id() {
@@ -497,6 +518,7 @@ export interface KMXPlusData {
     name?: Name;
     strs?: Strs; // strs is ignored in-memory
     tran?: Tran;
+    uset?: Uset; // uset is ignored in-memory
     vars?: Vars;
     vkey?: Vkey;
 };
@@ -552,6 +574,10 @@ export class KMXPlusFile extends KMXFile {
   public readonly COMP_PLUS_TRAN_TRANSFORM: any;
   public readonly COMP_PLUS_TRAN_REORDER: any;
   public readonly COMP_PLUS_TRAN: any;
+
+  public readonly COMP_PLUS_USET_USET: any;
+  public readonly COMP_PLUS_USET_RANGE: any;
+  public readonly COMP_PLUS_USET: any;
 
   public readonly COMP_PLUS_VKEY_ITEM: any;
   public readonly COMP_PLUS_VKEY: any;
@@ -807,6 +833,27 @@ export class KMXPlusFile extends KMXFile {
       groups: new r.Array(this.COMP_PLUS_TRAN_GROUP, 'groupCount'),
       transforms: new r.Array(this.COMP_PLUS_TRAN_TRANSFORM, 'transformCount'),
       reorders: new r.Array(this.COMP_PLUS_TRAN_REORDER, 'reorderCount'),
+    });
+
+    // 'uset'
+    this.COMP_PLUS_USET_USET = new r.Struct({
+      range: r.uint32le,
+      count: r.uint32le,
+      pattern: r.uint32le, // str
+    });
+
+    this.COMP_PLUS_USET_RANGE = new r.Struct({
+      start: r.uint32le,
+      end: r.uint32le,
+    });
+
+    this.COMP_PLUS_USET = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      usetCount: r.uint32le,
+      rangeCount: r.uint32le,
+      usets: new r.Array(this.COMP_PLUS_USET_USET, 'usetCount'),
+      ranges: new r.Array(this.COMP_PLUS_USET_RANGE, 'rangeCount'),
     });
 
     // 'vars'
