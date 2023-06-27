@@ -15,6 +15,7 @@ cd "$THIS_SCRIPT_PATH"
 
 builder_describe "Builds the Keyman Engine for Web's sample page setups." \
   "@/common/web/sentry-manager build" \
+  "@/web/src/tools/testing/recorder build" \
   "configure           Does nothing for this project" \
   "clean" \
   "build" \
