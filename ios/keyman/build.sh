@@ -64,6 +64,11 @@ function do_clean () {
   rm -rf $BUILD_PATH
 }
 
+function do_configure() {
+  # do literally nothing
+  true
+}
+
 function build_app() {
   echo "Building offline help."
   build_help_html ios keyman/Keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources
