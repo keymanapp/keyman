@@ -101,7 +101,7 @@ function CheckKey(
   //
 
   if(FId.trim() == '') {
-    if(!(FKeyType in [TouchLayout.TouchLayoutKeySp.blank, TouchLayout.TouchLayoutKeySp.spacer]) && FNextLayer == '') {
+    if(!([TouchLayout.TouchLayoutKeySp.blank, TouchLayout.TouchLayoutKeySp.spacer].includes(FKeyType)) && FNextLayer == '') {
       callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutUnidentifiedKey({layerId: layer.id}));
     }
     return true;
@@ -122,7 +122,7 @@ function CheckKey(
   // Check that each custom key code has at least *a* rule associated with it
   //
 
-  if (FValid == TKeyIdType.Key_Touch && FNextLayer == '' && FKeyType in [TouchLayout.TouchLayoutKeySp.normal, TouchLayout.TouchLayoutKeySp.deadkey]) {
+  if (FValid == TKeyIdType.Key_Touch && FNextLayer == '' && [TouchLayout.TouchLayoutKeySp.normal, TouchLayout.TouchLayoutKeySp.deadkey].includes(FKeyType)) {
     // Search for the key in the key dictionary - ignore K_LOPT, K_ROPT...
     if(FDictionary.indexOf(FId) < 0) {
       callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutCustomKeyNotDefined({keyId: FId, platformName: platformId, layerId: layer.id}));
@@ -139,7 +139,7 @@ function CheckKey(
     if((CSpecialText10.includes(FText) || CSpecialText14.includes(FText)) &&
         !CSpecialText14ZWNJ.includes(FText) &&
         !IsKeyboardVersion14OrLater() &&
-        !(FKeyType in [TouchLayout.TouchLayoutKeySp.special, TouchLayout.TouchLayoutKeySp.specialActive])) {
+        !([TouchLayout.TouchLayoutKeySp.special, TouchLayout.TouchLayoutKeySp.specialActive].includes(FKeyType))) {
       callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutSpecialLabelOnNormalKey({
         keyId: FId,
         platformName: platformId,
@@ -161,7 +161,7 @@ function CheckDictionaryKeyValidity(fk: KMX.KEYBOARD, FDictionary: string[]) {  
       continue;
     }
 
-    if(KeyIdType(FDictionary[i]) in [TKeyIdType.Key_Invalid, TKeyIdType.Key_Constant]) {
+    if([TKeyIdType.Key_Invalid, TKeyIdType.Key_Constant].includes(KeyIdType(FDictionary[i]))) {
       for(let fgp of fk.groups) {
         if(fgp.fUsingKeys) {
           for(let fkp of fgp.keys) {
