@@ -29,7 +29,7 @@ function do_build() {
   ./build.sh                         clean configure build --sim-artifact
 
   # Since we may be disabling it via build-agent environment variable at times...
-  if [ ! -z "$RELEASE_OEM" ]; then
+  if [ ! -z "${RELEASE_OEM+x}" ]; then
     ../oem/firstvoices/ios/build.sh  clean configure build --sim-artifact
   fi
 }
