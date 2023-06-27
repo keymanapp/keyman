@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.131 alpha 2023-06-27
+
+* feat(developer,common,core): ldml UTF-32 literals in binary (#9084)
+* fix(web): fixes Web build zip artifact construction (#9096)
+
 ## 17.0.130 alpha 2023-06-26
 
 * chore(deps): bump semver from 7.3.8 to 7.5.2 (#9085)
