@@ -66,3 +66,17 @@ export function unescapeString(s: string): string {
 
   return s;
 }
+
+/** True if this string *could* be a UTF-32 single char */
+export function
+isOneChar(value: string) : boolean {
+  return [...value].length === 1;
+}
+
+export function
+toOneChar(value: string) : number {
+  if (!isOneChar(value)) {
+    throw Error(`Not a single char: ${value}`);
+  }
+  return value.codePointAt(0);
+}
