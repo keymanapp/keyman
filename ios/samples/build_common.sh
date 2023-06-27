@@ -1,56 +1,44 @@
 #!/usr/bin/env bash
 
-# set -e: Terminate script if a command returns an error
-set -e
-# set -u: Terminate script if an unset variable is used
-set -u
-# set -x: Debugging use, print each statement
-# set -x
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+# TODO:  resolve how this is sourced by scripts in subfolders;
+# we want to cd to the subfolder including this script.
+#
+# # This script runs from its own folder
+# cd "$(dirname "$THIS_SCRIPT")"
+
+# Include our resource functions; they're pretty useful!
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
-if [[ "${OSTYPE}" == *"darwin" ]]; then
-  echo "This build script will only run in a Mac environment."
-  exit 1
-fi
+verify_on_mac
 
 if [ -z "$TARGET" ]; then
   exit 1
 fi
 
-display_usage ( ) {
-    echo "build.sh [-no-update] | [-lib-build] | [-lib-ignore] | [-clean]"
-    echo
-    echo "  -clean          Removes all previously-existing build products for this project before building."
-    echo "  -no-update      If an in-place copy of KeymanEngine.xcframework exists, does not seek out an updated copy."
-    echo "  -lib-build      Actively rebuilds KMEI before copying its build products to project resources."
-    echo "  -lib-nobuild    Prevents the build script from building KeymanEngine under any circumstances."
-    echo "  -no-codesign    Performs the build without code signing."
-    echo "  -debug          Sets the configuration to debug mode instead of release."
-    echo
-    echo "  If no settings are specified this script will grab a copy of the most recent build of KeymanEngine,"
-    echo "  performing an initial build of it if necessary."
-    exit 1
-}
+builder_describe "Builds sample app $TARGET that demos the Keyman Engine for iPhone and iPad" \
+  "@/ios/engine build" \
+  "clean" \
+  "configure" \
+  "build" \
+  "--debug          Avoids codesigning and adds full sourcemaps for the embedded predictive-text engine"
 
-assert ( ) {
-    if ! [ -f $1 ]; then
-        echo "Build failed:  missing $1"
-        exit 1
-    fi
-}
+builder_parse "$@"
 
-verify_KMEI ( ) {
-    KMEI_BUILD_EXISTS=true
-    [ -d "$KEYMAN_ENGINE_FRAMEWORK_SRC" ] || KMEI_BUILD_EXISTS=false
-}
+CONFIG=Release
+if builder_is_debug_build; then
+  CONFIG="Debug"
+fi
 
-KMEI_BUILD_DIR="../../"
+# TODO: should probably define this.
+# builder_describe_outputs \
+#   build     /ios/build/Build/Products/Release-iphoneos/Keyman.xcarchive
 
 BUILD_FOLDER=build
 
@@ -60,84 +48,20 @@ do_clean ( ) {
 
 ### START OF THE BUILD ###
 
-DO_UPDATE=true
-FORCE_KMEI_BUILD=false
-ALLOW_KMEI_BUILD=true
-CODE_SIGN=true
-CONFIG=Release
-KMEI_FLAGS=
-
-while [[ $# -gt 0 ]] ; do
-    key="$1"
-    case $key in
-        -no-update)
-            DO_UPDATE=false
-            ALLOW_KMEI_BUILD=false
-            ;;
-        -lib-build)
-            FORCE_KMEI_BUILD=true
-            ;;
-        -lib-nobuild)
-            ALLOW_KMEI_BUILD=false
-            ;;
-        -no-codesign)
-            CODE_SIGN=false
-            KMEI_FLAGS="$KMEI_FLAGS -no-codesign"
-            ;;
-        -h|-\?)
-            display_usage
-            ;;
-        -clean)
-            do_clean
-            KMEI_FLAGS="$KMEI_FLAGS -clean"
-            FORCE_KMEI_BUILD=true
-            ;;
-        -debug)
-            CONFIG=Debug
-            KMEI_FLAGS="$KMEI_FLAGS -debug"
-            ;;
-    esac
-    shift
-done
-
-KEYMAN_ENGINE_FRAMEWORK_SRC="../../build/Build/Products/$CONFIG/KeymanEngine.xcframework"
+KEYMAN_ENGINE_FRAMEWORK_SRC="$KEYMAN_ROOT/ios/build/Build/Products/$CONFIG/KeymanEngine.xcframework"
 KEYMAN_ENGINE_FRAMEWORK_DST=./
 
-if [ $DO_UPDATE = true ]; then
-    # Does a prior build of KMEI exist?
-    verify_KMEI
+function do_build() {
+  # Copy resources.
+  cp -Rf "$KEYMAN_ENGINE_FRAMEWORK_SRC" "$KEYMAN_ENGINE_FRAMEWORK_DST"
 
-    if [ $ALLOW_KMEI_BUILD = true ] && [ $FORCE_KMEI_BUILD = false ] && [ $KMEI_BUILD_EXISTS = false ]; then
-        echo "Previous KeymanEngine build information is unavailable."
-        FORCE_KMEI_BUILD=true
-    fi
+  CODE_SIGN=
+  if ! builder_has_option --debug; then
+    CODE_SIGN=CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED="NO" CODE_SIGNING_ENTITLEMENTS=""
+  fi
 
-    if [ $FORCE_KMEI_BUILD = true ]; then
-        echo "Building KeymanEngine..."
-        base_dir="$(pwd)"
+  run_xcodebuild -quiet $CODE_SIGN -target "$TARGET" -config "$CONFIG"
+}
 
-        cd $KMEI_BUILD_DIR
-        ./kmbuild.sh -only-framework $KMEI_FLAGS
-        cd $base_dir
-    fi
-
-    verify_KMEI
-
-    if ! [ $KMEI_BUILD_EXISTS ]; then
-      echo "Build failed:  could not build required KeymanEngine resources."
-      exit 1
-    fi
-
-    # Copy resources.
-    /bin/cp -Rf "$KEYMAN_ENGINE_FRAMEWORK_SRC" "$KEYMAN_ENGINE_FRAMEWORK_DST"
-fi
-
-if [ $CODE_SIGN = true ]; then
-  run_xcodebuild -quiet -target "$TARGET" -config "$CONFIG"
-else
-  run_xcodebuild -quiet CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED="NO" CODE_SIGNING_ENTITLEMENTS="" -target "$TARGET" -config "$CONFIG"
-fi
-
-if [ $? = 0 ]; then
-  echo "Build complete."
-fi
+builder_run_action clean     do_clean
+builder_run_action build     do_build

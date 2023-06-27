@@ -12,19 +12,16 @@ cd "$(dirname "$THIS_SCRIPT")"
 # Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
-. "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac
 
-builder_describe "Builds Keyman Engine and the Keyman app for use on iOS devices - iPhone and iPad." \
-  "@/web/src/app/webview        build:engine" \
-  "@/common/web/sentry-manager  build:engine" \
+builder_describe "Builds Keyman Engine for use on iOS devices - iPhone and iPad." \
+  "@/web/src/app/webview        build" \
+  "@/common/web/sentry-manager  build" \
   "clean" \
   "configure" \
   "build" \
-  ":engine         Builds KeymanEngine.xcframework, usable by our main app and by third-party apps" \
-  ":app            Builds the Keyman app for iOS platforms" \
   "--debug         Avoids codesigning and adds full sourcemaps for the embedded predictive-text engine" \
   "--sim-artifact  Also outputs a simulator-friendly test artifact corresponding to the build"
 
@@ -37,8 +34,7 @@ fi
 
 builder_describe_outputs \
   configure     /ios/Carthage/Build     \
-  build:engine  /ios/build/Build/Products/Release/KeymanEngine.xcframework     \
-  build:app     /ios/build/Build/Products/Release-iphoneos/Keyman.xcarchive
+  build         /ios/build/Build/Products/Release/KeymanEngine.xcframework
 
 # Base definitions (must be before do_clean call)
 DERIVED_DATA=build
@@ -52,11 +48,6 @@ KMW_ROOT=../web
 # Needed before `configure` action
 DEFAULT_KBD_ID="sil_euro_latin"
 DEFAULT_LM_ID="nrc.en.mtnt"
-
-# Build product paths
-APP_BUNDLE_PATH=$BUILD_PATH/${CONFIG}-iphoneos/Keyman.app
-KEYBOARD_BUNDLE_PATH=$BUILD_PATH/${CONFIG}-iphoneos/SWKeyboard.appex
-ARCHIVE_PATH=$BUILD_PATH/${CONFIG}-iphoneos/Keyman.xcarchive
 
 # Engine library build path
 KEYMAN_XCFRAMEWORK=$BUILD_PATH/$CONFIG/KeymanEngine.xcframework
@@ -72,6 +63,7 @@ fi
 ### START OF THE BUILD ###
 
 function do_clean () {
+  # Possible TODO:  can we clean the engine target without also cleaning the app target?
   rm -rf $BUILD_PATH
   rm -rf Carthage
 }
@@ -86,7 +78,7 @@ function carthage_die() {
 }
 
 function do_carthage() {
-  carthage checkout || carthage_die "Carthage dependency loading failed"
+  carthage checkout || carthage_die "Carthage dependency checkout failed"
 
   # --no-use-binaries: due to https://github.com/Carthage/Carthage/issues/3134,
   # which affects the sentry-cocoa dependency.
@@ -166,55 +158,6 @@ function build_engine() {
   assertDirExists "$KEYMAN_XCFRAMEWORK"
 }
 
-# TODO: split into separate script (so it can @depend on build:engine)
-function build_app() {
-  echo "Building offline help."
-  build_help_html ios keyman/Keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources
-
-  echo ""
-  echo "Building Keyman app."
-
-  # Provides a needed link for codesigning for our CI.
-  if ! [ -z "${DEVELOPMENT_TEAM+x}" ]; then
-    DEV_TEAM="DEVELOPMENT_TEAM=${DEVELOPMENT_TEAM}"
-  else
-    DEV_TEAM=
-  fi
-
-  # Time to prepare the deployment archive data.
-  echo ""
-  echo "Preparing .xcarchive for real devices."
-  run_xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
-              -archivePath $ARCHIVE_PATH \
-              archive -allowProvisioningUpdates \
-              VERSION=$VERSION \
-              VERSION_WITH_TAG=$VERSION_WITH_TAG \
-              VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
-              UPLOAD_SENTRY=$UPLOAD_SENTRY
-
-  assertDirExists "$ARCHIVE_PATH"
-
-  if ! builder_has_option --debug; then
-    echo "Preparing .ipa file for deployment to real devices"
-    # Do NOT use the _EXT variant here; there's no scheme to ref, which will lead
-    # Xcode to generate a build error.
-    run_xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH \
-                -exportOptionsPlist exportAppStore.plist \
-                -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
-  fi
-
-  if builder_has_option --sim-artifact; then
-    echo "Preparing .app file for simulator-targeted artifact for testing"
-    run_xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
-                -sdk iphonesimulator \
-                VERSION=$VERSION \
-                VERSION_WITH_TAG=$VERSION_WITH_TAG \
-                VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
-                UPLOAD_SENTRY=$UPLOAD_SENTRY
-  fi
-}
-
 builder_run_action clean         do_clean
 builder_run_action configure     do_configure
-builder_run_action build:engine  build_engine
-builder_run_action build:app     build_app
+builder_run_action build         build_engine
