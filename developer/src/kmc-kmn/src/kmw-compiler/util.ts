@@ -142,15 +142,17 @@ export function ExpandSentinel(fk: KMX.KEYBOARD, pwsz: string, x: number): TSent
       };
       break;
     case KMX.KMXFile.CODE_RESETOPT:  // I3429
+      const resetOptIdx = pwsz.charCodeAt(x) - 1;
       result.ResetOpt = {
-          StoreIndex: pwsz.charCodeAt(x) - 1,
-          Store: fk.stores[result.ResetOpt.StoreIndex]
+          StoreIndex: resetOptIdx,
+          Store: fk.stores[resetOptIdx]
       };
       break;
     case KMX.KMXFile.CODE_SAVEOPT:  // I3429
+      const saveOptIdx = pwsz.charCodeAt(x) - 1;
       result.SaveOpt = {
-        StoreIndex: pwsz.charCodeAt(x) - 1,
-        Store: fk.stores[result.SaveOpt.StoreIndex]
+        StoreIndex: saveOptIdx,
+        Store: fk.stores[saveOptIdx]
       };
       break;
     case KMX.KMXFile.CODE_IFOPT:  // I3429
