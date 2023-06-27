@@ -56,7 +56,7 @@ function do_build() {
   cp -Rf "$KEYMAN_ENGINE_FRAMEWORK_SRC" "$KEYMAN_ENGINE_FRAMEWORK_DST"
 
   CODE_SIGN=
-  if ! builder_has_option --debug; then
+  if builder_has_option --debug; then
     CODE_SIGN=CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED="NO" CODE_SIGNING_ENTITLEMENTS=""
   fi
 
