@@ -78,11 +78,16 @@ function carthage_die() {
 }
 
 function do_carthage() {
+  # Carthage setup must be handled from the directory with the Cartfile / Cartfile.resolved, it seems.
+  pushd .. > /dev/null
+
   carthage checkout || carthage_die "Carthage dependency checkout failed"
 
   # --no-use-binaries: due to https://github.com/Carthage/Carthage/issues/3134,
   # which affects the sentry-cocoa dependency.
   carthage build --use-xcframeworks --no-use-binaries --platform iOS || carthage_die "Carthage dependency loading failed"
+
+  popd > /dev/null
 }
 
 function do_packages() {
