@@ -16,12 +16,10 @@ LPKEYBOARD FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
 /*void Err(wchar_t *s) {
 	LogError(L"LoadKeyboard: %s, last error = %d\n", s, GetLastError());
 }*/
-/*
-*/
 
-PKMX_WCHART StringOffset(PKMX_BYTE base, KMX_DWORD offset) {
+PKMX_WCHAR StringOffset(PKMX_BYTE base, KMX_DWORD offset) {
   if(offset == 0) return NULL;
-  return (PKMX_WCHART)(base + offset);
+  return (PKMX_WCHAR)(base + offset);
 }
 
 
@@ -49,19 +47,17 @@ LPKEYBOARD FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize) {
 	for(gp = kbp->dpGroupArray, cgp = (PCOMP_GROUP) gp, i = 0; i < kbp->cxGroupArray; i++, gp++, cgp++)	{
     gp->dpName = StringOffset(base, cgp->dpName);
 		gp->dpKeyArray = (LPKEY) (base + cgp->dpKeyArray);
-		if(cgp->dpMatch != NULL) gp->dpMatch = (PWSTR) (base + cgp->dpMatch);
-		if(cgp->dpNoMatch != NULL) gp->dpNoMatch = (PWSTR) (base + cgp->dpNoMatch);
+		if(cgp->dpMatch != NULL) gp->dpMatch = (PKMX_WCHAR) (base + cgp->dpMatch);
+		if(cgp->dpNoMatch != NULL) gp->dpNoMatch = (PKMX_WCHAR) (base + cgp->dpNoMatch);
 
 		for(kp = gp->dpKeyArray, ckp = (PCOMP_KEY) kp, j = 0; j < gp->cxKeyArray; j++, kp++, ckp++) {
-			kp->dpOutput = (PWSTR) (base + ckp->dpOutput);
-			kp->dpContext = (PWSTR) (base + ckp->dpContext);
+			kp->dpOutput = (PKMX_WCHAR) (base + ckp->dpOutput);
+			kp->dpContext = (PKMX_WCHAR) (base + ckp->dpContext);
 		}
 	}
   return kbp;
 }
 
-
-KMX_BOOL VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz);
 
 KMX_BOOL LoadKeyboard(char* fileName, LPKEYBOARD *lpKeyboard) {
   std::cout << "##### LoadKeyboard of mcompile started #####\n";
@@ -207,7 +203,7 @@ MyCout("##### Line 198",1);
 
 
 KMX_BOOL VerifyKeyboard(LPBYTE filebase, KMX_DWORD sz) {
-  /*DWORD i;
+  KMX_DWORD i;
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) filebase;
   PCOMP_STORE csp;
 
@@ -220,18 +216,18 @@ KMX_BOOL VerifyKeyboard(LPBYTE filebase, KMX_DWORD sz) {
 				if(csp->dwSystemID == TSS_COMPILEDVERSION) {
 					wchar_t buf2[256];
           if(csp->dpString == 0) {
-					wsprintf(buf2, L"errWrongFileVersion:NULL");
+					// _S2 wsprintf(buf2, L"errWrongFileVersion:NULL");
           } else {
-					  wsprintf(buf2, L"errWrongFileVersion:%10.10ls", StringOffset(filebase, csp->dpString));
+					  // _S2 wsprintf(buf2, L"errWrongFileVersion:%10.10ls", StringOffset(filebase, csp->dpString));
           }
-					Err(buf2);
+					// _S2 Err(buf2);
 					return FALSE;
 				}
 		}
-		Err(L"errWrongFileVersion");
+		// _S2 Err(L"errWrongFileVersion");
 		return FALSE;
 	}
-*/
+/**/
 
   return TRUE;
 }

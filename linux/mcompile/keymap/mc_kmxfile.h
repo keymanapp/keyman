@@ -16,8 +16,8 @@ int dummytest_mc_kmx_file();
 
 typedef struct tagSTORE {
 	KMX_DWORD dwSystemID;
-	PKMX_WCHART dpName;
-	PKMX_WCHART dpString;
+	PKMX_WCHAR dpName;
+	PKMX_WCHAR dpString;
 } STORE, *LPSTORE;
 
 
@@ -25,16 +25,16 @@ typedef struct tagKEY {
 	KMX_WCHAR Key;
 	KMX_DWORD Line;
 	KMX_DWORD ShiftFlags;
-	PKMX_WCHART dpOutput;
-	PKMX_WCHART dpContext;
+	PKMX_WCHAR dpOutput;
+	PKMX_WCHAR dpContext;
 } KEY, *LPKEY;
 
 
 typedef struct tagGROUP {
-	PKMX_WCHART dpName;
+	PKMX_WCHAR dpName;
 	LPKEY dpKeyArray;		// [LPKEY] address of first item in key array
-	PKMX_WCHART dpMatch;
-	PKMX_WCHART dpNoMatch;
+	PKMX_WCHAR dpMatch;
+	PKMX_WCHAR dpNoMatch;
 	KMX_DWORD cxKeyArray;		// in array entries
 	KMX_BOOL  fUsingKeys;		// group(xx) [using keys] <-- specified or not
 } GROUP, *LPGROUP;
@@ -74,7 +74,7 @@ typedef struct tagKEYBOARD {
 	//HBITMAP	hBitmap;		// handle to the bitmap in the file;
 } KEYBOARD, *LPKEYBOARD;
 
-KMX_BOOL LoadKeyboard(PCKMX_WCHART fileName, LPKEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
+//KMX_BOOL LoadKeyboard(PCKMX_WCHART fileName, LPKEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
 KMX_BOOL LoadKeyboard(char* fileName, LPKEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
 
 #endif

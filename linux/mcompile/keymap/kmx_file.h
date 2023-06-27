@@ -11,7 +11,7 @@
 
 //_S2 what is this and do we need it???
 #define UNREFERENCED_PARAMETER(P)   (P)
-
+#define TRUNCATE ((size_t)-1)
 #ifdef KMN_KBP
 // TODO: move this to a common namespace keyman::common::kmx_file or similar in the future
 namespace km {
@@ -308,8 +308,8 @@ struct COMP_STORE {
   };
 
 struct COMP_KEY {
-  KMX_WORD Key;
-  KMX_WORD _reserved;
+  KMX_WORD  Key;
+  KMX_WORD  _reserved;
   KMX_DWORD Line;
   KMX_DWORD ShiftFlags;
   KMX_DWORD dpOutput;

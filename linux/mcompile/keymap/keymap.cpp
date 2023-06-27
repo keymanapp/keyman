@@ -528,7 +528,7 @@ void SaveKeyboard() {std::cout << "#### SaveKeyboard not implemented yet ! \n";}
 //--------------------------------------
 
 //int main(gint argc, gchar *argv[])    // this is for use of single keymap
-int main_keymap(gint argc, gchar *argv[])   // this is for use of keymap together with mcompile
+/*int main_keymap(gint argc, gchar *argv[])   // this is for use of keymap together with mcompile
 {
   check_avaiability_of_modules_();
   LoadKeyboard();
@@ -540,7 +540,7 @@ int main_keymap(gint argc, gchar *argv[])   // this is for use of keymap togethe
 
   std::cout << "################################################################################################################################### end keymap \n";
   return out ;
-}
+}*/
 // old ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 /*
 static void PrintKeymapForCode(GdkKeymap *keymap, guint keycode)
