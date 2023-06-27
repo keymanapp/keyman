@@ -138,7 +138,7 @@ fi
 # Note:  for now, this command is used to prepare the artifacts used by the download site, but
 #        NOT to actually UPLOAD them via rsync or to produce related .download_info files.
 if builder_start_action prepare:downloads.keyman.com; then
-  UPLOAD_PATH="build/upload/$VERSION"
+  UPLOAD_PATH="$KEYMAN_ROOT/web/build/upload/$VERSION"
 
   # --- First action artifact - the KMW zip file ---
   ZIP="$UPLOAD_PATH/keymanweb-$VERSION.zip"
@@ -168,7 +168,7 @@ if builder_start_action prepare:downloads.keyman.com; then
 
   pushd build/publish
   # Zip both the 'debug' and 'release' configurations together.
-  "${COMPRESS_CMD}" $COMPRESS_ADD ../../../../$ZIP *
+  "${COMPRESS_CMD}" $COMPRESS_ADD $ZIP *
   popd
 
   # --- Second action artifact - the 'static' folder (hosted user testing on downloads.keyman.com) ---
