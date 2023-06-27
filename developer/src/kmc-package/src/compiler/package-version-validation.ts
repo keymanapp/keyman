@@ -73,7 +73,7 @@ export class PackageVersionValidation {
 
     if(result) {
       if(followKeyboardVersion) {
-        kmp.info.version.description = kmp.keyboards[0].version;
+        kmp.info.version = {description: kmp.keyboards[0].version};
       }
       else if(kmp.info.version?.description != kmp.keyboards[0].version) {
         // Only need to compare against first keyboard as we compare keyboards above
