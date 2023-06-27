@@ -4,7 +4,7 @@ import { buildActivities } from './buildClasses/buildActivities.js';
 import { BuildProject } from './buildClasses/BuildProject.js';
 import { NodeCompilerCallbacks } from '../messages/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/messages.js';
-import { CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerErrorSeverity, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
 import { BaseOptions } from '../util/baseOptions.js';
 
 
@@ -79,8 +79,11 @@ async function build(filename: string, options: CompilerOptions): Promise<boolea
       }
     }
 
+    const failureCodes = [CompilerErrorSeverity.Fatal, CompilerErrorSeverity.Error];
+    // TODO: #9100: .concat(options.compilerWarningsAsErrors ? [CompilerErrorSeverity.Warn] : []);
     let result = await builder.build(filename, callbacks, options);
-    if(result) {
+    const firstFailureMessage = callbacks.messages.find(m => failureCodes.includes(m.code & CompilerErrorSeverity.Severity_Mask));
+    if(result && firstFailureMessage == undefined) {
       callbacks.reportMessage(InfrastructureMessages.Info_FileBuiltSuccessfully({filename}));
     } else {
       callbacks.reportMessage(InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename}));
