@@ -23,6 +23,12 @@ export class KPJFileReader {
     });
 
     parser.parseString(file, (e: unknown, r: unknown) => { data = r as KPJFile });
+    for(let file of data.KeymanDeveloperProject?.Files?.File) {
+      // xml2js imports <Details/> as '' so we will just delete the empty string
+      if(typeof file.Details == 'string') {
+        delete file.Details;
+      }
+    }
     data = this.boxArrays(data);
     return data as KPJFile;
   }
