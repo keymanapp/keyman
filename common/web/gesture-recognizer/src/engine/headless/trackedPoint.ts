@@ -76,10 +76,19 @@ export class TrackedPoint<HoveredItemType> {
   }
 
   /**
-   * The event target for the first `Event` corresponding to this `TrackedPoint`.
+   * The identifying metadata returned by the configuration's specified `itemIdentifier` for
+   * the target of the first `Event` that corresponded to this `TrackedPoint`.
    */
   public get initialHoveredItem(): HoveredItemType {
     return this._initialHoveredItem;
+  }
+
+  /**
+   * The identifying metadata returned by the configuration's specified `itemIdentifier` for
+   * the target of the latest `Event` that corresponded to this `TrackedPoint`.
+   */
+  public get currentHoveredItem(): HoveredItemType {
+    return this._currentHoveredItem;
   }
 
   /**
