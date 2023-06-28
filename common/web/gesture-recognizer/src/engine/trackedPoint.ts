@@ -29,6 +29,8 @@ export class TrackedPoint {
 
   private _path: TrackedPath;
 
+  private static _jsonIdSeed: -1;
+
   /**
    * Tracks the coordinates and timestamps of each update for the lifetime of this `TrackedPoint`.
    */
@@ -44,42 +46,26 @@ export class TrackedPoint {
    */
   constructor(identifier: number,
               initialTarget: EventTarget,
-              isFromTouch: boolean);
+              isFromTouch: boolean) {
+    this.rawIdentifier = identifier;
+    this._initialTarget = initialTarget;
+    this.isFromTouch = isFromTouch;
+    this._path = new TrackedPath();
+  }
+
   /**
    * Deserializes a TrackedPoint instance from its serialized-JSON form.
+   * @param jsonObj  The JSON representation to deserialize.
    * @param identifier The unique identifier to assign to this instance.
-   * @param parsedObj  The JSON representation to deserialize.
    */
-  constructor(identifier: number,
-    parsedObj: JSONTrackedPoint);
-  constructor(identifier: number,
-              obj: EventTarget | JSONTrackedPoint,
-              isFromTouch?: boolean) {
-    this.rawIdentifier = identifier;
-    if(obj instanceof EventTarget) {
-      this._initialTarget = obj;
-      this.isFromTouch = isFromTouch;
-      this._path = new TrackedPath();
-    } else {
-      // // TEMP:  conversion of old format.
-      // if(obj['sequence']) {
-      //   obj = obj['sequence'];
-      // }
-      // @ts-ignore
-      this.isFromTouch = obj.isFromTouch;
+  public static deserialize(jsonObj: JSONTrackedPoint, identifier: number) {
+    const id = identifier !== undefined ? identifier : this._jsonIdSeed++;
+    const isFromTouch = jsonObj.isFromTouch;
+    const path = TrackedPath.deserialize(jsonObj.path);
 
-      // TEMP:  conversion of old format
-      // @ts-ignore
-      let path = obj.path;
-      // if(obj['samples']) {
-      //   // @ts-ignore
-      //   path = {
-      //     coords: obj['samples']
-      //   };
-      // }
-
-      this._path = new TrackedPath(path);
-    }
+    const instance = new TrackedPoint(id, null, isFromTouch);
+    instance._path = path;
+    return instance;
   }
 
   /**

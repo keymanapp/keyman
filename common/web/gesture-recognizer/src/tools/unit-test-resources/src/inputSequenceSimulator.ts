@@ -194,7 +194,7 @@ export class InputSequenceSimulator {
 
       for(let index=0; index < inputs.length; index++) {
         // TODO:  does not iterate over all touchpoints.  Not that we can have more than one at present...
-        const touchpoint = new TrackedPoint(index, inputs[index].touchpoints[0]);
+        const touchpoint = TrackedPoint.deserialize(inputs[index].touchpoints[0], index);
         const indexInSequence = sequenceProgress[index];
 
         if(indexInSequence == Number.MAX_VALUE) {
@@ -207,7 +207,7 @@ export class InputSequenceSimulator {
         }
       }
 
-      const touchpoint = new TrackedPoint(selectedSequence, inputs[selectedSequence].touchpoints[0]);
+      const touchpoint = TrackedPoint.deserialize(inputs[selectedSequence].touchpoints[0], selectedSequence);
       const indexInSequence = sequenceProgress[selectedSequence];
       let state: string = "move";
 

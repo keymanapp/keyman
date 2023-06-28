@@ -53,24 +53,27 @@ export class TrackedPath extends EventEmitter<EventMap> {
   /**
    * Initializes an empty path intended for tracking a newly-activated touchpoint.
    */
-  constructor();
+  constructor() {
+    super();
+
+    this.stats = new CumulativePathStats();
+  }
+
   /**
    * Deserializes a TrackedPath instance from its corresponding JSON.parse() object.
    * @param jsonObj
    */
-  constructor(jsonObj: JSONTrackedPath)
-  constructor(jsonObj?: JSONTrackedPath) {
-    super();
+  static deserialize(jsonObj: JSONTrackedPath): TrackedPath {
+    const instance = new TrackedPath();
 
-    if(jsonObj) {
-      this.samples = [].concat(jsonObj.coords.map((obj) => ({...obj} as InputSample)));
-      // If we're reconstructing this from a JSON.parse, it's a previously-recorded,
-      // completed path.
-      this._isComplete = true;
-      this.wasCancelled = jsonObj.wasCancelled;
-    }
+    instance.samples = [].concat(jsonObj.coords.map((obj) => ({...obj} as InputSample)));
+    instance._isComplete = true;
+    instance.wasCancelled = jsonObj.wasCancelled;
 
-    this.stats = new CumulativePathStats();
+    let stats = instance.samples.reduce((stats: CumulativePathStats, sample) => stats.extend(sample), new CumulativePathStats());
+    instance.stats = stats;
+
+    return instance;
   }
 
   /**
