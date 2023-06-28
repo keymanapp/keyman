@@ -1,5 +1,5 @@
 import EventEmitter from "eventemitter3";
-import { JSONTrackedPoint, TrackedPoint } from "./trackedPoint.js";
+import { JSONTrackedPoint, TrackedPoint } from "./headless/trackedPoint.js";
 
 /**
  * Documents the expected typing of serialized versions of the `TrackedInput` class.
@@ -28,8 +28,8 @@ interface EventMap {
  * `'end'`:     all gesture recognition for this input is to be resolved.
  *   - Provides no parameters.
  */
-export class TrackedInput extends EventEmitter<EventMap> {
-  public readonly touchpoints: TrackedPoint[];
+export class TrackedInput<HoveredItemType> extends EventEmitter<EventMap> {
+  public readonly touchpoints: TrackedPoint<HoveredItemType>[];
 
   // --- Future design aspects ---
   // private _gesture: Gesture;
@@ -37,14 +37,14 @@ export class TrackedInput extends EventEmitter<EventMap> {
 
   private isActive = true;
 
-  constructor(basePoint: TrackedPoint) {
+  constructor(basePoint: TrackedPoint<HoveredItemType>) {
     super();
 
     this.touchpoints = [ basePoint ];
     this._attachPointHooks(basePoint);
   }
 
-  private _attachPointHooks(touchpoint: TrackedPoint) {
+  private _attachPointHooks(touchpoint: TrackedPoint<HoveredItemType>) {
     touchpoint.path.on('complete', () => {
       this.isActive = false;
       this.emit('end');

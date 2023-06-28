@@ -7,11 +7,11 @@ import { RecordedCoordSequenceSet } from "./inputRecording.js";
  *  verification itself.
  */
 
-type WrappedInputSequence = TrackedInput;
+type WrappedInputSequence = TrackedInput<any>;
 
 export class SequenceRecorder {
   controller: HostFixtureLayoutController;
-  records:  {[identifier: string]: TrackedInput} = {};
+  records:  {[identifier: string]: TrackedInput<any>} = {};
 
   /**
    * Tracks the order in which each sequence was first detected.

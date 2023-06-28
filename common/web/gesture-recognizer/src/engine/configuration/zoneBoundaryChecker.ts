@@ -37,7 +37,7 @@ export class ZoneBoundaryChecker {
    * Confirms whether or not the input coordinate lies within the accepted coordinate bounds
    * for a gesture input sequence's first coordinate.
    */
-  static inputStartOutOfBoundsCheck(coord: InputSample, config: Nonoptional<GestureRecognizerConfiguration>): boolean {
+  static inputStartOutOfBoundsCheck(coord: InputSample, config: Nonoptional<GestureRecognizerConfiguration<any>>): boolean {
     return !!this.getCoordZoneBitmask(coord, config.inputStartBounds); // true if out of bounds.
   }
 
@@ -48,12 +48,12 @@ export class ZoneBoundaryChecker {
    * This value should be provided as the third argument to `inputMoveCancellationCheck` for
    * updated input coordinates for the current input sequence.
    */
-  static inputStartSafeBoundProximityCheck(coord: InputSample, config: Nonoptional<GestureRecognizerConfiguration>): number {
+  static inputStartSafeBoundProximityCheck(coord: InputSample, config: Nonoptional<GestureRecognizerConfiguration<any>>): number {
     return this.getCoordZoneBitmask(coord, config.paddedSafeBounds);
   }
 
   static inputMoveCancellationCheck(coord: InputSample,
-                                    config: Nonoptional<GestureRecognizerConfiguration>,
+                                    config: Nonoptional<GestureRecognizerConfiguration<any>>,
                                     ignoredSafeBoundFlags?: number): boolean {
     ignoredSafeBoundFlags = ignoredSafeBoundFlags || 0;
 

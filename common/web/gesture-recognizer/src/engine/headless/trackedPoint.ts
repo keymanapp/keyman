@@ -1,11 +1,13 @@
-import { JSONTrackedPath, TrackedPath } from "./headless/trackedPath.js";
+import { InputSample } from "./inputSample.js";
+import { JSONTrackedPath, TrackedPath } from "./trackedPath.js";
 
 /**
  * Documents the expected typing of serialized versions of the `TrackedPoint` class.
  */
-export type JSONTrackedPoint = {
+export type JSONTrackedPoint<HoveredItemType = any> = {
   isFromTouch: boolean;
   path: JSONTrackedPath;
+  initialHoveredItem: HoveredItemType
   // identifier is not included b/c it's only needed during live processing.
 }
 
@@ -14,7 +16,7 @@ export type JSONTrackedPoint = {
  * This 'tracked point' corresponds to one touch source as recognized by `Touch.identifier` or to
  * one 'cursor-point' as represented by mouse-based motion.
  */
-export class TrackedPoint {
+export class TrackedPoint<HoveredItemType> {
   /**
    * Indicates whether or not this tracked point's original source is a DOM `Touch`.
    */
@@ -25,7 +27,8 @@ export class TrackedPoint {
    */
   public readonly rawIdentifier: number;
 
-  private _initialTarget: EventTarget;
+  private _initialHoveredItem: HoveredItemType;
+  private _currentHoveredItem: HoveredItemType;
 
   private _path: TrackedPath;
 
@@ -41,14 +44,12 @@ export class TrackedPoint {
   /**
    * Constructs a new TrackedPoint instance for tracking updates to an active input point over time.
    * @param identifier     The system identifier for the input point's events.
-   * @param initialTarget  The initiating event's original target element
+   * @param initialHoveredItem  The initiating event's original target element
    * @param isFromTouch    `true` if sourced from a `TouchEvent`; `false` otherwise.
    */
-  constructor(identifier: number,
-              initialTarget: EventTarget,
-              isFromTouch: boolean) {
+  constructor(identifier: number, initialHoveredItem: HoveredItemType, isFromTouch: boolean) {
     this.rawIdentifier = identifier;
-    this._initialTarget = initialTarget;
+    this._initialHoveredItem = initialHoveredItem;
     this.isFromTouch = isFromTouch;
     this._path = new TrackedPath();
   }
@@ -62,17 +63,23 @@ export class TrackedPoint {
     const id = identifier !== undefined ? identifier : this._jsonIdSeed++;
     const isFromTouch = jsonObj.isFromTouch;
     const path = TrackedPath.deserialize(jsonObj.path);
+    const hoveredItem = jsonObj.initialHoveredItem ?? null;
 
-    const instance = new TrackedPoint(id, null, isFromTouch);
+    const instance = new TrackedPoint(id, hoveredItem, isFromTouch);
     instance._path = path;
     return instance;
+  }
+
+  public update(sample: InputSample, target: HoveredItemType) {
+    this.path.extend(sample);
+    this._currentHoveredItem = target;
   }
 
   /**
    * The event target for the first `Event` corresponding to this `TrackedPoint`.
    */
-  public get initialTarget(): EventTarget {
-    return this._initialTarget;
+  public get initialHoveredItem(): HoveredItemType {
+    return this._initialHoveredItem;
   }
 
   /**
@@ -91,6 +98,7 @@ export class TrackedPoint {
   toJSON(): JSONTrackedPoint {
     let jsonClone: JSONTrackedPoint = {
       isFromTouch: this.isFromTouch,
+      initialHoveredItem: this.initialHoveredItem,
       path: this.path.toJSON()
     }
 

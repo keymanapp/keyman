@@ -6,30 +6,34 @@ import { Nonoptional } from "./nonoptional.js";
 import { PaddedZoneSource } from "./configuration/paddedZoneSource.js";
 import { TouchEventEngine } from "./touchEventEngine.js";
 import { TrackedInput } from "./trackedInput.js";
-import { TrackedPoint } from "./trackedPoint.js";
+import { TrackedPoint } from "./headless/trackedPoint.js";
 
 // Documents the types of events that GestureRecognizer supports.
-interface EventMap {
-  'inputstart': (input: TrackedInput) => any
+interface EventMap<HoveredItemType> {
+  'inputstart': (input: TrackedInput<HoveredItemType>) => any
 }
 
-export class GestureRecognizer extends EventEmitter<EventMap> {
-  public readonly config: Nonoptional<GestureRecognizerConfiguration>;
+export class GestureRecognizer<HoveredItemType> extends EventEmitter<EventMap<HoveredItemType>> {
+  public readonly config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>;
 
-  private readonly mouseEngine: MouseEventEngine;
-  private readonly touchEngine: TouchEventEngine;
+  private readonly mouseEngine: MouseEventEngine<HoveredItemType>;
+  private readonly touchEngine: TouchEventEngine<HoveredItemType>;
 
-  private _activeInputs: {[id: string]: TrackedInput} = {};
+  private _activeInputs: {[id: string]: TrackedInput<HoveredItemType>} = {};
 
-  protected static preprocessConfig(config: GestureRecognizerConfiguration): Nonoptional<GestureRecognizerConfiguration> {
+  protected static preprocessConfig<HoveredItemType>(
+    config: GestureRecognizerConfiguration<HoveredItemType>
+  ): Nonoptional<GestureRecognizerConfiguration<HoveredItemType>> {
     // Allows configuration pre-processing during this method.
-    let processingConfig: Mutable<Nonoptional<GestureRecognizerConfiguration>> = {...config} as Nonoptional<GestureRecognizerConfiguration>;
+    let processingConfig: Mutable<Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>> = {...config} as Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>;
     processingConfig.mouseEventRoot = processingConfig.mouseEventRoot ?? processingConfig.targetRoot;
     processingConfig.touchEventRoot = processingConfig.touchEventRoot ?? processingConfig.targetRoot;
 
     processingConfig.inputStartBounds = processingConfig.inputStartBounds ?? processingConfig.targetRoot;
     processingConfig.maxRoamingBounds = processingConfig.maxRoamingBounds ?? processingConfig.targetRoot;
     processingConfig.safeBounds       = processingConfig.safeBounds       ?? new PaddedZoneSource([2]);
+
+    processingConfig.itemIdentifier   = processingConfig.itemIdentifier   ?? (() => null);
 
     if(!config.paddedSafeBounds) {
       let paddingArray = config.safeBoundPadding;
@@ -47,18 +51,18 @@ export class GestureRecognizer extends EventEmitter<EventMap> {
     return processingConfig;
   }
 
-  public constructor(config: GestureRecognizerConfiguration) {
+  public constructor(config: GestureRecognizerConfiguration<HoveredItemType>) {
     super();
     this.config = GestureRecognizer.preprocessConfig(config);
 
-    this.mouseEngine = new MouseEventEngine(this.config);
-    this.touchEngine = new TouchEventEngine(this.config);
+    this.mouseEngine = new MouseEventEngine<HoveredItemType>(this.config);
+    this.touchEngine = new TouchEventEngine<HoveredItemType>(this.config);
 
     this.mouseEngine.registerEventHandlers();
     this.touchEngine.registerEventHandlers();
 
-    const forwardingUpdateHandler = (touchpoint: TrackedPoint) => {
-      const newInput = new TrackedInput(touchpoint);
+    const forwardingUpdateHandler = (touchpoint: TrackedPoint<HoveredItemType>) => {
+      const newInput = new TrackedInput<HoveredItemType>(touchpoint);
       this._activeInputs[touchpoint.identifier] = newInput;
 
       this.emit('inputstart', newInput);

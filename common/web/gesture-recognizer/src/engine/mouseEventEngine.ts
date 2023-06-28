@@ -4,7 +4,7 @@ import { InputSample } from "./headless/inputSample.js";
 import { Nonoptional } from "./nonoptional.js";
 import { ZoneBoundaryChecker } from "./configuration/zoneBoundaryChecker.js";
 
-export class MouseEventEngine extends InputEventEngine {
+export class MouseEventEngine<HoveredItemType> extends InputEventEngine<HoveredItemType> {
   private readonly _mouseStart: typeof MouseEventEngine.prototype.onMouseStart;
   private readonly _mouseMove:  typeof MouseEventEngine.prototype.onMouseMove;
   private readonly _mouseEnd:   typeof MouseEventEngine.prototype.onMouseEnd;
@@ -14,7 +14,7 @@ export class MouseEventEngine extends InputEventEngine {
 
   private static IDENTIFIER_SEED: number;
 
-  public constructor(config: Nonoptional<GestureRecognizerConfiguration>) {
+  public constructor(config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>) {
     super(config);
 
     // We use this approach, rather than .bind, because _this_ version allows hook
@@ -122,7 +122,7 @@ export class MouseEventEngine extends InputEventEngine {
     if(!event.buttons) {
       if(this.hasActiveClick) {
         this.hasActiveClick = false;
-        this.onInputMoveCancel(this.activeIdentifier, sample);
+        this.onInputMoveCancel(this.activeIdentifier, sample, event.target);
       }
       return;
     }
@@ -130,9 +130,9 @@ export class MouseEventEngine extends InputEventEngine {
     this.preventPropagation(event);
 
     if(!ZoneBoundaryChecker.inputMoveCancellationCheck(sample, this.config, this.disabledSafeBounds)) {
-      this.onInputMove(this.activeIdentifier, sample);
+      this.onInputMove(this.activeIdentifier, sample, event.target);
     } else {
-      this.onInputMoveCancel(this.activeIdentifier, sample);
+      this.onInputMoveCancel(this.activeIdentifier, sample, event.target);
     }
   }
 

@@ -2,10 +2,11 @@
 // it's just that the ELEMENTS and zone definitions involved shouldn't be shifting
 // after configuration.
 
+import { InputSample } from "../headless/inputSample.js";
 import { RecognitionZoneSource } from "./recognitionZoneSource.js";
 
 // For example, customization of a longpress timer's length need not be readonly.
-export interface GestureRecognizerConfiguration {
+export interface GestureRecognizerConfiguration<HoveredItemType> {
   /**
    * Specifies the element that mouse input listeners should be attached to.  If
    * not specified, `eventRoot` will be set equal to `targetRoot`.
@@ -67,4 +68,17 @@ export interface GestureRecognizerConfiguration {
    * set here.
    */
   readonly paddedSafeBounds?: RecognitionZoneSource;
+
+  /**
+   * Allows the gesture-recognizer client to specify the most relevant, identifying UI "item"
+   * (as perceived by users / relevant for gesture discrimination) underneath the touchpoint's
+   * current location based when processing input events.
+   *
+   * For applications in the DOM, simply returning `target` itself may be sufficient.
+   * @param coord   The current touchpath coordinate; its .targetX and .targetY values should be
+   *                interpreted as offsets from `targetRoot`.
+   * @param target  The `EventTarget` (`Node` or `Element`) provided by the corresponding input event.
+   * @returns
+   */
+  readonly itemIdentifier?: (coord: InputSample, target: EventTarget) => HoveredItemType;
 }
