@@ -5,8 +5,6 @@
   "files": [],
   "include": [],
   "references": [
-    { "path": "./common/web/gesture-recognizer/tsconfig.json" },
-    { "path": "./common/web/gesture-recognizer/src/tools/unit-test-resources/tsconfig.json" },
     { "path": "./common/predictive-text/testing/one-stage-embedded-webworker/tsconfig.json" },
     { "path": "./common/predictive-text/testing/two-stage-embedded-webworker/tsconfig.json" },
     { "path": "./common/predictive-text/testing/two-stage-embedded-webworker/worker/tsconfig.json" },
