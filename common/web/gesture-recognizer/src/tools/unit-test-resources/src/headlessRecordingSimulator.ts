@@ -21,6 +21,7 @@ export interface RecordingTestConfig {
   endSequence:  () => void;
 }
 
+// Note:  this class is currently only used by subsegmentation unit tests.
 export class HeadlessRecordingSimulator {
   // Designed to test against PathSegmenter and TrackedPath - just implement the config interface appropriately!
   static prepareTest(recordingObj: RecordedCoordSequenceSet, config: RecordingTestConfig): ProcessedSequenceTest {
