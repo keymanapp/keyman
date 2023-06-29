@@ -126,8 +126,7 @@ def _start_ibus_daemon(realuser):
 
 def restart_ibus(bus=None):
     verify_ibus_daemon(False)
-    realuser = os.environ.get('SUDO_USER')
-    if realuser:
+    if realuser := os.environ.get('SUDO_USER'):
         # we have been called with `sudo`. Restart ibus for the real user.
         logging.info('restarting IBus by subprocess for user %s', realuser)
         subprocess.run(['sudo', '-u', realuser, 'ibus', 'restart'])
