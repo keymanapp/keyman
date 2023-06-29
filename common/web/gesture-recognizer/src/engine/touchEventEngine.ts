@@ -78,8 +78,8 @@ export class TouchEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
     delete this.safeBoundMaskMap[identifier];
   }
 
-  private buildSampleFromTouch(touch: Touch): InputSample {
-    return this.buildSampleFor(touch.clientX, touch.clientY);
+  private buildSampleFromTouch(touch: Touch) {
+    return this.buildSampleFor(touch.clientX, touch.clientY, touch.target);
   }
 
   onTouchStart(event: TouchEvent) {

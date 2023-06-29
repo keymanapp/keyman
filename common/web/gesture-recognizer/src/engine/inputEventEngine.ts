@@ -35,21 +35,25 @@ export abstract class InputEventEngine<HoveredItemType> extends EventEmitter<Eve
     this._activeTouchpoints = this._activeTouchpoints.filter((point) => point.rawIdentifier != identifier);
   }
 
-  protected buildSampleFor(clientX: number, clientY: number): InputSample {
+  protected buildSampleFor(clientX: number, clientY: number, target: EventTarget): InputSample<HoveredItemType> {
     const targetRect = this.config.targetRoot.getBoundingClientRect();
-    return {
+    const sample: InputSample<HoveredItemType> = {
       clientX: clientX,
       clientY: clientY,
       targetX: clientX - targetRect.left,
       targetY: clientY - targetRect.top,
       t: performance.now()
     };
+
+    const hoveredItem = this.config.itemIdentifier(sample, target);
+    sample.item = hoveredItem;
+
+    return sample;
   }
 
-  protected onInputStart(identifier: number, sample: InputSample, target: EventTarget, isFromTouch: boolean) {
-    const hoveredItem = this.config.itemIdentifier(sample, target);
-    const touchpoint = new TrackedPoint<HoveredItemType>(identifier, hoveredItem, isFromTouch);
-    touchpoint.update(sample, hoveredItem);
+  protected onInputStart(identifier: number, sample: InputSample<HoveredItemType>, target: EventTarget, isFromTouch: boolean) {
+    const touchpoint = new TrackedPoint<HoveredItemType>(identifier, isFromTouch);
+    touchpoint.update(sample);
 
     this._activeTouchpoints.push(touchpoint);
 
@@ -66,24 +70,22 @@ export abstract class InputEventEngine<HoveredItemType> extends EventEmitter<Eve
     this.emit('pointstart', touchpoint);
   }
 
-  protected onInputMove(identifier: number, sample: InputSample, target: EventTarget) {
+  protected onInputMove(identifier: number, sample: InputSample<HoveredItemType>, target: EventTarget) {
     const activePoint = this.getTouchpointWithId(identifier);
     if(!activePoint) {
       return;
     }
 
-    const hoveredItem = this.config.itemIdentifier(sample, target);
-    activePoint.update(sample, hoveredItem);
+    activePoint.update(sample);
   }
 
-  protected onInputMoveCancel(identifier: number, sample: InputSample, target: EventTarget) {
+  protected onInputMoveCancel(identifier: number, sample: InputSample<HoveredItemType>, target: EventTarget) {
     const touchpoint = this.getTouchpointWithId(identifier);
     if(!touchpoint) {
       return;
     }
 
-    const hoveredItem = this.config.itemIdentifier(sample, target);
-    touchpoint.update(sample, hoveredItem);
+    touchpoint.update(sample);
     touchpoint.path.terminate(true);
   }
 

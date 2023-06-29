@@ -21,7 +21,7 @@ export class ZoneBoundaryChecker {
    * @param zone          An object defining a 'recognition zone' of the gesture engine.
    * @param ignoreBitmask A bitmask indicating select boundaries to ignore for the check.
    */
-  static getCoordZoneBitmask(coord: InputSample, zone: RecognitionZoneSource): number {
+  static getCoordZoneBitmask(coord: InputSample<any>, zone: RecognitionZoneSource): number {
     const bounds = zone.getBoundingClientRect();
 
     let bitmask = 0;
@@ -37,7 +37,7 @@ export class ZoneBoundaryChecker {
    * Confirms whether or not the input coordinate lies within the accepted coordinate bounds
    * for a gesture input sequence's first coordinate.
    */
-  static inputStartOutOfBoundsCheck(coord: InputSample, config: Nonoptional<GestureRecognizerConfiguration<any>>): boolean {
+  static inputStartOutOfBoundsCheck(coord: InputSample<any>, config: Nonoptional<GestureRecognizerConfiguration<any>>): boolean {
     return !!this.getCoordZoneBitmask(coord, config.inputStartBounds); // true if out of bounds.
   }
 
@@ -48,11 +48,11 @@ export class ZoneBoundaryChecker {
    * This value should be provided as the third argument to `inputMoveCancellationCheck` for
    * updated input coordinates for the current input sequence.
    */
-  static inputStartSafeBoundProximityCheck(coord: InputSample, config: Nonoptional<GestureRecognizerConfiguration<any>>): number {
+  static inputStartSafeBoundProximityCheck(coord: InputSample<any>, config: Nonoptional<GestureRecognizerConfiguration<any>>): number {
     return this.getCoordZoneBitmask(coord, config.paddedSafeBounds);
   }
 
-  static inputMoveCancellationCheck(coord: InputSample,
+  static inputMoveCancellationCheck(coord: InputSample<any>,
                                     config: Nonoptional<GestureRecognizerConfiguration<any>>,
                                     ignoredSafeBoundFlags?: number): boolean {
     ignoredSafeBoundFlags = ignoredSafeBoundFlags || 0;

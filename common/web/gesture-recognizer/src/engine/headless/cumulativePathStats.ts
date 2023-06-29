@@ -189,22 +189,22 @@ export class CumulativePathStats {
    *
    * Refer to https://en.wikipedia.org/wiki/Catastrophic_cancellation.
    */
-  private baseSample?: InputSample;
+  private baseSample?: InputSample<any>;
 
   /**
    * The initial sample included by this instance's computed stats.  Needed for
    * the 'directness' properties.
    */
-  private _initialSample?: InputSample;
+  private _initialSample?: InputSample<any>;
 
-  private _lastSample?: InputSample;
-  private followingSample?: InputSample;
+  private _lastSample?: InputSample<any>;
+  private followingSample?: InputSample<any>;
   private _sampleCount = 0;
 
   constructor();
-  constructor(sample: InputSample);
+  constructor(sample: InputSample<any>);
   constructor(instance: CumulativePathStats);
-  constructor(obj?: InputSample | CumulativePathStats) {
+  constructor(obj?: InputSample<any> | CumulativePathStats) {
     if(!obj) {
       return;
     }
@@ -230,7 +230,7 @@ export class CumulativePathStats {
    * @returns A new, separate instance for the cumulative properties up to the
    *          newly-sampled point.
    */
-  public extend(sample: InputSample): CumulativePathStats {
+  public extend(sample: InputSample<any>): CumulativePathStats {
     if(!this._initialSample) {
       this._initialSample = sample;
       this.baseSample = sample;
@@ -512,7 +512,7 @@ export class CumulativePathStats {
     // results of any mapping to and from the external coordinate space, however.
     let result = new CumulativePathStats(this);
 
-    let newBase: InputSample = {
+    let newBase: InputSample<any> = {
       targetX: this.mappedMean('x') + this.baseSample.targetX,
       targetY: this.mappedMean('y') + this.baseSample.targetY,
       t:       this.mappedMean('t') + this.baseSample.t

@@ -2,7 +2,7 @@
  * We want these to be readily and safely converted to and from
  * JSON (for unit test use and development)
  */
-export interface InputSample {
+export interface InputSample<Type> {
   /**
    * Represents the x-coordinate of the input sample
    * in 'client' / viewport coordinates.
@@ -32,10 +32,15 @@ export interface InputSample {
    * (in ms)
    */
   t: number;
+
+  /**
+   * The UI/UX 'item' underneath the touchpoint for this sample.
+   */
+  item?: Type;
 }
 
-export type InputSampleSequence = InputSample[];
+export type InputSampleSequence<Type> = InputSample<Type>[];
 
-export function isAnInputSample(obj: any): obj is InputSample {
+export function isAnInputSample<Type>(obj: any): obj is InputSample<Type> {
   return 'targetX' in obj && 'targetY' in obj && 't' in obj;
 }

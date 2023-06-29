@@ -6,7 +6,7 @@ import { JSONTrackedPath, TrackedPath } from "./trackedPath.js";
  */
 export type JSONTrackedPoint<HoveredItemType = any> = {
   isFromTouch: boolean;
-  path: JSONTrackedPath;
+  path: JSONTrackedPath<HoveredItemType>;
   initialHoveredItem: HoveredItemType
   // identifier is not included b/c it's only needed during live processing.
 }
@@ -27,17 +27,14 @@ export class TrackedPoint<HoveredItemType> {
    */
   public readonly rawIdentifier: number;
 
-  private _initialHoveredItem: HoveredItemType;
-  private _currentHoveredItem: HoveredItemType;
-
-  private _path: TrackedPath;
+  private _path: TrackedPath<HoveredItemType>;
 
   private static _jsonIdSeed: -1;
 
   /**
    * Tracks the coordinates and timestamps of each update for the lifetime of this `TrackedPoint`.
    */
-  public get path(): TrackedPath {
+  public get path(): TrackedPath<HoveredItemType> {
     return this._path;
   }
 
@@ -47,9 +44,8 @@ export class TrackedPoint<HoveredItemType> {
    * @param initialHoveredItem  The initiating event's original target element
    * @param isFromTouch    `true` if sourced from a `TouchEvent`; `false` otherwise.
    */
-  constructor(identifier: number, initialHoveredItem: HoveredItemType, isFromTouch: boolean) {
+  constructor(identifier: number, isFromTouch: boolean) {
     this.rawIdentifier = identifier;
-    this._initialHoveredItem = initialHoveredItem;
     this.isFromTouch = isFromTouch;
     this._path = new TrackedPath();
   }
@@ -63,16 +59,14 @@ export class TrackedPoint<HoveredItemType> {
     const id = identifier !== undefined ? identifier : this._jsonIdSeed++;
     const isFromTouch = jsonObj.isFromTouch;
     const path = TrackedPath.deserialize(jsonObj.path);
-    const hoveredItem = jsonObj.initialHoveredItem ?? null;
 
-    const instance = new TrackedPoint(id, hoveredItem, isFromTouch);
+    const instance = new TrackedPoint(id, isFromTouch);
     instance._path = path;
     return instance;
   }
 
-  public update(sample: InputSample, target: HoveredItemType) {
+  public update(sample: InputSample<HoveredItemType>) {
     this.path.extend(sample);
-    this._currentHoveredItem = target;
   }
 
   /**
@@ -80,7 +74,7 @@ export class TrackedPoint<HoveredItemType> {
    * the target of the first `Event` that corresponded to this `TrackedPoint`.
    */
   public get initialHoveredItem(): HoveredItemType {
-    return this._initialHoveredItem;
+    return this.path.coords[0].item;
   }
 
   /**
@@ -88,7 +82,7 @@ export class TrackedPoint<HoveredItemType> {
    * the target of the latest `Event` that corresponded to this `TrackedPoint`.
    */
   public get currentHoveredItem(): HoveredItemType {
-    return this._currentHoveredItem;
+    return this.path.coords[this.path.coords.length-1].item;
   }
 
   /**

@@ -5,27 +5,27 @@ import {
 import { RecordedCoordSequenceSet } from './inputRecording.js';
 import { timedPromise } from './timedPromise.js';
 
-export class ProcessedSequenceTest {
+export class ProcessedSequenceTest<Type> {
   samplePromises: Promise<void>[];
 
   endPromise: Promise<void>;
   compositePromise: Promise<any>; // nasty-complex return type.
 
-  originalSamples: InputSample[];
+  originalSamples: InputSample<Type>[];
   originalSegments: Segment[];
 }
 
 // Designed to faciliate testing against both PathSegmenter and TrackedPath.
-export interface RecordingTestConfig {
-  replaySample: (sample: InputSample) => void;
+export interface RecordingTestConfig<Type> {
+  replaySample: (sample: InputSample<Type>) => void;
   endSequence:  () => void;
 }
 
 // Note:  this class is currently only used by subsegmentation unit tests.
 export class HeadlessRecordingSimulator {
   // Designed to test against PathSegmenter and TrackedPath - just implement the config interface appropriately!
-  static prepareTest(recordingObj: RecordedCoordSequenceSet, config: RecordingTestConfig): ProcessedSequenceTest {
-    const testObj = new ProcessedSequenceTest();
+  static prepareTest<Type>(recordingObj: RecordedCoordSequenceSet, config: RecordingTestConfig<Type>): ProcessedSequenceTest<Type> {
+    const testObj = new ProcessedSequenceTest<Type>();
 
     // Next:  drill down to the relevant part(s).
     const sourceTrackedPath = recordingObj.inputs[0].touchpoints[0].path;

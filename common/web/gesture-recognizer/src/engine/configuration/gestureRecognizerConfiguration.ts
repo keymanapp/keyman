@@ -80,5 +80,5 @@ export interface GestureRecognizerConfiguration<HoveredItemType> {
    * @param target  The `EventTarget` (`Node` or `Element`) provided by the corresponding input event.
    * @returns
    */
-  readonly itemIdentifier?: (coord: InputSample, target: EventTarget) => HoveredItemType;
+  readonly itemIdentifier?: (coord: Omit<InputSample<any>, 'item'>, target: EventTarget) => HoveredItemType;
 }
