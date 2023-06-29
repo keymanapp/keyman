@@ -34,7 +34,6 @@ export class HeadlessRecordingSimulator {
     const sampleCount = testObj.originalSamples.length;
     // still exists on original recorded sequences that exist before we removed segmentation.
     testObj.originalSegments = sourceTrackedPath['segments'];
-    const lastSegment = testObj.originalSegments[testObj.originalSegments.length-1];
 
     // Build promises designed to reproduce the events at the correct times.
     testObj.samplePromises = testObj.originalSamples.map((sample) => {
@@ -43,14 +42,7 @@ export class HeadlessRecordingSimulator {
       }, sample.t - testObj.originalSamples[0].t);
     });
 
-
-    // Originally we did not record the release-timing of the touch, instead using the timing of
-    // the last sample for the last subsegmentation's last sample.  We've disabled that in order
-    // to get out a release in a more timely manner, but we'll still use it first if it's available.
-    //
-    // If not... we use a more current style.  TODO:  resolve 'release timing' aspect of input
-    // sequence recording + playback.
-    const endTime = lastSegment ? lastSegment.lastCoord.t : sourceTrackedPath.coords[sampleCount-1].t;
+    const endTime = sourceTrackedPath.coords[sampleCount-1].t;
 
     testObj.endPromise = timedPromise(() => {
       config.endSequence();

@@ -90,8 +90,26 @@ export abstract class InputEventEngine<HoveredItemType> extends EventEmitter<Eve
   }
 
   protected onInputEnd(identifier: number) {
-    // We do not add extend the path here because any 'end' event immediately
-    // follows a 'move' if it occurred simultaneously.
+    const touchpoint = this.getTouchpointWithId(identifier);
+    if(!touchpoint) {
+      return;
+    }
+
+    const lastEntry = touchpoint.path.coords[touchpoint.path.coords.length-1];
+    const sample = this.buildSampleFor(lastEntry.clientX, lastEntry.clientY);
+
+    /* While an 'end' event immediately follows a 'move' if it occurred simultaneously,
+     * this is decidedly _not_ the case if the touchpoint was held for a while without
+     * moving, even at the point of its release.
+     *
+     * We'll never need to worry about the touchpoint moving here, and thus we don't
+     * need to worry about `currentHoveredItem` changing.  We're only concerned with
+     * recording the _timing_ of the touchpoint's release.
+     */
+    if(sample.t != lastEntry.t) {
+      touchpoint.update(sample, touchpoint.currentHoveredItem);
+    }
+
     this.getTouchpointWithId(identifier)?.path.terminate(false);
   }
 }
