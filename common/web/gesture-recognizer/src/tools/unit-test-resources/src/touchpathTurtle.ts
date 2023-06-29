@@ -27,6 +27,14 @@ export class TouchpathTurtle<HoveredItemType> {
     return [].concat(this.pathSamples);
   }
 
+  get hoveredItem(): HoveredItemType {
+    return this.location.item;
+  }
+
+  set hoveredItem(item: HoveredItemType) {
+    this.location.item = item;
+  }
+
   protected trackSample(sample: InputSample<HoveredItemType>) {
     this.pathSamples.push(sample);
 
