@@ -49,12 +49,9 @@ def _uninstall_kmp_common(location, packageID, removeLanguages):
     kbfontdir = get_keyman_font_dir(location, packageID)
 
     where = 'shared' if location == InstallLocation.Shared else 'local'
-    if removeLanguages:
-        logging.info(f'Uninstalling {where} keyboard: {packageID}')
-    else:
-        logging.info(f'Replacing {where} keyboard: {packageID}')
     info, system, options, keyboards, files = get_metadata(kbdir)
     if removeLanguages:
+        logging.info(f'Uninstalling {where} keyboard: {packageID}')
         if keyboards:
             if is_fcitx_running():
                 _uninstall_keyboards_from_fcitx5()
@@ -64,6 +61,8 @@ def _uninstall_kmp_common(location, packageID, removeLanguages):
                 _uninstall_keyboards_from_ibus(keyboards, kbdir)
         else:
             logging.warning("could not uninstall keyboards")
+    else:
+        logging.info(f'Replacing {where} keyboard: {packageID}')
 
     if not os.path.isdir(kbdir):
         logging.error('Keyboard directory %s for %s does not exist.', kbdir, packageID)
@@ -126,8 +125,8 @@ def uninstall_kmp(packageID, sharedarea=False, removeLanguages=True):
 
     Args:
         packageID (str): Keyboard package ID
-        sharedarea (str): whether to uninstall from shared /usr/local or ~/.local
-        removeLanguages (str): if True also uninstall the languages associated with
+        sharedarea (boolean): whether to uninstall from shared /usr/local or ~/.local
+        removeLanguages (boolean): if True also uninstall the languages associated with
             the keyboard, otherwise only remove keyboard (i.e. in preparation for
             replacing the keyboard with a newer version)
     """

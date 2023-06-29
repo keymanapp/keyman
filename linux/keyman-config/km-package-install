@@ -183,21 +183,21 @@ def main():
                 logging.warning(f'km-package-install: Warning: Keyboard {args.package} is ' +
                                 'already installed in the shared area.')
             installed_kmp_ver = get_kmp_version_user(args.package)
-        kbdata = get_keyboard_data(args.package)
-        if not kbdata:
+        pkgdata = get_keyboard_data(args.package)
+        if not pkgdata:
             logging.error("km-package-install: error: Could not download keyboard data for %s", args.package)
             sys.exit(3)
-        kbdata_version = secure_lookup(kbdata, 'version')
-        if installed_kmp_ver and kbdata_version:
-            if parse_version(installed_kmp_ver) > parse_version(kbdata_version):
+        pkg_version = secure_lookup(pkgdata, 'version')
+        if installed_kmp_ver and pkg_version:
+            if parse_version(installed_kmp_ver) > parse_version(pkg_version):
                 if args.force:
                     logging.warning(f'km-package-install: warning: The {args.package} keyboard ' +
                                     f'is already installed with a newer version {installed_kmp_ver}. ' +
-                                    f'Downgrading to version {kbdata_version}.')
+                                    f'Downgrading to version {pkg_version}.')
                 else:
                     logging.error(f'km-package-install: error: The {args.package} keyboard is ' +
                                   f'already installed with a newer version {installed_kmp_ver}. ' +
-                                  f'Not installing version {kbdata_version}. Use `--force` to downgrade.')
+                                  f'Not installing version {pkg_version}. Use `--force` to downgrade.')
                     sys.exit(1)
         if args.force:
             uninstall_kmp(args.package, args.shared, False)
