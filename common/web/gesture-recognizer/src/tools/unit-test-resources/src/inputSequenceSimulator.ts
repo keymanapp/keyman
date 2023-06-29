@@ -296,7 +296,7 @@ export class InputSequenceSimulator<HoveredItemType> {
    * @param sequenceTestSpec A previously-recorded sequence of sampled input coordinates.
    * @returns A Promise for a recording of the reproduced version of that sequence.
    */
-    replayAsync(sequenceTestSpec: RecordedCoordSequenceSet): Promise<RecordedCoordSequenceSet> {
+  replayAsync(sequenceTestSpec: RecordedCoordSequenceSet): Promise<RecordedCoordSequenceSet> {
     // We're going to record the test spec as we replay it, eventually returning the
     // final result.
     const recorder = new SequenceRecorder(this.controller);

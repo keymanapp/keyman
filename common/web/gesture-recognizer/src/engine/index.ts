@@ -1,7 +1,8 @@
 export { ConstructingSegment } from './headless/subsegmentation/constructingSegment.js';
 export { CumulativePathStats } from './headless/cumulativePathStats.js';
 export { GestureRecognizer } from "./gestureRecognizer.js";
-export { GestureRecognizerConfiguration } from "./configuration/gestureRecognizerConfiguration.js"
+export { GestureRecognizerConfiguration } from "./configuration/gestureRecognizerConfiguration.js";
+export { InputEngineBase } from "./headless/inputEngineBase.js";
 export { InputSample } from "./headless/inputSample.js";
 export { JSONTrackedInput, TrackedInput } from "./headless/trackedInput.js";
 export { JSONTrackedPath, TrackedPath } from "./headless/trackedPath.js";

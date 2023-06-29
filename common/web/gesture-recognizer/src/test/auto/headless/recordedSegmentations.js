@@ -10,7 +10,7 @@ const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 
 import { PathSegmenter } from '@keymanapp/gesture-recognizer';
 
-import { HeadlessRecordingSimulator } from '../../../../build/tools/obj/index.js';
+import { HeadlessInputEngine } from '../../../../build/tools/obj/index.js';
 
 // Ensures that the resources are resolved relative to this script, not to the cwd when the test
 // runner was launched.
@@ -91,16 +91,18 @@ describe("Segmentation - from recorded sequences", function() {
     // Now the normal basic setup.
     const segmenter = new PathSegmenter(PathSegmenter.DEFAULT_CONFIG, spy);
 
-    const configObj = {
-      replaySample: (sample) => segmenter.add(sample),
-      endSequence:  () => segmenter.close()
-    }
+    let engine = new HeadlessInputEngine();
+    engine.once('pointstart', (point) => {
+      // The first point is always available initially, rather than via event.
+      segmenter.add(point.path.coords[0]);
+      point.path.on('step', (val) => {
+        segmenter.add(val);
+      });
+    });
 
-    const testObj = HeadlessRecordingSimulator.prepareTest(jsonObj, configObj);
-
-    // The fakeClock await must be first.  The other two should be fine in either order.
+    const testPromise = engine.playbackRecording(jsonObj).then(() => segmenter.close());
     await this.fakeClock.runAllAsync();
-    await testObj.compositePromise;
+    await testPromise;
     await recognitionTestCapturer.recognizedPromise;
 
     // Any post-sequence tests to run.
@@ -157,16 +159,18 @@ describe("Segmentation - from recorded sequences", function() {
     // Now the normal basic setup.
     const segmenter = new PathSegmenter(PathSegmenter.DEFAULT_CONFIG, spy);
 
-    const configObj = {
-      replaySample: (sample) => segmenter.add(sample),
-      endSequence:  () => segmenter.close()
-    }
+    let engine = new HeadlessInputEngine();
+    engine.once('pointstart', (point) => {
+      // The first point is always available initially, rather than via event.
+      segmenter.add(point.path.coords[0]);
+      point.path.on('step', (val) => {
+        segmenter.add(val);
+      });
+    });
 
-    const testObj = HeadlessRecordingSimulator.prepareTest(jsonObj, configObj);
-
-    // The fakeClock await must be first.  The other two should be fine in either order.
+    const testPromise = engine.playbackRecording(jsonObj).then(() => segmenter.close());
     await this.fakeClock.runAllAsync();
-    await testObj.compositePromise;
+    await testPromise;
     await recognitionTestCapturer.recognizedPromise;
 
     // Any post-sequence tests to run.
@@ -195,15 +199,18 @@ describe("Segmentation - from recorded sequences", function() {
     let spy = sinon.fake();
     const segmenter = new PathSegmenter(PathSegmenter.DEFAULT_CONFIG, spy);
 
-    const configObj = {
-      replaySample: (sample) => segmenter.add(sample),
-      endSequence:  () => segmenter.close()
-    }
+    let engine = new HeadlessInputEngine();
+    engine.once('pointstart', (point) => {
+      // The first point is always available initially, rather than via event.
+      segmenter.add(point.path.coords[0]);
+      point.path.on('step', (val) => {
+        segmenter.add(val);
+      });
+    });
 
-    const testObj = HeadlessRecordingSimulator.prepareTest(jsonObj, configObj);
-
+    const testPromise = engine.playbackRecording(jsonObj).then(() => segmenter.close());
     await this.fakeClock.runAllAsync();
-    await testObj.compositePromise;
+    await testPromise;
 
     // Any post-sequence tests to run.
     const originalSegments = retrieveSubsegmentations(jsonObj);
@@ -235,15 +242,18 @@ describe("Segmentation - from recorded sequences", function() {
     let spy = sinon.fake();
     const segmenter = new PathSegmenter(PathSegmenter.DEFAULT_CONFIG, spy);
 
-    const configObj = {
-      replaySample: (sample) => segmenter.add(sample),
-      endSequence:  () => segmenter.close()
-    }
+    let engine = new HeadlessInputEngine();
+    engine.once('pointstart', (point) => {
+      // The first point is always available initially, rather than via event.
+      segmenter.add(point.path.coords[0]);
+      point.path.on('step', (val) => {
+        segmenter.add(val);
+      });
+    });
 
-    const testObj = HeadlessRecordingSimulator.prepareTest(jsonObj, configObj);
-
+    const testPromise = engine.playbackRecording(jsonObj).then(() => segmenter.close());
     await this.fakeClock.runAllAsync();
-    await testObj.compositePromise;
+    await testPromise;
 
     // Any post-sequence tests to run.
     const originalSegments = retrieveSubsegmentations(jsonObj);
@@ -276,15 +286,18 @@ describe("Segmentation - from recorded sequences", function() {
     let spy = sinon.fake();
     const segmenter = new PathSegmenter(PathSegmenter.DEFAULT_CONFIG, spy);
 
-    const configObj = {
-      replaySample: (sample) => segmenter.add(sample),
-      endSequence:  () => segmenter.close()
-    }
+    let engine = new HeadlessInputEngine();
+    engine.once('pointstart', (point) => {
+      // The first point is always available initially, rather than via event.
+      segmenter.add(point.path.coords[0]);
+      point.path.on('step', (val) => {
+        segmenter.add(val);
+      });
+    });
 
-    const testObj = HeadlessRecordingSimulator.prepareTest(jsonObj, configObj);
-
+    const testPromise = engine.playbackRecording(jsonObj).then(() => segmenter.close());
     await this.fakeClock.runAllAsync();
-    await testObj.compositePromise;
+    await testPromise;
 
     // Any post-sequence tests to run.
     const reproedSegments = spy.getCalls().map((call) => call.args[0]);
