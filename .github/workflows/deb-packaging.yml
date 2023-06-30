@@ -113,7 +113,7 @@ jobs:
         path: artifacts
 
     - name: Build
-      uses: sillsdev/gha-ubuntu-packaging@07487c6f15361e7b46e8dfc49898d32fe296efe9 # v0.4
+      uses: sillsdev/gha-ubuntu-packaging@32ebcd2aa0c163a750e6a3aa58e03089af811a7e # v0.5
       with:
         github_token: "${{secrets.GITHUB_TOKEN}}"
         dist: "${{ matrix.dist }}"
