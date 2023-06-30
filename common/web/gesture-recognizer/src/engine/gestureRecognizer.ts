@@ -1,25 +1,16 @@
-import EventEmitter from "eventemitter3";
 import { GestureRecognizerConfiguration } from "./configuration/gestureRecognizerConfiguration.js";
 import { MouseEventEngine } from "./mouseEventEngine.js";
 import { Mutable } from "./mutable.js";
 import { Nonoptional } from "./nonoptional.js";
 import { PaddedZoneSource } from "./configuration/paddedZoneSource.js";
 import { TouchEventEngine } from "./touchEventEngine.js";
-import { TrackedInput } from "./trackedInput.js";
-import { TrackedPoint } from "./headless/trackedPoint.js";
+import { TouchpointCoordinator } from "./headless/touchpointCoordinator.js";
 
-// Documents the types of events that GestureRecognizer supports.
-interface EventMap<HoveredItemType> {
-  'inputstart': (input: TrackedInput<HoveredItemType>) => any
-}
-
-export class GestureRecognizer<HoveredItemType> extends EventEmitter<EventMap<HoveredItemType>> {
+export class GestureRecognizer<HoveredItemType> extends TouchpointCoordinator<HoveredItemType> {
   public readonly config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>;
 
   private readonly mouseEngine: MouseEventEngine<HoveredItemType>;
   private readonly touchEngine: TouchEventEngine<HoveredItemType>;
-
-  private _activeInputs: {[id: string]: TrackedInput<HoveredItemType>} = {};
 
   protected static preprocessConfig<HoveredItemType>(
     config: GestureRecognizerConfiguration<HoveredItemType>
@@ -61,16 +52,8 @@ export class GestureRecognizer<HoveredItemType> extends EventEmitter<EventMap<Ho
     this.mouseEngine.registerEventHandlers();
     this.touchEngine.registerEventHandlers();
 
-    const forwardingUpdateHandler = (touchpoint: TrackedPoint<HoveredItemType>) => {
-      const newInput = new TrackedInput<HoveredItemType>(touchpoint);
-      this._activeInputs[touchpoint.identifier] = newInput;
-
-      this.emit('inputstart', newInput);
-      return false;
-    }
-
-    this.mouseEngine.on('pointstart', forwardingUpdateHandler);
-    this.touchEngine.on('pointstart', forwardingUpdateHandler);
+    this.addEngine(this.mouseEngine);
+    this.addEngine(this.touchEngine);
   }
 
   public destroy() {

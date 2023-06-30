@@ -1,5 +1,5 @@
 import EventEmitter from "eventemitter3";
-import { JSONTrackedPoint, TrackedPoint } from "./headless/trackedPoint.js";
+import { JSONTrackedPoint, TrackedPoint } from "./trackedPoint.js";
 
 /**
  * Documents the expected typing of serialized versions of the `TrackedInput` class.

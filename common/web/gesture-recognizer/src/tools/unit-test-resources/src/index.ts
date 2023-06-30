@@ -1,5 +1,5 @@
 export * from './fixtureLayoutConfiguration.js';
-export * from './headlessRecordingSimulator.js';
+export * from './headlessInputEngine.js';
 export * from './hostFixtureLayoutController.js';
 export * from './inputSequenceSimulator.js';
 export * from './sequenceRecorder.js';
