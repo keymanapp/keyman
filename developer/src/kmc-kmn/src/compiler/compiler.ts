@@ -213,6 +213,22 @@ export class KmnCompiler implements UnicodeSetParser {
     return result;
   }
 
+  /**
+   * By default, when a `Uint8Array` is created from an `ArrayBuffer` (e.g.
+   * `Module.HEAP8.buffer`), it is a dynamic view into that buffer. This module
+   * buffer can be dynamically reallocated at any time, which can happen when
+   * allocating memory in WASM code (so the change will  look _really_ weird in
+   * a stack trace). Thus, to ensure we don't trip over ourselves, we need to
+   * copy the buffer. Fortunately, creating a `Uint8Array` from a `Uint8Array`
+   * copies the data, and is pretty quick.
+   * @param offset    Offset into the WASM memory space, in bytes
+   * @param size      Size of the buffer to copy, in bytes
+   * @returns         A _copy_ of the data in a new Uint8Array
+   */
+  private copyWasmBuffer(offset: number, size: number): Uint8Array {
+    return new Uint8Array(new Uint8Array(Module.HEAP8.buffer, offset, size));
+  }
+
   public runCompiler(infile: string, outfile: string, options: KmnCompilerOptions): CompilerResult {
     if(!this.verifyInitialized()) {
       /* c8 ignore next 2 */
@@ -246,7 +262,7 @@ export class KmnCompiler implements UnicodeSetParser {
       if(result.extra.targets & COMPILETARGETS_KMX) {
         result.kmx = {
           filename: outfile,
-          data: new Uint8Array(Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
+          data: this.copyWasmBuffer(wasm_result.kmx, wasm_result.kmxSize)
         };
       }
 
@@ -279,7 +295,7 @@ export class KmnCompiler implements UnicodeSetParser {
         const kmw_result: CompilerResult = this.copyWasmResult(wasm_result);
         kmw_result.displayMap = result.displayMap; // we can safely re-use the kmx compile displayMap
 
-        let web_kmx = new Uint8Array(Module.HEAP8.buffer, wasm_result.kmx, wasm_result.kmxSize)
+        const web_kmx = this.copyWasmBuffer(wasm_result.kmx, wasm_result.kmxSize);
         result.js = this.runWebCompiler(infile, outfile, web_kmx, result.kvk?.data, kmw_result, options);
         if(!result.js) {
           return null;
