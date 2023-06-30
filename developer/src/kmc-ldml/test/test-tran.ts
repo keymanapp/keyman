@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { TranCompiler, BkspCompiler } from '../src/compiler/tran.js';
 import { VarsCompiler } from '../src/compiler/vars.js';
-import { BASIC_DEPENDENCIES } from '../src/compiler/empty-compiler.js';
+import { BASIC_DEPENDENCIES, UsetCompiler } from '../src/compiler/empty-compiler.js';
 import { CompilerMessages } from '../src/compiler/messages.js';
 import { compilerTestCallbacks, testCompilationCases } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
@@ -10,7 +10,7 @@ import { KMXPlus } from '@keymanapp/common-types';
 import Tran = KMXPlus.Tran;// for tests…
 import Bksp = KMXPlus.Bksp;// for tests…
 import { constants } from '@keymanapp/ldml-keyboard-constants';
-const tranDependencies = [ ...BASIC_DEPENDENCIES, VarsCompiler ];
+const tranDependencies = [ ...BASIC_DEPENDENCIES, UsetCompiler, VarsCompiler ];
 const bkspDependencies = tranDependencies;
 
 describe('tran', function () {
@@ -113,6 +113,27 @@ describe('tran', function () {
         assert.strictEqual(reorders[0].elements[2].order, 4);
         assert.strictEqual(reorders[0].elements[3].order, 2);
         assert.isEmpty(reorders[0].before);
+      }
+    },
+    {
+      subpath: 'sections/ordr/nod-Lana.xml',
+      callback(sect) {
+        const tran = <Tran> sect;
+        assert.equal(tran.groups?.length, 1);
+        assert.equal(tran.groups[0].type, constants.tran_group_type_reorder);
+        const { reorders } = tran.groups[0];
+        // console.dir({reorders}, {depth: Infinity, color: true});
+        // assert.lengthOf(reorders, 1);
+        // assert.lengthOf(reorders[0].elements, 4);
+        // assert.strictEqual(reorders[0].elements[0].value.value, "ខ");
+        // assert.strictEqual(reorders[0].elements[1].value.value, "ែ");
+        // assert.strictEqual(reorders[0].elements[2].value.value, "្");
+        // assert.strictEqual(reorders[0].elements[3].value.value, "ម");
+        // assert.strictEqual(reorders[0].elements[0].order, 1);
+        // assert.strictEqual(reorders[0].elements[1].order, 3);
+        // assert.strictEqual(reorders[0].elements[2].order, 4);
+        // assert.strictEqual(reorders[0].elements[3].order, 2);
+        // assert.isEmpty(reorders[0].before);
       }
     },
     // bksp non-test

@@ -2,7 +2,6 @@ import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 import { SectionCompiler } from "./section-compiler.js";
 import { LDMLKeyboard, KMXPlus, CompilerCallbacks } from "@keymanapp/common-types";
 
-
 /**
  * Compiler for typrs that don't actually consume input XML
  */
@@ -35,7 +34,7 @@ export class ElemCompiler extends EmptyCompiler {
     super(constants.section.elem, source, callbacks);
   }
   public compile(sections: KMXPlus.DependencySections): KMXPlus.Section {
-    return new KMXPlus.Elem(sections.strs);
+    return new KMXPlus.Elem(sections);
   }
   public get dependencies(): Set<SectionIdent> {
     const strsOnly = new Set(<SectionIdent[]>[constants.section.strs]);
@@ -61,7 +60,7 @@ export class UsetCompiler extends EmptyCompiler {
     super(constants.section.uset, source, callbacks);
   }
   public compile(sections: KMXPlus.DependencySections): KMXPlus.Section {
-    return new KMXPlus.List(sections.strs);
+    return new KMXPlus.Uset();
   }
   public get dependencies(): Set<SectionIdent> {
     const strsOnly = new Set(<SectionIdent[]>[constants.section.strs]);

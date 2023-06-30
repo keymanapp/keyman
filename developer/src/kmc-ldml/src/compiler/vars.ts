@@ -24,6 +24,7 @@ export class VarsCompiler extends SectionCompiler {
     return defaults;
   }
 
+  // TODO-LDML: dup with 'vars'
   usetparser : UnicodeSetParser = null;
 
   public async init() : Promise<boolean> {
@@ -146,6 +147,9 @@ export class VarsCompiler extends SectionCompiler {
   }
 
   public compile(sections: DependencySections): Vars {
+    if (!sections.usetparser) {
+      sections.usetparser = this.usetparser;
+    }
     const result =  new Vars();
 
     const variables = this.keyboard?.variables;
