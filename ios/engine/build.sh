@@ -113,7 +113,7 @@ function update_bundle ( ) {
   cp "$KMW_PRODUCT/keymanweb-webview.js"        "$BUNDLE_PATH/keymanweb-webview.js"
 
   if builder_is_debug_build; then
-    cp "$KEYMAN_ROOT/$KMW_PRODUCT/keymanweb-webview.js.map"  "$BUNDLE_PATH/keymanweb-webview.js.map"
+    cp "$KMW_PRODUCT/keymanweb-webview.js.map"  "$BUNDLE_PATH/keymanweb-webview.js.map"
   elif [ -f "$BUNDLE_PATH/keymanweb-webview.js.map" ]; then
     rm      "$BUNDLE_PATH/keymanweb-webview.js.map"
   fi
