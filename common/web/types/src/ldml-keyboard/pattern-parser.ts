@@ -119,3 +119,53 @@ export class VariableParser {
     return str.trim().split(/\s+/);
   }
 }
+
+/** for ElementParser.segment() */
+export enum ElementType {
+  codepoint = '.',
+  escaped ='\\',
+  uset = '[',
+};
+
+/** one portion of a segmented element string */
+export class ElementSegment {
+  public readonly type: ElementType;
+  constructor(public segment: string) {
+    if (ElementParser.MATCH_USET.test(segment)) {
+      this.type = ElementType.uset;
+    } else if(ElementParser.MATCH_ESCAPED.test(segment)) {
+      this.type = ElementType.escaped;
+    } else {
+      this.type = ElementType.codepoint;
+    }
+  }
+};
+
+/** Class for helping with Element strings (i.e. reorder) */
+export class ElementParser {
+  /**
+   * Matches any complex UnicodeSet that would otherwise be misinterpreted
+   * by `MATCH_ELEMENT_SEGMENTS` due to nested `[]`'s.
+   * For example, `[[a-z]-[aeiou]]` could be
+   * mis-segmented into `[[a-z]`, `-`, `[aeiou]`, `]` */
+  public static readonly MATCH_NESTED_SQUARE_BRACKETS = /\[[^\]]*\[/;
+
+  /** Match (segment) UnicodeSets OR hex escapes OR single Unicode codepoints */
+  public static readonly MATCH_ELEMENT_SEGMENTS =
+    /(?:\[[^\]]*\]|\\u[0-9a-fA-F]{4}|\\u\{[0-9a-fA-F]{1,6}\}|.)/gu;
+
+  /** Does it start with a UnicodeSet? Used to test the segments. */
+  public static readonly MATCH_USET = /^\[/;
+
+  /** Does it start with an escaped char? Used to test the segments. */
+  public static readonly MATCH_ESCAPED = /^\\u/;
+
+  /** Split a string into ElementSegments */
+  public static segment(str: string): ElementSegment[] {
+    if (this.MATCH_NESTED_SQUARE_BRACKETS.test(str)) {
+      throw Error(`Unsupported: nested square brackets in element segment: ${str}`);
+    }
+    return str.match(ElementParser.MATCH_ELEMENT_SEGMENTS)
+      .map(str => new ElementSegment(str));
+  }
+};
