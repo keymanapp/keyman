@@ -1642,7 +1642,7 @@ PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_W
 
   q++;
 
-  r = xstrchr(q, &dClose);			        // Find closing delimiter
+  r = (PKMX_WCHAR) u16chr(q, dClose);			        // Find closing delimiter
   if (!r) return NULL;
 
   if (Flags & GDS_CUTLEAD)
@@ -1655,7 +1655,7 @@ PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_W
       r--;							// Cut off following spaces
       while (iswspace(*r) && r > q) r--;
       r++;
-      *r = 0; r = xstrchr((r + 1), &dClose);
+      *r = 0; r = (PKMX_WCHAR) u16chr((r + 1), dClose);
     }
   else *r = 0;
 

@@ -9,7 +9,6 @@ KMX_UCHAR* decxstr(KMX_UCHAR* p, KMX_UCHAR* pStart);
 int xstrlen(KMX_UCHAR* p);
 int xstrlen_ignoreifopt(KMX_UCHAR* p);
 int xstrpos(KMX_UCHAR* p1, KMX_UCHAR* p);
-KMX_UCHAR* xstrchr(KMX_UCHAR* buf, KMX_UCHAR* chr);
 int xchrcmp(KMX_UCHAR* ch1, KMX_UCHAR* ch2);
 
 #endif // XSTRING_H
