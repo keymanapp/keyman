@@ -1,6 +1,7 @@
 import { KmpJsonFile, CompilerCallbacks, KpsFile, KmxFileReader, KmxFileReaderError, KMX, KeymanFileTypes } from '@keymanapp/common-types';
 import { KeymanTarget, TouchKeymanTargets } from './keyman-targets.js';
 import { CompilerMessages } from './messages.js';
+import { getCompiledWebKeyboardMetadata, WebKeyboardMetadata } from './web-keyboard-metadata.js';
 
 // The DEFAULT_VERSION used to be '1.0', but we now use '0.0' to allow
 // pre-release 0.x keyboards to be considered later than a keyboard without
@@ -40,20 +41,26 @@ export class PackageVersionValidation {
     // We now know we have at least one keyboard in the package
 
     for(let keyboard of kmp.keyboards) {
-      const kmx = this.getKmxData(kpsFilename, kmp, keyboard);
-      if(!kmx) {
-        // Warnings or errors will have been raised by getKmxData
+      const data = this.getKeyboardFileData(kpsFilename, kmp, keyboard);
+      if(!data) {
+        // Warnings or errors will have been raised by getKeyboardFileData
         result = false;
         continue;
       }
 
-      // get the targets from the .kmx
-      this.verifyTargets(keyboard, kmx, kmp);
+      if(data.kmx) {
+        // get the targets from the .kmx
+        this.verifyTargets(keyboard, data.kmx, kmp);
+      }
 
       // Note: there is often version metadata in the .kps <Keyboard> element, but
       // we don't read from the metadata because we want to ensure we have the
       // most up-to-date keyboard version data here, from the compiled keyboard.
-      let keyboardVersion = this.getKeyboardVersionFromKmx(kmx);
+
+      const keyboardVersion = data.kmx ?
+        this.getKeyboardVersionFromKmx(data.kmx) :
+        data.js.keyboardVersion;
+
       if(followKeyboardVersion && keyboardVersion === null) {
         this.callbacks.reportMessage(CompilerMessages.Info_KeyboardFileHasNoKeyboardVersion({filename: keyboard.id}));
       }
@@ -103,16 +110,21 @@ export class PackageVersionValidation {
     return true;
   }
 
-  private getKmxData(
+  private getKeyboardFileData(
     kpsFilename: string,
     kmp: KmpJsonFile.KmpJsonFile,
     keyboard: KmpJsonFile.KmpJsonFileKeyboard
-  ): KMX.KEYBOARD {
+  ): {kmx?: KMX.KEYBOARD, js?:WebKeyboardMetadata} {
 
-    const file = kmp.files.find(file => this.callbacks.path.basename(file.name, KeymanFileTypes.Binary.Keyboard) == keyboard.id);
+    let isJavascript = false;
+    let file = kmp.files.find(file => this.callbacks.path.basename(file.name, KeymanFileTypes.Binary.Keyboard) == keyboard.id);
     if(!file) {
-      this.callbacks.reportMessage(CompilerMessages.Error_KeyboardContentFileNotFound({id:keyboard.id}));
-      return null;
+      isJavascript = true;
+      file = kmp.files.find(file => this.callbacks.path.basename(file.name, KeymanFileTypes.Binary.WebKeyboard) == keyboard.id);
+      if(!file) {
+        this.callbacks.reportMessage(CompilerMessages.Error_KeyboardContentFileNotFound({id:keyboard.id}));
+        return null;
+      }
     }
 
     const filename = this.callbacks.resolveFilename(kpsFilename, file.name);
@@ -122,19 +134,25 @@ export class PackageVersionValidation {
     }
 
     //
-    // load the .kmx and extract the version number
+    // load the data from file
     //
-    let kmxFileData;
+    let fileData;
     try {
-      kmxFileData = this.callbacks.loadFile(filename);
+      fileData = this.callbacks.loadFile(filename);
     } catch(e) {
       this.callbacks.reportMessage(CompilerMessages.Error_FileCouldNotBeRead({filename, e}));
       return null;
     }
+
+    if(isJavascript) {
+      const js = new TextDecoder().decode(fileData);
+      return {js: getCompiledWebKeyboardMetadata(js)};
+    }
+
     const kmxReader: KmxFileReader = new KmxFileReader();
     let kmx: KMX.KEYBOARD;
     try {
-      kmx = kmxReader.read(kmxFileData);
+      kmx = kmxReader.read(fileData);
     } catch(e) {
       if(e instanceof KmxFileReaderError) {
         // The file couldn't be read, it might not be a .kmx file
@@ -146,7 +164,7 @@ export class PackageVersionValidation {
       }
     }
 
-    return kmx;
+    return {kmx};
   }
 
   private getKeyboardVersionFromKmx(
