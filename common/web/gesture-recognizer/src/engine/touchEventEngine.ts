@@ -146,7 +146,7 @@ export class TouchEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
         propagationActive = false;
       }
 
-      this.onInputEnd(touch.identifier);
+      this.onInputEnd(touch.identifier, event.target);
     }
   }
 }

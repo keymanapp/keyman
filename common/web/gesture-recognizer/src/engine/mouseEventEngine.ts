@@ -145,6 +145,6 @@ export class MouseEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
       this.hasActiveClick = false;
     }
 
-    this.onInputEnd(this.activeIdentifier);
+    this.onInputEnd(this.activeIdentifier, event.target);
   }
 }
