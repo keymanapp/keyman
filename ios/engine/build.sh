@@ -89,9 +89,7 @@ function do_carthage() {
 }
 
 function do_packages() {
-  if ! [ -d "$BUNDLE_PATH" ]; then
-      mkdir -p "$BUNDLE_PATH"
-  fi
+  mkdir -p "$BUNDLE_PATH"
 
   downloadKeyboardPackage "$DEFAULT_KBD_ID"  "$BUNDLE_PATH/$DEFAULT_KBD_ID.kmp"
   downloadModelPackage    "$DEFAULT_LM_ID"   "$BUNDLE_PATH/$DEFAULT_LM_ID.model.kmp"
