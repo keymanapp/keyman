@@ -133,7 +133,7 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
 
   kpp = &k[(int)(kpp - gp->dpKeyArray)];
 
-  delete gp->dpKeyArray;
+  delete[] gp->dpKeyArray;
   gp->dpKeyArray = k;
   gp->cxKeyArray++;
 

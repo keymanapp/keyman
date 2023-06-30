@@ -150,7 +150,7 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
     return FALSE;
   }
 
-  delete str;
+  delete[] str;
 
   if (!kmcmp::CheckKeyboardFinalVersion(fk)) {
     return FALSE;
