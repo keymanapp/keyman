@@ -1,13 +1,13 @@
 import EventEmitter from 'eventemitter3';
-import { GestureRecognizer } from '@keymanapp/gesture-recognizer';
+import { GestureRecognizer, GestureRecognizerConfiguration } from '@keymanapp/gesture-recognizer';
 
 import { FixtureLayoutConfiguration } from './fixtureLayoutConfiguration.js';
 
 export class HostFixtureLayoutController extends EventEmitter {
   public static readonly CONFIG_CHANGED_EVENT = "configchanged";
 
-  private _recognizer: GestureRecognizer;
-  private _loadPromise: Promise<GestureRecognizer>;
+  private _recognizer: GestureRecognizer<any>;
+  private _loadPromise: Promise<GestureRecognizer<any>>;
 
   private _hostFixture: HTMLElement;
   private _layoutConfig: FixtureLayoutConfiguration;
@@ -40,7 +40,7 @@ export class HostFixtureLayoutController extends EventEmitter {
   }
 
   // The primary host-layout configuration.
-  protected buildBaseFixtureConfig = function() {
+  protected buildBaseFixtureConfig: () => GestureRecognizerConfiguration<string> = function() {
     // Written as a function in case the class is initialized before the window is loaded.
     return {
       mouseEventRoot: document.body,
@@ -53,12 +53,12 @@ export class HostFixtureLayoutController extends EventEmitter {
 
   private _setup: () => boolean = function(this: HostFixtureLayoutController) {
     let config = this.buildBaseFixtureConfig();
-    this._recognizer = new GestureRecognizer(config);
+    this._recognizer = new GestureRecognizer<any>(config);
     this._hostFixture = document.getElementById('host-fixture');
   }.bind(this);
 
-  public connect(): Promise<GestureRecognizer> {
-    this._loadPromise = new Promise<GestureRecognizer>((resolve, reject) => {
+  public connect(): Promise<GestureRecognizer<any>> {
+    this._loadPromise = new Promise<GestureRecognizer<any>>((resolve, reject) => {
       let pageLoadHandler = () => {
         try {
           this._setup();

@@ -10,8 +10,8 @@ export interface JSONSegment {
   peakSpeed: number
   angle: number,
   cardinalDirection: string,
-  initialCoord: InputSample,
-  lastCoord: InputSample
+  initialCoord: InputSample<any>,
+  lastCoord: InputSample<any>
 }
 
 /**
@@ -127,7 +127,7 @@ export class Segment {
   /**
    * The starting point of this touchpath segment.
    */
-  get initialCoord(): InputSample {
+  get initialCoord(): InputSample<any> {
     if(this._stats instanceof CumulativePathStats) {
       return this._stats.initialSample;
     } else {
@@ -138,7 +138,7 @@ export class Segment {
   /**
    * The ending point of this touchpath segment.
    */
-  get lastCoord(): InputSample {
+  get lastCoord(): InputSample<any> {
     if(this._stats instanceof CumulativePathStats) {
       return this._stats.lastSample;
     } else {
@@ -232,7 +232,7 @@ export class Segment {
    * @returns
    */
   public toJSON(): JSONSegment {
-    const cleanSample: (sample: InputSample) => InputSample = (sample) => {
+    const cleanSample: (sample: InputSample<any>) => InputSample<any> = (sample) => {
       const clone = {... sample};
       delete clone.clientX;
       delete clone.clientY;

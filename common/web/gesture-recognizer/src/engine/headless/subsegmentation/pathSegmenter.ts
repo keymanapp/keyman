@@ -593,7 +593,7 @@ export class PathSegmenter {
    * should neither further inputs be received nor termination of the touchpoint be indicated.
    * @param sample
    */
-  public add(sample: InputSample) {
+  public add(sample: InputSample<any>) {
     // If this is the first received input sample, generate & publish a "start" segment.
     // As ConstructingSegment is designed to work with -sequences- of samples, it's less
     // useful here... and unnecessary, as we already have all the info we need.
@@ -678,7 +678,7 @@ export class PathSegmenter {
    * @param sample
    * @param timeDelta
    */
-  private observe(sample: InputSample, timeDelta: number) {
+  private observe(sample: InputSample<any>, timeDelta: number) {
     let cumulativeStats: CumulativePathStats;
     if(this.steppedCumulativeStats.length) {
       cumulativeStats = this.steppedCumulativeStats[this.steppedCumulativeStats.length-1];

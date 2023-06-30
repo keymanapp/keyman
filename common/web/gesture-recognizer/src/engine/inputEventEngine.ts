@@ -2,17 +2,17 @@ import EventEmitter from "eventemitter3";
 import { GestureRecognizerConfiguration } from "./configuration/gestureRecognizerConfiguration.js";
 import { InputSample } from "./headless/inputSample.js";
 import { Nonoptional } from "./nonoptional.js";
-import { TrackedPoint } from "./trackedPoint.js";
+import { TrackedPoint } from "./headless/trackedPoint.js";
 
-interface EventMap {
-  'pointstart': (input: TrackedPoint) => void
+interface EventMap<HoveredItemType> {
+  'pointstart': (input: TrackedPoint<HoveredItemType>) => void
 }
 
-export abstract class InputEventEngine extends EventEmitter<EventMap> {
-  protected readonly config: Nonoptional<GestureRecognizerConfiguration>;
-  private _activeTouchpoints: TrackedPoint[] = [];
+export abstract class InputEventEngine<HoveredItemType> extends EventEmitter<EventMap<HoveredItemType>> {
+  protected readonly config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>;
+  private _activeTouchpoints: TrackedPoint<HoveredItemType>[] = [];
 
-  public constructor(config: Nonoptional<GestureRecognizerConfiguration>) {
+  public constructor(config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>) {
     super();
     this.config = config;
   }
@@ -35,20 +35,25 @@ export abstract class InputEventEngine extends EventEmitter<EventMap> {
     this._activeTouchpoints = this._activeTouchpoints.filter((point) => point.rawIdentifier != identifier);
   }
 
-  protected buildSampleFor(clientX: number, clientY: number): InputSample {
+  protected buildSampleFor(clientX: number, clientY: number, target: EventTarget): InputSample<HoveredItemType> {
     const targetRect = this.config.targetRoot.getBoundingClientRect();
-    return {
+    const sample: InputSample<HoveredItemType> = {
       clientX: clientX,
       clientY: clientY,
       targetX: clientX - targetRect.left,
       targetY: clientY - targetRect.top,
       t: performance.now()
     };
+
+    const hoveredItem = this.config.itemIdentifier(sample, target);
+    sample.item = hoveredItem;
+
+    return sample;
   }
 
-  onInputStart(identifier: number, sample: InputSample, target: EventTarget, isFromTouch: boolean) {
-    const touchpoint = new TrackedPoint(identifier, target, isFromTouch);
-    touchpoint.path.extend(sample);
+  protected onInputStart(identifier: number, sample: InputSample<HoveredItemType>, target: EventTarget, isFromTouch: boolean) {
+    const touchpoint = new TrackedPoint<HoveredItemType>(identifier, isFromTouch);
+    touchpoint.update(sample);
 
     this._activeTouchpoints.push(touchpoint);
 
@@ -65,17 +70,26 @@ export abstract class InputEventEngine extends EventEmitter<EventMap> {
     this.emit('pointstart', touchpoint);
   }
 
-  onInputMove(identifier: number, sample: InputSample) {
-    this.getTouchpointWithId(identifier)?.path.extend(sample);
+  protected onInputMove(identifier: number, sample: InputSample<HoveredItemType>, target: EventTarget) {
+    const activePoint = this.getTouchpointWithId(identifier);
+    if(!activePoint) {
+      return;
+    }
+
+    activePoint.update(sample);
   }
 
-  onInputMoveCancel(identifier: number, sample: InputSample) {
+  protected onInputMoveCancel(identifier: number, sample: InputSample<HoveredItemType>, target: EventTarget) {
     const touchpoint = this.getTouchpointWithId(identifier);
-    touchpoint?.path.extend(sample);
-    touchpoint?.path.terminate(true);
+    if(!touchpoint) {
+      return;
+    }
+
+    touchpoint.update(sample);
+    touchpoint.path.terminate(true);
   }
 
-  onInputEnd(identifier: number) {
+  protected onInputEnd(identifier: number) {
     // We do not add extend the path here because any 'end' event immediately
     // follows a 'move' if it occurred simultaneously.
     this.getTouchpointWithId(identifier)?.path.terminate(false);

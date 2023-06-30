@@ -5,13 +5,13 @@ import { CumulativePathStats } from "./cumulativePathStats.js";
 /**
  * Documents the expected typing of serialized versions of the `TrackedPoint` class.
  */
-export type JSONTrackedPath = {
-  coords: InputSample[]; // ensures type match with public class property.
+export type JSONTrackedPath<Type> = {
+  coords: InputSample<Type>[]; // ensures type match with public class property.
   wasCancelled?: boolean;
 }
 
-interface EventMap {
-  'step': (sample: InputSample) => void,
+interface EventMap<Type> {
+  'step': (sample: InputSample<Type>) => void,
   'complete': () => void,
   'invalidated': () => void
 }
@@ -42,8 +42,8 @@ interface EventMap {
  *     the most recently-preceding 'segmentation' event.
  *     - And possibly recognition Promise fulfillment.
  */
-export class TrackedPath extends EventEmitter<EventMap> {
-  private samples: InputSample[] = [];
+export class TrackedPath<Type> extends EventEmitter<EventMap<Type>> {
+  private samples: InputSample<Type>[] = [];
 
   private _isComplete: boolean = false;
   private wasCancelled?: boolean;
@@ -53,24 +53,27 @@ export class TrackedPath extends EventEmitter<EventMap> {
   /**
    * Initializes an empty path intended for tracking a newly-activated touchpoint.
    */
-  constructor();
+  constructor() {
+    super();
+
+    this.stats = new CumulativePathStats();
+  }
+
   /**
    * Deserializes a TrackedPath instance from its corresponding JSON.parse() object.
    * @param jsonObj
    */
-  constructor(jsonObj: JSONTrackedPath)
-  constructor(jsonObj?: JSONTrackedPath) {
-    super();
+  static deserialize<Type>(jsonObj: JSONTrackedPath<Type>): TrackedPath<Type> {
+    const instance = new TrackedPath<Type>();
 
-    if(jsonObj) {
-      this.samples = [].concat(jsonObj.coords.map((obj) => ({...obj} as InputSample)));
-      // If we're reconstructing this from a JSON.parse, it's a previously-recorded,
-      // completed path.
-      this._isComplete = true;
-      this.wasCancelled = jsonObj.wasCancelled;
-    }
+    instance.samples = [].concat(jsonObj.coords.map((obj) => ({...obj} as InputSample<Type>)));
+    instance._isComplete = true;
+    instance.wasCancelled = jsonObj.wasCancelled;
 
-    this.stats = new CumulativePathStats();
+    let stats = instance.samples.reduce((stats: CumulativePathStats, sample) => stats.extend(sample), new CumulativePathStats());
+    instance.stats = stats;
+
+    return instance;
   }
 
   /**
@@ -85,7 +88,7 @@ export class TrackedPath extends EventEmitter<EventMap> {
    * Extends the path with a newly-observed coordinate.
    * @param sample
    */
-  extend(sample: InputSample) {
+  extend(sample: InputSample<Type>) {
     if(this._isComplete) {
       throw new Error("Invalid state:  this TrackedPath has already terminated.");
     }
@@ -125,7 +128,7 @@ export class TrackedPath extends EventEmitter<EventMap> {
    * Returns all coordinate + timestamp pairings observed for the corresponding
    * touchpoint's path over its lifetime thus far.
    */
-  public get coords(): readonly InputSample[] {
+  public get coords(): readonly InputSample<Type>[] {
     return this.samples;
   }
 
@@ -134,13 +137,14 @@ export class TrackedPath extends EventEmitter<EventMap> {
    * `JSON.stringify`.
    */
   toJSON() {
-    let jsonClone: JSONTrackedPath = {
+    let jsonClone: JSONTrackedPath<Type> = {
       // Replicate array and its entries, but with certain fields of each entry missing.
       // No .clientX, no .clientY.
       coords: [].concat(this.samples.map((obj) => ({
         targetX: obj.targetX,
         targetY: obj.targetY,
-        t:       obj.t
+        t:       obj.t,
+        item:    obj.item
       }))),
       wasCancelled: this.wasCancelled
     }

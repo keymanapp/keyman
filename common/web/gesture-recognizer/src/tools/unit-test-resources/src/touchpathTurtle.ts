@@ -8,15 +8,15 @@ import {
  * Designed to facilitate creation of 'synthetic' touchpath sample sequences for use
  * in unit tests.
  */
-export class TouchpathTurtle {
-  private readonly startSample: InputSample;
-  private currentSample: InputSample;
+export class TouchpathTurtle<HoveredItemType> {
+  private readonly startSample: InputSample<HoveredItemType>;
+  private currentSample: InputSample<HoveredItemType>;
   private currentStats: CumulativePathStats;
   private currentChop:  CumulativePathStats = null;
 
   private _pathSegments: Subsegmentation[] = [];
 
-  constructor(obj: InputSample | TouchpathTurtle) {
+  constructor(obj: InputSample<HoveredItemType> | TouchpathTurtle<HoveredItemType>) {
     if(!(obj instanceof TouchpathTurtle)) {
       this.startSample = obj;
       this.currentSample = obj;
@@ -43,7 +43,7 @@ export class TouchpathTurtle {
     return this._pathSegments;
   }
 
-  get location(): InputSample {
+  get location(): InputSample<HoveredItemType> {
     return this.currentSample;
   }
 

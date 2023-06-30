@@ -1,11 +1,13 @@
-import { JSONTrackedPath, TrackedPath } from "./headless/trackedPath.js";
+import { InputSample } from "./inputSample.js";
+import { JSONTrackedPath, TrackedPath } from "./trackedPath.js";
 
 /**
  * Documents the expected typing of serialized versions of the `TrackedPoint` class.
  */
-export type JSONTrackedPoint = {
+export type JSONTrackedPoint<HoveredItemType = any> = {
   isFromTouch: boolean;
-  path: JSONTrackedPath;
+  path: JSONTrackedPath<HoveredItemType>;
+  initialHoveredItem: HoveredItemType
   // identifier is not included b/c it's only needed during live processing.
 }
 
@@ -14,7 +16,7 @@ export type JSONTrackedPoint = {
  * This 'tracked point' corresponds to one touch source as recognized by `Touch.identifier` or to
  * one 'cursor-point' as represented by mouse-based motion.
  */
-export class TrackedPoint {
+export class TrackedPoint<HoveredItemType> {
   /**
    * Indicates whether or not this tracked point's original source is a DOM `Touch`.
    */
@@ -25,68 +27,62 @@ export class TrackedPoint {
    */
   public readonly rawIdentifier: number;
 
-  private _initialTarget: EventTarget;
+  private _path: TrackedPath<HoveredItemType>;
 
-  private _path: TrackedPath;
+  private static _jsonIdSeed: -1;
 
   /**
    * Tracks the coordinates and timestamps of each update for the lifetime of this `TrackedPoint`.
    */
-  public get path(): TrackedPath {
+  public get path(): TrackedPath<HoveredItemType> {
     return this._path;
   }
 
   /**
    * Constructs a new TrackedPoint instance for tracking updates to an active input point over time.
    * @param identifier     The system identifier for the input point's events.
-   * @param initialTarget  The initiating event's original target element
+   * @param initialHoveredItem  The initiating event's original target element
    * @param isFromTouch    `true` if sourced from a `TouchEvent`; `false` otherwise.
    */
-  constructor(identifier: number,
-              initialTarget: EventTarget,
-              isFromTouch: boolean);
-  /**
-   * Deserializes a TrackedPoint instance from its serialized-JSON form.
-   * @param identifier The unique identifier to assign to this instance.
-   * @param parsedObj  The JSON representation to deserialize.
-   */
-  constructor(identifier: number,
-    parsedObj: JSONTrackedPoint);
-  constructor(identifier: number,
-              obj: EventTarget | JSONTrackedPoint,
-              isFromTouch?: boolean) {
+  constructor(identifier: number, isFromTouch: boolean) {
     this.rawIdentifier = identifier;
-    if(obj instanceof EventTarget) {
-      this._initialTarget = obj;
-      this.isFromTouch = isFromTouch;
-      this._path = new TrackedPath();
-    } else {
-      // // TEMP:  conversion of old format.
-      // if(obj['sequence']) {
-      //   obj = obj['sequence'];
-      // }
-      // @ts-ignore
-      this.isFromTouch = obj.isFromTouch;
-
-      // TEMP:  conversion of old format
-      // @ts-ignore
-      let path = obj.path;
-      // if(obj['samples']) {
-      //   // @ts-ignore
-      //   path = {
-      //     coords: obj['samples']
-      //   };
-      // }
-
-      this._path = new TrackedPath(path);
-    }
+    this.isFromTouch = isFromTouch;
+    this._path = new TrackedPath();
   }
 
   /**
-   * The event target for the first `Event` corresponding to this `TrackedPoint`.
+   * Deserializes a TrackedPoint instance from its serialized-JSON form.
+   * @param jsonObj  The JSON representation to deserialize.
+   * @param identifier The unique identifier to assign to this instance.
    */
-  public get initialTarget(): EventTarget {
-    return this._initialTarget;
+  public static deserialize(jsonObj: JSONTrackedPoint, identifier: number) {
+    const id = identifier !== undefined ? identifier : this._jsonIdSeed++;
+    const isFromTouch = jsonObj.isFromTouch;
+    const path = TrackedPath.deserialize(jsonObj.path);
+
+    const instance = new TrackedPoint(id, isFromTouch);
+    instance._path = path;
+    return instance;
+  }
+
+  public update(sample: InputSample<HoveredItemType>) {
+    this.path.extend(sample);
+  }
+
+  /**
+   * The identifying metadata returned by the configuration's specified `itemIdentifier` for
+   * the target of the first `Event` that corresponded to this `TrackedPoint`.
+   */
+  public get initialHoveredItem(): HoveredItemType {
+    return this.path.coords[0].item;
+  }
+
+  /**
+   * The identifying metadata returned by the configuration's specified `itemIdentifier` for
+   * the target of the latest `Event` that corresponded to this `TrackedPoint`.
+   */
+  public get currentHoveredItem(): HoveredItemType {
+    return this.path.coords[this.path.coords.length-1].item;
   }
 
   /**
@@ -105,6 +101,7 @@ export class TrackedPoint {
   toJSON(): JSONTrackedPoint {
     let jsonClone: JSONTrackedPoint = {
       isFromTouch: this.isFromTouch,
+      initialHoveredItem: this.initialHoveredItem,
       path: this.path.toJSON()
     }
 

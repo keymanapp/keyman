@@ -13,14 +13,14 @@ import { SequenceRecorder } from "./sequenceRecorder.js";
  * This class is designed to 'replay' a recorded InputSequence's DOM events to ensure
  * that the recognizer's DOM layer is working correctly.
  */
-export class InputSequenceSimulator {
+export class InputSequenceSimulator<HoveredItemType> {
   private controller: HostFixtureLayoutController;
 
   constructor(controller: HostFixtureLayoutController) {
     this.controller = controller;
   }
 
-  getSampleClientPos(sample: JSONObject<InputSample>): {clientX: number, clientY: number} {
+  getSampleClientPos(sample: JSONObject<InputSample<HoveredItemType>>): {clientX: number, clientY: number} {
     let targetRoot = this.controller.recognizer.config.targetRoot;
     let targetRect = targetRoot.getBoundingClientRect();
 
@@ -68,7 +68,7 @@ export class InputSequenceSimulator {
     return event;
   }
 
-  replayTouchSample(sample: JSONObject<InputSample>,
+  replayTouchSample(sample: JSONObject<InputSample<HoveredItemType>>,
                     state: string,
                     identifier: number,
                     otherTouches: Touch[],
@@ -124,7 +124,7 @@ export class InputSequenceSimulator {
     return touch;
   }
 
-  replayMouseSample(sample: JSONObject<InputSample>, state: string, targetElement?: HTMLElement) {
+  replayMouseSample(sample: JSONObject<InputSample<HoveredItemType>>, state: string, targetElement?: HTMLElement) {
     let config = this.controller.recognizer.config;
 
     let event: MouseEvent;
@@ -165,7 +165,7 @@ export class InputSequenceSimulator {
    * @returns The final sample to be simulated.
    */
   private replayCore(sequenceTestSpec: RecordedCoordSequenceSet,
-    replayExecutor: (func: () => void, sample?: InputSample) => void): InputSample {
+    replayExecutor: (func: () => void, sample?: InputSample<HoveredItemType>) => void): InputSample<HoveredItemType> {
     let inputs = sequenceTestSpec.inputs;
     const config = sequenceTestSpec.config;
 
@@ -194,7 +194,7 @@ export class InputSequenceSimulator {
 
       for(let index=0; index < inputs.length; index++) {
         // TODO:  does not iterate over all touchpoints.  Not that we can have more than one at present...
-        const touchpoint = new TrackedPoint(index, inputs[index].touchpoints[0]);
+        const touchpoint = TrackedPoint.deserialize(inputs[index].touchpoints[0], index);
         const indexInSequence = sequenceProgress[index];
 
         if(indexInSequence == Number.MAX_VALUE) {
@@ -207,7 +207,7 @@ export class InputSequenceSimulator {
         }
       }
 
-      const touchpoint = new TrackedPoint(selectedSequence, inputs[selectedSequence].touchpoints[0]);
+      const touchpoint = TrackedPoint.deserialize(inputs[selectedSequence].touchpoints[0], selectedSequence);
       const indexInSequence = sequenceProgress[selectedSequence];
       let state: string = "move";
 
@@ -223,7 +223,7 @@ export class InputSequenceSimulator {
         state = "start";
       }
 
-      const sample = touchpoint.path.coords[indexInSequence];
+      const sample = touchpoint.path.coords[indexInSequence] as InputSample<HoveredItemType>;
       if(touchpoint.isFromTouch) {
         let otherTouches = [].concat(sequenceTouches);
         otherTouches.splice(selectedSequence, 1);

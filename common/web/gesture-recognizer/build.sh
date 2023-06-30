@@ -24,8 +24,7 @@ builder_describe "Builds the gesture-recognition model for Web-based on-screen k
   "--ci    sets the --ci option for child scripts (i.e, the $(builder_term test) action)"
 
 builder_describe_outputs \
-  configure:module /node_modules \
-  configure:tools  /node_modules \
+  configure        /node_modules \
   build:module     /common/web/gesture-recognizer/build/lib/index.mjs \
   build:tools      /common/web/gesture-recognizer/build/tools/lib/index.mjs
 

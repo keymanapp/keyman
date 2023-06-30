@@ -4,14 +4,14 @@ import { InputSample } from "./headless/inputSample.js";
 import { Nonoptional } from "./nonoptional.js";
 import { ZoneBoundaryChecker } from "./configuration/zoneBoundaryChecker.js";
 
-export class TouchEventEngine extends InputEventEngine {
+export class TouchEventEngine<HoveredItemType> extends InputEventEngine<HoveredItemType> {
   private readonly _touchStart: typeof TouchEventEngine.prototype.onTouchStart;
   private readonly _touchMove:  typeof TouchEventEngine.prototype.onTouchMove;
   private readonly _touchEnd:   typeof TouchEventEngine.prototype.onTouchEnd;
 
   private safeBoundMaskMap: {[id: number]: number} = {};
 
-  public constructor(config: Nonoptional<GestureRecognizerConfiguration>) {
+  public constructor(config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>) {
     super(config);
 
     // We use this approach, rather than .bind, because _this_ version allows hook
@@ -78,8 +78,8 @@ export class TouchEventEngine extends InputEventEngine {
     delete this.safeBoundMaskMap[identifier];
   }
 
-  private buildSampleFromTouch(touch: Touch): InputSample {
-    return this.buildSampleFor(touch.clientX, touch.clientY);
+  private buildSampleFromTouch(touch: Touch) {
+    return this.buildSampleFor(touch.clientX, touch.clientY, touch.target);
   }
 
   onTouchStart(event: TouchEvent) {
@@ -125,9 +125,9 @@ export class TouchEventEngine extends InputEventEngine {
       const sample = this.buildSampleFromTouch(touch);
 
       if(!ZoneBoundaryChecker.inputMoveCancellationCheck(sample, this.config, this.safeBoundMaskMap[touch.identifier])) {
-        this.onInputMove(touch.identifier, sample);
+        this.onInputMove(touch.identifier, sample, touch.target);
       } else {
-        this.onInputMoveCancel(touch.identifier, sample);
+        this.onInputMoveCancel(touch.identifier, sample, touch.target);
       }
     }
   }
