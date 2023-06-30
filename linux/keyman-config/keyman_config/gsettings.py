@@ -7,7 +7,6 @@ import sys
 from gi.repository import Gio  # needs to come before gi.overrides.GLib!
 from gi.overrides.GLib import Variant
 
-
 class GSettings():
     def __init__(self, schema_id):
         """
@@ -59,7 +58,7 @@ class GSettings():
             children.append(child)
         return Variant.new_array(None, children)
 
-    def get(self, key: str) -> list[str] | None:
+    def get(self, key):
         if self.is_sudo:
             args = ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
                     f"DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{os.environ.get('SUDO_UID')}/bus",
@@ -84,7 +83,7 @@ class GSettings():
             value = self._convert_variant_to_array(variant)
         return value
 
-    def set(self, key: str, value: list[str], type) -> None:
+    def set(self, key, value, type) -> None:
         if self.is_sudo:
             variant = str(value)
             subprocess.run(
