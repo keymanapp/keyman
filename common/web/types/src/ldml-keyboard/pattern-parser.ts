@@ -125,13 +125,20 @@ export enum ElementType {
   codepoint = '.',
   escaped ='\\',
   uset = '[',
+  string = '*',
 };
 
 /** one portion of a segmented element string */
 export class ElementSegment {
   public readonly type: ElementType;
-  constructor(public segment: string) {
-    if (ElementParser.MATCH_USET.test(segment)) {
+  /**
+   * @param segment the string in the segment
+   * @param type type of segment. Will be calculated if not provided.
+   */
+  constructor(public segment: string, type?: ElementType) {
+    if (type) {
+      this.type = type;
+    } else if (ElementParser.MATCH_USET.test(segment)) {
       this.type = ElementType.uset;
     } else if(ElementParser.MATCH_ESCAPED.test(segment)) {
       this.type = ElementType.escaped;

@@ -1,6 +1,6 @@
 import 'mocha';
 import {assert} from 'chai';
-import {unescapeString, UnescapeError, isOneChar, toOneChar} from '../../src/util/util.js';
+import {unescapeString, UnescapeError, isOneChar, toOneChar, unescapeOneQuadString} from '../../src/util/util.js';
 
 describe('test UTF32 functions()', function() {
   it('should properly categorize strings', () => {
@@ -54,5 +54,11 @@ describe('test unescapeString()', function() {
 
   it("should throw UnescapeError on invalid escapes", function() {
     assert.throws(() => unescapeString('\\u{110000}'), UnescapeError);
+  });
+});
+
+describe('test unescapeOneQuadString()', () => {
+  it('should be able to convert', () => {
+    assert.equal(unescapeOneQuadString('\\u0127'), '\u{0127}');
   });
 });
