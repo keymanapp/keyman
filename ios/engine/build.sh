@@ -7,7 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # This script runs from its own folder
-cd "$(dirname "$THIS_SCRIPT")"
+cd "$THIS_SCRIPT_PATH"
 
 # Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -38,25 +38,23 @@ builder_describe_outputs \
 
 # Base definitions (must be before do_clean call)
 DERIVED_DATA="$KEYMAN_ROOT/ios/build"
-BUILD_PATH=$DERIVED_DATA/Build/Products
+BUILD_PATH="$DERIVED_DATA/Build/Products"
 
 # Extended path definitions
-KMEI_RESOURCES=engine/KMEI/KeymanEngine/resources
-BUNDLE_PATH=$KMEI_RESOURCES/Keyman.bundle/Contents/Resources
-KMW_ROOT=../web
+BUNDLE_PATH="${THIS_SCRIPT_PATH}/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources"
 
 # Needed before `configure` action
 DEFAULT_KBD_ID="sil_euro_latin"
 DEFAULT_LM_ID="nrc.en.mtnt"
 
 # Engine library build path
-KEYMAN_XCFRAMEWORK=$BUILD_PATH/$CONFIG/KeymanEngine.xcframework
+KEYMAN_XCFRAMEWORK="$BUILD_PATH/$CONFIG/KeymanEngine.xcframework"
 
 XCODEFLAGS="-quiet -configuration $CONFIG"
-XCODEFLAGS_EXT="$XCODEFLAGS -derivedDataPath $DERIVED_DATA -workspace ../keymanios.xcworkspace"
+XCODEFLAGS_EXT="$XCODEFLAGS -derivedDataPath \"$DERIVED_DATA\" -workspace ../keymanios.xcworkspace"
 
 CODE_SIGN=
-if builder_has_option --debug; then
+if builder_is_debug_build; then
   CODE_SIGN="CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO ${DEV_TEAM:-} CODE_SIGN_ENTITLEMENTS= CODE_SIGNING_ALLOWED=NO"
 fi
 
@@ -64,7 +62,7 @@ fi
 
 function do_clean () {
   # Possible TODO:  can we clean the engine target without also cleaning the app target?
-  rm -rf $BUILD_PATH
+  rm -rf "$BUILD_PATH"
   rm -rf Carthage
 }
 
@@ -95,10 +93,8 @@ function do_packages() {
       mkdir -p "$BUNDLE_PATH"
   fi
 
-  local base_dir="$(pwd)"
-
-  downloadKeyboardPackage "$DEFAULT_KBD_ID"  "$base_dir/$BUNDLE_PATH/$DEFAULT_KBD_ID.kmp"
-  downloadModelPackage    "$DEFAULT_LM_ID"   "$base_dir/$BUNDLE_PATH/$DEFAULT_LM_ID.model.kmp"
+  downloadKeyboardPackage "$DEFAULT_KBD_ID"  "$BUNDLE_PATH/$DEFAULT_KBD_ID.kmp"
+  downloadModelPackage    "$DEFAULT_LM_ID"   "$BUNDLE_PATH/$DEFAULT_LM_ID.model.kmp"
 }
 
 function do_configure ( ) {
@@ -108,33 +104,24 @@ function do_configure ( ) {
 
 # Manages KeymanEngine.bundle, which is included inside the :engine target.
 function update_bundle ( ) {
-  if ! [ -d "$BUNDLE_PATH" ]; then
-      mkdir -p "$BUNDLE_PATH"
-  fi
+  mkdir -p "$BUNDLE_PATH"
 
-  local base_dir="$(pwd)"
-
-  KMW_PRODUCT=web/build/app/webview/
-  KMW_RESOURCES=web/build/app/resources
-  if builder_has_option --debug; then
-    KMW_PRODUCT="$KMW_PRODUCT/debug"
-  else
-    KMW_PRODUCT="$KMW_PRODUCT/release"
-  fi
+  KMW_PRODUCT="$KEYMAN_ROOT/web/build/app/webview/$CONFIG"
+  KMW_RESOURCES="$KEYMAN_ROOT/web/build/app/resources"
 
   #Copy over the relevant resources!  It's easiest to do if we navigate to the resulting folder.
-  cp "$KEYMAN_ROOT/$KMW_RESOURCES/osk/kmwosk.css"            "$base_dir/$BUNDLE_PATH/kmwosk.css"
-  cp "$KEYMAN_ROOT/$KMW_RESOURCES/osk/keymanweb-osk.ttf"     "$base_dir/$BUNDLE_PATH/keymanweb-osk.ttf"
-  cp "$KEYMAN_ROOT/$KMW_PRODUCT/keymanweb-webview.js"        "$base_dir/$BUNDLE_PATH/keymanweb-webview.js"
+  cp "$KEYMAN_ROOT/$KMW_RESOURCES/osk/kmwosk.css"            "$BUNDLE_PATH/kmwosk.css"
+  cp "$KEYMAN_ROOT/$KMW_RESOURCES/osk/keymanweb-osk.ttf"     "$BUNDLE_PATH/keymanweb-osk.ttf"
+  cp "$KEYMAN_ROOT/$KMW_PRODUCT/keymanweb-webview.js"        "$BUNDLE_PATH/keymanweb-webview.js"
 
-  if builder_has_option --debug; then
-    cp "$KEYMAN_ROOT/$KMW_PRODUCT/keymanweb-webview.js.map"  "$base_dir/$BUNDLE_PATH/keymanweb-webview.js.map"
-  elif [ -f "$base_dir/$BUNDLE_PATH/keymanweb-webview.js.map" ]; then
-    rm      "$base_dir/$BUNDLE_PATH/keymanweb-webview.js.map"
+  if builder_is_debug_build; then
+    cp "$KEYMAN_ROOT/$KMW_PRODUCT/keymanweb-webview.js.map"  "$BUNDLE_PATH/keymanweb-webview.js.map"
+  elif [ -f "$BUNDLE_PATH/keymanweb-webview.js.map" ]; then
+    rm      "$BUNDLE_PATH/keymanweb-webview.js.map"
   fi
 
-  cp "$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js" "$base_dir/$BUNDLE_PATH/sentry.min.js"
-  cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js"   "$base_dir/$BUNDLE_PATH/keyman-sentry.js"
+  cp "$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js" "$BUNDLE_PATH/sentry.min.js"
+  cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js"     "$BUNDLE_PATH/keyman-sentry.js"
 }
 
 # First things first - update our dependencies.
@@ -150,9 +137,7 @@ function build_engine() {
   echo
   echo "Building KMEI..."
 
-  if [ -d "$BUILD_PATH/$CONFIG-universal" ]; then
-    rm -r $BUILD_PATH/$CONFIG-universal
-  fi
+  rm -rf "$BUILD_PATH/$CONFIG-universal"
 
   run_xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme KME-universal \
             VERSION=$VERSION \
