@@ -1,6 +1,6 @@
-import { CumulativePathStats } from "./cumulativePathStats.js";
-import { InputSample } from "./inputSample.js";
-import { type SegmentClass } from "./segmentClassifier.js";
+import { CumulativePathStats } from "../cumulativePathStats.js";
+import { InputSample } from "../inputSample.js";
+import { type SegmentClass } from "../segmentClassifier.js";
 
 export interface JSONSegment {
   type: SegmentClass,

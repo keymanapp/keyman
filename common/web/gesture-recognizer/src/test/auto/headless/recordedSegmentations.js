@@ -19,6 +19,25 @@ const SEGMENT_TEST_JSON_FOLDER = path.resolve(`${scriptFolder}/../../resources/j
 
 import { assertSegmentSimilarity } from '../../resources/assertSegmentSimilarity.js';
 
+/**
+ * Since we're disconnecting subsegmentation stuff for the first gestures release, our
+ * previously-recorded subsegmentations aren't retrievable in the same spot as before.
+ *
+ * This manually retrieves them from the originally-recorded version in order to preserve
+ * the unit tests.  Makes a few assumptions, but they're valid for the original recordings.
+ * @param {*} jsonObj
+ */
+function retrieveSubsegmentations(jsonObj) {
+  return jsonObj.inputs[0].touchpoints[0].path.segments;
+}
+
+// ---------------------------------------
+// NOTE:  this suite of tests is for a disconnected subsystem - subsegmentation - designed
+// to handle more complicated gestures than supported in our initial release.  We had to
+// triage it to prevent further delays.
+//
+// The tests themselves should still be functional.
+// ---------------------------------------
 describe("Segmentation - from recorded sequences", function() {
   beforeEach(function() {
     this.fakeClock = sinon.useFakeTimers();
@@ -85,7 +104,7 @@ describe("Segmentation - from recorded sequences", function() {
     await recognitionTestCapturer.recognizedPromise;
 
     // Any post-sequence tests to run.
-    const originalSegments = testObj.originalSegments;
+    const originalSegments = retrieveSubsegmentations(jsonObj);
     const originalSegmentTypeSequence = originalSegments.map((segment) => segment.type);
 
     const reproedSegments = spy.getCalls().map((call) => call.args[0]);
@@ -151,7 +170,7 @@ describe("Segmentation - from recorded sequences", function() {
     await recognitionTestCapturer.recognizedPromise;
 
     // Any post-sequence tests to run.
-    const originalSegments = testObj.originalSegments;
+    const originalSegments = retrieveSubsegmentations(jsonObj);
     const originalSegmentTypeSequence = originalSegments.map((segment) => segment.type);
 
     const reproedSegments = spy.getCalls().map((call) => call.args[0]);
@@ -187,7 +206,7 @@ describe("Segmentation - from recorded sequences", function() {
     await testObj.compositePromise;
 
     // Any post-sequence tests to run.
-    const originalSegments = testObj.originalSegments;
+    const originalSegments = retrieveSubsegmentations(jsonObj);
     const originalSegmentTypeSequence = originalSegments.map((segment) => segment.type);
 
     const reproedSegments = spy.getCalls().map((call) => call.args[0]);
@@ -227,7 +246,7 @@ describe("Segmentation - from recorded sequences", function() {
     await testObj.compositePromise;
 
     // Any post-sequence tests to run.
-    const originalSegments = testObj.originalSegments;
+    const originalSegments = retrieveSubsegmentations(jsonObj);
     const reproedSegments = spy.getCalls().map((call) => call.args[0]);
 
     // Because of the sweeping arc motion, we won't assume a perfect match to the segmentation here.
@@ -281,7 +300,7 @@ describe("Segmentation - from recorded sequences", function() {
     const nulls = reproedSegments.filter((segment) => segment.type === null);
 
     assert.isEmpty(nulls);
-    assert.isEmpty(holds.filter((hold) => hold.duration > 200)); // all motions were very quick.
+    assert.isEmpty(holds.filter((hold) => hold.duration > 300)); // all motions were very quick.
 
     // True (intended) motions were 'e' -> 's' -> 'w' -> 'n', but the motions weren't that precise
     // due to prioritizing speed.

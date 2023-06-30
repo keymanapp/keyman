@@ -21,6 +21,7 @@ export interface RecordingTestConfig {
   endSequence:  () => void;
 }
 
+// Note:  this class is currently only used by subsegmentation unit tests.
 export class HeadlessRecordingSimulator {
   // Designed to test against PathSegmenter and TrackedPath - just implement the config interface appropriately!
   static prepareTest(recordingObj: RecordedCoordSequenceSet, config: RecordingTestConfig): ProcessedSequenceTest {
@@ -30,7 +31,9 @@ export class HeadlessRecordingSimulator {
     const sourceTrackedPath = recordingObj.inputs[0].touchpoints[0].path;
 
     testObj.originalSamples = sourceTrackedPath.coords;
-    testObj.originalSegments = sourceTrackedPath.segments;
+    const sampleCount = testObj.originalSamples.length;
+    // still exists on original recorded sequences that exist before we removed segmentation.
+    testObj.originalSegments = sourceTrackedPath['segments'];
     const lastSegment = testObj.originalSegments[testObj.originalSegments.length-1];
 
     // Build promises designed to reproduce the events at the correct times.
@@ -40,9 +43,18 @@ export class HeadlessRecordingSimulator {
       }, sample.t - testObj.originalSamples[0].t);
     });
 
+
+    // Originally we did not record the release-timing of the touch, instead using the timing of
+    // the last sample for the last subsegmentation's last sample.  We've disabled that in order
+    // to get out a release in a more timely manner, but we'll still use it first if it's available.
+    //
+    // If not... we use a more current style.  TODO:  resolve 'release timing' aspect of input
+    // sequence recording + playback.
+    const endTime = lastSegment ? lastSegment.lastCoord.t : sourceTrackedPath.coords[sampleCount-1].t;
+
     testObj.endPromise = timedPromise(() => {
       config.endSequence();
-    }, lastSegment.lastCoord.t - testObj.originalSamples[0].t);
+    }, endTime - testObj.originalSamples[0].t);
 
     // Wrap it all together with a nice little bow.
     testObj.compositePromise = Promise.all([testObj.endPromise].concat(testObj.samplePromises)).catch((reason) => {

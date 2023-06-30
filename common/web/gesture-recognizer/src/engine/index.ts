@@ -10,7 +10,7 @@ export { MouseEventEngine } from "./mouseEventEngine.js";
 export { PathSegmenter, Subsegmentation } from "./headless/subsegmentation/pathSegmenter.js";
 export { PaddedZoneSource } from './configuration/paddedZoneSource.js';
 export { RecognitionZoneSource } from './configuration/recognitionZoneSource.js';
-export { Segment } from "./headless/segment.js";
+export { Segment } from "./headless/subsegmentation/segment.js";
 export { SegmentClassifier } from "./headless/segmentClassifier.js";
 export { TouchEventEngine } from "./touchEventEngine.js";
 export { ViewportZoneSource } from './configuration/viewportZoneSource.js';
