@@ -615,7 +615,7 @@ KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   if (fk->dpGroupArray)
   {
     memcpy(gp, fk->dpGroupArray, sizeof(FILE_GROUP) * fk->cxGroupArray);
-    delete fk->dpGroupArray;
+    delete[] fk->dpGroupArray;
   }
 
   fk->dpGroupArray = gp;
@@ -738,7 +738,7 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   if (fk->dpStoreArray)
   {
     memcpy(sp, fk->dpStoreArray, sizeof(FILE_STORE) * fk->cxStoreArray);
-    delete fk->dpStoreArray;
+    delete[] fk->dpStoreArray;
   }
 
   fk->dpStoreArray = sp;
@@ -799,7 +799,7 @@ KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, const KMX_WCHAR * str,
   if (fk->dpStoreArray)
   {
     memcpy(sp, fk->dpStoreArray, sizeof(FILE_STORE) * fk->cxStoreArray);
-    delete fk->dpStoreArray;
+    delete[] fk->dpStoreArray;
   }
 
   fk->dpStoreArray = sp;
@@ -1468,7 +1468,7 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
   if (gp->dpKeyArray)
   {
     memcpy(kp, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
-    delete gp->dpKeyArray;
+    delete[] gp->dpKeyArray;
   }
 
   gp->dpKeyArray = kp;
@@ -1587,7 +1587,7 @@ KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
 
   kpp = &k[(int)(kpp - gp->dpKeyArray)];
 
-  delete gp->dpKeyArray;
+  delete[] gp->dpKeyArray;
   gp->dpKeyArray = k;
   gp->cxKeyArray += nchrs - 1;
 
@@ -1621,8 +1621,8 @@ KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
     ExpandKp_ReplaceIndex(fk, k, keyIndex, n);
   }
 
-  delete dpContext;
-  delete dpOutput;
+  delete[] dpContext;
+  delete[] dpOutput;
 
   return CERR_None;
 }
@@ -3390,7 +3390,7 @@ int GetVKCode(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   {
     PFILE_VKDICTIONARY pvk = new FILE_VKDICTIONARY[fk->cxVKDictionary + 10];
     memcpy(pvk, fk->dpVKDictionary, fk->cxVKDictionary * sizeof(FILE_VKDICTIONARY));
-    delete fk->dpVKDictionary;
+    delete[] fk->dpVKDictionary;
     fk->dpVKDictionary = pvk;
   }
   u16ncpy(fk->dpVKDictionary[fk->cxVKDictionary].szName, p, _countof(fk->dpVKDictionary[fk->cxVKDictionary].szName) );  // I3481

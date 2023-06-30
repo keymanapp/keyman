@@ -51,8 +51,8 @@ NamedCodeConstants::NamedCodeConstants()
 
 NamedCodeConstants::~NamedCodeConstants()
 {
-  if(entries) delete entries;
-  if(entries_file) delete entries_file;
+  if(entries) delete[] entries;
+  if(entries_file) delete[] entries_file;
 }
 
 void NamedCodeConstants::AddCode(int n, const KMX_WCHAR *p, KMX_DWORD storeIndex)
@@ -63,7 +63,7 @@ void NamedCodeConstants::AddCode(int n, const KMX_WCHAR *p, KMX_DWORD storeIndex
     if(nEntries_file > 0)
     {
       memcpy(bn, entries_file, sizeof(NCCENTRY) * nEntries_file);
-      delete entries_file;
+      delete[] entries_file;
     }
     entries_file = bn;
   }
@@ -87,7 +87,7 @@ void NamedCodeConstants::AddCode_IncludedCodes(int n, const KMX_WCHAR *p)
     if(nEntries > 0)
     {
       memcpy(bn, entries, sizeof(NCCENTRY) * nEntries);
-      delete entries;
+      delete[] entries;
     }
     entries = bn;
   }
