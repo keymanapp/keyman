@@ -5,7 +5,7 @@ const Ajv = AjvModule.default; // The actual expected Ajv type.
 import { boxXmlArray } from '../util/util.js';
 import { DEFAULT_KVK_FONT, VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKey, VisualKeyboardKeyFlags, VisualKeyboardLegalShiftStates, VisualKeyboardShiftState } from './visual-keyboard.js';
 import { USVirtualKeyCodes } from '../consts/virtual-key-constants.js';
-import { BUILDER_KVK_HEADER_VERSION } from './kvk-file.js';
+import { BUILDER_KVK_HEADER_VERSION, KVK_HEADER_IDENTIFIER_BYTES } from './kvk-file.js';
 
 export default class KVKSFileReader {
   public read(file: Uint8Array): KVKSourceFile {
@@ -27,7 +27,15 @@ export default class KVKSFileReader {
       // rather than using the version tagged on npmjs.com.
     });
 
-    parser.parseString(file, (e: unknown, r: unknown) => { if(e) { throw e }; source = r as KVKSourceFile });
+    parser.parseString(file, (e: unknown, r: unknown) => {
+      if(e) {
+        if(file.byteLength > 4 && file.subarray(0,3).every((v,i) => v == KVK_HEADER_IDENTIFIER_BYTES[i])) {
+          throw new Error('File appears to be a binary .kvk file', {cause: e});
+        }
+        throw e;
+      };
+      source = r as KVKSourceFile;
+    });
     if(source) {
       source = this.boxArrays(source);
       this.cleanupFlags(source);

@@ -24,15 +24,6 @@
     <WebSite URL="https://keyman.com/keyboards/khmer_angkor">https://keyman.com/keyboards/khmer_angkor</WebSite>
   </Info>
   <Files>
-    <!-- missing .kmx triggers this warning: We're moving towards requiring .kmx
-         even for mobile-only keyboards, and have made the decision not to attempt
-         to parse .js for the kmp compiler, because it is too fragile. -->
-    <File>
-      <Name>..\build\khmer_angkor.js</Name>
-      <Description>File khmer_angkor.js</Description>
-      <CopyLocation>0</CopyLocation>
-      <FileType>.js</FileType>
-    </File>
     <File>
       <Name>..\build\khmer_angkor.kvk</Name>
       <Description>File khmer_angkor.kvk</Description>

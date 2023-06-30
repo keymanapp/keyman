@@ -21,6 +21,14 @@ describe('kvks-file-reader', function() {
     assert.isEmpty(invalidVkeys);
     verify_khmer_angkor(vk);
   });
+
+  it('should give a sensible error on a .kvk file', function() {
+    const path = makePathToFixture('kvk', 'khmer_angkor.kvk');
+    const input = fs.readFileSync(path);
+
+    const reader = new KvksFileReader();
+    assert.throws(() => reader.read(input), 'File appears to be a binary .kvk file');
+  });
 });
 
 describe('kvks-file-writer', function() {
