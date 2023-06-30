@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.132 alpha 2023-06-30
+
+* docs(mac): Update requirements.md (#9137)
+* fix(linux): Fix GHA package builds for non-Jammy dists (#9123)
+* fix(linux): Fix packaging GHA (#9142)
+
 ## 17.0.131 alpha 2023-06-27
 
 * feat(developer,common,core): ldml UTF-32 literals in binary (#9084)
