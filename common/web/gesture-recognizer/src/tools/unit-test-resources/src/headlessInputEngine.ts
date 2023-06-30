@@ -1,8 +1,6 @@
 import {
   InputEngineBase,
-  InputSample,
   JSONTrackedPoint,
-  Segment,
   TrackedPoint
 } from '@keymanapp/gesture-recognizer';
 
