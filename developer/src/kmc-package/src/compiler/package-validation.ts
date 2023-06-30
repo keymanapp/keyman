@@ -13,8 +13,8 @@ const MODEL_ID_PATTERN_PACKAGE = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a
 // const MODEL_ID_PATTERN_PROJECT = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.kpj$/;
 
 // "Content files" within the package should adhere to these pattern:
-const CONTENT_FILE_BASENAME_PATTERN = /^[a-z0-9_+.-]+$/;
-const CONTENT_FILE_EXTENSION_PATTERN = /^\.[a-z0-9_]+$/;
+const CONTENT_FILE_BASENAME_PATTERN = /^[a-z0-9_+.-]+$/i; // base names can be case insensitive
+const CONTENT_FILE_EXTENSION_PATTERN = /^\.[a-z0-9_]+$/;  // extensions should be lower-case
 
 export class PackageValidation {
 

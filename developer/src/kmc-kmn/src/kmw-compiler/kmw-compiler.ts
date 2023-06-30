@@ -8,7 +8,7 @@ import { VisualKeyboardFromFile } from "./visual-keyboard-compiler.js";
 import { CompilerResult, STORETYPE_DEBUG, STORETYPE_OPTION, STORETYPE_RESERVED } from "../compiler/compiler.js";
 
 function requote(s: string): string {
-  return "'" + s.replaceAll(/(['\\])/, "\\$1") + "'";
+  return "'" + s.replaceAll(/(['\\])/g, "\\$1") + "'";
 }
 
 export function RequotedString(s: string, RequoteSingleQuotes: boolean = false): string {
