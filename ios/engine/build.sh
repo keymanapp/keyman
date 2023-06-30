@@ -108,9 +108,9 @@ function update_bundle ( ) {
   KMW_RESOURCES="$KEYMAN_ROOT/web/build/app/resources"
 
   #Copy over the relevant resources!  It's easiest to do if we navigate to the resulting folder.
-  cp "$KEYMAN_ROOT/$KMW_RESOURCES/osk/kmwosk.css"            "$BUNDLE_PATH/kmwosk.css"
-  cp "$KEYMAN_ROOT/$KMW_RESOURCES/osk/keymanweb-osk.ttf"     "$BUNDLE_PATH/keymanweb-osk.ttf"
-  cp "$KEYMAN_ROOT/$KMW_PRODUCT/keymanweb-webview.js"        "$BUNDLE_PATH/keymanweb-webview.js"
+  cp "$KMW_RESOURCES/osk/kmwosk.css"            "$BUNDLE_PATH/kmwosk.css"
+  cp "$KMW_RESOURCES/osk/keymanweb-osk.ttf"     "$BUNDLE_PATH/keymanweb-osk.ttf"
+  cp "$KMW_PRODUCT/keymanweb-webview.js"        "$BUNDLE_PATH/keymanweb-webview.js"
 
   if builder_is_debug_build; then
     cp "$KEYMAN_ROOT/$KMW_PRODUCT/keymanweb-webview.js.map"  "$BUNDLE_PATH/keymanweb-webview.js.map"
