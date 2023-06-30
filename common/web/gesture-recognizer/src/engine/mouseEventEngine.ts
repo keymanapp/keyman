@@ -1,8 +1,8 @@
-import { GestureRecognizerConfiguration } from "./gestureRecognizerConfiguration.js";
+import { GestureRecognizerConfiguration } from "./configuration/gestureRecognizerConfiguration.js";
 import { InputEventEngine } from "./inputEventEngine.js";
-import { InputSample } from "./inputSample.js";
+import { InputSample } from "./headless/inputSample.js";
 import { Nonoptional } from "./nonoptional.js";
-import { ZoneBoundaryChecker } from "./zoneBoundaryChecker.js";
+import { ZoneBoundaryChecker } from "./configuration/zoneBoundaryChecker.js";
 
 export class MouseEventEngine extends InputEventEngine {
   private readonly _mouseStart: typeof MouseEventEngine.prototype.onMouseStart;

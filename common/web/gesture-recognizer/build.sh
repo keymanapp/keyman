@@ -40,7 +40,6 @@ if builder_start_action configure; then
 fi
 
 if builder_start_action clean; then
-  npm run clean
   rm -rf build/
   builder_finish_action success clean
 fi
@@ -59,9 +58,9 @@ fi
 
 if builder_start_action test:module; then
   if builder_has_option --ci; then
-    npm test -- --ci
+    ./test.sh --ci
   else
-    npm test
+    ./test.sh
   fi
   builder_finish_action success test:module
 fi

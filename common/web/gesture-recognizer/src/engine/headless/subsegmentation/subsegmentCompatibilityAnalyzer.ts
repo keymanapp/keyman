@@ -1,5 +1,5 @@
 import { SegmentationSplit } from "./pathSegmenter.js";
-import { SegmentClass, SegmentClassifier } from "./segmentClassifier.js";
+import { SegmentClass, SegmentClassifier } from "../segmentClassifier.js";
 
 /**
  * This class fulfills two roles:

@@ -1,6 +1,6 @@
 import { GestureRecognizerConfiguration } from "./gestureRecognizerConfiguration.js";
-import { InputSample } from "./inputSample.js";
-import { Nonoptional } from "./nonoptional.js";
+import { InputSample } from "../headless/inputSample.js";
+import { Nonoptional } from "../nonoptional.js";
 import { RecognitionZoneSource } from "./recognitionZoneSource.js";
 
 export class ZoneBoundaryChecker {

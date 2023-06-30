@@ -4,9 +4,9 @@
     "baseUrl": "./",
     "lib": [ "dom", "es6" ],
     "outDir": "./build/obj/",
-    "rootDir": "./src",
+    "rootDir": "./src/engine",
     "tsBuildInfoFile": "./build/obj/tsconfig.tsbuildinfo"
   },
-  "include": ["./src/**/*.ts"],
-  "exclude": ["./src/tools/**/*.ts"]
+  "include": ["./src/engine/**/*.ts"],
+  "exclude": ["./src/test/**/*.ts", "./src/tools/**/*.ts"]
 }

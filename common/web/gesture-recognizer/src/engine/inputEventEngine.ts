@@ -1,6 +1,6 @@
 import EventEmitter from "eventemitter3";
-import { GestureRecognizerConfiguration } from "./gestureRecognizerConfiguration.js";
-import { InputSample } from "./inputSample.js";
+import { GestureRecognizerConfiguration } from "./configuration/gestureRecognizerConfiguration.js";
+import { InputSample } from "./headless/inputSample.js";
 import { Nonoptional } from "./nonoptional.js";
 import { TrackedPoint } from "./trackedPoint.js";
 
