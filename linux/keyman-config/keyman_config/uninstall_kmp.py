@@ -87,8 +87,9 @@ def _uninstall_keyboards_from_ibus(keyboards, packageDir):
     if not sources:
         return
 
-    # install all kmx for first lang not just packageID
+    # uninstall all specified keyboards for all languages
     for kb in keyboards:
+        # keyboard ids are similar to `km:/path/to/keyman/khmer_angkor/khmer_angkor.kmx`
         match_id = ":%s" % get_ibus_keyboard_id(kb, packageDir, ignore_language=True)
         toRemove = [id for id in sources if id.endswith(match_id)]
         for val in toRemove:
