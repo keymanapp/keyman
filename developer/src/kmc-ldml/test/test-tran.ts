@@ -121,7 +121,7 @@ describe('tran', function () {
         const tran = <Tran> sect;
         assert.equal(tran.groups?.length, 1);
         assert.equal(tran.groups[0].type, constants.tran_group_type_reorder);
-        const { reorders } = tran.groups[0];
+        // const { reorders } = tran.groups[0];
         // console.dir({reorders}, {depth: Infinity, color: true});
         // assert.lengthOf(reorders, 1);
         // assert.lengthOf(reorders[0].elements, 4);

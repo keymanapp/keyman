@@ -1,5 +1,5 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlusData, StrsItem } from "../kmx-plus.js";
+import { KMXPlusData, StrsItem, UsetItem } from "../kmx-plus.js";
 import { build_strs_index, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_SECTION } from "./builder-section.js";
 
@@ -63,4 +63,24 @@ export function build_uset(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS ) : BUI
   };
 
   return uset;
+}
+
+
+/**
+ * @returns uset index
+ */
+export function build_uset_index(sect_uset: BUILDER_USET, value: UsetItem) {
+  if(!(value instanceof UsetItem)) {
+    if (value === null) {
+      throw new Error('unexpected null UsetItem');
+    } else {
+      throw new Error('Expected UsetItem but got '+ value);
+    }
+  }
+
+  let result = sect_uset.usets.findIndex(v => v._pattern.value === value.str.value);
+  if(result < 0) {
+    throw new Error('unexpectedly missing UsetItem ' + value.uset.toString());
+  }
+  return result;
 }

@@ -169,10 +169,10 @@ class Constants {
    *
    * `type = flags & elem_flags_type`
    */
-  readonly elem_flags_type       = 0x0000000C;
-  readonly elem_flags_type_char  = 0x0;
-  readonly elem_flags_type_str   = 0x1;
-  readonly elem_flags_type_uset  = 0x2;
+  readonly elem_flags_type      = 0x0000000C;
+  readonly elem_flags_type_char = 0x0 << 2;
+  readonly elem_flags_type_str  = 0x1 << 2;
+  readonly elem_flags_type_uset = 0x2 << 2;
 
 
   /**
