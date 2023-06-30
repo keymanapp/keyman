@@ -63,6 +63,9 @@ class KeyboardDetailsView(Gtk.Dialog):
                 logging.warning('Exception %s reading %s %s', type(e), jsonfile, e.args)
 
         self.grid = Gtk.Grid()
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.add(self.grid)
         # self.grid.set_column_homogeneous(True)
 
         # kbdatapath = path.join("/usr/local/share/keyman", self.kmp["id"], self.kmp["id"] + ".json")
@@ -97,8 +100,9 @@ class KeyboardDetailsView(Gtk.Dialog):
 
         self.add_button(_("_Close"), Gtk.ResponseType.CLOSE)
 
-        self.get_content_area().pack_start(self.grid, True, True, 12)
+        self.get_content_area().pack_start(scrolledWindow, True, True, 12)
         self.resize(800, 450)
+        scrolledWindow.set_vadjustment(None)
         self.show_all()
 
     def _add_info_for_all_keyboards(self, keyboards, prevlabel) -> Gtk.Widget:
