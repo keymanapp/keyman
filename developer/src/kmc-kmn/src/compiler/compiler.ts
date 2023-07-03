@@ -345,10 +345,12 @@ export class KmnCompiler implements UnicodeSetParser {
     // The compiler detected a .kvks file, which needs to be captured
     kvksFilename = this.callbacks.resolveFilename(kmnFilename, kvksFilename);
     const filename = this.callbacks.path.basename(kvksFilename);
+    let basename = null;
     let vk: VisualKeyboard.VisualKeyboard = null;
     if(filename.endsWith('.kvk')) {
       /* Legacy keyboards may reference a binary .kvk. That's not an error */
       // TODO: (lowpri) add hint to convert to .kvks?
+      basename = this.callbacks.path.basename(kvksFilename, KeymanFileTypes.Binary.VisualKeyboard);
       const reader = new KvkFileReader();
       try {
         vk = reader.read(this.callbacks.loadFile(kvksFilename));
@@ -357,6 +359,7 @@ export class KmnCompiler implements UnicodeSetParser {
         return null;
       }
     } else {
+      basename = this.callbacks.path.basename(kvksFilename, KeymanFileTypes.Source.VisualKeyboard);
       const reader = new KvksFileReader();
       let kvks = null;
       try {
@@ -385,7 +388,7 @@ export class KmnCompiler implements UnicodeSetParser {
     let writer = new KvkFileWriter();
     return {
       filename: this.callbacks.path.join(this.callbacks.path.dirname(kmxFilename),
-        this.callbacks.path.basename(kvksFilename, KeymanFileTypes.Source.VisualKeyboard) + KeymanFileTypes.Binary.VisualKeyboard),
+        basename + KeymanFileTypes.Binary.VisualKeyboard),
       data: writer.write(vk)
     };
   }
