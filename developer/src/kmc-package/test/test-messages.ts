@@ -145,12 +145,6 @@ describe('CompilerMessages', function () {
     testForMessage(this, ['invalid', 'warn_keyboard_versions_do_not_match.kps'], CompilerMessages.WARN_KeyboardVersionsDoNotMatch);
   });
 
-  // WARN_KeyboardVersionsDoNotMatchPackageVersion
-
-  it('should generate WARN_KeyboardVersionsDoNotMatchPackageVersion if <Keyboard> version does not match package version', async function() {
-    testForMessage(this, ['invalid', 'warn_keyboard_versions_do_not_match_package_version.kps'], CompilerMessages.WARN_KeyboardVersionsDoNotMatchPackageVersion);
-  });
-
   // ERROR_LanguageTagIsNotValid
 
   it('should generate ERROR_LanguageTagIsNotValid if keyboard has an invalid language tag', async function() {

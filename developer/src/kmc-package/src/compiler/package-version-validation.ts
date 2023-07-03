@@ -66,7 +66,7 @@ export class PackageVersionValidation {
       }
       keyboard.version = keyboardVersion ?? DEFAULT_VERSION;
 
-      if(result) {
+      if(result && followKeyboardVersion) {
         if(kmp.keyboards[0].version !== keyboard.version) {
           this.callbacks.reportMessage(CompilerMessages.Warn_KeyboardVersionsDoNotMatch({
             keyboard: keyboard.id,
@@ -78,18 +78,8 @@ export class PackageVersionValidation {
       }
     }
 
-    if(result) {
-      if(followKeyboardVersion) {
-        kmp.info.version = {description: kmp.keyboards[0].version};
-      }
-      else if(kmp.info.version?.description != kmp.keyboards[0].version) {
-        // Only need to compare against first keyboard as we compare keyboards above
-        this.callbacks.reportMessage(CompilerMessages.Warn_KeyboardVersionsDoNotMatchPackageVersion({
-          keyboard: kmp.keyboards[0].id,
-          keyboardVersion: kmp.keyboards[0].version,
-          packageVersion: kmp.info.version?.description
-        }));
-      }
+    if(result && followKeyboardVersion) {
+      kmp.info.version = {description: kmp.keyboards[0].version};
     }
 
     return result;

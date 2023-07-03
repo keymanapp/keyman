@@ -83,9 +83,7 @@ export class CompilerMessages {
     `Keyboard ${o.keyboard} version ${o.version} does not match keyboard ${o.firstKeyboard} version ${o.firstVersion}.`);
   static WARN_KeyboardVersionsDoNotMatch = SevWarn | 0x0012;
 
-  static Warn_KeyboardVersionsDoNotMatchPackageVersion = (o: {keyboard:string, keyboardVersion: string, packageVersion: string}) => m(this.WARN_KeyboardVersionsDoNotMatchPackageVersion,
-    `Keyboard ${o.keyboard} version ${o.keyboardVersion} does not match package version ${o.packageVersion}.`);
-  static WARN_KeyboardVersionsDoNotMatchPackageVersion = SevWarn | 0x0013;
+  // 0x0013 was WARN_KeyboardVersionsDoNotMatchPackageVersion
 
   static Error_LanguageTagIsNotValid = (o: {resourceType: string, id:string, lang:string, e:any}) => m(this.ERROR_LanguageTagIsNotValid,
     `Language tag '${o.lang}' in ${o.resourceType} ${o.id} is invalid.`);
