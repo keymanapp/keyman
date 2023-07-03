@@ -201,6 +201,9 @@ export class KmpCompiler {
   };
 
   private kpsLanguagesToKmpLanguages(language: KpsFile.KpsFileLanguage[]): KmpJsonFile.KmpJsonFileLanguage[] {
+    if(language.length == 0 || language[0] == undefined) {
+      return [];
+    }
     return language.map((element) => { return { name: element._, id: element.$.ID } });
   };
 

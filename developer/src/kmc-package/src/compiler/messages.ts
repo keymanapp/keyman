@@ -95,9 +95,9 @@ export class CompilerMessages {
     `Language tag '${o.actual}' in ${o.resourceType} ${o.id} is not minimal, and should be '${o.expected}'.`);
   static WARN_LanguageTagIsNotMinimal = SevWarn | 0x0015;
 
-  static Error_MustHaveAtLeastOneLanguage = (o:{resourceType:string, id:string}) => m(this.ERROR_MustHaveAtLeastOneLanguage,
-    `The ${o.resourceType} ${o.id} must have at least one language specified.`);
-  static ERROR_MustHaveAtLeastOneLanguage = SevError | 0x0016;
+  static Error_ModelMustHaveAtLeastOneLanguage = (o:{id:string}) => m(this.ERROR_ModelMustHaveAtLeastOneLanguage,
+    `The lexical model ${o.id} must have at least one language specified.`);
+  static ERROR_ModelMustHaveAtLeastOneLanguage = SevError | 0x0016;
 
   static Warn_RedistFileShouldNotBeInPackage = (o:{filename:string}) => m(this.WARN_RedistFileShouldNotBeInPackage,
     `The Keyman system file '${o.filename}' should not be compiled into the package.`);
@@ -114,5 +114,10 @@ export class CompilerMessages {
   static Warn_JsKeyboardFileIsMissing = (o:{id: string}) => m(this.WARN_JsKeyboardFileIsMissing,
     `Keyboard ${o.id} targets touch devices but corresponding ${o.id}.js file is not in the package.`);
   static WARN_JsKeyboardFileIsMissing = SevWarn | 0x001A;
+
+  static Warn_KeyboardShouldHaveAtLeastOneLanguage = (o:{id:string}) => m(this.WARN_KeyboardShouldHaveAtLeastOneLanguage,
+    `The keyboard ${o.id} should have at least one language specified.`);
+  static WARN_KeyboardShouldHaveAtLeastOneLanguage = SevWarn | 0x001B;
+
 }
 

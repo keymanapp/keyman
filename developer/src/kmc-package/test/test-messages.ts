@@ -163,11 +163,11 @@ describe('CompilerMessages', function () {
     testForMessage(this, ['invalid', 'warn_language_tag_is_not_minimal.kps'], CompilerMessages.WARN_LanguageTagIsNotMinimal);
   });
 
-  // ERROR_MustHaveAtLeastOneLanguage
+  // ERROR_ModelMustHaveAtLeastOneLanguage
 
-  it('should generate ERROR_MustHaveAtLeastOneLanguage if model or keyboard has zero language tags', async function() {
-    testForMessage(this, ['invalid', 'keyman.en.error_must_have_at_least_one_language.model.kps'],
-      CompilerMessages.ERROR_MustHaveAtLeastOneLanguage);
+  it('should generate ERROR_MustHaveAtLeastOneLanguage if model has zero language tags', async function() {
+    testForMessage(this, ['invalid', 'keyman.en.error_model_must_have_at_least_one_language.model.kps'],
+      CompilerMessages.ERROR_ModelMustHaveAtLeastOneLanguage);
   });
 
   // WARN_RedistFileShouldNotBeInPackage
@@ -196,6 +196,13 @@ describe('CompilerMessages', function () {
   it('should generate WARN_JsKeyboardFileIsMissing if package is missing corresponding .js for a touch .kmx', async function() {
     testForMessage(this, ['invalid', 'warn_js_keyboard_file_is_missing.kps'],
       CompilerMessages.WARN_JsKeyboardFileIsMissing);
+  });
+
+  // WARN_KeyboardShouldHaveAtLeastOneLanguage
+
+  it('should generate WARN_KeyboardShouldHaveAtLeastOneLanguage if keyboard has zero language tags', async function() {
+    testForMessage(this, ['invalid', 'warn_keyboard_should_have_at_least_one_language.kps'],
+      CompilerMessages.WARN_KeyboardShouldHaveAtLeastOneLanguage);
   });
 
 });
