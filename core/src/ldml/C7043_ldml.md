@@ -93,9 +93,9 @@ Each element string is made up of elements with the following item structure:
 
   | Bit position | Meaning       | Description                               |
   |--------------|---------------|-------------------------------------------|
-  |       0      | tertiary_base | 1: tertiary_base is true                  |
-  |       1      | prebase       | 1: prebase is true                        |
-  |      2-3     | type          | `element` is 0: UTF-32LE, 1: str, 2: uset |
+  |      0-1     | type          | `element` is 0: UTF-32LE, 1: str, 2: uset |
+  |       2      | tertiary_base | 1: tertiary_base is true                  |
+  |       3      | prebase       | 1: prebase is true                        |
   |      4-15    | reserved      | reserved                                  |
   |     16-23    | order         | signed int: -128 to +127                  |
   |     24-31    | tertiary      | signed int: -128 to +127                  |

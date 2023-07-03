@@ -227,8 +227,8 @@ block(elemOrdrFrom)
   # from="\u{1A60}[\u1A75-\u1A79]\u{1A45}" order="10 55 10"
   60 1a 00 00                        #    KMX_DWORD element;   '᩠'             // str: output string or UTF-32LE codepoint
   00 00 0A 00                        #    KMX_DWORD flags;                  // flag and order values - cp
-  00 00 00 00  # TODO-LDML: uset #0   #    KMX_DWORD element;   [uset]       // str: output string or UTF-32LE codepoint
-  08 00 37 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
+  00 00 00 00  # TODO-LDML: uset #0  #    KMX_DWORD element;   [uset]       // str: output string or UTF-32LE codepoint
+  02 00 37 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
   45 1A 00 00                        #    KMX_DWORD element;   'ᩅ'          // str: output string or UTF-32LE codepoint
   00 00 0A 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
 
