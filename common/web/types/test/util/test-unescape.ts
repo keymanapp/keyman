@@ -59,6 +59,7 @@ describe('test unescapeString()', function() {
 
 describe('test unescapeOneQuadString()', () => {
   it('should be able to convert', () => {
+    // testing that `\u0127` is unescaped correctly (to U+0127: 'ħ')
     assert.equal(unescapeOneQuadString('\\u0127'), '\u{0127}');
   });
 });
