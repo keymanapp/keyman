@@ -44,8 +44,12 @@ export class PackageValidation {
     let minimalTags: {[tag: string]: string} = {};
 
     if(languages.length == 0) {
-      this.callbacks.reportMessage(CompilerMessages.Error_MustHaveAtLeastOneLanguage({resourceType, id}));
-      return false;
+      if(resourceType == 'keyboard') {
+        this.callbacks.reportMessage(CompilerMessages.Warn_KeyboardShouldHaveAtLeastOneLanguage({id}));
+      } else {
+        this.callbacks.reportMessage(CompilerMessages.Error_ModelMustHaveAtLeastOneLanguage({id}));
+        return false;
+      }
     }
 
     for(let lang of languages) {

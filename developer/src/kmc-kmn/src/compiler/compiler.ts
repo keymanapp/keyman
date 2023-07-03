@@ -6,7 +6,7 @@ TODO: implement additional interfaces:
 */
 
 // TODO: rename wasm-host?
-import { UnicodeSetParser, UnicodeSet, Osk } from '@keymanapp/common-types';
+import { UnicodeSetParser, UnicodeSet, Osk, VisualKeyboard, KvkFileReader } from '@keymanapp/common-types';
 import { CompilerCallbacks, CompilerEvent, CompilerOptions, KeymanFileTypes, KvkFileWriter, KvksFileReader } from '@keymanapp/common-types';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
 import { CompilerMessages, mapErrorFromKmcmplib } from './messages.js';
@@ -343,21 +343,34 @@ export class KmnCompiler implements UnicodeSetParser {
 
   private runKvkCompiler(kvksFilename: string, kmnFilename: string, kmxFilename: string, displayMap?: Osk.PuaMap) {
     // The compiler detected a .kvks file, which needs to be captured
-    let reader = new KvksFileReader();
     kvksFilename = this.callbacks.resolveFilename(kmnFilename, kvksFilename);
-    let filename = this.callbacks.path.basename(kvksFilename);
-    let kvks = null;
-    try {
-      kvks = reader.read(this.callbacks.loadFile(kvksFilename));
-      reader.validate(kvks, this.callbacks.loadSchema('kvks'));
-    } catch(e) {
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({filename, e}));
-      return null;
-    }
-    let invalidVkeys: string[] = [];
-    let vk = reader.transform(kvks, invalidVkeys);
-    for(let invalidVkey of invalidVkeys) {
-      this.callbacks.reportMessage(CompilerMessages.Warn_InvalidVkeyInKvksFile({filename, invalidVkey}));
+    const filename = this.callbacks.path.basename(kvksFilename);
+    let vk: VisualKeyboard.VisualKeyboard = null;
+    if(filename.endsWith('.kvk')) {
+      /* Legacy keyboards may reference a binary .kvk. That's not an error */
+      // TODO: (lowpri) add hint to convert to .kvks?
+      const reader = new KvkFileReader();
+      try {
+        vk = reader.read(this.callbacks.loadFile(kvksFilename));
+      } catch(e) {
+        this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvkFile({filename, e}));
+        return null;
+      }
+    } else {
+      const reader = new KvksFileReader();
+      let kvks = null;
+      try {
+        kvks = reader.read(this.callbacks.loadFile(kvksFilename));
+        reader.validate(kvks, this.callbacks.loadSchema('kvks'));
+      } catch(e) {
+        this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({filename, e}));
+        return null;
+      }
+      let invalidVkeys: string[] = [];
+      vk = reader.transform(kvks, invalidVkeys);
+      for(let invalidVkey of invalidVkeys) {
+        this.callbacks.reportMessage(CompilerMessages.Warn_InvalidVkeyInKvksFile({filename, invalidVkey}));
+      }
     }
 
     // Make sure that we maintain the correspondence between source keyboard and

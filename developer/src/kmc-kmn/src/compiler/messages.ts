@@ -82,6 +82,10 @@ export class CompilerMessages {
   static Error_InvalidDisplayMapFile = (o:{filename: string, e: any}) => m(this.ERROR_InvalidDisplayMapFile,
     `Error encountered parsing display map ${o.filename}: ${o.e}`);
   static ERROR_InvalidDisplayMapFile = SevError | 0x90A;
+
+  static Error_InvalidKvkFile = (o:{filename: string, e: any}) => m(this.ERROR_InvalidKvkFile,
+    `Error encountered loading ${o.filename}: ${o.e}`);
+  static ERROR_InvalidKvkFile = SevError | 0x90B;
 };
 
 /**

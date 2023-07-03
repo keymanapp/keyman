@@ -89,8 +89,9 @@ class ProjectBuilder {
     const reader = new KPJFileReader(this.callbacks);
     const kpj = reader.read(kpjData);
     const schema = this.callbacks.loadSchema('kpj');
+    const legacySchema = this.callbacks.loadSchema('kpj-9.0');
     try {
-      reader.validate(kpj, schema);
+      reader.validate(kpj, schema, legacySchema);
     } catch(e) {
       this.callbacks.reportMessage(InfrastructureMessages.Error_InvalidProjectFile({message: (e??'').toString()}));
       return null;

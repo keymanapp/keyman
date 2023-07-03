@@ -45,6 +45,7 @@ function copy_schemas() {
   cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboardtest.schema.json" "$THIS_SCRIPT_PATH/build/src/"
   cp "$KEYMAN_ROOT/common/schemas/kvks/kvks.schema.json" "$THIS_SCRIPT_PATH/build/src/"
   cp "$KEYMAN_ROOT/common/schemas/kpj/kpj.schema.json" "$THIS_SCRIPT_PATH/build/src/"
+  cp "$KEYMAN_ROOT/common/schemas/kpj-9.0/kpj-9.0.schema.json" "$THIS_SCRIPT_PATH/build/src/"
   cp "$KEYMAN_ROOT/common/schemas/keyman-touch-layout/keyman-touch-layout.clean.spec.json" "$THIS_SCRIPT_PATH/build/src/"
   cp "$KEYMAN_ROOT/common/schemas/displaymap/displaymap.schema.json" "$THIS_SCRIPT_PATH/build/src/"
   # Store CLDR imports
