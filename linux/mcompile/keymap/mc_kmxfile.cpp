@@ -145,62 +145,182 @@ MyCout("#### Line 129 ",1);
 
   fclose(fp);
 
-MyCout("##### Line 153",1);;
-															//_S2 can go: 
-															/*
-																if(!VerifyKeyboard(filebase, sz)) {
-																Err(L"errVerifyKeyboard");
-																delete[] buf;
-																return FALSE;
-															}*/
+MyCout("##### Line 153",1);
 
-  if(!VerifyKeyboard(filebase, sz)) return FALSE;			//_S2 ToDo find replacement: VerifyKeyboard see further down;  finished version in /core/kmx_file.cpp
+if(!VerifyKeyboard(filebase, sz)) {
+	// Err(L"errVerifyKeyboard");             //_S2 ToDo find replacement: Err
+	                                          // _S2 delete [] buf; ????
+  return FALSE;
+  }
 
 
-
-  MyCout("##### Line 166",1);
+  MyCout("##### Line 157",1);
   kbp = FixupKeyboard(buf, filebase,sz);
-  MyCout("##### Line 168",1);
+  MyCout("##### Line 159",1);
 
 
 std::cout << "kbp: "<<kbp<< "\n";
-
-															//_S2 can go: 
-															/* if(!kbp) {
-																Err(L"errFixupKeyboard");
-																delete[] buf;
-																return FALSE;
-															}*/
   if(!kbp) {
 	//Err(L"errFixupKeyboard");								//_S2 ToDo find replacement: Err
-															// _S2 delete [] buf; ????
+															              // _S2 delete [] buf; ????
 
   MyCout("##### errFixupKeyboard ",1);
 	return FALSE;}
 
 
-  MyCout("##### Line 185 ",1);
-															//_S2 can go: 
-																/*if(kbp->dwIdentifier != FILEID_COMPILED) {
-																Err(L"errNotFileID");
-																delete[] buf;
-																return FALSE;
-															}*/
+  MyCout("##### Line 171 ",1);
+                                            //_S2 can go:
+                                              /*if(kbp->dwIdentifier != FILEID_COMPILED) {
+                                              Err(L"errNotFileID");
+                                              delete[] buf;
+                                              return FALSE;
+                                            }*/
 
+std::cout << "kbp->dwIdentifier: "<<kbp->dwIdentifier<< "\n";
 /*
  if(kbp->dwIdentifier != FILEID_COMPILED) {
     delete [] buf;
     //MyCout("errNotFileID",1);								//_S2 ToDo find replacement: DebugLog("errNotFileID");
-															// _S2 delete [] buf; ????
+															                // _S2 delete [] buf; ????
     return FALSE;
   }*/
-MyCout("##### Line 198",1);
+MyCout("##### Line 187",1);
 	*lpKeyboard = kbp;
-															// _S2 delete [] buf; ????
+															                // _S2 delete [] buf; ????
 	MyCout("##### LoadKeyboard of mcompile ended #####",1);
 	return TRUE;
 }
 
+// _S2 Version for char16_t filename
+KMX_BOOL LoadKeyboard(char16_t* fileName, LPKEYBOARD* lpKeyboard) {
+  std::cout << "##### LoadKeyboard of mcompile started #####\n";
+  std::cout << "fileName: " <<fileName << "\n";
+
+  LPKMX_BYTE buf;
+  FILE* fp;
+  LPKEYBOARD kbp;
+  PKMX_BYTE filebase;
+
+  //DebugLog("Loading file '%s'",fileName); 				  //_S2 ToDo find replacement:   DebugLog
+
+  if(!fileName || !lpKeyboard) {
+       std::cout << "TODO: Replace Err(LBad Filename)\n";//_S2 ToDo find replacement:   Err(L"Bad Filename");
+       return FALSE;
+  }
+
+  fp = Open_File((const KMX_WCHAR*)fileName, u"rb");
+
+  if(fp == NULL) {
+    std::cout << "Could not open file\n";          //_S2 ToDo find replacement: DebugLog("Could not open file");
+    return FALSE;
+  } else                                           // _S2 remove
+    std::cout << "Could OPEN file" << fp << "\n";  // _S2 remove
+
+   MyCout("##### Line 224", 1);                     // _S2 remove
+
+  if (fseek(fp, 0, SEEK_END) != 0) {
+    fclose(fp);
+    MyCout("Could not fseek file", 1);  //_S2 ToDo find replacement:	DebugLog("Could not fseek file");
+    return FALSE;
+  } else
+    MyCout("CCould  fseek file", 1);  // _S2 remove
+
+    MyCout("##### Line 234", 1);
+  auto sz = ftell(fp);
+  if (sz < 0) {
+    fclose(fp);
+    return FALSE;
+  }
+
+    MyCout("##### Line 241", 1);  // _S2 remove
+  if (fseek(fp, 0, SEEK_SET) != 0) {
+    fclose(fp);
+    MyCout("Could not fseek(set) file", 1);  //_S2 ToDo find replacement:	DebugLog("Could not fseek(set) file");
+    return FALSE;
+  }
+
+  // #ifdef KMX_64BIT
+  //  allocate enough memory for expanded data structure + original data.
+  //  Expanded data structure is double the size of data on disk (8-byte
+  //  pointers) - on disk the "pointers" are relative to the beginning of
+  //  the file.
+  //  We save the original data at the end of buf; we don't copy strings, so
+  //  those will remain in the location at the end of the buffer.
+  //  buf = new KMX_BYTE[sz * 3];
+  // #else
+  buf = new KMX_BYTE[sz];
+  // #endif
+
+    MyCout("#### Line 260 ", 1);
+  if (!buf) {
+    fclose(fp);
+    MyCout("Not allocmem", 1);  //_S2 ToDo find replacement: DebugLog()"Not allocmem");
+                                // _S2 delete [] buf; ????
+    return FALSE;
+  }
+
+  // #ifdef KMX_64BIT
+  // ilebase = buf + sz*2;
+  // #else
+  filebase = buf;
+  // #endif
+
+  if (fread(filebase, 1, sz, fp) < (size_t)sz) {
+    MyCout("Could not read file", 1);  //_S2 ToDo find replacement: DebugLog("Could not read file");
+    fclose(fp);
+    // _S2 delete [] buf; ????
+    return FALSE;
+  }
+
+  fclose(fp);
+
+  MyCout("##### Line 285", 1);
+  ;
+  KMX_DWORD sz_dw = (KMX_DWORD)sz;  //_S2
+  size_t sz_t = (size_t)sz;  //_S2
+  // shold call VerifyKeyboard_M of class
+  // if(!VerifyKeyboard(filebase, sz_t)) {
+  if (!VerifyKeyboard_S2(filebase, sz_t)) {
+    MyCout("##### errVerifyKeyboard", 1);
+    // Err(L"errVerifyKeyboard");             //_S2 ToDo find replacement: Err
+    // _S2 delete [] buf; ????
+    return FALSE;
+  }
+
+  MyCout("##### Line 297", 1);
+  kbp = FixupKeyboard(buf, filebase, sz_dw);    // _S" changed from sz->sz_dw
+  MyCout("##### Line 299", 1);
+
+  std::cout << "kbp: " << kbp << "\n";
+  if (!kbp) {
+    // Err(L"errFixupKeyboard");								//_S2 ToDo find replacement: Err
+    //  _S2 delete [] buf; ????
+
+    MyCout("##### errFixupKeyboard ", 1);
+    return FALSE;
+  }
+
+  MyCout("##### Line 311 ", 1);
+  //_S2 can go:
+  /*if(kbp->dwIdentifier != FILEID_COMPILED) {
+  Err(L"errNotFileID");
+  delete[] buf;
+  return FALSE;
+}*/
+
+  std::cout << "kbp->dwIdentifier: " << kbp->dwIdentifier << " FILEID_COMPILED: " << FILEID_COMPILED << "\n";
+  std::cout << "..xxxxx.\n";
+  if (kbp->dwIdentifier != FILEID_COMPILED) {
+    delete[] buf;
+    MyCout("errNotFileID", 1);  //_S2 ToDo find replacement: DebugLog("errNotFileID");
+    return FALSE;
+  }
+  MyCout("##### Line 327", 1);
+  *lpKeyboard = kbp;
+  // _S2 delete [] buf; ????
+  MyCout("##### LoadKeyboard of mcompile ended #####", 1);
+  return TRUE;
+}
 
 KMX_BOOL VerifyKeyboard(LPBYTE filebase, KMX_DWORD sz) {
   KMX_DWORD i;
@@ -217,18 +337,62 @@ KMX_BOOL VerifyKeyboard(LPBYTE filebase, KMX_DWORD sz) {
 					wchar_t buf2[256];
           if(csp->dpString == 0) {
 					// _S2 wsprintf(buf2, L"errWrongFileVersion:NULL");
+          MyCout("errWrongFileVersion",1);
           } else {
 					  // _S2 wsprintf(buf2, L"errWrongFileVersion:%10.10ls", StringOffset(filebase, csp->dpString));
+
+          MyCout("errWrongFileVersion-offset",1);
           }
+
+          MyCout("err buf",1);
 					// _S2 Err(buf2);
 					return FALSE;
 				}
 		}
+
+          MyCout("errWrongFileVersion",1);
 		// _S2 Err(L"errWrongFileVersion");
 		return FALSE;
 	}
 /**/
+MyCout("will return true",1);
+  return TRUE;
+}
 
+
+KMX_BOOL VerifyKeyboard_S2(LPBYTE filebase, KMX_DWORD sz) {
+  KMX_DWORD i;
+  PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD)filebase;
+  PCOMP_STORE csp;
+
+  // Check file version //
+
+  if (ckbp->dwFileVersion < VERSION_MIN || ckbp->dwFileVersion > VERSION_MAX) {
+    // Old or new version -- identify the desired program version //
+    for (csp = (PCOMP_STORE)(filebase + ckbp->dpStoreArray), i = 0; i < ckbp->cxStoreArray; i++, csp++) {
+      if (csp->dwSystemID == TSS_COMPILEDVERSION) {
+        wchar_t buf2[256];
+        if (csp->dpString == 0) {
+          // _S2 wsprintf(buf2, L"errWrongFileVersion:NULL");
+          MyCout("errWrongFileVersion", 1);
+        } else {
+          // _S2 wsprintf(buf2, L"errWrongFileVersion:%10.10ls", StringOffset(filebase, csp->dpString));
+
+          MyCout("errWrongFileVersion-offset", 1);
+        }
+
+        MyCout("err buf", 1);
+        // _S2 Err(buf2);
+        return FALSE;
+      }
+    }
+
+    MyCout("errWrongFileVersion", 1);
+    // _S2 Err(L"errWrongFileVersion");
+    return FALSE;
+  }
+  /**/
+  MyCout("will return true", 1);
   return TRUE;
 }
 

@@ -24,7 +24,7 @@
 #include <vector>
 #include "keymap.h"
 
-//int run(int argc, wchar_t* argv[]); //_S2 Do we need that?
+int run(int argc, std::vector< const char16_t*> argv);
 void LogError(PKMX_WCHART message, ...);
 
 

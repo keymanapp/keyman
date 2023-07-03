@@ -12,13 +12,41 @@ int dummytest_u16(){
   return 0;
 }
 
+
+std::vector<std::u16string> convert_argv_to_Vector_u16str(int argc, char* argv[]) {
+  std::vector<std::u16string> vector_u16;
+  int i;
+
+  // for each arg convert to u16string and push to vector
+  for (char** arg = argv, i=0; *arg; ++arg,i++) {
+    std::string S(*arg);
+    vector_u16.push_back(u16string_from_string(S));
+  }
+  return vector_u16;
+}
+
+std::vector<std::u16string> convert_argvW_to_Vector_u16str(int argc, wchar_t* argv[]) {
+  std::vector<std::u16string> vector_u16;
+  int i;
+
+  // for each arg convert to u16string and push to vector
+  for (wchar_t** arg = argv, i=0; *arg; ++arg,i++) {
+    std::wstring S(*arg);
+    vector_u16.push_back(u16string_from_wstring(S));
+  }
+  return vector_u16;
+}
+
+
+
+/* _S" does this work??
 //const wchar_t* <- const char*
 wchar_t* wchart_from_char( char* c) {
   std::string str(c);
   std::wstring wstr = wstring_from_string(str);
    wchar_t* wc =  (wchar_t*) wstr.c_str();
 }
-
+*/
 //String <- wstring
 std::string string_from_wstring(std::wstring const str) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
@@ -28,6 +56,13 @@ std::string string_from_wstring(std::wstring const str) {
 std::wstring wstring_from_string(std::string const str) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 	return converter.from_bytes(str);
+}
+
+// u16String <- wstring
+std::u16string u16string_from_wstring(std::wstring const wstr) {
+  std::string str= string_from_wstring(wstr);
+  std::u16string str16 = u16string_from_string(str);
+  return str16;
 }
 
 //u16String <- string

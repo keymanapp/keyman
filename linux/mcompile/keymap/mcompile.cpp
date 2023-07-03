@@ -40,43 +40,58 @@ mcompile -d runs 4 important steps:
 
 #include "mcompile.h"
 #include "helpers.h"
+//------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
 
-int main(int argc, char *argv[])
-{  //----------------------------------------
+#if defined(_WIN32) || defined(_WIN64)
+  int wmain(int argc, wchar_t* argv[]) {
+  // convert wchar_t-*> char16_t*
+  // call new run / method() with char16_t
+  std::vector<std::u16string> argv_16 = convert_argvW_to_Vector_u16str( argc, argv);
+#else  // LINUX
+  int main(int argc, char* argv[]) {
+    //MyCout("started Linux-main", 1);
+    // convert UTF-8 char* to char16_t*
+    std::vector<std::u16string> argv_16 = convert_argv_to_Vector_u16str(argc, argv);
+#endif
+
+  std::vector<const char16_t*> vec_cmdl_par;
+
+  for (int i = 0; i < argc; i++) {
+    const char16_t* cmdl_par = argv_16[i].c_str();
+    vec_cmdl_par.push_back(cmdl_par);
+  }
+
+  // call new run/ method() with char16_t
+  run(argc, vec_cmdl_par);
+
+}
+//------ run with char16_t !! -------------------------------------------------------------------------------------------------------------------------
+
+int run(int argc, std::vector< const char16_t*> argv) {
+ //----------------------------------------
 // test if all cpps are acccessible: can be removed
-//check_avaiability_of_modules_();    //_S2
+ //check_avaiability_of_modules_();    //_S2
 
- /* //in case we use wmain(...wchar_t*)
-   if(argc < 3 || (argc < 5 && wcscmp(argv[1], L"-u") != 0)) {   // I4273// I4273
-    printf(
-         "Usage: mcompile -u infile.kmx outfile.kmx\n"
-         "       mcompile [-d] infile.kmx kbdfile.dll kbid outfile.kmx\n"
-         "  With -u parameter, converts keyboard from ANSI to Unicode\n"
-         "  Otherwise, mcompile converts a Keyman mnemonic layout to a\n"
-         "  positional one based on the Windows keyboard\n"
-         "  layout file given by kbdfile.dll\n\n"
-         "  kbid should be a hexadecimal number e.g. 409 for US English\n"
-         "  -d   convert deadkeys to plain keys\n");   // I4552
+ printf("_S2 started run for char16_t*\n");
 
-    return 1;
-  }
-  */
+    if(argc < 3 || (argc < 5 && u16cmp(argv[1], u"-u") != 0)) {   // I4273// I4273
+     printf(
+          "Usage: mcompile -u infile.kmx outfile.kmx\n"
+          "       mcompile [-d] infile.kmx kbdfile.dll kbid outfile.kmx\n"
+          "  With -u parameter, converts keyboard from ANSI to Unicode\n"
+          "  Otherwise, mcompile converts a Keyman mnemonic layout to a\n"
+          "  positional one based on the Windows keyboard\n"
+          "  layout file given by kbdfile.dll\n\n"
+          "  kbid should be a hexadecimal number e.g. 409 for US English\n"
+          "  -d   convert deadkeys to plain keys\n");   // I4552
 
- //in case we use main(...char*)
- if(argc < 3 || (argc < 5 && strcmp(argv[1], "-u") != 0)) {   // I4273
-    printf(
-         "Usage: mcompile -u infile.kmx outfile.kmx\n"
-         "       mcompile [-d] infile.kmx kbdfile.dll kbid outfile.kmx\n"
-         "  With -u parameter, converts keyboard from ANSI to Unicode\n"
-         "  Otherwise, mcompile converts a Keyman mnemonic layout to a\n"
-         "  positional one based on the Windows keyboard\n"
-         "  layout file given by kbdfile.dll\n\n"
-         "  kbid should be a hexadecimal number e.g. 409 for US English\n"
-         "  -d   convert deadkeys to plain keys\n");   // I4552
+     return 1;
+   }
 
-    return 1;
-  }
-//--------u option will be done later----------------------
+//-_S2 -------u option will be done later----------------------
+
  /* if(wcscmp(argv[1], L"-u") == 0) {   // I4273
     wchar_t *infile = argv[2], *outfile = argv[3];
 
@@ -98,28 +113,42 @@ int main(int argc, char *argv[])
   }*/
 //-----------------------------
 
-std::cout<<"*********************************************************************************************";
+
+printf("_S2 *********************************************************************************************\n"); 
+
+    int bDeadkeyConversion = u16cmp(argv[1], u"-d") == 0;   // I4552
+    int n = (bDeadkeyConversion ? 2 : 1);
+
+    char16_t* infile = (char16_t*) argv[n], *indll =  (char16_t*) argv[n+1], *kbid = (char16_t*) argv[n+2], *outfile =  (char16_t*) argv[n+3];
 
 
-/* //in case we use wmain(...wchar_t*)
-  int bDeadkeyConversion = wcscmp(argv[1], L"-d") == 0;   // I4552
-  int n = (bDeadkeyConversion ? 2 : 1);
+// _S2 TODO print 
+ //setlocale(LC_ALL, "");
+printf("_S2 * TUp to here crocc-platform ******************************************************\n"); 
+printf("_S2 * TODO print infile/outfile to console ******************************************************\n"); 
+/*wchar_t* wcp=wchart_from_char16(infile);
+Print_wchar_t(wcp);
 */
+/*wchar_t wt =wchart_from_char16(kbid);
+wchar_t* p_wt = &wt;
+const wchar_t* pr= (const wchar_t*) p_wt;
+std::wstring blub(pr);
+printf("%ls",blub);
 
-  //in case we use main(...char*) and proceed with char
-  int bDeadkeyConversion = strcmp(argv[1], "-d") == 0;   // I4552
-  int n = (bDeadkeyConversion ? 2 : 1);
-  char *infile = argv[n], *indll = argv[n+1], *kbid = argv[n+2], *outfile  = argv[n+3];
-  printf("mcompile%s \"%s\" \"%s\" \"%s\" \"%s\"\n", bDeadkeyConversion ? " -d":"", infile, indll, kbid, outfile);   // I4174
-
-
-/* //in case we use main(...char*) and proceed with wchar_t
-  int bDeadkeyConversion = strcmp(argv[1], "-d") == 0;   // I4552
-  int n = (bDeadkeyConversion ? 2 : 1);
-  char *infile_c = argv[n], *indll_c  = argv[n+1], *kbid_c = argv[n+2], *outfile_c  = argv[n+3];
-  wchar_t *infile = wchart_from_char(infile_c) ,  *indll = wchart_from_char(indll_c) ,  *kbid = wchart_from_char(kbid_c) ,  *outfile = wchart_from_char(outfile_c) ;
-  wprintf(L"mcompile%ls \"%ls\" \"%ls\" \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d":L"", infile, indll, kbid, outfile);   // I4174
+int tukli=345678;
 */
+// wprintf(L"mcompile%ls \"%ls\" \"%ls\" \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d":L"", wchart_from_char16(infile),
+// wchart_from_char16(indll), wchart_from_char16(kbid), wchart_from_char16(outfile)); //  I4174
+// std::wcout << L"mcompile ";
+// if( bDeadkeyConversion ) std::wcout <<  L" -d";
+// else  std::wcout <<  wchart_from_char16(infile)<< wchart_from_char16(indll)<< wchart_from_char16(kbid)<<
+// wchart_from_char16(outfile); //  I4174
+
+
+
+
+
+
 
 /*  // 1. Load the keyman keyboard file
 

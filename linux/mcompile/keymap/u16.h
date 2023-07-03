@@ -11,12 +11,15 @@
 
 
 int dummytest_u16();
+std::vector<std::u16string> convert_argvW_to_Vector_u16str(int argc, wchar_t* argv[]) ;
+std::vector<std::u16string> convert_argv_to_Vector_u16str(int argc, char* argv[]);
 
 wchar_t* wchart_from_char( char* c) ;
 
 std::string string_from_wstring(std::wstring const str);
 std::wstring wstring_from_string(std::string const str);
 std::u16string u16string_from_string(std::string const str);
+std::u16string u16string_from_wstring(std::wstring const wstr);
 std::string string_from_u16string(std::u16string const str);
 
 std::wstring u16fmt(const KMX_WCHAR * str);
