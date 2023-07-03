@@ -3,7 +3,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*/*}/../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # This script runs from its own folder
@@ -27,9 +27,9 @@ builder_describe "Builds Keyman Engine for use on iOS devices - iPhone and iPad.
 
 builder_parse "$@"
 
-CONFIG="release"
+CONFIG="Release"
 if builder_is_debug_build; then
-  CONFIG="debug"
+  CONFIG="Debug"
 fi
 
 builder_describe_outputs \
@@ -137,7 +137,9 @@ function build_engine() {
 
   rm -rf "$BUILD_PATH/$CONFIG-universal"
 
-  run_xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme KME-universal \
+  run_xcodebuild $XCODEFLAGS_EXT \
+            $CODE_SIGN \
+            -scheme KME-universal \
             VERSION=$VERSION \
             VERSION_WITH_TAG=$VERSION_WITH_TAG \
             VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
