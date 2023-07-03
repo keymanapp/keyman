@@ -29,7 +29,7 @@ export class ElemElement {
 export class ElementString extends Array<ElemElement> {
   /**
    * @param source if a string array, does not get reinterpreted as UnicodeSet. This is used with vars, etc. Or pass `["str"]` for an explicit 1-element elem.
-   * If it is a string, will be interpreted per reorder element ruls.
+   * If it is a string, will be interpreted per reorder element rules.
    */
   constructor(sections: DependencySections, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string) {
     super();
@@ -38,9 +38,8 @@ export class ElementString extends Array<ElemElement> {
       return;
     }
 
-    const sourceIsArray = Array.isArray(source);
     let items : ElementSegment[];
-    if (sourceIsArray) {
+    if (Array.isArray(source)) {
       items = source.map(segment => new ElementSegment(segment, ElementType.string));
     } else {
       // use segmenter to analyze each part
