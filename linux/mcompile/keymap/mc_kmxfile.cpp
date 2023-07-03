@@ -279,8 +279,7 @@ KMX_BOOL LoadKeyboard(char16_t* fileName, LPKEYBOARD* lpKeyboard) {
   KMX_DWORD sz_dw = (KMX_DWORD)sz;  //_S2
   size_t sz_t = (size_t)sz;  //_S2
   // shold call VerifyKeyboard_M of class
-  // if(!VerifyKeyboard(filebase, sz_t)) {
-  if (!VerifyKeyboard_S2(filebase, sz_t)) {
+  if (!VerifyKeyboard(filebase, sz_t)) {
     MyCout("##### errVerifyKeyboard", 1);
     // Err(L"errVerifyKeyboard");             //_S2 ToDo find replacement: Err
     // _S2 delete [] buf; ????
@@ -358,45 +357,6 @@ KMX_BOOL VerifyKeyboard(LPBYTE filebase, KMX_DWORD sz) {
 MyCout("will return true",1);
   return TRUE;
 }
-
-
-KMX_BOOL VerifyKeyboard_S2(LPBYTE filebase, KMX_DWORD sz) {
-  KMX_DWORD i;
-  PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD)filebase;
-  PCOMP_STORE csp;
-
-  // Check file version //
-
-  if (ckbp->dwFileVersion < VERSION_MIN || ckbp->dwFileVersion > VERSION_MAX) {
-    // Old or new version -- identify the desired program version //
-    for (csp = (PCOMP_STORE)(filebase + ckbp->dpStoreArray), i = 0; i < ckbp->cxStoreArray; i++, csp++) {
-      if (csp->dwSystemID == TSS_COMPILEDVERSION) {
-        wchar_t buf2[256];
-        if (csp->dpString == 0) {
-          // _S2 wsprintf(buf2, L"errWrongFileVersion:NULL");
-          MyCout("errWrongFileVersion", 1);
-        } else {
-          // _S2 wsprintf(buf2, L"errWrongFileVersion:%10.10ls", StringOffset(filebase, csp->dpString));
-
-          MyCout("errWrongFileVersion-offset", 1);
-        }
-
-        MyCout("err buf", 1);
-        // _S2 Err(buf2);
-        return FALSE;
-      }
-    }
-
-    MyCout("errWrongFileVersion", 1);
-    // _S2 Err(L"errWrongFileVersion");
-    return FALSE;
-  }
-  /**/
-  MyCout("will return true", 1);
-  return TRUE;
-}
-
-
 //---------------------old----------------------------------------
 /*
 #include "pch.h"
