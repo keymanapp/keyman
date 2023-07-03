@@ -263,6 +263,19 @@ export class KmnCompiler implements UnicodeSetParser {
       return null;
     }
   }
+  public sizeUnicodeSet(pattern: string) : number {
+    if(!this.verifyInitialized()) {
+      /* c8 ignore next 2 */
+      return null;
+    }
+    const rc = this.Module.kmcmp_parseUnicodeSet(pattern, 0, 0);
+    if (rc >= 0) {
+      return rc;
+    } else {
+      this.callbacks.reportMessage(getUnicodeSetError(rc));
+      return -1;
+    }
+  }
 }
 
 /**

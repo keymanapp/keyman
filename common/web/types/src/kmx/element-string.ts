@@ -72,7 +72,9 @@ export class ElementString extends Array<ElemElement> {
       let typeFlag = 0;
       if (item.type === ElementType.uset) {
         typeFlag |= constants.elem_flags_type_uset;
-        const uset = sections.usetparser.parseUnicodeSet(item.segment, 100);
+        // TODO-LDML: err on max buffer size
+        const needRanges = sections.usetparser.sizeUnicodeSet(item.segment);
+        const uset = sections.usetparser.parseUnicodeSet(item.segment, needRanges);
         if (!uset) {
           // TODO-LDML - error callback
           throw Error(`Could not parse uset ${item.segment}`);
