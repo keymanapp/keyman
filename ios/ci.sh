@@ -26,7 +26,7 @@ builder_describe "Defines actions for use in CI-related iOS builds." \
 builder_parse "$@"
 
 function do_build() {
-  ./build.sh                         clean configure build --sim-artifact
+  ./build.sh                         clean configure build:engine build:app --sim-artifact
 
   # Since we may be disabling it via build-agent environment variable at times...
   if [ ! -z "${RELEASE_OEM+x}" ]; then
