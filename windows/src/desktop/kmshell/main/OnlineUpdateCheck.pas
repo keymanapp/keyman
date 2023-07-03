@@ -40,7 +40,9 @@ uses
   System.Classes,
   System.SysUtils,
   System.UITypes,
+  System.Types,
   Vcl.Forms,
+  TypInfo,
 
   httpuploader,
   Keyman.System.UpdateCheckResponse,
@@ -49,7 +51,9 @@ uses
 type
   EOnlineUpdateCheck = class(Exception);
 
-  TOnlineUpdateCheckResult = (oucUnknown, oucShutDown, oucSuccess, oucNoUpdates, oucFailure, oucOffline);
+  TOnlineUpdateCheckResult = (oucUnknown, oucShutDown, oucSuccess, oucNoUpdates, oucUpdatesAvailable, oucFailure, oucOffline);
+
+  TUpdateState = (idle, check, download, pending, installing, complete);
 
   TOnlineUpdateCheckParamsPackage = record
     ID: string;
@@ -179,7 +183,8 @@ type
       specified SavePath. This procedure utilizes the kmcom API to install the
       packages.
     }
-    procedure DoInstallKeyman;
+    procedure DoInstallKeyman; overload;
+    procedure DoInstallKeyman(SavePath: string); overload;
     {
       Installs the Keyman file using either msiexec.exe or the setup launched in
       a separate shell.
@@ -196,12 +201,39 @@ type
       tempPath.
     }
     procedure SavePackageUpgradesToDownloadTempPath;
+
+
+   {
+      // RC initially take code from DoRun
+      Performs an online update check, including package retrieval and version
+      query.
+
+      This function checks if a week has passed since the last update check. It
+      utilizes the kmcom API to retrieve the current packages. The function then
+      performs an HTTP request to query the remote versions of these packages.
+      The resulting information is stored in the FParams variable. Additionally,
+      the function handles the main Keyman install package.
+
+      [ It will also set the state registry flag ]
+
+      @returns  A TOnlineUpdateCheckResult indicating the result of the update
+      check.
+    }
+    function CheckForUpdates: TOnlineUpdateCheckResult;
+
+    procedure BackgroundInstall;
+
+
+
+
   public
 
   public
     constructor Create(AOwner: TCustomForm; AForce, ASilent: Boolean);
     destructor Destroy; override;
     function Run: TOnlineUpdateCheckResult;
+    { Run throughs the different states of an updating keyman from in the background }
+    procedure ProcessBackgroundInstall;
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
   end;
 
@@ -542,6 +574,8 @@ begin
   try
     if OpenKey(SRegKey_KeymanEngine_LM, True) then
       WriteString(SRegValue_Install_Update, BoolToStr(True));
+      // TODO: Write to this register value SRegValue_Update_State
+      // Make sure the state transistion makes sense
   finally
     Free;
   end;
@@ -578,6 +612,24 @@ begin
     FResult := TUtilExecute.Shell(0, 'msiexec.exe', '', '/qb /i "'+FParams.Keyman.SavePath+'" AUTOLAUNCHPRODUCT=1')  // I3349
   else if s = '.exe' then
     FResult := TUtilExecute.Shell(0, FParams.Keyman.SavePath, '', '-au')  // I3349
+  else
+    Exit;
+  if not FResult then
+    ShowMessage(SysErrorMessage(GetLastError));
+end;
+
+procedure TOnlineUpdateCheck.DoInstallKeyman(SavePath: string);
+var
+  s: string;
+  FResult: Boolean;
+begin
+  s := LowerCase(ExtractFileExt(SavePath));
+  if s = '.msp' then
+    FResult := TUtilExecute.Shell(0, 'msiexec.exe', '', '/qb /p "'+SavePath+'" AUTOLAUNCHPRODUCT=1')  // I3349
+  else if s = '.msi' then
+    FResult := TUtilExecute.Shell(0, 'msiexec.exe', '', '/qb /i "'+SavePath+'" AUTOLAUNCHPRODUCT=1')  // I3349
+  else if s = '.exe' then
+    FResult := TUtilExecute.Shell(0, SavePath, '', '-au')  // I3349
   else
     Exit;
   if not FResult then
@@ -919,6 +971,316 @@ end;
 function TOnlineUpdateSharedData.Params: TOnlineUpdateCheckParams;
 begin
   Result := FParams;
+end;
+
+
+function SetBackgroundState(Update : TUpdateState): Boolean;  // I2329
+var
+  UpdateStr : string;
+begin
+
+  Result := False;
+  // TODO Ask Marc how to handle the execption and return false
+  with TRegistryErrorControlled.Create do  // I2890
+  try
+    RootKey := HKEY_LOCAL_MACHINE;
+    if OpenKey(SRegKey_KeymanEngine_LM, True) then
+    begin
+        UpdateStr := GetEnumName(TypeInfo(TUpdateState), Ord(Update));
+        Write(SRegValue_Update_State, UpdateStr);
+    end;
+    Result := True;
+  //except
+  //  on E:Exception do
+  //  begin
+   //   Result := False;
+  //  end;
+  finally
+      Free;
+  end;
+
+end;
+
+function CheckBackgroundState : TUpdateState;  // I2329
+var
+  UpdateState : TUpdateState;
+
+begin
+  // We will use a registry flag to maintain the state of the background update
+
+  UpdateState := Idle; // do we need a unknown state ?
+  // check the registry value
+  with TRegistryErrorControlled.Create do  // I2890
+  try
+    RootKey := HKEY_LOCAL_MACHINE;
+    if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_Update_State) then
+        try
+          UpdateState := TUpdateState(GetEnumValue(TypeInfo(TUpdateState), ReadString(SRegValue_Update_State)));
+        except
+          UpdateState := Idle; // do we need a unknown state ?
+        end;
+    finally
+      Free;
+  end;
+  Result := UpdateState;
+end;
+
+procedure TOnlineUpdateCheck.BackgroundInstall;  // I2329
+var
+  Update : Boolean;
+  SavePath: String;
+  fileExt : String;
+  fileName: String;
+  fileNames: TStringDynArray;
+begin
+    // If Keyman is failed to be shutdown then it will exit
+    // the state will remain in background for the next time processbackgoundinstall is called.
+    SavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
+    GetFileNamesInDirectory(SavePath, fileNames);
+    // for now we only want the exe all though excute install can
+    // handle msi and msp
+    for fileName in fileNames do
+    begin
+      fileExt := LowerCase(ExtractFileExt(fileName));
+      if fileExt = '.exe' then
+        break;
+    end;
+    // make sure keyman hasn't started
+    try
+      if kmcom.Control.IsKeymanRunning then
+      try
+        kmcom.Control.StopKeyman;
+      except
+        on E:Exception do
+        begin
+          KL.Log(E.Message);
+          Exit;
+        end;
+      end;
+    except
+      on E:Exception do
+      begin
+        KL.Log(E.Message);
+        Exit;
+      end;
+    end;
+    // Install Keyman
+    //ExecuteInstall(SavePath + ExtractFileName(fileName));
+    DoInstallKeyman(SavePath + ExtractFileName(fileName));
+
+end;
+
+function TOnlineUpdateCheck.CheckForUpdates: TOnlineUpdateCheckResult;
+var
+  flags: DWord;
+  i, n: Integer;
+  pkg: IKeymanPackage;
+  j: Integer;
+  ucr: TUpdateCheckResponse;
+begin
+  {FProxyHost := '';
+  FProxyPort := 0;}
+
+  { Check if user is currently online and don't force dialup dialog to appear if not }
+  if FSilent then
+    if not InternetGetConnectedState(@flags, 0) then
+    begin
+      Result := oucOffline;
+      Exit;
+    end;
+
+  Result := oucNoUpdates;
+
+  try
+    with THTTPUploader.Create(nil) do
+    try
+      ShowUI := not FSilent;
+      Fields.Add('version', ansistring(CKeymanVersionInfo.Version));
+      Fields.Add('tier', ansistring(CKeymanVersionInfo.Tier));
+      if FForce
+        then Fields.Add('manual', '1')
+        else Fields.Add('manual', '0');
+
+      for i := 0 to kmcom.Packages.Count - 1 do
+      begin
+        pkg := kmcom.Packages[i];
+
+        // Due to limitations in PHP parsing of query string parameters names with
+        // space or period, we need to split the parameters up. The legacy pattern
+        // is still supported on the server side. Relates to #4886.
+        Fields.Add(AnsiString('packageid_'+IntToStr(i)), AnsiString(pkg.ID));
+        Fields.Add(AnsiString('packageversion_'+IntToStr(i)), AnsiString(pkg.Version));
+        pkg := nil;
+      end;
+
+      Proxy.Server := GetProxySettings.Server;
+      Proxy.Port := GetProxySettings.Port;
+      Proxy.Username := GetProxySettings.Username;
+      Proxy.Password := GetProxySettings.Password;
+
+      Request.HostName := API_Server;
+      Request.Protocol := API_Protocol;
+      Request.UrlPath := API_Path_UpdateCheck_Windows;
+      //OnStatus :=
+      Upload;
+      if Response.StatusCode = 200 then
+      begin
+        if ucr.Parse(Response.MessageBodyAsString, 'bundle', CKeymanVersionInfo.Version) then
+        begin
+          SetLength(FParams.Packages,0);
+          for i := Low(ucr.Packages) to High(ucr.Packages) do
+          begin
+            n := kmcom.Packages.IndexOf(ucr.Packages[i].ID);
+            if n >= 0 then
+            begin
+              pkg := kmcom.Packages[n];
+              j := Length(FParams.Packages);
+              SetLength(FParams.Packages, j+1);
+              FParams.Packages[j].NewID := ucr.Packages[i].NewID;
+              FParams.Packages[j].ID := ucr.Packages[i].ID;
+              FParams.Packages[j].Description := ucr.Packages[i].Name;
+              FParams.Packages[j].OldVersion := pkg.Version;
+              FParams.Packages[j].NewVersion := ucr.Packages[i].NewVersion;
+              FParams.Packages[j].DownloadSize := ucr.Packages[i].DownloadSize;
+              FParams.Packages[j].DownloadURL := ucr.Packages[i].DownloadURL;
+              FParams.Packages[j].FileName := ucr.Packages[i].FileName;
+              pkg := nil;
+            end
+            else
+              FErrorMessage := 'Unable to find package '+ucr.Packages[i].ID;
+          end;
+
+          case ucr.Status of
+            ucrsNoUpdate:
+              begin
+                FErrorMessage := ucr.ErrorMessage;
+              end;
+            ucrsUpdateReady:
+              begin
+                FParams.Keyman.OldVersion := ucr.CurrentVersion;
+                FParams.Keyman.NewVersion := ucr.NewVersion;
+                FParams.Keyman.DownloadURL := ucr.InstallURL;
+                FParams.Keyman.DownloadSize := ucr.InstallSize;
+                FParams.Keyman.FileName := ucr.FileName;
+              end;
+          end;
+          { TODO: OU instead of showing a form to update it just has to go and download }
+
+          if (Length(FParams.Packages) > 0) or (FParams.Keyman.DownloadURL <> '') then
+          begin
+          // Set State Flag Update available
+            Result := oucUpdatesAvailable;
+          end
+          else
+          begin  // set State Flag Idle
+            Result := oucNoUpdates
+          end;
+        end
+        else
+        begin
+          FErrorMessage := ucr.ErrorMessage;
+          Result := oucFailure;
+        end;
+      end
+      else
+        raise EOnlineUpdateCheck.Create('Error '+IntToStr(Response.StatusCode));
+    finally
+      Free;
+    end;
+  except
+    on E:EHTTPUploader do
+    begin
+      if (E.ErrorCode = 12007) or (E.ErrorCode = 12029)
+        then FErrorMessage := S_OnlineUpdate_UnableToContact
+        else FErrorMessage := WideFormat(S_OnlineUpdate_UnableToContact_Error, [E.Message]);
+      Result := oucFailure;
+    end;
+    on E:Exception do
+    begin
+      FErrorMessage := E.Message;
+      Result := oucFailure;
+    end;
+  end;
+
+  with TRegistryErrorControlled.Create do  // I2890
+  try
+    if OpenKey(SRegKey_KeymanDesktop_CU, True) then
+      WriteDateTime(SRegValue_LastUpdateCheckTime, Now);
+  finally
+    Free;
+  end;
+end;
+
+
+procedure TOnlineUpdateCheck.ProcessBackgroundInstall;  // I2329
+var
+  UpdateState : TUpdateState;
+  CheckResult : TOnlineUpdateCheckResult;
+begin
+// check the registry value
+  UpdateState := CheckBackgroundState;
+  case UpdateState of
+    idle:
+      begin
+      // Do Nothing
+      end;
+    check:
+      begin
+        CheckResult := CheckForUpdates;
+        if CheckResult = oucUpdatesAvailable then
+        begin
+          SetBackgroundState(download);
+          // We can transition straight to download
+          DownloadUpdatesBackground;
+        end
+        else
+          SetBackgroundState(idle);
+      end;
+    download:
+    begin
+      // if we have entered the state from ProcessBackground we need to
+      // check the server again as the download was interupted, and we don't
+      // preser the FParams result.
+      CheckResult := CheckForUpdates;
+        if CheckResult = oucUpdatesAvailable then
+        begin
+          SetBackgroundState(download);
+          // We can transition straight to download
+          DownloadUpdatesBackground;
+        end
+        else
+          SetBackgroundState(idle);
+      // TODO
+    end;
+
+    pending:
+    begin
+      // TODO  Need BackgroundInstall to return a result so we can go
+      // back to idle (abort) and log the error.
+      SetBackgroundState(installing);
+      BackgroundInstall
+
+      // IF BackroundInstall fails then log and set to idle
+      // Else is Successful we need to exit right out of kmshell as we have started
+      // an the install process to execute. We leave the registry value as installing
+      // one installing has finished then the registry value to be set to complete
+      // I also need to consider package updates.
+      // Can the setup.exe program write to the registery to it is complete? is so
+      // will using the msi mean this doesn't work?
+
+    end;
+    installing:
+    begin
+      // TODO if we are in state installing we shouldn't be hear either
+      // So exit and let the msi installer continue.
+    end;
+    complete:
+    begin
+      // TODO  Do any loging updating of files etc and then set back to idle
+    end;
+
+  end;
+
 end;
 
 end.

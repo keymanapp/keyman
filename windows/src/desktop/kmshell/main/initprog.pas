@@ -144,7 +144,6 @@ uses
   utilfocusappwnd,
   utilkmshell,
   utildir,
-  System.Types,
 
   KeyboardTIPCheck,
 
@@ -167,7 +166,6 @@ procedure ExecuteInstall(SavePath: String); forward;
 {
   Starts the install of the cached files
 }
-procedure BackgroundInstall; forward;
 
 procedure Main(Owner: TComponent = nil);
 var
@@ -443,7 +441,14 @@ begin
 
   if (FMode = fmInstallBackground) then
   begin
-    BackgroundInstall();
+    /// Moving this to OnlineUpdateCheck
+  with TOnlineUpdateCheck.Create(nil, True, True) do
+  try
+    ProcessBackgroundInstall
+
+  finally
+    Free;
+  end;
   end;
 
   if not FSilent or (FMode = fmUpgradeMnemonicLayout) then   // I4553
@@ -684,57 +689,5 @@ begin
     KL.Log(SysErrorMessage(GetLastError));
 end;
 
-procedure BackgroundInstall;  // I2329
-var
-  Update : Boolean;
-  SavePath: String;
-  fileExt : String;
-  fileName: String;
-  fileNames: TStringDynArray;
-begin
-// check the registry value
-  Update := False;
-  with TRegistryErrorControlled.Create do  // I2890
-  try
-    RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_Install_Update) then
-        Update := StrToBool(ReadString(SRegValue_Install_Update));
-    finally
-      Free;
-  end;
-  if Update then
-  begin
-      SavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
-      GetFileNamesInDirectory(SavePath, fileNames);
-      // for now we only want the exe all though excute install can
-      // handle msi and msp
-      for fileName in fileNames do
-      begin
-        fileExt := LowerCase(ExtractFileExt(fileName));
-        if fileExt = '.exe' then
-          break;
-      end;
-      // make sure keyman hasn't started
-      try
-        if kmcom.Control.IsKeymanRunning then
-        try
-          kmcom.Control.StopKeyman;
-        except
-          on E:Exception do
-          begin
-            KL.Log(E.Message);
-            Exit;
-          end;
-        end;
-      except
-        on E:Exception do
-        begin
-          KL.Log(E.Message);
-          Exit;
-        end;
-      end;
-      ExecuteInstall(SavePath + ExtractFileName(fileName));
-   end;
-end;
 
 end.

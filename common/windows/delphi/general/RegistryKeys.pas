@@ -296,7 +296,8 @@ const
 
   SRegValue_LanguageCheckDisabledItems = 'language check disabled items'; // CU
 
-  SRegValue_Install_Update = 'install update';
+  SRegValue_Install_Update             = 'install update';
+  SRegValue_Update_State               = 'update state';
 
 {-------------------------------------------------------------------------------
  - Keyman Developer keys and values                                            -
