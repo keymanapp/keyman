@@ -8,11 +8,16 @@ function do_build() {
   cp -Rf "$KEYMAN_ENGINE_FRAMEWORK_SRC" "$KEYMAN_ENGINE_FRAMEWORK_DST"
 
   CODE_SIGN=
-  if builder_is_debug_build; then
+  # `builder_is_debug_build` appears to fail here, while referring to the option does not?
+  # Perhaps it's due to the main build definition being within a function?
+  if builder_has_option --debug; then
     CODE_SIGN=CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED="NO" CODE_SIGNING_ENTITLEMENTS=""
   fi
 
-  run_xcodebuild -quiet $CODE_SIGN -target "$TARGET" -config "$CONFIG"
+  run_xcodebuild -quiet \
+                 $CODE_SIGN \
+                 -target "$TARGET" \
+                 -config "$CONFIG"
 }
 
 function execute_sample_build() {
