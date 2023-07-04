@@ -61,9 +61,16 @@ export class TouchLayoutFileWriter {
       }
       if(Object.hasOwn(key, 'width')) (key.width as any) = key.width.toString();
       if(Object.hasOwn(key, 'text') && key.text === '') delete key.text;
+      if(Object.hasOwn(key, 'id') && <string>key.id === '') delete key.id;
     };
 
     const fixupPlatform = (platform: TouchLayoutPlatform) => {
+      // font and fontsize are eliminated if nullish:
+      if(Object.hasOwn(platform,'font') && platform.font == '') delete platform.font;
+      if(Object.hasOwn(platform,'fontsize') && platform.fontsize == '') delete platform.fontsize;
+      // displayUnderlying is always written out by kmcomp, so we do the same for kmc:
+      platform.displayUnderlying = !!platform.displayUnderlying;
+
       for(let layer of platform.layer) {
         for(let row of layer.row) {
           // this matches the old spec for touch layout files
