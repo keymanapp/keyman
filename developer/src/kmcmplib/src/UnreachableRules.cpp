@@ -14,7 +14,7 @@
 #include "UnreachableRules.h"
 
 namespace kmcmp {
-    std::wstring MakeHashKeyFromFileKey(PFILE_KEY kp) {
+  std::wstring MakeHashKeyFromFileKey(PFILE_KEY kp) {
     std::wstringstream key;
     key << kp->Key << "," << kp->ShiftFlags << ",";
     if (kp->dpContext) {

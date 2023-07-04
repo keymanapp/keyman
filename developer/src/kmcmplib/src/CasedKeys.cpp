@@ -14,6 +14,8 @@ namespace kmcmp {
   extern KMX_BOOL FMnemonicLayout; // TODO: these globals should be consolidated one day
 }
 
+bool resizeKeyArray(PFILE_GROUP gp, int increment = 1);
+
 KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp);
 
 KMX_DWORD VerifyCasedKeys(PFILE_STORE sp) {
@@ -127,17 +129,14 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
   }
 
   // This key is modified by Caps Lock, so we need to duplicate this rule
-  PFILE_KEY k = new FILE_KEY[gp->cxKeyArray + 1];
-  if (!k) return CERR_CannotAllocateMemory;
-  memcpy(k, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
-
-  kpp = &k[(int)(kpp - gp->dpKeyArray)];
-
-  delete[] gp->dpKeyArray;
-  gp->dpKeyArray = k;
+  int offset = (int)(kpp - gp->dpKeyArray);
+  if(!resizeKeyArray(gp)) {
+    return CERR_CannotAllocateMemory;
+  }
+  kpp = &gp->dpKeyArray[offset];
   gp->cxKeyArray++;
 
-  k = &k[gp->cxKeyArray - 1];
+  PFILE_KEY k = &gp->dpKeyArray[gp->cxKeyArray - 1];
   k->dpContext = new KMX_WCHAR[u16len(kpp->dpContext) + 1];
   k->dpOutput  = new KMX_WCHAR[u16len(kpp->dpOutput) + 1];
   u16cpy(k->dpContext, kpp->dpContext );  // copy the context.

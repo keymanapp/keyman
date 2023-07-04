@@ -167,6 +167,9 @@ KMX_DWORD process_expansion(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, in
 
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
 
+bool resizeStoreArray(PFILE_KEYBOARD fk);
+bool resizeKeyArray(PFILE_GROUP gp, int increment = 1);
+
 const KMX_WCHAR * LineTokens[] = {
    u"SVNBHBGMNSCCLLCMLB",  u"store",  u"VERSION ",  u"NAME ",
    u"BITMAP ",  u"HOTKEY ",  u"begin",  u"group",  u"match",  u"nomatch",
@@ -732,16 +735,9 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
     if (!StoreTokens[i]) return CERR_InvalidSystemStore;
   }
 
-  sp = new FILE_STORE[fk->cxStoreArray + 1];
-  if (!sp) return CERR_CannotAllocateMemory;
-
-  if (fk->dpStoreArray)
-  {
-    memcpy(sp, fk->dpStoreArray, sizeof(FILE_STORE) * fk->cxStoreArray);
-    delete[] fk->dpStoreArray;
+  if(!resizeStoreArray(fk)) {
+    return CERR_CannotAllocateMemory;
   }
-
-  fk->dpStoreArray = sp;
   sp = &fk->dpStoreArray[fk->cxStoreArray];
 
   sp->line = kmcmp::currentLine;
@@ -790,19 +786,47 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   return CheckForDuplicateStore(fk, sp);
 }
 
+bool resizeStoreArray(PFILE_KEYBOARD fk) {
+  if(fk->cxStoreArray % 100 == 0) {
+    PFILE_STORE sp = new FILE_STORE[fk->cxStoreArray + 100];
+    if (!sp) return false;
+
+    if (fk->dpStoreArray)
+    {
+      memcpy(sp, fk->dpStoreArray, sizeof(FILE_STORE) * fk->cxStoreArray);
+      delete[] fk->dpStoreArray;
+    }
+
+    fk->dpStoreArray = sp;
+  }
+  return true;
+}
+
+/**
+ * reallocates the key array in increments of 100
+ */
+bool resizeKeyArray(PFILE_GROUP gp, int increment) {
+  if((gp->cxKeyArray + increment - 1) % 100 < increment) {
+    PFILE_KEY kp = new FILE_KEY[((gp->cxKeyArray + increment)/100 + 1) * 100];
+    if (!kp) return false;
+    if (gp->dpKeyArray)
+    {
+      memcpy(kp, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
+      delete[] gp->dpKeyArray;
+    }
+
+    gp->dpKeyArray = kp;
+  }
+  return true;
+}
+
 KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, const KMX_WCHAR * str, KMX_DWORD *dwStoreID)
 {
   PFILE_STORE sp;
-  sp = new FILE_STORE[fk->cxStoreArray + 1];
-  if (!sp) return CERR_CannotAllocateMemory;
-
-  if (fk->dpStoreArray)
-  {
-    memcpy(sp, fk->dpStoreArray, sizeof(FILE_STORE) * fk->cxStoreArray);
-    delete[] fk->dpStoreArray;
+  if(!resizeStoreArray(fk)) {
+    return CERR_CannotAllocateMemory;
   }
 
-  fk->dpStoreArray = sp;
   sp = &fk->dpStoreArray[fk->cxStoreArray];
 
   sp->line = kmcmp::currentLine;
@@ -832,16 +856,9 @@ KMX_DWORD AddDebugStore(PFILE_KEYBOARD fk, KMX_WCHAR const * str)
   KMX_WCHAR tstr[16];
   u16sprintf(tstr, _countof(tstr), L"%d", kmcmp::currentLine);  // I3481
 
-  sp = new FILE_STORE[fk->cxStoreArray + 1];
-  if (!sp) return CERR_CannotAllocateMemory;
-
-  if (fk->dpStoreArray)
-  {
-    memcpy(sp, fk->dpStoreArray, sizeof(FILE_STORE) * fk->cxStoreArray);
-    delete[] fk->dpStoreArray;
+  if(!resizeStoreArray(fk)) {
+    return CERR_CannotAllocateMemory;
   }
-
-  fk->dpStoreArray = sp;
   sp = &fk->dpStoreArray[fk->cxStoreArray];
 
   safe_wcsncpy(sp->szName, (PKMX_WCHAR) str, SZMAX_STORENAME);
@@ -1463,15 +1480,10 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
     }
   }
 
-  kp = new FILE_KEY[gp->cxKeyArray + 1];
-  if (!kp) return CERR_CannotAllocateMemory;
-  if (gp->dpKeyArray)
-  {
-    memcpy(kp, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
-    delete[] gp->dpKeyArray;
+  if(!resizeKeyArray(gp)) {
+    return CERR_CannotAllocateMemory;
   }
 
-  gp->dpKeyArray = kp;
   kp = &gp->dpKeyArray[gp->cxKeyArray];
 
   gp->cxKeyArray++;
@@ -1581,14 +1593,13 @@ KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
    and set the keystroke to the appropriate character in the store.
   */
 
-  k = new FILE_KEY[gp->cxKeyArray + nchrs - 1];
-  if (!k) return CERR_CannotAllocateMemory;
-  memcpy(k, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
+  int offset = (int)(kpp - gp->dpKeyArray);
 
-  kpp = &k[(int)(kpp - gp->dpKeyArray)];
+  if (!resizeKeyArray(gp, nchrs)) {
+    return CERR_CannotAllocateMemory;
+  }
 
-  delete[] gp->dpKeyArray;
-  gp->dpKeyArray = k;
+  kpp = &gp->dpKeyArray[offset];
   gp->cxKeyArray += nchrs - 1;
 
   for (k = kpp, n = 0, pn = sp->dpString; *pn; pn = incxstr(pn), k++, n++)
@@ -3132,14 +3143,7 @@ KMX_DWORD ReadLine(KMX_BYTE* infile, int sz, int& offset, PKMX_WCHAR wstr, KMX_B
     return CERR_EndOfFile;
   }
 
-  // neccessary to add this block for using on non-windows platforms (removes all \r for platforms that use \n instead of \r\n)
-  for (p = str, n = 0; n < len; n++, p++) {
-    if (*p == L'\r')
-      *p = L' ';
-  }
 
-  // \r is still left in this block even though Linux doesn`t use \r.
-  // This is to ensure to still have a working windows-only-version
   for (p = str, n = 0; n < len; n++, p++)
   {
     if (currentQuotes != 0)

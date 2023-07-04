@@ -15,7 +15,12 @@ export class KmxFileReader {
       // string ('')
       return null;
     }
-    return this.rString.fromBuffer(source.slice(offset));
+    // The following two lines are equivalent to :
+    //   return this.rString.fromBuffer(source.slice(offset));
+    // but is much faster because it is a read-only view into
+    // the data rather than a copy
+    const data = new Uint8Array(source.buffer, source.byteOffset + offset);
+    return this.rString.fromBuffer(data);
   }
 
   private isValidCodeUse(s: string, keyboard: KEYBOARD): boolean {
@@ -99,7 +104,8 @@ export class KmxFileReader {
   private readGroupsAndRules(binaryKeyboard: BUILDER_COMP_KEYBOARD, kmx: KMXFile, source: Uint8Array, result: KEYBOARD) {
     let offset = binaryKeyboard.dpGroupArray;
     for (let i = 0; i < binaryKeyboard.cxGroupArray; i++) {
-      let binaryGroup = kmx.COMP_GROUP.fromBuffer(source.slice(offset));
+      const data = new Uint8Array(source.buffer, source.byteOffset + offset);
+      let binaryGroup = kmx.COMP_GROUP.fromBuffer(data);
       let group = new GROUP();
       group.dpMatch = this.readString(source, binaryGroup.dpMatch);
       group.dpName = this.readString(source, binaryGroup.dpName);
@@ -109,7 +115,8 @@ export class KmxFileReader {
 
       let keyOffset = binaryGroup.dpKeyArray;
       for (let j = 0; j < binaryGroup.cxKeyArray; j++) {
-        let binaryKey = kmx.COMP_KEY.fromBuffer(source.slice(keyOffset));
+        const keyData = new Uint8Array(source.buffer, source.byteOffset + keyOffset);
+        let binaryKey = kmx.COMP_KEY.fromBuffer(keyData);
         let key = new KEY();
         key.Key = binaryKey.Key;
         key.Line = binaryKey.Line;
@@ -128,7 +135,8 @@ export class KmxFileReader {
   private readStores(binaryKeyboard: BUILDER_COMP_KEYBOARD, kmx: KMXFile, source: Uint8Array, result: KEYBOARD): void {
     let offset = binaryKeyboard.dpStoreArray;
     for (let i = 0; i < binaryKeyboard.cxStoreArray; i++) {
-      let binaryStore = kmx.COMP_STORE.fromBuffer(source.slice(offset));
+      const data = new Uint8Array(source.buffer, source.byteOffset + offset);
+      let binaryStore = kmx.COMP_STORE.fromBuffer(data);
       let store = new STORE();
       store.dwSystemID = binaryStore.dwSystemID;
       store.dpName = this.readString(source, binaryStore.dpName);
