@@ -131,7 +131,7 @@ export default class KVKSFileReader {
           let key: VisualKeyboardKey = {
             flags: isUnicode ? VisualKeyboardKeyFlags.kvkkUnicode : 0, // TODO-LDML: bitmap support
             shift: shift,
-            text: sourceKey._ ?? '',
+            text: sourceKey.bitmap ? '' : (sourceKey._ ?? ''),
             vkey: vkey
           }
           result.keys.push(key);
