@@ -57,8 +57,7 @@ export class KeysCompiler extends SectionCompiler {
           valid = this.validateHardwareLayerForKmap(layers.form, layer) && valid; // note: always validate even if previously invalid results found
         }
       }
-    } else {
-      // TODO-LDML: Touch?
+      // TODO-LDML: } else { touch?
     }
 
     return valid;
@@ -67,6 +66,7 @@ export class KeysCompiler extends SectionCompiler {
   public compile(sections: DependencySections): Keys {
     if (!this.keyboard?.keys?.key && !this.keyboard?.keys?.flicks) {
       // short-circuit if no keys or flicks
+      // TODO-LDML: coverage for this case?
       return null;
     }
 
@@ -81,6 +81,7 @@ export class KeysCompiler extends SectionCompiler {
     // Finally, kmap
     // Use LayerMap + keys to generate compiled keys for hardware
     const hardwareLayers = this.hardwareLayers();
+    /* c8 ignore next 3 */
     if (hardwareLayers.length > 1) {
       // validation should have already caught this
       throw Error(`Internal error: Expected 0 or 1 hardware layer, not ${hardwareLayers.length}`);
@@ -176,6 +177,7 @@ export class KeysCompiler extends SectionCompiler {
 
     const keymap = Constants.HardwareToKeymap.get(hardware);
     if (!keymap) {
+      // TODO-LDML: coverage
       this.callbacks.reportMessage(CompilerMessages.Error_InvalidHardware({ form: hardware }));
       valid = false;
     }
