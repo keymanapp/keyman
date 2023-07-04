@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 17.0.133 alpha 2023-07-04
+
+* feat(common): add segmenter for element strings (#9141)
+* fix(windows): adds an extra row for Change Hotkey text label (#9149)
+* fix(linux): Another attempt to fix packaging GHA (#9155)
+* fix(linux): Fix packaging GHA (#9164)
+* fix(linux): Fix packaging GHA (#9169)
+
 ## 17.0.132 alpha 2023-06-30
 
 * docs(mac): Update requirements.md (#9137)
