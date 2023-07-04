@@ -113,9 +113,8 @@ jobs:
         path: artifacts
 
     - name: Build
-      uses: sillsdev/gha-ubuntu-packaging@32ebcd2aa0c163a750e6a3aa58e03089af811a7e # v0.5
+      uses: sillsdev/gha-ubuntu-packaging@01e19837bcf45ec522dd7b091970efd12ce8f3ad # v0.6
       with:
-        github_token: "${{secrets.GITHUB_TOKEN}}"
         dist: "${{ matrix.dist }}"
         platform: "${{ matrix.arch }}"
         source_dir: "artifacts/keyman-srcpkg"
