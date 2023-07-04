@@ -36,7 +36,7 @@ describe('layr', function () {
     assert.equal(layer0.rows.length, 1);
     const row0 = layer0.rows[0];
     assert.ok(row0);
-    assert.equal(row0.keys.length, 1);
+    assert.equal(row0.keys.length, 2);
 
     assert.equal(layer0.id.value, 'base');
     assert.equal(layer0.mod, constants.keys_mod_none);

@@ -250,7 +250,6 @@ COMP_KMXPLUS_STRS::valid(KMX_DWORD _kmn_unused(length)) const {
     return false;
   }
   for (KMX_DWORD i=0; i<count; i++) {
-    DebugLog("#0x%X: ...", i);
     KMX_DWORD offset = entries[i].offset;
     KMX_DWORD length = entries[i].length;
     if(offset+((length+1)*2) > header.size) {
@@ -266,10 +265,22 @@ COMP_KMXPLUS_STRS::valid(KMX_DWORD _kmn_unused(length)) const {
       return false;
     }
     // TODO-LDML: validate valid UTF-16LE?
-    DebugLog("#0x%X: '%s'", i, Debug_UnicodeString(start));
+    DebugLog("strs #0x%X: '%s'", i, Debug_UnicodeString(start));
   }
   return true;
 }
+
+/**
+ * helper for extracting single char values
+ * @param v field with char type
+ * @return value a string
+ */
+std::u16string COMP_KMXPLUS_STRS::str_from_char(KMX_DWORD v) {
+  char16_single buf;
+  const int len = Utf32CharToUtf16(v, buf);
+  return std::u16string(buf.ch, len);
+}
+
 
 bool
 COMP_KMXPLUS_SECT::valid(KMX_DWORD length) const {
@@ -358,12 +369,11 @@ COMP_KMXPLUS_ELEM::getElementList(KMX_DWORD elementNumber, KMX_DWORD &length) co
   return reinterpret_cast<const COMP_KMXPLUS_ELEM_ELEMENT *>(rawdata + entry.offset);
 }
 
+
 std::u16string
-COMP_KMXPLUS_ELEM_ELEMENT::get_string() const {
-  assert(!(flags & LDML_ELEM_FLAGS_UNICODE_SET)); // should not be called.
-  char16_single buf;
-  const int len = Utf32CharToUtf16(element, buf);
-  return std::u16string(buf.ch, len);
+COMP_KMXPLUS_ELEM_ELEMENT::get_element_string() const {
+  assert((flags & LDML_ELEM_FLAGS_TYPE) == LDML_ELEM_FLAGS_TYPE_CHAR); // should only be called on char
+  return COMP_KMXPLUS_STRS::str_from_char(element);
 }
 
 // Note: shared with subclass COMP_KMXPLUS_BKSP
@@ -382,6 +392,40 @@ COMP_KMXPLUS_TRAN::valid(KMX_DWORD _kmn_unused(length)) const {
 COMP_KMXPLUS_TRAN_Helper::COMP_KMXPLUS_TRAN_Helper()
     : tran(nullptr), is_valid(false), groups(nullptr), transforms(nullptr), reorders(nullptr) {
 }
+
+bool COMP_KMXPLUS_TRAN_Helper::valid() const {
+  return is_valid;
+}
+
+const COMP_KMXPLUS_TRAN_GROUP *
+COMP_KMXPLUS_TRAN_Helper::getGroup(KMX_DWORD group) const {
+  if (!valid() || group >= tran->groupCount) {
+    assert(false);
+    return nullptr;
+  }
+  return groups + group;
+}
+
+
+const COMP_KMXPLUS_TRAN_TRANSFORM *
+COMP_KMXPLUS_TRAN_Helper::getTransform(KMX_DWORD transform) const {
+  if (!valid() || transform >= tran->transformCount) {
+    assert(false);
+    return nullptr;
+  }
+  return transforms + transform;
+}
+
+
+const COMP_KMXPLUS_TRAN_REORDER *
+COMP_KMXPLUS_TRAN_Helper::getReorder(KMX_DWORD reorder) const {
+  if (!valid() || reorder >= tran->reorderCount) {
+    assert(false);
+    return nullptr;
+  }
+  return reorders + reorder;
+}
+
 
 bool
 COMP_KMXPLUS_TRAN_Helper::setTran(const COMP_KMXPLUS_TRAN *newTran) {
@@ -722,13 +766,14 @@ COMP_KMXPLUS_KEYS_Helper::setKeys(const COMP_KMXPLUS_KEYS *newKeys) {
       DebugLog("<flick> %d: to=0x%X, directions=0x%X, flags=0x%X", i, e.to, e.directions, e.flags);
     }
     // now the kmap
-    DebugLog(" kmap count: #0x%X\n", key2->kmapCount);
+    DebugLog(" kmap count: #0x%X", key2->kmapCount);
     for (KMX_DWORD i = 0; i < key2->kmapCount; i++) {
-      DebugLog(" #0x%d\n", i);
+      // These are pretty noisy, drop them from the log
+      // DebugLog(" #0x%d\n", i);
       auto &entry = kmap[i];
-      DebugLog("  vkey\t0x%X\n", entry.vkey);
-      DebugLog("  mod\t0x%X\n", entry.mod);
-      DebugLog("  key\t#0x%X\n", entry.key);
+      // DebugLog("  vkey\t0x%X", entry.vkey);
+      // DebugLog("  mod\t0x%X", entry.mod);
+      // DebugLog("  key\t#0x%X", entry.key);
       if (!LDML_IS_VALID_MODIFIER_BITS(entry.mod)) {
         DebugLog("Invalid modifier value");
         assert(false);
@@ -768,9 +813,13 @@ COMP_KMXPLUS_KEYS_Helper::findKeyByStringId(KMX_DWORD strId, KMX_DWORD &i) const
 }
 
 const COMP_KMXPLUS_KEYS_KEY*
-COMP_KMXPLUS_KEYS_Helper::findKeyByStringTo(KMX_DWORD strId, KMX_DWORD &i) const {
+COMP_KMXPLUS_KEYS_Helper::findKeyByStringTo(const std::u16string& str, KMX_DWORD strId, KMX_DWORD &i) const {
   for (; i < key2->keyCount; i++) {
-    if (keys[i].to == strId) {
+    if (keys[i].flags & LDML_KEYS_KEY_FLAGS_EXTEND) {
+      if (strId != 0 && keys[i].to == strId) {
+        return &keys[i];
+      }
+    } else if (keys[i].get_to_string() == str) {
       return &keys[i];
     }
   }
@@ -805,11 +854,9 @@ COMP_KMXPLUS_KEYS_Helper::getKmap(KMX_DWORD i) const {
 }
 
 std::u16string
-COMP_KMXPLUS_KEYS_KEY::get_string() const {
+COMP_KMXPLUS_KEYS_KEY::get_to_string() const {
   assert(!(flags & LDML_KEYS_KEY_FLAGS_EXTEND)); // should not be called.
-  char16_single buf;
-  const int len = Utf32CharToUtf16(to, buf);
-  return std::u16string(buf.ch, len);
+  return COMP_KMXPLUS_STRS::str_from_char(to);
 }
 
 // LIST
@@ -909,10 +956,9 @@ COMP_KMXPLUS_LIST_Helper::getIndex(KMX_DWORD i) const {
 // ---- constructor
 
 kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
-    : loca(nullptr), meta(nullptr),
-      sect(nullptr), strs(nullptr), vkey(nullptr), valid(false) {
-
-  DebugLog("kmx_plus(): Got a COMP_KEYBOARD at %p\n", keyboard);
+    : bksp(nullptr), disp(nullptr), elem(nullptr), key2(nullptr), layr(nullptr), list(nullptr), loca(nullptr), meta(nullptr),
+      sect(nullptr), strs(nullptr), tran(nullptr), vars(nullptr), vkey(nullptr), valid(false) {
+  DebugLog("kmx_plus: Got a COMP_KEYBOARD at %p\n", keyboard);
   if (!(keyboard->dwFlags & KF_KMXPLUS)) {
     DebugLog("Err: flags COMP_KEYBOARD.dwFlags did not have KF_KMXPLUS set");
     valid = false;
@@ -922,7 +968,7 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
   const COMP_KEYBOARD_EX* ex = reinterpret_cast<const COMP_KEYBOARD_EX*>(keyboard);
 
   DebugLog("kmx_plus(): KMXPlus offset 0x%X, KMXPlus size 0x%X\n", ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize);
-  if (ex->kmxplus.dpKMXPlus < sizeof(kmx::COMP_KEYBOARD_EX)) {
+  if (ex->kmxplus.dpKMXPlus < sizeof(COMP_KEYBOARD_EX)) {
     DebugLog("dwKMXPlus is not past the end of COMP_KEYBOARD_EX");
     valid = false;
     assert(valid);
@@ -955,6 +1001,7 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     meta = section_from_sect<COMP_KMXPLUS_META>(sect);
     strs = section_from_sect<COMP_KMXPLUS_STRS>(sect);
     tran = section_from_sect<COMP_KMXPLUS_TRAN>(sect);
+    vars = section_from_sect<COMP_KMXPLUS_VARS>(sect);
     vkey = section_from_sect<COMP_KMXPLUS_VKEY>(sect);
 
     // calculate and validate the dynamic parts

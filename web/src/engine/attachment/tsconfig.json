@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.dom.json",
+
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "../../../build/engine/attachment/obj/",
+    "tsBuildInfoFile": "../../../build/engine/attachment/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
+  },
+
+  "include": [ "src/**/*.ts" ],
+
+  "references": [
+    { "path": "../dom-utils" },
+    { "path": "../element-wrappers" }
+  ]
+}

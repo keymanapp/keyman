@@ -2,7 +2,7 @@ import { constants } from '@keymanapp/ldml-keyboard-constants';
 import * as r from 'restructure';
 import { ElementString } from './element-string.js';
 import { ListItem } from './string-list.js';
-import { unescapeString } from '../util/util.js';
+import { isOneChar, toOneChar, unescapeString } from '../util/util.js';
 import { KMXFile } from './kmx.js';
 import { UnicodeSetParser, UnicodeSet } from '@keymanapp/common-types';
 import { VariableParser } from '../ldml-keyboard/pattern-parser.js';
@@ -87,13 +87,28 @@ export class Name extends Section {
  * into the string table at finalization.
  */
 export class StrsItem {
+  /** string value */
   readonly value: string;
-  constructor(value: string) {
+  /** char value if this is a single-char placeholder item (CharStrsItem) */
+  readonly char?: number;
+
+  constructor(value: string, char?: number) {
+    if (char !== undefined) {
+      if (!isOneChar(value)) {
+        throw new Error(`StrsItem: ${value} is not a single char`);
+      }
+      if (char !== toOneChar(value)) {
+        throw new Error(`StrsItem: ${char} is not the right codepoint for ${value}`);
+      }
+    }
     this.value = value;
+    this.char = char;
   }
+
   compareTo(o: StrsItem): number {
     return StrsItem.binaryStringCompare(this.value, o.value);
   }
+
   static binaryStringCompare(a: string, b: string): number {
     // https://tc39.es/ecma262/multipage/abstract-operations.html#sec-islessthan
     if(typeof a != 'string' || typeof b != 'string') {
@@ -103,6 +118,22 @@ export class StrsItem {
     if(a > b) return 1;
     return 0;
   }
+
+  get isOneChar() {
+    return this.char !== undefined;
+  }
+};
+
+/**
+ * A StrsItem for a single char. Used as a placeholder and hint to the builder
+ */
+export class CharStrsItem extends StrsItem {
+  constructor(value: string) {
+    if (!isOneChar(value)) {
+      throw RangeError(`not a 1-char string`);
+    }
+    super(value, toOneChar(value));
+  }
 };
 
 export class Strs extends Section {
@@ -110,17 +141,19 @@ export class Strs extends Section {
   /**
    * Allocate a StrsItem given the string, unescaping if necessary.
    * @param s escaped string
+   * @param singleOk if true, allocate a CharStrsItem (not in strs table) if single-char capable.
    * @returns
    */
-  allocAndUnescapeString(s?: string): StrsItem {
-    return this.allocString(unescapeString(s));
+  allocAndUnescapeString(s?: string, singleOk?: boolean): StrsItem {
+    return this.allocString(unescapeString(s), singleOk);
   }
   /**
    * Allocate a StrsItem given the string.
    * @param s string
+   * @param singleOk if true, allocate a CharStrsItem (not in strs table) if single-char capable.
    * @returns
    */
-  allocString(s?: string): StrsItem {
+  allocString(s?: string, singleOk?: boolean): StrsItem {
     if(s === undefined || s === null) {
       // undefined or null are always equivalent to empty string, see C7043
       s = '';
@@ -128,6 +161,11 @@ export class Strs extends Section {
 
     if(typeof s !== 'string') {
       throw new Error('alloc_string: s must be a string, undefined, or null.');
+    }
+
+    // if it's a single char, don't push it into the list
+    if (singleOk && isOneChar(s)) {
+      return new CharStrsItem(s);
     }
 
     let result = this.strings.find(item => item.value === s);
@@ -328,6 +366,27 @@ export class Tran extends Section {
   }
 };
 
+export class UsetItem {
+  constructor(public uset: UnicodeSet, public str: StrsItem) {
+  }
+  compareTo(other: UsetItem) : number {
+    return this.str.compareTo(other.str);
+  }
+};
+
+export class Uset extends Section {
+  usets: UsetItem[] = [];
+  allocUset(set: UnicodeSet, sections: DependencySections) : UsetItem {
+    // match the same pattern
+    let result = this.usets.find(s => set.pattern == s.uset.pattern);
+    if (result === undefined) {
+      result = new UsetItem(set, sections.strs.allocString(set.pattern));
+      this.usets.push(result);
+    }
+    return result;
+  }
+};
+
 // alias type for 'bksp'
 export class Bksp extends Tran {
   override get id() {
@@ -497,6 +556,7 @@ export interface KMXPlusData {
     name?: Name;
     strs?: Strs; // strs is ignored in-memory
     tran?: Tran;
+    uset?: Uset; // uset is ignored in-memory
     vars?: Vars;
     vkey?: Vkey;
 };
@@ -552,6 +612,10 @@ export class KMXPlusFile extends KMXFile {
   public readonly COMP_PLUS_TRAN_TRANSFORM: any;
   public readonly COMP_PLUS_TRAN_REORDER: any;
   public readonly COMP_PLUS_TRAN: any;
+
+  public readonly COMP_PLUS_USET_USET: any;
+  public readonly COMP_PLUS_USET_RANGE: any;
+  public readonly COMP_PLUS_USET: any;
 
   public readonly COMP_PLUS_VKEY_ITEM: any;
   public readonly COMP_PLUS_VKEY: any;
@@ -807,6 +871,27 @@ export class KMXPlusFile extends KMXFile {
       groups: new r.Array(this.COMP_PLUS_TRAN_GROUP, 'groupCount'),
       transforms: new r.Array(this.COMP_PLUS_TRAN_TRANSFORM, 'transformCount'),
       reorders: new r.Array(this.COMP_PLUS_TRAN_REORDER, 'reorderCount'),
+    });
+
+    // 'uset'
+    this.COMP_PLUS_USET_USET = new r.Struct({
+      range: r.uint32le,
+      count: r.uint32le,
+      pattern: r.uint32le, // str
+    });
+
+    this.COMP_PLUS_USET_RANGE = new r.Struct({
+      start: r.uint32le,
+      end: r.uint32le,
+    });
+
+    this.COMP_PLUS_USET = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      usetCount: r.uint32le,
+      rangeCount: r.uint32le,
+      usets: new r.Array(this.COMP_PLUS_USET_USET, 'usetCount'),
+      ranges: new r.Array(this.COMP_PLUS_USET_RANGE, 'rangeCount'),
     });
 
     // 'vars'

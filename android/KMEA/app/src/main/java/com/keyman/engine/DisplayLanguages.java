@@ -45,6 +45,7 @@ public class DisplayLanguages {
       new DisplayLanguageType("cs-CZ", "čeština (Czech)"),
       new DisplayLanguageType("ff-NG", "Ɗemngal Fulfulde"),
       new DisplayLanguageType("en", "English"),
+      new DisplayLanguageType("es-ES", "Español (Spanish)"),
       new DisplayLanguageType("es-419", "Español (Spanish - Latin America)"),
       new DisplayLanguageType("fr-FR", "French"),
       new DisplayLanguageType("ha-HG", "Hausa"),

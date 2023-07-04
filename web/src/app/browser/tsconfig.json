@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.dom.json",
+
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "../../../build/app/browser/obj/",
+    "rootDir": "./src",
+    "tsBuildInfoFile": "../../../build/app/browser/obj/tsconfig.tsbuildinfo"
+  },
+
+  "include": [ "**/*.ts" ],
+
+  "references": [
+    { "path": "../../engine/attachment" },
+    { "path": "../../engine/main" }
+  ]
+}

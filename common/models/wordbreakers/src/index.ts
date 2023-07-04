@@ -1,8 +1,5 @@
-/// <reference path="./ascii.ts" />
-/// <reference path="./default/index.ts" />
-/// <reference path="./placeholder.ts" />
+import placeholder from "./placeholder.js";
+import ascii from "./ascii.js";
+import default_ from "./default/index.js";
 
-// Let the word breakers be available both in the browser and in Node.
-if (typeof module !== "undefined" && (module as any).exports) {
-  (module as any).exports['wordBreakers'] = wordBreakers;
-}
+export { placeholder, ascii, default_ as default, default_ as defaultWordbreaker };
