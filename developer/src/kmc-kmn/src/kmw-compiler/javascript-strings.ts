@@ -61,9 +61,8 @@ export function JavaScript_Store(fk: KMX.KEYBOARD, line: number, pwsz: string): 
         }
         result += JavaScript_String(ch);  // I2242
       }
-
-      const stringStartsWithSurrogatePair = (s:string) => /^[\uD800-\uDBFF][\uDC00-\uDFFF]/.test(s);
-      pwsz = pwsz.substring(stringStartsWithSurrogatePair(pwsz) ? 2 : 1);
+      const x = incxstr(pwsz, 0);
+      pwsz = pwsz.substring(x);
     }
     result += '"';
   }
