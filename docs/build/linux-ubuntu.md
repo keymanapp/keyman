@@ -49,6 +49,10 @@ sudo apt install devscripts equivs
 sudo mk-build-deps --install linux/debian/control
 ```
 
+### Node.js
+
+Node.js v18 is required for the core build.
+
 ## Keyman for Linux
 
 All dependencies are already installed if you followed the instructions under [Prerequisites](#Prerequisites).
