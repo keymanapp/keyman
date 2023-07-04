@@ -94,10 +94,6 @@ export class CompilerMessages {
       `duplicate variables: id=${o.ids}`);
   static ERROR_DuplicateVariable = SevError | 0x0016;
 
-  static Fatal_SectionInitFailed = (o:{sect: string}) =>
-  m(this.FATAL_SectionInitFailed, `The compiler for '${o.sect}' failed to initialize.`);
-  static FATAL_SectionInitFailed = SevFatal | 0x0017;
-
   // Not hit due to XML parsing
   static Error_InvalidTransformsType = (o:{types: string[]}) =>
   m(this.ERROR_InvalidTransformsType, `Invalid transforms types: '${o.types?.join(',')}'`);

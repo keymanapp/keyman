@@ -1,4 +1,4 @@
-import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus, CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
+import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus, CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile, UnicodeSetParser } from '@keymanapp/common-types';
 import { CompilerOptions } from './compiler-options.js';
 import { CompilerMessages } from './messages.js';
 import { BkspCompiler, TranCompiler } from './tran.js';
@@ -17,6 +17,7 @@ import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 import KMXPlusFile = KMXPlus.KMXPlusFile;
 import DependencySections = KMXPlus.DependencySections;
 import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
+import { KmnCompiler } from '@keymanapp/kmc-kmn';
 
 export const SECTION_COMPILERS = [
   // These are in dependency order.
@@ -44,6 +45,9 @@ export class LdmlKeyboardCompiler {
   private readonly callbacks: CompilerCallbacks;
   private readonly options: CompilerOptions;
 
+  // uset parser
+  private usetparser?: UnicodeSetParser = undefined;
+
   constructor (callbacks: CompilerCallbacks, options: CompilerOptions) {
     this.options = {
       debug: false,
@@ -51,6 +55,24 @@ export class LdmlKeyboardCompiler {
       ...options
     };
     this.callbacks = callbacks;
+  }
+
+  /**
+   * Construct or return a UnicodeSetParser, aka KmnCompiler
+   * @returns the held UnicodeSetParser
+   */
+  async getUsetParser() : Promise<UnicodeSetParser> {
+    if (this.usetparser === undefined) {
+      // initialize
+      const compiler = new KmnCompiler();
+      const ok = await compiler.init(this.callbacks);
+      if (ok) {
+        this.usetparser = compiler;
+      } else {
+        this.usetparser = null; // Store null on failure
+      }
+    }
+    return this.usetparser;
   }
 
   private buildSections(source: LDMLKeyboardXMLSourceFile) {
@@ -149,13 +171,6 @@ export class LdmlKeyboardCompiler {
     const kmx = new KMXPlusFile();
 
     for(let section of sections) {
-      /* c8 ignore next 6 */
-      if (!await section.init()) {
-        // internal error, if a section can't initialize
-        passed = false;
-        this.callbacks.reportMessage(CompilerMessages.Fatal_SectionInitFailed({sect:section.id}));
-        continue;
-      }
       if(!section.validate()) {
         // TODO-LDML: coverage
         passed = false;
@@ -165,6 +180,8 @@ export class LdmlKeyboardCompiler {
       }
       // clone
       const globalSections : DependencySections = Object.assign({}, kmx.kmxplus);
+      // pre-initialize the usetparser
+      globalSections.usetparser = await this.getUsetParser();
       const dependencies = section.dependencies;
       Object.keys(constants.section).forEach((sectstr : string) => {
         const sectid : SectionIdent = constants.section[<SectionIdent>sectstr];
