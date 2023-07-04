@@ -30,7 +30,8 @@ function execute_sample_build() {
     "clean" \
     "configure" \
     "build" \
-    "--debug          Avoids codesigning and adds full sourcemaps for the embedded predictive-text engine"
+    "--debug          Avoids codesigning and adds full sourcemaps for the embedded predictive-text engine" \
+    "--sim-artifact+  Unused by this build at present"
 
   builder_parse "$@"
 
