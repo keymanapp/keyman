@@ -114,7 +114,7 @@ export function WriteCompiledKeyboard(
     sHelpFile = callbacks.resolveFilename(kmnfile, sHelpFile);
     try {
       const data = callbacks.loadFile(sHelpFile);
-      sHelp = new TextDecoder().decode(data).replace(/[\r\n]/g, ' ');
+      sHelp = new TextDecoder().decode(data).replace(/\r/g, '').replace(/\n/g, ' ');
       sHelp = requote(sHelp);
     } catch(e) {
       callbacks.reportMessage(KmwCompilerMessages.Warn_HelpFileMissing({filename: sHelpFile, e}));
