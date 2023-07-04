@@ -2,6 +2,8 @@
  * Utilities for transform and marker processing
  */
 
+import { MATCH_QUAD_ESCAPE, isOneChar, unescapeOneQuadString, unescapeString } from "../util/util.js";
+
 
 /**
  * Helper function for extracting matched items
@@ -146,6 +148,19 @@ export class ElementSegment {
       this.type = ElementType.codepoint;
     }
   }
+
+  /** unescaped format */
+  get unescaped() : string {
+    if (this.type !== ElementType.escaped) {
+      return this.segment;
+    } else {
+      if (MATCH_QUAD_ESCAPE.test(this.segment)) {
+        return unescapeOneQuadString(this.segment);
+      } else {
+        return unescapeString(this.segment);
+      }
+    }
+  }
 };
 
 /** Class for helping with Element strings (i.e. reorder) */
@@ -159,7 +174,7 @@ export class ElementParser {
 
   /** Match (segment) UnicodeSets OR hex escapes OR single Unicode codepoints */
   public static readonly MATCH_ELEMENT_SEGMENTS =
-    /(?:\[[^\]]*\]|\\u[0-9a-fA-F]{4}|\\u\{[0-9a-fA-F]{1,6}\}|.)/gu;
+    /(?:\[[^\]]*\]|\\u[0-9a-fA-F]{4}|\\u\{[0-9a-fA-F]{1,6}\}|\\u\{(?:[0-9a-fA-F]{1,6})(?: [0-9a-fA-F]{1,6}){1,}\}|.)/gu;
 
   /** Does it start with a UnicodeSet? Used to test the segments. */
   public static readonly MATCH_USET = /^\[/;
@@ -172,7 +187,25 @@ export class ElementParser {
     if (this.MATCH_NESTED_SQUARE_BRACKETS.test(str)) {
       throw Error(`Unsupported: nested square brackets in element segment: ${str}`);
     }
-    return str.match(ElementParser.MATCH_ELEMENT_SEGMENTS)
-      .map(str => new ElementSegment(str));
+    const list: ElementSegment[] = [];
+    for(let m of str.match(ElementParser.MATCH_ELEMENT_SEGMENTS)) {
+      const e = new ElementSegment(m);
+      if (e.type === ElementType.escaped) {
+        // unescape
+        const { unescaped } = e;
+        if (isOneChar(unescaped)) {
+          list.push(e);
+        } else {
+          // need to split the escaped segment, \u{41 42} -> \u{41}, \u{42}
+          for (let s of unescaped) {
+            list.push(new ElementSegment(`\\u{${s.codePointAt(0).toString(16)}}`));
+          }
+        }
+      } else {
+        // all others
+        list.push(e);
+      }
+    }
+    return list;
   }
 };

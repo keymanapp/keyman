@@ -154,6 +154,23 @@ describe('tran', function () {
 
       }
     },
+    {
+      // test escapes with spaces
+      subpath: 'sections/ordr/multi-escape.xml',
+      callback(sect) {
+        const tran = <Tran> sect;
+        assert.equal(tran.groups?.length, 1);
+        assert.equal(tran.groups[0].type, constants.tran_group_type_reorder);
+        const { reorders } = tran.groups[0];
+        assert.lengthOf(reorders, 1);
+        assert.lengthOf(reorders[0].elements, 2);
+        assert.equal(reorders[0].elements[0].value.char, 0x1A60);
+        assert.equal(reorders[0].elements[1].value.char, 0x1A45);
+        assert.equal(reorders[0].before.length, 0);
+        assert.equal(reorders[0].elements[0].order, 10);
+        assert.equal(reorders[0].elements[1].order, 10);
+      }
+    },
     // bksp non-test
     {
       subpath: 'sections/bksp/minimal.xml',
