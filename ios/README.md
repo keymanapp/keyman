@@ -8,15 +8,22 @@ The source for our published iOS Keyman app is found within the **keyman/** subd
 the views specific to the Keyman app, while the core functionality is found in KeymanEngine.framework.
 
 ### Building
-To build Keyman for iOS, please run the build.sh build script within this folder.
-You will need to run with the command-line argument `-no-codesign` or establish alternate code-signing permissions to
+To build Keyman for iOS, please run the build.sh build script within this folder against the `:app` target.
+You will need to run with the command-line argument `--debug` or establish alternate code-signing permissions to
 complete the build for the final app.
+  - Thus:  `./build.sh build:engine --debug`
 
 To run the app within a simulator after build.sh is completed,
 1. Open **keymanios.xcworkspace** in Xcode.
 2. Run the Keyman target.
 
 The Keyman app relies on KeymanEngine.framework, which will automatically be rebuilt by Xcode whenever it is changed.
+
+Each individual component also possesses its own separate build script; this folder's `./build.sh` can be used
+to run any and all of them as desired.
+
+For CI builds, note the parallel `./ci.sh` - this is the primary script used to launch builds as part of our
+continuous integration processes.  It may be used to set configuration for calls of the primary `./build.sh` and others.
 
 ### Running the app on a physical device
 In order to test any code changes on a physical device, Apple requires that an app be code-signed.  (Note that code-signing is not necessary for Simulator runs.)  The quickest way to handle this for personal testing:
@@ -43,21 +50,13 @@ KeymanEngine is a Swift 4 framework containing the core functionality of Keyman,
 * Keyboard selection and downloading.
 
 ### Building
-To build using command line, run `./build.sh -only-framework`.
+To build using command line, run `./build.sh build:engine --debug`.
 
 To build in Xcode,
 1. Open **engine/KMEI/KeymanEngine.xcodeproj**.
 2. Build the KME-universal target.
 
 The framework will be built to **engine/KMEI/build/(Debug|Release)-universal/KeymanEngine.framework**.
-
-If it doesn't build, and you have upgraded from Xcode 10.0 (or earlier) to 10.1 (or later), it may not
-build due to "Could not find any available simulators for iOS" error from Carthage, probably while
-building DeviceKit. Xcode 10.1 changed the output format which confuses Carthage. Upgrade Carthage:
-```
-brew upgrade carthage
-brew link --overwrite carthage
-```
 
 ### Linking with KeymanEngine
 1. Add KeymanEngine.framework to 'Linked Frameworks and Libraries' and 'Embedded Binaries' in your project targets.
