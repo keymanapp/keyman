@@ -113,11 +113,11 @@ jobs:
         path: artifacts
 
     - name: Build
-      uses: sillsdev/gha-ubuntu-packaging@01e19837bcf45ec522dd7b091970efd12ce8f3ad # v0.6
+      uses: sillsdev/gha-ubuntu-packaging@9f18bfb5fa8adc4ce8ac456edefe57f95ed8de37 # v0.7
       with:
         dist: "${{ matrix.dist }}"
         platform: "${{ matrix.arch }}"
-        source_dir: "artifacts/keyman-srcpkg"
+        source_dir: "${{github.workspace}}/artifacts/keyman-srcpkg"
         sourcepackage: "keyman_${{ needs.sourcepackage.outputs.VERSION }}-1.dsc"
         deb_fullname: ${{env.DEBFULLNAME}}
         deb_email: ${{env.DEBEMAIL}}
