@@ -67,19 +67,23 @@ export class LdmlKeyboardCompiler {
     const reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, this.callbacks);
     const data = this.callbacks.loadFile(filename);
     if(!data) {
+      // TODO-LDML: coverage for this
       this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to read XML file'}));
       return null;
     }
     const source = reader.load(data);
     if(!source) {
+      // TODO-LDML: coverage for this
       this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to load XML file'}));
       return null;
     }
     try {
       if (!reader.validate(source, this.callbacks.loadSchema('ldml-keyboard'))) {
+        // TODO-LDML: coverage
         return null;
       }
     } catch(e) {
+      // TODO-LDML: coverage
       this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: e.toString()}));
       return null;
     }
@@ -97,11 +101,13 @@ export class LdmlKeyboardCompiler {
       const reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, this.callbacks);
       const data = this.callbacks.loadFile(filename);
       if(!data) {
+        // TODO: coverage
         this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to read XML file'}));
         return null;
       }
       const source = reader.loadTestData(data);
       if(!source) {
+        // TODO: coverage
         this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to load XML file'}));
         return null;
       }
@@ -143,12 +149,15 @@ export class LdmlKeyboardCompiler {
     const kmx = new KMXPlusFile();
 
     for(let section of sections) {
+      /* c8 ignore next 6 */
       if (!await section.init()) {
+        // internal error, if a section can't initialize
         passed = false;
         this.callbacks.reportMessage(CompilerMessages.Fatal_SectionInitFailed({sect:section.id}));
         continue;
       }
       if(!section.validate()) {
+        // TODO-LDML: coverage
         passed = false;
         // We'll keep validating other sections anyway, so we get a full set of
         // errors for the keyboard developer.
@@ -160,8 +169,9 @@ export class LdmlKeyboardCompiler {
       Object.keys(constants.section).forEach((sectstr : string) => {
         const sectid : SectionIdent = constants.section[<SectionIdent>sectstr];
         if (dependencies.has(sectid)) {
-          /* istanbul ignore if */
+          /* c8 ignore next 4 */
           if (!kmx.kmxplus[sectid]) {
+            // Internal error useful during section bring-up
             throw new Error(`Internal error: section ${section.id} depends on uninitialized dependency ${sectid}, check ordering`);
           }
         } else {
@@ -171,7 +181,7 @@ export class LdmlKeyboardCompiler {
       });
       const sect = section.compile(globalSections);
 
-      /* istanbul ignore if */
+      /* c8 ignore next 7 */
       if(!sect) {
         // This should not happen -- validate() should have told us
         // if something is going to fail to compile
@@ -179,7 +189,9 @@ export class LdmlKeyboardCompiler {
         passed = false;
         continue;
       }
+      /* c8 ignore next 4 */
       if(kmx.kmxplus[section.id]) {
+        // Internal error useful during section bring-up
         throw new Error(`Internal error: section ${section.id} would be assigned twice`);
       }
       kmx.kmxplus[section.id] = sect as any;
