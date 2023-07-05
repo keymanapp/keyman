@@ -4,6 +4,7 @@
 
 import json
 import logging
+import re
 import tempfile
 from os import path
 
@@ -13,7 +14,7 @@ import qrcode.constants
 
 gi.require_version('Gtk', '3.0')
 
-from gi.repository import Gtk
+from gi.repository import GLib, Gtk
 
 from keyman_config import KeymanComUrl, _, secure_lookup
 from keyman_config.accelerators import init_accel
@@ -165,7 +166,7 @@ class KeyboardDetailsView(Gtk.Dialog):
         label = self._add_label(text, prevlabel)
         contentLabel = Gtk.Label()
         if content:
-            contentLabel.set_text(content)
+            contentLabel.set_text(re.sub(r'( )?</?[^>]*>', ' ', content))
         contentLabel.set_halign(Gtk.Align.START)
         contentLabel.set_selectable(True)
         contentLabel.set_line_wrap(True)
