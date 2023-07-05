@@ -4,9 +4,8 @@ import os
 import subprocess
 import sys
 
-from gi.repository import Gio # needs to come before gi.overrides.GLib!
+from gi.repository import Gio  # needs to come before gi.overrides.GLib!
 from gi.overrides.GLib import Variant
-
 
 class GSettings():
     def __init__(self, schema_id):
@@ -29,7 +28,7 @@ class GSettings():
         if variant.get_type_string() == 'as':
             return variant.get_strv()
 
-        assert(variant.get_type_string() == 'a(ss)')
+        assert variant.get_type_string() == 'a(ss)'
 
         values = []
         # Process variant of type "a(ss)" (array of tuples with two strings)
@@ -38,10 +37,8 @@ class GSettings():
             # Process variant of type "(ss)" (tuple with two strings)
             val = variant.get_child_value(i)
             typeVariant = val.get_child_value(0)
-            type = typeVariant.get_string()
             idVariant = val.get_child_value(1)
-            id = idVariant.get_string()
-            values.append((type, id))
+            values.append((typeVariant.get_string(), idVariant.get_string()))
         return values
 
     def _convert_array_to_variant(self, array, type):
@@ -51,7 +48,7 @@ class GSettings():
         if type == 'as':
             return Variant('as', array)
 
-        assert(type == 'a(ss)')
+        assert type == 'a(ss)'
 
         children = []
         for (type, id) in array:
@@ -64,14 +61,14 @@ class GSettings():
     def get(self, key):
         if self.is_sudo:
             args = ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
-                    'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus' % os.environ.get('SUDO_UID'),
+                    f"DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{os.environ.get('SUDO_UID')}/bus",
                     'gsettings', 'get', self.schema_id, key]
             if sys.version_info.major <= 3 and sys.version_info.minor < 7:
                 # capture_output got added in Python 3.7
                 try:
                     output = subprocess.check_output(args)
                     value = eval(output)
-                except(subprocess.CalledProcessError):
+                except subprocess.CalledProcessError:
                     value = None
                     logging.warning('Could not convert to sources')
             else:
@@ -86,12 +83,12 @@ class GSettings():
             value = self._convert_variant_to_array(variant)
         return value
 
-    def set(self, key, value, type):
+    def set(self, key, value, type) -> None:
         if self.is_sudo:
             variant = str(value)
             subprocess.run(
               ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
-               'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus' % os.environ.get('SUDO_UID'),
+               f"DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{os.environ.get('SUDO_UID')}/bus",
                'gsettings', 'set', self.schema_id, key, variant])
         else:
             variant = self._convert_array_to_variant(value, type)
