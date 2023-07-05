@@ -378,7 +378,7 @@ export function WriteCompiledKeyboard(
   }
 
   for(let n = 0; n < FCallFunctions.length; n++) {
-    const s = callbacks.resolveFilename(kmnfile, callbacks.path.basename(kmnfile, '.kmn') + FCallFunctions[n] + '.call_js');
+    const s = callbacks.resolveFilename(kmnfile, FCallFunctions[n] + '.call_js');
     if(callbacks.fs.existsSync(s)) {
       const data = new TextDecoder().decode(callbacks.loadFile(s));
       result += `${FTabStop}this.c${n}=function(t,e){${data.trim()}};${nl}`;

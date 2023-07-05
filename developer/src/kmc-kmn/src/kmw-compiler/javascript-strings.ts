@@ -834,7 +834,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
         }
         let n = FCallFunctions.indexOf(CallFunctionName(rec.Call.Store.dpString));
         if(n == -1) {
-          n = FCallFunctions.push(CallFunctionName(rec.Call.Store.dpString));
+          n = FCallFunctions.push(CallFunctionName(rec.Call.Store.dpString)) - 1;
         }
         Result += nlt+`r=this.c${n}(t,e);`;    // I1959   // I3681
         Result += nlt+'m=2;';  // #5440 - match desktop behavior
