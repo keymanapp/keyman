@@ -148,6 +148,7 @@ class KeyboardDetailsView(Gtk.Dialog):
         label = Gtk.Label()
         label.set_text(text)
         label.set_halign(Gtk.Align.END)
+        label.set_valign(Gtk.Align.START)
         if prevlabel:
             self.grid.attach_next_to(label, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
         else:
