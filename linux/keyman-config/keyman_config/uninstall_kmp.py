@@ -12,7 +12,7 @@ from keyman_config.get_kmp import (InstallLocation, get_keyboard_dir,
 from keyman_config.gnome_keyboards_util import (GnomeKeyboardsUtil,
                                                 get_ibus_keyboard_id,
                                                 is_gnome_shell)
-from keyman_config.ibus_util import (get_ibus_bus, restart_ibus,
+from keyman_config.ibus_util import (IbusUtil, get_ibus_bus, restart_ibus,
                                      uninstall_from_ibus)
 from keyman_config.kmpmetadata import get_metadata
 
@@ -82,14 +82,21 @@ def _uninstall_kmp_common(location, packageID, removeLanguages):
 
 def _uninstall_keyboards_from_ibus(keyboards, packageDir):
     bus = get_ibus_bus()
-    if bus or os.environ.get('SUDO_USER'):
-        # install all kmx for first lang not just packageID
-        for kb in keyboards:
-            ibus_keyboard_id = get_ibus_keyboard_id(kb, packageDir)
-            uninstall_from_ibus(bus, ibus_keyboard_id)
-        restart_ibus(bus)
-    else:
-        logging.warning("could not uninstall keyboards from IBus")
+    ibusUtil = IbusUtil()
+    sources = ibusUtil.read_preload_engines()
+    if not sources:
+        return
+
+    # uninstall all specified keyboards for all languages
+    for kb in keyboards:
+        # keyboard ids are similar to `km:/path/to/keyman/khmer_angkor/khmer_angkor.kmx`
+        match_id = ":%s" % get_ibus_keyboard_id(kb, packageDir, ignore_language=True)
+        toRemove = [id for id in sources if id.endswith(match_id)]
+        for val in toRemove:
+            sources.remove(val)
+
+    ibusUtil.write_preload_engines(bus, sources)
+    restart_ibus(bus)
 
 
 def _uninstall_keyboards_from_gnome(keyboards, packageDir):
