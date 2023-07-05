@@ -50,7 +50,14 @@ export class TouchLayoutFileWriter {
     // currently expects
 
     const fixupKey = (key: TouchLayoutKey | TouchLayoutSubKey) => {
-      if(Object.hasOwn(key, 'pad')) (key.pad as any) = key.pad.toString();
+      if(Object.hasOwn(key, 'pad')) {
+        if(key.pad == 0) {
+          delete key.pad;
+        }
+        else {
+          (key.pad as any) = key.pad.toString();
+        }
+      }
       if(Object.hasOwn(key, 'sp')) {
         if(key.sp == 0) {
           delete key.sp;
@@ -59,9 +66,17 @@ export class TouchLayoutFileWriter {
           (key.sp as any) = key.sp.toString();
         }
       }
-      if(Object.hasOwn(key, 'width')) (key.width as any) = key.width.toString();
+      if(Object.hasOwn(key, 'width')) {
+        if(key.width == 0) {
+          delete key.width;
+        }
+        else {
+          (key.width as any) = key.width.toString();
+        }
+      }
       if(Object.hasOwn(key, 'text') && key.text === '') delete key.text;
       if(Object.hasOwn(key, 'id') && <string>key.id === '') delete key.id;
+      if(Object.hasOwn(key, 'hint') && (<any>key).hint === '') delete (<any>key).hint;
     };
 
     const fixupPlatform = (platform: TouchLayoutPlatform) => {
