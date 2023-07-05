@@ -52,7 +52,7 @@ function web_sentry_upload () {
 
   pushd "$ARTIFACT_FOLDER"
   echo "Uploading to Sentry..."
-  npm run sentry-cli -- releases files "$SENTRY_RELEASE_VERSION" upload-sourcemaps --strip-common-prefix "@keymanapp/keyman/" --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
+  npm run sentry-cli -- releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix "@keymanapp/keyman/" --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
   echo "Upload successful."
   popd
 }
