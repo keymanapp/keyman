@@ -71,7 +71,7 @@ The Docker builder allows you to perform a linux build from anywhere Docker is s
 To build the docker image:
 
 ```shell
-cd ../../linux
+cd linux
 docker pull ubuntu:latest
 docker build . -t keymanapp/keyman-linux-builder:latest
 ```
@@ -85,7 +85,7 @@ Once the image is built, it may be used to build parts of Keyman.
 cd ../core
 # keep linux build artifacts separate
 mkdir -p build/linux
-docker run -it --rm -v $(pwd)/..:/home/build -v $(pwd)/build/linux:/home/build/core/build keyman-linux-builder:latest bash -c 'cd core; bash build.sh -d'
+docker run -it --rm -v $(pwd)/..:/home/build -v $(pwd)/build/linux:/home/build/core/build keymanapp/keyman-linux-builder:latest bash -c 'core/build.sh --debug'
 ```
 
 - linux
@@ -95,7 +95,7 @@ docker run -it --rm -v $(pwd)/..:/home/build -v $(pwd)/build/linux:/home/build/c
 # runs as root!
 # note: run 'git clean -fdx linux' afterwards to cleanup
 cd keymanapp/keyman
-docker run -it --rm -v $(pwd):/home/build/src/keyman -u root -w /home/build/src/keyman keymanapp/keyman-linux-builder:latest bash -c "cd linux && make reconf && make fullbuild && make install"
+docker run -it --rm -v $(pwd):/home/build/src/keyman -u root -w /home/build/src/keyman keymanapp/keyman-linux-builder:latest bash -c "linux/build.sh --debug build install"
 ```
 
 ## Keyman for Android
