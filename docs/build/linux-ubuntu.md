@@ -92,10 +92,8 @@ docker run -it --rm -v $(pwd)/..:/home/build -v $(pwd)/build/linux:/home/build/c
 
 ```shell
 # build 'linux' installation in docker
-# runs as root!
-# note: run 'git clean -fdx linux' afterwards to cleanup
 cd keymanapp/keyman
-docker run -it --rm -v $(pwd):/home/build/src/keyman -u root -w /home/build/src/keyman keymanapp/keyman-linux-builder:latest bash -c "linux/build.sh --debug build install"
+docker run -it --rm -v $(pwd):/home/build/src/keyman -w /home/build/src/keyman keymanapp/keyman-linux-builder:latest bash -c "DESTDIR=. linux/build.sh --debug build install"
 ```
 
 ## Keyman for Android
