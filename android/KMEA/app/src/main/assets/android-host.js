@@ -10,7 +10,7 @@ var oskHeight = Math.ceil(window.jsInterface.getKeyboardHeight() / window.device
 var oskWidth = 0;
 var fragmentToggle = 0;
 
-var sentryManager = new com.keyman.KeymanSentryManager({
+var sentryManager = new KeymanSentryManager({
   hostPlatform: "android"
 });
 sentryManager.init();
@@ -25,24 +25,24 @@ function init() {
   //document.body.style.backgroundColor="transparent";
   //window.console.log('Device type = '+device);
   //window.console.log('Keyboard height = '+oskHeight);
-  keyman.init({'app':device,'fonts':'packages/',root:'./'});
-  keyman.util.setOption('attachType','manual');
-  keyman.oninserttext = insertText;
   keyman.showKeyboardList = showMenu;
-  keyman.menuKeyUp = menuKeyUp;
   keyman.hideKeyboard = hideKeyboard;
+  keyman.menuKeyUp = menuKeyUp;
   keyman.getOskHeight = getOskHeight;
   keyman.getOskWidth = getOskWidth;
   keyman.beepKeyboard = beepKeyboard;
-  var ta = document.getElementById('ta');
-  keyman.setActiveElement(ta);
+  keyman.init({
+    'embeddingApp':device,
+    'fonts':'packages/',
+    oninserttext: insertText,
+    root:'./'
+  }).then(function () {  // Note:  For non-upgraded API 21, arrow functions will break the keyboard!
+    const bannerHeight = Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio);
 
-  ta.readOnly = false;
-  checkTextArea();
-
-  // Tell KMW the default banner height to use
-  com.keyman.osk.Banner.DEFAULT_HEIGHT =
-    Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio);
+    // The OSK is not available until initialization is complete.
+    keyman.osk.bannerView.activeBannerHeight = bannerHeight;
+    keyman.refreshOskLayout();
+  });
 
   keyman.addEventListener('keyboardloaded', setIsChiral);
   keyman.addEventListener('keyboardchange', setIsChiral);
@@ -71,7 +71,7 @@ function setBannerHeight(h) {
     osk.banner.height = Math.ceil(h / window.devicePixelRatio);
   }
   // Refresh KMW OSK
-  keyman.correctOSKTextSize();
+  keyman.refreshOskLayout();
 }
 
 function setOskHeight(h) {
@@ -81,7 +81,7 @@ function setOskHeight(h) {
   if(keyman && keyman.core && keyman.core.activeKeyboard) {
     keyman.core.activeKeyboard.refreshLayouts();
   }
-  keyman.correctOSKTextSize();
+  keyman.refreshOskLayout();
 }
 
 function setOskWidth(w) {
@@ -111,7 +111,7 @@ function onStateChange(change) {
   //window.console.log('onStateChange change: ' + change);
 
   // Refresh KMW OSK
-  keyman.correctOSKTextSize();
+  keyman.refreshOskLayout();
 
   fragmentToggle = (fragmentToggle + 1) % 100;
   if(change != 'configured') { // doesn't change the display; only initiates suggestions.
@@ -129,16 +129,11 @@ function setIsChiral(keyboardProperties) {
 
 function setKeymanLanguage(k) {
   KeymanWeb.registerStub(k);
-  keyman.setActiveKeyboard(k.KP + '::'+k.KI, k.KLC);
-  keyman.osk.show(true);
+  keyman.setActiveKeyboard(k.KI, k.KLC);
 }
 
 function setSpacebarText(mode) {
-  keyman.options['spacebarText'] = mode;
-  keyman.osk.show(true);
-
-  // Refresh KMW OSK
-  keyman.correctOSKTextSize();
+  keyman.config.spacebarText = mode;
 }
 
 // #6665: we need to know when the user has pressed a hardware key so we don't
@@ -164,29 +159,25 @@ function insertText(dn, s, dr) {
 }
 
 function deregisterModel(modelID) {
-  keyman.modelManager.deregister(modelID);
+  keyman.removeModel(modelID);
 }
 
 function enableSuggestions(model, mayPredict, mayCorrect) {
   // Set the options first so that KMW's ModelManager can properly handle model enablement states
   // the moment we actually register the new model.
-  keyman.osk.banner.setOptions({
-    'mayPredict': mayPredict,
-    'mayCorrect': mayCorrect
-  });
+  keyman.core.languageProcessor.mayPredict = mayPredict;
+  keyman.core.languageProcessor.mayCorrect = mayCorrect;
 
   registerModel(model);
 }
 
 function setBannerOptions(mayPredict) {
-  keyman.osk.banner.setOptions({
-    'mayPredict': mayPredict
-  });
+  keyman.core.languageProcessor.mayPredict = mayPredict;
 }
 
 function registerModel(model) {
   //window.console.log('registerModel: ' + model);
-  keyman.registerModel(model);
+  keyman.addModel(model);
 }
 
 function resetContext() {
@@ -201,16 +192,15 @@ function setNumericLayer() {
 }
 
 function updateKMText(text) {
-  var ta = document.getElementById('ta');
-  console_debug('updateKMText(text='+text+') ta.value='+ta.value);
-
   if(text == undefined) {
       text = '';
   }
 
-  if(ta.value != text) {
-    ta.value = text;
-    window.resetContext();
+  console_debug('updateKMText(text='+text+') context.value='+keyman.context.getText());
+
+  if(text != keyman.context.getText()) {
+    keyman.context.setText(text);
+    keyman.resetContext();
   }
 }
 
@@ -221,22 +211,19 @@ function console_debug(s) {
 }
 
 function updateKMSelectionRange(start, end) {
-  var ta = document.getElementById('ta');
-  console_debug('updateKMSelectionRange('+start+','+end+'): ta.selectionStart='+ta.selectionStart+' '+
-    '['+ta._KeymanWebSelectionStart+'] ta.selectionEnd='+ta.selectionEnd+' '+ta._KeymanWebSelectionEnd);
+  var context = keyman.context;
 
-  var selDirection = 'forward';
+  // console_debug('updateKMSelectionRange('+start+','+end+'): context.selStart='+ta.selectionStart+' '+
+  //   '['+ta._KeymanWebSelectionStart+'] context.selEnd='+ta.selectionEnd+' '+ta._KeymanWebSelectionEnd);
+
   if(start > end) {
     var e0 = end;
     end = start;
     start = e0;
-    selDirection = 'backward';
   }
 
-  if(ta.selectionStart != start || ta.selectionEnd != end || ta.selectionDirection != selDirection) {
-    ta.selectionStart = ta._KeymanWebSelectionStart = start;
-    ta.selectionEnd = ta._KeymanWebSelectionEnd = end;
-    ta.selectionDirection = selDirection;
+  if(context.selStart != start || context.selEnd != end) {
+    keyman.context.setSelection(start, end);
     keyman.resetContext();
   }
 }
@@ -330,7 +317,7 @@ function hideKeyboard() {
 
 function showKeyboard() {
   // Refresh KMW OSK
-  keyman.correctOSKTextSize();
+  keyman.refreshOskLayout();
 }
 
 function executePopupKey(keyID, keyText) {
@@ -339,19 +326,24 @@ function executePopupKey(keyID, keyText) {
   keyman.executePopupKey(keyID);
 }
 
+// Cannot make it explicitly async / await on API 21.
 function executeHardwareKeystroke(code, shift, lstates, eventModifiers) {
   console_debug('executeHardwareKeystroke(code='+code+',shift='+shift+',lstates='+lstates+',eventModifiers='+eventModifiers+')');
-  try {
-    executingHardwareKeystroke = true;
-    if (keyman.executeHardwareKeystroke(code, shift, lstates)) { // false if matched, true if not
+
+  executingHardwareKeystroke = true;
+
+  // Would be cleaner if we could async / await here, which would give us a simple try-catch implementation.
+  var promise = keyman.hardKeyboard.raiseKeyEvent(code, shift, lstates);
+  promise.then(function (result) {
+    if(result) { // false if matched, true if not
       // KMW didn't process the key, so have the Android app dispatch the key with the original event modifiers
       window.jsInterface.dispatchKey(code, eventModifiers);
+      executingHardwareKeystroke = false;
     }
-    executingHardwareKeystroke = false;
-  } catch(e) {
+  }).catch(function (e) {
     window.console.log('executeHardwareKeystroke exception: '+e);
     executingHardwareKeystroke = false;
-  }
+  });
 }
 
 function popupVisible(value) {
@@ -372,25 +364,4 @@ function toHex(theString) {
     hexString += theHex;
   }
   return hexString;
-}
-
-/**
- * Check the WebView version and determine if the textarea that KeymanWeb uses needs to be "visible".
- * Normally, this textarea is not displayed to avoid redundant layout calculations.
- * In older WebViews on Android 5.0 though, selectionStart and selectionEnd positions fail to
- * update unless the textarea is visible.
- * Reference: Issue #5376
- */
-function checkTextArea() {
-  var uaRe = /Chrome\/([0-9]*)\./g;
-  var chromeMajorVersion = uaRe.exec(navigator.userAgent);
-  if (chromeMajorVersion && parseInt(chromeMajorVersion[1]) <= 37) {
-    var ta = document.getElementById('ta');
-    if (ta != null) {
-      ta.style.display = '';
-      ta.style.position = 'absolute';
-      ta.style.left = '-500px';
-      ta.style.top = '0px';
-    }
-  }
 }

@@ -21,6 +21,7 @@ builder_describe \
   "Compiles the web-oriented utility function module." \
   "@/common/web/recorder  test" \
   "@/common/web/keyman-version" \
+  "@/common/web/es-bundling" \
   "@/common/web/utils" \
   configure \
   clean \
@@ -30,37 +31,34 @@ builder_describe \
 
 builder_describe_outputs \
   configure     /node_modules \
-  build         /common/web/keyboard-processor/build/index.js
+  build         /common/web/keyboard-processor/build/lib/index.mjs
 
 builder_parse "$@"
 
-if builder_start_action configure; then
-  verify_npm_setup
-  builder_finish_action success configure
-fi
+function do_build() {
+  tsc --build "$THIS_SCRIPT_PATH/tsconfig.all.json"
+  node ./build-bundler.js
 
-if builder_start_action clean; then
-  npm run clean
-  builder_finish_action success clean
-fi
+  # Declaration bundling.
+  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  tsc --emitDeclarationOnly --outFile ./build/lib/dom-keyboard-loader.d.ts -p src/keyboards/loaders/tsconfig.dom.json
+  tsc --emitDeclarationOnly --outFile ./build/lib/node-keyboard-loader.d.ts -p src/keyboards/loaders/tsconfig.node.json
+}
 
-if builder_start_action build; then
-  tsc --build "$THIS_SCRIPT_PATH/src/tsconfig.json"
-  builder_finish_action success build
-fi
-
-if builder_start_action test; then
-  tsc --build "$THIS_SCRIPT_PATH/src/tsconfig.bundled.json"
-
-  builder_heading "Running Keyboard Processor test suite"
-
-  FLAGS=
+function do_test() {
+  local MOCHA_FLAGS=
+  local KARMA_CONFIG=manual.conf.cjs
   if builder_has_option --ci; then
     echo "Replacing user-friendly test reports with CI-friendly versions."
-    FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
+    MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
+    KARMA_CONFIG=CI.conf.cjs
   fi
 
-  mocha --recursive $FLAGS ./tests/cases/
+  c8 mocha --recursive $MOCHA_FLAGS ./tests/node/
+  karma start ./tests/dom/$KARMA_CONFIG
+}
 
-  builder_finish_action success test
-fi
+builder_run_action configure  verify_npm_setup
+builder_run_action clean      rm -rf ./build
+builder_run_action build      do_build
+builder_run_action test       do_test

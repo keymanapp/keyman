@@ -68,4 +68,4 @@
 "copyright-label" = "Derechos de autor:";
 
 /* message displayed to alert user to need grant accessibility permission */
-"privacy-alert-text" = "To function properly, Keyman requires accessibility features:\n\nGrant access in System Preferences, Security & Privacy.\nRestart your system.";
+"privacy-alert-text" = "Para funcionar correctamente, Keyman requiere funciones de accesibilidad:\n\nPermitir el acceso en Preferencias del Sistema, Seguridad y Privacidad.\nReinicie el sistema.";

@@ -20,6 +20,7 @@ tests_without_testdata = [
   'k_003_transform',
   'k_004_tinyshift',
   'k_005_modbittest',
+  # 'k_006_backspace', ## not quite there yet. TODO-LDML
   'k_010_mt',
   'k_011_mt_iso',
   'k_100_keytest',

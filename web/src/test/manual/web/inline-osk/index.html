@@ -23,7 +23,7 @@
     </style>
 
     <!-- Insert uncompiled KeymanWeb source scripts -->
-    <script src="../../../../../build/app/web/debug/keymanweb.js" type="application/javascript"></script>
+    <script src="../../../../../build/publish/debug/keymanweb.js" type="application/javascript"></script>
 
     <!--
       For desktop browsers, a script for the user interface must be inserted here.
@@ -32,7 +32,7 @@
       The toolbar UI is best for any page designed to support keyboards for
       a large number of languages.
     -->
-    <script src="../../../../../build/app/ui/debug/kmwuitoggle.js"></script>
+    <script src="../../../../../build/publish/debug/kmwuitoggle.js"></script>
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
@@ -42,17 +42,16 @@
           {'browser': 'chrome', 'formFactor': 'desktop', OS: 'windows', touchable: false} :  // Or whatever target config you want.
           {'browser': 'chrome', 'formFactor': 'phone', OS: 'ios', touchable: true};
         if(newOSK) document.getElementById('KeymanWebControl').removeChild(newOSK.element);
-        newOSK = new com.keyman.osk.InlinedOSKView(targetDevice, keyman.util.device.coreSpec);
+        newOSK = new keyman.views.InlinedOSKView(keyman, { device: targetDevice });
         newOSK.setSize('300px', '150px');  // Or pick whatever size you want, however you want it.
         document.getElementById('KeymanWebControl').appendChild(newOSK.element);
         keyman.osk = newOSK;
-        newOSK.activeKeyboard = keyman.core.activeKeyboard;
         document.getElementById('ta1').focus();
       }
 
       var kmw=window.keyman;
       kmw.init({
-		    attachType:'auto'
+        attachType:'auto'
       }).then(function() {
         setOSK('windows');
         loadKeyboards(1);

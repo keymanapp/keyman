@@ -1,5 +1,72 @@
 # Keyman Version History
 
+## 17.0.133 alpha 2023-07-04
+
+* feat(common): add segmenter for element strings (#9141)
+* fix(windows): adds an extra row for Change Hotkey text label (#9149)
+* fix(linux): Another attempt to fix packaging GHA (#9155)
+* fix(linux): Fix packaging GHA (#9164)
+* fix(linux): Fix packaging GHA (#9169)
+
+## 17.0.132 alpha 2023-06-30
+
+* docs(mac): Update requirements.md (#9137)
+* fix(linux): Fix GHA package builds for non-Jammy dists (#9123)
+* fix(linux): Fix packaging GHA (#9142)
+
+## 17.0.131 alpha 2023-06-27
+
+* feat(developer,common,core): ldml UTF-32 literals in binary (#9084)
+* fix(web): fixes Web build zip artifact construction (#9096)
+
+## 17.0.130 alpha 2023-06-26
+
+* chore(deps): bump semver from 7.3.8 to 7.5.2 (#9085)
+* epic: conversion of Keyman Engine for Web to ES modules (#8560)
+
+## 17.0.129 alpha 2023-06-23
+
+* chore(common): Update crowdin strings for Spanish (es-ES and es-419) (#9040)
+* chore(android/app): Address some pre-launch accessibility report warnings (#9070)
+* fix(windows): support kmxplus in mcompile (#9071)
+* fix(core): fix ldml transforms (#9072)
+* feat(common,developer,core): add uset section (#9049)
+
+## 17.0.128 alpha 2023-06-22
+
+*  (#9061)
+* docs(windows): add more steps for clarity (#9063)
+
+## 17.0.127 alpha 2023-06-21
+
+* feat(core): implementation of non-regex components of tran (#9019)
+* chore: enable common ci for web (#9047)
+
+## 17.0.126 alpha 2023-06-19
+
+* chore(mac): move from altool to notarytool (#9010)
+
+## 17.0.125 alpha 2023-06-17
+
+* fix(android/samples): Cleanup Sample/Tests apk's (#9030)
+* chore(common): Bump crowdin github action to 1.3.2 (#9029)
+
+## 17.0.124 alpha 2023-06-14
+
+* fix(windows): qr code id uses keyboard name and not package name (#9002)
+* refactor(linux): Extract widgets to separate classes and files (#9007)
+
+## 17.0.123 alpha 2023-06-13
+
+* chore(developer): support cp1252 'ansi' keyboards (#8988)
+* fix(developer): keep kmc-kmn messages within namespace (#8999)
+* fix(linux): Fix display of installed keyboard version (#8948)
+* fix(linux): Fix creation of markdown help files for Linux (#9001)
+
+## 17.0.122 alpha 2023-06-12
+
+* refactor(developer): import kmcmplib errors into kmc-kmn (#8962)
+
 ## 17.0.121 alpha 2023-06-09
 
 * fix(linux): Fix disabling of buttons (#8946)

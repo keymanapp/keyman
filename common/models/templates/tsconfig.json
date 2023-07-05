@@ -1,16 +1,16 @@
 {
-  "extends": "../../../tsconfig-base.json",
+  "extends": "../tsconfig.kmw-worker-base.json",
   "compilerOptions": {
-    "declaration": true,
-    "module": "none",
-    "outFile": "./build/index.js",
-    "sourceMap": true,
-    "lib": ["es6"],
-    "target": "es5",
+    "strict": true,
+    "baseUrl": "./",
+    "outDir": "build/obj",
+    "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
   },
   "references": [
+    { "path": "../types" },
     { "path": "../../web/utils" },
-    { "path": "../types" }
+    { "path": "../../models/wordbreakers" }
   ],
   "include": [
 	"src/**/*.ts"

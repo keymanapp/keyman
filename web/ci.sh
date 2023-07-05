@@ -25,6 +25,7 @@ cd "$THIS_SCRIPT_PATH"
 S_KEYMAN_COM=
 
 builder_describe "Defines and implements the CI build steps for Keyman Engine for Web (KMW)." \
+  "@/web/src/tools/building/sourcemap-root prepare:s.keyman.com" \
   "build" \
   "test                         Runs all unit tests."  \
   "post-test                    Runs post-test cleanup.  Should be run even if a prior step fails." \
@@ -38,6 +39,24 @@ builder_parse "$@"
 
 ####
 
+TIER=`cat ../TIER.md`
+BUILD_NUMBER=`cat ../VERSION.md`
+
+function web_sentry_upload () {
+  if [ $1 = "webview" ]; then
+    # There is no "publish" version for app/webview; it's "published" inside our mobile apps.
+    ARTIFACT_FOLDER="$KEYMAN_ROOT/web/build/app/webview/release/"
+  elif [ $1 = "browser" ]; then
+    ARTIFACT_FOLDER="$KEYMAN_ROOT/web/build/publish/release/"
+  fi
+
+  pushd "$ARTIFACT_FOLDER"
+  echo "Uploading to Sentry..."
+  sentry-cli releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix "@keymanapp/keyman/" --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
+  echo "Upload successful."
+  popd
+}
+
 if builder_start_action build; then
   # Build step:  since CI builds start (and should start) from scratch, run the following
   # three actions:
@@ -45,7 +64,12 @@ if builder_start_action build; then
   # - clean:      make extra-sure that no prior build products exist.
   #               - also useful when validating this script on a local dev machine!
   # - build:      then do the ACTUAL build.
-  ./build.sh configure clean build
+  # one option:
+  # - --ci:       For app/browser, outputs 'release' config filesize profiling logs
+  ./build.sh configure clean build --ci
+
+  web_sentry_upload webview
+  web_sentry_upload browser
 
   builder_finish_action success build
 fi
@@ -53,15 +77,17 @@ fi
 if builder_start_action test; then
   # Testing step:  run ALL unit tests, including those of the submodules.
 
-  # For only top-level build-product tests, specify the :engine target
-  # For all others, specify only the :libraries target
-  FLAGS=
-
+  OPTIONS=
   if ! builder_is_debug_build; then
-    FLAGS=--ci
+    OPTIONS=--ci
   fi
 
-  ./test.sh $FLAGS
+  # No --reporter option exists yet for the headless modules.
+
+  $KEYMAN_ROOT/common/web/keyboard-processor/build.sh test $OPTIONS
+  $KEYMAN_ROOT/common/web/input-processor/build.sh test $OPTIONS
+
+  ./build.sh test $OPTIONS
 
   builder_finish_action success test
 fi
@@ -109,15 +135,17 @@ if builder_start_action prepare:s.keyman.com; then
 
   # The main build products are expected to reside at the root of this folder.
   BASE_PUBLISH_FOLDER="$S_KEYMAN_COM/kmw/engine/$VERSION"
+  echo "FOLDER: $BASE_PUBLISH_FOLDER"
   mkdir -p "$BASE_PUBLISH_FOLDER"
 
-  cp -Rf build/app/web/release/* "$BASE_PUBLISH_FOLDER"
-  cp -Rf build/app/ui/release/* "$BASE_PUBLISH_FOLDER"
+  # s.keyman.com - release-config only.  It's notably smaller, thus far more favorable
+  # for distribution via cloud service.
+  cp -Rf build/publish/release/* "$BASE_PUBLISH_FOLDER"
 
   # Third phase: tweak the sourcemaps
   # We can use an alt-mode of Web's sourcemap-root tool for this.
   for sourcemap in "$BASE_PUBLISH_FOLDER/"*.map; do
-    node build/tools/building/sourcemap-root/index.mjs null "$sourcemap" --sourceRoot "https://s.keyman.com/kmw/engine/$VERSION/src"
+    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" null "$sourcemap" --sourceRoot "https://s.keyman.com/kmw/engine/$VERSION/src"
   done
 
   # Actual construction of the PR will be left to CI-config scripting for now.
@@ -128,7 +156,7 @@ fi
 # Note:  for now, this command is used to prepare the artifacts used by the download site, but
 #        NOT to actually UPLOAD them via rsync or to produce related .download_info files.
 if builder_start_action prepare:downloads.keyman.com; then
-  UPLOAD_PATH="build/upload/$VERSION"
+  UPLOAD_PATH="$KEYMAN_ROOT/web/build/upload/$VERSION"
 
   # --- First action artifact - the KMW zip file ---
   ZIP="$UPLOAD_PATH/keymanweb-$VERSION.zip"
@@ -156,16 +184,9 @@ if builder_start_action prepare:downloads.keyman.com; then
     fi
   fi
 
-  pushd build/app/web/release
-  "${COMPRESS_CMD}" $COMPRESS_ADD ../../../../$ZIP *
-  cd ..
-  "${COMPRESS_CMD}" $COMPRESS_ADD ../../../$ZIP debug
-  popd
-
-  pushd build/app/ui/release
-  "${COMPRESS_CMD}" $COMPRESS_ADD ../../../../$ZIP *
-  cd ..
-  "${COMPRESS_CMD}" $COMPRESS_ADD ../../../$ZIP debug
+  pushd build/publish
+  # Zip both the 'debug' and 'release' configurations together.
+  "${COMPRESS_CMD}" $COMPRESS_ADD $ZIP *
   popd
 
   # --- Second action artifact - the 'static' folder (hosted user testing on downloads.keyman.com) ---
