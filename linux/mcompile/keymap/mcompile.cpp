@@ -46,23 +46,17 @@ mcompile -d runs 4 important steps:
 
 #if defined(_WIN32) || defined(_WIN64)
   int wmain(int argc, wchar_t* argv[]) {
-  // convert wchar_t-*> char16_t*
-  // call new run / method() with char16_t
   std::vector<std::u16string> argv_16 = convert_argvW_to_Vector_u16str( argc, argv);
 #else  // LINUX
   int main(int argc, char* argv[]) {
-    //MyCout("started Linux-main", 1);
-    // convert UTF-8 char* to char16_t*
     std::vector<std::u16string> argv_16 = convert_argv_to_Vector_u16str(argc, argv);
 #endif
 
   std::vector<const char16_t*> vec_cmdl_par;
-
   for (int i = 0; i < argc; i++) {
     const char16_t* cmdl_par = argv_16[i].c_str();
     vec_cmdl_par.push_back(cmdl_par);
   }
-
   // call new run/ method() with char16_t
   run(argc, vec_cmdl_par);
 
@@ -74,18 +68,18 @@ int run(int argc, std::vector< const char16_t*> argv) {
 // test if all cpps are acccessible: can be removed
  //check_avaiability_of_modules_();    //_S2
 
- printf("_S2 started run for char16_t*\n");
+ wprintf(L"_S2 started run for char16_t*\n");
 
     if(argc < 3 || (argc < 5 && u16cmp(argv[1], u"-u") != 0)) {   // I4273// I4273
-     printf(
-          "Usage: mcompile -u infile.kmx outfile.kmx\n"
-          "       mcompile [-d] infile.kmx kbdfile.dll kbid outfile.kmx\n"
-          "  With -u parameter, converts keyboard from ANSI to Unicode\n"
-          "  Otherwise, mcompile converts a Keyman mnemonic layout to a\n"
-          "  positional one based on the Windows keyboard\n"
-          "  layout file given by kbdfile.dll\n\n"
-          "  kbid should be a hexadecimal number e.g. 409 for US English\n"
-          "  -d   convert deadkeys to plain keys\n");   // I4552
+     wprintf(
+          L"Usage: mcompile -u infile.kmx outfile.kmx\n"
+          L"       mcompile [-d] infile.kmx kbdfile.dll kbid outfile.kmx\n"
+          L"  With -u parameter, converts keyboard from ANSI to Unicode\n"
+          L"  Otherwise, mcompile converts a Keyman mnemonic layout to a\n"
+          L"  positional one based on the Windows keyboard\n"
+          L"  layout file given by kbdfile.dll\n\n"
+          L"  kbid should be a hexadecimal number e.g. 409 for US English\n"
+          L"  -d   convert deadkeys to plain keys\n");   // I4552
 
      return 1;
    }
@@ -99,6 +93,7 @@ int run(int argc, std::vector< const char16_t*> argv) {
 
     if(!LoadKeyboard(infile, &kmxfile)) {
       LogError(L"Failed to load keyboard (%d)", GetLastError());
+      // replaced by _S2 KMX_LogError(L"Failed to load keyboard (%d)\n", errno );
       return 3;
     }
 
@@ -113,42 +108,12 @@ int run(int argc, std::vector< const char16_t*> argv) {
   }*/
 //-----------------------------
 
-
-printf("_S2 *********************************************************************************************\n"); 
-
     int bDeadkeyConversion = u16cmp(argv[1], u"-d") == 0;   // I4552
     int n = (bDeadkeyConversion ? 2 : 1);
 
     char16_t* infile = (char16_t*) argv[n], *indll =  (char16_t*) argv[n+1], *kbid = (char16_t*) argv[n+2], *outfile =  (char16_t*) argv[n+3];
 
-
-// _S2 TODO print 
- //setlocale(LC_ALL, "");
-printf("_S2 * TUp to here crocc-platform ******************************************************\n"); 
-printf("_S2 * TODO print infile/outfile to console ******************************************************\n"); 
-/*wchar_t* wcp=wchart_from_char16(infile);
-Print_wchar_t(wcp);
-*/
-/*wchar_t wt =wchart_from_char16(kbid);
-wchar_t* p_wt = &wt;
-const wchar_t* pr= (const wchar_t*) p_wt;
-std::wstring blub(pr);
-printf("%ls",blub);
-
-int tukli=345678;
-*/
-// wprintf(L"mcompile%ls \"%ls\" \"%ls\" \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d":L"", wchart_from_char16(infile),
-// wchart_from_char16(indll), wchart_from_char16(kbid), wchart_from_char16(outfile)); //  I4174
-// std::wcout << L"mcompile ";
-// if( bDeadkeyConversion ) std::wcout <<  L" -d";
-// else  std::wcout <<  wchart_from_char16(infile)<< wchart_from_char16(indll)<< wchart_from_char16(kbid)<<
-// wchart_from_char16(outfile); //  I4174
-
-
-
-
-
-
+    wprintf(L"mcompile%ls \"%ls\" \"%ls\" \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d" : L"", u16fmt((const char16_t*) infile).c_str(), u16fmt((const char16_t*) indll).c_str(), u16fmt((const char16_t*) kbid).c_str(), u16fmt((const char16_t*) outfile).c_str() );  // I4174
 
 /*  // 1. Load the keyman keyboard file
 
@@ -177,21 +142,20 @@ int tukli=345678;
   // 3. Write the new keyman keyboard file
 */
 
+wprintf(L"_S2 * Up to here cross-platform xx  :-))))) ******************************************************\n");
+
   LPKEYBOARD kmxfile;
 
   if (!LoadKeyboard(infile, &kmxfile)) {
-    std::cout << "TODO: Replace: Failed to load keyboard , GetLastError())\n";          //LogError(L"Failed to load keyboard (%d)", GetLastError());
+    KMX_LogError(L"Failed to load keyboard (%d)\n", errno );
     return 3;
   }
 
-/* QUESTIONS / TODO
-status: mcompile.cpp: Replacement of LogError
-status mc_kmx-file.cpp:
-  find replacement: DebugLog
-  find replacement: VerifyKeyboard
-  wchar<->char
-  char16_t<->wchar_t
-*/
+ /* QUESTIONS / TODO
+  status mc_kmx-file.cpp:
+    find replacement: VerifyKeyboard_S2
+    wrong entries in : VerifyKeyboard
+  */
 
 
 std::cout << " ++ UP TO HERE IN STEP 1 +++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
@@ -212,8 +176,7 @@ std::cout << " ++ UP TO HERE IN STEP 1 +++++++++++++++++++++++++++++++++++++++++
   //int out = run_DoConvert_Part1_getMap(argc,argv);
   //run_DoConvert_Part2_TranslateKeyboard();
   //SaveKeyboard();
-printf("°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°° end\n");
- 
+  wprintf(L"mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm end\n");
   return 0 ;
 }
 
@@ -686,15 +649,8 @@ BOOL DoConvert(LPKEYBOARD kbd, LPWSTR kbid, BOOL bDeadkeyConversion) {   // I455
 
 */
 
-//TODO adapt for cross-platform
-void LogError(PWSTR fmt, ...) {
-	/*WCHAR fmtbuf[256];
-
-	va_list vars;
-	va_start(vars, fmt);
-	_vsnwprintf_s(fmtbuf, _countof(fmtbuf), _TRUNCATE, fmt, vars);  // I2248   // I3547
-	fmtbuf[255] = 0;
-  _putws(fmtbuf);*/
+void KMX_LogError(const KMX_WCHART* m1,int m2) {
+  wprintf((PWSTR)m1, m2);
 }
 
 //---------old-------------------------------------------

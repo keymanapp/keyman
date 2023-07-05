@@ -25,6 +25,13 @@ void MyCout(std::string in, bool end, std::string pre ) {
     std::cout << pre << " " << in;
 }
 
+void MyCoutW(std::wstring in, bool end, std::wstring pre) {
+  if (end == true)
+    std::wcout << pre << L" " << in << L" " << L"\n";
+  else
+    std::wcout << pre << L" " << in;
+}
+
 
 void DebugLog_S2(std::wstring  txt, std::wstring fileName) {
 

@@ -5,6 +5,7 @@
 #include "km_types.h"
 #include "kmx_file.h"
 #include "filesystem.h"
+#include "mcompile.h"
 
 #include <iostream>		// _S2 can be removed later
 

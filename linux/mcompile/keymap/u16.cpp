@@ -39,14 +39,23 @@ std::vector<std::u16string> convert_argvW_to_Vector_u16str(int argc, wchar_t* ar
 
 
 
-/* _S" does this work??
+// _S" does this work??
 //const wchar_t* <- const char*
+/*
 wchar_t* wchart_from_char( char* c) {
-  std::string str(c);
+  std::string str(*c);
   std::wstring wstr = wstring_from_string(str);
-   wchar_t* wc =  (wchar_t*) wstr.c_str();
-}
-*/
+  wchar_t* wc =  (wchar_t*) wstr.c_str();
+  return wc;
+}*/
+
+/*  _S2 does this work ???
+wchar_t* wchart_from_char16( char16_t** c) {
+  std::u16string str(*c);
+  std::wstring wstr = wstring_from_u16string((std::u16string const) str);
+  return (wchar_t*) wstr.c_str();
+}*/
+
 //String <- wstring
 std::string string_from_wstring(std::wstring const str) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
@@ -75,6 +84,12 @@ std::u16string u16string_from_string(std::string const str) {
 std::string string_from_u16string(std::u16string const str) {
 	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
 	return converter.to_bytes(str);
+}
+//wstring <- u16string
+std::wstring wstring_from_u16string(std::u16string const str16) {
+	std::string str = string_from_u16string(str16);
+  std::wstring wstr = wstring_from_string( str);
+  return wstr;
 }
 
 // often used with c_str() e.g. u16fmt( DEBUGSTORE_MATCH).c_str()

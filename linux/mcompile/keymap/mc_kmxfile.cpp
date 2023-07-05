@@ -191,8 +191,124 @@ MyCout("##### Line 187",1);
 	return TRUE;
 }
 
-// _S2 Version for char16_t filename
 KMX_BOOL LoadKeyboard(char16_t* fileName, LPKEYBOARD* lpKeyboard) {
+  std::wcout << "##### LoadKeyboard of mcompile started #####\n";
+
+  LPKMX_BYTE buf;
+  FILE* fp;
+  LPKEYBOARD kbp;
+  PKMX_BYTE filebase;
+
+  wprintf(L"Loading file '%ls'\n", u16fmt((const char16_t*) fileName).c_str());
+
+  if(!fileName || !lpKeyboard) {
+    KMX_LogError(L"LogError1: Bad Filename\n" );
+    return FALSE;
+  }
+
+  fp = Open_File((const KMX_WCHAR*)fileName, u"rb");
+
+  if(fp == NULL) {
+    KMX_LogError(L"LogError1: Could not open file\n" );
+    return FALSE;
+  }
+
+  if (fseek(fp, 0, SEEK_END) != 0) {
+    fclose(fp);
+    KMX_LogError(L"LogError1: Could not fseek file\n" );
+    return FALSE;
+  }
+
+  auto sz = ftell(fp);
+  if (sz < 0) {
+    fclose(fp);
+    return FALSE;
+  }
+
+  if (fseek(fp, 0, SEEK_SET) != 0) {
+    fclose(fp);
+    KMX_LogError(L"LogErr1: Could not fseek(set) file\n" );
+    return FALSE;
+  }
+
+  // #ifdef KMX_64BIT
+  //  allocate enough memory for expanded data structure + original data.
+  //  Expanded data structure is double the size of data on disk (8-byte
+  //  pointers) - on disk the "pointers" are relative to the beginning of
+  //  the file.
+  //  We save the original data at the end of buf; we don't copy strings, so
+  //  those will remain in the location at the end of the buffer.
+  //  buf = new KMX_BYTE[sz * 3];
+  // #else
+  buf = new KMX_BYTE[sz];
+  // #endif
+
+    MyCoutW(L"#### Line 260 ", 1);
+  if (!buf) {
+    fclose(fp);
+    KMX_LogError(L"LogErr1: Not allocmem\n" );
+                                // _S2 delete [] buf; ????
+    return FALSE;
+  }
+
+  // #ifdef KMX_64BIT
+  // ilebase = buf + sz*2;
+  // #else
+  filebase = buf;
+  // #endif
+
+  if (fread(filebase, 1, sz, fp) < (size_t)sz) {
+    KMX_LogError(L"LogError1: Could not read file\n" );
+    fclose(fp);
+    // _S2 delete [] buf; ????
+    return FALSE;
+  }
+
+  fclose(fp);
+
+  MyCoutW(L"##### Line 285", 1);
+  ;
+  KMX_DWORD sz_dw = (KMX_DWORD)sz;  //_S2
+  size_t sz_t = (size_t)sz;  //_S2
+  // if(!VerifyKeyboard(filebase, sz_t)) {
+  if (!VerifyKeyboard(filebase, sz_t)) {
+    KMX_LogError(L"LogError1: errVerifyKeyboard\n" );
+    // _S2 delete [] buf; ????
+    return FALSE;
+  }
+
+  MyCoutW(L"##### Line 297", 1);
+  kbp = FixupKeyboard(buf, filebase, sz_dw);    // _S" changed from sz->sz_dw
+  MyCoutW(L"##### Line 299", 1);
+
+  if (!kbp) {
+    KMX_LogError(L"LogError1: errFixupKeyboard\n" );
+    //  _S2 delete [] buf; ????
+
+    MyCoutW(L"##### errFixupKeyboard ", 1);
+    return FALSE;
+  }
+
+  MyCoutW(L"##### Line 311 ", 1);
+
+  std::wcout << "kbp->dwIdentifier: " << kbp->dwIdentifier << " FILEID_COMPILED: " << FILEID_COMPILED << "\n";
+
+  if (kbp->dwIdentifier != FILEID_COMPILED) {
+    delete[] buf;
+    KMX_LogError(L"LogError1: errNotFileID\n" );
+    return FALSE;
+  }
+  MyCoutW(L"##### Line 327", 1);
+  *lpKeyboard = kbp;
+  // _S2 delete [] buf; ????
+  MyCoutW(L"##### LoadKeyboard of mcompile ended #####", 1);
+  return TRUE;
+}
+
+
+
+// _S2 Version for char16_t filename
+/*KMX_BOOL LoadKeyboard(char16_t* fileName, LPKEYBOARD* lpKeyboard) {
   std::cout << "##### LoadKeyboard of mcompile started #####\n";
   std::cout << "fileName: " <<fileName << "\n";
 
@@ -305,7 +421,7 @@ KMX_BOOL LoadKeyboard(char16_t* fileName, LPKEYBOARD* lpKeyboard) {
   Err(L"errNotFileID");
   delete[] buf;
   return FALSE;
-}*/
+}*//*
 
   std::cout << "kbp->dwIdentifier: " << kbp->dwIdentifier << " FILEID_COMPILED: " << FILEID_COMPILED << "\n";
   std::cout << "..xxxxx.\n";
@@ -320,7 +436,7 @@ KMX_BOOL LoadKeyboard(char16_t* fileName, LPKEYBOARD* lpKeyboard) {
   MyCout("##### LoadKeyboard of mcompile ended #####", 1);
   return TRUE;
 }
-
+*/
 KMX_BOOL VerifyKeyboard(LPBYTE filebase, KMX_DWORD sz) {
   KMX_DWORD i;
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) filebase;

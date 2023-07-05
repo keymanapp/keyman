@@ -25,7 +25,7 @@
 #include "keymap.h"
 
 int run(int argc, std::vector< const char16_t*> argv);
-void LogError(PKMX_WCHART message, ...);
+void KMX_LogError(const KMX_WCHART* m1, int m2 = 0);
 
 
 struct DeadkeyMapping {   // I4353
