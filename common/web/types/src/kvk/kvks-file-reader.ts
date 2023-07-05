@@ -129,10 +129,15 @@ export default class KVKSFileReader {
             continue;
           }
           let key: VisualKeyboardKey = {
-            flags: isUnicode ? VisualKeyboardKeyFlags.kvkkUnicode : 0, // TODO-LDML: bitmap support
+            flags:
+              (isUnicode ? VisualKeyboardKeyFlags.kvkkUnicode : 0) |
+              (sourceKey.bitmap ? VisualKeyboardKeyFlags.kvkkBitmap : 0),
             shift: shift,
             text: sourceKey.bitmap ? '' : (sourceKey._ ?? ''),
             vkey: vkey
+          };
+          if(sourceKey.bitmap) {
+            key.bitmap = this.base64ToArray(sourceKey.bitmap);
           }
           result.keys.push(key);
         }
@@ -140,6 +145,15 @@ export default class KVKSFileReader {
     }
 
     return result;
+  }
+
+  private base64ToArray(source: string): Uint8Array {
+    const binary = atob(source);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
   }
 
   /**

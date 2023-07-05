@@ -56,7 +56,8 @@ export default class KvkFileWriter {
         vkey: sourceKey.vkey,
         shift: sourceKey.shift,
         text: { len: 0, str: '' },
-        bitmap: 0
+        bitmapSize: sourceKey.bitmap ? sourceKey.bitmap.byteLength : 0,
+        bitmapData: sourceKey.bitmap ? Array.from(sourceKey.bitmap) : []
       };
       this.setString(binaryKey.text, sourceKey.text || '');
       binary.keys.push(binaryKey);
