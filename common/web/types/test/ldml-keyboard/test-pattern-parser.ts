@@ -149,16 +149,38 @@ describe('Test of Pattern Parsers', () => {
           str: `\\u1A60[\\u1A75-\\u1A79]\\u1A45ħ`,
           expect: [{
             segment: '\\u1A60',
-            type: ElementType.escaped
+            type: ElementType.escaped,
           },{
             segment: '[\\u1A75-\\u1A79]',
-            type: ElementType.uset
+            type: ElementType.uset,
           },{
             segment: '\\u1A45',
-            type: ElementType.escaped
+            type: ElementType.escaped,
           },{
             segment: 'ħ',
-            type: ElementType.codepoint
+            type: ElementType.codepoint,
+          }],
+        },
+        {
+          str: `\\u{22}\\u{0127}`,
+          expect: [{
+            segment: `\\u{22}`,
+            type: ElementType.escaped,
+          },
+          {
+            segment: `\\u{0127}`,
+            type: ElementType.escaped,
+          }],
+        },
+        {
+          str: `\\u{22 0127}`,
+          expect: [{
+            segment: `\\u{22}`,
+            type: ElementType.escaped,
+          },
+          {
+            segment: `\\u{127}`, // resegmented with minimal hex
+            type: ElementType.escaped,
           }],
         },
       ].forEach(({str, expect}) => it(`Segment: ${str}`, () => {
