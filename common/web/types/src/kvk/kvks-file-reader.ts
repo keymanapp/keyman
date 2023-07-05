@@ -61,6 +61,12 @@ export default class KVKSFileReader {
       if(source?.['_']?.trim() === '') {
         delete source['_'];
       }
+    } else {
+      // If key text is pure whitespace, replace with empty string,
+      // which matches kmcomp reader
+      if(source?.['_']?.match(/^( +)$/)) {
+        source['_'] = '';
+      }
     }
 
     for(let key of Object.keys(source)) {
