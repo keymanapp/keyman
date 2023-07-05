@@ -1,5 +1,23 @@
 # Keyman Version History
 
+## 17.0.134 alpha 2023-07-05
+
+* fix(linux): Fix packaging GHA (#9172)
+* chore(ios): standardizes iOS build scripts (#9092)
+* fix(web): fixes up Web's InlinedOSK manual test page (#9175)
+* fix(web): re-establishes web srcmap uploading (#9179)
+* refactor(linux): Code refactoring (#9129)
+* refactor(linux): Extract methods (#9168)
+* fix(linux): Fix vertical alignment of labels in About dialog (#9167)
+* fix(linux): Add scrollbar to About dialog (#9166)
+* fix(linux): Remove tags from package description (#9165)
+* docs(linux): Update readme (#9190)
+* feat(developer): uset in element string (#9144)
+* fix(developer): improve coverage, add todos (#9170)
+* chore(developer): refactor so KmnCompiler only created once within kmc (#9171)
+* fix(common): support multichar escapes in element sets (#9173)
+* chore(linux): Update docker builds (#9188)
+
 ## 17.0.133 alpha 2023-07-04
 
 * feat(common): add segmenter for element strings (#9141)
