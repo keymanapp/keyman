@@ -3,15 +3,6 @@ import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 
 /* istanbul ignore next */
 export class SectionCompiler {
-  /**
-   * Opportunity for async initialization.
-   * @returns true when OK. On false, causes a message to happen.
-   */
-  public async init() : Promise<boolean> {
-    // nothing to do here
-    return true;
-  }
-
   protected readonly keyboard: LDMLKeyboard.LKKeyboard;
   protected readonly callbacks: CompilerCallbacks;
 

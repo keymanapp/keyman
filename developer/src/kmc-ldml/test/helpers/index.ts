@@ -5,7 +5,7 @@ import 'mocha';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { SectionCompiler } from '../../src/compiler/section-compiler.js';
-import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile, compilerEventFormat, LDMLKeyboard } from '@keymanapp/common-types';
+import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile, compilerEventFormat, LDMLKeyboard, UnicodeSetParser, CompilerCallbacks } from '@keymanapp/common-types';
 import { LdmlKeyboardCompiler } from '../../src/main.js'; // make sure main.js compiles
 import { assert } from 'chai';
 import { KMXPlusMetadataCompiler } from '../../src/compiler/metadata-compiler.js';
@@ -18,6 +18,7 @@ import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 import DependencySections = KMXPlus.DependencySections;
 import Section = KMXPlus.Section;
 import { ElemCompiler, ListCompiler, StrsCompiler } from '../../src/compiler/empty-compiler.js';
+import { KmnCompiler } from '@keymanapp/kmc-kmn';
 // import Vars = KMXPlus.Vars;
 
 /**
@@ -66,13 +67,13 @@ export async function loadSectionFixture(compilerClass: typeof SectionCompiler, 
 
   const compiler = new compilerClass(source, callbacks);
 
-  assert.ok(await compiler.init(), `${compiler.id} failed init()`);
-
   if(!compiler.validate()) {
     return null;
   }
 
-  let sections: DependencySections = {};
+  let sections: DependencySections = {
+    usetparser: await getTestUnicodeSetParser(callbacks)
+  };
 
   // load dependencies first
   await loadDepsFor(sections, compiler, source, callbacks, dependencies);
@@ -96,7 +97,6 @@ async function loadDepsFor(sections: DependencySections, parentCompiler: Section
   for (const dep of dependencies) {
     const compiler = new dep(source, callbacks);
     assert.notEqual(compiler.id, parentId, `${parentId} depends on itself`);
-    assert.ok(await compiler.init(), `while setting up ${parentId}: ${compiler.id} failed init()`);
     assert.ok(compiler.validate(), `while setting up ${parentId}: ${compiler.id} failed validate()`);
 
     const sect = compiler.compile(sections);
@@ -231,3 +231,16 @@ export function testCompilationCases(compiler: typeof SectionCompiler, cases : C
     });
   }
 }
+async function getTestUnicodeSetParser(callbacks: CompilerCallbacks): Promise<UnicodeSetParser> {
+  // for tests, just create a new one
+  // see LdmlKeyboardCompiler.getUsetParser()
+  const compiler = new KmnCompiler();
+  const ok = await compiler.init(callbacks);
+  assert.ok(ok, `Could not initialize KmnCompiler (UnicodeSetParser), see callback messages`);
+  if (ok) {
+    return compiler;
+  } else {
+    return null;
+  }
+}
+
