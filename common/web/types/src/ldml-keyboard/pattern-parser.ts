@@ -104,21 +104,14 @@ export class VariableParser {
   }
 
   /**
-   * parse a string into references
-   * @param str input string
-   * @returns `[]` or an array of all string references referenced
-   */
-  public static allCaptureSetReferences(str: string): string[] {
-    return matchArray(str, this.CAPTURE_SET_REFERENCE);
-  }
-
-  /**
    * Split an input string into a proper set
    * @param str input string
    * @returns
    */
   public static setSplitter(str: string): string[] {
-    return str.trim().split(/\s+/);
+    const s = str?.trim();
+    if (!s) return [];
+    return s.split(/\s+/);
   }
 }
 
