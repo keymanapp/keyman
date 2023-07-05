@@ -953,6 +953,89 @@ COMP_KMXPLUS_LIST_Helper::getIndex(KMX_DWORD i) const {
   return indices + i;
 }
 
+
+// USET
+
+bool
+COMP_KMXPLUS_USET::valid(KMX_DWORD _kmn_unused(length)) const {
+  if (header.size < sizeof(*this)
+      + (usetCount  * sizeof(COMP_KMXPLUS_USET_USET))
+      + (rangeCount * sizeof(COMP_KMXPLUS_USET_RANGE))) {
+    DebugLog("header.size < expected size");
+    assert(false);
+    return false;
+  }
+  return true;
+}
+
+COMP_KMXPLUS_USET_Helper::COMP_KMXPLUS_USET_Helper() : uset(nullptr), is_valid(false), usets(nullptr), ranges(nullptr) {
+}
+
+bool
+COMP_KMXPLUS_USET_Helper::setUset(const COMP_KMXPLUS_USET *newUset) {
+  DebugLog("validating newUset=%p", newUset);
+  is_valid = true;
+  if (newUset == nullptr) {
+    // null = invalid
+    is_valid = false;
+    // No assert here: just a missing layer
+    return false;
+  }
+  uset = newUset;
+  const uint8_t *rawdata = reinterpret_cast<const uint8_t *>(newUset);
+  rawdata += LDML_LENGTH_USET;  // skip past non-dynamic portion
+  // usets
+  if (uset->usetCount > 0) {
+    usets = reinterpret_cast<const COMP_KMXPLUS_USET_USET *>(rawdata);
+  } else {
+    usets = nullptr;
+    // not invalid, just empty.
+  }
+  rawdata += sizeof(COMP_KMXPLUS_USET_USET) * uset->usetCount;
+  // entries
+  if (uset->rangeCount > 0) {
+    ranges = reinterpret_cast<const COMP_KMXPLUS_USET_RANGE *>(rawdata);
+  } else {
+    ranges = nullptr;
+  }
+
+  // Now, validate offsets by walking
+  if (is_valid) {
+    for (KMX_DWORD i = 0; is_valid && i < uset->usetCount; i++) {
+      const auto &e = usets[i];
+      // is the count off the end?
+      DebugLog("uset 0x%X: range %d, count %d, pattern 0x%X", i, e.range, e.count, e.pattern);
+      if ((e.range >= uset->rangeCount) || (e.range + e.count > uset->rangeCount)) {
+        DebugLog("uset[%d] would access range %d+%d, > count %d", i, e.range, e.count, uset->rangeCount);
+        is_valid = false;
+        assert(is_valid);
+      }
+    }
+  }
+  // Return results
+  DebugLog("COMP_KMXPLUS_USET_Helper.setUset(): %s", is_valid ? "valid" : "invalid");
+  assert(is_valid);
+  return is_valid;
+}
+
+const COMP_KMXPLUS_USET_USET *
+COMP_KMXPLUS_USET_Helper::getUset(KMXPLUS_USET i) const {
+  if (!valid() || i >= uset->usetCount) {
+    assert(false);
+    return nullptr;
+  }
+  return usets + i;
+}
+
+const COMP_KMXPLUS_USET_RANGE *
+COMP_KMXPLUS_USET_Helper::getRange(KMX_DWORD i) const {
+  if (!valid() || i >= uset->rangeCount) {
+    assert(false);
+    return nullptr;
+  }
+  return ranges + i;
+}
+
 // ---- constructor
 
 kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
@@ -1001,6 +1084,7 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     meta = section_from_sect<COMP_KMXPLUS_META>(sect);
     strs = section_from_sect<COMP_KMXPLUS_STRS>(sect);
     tran = section_from_sect<COMP_KMXPLUS_TRAN>(sect);
+    uset = section_from_sect<COMP_KMXPLUS_USET>(sect);
     vars = section_from_sect<COMP_KMXPLUS_VARS>(sect);
     vkey = section_from_sect<COMP_KMXPLUS_VKEY>(sect);
 
@@ -1010,6 +1094,7 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     (void)layrHelper.setLayr(layr);
     (void)listHelper.setList(list);
     (void)tranHelper.setTran(tran);
+    (void)usetHelper.setUset(uset);
   }
 }
 
