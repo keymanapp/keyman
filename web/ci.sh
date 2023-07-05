@@ -42,6 +42,21 @@ builder_parse "$@"
 TIER=`cat ../TIER.md`
 BUILD_NUMBER=`cat ../VERSION.md`
 
+function web_sentry_upload () {
+  if [ $1 = "webview" ]; then
+    # There is no "publish" version for app/webview; it's "published" inside our mobile apps.
+    ARTIFACT_FOLDER="$KEYMAN_ROOT/web/build/app/webview/release/"
+  elif [ $1 = "browser" ]; then
+    ARTIFACT_FOLDER="$KEYMAN_ROOT/web/build/publish/release/"
+  fi
+
+  pushd "$ARTIFACT_FOLDER"
+  echo "Uploading to Sentry..."
+  npm run sentry-cli -- releases files "$SENTRY_RELEASE_VERSION" upload-sourcemaps --strip-common-prefix "@keymanapp/keyman/" --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
+  echo "Upload successful."
+  popd
+}
+
 if builder_start_action build; then
   # Build step:  since CI builds start (and should start) from scratch, run the following
   # three actions:
@@ -52,6 +67,9 @@ if builder_start_action build; then
   # one option:
   # - --ci:       For app/browser, outputs 'release' config filesize profiling logs
   ./build.sh configure clean build --ci
+
+  web_sentry_upload webview
+  web_sentry_upload browser
 
   builder_finish_action success build
 fi
