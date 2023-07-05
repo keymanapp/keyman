@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ## Note - this script is designed solely for use within our Continuous
-## Integration processes with `pwd` as this script's parent folder.
+## Integration processes (thus, by ../ci.sh) with `pwd` as this script's parent folder.
 
 # Exit if program call fails
 set -e
