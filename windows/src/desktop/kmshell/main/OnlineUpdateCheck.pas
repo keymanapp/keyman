@@ -53,7 +53,7 @@ type
 
   TOnlineUpdateCheckResult = (oucUnknown, oucShutDown, oucSuccess, oucNoUpdates, oucUpdatesAvailable, oucFailure, oucOffline);
 
-  TUpdateState = (idle, check, download, pending, installing, complete);
+  TUpdateState = (idle, check, download, pending, installing, postinstall);
 
   TOnlineUpdateCheckParamsPackage = record
     ID: string;
@@ -184,7 +184,7 @@ type
       packages.
     }
     procedure DoInstallKeyman; overload;
-    procedure DoInstallKeyman(SavePath: string); overload;
+    function DoInstallKeyman(SavePath: string) : Boolean; overload;
     {
       Installs the Keyman file using either msiexec.exe or the setup launched in
       a separate shell.
@@ -221,7 +221,10 @@ type
     }
     function CheckForUpdates: TOnlineUpdateCheckResult;
 
-    procedure BackgroundInstall;
+    function BackgroundInstall: Boolean;
+    function IsKeymanRunning: Boolean;
+
+    function handleEventCheckForUpdates: Boolean;
 
 
 
@@ -463,7 +466,7 @@ end;
 
 procedure TOnlineUpdateCheck.DoDownloadUpdatesBackground(SavePath: string; var Result: Boolean);
 var
-  i: Integer;
+  i, downloadCount: Integer;
 
     function DownloadFile(const url, savepath: string): Boolean;
     begin
@@ -503,6 +506,7 @@ begin
   try
     FDownload.TotalSize := 0;
     FDownload.TotalDownloads := 0;
+    downloadCount := 0;
 
     for i := 0 to High(FParams.Packages) do
       if FParams.Packages[i].Install then
@@ -527,7 +531,9 @@ begin
         if not DownloadFile(FParams.Packages[i].DownloadURL, FParams.Packages[i].SavePath) then // I2742
         begin
           FParams.Packages[i].Install := False; // Download failed but install other files
-        end;
+        end
+        else
+          Inc(downloadCount);
         FDownload.StartPosition := FDownload.StartPosition + FParams.Packages[i].DownloadSize;
       end;
 
@@ -536,7 +542,11 @@ begin
       begin
         FParams.Keyman.Install := False;  // Download failed but user wants to install other files
       end;
-    Result := True;
+
+    // There needs to be at least one file successfully downloaded to return
+    // TRUE that files where downloaded
+    if downloadCount > 0  then
+      Result := True;
   except
     on E:EHTTPUploader do
     begin
@@ -569,16 +579,6 @@ begin
   DoDownloadUpdatesBackground(DownloadBackGroundSavePath, DownloadResult);
   KL.Log('TOnlineUpdateCheck.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
   ShowMessage('TOnlineUpdateCheck.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
-  // Set registry keys
-  with TRegistryErrorControlled.Create do  // I2890
-  try
-    if OpenKey(SRegKey_KeymanEngine_LM, True) then
-      WriteString(SRegValue_Install_Update, BoolToStr(True));
-      // TODO: Write to this register value SRegValue_Update_State
-      // Make sure the state transistion makes sense
-  finally
-    Free;
-  end;
   Result := DownloadResult;
 end;
 
@@ -618,7 +618,7 @@ begin
     ShowMessage(SysErrorMessage(GetLastError));
 end;
 
-procedure TOnlineUpdateCheck.DoInstallKeyman(SavePath: string);
+function TOnlineUpdateCheck.DoInstallKeyman(SavePath: string) : Boolean;
 var
   s: string;
   FResult: Boolean;
@@ -631,9 +631,11 @@ begin
   else if s = '.exe' then
     FResult := TUtilExecute.Shell(0, SavePath, '', '-au')  // I3349
   else
-    Exit;
+    Exit(False);
+
   if not FResult then
     ShowMessage(SysErrorMessage(GetLastError));
+  Result := FResult;
 end;
 
 procedure TOnlineUpdateCheck.SavePackageUpgradesToDownloadTempPath;
@@ -1016,6 +1018,7 @@ begin
     if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_Update_State) then
         try
           UpdateState := TUpdateState(GetEnumValue(TypeInfo(TUpdateState), ReadString(SRegValue_Update_State)));
+          KL.Log('CheckBackgroundState State is:[' + ReadString(SRegValue_Update_State) + ']');
         except
           UpdateState := Idle; // do we need a unknown state ?
         end;
@@ -1025,7 +1028,7 @@ begin
   Result := UpdateState;
 end;
 
-procedure TOnlineUpdateCheck.BackgroundInstall;  // I2329
+function TOnlineUpdateCheck.BackgroundInstall : Boolean;  // I2329
 var
   Update : Boolean;
   SavePath: String;
@@ -1045,29 +1048,23 @@ begin
       if fileExt = '.exe' then
         break;
     end;
-    // make sure keyman hasn't started
-    try
-      if kmcom.Control.IsKeymanRunning then
-      try
-        kmcom.Control.StopKeyman;
-      except
-        on E:Exception do
-        begin
-          KL.Log(E.Message);
-          Exit;
-        end;
-      end;
-    except
-      on E:Exception do
-      begin
-        KL.Log(E.Message);
-        Exit;
-      end;
-    end;
-    // Install Keyman
-    //ExecuteInstall(SavePath + ExtractFileName(fileName));
-    DoInstallKeyman(SavePath + ExtractFileName(fileName));
+    // ExecuteInstall(SavePath + ExtractFileName(fileName));
+    // TODO DoInstallPackages ( this may need to be as state in the enum seperate
+    // to installing the main keyman executable.
+    Result := DoInstallKeyman(SavePath + ExtractFileName(fileName));
+end;
 
+function TOnlineUpdateCheck.IsKeymanRunning: Boolean;  // I2329
+begin
+  try
+      Result :=  kmcom.Control.IsKeymanRunning;
+  except
+    on E:Exception do
+    begin
+      KL.Log(E.Message);
+      Exit;
+    end;
+  end;
 end;
 
 function TOnlineUpdateCheck.CheckForUpdates: TOnlineUpdateCheckResult;
@@ -1216,31 +1213,59 @@ procedure TOnlineUpdateCheck.ProcessBackgroundInstall;  // I2329
 var
   UpdateState : TUpdateState;
   CheckResult : TOnlineUpdateCheckResult;
+  DownloadResult: Boolean;
+  // For removing cache
+  SavePath: String;
+  fileName: String;
+  fileNames: TStringDynArray;
 begin
 // check the registry value
   UpdateState := CheckBackgroundState;
+  KL.Log('ProcessBackground Install case :[ idle  ]');
   case UpdateState of
     idle:
       begin
       // Do Nothing
+      KL.Log('ProcessBackground Install case :[ idle  ]');
       end;
     check:
       begin
+        KL.Log('ProcessBackground Install case :[ check  ]');
         CheckResult := CheckForUpdates;
         if CheckResult = oucUpdatesAvailable then
         begin
           SetBackgroundState(download);
           // We can transition straight to download
-          DownloadUpdatesBackground;
+          DownloadResult := DownloadUpdatesBackground;
+          if DownloadResult then
+            begin
+              SetBackgroundState(pending);
+              // request install
+              if IsKeymanRunning then
+                // can't install just set icon
+                // then handleInstall will kick it off
+              else
+               // start installing "handleInstall"
+               begin
+                SetBackgroundState(installing);
+                if not BackgroundInstall then
+                // TODO // if BackgroundInstall fails then exit and handle event
+                // back to pending ( 3 times ) then after that set reovery.
+                begin
+                  SetBackgroundState(pending);
+                end;
+               end;
+            end;
         end
         else
           SetBackgroundState(idle);
       end;
     download:
     begin
+      KL.Log('ProcessBackground Install case :[ download  ]');
       // if we have entered the state from ProcessBackground we need to
       // check the server again as the download was interupted, and we don't
-      // preser the FParams result.
+      // preserve the FParams result.
       CheckResult := CheckForUpdates;
         if CheckResult = oucUpdatesAvailable then
         begin
@@ -1255,12 +1280,21 @@ begin
 
     pending:
     begin
+      KL.Log('ProcessBackground Install case :[ pending  ]');
       // TODO  Need BackgroundInstall to return a result so we can go
       // back to idle (abort) and log the error.
-      SetBackgroundState(installing);
-      BackgroundInstall
 
-      // IF BackroundInstall fails then log and set to idle
+      SetBackgroundState(installing);
+      if not BackgroundInstall then
+      // TODO // if BackgroundInstall fails then exit and handle event
+      // back to pending ( 3 times ) then after that set reovery.
+      begin
+        SetBackgroundState(pending);
+      end;
+
+      // if BackgroundInstall fails then exit and handle event
+      // back to pending ( 3 times ) then after that exit
+      // IF BackgroundInstall fails then log and set to idle
       // Else is Successful we need to exit right out of kmshell as we have started
       // an the install process to execute. We leave the registry value as installing
       // one installing has finished then the registry value to be set to complete
@@ -1271,12 +1305,92 @@ begin
     end;
     installing:
     begin
+      KL.Log('ProcessBackground Install case :[ installing ]');
       // TODO if we are in state installing we shouldn't be hear either
       // So exit and let the msi installer continue.
     end;
-    complete:
+    postinstall:
     begin
-      // TODO  Do any loging updating of files etc and then set back to idle
+      KL.Log('ProcessBackground Install case :[ postinstall ]');
+      // TODO Remove cached files. Do any loging updating of files etc and then set back to idle
+      SavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
+      GetFileNamesInDirectory(SavePath, fileNames);
+      // for now we only want the exe all though excute install can
+      // handle msi and msp
+      for fileName in fileNames do
+      begin
+        System.SysUtils.DeleteFile(fileName);
+      end;
+      // Also remove old versioned dlls if necessary. Initial tests indicate the Microsoft Installer
+      // well do this.
+      SetBackgroundState(idle);
+    end;
+
+  end;
+
+end;
+
+
+function TOnlineUpdateCheck.handleEventCheckForUpdates: Boolean;  // I2329
+var
+  UpdateState : TUpdateState;
+  CheckResult : TOnlineUpdateCheckResult;
+  DownloadResult: Boolean;
+  // For removing cache
+  SavePath: String;
+  fileName: String;
+  fileNames: TStringDynArray;
+begin
+// check the registry value
+  UpdateState := CheckBackgroundState;
+  case UpdateState of
+    idle:
+      begin
+      // Do Nothing
+      end;
+    check, download:  // as the moment check and download are basically the same state
+      begin
+        CheckResult := CheckForUpdates;
+        if CheckResult = oucUpdatesAvailable then
+        begin
+          SetBackgroundState(download);
+          // We can transition straight to download
+          DownloadResult := DownloadUpdatesBackground;
+          if DownloadResult then
+            begin
+              SetBackgroundState(pending);
+              // request install
+              if IsKeymanRunning then
+                // can't install just set icon
+                // then handleInstall will kick it off
+              else
+               // start installing "handleInstall"
+               begin
+                SetBackgroundState(installing);
+                if not BackgroundInstall then
+                // TODO // if BackgroundInstall fails then exit and handle event
+                // back to pending ( 3 times ) then after that set reovery.
+                begin
+                  SetBackgroundState(pending);
+                end;
+               end;
+            end;
+        end
+        else
+          SetBackgroundState(idle);
+      end;
+
+    pending:
+    begin
+    end;
+    installing:
+    begin
+      // TODO if we are in state installing we shouldn't be hear either
+      // So exit and let the msi installer continue.
+    end;
+    postinstall:
+    begin
+
     end;
 
   end;
