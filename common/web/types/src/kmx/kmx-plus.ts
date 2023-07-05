@@ -18,6 +18,8 @@ export class Section {
  * Sections which are needed as dependencies.
  */
 export interface DependencySections extends KMXPlusData {
+  /** needed for UnicodeSet parsing */
+  usetparser?: UnicodeSetParser;
 }
 
 // 'sect'
@@ -30,12 +32,16 @@ export class Sect extends Section {};
 
 export class Elem extends Section {
   strings: ElementString[] = [];
-  constructor(strs: Strs) {
+  constructor(sections: DependencySections) {
     super();
-    this.strings.push(new ElementString(strs, '')); // C7043: null element string
+    this.strings.push(new ElementString(sections, '')); // C7043: null element string
   }
-  allocElementString(strs: Strs, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string): ElementString {
-    let s = new ElementString(strs, source, order, tertiary, tertiary_base, prebase);
+  /**
+   * @param source if a string array, does not get reinterpreted as UnicodeSet. This is used with vars, etc. Or pass `["str"]` for an explicit 1-element elem.
+   * If it is a string, will be interpreted per reorder element ruls.
+   */
+  allocElementString(sections: DependencySections, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string): ElementString {
+    let s = new ElementString(sections, source, order, tertiary, tertiary_base, prebase);
     let result = this.strings.find(item => item.isEqual(s));
     if(result === undefined) {
       result = s;
@@ -310,8 +316,10 @@ export class VarsItem extends Section {
 export class UnicodeSetItem extends VarsItem {
   constructor(id: string, value: string, sections: DependencySections, usetparser: UnicodeSetParser) {
     super(id, value, sections);
-    // TODO-LDML: buffer size
-    this.unicodeSet = usetparser.parseUnicodeSet(value, 100);
+    // TODO-LDML: err on max buffer size
+    const needRanges = sections.usetparser.sizeUnicodeSet(value);
+    this.unicodeSet = sections.usetparser.parseUnicodeSet(value, needRanges);
+
     // _unicodeSet may be null, indicating this is invalid.
     // A message will have been set in that case.
   }
@@ -324,7 +332,7 @@ export class UnicodeSetItem extends VarsItem {
 export class SetVarItem extends VarsItem {
   constructor(id: string, value: string[], sections: DependencySections) {
     super(id, value.join(' '), sections);
-    this.items = sections.elem.allocElementString(sections.strs, value);
+    this.items = sections.elem.allocElementString(sections, value);
   }
   items: ElementString;
   valid() : boolean {

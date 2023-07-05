@@ -10,7 +10,7 @@ import { MetaCompiler } from './meta.js';
 import { NameCompiler } from './name.js';
 import { VkeyCompiler } from './vkey.js';
 import { VarsCompiler } from './vars.js';
-import { StrsCompiler, ElemCompiler, ListCompiler } from './empty-compiler.js';
+import { StrsCompiler, ElemCompiler, ListCompiler, UsetCompiler } from './empty-compiler.js';
 
 
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
@@ -25,6 +25,7 @@ export const SECTION_COMPILERS = [
   StrsCompiler,
   ListCompiler,
   ElemCompiler,
+  UsetCompiler,
   // Next, Vars, which depends on others
   VarsCompiler,
   // Now all others:
@@ -161,7 +162,7 @@ export class LdmlKeyboardCompiler {
         if (dependencies.has(sectid)) {
           /* istanbul ignore if */
           if (!kmx.kmxplus[sectid]) {
-            throw new Error(`Internal error: section ${section.id} depends on uninitialized dependency ${sectid}`);
+            throw new Error(`Internal error: section ${section.id} depends on uninitialized dependency ${sectid}, check ordering`);
           }
         } else {
           // delete dependencies that aren't referenced

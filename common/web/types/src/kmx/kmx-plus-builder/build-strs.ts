@@ -50,7 +50,11 @@ export function build_strs(source_strs: Strs): BUILDER_STRS {
  */
 export function build_strs_index(sect_strs: BUILDER_STRS, value: StrsItem) {
   if(!(value instanceof StrsItem)) {
-    throw new Error('unexpected value '+ value);
+    if (value === null) {
+      throw new Error('unexpected null StrsItem, use an empty string instead');
+    } else {
+      throw new Error('unexpected StrsItem value '+ value);
+    }
   }
 
   if(value.isOneChar) {

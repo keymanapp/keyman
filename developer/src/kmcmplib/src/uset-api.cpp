@@ -9,7 +9,6 @@ EXTERN int kmcmp_parseUnicodeSet(
   uintptr_t outputBuffer_,
   uint32_t outputBufferSize
 ) {
-  uint32_t* outputBuffer = reinterpret_cast<uint32_t*>(outputBuffer_);
   const icu::UnicodeString str = icu::UnicodeString::fromUTF8(text.c_str());
   if (str.isBogus() || str.isEmpty()) {
     // empty string
@@ -31,12 +30,17 @@ EXTERN int kmcmp_parseUnicodeSet(
   } else if (uset.hasStrings()) {
     // Error, strings are not allowed
     return KMCMP_ERROR_HAS_STRINGS;
-  } else if (outputBuffer == nullptr) {
+  }
+  const int32_t count = uset.getRangeCount();
+  if (outputBufferSize == 0) {
+    // pure preflight - return buffer size needed as negative
+    return count;
+  }
+  uint32_t* outputBuffer = reinterpret_cast<uint32_t*>(outputBuffer_);
+  if (outputBuffer == nullptr) {
     // fail if nullptr passed
     return KMCMP_FATAL_OUT_OF_RANGE;
   }
-
-  const int32_t count = uset.getRangeCount();
   if ((count * 2L) > outputBufferSize) {
     // output buffer too small
     return KMCMP_FATAL_OUT_OF_RANGE;

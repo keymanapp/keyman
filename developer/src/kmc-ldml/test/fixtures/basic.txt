@@ -131,6 +131,9 @@ block(sectitems)
   74 72 61 6e
   diff(sect,tran)
 
+  75 73 65 74
+  diff(sect,uset)
+
   76 61 72 73
   diff(sect,vars)
 
@@ -221,15 +224,16 @@ block(elemSet)
   00 00 00 00              #    KMX_DWORD flags;
 
 block(elemOrdrFrom)
-  # <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
+  # from="\u{1A60}[\u1A75-\u1A79]\u{1A45}" order="10 55 10"
   60 1a 00 00                        #    KMX_DWORD element;   '᩠'             // str: output string or UTF-32LE codepoint
-  00 00 0A 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
-  75 1a 00 00                        #    KMX_DWORD element;   '᩵'             // str: output string or UTF-32LE codepoint
-  00 00 37 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
+  00 00 0A 00                        #    KMX_DWORD flags;                  // flag and order values - cp
+  00 00 00 00  # TODO-LDML: uset #0  #    KMX_DWORD element;   [uset]       // str: output string or UTF-32LE codepoint
+  02 00 37 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
   45 1A 00 00                        #    KMX_DWORD element;   'ᩅ'          // str: output string or UTF-32LE codepoint
   00 00 0A 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
 
 block(elemOrdrBefore)
+  # before="\u{1A6B}"
   6b 1a 00 00                        #    KMX_DWORD element;   'ᩫ'              // str: output string or UTF-32LE codepoint
   00 00 00 00                        #    KMX_DWORD flags;                  // flag and order values - unicodeset
 
@@ -395,6 +399,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strVersion)    sizeof(strVersion,2)
   diff(strs,strNorm)       sizeof(strNorm,2)
   diff(strs,strName)       sizeof(strName,2)
+  diff(strs,strFromSet)     sizeof(strFromSet,2)
   diff(strs,strUSet)       sizeof(strUSet,2)
   diff(strs,strElemTranFrom1) sizeof(strElemTranFrom1,2)
   diff(strs,strElemTranFrom1a) sizeof(strElemTranFrom1a,2)
@@ -426,6 +431,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strVersion)          31 00 2e 00 30 00 2e 00 30 00   block(x) 00 00             # '1.0.0'
   block(strNorm)             4e 00 46 00 43 00   block(x) 00 00                         # 'NFC'
   block(strName)             54 00 65 00 73 00 74 00 4b 00 62 00 64 00   block(x) 00 00 # 'TestKbd'
+  block(strFromSet)          5B 00 5C 00 75 00 31 00 41 00 37 00 35 00 2D 00 5C 00 75 00 31 00 41 00 37 00 39 00 5D 00 block(x) 00 00 # [\u1a75-\u1a79]
   block(strUSet)             5b 00 61 00 62 00 63 00 5d 00 block(x) 00 00               # '[abc]'
   block(strElemTranFrom1)    5E 00 block(x) 00 00                                       # '^'
   block(strElemTranFrom1a)   5E 00 61 00 block(x) 00 00                                       # '^a'
@@ -495,6 +501,21 @@ block(tran)                         # struct COMP_KMXPLUS_TRAN {
     index(elemNull,elemOrdrBefore)    #    KMXPLUS_ELEM before;
 
 block(tranEnd)
+
+block(uset)
+  75 73 65 74                       #   KMX_DWORD header.ident;   // 0000 Section name - uset
+  diff(uset,usetEnd)                #   KMX_DWORD header.size;    // 0004 Section length
+  01 00 00 00           # lists
+  01 00 00 00           # elements
+  # lists
+  00 00 00 00           # first list
+  01 00 00 00           # size: 1
+  index(strNull,strFromSet,2)           # str
+  # ranges
+   # range @0
+  75 1A 00 00           # start
+  79 1A 00 00           # end
+  block(usetEnd)
 
 block(vars)                         # struct COMP_KMXPLUS_VARS {
   76 61 72 73                       #   KMX_DWORD header.ident;   // 0000 Section name - vars
