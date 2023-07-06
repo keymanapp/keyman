@@ -5,9 +5,12 @@ import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { CompilerCallbacks, KeymanFileTypes, KvkFile } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
 import { KmpJsonFile, KpsFile } from '@keymanapp/common-types';
-import { PackageVersionValidation } from './package-version-validation.js';
+import { PackageMetadataCollector } from './package-metadata-collector.js';
 import { KmpInfWriter } from './kmp-inf-writer.js';
 import { transcodeToCP1252 } from './cp1252.js';
+import { MIN_LM_FILEVERSION_KMP_JSON, PackageVersionValidator } from './package-version-validator.js';
+import { PackageKeyboardTargetValidator } from './package-keyboard-target-validator.js';
+import { PackageMetadataUpdater } from './package-metadata-updater.js';
 
 const KMP_JSON_FILENAME = 'kmp.json';
 const KMP_INF_FILENAME = 'kmp.inf';
@@ -54,7 +57,7 @@ export class KmpCompiler {
 
     let kmp: KmpJsonFile.KmpJsonFile = {
       system: {
-        fileVersion: FILEVERSION_KMP_JSON,
+        fileVersion: null,
         keymanDeveloperVersion: KEYMAN_VERSION.VERSION
       },
       options: {}
@@ -154,32 +157,69 @@ export class KmpCompiler {
     }
 
     //
-    // Verify version metadata; doing this in the transform
-    // while we have access to the .kps metadata, and keeping the
+    // Collect metadata from keyboards (and later models) in order to update
+    // the kmp.json metadata for use downstream in apps. This will also be
+    // used later to fill in .keyboard_info file data.
     //
 
-    const versionValidator = new PackageVersionValidation(this.callbacks);
-    if(!versionValidator.validateAndUpdateVersions(kpsFilename, kps, kmp)) {
+    const collector = new PackageMetadataCollector(this.callbacks);
+    const metadata = collector.collectKeyboardMetadata(kpsFilename, kmp);
+    if(metadata == null) {
       return null;
     }
+
+    //
+    // Verify keyboard versions and update version metadata where appropriate
+    //
+
+    const versionValidator = new PackageVersionValidator(this.callbacks);
+    if(!versionValidator.validateAndUpdateVersions(kps, kmp, metadata)) {
+      return null;
+    }
+
+    if(kps.keyboards && kps.keyboards.keyboard) {
+      kmp.system.fileVersion = versionValidator.getMinKeymanVersion(metadata);
+    } else {
+      kmp.system.fileVersion = MIN_LM_FILEVERSION_KMP_JSON;
+    }
+
+    //
+    // Verify that packages that target mobile devices include a .js file
+    //
+
+    const targetValidator = new PackageKeyboardTargetValidator(this.callbacks);
+    targetValidator.verifyAllTargets(kmp, metadata);
+
+    //
+    // Update assorted keyboard metadata from the keyboards in the package
+    //
+
+    const updater = new PackageMetadataUpdater();
+    updater.updatePackage(metadata);
 
     //
     // Add Windows Start Menu metadata
     //
 
-    if(kps.startMenu && kps.startMenu.items) {
+    if(kps.startMenu && (kps.startMenu.folder || kps.startMenu.items)) {
       kmp.startMenu = {};
-      if(kps.startMenu.addUninstallEntry) kmp.startMenu.addUninstallEntry = kps.startMenu.addUninstallEntry === '';
+      if(kps.startMenu.addUninstallEntry === '') kmp.startMenu.addUninstallEntry = true;
       if(kps.startMenu.folder) kmp.startMenu.folder = kps.startMenu.folder;
-      if(kps.startMenu.items && kps.startMenu.items.item) kmp.startMenu.items = this.arrayWrap(kps.startMenu.items.item);
-    }
+      if(kps.startMenu.items && kps.startMenu.items.item) {
+        kmp.startMenu.items = this.arrayWrap(kps.startMenu.items.item);
 
-    //
-    // Add translation strings
-    //
-
-    if(kps.strings && kps.strings.string) {
-      kmp.strings = this.arrayWrap(kps.strings.string);
+        // Remove default values
+        for(let item of kmp.startMenu.items) {
+          if(item.icon == '') delete item.icon;
+          if(item.location == 'psmelStartMenu') delete item.location;
+          if(item.arguments == '') delete item.arguments;
+          // Horrific case change between .kps and kmp.json:
+          item.filename = (<any>item).fileName;
+          delete (<any>item).fileName;
+        }
+      } else {
+        kmp.startMenu.items = [];
+      }
     }
 
     kmp = this.stripUndefined(kmp) as KmpJsonFile.KmpJsonFile;
