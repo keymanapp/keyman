@@ -50,11 +50,14 @@ function web_sentry_upload () {
     ARTIFACT_FOLDER="$KEYMAN_ROOT/web/build/publish/release/"
   fi
 
-  pushd "$ARTIFACT_FOLDER"
-  echo "Uploading to Sentry..."
-  sentry-cli releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix "@keymanapp/keyman/" --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
+  echo "Uploading $(builder_term app/$1) ($ARTIFACT_FOLDER) to Sentry..."
+
+  # The "$ARTIFACT_FOLDER" bit is being used as the path to the sourcemaps.
+  # --strip-common-prefix does not take an argument, unlike --strip-prefix.  It auto-detects
+  # the most common prefix instead.
+  sentry-cli releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix "$ARTIFACT_FOLDER" \
+    --rewrite --ext js --ext map --ext ts
   echo "Upload successful."
-  popd
 }
 
 if builder_start_action build; then
