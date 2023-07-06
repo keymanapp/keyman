@@ -24,7 +24,6 @@ builder_describe "Builds Keyman Engine and the Keyman app for use on iOS devices
   ":sample1=Samples/KMSample1   Builds the first KeymanEngine sample app" \
   ":sample2=Samples/KMSample2   Builds the second KeymanEngine sample app" \
   ":fv=../oem/firstvoices/ios   Builds OEM FirstVoices for iOS platforms" \
-  "--debug+                     Avoids codesigning and adds full sourcemaps for the embedded predictive-text engine" \
   "--sim-artifact+              Also outputs a simulator-friendly test artifact corresponding to the build"
 
 builder_parse "$@"
