@@ -64,9 +64,9 @@ export class KeysCompiler extends SectionCompiler {
   }
 
   public compile(sections: DependencySections): Keys {
+    /* c8 ignore next 4 */
     if (!this.keyboard?.keys?.key && !this.keyboard?.keys?.flicks) {
-      // short-circuit if no keys or flicks
-      // TODO-LDML: coverage for this case?
+      // short-circuit if no keys or flicks. Doesn't happen in practice due to implied import.
       return null;
     }
 
@@ -176,8 +176,9 @@ export class KeysCompiler extends SectionCompiler {
     }
 
     const keymap = Constants.HardwareToKeymap.get(hardware);
+    /* c8 ignore next 5 */
     if (!keymap) {
-      // TODO-LDML: coverage
+      // not reached due to XML validation
       this.callbacks.reportMessage(CompilerMessages.Error_InvalidHardware({ form: hardware }));
       valid = false;
     }

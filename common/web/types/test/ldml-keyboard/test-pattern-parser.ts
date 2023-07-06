@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { ElementParser, ElementType, MarkerParser, VariableParser } from '../../src/ldml-keyboard/pattern-parser.js';
+import { ElementParser, ElementSegment, ElementType, MarkerParser, VariableParser } from '../../src/ldml-keyboard/pattern-parser.js';
 
 describe('Test of Pattern Parsers', () => {
   describe('should test MarkerParser', () => {
@@ -124,8 +124,45 @@ describe('Test of Pattern Parsers', () => {
           ...samplePatterns,
         ].forEach(s => assert.notOk(ElementParser.MATCH_NESTED_SQUARE_BRACKETS.test(s), `expected false: ${s}`));
       });
+      it('should be able to run some splitters', () => {
+        assert.sameDeepMembers(VariableParser.allStringReferences(
+          ``
+        ), [
+        ], `running allStringReferences('')`);
+
+        assert.sameDeepMembers(VariableParser.allStringReferences(
+          '${str1} ${str2}'
+        ), [
+          'str1', 'str2',
+        ], `running allStringReferences('\${str1} \${str2}')`);
+
+        assert.sameDeepMembers(VariableParser.allSetReferences(
+          '',
+        ), [
+        ], `running allSetReferences('')`);
+        assert.sameDeepMembers(VariableParser.allSetReferences(
+          ' $[set1] $[set2] ',
+        ), [
+          'set1', 'set2',
+        ], `running allSetReferences(' \$[set1] \$[set2]')`);
+        assert.sameDeepMembers(VariableParser.setSplitter(
+          ``
+        ), [
+        ], `running setSplitter('')`);
+        assert.sameDeepMembers(VariableParser.setSplitter(
+          ` A B  C`
+        ), [
+          'A', 'B', 'C',
+        ], `running setSplitter(' A B  C')`);
+      });
     });
     describe('segment some strings', () => {
+      it('should have a functioning ElementSegment() c’tor', () => {
+        assert.equal(new ElementSegment('String', ElementType.string).type, ElementType.string);
+        assert.equal(new ElementSegment('String', ElementType.string).unescaped, 'String');
+        assert.equal(new ElementSegment('\\u0041').unescaped, 'A');
+        assert.equal(new ElementSegment('\\u{0041}').unescaped, 'A');
+      });
       it('should be able to segment strings from the spec and samples', () => {
         samplePatterns.forEach(str => assert.ok(ElementParser.segment(str)));
       });

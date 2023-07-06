@@ -36,6 +36,8 @@ export class LayrCompiler extends SectionCompiler {
           valid = false;
           this.callbacks.reportMessage(CompilerMessages.Error_ExcessHardware({form}));
         } else if (!constants.layr_list_hardware_map.get(form)) {
+          /* c8 ignore next 4 */
+          // not reached due to XML validation
           valid = false;
           this.callbacks.reportMessage(CompilerMessages.Error_InvalidHardware({form}));
         }

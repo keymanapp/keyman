@@ -69,6 +69,7 @@ export class LdmlKeyboardCompiler {
       if (ok) {
         this.usetparser = compiler;
       } else {
+        /* c8 ignore next 2 */
         this.usetparser = null; // Store null on failure
       }
     }
@@ -87,25 +88,24 @@ export class LdmlKeyboardCompiler {
    */
   public load(filename: string): LDMLKeyboardXMLSourceFile | null {
     const reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, this.callbacks);
+    // load the file from disk into a string
     const data = this.callbacks.loadFile(filename);
     if(!data) {
-      // TODO-LDML: coverage for this
       this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to read XML file'}));
       return null;
     }
+    // parse (load) the string into an object tree
     const source = reader.load(data);
     if(!source) {
-      // TODO-LDML: coverage for this
       this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to load XML file'}));
       return null;
     }
     try {
+      // validate the object tree against the .xsd schema
       if (!reader.validate(source, this.callbacks.loadSchema('ldml-keyboard'))) {
-        // TODO-LDML: coverage
         return null;
       }
     } catch(e) {
-      // TODO-LDML: coverage
       this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: e.toString()}));
       return null;
     }
@@ -123,13 +123,12 @@ export class LdmlKeyboardCompiler {
       const reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, this.callbacks);
       const data = this.callbacks.loadFile(filename);
       if(!data) {
-        // TODO: coverage
         this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to read XML file'}));
         return null;
       }
       const source = reader.loadTestData(data);
+      /* c8 ignore next 4 */
       if(!source) {
-        // TODO: coverage
         this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to load XML file'}));
         return null;
       }

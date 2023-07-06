@@ -7,7 +7,7 @@ _km-package-install_completions()
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    opts="-h --help -v --verbose -vv --veryverbose --version -p --package -f --file -s --shared -l --bcp47"
+    opts="-h --help -v --verbose -vv --veryverbose --version -p --package -f --file -s --shared -l --bcp47 --force"
 
     cache=${XDG_CACHE_HOME:-~/.cache}/keyman/kmpdirlist
 
