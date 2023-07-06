@@ -33,11 +33,15 @@ Markers can appear in both 'emitting' and 'matching-only' areas:
 ## Theory / Encoding
 
 - Keyman already uses U_SENTINEL `U+FFFF` (noncharacter)
-- The general proposal here is to use the sequence `U+FFFF U+EXXX` to represent marker #XXX
+- The general proposal here is to use the sequence `U+FFFF U+XXXX` to represent marker #XXXX (starting with `U+0001`)
 - `U+FFFF` cannot otherwise occur in text, so it is unique
-- `U+EXXX` is always a private use character, so the marker number cannot collide with non-PUA text, however it may certainly collide with PUA text. The intention here is to reduce this possibility of collision, at least when (a) humans read a binary stream or (b) human _error_ causes the marker to show up in acutal text.  As a counter example, if we used `U+FFFF U+0022` to indicate marker 0x22, then the marker might show up as a doublequote (`"`).
-- `U+FFFF U+EFFF` to indicate 'any marker'  corresponds to `\m{.}`
-- this scheme allows for 4,095 (0xFFF) unique markers, from `U+FFFF U+E000` through `U+FFFF U+EFFE`
+- `U+FFFF U+FFFF` to indicate 'any marker'  corresponds to `\m{.}`
+- This scheme allows for 65,534 (0xFFFE) unique markers, from `U+FFFF U+0001` through `U+FFFF U+FFFE`
+
+## Terminology
+- A marker's "number" is its position in the `markers` list, starting at index 1 (U+0001) being the first element in that list.
+Note that this is different from other 0-based indices in KMX+. If there are three markers in a keyboard file, they will be numbered 1, 2, 3.
+- A marker's "id" is its string name such as `a` or `acute`
 
 ## Compiler (kmc)
 
@@ -52,21 +56,24 @@ Markers can appear in both 'emitting' and 'matching-only' areas:
 ### Other sections
 
 - `string value='\m{…}'` will simply store `\m{…}`, for application when expanded as with other variables.
-- Other emitters, such as `key`, `transform` will include the string `U+FFFF U+EXXX` where XXX corresponds to the marker's number.
-- Transforms will need to match against the marker or markers desired, so may need to emit sequences such as `(?:\uFFFF\uE123)` meaning a match to marker #0x123
-- matching `\m{.}` may need to expand to `(?:\uFFFF[\uE000-\uEFFE])`
+- Other emitters, such as `key`, `transform` will include the string `U+FFFF U+XXXX` where XXXX corresponds to the marker's 1-based number.
+- Transforms will need to match against the marker or markers desired, so may need to emit sequences such as `(?:\uFFFF\u0123)` meaning a match to marker #0x0123
+- matching `\m{.}` may then expand to `(?:\uFFFF.)`
 
 ## Binary (.kmx plus)
 
 - The `vars.markers` is a pointer into the `list` section with a list (binary order) of the marker names
-- Other strings will be in `U+FFFF U+E123` form etc. as if it was in the original text stream as such.
+- Other strings will be in `U+FFFF U+0123` form etc. as if it was in the original text stream as such.
 
 ## Implementation (core)
 
-- Core needs to recognize `U+FFFF …` sequences and convert them to markers in the context stream.
-- For normal processing, Core does _not_ need to correlate the marker _number_ with a marker _id_, although this would be helpful for a debugging or tracing facility.  I.e. `U+FFFF U+E123` corresponding to entry 0x123 in the `vars.markers` -> `list` table.
+- Core needs to recognize `U+FFFF …` sequences and convert them to markers in the context stream, with `state->context().push_marker(marker_number)`
+- For normal processing, Core does _not_ need to correlate the marker _number_ with a marker _id_, although this would be helpful for a debugging or tracing facility.  I.e. `U+FFFF U+0123` corresponding to entry 0x0123 in the `vars.markers` -> `list` table.
 - Core needs to remove `U+FFFF …` sequences before they are passed to the OS.
-- The default backspace processing needs to ignore `U+FFFF …` markers as it is deleting.
+
+- Transform processing needs to recognize these markers in the context stream and pass them to the transforms appropriately.
+- User-defined backspace processing `<transform type="backspace"/> may specifically operate on backspaces in the context stream, just as with other transform processing.
+- The default backspace processing needs to recognize these markers in the context stream and remove them as appropriate.
 
 
 [tr35-keyboards-markers]: https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-keyboards.md#markers
