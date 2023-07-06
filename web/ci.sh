@@ -64,6 +64,10 @@ if builder_start_action build; then
   ./build.sh configure clean build --ci
 
   # Upload the sentry-configuration engine used by the mobile apps to sentry
+  # Also, clean 'em first.
+  for sourcemap in "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/"*.map; do
+    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" null "$sourcemap" --clean
+  done
   web_sentry_upload "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/"
 
   # And, of course, the main build-products too
