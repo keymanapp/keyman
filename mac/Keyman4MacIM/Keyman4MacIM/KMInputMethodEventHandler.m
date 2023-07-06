@@ -964,9 +964,23 @@ NSRange _previousSelRange;
 //MARK: Core-related key processing
 // replacement handleEvent implementation for core event processing
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
+  NSLog(@"SGS handleEvent event = %@", event);
+
+  // mouse movement requires that the context be invalidated
+  
+  if (self.AppDelegate.contextChangingEventDetected)
+  {
+    if (!self.cachedContext.isInvalid) {
+      NSLog(@"Low-level event has invalidated the context.");
+      [self.cachedContext invalidateContext];
+    }
+    self.AppDelegate.contextChangingEventDetected = NO;
+  }
+
   if (event.type == NSKeyDown) {
-    // TODO: only do this for NSKeyDown?
-    [self loadContext:event forClient:sender];
+    if ([self.cachedContext isInvalid]) {
+      [self loadContext:event forClient:sender];
+    }
     
     if (event.keyCode == kKeymanEventKeyCode) {
       [self insertQueuedText: event client:sender];
@@ -985,7 +999,7 @@ NSRange _previousSelRange;
         switch([event keyCode]) {
             case kVK_RightCommand:
             case kVK_Command:
-                _contextOutOfDate = YES;
+            [self.cachedContext invalidateContext];
                 break;
             case kVK_Shift:
             case kVK_RightShift:
@@ -1015,21 +1029,25 @@ NSRange _previousSelRange;
 -(void)loadContext:(NSEvent *)event forClient:(id) client {
   NSString *contextString = nil;
   NSAttributedString *attributedString = nil;
-  
-  if([self.cachedContext isEmpty] && self.textCompatibility.canReadText) {
-    NSRange selectionRange = [client selectedRange];
-    NSRange contextRange = NSMakeRange(0, selectionRange.location);
-    attributedString = [client attributedSubstringFromRange:contextRange];
-  }
-  
-  if(attributedString == nil) {
-    contextString = @"";
-  } else {
-    contextString = attributedString.string;
-  }
-  
-  NSLog(@"***SGS checkContext, context='%@'", contextString);
-  [self.cachedContext addSubtring:contextString];
+  NSLog(@"***SGS loadContext called.");
+
+  if ([self.cachedContext isInvalid]) {
+    if (self.textCompatibility.canReadText) {
+      NSRange selectionRange = [client selectedRange];
+      NSRange contextRange = NSMakeRange(0, selectionRange.location);
+      attributedString = [client attributedSubstringFromRange:contextRange];
+    }
+    
+    if(attributedString == nil) {
+      contextString = @"";
+    } else {
+      contextString = attributedString.string;
+    }
+    
+    NSLog(@"***SGS loadContext, new context='%@'", contextString);
+    [self.cachedContext resetContext:contextString];
+    [self.kme setCoreContext:contextString];
+    }
 }
 
 -(void)checkClientTextCompatibility:(id) client {
@@ -1102,11 +1120,14 @@ NSRange _previousSelRange;
 -(void)executeSimpleOperation:(KMActionOperation*)operation keyDownEvent:(nonnull NSEvent *)event {
   CoreAction *action = operation.action;
   if (action != nil) {
-    
+    NSLog(@"KXMInputMethodHandler executeSimpleOperation: %@", operation);
   }
   switch(action.actionType) {
     case AlertAction:
       NSBeep();
+      break;
+    case InvalidateContextAction:
+      [self.cachedContext invalidateContext];
       break;
     case PersistOptionAction:
       //TODO: handle this somewhere
@@ -1118,6 +1139,7 @@ NSRange _previousSelRange;
     default:
       break;
   }
+
   [self.cachedContext applyAction:operation.action keyDownEvent:event];
 }
 

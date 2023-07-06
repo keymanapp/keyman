@@ -20,6 +20,7 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
 @interface KMContext()
 
 @property (readonly) NSMutableString *context;
+@property BOOL invalid;
 
 @end
 
@@ -29,6 +30,7 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
   self = [super init];
   if (self) {
     _context = [[NSMutableString alloc] initWithCapacity:MAXIMUM_CONTEXT_LENGTH];
+    _invalid = YES;
   }
   return self;
 }
@@ -36,30 +38,44 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
 -(instancetype)initWithString:(NSString*)initialContext {
   self = [self init];
   if (self) {
-    NSString *maximumContext = nil;
-    
-    // copy up to MAXIMUM_CONTEXT_LENGTH from the end of the context
-    NSUInteger initialLength = [initialContext length];
-    if (initialLength > MAXIMUM_CONTEXT_LENGTH) {
-      maximumContext = [initialContext substringFromIndex:initialLength-MAXIMUM_CONTEXT_LENGTH];
-    } else {
-      maximumContext = initialContext;
-    }
-
-    [_context setString:maximumContext];
+    [_context setString:[self trimToMaximumContext:initialContext]];
+    _invalid = NO;
   }
   return self;
+}
+
+-(NSString*)trimToMaximumContext:(NSString*)initialContext {
+  NSString *maximumContext = nil;
+
+  // copy up to MAXIMUM_CONTEXT_LENGTH from the end of the context
+  NSUInteger initialLength = [initialContext length];
+  if (initialLength > MAXIMUM_CONTEXT_LENGTH) {
+    maximumContext = [initialContext substringFromIndex:initialLength-MAXIMUM_CONTEXT_LENGTH];
+  } else {
+    maximumContext = initialContext;
+  }
+
+  return maximumContext;
+}
+
+-(void)resetContext:(NSString*)newContext {
+  [_context setString:[self trimToMaximumContext:newContext]];
+  self.invalid = NO;
 }
 
 -(NSString*)currentContext {
   return (NSString*)_context;
 }
 
--(BOOL)isEmpty {
-  return _context.length == 0;
+-(BOOL)isInvalid {
+  return self.invalid;
 }
 
-// TODO: synch with Keyman Core context, don't just set this on its own
+-(void)invalidateContext {
+  [self clearContext];
+  self.invalid = YES;
+}
+
 -(void)clearContext {
   _context.string = @"";
 }
@@ -87,7 +103,7 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
 }
 
 -(void)replaceSubstring:(NSString*)newText count:(int)count {
-  // loop through the string and replace one a time to account for characters of different width
+  // loop through the string and replace one at a time to account for characters of different width
   if (count > 0) {
     int i;
     for (i = 0; i < count; i++) {
@@ -123,7 +139,7 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
       [self applyUnhandledEvent:event];
       break;
     case InvalidateContextAction:
-      [self clearContext];
+      [self invalidateContext];
       break;
     default:
       NSLog(@"CachedContext applyAction, action not applied to context %@\n", action.typeName.description);
@@ -150,7 +166,7 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
     case kVK_PageUp:
     case kVK_PageDown:
     {
-      [self clearContext];
+      [self invalidateContext];
       break;
     }
     case kVK_Return:

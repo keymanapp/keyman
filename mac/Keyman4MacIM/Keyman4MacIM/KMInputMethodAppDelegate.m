@@ -385,7 +385,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (KMEngine *)kme {
     if (_kme == nil) {
-        _kme = [[KMEngine alloc] initWithKMX:nil contextBuffer:self.contextBuffer];
+      //TODO: verify that initial context is correct; this is passed to core
+       _kme = [[KMEngine alloc] initWithKMX:nil contextBuffer:self.contextBuffer];
         [_kme setDebugMode:self.debugMode];
     }
 

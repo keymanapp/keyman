@@ -20,12 +20,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 -(instancetype)init NS_DESIGNATED_INITIALIZER;
 -(instancetype)initWithString:(NSString*)initialContext;
+-(void)resetContext:(NSString*)newContext;
 -(void)addSubtring:(NSString*)string;
 -(void)replaceSubstring:(NSString*)newText count:(int)count;
 -(void)deleteLastCodePoint;
 -(void)applyAction:(CoreAction*)action keyDownEvent:(nonnull NSEvent *)event;
--(BOOL)isEmpty;
--(void)clearContext;
+-(BOOL)isInvalid;
+-(void)invalidateContext;
 
 @end
 

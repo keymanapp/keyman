@@ -30,6 +30,8 @@ extern DWORD VKMap[0x80];
 @property (assign, nonatomic) BOOL debugMode;
 
 - (id)initWithKMX:(KMXFile *)kmx contextBuffer:(NSString *)ctxBuf;
+- (void)setCoreContext:(NSString *)context;
+//TODO: remove additional context methods
 - (void)setContextBuffer:(NSString *)ctxBuf;
 - (NSString *)contextBuffer;
 - (void)setStore:(DWORD)storeID withValue:(NSString *)value;

@@ -118,6 +118,10 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
         NSLog(@"KME - Turning verbose logging off");
 }
 
+- (void)setCoreContext:(NSString *)context {
+  [self.keymanCore setContext:context];
+}
+
 - (void)setContextBuffer:(NSString *)ctxBuf {
     _tmpCtxBuf = [[NSMutableString alloc] initWithString:ctxBuf];
     [_tmpCtxBuf removeAllNullChars];
@@ -159,6 +163,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     if ([coreActions count] == 0) {
       return nil;
     } else {
+      NSLog(@"**SGS KME processEvent current context according to Core: %@", self.keymanCore.context);
       // update context from core
       [self.tmpCtxBuf setString:self.keymanCore.context];
       return coreActions;
