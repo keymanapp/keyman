@@ -579,7 +579,13 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
 
     // Step 1:  have the necessary conditions been met?
     const hasDimensions = this.width && this.height;
-    const fixedSize = hasDimensions && this.width.absolute && this.height.absolute;
+
+    if(!hasDimensions) {
+      // If dimensions haven't been set yet, we have no basis for layout calculations.
+      return;
+    }
+
+    const fixedSize = this.width.absolute && this.height.absolute;
     const computedStyle = getComputedStyle(this._Box);
     const isInDOM = computedStyle.height != '' && computedStyle.height != 'auto';
 
@@ -587,7 +593,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
     if(fixedSize) {
       this._computedWidth  = this.width.val;
       this._computedHeight = this.height.val;
-    } else if(isInDOM && hasDimensions) {
+    } else if(isInDOM) {
       // Note:  %-based auto-detect for dimensions currently has some issues; the stylesheets load
       // asynchronously, causing the format to be VERY off before the stylesheets fully load.
       //
@@ -596,12 +602,8 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
       const parent = this._Box.parentElement as HTMLElement;
       this._computedWidth  = this.width.val  * (this.width.absolute  ? 1 : parent.offsetWidth);
       this._computedHeight = this.height.val * (this.height.absolute ? 1 : parent.offsetHeight);
-    } else if(hasDimensions) {
-      console.warn("Unable to properly perform layout - specification uses a relative spec, thus relies upon insertion into the DOM for layout.");
-      return;
     } else {
-      // We may hit this point during certain control flows while establishing the OSK;
-      // it has been observed to happen during the Keyman for iOS keyboard init with some regularity.
+      console.warn("Unable to properly perform layout - specification uses a relative spec, thus relies upon insertion into the DOM for layout.");
       return;
     }
 
