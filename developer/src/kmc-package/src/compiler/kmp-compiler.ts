@@ -6,8 +6,11 @@ import { CompilerCallbacks, KeymanFileTypes, KvkFile } from '@keymanapp/common-t
 import { CompilerMessages } from './messages.js';
 import { KmpJsonFile, KpsFile } from '@keymanapp/common-types';
 import { PackageVersionValidation } from './package-version-validation.js';
+import { KmpInfWriter } from './kmp-inf-writer.js';
+import { transcodeToCP1252 } from './cp1252.js';
 
-const FILEVERSION_KMP_JSON = '12.0';
+const KMP_JSON_FILENAME = 'kmp.json';
+const KMP_INF_FILENAME = 'kmp.inf';
 
 export class KmpCompiler {
 
@@ -104,9 +107,18 @@ export class KmpCompiler {
     }
     kmp.files = kmp.files ?? [];
 
+    // Keyboard packages also include a legacy kmp.inf file (this will be removed,
+    // one day)
+    if(kps.keyboards && kps.keyboards.keyboard) {
+      kmp.files.push({
+        name: KMP_INF_FILENAME,
+        description: "Package information"
+      });
+    }
+
     // Add the standard kmp.json self-referential to match existing implementations
     kmp.files.push({
-      name: "kmp.json",
+      name: KMP_JSON_FILENAME,
       description: "Package information (JSON)"
     });
 
@@ -234,7 +246,6 @@ export class KmpCompiler {
   public buildKmpFile(kpsFilename: string, kmpJsonData: KmpJsonFile.KmpJsonFile): Promise<string> {
     const zip = JSZip();
 
-    const kmpJsonFileName = 'kmp.json';
 
     // Make a copy of kmpJsonData, as we mutate paths for writing
     const data: KmpJsonFile.KmpJsonFile = JSON.parse(JSON.stringify(kmpJsonData));
@@ -242,13 +253,15 @@ export class KmpCompiler {
       data.files = [];
     }
 
+    const hasKmpInf = !!data.files.find(file => file.name == KMP_INF_FILENAME);
+
     let failed = false;
     data.files.forEach((value) => {
       // Get the path of the file
       let filename = value.name;
 
       // We add this separately after zipping all other files
-      if(filename == 'kmp.json') {
+      if(filename == KMP_JSON_FILENAME || filename == KMP_INF_FILENAME) {
         return;
       }
 
@@ -287,10 +300,19 @@ export class KmpCompiler {
       return null;
     }
 
-    zip.file(kmpJsonFileName, JSON.stringify(data, null, 2));
+    zip.file(KMP_JSON_FILENAME, JSON.stringify(data, null, 2));
+    if(hasKmpInf) {
+      zip.file(KMP_INF_FILENAME, this.buildKmpInf(data));
+    }
 
     // Generate kmp file
     return zip.generateAsync({type: 'binarystring', compression:'DEFLATE'});
+  }
+
+  private buildKmpInf(data: KmpJsonFile.KmpJsonFile): Uint8Array {
+    const writer = new KmpInfWriter(data);
+    const s = writer.write();
+    return transcodeToCP1252(s);
   }
 
   /**
