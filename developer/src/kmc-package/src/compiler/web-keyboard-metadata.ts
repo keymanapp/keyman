@@ -5,6 +5,7 @@ export interface WebKeyboardMetadata {
   minKeymanVersion: string;
   isRtl: boolean;
   isMnemonic: boolean;
+  targets?: string;
 };
 
 /**

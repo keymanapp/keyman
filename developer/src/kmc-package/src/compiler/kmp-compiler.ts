@@ -5,9 +5,15 @@ import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { CompilerCallbacks, KeymanFileTypes, KvkFile } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
 import { KmpJsonFile, KpsFile } from '@keymanapp/common-types';
-import { PackageVersionValidation } from './package-version-validation.js';
+import { PackageMetadataCollector } from './package-metadata-collector.js';
+import { KmpInfWriter } from './kmp-inf-writer.js';
+import { transcodeToCP1252 } from './cp1252.js';
+import { MIN_LM_FILEVERSION_KMP_JSON, PackageVersionValidator } from './package-version-validator.js';
+import { PackageKeyboardTargetValidator } from './package-keyboard-target-validator.js';
+import { PackageMetadataUpdater } from './package-metadata-updater.js';
 
-const FILEVERSION_KMP_JSON = '12.0';
+const KMP_JSON_FILENAME = 'kmp.json';
+const KMP_INF_FILENAME = 'kmp.inf';
 
 export class KmpCompiler {
 
@@ -51,7 +57,7 @@ export class KmpCompiler {
 
     let kmp: KmpJsonFile.KmpJsonFile = {
       system: {
-        fileVersion: FILEVERSION_KMP_JSON,
+        fileVersion: null,
         keymanDeveloperVersion: KEYMAN_VERSION.VERSION
       },
       options: {}
@@ -71,7 +77,11 @@ export class KmpCompiler {
     if(kps.options) {
       for (let [src,dst] of keys) {
         if (kps.options[src]) {
-          kmp.options[dst] = kps.options[src];
+          if(dst == 'graphicFile' || dst == 'readmeFile') {
+            kmp.options[dst] = /[/\\]?([^/\\]*)$/.exec(kps.options[src])[1];
+          } else {
+            kmp.options[dst] = kps.options[src];
+          }
         }
       }
     }
@@ -91,8 +101,8 @@ export class KmpCompiler {
     if(kps.files && kps.files.file) {
       kmp.files = this.arrayWrap(kps.files.file).map((file: KpsFile.KpsFileContentFile) => {
         return {
-          name: file.name,
-          description: file.description,
+          name: file.name.trim(),
+          description: file.description.trim(),
           copyLocation: parseInt(file.copyLocation, 10) || undefined
           // note: we don't emit fileType as that is not permitted in kmp.json
         };
@@ -100,9 +110,18 @@ export class KmpCompiler {
     }
     kmp.files = kmp.files ?? [];
 
+    // Keyboard packages also include a legacy kmp.inf file (this will be removed,
+    // one day)
+    if(kps.keyboards && kps.keyboards.keyboard) {
+      kmp.files.push({
+        name: KMP_INF_FILENAME,
+        description: "Package information"
+      });
+    }
+
     // Add the standard kmp.json self-referential to match existing implementations
     kmp.files.push({
-      name: "kmp.json",
+      name: KMP_JSON_FILENAME,
       description: "Package information (JSON)"
     });
 
@@ -114,9 +133,10 @@ export class KmpCompiler {
       kmp.keyboards = this.arrayWrap(kps.keyboards.keyboard).map((keyboard: KpsFile.KpsFileKeyboard) => ({
         displayFont: keyboard.displayFont ? this.callbacks.path.basename(keyboard.displayFont) : undefined,
         oskFont: keyboard.oSKFont ? this.callbacks.path.basename(keyboard.oSKFont) : undefined,
-        name:keyboard.name,
-        id:keyboard.iD,
-        version:keyboard.version,
+        name:keyboard.name.trim(),
+        id:keyboard.iD.trim(),
+        version:keyboard.version.trim(),
+        rtl:keyboard.rTL == 'True' ? true : undefined,
         languages: keyboard.languages ?
           this.kpsLanguagesToKmpLanguages(this.arrayWrap(keyboard.languages.language) as KpsFile.KpsFileLanguage[]) :
           []
@@ -129,40 +149,77 @@ export class KmpCompiler {
 
     if(kps.lexicalModels && kps.lexicalModels.lexicalModel) {
       kmp.lexicalModels = this.arrayWrap(kps.lexicalModels.lexicalModel).map((model: KpsFile.KpsFileLexicalModel) => ({
-        name:model.name,
-        id:model.iD,
+        name:model.name.trim(),
+        id:model.iD.trim(),
         languages: model.languages ?
           this.kpsLanguagesToKmpLanguages(this.arrayWrap(model.languages.language) as KpsFile.KpsFileLanguage[]) : []
       }));
     }
 
     //
-    // Verify version metadata; doing this in the transform
-    // while we have access to the .kps metadata, and keeping the
+    // Collect metadata from keyboards (and later models) in order to update
+    // the kmp.json metadata for use downstream in apps. This will also be
+    // used later to fill in .keyboard_info file data.
     //
 
-    const versionValidator = new PackageVersionValidation(this.callbacks);
-    if(!versionValidator.validateAndUpdateVersions(kpsFilename, kps, kmp)) {
+    const collector = new PackageMetadataCollector(this.callbacks);
+    const metadata = collector.collectKeyboardMetadata(kpsFilename, kmp);
+    if(metadata == null) {
       return null;
     }
+
+    //
+    // Verify keyboard versions and update version metadata where appropriate
+    //
+
+    const versionValidator = new PackageVersionValidator(this.callbacks);
+    if(!versionValidator.validateAndUpdateVersions(kps, kmp, metadata)) {
+      return null;
+    }
+
+    if(kps.keyboards && kps.keyboards.keyboard) {
+      kmp.system.fileVersion = versionValidator.getMinKeymanVersion(metadata);
+    } else {
+      kmp.system.fileVersion = MIN_LM_FILEVERSION_KMP_JSON;
+    }
+
+    //
+    // Verify that packages that target mobile devices include a .js file
+    //
+
+    const targetValidator = new PackageKeyboardTargetValidator(this.callbacks);
+    targetValidator.verifyAllTargets(kmp, metadata);
+
+    //
+    // Update assorted keyboard metadata from the keyboards in the package
+    //
+
+    const updater = new PackageMetadataUpdater();
+    updater.updatePackage(metadata);
 
     //
     // Add Windows Start Menu metadata
     //
 
-    if(kps.startMenu && kps.startMenu.items) {
+    if(kps.startMenu && (kps.startMenu.folder || kps.startMenu.items)) {
       kmp.startMenu = {};
-      if(kps.startMenu.addUninstallEntry) kmp.startMenu.addUninstallEntry = kps.startMenu.addUninstallEntry === '';
+      if(kps.startMenu.addUninstallEntry === '') kmp.startMenu.addUninstallEntry = true;
       if(kps.startMenu.folder) kmp.startMenu.folder = kps.startMenu.folder;
-      if(kps.startMenu.items && kps.startMenu.items.item) kmp.startMenu.items = this.arrayWrap(kps.startMenu.items.item);
-    }
+      if(kps.startMenu.items && kps.startMenu.items.item) {
+        kmp.startMenu.items = this.arrayWrap(kps.startMenu.items.item);
 
-    //
-    // Add translation strings
-    //
-
-    if(kps.strings && kps.strings.string) {
-      kmp.strings = this.arrayWrap(kps.strings.string);
+        // Remove default values
+        for(let item of kmp.startMenu.items) {
+          if(item.icon == '') delete item.icon;
+          if(item.location == 'psmelStartMenu') delete item.location;
+          if(item.arguments == '') delete item.arguments;
+          // Horrific case change between .kps and kmp.json:
+          item.filename = (<any>item).fileName;
+          delete (<any>item).fileName;
+        }
+      } else {
+        kmp.startMenu.items = [];
+      }
     }
 
     kmp = this.stripUndefined(kmp) as KmpJsonFile.KmpJsonFile;
@@ -229,7 +286,6 @@ export class KmpCompiler {
   public buildKmpFile(kpsFilename: string, kmpJsonData: KmpJsonFile.KmpJsonFile): Promise<string> {
     const zip = JSZip();
 
-    const kmpJsonFileName = 'kmp.json';
 
     // Make a copy of kmpJsonData, as we mutate paths for writing
     const data: KmpJsonFile.KmpJsonFile = JSON.parse(JSON.stringify(kmpJsonData));
@@ -237,13 +293,15 @@ export class KmpCompiler {
       data.files = [];
     }
 
+    const hasKmpInf = !!data.files.find(file => file.name == KMP_INF_FILENAME);
+
     let failed = false;
     data.files.forEach((value) => {
       // Get the path of the file
       let filename = value.name;
 
       // We add this separately after zipping all other files
-      if(filename == 'kmp.json') {
+      if(filename == KMP_JSON_FILENAME || filename == KMP_INF_FILENAME) {
         return;
       }
 
@@ -282,10 +340,19 @@ export class KmpCompiler {
       return null;
     }
 
-    zip.file(kmpJsonFileName, JSON.stringify(data, null, 2));
+    zip.file(KMP_JSON_FILENAME, JSON.stringify(data, null, 2));
+    if(hasKmpInf) {
+      zip.file(KMP_INF_FILENAME, this.buildKmpInf(data));
+    }
 
     // Generate kmp file
     return zip.generateAsync({type: 'binarystring', compression:'DEFLATE'});
+  }
+
+  private buildKmpInf(data: KmpJsonFile.KmpJsonFile): Uint8Array {
+    const writer = new KmpInfWriter(data);
+    const s = writer.write();
+    return transcodeToCP1252(s);
   }
 
   /**

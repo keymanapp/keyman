@@ -1,7 +1,7 @@
 {
   "system": {
     "keymanDeveloperVersion": "16.0.60.0",
-    "fileVersion": "12.0"
+    "fileVersion": "7.0"
   },
   "options": {
     "readmeFile": "readme.htm",
@@ -86,6 +86,10 @@
     {
       "name": "splash.gif",
       "description": "File splash.gif"
+    },
+    {
+      "name": "kmp.inf",
+      "description": "Package information"
     },
     {
       "name": "kmp.json",
