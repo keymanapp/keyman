@@ -198,3 +198,20 @@ lcov.info
 # /developer/src/test/auto/kmcomp/*.kvk
 # /developer/src/test/auto/kmcomp/*.kvk*
 # /developer/src/test/auto/kmcomp/*.txt
+windows/src/engine/keyman32/exports.h
+.gitignore
+windows/src/engine/keyman32/premake.mak
+windows/src/engine/keyman32-ver/keyman32-ver.def
+windows/src/engine/keyman32-ver/keyman64-build-version.h
+windows/src/engine/keyman32-ver/keyman-debug-etwTEMP.BIN
+windows/src/engine/keyman32-ver/keyman-engine.pdb
+windows/src/engine/keyman32-ver/MSG00001.bin
+windows/src/engine/keyman32-ver/KEYMAN32-ver.res
+windows/src/engine/keyman32-ver/premake.mak
+windows/src/engine/keyman64/exports.h
+windows/src/engine/keyman64/keyman-debug-etwTEMP.BIN
+windows/src/engine/keyman64/MSG00001.bin
+windows/src/engine/keyman64/premake.mak
+windows/src/engine/keyman64-ver/premake.mak
+windows/src/engine/keyman64-ver/TODO.TXT
+windows/src/global/inc/keymanversion_build.h
