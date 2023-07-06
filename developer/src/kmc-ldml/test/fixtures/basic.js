@@ -38,7 +38,8 @@ function Keyboard_basic() {
           }
         ]
       }
-    ]
+    ],
+    "displayUnderlying": false
   }
 };
   this.gs=function(t,e){

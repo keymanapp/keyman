@@ -188,9 +188,9 @@ function TransformSpecialKeys14(FDebug: boolean, sLayoutFile: string): string {
     for(let i = 0; i < CSpecialText14Map.length; i++) {
       // Assumes the JSON output format will not change
       if(FDebug) {
-        sLayoutFile = sLayoutFile.replace('"text": "'+CSpecialText14Map[i][0]+'"', '"text": this._v>13 ? "'+CSpecialText14Map[i][0]+'" : "'+CSpecialText14Map[i][1]+'"');
+        sLayoutFile = sLayoutFile.replaceAll('"text": "'+CSpecialText14Map[i][0]+'"', '"text": this._v>13 ? "'+CSpecialText14Map[i][0]+'" : "'+CSpecialText14Map[i][1]+'"');
       } else {
-        sLayoutFile = sLayoutFile.replace('"text":"'+CSpecialText14Map[i][0]+'"', '"text":this._v>13?"'+CSpecialText14Map[i][0]+'":"'+CSpecialText14Map[i][1]+'"');
+        sLayoutFile = sLayoutFile.replaceAll('"text":"'+CSpecialText14Map[i][0]+'"', '"text":this._v>13?"'+CSpecialText14Map[i][0]+'":"'+CSpecialText14Map[i][1]+'"');
       }
     }
   }

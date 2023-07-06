@@ -47,7 +47,7 @@ export class VisualKeyboardKey {
   shift?: BUILDER_KVK_SHIFT_STATE;
   vkey?: number;
   text?: string;
-  //bitmap: bitmap-image, unsupported in ldml keyboards; may include for round-tripabilty?
+  bitmap?: Uint8Array;  // .bmp, unsupported in ldml keyboards; included for round-tripabilty
 };
 
 interface VisualKeyboardLegalShiftState {

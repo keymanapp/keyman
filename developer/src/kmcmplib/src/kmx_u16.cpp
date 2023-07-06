@@ -166,9 +166,8 @@ const KMX_WCHAR *  u16ncpy(KMX_WCHAR *dst, const KMX_WCHAR *src, size_t max) {
     *dst++ = *src++;
     max--;
   }
-  while(max > 0) {
-    *dst++ = 0;
-    max--;
+  if(max > 0) {
+    *dst = 0;
   }
   return o;
 }

@@ -96,7 +96,7 @@ export function ExpandSentinel(fk: KMX.KEYBOARD, pwsz: string, x: number): TSent
       result.Index = {
         StoreIndex: indexIdx,
         Store: fk.stores[indexIdx],
-        Index: pwsz.charCodeAt(x) - 1
+        Index: pwsz.charCodeAt(x)
       }
       break;
     case KMX.KMXFile.CODE_DEADKEY:

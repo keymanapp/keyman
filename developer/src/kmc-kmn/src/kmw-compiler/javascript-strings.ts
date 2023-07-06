@@ -61,9 +61,8 @@ export function JavaScript_Store(fk: KMX.KEYBOARD, line: number, pwsz: string): 
         }
         result += JavaScript_String(ch);  // I2242
       }
-
-      const stringStartsWithSurrogatePair = (s:string) => /^[\uD800-\uDBFF][\uDC00-\uDFFF]/.test(s);
-      pwsz = pwsz.substring(stringStartsWithSurrogatePair(pwsz) ? 2 : 1);
+      const x = incxstr(pwsz, 0);
+      pwsz = pwsz.substring(x);
     }
     result += '"';
   }
@@ -643,7 +642,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
       }
       x = incxstr(pwszContext, x);
     }
-    return Result + 1; // 1-based
+    return Result;
   }
 
   const ContextChar = function(ContextIndex: number, pwszContext: string, xContext: number): string {   // I4611
@@ -658,7 +657,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
 
       switch(recContext.Code) {
       case KMX.KMXFile.CODE_ANY:
-        Index = AdjustIndex(fkp.dpContext, ContextIndex);   // I3910   // I4611
+        Index = AdjustIndex(fkp.dpContext, ContextIndex) + 1;   // I3910   // I4611
         Result += nlt + `k.KIO(${len},this.s${JavaScript_Name(recContext.Any.StoreIndex, recContext.Any.Store.dpName)},${Index},t);`;   // I4611
         break;
       case KMX.KMXFile.CODE_DEADKEY:
@@ -670,7 +669,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
         if(!IsKeyboardVersion14OrLater()) {
           callbacks.reportMessage(KmwCompilerMessages.Error_NotAnyRequiresVersion14());
         }
-        Result += nlt + `k.KCXO(${len},t,${AdjustIndex(fkp.dpContext, xstrlen(fkp.dpContext))},${AdjustIndex(fkp.dpContext, ContextIndex)});`;
+        Result += nlt + `k.KCXO(${len},t,${AdjustIndex(fkp.dpContext, xstrlen(fkp.dpContext))},${AdjustIndex(fkp.dpContext, ContextIndex)+1});`;
         break;
       case KMX.KMXFile.CODE_IFOPT:
       case KMX.KMXFile.CODE_IFSYSTEMSTORE:
@@ -835,7 +834,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
         }
         let n = FCallFunctions.indexOf(CallFunctionName(rec.Call.Store.dpString));
         if(n == -1) {
-          n = FCallFunctions.push(CallFunctionName(rec.Call.Store.dpString));
+          n = FCallFunctions.push(CallFunctionName(rec.Call.Store.dpString)) - 1;
         }
         Result += nlt+`r=this.c${n}(t,e);`;    // I1959   // I3681
         Result += nlt+'m=2;';  // #5440 - match desktop behavior

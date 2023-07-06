@@ -25,6 +25,10 @@ export default class KvkFileReader {
         shift: binaryKey.shift,
         text: binaryKey.text.str
       };
+      if(binaryKey.bitmapSize) {
+        key.bitmap = new Uint8Array(binaryKey.bitmapData);
+      }
+
       result.keys.push(key);
     }
     return result;

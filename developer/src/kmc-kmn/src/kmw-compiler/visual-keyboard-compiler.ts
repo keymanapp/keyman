@@ -5,7 +5,7 @@ import { RequotedString } from "./kmw-compiler.js";
 
 export function VisualKeyboardFromFile(visualKeyboard: VisualKeyboard.VisualKeyboard, debug: boolean): string {
   const f102 = visualKeyboard.header.flags & KvkFile.BUILDER_KVK_HEADER_FLAGS.kvkh102 ? '1' : '0';
-  return `{F:' 1em "${RequotedString(visualKeyboard.header.unicodeFont.name)}"',K102:${f102}}` +
+  return `{F:' 1em "${RequotedString(visualKeyboard.header.unicodeFont.name, true)}"',K102:${f102}}` +
     `;` + VisualKeyboardToKLS(visualKeyboard) +
     ';' + BuildBKFromKLS(debug);
 }

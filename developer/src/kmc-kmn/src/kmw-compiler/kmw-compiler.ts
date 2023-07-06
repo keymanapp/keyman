@@ -24,10 +24,12 @@ export function RequotedString(s: string, RequoteSingleQuotes: boolean = false):
       i++;
     }
     else if(s.charAt(i) == '\n') {
-      s = s.substring(0, i) + '\\n' + s.substring(i + 1);
+      s = s.substring(0, i) + ' ' + s.substring(i + 1);
     }
     else if(s.charAt(i) == '\r') {
-      s = s.substring(0, i) + ' ' + s.substring(i + 1);
+      // Yes, `\r` gets converted to `\n`, per kmcomp pattern
+      // in the future we may change this
+      s = s.substring(0, i) + '\\n' + s.substring(i + 1);
     }
     i++;
   }
@@ -114,7 +116,9 @@ export function WriteCompiledKeyboard(
     sHelpFile = callbacks.resolveFilename(kmnfile, sHelpFile);
     try {
       const data = callbacks.loadFile(sHelpFile);
-      sHelp = new TextDecoder().decode(data).replace(/[\r\n]/g, ' ');
+      let html = new TextDecoder().decode(data);
+      if(!html.endsWith('\n')) html += '\n'; // CompileKeymanWeb.pas adds a new line at EOF
+      sHelp = html.replace(/\r/g, '').replace(/\n/g, ' ');
       sHelp = requote(sHelp);
     } catch(e) {
       callbacks.reportMessage(KmwCompilerMessages.Warn_HelpFileMissing({filename: sHelpFile, e}));
@@ -140,6 +144,7 @@ export function WriteCompiledKeyboard(
     try {
       const data = callbacks.loadFile(sEmbedCSSFilename);
       sEmbedCSS = new TextDecoder().decode(data);
+      if(sEmbedCSS != '' && !sEmbedCSS.endsWith('\r\n')) sEmbedCSS += '\r\n';  // match CompileKeymanWeb.pas
     } catch(e) {
       // TODO(lowpri): rename error constant to Warn_EmbedFileMissing
       callbacks.reportMessage(KmwCompilerMessages.Warn_EmbedJsFileMissing({filename: sEmbedCSSFilename, e}));
@@ -378,7 +383,7 @@ export function WriteCompiledKeyboard(
   }
 
   for(let n = 0; n < FCallFunctions.length; n++) {
-    const s = callbacks.resolveFilename(kmnfile, callbacks.path.basename(kmnfile, '.kmn') + FCallFunctions[n] + '.call_js');
+    const s = callbacks.resolveFilename(kmnfile, FCallFunctions[n] + '.call_js');
     if(callbacks.fs.existsSync(s)) {
       const data = new TextDecoder().decode(callbacks.loadFile(s));
       result += `${FTabStop}this.c${n}=function(t,e){${data.trim()}};${nl}`;
