@@ -19,6 +19,33 @@ namespace km {
 namespace kbp {
 namespace ldml {
 
+using km::kbp::kmx::USet;
+
+/**
+ * Type of a group
+*/
+enum any_group_type {
+  transform = LDML_TRAN_GROUP_TYPE_REORDER,
+  reorder   = LDML_TRAN_GROUP_TYPE_REORDER,
+};
+
+/**
+ * Corresponds to an 'elem' entry
+*/
+class element {
+  public:
+    element(const USet &u, KMX_DWORD flags);
+    element(const std::u16string &s, KMX_DWORD flags);
+
+    // TODO-LDML: getters that interpret flags
+
+    bool is_uset() const;
+
+  private:
+    const std::u16string str;
+    const USet           uset;
+    const KMX_DWORD      flags;
+};
 
 /**
  * Inner element, representing <transform>
@@ -67,10 +94,34 @@ class transform_group : public std::deque<transform_entry> {
     const transform_entry *match(const std::u16string &input, size_t &subMatched) const;
 };
 
+typedef std::deque<element> element_list;
+
+class reorder_entry {
+  public:
+    element_list before;
+    element_list elements;
+};
+
+typedef std::deque<reorder_entry> reorder_list;
+
+struct reorder_group {
+  public:
+    reorder_list list;
+};
+
+class any_group {
+  public:
+    any_group(const transform_group& g);
+    any_group(const reorder_group& g);
+    any_group_type type; // transform or reorder
+    transform_group transform;
+    reorder_group reorder;
+};
+
 /**
  * A list of groups
 */
-typedef std::deque<transform_group> transform_group_list;
+typedef std::deque<any_group> group_list;
 
 /**
  * This represents an entire <transforms> element
@@ -78,7 +129,7 @@ typedef std::deque<transform_group> transform_group_list;
 class transforms {
 
 private:
-  transform_group_list transform_groups;
+  group_list transform_groups;
 
 public:
   transforms();
@@ -86,7 +137,11 @@ public:
   /**
    * Add a transform group
    */
-  void addTransformGroup(const transform_group& s);
+  void addGroup(const transform_group& s);
+  /**
+   * Add a reorder group
+   */
+  void addGroup(const reorder_group& s);
 
   /**
    * Attempt to match and apply a pattern change.

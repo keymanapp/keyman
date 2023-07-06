@@ -17,6 +17,16 @@ namespace kbp {
 namespace ldml {
 
 
+element::element(const USet &u, KMX_DWORD flags) : str(), uset(u), flags(flags) {
+}
+
+element::element(const std::u16string &s, KMX_DWORD flags) : str(s), uset(), flags(flags) {
+}
+
+bool element::is_uset() const {
+  return (flags & LDML_ELEM_FLAGS_TYPE) == LDML_ELEM_FLAGS_TYPE_USET;
+}
+
 transform_entry::transform_entry(const std::u16string &from, const std::u16string &to) : fFrom(from), fTo(to) {
 }
 
@@ -38,13 +48,26 @@ transform_entry::apply(const std::u16string &/*input*/, size_t /*matchLen*/) con
   return fTo;
 }
 
+any_group::any_group(const transform_group& g) : type(any_group_type::transform), transform(g), reorder() {
+
+}
+any_group::any_group(const reorder_group& g) : type(any_group_type::reorder), transform(), reorder(g) {
+}
+
+
 transforms::transforms() : transform_groups() {
 }
 
 void
-transforms::addTransformGroup(const transform_group &s) {
-  transform_groups.push_back(s);
+transforms::addGroup(const transform_group &s) {
+  transform_groups.emplace_back(s);
 }
+
+void
+transforms::addGroup(const reorder_group &s) {
+  transform_groups.emplace_back(s);
+}
+
 
 transform_group::transform_group() {
 }
@@ -118,48 +141,54 @@ transforms::apply(const std::u16string &input, std::u16string &output) {
     size_t subMatched = 0;
 
     // find the first match in this group (if present)
-    auto transform = group->match(updatedInput, subMatched);
+    // TODO-LDML: check if reorder
+    if (group->type == any_group_type::transform) {
+      auto transform = group->transform.match(updatedInput, subMatched);
 
-    if (transform != nullptr) {
-      // now apply the found transform
+      if (transform != nullptr) {
+        // now apply the found transform
 
-      // update subOutput (string) and subMatched
-      std::u16string subOutput = transform->apply(updatedInput, subMatched);
+        // update subOutput (string) and subMatched
+        std::u16string subOutput = transform->apply(updatedInput, subMatched);
 
-      // remove the matched part of the updatedInput
-      updatedInput.resize(updatedInput.length() - subMatched); // chop of the subMatched part at end
-      updatedInput.append(subOutput);  // subOutput could be empty such as in backspace transform
+        // remove the matched part of the updatedInput
+        updatedInput.resize(updatedInput.length() - subMatched);  // chop of the subMatched part at end
+        updatedInput.append(subOutput);                           // subOutput could be empty such as in backspace transform
 
-      if (subMatched > output.size()) {
-        // including first time through
-        // expand match by amount subMatched prior to output
-        matched += (subMatched - output.size());
-      } // else: didn't match prior to the existing output, so don't expand 'match'
+        if (subMatched > output.size()) {
+          // including first time through
+          // expand match by amount subMatched prior to output
+          matched += (subMatched - output.size());
+        }  // else: didn't match prior to the existing output, so don't expand 'match'
 
-      // now update 'output'
-      if (subOutput.length() >= output.length() || subMatched > output.length()) {
-        output = subOutput; // replace all output
-      } else {
-        // replace output with new output
-        output.resize(output.length() - subMatched);
-        output.append(subOutput);
+        // now update 'output'
+        if (subOutput.length() >= output.length() || subMatched > output.length()) {
+          output = subOutput;  // replace all output
+        } else {
+          // replace output with new output
+          output.resize(output.length() - subMatched);
+          output.append(subOutput);
+        }
       }
-    } // else: continue to next group
+    } else if (group->type == any_group_type::reorder) {
+      // TODO-LDML reorder
+    }
+    // else: continue to next group
   }
-  /**
-   * TODO-LDML: optimization to contract 'matched' if possible.
-   * We could decrement 'matched' for every char of output
-   * which is already in input. Example (regex example):
-   * - str = "xxyyzz";
-   * - s/zz$/z/ -> match=2, output='z'
-   * - s/z$/zz/ -> match=2, output='zz'
-   *      (but could contract to match=0, output='' as already present)
-   * - s/zz$/zw/ -> match=2, output='zw'
-   *      (but could contract to match=1, output='w')
-   *
-   * could also handle from="x" to="x" as match=0
-   */
-  return matched;
+    /**
+     * TODO-LDML: optimization to contract 'matched' if possible.
+     * We could decrement 'matched' for every char of output
+     * which is already in input. Example (regex example):
+     * - str = "xxyyzz";
+     * - s/zz$/z/ -> match=2, output='z'
+     * - s/z$/zz/ -> match=2, output='zz'
+     *      (but could contract to match=0, output='' as already present)
+     * - s/zz$/zw/ -> match=2, output='zw'
+     *      (but could contract to match=1, output='w')
+     *
+     * could also handle from="x" to="x" as match=0
+     */
+    return matched;
 }
 
 // simple impl
@@ -234,7 +263,7 @@ transforms::load(const kmx::kmx_plus &kplus,
 
         newGroup.emplace_back(fromStr, toStr);  // creating a transform_entry
       }
-      transforms->addTransformGroup(newGroup);
+      transforms->addGroup(newGroup);
     } else if(group->type == LDML_TRAN_GROUP_TYPE_REORDER) {
       // TODO-LDML: reorder
       DebugLog("Skipping reorder (for now) TODO-LDML");

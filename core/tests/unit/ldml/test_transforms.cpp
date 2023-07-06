@@ -23,6 +23,7 @@
 
 
 using namespace km::kbp::ldml;
+using namespace km::kbp::kmx;
 
 //using km::kbp::kmx::u16cmp;
 
@@ -39,7 +40,7 @@ int test_transforms() {
 
     st.push_back(te);
 
-    tr.addTransformGroup(st);
+    tr.addGroup(st);
 
     // see if we can match the same
     {
@@ -67,22 +68,22 @@ int test_transforms() {
       transform_group st;
       st.emplace_back(std::u16string(u"za"), std::u16string(u"c"));
       st.emplace_back(std::u16string(u"a"), std::u16string(u"bb"));
-      tr.addTransformGroup(st);
+      tr.addGroup(st);
     }
     {
       transform_group st;
       st.emplace_back(std::u16string(u"bb"), std::u16string(u"ccc"));
-      tr.addTransformGroup(st);
+      tr.addGroup(st);
     }
     {
       transform_group st;
       st.emplace_back(std::u16string(u"cc"), std::u16string(u"d"));
-      tr.addTransformGroup(st);
+      tr.addGroup(st);
     }
     {
       transform_group st;
       st.emplace_back(std::u16string(u"tcd"), std::u16string(u"e"));
-      tr.addTransformGroup(st);
+      tr.addGroup(st);
     }
 
     // now test
@@ -125,7 +126,7 @@ int test_transforms() {
     {
       transform_group st;
       st.emplace_back(std::u16string(u"िह"), std::u16string(u"हि"));
-      tr.addTransformGroup(st);
+      tr.addGroup(st);
     }
     {
       std::u16string src(u"िह");
@@ -138,6 +139,48 @@ int test_transforms() {
   return EXIT_SUCCESS;
 }
 
+int test_reorder_standalone() {
+  std::cout << "== " << __FUNCTION__ << std::endl;
+
+  std::cout << __FILE__ << ":" << __LINE__ << " - nod-Lana " << std::endl;
+  {
+    const std::u16string roasts[] = {
+      // from the spec
+      u"\u1A21\u1A60\u1A45\u1A6B\u1A76", // 'ideal'
+      u"\u1A21\u1A6B\u1A76\u1A60\u1A45", // vowel first
+      u"\u1A21\u1A6B\u1A60\u1A76\u1A45", // vowel first, NFC
+      u"\u1A21\u1A6B\u1A60\u1A45\u1A76", // tone after lower
+    };
+    const std::u16string expect = roasts[0];
+    /*
+          <!-- from the spec: nod-Lana for ᩅᩫ᩶  -->
+      <reorder from="\u1A60" order="127" />
+      <reorder from="\u1A6B" order="42" />
+      <reorder from="[\u1A75-\u1A79]" order="55" />
+      <reorder before="\u1A6B" from="\u1A60\u1A45" order="10" />
+      <reorder before="\u1A6B[\u1A75-\u1A79]" from="\u1A60\u1A45" order="10" />
+      <reorder before="\u1A6B" from="\u1A60[\u1A75-\u1A79]\u1A45" order="10 55 10" />
+    */
+   // now setup the rules
+    const COMP_KMXPLUS_USET_RANGE ranges[] = {
+      // 0
+      {0x1A75, 0x1A79}
+    };
+    const COMP_KMXPLUS_USET_USET usets[] = {
+      {
+        0, 1, 0xFFFFFFFF
+      }
+    };
+    const COMP_KMXPLUS_USET_USET &toneMarksUset = usets[0];
+    const USet toneMarks(&ranges[toneMarksUset.range], toneMarksUset.count);
+    // validate
+    assert_equal(toneMarks.contains(0x1A76), true);
+    assert_equal(toneMarks.contains(0x1A60), false);
+    // TODO-LDML: build the transforms group.
+  }
+  return EXIT_SUCCESS;
+}
+
 int
 main(int argc, const char *argv[]) {
   int rc = EXIT_SUCCESS;
@@ -146,6 +189,9 @@ main(int argc, const char *argv[]) {
     rc = EXIT_FAILURE;
   }
 
+  if (test_reorder_standalone() != EXIT_SUCCESS) {
+    rc = EXIT_FAILURE;
+  }
 
   if (rc == EXIT_FAILURE) {
     std::cout << "== FAILURE" << std::endl;
