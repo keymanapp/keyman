@@ -681,6 +681,24 @@ struct COMP_KMXPLUS_USET_RANGE {
   km_kbp_usv end;
 };
 
+/**
+ * represents one of the uset elements
+ * Aliases, does not copy memory.
+ * The original KMX+ memory must stay around while this object is held.
+ */
+class USet {
+  public:
+    /** construct a set over the specified range. */
+    USet(const COMP_KMXPLUS_USET_RANGE* newStart, size_t newCount);
+    /** empty set */
+    USet();
+    /** true if the uset contains this char */
+    bool contains(km_kbp_usv ch) const;
+  private:
+    const COMP_KMXPLUS_USET_RANGE *ranges;
+    size_t count;
+};
+
 class COMP_KMXPLUS_USET_Helper {
 public:
   COMP_KMXPLUS_USET_Helper();
@@ -691,7 +709,7 @@ public:
   bool setUset(const COMP_KMXPLUS_USET *newUset);
   inline bool valid() const { return is_valid; }
 
-  const COMP_KMXPLUS_USET_USET  *getUset(KMXPLUS_USET list) const;
+  USet getUset(KMXPLUS_USET list) const;
   const COMP_KMXPLUS_USET_RANGE *getRange(KMX_DWORD index) const;
 
 private:

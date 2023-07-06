@@ -432,7 +432,8 @@ COMP_KMXPLUS_TRAN_Helper::setTran(const COMP_KMXPLUS_TRAN *newTran) {
   is_valid = true;
   if (newTran == nullptr) {
     DebugLog("tran helper: invalid, newTran=%p", newTran);
-    // null = invalid
+    // Note: kmx_plus::kmx_plus has already called section_from_bytes()
+    // which validates this section's length. Will be nullptr here if invalid.
     is_valid = false;
     // No assert here: just a missing layer
     return false;
@@ -537,7 +538,8 @@ COMP_KMXPLUS_LAYR_Helper::setLayr(const COMP_KMXPLUS_LAYR *newLayr) {
   DebugLog("validating newLayr=%p", newLayr);
   is_valid = true;
   if (newLayr == nullptr) {
-    // null = invalid
+    // Note: kmx_plus::kmx_plus has already called section_from_bytes()
+    // which validates this section's length. Will be nullptr here if invalid.
     is_valid = false;
     // No assert here: just a missing layer
     return false;
@@ -694,7 +696,8 @@ COMP_KMXPLUS_KEYS_Helper::setKeys(const COMP_KMXPLUS_KEYS *newKeys) {
   DebugLog("validating newKeys=%p", newKeys);
   is_valid = true;
   if (newKeys == nullptr) {
-    // null = invalid
+    // Note: kmx_plus::kmx_plus has already called section_from_bytes()
+    // which validates this section's length. Will be nullptr here if invalid.
     is_valid = false;
     // No assert here: just a missing layer
     return false;
@@ -882,7 +885,8 @@ COMP_KMXPLUS_LIST_Helper::setList(const COMP_KMXPLUS_LIST *newList) {
   DebugLog("validating newList=%p", newList);
   is_valid = true;
   if (newList == nullptr) {
-    // null = invalid
+    // Note: kmx_plus::kmx_plus has already called section_from_bytes()
+    // which validates this section's length. Will be nullptr here if invalid.
     is_valid = false;
     // No assert here: just a missing layer
     return false;
@@ -976,7 +980,8 @@ COMP_KMXPLUS_USET_Helper::setUset(const COMP_KMXPLUS_USET *newUset) {
   DebugLog("validating newUset=%p", newUset);
   is_valid = true;
   if (newUset == nullptr) {
-    // null = invalid
+    // Note: kmx_plus::kmx_plus has already called section_from_bytes()
+    // which validates this section's length. Will be nullptr here if invalid.
     is_valid = false;
     // No assert here: just a missing layer
     return false;
@@ -1000,15 +1005,34 @@ COMP_KMXPLUS_USET_Helper::setUset(const COMP_KMXPLUS_USET *newUset) {
   }
 
   // Now, validate offsets by walking
-  if (is_valid) {
-    for (KMX_DWORD i = 0; is_valid && i < uset->usetCount; i++) {
-      const auto &e = usets[i];
-      // is the count off the end?
-      DebugLog("uset 0x%X: range %d, count %d, pattern 0x%X", i, e.range, e.count, e.pattern);
-      if ((e.range >= uset->rangeCount) || (e.range + e.count > uset->rangeCount)) {
-        DebugLog("uset[%d] would access range %d+%d, > count %d", i, e.range, e.count, uset->rangeCount);
-        is_valid = false;
-        assert(is_valid);
+  // is_valid must be true at this point.
+  for (KMX_DWORD i = 0; is_valid && i < uset->usetCount; i++) {
+    const auto &e = usets[i];
+    // is the count off the end?
+    DebugLog("uset 0x%X: range %d, count %d, pattern 0x%X", i, e.range, e.count, e.pattern);
+    if ((e.range >= uset->rangeCount) || (e.range + e.count > uset->rangeCount)) {
+      DebugLog("uset[%d] would access range %d+%d, > count %d", i, e.range, e.count, uset->rangeCount);
+      is_valid = false;
+      assert(is_valid);
+    } else {
+      /** last lastEnd value */
+      KMX_DWORD lastEnd = 0x0;
+      for (KMX_DWORD r = 0; r < e.count; r++) {
+        const auto &range = ranges[e.range + r];  // already range-checked 'r' above
+        if (range.end < range.start) {
+          // range swapped
+          DebugLog("uset[%d]: range[%d+%d] end 0x%X<start 0x%X", i, e.range, r, range.end, range.start);
+          is_valid = false;
+          assert(is_valid);
+        } else if (range.start < lastEnd) {
+          // overlaps prior range AND/OR ranges aren't in order
+          DebugLog("uset[%d]: range[%d+%d] has start 0x%X, not > prior range (overlap/ranges unsorted?)",
+            i, e.range, r, range.start);
+            is_valid = false;
+            assert(is_valid);
+        } else {
+          lastEnd = range.end;
+        }
       }
     }
   }
@@ -1018,13 +1042,30 @@ COMP_KMXPLUS_USET_Helper::setUset(const COMP_KMXPLUS_USET *newUset) {
   return is_valid;
 }
 
-const COMP_KMXPLUS_USET_USET *
+USet::USet(const COMP_KMXPLUS_USET_RANGE *newRange, size_t newCount) : ranges(newRange), count(newCount) {
+}
+
+USet::USet() : ranges(nullptr), count(0) {
+}
+
+bool USet::contains(km_kbp_usv ch) const {
+  for (size_t i = 0; i < count; i++) {
+    const auto &range = ranges[i];
+    if (range.start <= ch && range.end >= ch) {
+      return true;
+    }
+  }
+  return false;
+}
+
+USet
 COMP_KMXPLUS_USET_Helper::getUset(KMXPLUS_USET i) const {
   if (!valid() || i >= uset->usetCount) {
     assert(false);
-    return nullptr;
+    return USet(nullptr, 0); // empty set
   }
-  return usets + i;
+  auto &set = usets[i];
+  return USet(getRange(set.range), set.count);
 }
 
 const COMP_KMXPLUS_USET_RANGE *
@@ -1073,7 +1114,7 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
   } else {
     valid = true;
     // load other sections, validating as we go
-    // these will be nullptr if they don't validate
+    // each field will be set to nullptr if validation fails
     bksp = section_from_sect<COMP_KMXPLUS_BKSP>(sect);
     disp = section_from_sect<COMP_KMXPLUS_DISP>(sect);
     elem = section_from_sect<COMP_KMXPLUS_ELEM>(sect);
@@ -1088,8 +1129,11 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     vars = section_from_sect<COMP_KMXPLUS_VARS>(sect);
     vkey = section_from_sect<COMP_KMXPLUS_VKEY>(sect);
 
-    // calculate and validate the dynamic parts
-    (void)bkspHelper.setTran(bksp); // because it's actually a tranHelper
+    // Initialize the helper objects for sections with dynamic parts.
+    // Note: all of these setters will be passed 'nullptr'
+    //  if any section had failed validation.
+
+    (void)bkspHelper.setTran(bksp); // bksp handled by …TRAN_Helper
     (void)key2Helper.setKeys(key2);
     (void)layrHelper.setLayr(layr);
     (void)listHelper.setList(list);
