@@ -25,6 +25,7 @@ PKMX_WCHAR StringOffset(PKMX_BYTE base, KMX_DWORD offset) {
 
 LPKEYBOARD FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize) {
 
+  MyCoutW(L"   ##### FixupKeyboard started", 1);
   UNREFERENCED_PARAMETER(dwFileSize);
 
   KMX_DWORD i, j;
@@ -39,26 +40,32 @@ LPKEYBOARD FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize) {
 	kbp->dpStoreArray = (LPSTORE) (base + ckbp->dpStoreArray);
 	kbp->dpGroupArray = (LPGROUP) (base + ckbp->dpGroupArray);
 
+  MyCoutW(L"   ##### first assignment finished", 1);
 	for(sp = kbp->dpStoreArray, csp = (PCOMP_STORE) sp, i = 0; i < kbp->cxStoreArray; i++, sp++, csp++)	{
     sp->dpName = StringOffset(base, csp->dpName);
 		sp->dpString = StringOffset(base, csp->dpString);
 	}
 
+  MyCoutW(L"   ##### sp filled", 1);
 	for(gp = kbp->dpGroupArray, cgp = (PCOMP_GROUP) gp, i = 0; i < kbp->cxGroupArray; i++, gp++, cgp++)	{
     gp->dpName = StringOffset(base, cgp->dpName);
 		gp->dpKeyArray = (LPKEY) (base + cgp->dpKeyArray);
 		if(cgp->dpMatch != NULL) gp->dpMatch = (PKMX_WCHAR) (base + cgp->dpMatch);
 		if(cgp->dpNoMatch != NULL) gp->dpNoMatch = (PKMX_WCHAR) (base + cgp->dpNoMatch);
 
+  MyCoutW(L"   ##### gp, cgp filled", 1);
 		for(kp = gp->dpKeyArray, ckp = (PCOMP_KEY) kp, j = 0; j < gp->cxKeyArray; j++, kp++, ckp++) {
 			kp->dpOutput = (PKMX_WCHAR) (base + ckp->dpOutput);
 			kp->dpContext = (PKMX_WCHAR) (base + ckp->dpContext);
 		}
 	}
+
+  MyCoutW(L"   ##### kp filled", 1);
+  MyCoutW(L"   ##### FixupKeyboard ended", 1);
   return kbp;
 }
 
-
+/*
 KMX_BOOL LoadKeyboard(char* fileName, LPKEYBOARD *lpKeyboard) {
   std::cout << "##### LoadKeyboard of mcompile started #####\n";
   std::cout << "fileName: " <<fileName<< "\n";
@@ -176,20 +183,21 @@ std::cout << "kbp: "<<kbp<< "\n";
                                               return FALSE;
                                             }*/
 
-std::cout << "kbp->dwIdentifier: "<<kbp->dwIdentifier<< "\n";
+//std::cout << "kbp->dwIdentifier: "<<kbp->dwIdentifier<< "\n";
 /*
  if(kbp->dwIdentifier != FILEID_COMPILED) {
     delete [] buf;
     //MyCout("errNotFileID",1);								//_S2 ToDo find replacement: DebugLog("errNotFileID");
 															                // _S2 delete [] buf; ????
     return FALSE;
-  }*/
+  }*//*
 MyCout("##### Line 187",1);
 	*lpKeyboard = kbp;
 															                // _S2 delete [] buf; ????
 	MyCout("##### LoadKeyboard of mcompile ended #####",1);
 	return TRUE;
 }
+*/
 
 KMX_BOOL LoadKeyboard(char16_t* fileName, LPKEYBOARD* lpKeyboard) {
   std::wcout << "##### LoadKeyboard of mcompile started #####\n";
@@ -243,7 +251,7 @@ KMX_BOOL LoadKeyboard(char16_t* fileName, LPKEYBOARD* lpKeyboard) {
   buf = new KMX_BYTE[sz];
   // #endif
 
-    MyCoutW(L"#### Line 260 ", 1);
+    MyCoutW(L"#### Line 246 ", 1);
   if (!buf) {
     fclose(fp);
     KMX_LogError(L"LogErr1: Not allocmem\n" );
@@ -266,7 +274,7 @@ KMX_BOOL LoadKeyboard(char16_t* fileName, LPKEYBOARD* lpKeyboard) {
 
   fclose(fp);
 
-  MyCoutW(L"##### Line 285", 1);
+  MyCoutW(L"##### Line 269", 1);
   ;
   KMX_DWORD sz_dw = (KMX_DWORD)sz;  //_S2
   size_t sz_t = (size_t)sz;  //_S2
@@ -277,9 +285,9 @@ KMX_BOOL LoadKeyboard(char16_t* fileName, LPKEYBOARD* lpKeyboard) {
     return FALSE;
   }
 
-  MyCoutW(L"##### Line 297", 1);
+  MyCoutW(L"##### Line 280", 1);
   kbp = FixupKeyboard(buf, filebase, sz_dw);    // _S" changed from sz->sz_dw
-  MyCoutW(L"##### Line 299", 1);
+  MyCoutW(L"##### Line 282", 1);
 
   if (!kbp) {
     KMX_LogError(L"LogError1: errFixupKeyboard\n" );
@@ -289,16 +297,16 @@ KMX_BOOL LoadKeyboard(char16_t* fileName, LPKEYBOARD* lpKeyboard) {
     return FALSE;
   }
 
-  MyCoutW(L"##### Line 311 ", 1);
+  MyCoutW(L"##### Line 292 ", 1);
 
-  std::wcout << "kbp->dwIdentifier: " << kbp->dwIdentifier << " FILEID_COMPILED: " << FILEID_COMPILED << "\n";
+  std::wcout << "##### kbp->dwIdentifier: " << kbp->dwIdentifier << " FILEID_COMPILED: " << FILEID_COMPILED << "\n";
 
   if (kbp->dwIdentifier != FILEID_COMPILED) {
     delete[] buf;
     KMX_LogError(L"LogError1: errNotFileID\n" );
     return FALSE;
   }
-  MyCoutW(L"##### Line 327", 1);
+  MyCoutW(L"##### Line 301", 1);
   *lpKeyboard = kbp;
   // _S2 delete [] buf; ????
   MyCoutW(L"##### LoadKeyboard of mcompile ended #####", 1);

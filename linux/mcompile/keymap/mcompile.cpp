@@ -108,12 +108,12 @@ int run(int argc, std::vector< const char16_t*> argv) {
   }*/
 //-----------------------------
 
-    int bDeadkeyConversion = u16cmp(argv[1], u"-d") == 0;   // I4552
-    int n = (bDeadkeyConversion ? 2 : 1);
+  int bDeadkeyConversion = u16cmp(argv[1], u"-d") == 0;   // I4552
+  int n = (bDeadkeyConversion ? 2 : 1);
 
-    char16_t* infile = (char16_t*) argv[n], *indll =  (char16_t*) argv[n+1], *kbid = (char16_t*) argv[n+2], *outfile =  (char16_t*) argv[n+3];
+  char16_t* infile = (char16_t*) argv[n], *indll =  (char16_t*) argv[n+1], *kbid = (char16_t*) argv[n+2], *outfile =  (char16_t*) argv[n+3];
 
-    wprintf(L"mcompile%ls \"%ls\" \"%ls\" \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d" : L"", u16fmt((const char16_t*) infile).c_str(), u16fmt((const char16_t*) indll).c_str(), u16fmt((const char16_t*) kbid).c_str(), u16fmt((const char16_t*) outfile).c_str() );  // I4174
+  wprintf(L"mcompile%ls \"%ls\" \"%ls\" \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d" : L"", u16fmt((const char16_t*) infile).c_str(), u16fmt((const char16_t*) indll).c_str(), u16fmt((const char16_t*) kbid).c_str(), u16fmt((const char16_t*) outfile).c_str() );  // I4174
 
 /*  // 1. Load the keyman keyboard file
 
@@ -146,7 +146,7 @@ wprintf(L"_S2 * Up to here cross-platform xx  :-))))) **************************
 
   LPKEYBOARD kmxfile;
 
-  if (!LoadKeyboard(infile, &kmxfile)) {
+  if(!LoadKeyboard(infile, &kmxfile)) {
     KMX_LogError(L"Failed to load keyboard (%d)\n", errno );
     return 3;
   }
