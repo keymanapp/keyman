@@ -43,14 +43,7 @@ TIER=`cat ../TIER.md`
 BUILD_NUMBER=`cat ../VERSION.md`
 
 function web_sentry_upload () {
-  if [ $1 = "webview" ]; then
-    # There is no "publish" version for app/webview; it's "published" inside our mobile apps.
-    ARTIFACT_FOLDER="$KEYMAN_ROOT/web/build/app/webview/release/"
-  elif [ $1 = "browser" ]; then
-    ARTIFACT_FOLDER="$KEYMAN_ROOT/web/build/publish/release/"
-  fi
-
-  echo "Uploading $(builder_term app/$1) ($ARTIFACT_FOLDER) to Sentry..."
+  echo "Uploading $ARTIFACT_FOLDER to Sentry..."
 
   # The "$ARTIFACT_FOLDER" bit is being used as the path to the sourcemaps.
   # --strip-common-prefix does not take an argument, unlike --strip-prefix.  It auto-detects
@@ -71,8 +64,12 @@ if builder_start_action build; then
   # - --ci:       For app/browser, outputs 'release' config filesize profiling logs
   ./build.sh configure clean build --ci
 
-  web_sentry_upload webview
-  web_sentry_upload browser
+  # Upload the sentry-configuration engine used by the mobile apps to sentry
+  web_sentry_upload "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/"
+
+  # And, of course, the main build-products too
+  web_sentry_upload "$KEYMAN_ROOT/web/build/app/webview/release/"
+  web_sentry_upload "$KEYMAN_ROOT/web/build/publish/release/"
 
   builder_finish_action success build
 fi
