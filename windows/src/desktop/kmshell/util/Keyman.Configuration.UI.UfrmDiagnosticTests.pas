@@ -62,7 +62,7 @@ var
   h: THandle;
   Keyman_Diagnostic: TKeyman_Diagnostic;
 begin
-  h := GetModuleHandle('keyman32-ver17.0.48-alpha-local');
+  h := GetModuleHandle('keyman32.dll');
   if h = 0 then
   begin
     ShowMessage('keyman32.dll is not loaded. Make sure Keyman is running.');

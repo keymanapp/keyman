@@ -227,7 +227,7 @@ BOOL UnloadDLLs(LPINTKEYBOARDINFO lpkbi)
 
   if (lpkbi->lpCoreKeyboardState) {
           km_kbp_state_imx_deregister_callback(lpkbi->lpCoreKeyboardState);
-          // Need to UnLoad the keyman32 or keyman64 dll proxy keyboard as the third-party dlls
+          // Need to Load the keyman32 or keyman64 dll proxy keyboard as the third-party dlls
           // will use this rather than the versioned dll.
           #ifdef _WIN64
             HMODULE hModule = GetModuleHandle("keyman64.dll");
@@ -596,7 +596,6 @@ LoadDLLs(LPINTKEYBOARDINFO lpkbi) {
   }
 
   char versioned_filename[260];
-  char test_library_name[260];
   char proxy_modulename[260];
 
   #ifdef _WIN64
@@ -604,8 +603,6 @@ LoadDLLs(LPINTKEYBOARDINFO lpkbi) {
   #else
     char keyman_name[] = "keyman32.dll";
   #endif
-
-  //GetModuleFileName(GetModuleHandle(LIBRARY_NAME), buf, 260);
 
   GetModuleFileName(g_hInstance, versioned_filename, 260);
 
@@ -615,9 +612,6 @@ LoadDLLs(LPINTKEYBOARDINFO lpkbi) {
       strncpy(proxy_modulename, versioned_filename, (size_t)len);
       strncat(proxy_modulename, keyman_name, 13);
   }
-
-  SendDebugMessageFormat(
-      0, sdmKeyboard, 0, "Testing methods to get library name test lib name:[%s], versioned_filename:[%s]", test_library_name, versioned_filename);
 
   if (!LoadLibrary(proxy_modulename)) {
       SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: [%s] not loaded with error:[%d]", proxy_modulename, GetLastError());
