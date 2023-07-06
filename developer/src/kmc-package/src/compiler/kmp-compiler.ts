@@ -95,8 +95,8 @@ export class KmpCompiler {
     if(kps.files && kps.files.file) {
       kmp.files = this.arrayWrap(kps.files.file).map((file: KpsFile.KpsFileContentFile) => {
         return {
-          name: file.name,
-          description: file.description,
+          name: file.name.trim(),
+          description: file.description.trim(),
           copyLocation: parseInt(file.copyLocation, 10) || undefined
           // note: we don't emit fileType as that is not permitted in kmp.json
         };
@@ -118,9 +118,10 @@ export class KmpCompiler {
       kmp.keyboards = this.arrayWrap(kps.keyboards.keyboard).map((keyboard: KpsFile.KpsFileKeyboard) => ({
         displayFont: keyboard.displayFont ? this.callbacks.path.basename(keyboard.displayFont) : undefined,
         oskFont: keyboard.oSKFont ? this.callbacks.path.basename(keyboard.oSKFont) : undefined,
-        name:keyboard.name,
-        id:keyboard.iD,
-        version:keyboard.version,
+        name:keyboard.name.trim(),
+        id:keyboard.iD.trim(),
+        version:keyboard.version.trim(),
+        rtl:keyboard.rTL == 'True' ? true : undefined,
         languages: keyboard.languages ?
           this.kpsLanguagesToKmpLanguages(this.arrayWrap(keyboard.languages.language) as KpsFile.KpsFileLanguage[]) :
           []
@@ -133,8 +134,8 @@ export class KmpCompiler {
 
     if(kps.lexicalModels && kps.lexicalModels.lexicalModel) {
       kmp.lexicalModels = this.arrayWrap(kps.lexicalModels.lexicalModel).map((model: KpsFile.KpsFileLexicalModel) => ({
-        name:model.name,
-        id:model.iD,
+        name:model.name.trim(),
+        id:model.iD.trim(),
         languages: model.languages ?
           this.kpsLanguagesToKmpLanguages(this.arrayWrap(model.languages.language) as KpsFile.KpsFileLanguage[]) : []
       }));
