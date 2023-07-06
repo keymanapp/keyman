@@ -43,12 +43,12 @@ TIER=`cat ../TIER.md`
 BUILD_NUMBER=`cat ../VERSION.md`
 
 function web_sentry_upload () {
-  echo "Uploading $ARTIFACT_FOLDER to Sentry..."
+  echo "Uploading $1 to Sentry..."
 
   # The "$ARTIFACT_FOLDER" bit is being used as the path to the sourcemaps.
   # --strip-common-prefix does not take an argument, unlike --strip-prefix.  It auto-detects
   # the most common prefix instead.
-  sentry-cli releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix "$ARTIFACT_FOLDER" \
+  sentry-cli releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix "$1" \
     --rewrite --ext js --ext map --ext ts
   echo "Upload successful."
 }
