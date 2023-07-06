@@ -39,20 +39,15 @@ function unescapeOne(hex: string): string {
 }
 
 /**
- * Unescape one single quad string such as \u0127
+ * Unescape one single quad string such as \u0127.
+ * Throws exception if the string doesn't match MATCH_QUAD_ESCAPE
  * @param s input string
  * @returns output
  */
 export function unescapeOneQuadString(s: string): string {
-  if (!s) {
-    return s;
+  if (!s || !s.match(MATCH_QUAD_ESCAPE)) {
+    throw new UnescapeError(`Not a quad escape: ${s}`);
   }
-  /**
- * process one regex match
- * @param str ignored
- * @param matched the entire match such as '0127' or '22 22'
- * @returns the unescaped match
- */
   function processMatch(str: string, matched: string): string {
     return unescapeOne(matched);
   }
@@ -85,11 +80,11 @@ export function unescapeString(s: string): string {
   } catch(e) {
     if (e instanceof RangeError) {
       throw new UnescapeError(`Out of range while unescaping '${s}': ${e.message}`, { cause: e });
+      /* c8 ignore next 3 */
     } else {
-      throw e;
+      throw e; // pass through some other error
     }
   }
-
   return s;
 }
 

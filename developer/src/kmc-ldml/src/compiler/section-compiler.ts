@@ -11,16 +11,13 @@ export class SectionCompiler {
     this.callbacks = callbacks;
   }
 
+  /* c8 ignore next 11 */
   public get id(): SectionIdent {
-    return null;
-  }
-
-  public get required(): boolean {
-    return true;
+    throw Error(`Internal Error: id() not implemented`);
   }
 
   public compile(sections: KMXPlus.DependencySections): KMXPlus.Section {
-    return null;
+    throw Error(`Internal Error: compile() not implemented`);
   }
 
   public validate(): boolean {

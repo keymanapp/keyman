@@ -92,6 +92,15 @@ describe('layr', function () {
       errors: [],
     },
     {
+      subpath: 'sections/keys/invalid-bad-modifier.xml',
+      errors: [
+        CompilerMessages.Error_InvalidModifier({
+          layer: 'base',
+          modifier: 'altR-shift'
+        }),
+      ],
+    },
+    {
       subpath: 'sections/layr/invalid-multi-hardware.xml',
       errors: [CompilerMessages.Error_ExcessHardware({ form: 'iso' })],
     },
