@@ -22,7 +22,7 @@ def get_languages():
     from keyman_config.get_kmp import keyman_cache_dir
 
     logging.info("Getting language list from search")
-    api_url = KeymanApiUrl + "/search?q=l:*&platform=linux"
+    api_url = f"{KeymanApiUrl}/search?q=l:*&platform=linux"
     logging.debug("At URL %s", api_url)
     cache_dir = keyman_cache_dir()
     current_dir = os.getcwd()
@@ -37,10 +37,7 @@ def get_languages():
         logging.debug("Time: {0} / Used Cache: {1}".format(now, response.from_cache))
         os.chdir(current_dir)
         requests_cache.uninstall_cache()
-        if response.status_code == 200:
-            return response.json()
-        else:
-            return None
+        return response.json() if response.status_code == 200 else None
     except Exception:
         return None
 
@@ -66,9 +63,8 @@ def get_keyboard_list():
 def write_kmpdirlist(kmpdirfile):
     try:
         with open(kmpdirfile, 'wt') as kmpdirlist:
-            keyboards = get_keyboard_list()
-            if keyboards:
-                for kb in get_keyboard_list():
+            if keyboards := get_keyboard_list():
+                for kb in keyboards:
                     print(kb, file=kmpdirlist)
     except Exception as e:
         logging.warning('Exception %s writing %s %s', type(e), kmpdirfile, e.args)
@@ -90,7 +86,7 @@ def _list_languages_for_keyboard_impl(packageId, packageDir):
     from keyman_config.get_kmp import keyman_cache_dir
     kmpfile = os.path.join(keyman_cache_dir(), packageId)
     if not os.path.exists(kmpfile):
-        kmpfile = kmpfile + '.kmp'
+        kmpfile = f'{kmpfile}.kmp'
         if not os.path.exists(kmpfile):
             return ''
     extract_kmp(kmpfile, packageDir)
@@ -123,9 +119,11 @@ def main():
     parser.add_argument('-f', '--file', metavar='KMPFILE', help='Keyman kmp file')
     parser.add_argument('-p', '--package', metavar='PACKAGE', help='Keyman package id')
     parser.add_argument('-l', '--bcp47', metavar='LANGTAG', help='bcp47 language tag')
-    parser.add_argument('--version', action='version', version='%(prog)s version ' + __version__)
+    parser.add_argument('--version', action='version', version=f'%(prog)s version {__version__}')
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
     parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
+    parser.add_argument('--force', action='store_true', help='force installation of keyboard even if it is ' +
+                        'a downgrade to an older version of the keyboard')
 
     args = parser.parse_args()
     if args.verbose:
@@ -173,39 +171,40 @@ def main():
             logging.error("km-package-install: Keyman kmp file %s not found.", args.file)
             logging.error("km-package-install -f <kmpfile>")
             sys.exit(2)
-        try_install_kmp(args.file, "file " + args.file, args.bcp47, args.shared)
+        try_install_kmp(args.file, f"file {args.file}", args.bcp47, args.shared)
     elif args.package:
         if args.shared:
             if get_kmp_version_user(args.package):
-                print("km-package-install: Warning: Keyboard %s is also installed for the current user."
-                      % args.package)
-            installed_kmp_v = get_kmp_version_shared(args.package)
+                logging.warning(f'km-package-install: Warning: Keyboard {args.package} is ' +
+                                'also installed for the current user.')
+            installed_kmp_ver = get_kmp_version_shared(args.package)
         else:
             if get_kmp_version_shared(args.package):
-                print("km-package-install: Warning: Keyboard %s is already installed in the shared area."
-                      % args.package)
-            installed_kmp_v = get_kmp_version_user(args.package)
-        kbdata = get_keyboard_data(args.package)
-        if not kbdata:
+                logging.warning(f'km-package-install: Warning: Keyboard {args.package} is ' +
+                                'already installed in the shared area.')
+            installed_kmp_ver = get_kmp_version_user(args.package)
+        pkgdata = get_keyboard_data(args.package)
+        if not pkgdata:
             logging.error("km-package-install: error: Could not download keyboard data for %s", args.package)
             sys.exit(3)
-        kbdata_v = secure_lookup(kbdata, 'version')
-        if installed_kmp_v and kbdata_v:
-            kbdata_version = parse_version(kbdata_v)
-            installed_kmp_ver = parse_version(installed_kmp_v)
-            if kbdata_version == installed_kmp_ver:
-                print("km-package-install: Version %s of the %s keyboard package is already installed."
-                      % (installed_kmp_ver, args.package))
-                sys.exit(1)
-            elif kbdata_version > installed_kmp_ver:
-                print("km-package-install: A newer version of %s keyboard package is available. Uninstalling old "
-                      "version %s then downloading and installing new version %s."
-                      % (args.package, installed_kmp_ver, kbdata_version))
-                uninstall_kmp(args.package, args.shared)
+        pkg_version = secure_lookup(pkgdata, 'version')
+        if installed_kmp_ver and pkg_version:
+            if parse_version(installed_kmp_ver) > parse_version(pkg_version):
+                if args.force:
+                    logging.warning(f'km-package-install: warning: The {args.package} keyboard ' +
+                                    f'is already installed with a newer version {installed_kmp_ver}. ' +
+                                    f'Downgrading to version {pkg_version}.')
+                else:
+                    logging.error(f'km-package-install: error: The {args.package} keyboard is ' +
+                                  f'already installed with a newer version {installed_kmp_ver}. ' +
+                                  f'Not installing version {pkg_version}. Use `--force` to downgrade.')
+                    sys.exit(1)
+        if args.force:
+            uninstall_kmp(args.package, args.shared, False)
 
         kmpfile = get_kmp(args.package)
         if kmpfile:
-            try_install_kmp(kmpfile, "keyboard package " + args.package, args.bcp47, args.shared)
+            try_install_kmp(kmpfile, f"keyboard package {args.package}", args.bcp47, args.shared)
         else:
             logging.error("km-package-install: error: Could not download keyboard package %s", args.package)
             sys.exit(2)

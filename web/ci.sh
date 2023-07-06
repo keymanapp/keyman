@@ -43,18 +43,13 @@ TIER=`cat ../TIER.md`
 BUILD_NUMBER=`cat ../VERSION.md`
 
 function web_sentry_upload () {
-  if [ $1 = "webview" ]; then
-    # There is no "publish" version for app/webview; it's "published" inside our mobile apps.
-    ARTIFACT_FOLDER="$KEYMAN_ROOT/web/build/app/webview/release/"
-  elif [ $1 = "browser" ]; then
-    ARTIFACT_FOLDER="$KEYMAN_ROOT/web/build/publish/release/"
-  fi
+  echo "Uploading $1 to Sentry..."
 
-  pushd "$ARTIFACT_FOLDER"
-  echo "Uploading to Sentry..."
-  sentry-cli releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix "@keymanapp/keyman/" --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
+  # --strip-common-prefix does not take an argument, unlike --strip-prefix.  It auto-detects
+  # the most common prefix instead.
+  sentry-cli releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix "$1" \
+    --rewrite --ext js --ext map --ext ts
   echo "Upload successful."
-  popd
 }
 
 if builder_start_action build; then
@@ -68,8 +63,16 @@ if builder_start_action build; then
   # - --ci:       For app/browser, outputs 'release' config filesize profiling logs
   ./build.sh configure clean build --ci
 
-  web_sentry_upload webview
-  web_sentry_upload browser
+  # Upload the sentry-configuration engine used by the mobile apps to sentry
+  # Also, clean 'em first.
+  for sourcemap in "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/"*.map; do
+    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" null "$sourcemap" --clean
+  done
+  web_sentry_upload "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/"
+
+  # And, of course, the main build-products too
+  web_sentry_upload "$KEYMAN_ROOT/web/build/app/webview/release/"
+  web_sentry_upload "$KEYMAN_ROOT/web/build/publish/release/"
 
   builder_finish_action success build
 fi

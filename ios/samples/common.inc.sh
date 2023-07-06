@@ -40,10 +40,10 @@ function execute_sample_build() {
     CONFIG="Debug"
   fi
 
-  local BUILD_FOLDER="$KEYMAN_ROOT/ios/samples/$TARGET/build"
+  local BUILD_FOLDER="ios/samples/$TARGET/build"
 
   builder_describe_outputs \
-    build  "$BUILD_FOLDER"
+    build  "/$BUILD_FOLDER"
 
   ### START OF THE BUILD ###
 
@@ -51,6 +51,6 @@ function execute_sample_build() {
   KEYMAN_ENGINE_FRAMEWORK_SRC="$KEYMAN_ROOT/ios/build/Build/Products/$CONFIG/KeymanEngine.xcframework"
   KEYMAN_ENGINE_FRAMEWORK_DST=./
 
-  builder_run_action clean     rm -rf "$BUILD_FOLDER"
+  builder_run_action clean     rm -rf "$KEYMAN_ROOT/$BUILD_FOLDER"
   builder_run_action build     do_build
 }
