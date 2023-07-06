@@ -47,7 +47,7 @@ Markers can appear in both 'emitting' and 'matching-only' areas:
 
 - `vars` compiler will prescan all of the elements listed under [Emitting](#emitting), but not match-only.
 - All found markers will be added to a single master `list`, which will be added under the `vars.markers` section.
-- Subsequent processes/compilers will be able to check this list for any missing markers. For example, a `<display to='\m{nonExistentMarker}'/>` can then trigger an error failing validation, because nothing is defined whith emits that marker.
+- Subsequent processes/compilers will be able to check this list for any missing markers. For example, a `<display to='\m{nonExistentMarker}'/>` can then trigger an error failing validation, because nothing is defined which emits that marker.
 
 ### Other sections
 
