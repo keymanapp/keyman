@@ -71,7 +71,11 @@ export class KmpCompiler {
     if(kps.options) {
       for (let [src,dst] of keys) {
         if (kps.options[src]) {
-          kmp.options[dst] = kps.options[src];
+          if(dst == 'graphicFile' || dst == 'readmeFile') {
+            kmp.options[dst] = /[/\\]?([^/\\]*)$/.exec(kps.options[src])[1];
+          } else {
+            kmp.options[dst] = kps.options[src];
+          }
         }
       }
     }
