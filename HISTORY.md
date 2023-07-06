@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 17.0.135 alpha 2023-07-06
+
+*  (#9195)
+* chore(ios): minor build-script cleanup (#9201)
+* chore(linux): Allow to run tests without integration tests (#9192)
+* fix(web): sentry sourcemapping round 2 - yesterday's 'fix' unfortunately doesn't upload the maps (#9199)
+* chore(web): normalizes sourcemap paths for cleaner Sentry reports (#9200)
+* feat(linux): Allow to install keyboard for multiple languages (#9017)
+
 ## 17.0.134 alpha 2023-07-05
 
 * fix(linux): Fix packaging GHA (#9172)
