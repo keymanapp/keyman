@@ -1,6 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { CompilerCallbacks, CompilerSchema, CompilerEvent, compilerErrorSeverityName, CompilerPathCallbacks, CompilerFileSystemCallbacks } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerSchema, CompilerEvent, compilerErrorSeverity,
+         compilerErrorSeverityName, CompilerPathCallbacks, CompilerFileSystemCallbacks,
+         CompilerLogLevel, compilerLogLevelToSeverity } from '@keymanapp/common-types';
 import { InfrastructureMessages } from './messages.js';
 
 /**
@@ -9,14 +11,17 @@ import { InfrastructureMessages } from './messages.js';
 
 // TODO: Make a common class for all the CompilerCallbacks implementations
 
+
+export interface CompilerCallbackOptions {
+  logLevel?: CompilerLogLevel;
+}
+
 export class NodeCompilerCallbacks implements CompilerCallbacks {
   /* NodeCompilerCallbacks */
 
   messages: CompilerEvent[] = [];
-  silent: boolean;
 
-  constructor(silent?: boolean) {
-    this.silent = !!silent;
+  constructor(private options: CompilerCallbackOptions) {
   }
 
   clear() {
@@ -68,9 +73,12 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
 
   reportMessage(event: CompilerEvent): void {
     this.messages.push(event);
-    if(this.silent) {
+
+    if(compilerErrorSeverity(event.code) < compilerLogLevelToSeverity[this.options.logLevel]) {
+      // collect messages but don't print to console
       return;
     }
+
     const code = event.code.toString(16);
     if(event.line) {
       console.log(`${compilerErrorSeverityName(event.code)} ${code} [${event.line}]: ${event.message}`);
@@ -80,7 +88,9 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   }
 
   debug(msg: string) {
-    console.debug(msg);
+    if(this.options.logLevel == 'debug') {
+      console.debug(msg);
+    }
   }
 
   loadSchema(schema: CompilerSchema): Uint8Array {

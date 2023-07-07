@@ -26,9 +26,22 @@ name_suffix = []
 
 if cpp_compiler.get_id() == 'emscripten'
   # wasm-exceptions supported in Node 18+, Chrome 95+, Firefox 100+, Safari 15.2+
-  flags += ['-fwasm-exceptions']
-  lib_links = ['--whole-archive', '-sMODULARIZE', '-sEXPORT_ES6']
-  links += ['-fwasm-exceptions', '--bind', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
+
+  # For additional (slow) sanitize, add:
+  # Additional sanitize required on both flags and links: '-fsanitize=undefined', '-fsanitize=address'
+  #sanitize = ['-fsanitize=undefined', '-fsanitize=address']
+  sanitize = []
+
+  flags += ['-fwasm-exceptions'] + sanitize
+
+  lib_links = ['--whole-archive', '-sALLOW_MEMORY_GROWTH', '-sMODULARIZE', '-sEXPORT_ES6']
+  links += ['-fwasm-exceptions', '--bind', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']'] + sanitize
+
+  # Alternative to sanitize is adding '-sASSERTIONS', '-sSAFE_HEAP' to lib_links:
+  # lib_links += ['-sASSERTIONS', '-sSAFE_HEAP']
+
+  # For profiling, add:
+  # lib_links += ['--profiling-funcs', '-sDEMANGLE_SUPPORT=1']
 endif
 
 icu = subproject('icu-for-uset', default_options: [ 'default_library=static', 'cpp_std=c++17', 'warning_level=0', 'werror=false'])

@@ -28,7 +28,7 @@
   "dependencies": {
     "@keymanapp/keyman-version": "*",
     "ajv": "^8.11.0",
-    "restructure": "git+https://github.com/keymanapp/dependency-restructure.git#49d129cf0916d082a7278bb09296fb89cecfcc50",
+    "restructure": "git+https://github.com/keymanapp/dependency-restructure.git#7a188a1e26f8f36a175d95b67ffece8702363dfc",
     "semver": "^7.5.2",
     "xml2js": "git+https://github.com/keymanapp/dependency-node-xml2js#535fe732dc408d697e0f847c944cc45f0baf0829"
   },
@@ -57,5 +57,22 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/keymanapp/keyman.git"
+  },
+  "c8": {
+    "all": true,
+    "src": ["src/"],
+    "exclude-after-remap": true,
+    "exclude": [
+      "src/kmx/kmx-plus-builder/",
+      "src/kmx/kmx-plus.ts",
+      "src/kmx/kmx-builder.ts",
+      "src/kmx/element-string.ts",
+      "src/kmx/string-list.ts",
+      "src/ldml-keyboard/ldml-keyboard-testdata-xml.ts",
+      "src/ldml-keyboard/unicodeset-parser-api.ts",
+      "src/keyman-touch-layout/keyman-touch-layout-file-writer.ts",
+      "src/osk/osk.ts",
+      "test/"
+    ]
   }
 }

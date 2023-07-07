@@ -37,7 +37,7 @@ let outputFilename: string = program.opts().outFile ? program.opts().outFile : i
 // Load .kps source data
 //
 
-const callbacks = new NodeCompilerCallbacks();
+const callbacks = new NodeCompilerCallbacks({logLevel: 'info'});
 let kmpCompiler = new KmpCompiler(callbacks);
 let kmpJsonData = kmpCompiler.transformKpsToKmpObject(inputFilename);
 if(!kmpJsonData) {

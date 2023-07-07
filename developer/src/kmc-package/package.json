@@ -59,8 +59,7 @@
     "exclude-after-remap": true,
     "exclude": [
       "test/",
-      "src/kmp-json-file.ts",
-      "src/kps-file.ts"
+      "src/main.ts"
     ]
   },
   "repository": {

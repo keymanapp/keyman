@@ -22,7 +22,7 @@
     <LexicalModel>
       <Name>SENĆOŦEN dictionary</Name>
       <ID>example.qaa.sencoten</ID>
-      <!-- ERROR_LexicalModelMustHaveAtLeastOneLanguage -->
+      <!-- ERROR_ModelMustHaveAtLeastOneLanguage -->
     </LexicalModel>
   </LexicalModels>
 </Package>

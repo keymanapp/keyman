@@ -45,6 +45,9 @@ fi
 SCHEMAS_COPIED=false
 
 copy_schemas() {
+  # TODO: why do we need a copy of the schemas here? kmc already has a copy of
+  #       them; are they used only by tests, in which case, can't we use them in
+  #       their source location?
   if $SCHEMAS_COPIED; then
     return 0
   fi
@@ -55,6 +58,7 @@ copy_schemas() {
   cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboardtest.schema.json" "$THIS_SCRIPT_PATH/build/src/"
   cp "$KEYMAN_ROOT/common/schemas/kvks/kvks.schema.json" "$THIS_SCRIPT_PATH/build/src/"
   cp "$KEYMAN_ROOT/common/schemas/kpj/kpj.schema.json" "$THIS_SCRIPT_PATH/build/src/"
+  cp "$KEYMAN_ROOT/common/schemas/kpj-9.0/kpj-9.0.schema.json" "$THIS_SCRIPT_PATH/build/src/"
 }
 
 #-------------------------------------------------------------------------------------------------------------------

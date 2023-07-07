@@ -20,6 +20,7 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "@/common/include" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
+  "@/developer/src/kmc-analyze" \
   "@/developer/src/kmc-kmn" \
   "@/developer/src/kmc-ldml" \
   "@/developer/src/kmc-model" \
@@ -60,6 +61,8 @@ function copy_schemas() {
   cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboardtest.schema.json" "$THIS_SCRIPT_PATH/build/src/util/"
   cp "$KEYMAN_ROOT/common/schemas/kvks/kvks.schema.json" "$THIS_SCRIPT_PATH/build/src/util/"
   cp "$KEYMAN_ROOT/common/schemas/kpj/kpj.schema.json" "$THIS_SCRIPT_PATH/build/src/util/"
+  cp "$KEYMAN_ROOT/common/schemas/kpj-9.0/kpj-9.0.schema.json" "$THIS_SCRIPT_PATH/build/src/util/"
+  cp "$KEYMAN_ROOT/common/schemas/displaymap/displaymap.schema.json" "$THIS_SCRIPT_PATH/build/src/util/"
 }
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -112,6 +115,7 @@ readonly PACKAGES=(
   common/web/types
   common/models/types
   core/include/ldml
+  developer/src/kmc-analyze
   developer/src/kmc-kmn
   developer/src/kmc-ldml
   developer/src/kmc-model

@@ -67,6 +67,7 @@ export class TouchLayoutFileReader {
     return result;
   }
 
+  // TODO: still using Buffer not Uint8Array here
   public validate(source: TouchLayoutFile, schemaBuffer: Buffer): void {
     const schema = JSON.parse(schemaBuffer.toString('utf8'));
     const ajv = new Ajv();

@@ -12,9 +12,11 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
   loadSchema(schema: CompilerSchema): Buffer {
     switch (schema) {
       case 'kpj':
-        throw new Error('loadKpjJsonSchema not implemented.'); // not needed for this test
+      case 'kpj-9.0':
       case 'kvks':
-        throw new Error('loadKvksJsonSchema not implemented.');
+      case 'displaymap':
+        // listing all unimplemented schemas rather than using 'default'
+        throw new Error(`loadSchema(${schema}) not implemented.`); // not needed for this test
       case 'ldml-keyboard':
         return loadSchema(schema);
       case 'ldml-keyboardtest':

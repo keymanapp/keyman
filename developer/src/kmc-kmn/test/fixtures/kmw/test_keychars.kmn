@@ -1,0 +1,14 @@
+c Verifies every letter on the US English keyboard, ensuring
+c that our mapping tables are correct
+
+store(&NAME) 'test_keychars'
+store(&version) '10.0'
+store(&targets) 'any'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+store(letter) ' !"#$%&' "'" '()*+,-./' '0'..'9' ':;<=>?@' 'A'..'Z' '[\]^_`'  'a'..'z' '{|}~'
+
++ any(letter) > '-' index(letter, 1) '-'

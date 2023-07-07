@@ -3,7 +3,7 @@ import 'mocha';
 import { loadSchema, makePathToFixture } from '../helpers/index.js';
 import KvksFileReader from "../../src/kvk/kvks-file-reader.js";
 import KvksFileWriter from "../../src/kvk/kvks-file-writer.js";
-import { verify_khmer_angkor } from './test-kvk-utils.js';
+import { verify_khmer_angkor, verify_balochi_inpage } from './test-kvk-utils.js';
 import { assert } from 'chai';
 
 describe('kvks-file-reader', function() {
@@ -20,6 +20,25 @@ describe('kvks-file-reader', function() {
     const vk = reader.transform(kvks, invalidVkeys);
     assert.isEmpty(invalidVkeys);
     verify_khmer_angkor(vk);
+  });
+
+  it('should read a valid file with bitmaps', function() {
+    const path = makePathToFixture('kvk', 'balochi_inpage.kvks');
+    const input = fs.readFileSync(path);
+    const reader = new KvksFileReader();
+    const kvks = reader.read(input);
+    const invalidVkeys: string[] = [];
+    const vk = reader.transform(kvks, invalidVkeys);
+    assert.isEmpty(invalidVkeys);
+    verify_balochi_inpage(vk);
+  });
+
+  it('should give a sensible error on a .kvk file', function() {
+    const path = makePathToFixture('kvk', 'khmer_angkor.kvk');
+    const input = fs.readFileSync(path);
+
+    const reader = new KvksFileReader();
+    assert.throws(() => reader.read(input), 'File appears to be a binary .kvk file');
   });
 });
 

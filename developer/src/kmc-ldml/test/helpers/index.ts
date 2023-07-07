@@ -9,7 +9,7 @@ import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent
 import { LdmlKeyboardCompiler } from '../../src/main.js'; // make sure main.js compiles
 import { assert } from 'chai';
 import { KMXPlusMetadataCompiler } from '../../src/compiler/metadata-compiler.js';
-import { CompilerOptions } from '../../src/compiler/compiler-options.js';
+import { LdmlCompilerOptions } from '../../src/compiler/ldml-compiler-options.js';
 import { LdmlKeyboardVisualKeyboardCompiler } from '../../src/compiler/visual-keyboard-compiler.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
@@ -34,7 +34,7 @@ export function makePathToFixture(...components: string[]): string {
 
 export const compilerTestCallbacks = new TestCompilerCallbacks();
 
-export const compilerTestOptions: CompilerOptions = {
+export const compilerTestOptions: LdmlCompilerOptions = {
   readerOptions: {
     importsPath: fileURLToPath(LDMLKeyboardXMLSourceFileReader.defaultImportsURL)
   }
@@ -108,13 +108,13 @@ async function loadDepsFor(sections: DependencySections, parentCompiler: Section
   }
 }
 
-export function loadTestdata(inputFilename: string, options: CompilerOptions) : LDMLKeyboardTestDataXMLSourceFile {
+export function loadTestdata(inputFilename: string, options: LdmlCompilerOptions) : LDMLKeyboardTestDataXMLSourceFile {
   const k = new LdmlKeyboardCompiler(compilerTestCallbacks, options);
   const source = k.loadTestData(inputFilename);
   return source;
 }
 
-export async function compileKeyboard(inputFilename: string, options: CompilerOptions): Promise<KMXPlusFile> {
+export async function compileKeyboard(inputFilename: string, options: LdmlCompilerOptions): Promise<KMXPlusFile> {
   const k = new LdmlKeyboardCompiler(compilerTestCallbacks, options);
   const source = k.load(inputFilename);
   checkMessages();
@@ -135,7 +135,7 @@ export async function compileKeyboard(inputFilename: string, options: CompilerOp
   return kmx;
 }
 
-export function compileVisualKeyboard(inputFilename: string, options: CompilerOptions): VisualKeyboard.VisualKeyboard {
+export function compileVisualKeyboard(inputFilename: string, options: LdmlCompilerOptions): VisualKeyboard.VisualKeyboard {
   const k = new LdmlKeyboardCompiler(compilerTestCallbacks, options);
   const source = k.load(inputFilename);
   checkMessages();

@@ -52,6 +52,7 @@ export class CompilerMessages {
   static Fatal_MissingWasmModule = (o:{e?: any}) => m(this.FATAL_MissingWasmModule, `Could not instantiate WASM compiler module or initialization failed: ${exc(o.e)}`);
   static FATAL_MissingWasmModule = SevFatal | 0x901;
 
+  // TODO: Is this now deprecated?
   static Fatal_UnableToSetCompilerOptions = () => m(this.FATAL_UnableToSetCompilerOptions, `Unable to set compiler options`);
   static FATAL_UnableToSetCompilerOptions = SevFatal | 0x902;
 
@@ -77,6 +78,14 @@ export class CompilerMessages {
   static Warn_InvalidVkeyInKvksFile = (o:{filename: string, invalidVkey: string}) => m(this.WARN_InvalidVkeyInKvksFile,
     `Invalid virtual key ${o.invalidVkey} found in ${o.filename}`);
   static WARN_InvalidVkeyInKvksFile = SevWarn | 0x909;
+
+  static Error_InvalidDisplayMapFile = (o:{filename: string, e: any}) => m(this.ERROR_InvalidDisplayMapFile,
+    `Error encountered parsing display map ${o.filename}: ${o.e}`);
+  static ERROR_InvalidDisplayMapFile = SevError | 0x90A;
+
+  static Error_InvalidKvkFile = (o:{filename: string, e: any}) => m(this.ERROR_InvalidKvkFile,
+    `Error encountered loading ${o.filename}: ${o.e}`);
+  static ERROR_InvalidKvkFile = SevError | 0x90B;
 };
 
 /**

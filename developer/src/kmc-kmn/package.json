@@ -27,7 +27,8 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "dependencies": {
-    "@keymanapp/keyman-version": "*"
+    "@keymanapp/keyman-version": "*",
+    "@keymanapp/kmc-kmn": "*"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
@@ -61,6 +62,7 @@
     "exclude-after-remap": true,
     "exclude": [
       "src/import/",
+      "src/kmw-compiler",
       "test/"
     ]
   },

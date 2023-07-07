@@ -14,7 +14,8 @@
     },
   "include": [
       "**/test-*.ts",
-      "./helpers/index.ts"
+      "./helpers/index.ts",
+      "./kmw/util.ts"
   ],
   "references": [
       { "path": "../../../../common/web/keyman-version/" },

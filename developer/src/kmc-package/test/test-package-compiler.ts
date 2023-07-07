@@ -1,5 +1,6 @@
 import 'mocha';
 import * as fs from 'fs';
+import * as path from 'path';
 import { assert } from 'chai';
 import JSZip from 'jszip';
 
@@ -112,6 +113,7 @@ describe('KmpCompiler', function () {
       'khmer_busra_kbd.ttf', 'Mondulkiri-R.ttf', 'OFL.txt', 'OFL-FAQ.txt', 'readme.htm',
       'splash.gif', 'welcome.htm',
       'kmp.json', // standard .kmp metadata file
+      'kmp.inf', // legacy keyboard .kmp metdata file
     ];
 
     assert.sameMembers(Object.entries(jszip.files).map(([s, o]) => o.name).sort(),
@@ -120,6 +122,37 @@ describe('KmpCompiler', function () {
 
     let kmpJsonData = JSON.parse(await jszip.file('kmp.json').async('string'));
     assert.deepEqual(kmpJsonData, kmpJsonFixture);
+  });
+
+  /*
+   * Testing kmp.json generation
+   */
+
+  it(`should transform a .kps file for a keyboard package to a correct kmp.json`, function () {
+    callbacks.clear();
+
+    const kpsPath = makePathToFixture('kmp.json', 'ahom_star.kps');
+    const kmpJsonRefPath = makePathToFixture('kmp.json', 'kmp.json');
+
+    let kmpJsonActual = kmpCompiler.transformKpsToKmpObject(kpsPath);
+    if(kmpJsonActual == null) {
+      callbacks.printMessages();
+      assert.isNotNull(kmpJsonActual);
+    }
+    let kmpJsonFixture = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
+    assert.isNotNull(kmpJsonFixture);
+
+    // Blank out system.keymanDeveloperVersion which will vary
+    kmpJsonActual.system.keymanDeveloperVersion = '-';
+    kmpJsonFixture.system.keymanDeveloperVersion = '-';
+
+    // Strip file paths to basename for the actual (this is currently part of the
+    // zip phase and not unit testable without refactoring)
+    for(const file of kmpJsonActual.files) {
+      file.name = path.basename(file.name);
+    }
+
+    assert.deepEqual(kmpJsonActual, kmpJsonFixture);
   });
 
   /*

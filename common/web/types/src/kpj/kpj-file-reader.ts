@@ -24,14 +24,26 @@ export class KPJFileReader {
 
     parser.parseString(file, (e: unknown, r: unknown) => { data = r as KPJFile });
     data = this.boxArrays(data);
+    for(let file of data.KeymanDeveloperProject?.Files?.File) {
+      // xml2js imports <Details/> as '' so we will just delete the empty string
+      if(typeof file.Details == 'string') {
+        delete file.Details;
+      }
+    }
     return data as KPJFile;
   }
 
-  public validate(source: KPJFile, schemaBuffer: Uint8Array): void {
+  public validate(source: KPJFile, schemaBuffer: Uint8Array, legacySchemaBuffer: Uint8Array): void {
     const schema = JSON.parse(new TextDecoder().decode(schemaBuffer));
     const ajv = new Ajv();
     if(!ajv.validate(schema, source)) {
-      throw new Error(ajv.errorsText());
+      const ajvLegacy = new Ajv();
+      const legacySchema = JSON.parse(new TextDecoder().decode(legacySchemaBuffer));
+      if(!ajvLegacy.validate(legacySchema, source)) {
+        // If the legacy schema also does not validate, then we will only report
+        // the errors against the modern schema
+        throw new Error(ajv.errorsText());
+      }
     }
   }
 
