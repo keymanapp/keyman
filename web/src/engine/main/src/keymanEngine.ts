@@ -2,7 +2,7 @@ import { type Keyboard, KeyboardKeymanGlobal, ProcessorInitOptions } from "@keym
 import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
 import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
 import { OSKView } from "keyman/engine/osk";
-import { KeyboardRequisitioner, ModelCache, ModelSpec } from "keyman/engine/package-cache";
+import { KeyboardRequisitioner, ModelCache, ModelSpec, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/package-cache";
 
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
 import KeyboardInterface from "./keyboardInterface.js";
@@ -310,12 +310,22 @@ export default class KeymanEngine<
   }
 
   public getDebugInfo(): Record<string, any> {
+    const activeKbd = this.contextManager.activeKeyboard;
+
     const report = {
-      configReport: this.config.debugReport()
-      // oskType / oskReport?
-      // - mode
-      // - dimensions
-      // other possible entries?
+      configReport: this.config.debugReport(),
+      keyboard: {
+        id: unprefixed(activeKbd.metadata.id),
+        langId: activeKbd?.metadata.langId || '',
+        version: activeKbd?.keyboard.version
+      },
+      model: {
+        id: this.core.activeModel?.id || ''
+      },
+      osk: {
+        banner: this.osk?.bannerController.activeType,
+        layer: this.osk?.vkbd?.layerId || ''
+      }
     };
 
     return report;

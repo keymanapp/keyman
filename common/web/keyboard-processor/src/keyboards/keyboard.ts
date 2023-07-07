@@ -331,6 +331,10 @@ export default class Keyboard {
     return kbd && ((kbd['KS'] && kbd['KS'] == 1) || kbd['KN'] == 'Hieroglyphic');
   }
 
+  get version(): string {
+    return this.scriptObject['KBVER'] || '';
+  }
+
   usesDesktopLayoutOnDevice(device: DeviceSpec) {
     if(this.scriptObject['KVKL']) {
       // A custom mobile layout is defined... but are we using it?
