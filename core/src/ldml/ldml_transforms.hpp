@@ -38,8 +38,9 @@ class element {
     element(const std::u16string &s, KMX_DWORD flags);
 
     // TODO-LDML: getters that interpret flags
-
     bool is_uset() const;
+    KMX_DWORD get_order() const;
+    KMX_DWORD get_flags() const;
 
   private:
     const std::u16string str;
@@ -98,8 +99,11 @@ typedef std::deque<element> element_list;
 
 class reorder_entry {
   public:
-    element_list before;
+    reorder_entry(const element_list& elements);
+    reorder_entry(const element_list& elements, const element_list& before);
+  public:
     element_list elements;
+    element_list before;
 };
 
 typedef std::deque<reorder_entry> reorder_list;

@@ -16,8 +16,8 @@ namespace km {
 namespace kbp {
 namespace ldml {
 
-
-element::element(const USet &u, KMX_DWORD flags) : str(), uset(u), flags(flags) {
+element::element(const USet &u, KMX_DWORD flags)
+    : str(), uset(u), flags((flags & ~LDML_ELEM_FLAGS_TYPE) | LDML_ELEM_FLAGS_TYPE_USET) {
 }
 
 element::element(const std::u16string &s, KMX_DWORD flags) : str(s), uset(), flags(flags) {
@@ -25,6 +25,19 @@ element::element(const std::u16string &s, KMX_DWORD flags) : str(s), uset(), fla
 
 bool element::is_uset() const {
   return (flags & LDML_ELEM_FLAGS_TYPE) == LDML_ELEM_FLAGS_TYPE_USET;
+}
+
+KMX_DWORD element::get_order() const {
+  return ((flags & LDML_ELEM_FLAGS_ORDER_MASK) >> LDML_ELEM_FLAGS_ORDER_BITSHIFT);
+}
+
+KMX_DWORD element::get_flags() const {
+  return flags;
+}
+
+reorder_entry::reorder_entry(const element_list &elements) : elements(elements), before() {
+}
+reorder_entry::reorder_entry(const element_list &elements, const element_list &before) : elements(elements), before(before) {
 }
 
 transform_entry::transform_entry(const std::u16string &from, const std::u16string &to) : fFrom(from), fTo(to) {
