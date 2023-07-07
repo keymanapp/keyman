@@ -5,6 +5,8 @@
   Authors:      Steven R. Loomis
 */
 
+#include <string>
+#include <algorithm>
 #include "ldml_transforms.hpp"
 #include "debuglog.h"
 
@@ -17,27 +19,160 @@ namespace kbp {
 namespace ldml {
 
 element::element(const USet &u, KMX_DWORD flags)
-    : str(), uset(u), flags((flags & ~LDML_ELEM_FLAGS_TYPE) | LDML_ELEM_FLAGS_TYPE_USET) {
+    : chr(), uset(u), flags((flags & ~LDML_ELEM_FLAGS_TYPE) | LDML_ELEM_FLAGS_TYPE_USET) {
 }
 
-element::element(const std::u16string &s, KMX_DWORD flags) : str(s), uset(), flags(flags) {
+element::element(km_kbp_usv ch, KMX_DWORD flags) : chr(ch), uset(), flags((flags & ~LDML_ELEM_FLAGS_TYPE) | LDML_ELEM_FLAGS_TYPE_CHAR) {
 }
 
 bool element::is_uset() const {
   return (flags & LDML_ELEM_FLAGS_TYPE) == LDML_ELEM_FLAGS_TYPE_USET;
 }
 
-KMX_DWORD element::get_order() const {
-  return ((flags & LDML_ELEM_FLAGS_ORDER_MASK) >> LDML_ELEM_FLAGS_ORDER_BITSHIFT);
+signed char element::get_order() const {
+  unsigned char uorder = ((flags & LDML_ELEM_FLAGS_ORDER_MASK) >> LDML_ELEM_FLAGS_ORDER_BITSHIFT);
+  return (signed char)uorder;
+}
+
+signed char element::get_tertiary() const {
+  unsigned char uorder = ((flags & LDML_ELEM_FLAGS_TERTIARY_MASK) >> LDML_ELEM_FLAGS_TERTIARY_BITSHIFT);
+  return (signed char)uorder;
+}
+
+bool element::is_prebase() const {
+  return flags & LDML_ELEM_FLAGS_PREBASE;
+}
+
+bool element::is_tertiary_base() const {
+  return flags & LDML_ELEM_FLAGS_TERTIARY_BASE;
 }
 
 KMX_DWORD element::get_flags() const {
   return flags;
 }
 
+bool element::matches(km_kbp_usv ch) const {
+  if (is_uset()) {
+    return uset.contains(ch);
+  } else {
+    return chr == ch;
+  }
+}
+
+int
+reorder_sort_key::compare(const reorder_sort_key &other) const {
+  if (primary < other.primary) {
+    return -1;
+  } else if (primary > other.primary) {
+    return 1;
+  } else if (secondary < other.secondary) {
+    return -1;
+  } else if (secondary > other.secondary) {
+    return 1;
+  } else if (tertiary < other.tertiary) {
+    return -1;
+  } else if (tertiary > other.tertiary) {
+    return 1;
+  } else if (quaternary < other.quaternary) {
+    return -1;
+  } else if (quaternary > other.quaternary) {
+    return 1;
+  } else if (ch < other.ch) {  // tiebreak with char value
+    return -1;
+  } else if (ch > other.ch) {
+    return 1;
+  } else {
+    return 0;  // identical
+  }
+}
+
+bool
+reorder_sort_key::operator<(const reorder_sort_key &other) const {
+  return (compare(other) == -1);
+}
+
+size_t
+element_list::match_end(const std::u32string &str) const {
+  if (str.size() < size()) {
+    return 0; // input string too short
+  }
+  // s: iterate from end to front on string
+  auto s = str.rbegin();
+  // e: end to front on elements. we know this is <= length of string. 
+  for (auto e = rbegin(); e < rend(); e++) {
+    if (!e->matches(*s)) {
+      return 0;
+    }
+    s++;
+  }
+  return size(); // match size = element size
+}
+
+std::deque<reorder_sort_key> element_list::get_sort_key(const std::u32string &str) const {
+  std::deque<reorder_sort_key> keylist;
+  // s: iterate from end to front on string
+  // keep consistent with about function
+  auto s = str.begin();
+  size_t c = 0;
+  for (auto e = begin(); e < end(); e++) {
+    // TODO-LDML: tertiary
+    // TODO-LDML: alternate index
+    keylist.emplace_back(reorder_sort_key{*s, e->get_order(), c, e->get_tertiary(), c});
+    s++;
+    c++;
+  }
+  return keylist;
+}
+
 reorder_entry::reorder_entry(const element_list &elements) : elements(elements), before() {
 }
 reorder_entry::reorder_entry(const element_list &elements, const element_list &before) : elements(elements), before(before) {
+}
+
+bool
+reorder_entry::apply(std::u32string &str) const {
+  DebugLog("applyin'");
+  // does it even match?
+  size_t match_len = elements.match_end(str);
+  if (match_len == 0) {
+    DebugLog("No match");
+    return false;
+  }
+
+  std::u32string prefix = str;
+  prefix.resize(str.size() - match_len); // just the part before the matched part.
+  if (!before.empty()) {
+    // make sure the 'before' is present
+    if (before.match_end(prefix) == 0) {
+      DebugLog("'before' nixed it");
+      return false; // break out.
+    }
+  }
+  // just the suffix (the matched part)
+  std::u32string suffix = str.substr(prefix.size(), match_len);
+  // make a sort key
+  auto sort_keys = elements.get_sort_key(suffix);
+  // sort it! Here's where the reorder happens
+  std::sort(sort_keys.begin(), sort_keys.end());
+  // recombine into a str
+  std::u32string newSuffix;
+  for (auto e = sort_keys.begin(); e < sort_keys.end(); e++) {
+    DebugLog("New Order U+%X was %d but %d", e->ch, e->secondary, e->primary);
+    newSuffix.append(1, e->ch);
+  }
+  str.resize(prefix.size());
+  str.append(newSuffix);
+  return true;
+}
+
+bool
+reorder_group::apply(std::u32string &str) const {
+  for (auto r = list.begin(); r < list.end(); r++) {
+    if (r->apply(str)) {
+      return true; // break at first match in this group
+    }
+  }
+  return false;
 }
 
 transform_entry::transform_entry(const std::u16string &from, const std::u16string &to) : fFrom(from), fTo(to) {
@@ -215,6 +350,21 @@ transforms::apply(std::u16string & str) {
   str.resize(str.size() - matchLength);
   str.append(output);
   return true;
+}
+
+bool
+transforms::apply(std::u32string &str) {
+  bool rc = false;
+  // TODO-LDML: PoC implementation for now, need to refactor into fcns
+  // ONLY reorder
+  for (auto group = transform_groups.begin(); group < transform_groups.end(); group++) {
+    assert(group->type == reorder); // TODO-LDML
+    auto rgroup = group->reorder;
+    if (rgroup.apply(str)) {
+      rc = true;
+    }
+  }
+  return rc;
 }
 
 

@@ -34,16 +34,26 @@ enum any_group_type {
 */
 class element {
   public:
+    /** from a USet */
     element(const USet &u, KMX_DWORD flags);
-    element(const std::u16string &s, KMX_DWORD flags);
+    /** from a single char */
+    element(km_kbp_usv ch, KMX_DWORD flags);
 
-    // TODO-LDML: getters that interpret flags
+  
+    /** @returns true if a USet type */
     bool is_uset() const;
-    KMX_DWORD get_order() const;
+    bool is_prebase() const;
+    bool is_tertiary_base() const;
+    signed char get_tertiary() const;
+    signed char get_order() const;
+    /** @returns raw elem flags */
     KMX_DWORD get_flags() const;
+    /** @returns true if matches this character*/
+    bool matches(km_kbp_usv ch) const;
 
   private:
-    const std::u16string str;
+    // TODO-LDML: support multi-char strings
+    const km_kbp_usv     chr;
     const USet           uset;
     const KMX_DWORD      flags;
 };
@@ -95,12 +105,34 @@ class transform_group : public std::deque<transform_entry> {
     const transform_entry *match(const std::u16string &input, size_t &subMatched) const;
 };
 
-typedef std::deque<element> element_list;
+/** a single char, categorized according to reorder rules*/
+struct reorder_sort_key {
+    km_kbp_usv ch;           // the single char value
+    signed char primary;     // primary order value
+    size_t secondary;        // index position
+    signed char tertiary;    // tertiary value, defaults to 0
+    size_t quaternary;       // index again
+
+    int compare(const reorder_sort_key &other) const;
+    bool operator<(const reorder_sort_key &other) const;
+};
+
+/**
+ * List of elements. Subclassed to provide match.
+*/
+class element_list : public std::deque<element> {
+  public:
+    /** @returns 0 if no match, or number of chars at end matched */
+    size_t match_end(const std::u32string& str) const;
+    std::deque<reorder_sort_key> get_sort_key(const std::u32string& str) const;
+};
 
 class reorder_entry {
   public:
     reorder_entry(const element_list& elements);
     reorder_entry(const element_list& elements, const element_list& before);
+    bool apply(std::u32string &str) const;
+
   public:
     element_list elements;
     element_list before;
@@ -111,6 +143,7 @@ typedef std::deque<reorder_entry> reorder_list;
 struct reorder_group {
   public:
     reorder_list list;
+    bool apply(std::u32string &str) const;
 };
 
 class any_group {
@@ -161,6 +194,12 @@ public:
    * @return true if str was altered
   */
   bool apply(std::u16string &str);
+
+  /**
+   * For tests - TODO-LDML only supports reorder
+   * @return true if str was altered
+  */
+  bool apply(std::u32string &str);
 
 public:
   static transforms *
