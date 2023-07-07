@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.136 alpha 2023-07-07
+
+* chore(common): Update crowdin strings for Kibaku (#9214)
+* feat(core): kmxplus uset implementation in core (#9197)
+* chore(linux): Add support for `--no-integration` flag to build files (#9212)
+*  (#9196)
+
 ## 17.0.135 alpha 2023-07-06
 
 *  (#9195)
