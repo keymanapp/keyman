@@ -310,20 +310,20 @@ export default class KeymanEngine<
   }
 
   public getDebugInfo(): Record<string, any> {
-    const activeKbd = this.contextManager.activeKeyboard;
+    const activeKbd = this.contextManager?.activeKeyboard;
 
     const report = {
-      configReport: this.config.debugReport(),
+      configReport: this.config?.debugReport(),
       keyboard: {
-        id: unprefixed(activeKbd.metadata.id),
-        langId: activeKbd?.metadata.langId || '',
-        version: activeKbd?.keyboard.version
+        id: unprefixed(activeKbd?.metadata?.id ?? ''),
+        langId: activeKbd?.metadata?.langId || '',
+        version: activeKbd?.keyboard?.version ?? ''
       },
       model: {
-        id: this.core.activeModel?.id || ''
+        id: this.core?.activeModel?.id || ''
       },
       osk: {
-        banner: this.osk?.bannerController.activeType,
+        banner: this.osk?.bannerController?.activeType ?? '',
         layer: this.osk?.vkbd?.layerId || ''
       }
     };
