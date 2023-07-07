@@ -3,18 +3,14 @@
 <!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
 <keyboard locale="mt" conformsTo="techpreview">
   <names>
-    <name value="keys-minimal" />
+    <name value="vars-fail" />
   </names>
 
-  <keys>
-    <key id="grave" to="🪦" />
-    <key id="mistake" to="oops" />
-  </keys>
+  <keys />
 
-  <layers form="us">
-    <layer id="base">
-      <row keys="grave mistake" />
-    </layer>
-  </layers>
+  <!-- from spec -->
+  <variables>
+    <set id="consonants" value="[ZXCV${missingStringInSet}]" /> <!-- fail: bad back reference to a string inside a set -->
+  </variables>
 
 </keyboard>

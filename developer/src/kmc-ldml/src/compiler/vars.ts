@@ -1,7 +1,6 @@
 import { SectionIdent, constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus, LDMLKeyboard, CompilerCallbacks } from '@keymanapp/common-types';
-import { UnicodeSetParser, VariableParser } from '@keymanapp/common-types';
-import { KmnCompiler } from  '@keymanapp/kmc-kmn';
+import { VariableParser } from '@keymanapp/common-types';
 import { SectionCompiler } from "./section-compiler.js";
 import Vars = KMXPlus.Vars;
 import StringVarItem = KMXPlus.StringVarItem;
@@ -22,17 +21,6 @@ export class VarsCompiler extends SectionCompiler {
     ]);
     defaults.delete(this.id);
     return defaults;
-  }
-
-  usetparser : UnicodeSetParser = null;
-
-  public async init() : Promise<boolean> {
-    const compiler = new KmnCompiler();
-    const ok = await compiler.init(this.callbacks);
-    if (ok) {
-      this.usetparser = compiler;
-    }
-    return ok;
   }
 
   constructor(source: LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
@@ -191,7 +179,7 @@ export class VarsCompiler extends SectionCompiler {
     let { value } = e;
     value = result.substituteStrings(value, sections);
     value = result.substituteUnicodeSets(value, sections);
-    result.unicodeSets.push(new UnicodeSetItem(id, value, sections, this.usetparser));
+    result.unicodeSets.push(new UnicodeSetItem(id, value, sections, sections.usetparser));
   }
   // routines for using/substituting variables have been moved to the Vars class and its
   // properties

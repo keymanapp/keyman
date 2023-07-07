@@ -27,7 +27,7 @@
   <!-- Context: General Strings -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Button_OK" comment="Ok button term">A</string>
+  <string name="S_Button_OK" comment="Ok button term">Kal kal</string>
   <!-- Context: General Strings -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -47,7 +47,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 16.0.47 -->
-  <string name="SKAddremove" comment="Add or Remove languages button opens a dialog window">Add/remove language...</string>
+  <string name="SKAddremove" comment="Add or Remove languages button opens a dialog window">Vu/kǝlba nya...</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.330.0 -->
@@ -71,15 +71,15 @@
   <!-- Context: Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 16.0.47.0 -->
-  <string name="S_Caption_Uninstall" comment="Configuration dialog link to Uninstall Keyboard">Uninstall</string>
+  <string name="S_Caption_Uninstall" comment="Configuration dialog link to Uninstall Keyboard">Kǝlba ka ɗalba</string>
   <!-- Context: Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 16.0.47.0 -->
-  <string name="S_Caption_Enable" comment="Configuration dialog link to Enable Keyboard">Enable</string>
+  <string name="S_Caption_Enable" comment="Configuration dialog link to Enable Keyboard">Vu ka ʻyati</string>
   <!-- Context: Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 16.0.47.0 -->
-  <string name="S_Caption_Disable" comment="Configuration dialog link to Disable Keyboard">Disable</string>
+  <string name="S_Caption_Disable" comment="Configuration dialog link to Disable Keyboard">Kanti ta ʻyati kura ka dzǝ ʻya kǝthlǝr</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -191,7 +191,7 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 16.0.47 -->
-  <string name="S_Languages_Addremove" comment="Title for dialog to add or remove languages for keyboard layout">Add/remove language</string>
+  <string name="S_Languages_Addremove" comment="Title for dialog to add or remove languages for keyboard layout">Vu/kǝlba nya</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -243,7 +243,7 @@
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.287.0 -->
-  <string name="S_Menu_Options" comment="KL option button submenu - keyboard options">Keyboard options...</string>
+  <string name="S_Menu_Options" comment="KL option button submenu - keyboard options">Su damwayere namtǝ kibod ata mǝzi ka ʻyatiyere...</string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -361,7 +361,7 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set">(no hotkey)</string>
+  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set">(hot ki adi wɛ)</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->

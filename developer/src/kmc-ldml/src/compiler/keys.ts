@@ -57,16 +57,16 @@ export class KeysCompiler extends SectionCompiler {
           valid = this.validateHardwareLayerForKmap(layers.form, layer) && valid; // note: always validate even if previously invalid results found
         }
       }
-    } else {
-      // TODO-LDML: Touch?
+      // TODO-LDML: } else { touch?
     }
 
     return valid;
   }
 
   public compile(sections: DependencySections): Keys {
+    /* c8 ignore next 4 */
     if (!this.keyboard?.keys?.key && !this.keyboard?.keys?.flicks) {
-      // short-circuit if no keys or flicks
+      // short-circuit if no keys or flicks. Doesn't happen in practice due to implied import.
       return null;
     }
 
@@ -81,6 +81,7 @@ export class KeysCompiler extends SectionCompiler {
     // Finally, kmap
     // Use LayerMap + keys to generate compiled keys for hardware
     const hardwareLayers = this.hardwareLayers();
+    /* c8 ignore next 3 */
     if (hardwareLayers.length > 1) {
       // validation should have already caught this
       throw Error(`Internal error: Expected 0 or 1 hardware layer, not ${hardwareLayers.length}`);
@@ -101,10 +102,11 @@ export class KeysCompiler extends SectionCompiler {
 
       for (let lkflick of lkflicks.flick) {
         let flags = 0;
-        // TODO-LDML: single char
-        const to = sections.strs.allocAndUnescapeString(lkflick.to);
-        flags |= constants.keys_flick_flags_extend;
-        let directions : ListItem = sections.list.allocListFromSpaces(sections.strs, lkflick.directions);
+        const to = sections.strs.allocAndUnescapeString(lkflick.to, true);
+        if (!to.isOneChar) {
+          flags |= constants.keys_flick_flags_extend;
+        }
+        let directions: ListItem = sections.list.allocListFromSpaces(sections.strs, lkflick.directions);
         flicks.flicks.push({
           directions,
           flags,
@@ -138,8 +140,10 @@ export class KeysCompiler extends SectionCompiler {
       const longPressDefault = sections.strs.allocAndUnescapeString(key.longPressDefault);
       const multiTap: ListItem = sections.list.allocListFromEscapedSpaces(sections.strs, key.multiTap);
       const keySwitch = sections.strs.allocString(key.switch); // 'switch' is a reserved word
-      flags |= constants.keys_key_flags_extend;
-      const to = sections.strs.allocAndUnescapeString(key.to); // TODO-LDML: single char
+      const to = sections.strs.allocAndUnescapeString(key.to, true);
+      if (!to.isOneChar) {
+        flags |= constants.keys_key_flags_extend;
+      }
       const width = Math.ceil((key.width || 1) * 10.0);  // default, width=1
       sect.keys.push({
         flags,
@@ -172,7 +176,9 @@ export class KeysCompiler extends SectionCompiler {
     }
 
     const keymap = Constants.HardwareToKeymap.get(hardware);
+    /* c8 ignore next 5 */
     if (!keymap) {
+      // not reached due to XML validation
       this.callbacks.reportMessage(CompilerMessages.Error_InvalidHardware({ form: hardware }));
       valid = false;
     }

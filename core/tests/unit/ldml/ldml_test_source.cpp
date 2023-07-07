@@ -565,18 +565,11 @@ LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
 
   // First, find the string as an id
   // TODO-LDML: will not work for multi string cases
-  KMX_DWORD strId = kmxplus->strs->find(chstr);
-  if (strId == 0) { // will also get here if id is empty.
-    fillin.string = u"No string for repertoire test: ";
-    fillin.string.append(chstr);
-    fillin.type = LDML_ACTION_FAIL;
-    return;
-  }
-  assert(strId != 0);
+  KMX_DWORD strId = kmxplus->strs->find(chstr); // not an error if chstr is 0, may be single ch
 
   // OK. Now we can search the keybag
   KMX_DWORD keyIndex = 0;
-  auto *key2 = kmxplus->key2Helper.findKeyByStringTo(strId, keyIndex);
+  auto *key2 = kmxplus->key2Helper.findKeyByStringTo(chstr, strId, keyIndex);
   if (key2 == nullptr) {
     fillin.string = u"No key for repertoire test: ";
     fillin.string.append(chstr);

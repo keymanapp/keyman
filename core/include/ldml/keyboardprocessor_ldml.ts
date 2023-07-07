@@ -140,6 +140,19 @@ class Constants {
   readonly length_elem_item_element = 8;
 
   /**
+   * bitwise or value for type in elem[elemstr][element].flags.
+   * If bits are 00b, then 'element' is a UTF-32LE codepoint.
+   * If bits are 01b, then 'element' is a string index.
+   * If bits are 10b (2), then 'element' is a uset index.
+   *
+   * `type = flags & elem_flags_type`
+   */
+  readonly elem_flags_type      = 0x00000003;
+  readonly elem_flags_type_char = 0x00000000;
+  readonly elem_flags_type_str  = 0x00000001;
+  readonly elem_flags_type_uset = 0x00000002;
+
+  /**
    * bitwise or value for tertiary_base in elem[elemstr][element].flags.
    * If bit is 1, then tertiary_base is true.
    * If bit is 0, then tertiary_base is false.
@@ -148,7 +161,7 @@ class Constants {
    *
    * `tertiary_base = flags & elem_flags_tertiary_base`
    */
-  readonly elem_flags_tertiary_base = 0x00000001;
+  readonly elem_flags_tertiary_base = 0x00000004;
 
   /**
    * bitwise or value for tertiary_base in elem[elemstr][element].flags.
@@ -159,21 +172,7 @@ class Constants {
    *
    * `prebase = flags & elem_flags_prebase`
    */
-  readonly elem_flags_prebase = 0x00000002;
-
-  /**
-   * bitwise or value for type in elem[elemstr][element].flags.
-   * If bits are 00b, then 'element' is a UTF-32LE codepoint.
-   * If bits are 01b, then 'element' is a string index.
-   * If bits are 10b (2), then 'element' is a uset index.
-   *
-   * `type = flags & elem_flags_type`
-   */
-  readonly elem_flags_type       = 0x0000000C;
-  readonly elem_flags_type_char  = 0x0;
-  readonly elem_flags_type_str   = 0x1;
-  readonly elem_flags_type_uset  = 0x2;
-
+  readonly elem_flags_prebase = 0x00000008;
 
   /**
    * bitwise mask for order in elem[elemstr][element].flags.

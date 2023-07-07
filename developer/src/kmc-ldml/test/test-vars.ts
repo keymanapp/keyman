@@ -176,5 +176,11 @@ describe('vars', function () {
         CompilerMessages.Error_CantReferenceSetFromUnicodeSet({id: 'nonUnicodeSet'})
       ],
     },
+    {
+      subpath: 'sections/vars/fail-badref-6.xml',
+      errors: [
+        CompilerMessages.Error_MissingStringVariable({id: 'missingStringInSet'})
+      ],
+    },
   ]);
 });

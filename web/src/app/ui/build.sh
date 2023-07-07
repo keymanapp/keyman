@@ -17,6 +17,7 @@ cd "$THIS_SCRIPT_PATH"
 
 builder_describe "Builds the Keyman Engine for Web's desktop form-factor keyboard selection modules." \
   "@/web/src/app/browser build" \
+  "@/web/src/tools/building/sourcemap-root" \
   "clean" \
   "configure" \
   "build" \

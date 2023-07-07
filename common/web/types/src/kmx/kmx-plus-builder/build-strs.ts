@@ -45,9 +45,20 @@ export function build_strs(source_strs: Strs): BUILDER_STRS {
   return result;
 }
 
+/**
+ * @returns str index, or UTF-32 char if value.char is set (single char)
+ */
 export function build_strs_index(sect_strs: BUILDER_STRS, value: StrsItem) {
   if(!(value instanceof StrsItem)) {
-    throw new Error('unexpected value '+ value);
+    if (value === null) {
+      throw new Error('unexpected null StrsItem, use an empty string instead');
+    } else {
+      throw new Error('unexpected StrsItem value '+ value);
+    }
+  }
+
+  if(value.isOneChar) {
+    return value.char;
   }
 
   let result = sect_strs.items.findIndex(v => v._value === value.value);

@@ -32,24 +32,24 @@ int test_COMP_KMXPLUS_KEYS_KEY() {
           0x0001F640,  // to
           0x00000000   // flags: CHAR
       }};
-  std::u16string s0 = e[0].get_string();
+  std::u16string s0 = e[0].get_to_string();
   assert_equal(s0.length(), 1);
   assert_equal(s0.at(0), 0x0127);
   assert(s0 == std::u16string(u"ħ"));
 
-  std::u16string s1 = e[1].get_string();
+  std::u16string s1 = e[1].get_to_string();
   assert_equal(s1.length(), 2);
   assert_equal(s1.at(0), 0xD83D);
   assert_equal(s1.at(1), 0xDE40);
   assert(s1 == std::u16string(u"🙀"));
 
   // now, elems. Parallel.
-  std::u16string es0 = elems[0].get_string();
+  std::u16string es0 = elems[0].get_element_string();
   assert_equal(es0.length(), 1);
   assert_equal(es0.at(0), 0x0127);
   assert(es0 == std::u16string(u"ħ"));
 
-  std::u16string es1 = elems[1].get_string();
+  std::u16string es1 = elems[1].get_element_string();
   assert_equal(es1.length(), 2);
   assert_equal(es1.at(0), 0xD83D);
   assert_equal(es1.at(1), 0xDE40);
@@ -144,6 +144,26 @@ int test_ldml_vkeys() {
   return EXIT_SUCCESS;
 }
 
+int test_uset() {
+  std::cout << "== " << __FUNCTION__ << std::endl;
+
+  const COMP_KMXPLUS_USET_RANGE r[] = {
+    {0x61, 0x7a}, // [a-z]
+    {0x127, 0x127} // [ħ]
+  };
+
+  USet u0(&r[0], 2);
+  assert_equal(u0.contains(0x62), true); // b
+  assert_equal(u0.contains(0x41), false); // A
+  assert_equal(u0.contains(0x127), true); // ħ
+
+  USet uempty;
+  assert_equal(uempty.contains(0x62), false);
+  assert_equal(uempty.contains(0x127), false);
+
+  return EXIT_SUCCESS;
+}
+
 int
 main(int argc, const char *argv[]) {
   int rc = EXIT_SUCCESS;
@@ -153,6 +173,10 @@ main(int argc, const char *argv[]) {
   }
 
   if (test_ldml_vkeys() != EXIT_SUCCESS) {
+    rc = EXIT_FAILURE;
+  }
+
+  if (test_uset() != EXIT_SUCCESS) {
     rc = EXIT_FAILURE;
   }
 
