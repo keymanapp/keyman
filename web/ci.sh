@@ -42,6 +42,16 @@ builder_parse "$@"
 TIER=`cat ../TIER.md`
 BUILD_NUMBER=`cat ../VERSION.md`
 
+function web_sentry_upload () {
+  echo "Uploading $1 to Sentry..."
+
+  # --strip-common-prefix does not take an argument, unlike --strip-prefix.  It auto-detects
+  # the most common prefix instead.
+  sentry-cli releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix "$1" \
+    --rewrite --ext js --ext map --ext ts
+  echo "Upload successful."
+}
+
 if builder_start_action build; then
   # Build step:  since CI builds start (and should start) from scratch, run the following
   # three actions:
@@ -52,6 +62,17 @@ if builder_start_action build; then
   # one option:
   # - --ci:       For app/browser, outputs 'release' config filesize profiling logs
   ./build.sh configure clean build --ci
+
+  # Upload the sentry-configuration engine used by the mobile apps to sentry
+  # Also, clean 'em first.
+  for sourcemap in "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/"*.map; do
+    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" null "$sourcemap" --clean
+  done
+  web_sentry_upload "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/"
+
+  # And, of course, the main build-products too
+  web_sentry_upload "$KEYMAN_ROOT/web/build/app/webview/release/"
+  web_sentry_upload "$KEYMAN_ROOT/web/build/publish/release/"
 
   builder_finish_action success build
 fi
@@ -138,7 +159,7 @@ fi
 # Note:  for now, this command is used to prepare the artifacts used by the download site, but
 #        NOT to actually UPLOAD them via rsync or to produce related .download_info files.
 if builder_start_action prepare:downloads.keyman.com; then
-  UPLOAD_PATH="build/upload/$VERSION"
+  UPLOAD_PATH="$KEYMAN_ROOT/web/build/upload/$VERSION"
 
   # --- First action artifact - the KMW zip file ---
   ZIP="$UPLOAD_PATH/keymanweb-$VERSION.zip"
@@ -168,7 +189,7 @@ if builder_start_action prepare:downloads.keyman.com; then
 
   pushd build/publish
   # Zip both the 'debug' and 'release' configurations together.
-  "${COMPRESS_CMD}" $COMPRESS_ADD ../../../../$ZIP *
+  "${COMPRESS_CMD}" $COMPRESS_ADD $ZIP *
   popd
 
   # --- Second action artifact - the 'static' folder (hosted user testing on downloads.keyman.com) ---

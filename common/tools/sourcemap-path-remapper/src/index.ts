@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import path from 'path';
 import convertSourceMap from 'convert-source-map'; // Transforms sourcemaps among various common formats.
                                                    // Base64, stringified-JSON, end-of-file comment...
 
@@ -97,11 +98,31 @@ class RemappingState {
   }
 
   /**
+   * Prepends all `sources` paths with the current sourceRoot (or just the part after a
+   * specified index).
+   * @param index
+   */
+  public normalizeWithSourceRoot(index?: number) {
+    const sources = this.sourceMap.sources;
+    const originalSrcRoot = this.sourceRoot;
+
+    index = index || 0;
+    const prefix = originalSrcRoot.substring(index);
+    this.sourceRoot = originalSrcRoot.substring(0, index);
+
+    for(let i=0; i < sources.length; i++) {
+      // Normalizes, then swaps Windows '\\' entries with '/' if they exist;
+      // path.normalize respects Windows too much for our taste here.
+      sources[i] = path.normalize(`${prefix}/${sources[i]}`).replace(/\\/g, '/');
+    }
+  }
+
+  /**
    * Writes the current state of the remapped sourcemap out to the specified file.
    * @param file
    */
   public toFile(file: fs.PathLike) {
-    fs.writeFileSync(file, convertSourceMap.fromObject(this.sourceMap).toJSON());
+    fs.writeFileSync(file, convertSourceMap.fromObject(this.sourceMap).toJSON(2)); // 2 = space count
   }
 }
 

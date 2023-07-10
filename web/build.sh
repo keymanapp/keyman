@@ -36,6 +36,7 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":engine/package-cache     Subset used to collate keyboards and request them from the cloud" \
   ":engine/paths             Subset used to configure KMW" \
   ":samples                  Builds all needed resources for the KMW sample-page set" \
+  ":tools                    Builds engine-related development resources" \
   ":test-pages=src/test/manual   Builds resources needed for the KMW manual testing pages" \
   "--ci+                     Set to utilize CI-based test configurations & reporting."
 
@@ -99,6 +100,8 @@ builder_run_child_actions build:app/ui
 builder_run_child_actions build:samples
 
 builder_run_child_actions build:test-pages
+
+builder_run_child_actions build:tools
 
 builder_run_child_actions test
 

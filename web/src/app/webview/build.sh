@@ -17,6 +17,7 @@ cd "$THIS_SCRIPT_PATH"
 
 builder_describe "Builds the Keyman Engine for Web's puppetable version designed for use within WebViews." \
   "@/web/src/engine/main build" \
+  "@/web/src/tools/building/sourcemap-root" \
   "clean" \
   "configure" \
   "build" \
@@ -44,6 +45,15 @@ compile_and_copy() {
 
   mkdir -p "$KEYMAN_ROOT/web/build/app/resources/osk"
   cp -R "$KEYMAN_ROOT/web/src/resources/osk/." "$KEYMAN_ROOT/web/build/app/resources/osk/"
+
+  # Clean the sourcemaps of .. and . components
+  for sourcemap in "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME/debug/"*.map; do
+    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" null "$sourcemap" --clean
+  done
+
+  for sourcemap in "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME/release/"*.map; do
+    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" null "$sourcemap" --clean
+  done
 
   # For dependent test pages.
   "$KEYMAN_ROOT/web/src/test/manual/embed/android-harness/build.sh"

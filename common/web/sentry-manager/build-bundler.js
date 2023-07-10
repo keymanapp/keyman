@@ -17,5 +17,6 @@ await esbuild.build({
   },
   outfile: 'build/lib/index.js',
   target: "es5",
-  tsconfig: './src/tsconfig.json'
+  tsconfig: './src/tsconfig.json',
+  sourceRoot: '@keymanapp/keyman/common/web/sentry-manager/build/lib/'
 });

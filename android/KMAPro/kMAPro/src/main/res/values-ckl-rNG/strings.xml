@@ -34,6 +34,8 @@
   <string name="ic_text_size_up" comment="Make text bigger">Dzakti ngakurir text</string>
   <!-- Context: Text Size dialog -->
   <string name="ic_text_size_down" comment="Make text smaller">Kǝnta ngakurir text</string>
+  <!-- Context: Text Size dialog -->
+  <string name="ic_text_size_slider" comment="Adjust text size">Sǝr mbǝyati ka su rubwa rubwa ʻya nga ta waci</string>
   <!-- Context: Clear Text dialog -->
   <string name="all_text_will_be_cleared" comment="Erase all the text">\nShanga text ata fwavuntadzi\n</string>
   <!-- Context: Get Started menu -->

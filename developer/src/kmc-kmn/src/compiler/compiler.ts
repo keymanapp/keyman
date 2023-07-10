@@ -228,22 +228,19 @@ export class KmnCompiler implements UnicodeSetParser {
   /**
    *
    * @param pattern UnicodeSet pattern such as `[a-z]`
-   * @param bufferSize guess as to the buffer size
+   * @param rangeCount number of ranges to allocate
    * @returns UnicodeSet accessor object, or null on failure
    */
-  public parseUnicodeSet(pattern: string, bufferSize: number) : UnicodeSet | null {
+  public parseUnicodeSet(pattern: string, rangeCount: number) : UnicodeSet | null {
     if(!this.verifyInitialized()) {
       /* c8 ignore next 2 */
       return null;
     }
 
-    if (!bufferSize) {
-      /* c8 ignore next 2 */
-      bufferSize = 100; // TODO-LDML: Preflight mode? Reuse buffer?
-    }
-    const buf = this.Module.asm.malloc(bufferSize * 2 * this.Module.HEAPU32.BYTES_PER_ELEMENT);
+    const buf = this.Module.asm.malloc(rangeCount * 2 * this.Module.HEAPU32.BYTES_PER_ELEMENT);
     // TODO-LDML: Catch OOM
-    const rc = this.Module.kmcmp_parseUnicodeSet(pattern, buf, bufferSize);
+    /** return code, if positive: range count */
+    const rc = this.Module.kmcmp_parseUnicodeSet(pattern, buf, rangeCount * 2);
     if (rc >= 0) {
       const ranges = [];
       const startu = (buf / this.Module.HEAPU32.BYTES_PER_ELEMENT);
@@ -261,6 +258,19 @@ export class KmnCompiler implements UnicodeSetParser {
       // Module.asm.free(buf);
       this.callbacks.reportMessage(getUnicodeSetError(rc));
       return null;
+    }
+  }
+  public sizeUnicodeSet(pattern: string) : number {
+    if(!this.verifyInitialized()) {
+      /* c8 ignore next 2 */
+      return null;
+    }
+    const rc = this.Module.kmcmp_parseUnicodeSet(pattern, 0, 0);
+    if (rc >= 0) {
+      return rc;
+    } else {
+      this.callbacks.reportMessage(getUnicodeSetError(rc));
+      return -1;
     }
   }
 }

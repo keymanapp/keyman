@@ -42,11 +42,10 @@
           {'browser': 'chrome', 'formFactor': 'desktop', OS: 'windows', touchable: false} :  // Or whatever target config you want.
           {'browser': 'chrome', 'formFactor': 'phone', OS: 'ios', touchable: true};
         if(newOSK) document.getElementById('KeymanWebControl').removeChild(newOSK.element);
-        newOSK = new com.keyman.osk.InlinedOSKView(targetDevice, keyman.util.device.coreSpec);
+        newOSK = new keyman.views.InlinedOSKView(keyman, { device: targetDevice });
         newOSK.setSize('300px', '150px');  // Or pick whatever size you want, however you want it.
         document.getElementById('KeymanWebControl').appendChild(newOSK.element);
         keyman.osk = newOSK;
-        newOSK.activeKeyboard = keyman.core.activeKeyboard;
         document.getElementById('ta1').focus();
       }
 

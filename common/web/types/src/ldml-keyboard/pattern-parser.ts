@@ -2,6 +2,8 @@
  * Utilities for transform and marker processing
  */
 
+import { MATCH_QUAD_ESCAPE, isOneChar, unescapeOneQuadString, unescapeString } from "../util/util.js";
+
 
 /**
  * Helper function for extracting matched items
@@ -102,20 +104,101 @@ export class VariableParser {
   }
 
   /**
-   * parse a string into references
-   * @param str input string
-   * @returns `[]` or an array of all string references referenced
-   */
-  public static allCaptureSetReferences(str: string): string[] {
-    return matchArray(str, this.CAPTURE_SET_REFERENCE);
-  }
-
-  /**
    * Split an input string into a proper set
    * @param str input string
    * @returns
    */
   public static setSplitter(str: string): string[] {
-    return str.trim().split(/\s+/);
+    const s = str?.trim();
+    if (!s) return [];
+    return s.split(/\s+/);
   }
 }
+
+/** for ElementParser.segment() */
+export enum ElementType {
+  codepoint = '.',
+  escaped ='\\',
+  uset = '[',
+  string = '*',
+};
+
+/** one portion of a segmented element string */
+export class ElementSegment {
+  public readonly type: ElementType;
+  /**
+   * @param segment the string in the segment
+   * @param type type of segment. Will be calculated if not provided.
+   */
+  constructor(public segment: string, type?: ElementType) {
+    if (type) {
+      this.type = type;
+    } else if (ElementParser.MATCH_USET.test(segment)) {
+      this.type = ElementType.uset;
+    } else if(ElementParser.MATCH_ESCAPED.test(segment)) {
+      this.type = ElementType.escaped;
+    } else {
+      this.type = ElementType.codepoint;
+    }
+  }
+
+  /** unescaped format */
+  get unescaped() : string {
+    if (this.type !== ElementType.escaped) {
+      return this.segment;
+    } else {
+      if (MATCH_QUAD_ESCAPE.test(this.segment)) {
+        return unescapeOneQuadString(this.segment);
+      } else {
+        return unescapeString(this.segment);
+      }
+    }
+  }
+};
+
+/** Class for helping with Element strings (i.e. reorder) */
+export class ElementParser {
+  /**
+   * Matches any complex UnicodeSet that would otherwise be misinterpreted
+   * by `MATCH_ELEMENT_SEGMENTS` due to nested `[]`'s.
+   * For example, `[[a-z]-[aeiou]]` could be
+   * mis-segmented into `[[a-z]`, `-`, `[aeiou]`, `]` */
+  public static readonly MATCH_NESTED_SQUARE_BRACKETS = /\[[^\]]*\[/;
+
+  /** Match (segment) UnicodeSets OR hex escapes OR single Unicode codepoints */
+  public static readonly MATCH_ELEMENT_SEGMENTS =
+    /(?:\[[^\]]*\]|\\u[0-9a-fA-F]{4}|\\u\{[0-9a-fA-F]{1,6}\}|\\u\{(?:[0-9a-fA-F]{1,6})(?: [0-9a-fA-F]{1,6}){1,}\}|.)/gu;
+
+  /** Does it start with a UnicodeSet? Used to test the segments. */
+  public static readonly MATCH_USET = /^\[/;
+
+  /** Does it start with an escaped char? Used to test the segments. */
+  public static readonly MATCH_ESCAPED = /^\\u/;
+
+  /** Split a string into ElementSegments */
+  public static segment(str: string): ElementSegment[] {
+    if (this.MATCH_NESTED_SQUARE_BRACKETS.test(str)) {
+      throw Error(`Unsupported: nested square brackets in element segment: ${str}`);
+    }
+    const list: ElementSegment[] = [];
+    for(let m of str.match(ElementParser.MATCH_ELEMENT_SEGMENTS)) {
+      const e = new ElementSegment(m);
+      if (e.type === ElementType.escaped) {
+        // unescape
+        const { unescaped } = e;
+        if (isOneChar(unescaped)) {
+          list.push(e);
+        } else {
+          // need to split the escaped segment, \u{41 42} -> \u{41}, \u{42}
+          for (let s of unescaped) {
+            list.push(new ElementSegment(`\\u{${s.codePointAt(0).toString(16)}}`));
+          }
+        }
+      } else {
+        // all others
+        list.push(e);
+      }
+    }
+    return list;
+  }
+};

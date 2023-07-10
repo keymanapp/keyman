@@ -25,6 +25,11 @@ describe('Compiler UnicodeSet function', function() {
     assert(set.length === 1);
     assert(set.ranges[0][0] === 'a'.charCodeAt(0));
     assert(set.ranges[0][1] === 'c'.charCodeAt(0));
+    assert.deepEqual(callbacks.messages, []);
+    callbacks.clear();
+    const len2 = compiler.sizeUnicodeSet(pat);
+    assert.deepEqual(callbacks.messages, []);
+    assert.equal(len2, set.length);
   });
   it('should compile a more complex uset', async function() {
     const compiler = new KmnCompiler();
@@ -40,6 +45,11 @@ describe('Compiler UnicodeSet function', function() {
     assert.equal(set.ranges[0][1], 'A'.charCodeAt(0));
     assert.equal(set.ranges[1][0], 0x1F640);
     assert.equal(set.ranges[1][1], 0x1F640);
+    assert.deepEqual(callbacks.messages, []);
+    callbacks.clear();
+    const len2 = compiler.sizeUnicodeSet(pat);
+    assert.deepEqual(callbacks.messages, []);
+    assert.equal(len2, set.length);
   });
   it('should fail in various ways', async function() {
     const compiler = new KmnCompiler();
