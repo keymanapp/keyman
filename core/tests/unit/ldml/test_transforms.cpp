@@ -255,7 +255,7 @@ test_reorder_standalone() {
           {U'\u1A45', 10, 4, 0, 3}};
       // add it to a list
       std::deque<reorder_sort_key> keylist;
-      for (size_t i = 0; i < std::size(keys0); i++) {
+      for (size_t i = 0; i < sizeof(keys0)/sizeof(keys0[0]); i++) {
         keylist.emplace_back(keys0[i]);
       }
       // now sort it
@@ -321,7 +321,7 @@ test_reorder_standalone() {
     // now actually test it
     std::cout << __FILE__ << ":" << __LINE__ << " - back to nod-Lana " << std::endl;
     // TODO-LDML: move this into test code perhaps
-    for (int r = 0; r < std::size(roasts); r++) {
+    for (size_t r = 0; r < sizeof(roasts)/sizeof(roasts[0]); r++) {
       std::cout << __FILE__ << ":" << __LINE__ << " - trying roast #" << r << std::endl;
       const auto &roast = roasts[r];
       // simulate typing this one char at a time;
