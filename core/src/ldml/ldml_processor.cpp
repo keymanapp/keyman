@@ -71,7 +71,8 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       auto keyEntry = kplus.key2Helper.getKeys(kmapEntry->key);
       assert(keyEntry != nullptr);
 
-      if (keyEntry->flags && LDML_KEYS_KEY_FLAGS_EXTEND) {
+      // TODO-LDML: LDML_KEYS_KEY_FLAGS_NOTRANSFORM
+      if (keyEntry->flags & LDML_KEYS_KEY_FLAGS_EXTEND) {
         if (nullptr == kplus.strs) {
           DebugLog("for keys: kplus.strs == nullptr"); // need a string table to get strings
           assert(false);
@@ -79,7 +80,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
         }
         str = kplus.strs->get(keyEntry->to);
       } else {
-        str = keyEntry->get_string();
+        str = keyEntry->get_to_string();
       }
       keys.add((km_kbp_virtual_key)kmapEntry->vkey, (uint16_t)kmapEntry->mod, str);
     }

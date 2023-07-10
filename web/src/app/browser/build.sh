@@ -18,6 +18,7 @@ cd "$THIS_SCRIPT_PATH"
 builder_describe "Builds the Keyman Engine for Web's website-integrating version for use in non-puppeted browsers." \
   "@/web/src/engine/attachment build" \
   "@/web/src/engine/main build" \
+  "@/web/src/tools/building/sourcemap-root" \
   "clean" \
   "configure" \
   "build" \

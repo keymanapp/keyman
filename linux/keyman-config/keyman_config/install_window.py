@@ -132,29 +132,21 @@ class InstallKmpWindow(Gtk.Dialog):
     def _uninstall_prev_version_if_necessary(self, keyboardid, viewkmp, installed_kmp_ver, info):
         if not installed_kmp_ver or not secure_lookup(info, 'version', 'description'):
             return True
-        if secure_lookup(info, 'version', 'description') == installed_kmp_ver:
-            response = self._show_version_message_dlg(
-              viewkmp,
-              # i18n: The words in braces (e.g. `{name}`) are placeholders. Don't translate them!
-              _("The {name} keyboard is already installed at version {version}. "
-                "Do you want to uninstall then reinstall it?").format(
-                  name=self.kbname, version=installed_kmp_ver))
-        else:
-            logging.info("package version %s", secure_lookup(info, 'version', 'description'))
-            logging.info("installed kmp version %s", installed_kmp_ver)
-            if parse_version(secure_lookup(info, 'version', 'description')) > parse_version(installed_kmp_ver):
-                return True
-            response = self._show_version_message_dlg(
-              viewkmp,
-              # i18n: The words in braces (e.g. `{name}`) are placeholders. Don't translate them!
-              _("The {name} keyboard is already installed with a newer version {installedversion}. "
-                "Do you want to uninstall it and install the older version {version}?")
-              .format(name=self.kbname, installedversion=installed_kmp_ver,
-                      version=secure_lookup(info, 'version', 'description')))
+        logging.info("package version %s", secure_lookup(info, 'version', 'description'))
+        logging.info("installed kmp version %s", installed_kmp_ver)
+        if parse_version(secure_lookup(info, 'version', 'description')) >= parse_version(installed_kmp_ver):
+            return True
+        response = self._show_version_message_dlg(
+          viewkmp,
+          # i18n: The words in braces (e.g. `{name}`) are placeholders. Don't translate them!
+          _("The {name} keyboard is already installed with a newer version {installedversion}. "
+            "Do you want to uninstall it and install the older version {version}?")
+          .format(name=self.kbname, installedversion=installed_kmp_ver,
+                  version=secure_lookup(info, 'version', 'description')))
         try:
             if response == Gtk.ResponseType.YES:
                 logging.debug("QUESTION dialog closed by clicking YES button")
-                uninstall_kmp(keyboardid)
+                uninstall_kmp(keyboardid, False, False)
                 return True
             elif response == Gtk.ResponseType.NO:
                 logging.debug("QUESTION dialog closed by clicking NO button")

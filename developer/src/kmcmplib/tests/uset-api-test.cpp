@@ -40,6 +40,13 @@ void test_kmcmp_parseUnicodeSet() {
     assert(rc == KMCMP_USET_OK);
   }
   {
+    // preflight null test
+    const auto bufsiz = 0;
+    uintptr_t buf_ = 0L;
+    int rc = kmcmp_parseUnicodeSet(u8"[]", buf_, bufsiz);
+    assert(rc == KMCMP_USET_OK); // == 0
+  }
+  {
     // basic test
     const auto bufsiz = 128;
     uint32_t buf[bufsiz];
@@ -50,6 +57,12 @@ void test_kmcmp_parseUnicodeSet() {
     assert(buf[1] == 0x43);
     assert(buf[2] == 0x78);
     assert(buf[3] == 0x78);
+  }
+  {
+    uintptr_t buf_ = 0L;
+    const auto bufsiz = 0;
+    int rc = kmcmp_parseUnicodeSet(u8"[x A-C]", buf_, bufsiz); // preflight
+    assert(rc == 2); // 2 ranges
   }
   {
     // bigger test
@@ -100,6 +113,34 @@ void test_kmcmp_parseUnicodeSet() {
     const auto bufsiz = 128;
     uint32_t buf[bufsiz];
     uintptr_t buf_ = reinterpret_cast<uintptr_t>(buf);
+    int rc = kmcmp_parseUnicodeSet(u8"[[]", buf_, bufsiz);
+    assert(rc == KMCMP_ERROR_SYNTAX_ERR);
+  }
+  {
+    // preflight err test
+    const auto bufsiz = 0; // preflight
+    uintptr_t buf_ = 0L;
+    int rc = kmcmp_parseUnicodeSet(u8"[:Adlm:]", buf_, bufsiz);
+    assert(rc == KMCMP_ERROR_UNSUPPORTED_PROPERTY);
+  }
+  {
+    // preflight err test
+    const auto bufsiz = 0; // preflight
+    uintptr_t buf_ = 0L;
+    int rc = kmcmp_parseUnicodeSet(u8"[[\\p{Mn}]&[A-Z]]", buf_, bufsiz);
+    assert(rc == KMCMP_ERROR_UNSUPPORTED_PROPERTY);
+  }
+  {
+    // preflight err test
+    const auto bufsiz = 0; // preflight
+    uintptr_t buf_ = 0L;
+    int rc = kmcmp_parseUnicodeSet(u8"[abc{def}]", buf_, bufsiz);
+    assert(rc == KMCMP_ERROR_HAS_STRINGS);
+  }
+  {
+    // preflight err test
+    const auto bufsiz = 0; // preflight
+    uintptr_t buf_ = 0L;
     int rc = kmcmp_parseUnicodeSet(u8"[[]", buf_, bufsiz);
     assert(rc == KMCMP_ERROR_SYNTAX_ERR);
   }

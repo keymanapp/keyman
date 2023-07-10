@@ -66,9 +66,10 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
     return valid;
   }
 
+  /* c8 ignore next 4 */
+  /** allocate a new TranBase subclass */
   protected newTran(): TranBase {
-    // needs to be overridden in the subclass
-    return null;
+    throw Error(`Internal Error: newTran() not implemented`);
   }
 
   private compileTransforms(sections: DependencySections, transforms: LKTransforms): TranBase {
@@ -84,6 +85,7 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
 
   private compileTransformGroup(sections: DependencySections, transformGroup: LKTransformGroup): TranGroup {
     if (transformGroup.reorder.length && transformGroup.transform.length) {
+      /* c8 ignore next 2 */
       // should have been caught by validate
       throw Error(`Internal error: transformGroup has both reorder and transform elements.`);
     } else if (transformGroup.reorder.length) {
@@ -91,6 +93,7 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
     } else if (transformGroup.transform.length) {
       return this.compileTransformTranGroup(sections, transformGroup.transform);
     } else {
+      /* c8 ignore next */
       throw Error(`Internal error: transformGroup has neither reorder nor transform elements.`);
     }
   }
@@ -143,8 +146,8 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
 
   private compileReorder(sections: DependencySections, reorder: LKReorder): TranReorder {
     let result = new TranReorder();
-    result.elements = sections.elem.allocElementString(sections.strs, reorder.from, reorder.order, reorder.tertiary, reorder.tertiaryBase, reorder.preBase);
-    result.before = sections.elem.allocElementString(sections.strs, reorder.before);
+    result.elements = sections.elem.allocElementString(sections, reorder.from, reorder.order, reorder.tertiary, reorder.tertiaryBase, reorder.preBase);
+    result.before = sections.elem.allocElementString(sections, reorder.before);
     return result;
   }
 
@@ -163,6 +166,7 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
       constants.section.list,
       constants.section.elem,
       constants.section.vars,
+      constants.section.uset,
     ]);
     defaults.delete(this.id);
     return defaults;
