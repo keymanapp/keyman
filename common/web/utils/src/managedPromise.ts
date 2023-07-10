@@ -2,8 +2,15 @@ type ResolveSignature<Type> = (value: Type | PromiseLike<Type>) => void;
 type RejectSignature = (reason?: any) => void;
 
 export default class ManagedPromise<Type> {
-  public resolve: ResolveSignature<Type>;
-  public reject: RejectSignature;
+  public get resolve(): ResolveSignature<Type> {
+    return this._resolve;
+  }
+  public get reject(): RejectSignature {
+    return this._reject;
+  }
+
+  protected _resolve: ResolveSignature<Type>;
+  protected _reject: RejectSignature;
 
   private _hasResolved: boolean = false;
   private _hasRejected: boolean = false;
@@ -16,6 +23,13 @@ export default class ManagedPromise<Type> {
     return this._hasRejected;
   }
 
+  // TODO: the proper Promise term is `settled`.
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise#description
+  //
+  // Note for PR:
+  // Fortunately, this class was only introduced during 17.0.  We can change it now without reprecussions.
+  // https://github.com/keymanapp/keyman/commit/d98744468373977bafd194b7da9f21f13410c2e5
+  // (#8056 / 17.0.82-alpha, dated Jan 20, during ES-module work)
   public get hasFinalized(): boolean {
     return this.hasResolved || this.hasRejected;
   }
@@ -23,21 +37,21 @@ export default class ManagedPromise<Type> {
   private _promise: Promise<Type>;
 
   constructor();
-  constructor(executor: (resolve: ResolveSignature<Type>, reject: RejectSignature) => Type);
-  constructor(executor?: (resolve: ResolveSignature<Type>, reject: RejectSignature) => Type) {
+  constructor(executor: (resolve: ResolveSignature<Type>, reject: RejectSignature) => void);
+  constructor(executor?: (resolve: ResolveSignature<Type>, reject: RejectSignature) => void) {
     this._promise = new Promise<Type>((resolve, reject) => {
-      this.resolve = (value) => {
+      this._resolve = (value) => {
         this._hasResolved = true;
         resolve(value);
       };
 
-      this.reject = (reason) => {
+      this._reject = (reason) => {
         this._hasRejected = true;
         reject(reason);
       };
 
       if(executor) {
-        executor(this.resolve, this.reject);
+        executor(this._resolve, this._reject);
       }
     });
   }

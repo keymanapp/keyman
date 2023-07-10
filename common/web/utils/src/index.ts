@@ -18,9 +18,8 @@ export { default as globalObject } from "./globalObject.js";
 
 export { default as extendString } from "./kmwstring.js";
 
-
-
 export { default as ManagedPromise } from "./managedPromise.js";
+export { default as TimeoutPromise } from "./timeoutPromise.js";
 
 // // Uncomment the following line and run the bundled output to verify successful
 // // esbuild bundling of this submodule:
