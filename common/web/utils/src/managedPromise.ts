@@ -2,9 +2,16 @@ type ResolveSignature<Type> = (value: Type | PromiseLike<Type>) => void;
 type RejectSignature = (reason?: any) => void;
 
 export default class ManagedPromise<Type> {
+  /**
+   * Calling this function will fulfill the Promise represented by this class.
+   */
   public get resolve(): ResolveSignature<Type> {
     return this._resolve;
   }
+
+  /**
+   * Calling this function will reject the Promise represented by this class.
+   */
   public get reject(): RejectSignature {
     return this._reject;
   }
@@ -12,26 +19,31 @@ export default class ManagedPromise<Type> {
   protected _resolve: ResolveSignature<Type>;
   protected _reject: RejectSignature;
 
-  private _hasResolved: boolean = false;
-  private _hasRejected: boolean = false;
+  private _isFulfilled: boolean = false;
+  private _isRejected: boolean = false;
 
-  public get hasResolved(): boolean {
-    return this._hasResolved;
+  /**
+   * Indicates that the promise has been fulfilled; the underlying `resolve` function has
+   * already been called and "locked in".
+   */
+  public get isFulfilled(): boolean {
+    return this._isFulfilled;
   }
 
-  public get hasRejected(): boolean {
-    return this._hasRejected;
+  /**
+   * Indicates that the promise has been rejected; the underlying `reject` function has
+   * already been called and "locked in".
+   */
+  public get isRejected(): boolean {
+    return this._isRejected;
   }
 
-  // TODO: the proper Promise term is `settled`.
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise#description
-  //
-  // Note for PR:
-  // Fortunately, this class was only introduced during 17.0.  We can change it now without reprecussions.
-  // https://github.com/keymanapp/keyman/commit/d98744468373977bafd194b7da9f21f13410c2e5
-  // (#8056 / 17.0.82-alpha, dated Jan 20, during ES-module work)
-  public get hasFinalized(): boolean {
-    return this.hasResolved || this.hasRejected;
+  /**
+   * Indicates that the promise itself has either been resolved or rejected.  It may not be fully
+   * settled if resolved or rejected with a "thenable" that has not yet fully resolved itself.
+   */
+  public get isResolved(): boolean {
+    return this.isFulfilled || this.isRejected;
   }
 
   private _promise: Promise<Type>;
@@ -41,12 +53,12 @@ export default class ManagedPromise<Type> {
   constructor(executor?: (resolve: ResolveSignature<Type>, reject: RejectSignature) => void) {
     this._promise = new Promise<Type>((resolve, reject) => {
       this._resolve = (value) => {
-        this._hasResolved = true;
+        this._isFulfilled = true;
         resolve(value);
       };
 
       this._reject = (reason) => {
-        this._hasRejected = true;
+        this._isRejected = true;
         reject(reason);
       };
 

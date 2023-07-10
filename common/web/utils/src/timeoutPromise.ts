@@ -18,7 +18,7 @@ export default class TimeoutPromise extends ManagedPromise<Boolean> {
 
     super((resolve) => {
       const timerId = setTimeout(() => {
-        if(!this.hasFinalized) {
+        if(!this.isResolved) {
           resolve(true)
         }
       }, timeoutInMillis);
@@ -37,6 +37,8 @@ export default class TimeoutPromise extends ManagedPromise<Boolean> {
       resolve(val);
     }
 
+    // Not a standard use-case; it's just here to ensure that the timeout resource is cleaned up
+    // even if `reject` gets used for whatever reason.
     /* c8 ignore next 6 */
     const reject = this._reject;
     this._reject = (val) => {
