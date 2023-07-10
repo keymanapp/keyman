@@ -104,7 +104,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     };
 
     const severityColor = colors[CompilerError.severity(event.code)] ?? color.reset;
-    const lineColor = this.messageSpecialColor(event) ?? color.reset;
+    const messageColor = this.messageSpecialColor(event) ?? color.reset;
     process.stdout.write(
       (
         event.filename
@@ -114,10 +114,10 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       ) +
       severityColor(CompilerError.formatSeverity(event.code)) + ' ' +
       color.grey(CompilerError.formatCode(event.code)) + ': ' +
-      lineColor(CompilerError.formatMessage(event.message)) + '\n'
+      messageColor(CompilerError.formatMessage(event.message)) + '\n'
     );
 
-    if(event.code == InfrastructureMessages.INFO_FileBuiltSuccessfully && (event.filename.endsWith('.kpj') || path.extname(event.filename) == '')) {
+    if(event.code == InfrastructureMessages.INFO_ProjectBuiltSuccessfully) {
       // Special case: we'll add a blank line after project builds
       process.stdout.write('\n');
     }
@@ -134,8 +134,10 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       case InfrastructureMessages.INFO_BuildingFile:
         return color.whiteBright;
       case InfrastructureMessages.INFO_FileNotBuiltSuccessfully:
+      case InfrastructureMessages.INFO_ProjectNotBuiltSuccessfully:
         return color.red;
       case InfrastructureMessages.INFO_FileBuiltSuccessfully:
+      case InfrastructureMessages.INFO_ProjectBuiltSuccessfully:
         return color.green;
     }
     return null;

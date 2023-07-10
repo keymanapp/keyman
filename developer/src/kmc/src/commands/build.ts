@@ -87,9 +87,15 @@ async function build(filename: string, parentCallbacks: NodeCompilerCallbacks, o
     let result = await builder.build(filename, callbacks, options);
     const firstFailureMessage = parentCallbacks.messages.find(m => failureCodes.includes(m.code & CompilerErrorMask.Severity));
     if(result && firstFailureMessage == undefined) {
-      callbacks.reportMessage(InfrastructureMessages.Info_FileBuiltSuccessfully({filename}));
+      callbacks.reportMessage(builder instanceof BuildProject
+        ? InfrastructureMessages.Info_ProjectBuiltSuccessfully({filename})
+        : InfrastructureMessages.Info_FileBuiltSuccessfully({filename})
+      );
     } else {
-      callbacks.reportMessage(InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename}));
+      callbacks.reportMessage(builder instanceof BuildProject
+        ? InfrastructureMessages.Info_ProjectNotBuiltSuccessfully({filename})
+        : InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename})
+      );
     }
 
     return result;

@@ -50,5 +50,16 @@ export class InfrastructureMessages {
   static Error_UnknownFileFormat = (o:{format:string}) => m(this.ERROR_UnknownFileFormat,
     `Unknown file format ${o.format}; only Markdown (.md), JSON (.json), and Text (.txt) are supported.`);
   static ERROR_UnknownFileFormat = SevError | 0x000A;
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static Info_ProjectBuiltSuccessfully = (o:{filename:string}) => ({filename:o.filename, ...m(this.INFO_ProjectBuiltSuccessfully,
+    `Project ${o.filename} built successfully.`)});
+  static INFO_ProjectBuiltSuccessfully = SevInfo | 0x000B;
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static Info_ProjectNotBuiltSuccessfully = (o:{filename:string}) => ({filename:o.filename, ...m(this.INFO_ProjectNotBuiltSuccessfully,
+    `Project ${o.filename} failed to build.`)});
+  static INFO_ProjectNotBuiltSuccessfully = SevInfo | 0x000C;
+
 }
 
