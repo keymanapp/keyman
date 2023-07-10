@@ -582,6 +582,11 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
 
     if(!hasDimensions) {
       // If dimensions haven't been set yet, we have no basis for layout calculations.
+      // We do not emit a warning here; if we did, at the time of writing this, we'd
+      // consistently get Sentry events from the Keyman mobile apps.
+      //
+      // See #9206 & https://github.com/keymanapp/keyman/pull/9206#issuecomment-1627917615
+      // for context and history.
       return;
     }
 
