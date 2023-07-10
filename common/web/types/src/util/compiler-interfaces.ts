@@ -311,6 +311,10 @@ export interface CompilerBaseOptions {
    * Optional output file for activities that generate output
    */
   outFile?: string;
+  /**
+   * Colorize log output, default is detected from console
+   */
+  color?: boolean;
 }
 
 export interface CompilerOptions extends CompilerBaseOptions {

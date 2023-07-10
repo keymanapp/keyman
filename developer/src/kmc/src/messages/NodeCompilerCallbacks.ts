@@ -12,12 +12,17 @@ import supportsColor from 'supports-color';
  */
 
 const color = chalk.default;
-
-export  enum CompilerLogColor { default, no, force };
+const severityColors: {[value in CompilerErrorSeverity]: chalk.Chalk} = {
+  [CompilerErrorSeverity.Info]: color.reset,
+  [CompilerErrorSeverity.Hint]: color.blueBright,
+  [CompilerErrorSeverity.Warn]: color.yellowBright,
+  [CompilerErrorSeverity.Error]: color.redBright,
+  [CompilerErrorSeverity.Fatal]: color.redBright,
+};
 
 export interface CompilerCallbackOptions {
   logLevel?: CompilerLogLevel;
-  color?: CompilerLogColor;
+  color?: boolean; // null or undefined == use console default
 }
 
 export class NodeCompilerCallbacks implements CompilerCallbacks {
@@ -26,6 +31,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   messages: CompilerEvent[] = [];
 
   constructor(private options: CompilerCallbackOptions) {
+    color.enabled = this.options.color ?? (supportsColor.stdout ? supportsColor.stdout.hasBasic : false);
   }
 
   clear() {
@@ -83,27 +89,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       return;
     }
 
-    switch(this.options.color) {
-    case CompilerLogColor.default:
-      color.enabled = supportsColor.stdout ? supportsColor.stdout.hasBasic : false;
-      break;
-    case CompilerLogColor.no:
-      color.enabled = false;
-      break;
-    case CompilerLogColor.force:
-      color.enabled = true;
-      break;
-    }
-
-    const colors: {[value in CompilerErrorSeverity]: chalk.Chalk} = {
-      [CompilerErrorSeverity.Info]: color.reset,
-      [CompilerErrorSeverity.Hint]: color.blueBright,
-      [CompilerErrorSeverity.Warn]: color.yellowBright,
-      [CompilerErrorSeverity.Error]: color.redBright,
-      [CompilerErrorSeverity.Fatal]: color.redBright,
-    };
-
-    const severityColor = colors[CompilerError.severity(event.code)] ?? color.reset;
+    const severityColor = severityColors[CompilerError.severity(event.code)] ?? color.reset;
     const messageColor = this.messageSpecialColor(event) ?? color.reset;
     process.stdout.write(
       (
