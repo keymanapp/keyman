@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.137 alpha 2023-07-10
+
+* chore: authenticate github request when triggering test builds (#9225)
+* feat(web): logs enhanced debug info for error reports (#9217)
+* fix(web): silences low-priority warning that shows up in iOS kbd init (#9206)
+
 ## 17.0.136 alpha 2023-07-07
 
 * chore(common): Update crowdin strings for Kibaku (#9214)
