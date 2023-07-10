@@ -57,6 +57,9 @@
   <!-- Context: Text Size dialog -->
   <string name="ic_text_size_down" comment="Make text smaller">Text size down</string>
 
+  <!-- Context: Text Size dialog -->
+  <string name="ic_text_size_slider" comment="Adjust text size">Text size slider</string>
+
 
   <!-- Context: Clear Text dialog -->
   <string name="all_text_will_be_cleared" comment="Erase all the text">\nAll text will be cleared\n</string>

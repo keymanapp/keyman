@@ -1,133 +1,134 @@
-namespace com.keyman.text {
-  /**
-   * Defines common behaviors associated with system stores.
-   */
-  export abstract class SystemStore {
-    public readonly id: number;
+import type KeyboardInterface from "./kbdInterface.js";
+import { SystemStoreIDs } from "./kbdInterface.js";
 
-    constructor(id: number) {
-      this.id = id;
-    }
+/**
+ * Defines common behaviors associated with system stores.
+ */
+export abstract class SystemStore {
+  public readonly id: number;
 
-    abstract matches(value: string): boolean;
-
-    set(value: string): void {
-      throw new Error("System store with ID " + this.id + " may not be directly set.");
-    }
+  constructor(id: number) {
+    this.id = id;
   }
 
-  /**
-   * A handler designed to receive feedback whenever a system store's value is changed.
-   * @param source    The system store being mutated, before the value change occurs.
-   * @param newValue  The new value being set
-   * @returns         `false` / `undefined` to allow the change, `true` to block the change.
-   */
-  export type SystemStoreMutationHandler = (source: MutableSystemStore, newValue: string) => boolean;
+  abstract matches(value: string): boolean;
 
-  export class MutableSystemStore extends SystemStore {
-    private _value: string;
-    handler?: SystemStoreMutationHandler = null;
+  set(value: string): void {
+    throw new Error("System store with ID " + this.id + " may not be directly set.");
+  }
+}
 
-    constructor(id: number, defaultValue: string) {
-      super(id);
-      this._value = defaultValue;
-    }
+/**
+ * A handler designed to receive feedback whenever a system store's value is changed.
+ * @param source    The system store being mutated, before the value change occurs.
+ * @param newValue  The new value being set
+ * @returns         `false` / `undefined` to allow the change, `true` to block the change.
+ */
+export type SystemStoreMutationHandler = (source: MutableSystemStore, newValue: string) => boolean;
 
-    get value() {
-      return this._value;
-    }
+export class MutableSystemStore extends SystemStore {
+  private _value: string;
+  handler?: SystemStoreMutationHandler = null;
 
-    matches(value: string) {
-      return this._value == value;
-    }
+  constructor(id: number, defaultValue: string) {
+    super(id);
+    this._value = defaultValue;
+  }
 
-    set(value: string) {
-      // Even if things stay the same, we should still signal this.
-      // It's important for tracking if a rule directly set the layer
-      // versus if it passively remained.
-      if(this.handler) {
-        if(this.handler(this, value)) {
-          return;
-        }
+  get value() {
+    return this._value;
+  }
+
+  matches(value: string) {
+    return this._value == value;
+  }
+
+  set(value: string) {
+    // Even if things stay the same, we should still signal this.
+    // It's important for tracking if a rule directly set the layer
+    // versus if it passively remained.
+    if(this.handler) {
+      if(this.handler(this, value)) {
+        return;
       }
-
-      this._value = value;
     }
+
+    this._value = value;
+  }
+}
+
+/**
+ * Handles checks against the current platform.
+ */
+export class PlatformSystemStore extends SystemStore {
+  private readonly kbdInterface: KeyboardInterface;
+
+  constructor(keyboardInterface: KeyboardInterface) {
+    super(SystemStoreIDs.TSS_PLATFORM);
+
+    this.kbdInterface = keyboardInterface;
   }
 
-  /**
-   * Handles checks against the current platform.
-   */
-  export class PlatformSystemStore extends SystemStore {
-    private readonly kbdInterface: KeyboardInterface;
+  matches(value: string) {
+    var i,constraint,constraints=value.split(' ');
+    let device = this.kbdInterface.activeDevice;
 
-    constructor(keyboardInterface: KeyboardInterface) {
-      super(KeyboardInterface.TSS_PLATFORM);
-
-      this.kbdInterface = keyboardInterface;
-    }
-
-    matches(value: string) {
-      var i,constraint,constraints=value.split(' ');
-      let device = this.kbdInterface.activeDevice;
-
-      for(i=0; i<constraints.length; i++) {
-        constraint=constraints[i].toLowerCase();
-        switch(constraint) {
-          case 'touch':
-          case 'hardware':
-            if(device.touchable != (constraint == 'touch')) {
-              return false;
-            }
-            break;
-
-          case 'macos':
-          case 'mac':
-            constraint = 'macosx';
-            // fall through
-          case 'macosx':
-          case 'windows':
-          case 'android':
-          case 'ios':
-          case 'linux':
-            if(device.OS != constraint) {
-              return false;
-            }
-            break;
-
-          case 'tablet':
-          case 'phone':
-          case 'desktop':
-            if(device.formFactor != constraint) {
-              return false;
-            }
-            break;
-
-          case 'web':
-            if(device.browser == 'native') {
-              return false; // web matches anything other than 'native'
-            }
-            break;
-
-          case 'native':
-            // This will return true for embedded KeymanWeb
-          case 'chrome':
-          case 'firefox':
-          case 'safari':
-          case 'edge':
-          case 'opera':
-            if(device.browser != constraint) {
-              return false;
-            }
-            break;
-
-          default:
+    for(i=0; i<constraints.length; i++) {
+      constraint=constraints[i].toLowerCase();
+      switch(constraint) {
+        case 'touch':
+        case 'hardware':
+          if(device.touchable != (constraint == 'touch')) {
             return false;
-        }
-      }
+          }
+          break;
 
-      // Everything we checked against was valid and had matches - it's a match!
-      return true;
+        case 'macos':
+        case 'mac':
+          constraint = 'macosx';
+          // fall through
+        case 'macosx':
+        case 'windows':
+        case 'android':
+        case 'ios':
+        case 'linux':
+          if(device.OS != constraint) {
+            return false;
+          }
+          break;
+
+        case 'tablet':
+        case 'phone':
+        case 'desktop':
+          if(device.formFactor != constraint) {
+            return false;
+          }
+          break;
+
+        case 'web':
+          if(device.browser == 'native') {
+            return false; // web matches anything other than 'native'
+          }
+          break;
+
+        case 'native':
+          // This will return true for embedded KeymanWeb
+        case 'chrome':
+        case 'firefox':
+        case 'safari':
+        case 'edge':
+        case 'opera':
+          if(device.browser != constraint) {
+            return false;
+          }
+          break;
+
+        default:
+          return false;
+      }
     }
+
+    // Everything we checked against was valid and had matches - it's a match!
+    return true;
   }
 }

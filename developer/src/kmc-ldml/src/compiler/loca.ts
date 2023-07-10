@@ -33,6 +33,7 @@ export class LocaCompiler extends SectionCompiler {
           this.callbacks.reportMessage(CompilerMessages.Error_InvalidLocale({tag}));
           valid = false;
         } else {
+          /* c8 ignore next 2 */
           throw e;
         }
       }

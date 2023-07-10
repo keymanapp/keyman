@@ -17,11 +17,10 @@ cd "$THIS_SCRIPT_PATH"
 ################################ Main script ################################
 
 builder_describe "Runs the Keyman Engine for Web unit-testing suites" \
-  "@./src/tools/testing/recorder test:engine" \
-  "@./src/engine" \
+  "@./src/tools/testing/recorder test:integrated" \
   "test+" \
-  ":engine               Runs the top-level Keyman Engine for Web unit tests" \
-  ":libraries            Runs all unit tests for KMW's submodules.  Currently excludes predictive-text tests" \
+  ":dom                  Runs DOM-oriented unit tests (reduced footprint, nothing browser-specific)" \
+  ":integrated           Runs KMW's integration test suite" \
   "--ci                  Set to utilize CI-based test configurations & reporting.  May not be set with $(builder_term --debug)." \
   "--reporters=REPORTERS Set to override the 'reporters' used by the unit testing engines" \
   "--browsers=BROWSERS   Set to override automatic browser selection for $(builder_term :engine) tests"
@@ -43,7 +42,7 @@ if builder_start_action test:libraries; then
   builder_finish_action success test:libraries
 fi
 
-# Browserstack or CI-based tests
+# Browser-based tests: common configs & kill-switches
 
 DO_BROWSER_TEST_SUITE=true
 
@@ -65,25 +64,48 @@ if [[ $VERSION_ENVIRONMENT == test ]]; then
   fi
 fi
 
-get_default_browser_set ( ) {
+function get_default_browser_set() {
   if [[ $BUILDER_OS == mac ]]; then
-      BROWSERS="--browsers Firefox,Chrome,Safari"
+    BROWSERS="--browsers Firefox,Chrome,Safari"
   elif [[ $BUILDER_OS == win ]]; then
-      BROWSERS="--browsers Firefox,Chrome,Edge"
+    BROWSERS="--browsers Firefox,Chrome"
   else
-      BROWSERS="--browsers Firefox,Chrome"
+    BROWSERS="--browsers Firefox,Chrome"
   fi
 }
 
-if builder_start_action test:engine; then
+if [[ $DO_BROWSER_TEST_SUITE == false ]]; then
+  builder_warn "Skipping action test:engine - this CI build does not appear to be for a Web PR."
+  builder_finish_action success test:engine
+  exit 0
+fi
+
+# Select the right CONFIG file.
+if builder_has_option --ci; then
+  CONFIG=CI.conf.cjs
+else
+  CONFIG=manual.conf.cjs
+fi
+
+# Prepare the flags for the karma command.
+KARMA_FLAGS=
+
+if builder_is_debug_build; then
+  KARMA_FLAGS="$KARMA_FLAGS --no-single-run"
+fi
+
+if builder_has_option --reporters; then
+  KARMA_FLAGS="$KARMA_FLAGS --reporters $REPORTERS"
+fi
+
+# End common configs.
+
+builder_run_action test:dom karma start $KARMA_FLAGS "${KEYMAN_ROOT}/web/src/test/auto/dom/$CONFIG"
+
+# The multi-browser test suite, which uses BrowserStack when run by our CI.
+if builder_start_action test:integrated; then
   if builder_has_option --ci && builder_is_debug_build; then
     builder_die "Options --ci and --debug are incompatible."
-  fi
-
-  if [[ $DO_BROWSER_TEST_SUITE == false ]]; then
-    builder_warn "Skipping action test:engine - this CI build does not appear to be for a Web PR."
-    builder_finish_action success test:engine
-    exit 0
   fi
 
   # Auto-select browsers if not specified as an option
@@ -91,32 +113,14 @@ if builder_start_action test:engine; then
     get_default_browser_set
   fi
 
-  # Select the right CONFIG file.
-  if builder_has_option --ci; then
-    CONFIG=CI.conf.js
-  else
-    CONFIG=manual.conf.js
+  KARMA_EXT_FLAGS=
+  if ! builder_has_option --ci; then
+    KARMA_EXT_FLAGS="$KARMA_FLAGS --browsers $BROWSERS"
   fi
 
   # Build modernizr module
-  npm --no-color run modernizr -- -c src/test/auto/modernizr.config.json -d src/test/auto/modernizr.js
+  modernizr -c src/test/auto/integrated/modernizr.config.json -d src/test/auto/integrated/modernizr.js
+  karma start $KARMA_FLAGS $KARMA_EXT_FLAGS "${KEYMAN_ROOT}/web/src/test/auto/integrated/$CONFIG"
 
-  # Prepare the flags for the karma command.
-  KARMA_FLAGS=
-
-  if builder_is_debug_build; then
-    KARMA_FLAGS="$KARMA_FLAGS --no-single-run"
-  fi
-
-  if builder_has_option --reporters; then
-    KARMA_FLAGS="$KARMA_FLAGS --reporters $REPORTERS"
-  fi
-
-  if ! builder_has_option --ci; then
-    KARMA_FLAGS="$KARMA_FLAGS --browsers $BROWSERS"
-  fi
-
-  npm --no-color run karma -- start $KARMA_FLAGS src/test/auto/$CONFIG
-
-  builder_finish_action success test:engine
+  builder_finish_action success test:integrated
 fi

@@ -18,10 +18,16 @@ describe('keys', function () {
         const keys = <Keys> sect;
         assert.ok(keys);
         assert.equal(compilerTestCallbacks.messages.length, 0);
-        assert.equal(keys.keys.length, 1);
+        assert.equal(keys.keys.length, 2);
         assert.equal(keys.flicks.length, 1); // there's always a 'null' flick
-        assert.equal(keys.keys[0].to.value, String.fromCodePoint(0x1FAA6));
-        assert.equal(keys.keys[0].id.value, 'grave');
+        assert.equal(keys.keys[0].to.value, 'oops');
+        assert.isFalse(keys.keys[0].to.isOneChar);
+        assert.equal(keys.keys[0].flags, constants.keys_key_flags_extend);
+        assert.equal(keys.keys[0].id.value, 'mistake');
+        assert.isTrue(keys.keys[1].to.isOneChar);
+        assert.equal(keys.keys[1].to.value, String.fromCodePoint(0x1FAA6));
+        assert.equal(keys.keys[1].flags, 0);
+        assert.equal(keys.keys[1].id.value, 'grave');
       },
     },
     {
@@ -120,7 +126,7 @@ describe('keys.kmap', function () {
     let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/minimal.xml', compilerTestCallbacks) as Keys;
     assert.isNotNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 0);
-    assert.equal(keys.kmap.length, 1);
+    assert.equal(keys.kmap.length, 2);
   });
 
   testCompilationCases(KeysCompiler, [

@@ -71,7 +71,8 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       auto keyEntry = kplus.key2Helper.getKeys(kmapEntry->key);
       assert(keyEntry != nullptr);
 
-      if (keyEntry->flags && LDML_KEYS_KEY_FLAGS_EXTEND) {
+      // TODO-LDML: LDML_KEYS_KEY_FLAGS_NOTRANSFORM
+      if (keyEntry->flags & LDML_KEYS_KEY_FLAGS_EXTEND) {
         if (nullptr == kplus.strs) {
           DebugLog("for keys: kplus.strs == nullptr"); // need a string table to get strings
           assert(false);
@@ -79,7 +80,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
         }
         str = kplus.strs->get(keyEntry->to);
       } else {
-        str = keyEntry->get_string();
+        str = keyEntry->get_to_string();
       }
       keys.add((km_kbp_virtual_key)kmapEntry->vkey, (uint16_t)kmapEntry->mod, str);
     }
@@ -225,77 +226,86 @@ ldml_processor::process_event(
           state->actions().push_backspace(KM_KBP_BT_UNKNOWN);
         } else {
           state->actions().push_backspace(KM_KBP_BT_CHAR, last_char);
+          state->context().pop_back();
         }
-        state->context().pop_back();
       }
       break;
     default:
-      // from kmx_processor.cpp
-      // Construct a context buffer from the items up until the last KM_KBP_CT_MARKER marker
-      ldml::string_list ctxt;
-      auto cp = state->context();
-      // We're only interested in as much of the context as is a KM_KBP_CT_CHAR.
-      // This will stop at the KM_KBP_CT_MARKER type.
-      uint8_t last_type = KM_KBP_BT_UNKNOWN;
-      for (auto c = cp.rbegin(); c != cp.rend(); c++) {
-        last_type = c->type;
-        if (last_type != KM_KBP_BT_CHAR) {
-          break;
-        }
-        km::kbp::kmx::char16_single buf;
-        const int len = km::kbp::kmx::Utf32CharToUtf16(c->character, buf);
-        const std::u16string str(buf.ch, len);
-        ctxt.push_front(str); // prepend to string
-      }
-      if (last_type != KM_KBP_BT_MARKER) {
-        // There was no beginning-of-translation marker.
-        //Add one.
-        state->context().push_marker(0x0);
-        state->actions().push_marker(0x0);
-      }
-      // Look up the key
-      const std::u16string str = keys.lookup(vk, modifier_state);
-      if (str.empty()) {
-        // not found
-        state->actions().commit(); // finish up and
-        return KM_KBP_STATUS_OK; // Nothing to do- no key
-      }
-      const std::u32string str32 = kmx::u16string_to_u32string(str);
-      for(size_t i=0; i<str32.length(); i++) {
-        state->context().push_character(str32[i]);
-        state->actions().push_character(str32[i]);
-      }
-      // add the newly added char
-      ctxt.push_back(str);
-      // Now process transforms
-      std::u16string outputString;
-      // Process the transforms
-      if (!!transforms) {
+      {
+        // adapted from kmx_processor.cpp
 
-        // TODO-LDML: unroll ctxt into a str
-        std::u16string ctxtstr;
-        for (size_t i = 0; i < ctxt.size(); i++) {
-          ctxtstr.append(ctxt[i]);
-        }
-        const size_t matchedContext = transforms->apply(ctxtstr, outputString);
+        /** a copy of the current/changed context, for transform use */
+        ldml::string_list ctxt;
 
-        if (matchedContext > 0) {
-          // Found something.
-          // Now, clear out the old context
-          for (size_t i = 0; i < matchedContext; i++) {
-            state->context().pop_back();  // Pop off last
-            auto deletedChar = ctxt[ctxt.size() - i - 1][0];
-            state->actions().push_backspace(KM_KBP_BT_CHAR, deletedChar);  // Cause prior char to be removed
+        // Construct a context buffer of all the KM_KBP_BT_CHAR items
+        // Extract the context into 'ctxt' for transforms to process
+        if (!!transforms) {
+          // if no transforms, no reason to do this extraction
+          auto &cp = state->context();
+          // We're only interested in as much of the context as is a KM_KBP_BT_CHAR.
+          uint8_t last_type = KM_KBP_BT_UNKNOWN;
+          for (auto c = cp.rbegin(); c != cp.rend(); c++) {
+            last_type = c->type;
+            if (last_type != KM_KBP_BT_CHAR) {
+              // not a char, get out
+              break;
+            }
+            // extract UTF-32 to 1 or 2 UTF-16 chars in a string
+            km::kbp::kmx::char16_single buf;
+            const int len = km::kbp::kmx::Utf32CharToUtf16(c->character, buf);
+            const std::u16string str(buf.ch, len);
+            ctxt.push_front(str); // prepend to string
           }
-          // Now, add in the updated text
-          const std::u32string outstr32 = kmx::u16string_to_u32string(outputString);
-          for (size_t i = 0; i < outstr32.length(); i++) {
-            state->context().push_character(outstr32[i]);
-            state->actions().push_character(outstr32[i]);
+        }
+
+        // Look up the key
+        const std::u16string str = keys.lookup(vk, modifier_state);
+        if (str.empty()) {
+          // not found
+          state->actions().push_invalidate_context();
+          state->actions().push_emit_keystroke();
+          break; // ----- commit and exit
+        }
+        // found the correct string - push it into the context and actions
+        const std::u32string str32 = kmx::u16string_to_u32string(str);
+        for(size_t i=0; i<str32.length(); i++) {
+          state->context().push_character(str32[i]);
+          state->actions().push_character(str32[i]);
+        }
+        // Now process transforms
+        // Process the transforms
+        if (!!transforms) {
+          // add the newly added char to ctxt
+          ctxt.push_back(str);
+
+          std::u16string outputString;
+  
+          // TODO-LDML: unroll ctxt into a str. Would be better to have transforms be able to process a vector
+          std::u16string ctxtstr;
+          for (size_t i = 0; i < ctxt.size(); i++) {
+            ctxtstr.append(ctxt[i]);
+          }
+          const size_t matchedContext = transforms->apply(ctxtstr, outputString);
+
+          if (matchedContext > 0) {
+            // Found something.
+            // Now, clear out the old context
+            for (size_t i = 0; i < matchedContext; i++) {
+              state->context().pop_back();  // Pop off last
+              auto deletedChar = ctxt[ctxt.size() - i - 1][0];
+              state->actions().push_backspace(KM_KBP_BT_CHAR, deletedChar);  // Cause prior char to be removed
+            }
+            // Now, add in the updated text
+            const std::u32string outstr32 = kmx::u16string_to_u32string(outputString);
+            for (size_t i = 0; i < outstr32.length(); i++) {
+              state->context().push_character(outstr32[i]);
+              state->actions().push_character(outstr32[i]);
+            }
           }
         }
       }
     }
+    // end of normal processing: commit and exit
     state->actions().commit();
   } catch (std::bad_alloc &) {
     state->actions().clear();

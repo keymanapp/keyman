@@ -42,7 +42,7 @@ export class DispCompiler extends SectionCompiler {
     result.disps = this.keyboard.displays?.display.map(display => ({
       to: sections.strs.allocAndUnescapeString(display.to),
       display: sections.strs.allocAndUnescapeString(display.display),
-    })) || [];
+    })) || []; // TODO-LDML: need coverage for the []
 
     result.disps.sort((a: DispItem, b: DispItem) => a.to.compareTo(b.to));
 

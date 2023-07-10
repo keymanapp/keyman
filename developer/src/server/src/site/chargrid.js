@@ -73,17 +73,10 @@
   function updateLogCursor() {
     var i, selStart, selLength, selDirection;
 
-    if(keyman.isPositionSynthesized()) { // this is an internal function
-      // For touch devices, we need to ask KMW
-      selStart = 0;
-      selLength = 0;
-      selDirection = 'forward';
-    } else {
-      // For desktop devices, we use the position reported by the textarea control
-      selStart = ta1.selectionStart;
-      selLength = ta1.selectionEnd - ta1.selectionStart;
-      selDirection = ta1.selectionDirection;
-    }
+    // We use the position reported by the textarea control
+    selStart = ta1.selectionStart;
+    selLength = ta1.selectionEnd - ta1.selectionStart;
+    selDirection = ta1.selectionDirection;
 
     selLength = calculateLengthByCodepoint(ta1.value, selStart, selLength);
     selStart = calculateLengthByCodepoint(ta1.value, 0, selStart);

@@ -183,7 +183,7 @@ You can use Windows Settings to add these environment variables permanently:
 
 **Requirements**:
 * emscripten 3.1.32
-* node.js 18
+* node.js 18+
 * [openjdk 11](https://learn.microsoft.com/en-us/java/openjdk/download#openjdk-11)+
 
 ```ps1

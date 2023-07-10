@@ -3,15 +3,6 @@ import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 
 /* istanbul ignore next */
 export class SectionCompiler {
-  /**
-   * Opportunity for async initialization.
-   * @returns true when OK. On false, causes a message to happen.
-   */
-  public async init() : Promise<boolean> {
-    // nothing to do here
-    return true;
-  }
-
   protected readonly keyboard: LDMLKeyboard.LKKeyboard;
   protected readonly callbacks: CompilerCallbacks;
 
@@ -20,16 +11,13 @@ export class SectionCompiler {
     this.callbacks = callbacks;
   }
 
+  /* c8 ignore next 11 */
   public get id(): SectionIdent {
-    return null;
-  }
-
-  public get required(): boolean {
-    return true;
+    throw Error(`Internal Error: id() not implemented`);
   }
 
   public compile(sections: KMXPlus.DependencySections): KMXPlus.Section {
-    return null;
+    throw Error(`Internal Error: compile() not implemented`);
   }
 
   public validate(): boolean {

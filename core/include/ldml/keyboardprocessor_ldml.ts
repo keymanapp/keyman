@@ -36,6 +36,7 @@ export type SectionIdent =
   'name' |
   'strs' |
   'tran' |
+  'uset' |
   'vars' |
   'vkey';
 
@@ -139,13 +140,17 @@ class Constants {
   readonly length_elem_item_element = 8;
 
   /**
-   * bitwise or value for unicode_set in elem[elemstr][element].flags.
-   * If bit is 1, then 'element' is a UnicodeSet string.
-   * If bit is 0, then 'element' is a UTF-32LE codepoint
+   * bitwise or value for type in elem[elemstr][element].flags.
+   * If bits are 00b, then 'element' is a UTF-32LE codepoint.
+   * If bits are 01b, then 'element' is a string index.
+   * If bits are 10b (2), then 'element' is a uset index.
    *
-   * `unicode_set = flags & elem_flags_unicode_set`
+   * `type = flags & elem_flags_type`
    */
-  readonly elem_flags_unicode_set = 0x00000001;
+  readonly elem_flags_type      = 0x00000003;
+  readonly elem_flags_type_char = 0x00000000;
+  readonly elem_flags_type_str  = 0x00000001;
+  readonly elem_flags_type_uset = 0x00000002;
 
   /**
    * bitwise or value for tertiary_base in elem[elemstr][element].flags.
@@ -156,7 +161,7 @@ class Constants {
    *
    * `tertiary_base = flags & elem_flags_tertiary_base`
    */
-  readonly elem_flags_tertiary_base = 0x00000002;
+  readonly elem_flags_tertiary_base = 0x00000004;
 
   /**
    * bitwise or value for tertiary_base in elem[elemstr][element].flags.
@@ -167,7 +172,7 @@ class Constants {
    *
    * `prebase = flags & elem_flags_prebase`
    */
-  readonly elem_flags_prebase = 0x00000004;
+  readonly elem_flags_prebase = 0x00000008;
 
   /**
    * bitwise mask for order in elem[elemstr][element].flags.
@@ -206,8 +211,8 @@ class Constants {
   readonly elem_flags_tertiary_bitshift = 24;
 
   /* ------------------------------------------------------------------
-    * finl section
-      ------------------------------------------------------------------ */
+   * finl section
+     ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'finl' section, not including entries
@@ -538,6 +543,25 @@ class Constants {
    */
   readonly vars_entry_type_unicodeSet = 2;
 
+  /* ------------------------------------------------------------------
+   * uset section
+   * ------------------------------------------------------------------ */
+
+  /*
+   * Minimum length of the 'uset' section not including variable parts
+   */
+  readonly length_uset = 16;
+
+  /**
+   * Length of each entry in the uset.usets subtable
+   */
+  readonly length_uset_uset = 12;
+
+  /**
+   * Length of each entry in the uset.ranges subtable
+   */
+  readonly length_uset_range = 8;
+
   /**
    * All section IDs.
    */
@@ -555,6 +579,7 @@ class Constants {
       sect: 'sect',
       strs: 'strs',
       tran: 'tran',
+      uset: 'uset',
       vars: 'vars',
       vkey: 'vkey',
   };

@@ -8,6 +8,8 @@ import LexicalModelCompiler from './lexical-model-compiler.js';
 import { LexicalModelSource } from './lexical-model.js';
 import { ModelCompilerError, ModelCompilerMessageContext, ModelCompilerMessages } from './model-compiler-errors.js';
 
+export { default as LexicalModelCompiler } from './lexical-model-compiler.js';
+
 /**
  * Compiles a model.ts file, using paths relative to its location.
  *

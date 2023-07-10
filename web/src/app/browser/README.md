@@ -1,0 +1,1 @@
+This subproject holds the new, modularized form of the old namespaced `app/web` subproject.

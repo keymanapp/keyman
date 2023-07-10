@@ -124,11 +124,11 @@ class Storage {
       return nil
     }
   }
-  
+
   func keyboardURL(for keyboard: InstallableKeyboard) -> URL {
     return resourceDir(for: keyboard)!.appendingPathComponent("\(keyboard.id).js")
   }
-  
+
   func lexicalModelURL(for lexicalModel: InstallableLexicalModel) -> URL {
     return resourceDir(for: lexicalModel)!.appendingPathComponent("\(lexicalModel.id).model.js")
   }
@@ -154,7 +154,7 @@ class Storage {
       return nil
     }
   }
-  
+
   func lexicalModelPackageURL(for lexicalModel: InstallableLexicalModel) -> URL {
     return resourceDir(for: lexicalModel)!.appendingPathComponent("\(lexicalModel.id).model.kmp")
   }
@@ -178,11 +178,11 @@ class Storage {
     }
     return legacyKeyboardDir(forID: keyboardID).appendingPathComponent("\(keyboardID)-\(version).js")
   }
-  
+
   func legacyLexicalModelURL(forID lexicalModelID: String, version: String) -> URL {
     return legacyLexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.js")
   }
-  
+
   func legacyLexicalModelPackageURL(forID lexicalModelID: String, version: String, asZip: Bool = false) -> URL {
     // Our unzipping dependency requires a .zip extension to function, so we append that here.
     return legacyLexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.kmp\(asZip ? ".zip" : "")")
@@ -225,7 +225,11 @@ extension Storage {
                      dstDir: baseDir,
                      excludeFromBackup: true)
     try Storage.copy(from: bundle,
-                     resourceName: "keymanios.js",
+                     resourceName: "keymanweb-webview.js",
+                     dstDir: baseDir,
+                     excludeFromBackup: true)
+    try Storage.copy(from: bundle,
+                     resourceName: "sentry.min.js",
                      dstDir: baseDir,
                      excludeFromBackup: true)
     try Storage.copy(from: bundle,
@@ -233,9 +237,9 @@ extension Storage {
                      dstDir: baseDir,
                      excludeFromBackup: true)
     // For debug compilations - IF we have a sourcemap file, copy that over too.
-    if bundle.url(forResource: "keyman.js.map", withExtension: nil) != nil {
+    if bundle.url(forResource: "keymanweb-webview.js.map", withExtension: nil) != nil {
       try Storage.copy(from: bundle,
-                       resourceName: "keyman.js.map",
+                       resourceName: "keymanweb-webview.js.map",
                        dstDir: baseDir,
                        excludeFromBackup: true)
     }
@@ -286,7 +290,7 @@ extension Storage {
       // Perform an auto-install of the lexical model's KMP if not already installed.
       let defaultKMPFile = defaultLexicalModelDir.appendingPathComponent("\(Defaults.lexicalModel.id).model.kmp")
       let package = try ResourceFileManager.shared.prepareKMPInstall(from: defaultKMPFile) as! LexicalModelKeymanPackage
-      
+
       // Install all languages for the model, not just the default-listed one.
       try ResourceFileManager.shared.install(resourcesWithIDs: package.installables[0].map { $0.fullID }, from: package)
     } catch {

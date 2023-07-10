@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.dom.json",
+
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "../../../build/engine/osk/obj/",
+    "tsBuildInfoFile": "../../../build/engine/osk/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
+  },
+
+  "include": [ "src/**/*.ts" ],
+
+  "references": [
+    { "path": "../../../../common/web/input-processor" },
+    { "path": "../dom-utils" },
+    { "path": "../events" }
+  ]
+}

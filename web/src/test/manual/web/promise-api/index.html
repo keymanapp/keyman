@@ -25,7 +25,7 @@
     </style>
 
     <!-- Insert uncompiled KeymanWeb source scripts -->
-    <script src="../../../../../build/app/web/debug/keymanweb.js" type="application/javascript"></script>
+    <script src="../../../../../build/publish/debug/keymanweb.js" type="application/javascript"></script>
 
     <!--
       For desktop browsers, a script for the user interface must be inserted here.
@@ -34,7 +34,7 @@
       The toolbar UI is best for any page designed to support keyboards for
       a large number of languages.
     -->
-    <script src="../../../../../build/app/ui/debug/kmwuitoggle.js"></script>
+    <script src="../../../../../build/publish/debug/kmwuitoggle.js"></script>
 
     <!-- Add keyboard management script for local selection of keyboards to use -->
     <script src="promisehdr.js"></script>
@@ -51,6 +51,7 @@
       addKeyboards('french','@he');
 
       kmw.init({
+        attachType: 'auto',
         useAlerts: alertType
       }).then(function() {
         loadKeyboards();

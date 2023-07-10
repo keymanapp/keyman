@@ -1,15 +1,11 @@
 {
-  "extends": "../../../tsconfig-base.json",
+  "extends": "../tsconfig.kmw-worker-base.json",
 
   "compilerOptions": {
-    "module": "none",
-    "lib": ["es6"],
-    "target": "es5",
-    "declaration": true,
-    "sourceMap": true,
-    "outFile": "./build/index.js",
-    "strict": true,
-    "allowJs": false,
+    "baseUrl": "./",
+    "outDir": "build/obj",
+    "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
   },
   "references": [
     { "path": "../types" }

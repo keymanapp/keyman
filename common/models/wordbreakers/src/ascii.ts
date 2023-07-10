@@ -1,40 +1,39 @@
 ///<reference types="@keymanapp/models-types" />
-namespace wordBreakers {
-  /**
-   * Splits ASCII words.
-   *
-   * @param phrase
-   */
-  export function ascii(phrase: string): Span[] {
-    let matchWord = /[A-Za-z0-9']+/g;
-    let words: Span[] = [];
-    let match: RegExpExecArray | null;
-    while ((match = matchWord.exec(phrase)) !== null) {
-      words.push(new RegExpDerivedSpan(match[0], match.index));
-    }
 
-    return words;
+/**
+ * Splits ASCII words.
+ *
+ * @param phrase
+ */
+export default function ascii(phrase: string): Span[] {
+  let matchWord = /[A-Za-z0-9']+/g;
+  let words: Span[] = [];
+  let match: RegExpExecArray | null;
+  while ((match = matchWord.exec(phrase)) !== null) {
+    words.push(new RegExpDerivedSpan(match[0], match.index));
   }
 
-  /**
-   * A concrete span class that derives its properties from the result of
-   * RegExp.exec() array.
-   */
-  class RegExpDerivedSpan implements Span {
-    readonly text: string;
-    readonly start: number;
+  return words;
+}
 
-    constructor(text: string, start: number) {
-      this.text = text;
-      this.start = start;
-    }
+/**
+ * A concrete span class that derives its properties from the result of
+ * RegExp.exec() array.
+ */
+class RegExpDerivedSpan implements Span {
+  readonly text: string;
+  readonly start: number;
 
-    get length(): number {
-      return this.text.length;
-    }
+  constructor(text: string, start: number) {
+    this.text = text;
+    this.start = start;
+  }
 
-    get end(): number {
-      return this.start + this.text.length;
-    }
+  get length(): number {
+    return this.text.length;
+  }
+
+  get end(): number {
+    return this.start + this.text.length;
   }
 }

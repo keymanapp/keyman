@@ -1,3 +1,4 @@
+/* c8 ignore start */
 import { LDMLKeyboardXMLSourceFileReaderOptions } from "@keymanapp/common-types";
 
 export interface CompilerOptions {
@@ -16,3 +17,7 @@ export interface CompilerOptions {
    */
   readerOptions: LDMLKeyboardXMLSourceFileReaderOptions;
 };
+
+/* c8 ignore end */
+// TODO-LDML: this file should already be ignored for coverage
+// bug: https://github.com/bcoe/c8/issues/359#issuecomment-1272646184

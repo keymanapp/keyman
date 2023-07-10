@@ -1,5 +1,5 @@
-const path = require('path');
-const assert = require('assert');
+import path from 'path';
+import { assert } from 'chai';
 
 var _ = global;
 
@@ -7,16 +7,25 @@ var _ = global;
 // TODO: then mocha invocation is as follows:
 // TODO:     mocha -r @keymanapp/models-test-helpers test/
 
-// Ensure that we can successfully load the module & apply kmwLength, as it's
-// needed for some of the unit tests.
-require('../build/index.bundled.js');
+import { extendString } from '@keymanapp/web-utils';
 
+import { createRequire } from "module";
+import { fileURLToPath } from 'url';
+
+extendString();
 assert.ok('💩'.kmwLength);
 
 /**
  * Load JSON fixtures from a well-known place.
  */
 _.jsonFixture = function (name) {
+  // The most straight-forward way... is to use CommonJS-style require to load JSON.
+  // Fortunately, Node provides the tools needed to recreate it.
+  const require = createRequire(import.meta.url);
+
+  // ES-module mode also leaves out `__dirname`, so we rebuild that too.
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
   return require(path.join(__dirname, 'fixtures', `${name}.json`));
 }
 

@@ -93,11 +93,11 @@ struct COMP_KMXPLUS_ELEM_ELEMENT {
     KMX_DWORD element;                // str: output string or UTF-32LE codepoint
     KMX_DWORD flags;                  // flag and order values
     /**
-     * @brief Get the 'to' as a string, if flags&LDML_ELEM_FLAGS_UNICODE_SET is not set
+     * @brief Get the 'element' as a string, if flags&LDML_ELEM_FLAGS_TYPE = CHAR
      *
      * @return std::u16string
      */
-    std::u16string get_string() const;
+    std::u16string get_element_string() const;
 };
 
 struct COMP_KMXPLUS_ELEM_ENTRY {
@@ -234,6 +234,9 @@ struct COMP_KMXPLUS_STRS {
    * @brief True if section is valid.
    */
   bool valid(KMX_DWORD length) const;
+
+  /** convert a single char to a string*/
+  static std::u16string str_from_char(KMX_DWORD v);
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_STRS) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");
@@ -506,6 +509,8 @@ struct COMP_KMXPLUS_KEYS_FLICK_ELEMENT {
   KMXPLUS_LIST directions;
   KMX_DWORD flags;
   KMXPLUS_STR to; // string or codepoint
+  /** get the 'to' string if a char */
+  std::u16string get_to_string() const;
 };
 
 struct COMP_KMXPLUS_KEYS_FLICK_LIST {
@@ -525,7 +530,7 @@ struct COMP_KMXPLUS_KEYS_KEY {
   KMXPLUS_LIST multiTap;
   KMX_DWORD flicks; // index
 
-  std::u16string get_string() const;
+  std::u16string get_to_string() const;
 };
 
 struct COMP_KMXPLUS_KEYS_KMAP {
@@ -558,11 +563,12 @@ public:
   const COMP_KMXPLUS_KEYS_KEY *findKeyByStringId(KMX_DWORD strId, KMX_DWORD &index) const;
   /**
    * Search for a key by 'to' string id
+   * @param str string to search for (for single char strings)
    * @param strID id to search for
    * @param index on entry, id to start with such as 0. On exit, index of item if found. Undefined otherwise.
    * @return pointer to key or nullptr
    */
-  const COMP_KMXPLUS_KEYS_KEY *findKeyByStringTo(KMX_DWORD strId, KMX_DWORD &index) const;
+  const COMP_KMXPLUS_KEYS_KEY *findKeyByStringTo(const std::u16string& str, KMX_DWORD strId, KMX_DWORD &index) const;
 
 private:
   const COMP_KMXPLUS_KEYS *key2;

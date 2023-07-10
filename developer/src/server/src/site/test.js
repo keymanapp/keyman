@@ -221,7 +221,7 @@ window.onload = function() {
 
     // Create a new on screen keyboard view and tell KeymanWeb that
     // we are using the targetDevice for context input.
-    newOSK = new com.keyman.osk.InlinedOSKView(targetDevice, keyman.util.device.coreSpec);
+    newOSK = new keyman.views.InlinedOSKView(keyman, { device: targetDevice });
     keyman.core.contextDevice = targetDevice;
     keyman.osk = newOSK;
 
@@ -238,11 +238,10 @@ window.onload = function() {
   keyman.addEventListener('keyboardchange', function(keyboardProperties) {
     if(newOSK) {
       keyman.osk = newOSK;
-      newOSK.activeKeyboard = keyman.core.activeKeyboard;
+      newOSK.activeKeyboard = keyman.contextManager.activeKeyboard;  // Private API refs on both sides
     }
     keyboardDropdown.set(keyboardProperties.internalName);
     window.sessionStorage.setItem('current-keyboard', keyboardProperties.internalName);
-    keyman.alignInputs();
   });
 }
 
@@ -285,7 +284,7 @@ function unloadKeyboardsAndModels() {
   const lastModel = keyman.core.activeModel;
   if(lastModel) {
     console.log('Unregistering model '+lastModel.id);
-    keyman.modelManager.deregister(lastModel.id);
+    keyman.removeModel(lastModel.id);
   }
 
   modelDropdown.removeAll();
@@ -360,7 +359,7 @@ function selectModel(modelId) {
   const lastModel = keyman.core.activeModel;
 
   if(lastModel) {
-    keyman.modelManager.deregister(lastModel.id);
+    keyman.removeModel(lastModel.id);
   }
 
   if(model) {

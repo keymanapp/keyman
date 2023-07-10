@@ -16,7 +16,7 @@
     "src/import/kmcmplib/wasm-host.js"
   ],
   "references": [
-    { "path": "../../../common/web/keyman-version/tsconfig.esm.json" },
+    { "path": "../../../common/web/keyman-version/tsconfig.json" },
     { "path": "../../../common/web/types/" },
   ]
 }

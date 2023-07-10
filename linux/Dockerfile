@@ -14,13 +14,20 @@ ENV HOME /home/build
 VOLUME /home/build
 WORKDIR /home/build
 ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_PRIORITY critical
+ENV DEBCONF_NOWARNINGS yes
+
 # Update to the latest
-RUN apt-get -q -y update && apt-get -q -y upgrade
-RUN apt-get -q -y install devscripts equivs meson python3 python3-setuptools
+RUN apt-get -q -y update &&  \
+  apt-get -q -y install devscripts equivs meson python3 python3-setuptools software-properties-common && \
+  add-apt-repository ppa:keymanapp/keyman && \
+  add-apt-repository ppa:keymanapp/keyman-alpha && \
+  apt-get -q -y upgrade
+
 ADD debian/control /tmp/control
 # Answer 'yes' to install questions
 RUN (yes | mk-build-deps --install /tmp/control) || true
-# now, switch to build user
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash
 RUN apt-get -q -y install nodejs
+# now, switch to build user
 USER build

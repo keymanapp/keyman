@@ -12,10 +12,6 @@ export class VkeyCompiler extends SectionCompiler {
     return constants.section.vkey;
   }
 
-  public get required(): boolean {
-    return !!this.keyboard.vkeys;
-  }
-
   public validate(): boolean {
     let valid = true;
     if(this.keyboard.vkeys) {
@@ -54,7 +50,8 @@ export class VkeyCompiler extends SectionCompiler {
   public compile(): Vkey {
     let result = new Vkey();
     if(!this.keyboard.vkeys) {
-      return result;
+      /* c8 ignore next 2 */
+      return result; // not hit due to boxing
     }
 
     result.vkeys = this.keyboard.vkeys?.vkey.map(vk => {

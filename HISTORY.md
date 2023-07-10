@@ -1,5 +1,64 @@
 # Keyman Version History
 
+## 17.0.135 alpha 2023-07-06
+
+*  (#9195)
+* chore(ios): minor build-script cleanup (#9201)
+* chore(linux): Allow to run tests without integration tests (#9192)
+* fix(web): sentry sourcemapping round 2 - yesterday's 'fix' unfortunately doesn't upload the maps (#9199)
+* chore(web): normalizes sourcemap paths for cleaner Sentry reports (#9200)
+* feat(linux): Allow to install keyboard for multiple languages (#9017)
+
+## 17.0.134 alpha 2023-07-05
+
+* fix(linux): Fix packaging GHA (#9172)
+* chore(ios): standardizes iOS build scripts (#9092)
+* fix(web): fixes up Web's InlinedOSK manual test page (#9175)
+* fix(web): re-establishes web srcmap uploading (#9179)
+* refactor(linux): Code refactoring (#9129)
+* refactor(linux): Extract methods (#9168)
+* fix(linux): Fix vertical alignment of labels in About dialog (#9167)
+* fix(linux): Add scrollbar to About dialog (#9166)
+* fix(linux): Remove tags from package description (#9165)
+* docs(linux): Update readme (#9190)
+* feat(developer): uset in element string (#9144)
+* fix(developer): improve coverage, add todos (#9170)
+* chore(developer): refactor so KmnCompiler only created once within kmc (#9171)
+* fix(common): support multichar escapes in element sets (#9173)
+* chore(linux): Update docker builds (#9188)
+
+## 17.0.133 alpha 2023-07-04
+
+* feat(common): add segmenter for element strings (#9141)
+* fix(windows): adds an extra row for Change Hotkey text label (#9149)
+* fix(linux): Another attempt to fix packaging GHA (#9155)
+* fix(linux): Fix packaging GHA (#9164)
+* fix(linux): Fix packaging GHA (#9169)
+
+## 17.0.132 alpha 2023-06-30
+
+* docs(mac): Update requirements.md (#9137)
+* fix(linux): Fix GHA package builds for non-Jammy dists (#9123)
+* fix(linux): Fix packaging GHA (#9142)
+
+## 17.0.131 alpha 2023-06-27
+
+* feat(developer,common,core): ldml UTF-32 literals in binary (#9084)
+* fix(web): fixes Web build zip artifact construction (#9096)
+
+## 17.0.130 alpha 2023-06-26
+
+* chore(deps): bump semver from 7.3.8 to 7.5.2 (#9085)
+* epic: conversion of Keyman Engine for Web to ES modules (#8560)
+
+## 17.0.129 alpha 2023-06-23
+
+* chore(common): Update crowdin strings for Spanish (es-ES and es-419) (#9040)
+* chore(android/app): Address some pre-launch accessibility report warnings (#9070)
+* fix(windows): support kmxplus in mcompile (#9071)
+* fix(core): fix ldml transforms (#9072)
+* feat(common,developer,core): add uset section (#9049)
+
 ## 17.0.128 alpha 2023-06-22
 
 *  (#9061)

@@ -270,6 +270,18 @@ COMP_KMXPLUS_STRS::valid(KMX_DWORD _kmn_unused(length)) const {
   return true;
 }
 
+/**
+ * helper for extracting single char values
+ * @param v field with char type
+ * @return value a string
+ */
+std::u16string COMP_KMXPLUS_STRS::str_from_char(KMX_DWORD v) {
+  char16_single buf;
+  const int len = Utf32CharToUtf16(v, buf);
+  return std::u16string(buf.ch, len);
+}
+
+
 bool
 COMP_KMXPLUS_SECT::valid(KMX_DWORD length) const {
   DebugLog("sect: total 0x%X\n", total);
@@ -357,12 +369,11 @@ COMP_KMXPLUS_ELEM::getElementList(KMX_DWORD elementNumber, KMX_DWORD &length) co
   return reinterpret_cast<const COMP_KMXPLUS_ELEM_ELEMENT *>(rawdata + entry.offset);
 }
 
+
 std::u16string
-COMP_KMXPLUS_ELEM_ELEMENT::get_string() const {
-  assert(!(flags & LDML_ELEM_FLAGS_UNICODE_SET)); // should not be called.
-  char16_single buf;
-  const int len = Utf32CharToUtf16(element, buf);
-  return std::u16string(buf.ch, len);
+COMP_KMXPLUS_ELEM_ELEMENT::get_element_string() const {
+  assert((flags & LDML_ELEM_FLAGS_TYPE) == LDML_ELEM_FLAGS_TYPE_CHAR); // should only be called on char
+  return COMP_KMXPLUS_STRS::str_from_char(element);
 }
 
 // Note: shared with subclass COMP_KMXPLUS_BKSP
@@ -802,9 +813,13 @@ COMP_KMXPLUS_KEYS_Helper::findKeyByStringId(KMX_DWORD strId, KMX_DWORD &i) const
 }
 
 const COMP_KMXPLUS_KEYS_KEY*
-COMP_KMXPLUS_KEYS_Helper::findKeyByStringTo(KMX_DWORD strId, KMX_DWORD &i) const {
+COMP_KMXPLUS_KEYS_Helper::findKeyByStringTo(const std::u16string& str, KMX_DWORD strId, KMX_DWORD &i) const {
   for (; i < key2->keyCount; i++) {
-    if (keys[i].to == strId) {
+    if (keys[i].flags & LDML_KEYS_KEY_FLAGS_EXTEND) {
+      if (strId != 0 && keys[i].to == strId) {
+        return &keys[i];
+      }
+    } else if (keys[i].get_to_string() == str) {
       return &keys[i];
     }
   }
@@ -839,11 +854,9 @@ COMP_KMXPLUS_KEYS_Helper::getKmap(KMX_DWORD i) const {
 }
 
 std::u16string
-COMP_KMXPLUS_KEYS_KEY::get_string() const {
+COMP_KMXPLUS_KEYS_KEY::get_to_string() const {
   assert(!(flags & LDML_KEYS_KEY_FLAGS_EXTEND)); // should not be called.
-  char16_single buf;
-  const int len = Utf32CharToUtf16(to, buf);
-  return std::u16string(buf.ch, len);
+  return COMP_KMXPLUS_STRS::str_from_char(to);
 }
 
 // LIST
@@ -955,7 +968,7 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
   const COMP_KEYBOARD_EX* ex = reinterpret_cast<const COMP_KEYBOARD_EX*>(keyboard);
 
   DebugLog("kmx_plus(): KMXPlus offset 0x%X, KMXPlus size 0x%X\n", ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize);
-  if (ex->kmxplus.dpKMXPlus < sizeof(kmx::COMP_KEYBOARD_EX)) {
+  if (ex->kmxplus.dpKMXPlus < sizeof(COMP_KEYBOARD_EX)) {
     DebugLog("dwKMXPlus is not past the end of COMP_KEYBOARD_EX");
     valid = false;
     assert(valid);
