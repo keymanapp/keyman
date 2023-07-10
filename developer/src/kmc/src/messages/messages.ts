@@ -12,8 +12,9 @@ export class InfrastructureMessages {
     `Unexpected exception: ${(o.e ?? 'unknown error').toString()}\n\nCall stack:\n${(o.e instanceof Error ? o.e.stack : (new Error()).stack)}`);
   static FATAL_UnexpectedException = SevFatal | 0x0001;
 
-  static Info_BuildingFile = (o:{filename:string}) => m(this.INFO_BuildingFile,
-    `Building ${o.filename}`);
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static Info_BuildingFile = (o:{filename:string}) => ({filename:o.filename, ...m(this.INFO_BuildingFile,
+    `Building ${o.filename}`)});
   static INFO_BuildingFile = SevInfo | 0x0002;
 
   static Error_FileDoesNotExist = (o:{filename:string}) => m(this.ERROR_FileDoesNotExist,
@@ -28,12 +29,14 @@ export class InfrastructureMessages {
     `--out-file should not be specified for project builds`);
   static ERROR_OutFileNotValidForProjects = SevError | 0x0005;
 
-  static Info_FileBuiltSuccessfully = (o:{filename:string}) => m(this.INFO_FileBuiltSuccessfully,
-    `${o.filename} built successfully.`);
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static Info_FileBuiltSuccessfully = (o:{filename:string}) => ({filename:o.filename, ...m(this.INFO_FileBuiltSuccessfully,
+    `${o.filename} built successfully.`)});
   static INFO_FileBuiltSuccessfully = SevInfo | 0x0006;
 
-  static Info_FileNotBuiltSuccessfully = (o:{filename:string}) => m(this.INFO_FileNotBuiltSuccessfully,
-    `${o.filename} failed to build.`);
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static Info_FileNotBuiltSuccessfully = (o:{filename:string}) => ({filename:o.filename, ...m(this.INFO_FileNotBuiltSuccessfully,
+    `${o.filename} failed to build.`)});
   static INFO_FileNotBuiltSuccessfully = SevInfo | 0x0007;
 
   static Error_InvalidProjectFile = (o:{message:string}) => m(this.ERROR_InvalidProjectFile,

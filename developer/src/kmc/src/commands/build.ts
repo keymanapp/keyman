@@ -2,9 +2,9 @@ import * as fs from 'fs';
 import { Command } from 'commander';
 import { buildActivities } from './buildClasses/buildActivities.js';
 import { BuildProject } from './buildClasses/BuildProject.js';
-import { NodeCompilerCallbacks } from '../messages/NodeCompilerCallbacks.js';
+import { CompilerLogColor, NodeCompilerCallbacks } from '../messages/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/messages.js';
-import { CompilerErrorSeverity, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerErrorSeverity, CompilerErrorMask, CompilerFileCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
 import { BaseOptions } from '../util/baseOptions.js';
 
 
@@ -34,6 +34,9 @@ export function declareBuild(program: Command) {
     .option('-w, --compiler-warnings-as-errors', 'Causes warnings to fail the build')
     .option('--no-warn-deprecated-code', 'Turn off warnings for deprecated code styles')
     .action(async (filenames: string[], options: any) => {
+      options = commandOptionsToCompilerOptions(options);
+      const callbacks = new NodeCompilerCallbacks({color:CompilerLogColor.default, ...options});
+
       if(!filenames.length) {
         // If there are no filenames provided, then we are building the current
         // folder ('.') as a project-style build
@@ -41,7 +44,7 @@ export function declareBuild(program: Command) {
       }
 
       for(let filename of filenames) {
-        if(!await build(filename, commandOptionsToCompilerOptions(options))) {
+        if(!await build(filename, callbacks, options)) {
           // Once a file fails to build, we bail on subsequent builds
           // TODO: is this the most appropriate semantics?
           process.exit(1);
@@ -50,8 +53,8 @@ export function declareBuild(program: Command) {
     });
 }
 
-async function build(filename: string, options: CompilerOptions): Promise<boolean> {
-  let callbacks = new NodeCompilerCallbacks(options);
+async function build(filename: string, parentCallbacks: NodeCompilerCallbacks, options: CompilerOptions): Promise<boolean> {
+  let callbacks = new CompilerFileCallbacks(filename, parentCallbacks);
 
   try {
     callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename}));
@@ -82,7 +85,7 @@ async function build(filename: string, options: CompilerOptions): Promise<boolea
     const failureCodes = [CompilerErrorSeverity.Fatal, CompilerErrorSeverity.Error];
     // TODO: #9100: .concat(options.compilerWarningsAsErrors ? [CompilerErrorSeverity.Warn] : []);
     let result = await builder.build(filename, callbacks, options);
-    const firstFailureMessage = callbacks.messages.find(m => failureCodes.includes(m.code & CompilerErrorSeverity.Severity_Mask));
+    const firstFailureMessage = parentCallbacks.messages.find(m => failureCodes.includes(m.code & CompilerErrorMask.Severity));
     if(result && firstFailureMessage == undefined) {
       callbacks.reportMessage(InfrastructureMessages.Info_FileBuiltSuccessfully({filename}));
     } else {

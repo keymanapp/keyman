@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { loadFile, loadSchema, resolveFilename } from '../helpers/index.js';
-import { CompilerCallbacks, CompilerEvent, CompilerFileSystemCallbacks, CompilerPathCallbacks, CompilerSchema } from '../../src/util/compiler-interfaces.js';
+import { CompilerCallbacks, CompilerError, CompilerEvent, CompilerFileSystemCallbacks, CompilerPathCallbacks, CompilerSchema } from '../../src/util/compiler-interfaces.js';
 
 // This is related to developer/src/common/web/test-helpers/index.ts but has a slightly different API surface
 // as this runs at a lower level than the compiler.
@@ -28,6 +28,10 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
   }
   debug(msg: string): void {
     console.debug(msg);
+  }
+
+  printMessages() {
+    process.stdout.write(CompilerError.formatEvent(this.messages));
   }
 
   messages: CompilerEvent[] = [];
