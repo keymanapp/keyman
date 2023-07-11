@@ -9,9 +9,6 @@ import { CompilerCallbacks, CompilerSchema, CompilerEvent,
 import { InfrastructureMessages } from './messages.js';
 import chalk from 'chalk';
 import supportsColor from 'supports-color';
-/**
- * Concrete implementation for CLI use
- */
 
 const color = chalk.default;
 const severityColors: {[value in CompilerErrorSeverity]: chalk.Chalk} = {
@@ -22,10 +19,20 @@ const severityColors: {[value in CompilerErrorSeverity]: chalk.Chalk} = {
   [CompilerErrorSeverity.Fatal]: color.redBright,
 };
 
+/**
+ * Maximum messages that will be emitted before suppressing further messages.
+ * We may in the future make this user configurable?
+ */
+const MaxMessagesDefault = 100;
+
+/**
+ * Concrete implementation for CLI use
+ */
 export class NodeCompilerCallbacks implements CompilerCallbacks {
   /* NodeCompilerCallbacks */
 
   messages: CompilerEvent[] = [];
+  messageCount = 0;
 
   constructor(private options: CompilerCallbackOptions) {
     color.enabled = this.options.color ?? (supportsColor.stdout ? supportsColor.stdout.hasBasic : false);
@@ -33,6 +40,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
 
   clear() {
     this.messages = [];
+    this.messageCount = 0;
   }
 
   /**
@@ -100,6 +108,23 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     if(CompilerError.severity(event.code) < compilerLogLevelToSeverity[this.options.logLevel]) {
       // collect messages but don't print to console
       return;
+    }
+
+    // We don't use this.messages.length because we only want to count visible
+    // messages, and there's no point in recalculating the total for every
+    // message emitted.
+    this.messageCount++;
+    if(this.messageCount > MaxMessagesDefault) {
+      return;
+    }
+
+    if(this.messageCount == MaxMessagesDefault) {
+      // We've hit our event limit so we'll suppress further messages, and emit
+      // our little informational message so users know what's going on. Note
+      // that this message will not be included in the this.messages array, and
+      // that will continue to collect all messages; this only affects the
+      // console emission of messages.
+      event = InfrastructureMessages.Info_TooManyMessages({count: MaxMessagesDefault});
     }
 
     const severityColor = severityColors[CompilerError.severity(event.code)] ?? color.reset;
