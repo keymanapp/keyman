@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.138 alpha 2023-07-11
+
+* chore: Update standards data (#9193)
+* chore(linux): Trigger Linux integration tests (#9221)
+
 ## 17.0.137 alpha 2023-07-10
 
 * chore: authenticate github request when triggering test builds (#9225)
