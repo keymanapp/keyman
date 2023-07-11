@@ -89,10 +89,10 @@ typedef struct tagKEYBOARD {
 
 	DWORD dwHotKey;			// standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
 
-	//PKMX_WCHART dpName;			// offset of name
-	//PKMX_WCHART dpLanguageName;	// offset of language name;
-	//PKMX_WCHART dpCopyright;		// offset of copyright
-	//PKMX_WCHART dpMessage;		// offset of message in Keyboard About box
+	//PWSTR dpName;			// offset of name
+	//PWSTR dpLanguageName;	// offset of language name;
+	//PWSTR dpCopyright;		// offset of copyright
+	//PWSTR dpMessage;		// offset of message in Keyboard About box
 
 	DWORD dpBitmapOffset;	// 0038 offset of the bitmaps in the file
 	DWORD dwBitmapSize;		// 003C size in bytes of the bitmaps
@@ -122,10 +122,10 @@ typedef struct tagKEYBOARD {
 
 										KMX_DWORD dwHotKey;			// standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
 
-										//PKMX_WCHART dpName;			// offset of name
-										//PKMX_WCHART dpLanguageName;	// offset of language name;
-										//PKMX_WCHART dpCopyright;		// offset of copyright
-										//PKMX_WCHART dpMessage;		// offset of message in Keyboard About box
+										//PWSTR dpName;			// offset of name
+										//PWSTR dpLanguageName;	// offset of language name;
+										//PWSTR dpCopyright;		// offset of copyright
+										//PWSTR dpMessage;		// offset of message in Keyboard About box
 
 										KMX_DWORD dpBitmapOffset;	// 0038 offset of the bitmaps in the file
 										KMX_DWORD dwBitmapSize;		// 003C size in bytes of the bitmaps

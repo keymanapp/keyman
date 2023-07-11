@@ -29,7 +29,7 @@ void KMX_LogError(const KMX_WCHART* m1, int m2 = 0);
 
 
 struct DeadkeyMapping {   // I4353
-  KMX_WCHART deadkey, dkid;
+  KMX_WCHAR deadkey, dkid;
   KMX_UINT shift;
   KMX_WORD vk;
 };
