@@ -38,7 +38,7 @@ def checkandsaveico(icofile):
         _convert_ico_to_bmp(icofile, bmpfile)
     try:
         with Image.open(bmpfile) as im3:
-            with im3.resize((64, 64), Image.ANTIALIAS) as im4:
+            with im3.resize((64, 64), Image.LANCZOS) as im4:
                 # Using .bmp.png file extension so it won't conflict if the package already contains .png
                 im4.save(f'{bmpfile}.png', 'png')
     except (IOError, OSError):
