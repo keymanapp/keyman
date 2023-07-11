@@ -11,7 +11,7 @@ import { transcodeToCP1252 } from '../src/compiler/cp1252.js';
 
 describe('KmpInfWriter', function () {
   it(`should transform kmp.json to kmp.inf`, function () {
-    const data: KmpJsonFile.KmpJsonFile = JSON.parse(fs.readFileSync(makePathToFixture('kmp.inf', 'kmp.json'), 'UTF-8'));
+    const data: KmpJsonFile.KmpJsonFile = JSON.parse(fs.readFileSync(makePathToFixture('kmp.inf', 'kmp.json'), 'utf-8'));
     const writer = new KmpInfWriter(data);
     const fixtureKmpInf = fs.readFileSync(makePathToFixture('kmp.inf', 'kmp.inf'));
     const value = writer.write();

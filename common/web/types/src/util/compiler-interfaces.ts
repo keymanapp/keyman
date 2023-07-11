@@ -14,57 +14,141 @@ export enum CompilerErrorSeverity {
   Warn =          0x200000, // Warning: Not great, but we can keep going.
   Error =         0x300000, // Severe error where we can't continue
   Fatal =         0x400000, // OOM or should-not-happen internal problem
-
-  // Mask values for mapping compiler errors
-  // TODO: make this a separate enum?
-  Severity_Mask =  0x00F00000,  // includes reserved bits, 16 possible severity levels
-  Error_Mask =     0x000FFFFF,  // error | namespace
-  Namespace_Mask = 0x000FF000,  // 256 possible namespaces
-  BaseError_Mask = 0x00000FFF,  // error code, 2,048 possible error codes per namespace
-  Reserved_Mask  = 0xFF000000,  // do not use these error values at this time
 };
 
-export function compilerErrorSeverity(code: number): number {
-  return code & CompilerErrorSeverity.Severity_Mask;
+/**
+ * Mask values for mapping compiler errors
+ */
+export enum CompilerErrorMask {
+  Severity =  0x00F00000,  // includes reserved bits, 16 possible severity levels
+  Error =     0x000FFFFF,  // error | namespace
+  Namespace = 0x000FF000,  // 256 possible namespaces
+  BaseError = 0x00000FFF,  // error code, 2,048 possible error codes per namespace
+  Reserved  = 0xFF000000,  // do not use these error values at this time
+};
+
+const errorSeverityName = {
+  [CompilerErrorSeverity.Info]: 'info',
+  [CompilerErrorSeverity.Hint]: 'hint',
+  [CompilerErrorSeverity.Warn]: 'warn',
+  [CompilerErrorSeverity.Error]: 'error',
+  [CompilerErrorSeverity.Fatal]: 'fatal',
+};
+
+export class CompilerError {
+  static severity(code: number): CompilerErrorSeverity {
+    return code & CompilerErrorMask.Severity;
+  }
+  static error(code: number): number {
+    return code & CompilerErrorMask.Error;
+  }
+  static baseError(code: number): number {
+    return code & CompilerErrorMask.BaseError;
+  }
+  static formatSeverity(code: number): string {
+    return errorSeverityName[CompilerError.severity(code)] ?? 'UNKNOWN';
+  }
+  /**
+   * Format an error code number. The error code number does not include
+   * the severity mask, as this is reported in text form separately; see
+   * `severityName`.
+   * @example
+   *
+   * The following call returns `KM03004`
+   * ```
+   *   formatCode(CompilerMessage.ERROR_InvalidDisplayMapFile)
+   * ```
+   */
+  static formatCode(code: number): string {
+    return 'KM' + CompilerError.error(code).toString(16).toUpperCase().padStart(5, '0');
+  }
+
+  /**
+   * Formats an event filename for an error report,
+   * stripping off path component
+   * @param filename
+   * @returns
+   */
+  static formatFilename(filename: string): string {
+    if(!filename) {
+      return '';
+    }
+
+    let x = filename.lastIndexOf('/');
+    if(x < 0) {
+      x = filename.lastIndexOf('\\');
+    }
+    return x >= 0 ? filename.substring(x+1) : filename;
+  }
+
+  /**
+   * Formats an event line for an error report
+   * @param line
+   * @returns
+   */
+  static formatLine(line: number): string {
+    return line ? line.toString() : '';
+  }
+
+  /**
+   * Formats an event message for an error report
+   * @param message
+   * @returns
+   */
+  static formatMessage(message: string): string {
+    return message ?? '';
+  }
+
+  /**
+   * Formats a compiler message, without coloring; an ANSI color version is
+   * implemented in NodeCompilerCallbacks.
+   * @param event event or array of events
+   */
+  static formatEvent(event : CompilerEvent | CompilerEvent[]): string {
+    if (!event) {
+      return "";
+    }
+    if (Array.isArray(event)) {
+      return event.map(item => CompilerError.formatEvent(item)).join('\n') + '\n';
+    }
+
+    return (
+      event.filename
+      ? CompilerError.formatFilename(event.filename) +
+        (event.line ? ':' + CompilerError.formatLine(event.line) : '') + ' - '
+      : ''
+    ) +
+    CompilerError.formatSeverity(event.code) + ' ' +
+    CompilerError.formatCode(event.code) + ': ' +
+    CompilerError.formatMessage(event.message);
+  }
+
+  /**
+   * @param e Error-like
+   */
+  static exceptionToString(e?: any) : string {
+    return `${(e ?? 'unknown error').toString()}\n\nCall stack:\n${(e instanceof Error ? e.stack : (new Error()).stack)}`;
+  }
+};
+
+/** @deprecated use `CompilerError.severity` instead */
+export function compilerErrorSeverity(code: number): CompilerErrorSeverity {
+  return CompilerError.severity(code);
 }
 
+/** @deprecated use `CompilerError.formatSeverity` instead */
 export function compilerErrorSeverityName(code: number): string {
-  switch(compilerErrorSeverity(code)) {
-    case CompilerErrorSeverity.Info: return 'INFO';
-    case CompilerErrorSeverity.Hint: return 'HINT';
-    case CompilerErrorSeverity.Warn: return 'WARN';
-    case CompilerErrorSeverity.Error: return 'ERROR';
-    case CompilerErrorSeverity.Fatal: return 'FATAL';
-    /* istanbul ignore next */
-    default: return 'UNKNOWN';
-  }
+  return CompilerError.formatSeverity(code);
 }
 
-/**
- * Format the error code number
- * example: "FATAL:0x03004"
- */
+/** @deprecated use `CompilerError.formatCode` instead */
 export function compilerErrorFormatCode(code: number): string {
-  const severity = code & CompilerErrorSeverity.Severity_Mask;
-  const severityName = compilerErrorSeverityName(severity);
-  const errorCode = code & CompilerErrorSeverity.Error_Mask;
-  const errorCodeString = Number(errorCode).toString(16).padStart(5,'0');
-  return `${severityName}:0x${errorCodeString}`;
+  return CompilerError.formatCode(code);
 }
 
-/**
- * @param e event or array of events
- * @returns string
- */
+/** @deprecated use `CompilerError.formatEvent` instead */
 export function compilerEventFormat(e : CompilerEvent | CompilerEvent[]) : string {
-  if (!e) {
-    return "";
-  }
-  if (Array.isArray(e)) {
-    return e.map(item => compilerEventFormat(item)).join('\n');
-  }
-  const {code, message} = e;
-  return `${compilerErrorFormatCode(code)}: “${message}”`;
+  return CompilerError.formatEvent(e);
 }
 
 /**
@@ -173,8 +257,45 @@ export interface CompilerCallbacks {
 
   loadSchema(schema: CompilerSchema): Uint8Array;
   reportMessage(event: CompilerEvent): void;
+
   debug(msg: string): void;
 };
+
+/**
+ * Wrapper class for CompilerCallbacks for a given input file
+ */
+export class CompilerFileCallbacks implements CompilerCallbacks {
+  constructor(private filename: string, private parent: CompilerCallbacks) {
+  }
+
+  loadFile(filename: string): Uint8Array {
+    return this.parent.loadFile(filename);
+  }
+
+  get path(): CompilerPathCallbacks {
+    return this.parent.path;
+  }
+
+  get fs(): CompilerFileSystemCallbacks {
+    return this.parent.fs;
+  }
+
+  resolveFilename(baseFilename: string, filename: string): string {
+    return this.parent.resolveFilename(baseFilename, filename);
+  }
+
+  loadSchema(schema: CompilerSchema): Uint8Array {
+    return this.parent.loadSchema(schema);
+  }
+
+  reportMessage(event: CompilerEvent): void {
+    this.parent.reportMessage({filename: this.filename, ...event});
+  }
+
+  debug(msg: string): void {
+    return this.parent.debug(msg);
+  }
+}
 
 /**
  * Abstract interface for compiler options
@@ -229,10 +350,10 @@ export const defaultCompilerOptions: CompilerOptions = {
 export const CompilerMessageSpec = (code: number, message: string) : CompilerEvent => { return { code, message } };
 
 /**
- * @param e Error-like
+ * @deprecated use `CompilerError.exceptionToString` instead
  */
 export function compilerExceptionToString(e?: any) : string {
-  return `${(e ?? 'unknown error').toString()}\n\nCall stack:\n${(e instanceof Error ? e.stack : (new Error()).stack)}`;
+  return CompilerError.exceptionToString(e);
 }
 
 /**
@@ -252,7 +373,7 @@ type CompilerLogLevelTuple = typeof ALL_COMPILER_LOG_LEVELS;
 export type CompilerLogLevel = CompilerLogLevelTuple[number];
 
 export const compilerLogLevelToSeverity: {[index in CompilerLogLevel]: number} = {
-  'silent': CompilerErrorSeverity.Severity_Mask,  // effectively excludes all reporting
+  'silent': CompilerErrorMask.Severity,  // effectively excludes all reporting
   'error': CompilerErrorSeverity.Error,
   'warn': CompilerErrorSeverity.Warn,
   'hint': CompilerErrorSeverity.Hint,

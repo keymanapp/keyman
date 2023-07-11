@@ -36,7 +36,7 @@
     "@types/chai": "^4.1.7",
     "@types/git-diff": "^2.0.3",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^10.14.6",
+    "@types/node": "^20.4.1",
     "@types/semver": "^7.3.12",
     "@types/xml2js": "^0.4.5",
     "c8": "^7.12.0",
@@ -60,7 +60,9 @@
   },
   "c8": {
     "all": true,
-    "src": ["src/"],
+    "src": [
+      "src/"
+    ],
     "exclude-after-remap": true,
     "exclude": [
       "src/kmx/kmx-plus-builder/",

@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { CompilerCallbacks, CompilerOptions, KeymanDeveloperProject, KeymanFileTypes, KPJFileReader } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerFileCallbacks, CompilerOptions, KeymanDeveloperProject, KeymanFileTypes, KPJFileReader } from '@keymanapp/common-types';
 import { KeymanDeveloperProjectFile } from '../../../../../../common/web/types/src/kpj/keyman-developer-project.js';
 import { BuildActivity } from './BuildActivity.js';
 import { buildActivities } from './buildActivities.js';
@@ -25,7 +25,7 @@ class ProjectBuilder {
 
   constructor(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions) {
     this.infile = path.resolve(infile);
-    this.callbacks = callbacks;
+    this.callbacks = new CompilerFileCallbacks(infile, callbacks);
     this.options = options;
   }
 
@@ -114,16 +114,19 @@ class ProjectBuilder {
     const options = {...this.options};
     options.outFile = this.project.resolveOutputFilePath(file, activity.sourceExtension, activity.compiledExtension);
     const infile = this.project.resolveInputFilePath(file);
-    this.callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename: infile}));
+
+    const callbacks = new CompilerFileCallbacks(infile, this.callbacks);
+    callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename: infile}));
 
     fs.mkdirSync(path.dirname(options.outFile), {recursive:true});
 
-    let result = await activity.build(infile, this.callbacks, options);
+    let result = await activity.build(infile, callbacks, options);
     if(result) {
-      this.callbacks.reportMessage(InfrastructureMessages.Info_FileBuiltSuccessfully({filename: path.basename(infile)}));
+      callbacks.reportMessage(InfrastructureMessages.Info_FileBuiltSuccessfully({filename: path.basename(infile)}));
     } else {
-      this.callbacks.reportMessage(InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename: path.basename(infile)}));
+      callbacks.reportMessage(InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename: path.basename(infile)}));
     }
+
     return result;
   }
 

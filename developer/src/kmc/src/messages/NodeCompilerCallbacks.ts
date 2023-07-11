@@ -1,19 +1,23 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { CompilerCallbacks, CompilerSchema, CompilerEvent, compilerErrorSeverity,
-         compilerErrorSeverityName, CompilerPathCallbacks, CompilerFileSystemCallbacks,
-         CompilerLogLevel, compilerLogLevelToSeverity } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerSchema, CompilerEvent,
+         CompilerPathCallbacks, CompilerFileSystemCallbacks,
+         CompilerLogLevel, compilerLogLevelToSeverity, CompilerErrorSeverity,
+         CompilerError } from '@keymanapp/common-types';
 import { InfrastructureMessages } from './messages.js';
-
+import chalk from 'chalk';
+import supportsColor from 'supports-color';
 /**
  * Concrete implementation for CLI use
  */
 
-// TODO: Make a common class for all the CompilerCallbacks implementations
+const color = chalk.default;
 
+export  enum CompilerLogColor { default, no, force };
 
 export interface CompilerCallbackOptions {
   logLevel?: CompilerLogLevel;
+  color?: CompilerLogColor;
 }
 
 export class NodeCompilerCallbacks implements CompilerCallbacks {
@@ -72,19 +76,71 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   }
 
   reportMessage(event: CompilerEvent): void {
-    this.messages.push(event);
+    this.messages.push({...event});
 
-    if(compilerErrorSeverity(event.code) < compilerLogLevelToSeverity[this.options.logLevel]) {
+    if(CompilerError.severity(event.code) < compilerLogLevelToSeverity[this.options.logLevel]) {
       // collect messages but don't print to console
       return;
     }
 
-    const code = event.code.toString(16);
-    if(event.line) {
-      console.log(`${compilerErrorSeverityName(event.code)} ${code} [${event.line}]: ${event.message}`);
-    } else {
-      console.log(`${compilerErrorSeverityName(event.code)} ${code}: ${event.message}`);
+    switch(this.options.color) {
+    case CompilerLogColor.default:
+      color.enabled = supportsColor.stdout ? supportsColor.stdout.hasBasic : false;
+      break;
+    case CompilerLogColor.no:
+      color.enabled = false;
+      break;
+    case CompilerLogColor.force:
+      color.enabled = true;
+      break;
     }
+
+    const colors: {[value in CompilerErrorSeverity]: chalk.Chalk} = {
+      [CompilerErrorSeverity.Info]: color.reset,
+      [CompilerErrorSeverity.Hint]: color.blueBright,
+      [CompilerErrorSeverity.Warn]: color.yellowBright,
+      [CompilerErrorSeverity.Error]: color.redBright,
+      [CompilerErrorSeverity.Fatal]: color.redBright,
+    };
+
+    const severityColor = colors[CompilerError.severity(event.code)] ?? color.reset;
+    const messageColor = this.messageSpecialColor(event) ?? color.reset;
+    process.stdout.write(
+      (
+        event.filename
+        ? color.cyan(CompilerError.formatFilename(event.filename)) +
+          (event.line ? ':' + color.yellowBright(CompilerError.formatLine(event.line)) : '') + ' - '
+        : ''
+      ) +
+      severityColor(CompilerError.formatSeverity(event.code)) + ' ' +
+      color.grey(CompilerError.formatCode(event.code)) + ': ' +
+      messageColor(CompilerError.formatMessage(event.message)) + '\n'
+    );
+
+    if(event.code == InfrastructureMessages.INFO_ProjectBuiltSuccessfully) {
+      // Special case: we'll add a blank line after project builds
+      process.stdout.write('\n');
+    }
+
+  }
+
+  /**
+   * We treat a few certain infrastructure messages with special colours
+   * @param event
+   * @returns
+   */
+  messageSpecialColor(event: CompilerEvent) {
+    switch(event.code) {
+      case InfrastructureMessages.INFO_BuildingFile:
+        return color.whiteBright;
+      case InfrastructureMessages.INFO_FileNotBuiltSuccessfully:
+      case InfrastructureMessages.INFO_ProjectNotBuiltSuccessfully:
+        return color.red;
+      case InfrastructureMessages.INFO_FileBuiltSuccessfully:
+      case InfrastructureMessages.INFO_ProjectBuiltSuccessfully:
+        return color.green;
+    }
+    return null;
   }
 
   debug(msg: string) {

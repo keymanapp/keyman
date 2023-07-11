@@ -22,7 +22,7 @@ export * as Constants from './consts/virtual-key-constants.js';
 
 export { defaultCompilerOptions, CompilerBaseOptions, CompilerCallbacks, CompilerOptions, CompilerSchema, CompilerEvent, CompilerErrorNamespace,
          CompilerErrorSeverity, CompilerPathCallbacks, CompilerFileSystemCallbacks,
-         CompilerMessageSpec, compilerErrorSeverity, compilerErrorSeverityName,
+         CompilerError, CompilerMessageSpec, compilerErrorSeverity, CompilerErrorMask, CompilerFileCallbacks, compilerErrorSeverityName,
          compilerExceptionToString, compilerErrorFormatCode,
          compilerLogLevelToSeverity, CompilerLogLevel, compilerEventFormat, ALL_COMPILER_LOG_LEVELS } from './util/compiler-interfaces.js';
 export { CommonTypesMessages } from './util/common-events.js';
