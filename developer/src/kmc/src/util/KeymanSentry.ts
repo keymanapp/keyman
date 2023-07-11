@@ -102,8 +102,9 @@ This error has been automatically reported to the Keyman team.
 `);
       await Sentry.close(2000);
 
-      // For local development, we don't want to bury the trace
-      if(KEYMAN_VERSION.VERSION_ENVIRONMENT == 'local') {
+      // For local development, we don't want to bury the trace; we need the cast to avoid
+      // TS2367 (comparison appears to be unintentional)
+      if((KEYMAN_VERSION.VERSION_ENVIRONMENT as string) == 'local') {
         throw e;
       }
       process.exit(1);
