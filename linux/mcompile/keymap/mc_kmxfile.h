@@ -16,68 +16,129 @@ int dummytest_mc_kmx_file();
 #define _KMXFILE_H
 
 typedef struct tagSTORE {
-	KMX_DWORD dwSystemID;
-	PKMX_WCHAR dpName;
-	PKMX_WCHAR dpString;
+	DWORD dwSystemID;
+	PWSTR dpName;
+	PWSTR dpString;
 } STORE, *LPSTORE;
+
+						typedef struct KMX_tagSTORE {
+							KMX_DWORD dwSystemID;
+							PKMX_WCHART dpName;
+							PKMX_WCHART dpString;
+						} KMX_STORE, *LPKMX_STORE;
 
 
 typedef struct tagKEY {
-	KMX_WCHAR Key;
+	KMX_WCHART Key;
 	KMX_DWORD Line;
 	KMX_DWORD ShiftFlags;
-	PKMX_WCHAR dpOutput;
-	PKMX_WCHAR dpContext;
+	PKMX_WCHART dpOutput;
+	PKMX_WCHART dpContext;
 } KEY, *LPKEY;
+
+					typedef struct KMX_tagKEY {
+						KMX_WCHART Key;
+						KMX_DWORD Line;
+						KMX_DWORD ShiftFlags;
+						PKMX_WCHART dpOutput;
+						PKMX_WCHART dpContext;
+					} KMX_KEY, *LPKMX_KEY;
 
 
 typedef struct tagGROUP {
-	PKMX_WCHAR dpName;
+	wchar_t* dpName;
 	LPKEY dpKeyArray;		// [LPKEY] address of first item in key array
-	PKMX_WCHAR dpMatch;
-	PKMX_WCHAR dpNoMatch;
-	KMX_DWORD cxKeyArray;		// in array entries
-	KMX_BOOL  fUsingKeys;		// group(xx) [using keys] <-- specified or not
+	PWSTR dpMatch;
+	PWSTR dpNoMatch;
+	uint32_t cxKeyArray;		// in array entries  // _S2 was DWORD
+	int  fUsingKeys;		// group(xx) [using keys] <-- specified or not
 } GROUP, *LPGROUP;
+
+					typedef struct KMX_tagGROUP {
+						KMX_WCHART* dpName;
+						LPKMX_KEY dpKeyArray;		// [LPKEY] address of first item in key array
+						PKMX_WCHART dpMatch;
+						PKMX_WCHART dpNoMatch;
+						uint32_t cxKeyArray;		// in array entries  // _S2 was DWORD
+						int  fUsingKeys;		// group(xx) [using keys] <-- specified or not
+					} KMX_GROUP, *LPKMX_GROUP;
+
 
 
 
 typedef struct tagKEYBOARD {
-	KMX_DWORD dwIdentifier;		// Keyman compiled keyboard id
+	DWORD dwIdentifier;		// Keyman compiled keyboard id
 
-	KMX_DWORD dwFileVersion;	// Version of the file - Keyman 4.0 is 0x0400
+	DWORD dwFileVersion;	// Version of the file - Keyman 4.0 is 0x0400
 
-	KMX_DWORD dwCheckSum;		// As stored in keyboard. DEPRECATED as of 16.0
-	KMX_DWORD xxkbdlayout;    	// as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
-	KMX_DWORD IsRegistered;		// layout id, from same registry key
-	KMX_DWORD version;			// keyboard version
+	DWORD dwCheckSum;		// As stored in keyboard. DEPRECATED as of 16.0
+	DWORD xxkbdlayout;    	// as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
+	DWORD IsRegistered;		// layout id, from same registry key
+	DWORD version;			// keyboard version
 
-	KMX_DWORD cxStoreArray;		// in array entries
-	KMX_DWORD cxGroupArray;		// in array entries
+	DWORD cxStoreArray;		// in array entries
+	DWORD cxGroupArray;		// in array entries
 
 	LPSTORE dpStoreArray;	// [LPSTORE] address of first item in store array, from start of file
 	LPGROUP dpGroupArray;	// [LPGROUP] address of first item in group array, from start of file
 
-	KMX_DWORD StartGroup[2];	// index of starting groups [2 of them]
+	DWORD StartGroup[2];	// index of starting groups [2 of them]
 							// Ansi=0, Unicode=1
 
-	KMX_DWORD dwFlags;			// Flags for the keyboard file
+	DWORD dwFlags;			// Flags for the keyboard file
 
-	KMX_DWORD dwHotKey;			// standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
+	DWORD dwHotKey;			// standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
 
 	//PKMX_WCHART dpName;			// offset of name
 	//PKMX_WCHART dpLanguageName;	// offset of language name;
 	//PKMX_WCHART dpCopyright;		// offset of copyright
 	//PKMX_WCHART dpMessage;		// offset of message in Keyboard About box
 
-	KMX_DWORD dpBitmapOffset;	// 0038 offset of the bitmaps in the file
-	KMX_DWORD dwBitmapSize;		// 003C size in bytes of the bitmaps
+	DWORD dpBitmapOffset;	// 0038 offset of the bitmaps in the file
+	DWORD dwBitmapSize;		// 003C size in bytes of the bitmaps
 	//HBITMAP	hBitmap;		// handle to the bitmap in the file;
 } KEYBOARD, *LPKEYBOARD;
 
-KMX_BOOL LoadKeyboard(char* fileName, LPKEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
+									typedef struct KMX_tagKEYBOARD {
+										KMX_DWORD dwIdentifier;		// Keyman compiled keyboard id
 
-KMX_BOOL LoadKeyboard(char16_t* fileName, LPKEYBOARD* lpKeyboard);
+										KMX_DWORD dwFileVersion;	// Version of the file - Keyman 4.0 is 0x0400
+
+										KMX_DWORD dwCheckSum;		// As stored in keyboard. DEPRECATED as of 16.0
+										KMX_DWORD xxkbdlayout;    	// as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
+										KMX_DWORD IsRegistered;		// layout id, from same registry key
+										KMX_DWORD version;			// keyboard version
+
+										KMX_DWORD cxStoreArray;		// in array entries
+										KMX_DWORD cxGroupArray;		// in array entries
+
+										LPKMX_STORE dpStoreArray;	// [LPSTORE] address of first item in store array, from start of file
+										LPKMX_GROUP dpGroupArray;	// [LPGROUP] address of first item in group array, from start of file
+
+										KMX_DWORD StartGroup[2];	// index of starting groups [2 of them]
+																// Ansi=0, Unicode=1
+
+										KMX_DWORD dwFlags;			// Flags for the keyboard file
+
+										KMX_DWORD dwHotKey;			// standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
+
+										//PKMX_WCHART dpName;			// offset of name
+										//PKMX_WCHART dpLanguageName;	// offset of language name;
+										//PKMX_WCHART dpCopyright;		// offset of copyright
+										//PKMX_WCHART dpMessage;		// offset of message in Keyboard About box
+
+										KMX_DWORD dpBitmapOffset;	// 0038 offset of the bitmaps in the file
+										KMX_DWORD dwBitmapSize;		// 003C size in bytes of the bitmaps
+										//HBITMAP	hBitmap;		// handle to the bitmap in the file;
+									} KMX_KEYBOARD, *LPKMX_KEYBOARD;
+
+BOOL LoadKeyboard(char* fileName, LPKEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
+BOOL LoadKeyboard(wchar_t* fileName, LPKEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
+BOOL LoadKeyboard(char16_t* fileName, LPKEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
+		KMX_BOOL KMX_LoadKeyboard(char* fileName, LPKMX_KEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
+		KMX_BOOL KMX_LoadKeyboard(wchar_t* fileName, LPKMX_KEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
+		KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
+
 
 #endif
 

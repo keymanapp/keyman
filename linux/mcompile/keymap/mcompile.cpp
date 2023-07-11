@@ -144,9 +144,9 @@ int run(int argc, std::vector< const char16_t*> argv) {
 
 wprintf(L"_S2 * Up to here cross-platform xx  :-))))) ******************************************************\n");
 
-  LPKEYBOARD kmxfile;
+  LPKMX_KEYBOARD kmxfile;
 
-  if(!LoadKeyboard(infile, &kmxfile)) {
+  if(!KMX_LoadKeyboard(infile, &kmxfile)) {
     KMX_LogError(L"Failed to load keyboard (%d)\n", errno );
     return 3;
   }

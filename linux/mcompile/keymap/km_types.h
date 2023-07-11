@@ -29,6 +29,10 @@ typedef uint32_t   KMX_DWORD;
 typedef int32_t    KMX_BOOL;
 typedef uint8_t    KMX_BYTE;
 typedef uint16_t   KMX_WORD;
+typedef uint32_t   DWORD;
+typedef int32_t    BOOL;
+typedef uint8_t    BYTE;
+typedef uint16_t   WORD;
 
 #if defined(__cplusplus)
 typedef char16_t   km_kbp_cp;
@@ -55,10 +59,11 @@ typedef char*      LPSTR;               // _S2 needs to be removed?
 typedef LPSTR      LPKMX_STR;           // _S2 needs to be removed?
 
 typedef uint8_t*   LPBYTE;              // _S2 needs to be removed/?
-typedef LPBYTE     LPKMX_BYTE;          // _S2 needs to be removed?
+typedef uint8_t*   LPKMX_BYTE;          // _S2 needs to be removed?
+
 
 typedef uint8_t*   PBYTE;               // _S2 needs to be removed/?
-typedef PBYTE      PKMX_BYTE;           // _S2 needs to be removed?
+typedef uint8_t*   PKMX_BYTE;           // _S2 needs to be removed?
 
                                         // _S2 LPKEYBOARD ok to leave as is??
 
@@ -67,13 +72,14 @@ typedef char*      PKMX_STR;            // _S2 needs to be removed/?
 
 typedef KMX_CHAR*  PKMX_CHAR;           // _S2 needs to be removed/?
 
-
-
 typedef uint32_t   KMX_UINT;
 
 typedef KMX_BYTE*  PKMX_BYTE;
 typedef KMX_WORD*  PKMX_WORD;
 typedef KMX_DWORD* PKMX_DWORD;
+typedef BYTE*  PBYTE;
+typedef WORD*  PWORD;
+typedef DWORD* PDWORD;
 
 #ifndef FALSE
 #define FALSE               0
