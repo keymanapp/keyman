@@ -2,8 +2,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { CompilerCallbacks, CompilerSchema, CompilerEvent,
          CompilerPathCallbacks, CompilerFileSystemCallbacks,
-         CompilerLogLevel, compilerLogLevelToSeverity, CompilerErrorSeverity,
-         CompilerError } from '@keymanapp/common-types';
+         compilerLogLevelToSeverity, CompilerErrorSeverity,
+         CompilerError,
+         CompilerCallbackOptions,
+         CompilerFileCallbacks} from '@keymanapp/common-types';
 import { InfrastructureMessages } from './messages.js';
 import chalk from 'chalk';
 import supportsColor from 'supports-color';
@@ -20,11 +22,6 @@ const severityColors: {[value in CompilerErrorSeverity]: chalk.Chalk} = {
   [CompilerErrorSeverity.Fatal]: color.redBright,
 };
 
-export interface CompilerCallbackOptions {
-  logLevel?: CompilerLogLevel;
-  color?: boolean; // null or undefined == use console default
-}
-
 export class NodeCompilerCallbacks implements CompilerCallbacks {
   /* NodeCompilerCallbacks */
 
@@ -36,6 +33,22 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
 
   clear() {
     this.messages = [];
+  }
+
+  /**
+   * Returns true if any message in the log is a Fatal, Error, or if we are
+   * treating warnings as errors, a Warning. The warning option will be taken
+   * from the CompilerOptions passed to the constructor, or the parameter, to
+   * allow for per-file overrides (as seen with projects, for example).
+   * @param compilerWarningsAsErrors
+   * @returns
+   */
+  hasFailureMessage(compilerWarningsAsErrors?: boolean): boolean {
+    return CompilerFileCallbacks.hasFailureMessage(
+      this.messages,
+      // parameter overrides global option
+      compilerWarningsAsErrors ?? this.options.compilerWarningsAsErrors
+    );
   }
 
   hasMessage(code: number): boolean {

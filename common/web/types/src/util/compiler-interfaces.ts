@@ -233,6 +233,12 @@ export interface CompilerFileSystemCallbacks {
   existsSync(name: string): boolean;
 }
 
+export interface CompilerCallbackOptions {
+  logLevel?: CompilerLogLevel;
+  color?: boolean; // null or undefined == use console default
+  compilerWarningsAsErrors?: boolean;
+};
+
 /**
  * Abstract interface for callbacks, to abstract out file i/o
  */
@@ -265,7 +271,41 @@ export interface CompilerCallbacks {
  * Wrapper class for CompilerCallbacks for a given input file
  */
 export class CompilerFileCallbacks implements CompilerCallbacks {
-  constructor(private filename: string, private parent: CompilerCallbacks) {
+  messages: CompilerEvent[] = [];
+
+  constructor(private filename: string, private options: CompilerCallbackOptions, private parent: CompilerCallbacks) {
+  }
+
+  /**
+   * Returns `true` if any message in the `messages` array is a Fatal or Error
+   * message, and if `compilerWarningsAsErrors` is `true`, then also returns
+   * `true` if any message is a Warning.
+   */
+  static hasFailureMessage(messages: CompilerEvent[], compilerWarningsAsErrors: boolean) {
+    const failureCodes = [
+      CompilerErrorSeverity.Fatal, CompilerErrorSeverity.Error
+    ].concat(compilerWarningsAsErrors ? [CompilerErrorSeverity.Warn] : []);
+    return messages.find(m => failureCodes.includes(CompilerError.severity(m.code))) != undefined;
+  }
+
+  /**
+   * Returns `true` if any message in the `messages` array is a Fatal or Error
+   * message, and if `compilerWarningsAsErrors` is `true`, then also returns
+   * `true` if any message is a Warning.
+   *
+   * If passed a defined `compilerWarningsAsErrors` value, then uses that,
+   * otherwise uses `options.compilerWarningsAsErrors`, or `false` if that is
+   * also `undefined`.
+   */
+  hasFailureMessage(compilerWarningsAsErrors?: boolean) {
+    return CompilerFileCallbacks.hasFailureMessage(
+      this.messages,
+      compilerWarningsAsErrors ?? this.options.compilerWarningsAsErrors ?? false
+    );
+  }
+
+  clear() {
+    this.messages = [];
   }
 
   loadFile(filename: string): Uint8Array {
@@ -289,6 +329,7 @@ export class CompilerFileCallbacks implements CompilerCallbacks {
   }
 
   reportMessage(event: CompilerEvent): void {
+    this.messages.push(event);
     this.parent.reportMessage({filename: this.filename, ...event});
   }
 
