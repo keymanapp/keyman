@@ -13,21 +13,26 @@ class TestKeymanOptions(unittest.TestCase):
         # Reset the GSettings to its original state
         self.settings.reset("options")
 
+    def test_get_option_no_info(self):
+        # Test getting options with invalid info
+        options = get_option({})
+        self.assertEqual(options, {})
+
     def test_get_option_invalid_info(self):
         # Test getting options with invalid info
-        info = {"packageID": "invalid", "keyboardID": "invalid"}
+        info = {"packageID": "", "keyboardID": ""}
         options = get_option(info)
         self.assertEqual(options, {})
 
     def test_get_option_valid_info(self):
         # Test getting options with valid info
-        info = {"packageID": "sil_cipher_music", "keyboardID": "sil_cipher_music"}
+        info = {"packageID": "foo", "keyboardID": "bar"}
         options = get_option(info)
         self.assertIsInstance(options, dict)
 
     def test_set_option(self):
         # Test setting options
-        info = {"packageID": "sil_cipher_music", "keyboardID": "sil_cipher_music"}
+        info = {"packageID": "foo", "keyboardID": "bar"}
         options = {"set_nfc": "1"}
         set_option(info, options)
         retrieved_options = get_option(info)
