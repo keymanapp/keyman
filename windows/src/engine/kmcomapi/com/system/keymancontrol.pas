@@ -685,29 +685,6 @@ end;
 
 procedure TKeymanControl.LoadKeyman32;
 
-    function GetKeyman32Name: string;
-    var
-      Keyman32Name: string;
-    begin
-      Keyman32Name := '';
-      with TRegistryErrorControlled.Create do  // I2890
-      try
-        RootKey := HKEY_LOCAL_MACHINE;
-        if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_Keyman32_Name) then
-            Keyman32Name := ReadString(SRegValue_Keyman32_Name);
-      finally
-        Free;
-      end;
-
-      if Keyman32Name = '' then
-      begin
-        Keyman32Name := 'keyman32.dll';
-      end;
-
-      Result := Keyman32Name;
-
-    end;
-
     function GetKeymanInstallPath: string;   // I3598
     var
       buf: array[0..260] of char;

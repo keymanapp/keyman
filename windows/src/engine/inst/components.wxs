@@ -152,7 +152,6 @@
       <Component Id="Reg_KeymanVersion" Guid="*">
                 <RegistryValue KeyPath="yes" Root="HKLM" Key="Software\Keyman\Keyman Engine" Name="keyman32 name" Type="string" Value="keyman32-ver$(var.VERSION_WITH_TAG).dll" />
                 <RegistryValue Root="HKLM" Key="Software\Keyman\Keyman Engine" Name="keyman64 name" Type="string" Value="keyman64-ver$(var.VERSION_WITH_TAG).dll" />
-                <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\Keyman\Keyman Engine" />
       </Component>
 
       <Component Guid="{FB88ED52-C8F9-44F8-91F2-D0E377504C0D}">
