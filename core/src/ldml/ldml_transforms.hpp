@@ -39,7 +39,7 @@ class element {
     /** from a single char */
     element(km_kbp_usv ch, KMX_DWORD flags);
 
-  
+
     /** @returns true if a USet type */
     bool is_uset() const;
     bool is_prebase() const;
@@ -115,6 +115,9 @@ struct reorder_sort_key {
 
     int compare(const reorder_sort_key &other) const;
     bool operator<(const reorder_sort_key &other) const;
+
+    /** create a 'baseline' sort key */
+    static std::deque<reorder_sort_key> from(const std::u32string &str);
 };
 
 /**
@@ -124,7 +127,11 @@ class element_list : public std::deque<element> {
   public:
     /** @returns 0 if no match, or number of chars at end matched */
     size_t match_end(const std::u32string& str) const;
+    /** now just for testing */
     std::deque<reorder_sort_key> get_sort_key(const std::u32string& str) const;
+
+    std::deque<reorder_sort_key> &
+    update_sort_key(size_t offset, const std::u32string &str, std::deque<reorder_sort_key> &key) const;
 };
 
 class reorder_entry {
@@ -132,6 +139,12 @@ class reorder_entry {
     reorder_entry(const element_list& elements);
     reorder_entry(const element_list& elements, const element_list& before);
     bool apply(std::u32string &str) const;
+    /**
+     * @param str string to match
+     * @param offset start matching at this offset
+     * @return 0 if no match otherwise length matched
+     */
+    size_t match_end(std::u32string &str, size_t offset) const;
 
   public:
     element_list elements;

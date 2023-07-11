@@ -290,6 +290,7 @@ test_reorder_standalone() {
       element_list e2;
       e2.emplace_back(toneMarks, 55 << LDML_ELEM_FLAGS_ORDER_BITSHIFT);
       rg.list.emplace_back(e2);
+
       // <reorder before="\u1A6B" from="\u1A60\u1A45" order="10" />
       element_list e3;
       e3.emplace_back(U'\u1A60', 55 << LDML_ELEM_FLAGS_ORDER_BITSHIFT);
@@ -306,6 +307,7 @@ test_reorder_standalone() {
       e4before.emplace_back(U'\u1A6B', 0);
       e4before.emplace_back(toneMarks, 0);
       rg.list.emplace_back(e4, e4before);
+
       // <reorder before="\u1A6B" from="\u1A60[\u1A75-\u1A79]\u1A45" order="10 55 10" />
       element_list e5;
       e5.emplace_back(U'\u1A60', 10 << LDML_ELEM_FLAGS_ORDER_BITSHIFT);

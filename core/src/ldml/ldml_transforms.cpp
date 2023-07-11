@@ -91,6 +91,19 @@ reorder_sort_key::operator<(const reorder_sort_key &other) const {
   return (compare(other) == -1);
 }
 
+std::deque<reorder_sort_key>
+reorder_sort_key::from(const std::u32string &str) {
+  std::deque<reorder_sort_key> keylist;
+  auto s = str.begin();
+  size_t c = 0;
+  for (auto e = str.begin(); e < str.end(); e++) {
+    keylist.emplace_back(reorder_sort_key{*s, 0, c, 0, c});
+    s++;
+    c++;
+  }
+  return keylist;
+}
+
 size_t
 element_list::match_end(const std::u32string &str) const {
   if (str.size() < size()) {
@@ -98,7 +111,7 @@ element_list::match_end(const std::u32string &str) const {
   }
   // s: iterate from end to front on string
   auto s = str.rbegin();
-  // e: end to front on elements. we know this is <= length of string. 
+  // e: end to front on elements. we know this is <= length of string.
   for (auto e = rbegin(); e < rend(); e++) {
     if (!e->matches(*s)) {
       return 0;
@@ -108,15 +121,12 @@ element_list::match_end(const std::u32string &str) const {
   return size(); // match size = element size
 }
 
+// keeping this for testing
 std::deque<reorder_sort_key> element_list::get_sort_key(const std::u32string &str) const {
   std::deque<reorder_sort_key> keylist;
-  // s: iterate from end to front on string
-  // keep consistent with about function
   auto s = str.begin();
   size_t c = 0;
   for (auto e = begin(); e < end(); e++) {
-    // TODO-LDML: tertiary
-    // TODO-LDML: alternate index
     keylist.emplace_back(reorder_sort_key{*s, e->get_order(), c, e->get_tertiary(), c});
     s++;
     c++;
@@ -124,13 +134,48 @@ std::deque<reorder_sort_key> element_list::get_sort_key(const std::u32string &st
   return keylist;
 }
 
+std::deque<reorder_sort_key> &
+element_list::update_sort_key(size_t offset, const std::u32string &str, std::deque<reorder_sort_key> &key) const {
+  auto s = str.begin();
+  size_t c = 0;
+  for (auto e = begin(); e < end(); e++) {
+    auto &k    = key.at(c + offset);
+    k.primary  = e->get_order();
+    k.tertiary = e->get_tertiary();  // TODO-LDML: need more detailed tertiary work
+    s++;
+    c++;
+  }
+  return key;
+}
+
 reorder_entry::reorder_entry(const element_list &elements) : elements(elements), before() {
 }
 reorder_entry::reorder_entry(const element_list &elements, const element_list &before) : elements(elements), before(before) {
 }
 
+size_t
+reorder_entry::match_end(std::u32string &str, size_t offset) const {
+  auto substr = str.substr(offset);
+  size_t match_len = elements.match_end(substr);
+  if (match_len == 0) {
+    DebugLog("No match");
+    return 0;
+  }
+
+  if (!before.empty()) {
+    std::u32string prefix = substr.substr(0, substr.size() - match_len);
+    // make sure the 'before' is present
+    if (before.match_end(prefix) == 0) {
+      DebugLog("'before' nixed it");
+      return 0; // break out.
+    }
+  }
+  return match_len;
+}
+
 bool
 reorder_entry::apply(std::u32string &str) const {
+  // TODO-LDML: old, outdated
   DebugLog("applyin'");
   // does it even match?
   size_t match_len = elements.match_end(str);
@@ -167,12 +212,55 @@ reorder_entry::apply(std::u32string &str) const {
 
 bool
 reorder_group::apply(std::u32string &str) const {
+  /** did we apply anything */
+  bool applied = false;
+  /** did we match anything */
+  bool some_match = false;
+
+  // get a baseline sort key
+  auto sort_keys = reorder_sort_key::from(str);
+
+  // apply ALL reorders in the group.
+  // TODO-LDML assume they match the whole string
   for (auto r = list.begin(); r < list.end(); r++) {
-    if (r->apply(str)) {
-      return true; // break at first match in this group
+    size_t submatch = r->match_end(str, 0);
+    if (submatch != 0) {
+      // update the sort key
+      r->elements.update_sort_key(0, str, sort_keys);
+      some_match = true;
     }
   }
-  return false;
+  if (!some_match) {
+    return false; // nothing matched, so no work.
+  }
+
+  size_t match_len = str.size(); // TODO-LDML: for now, assume entire match
+
+  std::u32string prefix = str;
+  prefix.resize(str.size() - match_len); // just the part before the matched part.
+  // just the suffix (the matched part)
+  std::u32string suffix = str.substr(prefix.size(), match_len);
+  // sort it! Here's where the reorder happens
+  // TODO: need to sort only between primary bases…
+  // std::sort(sort_keys.begin(), sort_keys.end());
+  for(auto e = sort_keys.end(); !applied && e > sort_keys.begin(); e--) {
+    if (e->primary == 0) {
+      // Got it.
+      std::sort(e, sort_keys.end());
+      applied = true;
+    }
+  }
+  // recombine into a str
+  std::u32string newSuffix;
+  size_t q = sort_keys.begin()->quaternary; //
+  for (auto e = sort_keys.begin(); e < sort_keys.end(); e++) {
+    DebugLog("New Order U+%X was %d but %d (q=%d/%d)", e->ch, e->secondary, e->primary, e->quaternary, q);
+    newSuffix.append(1, e->ch);
+    q++; // TODO: use this to check if reorder happened.
+  }
+  str.resize(prefix.size());
+  str.append(newSuffix);
+  return true;
 }
 
 transform_entry::transform_entry(const std::u16string &from, const std::u16string &to) : fFrom(from), fTo(to) {
