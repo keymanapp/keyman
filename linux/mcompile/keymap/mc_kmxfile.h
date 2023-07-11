@@ -23,44 +23,44 @@ typedef struct tagSTORE {
 
 						typedef struct KMX_tagSTORE {
 							KMX_DWORD dwSystemID;
-							PKMX_WCHART dpName;
-							PKMX_WCHART dpString;
+							PKMX_WCHAR dpName;
+							PKMX_WCHAR dpString;
 						} KMX_STORE, *LPKMX_STORE;
 
 
 typedef struct tagKEY {
-	KMX_WCHART Key;
-	KMX_DWORD Line;
-	KMX_DWORD ShiftFlags;
-	PKMX_WCHART dpOutput;
-	PKMX_WCHART dpContext;
+	WCHAR Key;
+	DWORD Line;
+	DWORD ShiftFlags;
+	PWSTR dpOutput;
+	PWSTR dpContext;
 } KEY, *LPKEY;
 
 					typedef struct KMX_tagKEY {
-						KMX_WCHART Key;
+						KMX_WCHAR Key;
 						KMX_DWORD Line;
 						KMX_DWORD ShiftFlags;
-						PKMX_WCHART dpOutput;
-						PKMX_WCHART dpContext;
+						PKMX_WCHAR dpOutput;
+						PKMX_WCHAR dpContext;
 					} KMX_KEY, *LPKMX_KEY;
 
 
 typedef struct tagGROUP {
-	wchar_t* dpName;
+	PWSTR dpName;
 	LPKEY dpKeyArray;		// [LPKEY] address of first item in key array
 	PWSTR dpMatch;
 	PWSTR dpNoMatch;
-	uint32_t cxKeyArray;		// in array entries  // _S2 was DWORD
+	DWORD cxKeyArray;		// in array entries
 	int  fUsingKeys;		// group(xx) [using keys] <-- specified or not
 } GROUP, *LPGROUP;
 
 					typedef struct KMX_tagGROUP {
-						KMX_WCHART* dpName;
+						KMX_WCHAR* dpName;
 						LPKMX_KEY dpKeyArray;		// [LPKEY] address of first item in key array
-						PKMX_WCHART dpMatch;
-						PKMX_WCHART dpNoMatch;
-						uint32_t cxKeyArray;		// in array entries  // _S2 was DWORD
-						int  fUsingKeys;		// group(xx) [using keys] <-- specified or not
+						PKMX_WCHAR dpMatch;
+						PKMX_WCHAR dpNoMatch;
+						KMX_DWORD cxKeyArray;		// in array entries  // _S2 was DWORD
+						int32_t  fUsingKeys;		// group(xx) [using keys] <-- specified or not
 					} KMX_GROUP, *LPKMX_GROUP;
 
 

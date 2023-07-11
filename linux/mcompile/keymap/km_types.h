@@ -29,10 +29,6 @@ typedef uint32_t   KMX_DWORD;
 typedef int32_t    KMX_BOOL;
 typedef uint8_t    KMX_BYTE;
 typedef uint16_t   KMX_WORD;
-typedef uint32_t   DWORD;
-typedef int32_t    BOOL;
-typedef uint8_t    BYTE;
-typedef uint16_t   WORD;
 
 #if defined(__cplusplus)
 typedef char16_t   km_kbp_cp;
@@ -51,8 +47,6 @@ typedef char16_t   KMX_WCHAR;           // _S2
 typedef KMX_WCHAR* PKMX_WCHAR;          // _S2
 typedef wchar_t*   PWSTR;               // _S2 needs to be removed/ wchart-> char16
 typedef PWSTR      PKMX_WCHART;         // _S2 needs to be removed/ wchart-> char16
-
-//typedef wchar_t*   LPKMX_WCHART;        // _S2 needs to be removed/ wchart-> char16
 typedef const wchar_t*  PCKMX_WCHART;   // _S2 needs to be removed/?
 
 typedef char*      LPSTR;               // _S2 needs to be removed?
@@ -61,25 +55,27 @@ typedef LPSTR      LPKMX_STR;           // _S2 needs to be removed?
 typedef uint8_t*   LPBYTE;              // _S2 needs to be removed/?
 typedef uint8_t*   LPKMX_BYTE;          // _S2 needs to be removed?
 
-
 typedef uint8_t*   PBYTE;               // _S2 needs to be removed/?
 typedef uint8_t*   PKMX_BYTE;           // _S2 needs to be removed?
-
-                                        // _S2 LPKEYBOARD ok to leave as is??
 
 typedef char       KMX_CHAR;            // _S2 needs to be removed/?
 typedef char*      PKMX_STR;            // _S2 needs to be removed/?
 
+typedef unsigned char   BYTE;           // _S2 needs to be removed?
+typedef unsigned long  DWORD;           // _S2 needs to be removed/?
+typedef unsigned short WORD;            // _S2 needs to be removed/?
+typedef wchar_t*     LPWSTR;            // _S2 needs to be removed/?
+typedef WCHAR*       PWCHAR;            // _S2 needs to be removed/?
+
 typedef KMX_CHAR*  PKMX_CHAR;           // _S2 needs to be removed/?
+
+typedef int        BOOL;                // _S2 needs to be removed/? or is it int32_t??
 
 typedef uint32_t   KMX_UINT;
 
 typedef KMX_BYTE*  PKMX_BYTE;
 typedef KMX_WORD*  PKMX_WORD;
 typedef KMX_DWORD* PKMX_DWORD;
-typedef BYTE*  PBYTE;
-typedef WORD*  PWORD;
-typedef DWORD* PDWORD;
 
 #ifndef FALSE
 #define FALSE               0

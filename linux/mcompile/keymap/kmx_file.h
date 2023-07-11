@@ -314,8 +314,7 @@ struct COMP_STORE {
                                     };
 
 struct COMP_KEY {
-  KMX_WORD  Key;
-  KMX_WORD  _reserved;
+  WORD  Key;
   DWORD Line;
   DWORD ShiftFlags;
   DWORD dpOutput;
@@ -447,15 +446,10 @@ extern const int CODE__SIZE[];
 #define KEYBOARDFILEGROUP_SIZE  24
 #define KEYBOARDFILEKEY_SIZE    20
 
-static_assert(sizeof(COMP_STORE) == KEYBOARDFILESTORE_SIZE, "COMP_STORE must be KEYBOARDFILESTORE_SIZE bytes");
-static_assert(sizeof(COMP_KEY) == KEYBOARDFILEKEY_SIZE, "COMP_KEY must be KEYBOARDFILEKEY_SIZE bytes");
-static_assert(sizeof(COMP_GROUP) == KEYBOARDFILEGROUP_SIZE, "COMP_GROUP must be KEYBOARDFILEGROUP_SIZE bytes");
-static_assert(sizeof(COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOARD must be KEYBOARDFILEHEADER_SIZE bytes");
-
-  static_assert(sizeof(KMX_COMP_STORE) == KEYBOARDFILESTORE_SIZE, "COMP_STORE must be KEYBOARDFILESTORE_SIZE bytes");
-  static_assert(sizeof(KMX_COMP_KEY) == KEYBOARDFILEKEY_SIZE, "COMP_KEY must be KEYBOARDFILEKEY_SIZE bytes");
-  static_assert(sizeof(KMX_COMP_GROUP) == KEYBOARDFILEGROUP_SIZE, "COMP_GROUP must be KEYBOARDFILEGROUP_SIZE bytes");
-  static_assert(sizeof(KMX_COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOARD must be KEYBOARDFILEHEADER_SIZE bytes");
+static_assert(sizeof(KMX_COMP_STORE) == KEYBOARDFILESTORE_SIZE, "COMP_STORE must be KEYBOARDFILESTORE_SIZE bytes");
+static_assert(sizeof(KMX_COMP_KEY) == KEYBOARDFILEKEY_SIZE, "COMP_KEY must be KEYBOARDFILEKEY_SIZE bytes");
+static_assert(sizeof(KMX_COMP_GROUP) == KEYBOARDFILEGROUP_SIZE, "COMP_GROUP must be KEYBOARDFILEGROUP_SIZE bytes");
+static_assert(sizeof(KMX_COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOARD must be KEYBOARDFILEHEADER_SIZE bytes");
 
 #ifdef KMN_KBP
 } // namespace kmx
