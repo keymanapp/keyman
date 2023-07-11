@@ -2,6 +2,9 @@ import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { Strs, StrsItem } from "../kmx-plus.js";
 import { BUILDER_SECTION } from "./builder-section.js";
 
+/** reference from build_strs_index */
+export type BUILDER_STR_REF = number;
+
 /* ------------------------------------------------------------------
  * strs section
    ------------------------------------------------------------------ */
@@ -48,7 +51,7 @@ export function build_strs(source_strs: Strs): BUILDER_STRS {
 /**
  * @returns str index, or UTF-32 char if value.char is set (single char)
  */
-export function build_strs_index(sect_strs: BUILDER_STRS, value: StrsItem) {
+export function build_strs_index(sect_strs: BUILDER_STRS, value: StrsItem) : BUILDER_STR_REF {
   if(!(value instanceof StrsItem)) {
     if (value === null) {
       throw new Error('unexpected null StrsItem, use an empty string instead');
@@ -58,12 +61,12 @@ export function build_strs_index(sect_strs: BUILDER_STRS, value: StrsItem) {
   }
 
   if(value.isOneChar) {
-    return value.char;
+    return <BUILDER_STR_REF>value.char;
   }
 
   let result = sect_strs.items.findIndex(v => v._value === value.value);
   if(result < 0) {
     throw new Error('unexpectedly missing StrsItem '+value.value);
   }
-  return result;
+  return <BUILDER_STR_REF>result;
 }
