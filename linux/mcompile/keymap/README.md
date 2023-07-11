@@ -1,8 +1,10 @@
-# Keymap
 
+This is a proposal to rewrite  mcompile for Linux.  For this we need to  query the base keyboard data from the Linux platform, then rewriting the keyboard .kmx using the same approach as is done in mcompile for Windows, but working from the data from the x11 keyboard on Linux.
+
+Ideally, we'd rewrite mcompile to be cross-platform (Windows, Linux, macOS), so that the keyboard interrogation would be separated from the .kmx rewriting, at least to some degree. Nevertheless it would probably be easiest to start from a standalone implementation. 
 Sample program that reads US basic keyboard and compares to key value group
 
-
+# Keymap
 
 TODO check if US basic is the right Keyboard to compare with
 TODO non-letter characters don't work OK yet
@@ -17,19 +19,11 @@ TODO get rid of GTK functions that are deprecated and use X11 instead
 TODO retrieve name of Other keyboard and use appropriate name instead of "Other"
 TODO change keymap.cpp->main()  to function()
 TODO use/adapt TranslateKeyboard() to work on Linux/cross-platform
-TODO use/adapt LoadKeyboard() to work on Linux/cross-platform
 TODO use/adapt SaveKeyboard() to work on Linux/cross-platform
-TODO include deadkeys
 TODO mcompile.cpp: open mcompile -u - option
-TODO replace GetLastError with SetError/AddCompileError/AddCompileWarning
-TODO u16.h u16.cpp include fron folder of kmx_u16.h
-TOTO use wchar_t* as cmd-lne-par in main ??
-TOTO changes inside VerifyKeyboard()
-TOTO changes inside FixupKeyboard()
 TODO check if I can use files from some other keyman path instead of a copy in keymap ( e.g. filesystem.h exists elsewhere)
 TODO ...
 
 //---------------------------
 TOASK is using string OK, or do we use char, wchar?
 TOASK a-z, A_Z or more keys? ...
-TOASK main/wmain? will we use wchar_t Filenames on Linux?

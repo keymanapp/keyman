@@ -151,13 +151,6 @@ wprintf(L"_S2 * Up to here cross-platform xx  :-))))) **************************
     return 3;
   }
 
- /* QUESTIONS / TODO
-  status mc_kmx-file.cpp:
-    find replacement: VerifyKeyboard_S2
-    wrong entries in : VerifyKeyboard
-  */
-
-
 std::cout << " ++ UP TO HERE IN STEP 1 +++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 
 /*  if(DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552
