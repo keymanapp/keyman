@@ -111,6 +111,12 @@ struct TypeID<T,
 }  // namespace internal
 }  // namespace emscripten
 
+int kmcmp_testSentry() {
+  int *p = nullptr;
+  *p = 0;
+  return 0;
+}
+
 EMSCRIPTEN_BINDINGS(compiler_interface) {
 
   emscripten::class_<KMCMP_COMPILER_OPTIONS>("CompilerOptions")
@@ -158,6 +164,7 @@ EMSCRIPTEN_BINDINGS(compiler_interface) {
 
   emscripten::function("kmcmp_compile", &kmcmp_wasm_compile);
   emscripten::function("kmcmp_parseUnicodeSet", &kmcmp_parseUnicodeSet);
+  emscripten::function("kmcmp_testSentry", &kmcmp_testSentry);
 }
 
 #endif

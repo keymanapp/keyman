@@ -408,6 +408,14 @@ export class KmnCompiler implements UnicodeSetParser {
     }
   }
 
+  public testSentry() {
+    if(!this.verifyInitialized()) {
+      return null;
+    }
+
+    return Module.kmcmp_testSentry();
+  }
+
   /**
    *
    * @param pattern UnicodeSet pattern such as `[a-z]`
