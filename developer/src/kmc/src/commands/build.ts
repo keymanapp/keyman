@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { Command } from 'commander';
 import { buildActivities } from './buildClasses/buildActivities.js';
 import { BuildProject } from './buildClasses/BuildProject.js';
-import { CompilerLogColor, NodeCompilerCallbacks } from '../messages/NodeCompilerCallbacks.js';
+import { NodeCompilerCallbacks } from '../messages/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/messages.js';
 import { CompilerErrorSeverity, CompilerErrorMask, CompilerFileCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
 import { BaseOptions } from '../util/baseOptions.js';
@@ -16,6 +16,7 @@ function commandOptionsToCompilerOptions(options: any): CompilerOptions {
     // CompilerBaseOptions
     outFile: options.outFile,
     logLevel: options.logLevel,
+    color: options.color,
     // CompilerOptions
     shouldAddCompilerVersion: options.compilerVersion,
     saveDebug: options.debug,
@@ -30,12 +31,14 @@ export function declareBuild(program: Command) {
     .description('Build a source file into a final file')
   )
     .option('-d, --debug', 'Include debug information in output')
-    .option('--no-compiler-version', 'Exclude compiler version metadata from output')
     .option('-w, --compiler-warnings-as-errors', 'Causes warnings to fail the build')
+    .option('--no-compiler-version', 'Exclude compiler version metadata from output')
     .option('--no-warn-deprecated-code', 'Turn off warnings for deprecated code styles')
+    .option('--color', 'Force colorization for log messages')
+    .option('--no-color', 'No colorization for log messages; if both omitted, detects from console')
     .action(async (filenames: string[], options: any) => {
       options = commandOptionsToCompilerOptions(options);
-      const callbacks = new NodeCompilerCallbacks({color:CompilerLogColor.default, ...options});
+      const callbacks = new NodeCompilerCallbacks(options);
 
       if(!filenames.length) {
         // If there are no filenames provided, then we are building the current
