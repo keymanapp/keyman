@@ -1,7 +1,8 @@
 # standards-data
 
 The subfolders of this directory contain data from various standards
-that are used in Keyman.
+that are used in Keyman. If you update any files, be sure to update
+the version data in this file also.
 
 ## Current Versions
 
@@ -19,11 +20,12 @@ that are used in Keyman.
 
 ### Ethnologue
 
-??? (I'm not sure how to update this file or where it comes from)
+This data comes from https://www.ethnologue.com/#resources, LanguageIndex.tab. It has been hand-converted from TSV to CSV, and the header line has been replaced.
+
 
 ### iso639-3
 
-The file can be update with:
+The file can be updated with:
 
 ```bash
 wget https://iso639-3.sil.org/sites/iso639-3/files/downloads/iso-639-3.tab -O iso639-3/iso639-3.tab
@@ -37,6 +39,8 @@ The file is retrieved from <https://ldml.api.sil.org/langtags.json>:
 wget https://ldml.api.sil.org/langtags.json -O langtags/langtags.json
 ```
 
+See also [langtags/readme.md](langtags/readme.md).
+
 ### language-subtag-registry
 
 The file can be updated with:
@@ -49,6 +53,8 @@ wget https://www.iana.org/assignments/language-subtag-registry/language-subtag-r
 ### ldml-keyboards
 
 This data is from <https://github.com/unicode-org/cldr.git>
+
+See also [ldml-keyboards/readme.md](ldml-keyboards/readme.md).
 
 ### unicode-character-database
 
