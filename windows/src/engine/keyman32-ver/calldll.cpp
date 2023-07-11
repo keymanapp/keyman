@@ -595,8 +595,8 @@ LoadDLLs(LPINTKEYBOARDINFO lpkbi) {
     return FALSE;
   }
 
-  char versioned_filename[260];
-  char proxy_modulename[260];
+  char versioned_filename[_MAX_PATH];
+  char proxy_modulename[_MAX_PATH];
 
   #ifdef _WIN64
     char keyman_name[] = "keyman64.dll";

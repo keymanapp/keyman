@@ -13,20 +13,19 @@ build: version.res dirs
 
 #   $(COPY) keyman64-ver.lib $(OUTLIB) - already done
 
-clean: def-clean
-		$(MKVER_U) premake.in premake.mak
+clean: def-clean premake.mak
     $(MAKE) -fpremake.mak clean
 
-signcode:
-    $(MKVER_U) premake.in premake.mak
+signcode: premake.mak
     $(MAKE) -fpremake.mak signcode
 
-wrap-symbols:
-    $(MKVER_U) premake.in premake.mak
+wrap-symbols: premake.mak
     $(MAKE) -fpremake.mak wrap-symbols
 
-install:
-    $(MKVER_U) premake.in premake.mak
+install: premake.mak
     $(MAKE) -fpremake.mak install
+    
+premake.mak:
+    $(MKVER_U) premake.in premake.mak
 
 !include ..\..\Target.mak
