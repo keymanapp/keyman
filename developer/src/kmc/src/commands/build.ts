@@ -4,7 +4,7 @@ import { buildActivities } from './buildClasses/buildActivities.js';
 import { BuildProject } from './buildClasses/BuildProject.js';
 import { NodeCompilerCallbacks } from '../messages/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/messages.js';
-import { CompilerErrorSeverity, CompilerErrorMask, CompilerFileCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerFileCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
 import { BaseOptions } from '../util/baseOptions.js';
 
 
@@ -57,7 +57,7 @@ export function declareBuild(program: Command) {
 }
 
 async function build(filename: string, parentCallbacks: NodeCompilerCallbacks, options: CompilerOptions): Promise<boolean> {
-  let callbacks = new CompilerFileCallbacks(filename, parentCallbacks);
+  let callbacks = new CompilerFileCallbacks(filename, options, parentCallbacks);
 
   try {
     callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename}));
@@ -85,11 +85,10 @@ async function build(filename: string, parentCallbacks: NodeCompilerCallbacks, o
       }
     }
 
-    const failureCodes = [CompilerErrorSeverity.Fatal, CompilerErrorSeverity.Error];
-    // TODO: #9100: .concat(options.compilerWarningsAsErrors ? [CompilerErrorSeverity.Warn] : []);
+
     let result = await builder.build(filename, callbacks, options);
-    const firstFailureMessage = parentCallbacks.messages.find(m => failureCodes.includes(m.code & CompilerErrorMask.Severity));
-    if(result && firstFailureMessage == undefined) {
+    result = result && !callbacks.hasFailureMessage();
+    if(result) {
       callbacks.reportMessage(builder instanceof BuildProject
         ? InfrastructureMessages.Info_ProjectBuiltSuccessfully({filename})
         : InfrastructureMessages.Info_FileBuiltSuccessfully({filename})

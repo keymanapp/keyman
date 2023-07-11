@@ -25,7 +25,7 @@ class ProjectBuilder {
 
   constructor(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions) {
     this.infile = path.resolve(infile);
-    this.callbacks = new CompilerFileCallbacks(infile, callbacks);
+    this.callbacks = new CompilerFileCallbacks(infile, options, callbacks);
     this.options = options;
   }
 
@@ -115,12 +115,17 @@ class ProjectBuilder {
     options.outFile = this.project.resolveOutputFilePath(file, activity.sourceExtension, activity.compiledExtension);
     const infile = this.project.resolveInputFilePath(file);
 
-    const callbacks = new CompilerFileCallbacks(infile, this.callbacks);
+    const callbacks = new CompilerFileCallbacks(infile, options, this.callbacks);
     callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename: infile}));
 
     fs.mkdirSync(path.dirname(options.outFile), {recursive:true});
 
     let result = await activity.build(infile, callbacks, options);
+
+    // check if we had a message that causes the build to be a failure
+    // note: command line option here, if set, overrides project setting
+    result = result && !callbacks.hasFailureMessage(this.options.compilerWarningsAsErrors ?? this.project.options.compilerWarningsAsErrors);
+
     if(result) {
       callbacks.reportMessage(InfrastructureMessages.Info_FileBuiltSuccessfully({filename: path.basename(infile)}));
     } else {
