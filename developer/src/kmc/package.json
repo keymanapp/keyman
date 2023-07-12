@@ -55,6 +55,7 @@
     "build/src/"
   ],
   "devDependencies": {
+    "@sentry/cli": "^2.19.4",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
     "@types/node": "^20.4.1",

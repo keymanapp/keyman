@@ -82,9 +82,26 @@ fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
+sourcemap_paths=(
+  ../kmc/build
+  ../kmc-analyze/build
+  ../kmc-kmn/build
+  ../kmc-ldml/build
+  ../kmc-model/build
+  ../kmc-model-info/build
+  ../kmc-package/build
+)
+
 if builder_start_action build; then
   copy_schemas
   npm run build
+  ./node_modules/.bin/sentry-cli sourcemaps inject \
+   --org keyman \
+   --project keyman-developer \
+   --release "$VERSION_GIT_TAG"  \
+   --dist "$VERSION_ENVIRONMENT" \
+   --ext js --ext mjs --ext ts --ext map \
+    "${sourcemap_paths[@]}"
   builder_finish_action success build
 fi
 
