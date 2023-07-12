@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { CompilerCallbacks, CompilerSchema, CompilerEvent,
+import { CompilerCallbacks, CompilerEvent,
          CompilerPathCallbacks, CompilerFileSystemCallbacks,
          compilerLogLevelToSeverity, CompilerErrorSeverity,
          CompilerError,
@@ -171,11 +171,6 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     if(this.options.logLevel == 'debug') {
       console.debug(msg);
     }
-  }
-
-  loadSchema(schema: CompilerSchema): Uint8Array {
-    let schemaPath = new URL('./' + schema + '.schema.json', import.meta.url);
-    return fs.readFileSync(schemaPath);
   }
 
   fileExists(filename: string) {

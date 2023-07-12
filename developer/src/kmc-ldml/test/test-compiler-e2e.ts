@@ -4,7 +4,6 @@ import x_hextobin from '@keymanapp/hextobin';
 import { KMXBuilder } from '@keymanapp/common-types';
 import {checkMessages, compileKeyboard, compilerTestCallbacks, compilerTestOptions, makePathToFixture} from './helpers/index.js';
 import { LdmlKeyboardCompiler } from '../src/compiler/compiler.js';
-import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 const hextobin = (x_hextobin as any).default;
 
@@ -49,15 +48,6 @@ describe('compiler-tests', function() {
   it('should handle not-valid files', () => {
     const filename = makePathToFixture('test-fr.xml'); // not a keyboard .xml file
     const k = new LdmlKeyboardCompiler(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
-    const source = k.load(filename);
-    assert.notOk(source, `Trying to load(${filename})`);
-  });
-  it('should throw on broken schema', () => {
-    const filename = makePathToFixture('basic.xml');
-    const callbacks = new TestCompilerCallbacks();
-    // simulate broken schema
-    callbacks.loadSchema = () => new Uint8Array();
-    const k = new LdmlKeyboardCompiler(callbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
     const source = k.load(filename);
     assert.notOk(source, `Trying to load(${filename})`);
   });

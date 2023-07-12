@@ -61,7 +61,7 @@ export async function loadSectionFixture(compilerClass: typeof SectionCompiler, 
   const source = reader.load(data);
   assert.isNotNull(source, `Failed to load XML from ${inputFilename}`);
 
-  if (!reader.validate(source, callbacks.loadSchema('ldml-keyboard'))) {
+  if (!reader.validate(source)) {
     return null; // mimic kmc behavior - bail if validate fails
   }
 

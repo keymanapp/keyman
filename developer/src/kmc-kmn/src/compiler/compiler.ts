@@ -364,7 +364,7 @@ export class KmnCompiler implements UnicodeSetParser {
       let kvks = null;
       try {
         kvks = reader.read(this.callbacks.loadFile(kvksFilename));
-        reader.validate(kvks, this.callbacks.loadSchema('kvks'));
+        reader.validate(kvks);
       } catch(e) {
         this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({filename, e}));
         return null;
@@ -399,9 +399,8 @@ export class KmnCompiler implements UnicodeSetParser {
     try {
       // Expected file format: displaymap.schema.json
       const data = this.callbacks.loadFile(displayMapFilename);
-      const schema = this.callbacks.loadSchema('displaymap');
       const mapping = JSON.parse(new TextDecoder().decode(data));
-      return Osk.parseMapping(mapping, schema);
+      return Osk.parseMapping(mapping);
     } catch(e) {
       this.callbacks.reportMessage(CompilerMessages.Error_InvalidDisplayMapFile({filename: displayMapFilename, e}));
       return null;
