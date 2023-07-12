@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import { Command } from 'commander';
 import { buildActivities } from './buildClasses/buildActivities.js';
 import { BuildProject } from './buildClasses/BuildProject.js';
@@ -58,16 +59,13 @@ export function declareBuild(program: Command) {
 }
 
 async function build(filename: string, parentCallbacks: NodeCompilerCallbacks, options: CompilerOptions): Promise<boolean> {
-  let callbacks = new CompilerFileCallbacks(filename, options, parentCallbacks);
+
+  if(!fs.existsSync(filename)) {
+    parentCallbacks.reportMessage(InfrastructureMessages.Error_FileDoesNotExist({filename}));
+    return false;
+  }
 
   try {
-    callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename}));
-
-    if(!fs.existsSync(filename)) {
-      callbacks.reportMessage(InfrastructureMessages.Error_FileDoesNotExist({filename}));
-      return false;
-    }
-
     let builder = null;
 
     // If infile is a directory, then we treat that as a project and build it
@@ -81,29 +79,39 @@ async function build(filename: string, parentCallbacks: NodeCompilerCallbacks, o
         return filename.toLowerCase().endsWith(build.sourceExtension);
       });
       if(!builder) {
-        callbacks.reportMessage(InfrastructureMessages.Error_FileTypeNotRecognized({filename, extensions: extensions.join(', ')}));
+        parentCallbacks.reportMessage(InfrastructureMessages.Error_FileTypeNotRecognized({filename, extensions: extensions.join(', ')}));
         return false;
       }
     }
 
+    // For builds which refer to a project folder, we'll imply a build of the
+    // .kpj, even if it doesn't actually exist, just for clarity.
+    let buildFilename = path.resolve(filename);
+    if(fs.statSync(filename).isDirectory()) {
+      buildFilename = path.join(buildFilename, path.basename(buildFilename) + KeymanFileTypes.Source.Project);
+    }
+    buildFilename = path.relative(process.cwd(), buildFilename).replace(/\\/g, '/');
+
+    const callbacks = new CompilerFileCallbacks(buildFilename, options, parentCallbacks);
+    callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename:buildFilename}));
 
     let result = await builder.build(filename, callbacks, options);
     result = result && !callbacks.hasFailureMessage();
     if(result) {
       callbacks.reportMessage(builder instanceof BuildProject
-        ? InfrastructureMessages.Info_ProjectBuiltSuccessfully({filename})
-        : InfrastructureMessages.Info_FileBuiltSuccessfully({filename})
+        ? InfrastructureMessages.Info_ProjectBuiltSuccessfully({filename:buildFilename})
+        : InfrastructureMessages.Info_FileBuiltSuccessfully({filename:buildFilename})
       );
     } else {
       callbacks.reportMessage(builder instanceof BuildProject
-        ? InfrastructureMessages.Info_ProjectNotBuiltSuccessfully({filename})
-        : InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename})
+        ? InfrastructureMessages.Info_ProjectNotBuiltSuccessfully({filename:buildFilename})
+        : InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename:buildFilename})
       );
     }
 
     return result;
   } catch(e) {
-    callbacks.reportMessage(InfrastructureMessages.Fatal_UnexpectedException({e}));
+    parentCallbacks.reportMessage(InfrastructureMessages.Fatal_UnexpectedException({e}));
     return false;
   }
 }
