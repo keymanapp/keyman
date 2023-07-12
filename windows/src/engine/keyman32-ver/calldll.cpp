@@ -30,6 +30,12 @@
 
 typedef BOOL (WINAPI *InitDllFunction)(PSTR name);
 
+#ifdef _WIN64
+  const char keyman_engine_arch[] = "keyman64.dll";
+#else
+  const char keyman_engine_arch[] = "keyman32.dll";
+#endif
+
 /* Add a dll to the list of dlls associated with the keyboard */
 // core processor implementation also uses this function
 static LPIMDLL AddIMDLL(LPINTKEYBOARDINFO lpkbi, LPSTR kbdpath, LPSTR dllfilename)
@@ -227,15 +233,11 @@ BOOL UnloadDLLs(LPINTKEYBOARDINFO lpkbi)
 
   if (lpkbi->lpCoreKeyboardState) {
           km_kbp_state_imx_deregister_callback(lpkbi->lpCoreKeyboardState);
-          // Need to Load the keyman32 or keyman64 dll proxy keyboard as the third-party dlls
-          // will use this rather than the versioned dll.
-          #ifdef _WIN64
-            HMODULE hModule = GetModuleHandle("keyman64.dll");
-          #else
-            HMODULE hModule = GetModuleHandle("keyman32.dll");
-          #endif
-          if (hModule){
-            FreeLibrary(hModule);
+          PKEYMAN64THREADDATA _td = ThreadGlobals();
+          if (!_td)
+            return FALSE;
+          if (_td->hModuleProxy){
+            FreeLibrary(_td->hModuleProxy);
           }
   }
 	return TRUE;
@@ -589,31 +591,42 @@ LoadDLLs(LPINTKEYBOARDINFO lpkbi) {
     return FALSE;
   }
 
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td){
+    return FALSE;
+  }
+
   km_kbp_keyboard_imx *imx_list = lpkbi->lpIMXList;
   // return early if the list empty avoiding loading the proxy dll into memory
   if (!imx_list->library_name) {
     return FALSE;
   }
 
-  char versioned_filename[260];
-  char proxy_modulename[260];
+  char versioned_filename[_MAX_PATH];
+  char proxy_modulename[_MAX_PATH];
+  char check_modulename[_MAX_PATH];
 
-  #ifdef _WIN64
-    char keyman_name[] = "keyman64.dll";
-  #else
-    char keyman_name[] = "keyman32.dll";
-  #endif
-
-  GetModuleFileName(g_hInstance, versioned_filename, 260);
+  GetModuleFileName(g_hInstance, versioned_filename, _MAX_PATH);
 
   char *p = strrchr(versioned_filename, '\\'); // find last occurrence of '\'
   if (p != NULL) {
       int64_t len = p - versioned_filename + 1;
       strncpy(proxy_modulename, versioned_filename, (size_t)len);
-      strncat(proxy_modulename, keyman_name, 13);
+      strncat(proxy_modulename, keyman_engine_arch, 13);
   }
+  if (_td->hModuleProxy){ // Not sure I need this check
+    GetModuleFileName(_td->hModuleProxy, check_modulename, _MAX_PATH);
+    if (!strstr(check_modulename, proxy_modulename))
+    {
+      FreeLibrary(_td->hModuleProxy);
+      _td->hModuleProxy = LoadLibrary(proxy_modulename);
+    }
+  }
+  else {
+    _td->hModuleProxy = LoadLibrary(proxy_modulename);
+  }
+  if (!_td->hModuleProxy) {
 
-  if (!LoadLibrary(proxy_modulename)) {
       SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: [%s] not loaded with error:[%d]", proxy_modulename, GetLastError());
       return FALSE;
   }
