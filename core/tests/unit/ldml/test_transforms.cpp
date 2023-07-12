@@ -174,7 +174,7 @@ test_reorder_standalone() {
     std::cout << __FILE__ << ":" << __LINE__ << " - element test " << std::endl;
     // element test
     {
-      element es(U'a', 0xF4500000 | LDML_ELEM_FLAGS_PREBASE | LDML_ELEM_FLAGS_TERTIARY_BASE); // tertiary -12, primary 80
+      element es(U'a', 0xF4500000 | LDML_ELEM_FLAGS_PREBASE | LDML_ELEM_FLAGS_TERTIARY_BASE);  // tertiary -12, primary 80
       std::cout << "es flags" << std::hex << es.get_flags() << std::dec << std::endl;
       // verify element metadata
       assert_equal(es.is_uset(), false);
@@ -200,29 +200,39 @@ test_reorder_standalone() {
       assert_equal(eu.matches(U'\u1A76'), true);
       assert_equal(eu.matches(U'\u1A75'), true);
 
-      element_list l; // '[tones]a'
+      element_list l;  // '[tones]a'
       l.emplace_back(es);
       l.emplace_back(eu);
 
       std::cout << __FILE__ << ":" << __LINE__ << " - list test " << std::endl;
-      assert_equal(l.match_end(U"asdfasdf"), 0); // no match
-      assert_equal(l.match_end(U"a"), 0);        // partial substring, fastpath because it's short
-      assert_equal(l.match_end(U"\u1A76"), 0);   // partial substring, fastpath because it's short
-      assert_equal(l.match_end(U"a\u1A76"), 2);  // Match
-      assert_equal(l.match_end(U"a\u1A75"), 2);  // Match
+      assert_equal(l.match_end(U"asdfasdf"), 0);                            // no match
+      assert_equal(l.match_end(U"a"), 0);                                   // partial substring, fastpath because it's short
+      assert_equal(l.match_end(U"\u1A76"), 0);                              // partial substring, fastpath because it's short
+      assert_equal(l.match_end(U"a\u1A76"), 2);                             // Match
+      assert_equal(l.match_end(U"a\u1A75"), 2);                             // Match
       assert_equal(l.match_end(U"SomethingSomethingSomethinga\u1A76"), 2);  // Sub-Match
 
       // generate sort keys
       std::cout << __FILE__ << ":" << __LINE__ << " - get_sort_key test " << std::endl;
-      auto keylist = l.get_sort_key(U"a\u1A7A");
+      std::u32string str = U"a\u1A78";
+      // get the baseline sortkey
+      auto keylist = reorder_sort_key::from(str);
+      std::cout << __FILE__ << ":" << __LINE__ << "  baseline sortkey" << std::endl;
+      for (auto i = keylist.begin(); i < keylist.end(); i++) {
+        i->dump();
+      }
+      // make sure it matches
+      assert_equal(l.match_end(str), 2);
+      // update the keylist with these elements.
+      l.update_sort_key(0, keylist);
+      std::cout << __FILE__ << ":" << __LINE__ << "  updated sortkey" << std::endl;
       assert_equal(keylist.size(), 2);
       size_t secondary = 0;
       for (auto i = keylist.begin(); i < keylist.end(); i++) {
-        std::cout << " U+" << std::hex << i->ch << std::dec << " (" << (int)i->primary << "," << (int)i->secondary
-          << "," << (int)i->tertiary << "," << (int)i->quaternary << ")";
-          assert_equal(i->secondary, secondary);
-          assert_equal(i->quaternary, secondary);
-          secondary++;
+        i->dump();
+        assert_equal(i->secondary, secondary);
+        assert_equal(i->quaternary, secondary);
+        secondary++;
       }
       std::cout << std::endl;
 
@@ -230,19 +240,19 @@ test_reorder_standalone() {
       assert_equal(keylist.begin()->primary, 80);
       assert_equal(keylist.begin()->tertiary, -12);
       assert_equal(keylist.begin()->ch, 0x61);
+      std::cout << __FILE__ << ":" << __LINE__ << "  sorted sortkey" << std::endl;
 
       // now sort them
       std::sort(keylist.begin(), keylist.end());
       for (auto i = keylist.begin(); i < keylist.end(); i++) {
-        std::cout << " U+" << std::hex << i->ch << std::dec << " (" << (int)i->primary << "," << (int)i->secondary
-          << "," << (int)i->tertiary << "," << (int)i->quaternary << ")";
+        i->dump();
       }
       std::cout << std::endl;
       // spot check first sort key
       assert_equal(keylist.begin()->primary, -12);
       assert_equal(keylist.begin()->tertiary, 55);
-      assert_equal(keylist.begin()->ch, 0x1A7A);
-  }
+      assert_equal(keylist.begin()->ch, 0x1A78);
+    }
 
     std::cout << __FILE__ << ":" << __LINE__ << " - key test " << std::endl;
     {
@@ -255,19 +265,19 @@ test_reorder_standalone() {
           {U'\u1A45', 10, 4, 0, 3}};
       // add it to a list
       std::deque<reorder_sort_key> keylist;
-      for (size_t i = 0; i < sizeof(keys0)/sizeof(keys0[0]); i++) {
+      for (size_t i = 0; i < sizeof(keys0) / sizeof(keys0[0]); i++) {
         keylist.emplace_back(keys0[i]);
+        // print it out
+        keys0[i].dump();
       }
       // now sort it
+      std::cout << __FILE__ << ":" << __LINE__ << "  sort" << std::endl;
       std::sort(keylist.begin(), keylist.end());
       std::u32string sorted;
-      std::cout << " sorted: ";
       for (auto i = keylist.begin(); i < keylist.end(); i++) {
-        std::cout << " U+" << std::hex << i->ch << std::dec << " (" << (int)i->primary << "," << (int)i->secondary
-          << "," << (int)i->tertiary << "," << (int)i->quaternary << ")";
+        i->dump();
         sorted.append(1, i->ch);
       }
-      std::cout << std::endl;
       // did the roast come out?
       zassert_string_equal(sorted, expect);
     }
@@ -293,8 +303,8 @@ test_reorder_standalone() {
 
       // <reorder before="\u1A6B" from="\u1A60\u1A45" order="10" />
       element_list e3;
-      e3.emplace_back(U'\u1A60', 55 << LDML_ELEM_FLAGS_ORDER_BITSHIFT);
-      e3.emplace_back(U'\u1A45', 55 << LDML_ELEM_FLAGS_ORDER_BITSHIFT);
+      e3.emplace_back(U'\u1A60', 10 << LDML_ELEM_FLAGS_ORDER_BITSHIFT);
+      e3.emplace_back(U'\u1A45', 10 << LDML_ELEM_FLAGS_ORDER_BITSHIFT);
       element_list e3before;
       e3before.emplace_back(U'\u1A6B', 0);
       rg.list.emplace_back(e3, e3before);
@@ -323,23 +333,34 @@ test_reorder_standalone() {
     // now actually test it
     std::cout << __FILE__ << ":" << __LINE__ << " - back to nod-Lana " << std::endl;
     // TODO-LDML: move this into test code perhaps
-    for (size_t r = 0; r < sizeof(roasts)/sizeof(roasts[0]); r++) {
+    for (size_t r = 0; r < sizeof(roasts) / sizeof(roasts[0]); r++) {
       std::cout << __FILE__ << ":" << __LINE__ << " - trying roast #" << r << std::endl;
       const auto &roast = roasts[r];
-      // simulate typing this one char at a time;
-      std::u32string text;
-      for (auto ch = roast.begin(); ch < roast.end(); ch++) {
-        // append the string
-        text.append(1, *ch);
-        std::cout << "-: " << text << std::endl;
+      // try all-at-once
+      {
+        std::u32string text = roast;
         if (!tr.apply(text)) {
           std::cout << " (did not apply)" << std::endl;
         }
+        zassert_string_equal(text, expect);
+        std::cout << " matched (converting all at once)!" << std::endl;
       }
-      // now the moment of truth
-      zassert_string_equal(text, expect);
-      std::cout << " matched!" << std::endl;
-      std::cout << std::endl;
+      // simulate typing this one char at a time;
+      {
+        std::u32string text;
+        for (auto ch = roast.begin(); ch < roast.end(); ch++) {
+          // append the string
+          text.append(1, *ch);
+          std::cout << "-: " << text << std::endl;
+          if (!tr.apply(text)) {
+            std::cout << " (did not apply)" << std::endl;
+          }
+        }
+        // now the moment of truth
+        zassert_string_equal(text, expect);
+        std::cout << " matched! (converting char at a time)" << std::endl;
+        std::cout << std::endl;
+      }
     }
   }
   return EXIT_SUCCESS;
