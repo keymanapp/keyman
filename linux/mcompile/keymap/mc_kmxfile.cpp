@@ -33,6 +33,7 @@ PKMX_WCHAR KMX_StringOffset(PKMX_BYTE base, KMX_DWORD offset) {
 */
 LPKMX_KEYBOARD KMX_CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 {
+  MyCoutW(L"  #### KMX_CopyKeyboard of mc_kmxfile started", 1);
   PKMX_COMP_KEYBOARD ckbp = (PKMX_COMP_KEYBOARD) base;
 
   /* Copy keyboard structure */
@@ -106,6 +107,7 @@ LPKMX_KEYBOARD KMX_CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
     }
   }
 
+  MyCoutW(L"  #### KMX_CopyKeyboard of mc_kmxfile ended", 1);
   return kbp;
 }
 
@@ -214,7 +216,6 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
     buf = new KMX_BYTE[sz];
   #endif                        // _S2 opened for copyKeyboard-Version
 
-    MyCoutW(L"#### Line 435 ", 1);
   if (!buf) {
     fclose(fp);
     KMX_LogError(L"LogErr1: Not allocmem\n" );
@@ -247,8 +248,6 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   }
   // _S2 opened for copyKeyboard-Version ^
 
-  MyCoutW(L"##### Line 458", 1);
-
   if (!KMX_VerifyKeyboard(filebase, sz)) {
     KMX_LogError(L"LogError1: errVerifyKeyboard\n" );
     // _S2 delete [] buf; ????
@@ -258,9 +257,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 #ifdef KMX_64BIT                                          // _S2 opened for copyKeyboard-Version
   kbp = KMX_CopyKeyboard(buf, filebase);                  // _S2 opened for copyKeyboard-Version
 #else                                                     // _S2 opened for copyKeyboard-Version
-  MyCoutW(L"##### Line 469", 1);
   kbp = KMX_FixupKeyboard(buf, filebase, sz);       // _S2 changed from sz->sz_dw
-  MyCoutW(L"##### Line 471", 1);
 #endif                                                    // _S2 opened for copyKeyboard-Version
 
 
@@ -272,8 +269,6 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
     return FALSE;
   }
 
-  MyCoutW(L"##### Line 468 ", 1);
-
   std::wcout << "kbp->dwIdentifier: " << kbp->dwIdentifier << " FILEID_COMPILED: " << FILEID_COMPILED << "\n";
 
   if (kbp->dwIdentifier != FILEID_COMPILED) {
@@ -281,7 +276,6 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
     KMX_LogError(L"LogError1: errNotFileID\n" );
     return FALSE;
   }
-  MyCoutW(L"##### Line 477", 1);
   *lpKeyboard = kbp;
   // _S2 delete [] buf; ????
   MyCoutW(L"##### LoadKeyboard of mcompile ended #####", 1);
@@ -289,6 +283,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 }
 
 KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz){
+  MyCoutW(L"  #### KMX_VerifyKeyboard of mc_kmxfile started", 1);
   KMX_DWORD i;
   PKMX_COMP_KEYBOARD ckbp = (PKMX_COMP_KEYBOARD)filebase;
   PKMX_COMP_STORE csp;
