@@ -140,6 +140,10 @@ public:
    * @returns the key parameter
   */
   std::deque<reorder_sort_key> &update_sort_key(size_t offset, std::deque<reorder_sort_key> &key) const;
+
+  /** construct from KMX+ elem id*/
+  bool
+  load(const kmx::kmx_plus& kplus, kmx::KMXPLUS_ELEM id);
 };
 
 class reorder_entry {

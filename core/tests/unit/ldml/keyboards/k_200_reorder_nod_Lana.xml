@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Test Keyboard from Spec
+  see https://keyman.com/keyboards/sil_boonkit
+-->
+
+<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
+<keyboard locale="nod" conformsTo="techpreview">
+  <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
+  <names>
+    <name value="nod-Lana Test" />
+  </names>
+
+  <keys>
+    <key id="kha" to="\u{1A21}" />
+    <key id="sakot" to="\u{1A60}" />
+    <key id="wa" to="\u{1A45}" />
+    <key id="o" to="\u{1A6B}" />
+    <key id="t2" to="\u{1A76}" />
+  </keys>
+
+  <layers form="us">
+    <layer modifier="none" id="base">
+      <row keys="gap" />
+      <row keys="gap wa gap gap t2 gap gap gap o gap" />
+      <row keys="gap sakot gap gap gap gap gap kha gap" />
+      <row keys="gap gap gap gap gap gap gap" />
+      <row keys="space" />
+    </layer>
+  </layers>
+
+
+  <transforms type="simple">
+    <transformGroup>
+      <!-- from the spec: nod-Lana for ᩅᩫ᩶  -->
+      <reorder from="\u1A60" order="127" />
+      <reorder from="\u1A6B" order="42" />
+      <reorder from="[\u1A75-\u1A79]" order="55" />
+      <reorder before="\u1A6B" from="\u1A60\u1A45" order="10" />
+      <reorder before="\u1A6B[\u1A75-\u1A79]" from="\u1A60\u1A45" order="10" />
+      <reorder before="\u1A6B" from="\u1A60[\u1A75-\u1A79]\u1A45" order="10 55 10" />
+    </transformGroup>
+  </transforms>
+</keyboard>
