@@ -33,7 +33,9 @@ export interface InputModel<ItemType> {  // Only generic b/c TouchpointModel<Ite
   // If an array, but more paths exist than have an entry, the last will be used as default.
   readonly initialItemSource: ('initial' | 'current')[] | 'initial' | 'current';
 
-  readonly pathInheritance?: 'none' | 'reset' | 'full';
+  // 'reject':  multitaps must not have a lingering prior path.  If a simple touch was triggered due to a second touchpoint,
+  // 'reject' will fail the multitouch because the second touchpoint's existence will continue and attempt inheritance
+  readonly pathInheritance?: 'none' | 'reset' | 'full' | 'reject';
 
   readonly onResolution: {
     // At least one must be set.
