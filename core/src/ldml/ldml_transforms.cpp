@@ -546,8 +546,8 @@ transforms::load(
         element_list elements;
         element_list before;
 
-        assert(elements.load(kplus, reorder->elements));
-        assert(before.load(kplus, reorder->before));
+        bool load_ok = elements.load(kplus, reorder->elements) && before.load(kplus, reorder->before);
+        assert(load_ok);
 
         newGroup.list.emplace_back(elements, before);
       }
