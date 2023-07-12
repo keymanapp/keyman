@@ -141,7 +141,7 @@
         <File Id="keyman64.dll" Name="keyman64.dll" KeyPath="yes" Source="..\..\..\bin\engine\keyman64.dll" />
       </Component>
 
-      <Component Guid="*">
+      <Component Guid="*" SharedDllRefCount="yes">
         <File Id="keyman64_ver.dll" Name="keyman64-ver$(var.VERSION_WITH_TAG).dll" KeyPath="yes" Source="..\..\..\bin\engine\keyman64-ver$(var.VERSION_WITH_TAG).dll" />
       </Component>
 
