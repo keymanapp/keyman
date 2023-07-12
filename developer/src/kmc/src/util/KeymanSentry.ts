@@ -1,5 +1,5 @@
 import { KmnCompiler } from "@keymanapp/kmc-kmn";
-import { NodeCompilerCallbacks } from "../messages/NodeCompilerCallbacks.js";
+import { NodeCompilerCallbacks } from "./NodeCompilerCallbacks.js";
 import Sentry from "@sentry/node";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { spawnChild } from "./spawnAwait.js";

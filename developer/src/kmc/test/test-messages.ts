@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { InfrastructureMessages } from '../src/messages/messages.js';
 import { verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
-import { NodeCompilerCallbacks } from '../src/messages/NodeCompilerCallbacks.js';
+import { NodeCompilerCallbacks } from './util/NodeCompilerCallbacks.js';
 import { CompilerErrorNamespace } from '@keymanapp/common-types';
 
 describe('InfrastructureMessages', function () {

@@ -56,13 +56,20 @@ fi
 
 function copy_schemas() {
   # We need the schema file at runtime and bundled, so always copy it for all actions except `clean`
+  local schemas=(
+    "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json"
+    "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboardtest.schema.json"
+    "$KEYMAN_ROOT/common/schemas/kvks/kvks.schema.json"
+    "$KEYMAN_ROOT/common/schemas/kpj/kpj.schema.json"
+    "$KEYMAN_ROOT/common/schemas/kpj-9.0/kpj-9.0.schema.json"
+    "$KEYMAN_ROOT/common/schemas/displaymap/displaymap.schema.json"
+  )
+
   mkdir -p "$THIS_SCRIPT_PATH/build/src/util/"
-  cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json" "$THIS_SCRIPT_PATH/build/src/util/"
-  cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboardtest.schema.json" "$THIS_SCRIPT_PATH/build/src/util/"
-  cp "$KEYMAN_ROOT/common/schemas/kvks/kvks.schema.json" "$THIS_SCRIPT_PATH/build/src/util/"
-  cp "$KEYMAN_ROOT/common/schemas/kpj/kpj.schema.json" "$THIS_SCRIPT_PATH/build/src/util/"
-  cp "$KEYMAN_ROOT/common/schemas/kpj-9.0/kpj-9.0.schema.json" "$THIS_SCRIPT_PATH/build/src/util/"
-  cp "$KEYMAN_ROOT/common/schemas/displaymap/displaymap.schema.json" "$THIS_SCRIPT_PATH/build/src/util/"
+  cp "${schemas[@]}" "$THIS_SCRIPT_PATH/build/src/util/"
+
+  mkdir -p "$THIS_SCRIPT_PATH/build/dist/"
+  cp "${schemas[@]}" "$THIS_SCRIPT_PATH/build/dist/"
 }
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -94,16 +101,21 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action bundle; then
-  copy_schemas
 
   if ! builder_has_option --build-path; then
     builder_finish_action "Parameter --build-path is required" bundle
     exit 64
   fi
 
-  mkdir -p build/cjs-src
-  npm run bundle
-  cp build/cjs-src/* "$BUILD_PATH"
+  rm -rf build/dist
+  mkdir -p build/dist
+  node build-bundler.js
+
+  # Manually copy over kmcmplib module and schemas
+  copy_schemas
+  cp ../kmc-kmn/build/src/import/kmcmplib/wasm-host.wasm build/dist/
+
+  cp build/dist/* "$BUILD_PATH"
 
   builder_finish_action success bundle
 fi

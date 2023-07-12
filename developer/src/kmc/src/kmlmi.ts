@@ -9,7 +9,7 @@ import { KmpCompiler, PackageValidation } from '@keymanapp/kmc-package';
 import { ModelInfoOptions, writeMergedModelMetadataFile } from '@keymanapp/kmc-model-info';
 import { SysExits } from './util/sysexits.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
-import { NodeCompilerCallbacks } from './messages/NodeCompilerCallbacks.js';
+import { NodeCompilerCallbacks } from './util/NodeCompilerCallbacks.js';
 
 let inputFilename: string;
 const program = new Command();
