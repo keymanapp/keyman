@@ -215,3 +215,9 @@ windows/src/engine/keyman64/premake.mak
 windows/src/engine/keyman64-ver/premake.mak
 windows/src/engine/keyman64-ver/TODO.TXT
 windows/src/global/inc/keymanversion_build.h
+common/windows/cpp/include/keymanversion_build.h
+windows/src/engine/keyman32-ver/keyman-debug-etw.h
+windows/src/engine/keyman64-ver/Keyman64-ver.res
+windows/src/engine/keyman64-ver/premake_version.mak
+windows/src/engine/keyman64/keyman-debug-etw.h
+windows/src/engine/keyman64/keyman-debug-etw.res
