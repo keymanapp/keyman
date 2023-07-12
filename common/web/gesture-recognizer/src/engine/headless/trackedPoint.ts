@@ -27,16 +27,34 @@ export class TrackedPoint<HoveredItemType> {
    */
   public readonly rawIdentifier: number;
 
-  private _path: TrackedPath<HoveredItemType>;
+  // A full, uninterrupted recording of all samples observed during the lifetime of the touchpoint.
+  private _fullPath: TrackedPath<HoveredItemType>;
+
+  // The portion of the touchpoint's lifetime currently under consideration for gestures.
+  private _activePath: TrackedPath<HoveredItemType>
+
+  // TODO:  consider preserving 'effective segmentation' caused by path-resetting during transition between gestures
+  // when in debug/dev mode.  It's not the same as the old subsegmentation, but it may still be useful data for
+  // debugging and/or automated-test development.
 
   private static _jsonIdSeed: -1;
 
   /**
    * Tracks the coordinates and timestamps of each update for the lifetime of this `TrackedPoint`.
    */
-  public get path(): TrackedPath<HoveredItemType> {
-    return this._path;
+  public get fullPath(): TrackedPath<HoveredItemType> {
+    return this._fullPath;
   }
+
+  /**
+   * Tracks the coordinates and timestamps of each update under consideration for this `TrackedPoint`.
+   * Does not include any components preceding the most recent `resetPath()` call.
+   */
+  public get path(): TrackedPath<HoveredItemType> {
+    return this._activePath;
+  }
+
+  private itemSource: InputSample<HoveredItemType>;
 
   /**
    * Constructs a new TrackedPoint instance for tracking updates to an active input point over time.
@@ -47,7 +65,8 @@ export class TrackedPoint<HoveredItemType> {
   constructor(identifier: number, isFromTouch: boolean) {
     this.rawIdentifier = identifier;
     this.isFromTouch = isFromTouch;
-    this._path = new TrackedPath();
+    this._fullPath = new TrackedPath();
+    this._activePath = this._fullPath;
   }
 
   /**
@@ -61,12 +80,17 @@ export class TrackedPoint<HoveredItemType> {
     const path = TrackedPath.deserialize(jsonObj.path);
 
     const instance = new TrackedPoint(id, isFromTouch);
-    instance._path = path;
+    instance._fullPath = path;
     return instance;
   }
 
   public update(sample: InputSample<HoveredItemType>) {
-    this.path.extend(sample);
+    this._fullPath.extend(sample);
+    if(this._activePath != this._fullPath) {
+      this._activePath.extend(sample);
+    }
+
+    this.itemSource ||= sample;
   }
 
   /**
@@ -74,7 +98,7 @@ export class TrackedPoint<HoveredItemType> {
    * the target of the first `Event` that corresponded to this `TrackedPoint`.
    */
   public get initialHoveredItem(): HoveredItemType {
-    return this.path.coords[0].item;
+    return this.itemSource?.item;
   }
 
   /**
@@ -83,6 +107,18 @@ export class TrackedPoint<HoveredItemType> {
    */
   public get currentHoveredItem(): HoveredItemType {
     return this.path.coords[this.path.coords.length-1].item;
+  }
+
+  public resetPath(preserveInitial: boolean) {
+    const lastSample = this._fullPath.latestInput;
+    this._activePath = new TrackedPath<HoveredItemType>();
+    if(lastSample) {
+      this._activePath.extend(lastSample);
+    }
+
+    if(!preserveInitial) {
+      this.itemSource = lastSample;
+    }
   }
 
   /**

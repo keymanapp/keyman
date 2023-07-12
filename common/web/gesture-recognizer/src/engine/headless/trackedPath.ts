@@ -157,4 +157,12 @@ export class TrackedPath<Type> extends EventEmitter<EventMap<Type>> {
 
     return jsonClone;
   }
+
+  public get firstInput(): InputSample<Type> {
+    return this.coords[0];
+  }
+
+  public get latestInput(): InputSample<Type> {
+    return this.coords[this.coords.length-1];
+  }
 }

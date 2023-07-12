@@ -23,7 +23,8 @@ interface EventMap<HoveredItemType> {
 export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMap<HoveredItemType>> {
   private inputEngines: InputEngineBase<HoveredItemType>[];
 
-  private _activeInputs: {[id: string]: TrackedInput<HoveredItemType>} = {};
+  private _activeTouchpointMap: {[id: string]: TrackedInput<HoveredItemType>} = {};
+  private _activeInputs: TrackedInput<HoveredItemType>[] = [];
 
   public constructor() {
     super();
@@ -36,10 +37,61 @@ export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMa
   }
 
   private readonly onNewTrackedPath = (touchpoint: TrackedPoint<HoveredItemType>) => {
-    const newInput = new TrackedInput<HoveredItemType>(touchpoint);
-    this._activeInputs[touchpoint.identifier] = newInput;
+    // Step 1:  do we have any other active inputs?  If so, how many?  Might this touchpoint fit well with one
+    // of them?  What gestures might the touchpoint get folded into?
 
+    // TODO:  something to define 'priority'
+    // Probably don't need a priority queue here; there shouldn't be that many entries at once, at least in general use.
+    let potentialGestureSets = this._activeInputs.map((input) => {
+      return input.potentialGestures.map((gesture) => {
+        return {
+          input: input,
+          gesture: gesture
+        };
+      });
+    });
+    let potentialGestures = potentialGestureSets.reduce((flattenedArray, set) => {
+      return flattenedArray.concat(set)
+    }, []);
+    potentialGestures.sort((a, b) => a.gesture.priority - b.gesture.priority);
+    for(let potentialGesture of potentialGestures) {
+      // Possibilities:
+      // 1.  A gesture says 'wait, there's another touchpath?  I should abort!'
+      // 2.  A gesture says 'hey, I was waiting on that - gimme!
+      // 3.  No existing gestures, so this loop is bypassed.
+      // 4.  Existing gestures, but none of them care.
+    }
+
+    // Step ???: if the touchpoint does not belong with any other gestures, give it its own TrackedInput.
+    const newInput = this.wrapPointWithInput(touchpoint);
     this.emit('inputstart', newInput);
-    return false;
+  }
+
+  private onPointUpdate(touchpoint: TrackedPoint<HoveredItemType>) {
+    // stuff.
+  }
+
+  private wrapPointWithInput(touchpoint: TrackedPoint<HoveredItemType>): TrackedInput<HoveredItemType> {
+    const newInput = new TrackedInput<HoveredItemType>(touchpoint);
+    this._activeTouchpointMap[touchpoint.identifier] = newInput;
+
+    // It will be possible for this._activeInputs[touchpoint.identifier] to change
+    // during certain gestures, so use that rather than `newInput`.
+    touchpoint.path.on('step', () => this.onPointUpdate(touchpoint));
+    touchpoint.path.on('invalidated', () => {
+      // TODO: on cancellation, is there any other cleanup to be done?
+
+      // Also mark the touchpoint as no longer active.
+      delete this._activeTouchpointMap[touchpoint.identifier];
+    });
+    touchpoint.path.on('complete', () => {
+      // TODO: on cancellation, is there any other cleanup to be done?
+
+      // Also mark the touchpoint as no longer active.
+      delete this._activeTouchpointMap[touchpoint.identifier];
+    });
+
+    this._activeInputs.push(newInput);
+    return newInput;
   }
 }

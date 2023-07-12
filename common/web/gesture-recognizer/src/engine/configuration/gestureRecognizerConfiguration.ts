@@ -2,7 +2,7 @@
 // it's just that the ELEMENTS and zone definitions involved shouldn't be shifting
 // after configuration.
 
-import { InputSample } from "../headless/inputSample.js";
+import { BaseItemIdentifier, GestureItemIdentifier } from "./itemIdentifier.js";
 import { RecognitionZoneSource } from "./recognitionZoneSource.js";
 
 // For example, customization of a longpress timer's length need not be readonly.
@@ -80,5 +80,16 @@ export interface GestureRecognizerConfiguration<HoveredItemType> {
    * @param target  The `EventTarget` (`Node` or `Element`) provided by the corresponding input event.
    * @returns
    */
-  readonly itemIdentifier?: (coord: Omit<InputSample<any>, 'item'>, target: EventTarget) => HoveredItemType;
+  readonly itemIdentifier?: BaseItemIdentifier<HoveredItemType>;
+
+  /**
+   * Allows defining specific item identifiers for specific gesture types.
+   *
+   * For example, keyboard flicks lock in a base key as well, specifying a subkey based on the properties
+   * of the gesture's motion.  All this is before they can lock-in.
+   *
+   * Keyboard longpresses, however, can 'lock-in', and they typically present a subkey menu that's best
+   * handled by an alternate configuration instead.  They're a better fit for that model.
+   */
+  readonly gestureItemIdentifiers?: Record<string, GestureItemIdentifier<HoveredItemType>>;
 }

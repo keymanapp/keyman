@@ -1,5 +1,6 @@
 import EventEmitter from "eventemitter3";
 import { JSONTrackedPoint, TrackedPoint } from "./trackedPoint.js";
+import * as Gestures from "./gestures/index.js";
 
 /**
  * Documents the expected typing of serialized versions of the `TrackedInput` class.
@@ -31,9 +32,7 @@ interface EventMap {
 export class TrackedInput<HoveredItemType> extends EventEmitter<EventMap> {
   public readonly touchpoints: TrackedPoint<HoveredItemType>[];
 
-  // --- Future design aspects ---
-  // private _gesture: Gesture;
-  // public get gesture() { return this._gesture };
+  private _potentialGestures: Gestures.InputModel<HoveredItemType>[];
 
   private isActive = true;
 
@@ -72,6 +71,10 @@ export class TrackedInput<HoveredItemType> extends EventEmitter<EventMap> {
         point.path.terminate(false);
       }
     }
+  }
+
+  get potentialGestures(): Gestures.InputModel<HoveredItemType>[] {
+    return [].concat(this._potentialGestures);
   }
 
   /**
