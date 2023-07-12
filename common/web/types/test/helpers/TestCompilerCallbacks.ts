@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { loadFile, loadSchema, resolveFilename } from '../helpers/index.js';
-import { CompilerCallbacks, CompilerError, CompilerEvent, CompilerFileSystemCallbacks, CompilerPathCallbacks, CompilerSchema } from '../../src/util/compiler-interfaces.js';
+import { loadFile, resolveFilename } from '../helpers/index.js';
+import { CompilerCallbacks, CompilerError, CompilerEvent, CompilerFileSystemCallbacks, CompilerPathCallbacks } from '../../src/util/compiler-interfaces.js';
 
 // This is related to developer/src/common/web/test-helpers/index.ts but has a slightly different API surface
 // as this runs at a lower level than the compiler.
@@ -9,20 +9,6 @@ import { CompilerCallbacks, CompilerError, CompilerEvent, CompilerFileSystemCall
  * A CompilerCallbacks implementation for testing
  */
 export class TestCompilerCallbacks implements CompilerCallbacks {
-  loadSchema(schema: CompilerSchema): Buffer {
-    switch (schema) {
-      case 'kpj':
-      case 'kpj-9.0':
-      case 'kvks':
-      case 'displaymap':
-        // listing all unimplemented schemas rather than using 'default'
-        throw new Error(`loadSchema(${schema}) not implemented.`); // not needed for this test
-      case 'ldml-keyboard':
-        return loadSchema(schema);
-      case 'ldml-keyboardtest':
-        return loadSchema(schema);
-    }
-  }
   clear() {
     this.messages = [];
   }

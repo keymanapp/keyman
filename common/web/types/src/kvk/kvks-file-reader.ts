@@ -6,6 +6,8 @@ import { boxXmlArray } from '../util/util.js';
 import { DEFAULT_KVK_FONT, VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKey, VisualKeyboardKeyFlags, VisualKeyboardLegalShiftStates, VisualKeyboardShiftState } from './visual-keyboard.js';
 import { USVirtualKeyCodes } from '../consts/virtual-key-constants.js';
 import { BUILDER_KVK_HEADER_VERSION, KVK_HEADER_IDENTIFIER_BYTES } from './kvk-file.js';
+import Schemas from '../schemas.js';
+
 
 export default class KVKSFileReader {
   public read(file: Uint8Array): KVKSourceFile {
@@ -82,10 +84,9 @@ export default class KVKSFileReader {
     }
   }
 
-  public validate(source: KVKSourceFile, schemaBuffer: Uint8Array): void {
-    const schema = JSON.parse(new TextDecoder().decode(schemaBuffer));
+  public validate(source: KVKSourceFile): void {
     const ajv = new Ajv();
-    if(!ajv.validate(schema, source)) {
+    if(!ajv.validate(Schemas.kvks, source)) {
       throw new Error(ajv.errorsText());
     }
   }

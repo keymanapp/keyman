@@ -1,7 +1,6 @@
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
-import { CompilerSchema } from "../../src/util/compiler-interfaces.js";
 
 /**
  * Builds a path to the fixture with the given path components.
@@ -21,10 +20,6 @@ export function loadKeymanTouchLayoutCleanJsonSchema(): Buffer {
 
 export function loadFile(filename: string | URL): Buffer {
   return fs.readFileSync(filename);
-}
-
-export function loadSchema(schema: CompilerSchema): Buffer {
-  return fs.readFileSync(new URL(path.join('..', '..', 'src', schema + '.schema.json'), import.meta.url));
 }
 
 export function resolveFilename(baseFilename: string, filename: string) {

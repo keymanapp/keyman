@@ -4,7 +4,7 @@ import {assert} from 'chai';
 import Hexy from 'hexy';
 import gitDiff from 'git-diff';
 const { hexy } = Hexy;
-import { loadSchema, makePathToFixture } from '../helpers/index.js';
+import { makePathToFixture } from '../helpers/index.js';
 import KvksFileReader from "../../src/kvk/kvks-file-reader.js";
 import KvkFileReader from "../../src/kvk/kvk-file-reader.js";
 import KvkFileWriter from "../../src/kvk/kvk-file-writer.js";
@@ -51,7 +51,7 @@ describe('kvks-file-reader', function () {
     const reader = new KvksFileReader();
     const kvks = reader.read(input);
     assert.doesNotThrow(() => {
-      reader.validate(kvks, loadSchema('kvks'));
+      reader.validate(kvks);
     });
     const invalidVkeys: string[] = [];
     const vk = reader.transform(kvks, invalidVkeys);
@@ -74,7 +74,7 @@ describe('kvks-file-reader', function () {
       // Now, re-read kvk from the kvks
       const kvks = kvksReader.read(Buffer.from(kvksOut));
       assert.doesNotThrow(() => {
-        kvksReader.validate(kvks, loadSchema('kvks'));
+        kvksReader.validate(kvks);
       });
       const invalidVkeys: string[] = [];
       const vk2 = kvksReader.transform(kvks, invalidVkeys);

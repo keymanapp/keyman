@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import 'mocha';
-import { loadSchema, makePathToFixture } from '../helpers/index.js';
+import { makePathToFixture } from '../helpers/index.js';
 import KvksFileReader from "../../src/kvk/kvks-file-reader.js";
 import KvksFileWriter from "../../src/kvk/kvks-file-writer.js";
 import { verify_khmer_angkor, verify_balochi_inpage } from './test-kvk-utils.js';
@@ -14,7 +14,7 @@ describe('kvks-file-reader', function() {
     const reader = new KvksFileReader();
     const kvks = reader.read(input);
     assert.doesNotThrow(() => {
-      reader.validate(kvks, loadSchema('kvks'));
+      reader.validate(kvks);
     });
     const invalidVkeys: string[] = [];
     const vk = reader.transform(kvks, invalidVkeys);
