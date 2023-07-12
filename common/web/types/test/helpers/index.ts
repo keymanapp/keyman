@@ -13,11 +13,6 @@ export function makePathToFixture(...components: string[]): string {
   return fileURLToPath(new URL(path.join('..', '..', '..', 'test', 'fixtures', ...components), import.meta.url));
 }
 
-export function loadKeymanTouchLayoutCleanJsonSchema(): Buffer {
-  // TODO: this has the Wrong Name Pattern!
-  return fs.readFileSync(new URL(path.join('..', '..', 'src', 'keyman-touch-layout.clean.spec.json'), import.meta.url));
-}
-
 export function loadFile(filename: string | URL): Buffer {
   return fs.readFileSync(filename);
 }

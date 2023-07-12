@@ -11,8 +11,10 @@ import ldmlKeyboard from './schemas/ldml-keyboard.schema.json' assert { type: 'j
 import ldmlKeyboardTest from './schemas/ldml-keyboardtest.schema.json' assert { type: 'json' };
 // @ts-expect-error(2821) import assertions
 import displayMap from './schemas/displaymap.schema.json' assert { type: 'json' };
-
-// 'keyman-touch-layout.clean'; TODO this has the wrong name pattern, .spec.json instead of .schema.json
+// @ts-expect-error(2821) import assertions
+import touchLayoutClean from './schemas/keyman-touch-layout.clean.spec.json' assert { type: 'json' };
+// @ts-expect-error(2821) import assertions
+import touchLayout from './schemas/keyman-touch-layout.spec.json' assert { type: 'json' };
 
 const Schemas = {
   kpj,
@@ -21,6 +23,8 @@ const Schemas = {
   ldmlKeyboard,
   ldmlKeyboardTest,
   displayMap,
+  touchLayoutClean,
+  touchLayout,
 };
 
 export default Schemas;

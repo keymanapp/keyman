@@ -1,17 +1,16 @@
 import * as fs from 'fs';
 import 'mocha';
 import { assert } from 'chai';
-import { loadKeymanTouchLayoutCleanJsonSchema, makePathToFixture } from '../helpers/index.js';
+import { makePathToFixture } from '../helpers/index.js';
 import { TouchLayoutFileReader } from "../../src/keyman-touch-layout/keyman-touch-layout-file-reader.js";
 
 describe('TouchLayoutFileReader', function () {
   it('should read a valid file', function() {
     const path = makePathToFixture('keyman-touch-layout', 'khmer_angkor.keyman-touch-layout');
-    const schema = loadKeymanTouchLayoutCleanJsonSchema();
     const input = fs.readFileSync(path);
     const reader = new TouchLayoutFileReader();
     const layout = reader.read(input);
-    reader.validate(layout, schema);
+    reader.validate(layout);
 
     // We don't really need to validate the JSON parser. We'll do a handful of
     // tests for object integrity and a couple of object members inside the file
@@ -36,11 +35,10 @@ describe('TouchLayoutFileReader', function () {
 
   it('should fixup numeric types in a valid legacy file', function() {
     const path = makePathToFixture('keyman-touch-layout', 'legacy.keyman-touch-layout');
-    const schema = loadKeymanTouchLayoutCleanJsonSchema();
     const input = fs.readFileSync(path);
     const reader = new TouchLayoutFileReader();
     const layout = reader.read(input);
-    reader.validate(layout, schema);
+    reader.validate(layout);
 
     // row.id can be a string in legacy files
     assert.strictEqual(layout.tablet.layer[0].row[0].id, 1);
@@ -58,11 +56,10 @@ describe('TouchLayoutFileReader', function () {
 
   it('should fixup remove empty arrays in a valid legacy file', function() {
     const path = makePathToFixture('keyman-touch-layout', 'legacy.keyman-touch-layout');
-    const schema = loadKeymanTouchLayoutCleanJsonSchema();
     const input = fs.readFileSync(path);
     const reader = new TouchLayoutFileReader();
     const layout = reader.read(input);
-    reader.validate(layout, schema);
+    reader.validate(layout);
 
     // sk was defined as [] in legacy.keyman-touch-layout but we want to treat
     // it as not present
