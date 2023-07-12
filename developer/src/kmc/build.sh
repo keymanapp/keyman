@@ -92,7 +92,9 @@ fi
 
 if builder_start_action test; then
   copy_schemas
-  npm test
+  eslint .
+  tsc --build test/
+  mocha
   # TODO: enable c8 (disabled because no coverage at present)
   #     && c8 --reporter=lcov --reporter=text mocha
   builder_finish_action success test
