@@ -18,7 +18,7 @@ export interface PushResult {
 export interface ComplexResolveResult {
   type: 'resolve';
   cancelBaseAwait?: boolean; // default false, but if true, will auto-cancel the top-level model's await (if it exists)
-  set?: 'initial' | 'set' | 'current'
+  set?: 'initial' | 'current'
 }
 
 type WrappedString<Text> = { type: Text };
@@ -38,7 +38,7 @@ type SimpleStringResult = 'resolve' | 'reject' | 'pop';
 export type PointModelResolution =  SimpleStringResult | AwaitResult | PushResult |
                                     ComplexResolveResult | WrappedString<SimpleStringResult>;
 
-export interface TouchpointModel<Type> {
+export interface PointModel<Type> {
   pathModel: PathModel<Type>, // Might be able to fully drop the generic.
   onPathResolve: PointModelResolution,
   itemPriority: number; // If multiple touchpoints are active, determines which point's item 'wins' for

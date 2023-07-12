@@ -1,4 +1,4 @@
-import { TouchpointModel } from './pointModel.js';
+import { PointModel } from './pointModel.js';
 
 // Leave this as an interface; it's easier for external stuff to specify that way.
 export interface InputModel<ItemType> {  // Only generic b/c TouchpointModel<ItemType>.
@@ -14,7 +14,7 @@ export interface InputModel<ItemType> {  // Only generic b/c TouchpointModel<Ite
 
   // One or more "touchpath models" - how a touchpath matching this gesture would look, based on its
   // ordinal position.  (Same order as in the TrackedInput)
-  readonly touchpathModels: TouchpointModel<ItemType>[]; // May be able to drop the generic bit!
+  readonly touchpathModels: PointModel<ItemType>[]; // May be able to drop the generic bit!
 
   // if this is defined, the gesture can't resolve while the spec'd Promise is active.
   // Even if `expectedResult` is negative.
