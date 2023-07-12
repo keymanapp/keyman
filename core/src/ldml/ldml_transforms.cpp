@@ -18,12 +18,12 @@ namespace km {
 namespace kbp {
 namespace ldml {
 
-element::element(const USet &u, KMX_DWORD flags)
-    : chr(), uset(u), flags((flags & ~LDML_ELEM_FLAGS_TYPE) | LDML_ELEM_FLAGS_TYPE_USET) {
+element::element(const USet &new_u, KMX_DWORD new_flags)
+    : chr(), uset(new_u), flags((new_flags & ~LDML_ELEM_FLAGS_TYPE) | LDML_ELEM_FLAGS_TYPE_USET) {
 }
 
-element::element(km_kbp_usv ch, KMX_DWORD flags)
-    : chr(ch), uset(), flags((flags & ~LDML_ELEM_FLAGS_TYPE) | LDML_ELEM_FLAGS_TYPE_CHAR) {
+element::element(km_kbp_usv ch, KMX_DWORD new_flags)
+    : chr(ch), uset(), flags((new_flags & ~LDML_ELEM_FLAGS_TYPE) | LDML_ELEM_FLAGS_TYPE_CHAR) {
 }
 
 bool
@@ -158,9 +158,9 @@ element_list::update_sort_key(size_t offset, std::deque<reorder_sort_key> &key) 
   return key;
 }
 
-reorder_entry::reorder_entry(const element_list &elements) : elements(elements), before() {
+reorder_entry::reorder_entry(const element_list &new_elements) : elements(new_elements), before() {
 }
-reorder_entry::reorder_entry(const element_list &elements, const element_list &before) : elements(elements), before(before) {
+reorder_entry::reorder_entry(const element_list &new_elements, const element_list &new_before) : elements(new_elements), before(new_before) {
 }
 
 size_t
