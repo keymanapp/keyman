@@ -45,12 +45,12 @@ element::get_tertiary() const {
 
 bool
 element::is_prebase() const {
-  return flags & LDML_ELEM_FLAGS_PREBASE;
+  return !!(flags & LDML_ELEM_FLAGS_PREBASE);
 }
 
 bool
 element::is_tertiary_base() const {
-  return flags & LDML_ELEM_FLAGS_TERTIARY_BASE;
+  return !!(flags & LDML_ELEM_FLAGS_TERTIARY_BASE);
 }
 
 KMX_DWORD
@@ -96,7 +96,7 @@ reorder_sort_key::compare(const reorder_sort_key &other) const {
 
 bool
 reorder_sort_key::operator<(const reorder_sort_key &other) const {
-  return (compare(other) == -1);
+  return (compare(other) < 0);
 }
 
 std::deque<reorder_sort_key>
@@ -129,7 +129,7 @@ element_list::match_end(const std::u32string &str) const {
   auto s = str.rbegin();
   // e: end to front on elements.
   // we know the # of elements is <= length of string,
-  // so we dont' need to check the string's boundaries
+  // so we don't need to check the string's boundaries
   for (auto e = rbegin(); e < rend(); e++) {
     assert(s < str.rend()); // double check
     if (!e->matches(*s)) {
