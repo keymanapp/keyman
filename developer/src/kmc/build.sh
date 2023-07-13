@@ -82,25 +82,9 @@ fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
-sourcemap_paths=(
-  ../kmc/build
-  ../kmc-analyze/build
-  ../kmc-kmn/build
-  ../kmc-ldml/build
-  ../kmc-model/build
-  ../kmc-model-info/build
-  ../kmc-package/build
-)
-
 if builder_start_action build; then
   copy_schemas
   npm run build
-  ./node_modules/.bin/sentry-cli sourcemaps inject \
-   --org keyman \
-   --project keyman-developer \
-   --release "$VERSION_GIT_TAG"  \
-   --ext js --ext mjs --ext ts --ext map \
-    "${sourcemap_paths[@]}"
   builder_finish_action success build
 fi
 
@@ -118,28 +102,6 @@ fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_start_action bundle; then
-
-  if ! builder_has_option --build-path; then
-    builder_finish_action "Parameter --build-path is required" bundle
-    exit 64
-  fi
-
-  rm -rf build/dist
-  mkdir -p build/dist
-  node build-bundler.js
-
-  # Manually copy over kmcmplib module and schemas
-  copy_schemas
-  cp ../kmc-kmn/build/src/import/kmcmplib/wasm-host.wasm build/dist/
-
-  cp build/dist/* "$BUILD_PATH"
-
-  builder_finish_action success bundle
-fi
-
-#-------------------------------------------------------------------------------------------------------------------
-
 readonly PACKAGES=(
   common/web/keyman-version
   common/web/types
@@ -152,6 +114,48 @@ readonly PACKAGES=(
   developer/src/kmc-model-info
   developer/src/kmc-package
 )
+
+if builder_start_action bundle; then
+  SOURCEMAP_PATHS=( "${PACKAGES[@]}" )
+  SOURCEMAP_PATHS=( "${SOURCEMAP_PATHS[@]/%//build}" )
+  SOURCEMAP_PATHS=( "${SOURCEMAP_PATHS[@]/#/../../../}" )
+  readonly SOURCEMAP_PATHS
+
+  if ! builder_has_option --build-path; then
+    builder_finish_action "Parameter --build-path is required" bundle
+    exit 64
+  fi
+
+  rm -rf build/dist
+
+  ./node_modules/.bin/sentry-cli sourcemaps inject \
+    --org keyman \
+    --project keyman-developer \
+    --release "$VERSION_GIT_TAG"  \
+    --ext js --ext mjs --ext ts --ext map \
+    build/ "${SOURCEMAP_PATHS[@]}"
+
+  mkdir -p build/dist
+  node build-bundler.js
+
+  ./node_modules/.bin/sentry-cli sourcemaps inject \
+    --org keyman \
+    --project keyman-developer \
+    --release "$VERSION_GIT_TAG"  \
+    --ext js --ext mjs --ext ts --ext map \
+    build/dist
+
+  # Manually copy over kmcmplib module and schemas
+  copy_schemas
+  cp ../kmc-kmn/build/src/import/kmcmplib/wasm-host.wasm build/dist/
+
+  cp build/dist/* "$BUILD_PATH"
+
+  builder_finish_action success bundle
+fi
+
+#-------------------------------------------------------------------------------------------------------------------
+
 
 if builder_start_action publish; then
   . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
