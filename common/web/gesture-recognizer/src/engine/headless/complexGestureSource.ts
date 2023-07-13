@@ -2,9 +2,9 @@ import EventEmitter from "eventemitter3";
 import { SerializedSimpleGestureSource, SimpleGestureSource } from "./simpleGestureSource.js";
 
 /**
- * Documents the expected typing of serialized versions of the `TrackedInput` class.
+ * Documents the expected typing of serialized versions of the `ComplexGestureSource` class.
  */
-export interface JSONTrackedInput {
+export interface SerializedComplexGestureSource {
   touchpoints: SerializedSimpleGestureSource[];
   // gesture: Gesture;
 }
@@ -28,7 +28,7 @@ interface EventMap {
  * `'end'`:     all gesture recognition for this input is to be resolved.
  *   - Provides no parameters.
  */
-export class TrackedInput<HoveredItemType> extends EventEmitter<EventMap> {
+export class ComplexGestureSource<HoveredItemType> extends EventEmitter<EventMap> {
   public readonly touchpoints: SimpleGestureSource<HoveredItemType>[];
 
   // --- Future design aspects ---
@@ -78,7 +78,7 @@ export class TrackedInput<HoveredItemType> extends EventEmitter<EventMap> {
    * Creates a serialization-friendly version of this instance for use by
    * `JSON.stringify`.
    */
-  toJSON(): JSONTrackedInput {
+  toJSON(): SerializedComplexGestureSource {
     return {
       touchpoints: this.touchpoints.map((point) => point.toJSON())
     };
