@@ -61,5 +61,8 @@ export class InfrastructureMessages {
     `Project ${o.filename} failed to build.`)});
   static INFO_ProjectNotBuiltSuccessfully = SevInfo | 0x000C;
 
+  static Info_TooManyMessages = (o:{count:number}) => m(this.INFO_TooManyMessages,
+    `More than ${o.count} warnings or errors received; suppressing further messages.`);
+  static INFO_TooManyMessages = SevInfo | 0x000D;
 }
 
