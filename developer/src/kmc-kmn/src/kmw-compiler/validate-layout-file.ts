@@ -223,9 +223,9 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
     // Test that the font matches on all platforms   // I4872
 
     if(FTouchLayoutFont == '') {
-      FTouchLayoutFont = platform.font ?? '';
+      FTouchLayoutFont = platform.font?.toLowerCase() ?? '';
     }
-    else if(platform.font?.toLowerCase() ?? '' != FTouchLayoutFont) {
+    else if((platform.font?.toLowerCase() ?? '') != FTouchLayoutFont) {
       callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutFontShouldBeSameForAllPlatforms());
       // TODO: why support multiple font values if it has to be the same across all platforms?!
     }
