@@ -16,6 +16,7 @@ await esbuild.build({
   platform: 'node',
   target: 'es2022',
   outdir: 'build/dist/',
+  sourcemap: true,
 
   // We want a .mjs extension to force node into ESM module mode
   outExtension: { '.js': '.mjs' },
