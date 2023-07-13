@@ -53,7 +53,7 @@ export default class KeymanEngine extends KeymanEngineBase<WebviewConfiguration,
     // There may be some valid mutations possible even on repeated calls?
     // The original seems to allow it.
 
-    if(this.config.deferForInitialization.hasFinalized) {
+    if(this.config.deferForInitialization.isResolved) {
       // abort!  Maybe throw an error, too.
       return Promise.resolve();
     }

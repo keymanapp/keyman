@@ -10,7 +10,7 @@ import {
   PageContextAttachment
 } from '/@keymanapp/keyman/build/engine/attachment/lib/index.mjs';
 
-import timedPromise from '../../timedPromise.mjs';
+import { timedPromise } from '/@keymanapp/web-utils/build/lib/index.mjs';
 import sinon from '/node_modules/sinon/pkg/sinon-esm.js';
 
 let assert = chai.assert;

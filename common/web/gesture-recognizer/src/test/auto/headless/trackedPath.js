@@ -3,7 +3,7 @@ import sinon  from 'sinon';
 
 import { TrackedPath } from '@keymanapp/gesture-recognizer';
 
-import { timedPromise } from '../../../../build/tools/obj/index.js';
+import { timedPromise } from '@keymanapp/web-utils';
 
 // End of "for the integrated style..."
 
@@ -158,9 +158,9 @@ describe("TrackedPath", function() {
       const samples = [startSample, endSample];
 
       const samplePromises = samples.map((sample) => {
-        return timedPromise(() => {
+        return timedPromise(sample.t - startSample.t).then(() => {
           touchpath.extend(sample);
-        }, sample.t - startSample.t);
+        });
       });
 
       // Finalization: segmentation is then ended via a followup event as soon as the

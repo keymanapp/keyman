@@ -6,7 +6,7 @@ const promiseStatus       = PromiseStatusModule.promiseStatus;
 const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 
 import {  PathSegmenter } from '@keymanapp/gesture-recognizer';
-import { timedPromise } from '../../../../build/tools/obj/index.js';
+import { timedPromise } from '@keymanapp/web-utils';
 
 describe("Basic segmentation cases", function() {
   describe("Single-sample 'sequence'", function() {
@@ -115,7 +115,7 @@ describe("Basic segmentation cases", function() {
       const segment2Resolution  = sinon.fake();
 
       // Timestamp 1:  segmentation begins, with an initial Sample recorded.
-      const firstPromise = timedPromise(() => {
+      const firstPromise = timedPromise(0).then(() => {
         segmenter.add(startSample);
         assert.isTrue(spy.calledTwice, "Segmenter callback was not called exactly twice upon adding the first point.");
 
@@ -125,7 +125,7 @@ describe("Basic segmentation cases", function() {
 
         pendingSegment.whenRecognized.then(segment2Recognition);
         pendingSegment.whenResolved.then(segment2Resolution);
-      }, 0).then(() => {
+      }).then(() => {
         // At time = 0, neither recognition nor resolution should have triggered.
         assert.isFalse(segment2Recognition.called);
 
@@ -137,7 +137,7 @@ describe("Basic segmentation cases", function() {
 
       // Timestamp 2:  segmentation continues... a second later.  A second Sample is recorded.
       const secondSampleTestPromise = firstPromise.then(() => {
-        return timedPromise(() => {
+        return timedPromise(1000).then(() => {
           // This should have occurred already, despite no new sample having been provided
           // to the segmenter.
           assert.isTrue(segment2Recognition.called);
@@ -147,7 +147,7 @@ describe("Basic segmentation cases", function() {
 
           // And now to update with a new sample.
           segmenter.add(endSample);
-        }, 1000).then(() => {
+        }).then(() => {
           assert.isFalse(segment2Resolution.called);
 
           const pendingSegment = spy.secondCall.args[0];
@@ -198,9 +198,9 @@ describe("Basic segmentation cases", function() {
       const samples = [startSample, endSample];
 
       const samplePromises = samples.map((sample) => {
-        return timedPromise(() => {
+        return timedPromise(sample.t - startSample.t).then(() => {
           segmenter.add(sample);
-        }, sample.t - startSample.t);
+        });
       });
 
       // Timestamp 3: segmentation is then ended via a followup event.
@@ -274,9 +274,9 @@ describe("Basic segmentation cases", function() {
       const samples = buildSampleSequence();
 
       const samplePromises = samples.map((sample) => {
-        return timedPromise(() => {
+        return timedPromise(sample.t - samples[0].t).then(() => {
           segmenter.add(sample);
-        }, sample.t - samples[0].t);
+        });
       });
 
       // Find and replace select promises with then'd versions of themselves to 'hook in' as needed.
@@ -347,9 +347,9 @@ describe("Basic segmentation cases", function() {
       const samples = buildSampleSequence();
 
       const samplePromises = samples.map((sample) => {
-        return timedPromise(() => {
+        return timedPromise(sample.t - samples[0].t).then(() => {
           segmenter.add(sample);
-        }, sample.t - samples[0].t);
+        });
       });
 
       // Timestamp 3: segmentation is then ended via a followup event.

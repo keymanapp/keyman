@@ -27,7 +27,7 @@ export default class DOMCloudRequester implements CloudRequesterInterface {
       // This case should only happen if a returned, otherwise-valid keyboard
       // script does not ever call `register`.  Also provides default handling
       // should `register` fail to report results/failure correctly.
-      if(!promise.hasFinalized) {
+      if(!promise.isResolved) {
         promise.reject(new Error(CLOUD_STUB_REGISTRATION_ERR));
       }
     };
