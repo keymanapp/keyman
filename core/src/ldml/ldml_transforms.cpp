@@ -69,28 +69,23 @@ element::matches(km_kbp_usv ch) const {
 
 int
 reorder_sort_key::compare(const reorder_sort_key &other) const {
-  if (primary < other.primary) {
-    return -1;
-  } else if (primary > other.primary) {
-    return 1;
-  } else if (secondary < other.secondary) {
-    return -1;
-  } else if (secondary > other.secondary) {
-    return 1;
-  } else if (tertiary < other.tertiary) {
-    return -1;
-  } else if (tertiary > other.tertiary) {
-    return 1;
-  } else if (quaternary < other.quaternary) {
-    return -1;
-  } else if (quaternary > other.quaternary) {
-    return 1;
-  } else if (ch < other.ch) {  // tiebreak with char value
-    return -1;
-  } else if (ch > other.ch) {
-    return 1;
+  int primaryResult    = (int)primary    - (int)other.primary;
+  int secondaryResult  = (int)secondary  - (int)other.secondary;
+  int tertiaryResult   = (int)tertiary   - (int)other.tertiary;
+  int quaternaryResult = (int)quaternary - (int)other.quaternary;
+
+  if (primaryResult) {
+    return primaryResult;
+  } else if (secondaryResult) {
+    return secondaryResult;
+  } else if (tertiaryResult) {
+    return tertiaryResult;
+  } else if (quaternaryResult) {
+    return quaternaryResult;
   } else {
-    return 0;  // identical
+    assert(quaternaryResult);  // quaternary is a string index, should always be !=
+    int identityResult = (int)ch - (int)other.ch;  // tie breaker
+    return identityResult;
   }
 }
 
