@@ -2,13 +2,14 @@ import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlusData } from "../kmx-plus.js";
 import { build_strs_index, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_SECTION } from "./builder-section.js";
+import { build_elem_index, BUILDER_ELEM } from "./build-elem.js";
 
 
 interface BUILDER_VARS_ITEM {
   type: number;
   id: number; // str
   value: number; // str
-  elem?: number; // elem, TODO-LDML
+  elem?: number; // elem
 };
 
 export interface BUILDER_VARS extends BUILDER_SECTION {
@@ -20,7 +21,7 @@ export interface BUILDER_VARS extends BUILDER_SECTION {
 /**
 * Builder for the 'vars' section
 */
-export function build_vars(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS /*, sect_elem: BUILDER_ELEM*/) : BUILDER_VARS {
+export function build_vars(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_elem: BUILDER_ELEM) : BUILDER_VARS {
   if(!kmxplus.vars) {
     return null;
   }
@@ -34,6 +35,7 @@ export function build_vars(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS /*, sec
     type: constants.vars_entry_type_set,
     id: build_strs_index(sect_strs, v.id),
     value: build_strs_index(sect_strs, v.value),
+    elem: build_elem_index(sect_elem, v.items),
   });
   const uniSetVars = kmxplus.vars.unicodeSets.map(v => <BUILDER_VARS_ITEM>{
     type: constants.vars_entry_type_unicodeSet,

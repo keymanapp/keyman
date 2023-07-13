@@ -528,7 +528,7 @@ block(vars)                         # struct COMP_KMXPLUS_VARS {
   01 00 00 00                       #   KMX_DWORD type = set
   index(strNull,strVse,2)           #   KMXPLUS_STR id  'vse'
   index(strNull,strSet,2)           #   KMXPLUS_STR value 'a b c'
-  00 00 00 00                       #   KMXPLUS_ELEM elem TODO-LDML should be set
+  01 00 00 00                       #   KMXPLUS_ELEM elem 'a b c' see 'elemSet'
 
   # var 1
   00 00 00 00                       #   KMX_DWORD type = string

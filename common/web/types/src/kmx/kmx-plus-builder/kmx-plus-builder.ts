@@ -99,7 +99,7 @@ export default class KMXPlusBuilder {
     this.sect.name = build_name(this.file.kmxplus, this.sect.strs);
     this.sect.tran = build_tran(this.file.kmxplus.tran, this.sect.strs, this.sect.elem);
     this.sect.uset = build_uset(this.file.kmxplus, this.sect.strs);
-    this.sect.vars = build_vars(this.file.kmxplus, this.sect.strs);
+    this.sect.vars = build_vars(this.file.kmxplus, this.sect.strs, this.sect.elem);
     this.sect.vkey = build_vkey(this.file.kmxplus);
 
     // Finalize the sect (index) section
