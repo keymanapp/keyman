@@ -99,7 +99,6 @@ if builder_start_action build; then
    --org keyman \
    --project keyman-developer \
    --release "$VERSION_GIT_TAG"  \
-   --dist "$VERSION_ENVIRONMENT" \
    --ext js --ext mjs --ext ts --ext map \
     "${sourcemap_paths[@]}"
   builder_finish_action success build
