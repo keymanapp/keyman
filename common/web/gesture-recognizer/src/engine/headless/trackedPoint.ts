@@ -1,12 +1,12 @@
 import { InputSample } from "./inputSample.js";
-import { JSONTrackedPath, TrackedPath } from "./trackedPath.js";
+import { SerializedGesturePath, GesturePath } from "./gesturePath.js";
 
 /**
  * Documents the expected typing of serialized versions of the `TrackedPoint` class.
  */
 export type JSONTrackedPoint<HoveredItemType = any> = {
   isFromTouch: boolean;
-  path: JSONTrackedPath<HoveredItemType>;
+  path: SerializedGesturePath<HoveredItemType>;
   initialHoveredItem: HoveredItemType
   // identifier is not included b/c it's only needed during live processing.
 }
@@ -27,14 +27,14 @@ export class TrackedPoint<HoveredItemType> {
    */
   public readonly rawIdentifier: number;
 
-  private _path: TrackedPath<HoveredItemType>;
+  private _path: GesturePath<HoveredItemType>;
 
   private static _jsonIdSeed: -1;
 
   /**
    * Tracks the coordinates and timestamps of each update for the lifetime of this `TrackedPoint`.
    */
-  public get path(): TrackedPath<HoveredItemType> {
+  public get path(): GesturePath<HoveredItemType> {
     return this._path;
   }
 
@@ -47,7 +47,7 @@ export class TrackedPoint<HoveredItemType> {
   constructor(identifier: number, isFromTouch: boolean) {
     this.rawIdentifier = identifier;
     this.isFromTouch = isFromTouch;
-    this._path = new TrackedPath();
+    this._path = new GesturePath();
   }
 
   /**
@@ -58,7 +58,7 @@ export class TrackedPoint<HoveredItemType> {
   public static deserialize(jsonObj: JSONTrackedPoint, identifier: number) {
     const id = identifier !== undefined ? identifier : this._jsonIdSeed++;
     const isFromTouch = jsonObj.isFromTouch;
-    const path = TrackedPath.deserialize(jsonObj.path);
+    const path = GesturePath.deserialize(jsonObj.path);
 
     const instance = new TrackedPoint(id, isFromTouch);
     instance._path = path;

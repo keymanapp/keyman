@@ -5,7 +5,7 @@ export { GestureRecognizerConfiguration } from "./configuration/gestureRecognize
 export { InputEngineBase } from "./headless/inputEngineBase.js";
 export { InputSample } from "./headless/inputSample.js";
 export { JSONTrackedInput, TrackedInput } from "./headless/trackedInput.js";
-export { JSONTrackedPath, TrackedPath } from "./headless/trackedPath.js";
+export { SerializedGesturePath, GesturePath } from "./headless/gesturePath.js";
 export { JSONTrackedPoint, TrackedPoint } from "./headless/trackedPoint.js";
 export { MouseEventEngine } from "./mouseEventEngine.js";
 export { PathSegmenter, Subsegmentation } from "./headless/subsegmentation/pathSegmenter.js";
