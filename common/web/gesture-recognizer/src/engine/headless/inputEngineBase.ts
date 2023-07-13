@@ -1,12 +1,12 @@
 import EventEmitter from "eventemitter3";
-import { TrackedPoint } from "./trackedPoint.js";
+import { SimpleGestureSource } from "./simpleGestureSource.js";
 
 interface EventMap<HoveredItemType> {
   /**
    * Indicates that a new, ongoing touchpoint or mouse interaction has begun.
    * @param input The instance that tracks all future updates over the lifetime of the touchpoint / mouse interaction.
    */
-  'pointstart': (input: TrackedPoint<HoveredItemType>) => void;
+  'pointstart': (input: SimpleGestureSource<HoveredItemType>) => void;
 
   // // idea for line below: to help multitouch gestures keep touchpaths in sync, rather than updated separately
   // 'eventcomplete': () => void;
@@ -18,7 +18,7 @@ interface EventMap<HoveredItemType> {
  * (headlessly).
  */
 export abstract class InputEngineBase<HoveredItemType> extends EventEmitter<EventMap<HoveredItemType>> {
-  private _activeTouchpoints: TrackedPoint<HoveredItemType>[] = [];
+  private _activeTouchpoints: SimpleGestureSource<HoveredItemType>[] = [];
 
   /**
    * @param identifier The identifier number corresponding to the input sequence.
@@ -35,7 +35,7 @@ export abstract class InputEngineBase<HoveredItemType> extends EventEmitter<Even
     this._activeTouchpoints = this._activeTouchpoints.filter((point) => point.rawIdentifier != identifier);
   }
 
-  protected addTouchpoint(touchpoint: TrackedPoint<HoveredItemType>) {
+  protected addTouchpoint(touchpoint: SimpleGestureSource<HoveredItemType>) {
     this._activeTouchpoints.push(touchpoint);
   }
 }

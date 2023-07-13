@@ -23,7 +23,7 @@ export class MouseEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
     this._mouseMove  = (event: MouseEvent) => this.onMouseMove(event);
     this._mouseEnd   = (event: MouseEvent) => this.onMouseEnd(event);
 
-    // IDs should be unique.  Fortunately, they're disambiguated by their corresponding TrackedPoint,
+    // IDs should be unique.  Fortunately, they're disambiguated by their corresponding SimpleGestureSource,
     // which has gives a globally-unique string-based identifier based partly on the numeric ID set here.
     MouseEventEngine.IDENTIFIER_SEED = 0;
   }

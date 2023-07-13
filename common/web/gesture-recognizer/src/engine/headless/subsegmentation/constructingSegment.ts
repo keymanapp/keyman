@@ -296,7 +296,7 @@ export class ConstructingSegment {
   }
 
   /**
-   * The in-construction Segment, as published to `TrackedPath.segments` & `TrackedPath`'s
+   * The in-construction Segment, as published to `GesturePath.segments` & `GesturePath`'s
    * 'segmentation' event.
    */
   public get pathSegment() {

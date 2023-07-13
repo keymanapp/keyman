@@ -1,11 +1,11 @@
 import EventEmitter from "eventemitter3";
-import { JSONTrackedPoint, TrackedPoint } from "./trackedPoint.js";
+import { SerializedSimpleGestureSource, SimpleGestureSource } from "./simpleGestureSource.js";
 
 /**
- * Documents the expected typing of serialized versions of the `TrackedInput` class.
+ * Documents the expected typing of serialized versions of the `ComplexGestureSource` class.
  */
-export interface JSONTrackedInput {
-  touchpoints: JSONTrackedPoint[];
+export interface SerializedComplexGestureSource {
+  touchpoints: SerializedSimpleGestureSource[];
   // gesture: Gesture;
 }
 
@@ -16,20 +16,27 @@ interface EventMap {
 
 
 /**
- * Models a single ongoing input event, which may or may not involve multiple
- * touchpoints.
+ * Models all ongoing contact that is considered part of the same single gesture
+ * or sequence of chained Gestures over time.  This may or may not involve
+ * multiple touch contact points / "SimpleGestureSource" instances.
+ *
+ * Note that multiple chained gestures may arise over the lifetime of a single
+ * instance of this class.  For example, detecting a multitap requires
+ * multiple contact points over time, possibly with each tap arising as a
+ * potential 'last' tap gesture before new ones are received to continue the
+ * sequence.
  *
  * _Supported events_:
  *
  * `'cancel'`:  all gesture recognition for this input is to be cancelled
- *                   and left incomplete.
+ *              and left incomplete.
  * - Provides no parameters.
  *
  * `'end'`:     all gesture recognition for this input is to be resolved.
  *   - Provides no parameters.
  */
-export class TrackedInput<HoveredItemType> extends EventEmitter<EventMap> {
-  public readonly touchpoints: TrackedPoint<HoveredItemType>[];
+export class ComplexGestureSource<HoveredItemType> extends EventEmitter<EventMap> {
+  public readonly touchpoints: SimpleGestureSource<HoveredItemType>[];
 
   // --- Future design aspects ---
   // private _gesture: Gesture;
@@ -37,14 +44,14 @@ export class TrackedInput<HoveredItemType> extends EventEmitter<EventMap> {
 
   private isActive = true;
 
-  constructor(basePoint: TrackedPoint<HoveredItemType>) {
+  constructor(basePoint: SimpleGestureSource<HoveredItemType>) {
     super();
 
     this.touchpoints = [ basePoint ];
     this._attachPointHooks(basePoint);
   }
 
-  private _attachPointHooks(touchpoint: TrackedPoint<HoveredItemType>) {
+  private _attachPointHooks(touchpoint: SimpleGestureSource<HoveredItemType>) {
     touchpoint.path.on('complete', () => {
       this.isActive = false;
       this.emit('end');
@@ -78,7 +85,7 @@ export class TrackedInput<HoveredItemType> extends EventEmitter<EventMap> {
    * Creates a serialization-friendly version of this instance for use by
    * `JSON.stringify`.
    */
-  toJSON(): JSONTrackedInput {
+  toJSON(): SerializedComplexGestureSource {
     return {
       touchpoints: this.touchpoints.map((point) => point.toJSON())
     };

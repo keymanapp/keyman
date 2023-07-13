@@ -554,7 +554,7 @@ export class PathSegmenter {
 
   /**
    * A closure used to 'forward' generated Segments, generally to their public-facing
-   * location on TrackedPath.segments.
+   * location on GesturePath.segments.
    */
   private readonly segmentForwarder: (segment: Segment) => void;
 

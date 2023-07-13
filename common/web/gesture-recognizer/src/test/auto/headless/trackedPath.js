@@ -1,13 +1,13 @@
 import { assert } from 'chai'
 import sinon  from 'sinon';
 
-import { TrackedPath } from '@keymanapp/gesture-recognizer';
+import { GesturePath } from '@keymanapp/gesture-recognizer';
 
 import { timedPromise } from '@keymanapp/web-utils';
 
 // End of "for the integrated style..."
 
-describe("TrackedPath", function() {
+describe("FingerPath", function() {
   // // File paths need to be from the package's / module's root folder
   // let testJSONtext = fs.readFileSync('src/test/resources/json/canaryRecording.json');
 
@@ -17,7 +17,7 @@ describe("TrackedPath", function() {
       const spyEventComplete    = sinon.fake();
       const spyEventInvalidated = sinon.fake();
 
-      const touchpath = new TrackedPath();
+      const touchpath = new GesturePath();
       touchpath.on('step', spyEventStep);
       touchpath.on('complete', spyEventComplete);
       touchpath.on('invalidated', spyEventInvalidated);
@@ -50,7 +50,7 @@ describe("TrackedPath", function() {
       const spyEventComplete    = sinon.fake();
       const spyEventInvalidated = sinon.fake();
 
-      const touchpath = new TrackedPath();
+      const touchpath = new GesturePath();
       touchpath.on('step', spyEventStep);
       touchpath.on('complete', spyEventComplete);
       touchpath.on('invalidated', spyEventInvalidated);
@@ -82,7 +82,7 @@ describe("TrackedPath", function() {
       const spyEventComplete     = sinon.fake();
       const spyEventInvalidated  = sinon.fake();
 
-      const touchpath = new TrackedPath();
+      const touchpath = new GesturePath();
       touchpath.on('step', spyEventStep);
       touchpath.on('complete', spyEventComplete);
       touchpath.on('invalidated', spyEventInvalidated);
@@ -104,7 +104,7 @@ describe("TrackedPath", function() {
       const spyEventComplete     = sinon.fake();
       const spyEventInvalidated  = sinon.fake();
 
-      const touchpath = new TrackedPath();
+      const touchpath = new GesturePath();
       touchpath.on('step', spyEventStep);
       touchpath.on('complete', spyEventComplete);
       touchpath.on('invalidated', spyEventInvalidated);
@@ -137,7 +137,7 @@ describe("TrackedPath", function() {
       const spyEventComplete     = sinon.fake();
       const spyEventInvalidated  = sinon.fake();
 
-      const touchpath = new TrackedPath();
+      const touchpath = new GesturePath();
       touchpath.on('step', spyEventStep);
       touchpath.on('complete', spyEventComplete);
       touchpath.on('invalidated', spyEventInvalidated);

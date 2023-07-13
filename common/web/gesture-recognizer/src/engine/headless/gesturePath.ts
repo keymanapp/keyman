@@ -3,9 +3,9 @@ import { InputSample } from "./inputSample.js";
 import { CumulativePathStats } from "./cumulativePathStats.js";
 
 /**
- * Documents the expected typing of serialized versions of the `TrackedPoint` class.
+ * Documents the expected typing of serialized versions of the `GesturePath` class.
  */
-export type JSONTrackedPath<Type> = {
+export type SerializedGesturePath<Type> = {
   coords: InputSample<Type>[]; // ensures type match with public class property.
   wasCancelled?: boolean;
 }
@@ -42,7 +42,7 @@ interface EventMap<Type> {
  *     the most recently-preceding 'segmentation' event.
  *     - And possibly recognition Promise fulfillment.
  */
-export class TrackedPath<Type> extends EventEmitter<EventMap<Type>> {
+export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
   private samples: InputSample<Type>[] = [];
 
   private _isComplete: boolean = false;
@@ -60,11 +60,11 @@ export class TrackedPath<Type> extends EventEmitter<EventMap<Type>> {
   }
 
   /**
-   * Deserializes a TrackedPath instance from its corresponding JSON.parse() object.
+   * Deserializes a GesturePath instance from its corresponding JSON.parse() object.
    * @param jsonObj
    */
-  static deserialize<Type>(jsonObj: JSONTrackedPath<Type>): TrackedPath<Type> {
-    const instance = new TrackedPath<Type>();
+  static deserialize<Type>(jsonObj: SerializedGesturePath<Type>): GesturePath<Type> {
+    const instance = new GesturePath<Type>();
 
     instance.samples = [].concat(jsonObj.coords.map((obj) => ({...obj} as InputSample<Type>)));
     instance._isComplete = true;
@@ -90,7 +90,7 @@ export class TrackedPath<Type> extends EventEmitter<EventMap<Type>> {
    */
   extend(sample: InputSample<Type>) {
     if(this._isComplete) {
-      throw new Error("Invalid state:  this TrackedPath has already terminated.");
+      throw new Error("Invalid state:  this GesturePath has already terminated.");
     }
 
     // The tracked path should emit InputSample events before Segment events and
@@ -106,7 +106,7 @@ export class TrackedPath<Type> extends EventEmitter<EventMap<Type>> {
    */
   terminate(cancel: boolean = false) {
     if(this._isComplete) {
-      throw new Error("Invalid state:  this TrackedPath has already terminated.");
+      throw new Error("Invalid state:  this GesturePath has already terminated.");
     }
     this.wasCancelled = cancel;
     this._isComplete = true;
@@ -137,7 +137,7 @@ export class TrackedPath<Type> extends EventEmitter<EventMap<Type>> {
    * `JSON.stringify`.
    */
   toJSON() {
-    let jsonClone: JSONTrackedPath<Type> = {
+    let jsonClone: SerializedGesturePath<Type> = {
       // Replicate array and its entries, but with certain fields of each entry missing.
       // No .clientX, no .clientY.
       coords: [].concat(this.samples.map((obj) => ({
