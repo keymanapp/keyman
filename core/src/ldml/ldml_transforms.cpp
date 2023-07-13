@@ -548,13 +548,18 @@ transforms::load(
 
         bool load_ok = elements.load(kplus, reorder->elements) && before.load(kplus, reorder->before);
         assert(load_ok);
-
-        newGroup.list.emplace_back(elements, before);
+        if (load_ok) {
+          newGroup.list.emplace_back(elements, before);
+        } else {
+          return nullptr;
+        }
       }
       transforms->addGroup(newGroup);
     } else {
       // internal error - some other type - should have been caught by validation
       DebugLog("ERROR: some other type");
+      assert(false);
+      return nullptr;
     }
   }
   return transforms;
