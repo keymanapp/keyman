@@ -16,13 +16,20 @@ interface EventMap {
 
 
 /**
- * Models a single ongoing input event, which may or may not involve multiple
- * touchpoints.
+ * Models all ongoing contact that is considered part of the same single gesture
+ * or sequence of chained Gestures over time.  This may or may not involve
+ * multiple touch contact points / "SimpleGestureSource" instances.
+ *
+ * Note that multiple chained gestures may arise over the lifetime of a single
+ * instance of this class.  For example, detecting a multitap requires
+ * multiple contact points over time, possibly with each tap arising as a
+ * potential 'last' tap gesture before new ones are received to continue the
+ * sequence.
  *
  * _Supported events_:
  *
  * `'cancel'`:  all gesture recognition for this input is to be cancelled
- *                   and left incomplete.
+ *              and left incomplete.
  * - Provides no parameters.
  *
  * `'end'`:     all gesture recognition for this input is to be resolved.
