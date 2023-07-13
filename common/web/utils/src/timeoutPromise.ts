@@ -12,7 +12,7 @@ export default class TimeoutPromise extends ManagedPromise<Boolean> {
   constructor(timeoutInMillis: number) {
     // Helps marshal the internal timer handle to its member field despite being
     // initialized in a closure passed to `super`, which cannot access `this`.
-    let timerHandleCapture: null as number | NodeJS.Timeout = null;
+    let timerHandleCapture: (number | NodeJS.Timeout) = null;
 
     super((resolve) => {
       const timerId = setTimeout(() => {
