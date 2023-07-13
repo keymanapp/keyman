@@ -54,7 +54,6 @@ sourcemap_paths=(
 echo "Uploading symbols for developer/"
 ./kmc/node_modules/.bin/sentry-cli upload-dif \
    --project keyman-developer \
-   -t breakpad -t pdb -t pe -t wasm \
    --include-sources \
    --no-zips \
    .
