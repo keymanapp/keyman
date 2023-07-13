@@ -1,7 +1,7 @@
 import EventEmitter from "eventemitter3";
 import { InputEngineBase } from "./inputEngineBase.js";
 import { TrackedInput } from "./trackedInput.js";
-import { TrackedPoint } from "./trackedPoint.js";
+import { SimpleGestureSource } from "./simpleGestureSource.js";
 
 interface EventMap<HoveredItemType> {
   /**
@@ -35,7 +35,7 @@ export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMa
     this.inputEngines.push(engine);
   }
 
-  private readonly onNewTrackedPath = (touchpoint: TrackedPoint<HoveredItemType>) => {
+  private readonly onNewTrackedPath = (touchpoint: SimpleGestureSource<HoveredItemType>) => {
     const newInput = new TrackedInput<HoveredItemType>(touchpoint);
     this._activeInputs[touchpoint.identifier] = newInput;
 

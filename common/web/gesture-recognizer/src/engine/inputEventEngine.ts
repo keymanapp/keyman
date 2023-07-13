@@ -2,7 +2,7 @@ import { GestureRecognizerConfiguration } from "./configuration/gestureRecognize
 import { InputEngineBase } from "./headless/inputEngineBase.js";
 import { InputSample } from "./headless/inputSample.js";
 import { Nonoptional } from "./nonoptional.js";
-import { TrackedPoint } from "./headless/trackedPoint.js";
+import { SimpleGestureSource } from "./headless/simpleGestureSource.js";
 
 export abstract class InputEventEngine<HoveredItemType> extends InputEngineBase<HoveredItemType> {
   protected readonly config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>;
@@ -32,7 +32,7 @@ export abstract class InputEventEngine<HoveredItemType> extends InputEngineBase<
   }
 
   protected onInputStart(identifier: number, sample: InputSample<HoveredItemType>, target: EventTarget, isFromTouch: boolean) {
-    const touchpoint = new TrackedPoint<HoveredItemType>(identifier, isFromTouch);
+    const touchpoint = new SimpleGestureSource<HoveredItemType>(identifier, isFromTouch);
     touchpoint.update(sample);
 
     this.addTouchpoint(touchpoint);

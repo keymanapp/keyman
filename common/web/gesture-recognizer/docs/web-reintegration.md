@@ -48,4 +48,12 @@ Further events for that "tracked point" are based on `TrackedPoint.path`.  This 
 perspective of each touch point individually for further processing... effectively splitting multi-touchpoint
 events into multiple _individual_ events while keeping the metadata organized over each touchpoint's lifetime.
 
+## From change/web/internal-gesture-src-nomenclature
+
+In case someone has to trace this history on things:
+
+- `TrackedInput` is now `ComplexGestureSource`.
+- `TrackedPoint` is now `SimpleGestureSource`.
+- `TrackedPath`  is now `GesturePath`.
+
 

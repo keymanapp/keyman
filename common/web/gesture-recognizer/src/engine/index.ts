@@ -6,7 +6,7 @@ export { InputEngineBase } from "./headless/inputEngineBase.js";
 export { InputSample } from "./headless/inputSample.js";
 export { JSONTrackedInput, TrackedInput } from "./headless/trackedInput.js";
 export { SerializedGesturePath, GesturePath } from "./headless/gesturePath.js";
-export { JSONTrackedPoint, TrackedPoint } from "./headless/trackedPoint.js";
+export { SerializedSimpleGestureSource, SimpleGestureSource } from "./headless/simpleGestureSource.js";
 export { MouseEventEngine } from "./mouseEventEngine.js";
 export { PathSegmenter, Subsegmentation } from "./headless/subsegmentation/pathSegmenter.js";
 export { PaddedZoneSource } from './configuration/paddedZoneSource.js';

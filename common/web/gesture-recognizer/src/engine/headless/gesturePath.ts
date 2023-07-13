@@ -3,7 +3,7 @@ import { InputSample } from "./inputSample.js";
 import { CumulativePathStats } from "./cumulativePathStats.js";
 
 /**
- * Documents the expected typing of serialized versions of the `TrackedPoint` class.
+ * Documents the expected typing of serialized versions of the `GesturePath` class.
  */
 export type SerializedGesturePath<Type> = {
   coords: InputSample<Type>[]; // ensures type match with public class property.
@@ -60,7 +60,7 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
   }
 
   /**
-   * Deserializes a TrackedPath instance from its corresponding JSON.parse() object.
+   * Deserializes a GesturePath instance from its corresponding JSON.parse() object.
    * @param jsonObj
    */
   static deserialize<Type>(jsonObj: SerializedGesturePath<Type>): GesturePath<Type> {
@@ -90,7 +90,7 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
    */
   extend(sample: InputSample<Type>) {
     if(this._isComplete) {
-      throw new Error("Invalid state:  this TrackedPath has already terminated.");
+      throw new Error("Invalid state:  this GesturePath has already terminated.");
     }
 
     // The tracked path should emit InputSample events before Segment events and
@@ -106,7 +106,7 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
    */
   terminate(cancel: boolean = false) {
     if(this._isComplete) {
-      throw new Error("Invalid state:  this TrackedPath has already terminated.");
+      throw new Error("Invalid state:  this GesturePath has already terminated.");
     }
     this.wasCancelled = cancel;
     this._isComplete = true;
