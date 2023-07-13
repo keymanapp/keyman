@@ -40,8 +40,6 @@ fi
 
 function copy_schemas() {
   # We need the schema files at runtime and bundled, so always copy it for all actions except `clean`
-
-  # We need the schema file at runtime and bundled, so always copy it for all actions except `clean`
   local schemas=(
     "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json"
     "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboardtest.schema.json"
