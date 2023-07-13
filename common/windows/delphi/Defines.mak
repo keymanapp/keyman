@@ -191,7 +191,7 @@ WIXLIGHTCOMPRESSION=-dcl:none
 # for test builds, we also turn off compression
 WIXLIGHTCOMPRESSION=-dcl:none
 !ELSE
-WIXLIGHTCOMPRESSION=
+WIXLIGHTCOMPRESSION=-dcl:high
 !ENDIF
 !ENDIF
 
