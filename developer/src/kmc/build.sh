@@ -128,13 +128,6 @@ if builder_start_action bundle; then
 
   rm -rf build/dist
 
-  ./node_modules/.bin/sentry-cli sourcemaps inject \
-    --org keyman \
-    --project keyman-developer \
-    --release "$VERSION_GIT_TAG"  \
-    --ext js --ext mjs --ext ts --ext map \
-    build/ "${SOURCEMAP_PATHS[@]}"
-
   mkdir -p build/dist
   node build-bundler.js
 
@@ -143,7 +136,7 @@ if builder_start_action bundle; then
     --project keyman-developer \
     --release "$VERSION_GIT_TAG"  \
     --ext js --ext mjs --ext ts --ext map \
-    build/dist
+    build/ "${SOURCEMAP_PATHS[@]}"
 
   # Manually copy over kmcmplib module and schemas
   copy_schemas
