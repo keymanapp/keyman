@@ -187,7 +187,7 @@ WIXLIGHTLINT= -sice:ICE82 -sice:ICE80
 # for debug builds, we turn off compression because it is so hideously slow
 WIXLIGHTCOMPRESSION=-dcl:none
 !ELSE
-!IF "$(VERSION_ENVIRONMENT)" == "test"
+!IFDEF TEAMCITY_PR_NUMBER
 # for test builds, we also turn off compression
 WIXLIGHTCOMPRESSION=-dcl:none
 !ELSE
