@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.139 alpha 2023-07-13
+
+*  (#9259)
+* chore(linux): Add unit tests for dconf_util.py (#9215)
+* refactor(linux): Refactor image loading (#9245)
+
 ## 17.0.138 alpha 2023-07-11
 
 * chore: Update standards data (#9193)
