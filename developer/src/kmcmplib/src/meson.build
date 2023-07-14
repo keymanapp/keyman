@@ -35,7 +35,10 @@ if cpp_compiler.get_id() == 'emscripten'
   flags += ['-fwasm-exceptions'] + sanitize
 
   lib_links = ['--whole-archive', '-sALLOW_MEMORY_GROWTH', '-sMODULARIZE', '-sEXPORT_ES6']
-  links += ['-fwasm-exceptions', '--bind', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']'] + sanitize
+  links += [
+    # Forcing inclusion of debug symbols
+    '-g', '-Wlimited-postlink-optimizations',
+    '-fwasm-exceptions', '--bind', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']'] + sanitize
 
   # Alternative to sanitize is adding '-sASSERTIONS', '-sSAFE_HEAP' to lib_links:
   # lib_links += ['-sASSERTIONS', '-sSAFE_HEAP']
@@ -84,11 +87,23 @@ kmcmplib = declare_dependency(link_with: lib, include_directories: inc)
 
 if cpp_compiler.get_id() == 'emscripten'
   # Build an executable
-  host = executable('wasm-host', #'wasm-host.cpp',
+  # TODO: rename wasm-host to kmcmplib.wasm
+  host = executable('wasm-host',
     cpp_args: defns,
     include_directories: inc,
     link_args: links + lib_links,
     objects: lib.extract_all_objects(),
     dependencies: icuuc_dep)
+
+  if get_option('buildtype') == 'release'
+    # Split debug symbols into separate wasm file for release builds only
+    # as the release symbols will be uploaded to sentry
+    # custom_target('kmcmplib.wasm',
+    #   depends: host,
+    #   input: host,
+    #   output: 'kmcmplib.wasm',
+    #   command: ['wasm-split', '@OUTDIR@/wasm-host.wasm', '-o', '@OUTPUT@', '--strip', '--debug-out=@OUTDIR@/kmcmplib.debug.wasm'],
+    #   build_by_default: true)
+  endif
 endif
 
