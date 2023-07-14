@@ -134,6 +134,29 @@ element_list::match_end(const std::u32string &str) const {
   return size();  // match size = element size
 }
 
+bool
+element_list::load(const kmx::kmx_plus &kplus, kmx::KMXPLUS_ELEM id) {
+  KMX_DWORD elementsLength;
+  auto elements = kplus.elem->getElementList(id, elementsLength);
+  assert((elementsLength == 0) || (elements != nullptr));
+  for (size_t i = 0; i<elementsLength; i++) {
+    auto e = elements[i];
+    auto flags = e.flags;
+    auto type = flags & LDML_ELEM_FLAGS_TYPE;
+    if (type == LDML_ELEM_FLAGS_TYPE_CHAR) {
+      emplace_back(e.element, flags); // char
+    } else if (type == LDML_ELEM_FLAGS_TYPE_USET) {
+      auto u = kplus.usetHelper.getUset(e.element);
+      emplace_back(u, e.flags);
+    } else {
+      // not handled
+      assert((type != LDML_ELEM_FLAGS_TYPE_USET) && (type != LDML_ELEM_FLAGS_TYPE_CHAR));
+      return false;
+    }
+  }
+  return true;
+}
+
 std::deque<reorder_sort_key> &
 element_list::update_sort_key(size_t offset, std::deque<reorder_sort_key> &key) const {
   size_t c = 0;
@@ -506,11 +529,29 @@ transforms::load(
       }
       transforms->addGroup(newGroup);
     } else if (group->type == LDML_TRAN_GROUP_TYPE_REORDER) {
-      // TODO-LDML: reorder
-      DebugLog("Skipping reorder (for now) TODO-LDML");
+      reorder_group newGroup;
+
+      // fetch each reorder in the group
+      for (KMX_DWORD itemNumber = 0; itemNumber < group->count; itemNumber++) {
+        const kmx::COMP_KMXPLUS_TRAN_REORDER *reorder = tranHelper.getReorder(group->index + itemNumber);
+
+        element_list elements;
+        element_list before;
+
+        bool load_ok = elements.load(kplus, reorder->elements) && before.load(kplus, reorder->before);
+        assert(load_ok);
+        if (load_ok) {
+          newGroup.list.emplace_back(elements, before);
+        } else {
+          return nullptr;
+        }
+      }
+      transforms->addGroup(newGroup);
     } else {
       // internal error - some other type - should have been caught by validation
       DebugLog("ERROR: some other type");
+      assert(false);
+      return nullptr;
     }
   }
   return transforms;
