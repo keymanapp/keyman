@@ -603,33 +603,28 @@ LoadDLLs(LPINTKEYBOARDINFO lpkbi) {
     return FALSE;
   }
 
-  char versioned_filename[_MAX_PATH];
-  char proxy_modulename[_MAX_PATH];
-  char check_modulename[_MAX_PATH];
-
-  GetModuleFileName(g_hInstance, versioned_filename, _MAX_PATH);
-
-  char *p = strrchr(versioned_filename, '\\'); // find last occurrence of '\'
-  if (p != NULL) {
-      int64_t len = p - versioned_filename + 1;
-      strncpy(proxy_modulename, versioned_filename, (size_t)len);
-      strncat(proxy_modulename, keyman_engine_arch, 13);
-  }
-  if (_td->hModuleProxy){ // Not sure I need this check
-    GetModuleFileName(_td->hModuleProxy, check_modulename, _MAX_PATH);
-    if (!strstr(check_modulename, proxy_modulename))
-    {
-      FreeLibrary(_td->hModuleProxy);
-      _td->hModuleProxy = LoadLibrary(proxy_modulename);
+   if (!_td->hModuleProxy) {
+    char module_filename[_MAX_PATH];
+    if(!GetModuleFileName(g_hInstance, module_filename, _MAX_PATH)){
+      SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: unable to get handle for loaded keyman versioned dll; error:[%d]", GetLastError());
+        return FALSE;
     }
-  }
-  else {
-    _td->hModuleProxy = LoadLibrary(proxy_modulename);
-  }
-  if (!_td->hModuleProxy) {
-
-      SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: [%s] not loaded with error:[%d]", proxy_modulename, GetLastError());
-      return FALSE;
+    char *p = strrchr(module_filename, '\\'); // find last occurrence of '\'
+    if (p != NULL) {
+      int64_t len = strnlen(keyman_engine_arch,_MAX_PATH);
+      // We know that the arch filename is shorter than the versioned filename so this
+      // should always be safe, just insure we insert the null character
+      strncpy(p, keyman_engine_arch, len + 1); // +1 ensure null padding terminates the string
+      _td->hModuleProxy = LoadLibrary(module_filename);
+      if (!_td->hModuleProxy) {
+        SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: [%s] not loaded with error:[%d]", module_filename, GetLastError());
+        return FALSE;
+      }
+    }
+    else {
+      SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: unable to find path for keyman versioned dll");
+        return FALSE;
+    }
   }
 
   BOOL result = false;
