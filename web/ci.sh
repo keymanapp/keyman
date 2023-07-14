@@ -89,6 +89,7 @@ if builder_start_action test; then
 
   $KEYMAN_ROOT/common/web/keyboard-processor/build.sh test $OPTIONS
   $KEYMAN_ROOT/common/web/input-processor/build.sh test $OPTIONS
+  $KEYMAN_ROOT/common/web/gesture-processor/test.sh $OPTIONS
 
   ./build.sh test $OPTIONS
 
