@@ -2,6 +2,22 @@ import { gestures } from '@keymanapp/gesture-recognizer';
 import specs = gestures.specs;
 import ContactModel = specs.ContactModel;
 
+export const InstantRejectionModel: ContactModel = {
+  itemPriority: 0,
+  onPathResolve: 'reject',
+  pathModel: {
+    evaluate: (path) => 'resolve'
+  }
+}
+
+export const InstantResolutionModel: ContactModel = {
+  itemPriority: 0,
+  onPathResolve: 'resolve',
+  pathModel: {
+    evaluate: (path) => 'resolve'
+  }
+}
+
 export const MainLongpressSourceModel: ContactModel = {
   onItemChange: 'reject',
   itemPriority: 0,

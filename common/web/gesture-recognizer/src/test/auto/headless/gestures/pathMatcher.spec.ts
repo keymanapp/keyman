@@ -9,6 +9,8 @@ import { InputSample, SimpleGestureSource, gestures } from '@keymanapp/gesture-r
 import { timedPromise } from '@keymanapp/web-utils';
 
 import {
+  InstantRejectionModel,
+  InstantResolutionModel,
   MainLongpressSourceModel,
   MainLongpressSourceModelWithShortcut
 } from './isolatedPathSpecs.js';
@@ -53,6 +55,46 @@ describe("PathMatcher", function() {
   afterEach(function() {
     this.fakeClock.restore();
   })
+
+  describe("Instant fulfillment modeling", function() {
+    it("resolve", async function() {
+      const emulatedContactPoint = new SimpleGestureSource<string>(1, true);
+      const modelMatcher = new gestures.matchers.PathMatcher(InstantResolutionModel, emulatedContactPoint);
+
+      const startSample = {
+        targetX: 1,
+        targetY: 1,
+        t: 100,
+        item: 'a'
+      };
+
+      const samples = [startSample];
+      // In case of unexpected errors during sample or cancel simulation.
+      await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher, {terminate: false});
+
+      assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      assert.deepEqual(await modelMatcher.promise, {type: 'resolve'});
+    });
+
+    it("reject", async function() {
+      const emulatedContactPoint = new SimpleGestureSource<string>(1, true);
+      const modelMatcher = new gestures.matchers.PathMatcher(InstantRejectionModel, emulatedContactPoint);
+
+      const startSample = {
+        targetX: 1,
+        targetY: 1,
+        t: 100,
+        item: 'a'
+      };
+
+      const samples = [startSample];
+      // In case of unexpected errors during sample or cancel simulation.
+      await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher, {terminate: false});
+
+      assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      assert.deepEqual(await modelMatcher.promise, {type: 'reject'});
+    });
+  });
 
   describe("Longpress: primary path modeling", function() {
     it("resolve: longpress timer completed", async function() {
