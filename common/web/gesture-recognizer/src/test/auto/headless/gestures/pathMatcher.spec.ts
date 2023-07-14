@@ -13,6 +13,8 @@ import {
   InstantResolutionModel,
   MainLongpressSourceModel,
   MainLongpressSourceModelWithShortcut,
+  ModipressStartModel,
+  ModipressEndModel,
   SimpleTapModel
 } from './isolatedPathSpecs.js';
 
@@ -328,6 +330,73 @@ describe("PathMatcher", function() {
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
       assert.deepEqual(await modelMatcher.promise, {type: 'resolve'});
+    });
+  });
+
+  describe("Modipress: primary path modeling", function () {
+    it("push: on path start", async function() {
+      const emulatedContactPoint = new SimpleGestureSource<string>(1, true);
+      const modelMatcher = new gestures.matchers.PathMatcher(ModipressStartModel, emulatedContactPoint);
+
+      const startSample = {
+        targetX: 1,
+        targetY: 1,
+        t: 100,
+        item: 'a'
+      };
+
+      const samples = [startSample];
+      // In case of unexpected errors during sample or cancel simulation.
+      await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher, {terminate: false});
+
+      assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      assert.equal((await modelMatcher.promise).type, 'push');
+      assert.isOk(((await modelMatcher.promise) as gestures.specs.PushResult).permittedGestures);
+    });
+
+    it("pop: released", async function() {
+      const emulatedContactPoint = new SimpleGestureSource<string>(1, true);
+      const modelMatcher = new gestures.matchers.PathMatcher(ModipressEndModel, emulatedContactPoint);
+
+      const startSample = {
+        targetX: 1,
+        targetY: 1,
+        t: 100,
+        item: 'a'
+      };
+
+      const samples = [startSample];
+      // In case of unexpected errors during sample or cancel simulation.
+      await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher, {terminate: true});
+
+      assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      assert.deepEqual(await modelMatcher.promise, {type: 'pop'});
+    });
+
+    it("pop: item changed", async function() {
+      const emulatedContactPoint = new SimpleGestureSource<string>(1, true);
+      const modelMatcher = new gestures.matchers.PathMatcher(ModipressEndModel, emulatedContactPoint);
+
+      const startSample = {
+        targetX: 1,
+        targetY: 1,
+        t: 100,
+        item: 'a'
+      };
+
+      const endSample = {
+        targetX: 2,
+        targetY: 2,
+        t: 500,
+        item: 'b'
+      }
+
+      const samples = [startSample, endSample];
+      // In case of unexpected errors during sample or cancel simulation.
+      await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher, {terminate: false});
+
+      assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      assert.deepEqual(await modelMatcher.promise, {type: 'pop'});
     });
   });
 

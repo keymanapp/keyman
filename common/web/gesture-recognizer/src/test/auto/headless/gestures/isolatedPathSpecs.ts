@@ -2,6 +2,8 @@ import { gestures } from '@keymanapp/gesture-recognizer';
 import specs = gestures.specs;
 import ContactModel = specs.ContactModel;
 
+// TBD:  flick modeling
+
 export const InstantRejectionModel: ContactModel = {
   itemPriority: 0,
   onPathResolve: 'reject',
@@ -52,6 +54,32 @@ export const MainLongpressSourceModelWithShortcut: ContactModel = {
       }
 
       return MainLongpressSourceModel.pathModel.evaluate(path);
+    }
+  }
+}
+
+export const ModipressStartModel: ContactModel = {
+  itemPriority: -1,
+  onPathResolve: {
+    type: 'push',
+    permittedGestures: ['TBD, but irrelevant at the PathMatcher level']
+  },
+  pathModel: {
+    // Consideration of whether the underlying item supports the corresponding
+    // gesture will be handled elsewhere.
+    evaluate: (path) => 'resolve'
+  }
+}
+
+export const ModipressEndModel: ContactModel = {
+  itemPriority: -1,
+  onItemChange: 'resolve',
+  onPathResolve: 'pop',
+  pathModel: {
+    evaluate: (path) => {
+      if(path.isComplete) {
+        return 'resolve';
+      }
     }
   }
 }
