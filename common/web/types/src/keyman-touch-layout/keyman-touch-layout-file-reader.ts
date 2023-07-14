@@ -1,6 +1,7 @@
 import { default as AjvModule } from 'ajv';
 const Ajv = AjvModule.default; // The actual expected Ajv type.
 import { TouchLayoutFile } from "./keyman-touch-layout-file.js";
+import Schemas from '../../src/schemas.js';
 
 export class TouchLayoutFileReader {
   public read(source: Uint8Array): TouchLayoutFile {
@@ -67,11 +68,9 @@ export class TouchLayoutFileReader {
     return result;
   }
 
-  // TODO: still using Buffer not Uint8Array here
-  public validate(source: TouchLayoutFile, schemaBuffer: Buffer): void {
-    const schema = JSON.parse(schemaBuffer.toString('utf8'));
+  public validate(source: TouchLayoutFile): void {
     const ajv = new Ajv();
-    if(!ajv.validate(schema, source))
+    if(!ajv.validate(Schemas.touchLayoutClean, source))
     /* c8 ignore next 3 */
     {
       throw new Error(ajv.errorsText());

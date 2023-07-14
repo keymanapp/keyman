@@ -100,7 +100,7 @@ export class LdmlKeyboardCompiler {
     }
     try {
       // validate the object tree against the .xsd schema
-      if (!reader.validate(source, this.callbacks.loadSchema('ldml-keyboard'))) {
+      if (!reader.validate(source)) {
         return null;
       }
     } catch(e) {
@@ -133,7 +133,7 @@ export class LdmlKeyboardCompiler {
       // TODO-LDML: The unboxed data doesn't match the schema anymore. Skipping validation, for now.
 
       // try {
-      //   if (!reader.validate(source, this.callbacks.loadSchema('ldml-keyboard-test'))) {
+      //   if (!reader.validate(source)) {
       //     return null;
       //   }
       // } catch(e) {

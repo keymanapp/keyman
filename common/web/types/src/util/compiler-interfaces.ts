@@ -195,15 +195,6 @@ export enum CompilerErrorNamespace {
   KmwCompiler = 0x7000,
 };
 
-export type CompilerSchema =
-  'ldml-keyboard' |
-  'ldml-keyboardtest' |
-  'kvks' |
-  'kpj' |
-  'kpj-9.0' |
-  'displaymap';
-  // | 'keyman-touch-layout.clean'; TODO this has the wrong name pattern, .spec.json instead of .schema.json
-
 /**
  * A mapping for common path operations, maps to Node path module. This only
  * defines the functions we are actually using, so that we can port more easily
@@ -261,7 +252,6 @@ export interface CompilerCallbacks {
    */
   resolveFilename(baseFilename: string, filename: string): string;
 
-  loadSchema(schema: CompilerSchema): Uint8Array;
   reportMessage(event: CompilerEvent): void;
 
   debug(msg: string): void;
@@ -322,10 +312,6 @@ export class CompilerFileCallbacks implements CompilerCallbacks {
 
   resolveFilename(baseFilename: string, filename: string): string {
     return this.parent.resolveFilename(baseFilename, filename);
-  }
-
-  loadSchema(schema: CompilerSchema): Uint8Array {
-    return this.parent.loadSchema(schema);
   }
 
   reportMessage(event: CompilerEvent): void {

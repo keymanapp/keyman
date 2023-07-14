@@ -40,14 +40,20 @@ fi
 
 function copy_schemas() {
   # We need the schema files at runtime and bundled, so always copy it for all actions except `clean`
-  mkdir -p "$THIS_SCRIPT_PATH/build/src/"
-  cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json" "$THIS_SCRIPT_PATH/build/src/"
-  cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboardtest.schema.json" "$THIS_SCRIPT_PATH/build/src/"
-  cp "$KEYMAN_ROOT/common/schemas/kvks/kvks.schema.json" "$THIS_SCRIPT_PATH/build/src/"
-  cp "$KEYMAN_ROOT/common/schemas/kpj/kpj.schema.json" "$THIS_SCRIPT_PATH/build/src/"
-  cp "$KEYMAN_ROOT/common/schemas/kpj-9.0/kpj-9.0.schema.json" "$THIS_SCRIPT_PATH/build/src/"
-  cp "$KEYMAN_ROOT/common/schemas/keyman-touch-layout/keyman-touch-layout.clean.spec.json" "$THIS_SCRIPT_PATH/build/src/"
-  cp "$KEYMAN_ROOT/common/schemas/displaymap/displaymap.schema.json" "$THIS_SCRIPT_PATH/build/src/"
+  local schemas=(
+    "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json"
+    "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboardtest.schema.json"
+    "$KEYMAN_ROOT/common/schemas/kvks/kvks.schema.json"
+    "$KEYMAN_ROOT/common/schemas/kpj/kpj.schema.json"
+    "$KEYMAN_ROOT/common/schemas/kpj-9.0/kpj-9.0.schema.json"
+    "$KEYMAN_ROOT/common/schemas/displaymap/displaymap.schema.json"
+    "$KEYMAN_ROOT/common/schemas/keyman-touch-layout/keyman-touch-layout.spec.json"
+    "$KEYMAN_ROOT/common/schemas/keyman-touch-layout/keyman-touch-layout.clean.spec.json"
+  )
+
+  rm -rf "$THIS_SCRIPT_PATH/src/schemas"
+  mkdir -p "$THIS_SCRIPT_PATH/src/schemas"
+  cp "${schemas[@]}" "$THIS_SCRIPT_PATH/src/schemas/"
   # Store CLDR imports
   # load all versions that have a cldr_info.json
   for CLDR_INFO_PATH in "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/"*/cldr_info.json

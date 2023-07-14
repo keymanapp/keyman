@@ -5,6 +5,7 @@ const Ajv = AjvModule.default; // The actual expected Ajv type.
 import { boxXmlArray } from '../util/util.js';
 import { KeymanDeveloperProject, KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from './keyman-developer-project.js';
 import { CompilerCallbacks } from '../util/compiler-interfaces.js';
+import Schemas from '../schemas.js';
 
 export class KPJFileReader {
   constructor(private callbacks: CompilerCallbacks) {
@@ -33,13 +34,11 @@ export class KPJFileReader {
     return data as KPJFile;
   }
 
-  public validate(source: KPJFile, schemaBuffer: Uint8Array, legacySchemaBuffer: Uint8Array): void {
-    const schema = JSON.parse(new TextDecoder().decode(schemaBuffer));
+  public validate(source: KPJFile): void {
     const ajv = new Ajv();
-    if(!ajv.validate(schema, source)) {
+    if(!ajv.validate(Schemas.kpj, source)) {
       const ajvLegacy = new Ajv();
-      const legacySchema = JSON.parse(new TextDecoder().decode(legacySchemaBuffer));
-      if(!ajvLegacy.validate(legacySchema, source)) {
+      if(!ajvLegacy.validate(Schemas.kpj90, source)) {
         // If the legacy schema also does not validate, then we will only report
         // the errors against the modern schema
         throw new Error(ajv.errorsText());

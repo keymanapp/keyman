@@ -54,28 +54,9 @@ if builder_start_action clean; then
   builder_finish_action success clean
 fi
 
-function copy_schemas() {
-  # We need the schema file at runtime and bundled, so always copy it for all actions except `clean`
-  local schemas=(
-    "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json"
-    "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboardtest.schema.json"
-    "$KEYMAN_ROOT/common/schemas/kvks/kvks.schema.json"
-    "$KEYMAN_ROOT/common/schemas/kpj/kpj.schema.json"
-    "$KEYMAN_ROOT/common/schemas/kpj-9.0/kpj-9.0.schema.json"
-    "$KEYMAN_ROOT/common/schemas/displaymap/displaymap.schema.json"
-  )
-
-  mkdir -p "$THIS_SCRIPT_PATH/build/src/util/"
-  cp "${schemas[@]}" "$THIS_SCRIPT_PATH/build/src/util/"
-
-  mkdir -p "$THIS_SCRIPT_PATH/build/dist/"
-  cp "${schemas[@]}" "$THIS_SCRIPT_PATH/build/dist/"
-}
-
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action configure; then
-  copy_schemas
   verify_npm_setup
   builder_finish_action success configure
 fi
@@ -83,7 +64,6 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action build; then
-  copy_schemas
   npm run build
   builder_finish_action success build
 fi
@@ -91,7 +71,6 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action test; then
-  copy_schemas
   eslint .
   tsc --build test/
   mocha

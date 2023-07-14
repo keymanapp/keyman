@@ -1,11 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { CompilerEvent, CompilerCallbacks, CompilerSchema, CompilerPathCallbacks, CompilerFileSystemCallbacks, CompilerError } from '@keymanapp/common-types';
+import { CompilerEvent, CompilerCallbacks, CompilerPathCallbacks, CompilerFileSystemCallbacks, CompilerError } from '@keymanapp/common-types';
 export { verifyCompilerMessagesObject } from './verifyCompilerMessagesObject.js';
-
-// TODO: schemas are only used by kmc-ldml for now, so this works at this
-// time, but it's a little fragile if we need them elsewhere in the future
-const SCHEMA_BASE = '../../../../kmc-ldml/build/src/';
 
 /**
  * A CompilerCallbacks implementation for testing
@@ -71,10 +67,6 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
   reportMessage(event: CompilerEvent): void {
     // console.log(event.message);
     this.messages.push(event);
-  }
-
-  loadSchema(schema: CompilerSchema): Uint8Array {
-    return fs.readFileSync(new URL(SCHEMA_BASE + schema + '.schema.json', import.meta.url));
   }
 
   debug(msg: string) {
