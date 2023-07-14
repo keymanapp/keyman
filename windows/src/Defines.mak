@@ -32,11 +32,16 @@ INSTALLPATH_KEYMANDEVELOPER=%ProgramFiles(X86)%\Keyman\Keyman Developer
 INSTALLPATH_KEYMANENGINE=%CommonProgramFiles(X86)%\Keyman\Keyman Engine
 
 !IFDEF DEBUG
+GO_FAST=1
 MAKEFLAG_DEBUG="DEBUG=$(DEBUG)"
 DELPHI_MSBUILD_FLAG_DEBUG="/p:Config=Debug"
 !ELSE
+!IFDEF TEAMCITY_PR_NUMBER
+GO_FAST=1
+!ENDIF
 DELPHI_MSBUILD_FLAG_DEBUG="/p:Config=Release"
 !ENDIF
+
 
 !IFDEF USERDEFINES
 MAKEFLAG_USERDEFINES="USERDEFINES=$(USERDEFINES)"
@@ -184,7 +189,12 @@ MSBUILD_CLEAN=/t:Clean /p:Configuration=Release
 COPY=copy
 ISXBUILD=C:\PROGRA~1\INSTALLSHIELD\Express\System\IsExpCmdBld
 WZZIPPATH="C:\program files\7-zip\7z.exe"
-WZZIP=$(WZZIPPATH) a
+
+!IFDEF GO_FAST
+WZZIP=$(WZZIPPATH) a -mx1
+!ELSE
+WZZIP=$(WZZIPPATH) a -mx9
+!ENDIF
 WZUNZIP=$(WZZIPPATH) e
 
 # TDSPACK=error! $(ROOT)\src\buildtools\tdspack\tdspack -e
@@ -206,16 +216,12 @@ WIXLIGHTLINT=
 WIXLIGHTLINT= -sice:ICE82 -sice:ICE80
 !ENDIF
 
-!IFDEF DEBUG
+!IFDEF GO_FAST
 # for debug builds, we turn off compression because it is so hideously slow
-WIXLIGHTCOMPRESSION=-dcl:none
-!ELSE
-!IFDEF TEAMCITY_PR_NUMBER
 # for test builds, we also turn off compression
 WIXLIGHTCOMPRESSION=-dcl:none
 !ELSE
 WIXLIGHTCOMPRESSION=-dcl:high
-!ENDIF
 !ENDIF
 
 WIXLIGHT=$(WIXPATH)\light.exe -wx -nologo $(WIXLIGHTLINT) $(WIXLIGHTCOMPRESSION)
