@@ -7,7 +7,7 @@ import { timedPromise } from '@keymanapp/web-utils';
 
 // End of "for the integrated style..."
 
-describe("FingerPath", function() {
+describe("GesturePath", function() {
   // // File paths need to be from the package's / module's root folder
   // let testJSONtext = fs.readFileSync('src/test/resources/json/canaryRecording.json');
 

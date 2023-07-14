@@ -46,9 +46,13 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
   private samples: InputSample<Type>[] = [];
 
   private _isComplete: boolean = false;
-  private wasCancelled?: boolean;
+  private _wasCancelled?: boolean;
 
-  private stats: CumulativePathStats;
+  private _stats: CumulativePathStats;
+
+  public get stats() {
+    return new CumulativePathStats(this._stats);
+  }
 
   /**
    * Initializes an empty path intended for tracking a newly-activated touchpoint.
@@ -56,7 +60,7 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
   constructor() {
     super();
 
-    this.stats = new CumulativePathStats();
+    this._stats = new CumulativePathStats();
   }
 
   /**
@@ -68,10 +72,10 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
 
     instance.samples = [].concat(jsonObj.coords.map((obj) => ({...obj} as InputSample<Type>)));
     instance._isComplete = true;
-    instance.wasCancelled = jsonObj.wasCancelled;
+    instance._wasCancelled = jsonObj.wasCancelled;
 
     let stats = instance.samples.reduce((stats: CumulativePathStats, sample) => stats.extend(sample), new CumulativePathStats());
-    instance.stats = stats;
+    instance._stats = stats;
 
     return instance;
   }
@@ -82,6 +86,10 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
    */
   public get isComplete() {
     return this._isComplete;
+  }
+
+  public get wasCancelled() {
+    return this._wasCancelled;
   }
 
   /**
@@ -96,7 +104,7 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
     // The tracked path should emit InputSample events before Segment events and
     // resolution of Segment Promises.
     this.samples.push(sample);
-    this.stats = this.stats.extend(sample);
+    this._stats = this._stats.extend(sample);
     this.emit('step', sample);
   }
 
@@ -108,7 +116,7 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
     if(this._isComplete) {
       throw new Error("Invalid state:  this GesturePath has already terminated.");
     }
-    this.wasCancelled = cancel;
+    this._wasCancelled = cancel;
     this._isComplete = true;
 
     // If cancelling, do so before finishing segments
@@ -146,7 +154,7 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
         t:       obj.t,
         item:    obj.item
       }))),
-      wasCancelled: this.wasCancelled
+      wasCancelled: this._wasCancelled
     }
 
     // Removes components of each sample that we don't want serialized.
