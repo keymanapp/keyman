@@ -45,12 +45,12 @@ element::get_tertiary() const {
 
 bool
 element::is_prebase() const {
-  return flags & LDML_ELEM_FLAGS_PREBASE;
+  return !!(flags & LDML_ELEM_FLAGS_PREBASE);
 }
 
 bool
 element::is_tertiary_base() const {
-  return flags & LDML_ELEM_FLAGS_TERTIARY_BASE;
+  return !!(flags & LDML_ELEM_FLAGS_TERTIARY_BASE);
 }
 
 KMX_DWORD
@@ -69,34 +69,29 @@ element::matches(km_kbp_usv ch) const {
 
 int
 reorder_sort_key::compare(const reorder_sort_key &other) const {
-  if (primary < other.primary) {
-    return -1;
-  } else if (primary > other.primary) {
-    return 1;
-  } else if (secondary < other.secondary) {
-    return -1;
-  } else if (secondary > other.secondary) {
-    return 1;
-  } else if (tertiary < other.tertiary) {
-    return -1;
-  } else if (tertiary > other.tertiary) {
-    return 1;
-  } else if (quaternary < other.quaternary) {
-    return -1;
-  } else if (quaternary > other.quaternary) {
-    return 1;
-  } else if (ch < other.ch) {  // tiebreak with char value
-    return -1;
-  } else if (ch > other.ch) {
-    return 1;
+  int primaryResult    = (int)primary    - (int)other.primary;
+  int secondaryResult  = (int)secondary  - (int)other.secondary;
+  int tertiaryResult   = (int)tertiary   - (int)other.tertiary;
+  int quaternaryResult = (int)quaternary - (int)other.quaternary;
+
+  if (primaryResult) {
+    return primaryResult;
+  } else if (secondaryResult) {
+    return secondaryResult;
+  } else if (tertiaryResult) {
+    return tertiaryResult;
+  } else if (quaternaryResult) {
+    return quaternaryResult;
   } else {
-    return 0;  // identical
+    assert(quaternaryResult);  // quaternary is a string index, should always be !=
+    int identityResult = (int)ch - (int)other.ch;  // tie breaker
+    return identityResult;
   }
 }
 
 bool
 reorder_sort_key::operator<(const reorder_sort_key &other) const {
-  return (compare(other) == -1);
+  return (compare(other) < 0);
 }
 
 std::deque<reorder_sort_key>
@@ -106,10 +101,8 @@ reorder_sort_key::from(const std::u32string &str) {
   std::deque<reorder_sort_key> keylist;
   auto s   = str.begin();  // str iterator
   size_t c = 0;            // str index
-  for (auto e = str.begin(); e < str.end(); e++) {
+  for (auto e = str.begin(); e < str.end(); e++, s++, c++) {
     keylist.emplace_back(reorder_sort_key{*s, 0, c, 0, c});
-    s++;
-    c++;
   }
   return keylist;
 }
@@ -129,7 +122,7 @@ element_list::match_end(const std::u32string &str) const {
   auto s = str.rbegin();
   // e: end to front on elements.
   // we know the # of elements is <= length of string,
-  // so we dont' need to check the string's boundaries
+  // so we don't need to check the string's boundaries
   for (auto e = rbegin(); e < rend(); e++) {
     assert(s < str.rend()); // double check
     if (!e->matches(*s)) {
@@ -267,12 +260,11 @@ reorder_group::apply(std::u32string &str) const {
   // recombine into a str
   std::u32string newSuffix;
   size_t q = sort_keys.begin()->quaternary;  //
-  for (auto e = sort_keys.begin(); e < sort_keys.end(); e++) {
+  for (auto e = sort_keys.begin(); e < sort_keys.end(); e++, q++) {
     if (q != e->quaternary) {                // something rearranged in this subrange
       applied = true;
     }
     newSuffix.append(1, e->ch);
-    q++;  // TODO: use this to check if reorder happened.
   }
   if (applied) {
     // DebugLog("Final Sort");
