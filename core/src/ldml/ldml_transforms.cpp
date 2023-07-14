@@ -101,10 +101,8 @@ reorder_sort_key::from(const std::u32string &str) {
   std::deque<reorder_sort_key> keylist;
   auto s   = str.begin();  // str iterator
   size_t c = 0;            // str index
-  for (auto e = str.begin(); e < str.end(); e++) {
+  for (auto e = str.begin(); e < str.end(); e++, s++, c++) {
     keylist.emplace_back(reorder_sort_key{*s, 0, c, 0, c});
-    s++;
-    c++;
   }
   return keylist;
 }
@@ -239,12 +237,11 @@ reorder_group::apply(std::u32string &str) const {
   // recombine into a str
   std::u32string newSuffix;
   size_t q = sort_keys.begin()->quaternary;  //
-  for (auto e = sort_keys.begin(); e < sort_keys.end(); e++) {
+  for (auto e = sort_keys.begin(); e < sort_keys.end(); e++, q++) {
     if (q != e->quaternary) {                // something rearranged in this subrange
       applied = true;
     }
     newSuffix.append(1, e->ch);
-    q++;  // TODO: use this to check if reorder happened.
   }
   if (applied) {
     // DebugLog("Final Sort");
