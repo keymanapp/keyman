@@ -51,7 +51,7 @@ sudo mk-build-deps --install linux/debian/control
 
 ### Node.js
 
-Node.js v18 is required for the core build.
+Node.js v18 is required for Core build, Web tests, and Developer command line tools.
 
 ## Keyman for Linux
 
