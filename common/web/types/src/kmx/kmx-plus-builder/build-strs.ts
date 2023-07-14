@@ -14,7 +14,7 @@ interface BUILDER_STRS_ITEM {
   // we always write a null terminator, so we can get restructure to do that for us here
   offset: number; //? new r.Pointer(r.uint32le, new r.String(null, 'utf16le')),
   length: number; // in UTF-16 code units
-  _value: string
+  _value: string; // in-memory: for finding and sorting
 };
 
 /**

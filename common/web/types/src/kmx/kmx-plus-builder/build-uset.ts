@@ -1,7 +1,7 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlusData, StrsItem, UsetItem } from "../kmx-plus.js";
 import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
-import { BUILDER_SECTION } from "./builder-section.js";
+import { BUILDER_SECTION, BUILDER_U32CHAR } from "./builder-section.js";
 
 /** reference from build_uset_index */
 export type BUILDER_USET_REF = number;
@@ -14,8 +14,8 @@ interface BUILDER_USET_USET {
 };
 
 interface BUILDER_USET_RANGE {
-  start: number; // uchar32
-  end: number; // uchar32
+  start: BUILDER_U32CHAR; // uchar32
+  end: BUILDER_U32CHAR; // uchar32
 }
 
 export interface BUILDER_USET extends BUILDER_SECTION {

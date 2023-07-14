@@ -2,7 +2,7 @@ import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { ElementString } from "../element-string.js";
 import { Elem } from "../kmx-plus.js";
 import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
-import { BUILDER_SECTION } from "./builder-section.js";
+import { BUILDER_SECTION, BUILDER_U32CHAR } from "./builder-section.js";
 import { build_uset_index, BUILDER_USET, BUILDER_USET_REF } from "./build-uset.js";
 
 /* ------------------------------------------------------------------
@@ -13,7 +13,7 @@ import { build_uset_index, BUILDER_USET, BUILDER_USET_REF } from "./build-uset.j
 export type BUILDER_ELEM_REF = number;
 
 interface BUILDER_ELEM_ELEMENT {
-  element: BUILDER_STR_REF | BUILDER_USET_REF | number;  // str | UTF-32 char
+  element: BUILDER_STR_REF | BUILDER_USET_REF | BUILDER_U32CHAR;  // str | UTF-32 char
   flags: number;
   _value: string;
 };

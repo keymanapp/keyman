@@ -3,7 +3,7 @@ import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KeysFlick, KMXPlusData, StrsItem } from "../kmx-plus.js";
 import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { build_list_index, BUILDER_LIST, BUILDER_LIST_REF } from "./build-list.js";
-import { BUILDER_SECTION } from "./builder-section.js";
+import { BUILDER_SECTION, BUILDER_U32CHAR } from "./builder-section.js";
 
 /* ------------------------------------------------------------------
  * keys section
@@ -13,7 +13,7 @@ import { BUILDER_SECTION } from "./builder-section.js";
  * This struct is a single <key> in the keys keybag
  */
 interface BUILDER_KEYS_KEY {
-  to: number; // str or single codepoint
+  to: BUILDER_STR_REF | BUILDER_U32CHAR; // str or single codepoint
   flags: number;
   id: BUILDER_STR_REF; // str with original key id
   _id: string; // original key id, for sorting
@@ -56,8 +56,6 @@ interface BUILDER_KEYS_KMAP {
  * Builder for the 'keys' section
  */
 export interface BUILDER_KEYS extends BUILDER_SECTION {
-  ident: number;
-  size: number;
   keyCount: number;
   flicksCount: number;
   flickCount: number;
