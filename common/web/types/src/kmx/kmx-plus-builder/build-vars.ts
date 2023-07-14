@@ -3,7 +3,7 @@ import { KMXPlusData } from "../kmx-plus.js";
 import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_SECTION } from "./builder-section.js";
 import { BUILDER_LIST_REF } from "./build-list.js";
-import { /*build_elem_index, BUILDER_ELEM,*/ BUILDER_ELEM_REF } from "./build-elem.js";
+import { build_elem_index, BUILDER_ELEM, BUILDER_ELEM_REF } from "./build-elem.js";
 
 
 interface BUILDER_VARS_ITEM {
@@ -22,7 +22,7 @@ export interface BUILDER_VARS extends BUILDER_SECTION {
 /**
 * Builder for the 'vars' section
 */
-export function build_vars(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS /*, sect_elem: BUILDER_ELEM */) : BUILDER_VARS {
+export function build_vars(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_elem: BUILDER_ELEM) : BUILDER_VARS {
   if(!kmxplus.vars) {
     return null;
   }
@@ -36,8 +36,7 @@ export function build_vars(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS /*, sec
     type: constants.vars_entry_type_set,
     id: build_strs_index(sect_strs, v.id),
     value: build_strs_index(sect_strs, v.value),
-    // TODO-LDML: elem
-    // elem: build_elem_index(sect_elem, v.items),
+    elem: build_elem_index(sect_elem, v.items),
   });
   const uniSetVars = kmxplus.vars.unicodeSets.map(v => <BUILDER_VARS_ITEM>{
     type: constants.vars_entry_type_unicodeSet,
