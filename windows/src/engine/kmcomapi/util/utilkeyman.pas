@@ -309,7 +309,7 @@ begin
   end;
   Result := IncludeTrailingPathDelimiter(RootPath);
   Keyman32Name := GetKeyman32Name;
-  if not FileExists(Result + Keyman32Name) then
+  if (Keyman32Name = '') or not FileExists(Result + Keyman32Name) then
     raise EKeymanNotInstalled.Create( 'The executable '+Keyman32Name+' could not '+
       'be found.  You should reinstall.');
 end;

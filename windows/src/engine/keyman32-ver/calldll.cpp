@@ -238,6 +238,7 @@ BOOL UnloadDLLs(LPINTKEYBOARDINFO lpkbi)
             return FALSE;
           if (_td->hModuleProxy){
             FreeLibrary(_td->hModuleProxy);
+            _td->hModuleProxy = NULL;
           }
   }
 	return TRUE;
