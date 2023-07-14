@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as kmcLdml from '@keymanapp/kmc-ldml';
 import { CompilerBaseOptions, CompilerCallbacks, defaultCompilerOptions, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboardXMLSourceFileReader } from '@keymanapp/common-types';
-import { NodeCompilerCallbacks } from '../../messages/NodeCompilerCallbacks.js';
+import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 import { fileURLToPath } from 'url';
 
 export function buildTestData(infile: string, options: CompilerBaseOptions) {

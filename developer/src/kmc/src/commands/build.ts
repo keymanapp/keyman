@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { Command } from 'commander';
 import { buildActivities } from './buildClasses/buildActivities.js';
 import { BuildProject } from './buildClasses/BuildProject.js';
-import { NodeCompilerCallbacks } from '../messages/NodeCompilerCallbacks.js';
+import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/messages.js';
 import { CompilerFileCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
 import { BaseOptions } from '../util/baseOptions.js';

@@ -6,7 +6,7 @@ import { CompilerCallbacks, CompilerSchema, CompilerEvent,
          CompilerError,
          CompilerCallbackOptions,
          CompilerFileCallbacks} from '@keymanapp/common-types';
-import { InfrastructureMessages } from './messages.js';
+import { InfrastructureMessages } from '../messages/messages.js';
 import chalk from 'chalk';
 import supportsColor from 'supports-color';
 
@@ -174,7 +174,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   }
 
   loadSchema(schema: CompilerSchema): Uint8Array {
-    let schemaPath = new URL('../util/' + schema + '.schema.json', import.meta.url);
+    let schemaPath = new URL('./' + schema + '.schema.json', import.meta.url);
     return fs.readFileSync(schemaPath);
   }
 
