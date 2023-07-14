@@ -2,8 +2,6 @@ import { gestures } from '@keymanapp/gesture-recognizer';
 import specs = gestures.specs;
 import ContactModel = specs.ContactModel;
 
-// TBD:  flick modeling
-
 export const InstantRejectionModel: ContactModel = {
   itemPriority: 0,
   onPathResolve: 'reject',

@@ -59,6 +59,12 @@ describe("PathMatcher", function() {
     this.fakeClock.restore();
   })
 
+  describe.skip("Flick:  primary path modeling", function() {
+    it("Actual expectations for flick behavior still in flux - cannot spec yet", async function() {
+
+    });
+  });
+
   describe("Instant fulfillment modeling", function() {
     it("resolve", async function() {
       const emulatedContactPoint = new SimpleGestureSource<string>(1, true);
