@@ -55,3 +55,16 @@ export const MainLongpressSourceModelWithShortcut: ContactModel = {
     }
   }
 }
+
+export const SimpleTapModel: ContactModel = {
+  itemPriority: 0,
+  onItemChange: 'reject',
+  onPathResolve: 'resolve',
+  pathModel: {
+    evaluate: (path) => {
+      if(path.isComplete && !path.wasCancelled) {
+        return 'resolve';
+      }
+    }
+  }
+}
