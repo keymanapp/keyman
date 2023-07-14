@@ -1,19 +1,20 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlusData } from "../kmx-plus.js";
-import { build_strs_index, BUILDER_STRS } from "./build-strs.js";
+import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_SECTION } from "./builder-section.js";
-import { build_elem_index, BUILDER_ELEM } from "./build-elem.js";
+import { BUILDER_LIST_REF } from "./build-list.js";
+import { build_elem_index, BUILDER_ELEM, BUILDER_ELEM_REF } from "./build-elem.js";
 
 
 interface BUILDER_VARS_ITEM {
   type: number;
-  id: number; // str
-  value: number; // str
-  elem?: number; // elem
+  id: BUILDER_STR_REF; // str
+  value: BUILDER_STR_REF; // str
+  elem?: BUILDER_ELEM_REF; // elem
 };
 
 export interface BUILDER_VARS extends BUILDER_SECTION {
-  markers: number; // list, TODO-LDML
+  markers: BUILDER_LIST_REF;
   varCount: number;
   varEntries: BUILDER_VARS_ITEM[];
 };

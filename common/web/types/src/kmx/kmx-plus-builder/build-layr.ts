@@ -1,7 +1,7 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlusData, LayrEntry, LayrRow, StrsItem } from "../kmx-plus.js";
-import { build_strs_index, BUILDER_STRS } from "./build-strs.js";
+import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_LIST } from "./build-list.js";
 import { BUILDER_SECTION } from "./builder-section.js";
 
@@ -24,7 +24,7 @@ interface BUILDER_LAYR_LIST {
  * <layer> element
  */
 interface BUILDER_LAYR_LAYER {
-  id: number; // str of layer id
+  id: BUILDER_STR_REF; // str of layer id
   _id: string; // original layer id, for sorting
   mod: number; // bitfield with modifier info
   row: number; // row index into row subtable

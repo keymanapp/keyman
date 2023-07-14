@@ -1,16 +1,19 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { ElementString } from "../element-string.js";
 import { Elem } from "../kmx-plus.js";
-import { build_strs_index, BUILDER_STRS } from "./build-strs.js";
-import { BUILDER_SECTION } from "./builder-section.js";
-import { build_uset_index, BUILDER_USET } from "./build-uset.js";
+import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
+import { BUILDER_SECTION, BUILDER_U32CHAR } from "./builder-section.js";
+import { build_uset_index, BUILDER_USET, BUILDER_USET_REF } from "./build-uset.js";
 
 /* ------------------------------------------------------------------
  * elem section
    ------------------------------------------------------------------ */
 
+/** return from build_elem_index */
+export type BUILDER_ELEM_REF = number;
+
 interface BUILDER_ELEM_ELEMENT {
-  element: number;  // str | UTF-32 char
+  element: BUILDER_STR_REF | BUILDER_USET_REF | BUILDER_U32CHAR;  // str | UTF-32 char
   flags: number;
   _value: string;
 };
@@ -98,7 +101,7 @@ export function build_elem(source_elem: Elem, sect_strs: BUILDER_STRS, sect_uset
   return result;
 }
 
-export function build_elem_index(sect_elem: BUILDER_ELEM, value: ElementString) {
+export function build_elem_index(sect_elem: BUILDER_ELEM, value: ElementString) : BUILDER_ELEM_REF{
   if(!(value instanceof ElementString)) {
     throw new Error('unexpected value '+value);
   }
@@ -107,5 +110,5 @@ export function build_elem_index(sect_elem: BUILDER_ELEM, value: ElementString) 
   if(result < 0) {
     throw new Error('unexpectedly missing StrsItem '+value);
   }
-  return result;
+  return <BUILDER_ELEM_REF>result;
 }
