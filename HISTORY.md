@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.141 alpha 2023-07-15
+
+* feat(core): implement reorder (#9223)
+* chore(common): add BUILDER_STR_REF (#9248)
+* feat(core): load reorder from kmx+, test case (#9260)
+
 ## 17.0.140 alpha 2023-07-14
 
 *  (#9008)
