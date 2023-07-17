@@ -33,6 +33,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
 
   messages: CompilerEvent[] = [];
   messageCount = 0;
+  messageFilename: string = '';
 
   constructor(private options: CompilerCallbackOptions) {
     color.enabled = this.options.color ?? (supportsColor.stdout ? supportsColor.stdout.hasBasic : false);
@@ -41,6 +42,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   clear() {
     this.messages = [];
     this.messageCount = 0;
+    this.messageFilename = '';
   }
 
   /**
@@ -113,6 +115,13 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     // We don't use this.messages.length because we only want to count visible
     // messages, and there's no point in recalculating the total for every
     // message emitted.
+
+    if(this.messageFilename != event.filename) {
+      // Reset max message limit when a new file is being processed
+      this.messageFilename = event.filename;
+      this.messageCount = 0;
+    }
+
     this.messageCount++;
     if(this.messageCount > MaxMessagesDefault) {
       return;
