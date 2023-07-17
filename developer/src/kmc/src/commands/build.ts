@@ -7,6 +7,7 @@ import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/messages.js';
 import { CompilerFileCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
 import { BaseOptions } from '../util/baseOptions.js';
+import { expandFileLists } from '../util/fileLists.js';
 
 
 function commandOptionsToCompilerOptions(options: any): CompilerOptions {
@@ -29,7 +30,19 @@ function commandOptionsToCompilerOptions(options: any): CompilerOptions {
 export function declareBuild(program: Command) {
   BaseOptions.addAll(program
     .command('build [infile...]')
-    .description('Build a source file into a final file')
+    .description(`Compile one or more source files or projects.`)
+    .addHelpText('after', `
+Supported file types:
+  * folder: Keyman project in folder
+  * .kpj: Keyman project
+  * .kmn: Keyman keyboard
+  * .xml: LDML keyboard
+  * .model.ts: Keyman lexical model
+  * .kps: Keyman keyboard package
+
+File lists can be referenced with @filelist.txt.
+
+If no input file is supplied, kmc will build the current folder.`)
   )
     .option('-d, --debug', 'Include debug information in output')
     .option('-w, --compiler-warnings-as-errors', 'Causes warnings to fail the build; overrides project-level warnings-as-errors option')
@@ -48,10 +61,13 @@ export function declareBuild(program: Command) {
         filenames.push('.');
       }
 
+      if(!expandFileLists(filenames, callbacks)) {
+        process.exit(1);
+      }
+
       for(let filename of filenames) {
         if(!await build(filename, callbacks, options)) {
           // Once a file fails to build, we bail on subsequent builds
-          // TODO: is this the most appropriate semantics?
           process.exit(1);
         }
       }
