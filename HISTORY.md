@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.142 alpha 2023-07-17
+
+* chore(windows): disable wix compression for debug builds (#9074)
+
 ## 17.0.141 alpha 2023-07-15
 
 * feat(core): implement reorder (#9223)
