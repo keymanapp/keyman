@@ -5,7 +5,6 @@
 #include <iostream>
 #include "mc_savekeyboard.h"
 #include "mc_kmxfile.h"
-#include "mc_savekeyboard.h"
 
 int dummytest_helpers();
 void  check_avaiability_of_modules_();
