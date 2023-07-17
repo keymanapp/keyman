@@ -117,8 +117,7 @@ if builder_start_action bundle; then
     --ext js --ext mjs --ext ts --ext map \
     build/ "${SOURCEMAP_PATHS[@]}"
 
-  # Manually copy over kmcmplib module and schemas
-  copy_schemas
+  # Manually copy over kmcmplib module
   cp ../kmc-kmn/build/src/import/kmcmplib/wasm-host.wasm build/dist/
 
   cp build/dist/* "$BUILD_PATH"
