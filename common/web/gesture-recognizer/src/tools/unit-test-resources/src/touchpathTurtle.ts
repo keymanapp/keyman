@@ -1,26 +1,49 @@
+import EventEmitter from "eventemitter3";
+
 import {
   type InputSample
 } from "@keymanapp/gesture-recognizer"
+
+interface EventMap<Type> {
+  /**
+   * Emits samples once they are fully specified.  Note that there may be a slight delay enforced -
+   * this allows the 'hovered item' to be altered after any turtle pathing command before the
+   * corresponding sample is published to the event.
+   *
+   * The slight delay also facilitates emitting the sample provided during initialization, simplifying
+   * its integration with path-oriented unit tests.
+   */
+  'sample': (sample: InputSample<Type>) => void
+}
 
 /**
  * Designed to facilitate creation of 'synthetic' touchpath sample sequences for use
  * in unit tests.
  */
-export class TouchpathTurtle<HoveredItemType> {
+export class TouchpathTurtle<HoveredItemType> extends EventEmitter<EventMap<HoveredItemType>> {
   private pathSamples: InputSample<HoveredItemType>[];
+  private pendingSample: InputSample<HoveredItemType> = null;
 
   constructor(obj: InputSample<HoveredItemType> | TouchpathTurtle<HoveredItemType>) {
+    super();
+
     if(!(obj instanceof TouchpathTurtle)) {
-      this.pathSamples = [obj];
+      this.pathSamples = [];
+      this.pendingSample = obj;
       return;
     }
 
     // Do deep-copying.
     this.pathSamples   = [].concat(obj.pathSamples);
+    this.pendingSample = obj.pendingSample;
   }
 
   get location(): InputSample<HoveredItemType> {
-    return this.pathSamples[this.pathSamples.length-1];
+    if(this.pendingSample) {
+      return this.pendingSample;
+    } else {
+      return this.pathSamples[this.pathSamples.length-1];
+    }
   }
 
   get path(): InputSample<HoveredItemType>[] {
@@ -32,22 +55,40 @@ export class TouchpathTurtle<HoveredItemType> {
   }
 
   set hoveredItem(item: HoveredItemType) {
-    this.location.item = item;
+    if(this.pendingSample) {
+      this.pendingSample.item = item;
+    } else {
+      this.pendingSample = {
+        ...this.location,
+        item: item
+      }
+    }
+  }
+
+  /**
+   * Force-publishes the most recently-generated sample.  By default, the most recent sample
+   * is left unpublished in case the its 'item' entry needs to be altered.
+   */
+  public commitPending() {
+    const pending = this.pendingSample;
+    if(pending) {
+      this.pathSamples.push(pending);
+      this.emit('sample', pending);
+    }
+    this.pendingSample = null;
   }
 
   protected trackSample(sample: InputSample<HoveredItemType>) {
-    this.pathSamples.push(sample);
+    this.commitPending();
+    this.pendingSample = sample;
 
     /*
      * Future subsegmentation hook notes:
      *
-     * 1. Have this class accept a callback that gets samples.
-     * 2. Call it from this method.  That's why sample-adding has been
-     *    centralized here.
-     * 3. Define a separate class... SubsegmentationMockingTurtle(?)...
+     * 1. Define a separate class... SubsegmentationMockingTurtle(?)...
      *    to fulfill any subsegmentation-algorithm-mocking needs by
      *    making them from the turtle itself (as the original did).
-     * 4. Use this class internally, but restore the code removed in THIS
+     * 2. Use this class internally, but restore the code removed in THIS
      *    commit (use `git blame` to confirm) in THAT class.
      *    - that class would be focused on managing the stats objects
      *    - it would also provide the original signatures for `wait` and
@@ -80,8 +121,8 @@ export class TouchpathTurtle<HoveredItemType> {
     this.trackSample(currentSample);
   }
 
-  move(angleInDegrees: number, distance: number, time: number, interval: number) {
-    if(distance < 0 || time < 0 || interval < 0) {
+  move(angleInDegrees: number, distance: number, time: number, sampleCount: number) {
+    if(distance < 0 || time < 0 || sampleCount < 1) {
       // negative angles are actually fine, so we don't filter those.
       throw new Error("Invalid parameter value:  may not be negative!");
     }
@@ -91,29 +132,24 @@ export class TouchpathTurtle<HoveredItemType> {
     let xDistance = Math.cos(angle) * distance;
     let yDistance = -Math.sin(angle) * distance;
 
-    const xTickDist = xDistance * interval / time;
-    const yTickDist = yDistance * interval / time;
+    const xTickDist = xDistance / sampleCount;
+    const yTickDist = yDistance / sampleCount;
+    const tTickDist = time / sampleCount;
 
     const startSample = this.location;
 
     // While _definitely_ not a perfect match for a real input recording... we'll just interpolate evenly.
     let currentSample = {...startSample};
 
-    for(let timeDelta = 0; timeDelta < time; timeDelta += interval) {
+    for(let i = 1; i <= sampleCount; i++) {
       currentSample = {
-        targetX: currentSample.targetX + xTickDist,
-        targetY: currentSample.targetY + yTickDist,
-        t: startSample.t + timeDelta
+        targetX: startSample.targetX + xTickDist * i,
+        targetY: startSample.targetY + yTickDist * i,
+        t: startSample.t + tTickDist * i,
+        item: startSample.item
       };
 
       this.trackSample(currentSample);
     }
-
-    currentSample = {
-      targetX: startSample.targetX + xDistance,
-      targetY: startSample.targetY + yDistance,
-      t: startSample.t + time
-    };
-    this.trackSample(currentSample);
   }
 }
