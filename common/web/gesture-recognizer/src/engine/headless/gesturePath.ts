@@ -97,6 +97,7 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
    * @param sample
    */
   extend(sample: InputSample<Type>) {
+    /* c8 ignore next 3 */
     if(this._isComplete) {
       throw new Error("Invalid state:  this GesturePath has already terminated.");
     }
@@ -113,6 +114,7 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
    * @param cancel Whether or not this finalization should trigger cancellation.
    */
   terminate(cancel: boolean = false) {
+    /* c8 ignore next 3 */
     if(this._isComplete) {
       throw new Error("Invalid state:  this GesturePath has already terminated.");
     }
@@ -161,6 +163,11 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
     for(let sample of jsonClone.coords) {
       delete sample.clientX;
       delete sample.clientY;
+
+      // No point in serializing an `undefined` 'item' entry.
+      if(sample.item === undefined) {
+        delete sample.item;
+      }
     }
 
     return jsonClone;
