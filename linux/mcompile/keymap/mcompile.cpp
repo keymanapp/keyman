@@ -37,6 +37,7 @@ mcompile -d runs 4 important steps:
 
 // run with       ./mcompile -d in.kmx bla.dll 0407 out.kmx
 //./mcompile -d /Projects/keyman/keyman/linux/mcompile/keymap/anii.kmx bla.dll 0407 /Projects/keyman/keyman/linux/mcompile/keymap/anii_out.kmx
+//./mcompile -d /Projects/keyman/keyman/linux/mcompile/keymap/sil_ipa_o.kmx bla.dll 0407 /Projects/keyman/keyman/linux/mcompile/keymap/sil_ipa_o_out2.kmx
 
 #include "mcompile.h"
 #include "helpers.h"
@@ -52,13 +53,13 @@ mcompile -d runs 4 important steps:
     std::vector<std::u16string> argv_16 = convert_argv_to_Vector_u16str(argc, argv);
 #endif
 
-  std::vector<const char16_t*> vec_cmdl_par;
+  std::vector<const char16_t*> v_argv_16;
   for (int i = 0; i < argc; i++) {
     const char16_t* cmdl_par = argv_16[i].c_str();
-    vec_cmdl_par.push_back(cmdl_par);
+    v_argv_16.push_back(cmdl_par);
   }
   // call new run/ method() with char16_t
-  run(argc, vec_cmdl_par);
+  run(argc, v_argv_16);
 
 }
 //------ run with char16_t !! -------------------------------------------------------------------------------------------------------------------------
@@ -151,7 +152,13 @@ wprintf(L"_S2 * Up to here cross-platform xx  :-))))) **************************
     return 3;
   }
 
-std::cout << " ++ UP TO HERE IN STEP 1 +++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+std::wcout << " ++ UP TO HERE IN STEP 1 +++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+// _S2 this is only for testing- remove and use SaveKeyboard in  block below
+
+std::wcout << " ++ will start KMX_SaveKeyboard +++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+ KMX_SaveKeyboard(kmxfile, outfile);
+std::wcout << " ++ ended KMX_SaveKeyboard +++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+
 
 /*  if(DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552
     SaveKeyboard(kmxfile, outfile);

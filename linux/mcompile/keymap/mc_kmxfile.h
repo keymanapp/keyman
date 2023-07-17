@@ -139,9 +139,9 @@ BOOL LoadKeyboard(char16_t* fileName, LPKEYBOARD *lpKeyboard);		// _S2 LPKEYBOAR
 		KMX_BOOL KMX_LoadKeyboard(wchar_t* fileName, LPKMX_KEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
 		KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
 
-
+KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename);
+KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug);
 #endif
-
 
 
 

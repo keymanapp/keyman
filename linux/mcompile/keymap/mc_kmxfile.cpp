@@ -1,4 +1,3 @@
-
 #include "mc_kmxfile.h"
 #include "helpers.h"
 #include "u16.h"
@@ -16,6 +15,220 @@ KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz);
 
 LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
 
+KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename) {
+
+  MyCoutW(L"#### KMX_SaveKeyboard of mcompile started", 1);
+  FILE *fp;
+  fp = Open_File(filename, u"wb");
+
+  if(fp == NULL)
+  {
+    KMX_LogError(L"Failed to create output file (%d)", errno);
+    return FALSE;
+  }
+
+  KMX_DWORD err = KMX_WriteCompiledKeyboard(kbd, fp, FALSE);
+  fclose(fp);
+
+  if(err != CERR_None) {
+    KMX_LogError(L"Failed to write compiled keyboard with error %d", err);
+
+    std::u16string u16_filname(filename);
+    std::string s = string_from_u16string(u16_filname);
+
+    remove(s.c_str());
+    return FALSE;
+  }
+
+  MyCoutW(L"#### KMX_SaveKeyboard of mcompile ended", 1);
+  return TRUE;
+}
+
+KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug)
+{
+
+  MyCoutW(L"  #### KMX_WriteCompiledKeyboard of mcompile started", 1);
+	LPKMX_GROUP fgp;
+	LPKMX_STORE fsp;
+	LPKMX_KEY fkp;
+
+	PKMX_COMP_KEYBOARD ck;
+	PKMX_COMP_GROUP gp;
+	PKMX_COMP_STORE sp;
+	PKMX_COMP_KEY kp;
+	PKMX_BYTE buf;
+	KMX_DWORD size, offset;
+	DWORD i, j;
+
+	// Calculate how much memory to allocate
+	size = sizeof(KMX_COMP_KEYBOARD) +
+			fk->cxGroupArray * sizeof(KMX_COMP_GROUP) +
+			fk->cxStoreArray * sizeof(KMX_COMP_STORE) +
+      //wcslen(fk->szName)*2 + 2 +
+			//wcslen(fk->szCopyright)*2 + 2 +
+			//wcslen(fk->szLanguageName)*2 + 2 +
+			//wcslen(fk->szMessage)*2 + 2 +
+      fk->dwBitmapSize;
+
+	for(i = 0, fgp = fk->dpGroupArray; i < fk->cxGroupArray; i++, fgp++) {
+    if(fgp->dpName)
+	    size += u16len(fgp->dpName)*2 + 2;
+		size += fgp->cxKeyArray * sizeof(KMX_COMP_KEY);
+		for(j = 0, fkp = fgp->dpKeyArray; j < fgp->cxKeyArray; j++, fkp++) {
+			size += u16len(fkp->dpOutput)*2 + 2;
+			size += u16len(fkp->dpContext)*2 + 2;
+		}
+
+		if( fgp->dpMatch ) size += u16len(fgp->dpMatch)*2 + 2;
+		if( fgp->dpNoMatch ) size += u16len(fgp->dpNoMatch)*2 + 2;
+	}
+
+
+	for(i = 0; i < fk->cxStoreArray; i++)
+	{
+		size += u16len(fk->dpStoreArray[i].dpString)*2 + 2;
+    if(fk->dpStoreArray[i].dpName)
+      size += u16len(fk->dpStoreArray[i].dpName)*2 + 2;
+	}
+
+	buf = new KMX_BYTE[size];
+	if(!buf) return CERR_CannotAllocateMemory;
+	memset(buf, 0, size);
+
+	ck = (PKMX_COMP_KEYBOARD) buf;
+
+	ck->dwIdentifier = FILEID_COMPILED;
+
+  ck->dwFileVersion = fk->dwFileVersion;
+	ck->dwCheckSum = 0; // No checksum in 16.0, see #7276
+	ck->KeyboardID = fk->xxkbdlayout;
+  ck->IsRegistered = fk->IsRegistered;
+	ck->cxStoreArray = fk->cxStoreArray;
+	ck->cxGroupArray = fk->cxGroupArray;
+	ck->StartGroup[0] = fk->StartGroup[0];
+	ck->StartGroup[1] = fk->StartGroup[1];
+	ck->dwHotKey = fk->dwHotKey;
+
+	ck->dwFlags = fk->dwFlags;
+
+	offset = sizeof(KMX_COMP_KEYBOARD);
+
+	// ck->dpLanguageName = offset;
+	//wcscpy((PWSTR)(buf + offset), fk->szLanguageName);
+	//offset += wcslen(fk->szLanguageName)*2 + 2;
+
+	//ck->dpName = offset;
+	//wcscpy((PWSTR)(buf + offset), fk->szName);
+	//offset += wcslen(fk->szName)*2 + 2;
+
+	//ck->dpCopyright = offset;
+	//wcscpy((PWSTR)(buf + offset), fk->szCopyright);
+	//offset += wcslen(fk->szCopyright)*2 + 2;
+
+	//ck->dpMessage = offset;
+	//wcscpy((PWSTR)(buf + offset), fk->szMessage);
+	//offset += wcslen(fk->szMessage)*2 + 2;
+
+
+	ck->dpStoreArray = offset;
+	sp = (PKMX_COMP_STORE)(buf+offset);
+	fsp = fk->dpStoreArray;
+	offset += sizeof(KMX_COMP_STORE) * ck->cxStoreArray;
+	for(i = 0; i < ck->cxStoreArray; i++, sp++, fsp++) {
+		sp->dwSystemID = fsp->dwSystemID;
+		sp->dpString = offset;
+		u16ncpy((PKMX_WCHAR)(buf+offset), fsp->dpString, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
+		offset += u16len(fsp->dpString)*2 + 2;
+
+    if(!fsp->dpName) {
+      sp->dpName = 0;
+    } else {
+      sp->dpName = offset;
+      u16ncpy((PKMX_WCHAR)(buf+offset), fsp->dpName, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
+		  offset += u16len(fsp->dpName)*2 + 2;
+    }
+	}
+
+	ck->dpGroupArray = offset;
+	gp = (PKMX_COMP_GROUP)(buf+offset);
+	fgp = fk->dpGroupArray;
+
+	offset += sizeof(KMX_COMP_GROUP) * ck->cxGroupArray;
+
+	for(i = 0; i < ck->cxGroupArray; i++, gp++, fgp++) {
+		gp->cxKeyArray = fgp->cxKeyArray;
+		gp->fUsingKeys = fgp->fUsingKeys;
+
+		gp->dpMatch = gp->dpNoMatch = 0;
+
+		if(fgp->dpMatch) {
+			gp->dpMatch = offset;
+			u16ncpy((PKMX_WCHAR)(buf+offset), fgp->dpMatch, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
+			offset += u16len(fgp->dpMatch)*2 + 2;
+		}
+		if(fgp->dpNoMatch) {
+			gp->dpNoMatch = offset;
+			u16ncpy((PKMX_WCHAR)(buf+offset), fgp->dpNoMatch, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
+			offset += u16len(fgp->dpNoMatch)*2 + 2;
+		}
+
+    if(fgp->dpName) {
+			gp->dpName = offset;
+			u16ncpy((PKMX_WCHAR)(buf+offset), fgp->dpName, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
+			offset += u16len(fgp->dpName)*2 + 2;
+		}	else {
+      gp->dpName = 0;
+    }
+
+    gp->dpKeyArray = offset;
+		kp = (PKMX_COMP_KEY) (buf + offset);
+		fkp = fgp->dpKeyArray;
+		offset += gp->cxKeyArray * sizeof(KMX_COMP_KEY);
+		for(j = 0; j < gp->cxKeyArray; j++, kp++, fkp++) {
+			kp->Key = fkp->Key;
+			kp->Line = fkp->Line;
+			kp->ShiftFlags = fkp->ShiftFlags;
+			kp->dpOutput = offset;
+
+
+			u16ncpy((PKMX_WCHAR)(buf+offset), fkp->dpOutput, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
+			offset += u16len(fkp->dpOutput)*2 + 2;
+
+
+      kp->dpContext = offset;
+      u16ncpy((PKMX_WCHAR)(buf+offset), fkp->dpContext, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
+		  offset += u16len(fkp->dpContext)*2 + 2;
+		}
+	}
+
+  if(fk->dwBitmapSize > 0) {
+    ck->dwBitmapSize = fk->dwBitmapSize;
+	  ck->dpBitmapOffset = offset;
+    memcpy(buf + offset, ((PKMX_BYTE)fk) + fk->dpBitmapOffset, fk->dwBitmapSize);
+	  offset += fk->dwBitmapSize;
+  } else {
+    ck->dwBitmapSize = 0;
+	  ck->dpBitmapOffset = 0;
+  }
+
+	if(offset != size)
+  {
+    delete[] buf;
+    return CERR_SomewhereIGotItWrong;
+  }
+
+  fwrite(buf, size,1,hOutfile);
+	if(offset != size)
+  {
+    delete[] buf;
+    return CERR_UnableToWriteFully;
+  }
+
+	delete[] buf;
+
+  MyCoutW(L"  #### KMX_WriteCompiledKeyboard of mcompile ended", 1);
+	return CERR_None;
+}
 
 
 PKMX_WCHAR KMX_StringOffset(PKMX_BYTE base, KMX_DWORD offset) {
@@ -172,7 +385,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   LPKMX_KEYBOARD kbp;
   PKMX_BYTE filebase;
 
-  wprintf(L"Loading file '%ls'\n", u16fmt((const char16_t*) fileName).c_str());
+  wprintf(L"  Loading file '%ls'\n", u16fmt((const char16_t*) fileName).c_str());
 
   if(!fileName || !lpKeyboard) {
     KMX_LogError(L"LogError1: Bad Filename\n" );
@@ -269,7 +482,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
     return FALSE;
   }
 
-  std::wcout << "kbp->dwIdentifier: " << kbp->dwIdentifier << " FILEID_COMPILED: " << FILEID_COMPILED << "\n";
+  std::wcout << "     kbp->dwIdentifier: " << kbp->dwIdentifier << " FILEID_COMPILED: " << FILEID_COMPILED << "\n";
 
   if (kbp->dwIdentifier != FILEID_COMPILED) {
     delete[] buf;
