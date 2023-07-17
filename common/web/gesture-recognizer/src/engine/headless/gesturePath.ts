@@ -51,7 +51,8 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
   private _stats: CumulativePathStats;
 
   public get stats() {
-    return new CumulativePathStats(this._stats);
+    // Is (practically) immutable, so it's safe to expose the instance directly.
+    return this._stats;
   }
 
   /**

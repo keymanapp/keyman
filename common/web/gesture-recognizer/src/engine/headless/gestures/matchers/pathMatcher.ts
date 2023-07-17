@@ -14,14 +14,14 @@ export class PathMatcher<Type> {
   }
 
   constructor(model: ContactModel, source: SimpleGestureSource<Type>) {
-    this.model = model;
-    this.publishedPromise = new ManagedPromise<PointModelResolution>();
-    this.source = source;
-
     /* c8 ignore next 3 */
     if(!model || !source) {
       throw new Error("A gesture-path source and contact-path model must be specified.");
     }
+
+    this.model = model;
+    this.publishedPromise = new ManagedPromise<PointModelResolution>();
+    this.source = source;
 
     if(model.timer) {
       this.timerPromise = new TimeoutPromise(model.timer.duration);
@@ -44,10 +44,10 @@ export class PathMatcher<Type> {
 
     const model = this.model;
     if(result) {
-      if(typeof model.onPathResolve == 'string') {
-        this.publishedPromise.resolve({type: model.onPathResolve});
+      if(typeof model.pathResolutionAction == 'string') {
+        this.publishedPromise.resolve({type: model.pathResolutionAction});
       } else {
-        this.publishedPromise.resolve(model.onPathResolve);
+        this.publishedPromise.resolve(model.pathResolutionAction);
       }
     } else {
       this.publishedPromise.resolve({type: 'reject'});
@@ -63,8 +63,8 @@ export class PathMatcher<Type> {
       return 'reject';
     }
 
-    if(model.onItemChange && source.currentHoveredItem != source.initialHoveredItem) {
-      const result = model.onItemChange == 'resolve';
+    if(model.itemChangeAction && source.currentHoveredItem != source.initialHoveredItem) {
+      const result = model.itemChangeAction == 'resolve';
 
       this.finalize(result);
       return result;
@@ -75,8 +75,9 @@ export class PathMatcher<Type> {
       if(result != 'continue') {
         this.finalize(result == 'resolve');
       } else if(source.path.isComplete) {
-        return 'reject'; // if the PathModel said to 'continue' but the path is done, we default
-                         // to rejecting the model; there will be no more changes, after all.
+        // If the PathModel said to 'continue' but the path is done, we default
+        // to rejecting the model; there will be no more changes, after all.
+        return 'reject';
       }
 
       return result;

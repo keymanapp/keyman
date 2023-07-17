@@ -4,7 +4,7 @@ import ContactModel = specs.ContactModel;
 
 export const InstantRejectionModel: ContactModel = {
   itemPriority: 0,
-  onPathResolve: 'reject',
+  pathResolutionAction: 'reject',
   pathModel: {
     evaluate: (path) => 'resolve'
   }
@@ -12,16 +12,16 @@ export const InstantRejectionModel: ContactModel = {
 
 export const InstantResolutionModel: ContactModel = {
   itemPriority: 0,
-  onPathResolve: 'resolve',
+  pathResolutionAction: 'resolve',
   pathModel: {
     evaluate: (path) => 'resolve'
   }
 }
 
 export const MainLongpressSourceModel: ContactModel = {
-  onItemChange: 'reject',
+  itemChangeAction: 'reject',
   itemPriority: 0,
-  onPathResolve: 'resolve',
+  pathResolutionAction: 'resolve',
   timer: {
     duration: 500,
     expectedResult: true
@@ -58,7 +58,7 @@ export const MainLongpressSourceModelWithShortcut: ContactModel = {
 
 export const ModipressStartModel: ContactModel = {
   itemPriority: -1,
-  onPathResolve: {
+  pathResolutionAction: {
     type: 'push',
     permittedGestures: ['TBD, but irrelevant at the PathMatcher level']
   },
@@ -71,8 +71,8 @@ export const ModipressStartModel: ContactModel = {
 
 export const ModipressEndModel: ContactModel = {
   itemPriority: -1,
-  onItemChange: 'resolve',
-  onPathResolve: 'pop',
+  itemChangeAction: 'resolve',
+  pathResolutionAction: 'pop',
   pathModel: {
     evaluate: (path) => {
       if(path.isComplete) {
@@ -84,8 +84,8 @@ export const ModipressEndModel: ContactModel = {
 
 export const SimpleTapModel: ContactModel = {
   itemPriority: 0,
-  onItemChange: 'reject',
-  onPathResolve: 'resolve',
+  itemChangeAction: 'reject',
+  pathResolutionAction: 'resolve',
   pathModel: {
     evaluate: (path) => {
       if(path.isComplete && !path.wasCancelled) {
