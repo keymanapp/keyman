@@ -13,7 +13,7 @@ export interface ComplexResolveResult {
 
 type WrappedString<Text> = { type: Text };
 
-// pop - ends the modipress 'push' state.
+// pop - a signal to reverse actions taken in response to the most-recent 'push'.  (Generally, for 'modipress' gestures)
 type SimpleStringResult = 'resolve' | 'reject' | 'pop';
 
 export type PointModelResolution =  PushResult | ComplexResolveResult | WrappedString<SimpleStringResult>;
@@ -22,10 +22,12 @@ export type PointModelResolution =  PushResult | ComplexResolveResult | WrappedS
 export type SpecPointModelResolution = SimpleStringResult | PointModelResolution;
 
 export interface ContactModel {
-  pathModel: PathModel, // Might be able to fully drop the generic.
-  onPathResolve: SpecPointModelResolution,
-  itemPriority: number; // If multiple touchpoints are active, determines which point's item 'wins' for
-                        // gesture-state updates and resolution.  Higher = better.
+  pathModel: PathModel,
+  pathResolutionAction: SpecPointModelResolution,
+
+  // If multiple touchpoints are active, determines which point's item 'wins' for
+  // gesture-state updates and resolution.  Higher = better.
+  itemPriority: number;
 
   // For longpresses, in particular.
   // Reset:  this one should fail (base item change)
@@ -38,5 +40,5 @@ export interface ContactModel {
   // Allows specifying use of one of the configured 'gestureItemIdentifiers'.
   recognizerId?: string;
 
-  readonly onItemChange?: 'reject' | 'resolve'; // may be undefined for 'continue'
+  readonly itemChangeAction?: 'reject' | 'resolve'; // may be undefined for 'continue'
 }
