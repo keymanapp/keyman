@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
-#
-# Compiles the common file types module
-#
-
-# Exit on command failure and when using unset variables:
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -33,12 +26,7 @@ builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_start_action clean; then
-  rm -rf ./build/ ./tsconfig.tsbuildinfo
-  builder_finish_action success clean
-fi
-
-function copy_schemas() {
+function compile_schemas() {
   # We need the schema files at runtime and bundled, so always copy it for all actions except `clean`
   local schemas=(
     "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json"
@@ -54,6 +42,16 @@ function copy_schemas() {
   rm -rf "$THIS_SCRIPT_PATH/src/schemas"
   mkdir -p "$THIS_SCRIPT_PATH/src/schemas"
   cp "${schemas[@]}" "$THIS_SCRIPT_PATH/src/schemas/"
+
+  # TODO: use json modules instead of this once they stablise
+  for schema in "${schemas[@]}"; do
+    local fn="$THIS_SCRIPT_PATH/src/schemas/$(basename "$schema" .json)"
+    echo 'export default ' > "$fn.ts"
+    cat "$fn.json" >> "$fn.ts"
+  done
+}
+
+function copy_cldr_imports() {
   # Store CLDR imports
   # load all versions that have a cldr_info.json
   for CLDR_INFO_PATH in "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/"*/cldr_info.json
@@ -67,38 +65,32 @@ function copy_schemas() {
   done
 }
 
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_start_action configure; then
+function do_configure() {
+  compile_schemas
+  copy_cldr_imports
   verify_npm_setup
-  builder_finish_action success configure
-fi
+}
+
+function do_test() {
+  eslint .
+  tsc --build test
+  c8 --skip-full --reporter=lcov --reporter=text mocha "${builder_extra_params[@]}"
+}
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_start_action build; then
-  copy_schemas
-  npm run build
-  builder_finish_action success build
-fi
-
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_start_action test; then
-  copy_schemas
-  npm test -- "${builder_extra_params[@]}"
-  builder_finish_action success test
-fi
+builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo
+builder_run_action configure  do_configure
+builder_run_action build      tsc --build
+builder_run_action test       do_test
 
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action publish; then
-  copy_schemas
   . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
   builder_publish_to_npm
   builder_finish_action success publish
 elif builder_start_action pack; then
-  copy_schemas
   . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
   builder_publish_to_pack
   builder_finish_action success pack
