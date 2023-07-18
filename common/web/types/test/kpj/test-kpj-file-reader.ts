@@ -75,7 +75,7 @@ describe('kpj-file-reader', function () {
     assert.isTrue(project.options.warnDeprecatedCode);
     assert.equal(project.options.version, '1.0');
 
-    assert.lengthOf(project.files, 2);
+    assert.lengthOf(project.files, 3);
 
     let f: KeymanDeveloperProjectFile10 = <KeymanDeveloperProjectFile10>project.files[0];
     assert.equal(f.id, 'id_f347675c33d2e6b1c705c787fad4941a');
