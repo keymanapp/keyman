@@ -18,5 +18,5 @@ mcompile = executable(  'mcompile',  sources: [cpp_files],  dependencies: [gtk])
 
 #project('keymap', 'c', 'cpp',        license: 'MIT',       meson_version: '>=1.0')
 #gtk = dependency('gtk+-3.0', version: '>= 2.4')
-#cpp_files = files(  'keymap.cpp',    'mc_kmxfile.cpp',  'mc_savekeyboard.cpp',  'helpers.cpp',  'u16.cpp',)
+#cpp_files = files(  'keymap.cpp',   'mcompile.cpp',    'filesystem.cpp',   'mc_kmxfile.cpp',  'mc_savekeyboard.cpp',  'helpers.cpp',  'u16.cpp',)
 #keymap = executable(  'keymap',  sources: [cpp_files],   dependencies: [gtk])
