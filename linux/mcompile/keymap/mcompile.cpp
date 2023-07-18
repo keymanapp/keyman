@@ -48,6 +48,8 @@ mcompile -d runs 4 important steps:
 //------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------
 
+KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]);
+
 #if defined(_WIN32) || defined(_WIN64)
   int wmain(int argc, wchar_t* argv[]) {
     std::vector<std::u16string> str_argv_16 = convert_argvW_to_Vector_u16str( argc, argv);  
@@ -159,10 +161,6 @@ int run(int argc, std::vector<std::u16string>  str_argv, char* argv_ch[] = NULL)
 
 wprintf(L"_S2 * Up to here cross-platform xx  :-))))) ******************************************************\n");
 std::wcout << " ++ UP TO HERE IN STEP 1 +++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-std::wcout << " ++ will start KMX_SaveKeyboard ++++++++++++++++++++++++++++++++++++++++++++++++\n";
-// _S2 this is only for testing- remove and use SaveKeyboard in  block below
- KMX_SaveKeyboard(kmxfile, outfile);
-std::wcout << " ++ ended KMX_SaveKeyboard ###############################################\n";
 
 dummytest_keymap();
 
@@ -175,11 +173,9 @@ dummytest_keymap();
   }*/
 #else  // LINUX
   // _S2 this is only for testing- remove and use SaveKeyboard in  block below
-  run_DoConvert_Part1_getMap(argc, (gchar**) argv_ch);
-/*
-  if(DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552F
+  if(KMX_DoConvert( kmxfile,  kbid,  bDeadkeyConversion, argc, (gchar**) argv_ch)) {   // I4552F
     KMX_SaveKeyboard(kmxfile, outfile);
-  }*/
+}
 #endif
 
 
@@ -214,7 +210,15 @@ dummytest_keymap();
 
 
 
+  KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]) {
 
+    if (!(run_DoConvert_Part1_getMap(argc, argv)))
+    //run_DoConvert_Part2_TranslateKeyboard();
+
+    //if (!(run_DoConvert_Part1_getMap(argc, argv))   && (!run_DoConvert_Part2_TranslateKeyboard()) )
+
+    return true;
+  }
 
 
 
