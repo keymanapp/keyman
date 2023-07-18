@@ -9,7 +9,8 @@ export interface SerializedComplexGestureSource {
   // gesture: Gesture;
 }
 
-interface EventMap {
+interface EventMap<Type> {
+  'newcontact': (contact: SimpleGestureSource<Type>) => void;
   'end':    () => void;
   'cancel': () => void;
 }
@@ -35,7 +36,7 @@ interface EventMap {
  * `'end'`:     all gesture recognition for this input is to be resolved.
  *   - Provides no parameters.
  */
-export class ComplexGestureSource<HoveredItemType> extends EventEmitter<EventMap> {
+export class ComplexGestureSource<HoveredItemType> extends EventEmitter<EventMap<HoveredItemType>> {
   public readonly touchpoints: SimpleGestureSource<HoveredItemType>[];
 
   // --- Future design aspects ---
@@ -65,6 +66,11 @@ export class ComplexGestureSource<HoveredItemType> extends EventEmitter<EventMap
     })
   }
 
+  addTouchpoint(touchpoint: SimpleGestureSource<HoveredItemType>) {
+    this.touchpoints.push(touchpoint);
+    this._attachPointHooks(touchpoint);
+  }
+
   cancel() {
     if(this.isActive) {
       for(let point of this.touchpoints) {
@@ -78,6 +84,22 @@ export class ComplexGestureSource<HoveredItemType> extends EventEmitter<EventMap
       for(let point of this.touchpoints) {
         point.path.terminate(false);
       }
+    }
+  }
+
+  public get hasSyncedPaths(): boolean {
+    if(this.touchpoints.length <= 1) {
+      return true;
+    } else {
+      const timestamp = this.touchpoints[0].currentSample.t;
+
+      for(let i=1; i < this.touchpoints.length; i++) {
+        if(this.touchpoints[i].currentSample.t != timestamp) {
+          return false;
+        }
+      }
+
+      return true;
     }
   }
 

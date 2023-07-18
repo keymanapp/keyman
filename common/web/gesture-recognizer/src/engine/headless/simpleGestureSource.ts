@@ -7,7 +7,6 @@ import { SerializedGesturePath, GesturePath } from "./gesturePath.js";
 export type SerializedSimpleGestureSource<HoveredItemType = any> = {
   isFromTouch: boolean;
   path: SerializedGesturePath<HoveredItemType>;
-  initialHoveredItem: HoveredItemType
   // identifier is not included b/c it's only needed during live processing.
 }
 
@@ -84,19 +83,17 @@ export class SimpleGestureSource<HoveredItemType> {
   }
 
   /**
-   * The identifying metadata returned by the configuration's specified `itemIdentifier` for
-   * the target of the first `Event` that corresponded to this `SimpleGestureSource`.
+   * The initial path sample (coordinate) under consideration for this `SimpleGestureSource`.
    */
-  public get initialHoveredItem(): HoveredItemType {
-    return this.path.coords[0].item;
+  public get initialSample(): InputSample<HoveredItemType> {
+    return this.path.coords[0];
   }
 
   /**
-   * The identifying metadata returned by the configuration's specified `itemIdentifier` for
-   * the target of the latest `Event` that corresponded to this `SimpleGestureSource`.
+   * The most recent path sample (coordinate) under consideration for this `SimpleGestureSource`.
    */
-  public get currentHoveredItem(): HoveredItemType {
-    return this.path.coords[this.path.coords.length-1].item;
+  public get currentSample(): InputSample<HoveredItemType> {
+    return this.path.coords[this.path.coords.length-1];
   }
 
   /**
@@ -115,7 +112,6 @@ export class SimpleGestureSource<HoveredItemType> {
   toJSON(): SerializedSimpleGestureSource {
     let jsonClone: SerializedSimpleGestureSource = {
       isFromTouch: this.isFromTouch,
-      initialHoveredItem: this.initialHoveredItem,
       path: this.path.toJSON()
     }
 
