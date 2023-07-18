@@ -220,6 +220,7 @@ export interface CompilerFileSystemCallbacks {
   readFileSync(path: string, options: { encoding: string; flag?: string; } | string): string;
   readFileSync(path: string, options?: { encoding?: string | null; flag?: string; } | string | null): string | Uint8Array;
   writeFileSync(path: string, data: Uint8Array): void;
+  // statSync(path: string):
 
   existsSync(name: string): boolean;
 }
@@ -237,10 +238,14 @@ export interface CompilerCallbacks {
   /**
    * Attempt to load a file. Return falsy if not found.
    * TODO: never return falsy, just throw if not found?
-   * @param baseFilename
    * @param filename
    */
   loadFile(filename: string): Uint8Array;
+
+  /**
+   * Get file size, returns undefined if not found
+   */
+  fileSize(filename: string): number;
 
   get path(): CompilerPathCallbacks;
   get fs(): CompilerFileSystemCallbacks;
@@ -300,6 +305,10 @@ export class CompilerFileCallbacks implements CompilerCallbacks {
 
   loadFile(filename: string): Uint8Array {
     return this.parent.loadFile(filename);
+  }
+
+  fileSize(filename: string): number {
+    return this.parent.fileSize(filename);
   }
 
   get path(): CompilerPathCallbacks {
