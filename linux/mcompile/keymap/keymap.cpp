@@ -173,8 +173,8 @@ MyCoutW(L"    #### Split_US_To_3D_Vector of keymap started", 1);
 bool foundCharacterInList(std::string tok) {
   MyCoutW(L"  #### foundCharacterInList of keymap started", 1);
   //TOASK Do we need more and which?
-  //US keys:          Q    W    E    R    T    Y    U    I    O    P    A    S    D    F    G    H    J    K    L    :    Z    X    C    V    B    N    M
-  v_str_1D Keysyms { "24","25","26","27","28","29","30","31","32","33","38","39","40","41","42","43","44","45","46","47","52","53","54","55","56","57","58"};
+  //US keys:          Q    W    E    R    T    Y    U    I    O    P    A    S    D    F    G    H    J    K    L    Z    X    C    V    B    N    M
+  v_str_1D Keysyms { "24","25","26","27","28","29","30","31","32","33","38","39","40","41","42","43","44","45","46","52","53","54","55","56","57","58"};
 
   for ( int i =0; i< (int) Keysyms.size();i++) {
     //std::cout << "foundCharacterInList" << i <<"\n";
@@ -262,21 +262,21 @@ bool append_other_ToVector(v_str_3D &All_Vector,GdkKeymap * keymap) {
   All_Vector.push_back(Other_Vector2D);
   wprintf(L"+++++++ dimensions of Vector after append_other_ToVector\t %li..%li..%li\n", All_Vector.size(), All_Vector[0].size(),All_Vector[0][0].size());
 
-  if (All_Vector.size()==0) {
+  if (All_Vector.size() < 2) {
     wprintf(L"ERROR: creation of 3D-Vector failed");
     return 1;
   }
 
   for(int i =0; i< (int) All_Vector[1].size();i++) {
 
-    // get key name US stored in [0][i][0] and copy to name in other-block[1][i][0]
+    // get key name US stored in [0][i][0] and copy to name in "other"-block[1][i][0]
     All_Vector[1][i][0] = All_Vector[0][i][0];
 
-    // write this value to 3D- Vector
+    // get Keyvals of this key and copy to unshifted/shifted in "other"-block[1][i][1] / block[1][i][2]
     All_Vector[1][i][0+1] = GetKeyvalsFromKeymap(keymap,stoi(All_Vector[1][i][0]),0);   //shift state: unshifted:0
     All_Vector[1][i][1+1] = GetKeyvalsFromKeymap(keymap,stoi(All_Vector[1][i][0]),1);   //shift state: shifted:1
 
-    wprintf(L" Keycodes US->Other:   %d(US): %s %s ---- (other):%s,    \n",stoi(All_Vector[1][i][0]),All_Vector[0][i][1].c_str(),All_Vector[0][i][2].c_str(),All_Vector[1][i][1].c_str());  
+    wprintf(L" Keycodes US->Other:   %d(US): %s, %s ---- (other):%s, %s    \n",stoi(All_Vector[1][i][0]),All_Vector[0][i][1].c_str(),All_Vector[0][i][2].c_str(),All_Vector[1][i][1].c_str(),All_Vector[1][i][2].c_str());  
   }
 
   MyCoutW(L"  #### append_other_ToVector of keymap ended", 1);
@@ -304,7 +304,7 @@ v_str_2D create_empty_2D( int dim_rows,int dim_shifts) {
 
 int GetKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
 
-  MyCoutW(L"  #### GetKeyvalsFromKeymap of keymap started", 1);
+  //MyCoutW(L"  #### GetKeyvalsFromKeymap of keymap started", 1);
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
@@ -323,7 +323,7 @@ int GetKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) 
   g_free(keyvals);
   g_free(maps);
 
-  MyCoutW(L"  #### GetKeyvalsFromKeymap of keymap ended", 1);
+  //MyCoutW(L"  #### GetKeyvalsFromKeymap of keymap ended", 1);
   return out;
 }
 
@@ -333,25 +333,30 @@ bool extract_difference( v_str_3D &All_Vector) {
   // TODO define which Folder; find better name
   std::ofstream Map_File("Map_US.txt");
   std::string diff =" ";
+  std::wstring diff_w = L" ";
 
-  printf("-----------------------------------------------------------------------------------------------------------------------------------------------\n");
-  std::wcout << "Nr of \n" ;
-  std::wcout << "Key: " <<  "\t Character US (no shift) " <<  "  Character US (shift) "<<  "\t\tCharacter other (no shift)" <<  "\tCharacter other (shift)   difference \n" ;
+  wprintf(L"-----------------------------------------------------------------------------------------------------------------------------------------------\n");
+  std::wcout << "Nr of " <<  "\tCharacter US"<< "\tCharacter US"<<"\t\tCharacter Other"<<"\t  Character Other"<< "\tdifference\n";
+  std::wcout << "Key: "  <<  "\t(no shift) " <<  "\t(shift) "<<  "\t\t(no shift)" <<  "\t  (shift)\n" ;
   wprintf(L"-----------------------------------------------------------------------------------------------------------------------------------------------\n");
 
   Map_File <<"--------------------------------------------------------------------------------------------------------------------------------------------\n";
-  Map_File << "Nr of \n" ;
-  Map_File << "Key: " <<  "\t Character US (no shift) " <<  "  Character US (shift) "<<  "\t\tCharacter other (no shift)" <<  "\tCharacter other (shift)   difference \n" ;
+  Map_File << "Nr of " <<  "\tCharacter US"<< "\t  Character US"<<"\t\tCharacter Other"<<"\t  Character Other"<< "\tdifference\n";
+  Map_File << "Key: "  <<  "\t(no shift) " <<  "\t  (shift) "<<  "\t\t (no shift)" <<  "\t  (shift)\n" ;
   Map_File <<"--------------------------------------------------------------------------------------------------------------------------------------------\n";
 
   for ( int k=0; k<(int)All_Vector[0].size(); k++) {
-    if (All_Vector[0][k][1] == All_Vector[1][k][1])
-      diff =" ";
-    else
-      diff =" *** ";
+    if (All_Vector[0][k][1] == All_Vector[1][k][1]) {
+      diff =    "     ";
+      diff_w = L"     ";
+    }
+    else {
+      diff =    "*** ";
+      diff_w = L"*** ";
+    }
 
-    std::cout << All_Vector[0][k][0] << "\t " <<+(*(All_Vector[0][k][1].c_str()))<< "\t("<< All_Vector[0][k][1] <<")"<<std::setw(20-All_Vector[0][k][1].size())<<  +(*(All_Vector[0][k][2].c_str()))<< "\t("<< All_Vector[0][k][2] <<")"<<std::setw(20-All_Vector[0][k][2].size())<< "\t...\t"<< +(*(All_Vector[1][k][1].c_str()))<< "\t("<< All_Vector[1][k][1] <<")"<<std::setw(24-All_Vector[1][k][1].size())<<   +(*(All_Vector[1][k][2].c_str()))<< "\t("<< All_Vector[1][k][2] <<")"<<std::setw(20-All_Vector[1][k][2].size())<< diff <<"\n";
-    Map_File  << All_Vector[0][k][0] << " \t "<<+(*(All_Vector[0][k][1].c_str()))<< "\t("<< All_Vector[0][k][1] <<")"<<std::setw(20-All_Vector[0][k][1].size())<<  +(*(All_Vector[0][k][2].c_str()))<< "\t("<< All_Vector[0][k][2] <<")"<<std::setw(20-All_Vector[0][k][2].size())<< "\t...\t"<< +(*(All_Vector[1][k][1].c_str()))<< "\t("<< All_Vector[1][k][1] <<")"<<std::setw(24-All_Vector[1][k][1].size())<<   +(*(All_Vector[1][k][2].c_str()))<< "\t("<< All_Vector[1][k][2] <<")"<<std::setw(20-All_Vector[1][k][2].size())<< diff << "\n";
+     wprintf(L" %d\t%s\t\t%s\t\t|\t%s\t\t   %s\t\t\t%S\n", stoi(All_Vector[1][k][0]), All_Vector[0][k][1].c_str(), All_Vector[0][k][2].c_str(), All_Vector[1][k][1].c_str(), All_Vector[1][k][2].c_str(),  diff_w.c_str());  
+     Map_File  << All_Vector[0][k][0] << " \t"<<+(*(All_Vector[0][k][1].c_str()))<< "\t("<< All_Vector[0][k][1] <<")"<<std::setw(10-All_Vector[0][k][1].size())<<  +(*(All_Vector[0][k][2].c_str()))<< "\t("<< All_Vector[0][k][2] <<")"<<std::setw(18-All_Vector[0][k][2].size())<< +(*(All_Vector[1][k][1].c_str()))<< "\t("<< All_Vector[1][k][1] <<")"<<std::setw(10-All_Vector[1][k][1].size())<<   +(*(All_Vector[1][k][2].c_str()))<< "\t("<< All_Vector[1][k][2] <<")"<<std::setw(10-All_Vector[1][k][2].size())<< "\t"<<diff << "\n";
   }
 
   std::streampos fsize = Map_File.tellp();
@@ -369,7 +374,7 @@ bool extract_difference( v_str_3D &All_Vector) {
 
 std::string get_Other_Char_FromUS( std::string in , v_str_3D &All_Vector) {
 
-  MyCoutW(L"  #### get_Other_Char_FromUS of keymap started", 1);
+  //MyCoutW(L"  #### get_Other_Char_FromUS of keymap started", 1);
   std::string diff;
   // find correct row of char in US
   for( int i=0; i< (int) All_Vector[0].size();i++) {
@@ -392,7 +397,7 @@ std::string get_Other_Char_FromUS( std::string in , v_str_3D &All_Vector) {
 
 std::string get_US_Char_FromOther(std::string in , v_str_3D &All_Vector) {
 
-  MyCoutW(L"  #### get_US_Char_FromOther of keymap started", 1);
+  //MyCoutW(L"  #### get_US_Char_FromOther of keymap started", 1);
   std::string diff;
   // find correct row of char in other
   for( int i=0; i< (int)All_Vector[1].size();i++) {
@@ -413,7 +418,7 @@ std::string get_US_Char_FromOther(std::string in , v_str_3D &All_Vector) {
 
 std::string getKeyNrOf_USChar(std::string in , v_str_3D &All_Vector) {
 
-  MyCoutW(L"  #### getKeyNrOf_USChar of keymap started", 1);
+  //MyCoutW(L"  #### getKeyNrOf_USChar of keymap started", 1);
   // find correct row of char in US
   for( int i=0; i< (int)All_Vector[0].size();i++) {
     for( int j=1; j< (int)All_Vector[0][0].size();j++) {
@@ -429,7 +434,7 @@ std::string getKeyNrOf_USChar(std::string in , v_str_3D &All_Vector) {
 
 std::string getKeyNrOf_OtherChar(std::string in , v_str_3D &All_Vector) {
 
-  MyCoutW(L"  #### getKeyNrOf_OtherChar of keymap started", 1);
+  //MyCoutW(L"  #### getKeyNrOf_OtherChar of keymap started", 1);
   // find correct row of char in US
   for( int i=0; i< (int)All_Vector[1].size();i++) {
     for( int j=1; j< (int)All_Vector[1][0].size();j++) {
@@ -554,6 +559,15 @@ int run_DoConvert_Part1_getMap(gint argc, gchar *argv[]) {
 
   // write content of xkb_symbols to 3D Vector
   // I assume we use Keyboard US basic as base
+
+  // All_Vector[ language ][ Key ][ shiftstate ]
+  // we use a 3D vector All_Vector to store the Character values of the US keyboard and the "Other" Keyboard.
+  // All_Vector[ 0 ][..][..] and All_Vector[ 1 ][..][..] hold the name of the key which is the same for both keyboards(US and Other)
+  // e.g. All_Vector[ 0 ][..][ 0 ] = "y"  for the US-Keyboard (0: unshifted)
+  //      All_Vector[ 1 ][..][ 0 ] = "z"  for the Other Keyboard (german in this case) (0: unshifted)
+  //      All_Vector[ 0 ][..][ 1 ] = "Y"  for the US-Keyboard (1: shifted)
+  //      All_Vector[ 1 ][..][ 1 ] = "Z"  for the Other Keyboard (german in this case) (1: shifted)
+
   std::string US_language    = "us";
   const char* text_us        = "xkb_symbols \"basic\"";
 
@@ -565,7 +579,7 @@ int run_DoConvert_Part1_getMap(gint argc, gchar *argv[]) {
   test(All_Vector);
 
   MyCoutW(L"  # write_US_ToVector of keymap OK", 1);
-  // add contents of other keyboard to vector
+  // add contents of other keyboard to All_Vector
   if( append_other_ToVector(All_Vector,keymap)) {
     printf("ERROR: can't append other ToVector \n");
     return 1;

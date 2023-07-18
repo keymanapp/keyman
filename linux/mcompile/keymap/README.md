@@ -22,6 +22,9 @@ TODO use/adapt TranslateKeyboard() to work on Linux/cross-platform
 TODO use/adapt SaveKeyboard() to work on Linux/cross-platform
 TODO mcompile.cpp: open mcompile -u - option
 TODO check if I can use files from some other keyman path instead of a copy in keymap ( e.g. filesystem.h exists elsewhere)
+TODO remove kbdid and kbd for Linux
+TODO remove unneccessary testing fungctions in keymap.cpp/h
+TODO remove helpers.cpp/h
 TODO ...
 
 //---------------------------
