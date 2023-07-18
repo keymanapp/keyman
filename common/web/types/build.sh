@@ -19,7 +19,7 @@ builder_describe "Build Keyman common file types module" \
   "publish                   publish to npm" \
   "--dry-run,-n              don't actually publish, just dry run"
 builder_describe_outputs \
-  configure   /node_modules \
+  configure   /common/web/types/src/schemas/kpj.schema.ts \
   build       /common/web/types/build/src/main.js
 
 builder_parse "$@"
