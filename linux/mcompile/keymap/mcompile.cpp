@@ -35,9 +35,12 @@ mcompile -d runs 4 important steps:
 
 */
 
-// run with       ./mcompile -d in.kmx bla.dll 0407 out.kmx
+// REMEMBER in this VM only run  with meson compile is possible  NOT with F5 !!!
+// run with:
+//./mcompile -d in.kmx bla.dll 0407 out.kmx
 //./mcompile -d /Projects/keyman/keyman/linux/mcompile/keymap/anii.kmx bla.dll 0407 /Projects/keyman/keyman/linux/mcompile/keymap/anii_out.kmx
 //./mcompile -d /Projects/keyman/keyman/linux/mcompile/keymap/sil_ipa_o.kmx bla.dll 0407 /Projects/keyman/keyman/linux/mcompile/keymap/sil_ipa_o_out2.kmx
+//./mcompile -d /Projects/keyman/keyman/linux/mcompile/keymap/mcompile_test.kmx bla.dll 0407 /Projects/keyman/keyman/linux/mcompile/keymap/mcompile_test_out.kmx
 
 #include "mcompile.h"
 #include "helpers.h"
@@ -47,24 +50,27 @@ mcompile -d runs 4 important steps:
 
 #if defined(_WIN32) || defined(_WIN64)
   int wmain(int argc, wchar_t* argv[]) {
-  std::vector<std::u16string> argv_16 = convert_argvW_to_Vector_u16str( argc, argv);
+    std::vector<std::u16string> str_argv_16 = convert_argvW_to_Vector_u16str( argc, argv);  
+    run(argc, str_argv_16);
+
 #else  // LINUX
   int main(int argc, char* argv[]) {
-    std::vector<std::u16string> argv_16 = convert_argv_to_Vector_u16str(argc, argv);
+    std::vector<std::u16string> str_argv_16 = convert_argv_to_Vector_u16str(argc, argv);
+    run(argc, str_argv_16, argv);
 #endif
 
-  std::vector<const char16_t*> v_argv_16;
-  for (int i = 0; i < argc; i++) {
-    const char16_t* cmdl_par = argv_16[i].c_str();
-    v_argv_16.push_back(cmdl_par);
-  }
-  // call new run/ method() with char16_t
-  run(argc, v_argv_16);
 
 }
 //------ run with char16_t !! -------------------------------------------------------------------------------------------------------------------------
+int run(int argc, std::vector<std::u16string>  str_argv, char* argv_ch[] = NULL){
 
-int run(int argc, std::vector< const char16_t*> argv) {
+  // convert std::vector<std::u16string> to std::vector<const char16_t*>
+  std::vector<const char16_t*> argv;
+  for (int i = 0; i < argc; i++) {
+    const char16_t* cmdl_par = str_argv[i].c_str();
+    argv.push_back(cmdl_par);
+  }
+
  //----------------------------------------
 // test if all cpps are acccessible: can be removed
  //check_avaiability_of_modules_();    //_S2
@@ -143,7 +149,6 @@ int run(int argc, std::vector< const char16_t*> argv) {
   // 3. Write the new keyman keyboard file
 */
 
-wprintf(L"_S2 * Up to here cross-platform xx  :-))))) ******************************************************\n");
 
   LPKMX_KEYBOARD kmxfile;
 
@@ -152,16 +157,35 @@ wprintf(L"_S2 * Up to here cross-platform xx  :-))))) **************************
     return 3;
   }
 
+wprintf(L"_S2 * Up to here cross-platform xx  :-))))) ******************************************************\n");
 std::wcout << " ++ UP TO HERE IN STEP 1 +++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+std::wcout << " ++ will start KMX_SaveKeyboard ++++++++++++++++++++++++++++++++++++++++++++++++\n";
 // _S2 this is only for testing- remove and use SaveKeyboard in  block below
-
-std::wcout << " ++ will start KMX_SaveKeyboard +++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
  KMX_SaveKeyboard(kmxfile, outfile);
-std::wcout << " ++ ended KMX_SaveKeyboard +++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+std::wcout << " ++ ended KMX_SaveKeyboard ###############################################\n";
+
+dummytest_keymap();
 
 
-/*  if(DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552
-    SaveKeyboard(kmxfile, outfile);
+#if defined(_WIN32) || defined(_WIN64)
+  //  DoConvert for windows needs to be done later ( can it be copied from engine/mcompile ?)
+  /*
+  if(DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552F
+    KMX_SaveKeyboard(kmxfile, outfile);
+  }*/
+#else  // LINUX
+  // _S2 this is only for testing- remove and use SaveKeyboard in  block below
+  run_DoConvert_Part1_getMap(argc, (gchar**) argv_ch);
+/*
+  if(DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552F
+    KMX_SaveKeyboard(kmxfile, outfile);
+  }*/
+#endif
+
+
+/*
+  if(DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552F
+    KMX_SaveKeyboard(kmxfile, outfile);
   }
 
   //DeleteReallocatedPointers(kmxfile); :TODO

@@ -24,7 +24,7 @@
 #include <vector>
 #include "keymap.h"
 
-int run(int argc, std::vector< const char16_t*> argv);
+int run(int argc, std::vector<std::u16string>  str_argv, char* argv[]);
 void KMX_LogError(const KMX_WCHART* m1, int m2 = 0);
 
 
