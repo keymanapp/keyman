@@ -75,6 +75,7 @@ export class KPJFileReader {
 
     if(result.options.version == '1.0') {
       this.transformFilesVersion10(project, result);
+      result.addMetadataFile();
     } else {
       result.populateFiles();
     }

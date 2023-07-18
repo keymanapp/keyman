@@ -1,10 +1,10 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { CompilerCallbacks, CompilerFileCallbacks, CompilerOptions, KeymanDeveloperProject, KeymanFileTypes, KPJFileReader } from '@keymanapp/common-types';
-import { KeymanDeveloperProjectFile } from '../../../../../../common/web/types/src/kpj/keyman-developer-project.js';
+import { CompilerCallbacks, CompilerFileCallbacks, CompilerOptions, KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanFileTypes } from '@keymanapp/common-types';
 import { BuildActivity } from './BuildActivity.js';
 import { buildActivities } from './buildActivities.js';
 import { InfrastructureMessages } from '../../messages/messages.js';
+import { loadProject } from '../../util/projectLoader.js';
 
 export class BuildProject extends BuildActivity {
   public get name(): string { return 'Project'; }
@@ -35,7 +35,7 @@ class ProjectBuilder {
       return false;
     }
 
-    this.project = this.loadProject();
+    this.project = loadProject(this.infile, this.callbacks);
     if(!this.project) {
       return false;
     }
@@ -56,46 +56,6 @@ class ProjectBuilder {
     // $PROJECTPATH/.keyboard_info for version 1.0 projects)
 
     return true;
-  }
-
-  loadProject(): KeymanDeveloperProject {
-    // TODO: callbacks.reportMessage on exceptions
-    // TODO: version 2.0 projects are folder-based and scan source/ folder for valid
-    // files. .kpj need not exist, but if it does, is used just for options.
-
-    this.infile = path.resolve(this.infile.replace(/\\/g, '/'));
-
-    if(fs.statSync(this.infile).isDirectory()) {
-      // This is a project folder, look for folder-name.kpj
-      this.infile = path.join(this.infile, path.basename(this.infile) + KeymanFileTypes.Source.Project);
-    }
-
-    const project = fs.existsSync(this.infile) ?
-      this.loadProjectFromFile() :
-      this.loadDefaultProjectFromFolder();
-
-    return project;
-  }
-
-  loadDefaultProjectFromFolder() {
-    // The folder does not contain a .kpj, so construct a default 2.0 .kpj
-    const project = new KeymanDeveloperProject(this.infile, '2.0', this.callbacks);
-    project.populateFiles();
-    return project;
-  }
-
-  loadProjectFromFile(): KeymanDeveloperProject {
-    const kpjData = this.callbacks.loadFile(this.infile);
-    const reader = new KPJFileReader(this.callbacks);
-    const kpj = reader.read(kpjData);
-    try {
-      reader.validate(kpj);
-    } catch(e) {
-      this.callbacks.reportMessage(InfrastructureMessages.Error_InvalidProjectFile({message: (e??'').toString()}));
-      return null;
-    }
-    const project = reader.transform(this.infile, kpj);
-    return project;
   }
 
   async buildProjectTargets(activity: BuildActivity): Promise<boolean> {
