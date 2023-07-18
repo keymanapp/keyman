@@ -3,6 +3,8 @@ import {assert} from 'chai';
 import 'mocha';
 
 import { makePathToFixture, compileModelSourceCode } from './helpers/index.js';
+import { setCompilerCallbacks } from '../src/compiler-callbacks.js';
+import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 describe('LexicalModelCompiler', function () {
   describe('specifying punctuation', function () {
@@ -10,6 +12,8 @@ describe('LexicalModelCompiler', function () {
     const PATH = makePathToFixture(MODEL_ID);
 
     it('should compile punctuation into the generated code', function () {
+      setCompilerCallbacks(new TestCompilerCallbacks());
+
       let compiler = new LexicalModelCompiler;
       let code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',

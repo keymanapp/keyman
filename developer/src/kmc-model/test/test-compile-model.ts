@@ -24,10 +24,8 @@ describe('compileModel', function () {
 
     it(`should compile ${modelID}`, function () {
       let code = compileModel(modelPath, callbacks);
-      let r: unknown;
-      assert.doesNotThrow(() => {
-        r = compileModelSourceCode(code);
-      });
+      callbacks.printMessages();
+      let r = compileModelSourceCode(code);
       let compilation = r as CompilationResult;
 
       assert.isFalse(compilation.hasSyntaxError, 'model code had syntax error');

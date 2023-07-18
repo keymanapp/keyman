@@ -3,8 +3,12 @@ import {assert} from 'chai';
 import 'mocha';
 
 import { makePathToFixture, compileModelSourceCode } from './helpers/index.js';
+import { setCompilerCallbacks } from '../src/compiler-callbacks.js';
+import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
+  setCompilerCallbacks(new TestCompilerCallbacks());
+
   const MODEL_ID = 'example.qaa.trivial';
   const PATH = makePathToFixture(MODEL_ID);
 
