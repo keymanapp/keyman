@@ -9,6 +9,7 @@ import { minKeymanVersion } from "./min-keyman-version.js";
 import { ModelInfoFile } from "./model-info-file.js";
 import { KmpJsonFile } from "@keymanapp/common-types";
 
+/* c8 ignore start */
 export class ModelInfoOptions {
   /** The identifier for the model */
   model_id: string;
@@ -25,6 +26,7 @@ export class ModelInfoOptions {
   /** The compiled package filename and relative path (.kmp) */
   kmpFileName: string;
 };
+/* c8 ignore stop */
 
 /**
  * Merges source .model_info file with metadata from the model and package source file.
@@ -68,6 +70,7 @@ export function writeMergedModelMetadataFile(
   //
 
   function setModelMetadata(field: keyof ModelInfoFile, expected: unknown, warn: boolean = true) {
+    /* c8 ignore next 4 */
     if (model_info[field] && model_info[field] !== expected) {
       if (warn || typeof warn === 'undefined')
         console.warn(`Warning: source ${sourceModelInfoFileName} field ${field} value "${model_info[field]}" does not match "${expected}" found in source file metadata.`);
@@ -92,6 +95,7 @@ export function writeMergedModelMetadataFile(
   if (author.url) {
     // we strip the mailto: from the .kps file for the .model_info
     let match = author.url.match(/^(mailto\:)?(.+)$/);
+    /* c8 ignore next 3 */
     if (match === null) {
       throw new Error(`Invalid author email: ${author.url}`);
     }
