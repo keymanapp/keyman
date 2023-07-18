@@ -14,6 +14,7 @@ describe("TimeoutPromise", () => {
     assert.isTrue(await promise.corePromise);
 
     const end = Date.now();
+    // https://github.com/nodejs/node/issues/26578 - setTimeout() may resolve 1ms early than requested.
     assert.isAtLeast(end-start, INTERVAL);
   });
 
@@ -59,7 +60,8 @@ describe("TimeoutPromise", () => {
 
     const end = Date.now();
     assert.isAtMost(end-start, INTERVAL-1);  // completes early
-    assert.isAtLeast(end-start, INTERVAL/2); // but not TOO early
+    // https://github.com/nodejs/node/issues/26578 - setTimeout() may resolve 1ms early than requested.
+    assert.isAtLeast(end-start, INTERVAL/2-1); // but not TOO early
   });
 
   it('late dual fulfillment does not change first result', async () => {
@@ -69,6 +71,7 @@ describe("TimeoutPromise", () => {
     assert.isTrue(await promise.corePromise);
 
     const end = Date.now();
+    // https://github.com/nodejs/node/issues/26578 - setTimeout() may resolve 1ms early than requested.
     assert.isAtLeast(end-start, INTERVAL);
 
     promise.resolve(false);
