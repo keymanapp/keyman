@@ -160,42 +160,23 @@ int run(int argc, std::vector<std::u16string>  str_argv, char* argv_ch[] = NULL)
   }
 
 wprintf(L"_S2 * Up to here cross-platform xx  :-))))) ******************************************************\n");
-std::wcout << " ++ UP TO HERE IN STEP 1 +++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-
-dummytest_keymap();
-
 
 #if defined(_WIN32) || defined(_WIN64)
-  //  DoConvert for windows needs to be done later ( can it be copied from engine/mcompile ?)
-  /*
-  if(DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552F
-    KMX_SaveKeyboard(kmxfile, outfile);
+  // _S2 DoConvert for windows needs to be done later ( can it be copied from engine/mcompile ?)
+  /*if(DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552F
+      KMX_SaveKeyboard(kmxfile, outfile);
   }*/
+
 #else  // LINUX
-  // _S2 this is only for testing- remove and use SaveKeyboard in  block below
+// _S2 do I need all parameters?-no
   if(KMX_DoConvert( kmxfile,  kbid,  bDeadkeyConversion, argc, (gchar**) argv_ch)) {   // I4552F
     KMX_SaveKeyboard(kmxfile, outfile);
 }
 #endif
 
-
-/*
-  if(DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552F
-    KMX_SaveKeyboard(kmxfile, outfile);
-  }
-
-  //DeleteReallocatedPointers(kmxfile); :TODO
+  //DeleteReallocatedPointers(kmxfile); :TODO   // _S2 not my ToDo :-)
   delete kmxfile;
 
-	return 0;
-
-*/
-
-  //------------------------------------
-  //LoadKeyboard();
-  //int out = run_DoConvert_Part1_getMap(argc,argv);
-  //run_DoConvert_Part2_TranslateKeyboard();
-  //SaveKeyboard();
   wprintf(L"mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm end\n");
   return 0 ;
 }
@@ -207,29 +188,88 @@ dummytest_keymap();
 
 
 
+KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
+   MyCoutW(L"#### KMX_SetKeyboardToPositional of keymap started", 1);
+  LPKMX_STORE sp;
+  KMX_UINT i;
+  for(i = 0, sp = kbd->dpStoreArray; i < kbd->cxStoreArray; i++, sp++) {
+    if(sp->dwSystemID == TSS_MNEMONIC) {
+      if(!sp->dpString) {
+        KMX_LogError(L"Invalid &mnemoniclayout system store");
+        MyCoutW(L"    #### KMX_SetKeyboardToPositional Invalid &mnemoniclayout system store", 1);
+        return FALSE;
+      }
+      if(u16cmp((const KMX_WCHAR*)sp->dpString, u"1") != 0) {
+        KMX_LogError(L"Keyboard is not a mnemonic layout keyboard");
+        MyCoutW(L"    #### KMX_SetKeyboardToPositional Keyboard is not a mnemonic layout keyboard", 1);
+        return FALSE;
+      }
+      *sp->dpString = '0';
+        MyCoutW(L"    #### KMX_SetKeyboardToPositional Keyboard all good !!", 1);
+      return TRUE;
+    }
+  }
+
+  KMX_LogError(L"Keyboard is not a mnemonic layout keyboard");
+
+   MyCoutW(L"#### KMX_SetKeyboardToPositional of keymap ended", 1);
+  return FALSE;
+}
+
+
 
 
 
   KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]) {
 
-    if (!(run_DoConvert_Part1_getMap(argc, argv)))
-    //run_DoConvert_Part2_TranslateKeyboard();
+    KMX_WCHART DeadKey;
+
+    if(!KMX_SetKeyboardToPositional(kbd)) return FALSE;
+
+    // Go through each of the shift states - base, shift, ctrl+alt, ctrl+alt+shift, [caps vs ncaps?]
+    // Currently, we go in this order so the 102nd key works. But this is not ideal for keyboards without 102nd key:   // I4651
+    // it catches only the first key that matches a given rule, but multiple keys may match that rule. This is particularly
+    // evident for the 102nd key on UK, for example, where \ can be generated with VK_OEM_102 or AltGr+VK_QUOTE.
+    // For now, we get the least shifted version, which is hopefully adequate.
+  /*
+    for(int j = 0; VKShiftState[j] != 0xFFFF; j++) {   // I4651
+      // Go through each possible key on the keyboard
+      for(int i = 0; VKMap[i]; i++) {   // I4651
+        UINT vkUnderlying = VKUSToVKUnderlyingLayout(VKMap[i]);
+
+        WCHAR ch = CharFromVK(vkUnderlying, VKShiftState[j], &DeadKey);
+
+        //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
+
+        if(bDeadkeyConversion) {   // I4552
+          if(ch == 0xFFFF) {
+            ch = DeadKey;
+          }
+        }
+
+        switch(ch) {
+          case 0x0000: break;
+          case 0xFFFF: ConvertDeadkey(kbd, VKMap[i], VKShiftState[j], DeadKey); break;
+          default:     TranslateKeyboard(kbd, VKMap[i], VKShiftState[j], ch);
+        }
+
+        //
+      }*/
+
+
 
     //if (!(run_DoConvert_Part1_getMap(argc, argv))   && (!run_DoConvert_Part2_TranslateKeyboard()) )
+
+    if (!(run_DoConvert_Part1_getMap(argc, argv)))
+      int do_something;
 
     return true;
   }
 
-
-
-
-
-
-
-
-
-
-
+void KMX_LogError(const KMX_WCHART* m1,int m2) {
+  wprintf((PWSTR)m1, m2);
+}
+// ---- old ----------------------------------------------------------
 
 
 //
@@ -677,9 +717,6 @@ BOOL DoConvert(LPKEYBOARD kbd, LPWSTR kbid, BOOL bDeadkeyConversion) {   // I455
 
 */
 
-void KMX_LogError(const KMX_WCHART* m1,int m2) {
-  wprintf((PWSTR)m1, m2);
-}
 
 //---------old-------------------------------------------
 /*#include "pch.h"
