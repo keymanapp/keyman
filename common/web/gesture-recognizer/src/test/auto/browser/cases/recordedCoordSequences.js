@@ -48,7 +48,7 @@ describe("Layer one - DOM -> InputSequence", function() {
       // **********************************
       // Android-Chrome sequence simulation does not allow fractional values in MouseEvent clientX/clientY...
       // and it's impossible to coerce elements to have proper pixel alignment, it seems.  Fractional
-      // values are fine for touch events `Touch` objects, though.
+      // values are fine for touch events' `Touch` objects, though.
       //
       // So, the best way forward for doing automated testing on Android devices... is to note if we're
       // Android and coerce test sequences to all run in 'touch' mode if so.
