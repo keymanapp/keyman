@@ -2,17 +2,14 @@
   lexical-model-compiler.ts: base file for lexical model compiler.
 */
 
-/// <reference path="./lexical-model.ts" />
-
 import * as ts from "typescript";
-import * as fs from "fs";
-import * as path from "path";
 import { createTrieDataStructure } from "./build-trie.js";
 import { ModelDefinitions } from "./model-definitions.js";
 import {decorateWithJoin} from "./join-word-breaker-decorator.js";
 import {decorateWithScriptOverrides} from "./script-overrides-decorator.js";
 import { LexicalModelSource, WordBreakerSpec, SimpleWordBreakerSpec } from "./lexical-model.js";
 import { ModelCompilerError, ModelCompilerMessages } from "./model-compiler-errors.js";
+import { callbacks } from "./compiler-callbacks.js";
 
 export default class LexicalModelCompiler {
 
@@ -38,7 +35,7 @@ export default class LexicalModelCompiler {
     switch(modelSource.format) {
       case "custom-1.0":
         let sources: string[] = modelSource.sources.map(function(source) {
-          return fs.readFileSync(path.join(sourcePath, source), 'utf8');
+          return new TextDecoder().decode(callbacks.loadFile(callbacks.path.join(sourcePath, source)));
         });
         func += this.transpileSources(sources).join('\n');
         func += `LMLayerWorker.loadModel(new ${modelSource.rootClass}());\n`;
@@ -49,7 +46,7 @@ export default class LexicalModelCompiler {
         // Convert all relative path names to paths relative to the enclosing
         // directory. This way, we'll read the files relative to the model.ts
         // file, rather than the current working directory.
-        let filenames = modelSource.sources.map(filename => path.join(sourcePath, filename));
+        let filenames = modelSource.sources.map(filename => callbacks.path.join(sourcePath, filename));
 
         let definitions = new ModelDefinitions(modelSource);
 
