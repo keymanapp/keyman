@@ -65,6 +65,7 @@ export class CumulativePathStats {
      * @param independentAxis The 'input' axis/dimension.
      */
     constructor(mainStats: CumulativePathStats, dependentAxis: PathCoordAxis, independentAxis: PathCoordAxis) {
+      /* c8 ignore next 3 */
       if(dependentAxis == independentAxis) {
         throw new Error("Two different axes must be specified for the regression object.");
       }
@@ -218,6 +219,7 @@ export class CumulativePathStats {
       this.rawSquaredSums   = {...obj.rawSquaredSums};
     } else if(isAnInputSample(obj)) {
       Object.assign(this, this.extend(obj));
+      /* c8 ignore next 3 */
     } else {
       throw new Error("A constructor for this input pattern has not yet been implemented");
     }
@@ -322,6 +324,7 @@ export class CumulativePathStats {
       return result;
     }
 
+    /* c8 ignore next 3 */
     if(!subsetStats.followingSample || !subsetStats.lastSample) {
       throw 'Invalid argument:  stats missing necessary tracking variable.';
     }
@@ -721,6 +724,7 @@ export class CumulativePathStats {
     return this.coordArcSum;
   }
 
+  /* c8 ignore start */
   /**
    * Provides a JSON.stringify()-friendly object with the properties most useful for
    * debugger-based inspection and/or console-logging statements.
@@ -739,4 +743,5 @@ export class CumulativePathStats {
       speedVariance: this.variance('v')
     }
   }
+  /* c8 ignore end */
 }

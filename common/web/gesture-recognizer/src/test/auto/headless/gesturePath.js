@@ -1,15 +1,101 @@
 import { assert } from 'chai'
 import sinon  from 'sinon';
+import path from 'path';
+import url from 'url';
+import fs from 'fs';
 
 import { GesturePath } from '@keymanapp/gesture-recognizer';
-
 import { timedPromise } from '@keymanapp/web-utils';
+import { TouchpathTurtle } from '../../../../build/tools/obj/index.js';
 
-// End of "for the integrated style..."
+// Ensures that the resources are resolved relative to this script, not to the cwd when the test
+// runner was launched.
+const scriptFolder = path.dirname(url.fileURLToPath(import.meta.url));
+const SEGMENT_TEST_JSON_FOLDER = path.resolve(`${scriptFolder}/../../resources/json/segmentation`);
 
 describe("GesturePath", function() {
-  // // File paths need to be from the package's / module's root folder
-  // let testJSONtext = fs.readFileSync('src/test/resources/json/canaryRecording.json');
+  // Note:  if part of the suite below fails, it'll probably cascade into failures for some of the
+  // other automated tests for the module.
+  describe("canary tests: serialization & deserialization", function() {
+    it('from fixture', () => {
+      let testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/simple_ne_move.json`);
+      let fullSerializedJSON = JSON.parse(testJSONtext);
+      let rawPathObject = fullSerializedJSON.inputs[0].touchpoints[0].path;
+
+      if(rawPathObject.segments) {
+        // Left-over fixture data from before we removed subsegmentation.
+        delete rawPathObject.segments;
+      }
+
+      let reconstructedPath = GesturePath.deserialize(rawPathObject);
+      assert.isFalse(reconstructedPath.wasCancelled);
+
+      assert.sameDeepOrderedMembers(reconstructedPath.coords, rawPathObject.coords);
+      assert.notEqual(reconstructedPath.toJSON(), rawPathObject);
+      assert.deepEqual(reconstructedPath.toJSON(), rawPathObject);
+    });
+
+    it('synthetic', () => {
+      const initialSample = {
+        targetX: 0,
+        targetY: 0,
+        item: 'a',
+        t: 0
+      };
+
+      let path = new GesturePath();
+      let turtle = new TouchpathTurtle(initialSample);
+      turtle.on('sample', (sample) => path.extend(sample));
+
+      turtle.move(90, 2, 20, 2);
+      turtle.hoveredItem = 'b';
+      turtle.move(0, 2, 20, 2);
+      turtle.hoveredItem = 'c';
+      turtle.commitPending();
+      path.terminate(true);
+
+      const serializationObj = path.toJSON();
+      const SERIALIZATION_TO_MATCH = `
+{
+  "coords": [
+    {
+      "targetX": 0,
+      "targetY": 0,
+      "t": 0,
+      "item": "a"
+    },
+    {
+      "targetX": 1,
+      "targetY": 0,
+      "t": 10,
+      "item": "a"
+    },
+    {
+      "targetX": 2,
+      "targetY": 0,
+      "t": 20,
+      "item": "b"
+    },
+    {
+      "targetX": 2,
+      "targetY": -1,
+      "t": 30,
+      "item": "b"
+    },
+    {
+      "targetX": 2,
+      "targetY": -2,
+      "t": 40,
+      "item": "c"
+    }
+  ],
+  "wasCancelled": true
+}
+      `.trim();
+
+      assert.equal(JSON.stringify(serializationObj, null, 2), SERIALIZATION_TO_MATCH);
+    });
+  });
 
   describe("Single-sample 'sequence'", function() {
     it("'step', 'complete' events", function() {
