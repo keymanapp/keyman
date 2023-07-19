@@ -39,9 +39,11 @@ export interface ContactModel<Type> {
    */
   readonly itemChangeAction?: 'reject' | 'resolve'; // may be undefined for 'continue'
 
-  // Is needed to define whether or not the contact-point should be ignored by this gesture type.
-  // If undefined, defaults to () => true.
-  // Param 2 only matters for slot 2+ of a multitouch gesture spec; it will receive the latest sample
-  // from already-linked.
+  /**
+   * Is needed to define whether or not the contact-point should be ignored by this gesture type.
+   * If undefined, defaults to () => true.
+   * Param 2 only matters for slot 2+ of a multitouch gesture spec; it will receive the latest sample
+   * from already-linked.
+   */
   readonly allowsInitialState?: (incomingSample: InputSample<Type>, priorityMultitouchSample?: InputSample<Type>) => boolean;
 }
