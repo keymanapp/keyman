@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.143 alpha 2023-07-19
+
+*  (#9292)
+* docs(linux): Update man page and remove do-nothing option (#9291)
+* docs(linux): Update documentation (#9277)
+
 ## 17.0.142 alpha 2023-07-17
 
 * chore(windows): disable wix compression for debug builds (#9074)
