@@ -9,9 +9,14 @@ import {decorateWithJoin} from "./join-word-breaker-decorator.js";
 import {decorateWithScriptOverrides} from "./script-overrides-decorator.js";
 import { LexicalModelSource, WordBreakerSpec, SimpleWordBreakerSpec } from "./lexical-model.js";
 import { ModelCompilerError, ModelCompilerMessages } from "./model-compiler-errors.js";
-import { callbacks } from "./compiler-callbacks.js";
+import { callbacks, setCompilerCallbacks } from "./compiler-callbacks.js";
+import { CompilerCallbacks } from "@keymanapp/common-types";
 
 export default class LexicalModelCompiler {
+
+  constructor(callbacks: CompilerCallbacks) {
+    setCompilerCallbacks(callbacks);
+  }
 
   /**
    * Returns the generated code for the model that will ultimately be loaded by

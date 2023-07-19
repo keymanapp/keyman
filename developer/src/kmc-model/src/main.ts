@@ -21,7 +21,7 @@ export function compileModel(filename: string, callbacks: CompilerCallbacks): st
     let modelSource = loadFromFilename(filename, callbacks);
     let containingDirectory = callbacks.path.dirname(filename);
 
-    return (new LexicalModelCompiler)
+    return (new LexicalModelCompiler(callbacks))
       .generateLexicalModelCode('<unknown>', modelSource, containingDirectory);
   } catch(e) {
     callbacks.reportMessage(
