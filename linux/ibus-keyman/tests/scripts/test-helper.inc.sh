@@ -155,7 +155,7 @@ function _setup_display_server() {
   PID_FILE=$2
   DISPLAY_SERVER=$3
 
-  if [ "$DISPLAY_SERVER" == "wayland" ]; then
+  if [ "$DISPLAY_SERVER" == "--wayland" ]; then
     if ! can_run_wayland; then
       # support for --headless got added in mutter 40.x
       echo "ERROR: mutter doesn't support running headless. Can't run Wayland tests."
