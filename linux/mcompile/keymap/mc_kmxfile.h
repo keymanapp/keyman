@@ -64,8 +64,6 @@ typedef struct tagGROUP {
 					} KMX_GROUP, *LPKMX_GROUP;
 
 
-
-
 typedef struct tagKEYBOARD {
 	DWORD dwIdentifier;		// Keyman compiled keyboard id
 
@@ -142,10 +140,6 @@ BOOL LoadKeyboard(char16_t* fileName, LPKEYBOARD *lpKeyboard);		// _S2 LPKEYBOAR
 KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename);
 KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug);
 #endif
-
-
-
-
 
 //---------------------old----------------------------------------
 /*

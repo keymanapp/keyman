@@ -36,10 +36,6 @@ void LoadKeyboard();
 // use TranslateKeyboard, TranslateGroup,TranslateKey from mcompile
 void run_DoConvert_Part2_TranslateKeyboard();
 
-// adapt from mc_savekeyboard.cpp
-//void SaveKeyboard();
-
-
 // read configuration file, split and write to 3D-Vector (Data for US on [0][ ][ ]  )
 bool write_US_ToVector(v_str_3D &vec, std::string language, const char *text);
 

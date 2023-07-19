@@ -86,10 +86,6 @@ int run(int argc, std::vector<std::u16string>  str_argv, char* argv_ch[] = NULL)
     argv.push_back(cmdl_par);
   }
 
- //----------------------------------------
-// test if all cpps are acccessible: can be removed
- //check_avaiability_of_modules_();    //_S2
-
  wprintf(L"_S2 started run for char16_t*\n");
 
     if(argc < 3 || (argc < 5 && u16cmp(argv[1], u"-u") != 0)) {   // I4273// I4273
@@ -202,23 +198,19 @@ wprintf(L"_S2 * Up to here cross-platform xx  :-))))) **************************
 
 
 KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
-   MyCoutW(L"#### KMX_SetKeyboardToPositional of keymap started", 1);
   LPKMX_STORE sp;
   KMX_UINT i;
   for(i = 0, sp = kbd->dpStoreArray; i < kbd->cxStoreArray; i++, sp++) {
     if(sp->dwSystemID == TSS_MNEMONIC) {
       if(!sp->dpString) {
         KMX_LogError(L"Invalid &mnemoniclayout system store");
-        MyCoutW(L"    #### KMX_SetKeyboardToPositional Invalid &mnemoniclayout system store", 1);
         return FALSE;
       }
       if(u16cmp((const KMX_WCHAR*)sp->dpString, u"1") != 0) {
         KMX_LogError(L"Keyboard is not a mnemonic layout keyboard");
-        MyCoutW(L"    #### KMX_SetKeyboardToPositional Keyboard is not a mnemonic layout keyboard", 1);
         return FALSE;
       }
       *sp->dpString = '0';
-        MyCoutW(L"    #### KMX_SetKeyboardToPositional Keyboard all good !!", 1);
       return TRUE;
     }
   }
@@ -229,7 +221,6 @@ KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
   return FALSE;
 }
 
-//UINT KMX_VKUSToVKUnderlyingLayout(const DWORD US_Keycode, GdkDisplay *display){
 UINT KMX_VKUSToVKUnderlyingLayout(const DWORD US_Keycode, GdkDisplay *display){
   uint ret =88;
 /*

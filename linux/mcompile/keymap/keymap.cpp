@@ -26,6 +26,7 @@ int dummytest_keymap(){
   std::wcout<< " dummytest_keymap    is available\n";
   return 0;
 }
+
 bool write_US_ToVector( v_str_3D &vec,std::string language, const char* text) {
 
   MyCoutW(L"  #### write_US_ToVector of keymap started", 1);
@@ -536,9 +537,7 @@ void test_specific_Characters(v_str_3D &All_Vector) {
   MyCoutW(L"  #### test_specific_Characters of keymap ended", 1);
 }
 
-//TODO needs to take 2 keyboards as input
 int run_DoConvert_Part1_getMap(gint argc, gchar *argv[]) {
-//int main(gint argc, gchar *argv[]) {
 
   MyCoutW(L"#### run_DoConvert_Part1_getMap of keymap started", 1);
 
@@ -604,6 +603,7 @@ int run_DoConvert_Part1_getMap(gint argc, gchar *argv[]) {
   printf("°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°° end\n");
   return 0;
 }
+
 void LoadKeyboard() {std::cout << "#### LoadKeyboard not implemented yet ! \n";}
 
 void run_DoConvert_Part2_TranslateKeyboard() {std::cout << "#### TranslateKeyboard not implemented yet ! \n";}
@@ -611,20 +611,6 @@ void run_DoConvert_Part2_TranslateKeyboard() {std::cout << "#### TranslateKeyboa
 void SaveKeyboard() {std::cout << "#### SaveKeyboard not implemented yet ! \n";}
 //--------------------------------------
 
-//int main(gint argc, gchar *argv[])    // this is for use of single keymap
-/*int main_keymap(gint argc, gchar *argv[])   // this is for use of keymap together with mcompile
-{
-  check_avaiability_of_modules_();
-  LoadKeyboard();
-  std::cout << "############################################################################################### end LoadKeyboard \n";
-
-  int out = run_DoConvert_Part1_getMap(argc,argv);
-  run_DoConvert_Part2_TranslateKeyboard();
-  SaveKeyboard();
-
-  std::cout << "################################################################################################################################### end keymap \n";
-  return out ;
-}*/
 // old ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 /*
 static void PrintKeymapForCode(GdkKeymap *keymap, guint keycode)
