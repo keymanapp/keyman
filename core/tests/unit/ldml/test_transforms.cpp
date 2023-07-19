@@ -288,7 +288,7 @@ test_reorder_standalone() {
 
       // <reorder from="\u1A60" order="127" />
       element_list e0;
-      e0.emplace_back(U'\u1A6B', 127 << LDML_ELEM_FLAGS_ORDER_BITSHIFT);
+      e0.emplace_back(U'\u1A60', 127 << LDML_ELEM_FLAGS_ORDER_BITSHIFT);
       rg.list.emplace_back(e0);
 
       // <reorder from="\u1A6B" order="42" />
@@ -334,12 +334,28 @@ test_reorder_standalone() {
     std::cout << __FILE__ << ":" << __LINE__ << " - back to nod-Lana " << std::endl;
     // TODO-LDML: move this into test code perhaps
     for (size_t r = 0; r < sizeof(roasts) / sizeof(roasts[0]); r++) {
-      std::cout << __FILE__ << ":" << __LINE__ << " - trying roast #" << r << std::endl;
       const auto &roast = roasts[r];
+      std::cout << __FILE__ << ":" << __LINE__ << " - trying roast #" << r << "=" << roast << std::endl;
+      // try apply with string
+      {
+          std::cout << "- try apply(text, output)" << std::endl;
+          std::u32string text = roast;
+          std::u32string output;
+          size_t len = tr.apply(text, output);
+          if (len == 0) {
+            std::cout << " (did not apply)" << std::endl;
+          } else {
+            std::cout << " applied, matchLen= " << len << std::endl;
+            text.resize(text.size()-len); // shrink
+            text.append(output);
+            std::cout << " = " << text << std::endl;
+          }
+          zassert_string_equal(text, expect);
+      }
       // try all-at-once
       {
+        std::cout << "- try apply(text)" << std::endl;
         std::u32string text = roast;
-        std::cout << " Starting: " << roast << std::endl;
         if (!tr.apply(text)) {
           std::cout << " (did not apply)" << std::endl;
         } else if (text == roast) {
@@ -352,6 +368,7 @@ test_reorder_standalone() {
       }
       // simulate typing this one char at a time;
       {
+        std::cout << "- try key-at-a-time" << std::endl;
         std::u32string text;
         for (auto ch = roast.begin(); ch < roast.end(); ch++) {
           // append the string
@@ -365,6 +382,24 @@ test_reorder_standalone() {
         zassert_string_equal(text, expect);
         std::cout << " matched! (converting char at a time)" << std::endl;
         std::cout << std::endl;
+      }
+    }
+    // special test
+    {
+      std::cout << __FILE__ << ":" << __LINE__ << " - special test " << std::endl;
+      const std::u32string expect = U"\u1A21\u1A60\u1A45"; // this string shouldn't mutate at all.
+      {
+        std::u32string text = expect;
+        tr.apply(text);
+        zassert_string_equal(text, expect);
+      }
+      {
+        // try submatch
+        std::u32string text = expect;
+        std::u32string output;
+        size_t len = tr.apply(text, output);
+        zassert_string_equal(output, U"");
+        assert_equal(len, 0);
       }
     }
   }

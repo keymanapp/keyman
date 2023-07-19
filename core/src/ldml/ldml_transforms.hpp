@@ -116,6 +116,7 @@ struct reorder_sort_key {
   */
   int compare(const reorder_sort_key &other) const;
   bool operator<(const reorder_sort_key &other) const;
+  bool operator>(const reorder_sort_key &other) const;
 
   /** create a 'baseline' sort key, all 0 primary weights */
   static std::deque<reorder_sort_key> from(const std::u32string &str);

@@ -96,6 +96,11 @@ reorder_sort_key::operator<(const reorder_sort_key &other) const {
   return (compare(other) < 0);
 }
 
+bool
+reorder_sort_key::operator>(const reorder_sort_key &other) const {
+  return (compare(other) > 0);
+}
+
 std::deque<reorder_sort_key>
 reorder_sort_key::from(const std::u32string &str) {
   // construct a 'baseline' sort key, that is, in the absence of
@@ -210,21 +215,16 @@ reorder_group::apply(std::u32string &str) const {
   // get a baseline sort key
   auto sort_keys = reorder_sort_key::from(str);
 
-  // DebugLog("Baseline Keys:");
-  // for (auto e = sort_keys.begin(); e < sort_keys.end(); e++) {
-  //   e->dump();
-  // }
-
   // apply ALL reorders in the group.
-  // size_t c = 0;
-  for (auto r = list.begin(); r < list.end(); r++) {
+  for (const auto &r : list) {
     // work backward from end of string forward
+    // That is, see if "abc" matches "abc" or "ab" or "a"
     for (size_t s = str.size(); s > 0; s--) {
-      size_t submatch = r->match_end(str, 0, s);
+      size_t submatch = r.match_end(str, 0, s);
       if (submatch != 0) {
         // update the sort key
         size_t sub_match_start = s - submatch;
-        r->elements.update_sort_key(sub_match_start, sort_keys);
+        r.elements.update_sort_key(sub_match_start, sort_keys);
         some_match = true;
       }
     }
@@ -235,30 +235,28 @@ reorder_group::apply(std::u32string &str) const {
     return false;  // nothing matched, so no work.
   }
 
-  size_t match_len = str.size();  // TODO-LDML: for now, assume entire match
-
-  // DebugLog("Updated Keys:");
-  // for (auto e = sort_keys.begin(); e < sort_keys.end(); e++) {
-  //   e->dump();
-  // }
+  size_t match_len = str.size();  // TODO-LDML: for now, assume matches entire string
 
   std::u32string prefix = str;
   prefix.resize(str.size() - match_len);  // just the part before the matched part.
   // just the suffix (the matched part)
   std::u32string suffix = str.substr(prefix.size(), match_len);
-  // sort it! Here's where the reorder happens
-  // TODO: need to sort only between primary bases…
-  std::sort(sort_keys.begin(), sort_keys.end());
-#if 0
-  // TODO-LDML :need to sort sub-runs
-  for(auto e = sort_keys.end(); !applied && e > sort_keys.begin(); e--) {
-    if (e->primary == 0) {
-      // Got it.
-      std::sort(e, sort_keys.end());
-      // DebugLog("… sorting at q=%d", (int)e->quaternary);
+
+  /** pointer to the beginning of the current run. */
+  std::deque<reorder_sort_key>::iterator run_start = sort_keys.begin();
+  for(auto e = run_start; e != sort_keys.end(); e++) {
+    e->dump();
+    if ((e->primary == 0) && (e != run_start)) { // it's a base
+      auto run_end = e - 1;
+      std::sort(run_start, run_end); // reversed because it's a reverse iterator…?
+      // move the start
+      run_start = e; // next run starts here
     }
   }
-#endif
+  // sort the last run in the string as well.
+  if (run_start != sort_keys.end()) {
+    std::sort(run_start, sort_keys.end()); // reversed because it's a reverse iterator…?
+  }
   // recombine into a str
   std::u32string newSuffix;
   size_t q = sort_keys.begin()->quaternary;  //
@@ -269,10 +267,6 @@ reorder_group::apply(std::u32string &str) const {
     newSuffix.append(1, e->ch);
   }
   if (applied) {
-    // DebugLog("Final Sort");
-    // for (auto e = sort_keys.begin(); e < sort_keys.end(); e++) {
-    //   e->dump();
-    // }
     str.resize(prefix.size());
     str.append(newSuffix);
   } else {
