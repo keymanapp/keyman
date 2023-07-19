@@ -101,13 +101,13 @@ export default class KeyboardRequisitioner {
     // Handles keymanweb.com's precached keyboard array.  There is no associated promise,
     // so there's nothing handling the `register` call's results otherwise.
     this.cloudQueryEngine.on('unboundregister', (registration) => {
-      try {
-        if(Array.isArray(registration)) {
-          registration.forEach((entry) => {
-            this.cache.addStub(entry);
-          });
-        }
-      } finally { }
+      // Internal, undocumented use-case of `keyman.register`:  precached keyboard loading
+      // Other uses may trigger errors, especially if there's a type-structure mismatch.
+      // Those errors should not be handled here; let them surface.
+      if(Array.isArray(registration)) {
+        registration.forEach((entry) => {
+          this.cache.addStub(entry);
+        });
     });
   }
 
