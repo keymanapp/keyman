@@ -96,6 +96,10 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     }
   }
 
+  fileSize(filename: string): number {
+    return fs.statSync(filename)?.size;
+  }
+
   get path(): CompilerPathCallbacks {
     return path;
   }

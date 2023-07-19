@@ -3,6 +3,7 @@
  * kmlmi - Keyman Lexical Model model_info Compiler
  */
 
+import * as fs from 'fs';
 import * as path from 'path';
 import { Command } from 'commander';
 import { KmpCompiler, PackageValidation } from '@keymanapp/kmc-package';
@@ -74,10 +75,11 @@ let modelInfoOptions: ModelInfoOptions = {
 };
 
 try {
-  writeMergedModelMetadataFile(
+  const data = writeMergedModelMetadataFile(
     inputFilename,
-    outputFilename,
+    callbacks,
     modelInfoOptions);
+  fs.writeFileSync(outputFilename, data);
 } catch(e) {
   console.error(e);
   process.exit(SysExits.EX_DATAERR);

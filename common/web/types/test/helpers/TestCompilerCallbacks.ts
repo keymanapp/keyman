@@ -47,6 +47,10 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
     }
   }
 
+  fileSize(filename: string): number {
+    return fs.statSync(filename).size;
+  }
+
   reportMessage(event: CompilerEvent): void {
     // console.log(event.message);
     this.messages.push(event);

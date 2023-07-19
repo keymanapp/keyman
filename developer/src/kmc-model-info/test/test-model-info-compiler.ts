@@ -23,15 +23,16 @@ describe('model-info-compiler', function () {
     const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFileName);
     const modelFileName = makePathToFixture('sil.cmo.bw', 'build', 'sil.cmo.bw.model.js');
 
-    writeMergedModelMetadataFile(path, path+'.out', {
+    const data = writeMergedModelMetadataFile(path, callbacks, {
       kmpFileName,
       kmpJsonData,
       model_id: 'sil.cmo.bw',
       modelFileName,
       sourcePath: 'release/sil/sil.cmo.bw'
     });
+    assert.isNotNull(data);
 
-    const actual = JSON.parse(fs.readFileSync(path+'.out', 'utf-8'));
+    const actual = JSON.parse(new TextDecoder().decode(data));
     let expected = JSON.parse(fs.readFileSync(buildModelInfoFilename, 'utf-8'));
 
     // `lastModifiedDate` is dependent on time of run (not worth mocking)

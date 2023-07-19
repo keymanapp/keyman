@@ -3,11 +3,9 @@
  * compiled files to produce a comprehensive .model_info file.
  */
 
-import * as fs from "fs";
-import * as path from "path";
 import { minKeymanVersion } from "./min-keyman-version.js";
 import { ModelInfoFile } from "./model-info-file.js";
-import { KmpJsonFile } from "@keymanapp/common-types";
+import { CompilerCallbacks, KmpJsonFile } from "@keymanapp/common-types";
 
 /* c8 ignore start */
 export class ModelInfoOptions {
@@ -35,14 +33,13 @@ export class ModelInfoOptions {
  * number of places the filenames are constructed.
  *
  * @param sourceModelInfoFileName  Path for the source .model_info file
- * @param destModelInfoFileName    Path to write the merged .model_info file to
  * @param options                  Details on files from which to extract additional metadata
  */
 export function writeMergedModelMetadataFile(
     sourceModelInfoFileName: string,
-    destModelInfoFileName: string,
+    callbacks: CompilerCallbacks,
     options: ModelInfoOptions
-  ) {
+  ): Uint8Array {
 
   /*
     * Model info looks like this:
@@ -60,7 +57,23 @@ export function writeMergedModelMetadataFile(
     * For full documentation, see:
     * https://help.keyman.com/developer/cloud/model_info/1.0/
     */
-  let model_info: ModelInfoFile = JSON.parse(fs.readFileSync(sourceModelInfoFileName, 'utf8'));
+  const dataInput = callbacks.loadFile(sourceModelInfoFileName);
+  if(!dataInput) {
+    // TODO errror
+    throw new Error(`Missing input data`);
+  }
+  let jsonInput = null;
+
+  try {
+    jsonInput = new TextDecoder('utf-8', {fatal: true}).decode(dataInput);
+  } catch(e) {
+    throw new Error(`Not valid json: `+e);
+  }
+  if(!jsonInput) {
+    throw new Error(`json missing`);
+  }
+
+  let model_info: ModelInfoFile = JSON.parse(jsonInput);
 
   //
   // Build merged .model_info file
@@ -112,15 +125,17 @@ export function writeMergedModelMetadataFile(
   model_info.languages = model_info.languages || options.kmpJsonData.lexicalModels.reduce((a, e) => [].concat(a, e.languages.map((f) => f.id)), []);
 
   setModelMetadata('lastModifiedDate', (new Date).toISOString());
-  setModelMetadata('packageFilename', path.basename(options.kmpFileName));
+  setModelMetadata('packageFilename', callbacks.path.basename(options.kmpFileName));
 
   // Always overwrite with actual file size
-  model_info.packageFileSize = fs.statSync(options.kmpFileName).size;
+  model_info.packageFileSize = callbacks.fileSize(options.kmpFileName);
+  // TODO: handle error
 
-  setModelMetadata('jsFilename', path.basename(options.modelFileName));
+  setModelMetadata('jsFilename', callbacks.path.basename(options.modelFileName));
 
   // Always overwrite with actual file size
-  model_info.jsFileSize = fs.statSync(options.modelFileName).size;
+  model_info.jsFileSize = callbacks.fileSize(options.modelFileName);
+  // TODO: handle error
 
   // Always overwrite source data
   model_info.packageIncludes = options.kmpJsonData.files.filter((e) => !!e.name.match(/.[ot]tf$/i)).length ? ['fonts'] : [];
@@ -134,5 +149,6 @@ export function writeMergedModelMetadataFile(
     setModelMetadata('sourcePath', options.sourcePath);
   }
 
-  fs.writeFileSync(destModelInfoFileName, JSON.stringify(model_info, null, 2));
+  const jsonOutput = JSON.stringify(model_info, null, 2);
+  return new TextEncoder().encode(jsonOutput);
 }

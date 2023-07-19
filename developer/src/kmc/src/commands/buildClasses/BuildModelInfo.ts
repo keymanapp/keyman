@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { BuildActivity } from './BuildActivity.js';
 import { CompilerCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
 import { writeMergedModelMetadataFile } from '@keymanapp/kmc-model-info';
@@ -57,9 +58,9 @@ export class BuildModelInfo extends BuildActivity {
       throw new Error('Invalid .kps file');
     }
 
-    writeMergedModelMetadataFile(
+    const data = writeMergedModelMetadataFile(
       project.resolveInputFilePath(metadata),
-      project.resolveOutputFilePath(metadata, KeymanFileTypes.Source.ModelInfo, KeymanFileTypes.Binary.ModelInfo),
+      callbacks,
       {
         model_id: callbacks.path.basename(metadata.filename, KeymanFileTypes.Source.ModelInfo),
         kmpJsonData,
@@ -69,8 +70,15 @@ export class BuildModelInfo extends BuildActivity {
       }
     );
 
-    // Output:
-    // TODO fs.writeFileSync(options.outFile, code, 'utf8');
+    if(data == null) {
+      // TODO error would have been emitted by writeMergedModelMetadataFile
+      return false;
+    }
+
+    fs.writeFileSync(
+      project.resolveOutputFilePath(metadata, KeymanFileTypes.Source.ModelInfo, KeymanFileTypes.Binary.ModelInfo),
+      data
+    );
 
     return true;
   }
