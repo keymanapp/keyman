@@ -51,10 +51,15 @@ export class KeymanDeveloperProject {
   }
 
   public addMetadataFile() {
+    const ext = this.isLexicalModelProject() ? KeymanFileTypes.Source.ModelInfo : KeymanFileTypes.Source.KeyboardInfo;
+
+    if(this.files.find(file => KeymanFileTypes.filenameIs(file.filename, ext))) {
+      return;
+    }
+
     const infoFile =
       this.callbacks.path.join(this.projectPath,
-      this.callbacks.path.basename(this.projectFilename, KeymanFileTypes.Source.Project) +
-      (this.isLexicalModelProject() ? KeymanFileTypes.Source.ModelInfo : KeymanFileTypes.Source.KeyboardInfo));
+      this.callbacks.path.basename(this.projectFilename, KeymanFileTypes.Source.Project) + ext);
     this.files.push(new KeymanDeveloperProjectFile20(infoFile, this.callbacks));
   }
 
