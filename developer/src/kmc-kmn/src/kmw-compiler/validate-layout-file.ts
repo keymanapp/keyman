@@ -82,7 +82,9 @@ function CheckKey(
 
   for(let key of CRequiredKeys) {
     if(TRequiredKey[key].toLowerCase() == FId.toLowerCase()) {
-      FRequiredKeys.push(key);
+      if(FRequiredKeys.indexOf(key) < 0) {
+        FRequiredKeys.push(key);
+      }
       break;
     }
   }

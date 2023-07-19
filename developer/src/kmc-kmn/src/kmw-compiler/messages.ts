@@ -60,7 +60,7 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
   static Warn_TouchLayoutFontShouldBeSameForAllPlatforms = () => m(this.WARN_TouchLayoutFontShouldBeSameForAllPlatforms,
     `The touch layout font should be the same for all platforms.`);
   static Warn_TouchLayoutMissingRequiredKeys = (o:{layerId:string, platformName:string, missingKeys:string}) => m(this.WARN_TouchLayoutMissingRequiredKeys,
-    `Layer "${o.layerId}" on platform "${o.platformName}" is missing the required key(s) '${o.missingKeys}.`);
+    `Layer "${o.layerId}" on platform "${o.platformName}" is missing the required key(s) '${o.missingKeys}'.`);
 
   // Following messages are kmw-compiler only, so use KmwCompiler error namespace
 
