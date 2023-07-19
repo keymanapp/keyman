@@ -62,30 +62,30 @@ private:
 class transform_entry {
 public:
   transform_entry(
-      const std::u16string &from,
-      const std::u16string &to
+      const std::u32string &from,
+      const std::u32string &to
       /*TODO-LDML: mapFrom, mapTo*/
   );
 
   /**
    * @returns length if it's a match
    */
-  size_t match(const std::u16string &input) const;
+  size_t match(const std::u32string &input) const;
 
   /**
    * @returns output string
    */
-  std::u16string apply(const std::u16string &input, size_t matchLen) const;
+  std::u32string apply(const std::u32string &input, size_t matchLen) const;
 
 private:
-  const std::u16string fFrom;  // TODO-LDML: regex
-  const std::u16string fTo;
+  const std::u32string fFrom;  // TODO-LDML: regex
+  const std::u32string fTo;
 };
 
 /**
  * An ordered list of strings.
  */
-typedef std::deque<std::u16string> string_list;
+typedef std::deque<std::u32string> string_list;
 
 /**
  * a group of <transform> entries - a <transformGroup>
@@ -100,7 +100,7 @@ public:
    * @param subMatched on output, the matched length
    * @returns alias to transform_entry or nullptr
    */
-  const transform_entry *match(const std::u16string &input, size_t &subMatched) const;
+  const transform_entry *match(const std::u32string &input, size_t &subMatched) const;
 };
 
 /** a single char, categorized according to reorder rules*/
@@ -217,13 +217,7 @@ public:
    * @param output if matched, contains the replacement output text
    * @return length in chars of the input (counting from the end) which matched context
    */
-  size_t apply(const std::u16string &input, std::u16string &output);
-
-  /**
-   * For tests
-   * @return true if str was altered
-   */
-  bool apply(std::u16string &str);
+  size_t apply(const std::u32string &input, std::u32string &output);
 
   /**
    * For tests - TODO-LDML only supports reorder

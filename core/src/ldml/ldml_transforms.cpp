@@ -9,6 +9,8 @@
 #include "debuglog.h"
 #include <algorithm>
 #include <string>
+#include "kmx/kmx_xstring.h"
+
 
 #ifndef assert
 #define assert(x)  // TODO-LDML
@@ -279,11 +281,11 @@ reorder_group::apply(std::u32string &str) const {
   return applied;
 }
 
-transform_entry::transform_entry(const std::u16string &from, const std::u16string &to) : fFrom(from), fTo(to) {
+transform_entry::transform_entry(const std::u32string &from, const std::u32string &to) : fFrom(from), fTo(to) {
 }
 
 size_t
-transform_entry::match(const std::u16string &input) const {
+transform_entry::match(const std::u32string &input) const {
   if (input.length() < fFrom.length()) {
     return 0;
   }
@@ -295,8 +297,8 @@ transform_entry::match(const std::u16string &input) const {
   return substr.length();
 }
 
-std::u16string
-transform_entry::apply(const std::u16string & /*input*/, size_t /*matchLen*/) const {
+std::u32string
+transform_entry::apply(const std::u32string & /*input*/, size_t /*matchLen*/) const {
   return fTo;
 }
 
@@ -325,7 +327,7 @@ transform_group::transform_group() {
  * return the first transform match in this group
  */
 const transform_entry *
-transform_group::match(const std::u16string &input, size_t &subMatched) const {
+transform_group::match(const std::u32string &input, size_t &subMatched) const {
   for (auto transform = begin(); (subMatched == 0) && (transform < end()); transform++) {
     // TODO-LDML: non regex implementation
     // is the match area too short?
@@ -345,7 +347,7 @@ transform_group::match(const std::u16string &input, size_t &subMatched) const {
  * @return match length: number of chars at end of input string to modify.  0 if no match.
  */
 size_t
-transforms::apply(const std::u16string &input, std::u16string &output) {
+transforms::apply(const std::u32string &input, std::u32string &output) {
   /**
    * Example:
    * Group0:   za -> c, a -> bb
@@ -380,7 +382,7 @@ transforms::apply(const std::u16string &input, std::u16string &output) {
    */
   size_t matched = 0;
   /** modified copy of input */
-  std::u16string updatedInput = input;
+  std::u32string updatedInput = input;
   for (auto group = transform_groups.begin(); group < transform_groups.end(); group++) {
     // for each transform group
     // break out once there's a match
@@ -398,7 +400,7 @@ transforms::apply(const std::u16string &input, std::u16string &output) {
         // now apply the found transform
 
         // update subOutput (string) and subMatched
-        std::u16string subOutput = transform->apply(updatedInput, subMatched);
+        std::u32string subOutput = transform->apply(updatedInput, subMatched);
 
         // remove the matched part of the updatedInput
         updatedInput.resize(updatedInput.length() - subMatched);  // chop of the subMatched part at end
@@ -420,7 +422,15 @@ transforms::apply(const std::u16string &input, std::u16string &output) {
         }
       }
     } else if (group->type == any_group_type::reorder) {
-      // TODO-LDML reorder
+      // TODO-LDML: cheesy solution
+      std::u32string str2 = updatedInput;
+      if (group->reorder.apply(str2)) {
+        // pretend the whole thing matched
+        output.resize(0);
+        output.append(str2);
+        updatedInput.resize(0);
+        updatedInput.append(str2);
+      }
     }
     // else: continue to next group
   }
@@ -442,8 +452,8 @@ transforms::apply(const std::u16string &input, std::u16string &output) {
 
 // simple impl
 bool
-transforms::apply(std::u16string &str) {
-  std::u16string output;
+transforms::apply(std::u32string &str) {
+  std::u32string output;
   size_t matchLength = apply(str, output);
   if (matchLength == 0) {
     return false;
@@ -452,22 +462,6 @@ transforms::apply(std::u16string &str) {
   str.append(output);
   return true;
 }
-
-bool
-transforms::apply(std::u32string &str) {
-  bool rc = false;
-  // TODO-LDML: PoC implementation for now, need to refactor into fcns
-  // ONLY reorder
-  for (auto group = transform_groups.begin(); group < transform_groups.end(); group++) {
-    assert(group->type == reorder);  // TODO-LDML
-    auto rgroup = group->reorder;
-    if (rgroup.apply(str)) {
-      rc = true;
-    }
-  }
-  return rc;
-}
-
 // Loader
 
 transforms *
@@ -515,8 +509,8 @@ transforms::load(
 
       for (KMX_DWORD itemNumber = 0; itemNumber < group->count; itemNumber++) {
         const kmx::COMP_KMXPLUS_TRAN_TRANSFORM *element = tranHelper.getTransform(group->index + itemNumber);
-        const std::u16string fromStr                    = kplus.strs->get(element->from);
-        const std::u16string toStr                      = kplus.strs->get(element->to);
+        const std::u32string fromStr                    = kmx::u16string_to_u32string(kplus.strs->get(element->from));
+        const std::u32string toStr                      = kmx::u16string_to_u32string(kplus.strs->get(element->to));
         std::u16string mapFrom, mapTo;
 
         if (element->mapFrom && element->mapTo) {
@@ -525,7 +519,7 @@ transforms::load(
           mapTo   = kplus.strs->get(element->mapTo);
         }
 
-        newGroup.emplace_back(fromStr, toStr);  // creating a transform_entry
+        newGroup.emplace_back(fromStr, toStr /* ,mapFrom, mapTo */);  // creating a transform_entry
       }
       transforms->addGroup(newGroup);
     } else if (group->type == LDML_TRAN_GROUP_TYPE_REORDER) {

@@ -40,7 +40,7 @@ test_transforms() {
   std::cout << __FILE__ << ":" << __LINE__ << " - basic " << std::endl;
   {
     // start with one
-    transform_entry te(std::u16string(u"e^"), std::u16string(u"E"));  // keep it simple
+    transform_entry te(std::u32string(U"e^"), std::u32string(U"E"));  // keep it simple
     // OK now make a group do it
     transforms tr;
     transform_group st;
@@ -51,17 +51,17 @@ test_transforms() {
 
     // see if we can match the same
     {
-      std::u16string src(u"barQ^");
+      std::u32string src(U"barQ^");
       bool res = tr.apply(src);
       zassert_equal(res, false);
-      zassert_string_equal(src, std::u16string(u"barQ^"));  // no change
+      zassert_string_equal(src, std::u32string(U"barQ^"));  // no change
     }
 
     {
-      std::u16string src(u"fooe^");
+      std::u32string src(U"fooe^");
       bool res = tr.apply(src);
       zassert_equal(res, true);
-      zassert_string_equal(src, std::u16string(u"fooE"));
+      zassert_string_equal(src, std::u32string(U"fooE"));
     }
   }
 
@@ -73,23 +73,23 @@ test_transforms() {
     // setup
     {
       transform_group st;
-      st.emplace_back(std::u16string(u"za"), std::u16string(u"c"));
-      st.emplace_back(std::u16string(u"a"), std::u16string(u"bb"));
+      st.emplace_back(std::u32string(U"za"), std::u32string(U"c"));
+      st.emplace_back(std::u32string(U"a"), std::u32string(U"bb"));
       tr.addGroup(st);
     }
     {
       transform_group st;
-      st.emplace_back(std::u16string(u"bb"), std::u16string(u"ccc"));
+      st.emplace_back(std::u32string(U"bb"), std::u32string(U"ccc"));
       tr.addGroup(st);
     }
     {
       transform_group st;
-      st.emplace_back(std::u16string(u"cc"), std::u16string(u"d"));
+      st.emplace_back(std::u32string(U"cc"), std::u32string(U"d"));
       tr.addGroup(st);
     }
     {
       transform_group st;
-      st.emplace_back(std::u16string(u"tcd"), std::u16string(u"e"));
+      st.emplace_back(std::u32string(U"tcd"), std::u32string(U"e"));
       tr.addGroup(st);
     }
 
@@ -97,31 +97,31 @@ test_transforms() {
 
     // see if we can match the same
     {
-      std::u16string src(u"ta");
+      std::u32string src(U"ta");
       bool res = tr.apply(src);
       // pipe (|) symbol shows where the 'output' is delineated
       // t|a --> t|bb --> t|ccc --> t|cd --> |e
-      zassert_string_equal(src, std::u16string(u"e"));
+      zassert_string_equal(src, std::u32string(U"e"));
       zassert_equal(res, true);
     }
     {
-      std::u16string src(u"qza");
+      std::u32string src(U"qza");
       bool res = tr.apply(src);
       // pipe (|) symbol shows where the 'output' is delineated
       // q|za -> q|c
-      zassert_string_equal(src, std::u16string(u"qc"));
+      zassert_string_equal(src, std::u32string(U"qc"));
       zassert_equal(res, true);
     }
     {
-      std::u16string src(u"qa");
+      std::u32string src(U"qa");
       bool res = tr.apply(src);
-      zassert_string_equal(src, std::u16string(u"qcd"));
+      zassert_string_equal(src, std::u32string(U"qcd"));
       zassert_equal(res, true);
     }
     {
-      std::u16string src(u"tb");
+      std::u32string src(U"tb");
       bool res = tr.apply(src);
-      zassert_string_equal(src, std::u16string(u"tb"));
+      zassert_string_equal(src, std::u32string(U"tb"));
       zassert_equal(res, false);
     }
   }
@@ -132,13 +132,13 @@ test_transforms() {
     transforms tr;
     {
       transform_group st;
-      st.emplace_back(std::u16string(u"िह"), std::u16string(u"हि"));
+      st.emplace_back(std::u32string(U"िह"), std::u32string(U"हि"));
       tr.addGroup(st);
     }
     {
-      std::u16string src(u"िह");
+      std::u32string src(U"िह");
       bool res = tr.apply(src);
-      zassert_string_equal(src, std::u16string(u"हि"));
+      zassert_string_equal(src, std::u32string(U"हि"));
       zassert_equal(res, true);
     }
   }
