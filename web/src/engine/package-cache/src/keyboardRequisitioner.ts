@@ -97,6 +97,18 @@ export default class KeyboardRequisitioner {
     this.pathConfig = pathConfig;
     this.cache = new StubAndKeyboardCache(keyboardLoader);
     this.cloudQueryEngine = new CloudQueryEngine(keyboardRequester, this.pathConfig);
+
+    // Handles keymanweb.com's precached keyboard array.  There is no associated promise,
+    // so there's nothing handling the `register` call's results otherwise.
+    this.cloudQueryEngine.on('unboundregister', (registration) => {
+      try {
+        if(Array.isArray(registration)) {
+          registration.forEach((entry) => {
+            this.cache.addStub(entry);
+          });
+        }
+      } finally { }
+    });
   }
 
   addKeyboardArray(x: (string|RawKeyboardMetadata)[]): Promise<(KeyboardStub | ErrorStub)[]> {
