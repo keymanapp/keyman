@@ -57,7 +57,7 @@ if(!kmpJsonData) {
 // Validate the package file
 //
 
-const validation = new PackageValidation(callbacks);
+const validation = new PackageValidation(callbacks, {});
 if(!validation.validate(kpsFilename, kmpJsonData)) {
   process.exit(1);
 }

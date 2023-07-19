@@ -5,7 +5,7 @@ import { CompilerMessages } from '../src/compiler/messages.js';
 import { makePathToFixture } from './helpers/index.js';
 import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
 import { PackageValidation } from '../src/compiler/package-validation.js';
-import { CompilerErrorNamespace } from '@keymanapp/common-types';
+import { CompilerErrorNamespace, CompilerOptions } from '@keymanapp/common-types';
 
 const debug = false;
 const callbacks = new TestCompilerCallbacks();
@@ -20,7 +20,7 @@ describe('CompilerMessages', function () {
   // Message tests
   //
 
-  function testForMessage(context: Mocha.Context, fixture: string[], messageId?: number) {
+  function testForMessage(context: Mocha.Context, fixture: string[], messageId?: number, options?: CompilerOptions) {
     context.timeout(10000);
 
     callbacks.clear();
@@ -30,7 +30,7 @@ describe('CompilerMessages', function () {
 
     let kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
     if(kmpJson && callbacks.messages.length == 0) {
-      const validator = new PackageValidation(callbacks);
+      const validator = new PackageValidation(callbacks, options ?? {});
       validator.validate(kpsPath, kmpJson); // we'll ignore return value and rely on the messages
     }
 
@@ -122,8 +122,10 @@ describe('CompilerMessages', function () {
   // WARN_FileInPackageDoesNotFollowFilenameConventions
 
   it('should generate WARN_FileInPackageDoesNotFollowFilenameConventions if content filename has wrong conventions', async function() {
-    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions.kps'], CompilerMessages.WARN_FileInPackageDoesNotFollowFilenameConventions);
-    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions_2.kps'], CompilerMessages.WARN_FileInPackageDoesNotFollowFilenameConventions);
+    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions.kps'],
+      CompilerMessages.WARN_FileInPackageDoesNotFollowFilenameConventions, {checkFilenameConventions: true});
+    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions_2.kps'],
+      CompilerMessages.WARN_FileInPackageDoesNotFollowFilenameConventions, {checkFilenameConventions: true});
   });
 
   // ERROR_PackageNameCannotBeBlank

@@ -44,7 +44,7 @@ export class InfrastructureMessages {
   static ERROR_InvalidProjectFile = SevError | 0x0008;
 
   static Hint_FilenameHasDifferingCase = (o:{reference:string, filename:string}) => m(this.HINT_FilenameHasDifferingCase,
-    `File ${o.filename} differs in case from reference ${o.reference}; this will fail on platforms with case-sensitive filesystems.`);
+    `File on disk '${o.filename}' does not match case of '${o.reference}' in source file; this is an error on platforms with case-sensitive filesystems.`);
   static HINT_FilenameHasDifferingCase = SevHint | 0x0009;
 
   static Error_UnknownFileFormat = (o:{format:string}) => m(this.ERROR_UnknownFileFormat,

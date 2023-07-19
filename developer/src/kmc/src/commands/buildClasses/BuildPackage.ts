@@ -26,7 +26,7 @@ export class BuildPackage extends BuildActivity {
     // Validate the package file
     //
 
-    const validation = new PackageValidation(callbacks);
+    const validation = new PackageValidation(callbacks, options);
     if(!validation.validate(infile, kmpJsonData)) {
       return false;
     }
