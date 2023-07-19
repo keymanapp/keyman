@@ -6,6 +6,11 @@ import {
   InputSequenceSimulator
 } from '../../../../../build/tools/lib/index.mjs';
 
+function isOnAndroid() {
+  const agent=navigator.userAgent;
+  return agent.indexOf('Android' >= 0);
+}
+
 describe("Layer one - DOM -> InputSequence", function() {
   this.timeout(testconfig.timeouts.standard);
 
@@ -39,6 +44,23 @@ describe("Layer one - DOM -> InputSequence", function() {
       let resultPromise;
 
       let playbackEngine = new InputSequenceSimulator(this.controller);
+
+      // **********************************
+      // Android-Chrome sequence simulation does not allow fractional values in MouseEvent clientX/clientY...
+      // and it's impossible to coerce elements to have proper pixel alignment, it seems.  Fractional
+      // values are fine for touch events' `Touch` objects, though.
+      //
+      // So, the best way forward for doing automated testing on Android devices... is to note if we're
+      // Android and coerce test sequences to all run in 'touch' mode if so.
+      // **********************************
+      if(isOnAndroid()) {
+        for(let input of testObj.inputs) {
+          for(let touchpoint of input.touchpoints) {
+            touchpoint.isFromTouch = true;
+          }
+        }
+      }
+
       resultPromise = playbackEngine.replayAsync(testObj);
 
       // replayAsync sets up timeouts against the `clock` object.
@@ -61,7 +83,24 @@ describe("Layer one - DOM -> InputSequence", function() {
         let cleanOriginalSet = testObj.inputs.map(seqCleaner);
         let cleanResultSet   = result .inputs.map(seqCleaner);
 
-        expect(cleanResultSet).to.deep.equal(cleanOriginalSet);
+        expect(cleanOriginalSet.length).to.equal(cleanResultSet.length, "Unexpected difference in number of touch contact points");
+
+        for(let i=0; i < cleanOriginalSet.length; i++) {
+          let resultContactPath = cleanResultSet[i];
+          let originalContactPath = cleanOriginalSet[i];
+
+          for(let j=0; j < Math.max(resultContactPath.length, originalContactPath.length); j++) {
+            const sampleResult = resultContactPath[j];
+            const sampleOriginal = originalContactPath[j];
+
+            assert.isOk(sampleResult, `An expected sample was missing during simulation - failed at path entry ${j}`);
+            assert.isOk(sampleOriginal, `An extra sample was generated during simulation - failed at path entry ${j}`);
+
+            // During test runs against a real Android device, we tend to get almost, but not-quite, integer targetX and targetY values.
+            expect(sampleResult.targetX).to.be.closeTo(sampleOriginal.targetX, 1e-4, `Mismatch in x-coord at path entry ${j}`);
+            expect(sampleResult.targetY).to.be.closeTo(sampleOriginal.targetY, 1e-4, `Mismatch in y-coord at path entry ${j}`);
+          }
+        }
 
         // Now to compare just the timestamp elements.  We'll tolerate a difference of up to 1.
         // Note:  if using the `replaySync` function instead, disable this section!
