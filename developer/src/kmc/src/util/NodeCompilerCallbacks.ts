@@ -14,7 +14,7 @@ const color = chalk.default;
 const severityColors: {[value in CompilerErrorSeverity]: chalk.Chalk} = {
   [CompilerErrorSeverity.Info]: color.reset,
   [CompilerErrorSeverity.Hint]: color.blueBright,
-  [CompilerErrorSeverity.Warn]: color.yellowBright,
+  [CompilerErrorSeverity.Warn]: color.hex('FFA500'), // orange
   [CompilerErrorSeverity.Error]: color.redBright,
   [CompilerErrorSeverity.Fatal]: color.redBright,
 };
@@ -74,8 +74,8 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       const nativeFilename = fs.realpathSync.native(filename);
       if(filename != nativeFilename) {
         this.reportMessage(InfrastructureMessages.Hint_FilenameHasDifferingCase({
-          reference: originalFilename,
-          filename: nativeFilename
+          reference: path.basename(originalFilename),
+          filename: path.basename(nativeFilename)
         }));
       }
     }
