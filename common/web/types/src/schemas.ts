@@ -1,20 +1,12 @@
 
-// @ts-expect-error(2821) import assertions
-import kpj from './schemas/kpj.schema.json' assert { type: 'json' };
-// @ts-expect-error(2821) import assertions
-import kpj90 from './schemas/kpj-9.0.schema.json' assert { type: 'json' };
-// @ts-expect-error(2821) import assertions
-import kvks from './schemas/kvks.schema.json' assert { type: 'json' };
-// @ts-expect-error(2821) import assertions
-import ldmlKeyboard from './schemas/ldml-keyboard.schema.json' assert { type: 'json' };
-// @ts-expect-error(2821) import assertions
-import ldmlKeyboardTest from './schemas/ldml-keyboardtest.schema.json' assert { type: 'json' };
-// @ts-expect-error(2821) import assertions
-import displayMap from './schemas/displaymap.schema.json' assert { type: 'json' };
-// @ts-expect-error(2821) import assertions
-import touchLayoutClean from './schemas/keyman-touch-layout.clean.spec.json' assert { type: 'json' };
-// @ts-expect-error(2821) import assertions
-import touchLayout from './schemas/keyman-touch-layout.spec.json' assert { type: 'json' };
+import kpj from './schemas/kpj.schema.js';
+import kpj90 from './schemas/kpj-9.0.schema.js';
+import kvks from './schemas/kvks.schema.js';
+import ldmlKeyboard from './schemas/ldml-keyboard.schema.js';
+import ldmlKeyboardTest from './schemas/ldml-keyboardtest.schema.js';
+import displayMap from './schemas/displaymap.schema.js';
+import touchLayoutClean from './schemas/keyman-touch-layout.clean.spec.js';
+import touchLayout from './schemas/keyman-touch-layout.spec.js';
 
 const Schemas = {
   kpj,
