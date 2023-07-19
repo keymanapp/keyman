@@ -109,6 +109,16 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   }
 
   reportMessage(event: CompilerEvent): void {
+    if(!event.filename) {
+      event.filename = this.messageFilename;
+    }
+
+    if(this.messageFilename != event.filename) {
+      // Reset max message limit when a new file is being processed
+      this.messageFilename = event.filename;
+      this.messageCount = 0;
+    }
+
     this.messages.push({...event});
 
     if(CompilerError.severity(event.code) < compilerLogLevelToSeverity[this.options.logLevel]) {
@@ -119,12 +129,6 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     // We don't use this.messages.length because we only want to count visible
     // messages, and there's no point in recalculating the total for every
     // message emitted.
-
-    if(this.messageFilename != event.filename) {
-      // Reset max message limit when a new file is being processed
-      this.messageFilename = event.filename;
-      this.messageCount = 0;
-    }
 
     this.messageCount++;
     if(this.messageCount > MaxMessagesDefault) {
@@ -138,6 +142,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       // that will continue to collect all messages; this only affects the
       // console emission of messages.
       event = InfrastructureMessages.Info_TooManyMessages({count: MaxMessagesDefault});
+      event.filename = this.messageFilename;
     }
 
     const severityColor = severityColors[CompilerError.severity(event.code)] ?? color.reset;
