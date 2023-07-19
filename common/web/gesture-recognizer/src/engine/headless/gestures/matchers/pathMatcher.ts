@@ -2,12 +2,31 @@ import { SimpleGestureSource } from "../../simpleGestureSource.js";
 import { ContactModel, PointModelResolution } from "../specs/contactModel.js";
 import { ManagedPromise, TimeoutPromise } from "@keymanapp/web-utils";
 
+type FulfillmentCause = 'path' | 'timer' | 'item';
+
+export interface PathMatchResolution {
+  type: 'resolve',
+  cause: FulfillmentCause
+}
+
+export interface PathMatchRejection {
+  type: 'reject'
+  cause: FulfillmentCause
+}
+
+export interface PathNotFulfilled {
+  type: 'continue'
+}
+
+type PathMatchResult = PathMatchRejection | PathMatchResolution;
+type PathUpdateResult = PathMatchResult | PathNotFulfilled;
+
 export class PathMatcher<Type> {
   private timerPromise?: TimeoutPromise;
   private model: ContactModel;
   private source: SimpleGestureSource<Type>;
 
-  private readonly publishedPromise: ManagedPromise<PointModelResolution>
+  private readonly publishedPromise: ManagedPromise<PathMatchResult>
 
   public get promise() {
     return this.publishedPromise.corePromise;
@@ -20,7 +39,7 @@ export class PathMatcher<Type> {
     }
 
     this.model = model;
-    this.publishedPromise = new ManagedPromise<PointModelResolution>();
+    this.publishedPromise = new ManagedPromise<PathMatchResult>();
     this.source = source;
 
     if(model.timer) {
@@ -32,55 +51,63 @@ export class PathMatcher<Type> {
       });
 
       this.timerPromise.then((result) => {
-        this.finalize(result == model.timer.expectedResult);
+        this.finalize(result == model.timer.expectedResult, 'timer');
       });
     }
   }
 
-  private finalize(result: boolean) {
+  private finalize(result: boolean, cause: FulfillmentCause) {
     if(this.publishedPromise.isFulfilled) {
       return;
     }
 
     const model = this.model;
+    let retVal: PathMatchResult;
     if(result) {
-      if(typeof model.pathResolutionAction == 'string') {
-        this.publishedPromise.resolve({type: model.pathResolutionAction});
-      } else {
-        this.publishedPromise.resolve(model.pathResolutionAction);
-      }
+      retVal = {
+        type: model.pathResolutionAction,
+        cause: cause
+      };
     } else {
-      this.publishedPromise.resolve({type: 'reject'});
+      retVal = {
+        type: 'reject',
+        cause: cause
+      };
     }
+    this.publishedPromise.resolve(retVal);
+    return retVal;
   }
 
-  update() {
+  update(): PathUpdateResult {
     const model = this.model;
     const source = this.source;
 
     if(source.path.wasCancelled) {
-      this.finalize(false);
-      return 'reject';
+      return this.finalize(false, 'path');
     }
 
     if(model.itemChangeAction && source.currentHoveredItem != source.initialHoveredItem) {
       const result = model.itemChangeAction == 'resolve';
 
-      this.finalize(result);
-      return result;
+      return this.finalize(result, 'item');
     } else {
       // Note:  is current path, not 'full path'.
       const result = model.pathModel.evaluate(source.path) || 'continue';
 
       if(result != 'continue') {
-        this.finalize(result == 'resolve');
+        return this.finalize(result == 'resolve', 'path');
       } else if(source.path.isComplete) {
         // If the PathModel said to 'continue' but the path is done, we default
         // to rejecting the model; there will be no more changes, after all.
-        return 'reject';
+        return {
+          type: 'reject',
+          cause: 'path'
+        };
       }
 
-      return result;
+      return {
+        type: 'continue'
+      };
     }
   }
 }

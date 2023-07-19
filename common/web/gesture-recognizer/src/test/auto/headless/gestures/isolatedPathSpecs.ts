@@ -58,10 +58,7 @@ export const MainLongpressSourceModelWithShortcut: ContactModel = {
 
 export const ModipressStartModel: ContactModel = {
   itemPriority: -1,
-  pathResolutionAction: {
-    type: 'push',
-    permittedGestures: ['TBD, but irrelevant at the PathMatcher level']
-  },
+  pathResolutionAction: 'resolve',
   pathModel: {
     // Consideration of whether the underlying item supports the corresponding
     // gesture will be handled elsewhere.
@@ -72,7 +69,7 @@ export const ModipressStartModel: ContactModel = {
 export const ModipressEndModel: ContactModel = {
   itemPriority: -1,
   itemChangeAction: 'resolve',
-  pathResolutionAction: 'pop',
+  pathResolutionAction: 'resolve',
   pathModel: {
     evaluate: (path) => {
       if(path.isComplete) {
