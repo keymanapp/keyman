@@ -50,6 +50,19 @@ mcompile -d runs 4 important steps:
 
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]);
 
+//
+// Map of all shift states that we will work with
+//
+//const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCTRLFLAG|RALTFLAG, 0xFFFF};
+const UINT VKShiftState[] = {0, 1, 0xFFFF};
+
+
+// Map of all US English virtual key codes that we can translate
+//   US Keys:                       Q    W    E    R    T    Y    U    I    O    P    A    S    D    F    G    H    J    K    L    Z    X    C    V    B    N    M
+const DWORD VKMap_US_Keycode[] = {  24 , 25 , 26 , 27 , 28 , 29 , 30 , 31 , 32 , 33 , 38 , 39 , 40 , 41 , 42 , 43 , 44 , 45 , 46 , 52 , 53 , 54 , 55 , 56 , 57 , 58 };
+
+
+
 #if defined(_WIN32) || defined(_WIN64)
   int wmain(int argc, wchar_t* argv[]) {
     std::vector<std::u16string> str_argv_16 = convert_argvW_to_Vector_u16str( argc, argv);  
@@ -216,55 +229,87 @@ KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
   return FALSE;
 }
 
+//UINT KMX_VKUSToVKUnderlyingLayout(const DWORD US_Keycode, GdkDisplay *display){
+UINT KMX_VKUSToVKUnderlyingLayout(const DWORD US_Keycode, GdkDisplay *display){
+  uint ret =88;
+/*
+  ret = XkbKeycodeToKeysym(display, US_Keycode,0)
+  MyCoutW(L"#### KMX_VKUSToVKUnderlyingLayout of mcompile ended", 0);
+  MyCoutW(ret, 1);*/
+  return US_Keycode-1;
+}
 
-
-
-
-  KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]) {
+KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]) {
 
     KMX_WCHART DeadKey;
 
     if(!KMX_SetKeyboardToPositional(kbd)) return FALSE;
 
-    // Go through each of the shift states - base, shift, ctrl+alt, ctrl+alt+shift, [caps vs ncaps?]
-    // Currently, we go in this order so the 102nd key works. But this is not ideal for keyboards without 102nd key:   // I4651
-    // it catches only the first key that matches a given rule, but multiple keys may match that rule. This is particularly
-    // evident for the 102nd key on UK, for example, where \ can be generated with VK_OEM_102 or AltGr+VK_QUOTE.
-    // For now, we get the least shifted version, which is hopefully adequate.
-  /*
-    for(int j = 0; VKShiftState[j] != 0xFFFF; j++) {   // I4651
-      // Go through each possible key on the keyboard
-      for(int i = 0; VKMap[i]; i++) {   // I4651
-        UINT vkUnderlying = VKUSToVKUnderlyingLayout(VKMap[i]);
+        MyCoutW(L"#### KMX_DoConvert of keymap started", 1);
 
-        WCHAR ch = CharFromVK(vkUnderlying, VKShiftState[j], &DeadKey);
-
-        //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
-
-        if(bDeadkeyConversion) {   // I4552
-          if(ch == 0xFFFF) {
-            ch = DeadKey;
-          }
+        gdk_init(&argc, &argv);
+        GdkDisplay *display = gdk_display_get_default();
+        if (!display) {
+          printf("ERROR: can't get display\n");
+          return 1;
+        }
+        GdkKeymap *keymap = gdk_keymap_get_for_display(display);
+        if (!keymap) {
+          printf("ERROR: Can't get keymap\n");
+          gdk_display_close(display);
+          return 2;
         }
 
-        switch(ch) {
-          case 0x0000: break;
-          case 0xFFFF: ConvertDeadkey(kbd, VKMap[i], VKShiftState[j], DeadKey); break;
-          default:     TranslateKeyboard(kbd, VKMap[i], VKShiftState[j], ch);
+        MyCoutW(L"  # Top checks of keymap OK", 1);
+
+  // Go through each of the shift states - base, shift, ctrl+alt, ctrl+alt+shift, [caps vs ncaps?]
+  // Currently, we go in this order so the 102nd key works. But this is not ideal for keyboards without 102nd key:   // I4651
+  // it catches only the first key that matches a given rule, but multiple keys may match that rule. This is particularly
+  // evident for the 102nd key on UK, for example, where \ can be generated with VK_OEM_102 or AltGr+VK_QUOTE.
+  // For now, we get the least shifted version, which is hopefully adequate.
+
+  for (int j = 0; VKShiftState[j] != 0xFFFF; j++) {   // I4651
+    wprintf(L"   +++++++ VKShiftState Nr:  %i \n", j);
+    // Go through each possible key on the keyboard
+    for (int i = 0; VKMap_US_Keycode[i]; i++) {   // I4651
+    wprintf(L"   +++++++ VKMap_US_Keycode Nr: %i , value %i \n", i,VKMap_US_Keycode[i]);
+      //UINT vkUnderlying = KMX_VKUSToVKUnderlyingLayout(VKMap_US_Keycode[i], display);
+      UINT vkUnderlying = KMX_VKUSToVKUnderlyingLayout(VKMap_US_Keycode[i], display);
+      wprintf(L"   +++++++ back from KMX_VKUSToVKUnderlyingLayout: %i \n", vkUnderlying);
+
+     // WCHAR ch = CharFromVK(vkUnderlying, VKShiftState[j], &DeadKey);
+
+
+/*
+
+
+      //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
+
+      if (bDeadkeyConversion) {   // I4552
+        if (ch == 0xFFFF) {
+          ch = DeadKey;
         }
+      }
 
-        //
-      }*/
-
-
-
-    //if (!(run_DoConvert_Part1_getMap(argc, argv))   && (!run_DoConvert_Part2_TranslateKeyboard()) )
-
-    if (!(run_DoConvert_Part1_getMap(argc, argv)))
-      int do_something;
-
-    return true;
+      switch (ch) {
+      case 0x0000: break;
+      case 0xFFFF: ConvertDeadkey(kbd, VKMap[i], VKShiftState[j], DeadKey); break;
+      default:     TranslateKeyboard(kbd, VKMap[i], VKShiftState[j], ch);
+      }
+*/
+    }
   }
+/*
+  ReportUnconvertedKeyboardRules(kbd);
+
+  if(!ImportRules(kbid, kbd, &FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
+    return FALSE;
+  }
+*/
+  return TRUE;
+}
+
+
 
 void KMX_LogError(const KMX_WCHART* m1,int m2) {
   wprintf((PWSTR)m1, m2);

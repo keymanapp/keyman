@@ -68,6 +68,7 @@ typedef wchar_t*     LPWSTR;            // _S2 needs to be removed/?
 typedef WCHAR*       PWCHAR;            // _S2 needs to be removed/?
 
 typedef KMX_CHAR*  PKMX_CHAR;           // _S2 needs to be removed/?
+typedef unsigned int UINT;              // _S2 needs to be removed/?
 
 typedef int        BOOL;                // _S2 needs to be removed/? or is it int32_t??
 
@@ -96,5 +97,21 @@ typedef  wchar_t KMX_UCHAR;
 #endif
 
 typedef KMX_UCHAR* KMX_PUCHAR;
+
+// _S2 do we need this ?
+#define VK_SPACE    0x20
+#define VK_COLON	0xBA
+#define VK_EQUAL	0xBB
+#define VK_COMMA	0xBC
+#define VK_HYPHEN	0xBD
+#define VK_PERIOD	0xBE
+#define	VK_SLASH	0xBF
+#define VK_ACCENT	0xC0
+#define VK_LBRKT	0xDB
+#define VK_BKSLASH	0xDC
+#define VK_RBRKT	0xDD
+#define VK_QUOTE	0xDE
+#define VK_xDF		0xDF
+#define VK_OEM_102  0xE2  //  "<>" or "\|" on RT 102-key kbd.
 
 #endif /*KM_TYPES*/
