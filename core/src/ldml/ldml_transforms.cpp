@@ -172,6 +172,7 @@ element_list::update_sort_key(size_t offset, std::deque<reorder_sort_key> &key) 
     if (!e->matches(k.ch)) {
       DebugLog("!! updateSortKey(%d+%d): element did not re-match the sortkey", offset, c);
       k.dump();
+      // TODO-LDML: assertion follows
     }
     assert(e->matches(k.ch));        // double check that this element matches
     k.primary  = e->get_order();
@@ -245,7 +246,6 @@ reorder_group::apply(std::u32string &str) const {
   /** pointer to the beginning of the current run. */
   std::deque<reorder_sort_key>::iterator run_start = sort_keys.begin();
   for(auto e = run_start; e != sort_keys.end(); e++) {
-    e->dump();
     if ((e->primary == 0) && (e != run_start)) { // it's a base
       auto run_end = e - 1;
       std::sort(run_start, run_end); // reversed because it's a reverse iterator…?
