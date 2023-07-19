@@ -155,7 +155,7 @@ function _setup_display_server() {
   PID_FILE=$2
   DISPLAY_SERVER=$3
 
-  if [ "$DISPLAY_SERVER" == "wayland" ]; then
+  if [ "$DISPLAY_SERVER" == "--wayland" ]; then
     if ! can_run_wayland; then
       # support for --headless got added in mutter 40.x
       echo "ERROR: mutter doesn't support running headless. Can't run Wayland tests."
@@ -281,5 +281,13 @@ function cleanup() {
     bash "$PID_FILE" > /dev/null 2>&1
     rm "$PID_FILE"
     echo "# Finished shutdown of processes."
+  fi
+}
+
+function exit_on_package_build() {
+  if [ -v KEYMAN_PKG_BUILD ]; then
+    # Skip setup during package builds - can't run headless and we won't
+    # run the other tests anyway
+    exit 0
   fi
 }

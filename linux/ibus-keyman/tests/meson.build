@@ -57,22 +57,16 @@ teardown_tests = find_program('teardown-tests.sh', dirs: [meson.current_source_d
 run_test = find_program('run-single-test.sh', dirs: [meson.current_source_dir() / 'scripts'])
 find_tests = find_program('find-tests.sh', dirs: [meson.current_source_dir() / 'scripts'])
 
+# Mutter 40.x added the --headless option wich we need in order to be able to run the Wayland tests
+mutter = find_program('mutter', required: false, version: '>=40')
+can_build_wayland = mutter.found()
+
 test(
   'setup-x11',
   setup_tests,
   args: ['--x11', env_file, pid_file],
   env: test_env,
   priority: -10,
-  is_parallel: false,
-  protocol: 'exitcode'
-)
-
-test(
-  'setup-wayland',
-  setup_tests,
-  args: ['--wayland', env_file, pid_file],
-  env: test_env,
-  priority: -20,
   is_parallel: false,
   protocol: 'exitcode'
 )
@@ -86,14 +80,26 @@ test(
   protocol: 'exitcode'
 )
 
-test(
-  'teardown-wayland',
-  teardown_tests,
-  args: [pid_file],
-  priority: -29,
-  is_parallel: false,
-  protocol: 'exitcode'
-)
+if can_build_wayland
+  test(
+    'setup-wayland',
+    setup_tests,
+    args: ['--wayland', env_file, pid_file],
+    env: test_env,
+    priority: -20,
+    is_parallel: false,
+    protocol: 'exitcode'
+  )
+
+  test(
+    'teardown-wayland',
+    teardown_tests,
+    args: [pid_file],
+    priority: -29,
+    is_parallel: false,
+    protocol: 'exitcode'
+  )
+endif
 
 kmxtest_files = run_command(
   find_tests,
@@ -130,26 +136,28 @@ foreach kmx: kmxtest_files
     timeout: 120,
     protocol: 'tap',
   )
-  test(
-    'Wayland-' + testname + '__surrounding-text',
-    run_test,
-    args: [ '--wayland', '--surrounding-text', test_args],
-    env: test_env,
-    depends: [test_exe],
-    priority: -21,
-    is_parallel: false,
-    timeout: 120,
-    protocol: 'tap',
-  )
-  test(
-    'Wayland-' + testname + '__no-surrounding-text',
-    run_test,
-    args: [ '--wayland', '--no-surrounding-text', test_args],
-    env: test_env,
-    depends: [test_exe],
-    priority: -22,
-    is_parallel: false,
-    timeout: 120,
-    protocol: 'tap',
-  )
+  if can_build_wayland
+    test(
+      'Wayland-' + testname + '__surrounding-text',
+      run_test,
+      args: [ '--wayland', '--surrounding-text', test_args],
+      env: test_env,
+      depends: [test_exe],
+      priority: -21,
+      is_parallel: false,
+      timeout: 120,
+      protocol: 'tap',
+    )
+    test(
+      'Wayland-' + testname + '__no-surrounding-text',
+      run_test,
+      args: [ '--wayland', '--no-surrounding-text', test_args],
+      env: test_env,
+      depends: [test_exe],
+      priority: -22,
+      is_parallel: false,
+      timeout: 120,
+      protocol: 'tap',
+    )
+  endif
 endforeach
