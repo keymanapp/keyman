@@ -82,7 +82,7 @@ describe("PathMatcher", function() {
       await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher, {terminate: false});
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {type: 'resolve'});
+      assert.deepEqual(await modelMatcher.promise, {type: 'resolve', cause: 'path'});
     });
 
     it("reject", async function() {
@@ -101,7 +101,7 @@ describe("PathMatcher", function() {
       await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher, {terminate: false});
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {type: 'reject'});
+      assert.deepEqual(await modelMatcher.promise, {type: 'reject', cause: 'path'});
     });
   });
 
@@ -129,7 +129,7 @@ describe("PathMatcher", function() {
       await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher);
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {type: 'resolve'});
+      assert.deepEqual(await modelMatcher.promise, {type: 'resolve', cause: 'timer'});
     });
 
     it("resolve: path not completed (long wait)", async function() {
@@ -155,7 +155,7 @@ describe("PathMatcher", function() {
       await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher, {terminate: false});
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {type: 'resolve'});
+      assert.deepEqual(await modelMatcher.promise, {type: 'resolve', cause: 'timer'});
     });
 
     it("reject: path completed (short wait)", async function() {
@@ -181,7 +181,7 @@ describe("PathMatcher", function() {
       await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher);
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {type: 'reject'});
+      assert.deepEqual(await modelMatcher.promise, {type: 'reject', cause: 'path'});
     });
 
     it("reject: path cancelled", async function() {
@@ -214,7 +214,7 @@ describe("PathMatcher", function() {
       await cancelPromise;
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {type: 'reject'});
+      assert.deepEqual(await modelMatcher.promise, {type: 'reject', cause: 'path'});
     });
 
     it("reject: distance moved", async function() {
@@ -249,7 +249,7 @@ describe("PathMatcher", function() {
       await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher);
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {type: 'reject'});
+      assert.deepEqual(await modelMatcher.promise, {type: 'reject', cause: 'path'});
     });
 
     it("reject: item changed", async function() {
@@ -283,7 +283,7 @@ describe("PathMatcher", function() {
       await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher);
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {type: 'reject'});
+      assert.deepEqual(await modelMatcher.promise, {type: 'reject', cause: 'item'});
     });
 
     it("reject: disabled up-flick shortcut", async function() {
@@ -309,7 +309,7 @@ describe("PathMatcher", function() {
       await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher);
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {type: 'reject'});
+      assert.deepEqual(await modelMatcher.promise, {type: 'reject', cause: 'path'});
     });
 
     it("resolve: enabled up-flick shortcut", async function() {
@@ -335,7 +335,7 @@ describe("PathMatcher", function() {
       await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher, { terminate: false });
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {type: 'resolve'});
+      assert.deepEqual(await modelMatcher.promise, {type: 'resolve', cause: 'path'});
     });
   });
 
@@ -356,8 +356,7 @@ describe("PathMatcher", function() {
       await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher, {terminate: false});
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.equal((await modelMatcher.promise).type, 'push');
-      assert.isOk(((await modelMatcher.promise) as gestures.specs.PushResult).permittedGestures);
+      assert.deepEqual(await modelMatcher.promise, {type: 'resolve', cause: 'path'});
     });
 
     it("pop: released", async function() {
@@ -376,7 +375,7 @@ describe("PathMatcher", function() {
       await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher, {terminate: true});
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {type: 'pop'});
+      assert.deepEqual(await modelMatcher.promise, {type: 'resolve', cause: 'path'});
     });
 
     it("pop: item changed", async function() {
@@ -402,7 +401,7 @@ describe("PathMatcher", function() {
       await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher, {terminate: false});
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {type: 'pop'});
+      assert.deepEqual(await modelMatcher.promise, {type: 'resolve', cause: 'item'});
     });
   });
 
@@ -430,7 +429,7 @@ describe("PathMatcher", function() {
       await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher);
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {type: 'resolve'});
+      assert.deepEqual(await modelMatcher.promise, {type: 'resolve', cause: 'path'});
     });
 
     it("resolve: path completed (short wait)", async function() {
@@ -456,7 +455,7 @@ describe("PathMatcher", function() {
       await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher);
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {type: 'resolve'});
+      assert.deepEqual(await modelMatcher.promise, {type: 'resolve', cause: 'path'});
     });
 
     it("reject: path cancelled", async function() {
@@ -489,7 +488,7 @@ describe("PathMatcher", function() {
       await cancelPromise;
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {type: 'reject'});
+      assert.deepEqual(await modelMatcher.promise, {type: 'reject', cause: 'path'});
     });
 
     it("resolve: significant movement, but no item change", async function() {
@@ -524,7 +523,7 @@ describe("PathMatcher", function() {
       await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher);
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {type: 'resolve'});
+      assert.deepEqual(await modelMatcher.promise, {type: 'resolve', cause: 'path'});
     });
 
     it("reject: little movement, but item changed", async function() {
@@ -558,7 +557,7 @@ describe("PathMatcher", function() {
       await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher);
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {type: 'reject'});
+      assert.deepEqual(await modelMatcher.promise, {type: 'reject', cause: 'item'});
     });
   });
 });

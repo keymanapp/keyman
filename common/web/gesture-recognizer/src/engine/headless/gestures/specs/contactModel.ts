@@ -1,29 +1,13 @@
 import { PathModel } from "./pathModel.js";
 
-// For modipress, in particular - says what gestures are allowed during the 'push' state.
-export interface PushResult {
-  type: 'push';
-  permittedGestures: string[]; // of ids for allowed types
-}
-
-export interface ComplexResolveResult {
-  type: 'resolve';
-  cancelBaseAwait?: boolean; // default false, but if true, will auto-cancel the top-level model's await (if it exists)
-}
-
-type WrappedString<Text> = { type: Text };
-
 // pop - a signal to reverse actions taken in response to the most-recent 'push'.  (Generally, for 'modipress' gestures)
-type SimpleStringResult = 'resolve' | 'reject' | 'pop';
+type SimpleStringResult = 'resolve' | 'reject';
 
-export type PointModelResolution =  PushResult | ComplexResolveResult | WrappedString<SimpleStringResult>;
-
-
-export type SpecPointModelResolution = SimpleStringResult | PointModelResolution;
+export type PointModelResolution = SimpleStringResult;
 
 export interface ContactModel {
   pathModel: PathModel,
-  pathResolutionAction: SpecPointModelResolution,
+  pathResolutionAction: PointModelResolution,
 
   // If multiple touchpoints are active, determines which point's item 'wins' for
   // gesture-state updates and resolution.  Higher = better.
