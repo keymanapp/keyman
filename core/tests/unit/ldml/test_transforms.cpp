@@ -339,8 +339,13 @@ test_reorder_standalone() {
       // try all-at-once
       {
         std::u32string text = roast;
+        std::cout << " Starting: " << roast << std::endl;
         if (!tr.apply(text)) {
           std::cout << " (did not apply)" << std::endl;
+        } else if (text == roast) {
+          std::cout << " (suboptimal: apply returned true but made no change)" << std::endl;
+        } else {
+          std::cout << " changed to " << text;
         }
         zassert_string_equal(text, expect);
         std::cout << " matched (converting all at once)!" << std::endl;

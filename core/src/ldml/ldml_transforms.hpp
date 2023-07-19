@@ -24,7 +24,7 @@ using km::kbp::kmx::USet;
  * Type of a group
  */
 enum any_group_type {
-  transform = LDML_TRAN_GROUP_TYPE_REORDER,
+  transform = LDML_TRAN_GROUP_TYPE_TRANSFORM,
   reorder   = LDML_TRAN_GROUP_TYPE_REORDER,
 };
 

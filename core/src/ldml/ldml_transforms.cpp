@@ -430,6 +430,7 @@ transforms::apply(const std::u32string &input, std::u32string &output) {
         output.append(str2);
         updatedInput.resize(0);
         updatedInput.append(str2);
+        matched = output.length();
       }
     }
     // else: continue to next group
