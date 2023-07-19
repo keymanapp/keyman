@@ -23,7 +23,8 @@ interface EventMap<HoveredItemType> {
 export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMap<HoveredItemType>> {
   private inputEngines: InputEngineBase<HoveredItemType>[];
 
-  private _activeInputs: {[id: string]: ComplexGestureSource<HoveredItemType>} = {};
+  private _activeSourcesMap: {[id: string]: ComplexGestureSource<HoveredItemType>} = {};
+  private _activeSources: ComplexGestureSource<HoveredItemType>[] = [];
 
   public constructor() {
     super();
@@ -37,7 +38,8 @@ export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMa
 
   private readonly onNewTrackedPath = (touchpoint: SimpleGestureSource<HoveredItemType>) => {
     const newInput = new ComplexGestureSource<HoveredItemType>(touchpoint);
-    this._activeInputs[touchpoint.identifier] = newInput;
+    this._activeSourcesMap[touchpoint.identifier] = newInput;
+    this._activeSources.push(newInput);
 
     this.emit('inputstart', newInput);
     return false;

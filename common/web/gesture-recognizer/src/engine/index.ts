@@ -17,4 +17,6 @@ export { TouchEventEngine } from "./touchEventEngine.js";
 export { TouchpointCoordinator } from "./headless/touchpointCoordinator.js";
 export { ViewportZoneSource } from './configuration/viewportZoneSource.js';
 
+export * as gestures from './headless/gestures/index.js';
+
 // TODO:  export other odds & ends.

@@ -1,0 +1,9 @@
+{
+  "extensions": ["js", "ts"],
+  "spec" : [
+    "src/test/auto/headless/**/*.*"
+  ],
+  "node-option": [
+    "loader=ts-node/esm"
+  ]
+}
