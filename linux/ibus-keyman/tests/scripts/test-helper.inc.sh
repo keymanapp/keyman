@@ -283,3 +283,11 @@ function cleanup() {
     echo "# Finished shutdown of processes."
   fi
 }
+
+function exit_on_package_build() {
+  if [ -v KEYMAN_PKG_BUILD ]; then
+    # Skip setup during package builds - can't run headless and we won't
+    # run the other tests anyway
+    exit 0
+  fi
+}
