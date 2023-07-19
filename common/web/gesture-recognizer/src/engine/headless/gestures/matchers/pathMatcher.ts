@@ -23,7 +23,7 @@ type PathUpdateResult = PathMatchResult | PathNotFulfilled;
 
 export class PathMatcher<Type> {
   private timerPromise?: TimeoutPromise;
-  private model: ContactModel;
+  private model: ContactModel<Type>;
   private source: SimpleGestureSource<Type>;
 
   private readonly publishedPromise: ManagedPromise<PathMatchResult>
@@ -32,7 +32,7 @@ export class PathMatcher<Type> {
     return this.publishedPromise.corePromise;
   }
 
-  constructor(model: ContactModel, source: SimpleGestureSource<Type>) {
+  constructor(model: ContactModel<Type>, source: SimpleGestureSource<Type>) {
     /* c8 ignore next 3 */
     if(!model || !source) {
       throw new Error("A gesture-path source and contact-path model must be specified.");
