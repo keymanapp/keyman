@@ -193,6 +193,14 @@ export enum CompilerErrorNamespace {
    * reasons
    */
   KmwCompiler = 0x7000,
+  /**
+   * kmc-model-info 0x8000…0x8FFF
+   */
+  ModelInfoCompiler = 0x8000,
+  /**
+   * kmc-keyboard-info 0x9000…0x9FFF
+   */
+  KeyboardInfoCompiler = 0x9000,
 };
 
 /**

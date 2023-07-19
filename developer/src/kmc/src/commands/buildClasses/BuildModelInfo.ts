@@ -4,6 +4,7 @@ import { CompilerCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/
 import { writeMergedModelMetadataFile } from '@keymanapp/kmc-model-info';
 import { KmpCompiler } from '@keymanapp/kmc-package';
 import { loadProject } from '../../util/projectLoader.js';
+import { InfrastructureMessages } from 'src/messages/messages.js';
 
 export class BuildModelInfo extends BuildActivity {
   public get name(): string { return 'Lexical model metadata'; }
@@ -35,27 +36,27 @@ export class BuildModelInfo extends BuildActivity {
 
     const metadata = project.files.find(file => file.getFileType() == KeymanFileTypes.Source.ModelInfo);
     if(!metadata) {
-      // TODO error
-      throw new Error('Missing .model_info file');
+      callbacks.reportMessage(InfrastructureMessages.Error_FileTypeNotFound({ext: KeymanFileTypes.Source.ModelInfo}));
+      return false;
     }
 
     const model = project.files.find(file => file.getFileType() == KeymanFileTypes.Source.Model);
     if(!model) {
-      // TODO error
-      throw new Error('Missing .model.ts file');
+      callbacks.reportMessage(InfrastructureMessages.Error_FileTypeNotFound({ext: KeymanFileTypes.Source.Model}));
+      return false;
     }
 
     const kps = project.files.find(file => file.getFileType() == KeymanFileTypes.Source.Package);
     if(!kps) {
-      // TODO error
-      throw new Error('Missing .kps file');
+      callbacks.reportMessage(InfrastructureMessages.Error_FileTypeNotFound({ext: KeymanFileTypes.Source.Package}));
+      return false;
     }
 
     let kmpCompiler = new KmpCompiler(callbacks);
     let kmpJsonData = kmpCompiler.transformKpsToKmpObject(project.resolveInputFilePath(kps));
     if(!kmpJsonData) {
-      // TODO error
-      throw new Error('Invalid .kps file');
+      // Errors will have been emitted by KmpCompiler
+      return false;
     }
 
     const data = writeMergedModelMetadataFile(
@@ -71,7 +72,7 @@ export class BuildModelInfo extends BuildActivity {
     );
 
     if(data == null) {
-      // TODO error would have been emitted by writeMergedModelMetadataFile
+      // Error messages have already been emitted by writeMergedModelMetadataFile
       return false;
     }
 

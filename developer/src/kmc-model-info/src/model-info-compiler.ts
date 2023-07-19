@@ -6,6 +6,7 @@
 import { minKeymanVersion } from "./min-keyman-version.js";
 import { ModelInfoFile } from "./model-info-file.js";
 import { CompilerCallbacks, KmpJsonFile } from "@keymanapp/common-types";
+import { ModelInfoCompilerMessages } from "./messages.js";
 
 /* c8 ignore start */
 export class ModelInfoOptions {
@@ -59,21 +60,18 @@ export function writeMergedModelMetadataFile(
     */
   const dataInput = callbacks.loadFile(sourceModelInfoFileName);
   if(!dataInput) {
-    // TODO errror
-    throw new Error(`Missing input data`);
+    callbacks.reportMessage(ModelInfoCompilerMessages.Error_FileDoesNotExist({filename: sourceModelInfoFileName}));
+    return null;
   }
-  let jsonInput = null;
 
+  let model_info: ModelInfoFile = null;
   try {
-    jsonInput = new TextDecoder('utf-8', {fatal: true}).decode(dataInput);
+    const jsonInput = new TextDecoder('utf-8', {fatal: true}).decode(dataInput);
+    model_info = JSON.parse(jsonInput);
   } catch(e) {
-    throw new Error(`Not valid json: `+e);
+    callbacks.reportMessage(ModelInfoCompilerMessages.Error_FileIsNotValid({filename: sourceModelInfoFileName, e}));
+    return null;
   }
-  if(!jsonInput) {
-    throw new Error(`json missing`);
-  }
-
-  let model_info: ModelInfoFile = JSON.parse(jsonInput);
 
   //
   // Build merged .model_info file
@@ -85,8 +83,12 @@ export function writeMergedModelMetadataFile(
   function setModelMetadata(field: keyof ModelInfoFile, expected: unknown, warn: boolean = true) {
     /* c8 ignore next 4 */
     if (model_info[field] && model_info[field] !== expected) {
-      if (warn || typeof warn === 'undefined')
-        console.warn(`Warning: source ${sourceModelInfoFileName} field ${field} value "${model_info[field]}" does not match "${expected}" found in source file metadata.`);
+      if (warn ?? true) {
+        callbacks.reportMessage(ModelInfoCompilerMessages.Warn_MetadataFieldInconsistent({
+          field, value:model_info[field], expected
+        }));
+      }
+
     }
     // TypeScript gets upset with this assignment, because it cannot deduce
     // the exact type of model_info[field] -- there are many possibilities!
@@ -110,7 +112,8 @@ export function writeMergedModelMetadataFile(
     let match = author.url.match(/^(mailto\:)?(.+)$/);
     /* c8 ignore next 3 */
     if (match === null) {
-      throw new Error(`Invalid author email: ${author.url}`);
+      callbacks.reportMessage(ModelInfoCompilerMessages.Error_InvalidAuthorEmail({email:author.url}));
+      return null;
     }
 
     let email = match[2];
@@ -129,13 +132,19 @@ export function writeMergedModelMetadataFile(
 
   // Always overwrite with actual file size
   model_info.packageFileSize = callbacks.fileSize(options.kmpFileName);
-  // TODO: handle error
+  if(model_info.packageFileSize === undefined) {
+    callbacks.reportMessage(ModelInfoCompilerMessages.Error_FileDoesNotExist({filename:options.kmpFileName}));
+    return null;
+  }
 
   setModelMetadata('jsFilename', callbacks.path.basename(options.modelFileName));
 
   // Always overwrite with actual file size
   model_info.jsFileSize = callbacks.fileSize(options.modelFileName);
-  // TODO: handle error
+  if(model_info.jsFileSize === undefined) {
+    callbacks.reportMessage(ModelInfoCompilerMessages.Error_FileDoesNotExist({filename:options.modelFileName}));
+    return null;
+  }
 
   // Always overwrite source data
   model_info.packageIncludes = options.kmpJsonData.files.filter((e) => !!e.name.match(/.[ot]tf$/i)).length ? ['fonts'] : [];

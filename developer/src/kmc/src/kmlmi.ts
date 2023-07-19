@@ -50,7 +50,7 @@ const callbacks = new NodeCompilerCallbacks({logLevel: 'info'});
 let kmpCompiler = new KmpCompiler(callbacks);
 let kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
 if(!kmpJsonData) {
-  process.exit(1);
+  process.exit(SysExits.EX_DATAERR);
 }
 
 //
@@ -59,7 +59,7 @@ if(!kmpJsonData) {
 
 const validation = new PackageValidation(callbacks, {});
 if(!validation.validate(kpsFilename, kmpJsonData)) {
-  process.exit(1);
+  process.exit(SysExits.EX_DATAERR);
 }
 
 //
@@ -74,16 +74,14 @@ let modelInfoOptions: ModelInfoOptions = {
   kmpFileName: kmpFilename
 };
 
-try {
-  const data = writeMergedModelMetadataFile(
-    inputFilename,
-    callbacks,
-    modelInfoOptions);
-  fs.writeFileSync(outputFilename, data);
-} catch(e) {
-  console.error(e);
+const data = writeMergedModelMetadataFile(
+  inputFilename,
+  callbacks,
+  modelInfoOptions);
+if(!data) {
   process.exit(SysExits.EX_DATAERR);
 }
+fs.writeFileSync(outputFilename, data);
 
 function exitDueToUsageError(message: string): never  {
   console.error(`${program.name()}: ${message}`);
