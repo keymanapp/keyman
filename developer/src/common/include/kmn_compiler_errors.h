@@ -184,7 +184,7 @@
 #define CWARN_ANSIInUnicodeGroup                           0x00002087
 #define CWARN_UnicodeSurrogateUsed                         0x00002088
 #define CWARN_ReservedCharacter                            0x00002089
-#define CWARN_Info                                         0x0000208A
+#define CWARN_Info                                         0x0000008A
 #define CWARN_VirtualKeyWithMnemonicLayout                 0x0000208B
 #define CWARN_VirtualCharKeyWithPositionalLayout           0x0000208C
 #define CWARN_StoreAlreadyUsedAsOptionOrCall               0x0000208D

@@ -241,7 +241,10 @@ export class KmnCompilerMessages {
   static WARN_ANSIInUnicodeGroup                              = SevWarn | 0x087;
   static WARN_UnicodeSurrogateUsed                            = SevWarn | 0x088;
   static WARN_ReservedCharacter                               = SevWarn | 0x089;
-  static WARN_Info                                            = SevWarn | 0x08A;
+
+  // Note: INFO_Info is called CWARN_Info in kmn_compiler_errors.h, but should have an "info" severity
+  static INFO_Info                                            = SevInfo | 0x08A;
+
   static WARN_VirtualKeyWithMnemonicLayout                    = SevWarn | 0x08B;
   static WARN_VirtualCharKeyWithPositionalLayout              = SevWarn | 0x08C;
   static WARN_StoreAlreadyUsedAsOptionOrCall                  = SevWarn | 0x08D;
