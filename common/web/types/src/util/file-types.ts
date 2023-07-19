@@ -11,6 +11,8 @@ export const enum Source {
   Package = '.kps',
   VisualKeyboard = '.kvks',
   TouchLayout = '.keyman-touch-layout',
+  KeyboardInfo = '.keyboard_info',
+  ModelInfo = '.model_info',
 };
 
 /**
@@ -25,6 +27,8 @@ export const ALL_SOURCE: ReadonlyArray<Source> = [
   Source.Package,
   Source.VisualKeyboard,
   Source.TouchLayout,
+  Source.KeyboardInfo,
+  Source.ModelInfo,
 ] as const;
 
 /**
@@ -37,6 +41,8 @@ export const enum Binary {
   Keyboard = '.kmx',
   Package = '.kmp',
   VisualKeyboard = '.kvk',
+  KeyboardInfo = '.keyboard_info',
+  ModelInfo = '.model_info',
 }
 
 /**
@@ -50,6 +56,8 @@ export const ALL_BINARY: ReadonlyArray<Binary> = [
   Binary.Keyboard,
   Binary.Package,
   Binary.VisualKeyboard,
+  Binary.KeyboardInfo,
+  Binary.ModelInfo,
  ] as const;
 
 export const ALL = [...ALL_SOURCE, ...ALL_BINARY] as const;
@@ -119,4 +127,20 @@ export function filenameIs(filename: string, fileType: Source | Binary) {
     return false;
   }
   return filename.toLowerCase().endsWith(fileType);
+}
+
+/**
+ * Replaces a filename extension with the new extension. Returns `null` if the
+ * filename does not end with oldExtension.
+ * @param filename
+ * @param oldExtension
+ * @param newExtension
+ * @returns
+ */
+export function replaceExtension(filename: string, oldExtension: string, newExtension: string): string {
+  const ext = filename.substring(filename.length - oldExtension.length);
+  if(ext !== oldExtension) {
+    return null;
+  }
+  return filename.substring(0, filename.length - oldExtension.length) + newExtension;
 }

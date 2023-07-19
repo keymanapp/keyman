@@ -1,7 +1,9 @@
 import { BuildActivity } from './BuildActivity.js';
+import { BuildKeyboardInfo } from './BuildKeyboardInfo.js';
 import { BuildKmnKeyboard } from './BuildKmnKeyboard.js';
 import { BuildLdmlKeyboard } from './BuildLdmlKeyboard.js';
 import { BuildModel } from './BuildModel.js';
+import { BuildModelInfo } from './BuildModelInfo.js';
 import { BuildPackage } from './BuildPackage.js';
 
 // These builders are listed in the order that files need to be built in
@@ -10,7 +12,9 @@ export const buildActivities: BuildActivity[] = [
   new BuildKmnKeyboard(),
   new BuildLdmlKeyboard(),
   new BuildModel(),
-  new BuildPackage()
+  new BuildPackage(),
+  new BuildKeyboardInfo(),
+  new BuildModelInfo(),
 ];
 
 // Note: BuildProject is not listed here to avoid circular references,

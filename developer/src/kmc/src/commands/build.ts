@@ -38,7 +38,11 @@ Supported file types:
   * .kmn: Keyman keyboard
   * .xml: LDML keyboard
   * .model.ts: Keyman lexical model
-  * .kps: Keyman keyboard or model package
+  * .kps: Keyman keyboard or lexical model package
+
+The following two metadata file types are also supported:
+  * .model_info: lexical model metadata file
+  * .keyboard_info: keyboard metadata file
 
 File lists can be referenced with @filelist.txt.
 

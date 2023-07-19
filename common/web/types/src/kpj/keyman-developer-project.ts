@@ -38,6 +38,24 @@ export class KeymanDeveloperProject {
         this.files.push(file);
       }
     }
+
+    this.addMetadataFile();
+  }
+
+  public isKeyboardProject() {
+    return !!this.files.find(file => file.fileType == KeymanFileTypes.Source.KeymanKeyboard || file.fileType == KeymanFileTypes.Source.LdmlKeyboard);
+  }
+
+  public isLexicalModelProject() {
+    return !!this.files.find(file => file.fileType == KeymanFileTypes.Source.Model);
+  }
+
+  public addMetadataFile() {
+    const infoFile =
+      this.callbacks.path.join(this.projectPath,
+      this.callbacks.path.basename(this.projectFilename, KeymanFileTypes.Source.Project) +
+      (this.isLexicalModelProject() ? KeymanFileTypes.Source.ModelInfo : KeymanFileTypes.Source.KeyboardInfo));
+    this.files.push(new KeymanDeveloperProjectFile20(infoFile, this.callbacks));
   }
 
   private resolveProjectPath(p: string): string {
@@ -111,7 +129,11 @@ export class KeymanDeveloperProjectFile10 {
   readonly filename: string;
   readonly filePath: string;
   readonly fileVersion: string;  // 1.0 only
-  readonly fileType: KeymanFileTypes.Any;     // file extension of filename, but .model.ts is technically not the ext because of 2 periods
+  /**
+   * file extension of filename; warning: .model.ts is technically not the fileType because of 2 periods
+   * @deprecated use `getFileType()`
+   */
+  readonly fileType: KeymanFileTypes.Any; // 1.0 only
   details: KeymanDeveloperProjectFileDetail_Kmn & KeymanDeveloperProjectFileDetail_Kps; // 1.0 only
   childFiles: KeymanDeveloperProjectFile[]; // 1.0 only
   constructor(id: string, filename: string, filePath: string, fileVersion:string, fileType: KeymanFileTypes.Any) {
@@ -123,6 +145,9 @@ export class KeymanDeveloperProjectFile10 {
     this.fileVersion = fileVersion;
     this.fileType = fileType;
   }
+  getFileType() {
+    return KeymanFileTypes.sourceTypeFromFilename(this.filename);
+  }
 };
 
 export type KeymanDeveloperProjectFileType20 = KeymanFileTypes.Source;
@@ -130,11 +155,18 @@ export type KeymanDeveloperProjectFileType20 = KeymanFileTypes.Source;
 export class KeymanDeveloperProjectFile20 {
   readonly filename: string;
   readonly filePath: string;
-  readonly fileType: KeymanFileTypes.Source; // string; // file extension of filename, but .model.ts is technically not the ext because of 2 periods
+  /**
+   * file extension of filename, but .model.ts is technically not the ext because of 2 periods
+   * @deprecated TODO: remove this from 2.0 or make it private
+   */
+  readonly fileType: KeymanFileTypes.Source;
   constructor(filePath: string, private callbacks: CompilerCallbacks) {
     this.filename = this.callbacks.path.basename(filePath);
     this.filePath = filePath;
     this.fileType = KeymanFileTypes.sourceTypeFromFilename(this.filename);
+  }
+  getFileType() {
+    return this.fileType;
   }
 };
 

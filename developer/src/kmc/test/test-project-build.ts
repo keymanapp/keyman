@@ -3,6 +3,7 @@ import { assert } from 'chai';
 import 'mocha';
 import { BuildProject } from '../src/commands/buildClasses/BuildProject.js';
 import { makePathToFixture } from './helpers/index.js';
+import { InfrastructureMessages } from '../src/messages/messages.js';
 
 const callbacks = new TestCompilerCallbacks();
 
@@ -17,9 +18,22 @@ describe('BuildProject', function () {
       warnDeprecatedCode: true,
       logLevel: 'info'
     });
-    // 4 messages == starting build x 2, build successful x 2
-    // callbacks.printMessages();
-    assert.equal(callbacks.messages.length, 4);
+    if(callbacks.messages.length != 6) {
+      callbacks.printMessages();
+    }
+    assert.equal(callbacks.messages.length, 6);
+    const messages = [
+      InfrastructureMessages.INFO_BuildingFile, // kmn
+      InfrastructureMessages.INFO_FileBuiltSuccessfully,
+      InfrastructureMessages.INFO_BuildingFile, // kps
+      InfrastructureMessages.INFO_FileBuiltSuccessfully,
+      InfrastructureMessages.INFO_BuildingFile, // keyboard_info
+      InfrastructureMessages.INFO_FileBuiltSuccessfully,
+    ];
+    for(let i = 0; i < messages.length; i++) {
+      assert.equal(callbacks.messages[i].code, messages[i]);
+    }
+
     assert.isTrue(result);
   });
 });
