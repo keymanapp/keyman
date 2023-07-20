@@ -158,9 +158,8 @@ def bus_has_engine(bus, name):
 def get_current_engine(bus):
     try:
         contextname = bus.current_input_context()
-        ic = IBus.InputContext.get_input_context(contextname, bus.get_connection())
-        engine = ic.get_engine()
-        if engine:
+        inputContext = IBus.InputContext.get_input_context(contextname, bus.get_connection())
+        if engine := inputContext.get_engine():
             return engine.get_name()
     except Exception as e:
         logging.warning("Failed to get current engine")
@@ -170,11 +169,11 @@ def get_current_engine(bus):
 def change_to_keyboard(bus, keyboard_id):
     try:
         contextname = bus.current_input_context()
-        ic = IBus.InputContext.get_input_context(contextname, bus.get_connection())
+        inputContext = IBus.InputContext.get_input_context(contextname, bus.get_connection())
         if bus_has_engine(bus, keyboard_id) <= 0:
-            logging.warning("Could not find engine %s" % keyboard_id)
+            logging.warning(f"Could not find engine {keyboard_id}")
         else:
-            ic.set_engine(keyboard_id)
+            inputContext.set_engine(keyboard_id)
     except Exception as e:
         logging.warning("Failed to change keyboard")
         logging.warning(e)
