@@ -12,8 +12,7 @@ from keyman_config.get_kmp import (InstallLocation, get_keyboard_dir,
 from keyman_config.gnome_keyboards_util import (GnomeKeyboardsUtil,
                                                 get_ibus_keyboard_id,
                                                 is_gnome_shell)
-from keyman_config.ibus_util import (IbusUtil, get_ibus_bus, restart_ibus,
-                                     uninstall_from_ibus)
+from keyman_config.ibus_util import IbusUtil, get_ibus_bus, restart_ibus
 from keyman_config.kmpmetadata import get_metadata
 
 
@@ -51,7 +50,7 @@ def _uninstall_kmp_common(location, packageID, removeLanguages):
     where = 'shared' if location == InstallLocation.Shared else 'local'
     info, system, options, keyboards, files = get_metadata(kbdir)
     if removeLanguages:
-        logging.info(f'Uninstalling {where} keyboard: {packageID}')
+        logging.info(f'Uninstalling {where} keyboard: "{packageID}"')
         if keyboards:
             if is_fcitx_running():
                 _uninstall_keyboards_from_fcitx5()
@@ -60,12 +59,13 @@ def _uninstall_kmp_common(location, packageID, removeLanguages):
             else:
                 _uninstall_keyboards_from_ibus(keyboards, kbdir)
         else:
-            logging.warning("could not uninstall keyboards")
+            logging.info(f'Could not uninstall {where} keyboard "{packageID}" from list of keyboards')
     else:
-        logging.info(f'Replacing {where} keyboard: {packageID}')
+        logging.info(f'Replacing {where} keyboard: "{packageID}"')
 
     if not os.path.isdir(kbdir):
-        logging.error('Keyboard directory %s for %s does not exist.', kbdir, packageID)
+        logging.info(f'Keyboard directory {kbdir} for "{packageID}" does not exist.')
+        logging.warning(f'Cannot uninstall non-existing {where} keyboard "{packageID}"')
 
     _uninstall_dir('Keyman keyboards', kbdir)
     _uninstall_dir('documentation', kbdocdir)
@@ -76,7 +76,7 @@ def _uninstall_kmp_common(location, packageID, removeLanguages):
         logging.error(msg)
         return msg
 
-    logging.info("Finished uninstalling %s keyboard: %s", where, packageID)
+    logging.info(f'Finished uninstalling {where} keyboard: "{packageID}"')
     return ''
 
 
