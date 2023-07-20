@@ -39,7 +39,7 @@ def get_ibus_bus():
     except Exception as e:
         logging.warning("Failed get bus")
         logging.warning(e)
-    logging.warning("could not find connected IBus.Bus")
+    logging.info("could not find connected IBus.Bus")
     return None
 
 
