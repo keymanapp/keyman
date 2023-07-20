@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import getpass
 import logging
 import os
 from shutil import rmtree
@@ -47,7 +48,7 @@ def _uninstall_kmp_common(location, packageID, removeLanguages):
     kbdocdir = get_keyman_doc_dir(location, packageID)
     kbfontdir = get_keyman_font_dir(location, packageID)
 
-    where = 'shared' if location == InstallLocation.Shared else 'local'
+    where = 'shared' if location == InstallLocation.Shared else 'user'
     info, system, options, keyboards, files = get_metadata(kbdir)
     if removeLanguages:
         logging.info(f'Uninstalling {where} keyboard: "{packageID}"')
@@ -65,7 +66,7 @@ def _uninstall_kmp_common(location, packageID, removeLanguages):
 
     if not os.path.isdir(kbdir):
         logging.info(f'Keyboard directory {kbdir} for "{packageID}" does not exist.')
-        logging.warning(f'Cannot uninstall non-existing {where} keyboard "{packageID}"')
+        logging.warning(f'Cannot uninstall non-existing {where} keyboard "{packageID}" for user {getpass.getuser()}')
 
     _uninstall_dir('Keyman keyboards', kbdir)
     _uninstall_dir('documentation', kbdocdir)
