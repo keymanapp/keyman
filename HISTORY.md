@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.144 alpha 2023-07-20
+
+* refactor(linux): Use better way to get username (#9313)
+
 ## 17.0.143 alpha 2023-07-19
 
 *  (#9292)
