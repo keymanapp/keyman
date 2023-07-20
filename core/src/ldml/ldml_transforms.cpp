@@ -20,6 +20,16 @@ namespace km {
 namespace kbp {
 namespace ldml {
 
+#ifndef KMXPLUS_DEBUG_TRANSFORM
+#define KMXPLUS_DEBUG_TRANSFORM 1
+#endif
+
+#if KMXPLUS_DEBUG_TRANSFORM
+#define DebugTran(msg, ...) DebugLog(msg, __VA_ARGS__)
+#else
+#define DebugTran(msg, ...)
+#endif
+
 element::element(const USet &new_u, KMX_DWORD new_flags)
     : chr(), uset(new_u), flags((new_flags & ~LDML_ELEM_FLAGS_TYPE) | LDML_ELEM_FLAGS_TYPE_USET) {
 }
@@ -216,6 +226,13 @@ reorder_group::apply(std::u32string &str) const {
   // get a baseline sort key
   auto sort_keys = reorder_sort_key::from(str);
 
+#if 0 && KMXPLUS_DEBUG_TRANSFORM
+  DebugTran("Baseline sortkey");
+  for (const auto &r : sort_keys) {
+    r.dump();
+  }
+#endif
+
   // apply ALL reorders in the group.
   for (const auto &r : list) {
     // work backward from end of string forward
@@ -232,9 +249,16 @@ reorder_group::apply(std::u32string &str) const {
     // c++;
   }
   if (!some_match) {
-    // DebugLog("Skip: No reorder elements matched.");
+    DebugTran("Skip: No reorder elements matched.");
     return false;  // nothing matched, so no work.
   }
+
+#if KMXPLUS_DEBUG_TRANSFORM
+  DebugTran("Updated sortkey");
+  for (const auto &r : sort_keys) {
+    r.dump();
+  }
+#endif
 
   size_t match_len = str.size();  // TODO-LDML: for now, assume matches entire string
 
@@ -248,13 +272,15 @@ reorder_group::apply(std::u32string &str) const {
   for(auto e = run_start; e != sort_keys.end(); e++) {
     if ((e->primary == 0) && (e != run_start)) { // it's a base
       auto run_end = e - 1;
-      std::sort(run_start, run_end); // reversed because it's a reverse iterator…?
+      DebugTran("Sorting subrange quaternary=[%d..]", run_start->quaternary);
+      std::sort(run_start, run_end);  // reversed because it's a reverse iterator…?
       // move the start
       run_start = e; // next run starts here
     }
   }
   // sort the last run in the string as well.
-  if (run_start != sort_keys.end()) {
+  if (run_start != sort_keys.end()) { // TODO-LDML: skip if a single-char run
+    DebugTran("Sorting final subrange quaternary=[%d..]", run_start->quaternary);
     std::sort(run_start, sort_keys.end()); // reversed because it's a reverse iterator…?
   }
   // recombine into a str
@@ -270,8 +296,14 @@ reorder_group::apply(std::u32string &str) const {
     str.resize(prefix.size());
     str.append(newSuffix);
   } else {
-    // DebugLog("Skip: no reordering change detected");
+    DebugTran("Skip: sorting caused no reordering");
   }
+#if KMXPLUS_DEBUG_TRANSFORM
+  DebugTran("Sorted sortkey");
+  for (const auto &r : sort_keys) {
+    r.dump();
+  }
+#endif
   return applied;
 }
 
