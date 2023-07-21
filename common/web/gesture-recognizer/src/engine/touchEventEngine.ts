@@ -78,8 +78,8 @@ export class TouchEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
     delete this.safeBoundMaskMap[identifier];
   }
 
-  private buildSampleFromTouch(touch: Touch) {
-    return this.buildSampleFor(touch.clientX, touch.clientY, touch.target);
+  private buildSampleFromTouch(touch: Touch, timestamp: number) {
+    return this.buildSampleFor(touch.clientX, touch.clientY, touch.target, timestamp);
   }
 
   onTouchStart(event: TouchEvent) {
@@ -91,9 +91,14 @@ export class TouchEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
 
     this.preventPropagation(event);
 
-    for(let i=0; i < event.changedTouches.length; i++) {
-      const touch = event.changedTouches.item(i);
-      const sample = this.buildSampleFromTouch(touch);
+    // Ensure the same timestamp is used for all touches being updated.
+    const timestamp = performance.now();
+
+    // Do not change to `changedTouches` - we need a sample for all active touches in order
+    // to facilitate path-update synchronization for multi-touch gestures.
+    for(let i=0; i < event.touches.length; i++) {
+      const touch = event.touches.item(i);
+      const sample = this.buildSampleFromTouch(touch, timestamp);
 
       if(!ZoneBoundaryChecker.inputStartOutOfBoundsCheck(sample, this.config)) {
         // If we started very close to a safe zone border, remember which one(s).
@@ -110,6 +115,9 @@ export class TouchEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
 
   onTouchMove(event: TouchEvent) {
     let propagationActive = true;
+    // Ensure the same timestamp is used for all touches being updated.
+    const timestamp = performance.now();
+
     for(let i=0; i < event.changedTouches.length; i++) {
       const touch = event.changedTouches.item(i);
 
@@ -122,7 +130,7 @@ export class TouchEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
         propagationActive = false;
       }
 
-      const sample = this.buildSampleFromTouch(touch);
+      const sample = this.buildSampleFromTouch(touch, timestamp);
 
       if(!ZoneBoundaryChecker.inputMoveCancellationCheck(sample, this.config, this.safeBoundMaskMap[touch.identifier])) {
         this.onInputMove(touch.identifier, sample, touch.target);

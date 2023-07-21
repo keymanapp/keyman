@@ -86,7 +86,7 @@ export class PathMatcher<Type> {
       return this.finalize(false, 'path');
     }
 
-    if(model.itemChangeAction && source.currentHoveredItem != source.initialHoveredItem) {
+    if(model.itemChangeAction && source.currentSample.item != source.initialSample.item) {
       const result = model.itemChangeAction == 'resolve';
 
       return this.finalize(result, 'item');

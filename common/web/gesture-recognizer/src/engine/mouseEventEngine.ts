@@ -89,7 +89,7 @@ export class MouseEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
   }
 
   private buildSampleFromEvent(event: MouseEvent) {
-    return this.buildSampleFor(event.clientX, event.clientY, event.target);
+    return this.buildSampleFor(event.clientX, event.clientY, event.target, performance.now());
   }
 
   onMouseStart(event: MouseEvent) {

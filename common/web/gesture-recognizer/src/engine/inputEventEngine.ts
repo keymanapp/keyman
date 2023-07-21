@@ -15,14 +15,14 @@ export abstract class InputEventEngine<HoveredItemType> extends InputEngineBase<
   abstract registerEventHandlers(): void;
   abstract unregisterEventHandlers(): void;
 
-  protected buildSampleFor(clientX: number, clientY: number, target: EventTarget): InputSample<HoveredItemType> {
+  protected buildSampleFor(clientX: number, clientY: number, target: EventTarget, timestamp: number): InputSample<HoveredItemType> {
     const targetRect = this.config.targetRoot.getBoundingClientRect();
     const sample: InputSample<HoveredItemType> = {
       clientX: clientX,
       clientY: clientY,
       targetX: clientX - targetRect.left,
       targetY: clientY - targetRect.top,
-      t: performance.now()
+      t: timestamp
     };
 
     const hoveredItem = this.config.itemIdentifier(sample, target);
@@ -76,7 +76,7 @@ export abstract class InputEventEngine<HoveredItemType> extends InputEngineBase<
     }
 
     const lastEntry = touchpoint.path.coords[touchpoint.path.coords.length-1];
-    const sample = this.buildSampleFor(lastEntry.clientX, lastEntry.clientY, target);
+    const sample = this.buildSampleFor(lastEntry.clientX, lastEntry.clientY, target, lastEntry.t);
 
     /* While an 'end' event immediately follows a 'move' if it occurred simultaneously,
      * this is decidedly _not_ the case if the touchpoint was held for a while without

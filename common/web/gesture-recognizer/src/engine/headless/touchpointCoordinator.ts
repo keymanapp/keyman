@@ -37,11 +37,58 @@ export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMa
   }
 
   private readonly onNewTrackedPath = (touchpoint: SimpleGestureSource<HoveredItemType>) => {
-    const newInput = new ComplexGestureSource<HoveredItemType>(touchpoint);
-    this._activeSourcesMap[touchpoint.identifier] = newInput;
-    this._activeSources.push(newInput);
+    this.addSimpleSourceHooks(touchpoint);
+
+    // ... stuff.
+
+    // If no active ComplexGestureSource entries may match the incoming touchpoint, we have a new
+    // ComplexGestureSource.
+    const newInput = this.establishNewComplexSource(touchpoint);
 
     this.emit('inputstart', newInput);
     return false;
+  }
+
+  private doGestureUpdate(source: ComplexGestureSource<HoveredItemType>) {
+    // Should probably ensure data-updates for multi-contact gestures are synchronized
+    // before proceeding.  Single-contact cases are inherently synchronized, of course.
+    //
+    // Should a gesture type have geometric requirements on the current location of active
+    // touchpaths, having a desync during a quick movement could cause the calculated
+    // distance between the locations to be markedly different than expected.
+    if(!source.hasSyncedPaths) {
+      return;
+    }
+
+    // TODO: stuff.
+  }
+
+  private addSimpleSourceHooks(touchpoint: SimpleGestureSource<HoveredItemType>) {
+    // It will be possible for this._activeInputs[touchpoint.identifier] to change during certain
+    // gestures, so use that - within each handler - for lookups rather than the current `newInput`.
+
+    // ----------
+
+    touchpoint.path.on('step', () => this.doGestureUpdate(this._activeSourcesMap[touchpoint.identifier]));
+
+    touchpoint.path.on('invalidated', () => {
+      // TODO: on cancellation, is there any other cleanup to be done?
+
+      // Also mark the touchpoint as no longer active.
+      delete this._activeSourcesMap[touchpoint.identifier];
+    });
+    touchpoint.path.on('complete', () => {
+      // TODO: on cancellation, is there any other cleanup to be done?
+
+      // Also mark the touchpoint as no longer active.
+      delete this._activeSourcesMap[touchpoint.identifier];
+    });
+  }
+
+  private establishNewComplexSource(touchpoint: SimpleGestureSource<HoveredItemType>) {
+    const newInput = new ComplexGestureSource<HoveredItemType>(touchpoint);
+    this._activeSourcesMap[touchpoint.identifier] = newInput;
+    this._activeSources.push(newInput);
+    return newInput;
   }
 }

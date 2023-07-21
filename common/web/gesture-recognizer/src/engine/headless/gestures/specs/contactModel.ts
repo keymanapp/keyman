@@ -37,7 +37,7 @@ export interface ContactModel<Type> {
    * For example, a longpress component should likely reject on change of base item,
    * allowing a new longpress (with a fresh timer) to start with the new base item.
    */
-  readonly itemChangeAction?: 'reject' | 'resolve'; // may be undefined for 'continue'
+  readonly itemChangeAction?: 'reject' | 'resolve' | undefined; // may be undefined for 'continue'
 
   /**
    * Is needed to define whether or not the contact-point should be ignored by this gesture type.
