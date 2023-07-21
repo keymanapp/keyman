@@ -61,7 +61,7 @@ fi
 if builder_start_action test; then
   cd "$THIS_SCRIPT_PATH/$MESON_PATH"
   if builder_has_option --no-integration; then
-    meson test --print-errorlogs $builder_verbose keymanutil-tests print-kmpdetails-test print-kmp-test
+    meson test --print-errorlogs $builder_verbose setup-src-test keymanutil-tests print-kmpdetails-test print-kmp-test bcp47-util-tests teardown-src-test
   else
     meson test --print-errorlogs $builder_verbose
   fi
