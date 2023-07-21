@@ -44,6 +44,9 @@ mcompile -d runs 4 important steps:
 
 #include "mcompile.h"
 #include "helpers.h"
+
+#include </usr/include/xkbcommon/xkbcommon.h>  // _S2 do I need that???
+
 //------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------
@@ -59,7 +62,11 @@ const UINT VKShiftState[] = {0, 1, 0xFFFF};
 
 // Map of all US English virtual key codes that we can translate
 //   US Keys:                       Q    W    E    R    T    Y    U    I    O    P    A    S    D    F    G    H    J    K    L    Z    X    C    V    B    N    M
-const DWORD VKMap_US_Keycode[] = {  24 , 25 , 26 , 27 , 28 , 29 , 30 , 31 , 32 , 33 , 38 , 39 , 40 , 41 , 42 , 43 , 44 , 45 , 46 , 52 , 53 , 54 , 55 , 56 , 57 , 58 };
+const DWORD VKMap_US_Keycode[] = {  24 , 25 , 26 , 27 , 28 , 29 , 30 , 31 , 32 , 33 , 38 , 39 , 40 , 41 , 42 , 43 , 44 , 45 , 46 , 52 , 53 , 54 , 55 , 56 , 57 , 77 ,0};
+
+// Map of all US English virtual key codes that we can translate
+//   US Keys:                     24 , 25 , 26 , 27 , 28 , 29 , 30 , 31 , 32 , 33 , 38 , 39 , 40 , 41 , 42 , 43 , 44 , 45 , 46 , 47,  52 , 53 , 54 , 55 , 56 , 57 , 77 , 0    
+const char VKMap_US_Keysym[] = { 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '0'};
 
 
 
@@ -192,11 +199,6 @@ wprintf(L"_S2 * Up to here cross-platform xx  :-))))) **************************
 
 
 
-
-
-
-
-
 KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
   LPKMX_STORE sp;
   KMX_UINT i;
@@ -216,18 +218,71 @@ KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
   }
 
   KMX_LogError(L"Keyboard is not a mnemonic layout keyboard");
-
-   MyCoutW(L"#### KMX_SetKeyboardToPositional of keymap ended", 1);
   return FALSE;
 }
 
-UINT KMX_VKUSToVKUnderlyingLayout(const DWORD US_Keycode, GdkDisplay *display){
-  uint ret =88;
-/*
-  ret = XkbKeycodeToKeysym(display, US_Keycode,0)
-  MyCoutW(L"#### KMX_VKUSToVKUnderlyingLayout of mcompile ended", 0);
-  MyCoutW(ret, 1);*/
-  return US_Keycode-1;
+bool get_OtherKeysym_From_US_Keysym(v_str_3D &All_Vector,int inUS,int &outOther){
+
+  //MyCoutW(L"  #### get_OtherKeysym_From_US_Keysym of keymap started", 1);
+  // loop and find char in US; then find char of Other
+  for( int i=0; i< (int)All_Vector[1].size();i++) {
+    for( int j=0; j< (int)All_Vector[1][0].size();j++) {
+
+      int KeysymUS = (int) *All_Vector[0][i][j].c_str();
+      int KeysymOther  = (int) *All_Vector[1][i][j].c_str();
+      std::wstring KeysymUS_wstr = wstring_from_string(All_Vector[0][i][j]);
+
+      if( inUS == KeysymUS ) {
+       //wprintf(L"     FOUND  Value in OTHER !!!!! : Other in: %i ( %s ) -- Keycode : %s -- US out ########:  %i ( %s ) \n", KeysymUS,All_Vector[0][i][j].c_str(),  All_Vector[1][i][0].c_str()   ,        KeysymOther,All_Vector[1][i][j].c_str());
+       wprintf(L"    get_OtherKeysym_From_US_Keysym FOUND  Value in US !!!!! : Other in: %i ( %s ) -- Keycode : %s -- US out ########:  %i ( %s ) \n",
+       KeysymUS,All_Vector[0][i][j].c_str(),  All_Vector[1][i][0].c_str()   ,        KeysymOther,All_Vector[1][i][j].c_str());
+       outOther = KeysymOther;
+
+        //MyCoutW(L"  #### get_OtherKeysym_From_US_Keysym of keymap ended", 1);
+        return true;
+      }
+    }
+  }
+  return true;
+}
+
+bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]){
+// get keymap of keyboard layout in use
+
+  gdk_init(&argc, &argv);
+  GdkDisplay *display = gdk_display_get_default();
+  if (!display) {
+    printf("ERROR: can't get display\n");
+    return 1;
+  }
+
+  *keymap = gdk_keymap_get_for_display(display);
+  if (!keymap) {
+    printf("ERROR: Can't get keymap\n");
+    gdk_display_close(display);
+    return 2;
+  }
+
+  return 0;
+}
+
+bool createVectorForBothKeyboards(v_str_3D &All_Vector,GdkKeymap *keymap){
+
+  std::string US_language    = "us";
+  const char* text_us        = "xkb_symbols \"basic\"";
+
+  if(write_US_ToVector(All_Vector,US_language, text_us)) {
+    printf("ERROR: can't write US to Vector \n");
+    return 1;
+  }
+
+  // add contents of other keyboard to All_Vector
+  if( append_other_ToVector(All_Vector,keymap)) {
+    printf("ERROR: can't append other ToVector \n");
+    return 1;
+  }
+  test(All_Vector);
+  return 0;
 }
 
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]) {
@@ -236,60 +291,44 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
 
     if(!KMX_SetKeyboardToPositional(kbd)) return FALSE;
 
-        MyCoutW(L"#### KMX_DoConvert of keymap started", 1);
-
-        gdk_init(&argc, &argv);
-        GdkDisplay *display = gdk_display_get_default();
-        if (!display) {
-          printf("ERROR: can't get display\n");
-          return 1;
-        }
-        GdkKeymap *keymap = gdk_keymap_get_for_display(display);
-        if (!keymap) {
-          printf("ERROR: Can't get keymap\n");
-          gdk_display_close(display);
-          return 2;
-        }
-
-        MyCoutW(L"  # Top checks of keymap OK", 1);
-
   // Go through each of the shift states - base, shift, ctrl+alt, ctrl+alt+shift, [caps vs ncaps?]
   // Currently, we go in this order so the 102nd key works. But this is not ideal for keyboards without 102nd key:   // I4651
   // it catches only the first key that matches a given rule, but multiple keys may match that rule. This is particularly
   // evident for the 102nd key on UK, for example, where \ can be generated with VK_OEM_102 or AltGr+VK_QUOTE.
   // For now, we get the least shifted version, which is hopefully adequate.
 
+  // first version with GTK - change later to  XklGetGroupNames  und XklGetCurrentState  as Eberhard suggested
+  //_ init gdk
+  GdkKeymap *keymap;
+  if(InitializeGDK(&keymap , argc,  argv) )
+      printf("ERROR: can't InitializeGDK\n");
+
+  // create vector
+  v_str_3D All_Vector;
+  if(createVectorForBothKeyboards(All_Vector,keymap) )
+      printf("ERROR: can't createVectorForBothKeyboards\n");
+
+
+//--------------------------------------------------------------------------------
+
   for (int j = 0; VKShiftState[j] != 0xFFFF; j++) {   // I4651
-    wprintf(L"   +++++++ VKShiftState Nr:  %i \n", j);
+
     // Go through each possible key on the keyboard
-    for (int i = 0; VKMap_US_Keycode[i]; i++) {   // I4651
-    wprintf(L"   +++++++ VKMap_US_Keycode Nr: %i , value %i \n", i,VKMap_US_Keycode[i]);
-      //UINT vkUnderlying = KMX_VKUSToVKUnderlyingLayout(VKMap_US_Keycode[i], display);
-      UINT vkUnderlying = KMX_VKUSToVKUnderlyingLayout(VKMap_US_Keycode[i], display);
-      wprintf(L"   +++++++ back from KMX_VKUSToVKUnderlyingLayout: %i \n", vkUnderlying);
+    for (int i = 0;VKMap_US_Keysym[i]; i++) {   // I4651
 
-     // WCHAR ch = CharFromVK(vkUnderlying, VKShiftState[j], &DeadKey);
+    //wprintf(L"   +++++++ VKMap_US_Keycode Nr:  %i , i \n", i, VKMap_US_Keycode[i]);
+    // _S2 why not merging the 2 functions KMX_VKUSToVKUnderlyingLayout, CharFromVK?
+    // UINT vkUnderlying = KMX_VKUSToVKUnderlyingLayout(VKMap_US_Keycode[i], display);
 
+    int vkUnderlying;
+    //wprintf(L"   ########:                                will steart with 1 get_US_Keysym_From_OtherKeysym   inxx: %i  outxx:  \n", VKMap_US_Keysym[i]);
+    bool ranOK = get_OtherKeysym_From_US_Keysym(All_Vector,(int) VKMap_US_Keysym[i],vkUnderlying );
 
-/*
-
-
-      //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
-
-      if (bDeadkeyConversion) {   // I4552
-        if (ch == 0xFFFF) {
-          ch = DeadKey;
-        }
-      }
-
-      switch (ch) {
-      case 0x0000: break;
-      case 0xFFFF: ConvertDeadkey(kbd, VKMap[i], VKShiftState[j], DeadKey); break;
-      default:     TranslateKeyboard(kbd, VKMap[i], VKShiftState[j], ch);
-      }
-*/
+    //wprintf(L"   +++++++ back from KMX_VKUSToVKUnderlyingLayout: %i \n", vkUnderlying);
+    // WCHAR ch = CharFromVK(vkUnderlying, VKShiftState[j], &DeadKey);
     }
   }
+
 /*
   ReportUnconvertedKeyboardRules(kbd);
 
@@ -300,11 +339,10 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
   return TRUE;
 }
 
-
-
 void KMX_LogError(const KMX_WCHART* m1,int m2) {
   wprintf((PWSTR)m1, m2);
 }
+
 // ---- old ----------------------------------------------------------
 
 
@@ -433,8 +471,8 @@ int run(int argc, wchar_t * argv[])
 // Map of all US English virtual key codes that we can translate
 //
 const WORD VKMap[] = {
-  'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
-  '0','1','2','3','4','5','6','7','8','9',
+  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
   VK_SPACE,
   VK_ACCENT, VK_HYPHEN, VK_EQUAL,
   VK_LBRKT, VK_RBRKT, VK_BKSLASH,
@@ -873,8 +911,8 @@ int run(int argc, wchar_t * argv[])
 // Map of all US English virtual key codes that we can translate
 //
 const WORD VKMap[] = {
-  'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
-  '0','1','2','3','4','5','6','7','8','9',
+  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
   VK_SPACE,
   VK_ACCENT, VK_HYPHEN, VK_EQUAL,
   VK_LBRKT, VK_RBRKT, VK_BKSLASH,
@@ -1201,3 +1239,328 @@ void LogError(PWSTR fmt, ...) {
   _putws(fmtbuf);
 }
 */
+
+
+
+
+// _S2 maybe I will need that later??
+
+/*  static xkb_keysym_t get_ascii(struct xkb_state *state, xkb_keycode_t keycode) {
+    struct xkb_keymap *keymap;
+    xkb_layout_index_t num_layouts;
+    xkb_layout_index_t layout;
+    xkb_level_index_t level;
+    const xkb_keysym_t *syms;
+    int num_syms;
+
+    keymap = xkb_state_get_keymap(state);
+    num_layouts = xkb_keymap_num_layouts_for_key(keymap, keycode);
+
+    for (layout = 0; layout < num_layouts; layout++) {
+        level = xkb_state_key_get_level(state, keycode, layout);
+        num_syms = xkb_keymap_key_get_syms_by_level(keymap, keycode,
+                                                    layout, level, &syms);
+        if (num_syms != 1)
+            continue;
+
+        if (syms[0] > 0 && xkb_keysym_to_utf32(syms[0]) < 128)
+            return syms[0];
+    }
+
+    return XKB_KEY_NoSymbol;
+}
+*/
+
+
+  /*static xkb_keysym_t get_ascii_SAB(xkb_keycode_t keycode) {
+
+    xkb_layout_index_t num_layouts;
+    xkb_layout_index_t layout;
+    xkb_level_index_t level;
+    const xkb_keysym_t *syms;
+    int num_syms;
+
+    struct xkb_context *ctx;
+
+    ctx = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
+    if (!ctx) 
+      MyCoutW(L"  # Error in xkb_context_new", 1);
+
+
+
+
+// get a keymap from a given name ( is)
+struct xkb_keymap *keymap_is;
+    struct xkb_rule_names names = {
+    // Example RMLVO for Icelandic Dvorak. 
+        .rules = NULL,
+        .model = "pc105",
+        .layout = "is",
+        .variant = "dvorak",
+        .options = "terminate:ctrl_alt_bksp"
+    };
+    keymap_is = xkb_keymap_new_from_names(ctx, &names, XKB_KEYMAP_COMPILE_NO_FLAGS);
+
+    if (!keymap_is)     
+      MyCoutW(L"  # Error in xkb_keymap_new_from_names", 1);
+
+    // how many layouts are in keymap ( here is: 4)
+    num_layouts = xkb_keymap_num_layouts_for_key(keymap_is, keycode);
+    std::wcout << L"     num_layouts: " << num_layouts << L"\n";
+
+    for (layout = 0; layout < num_layouts; layout++) {
+
+      // how many levels  do we have per key e.g. [a, A, ä, ascitilde ]
+      std::wcout << L"     layout: Nr" << layout << L"\n"; 
+      xkb_level_index_t level = xkb_keymap_num_levels_for_key 	( 	keymap_is,		keycode,   	layout 	) 	;	
+      std::wcout <<  L"               we have level nr of : " << level << L"\n";
+
+for( int j=0; j< level;j++)
+{
+           std::wcout <<  L"     j: " << j << L"\n";
+           // get the keysym(characzter) in level level ( get  a for level 1; A for level 2;)
+           num_syms = xkb_keymap_key_get_syms_by_level(keymap_is, keycode,  layout, j, &syms);     
+           std::wcout <<  L"     num_syms(j): " << num_syms << L"\n";
+
+            // if no entry for this level
+            if (num_syms != 1)
+                continue;
+
+            if (syms[0] > 0 && xkb_keysym_to_utf32(syms[0]) < 128)
+                return syms[0];
+
+    }
+        }
+
+    return XKB_KEY_NoSymbol;
+}*/
+// bak all tries for DoConvert here:
+/*
+
+//#include "XKeyboard.h"
+#include "/usr/include/libxklavier/xklavier.h"
+#include "/usr/include/libxklavier/xkl_config_item.h"
+#include "/usr/include/libxklavier/xkl_config_rec.h
+#include "/usr/include/libxklavier/xkl_config_registry.h
+#include "/usr/include/libxklavier/xkl_engine.h
+#include "/usr/include/libxklavier/xkl_engine_marshal.h
+#include "/usr/include/libxklavier/xkl-enum-types.h
+#include "/usr/include/libxklavier/xklavier.h"
+#include "/usr/include/libxklavier/xklavier.h"
+
+
+
+
+std::wcout << L"qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq\n";
+std::string st =  std::locale("").name() ;
+std::wstring wstr = wstring_from_string(st);
+
+std::wcout << wstr;
+std::wcout << L"qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq\n";
+xklgetg
+//const char** ccc = XklGetGroupNames 	(  	  		 ) ;
+//xkl_engine_get_groups_names
+//const char**  cccc = XkbGetNames 	( ) ;
+/*
+  Display *dpy = XOpenDisplay(NULL);
+
+  if (dpy == NULL) {
+    fprintf(stderr, "Cannot open display\n");
+    exit(1);
+  }
+
+  XkbStateRec state;
+  XkbGetState(dpy, XkbUseCoreKbd, &state);
+
+  XkbDescPtr desc = XkbGetKeyboard(dpy, XkbAllComponentsMask, XkbUseCoreKbd);
+  char*symbols = XGetAtomName(dpy, desc->names->symbols);
+ //char *group = XGetAtomName(dpy, desc->names->groups[state.group]);
+  //printf("Full name: %s\n", group);
+
+XKeyboard xkb;
+
+std::string cGrpName=xkb.currentGroupName(); //return somethings like "USA"
+std::string cGrpSymb=xkb.currentGroupSymbol(); //return somethings like "us"
+
+xkb.setGroupByNum(0);//set keyboard layout to first layout in available ones
+
+//wprintf(L"Full name: %s\n", symbols);
+
+//std::wcout << L"qqqqqqqqqqqqqqqqqqqq: " << *symbols;
+
+
+
+
+  xkb_keysym_t in;
+  xkb_keysym_t out;  
+
+std::vector < int > vi ={34,39,43,47,48,61,57};
+for( int i=0; i<vi.size();i++)
+{
+  in = vi[i];
+ out =  get_ascii_SAB(in) ;
+ std:: wcout << L" in : " << in << L" out : " << out << L" ( " << (char)out << L")\n " ;
+}
+
+        MyCoutW(L"#### KMX_DoConvert of keymap started", 1);
+
+        gdk_init(&argc, &argv);
+        GdkDisplay *display = gdk_display_get_default();
+        if (!display) {
+          printf("ERROR: can't get display\n");
+          return 1;
+        }
+        GdkKeymap *keymap = gdk_keymap_get_for_display(display);
+        if (!keymap) {
+          printf("ERROR: Can't get keymap\n");
+          gdk_display_close(display);
+          return 2;
+        }
+
+        MyCoutW(L"  # Top checks of keymap OK", 1);
+das geht... v
+    struct xkb_context *ctx;
+
+    ctx = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
+    if (!ctx) 
+      MyCoutW(L"  # Error in xkb_context_new", 1);
+
+struct xkb_keymap *keymap;
+
+    struct xkb_rule_names names = {
+    // Example RMLVO for Icelandic Dvorak. 
+        .rules = NULL,
+        .model = "pc105",
+        .layout = "is",
+        .variant = "dvorak",
+        .options = "terminate:ctrl_alt_bksp"
+    };
+
+    keymap = xkb_keymap_new_from_names(ctx, &names,
+                                       XKB_KEYMAP_COMPILE_NO_FLAGS);
+    if (!keymap)     
+      MyCoutW(L"  # Error in xkb_keymap_new_from_names", 1);
+
+
+      MyCoutW(L"  # XKB setup OK", 1);
+
+    xkb_layout_index_t num_layouts;
+    xkb_layout_index_t layout;
+    xkb_level_index_t level;
+    const xkb_keysym_t *syms;
+    int num_syms;
+
+std::vector < int > vi ={34,39,43,47,48,61,57};
+for( int i=0; i<vi.size();i++)
+{
+
+        num_syms = xkb_keymap_key_get_syms_by_level(keymap, vi[i], layout, 0, &syms);
+
+      std::wcout << L"keycode in: " << vi[i]  <<  L" keysym out: " << num_syms << L"\n";; 
+
+}
+
+ das geht...  ^
+
+        //num_syms = xkb_keymap_key_get_syms_by_level(keymap, keycode, layout, level, &syms);
+// *******************************************************************************************************************
+struct xkb_keymap *keymap1;
+    xkb_layout_index_t num_layouts;
+    xkb_layout_index_t layout;
+    xkb_level_index_t level;
+    const xkb_keysym_t *syms;
+    int num_syms;
+
+    keymap1 = xkb_state_get_keymap(state);
+    num_layouts = xkb_keymap_num_layouts_for_key(keymap1, keycode);
+
+    for (layout = 0; layout < num_layouts; layout++) {
+        level = xkb_state_key_get_level(state, keycode, layout);
+        num_syms = xkb_keymap_key_get_syms_by_level(keymap1, keycode,
+                                                    layout, level, &syms);
+        if (num_syms != 1)
+            continue;
+
+        if (syms[0] > 0 && xkb_keysym_to_utf32(syms[0]) < 128)
+            return syms[0];
+
+            
+    }
+
+
+    //return XKB_KEY_NoSymbol;
+
+
+      MyCoutW(L"  # XKB get syn  OK", 1);
+
+     // https://cpp.hotexamples.com/examples/-/-/xkb_state_get_keymap/cpp-xkb_state_get_keymap-function-examples.html
+
+ int num;
+      lv = xkb_state_key_get_level(state, code + KBDXKB_SHIFT, lo);
+                num = xkb_keymap_key_get_syms_by_level(keymap, code + KBDXKB_SHIFT, lo, lv, &s);
+      
+
+
+*/
+
+/*int get_OtherKeysym_From_US_Keysym(v_str_3D &All_Vector,int inUS){
+  int outOther;
+  MyCoutW(L"  #### get_OtherKeysym_From_US_Keysym of keymap started", 1);
+  wprintf(L"    in Us #####################  %i  and KeysymsUS  : \n",   inUS   );
+  // loop and find char in US; then find char of Other
+  for( int i=0; i< (int)All_Vector[1].size();i++) {
+    for( int j=0; j< (int)All_Vector[1][0].size();j++) {
+
+      int KeysymUS = (int) *All_Vector[0][i][j].c_str();
+      int KeysymOther  = (int) *All_Vector[1][i][j].c_str();
+      std::wstring KeysymUS_wstr = wstring_from_string(All_Vector[0][i][j]);      
+      //if ( inUS == 58)
+wprintf(L"    in Us   %i  and KeysymsUS %i : \n",   inUS ,KeysymUS  );
+//wprintf(L"   ...................................................................................   inxx: %s  outxx: %s %s\n", All_Vector[0][25][2].c_str(),All_Vector[1][25][0].c_str(),All_Vector[1][25][2].c_str());
+      if( inUS == KeysymUS ) {
+        //wprintf(L"     FOUND Value in US !!!!! : %i  out ########:  %S \n", inUS,KeysymUS_wstr.c_str());     
+        //wprintf(L"     FOUND Value in US !!!!! : %i  out ########:  %S \n", inUS,KeysymUS_wstr.c_str());      
+         // wprintf(L"     FOUND  Value in OTHER !!!!! : Other in: %i ( %s ) -- Keycode : %s -- US out ########:  %i ( %s ) \n", KeysymUS,All_Vector[0][i][j].c_str(),  All_Vector[1][i][0].c_str()   ,        KeysymOther,All_Vector[1][i][j].c_str());
+       wprintf(L"    get_OtherKeysym_From_US_Keysym FOUND  Value in US !!!!! : Other in: %i ( %s ) -- Keycode : %s -- US out ########:  %i ( %s ) \n", 
+       KeysymUS,All_Vector[0][i][j].c_str(),  All_Vector[1][i][0].c_str()   ,        KeysymOther,All_Vector[1][i][j].c_str());
+        
+        
+         //wprintf(L"     FOUND 2 Value in OTHER !!!!! : Other in: %i ( %s ) -- Keycode : %s -- US out ########:  %i ( %s ) \n", KeysymOther,All_Vector[1][i][j].c_str(),  All_Vector[1][i][0].c_str()   ,        KeysymUS,All_Vector[0][i][j].c_str());
+    
+        outOther = KeysymOther;
+
+  MyCoutW(L"  #### get_OtherKeysym_From_US_Keysym of keymap ended", 1);
+  
+        return outOther;
+      }
+    }
+  }
+  MyCoutW(L"  #### get_US_Char_FromOther of keymap ended", 1);
+  return true;
+}
+*/
+
+
+
+/*   // _S2 maybe not needed
+bool get_US_Keysym_From_OtherKeysym(v_str_3D &All_Vector, int inOther, int &OutUS){
+
+  MyCoutW(L"  #### get_US_Char_FromOther of keymap started", 1);
+  // loop and find char in Other; then find char of US
+  for( int i=0; i< All_Vector[1].size();i++) {
+    for( int j=1; j< (int)All_Vector[1][0].size();j++) {
+
+      int KeysymUS = (int) *All_Vector[0][i][j].c_str();
+      int KeysymOther  = (int) *All_Vector[1][i][j].c_str();
+      std::wstring KeysymUS_wstr = wstring_from_string(All_Vector[1][i][j]);
+
+      if( inOther == KeysymOther ) {
+          OutUS = KeysymUS;
+        return true;
+      }
+    }
+  }
+  MyCoutW(L"  #### get_US_Char_FromOther of keymap ended", 1);
+  return true;
+}*/
+
