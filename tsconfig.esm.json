@@ -8,8 +8,12 @@
     { "path": "./core/include/ldml/tsconfig.json" },
 
     //{ "path": "./developer/src/kmc/test/tsconfig.json" },
+    { "path": "./developer/src/common/web/test-helpers/tsconfig.json" },
+
     { "path": "./developer/src/kmc/tsconfig.json" },
 
+    // { "path": "./developer/src/kmc-analyze/test/tsconfig.json" },
+    { "path": "./developer/src/kmc-analyze/tsconfig.json" },
     { "path": "./developer/src/kmc-kmn/test/tsconfig.json" },
     { "path": "./developer/src/kmc-kmn/tsconfig.json" },
     { "path": "./developer/src/kmc-ldml/test/tsconfig.json" },

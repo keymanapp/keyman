@@ -8,9 +8,28 @@ import * as r from 'restructure';
 // kmx-builder will transform these to the corresponding COMP_xxxx
 
 export class KEYBOARD {
-  //TODO: additional header fields
+  fileVersion?: number;  // dwFileVersion (TSS_FILEVERSION)
+
+  startGroup: {
+    ansi: number;           // from COMP_KEYBOARD
+    unicode: number;        // from COMP_KEYBOARD
+    newContext: number;     // from TSS_BEGIN_NEWCONTEXT store
+    postKeystroke: number;  // from TSS_BEGIN_POSTKEYSTROKE store
+  } = {ansi:-1, unicode:-1, newContext:-1, postKeystroke:-1};
+
+  flags?: number;
+  hotkey?: number;
+
+  //bitmap:
   groups: GROUP[] = [];
   stores: STORE[] = [];
+
+  // Following values are extracted from stores[] but are
+  // informative only
+
+  keyboardVersion?: string;  // version (TSS_KEYBOARDVERSION)
+  isMnemonic: boolean;        // TSS_MNEMONICLAYOUT store
+
 };
 
 export class STORE {
@@ -21,7 +40,7 @@ export class STORE {
 
 export class GROUP {
   dpName: string;
-  keys: KEY[];
+  keys: KEY[] = [];
   dpMatch: string;
   dpNoMatch: string;
   fUsingKeys: boolean;
@@ -231,7 +250,13 @@ export class KMXFile {
 
   public static readonly TSS__KEYMAN_150_MAX =     43;
 
-  public static readonly TSS__MAX =                43;
+  /* Keyman 17.0 system stores */
+
+  public static readonly TSS_DISPLAYMAP =          44;
+
+  public static readonly TSS__KEYMAN_170_MAX =     44;
+
+  public static readonly TSS__MAX =                44;
 
 
   public static readonly UC_SENTINEL =       0xFFFF;
@@ -319,6 +344,21 @@ export class KMXFile {
   public static readonly ISVIRTUALKEY   = 0x4000;    // It is a Virtual Key Sequence
   public static readonly VIRTUALCHARKEY = 0x8000;    // Keyman 6.0: Virtual Key Cap Sequence NOT YET
 
+  public static readonly MASK_MODIFIER_CHIRAL = KMXFile.LCTRLFLAG | KMXFile.RCTRLFLAG | KMXFile.LALTFLAG | KMXFile.RALTFLAG;
+  public static readonly MASK_MODIFIER_SHIFT = KMXFile.K_SHIFTFLAG;
+  public static readonly MASK_MODIFIER_NONCHIRAL = KMXFile.K_CTRLFLAG | KMXFile.K_ALTFLAG;
+
+  public static readonly MASK_STATEKEY = KMXFile.CAPITALFLAG | KMXFile.NOTCAPITALFLAG |
+                                         KMXFile.NUMLOCKFLAG | KMXFile.NOTNUMLOCKFLAG |
+                                         KMXFile.SCROLLFLAG | KMXFile.NOTSCROLLFLAG;
+  public static readonly MASK_KEYTYPE  = KMXFile.ISVIRTUALKEY | KMXFile.VIRTUALCHARKEY;
+
+  public static readonly MASK_MODIFIER = KMXFile.MASK_MODIFIER_CHIRAL | KMXFile.MASK_MODIFIER_SHIFT | KMXFile.MASK_MODIFIER_NONCHIRAL;
+
+  public static readonly MASK_KEYS = KMXFile.MASK_MODIFIER | KMXFile.MASK_STATEKEY;
+  public static readonly KMX_MASK_VALID    = KMXFile.MASK_KEYS | KMXFile.MASK_KEYTYPE;
+
+
   public static readonly K_MODIFIERFLAG    = 0x007F;
   public static readonly K_NOTMODIFIERFLAG = 0xFF00;   // I4548
 
@@ -328,12 +368,13 @@ export class KMXFile {
   public static readonly COMP_GROUP_SIZE  = 24;
   public static readonly COMP_KEY_SIZE    = 20;
 
+
+  public static readonly VERSION_MASK_MINOR = 0x00FF;
+  public static readonly VERSION_MASK_MAJOR = 0xFF00;
+
   /* In-memory representation of the keyboard */
 
-  public keyboard: KEYBOARD = {
-    groups: [],
-    stores: []
-  };
+  public keyboard: KEYBOARD = new KEYBOARD();
 
   constructor() {
 

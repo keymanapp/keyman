@@ -3,13 +3,14 @@
  * kmlmi - Keyman Lexical Model model_info Compiler
  */
 
+import * as fs from 'fs';
 import * as path from 'path';
 import { Command } from 'commander';
 import { KmpCompiler, PackageValidation } from '@keymanapp/kmc-package';
 import { ModelInfoOptions, writeMergedModelMetadataFile } from '@keymanapp/kmc-model-info';
 import { SysExits } from './util/sysexits.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
-import { NodeCompilerCallbacks } from './messages/NodeCompilerCallbacks.js';
+import { NodeCompilerCallbacks } from './util/NodeCompilerCallbacks.js';
 
 let inputFilename: string;
 const program = new Command();
@@ -45,7 +46,7 @@ let jsFilename = program.opts().jsFilename ? program.opts().jsFilename : path.jo
 // Load .kps source data
 //
 
-const callbacks = new NodeCompilerCallbacks();
+const callbacks = new NodeCompilerCallbacks({logLevel: 'info'});
 let kmpCompiler = new KmpCompiler(callbacks);
 let kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
 if(!kmpJsonData) {
@@ -56,7 +57,7 @@ if(!kmpJsonData) {
 // Validate the package file
 //
 
-const validation = new PackageValidation(callbacks);
+const validation = new PackageValidation(callbacks, {});
 if(!validation.validate(kpsFilename, kmpJsonData)) {
   process.exit(1);
 }
@@ -74,10 +75,11 @@ let modelInfoOptions: ModelInfoOptions = {
 };
 
 try {
-  writeMergedModelMetadataFile(
+  const data = writeMergedModelMetadataFile(
     inputFilename,
-    outputFilename,
+    callbacks,
     modelInfoOptions);
+  fs.writeFileSync(outputFilename, data);
 } catch(e) {
   console.error(e);
   process.exit(SysExits.EX_DATAERR);

@@ -5,6 +5,7 @@ const Ajv = AjvModule.default; // The actual expected Ajv type.
 import { boxXmlArray } from '../util/util.js';
 import { KeymanDeveloperProject, KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from './keyman-developer-project.js';
 import { CompilerCallbacks } from '../util/compiler-interfaces.js';
+import Schemas from '../schemas.js';
 
 export class KPJFileReader {
   constructor(private callbacks: CompilerCallbacks) {
@@ -24,14 +25,24 @@ export class KPJFileReader {
 
     parser.parseString(file, (e: unknown, r: unknown) => { data = r as KPJFile });
     data = this.boxArrays(data);
+    for(let file of data.KeymanDeveloperProject?.Files?.File) {
+      // xml2js imports <Details/> as '' so we will just delete the empty string
+      if(typeof file.Details == 'string') {
+        delete file.Details;
+      }
+    }
     return data as KPJFile;
   }
 
-  public validate(source: KPJFile, schemaBuffer: Uint8Array): void {
-    const schema = JSON.parse(new TextDecoder().decode(schemaBuffer));
+  public validate(source: KPJFile): void {
     const ajv = new Ajv();
-    if(!ajv.validate(schema, source)) {
-      throw new Error(ajv.errorsText());
+    if(!ajv.validate(Schemas.kpj, source)) {
+      const ajvLegacy = new Ajv();
+      if(!ajvLegacy.validate(Schemas.kpj90, source)) {
+        // If the legacy schema also does not validate, then we will only report
+        // the errors against the modern schema
+        throw new Error(ajv.errorsText());
+      }
     }
   }
 
@@ -54,7 +65,7 @@ export class KPJFileReader {
     } else {
       result.options.buildPath = (project.Options?.BuildPath || '').replace(/\\/g, '/');
     }
-    result.options.checkFilenameConventions = this.boolFromString(project.Options?.CheckFilenameConventions, true);
+    result.options.checkFilenameConventions = this.boolFromString(project.Options?.CheckFilenameConventions, false);
     result.options.compilerWarningsAsErrors = this.boolFromString(project.Options?.CompilerWarningsAsErrors, false);
     result.options.warnDeprecatedCode = this.boolFromString(project.Options?.WarnDeprecatedCode, true);
     result.options.projectType =
@@ -64,6 +75,7 @@ export class KPJFileReader {
 
     if(result.options.version == '1.0') {
       this.transformFilesVersion10(project, result);
+      result.addMetadataFile();
     } else {
       result.populateFiles();
     }

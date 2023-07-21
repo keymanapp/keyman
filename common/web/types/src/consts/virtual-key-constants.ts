@@ -124,6 +124,10 @@ export const USVirtualKeyCodes = {
   K_OE2:226,
   k_oC1:193,  // ISO B11, ABNT-2 key to left of right shift, not on US keyboard
   k_OC1:193,
+  'K_?C1':193,
+  'k_?C1':193,
+  K_oDF:0xDF,
+  K_ODF:0xDF,
   /*K_LOPT:50001,
   K_ROPT:50002,
   K_NUMERALS:50003,

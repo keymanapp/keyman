@@ -42,25 +42,9 @@ if builder_start_action clean; then
   builder_finish_action success clean
 fi
 
-SCHEMAS_COPIED=false
-
-copy_schemas() {
-  if $SCHEMAS_COPIED; then
-    return 0
-  fi
-  SCHEMAS_COPIED=true
-  # We need the schema file at runtime and bundled, so always copy it for all actions except `clean`
-  mkdir -p "$THIS_SCRIPT_PATH/build/src/"
-  cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json" "$THIS_SCRIPT_PATH/build/src/"
-  cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboardtest.schema.json" "$THIS_SCRIPT_PATH/build/src/"
-  cp "$KEYMAN_ROOT/common/schemas/kvks/kvks.schema.json" "$THIS_SCRIPT_PATH/build/src/"
-  cp "$KEYMAN_ROOT/common/schemas/kpj/kpj.schema.json" "$THIS_SCRIPT_PATH/build/src/"
-}
-
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action configure; then
-  copy_schemas
   verify_npm_setup
   builder_finish_action success configure
 fi
@@ -68,7 +52,6 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action build; then
-  copy_schemas
   npm run build
   builder_finish_action success build
 fi
@@ -76,8 +59,6 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action build-fixtures; then
-  copy_schemas
-
   # Build basic.kmx and emit its checksum
   mkdir -p ./build/test/fixtures
   node ../kmc build ./test/fixtures/basic.xml --no-compiler-version --debug --out-file ./build/test/fixtures/basic-xml.kmx
@@ -93,7 +74,6 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action test; then
-  copy_schemas
   npm test
   builder_finish_action success test
 fi
@@ -101,12 +81,10 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action publish; then
-  copy_schemas
   . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
   builder_publish_to_npm
   builder_finish_action success publish
 elif builder_start_action pack; then
-  copy_schemas
   . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
   builder_publish_to_pack
   builder_finish_action success pack

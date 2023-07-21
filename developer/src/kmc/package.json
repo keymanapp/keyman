@@ -37,27 +37,31 @@
     "kmlmi": "build/src/kmlmi.js"
   },
   "dependencies": {
-    "@keymanapp/keyman-version": "*",
     "@keymanapp/common-types": "*",
+    "@keymanapp/keyman-version": "*",
+    "@keymanapp/kmc-analyze": "*",
     "@keymanapp/kmc-kmn": "*",
     "@keymanapp/kmc-ldml": "*",
     "@keymanapp/kmc-model": "*",
     "@keymanapp/kmc-model-info": "*",
     "@keymanapp/kmc-package": "*",
     "@keymanapp/models-types": "*",
-    "commander": "^10.0.0"
+    "@sentry/node": "^7.57.0",
+    "chalk": "^2.4.2",
+    "commander": "^10.0.0",
+    "supports-color": "^9.4.0"
   },
   "files": [
     "build/src/"
   ],
   "devDependencies": {
+    "@sentry/cli": "^2.19.4",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^10.14.6",
+    "@types/node": "^20.4.1",
     "@types/xml2js": "^0.4.5",
     "c8": "^7.12.0",
     "chai": "^4.3.4",
-    "chalk": "^2.4.2",
     "esbuild": "^0.15.8",
     "mocha": "^8.4.0",
     "ts-node": "^9.1.1",

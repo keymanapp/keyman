@@ -92,6 +92,9 @@ export default class KVKSFileWriter {
         $: {vkey: vkeyName},
         _: key.text,
       }
+      if(key.bitmap) {
+        k.bitmap = this.arrayToBase64(key.bitmap);
+      }
 
       l.key.push(k);
     }
@@ -99,6 +102,12 @@ export default class KVKSFileWriter {
     let result = builder.buildObject(kvks);
     return result; //Uint8Array.from(result);
   }
+
+  private arrayToBase64(source: Uint8Array): string {
+    const ascii = String.fromCharCode(...source);
+    return btoa(ascii);
+  }
+
 
   public kvkShiftToKvksShift(shift: VisualKeyboardShiftState): string {
     // TODO-LDML(lowpri): make a map of this?
