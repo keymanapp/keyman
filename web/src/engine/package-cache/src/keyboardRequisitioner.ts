@@ -108,6 +108,7 @@ export default class KeyboardRequisitioner {
         registration.forEach((entry) => {
           this.cache.addStub(entry);
         });
+      }
     });
   }
 
