@@ -1,3 +1,5 @@
+import EventEmitter from 'eventemitter3';
+
 import { PathConfiguration } from 'keyman/engine/paths';
 
 import { default as KeyboardStub, ErrorStub, KeyboardAPISpec, mergeAndResolveStubPromises } from '../keyboardStub.js';
@@ -55,7 +57,11 @@ type CloudLanguagesQueryResult = {
 
 export type CloudQueryResult = CloudKeyboardQueryResult | CloudLanguagesQueryResult;
 
-export default class CloudQueryEngine {
+interface EventMap {
+  'unboundregister': (registration: ReturnType<CloudQueryEngine['_registerCore']>) => void
+}
+
+export default class CloudQueryEngine extends EventEmitter<EventMap> {
   private cloudResolutionPromises: Record<number, ManagedPromise<KeyboardStub[] | ManagedPromise<LanguageAPIPropertySpec[]>>> = {};
 
   private _languageListPromise: ManagedPromise<LanguageAPIPropertySpec[]>;
@@ -65,6 +71,8 @@ export default class CloudQueryEngine {
   private pathConfig: PathConfiguration;
 
   constructor(requestEngine: CloudRequesterInterface, pathConfig: PathConfiguration) {
+    super();
+
     this.requestEngine = requestEngine;
     this.pathConfig = pathConfig;
 
@@ -138,10 +146,16 @@ export default class CloudQueryEngine {
       result = new Error(CLOUD_REGISTRATION_ERR + err);
     }
 
-    if(promiseid) {
+    if(!promiseid) {
+      this.emit('unboundregister', result);
+      return;
+    } else {
       const promise: ManagedPromise<KeyboardStub[]> | ManagedPromise<LanguageAPIPropertySpec[]> = this.cloudResolutionPromises[promiseid];
 
-      if(promise) {
+      if(!promise) {
+        this.emit('unboundregister', result);
+        return;
+      } else {
         try {
           if(result instanceof Error) {
             promise.reject(result as Error);

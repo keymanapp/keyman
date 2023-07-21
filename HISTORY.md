@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 17.0.145 alpha 2023-07-21
+
+* fix(linux): Fix logging (#9310)
+* fix(windows): open pdf in an external browser (#9295)
+* fix(linux): Fix installation of keyboards with lang tag `mul` (#9027)
+* fix(web): allows registering precached keyboards (#9304)
+
+## 17.0.144 alpha 2023-07-20
+
+* refactor(linux): Use better way to get username (#9313)
+
 ## 17.0.143 alpha 2023-07-19
 
 *  (#9292)
