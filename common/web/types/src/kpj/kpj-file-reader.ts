@@ -65,7 +65,7 @@ export class KPJFileReader {
     } else {
       result.options.buildPath = (project.Options?.BuildPath || '').replace(/\\/g, '/');
     }
-    result.options.checkFilenameConventions = this.boolFromString(project.Options?.CheckFilenameConventions, true);
+    result.options.checkFilenameConventions = this.boolFromString(project.Options?.CheckFilenameConventions, false);
     result.options.compilerWarningsAsErrors = this.boolFromString(project.Options?.CompilerWarningsAsErrors, false);
     result.options.warnDeprecatedCode = this.boolFromString(project.Options?.WarnDeprecatedCode, true);
     result.options.projectType =

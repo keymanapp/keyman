@@ -5,14 +5,20 @@ import 'mocha';
 import {makePathToFixture, compileModelSourceCode} from './helpers/index.js';
 import { createTrieDataStructure } from '../src/build-trie.js';
 import { ModelCompilerError } from '../src/model-compiler-errors.js';
+import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 describe('LexicalModelCompiler', function () {
+  const callbacks = new TestCompilerCallbacks();
+  this.beforeEach(function() {
+    callbacks.clear();
+  });
+
   describe('#generateLexicalModelCode', function () {
     it('should compile a trivial word list', function () {
       const MODEL_ID = 'example.qaa.trivial';
       const PATH = makePathToFixture(MODEL_ID);
 
-      let compiler = new LexicalModelCompiler;
+      let compiler = new LexicalModelCompiler(callbacks);
       let code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv']
@@ -35,7 +41,7 @@ describe('LexicalModelCompiler', function () {
       const MODEL_ID = 'example.qaa.utf16le';
       const PATH = makePathToFixture(MODEL_ID);
 
-      let compiler = new LexicalModelCompiler;
+      let compiler = new LexicalModelCompiler(callbacks);
       let code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.txt']
@@ -56,7 +62,7 @@ describe('LexicalModelCompiler', function () {
     const MODEL_ID = 'example.qaa.trivial';
     const PATH = makePathToFixture(MODEL_ID);
 
-    let compiler = new LexicalModelCompiler;
+    let compiler = new LexicalModelCompiler(callbacks);
     let code = compiler.generateLexicalModelCode(MODEL_ID, {
       format: 'trie-1.0',
       sources: ['wordlist.tsv'],
@@ -79,7 +85,7 @@ describe('LexicalModelCompiler', function () {
     const MODEL_ID = 'example.qaa.smp';
     const PATH = makePathToFixture(MODEL_ID);
 
-    let compiler = new LexicalModelCompiler;
+    let compiler = new LexicalModelCompiler(callbacks);
     let code = compiler.generateLexicalModelCode(MODEL_ID, {
       format: 'trie-1.0',
       sources: ['wordlist.tsv']
@@ -112,7 +118,7 @@ describe('LexicalModelCompiler', function () {
   it('should include the source code of its search term to key function', function () {
     const MODEL_ID = 'example.qaa.trivial';
     const PATH = makePathToFixture(MODEL_ID);
-    let compiler = new LexicalModelCompiler;
+    let compiler = new LexicalModelCompiler(callbacks);
     let code = compiler.generateLexicalModelCode(MODEL_ID, {
       format: 'trie-1.0',
       sources: ['wordlist.tsv']

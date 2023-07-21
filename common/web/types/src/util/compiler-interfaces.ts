@@ -369,6 +369,10 @@ export interface CompilerOptions extends CompilerBaseOptions {
    * Emit warnings if deprecated code is encountered
    */
 	warnDeprecatedCode?: boolean;
+  /**
+   * Check filename conventions in packages
+   */
+  checkFilenameConventions?: boolean;
 };
 
 export const defaultCompilerOptions: CompilerOptions = {
@@ -378,6 +382,7 @@ export const defaultCompilerOptions: CompilerOptions = {
   shouldAddCompilerVersion: true,
   compilerWarningsAsErrors: false,
   warnDeprecatedCode: true,
+  checkFilenameConventions: false,
 }
 
 /**

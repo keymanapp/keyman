@@ -102,7 +102,7 @@ export class KeymanDeveloperProjectOptions {
   sourcePath: string;
   compilerWarningsAsErrors: boolean = false;
   warnDeprecatedCode: boolean = true;
-  checkFilenameConventions: boolean = true;
+  checkFilenameConventions: boolean = false;  // missing option defaults to False
   projectType: KeymanDeveloperProjectType = KeymanDeveloperProjectType.Keyboard;
   readonly version: KeymanDeveloperProjectVersion;
   constructor(version: KeymanDeveloperProjectVersion) {

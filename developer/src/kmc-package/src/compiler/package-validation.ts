@@ -1,4 +1,4 @@
-import { KmpJsonFile, CompilerCallbacks } from '@keymanapp/common-types';
+import { KmpJsonFile, CompilerCallbacks, CompilerOptions } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
 import { keymanEngineForWindowsFiles, keymanForWindowsInstallerFiles, keymanForWindowsRedistFiles } from './redist-files.js';
 
@@ -14,11 +14,11 @@ const MODEL_ID_PATTERN_PACKAGE = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a
 
 // "Content files" within the package should adhere to these pattern:
 const CONTENT_FILE_BASENAME_PATTERN = /^[a-z0-9_+.-]+$/i; // base names can be case insensitive
-const CONTENT_FILE_EXTENSION_PATTERN = /^\.[a-z0-9_]+$/;  // extensions should be lower-case
+const CONTENT_FILE_EXTENSION_PATTERN = /^(\.[a-z0-9_-]+)?$/;  // extensions should be lower-case or empty
 
 export class PackageValidation {
 
-  constructor(private callbacks: CompilerCallbacks) {
+  constructor(private callbacks: CompilerCallbacks, private options: CompilerOptions) {
   }
 
   public validate(filename: string, kmpJson: KmpJsonFile.KmpJsonFile) {
@@ -153,8 +153,10 @@ export class PackageValidation {
     const filename = this.callbacks.path.basename(file.name);
     const ext = this.callbacks.path.extname(filename);
     const base = filename.substring(0, filename.length-ext.length);
-    if(!CONTENT_FILE_BASENAME_PATTERN.test(base) || !CONTENT_FILE_EXTENSION_PATTERN.test(ext)) {
-      this.callbacks.reportMessage(CompilerMessages.Warn_FileInPackageDoesNotFollowFilenameConventions({filename}));
+    if(this.options.checkFilenameConventions) {
+      if(!CONTENT_FILE_BASENAME_PATTERN.test(base) || !CONTENT_FILE_EXTENSION_PATTERN.test(ext)) {
+        this.callbacks.reportMessage(CompilerMessages.Warn_FileInPackageDoesNotFollowFilenameConventions({filename}));
+      }
     }
 
     if(!this.checkIfContentFileIsDangerous(file)) {

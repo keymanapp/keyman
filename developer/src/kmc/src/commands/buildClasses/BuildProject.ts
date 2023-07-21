@@ -71,6 +71,7 @@ class ProjectBuilder {
   async buildTarget(file: KeymanDeveloperProjectFile, activity: BuildActivity): Promise<boolean> {
     const options = {...this.options};
     options.outFile = this.project.resolveOutputFilePath(file, activity.sourceExtension, activity.compiledExtension);
+    options.checkFilenameConventions = this.project.options.checkFilenameConventions ?? this.options.checkFilenameConventions;
     const infile = this.project.resolveInputFilePath(file);
 
     const buildFilename = path.relative(process.cwd(), infile).replace(/\\/g, '/');
