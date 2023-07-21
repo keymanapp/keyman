@@ -33,6 +33,12 @@ int run_DoConvert_Part1_getMap(gint argc, gchar *argv[]);
 // adapt from mc_kmxfile.cpp
 void LoadKeyboard();
 
+// initialize GDK
+bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
+
+// create a Vector with all entries of both keymaps
+bool createVectorForBothKeyboards(v_str_3D &All_Vector,GdkKeymap *keymap);
+
 // use TranslateKeyboard, TranslateGroup,TranslateKey from mcompile
 void run_DoConvert_Part2_TranslateKeyboard();
 

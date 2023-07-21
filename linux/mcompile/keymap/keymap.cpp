@@ -277,7 +277,7 @@ bool append_other_ToVector(v_str_3D &All_Vector,GdkKeymap * keymap) {
     All_Vector[1][i][0+1] = GetKeyvalsFromKeymap(keymap,stoi(All_Vector[1][i][0]),0);   //shift state: unshifted:0
     All_Vector[1][i][1+1] = GetKeyvalsFromKeymap(keymap,stoi(All_Vector[1][i][0]),1);   //shift state: shifted:1
 
-    wprintf(L" Keycodes US->Other:   %d(US): %s, %s ---- (other):%s, %s    \n",stoi(All_Vector[1][i][0]),All_Vector[0][i][1].c_str(),All_Vector[0][i][2].c_str(),All_Vector[1][i][1].c_str(),All_Vector[1][i][2].c_str());  
+    wprintf(L" Keycodes US->Other:   %d (US):%s, %s ---- (other):%s, %s    \n",stoi(All_Vector[1][i][0]),All_Vector[0][i][1].c_str(),All_Vector[0][i][2].c_str(),All_Vector[1][i][1].c_str(),All_Vector[1][i][2].c_str());
   }
 
   MyCoutW(L"  #### append_other_ToVector of keymap ended", 1);
@@ -375,8 +375,8 @@ bool extract_difference( v_str_3D &All_Vector) {
 
 std::string get_Other_Char_FromUS( std::string in , v_str_3D &All_Vector) {
 
-  //MyCoutW(L"  #### get_Other_Char_FromUS of keymap started", 1);
-  std::string diff;
+  MyCoutW(L"    #### get_Other_Char_FromUS of keymap started", 1);
+  std::wstring diff;
   // find correct row of char in US
   for( int i=0; i< (int) All_Vector[0].size();i++) {
     for( int j=1; j< (int)All_Vector[0][0].size();j++) {
@@ -384,15 +384,15 @@ std::string get_Other_Char_FromUS( std::string in , v_str_3D &All_Vector) {
       //std::cout << "see and compare:  "<<  "All_Vector[0]["<<i<<"]["<<j<<"] :"<< All_Vector[0][i][j].c_str() << " in: " << in<<"\n";
       if  ( All_Vector[0][i][j] == in ) {
         if ( All_Vector[0][i][j] != All_Vector[1][i][j])
-          diff =" **  ";
-        std::cout << "US -> Other: "<<  std::setw(5)<<diff<<All_Vector[0][i][j] << std::setw(15-All_Vector[0][i][j].size())<< All_Vector[1][i][j] <<"\n";
+          diff =L" **  ";
+        wprintf(L"         US -> Other: %d   (US): %s, %s ---- (other):%s, %s    \n",stoi(All_Vector[1][i][0]),All_Vector[0][i][1].c_str(),All_Vector[0][i][2].c_str(),All_Vector[1][i][1].c_str(),All_Vector[1][i][2].c_str());  
         return All_Vector[1][i][j] ;
       }
     }
   }
   std::cout << "US -> Other:      (" <<  in << ": no match)\n";
 
-  MyCoutW(L"  #### get_Other_Char_FromUS of keymap ended", 1);
+  MyCoutW(L"    #### get_Other_Char_FromUS of keymap ended", 1);
   return "-";
 }
 
