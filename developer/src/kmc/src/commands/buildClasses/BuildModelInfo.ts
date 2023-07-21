@@ -4,7 +4,7 @@ import { CompilerCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/
 import { writeMergedModelMetadataFile } from '@keymanapp/kmc-model-info';
 import { KmpCompiler } from '@keymanapp/kmc-package';
 import { loadProject } from '../../util/projectLoader.js';
-import { InfrastructureMessages } from 'src/messages/messages.js';
+import { InfrastructureMessages } from '../../messages/messages.js';
 
 export class BuildModelInfo extends BuildActivity {
   public get name(): string { return 'Lexical model metadata'; }
