@@ -25,7 +25,7 @@ namespace ldml {
 #endif
 
 #if KMXPLUS_DEBUG_TRANSFORM
-#define DebugTran(msg, ...) DebugLog(msg, __VA_ARGS__)
+#define DebugTran(msg, ...) DebugLog(msg, ##__VA_ARGS__)
 #else
 #define DebugTran(msg, ...)
 #endif

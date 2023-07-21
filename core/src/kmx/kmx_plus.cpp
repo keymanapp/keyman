@@ -779,7 +779,12 @@ COMP_KMXPLUS_KEYS_Helper::setKeys(const COMP_KMXPLUS_KEYS *newKeys) {
     }
     for(KMX_DWORD i = 0; is_valid && i < key2->flickCount; i++) {
       const auto &e = flickElements[i];
-      // is the count off the end?
+      // validate to is present
+      if (e.to == 0 || e.directions == 0) {
+        DebugLog("flickElement[%d] has empty to=%0x%X or directions=%0x%X", i, e.to, e.directions);
+        is_valid = false;
+        assert(is_valid);
+      }
       DebugLoad("<flick> %d: to=0x%X, directions=0x%X, flags=0x%X", i, e.to, e.directions, e.flags);
     }
     // now the kmap
@@ -941,10 +946,12 @@ COMP_KMXPLUS_LIST_Helper::setList(const COMP_KMXPLUS_LIST *newList) {
         assert(is_valid);
       }
     }
+#if KMXPLUS_DEBUG_LOAD
     for (KMX_DWORD i = 0; is_valid && i < list->indexCount; i++) {
       const auto &e = indices[i];
       DebugLoad(" index %d: str 0x%X", i, e);
     }
+#endif
   }
   // Return results
   DebugLog("COMP_KMXPLUS_LIST_Helper.setList(): %s", is_valid ? "valid" : "invalid");
