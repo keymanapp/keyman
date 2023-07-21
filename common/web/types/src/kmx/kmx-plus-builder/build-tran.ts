@@ -1,8 +1,8 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { Bksp, Tran } from "../kmx-plus.js";
-import { BUILDER_ELEM, build_elem_index } from "./build-elem.js";
-import { BUILDER_STRS, build_strs_index } from "./build-strs.js";
+import { BUILDER_ELEM, BUILDER_ELEM_REF, build_elem_index } from "./build-elem.js";
+import { BUILDER_STRS, BUILDER_STR_REF, build_strs_index } from "./build-strs.js";
 import { BUILDER_SECTION } from "./builder-section.js";
 
 /* ------------------------------------------------------------------
@@ -16,15 +16,15 @@ interface BUILDER_TRAN_GROUP {
 };
 
 interface BUILDER_TRAN_TRANSFORM {
-  from: number; //str
-  to: number; //str
-  mapFrom: number; // elem
-  mapTo: number; // elem
+  from: BUILDER_STR_REF; //str
+  to: BUILDER_STR_REF; //str
+  mapFrom: BUILDER_ELEM_REF; // elem
+  mapTo: BUILDER_ELEM_REF; // elem
 };
 
 interface BUILDER_TRAN_REORDER {
-  elements: number; //elem
-  before: number; //elem
+  elements: BUILDER_ELEM_REF; //elem
+  before: BUILDER_ELEM_REF; //elem
 };
 
 export interface BUILDER_TRAN extends BUILDER_SECTION {

@@ -1,5 +1,53 @@
 # Keyman Version History
 
+## 17.0.144 alpha 2023-07-20
+
+* refactor(linux): Use better way to get username (#9313)
+
+## 17.0.143 alpha 2023-07-19
+
+*  (#9292)
+* docs(linux): Update man page and remove do-nothing option (#9291)
+* docs(linux): Update documentation (#9277)
+
+## 17.0.142 alpha 2023-07-17
+
+* chore(windows): disable wix compression for debug builds (#9074)
+
+## 17.0.141 alpha 2023-07-15
+
+* feat(core): implement reorder (#9223)
+* chore(common): add BUILDER_STR_REF (#9248)
+* feat(core): load reorder from kmx+, test case (#9260)
+
+## 17.0.140 alpha 2023-07-14
+
+*  (#9008)
+
+## 17.0.139 alpha 2023-07-13
+
+*  (#9259)
+* chore(linux): Add unit tests for dconf_util.py (#9215)
+* refactor(linux): Refactor image loading (#9245)
+
+## 17.0.138 alpha 2023-07-11
+
+* chore: Update standards data (#9193)
+* chore(linux): Trigger Linux integration tests (#9221)
+
+## 17.0.137 alpha 2023-07-10
+
+* chore: authenticate github request when triggering test builds (#9225)
+* feat(web): logs enhanced debug info for error reports (#9217)
+* fix(web): silences low-priority warning that shows up in iOS kbd init (#9206)
+
+## 17.0.136 alpha 2023-07-07
+
+* chore(common): Update crowdin strings for Kibaku (#9214)
+* feat(core): kmxplus uset implementation in core (#9197)
+* chore(linux): Add support for `--no-integration` flag to build files (#9212)
+*  (#9196)
+
 ## 17.0.135 alpha 2023-07-06
 
 *  (#9195)

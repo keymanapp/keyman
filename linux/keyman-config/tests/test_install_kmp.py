@@ -199,19 +199,22 @@ class InstallKmpTests(unittest.TestCase):
         languages = [
             {'id': 'de'},
             {'id': 'esi-Latn'},
-            {'id': 'dyo'}
+            {'id': 'dyo'},
+            {'id': 'fuh-Arab'}
         ]
 
         for testcase in [
             {'given': 'de', 'expected': 'de'},
-            {'given': 'esi', 'expected': 'esi-Latn'},
-            {'given': 'esi-Latn', 'expected': 'esi-Latn'},
+            {'given': 'esi', 'expected': 'esi'},
+            {'given': 'esi-Latn', 'expected': 'esi'},
             {'given': 'es', 'expected': None},
             {'given': 'en', 'expected': None},
             {'given': None, 'expected': None},
             # #3399
-            {'given': 'dyo-latn', 'expected': 'dyo-Latn'},
-            {'given': 'dyo', 'expected': 'dyo-Latn'},
+            {'given': 'dyo-latn', 'expected': 'dyo'},
+            {'given': 'dyo', 'expected': 'dyo'},
+            {'given': 'fuh-Arab', 'expected': 'fuh-Arab'},
+            {'given': 'fuh', 'expected': None},
         ]:
             with self.subTest(data=testcase):
                 # Execute
