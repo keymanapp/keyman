@@ -55,7 +55,7 @@ namespace kmx {
  * @brief True if in codespace and NOT a surrogate or noncharacter.
  * \def Uni_IsValid
 */
-#define Uni_IsValid(ch) true // (Uni_InCodespace(ch) && !Uni_IsSurrogate(ch) && !Uni_IsNoncharacter(ch))
+#define Uni_IsValid(ch) (Uni_InCodespace(ch) && !Uni_IsSurrogate(ch) && !Uni_IsNoncharacter(ch))
 
 /**
  * char16_t array big enough to hold a single Unicode codepoint,
