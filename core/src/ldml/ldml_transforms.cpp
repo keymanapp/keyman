@@ -21,7 +21,7 @@ namespace kbp {
 namespace ldml {
 
 #ifndef KMXPLUS_DEBUG_TRANSFORM
-#define KMXPLUS_DEBUG_TRANSFORM 1
+#define KMXPLUS_DEBUG_TRANSFORM 0
 #endif
 
 #if KMXPLUS_DEBUG_TRANSFORM
@@ -76,6 +76,16 @@ element::matches(km_kbp_usv ch) const {
     return uset.contains(ch);
   } else {
     return chr == ch;
+  }
+}
+
+void
+element::dump() const {
+  if (is_uset()) {
+    DebugLog("element order=%d USET", (int)get_order());
+    uset.dump();
+  } else {
+    DebugLog("element order=%d U+%04X", (int)get_order(), (int)chr);
   }
 }
 
@@ -164,6 +174,12 @@ element_list::load(const kmx::kmx_plus &kplus, kmx::KMXPLUS_ELEM id) {
       emplace_back(e.element, flags); // char
     } else if (type == LDML_ELEM_FLAGS_TYPE_USET) {
       auto u = kplus.usetHelper.getUset(e.element);
+      if (!u.valid()) {
+        DebugLog("Error, invalid UnicodeSet at element %d", (int)i);
+        u.dump();
+        assert(u.valid());
+        return false;
+      }
       emplace_back(u, e.flags);
     } else {
       // not handled
@@ -171,6 +187,10 @@ element_list::load(const kmx::kmx_plus &kplus, kmx::KMXPLUS_ELEM id) {
       return false;
     }
   }
+#if KMXPLUS_DEBUG_TRANSFORM
+  DebugTran("Loaded:");
+  dump();
+#endif
   return true;
 }
 
@@ -187,9 +207,19 @@ element_list::update_sort_key(size_t offset, std::deque<reorder_sort_key> &key) 
     assert(e->matches(k.ch));        // double check that this element matches
     k.primary  = e->get_order();
     k.tertiary = e->get_tertiary();  // TODO-LDML: need more detailed tertiary work
+    DebugTran("Updating at +%d", c);
+    k.dump();
     c++;
   }
   return key;
+}
+
+void
+element_list::dump() const {
+  DebugLog("element_list[%d]", size());
+  for (const auto &e : *this) {
+    e.dump();
+  }
 }
 
 reorder_entry::reorder_entry(const element_list &new_elements) : elements(new_elements), before() {
@@ -226,13 +256,6 @@ reorder_group::apply(std::u32string &str) const {
   // get a baseline sort key
   auto sort_keys = reorder_sort_key::from(str);
 
-#if 0 && KMXPLUS_DEBUG_TRANSFORM
-  DebugTran("Baseline sortkey");
-  for (const auto &r : sort_keys) {
-    r.dump();
-  }
-#endif
-
   // apply ALL reorders in the group.
   for (const auto &r : list) {
     // work backward from end of string forward
@@ -240,6 +263,10 @@ reorder_group::apply(std::u32string &str) const {
     for (size_t s = str.size(); s > 0; s--) {
       size_t submatch = r.match_end(str, 0, s);
       if (submatch != 0) {
+#if KMXPLUS_DEBUG_TRANSFORM
+        DebugTran("Matched: %S (off=%d, len=%d)", str, 0, s);
+        r.elements.dump();
+#endif
         // update the sort key
         size_t sub_match_start = s - submatch;
         r.elements.update_sort_key(sub_match_start, sort_keys);
@@ -564,6 +591,7 @@ transforms::load(
         if (load_ok) {
           newGroup.list.emplace_back(elements, before);
         } else {
+          DebugLog("reorder elements(%d+%d) failed to load", group->index, itemNumber);
           return nullptr;
         }
       }

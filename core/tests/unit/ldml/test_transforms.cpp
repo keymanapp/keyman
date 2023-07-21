@@ -163,7 +163,7 @@ test_reorder_standalone() {
     const std::u32string expect = roasts[0];
     // now setup the rules
     const COMP_KMXPLUS_USET_RANGE ranges[]      = {// 0
-                                              {0x1A75, 0x1A79}};
+                                              COMP_KMXPLUS_USET_RANGE(0x1A75, 0x1A79)};
     const COMP_KMXPLUS_USET_USET usets[]        = {{0, 1, 0xFFFFFFFF}};
     const COMP_KMXPLUS_USET_USET &toneMarksUset = usets[0];
     const USet toneMarks(&ranges[toneMarksUset.range], toneMarksUset.count);

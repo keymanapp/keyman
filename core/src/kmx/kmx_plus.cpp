@@ -982,7 +982,13 @@ COMP_KMXPLUS_USET::valid(KMX_DWORD _kmn_unused(length)) const {
     assert(false);
     return false;
   }
-  return true;
+  return true; // see helper
+}
+
+COMP_KMXPLUS_USET_RANGE::COMP_KMXPLUS_USET_RANGE(KMX_DWORD s, KMX_DWORD e) : start(s), end(e) {
+}
+
+COMP_KMXPLUS_USET_RANGE::COMP_KMXPLUS_USET_RANGE(const COMP_KMXPLUS_USET_RANGE &other) : start(other.start), end(other.end) {
 }
 
 COMP_KMXPLUS_USET_Helper::COMP_KMXPLUS_USET_Helper() : uset(nullptr), is_valid(false), usets(nullptr), ranges(nullptr) {
@@ -1030,9 +1036,13 @@ COMP_KMXPLUS_USET_Helper::setUset(const COMP_KMXPLUS_USET *newUset) {
     } else {
       /** last lastEnd value */
       KMX_DWORD lastEnd = 0x0;
-      for (KMX_DWORD r = 0; r < e.count; r++) {
+      for (KMX_DWORD r = 0; is_valid && r < e.count; r++) {
         const auto &range = ranges[e.range + r];  // already range-checked 'r' above
-        if (range.end < range.start) {
+        if (!Uni_IsValid(range.start) || !Uni_IsValid(range.end)) {
+          DebugLog("uset[%d][%d] not valid: [U+%04X-U+%04X]", i, r, range.start, range.end);
+          is_valid = false;
+          assert(is_valid);
+        } else if (range.end < range.start) {
           // range swapped
           DebugLog("uset[%d]: range[%d+%d] end 0x%X<start 0x%X", i, e.range, r, range.end, range.start);
           is_valid = false;
@@ -1055,20 +1065,46 @@ COMP_KMXPLUS_USET_Helper::setUset(const COMP_KMXPLUS_USET *newUset) {
   return is_valid;
 }
 
-USet::USet(const COMP_KMXPLUS_USET_RANGE *newRange, size_t newCount) : ranges(newRange), count(newCount) {
+USet::USet(const COMP_KMXPLUS_USET_RANGE *newRange, size_t newCount)  {
+  for (size_t i = 0; i < newCount; i++) {
+    ranges.emplace_back(newRange[i].start, newRange[i].end);
+  }
 }
 
-USet::USet() : ranges(nullptr), count(0) {
+USet::USet() {
 }
 
 bool USet::contains(km_kbp_usv ch) const {
-  for (size_t i = 0; i < count; i++) {
-    const auto &range = ranges[i];
+  for (const auto &range : ranges) {
     if (range.start <= ch && range.end >= ch) {
       return true;
     }
   }
   return false;
+}
+
+bool
+USet::valid() const {
+  // double check
+  for (const auto &range : ranges) {
+    if (!Uni_IsValid(range.start) || !Uni_IsValid(range.end)) {
+      DebugLog("Invalid UnicodeSet (contains noncharacters): [U+%04X,U+%04X]", (int)range.start, (int)range.end);
+      return false;
+    }
+  }
+  return true;
+}
+
+void
+USet::dump() const {
+  DebugLog(" - USet size=%d", ranges.size());
+  for (const auto &range : ranges) {
+    if (range.start == range.end) {
+      DebugLog("  - [U+%04X]", (uint32_t)range.start);
+    } else {
+      DebugLog("  - [U+%04X-U+%04X]", (uint32_t)range.start, (uint32_t)range.end);
+    }
+  }
 }
 
 USet

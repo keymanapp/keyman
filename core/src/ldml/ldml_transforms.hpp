@@ -48,6 +48,7 @@ public:
   KMX_DWORD get_flags() const;
   /** @returns true if matches this character*/
   bool matches(km_kbp_usv ch) const;
+  void dump() const;
 
 private:
   // TODO-LDML: support multi-char strings
@@ -145,6 +146,8 @@ public:
   /** construct from KMX+ elem id*/
   bool
   load(const kmx::kmx_plus& kplus, kmx::KMXPLUS_ELEM id);
+
+  void dump() const;
 };
 
 class reorder_entry {
