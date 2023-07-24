@@ -40,6 +40,7 @@
     "@keymanapp/common-types": "*",
     "@keymanapp/keyman-version": "*",
     "@keymanapp/kmc-analyze": "*",
+    "@keymanapp/kmc-keyboard-info": "*",
     "@keymanapp/kmc-kmn": "*",
     "@keymanapp/kmc-ldml": "*",
     "@keymanapp/kmc-model": "*",
