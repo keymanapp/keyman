@@ -27,9 +27,9 @@ export class KEYBOARD {
   // Following values are extracted from stores[] but are
   // informative only
 
-  keyboardVersion?: string;  // version (TSS_KEYBOARDVERSION)
+  keyboardVersion?: string;   // version (TSS_KEYBOARDVERSION)
   isMnemonic: boolean;        // TSS_MNEMONICLAYOUT store
-
+  targets: string;            // TSS_TARGETS store ('desktop' if missing)
 };
 
 export class STORE {

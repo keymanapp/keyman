@@ -51,3 +51,12 @@ export const
     [KeymanTarget.mobile]: 'Mobile devices', [KeymanTarget.desktop]: 'Desktop devices',
       [KeymanTarget.tablet]: 'Tablet devices'
   };
+
+
+  export function keymanTargetsFromString(targets: string, options?: {expandAny?: boolean}): KeymanTarget[] {
+    let result = <KeymanTarget[]>targets.split(/ +/);
+    if(options?.expandAny && result.includes(KeymanTarget.any)) {
+      result = AllKeymanTargets;
+    }
+    return result;
+  }

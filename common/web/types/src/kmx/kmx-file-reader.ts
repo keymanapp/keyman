@@ -41,6 +41,9 @@ export class KmxFileReader {
       case KMXFile.TSS_KEYBOARDVERSION:
         result.keyboardVersion = store.dpString;
         break;
+      case KMXFile.TSS_TARGETS:
+        result.targets = store.dpString;
+        break;
       case KMXFile.TSS_BEGIN_NEWCONTEXT:
         if(!this.isValidCodeUse(store.dpString, result)) {
           throw new KmxFileReaderError(`Invalid TSS_BEGIN_NEWCONTEXT system store`);

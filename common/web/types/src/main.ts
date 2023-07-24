@@ -2,6 +2,7 @@ export * as KMX from './kmx/kmx.js';
 export * as KMXPlus from './kmx/kmx-plus.js';
 export { default as KMXBuilder } from './kmx/kmx-builder.js';
 export { KmxFileReader, KmxFileReaderError } from './kmx/kmx-file-reader.js';
+export * as KeymanTargets from './kmx/keyman-targets.js';
 
 export * as VisualKeyboard from './kvk/visual-keyboard.js';
 export { default as KMXPlusBuilder}  from './kmx/kmx-plus-builder/kmx-plus-builder.js';
