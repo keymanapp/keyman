@@ -108,7 +108,6 @@ bool Split_US_To_3D_Vector(v_str_3D &all_US,v_str_1D completeList) {
   // 2: seperate the name e.g. key<AD06> from the shiftstates
   // 3: push Names/Shiftstates to shift_states and then shiftstates to All_US, our 3D-Vector holding all Elements
 
-//MyCoutW(L"    #### Split_US_To_3D_Vector of keymap started", 1);
   std::vector<char> delim{' ', '[', ']', '}', ';', '\t', '\n'};
   char split_bracel = '{';
   char split_char_komma  = ',';
@@ -163,13 +162,10 @@ bool Split_US_To_3D_Vector(v_str_3D &all_US,v_str_1D completeList) {
     printf("ERROR: Can't split US to 3D-Vector\n");
     return 1;
   }
-  //MyCoutW(L"    #### Split_US_To_3D_Vector of keymap ended", 1);
-  //printf("### 6 Split_US_To_3D_clearVector %li..%li..%li\n", all_US.size(), all_US[0].size(),all_US[0][0].size());
   return 0;
 }
 
 bool foundCharacterInList(std::string tok) {
-  //MyCoutW(L"  #### foundCharacterInList of keymap started", 1);
   //TOASK Do we need more and which?
   //US keys:          Q    W    E    R    T    Y    U    I    O    P    A    S    D    F    G    H    J    K    L    Z    X    C    V    B    N    M
   v_str_1D Keysyms { "24","25","26","27","28","29","30","31","32","33","38","39","40","41","42","43","44","45","46","52","53","54","55","56","57","58"};
@@ -180,8 +176,6 @@ bool foundCharacterInList(std::string tok) {
       return true;
       }
     }
-
-  //MyCoutW(L"  #### foundCharacterInList of keymap ended", 1);
   return false;
 }
 
@@ -246,7 +240,6 @@ int replace_PosKey_with_Keycode(std::string  in) {
 
 bool append_other_ToVector(v_str_3D &All_Vector,GdkKeymap * keymap) {
 
-  //MyCoutW(L"  #### append_other_ToVector of keymap started", 1);
   // create a 2D vector all filled with "--" and push to 3D-Vector
   v_str_2D Other_Vector2D = create_empty_2D(All_Vector[0].size(),All_Vector[0][0].size());
 
@@ -274,8 +267,6 @@ bool append_other_ToVector(v_str_3D &All_Vector,GdkKeymap * keymap) {
 
     wprintf(L" Keycodes US->Other:   %d (US):%s, %s ---- (other):%s, %s    \n",stoi(All_Vector[1][i][0]),All_Vector[0][i][1].c_str(),All_Vector[0][i][2].c_str(),All_Vector[1][i][1].c_str(),All_Vector[1][i][2].c_str());
   }
-
-  //MyCoutW(L"  #### append_other_ToVector of keymap ended", 1);
   return 0;
 }
 
@@ -338,7 +329,6 @@ bool test(v_str_3D &V) {
 /*
 bool extract_difference( v_str_3D &All_Vector) {
 
-  MyCoutW(L"  #### extract_difference of keymap started", 1);
   // TODO define which Folder; find better name
   std::ofstream Map_File("Map_US.txt");
   std::string diff =" ";
@@ -376,8 +366,6 @@ bool extract_difference( v_str_3D &All_Vector) {
   }
 
   Map_File.close();
-
-  MyCoutW(L"  #### extract_difference of keymap ended", 1);
   return 0;
 }
 *//*

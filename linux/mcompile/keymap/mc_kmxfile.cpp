@@ -230,7 +230,6 @@ KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL 
 	return CERR_None;
 }
 
-
 PKMX_WCHAR KMX_StringOffset(PKMX_BYTE base, KMX_DWORD offset) {
   if(offset == 0) return NULL;
   return (PKMX_WCHAR)(base + offset);
@@ -246,7 +245,6 @@ PKMX_WCHAR KMX_StringOffset(PKMX_BYTE base, KMX_DWORD offset) {
 */
 LPKMX_KEYBOARD KMX_CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 {
-  MyCoutW(L"  #### KMX_CopyKeyboard of mc_kmxfile started", 1);
   PKMX_COMP_KEYBOARD ckbp = (PKMX_COMP_KEYBOARD) base;
 
   /* Copy keyboard structure */
@@ -319,8 +317,6 @@ LPKMX_KEYBOARD KMX_CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
       kp->dpContext = KMX_StringOffset(base, ckp->dpContext);
     }
   }
-
-  MyCoutW(L"  #### KMX_CopyKeyboard of mc_kmxfile ended", 1);
   return kbp;
 }
 
@@ -478,7 +474,6 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
     KMX_LogError(L"LogError1: errFixupKeyboard\n" );
     //  _S2 delete [] buf; ????
 
-    MyCoutW(L"##### errFixupKeyboard ", 1);
     return FALSE;
   }
 
@@ -491,12 +486,10 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   }
   *lpKeyboard = kbp;
   // _S2 delete [] buf; ????
-  MyCoutW(L"##### LoadKeyboard of mcompile ended #####", 1);
   return TRUE;
 }
 
 KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz){
-  MyCoutW(L"  #### KMX_VerifyKeyboard of mc_kmxfile started", 1);
   KMX_DWORD i;
   PKMX_COMP_KEYBOARD ckbp = (PKMX_COMP_KEYBOARD)filebase;
   PKMX_COMP_STORE csp;
@@ -519,10 +512,6 @@ KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz){
     KMX_LogError(L"LogErr1: errWrongFileVersion");
     return FALSE;
   }
-
-  MyCout("will return true", 1);
-  MyCoutW(L"  #### KMX_VerifyKeyboard of mc_kmxfile ended", 1);
-
   return TRUE;
 }
 
