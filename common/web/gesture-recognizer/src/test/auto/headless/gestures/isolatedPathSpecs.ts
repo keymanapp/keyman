@@ -1,7 +1,7 @@
 import { gestures } from '@keymanapp/gesture-recognizer';
-import specs = gestures.specs;
+import specTypeDefs = gestures.specs;
 
-type ContactModel = specs.ContactModel<string>;
+type ContactModel = specTypeDefs.ContactModel<string>;
 
 export const InstantRejectionModel: ContactModel = {
   itemPriority: 0,
