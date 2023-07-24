@@ -72,7 +72,7 @@ describe("TimeoutPromise", () => {
 
     const end = Date.now();
     // https://github.com/nodejs/node/issues/26578 - setTimeout() may resolve 1ms early than requested.
-    assert.isAtLeast(end-start, INTERVAL);
+    assert.isAtLeast(end-start, INTERVAL-1);
 
     promise.resolve(false);
 
