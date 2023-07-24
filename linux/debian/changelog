@@ -1,3 +1,10 @@
+keyman (16.0.140-1) unstable; urgency=medium
+
+  * New upstream release (closes: #1037707).
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 24 Jul 2023 11:41:07 +0200
+
 keyman (16.0.139-4) unstable; urgency=medium
 
   * debian/tests: Revert previous change and ignore s390x from autopkgtests
