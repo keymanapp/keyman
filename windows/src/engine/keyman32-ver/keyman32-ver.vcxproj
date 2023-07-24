@@ -343,6 +343,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\keyman32\keyman-debug-etw.h" />
     <ClInclude Include="keymanengine.h" />
     <ClInclude Include="..\..\..\include\kmtip_guids.h" />
     <ClInclude Include="appint\aiTIP.h" />
@@ -360,7 +361,6 @@
     <ClInclude Include="keyboardoptions.h" />
     <ClInclude Include="keyman64.h" />
     <ClInclude Include="keymancontrol.h" />
-    <ClInclude Include="keyman-debug-etw.h" />
     <ClInclude Include="keyeventsenderthread.h" />
     <ClInclude Include="keystate.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\registry.h" />

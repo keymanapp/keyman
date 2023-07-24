@@ -609,12 +609,13 @@ LoadDLLs(LPINTKEYBOARDINFO lpkbi) {
       SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: unable to get handle for loaded keyman versioned dll; error:[%d]", GetLastError());
         return FALSE;
     }
+
     char *p = strrchr(module_filename, '\\'); // find last occurrence of '\'
     if (p != NULL) {
-      int64_t len = strnlen(keyman_engine_arch,_MAX_PATH);
+      size_t len = strnlen(keyman_engine_arch,_MAX_PATH);
       // We know that the arch filename is shorter than the versioned filename so this
       // should always be safe, just insure we insert the null character
-      strncpy(p, keyman_engine_arch, len + 1); // +1 ensure null padding terminates the string
+      strncpy_s(p, _MAX_PATH - (p - module_filename), keyman_engine_arch, len);
       _td->hModuleProxy = LoadLibrary(module_filename);
       if (!_td->hModuleProxy) {
         SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: [%s] not loaded with error:[%d]", module_filename, GetLastError());
