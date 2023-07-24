@@ -29,8 +29,8 @@ export class PackageKeyboardTargetValidator {
 
     // If at least one target is a touch target, we need to check that the
     // package also includes the .js
-    const targets = <KeymanTargets.KeymanTarget[]>targetsText.split(' ');
-    if(targets.some(target => ['any', ...KeymanTargets.TouchKeymanTargets].includes(target))) {
+    const targets = KeymanTargets.keymanTargetsFromString(targetsText, {expandAny: true});
+    if(targets.some(target => KeymanTargets.TouchKeymanTargets.includes(target))) {
       if(!kmp.files.find(file => this.callbacks.path.basename(file.name, '.js') == keyboard.id)) {
         // .js version of the keyboard is not found, warn
         this.callbacks.reportMessage(CompilerMessages.Warn_JsKeyboardFileIsMissing({id: keyboard.id}));
