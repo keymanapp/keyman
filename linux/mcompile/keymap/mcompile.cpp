@@ -53,22 +53,6 @@ mcompile -d runs 4 important steps:
 
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]);
 
-//
-// Map of all shift states that we will work with
-//
-//const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCTRLFLAG|RALTFLAG, 0xFFFF};
-const UINT VKShiftState[] = {0, 1, 2,0xFFFF};
-// _S2 shiftstate from systems-file
-
-// Map of all US English virtual key codes that we can translate
-//   US Keys:                       Q    W    E    R    T    Y    U    I    O    P    A    S    D    F    G    H    J    K    L    Z    X    C    V    B    N    M
-const DWORD VKMap_US_Keycode[] = {  24 , 25 , 26 , 27 , 28 , 29 , 30 , 31 , 32 , 33 , 38 , 39 , 40 , 41 , 42 , 43 , 44 , 45 , 46 , 52 , 53 , 54 , 55 , 56 , 57 , 77 ,0};
-
-// Map of all US English virtual key codes that we can translate
-//   US Keys:                     24 , 25 , 26 , 27 , 28 , 29 , 30 , 31 , 32 , 33 , 38 , 39 , 40 , 41 , 42 , 43 , 44 , 45 , 46 , 47,  52 , 53 , 54 , 55 , 56 , 57 , 77 , 0    
-const char VKMap_US_Keysym[] = { 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '0'};
-
-
 #if defined(_WIN32) || defined(_WIN64)
   int wmain(int argc, wchar_t* argv[]) {
     std::vector<std::u16string> str_argv_16 = convert_argvW_to_Vector_u16str( argc, argv);  
@@ -196,7 +180,38 @@ wprintf(L"_S2 * Up to here cross-platform xx  :-))))) **************************
   return 0 ;
 }
 
+/*// Map of all US English virtual key codes that we can translate
+//
+const WORD VKMap[] = {
+  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+  VK_SPACE,
+  VK_ACCENT, VK_HYPHEN, VK_EQUAL,
+  VK_LBRKT, VK_RBRKT, VK_BKSLASH,
+  VK_COLON, VK_QUOTE,
+  VK_COMMA, VK_PERIOD, VK_SLASH,
+  VK_xDF, VK_OEM_102,
+  0
+};
+*/
 
+// Map of all US English virtual key codes that we can translate
+//   US Keys:                       Q    W    E    R    T    Y    U    I    O    P    A    S    D    F    G    H    J    K    L    Z    X    C    V    B    N    M
+const DWORD VKMap_US_Keycode[] = {  24 , 25 , 26 , 27 , 28 , 29 , 30 , 31 , 32 , 33 , 38 , 39 , 40 , 41 , 42 , 43 , 44 , 45 , 46 , 52 , 53 , 54 , 55 , 56 , 57 , 77 ,0};
+
+// Map of all US English virtual key codes that we can translate
+//   US Keys:                     24 , 25 , 26 , 27 , 28 , 29 , 30 , 31 , 32 , 33 , 38 , 39 , 40 , 41 , 42 , 43 , 44 , 45 , 46 , 47,  52 , 53 , 54 , 55 , 56 , 57 , 77 , 0    
+const char VKMap_US_Keysym[] = { 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '0'};
+
+// Map of all shift states that we will work with
+//
+//const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCTRLFLAG|RALTFLAG, 0xFFFF};
+const UINT VKShiftState[] = {0, 1, 2,0xFFFF};
+// _S2 shiftstate from systems-file
+
+void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, DWORD vk, UINT shift, KMX_WCHAR ch) {
+  wprintf(L"KMX_TranslateKeyboard not implemented yet\n");
+}
 
 KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
   LPKMX_STORE sp;
@@ -219,34 +234,6 @@ KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
   KMX_LogError(L"Keyboard is not a mnemonic layout keyboard");
   return FALSE;
 }
-/*
-bool get_OtherKeysym_From_US_Keysym(v_str_3D &All_Vector,int inUS,int &outOther){
-
-  //MyCoutW(L"  #### get_OtherKeysym_From_US_Keysym of keymap started", 1);
-  // loop and find char in US; then find char of Other
-  for( int i=0; i< (int)All_Vector[1].size();i++) {
-    for( int j=0; j< (int)All_Vector[1][0].size();j++) {
-
-      int KeysymUS = (int) *All_Vector[0][i][j].c_str();
-      int KeysymOther  = (int) *All_Vector[1][i][j].c_str();
-      std::wstring KeysymUS_wstr = wstring_from_string(All_Vector[0][i][j]);
-
-      if( inUS == KeysymUS ) {
-       //wprintf(L"     FOUND  Value in OTHER !!!!! : Other in: %i ( %s ) -- Keycode : %s -- US out ########:  %i ( %s ) \n", KeysymUS,All_Vector[0][i][j].c_str(),  All_Vector[1][i][0].c_str()   ,        KeysymOther,All_Vector[1][i][j].c_str());
-       wprintf(L"    get_OtherKeysym_From_US_Keysym FOUND  Value in US !!!!! : Other in: %i ( %s ) -- Keycode : %s -- US out ########:  %i ( %s ) \n",
-       KeysymUS,All_Vector[0][i][j].c_str(),  All_Vector[1][i][0].c_str()   ,        KeysymOther,All_Vector[1][i][j].c_str());
-       outOther = KeysymOther;
-
-        //MyCoutW(L"  #### get_OtherKeysym_From_US_Keysym of keymap ended", 1);
-        return true;
-      }
-    }
-  }
-  return true;
-}
-
-*/
-
 
 // takes capital letter of US returns cpital character of Other keyboard
 int  KMX_VKUSToVKUnderlyingLayout(v_str_3D &All_Vector,int inUS) {
@@ -281,7 +268,6 @@ KMX_WCHAR KMX_CharFromVK(v_str_3D &All_Vector,int vkUnderlying, WCHAR VKShiftSta
 }
 
 
-
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]){
 // get keymap of keyboard layout in use
 
@@ -302,6 +288,7 @@ bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]){
   return 0;
 }
 
+
 bool createVectorForBothKeyboards(v_str_3D &All_Vector,GdkKeymap *keymap){
 
   std::string US_language    = "us";
@@ -320,6 +307,7 @@ bool createVectorForBothKeyboards(v_str_3D &All_Vector,GdkKeymap *keymap){
   test(All_Vector);
   return 0;
 }
+
 
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]) {
 
@@ -355,7 +343,25 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
       wprintf(L"    !!!!! KMX_VKUSToVKUnderlyingLayout xx  in:  :%i --->  %i " , (int) VKMap_US_Keysym[i],  vkUnderlying );
 
       KMX_WCHAR ch = KMX_CharFromVK(All_Vector,vkUnderlying, VKShiftState[j], &DeadKey);
-      wprintf(L"   ( %i )  ---   :%i ---- >  %i  ( %i)\n",  VKShiftState[j] , vkUnderlying, ch , ( vkUnderlying-ch));        
+      wprintf(L"   ( %i )  ---   :%i ---- >  %i  ( %i)\n",  VKShiftState[j] , vkUnderlying, ch , ( vkUnderlying-ch));
+
+      //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
+
+      if(bDeadkeyConversion) {   // I4552
+        if(ch == 0xFFFF) {
+          ch = DeadKey;
+        }
+      }
+
+      switch(ch) {
+        case 0x0000: break;
+        // _S2 deadkeys will be done later
+        //case 0xFFFF: ConvertDeadkey(kbd, VKMap[i], VKShiftState[j], DeadKey); break;
+
+        //default:     TranslateKeyboard(kbd, VKMap[i], VKShiftState[j], ch);
+        default:     KMX_TranslateKeyboard(kbd, VKMap_US_Keysym[i], VKShiftState[j], ch);
+      }
+
     }
   }
 
@@ -369,9 +375,41 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
   return TRUE;
 }
 
+
 void KMX_LogError(const KMX_WCHART* m1,int m2) {
   wprintf((PWSTR)m1, m2);
 }
+
+
+/* unused _S2
+
+bool get_OtherKeysym_From_US_Keysym(v_str_3D &All_Vector,int inUS,int &outOther){
+
+  //MyCoutW(L"  #### get_OtherKeysym_From_US_Keysym of keymap started", 1);
+  // loop and find char in US; then find char of Other
+  for( int i=0; i< (int)All_Vector[1].size();i++) {
+    for( int j=0; j< (int)All_Vector[1][0].size();j++) {
+
+      int KeysymUS = (int) *All_Vector[0][i][j].c_str();
+      int KeysymOther  = (int) *All_Vector[1][i][j].c_str();
+      std::wstring KeysymUS_wstr = wstring_from_string(All_Vector[0][i][j]);
+
+      if( inUS == KeysymUS ) {
+       //wprintf(L"     FOUND  Value in OTHER !!!!! : Other in: %i ( %s ) -- Keycode : %s -- US out ########:  %i ( %s ) \n", KeysymUS,All_Vector[0][i][j].c_str(),  All_Vector[1][i][0].c_str()   ,        KeysymOther,All_Vector[1][i][j].c_str());
+       wprintf(L"    get_OtherKeysym_From_US_Keysym FOUND  Value in US !!!!! : Other in: %i ( %s ) -- Keycode : %s -- US out ########:  %i ( %s ) \n",
+       KeysymUS,All_Vector[0][i][j].c_str(),  All_Vector[1][i][0].c_str()   ,        KeysymOther,All_Vector[1][i][j].c_str());
+       outOther = KeysymOther;
+
+        //MyCoutW(L"  #### get_OtherKeysym_From_US_Keysym of keymap ended", 1);
+        return true;
+      }
+    }
+  }
+  return true;
+}
+
+*/
+
 
 // ---- old ----------------------------------------------------------
 
