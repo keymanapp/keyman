@@ -139,14 +139,32 @@
     },
     {
       "type": "shell",
-      "label": "ibus-keyman: test",
+      "label": "ibus-keyman: unit tests",
       "command": "./build.sh",
-      "args": ["test", "--debug"],
+      "args": [
+        "test",
+        "--debug",
+        "--no-integration"
+      ],
       "options": {
         "cwd": "${workspaceFolder}/linux/ibus-keyman/",
       },
       "group": "build",
-      "detail": "run tests of ibus-keyman"
+      "detail": "run unit tests of ibus-keyman"
+    },
+    {
+      "type": "shell",
+      "label": "ibus-keyman: test (unit+integration)",
+      "command": "./build.sh",
+      "args": [
+        "test",
+        "--debug"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/linux/ibus-keyman/",
+      },
+      "group": "build",
+      "detail": "run unit and integration tests of ibus-keyman"
     },
     {
       "type": "shell",

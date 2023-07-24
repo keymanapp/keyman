@@ -14,8 +14,8 @@ describe("TimeoutPromise", () => {
     assert.isTrue(await promise.corePromise);
 
     const end = Date.now();
-    // https://github.com/nodejs/node/issues/26578 - setTimeout() may resolve 1ms early than requested.
-    assert.isAtLeast(end-start, INTERVAL);
+    // https://github.com/nodejs/node/issues/26578 - setTimeout() may resolve 1ms earlier than requested.
+    assert.isAtLeast(end-start, INTERVAL-1);
   });
 
   it('simple early fulfillment', async () => {
@@ -60,7 +60,7 @@ describe("TimeoutPromise", () => {
 
     const end = Date.now();
     assert.isAtMost(end-start, INTERVAL-1);  // completes early
-    // https://github.com/nodejs/node/issues/26578 - setTimeout() may resolve 1ms early than requested.
+    // https://github.com/nodejs/node/issues/26578 - setTimeout() may resolve 1ms earlier than requested.
     assert.isAtLeast(end-start, INTERVAL/2-1); // but not TOO early
   });
 
@@ -71,8 +71,8 @@ describe("TimeoutPromise", () => {
     assert.isTrue(await promise.corePromise);
 
     const end = Date.now();
-    // https://github.com/nodejs/node/issues/26578 - setTimeout() may resolve 1ms early than requested.
-    assert.isAtLeast(end-start, INTERVAL);
+    // https://github.com/nodejs/node/issues/26578 - setTimeout() may resolve 1ms earlier than requested.
+    assert.isAtLeast(end-start, INTERVAL-1);
 
     promise.resolve(false);
 

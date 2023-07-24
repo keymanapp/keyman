@@ -1,7 +1,5 @@
 # ldml-keyboards
 
-This data is from https://github.com/unicode-org/cldr.git
-
 Data will eventually be versioned, so there would be a `42`, `43` etc directory.
 
 Currently there is a `techpreview` directory referring to the technical preview—work in progress work in 2022.

@@ -9,7 +9,7 @@
     <!-- ALLOW Upgrade from 8.0 -->
 <!-- TODO: find 8.0 upgrade id from existing installer; are there any 7.0 installs?
     <Upgrade Id="E756C3BC-A261-427f-91BE-37955544A126">
-      <UpgradeVersion OnlyDetect="no" Minimum="8.0.300.0" IncludeMinimum="yes" 
+      <UpgradeVersion OnlyDetect="no" Minimum="8.0.300.0" IncludeMinimum="yes"
                       Maximum="9.0.0.0" IncludeMaximum="no" MigrateFeatures="yes" Property="OLDERFOUND80" />
     </Upgrade>
 -->
@@ -17,16 +17,16 @@
     <!-- ALLOW Upgrade from 9.0 -->
 <!-- TODO: find 9.0 upgrade id from existing installer
     <Upgrade Id="593EA657-7DF2-4799-B90E-B9E95A8E66D3">
-      <UpgradeVersion OnlyDetect="no" Minimum="9.0.454.0" IncludeMinimum="yes" 
+      <UpgradeVersion OnlyDetect="no" Minimum="9.0.454.0" IncludeMinimum="yes"
                       Maximum="10.0.0.0" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION9FOUND" />
     </Upgrade>
 -->
-    
+
     <!-- PREVENT or ALLOW Upgrade from 11.0 or later versions -->
     <Upgrade Id="f212edf7-0bef-43bb-8fc2-2625ae7bbfca">
-      <UpgradeVersion OnlyDetect="no" Minimum="11.0.0.0" IncludeMinimum="yes" 
+      <UpgradeVersion OnlyDetect="no" Minimum="11.0.0.0" IncludeMinimum="yes"
                       Maximum="$(var.VERSION)" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION11FOUND" />
-      <UpgradeVersion OnlyDetect="yes" Minimum="$(var.VERSION)" IncludeMinimum="yes" 
+      <UpgradeVersion OnlyDetect="yes" Minimum="$(var.VERSION)" IncludeMinimum="yes"
                       Maximum="$(var.VERSION)" IncludeMaximum="yes" Property="CURRENTVERSIONFOUND" />
       <UpgradeVersion OnlyDetect="yes" Minimum="$(var.VERSION)" IncludeMinimum="no" Property="NEWERFOUND" />
     </Upgrade>
@@ -34,13 +34,13 @@
     <Property Id='OLDINSTALLDIR'>
       <RegistrySearch Id='oldinstalldir_search' Key='Software\$(var.OEMNAME)\$(var.PRODUCTNAME)' Root='HKLM' Name='root path' Type='raw' />
     </Property>
-    
+
     <Property Id='OnlineProductID' Value='30' />
-    
+
     <Directory Id="TARGETDIR" Name="SourceDir" DiskId="1">
 
       <Merge Id="keymanengine" Language='1033' SourceFile='$(var.ROOT)\src\engine\inst\keymanengine.msm' />
-      
+
       <Directory Id="ProgramFilesFolder" Name=".">
         <Directory Id="KEYMANROOT" Name="$(var.OEMNAME)">
           <Directory Id="KEYMAN" Name="$(var.PRODUCTNAME)">
@@ -52,20 +52,20 @@
                   <Shortcut Id="startmenuKeyman" Advertise="yes" Directory="ProgramMenuDir" Name="$(var.PRODUCTNAME)" WorkingDirectory='INSTALLDIR' Icon="appicon.ico" IconIndex="0" />
                   <Shortcut Id="startmenuKeymanConfiguration" Advertise="yes" Directory="ProgramMenuDir" Arguments="-c" Name="$(var.PRODUCTNAME) Configuration" WorkingDirectory='INSTALLDIR' Icon="KMSHELL.ico" IconIndex="0" />
                 </File>
-                
+
                 <RemoveFile Id="CachedInstallDirFiles" Property="CachedInstallDir" On="uninstall" Name="*" />
                 <RemoveFolder Id="CachedInstallDir" Property="CachedInstallDir" On="uninstall" />
                 <RemoveFolder Id="CachedInstallDirParent" Property="CachedInstallDirParent" On="uninstall" />
               </Component>
-              
+
               <Component>
                 <File Name="menu.txt" Source="..\branding\menu.txt" KeyPath="yes" />
               </Component>
-              
+
               <Component>
                 <File Name="messages.txt" Source="$(var.ROOT)\src\desktop\branding\messages.txt" KeyPath="yes" />
               </Component>
-              
+
               <Component>
                 <File Name="menutitle.png" Source="..\branding\menutitle.png" KeyPath="yes" />
               </Component>
@@ -73,19 +73,19 @@
               <Component>
                 <File Id="trayicon.ico" Name="trayicon.ico" Source="..\branding\trayicon.ico" KeyPath="yes" />
               </Component>
-                            
+
               <Component>
                 <File Id="KeymanDesktop.chm" Name="KeymanDesktop.chm" KeyPath="yes" />
               </Component>
-              
+
               <Component>
                 <File Id="appicon.ico" Name="appicon.ico" Source="..\branding\appicon.ico" KeyPath="yes" />
               </Component>
-              
+
               <Component>
                 <File Id="cfgicon.ico" Name="cfgicon.ico" Source="..\branding\cfgicon.ico" KeyPath="yes" />
               </Component>
-              
+
               <Component Id="Reg_RootPath" Guid="*">
                 <RegistryValue KeyPath="yes" Root="HKLM" Key="SOFTWARE\$(var.OEMNAME)\$(var.PRODUCTNAME)" Name="root path" Type="string" Value="[INSTALLDIR]" />
                 <RegistryValue Root="HKLM" Key="SOFTWARE\$(var.OEMNAME)\$(var.PRODUCTNAME)" Name="version" Type="string" Value="$(var.VERSION)" />
@@ -98,7 +98,7 @@
                   <RegistryValue KeyPath="yes" Name="oem product path" Type="multiString" Value="[INSTALLDIR]" Action="append" />
                 </RegistryKey>
               </Component>
-              
+
               <Component Id="removeCU" Guid="*">
                 <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\$(var.OEMNAME)\$(var.PRODUCTNAME)" Name="Install" Type="string" Value="1" />
                 <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKCU" Key="Software\$(var.OEMNAME)\$(var.PRODUCTNAME)" />
@@ -111,7 +111,7 @@
           </Directory>
         </Directory>
       </Directory>
-      
+
       <Directory Id="ProgramMenuFolder" Name="Programs">
         <Directory Id="ProgramMenuDir" Name="$(var.OEMNAME)" />
       </Directory>
@@ -130,7 +130,7 @@
       <ComponentRef Id="appicon.ico" />
       <ComponentRef Id="cfgicon.ico" />
       <ComponentRef Id="menutitle.png" />
-      
+
       <ComponentRef Id="Reg_RootPath" />
       <ComponentRef Id="Reg_OemProductPath" />
       <ComponentRef Id="removeCU" />
@@ -138,9 +138,9 @@
 
       <MergeRef Id='keymanengine' />
     </Feature>
-    
+
     <!-- Actions -->
-    
+
     <CustomAction Id="RollbackPostInstallCU" Execute="rollback" Impersonate="yes" ExeCommand='-rcu' BinaryKey='insthelp.exe' />
     <CustomAction Id="RollbackPostInstallLM" Execute="rollback" Impersonate="no" ExeCommand='-rlm' BinaryKey='insthelp.exe' />
     <CustomAction Id="PreUninstallUser" Execute="deferred" Impersonate="yes" ExeCommand='-uu' BinaryKey="insthelp.exe" />
@@ -174,7 +174,7 @@
       <Custom Action='SaveARPInstallLocation' After='InstallValidate'><![CDATA[Not Installed Or REINSTALL]]></Custom>
     </InstallExecuteSequence>
 
-    <Media Id="1" CompressionLevel="high" EmbedCab="yes" Cabinet="Data1.cab" VolumeLabel="DISK1" />
+    <Media Id="1" EmbedCab="yes" Cabinet="Data1.cab" VolumeLabel="DISK1" />
 
     <Property Id="ALLUSERS">1</Property>
 
