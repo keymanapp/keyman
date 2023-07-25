@@ -25,10 +25,17 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
+function do_configure() {
+  verify_npm_setup
+  mkdir -p src/imports
+  echo 'export default ' > src/imports/langtags.ts
+  cat "$KEYMAN_ROOT/resources/standards-data/langtags/langtags.json" >> src/imports/langtags.ts
+
+}
 #-------------------------------------------------------------------------------------------------------------------
 
 builder_run_action clean       rm -rf ./build/ ./tsconfig.tsbuildinfo
-builder_run_action configure   verify_npm_setup
+builder_run_action configure   do_configure
 builder_run_action build       tsc --build
 
 #-------------------------------------------------------------------------------------------------------------------

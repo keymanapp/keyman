@@ -7,10 +7,33 @@ import { minKeymanVersion } from "./min-keyman-version.js";
 import { KeyboardInfoFile, KeyboardInfoFileIncludes, KeyboardInfoFileLanguage, KeyboardInfoFilePlatform } from "./keyboard-info-file.js";
 import { KeymanFileTypes, CompilerCallbacks, KmpJsonFile, KmxFileReader, KMX, KeymanTargets } from "@keymanapp/common-types";
 import { KeyboardInfoCompilerMessages } from "./messages.js";
+import langtags from "./imports/langtags.js";
 
 const regionNames = new Intl.DisplayNames(['en'], { type: "region" });
 const scriptNames = new Intl.DisplayNames(['en'], { type: "script" });
-const languageNames = new Intl.DisplayNames(['en'], { type: "language" });
+const langtagsByTag = {};
+
+/**
+ * Build a dictionary of language tags from langtags.json
+ */
+
+function init(): void {
+  if(langtagsByTag['en']) {
+    // Already initialized, we can reasonably assume that 'en' will always be in
+    // langtags.json.
+    return;
+  }
+
+  for(const tag of langtags) {
+    langtagsByTag[tag.tag] = tag;
+    langtagsByTag[tag.full] = tag;
+    if(tag.tags) {
+      for(const t of tag.tags) {
+        langtagsByTag[t] = tag;
+      }
+    }
+  }
+}
 
 /* c8 ignore start */
 export class KeyboardInfoOptions {
@@ -26,37 +49,20 @@ export class KeyboardInfoOptions {
   /** The full URL to the keyboard help, starting with https://help.keyman.com/keyboard/ (optional) */
   helpLink?: string;
 
-  /** The compiled keyboard filename and relative path (.js and .kmx) */
+  /** The compiled keyboard filename and relative path (.js only) */
   keyboardFileNameJs?: string;
-  //keyboardFileNameKmx?: string;
 
   /** The compiled package filename and relative path (.kmp) */
   kmpFileName: string;
+
+  /** The source package filename and relative path (.kps) */
   kpsFileName: string;
 };
 /* c8 ignore stop */
 
 export class KeyboardInfoCompiler {
-  private keyboard_info: KeyboardInfoFile = null;
-
-  private jsFile: {
-    filename: string;
-    data: string;
-    standalone: boolean;
-  } = null;
-
-  private kmxFiles: {
-    filename: string,
-    data: KMX.KEYBOARD
-  }[] = [];
-
   constructor(private callbacks: CompilerCallbacks) {
-  }
-
-  private clear() {
-    this.keyboard_info = null;
-    this.jsFile = null;
-    this.kmxFiles = [];
+    init();
   }
 
   /**
@@ -74,24 +80,51 @@ export class KeyboardInfoCompiler {
     sourceKeyboardInfoFileName: string,
     options: KeyboardInfoOptions
   ): Uint8Array {
+    let keyboard_info: KeyboardInfoFile = null;
 
-    const dataInput = this.callbacks.loadFile(sourceKeyboardInfoFileName);
-    if(!dataInput) {
-      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileDoesNotExist({filename: sourceKeyboardInfoFileName}));
-      return null;
+    if(this.callbacks.fs.existsSync(sourceKeyboardInfoFileName)) {
+      const dataInput = this.callbacks.loadFile(sourceKeyboardInfoFileName);
+      if(!dataInput) {
+        this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileDoesNotExist({filename: sourceKeyboardInfoFileName}));
+        return null;
+      }
+
+      try {
+        const jsonInput = new TextDecoder('utf-8', {fatal: true}).decode(dataInput);
+        keyboard_info = JSON.parse(jsonInput);
+      } catch(e) {
+        this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileIsNotValid({filename: sourceKeyboardInfoFileName, e}));
+        return null;
+      }
+    } else {
+      // TODO: this code pathway is still under development and won't yet be
+      // called by kmc. Building metadata without a source .keyboard_info file
+      // is on the roadmap but more data is needed in the .kps to complete this.
+      if(!options.kmpFileName) {
+        // We can't build any metadata without a .kmp file
+        return null;
+      }
+      keyboard_info = {
+        // Only two fields that won't be automatically filled if file is not
+        // present
+        encodings: ['unicode'],
+        license: 'mit'
+      };
     }
 
-    this.clear();
-    try {
-      const jsonInput = new TextDecoder('utf-8', {fatal: true}).decode(dataInput);
-      this.keyboard_info = JSON.parse(jsonInput);
-    } catch(e) {
-      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileIsNotValid({filename: sourceKeyboardInfoFileName, e}));
-      return null;
+    let jsFile: string = null;
+
+    if(options.keyboardFileNameJs) {
+      jsFile = this.loadJsFile(options.keyboardFileNameJs);
+      if(!jsFile) {
+         return null;
+      }
     }
 
-    this.loadJsFile(options.keyboardFileNameJs);
-    this.loadKmxFiles(options.kpsFileName, options.kmpJsonData);
+    const kmxFiles: {
+      filename: string,
+      data: KMX.KEYBOARD
+    }[] = this.loadKmxFiles(options.kpsFileName, options.kmpJsonData);
 
     //
     // Build merged .keyboard_info file
@@ -100,79 +133,72 @@ export class KeyboardInfoCompiler {
     // https://help.keyman.com/developer/cloud/keyboard_info/1.0
     //
 
-    // CheckPackageKeyboardFilenames;
-    // CheckOrMigrateLanguages;
-
-    this.keyboard_info.isRTL = this.keyboard_info.isRTL ?? !!this.jsFile?.data.match(/this\.KRTL=1/);
-    if(!this.keyboard_info.isRTL) {
-      delete this.keyboard_info.isRTL;
+    keyboard_info.isRTL = keyboard_info.isRTL ?? !!jsFile?.match(/this\.KRTL=1/);
+    if(!keyboard_info.isRTL) {
+      delete keyboard_info.isRTL;
     }
 
-    //
-    // Merge keyboard info file -- some fields have "special" behaviours -- see below
-    //
+    this.setField(keyboard_info, 'id', options.keyboard_id);
 
-    this.setField('id', options.keyboard_id);
-
-    this.setField('name', options.kmpJsonData.info.name.description);
+    this.setField(keyboard_info, 'name', options.kmpJsonData.info.name.description);
 
     const author = options.kmpJsonData.info.author;
-    this.setField('authorName', author.description);
+    if(author && (author.description || author.url)) {
+      this.setField(keyboard_info, 'authorName', author?.description);
 
-    if (author.url) {
-      // we strip the mailto: from the .kps file for the .keyboard_info
-      const match = author.url.match(/^(mailto\:)?(.+)$/);
-      /* c8 ignore next 3 */
-      if (match === null) {
-        this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_InvalidAuthorEmail({email:author.url}));
-        return null;
+      if (author?.url) {
+        // we strip the mailto: from the .kps file for the .keyboard_info
+        const match = author.url.match(/^(mailto\:)?(.+)$/);
+        /* c8 ignore next 3 */
+        if (match === null) {
+          this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_InvalidAuthorEmail({email:author.url}));
+          return null;
+        }
+
+        const email = match[2];
+        this.setField(keyboard_info, 'authorEmail', email, false);
       }
-
-      const email = match[2];
-      this.setField('authorEmail', email, false);
     }
 
-    // extract the language identifiers from the language metadata
-    // arrays for each of the keyboards in the kmp.json file,
-    // and merge into a single array of identifiers in the
-    // .keyboard_info file.
+    // extract the language identifiers from the language metadata arrays for
+    // each of the keyboards in the kmp.json file, and merge into a single array
+    // of identifiers in the .keyboard_info file.
 
-    // TODO: expand and add extra metadata?
-    this.fillLanguages(options.kmpJsonData);
+    this.fillLanguages(keyboard_info, options.kmpJsonData);
 
-    this.setField('lastModifiedDate', (new Date).toISOString());
+    this.setField(keyboard_info, 'lastModifiedDate', (new Date).toISOString(), false);
 
     if(options.kmpFileName) {
-      this.setField('packageFilename', this.callbacks.path.basename(options.kmpFileName));
+      this.setField(keyboard_info, 'packageFilename', this.callbacks.path.basename(options.kmpFileName));
 
       // Always overwrite with actual file size
-      this.keyboard_info.packageFileSize = this.callbacks.fileSize(options.kmpFileName);
-      if(this.keyboard_info.packageFileSize === undefined) {
+      keyboard_info.packageFileSize = this.callbacks.fileSize(options.kmpFileName);
+      if(keyboard_info.packageFileSize === undefined) {
         this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileDoesNotExist({filename:options.kmpFileName}));
         return null;
       }
     } else {
-      // TODO: warn if set in .keyboard_info
-      delete this.keyboard_info.packageFilename;
-      delete this.keyboard_info.packageFileSize;
+      // TODO: warn if set in .keyboard_info?
+      delete keyboard_info.packageFilename;
+      delete keyboard_info.packageFileSize;
     }
 
     if(options.keyboardFileNameJs) {
-      this.setField('jsFilename', this.callbacks.path.basename(options.keyboardFileNameJs));
+      this.setField(keyboard_info, 'jsFilename', this.callbacks.path.basename(options.keyboardFileNameJs));
       // Always overwrite with actual file size
-      this.keyboard_info.jsFileSize = this.callbacks.fileSize(options.keyboardFileNameJs);
-      if(this.keyboard_info.jsFileSize === undefined) {
+      keyboard_info.jsFileSize = this.callbacks.fileSize(options.keyboardFileNameJs);
+      if(keyboard_info.jsFileSize === undefined) {
         this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileDoesNotExist({filename:options.keyboardFileNameJs}));
         return null;
       }
     } else {
-      // TODO: warn if set in .keyboard_info
-      delete this.keyboard_info.jsFilename;
-      delete this.keyboard_info.jsFileSize;
+      // TODO: warn if set in .keyboard_info?
+      delete keyboard_info.jsFilename;
+      delete keyboard_info.jsFileSize;
     }
 
     const includes = new Set<KeyboardInfoFileIncludes>();
-    this.keyboard_info.packageIncludes = [];
+    keyboard_info.packageIncludes = [];
     for(const file of options.kmpJsonData.files) {
       if(file.name.match(/\.(otf|ttf|ttc)$/)) {
         includes.add('fonts');
@@ -184,34 +210,31 @@ export class KeyboardInfoCompiler {
         includes.add('documentation');
       }
     }
-    this.keyboard_info.packageIncludes = [...includes];
-
+    keyboard_info.packageIncludes = [...includes];
 
     // Always overwrite source data
     if(options.kmpFileName) {
-      this.setField('version', options.kmpJsonData.info.version.description);
-    } else if(this.jsFile?.data) {
-      const m = this.jsFile.data.match(/this\.KBVER\s*=\s*(['"])([^'"]+)(\1)/);
+      this.setField(keyboard_info, 'version', options.kmpJsonData.info.version.description);
+    } else {
+      const m = jsFile?.match(/this\.KBVER\s*=\s*(['"])([^'"]+)(\1)/);
       if(m) {
-        this.setField('version', m[2]);
+        this.setField(keyboard_info, 'version', m[2]);
       } else {
-        this.keyboard_info.version = '1.0';
+        keyboard_info.version = '1.0';
       }
     }
 
-    // The minimum Keyman version detected in the package file may be manually set higher by the developer
-    // TODO: extract from .kmx files
+    // The minimum Keyman version detected in the package file may be manually
+    // set higher by the developer
     let minVersion = minKeymanVersion;
-    if(this.jsFile?.data) {
-      const m = this.jsFile.data.match(/this.KMINVER\s*=\s*(['"])(.*?)\1/);
-      if(m) {
-        if(parseFloat(m[2]) > parseFloat(minVersion)) {
-          minVersion = m[2];
-        }
+    const m = jsFile?.match(/this.KMINVER\s*=\s*(['"])(.*?)\1/);
+    if(m) {
+      if(parseFloat(m[2]) > parseFloat(minVersion)) {
+        minVersion = m[2];
       }
     }
 
-    for(const file of this.kmxFiles) {
+    for(const file of kmxFiles) {
       const v = this.kmxFileVersionToString(file.data.fileVersion);
       if(parseFloat(v) > parseFloat(minVersion)) {
         minVersion = v;
@@ -220,36 +243,63 @@ export class KeyboardInfoCompiler {
 
     // Only legacy keyboards supprt non-Unicode encodings, and we no longer
     // rewrite the .keyboard_info for those.
-    this.keyboard_info.encodings = ['unicode'];
+    keyboard_info.encodings = ['unicode'];
 
     // platformSupport
     const platforms = new Set<KeyboardInfoFilePlatform>();
-    for(const file of this.kmxFiles) {
+    for(const file of kmxFiles) {
       const targets = KeymanTargets.keymanTargetsFromString(file.data.targets, {expandAny: true});
       for(const target of targets) {
         this.mapKeymanTargetToPlatform(target).forEach(platform => platforms.add(platform));
       }
     }
 
-    this.keyboard_info.platformSupport = {};
+    if(jsFile) {
+      if(platforms.size == 0) {
+        // In this case, there was no .kmx metadata available. We need to
+        // make an assumption that this keyboard is both desktop+mobile web,
+        // and if the .js is in the package, that it is mobile native as well,
+        // because the targets metadata is not available in the .js.
+        platforms.add('mobileWeb').add('desktopWeb');
+        if(options.kmpJsonData.files.find(file => file.name.match(/\.js$/))) {
+          platforms.add('android').add('ios');
+        }
+      }
+      // Special case for determining desktopWeb and mobileWeb support: we use
+      // &targets to determine which platforms the .js is actually compatible
+      // with. The presence of the .js file itself determines whether there is
+      // supposed to be any web support. The presence of the .js file in the
+      // package (which is a separate check) does not determine whether or not
+      // the keyboard itself actually supports mobile, although it must be
+      // included in the package in order to actually be delivered to mobile
+      // apps.
+      if(platforms.has('android') || platforms.has('ios')) {
+        platforms.add('mobileWeb');
+      }
+      if(platforms.has('linux') || platforms.has('macos') || platforms.has('windows')) {
+        platforms.add('desktopWeb');
+      }
+    }
+
+    keyboard_info.platformSupport = {};
     for(const platform of platforms) {
-      this.keyboard_info.platformSupport[platform] = 'full';
+      keyboard_info.platformSupport[platform] = 'full';
     }
 
     // minKeymanVersion
-    if(parseFloat(this.keyboard_info.minKeymanVersion ?? minKeymanVersion) < parseFloat(minVersion)) {
-      this.setField('minKeymanVersion', minVersion, false);
+    if(parseFloat(keyboard_info.minKeymanVersion ?? minKeymanVersion) < parseFloat(minVersion)) {
+      this.setField(keyboard_info, 'minKeymanVersion', minVersion, false);
     }
 
     if(options.sourcePath) {
-      this.setField('sourcePath', options.sourcePath);
+      this.setField(keyboard_info, 'sourcePath', options.sourcePath);
     }
 
     if(options.helpLink) {
-      this.setField('helpLink', options.helpLink);
+      this.setField(keyboard_info, 'helpLink', options.helpLink);
     }
 
-    const jsonOutput = JSON.stringify(this.keyboard_info, null, 2);
+    const jsonOutput = JSON.stringify(keyboard_info, null, 2);
     return new TextEncoder().encode(jsonOutput);
   }
 
@@ -263,9 +313,9 @@ export class KeyboardInfoCompiler {
       iphone: ['ios'],
       linux: ['linux'],
       macosx: ['macos'],
-      mobile: ['android','ios','mobileWeb'],
-      tablet: ['android','ios','mobileWeb'],
-      web: ['desktopWeb'],
+      mobile: ['android','ios'],
+      tablet: ['android','ios'],
+      web: ['desktopWeb'],  // note: assuming that web == desktopWeb but not necessarily mobileWeb, for historical reasons
       windows: ['windows']
     }
     return map[target] ?? [];
@@ -275,12 +325,12 @@ export class KeyboardInfoCompiler {
     return ((version & 0xFF00) >> 8).toString() + '.' + (version & 0xFF).toString();
   }
 
-  private setField(field: keyof KeyboardInfoFile, expected: unknown, warn: boolean = true) {
+  private setField(keyboard_info: KeyboardInfoFile, field: keyof KeyboardInfoFile, expected: unknown, warn: boolean = true) {
     /* c8 ignore next 4 */
-    if (this.keyboard_info[field] && this.keyboard_info[field] !== expected) {
+    if (keyboard_info[field] && keyboard_info[field] !== expected && expected !== undefined) {
       if (warn ?? true) {
         this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Warn_MetadataFieldInconsistent({
-          field, value:this.keyboard_info[field], expected
+          field, value: keyboard_info[field], expected
         }));
       }
 
@@ -288,12 +338,12 @@ export class KeyboardInfoCompiler {
     // TypeScript gets upset with this assignment, because it cannot deduce
     // the exact type of keyboard_info[field] -- there are many possibilities!
     // So we assert that it's unknown so that TypeScript can chill.
-    (<unknown> this.keyboard_info[field]) = this.keyboard_info[field] || expected;
+    (<unknown> keyboard_info[field]) = keyboard_info[field] || expected;
   }
 
   private loadKmxFiles(kpsFilename: string, kmpJsonData: KmpJsonFile.KmpJsonFile) {
     const reader = new KmxFileReader();
-    this.kmxFiles = kmpJsonData.files
+    return kmpJsonData.files
       .filter(file => KeymanFileTypes.filenameIs(file.name, KeymanFileTypes.Binary.Keyboard))
       .map(file => ({
         filename: this.callbacks.path.basename(file.name),
@@ -302,36 +352,60 @@ export class KeyboardInfoCompiler {
     );
   }
 
-  private loadJsFile(filename?: string) {
-    this.jsFile = filename
-      ? {
-        filename,
-        // TODO: consider loader errors
-        data: new TextDecoder().decode(this.callbacks.loadFile(filename)),
-        standalone: true
-      }
-      : null;
+  private loadJsFile(filename: string) {
+    const data = this.callbacks.loadFile(filename);
+    if(!data) {
+      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileDoesNotExist({filename}));
+      return null;
+    }
+    const text = new TextDecoder('utf-8', {fatal: true}).decode(data);
+    return text;
   }
 
-  private fillLanguages(kmpJsonData:  KmpJsonFile.KmpJsonFile) {
-    this.keyboard_info.languages = this.keyboard_info.languages ||
+  private fillLanguages(keyboard_info: KeyboardInfoFile, kmpJsonData:  KmpJsonFile.KmpJsonFile) {
+    keyboard_info.languages = keyboard_info.languages ||
       kmpJsonData.keyboards.reduce((a, e) => [].concat(a, e.languages.map((f) => f.id)), []);
 
     // Transform array into object
-    if(Array.isArray(this.keyboard_info.languages)) {
+    if(Array.isArray(keyboard_info.languages)) {
       const languages: {[index:string]: KeyboardInfoFileLanguage} = {};
-      for(const language of this.keyboard_info.languages) {
+      for(const language of keyboard_info.languages) {
         languages[language] = {};
       }
-      this.keyboard_info.languages = languages;
+      keyboard_info.languages = languages;
     }
 
-    for(const bcp47 of Object.keys(this.keyboard_info.languages)) {
+    for(const bcp47 of Object.keys(keyboard_info.languages)) {
+      const language = keyboard_info.languages[bcp47];
       const locale = new Intl.Locale(bcp47);
-      this.keyboard_info.languages[bcp47].displayName = languageNames.of(bcp47);
-      this.keyboard_info.languages[bcp47].languageName = languageNames.of(locale.language);
-      this.keyboard_info.languages[bcp47].regionName = locale.region ? regionNames.of(locale.region) : undefined;
-      this.keyboard_info.languages[bcp47].scriptName = locale.script ? scriptNames.of(locale.script) : undefined;
+      // DisplayNames.prototype.of will throw a RangeError if it doesn't understand
+      // the format of the bcp47 tag. This happens with Node 18.14.1, for example, with:
+      //   new Intl.DisplayNames(['en'], {type: 'language'}).of('und-fonipa');
+      const mapName = (code: string, dict: Intl.DisplayNames) => {
+        try {
+           return dict.of(code);
+        } catch(e) {
+          if(e instanceof RangeError) {
+            return code;
+          } else {
+            throw e;
+          }
+        }
+      }
+      const tag = langtagsByTag[bcp47] ?? langtagsByTag[locale.language];
+      language.languageName = tag ? tag.name : bcp47;
+      language.regionName = mapName(locale.region, regionNames);
+      language.scriptName = mapName(locale.script, scriptNames);
+
+      language.displayName = language.languageName + (
+        (language.scriptName && language.regionName) ?
+        ` (${language.scriptName}, ${language.regionName})` :
+        language.scriptName ?
+        ` (${language.scriptName})` :
+        language.regionName ?
+        ` (${language.regionName})` :
+        ''
+      );
     }
   }
 
