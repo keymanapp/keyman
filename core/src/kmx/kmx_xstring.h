@@ -47,9 +47,9 @@ namespace kmx {
 #define Uni_UTF32ToSurrogate1(ch) (char16_t)(((ch) - 0x10000) / 0x400 + 0xD800)
 #define Uni_UTF32ToSurrogate2(ch) (char16_t)(((ch) - 0x10000) % 0x400 + 0xDC00)
 
-#define Uni_IsNoncharacter(ch) ((ch >= 0xFDD0 && ch <= 0xFDEF) || ((ch & 0xFFFE) == 0xFFFE))
+#define Uni_IsNoncharacter(ch) (((ch) >= 0xFDD0 && (ch) <= 0xFDEF) || (((ch) & 0xFFFE) == 0xFFFE))
 
-#define Uni_InCodespace(ch) (ch <= 0x10FFFF)
+#define Uni_InCodespace(ch) ((ch) <= 0x10FFFF)
 
 /**
  * @brief True if in codespace and NOT a surrogate or noncharacter.

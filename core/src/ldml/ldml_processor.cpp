@@ -279,8 +279,8 @@ ldml_processor::process_event(
 
           // TODO-LDML: unroll ctxt into a str. Would be better to have transforms be able to process a vector
           std::u32string ctxtstr;
-          for (size_t i = 0; i < ctxt.size(); i++) {
-            ctxtstr.append(ctxt[i]);
+          for (const auto &ch : ctxt) {
+            ctxtstr.append(ch);
           }
           const size_t matchedContext = transforms->apply(ctxtstr, outputString);
 
@@ -293,9 +293,9 @@ ldml_processor::process_event(
               state->actions().push_backspace(KM_KBP_BT_CHAR, deletedChar);  // Cause prior char to be removed
             }
             // Now, add in the updated text
-            for (size_t i = 0; i < outputString.length(); i++) {
-              state->context().push_character(outputString[i]);
-              state->actions().push_character(outputString[i]);
+            for (const auto &ch : outputString) {
+              state->context().push_character(ch);
+              state->actions().push_character(ch);
             }
           }
         }

@@ -788,7 +788,7 @@ COMP_KMXPLUS_KEYS_Helper::setKeys(const COMP_KMXPLUS_KEYS *newKeys) {
       DebugLoad("<flick> %d: to=0x%X, directions=0x%X, flags=0x%X", i, e.to, e.directions, e.flags);
     }
     // now the kmap
-    DebugLog(" kmap count: #0x%X", key2->kmapCount);
+    DebugLoad(" kmap count: #0x%X", key2->kmapCount);
     for (KMX_DWORD i = 0; i < key2->kmapCount; i++) {
       DebugLoad(" #0x%d\n", i);
       auto &entry = kmap[i];
