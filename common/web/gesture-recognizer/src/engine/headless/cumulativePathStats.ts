@@ -45,7 +45,7 @@ export function sigMinus(operand1: number, operand2: number) {
  *
  * Instances of this class are immutable.
  */
-export class CumulativePathStats {
+export class CumulativePathStats<Type = any> {
   /**
    * Provides linear-regression statistics & fitting values based on the underlying `CumulativePathStats`
    * object used to generate it.  All operations are O(1).
@@ -204,8 +204,8 @@ export class CumulativePathStats {
 
   constructor();
   constructor(sample: InputSample<any>);
-  constructor(instance: CumulativePathStats);
-  constructor(obj?: InputSample<any> | CumulativePathStats) {
+  constructor(instance: CumulativePathStats<Type>);
+  constructor(obj?: InputSample<any> | CumulativePathStats<Type>) {
     if(!obj) {
       return;
     }
@@ -232,7 +232,7 @@ export class CumulativePathStats {
    * @returns A new, separate instance for the cumulative properties up to the
    *          newly-sampled point.
    */
-  public extend(sample: InputSample<any>): CumulativePathStats {
+  public extend(sample: InputSample<any>): CumulativePathStats<Type> {
     if(!this._initialSample) {
       this._initialSample = sample;
       this.baseSample = sample;
@@ -301,7 +301,7 @@ export class CumulativePathStats {
    *                    from this instance's current accumulation.
    * @returns
    */
-  public deaccumulate(subsetStats?: CumulativePathStats): CumulativePathStats {
+  public deaccumulate(subsetStats?: CumulativePathStats<Type>): CumulativePathStats<Type> {
     // Possible addition:  use `this.buildRenormalized` on the returned version
     // if catastrophic cancellation effects (random, small floating point errors)
     // are not sufficiently mitigated & handled by the measures currently in place.
@@ -509,7 +509,7 @@ export class CumulativePathStats {
    * errors than the old instance whenever they do occur.
    * @returns
    */
-  public buildRenormalized(): CumulativePathStats {
+  public buildRenormalized(): CumulativePathStats<Type> {
     // Other (internal) notes:  the internal mapping of the new instance will not
     // match that of the old instance.  This should not affect the practical
     // results of any mapping to and from the external coordinate space, however.
