@@ -28,8 +28,8 @@ builder_parse "$@"
 function do_configure() {
   verify_npm_setup
   mkdir -p src/imports
-  echo 'export default ' > src/imports/langtags.ts
-  cat "$KEYMAN_ROOT/resources/standards-data/langtags/langtags.json" >> src/imports/langtags.ts
+  echo 'export default ' > src/imports/langtags.js
+  cat "$KEYMAN_ROOT/resources/standards-data/langtags/langtags.json" >> src/imports/langtags.js
 
 }
 #-------------------------------------------------------------------------------------------------------------------
