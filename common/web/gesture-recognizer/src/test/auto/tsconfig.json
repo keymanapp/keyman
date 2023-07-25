@@ -1,0 +1,12 @@
+/*
+ * VS Code Intellisense needs this helper in order to properly use subpath imports in the
+ * test specs found under the `headless` subfolder.  Otherwise, it'll report errors while
+ * editing - even if the tests themselves actually work.
+ */
+{
+  // Enabling the following line re-breaks it for some reason?
+  // "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "moduleResolution": "Node16",
+  }
+}

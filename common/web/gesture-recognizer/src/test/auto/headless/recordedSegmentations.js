@@ -10,7 +10,7 @@ const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 
 import { PathSegmenter } from '@keymanapp/gesture-recognizer';
 
-import { HeadlessInputEngine } from '../../../../build/tools/obj/index.js';
+import { HeadlessInputEngine } from '#tools';
 
 // Ensures that the resources are resolved relative to this script, not to the cwd when the test
 // runner was launched.

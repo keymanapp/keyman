@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { CumulativePathStats, InputSample } from '@keymanapp/gesture-recognizer';
 
-import { TouchpathTurtle } from '../../../../build/tools/obj/index.js';
+import { TouchpathTurtle } from '#tools';
 
 describe("CumulativePathStats", function() {
   it("Sample count = 0", function() {
