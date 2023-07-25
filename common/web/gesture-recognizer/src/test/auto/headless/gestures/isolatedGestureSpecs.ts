@@ -12,6 +12,7 @@ export const SimpleTapModel: GestureModel = {
     {
       model: {
         ...specs.SimpleTapModel,
+        pathInheritance: 'chop',
         itemPriority: 1
       },
       endOnResolve: true
@@ -52,5 +53,38 @@ export const MultitapModel: GestureModel = {
   resolutionAction: {
     type: 'chain',
     next: 'multitap'
+  }
+}
+
+export const LongpressModel: GestureModel = {
+  id: 'longpress',
+  resolutionPriority: 0,
+  itemPriority: 0,
+  contacts: [
+    {
+      model: {
+        ...specs.MainLongpressSourceModel,
+        itemPriority: 1,
+        pathInheritance: 'chop'
+      },
+      endOnResolve: false
+    }, {
+      model: specs.InstantRejectionModel
+    }
+  ],
+  resolutionAction: {
+    type: 'chain',
+    next: 'subkeyselect',
+    item: 'none'
+  },
+  rejectionActions: {
+    item: {
+      type: 'optional-chain',
+      allowNext: 'longpress'
+    },
+    path: {
+      type: 'optional-chain',
+      allowNext: 'longpress'
+    }
   }
 }

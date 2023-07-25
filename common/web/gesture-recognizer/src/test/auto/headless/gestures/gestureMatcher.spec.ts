@@ -7,15 +7,20 @@ const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 
 import { ComplexGestureSource, InputSample, SimpleGestureSource, gestures } from '@keymanapp/gesture-recognizer';
 
-// import { HeadlessInputEngine, TouchpathTurtle } from '../../../../../build/tools/obj/index.js'; //'#tools';
 import { TouchpathTurtle } from '#tools';
 import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
 
 import {
+  LongpressModel,
   MultitapModel,
   SimpleTapModel
 } from './isolatedGestureSpecs.js';
 import { GestureMatcher } from '../../../../../build/obj/headless/gestures/matchers/gestureMatcher.js';
+
+import {
+  LongpressDistanceThreshold,
+  MainLongpressSourceModel
+} from './isolatedPathSpecs.js';
 
 interface SimSpecSequence<Type> {
   type: 'sequence',
@@ -199,69 +204,120 @@ describe.only("GestureMatcher", function() {
     this.fakeClock.restore();
   })
 
-  describe("Simple tap", function() {
-    it("resolve: single path, touch release", async function() {
+  describe("Longpress", function() {
+    it("resolve: path not completed (long wait)", async function() {
       const turtle = new TouchpathTurtle({
-        targetX: 0,
-        targetY: 0,
-        t: 0,
+        targetX: 1,
+        targetY: 1,
+        t: 100,
         item: 'a'
       });
-
-      turtle.wait(100, 5);
+      turtle.wait(1000, 50);
       turtle.commitPending();
 
       const {
         source,
         modelMatcherPromise,
         executor
-      } = simulateComplexGestureSource([{type: 'sequence', samples: turtle.path, terminate: true}], this.fakeClock, SimpleTapModel);
+      } = simulateComplexGestureSource([
+        { type: 'sequence', samples: turtle.path, terminate: false }
+      ], this.fakeClock, LongpressModel);
 
-      await executor();
+      let completion = executor();
       const modelMatcher = await modelMatcherPromise;
+      await Promise.race([completion, modelMatcher.promise]);
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap'}});
-      assert.isTrue(source.touchpoints[0].path.isComplete);
+      assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
+
+      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'chain', item: null, next: 'subkeyselect'}});
+      assert.isFalse(source.touchpoints[0].path.isComplete);
+
+      // Did we resolve at the expected point in the path - once the timer duration had passed?
+      assert.isAtLeast(source.touchpoints[0].currentSample.t, turtle.path[0].t + MainLongpressSourceModel.timer.duration - 1);
+
+      // Allow the rest of the simulation to play out; it's easy cleanup that way.
+      await completion;
     });
 
-    it("resolve: second contact-point", async function() {
-      const turtle1 = new TouchpathTurtle({
-        targetX: 0,
-        targetY: 0,
-        t: 0,
+    it("reject: distance moved", async function() {
+      const turtle = new TouchpathTurtle({
+        targetX: 1,
+        targetY: 1,
+        t: 100,
         item: 'a'
       });
-
-      turtle1.wait(100, 5);
-      turtle1.commitPending();
-
-      const turtle2 = new TouchpathTurtle({
-        targetX: 50,
-        targetY: 0,
-        t: 100,
-        item: 'b'
-      });
-      turtle2.commitPending();
+      turtle.move(45, 16, 240, 12);
+      turtle.commitPending();
 
       const {
         source,
         modelMatcherPromise,
         executor
-      } = simulateComplexGestureSource([{
-        type: 'sequence', samples: turtle1.path, terminate: false,
-      }, {
-        type: 'sequence', samples: turtle2.path, terminate: false
-      }], this.fakeClock, SimpleTapModel);
+      } = simulateComplexGestureSource([
+        { type: 'sequence', samples: turtle.path, terminate: false }
+      ], this.fakeClock, LongpressModel);
 
-      await executor();
+
+      let completion = executor();
       const modelMatcher = await modelMatcherPromise;
+      await Promise.race([completion, modelMatcher.promise]);
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
+      assert.deepEqual(await modelMatcher.promise, {matched: false, action: { type: 'optional-chain', item: null, allowNext: 'longpress'}});
+      assert.isFalse(source.touchpoints[0].path.isComplete);
 
-      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap'}});
-      assert.isTrue(source.touchpoints[0].path.isComplete);
-      assert.isFalse(source.touchpoints[1].path.isComplete);
+      const dist = (sample1: InputSample<any>, sample2: InputSample<any>) => {
+        const deltaX = sample1.targetX - sample2.targetX;
+        const deltaY = sample1.targetY - sample2.targetY;
+
+        return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      };
+
+      assert.isAtLeast(dist(source.touchpoints[0].currentSample, turtle.path[0]), LongpressDistanceThreshold);
+
+      // Allow the rest of the simulation to play out; it's easy cleanup that way.
+      await completion;
+    });
+
+    it("reject: item changed", async function() {
+      const turtle = new TouchpathTurtle({
+        targetX: 1,
+        targetY: 1,
+        t: 100,
+        item: 'a'
+      });
+      turtle.move(45, 2, 40, 2);
+      turtle.hoveredItem = 'b'; // updates the 'item' entry for the 'pending' sample
+
+      // Commit it now so to gain a reference to the sample we can use later for comparison
+      // within this unit test.
+      const transitionSample = turtle.commitPending();
+      turtle.move(45, 2, 40, 2);
+      turtle.commitPending();
+
+      const {
+        source,
+        modelMatcherPromise,
+        executor
+      } = simulateComplexGestureSource([
+        { type: 'sequence', samples: turtle.path, terminate: false }
+      ], this.fakeClock, LongpressModel);
+
+      let completion = executor();
+      const modelMatcher = await modelMatcherPromise;
+      await Promise.race([completion, modelMatcher.promise]);
+
+      assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
+      assert.deepEqual(await modelMatcher.promise, {matched: false, action: { type: 'optional-chain', item: null, allowNext: 'longpress'}});
+      assert.isFalse(source.touchpoints[0].path.isComplete);
+
+      // The sample at which the item changed from 'a' to 'b'.
+      assert.deepEqual(source.touchpoints[0].currentSample, transitionSample);
+
+      await completion;
     });
   });
 
@@ -480,6 +536,73 @@ describe.only("GestureMatcher", function() {
       // Design note:  as this one is _not_ complete, when gesture chaining tries to do a followup multitap match,
       // it will fail.  Same mechanism as the "Pre-existing route" test.
       assert.isFalse(source.touchpoints[2].path.isComplete);
+    });
+  });
+
+
+  describe("Simple tap", function() {
+    it("resolve: single path, touch release", async function() {
+      const turtle = new TouchpathTurtle({
+        targetX: 0,
+        targetY: 0,
+        t: 0,
+        item: 'a'
+      });
+
+      turtle.wait(100, 5);
+      turtle.commitPending();
+
+      const {
+        source,
+        modelMatcherPromise,
+        executor
+      } = simulateComplexGestureSource([{type: 'sequence', samples: turtle.path, terminate: true}], this.fakeClock, SimpleTapModel);
+
+      await executor();
+      const modelMatcher = await modelMatcherPromise;
+
+      assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap'}});
+      assert.isTrue(source.touchpoints[0].path.isComplete);
+    });
+
+    it("resolve: second contact-point", async function() {
+      const turtle1 = new TouchpathTurtle({
+        targetX: 0,
+        targetY: 0,
+        t: 0,
+        item: 'a'
+      });
+
+      turtle1.wait(100, 5);
+      turtle1.commitPending();
+
+      const turtle2 = new TouchpathTurtle({
+        targetX: 50,
+        targetY: 0,
+        t: 100,
+        item: 'b'
+      });
+      turtle2.commitPending();
+
+      const {
+        source,
+        modelMatcherPromise,
+        executor
+      } = simulateComplexGestureSource([{
+        type: 'sequence', samples: turtle1.path, terminate: false,
+      }, {
+        type: 'sequence', samples: turtle2.path, terminate: false
+      }], this.fakeClock, SimpleTapModel);
+
+      await executor();
+      const modelMatcher = await modelMatcherPromise;
+
+      assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+
+      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap'}});
+      assert.isTrue(source.touchpoints[0].path.isComplete);
+      assert.isFalse(source.touchpoints[1].path.isComplete);
     });
   });
 });
