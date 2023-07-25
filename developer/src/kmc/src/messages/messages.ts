@@ -64,5 +64,9 @@ export class InfrastructureMessages {
   static Info_TooManyMessages = (o:{count:number}) => m(this.INFO_TooManyMessages,
     `More than ${o.count} warnings or errors received; suppressing further messages.`);
   static INFO_TooManyMessages = SevInfo | 0x000D;
+
+  static Error_FileTypeNotFound = (o:{ext:string}) => m(this.ERROR_FileTypeNotFound,
+    `A file of type ${o.ext} was not found in the project.`);
+  static ERROR_FileTypeNotFound = SevError | 0x000E;
 }
 
