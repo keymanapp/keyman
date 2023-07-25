@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.141 stable 2023-07-25
+
+* chore(mac): fix corrupt installer (#9332)
+
 ## 16.0.140 stable 2023-07-21
 
 * chore(linux): Update debian changelog (#8451)
