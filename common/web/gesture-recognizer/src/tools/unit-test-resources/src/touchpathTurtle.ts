@@ -76,6 +76,7 @@ export class TouchpathTurtle<HoveredItemType> extends EventEmitter<EventMap<Hove
       this.emit('sample', pending);
     }
     this.pendingSample = null;
+    return pending;
   }
 
   protected trackSample(sample: InputSample<HoveredItemType>) {
@@ -102,23 +103,20 @@ export class TouchpathTurtle<HoveredItemType> extends EventEmitter<EventMap<Hove
      */
   }
 
-  wait(totalTime: number, repeatInterval: number) {
-    if(repeatInterval < 0 || totalTime < 0) {
+  wait(totalTime: number, sampleCount: number) {
+    if(sampleCount <= 0 || totalTime < 0) {
       throw new Error("Invalid parameter value:  may not be negative!");
     }
 
     const startSample = this.location;
+    const timeDelta = totalTime / sampleCount;
 
     // Base sample always exists in advance.
-    for(let timeDelta = 0; timeDelta < totalTime; timeDelta += repeatInterval) {
+    for(let i = 1; i <= sampleCount; i++) {
       let sample = {...startSample};
-      sample.t += timeDelta;
+      sample.t += timeDelta * i;
       this.trackSample(sample);
     }
-
-    let currentSample = {...startSample};
-    currentSample.t += totalTime;
-    this.trackSample(currentSample);
   }
 
   move(angleInDegrees: number, distance: number, time: number, sampleCount: number) {
