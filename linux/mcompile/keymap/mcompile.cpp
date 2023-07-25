@@ -210,7 +210,7 @@ const UINT VKShiftState[] = {0, 1, 2,0xFFFF};
 // _S2 shiftstate from systems-file
 
 void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, DWORD vk, UINT shift, KMX_WCHAR ch) {
-  wprintf(L"KMX_TranslateKeyboard not implemented yet\n");
+  //wprintf(L"KMX_TranslateKeyboard not implemented yet\n");
 }
 
 KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
@@ -332,7 +332,6 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
   if(createVectorForBothKeyboards(All_Vector,keymap) )
       printf("ERROR: can't createVectorForBothKeyboards\n");
 
-
 //--------------------------------------------------------------------------------
 
   for (int j = 1; VKShiftState[j] != 0xFFFF; j++) {   // I4651
@@ -340,11 +339,10 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
     // Go through each possible key on the keyboard
     for (int i = 0;VKMap_US_Keysym[i]; i++) {   // I4651
       int vkUnderlying = KMX_VKUSToVKUnderlyingLayout(All_Vector,(int) VKMap_US_Keysym[i] );
-      wprintf(L"    !!!!! KMX_VKUSToVKUnderlyingLayout xx  in:  :%i --->  %i " , (int) VKMap_US_Keysym[i],  vkUnderlying );
 
       KMX_WCHAR ch = KMX_CharFromVK(All_Vector,vkUnderlying, VKShiftState[j], &DeadKey);
-      wprintf(L"   ( %i )  ---   :%i ---- >  %i  ( %i)\n",  VKShiftState[j] , vkUnderlying, ch , ( vkUnderlying-ch));
 
+      wprintf(L"    KMX_VKUSToVKUnderlyingLayout/KMX_CharFromVK i:  %i (VKMap_US_Keysym): %i (%c)  --->  vkUnderlying: %i (%c)    shiftstate: ( %i )   ---- >  ch: %i (%c) ( %i)  %ls\n" , i,(int) VKMap_US_Keysym[i],(int)VKMap_US_Keysym[i],  vkUnderlying,vkUnderlying, VKShiftState[j] ,  ch ,ch , ( vkUnderlying-ch), ((int) vkUnderlying != (int) VKMap_US_Keysym[i] ) ? L" *** ": L"");
       //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
 
       if(bDeadkeyConversion) {   // I4552
