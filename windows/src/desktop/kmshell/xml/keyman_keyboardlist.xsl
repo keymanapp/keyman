@@ -163,26 +163,29 @@
                   <xsl:with-param name="id">share_<xsl:value-of select="id"/></xsl:with-param>
                   <xsl:with-param name="className">kbd_button</xsl:with-param>
                   <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Keyboard_Share']"/></xsl:with-param>
-                  <xsl:with-param name="command">javascript:showKeyboardLink('<xsl:value-of select="../../id" />')</xsl:with-param>
+                  <xsl:with-param name="command">javascript:showKeyboardLink('<xsl:value-of select="id" />')</xsl:with-param>
                 </xsl:call-template>
                 <div class='qrcode'>
-                  <xsl:attribute name='id'>qrcode-<xsl:value-of select="../../id" /></xsl:attribute>
+                  <!-- Use the keyboard id to ensure unique id -->
+                  <xsl:attribute name='id'>qrcode-<xsl:value-of select="id" /></xsl:attribute>
                   <div class='qrcode_back'>
-                    <xsl:attribute name="onclick">return hideKeyboardLink('<xsl:value-of select="../../id" />')</xsl:attribute>
+                    <xsl:attribute name="onclick">return hideKeyboardLink('<xsl:value-of select="id" />')</xsl:attribute>
                   </div>
                   <div class='qrcode_popup'>
                     <div>
-                      <xsl:attribute name='id'>qrcode-img-<xsl:value-of select="../../id" /></xsl:attribute>
+                      <!-- Use the keyboard id to ensure unique xml id -->
+                      <xsl:attribute name='id'>qrcode-img-<xsl:value-of select="id" /></xsl:attribute>
                     </div>
                     <div class='qrcode_caption'>
                       <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_QRCode']"/>&#160;
                       <a>
+                        <!-- Use the package id for the actual URL link -->
                         <xsl:attribute name="href">keyman:link?url=<xsl:value-of select="/Keyman/keyman-com" />/go/keyboard/<xsl:value-of select="../../id" />/share</xsl:attribute>
                         <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_Link']"/>
                       </a>
                       <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_LinkSuffix']"/>
                     </div>
-                    <script>new QRCode(document.getElementById("qrcode-img-<xsl:value-of select="../../id"/>"), {
+                    <script>new QRCode(document.getElementById("qrcode-img-<xsl:value-of select="id"/>"), {
                         text: '<xsl:value-of select="/Keyman/keyman-com" />/go/keyboard/<xsl:value-of select="../../id"/>/share',
                         width: 256,
                         height: 256

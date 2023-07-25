@@ -35,14 +35,16 @@ builder_describe "Build KeyboardHarness test app for Android." \
 # parse before describe outputs to check debug flags  
 builder_parse "$@"
 
+ARTIFACT="app-release-unsigned.apk"
+
 if builder_is_debug_build; then
   builder_heading "### Debug config ####"
   CONFIG="debug"
   BUILD_FLAGS="assembleDebug -x lint -x test"
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
+  ARTIFACT="app-$CONFIG.apk"
 fi
 
-ARTIFACT="app-$CONFIG.apk"
 
 builder_describe_outputs \
   configure    /android/Tests/KeyboardHarness/app/libs/keyman-engine.aar \

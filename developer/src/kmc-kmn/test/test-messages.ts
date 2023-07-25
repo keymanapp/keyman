@@ -5,12 +5,13 @@ import { CompilerMessages } from '../src/compiler/messages.js';
 import { TestCompilerCallbacks, verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { KmnCompiler } from '../src/main.js';
+import { CompilerErrorNamespace } from '@keymanapp/common-types';
 
 describe('CompilerMessages', function () {
   const callbacks = new TestCompilerCallbacks();
 
   it('should have a valid CompilerMessages object', function() {
-    return verifyCompilerMessagesObject(CompilerMessages);
+    return verifyCompilerMessagesObject(CompilerMessages, CompilerErrorNamespace.KmnCompiler);
   });
 
   //

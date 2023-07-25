@@ -35,7 +35,7 @@ window.addEventListener('load', function() {
     ? window.location.href.substr(0, window.location.href.lastIndexOf('/')+1)
     : window.location.href;
 
-  keyman.modelManager.register({
+  keyman.addModel({
     id: 'nrc.en.mtnt',
     languages: ['en'],
     path: pageRef + 'dmg.dv.test.model.js'

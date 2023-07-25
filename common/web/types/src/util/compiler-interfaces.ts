@@ -15,8 +15,13 @@ export enum CompilerErrorSeverity {
   Error =         0x300000, // Severe error where we can't continue
   Fatal =         0x400000, // OOM or should-not-happen internal problem
 
-  Severity_Mask = 0xF00000, // includes reserved bits
-  Error_Mask =    0x0FFFFF,
+  // Mask values for mapping compiler errors
+  // TODO: make this a separate enum?
+  Severity_Mask =  0x00F00000,  // includes reserved bits, 16 possible severity levels
+  Error_Mask =     0x000FFFFF,  // error | namespace
+  Namespace_Mask = 0x000FF000,  // 256 possible namespaces
+  BaseError_Mask = 0x00000FFF,  // error code, 2,048 possible error codes per namespace
+  Reserved_Mask  = 0xFF000000,  // do not use these error values at this time
 };
 
 export function compilerErrorSeverityName(code: number): string {

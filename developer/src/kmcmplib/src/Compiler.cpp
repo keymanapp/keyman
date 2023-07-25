@@ -75,7 +75,7 @@
 #include "versioning.h"
 #include "kmcmplib.h"
 #include "DeprecationChecks.h"
-
+#include "cp1252.h"
 #include "virtualcharkeys.h"
 
 // TODO: These three should be under common/cpp/include -- not windows specific
@@ -3405,8 +3405,6 @@ bool hasPreamble(std::u16string result) {
   return result.size() > 0 && result[0] == 0xFEFF;
 }
 
-#include "unicode/ucnv.h"
-
 bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int *sz16) {
   if(sz == 0) {
     return FALSE;
@@ -3418,22 +3416,11 @@ bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int *sz16)
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
     result = converter.from_bytes((char*)infile, (char*)infile+sz);
   } catch(std::range_error e) {
-    UErrorCode status = U_ZERO_ERROR;
-    // TODO: we need ICU data files here #8884
-    UConverter* conv = ucnv_open("windows-1252", &status);
-    if(U_FAILURE(status)) {
-      return FALSE;
+    AddCompileError(CHINT_NonUnicodeFile);
+    result.resize(sz);
+    for(int i = 0; i < sz; i++) {
+      result[i] = CP1252_UNICODE[infile[i]];
     }
-
-    char16_t* dest = new char16_t[sz*2];
-    ucnv_toUChars(conv, dest, sz*2, (char*)infile, sz, &status);
-    if(U_FAILURE(status)) {
-      delete[] dest;
-      return FALSE;
-    }
-
-    result = dest;
-    delete[] dest;
   }
 
   if(hasPreamble(result)) {

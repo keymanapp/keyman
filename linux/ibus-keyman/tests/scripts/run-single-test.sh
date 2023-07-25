@@ -9,8 +9,8 @@ if [ -v KEYMAN_PKG_BUILD ]; then
   # ibus requires to find /var/lib/dbus/machine-id or /etc/machine-id, otherwise it fails with:
   # "Bail out! IBUS-FATAL-WARNING: Unable to load /var/lib/dbus/machine-id: Failed to open file
   # “/var/lib/dbus/machine-id”: No such file or directory"
-  echo "1..1"
-  echo "ok 1 - Integration tests # SKIP on package build"
+  echo "TAP version 14"
+  echo "1..0  # SKIP on package build"
   exit 0
 fi
 
@@ -38,10 +38,13 @@ function help() {
 }
 
 function run_tests() {
-  echo "# NOTE: When the tests fail check /tmp/ibus-engine-keyman.log and /tmp/ibus-daemon.log!"
-  echo ""
+  # Output these lines to stderr - the first line on stdout has to be the TAP version number
+  # which running ${TESTFILE} outputs
+  echo "# NOTE: When the tests fail check /tmp/ibus-engine-keyman.log and /tmp/ibus-daemon.log!" >&2
+  echo "" >&2
 
-  echo "# Starting tests..."
+  echo "# Starting tests..." >&2
+
   # Note: -k and --tap are consumed by the GLib testing framework
   # shellcheck disable=SC2086
   "${G_TEST_BUILDDIR:-.}"/ibus-keyman-tests ${ARG_K-} ${ARG_TAP-} \

@@ -23,16 +23,28 @@
 #ifndef _kmn_compiler_errors_h
 #define _kmn_compiler_errors_h
 
-// Note: these are not be a bitmask
+// Compiler Error Masks
+
+#define CERR_SEVERITY_MASK                                 0x0000F000
+#define CERR_MESSAGE_MASK                                  0x00000FFF
+#define CERR_MASK                                          0x0000FFFF
+
+// Severity codes
+//
+// Note: these may not be combined, and are not a bitmask, for historical
+// reasons they are separate bits
 #define CERR_FATAL                                         0x00008000
 #define CERR_ERROR                                         0x00004000
 #define CERR_WARNING                                       0x00002000
 #define CERR_HINT                                          0x00001000
+#define CERR_INFO                                          0x00000000
 
-// Any messages from the lexical model compiler occupy this range:
-#define CERR_LEXICAL_MODEL_MIN                             0x00000800
-#define CERR_LEXICAL_MODEL_MAX                             0x000008FF
-
+// Message codes
+//
+// All errors here and below are mirrored in kmc-kmn/src/compiler/messages.ts;
+// if you add a new error here be sure to update that file also. Note that this
+// correlation is currently maintained manually. All values must be below
+// 0x1000 (exclusive of severity code).
 #define CERR_None                                          0x00000000
 #define CERR_EndOfFile                                     0x00000001
 

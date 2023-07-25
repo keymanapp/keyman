@@ -1,7 +1,7 @@
 import gettext
+import logging
 
 from keyman_config.sentry_handling import SentryErrorHandling
-
 from keyman_config.version import (
   __version__,
   __versionwithtag__,
@@ -36,6 +36,30 @@ def secure_lookup(data, key1, key2=None):
     return None
 
 
+def initialize_logging(args):
+    if args.verbose:
+        logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(message)s')
+    elif args.veryverbose:
+        logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(message)s')
+    else:
+        logging.basicConfig(format='%(levelname)s:%(message)s')
+
+
+def initialize_sentry():
+    SentryErrorHandling().initialize_sentry()
+
+
+def add_standard_arguments(parser):
+    if __pkgversion__:
+        versionstring = f"{__versionwithtag__} (package version {__pkgversion__})"
+    else:
+        versionstring = f"{__versionwithtag__}"
+
+    parser.add_argument('--version', action='version', version=f'%(prog)s version {versionstring}')
+    parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
+    parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
+
+
 gettext.bindtextdomain('keyman-config', '/usr/share/locale')
 gettext.textdomain('keyman-config')
 
@@ -53,5 +77,3 @@ KeymanApiUrl = 'https://api.keyman.com'
 
 # There's no staging site for downloads
 KeymanDownloadsUrl = 'https://downloads.keyman.com'
-
-SentryErrorHandling().initialize_sentry()

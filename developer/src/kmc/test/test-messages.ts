@@ -4,10 +4,11 @@ import { InfrastructureMessages } from '../src/messages/messages.js';
 import { verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { NodeCompilerCallbacks } from '../src/messages/NodeCompilerCallbacks.js';
+import { CompilerErrorNamespace } from '@keymanapp/common-types';
 
 describe('InfrastructureMessages', function () {
   it('should have a valid InfrastructureMessages object', function() {
-    return verifyCompilerMessagesObject(InfrastructureMessages);
+    return verifyCompilerMessagesObject(InfrastructureMessages, CompilerErrorNamespace.Infrastructure);
   });
 
   //

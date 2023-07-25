@@ -1,12 +1,31 @@
 {
   "name": "@keymanapp/lexical-model-layer",
   "description": "Keyman/Predictive Text integration layer",
-  "main": "build/index.js",
+  "main": "build/obj/node/index.js",
+  "exports": {
+    ".": {
+      "node": {
+        "types": "./build/obj/node/index.d.ts",
+        "import": "./build/obj/index.js"
+      },
+      "default": {
+        "types": "./build/obj/web/index.d.ts",
+        "import": "./build/obj/web/index.js"
+      }
+    },
+    "./node": "./build/obj/node/index.js",
+    "./web": "./build/obj/web/index.js",
+    "./build/obj/node/index.js": "./build/obj/node/index.js",
+    "./build/obj/web/index.js": "./build/obj/web/index.js"
+  },
+  "imports": {
+    "#./*.js": "./build/obj/*.js",
+    "#./node/*.js": "./build/obj/node/*.js",
+    "#./web/*.js": "./build/obj/web/*.js"
+  },
+  "type": "module",
   "scripts": {
-    "karma": "karma",
-    "mocha": "mocha",
-    "test": "gosh ./unit_tests/test.sh",
-    "tsc": "tsc"
+    "test": "gosh ./unit_tests/test.sh"
   },
   "repository": {
     "type": "git",

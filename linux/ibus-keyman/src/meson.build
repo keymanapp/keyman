@@ -1,6 +1,7 @@
 util_files = files(
   'keymanutil.c',
   'kmpdetails.c',
+  'bcp47util.c',
 )
 
 engine_files = files(
@@ -16,7 +17,7 @@ include_dirs = [
   include_directories(meson.current_build_dir() / '..'),
 ]
 
-deps = [ibus, gtk, json_glib, kmnkbp_lib, systemd]
+deps = [gtk, ibus, icu, json_glib, kmnkbp_lib, systemd]
 
 prefix = get_option('prefix')
 cfg = configuration_data()

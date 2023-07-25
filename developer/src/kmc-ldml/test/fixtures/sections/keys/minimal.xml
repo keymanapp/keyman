@@ -8,11 +8,12 @@
 
   <keys>
     <key id="grave" to="🪦" />
+    <key id="mistake" to="oops" />
   </keys>
 
   <layers form="us">
     <layer id="base">
-      <row keys="grave" />
+      <row keys="grave mistake" />
     </layer>
   </layers>
 

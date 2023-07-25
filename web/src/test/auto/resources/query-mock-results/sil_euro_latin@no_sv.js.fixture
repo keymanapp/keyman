@@ -1,0 +1,52 @@
+keyman.register({
+  "options": {
+      "context": "keyboard",
+      "dateFormat": "standard",
+      "device": "any",
+      "keyboardBaseUri": "https://s.keyman.com/keyboard/",
+      "fontBaseUri": "https://s.keyman.com/font/deploy/",
+      "keyboardid": "sil_euro_latin@no,sil_euro_latin@sv",
+      "keyboardVersion": "current"
+  },
+  "keyboard": [{
+      "id": "sil_euro_latin",
+      "name": "EuroLatin (SIL)",
+      "filename": "sil_euro_latin/2.0.3/sil_euro_latin-2.0.3.js",
+      "version": "2.0.3",
+      "source": "https://github.com/keymanapp/keyboards/tree/master/release/sil/sil_euro_latin",
+      "devices": {
+          "phone": 2,
+          "tablet": 2,
+          "desktop": 2
+      },
+      "languages": [{
+          "id": "no",
+          "name": "Norwegian",
+          "region": 4,
+          "font": {
+              "family": "LatinWeb",
+              "source": ["DejaVuSans.ttf", "DejaVuSans.mobileconfig"]
+          }
+      }]
+  }, {
+      "id": "sil_euro_latin",
+      "name": "EuroLatin (SIL)",
+      "filename": "sil_euro_latin/2.0.3/sil_euro_latin-2.0.3.js",
+      "version": "2.0.3",
+      "source": "https://github.com/keymanapp/keyboards/tree/master/release/sil/sil_euro_latin",
+      "devices": {
+          "phone": 2,
+          "tablet": 2,
+          "desktop": 2
+      },
+      "languages": [{
+          "id": "sv",
+          "name": "Swedish",
+          "region": 4,
+          "font": {
+              "family": "LatinWeb",
+              "source": ["DejaVuSans.ttf", "DejaVuSans.mobileconfig"]
+          }
+      }]
+  }]
+});

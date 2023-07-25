@@ -19,7 +19,7 @@
     "src/**/*.ts"
   ],
   "references": [
-    { "path": "../../../common/web/keyman-version/tsconfig.esm.json" },
+    { "path": "../../../common/web/keyman-version" },
     { "path": "../../../common/web/types/" },
     { "path": "../kmc-kmn/" },
     { "path": "../../../core/include/ldml/"},

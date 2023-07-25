@@ -83,7 +83,7 @@ function help_product_path {
 function generate_markdown_help {
   if [ $platform == 'linux' ]; then
     pushd $KEYMAN_ROOT/linux/keyman-config > /dev/null
-    ./build-help.sh --md
+    ./build.sh build
     popd
   fi
 }

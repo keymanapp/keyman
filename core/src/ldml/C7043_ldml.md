@@ -87,20 +87,20 @@ Each element string is made up of elements with the following item structure:
 | 0 |  32  | element   | str: output string OR UTF-32LE codepoint                 |
 | 4 |  32  | flags     | flags and order values                                   |
 
-- `element`: either a UnicodeSet stored in a `strs` section entry, or a UTF-32LE
-  codepoint; see also `unicode_set` flag.
+- `element`: either a UnicodeSet stored in a `strs` section entry, a UTF-32LE
+  codepoint, or a `uset` section entry. see also `type` flag.
 - `flags`: a 32-bit bitfield defined as below:
 
-  | Bit position | Meaning       | Description                      |
-  |--------------|---------------|----------------------------------|
-  |       0      | unicode_set   | `element` is 0: UTF-32LE, 1: str |
-  |       1      | tertiary_base | 1: tertiary_base is true         |
-  |       2      | prebase       | 1: prebase is true               |
-  |      3-15    | reserved      | reserved                         |
-  |     16-23    | order         | signed int: -128 to +127         |
-  |     24-31    | tertiary      | signed int: -128 to +127         |
+  | Bit position | Meaning       | Description                               |
+  |--------------|---------------|-------------------------------------------|
+  |      0-1     | type          | `element` is 0: UTF-32LE, 1: str, 2: uset |
+  |       2      | tertiary_base | 1: tertiary_base is true                  |
+  |       3      | prebase       | 1: prebase is true                        |
+  |      4-15    | reserved      | reserved                                  |
+  |     16-23    | order         | signed int: -128 to +127                  |
+  |     24-31    | tertiary      | signed int: -128 to +127                  |
 
-  For transforms, only `flags.unicode_set` will be used. The remaining flags are
+  For transforms and sets, only `flags.type` will be used. The remaining flags are
   used for reorders, `from` attribute only.
 
 ### C7043.2.4 Removed: `finl`
@@ -259,8 +259,8 @@ For each transform in the subtable:
 |---|------|---------|------------------------------------------|
 | 0+|  32  | from    | str: processed regex of from= side       |
 | 4+|  32  | to      | str: output pattern                      |
-| 8+|  32  | mapFrom | elem: If not 0, elem of set var for $1   |
-| 8+|  32  | mapTo   | elem: If not 0, elem of set var for $1   |
+| 8+|  32  | mapFrom | str: name of set variable for 'from' $1  |
+| 8+|  32  | mapTo   | str: name of set variable for 'to'  $1   |
 
 - `from`: the source text, index into `elem` section.
 - `to`: sequence of Unicode codepoints that replace `from`. May be the null
@@ -271,6 +271,9 @@ For each transform in the subtable:
   - replace the entire matched `from` regex with the same indexed value in `mapTo`
   - `to` will be null in this case
   - Debugging note: The variables table can be searched for matching `elem` pointers.
+  - For example, from="($[upper])" to="$[1:lower]" will result in:
+    mapFrom: "upper"
+    mapTo:   "lower"
 
 ### C7043.2.11.2 `tran.reorders` subtable
 
@@ -574,7 +577,53 @@ For each variable,
   -  1 : set
   -  2 : unicodeSet
 
+TODO-LDML: note that at present, unicodeSet variables are not stored using the `uset` type
+
 Items are sorted by id
+
+### C7043.2.18 `uset` UnicodeSets table
+
+This table contains serialized [UnicodeSet](http://www.unicode.org/reports/tr35/#Unicode_Sets)s,
+together with their original patterns.  Each UnicodeSet is converted into an array of ranges.
+Per the Keyboard spec, sets with multi-character strings are not allowed.
+
+For example, `[a-c q]` would be converted into the two ranges (U+0061-U+0063) and (U+0071-U+0071),
+the latter being the single codepoint `q`.
+
+| ∆ | Bits | Name          | Description                              |
+|---|------|---------------|------------------------------------------|
+| 0 |  32  | ident         | `uset`                                   |
+| 4 |  32  | size          | int: Length of section                   |
+| 8 |  32  | usetCount     | int: Total number of range lists         |
+|12 |  32  | rangeCount    | int: Total number of range elements      |
+|16 | var  | usets         | uset list sub-table                      |
+| - | var  | ranges        | range sub-table                          |
+
+#### `uset.usets` sub-table
+
+Each entry in this subtable represents a UnicodeSet, and is referenced by
+index by other tables.
+
+| ∆ | Bits | Name    | Description                         |
+|---|------|---------|------------------------------------ |
+| 0+|  32  | range   | int: Index into 'ranges' subtable   |
+| 4+|  32  | count   | int: Number of ranges in this set   |
+| 8+|  32  | pattern | str: UnicodeSet as string           |
+
+The usets are sorted in order of their pattern string's binary
+order.
+
+#### `uset.ranges` sub-table
+
+Each represents a UnicodeSet
+
+| ∆ | Bits | Name    | Description                         |
+|---|------|---------|------------------------------------ |
+| 0+|  32  | start   | int: UTF-32 char start              |
+| 4+|  32  | end     | int: UTF-32 char end                |
+
+`start` is always <= `end`. `start` and `end` may be equal if a single codepoint
+is represented.
 
 ## TODO-LDML: various things that need to be completed here or fixed in-spec
 > * spec: ABNT2 key has hex value 0xC1 (even if kbdus.dll doesn't produce that)

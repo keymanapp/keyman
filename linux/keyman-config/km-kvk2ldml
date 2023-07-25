@@ -5,7 +5,8 @@ import logging
 import os
 import sys
 
-from keyman_config import __version__
+from keyman_config import add_standard_arguments, initialize_logging, initialize_sentry
+from keyman_config.kvk2ldml import parse_kvk_file, print_kvk, convert_ldml, output_ldml
 
 
 def main():
@@ -16,19 +17,12 @@ def main():
     parser.add_argument('-k', "--keys", help='if printing also print all keys', action="store_true")
     parser.add_argument('kvkfile', help='kvk file')
     parser.add_argument('-o', '--output', metavar='LDMLFILE', help='output LDML file location')
-    parser.add_argument('--version', action='version', version='%(prog)s version ' + __version__)
-    parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
-    parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
+    add_standard_arguments(parser)
 
     args = parser.parse_args()
-    if args.verbose:
-        logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(message)s')
-    elif args.veryverbose:
-        logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(message)s')
-    else:
-        logging.basicConfig(format='%(levelname)s:%(message)s')
 
-    from keyman_config.kvk2ldml import parse_kvk_file, print_kvk, convert_ldml, output_ldml
+    initialize_logging(args)
+    initialize_sentry()
 
     name, ext = os.path.splitext(args.kvkfile)
     # Check if input file extension is kvk

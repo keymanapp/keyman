@@ -23,7 +23,7 @@
     </style>
 
     <!-- Insert uncompiled KeymanWeb source scripts -->
-    <script src="../../../../../build/app/web/debug/keymanweb.js" type="application/javascript"></script>
+    <script src="../../../../../build/publish/debug/keymanweb.js" type="application/javascript"></script>
 
     <!--
       For desktop browsers, a script for the user interface must be inserted here.
@@ -32,17 +32,17 @@
       The toolbar UI is best for any page designed to support keyboards for
       a large number of languages.
     -->
-    <script src="../../../../../build/app/ui/debug/kmwuitoggle.js"></script>
+    <script src="../../../../../build/publish/debug/kmwuitoggle.js"></script>
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
       var kmw=window.keyman;
       kmw.init({
         attachType:'auto'
-        });
-      kmw.addKeyboards(
-        {id:'issue160',name:'Issue 160',languages:{id:'en',name:'English'}, filename:'./issue160.js'}
-        );
+      });
+      kmw.addKeyboards({
+        id:'issue160',name:'Issue 160',languages:{id:'en',name:'English'}, filename:'./issue160.js'
+      });
     </script>
 
 

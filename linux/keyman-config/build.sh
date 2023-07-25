@@ -16,6 +16,7 @@ builder_describe \
   "test" \
   "install                   install artifacts" \
   "uninstall                 uninstall artifacts" \
+  "--no-integration          don't run integration tests"
 
 builder_parse "$@"
 

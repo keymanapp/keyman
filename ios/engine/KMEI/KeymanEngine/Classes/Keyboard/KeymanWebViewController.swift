@@ -336,7 +336,7 @@ extension KeymanWebViewController {
   }
 
   func deregisterLexicalModel(_ lexicalModel: InstallableLexicalModel) {
-    webView!.evaluateJavaScript("keyman.modelManager.deregister(\"\(lexicalModel.id)\")")
+    webView!.evaluateJavaScript("keyman.removeModel(\"\(lexicalModel.id)\")")
   }
 
   func registerLexicalModel(_ lexicalModel: InstallableLexicalModel) throws {
@@ -397,7 +397,7 @@ extension KeymanWebViewController {
       webView!.evaluateJavaScript("enableSuggestions(\(stubString), \(predict), \(correct))")
       self.activeModel = predict
     } else {  // We're registering a model in the background - don't change settings.
-      webView!.evaluateJavaScript("keyman.registerModel(\(stubString));", completionHandler: nil)
+      webView!.evaluateJavaScript("keyman.addModel(\(stubString));", completionHandler: nil)
     }
 
     setBannerHeight(to: Int(InputViewController.topBarHeight))

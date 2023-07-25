@@ -5,13 +5,14 @@ import { CompilerMessages } from '../src/compiler/messages.js';
 import { makePathToFixture } from './helpers/index.js';
 import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
 import { PackageValidation } from '../src/compiler/package-validation.js';
+import { CompilerErrorNamespace } from '@keymanapp/common-types';
 
 const debug = false;
 const callbacks = new TestCompilerCallbacks();
 
 describe('CompilerMessages', function () {
   it('should have a valid CompilerMessages object', function() {
-    return verifyCompilerMessagesObject(CompilerMessages);
+    return verifyCompilerMessagesObject(CompilerMessages, CompilerErrorNamespace.PackageCompiler);
   });
 
 

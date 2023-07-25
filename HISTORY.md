@@ -1,5 +1,158 @@
 # Keyman Version History
 
+## 17.0.146 alpha 2023-07-24
+
+* chore(deps-dev): bump word-wrap from 1.2.3 to 1.2.4 (#9314)
+
+## 17.0.145 alpha 2023-07-21
+
+* fix(linux): Fix logging (#9310)
+* fix(windows): open pdf in an external browser (#9295)
+* fix(linux): Fix installation of keyboards with lang tag `mul` (#9027)
+* fix(web): allows registering precached keyboards (#9304)
+
+## 17.0.144 alpha 2023-07-20
+
+* refactor(linux): Use better way to get username (#9313)
+
+## 17.0.143 alpha 2023-07-19
+
+*  (#9292)
+* docs(linux): Update man page and remove do-nothing option (#9291)
+* docs(linux): Update documentation (#9277)
+
+## 17.0.142 alpha 2023-07-17
+
+* chore(windows): disable wix compression for debug builds (#9074)
+
+## 17.0.141 alpha 2023-07-15
+
+* feat(core): implement reorder (#9223)
+* chore(common): add BUILDER_STR_REF (#9248)
+* feat(core): load reorder from kmx+, test case (#9260)
+
+## 17.0.140 alpha 2023-07-14
+
+*  (#9008)
+
+## 17.0.139 alpha 2023-07-13
+
+*  (#9259)
+* chore(linux): Add unit tests for dconf_util.py (#9215)
+* refactor(linux): Refactor image loading (#9245)
+
+## 17.0.138 alpha 2023-07-11
+
+* chore: Update standards data (#9193)
+* chore(linux): Trigger Linux integration tests (#9221)
+
+## 17.0.137 alpha 2023-07-10
+
+* chore: authenticate github request when triggering test builds (#9225)
+* feat(web): logs enhanced debug info for error reports (#9217)
+* fix(web): silences low-priority warning that shows up in iOS kbd init (#9206)
+
+## 17.0.136 alpha 2023-07-07
+
+* chore(common): Update crowdin strings for Kibaku (#9214)
+* feat(core): kmxplus uset implementation in core (#9197)
+* chore(linux): Add support for `--no-integration` flag to build files (#9212)
+*  (#9196)
+
+## 17.0.135 alpha 2023-07-06
+
+*  (#9195)
+* chore(ios): minor build-script cleanup (#9201)
+* chore(linux): Allow to run tests without integration tests (#9192)
+* fix(web): sentry sourcemapping round 2 - yesterday's 'fix' unfortunately doesn't upload the maps (#9199)
+* chore(web): normalizes sourcemap paths for cleaner Sentry reports (#9200)
+* feat(linux): Allow to install keyboard for multiple languages (#9017)
+
+## 17.0.134 alpha 2023-07-05
+
+* fix(linux): Fix packaging GHA (#9172)
+* chore(ios): standardizes iOS build scripts (#9092)
+* fix(web): fixes up Web's InlinedOSK manual test page (#9175)
+* fix(web): re-establishes web srcmap uploading (#9179)
+* refactor(linux): Code refactoring (#9129)
+* refactor(linux): Extract methods (#9168)
+* fix(linux): Fix vertical alignment of labels in About dialog (#9167)
+* fix(linux): Add scrollbar to About dialog (#9166)
+* fix(linux): Remove tags from package description (#9165)
+* docs(linux): Update readme (#9190)
+* feat(developer): uset in element string (#9144)
+* fix(developer): improve coverage, add todos (#9170)
+* chore(developer): refactor so KmnCompiler only created once within kmc (#9171)
+* fix(common): support multichar escapes in element sets (#9173)
+* chore(linux): Update docker builds (#9188)
+
+## 17.0.133 alpha 2023-07-04
+
+* feat(common): add segmenter for element strings (#9141)
+* fix(windows): adds an extra row for Change Hotkey text label (#9149)
+* fix(linux): Another attempt to fix packaging GHA (#9155)
+* fix(linux): Fix packaging GHA (#9164)
+* fix(linux): Fix packaging GHA (#9169)
+
+## 17.0.132 alpha 2023-06-30
+
+* docs(mac): Update requirements.md (#9137)
+* fix(linux): Fix GHA package builds for non-Jammy dists (#9123)
+* fix(linux): Fix packaging GHA (#9142)
+
+## 17.0.131 alpha 2023-06-27
+
+* feat(developer,common,core): ldml UTF-32 literals in binary (#9084)
+* fix(web): fixes Web build zip artifact construction (#9096)
+
+## 17.0.130 alpha 2023-06-26
+
+* chore(deps): bump semver from 7.3.8 to 7.5.2 (#9085)
+* epic: conversion of Keyman Engine for Web to ES modules (#8560)
+
+## 17.0.129 alpha 2023-06-23
+
+* chore(common): Update crowdin strings for Spanish (es-ES and es-419) (#9040)
+* chore(android/app): Address some pre-launch accessibility report warnings (#9070)
+* fix(windows): support kmxplus in mcompile (#9071)
+* fix(core): fix ldml transforms (#9072)
+* feat(common,developer,core): add uset section (#9049)
+
+## 17.0.128 alpha 2023-06-22
+
+*  (#9061)
+* docs(windows): add more steps for clarity (#9063)
+
+## 17.0.127 alpha 2023-06-21
+
+* feat(core): implementation of non-regex components of tran (#9019)
+* chore: enable common ci for web (#9047)
+
+## 17.0.126 alpha 2023-06-19
+
+* chore(mac): move from altool to notarytool (#9010)
+
+## 17.0.125 alpha 2023-06-17
+
+* fix(android/samples): Cleanup Sample/Tests apk's (#9030)
+* chore(common): Bump crowdin github action to 1.3.2 (#9029)
+
+## 17.0.124 alpha 2023-06-14
+
+* fix(windows): qr code id uses keyboard name and not package name (#9002)
+* refactor(linux): Extract widgets to separate classes and files (#9007)
+
+## 17.0.123 alpha 2023-06-13
+
+* chore(developer): support cp1252 'ansi' keyboards (#8988)
+* fix(developer): keep kmc-kmn messages within namespace (#8999)
+* fix(linux): Fix display of installed keyboard version (#8948)
+* fix(linux): Fix creation of markdown help files for Linux (#9001)
+
+## 17.0.122 alpha 2023-06-12
+
+* refactor(developer): import kmcmplib errors into kmc-kmn (#8962)
+
 ## 17.0.121 alpha 2023-06-09
 
 * fix(linux): Fix disabling of buttons (#8946)

@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/keymanapp/keyman.git"
   },
-  "author": "Joshua A. Horton <jahorton@sil.org>",
+  "author": "Joshua A. Horton <joshua_horton@sil.org>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/keymanapp/keyman/issues"

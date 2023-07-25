@@ -331,6 +331,12 @@
 		9A3D6C5C221531B0008785A3 /* KMOSVersion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMOSVersion.m; sourceTree = "<group>"; };
 		A71FD8BA8404531DFBD861B6 /* Pods_KeymanTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KeymanTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B644E63217FFE54B91C71C94 /* Pods_Keyman.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Keyman.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CEFFECD82A417FEA00D58C36 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/KMAboutWindowController.strings; sourceTree = "<group>"; };
+		CEFFECD92A417FEB00D58C36 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/preferences.strings; sourceTree = "<group>"; };
+		CEFFECDA2A417FEB00D58C36 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/KMInfoWindowController.strings; sourceTree = "<group>"; };
+		CEFFECDB2A417FEC00D58C36 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/KMKeyboardHelpWindowController.strings; sourceTree = "<group>"; };
+		CEFFECDC2A417FEC00D58C36 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		CEFFECDD2A4180FD00D58C36 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E211769B20E1826800F8065D /* NoContextTestClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NoContextTestClient.h; sourceTree = "<group>"; };
 		E211769C20E182DD00F8065D /* NoContextTestClient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NoContextTestClient.m; sourceTree = "<group>"; };
 		E211769E20E18C0B00F8065D /* AppleCompliantTestClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleCompliantTestClient.h; sourceTree = "<group>"; };
@@ -783,6 +789,7 @@
 				sv,
 				uk,
 				ru,
+				es,
 			);
 			mainGroup = 989C9BFF1A7876DE00A20425;
 			productRefGroup = 989C9C091A7876DE00A20425 /* Products */;
@@ -1035,6 +1042,7 @@
 				298566C82980C9AD004ACA95 /* sv */,
 				298566D42980D47C004ACA95 /* uk */,
 				298566E02980E579004ACA95 /* ru */,
+				CEFFECD82A417FEA00D58C36 /* es */,
 			);
 			name = KMAboutWindowController.xib;
 			sourceTree = "<group>";
@@ -1060,6 +1068,7 @@
 				298566C92980C9AD004ACA95 /* sv */,
 				298566D52980D47D004ACA95 /* uk */,
 				298566E12980E579004ACA95 /* ru */,
+				CEFFECD92A417FEB00D58C36 /* es */,
 			);
 			name = preferences.xib;
 			path = Keyman4MacIM/KMConfiguration;
@@ -1085,6 +1094,7 @@
 				298566CD2980C9B9004ACA95 /* sv */,
 				298566D92980D489004ACA95 /* uk */,
 				298566E52980E584004ACA95 /* ru */,
+				CEFFECDD2A4180FD00D58C36 /* es */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1110,6 +1120,7 @@
 				298566CA2980C9AD004ACA95 /* sv */,
 				298566D62980D47D004ACA95 /* uk */,
 				298566E22980E57A004ACA95 /* ru */,
+				CEFFECDA2A417FEB00D58C36 /* es */,
 			);
 			name = KMInfoWindowController.xib;
 			path = Keyman4MacIM/KMInfoWindow;
@@ -1136,6 +1147,7 @@
 				298566CB2980C9AE004ACA95 /* sv */,
 				298566D72980D47D004ACA95 /* uk */,
 				298566E32980E57A004ACA95 /* ru */,
+				CEFFECDB2A417FEC00D58C36 /* es */,
 			);
 			name = KMKeyboardHelpWindowController.xib;
 			path = Keyman4MacIM/KMKeyboardHelpWindow;
@@ -1162,6 +1174,7 @@
 				298566CC2980C9AE004ACA95 /* sv */,
 				298566D82980D47E004ACA95 /* uk */,
 				298566E42980E57A004ACA95 /* ru */,
+				CEFFECDC2A417FEC00D58C36 /* es */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";

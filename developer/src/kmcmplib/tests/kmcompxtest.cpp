@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 
     // Write out for reference
     fwrite(result.kmx, 1, result.kmxSize, fp1);
-
+    fclose(fp1);
 
     FILE* fp2 = Open_File(reference_kmx, "rb");
     if(!fp2) return __LINE__;                      // exit code: fail if no reference kmx file in build-folder
