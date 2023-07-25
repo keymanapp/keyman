@@ -207,8 +207,10 @@ element_list::update_sort_key(size_t offset, std::deque<reorder_sort_key> &key) 
     assert(e->matches(k.ch));        // double check that this element matches
     k.primary  = e->get_order();
     k.tertiary = e->get_tertiary();  // TODO-LDML: need more detailed tertiary work
+#if KMXPLUS_DEBUG_TRANSFORM
     DebugTran("Updating at +%d", c);
     k.dump();
+#endif
     c++;
   }
   return key;
