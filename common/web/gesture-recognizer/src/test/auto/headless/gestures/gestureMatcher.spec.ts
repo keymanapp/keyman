@@ -46,6 +46,28 @@ interface MockedPredecessor<Type> {
   }
 }
 
+type PathInheritanceType = gestures.specs.ContactModel<string>['pathInheritance'];
+function dummyInheritanceMatcher(inheritanceType: PathInheritanceType): gestures.specs.GestureModel<string> {
+  return {
+    id: "dummy",
+    itemPriority: 0,
+    resolutionPriority: 0,
+    resolutionAction: { type: 'complete', item: 'current' },
+    contacts: [
+      {
+        model: {
+          pathInheritance: inheritanceType,
+          itemPriority: 0,
+          pathResolutionAction: 'resolve',
+          pathModel: {
+            evaluate: () => undefined
+          }
+        }
+      }
+    ]
+  }
+}
+
 function mockedPredecessor<Type>(
   lastSample: InputSample<Type>,
   baseItem?: Type
@@ -205,18 +227,248 @@ describe.only("GestureMatcher", function() {
   })
 
   describe("Path inheritance handling", function() {
-    // TODO:  tests for 'chop', 'partial', 'full', 'reject' path inheritance - apart from
-    // specific gestures.
-    //
-    // Test that it provides the right starting point for the new path.
+    it("'chop'", async function() {
+      const turtle = new TouchpathTurtle({
+        targetX: 1,
+        targetY: 1,
+        t: 100,
+        item: 'a'
+      });
+      turtle.wait(MainLongpressSourceModel.timer.duration, 25);
+      turtle.hoveredItem = 'b'; // A distinct aspect of 'chop' behavior.
+      const waitCompletionSample = turtle.commitPending();
+      turtle.move(90, 50, 100, 4);
+      turtle.commitPending();
 
-    // Which reminds me about the issue with editing the SimpleGestureSource's path.
+      const {
+        source,
+        modelMatcherPromise,
+        executor
+      } = simulateComplexGestureSource([
+        { type: 'sequence', samples: turtle.path, terminate: true }
+      ], this.fakeClock, LongpressModel);
 
-    // Decent solution, perhaps:  lock in the `path` ref used by the matcher.
-    // Have a secondary version of it out of the gate, rather than re-using `fullPath` then.
-    //
-    // Can then view history via the locked `path`, which is no longer ref'd by the
-    // SimpleGestureSource and thus no longer updated!
+      let completion = executor();
+      const modelMatcher = await modelMatcherPromise;
+
+      await Promise.race([completion, modelMatcher.promise]);
+
+      // Copies from the longpress unit test to find a good spot to split the path.
+      assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
+
+      // And now for the real meat of the test.
+
+      // Starts a new matcher for a followup gesture component/link, which has a number of fun
+      // intentional side-effects.
+      const secondMatcher = new gestures.matchers.GestureMatcher<string>(dummyInheritanceMatcher('chop'), modelMatcher);
+      // There's only the one touchpoint, so there's no need for synchronization overhead here.
+      source.touchpoints[0].path.on('step', () => secondMatcher.update());
+      source.touchpoints[0].path.on('complete', () => {
+        secondMatcher.update();
+      });
+
+
+      // Because 'chopped'.
+      assert.equal(secondMatcher.pathMatchers[0].source.path.coords.length, 1);
+      assert.deepEqual(source.touchpoints[0].currentSample, waitCompletionSample);
+      // because we 'chopped' the path, we use the current sample's item as the new base.
+      assert.equal(secondMatcher.pathMatchers[0].source.baseItem, 'b');
+      // This technically does affect what the first `modelMatcher` would see as the base item, but its Promise
+      // is already fulfilled - its effects are already fully committed.
+
+      const firstMatcherStats = modelMatcher.pathMatchers[0].stats;
+      assert.equal(firstMatcherStats.duration, MainLongpressSourceModel.timer.duration);
+      assert.equal(firstMatcherStats.rawDistance, 0);
+
+      // subview
+      assert.equal(secondMatcher.pathMatchers[0].source.path.stats.duration, 0);
+      // original
+      assert.equal(source.touchpoints[0].path.stats.duration, MainLongpressSourceModel.timer.duration);
+
+      await completion;
+
+      assert.equal(await promiseStatus(secondMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      const secondMatcherStats = secondMatcher.pathMatchers[0].stats;
+      assert.equal(secondMatcherStats.duration, 100);
+      assert.closeTo(secondMatcherStats.netDistance, 50, 1e-6);
+      assert.equal(secondMatcherStats.cardinalDirection, 'e');
+    });
+
+    it("'partial'", async function() {
+      const turtle = new TouchpathTurtle({
+        targetX: 1,
+        targetY: 1,
+        t: 100,
+        item: 'a'
+      });
+      turtle.wait(MainLongpressSourceModel.timer.duration, 25);
+      turtle.hoveredItem = 'b'; // A distinct aspect of 'chop' behavior.
+      const waitCompletionSample = turtle.commitPending();
+      turtle.move(90, 50, 100, 4);
+      turtle.commitPending();
+
+      const {
+        source,
+        modelMatcherPromise,
+        executor
+      } = simulateComplexGestureSource([
+        { type: 'sequence', samples: turtle.path, terminate: true }
+      ], this.fakeClock, LongpressModel);
+
+      let completion = executor();
+      const modelMatcher = await modelMatcherPromise;
+
+      await Promise.race([completion, modelMatcher.promise]);
+
+      // Copies from the longpress unit test to find a good spot to split the path.
+      assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
+
+      // And now for the real meat of the test.
+
+      // Starts a new matcher for a followup gesture component/link, which has a number of fun
+      // intentional side-effects.
+      const secondMatcher = new gestures.matchers.GestureMatcher<string>(dummyInheritanceMatcher('partial'), modelMatcher);
+      // There's only the one touchpoint, so there's no need for synchronization overhead here.
+      source.touchpoints[0].path.on('step', () => secondMatcher.update());
+      source.touchpoints[0].path.on('complete', () => {
+        secondMatcher.update();
+      });
+
+
+      // 'partial' path inheritance still drops the pre-existing path components...
+      assert.equal(secondMatcher.pathMatchers[0].source.path.coords.length, 1);
+      assert.deepEqual(source.touchpoints[0].currentSample, waitCompletionSample);
+      // ... but preserves the original base item.
+      assert.equal(source.touchpoints[0].baseItem, 'a');
+
+      // The rest of what's below should match the assertions for the 'chop' path.
+      const firstMatcherStats = modelMatcher.pathMatchers[0].stats;
+      assert.equal(firstMatcherStats.duration, MainLongpressSourceModel.timer.duration);
+      assert.equal(firstMatcherStats.rawDistance, 0);
+
+      assert.equal(secondMatcher.pathMatchers[0].source.path.stats.duration, 0);
+      assert.equal(source.touchpoints[0].path.stats.duration, MainLongpressSourceModel.timer.duration);
+
+      await completion;
+
+      assert.equal(await promiseStatus(secondMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      const secondMatcherStats = secondMatcher.pathMatchers[0].stats;
+      assert.equal(secondMatcherStats.duration, 100);
+      assert.closeTo(secondMatcherStats.netDistance, 50, 1e-6);
+      assert.equal(secondMatcherStats.cardinalDirection, 'e');
+    });
+
+    it("'reject'", async function() {
+      const turtle = new TouchpathTurtle({
+        targetX: 1,
+        targetY: 1,
+        t: 100,
+        item: 'a'
+      });
+      turtle.wait(MainLongpressSourceModel.timer.duration, 25);
+      turtle.move(90, 50, 100, 4);
+      turtle.commitPending();
+
+      const {
+        source,
+        modelMatcherPromise,
+        executor
+      } = simulateComplexGestureSource([
+        { type: 'sequence', samples: turtle.path, terminate: true }
+      ], this.fakeClock, LongpressModel);
+
+      let completion = executor();
+      const modelMatcher = await modelMatcherPromise;
+
+      await Promise.race([completion, modelMatcher.promise]);
+
+      // Copies from the longpress unit test to find a good spot to split the path.
+      assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
+
+      // And now for the real meat of the test.
+
+      // Starts a new matcher for a followup gesture component/link, which has a number of fun
+      // intentional side-effects.
+      const secondMatcher = new gestures.matchers.GestureMatcher<string>(dummyInheritanceMatcher('reject'), modelMatcher);
+      // There's only the one touchpoint, so there's no need for synchronization overhead here.
+      source.touchpoints[0].path.on('step', () => secondMatcher.update());
+      source.touchpoints[0].path.on('complete', () => {
+        secondMatcher.update();
+      });
+
+
+      // 'reject' path inheritance should instantly resolve.
+      assert.equal(await promiseStatus(secondMatcher.promise), PromiseStatusModule.PROMISE_RESOLVED);
+      assert.isFalse((await secondMatcher.promise).matched);
+    });
+
+    it("'full'", async function() {
+      const turtle = new TouchpathTurtle({
+        targetX: 1,
+        targetY: 1,
+        t: 100,
+        item: 'a'
+      });
+      turtle.wait(MainLongpressSourceModel.timer.duration, 25);
+      turtle.hoveredItem = 'b'; // A distinct aspect of 'chop' behavior.
+      const waitCompletionSample = turtle.commitPending();
+      turtle.move(90, 50, 100, 4);
+      turtle.commitPending();
+
+      const {
+        source,
+        modelMatcherPromise,
+        executor
+      } = simulateComplexGestureSource([
+        { type: 'sequence', samples: turtle.path, terminate: true }
+      ], this.fakeClock, LongpressModel);
+
+      let completion = executor();
+      const modelMatcher = await modelMatcherPromise;
+
+      await Promise.race([completion, modelMatcher.promise]);
+
+      // Copies from the longpress unit test to find a good spot to split the path.
+      assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
+
+      // And now for the real meat of the test.
+
+      // Starts a new matcher for a followup gesture component/link, which has a number of fun
+      // intentional side-effects.
+      const secondMatcher = new gestures.matchers.GestureMatcher<string>(dummyInheritanceMatcher('full'), modelMatcher);
+      // There's only the one touchpoint, so there's no need for synchronization overhead here.
+      source.touchpoints[0].path.on('step', () => secondMatcher.update());
+      source.touchpoints[0].path.on('complete', () => {
+        secondMatcher.update();
+      });
+
+
+      // 'full' path inheritance maintains all pre-existing path components...
+      assert.equal(secondMatcher.pathMatchers[0].source.path.coords.length, source.touchpoints[0].path.coords.length);
+      assert.deepEqual(secondMatcher.pathMatchers[0].source.path.coords, source.touchpoints[0].path.coords)
+      assert.deepEqual(source.touchpoints[0].currentSample, waitCompletionSample);
+      // ... and also preserves the original base item.
+      assert.equal(source.touchpoints[0].baseItem, 'a');
+
+      const firstMatcherStats = modelMatcher.pathMatchers[0].stats;
+      assert.equal(firstMatcherStats.duration, MainLongpressSourceModel.timer.duration);
+      assert.equal(firstMatcherStats.rawDistance, 0);
+
+      assert.equal(source.touchpoints[0].path.stats.duration, MainLongpressSourceModel.timer.duration);
+      assert.equal(secondMatcher.pathMatchers[0].source.path.stats.duration, source.touchpoints[0].path.stats.duration);
+
+      await completion;
+
+      assert.equal(await promiseStatus(secondMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      const secondMatcherStats = secondMatcher.pathMatchers[0].stats;
+      assert.equal(secondMatcherStats.duration, MainLongpressSourceModel.timer.duration + 100);
+      assert.closeTo(secondMatcherStats.netDistance, 50, 1e-6);
+      assert.equal(secondMatcherStats.cardinalDirection, 'e');
+    });
   });
 
   describe.skip("Flicks", function() {
