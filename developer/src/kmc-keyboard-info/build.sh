@@ -20,7 +20,7 @@ builder_describe "Build Keyman kmc keyboard-info Compiler module" \
   "--dry-run,-n              don't actually publish, just dry run"
 
 builder_describe_outputs \
-  configure     /node_modules \
+  configure     /developer/src/kmc-keyboard-info/src/imports/langtags.js \
   build         /developer/src/kmc-keyboard-info/build/src/index.js
 
 builder_parse "$@"
