@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE keyboardTest SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest.dtd">
+<keyboardTest conformsTo="techpreview">
+  <info keyboard="k_200_reorder_nod_Lana.xml" author="Team Keyboard" name="nod-Lana" />
+  <tests name="reorder-tests">
+    <test name="roast0-orig">
+      <startContext to="" />
+      <keystroke key="kha" />
+      <keystroke key="sakot" />
+      <keystroke key="wa" />
+      <keystroke key="o" />
+      <keystroke key="t2" />
+      <check result="\u1A21\u1A60\u1A45\u1A6B\u1A76" />
+    </test>
+    <!-- <test name="roast1-upper-first">
+      <startContext to="" />
+      <keystroke key="kha" />
+      <keystroke key="o" />
+      <keystroke key="t2" />
+      <keystroke key="sakot" />
+      <keystroke key="wa" />
+      <check result="\u1A21\u1A60\u1A45\u1A6B\u1A76" />
+    </test>
+    <test name="roast2-upper-first-nfc">
+      <startContext to="" />
+      <keystroke key="kha" />
+      <keystroke key="o" />
+      <keystroke key="sakot" />
+      <keystroke key="t2" />
+      <keystroke key="wa" />
+      <check result="\u1A21\u1A60\u1A45\u1A6B\u1A76" />
+    </test>
+    <test name="roast3-tone-after-lower">
+      <startContext to="" />
+      <keystroke key="kha" />
+      <keystroke key="o" />
+      <keystroke key="sakot" />
+      <keystroke key="wa" />
+      <keystroke key="t2" />
+      <check result="\u1A21\u1A60\u1A45\u1A6B\u1A76" />
+    </test> -->
+  </tests>
+</keyboardTest>
