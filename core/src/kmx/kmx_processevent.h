@@ -99,7 +99,7 @@ public:
 
   KMX_BOOL Load(km_kbp_path_name keyboardName);
   KMX_BOOL ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers, KMX_BOOL isKeyDown);  // returns FALSE on error or key not matched
-
+  /// TODO: 5822 public member process external event.
   KMX_Actions *GetActions();
   KMX_Context *GetContext();
   KMX_Options *GetOptions();

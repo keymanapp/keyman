@@ -103,6 +103,35 @@ kmx_processor::update_option(
   return option(scope, key, value);
 }
 
+km_kbp_status
+kmx_processor::external_event(
+      km_kbp_state* state,
+      uint32_t event,
+      void* data
+      ) {
+
+  switch (event){
+    case KM_KBP_EVENT_KEYBOARD_ACTIVATED:
+      // reset any current actions in the queue as we have
+      // just loaded a new keyboard
+      _kmx.GetActions()->ResetQueue();
+      state->actions().clear();
+      // TODO: #5822
+      // just force it if caps always off is set.
+      // We need to pass the current modifiers in from the
+      // platform if we were to check.
+    KMX_DWORD dummy_modifiers = 0;
+    if (_kmx.GetKeyboard()->Keyboard->dwFlags & KF_CAPSALWAYSOFF) {
+       // TODO: #5822    need to use public member to access_kmx
+      _kmx.SetCapsLock(dummy_modifiers, FALSE, TRUE);
+      }
+    break;
+    default:
+      return KM_KBP_STATUS_INVALID_ARGUMENT;
+  }
+  return internal_process_queued_actions(state);
+}
+
 bool
 kmx_processor::queue_action(
   km_kbp_state * state,

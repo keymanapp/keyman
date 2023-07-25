@@ -61,6 +61,13 @@ namespace kbp
       km_kbp_state *state
       ) override;
 
+    km_kbp_status
+    external_event(
+      km_kbp_state* state,
+      uint32_t event,
+      void* data
+      ) override;
+
     bool
     queue_action(
       km_kbp_state * state,
