@@ -94,3 +94,15 @@ export const SimpleTapModel: ContactModel = {
     }
   }
 }
+
+export const SubkeySelectModel: ContactModel = {
+  itemPriority: 0,
+  pathResolutionAction: 'resolve',
+  pathModel: {
+    evaluate: (path) => {
+      if(path.isComplete && !path.wasCancelled) {
+        return 'resolve';
+      }
+    }
+  }
+}

@@ -13,7 +13,8 @@ import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
 import {
   LongpressModel,
   MultitapModel,
-  SimpleTapModel
+  SimpleTapModel,
+  SubkeySelectModel
 } from './isolatedGestureSpecs.js';
 import { GestureMatcher } from '../../../../../build/obj/headless/gestures/matchers/gestureMatcher.js';
 
@@ -214,7 +215,7 @@ function simulateComplexGestureSource<Type>(
   }
 }
 
-describe.only("GestureMatcher", function() {
+describe("GestureMatcher", function() {
   // // File paths need to be from the package's / module's root folder
   // let testJSONtext = fs.readFileSync('src/test/resources/json/canaryRecording.json');
 
@@ -889,6 +890,175 @@ describe.only("GestureMatcher", function() {
       assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap'}});
       assert.isTrue(source.touchpoints[0].path.isComplete);
       assert.isFalse(source.touchpoints[1].path.isComplete);
+    });
+  });
+
+  describe("Subkey selection", function() {
+    it("resolved: subkey hovered", async function() {
+      const turtle = new TouchpathTurtle({
+        targetX: 1,
+        targetY: 1,
+        t: 100,
+        item: 'a'
+      });
+      turtle.wait(MainLongpressSourceModel.timer.duration, 25);
+      turtle.hoveredItem = null;
+      turtle.commitPending();
+      turtle.move(45, 50, 100, 4);
+      turtle.hoveredItem = 'b';
+      turtle.commitPending();
+
+      const {
+        source,
+        modelMatcherPromise,
+        executor
+      } = simulateComplexGestureSource([
+        { type: 'sequence', samples: turtle.path, terminate: true }
+      ], this.fakeClock, LongpressModel);
+
+      let completion = executor();
+      const modelMatcher = await modelMatcherPromise;
+
+      await Promise.race([completion, modelMatcher.promise]);
+
+      // Copies from the longpress unit test to find a good spot to split the path.
+      assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
+
+      // And now for the real meat of the test.
+
+      // Starts a new matcher for a followup gesture component/link, which has a number of fun
+      // intentional side-effects.
+      const secondMatcher = new gestures.matchers.GestureMatcher<string>(SubkeySelectModel, modelMatcher);
+      // There's only the one touchpoint, so there's no need for synchronization overhead here.
+      source.touchpoints[0].path.on('step', () => secondMatcher.update());
+      source.touchpoints[0].path.on('complete', () => secondMatcher.update());
+      source.touchpoints[0].path.on('invalidated', () => secondMatcher.update());
+
+      // With the followup matcher now fully constructed & connected, play the rest of the sequence out.
+      await completion;
+
+      assert.equal(await promiseStatus(secondMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      assert.deepEqual(await secondMatcher.promise, { matched: true, action: { type: 'complete', item: 'b' } });
+      assert.isTrue(source.touchpoints[0].path.isComplete);
+    });
+
+    it("rejected: path cancelled", async function() {
+      const turtle = new TouchpathTurtle({
+        targetX: 1,
+        targetY: 1,
+        t: 100,
+        item: 'a'
+      });
+      turtle.wait(MainLongpressSourceModel.timer.duration, 25);
+      turtle.hoveredItem = null;
+      turtle.commitPending();
+      turtle.move(45, 50, 100, 4);
+      turtle.hoveredItem = 'b';
+      turtle.commitPending();
+
+      const {
+        source,
+        modelMatcherPromise,
+        executor
+      } = simulateComplexGestureSource([
+        { type: 'sequence', samples: turtle.path, terminate: false }
+      ], this.fakeClock, LongpressModel);
+
+      let completion = executor();
+      const modelMatcher = await modelMatcherPromise;
+
+      await Promise.race([completion, modelMatcher.promise]);
+
+      // Copies from the longpress unit test to find a good spot to split the path.
+      assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
+
+      // And now for the real meat of the test.
+
+      // Starts a new matcher for a followup gesture component/link, which has a number of fun
+      // intentional side-effects.
+      const secondMatcher = new gestures.matchers.GestureMatcher<string>(SubkeySelectModel, modelMatcher);
+      // There's only the one touchpoint, so there's no need for synchronization overhead here.
+      source.touchpoints[0].path.on('step', () => secondMatcher.update());
+      source.touchpoints[0].path.on('complete', () => secondMatcher.update());
+      source.touchpoints[0].path.on('invalidated', () => secondMatcher.update());
+
+      // With the followup matcher now fully constructed & connected, play the rest of the sequence out.
+      await completion;
+
+      // Manually cancel.
+      source.touchpoints[0].terminate(true);
+      secondMatcher.update();
+      await Promise.resolve(); // let any Promise followups shake out before continuing.
+
+      assert.equal(await promiseStatus(secondMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      assert.deepEqual(await secondMatcher.promise, { matched: false, action: { type: 'none', item: null } });
+      assert.isTrue(source.touchpoints[0].path.isComplete);
+    });
+
+    it("rejected: extra touch detected", async function() {
+      const turtle = new TouchpathTurtle({
+        targetX: 1,
+        targetY: 1,
+        t: 100,
+        item: 'a'
+      });
+      turtle.wait(MainLongpressSourceModel.timer.duration, 25);
+      turtle.hoveredItem = null;
+      turtle.commitPending();
+      turtle.move(45, 50, 100, 4);
+      turtle.hoveredItem = 'b';
+      turtle.commitPending();
+
+      const {
+        source,
+        modelMatcherPromise,
+        executor
+      } = simulateComplexGestureSource([
+        { type: 'sequence', samples: turtle.path, terminate: false }
+      ], this.fakeClock, LongpressModel);
+
+      let completion = executor();
+      const modelMatcher = await modelMatcherPromise;
+
+      await Promise.race([completion, modelMatcher.promise]);
+
+      // Copies from the longpress unit test to find a good spot to split the path.
+      assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
+
+      // And now for the real meat of the test.
+
+      // Starts a new matcher for a followup gesture component/link, which has a number of fun
+      // intentional side-effects.
+      const secondMatcher = new gestures.matchers.GestureMatcher<string>(SubkeySelectModel, modelMatcher);
+      // There's only the one touchpoint, so there's no need for synchronization overhead here.
+      source.touchpoints[0].path.on('step', () => secondMatcher.update());
+      source.touchpoints[0].path.on('complete', () => secondMatcher.update());
+      source.touchpoints[0].path.on('invalidated', () => secondMatcher.update());
+
+      timedPromise(50).then(() => {
+        const secondContact = new SimpleGestureSource<string>(5, true);
+        source.addTouchpoint(secondContact);
+        secondMatcher.addContact(secondContact);
+        secondContact.update({
+          targetX: 50,
+          targetY: 50,
+          t: 100 + MainLongpressSourceModel.timer.duration + 50,
+          item: 'c'
+        });
+      });
+
+      // 100ms left to simulate until the end.
+
+      // With the followup matcher now fully constructed & connected, play the rest of the sequence out.
+      await completion;
+
+      assert.equal(await promiseStatus(secondMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+      assert.deepEqual(await secondMatcher.promise, { matched: false, action: { type: 'none', item: null } });
+      assert.isTrue(source.touchpoints[0].path.isComplete);
+      assert.isTrue(source.touchpoints[0].path.wasCancelled);
     });
   });
 });

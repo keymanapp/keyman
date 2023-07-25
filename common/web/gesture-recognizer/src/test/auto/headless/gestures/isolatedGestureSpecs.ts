@@ -88,3 +88,31 @@ export const SimpleTapModel: GestureModel = {
     allowNext: 'multitap'
   }
 }
+
+export const SubkeySelectModel: GestureModel = {
+  id: 'subkey-select',
+  resolutionPriority: 0,
+  itemPriority: 0,
+  contacts: [
+    {
+      model: {
+        ...specs.SubkeySelectModel,
+        pathInheritance: 'full',
+        itemPriority: 1
+      },
+      endOnResolve: true,
+      endOnReject: true
+    }, {
+      // A second touch while selecting a subkey will trigger instant cancellation
+      // of subkey mode.  (With this setting in place, anyway.)
+      //
+      // Might not be ideal for actual production... but it does have benefits for
+      // unit testing the gesture-matching engine.
+      model: specs.InstantRejectionModel
+    }
+  ],
+  resolutionAction: {
+    type: 'complete',
+    item: 'current'
+  }
+}
