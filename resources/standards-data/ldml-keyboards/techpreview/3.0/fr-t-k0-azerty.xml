@@ -63,12 +63,9 @@
 		<key id="symbol" switch="symbol" />
 		<key id="base" switch="base" />
 
-		<!--
-			TODO: need discussion
 		<key id="bksp" gap="true" />
 		<key id="extra" gap="true" />
 		<key id="enter" to="\u{000A}" />
-		-->
 
 		<!-- extra keys -->
 		<key id="u-grave" to="ü" />

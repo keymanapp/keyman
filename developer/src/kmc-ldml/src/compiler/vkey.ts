@@ -19,13 +19,13 @@ export class VkeyCompiler extends SectionCompiler {
 
       this.keyboard.vkeys.vkey.forEach(vk => {
         if(LdmlVkeyNames[vk.from] === undefined) {
-          this.callbacks.reportMessage(CompilerMessages.Error_VkeyIsNotValid({vkey: vk.from}));
-          valid = false;
+          this.callbacks.reportMessage(CompilerMessages.Hint_VkeyIsNotValid({vkey: vk.from}));
+          return;
         }
 
         if(LdmlVkeyNames[vk.to] === undefined) {
-          this.callbacks.reportMessage(CompilerMessages.Error_VkeyIsNotValid({vkey: vk.to}));
-          valid = false;
+          this.callbacks.reportMessage(CompilerMessages.Hint_VkeyIsNotValid({vkey: vk.to}));
+          return;
         }
 
         if(vk.from == vk.to) {
