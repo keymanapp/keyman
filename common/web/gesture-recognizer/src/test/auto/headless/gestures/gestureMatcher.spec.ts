@@ -204,6 +204,27 @@ describe.only("GestureMatcher", function() {
     this.fakeClock.restore();
   })
 
+  describe("Path inheritance handling", function() {
+    // TODO:  tests for 'chop', 'partial', 'full', 'reject' path inheritance - apart from
+    // specific gestures.
+    //
+    // Test that it provides the right starting point for the new path.
+
+    // Which reminds me about the issue with editing the SimpleGestureSource's path.
+
+    // Decent solution, perhaps:  lock in the `path` ref used by the matcher.
+    // Have a secondary version of it out of the gate, rather than re-using `fullPath` then.
+    //
+    // Can then view history via the locked `path`, which is no longer ref'd by the
+    // SimpleGestureSource and thus no longer updated!
+  });
+
+  describe.skip("Flicks", function() {
+    it("Actual expectations for flick behavior still in flux - cannot spec yet", async function() {
+
+    });
+  });
+
   describe("Longpress", function() {
     it("resolve: path not completed (long wait)", async function() {
       const turtle = new TouchpathTurtle({
@@ -235,6 +256,10 @@ describe.only("GestureMatcher", function() {
 
       // Did we resolve at the expected point in the path - once the timer duration had passed?
       assert.isAtLeast(source.touchpoints[0].currentSample.t, turtle.path[0].t + MainLongpressSourceModel.timer.duration - 1);
+
+      const finalStats = modelMatcher.pathMatchers[0].stats;
+      assert.isAtLeast(finalStats.duration, MainLongpressSourceModel.timer.duration - 1);
+      assert.equal(finalStats.rawDistance, 0)
 
       // Allow the rest of the simulation to play out; it's easy cleanup that way.
       await completion;
@@ -528,6 +553,9 @@ describe.only("GestureMatcher", function() {
       await executor();
       const modelMatcher = await modelMatcherPromise;
 
+      if(await promiseStatus(modelMatcher.promise) == PromiseStatusModule.PROMISE_REJECTED) {
+        await modelMatcher.promise;
+      }
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
 
       assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'chain', item: 'a', next: 'multitap'}});
@@ -538,7 +566,6 @@ describe.only("GestureMatcher", function() {
       assert.isFalse(source.touchpoints[2].path.isComplete);
     });
   });
-
 
   describe("Simple tap", function() {
     it("resolve: single path, touch release", async function() {
@@ -561,9 +588,16 @@ describe.only("GestureMatcher", function() {
       await executor();
       const modelMatcher = await modelMatcherPromise;
 
+      if(await promiseStatus(modelMatcher.promise) == PromiseStatusModule.PROMISE_REJECTED) {
+        await modelMatcher.promise;
+      }
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
       assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap'}});
       assert.isTrue(source.touchpoints[0].path.isComplete);
+
+      const finalStats = modelMatcher.pathMatchers[0].stats;
+      assert.isAtLeast(finalStats.duration, 100);
+      assert.equal(finalStats.rawDistance, 0)
     });
 
     it("resolve: second contact-point", async function() {
