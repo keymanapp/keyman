@@ -1348,7 +1348,11 @@ void test_is_valid() {
   assert_equal(Uni_IsValid(0x02FFFF), false); // nonchar
   assert_equal(Uni_IsValid(0x02FFFE), false); // nonchar
   assert_equal(Uni_IsValid(0xFDD1), false); // nonchar
-  assert_equal(Uni_IsValid(0xFDD0), false); // nonchar  
+  assert_equal(Uni_IsValid(0xFDD0), false); // nonchar
+
+  // range test
+  assert_equal(Uni_IsValid(0, 0x10FFFF), false); // ends with nonchar
+  assert_equal(Uni_IsValid(0, 0x10FFFD), false); // contains lots o' nonchars
 }
 
 constexpr const auto help_str = u"\

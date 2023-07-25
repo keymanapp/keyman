@@ -47,15 +47,21 @@ namespace kmx {
 #define Uni_UTF32ToSurrogate1(ch) (char16_t)(((ch) - 0x10000) / 0x400 + 0xD800)
 #define Uni_UTF32ToSurrogate2(ch) (char16_t)(((ch) - 0x10000) % 0x400 + 0xDC00)
 
-#define Uni_IsNoncharacter(ch) (((ch) >= 0xFDD0 && (ch) <= 0xFDEF) || (((ch) & 0xFFFE) == 0xFFFE))
-
-#define Uni_InCodespace(ch) ((ch) <= 0x10FFFF)
+/**
+ * @returns true if the character is a noncharacter
+*/
+bool Uni_IsNonCharacter(km_kbp_usv ch);
 
 /**
- * @brief True if in codespace and NOT a surrogate or noncharacter.
- * \def Uni_IsValid
+ * @returns true if the character is a valid Unicode code point
 */
-#define Uni_IsValid(ch) (Uni_InCodespace(ch) && !Uni_IsSurrogate(ch) && !Uni_IsNoncharacter(ch))
+bool Uni_IsValid(km_kbp_usv ch);
+
+/**
+ * @returns true if the character is a valid Unicode code point range, that is, [start-end] are all
+ * valid.
+*/
+bool Uni_IsValid(km_kbp_usv start, km_kbp_usv range);
 
 /**
  * char16_t array big enough to hold a single Unicode codepoint,
@@ -148,6 +154,34 @@ u16string_to_u32string(const std::u16string &source) {
   }
   return out;
 }
+
+
+inline bool Uni_IsNoncharacter(km_kbp_usv ch) {
+  return (((ch) >= 0xFDD0 && (ch) <= 0xFDEF) || (((ch) & 0xFFFE) == 0xFFFE));
+}
+
+inline bool Uni_InCodespace(km_kbp_usv ch) {
+  return ((ch) <= 0x10FFFF);
+};
+
+inline bool Uni_IsValid(km_kbp_usv ch) {
+  return (Uni_InCodespace(ch) && !Uni_IsSurrogate(ch) && !Uni_IsNoncharacter(ch));
+}
+
+inline bool Uni_IsValid(km_kbp_usv start, km_kbp_usv end) {
+  // quicker check
+  if (!Uni_IsValid(start) || !Uni_IsValid(end)) {
+    return false;
+  }
+
+  // brute force it
+  for (km_kbp_usv i = start; i <= end; i++) {
+    if (!Uni_IsValid(i)) return false;
+  }
+
+  return true;
+}
+
 
 } // namespace kmx
 } // namespace kbp
