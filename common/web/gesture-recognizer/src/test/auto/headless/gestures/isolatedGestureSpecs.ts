@@ -4,25 +4,36 @@ import specTypeDefs = gestures.specs;
 
 type GestureModel = specTypeDefs.GestureModel<string>;
 
-export const SimpleTapModel: GestureModel = {
-  id: 'simple-tap',
+export const LongpressModel: GestureModel = {
+  id: 'longpress',
   resolutionPriority: 0,
   itemPriority: 0,
   contacts: [
     {
       model: {
-        ...specs.SimpleTapModel,
-        pathInheritance: 'chop',
-        itemPriority: 1
+        ...specs.MainLongpressSourceModel,
+        itemPriority: 1,
+        pathInheritance: 'chop'
       },
-      endOnResolve: true
+      endOnResolve: false
     }, {
-      model: specs.InstantResolutionModel
+      model: specs.InstantRejectionModel
     }
   ],
   resolutionAction: {
-    type: 'optional-chain',
-    allowNext: 'multitap'
+    type: 'chain',
+    next: 'subkeyselect',
+    item: 'none'
+  },
+  rejectionActions: {
+    item: {
+      type: 'optional-chain',
+      allowNext: 'longpress'
+    },
+    path: {
+      type: 'optional-chain',
+      allowNext: 'longpress'
+    }
   }
 }
 
@@ -56,35 +67,24 @@ export const MultitapModel: GestureModel = {
   }
 }
 
-export const LongpressModel: GestureModel = {
-  id: 'longpress',
+export const SimpleTapModel: GestureModel = {
+  id: 'simple-tap',
   resolutionPriority: 0,
   itemPriority: 0,
   contacts: [
     {
       model: {
-        ...specs.MainLongpressSourceModel,
-        itemPriority: 1,
-        pathInheritance: 'chop'
+        ...specs.SimpleTapModel,
+        pathInheritance: 'chop',
+        itemPriority: 1
       },
-      endOnResolve: false
+      endOnResolve: true
     }, {
-      model: specs.InstantRejectionModel
+      model: specs.InstantResolutionModel
     }
   ],
   resolutionAction: {
-    type: 'chain',
-    next: 'subkeyselect',
-    item: 'none'
-  },
-  rejectionActions: {
-    item: {
-      type: 'optional-chain',
-      allowNext: 'longpress'
-    },
-    path: {
-      type: 'optional-chain',
-      allowNext: 'longpress'
-    }
+    type: 'optional-chain',
+    allowNext: 'multitap'
   }
 }
