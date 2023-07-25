@@ -14,6 +14,19 @@ export LC_ALL=C.UTF-8
 
 include /usr/share/dpkg/pkg-info.mk
 
+# Workaround for https://bugs.debian.org/1041499 and
+# https://github.com/mesonbuild/meson/issues/12017
+# --native-file got added in Meson 0.49, so we check for that version here
+MESON_049_OR_HIGHER := $(shell expr `meson --version | sed -e 's/\.\([0-9][0-9]\)/\1/g' -e 's/\.\([0-9]\)/0\1/g' -e 's/^[0-9]\{3,4\}$$/&00/'` \>= 04900)
+
+configure_options :=
+
+ifeq ($(DEB_HOST_ARCH),$(DEB_BUILD_ARCH))
+ifeq ($(MESON_049_OR_HIGHER), 1)
+configure_options += --native-file=$(CURDIR)/debian/meson/no-exe-wrapper.ini
+endif
+endif
+
 # Unfortunately dh-python 3.20180325 (bionic) doesn't provide the virtual dh-sequence-python3
 # package, so we'll have to pass --with-python3 here
 %:
@@ -24,7 +37,7 @@ override_dh_auto_configure:
 	cd core && \
 		./build.sh configure -- --wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc \
 			--localstatedir=/var --libdir=lib/$(DEB_TARGET_MULTIARCH) \
-			--libexecdir=lib/$(DEB_TARGET_MULTIARCH)
+			--libexecdir=lib/$(DEB_TARGET_MULTIARCH) $(configure_options)
 	# ibus-keyman
 	cd linux/ibus-keyman && \
 		cp -f ../../VERSION.md VERSION && \
