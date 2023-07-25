@@ -144,6 +144,26 @@ int test_ldml_vkeys() {
   return EXIT_SUCCESS;
 }
 
+int test_uset() {
+  std::cout << "== " << __FUNCTION__ << std::endl;
+
+  const COMP_KMXPLUS_USET_RANGE r[] = {
+    {0x61, 0x7a}, // [a-z]
+    {0x127, 0x127} // [ħ]
+  };
+
+  USet u0(&r[0], 2);
+  assert_equal(u0.contains(0x62), true); // b
+  assert_equal(u0.contains(0x41), false); // A
+  assert_equal(u0.contains(0x127), true); // ħ
+
+  USet uempty;
+  assert_equal(uempty.contains(0x62), false);
+  assert_equal(uempty.contains(0x127), false);
+
+  return EXIT_SUCCESS;
+}
+
 int
 main(int argc, const char *argv[]) {
   int rc = EXIT_SUCCESS;
@@ -153,6 +173,10 @@ main(int argc, const char *argv[]) {
   }
 
   if (test_ldml_vkeys() != EXIT_SUCCESS) {
+    rc = EXIT_FAILURE;
+  }
+
+  if (test_uset() != EXIT_SUCCESS) {
     rc = EXIT_FAILURE;
   }
 

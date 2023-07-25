@@ -5,19 +5,19 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlusData } from "../kmx-plus.js";
-import { build_strs_index, BUILDER_STRS } from "./build-strs.js";
+import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_SECTION } from "./builder-section.js";
 
 /**
  * Builder for the 'meta' section
  */
 export interface BUILDER_META extends BUILDER_SECTION {
-  author: number; //str
-  conform: number; //str
-  layout: number; //str
-  normalization: number; //str
-  indicator: number; //str
-  version: number; //str
+  author: BUILDER_STR_REF; //str
+  conform: BUILDER_STR_REF; //str
+  layout: BUILDER_STR_REF; //str
+  normalization: BUILDER_STR_REF; //str
+  indicator: BUILDER_STR_REF; //str
+  version: BUILDER_STR_REF; //str
   settings: number; //bitfield
 };
 
