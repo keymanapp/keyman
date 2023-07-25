@@ -42,13 +42,13 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
     const endTime = originalSamples[sampleCount-1].t;
 
     const endPromise = timedPromise(endTime).then(() => {
-      replayPoint.path.terminate(recordedPoint.path.wasCancelled);
+      replayPoint.terminate(recordedPoint.path.wasCancelled);
     });
 
     // Wrap it all together with a nice little bow.
     const compositePromise = Promise.all([endPromise].concat(samplePromises)).catch((reason) => {
       // Because we use a `setInterval` internally, we need cleanup if things go wrong.
-      replayPoint.path.terminate(true);
+      replayPoint.terminate(true);
       throw reason;
     });
 

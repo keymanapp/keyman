@@ -40,15 +40,28 @@ export class SimpleGestureSource<HoveredItemType> {
    */
   public readonly rawIdentifier: number;
 
-  private _path: GesturePath<HoveredItemType>;
+  // A full, uninterrupted recording of all samples observed during the lifetime of the touchpoint.
+  private _fullPath: GesturePath<HoveredItemType>;
+
+  // The portion of the touchpoint's lifetime currently under consideration for gestures.
+  private _activePath: GesturePath<HoveredItemType>;
+
+  private _baseItem: HoveredItemType;
 
   private static _jsonIdSeed: -1;
 
   /**
    * Tracks the coordinates and timestamps of each update for the lifetime of this `SimpleGestureSource`.
    */
+  public get fullPath(): GesturePath<HoveredItemType> {
+    return this._fullPath;
+  }
+
+  /**
+   * Tracks the coordinates and timestamps of each update for the lifetime of this `SimpleGestureSource`.
+   */
   public get path(): GesturePath<HoveredItemType> {
-    return this._path;
+    return this._activePath;
   }
 
   /**
@@ -60,7 +73,8 @@ export class SimpleGestureSource<HoveredItemType> {
   constructor(identifier: number, isFromTouch: boolean) {
     this.rawIdentifier = identifier;
     this.isFromTouch = isFromTouch;
-    this._path = new GesturePath();
+    this._fullPath = new GesturePath();
+    this._activePath = this.fullPath;
   }
 
   /**
@@ -74,19 +88,26 @@ export class SimpleGestureSource<HoveredItemType> {
     const path = GesturePath.deserialize(jsonObj.path);
 
     const instance = new SimpleGestureSource(id, isFromTouch);
-    instance._path = path;
+    instance._fullPath = path;
+    instance._activePath = path;
     return instance;
   }
 
   public update(sample: InputSample<HoveredItemType>) {
-    this.path.extend(sample);
+    this.fullPath.extend(sample);
+
+    if(this.fullPath != this.path) {
+      this.path.extend(sample);
+    }
+
+    this._baseItem ||= sample.item;
   }
 
   /**
-   * The initial path sample (coordinate) under consideration for this `SimpleGestureSource`.
+   * The first path sample (coordinate) under consideration for this `SimpleGestureSource`.
    */
-  public get initialSample(): InputSample<HoveredItemType> {
-    return this.path.coords[0];
+  public get baseItem(): HoveredItemType {
+    return this._baseItem;
   }
 
   /**
@@ -94,6 +115,32 @@ export class SimpleGestureSource<HoveredItemType> {
    */
   public get currentSample(): InputSample<HoveredItemType> {
     return this.path.coords[this.path.coords.length-1];
+  }
+
+  public resetPath(preserveBaseSample: boolean) {
+    const lastSample = this._fullPath.coords[this._fullPath.coords.length-1];
+    this._activePath = new GesturePath<HoveredItemType>();
+    if(lastSample) {
+      this._activePath.extend(lastSample);
+    }
+
+    if(!preserveBaseSample) {
+      this._baseItem = lastSample?.item;
+    }
+  }
+
+  public terminate(cancel?: boolean) {
+    this.path.terminate(cancel);
+    if(this.path != this.fullPath) {
+      this.fullPath.terminate(cancel);
+    }
+  }
+
+  public get isPathComplete(): boolean {
+    if(this.path.isComplete != this.fullPath.isComplete) {
+      throw new Error("Unexpected state: desync between internal path tracking objects: path = " + this.path.isComplete);
+    }
+    return this.fullPath.isComplete;
   }
 
   /**
