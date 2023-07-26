@@ -639,6 +639,14 @@ export class KMXPlusFile extends KMXFile {
     super();
     // Binary-correct structures matching kmx_plus.h
 
+    // helpers
+    const STR_REF       = r.uint32le;
+    const ELEM_REF      = r.uint32le;
+    const LIST_REF      = r.uint32le;
+    const STR_OR_CHAR32 = r.uint32le;
+    const CHAR32        = r.uint32le;
+    const STR_OR_CHAR32_OR_USET = r.uint32le;
+    const IDENT         = r.uint32le;
     // 'sect'
 
     this.COMP_PLUS_SECT_ITEM = new r.Struct({
@@ -647,7 +655,7 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_SECT = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       total: r.uint32le,
       count: r.uint32le,
@@ -658,22 +666,22 @@ export class KMXPlusFile extends KMXFile {
 
     // 'disp'
     this.COMP_PLUS_DISP_ITEM = new r.Struct({
-      to: r.uint32le,
-      display: r.uint32le,
+      to: STR_REF,
+      display: STR_REF,
     });
 
     this.COMP_PLUS_DISP = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       count: r.uint32le,
-      baseCharacter: r.uint32le,
+      baseCharacter: CHAR32,
       items: new r.Array(this.COMP_PLUS_DISP_ITEM, 'count'),
     });
 
     // 'elem'
 
     this.COMP_PLUS_ELEM_ELEMENT = new r.Struct({
-      element: r.uint32le,
+      element: STR_OR_CHAR32_OR_USET,
       flags: r.uint32le
     });
 
@@ -683,7 +691,7 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_ELEM = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       count: r.uint32le,
       strings: new r.Array(this.COMP_PLUS_ELEM_STRING, 'count')
@@ -720,7 +728,7 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_LAYR = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       listCount: r.uint32le,
       layerCount: r.uint32le,
@@ -733,26 +741,26 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_KEYS_FLICK = new r.Struct({
-      directions: r.uint32le, // list
+      directions: LIST_REF, // list
       flags: r.uint32le,
-      to: r.uint32le, // str | codepoint
+      to: STR_OR_CHAR32, // str | codepoint
     });
 
     this.COMP_PLUS_KEYS_FLICKS = new r.Struct({
       count: r.uint32le,
       flick: r.uint32le,
-      id: r.uint32le, // str
+      id: STR_REF, // str
     });
 
     this.COMP_PLUS_KEYS_KEY = new r.Struct({
-      to: r.uint32le, // str | codepoint
+      to: STR_OR_CHAR32, // str | codepoint
       flags: r.uint32le,
-      id: r.uint32le, // str
-      switch: r.uint32le, // str
+      id: STR_REF, // str
+      switch: STR_REF, // str
       width: r.uint32le, // width*10  ( 1 = 0.1 keys)
-      longPress: r.uint32le, // list index
-      longPressDefault: r.uint32le, // str
-      multiTap: r.uint32le, // list index
+      longPress: LIST_REF, // list index
+      longPressDefault: STR_REF, // str
+      multiTap: LIST_REF, // list index
       flicks: r.uint32le, // index into flicks table
     });
 
@@ -763,7 +771,7 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_KEYS = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       keyCount: r.uint32le,
       flicksCount: r.uint32le,
@@ -783,11 +791,11 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_LIST_INDEX = new r.Struct({
-      str: r.uint32le, // str
+      str: STR_REF, // str
     });
 
     this.COMP_PLUS_LIST = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       listCount: r.uint32le,
       indexCount: r.uint32le,
@@ -800,7 +808,7 @@ export class KMXPlusFile extends KMXFile {
     this.COMP_PLUS_LOCA_ITEM = r.uint32le; //str
 
     this.COMP_PLUS_LOCA = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       count: r.uint32le,
       items: new r.Array(this.COMP_PLUS_LOCA_ITEM, 'count')
@@ -809,14 +817,14 @@ export class KMXPlusFile extends KMXFile {
     // 'meta'
 
     this.COMP_PLUS_META = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
-      author: r.uint32le, //str
-      conform: r.uint32le, //str
-      layout: r.uint32le, //str
-      normalization: r.uint32le, //str
-      indicator: r.uint32le, //str
-      version: r.uint32le, //str
+      author: STR_REF, //str
+      conform: STR_REF, //str
+      layout: STR_REF, //str
+      normalization: STR_REF, //str
+      indicator: STR_REF, //str
+      version: STR_REF, //str
       settings: r.uint32le, //new r.Bitfield(r.uint32le, ['fallback', 'transformFailure', 'transformPartial'])
     });
 
@@ -825,7 +833,7 @@ export class KMXPlusFile extends KMXFile {
     this.COMP_PLUS_NAME_ITEM = r.uint32le; //str
 
     this.COMP_PLUS_NAME = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       count: r.uint32le,
       items: new r.Array(this.COMP_PLUS_NAME_ITEM, 'count')
@@ -843,7 +851,7 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_STRS = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       count: r.uint32le,
       items: new r.Array(this.COMP_PLUS_STRS_ITEM, 'count')
@@ -859,19 +867,19 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_TRAN_TRANSFORM = new r.Struct({
-      from: r.uint32le, //str
-      to: r.uint32le, //str
-      mapFrom: r.uint32le, //elem
-      mapTo: r.uint32le //elem
+      from: STR_REF, //str
+      to: STR_REF, //str
+      mapFrom: ELEM_REF, //elem
+      mapTo: ELEM_REF //elem
     });
 
     this.COMP_PLUS_TRAN_REORDER = new r.Struct({
-      elements: r.uint32le, //elem
-      before: r.uint32le, //elem
+      elements: ELEM_REF, //elem
+      before: ELEM_REF, //elem
     });
 
     this.COMP_PLUS_TRAN = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       groupCount: r.uint32le,
       transformCount: r.uint32le,
@@ -885,16 +893,16 @@ export class KMXPlusFile extends KMXFile {
     this.COMP_PLUS_USET_USET = new r.Struct({
       range: r.uint32le,
       count: r.uint32le,
-      pattern: r.uint32le, // str
+      pattern: STR_REF, // str
     });
 
     this.COMP_PLUS_USET_RANGE = new r.Struct({
-      start: r.uint32le,
-      end: r.uint32le,
+      start: CHAR32,
+      end: CHAR32,
     });
 
     this.COMP_PLUS_USET = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       usetCount: r.uint32le,
       rangeCount: r.uint32le,
@@ -906,15 +914,15 @@ export class KMXPlusFile extends KMXFile {
 
     this.COMP_PLUS_VARS_ITEM = new r.Struct({
       type: r.uint32le,
-      id: r.uint32le, // str
-      value: r.uint32le, // str
-      elem: r.uint32le, // elem TODO-LDML
+      id: STR_REF, // str
+      value: STR_REF, // str
+      elem: ELEM_REF,
     });
 
     this.COMP_PLUS_VARS = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
-      markers: r.uint32le, // list TODO-LDML
+      markers: LIST_REF,
       varCount: r.uint32le,
       varEntries: new r.Array(this.COMP_PLUS_VARS_ITEM, 'varCount'),
     });
@@ -927,7 +935,7 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_VKEY = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       count: r.uint32le,
       items: new r.Array(this.COMP_PLUS_VKEY_ITEM, 'count')

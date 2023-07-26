@@ -297,7 +297,7 @@
       <ComponentGroupRef Id="Server" />
     </Feature>
 
-    <Media Id="1" EmbedCab="yes" CompressionLevel="high" Cabinet="Data1.cab" VolumeLabel="DISK1" />
+    <Media Id="1" EmbedCab="yes" Cabinet="Data1.cab" VolumeLabel="DISK1" />
 
     <UIRef Id="WixUI_FeatureTree"/>
 

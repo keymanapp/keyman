@@ -259,8 +259,8 @@ For each transform in the subtable:
 |---|------|---------|------------------------------------------|
 | 0+|  32  | from    | str: processed regex of from= side       |
 | 4+|  32  | to      | str: output pattern                      |
-| 8+|  32  | mapFrom | elem: If not 0, elem of set var for $1   |
-| 8+|  32  | mapTo   | elem: If not 0, elem of set var for $1   |
+| 8+|  32  | mapFrom | str: name of set variable for 'from' $1  |
+| 8+|  32  | mapTo   | str: name of set variable for 'to'  $1   |
 
 - `from`: the source text, index into `elem` section.
 - `to`: sequence of Unicode codepoints that replace `from`. May be the null
@@ -271,6 +271,9 @@ For each transform in the subtable:
   - replace the entire matched `from` regex with the same indexed value in `mapTo`
   - `to` will be null in this case
   - Debugging note: The variables table can be searched for matching `elem` pointers.
+  - For example, from="($[upper])" to="$[1:lower]" will result in:
+    mapFrom: "upper"
+    mapTo:   "lower"
 
 ### C7043.2.11.2 `tran.reorders` subtable
 

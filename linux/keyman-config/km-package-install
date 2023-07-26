@@ -4,23 +4,22 @@ import argparse
 import datetime
 import logging
 import os
+import requests
+import requests_cache
 import sys
 import time
 from pkg_resources import parse_version
 from zipfile import is_zipfile
 
-from keyman_config import KeymanApiUrl, __version__, secure_lookup
-from keyman_config.install_kmp import extract_kmp
+from keyman_config import KeymanApiUrl, add_standard_arguments, initialize_logging, initialize_sentry, secure_lookup
+from keyman_config.get_kmp import get_keyboard_data, get_kmp, keyman_cache_dir
+from keyman_config.install_kmp import extract_kmp, InstallError, InstallStatus, install_kmp
 from keyman_config.kmpmetadata import get_metadata
+from keyman_config.list_installed_kmp import get_kmp_version_shared, get_kmp_version_user
 from keyman_config.uninstall_kmp import uninstall_kmp
 
 
 def get_languages():
-    import requests
-    import requests_cache
-
-    from keyman_config.get_kmp import keyman_cache_dir
-
     logging.info("Getting language list from search")
     api_url = f"{KeymanApiUrl}/search?q=l:*&platform=linux"
     logging.debug("At URL %s", api_url)
@@ -71,7 +70,6 @@ def write_kmpdirlist(kmpdirfile):
 
 
 def list_keyboards():
-    from keyman_config.get_kmp import keyman_cache_dir
     kmpdirfile = os.path.join(keyman_cache_dir(), 'kmpdirlist')
     if not os.path.exists(kmpdirfile):
         write_kmpdirlist(kmpdirfile)
@@ -83,7 +81,6 @@ def list_keyboards():
 
 
 def _list_languages_for_keyboard_impl(packageId, packageDir):
-    from keyman_config.get_kmp import keyman_cache_dir
     kmpfile = os.path.join(keyman_cache_dir(), packageId)
     if not os.path.exists(kmpfile):
         kmpfile = f'{kmpfile}.kmp'
@@ -119,19 +116,14 @@ def main():
     parser.add_argument('-f', '--file', metavar='KMPFILE', help='Keyman kmp file')
     parser.add_argument('-p', '--package', metavar='PACKAGE', help='Keyman package id')
     parser.add_argument('-l', '--bcp47', metavar='LANGTAG', help='bcp47 language tag')
-    parser.add_argument('--version', action='version', version=f'%(prog)s version {__version__}')
-    parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
-    parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
     parser.add_argument('--force', action='store_true', help='force installation of keyboard even if it is ' +
                         'a downgrade to an older version of the keyboard')
+    add_standard_arguments(parser)
 
     args = parser.parse_args()
-    if args.verbose:
-        logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(message)s')
-    elif args.veryverbose:
-        logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(message)s')
-    else:
-        logging.basicConfig(format='%(levelname)s:%(message)s')
+
+    initialize_logging(args)
+    initialize_sentry()
 
     if args.package and args.file:
         parser.print_usage()
@@ -139,12 +131,6 @@ def main():
           "km-package-install: error: too many arguments: either install a local kmp file or " +
           "specify a keyboard id to download and install.")
         sys.exit(2)
-
-    from keyman_config.get_kmp import (get_keyboard_data, get_kmp,
-                                       keyman_cache_dir)
-    from keyman_config.install_kmp import (InstallError, InstallStatus,
-                                           install_kmp)
-    from keyman_config.list_installed_kmp import get_kmp_version_shared, get_kmp_version_user
 
     if os.path.exists(os.path.join(keyman_cache_dir(), 'kmpdirlist')):
         os.remove(os.path.join(keyman_cache_dir(), 'kmpdirlist'))
