@@ -15,7 +15,7 @@ def get_child_schema(info):
     if not path.endswith('/'):
         path += '/'
     path += info['packageID'] + '/' + info['keyboardID'] + '/'
-    return Gio.Settings(GSETTINGS_BASE + '.child', path)
+    return Gio.Settings(f'{GSETTINGS_BASE}.child', path)
 
 
 def get_option(info):
@@ -51,11 +51,8 @@ def set_option(info, options):
             key and values to store
     """
     if "packageID" in info and "keyboardID" in info and options:
-        # Convert dictionary of options into a list of comma-separated option strings
-        list_options = []
-        for key, value in options.items():
-            list_options.append(key + "=" + value)
-
+        # Convert dictionary of options into a list of option strings
+        list_options = [f"{key}={value}" for key, value in options.items()]
         child_schema = get_child_schema(info)
         child_schema.set_strv("options", list_options)
 

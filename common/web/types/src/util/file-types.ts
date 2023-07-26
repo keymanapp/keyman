@@ -131,7 +131,7 @@ export function filenameIs(filename: string, fileType: Source | Binary) {
 
 /**
  * Replaces a filename extension with the new extension. Returns `null` if the
- * filename does not start with oldExtension.
+ * filename does not end with oldExtension.
  * @param filename
  * @param oldExtension
  * @param newExtension

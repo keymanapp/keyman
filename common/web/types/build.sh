@@ -43,7 +43,7 @@ function compile_schemas() {
   mkdir -p "$THIS_SCRIPT_PATH/src/schemas"
   cp "${schemas[@]}" "$THIS_SCRIPT_PATH/src/schemas/"
 
-  # TODO: use json modules instead of this once they stablise
+  # TODO: use https://github.com/tc39/proposal-json-modules instead of this once it stablises
   for schema in "${schemas[@]}"; do
     local fn="$THIS_SCRIPT_PATH/src/schemas/$(basename "$schema" .json)"
     echo 'export default ' > "$fn.ts"

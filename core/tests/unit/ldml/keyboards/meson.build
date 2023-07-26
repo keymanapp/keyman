@@ -26,12 +26,14 @@ tests_without_testdata = [
   'k_100_keytest',
   'k_101_keytest',
   'k_102_keytest',
+
 ]
 
 # These tests have a k_001_tiny-test.xml file as well.
 tests_with_testdata = [
   'k_001_tiny',
   'fr-t-k0-azerty', # TODO-LDML: move to cldr above (fix vkey)
+  'k_200_reorder_nod_Lana',
 ]
 
 tests =  tests_without_testdata
