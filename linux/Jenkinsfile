@@ -5,7 +5,7 @@
 @Library('lsdev-pipeline-library') _
 
 keymanPackaging {
-  distributionsToPackage = 'bionic focal jammy kinetic'
+  distributionsToPackage = 'bionic focal jammy'
   arches = 'amd64 i386'
   packagesToBuild = ['keyman']
 }
