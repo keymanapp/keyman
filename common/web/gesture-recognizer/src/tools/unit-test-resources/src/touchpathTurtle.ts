@@ -105,7 +105,7 @@ export class TouchpathTurtle<HoveredItemType> extends EventEmitter<EventMap<Hove
 
   wait(totalTime: number, sampleCount: number) {
     if(sampleCount <= 0 || totalTime < 0) {
-      throw new Error("Invalid parameter value:  may not be negative!");
+      throw new Error("Invalid parameter value: totalTime may not be negative and sampleCount must be > 0!");
     }
 
     const startSample = this.location;
