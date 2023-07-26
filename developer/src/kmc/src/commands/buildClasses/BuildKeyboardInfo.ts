@@ -5,6 +5,7 @@ import { KeyboardInfoCompiler } from '@keymanapp/kmc-keyboard-info';
 import { loadProject } from '../../util/projectLoader.js';
 import { InfrastructureMessages } from '../../messages/messages.js';
 import { KmpCompiler } from '@keymanapp/kmc-package';
+import { calculateSourcePath } from '../../util/calculateSourcePath.js';
 
 const HelpRoot = 'https://help.keyman.com/keyboard/';
 
@@ -85,16 +86,4 @@ function findProjectFile(callbacks: CompilerCallbacks, project: KeymanDeveloperP
     callbacks.reportMessage(InfrastructureMessages.Error_FileTypeNotFound({ext}));
   }
   return file;
-}
-
-function calculateSourcePath(infile: string): string {
-  // Given "c/path/to/keyboards/release/k/keyboard/keyboard.kpj, we want to
-  // extract "release/k/keyboard"
-
-  infile = infile.replace(/\\/g, '/');
-  const result = /([^\/]+)\/([^\/]+)\/([^\/]+)\/([^\/]+)\.kpj$/.exec(infile);
-  if(!result) {
-    throw new Error(`Invalid path ${infile}`);
-  }
-  return `${result[1]}/${result[2]}/${result[3]}`;
 }
