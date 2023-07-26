@@ -248,7 +248,7 @@ export class KeyboardInfoCompiler {
     // platformSupport
     const platforms = new Set<KeyboardInfoFilePlatform>();
     for(const file of kmxFiles) {
-      const targets = KeymanTargets.keymanTargetsFromString(file.data.targets, {expandAny: true});
+      const targets = KeymanTargets.keymanTargetsFromString(file.data.targets, {expandTargets: true});
       for(const target of targets) {
         this.mapKeymanTargetToPlatform(target).forEach(platform => platforms.add(platform));
       }
@@ -305,16 +305,16 @@ export class KeyboardInfoCompiler {
 
   private mapKeymanTargetToPlatform(target: KeymanTargets.KeymanTarget): KeyboardInfoFilePlatform[] {
     const map: {[index in KeymanTargets.KeymanTarget]: KeyboardInfoFilePlatform[]} = {
-      any: [],
+      any: [], // unused
       androidphone: ['android'],
       androidtablet: ['android'],
-      desktop: ['linux', 'macos', 'windows'],
+      desktop: [], // unused
       ipad: ['ios'],
       iphone: ['ios'],
       linux: ['linux'],
       macosx: ['macos'],
-      mobile: ['android','ios'],
-      tablet: ['android','ios'],
+      mobile: [], // unused
+      tablet: [], // unused
       web: ['desktopWeb'],  // note: assuming that web == desktopWeb but not necessarily mobileWeb, for historical reasons
       windows: ['windows']
     }
