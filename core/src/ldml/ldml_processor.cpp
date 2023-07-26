@@ -240,14 +240,15 @@ ldml_processor::process_event(
         // Construct a context buffer of all the KM_KBP_BT_CHAR items
         // Extract the context into 'ctxt' for transforms to process
         if (!!transforms) {
-          // if no transforms, no reason to do this extraction
+          // if no transforms, no reason to do this extraction (ctxt will remain empty)
           auto &cp = state->context();
           // We're only interested in as much of the context as is a KM_KBP_BT_CHAR.
           uint8_t last_type = KM_KBP_BT_UNKNOWN;
           for (auto c = cp.rbegin(); c != cp.rend(); c++) {
             last_type = c->type;
             if (last_type != KM_KBP_BT_CHAR) {
-              // not a char, get out
+              // not a char, stop here
+              // TODO-LDML: markers?
               break;
             }
             ctxt.emplace_front(1, c->character);
@@ -258,16 +259,16 @@ ldml_processor::process_event(
         // Look up the key
         const std::u16string str = keys.lookup(vk, modifier_state);
         if (str.empty()) {
-          // not found
+          // not found, so pass the keystroke on to the
           state->actions().push_invalidate_context();
           state->actions().push_emit_keystroke();
           break; // ----- commit and exit
         }
         // found the correct string - push it into the context and actions
         const std::u32string str32 = kmx::u16string_to_u32string(str);
-        for(size_t i=0; i<str32.length(); i++) {
-          state->context().push_character(str32[i]);
-          state->actions().push_character(str32[i]);
+        for (const auto &ch : str32) {
+          state->context().push_character(ch);
+          state->actions().push_character(ch);
         }
         // Now process transforms
         // Process the transforms
@@ -282,6 +283,7 @@ ldml_processor::process_event(
           for (const auto &ch : ctxt) {
             ctxtstr.append(ch);
           }
+          // check if the context matched, and if so how much (at the end)
           const size_t matchedContext = transforms->apply(ctxtstr, outputString);
 
           if (matchedContext > 0) {
