@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 17.0.147 alpha 2023-07-25
+
+* chore(linux): Update debian changelog (#9327)
+
+## 17.0.146 alpha 2023-07-24
+
+* chore(deps-dev): bump word-wrap from 1.2.3 to 1.2.4 (#9314)
+
 ## 17.0.145 alpha 2023-07-21
 
 * fix(linux): Fix logging (#9310)
