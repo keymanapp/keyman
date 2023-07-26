@@ -4,7 +4,11 @@ import * as fs from 'fs';
 import { CompilerCallbacks, KeymanDeveloperProject, KeymanFileTypes, KPJFileReader } from "@keymanapp/common-types";
 import { InfrastructureMessages } from "../messages/messages.js";
 
-// TODO: merge with projectReader.ts, which should be renamed to projectRunner
+export const isProject = (filename: string): boolean =>
+  fs.existsSync(filename) && (
+    fs.statSync(filename).isDirectory() ||
+    KeymanFileTypes.sourceTypeFromFilename(filename) == KeymanFileTypes.Source.Project
+  );
 
 export function loadProject(infile: string, callbacks: CompilerCallbacks) {
   // TODO: move path requirement out of here?

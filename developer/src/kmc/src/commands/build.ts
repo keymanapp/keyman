@@ -8,6 +8,7 @@ import { InfrastructureMessages } from '../messages/messages.js';
 import { CompilerFileCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
 import { BaseOptions } from '../util/baseOptions.js';
 import { expandFileLists } from '../util/fileLists.js';
+import { isProject } from 'src/util/projectLoader.js';
 
 
 function commandOptionsToCompilerOptions(options: any): CompilerOptions {
@@ -89,7 +90,7 @@ async function build(filename: string, parentCallbacks: NodeCompilerCallbacks, o
     let builder = null;
 
     // If infile is a directory, then we treat that as a project and build it
-    if(fs.statSync(filename).isDirectory() || KeymanFileTypes.filenameIs(filename, KeymanFileTypes.Source.Project)) {
+    if(isProject(filename)) {
       builder = new BuildProject();
     } else {
       // Otherwise, if it's one of our known file extensions, we build it
