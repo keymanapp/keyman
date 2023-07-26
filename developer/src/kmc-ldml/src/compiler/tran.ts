@@ -1,5 +1,5 @@
 import { constants, SectionIdent } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlus, LDMLKeyboard, CompilerCallbacks, VariableParser } from '@keymanapp/common-types';
+import { KMXPlus, LDMLKeyboard, CompilerCallbacks, VariableParser, MarkerParser } from '@keymanapp/common-types';
 import { SectionCompiler } from "./section-compiler.js";
 
 import Bksp = KMXPlus.Bksp;
@@ -18,7 +18,18 @@ import { CompilerMessages } from "./messages.js";
 
 type TransformCompilerType = 'simple' | 'backspace';
 
-class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> extends SectionCompiler {
+export class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> extends SectionCompiler {
+
+  static validateMarkers(keyboard: LDMLKeyboard.LKKeyboard, emitMarkers: Set<string>, matchMarkers: Set<string>): boolean {
+    keyboard?.transforms?.forEach(transforms =>
+      transforms.transformGroup.forEach(transformGroup => {
+        transformGroup.transform?.forEach(({ to, from }) => {
+          MarkerParser.allReferences(from).forEach(marker => matchMarkers.add(marker));
+          MarkerParser.allReferences(to).forEach(marker => emitMarkers.add(marker));
+        });
+      }));
+    return true;
+  }
 
   protected type: T;
 

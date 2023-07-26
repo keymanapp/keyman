@@ -24,6 +24,12 @@ This will fail because the two markers given don't exist anywhere.
     <string id="unused-variable" value="\{maybe-emitted}" />
   </variables>
 
+  <transforms type="simple">
+    <transformGroup>
+      <!-- not OK, nobody emits this. -->
+      <transform from="\m{doesnt-exist-3}" to="3" />
+    </transformGroup>
+  </transforms>
   <transforms type="backspace">
     <transformGroup>
       <!-- not OK, nobody emits this. -->

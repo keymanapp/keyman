@@ -1,5 +1,5 @@
 import { constants } from '@keymanapp/ldml-keyboard-constants';
-import { LDMLKeyboard, KMXPlus, Constants } from '@keymanapp/common-types';
+import { LDMLKeyboard, KMXPlus, Constants, MarkerParser } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
 import { SectionCompiler } from "./section-compiler.js";
 
@@ -10,6 +10,12 @@ import KeysFlicks = KMXPlus.KeysFlicks;
 import { allUsedKeyIdsInLayers, calculateUniqueKeys, translateLayerAttrToModifier, validModifier } from '../util/util.js';
 
 export class KeysCompiler extends SectionCompiler {
+  static validateMarkers(keyboard: LDMLKeyboard.LKKeyboard, emitMarkers: Set<string>, matchMarkers: Set<string>): boolean {
+    keyboard.keys?.key?.forEach(({ to }) => {
+      MarkerParser.allReferences(to).forEach(marker => emitMarkers.add(marker));
+    });
+    return true;
+  }
 
   public get id() {
     return constants.section.keys;

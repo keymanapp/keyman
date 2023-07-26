@@ -1,5 +1,5 @@
 import { SectionIdent, constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlus, LDMLKeyboard, CompilerCallbacks } from '@keymanapp/common-types';
+import { KMXPlus, LDMLKeyboard, CompilerCallbacks, MarkerParser } from '@keymanapp/common-types';
 import { VariableParser } from '@keymanapp/common-types';
 import { SectionCompiler } from "./section-compiler.js";
 import Vars = KMXPlus.Vars;
@@ -9,6 +9,9 @@ import UnicodeSetItem = KMXPlus.UnicodeSetItem;
 import DependencySections = KMXPlus.DependencySections;
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 import { CompilerMessages } from "./messages.js";
+import { KeysCompiler } from "./keys.js";
+import { TransformCompiler } from "./tran.js";
+import { DispCompiler } from "./disp.js";
 export class VarsCompiler extends SectionCompiler {
   public get id() {
     return constants.section.vars;
@@ -131,12 +134,56 @@ export class VarsCompiler extends SectionCompiler {
       valid = false;
     }
 
-    valid = valid && this.validateMarkers();
+    valid = this.validateMarkers() && valid; // accumulate validity
+
+    return valid;
+  }
+
+  private collectMarkers(emitMarkers : Set<string>, matchMarkers : Set<string>) : boolean {
+    let valid = true;
+
+    // call our friends to validate
+    valid = this.validateVarsMarkers(this.keyboard, emitMarkers, matchMarkers) && valid; // accumulate validity
+    valid = KeysCompiler.validateMarkers(this.keyboard, emitMarkers, matchMarkers) && valid; // accumulate validity
+    valid = TransformCompiler.validateMarkers(this.keyboard, emitMarkers, matchMarkers) && valid; // accumulate validity
+    valid = DispCompiler.validateMarkers(this.keyboard, emitMarkers, matchMarkers) && valid; // accumulate validity
 
     return valid;
   }
 
   private validateMarkers(): boolean {
+    /** only the markers used in emitters */
+    const emitMarkers : Set<string> = new Set<string>();
+    /** only the markers used in matchers */
+    const matchMarkers : Set<string> = new Set<string>();
+
+
+    let valid = this.collectMarkers(emitMarkers, matchMarkers);
+
+    // see if there are any matched-but-not-emitted
+    const matchedNotEmitted : string[] = [];
+    for (const m of matchMarkers.values()) {
+      if (m === '.') continue; // match-all marker
+      if (!emitMarkers.has(m)) {
+        matchedNotEmitted.push(m);
+      }
+    }
+
+    // report once
+    if (matchedNotEmitted.length) {
+      matchedNotEmitted.sort();
+      this.callbacks.reportMessage(CompilerMessages.Error_MissingMarkers({ ids: matchedNotEmitted }));
+      valid = false;
+    }
+    return valid;
+  }
+
+  validateVarsMarkers(keyboard: LDMLKeyboard.LKKeyboard, emitMarkers: Set<string>, matchMarkers: Set<string>) : boolean {
+    keyboard?.variables?.string?.forEach(({value}) =>
+          MarkerParser.allReferences(value).forEach(marker => {
+            emitMarkers.add(marker);
+            matchMarkers.add(marker);
+          }));
     return true;
   }
 

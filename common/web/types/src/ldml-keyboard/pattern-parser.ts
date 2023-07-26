@@ -51,6 +51,9 @@ export class MarkerParser {
    * @returns `[]` or an array of all markers referenced
    */
   public static allReferences(str: string): string[] {
+    if (!str) {
+      return [];
+    }
     return matchArray(str, this.REFERENCE);
   }
 }

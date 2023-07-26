@@ -197,6 +197,7 @@ describe('vars', function () {
             ids: [
               'doesnt-exist-1',
               'doesnt-exist-2',
+              'doesnt-exist-3',
             ]
           }),
         ],
