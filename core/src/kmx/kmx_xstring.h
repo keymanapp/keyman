@@ -18,6 +18,12 @@ namespace kmx {
 #define Uni_IsSurrogate2(ch) ((ch) >= 0xDC00 && (ch) <= 0xDFFF)
 
 /**
+ * @brief True if any surrogate
+ * \def UniIsSurrogate
+*/
+#define Uni_IsSurrogate(ch) (Uni_IsSurrogate1(ch) || Uni_IsSurrogate2(ch))
+
+/**
  * @brief Returns true if BMP (Plane 0)
  * \def Uni_IsBMP
  */
@@ -40,6 +46,16 @@ namespace kmx {
 
 #define Uni_UTF32ToSurrogate1(ch) (char16_t)(((ch) - 0x10000) / 0x400 + 0xD800)
 #define Uni_UTF32ToSurrogate2(ch) (char16_t)(((ch) - 0x10000) % 0x400 + 0xDC00)
+
+#define Uni_IsNoncharacter(ch) (((ch) >= 0xFDD0 && (ch) <= 0xFDEF) || (((ch) & 0xFFFE) == 0xFFFE))
+
+#define Uni_InCodespace(ch) ((ch) <= 0x10FFFF)
+
+/**
+ * @brief True if in codespace and NOT a surrogate or noncharacter.
+ * \def Uni_IsValid
+*/
+#define Uni_IsValid(ch) (Uni_InCodespace(ch) && !Uni_IsSurrogate(ch) && !Uni_IsNoncharacter(ch))
 
 /**
  * char16_t array big enough to hold a single Unicode codepoint,

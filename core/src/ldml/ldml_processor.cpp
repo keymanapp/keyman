@@ -250,11 +250,8 @@ ldml_processor::process_event(
               // not a char, get out
               break;
             }
+            ctxt.emplace_front(1, c->character);
             // extract UTF-32 to 1 or 2 UTF-16 chars in a string
-            km::kbp::kmx::char16_single buf;
-            const int len = km::kbp::kmx::Utf32CharToUtf16(c->character, buf);
-            const std::u16string str(buf.ch, len);
-            ctxt.push_front(str); // prepend to string
           }
         }
 
@@ -276,14 +273,14 @@ ldml_processor::process_event(
         // Process the transforms
         if (!!transforms) {
           // add the newly added char to ctxt
-          ctxt.push_back(str);
+          ctxt.push_back(str32);
 
-          std::u16string outputString;
-  
+          std::u32string outputString;
+
           // TODO-LDML: unroll ctxt into a str. Would be better to have transforms be able to process a vector
-          std::u16string ctxtstr;
-          for (size_t i = 0; i < ctxt.size(); i++) {
-            ctxtstr.append(ctxt[i]);
+          std::u32string ctxtstr;
+          for (const auto &ch : ctxt) {
+            ctxtstr.append(ch);
           }
           const size_t matchedContext = transforms->apply(ctxtstr, outputString);
 
@@ -296,10 +293,9 @@ ldml_processor::process_event(
               state->actions().push_backspace(KM_KBP_BT_CHAR, deletedChar);  // Cause prior char to be removed
             }
             // Now, add in the updated text
-            const std::u32string outstr32 = kmx::u16string_to_u32string(outputString);
-            for (size_t i = 0; i < outstr32.length(); i++) {
-              state->context().push_character(outstr32[i]);
-              state->actions().push_character(outstr32[i]);
+            for (const auto &ch : outputString) {
+              state->context().push_character(ch);
+              state->actions().push_character(ch);
             }
           }
         }

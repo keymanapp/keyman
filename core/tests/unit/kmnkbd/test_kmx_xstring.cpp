@@ -1238,6 +1238,7 @@ test_xstrlen_ignoreifopt() {
 
 void
 test_utf32() {
+  std::cout << "== " << __FUNCTION__ << std::endl;
   const KMX_DWORD u295 =     0x0127; // ħ
 
   assert(Uni_IsBMP(u295));
@@ -1270,6 +1271,7 @@ test_utf32() {
 
 void
 test_u16string_to_u32string() {
+  std::cout << "== " << __FUNCTION__ << std::endl;
   // normal cases
   {
     const std::u32string str = u16string_to_u32string(u"");
@@ -1327,6 +1329,28 @@ test_u16string_to_u32string() {
   }
 }
 
+void test_is_valid() {
+  std::cout << "== " << __FUNCTION__ << std::endl;
+  // valid
+  assert_equal(Uni_IsValid(0x0000), true);
+  assert_equal(Uni_IsValid(0x0127), true);
+  assert_equal(Uni_IsValid(U'🙀'), true);
+
+  // invalid
+  assert_equal(Uni_IsValid(0xDECAFBAD), false); // out of range
+  assert_equal(Uni_IsValid(0x566D4128), false);
+  assert_equal(Uni_IsValid(0xFFFF), false); // nonchar
+  assert_equal(Uni_IsValid(0xFFFE), false); // nonchar
+  assert_equal(Uni_IsValid(0x10FFFF), false); // nonchar
+  assert_equal(Uni_IsValid(0x10FFFE), false); // nonchar
+  assert_equal(Uni_IsValid(0x01FFFF), false); // nonchar
+  assert_equal(Uni_IsValid(0x01FFFE), false); // nonchar
+  assert_equal(Uni_IsValid(0x02FFFF), false); // nonchar
+  assert_equal(Uni_IsValid(0x02FFFE), false); // nonchar
+  assert_equal(Uni_IsValid(0xFDD1), false); // nonchar
+  assert_equal(Uni_IsValid(0xFDD0), false); // nonchar  
+}
+
 constexpr const auto help_str = u"\
 test_kmx_xstring [--color]\n\
 \n\
@@ -1349,6 +1373,7 @@ int main(int argc, char *argv []) {
   test_xstrlen_ignoreifopt();
   test_utf32();
   test_u16string_to_u32string();
+  test_is_valid();
 
   return 0;
 }

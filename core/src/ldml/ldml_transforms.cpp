@@ -9,6 +9,8 @@
 #include "debuglog.h"
 #include <algorithm>
 #include <string>
+#include "kmx/kmx_xstring.h"
+
 
 #ifndef assert
 #define assert(x)  // TODO-LDML
@@ -17,6 +19,16 @@
 namespace km {
 namespace kbp {
 namespace ldml {
+
+#ifndef KMXPLUS_DEBUG_TRANSFORM
+#define KMXPLUS_DEBUG_TRANSFORM 0
+#endif
+
+#if KMXPLUS_DEBUG_TRANSFORM
+#define DebugTran(msg, ...) DebugLog(msg, ##__VA_ARGS__)
+#else
+#define DebugTran(msg, ...)
+#endif
 
 element::element(const USet &new_u, KMX_DWORD new_flags)
     : chr(), uset(new_u), flags((new_flags & ~LDML_ELEM_FLAGS_TYPE) | LDML_ELEM_FLAGS_TYPE_USET) {
@@ -67,6 +79,16 @@ element::matches(km_kbp_usv ch) const {
   }
 }
 
+void
+element::dump() const {
+  if (is_uset()) {
+    DebugLog("element order=%d USET", (int)get_order());
+    uset.dump();
+  } else {
+    DebugLog("element order=%d U+%04X", (int)get_order(), (int)chr);
+  }
+}
+
 int
 reorder_sort_key::compare(const reorder_sort_key &other) const {
   int primaryResult    = (int)primary    - (int)other.primary;
@@ -92,6 +114,11 @@ reorder_sort_key::compare(const reorder_sort_key &other) const {
 bool
 reorder_sort_key::operator<(const reorder_sort_key &other) const {
   return (compare(other) < 0);
+}
+
+bool
+reorder_sort_key::operator>(const reorder_sort_key &other) const {
+  return (compare(other) > 0);
 }
 
 std::deque<reorder_sort_key>
@@ -147,6 +174,12 @@ element_list::load(const kmx::kmx_plus &kplus, kmx::KMXPLUS_ELEM id) {
       emplace_back(e.element, flags); // char
     } else if (type == LDML_ELEM_FLAGS_TYPE_USET) {
       auto u = kplus.usetHelper.getUset(e.element);
+      if (!u.valid()) {
+        DebugLog("Error, invalid UnicodeSet at element %d", (int)i);
+        u.dump();
+        assert(u.valid());
+        return false;
+      }
       emplace_back(u, e.flags);
     } else {
       // not handled
@@ -154,6 +187,10 @@ element_list::load(const kmx::kmx_plus &kplus, kmx::KMXPLUS_ELEM id) {
       return false;
     }
   }
+#if KMXPLUS_DEBUG_TRANSFORM
+  DebugTran("Loaded:");
+  dump();
+#endif
   return true;
 }
 
@@ -165,13 +202,26 @@ element_list::update_sort_key(size_t offset, std::deque<reorder_sort_key> &key) 
     if (!e->matches(k.ch)) {
       DebugLog("!! updateSortKey(%d+%d): element did not re-match the sortkey", offset, c);
       k.dump();
+      // TODO-LDML: assertion follows
     }
     assert(e->matches(k.ch));        // double check that this element matches
     k.primary  = e->get_order();
     k.tertiary = e->get_tertiary();  // TODO-LDML: need more detailed tertiary work
+#if KMXPLUS_DEBUG_TRANSFORM
+    DebugTran("Updating at +%d", c);
+    k.dump();
+#endif
     c++;
   }
   return key;
+}
+
+void
+element_list::dump() const {
+  DebugLog("element_list[%d]", size());
+  for (const auto &e : *this) {
+    e.dump();
+  }
 }
 
 reorder_entry::reorder_entry(const element_list &new_elements) : elements(new_elements), before() {
@@ -208,55 +258,60 @@ reorder_group::apply(std::u32string &str) const {
   // get a baseline sort key
   auto sort_keys = reorder_sort_key::from(str);
 
-  // DebugLog("Baseline Keys:");
-  // for (auto e = sort_keys.begin(); e < sort_keys.end(); e++) {
-  //   e->dump();
-  // }
-
   // apply ALL reorders in the group.
-  // size_t c = 0;
-  for (auto r = list.begin(); r < list.end(); r++) {
+  for (const auto &r : list) {
     // work backward from end of string forward
+    // That is, see if "abc" matches "abc" or "ab" or "a"
     for (size_t s = str.size(); s > 0; s--) {
-      size_t submatch = r->match_end(str, 0, s);
+      size_t submatch = r.match_end(str, 0, s);
       if (submatch != 0) {
+#if KMXPLUS_DEBUG_TRANSFORM
+        DebugTran("Matched: %S (off=%d, len=%d)", str, 0, s);
+        r.elements.dump();
+#endif
         // update the sort key
         size_t sub_match_start = s - submatch;
-        r->elements.update_sort_key(sub_match_start, sort_keys);
+        r.elements.update_sort_key(sub_match_start, sort_keys);
         some_match = true;
       }
     }
     // c++;
   }
   if (!some_match) {
-    // DebugLog("Skip: No reorder elements matched.");
+    DebugTran("Skip: No reorder elements matched.");
     return false;  // nothing matched, so no work.
   }
 
-  size_t match_len = str.size();  // TODO-LDML: for now, assume entire match
+#if KMXPLUS_DEBUG_TRANSFORM
+  DebugTran("Updated sortkey");
+  for (const auto &r : sort_keys) {
+    r.dump();
+  }
+#endif
 
-  // DebugLog("Updated Keys:");
-  // for (auto e = sort_keys.begin(); e < sort_keys.end(); e++) {
-  //   e->dump();
-  // }
+  size_t match_len = str.size();  // TODO-LDML: for now, assume matches entire string
 
   std::u32string prefix = str;
   prefix.resize(str.size() - match_len);  // just the part before the matched part.
   // just the suffix (the matched part)
   std::u32string suffix = str.substr(prefix.size(), match_len);
-  // sort it! Here's where the reorder happens
-  // TODO: need to sort only between primary bases…
-  std::sort(sort_keys.begin(), sort_keys.end());
-#if 0
-  // TODO-LDML :need to sort sub-runs
-  for(auto e = sort_keys.end(); !applied && e > sort_keys.begin(); e--) {
-    if (e->primary == 0) {
-      // Got it.
-      std::sort(e, sort_keys.end());
-      // DebugLog("… sorting at q=%d", (int)e->quaternary);
+
+  /** pointer to the beginning of the current run. */
+  std::deque<reorder_sort_key>::iterator run_start = sort_keys.begin();
+  for(auto e = run_start; e != sort_keys.end(); e++) {
+    if ((e->primary == 0) && (e != run_start)) { // it's a base
+      auto run_end = e - 1;
+      DebugTran("Sorting subrange quaternary=[%d..]", run_start->quaternary);
+      std::sort(run_start, run_end);  // reversed because it's a reverse iterator…?
+      // move the start
+      run_start = e; // next run starts here
     }
   }
-#endif
+  // sort the last run in the string as well.
+  if (run_start != sort_keys.end()) { // TODO-LDML: skip if a single-char run
+    DebugTran("Sorting final subrange quaternary=[%d..]", run_start->quaternary);
+    std::sort(run_start, sort_keys.end()); // reversed because it's a reverse iterator…?
+  }
   // recombine into a str
   std::u32string newSuffix;
   size_t q = sort_keys.begin()->quaternary;  //
@@ -267,23 +322,25 @@ reorder_group::apply(std::u32string &str) const {
     newSuffix.append(1, e->ch);
   }
   if (applied) {
-    // DebugLog("Final Sort");
-    // for (auto e = sort_keys.begin(); e < sort_keys.end(); e++) {
-    //   e->dump();
-    // }
     str.resize(prefix.size());
     str.append(newSuffix);
   } else {
-    // DebugLog("Skip: no reordering change detected");
+    DebugTran("Skip: sorting caused no reordering");
   }
+#if KMXPLUS_DEBUG_TRANSFORM
+  DebugTran("Sorted sortkey");
+  for (const auto &r : sort_keys) {
+    r.dump();
+  }
+#endif
   return applied;
 }
 
-transform_entry::transform_entry(const std::u16string &from, const std::u16string &to) : fFrom(from), fTo(to) {
+transform_entry::transform_entry(const std::u32string &from, const std::u32string &to) : fFrom(from), fTo(to) {
 }
 
 size_t
-transform_entry::match(const std::u16string &input) const {
+transform_entry::match(const std::u32string &input) const {
   if (input.length() < fFrom.length()) {
     return 0;
   }
@@ -295,8 +352,8 @@ transform_entry::match(const std::u16string &input) const {
   return substr.length();
 }
 
-std::u16string
-transform_entry::apply(const std::u16string & /*input*/, size_t /*matchLen*/) const {
+std::u32string
+transform_entry::apply(const std::u32string & /*input*/, size_t /*matchLen*/) const {
   return fTo;
 }
 
@@ -325,7 +382,7 @@ transform_group::transform_group() {
  * return the first transform match in this group
  */
 const transform_entry *
-transform_group::match(const std::u16string &input, size_t &subMatched) const {
+transform_group::match(const std::u32string &input, size_t &subMatched) const {
   for (auto transform = begin(); (subMatched == 0) && (transform < end()); transform++) {
     // TODO-LDML: non regex implementation
     // is the match area too short?
@@ -345,7 +402,7 @@ transform_group::match(const std::u16string &input, size_t &subMatched) const {
  * @return match length: number of chars at end of input string to modify.  0 if no match.
  */
 size_t
-transforms::apply(const std::u16string &input, std::u16string &output) {
+transforms::apply(const std::u32string &input, std::u32string &output) {
   /**
    * Example:
    * Group0:   za -> c, a -> bb
@@ -380,7 +437,7 @@ transforms::apply(const std::u16string &input, std::u16string &output) {
    */
   size_t matched = 0;
   /** modified copy of input */
-  std::u16string updatedInput = input;
+  std::u32string updatedInput = input;
   for (auto group = transform_groups.begin(); group < transform_groups.end(); group++) {
     // for each transform group
     // break out once there's a match
@@ -398,7 +455,7 @@ transforms::apply(const std::u16string &input, std::u16string &output) {
         // now apply the found transform
 
         // update subOutput (string) and subMatched
-        std::u16string subOutput = transform->apply(updatedInput, subMatched);
+        std::u32string subOutput = transform->apply(updatedInput, subMatched);
 
         // remove the matched part of the updatedInput
         updatedInput.resize(updatedInput.length() - subMatched);  // chop of the subMatched part at end
@@ -420,7 +477,16 @@ transforms::apply(const std::u16string &input, std::u16string &output) {
         }
       }
     } else if (group->type == any_group_type::reorder) {
-      // TODO-LDML reorder
+      // TODO-LDML: cheesy solution
+      std::u32string str2 = updatedInput;
+      if (group->reorder.apply(str2)) {
+        // pretend the whole thing matched
+        output.resize(0);
+        output.append(str2);
+        updatedInput.resize(0);
+        updatedInput.append(str2);
+        matched = output.length();
+      }
     }
     // else: continue to next group
   }
@@ -442,8 +508,8 @@ transforms::apply(const std::u16string &input, std::u16string &output) {
 
 // simple impl
 bool
-transforms::apply(std::u16string &str) {
-  std::u16string output;
+transforms::apply(std::u32string &str) {
+  std::u32string output;
   size_t matchLength = apply(str, output);
   if (matchLength == 0) {
     return false;
@@ -452,22 +518,6 @@ transforms::apply(std::u16string &str) {
   str.append(output);
   return true;
 }
-
-bool
-transforms::apply(std::u32string &str) {
-  bool rc = false;
-  // TODO-LDML: PoC implementation for now, need to refactor into fcns
-  // ONLY reorder
-  for (auto group = transform_groups.begin(); group < transform_groups.end(); group++) {
-    assert(group->type == reorder);  // TODO-LDML
-    auto rgroup = group->reorder;
-    if (rgroup.apply(str)) {
-      rc = true;
-    }
-  }
-  return rc;
-}
-
 // Loader
 
 transforms *
@@ -515,8 +565,8 @@ transforms::load(
 
       for (KMX_DWORD itemNumber = 0; itemNumber < group->count; itemNumber++) {
         const kmx::COMP_KMXPLUS_TRAN_TRANSFORM *element = tranHelper.getTransform(group->index + itemNumber);
-        const std::u16string fromStr                    = kplus.strs->get(element->from);
-        const std::u16string toStr                      = kplus.strs->get(element->to);
+        const std::u32string fromStr                    = kmx::u16string_to_u32string(kplus.strs->get(element->from));
+        const std::u32string toStr                      = kmx::u16string_to_u32string(kplus.strs->get(element->to));
         std::u16string mapFrom, mapTo;
 
         if (element->mapFrom && element->mapTo) {
@@ -525,7 +575,7 @@ transforms::load(
           mapTo   = kplus.strs->get(element->mapTo);
         }
 
-        newGroup.emplace_back(fromStr, toStr);  // creating a transform_entry
+        newGroup.emplace_back(fromStr, toStr /* ,mapFrom, mapTo */);  // creating a transform_entry
       }
       transforms->addGroup(newGroup);
     } else if (group->type == LDML_TRAN_GROUP_TYPE_REORDER) {
@@ -543,6 +593,7 @@ transforms::load(
         if (load_ok) {
           newGroup.list.emplace_back(elements, before);
         } else {
+          DebugLog("reorder elements(%d+%d) failed to load", group->index, itemNumber);
           return nullptr;
         }
       }

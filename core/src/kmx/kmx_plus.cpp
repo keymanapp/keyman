@@ -18,6 +18,20 @@ namespace km {
 namespace kbp {
 namespace kmx {
 
+/**
+ * \def KMXPLUS_DEBUG_LOAD set to 1 to print messages on KMXPLUS loading.
+ * Off by default.
+*/
+#ifndef KMXPLUS_DEBUG_LOAD
+#define KMXPLUS_DEBUG_LOAD 0
+#endif
+
+#if KMXPLUS_DEBUG_LOAD
+#define DebugLoad(msg,...) DebugLog(msg, __VA_ARGS__)
+#else
+#define DebugLoad(msg,...)
+#endif
+
 // double check these modifier mappings
 static_assert(LCTRLFLAG == LDML_KEYS_MOD_CTRLL, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
 static_assert(RCTRLFLAG == LDML_KEYS_MOD_CTRLR, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
@@ -231,7 +245,7 @@ COMP_KMXPLUS_DISP::valid(KMX_DWORD _kmn_unused(length)) const {
     DebugLog("disp: baseCharacter str#0x%X", baseCharacter);
   }
   for (KMX_DWORD i=0; i<count; i++) {
-    DebugLog("disp#%d: to: str0x%X -> str0x%X", i, entries[i].to, entries[i].display);
+    DebugLoad("disp#%d: to: str0x%X -> str0x%X", i, entries[i].to, entries[i].display);
     if (entries[i].to == 0 || entries[i].display == 0) {
       DebugLog("disp to: or display: has a zero string");
       assert(false);
@@ -265,7 +279,7 @@ COMP_KMXPLUS_STRS::valid(KMX_DWORD _kmn_unused(length)) const {
       return false;
     }
     // TODO-LDML: validate valid UTF-16LE?
-    DebugLog("strs #0x%X: '%s'", i, Debug_UnicodeString(start));
+    DebugLoad("strs #0x%X: '%s'", i, Debug_UnicodeString(start));
   }
   return true;
 }
@@ -740,7 +754,7 @@ COMP_KMXPLUS_KEYS_Helper::setKeys(const COMP_KMXPLUS_KEYS *newKeys) {
     for(KMX_DWORD i = 0; is_valid && i < key2->keyCount; i++) {
       const auto &key = keys[i];
       // is the count off the end?
-      DebugLog( "<key #%d> id=0x%X, to=0x%X, flicks=%d", i, key.id, key.to, key.flicks); // TODO-LDML: could dump more fields here
+      DebugLoad( "<key #%d> id=0x%X, to=0x%X, flicks=%d", i, key.id, key.to, key.flicks); // TODO-LDML: could dump more fields here
       if (key.flicks >0 && key.flicks >= key2->flicksCount) {
         DebugLog("key[%d] has invalid flicks index %d", i, key.flicks);
         is_valid = false;
@@ -750,7 +764,7 @@ COMP_KMXPLUS_KEYS_Helper::setKeys(const COMP_KMXPLUS_KEYS *newKeys) {
     for(KMX_DWORD i = 0; is_valid && i < key2->flicksCount; i++) {
       const auto &e = flickLists[i];
       // is the count off the end?
-      DebugLog("<flicks> %d: index %d, count %d", i, e.flick, e.count);
+      DebugLoad("<flicks> %d: index %d, count %d", i, e.flick, e.count);
       if (i == 0) {
         if (e.flick != 0 || e.count != 0) {
           DebugLog("Error: Invalid Flick #0");
@@ -765,18 +779,22 @@ COMP_KMXPLUS_KEYS_Helper::setKeys(const COMP_KMXPLUS_KEYS *newKeys) {
     }
     for(KMX_DWORD i = 0; is_valid && i < key2->flickCount; i++) {
       const auto &e = flickElements[i];
-      // is the count off the end?
-      DebugLog("<flick> %d: to=0x%X, directions=0x%X, flags=0x%X", i, e.to, e.directions, e.flags);
+      // validate to is present
+      if (e.to == 0 || e.directions == 0) {
+        DebugLog("flickElement[%d] has empty to=%0x%X or directions=%0x%X", i, e.to, e.directions);
+        is_valid = false;
+        assert(is_valid);
+      }
+      DebugLoad("<flick> %d: to=0x%X, directions=0x%X, flags=0x%X", i, e.to, e.directions, e.flags);
     }
     // now the kmap
-    DebugLog(" kmap count: #0x%X", key2->kmapCount);
+    DebugLoad(" kmap count: #0x%X", key2->kmapCount);
     for (KMX_DWORD i = 0; i < key2->kmapCount; i++) {
-      // These are pretty noisy, drop them from the log
-      // DebugLog(" #0x%d\n", i);
+      DebugLoad(" #0x%d\n", i);
       auto &entry = kmap[i];
-      // DebugLog("  vkey\t0x%X", entry.vkey);
-      // DebugLog("  mod\t0x%X", entry.mod);
-      // DebugLog("  key\t#0x%X", entry.key);
+      DebugLoad("  vkey\t0x%X", entry.vkey);
+      DebugLoad("  mod\t0x%X", entry.mod);
+      DebugLoad("  key\t#0x%X", entry.key);
       if (!LDML_IS_VALID_MODIFIER_BITS(entry.mod)) {
         DebugLog("Invalid modifier value");
         assert(false);
@@ -928,10 +946,12 @@ COMP_KMXPLUS_LIST_Helper::setList(const COMP_KMXPLUS_LIST *newList) {
         assert(is_valid);
       }
     }
+#if KMXPLUS_DEBUG_LOAD
     for (KMX_DWORD i = 0; is_valid && i < list->indexCount; i++) {
       const auto &e = indices[i];
-      DebugLog(" index %d: str 0x%X", i, e);
+      DebugLoad(" index %d: str 0x%X", i, e);
     }
+#endif
   }
   // Return results
   DebugLog("COMP_KMXPLUS_LIST_Helper.setList(): %s", is_valid ? "valid" : "invalid");
@@ -969,7 +989,13 @@ COMP_KMXPLUS_USET::valid(KMX_DWORD _kmn_unused(length)) const {
     assert(false);
     return false;
   }
-  return true;
+  return true; // see helper
+}
+
+COMP_KMXPLUS_USET_RANGE::COMP_KMXPLUS_USET_RANGE(KMX_DWORD s, KMX_DWORD e) : start(s), end(e) {
+}
+
+COMP_KMXPLUS_USET_RANGE::COMP_KMXPLUS_USET_RANGE(const COMP_KMXPLUS_USET_RANGE &other) : start(other.start), end(other.end) {
 }
 
 COMP_KMXPLUS_USET_Helper::COMP_KMXPLUS_USET_Helper() : uset(nullptr), is_valid(false), usets(nullptr), ranges(nullptr) {
@@ -977,7 +1003,7 @@ COMP_KMXPLUS_USET_Helper::COMP_KMXPLUS_USET_Helper() : uset(nullptr), is_valid(f
 
 bool
 COMP_KMXPLUS_USET_Helper::setUset(const COMP_KMXPLUS_USET *newUset) {
-  DebugLog("validating newUset=%p", newUset);
+  DebugLoad("validating newUset=%p", newUset);
   is_valid = true;
   if (newUset == nullptr) {
     // Note: kmx_plus::kmx_plus has already called section_from_bytes()
@@ -1017,9 +1043,13 @@ COMP_KMXPLUS_USET_Helper::setUset(const COMP_KMXPLUS_USET *newUset) {
     } else {
       /** last lastEnd value */
       KMX_DWORD lastEnd = 0x0;
-      for (KMX_DWORD r = 0; r < e.count; r++) {
+      for (KMX_DWORD r = 0; is_valid && r < e.count; r++) {
         const auto &range = ranges[e.range + r];  // already range-checked 'r' above
-        if (range.end < range.start) {
+        if (!Uni_IsValid(range.start) || !Uni_IsValid(range.end)) {
+          DebugLog("uset[%d][%d] not valid: [U+%04X-U+%04X]", i, r, range.start, range.end);
+          is_valid = false;
+          assert(is_valid);
+        } else if (range.end < range.start) {
           // range swapped
           DebugLog("uset[%d]: range[%d+%d] end 0x%X<start 0x%X", i, e.range, r, range.end, range.start);
           is_valid = false;
@@ -1042,20 +1072,46 @@ COMP_KMXPLUS_USET_Helper::setUset(const COMP_KMXPLUS_USET *newUset) {
   return is_valid;
 }
 
-USet::USet(const COMP_KMXPLUS_USET_RANGE *newRange, size_t newCount) : ranges(newRange), count(newCount) {
+USet::USet(const COMP_KMXPLUS_USET_RANGE *newRange, size_t newCount)  {
+  for (size_t i = 0; i < newCount; i++) {
+    ranges.emplace_back(newRange[i].start, newRange[i].end);
+  }
 }
 
-USet::USet() : ranges(nullptr), count(0) {
+USet::USet() {
 }
 
 bool USet::contains(km_kbp_usv ch) const {
-  for (size_t i = 0; i < count; i++) {
-    const auto &range = ranges[i];
+  for (const auto &range : ranges) {
     if (range.start <= ch && range.end >= ch) {
       return true;
     }
   }
   return false;
+}
+
+bool
+USet::valid() const {
+  // double check
+  for (const auto &range : ranges) {
+    if (!Uni_IsValid(range.start) || !Uni_IsValid(range.end)) {
+      DebugLog("Invalid UnicodeSet (contains noncharacters): [U+%04X,U+%04X]", (int)range.start, (int)range.end);
+      return false;
+    }
+  }
+  return true;
+}
+
+void
+USet::dump() const {
+  DebugLog(" - USet size=%d", ranges.size());
+  for (const auto &range : ranges) {
+    if (range.start == range.end) {
+      DebugLog("  - [U+%04X]", (uint32_t)range.start);
+    } else {
+      DebugLog("  - [U+%04X-U+%04X]", (uint32_t)range.start, (uint32_t)range.end);
+    }
+  }
 }
 
 USet
@@ -1083,6 +1139,9 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     : bksp(nullptr), disp(nullptr), elem(nullptr), key2(nullptr), layr(nullptr), list(nullptr), loca(nullptr), meta(nullptr),
       sect(nullptr), strs(nullptr), tran(nullptr), vars(nullptr), vkey(nullptr), valid(false) {
   DebugLog("kmx_plus: Got a COMP_KEYBOARD at %p\n", keyboard);
+#if !KMXPLUS_DEBUG_LOAD
+  DebugLog("Note: define KMXPLUS_DEBUG_LOAD=1 at compile time for more verbosity in loading");
+#endif
   if (!(keyboard->dwFlags & KF_KMXPLUS)) {
     DebugLog("Err: flags COMP_KEYBOARD.dwFlags did not have KF_KMXPLUS set");
     valid = false;
