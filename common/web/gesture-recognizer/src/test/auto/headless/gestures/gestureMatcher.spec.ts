@@ -2,8 +2,8 @@ import { assert } from 'chai'
 import sinon from 'sinon';
 
 import * as PromiseStatusModule from 'promise-status-async';
-const promiseStatus       = PromiseStatusModule.promiseStatus;
 const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
+import { assertingPromiseStatus as promiseStatus } from '../../../resources/assertingPromiseStatus.js';
 
 import { ComplexGestureSource, InputSample, SimpleGestureSource, gestures } from '@keymanapp/gesture-recognizer';
 
