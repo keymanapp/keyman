@@ -130,7 +130,14 @@ export class VarsCompiler extends SectionCompiler {
       }));
       valid = false;
     }
+
+    valid = valid && this.validateMarkers();
+
     return valid;
+  }
+
+  private validateMarkers(): boolean {
+    return true;
   }
 
   public compile(sections: DependencySections): Vars {

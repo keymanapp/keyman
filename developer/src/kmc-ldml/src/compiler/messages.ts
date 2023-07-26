@@ -130,5 +130,9 @@ export class CompilerMessages {
   static Error_CantReferenceSetFromUnicodeSet = (o:{id: string}) =>
   m(this.ERROR_CantReferenceSetFromUnicodeSet, `Illegal use of set variable from within UnicodeSet: \$[${o.id}]`);
   static ERROR_CantReferenceSetFromUnicodeSet = SevError | 0x0020;
+
+  static Error_MissingMarkers = (o: { ids: string[] }) =>
+  m(this.ERROR_MissingMarkers, `Markers used for matching but not defined: ${o.ids?.join(',')}`);
+  static ERROR_MissingMarkers = SevError | 0x0021;
 }
 

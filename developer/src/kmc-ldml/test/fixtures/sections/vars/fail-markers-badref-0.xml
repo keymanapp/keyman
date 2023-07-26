@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+This will fail because the two markers given don't exist anywhere.
+
+-->
+<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
+<keyboard locale="mt" conformsTo="techpreview">
+  <names>
+    <name value="vars-markers-badref-0" />
+  </names>
+
+  <displays>
+    <!-- Not ok, nobody emits this, so this display doesn't make sense -->
+    <display to="\{doesnt-exist-1}" display="¬" />
+    <!-- OK - it si in the strings list.  Could warn that it matches no keys -->
+    <display to="\{maybe-emitted}" display="‽" />
+  </displays>
+
+  <variables>
+    <!-- This may be emitted, so at present it does not cause an error. -->
+    <!-- A linter could, however, hint on an unused variable. -->
+    <!-- Removing this variable would cause \m{maybe-emitted}  to error in the transform group -->
+    <string id="unused-variable" value="\{maybe-emitted}" />
+  </variables>
+
+  <transforms type="backspace">
+    <transformGroup>
+      <!-- not OK, nobody emits this. -->
+      <transform from="\m{doesnt-exist-2}" />
+      <!-- OK - it's in the variable list -->
+      <transform from="\m{maybe-emitted}" />
+      <!-- OK - matches all markers -->
+      <transform from="\m{.}" />
+    </transformGroup>
+  </transforms>
+</keyboard>
