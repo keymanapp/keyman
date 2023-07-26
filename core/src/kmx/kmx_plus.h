@@ -643,6 +643,87 @@ static_assert(sizeof(struct COMP_KMXPLUS_LIST) == LDML_LENGTH_LIST, "mismatched 
 static_assert(sizeof(struct COMP_KMXPLUS_LIST_ITEM) == LDML_LENGTH_LIST_ITEM, "mismatched size of section list.lists subtable");
 static_assert(sizeof(COMP_KMXPLUS_LIST_INDEX) == LDML_LENGTH_LIST_INDEX, "mismatched size of section list.indices subtable");
 
+
+
+/* ------------------------------------------------------------------
+ * uset section
+   ------------------------------------------------------------------ */
+/**
+ * uset.range index
+ */
+typedef KMX_DWORD KMXPLUS_USET;
+
+struct COMP_KMXPLUS_USET {
+  static const KMX_DWORD IDENT = LDML_SECTIONID_USET;
+  COMP_KMXPLUS_HEADER header;
+  KMX_DWORD usetCount;
+  KMX_DWORD rangeCount;
+  // see helper for: usets sub-table
+  // see helper for: ranges sub-table
+
+  /**
+   * @brief True if section is valid.
+   */
+  bool valid(KMX_DWORD length) const;
+};
+
+/**
+ * uset.usets subtable
+ */
+struct COMP_KMXPLUS_USET_USET {
+  KMX_DWORD range;
+  KMX_DWORD count;
+  KMXPLUS_STR pattern;
+};
+
+struct COMP_KMXPLUS_USET_RANGE {
+  km_kbp_usv start;
+  km_kbp_usv end;
+};
+
+/**
+ * represents one of the uset elements
+ * Aliases, does not copy memory.
+ * The original KMX+ memory must stay around while this object is held.
+ */
+class USet {
+  public:
+    /** construct a set over the specified range. */
+    USet(const COMP_KMXPLUS_USET_RANGE* newStart, size_t newCount);
+    /** empty set */
+    USet();
+    /** true if the uset contains this char */
+    bool contains(km_kbp_usv ch) const;
+  private:
+    const COMP_KMXPLUS_USET_RANGE *ranges;
+    size_t count;
+};
+
+class COMP_KMXPLUS_USET_Helper {
+public:
+  COMP_KMXPLUS_USET_Helper();
+  /**
+   * Initialize the helper to point at a uset section.
+   * @return true if valid
+  */
+  bool setUset(const COMP_KMXPLUS_USET *newUset);
+  inline bool valid() const { return is_valid; }
+
+  USet getUset(KMXPLUS_USET list) const;
+  const COMP_KMXPLUS_USET_RANGE *getRange(KMX_DWORD index) const;
+
+private:
+  const COMP_KMXPLUS_USET *uset;
+  bool is_valid;
+  const COMP_KMXPLUS_USET_USET *usets;
+  const COMP_KMXPLUS_USET_RANGE *ranges;
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_USET) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");
+static_assert(sizeof(struct COMP_KMXPLUS_USET) == LDML_LENGTH_USET, "mismatched size of section uset");
+static_assert(sizeof(struct COMP_KMXPLUS_USET_RANGE) == LDML_LENGTH_USET_RANGE, "mismatched size of section uset.ranges subtable");
+static_assert(sizeof(struct COMP_KMXPLUS_USET_USET) == LDML_LENGTH_USET_USET, "mismatched size of section uset.usets subtable");
+
 /**
  * @brief helper accessor object for KMX Plus data
  *
@@ -670,6 +751,7 @@ class kmx_plus {
     const COMP_KMXPLUS_SECT *sect;
     const COMP_KMXPLUS_STRS *strs;
     const COMP_KMXPLUS_TRAN *tran;
+    const COMP_KMXPLUS_USET *uset;
     const COMP_KMXPLUS_VARS *vars;
     const COMP_KMXPLUS_VKEY *vkey;
     inline bool is_valid() { return valid; }
@@ -678,6 +760,7 @@ class kmx_plus {
     COMP_KMXPLUS_LAYR_Helper layrHelper;
     COMP_KMXPLUS_LIST_Helper listHelper;
     COMP_KMXPLUS_TRAN_Helper tranHelper;
+    COMP_KMXPLUS_USET_Helper usetHelper;
   private:
     bool valid; // true if valid
 };

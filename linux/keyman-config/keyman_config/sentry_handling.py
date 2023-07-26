@@ -5,7 +5,6 @@ import logging
 import os
 import platform
 import sys
-from keyman_config.gsettings import GSettings
 from keyman_config.version import (
   __version__,
   __versionwithtag__,

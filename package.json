@@ -45,5 +45,8 @@
     "@keymanapp/hextobin": "file:common/tools/hextobin",
     "@keymanapp/keyman-version": "file:common/web/keyman-version",
     "@keymanapp/ldml-keyboard-constants": "file:core/include/ldml"
+  },
+  "engines": {
+    "node": "^18.x"
   }
 }
