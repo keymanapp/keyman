@@ -155,9 +155,12 @@ u16string_to_u32string(const std::u16string &source) {
   return out;
 }
 
+inline bool Uni_IsEndOfPlaneNonCharacter(km_kbp_usv ch) {
+  return (((ch) & 0xFFFE) == 0xFFFE);
+}
 
 inline bool Uni_IsNoncharacter(km_kbp_usv ch) {
-  return (((ch) >= 0xFDD0 && (ch) <= 0xFDEF) || (((ch) & 0xFFFE) == 0xFFFE));
+  return (((ch) >= 0xFDD0 && (ch) <= 0xFDEF) || Uni_IsEndOfPlaneNonCharacter(ch));
 }
 
 inline bool Uni_InCodespace(km_kbp_usv ch) {
@@ -170,7 +173,7 @@ inline bool Uni_IsValid(km_kbp_usv ch) {
 
 inline bool Uni_IsValid(km_kbp_usv start, km_kbp_usv end) {
   // quicker check
-  if (!Uni_IsValid(start) || !Uni_IsValid(end)) {
+  if (!Uni_IsValid(end) || (end < start)) { // start is checked below
     return false;
   }
 
