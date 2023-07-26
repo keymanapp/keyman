@@ -51,3 +51,30 @@ export const
     [KeymanTarget.mobile]: 'Mobile devices', [KeymanTarget.desktop]: 'Desktop devices',
       [KeymanTarget.tablet]: 'Tablet devices'
   };
+
+
+  export function keymanTargetsFromString(targets: string, options?: {expandTargets?: boolean}): KeymanTarget[] {
+    let result = new Set<KeymanTarget>(<KeymanTarget[]>targets.split(/ +/));
+    if(options?.expandTargets) {
+      if(result.has(KeymanTarget.any)) {
+        return AllKeymanTargets;
+      }
+      if(result.has(KeymanTarget.mobile)) {
+        result.delete(KeymanTarget.mobile);
+        result.add(KeymanTarget.androidphone);
+        result.add(KeymanTarget.iphone);
+      }
+      if(result.has(KeymanTarget.tablet)) {
+        result.delete(KeymanTarget.tablet);
+        result.add(KeymanTarget.androidtablet);
+        result.add(KeymanTarget.ipad);
+      }
+      if(result.has(KeymanTarget.desktop)) {
+        result.delete(KeymanTarget.desktop);
+        result.add(KeymanTarget.linux);
+        result.add(KeymanTarget.macosx);
+        result.add(KeymanTarget.windows);
+      }
+    }
+    return [...result];
+  }

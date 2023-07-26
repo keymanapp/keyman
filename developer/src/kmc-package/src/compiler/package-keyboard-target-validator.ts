@@ -1,5 +1,4 @@
-import { CompilerCallbacks, KmpJsonFile } from "@keymanapp/common-types";
-import { KeymanTarget, TouchKeymanTargets } from "./keyman-targets.js";
+import { KeymanTargets, CompilerCallbacks, KmpJsonFile } from "@keymanapp/common-types";
 import { CompilerMessages } from "./messages.js";
 import { KeyboardMetadataCollection } from "./package-metadata-collector.js";
 
@@ -30,8 +29,8 @@ export class PackageKeyboardTargetValidator {
 
     // If at least one target is a touch target, we need to check that the
     // package also includes the .js
-    const targets = <KeymanTarget[]>targetsText.split(' ');
-    if(targets.some(target => ['any', ...TouchKeymanTargets].includes(target))) {
+    const targets = KeymanTargets.keymanTargetsFromString(targetsText, {expandTargets: true});
+    if(targets.some(target => KeymanTargets.TouchKeymanTargets.includes(target))) {
       if(!kmp.files.find(file => this.callbacks.path.basename(file.name, '.js') == keyboard.id)) {
         // .js version of the keyboard is not found, warn
         this.callbacks.reportMessage(CompilerMessages.Warn_JsKeyboardFileIsMissing({id: keyboard.id}));
