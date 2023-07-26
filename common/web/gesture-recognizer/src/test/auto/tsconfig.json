@@ -5,7 +5,7 @@
  */
 {
   // Enabling the following line re-breaks it for some reason?
-  // "extends": "../../../tsconfig.json",
+  "extends": "../../../../tsconfig.kmw-main-base.json",
   "compilerOptions": {
     "moduleResolution": "Node16",
   }
