@@ -140,7 +140,8 @@ export class SimpleGestureSourceSubview<HoveredItemType> extends SimpleGestureSo
   private subviewDisconnector: () => void;
 
   /**
-   * Constructs a new SimpleGestureSource instance for tracking updates to an active input point over time.
+   * Constructs a new "Subview" into an existing SimpleGestureSource instance.  Future updates of the base
+   *  SimpleGestureSource will automatically be included until this instance's `disconnect` method is called.
    * @param identifier     The system identifier for the input point's events.
    * @param initialHoveredItem  The initiating event's original target element
    * @param isFromTouch    `true` if sourced from a `TouchEvent`; `false` otherwise.
