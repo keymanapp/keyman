@@ -154,7 +154,7 @@ if [ $DO_UPDATE = true ]; then
     fi
 
     # Copy resources.
-    cp -Rf "$KEYMAN_ENGINE_FRAMEWORK_SRC" "$KEYMAN_ENGINE_FRAMEWORK_DST"
+    /bin/cp -Rf "$KEYMAN_ENGINE_FRAMEWORK_SRC" "$KEYMAN_ENGINE_FRAMEWORK_DST"
 fi
 
 # First things first - update our dependencies.
