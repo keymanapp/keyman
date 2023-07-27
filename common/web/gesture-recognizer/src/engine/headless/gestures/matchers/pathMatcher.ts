@@ -31,9 +31,6 @@ export class PathMatcher<Type> {
   // underlying the `path` field.
   public readonly source: SimpleGestureSource<Type>;
 
-  private _finalStats: CumulativePathStats<Type>;
-  private _baseItem: Type;
-
   private readonly publishedPromise: ManagedPromise<PathMatchResult>
   private _result: PathMatchResult;
 
@@ -86,43 +83,19 @@ export class PathMatcher<Type> {
     this.publishedPromise.resolve(retVal)
     this._result = retVal;
 
-    /*
-     * Lock in the current instance of path, before further processing on the SimpleGestureSource
-     * performs any 'chop'-style operations.
-     *
-     * No need to deep copy; the only mutable part is the "followingSample" field, which relates to
-     * any path continuation by later stages of the ongoing gesture path.  That's fine, as it's
-     * not the part we actually need to preserve in a fixed state.
-     *
-     * While we _could_, in theory, preserve the overall path... we don't need the samples -
-     * just the stats will do.
-     */
-    this._finalStats = this.source.path.stats;
-    this._baseItem = this.source.baseItem;
-
     return retVal;
   }
 
-  get finalStats() {
-    // Note:  contains `initialSample` and `lastSample`, the endpoints of the path segment that was matched.
-    // The latter can be used to find the matcher's final `currentItem` value if/as desired.
-    return this._finalStats;
+  get stats() {
+    return this.source.path.stats;
   }
 
   get baseItem() {
-    if(this.publishedPromise.isFulfilled) {
-      return this._baseItem;
-    } else {
-      return this.source.baseItem;
-    }
+    return this.source.baseItem;
   }
 
   get lastItem() {
-    if(this.publishedPromise.isFulfilled) {
-      return this.finalStats.lastSample.item;
-    } else {
-      return this.source.currentSample.item;
-    }
+    return this.source.currentSample.item;
   }
 
   update(): PathUpdateResult {
