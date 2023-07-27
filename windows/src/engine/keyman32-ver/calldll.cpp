@@ -234,9 +234,10 @@ BOOL UnloadDLLs(LPINTKEYBOARDINFO lpkbi)
   if (lpkbi->lpCoreKeyboardState) {
           km_kbp_state_imx_deregister_callback(lpkbi->lpCoreKeyboardState);
           PKEYMAN64THREADDATA _td = ThreadGlobals();
-          if (!_td)
+          if (!_td) {
             return FALSE;
-          if (_td->hModuleProxy){
+          }
+          if (_td->hModuleProxy) {
             FreeLibrary(_td->hModuleProxy);
             _td->hModuleProxy = NULL;
           }

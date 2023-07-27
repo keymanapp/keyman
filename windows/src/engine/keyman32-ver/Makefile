@@ -11,7 +11,8 @@ build: version.res dirs pull-core
 	 $(MAKE) -fpremake.mak build
 
 clean: def-clean
-    $(MAKE) -fpremake.mak clean
+     $(MKVER_U) premake.in premake.mak
+     $(MAKE) -fpremake.mak clean
 
 signcode:
     $(MKVER_U) premake.in premake.mak
