@@ -80,12 +80,10 @@ git clone https://github.com/emscripten-core/emsdk.git
 cd emsdk
 ./emsdk install latest
 ./emsdk activate latest
-source ./emsdk_env.sh
-export EMSDK_NODE=/usr/bin/node
+export EMSCRIPTEN_BASE=$(pwd)/upstream/emscripten
 ```
 
-*emscripten* comes with an older version of node, so it's important to set
-the `EMSDK_NODE` environment variable to the node version we need.
+**NOTE:** Don't put EMSDK on the path, i.e. don't source `emsdk_env.sh`.
 
 ### Building Keyman Core
 
@@ -114,7 +112,7 @@ mkdir -p build/linux
 docker run -it --rm -v $(pwd)/..:/home/build/build \
   -v $(pwd)/build/linux:/home/build/build/core/build \
   keymanapp/keyman-linux-builder:latest \
-  bash -c 'core/build.sh --debug'
+  wrapper core/build.sh --debug
 ```
 
 - linux
@@ -124,7 +122,7 @@ docker run -it --rm -v $(pwd)/..:/home/build/build \
 cd $(git rev-parse --show-toplevel)
 docker run -it --rm -v $(pwd):/home/build/build \
   keymanapp/keyman-linux-builder:latest \
-  bash -c 'DESTDIR=/home/build linux/build.sh --debug build install'
+  wrapper 'DESTDIR=/home/build linux/build.sh --debug build install'
 ```
 
 ## Keyman for Android

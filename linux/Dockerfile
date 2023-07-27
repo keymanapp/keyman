@@ -20,7 +20,7 @@ ENV DEBCONF_NOWARNINGS yes
 
 # Update to the latest
 RUN apt-get -q -y update &&  \
-  apt-get -q -y install devscripts equivs meson python3 python3-setuptools software-properties-common && \
+  apt-get -q -y install devscripts equivs meson python3 python3-setuptools software-properties-common curl && \
   add-apt-repository ppa:keymanapp/keyman && \
   add-apt-repository ppa:keymanapp/keyman-alpha
 RUN apt-get -q -y update &&  \
@@ -41,9 +41,10 @@ RUN cd /usr/share && \
   cd emsdk && \
   ./emsdk install latest && \
   ./emsdk activate latest && \
-  echo 'source "/usr/share/emsdk/emsdk_env.sh"' >> $HOME/.bashrc && \
-  echo "export EMSDK_NODE=/usr/bin/node" >> $HOME/.bashrc && \
-  echo 'echo "node $(node --version)"' >> $HOME/.bashrc
+  echo "#!/bin/bash" > /usr/bin/wrapper && \
+  echo "export EMSCRIPTEN_BASE=/usr/share/emsdk/upstream/emscripten" >> /usr/bin/wrapper && \
+  echo "bash -c \"\${@:-bash}\"">> /usr/bin/wrapper && \
+  chmod +x /usr/bin/wrapper
 
 # now, switch to build user
 USER build
