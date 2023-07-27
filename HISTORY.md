@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.148 alpha 2023-07-27
+
+* feat(core): merge transform/reorder processing w/ u32 (#9293)
+* chore(developer): make unknown vkey a hint, not error (#9344)
+* chore(linux): Update supported Ubuntu versions (#9341)
+
 ## 17.0.147 alpha 2023-07-25
 
 * chore(linux): Update debian changelog (#9327)
