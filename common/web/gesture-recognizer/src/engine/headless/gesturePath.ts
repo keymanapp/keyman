@@ -64,6 +64,16 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
     this._stats = new CumulativePathStats();
   }
 
+  public clone(): GesturePath<Type> {
+    const instance = new GesturePath<Type>();
+    instance.samples = [].concat(this.samples);
+    instance._isComplete = this._isComplete;
+    instance._wasCancelled = this._wasCancelled;
+    instance._stats = new CumulativePathStats<Type>(this._stats);
+
+    return instance;
+  }
+
   /**
    * Deserializes a GesturePath instance from its corresponding JSON.parse() object.
    * @param jsonObj

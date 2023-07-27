@@ -41,27 +41,17 @@ export class SimpleGestureSource<HoveredItemType> {
   public readonly rawIdentifier: number;
 
   // A full, uninterrupted recording of all samples observed during the lifetime of the touchpoint.
-  private _fullPath: GesturePath<HoveredItemType>;
+  protected _path: GesturePath<HoveredItemType>;
 
-  // The portion of the touchpoint's lifetime currently under consideration for gestures.
-  private _activePath: GesturePath<HoveredItemType>;
-
-  private _baseItem: HoveredItemType;
+  protected _baseItem: HoveredItemType;
 
   private static _jsonIdSeed: -1;
 
   /**
    * Tracks the coordinates and timestamps of each update for the lifetime of this `SimpleGestureSource`.
    */
-  public get fullPath(): GesturePath<HoveredItemType> {
-    return this._fullPath;
-  }
-
-  /**
-   * Tracks the coordinates and timestamps of each update for the lifetime of this `SimpleGestureSource`.
-   */
   public get path(): GesturePath<HoveredItemType> {
-    return this._activePath;
+    return this._path;
   }
 
   /**
@@ -73,8 +63,7 @@ export class SimpleGestureSource<HoveredItemType> {
   constructor(identifier: number, isFromTouch: boolean) {
     this.rawIdentifier = identifier;
     this.isFromTouch = isFromTouch;
-    this._fullPath = new GesturePath();
-    this._activePath = this.fullPath;
+    this._path = new GesturePath();
   }
 
   /**
@@ -88,18 +77,12 @@ export class SimpleGestureSource<HoveredItemType> {
     const path = GesturePath.deserialize(jsonObj.path);
 
     const instance = new SimpleGestureSource(id, isFromTouch);
-    instance._fullPath = path;
-    instance._activePath = path;
+    instance._path = path;
     return instance;
   }
 
   public update(sample: InputSample<HoveredItemType>) {
-    this.fullPath.extend(sample);
-
-    if(this.fullPath != this.path) {
-      this.path.extend(sample);
-    }
-
+    this.path.extend(sample);
     this._baseItem ||= sample.item;
   }
 
@@ -117,30 +100,16 @@ export class SimpleGestureSource<HoveredItemType> {
     return this.path.coords[this.path.coords.length-1];
   }
 
-  public resetPath(preserveBaseSample: boolean) {
-    const lastSample = this._fullPath.coords[this._fullPath.coords.length-1];
-    this._activePath = new GesturePath<HoveredItemType>();
-    if(lastSample) {
-      this._activePath.extend(lastSample);
-    }
-
-    if(!preserveBaseSample) {
-      this._baseItem = lastSample?.item;
-    }
+  public constructSubview(startAtEnd: boolean, preserveBaseItem: boolean) {
+    return new SimpleGestureSourceSubview(this, startAtEnd, preserveBaseItem);
   }
 
   public terminate(cancel?: boolean) {
     this.path.terminate(cancel);
-    if(this.path != this.fullPath) {
-      this.fullPath.terminate(cancel);
-    }
   }
 
   public get isPathComplete(): boolean {
-    if(this.path.isComplete != this.fullPath.isComplete) {
-      throw new Error("Unexpected state: desync between internal path tracking objects: path = " + this.path.isComplete);
-    }
-    return this.fullPath.isComplete;
+    return this.path.isComplete;
   }
 
   /**
@@ -163,5 +132,85 @@ export class SimpleGestureSource<HoveredItemType> {
     }
 
     return jsonClone;
+  }
+}
+
+export class SimpleGestureSourceSubview<HoveredItemType> extends SimpleGestureSource<HoveredItemType> {
+  private _baseSource: SimpleGestureSource<HoveredItemType>
+  private subviewDisconnector: () => void;
+
+  /**
+   * Constructs a new SimpleGestureSource instance for tracking updates to an active input point over time.
+   * @param identifier     The system identifier for the input point's events.
+   * @param initialHoveredItem  The initiating event's original target element
+   * @param isFromTouch    `true` if sourced from a `TouchEvent`; `false` otherwise.
+   */
+  constructor(source: SimpleGestureSource<HoveredItemType>, startAtEnd: boolean, preserveBaseItem: boolean) {
+    super(source.rawIdentifier, source.isFromTouch);
+
+    const baseSource = this._baseSource = source instanceof SimpleGestureSourceSubview ? source._baseSource : source;
+
+    // Note: we don't particularly need subviews to track the actual coords aside from
+    // tracking related stats data.  But... we don't have an "off-switch" for that yet.
+    let subpath: GesturePath<HoveredItemType>;
+
+    // Will hold the last sample _even if_ we don't save every coord that comes through.
+    const lastSample = source.path.stats.lastSample;
+
+    if(startAtEnd) {
+      subpath = new GesturePath<HoveredItemType>();
+      if(lastSample) {
+        subpath.extend(lastSample);
+      }
+    } else {
+      subpath = source.path.clone();
+    }
+
+    this._path = subpath;
+
+    if(preserveBaseItem) {
+      this._baseItem = source.baseItem;
+    } else {
+      this._baseItem = lastSample?.item;
+    }
+
+    // Ensure that this 'subview' is updated whenever the "source of truth" is.
+    const completeHook    = ()       => this.path.terminate(false);
+    const invalidatedHook = ()       => this.path.terminate(true);
+    const stepHook        = (sample) => this.update(sample);
+    baseSource.path.on('complete',    completeHook);
+    baseSource.path.on('invalidated', invalidatedHook);
+    baseSource.path.on('step',        stepHook);
+
+    // But make sure we can "disconnect" it later once the gesture being matched
+    // with the subview has fully matched; it's good to have a snapshot left over.
+    this.subviewDisconnector = () => {
+      baseSource.path.off('complete',    completeHook);
+      baseSource.path.off('invalidated', invalidatedHook);
+      baseSource.path.off('step',        stepHook);
+    }
+  }
+
+  /**
+   * The original SimpleGestureSource this subview is based upon.
+   */
+  public get baseSource() {
+    return this._baseSource;
+  }
+
+  public disconnect() {
+    if(this.subviewDisconnector) {
+      this.subviewDisconnector();
+      this.subviewDisconnector = null;
+    }
+  }
+
+  /**
+   * Will also terminate the baseSource.  If the decision has been made to actively
+   * terminate the path by a gesture matcher, this is what is actually desired, even
+   * if called on a 'subview' of it.
+   */
+  public terminate(cancel?: boolean) {
+    this.baseSource.terminate(cancel);
   }
 }

@@ -53,13 +53,13 @@ export class ComplexGestureSource<HoveredItemType> extends EventEmitter<EventMap
   }
 
   private _attachPointHooks(touchpoint: SimpleGestureSource<HoveredItemType>) {
-    touchpoint.fullPath.on('complete', () => {
+    touchpoint.path.on('complete', () => {
       this.isActive = false;
       this.emit('end');
       this.removeAllListeners();
     });
 
-    touchpoint.fullPath.on('invalidated', () => {
+    touchpoint.path.on('invalidated', () => {
       this.isActive = false;
       this.emit('cancel');
       this.removeAllListeners();
