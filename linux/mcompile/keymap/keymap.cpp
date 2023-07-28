@@ -27,8 +27,8 @@ int dummytest_keymap(){
   return 0;
 }
 
-bool write_US_ToVector( v_str_3D &vec,std::string language, const char* text) {
 
+bool write_US_ToVector( v_str_3D &vec,std::string language, const char* text) {
 
   // _S2 relative path !!
   std::string FullPathName = "/usr/share/X11/xkb/symbols/" + language;
@@ -52,8 +52,10 @@ bool write_US_ToVector( v_str_3D &vec,std::string language, const char* text) {
     printf("ERROR: can't Split USto 3D-Vector \n");
     return 1;
   }
-
+  wprintf(L"\n   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
   wprintf(L"   +++++++ dimensions of Vector after write_US_ToVector (languages..characters..shiftstates)\t\t %li..%li..%li\n", vec.size(), vec[0].size(),vec[0][0].size());
+
+  //test_single(vec);
   fclose(fp);
   return 0;
 }
@@ -68,7 +70,7 @@ bool  CreateCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, 
   const char* key = "key <";
   std::string str_txt(text);
   std::string xbk_mark = "xkb_symbol";
-  // TODO define folder to store File in
+  // _S2 TODO define folder to store File in
   std::ofstream KeyboardFile("File_" + language + ".txt");
 
   printf("Keyboard %s\n", text);
@@ -115,7 +117,7 @@ bool Split_US_To_3D_Vector(v_str_3D &all_US,v_str_1D completeList) {
   v_str_1D tokens;
   v_str_2D shift_states;
 
-  // go through the whole vector
+  // loop through the whole vector
   for (int k = 0; k < (int)completeList.size() - 1; k++) {
 
     // remove all unwanted char
@@ -134,25 +136,22 @@ bool Split_US_To_3D_Vector(v_str_3D &all_US,v_str_1D completeList) {
       int Keycde = replace_PosKey_with_Keycode(tokens[0]);
       tokens[0] = std::to_string(Keycde);
 
-      // we use characters a-z, A_Z only at the moment
-      if (foundCharacterInList(tokens[0])) {
+      // seperate rest of the vector to its elements and push to 'tokens'
+      std::istringstream split(tokens[1]);
+      tokens.pop_back();
 
-        // seperate rest of the vector to its elements and push to 'tokens'
-        std::istringstream split(tokens[1]);
+      for (std::string each; std::getline(split, each, split_char_komma); tokens.push_back(each));
+      // _S2 do we still need that??
+      // at the moment we only use the first 4 shiftstates (non-shift+shift) so get rid of all others
+      //int surplus = tokens.size() - shift_state_count -1;
+      int surplus = tokens.size() - 4 -1;
+      for ( int j=0; j < surplus; j++) {
         tokens.pop_back();
-
-        for (std::string each; std::getline(split, each, split_char_komma); tokens.push_back(each));
-        //printf("### 5 Split_US_To_3D_Vector: tokens: size:%li...tokens[0]-[4]:-name:%s\tShiftstates:%s--%s--%s--%s---.\n", tokens.size(),tokens[0].c_str(),tokens[1].c_str(),tokens[2].c_str(),tokens[3].c_str(),tokens[4].c_str());
-
-        // at the moment we only use the first 2 shiftstates (non-shift+shift) so get rid of all others
-        int surplus = tokens.size() - shift_state_count -1;
-        for( int j=0; j < surplus;j++) {
-          tokens.pop_back();
-        }
-
-        // now push result to shift_states
-        shift_states.push_back(tokens);
       }
+
+      // now push result to shift_states
+      shift_states.push_back(tokens);
+
       tokens.clear();
     }
   }
@@ -163,20 +162,6 @@ bool Split_US_To_3D_Vector(v_str_3D &all_US,v_str_1D completeList) {
     return 1;
   }
   return 0;
-}
-
-bool foundCharacterInList(std::string tok) {
-  //TOASK Do we need more and which?
-  //US keys:          Q    W    E    R    T    Y    U    I    O    P    A    S    D    F    G    H    J    K    L    Z    X    C    V    B    N    M
-  v_str_1D Keysyms { "24","25","26","27","28","29","30","31","32","33","38","39","40","41","42","43","44","45","46","52","53","54","55","56","57","58"};
-
-  for ( int i =0; i< (int) Keysyms.size();i++) {
-    //std::cout << "foundCharacterInList" << i <<"\n";
-    if( tok == Keysyms[i]) {
-      return true;
-      }
-    }
-  return false;
 }
 
 int replace_PosKey_with_Keycode(std::string  in) {
@@ -232,8 +217,8 @@ int replace_PosKey_with_Keycode(std::string  in) {
   else if ( in == "key<AB08>")    out = 59;
   else if ( in == "key<AB09>")    out = 60;
   else if ( in == "key<AB10>")    out = 61;
-  else if ( in == "key<BKSL>")    out = 62;   //TOASK correct ???
-  else if ( in == "key<LSGT>")    out = 51;   //TOASK correct ???
+  else if ( in == "key<BKSL>")    out = 51;
+  else if ( in == "key<LSGT>")    out = 94;
 
   return out;
 }
@@ -249,7 +234,8 @@ bool append_other_ToVector(v_str_3D &All_Vector,GdkKeymap * keymap) {
   }
 
   All_Vector.push_back(Other_Vector2D);
-  wprintf(L"+++++++ dimensions of Vector after append_other_ToVector\t %li..%li..%li\n", All_Vector.size(), All_Vector[0].size(),All_Vector[0][0].size());
+  wprintf(L"   +++++++ dimensions of Vector after append_other_ToVector\t\t\t\t\t\t %li..%li..%li\n", All_Vector.size(), All_Vector[0].size(),All_Vector[0][0].size());
+  wprintf(L"   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
 
   if (All_Vector.size() < 2) {
     wprintf(L"ERROR: creation of 3D-Vector failed");
@@ -265,8 +251,10 @@ bool append_other_ToVector(v_str_3D &All_Vector,GdkKeymap * keymap) {
     All_Vector[1][i][0+1] = GetKeyvalsFromKeymap(keymap,stoi(All_Vector[1][i][0]),0);   //shift state: unshifted:0
     All_Vector[1][i][1+1] = GetKeyvalsFromKeymap(keymap,stoi(All_Vector[1][i][0]),1);   //shift state: shifted:1
 
-    wprintf(L" Keycodes US->Other:   %d (US):%s, %s ---- (other):%s, %s    \n",stoi(All_Vector[1][i][0]),All_Vector[0][i][1].c_str(),All_Vector[0][i][2].c_str(),All_Vector[1][i][1].c_str(),All_Vector[1][i][2].c_str());
+    //wprintf(L" Keycodes US        :   %d (US):%s, %s ---- (other):%s, %s    \n",stoi(All_Vector[1][i][0]),All_Vector[0][i][1].c_str(),All_Vector[0][i][2].c_str(),All_Vector[1][i][1].c_str(),All_Vector[1][i][2].c_str());
+    //wprintf(L"   Keycodes ->Other:-:    %d (US):%s, %s ,%s, %s   \n\n",stoi(All_Vector[1][i][0]),All_Vector[1][i][1].c_str(),All_Vector[1][i][2].c_str(),All_Vector[1][i][3].c_str(),All_Vector[1][i][4].c_str());
   }
+
   return 0;
 }
 
@@ -274,20 +262,19 @@ v_str_2D create_empty_2D( int dim_rows,int dim_shifts) {
 
   std::string empty = "--";
   v_str_1D shifts;
-  v_str_2D all;
+  v_str_2D all_2D;
 
   for ( int i=0; i< dim_rows;i++) {
     for ( int j=0; j< dim_shifts;j++) {
       shifts.push_back(empty);
     }
-    all.push_back(shifts);
+    all_2D.push_back(shifts);
     shifts.clear();
   }
-  return all;
+  return all_2D;
 }
 
 int GetKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
-
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
@@ -303,6 +290,12 @@ int GetKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) 
 
   out = keyvals[shift_state_pos];
 
+  //wprintf(L" GetKeyvalsFromKeymap: in %i  -- out : %i \n", (int)keycode, out);
+
+  // _S2 if out of range of ascii return 0 or other value ?
+  if (out > 127)
+      out = 0;
+
   g_free(keyvals);
   g_free(maps);
 
@@ -311,16 +304,39 @@ int GetKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) 
 
 bool test(v_str_3D &V) {
 
-  printf("+++++++ dimensions of Vector in test()\t\t %li..%li..%li\n", V.size(), V[0].size(),V[0][0].size());
-  printf("\n+++++++++ print some characters of US and Other +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+  std::string extra = "  ";
+  wprintf(L"+++++++ dimensions of whole Vector in test()\t\t %li..%li..%li\n", V.size(), V[0].size(),V[0][0].size());
+  wprintf(L"\n+++++++++ print some characters of US and Other ++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 
   for ( int k=0; k<(int)V[0].size(); k++) {
-    std::cout   << " row 1 (US)......" << V[0][k][0]<< ".."  << V[0][k][1]<< ".."<<  "..\n"   ;
-    if (V.size()>1)
-      std::cout << "   row 1 (Other).."<< V[1][k][0]<< ".."  << V[1][k][1]<< ".."<<  "..\n" ;
-  }
-  printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");        
+    if(V[0][k][2] != V[1][k][2] )
+      extra = " *** ";
+    else
+      extra = "  ";
 
+    if (V[0].size()>0) {
+      wprintf(L" row 1 xx(US)   ...... %s  .. %s .. %s .. %s .. %s  --- ", V[0][k][0].c_str(),  V[0][k][1].c_str() ,  V[0][k][2].c_str() ,  V[0][k][3].c_str() ,  V[0][k][4].c_str() ); 
+      wprintf(L"  \n");
+      wprintf(L"   row 1 xx(Other)..... %s  .. %s .. %s  .. %s .. %s  %s  \n", V[1][k][0].c_str(),  V[1][k][1].c_str() ,  V[1][k][2].c_str() ,  V[1][k][3].c_str() ,  V[1][k][4].c_str() , extra.c_str()); 
+    wprintf(L"  \n");
+    }
+  }
+  wprintf(L"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+  return true;
+}
+
+bool test_single(v_str_3D &V) {
+
+  std::string extra = "  ";
+  wprintf(L"+++++++ dimensions of single Vector in test()\t\t %li..%li..%li\n", V.size(), V[0].size(),V[0][0].size());
+  wprintf(L"\n+++++++++ print characters of SINGLE  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+
+  for ( int k=0; k<(int)V[0].size(); k++) {
+    if (V[0].size()>0) {
+      wprintf(L" row 1 (US)   ...... %s  .. %s .. %s .. %s .. %s  --- \n", V[0][k][0].c_str(),  V[0][k][1].c_str() ,  V[0][k][2].c_str() ,  V[0][k][3].c_str() ,  V[0][k][4].c_str() ); 
+    }
+  }
+  wprintf(L"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
   return true;
 }
 

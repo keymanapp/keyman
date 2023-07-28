@@ -20,7 +20,7 @@ void check_avaiability_of_modules_(){
 
 void MyCout(std::string in, bool end, std::string pre ) {
   if (end == true)
-    std::cout << pre << " " << in << " " << "\n";
+    std::cout << pre << "" << in << " " << "\n";
   else
     std::cout << pre << " " << in;
 }

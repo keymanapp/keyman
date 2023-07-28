@@ -28,6 +28,21 @@ typedef std::vector<std::vector<std::vector<std::string> > > v_str_3D;
 
 static int shift_state_count = 2;  // use  shiftstate :  no shift, shift
 
+// Map of all US English virtual key codes that we can translate
+//
+const WORD KMX_VKMap[] = {
+  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+
+  //_S2 those might not work yet*/
+  VK_SPACE,
+  VK_ACCENT, VK_HYPHEN, VK_EQUAL,
+  VK_LBRKT, VK_RBRKT, VK_BKSLASH,
+  VK_COLON, VK_QUOTE,
+  VK_COMMA, VK_PERIOD, VK_SLASH,
+  VK_xDF, VK_OEM_102,
+  0
+};
 // initialize GDK
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
 
@@ -43,9 +58,6 @@ bool CreateCompleteRow_US(v_str_1D &complete_List, FILE *fpp, const char *text, 
 // 2nd step: write contents to 3D vector
 bool Split_US_To_3D_Vector(v_str_3D &all_US, v_str_1D completeList);
 
-// make sure only a-z, A_Z is used
-bool foundCharacterInList(std::string tok);
-
 // replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 15 )
 int replace_PosKey_with_Keycode(std::string in);
 
@@ -60,6 +72,7 @@ int GetKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 
 // testing of Vector contents ( first row of US and Other)
 bool test(v_str_3D &V);
+bool test_single(v_str_3D &V) ;
 
 /*
 // print both sets of characters (US and OtherLanguage) to console and file for comparison

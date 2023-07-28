@@ -133,8 +133,8 @@ typedef struct tagKEYBOARD {
 BOOL LoadKeyboard(char* fileName, LPKEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
 BOOL LoadKeyboard(wchar_t* fileName, LPKEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
 BOOL LoadKeyboard(char16_t* fileName, LPKEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
-		KMX_BOOL KMX_LoadKeyboard(char* fileName, LPKMX_KEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
-		KMX_BOOL KMX_LoadKeyboard(wchar_t* fileName, LPKMX_KEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
+		//KMX_BOOL KMX_LoadKeyboard(char* fileName, LPKMX_KEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
+		//KMX_BOOL KMX_LoadKeyboard(wchar_t* fileName, LPKMX_KEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
 		KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
 
 KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename);

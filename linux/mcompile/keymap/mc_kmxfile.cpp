@@ -17,7 +17,7 @@ LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFil
 
 KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename) {
 
-  MyCoutW(L"#### KMX_SaveKeyboard of mcompile started", 1);
+  MyCoutW(L"#### KMX_SaveKeyboard of mc_kmxfile started", 1);
   FILE *fp;
   fp = Open_File(filename, u"wb");
 
@@ -40,14 +40,14 @@ KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename) {
     return FALSE;
   }
 
-  MyCoutW(L"#### KMX_SaveKeyboard of mcompile ended", 1);
+  MyCoutW(L"#### KMX_SaveKeyboard of mc_kmxfile ended", 1);
   return TRUE;
 }
 
 KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug)
 {
 
-  MyCoutW(L"  #### KMX_WriteCompiledKeyboard of mcompile started", 1);
+  MyCoutW(L" ##### KMX_WriteCompiledKeyboard of mc_kmxfile started", 1);
 	LPKMX_GROUP fgp;
 	LPKMX_STORE fsp;
 	LPKMX_KEY fkp;
@@ -226,7 +226,7 @@ KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL 
 
 	delete[] buf;
 
-  MyCoutW(L"  #### KMX_WriteCompiledKeyboard of mcompile ended", 1);
+  MyCoutW(L" ##### KMX_WriteCompiledKeyboard of mc_kmxfile ended", 1);
 	return CERR_None;
 }
 
@@ -374,7 +374,7 @@ LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFil
 #endif
 
 KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
-  std::wcout << "##### KMX_LoadKeyboard of mc_kmxfile started #####\n";
+  std::wcout << "\n##### KMX_LoadKeyboard of mc_kmxfile started #####\n";
 
   PKMX_BYTE buf;
   FILE* fp;
@@ -477,8 +477,6 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
     return FALSE;
   }
 
-  std::wcout << "     kbp->dwIdentifier: " << kbp->dwIdentifier << " FILEID_COMPILED: " << FILEID_COMPILED << "\n";
-
   if (kbp->dwIdentifier != FILEID_COMPILED) {
     delete[] buf;
     KMX_LogError(L"LogError1: errNotFileID\n" );
@@ -486,6 +484,8 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   }
   *lpKeyboard = kbp;
   // _S2 delete [] buf; ????
+
+  std::wcout << "##### KMX_LoadKeyboard of mc_kmxfile ended #####\n";
   return TRUE;
 }
 

@@ -180,33 +180,16 @@ wprintf(L"_S2 * Up to here cross-platform xx  :-))))) **************************
   return 0 ;
 }
 
-/*// Map of all US English virtual key codes that we can translate
-//
-const WORD VKMap[] = {
-  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-  VK_SPACE,
-  VK_ACCENT, VK_HYPHEN, VK_EQUAL,
-  VK_LBRKT, VK_RBRKT, VK_BKSLASH,
-  VK_COLON, VK_QUOTE,
-  VK_COMMA, VK_PERIOD, VK_SLASH,
-  VK_xDF, VK_OEM_102,
-  0
-};
-*/
-
-// Map of all US English virtual key codes that we can translate
-//   US Keys:                       Q    W    E    R    T    Y    U    I    O    P    A    S    D    F    G    H    J    K    L    Z    X    C    V    B    N    M
-const DWORD VKMap_US_Keycode[] = {  24 , 25 , 26 , 27 , 28 , 29 , 30 , 31 , 32 , 33 , 38 , 39 , 40 , 41 , 42 , 43 , 44 , 45 , 46 , 52 , 53 , 54 , 55 , 56 , 57 , 77 ,0};
-
-// Map of all US English virtual key codes that we can translate
-//   US Keys:                     24 , 25 , 26 , 27 , 28 , 29 , 30 , 31 , 32 , 33 , 38 , 39 , 40 , 41 , 42 , 43 , 44 , 45 , 46 , 47,  52 , 53 , 54 , 55 , 56 , 57 , 77 , 0    
-const char VKMap_US_Keysym[] = { 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '0'};
 
 // Map of all shift states that we will work with
 //
 //const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCTRLFLAG|RALTFLAG, 0xFFFF};
-const UINT VKShiftState[] = {0, 1, 2,0xFFFF};
+
+// Ubuntu:  Each of the 4 columns specifies a different modifier:  unmodified,  shift,   right alt (altgr),     shift+right alt(altgr)
+// we have assigned these to columns 1-4  ( column o holds the keycode)
+// some hold up to 8 what are those ???
+const UINT VKShiftState[] = {0, 1,  2, 3, 4, 0xFFFF};
+//cconst UINT VKShiftState[] = {0, 1,  2,  0xFFFF};
 // _S2 shiftstate from systems-file
 
 void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, DWORD vk, UINT shift, KMX_WCHAR ch) {
@@ -237,15 +220,17 @@ KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
 
 // takes capital letter of US returns cpital character of Other keyboard
 int  KMX_VKUSToVKUnderlyingLayout(v_str_3D &All_Vector,int inUS) {
+
+int KeysymOther = inUS;
   // loop and find char in US; then find char of Other
-  for( int i=0; i< (int)All_Vector[1].size();i++) {
-    for( int j=0; j< (int)All_Vector[1][0].size();j++) {
+  for( int i=0; i< (int)All_Vector[0].size();i++) {
+    // lists entries of all_vector
+    for( int j=1; j< (int)All_Vector[0][0].size();j++) {
       int KeysymUS = (int) *All_Vector[0][i][j].c_str();
-      if( inUS == KeysymUS ) {
-        if(All_Vector[1][i].size() >2 ) {
-          int KeysymOther  = (int) *All_Vector[1][i][2].c_str();
-          return  KeysymOther;
-        }
+
+      if( ( All_Vector[0][i][j].size() == 1 ) && inUS == KeysymUS ) {
+        KeysymOther  = (int) *All_Vector[1][i][2].c_str();
+        return  KeysymOther;
       }
     }
   }
@@ -254,19 +239,17 @@ int  KMX_VKUSToVKUnderlyingLayout(v_str_3D &All_Vector,int inUS) {
 
 // takes cpital character of Other keyboard and returns character of Other keyboard with shiftstate VKShiftState[j]
 KMX_WCHAR KMX_CharFromVK(v_str_3D &All_Vector,int vkUnderlying, WCHAR VKShiftState, KMX_WCHAR* DeadKey){
+
   // loop and find vkUnderlying in Other; then return char with correct shiftstate
   for( int i=0; i< (int)All_Vector[1].size();i++) {
-    for( int j=0; j< (int)All_Vector[1][0].size();j++) {
-      int CharOther = (int) *All_Vector[1][i][j].c_str();
+      int CharOther = (int) *All_Vector[1][i][2].c_str();
       if( vkUnderlying == CharOther ) {
-          int CharOtherShifted  = (int) *All_Vector[1][i][VKShiftState].c_str();
-          return  CharOtherShifted;
+        int CharOtherShifted  = (int) *All_Vector[1][i][VKShiftState].c_str();
+        return  CharOtherShifted;
       }
-    }
   }
   return vkUnderlying;
 }
-
 
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]){
 // get keymap of keyboard layout in use
@@ -288,11 +271,11 @@ bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]){
   return 0;
 }
 
-
 bool createVectorForBothKeyboards(v_str_3D &All_Vector,GdkKeymap *keymap){
 
   std::string US_language    = "us";
-  const char* text_us        = "xkb_symbols \"basic\"";
+  //const char* text_us        = "xkb_symbols \"basic\"";
+  const char* text_us        = "xkb_symbols \"intl\"";
 
   if(write_US_ToVector(All_Vector,US_language, text_us)) {
     printf("ERROR: can't write US to Vector \n");
@@ -304,13 +287,13 @@ bool createVectorForBothKeyboards(v_str_3D &All_Vector,GdkKeymap *keymap){
     printf("ERROR: can't append other ToVector \n");
     return 1;
   }
-  test(All_Vector);
+
   return 0;
 }
 
-
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]) {
 
+  std::wcout << "\n##### KMX_DoConvert of mcompile started #####\n";
     KMX_WCHAR DeadKey;
 
     if(!KMX_SetKeyboardToPositional(kbd)) return FALSE;
@@ -331,18 +314,30 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
   v_str_3D All_Vector;
   if(createVectorForBothKeyboards(All_Vector,keymap) )
       printf("ERROR: can't createVectorForBothKeyboards\n");
+  //test(All_Vector);
 
 //--------------------------------------------------------------------------------
+// _S2 for 1-> VKShiftState or shift_state_count ???
+//0,1,2,3,4,ff
 
+  const wchar_t* ERROR = L"   ";
   for (int j = 1; VKShiftState[j] != 0xFFFF; j++) {   // I4651
 
-    // Go through each possible key on the keyboard
-    for (int i = 0;VKMap_US_Keysym[i]; i++) {   // I4651
-      int vkUnderlying = KMX_VKUSToVKUnderlyingLayout(All_Vector,(int) VKMap_US_Keysym[i] );
+    // Loop through each possible key on the keyboard
+    for (int i = 0;KMX_VKMap[i]; i++) {   // I4651
+
+      // _S2 why not in 1 step ??
+      int vkUnderlying = KMX_VKUSToVKUnderlyingLayout(All_Vector,(int) KMX_VKMap[i] );
 
       KMX_WCHAR ch = KMX_CharFromVK(All_Vector,vkUnderlying, VKShiftState[j], &DeadKey);
 
-      wprintf(L"    KMX_VKUSToVKUnderlyingLayout/KMX_CharFromVK i:  %i (VKMap_US_Keysym): %i (%c)  --->  vkUnderlying: %i (%c)    shiftstate: ( %i )   ---- >  ch: %i (%c) ( %i)  %ls\n" , i,(int) VKMap_US_Keysym[i],(int)VKMap_US_Keysym[i],  vkUnderlying,vkUnderlying, VKShiftState[j] ,  ch ,ch , ( vkUnderlying-ch), ((int) vkUnderlying != (int) VKMap_US_Keysym[i] ) ? L" *** ": L"");
+      //_S2 mark if difference is not 32= (unshifted-shifted )
+      if (!( ((int) KMX_VKMap[i] == ch ) || ((int) KMX_VKMap[i] == (int) ch -32)    )  )
+        ERROR = L" !!!";
+      else
+        ERROR = L" ";
+
+      wprintf(L"    DoConvert-read i:  %i (KMX_VKMap): %i (%c)  --->  vkUnderlying: %i (%c)    shiftstate: ( %i )   ---- >  ch: %i (%c)  %ls  %ls\n" , i,(int) KMX_VKMap[i],(int)KMX_VKMap[i],  vkUnderlying,vkUnderlying, VKShiftState[j] ,  ch ,ch ,  ((int) vkUnderlying != (int) KMX_VKMap[i] ) ? L" *** ": L"", ERROR);
       //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
 
       if(bDeadkeyConversion) {   // I4552
@@ -357,9 +352,8 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
         //case 0xFFFF: ConvertDeadkey(kbd, VKMap[i], VKShiftState[j], DeadKey); break;
 
         //default:     TranslateKeyboard(kbd, VKMap[i], VKShiftState[j], ch);
-        default:     KMX_TranslateKeyboard(kbd, VKMap_US_Keysym[i], VKShiftState[j], ch);
+        default:     KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
       }
-
     }
   }
 
@@ -370,9 +364,10 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
     return FALSE;
   }
 */
+
+  std::wcout << "\n##### KMX_DoConvert of mcompile ended #####\n";
   return TRUE;
 }
-
 
 void KMX_LogError(const KMX_WCHART* m1,int m2) {
   wprintf((PWSTR)m1, m2);
