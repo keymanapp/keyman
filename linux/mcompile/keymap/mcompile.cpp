@@ -257,13 +257,13 @@ bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]){
   gdk_init(&argc, &argv);
   GdkDisplay *display = gdk_display_get_default();
   if (!display) {
-    printf("ERROR: can't get display\n");
+    wprintf(L"ERROR: can't get display\n");
     return 1;
   }
 
   *keymap = gdk_keymap_get_for_display(display);
   if (!keymap) {
-    printf("ERROR: Can't get keymap\n");
+    wprintf(L"ERROR: Can't get keymap\n");
     gdk_display_close(display);
     return 2;
   }
@@ -278,13 +278,13 @@ bool createVectorForBothKeyboards(v_str_3D &All_Vector,GdkKeymap *keymap){
   const char* text_us        = "xkb_symbols \"intl\"";
 
   if(write_US_ToVector(All_Vector,US_language, text_us)) {
-    printf("ERROR: can't write US to Vector \n");
+    wprintf(L"ERROR: can't write US to Vector \n");
     return 1;
   }
 
   // add contents of other keyboard to All_Vector
   if( append_other_ToVector(All_Vector,keymap)) {
-    printf("ERROR: can't append other ToVector \n");
+    wprintf(L"ERROR: can't append other ToVector \n");
     return 1;
   }
 
@@ -308,12 +308,12 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
   //_ init gdk
   GdkKeymap *keymap;
   if(InitializeGDK(&keymap , argc,  argv) )
-      printf("ERROR: can't InitializeGDK\n");
+      wprintf(L"ERROR: can't InitializeGDK\n");
 
   // create vector
   v_str_3D All_Vector;
   if(createVectorForBothKeyboards(All_Vector,keymap) )
-      printf("ERROR: can't createVectorForBothKeyboards\n");
+      wprintf(L"ERROR: can't createVectorForBothKeyboards\n");
   //test(All_Vector);
 
 //--------------------------------------------------------------------------------
@@ -365,7 +365,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
   }
 */
 
-  std::wcout << "\n##### KMX_DoConvert of mcompile ended #####\n";
+  wprintf(L"\n##### KMX_DoConvert of mcompile ended #####\n");
   return TRUE;
 }
 

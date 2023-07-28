@@ -17,7 +17,7 @@ LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFil
 
 KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename) {
 
-  MyCoutW(L"#### KMX_SaveKeyboard of mc_kmxfile started", 1);
+  wprintf(L"#### KMX_SaveKeyboard of mc_kmxfile started");
   FILE *fp;
   fp = Open_File(filename, u"wb");
 
@@ -40,14 +40,14 @@ KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename) {
     return FALSE;
   }
 
-  MyCoutW(L"#### KMX_SaveKeyboard of mc_kmxfile ended", 1);
+  wprintf(L"#### KMX_SaveKeyboard of mc_kmxfile ended");
   return TRUE;
 }
 
 KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug)
 {
 
-  MyCoutW(L" ##### KMX_WriteCompiledKeyboard of mc_kmxfile started", 1);
+  wprintf(L" ##### KMX_WriteCompiledKeyboard of mc_kmxfile started");
 	LPKMX_GROUP fgp;
 	LPKMX_STORE fsp;
 	LPKMX_KEY fkp;
@@ -226,7 +226,7 @@ KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL 
 
 	delete[] buf;
 
-  MyCoutW(L" ##### KMX_WriteCompiledKeyboard of mc_kmxfile ended", 1);
+  wprintf(L" ##### KMX_WriteCompiledKeyboard of mc_kmxfile ended");
 	return CERR_None;
 }
 
@@ -328,7 +328,7 @@ LPKMX_KEYBOARD KMX_CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 */
 
 LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize) {
-  MyCoutW(L"  ##### KMX_FixupKeyboard of mcompile started",1);
+  wprintf(L"  ##### KMX_FixupKeyboard of mcompile started");
   UNREFERENCED_PARAMETER(dwFileSize);
 
   KMX_DWORD i, j;
@@ -368,13 +368,13 @@ LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFil
 		}
 	}
 
-  MyCoutW(L"  ##### KMX_FixupKeyboard of mcompile ended",1);
+  wprintf(L"  ##### KMX_FixupKeyboard of mcompile ended");
   return kbp;
 }
 #endif
 
 KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
-  std::wcout << "\n##### KMX_LoadKeyboard of mc_kmxfile started #####\n";
+  wprintf(L"\n##### KMX_LoadKeyboard of mc_kmxfile started #####\n");
 
   PKMX_BYTE buf;
   FILE* fp;
@@ -485,7 +485,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   *lpKeyboard = kbp;
   // _S2 delete [] buf; ????
 
-  std::wcout << "##### KMX_LoadKeyboard of mc_kmxfile ended #####\n";
+ wprintf(L"##### KMX_LoadKeyboard of mc_kmxfile ended #####\n");
   return TRUE;
 }
 

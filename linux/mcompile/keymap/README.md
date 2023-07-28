@@ -9,7 +9,6 @@ Sample program that reads US basic keyboard and compares to key value group
 TODO check if US basic is the right Keyboard to compare with
 TODO non-letter characters don't work OK yet
 TODO Umlauts don't work OK yet
-TODO remove unnecessary printf/cout
 TODO path for xkb/symbols as compile time option in meson
 TODO check how many/which shift states we use ( at the moment we read all shiftstate-columns of US but then use only 2 colums (non-shift + shift) then use as many colums for Other )
 TODO define folder to store File_US.txt" in and find better name

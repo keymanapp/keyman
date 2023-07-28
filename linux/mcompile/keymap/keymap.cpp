@@ -43,13 +43,13 @@ bool write_US_ToVector( v_str_3D &vec,std::string language, const char* text) {
   // create 1D-vector of the complete line
   v_str_1D Vector_completeUS;
   if( CreateCompleteRow_US(Vector_completeUS,fp , text, language)) {
-    printf("ERROR: can't Create complete row US \n");
+    wprintf(L"ERROR: can't Create complete row US \n");
     return 1;
   }
 
   // split contents of 1D Vector to 3D vector
   if( Split_US_To_3D_Vector( vec,Vector_completeUS)) {
-    printf("ERROR: can't Split USto 3D-Vector \n");
+    wprintf(L"ERROR: can't Split USto 3D-Vector \n");
     return 1;
   }
   wprintf(L"\n   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
@@ -158,7 +158,7 @@ bool Split_US_To_3D_Vector(v_str_3D &all_US,v_str_1D completeList) {
   all_US.push_back(shift_states);
 
   if ( all_US.size() ==0) {
-    printf("ERROR: Can't split US to 3D-Vector\n");
+    wprintf(L"ERROR: Can't split US to 3D-Vector\n");
     return 1;
   }
   return 0;
