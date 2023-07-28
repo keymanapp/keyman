@@ -15,7 +15,5 @@ void  check_avaiability_of_modules_WC();
 void MyCout(std::string in, bool end, std::string pre = "");
 void MyCoutW(std::wstring in, bool end, std::wstring pre =L"");
 
-//Just for now: wrote my oẃn DebugLog -TODO to be replaced
-void DebugLog_S2(std::wstring  txt, std::wstring fileName);
 
 #endif /* HELPERS_H*/

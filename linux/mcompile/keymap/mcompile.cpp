@@ -64,7 +64,6 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
     run(argc, str_argv_16, argv);
 #endif
 
-
 }
 //------ run with char16_t !! -------------------------------------------------------------------------------------------------------------------------
 int run(int argc, std::vector<std::u16string>  str_argv, char* argv_ch[] = NULL){
@@ -220,25 +219,23 @@ KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
 
 // takes capital letter of US returns cpital character of Other keyboard
 int  KMX_VKUSToVKUnderlyingLayout(v_str_3D &All_Vector,int inUS) {
-
-int KeysymOther = inUS;
   // loop and find char in US; then find char of Other
   for( int i=0; i< (int)All_Vector[0].size();i++) {
     // lists entries of all_vector
     for( int j=1; j< (int)All_Vector[0][0].size();j++) {
       int KeysymUS = (int) *All_Vector[0][i][j].c_str();
 
-      if( ( All_Vector[0][i][j].size() == 1 ) && inUS == KeysymUS ) {
-        KeysymOther  = (int) *All_Vector[1][i][2].c_str();
-        return  KeysymOther;
+      if( ( All_Vector[0][i][j].size() == 1 ) && (inUS == KeysymUS )) {
+        inUS  = (int) *All_Vector[1][i][2].c_str();
+        return  inUS;
       }
     }
   }
   return inUS;
 }
 
-// takes cpital character of Other keyboard and returns character of Other keyboard with shiftstate VKShiftState[j]
-KMX_WCHAR KMX_CharFromVK(v_str_3D &All_Vector,int vkUnderlying, WCHAR VKShiftState, KMX_WCHAR* DeadKey){
+/*// takes cpital character of Other keyboard and returns character of Other keyboard with shiftstate VKShiftState[j]
+int KMX_CharFromVK(v_str_3D &All_Vector,int vkUnderlying, WCHAR VKShiftState, KMX_WCHAR* DeadKey){
 
   // loop and find vkUnderlying in Other; then return char with correct shiftstate
   for( int i=0; i< (int)All_Vector[1].size();i++) {
@@ -249,6 +246,24 @@ KMX_WCHAR KMX_CharFromVK(v_str_3D &All_Vector,int vkUnderlying, WCHAR VKShiftSta
       }
   }
   return vkUnderlying;
+}*/
+// takes cpital character of Other keyboard and returns character of Other keyboard with shiftstate VKShiftState[j]
+
+KMX_WCHAR KMX_CharFromVK(v_str_3D &All_Vector,int vkUnderlying, WCHAR VKShiftState, KMX_WCHAR* DeadKey){
+
+  //_S2 can I cast int to KMX_WCHAR??
+  // _S2 careful if we had strings with more than 1 char in our vector elements: CharOther would only take the first CHARACTR!!
+  // loop and find vkUnderlying in Other; then return char with correct shiftstate
+  for( int i=0; i< (int)All_Vector[1].size();i++) {
+      int CharOther = (int) *All_Vector[1][i][2].c_str();
+
+      //if( vkUnderlying == CharOther ) {
+      if( ( All_Vector[1][i][2].size() == 1 ) && (vkUnderlying == CharOther )) {
+        int CharOtherShifted  = (int) *All_Vector[1][i][VKShiftState].c_str();
+        return  (KMX_WCHAR) CharOtherShifted;
+      }
+  }
+  return (KMX_WCHAR) vkUnderlying;
 }
 
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]){
@@ -294,9 +309,9 @@ bool createVectorForBothKeyboards(v_str_3D &All_Vector,GdkKeymap *keymap){
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]) {
 
   std::wcout << "\n##### KMX_DoConvert of mcompile started #####\n";
-    KMX_WCHAR DeadKey;
+  KMX_WCHAR DeadKey;
 
-    if(!KMX_SetKeyboardToPositional(kbd)) return FALSE;
+  if(!KMX_SetKeyboardToPositional(kbd)) return FALSE;
 
   // Go through each of the shift states - base, shift, ctrl+alt, ctrl+alt+shift, [caps vs ncaps?]
   // Currently, we go in this order so the 102nd key works. But this is not ideal for keyboards without 102nd key:   // I4651
@@ -317,28 +332,28 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
   //test(All_Vector);
 
 //--------------------------------------------------------------------------------
-// _S2 for 1-> VKShiftState or shift_state_count ???
-//0,1,2,3,4,ff
 
   const wchar_t* ERROR = L"   ";
+
   for (int j = 1; VKShiftState[j] != 0xFFFF; j++) {   // I4651
 
     // Loop through each possible key on the keyboard
     for (int i = 0;KMX_VKMap[i]; i++) {   // I4651
 
-      // _S2 why not in 1 step ??
+      // _S2 why were those 2 functions originally not done in 1 step ??
       int vkUnderlying = KMX_VKUSToVKUnderlyingLayout(All_Vector,(int) KMX_VKMap[i] );
 
       KMX_WCHAR ch = KMX_CharFromVK(All_Vector,vkUnderlying, VKShiftState[j], &DeadKey);
+
 
       //_S2 mark if difference is not 32= (unshifted-shifted )
       if (!( ((int) KMX_VKMap[i] == ch ) || ((int) KMX_VKMap[i] == (int) ch -32)    )  )
         ERROR = L" !!!";
       else
         ERROR = L" ";
-
       wprintf(L"    DoConvert-read i:  %i (KMX_VKMap): %i (%c)  --->  vkUnderlying: %i (%c)    shiftstate: ( %i )   ---- >  ch: %i (%c)  %ls  %ls\n" , i,(int) KMX_VKMap[i],(int)KMX_VKMap[i],  vkUnderlying,vkUnderlying, VKShiftState[j] ,  ch ,ch ,  ((int) vkUnderlying != (int) KMX_VKMap[i] ) ? L" *** ": L"", ERROR);
       //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
+
 
       if(bDeadkeyConversion) {   // I4552
         if(ch == 0xFFFF) {

@@ -26,7 +26,7 @@ typedef std::vector<std::string> v_str_1D;
 typedef std::vector<std::vector<std::string> > v_str_2D;
 typedef std::vector<std::vector<std::vector<std::string> > > v_str_3D;
 
-static int shift_state_count = 2;  // use  shiftstate :  no shift, shift
+//static int shift_state_count = 2;  // use  shiftstate :  no shift, shift
 
 // Map of all US English virtual key codes that we can translate
 //

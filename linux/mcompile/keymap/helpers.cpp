@@ -33,7 +33,3 @@ void MyCoutW(std::wstring in, bool end, std::wstring pre) {
 }
 
 
-void DebugLog_S2(std::wstring  txt, std::wstring fileName) {
-
-  wprintf(txt.c_str(),  fileName);
-}

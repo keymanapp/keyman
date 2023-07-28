@@ -15,7 +15,6 @@ int dummytest_u16(){
 
 std::vector<std::u16string> convert_argv_to_Vector_u16str(int argc, char* argv[]) {
   std::vector<std::u16string> vector_u16;
-  int i;
 
   // for each arg convert to u16string and push to vector
   for (char** arg = argv, i=0; *arg; ++arg,i++) {
@@ -27,7 +26,6 @@ std::vector<std::u16string> convert_argv_to_Vector_u16str(int argc, char* argv[]
 
 std::vector<std::u16string> convert_argvW_to_Vector_u16str(int argc, wchar_t* argv[]) {
   std::vector<std::u16string> vector_u16;
-  int i;
 
   // for each arg convert to u16string and push to vector
   for (wchar_t** arg = argv, i=0; *arg; ++arg,i++) {
@@ -37,30 +35,12 @@ std::vector<std::u16string> convert_argvW_to_Vector_u16str(int argc, wchar_t* ar
   return vector_u16;
 }
 
-
-
-// _S" does this work??
-//const wchar_t* <- const char*
-/*
-wchar_t* wchart_from_char( char* c) {
-  std::string str(*c);
-  std::wstring wstr = wstring_from_string(str);
-  wchar_t* wc =  (wchar_t*) wstr.c_str();
-  return wc;
-}*/
-
-/*  _S2 does this work ???
-wchar_t* wchart_from_char16( char16_t** c) {
-  std::u16string str(*c);
-  std::wstring wstr = wstring_from_u16string((std::u16string const) str);
-  return (wchar_t*) wstr.c_str();
-}*/
-
 //String <- wstring
 std::string string_from_wstring(std::wstring const str) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 	return converter.to_bytes(str);
 }
+
 //wstring <- string
 std::wstring wstring_from_string(std::string const str) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
@@ -157,8 +137,8 @@ std::string toHex(int num1) {
 	}
 	reverse(s.begin(), s.end());
 	return s;
-}
-*/
+}*/
+
 const KMX_WCHAR *  u16ncat(KMX_WCHAR *dst, const KMX_WCHAR *src, size_t max) {
   KMX_WCHAR* o = dst;
   dst = (KMX_WCHAR*) u16chr(dst, 0);

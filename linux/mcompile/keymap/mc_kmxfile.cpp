@@ -500,7 +500,6 @@ KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz){
     // Old or new version -- identify the desired program version //
     for (csp = (PKMX_COMP_STORE)(filebase + ckbp->dpStoreArray), i = 0; i < ckbp->cxStoreArray; i++, csp++) {
       if (csp->dwSystemID == TSS_COMPILEDVERSION) {
-        wchar_t buf2[256];
         if (csp->dpString == 0) {
           KMX_LogError(L"LogErr1: errWrongFileVersion:NULL");
         } else {

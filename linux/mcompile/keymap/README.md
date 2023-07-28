@@ -25,7 +25,15 @@ ToDo remove std::cout std::wcout
 TODO several Versions of KMX_LoadKeyboard
 TODO shiftstate-count
 TODO keymap SplitToV.cpp exchange 4 with genaerated shiftcount
+TODO check if part with surplus is neccessary
 TODO shift-statevector
+TODO meson.build do I need version of dependency??
+TODO meson remove helpers.cpp
+TODO remove mc_savekeyboard.cpp/h
+TODO remove dummytest()
+TODO see which functions I need from u16.cpp/h
+TODO see which data types I can remove from km_types.h
+TODO replace/remove old structs or move kmx_structs to the left side of file
 TODO ...
 
 //---------------------------
