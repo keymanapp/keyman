@@ -4,7 +4,6 @@
  * editing - even if the tests themselves actually work.
  */
 {
-  // Enabling the following line re-breaks it for some reason?
   "extends": "../../../../tsconfig.kmw-main-base.json",
   "compilerOptions": {
     "moduleResolution": "Node16",
