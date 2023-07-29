@@ -195,9 +195,9 @@ describe('vars', function () {
         errors: [
           CompilerMessages.Error_MissingMarkers({
             ids: [
-              'doesnt-exist-1',
-              'doesnt-exist-2',
-              'doesnt-exist-3',
+              'doesnt_exist_1',
+              'doesnt_exist_2',
+              'doesnt_exist_3',
             ]
           }),
         ],
