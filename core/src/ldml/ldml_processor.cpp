@@ -259,7 +259,7 @@ ldml_processor::process_event(
         // Look up the key
         const std::u16string str = keys.lookup(vk, modifier_state);
         if (str.empty()) {
-          // not found, so pass the keystroke on to the
+          // not found, so pass the keystroke on to the Engine
           state->actions().push_invalidate_context();
           state->actions().push_emit_keystroke();
           break; // ----- commit and exit
