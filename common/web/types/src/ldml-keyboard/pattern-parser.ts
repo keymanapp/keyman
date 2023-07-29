@@ -2,6 +2,7 @@
  * Utilities for transform and marker processing
  */
 
+import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { MATCH_QUAD_ESCAPE, isOneChar, unescapeOneQuadString, unescapeString } from "../util/util.js";
 
 
@@ -41,9 +42,9 @@ export class MarkerParser {
   public static readonly ANY_MARKER_ID = '.';
 
   /**
-   * Marker sentinel, == U_SENTINEL
+   * Marker sentinel as a string - U+FFFF
    */
-  public static readonly SENTINEL = '\uFFFF';
+  public static readonly SENTINEL = String.fromCodePoint(constants.marker_sentinel);
 
   /**
    * Matches all markers.
@@ -51,13 +52,13 @@ export class MarkerParser {
   public static readonly SENTINEL_ALL_MARKERS = this.SENTINEL + this.SENTINEL;
 
   /** Minimum ID (trailing code unit) */
-  public static readonly MIN_MARKER_INDEX = 0x0001;
+  public static readonly MIN_MARKER_INDEX = constants.marker_min_index;
   /** Index meaning 'any marker' == `\m{.}` */
-  public static readonly ANY_MARKER_INDEX = 0xFFFF;
+  public static readonly ANY_MARKER_INDEX = constants.marker_any_index;
   /** Maximum usable marker index */
-  public static readonly MAX_MARKER_INDEX = this.ANY_MARKER_INDEX - 1;
+  public static readonly MAX_MARKER_INDEX = constants.marker_max_index;
   /** Max count of markers */
-  public static readonly MAX_MARKER_COUNT = this.MAX_MARKER_INDEX - this.MIN_MARKER_INDEX;
+  public static readonly MAX_MARKER_COUNT = constants.marker_max_count;
 
   /**
    * Pattern for matching a marker reference, OR the special marker \m{.}
