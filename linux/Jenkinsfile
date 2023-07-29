@@ -1,11 +1,11 @@
 #!groovy
-// Copyright (c) 2019-2022 SIL International
+// Copyright (c) 2019-2023 SIL International
 // This software is licensed under the MIT license (http://opensource.org/licenses/MIT)
 
 @Library('lsdev-pipeline-library') _
 
 keymanPackaging {
-  distributionsToPackage = 'focal jammy kinetic lunar'
+  distributionsToPackage = 'focal jammy lunar mantic'
   arches = 'amd64 i386'
   packagesToBuild = ['keyman']
 }

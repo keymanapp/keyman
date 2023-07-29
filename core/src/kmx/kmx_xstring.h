@@ -19,6 +19,7 @@ const char16_t Uni_FFFF_NONCHARACTER     = 0xFFFF;
 const char16_t Uni_BMP_END               = 0xFFFF;
 const km_kbp_usv Uni_SMP_START           = 0x010000;
 const km_kbp_usv Uni_PLANE_MASK          = 0x1F0000;
+const km_kbp_usv Uni_MAX_CODEPOINT       = 0x10FFFF;
 
 /**
  * @brief True if a lead surrogate
@@ -180,7 +181,7 @@ inline bool Uni_IsNoncharacter(km_kbp_usv ch) {
 }
 
 inline bool Uni_InCodespace(km_kbp_usv ch) {
-  return ((ch) <= 0x10FFFF);
+  return ((ch) <= Uni_MAX_CODEPOINT);
 };
 
 inline bool Uni_IsValid(km_kbp_usv ch) {
@@ -188,30 +189,24 @@ inline bool Uni_IsValid(km_kbp_usv ch) {
 }
 
 inline bool Uni_IsValid(km_kbp_usv start, km_kbp_usv end) {
-  // quicker check
-  if (!Uni_IsValid(end) || !Uni_IsValid(start) || (end < start)) {  // start is checked below
+  if (!Uni_IsValid(end) || !Uni_IsValid(start) || (end < start)) {
+    // start or end out of range, or inverted range
     return false;
-  }
-
-  // If 'start' is low enough in the BMP, we need to avoid (1) Surrogates and (2) the FDxx nonchars
-  if (start < Uni_FD_NONCHARACTER_END) {
-    if ((start <= Uni_SURROGATE_END) && (end >= Uni_SURROGATE_START)) {
-      return false; // contains some of the surrogate range
-    } else if ((start <= Uni_FD_NONCHARACTER_END) && (end >= Uni_FD_NONCHARACTER_START)) {
-      return false; // contains some of the noncharacter range
-    }
-  }
-
-  // Are the end-of-plane noncharacters contained?
-  // As a reminder, we already checked that start/end are themselves valid,
-  // so we know that 'end' is not on a noncharacter at end of plane.
-  if ((start & Uni_PLANE_MASK) != (end & Uni_PLANE_MASK)) {
+  } else if ((start <= Uni_SURROGATE_END) && (end >= Uni_SURROGATE_START)) {
+    // contains some of the surrogate range
+    return false;
+  } else if ((start <= Uni_FD_NONCHARACTER_END) && (end >= Uni_FD_NONCHARACTER_START)) {
+    // contains some of the noncharacter range
+    return false;
+  } else if ((start & Uni_PLANE_MASK) != (end & Uni_PLANE_MASK)) {
     // start and end are on different planes, meaning that the U+__FFFE/U+__FFFF noncharacters
-    // are contained.  Invalid.
+    // are contained.
+    // As a reminder, we already checked that start/end are themselves valid,
+    // so we know that 'end' is not on a noncharacter at end of plane.
     return false;
+  } else {
+    return true;
   }
-
-  return true;
 }
 
 
