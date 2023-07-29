@@ -17,7 +17,7 @@ LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFil
 
 KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename) {
 
-  wprintf(L"#### KMX_SaveKeyboard of mc_kmxfile started");
+  wprintf(L"#### KMX_SaveKeyboard of mc_kmxfile started\n");
   FILE *fp;
   fp = Open_File(filename, u"wb");
 
@@ -40,14 +40,14 @@ KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename) {
     return FALSE;
   }
 
-  wprintf(L"#### KMX_SaveKeyboard of mc_kmxfile ended");
+  wprintf(L"#### KMX_SaveKeyboard of mc_kmxfile ended\n");
   return TRUE;
 }
 
 KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug)
 {
 
-  wprintf(L" ##### KMX_WriteCompiledKeyboard of mc_kmxfile started");
+  wprintf(L" ##### KMX_WriteCompiledKeyboard of mc_kmxfile started\n");
 	LPKMX_GROUP fgp;
 	LPKMX_STORE fsp;
 	LPKMX_KEY fkp;
@@ -226,7 +226,7 @@ KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL 
 
 	delete[] buf;
 
-  wprintf(L" ##### KMX_WriteCompiledKeyboard of mc_kmxfile ended");
+  wprintf(L" ##### KMX_WriteCompiledKeyboard of mc_kmxfile ended\n");
 	return CERR_None;
 }
 
@@ -328,7 +328,7 @@ LPKMX_KEYBOARD KMX_CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 */
 
 LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize) {
-  wprintf(L"  ##### KMX_FixupKeyboard of mcompile started");
+  wprintf(L"  ##### KMX_FixupKeyboard of mcompile started\n");
   UNREFERENCED_PARAMETER(dwFileSize);
 
   KMX_DWORD i, j;
@@ -368,7 +368,7 @@ LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFil
 		}
 	}
 
-  wprintf(L"  ##### KMX_FixupKeyboard of mcompile ended");
+  wprintf(L"  ##### KMX_FixupKeyboard of mcompile ended\n");
   return kbp;
 }
 #endif
