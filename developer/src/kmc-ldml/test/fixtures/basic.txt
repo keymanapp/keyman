@@ -426,6 +426,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strTranTo)          sizeof(strTranTo,2)
   diff(strs,strKeys)       sizeof(strKeys,2)
   diff(strs,strIndicator)  sizeof(strIndicator,2)
+  diff(strs,strSentinel0001)  sizeof(strSentinel0001,2)
 
 
   # String table -- block(x) is used to store the null u16char at end of each string
@@ -464,7 +465,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strKeys)             90 17 b6 17 block(x) 00 00                               # 'ថា'
   # <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
   block(strIndicator)        3d d8 40 de block(x) 00 00                               # '🙀'
-
+  block(strSentinel0001)     FF FF 01 00 block(x) 00 00                   # U+FFFF U+0001
 
 
 
@@ -484,10 +485,15 @@ block(tran)                         # struct COMP_KMXPLUS_TRAN {
   block(tranGroupStart)             # COMP_KMXPLUS_TRAN_GROUP
     # group 0
     00 00 00 00                       # KMX_DWORD type = transform
-    01 00 00 00                       # KMX_DWORD count
+    02 00 00 00                       # KMX_DWORD count
     diff(tranTransformStart,tranTransform0,16) # KMX_DWORD index
 
     # group 1
+    00 00 00 00                       # KMX_DWORD type = transform
+    01 00 00 00                       # KMX_DWORD count
+    diff(tranTransformStart,tranTransform2,16) # KMX_DWORD index
+
+    # group 2
     01 00 00 00                       # KMX_DWORD type = reorder
     01 00 00 00                       # KMX_DWORD count
     diff(tranReorderStart,tranReorder0,8) # KMX_DWORD index
@@ -497,6 +503,18 @@ block(tran)                         # struct COMP_KMXPLUS_TRAN {
     block(tranTransform0)
     index(strNull,strElemTranFrom1a,2)  #    KMXPLUS_STR from;
     index(strNull,strTranTo,2)        #    KMXPLUS_STR to;
+    index(strNull,strNull,2)          # mapFrom
+    index(strNull,strNull,2)          # mapTo
+
+  block(tranTransform1)
+    index(strNull,strA,2)  #    KMXPLUS_STR from; 'a'
+    index(strNull,strSentinel0001,2)        #    KMXPLUS_STR to; \m{a}
+    index(strNull,strNull,2)          # mapFrom
+    index(strNull,strNull,2)          # mapTo
+
+  block(tranTransform2)  # Next group
+    index(strNull,strSentinel0001,2)  #    KMXPLUS_STR from; (\m{a})
+    index(strNull,strNull,2)        #    KMXPLUS_STR to; (none)
     index(strNull,strNull,2)          # mapFrom
     index(strNull,strNull,2)          # mapTo
 
