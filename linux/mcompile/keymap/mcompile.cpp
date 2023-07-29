@@ -187,8 +187,8 @@ wprintf(L"_S2 * Up to here cross-platform xx  :-))))) **************************
 // Ubuntu:  Each of the 4 columns specifies a different modifier:  unmodified,  shift,   right alt (altgr),     shift+right alt(altgr)
 // we have assigned these to columns 1-4  ( column o holds the keycode)
 // some hold up to 8 what are those ???
-const UINT VKShiftState[] = {0, 1,  2, 3, 4, 0xFFFF};
-//cconst UINT VKShiftState[] = {0, 1,  2,  0xFFFF};
+//const UINT VKShiftState[] = {0, 1,  2, 3, 4, 0xFFFF};
+const UINT VKShiftState[] = {0, 1,  2,  0xFFFF};
 // _S2 shiftstate from systems-file
 
 void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, DWORD vk, UINT shift, KMX_WCHAR ch) {
@@ -244,7 +244,7 @@ int  KMX_VKUSToVKUnderlyingLayout_dw(v_dw_3D &All_Vector,KMX_DWORD inUS) {
 
       if((inUS == KeysymUS )) {
         inUS  = All_Vector[1][i][2];
-        return  inUS;
+        //return  inUS;
       }
     }
   }
@@ -258,8 +258,7 @@ KMX_DWORD KMX_CharFromVK_dw(v_dw_3D &All_Vector,KMX_DWORD vkUnderlying, WCHAR VK
   for( int i=0; i< (int)All_Vector[1].size();i++) {
       KMX_DWORD CharOther = All_Vector[1][i][2];
       if( vkUnderlying == CharOther ) {
-        KMX_DWORD CharOtherShifted  = All_Vector[1][i][VKShiftState];
-        return  CharOtherShifted;
+        return All_Vector[1][i][VKShiftState];
       }
   }
   return vkUnderlying;
@@ -339,7 +338,6 @@ bool createVectorForBothKeyboards_dw(v_dw_3D &All_Vector,GdkKeymap *keymap){
     wprintf(L"ERROR: can't append other ToVector \n");
     return 1;
   }
-/**/
   return 0;
 }
 
@@ -403,7 +401,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
       else
         ERROR = L" ";
       //wprintf(L"    DoConvert-read i:  %i (KMX_VKMap): %i (%c)  --->  vkUnderlying: %i (%c)    shiftstate: ( %i )   ---- >  ch: %i (%c)  %ls  %ls\n" , i,(int) KMX_VKMap[i],(int)KMX_VKMap[i],  vkUnderlying,vkUnderlying, VKShiftState[j] ,  ch ,ch ,  ((int) vkUnderlying != (int) KMX_VKMap[i] ) ? L" *** ": L"", ERROR);
-      wprintf(L" dw DoConvert-read i:  %i (KMX_VKMap): %i (%c)  --->  vkUnderlying: %i (%c)    shiftstate: ( %i )   ---- >  ch: %i (%c)  %ls  %ls\n" , i,(int) KMX_VKMap[i],(int)KMX_VKMap[i],  vkUnderlying_dw,vkUnderlying_dw, VKShiftState[j] ,  ch_dw ,ch_dw ,  ((int) vkUnderlying_dw != (int) KMX_VKMap[i] ) ? L" *** ": L"", ERROR);
+      wprintf(L" dw DoConvert-read i:  %i \t(KMX_VKMap): %i (%c)  \t--->  vkUnderlying: %i (%c)    \tshiftstate: ( %i )   \t---- >  ch: %i (%c)  \t%ls  \t%ls\n" , i,(int) KMX_VKMap[i],(int)KMX_VKMap[i],  vkUnderlying_dw,vkUnderlying_dw, VKShiftState[j] ,  ch_dw ,ch_dw ,  ((int) vkUnderlying_dw != (int) KMX_VKMap[i] ) ? L" *** ": L"", ERROR);
       //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
 
 

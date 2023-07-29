@@ -68,8 +68,6 @@ bool CreateCompleteRow_US(v_str_1D &complete_List, FILE *fpp, const char *text, 
 bool Split_US_To_3D_Vector(v_str_3D &all_US, v_str_1D completeList);
 bool Split_US_To_3D_Vector_dw(v_dw_3D &all_US, v_str_1D completeList);
 
-
-
 // replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 15 )
 int replace_PosKey_with_Keycode(std::string in);
 

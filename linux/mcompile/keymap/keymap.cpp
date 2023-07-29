@@ -62,7 +62,7 @@ bool write_US_ToVector( v_str_3D &vec,std::string language, const char* text) {
 
 bool write_US_ToVector_dw( v_dw_3D &vec,std::string language, const char* text) {
 
- // _S2 relative path !!
+  // _S2 relative path !!
   std::string FullPathName = "/usr/share/X11/xkb/symbols/" + language;
 
   const char* path = FullPathName.c_str();
@@ -87,7 +87,6 @@ bool write_US_ToVector_dw( v_dw_3D &vec,std::string language, const char* text) 
   wprintf(L"\n   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
   wprintf(L"   +++++++ dimensions of Vector after write_US_ToVector_dw (languages..characters..shiftstates)\t\t %li..%li..%li\n", vec.size(), vec[0].size(),vec[0][0].size());
 
-  //test_single(vec);
   test_single_dw(vec);
   fclose(fp);
   return 0;
@@ -242,7 +241,7 @@ bool Split_US_To_3D_Vector_dw(v_dw_3D &all_US,v_str_1D completeList) {
   KMX_DWORD tokens_int;
   std::wstring tok_wstr;
 
-   // loop through the whole vector
+  // loop through the whole vector
   for (int k = 0; k < (int)completeList.size() - 1; k++) {
 
     // remove all unwanted char
@@ -267,7 +266,6 @@ bool Split_US_To_3D_Vector_dw(v_dw_3D &all_US,v_str_1D completeList) {
 
       for (std::string each; std::getline(split, each, split_char_komma); tokens.push_back(each));
 
-
       // now convert all to KMX_DWORD and fill tokens_dw
       tokens_dw.push_back((KMX_DWORD) Keycde);
 
@@ -284,10 +282,10 @@ bool Split_US_To_3D_Vector_dw(v_dw_3D &all_US,v_str_1D completeList) {
           tokens_int = ValueInvalid;
         }
         tokens_dw.push_back(tokens_int);
-
-        wprintf(L"<<< %i  (%c) %i  (%c) %i  (%c) %i  (%c) \n", tokens_dw[0],tokens_dw[0],tokens_dw[1],tokens_dw[1], tokens_dw[2], tokens_dw[2], tokens_dw[3],tokens_dw[3]);
       }
 
+      wprintf(L"  Keyval  %i:   %i (%c) --- %i (%c)  \n", tokens_dw[0],tokens_dw[1],tokens_dw[1], tokens_dw[2], tokens_dw[2]);
+   
       // now push result to shift_states
       shift_states_dw.push_back(tokens_dw);
       tokens_dw.clear();
@@ -425,16 +423,8 @@ bool append_other_ToVector_dw(v_dw_3D &All_Vector,GdkKeymap * keymap) {
     All_Vector[1][i][0+1] = GetKeyvalsFromKeymap(keymap,(All_Vector[1][i][0]),0);   //shift state: unshifted:0
     All_Vector[1][i][1+1] = GetKeyvalsFromKeymap(keymap,(All_Vector[1][i][0]),1);   //shift state: shifted:1
 
-    //std::wcout << L" after GetKeyvalsFromKeymap " << All_Vector[1][i][0+1]<<   L" ... "<<All_Vector[1][i][1+1] << L"..\n";
-    //wprintf(L"  wf after GetKeyvalsFromKeymap %i (%c)... %i (%c) ....\n" , All_Vector[1][i][0+1],All_Vector[1][i][0+1]   ,All_Vector[1][i][1+1] ,All_Vector[1][i][1+1] ) ;
-
-    wprintf(L" Keycodes US dw        :   %d (US): -- %i (%c)  -- %i (%c) ---- (other): %i (%c)  --  %i(%c)    \n",(All_Vector[1][i][0]),All_Vector[0][i][1],All_Vector[0][i][1],All_Vector[0][i][2],All_Vector[0][i][2],All_Vector[1][i][1] ,All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
-    wprintf(L"   Keycodes ->Other dw:-:   %d (US): -- %i (%c)  -- %i (%c)   \n\n",(All_Vector[1][i][0]),All_Vector[1][i][1],All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
-
-    //wprintf(L"   Keycodes ->Other dw:-:    %d (US):%i (%c) %i (%c)   \n\n",(All_Vector[1][i][0]),All_Vector[1][i][1],All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
-
-    //wprintf(L" Keycodes US dw        :   %d (US):%s, %s ---- (other):%s, %s    \n",stoi(All_Vector[1][i][0]),All_Vector[0][i][1].c_str(),All_Vector[0][i][2].c_str(),All_Vector[1][i][1].c_str(),All_Vector[1][i][2].c_str());
-    //wprintf(L"   Keycodes ->Other dw:-:    %d (US):%s, %s ,%s, %s   \n\n",stoi(All_Vector[1][i][0]),All_Vector[1][i][1].c_str(),All_Vector[1][i][2].c_str(),All_Vector[1][i][3].c_str(),All_Vector[1][i][4].c_str());
+    //wprintf(L" Keycodes US dw        :   %d (US): -- %i (%c)  -- %i (%c) ---- (other): %i (%c)  --  %i(%c)    \n",(All_Vector[1][i][0]),All_Vector[0][i][1],All_Vector[0][i][1],All_Vector[0][i][2],All_Vector[0][i][2],All_Vector[1][i][1] ,All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
+    //wprintf(L"   Keycodes ->Other dw:-:   %d (US): -- %i (%c)  -- %i (%c)   \n\n",(All_Vector[1][i][0]),All_Vector[1][i][1],All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
   }
   return 0;
 }
@@ -489,8 +479,8 @@ int GetKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) 
 
   //wprintf(L" GetKeyvalsFromKeymap: in %i  -- out : %i \n", (int)keycode, out);
 
-  // _S2 if out of range of ascii return 0 or other value ?
-  if (out > 127)
+  // _S2 if out of range of what ( ascii??) return 0 or other value ?
+  if (out > 255)
       out = 0;
 
   g_free(keyvals);
@@ -512,28 +502,28 @@ bool test(v_str_3D &V) {
       extra = "  ";
 
     if (V[0].size()>0) {
-      wprintf(L" row 1 xx(US)   ...... %s  .. %s .. %s .. %s .. %s  --- ", V[0][k][0].c_str(),  V[0][k][1].c_str() ,  V[0][k][2].c_str() ,  V[0][k][3].c_str() ,  V[0][k][4].c_str() ); 
-      wprintf(L"  \n");
-      wprintf(L"   row 1 xx(Other)..... %s  .. %s .. %s  .. %s .. %s  %s  \n", V[1][k][0].c_str(),  V[1][k][1].c_str() ,  V[1][k][2].c_str() ,  V[1][k][3].c_str() ,  V[1][k][4].c_str() , extra.c_str()); 
-    wprintf(L"  \n");
+      //wprintf(L"    row (US)   ...... %s  .. %s .. %s .. %s .. %s  --- ", V[0][k][0].c_str(),  V[0][k][1].c_str() ,  V[0][k][2].c_str() ,  V[0][k][3].c_str() ,  V[0][k][4].c_str() ); 
+      //wprintf(L"  \n");
+      //wprintf(L"      row (Other)..... %s  .. %s .. %s  .. %s .. %s  %s  \n", V[1][k][0].c_str(),  V[1][k][1].c_str() ,  V[1][k][2].c_str() ,  V[1][k][3].c_str() ,  V[1][k][4].c_str() , extra.c_str()); 
+    //wprintf(L"  \n");
     }
   }
-  wprintf(L"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+  wprintf(L"   +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
   return true;
 }
 
 bool test_single(v_str_3D &V) {
 
   std::string extra = "  ";
-  wprintf(L"+++++++ dimensions of single Vector in test()\t\t %li..%li..%li\n", V.size(), V[0].size(),V[0][0].size());
-  wprintf(L"\n+++++++++ print characters of SINGLE  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+  //wprintf(L"   +++++++ dimensions of single Vector in test()\t\t %li..%li..%li\n", V.size(), V[0].size(),V[0][0].size());
+  //wprintf(L"\n+++++++++ print characters of SINGLE  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 
   for ( int k=0; k<(int)V[0].size(); k++) {
     if (V[0].size()>0) {
-      wprintf(L" row 1 (US)   ...... %s  .. %s .. %s .. %s .. %s  --- \n", V[0][k][0].c_str(),  V[0][k][1].c_str() ,  V[0][k][2].c_str() ,  V[0][k][3].c_str() ,  V[0][k][4].c_str() ); 
+      //wprintf(L"    row 1 (US)   ...... %s  .. %s .. %s .. %s .. %s  --- \n", V[0][k][0].c_str(),  V[0][k][1].c_str() ,  V[0][k][2].c_str() ,  V[0][k][3].c_str() ,  V[0][k][4].c_str() ); 
     }
   }
-  wprintf(L"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+  wprintf(L"   +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
   return true;
 }
 
@@ -541,8 +531,8 @@ bool test_single(v_str_3D &V) {
 bool test_dw(v_dw_3D &V) {
 
   std::string extra = "  ";
-  wprintf(L"+++++++ dimensions of whole Vector in test()\t\t %li..%li..%li\n", V.size(), V[0].size(),V[0][0].size());
-  wprintf(L"\n+++++++++ print some characters of US and Other ++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+  wprintf(L"   +++++++ dimensions of whole Vector in test_dw()\t\t\t\t\t\t\t %li..%li..%li\n", V.size(), V[0].size(),V[0][0].size());
+  wprintf(L"\n+++++++++ print some characters of US and Other +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 
   for ( int k=0; k<(int)V[0].size(); k++) {
     if(V[0][k][2] != V[1][k][2] )
@@ -551,28 +541,28 @@ bool test_dw(v_dw_3D &V) {
       extra = "  ";
 
     if (V[0].size()>0) {
-      wprintf(L" row 1 xx(US)   ...... %i   .. %i (%c) .. %i (%c) ..  --- ",V[0][k][0] ,  V[0][k][1] ,  V[0][k][1]  ,  V[0][k][2] ,  V[0][k][2]    ); 
-      wprintf(L"  \n");
-      wprintf(L"   row 1 xx(Other)..... %i   .. %i (%c) .. %i (%c)  ..   %s  \n",  V[1][k][0] ,  V[1][k][1],  V[1][k][1]  ,  V[1][k][2],  V[1][k][2]  ,    extra.c_str()); 
-    wprintf(L"  \n");
+      //wprintf(L" row (US)   ...... %i   .. %i (%c) .. %i (%c) ..  --- ",V[0][k][0] ,  V[0][k][1] ,  V[0][k][1]  ,  V[0][k][2] ,  V[0][k][2]    ); 
+      //wprintf(L"  \n");
+      //wprintf(L"   row (Other)..... %i   .. %i (%c) .. %i (%c)  ..   %s  \n",  V[1][k][0] ,  V[1][k][1],  V[1][k][1]  ,  V[1][k][2],  V[1][k][2]  ,    extra.c_str()); 
+    //wprintf(L"  \n");
     }
   }
-  wprintf(L"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+  wprintf(L"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
   return true;
 }
 
 bool test_single_dw(v_dw_3D &V) {
 
   std::string extra = "  ";
-  wprintf(L"   +++++++ dimensions of single Vector in test_single_dw()\t\t %li..%li..%li\n", V.size(), V[0].size(),V[0][0].size());
-  wprintf(L"\n   +++++++++ print characters of SINGLE DW +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+  wprintf(L"   +++++++ dimensions of single Vector in test_single_dw()\t\t\t\t\t\t %li..%li..%li\n", V.size(), V[0].size(),V[0][0].size());
+  wprintf(L"\n   +++++++++ print characters of SINGLE DW ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 
   for ( int k=0; k<(int)V[0].size(); k++) {
     if (V[0].size()>0) {
-      wprintf(L" row 1 (US)   ...... %i  .. %i (%c) .. %i (%c) ........  %i  (%c).. %i  (%c) --- \n", V[0][k][0] ,   V[0][k][1]  ,V[0][k][1]  ,  V[0][k][2],  V[0][k][2]  ,  V[0][k][3] ,  V[0][k][3]  ,  V[0][k][4] ,  V[0][k][4]  ); 
+      wprintf(L"    row (US)   ...... %i  .. %i (%c) .. %i (%c) ........   \n", V[0][k][0] ,   V[0][k][1]  ,V[0][k][1]  ,  V[0][k][2],  V[0][k][2]   ); 
     }
   }
-  wprintf(L"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+  wprintf(L"   +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
   return true;
 }
 
