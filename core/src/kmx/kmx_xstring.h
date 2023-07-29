@@ -6,16 +6,31 @@ namespace km {
 namespace kbp {
 namespace kmx {
 
+const char16_t Uni_LEAD_SURROGATE_START  = 0xD800;
+const char16_t Uni_LEAD_SURROGATE_END    = 0xDBFF;
+const char16_t Uni_TRAIL_SURROGATE_START = 0xDC00;
+const char16_t Uni_TRAIL_SURROGATE_END   = 0xDFFF;
+const char16_t Uni_SURROGATE_START       = Uni_LEAD_SURROGATE_START;
+const char16_t Uni_SURROGATE_END         = Uni_TRAIL_SURROGATE_END;
+const char16_t Uni_FD_NONCHARACTER_START = 0xFDD0;
+const char16_t Uni_FD_NONCHARACTER_END   = 0xFDEF;
+const char16_t Uni_FFFE_NONCHARACTER     = 0xFFFE;
+const char16_t Uni_FFFF_NONCHARACTER     = 0xFFFF;
+const char16_t Uni_BMP_END               = 0xFFFF;
+const km_kbp_usv Uni_SMP_START           = 0x010000;
+const km_kbp_usv Uni_PLANE_MASK          = 0x1F0000;
+const km_kbp_usv Uni_MAX_CODEPOINT       = 0x10FFFF;
+
 /**
  * @brief True if a lead surrogate
  * \def Uni_IsSurrogate1
  */
-#define Uni_IsSurrogate1(ch) ((ch) >= 0xD800 && (ch) <= 0xDBFF)
+#define Uni_IsSurrogate1(ch) ((ch) >= km::kbp::kmx::Uni_LEAD_SURROGATE_START && (ch) <= km::kbp::kmx::Uni_LEAD_SURROGATE_END)
 /**
  * @brief True if a trail surrogate
  * \def Uni_IsSurrogate2
  */
-#define Uni_IsSurrogate2(ch) ((ch) >= 0xDC00 && (ch) <= 0xDFFF)
+#define Uni_IsSurrogate2(ch) ((ch) >= km::kbp::kmx::Uni_TRAIL_SURROGATE_START && (ch) <= km::kbp::kmx::Uni_TRAIL_SURROGATE_END)
 
 /**
  * @brief True if any surrogate
@@ -27,7 +42,7 @@ namespace kmx {
  * @brief Returns true if BMP (Plane 0)
  * \def Uni_IsBMP
  */
-#define Uni_IsBMP(ch) ((ch) < 0x10000)
+#define Uni_IsBMP(ch) ((ch) <=  km::kbp::kmx::Uni_BMP_END)
 
 /**
  * @brief Convert two UTF-16 surrogates into one UTF-32 codepoint
@@ -35,27 +50,35 @@ namespace kmx {
  * @param cl trail surrogate - Uni_IsSurrogate2(cl) must == true
  * \def Uni_SurrogateToUTF
  */
-#define Uni_SurrogateToUTF32(ch, cl) (((ch) - 0xD800) * 0x400 + ((cl) - 0xDC00) + 0x10000)
+#define Uni_SurrogateToUTF32(ch, cl) (((ch) - km::kbp::kmx::Uni_LEAD_SURROGATE_START) * 0x400 + ((cl) - km::kbp::kmx::Uni_TRAIL_SURROGATE_START) + km::kbp::kmx::Uni_SMP_START)
 
 /**
  * @brief Convert UTF-32 BMP to UTF-16 BMP
  * @param ch codepoint - Uni_IsBMP(ch) must == true
  * \def Uni_UTF32BMPToUTF16
  */
-#define Uni_UTF32BMPToUTF16(ch) (ch & 0xFFFF)
+#define Uni_UTF32BMPToUTF16(ch) ((ch) & Uni_FFFF_NONCHARACTER)
 
-#define Uni_UTF32ToSurrogate1(ch) (char16_t)(((ch) - 0x10000) / 0x400 + 0xD800)
-#define Uni_UTF32ToSurrogate2(ch) (char16_t)(((ch) - 0x10000) % 0x400 + 0xDC00)
-
-#define Uni_IsNoncharacter(ch) (((ch) >= 0xFDD0 && (ch) <= 0xFDEF) || (((ch) & 0xFFFE) == 0xFFFE))
-
-#define Uni_InCodespace(ch) ((ch) <= 0x10FFFF)
+#define Uni_UTF32ToSurrogate1(ch) (char16_t)(((ch) - km::kbp::kmx::Uni_SMP_START) / 0x400 + km::kbp::kmx::Uni_LEAD_SURROGATE_START)
+#define Uni_UTF32ToSurrogate2(ch) (char16_t)(((ch) - km::kbp::kmx::Uni_SMP_START) % 0x400 + km::kbp::kmx::Uni_TRAIL_SURROGATE_START)
 
 /**
- * @brief True if in codespace and NOT a surrogate or noncharacter.
- * \def Uni_IsValid
+ * @returns true if the character is a noncharacter
 */
-#define Uni_IsValid(ch) (Uni_InCodespace(ch) && !Uni_IsSurrogate(ch) && !Uni_IsNoncharacter(ch))
+bool Uni_IsNonCharacter(km_kbp_usv ch);
+
+/**
+ * @returns true if the character is a valid Unicode code point.
+ * Surrogates belong to UTF-16 and are invalid.
+*/
+bool Uni_IsValid(km_kbp_usv ch);
+
+/**
+ * @returns true if the character is a valid Unicode code point range, that is, [start-end] are all
+ * valid.
+ * Surrogates belong to UTF-16 and are invalid.
+*/
+bool Uni_IsValid(km_kbp_usv start, km_kbp_usv range);
 
 /**
  * char16_t array big enough to hold a single Unicode codepoint,
@@ -148,6 +171,44 @@ u16string_to_u32string(const std::u16string &source) {
   }
   return out;
 }
+
+inline bool Uni_IsEndOfPlaneNonCharacter(km_kbp_usv ch) {
+  return (((ch) & Uni_FFFE_NONCHARACTER) == Uni_FFFE_NONCHARACTER); // matches FFFF or FFFE
+}
+
+inline bool Uni_IsNoncharacter(km_kbp_usv ch) {
+  return (((ch) >= Uni_FD_NONCHARACTER_START && (ch) <= Uni_FD_NONCHARACTER_END) || Uni_IsEndOfPlaneNonCharacter(ch));
+}
+
+inline bool Uni_InCodespace(km_kbp_usv ch) {
+  return ((ch) <= Uni_MAX_CODEPOINT);
+};
+
+inline bool Uni_IsValid(km_kbp_usv ch) {
+  return (Uni_InCodespace(ch) && !Uni_IsSurrogate(ch) && !Uni_IsNoncharacter(ch));
+}
+
+inline bool Uni_IsValid(km_kbp_usv start, km_kbp_usv end) {
+  if (!Uni_IsValid(end) || !Uni_IsValid(start) || (end < start)) {
+    // start or end out of range, or inverted range
+    return false;
+  } else if ((start <= Uni_SURROGATE_END) && (end >= Uni_SURROGATE_START)) {
+    // contains some of the surrogate range
+    return false;
+  } else if ((start <= Uni_FD_NONCHARACTER_END) && (end >= Uni_FD_NONCHARACTER_START)) {
+    // contains some of the noncharacter range
+    return false;
+  } else if ((start & Uni_PLANE_MASK) != (end & Uni_PLANE_MASK)) {
+    // start and end are on different planes, meaning that the U+__FFFE/U+__FFFF noncharacters
+    // are contained.
+    // As a reminder, we already checked that start/end are themselves valid,
+    // so we know that 'end' is not on a noncharacter at end of plane.
+    return false;
+  } else {
+    return true;
+  }
+}
+
 
 } // namespace kmx
 } // namespace kbp
