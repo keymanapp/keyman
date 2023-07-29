@@ -7,12 +7,12 @@ import { SectionCompiler } from "./section-compiler.js";
 import DependencySections = KMXPlus.DependencySections;
 import Disp = KMXPlus.Disp;
 import DispItem = KMXPlus.DispItem;
+import { MarkerTracker, MarkerUse } from "./marker-tracker.js";
 
 export class DispCompiler extends SectionCompiler {
-  static validateMarkers(keyboard: LDMLKeyboard.LKKeyboard, emitMarkers: Set<string>, matchMarkers: Set<string>): boolean {
-    keyboard.displays?.display?.forEach(({ to }) => {
-      MarkerParser.allReferences(to).forEach(marker => matchMarkers.add(marker));
-    });
+  static validateMarkers(keyboard: LDMLKeyboard.LKKeyboard, mt : MarkerTracker): boolean {
+    keyboard.displays?.display?.forEach(({ to }) =>
+      mt.add(MarkerUse.match, MarkerParser.allReferences(to)));
     return true;
   }
 

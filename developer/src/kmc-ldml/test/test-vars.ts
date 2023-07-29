@@ -189,6 +189,12 @@ describe('vars', function () {
     testCompilationCases(VarsCompiler, [
       {
         subpath: 'sections/vars/markers-maximal.xml',
+        callback(sect) {
+          const vars = <Vars> sect;
+          assert.ok(vars.markers);
+          assert.sameDeepOrderedMembers(vars.markers.toStringArray(),
+            ['m','x']);
+        },
       },
       {
         subpath: 'sections/vars/fail-markers-badref-0.xml',

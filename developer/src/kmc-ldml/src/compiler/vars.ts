@@ -12,6 +12,7 @@ import { CompilerMessages } from "./messages.js";
 import { KeysCompiler } from "./keys.js";
 import { TransformCompiler } from "./tran.js";
 import { DispCompiler } from "./disp.js";
+import { MarkerTracker, MarkerUse } from "./marker-tracker.js";
 export class VarsCompiler extends SectionCompiler {
   public get id() {
     return constants.section.vars;
@@ -20,7 +21,8 @@ export class VarsCompiler extends SectionCompiler {
   public get dependencies(): Set<SectionIdent> {
     const defaults = new Set(<SectionIdent[]>[
       constants.section.strs,
-      constants.section.elem
+      constants.section.elem,
+      constants.section.list,
     ]);
     defaults.delete(this.id);
     return defaults;
@@ -32,7 +34,6 @@ export class VarsCompiler extends SectionCompiler {
 
   public validate(): boolean {
     let valid = true;
-    // TODO-LDML scan for markers?
 
     // Check for duplicate ids
     const allIds = new Set();
@@ -139,51 +140,47 @@ export class VarsCompiler extends SectionCompiler {
     return valid;
   }
 
-  private collectMarkers(emitMarkers : Set<string>, matchMarkers : Set<string>) : boolean {
+  private collectMarkers(mt : MarkerTracker) : boolean {
     let valid = true;
 
     // call our friends to validate
-    valid = this.validateVarsMarkers(this.keyboard, emitMarkers, matchMarkers) && valid; // accumulate validity
-    valid = KeysCompiler.validateMarkers(this.keyboard, emitMarkers, matchMarkers) && valid; // accumulate validity
-    valid = TransformCompiler.validateMarkers(this.keyboard, emitMarkers, matchMarkers) && valid; // accumulate validity
-    valid = DispCompiler.validateMarkers(this.keyboard, emitMarkers, matchMarkers) && valid; // accumulate validity
+    valid = this.validateVarsMarkers(this.keyboard, mt) && valid; // accumulate validity
+    valid = KeysCompiler.validateMarkers(this.keyboard, mt) && valid; // accumulate validity
+    valid = TransformCompiler.validateMarkers(this.keyboard, mt) && valid; // accumulate validity
+    valid = DispCompiler.validateMarkers(this.keyboard, mt) && valid; // accumulate validity
 
     return valid;
   }
 
   private validateMarkers(): boolean {
-    /** only the markers used in emitters */
-    const emitMarkers : Set<string> = new Set<string>();
-    /** only the markers used in matchers */
-    const matchMarkers : Set<string> = new Set<string>();
-
-
-    let valid = this.collectMarkers(emitMarkers, matchMarkers);
-
+    const mt = new MarkerTracker();
+    let valid = this.collectMarkers(mt);
     // see if there are any matched-but-not-emitted
-    const matchedNotEmitted : string[] = [];
-    for (const m of matchMarkers.values()) {
-      if (m === '.') continue; // match-all marker
-      if (!emitMarkers.has(m)) {
-        matchedNotEmitted.push(m);
+    const matchedNotEmitted : Set<string> = new Set<string>();
+    for (const m of mt.matched.values()) {
+      if (m === MarkerParser.ANY_MARKER_ID) continue; // match-all marker
+      if (!mt.emitted.has(m)) {
+        matchedNotEmitted.add(m);
+      }
+    }
+    for (const m of mt.consumed.values()) {
+      if (m === MarkerParser.ANY_MARKER_ID) continue; // match-all marker
+      if (!mt.emitted.has(m)) {
+        matchedNotEmitted.add(m);
       }
     }
 
     // report once
-    if (matchedNotEmitted.length) {
-      matchedNotEmitted.sort();
-      this.callbacks.reportMessage(CompilerMessages.Error_MissingMarkers({ ids: matchedNotEmitted }));
+    if (matchedNotEmitted.size > 0) {
+      this.callbacks.reportMessage(CompilerMessages.Error_MissingMarkers({ ids: Array.from(matchedNotEmitted.values()).sort() }));
       valid = false;
     }
     return valid;
   }
 
-  validateVarsMarkers(keyboard: LDMLKeyboard.LKKeyboard, emitMarkers: Set<string>, matchMarkers: Set<string>) : boolean {
+  validateVarsMarkers(keyboard: LDMLKeyboard.LKKeyboard, mt : MarkerTracker) : boolean {
     keyboard?.variables?.string?.forEach(({value}) =>
-          MarkerParser.allReferences(value).forEach(marker => {
-            emitMarkers.add(marker);
-            matchMarkers.add(marker);
-          }));
+          mt.add(MarkerUse.variable, MarkerParser.allReferences(value)));
     return true;
   }
 
@@ -206,6 +203,14 @@ export class VarsCompiler extends SectionCompiler {
       this.addSet(result, e, sections));
     variables?.unicodeSet?.forEach((e) =>
       this.addUnicodeSet(result, e, sections));
+
+    // reload markers - TODO-LDML: double work!
+    const mt = new MarkerTracker();
+    this.collectMarkers(mt);
+
+    // collect all markers, excluding the match-all
+    const allMarkers : string[] = Array.from(mt.all).filter(m => m !== MarkerParser.ANY_MARKER_ID).sort();
+    result.markers = sections.list.allocList(sections.strs, allMarkers);
 
     return result.valid() ? result : null;
   }

@@ -15,19 +15,19 @@ import LKTransform = LDMLKeyboard.LKTransform;
 import LKTransforms = LDMLKeyboard.LKTransforms;
 import { verifyValidAndUnique } from "../util/util.js";
 import { CompilerMessages } from "./messages.js";
+import { MarkerTracker, MarkerUse } from "./marker-tracker.js";
 
 type TransformCompilerType = 'simple' | 'backspace';
 
 export class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> extends SectionCompiler {
 
-  static validateMarkers(keyboard: LDMLKeyboard.LKKeyboard, emitMarkers: Set<string>, matchMarkers: Set<string>): boolean {
+  static validateMarkers(keyboard: LDMLKeyboard.LKKeyboard, mt : MarkerTracker): boolean {
     keyboard?.transforms?.forEach(transforms =>
       transforms.transformGroup.forEach(transformGroup => {
         transformGroup.transform?.forEach(({ to, from }) => {
-          MarkerParser.allReferences(from).forEach(marker => matchMarkers.add(marker));
-          MarkerParser.allReferences(to).forEach(marker => emitMarkers.add(marker));
-        });
-      }));
+          mt.add(MarkerUse.emit, MarkerParser.allReferences(to));
+          mt.add(MarkerUse.consume, MarkerParser.allReferences(from));
+        })}));
     return true;
   }
 
