@@ -188,7 +188,7 @@ export class VarsCompiler extends SectionCompiler {
     const result =  new Vars();
 
     const variables = this.keyboard?.variables;
-
+    // we always have vars, it's depended on by other sections 
     if (!variables) return result; // Empty vars, to simplify other sections
 
     // we already know the variables do not conflict with each other

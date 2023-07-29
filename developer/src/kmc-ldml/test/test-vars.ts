@@ -5,6 +5,9 @@ import { CompilerMessages } from '../src/compiler/messages.js';
 import { CompilerMessages as KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 import { testCompilationCases } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
+import { BASIC_DEPENDENCIES } from '../src/compiler/empty-compiler.js';
+// now that 'everything' depends on vars, we need an explicit dependency here
+const varsDependencies = BASIC_DEPENDENCIES.filter(c => c !== VarsCompiler);
 
 import Vars = KMXPlus.Vars;
 
@@ -182,7 +185,7 @@ describe('vars', function () {
         CompilerMessages.Error_MissingStringVariable({id: 'missingStringInSet'})
       ],
     },
-  ]);
+  ], varsDependencies);
   describe('markers', function () {
     this.slow(500); // 0.5 sec -- json schema validation takes a while
 
@@ -208,6 +211,6 @@ describe('vars', function () {
           }),
         ],
       },
-    ]);
+    ], varsDependencies);
   });
 });

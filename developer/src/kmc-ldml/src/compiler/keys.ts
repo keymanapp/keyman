@@ -132,6 +132,7 @@ export class KeysCompiler extends SectionCompiler {
         flicks.flicks.push({
           directions,
           flags,
+          // TODO-LDML: markers,variables
           to,
         });
       }
@@ -160,17 +161,23 @@ export class KeysCompiler extends SectionCompiler {
       const id = sections.strs.allocString(key.id);
       const longPress: ListItem = sections.list.allocListFromEscapedSpaces(
         sections.strs,
+        // TODO-LDML: markers,variables
         key.longPress
       );
       const longPressDefault = sections.strs.allocAndUnescapeString(
+        // TODO-LDML: markers,variables
         key.longPressDefault
       );
       const multiTap: ListItem = sections.list.allocListFromEscapedSpaces(
         sections.strs,
+        // TODO-LDML: markers,variables
         key.multiTap
       );
       const keySwitch = sections.strs.allocString(key.switch); // 'switch' is a reserved word
-      const to = sections.strs.allocAndUnescapeString(key.to, true);
+      const toRaw = key.to;
+      // TODO-LDML: variables
+      let toCooked = sections.vars.substituteMarkerString(toRaw);
+      const to = sections.strs.allocAndUnescapeString(toCooked, true);
       if (!to.isOneChar) {
         flags |= constants.keys_key_flags_extend;
       }

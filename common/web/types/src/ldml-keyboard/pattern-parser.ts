@@ -93,6 +93,7 @@ export class MarkerParser {
 
   /** @returns all marker strings as sentinel values */
   public static toSentinelString(s: string, markers?: OrderedStringList) : string {
+    if (!s) return s;
     return s.replaceAll(this.REFERENCE, (sub, arg) => {
       if (arg === MarkerParser.ANY_MARKER_ID) {
         return MarkerParser.SENTINEL_ALL_MARKERS;

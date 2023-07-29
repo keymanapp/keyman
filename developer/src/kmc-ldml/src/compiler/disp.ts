@@ -44,9 +44,11 @@ export class DispCompiler extends SectionCompiler {
     // displayOptions
     result.baseCharacter = sections.strs.allocAndUnescapeString(this.keyboard.displays?.displayOptions?.baseCharacter);
 
+    // TODO-LDML: substitute variables!
+
     // displays
     result.disps = this.keyboard.displays?.display.map(display => ({
-      to: sections.strs.allocAndUnescapeString(display.to),
+      to: sections.strs.allocAndUnescapeString(sections.vars.substituteMarkerString(display.to)),
       display: sections.strs.allocAndUnescapeString(display.display),
     })) || []; // TODO-LDML: need coverage for the []
 
