@@ -33,25 +33,30 @@ enum any_group_type {
  */
 class element {
 public:
-  /** from a USet */
+  /** construct from a USet */
   element(const USet &u, KMX_DWORD flags);
-  /** from a single char */
+  /** construct from a single char */
   element(km_kbp_usv ch, KMX_DWORD flags);
 
   /** @returns true if a USet type */
   bool is_uset() const;
+  /** @returns true if prebase bit set*/
   bool is_prebase() const;
+  /** @returns true if tertiary base bit set */
   bool is_tertiary_base() const;
-  signed char get_tertiary() const;
+  /** @returns the primary order */
   signed char get_order() const;
+  /** @returns the tertiary order */
+  signed char get_tertiary() const;
   /** @returns raw elem flags */
   KMX_DWORD get_flags() const;
   /** @returns true if matches this character*/
   bool matches(km_kbp_usv ch) const;
+  /** debugging: dump this element via DebugLog() */
   void dump() const;
 
 private:
-  // TODO-LDML: support multi-char strings
+  // TODO-LDML: support multi-char strings?
   const km_kbp_usv chr;
   const USet uset;
   const KMX_DWORD flags;
@@ -112,14 +117,12 @@ struct reorder_sort_key {
   signed char tertiary;  // tertiary value, defaults to 0
   size_t quaternary;     // index again
 
-  /**
-   * Return -1, 0, 1 depending on order
-  */
+  /** @returns -1, 0, 1 depending on ordering */
   int compare(const reorder_sort_key &other) const;
   bool operator<(const reorder_sort_key &other) const;
   bool operator>(const reorder_sort_key &other) const;
 
-  /** create a 'baseline' sort key, all 0 primary weights */
+  /** create a 'baseline' sort key, with each character having primary weight 0 */
   static std::deque<reorder_sort_key> from(const std::u32string &str);
 
   /** TODO-LDML: for debugging. */
@@ -138,7 +141,7 @@ public:
    * Update the deque (see reorder_sort_key::from()) with the weights from this element list
    * starting at the beginning of this element list
    * @param offset start at this offset in the deque. Still starts at the first element
-   * @param the key deque to update
+   * @param key key deque to update
    * @returns the key parameter
   */
   std::deque<reorder_sort_key> &update_sort_key(size_t offset, std::deque<reorder_sort_key> &key) const;
@@ -147,6 +150,7 @@ public:
   bool
   load(const kmx::kmx_plus& kplus, kmx::KMXPLUS_ELEM id);
 
+  /** TODO-LDML: for debugging */
   void dump() const;
 };
 
@@ -230,12 +234,13 @@ public:
   bool apply(std::u32string &str);
 
 public:
+  /** load from a kmx_plus data section, either tran or bksp */
   static transforms *
-  load(const kmx::kmx_plus &kplus, const kbp::kmx::COMP_KMXPLUS_TRAN *tran, const kbp::kmx::COMP_KMXPLUS_TRAN_Helper &tranHelper);
+  load(const kmx::kmx_plus &kplus,
+       const kbp::kmx::COMP_KMXPLUS_TRAN *tran,
+       const kbp::kmx::COMP_KMXPLUS_TRAN_Helper &tranHelper);
 };
-/**
- * Loader for transform groups (from tran or bksp)
- */
+
 }  // namespace ldml
 }  // namespace kbp
 }  // namespace km
