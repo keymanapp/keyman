@@ -22,6 +22,12 @@ function matchArray(str: string, match: RegExp) : string[] {
  */
 const COMMON_ID = /^[0-9A-Za-z_]{1,32}$/;
 
+/** for use with markers, means an ordering can be determined */
+export interface OrderedStringList {
+  /** @returns the ordering of an item (0..), or -1 if not found */
+  getItemOrder(item : string) : number;
+}
+
 /**
  * Class for helping with markers
  */
@@ -83,6 +89,23 @@ export class MarkerParser {
       throw RangeError(`Internal Error: marker index out of range ${n}`);
     }
     return this.SENTINEL + String.fromCharCode(n);
+  }
+
+  /** @returns all marker strings as sentinel values */
+  public static toSentinelString(s: string, markers: OrderedStringList) : string {
+    return s.replaceAll(this.REFERENCE, (sub, arg) => {
+      if (arg === MarkerParser.ANY_MARKER_ID) {
+        return MarkerParser.SENTINEL_ALL_MARKERS;
+      }
+      const order = markers.getItemOrder(arg);
+      if (order === -1) {
+        throw RangeError(`Internal Error: Could not find marker \\m{${arg}}`);
+      } else if(order >= MarkerParser.MAX_MARKER_INDEX) {
+        throw RangeError(`Internal Error: marker \\m{${arg}} has out of range index ${order}`);
+      } else {
+        return MarkerParser.markerOutput(order+1);
+      }
+    });
   }
 }
 

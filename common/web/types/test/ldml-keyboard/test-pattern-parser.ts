@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { ElementParser, ElementSegment, ElementType, MarkerParser, VariableParser } from '../../src/ldml-keyboard/pattern-parser.js';
+import { ElementParser, ElementSegment, ElementType, MarkerParser, OrderedStringList, VariableParser } from '../../src/ldml-keyboard/pattern-parser.js';
 
 describe('Test of Pattern Parsers', () => {
   describe('should test MarkerParser', () => {
@@ -56,6 +56,42 @@ describe('Test of Pattern Parsers', () => {
       assert.equal(MarkerParser.markerOutput(MarkerParser.ANY_MARKER_INDEX), MarkerParser.SENTINEL_ALL_MARKERS, 'Wrong sentinel value emitted for ffff');
       assert.throws(() => MarkerParser.markerOutput(0)); // below MIN
       assert.throws(() => MarkerParser.markerOutput(0x10000)); // above MAX
+    });
+    it('should be able to output sentinel strings', () => {
+      class MyMarkers implements OrderedStringList {
+        getItemOrder(item: string): number {
+          const m : any = {
+            'a': 0,
+            'b': 1,
+            'c': 2,
+            'zzz': 0x2FFFFF,
+          };
+          const o = m[item];
+          if (o === undefined) return -1;
+          return o;
+        }
+      };
+      const markers = new MyMarkers();
+      assert.equal(MarkerParser.toSentinelString(
+        `No markers here!`, markers),
+        `No markers here!`
+      );
+      assert.equal(MarkerParser.toSentinelString(
+        `Give me \\m{a} and \\m{c}, or \\m{.}.`, markers),
+        `Give me \uFFFF\u0001 and \uFFFF\u0003, or \uFFFF\uFFFF.`
+      );
+      assert.throws(() =>
+        MarkerParser.toSentinelString(
+          `Want to see something funny? \\m{zzz}`, // out of range
+          markers
+        )
+      );
+      assert.throws(() =>
+        MarkerParser.toSentinelString(
+          `Want to see something sad? \\m{nothing}`, // non existent
+          markers
+        )
+      );
     });
   });
   describe('should test VariableParser', () => {
