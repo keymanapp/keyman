@@ -51,6 +51,12 @@ describe('Test of Pattern Parsers', () => {
         assert.deepEqual(MarkerParser.allReferences(str), [], `expected no markers: ${str}`);
       }
     });
+    it('should be able to emit sentinel values', () => {
+      assert.equal(MarkerParser.markerOutput(295), '\uFFFF\u0127', 'Wrong sentinel value emitted');
+      assert.equal(MarkerParser.markerOutput(MarkerParser.ANY_MARKER_INDEX), MarkerParser.SENTINEL_ALL_MARKERS, 'Wrong sentinel value emitted for ffff');
+      assert.throws(() => MarkerParser.markerOutput(0)); // below MIN
+      assert.throws(() => MarkerParser.markerOutput(0x10000)); // above MAX
+    });
   });
   describe('should test VariableParser', () => {
     // same test as for markers

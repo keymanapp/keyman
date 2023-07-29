@@ -41,6 +41,25 @@ export class MarkerParser {
   public static readonly ANY_MARKER_ID = '.';
 
   /**
+   * Marker sentinel, == U_SENTINEL
+   */
+  public static readonly SENTINEL = '\uFFFF';
+
+  /**
+   * Matches all markers.
+   */
+  public static readonly SENTINEL_ALL_MARKERS = this.SENTINEL + this.SENTINEL;
+
+  /** Minimum ID (trailing code unit) */
+  public static readonly MIN_MARKER_INDEX = 0x0001;
+  /** Index meaning 'any marker' == `\m{.}` */
+  public static readonly ANY_MARKER_INDEX = 0xFFFF;
+  /** Maximum usable marker index */
+  public static readonly MAX_MARKER_INDEX = this.ANY_MARKER_INDEX - 1;
+  /** Max count of markers */
+  public static readonly MAX_MARKER_COUNT = this.MAX_MARKER_INDEX - this.MIN_MARKER_INDEX;
+
+  /**
    * Pattern for matching a marker reference, OR the special marker \m{.}
    */
   public static readonly REFERENCE = /\\m{([0-9A-Za-z_]{1,32}|\.)}/g;
@@ -55,6 +74,14 @@ export class MarkerParser {
       return [];
     }
     return matchArray(str, this.REFERENCE);
+  }
+
+  /** @returns string for marker #n */
+  public static markerOutput(n: number): string {
+    if (n < MarkerParser.MIN_MARKER_INDEX || n > MarkerParser.ANY_MARKER_INDEX) {
+      throw RangeError(`Internal Error: marker index out of range ${n}`);
+    }
+    return this.SENTINEL + String.fromCharCode(n);
   }
 }
 
