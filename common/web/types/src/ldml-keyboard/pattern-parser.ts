@@ -92,10 +92,13 @@ export class MarkerParser {
   }
 
   /** @returns all marker strings as sentinel values */
-  public static toSentinelString(s: string, markers: OrderedStringList) : string {
+  public static toSentinelString(s: string, markers?: OrderedStringList) : string {
     return s.replaceAll(this.REFERENCE, (sub, arg) => {
       if (arg === MarkerParser.ANY_MARKER_ID) {
         return MarkerParser.SENTINEL_ALL_MARKERS;
+      }
+      if (!markers) {
+        throw RangeError(`Internal Error: Could not find marker \\m{${arg}} (no markers defined)`);
       }
       const order = markers.getItemOrder(arg);
       if (order === -1) {

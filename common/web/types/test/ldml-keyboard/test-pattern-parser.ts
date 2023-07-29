@@ -58,6 +58,15 @@ describe('Test of Pattern Parsers', () => {
       assert.throws(() => MarkerParser.markerOutput(0x10000)); // above MAX
     });
     it('should be able to output sentinel strings', () => {
+      // with nothing (no markers)
+      assert.equal(
+        MarkerParser.toSentinelString(`No markers here!`),
+        `No markers here!`
+      );
+      assert.throws(() =>
+        MarkerParser.toSentinelString(`Marker \\m{sorryNoMarkers}`)
+      );
+      // with a custom class
       class MyMarkers implements OrderedStringList {
         getItemOrder(item: string): number {
           const m : any = {
