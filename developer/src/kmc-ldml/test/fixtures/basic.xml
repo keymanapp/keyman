@@ -37,6 +37,7 @@
   </layers>
 
   <variables>
+    <string id="a" value="\m{a}"/>
     <string id="vst" value="abc"/>
     <set id="vse" value="a b c"/>
     <unicodeSet id="vus" value="[abc]"/>
