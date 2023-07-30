@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.149 alpha 2023-07-30
+
+* fix(core): Better range check for Uni_IsValid() (#9346)
+* chore(core): update documentation in transform logic and processor (#9352)
+
 ## 17.0.148 alpha 2023-07-27
 
 * feat(core): merge transform/reorder processing w/ u32 (#9293)
