@@ -107,11 +107,11 @@ km_kbp_status
 kmx_processor::external_event(
       km_kbp_state* state,
       uint32_t event,
-      void* data
+      void* _kmn_unused(data)
       ) {
 
   switch (event){
-    case KM_KBP_EVENT_KEYBOARD_ACTIVATED:
+    case KM_KBP_EVENT_KEYBOARD_ACTIVATED:{
       // reset any current actions in the queue as we have
       // just loaded a new keyboard
       _kmx.GetActions()->ResetQueue();
@@ -125,6 +125,7 @@ kmx_processor::external_event(
        // TODO: #5822    need to use public member to access_kmx
       _kmx.SetCapsLock(dummy_modifiers, FALSE, TRUE);
       }
+    }
     break;
     default:
       return KM_KBP_STATUS_INVALID_ARGUMENT;
