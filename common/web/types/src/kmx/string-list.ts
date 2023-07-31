@@ -68,7 +68,12 @@ export class ListItem extends Array<ListIndex> {
       return 0;
     }
   }
+  /** for debugging, print as single string */
   toString(): string {
-    return this.map(v => v.value.value).join(' ');
+    return this.toStringArray().join(' ');
+  }
+  /** for debugging, map to string array */
+  toStringArray(): string[] {
+    return this.map(v => v.value.value);
   }
 };

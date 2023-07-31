@@ -1,5 +1,5 @@
 import { SectionIdent, constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlus, LDMLKeyboard, CompilerCallbacks } from '@keymanapp/common-types';
+import { KMXPlus, LDMLKeyboard, CompilerCallbacks, MarkerParser } from '@keymanapp/common-types';
 import { VariableParser } from '@keymanapp/common-types';
 import { SectionCompiler } from "./section-compiler.js";
 import Vars = KMXPlus.Vars;
@@ -9,6 +9,10 @@ import UnicodeSetItem = KMXPlus.UnicodeSetItem;
 import DependencySections = KMXPlus.DependencySections;
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 import { CompilerMessages } from "./messages.js";
+import { KeysCompiler } from "./keys.js";
+import { TransformCompiler } from "./tran.js";
+import { DispCompiler } from "./disp.js";
+import { MarkerTracker, MarkerUse } from "./marker-tracker.js";
 export class VarsCompiler extends SectionCompiler {
   public get id() {
     return constants.section.vars;
@@ -17,7 +21,8 @@ export class VarsCompiler extends SectionCompiler {
   public get dependencies(): Set<SectionIdent> {
     const defaults = new Set(<SectionIdent[]>[
       constants.section.strs,
-      constants.section.elem
+      constants.section.elem,
+      constants.section.list,
     ]);
     defaults.delete(this.id);
     return defaults;
@@ -29,7 +34,6 @@ export class VarsCompiler extends SectionCompiler {
 
   public validate(): boolean {
     let valid = true;
-    // TODO-LDML scan for markers?
 
     // Check for duplicate ids
     const allIds = new Set();
@@ -130,7 +134,54 @@ export class VarsCompiler extends SectionCompiler {
       }));
       valid = false;
     }
+
+    valid = this.validateMarkers() && valid; // accumulate validity
+
     return valid;
+  }
+
+  private collectMarkers(mt : MarkerTracker) : boolean {
+    let valid = true;
+
+    // call our friends to validate
+    valid = this.validateVarsMarkers(this.keyboard, mt) && valid; // accumulate validity
+    valid = KeysCompiler.validateMarkers(this.keyboard, mt) && valid; // accumulate validity
+    valid = TransformCompiler.validateMarkers(this.keyboard, mt) && valid; // accumulate validity
+    valid = DispCompiler.validateMarkers(this.keyboard, mt) && valid; // accumulate validity
+
+    return valid;
+  }
+
+  private validateMarkers(): boolean {
+    const mt = new MarkerTracker();
+    let valid = this.collectMarkers(mt);
+    // see if there are any matched-but-not-emitted
+    const matchedNotEmitted : Set<string> = new Set<string>();
+    for (const m of mt.matched.values()) {
+      if (m === MarkerParser.ANY_MARKER_ID) continue; // match-all marker
+      if (!mt.emitted.has(m)) {
+        matchedNotEmitted.add(m);
+      }
+    }
+    for (const m of mt.consumed.values()) {
+      if (m === MarkerParser.ANY_MARKER_ID) continue; // match-all marker
+      if (!mt.emitted.has(m)) {
+        matchedNotEmitted.add(m);
+      }
+    }
+
+    // report once
+    if (matchedNotEmitted.size > 0) {
+      this.callbacks.reportMessage(CompilerMessages.Error_MissingMarkers({ ids: Array.from(matchedNotEmitted.values()).sort() }));
+      valid = false;
+    }
+    return valid;
+  }
+
+  validateVarsMarkers(keyboard: LDMLKeyboard.LKKeyboard, mt : MarkerTracker) : boolean {
+    keyboard?.variables?.string?.forEach(({value}) =>
+          mt.add(MarkerUse.variable, MarkerParser.allReferences(value)));
+    return true;
   }
 
   public compile(sections: DependencySections): Vars {
@@ -152,6 +203,14 @@ export class VarsCompiler extends SectionCompiler {
       this.addSet(result, e, sections));
     variables?.unicodeSet?.forEach((e) =>
       this.addUnicodeSet(result, e, sections));
+
+    // reload markers - TODO-LDML: double work!
+    const mt = new MarkerTracker();
+    this.collectMarkers(mt);
+
+    // collect all markers, excluding the match-all
+    const allMarkers : string[] = Array.from(mt.all).filter(m => m !== MarkerParser.ANY_MARKER_ID).sort();
+    result.markers = sections.list.allocList(sections.strs, allMarkers);
 
     return result.valid() ? result : null;
   }

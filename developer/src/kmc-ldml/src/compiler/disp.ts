@@ -1,5 +1,5 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlus } from '@keymanapp/common-types';
+import { KMXPlus, LDMLKeyboard, MarkerParser } from '@keymanapp/common-types';
 
 import { CompilerMessages } from "./messages.js";
 import { SectionCompiler } from "./section-compiler.js";
@@ -7,8 +7,14 @@ import { SectionCompiler } from "./section-compiler.js";
 import DependencySections = KMXPlus.DependencySections;
 import Disp = KMXPlus.Disp;
 import DispItem = KMXPlus.DispItem;
+import { MarkerTracker, MarkerUse } from "./marker-tracker.js";
 
 export class DispCompiler extends SectionCompiler {
+  static validateMarkers(keyboard: LDMLKeyboard.LKKeyboard, mt : MarkerTracker): boolean {
+    keyboard.displays?.display?.forEach(({ to }) =>
+      mt.add(MarkerUse.match, MarkerParser.allReferences(to)));
+    return true;
+  }
 
   public get id() {
     return constants.section.disp;

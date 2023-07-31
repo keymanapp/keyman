@@ -183,4 +183,31 @@ describe('vars', function () {
       ],
     },
   ]);
+  describe('markers', function () {
+    this.slow(500); // 0.5 sec -- json schema validation takes a while
+
+    testCompilationCases(VarsCompiler, [
+      {
+        subpath: 'sections/vars/markers-maximal.xml',
+        callback(sect) {
+          const vars = <Vars> sect;
+          assert.ok(vars.markers);
+          assert.sameDeepOrderedMembers(vars.markers.toStringArray(),
+            ['m','x']);
+        },
+      },
+      {
+        subpath: 'sections/vars/fail-markers-badref-0.xml',
+        errors: [
+          CompilerMessages.Error_MissingMarkers({
+            ids: [
+              'doesnt_exist_1',
+              'doesnt_exist_2',
+              'doesnt_exist_3',
+            ]
+          }),
+        ],
+      },
+    ]);
+  });
 });
