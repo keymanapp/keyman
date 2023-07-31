@@ -31,9 +31,9 @@
 typedef BOOL (WINAPI *InitDllFunction)(PSTR name);
 
 #ifdef _WIN64
-  const char keyman_engine_arch[] = "keyman64.dll";
+  const wchar_t keyman_engine_arch[] = L"keyman64.dll";
 #else
-  const char keyman_engine_arch[] = "keyman32.dll";
+  const wchar_t keyman_engine_arch[] = L"keyman32.dll";
 #endif
 
 /* Add a dll to the list of dlls associated with the keyboard */
@@ -605,19 +605,19 @@ LoadDLLs(LPINTKEYBOARDINFO lpkbi) {
   }
 
    if (!_td->hModuleProxy) {
-    char module_filename[_MAX_PATH];
-    if(!GetModuleFileName(g_hInstance, module_filename, _MAX_PATH)){
+    wchar_t module_filename[_MAX_PATH];
+    if(!GetModuleFileNameW(g_hInstance, module_filename, _MAX_PATH)){
       SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: unable to get handle for loaded keyman versioned dll; error:[%d]", GetLastError());
         return FALSE;
     }
 
-    char *p = strrchr(module_filename, '\\'); // find last occurrence of '\'
+    wchar_t *p = wcsrchr(module_filename, '\\'); // find last occurrence of '\'
     if (p != NULL) {
-      size_t len = strnlen(keyman_engine_arch,_MAX_PATH);
+      size_t len = wcslen(keyman_engine_arch);
       // We know that the arch filename is shorter than the versioned filename so this
       // should always be safe, just insure we insert the null character
-      strncpy_s(p, _MAX_PATH - (p - module_filename), keyman_engine_arch, len);
-      _td->hModuleProxy = LoadLibrary(module_filename);
+      wcsncpy_s(p, _MAX_PATH - (p - module_filename), keyman_engine_arch, len);
+      _td->hModuleProxy = LoadLibraryW(module_filename);
       if (!_td->hModuleProxy) {
         SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: [%s] not loaded with error:[%d]", module_filename, GetLastError());
         return FALSE;
