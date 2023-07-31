@@ -466,7 +466,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 #ifdef KMX_64BIT                                          // _S2 opened for copyKeyboard-Version
   kbp = KMX_CopyKeyboard(buf, filebase);                  // _S2 opened for copyKeyboard-Version
 #else                                                     // _S2 opened for copyKeyboard-Version
-  kbp = KMX_FixupKeyboard(buf, filebase, sz);       // _S2 changed from sz->sz_dw
+  kbp = KMX_FixupKeyboard(buf, filebase, sz);             // _S2 changed from sz->sz_dw
 #endif                                                    // _S2 opened for copyKeyboard-Version
 
 

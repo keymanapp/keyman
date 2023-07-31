@@ -27,8 +27,7 @@ int dummytest_keymap(){
   return 0;
 }
 
-
-bool write_US_ToVector( v_str_3D &vec,std::string language, const char* text) {
+bool write_US_ToVector( v_dw_3D &vec,std::string language, const char* text) {
 
   // _S2 relative path !!
   std::string FullPathName = "/usr/share/X11/xkb/symbols/" + language;
@@ -55,39 +54,6 @@ bool write_US_ToVector( v_str_3D &vec,std::string language, const char* text) {
   wprintf(L"\n   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
   wprintf(L"   +++++++ dimensions of Vector after write_US_ToVector (languages..characters..shiftstates)\t\t %li..%li..%li\n", vec.size(), vec[0].size(),vec[0][0].size());
 
-  //test_single(vec);
-  fclose(fp);
-  return 0;
-}
-
-bool write_US_ToVector_dw( v_dw_3D &vec,std::string language, const char* text) {
-
-  // _S2 relative path !!
-  std::string FullPathName = "/usr/share/X11/xkb/symbols/" + language;
-
-  const char* path = FullPathName.c_str();
-  FILE* fp = fopen((path), "r");
-  if ( !fp) {
-    wprintf(L"could not open file!");
-    return 1;
-  }
-
-  // create 1D-vector of the complete line
-  v_str_1D Vector_completeUS;
-  if( CreateCompleteRow_US(Vector_completeUS,fp , text, language)) {
-    wprintf(L"ERROR: can't Create complete row US \n");
-    return 1;
-  }
-
-  // split contents of 1D Vector to 3D vector
-  if( Split_US_To_3D_Vector_dw( vec,Vector_completeUS)) {
-    wprintf(L"ERROR: can't Split USto 3D-Vector \n");
-    return 1;
-  }
-  wprintf(L"\n   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-  wprintf(L"   +++++++ dimensions of Vector after write_US_ToVector_dw (languages..characters..shiftstates)\t\t %li..%li..%li\n", vec.size(), vec[0].size(),vec[0][0].size());
-
-  test_single_dw(vec);
   fclose(fp);
   return 0;
 }
@@ -137,96 +103,8 @@ bool  CreateCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, 
    return 0;
 }
 
-bool Split_US_To_3D_Vector(v_str_3D &all_US,v_str_1D completeList) {
-  // 1: take the whole line of the 1D-Vector and remove unwanted characters.
-  // 2: seperate the name e.g. key<AD06> from the shiftstates
-  // 3: push Names/Shiftstates to shift_states and then shiftstates to All_US, our 3D-Vector holding all Elements
-
-  std::vector<char> delim{' ', '[', ']', '}', ';', '\t', '\n'};
-  char split_bracel = '{';
-  char split_char_komma  = ',';
-  std::string empty  = "--";
-  v_str_1D tokens;
-  v_str_2D shift_states;
-
-  // loop through the whole vector
-  for (int k = 0; k < (int)completeList.size() - 1; k++) {
-
-    // remove all unwanted char
-    for (int i = 0; i < (int) delim.size(); i++) {
-      completeList[k].erase(remove(completeList[k].begin(), completeList[k].end(), delim[i]), completeList[k].end());
-    }
-
-    // only lines with ("key<.. are of interest
-    if (completeList[k].find("key<") != std::string::npos) {
-
-      //split off the key names
-      std::istringstream split1(completeList[k]);
-      for (std::string each; std::getline(split1, each, split_bracel); tokens.push_back(each));
-
-      // replace keys names with number (<AD06> with 29,...)
-      int Keycde = replace_PosKey_with_Keycode(tokens[0]);
-      tokens[0] = std::to_string(Keycde);
-
-      // seperate rest of the vector to its elements and push to 'tokens'
-      std::istringstream split(tokens[1]);
-      tokens.pop_back();
-
-      for (std::string each; std::getline(split, each, split_char_komma); tokens.push_back(each));
-      // _S2 do we still need that??
-      // at the moment we only use the first 4 shiftstates (non-shift+shift) so get rid of all others
-      //int surplus = tokens.size() - shift_state_count -1;
-      int surplus = tokens.size() - 4 -1;
-      for ( int j=0; j < surplus; j++) {
-        tokens.pop_back();
-      }
-
-      // now push result to shift_states
-      shift_states.push_back(tokens);
-
-      tokens.clear();
-    }
-  }
-  all_US.push_back(shift_states);
-
-  if ( all_US.size() ==0) {
-    wprintf(L"ERROR: Can't split US to 3D-Vector\n");
-    return 1;
-  }
-  return 0;
-}
-
-std::wstring  replaceNamesWithCharacter(std::wstring tok_wstr){
-
-  std::wstring tok_wstr_out;
-  //Names of Characters we use:
-  std::wstring UsableCharacters[10][2] = {
-    {L"exclam",           L"!"} ,
-    {L"at",               L"@"} ,
-    {L"numbersign",       L"#"} ,
-    {L"dollar",           L"$"} ,
-    {L"percent",          L"%"} ,
-    {L"dead_circumflex",  L"^"} ,
-    {L"ampersand",        L"&"} ,
-    {L"asterisk",         L"*"} ,
-    {L"parenleft",        L"("} ,
-    {L"parenright",       L")"} };
-
-  int size_arr = sizeof(UsableCharacters)/sizeof(UsableCharacters[0]);
-
-  for ( int i =0; i< size_arr;i++) {
-      if (tok_wstr == UsableCharacters[i][0]) {
-      tok_wstr_out = UsableCharacters[i][1];
-      return UsableCharacters[i][1];
-    }
-  }
-
-  return tok_wstr;
-}
-
- KMX_DWORD replaceNamesWithCharacterInt(std::wstring tok_wstr){
-  KMX_DWORD returnn_default =32;   // _S2 32 as default?
-  KMX_DWORD tokens_int;
+KMX_DWORD replaceNamesWithCharacterInt(std::wstring tok_wstr){
+  KMX_DWORD ValueInvalid = 32;      // _S2 do we use space, 0, FFFF for a char we cannot use ??
   std::map<std::wstring, unsigned long int > first;
 
   //initializing
@@ -254,23 +132,19 @@ std::wstring  replaceNamesWithCharacter(std::wstring tok_wstr){
  // _S2 ?? VK_SPACE,  VK_ACCENT, VK_HYPHEN, VK_QUOTE, VK_OEM_102,
 
   if ( tok_wstr.size() == 1) {
-    tokens_int = (KMX_DWORD) ( *tok_wstr.c_str() );
-    return tokens_int;
+    return (KMX_DWORD) ( *tok_wstr.c_str() );;
   }
   else {
 		std::map<std::wstring, unsigned long int > ::iterator it;
 		for (it = first.begin(); it != first.end(); ++it) {
-			std::wcout << it->first << " => " << it->second << '\n';
 			if (it->first == tok_wstr)
 				return it->second;
 		}
   }
-
-  tokens_int = returnn_default;
-  return tokens_int;
+  return ValueInvalid;
 }
 
-bool Split_US_To_3D_Vector_dw(v_dw_3D &all_US,v_str_1D completeList) {
+bool Split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
   // 1: take the whole line of the 1D-Vector and remove unwanted characters.
   // 2: seperate the name e.g. key<AD06> from the shiftstates
   // 3: convert to DWORD
@@ -279,11 +153,10 @@ bool Split_US_To_3D_Vector_dw(v_dw_3D &all_US,v_str_1D completeList) {
   std::vector<char> delim{' ', '[', ']', '}', ';', '\t', '\n'};
   char split_bracel = '{';
   char split_char_komma  = ',';
-  int ValueInvalid = 32;      // _S2 do we use space, 0, FFFF for a char we cannot use ??
   int Keycde;
   v_str_1D tokens;
   v_dw_1D tokens_dw;
-  v_dw_2D shift_states_dw;
+  v_dw_2D shift_states;
   KMX_DWORD tokens_int;
   std::wstring tok_wstr;
 
@@ -312,25 +185,25 @@ bool Split_US_To_3D_Vector_dw(v_dw_3D &all_US,v_str_1D completeList) {
 
       for (std::string each; std::getline(split, each, split_char_komma); tokens.push_back(each));
 
-      // now convert all to KMX_DWORD and fill tokens_dw
+      // now convert all to KMX_DWORD and fill tokens
       tokens_dw.push_back((KMX_DWORD) Keycde);
 
-      for ( int i = 1; i< tokens.size();i++) {
+      for ( int i = 1; i< (int) tokens.size();i++) {
 
         // replace a name with a single character ( a -> a  ; equal -> = ) 
         tokens_int = replaceNamesWithCharacterInt( wstring_from_string(tokens[i]));
         tokens_dw.push_back(tokens_int);
       }
 
-      wprintf(L"  Keyval  %i:   %i (%c) --- %i (%c)  \n", tokens_dw[0],tokens_dw[1],tokens_dw[1], tokens_dw[2], tokens_dw[2]);
+      //wprintf(L"  Keyval  %i:   %i (%c) --- %i (%c)  \n", tokens_dw[0],tokens_dw[1],tokens_dw[1], tokens_dw[2], tokens_dw[2]);
    
       // now push result to shift_states
-      shift_states_dw.push_back(tokens_dw);
+      shift_states.push_back(tokens_dw);
       tokens_dw.clear();
       tokens.clear();
     }
   }
-  all_US.push_back(shift_states_dw);
+  all_US.push_back(shift_states);
 
   if ( all_US.size() ==0) {
     wprintf(L"ERROR: Can't split US to 3D-Vector\n");
@@ -340,7 +213,6 @@ bool Split_US_To_3D_Vector_dw(v_dw_3D &all_US,v_str_1D completeList) {
 }
 
 int replace_PosKey_with_Keycode(std::string  in) {
-
   int out=0;
   if      ( in == "key<TLDE>")    out = 49;   // TOASK correct ???
   else if ( in == "key<AE01>")    out = 10;
@@ -398,10 +270,9 @@ int replace_PosKey_with_Keycode(std::string  in) {
   return out;
 }
 
-bool append_other_ToVector(v_str_3D &All_Vector,GdkKeymap * keymap) {
-
+bool append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
   // create a 2D vector all filled with "--" and push to 3D-Vector
-  v_str_2D Other_Vector2D = create_empty_2D(All_Vector[0].size(),All_Vector[0][0].size());
+  v_dw_2D Other_Vector2D = create_empty_2D(All_Vector[0].size(),All_Vector[0][0].size());
 
   if (Other_Vector2D.size()==0) {
     wprintf(L"ERROR: create empty 2D-Vector failed");
@@ -410,41 +281,6 @@ bool append_other_ToVector(v_str_3D &All_Vector,GdkKeymap * keymap) {
 
   All_Vector.push_back(Other_Vector2D);
   wprintf(L"   +++++++ dimensions of Vector after append_other_ToVector\t\t\t\t\t\t %li..%li..%li\n", All_Vector.size(), All_Vector[0].size(),All_Vector[0][0].size());
-  wprintf(L"   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
-
-  if (All_Vector.size() < 2) {
-    wprintf(L"ERROR: creation of 3D-Vector failed");
-    return 1;
-  }
-
-  for(int i =0; i< (int) All_Vector[1].size();i++) {
-
-    // get key name US stored in [0][i][0] and copy to name in "other"-block[1][i][0]
-    All_Vector[1][i][0] = All_Vector[0][i][0];
-
-    // get Keyvals of this key and copy to unshifted/shifted in "other"-block[1][i][1] / block[1][i][2]
-    All_Vector[1][i][0+1] = GetKeyvalsFromKeymap(keymap,stoi(All_Vector[1][i][0]),0);   //shift state: unshifted:0
-    All_Vector[1][i][1+1] = GetKeyvalsFromKeymap(keymap,stoi(All_Vector[1][i][0]),1);   //shift state: shifted:1
-
-    //wprintf(L" Keycodes US        :   %d (US):%s, %s ---- (other):%s, %s    \n",stoi(All_Vector[1][i][0]),All_Vector[0][i][1].c_str(),All_Vector[0][i][2].c_str(),All_Vector[1][i][1].c_str(),All_Vector[1][i][2].c_str());
-    //wprintf(L"   Keycodes ->Other:-:    %d (US):%s, %s ,%s, %s   \n\n",stoi(All_Vector[1][i][0]),All_Vector[1][i][1].c_str(),All_Vector[1][i][2].c_str(),All_Vector[1][i][3].c_str(),All_Vector[1][i][4].c_str());
-  }
-
-  return 0;
-}
-
-bool append_other_ToVector_dw(v_dw_3D &All_Vector,GdkKeymap * keymap) {
-
-  // create a 2D vector all filled with "--" and push to 3D-Vector
-  v_dw_2D Other_Vector2D = create_empty_2D_dw(All_Vector[0].size(),All_Vector[0][0].size());
-
-  if (Other_Vector2D.size()==0) {
-    wprintf(L"ERROR: create empty 2D-Vector failed");
-    return 1;
-  }
-
-  All_Vector.push_back(Other_Vector2D);
-  wprintf(L"   +++++++ dimensions of Vector after append_other_ToVector_dw\t\t\t\t\t\t %li..%li..%li\n", All_Vector.size(), All_Vector[0].size(),All_Vector[0][0].size());
   wprintf(L"   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
 
   if (All_Vector.size() < 2) {
@@ -467,24 +303,7 @@ bool append_other_ToVector_dw(v_dw_3D &All_Vector,GdkKeymap * keymap) {
   return 0;
 }
 
-v_str_2D create_empty_2D( int dim_rows,int dim_shifts) {
-
-  std::string empty = "--";
-  v_str_1D shifts;
-  v_str_2D all_2D;
-
-  for ( int i=0; i< dim_rows;i++) {
-    for ( int j=0; j< dim_shifts;j++) {
-      shifts.push_back(empty);
-    }
-    all_2D.push_back(shifts);
-    shifts.clear();
-  }
-  return all_2D;
-}
-
-v_dw_2D create_empty_2D_dw( int dim_rows,int dim_shifts) {
-
+v_dw_2D create_empty_2D( int dim_rows,int dim_shifts) {
   KMX_DWORD empty = 32;
   v_dw_1D shifts;
   v_dw_2D all_2D;
@@ -527,49 +346,9 @@ int GetKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) 
   return out;
 }
 
-bool test(v_str_3D &V) {
-
+bool test(v_dw_3D &V) {
   std::string extra = "  ";
-  wprintf(L"+++++++ dimensions of whole Vector in test()\t\t %li..%li..%li\n", V.size(), V[0].size(),V[0][0].size());
-  wprintf(L"\n+++++++++ print some characters of US and Other ++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-
-  for ( int k=0; k<(int)V[0].size(); k++) {
-    if(V[0][k][2] != V[1][k][2] )
-      extra = " *** ";
-    else
-      extra = "  ";
-
-    if (V[0].size()>0) {
-      //wprintf(L"    row (US)   ...... %s  .. %s .. %s .. %s .. %s  --- ", V[0][k][0].c_str(),  V[0][k][1].c_str() ,  V[0][k][2].c_str() ,  V[0][k][3].c_str() ,  V[0][k][4].c_str() ); 
-      //wprintf(L"  \n");
-      //wprintf(L"      row (Other)..... %s  .. %s .. %s  .. %s .. %s  %s  \n", V[1][k][0].c_str(),  V[1][k][1].c_str() ,  V[1][k][2].c_str() ,  V[1][k][3].c_str() ,  V[1][k][4].c_str() , extra.c_str()); 
-    //wprintf(L"  \n");
-    }
-  }
-  wprintf(L"   +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-  return true;
-}
-
-bool test_single(v_str_3D &V) {
-
-  std::string extra = "  ";
-  //wprintf(L"   +++++++ dimensions of single Vector in test()\t\t %li..%li..%li\n", V.size(), V[0].size(),V[0][0].size());
-  //wprintf(L"\n+++++++++ print characters of SINGLE  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-
-  for ( int k=0; k<(int)V[0].size(); k++) {
-    if (V[0].size()>0) {
-      //wprintf(L"    row 1 (US)   ...... %s  .. %s .. %s .. %s .. %s  --- \n", V[0][k][0].c_str(),  V[0][k][1].c_str() ,  V[0][k][2].c_str() ,  V[0][k][3].c_str() ,  V[0][k][4].c_str() ); 
-    }
-  }
-  wprintf(L"   +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-  return true;
-}
-
-
-bool test_dw(v_dw_3D &V) {
-
-  std::string extra = "  ";
-  wprintf(L"   +++++++ dimensions of whole Vector in test_dw()\t\t\t\t\t\t\t %li..%li..%li\n", V.size(), V[0].size(),V[0][0].size());
+  wprintf(L"   +++++++ dimensions of whole Vector in test()\t\t\t\t\t\t\t %li..%li..%li\n", V.size(), V[0].size(),V[0][0].size());
   wprintf(L"\n+++++++++ print some characters of US and Other +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 
   for ( int k=0; k<(int)V[0].size(); k++) {
@@ -589,10 +368,9 @@ bool test_dw(v_dw_3D &V) {
   return true;
 }
 
-bool test_single_dw(v_dw_3D &V) {
-
+bool test_single(v_dw_3D &V) {
   std::string extra = "  ";
-  wprintf(L"   +++++++ dimensions of single Vector in test_single_dw()\t\t\t\t\t\t %li..%li..%li\n", V.size(), V[0].size(),V[0][0].size());
+  wprintf(L"   +++++++ dimensions of single Vector in test_single()\t\t\t\t\t\t %li..%li..%li\n", V.size(), V[0].size(),V[0][0].size());
   wprintf(L"\n   +++++++++ print characters of SINGLE DW ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 
   for ( int k=0; k<(int)V[0].size(); k++) {
