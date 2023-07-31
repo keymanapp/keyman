@@ -53,6 +53,8 @@ mcompile -d runs 4 important steps:
 
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]);
 
+
+
 #if defined(_WIN32) || defined(_WIN64)
   int wmain(int argc, wchar_t* argv[]) {
     std::vector<std::u16string> str_argv_16 = convert_argvW_to_Vector_u16str( argc, argv);  
@@ -236,15 +238,16 @@ int  KMX_VKUSToVKUnderlyingLayout(v_str_3D &All_Vector,int inUS) {
 
 // takes capital letter of US returns cpital character of Other keyboard
 int  KMX_VKUSToVKUnderlyingLayout_dw(v_dw_3D &All_Vector,KMX_DWORD inUS) {
+  KMX_DWORD outOther;
   // loop and find char in US; then find char of Other
   for( int i=0; i< (int)All_Vector[0].size();i++) {
     // lists entries of all_vector
     for( int j=1; j< (int)All_Vector[0][0].size();j++) {
       KMX_DWORD KeysymUS =  All_Vector[0][i][j];
 
-      if((inUS == KeysymUS )) {
-        inUS  = All_Vector[1][i][2];
-        //return  inUS;
+      if((inUS == All_Vector[0][i][j] )) {
+        outOther  = All_Vector[1][i][2];
+        return  All_Vector[1][i][2];
       }
     }
   }
@@ -341,10 +344,6 @@ bool createVectorForBothKeyboards_dw(v_dw_3D &All_Vector,GdkKeymap *keymap){
   return 0;
 }
 
-
-
-
-
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]) {
 
   std::wcout << "\n##### KMX_DoConvert of mcompile started #####\n";
@@ -375,8 +374,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
   if(createVectorForBothKeyboards_dw(All_Vector_dw,keymap) )
     wprintf(L"ERROR: can't createVectorForBothKeyboardsDWORD\n");
 
-  test_dw(All_Vector_dw);
-
+  //test_dw(All_Vector_dw);
 
 //--------------------------------------------------------------------------------
 

@@ -224,6 +224,52 @@ std::wstring  replaceNamesWithCharacter(std::wstring tok_wstr){
   return tok_wstr;
 }
 
+ KMX_DWORD replaceNamesWithCharacterInt(std::wstring tok_wstr){
+  KMX_DWORD returnn_default =32;   // _S2 32 as default?
+  KMX_DWORD tokens_int;
+  std::map<std::wstring, unsigned long int > first;
+
+  //initializing
+  first[L"exclam"] =           33;
+  first[L"at"] =               64;
+  first[L"numbersign"] =       35;
+  first[L"dollar"] =           36;
+  first[L"percent"] =          37;
+  first[L"dead_circumflex"] =  94;  /* _S2 ??? */
+  first[L"ampersand"] =        38;
+  first[L"asterisk"] =         42;
+  first[L"parenleft"] =        40;
+  first[L"parenright"] =       41;
+
+  first[L"equal"] =          VK_EQUAL;      /* BB = 187 */
+  first[L"backslash"] =      VK_BKSLASH;    /* DC = 220 */
+  first[L"bracketleft"]  =   VK_LBRKT;      /* DB = 219 */
+  first[L"bracketright"] =   VK_RBRKT;      /* DD = 221 */
+  first[L"parenright"] =     VK_COLON;      /* BA = 186 */
+  first[L"comma"] =          VK_COMMA;      /* BC = 188 */
+  first[L"period"] =         VK_PERIOD;     /* BE = 190 */
+  first[L"slash"] =          VK_SLASH;      /* BF = 191 */
+  first[L"ssharp"] =         VK_xDF;        /* DF = 223 ß  */
+
+ // _S2 ?? VK_SPACE,  VK_ACCENT, VK_HYPHEN, VK_QUOTE, VK_OEM_102,
+
+  if ( tok_wstr.size() == 1) {
+    tokens_int = (KMX_DWORD) ( *tok_wstr.c_str() );
+    return tokens_int;
+  }
+  else {
+		std::map<std::wstring, unsigned long int > ::iterator it;
+		for (it = first.begin(); it != first.end(); ++it) {
+			std::wcout << it->first << " => " << it->second << '\n';
+			if (it->first == tok_wstr)
+				return it->second;
+		}
+  }
+
+  tokens_int = returnn_default;
+  return tokens_int;
+}
+
 bool Split_US_To_3D_Vector_dw(v_dw_3D &all_US,v_str_1D completeList) {
   // 1: take the whole line of the 1D-Vector and remove unwanted characters.
   // 2: seperate the name e.g. key<AD06> from the shiftstates
@@ -271,16 +317,8 @@ bool Split_US_To_3D_Vector_dw(v_dw_3D &all_US,v_str_1D completeList) {
 
       for ( int i = 1; i< tokens.size();i++) {
 
-        // check if a name can be replaced with a single character
-        tok_wstr = replaceNamesWithCharacter( wstring_from_string(tokens[i]));
-
-        // for single char: copy value of char
-        if ( tok_wstr.size() == 1) {
-          tokens_int = (KMX_DWORD) ( *tok_wstr.c_str() );
-        }
-        else {
-          tokens_int = ValueInvalid;
-        }
+        // replace a name with a single character ( a -> a  ; equal -> = ) 
+        tokens_int = replaceNamesWithCharacterInt( wstring_from_string(tokens[i]));
         tokens_dw.push_back(tokens_int);
       }
 

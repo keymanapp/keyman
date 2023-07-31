@@ -18,7 +18,7 @@
 #include "mc_savekeyboard.h"
 #include "helpers.h"
 #include "u16.h"
-
+#include <map>
 
 int dummytest_keymap();
 
@@ -50,6 +50,7 @@ const KMX_DWORD KMX_VKMap[] = {
 
 
 std::wstring  replaceNamesWithCharacter(std::wstring tok_wstr);
+KMX_DWORD replaceNamesWithCharacterInt(std::wstring tok_wstr);
 // initialize GDK
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
 
@@ -85,6 +86,7 @@ int GetKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 // testing of Vector contents ( first row of US and Other)
 bool test(v_str_3D &V);
 bool test_dw(v_dw_3D &V);
+
 bool test_single(v_str_3D &V) ;
 bool test_single_dw(v_dw_3D &V) ;
 
