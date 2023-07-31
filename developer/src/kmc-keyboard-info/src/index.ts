@@ -35,8 +35,7 @@ function init(): void {
   }
 }
 
-/* c8 ignore start */
-export class KeyboardInfoOptions {
+export interface KeyboardInfoOptions {
   /** The identifier for the keyboard */
   keyboard_id: string;
 
