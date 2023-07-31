@@ -1,8 +1,9 @@
+import { CumulativePathStats } from "../../cumulativePathStats.js";
 import { SimpleGestureSource } from "../../simpleGestureSource.js";
-import { ContactModel, PointModelResolution } from "../specs/contactModel.js";
+import { ContactModel } from "../specs/contactModel.js";
 import { ManagedPromise, TimeoutPromise } from "@keymanapp/web-utils";
 
-type FulfillmentCause = 'path' | 'timer' | 'item';
+export type FulfillmentCause = 'path' | 'timer' | 'item';
 
 export interface PathMatchResolution {
   type: 'resolve',
@@ -23,10 +24,15 @@ type PathUpdateResult = PathMatchResult | PathNotFulfilled;
 
 export class PathMatcher<Type> {
   private timerPromise?: TimeoutPromise;
-  private model: ContactModel<Type>;
-  private source: SimpleGestureSource<Type>;
+  public readonly model: ContactModel<Type>;
+
+  // During execution, source.path is fine... but once this matcher's role is done,
+  // `source` will continue to receive edits and may even change the instance
+  // underlying the `path` field.
+  public readonly source: SimpleGestureSource<Type>;
 
   private readonly publishedPromise: ManagedPromise<PathMatchResult>
+  private _result: PathMatchResult;
 
   public get promise() {
     return this.publishedPromise.corePromise;
@@ -56,9 +62,9 @@ export class PathMatcher<Type> {
     }
   }
 
-  private finalize(result: boolean, cause: FulfillmentCause) {
+  private finalize(result: boolean, cause: FulfillmentCause): PathMatchResult {
     if(this.publishedPromise.isFulfilled) {
-      return;
+      return this._result;
     }
 
     const model = this.model;
@@ -74,8 +80,22 @@ export class PathMatcher<Type> {
         cause: cause
       };
     }
-    this.publishedPromise.resolve(retVal);
+    this.publishedPromise.resolve(retVal)
+    this._result = retVal;
+
     return retVal;
+  }
+
+  get stats() {
+    return this.source.path.stats;
+  }
+
+  get baseItem() {
+    return this.source.baseItem;
+  }
+
+  get lastItem() {
+    return this.source.currentSample.item;
   }
 
   update(): PathUpdateResult {
@@ -86,7 +106,7 @@ export class PathMatcher<Type> {
       return this.finalize(false, 'path');
     }
 
-    if(model.itemChangeAction && source.currentSample.item != source.initialSample.item) {
+    if(model.itemChangeAction && source.currentSample.item != source.baseItem) {
       const result = model.itemChangeAction == 'resolve';
 
       return this.finalize(result, 'item');
@@ -99,10 +119,7 @@ export class PathMatcher<Type> {
       } else if(source.path.isComplete) {
         // If the PathModel said to 'continue' but the path is done, we default
         // to rejecting the model; there will be no more changes, after all.
-        return {
-          type: 'reject',
-          cause: 'path'
-        };
+        return this.finalize(false, 'path');
       }
 
       return {

@@ -32,11 +32,11 @@ async function simulateSequence(
   const startSample = samples[0];
   const samplePromises = samples.map((sample) => {
     return timedPromise(sample.t - startSample.t).then(async () => {
-      emulatedContactPoint.path.extend(sample);
+      emulatedContactPoint.update(sample);
       modelMatcher.update();
 
       if((options?.terminate ?? true) && sample == samples[samples.length-1]) {
-        emulatedContactPoint.path.terminate(false);
+        emulatedContactPoint.terminate(false);
         modelMatcher.update();
       }
     });
@@ -198,7 +198,7 @@ describe("PathMatcher", function() {
       const cancelPromise = timedPromise(250).then(async () => {
         assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_PENDING);
 
-        emulatedContactPoint.path.terminate(true);
+        emulatedContactPoint.terminate(true);
         modelMatcher.update();
 
         // As there's a minor level of indirection in the internal promises, we need the following
@@ -472,7 +472,7 @@ describe("PathMatcher", function() {
       const cancelPromise = timedPromise(250).then(async () => {
         assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_PENDING);
 
-        emulatedContactPoint.path.terminate(true);
+        emulatedContactPoint.terminate(true);
         modelMatcher.update();
 
         // As there's a minor level of indirection in the internal promises, we need the following

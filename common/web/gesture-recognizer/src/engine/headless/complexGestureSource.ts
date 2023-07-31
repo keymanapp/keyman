@@ -74,7 +74,7 @@ export class ComplexGestureSource<HoveredItemType> extends EventEmitter<EventMap
   cancel() {
     if(this.isActive) {
       for(let point of this.touchpoints) {
-        point.path.terminate(true);
+        point.terminate(true);
       }
     }
   }
@@ -82,7 +82,7 @@ export class ComplexGestureSource<HoveredItemType> extends EventEmitter<EventMap
   end() {
     if(this.isActive) {
       for(let point of this.touchpoints) {
-        point.path.terminate(false);
+        point.terminate(false);
       }
     }
   }

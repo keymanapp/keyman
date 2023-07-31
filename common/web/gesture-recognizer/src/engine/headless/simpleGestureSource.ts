@@ -40,7 +40,10 @@ export class SimpleGestureSource<HoveredItemType> {
    */
   public readonly rawIdentifier: number;
 
-  private _path: GesturePath<HoveredItemType>;
+  // A full, uninterrupted recording of all samples observed during the lifetime of the touchpoint.
+  protected _path: GesturePath<HoveredItemType>;
+
+  protected _baseItem: HoveredItemType;
 
   private static _jsonIdSeed: -1;
 
@@ -80,13 +83,14 @@ export class SimpleGestureSource<HoveredItemType> {
 
   public update(sample: InputSample<HoveredItemType>) {
     this.path.extend(sample);
+    this._baseItem ||= sample.item;
   }
 
   /**
-   * The initial path sample (coordinate) under consideration for this `SimpleGestureSource`.
+   * The first path sample (coordinate) under consideration for this `SimpleGestureSource`.
    */
-  public get initialSample(): InputSample<HoveredItemType> {
-    return this.path.coords[0];
+  public get baseItem(): HoveredItemType {
+    return this._baseItem;
   }
 
   /**
@@ -94,6 +98,39 @@ export class SimpleGestureSource<HoveredItemType> {
    */
   public get currentSample(): InputSample<HoveredItemType> {
     return this.path.coords[this.path.coords.length-1];
+  }
+
+  /**
+   * Creates a 'subview' of the current SimpleGestureSource.  It will be updated as the underlying
+   * source continues to receive updates until disconnected.
+   *
+   * @param startAtEnd If `true`, the 'subview' will appear to start at the most recently-observed
+   * path coordinate.  If `false`, it will have full knowledge of the current path.
+   * @param preserveBaseItem If `true`, the 'subview' will denote its base item as the same
+   * as its source.  If `false`, the base item for the 'subview' will be set to the `item` entry
+   * from the most recently-observed path coordinate.
+   * @returns
+   */
+  public constructSubview(startAtEnd: boolean, preserveBaseItem: boolean) {
+    return new SimpleGestureSourceSubview(this, startAtEnd, preserveBaseItem);
+  }
+
+  /**
+   * Terminates all tracking for the modeled contact point.  Passing `true` as a parameter will
+   * treat the touchpath as if it were cancelled; `false` and `undefined` will treat it as if
+   * the touchpath has completed its standard lifecycle.
+   * @param cancel
+   */
+  public terminate(cancel?: boolean) {
+    this.path.terminate(cancel);
+  }
+
+  /**
+   * Denotes if the contact point's path either was cancelled or completed its standard
+   * lifecycle.
+   */
+  public get isPathComplete(): boolean {
+    return this.path.isComplete;
   }
 
   /**
@@ -116,5 +153,91 @@ export class SimpleGestureSource<HoveredItemType> {
     }
 
     return jsonClone;
+  }
+}
+
+export class SimpleGestureSourceSubview<HoveredItemType> extends SimpleGestureSource<HoveredItemType> {
+  private _baseSource: SimpleGestureSource<HoveredItemType>
+  private subviewDisconnector: () => void;
+
+  /**
+   * Constructs a new "Subview" into an existing SimpleGestureSource instance.  Future updates of the base
+   *  SimpleGestureSource will automatically be included until this instance's `disconnect` method is called.
+   * @param identifier     The system identifier for the input point's events.
+   * @param initialHoveredItem  The initiating event's original target element
+   * @param isFromTouch    `true` if sourced from a `TouchEvent`; `false` otherwise.
+   */
+  constructor(source: SimpleGestureSource<HoveredItemType>, startAtEnd: boolean, preserveBaseItem: boolean) {
+    super(source.rawIdentifier, source.isFromTouch);
+
+    const baseSource = this._baseSource = source instanceof SimpleGestureSourceSubview ? source._baseSource : source;
+
+    // Note: we don't particularly need subviews to track the actual coords aside from
+    // tracking related stats data.  But... we don't have an "off-switch" for that yet.
+    let subpath: GesturePath<HoveredItemType>;
+
+    // Will hold the last sample _even if_ we don't save every coord that comes through.
+    const lastSample = source.path.stats.lastSample;
+
+    if(startAtEnd) {
+      subpath = new GesturePath<HoveredItemType>();
+      if(lastSample) {
+        subpath.extend(lastSample);
+      }
+    } else {
+      subpath = source.path.clone();
+    }
+
+    this._path = subpath;
+
+    if(preserveBaseItem) {
+      this._baseItem = source.baseItem;
+    } else {
+      this._baseItem = lastSample?.item;
+    }
+
+    // Ensure that this 'subview' is updated whenever the "source of truth" is.
+    const completeHook    = ()       => this.path.terminate(false);
+    const invalidatedHook = ()       => this.path.terminate(true);
+    const stepHook        = (sample) => this.update(sample);
+    baseSource.path.on('complete',    completeHook);
+    baseSource.path.on('invalidated', invalidatedHook);
+    baseSource.path.on('step',        stepHook);
+
+    // But make sure we can "disconnect" it later once the gesture being matched
+    // with the subview has fully matched; it's good to have a snapshot left over.
+    this.subviewDisconnector = () => {
+      baseSource.path.off('complete',    completeHook);
+      baseSource.path.off('invalidated', invalidatedHook);
+      baseSource.path.off('step',        stepHook);
+    }
+  }
+
+  /**
+   * The original SimpleGestureSource this subview is based upon.
+   */
+  public get baseSource() {
+    return this._baseSource;
+  }
+
+  /**
+   * This disconnects this subview from receiving further updates from the the underlying
+   * source without causing it to be cancelled or treated as completed.
+   */
+  public disconnect() {
+    if(this.subviewDisconnector) {
+      this.subviewDisconnector();
+      this.subviewDisconnector = null;
+    }
+  }
+
+  /**
+   * Like `disconnect`, but this will also terminate the baseSource and prevent further
+   * updates for the true, original `SimpleGestureSource` instance.  If the gesture-model
+   * and gesture-matching algorithm has determined this should be called, full path-update
+   * termination is correct, even if called against a subview into the instance.
+   */
+  public terminate(cancel?: boolean) {
+    this.baseSource.terminate(cancel);
   }
 }
