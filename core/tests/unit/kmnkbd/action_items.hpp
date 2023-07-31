@@ -2,7 +2,7 @@
 #include <string>
 #include <iostream>
 
-#include "../test_assert.h"
+#include <test_assert.h>
 
 namespace
 {

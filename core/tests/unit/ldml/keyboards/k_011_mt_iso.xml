@@ -10,7 +10,6 @@ Gets part of the way,
 Exact copy of mt.xml from CLDR, but with:
   - an updated DTD path
   - test case
-  - changed 'altR-shift' to 'altR shift'
 -->
 <!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
 <keyboard locale="mt" conformsTo="techpreview">
@@ -21,13 +20,14 @@ Exact copy of mt.xml from CLDR, but with:
     <info author="Steven R. Loomis" normalization="NFC" layout="QWERTY" indicator="MT" />
 
     <names>
-        <name value="Maltese (48-key)" />
-        <!-- <name value="MSA 100:2002" /> -->
+        <name value="Maltese" />
+        <name value="MSA 100:2002" />
     </names>
 
     <keys>
         <!-- imports -->
         <import base="cldr" path="techpreview/keys-Zyyy-punctuation.xml"/>
+        <import base="cldr" path="techpreview/keys-Zyyy-currency.xml"/>
 
         <!-- accent grave -->
         <key id="a-grave" to="à" />
@@ -41,8 +41,8 @@ Exact copy of mt.xml from CLDR, but with:
         <key id="u-grave" to="ù" />
         <key id="U-grave" to="Ù" />
 
-        <!-- tikka and maqtua -->
-        <key id="c-tikka" to="ċ" />
+        <!-- tikka and maqtugha -->
+        <key id="c-tikka" to="ċ" /> <!-- tikka is a dot -->
         <key id="C-tikka" to="Ċ" />
         <key id="g-tikka" to="ġ" />
         <key id="G-tikka" to="Ġ" />
@@ -55,7 +55,8 @@ Exact copy of mt.xml from CLDR, but with:
         <key id="c-cedilla" to="ç" />
     </keys>
 
-    <layers form="hardware" hardware="iso">
+     <!-- 48-key -->
+    <layers form="iso">
         <layer modifier="none">
             <row keys="c-tikka 1 2 3 4 5 6 7 8 9 0 hyphen equal" />
             <row keys="q w e r t y u i o p g-tikka h-maqtugha" />
@@ -88,4 +89,5 @@ Exact copy of mt.xml from CLDR, but with:
             <row keys="space" />
         </layer>
     </layers>
+
 </keyboard>

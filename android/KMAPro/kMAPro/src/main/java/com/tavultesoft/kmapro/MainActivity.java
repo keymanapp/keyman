@@ -109,6 +109,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   private final int minTextSize = 16;
   private final int maxTextSize = 72;
   private int textSize = minTextSize;
+  private int lastOrientation = Configuration.ORIENTATION_UNDEFINED;
   private static final String defaultKeyboardInstalled = "DefaultKeyboardInstalled";
   private static final String defaultDictionaryInstalled = "DefaultDictionaryInstalled";
   private static final String userTextKey = "UserText";
@@ -262,6 +263,14 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     super.onResume();
     KMManager.onResume();
     KMManager.hideSystemKeyboard();
+
+    // onConfigurationChanged() only triggers when device is rotated while app is in foreground
+    // This handles when device is rotated while app is in background
+    Configuration newConfig = this.getResources().getConfiguration();
+    if (newConfig != null && newConfig.orientation != lastOrientation) {
+      lastOrientation = newConfig.orientation;
+      KMManager.onConfigurationChanged(newConfig);
+    }
     resizeTextView(textView.isKeyboardVisible());
 
     KMManager.addKeyboardEventListener(this);
@@ -345,9 +354,11 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
+    KMManager.onConfigurationChanged(newConfig);
     getSupportActionBar().setBackgroundDrawable(getActionBarDrawable(this));
     resizeTextView(textView.isKeyboardVisible());
     invalidateOptionsMenu();
+    lastOrientation = newConfig.orientation;
   }
 
   @SuppressLint("RestrictedApi")
@@ -434,9 +445,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       case R.id.action_share:
         showShareDialog();
         return true;
+      /* Disable Web Browser to investigate Google sign-in
       case R.id.action_web:
         showWebBrowser();
-        return true;
+        return true;*/
       case R.id.action_text_size:
         showTextSizeDialog();
         return true;

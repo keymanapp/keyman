@@ -1,7 +1,7 @@
 
 
 import { Command } from 'commander';
-import { buildTestData } from '../activities/buildTestData.js';
+import { buildTestData } from './buildTestData/index.js';
 
 export function declareBuildTestData(program: Command) {
   program

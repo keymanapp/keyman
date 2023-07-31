@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 
-# Don't call `set -e`. Even if some commands should fail, it's still
-# worth running the rest of the commands.
+# Exit on errors - Debian policy 10.4
+set -e
 
 case "$1" in
 
@@ -12,7 +12,7 @@ case "$1" in
     if which sudo > /dev/null && which ps > /dev/null; then
 
       # check for gnome-shell as it works differently
-      gspid=$(ps -C gnome-shell -o pid=|head -n 1)
+      ! gspid=$(ps -C gnome-shell -o pid=|head -n 1)
       if [ "$gspid" != "" ]; then
         # gnome-shell has multiple ibus-daemon processes and needs exit instead of restart
         is_gnome_shell=1
@@ -21,7 +21,7 @@ case "$1" in
       fi
 
       # Restart IBus if it is running
-      ibuspid=$(ps -C ibus-daemon -o pid=|head -n 1)
+      ! ibuspid=$(ps -C ibus-daemon -o pid=|head -n 1)
 
       if [ "$ibuspid" != "" ]; then
         if [ "$is_gnome_shell" = "1" ]; then
@@ -41,7 +41,7 @@ case "$1" in
 
       # Verify that it's running now
       if [ -n "$SUDO_USER" ] && id "$SUDO_USER" > /dev/null 2>/dev/null; then
-        ibusdaemon=$(ps --user "$SUDO_USER" -o s= -o cmd | grep --regexp="^[^ZT] \(/usr/bin/\)\?ibus-daemon .*--xim.*")
+        ! ibusdaemon=$(ps --user "$SUDO_USER" -o s= -o cmd | grep --regexp="^[^ZT] \(/usr/bin/\)\?ibus-daemon .*--xim.*")
         if [ "$ibusdaemon" = "" ]; then
           # otherwise try to start it for the user installing the package
           if [ "$is_gnome_shell" = "1" ]; then

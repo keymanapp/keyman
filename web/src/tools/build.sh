@@ -18,13 +18,16 @@ cd "$THIS_SCRIPT_PATH"
 ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's development & unit-testing tools" \
-  "@../../../common/web/keyman-version" \
-  "@../../../common/web/keyboard-processor" \
+  "@/common/web/keyman-version" \
+  "@/common/web/keyboard-processor" \
+  "configure" \
   "clean" \
   "build" \
-  ":bulk_rendering     Builds the bulk-rendering tool used to validate changes to OSK display code" \
-  ":recorder           Builds the KMW recorder tool used for development of unit-test resources" \
-  ":sourcemap-root     Builds the sourcemap-cleaning tool used during minification of app/ builds"
+  "test" \
+  "--ci         Does nothing for this script" \
+  ":bulk_rendering=testing/bulk_rendering   Builds the bulk-rendering tool used to validate changes to OSK display code" \
+  ":recorder=testing/recorder               Builds the KMW recorder tool used for development of unit-test resources" \
+  ":sourcemap-root=building/sourcemap-root  Builds the sourcemap-cleaning tool used during minification of app/ builds"
 
 builder_parse "$@"
 

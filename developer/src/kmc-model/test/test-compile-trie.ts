@@ -4,6 +4,7 @@ import 'mocha';
 
 import {makePathToFixture, compileModelSourceCode} from './helpers/index.js';
 import { createTrieDataStructure } from '../src/build-trie.js';
+import { ModelCompilerError } from '../src/model-compiler-errors.js';
 
 describe('LexicalModelCompiler', function () {
   describe('#generateLexicalModelCode', function () {
@@ -131,7 +132,7 @@ describe('createTrieDataStructure()', function () {
   it('must be given an explicit searchTermToKey function', function () {
     assert.throws(function () {
       createTrieDataStructure([WORDLIST_FILENAME]);
-    }, TypeError)
+    }, ModelCompilerError)
   });
 
   it('uses the provided searchTermToKey function', function () {

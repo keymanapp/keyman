@@ -1199,8 +1199,8 @@ th
 .list_languages_add {
   padding-top: 10px;
   position: fixed;
-  top: 45%;
-  left: 49%;
+  top: 223px; /* Have to use fixed position can't use flex or grid inside a fixed child */
+  right: 281px;
 }
 
 .modify .keyboard_language {

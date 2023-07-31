@@ -21,7 +21,7 @@
     <!-- no keys listed, keys-Latn-implied.xml will be implicitly imported -->
   </keys>
 
-  <layers form="hardware" hardware="us">
+  <layers form="us">
     <layer id="base">
       <row keys="a" /> <!-- number row -->
     </layer>

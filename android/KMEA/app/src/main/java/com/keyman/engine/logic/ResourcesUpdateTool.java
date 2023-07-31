@@ -436,7 +436,11 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       .setAutoCancel(true)
       .setContentIntent(startUpdateIntent);
 
-    notificationManager.notify(notification_id,builder.build());
+    try {
+      notificationManager.notify(notification_id, builder.build());
+    } catch (SecurityException e) {
+      KMLog.LogException(TAG, "Security permission POST_NOTIFICATIONS denied", e);
+    }
   }
 
   private boolean isContextAvailable() {

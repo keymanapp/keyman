@@ -11,9 +11,13 @@
   "exports": {
     ".": "./build/src/main.js"
   },
+  "files": [
+    "/build/src/"
+  ],
   "scripts": {
     "build": "tsc -b",
-    "test": "cd test && tsc -b && cd .. && c8 --skip-full --reporter=lcov --reporter=text mocha",
+    "lint": "eslint .",
+    "test": "npm run lint && cd test && tsc -b && cd .. && c8 --skip-full --reporter=lcov --reporter=text mocha",
     "prepublishOnly": "npm run build"
   },
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
@@ -25,7 +29,7 @@
     "@keymanapp/keyman-version": "*",
     "ajv": "^8.11.0",
     "restructure": "git+https://github.com/keymanapp/dependency-restructure.git#49d129cf0916d082a7278bb09296fb89cecfcc50",
-    "semver": "^7.3.7",
+    "semver": "^7.5.2",
     "xml2js": "git+https://github.com/keymanapp/dependency-node-xml2js#535fe732dc408d697e0f847c944cc45f0baf0829"
   },
   "devDependencies": {
@@ -42,7 +46,7 @@
     "hexy": "^0.3.4",
     "mocha": "^8.4.0",
     "ts-node": "^9.1.1",
-    "typescript": "4.6.3"
+    "typescript": "^4.9.5"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",

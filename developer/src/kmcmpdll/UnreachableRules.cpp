@@ -2,7 +2,7 @@
 #include "pch.h"
 
 #include <compfile.h>
-#include <comperr.h>
+#include <kmn_compiler_errors.h>
 #include "../../../common/windows/cpp/include/vkeys.h"
 #include <kmcmpdll.h>
 
@@ -16,7 +16,8 @@
 std::wstring MakeHashKeyFromFileKey(PFILE_KEY kp) {
   std::wstringstream key;
   key << kp->Key << "," << kp->ShiftFlags << ",";
-  if (kp->dpContext) key << kp->dpContext;
+  if (kp->dpContext)
+    key << kp->dpContext;
   return key.str();
 }
 

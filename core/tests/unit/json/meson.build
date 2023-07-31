@@ -4,7 +4,7 @@
 # Authors:      Tim Eves (TSE)
 #
 
-if compiler.get_id() == 'emscripten'
+if cpp_compiler.get_id() == 'emscripten'
   tests_flags = ['-lnodefs.js']
 else
   tests_flags = []

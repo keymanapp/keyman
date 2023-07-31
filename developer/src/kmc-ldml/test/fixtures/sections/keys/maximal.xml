@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
+<keyboard locale="mt" conformsTo="techpreview">
+  <names>
+    <name value="hardware-gap-switch" />
+  </names>
+
+  <keys>
+    <key id="Q" gap="true" />
+    <key id="W" switch="shift" />
+    <!-- This key gets a bunch of other status -->
+    <key id="q" flicks="flick0" to="q" longPress="á é í" longPressDefault="é"
+        multiTap="ä ë ï" transform="no" width="3.14159" />
+    <key id="w" to="w" />
+    <flicks id="flick0">
+        <flick directions="nw se" to="ç" />
+        <flick directions="ne sw" to="ê" />
+    </flicks>
+  </keys>
+
+  <layers form="touch" minDeviceWidth="300">
+    <layer id="base">
+      <row keys="Q q W w" />
+    </layer>
+  </layers>
+  <layers form="iso">
+    <layer id="base">
+      <!-- beware: this is mapping ` and 1! -->
+      <row keys="Q W" />
+    </layer>
+    <layer id="shift" modifier="shift">
+      <!-- beware: this is mapping ` and 1! -->
+      <row keys="q w" />
+    </layer>
+  </layers>
+</keyboard>

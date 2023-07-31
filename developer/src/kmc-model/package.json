@@ -12,10 +12,13 @@
   "exports": {
     ".": "./build/src/main.js"
   },
+  "files": [
+    "/build/src/"
+  ],
   "scripts": {
-    "build": "tsc -b && npm run build-cjs",
-    "build-cjs": "esbuild build/src/lexical-model-compiler.js --bundle --platform=node --external:../../node_modules/* > build/cjs-src/lexical-model-compiler.cjs",
-    "test": "cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha",
+    "build": "tsc -b",
+    "lint": "eslint .",
+    "test": "npm run lint && cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha",
     "prepublishOnly": "npm run build"
   },
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
@@ -30,12 +33,11 @@
   "dependencies": {
     "@keymanapp/keyman-version": "*",
     "@keymanapp/models-types": "*",
+    "@keymanapp/common-types": "*",
     "typescript": "^4.9.5",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
-    "@keymanapp/models-templates": "*",
-    "@keymanapp/models-wordbreakers": "*",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
     "@types/node": "^10.14.6",
@@ -45,12 +47,25 @@
     "chalk": "^2.4.2",
     "esbuild": "^0.15.7",
     "mocha": "^10.0.0",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "@keymanapp/developer-test-helpers": "*"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",
     "require": [
       "source-map-support/register"
+    ]
+  },
+  "c8": {
+    "all": true,
+    "src": [
+      "src/"
+    ],
+    "exclude-after-remap": true,
+    "exclude": [
+      "test/",
+      "tools/",
+      "src/lexical-model.ts"
     ]
   },
   "repository": {

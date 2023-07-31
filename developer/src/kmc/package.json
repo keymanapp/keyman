@@ -12,11 +12,11 @@
   "scripts": {
     "build": "tsc -b",
     "bundle": "npm run bundle-kmc && npm run bundle-kmlmc && npm run bundle-kmlmi && npm run bundle-kmlmp",
-    "bundle-kmc": "esbuild build/src/kmc.js --bundle --platform=node > build/cjs-src/kmc.cjs",
-    "bundle-kmlmc": "esbuild build/src/kmlmc.js --bundle --platform=node > build/cjs-src/kmlmc.cjs",
-    "bundle-kmlmi": "esbuild build/src/kmlmi.js --bundle --platform=node > build/cjs-src/kmlmi.cjs",
-    "bundle-kmlmp": "esbuild build/src/kmlmp.js --bundle --platform=node > build/cjs-src/kmlmp.cjs",
-    "test": "cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha",
+    "bundle-kmc": "esbuild build/src/kmc.js --bundle --platform=node --target=es2022 > build/cjs-src/kmc.cjs",
+    "bundle-kmlmc": "esbuild build/src/kmlmc.js --bundle --platform=node --target=es2022 > build/cjs-src/kmlmc.cjs",
+    "bundle-kmlmi": "esbuild build/src/kmlmi.js --bundle --platform=node --target=es2022 > build/cjs-src/kmlmi.cjs",
+    "bundle-kmlmp": "esbuild build/src/kmlmp.js --bundle --platform=node --target=es2022 > build/cjs-src/kmlmp.cjs",
+    "test": "eslint . && cd test && tsc -b && cd .. && mocha",
     "prepublishOnly": "npm run build"
   },
   "type": "module",
@@ -39,13 +39,17 @@
   "dependencies": {
     "@keymanapp/keyman-version": "*",
     "@keymanapp/common-types": "*",
-    "@keymanapp/kmc-keyboard": "*",
+    "@keymanapp/kmc-kmn": "*",
+    "@keymanapp/kmc-ldml": "*",
     "@keymanapp/kmc-model": "*",
     "@keymanapp/kmc-model-info": "*",
     "@keymanapp/kmc-package": "*",
     "@keymanapp/models-types": "*",
     "commander": "^10.0.0"
   },
+  "files": [
+    "build/src/"
+  ],
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
@@ -57,12 +61,22 @@
     "esbuild": "^0.15.8",
     "mocha": "^8.4.0",
     "ts-node": "^9.1.1",
-    "typescript": "^4.5.4"
+    "typescript": "^4.9.5"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",
     "require": [
       "source-map-support/register"
+    ]
+  },
+  "c8": {
+    "all": true,
+    "src": [
+      "src/"
+    ],
+    "exclude-after-remap": true,
+    "exclude": [
+      "test/"
     ]
   },
   "repository": {

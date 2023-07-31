@@ -5,6 +5,8 @@ apply from: "$rootPath/version.gradle"
 
 android {
     compileSdkVersion 33
+    namespace="com.keyman.android.tests.keycode"
+
     defaultConfig {
         applicationId "com.keyman.android.tests.keycode"
         minSdkVersion 21

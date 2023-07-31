@@ -61,7 +61,7 @@ begin
       if m.Success then
       begin
         msgFilename := m.Groups[1].Value;
-        msgLine := StrToInt(m.Groups[2].Value);
+        msgLine := StrToIntDef(m.Groups[2].Value, 0);
         msgType := m.Groups[3].Value;
         msgCode := StrToInt('$'+m.Groups[4].Value);
         msgText := m.Groups[5].Value;

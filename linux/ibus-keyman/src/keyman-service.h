@@ -30,6 +30,7 @@
 #define __KM_SERVICE_H__
 
 #include <glib-object.h>
+#include <ibus.h>
 
 G_BEGIN_DECLS
 
@@ -53,16 +54,18 @@ struct _KeymanService
 
 GType             km_service_get_type          (void) G_GNUC_CONST;
 
-KeymanService *       km_service_get_default       (void);
+KeymanService *       km_service_get_default       (IBusEngine *keyman);
 
-// const gchar *  km_service_get_ldmlfile    (KeymanService       *service);
-void              km_service_set_ldmlfile    (KeymanService       *service,
-                                                const gchar *xml);
+// const gchar *  km_service_get_ldmlfile(KeymanService *service);
+void              km_service_set_ldmlfile(KeymanService *service,
+                                          const gchar   *xml);
 
-// const gchar *  km_service_get_name    (KeymanService       *service);
-void              km_service_set_name    (KeymanService       *service,
-                                                const gchar *name);
+// const gchar *  km_service_get_name    (KeymanService *service);
+void              km_service_set_name    (KeymanService *service,
+                                          const gchar   *name);
 
+void              km_service_send_text   (KeymanService *service,
+                                          const gchar   *text);
 
 G_END_DECLS
 

@@ -14,27 +14,19 @@ project('keyboardprocessor', 'cpp', 'c',
                            'warning_level=2'],
         meson_version: '>=0.53.0')
 
-compiler = meson.get_compiler('cpp')
+# Import our standard compiler defines; this is copied from
+# /resources/build/standard.meson.build by build.sh, because
+# meson doesn't allow us to reference a file outside its root
+subdir('resources')
 
 lib_version = '0.0.0'
 
 py = import('python')
 python = py.find_installation()
 
-# Once we can assume meson 0.60 we can delete this
-# (https://mesonbuild.com/Release-notes-for-0-60-0.html#msvc-compiler-now-assumes-utf8-source-code-by-default)
-if compiler.get_id() == 'msvc'
-  add_global_arguments('/source-charset:utf-8', language: ['c', 'cpp'])
-endif
-
-message('host_machine.system(): ' + host_machine.system())
-message('compiler.get_id(): ' + compiler.get_id())
-
-cc = meson.get_compiler('c')
-
 # TODO: Shared includes may use namespaces, etc which need future tidyup.
 # For now, we use KMN_KBP to inject the km::kbp::kmx namespace
-defns = ['-DKMN_KBP']
+defns += ['-DKMN_KBP']
 
 # #define DEBUG when we are on a debug build
 if get_option('buildtype') == 'debug'

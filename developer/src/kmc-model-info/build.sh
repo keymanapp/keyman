@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
-#
-# Compiles the kmc lexical model model-info compiler.
-#
-
-# Exit on command failure and when using unset variables:
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -17,16 +10,19 @@ cd "$THIS_SCRIPT_PATH"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 builder_describe "Build Keyman kmc Lexical Model model-info Compiler module" \
-  "@../kmc-package" \
+  "@/common/web/types" \
+  "@/common/models/types" \
+  "clean" \
   "configure" \
   "build" \
-  "clean" \
   "test" \
+  "pack                      build a local .tgz pack for testing" \
   "publish                   publish to npm" \
   "--dry-run,-n              don't actually publish, just dry run"
+
 builder_describe_outputs \
   configure     /node_modules \
-  build         build/src/model-info-compiler.js
+  build         /developer/src/kmc-model-info/build/src/model-info-compiler.js
 
 builder_parse "$@"
 
@@ -54,14 +50,19 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action test; then
-  #npm test - no tests as yet
+  npm test
+  # TODO: no unit tests yet, later add: `&& cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha`
   builder_finish_action success test
 fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action publish; then
-  . "$KEYMAN_ROOT/resources/build/npm-publish.inc.sh"
-  npm_publish
+  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+  builder_publish_to_npm
   builder_finish_action success publish
+elif builder_start_action pack; then
+  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+  builder_publish_to_pack
+  builder_finish_action success pack
 fi

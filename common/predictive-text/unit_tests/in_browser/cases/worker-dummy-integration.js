@@ -1,5 +1,7 @@
 var assert = chai.assert;
-var LMLayer = com.keyman.text.prediction.LMLayer;
+
+import { LMLayer, Worker }   from "../../../build/lib/web/index.mjs";
+import * as helpers from "../helpers.mjs";
 
 /*
  * Shows off the LMLayer API, using the full prediction interface.
@@ -17,7 +19,7 @@ describe('LMLayer using dummy model', function () {
       this.timeout(testconfig.timeouts.standard * 3); // This one makes multiple subsequent calls across
                                                       // the WebWorker boundary, so we should be generous here.
 
-      var lmLayer = new LMLayer(helpers.defaultCapabilities, null, true);
+      var lmLayer = new LMLayer(helpers.defaultCapabilities, Worker.constructInstance(), true);
 
       var stripIDs = function(suggestions) {
         suggestions.forEach(function(suggestion) {
@@ -60,7 +62,7 @@ describe('LMLayer using dummy model', function () {
     it('will perform (default) wordbreaking and return word at caret', function () {
       this.timeout(testconfig.timeouts.standard * 3); // This one makes multiple subsequent calls across
                                                       // the WebWorker boundary, so we should be generous here.
-      var lmLayer = new LMLayer(helpers.defaultCapabilities);
+      var lmLayer = new LMLayer(helpers.defaultCapabilities, Worker.constructInstance());
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax, but
@@ -94,6 +96,6 @@ describe('LMLayer using dummy model', function () {
   }
 
   function iGotDistractedByHazel() {
-    return __json__['future_suggestions/i_got_distracted_by_hazel'];
+    return __json__['models/future_suggestions/i_got_distracted_by_hazel'];
   }
 });

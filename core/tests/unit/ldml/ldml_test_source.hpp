@@ -33,7 +33,12 @@ enum ldml_action_type {
    * expected text
   */
   LDML_ACTION_CHECK_EXPECTED,
-  // TODO-LDML: gestures, etc?
+  // TODO-LDML: gestures, etc? Depends on touch.
+
+  /**
+   * fail test.  'string' has message.
+  */
+  LDML_ACTION_FAIL,
 };
 
 struct ldml_action {
@@ -60,7 +65,6 @@ public:
   // helper functions
   static key_event char_to_event(char ch);
   static uint16_t get_modifier(std::string const m);
-  static km_kbp_virtual_key get_vk(std::string const &vk);
   static std::u16string parse_source_string(std::string const &s);
   static std::u16string parse_u8_source_string(std::string const &s);
 

@@ -1,21 +1,17 @@
 test_files = [
   'ibusimcontext.c',
-  'ibusimcontext.h',
   'testfixture.cpp',
   'testmodule.c',
-  'testmodule.h',
-]
-
-kmx_dir = [
-  core_dir / 'build/arch' / get_option('buildtype') / 'tests/kmx_test_source'
+  '../src/KeymanSystemServiceClient.cpp',
 ]
 
 kmnkbp_tests_lib = cc.find_library(
-  'libkmnkbp-tests',
-  dirs: kmx_dir
+  'kmnkbp-tests', # meson will prefix 'lib'
+  dirs: [ core_dir / 'build/arch' / get_option('buildtype') / 'tests/kmx_test_source' ]
 )
 
-deps = [ibus, gtk, x11, json_glib, kmnkbp_lib, kmnkbp_tests_lib]
+test_deps = [ibus, gtk, json_glib, kmnkbp_lib, kmnkbp_tests_lib, systemd]
+dbus_deps = [gtk, systemd]
 
 test_env = [
   'G_TEST_SRCDIR=' + meson.current_source_dir(),
@@ -32,8 +28,25 @@ test_include_dirs = [
 test_exe = executable(
   'ibus-keyman-tests',
   test_files, util_files,
-  dependencies: deps,
+  dependencies: test_deps,
   include_directories: test_include_dirs,
+)
+
+system_service_dir = meson.current_source_dir() / '../../keyman-system-service/build' / build_machine.cpu_family() / get_option('buildtype') / 'tests/services'
+
+dbus_test_server = executable(
+  'km-dbus-test-server',
+  'KmDbusTestServer.cpp',
+  dependencies: dbus_deps,
+  cpp_args: [
+  '-DKEYMAN_TEST_SERVICE_PATH="' + system_service_dir + '"'
+ ]
+)
+
+stop_test_server = executable(
+  'stop-test-server',
+  'StopTestServer.cpp',
+  dependencies: dbus_deps,
 )
 
 env_file = '/tmp/env.txt'
@@ -84,7 +97,7 @@ test(
 
 kmxtest_files = run_command(
   find_tests,
-  kmx_dir,
+  [ common_dir / 'test/keyboards/baseline' ],
   check: true,
 ).stdout().split('\n')
 

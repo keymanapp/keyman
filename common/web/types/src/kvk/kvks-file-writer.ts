@@ -96,7 +96,6 @@ export default class KVKSFileWriter {
       l.key.push(k);
     }
 
-    // console.dir(kvks, {depth:8});
     let result = builder.buildObject(kvks);
     return result; //Uint8Array.from(result);
   }

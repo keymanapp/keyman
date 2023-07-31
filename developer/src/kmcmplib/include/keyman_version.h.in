@@ -1,0 +1,9 @@
+#define keyman_version_stringify(x) keyman_version_to_string(x)
+#define keyman_version_to_string(x) #x
+
+// Product versioning
+
+#define KEYMAN_VERSION_MAJOR @majorver@
+#define KEYMAN_VERSION_MINOR @minorver@
+#define KEYMAN_VERSION_PATCH @patchver@
+#define KEYMAN_VERSION_STRING keyman_version_stringify(@majorver@ ## . ## @minorver@ ## . ## @patchver@ ## .0)

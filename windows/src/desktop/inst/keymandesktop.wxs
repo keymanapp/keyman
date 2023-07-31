@@ -202,7 +202,7 @@
 
               <Directory Id="dir_locale" Name="locale" />
 
-              <Directory Id="dir_sentry_0.4.9" Name="sentry-0.4.9" />
+              <Directory Id="dir_sentry_0.6.0" Name="sentry-0.6.0" />
             </Directory>
           </Directory>
         </Directory>
@@ -223,7 +223,7 @@
 
     </Directory>
 
-    <ComponentGroup Id="KeymanSentryComponents" Directory="dir_sentry_0.4.9" Source="..\..\..\..\common\windows\delphi\ext\sentry">
+    <ComponentGroup Id="KeymanSentryComponents" Directory="dir_sentry_0.6.0" Source="..\..\..\..\common\windows\delphi\ext\sentry">
       <Component>
         <File Id="sentry.dll" KeyPath="yes" />
       </Component>
@@ -298,7 +298,7 @@
       <Custom Action='SaveARPInstallLocation' After='InstallValidate'><![CDATA[Not Installed Or REINSTALL]]></Custom>
     </InstallExecuteSequence>
 
-    <Media Id="1" CompressionLevel="high" EmbedCab="yes" Cabinet="Data1.cab" VolumeLabel="DISK1" />
+    <Media Id="1" EmbedCab="yes" Cabinet="Data1.cab" VolumeLabel="DISK1" />
 
     <Property Id="ALLUSERS">1</Property>
 

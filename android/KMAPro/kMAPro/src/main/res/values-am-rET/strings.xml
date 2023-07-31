@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <!-- app_name removed in 16.0 beta. Set in build.gradle -->
   <!-- Context: Menu Action -->
   <string name="action_share" comment="Menu action to send text content to another app">አጋራ</string>
   <!-- Context: Menu Action -->
@@ -25,6 +26,7 @@
   <!-- Context: Textfield prompt (&#8230; is the ellipsis character "...") -->
   <string name="textview_hint" comment="Prompt to start typing">እዚህ ጋር መጻፍ ይጀምሩ &#8230;</string>
   <!-- Context: Splash screen (version/copyright info currently disabled -->
+  <string name="splash_blank" translatable="false" comment="Blank text while version info on splash page is disabled"></string>
   <!-- Context: Splash screen (version/copyright info currently disabled -->
   <!-- Context: Text Size dialog -->
   <string name="text_size" comment="Current text size (number)">የጽሑፍ መጠን፦ %1$d</string>
@@ -156,5 +158,5 @@
   <!-- Context: KMP Package strings -->
   <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">የፊደል ገበታው አዲሱን የኪይማን ስሪት ይፈልጋል</string>
   <!-- Context: anywhere -->
-  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">ብራውሰሩን ማስጀመር አልተቻለም</string>
 </resources>

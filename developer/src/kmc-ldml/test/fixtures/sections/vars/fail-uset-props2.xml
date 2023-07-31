@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
+<keyboard locale="mt" conformsTo="techpreview">
+  <names>
+    <name value="vars-err" />
+  </names>
+
+  <keys />
+
+  <!-- from spec -->
+  <variables>
+    <unicodeSet id="fail_props" value="[[\p{Mn}]&amp;[A-z]]" />
+  </variables>
+
+</keyboard>

@@ -124,20 +124,18 @@ fi
 
 if (( build_keymanweb )); then
   pushd "$KEYMAN_ROOT/web/"
-  ./build.sh --no-minify
+  ./build.sh build --debug
   popd
 fi
 
 if (( copy_keymanweb )); then
-  WEB_SRC="$KEYMAN_ROOT/web/build/app/web/debug"
-  UI_SRC="$KEYMAN_ROOT/web/build/app/ui/debug"
+  WEB_SRC="$KEYMAN_ROOT/web/build/publish/debug"
   DST="$(dirname "$THIS_SCRIPT")/src/site/resource"
 
   rm -rf "$DST"
   mkdir -p "$DST/osk"
   mkdir -p "$DST/ui"
   cp "$WEB_SRC/"*.js "$WEB_SRC/"*.js.map "$DST/"
-  cp "$UI_SRC/"*.js "$UI_SRC/"*.js.map "$DST/"
   cp -R "$WEB_SRC/osk/"* "$DST/osk/"
   cp -R "$WEB_SRC/ui/"* "$DST/ui/"
   cp "$KEYMAN_ROOT/web/LICENSE" "$DST/"

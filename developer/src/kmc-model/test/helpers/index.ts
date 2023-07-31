@@ -6,7 +6,6 @@
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import {assert} from 'chai';
-import {LogMessage, KeymanCompilerError, redirectLogMessagesTo, resetLogMessageHandler, LogLevel} from '../../src/model-compiler-errors.js';
 
 export interface CompilationResult {
   hasSyntaxError: boolean;
@@ -119,64 +118,6 @@ export function compileModelSourceCode(code: string) {
   return {
     error, exportedModel, hasSyntaxError, modelConstructorName
   };
-}
-
-/**
- * Enables one to query log messages after they have been logged.
- */
-export class LogHoarder {
-  private messages: LogMessage[] = [];
-
-  /**
-   * Get rid of all log messages seen.
-   */
-  clear() {
-    this.messages = [];
-  }
-
-  /**
-   * Hoards a log message for later perusal.
-   */
-  handleLog(log: LogMessage) {
-    this.messages.push(log);
-  }
-
-  /**
-   * Has an error message with this code been witnessed?
-   */
-  hasSeenCode(code: KeymanCompilerError): boolean {
-    return Boolean(this.messages.find(log => log.code === code));
-  }
-
-  /**
-   * Have any warnings been logged?
-   */
-  hasSeenWarnings(): boolean {
-    return this.messages
-      .filter(log => log.level === LogLevel.CERR_WARNING)
-      .length > 0;
-  }
-
-  /**
-   * Overrides the global log handler, allowing one to browse log messages
-   * later.
-   *
-   * Remember to uninstall the log handler afterwards!
-   */
-  install(): this {
-    redirectLogMessagesTo(this.handleLog.bind(this));
-    return this;
-  }
-
-  /**
-   * Return the log message handler to its default.
-   *
-   * Note: You MUST uninstall the hoarder after use!
-   * It's recommended you put this in an afterEach() callback.
-   */
-  uninstall() {
-    resetLogMessageHandler()
-  }
 }
 
 type ModuleType = (a: LMLayerWorker, b: ModelsNamespace, c: WordBreakersNamespace) => any;

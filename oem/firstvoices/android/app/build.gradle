@@ -9,11 +9,7 @@ apply from: "$rootPath/version.gradle"
 
 android {
     compileSdkVersion 33
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
+    namespace="com.firstvoices.keyboards"
 
     defaultConfig {
         applicationId "com.firstvoices.keyboards"
@@ -58,9 +54,21 @@ android {
     productFlavors {
     }
 
+    applicationVariants.all { variant ->
+        // Adjust output name to "firstvoices-${VERSION_MD}.apk"
+        variant.outputs.all {
+            outputFileName = "firstvoices-" + VERSION_MD + ".apk"
+        }
+    }
     lintOptions {
         disable 'MissingTranslation'
         lintConfig file("lint.xml")
+    }
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
     }
 }
 

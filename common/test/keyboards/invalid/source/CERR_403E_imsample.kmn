@@ -1,0 +1,17 @@
+﻿c ***** CERR_501FeatureOnly_Call 0x0000403E *************************
+store(&VERSION) '3.0'
+c *******************************************************************
+store(&NAME) 'IMTest'
+store(DLLFunction) "imsample.dll:DF"
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+c ***** CERR_501FeatureOnly_Call 0x0000403E *************************
+
++ [K_BKSP] > call(DLLFunction)
++ [K_ESC] > call(DLLFunction)
+
+nomatch > call(DLLFunction)
+c *******************************************************************

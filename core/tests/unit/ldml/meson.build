@@ -4,7 +4,27 @@
 # Authors:      Marc Durdin
 #
 
-if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang' or compiler.get_id() == 'emscripten'
+# ICU4C is used for repertoire tests
+
+
+if target_machine.system() == 'linux'
+  # use pkg-config when targetting linux
+  pkgconfig = 'pkg-config'
+  icu_uc = dependency('icu-uc', required: true)
+else
+  # load ICU from wrap
+  # Requires meson of about 0.57+
+  icu4c = subproject('icu-minimal', default_options: [ 'default_library=static', 'cpp_std=c++17', 'warning_level=0',
+'werror=false']) # TODO-LDML: options: static, no data (these are in the meson build files)
+  icu_uc = icu4c.get_variable('icuuc_dep')
+endif
+
+if icu_uc.found()
+  defns += '-DHAVE_ICU4C'
+endif
+
+# TODO -- why are these differing from the standard.meson.build flags?
+if cpp_compiler.get_id() == 'gcc' or cpp_compiler.get_id() == 'clang' or cpp_compiler.get_id() == 'emscripten'
   warns = [
      '-Wno-missing-field-initializers',
      '-Wno-unused-parameter'
@@ -37,7 +57,7 @@ endif
 
 # Build ldml test executable
 
-if compiler.get_id() == 'emscripten'
+if cpp_compiler.get_id() == 'emscripten'
   tests_flags = ['--embed-file', join_paths(meson.current_build_dir(),'keyboards','@')]
   tests_flags += ['--embed-file', join_paths(meson.current_build_dir(),'invalid-keyboards','@')]
   test_path = '/'
@@ -51,10 +71,13 @@ endif
 ldml = executable('ldml',
     'ldml.cpp',
     'ldml_test_source.cpp',
+    'ldml_test_utils.cpp',
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
     link_args: links + tests_flags,
-    objects: lib.extract_all_objects(recursive: false))
+    objects: lib.extract_all_objects(recursive: false),
+    dependencies: [icu_uc],
+    )
 
 # Run tests on all keyboards (`tests` defined in keyboards/meson.build)
 
@@ -76,8 +99,16 @@ endforeach
 # Build and run additional test_kmx_plus test
 
 e = executable('test_kmx_plus', 'test_kmx_plus.cpp',
+    'ldml_test_utils.cpp',
     cpp_args: defns + warns,
-    include_directories: [inc, libsrc],
+    include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
     link_args: links + tests_flags,
     objects: lib.extract_all_objects(recursive: false))
 test('test_kmx_plus', e, suite: 'ldml')
+
+t = executable('test_transforms', 'test_transforms.cpp',
+    cpp_args: defns + warns,
+    include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
+    link_args: links + tests_flags,
+    objects: lib.extract_all_objects(recursive: false))
+test('test_transforms', t, suite: 'ldml')

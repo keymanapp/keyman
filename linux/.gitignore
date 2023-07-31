@@ -12,14 +12,12 @@ keyman-config/make_deb
 tmp/
 dist/
 *~
-# keyboardprocessor build artifacts (Keyman Core desktop)
-keyboardprocessor/
 # IDE config files
 **/.idea/
 upload/
 launchpad
 launchpad-*
-keyman-config/build
+build/
 keyman-config/debian/man
 keyman-config/experiments/*.txt
 keyman-config/keyman_config/version.py

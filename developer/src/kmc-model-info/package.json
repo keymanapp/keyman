@@ -12,9 +12,13 @@
   "exports": {
     ".": "./build/src/model-info-compiler.js"
   },
+  "files": [
+    "/build/src/"
+  ],
   "scripts": {
     "build": "tsc -b",
-    "test": "cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha",
+    "lint": "eslint .",
+    "test": "npm run lint",
     "prepublishOnly": "npm run build"
   },
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
@@ -27,8 +31,7 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "dependencies": {
-    "@keymanapp/keyman-version": "*",
-    "@keymanapp/kmc-package": "*",
+    "@keymanapp/common-types": "*",
     "@keymanapp/models-types": "*"
   },
   "devDependencies": {
@@ -41,7 +44,7 @@
     "chalk": "^2.4.2",
     "mocha": "^8.4.0",
     "ts-node": "^9.1.1",
-    "typescript": "^4.5.4"
+    "typescript": "^4.9.5"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",

@@ -29,6 +29,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -47,6 +48,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.ExtractedText;
+import android.view.inputmethod.ExtractedTextRequest;
+import android.view.inputmethod.InputConnection;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -67,15 +71,33 @@ import io.sentry.SentryLevel;
 final class KMKeyboard extends WebView {
   private static final String TAG = "KMKeyboard";
   private final Context context;
-  private KeyboardType keyboardType = KeyboardType.KEYBOARD_TYPE_UNDEFINED;
   private String packageID;
   private String keyboardID;
   private String keyboardName;
   private String keyboardVersion;
 
+  private boolean shouldIgnoreTextChange = false;
+  private boolean shouldIgnoreSelectionChange = false;
+
+  protected KeyboardType keyboardType = KeyboardType.KEYBOARD_TYPE_UNDEFINED;
   protected ArrayList<String> javascriptAfterLoad = new ArrayList<String>();
 
   private static String currentKeyboard = null;
+
+  /**
+   * Banner state value: "blank" - no banner available.
+   */
+  protected static final String KM_BANNER_STATE_BLANK = "blank";
+  /**
+   * Banner state value: "suggestion" - dictionary suggestions are shown.
+   */
+  protected static final String KM_BANNER_STATE_SUGGESTION = "suggestion";
+
+  /**
+   * Current banner state.
+   */
+  protected static String currentBanner = KM_BANNER_STATE_BLANK;
+
   private static String txtFont = "";
   private static String oskFont = null;
   private static String keyboardRoot = "";
@@ -121,7 +143,7 @@ final class KMKeyboard extends WebView {
   }
 
   public boolean getShouldShowHelpBubble() {
-    if(this._shouldShowHelpBubble == null) {
+    if (this._shouldShowHelpBubble == null) {
       SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
       this._shouldShowHelpBubble = prefs.getBoolean(KMManager.KMKey_ShouldShowHelpBubble, true);
     }
@@ -132,6 +154,55 @@ final class KMKeyboard extends WebView {
   public void setShouldShowHelpBubble(boolean flag) {
     this._shouldShowHelpBubble = flag;
   }
+
+  protected boolean shouldIgnoreTextChange() {
+    return shouldIgnoreTextChange;
+  }
+
+  protected void setShouldIgnoreTextChange(boolean ignore) {
+    this.shouldIgnoreTextChange = ignore;
+  }
+
+  protected boolean shouldIgnoreSelectionChange() {
+    return shouldIgnoreSelectionChange;
+  }
+
+  protected void setShouldIgnoreSelectionChange(boolean ignore) {
+    this.shouldIgnoreSelectionChange = ignore;
+  }
+
+  protected boolean updateText(String text) {
+    boolean result = false;
+    String kmText = "";
+    if (text != null) {
+      kmText = text.toString().replace("\\", "\\u005C").replace("'", "\\u0027").replace("\n", "\\n");
+    }
+
+    if (KMManager.isKeyboardLoaded(this.keyboardType) && !shouldIgnoreTextChange) {
+      this.loadJavascript(KMString.format("updateKMText('%s')", kmText));
+      result = true;
+    }
+
+    shouldIgnoreTextChange = false;
+    return result;
+  }
+
+  protected boolean updateSelectionRange(int selStart, int selEnd) {
+    boolean result = false;
+    InputConnection ic = KMManager.getInputConnection(this.keyboardType);
+    if (ic != null) {
+      ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
+      if (icText != null) {
+        updateText(icText.text.toString());
+      }
+    }
+    this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
+    result = true;
+
+    return result;
+  }
+
+
 
   @SuppressWarnings("deprecation")
   @SuppressLint("SetJavaScriptEnabled")
@@ -150,22 +221,14 @@ final class KMKeyboard extends WebView {
 
     getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
     getSettings().setSupportZoom(false);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      getSettings().setUseWideViewPort(true);
-      getSettings().setLoadWithOverviewMode(true);
+
+    getSettings().setUseWideViewPort(true);
+    getSettings().setLoadWithOverviewMode(true);
+    if (0 != (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
+      // Enable debugging of WebView via adb. Not used during unit tests
+      // Refer: https://developer.chrome.com/docs/devtools/remote-debugging/webviews/#configure_webviews_for_debugging
       setWebContentsDebuggingEnabled(true);
     }
-
-    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1)
-      setLayerType(View.LAYER_TYPE_SOFTWARE, null); // Disable hardware acceleration for API < 17, Keyman keyboard is slower without HWA but it causes some display issues.
-    // (Tested on Samsung Galaxy Nexus running Android 4.1.2)
-
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
-      // These were deprecated in API 18
-      getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
-      getSettings().setPluginState(WebSettings.PluginState.ON_DEMAND);
-    }
-
     setWebChromeClient(new WebChromeClient() {
       public boolean onConsoleMessage(ConsoleMessage cm) {
         String msg = KMString.format("KMW JS Log: Line %d, %s:%s", cm.lineNumber(), cm.sourceId(), cm.message());
@@ -410,6 +473,24 @@ final class KMKeyboard extends WebView {
 
   public static String currentKeyboard() {
     return currentKeyboard;
+  }
+
+  public static void setCurrentBanner(String banner) {
+    currentBanner = banner;
+  }
+
+  public static String currentBanner() { return currentBanner; }
+
+  protected void toggleSuggestionBanner(HashMap<String, String> associatedLexicalModel, boolean keyboardChanged) {
+    //reset banner state if new language has no lexical model
+    if (currentBanner != null && currentBanner.equals(KM_BANNER_STATE_SUGGESTION)
+        && associatedLexicalModel == null) {
+      setCurrentBanner(KMKeyboard.KM_BANNER_STATE_BLANK);
+    }
+
+    if(keyboardChanged) {
+      setLayoutParams(KMManager.getKeyboardLayoutParams());
+    }
   }
 
   /**

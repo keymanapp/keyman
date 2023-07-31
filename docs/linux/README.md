@@ -13,16 +13,15 @@ See [license information](../../linux/LICENSE.md) about licensing.
 
 - It is helpful to be using the [packages.sil.org](http://packages.sil.org) repo
 
-- Install packages required for building and developing Keyman for Linux
+- Install packages required for building and developing Keyman for Linux.
+  The list of required packages can be seen in `linux/debian/control`.
+  It is easiest to use the `mk-build-deps` tool to install the
+  dependencies:
 
   ```bash
-  sudo apt install cdbs debhelper libx11-dev autotools-dev build-essential \
-    dh-autoreconf flex bison libibus-1.0-dev python3-setuptools meson \
-    libjson-glib-dev libgtk-3-dev libxml2-utils help2man python3-lxml \
-    python3-magic python3-numpy python3-pil python3-pip python3-qrcode \
-    python3-requests python3-requests-cache python3 python3-gi dconf-cli \
-    dconf-editor cargo python3-dbus gir1.2-webkit2-4.0 ibus libglib2.0-bin \
-    liblocale-gettext-perl xvfb xserver-xephyr metacity mutter
+  sudo apt update
+  sudo apt install devscripts equivs
+  sudo mk-build-deps --install linux/debian/control
   ```
 
 ## Compiling from Command Line
@@ -47,29 +46,11 @@ See [license information](../../linux/LICENSE.md) about licensing.
 
 - run `sudo linux/build.sh uninstall` to uninstall everything and put it back again
 
-#### Tmp install
-
-Used by TC for validating PRs
-
-Run `make tmpinstall` to build and install **keyboardprocessor** and **ibus-keyman** to `/tmp/keyman`
-
-This is only for testing the build, not for running **ibus-keyman** in ibus
-
-### Manually
-
-- **ibus-keyman** requires headers and lib from **keyboardprocessor**
-
-So
-
-- **keyboardprocessor** must be built before **ibus-keyman**
-
-For each project run `./build.sh && ./build.sh install`.
-
 ## Continuous integration
 
-Teamcity PR builds will run `make tmpinstall`
+Teamcity PR builds will run `linux/build.sh install`
 
-Master builds run `make tmpinstall` and create source packages
+Master builds run `linux/build.sh install` and create source packages
 
 Nightly and release builds upload the most recent new master build to <https://downloads.keyman.com>
 

@@ -28,16 +28,16 @@ export type SectionIdent =
   'bksp' |
   'disp' |
   'elem' |
-  'finl' |
   'keys' |
   'layr' |
   'list' |
   'loca' |
   'meta' |
   'name' |
-  'ordr' |
   'strs' |
   'tran' |
+  'uset' |
+  'vars' |
   'vkey';
 
 
@@ -140,13 +140,17 @@ class Constants {
   readonly length_elem_item_element = 8;
 
   /**
-   * bitwise or value for unicode_set in elem[elemstr][element].flags.
-   * If bit is 1, then 'element' is a UnicodeSet string.
-   * If bit is 0, then 'element' is a UTF-32LE codepoint
+   * bitwise or value for type in elem[elemstr][element].flags.
+   * If bits are 00b, then 'element' is a UTF-32LE codepoint.
+   * If bits are 01b, then 'element' is a string index.
+   * If bits are 10b (2), then 'element' is a uset index.
    *
-   * `unicode_set = flags & elem_flags_unicode_set`
+   * `type = flags & elem_flags_type`
    */
-  readonly elem_flags_unicode_set = 0x00000001;
+  readonly elem_flags_type      = 0x00000003;
+  readonly elem_flags_type_char = 0x00000000;
+  readonly elem_flags_type_str  = 0x00000001;
+  readonly elem_flags_type_uset = 0x00000002;
 
   /**
    * bitwise or value for tertiary_base in elem[elemstr][element].flags.
@@ -157,7 +161,7 @@ class Constants {
    *
    * `tertiary_base = flags & elem_flags_tertiary_base`
    */
-  readonly elem_flags_tertiary_base = 0x00000002;
+  readonly elem_flags_tertiary_base = 0x00000004;
 
   /**
    * bitwise or value for tertiary_base in elem[elemstr][element].flags.
@@ -168,7 +172,7 @@ class Constants {
    *
    * `prebase = flags & elem_flags_prebase`
    */
-  readonly elem_flags_prebase = 0x00000004;
+  readonly elem_flags_prebase = 0x00000008;
 
   /**
    * bitwise mask for order in elem[elemstr][element].flags.
@@ -207,8 +211,8 @@ class Constants {
   readonly elem_flags_tertiary_bitshift = 24;
 
   /* ------------------------------------------------------------------
-    * finl section
-      ------------------------------------------------------------------ */
+   * finl section
+     ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'finl' section, not including entries
@@ -230,39 +234,39 @@ class Constants {
   /**
    * Constant for no modifiers
    */
-  readonly keys_mod_none = 0;
+  readonly keys_mod_none = 0x0000;
   /**
    * bitmask for Left Alt modifier key
    */
-  readonly keys_mod_altL = 1 << 2;
+  readonly keys_mod_altL = 0x0004;
   /**
    * bitmask for Right Alt (AltGr) modifier key
    */
-  readonly keys_mod_altR = 1 << 3;
+  readonly keys_mod_altR = 0x0008;
   /**
    * bitmask for either Alt (Windows) or Option (Apple) modifier keys
    */
-  readonly keys_mod_alt  = this.keys_mod_altL | this.keys_mod_altR;
+  readonly keys_mod_alt  = 0x0040;
   /**
    * bitmask for Caps modifier key
    */
-  readonly keys_mod_caps = 1 << 8;
+  readonly keys_mod_caps = 0x0100;
   /**
    * bitmask for Left control modifier key
    */
-  readonly keys_mod_ctrlL = 1 << 0;
+  readonly keys_mod_ctrlL = 0x0001;
   /**
    * bitmask for Right control modifier key
    */
-  readonly keys_mod_ctrlR = 1 << 1;
+  readonly keys_mod_ctrlR = 0x0002;
   /**
    * bitmask for either Control modifier key
    */
-  readonly keys_mod_ctrl = this.keys_mod_ctrlL | this.keys_mod_ctrlR;
+  readonly keys_mod_ctrl = 0x0020;
   /**
    * bitmask for either shift.
    */
-  readonly keys_mod_shift = 1 << 4;
+  readonly keys_mod_shift = 0x0010;
 
   /**
    * Convenience map for modifiers
@@ -453,19 +457,6 @@ class Constants {
   readonly length_name_item = 4;
 
   /* ------------------------------------------------------------------
-    * ordr section
-      ------------------------------------------------------------------ */
-
-  /**
-   * Minimum length of the 'ordr' section, not including entries
-   */
-  readonly length_ordr = 12;
-  /**
-   *  Length of each item in the 'ordr' section variable part
-   */
-  readonly length_ordr_item = 8;
-
-  /* ------------------------------------------------------------------
     * strs section
       ------------------------------------------------------------------ */
 
@@ -485,15 +476,33 @@ class Constants {
   /**
    * Minimum length of the 'tran' section, not including entries
    */
-  readonly length_tran = 12;
+  readonly length_tran = 20;
   /**
-   *  Length of each item in the 'tran' section variable part
+   *  Length of each transform group item
    */
-  readonly length_tran_item = 16;
+  readonly length_tran_group = 12;
+  /**
+   *  Length of each transform item
+   */
+  readonly length_tran_transform = 16;
+  /**
+   *  Length of each reorder subtable item
+   */
+  readonly length_tran_reorder = 8;
+
   /**
    * bitwise or value for error="fail" in transform
    */
   readonly tran_flags_error = 0x0001;
+
+  /**
+   * this group is full of transform items
+   */
+  readonly tran_group_type_transform = 0;
+  /**
+   * this group is full of reorder items
+   */
+  readonly tran_group_type_reorder = 1;
 
   /* ------------------------------------------------------------------
     * vkey section
@@ -508,6 +517,51 @@ class Constants {
    */
   readonly length_vkey_item = 8;
 
+  /* ------------------------------------------------------------------
+   * vars section
+   * ------------------------------------------------------------------ */
+
+  /**
+   * Minimum length of the 'vars' section not including variable parts
+   */
+  readonly length_vars = 16;
+  /**
+   *  Length of each item in the 'vars' section variable part
+   */
+  readonly length_vars_item = 16;
+
+  /**
+   * String variable
+   */
+  readonly vars_entry_type_string = 0;
+  /**
+   * Set variable
+   */
+  readonly vars_entry_type_set = 1;
+  /**
+   * unicodeSet variable
+   */
+  readonly vars_entry_type_unicodeSet = 2;
+
+  /* ------------------------------------------------------------------
+   * uset section
+   * ------------------------------------------------------------------ */
+
+  /*
+   * Minimum length of the 'uset' section not including variable parts
+   */
+  readonly length_uset = 16;
+
+  /**
+   * Length of each entry in the uset.usets subtable
+   */
+  readonly length_uset_uset = 12;
+
+  /**
+   * Length of each entry in the uset.ranges subtable
+   */
+  readonly length_uset_range = 8;
+
   /**
    * All section IDs.
    */
@@ -516,17 +570,17 @@ class Constants {
       bksp: 'bksp',
       disp: 'disp',
       elem: 'elem',
-      finl: 'finl',
       keys: 'keys',
       layr: 'layr',
       list: 'list',
       loca: 'loca',
       meta: 'meta',
       name: 'name',
-      ordr: 'ordr',
       sect: 'sect',
       strs: 'strs',
       tran: 'tran',
+      uset: 'uset',
+      vars: 'vars',
       vkey: 'vkey',
   };
 
@@ -552,7 +606,7 @@ class Constants {
    * @returns string such as 'sect'
    */
   str_section_id(hex:number) : string {
-    let chars : string[] = [];
+    const chars : string[] = [];
     for (let i = 3; i>=0; i--) {
       chars.push(String.fromCharCode(hex & 0xFF));
       hex >>= 8;

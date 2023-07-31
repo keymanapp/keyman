@@ -75,16 +75,9 @@ for(let procArgIndex = 4; procArgIndex < process.argv.length; procArgIndex++) {
 let srcMap = SourcemapRemapper.fromFile(destFile);
 
 if(shouldClean) {
-  // First pass:  remove any closure prepended ../../../ pathing.
-  srcMap.remapPaths([
-    { from: "../../../", to: "" }
-  ]);
-
-  // Second pass:  fix up any mangled source paths
-  srcMap.remapPaths([
-    { from: "common/web/input-processor/build/keyman/", to: "" },
-    { from: "common/web/keyboard-processor/build/keyman/", to: "" }
-  ]);
+  // Keeps "@keymanapp/keyman" as sourceRoot, but prepends all `sources` entries with
+  // the remainder / suffix of sourceRoot and normalizes the paths.
+  srcMap.normalizeWithSourceRoot('@keymanapp/keyman/'.length);
 }
 
 if(sourceRoot) {

@@ -1,8 +1,10 @@
 import {parseWordListFromContents, parseWordListFromFilename, WordList} from '../src/build-trie.js';
 import {assert} from 'chai';
 import 'mocha';
-import { makePathToFixture, LogHoarder } from './helpers/index.js';
-import { KeymanCompilerError } from '../src/model-compiler-errors.js';
+import { makePathToFixture } from './helpers/index.js';
+import { ModelCompilerMessages } from '../src/model-compiler-errors.js';
+import { setCompilerCallbacks } from '../src/compiler-callbacks.js';
+import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 const BOM = '\ufeff';
 const SENCOTEN_WORDLIST = {
@@ -18,15 +20,18 @@ const SENCOTEN_WORDLIST = {
   'I': 1884
 };
 
+
 describe('parsing a word list', function () {
+  let testCallbacks = new TestCompilerCallbacks();
+
   beforeEach(function () {
-    this.logHoarder = (new LogHoarder).install()
-  })
+    testCallbacks.clear();
+    setCompilerCallbacks(testCallbacks);
+  });
 
   afterEach(function () {
-    this.logHoarder.uninstall();
-    delete this.logHoarder;
-  })
+    setCompilerCallbacks(null);
+  });
 
   it('should remove the UTF-8 byte order mark from files', function () {
     let word = 'hello';
@@ -38,12 +43,12 @@ describe('parsing a word list', function () {
     let withoutBOM: WordList = {};
     parseWordListFromContents(withoutBOM, file);
     assert.deepEqual(withoutBOM, expected, "expected regular file to parse properly");
-    assert.isFalse(this.logHoarder.hasSeenWarnings());
+    assert.isEmpty(testCallbacks.messages);
 
     let withBOM: WordList = {};
     parseWordListFromContents(withBOM, `${BOM}${file}`)
     assert.deepEqual(withBOM, expected, "expected BOM to be ignored");
-    assert.isFalse(this.logHoarder.hasSeenWarnings());
+    assert.isEmpty(testCallbacks.messages);
   });
 
   it('should read word lists in UTF-8', function () {
@@ -53,7 +58,7 @@ describe('parsing a word list', function () {
     parseWordListFromFilename(wordlist, filename);
 
     assert.deepEqual(wordlist, SENCOTEN_WORDLIST);
-    assert.isFalse(this.logHoarder.hasSeenWarnings());
+    assert.isEmpty(testCallbacks.messages);
   });
 
   it('should read word lists in UTF-16 little-endian (with BOM)', function () {
@@ -64,7 +69,7 @@ describe('parsing a word list', function () {
     parseWordListFromFilename(wordlist, filename);
 
     assert.deepEqual(wordlist, SENCOTEN_WORDLIST);
-    assert.isFalse(this.logHoarder.hasSeenWarnings());
+    assert.isEmpty(testCallbacks.messages);
   });
 
   it('should NOT read word lists in UTF-16 big-endian (with BOM)', function () {
@@ -101,22 +106,22 @@ describe('parsing a word list', function () {
 
     assert.deepEqual(repeatedWords, expected);
 
-    assert.isTrue(this.logHoarder.hasSeenWarnings());
+    assert.lengthOf(testCallbacks.messages, 4);
     // hello has been seen multiple times:
-    assert.isTrue(this.logHoarder.hasSeenCode(KeymanCompilerError.CWARN_DuplicateWordInSameFile));
+    assert.isTrue(testCallbacks.hasMessage(ModelCompilerMessages.WARN_DuplicateWordInSameFile));
     // helló and hello + U+0301 have both been seen:
-    assert.isTrue(this.logHoarder.hasSeenCode(KeymanCompilerError.CWARN_MixedNormalizationForms));
+    assert.isTrue(testCallbacks.hasMessage(ModelCompilerMessages.WARN_MixedNormalizationForms));
 
     // Let's parse another file:
 
-    this.logHoarder.clear();
+    testCallbacks.clear();
     // Now, parse a DIFFERENT file, but with an NFD entry.
     parseWordListFromContents(repeatedWords, "hello\u0301\t5\n");
-    assert.isTrue(this.logHoarder.hasSeenWarnings())
+    assert.lengthOf(testCallbacks.messages, 1);
     // hello + U+0301 (NFD) has been seen, but...
-    assert.isTrue(this.logHoarder.hasSeenCode(KeymanCompilerError.CWARN_MixedNormalizationForms));
+    assert.isTrue(testCallbacks.hasMessage(ModelCompilerMessages.WARN_MixedNormalizationForms));
     // BUT! We have not seen a duplicate **within the same file**
-    assert.isFalse(this.logHoarder.hasSeenCode(KeymanCompilerError.CWARN_DuplicateWordInSameFile));
+    assert.isFalse(testCallbacks.hasMessage(ModelCompilerMessages.WARN_DuplicateWordInSameFile));
 
     assert.deepEqual(repeatedWords, {
       hello: expected['hello'],

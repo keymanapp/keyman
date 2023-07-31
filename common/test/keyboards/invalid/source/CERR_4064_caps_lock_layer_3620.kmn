@@ -1,0 +1,22 @@
+﻿c caps_lock_layer_3620 generated from template at 2021-11-30 14:58:52
+c with name "Caps Lock Layer 3620"
+store(&VERSION) '10.0'
+store(&NAME) 'Caps Lock Layer 3620'
+store(&COPYRIGHT) '©'
+store(&KEYBOARDVERSION) '1.0'
+store(&TARGETS) 'any'
+store(&VISUALKEYBOARD) 'caps_lock_layer_3620.kvks'
+store(&LAYOUTFILE) 'caps_lock_layer_3620.keyman-touch-layout'
+
+begin Unicode > use(main)
+
+store(key) [K_A] .. [K_Z] [SHIFT K_A] .. [SHIFT K_Z]
+c ***** CERR_ExpansionMustFollowCharacterOrVKey 0x00004064 **********
+store(out)  .. 'z'     'A' .. 'Z'
+c *******************************************************************
+store(&CasedKeys) [K_A] .. [K_Z]
+
+group(main) using keys
+
++ any(key) > index(out, 1)
+

@@ -62,7 +62,7 @@ jobs:
       shell: bash
       run: |
         THIS_SCRIPT="$GITHUB_WORKSPACE/.github/workflows/deb-packaging.yml"
-        . "resources/build/build-utils.sh"
+        . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
         echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
     - name: Set prerelease tag as output parameter
@@ -102,7 +102,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [focal, jammy, kinetic]
+        dist: [focal, jammy, kinetic, lunar]
         arch: [amd64]
 
     runs-on: ubuntu-latest
@@ -113,14 +113,14 @@ jobs:
         path: artifacts
 
     - name: Build
-      uses: sillsdev/gha-ubuntu-packaging@5b56c86ee78598308d864edc55a1d06b4ba36f92 # v0.3
+      uses: sillsdev/gha-ubuntu-packaging@4f3a013ec28f4defc2b3d6ecb04c98815cd9de25 # v0.9
       with:
         dist: "${{ matrix.dist }}"
         platform: "${{ matrix.arch }}"
         source_dir: "artifacts/keyman-srcpkg"
         sourcepackage: "keyman_${{ needs.sourcepackage.outputs.VERSION }}-1.dsc"
-        deb_fullname: $DEBFULLNAME
-        deb_email: $DEBEMAIL
+        deb_fullname: ${{env.DEBFULLNAME}}
+        deb_email: ${{env.DEBEMAIL}}
         prerelease_tag: ${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}
 
     - name: Output resulting .deb files
@@ -159,7 +159,7 @@ jobs:
 
   upload-to-llso:
     name: Upload packages to llso
-    needs: deb_signing
+    needs: [sourcepackage, deb_signing]
     runs-on: self-hosted
     environment: "deploy (linux)"
     if: github.event.client_payload.isTestBuild == 'false'
@@ -192,29 +192,14 @@ jobs:
 
     - name: Upload
       run: |
-        # DEBUG
-        set +x
-
-        ping -c 4 package-drop.psonet
-        cat ~/.dput.cf
-        # DEBUG
-
         case ${{ github.event.client_payload.branch }} in
           stable-*)  destination='' ;;
           beta)      destination='-proposed' ;;
           *)         destination='-experimental' ;;
         esac
 
-        ls -R
-
         echo -e "::group::${COLOR_GREEN}Upload source package"
         cd keyman-srcpkg
-
-        # DEBUG
-        echo "${COLOR_GREEN}Verify signature"
-        gpg --verify *.changes
-        echo "${COLOR_GREEN}dput source package"
-        # DEBUG
 
         dput -U llso:ubuntu/jammy${destination} *_source.changes
         echo "::endgroup::"

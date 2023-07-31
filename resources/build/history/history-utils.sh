@@ -8,7 +8,7 @@ _hu_base_dir=$(dirname "$BASH_SOURCE")/../../..
 . $_hu_base_dir/resources/shellHelperFunctions.sh
 
 _hu_debug() {
-  if [[ $DEBUG == 1 ]]; then echo "$1"; fi
+  if [[ ! -z ${DEBUG+x} ]] && [[ $DEBUG == 1 ]]; then echo "$1"; fi
 }
 
 get_history_file_path() {

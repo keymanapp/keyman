@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
+<keyboard locale="mt" conformsTo="techpreview">
+  <names>
+    <name value="hardware-missing-flick" />
+  </names>
+
+  <keys>
+    <key id="Q" to="Q" flicks="an-undefined-flick-id"/>
+    <key id="W" to="W" flicks="flick0" />
+    <flicks id="flick0">
+        <flick directions="nw se" to="ç" />
+    </flicks>
+  </keys>
+
+  <layers form="iso">
+    <layer id="base">
+      <!-- beware: this is mapping ` and 1! -->
+      <row keys="Q W" />
+    </layer>
+  </layers>
+</keyboard>

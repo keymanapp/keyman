@@ -1,6 +1,26 @@
 import 'mocha';
 import {assert} from 'chai';
-import {unescapeString, UnescapeError} from '../../src/util/util.js';
+import {unescapeString, UnescapeError, isOneChar, toOneChar, unescapeOneQuadString} from '../../src/util/util.js';
+
+describe('test UTF32 functions()', function() {
+  it('should properly categorize strings', () => {
+    [
+      'x',
+      '🙀',
+    ].forEach(s => assert.isTrue(isOneChar(s), `isOneChar(${s})`));
+
+    [
+      'xx',
+      '🙀🙀',
+    ].forEach(s => assert.isFalse(isOneChar(s), `!isOneChar(${s})`));
+  });
+
+  it('should convert to single chars', function() {
+    assert.equal(toOneChar('ħ'), 295);
+    assert.equal(toOneChar('🙀'), 0x1F640);
+    assert.throws(() => toOneChar('ħħħ'), /Not a single char/);
+  });
+});
 
 describe('test unescapeString()', function() {
   it("should correctly handle multi strings", function() {
@@ -34,5 +54,17 @@ describe('test unescapeString()', function() {
 
   it("should throw UnescapeError on invalid escapes", function() {
     assert.throws(() => unescapeString('\\u{110000}'), UnescapeError);
+  });
+});
+
+describe('test unescapeOneQuadString()', () => {
+  it('should be able to convert', () => {
+    // testing that `\u0127` is unescaped correctly (to U+0127: 'ħ')
+    assert.equal(unescapeOneQuadString('\\u0127'), '\u{0127}');
+    // test the fail cases
+  });
+  it('should fail when it needs to fail', () => {
+    assert.throws(() => unescapeOneQuadString(null), null);
+    assert.throws(() => unescapeOneQuadString('\uFFFFFFFFFFFF'));
   });
 });

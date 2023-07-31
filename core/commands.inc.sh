@@ -1,4 +1,7 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
+# no hashbang for .inc.sh
+
+. "$KEYMAN_ROOT/resources/locate_emscripten.inc.sh"
 
 # ----------------------------------------------------------------------------
 # clean
@@ -20,17 +23,11 @@ do_configure() {
   local target=$1
   builder_start_action configure:$target || return 0
 
-  local STANDARD_MESON_ARGS="$MESON_OPTION_keyman_core_tests"
+  local STANDARD_MESON_ARGS="$MESON_OPTION_keyman_core_tests --default-library both"
   local MESON_CROSS_FILE=
 
   if [[ -f "$THIS_SCRIPT_PATH/cross-$target.build" ]]; then
     MESON_CROSS_FILE="--cross-file cross-$target.build"
-  fi
-
-  if [[ $target =~ ^mac ]]; then
-    # On mac, build both dynamic and static libraries; win does the same in build.bat
-    # In the future, we may do this on Linux as well
-    STANDARD_MESON_ARGS="$STANDARD_MESON_ARGS --default-library both"
   fi
 
   builder_heading "======= Configuring $target ======="
@@ -43,11 +40,11 @@ do_configure() {
   fi
 
   if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $CONFIGURATION configure $BUILD_BAT_keyman_core_tests "${builder_extra_params[@]}"
+    cmd //C build.bat $target $BUILDER_CONFIGURATION configure $BUILD_BAT_keyman_core_tests "${builder_extra_params[@]}"
   else
     pushd "$THIS_SCRIPT_PATH" > /dev/null
     # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
-    meson setup "$MESON_PATH" $MESON_CROSS_FILE --werror --buildtype $CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
+    meson setup "$MESON_PATH" $MESON_CROSS_FILE --werror --buildtype $BUILDER_CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
     popd > /dev/null
   fi
 
@@ -62,7 +59,7 @@ do_build() {
   local target=$1
   builder_start_action build:$target || return 0
   if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $CONFIGURATION build "${builder_extra_params[@]}"
+    cmd //C build.bat $target $BUILDER_CONFIGURATION build "${builder_extra_params[@]}"
   elif $MESON_LOW_VERSION; then
     pushd "$MESON_PATH" > /dev/null
     ninja
@@ -81,7 +78,7 @@ do_test() {
   local target=$1
   builder_start_action test:$target || return 0
   if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $CONFIGURATION test "${builder_extra_params[@]}"
+    cmd //C build.bat $target $BUILDER_CONFIGURATION test "${builder_extra_params[@]}"
   else
     meson test -C "$MESON_PATH" "${builder_extra_params[@]}"
   fi
@@ -120,34 +117,6 @@ do_uninstall() {
 # utility functions
 # ----------------------------------------------------------------------------
 
-#
-# We don't want to rely on emcc being on the path, because Emscripten puts far
-# too many things onto the path (in particular for us, node).
-#
-# The following comment suggests that we don't need emcc on the path.
-# https://github.com/emscripten-core/emscripten/issues/4848#issuecomment-1097357775
-#
-# So we try and locate emcc in common locations ourselves. The search pattern
-# is:
-#
-# 1. Look for $EMSCRIPTEN_BASE (our primary emscripten variable), which should
-#    point to the folder that emcc is located in
-# 2. Look for $EMCC which should point to the emcc executable
-# 3. Look for emcc on the path
-#
-locate_emscripten() {
-  if [[ -z ${EMSCRIPTEN_BASE+x} ]]; then
-    if [[ -z ${EMCC+x} ]]; then
-      local EMCC=`which emcc`
-      [[ -z $EMCC ]] && builder_die "locate_emscripten: Could not locate emscripten (emcc) on the path or with \$EMCC or \$EMSCRIPTEN_BASE"
-    fi
-    [[ -x $EMCC ]] || builder_die "locate_emscripten: Variable EMCC ($EMCC) does not point to a valid executable emcc"
-    EMSCRIPTEN_BASE="$(dirname "$EMCC")"
-  fi
-
-  [[ -x ${EMSCRIPTEN_BASE}/emcc ]] || builder_die "locate_emscripten: Variable EMSCRIPTEN_BASE ($EMSCRIPTEN_BASE) does not point to emcc's folder"
-}
-
 build_meson_cross_file_for_wasm() {
   if [ $BUILDER_OS == win ]; then
     local R=$(cygpath -w $(echo $EMSCRIPTEN_BASE) | sed 's_\\_\\\\_g')
@@ -165,6 +134,8 @@ build_meson_cross_file_for_wasm() {
 #     This link.exe is not a linker.
 #     You may need to reorder entries to your %PATH% variable to resolve this.
 #
+# TODO: is this still required with meson 1.0?
+#
 
 cleanup_visual_studio_path() {
   local _split_path _new_path=""
@@ -174,7 +145,6 @@ cleanup_visual_studio_path() {
       _new_path="$_new_path:$p"
     fi
   done
-  echo
   PATH="${_new_path:1}"
   unset VSINSTALLDIR
 }

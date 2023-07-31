@@ -1,6 +1,57 @@
 {
   "name": "keyman",
   "description": "Facilitates text input in any language.",
+  "exports": {
+    "./app/browser": {
+      "types": "./build/app/browser/obj/test-index.d.js",
+      "import": "./build/app/browser/obj/test-index.js"
+    },
+    "./engine/attachment": {
+      "types": "./build/engine/attachment/obj/index.d.ts",
+      "import": "./build/engine/attachment/obj/index.js"
+    },
+    "./engine/paths": {
+      "types": "./build/engine/paths/obj/index.d.ts",
+      "import": "./build/engine/paths/obj/index.js"
+    },
+    "./engine/device-detect": {
+      "types": "./build/engine/device-detect/obj/index.d.ts",
+      "import": "./build/engine/device-detect/obj/index.js"
+    },
+    "./engine/dom-utils": {
+      "types": "./build/engine/dom-utils/obj/index.d.ts",
+      "import": "./build/engine/dom-utils/obj/index.js"
+    },
+    "./engine/element-wrappers": {
+      "types": "./build/engine/element-wrappers/obj/index.d.ts",
+      "import": "./build/engine/element-wrappers/obj/index.js"
+    },
+    "./engine/events": {
+      "types": "./build/engine/events/obj/index.d.ts",
+      "import": "./build/engine/events/obj/index.js"
+    },
+    "./engine/package-cache": {
+      "types": "./build/engine/package-cache/obj/index.d.ts",
+      "import": "./build/engine/package-cache/obj/index.js",
+      "require": "./build/engine/package-cache/obj/index.js"
+    },
+    "./engine/package-cache/dom-requester": {
+      "types": "./build/engine/package-cache/obj/domCloudRequester.d.ts",
+      "import": "./build/engine/package-cache/obj/domCloudRequester.js"
+    },
+    "./engine/package-cache/node-requester": {
+      "types": "./build/engine/package-cache/obj/nodeCloudRequester.d.ts",
+      "import": "./build/engine/package-cache/obj/nodeCloudRequester.js"
+    },
+    "./engine/main": {
+      "types": "./build/engine/main/obj/index.d.ts",
+      "import": "./build/engine/main/obj/index.js"
+    },
+    "./engine/osk": {
+      "types": "./build/engine/osk/obj/index.d.ts",
+      "import": "./build/engine/osk/obj/index.js"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/keymanapp/keyman.git"
@@ -20,8 +71,8 @@
     "@keymanapp/resources-gosh": "*",
     "@keymanapp/web-sentry-manager": "*",
     "@sentry/cli": "2.2.0",
+    "c8": "^7.12.0",
     "chai": "^4.3.4",
-    "google-closure-compiler-java": "^20200224.0.0",
     "karma": "^6.4.1",
     "karma-browserstack-launcher": "^1.6.0",
     "karma-chai": "^0.1.0",
@@ -42,12 +93,7 @@
     "typescript": "^4.9.5"
   },
   "scripts": {
-    "tsc": "tsc",
-    "test": "gosh ./test.sh",
-    "karma": "karma",
-    "mocha": "mocha",
-    "modernizr": "modernizr",
-    "sentry-cli": "sentry-cli"
+    "test": "gosh ./test.sh"
   },
   "dependencies": {
     "@keymanapp/input-processor": "*",
@@ -56,8 +102,11 @@
     "@keymanapp/lexical-model-layer": "*",
     "@keymanapp/models-types": "*",
     "@keymanapp/recorder-core": "*",
+    "@keymanapp/tslib": "*",
     "@keymanapp/web-utils": "*",
     "@types/node": "^11.9.4",
-    "eventemitter3": "^4.0.0"
-  }
+    "eventemitter3": "^4.0.0",
+    "tslib": "^2.5.2"
+  },
+  "type": "module"
 }

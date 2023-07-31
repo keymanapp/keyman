@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 #include <stdint.h>
 
@@ -21,30 +22,31 @@
 #define KMX_64BIT
 #endif
 
-typedef uint32_t            KMX_DWORD;
-typedef int32_t             KMX_BOOL;
-typedef uint8_t             KMX_BYTE;
-typedef uint16_t            KMX_WORD;
+typedef uint32_t   KMX_DWORD;
+typedef int32_t    KMX_BOOL;
+typedef uint8_t    KMX_BYTE;
+typedef uint16_t   KMX_WORD;
 
 #if defined(__cplusplus)
 typedef char16_t   km_kbp_cp;
 typedef char32_t   km_kbp_usv;
 #else
-typedef uint16_t    km_kbp_cp;          // code point
-typedef uint32_t    km_kbp_usv;         // Unicode Scalar Value
+typedef uint16_t   km_kbp_cp;          // code point
+typedef uint32_t   km_kbp_usv;         // Unicode Scalar Value
 #endif
 
-typedef km_kbp_cp KMX_WCHAR;    // wc,   16-bit UNICODE character
-typedef KMX_WCHAR *PKMX_WCHAR;
+typedef km_kbp_cp  KMX_WCHAR;    // wc,   16-bit UNICODE character
+typedef KMX_WCHAR* PKMX_WCHAR;
 
-typedef char KMX_CHAR;
-typedef KMX_CHAR *PKMX_CHAR;
+typedef char       KMX_CHAR;
+typedef char*      PKMX_STR;
+typedef KMX_CHAR*  PKMX_CHAR;
 
-typedef uint32_t             KMX_UINT;
+typedef uint32_t   KMX_UINT;
 
-typedef KMX_BYTE *PKMX_BYTE;
-typedef KMX_WORD *PKMX_WORD;
-typedef KMX_DWORD *PKMX_DWORD;
+typedef KMX_BYTE*  PKMX_BYTE;
+typedef KMX_WORD*  PKMX_WORD;
+typedef KMX_DWORD* PKMX_DWORD;
 
 #ifndef FALSE
 #define FALSE               0

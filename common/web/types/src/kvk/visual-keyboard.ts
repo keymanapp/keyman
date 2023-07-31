@@ -4,14 +4,14 @@
 // Corresponds to .kvk / .kvks file data
 //
 
-import { BUILDER_KVK_SHIFT_STATE, BUILDER_KVK_HEADER_FLAGS, BUILDER_KVK_KEY_FLAGS } from "./kvk-file";
+import { BUILDER_KVK_SHIFT_STATE, BUILDER_KVK_HEADER_FLAGS, BUILDER_KVK_KEY_FLAGS } from "./kvk-file.js";
 
 export class VisualKeyboard {
   header: VisualKeyboardHeader = {flags: 0, ansiFont:{}, unicodeFont:{}, underlyingLayout: undefined};
   keys: VisualKeyboardKey[] = [];
 };
 
-export { BUILDER_KVK_HEADER_FLAGS as VisualKeyboardHeaderFlags } from "./kvk-file";
+export { BUILDER_KVK_HEADER_FLAGS as VisualKeyboardHeaderFlags } from "./kvk-file.js";
 
 export class VisualKeyboardHeader {
   version?: number;                      // 0x0600

@@ -31,7 +31,7 @@ function debug_echo() {
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "${THIS_SCRIPT%/*}/trigger-definitions.inc.sh"
@@ -90,7 +90,7 @@ fi
 #
 
 echo ". Get information about pull request #$PRNUM from GitHub"
-prinfo=`curl -s -H "User-Agent: @keymanapp" https://api.github.com/repos/keymanapp/keyman/pulls/$PRNUM`
+prinfo=`curl -s -H "User-Agent: @keymanapp" -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/repos/keymanapp/keyman/pulls/$PRNUM`
 prbase=`echo ${prinfo} | "$JQ" -r '.base.ref'`
 prhead=`echo ${prinfo} | "$JQ" -r '.head.ref'`
 prbaserepo=`echo ${prinfo} | "$JQ" -r '.base.repo.html_url'`

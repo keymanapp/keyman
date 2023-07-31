@@ -1,2 +1,4 @@
-[properties]
-root = '$EMSCRIPTEN_BASE/system'
+[binaries]
+c = ['$EMSCRIPTEN_BASE/emcc.py']
+cpp = ['$EMSCRIPTEN_BASE/em++.py']
+ar = ['$EMSCRIPTEN_BASE/emar.py']

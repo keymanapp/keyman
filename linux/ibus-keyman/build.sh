@@ -19,14 +19,12 @@ builder_describe \
   "test" \
   "install                   install artifacts" \
   "uninstall                 uninstall artifacts" \
-  "--debug,-d                Debug build"
-# We can't yet depend on core until it moved to the new build.sh syntax
-# (currently it doesn't know some parameters that we're passing)
-#  "@/core configure build"
+  "@/core:arch" \
+  "--no-integration          don't run integration tests"
 
 builder_parse "$@"
 
-if builder_has_option --debug; then
+if builder_is_debug_build; then
   MESON_TARGET=debug
   export CPPFLAGS=-DG_MESSAGES_DEBUG
   export CFLAGS="-O0"
@@ -36,10 +34,11 @@ else
 fi
 MESON_PATH="../build/$(uname -m)/$MESON_TARGET"
 
+cd "$THIS_SCRIPT_PATH"
+
 builder_describe_outputs \
   configure "${MESON_PATH}/build.ninja" \
-  build "${MESON_PATH}/src/ibus-engine-keyman" \
-  build "${MESON_PATH}/tests/ibus-keyman-tests"
+  build "${MESON_PATH}/src/ibus-engine-keyman"
 
 if builder_start_action clean; then
   rm -rf "$THIS_SCRIPT_PATH/../build/"
@@ -54,25 +53,29 @@ if builder_start_action configure; then
 fi
 
 if builder_start_action build; then
-  cd "$MESON_PATH"
+  cd "$THIS_SCRIPT_PATH/$MESON_PATH"
   ninja
   builder_finish_action success build
 fi
 
 if builder_start_action test; then
-  cd "$MESON_PATH"
-  meson test --print-errorlogs $builder_verbose
+  cd "$THIS_SCRIPT_PATH/$MESON_PATH"
+  if builder_has_option --no-integration; then
+    meson test --print-errorlogs $builder_verbose keymanutil-tests print-kmpdetails-test print-kmp-test
+  else
+    meson test --print-errorlogs $builder_verbose
+  fi
   builder_finish_action success test
 fi
 
 if builder_start_action install; then
-  cd "$MESON_PATH"
+  cd "$THIS_SCRIPT_PATH/$MESON_PATH"
   ninja install
   builder_finish_action success install
 fi
 
 if builder_start_action uninstall; then
-  cd "$MESON_PATH"
+  cd "$THIS_SCRIPT_PATH/$MESON_PATH"
   ninja uninstall
   builder_finish_action success uninstall
 fi

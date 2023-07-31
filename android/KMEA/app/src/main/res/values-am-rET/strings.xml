@@ -168,5 +168,5 @@
     <!-- Context: Other strings -->
     <string name="help_bubble_text">የፊደል ገበታውን ለመቀየር እዚህ ጋር ንካ</string>
     <!-- Context: anywhere -->
-    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">ብራውሰሩን ማስጀመር አልተቻለም</string>
 </resources>

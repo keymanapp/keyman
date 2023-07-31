@@ -105,6 +105,7 @@ type
     gbServer: TGroupBox;
     chkListLocalURLs: TCheckBox;
     cmdConfigureServer: TButton;
+    chkUseLegacyCompiler: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
     procedure cmdDefaultFontClick(Sender: TObject);
@@ -193,6 +194,8 @@ begin
     chkDebuggerAutoResetBeforeCompiling.Checked := DebuggerAutoResetBeforeCompiling;
     chkAutoSaveBeforeCompiling.Checked :=          AutoSaveBeforeCompiling;
     chkOSKAutoSaveBeforeImporting.Checked :=       OSKAutoSaveBeforeImporting;
+
+    chkUseLegacyCompiler.Checked := UseLegacyCompiler;
 
     chkCharMapAutoLookup.Checked := CharMapAutoLookup;
     chkCharMapDisableDatabaseLookups.Checked := CharMapDisableDatabaseLookups;
@@ -294,6 +297,8 @@ begin
     DebuggerAutoResetBeforeCompiling := chkDebuggerAutoResetBeforeCompiling.Checked;
     AutoSaveBeforeCompiling          := chkAutoSaveBeforeCompiling.Checked;
     OSKAutoSaveBeforeImporting       := chkOSKAutoSaveBeforeImporting.Checked;
+
+    UseLegacyCompiler := chkUseLegacyCompiler.Checked;
 
     ServerUseLocalAddresses := chkListLocalURLs.Checked;
 

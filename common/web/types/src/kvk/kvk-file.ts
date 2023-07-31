@@ -5,6 +5,7 @@ import * as r from 'restructure';
 //
 
 export const BUILDER_KVK_HEADER_IDENTIFIER = 0x464B564B; // 'KVKF', little-endian
+export const KVK_HEADER_IDENTIFIER_BYTES = [0x4B, 0x56, 0x4B, 0x46];
 export const BUILDER_KVK_HEADER_VERSION    = 0x0600;     // Keyman 6.0
 
 export interface BUILDER_KVK_STRING {

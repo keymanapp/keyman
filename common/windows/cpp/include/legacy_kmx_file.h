@@ -346,6 +346,7 @@ static_assert(sizeof(COMP_STORE) == KEYBOARDFILESTORE_SIZE, "COMP_STORE must be 
 
 struct COMP_KEY {
 	WORD Key;
+	WORD _reserved;
 	DWORD Line;
 	DWORD ShiftFlags;
 	DWORD dpOutput;
@@ -404,9 +405,17 @@ typedef COMP_STORE *PCOMP_STORE;
 typedef COMP_KEY *PCOMP_KEY;
 typedef COMP_GROUP *PCOMP_GROUP;
 
+
+typedef struct _COMPILER_OPTIONS {
+  DWORD dwSize;
+  BOOL ShouldAddCompilerVersion;
+} COMPILER_OPTIONS;
+
+typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
+
 typedef int (CALLBACK *CompilerMessageProc)(int line, DWORD dwMsgCode, LPSTR szText);
 
-extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL FSaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc);   // I4865   // I4866
+//extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL FSaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc);   // I4865   // I4866
 
 #endif		// _COMPILER_H
 

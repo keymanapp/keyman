@@ -1,11 +1,18 @@
 import 'mocha';
 import * as fs from 'fs';
-import {assert} from 'chai';
-
-import KmpCompiler from '../src/kmp-compiler.js';
-import {makePathToFixture} from './helpers/index.js';
+import { assert } from 'chai';
 import JSZip from 'jszip';
-import KEYMAN_VERSION from "@keymanapp/keyman-version/keyman-version.mjs";
+
+import KEYMAN_VERSION from "@keymanapp/keyman-version";
+import { KmpJsonFile } from '@keymanapp/common-types';
+import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
+
+import { makePathToFixture } from './helpers/index.js';
+
+import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
+import { CompilerMessages } from '../src/compiler/messages.js';
+
+const debug = false;
 
 describe('KmpCompiler', function () {
   const MODELS : string[] = [
@@ -13,7 +20,8 @@ describe('KmpCompiler', function () {
     'withfolders.qaa.sencoten',
   ];
 
-  let kmpCompiler = new KmpCompiler();
+  const callbacks = new TestCompilerCallbacks();
+  let kmpCompiler = new KmpCompiler(callbacks);
 
   for (let modelID of MODELS) {
     const kpsPath = modelID.includes('withfolders') ?
@@ -32,11 +40,10 @@ describe('KmpCompiler', function () {
     // Test just the transform from kps to kmp.json
     //
     it(`should transform ${modelID}.model.kps to kmp.json`, function () {
-      let source = fs.readFileSync(kpsPath, 'utf-8');
-      let kmpJson: KmpJsonFile;
+      let kmpJson: KmpJsonFile.KmpJsonFile;
 
       assert.doesNotThrow(() => {
-        kmpJson = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
+        kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
       });
 
       // Test that the kmp.json data is identical
@@ -50,10 +57,9 @@ describe('KmpCompiler', function () {
       //fs.writeFileSync(kmpJsonPath, JSON.stringify(kmpJson), 'utf-8');
     });
     it(`should build a full .kmp for ${modelID}`, async function() {
-      const source = fs.readFileSync(kpsPath, 'utf-8');
       const zip = JSZip();
       // Build kmp.json in memory
-      const kmpJson: KmpJsonFile = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
+      const kmpJson: KmpJsonFile.KmpJsonFile = kmpCompiler.transformKpsToKmpObject(kpsPath);
       // Build file.kmp in memory
       const promise = kmpCompiler.buildKmpFile(kpsPath, kmpJson);
       promise.then(data => {
@@ -77,20 +83,20 @@ describe('KmpCompiler', function () {
   }
 
   it('should generates a valid .kmp (zip) file', async function() {
-    // const kmpPath = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    this.timeout(10000); // building a zip file can sometimes be slow
+
     const kpsPath = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
     const kmpJsonRefPath = makePathToFixture('khmer_angkor', 'ref', 'kmp.json');
 
-    const kmpCompiler = new KmpCompiler();
-    const source = fs.readFileSync(kpsPath, 'utf-8');
-    const kmpJsonFixture: KmpJsonFile = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
+    const kmpCompiler = new KmpCompiler(callbacks);
+    const kmpJsonFixture: KmpJsonFile.KmpJsonFile = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
 
     // We override the fixture version so that we can compare with the compiler output
     kmpJsonFixture.system.keymanDeveloperVersion = KEYMAN_VERSION.VERSION;
 
     let kmpJson = null;
     assert.doesNotThrow(() => {
-      kmpJson = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
+      kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
     });
 
     const kmpData = await kmpCompiler.buildKmpFile(kpsPath, kmpJson);
@@ -116,4 +122,30 @@ describe('KmpCompiler', function () {
     assert.deepEqual(kmpJsonData, kmpJsonFixture);
   });
 
+  /*
+   * Testing Warnings and Errors
+   */
+
+  it('should warn on absolute paths', async function() {
+    this.timeout(10000); // building a zip file can sometimes be slow
+
+    callbacks.clear();
+
+    const kpsPath = makePathToFixture('absolute_path', 'source', 'absolute_path.kps');
+    const kmpCompiler = new KmpCompiler(callbacks);
+
+    let kmpJson: KmpJsonFile.KmpJsonFile = null;
+
+    assert.doesNotThrow(() => {
+      kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
+    });
+
+    await assert.isNull(kmpCompiler.buildKmpFile(kpsPath, kmpJson));
+
+    if(debug) callbacks.printMessages();
+
+    assert.lengthOf(callbacks.messages, 2);
+    assert.deepEqual(callbacks.messages[0].code, CompilerMessages.WARN_AbsolutePath);
+    assert.deepEqual(callbacks.messages[1].code, CompilerMessages.ERROR_FileDoesNotExist);
+  });
 });

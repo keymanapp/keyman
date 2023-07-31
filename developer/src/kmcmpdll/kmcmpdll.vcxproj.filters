@@ -7,7 +7,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="comperr.h">
+    <ClInclude Include="$(KEYMAN_ROOT)\developer\src\common\include\kmn_compiler_errors.h">
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="compfile.h">

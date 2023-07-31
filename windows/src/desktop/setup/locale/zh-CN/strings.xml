@@ -72,9 +72,7 @@
   <string name="ssDownloadingTitle">正在下载 %0:s</string>
   <!-- Parameters: %0:s: filename -->
   <string name="ssDownloadingText">正在下载 %0:s</string>
-  <string name="ssOffline">$APPNAME 安装程序无法连接到 keyman.com 下载额外资源。
-
-请检查您是否在线，并在防火墙设置中授予 $APPNAME 访问互联网的权限。
-
-点击中止退出设置，点击重试以重新下载资源，或者点击忽略以离线继续。</string>
+  <string name="ssOffline">$APPNAME 安装程序无法连接到 keyman.com 下载额外资源。</string>
+  <string name="ssOffline2">请检查您是否在线，并在防火墙设置中授予 $APPNAME 访问互联网的权限。</string>
+  <string name="ssOffline3">点击中止退出设置，点击重试以重新下载资源，或者点击忽略以离线继续。</string>
 </resources>

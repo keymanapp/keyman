@@ -1,0 +1,3 @@
+store(&NAME) "nokeyboardversion"
+store(&VERSION) "10.0"
+c no &keyboardversion store!

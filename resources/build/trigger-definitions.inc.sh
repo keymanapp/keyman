@@ -3,7 +3,7 @@
 # This file maps specific paths to build triggers
 #
 
-available_platforms=(android ios linux mac web windows developer)
+available_platforms=(android common_web common_windows common_mac common_linux ios linux mac web windows developer)
 
 # the base folder for each pattern does not need to be included, nor oem folders
 # e.g. android='common/models|common/predictive-text'
@@ -16,6 +16,16 @@ watch_mac='core'
 watch_web='common/models|common/predictive-text|common/web|core'
 watch_windows='common|core|web'
 watch_developer='common|core|web'
+
+# Note, currently common_web build is a no-op because we rely on running the web
+# tests on all three of our build platforms as seen below
+watch_common_web='common/web'
+# Currently, we run web tests on all three of our build platforms, to ensure
+# that they work in all our environments. So we need to include common/web in
+# the matches for these
+watch_common_windows='common/windows|common/web'
+watch_common_mac='common/mac|common/web'
+watch_common_linux='common/linux|common/web'
 
 #
 # Available build configurations and VCS identifiers; identifiers are somewhat inconsistent due
@@ -36,11 +46,17 @@ bc_test_all=()
 
 bc_test_android=(KeymanAndroid_TestPullRequests KeymanAndroid_TestSamplesAndTestProjects)
 bc_test_ios=(Keyman_iOS_TestPullRequests Keyman_iOS_TestSamplesAndTestProjects)
-bc_test_linux=(KeymanLinux_TestPullRequests Keyman_Common_KPAPI_TestPullRequests_Linux pipeline-keyman-packaging_Jenkins deb-pr-packaging_GitHub)
+bc_test_linux=(KeymanLinux_TestPullRequests Keyman_Linux_Test_Integration Keyman_Common_KPAPI_TestPullRequests_Linux pipeline-keyman-packaging_Jenkins deb-pr-packaging_GitHub)
 bc_test_mac=(Keyman_KeymanMac_PullRequests Keyman_Common_KPAPI_TestPullRequests_macOS)
 bc_test_windows=(KeymanDesktop_TestPullRequests KeymanDesktop_TestPrRenderOnScreenKeyboards Keyman_Common_KPAPI_TestPullRequests_Windows)
 bc_test_web=(Keymanweb_TestPullRequests Keyman_Common_LMLayer_TestPullRequests Keyman_Common_KPAPI_TestPullRequests_WASM)
 bc_test_developer=(Keyman_Developer_Test)
+
+bc_test_common_web=(Keyman_Test_Common_Web)
+bc_test_common_windows=(Keyman_Test_Common_Windows)
+bc_test_common_mac=(Keyman_Test_Common_Mac)
+bc_test_common_linux=(Keyman_Test_Common_Linux)
+
 # Keymanweb_TestPullRequestRegressions : currently this is timing out so disabled until we have
 #                                        time to investigate further
 

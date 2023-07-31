@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>15.0.266.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Options>
+    <FollowKeyboardVersion/>
+  </Options>
+  <StartMenu>
+    <Folder></Folder>
+    <Items/>
+  </StartMenu>
+  <Info>
+    <Name URL="">Khmer Angkor</Name>
+    <Copyright URL="">© 2015-2022 SIL International</Copyright>
+    <Author URL="mailto:makara_sok@sil.org">Makara Sok</Author>
+    <Version URL=""></Version>
+    <WebSite URL="https://keyman.com/keyboards/khmer_angkor">https://keyman.com/keyboards/khmer_angkor</WebSite>
+  </Info>
+  <Files>
+    <File>
+      <Name>nokeyboardversion.kmx</Name>
+      <Description>Keyboard Khmer Angkor</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>Khmer Angkor</Name>
+      <ID>nokeyboardversion</ID>
+      <Version>1.3</Version>
+      <Languages>
+        <Language ID="km">Central Khmer (Khmer, Cambodia)</Language>
+      </Languages>
+    </Keyboard>
+  </Keyboards>
+  <Strings/>
+</Package>

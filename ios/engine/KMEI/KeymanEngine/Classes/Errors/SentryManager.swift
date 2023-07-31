@@ -167,7 +167,7 @@ public class SentryManager {
   public static func breadcrumbAndLog(crumb: Sentry.Breadcrumb, logLevel: XCGLogger.Level? = nil) {
     // Guarded in case a library consumer decides against initializing Sentry.
     if _started {
-      SentrySDK.addBreadcrumb(crumb: crumb)
+      SentrySDK.addBreadcrumb(crumb)
     }
 
     let level = logLevel ?? mapLoggingLevel(crumb.level)
@@ -193,7 +193,7 @@ public class SentryManager {
   }
 
   public static func forceError() {
-    SentrySDK.addBreadcrumb(crumb: Sentry.Breadcrumb(level: .info, category: "Deliberate testing error"))
+    SentrySDK.addBreadcrumb(Sentry.Breadcrumb(level: .info, category: "Deliberate testing error"))
     SentrySDK.crash()
   }
 }

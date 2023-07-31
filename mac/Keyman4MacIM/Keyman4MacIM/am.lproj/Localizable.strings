@@ -68,4 +68,4 @@
 "copyright-label" = "የባለቤትነት መብት፦";
 
 /* message displayed to alert user to need grant accessibility permission */
-"privacy-alert-text" = "To function properly, Keyman requires accessibility features:\n\nGrant access in System Preferences, Security & Privacy.\nRestart your system.";
+"privacy-alert-text" = "ኪይማን በአግባቡ ለመስራት የተደራሽነት ባህሪያትን ይፈልጋል፦ \n\nበስርዓት ምርጫዎች፣ ደህንነት እና ግላዊነት ውስጥ መዳረሻ ፍቀድ። \nስርዓት እንደገና አስጀምር።";

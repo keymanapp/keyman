@@ -1,4 +1,5 @@
-import Ajv from "ajv";
+import { default as AjvModule } from 'ajv';
+const Ajv = AjvModule.default; // The actual expected Ajv type.
 import { TouchLayoutFile } from "./keyman-touch-layout-file.js";
 
 export class TouchLayoutFileReader {

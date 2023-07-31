@@ -10,23 +10,19 @@
 # DIST="<dist>" only upload for this distribution
 # PACKAGEVERSION="<version>" string to append to the package version. Default to "1~sil1"
 
-set -e
+set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+# shellcheck source=resources/build/build-utils.sh
 . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. $(dirname "$THIS_SCRIPT")/package-build.inc.sh
+# shellcheck source=linux/scripts/package-build.inc.sh
+. "$(dirname "$THIS_SCRIPT")/package-build.inc.sh"
 
 checkPrerequisites
-
-if [ "${UPLOAD}" == "yes" ]; then
-    SIM=""
-else
-    SIM="-s"
-fi
 
 if [ "${TIER}" == "stable" ]; then
     ppa="ppa:keymanapp/keyman"
@@ -37,32 +33,22 @@ else
 fi
 echo "ppa: ${ppa}"
 
-if [ "${DIST:-}" != "" ]; then
-    distributions="${DIST}"
-else
-    distributions="focal jammy kinetic"
-fi
-
-if [ "${PACKAGEVERSION:-}" != "" ]; then
-    packageversion="${PACKAGEVERSION}"
-else
-    packageversion="1~sil1"
-fi
-
+distributions="${DIST:-focal jammy kinetic lunar}"
+packageversion="${PACKAGEVERSION:-1~sil1}"
 
 BASEDIR=$(pwd)
 
 rm -rf launchpad
 mkdir -p launchpad
 
-for proj in ${projects}; do
+for proj in ${projects:-}; do
     downloadSource launchpad
 
-    cd "${proj}-${version}"
+    cd "${proj}-${version:-}"
     pwd
-    cp debian/changelog ../${proj}-changelog
+    cp debian/changelog "../${proj}-changelog"
     for dist in ${distributions}; do
-        cp ../${proj}-changelog debian/changelog
+        cp "../${proj}-changelog" debian/changelog
         dch -v "${version}-${packageversion}~${dist}" "source package for PPA"
         dch -D "${dist}" -r ""
         debuild -d -S -sa -Zxz

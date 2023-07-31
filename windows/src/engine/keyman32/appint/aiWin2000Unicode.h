@@ -1,18 +1,18 @@
 /*
   Name:             aiWin2000Unicode
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      27 Jan 2009
 
   Modified Date:    23 Jun 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:                        
+  Bugs:
+  Todo:
+  Notes:
   History:          27 Jan 2009 - mcdurdin - I1797 - Add fallback for AIWin2000 app integration
                     11 Dec 2009 - mcdurdin - I934 - x64 - Initial version
                     24 Jun 2010 - mcdurdin - I2436 - Add space to context for AIWin2000Unicode when not matched
@@ -43,7 +43,7 @@ public:
 	virtual BOOL QueueAction(int ItemType, DWORD dwData);
 
 	/* Information functions */
-  
+
 	virtual BOOL CanHandleWindow(HWND ahwnd);
 	virtual BOOL IsWindowHandled(HWND ahwnd);
 	virtual BOOL HandleWindow(HWND ahwnd);
@@ -59,9 +59,8 @@ public:
   virtual void SetContext(const WCHAR* buf);
 
 	/* Queue and sending functions */
-  
+
 	virtual BOOL SendActions();   // I4196
-	virtual BOOL QueueDebugInformation(int ItemType, LPGROUP Group, LPKEY Rule, PWSTR fcontext, PWSTR foutput, DWORD_PTR dwExtraFlags);
 };
 
 #endif

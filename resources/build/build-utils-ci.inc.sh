@@ -68,8 +68,12 @@ function builder_pull_has_label() {
 # parameter, will do a dry run
 #
 # Note that `package.json` will be dirty after this command, as the `version`
-# field will be added to it. This change should not be committed to the
-# repository.
+# field will be added to it, and @keymanapp dependency versions will also be
+# modified. This change should not be committed to the repository.
+#
+# builder_publish_to_pack and builder_publish_to_npm are similar:
+#  * builder_publish_to_npm publishes to the public registry
+#  * builder_publish_to_pack creates a local tarball which can be used to test
 #
 # Usage:
 # ```bash
@@ -77,6 +81,15 @@ function builder_pull_has_label() {
 # ```
 #
 function builder_publish_to_npm() {
+  _builder_publish_npm_package publish
+}
+
+function builder_publish_to_pack() {
+  _builder_publish_npm_package pack
+}
+
+function _builder_publish_npm_package() {
+  local action=$1
   local dist_tag=$TIER dry_run=
 
   if [[ $TIER == stable ]]; then
@@ -87,17 +100,50 @@ function builder_publish_to_npm() {
     dry_run=--dry-run
   fi
 
-  # We use --no-git-tag-version because our CI system controls version numbering and
-  # already tags releases. We also want to have the version of this match the
-  # release of Keyman Developer -- these two versions should be in sync. Because this
-  # is a large repo with multiple projects and build systems, it's better for us that
-  # individual build systems don't take too much ownership of git tagging. :)
-  npm version --allow-same-version --no-git-tag-version --no-commit-hooks "$VERSION_WITH_TAG"
+  _builder_write_npm_version
 
-  # Note: In either case, npm publish MUST be given --access public to publish
-  # a package in the @keymanapp scope on the public npm package index.
+  # Note: In either case, npm publish MUST be given --access public to publish a
+  # package in the @keymanapp scope on the public npm package index.
   #
   # See `npm help publish` for more details.
-  echo "Publishing $dry_run npm package $THIS_SCRIPT_IDENTIFIER with tag $dist_tag"
-  npm publish $dry_run --access public --tag $dist_tag
+  if [[ $action == pack ]]; then
+    # We can use --publish-to-pack to locally test a package
+    # before publishing to the package registry
+    echo "Packing $dry_run npm package $THIS_SCRIPT_IDENTIFIER with tag $dist_tag"
+    npm pack $dry_run --access public --tag $dist_tag
+  else # $action == publish
+    echo "Publishing $dry_run npm package $THIS_SCRIPT_IDENTIFIER with tag $dist_tag"
+    npm publish $dry_run --access public --tag $dist_tag
+  fi
+}
+
+function _builder_write_npm_version() {
+  # We use --no-git-tag-version because our CI system controls version numbering
+  # and already tags releases. We also want to have the version of this match
+  # the release of Keyman Developer -- these two versions should be in sync.
+  # Because this is a large repo with multiple projects and build systems, it's
+  # better for us that individual build systems don't take too much ownership of
+  # git tagging. :)
+  if ! "$JQ" -e '.version' package.json > /dev/null; then
+    pushd "$KEYMAN_ROOT" > /dev/null
+    npm version --allow-same-version --no-git-tag-version --no-commit-hooks --workspaces "$VERSION_WITH_TAG"
+    popd > /dev/null
+  fi
+
+  # Updates all @keymanapp/* [*]dependencies in all package.jsons to the current
+  # version-with-tag, so that the published version has precise dependencies, and
+  # we don't accidentally end up with either older or newer deps. This overwrites
+  # the local package.json files, so they do need to be restored afterwards
+  find "$KEYMAN_ROOT" -name "package.json" -not -path '*/node_modules/*' -print0 | \
+    while IFS= read -r -d '' line; do
+      cat "$line" | "$JQ" --arg VERSION_WITH_TAG "$VERSION_WITH_TAG" \
+        '
+          . +
+          (try { dependencies: (.dependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {}) +
+          (try { devDependencies: (.devDependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {}) +
+          (try { bundleDependencies: (.bundleDependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {}) +
+          (try { optionalDependencies: (.optionalDependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {})
+        ' > "${line}_"
+      mv -f "${line}_" "$line"
+    done
 }

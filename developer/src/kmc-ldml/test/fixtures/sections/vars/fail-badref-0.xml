@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
+<keyboard locale="mt" conformsTo="techpreview">
+  <names>
+    <name value="vars-fail" />
+  </names>
+
+  <keys />
+
+  <!-- from spec -->
+  <variables>
+    <string id="y" value="${yes}" /> <!-- FAIL: bad back reference-->
+  </variables>
+
+
+</keyboard>

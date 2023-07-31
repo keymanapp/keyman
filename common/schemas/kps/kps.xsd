@@ -126,7 +126,6 @@
                 <xs:all>
                   <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" />
                   <xs:element minOccurs="0" maxOccurs="1" name="ID" type="xs:string" />
-                  <xs:element minOccurs="0" maxOccurs="1" name="Version" type="xs:string" />
                   <xs:element minOccurs="0" maxOccurs="1" name="RTL" type="xs:string" />
                   <xs:element minOccurs="0" maxOccurs="1" name="Languages" type="km-keyboard-languages" />
                 </xs:all>

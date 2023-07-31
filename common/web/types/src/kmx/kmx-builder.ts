@@ -1,67 +1,7 @@
 import * as r from 'restructure';
-import { KMXFile, GROUP, KEY, STORE } from './kmx.js';
+import { KMXFile, GROUP, KEY, STORE, BUILDER_COMP_KEYBOARD, BUILDER_COMP_KEYBOARD_KMXPLUSINFO, BUILDER_COMP_STORE, BUILDER_COMP_GROUP, BUILDER_COMP_KEY } from './kmx.js';
 import { KMXPlusFile } from './kmx-plus.js';
 import KMXPlusBuilder from './kmx-plus-builder/kmx-plus-builder.js';
-
-// These type-checking structures are here to ensure that
-// we match the structures from kmx.ts in the generator
-//
-// They are used internally when building a .kmx file
-
-interface BUILDER_COMP_KEYBOARD {
-  dwIdentifier: number;
-  dwFileVersion: number;
-  dwCheckSum: number;
-  KeyboardID: number;
-  IsRegistered: number;
-  version: number;
-
-  cxStoreArray: number;
-  cxGroupArray: number;
-
-  dpStoreArray: number;
-  dpGroupArray: number;
-
-  StartGroup_ANSI: number;
-  StartGroup_Unicode: number;
-
-  dwFlags: number;
-
-  dwHotKey: number;
-
-  dpBitmapOffset: number;
-  dwBitmapSize: number;
-};
-
-interface BUILDER_COMP_KEYBOARD_KMXPLUSINFO {
-  dpKMXPlus: number;
-  dwKMXPlusSize: number;
-};
-
-interface BUILDER_COMP_STORE {
-  dwSystemID: number;
-  dpName: number;
-  dpString: number;
-};
-
-interface BUILDER_COMP_KEY {
-  Key: number;
-  _padding: number;
-  Line: number;
-  ShiftFlags: number;
-  dpOutput: number;
-  dpContext: number;
-};
-
-interface BUILDER_COMP_GROUP {
-  dpName: number;
-  dpKeyArray: number;
-  dpMatch: number;
-  dpNoMatch: number;
-  cxKeyArray: number;
-  fUsingKeys: number;
-};
-
 
 export default class KMXBuilder {
   file: KMXFile;

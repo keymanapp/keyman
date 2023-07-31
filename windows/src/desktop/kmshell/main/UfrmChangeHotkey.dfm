@@ -5,26 +5,26 @@ inherited frmChangeHotkey: TfrmChangeHotkey
   BorderIcons = [biSystemMenu, biHelp]
   BorderStyle = bsDialog
   Caption = 'Change Hotkey'
-  ClientHeight = 217
+  ClientHeight = 237
   ClientWidth = 305
   Font.Name = 'Tahoma'
   Position = poScreenCenter
   ExplicitWidth = 311
-  ExplicitHeight = 246
+  ExplicitHeight = 266
   PixelsPerInch = 96
   TextHeight = 13
   object lblHotkey: TLabel
     Left = 12
     Top = 12
     Width = 281
-    Height = 49
+    Height = 69
     AutoSize = False
     Caption = 'lblHotkey'
     WordWrap = True
   end
   object hkHotkey: THotKey
     Left = 75
-    Top = 152
+    Top = 172
     Width = 155
     Height = 19
     HotKey = 49217
@@ -34,7 +34,7 @@ inherited frmChangeHotkey: TfrmChangeHotkey
   end
   object cmdOK: TButton
     Left = 140
-    Top = 180
+    Top = 200
     Width = 73
     Height = 25
     Caption = 'OK'
@@ -44,7 +44,7 @@ inherited frmChangeHotkey: TfrmChangeHotkey
   end
   object cmdCancel: TButton
     Left = 220
-    Top = 180
+    Top = 200
     Width = 73
     Height = 25
     Cancel = True
@@ -54,7 +54,7 @@ inherited frmChangeHotkey: TfrmChangeHotkey
   end
   object rbAltLeftShift: TRadioButton
     Left = 12
-    Top = 84
+    Top = 104
     Width = 113
     Height = 17
     Caption = 'Left Alt + Shift'
@@ -63,7 +63,7 @@ inherited frmChangeHotkey: TfrmChangeHotkey
   end
   object rbNone: TRadioButton
     Left = 12
-    Top = 61
+    Top = 81
     Width = 113
     Height = 17
     Caption = 'No Hotkey'
@@ -72,7 +72,7 @@ inherited frmChangeHotkey: TfrmChangeHotkey
   end
   object rbCtrlShift: TRadioButton
     Left = 12
-    Top = 107
+    Top = 127
     Width = 113
     Height = 17
     Caption = 'Ctrl + Shift'
@@ -81,7 +81,7 @@ inherited frmChangeHotkey: TfrmChangeHotkey
   end
   object rbCustom: TRadioButton
     Left = 12
-    Top = 129
+    Top = 149
     Width = 113
     Height = 17
     Caption = 'Custom'

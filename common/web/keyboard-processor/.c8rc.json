@@ -1,0 +1,15 @@
+{
+  "check-coverage": false,
+  "clean": true,
+  "exclude": [
+    "src/keyboards/loaders/dom*",
+    "node_modules/*",
+    "tests"
+  ],
+  "exclude-after-remap": true,
+  "reporter": ["text", "text-summary"],
+  "reports-dir": "build/coverage",
+  "src": [
+    "src/"
+  ]
+}

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sentry.h>
+
 /*
  * Map of Sentry levels for events and breadcrumbs.
  */
@@ -26,7 +28,7 @@ int keyman_sentry_main(bool is_keyman_developer, const char *logger, int argc, c
 int keyman_sentry_wmain(bool is_keyman_developer, const char *logger, int argc, wchar_t *argv[], int(*run)(int, wchar_t**));
 
 void keyman_sentry_setexceptionfilter();
-void keyman_sentry_report_message(keyman_sentry_level_t level, const char *message, bool includeStack = false);
+sentry_uuid_t keyman_sentry_report_message(keyman_sentry_level_t level, const char *message, bool includeStack = false);
 void keyman_sentry_report_start();
 
 //
@@ -37,3 +39,4 @@ void keyman_sentry_report_start();
 // d) privacy options are correctly checked
 //
 void keyman_sentry_test_crash();
+void keyman_sentry_test_message();

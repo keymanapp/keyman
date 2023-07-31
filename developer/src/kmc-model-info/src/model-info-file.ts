@@ -1,4 +1,4 @@
-interface ModelInfoFile {
+export interface ModelInfoFile {
   id?: string;
   name?: string;
   authorName?: string;
@@ -21,12 +21,12 @@ interface ModelInfoFile {
   related?: ModelInfoFileRelated[];
 }
 
-interface ModelInfoFileLink {
+export interface ModelInfoFileLink {
   name: string;
   url: string;
 }
 
-interface ModelInfoFileRelated {
+export interface ModelInfoFileRelated {
   deprecates?: string;
   deprecatedBy?: string;
   note?: string;

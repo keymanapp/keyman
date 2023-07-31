@@ -57,22 +57,28 @@ sudo dpkg --purge ibus-kmfl libkmfl
 
 ## Q. What Linux distros will Keyman work with?
 
-**A.** Keyman runs on Debian, Ubuntu, Wasta Linux and can be compiled to run from source in most distributions.
+**A.** Keyman runs on Debian, Ubuntu, Wasta Linux and can be compiled to run
+from source in most distributions.
 
 **Note:** Keyman for Linux no longer supports Ubuntu 16.04 LTS (Xenial Xerus).
+Keyman 16 was the last version that supports Ubuntu 18.04 LTS (Bionic Beaver).
 
 ## Q. Will my existing Windows Keyman keyboard work with Keyman for Linux?
 
-**A.** Most keyboards will work without change. A small subset of keyboards require features which
-are not yet available in Keyman for Linux. These features will be progressively implemented.
+**A.** Most keyboards will work without change. A small subset of keyboards
+require features which are not yet available in Keyman for Linux. These
+features will be progressively implemented.
 
 ## Q. How can I disable automatically reporting errors?
 
-**A.** If Keyman crashes, it will automatically send a report to the development team. This report
-is anonymous and contains only technical details relating to the crash. It does not include keystroke
-data or personally identifying data. If you don't want these automatic error reports to be sent you
-can set the environment variable `KEYMAN_NOSENTRY`:
+**A.** If Keyman crashes, it will automatically send a report to the development
+team. This report is anonymous and contains only technical details relating to
+the crash. It does not include keystroke data or personally identifying data. If
+you don't want these automatic error reports to be sent you can set the
+environment variable `KEYMAN_NOSENTRY` and start `km-config` from
+the command line:
 
 ```bash
 export KEYMAN_NOSENTRY=1
+km-config
 ```

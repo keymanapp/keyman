@@ -10,101 +10,64 @@ set -eu
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-EX_USAGE=64
+cd "$THIS_SCRIPT_PATH"
+
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 
-display_usage ( ) {
-  echo "Usage: $0 [-test] [-publish-to-npm]"
-  echo "       $0 -help"
-  echo
-  echo "  -help               displays this screen and exits"
-  echo "  -test               runs tests"
-  echo "  -publish-to-npm     publishes the current version to the npm package index"
-  echo "  -dry-run            do test, etc, but don't actually publish"
-}
+builder_describe "Build Keyman model types package" \
+  "clean" \
+  "configure" \
+  "build" \
+  "test" \
+  "pack                      build a local .tgz pack for testing" \
+  "publish                   publish to npm" \
+  "--dry-run,-n              don't actually publish, just dry run"
 
-################################ Main script ################################
+builder_describe_outputs \
+  configure     /node_modules \
+  build         /common/models/types/build/common/models/types/tsconfig.tsbuildinfo
 
-run_tests=0
-install_dependencies=1
-should_publish=0
-npm_dist_tag=
-should_dry_run=0
+builder_parse "$@"
 
-# Process command-line arguments
-while [[ $# -gt 0 ]] ; do
-  key="$1"
-  case $key in
-    -help|-h)
-      display_usage
-      exit
-      ;;
-    -dry-run)
-      should_dry_run=1
-      ;;
-    -test)
-      run_tests=1
-      install_dependencies=0
-      ;;
-    -version)
-      echo "Warning: -version is now ignored"
-      ;;
-    -tier)
-      echo "Warning: -tier is now ignored"
-      ;;
-    -publish-to-npm)
-      should_publish=1
-      ;;
-    *)
-      echo "$0: invalid option: $key"
-      display_usage
-      exit $EX_USAGE
-  esac
-  shift # past the processed argument
-done
+#-------------------------------------------------------------------------------------------------------------------
 
-# Dry run settings
-if (( should_dry_run )); then
-  DRY_RUN=--dry-run
-else
-  DRY_RUN=
+if builder_start_action clean; then
+  rm -rf ./build/
+  builder_finish_action success clean
 fi
 
-# Check that we're doing any task at all!
-if (( !run_tests )) && (( !should_publish )); then
-  echo "$0: Must do at least one of: -test, -publish-npm" >&2
-  display_usage
-  exit $EX_USAGE
+#-------------------------------------------------------------------------------------------------------------------
+
+if builder_start_action configure; then
+  verify_npm_setup
+  builder_finish_action success configure
 fi
 
-# Check if Node.JS/npm is installed.
-type npm >/dev/null ||\
-    builder_die "Build environment setup error detected!  Please ensure Node.js is installed!"
+#-------------------------------------------------------------------------------------------------------------------
 
-if (( install_dependencies )) ; then
-  npm install || builder_die "Could not download dependencies."
+if builder_start_action build; then
+  tsc --build
+  builder_finish_action success build
 fi
 
-if (( run_tests )); then
-  npm test || builder_die "Tests failed"
+#-------------------------------------------------------------------------------------------------------------------
+
+if builder_start_action test; then
+  npm test
+  builder_finish_action success test
 fi
 
-if (( should_publish )); then
-  if [[ $TIER == stable ]]; then
-    npm_dist_tag=latest
-  else
-    npm_dist_tag=$TIER
-  fi
+#-------------------------------------------------------------------------------------------------------------------
 
-  set_npm_version
-
-  # Note: In either case, npm publish MUST be given --access public to publish
-  # a package in the @keymanapp scope on the public npm package index.
-  #
-  # See `npm help publish` for more details.
-  echo "Publishing $DRY_RUN npm package with tag $npm_dist_tag"
-  npm publish $DRY_RUN --access public --tag $npm_dist_tag || builder_die "Could not publish $npm_dist_tag release."
+if builder_start_action publish; then
+  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+  builder_publish_to_npm
+  builder_finish_action success publish
+elif builder_start_action pack; then
+  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+  builder_publish_to_pack
+  builder_finish_action success pack
 fi

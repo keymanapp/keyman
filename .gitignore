@@ -36,6 +36,7 @@
 /common/windows/delphi/**/*.bpl
 /common/windows/delphi/**/*.map
 /common/windows/delphi/**/*.tds
+/common/windows/delphi/**/*.identcache
 
 # Temp files generated during release build
 /windows/src/buildtools/inst/copydebug.mak
@@ -190,3 +191,10 @@ lcov.info
 /keyman*.buildinfo
 /keyman*.changes
 /keyman*.tar.?z
+
+#Sabine:
+# /common/test/keyboards/invalid/source/*.kmx
+# /developer/src/test/auto/kmcomp/*.kmn
+# /developer/src/test/auto/kmcomp/*.kvk
+# /developer/src/test/auto/kmcomp/*.kvk*
+# /developer/src/test/auto/kmcomp/*.txt

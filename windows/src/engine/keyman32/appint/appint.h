@@ -43,22 +43,6 @@ typedef struct
 #define QIT_CAPSLOCK 8
 #define QIT_INVALIDATECONTEXT 9
 
-// QueueDebugInformation ItemTypes
-#define QID_BEGIN_UNICODE		0
-#define QID_BEGIN_ANSI			1
-#define QID_GROUP_ENTER			2
-#define QID_GROUP_EXIT			3
-#define QID_RULE_ENTER			4
-#define QID_RULE_EXIT			5
-#define QID_MATCH_ENTER			6
-#define QID_MATCH_EXIT			7
-#define QID_NOMATCH_ENTER		8
-#define QID_NOMATCH_EXIT		9
-#define QID_END					10
-
-#define QID_FLAG_RECURSIVE_OVERFLOW	0x0001
-#define QID_FLAG_NOMATCH			0x0002
-
 #define QVK_EXTENDED 0x00010000 // Flag for QIT_VKEYDOWN to indicate an extended key
 #define QVK_KEYMASK  0x0000FFFF
 #define QVK_FLAGMASK 0xFFFF0000
@@ -178,15 +162,6 @@ public:
 
 };
 
-class AppContextWithStores : public AppContext   // I4978
-{
-public:
-  AppContextWithStores(int nKeyboardOptions);
-  ~AppContextWithStores();
-  DWORD nKeyboardOptions;
-  LPINTKEYBOARDOPTIONS KeyboardOptions;
-};
-
 class AppIntegration:public AppActionQueue
 {
 protected:
@@ -214,7 +189,6 @@ public:
 
 	/* Queue and sending functions */
 
-	virtual BOOL QueueDebugInformation(int ItemType, LPGROUP Group, LPKEY Rule, PWSTR fcontext, PWSTR foutput, DWORD_PTR dwExtraFlags) = 0;
 	void SetCurrentShiftState(int ShiftFlags) { FShiftFlags = ShiftFlags; }
 	virtual BOOL SendActions() = 0;   // I4196
 };

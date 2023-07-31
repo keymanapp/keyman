@@ -1,6 +1,7 @@
 import * as xml2js from 'xml2js';
 import { LDMLKeyboardXMLSourceFile, LKImport } from './ldml-keyboard-xml.js';
-import Ajv from 'ajv';
+import { default as AjvModule } from 'ajv';
+const Ajv = AjvModule.default; // The actual expected Ajv type.
 import { boxXmlArray } from '../util/util.js';
 import { CompilerCallbacks } from '../util/compiler-interfaces.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
@@ -13,18 +14,21 @@ interface NameAndProps  {
   '$$'?: any; // children
 };
 
-export default class LDMLKeyboardXMLSourceFileReader {
-  callbacks: CompilerCallbacks;
+export class LDMLKeyboardXMLSourceFileReaderOptions {
+  importsPath: string;
+};
 
-  constructor(callbacks : CompilerCallbacks) {
-    this.callbacks = callbacks;
+export class LDMLKeyboardXMLSourceFileReader {
+  constructor(private options: LDMLKeyboardXMLSourceFileReaderOptions, private callbacks : CompilerCallbacks) {
   }
 
-  readImportFile(version: string, subpath: string): Buffer {
-    // TODO-LDML: sanitize input string
-    let importPath = new URL(`../import/${version}/${subpath}`, import.meta.url);
-    // TODO-LDML: support baseFileName?
-    return this.callbacks.loadFile(importPath.pathname, importPath);
+  static get defaultImportsURL() {
+    return new URL(`../import/`, import.meta.url);
+  }
+
+  readImportFile(version: string, subpath: string): Uint8Array {
+    const importPath = this.callbacks.resolveFilename(this.options.importsPath, `${version}/${subpath}`);
+    return this.callbacks.loadFile(importPath);
   }
 
   /**
@@ -68,12 +72,20 @@ export default class LDMLKeyboardXMLSourceFileReader {
         boxXmlArray(flicks, 'flick');
       }
     }
+    if(source?.keyboard?.variables) {
+      boxXmlArray(source?.keyboard?.variables, 'set');
+      boxXmlArray(source?.keyboard?.variables, 'string');
+      boxXmlArray(source?.keyboard?.variables, 'unicodeSet');
+    }
     if(source?.keyboard?.transforms) {
-      for(let transform of source.keyboard.transforms)  {
-        boxXmlArray(transform, 'transform');
+      for(let transforms of source.keyboard.transforms)  {
+        boxXmlArray(transforms, 'transformGroup');
+        for (let transformGroup of transforms.transformGroup) {
+          boxXmlArray(transformGroup, 'transform');
+          boxXmlArray(transformGroup, 'reorder');
+        }
       }
     }
-    boxXmlArray(source?.keyboard?.reorders, 'reorder');
     return this.boxImportsAndSpecials(source, 'keyboard');
   }
 
@@ -193,8 +205,8 @@ export default class LDMLKeyboardXMLSourceFileReader {
   /**
    * @returns true if valid, false if invalid
    */
-  public validate(source: LDMLKeyboardXMLSourceFile | LDMLKeyboardTestDataXMLSourceFile, schemaSource: Buffer): boolean {
-    const schema = JSON.parse(schemaSource.toString('utf8'));
+  public validate(source: LDMLKeyboardXMLSourceFile | LDMLKeyboardTestDataXMLSourceFile, schemaSource: Uint8Array): boolean {
+    const schema = JSON.parse(new TextDecoder().decode(schemaSource));
     const ajv = new Ajv();
     if(!ajv.validate(schema, source)) {
       for (let err of ajv.errors) {

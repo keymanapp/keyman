@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
+<keyboard locale="mt" conformsTo="techpreview">
+  <names>
+    <name value="tran-minimal" />
+  </names>
+
+  <keys />
+
+  <transforms type="random-predictive"> <!-- invalid type -->
+    <transformGroup>
+      <transform from="xx" to="x"/>
+    </transformGroup>
+  </transforms>
+  <transforms type="random-predictive"> <!-- invalid type and dup -->
+    <transformGroup>
+      <transform from="yy" to="y"/>
+    </transformGroup>
+  </transforms>
+</keyboard>

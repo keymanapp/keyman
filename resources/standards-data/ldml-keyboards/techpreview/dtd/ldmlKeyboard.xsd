@@ -13,7 +13,7 @@
   
   This DTD is a work in progress.
   
-  Please see CLDR-15034 for the latest information.
+  Please see https://cldr.unicode.org/index/keyboard-workgroup for the latest information.
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:element name="keyboard">
@@ -29,8 +29,8 @@
         <xs:element minOccurs="0" ref="displays"/>
         <xs:element minOccurs="0" ref="keys"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="layers"/>
+        <xs:element minOccurs="0" ref="variables"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="transforms"/>
-        <xs:element minOccurs="0" ref="reorders"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="special"/>
       </xs:sequence>
       <xs:attribute name="locale" use="required"/>
@@ -43,6 +43,7 @@
       </xs:attribute>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <!-- @MATCH:validity/bcp47 -->
   <!-- @MATCH:any -->
   <!-- @METADATA -->
@@ -58,9 +59,8 @@
       </xs:attribute>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <!-- @MATCH:any -->
-  <!-- @VALUE -->
-  <!-- @VALUE -->
   <xs:element name="locales">
     <xs:complexType>
       <xs:sequence>
@@ -68,11 +68,13 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <xs:element name="locale">
     <xs:complexType>
       <xs:attribute name="id" use="required"/>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <!-- @MATCH:validity/bcp47 -->
   <!-- @VALUE -->
   <xs:element name="version">
@@ -87,6 +89,7 @@
       </xs:attribute>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <!-- Note: post techpreview, change cldrVersion to MATCH:version -->
   <!-- @MATCH:semver -->
   <!-- @VALUE -->
@@ -100,6 +103,7 @@
       <xs:attribute name="indicator"/>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <!-- @MATCH:any -->
   <!-- @VALUE -->
   <!-- @MATCH:literal/NFC, NFD, other -->
@@ -117,15 +121,18 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <xs:element name="name">
     <xs:complexType>
       <xs:attribute name="value" use="required"/>
     </xs:complexType>
   </xs:element>
   <!-- @ORDERED -->
+  <!-- @TECHPREVIEW -->
   <!-- @MATCH:any -->
   <!-- @VALUE -->
   <xs:element name="special" type="any"/>
+  <!-- @TECHPREVIEW -->
   <xs:element name="settings">
     <xs:complexType>
       <xs:attribute name="fallback">
@@ -135,25 +142,10 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="transformFailure">
-        <xs:simpleType>
-          <xs:restriction base="xs:token">
-            <xs:enumeration value="omit"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
-      <xs:attribute name="transformPartial">
-        <xs:simpleType>
-          <xs:restriction base="xs:token">
-            <xs:enumeration value="hide"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
     </xs:complexType>
   </xs:element>
   <!-- @ORDERED -->
-  <!-- @VALUE -->
-  <!-- @VALUE -->
+  <!-- @TECHPREVIEW -->
   <!-- @VALUE -->
   <xs:element name="vkeys">
     <xs:complexType>
@@ -164,12 +156,14 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <xs:element name="vkey">
     <xs:complexType>
       <xs:attribute name="from" use="required"/>
       <xs:attribute name="to" use="required"/>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <!-- @MATCH:any -->
   <!-- @MATCH:any -->
   <!-- @VALUE -->
@@ -183,22 +177,28 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <xs:element name="display">
     <xs:complexType>
       <xs:attribute name="to" use="required"/>
       <xs:attribute name="display" use="required"/>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <!-- @MATCH:any -->
+  <!-- @ALLOWS_UESC -->
   <!-- @MATCH:any -->
   <!-- @VALUE -->
+  <!-- @ALLOWS_UESC -->
   <xs:element name="displayOptions">
     <xs:complexType>
       <xs:attribute name="baseCharacter"/>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <!-- @MATCH:any -->
   <!-- @VALUE -->
+  <!-- @ALLOWS_UESC -->
   <xs:element name="keys">
     <xs:complexType>
       <xs:sequence>
@@ -211,6 +211,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <xs:element name="key">
     <xs:complexType>
       <xs:attribute name="id" use="required"/>
@@ -244,16 +245,21 @@
       <xs:attribute name="width"/>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <!-- @MATCH:regex/[A-Za-z0-9][A-Za-z0-9-]* -->
   <!-- @MATCH:regex/[A-Za-z0-9][A-Za-z0-9-]* -->
   <!-- @VALUE -->
   <!-- @MATCH:any -->
   <!-- @VALUE -->
+  <!-- @ALLOWS_UESC -->
   <!-- @MATCH:any -->
   <!-- @VALUE -->
+  <!-- @ALLOWS_UESC -->
   <!-- @MATCH:any -->
   <!-- @VALUE -->
+  <!-- @ALLOWS_UESC -->
   <!-- @VALUE -->
+  <!-- @ALLOWS_UESC -->
   <!-- @VALUE -->
   <!-- @MATCH:regex/[A-Za-z0-9][A-Za-z0-9-]* -->
   <!-- @VALUE -->
@@ -269,6 +275,7 @@
       <xs:attribute name="id" use="required" type="xs:NMTOKEN"/>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <!-- @MATCH:regex/[A-Za-z0-9][A-Za-z0-9-]* -->
   <xs:element name="flick">
     <xs:complexType>
@@ -276,9 +283,11 @@
       <xs:attribute name="to" use="required"/>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <!-- @MATCH:regex/(n|e|s|w|ne|nw|se|sw)([ ]+(n|e|s|w|ne|nw|se|sw))* -->
   <!-- @MATCH:any -->
   <!-- @VALUE -->
+  <!-- @ALLOWS_UESC -->
   <xs:element name="layers">
     <xs:complexType>
       <xs:sequence>
@@ -289,17 +298,19 @@
       <xs:attribute name="form" use="required">
         <xs:simpleType>
           <xs:restriction base="xs:token">
-            <xs:enumeration value="hardware"/>
             <xs:enumeration value="touch"/>
+            <xs:enumeration value="us"/>
+            <xs:enumeration value="iso"/>
+            <xs:enumeration value="jis"/>
+            <xs:enumeration value="abnt2"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
       <xs:attribute name="minDeviceWidth"/>
-      <xs:attribute name="hardware" type="xs:NMTOKEN"/>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <!-- @MATCH:range/1~999 -->
-  <!-- @MATCH:literal/us, iso, jis, abnt2 -->
   <xs:element name="layer">
     <xs:complexType>
       <xs:sequence>
@@ -307,9 +318,10 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="special"/>
       </xs:sequence>
       <xs:attribute name="id" type="xs:NMTOKEN"/>
-      <xs:attribute name="modifier" type="xs:NMTOKEN"/>
+      <xs:attribute name="modifier" type="xs:NMTOKENS"/>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
   <!-- @MATCH:any -->
   <!-- @MATCH:any -->
   <xs:element name="row">
@@ -318,54 +330,95 @@
     </xs:complexType>
   </xs:element>
   <!-- @ORDERED -->
+  <!-- @TECHPREVIEW -->
+  <!-- @MATCH:any -->
+  <!-- @VALUE -->
+  <xs:element name="variables">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="import"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="string"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="set"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="unicodeSet"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="special"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- @TECHPREVIEW -->
+  <xs:element name="string">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="value" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <!-- @MATCH:regex/[0-9A-Za-z_]{1,32} -->
+  <!-- @MATCH:any -->
+  <!-- @VALUE -->
+  <!-- @ALLOWS_UESC -->
+  <xs:element name="set">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="value" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <!-- @MATCH:regex/[0-9A-Za-z_]{1,32} -->
+  <!-- @MATCH:any -->
+  <!-- @VALUE -->
+  <!-- @ALLOWS_UESC -->
+  <xs:element name="unicodeSet">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="value" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <!-- @MATCH:regex/[0-9A-Za-z_]{1,32} -->
   <!-- @MATCH:any -->
   <!-- @VALUE -->
   <xs:element name="transforms">
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="import"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="transform"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="transformGroup"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="special"/>
       </xs:sequence>
       <xs:attribute name="type" use="required">
         <xs:simpleType>
           <xs:restriction base="xs:token">
             <xs:enumeration value="simple"/>
-            <xs:enumeration value="final"/>
             <xs:enumeration value="backspace"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
     </xs:complexType>
   </xs:element>
-  <!-- @MATCH:literal/simple, final, backspace -->
-  <xs:element name="transform">
-    <xs:complexType>
-      <xs:attribute name="before"/>
-      <xs:attribute name="from" use="required"/>
-      <xs:attribute name="to"/>
-      <xs:attribute name="error">
-        <xs:simpleType>
-          <xs:restriction base="xs:token">
-            <xs:enumeration value="fail"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
-  <!-- @MATCH:any -->
-  <!-- @MATCH:any -->
-  <!-- @VALUE -->
-  <!-- @VALUE -->
-  <xs:element name="reorders">
+  <!-- @TECHPREVIEW -->
+  <!-- @MATCH:literal/simple, backspace -->
+  <xs:element name="transformGroup">
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="import"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="reorder"/>
+        <xs:choice>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="transform"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="reorder"/>
+        </xs:choice>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="special"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <!-- @TECHPREVIEW -->
+  <xs:element name="transform">
+    <xs:complexType>
+      <xs:attribute name="from" use="required"/>
+      <xs:attribute name="to"/>
+    </xs:complexType>
+  </xs:element>
+  <!-- @ORDERED -->
+  <!-- @MATCH:any -->
+  <!-- @VALUE -->
+  <!-- @ALLOWS_UESC -->
+  <!-- @MATCH:any -->
+  <!-- @VALUE -->
+  <!-- @ALLOWS_UESC -->
   <xs:element name="reorder">
     <xs:complexType>
       <xs:attribute name="before"/>
@@ -382,7 +435,19 @@
     </xs:sequence>
   </xs:complexType>
 </xs:schema>
+<!-- @ORDERED -->
+<!-- @TECHPREVIEW -->
+<!-- @MATCH:any -->
 <!-- @VALUE -->
+<!-- @ALLOWS_UESC -->
+<!-- @MATCH:any -->
 <!-- @VALUE -->
+<!-- @ALLOWS_UESC -->
+<!-- @MATCH:any -->
 <!-- @VALUE -->
+<!-- @MATCH:any -->
+<!-- @VALUE -->
+<!-- @MATCH:any -->
+<!-- @VALUE -->
+<!-- @MATCH:any -->
 <!-- @VALUE -->

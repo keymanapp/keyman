@@ -27,8 +27,8 @@ export interface LKKeyboard {
   displays?: LKDisplays;
   layers?: LKLayers[];
   vkeys?: LKVkeys;
+  variables?: LKVariables;
   transforms?: LKTransforms[];
-  reorders?: LKReorders;
 };
 
 /**
@@ -108,13 +108,9 @@ export interface LKFlick {
 
 export interface LKLayers {
   /**
-   * `hardware` or `touch`
+   * `touch`, or hardware `us`, `iso`, `jis`, `abnt2`
    */
   form?: string;
-  /**
-   * `us`, `iso`, `jis`, or `abnt2`
-   */
-  hardware?: string;
   /**
    * Minimum width in millimeters
    */
@@ -141,29 +137,46 @@ export interface LKVkey {
   to?: string;
 };
 
+export interface LKVariables {
+  string?: LKString[];
+  set?: LKSet[];
+  unicodeSet?: LKUnicodeSet[];
+};
+
+/**
+ * Shared interface for all three variable types
+ */
+export interface Variable {
+  id?: string;
+  value?: string;
+};
+
+export interface LKString extends Variable {};
+export interface LKSet extends Variable {};
+export interface LKUnicodeSet extends Variable {};
+
 export interface LKTransforms {
-  type?: "simple" | "final";
-  transform: LKTransform[];
+  type?: "simple" | "backspace";
+  transformGroup?: LKTransformGroup[];
 };
 
 export interface LKTransform {
   from?: string;
   to?: string;
-  before?: string;
-  error?: "fail";
 };
 
-export interface LKReorders {
-  reorder: LKReorder[];
+export interface LKTransformGroup {
+  // one or the other, not both
+  transform?: LKTransform[];
+  reorder?: LKReorder[];
 };
-
 export interface LKReorder {
   from?: string;
   before?: string;
   order?: string;
   tertiary?: string;
-  tertiary_base?: string;
-  prebase?: string;
+  tertiaryBase?: string;
+  preBase?: string;
 };
 
 export interface LKDisplayOptions {
@@ -173,6 +186,7 @@ export interface LKDisplayOptions {
 export interface LKDisplay {
   to?: string;
   display?: string;
+  id?: string; // TODO-LDML: This comes in a near-future CLDR update
 };
 
 export interface LKDisplays {

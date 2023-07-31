@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+
+# Note: these two lines can be uncommented for debugging and profiling build
+# scripts:
+#
+#   set -x
+#   PS4='+ $EPOCHREALTIME $0 $LINENO   '
+#
+
 #
 # This script contains utilities for builder_script calls
 #
@@ -27,11 +35,9 @@ function _builder_init() {
 }
 
 function _builder_findRepoRoot() {
-    # See https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
-    # None of the answers are 100% correct for cross-platform
-    # On macOS, requires coreutils (`brew install coreutils`)
-    local SCRIPT=$(readlink -f "${BASH_SOURCE[0]}")
-    REPO_ROOT="${SCRIPT%/*/*}"
+    # We don't need readlink here because our standard script prolog does a
+    # readlink -f already so we will have already escaped from any symlinks
+    REPO_ROOT="${BASH_SOURCE[0]%/*/*}"
     readonly REPO_ROOT
 }
 
@@ -59,7 +65,7 @@ function _builder_setBuildScriptIdentifiers() {
     THIS_SCRIPT_IDENTIFIER=${THIS_SCRIPT_PATH#"$REPO_ROOT/"}
     readonly THIS_SCRIPT_IDENTIFIER
   else
-    echo "Warning: THIS_SCRIPT not defined; builder.inc.sh has not been sourced with standard script include."
+    builder_die "THIS_SCRIPT not defined; builder.inc.sh has not been sourced with standard script include."
   fi
 }
 
@@ -77,18 +83,20 @@ function _builder_setBuildScriptIdentifiers() {
 #  1: use_color       true or false
 builder_use_color() {
   if $1; then
-    COLOR_RED=$(tput setaf 1)
-    COLOR_GREEN=$(tput setaf 2)
-    COLOR_YELLOW=$(tput setaf 3)
-    COLOR_BLUE=$(tput setaf 4)
-    COLOR_PURPLE=$(tput setaf 5)
-    COLOR_TEAL=$(tput setaf 6)
-    COLOR_WHITE=$(tput setaf 7)
-    COLOR_GREY=$(tput setaf 8)
-    COLOR_RESET=$(tput sgr0)
+    # Using esc codes instead of tput for performance
+    COLOR_RED='\x1b[31m'                # $(tput setaf 1)
+    COLOR_GREEN='\x1b[32m'              # $(tput setaf 2)
+    COLOR_YELLOW='\x1b[33m'             # $(tput setaf 3)
+    COLOR_BLUE='\x1b[34m'               # $(tput setaf 4)
+    COLOR_PURPLE='\x1b[35m'             # $(tput setaf 5)
+    COLOR_TEAL='\x1b[36m'               # $(tput setaf 6)
+    COLOR_WHITE='\x1b[38;5;252m'        # $(tput setaf 252)
+    COLOR_BRIGHT_WHITE='\x1b[38;5;255m' # $(tput setaf 255)
+    COLOR_GREY='\x1b[90m'               # $(tput setaf 8)
+    COLOR_RESET='\x1b(B\x1b[m'          # $(tput sgr0)
     # e.g. VSCode https://code.visualstudio.com/updates/v1_69#_setmark-sequence-support
+    BUILDER_BOLD='\x1b[1m'              # $(tput bold)
     HEADING_SETMARK='\x1b]1337;SetMark\x07'
-
     # Used by `builder_display_usage` when marking special terms (actions, targets, options)
     # in the plain-text description area.
     BUILDER_TERM_START="$COLOR_BLUE"
@@ -101,8 +109,10 @@ builder_use_color() {
     COLOR_PURPLE=
     COLOR_TEAL=
     COLOR_WHITE=
+    COLOR_BRIGHT_WHITE=
     COLOR_GREY=
     COLOR_RESET=
+    BUILDER_BOLD=
     HEADING_SETMARK=
     BUILDER_TERM_START="<"
     BUILDER_TERM_END=">"
@@ -120,20 +130,20 @@ function builder_term() {
 function builder_die() {
   echo
   if [[ $# -eq 0 ]]; then
-    echo "${COLOR_RED}Unspecified error, aborting script${COLOR_RESET}"
+    builder_echo error "Unspecified error, aborting script"
   else
-    echo "${COLOR_RED}$*${COLOR_RESET}"
+    builder_echo error "$*"
   fi
   echo
   exit 1
 }
 
 function builder_warn() {
-  echo "${COLOR_YELLOW}$*${COLOR_RESET}"
+  builder_echo warning "$*"
 }
 
 function builder_heading() {
-  echo -e "${HEADING_SETMARK}${COLOR_BLUE}$*${COLOR_RESET}"
+  builder_echo heading "$*"
 }
 
 
@@ -143,17 +153,48 @@ function builder_heading() {
 #
 ####################################################################################
 
+
+builder_echo() {
+  local color=white message= mark=
+  if [[ $# -gt 1 && $1 =~ ^(white|grey|green|success|blue|heading|yellow|warning|red|error|purple|brightwhite|teal|debug|setmark)$ ]]; then
+    color="$1"
+    shift
+  fi
+  message="$*"
+
+  if [[ ! -z ${COLOR_RED+x} ]]; then
+    case $color in
+      white) color="$COLOR_WHITE" ;;
+      grey) color="$COLOR_GREY" ;;
+      green|success) color="$COLOR_GREEN" ;;
+      blue|heading) color="$COLOR_BLUE" ;;
+      yellow|warning) color="$COLOR_YELLOW" ;;
+      red|error) color="$COLOR_RED" ;;
+      purple) color="$COLOR_PURPLE" ;;
+      brightwhite) color="$COLOR_BRIGHTWHITE" ;;
+      teal|debug) color="$COLOR_TEAL" ;;
+      setmark) mark="$HEADING_SETMARK" color="$COLOR_PURPLE" ;;
+    esac
+
+    if builder_is_dep_build; then
+      echo -e "$mark$COLOR_GREY[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
+    else
+      echo -e "$mark$BUILDER_BOLD$COLOR_BRIGHT_WHITE[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
+    fi
+  else
+    # Cope with the case of pre-init message and just emit plain text
+    echo -e "$message"
+  fi
+}
+
+builder_echo_debug() {
+  builder_echo debug "[DEBUG] $*"
+}
+
 #
 # builder_ names are reserved.
 # _builder_ names are internal use and subject to change
 #
-if [ -z ${_builder_debug+x} ]; then
-  _builder_debug=false
-fi
-
-if $_builder_debug; then
-  echo "[DEBUG] Command line: $0 $@"
-fi
 
 #
 # builder_extra_params: string containing all parameters after '--'
@@ -199,6 +240,67 @@ _builder_item_in_glob_array() {
   return 1
 }
 
+#
+# Expands a shorthand item into a full match from an array of possibilities;
+# reports an error if there are ambiguous options. Note that this function
+# returns the number of matches, so 0 = no match, 1 = a precise match.
+#
+# ### Parameters
+#
+# * 1: `item`       item to search for in array, e.g. "t"
+# * 2: `array`      bash array, e.g. `array=(one two three)`
+#
+# ### Description
+#
+# Does a substring search by regex for
+#
+# ### Example
+#
+# ```bash
+#   actions=(clean configure build test)
+#
+#   action=`_builder_expand_shorthand $1 "${actions[@]}"` &&
+#     builder_die "Unrecognized parameter $1" ||
+#     case $? in
+#       1) echo "Parameter $1 matches {$action}"
+#       ;;
+#       *) builder_die "Parameter $1 has $? matches, could mean any of {$action}"
+#     esac
+# ```
+#
+_builder_expand_shorthand() {
+  local item=$1
+  shift
+  local count=0
+  local result=
+  local string=
+  for e; do
+    if [[ $e == $item ]]; then
+      # Exact match trumps substring matches
+      echo $item
+      return 1
+    fi
+    if [[ $e == "$item"* ]]; then
+      count=$((count+1))
+      if [[ $count == 2 ]]; then
+        string="$result, $e"
+        result=$item
+      elif [[ $count -gt 2 ]]; then
+        string="$string, $e"
+      else
+        result=$e
+      fi
+    fi
+  done
+
+  if [[ $count -lt 2 ]]; then
+    echo $result
+  else
+    echo $string
+  fi
+  return $count
+}
+
 
 _builder_item_is_target() {
   local item="$1"
@@ -208,8 +310,7 @@ _builder_item_is_target() {
 
 function _builder_warn_if_incomplete() {
   if [ -n "${_builder_current_action}" ]; then
-    local scope="[$THIS_SCRIPT_IDENTIFIER] "
-    echo "${COLOR_YELLOW}## ${scope}Warning - $_builder_current_action never reported success or failure${COLOR_RESET}"
+    builder_echo warning "$_builder_current_action never reported success or failure"
     # exit 1  # If we wanted this scenario to result in a forced build-script fail.
   fi
 
@@ -238,19 +339,19 @@ _builder_failure_trap() {
   if [ -n "${_builder_current_action}" ]; then
     action="${_builder_current_action}"
     if [[ $action =~ : ]]; then
-      IFS=: read -r action target <<< $action
+      IFS=: read -r action target <<< "$action"
       target=:$target
     else
       target=:project
     fi
 
     builder_finish_action failure $action$target
-
-    # Make 100% sure that the exit code chains fully.
-    # Without this, nested scripts have failed to chain errors from npm calls past the script
-    # that directly executed the failed npm command.
-    exit $trappedExitCode
   fi
+
+  # Make 100% sure that the exit code chains fully.
+  # Without this, nested scripts have failed to chain errors from npm calls past the script
+  # that directly executed the failed npm command.
+  exit $trappedExitCode
 }
 
 #
@@ -258,9 +359,9 @@ _builder_failure_trap() {
 # finishes.
 #
 _builder_cleanup_deps() {
-  if ! builder_is_dep_build && [[ ! -z ${_builder_deps_built+x} ]]; then
-    if $_builder_debug; then
-      echo "[DEBUG] Dependencies that were built:"
+  if ! builder_is_dep_build && ! builder_is_child_build && [[ ! -z ${_builder_deps_built+x} ]]; then
+    if $_builder_debug_internal; then
+      builder_echo_debug "Dependencies that were built:"
       cat "$_builder_deps_built"
     fi
     rm -f "$_builder_deps_built"
@@ -268,27 +369,42 @@ _builder_cleanup_deps() {
   fi
 }
 
+#------------------------------------------------------------------------------------------
+# Child scripts
+#------------------------------------------------------------------------------------------
+
 _builder_execute_child() {
   local action=$1
   local target=$2
 
-  local scope="[$THIS_SCRIPT_IDENTIFIER] "
   local script="$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh"
 
-  if $_builder_debug; then
-    echo "${COLOR_BLUE}## $scope$action$target starting...${COLOR_RESET}"
+  if $_builder_debug_internal; then
+    builder_echo heading "## $action$target starting..."
   fi
 
+  # Build array of specified inheritable options
+  local child_options=()
+  local opt
+  for opt in "${_builder_options_inheritable[@]}"; do
+    if builder_has_option $opt; then
+      child_options+=($opt)
+    fi
+  done
+
   "$script" $action \
+    --builder-child \
+    $_builder_build_deps \
+    ${child_options[@]} \
     $builder_verbose \
     $builder_debug \
   && (
-    if $_builder_debug; then
-      echo "${COLOR_GREEN}## $scope$action$target completed successfully${COLOR_RESET}"
+    if $_builder_debug_internal; then
+      builder_echo success "## $action$target completed successfully"
     fi
   ) || (
     result=$?
-    echo "${COLOR_RED}## $scope$action$target failed with exit code $result${COLOR_RESET}"
+    builder_echo error "## $action$target failed with exit code $result"
     exit $result
   ) || exit $? # Required due to above subshell masking exit
 }
@@ -297,7 +413,7 @@ _builder_run_child_action() {
   local action="$1" target
 
   if [[ $action =~ : ]]; then
-    IFS=: read -r action target <<< $action
+    IFS=: read -r action target <<< "$action"
     target=:$target
   else
     target=':*'
@@ -310,7 +426,8 @@ _builder_run_child_action() {
         # We have to re-test the action because the user may not
         # have specified all targets in their invocation
         if builder_has_action $action$target; then
-          if [ -f "$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh" ]; then
+          if [[ ! -z ${_builder_target_paths[$target]+x} ]] &&
+            [[ -f "$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh" ]]; then
             _builder_execute_child $action $target
           fi
         fi
@@ -352,6 +469,10 @@ builder_run_child_actions() {
   done
 }
 
+#------------------------------------------------------------------------------------------
+# Various API endpoints
+#------------------------------------------------------------------------------------------
+
 #
 # Builds the standardized `action:target` string for the specified action-target
 # pairing and also returns 0 if the user has asked to perform it on the command
@@ -381,7 +502,7 @@ builder_has_action() {
   local action="$1" target
 
   if [[ $action =~ : ]]; then
-    IFS=: read -r action target <<< $action
+    IFS=: read -r action target <<< "$action"
     target=:$target
   else
     target=':*'
@@ -402,20 +523,46 @@ builder_has_action() {
   fi
 }
 
-_builder_dep_output_defined() {
-  if [[ ! -z ${_builder_dep_path[$1]+x} ]]; then
-    return 0
-  else
-    return 1
+#
+# Wraps builder_start_action and builder_finish action for single-command
+# actions. Can be used together with a local function for multi-command actions.
+# Do be aware that this pseudo-closure style cannot be mixed with operators such
+# as `<`, `>`, `&&`, `;`, `()` and so on.
+#
+# ### Usage
+#
+# ```bash
+#   builder_run_action action[:target] command [command-params...]
+# ```
+#
+# ### Parameters
+#
+# * 1: `action[:target]`   name of action, and optionally also target, if target
+#                          excluded starts for all defined targets
+# * 2: command             command to run if action is started
+# * 3...: command-params   parameters for command
+#
+# ### Example
+#
+# ```bash
+#   function do_build() {
+#     mkdir -p build/cjs-src
+#     npm run build
+#   }
+#
+#   builder_run_action clean        rm -rf ./build/ ./tsconfig.tsbuildinfo
+#   builder_run_action configure    verify_npm_setup
+#   builder_run_action build        do_build
+# ```
+#
+function builder_run_action() {
+  local action=$1
+  shift
+  if builder_start_action $action; then
+    ($@)
+    builder_finish_action success $action
   fi
-}
-
-_builder_dep_output_exists() {
-  if _builder_dep_output_defined $1 && [[ -e "$KEYMAN_ROOT/${_builder_dep_path[$1]}" ]]; then
-    return 0
-  else
-    return 1
-  fi
+  return 0
 }
 
 #
@@ -441,8 +588,6 @@ _builder_dep_output_exists() {
 # ```
 #
 builder_start_action() {
-  local scope="[$THIS_SCRIPT_IDENTIFIER] "
-
   if builder_has_action $1; then
     # In a dependency quick build (the default), determine whether we actually
     # need to run this step. Uses data passed to builder_describe_outputs to
@@ -450,11 +595,11 @@ builder_start_action() {
     if builder_is_dep_build &&
         ! builder_is_full_dep_build &&
         _builder_dep_output_exists $_builder_matched_action; then
-      echo "$scope skipping $_builder_matched_action_name, up-to-date"
+      builder_echo "skipping $_builder_matched_action_name, up-to-date"
       return 1
     fi
 
-    echo "${COLOR_BLUE}## $scope$_builder_matched_action_name starting...${COLOR_RESET}"
+    builder_echo blue "## $_builder_matched_action_name starting..."
     if [ -n "${_builder_current_action}" ]; then
       _builder_warn_if_incomplete
     fi
@@ -487,7 +632,20 @@ builder_has_option() {
   return 1
 }
 
-_builder_trim() {
+#
+# Trims leading and following whitespace from the input parameters
+#
+# ### Usage
+#
+# ```bash
+#   my_string="$(builder_trim "$my_string")"
+# ```
+#
+# ### Parameters
+#
+# * `my_string`    An input string
+#
+builder_trim() {
   local var="$*"
   # remove leading whitespace characters
   var="${var#"${var%%[![:space:]]*}"}"
@@ -525,10 +683,9 @@ _builder_expand_relative_path() {
 _builder_expand_action_target() {
   local input="$1" target= action=
   if [[ "$input" =~ : ]]; then
-    action=$(echo "$input" | cut -d: -f 1 -)
-    target=$(echo "$input" | cut -d: -f 2 -)
+    IFS=":" read -r action target <<< "$input"
   else
-    action=$input
+    action="$input"
   fi
 
   if [[ -z "$action" ]]; then
@@ -544,14 +701,38 @@ _builder_expand_action_target() {
 _builder_expand_action_targets() {
   local input=($1) e output=()
   for e in "${input[@]}"; do
-    e=`_builder_expand_action_target "$e"`
-    output+=($e)
+    e="$(_builder_expand_action_target "$e")"
+    output+=("$e")
   done
   if [[ ${#output[@]} == 0 ]]; then
     echo "*:*"
   else
     echo "${output[@]}"
   fi
+}
+
+_builder_child_base=
+#
+# Describes the path from the build script's working directory to the common subfolder
+# containing child scripts / projects without defined custom paths.
+#
+# This function must be called to set the child base path before builder_describe is
+# called in order to work correctly.  Furthermore, note that this setting will be
+# ignored by targets with custom paths.
+#
+# ### Usage
+#
+# ```bash
+#    builder_set_child_base path
+# ```
+#
+# ### Parameters
+#
+#  * `path`  The relative path from the directory containing the calling script to
+#            the base folder to use for child-project detection and resolution
+#
+builder_set_child_base() {
+  _builder_child_base="$1/"
 }
 
 #
@@ -573,16 +754,21 @@ _builder_expand_action_targets() {
 #
 # There are four types of parameters that may be specified:
 #
-# * **Option:** `"--option[,-o][=var]   [One line description]"`
+# * **Option:** `"--option[,-o][+][=var]   [One line description]"`
 #
 #   All options must have a longhand form with two prefix hyphens,
 #   e.g. `--option`. The `,-o` shorthand form is optional. When testing if
 #   the option is set with `builder_has_option`, always use the longhand
 #   form.
 #
-#   if `=var` is specified, then the next parameter will be a variable stored in
+#   If `=var` is specified, then the next parameter will be a variable stored in
 #   `$var` for that option. e.g. `--option=opt` means `$opt` will have the value
 #   `"foo"` when the script is called for `--option foo`.
+#
+#   If `+` is specified, then the option will be passed to child scripts. All
+#   child scripts _must_ accept this option, or they will fail. It is acceptable
+#   for the child script to declare the option but ignore it. However, the option
+#   will _not_ be passed to dependencies.
 #
 # * **Action**: `"action   [One line description]"`
 #
@@ -601,7 +787,7 @@ _builder_expand_action_targets() {
 #   `=path` to the target definition, for example `:app=src/app`. Where
 #   possible, avoid differences in names of child projects and folders.
 #
-# * **Dependency:** `"@/path/to/dependency [action][:target] ..."``
+# * **Dependency:** `"@/path/to/dependency[:target] [action][:target] ..."``
 #
 #   A dependency always starts with `@`. The path to the dependency will be
 #   relative to the build script folder, or to the root of the repository, if
@@ -610,6 +796,10 @@ _builder_expand_action_targets() {
 #
 #   Relative paths will be expanded to full paths, again, relative to the root
 #   of the repository.
+#
+#   A dependency definition can include a target for that dependency, for
+#   example, `"@/core:arch"`. This would build only the ':arch' target for the
+#   core module.
 #
 #   Dependencies may be limited to specific `action:target` pairs on the current
 #   script. If not specified, dependencies will be built for all actions on all
@@ -624,6 +814,7 @@ builder_describe() {
   _builder_targets=()
   _builder_options=()
   _builder_deps=()                    # array of all dependencies for this script
+  _builder_options_inheritable=()     # array of all options that should be passed to child scripts
   _builder_default_action=build
   declare -A -g _builder_params
   declare -A -g _builder_options_short
@@ -632,14 +823,18 @@ builder_describe() {
   declare -A -g _builder_dep_related_actions  # array of action:targets associated with a given dependency
   declare -A -g _builder_internal_dep         # array of internal action:targets dependency relationships
   declare -A -g _builder_target_paths         # array of target child project paths
+  declare -A -g _builder_dep_targets          # array of :targets given for a specific dependency (comma separated if more than one)
   shift
+  local sub=()
   # describe each target, action, and option possibility
   while [[ $# -gt 0 ]]; do
     local key="$1"
-    local value="$(echo "$key" | cut -d" " -f 1 -)"
+    local value="$key"
     local description=
     if [[ $key =~ [[:space:]] ]]; then
-      description="$(_builder_trim "$(echo "$key" | cut -d" " -f 2- -)")"
+      IFS=" " read -r -a sub <<< "$key"
+      value="${sub[0]}"
+      description="$(builder_trim "${sub[@]:1}")"
     fi
 
     if [[ $value =~ ^: ]]; then
@@ -647,16 +842,17 @@ builder_describe() {
       local target_path=
       if [[ $value =~ = ]]; then
         # The target has a custom child project path
-        target_path="$(echo "$value" | cut -d= -f 2 -)"
-        value="$(echo "$value" | cut -d= -f 1 -)"
+        IFS="=" read -r -a sub <<< "$value"
+        target_path="${sub[@]:1}"
+        value="${sub[0]}"
         if [[ ! -d "$THIS_SCRIPT_PATH/$target_path" ]]; then
           builder_die "Target path '$target_path' for $value does not exist."
         fi
       else
         # If the target name matches a folder name, implicitly
         # make it available as a child project
-        if [[ -d "$THIS_SCRIPT_PATH/${value:1}" ]]; then
-          target_path="${value:1}"
+        if [[ -d "$THIS_SCRIPT_PATH/$_builder_child_base${value:1}" ]]; then
+          target_path="$_builder_child_base${value:1}"
         fi
       fi
       _builder_targets+=($value)
@@ -666,10 +862,16 @@ builder_describe() {
     elif [[ $value =~ ^@ ]]; then
       # Parameter is a dependency
       local dependency="${value:1}"
+      local dependency_target= # all targets
+      if [[ $dependency =~ : ]]; then
+        IFS=":" read -r dependency dependency_target <<< "$dependency"
+        dependency_target=":$dependency_target"
+      fi
+
       dependency="`_builder_expand_relative_path "$dependency"`"
       _builder_deps+=($dependency)
-      _builder_dep_related_actions[$dependency]="`_builder_expand_action_targets "$description"`"
-
+      _builder_dep_related_actions[$dependency]="$(_builder_expand_action_targets "$description")"
+      _builder_dep_targets[$dependency]="$dependency_target"
       # We don't want to add deps to params, so shift+continue
       shift
       continue
@@ -678,14 +880,27 @@ builder_describe() {
       # Look for a shorthand version of the option
       local option_var=
       if [[ $value =~ = ]]; then
-        option_var="$(echo "$value" | cut -d= -f 2 -)"
-        value="$(echo "$value" | cut -d= -f 1 -)"
+        IFS="=" read -r -a sub <<< "$value"
+        option_var="${sub[@]:1}"
+        value="${sub[0]}"
+      fi
+
+      local is_inheritable=false
+
+      if [[ $value =~ \+$ ]]; then
+        # final + indicates that option is inheritable
+        is_inheritable=true
+        value="${value:0:-1}"
       fi
 
       if [[ $value =~ , ]]; then
-        local option_long="$(echo "$value" | cut -d, -f 1 -)"
-        local option_short="$(echo "$value" | cut -d, -f 2 -)"
+        IFS="," read -r -a sub <<< "$value"
+        local option_long="${sub[0]}"
+        local option_short="${sub[@]:1}"
         _builder_options+=($option_long)
+        if $is_inheritable; then
+          _builder_options_inheritable+=($option_long)
+        fi
         _builder_options_short[$option_short]="$option_long"
         if [[ ! -z "$option_var" ]]; then
           _builder_options_var[$option_long]="$option_var"
@@ -693,6 +908,9 @@ builder_describe() {
         value="$option_long, $option_short"
       else
         _builder_options+=($value)
+        if $is_inheritable; then
+          _builder_options_inheritable+=($value)
+        fi
         if [[ ! -z "$option_var" ]]; then
           _builder_options_var[$value]="$option_var"
         fi
@@ -701,6 +919,7 @@ builder_describe() {
       if [[ ! -z $option_var ]]; then
         value="$value $option_var"
       fi
+
     else
       # Parameter is an action
       if [[ $value =~ \+$ ]]; then
@@ -750,20 +969,20 @@ builder_describe() {
 #
 # ```bash
 #   builder_describe_outputs \
-#     "configure" "/node_modules" \
-#     "build"     "build/index.js"
+#     configure   /node_modules \
+#     build       build/index.js
 # ```
 #
 function builder_describe_outputs() {
   _builder_record_function_call builder_describe_outputs
 
   while [[ $# -gt 0 ]]; do
-    local key="$1" path="$2" action target
+    local key="$1" path="$2" action= target=
     path="`_builder_expand_relative_path "$path"`"
 
     if [[ $key =~ : ]]; then
-      action="$(echo "$key" | cut -d: -f 1 -)"
-      target=":$(echo "$key" | cut -d: -f 2 -)"
+      IFS=":" read -r action target <<< "$key"
+      target=":$target"
     else
       # Add dependency expected output file for all targets, as well as a
       # wildcard target match
@@ -808,11 +1027,10 @@ _builder_parameter_error() {
   local program="$1"
   local type="$2"
   local param="$3"
-  echo "$COLOR_RED$program: invalid $type: $param$COLOR_RESET"
+  builder_echo red "$program: invalid $type: $param"
   echo
   builder_display_usage
   exit 64
-
 }
 
 #
@@ -873,12 +1091,12 @@ _builder_add_chosen_action_target_dependencies() {
 
   if [[ ${#new_actions[@]} -gt 0 ]]; then
     if builder_is_full_dep_build; then
-      echo "Automatically running all dependency actions due to --force-deps:"
+      builder_echo "Automatically running all dependency actions due to --force-deps:"
     else
-      echo "Automatically running following required actions with missing outputs:"
+      builder_echo "Automatically running following required actions with missing outputs:"
     fi
     for e in "${new_actions[@]}"; do
-      echo "* $e"
+      builder_echo "* $e"
     done
   fi
 }
@@ -950,18 +1168,72 @@ builder_describe_internal_dependency() {
 # Parameters
 #   1: $@         command-line arguments
 builder_parse() {
-
   _builder_record_function_call builder_parse
 
-  local _builder_params="$@"
+  local exp=()
+  builder_extra_params=()
 
+  while [[ $# -gt 0 ]] ; do
+    local action= target=
+    local key="$1"
+    if [[ $key == "--" ]]; then
+      shift
+      builder_extra_params=("$@")
+      break
+    fi
+
+    if [[ $key =~ ^- ]]; then
+      exp+=($key)
+    else
+      # Expand comma separated values
+      if [[ $key =~ : ]]; then
+        IFS=: read -r action target <<< "$key"
+      else
+        action="$key"
+        target=
+      fi
+
+      local actions targets
+      IFS=, read -r -a actions <<< "$action"
+      IFS=, read -r -a targets <<< "$target"
+
+      if [[ "${#actions[@]}" -eq 0 ]]; then
+        # No actions, so must be at least one :target
+        for target in "${targets[@]}"; do
+          exp+=(:$target)
+        done
+      else
+        for action in "${actions[@]}"; do
+          if [[ "${#targets[@]}" -eq 0 ]]; then
+            # No :targets so just expand actions
+            exp+=($action)
+          else
+            # Actions:targets, expand them all
+            for target in "${targets[@]}"; do
+              exp+=($action:$target)
+            done
+          fi
+        done
+      fi
+    fi
+
+    shift
+  done
+
+  _builder_parse_expanded_parameters "${exp[@]}"
+}
+
+_builder_parse_expanded_parameters() {
   _builder_build_deps=--deps
   builder_verbose=
   builder_debug=
-  builder_extra_params=()
+  local _params=($@)
   _builder_chosen_action_targets=()
   _builder_chosen_options=()
   _builder_current_action=
+  _builder_is_child=1
+
+  local n=0
 
   # Process command-line arguments
   while [[ $# -gt 0 ]] ; do
@@ -970,22 +1242,46 @@ builder_parse() {
     local target=
     local e has_action has_target has_option longhand_option
 
-    if [[ $key == "--" ]]; then
-      shift
-      builder_extra_params=("$@")
-      break
-    fi
-
     if [[ $key =~ : ]]; then
-      IFS=: read -r action target <<< $key
+      IFS=: read -r action target <<< "$key"
       target=:$target
     else
       action="$key"
       target=
     fi
 
+    # Expand shorthand parameters
+
+    new_action=$(_builder_expand_shorthand $action "${_builder_actions[@]}") ||
+      case $? in
+        1)
+          action=$new_action
+          ;;
+        *)
+          builder_warn "Parameter $action has $? matches, could mean any of {$new_action}"
+          exit 1
+          ;;
+      esac
+
+    new_target=$(_builder_expand_shorthand $target "${_builder_targets[@]}") ||
+      case $? in
+        1)
+          target=$new_target
+          ;;
+        *)
+          builder_warn "Parameter $target has $? matches, could mean any of {$new_target}"
+          exit 1
+          ;;
+      esac
+
     _builder_item_in_array "$action" "${_builder_actions[@]}" && has_action=1 || has_action=0
     _builder_item_in_array "$target" "${_builder_targets[@]}" && has_target=1 || has_target=0
+
+    if (( has_action )) || (( has_target )); then
+      # Document parameter expansion for end use
+      _params[$n]=$action$target
+    fi
+    n=$((n + 1))
 
     # Expand short -o to --option in options lookup
     if [[ ! -z ${_builder_options_short[$key]+x} ]]; then
@@ -995,7 +1291,7 @@ builder_parse() {
 
     if (( has_action )) && (( has_target )); then
       # apply the selected action and selected target
-      _builder_chosen_action_targets+=("$key")
+      _builder_chosen_action_targets+=("$action$target")
     elif (( has_action )); then
       # apply the selected action to all targets
       if [[ ! -z $target ]]; then
@@ -1057,16 +1353,15 @@ builder_parse() {
           shift
           builder_dep_parent="$1"
           ;;
-        --builder-deps-built)
-          # internal use parameter for dependency builds - path to dependency tracking file
-          shift
-          _builder_deps_built="$1"
+        --builder-child)
+          _builder_is_child=0
           ;;
         --builder-report-dependencies)
           # internal reporting function, ignores all other parameters
           _builder_report_dependencies
           ;;
         *)
+          # script does not recognize anything of action or target form at this point.
           _builder_parameter_error "$0" parameter "$key"
       esac
     fi
@@ -1084,30 +1379,43 @@ builder_parse() {
     _builder_add_chosen_action_target_dependencies
   fi
 
-  if $_builder_debug; then
-    echo "[$THIS_SCRIPT_IDENTIFIER] [DEBUG] Selected actions and targets:"
+  if $_builder_debug_internal; then
+    builder_echo_debug "Selected actions and targets:"
     for e in "${_builder_chosen_action_targets[@]}"; do
-      echo "[$THIS_SCRIPT_IDENTIFIER] * $e"
+      builder_echo_debug "* $e"
     done
-    echo
-    echo "[$THIS_SCRIPT_IDENTIFIER] [DEBUG] Selected options:"
+    builder_echo_debug
+    builder_echo_debug "Selected options:"
     for e in "${_builder_chosen_options[@]}"; do
-      echo "[$THIS_SCRIPT_IDENTIFIER] * $e"
+      builder_echo_debug "* $e"
     done
   fi
 
   if builder_is_dep_build; then
-    echo -e "${HEADING_SETMARK}${COLOR_PURPLE}[$THIS_SCRIPT_IDENTIFIER] dependency build, started by $builder_dep_parent${COLOR_RESET}"
+    builder_echo setmark "dependency build, started by $builder_dep_parent"
+    builder_echo grey "build.sh parameters: <${_params[@]}>"
     if [[ -z ${_builder_deps_built+x} ]]; then
-      echo "FATAL ERROR: Expected --builder-deps-built parameter"
-      exit 1
+      builder_die "FATAL ERROR: Expected '_builder_deps_built' variable to be set"
+    fi
+  elif builder_is_child_build; then
+    builder_echo setmark "child build, parameters: <${_params[@]}>"
+    if [[ -z ${_builder_deps_built+x} ]]; then
+      builder_die "FATAL ERROR: Expected '_builder_deps_built' variable to be set"
     fi
   else
-    # This is a top-level invocation, not a dependency build, so we want to
-    # track which dependencies have been built, so they don't get built multiple
-    # times.
-    echo -e "${HEADING_SETMARK}${COLOR_PURPLE}[$THIS_SCRIPT_IDENTIFIER] build.sh launched with: <${_builder_params[@]}>${COLOR_RESET}"
-    _builder_deps_built=`mktemp`
+    # This is a top-level invocation, so we want to track which dependencies
+    # have been built, so they don't get built multiple times.
+    builder_echo setmark "build.sh parameters: <${_params[@]}>"
+    if [[ ${#builder_extra_params[@]} -gt 0 ]]; then
+      builder_echo grey "build.sh extra parameters: <${builder_extra_params[@]}>"
+    fi
+    export _builder_deps_built=`mktemp`
+  fi
+
+  if builder_is_debug_build; then
+    BUILDER_CONFIGURATION=debug
+  else
+    BUILDER_CONFIGURATION=release
   fi
 
   # Now that we've successfully parsed options adhering to the _builder spec, we may activate our
@@ -1214,10 +1522,10 @@ builder_display_usage() {
   local c1=$BUILDER_TERM_START
   local c0=$BUILDER_TERM_END
   echo
-  echo "* Specify ${c1}action:target${c0} to run a specific ${c1}action${c0} against a specific ${c1}:target${c0}."
-  echo "* If ${c1}action${c0} is specified without a ${c1}target${c0} suffix, it will be applied to all ${c1}:target${c0}s."
-  echo "* If ${c1}:target${c0} is specified without an ${c1}action${c0} prefix, ${c1}$_builder_default_action:target${c0} will be inferred."
-  echo "* If no ${c1}action${c0}, ${c1}:target${c0}, or ${c1}action:target${c0} entries are specified, ${c1}$_builder_default_action${c0} will run on all ${c1}:target${c0}s."
+  echo -e "* Specify ${c1}action:target${c0} to run a specific ${c1}action${c0} against a specific ${c1}:target${c0}."
+  echo -e "* If ${c1}action${c0} is specified without a ${c1}target${c0} suffix, it will be applied to all ${c1}:target${c0}s."
+  echo -e "* If ${c1}:target${c0} is specified without an ${c1}action${c0} prefix, ${c1}$_builder_default_action:target${c0} will be inferred."
+  echo -e "* If no ${c1}action${c0}, ${c1}:target${c0}, or ${c1}action:target${c0} entries are specified, ${c1}$_builder_default_action${c0} will run on all ${c1}:target${c0}s."
   echo
 }
 
@@ -1226,7 +1534,7 @@ builder_finish_action() {
   local action="$2" target action_name
 
   if [[ $action =~ : ]]; then
-    IFS=: read -r action target <<< $action
+    IFS=: read -r action target <<< "$action"
     target=":$target"
   else
     target=':*'
@@ -1238,7 +1546,6 @@ builder_finish_action() {
     action_name="$action$target"
   fi
 
-  local scope="[$THIS_SCRIPT_IDENTIFIER] "
   local matched_action="$action$target"
 
   if [[ "$matched_action" == "${_builder_current_action}" ]]; then
@@ -1246,21 +1553,41 @@ builder_finish_action() {
       # Sanity check:  if there is a described output for this action, does the corresponding
       # file or directory exist now?
       if _builder_dep_output_defined $matched_action && ! _builder_dep_output_exists "$matched_action"; then
-        builder_warn "## $scope$action_name was successful, but output does not exist"
-        builder_warn "## ${scope}Expected output: '${_builder_dep_path[$matched_action]}'."
+        builder_echo warning "Expected output: '${_builder_dep_path[$matched_action]}'."
+        builder_echo warning "## $action_name completed successfully, but output does not exist"
       else
-        echo "${COLOR_GREEN}## $scope$action_name completed successfully${COLOR_RESET}"
+        builder_echo success "## $action_name completed successfully"
       fi
     elif [[ $result == failure ]]; then
-      echo "${COLOR_RED}## $scope$action_name failed${COLOR_RESET}"
+      builder_echo error "## $action_name failed"
     else
-      echo "${COLOR_RED}## $scope$action_name failed with message: $result${COLOR_RESET}"
+      builder_echo error "## $action_name failed with message: $result"
     fi
 
     # Remove $action$target from the array; it is no longer a current action
     _builder_current_action=
   else
-    echo "${COLOR_YELLOW}## Warning: reporting result of $action_name but the action was never started!${COLOR_RESET}"
+    builder_echo warning "reporting result of $action_name but the action was never started!"
+  fi
+}
+
+#------------------------------------------------------------------------------------------
+# Dependencies
+#------------------------------------------------------------------------------------------
+
+_builder_dep_output_defined() {
+  if [[ ! -z ${_builder_dep_path[$1]+x} ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+_builder_dep_output_exists() {
+  if _builder_dep_output_defined $1 && [[ -e "$KEYMAN_ROOT/${_builder_dep_path[$1]}" ]]; then
+    return 0
+  else
+    return 1
   fi
 }
 
@@ -1277,10 +1604,6 @@ _builder_should_build_dep() {
     return 1
   fi
 
-  # echo "bdra: ${_builder_dep_related_actions[@]}"
-  # echo "target: $action_target"
-  # echo "dep: $2"
-  # echo "ra: ${related_actions[@]}"
   if ! _builder_item_in_glob_array "$action_target" "${related_actions[@]}"; then
     return 1
   fi
@@ -1323,7 +1646,7 @@ _builder_do_build_deps() {
     # Don't attempt to build dependencies that don't match the current
     # action:target (wildcards supported for matches here)
     if ! _builder_should_build_dep "$action_target" "$dep"; then
-      echo "[$THIS_SCRIPT_IDENTIFIER] Skipping dependency $dep for $_builder_matched_action_name"
+      builder_echo "Skipping dependency $dep for $_builder_matched_action_name"
       continue
     fi
 
@@ -1332,20 +1655,25 @@ _builder_do_build_deps() {
       continue
     fi
 
-    # TODO: add --debug as a standard builder parameter
+    dep_target=
+    if [[ ! -z ${_builder_dep_targets[$dep]+x} ]]; then
+      # TODO: in the future split _builder_dep_targets into comma-separated
+      #       array for multiple targets for a dep?
+      dep_target=${_builder_dep_targets[$dep]}
+    fi
+
     builder_set_module_has_been_built "$dep"
-    "$KEYMAN_ROOT/$dep/build.sh" configure build \
+    "$KEYMAN_ROOT/$dep/build.sh" "configure$dep_target" "build$dep_target" \
       $builder_verbose \
       $builder_debug \
       $_builder_build_deps \
-      --builder-deps-built "$_builder_deps_built" \
       --builder-dep-parent "$THIS_SCRIPT_IDENTIFIER" && (
-      if $_builder_debug; then
-        echo "${COLOR_GREEN}## [$THIS_SCRIPT_IDENTIFIER] Dependency $dep for $_builder_matched_action_name successfully${COLOR_RESET}"
+      if $_builder_debug_internal; then
+        builder_echo success "## Dependency $dep for $_builder_matched_action_name successfully"
       fi
     ) || (
       result=$?
-      echo "${COLOR_RED}## [$THIS_SCRIPT_IDENTIFIER] Dependency failed with exit code $result${COLOR_RESET}"
+      builder_echo error "## Dependency failed with exit code $result"
       exit $result
     ) || exit $? # Required due to above subshell masking exit
   done
@@ -1359,6 +1687,13 @@ builder_is_dep_build() {
     return 0
   fi
   return 1
+}
+
+#
+# returns `0` if we are in a child script doing a build
+#
+builder_is_child_build() {
+  return $_builder_is_child
 }
 
 #
@@ -1422,6 +1757,7 @@ builder_has_dependencies() {
 builder_has_module_been_built() {
   local module="$1"
 
+
   if [[ -z ${_builder_deps_built+x} ]]; then
     # not in a builder context, so we assume a build is needed
     return 1
@@ -1467,6 +1803,19 @@ builder_set_module_has_been_built() {
 }
 
 #
+# Reports on all described dependencies, then exits
+# used by builder-controls.sh
+#
+_builder_report_dependencies() {
+  echo "${_builder_deps[@]}"
+  exit 0
+}
+
+#------------------------------------------------------------------------------------------
+# Utility functions
+#------------------------------------------------------------------------------------------
+
+#
 # returns `0` if we should be verbose in output
 #
 builder_verbose() {
@@ -1479,20 +1828,11 @@ builder_verbose() {
 #
 # returns `0` if we are doing a debug build
 #
-builder_debug() {
+builder_is_debug_build() {
   if [[ $builder_debug == --debug ]]; then
     return 0
   fi
   return 1
-}
-
-#
-# Reports on all described dependencies, then exits
-# used by builder-controls.sh
-#
-_builder_report_dependencies() {
-  echo "${_builder_deps[@]}"
-  exit 0
 }
 
 #
@@ -1525,3 +1865,15 @@ _builder_has_function_been_called() {
 #
 _builder_init
 _builder_check_color "$@"
+
+# _builder_debug_internal flag can be used to emit verbose logs for builder itself,
+# e.g.:
+#   _builder_debug_internal=true ./build.sh
+#
+if [ -z ${_builder_debug_internal+x} ]; then
+  _builder_debug_internal=false
+fi
+
+if $_builder_debug_internal; then
+  builder_echo_debug "Command line: $0 $@"
+fi

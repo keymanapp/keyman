@@ -1,0 +1,51 @@
+# systemd service file
+# /usr/lib/systemd/system/systemd-keyman.service
+# See https://stackoverflow.com/a/31725112
+
+[Unit]
+Description=Keyman System Service
+
+[Service]
+Type=dbus
+BusName=com.keyman.SystemService1
+ExecStart=/usr/libexec/keyman-system-service
+Restart=on-failure
+
+# Filesystem lockdown
+ProtectSystem=strict
+ProtectKernelTunables=true
+ProtectControlGroups=true
+ReadWritePaths=/dev/input/
+PrivateTmp=true
+
+# Network
+PrivateNetwork=true
+IPAddressDeny=any
+RestrictAddressFamilies=AF_UNIX
+
+# Execute Mappings
+MemoryDenyWriteExecute=true
+
+# Modules
+ProtectKernelModules=true
+
+# Real-time
+RestrictRealtime=true
+
+# Privilege escalation
+NoNewPrivileges=true
+
+# Capabilities
+CapabilityBoundingSet=
+
+# System call interfaces
+LockPersonality=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+
+# Namespaces
+PrivateUsers=yes
+RestrictNamespaces=yes
+
+# Locked memory
+LimitMEMLOCK=0

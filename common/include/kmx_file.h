@@ -64,6 +64,8 @@ namespace kmx {
 // Different begin types
 #define BEGIN_ANSI    0
 #define BEGIN_UNICODE 1
+#define BEGIN_NEWCONTEXT 2
+#define BEGIN_POSTKEYSTROKE 3
 
 #define TSS_NONE        0
 #define TSS_BITMAP        1
@@ -302,6 +304,7 @@ struct COMP_STORE {
 
 struct COMP_KEY {
   KMX_WORD Key;
+  KMX_WORD _reserved;
   KMX_DWORD Line;
   KMX_DWORD ShiftFlags;
   KMX_DWORD dpOutput;

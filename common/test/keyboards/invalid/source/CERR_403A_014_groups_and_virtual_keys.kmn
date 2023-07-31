@@ -1,0 +1,34 @@
+﻿c RegressionTest: Multiple groups and virtual keys
+c Font: Arial Unicode MS
+c Encoding: Unicode
+c Description: Tests multiple groups and virtual keys -- bug Ixxx
+c Procedure: Press A, Shift+2, A, Ctrl+2, A
+c AutoProc: K_A S+ K_2 S- K_A C+ K_2 C- K_A
+c FinalOutput: U+03B1 U+1FB0 U+1FB1
+
+c ***** CERR_60FeatureOnly_MnemonicLayout 0x0000403A ****************
+store(&VERSION) '3.0'
+c *******************************************************************
+
+NAME "AltGr Deadkeys Test" 
+
+begin Unicode > use(UMain) c Substitute UMain1 or UMain2 
+
+c ***** CERR_60FeatureOnly_MnemonicLayout 0x0000403A ****************
+store(&MnemonicLayout) "1"
+c *******************************************************************
+
+
+c ----------------------------------------------
+group(UMain) using keys 
+  + ['a'] > U+03B1
+  + [CTRL  '2'] > deadkey(MacronBug)
+  + [ALT  '2'] > deadkey(MacronBug)
+  + [SHIFT    '2'] > deadkey(BreveBug)
+  match > use(DK1)
+ 
+c ----------------------------------------------
+
+group(DK1)           
+  deadkey(MacronBug) U+03B1 > U+1FB1 c won't work
+  deadkey(BreveBug)  U+03B1 > U+1FB0 c works

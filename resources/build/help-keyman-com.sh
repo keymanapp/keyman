@@ -11,7 +11,7 @@ set -u
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 #
@@ -83,7 +83,7 @@ function help_product_path {
 function generate_markdown_help {
   if [ $platform == 'linux' ]; then
     pushd $KEYMAN_ROOT/linux/keyman-config > /dev/null
-    ./build-help.sh --md
+    ./build.sh build
     popd
   fi
 }

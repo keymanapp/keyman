@@ -8,12 +8,15 @@
   ],
   "type": "module",
   "exports": {
-    ".": "./build/src/kmp-compiler.js",
-    "./kmp-json-file": "./build/src/kmp-json-file.js"
+    ".": "./build/src/main.js"
   },
+  "files": [
+    "/build/src/"
+  ],
   "scripts": {
     "build": "tsc -b",
-    "test": "cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha",
+    "lint": "eslint .",
+    "test": "npm run lint && cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha",
     "coverage": "npm test",
     "prepublishOnly": "npm run build"
   },
@@ -27,7 +30,8 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "dependencies": {
-    "jszip": "^3.7.0"
+    "jszip": "^3.7.0",
+    "@keymanapp/common-types": "*"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
@@ -38,12 +42,25 @@
     "chalk": "^2.4.2",
     "mocha": "^8.4.0",
     "ts-node": "^9.1.1",
-    "typescript": "^4.5.4"
+    "typescript": "^4.9.5",
+    "@keymanapp/developer-test-helpers": "*"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",
     "require": [
       "source-map-support/register"
+    ]
+  },
+  "c8": {
+    "all": true,
+    "src": [
+      "src/"
+    ],
+    "exclude-after-remap": true,
+    "exclude": [
+      "test/",
+      "src/kmp-json-file.ts",
+      "src/kps-file.ts"
     ]
   },
   "repository": {

@@ -23,7 +23,7 @@
     </style>
 
     <!-- Insert uncompiled KeymanWeb source scripts -->
-    <script src="../../../../../build/app/web/debug/keymanweb.js" type="application/javascript"></script>
+    <script src="../../../../../build/publish/debug/keymanweb.js" type="application/javascript"></script>
 
     <!--
       For desktop browsers, a script for the user interface must be inserted here.
@@ -32,14 +32,14 @@
       The toolbar UI is best for any page designed to support keyboards for
       a large number of languages.
     -->
-    <script src="../../../../../build/app/ui/debug/kmwuitoggle.js"></script>
+    <script src="../../../../../build/publish/debug/kmwuitoolbar.js"></script>
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
       var kmw=window['keyman'] ? keyman : tavultesoft.keymanweb;
       kmw.init({
-          attachType:'auto'
-        });
+        attachType:'auto'
+      });
     </script>
 
     <!-- Add keyboard management script for local selection of keyboards to use -->
@@ -57,10 +57,10 @@
   <ul>
   <li>us, en</li>
   <li>french, fr</li>
-  <li>european2, no</li>
-  <li>european2, sv</li>
+  <li>sil_euro_latin, no</li>
+  <li>sil_euro_latin, sv</li>
   <li>hebrew, he</li>
-  <li>dzongkha, dzo</li>
+  <li>dzongkha, dz</li>
   <li>lao_2008_basic, lo</li>
   </ul>
   </p>

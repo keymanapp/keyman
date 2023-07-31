@@ -31,6 +31,16 @@
 #include "utfcodec.hpp"
 
 #include "ldml_test_source.hpp"
+#include "ldml_test_utils.hpp"
+
+#if defined(HAVE_ICU4C)
+// TODO-LDML: Needed this for some compiler warnings
+#define U_FALLTHROUGH
+#include "unicode/uniset.h"
+#include "unicode/usetiter.h"
+#else
+#error icu4c is required for this test
+#endif
 
 #define assert_or_return(expr) if(!(expr)) { \
   std::wcerr << __FILE__ << ":" << __LINE__ << ": " << \
@@ -45,7 +55,7 @@
 namespace km {
 namespace tests {
 
-#include "../test_color.h"
+#include <test_color.h>
 
 
 LdmlTestSource::LdmlTestSource() {
@@ -270,16 +280,6 @@ LdmlTestSource::get_modifier(std::string const m) {
   return 0;
 }
 
-km_kbp_virtual_key
-LdmlTestSource::get_vk(std::string const &vk) {
-  for (int i = 1; i < 256; i++) {
-    if (vk == km::kbp::kmx::s_key_names[i]) {
-      return i;
-    }
-  }
-  return 0;
-}
-
 key_event
 LdmlEmbeddedTestSource::vkey_to_event(std::string const &vk_event) {
   // vkey format is MODIFIER MODIFIER K_NAME
@@ -398,13 +398,15 @@ void LdmlJsonTestSource::set_key_from_id(key_event& k, const std::u16string& id)
 
   // First, find the string
   KMX_DWORD strId = kmxplus->strs->find(id);
-  assert(strId != 0);
-  if (strId == 0) { // will also get here if id is empty.
+  if (strId == 0) {
+    // will also get here if id is empty.
+    std::cerr << "ERROR: could not find string for " << id << std::endl;
+    assert(false);
     return;
   }
 
   // OK. Now we can search the keybag
-  KMX_DWORD keyIndex = 0;
+  KMX_DWORD keyIndex = 0; // initialize loop
   auto *key2 = kmxplus->key2Helper.findKeyByStringId(strId, keyIndex);
   assert(key2 != nullptr);
   if (key2 == nullptr) {
@@ -480,6 +482,158 @@ int LdmlJsonTestSource::load(const nlohmann::json &data) {
   return 0;
 }
 
+#if defined(HAVE_ICU4C)
+class LdmlJsonRepertoireTestSource : public LdmlTestSource {
+public:
+  LdmlJsonRepertoireTestSource(const std::string &path, km::kbp::kmx::kmx_plus *kmxplus);
+  virtual ~LdmlJsonRepertoireTestSource();
+  virtual const std::u16string &get_context() const;
+  int load(const nlohmann::json &test);
+  virtual void next_action(ldml_action &fillin);
+private:
+  std::string path;
+  nlohmann::json data;  // maybe
+  std::string type;
+  std::u16string context;
+  std::u16string expected;
+  std::string chars;
+  std::unique_ptr<icu::UnicodeSet> uset;
+  std::unique_ptr<icu::UnicodeSetIterator> iterator;
+  bool need_check = false; // set this after each char
+  const km::kbp::kmx::kmx_plus *kmxplus;
+  /**
+   * Helpers
+  */
+  void set_key_from_id(key_event& k, const std::u16string& id);
+};
+
+LdmlJsonRepertoireTestSource::LdmlJsonRepertoireTestSource(const std::string &path, km::kbp::kmx::kmx_plus *k)
+:path(path), kmxplus(k){
+
+}
+
+LdmlJsonRepertoireTestSource::~LdmlJsonRepertoireTestSource() {
+}
+
+void
+LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
+  if (type != "simple") {
+    std::cerr << "TODO-LDML: Warning: only 'simple' is supported now, not "  << type << std::endl;
+    fillin.type = LDML_ACTION_DONE;
+    return;
+  }
+
+  if (!iterator->next()) {
+    std::cout << "TODO-LDML: end of unicode set iterator" << std::endl;
+    fillin.type = LDML_ACTION_DONE;
+    return;
+  }
+
+  if (need_check) {
+    need_check = false;
+    fillin.type = LDML_ACTION_CHECK_EXPECTED;
+    fillin.string = expected;
+    return;
+  }
+
+  // we have already excluded strings, so just get the codepoint
+  const km_kbp_usv ch = iterator->getCodepoint();
+
+  // as string for debugging.
+  // const icu::UnicodeString& str = iterator->getString();
+
+  km::kbp::kmx::char16_single ch16;
+  std::size_t len = km::kbp::kmx::Utf32CharToUtf16(ch, ch16);
+  std::u16string chstr = std::u16string(ch16.ch, len);
+  // append to expected
+  expected.append(chstr);
+  need_check = true;
+
+  // ---------------------------------------------------
+  // find a key that can emit this string.
+  // TODO-LDML: no transforms yet.
+  // TODO-LDML: looking for an exact single key for now
+
+  assert(kmxplus != nullptr);
+  // lookup the id
+  assert(kmxplus->strs != nullptr);
+  assert(kmxplus->key2 != nullptr);
+  assert(kmxplus->layr != nullptr);
+
+  assert(kmxplus->key2Helper.valid());
+  assert(kmxplus->layrHelper.valid());
+
+  // First, find the string as an id
+  // TODO-LDML: will not work for multi string cases
+  KMX_DWORD strId = kmxplus->strs->find(chstr); // not an error if chstr is 0, may be single ch
+
+  // OK. Now we can search the keybag
+  KMX_DWORD keyIndex = 0;
+  auto *key2 = kmxplus->key2Helper.findKeyByStringTo(chstr, strId, keyIndex);
+  if (key2 == nullptr) {
+    fillin.string = u"No key for repertoire test: ";
+    fillin.string.append(chstr);
+    fillin.type = LDML_ACTION_FAIL;
+    return;
+  }
+
+  // Now, look for the _first_ candidate vkey match in the kmap.
+  for (KMX_DWORD kmapIndex = 0; kmapIndex < kmxplus->key2->kmapCount; kmapIndex++) {
+    auto *kmap = kmxplus->key2Helper.getKmap(kmapIndex);
+    assert(kmap != nullptr);
+    if (kmap->key == keyIndex) {
+      fillin.k = {(km_kbp_virtual_key)kmap->vkey, (uint16_t)kmap->mod};
+      std::cout << "found vkey " << fillin.k.vk << ":" << fillin.k.modifier_state << std::endl;
+      fillin.type = LDML_ACTION_KEY_EVENT;
+      return;
+    }
+  }
+
+  fillin.type = LDML_ACTION_FAIL;
+  fillin.string = u"Could not find candidate vkey: ";
+  fillin.string.append(chstr);
+}
+
+const std::u16string &
+LdmlJsonRepertoireTestSource::get_context() const {
+  return context; // no context needed
+}
+
+int LdmlJsonRepertoireTestSource::load(const nlohmann::json &data) {
+  this->data = data;  // TODO-LDML
+  // Need an update to json.hpp to use contains()
+  // if (data.contains("/type"_json_pointer)) {
+  if (data.find("type") != data.end()) {
+    type = data["/type"_json_pointer].get<std::string>();
+  } else {
+    type = "default";
+  }
+  chars      = data["/chars"_json_pointer].get<std::string>();
+  std::cout << "Loaded " << path << " = " << this->type << " || " << this->chars << std::endl;
+  UErrorCode status = U_ZERO_ERROR;
+  icu::StringPiece piece(chars);
+  icu::UnicodeString pattern = icu::UnicodeString::fromUTF8(piece);
+  // icu::UnicodeString pattern(chars.data(), (int32_t)chars.length());
+  uset = std::unique_ptr<icu::UnicodeSet>(new icu::UnicodeSet(pattern, status));
+  if (U_FAILURE(status)) {
+    // could be a malformed syntax isue
+    std::cerr << "UnicodeSet c'tor problem " << u_errorName(status) << std::endl;
+    return 1;
+  }
+  std::cout << "Got UnicodeSet of " << uset->size() << " char(s)." << std::endl;
+  // #if (U_ICU_VERSION_MAJOR_NUM >= 70)
+  // // TODO-LDML: function was private previously
+  // if (uset->hasStrings()) {
+  //   // illegal unicodeset of this form:  [a b c {this_is_a_string}]
+  //   std::cerr << "Spec err: may not have strings. " << chars << std::endl;
+  //   return 1;
+  // }
+  // #endif
+  iterator = std::unique_ptr<icu::UnicodeSetIterator>(new icu::UnicodeSetIterator(*uset));
+  return 0;
+}
+#endif // HAVE_ICU4C
+
 LdmlJsonTestSourceFactory::LdmlJsonTestSourceFactory() : test_map() {
 }
 
@@ -528,17 +682,15 @@ int LdmlJsonTestSourceFactory::load(const km::kbp::path &compiled, const km::kbp
   // TODO-LDML: store these elsewhere?
   std::cout << "JSON: reading " << info_name << " test of " << info_keyboard << " by " << info_author << std::endl;
 
-  // TODO-LDML: repertoire test
-
   auto all_tests = data["/keyboardTest/tests"_json_pointer];
-  assert_or_return((!all_tests.empty()) && (all_tests.size() > 0));
+  assert_or_return((!all_tests.empty()) && (all_tests.size() > 0));  // TODO-LDML: can be empty if repertoire only?
 
   for(auto tests : all_tests) {
     auto tests_name = tests["/name"_json_pointer].get<std::string>();
     for (auto test : tests["/test"_json_pointer]) {
       auto test_name = test["/name"_json_pointer].get<std::string>();
       std::string test_path;
-      test_path.append(tests_name).append("/").append(test_name);
+      test_path.append(info_name).append("/tests/").append(tests_name).append("/").append(test_name);
       std::cout << "JSON: reading " << info_name << "/" << test_path << std::endl;
 
       std::unique_ptr<LdmlJsonTestSource> subtest(new LdmlJsonTestSource(test_path, kmxplus.get()));
@@ -546,6 +698,26 @@ int LdmlJsonTestSourceFactory::load(const km::kbp::path &compiled, const km::kbp
       test_map[test_path] = std::unique_ptr<LdmlTestSource>(subtest.release());
     }
   }
+
+#if defined(HAVE_ICU4C)
+  auto rep_tests = data["/keyboardTest/repertoire"_json_pointer];
+  assert_or_return((!rep_tests.empty()) && (rep_tests.size() > 0));  // TODO-LDML: can be empty if tests only?
+
+  for(auto rep : rep_tests) {
+    auto rep_name  = rep["/name"_json_pointer].get<std::string>();
+
+    std::string test_path;
+    test_path.append(info_name).append("/repertoire/").append(rep_name);
+
+    std::unique_ptr<LdmlJsonRepertoireTestSource> reptest(new LdmlJsonRepertoireTestSource(test_path, kmxplus.get()));
+    assert_or_return(reptest->load(rep) == 0);
+    test_map[test_path] = std::unique_ptr<LdmlTestSource>(reptest.release());
+  }
+
+
+#else
+  std::cerr << "Warning: HAVE_ICU4C not defined, so not enabling repertoire tests" << std::endl;
+#endif
 
   return 0;
 }

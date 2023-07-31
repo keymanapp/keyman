@@ -6,8 +6,8 @@ On Linux, you can build the following projects:
 
 * [Keyman for Linux](#keyman-for-linux)
 * [Keyman Core](#keyman-core) (Linux only) (aka core)
-<!-- TODO: document how to build for Android, Web, Core-Wasm and Common/Web on Linux. See TC build agent for details. -->
-* Keyman for Android
+* [Keyman for Android](#keyman-for-android)
+<!-- TODO: document how to build for Web, Core-Wasm and Common/Web on Linux. See TC build agent for details. -->
 * Keyman Core (wasm targets)
 * Common/Web
 * KeymanWeb
@@ -21,7 +21,7 @@ The following projects **cannot** be built on Linux:
 
 ## System Requirements
 
-* Minimum Ubuntu version: Ubuntu 18.04
+* Minimum Ubuntu version: Ubuntu 20.04
 
 Other Linux distributions will also work if appropriate dependencies are installed.
 
@@ -49,6 +49,10 @@ sudo apt install devscripts equivs
 sudo mk-build-deps --install linux/debian/control
 ```
 
+### Node.js
+
+Node.js v18 is required for Core build, Web tests, and Developer command line tools.
+
 ## Keyman for Linux
 
 All dependencies are already installed if you followed the instructions under [Prerequisites](#Prerequisites).
@@ -71,7 +75,7 @@ The Docker builder allows you to perform a linux build from anywhere Docker is s
 To build the docker image:
 
 ```shell
-cd ../../linux
+cd linux
 docker pull ubuntu:latest
 docker build . -t keymanapp/keyman-linux-builder:latest
 ```
@@ -85,17 +89,80 @@ Once the image is built, it may be used to build parts of Keyman.
 cd ../core
 # keep linux build artifacts separate
 mkdir -p build/linux
-docker run -it --rm -v $(pwd)/..:/home/build -v $(pwd)/build/linux:/home/build/core/build keyman-linux-builder:latest bash -c 'cd core; bash build.sh -d'
+docker run -it --rm -v $(pwd)/..:/home/build -v $(pwd)/build/linux:/home/build/core/build keymanapp/keyman-linux-builder:latest bash -c 'core/build.sh --debug'
 ```
 
 - linux
 
 ```shell
 # build 'linux' installation in docker
-# runs as root!
-# note: run 'git clean -fdx linux' afterwards to cleanup
 cd keymanapp/keyman
-docker run -it --rm -v $(pwd):/home/build/src/keyman -u root -w /home/build/src/keyman keymanapp/keyman-linux-builder:latest bash -c "cd linux && make reconf && make fullbuild && make install"
+docker run -it --rm -v $(pwd):/home/build/src/keyman -w /home/build/src/keyman keymanapp/keyman-linux-builder:latest bash -c "DESTDIR=. linux/build.sh --debug build install"
 ```
 
+## Keyman for Android
 
+**Dependencies:**
+
+* [Base](#base-dependencies)
+* [Web](./windows#web-dependencies)
+
+**Additional requirements:**
+
+* Android SDK
+* [Android Studio](https://developer.android.com/studio/install#linux)
+* Gradle
+* Maven
+* OpenJDK 11 (for Keyman 17.0+)
+* pandoc
+
+Run Android Studio once after installation to install additional components
+such as emulator images and SDK updates.
+
+**Required environment variable:**
+
+* `ANDROID_HOME` pointing to Android SDK (`$HOME/Android/Sdk`)
+
+**Recommended environment variable:**
+
+* [`JAVA_HOME`](#java_home)
+
+Building:
+
+* [Building Keyman for Android](../../android/README.md)
+
+## Prerequisites
+
+Many dependencies are only required for specific projects.
+
+### Base Dependencies
+
+**Environment variables:**
+
+* --
+
+## Notes on Environment Variables
+
+### JAVA_HOME
+
+This environment variable tells Gradle what version of Java to use for building
+Keyman for Android. OpenJDK 11 is used for master.
+
+It's recommended to set the environment variables to:
+
+```bash
+export JAVA_HOME="[path to OpenJDK 11]"
+```
+
+Also edit `/etc/profile.d/jvm.sh` as sudo:
+
+```bash
+export JAVA_HOME="[path to OpenJDK 11]"
+```
+
+**Multiple versions of Java:** If you need to build Keyman for Android 16.0 or
+older versions, you can set `JAVA_HOME_11` to the OpenJDK 11 path and
+`JAVA_HOME` to the OpenJDK 8 path. This will build both versions correctly
+from command line. But note that you do need to update your `JAVA_HOME` env
+var to the associated version before opening Android Studio and loading any
+Android projects. `JAVA_HOME_11` is mostly used by CI.

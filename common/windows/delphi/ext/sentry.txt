@@ -4,7 +4,7 @@ Keyman Third Party Package Readme: Sentry
 Name:              Sentry
 Purpose:           Sentry provides error reporting to a Sentry server
 Source:            https://github.com/getsentry/sentry-native
-Version:           0.4.9
+Version:           0.6.0
 License:           MIT
 Updated for:       N/A
 Documentation:     https://docs.sentry.io/platforms/native/
@@ -15,8 +15,8 @@ Include Paths:     N/A
 Installation notes
 ------------------
 
-The original C++ version can be downloaded from site above. Source is
-not included
+The original C++ version can be downloaded from site above, and must be
+built following the instructions below.
 
 Build notes
 -----------
@@ -27,6 +27,9 @@ team. This needs to be updated whenever Sentry is updated.
 Sentry.Client.pas is a wrapper of sentry.pas which provides a Delphi-style
 interface to Sentry.
 
+Note: as of 0.6.0, performance SDKs are not included in Sentry.Client.pas,
+because we are not currently using them.
+
 build_sentry_for_keyman.bat should be copied into the sentry-native repo,
 and tweaked as required for updated versions of Sentry. Run:
 
@@ -36,6 +39,11 @@ and tweaked as required for updated versions of Sentry. Run:
   build: build x86 and x64 libraries
   install: prepare install folder in sentry-native
   deploy: copy the sentry.dll and related files into this repo
+
+**Important:** ensure that the sentry folder name in all .wxs files is
+updated to match the SENTRY_SDK_VERSION from sentry.h. Source C++ and .pas
+files use the constant to refer to the location where the files may be
+found.
 
 License - MIT
 -------------

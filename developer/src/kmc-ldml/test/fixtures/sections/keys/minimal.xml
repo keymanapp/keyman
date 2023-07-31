@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
+<keyboard locale="mt" conformsTo="techpreview">
+  <names>
+    <name value="keys-minimal" />
+  </names>
+
+  <keys>
+    <key id="grave" to="🪦" />
+    <key id="mistake" to="oops" />
+  </keys>
+
+  <layers form="us">
+    <layer id="base">
+      <row keys="grave mistake" />
+    </layer>
+  </layers>
+
+</keyboard>

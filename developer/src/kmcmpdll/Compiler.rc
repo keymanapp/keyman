@@ -1,5 +1,5 @@
 #include <windows.h>
-#include "comperr.h"
+#include "kmn_compiler_errors.h"
 
 #include "version.rc"
 
@@ -91,12 +91,6 @@ END
 STRINGTABLE
 BEGIN
     CERR_InvalidSystemStore "Invalid system store name found"
-    CERR_CallIsProfessionalFeature
-                            "Call() is only available in Keyman Developer Professional"
-    CERR_IncludeCodesIsProfessionalFeature
-                            "&IncludeCodes is only available in Keyman Developer Professional"
-    CERR_MnemonicLayoutIsProfessionalFeature
-                            "&MnemonicLayout is only available in Keyman Developer Professional"
     CERR_60FeatureOnly_VirtualCharKey
                             "Virtual character keys require VERSION 6.0"
     CERR_VersionAlreadyIncluded

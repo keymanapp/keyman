@@ -13,7 +13,7 @@
 #include "../../../src/kmx/kmx_context.h"
 #include "../../../src/kmx/kmx_processevent.h" // for Debug_UnicodeString
 #include "../../../src/kmx/kmx_xstring.h"
-#include "../test_assert.h"
+#include <test_assert.h>
 
 using namespace km::kbp::kmx;
 using namespace std;

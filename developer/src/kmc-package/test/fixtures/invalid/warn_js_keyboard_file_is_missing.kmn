@@ -1,0 +1,8 @@
+store(&NAME) "warn_js_keyboard_file_is_missing"
+store(&VERSION) "10.0"
+store(&keyboardversion) "1.0"
+store(&targets) "any"
+
+begin unicode > use(main)
+
+group(main) using keys

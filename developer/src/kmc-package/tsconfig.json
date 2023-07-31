@@ -7,9 +7,10 @@
     "allowSyntheticDefaultImports": true, // for jszip
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
   ],
   "references": [
-    { "path": "../../../common/web/keyman-version/tsconfig.esm.json" },
+    { "path": "../../../common/web/keyman-version" },
+    { "path": "../../../common/web/types" },
   ]
 }

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.firstvoices.keyboards" >
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Keyman Engine removes INTERNET permission, so add it back for crash reporting and get dictionaries -->
     <uses-permission android:name="android.permission.INTERNET" tools:node="replace" />

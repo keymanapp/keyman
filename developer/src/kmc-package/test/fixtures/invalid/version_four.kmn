@@ -1,0 +1,6 @@
+store(&name) 'version 4'
+store(&keyboardversion) '4.0'
+
+begin unicode > use(main)
+
+group(main) using keys

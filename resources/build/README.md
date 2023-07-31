@@ -16,13 +16,6 @@ including this file...
 
 See [build-utils.md](build-utils.md)
 
-### vswhere
-
-vswhere.exe is used by Keyman Core to select a Visual Studio version on Windows.
-
-Official source: <https://github.com/microsoft/vswhere>.
-License: [MIT](vswhere-license.txt)
-
 ### jq-win64
 
 jq-win64.exe is used by various builds for json query.

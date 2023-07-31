@@ -3,8 +3,11 @@ import {assert} from 'chai';
 
 import {compileModel} from '../src/main.js';
 import {makePathToFixture, compileModelSourceCode, CompilationResult} from './helpers/index.js';
+import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 describe('compileModel', function () {
+  let callbacks = new TestCompilerCallbacks();
+
   // Try to compile ALL of the correct models.
   const MODELS = [
     'example.qaa.sencoten',
@@ -19,7 +22,7 @@ describe('compileModel', function () {
     let modelPath = makePathToFixture(modelID, `${modelID}.model.ts`);
 
     it(`should compile ${modelID}`, function () {
-      let code = compileModel(modelPath);
+      let code = compileModel(modelPath, callbacks);
       let r: unknown;
       assert.doesNotThrow(() => {
         r = compileModelSourceCode(code);

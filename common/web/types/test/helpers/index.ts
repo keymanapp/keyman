@@ -1,6 +1,7 @@
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
+import { CompilerSchema } from "../../src/util/compiler-interfaces.js";
 
 /**
  * Builds a path to the fixture with the given path components.
@@ -13,27 +14,34 @@ export function makePathToFixture(...components: string[]): string {
   return fileURLToPath(new URL(path.join('..', '..', '..', 'test', 'fixtures', ...components), import.meta.url));
 }
 
-export function loadKvksJsonSchema(): Buffer {
-  return fs.readFileSync(new URL(path.join('..', '..', 'src', 'kvks.schema.json'), import.meta.url));
-}
-
 export function loadKeymanTouchLayoutCleanJsonSchema(): Buffer {
+  // TODO: this has the Wrong Name Pattern!
   return fs.readFileSync(new URL(path.join('..', '..', 'src', 'keyman-touch-layout.clean.spec.json'), import.meta.url));
 }
 
-export function loadFile(baseFilename: string, filename: string | URL): Buffer {
-  // TODO: translate filename based on the baseFilename
+export function loadFile(filename: string | URL): Buffer {
   return fs.readFileSync(filename);
 }
 
-export function loadLdmlKeyboardSchema(): Buffer {
-  return fs.readFileSync(new URL(path.join('..', '..', 'src', 'ldml-keyboard.schema.json'), import.meta.url));
+export function loadSchema(schema: CompilerSchema): Buffer {
+  return fs.readFileSync(new URL(path.join('..', '..', 'src', schema + '.schema.json'), import.meta.url));
 }
 
-export function loadLdmlKeyboardTestDataSchema(): Buffer {
-  return fs.readFileSync(new URL(path.join('..', '..', 'src', 'ldml-keyboardtest.schema.json'), import.meta.url));
-}
-
-export function loadKpjJsonSchema(): Buffer {
-  return fs.readFileSync(new URL(path.join('..', '..', 'src', 'kpj.schema.json'), import.meta.url));
+export function resolveFilename(baseFilename: string, filename: string) {
+  const basePath =
+    baseFilename.endsWith('/') || baseFilename.endsWith('\\') ?
+    baseFilename :
+    path.dirname(baseFilename);
+  // Transform separators to platform separators -- we are agnostic
+  // in our use here but path prefers files may use
+  // either / or \, although older kps files were always \.
+  if(path.sep == '/') {
+    filename = filename.replace(/\\/g, '/');
+  } else {
+    filename = filename.replace(/\//g, '\\');
+  }
+  if(!path.isAbsolute(filename)) {
+    filename = path.resolve(basePath, filename);
+  }
+  return filename;
 }

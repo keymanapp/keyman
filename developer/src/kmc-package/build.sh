@@ -18,15 +18,17 @@ cd "$THIS_SCRIPT_PATH"
 
 builder_describe "Build Keyman kmc Package Compiler module" \
   "@/common/web/keyman-version" \
+  "@/developer/src/common/web/test-helpers" \
   "configure" \
   "build" \
   "clean" \
   "test" \
+  "pack                      build a local .tgz pack for testing" \
   "publish                   publish to npm" \
   "--dry-run,-n              don't actually publish, just dry run"
 builder_describe_outputs \
   configure     /node_modules \
-  build         build/src/kmp-compiler.js
+  build         /developer/src/kmc-package/build/src/main.js
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -60,7 +62,11 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action publish; then
-  . "$KEYMAN_ROOT/resources/build/npm-publish.inc.sh"
-  npm_publish
+  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+  builder_publish_to_npm
   builder_finish_action success publish
+elif builder_start_action pack; then
+  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+  builder_publish_to_pack
+  builder_finish_action success pack
 fi

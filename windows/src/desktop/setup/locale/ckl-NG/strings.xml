@@ -72,9 +72,7 @@ Restart now?</string>
   <string name="ssDownloadingTitle">Downloading %0:s</string>
   <!-- Parameters: %0:s: filename -->
   <string name="ssDownloadingText">Downloading %0:s</string>
-  <string name="ssOffline">$APPNAME Setup could not connect to keyman.com to download additional resources.
-
-Please check that you are online, and give $APPNAME Setup permission to access the Internet in your firewall settings.
-
-Click Abort to exit Setup, Retry to try and download resources again, or Ignore to continue offline.</string>
+  <string name="ssOffline">$APPNAME Setup adita ɓui ka tsǝbti ka kǝba aka keyman.com wɛ akuya ka dzǝ ani ʻyati ka sǝgǝl aka su damwayere nǝr ʻya kǝthlǝryere wɛ.</string>
+  <string name="ssOffline2">Usɛ ka gǝ ani wulba ka zǝndi apǝri gǝ ata layǝr sambar Please, ba ka gǝ ani na $APPNAME Setup whalɛ namtǝ dzata ɓui ka lukwa Internet akwa kuta settingyere nǝr firewall nǝngɛ.</string>
+  <string name="ssOffline3">Ka gǝ ani tsani Abort akuya ka gǝ ɓui ka sǝba angyar Setup, Ɓǝla ʻyati ka nkǝrti ka sǝgǝl sǝgǝl aka sǝr ʻya kǝthlǝryere kadwam, ko ma adǝyapani wɛ fwani ata kǝra su akuya ka gǝ ani lǝkǝma kura akǝr kura gata layi nǝr sambar ani offline.</string>
 </resources>

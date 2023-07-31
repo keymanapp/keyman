@@ -1,4 +1,4 @@
-import { LKKey } from './../../src/ldml-keyboard/ldml-keyboard-xml';
+import { LKKey } from './../../src/ldml-keyboard/ldml-keyboard-xml.js';
 import 'mocha';
 import {assert} from 'chai';
 import { CommonTypesMessages } from '../../src/util/common-events.js';

@@ -249,12 +249,12 @@
       "properties": {
         "form": {
           "enum": [
-            "hardware",
-            "touch"
+            "touch",
+            "us",
+            "iso",
+            "jis",
+            "abnt2"
           ],
-          "type": "string"
-        },
-        "hardware": {
           "type": "string"
         },
         "import": {
@@ -375,7 +375,81 @@
       ],
       "type": "object"
     },
-    "reorders": {
+    "row": {
+      "additionalProperties": false,
+      "properties": {
+        "keys": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "keys"
+      ],
+      "type": "object"
+    },
+    "set": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "value"
+      ],
+      "type": "object"
+    },
+    "settings": {
+      "additionalProperties": false,
+      "properties": {
+        "fallback": {
+          "enum": [
+            "omit"
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "special": {
+      "$ref": "#/definitions/any"
+    },
+    "stringVariable": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "value"
+      ],
+      "type": "object"
+    },
+    "transform": {
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "from"
+      ],
+      "type": "object"
+    },
+    "transformGroup": {
       "additionalProperties": false,
       "properties": {
         "import": {
@@ -395,71 +469,14 @@
             "$ref": "#/definitions/special"
           },
           "type": "array"
+        },
+        "transform": {
+          "items": {
+            "$ref": "#/definitions/transform"
+          },
+          "type": "array"
         }
       },
-      "type": "object"
-    },
-    "row": {
-      "additionalProperties": false,
-      "properties": {
-        "keys": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "keys"
-      ],
-      "type": "object"
-    },
-    "settings": {
-      "additionalProperties": false,
-      "properties": {
-        "fallback": {
-          "enum": [
-            "omit"
-          ],
-          "type": "string"
-        },
-        "transformFailure": {
-          "enum": [
-            "omit"
-          ],
-          "type": "string"
-        },
-        "transformPartial": {
-          "enum": [
-            "hide"
-          ],
-          "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "special": {
-      "$ref": "#/definitions/any"
-    },
-    "transform": {
-      "additionalProperties": false,
-      "properties": {
-        "before": {
-          "type": "string"
-        },
-        "error": {
-          "enum": [
-            "fail"
-          ],
-          "type": "string"
-        },
-        "from": {
-          "type": "string"
-        },
-        "to": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "from"
-      ],
       "type": "object"
     },
     "transforms": {
@@ -477,16 +494,15 @@
           },
           "type": "array"
         },
-        "transform": {
+        "transformGroup": {
           "items": {
-            "$ref": "#/definitions/transform"
+            "$ref": "#/definitions/transformGroup"
           },
           "type": "array"
         },
         "type": {
           "enum": [
             "simple",
-            "final",
             "backspace"
           ],
           "type": "string"
@@ -495,6 +511,58 @@
       "required": [
         "type"
       ],
+      "type": "object"
+    },
+    "unicodeSet": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "value"
+      ],
+      "type": "object"
+    },
+    "variables": {
+      "additionalProperties": false,
+      "properties": {
+        "import": {
+          "items": {
+            "$ref": "#/definitions/import"
+          },
+          "type": "array"
+        },
+        "set": {
+          "items": {
+            "$ref": "#/definitions/set"
+          },
+          "type": "array"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        },
+        "string": {
+          "items": {
+            "$ref": "#/definitions/stringVariable"
+          },
+          "type": "array"
+        },
+        "unicodeSet": {
+          "items": {
+            "$ref": "#/definitions/unicodeSet"
+          },
+          "type": "array"
+        }
+      },
       "type": "object"
     },
     "version": {
@@ -593,9 +661,6 @@
         "names": {
           "$ref": "#/definitions/names"
         },
-        "reorders": {
-          "$ref": "#/definitions/reorders"
-        },
         "settings": {
           "$ref": "#/definitions/settings"
         },
@@ -610,6 +675,9 @@
             "$ref": "#/definitions/transforms"
           },
           "type": "array"
+        },
+        "variables": {
+          "$ref": "#/definitions/variables"
         },
         "version": {
           "$ref": "#/definitions/version"

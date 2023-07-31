@@ -55,7 +55,7 @@
         <Directory Id="KeymanRoot" Name="Keyman">
           <Directory Id="KEYMANDEV" Name="Keyman Developer">
             <Directory Id="INSTALLDIR" Name="." FileSource="..\bin\">
-              <Directory Id="dir_sentry_0.4.9" Name="sentry-0.4.9" />
+              <Directory Id="dir_sentry_0.6.0" Name="sentry-0.6.0" />
               <Directory Id="dirNode" Name="node.js" />
               <Directory Id="dirProjects" Name="Projects" />
             </Directory>
@@ -211,7 +211,7 @@
     </ComponentGroup>
 
     <!-- Sentry -->
-    <ComponentGroup Id="KeymanDevSentryComponents" Directory="dir_sentry_0.4.9" Source="..\..\..\common\windows\delphi\ext\sentry">
+    <ComponentGroup Id="KeymanDevSentryComponents" Directory="dir_sentry_0.6.0" Source="..\..\bin\">
       <Component>
         <File Id="sentry.dll" KeyPath="yes" />
       </Component>
@@ -297,7 +297,7 @@
       <ComponentGroupRef Id="Server" />
     </Feature>
 
-    <Media Id="1" EmbedCab="yes" CompressionLevel="high" Cabinet="Data1.cab" VolumeLabel="DISK1" />
+    <Media Id="1" EmbedCab="yes" Cabinet="Data1.cab" VolumeLabel="DISK1" />
 
     <UIRef Id="WixUI_FeatureTree"/>
 

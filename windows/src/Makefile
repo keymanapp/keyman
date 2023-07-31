@@ -276,7 +276,7 @@ build-tools:
 
 global-versions:
     cd $(COMMON_ROOT)
-    @if not exist $(KEYMAN_ROOT)\common\windows\cpp\include\keymanversion_build.h $(MAKE) global-versions
+    @if not exist $(KEYMAN_ROOT)\include\keymanversion_build.h $(MAKE) global-versions
     cd $(ROOT)\src
 
 message-constants: build-tools

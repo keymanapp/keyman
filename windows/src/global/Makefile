@@ -20,7 +20,7 @@ build-release:
 
 clean:
   -del $(ROOT)\src\global\delphi\general\keymanversion_build.inc
-  -del $(KEYMAN_ROOT)\common\windows\cpp\include\keymanversion_build.h
+  $(GIT_BASH_FOR_KEYMAN) $(KEYMAN_ROOT)/common/include/build.sh clean
 
   cd $(ROOT)\src\global\delphi
   $(MAKE) clean

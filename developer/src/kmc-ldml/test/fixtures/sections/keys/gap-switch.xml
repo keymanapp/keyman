@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
+<keyboard locale="mt" conformsTo="techpreview">
+  <names>
+    <name value="hardware-gap-switch" />
+  </names>
+
+  <keys>
+    <key id="Q" gap="true" />
+    <key id="W" switch="shift" />
+    <key id="q" to="q" />
+    <key id="w" to="w" />
+  </keys>
+
+  <layers form="us">
+    <layer id="base">
+      <!-- beware: this is mapping ` and 1! -->
+      <row keys="Q W" />
+    </layer>
+    <layer id="shift">
+      <!-- beware: this is mapping ` and 1! -->
+      <row keys="q w" />
+    </layer>
+  </layers>
+</keyboard>

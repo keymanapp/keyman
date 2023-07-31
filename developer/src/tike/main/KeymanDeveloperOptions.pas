@@ -70,6 +70,7 @@ type
     FServerNgrokToken: string;
     FServerNgrokRegion: string;
     FServerKeepAlive: Boolean;
+    FUseLegacyCompiler: Boolean;
     procedure CloseRegistry;
     procedure OpenRegistry;
     function regReadString(const nm, def: string): string;
@@ -103,6 +104,8 @@ type
     property DebuggerAutoResetBeforeCompiling: Boolean read FDebuggerAutoResetBeforeCompiling write FDebuggerAutoResetBeforeCompiling;
     property AutoSaveBeforeCompiling: Boolean read FAutoSaveBeforeCompiling write FAutoSaveBeforeCompiling;
     property OSKAutoSaveBeforeImporting: Boolean read FOSKAutoSaveBeforeImporting write FOSKAutoSaveBeforeImporting;
+
+    property UseLegacyCompiler: Boolean read FUseLegacyCompiler write FUseLegacyCompiler;
 
     property ReportErrors: Boolean read FReportErrors write FReportErrors;
     property ReportUsage: Boolean read FReportUsage write FReportUsage;
@@ -215,6 +218,8 @@ begin
     FAutoSaveBeforeCompiling := regReadBool(SRegValue_IDEOptAutoSaveBeforeCompiling, False);
     FOSKAutoSaveBeforeImporting := regReadBool(SRegValue_IDEOptOSKAutoSaveBeforeImporting, False);
 
+    FUseLegacyCompiler := regReadBool(SRegValue_IDEOptUseLegacyCompiler, False);
+
     FServerDefaultPort := regReadInt(SRegValue_IDEOptServerPort, 8008);
     FServerKeepAlive := regReadBool(SRegValue_IDEOptServerKeepAlive, False);
     FServerUseLocalAddresses := regReadBool(SRegValue_IDEOptServerUseLocalAddresses, True);
@@ -276,6 +281,7 @@ begin
     regWriteBool(SRegValue_IDEOptAutoSaveBeforeCompiling, FAutoSaveBeforeCompiling);
     regWriteBool(SRegValue_IDEOptOSKAutoSaveBeforeImporting, FOSKAutoSaveBeforeImporting);
 
+    regWriteBool(SRegValue_IDEOptUseLegacyCompiler, FUseLegacyCompiler);
 
     regWriteInt(SRegValue_IDEOptServerPort, FServerDefaultPort);
     regWriteBool(SRegValue_IDEOptServerKeepAlive, FServerKeepAlive);

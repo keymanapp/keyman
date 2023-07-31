@@ -29,23 +29,26 @@
 # Note: keep changes to version, tier and tag determination in sync with mkver (windows/src/buildutils/mkver)
 #
 
+# Exit on command failure and when using unset variables:
+set -eu
+
 #
 # Prevents 'clear' on exit of mingw64 bash shell
 #
 SHLVL=0
 
 function findKeymanRoot() {
-    # See https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
-    # None of the answers are 100% correct for cross-platform
-    # On macOS, requires coreutils (`brew install coreutils`)
-    local SCRIPT=$(readlink -f "${BASH_SOURCE[0]}")
-    KEYMAN_ROOT="${SCRIPT%/*/*/*}"
-    readonly KEYMAN_ROOT
+  # We don't need readlink here because our standard script prolog does a
+  # readlink -f already so we will have already escaped from any symlinks
+  # But we still need to canonicalize paths to remove ../../..
+  KEYMAN_ROOT="${BASH_SOURCE[0]%/*/*/*}"
+  KEYMAN_ROOT="$( cd "$KEYMAN_ROOT" && echo "$PWD" )"
+  readonly KEYMAN_ROOT
 }
 
 function findVersion() {
     local VERSION_MD="$KEYMAN_ROOT/VERSION.md"
-    VERSION=`cat $VERSION_MD | tr -d "[:space:]"`
+    VERSION=$(builder_trim $(<"$VERSION_MD"))
     [[ "$VERSION" =~ ^([[:digit:]]+)\.([[:digit:]]+)\.([[:digit:]]+)$ ]] && {
         VERSION_MAJOR="${BASH_REMATCH[1]}"
         VERSION_MINOR="${BASH_REMATCH[2]}"
@@ -119,12 +122,12 @@ function findVersion() {
 }
 
 function findTier() {
-    local TIER_MD="$KEYMAN_ROOT/TIER.md"
-    TIER=`cat $TIER_MD | tr -d "[:space:]"`
-    [[ "$TIER" =~ ^(alpha|beta|stable)$ ]] || {
-        echo "Invalid TIER.md file: expected alpha, beta or stable."
-        exit 1;
-    }
+  local TIER_MD="$KEYMAN_ROOT/TIER.md"
+  TIER=$(builder_trim $(<"$TIER_MD"))
+  [[ "$TIER" =~ ^(alpha|beta|stable)$ ]] || {
+      echo "Invalid TIER.md file: expected alpha, beta or stable."
+      exit 1;
+  }
 }
 
 function printBuildNumberForTeamCity() {
@@ -171,11 +174,13 @@ function findShouldSentryRelease() {
 }
 
 findKeymanRoot
-findTier
-findVersion
 
 # Source builder_script
 . "$KEYMAN_ROOT/resources/builder.inc.sh"
+
+findTier
+findVersion
+
 # printVersionUtilsDebug
 printBuildNumberForTeamCity
 
@@ -283,6 +288,15 @@ replaceVersionStrings_Mkver() {
 
 set_keyman_standard_build_path() {
   PATH="$KEYMAN_ROOT/node_modules/.bin:$PATH"
+}
+
+# For CI compatbility of building Keyman for Android 16.0 with OpenJDK 8,
+# this overrides JAVA_HOME for the builder script to use OpenJDK 11.
+set_java_home() {
+  if [[ ! -z ${JAVA_HOME_11+x} ]]; then
+    builder_echo "Setting JAVA_HOME to JAVA_HOME_11 ($JAVA_HOME_11)"
+    export JAVA_HOME="${JAVA_HOME_11}"
+  fi
 }
 
 #

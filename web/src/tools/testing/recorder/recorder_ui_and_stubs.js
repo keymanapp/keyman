@@ -1,37 +1,44 @@
+import * as KMWRecorder from '../../../../build/tools/testing/recorder/lib/index.mjs';
+import { Device } from '../../../../build/engine/device-detect/lib/index.mjs';
+
+import { getResourcePathPrefix } from './recorder_KeyboardScripts.js';
+
+let RESOURCE_PATH_PREFIX = getResourcePathPrefix();
+
 var ta_inputJSON;
 var in_output;
 var recorderScribe;
 
-function focusReceiver() {
+window.focusReceiver = () => {
   var receiver = document.getElementById('receiver');
   receiver.focus();
 
-  if(keyman.util.device.touchable) {
+  if(keyman.config.hostDevice.touchable) {
     // At present, touch doesn't 'focus' properly.
     keyman.setActiveElement(receiver);
     keyman.osk.show(true);
   }
 }
 
-setElementText = function(ele, text) {
+window.setElementText = function(ele, text) {
   ele.value = text;
 }
 
-onUpdateInputRecord = function(json) {
+window.onUpdateInputRecord = function(json) {
   setElementText(ta_inputJSON, json);
 }
 
-onResetInputRecord = function() {
+window.onResetInputRecord = function() {
   setElementText(ta_inputJSON, "");
   setElementText(in_output, "");
   setElementText(document.getElementById('errorText'), "");
 }
 
-resetInputRecord = function() {
+window.resetInputRecord = function() {
   recorderScribe.resetInputRecord();
 }
 
-copyInputRecord = function() {
+window.copyInputRecord = function() {
   try {
     ta_inputJSON.select();
 
@@ -44,11 +51,11 @@ copyInputRecord = function() {
   alert("Unable to copy successfully.");
 }
 
-function saveInputRecord(constraint) {
+window.saveInputRecord = (constraint) => {
   if(!constraint) {
     var target;
     if(recorderScribe.currentSequence.hasOSKInteraction()) {
-      target = keyman.util.device.formFactor;
+      target = keyman.config.hostDevice.formFactor;
     } else {
       target = 'hardware';
     }
@@ -60,23 +67,23 @@ function saveInputRecord(constraint) {
   recorderScribe.saveInputRecord(constraint);
 }
 
-reviseInputRecord = function() {
+window.reviseInputRecord = function() {
   recorderScribe.currentSequence = new KMWRecorder.InputEventSpecSequence(JSON.parse(ta_inputJSON.value));
 }
 
-onTestDefinitionChanged = function(testDefJSON) {
+window.onTestDefinitionChanged = function(testDefJSON) {
   var masterJSON = document.getElementById('masterJSON');
   masterJSON.value = testDefJSON;
 }
 
-setTestDefinition = function(testDef) {
+window.setTestDefinition = function(testDef) {
   if(!testDef) {
     testDef = new KMWRecorder.KeyboardTest();
   }
   recorderScribe.testDefinition = testDef;
 }
 
-copyTestDefinition = function() {
+window.copyTestDefinition = function() {
   var masterJSON = document.getElementById('masterJSON');
 
   try {
@@ -91,7 +98,7 @@ copyTestDefinition = function() {
   alert("Unable to copy successfully.");
 }
 
-onKeyboardChanged = function(kbdProperties) {
+window.onKeyboardChanged = function(kbdProperties) {
   let PInternalName = kbdProperties.internalName;
   let PLgCode = kbdProperties.languageCode;
 
@@ -110,14 +117,14 @@ onKeyboardChanged = function(kbdProperties) {
   }
 }
 
-function errorUpdate() {
+window.errorUpdate = () => {
   var errorInput = document.getElementById('errorText');
   recorderScribe.errorUpdate(errorInput.value);
 }
 
-var initDevice = function() {
+window.initDevice = () => {
   // From KMW.
-  var device = new com.keyman.Device();
+  var device = new Device();
   device.detect();
 
   document.getElementById("activeFormFactor").textContent = device.formFactor;
@@ -126,9 +133,11 @@ var initDevice = function() {
   document.getElementById("activeBrowser").textContent = device.browser;
 }
 
-window.addEventListener('load', function() {
+window.addEventListener('load', async function() {
   ta_inputJSON = document.getElementById('inputRecord');
   in_output = document.getElementById('receiver');
+
+  await keyman.config.deferForInitialization.corePromise;
 
   // Set up Scribe methods
   recorderScribe = new KMWRecorder.Scribe();
@@ -137,7 +146,7 @@ window.addEventListener('load', function() {
   recorderScribe.on('record-reset', onResetInputRecord);
   recorderScribe.on('test-changed', onTestDefinitionChanged);
 
-  keyman.attachToControl(in_output);
+  keyman.contextManager.page.attachToControl(in_output);
   keyman.setKeyboardForControl(in_output, '', '');
   keyman.addEventListener('keyboardchange', onKeyboardChanged);
 
@@ -151,7 +160,7 @@ window.addEventListener('load', function() {
 });
 
 //var p={'internalName':_internalName,'language':_language,'keyboardName':_keyboardName,'languageCode':_languageCode};
-function keyboardAdded(properties) {
+window.keyboardAdded = (properties) => {
   var kbdControl = document.getElementById('KMW_Keyboard');
 
   var opt = document.createElement('OPTION');
@@ -160,7 +169,7 @@ function keyboardAdded(properties) {
   kbdControl.appendChild(opt);
 }
 
-function setupKeyboardPicker() {
+window.setupKeyboardPicker = () => {
   /* Make sure that Keyman is initialized (we can't guarantee initialization order) */
   keyman.init();
 
@@ -179,7 +188,7 @@ function setupKeyboardPicker() {
   keyman.addEventListener('keyboardregistered', keyboardAdded);
 }
 
-function doKeyboardChange(name, languageCode) {
+window.doKeyboardChange = (name, languageCode) => {
   var activeElement = document.activeElement;
   if(!activeElement) {
     activeElement = in_output;
@@ -193,7 +202,7 @@ function doKeyboardChange(name, languageCode) {
 }
 
 /* Called when user selects an item in the KMW_Keyboard SELECT */
-function KMW_KeyboardChange() {
+window.KMW_KeyboardChange = () => {
   var kbdControl = document.getElementById('KMW_Keyboard');
   /* Select the keyboard in KeymanWeb */
   var name = kbdControl.value.substr(0, kbdControl.value.indexOf("$$"));
@@ -202,7 +211,7 @@ function KMW_KeyboardChange() {
   doKeyboardChange(name, languageCode);
 }
 
-function loadExistingTest(files) {
+window.loadExistingTest = (files) => {
   if(files.length > 0) {
     var reader = new FileReader();
     reader.onload = function() {
@@ -237,7 +246,7 @@ function loadExistingTest(files) {
 
 // --------- TEST DEFINITIONS: SPEC VERSION MIGRATION ----------
 
-function convertTestDefinition(sourceSet) {
+window.convertTestDefinition = (sourceSet) => {
   if(!sourceSet) {
     // Called via HTML button, so we use the currently-loaded test definition.
     sourceSet = recorderScribe.testDefinition;
@@ -267,7 +276,7 @@ function convertTestDefinition(sourceSet) {
     return false;
   }).then(function(success) {
     // Reset KMW's detected-device set to normal.
-    keyman.util.initDevices();
+    // keyman.util.initDevices();
 
     if(success) {
       alert("Test Definition conversion complete.");
@@ -277,7 +286,7 @@ function convertTestDefinition(sourceSet) {
   });
 }
 
-function convertSet(testSet) {
+window.convertSet = (testSet) => {
   // Ensure KMW's master Device property reflects what is needed for the test!
   let simDevice = deviceFromConstraint(testSet.constraint);
   let simPhysDevice = new com.keyman.Device();
@@ -331,7 +340,7 @@ function convertSet(testSet) {
   return currentPromise;
 }
 
-function deviceFromConstraint(constraint) {
+window.deviceFromConstraint = (constraint) => {
   let trueDevice = new com.keyman.Device();
   trueDevice.detect();
 
@@ -363,7 +372,7 @@ function deviceFromConstraint(constraint) {
 
 // ----------- END SPEC VERSION MIGRATION -------------
 
-function loadExistingStubs(files) {
+window.loadExistingStubs = (files) => {
 
   var processStub = function(json, file) {
     try {
@@ -450,9 +459,9 @@ function _getCategory(arr, prefix) {
   return res.length > 0 ? res : null;
 }
 
-function clearPlatforms() { _clearCategory(     PLATFORMS,  "platform_"); }
-function setPlatformAny() { _setCategoryAny(    PLATFORMS,  "platform_"); }
-function getPlatforms()   { return _getCategory(PLATFORMS,  "platform_"); }
-function clearBrowsers()  { _clearCategory(     BROWSERS,   "browser_"); }
-function setBrowserAny()  { _setCategoryAny(    BROWSERS,   "browser_"); }
-function getBrowsers()    { return _getCategory(BROWSERS,   "browser_"); }
+window.clearPlatforms = () => { _clearCategory(     PLATFORMS,  "platform_"); }
+window.setPlatformAny = () => { _setCategoryAny(    PLATFORMS,  "platform_"); }
+window.getPlatforms = ()   => { return _getCategory(PLATFORMS,  "platform_"); }
+window.clearBrowsers = ()  => { _clearCategory(     BROWSERS,   "browser_"); }
+window.setBrowserAny = ()  => { _setCategoryAny(    BROWSERS,   "browser_"); }
+window.getBrowsers = ()    => { return _getCategory(BROWSERS,   "browser_"); }

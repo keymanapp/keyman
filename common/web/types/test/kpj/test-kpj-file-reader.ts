@@ -1,19 +1,22 @@
 import * as fs from 'fs';
 import 'mocha';
 import {assert} from 'chai';
-import { loadKpjJsonSchema, makePathToFixture } from '../helpers/index.js';
+import { loadSchema, makePathToFixture } from '../helpers/index.js';
 import { KPJFileReader } from "../../src/kpj/kpj-file-reader.js";
-import { KeymanDeveloperProjectType } from '../../src/kpj/keyman-developer-project.js';
+import { KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from '../../src/kpj/keyman-developer-project.js';
+import { TestCompilerCallbacks } from '../helpers/TestCompilerCallbacks.js';
+
+const callbacks = new TestCompilerCallbacks();
 
 describe('kpj-file-reader', function () {
   it('kpj-file-reader should read a valid file', function() {
-    const path = makePathToFixture('kpj', 'khmer_angkor.kpj');
+    const kpjPath = 'khmer_angkor.kpj';
+    const path = makePathToFixture('kpj', kpjPath);
     const input = fs.readFileSync(path);
-    const reader = new KPJFileReader();
+    const reader = new KPJFileReader(callbacks);
     const kpj = reader.read(input);
-    console.dir(kpj);
     assert.doesNotThrow(() => {
-      reader.validate(kpj, loadKpjJsonSchema());
+      reader.validate(kpj, loadSchema('kpj'));
     });
     assert.equal(kpj.KeymanDeveloperProject.Options.BuildPath, '$PROJECTPATH\\build');
     assert.equal(kpj.KeymanDeveloperProject.Options.CheckFilenameConventions, 'False');
@@ -63,7 +66,7 @@ describe('kpj-file-reader', function () {
 
     // Test transform of .kpj into a KeymanDeveloperProject
 
-    const project = reader.transform(kpj);
+    const project = reader.transform(kpjPath, kpj);
 
     assert.equal(project.options.buildPath, '$PROJECTPATH/build');
     assert.isFalse(project.options.checkFilenameConventions);
@@ -74,8 +77,7 @@ describe('kpj-file-reader', function () {
 
     assert.lengthOf(project.files, 2);
 
-    let f = project.files[0];
-    console.dir(f);
+    let f: KeymanDeveloperProjectFile10 = <KeymanDeveloperProjectFile10>project.files[0];
     assert.equal(f.id, 'id_f347675c33d2e6b1c705c787fad4941a');
     assert.equal(f.filename, 'khmer_angkor.kmn');
     assert.equal(f.filePath, 'source/khmer_angkor.kmn');
@@ -87,7 +89,7 @@ describe('kpj-file-reader', function () {
     assert.isUndefined(f.details.version);
     assert.lengthOf(f.childFiles, 1);
 
-    f = project.files[1];
+    f = <KeymanDeveloperProjectFile10>project.files[1];
     assert.equal(f.id, 'id_8d4eb765f80c9f2b0f769cf4e4aaa456');
     assert.equal(f.filename, 'khmer_angkor.kps');
     assert.equal(f.filePath, 'source/khmer_angkor.kps');
@@ -99,7 +101,8 @@ describe('kpj-file-reader', function () {
     assert.isUndefined(f.details.version);
     assert.lengthOf(f.childFiles, 18);
 
-    f = project.files[0].childFiles[0];
+    f = <KeymanDeveloperProjectFile10>project.files[0];
+    f = <KeymanDeveloperProjectFile10>f.childFiles[0];
     assert.equal(f.id, 'id_8a1efc7c4ab7cfece8aedd847679ca27');
     assert.equal(f.filename, 'khmer_angkor.ico');
     assert.equal(f.filePath, 'source/khmer_angkor.ico');
@@ -108,7 +111,8 @@ describe('kpj-file-reader', function () {
     assert.isEmpty(f.details);
     assert.lengthOf(f.childFiles, 0);
 
-    f = project.files[1].childFiles[0];
+    f = <KeymanDeveloperProjectFile10>project.files[1];
+    f = <KeymanDeveloperProjectFile10>f.childFiles[0];
     assert.equal(f.id, 'id_8dc195db32d1fd0514de0ad51fff5df0');
     assert.equal(f.filename, 'khmer_angkor.js');
     assert.equal(f.filePath, 'source/../build/khmer_angkor.js');
