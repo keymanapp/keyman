@@ -4,14 +4,13 @@
 
 On Linux, you can build the following projects:
 
+- [Keyman Core](#keyman-core) (aka core)
 - [Keyman for Linux](#keyman-for-linux)
-- [Keyman Core](#keyman-core) (Linux only) (aka core)
+- [Keyman Web](#keyman-web)
 - [Keyman for Android](#keyman-for-android)
-<!-- TODO: document how to build for Web, Core-Wasm and Common/Web on Linux.
+<!-- TODO: document how to build for Common/Web on Linux.
      See TC build agent for details. -->
-- Keyman Core (wasm targets)
 - Common/Web
-- KeymanWeb
 
 The following projects **cannot** be built on Linux:
 
@@ -20,13 +19,15 @@ The following projects **cannot** be built on Linux:
 - Keyman for macOS
 - Keyman for iOS
 
-## System Requirements
+## Requirements
+
+### System Requirements
 
 - Minimum Ubuntu version: Ubuntu 20.04
 
 Other Linux distributions will also work if appropriate dependencies are installed.
 
-## Repository Paths
+### Repository Paths
 
 Recommended filesystem layout:
 
@@ -39,7 +40,7 @@ $HOME/keyman/
     ...
 ```
 
-## Prerequisites
+### Prerequisites
 
 The current list of dependencies can be found in the `Build-Depends` section of `linux/debian/control`.
 They are most easily installed with the `mk-build-deps` tool:
@@ -50,7 +51,7 @@ sudo apt install devscripts equivs
 sudo mk-build-deps --install linux/debian/control
 ```
 
-### Node.js
+#### Node.js
 
 Node.js v18 is required for Core build, Web tests, and Developer command line tools.
 
@@ -61,19 +62,9 @@ curl -sL https://deb.nodesource.com/setup_18.x | bash
 apt-get -q -y install nodejs
 ```
 
-## Keyman for Linux
+#### Emscripten
 
-All dependencies are already installed if you followed the instructions
-under [Prerequisites](#prerequisites).
-
-### Building Keyman for Linux
-
-- [Building Keyman for Linux](../../linux/README.md)
-
-## Keyman Core
-
-Most dependencies are already installed if you followed the instructions under
-[Prerequisites](#prerequisites). You'll still have to install `emscripten`:
+You'll also have to install `emscripten` (version 3.1.44 is known to work):
 
 ```shell
 git clone https://github.com/emscripten-core/emsdk.git
@@ -85,64 +76,96 @@ export EMSCRIPTEN_BASE=$(pwd)/upstream/emscripten
 
 **NOTE:** Don't put EMSDK on the path, i.e. don't source `emsdk_env.sh`.
 
+## Keyman Core
+
+All dependencies are already installed if you followed the instructions under
+[Prerequisites](#prerequisites).
+
 ### Building Keyman Core
+
+Keyman Core can be built with the `core/build.sh` script.
 
 - [Building Keyman Core](../../core/doc/BUILDING.md)
 
-## Docker Builder
+## Keyman for Linux
 
-The Docker builder allows you to perform a linux build from anywhere Docker is supported.
-To build the docker image:
+All dependencies are already installed if you followed the instructions
+under [Prerequisites](#prerequisites).
 
-```shell
-cd linux
-docker pull ubuntu:latest
-docker build . -t keymanapp/keyman-linux-builder:latest
+### Building Keyman for Linux
+
+Keyman for Linux can be built with the `linux/build.sh` script.
+
+- [Building Keyman for Linux](../../linux/README.md)
+
+## Keyman Web
+
+Most dependencies are already installed if you followed the instructions under
+[Prerequisites](#prerequisites). You'll still have to install Chrome:
+
+```bash
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo apt install ./google-chrome-stable_current_amd64.deb
 ```
 
-Once the image is built, it may be used to build parts of Keyman.
+And add the `CHROME_BIN` environment variable to `.bashrc:
 
-- core
-
-```shell
-# build 'core' in docker
-cd $(git rev-parse --show-toplevel)/core
-# keep linux build artifacts separate
-mkdir -p build/linux
-docker run -it --rm -v $(pwd)/..:/home/build/build \
-  -v $(pwd)/build/linux:/home/build/build/core/build \
-  keymanapp/keyman-linux-builder:latest \
-  wrapper core/build.sh --debug
+```bash
+export CHROME_BIN=/opt/google/chrome/chrome
 ```
 
-- linux
+### Environment variables for Keyman Web
 
-```shell
-# build 'linux' installation in docker
-cd $(git rev-parse --show-toplevel)
-docker run -it --rm -v $(pwd):/home/build/build \
-  keymanapp/keyman-linux-builder:latest \
-  wrapper 'DESTDIR=/home/build linux/build.sh --debug build install'
-```
+`CHROME_BIN` pointing to the Google Chrome binary.
+
+### Building Keyman Web
+
+Keyman Web can be built with the `web/build.sh` script.
+
+- [Building Keyman Web](../../web/README.md)
 
 ## Keyman for Android
 
 **Dependencies:**
 
-- [Base](#base-dependencies)
-- [Web](./windows#web-dependencies)
+Most dependencies are already installed if you followed the instructions
+under [Prerequisites](#prerequisites).
 
 **Additional requirements:**
 
-- Android SDK
 - [Android Studio](https://developer.android.com/studio/install#linux)
-- Gradle
+  or sdkmanager
 - Maven
-- OpenJDK 11 (for Keyman 17.0+)
 - pandoc
+- Android SDK
+- Gradle
+- jq
+
+If you only use the command line you don't need Android Studio, however
+to do development it's recommended to install it.
 
 Run Android Studio once after installation to install additional components
 such as emulator images and SDK updates.
+
+Maven, jq and pandoc can be installed with:
+
+```shell
+sudo apt update
+sudo apt install maven pandoc jq
+```
+
+If necessary, Android SDK and Gradle will be installed by the build script.
+In order for that to work, run the following command once. You won't need
+this if you install Android SDK through Android Studio.
+
+```shell
+sudo apt install sdkmanager
+sudo sdkmanager platform-tools
+sudo chown -R $USER:$USER /opt/android-sdk/
+sdkmanager --licenses
+```
+
+### Environment variables for Keyman for Android
 
 **Required environment variable:**
 
@@ -152,23 +175,15 @@ such as emulator images and SDK updates.
 
 - [`JAVA_HOME`](#java_home)
 
-Building:
+### Building Keyman for Android
+
+Keyman for Android can be built with the `android/build.sh` script.
 
 - [Building Keyman for Android](../../android/README.md)
 
-## Prerequisites
+### Notes on Environment Variables
 
-Many dependencies are only required for specific projects.
-
-### Base Dependencies
-
-**Environment variables:**
-
-- --
-
-## Notes on Environment Variables
-
-### JAVA_HOME
+#### JAVA_HOME
 
 This environment variable tells Gradle what version of Java to use for building
 Keyman for Android. OpenJDK 11 is used for master.
@@ -191,3 +206,59 @@ older versions, you can set `JAVA_HOME_11` to the OpenJDK 11 path and
 from command line. But note that you do need to update your `JAVA_HOME` env
 var to the associated version before opening Android Studio and loading any
 Android projects. `JAVA_HOME_11` is mostly used by CI.
+
+## Docker Builder
+
+The Docker builder allows you to perform a build from anywhere Docker is supported.
+
+To build the docker image:
+
+```shell
+cd linux
+docker pull ubuntu:latest
+docker build . -t keymanapp/keyman-linux-builder:latest
+```
+
+Once the image is built, it may be used to build parts of Keyman.
+
+**Note** that it's not yet possible to run tests in the Docker container.
+
+- core
+
+  ```shell
+  # build 'Keyman Core' in docker
+  # keep linux build artifacts separate
+  mkdir -p $(git rev-parse --show-toplevel)/core/build/linux
+  docker run -it --rm -v $(git rev-parse --show-toplevel):/home/build/build \
+    -v $(git rev-parse --show-toplevel)/core/build/linux:/home/build/build/core/build \
+    keymanapp/keyman-linux-builder:latest \
+    core/build.sh --debug
+  ```
+
+- linux
+
+  ```shell
+  # build 'Keyman for Linux' installation in docker
+  docker run -it --rm -v $(git rev-parse --show-toplevel):/home/build/build \
+    --entrypoint /bin/bash keymanapp/keyman-linux-builder:latest \
+    -c 'DESTDIR=/home/build /usr/bin/bashwrapper linux/build.sh --debug build install'
+  ```
+
+- Keyman Web
+
+  ```shell
+  # build 'Keyman Web' in docker
+  docker run --privileged -it --rm \
+    -v $(git rev-parse --show-toplevel):/home/build/build \
+    keymanapp/keyman-linux-builder:latest \
+    web/build.sh --debug
+  ```
+
+- Keyman for Android
+
+  ```shell
+  # build 'Keyman for Android' in docker
+  docker run -it --rm -v $(git rev-parse --show-toplevel):/home/build/build \
+    keymanapp/keyman-linux-builder:latest \
+    android/build.sh --debug
+  ```
