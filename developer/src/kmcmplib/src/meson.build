@@ -28,7 +28,7 @@ if cpp_compiler.get_id() == 'emscripten'
   # wasm-exceptions supported in Node 18+, Chrome 95+, Firefox 100+, Safari 15.2+
   flags += ['-fwasm-exceptions']
   lib_links = ['--whole-archive', '-sMODULARIZE', '-sEXPORT_ES6']
-  links += ['-fwasm-exceptions', '--bind', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
+  links += ['-fwasm-exceptions', '--bind', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\',\'wasmExports\']']
 endif
 
 icu = subproject('icu-for-uset', default_options: [ 'default_library=static', 'cpp_std=c++17', 'warning_level=0', 'werror=false'])
