@@ -1,8 +1,10 @@
-keyman (16.0.141-1) UNRELEASED; urgency=medium
+keyman (16.0.141-1) unstable; urgency=medium
 
   * Work around mips64el build failure (#1041499)
+  * New upstream release.
+  * Re-release to Debian
 
- -- Eberhard Beilharz <eb1@sil.org>  Tue, 25 Jul 2023 18:49:54 +0200
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 27 Jul 2023 16:30:04 +0200
 
 keyman (16.0.140-1) unstable; urgency=medium
 
