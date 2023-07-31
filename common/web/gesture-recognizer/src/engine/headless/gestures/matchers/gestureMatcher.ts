@@ -6,10 +6,6 @@ import { GestureModel, GestureResolution, GestureResolutionSpec, RejectionDefaul
 import { ManagedPromise, TimeoutPromise } from "@keymanapp/web-utils";
 import { FulfillmentCause, PathMatcher } from "./pathMatcher.js";
 
-//
-// TODO:  Next up - let's unit-test this bad boy!
-//
-
 export interface MatchResult<Type> {
   matched: boolean,
   action: GestureResolution<Type>
@@ -65,12 +61,9 @@ export class GestureMatcher<Type> {
 
     this.pathMatchers = [];
 
-    let sourceTouchpoints: SimpleGestureSource<Type>[];
-    if(source) {
-      sourceTouchpoints = source.touchpoints;
-    } else {
-      sourceTouchpoints = predecessor.pathMatchers.map((matcher) => matcher.source);
-    }
+    const sourceTouchpoints: SimpleGestureSource<Type>[] = source
+      ? source.touchpoints
+      : predecessor.pathMatchers.map((matcher) => matcher.source);
 
     let offset = 0;
     for(let touchpointIndex = 0; touchpointIndex < sourceTouchpoints.length; touchpointIndex++) {
@@ -131,7 +124,7 @@ export class GestureMatcher<Type> {
         // Some gesture types may wish to restart with a new base item if they fail due to
         // it changing during its lifetime or due to characteristics of the contact-point's
         // path.
-        if(this.model.rejectionActions && this.model.rejectionActions[cause]) {
+        if(this.model.rejectionActions?.[cause]) {
           action = this.model.rejectionActions[cause];
           action.item = 'none';
         }
