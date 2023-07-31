@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.150 alpha 2023-07-31
+
+* chore(linux): Update debian changelog (#9358)
+* chore(linux): Fix creation of PRs after uploading to Debian (#9360)
+
 ## 17.0.149 alpha 2023-07-30
 
 * fix(core): Better range check for Uni_IsValid() (#9346)
