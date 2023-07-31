@@ -141,6 +141,10 @@ export class TransformCompiler<T extends TransformCompilerType, TranBase extends
       cookedTo = sections.vars.substituteStrings(cookedTo, sections);
     }
 
+    // add in markers. idempotent if no markers.
+    cookedFrom = sections.vars.substituteMarkerString(cookedFrom); // TODO-LDML: need to support \m{.} here, maybe other edge cases
+    cookedTo = sections.vars.substituteMarkerString(cookedTo);
+
     result.from = sections.strs.allocAndUnescapeString(cookedFrom); // TODO-LDML: not unescaped here, done previously
     result.to = sections.strs.allocAndUnescapeString(cookedTo); // TODO-LDML: not unescaped here, done previously
     return result;

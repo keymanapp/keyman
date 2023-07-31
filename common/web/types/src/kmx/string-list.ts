@@ -1,3 +1,4 @@
+import { OrderedStringList } from 'src/ldml-keyboard/pattern-parser.js';
 import { Strs, StrsItem } from './kmx-plus.js';
 
 /**
@@ -22,7 +23,7 @@ export class ListIndex {
  * A string list in memory. This will be replaced with an index
  * into the string table at finalization.
  */
-export class ListItem extends Array<ListIndex> {
+export class ListItem extends Array<ListIndex> implements OrderedStringList {
   /**
    * Construct a new list from an array of strings.
    * Use List. This is meant to be called by the List.allocString*() functions.
@@ -40,6 +41,9 @@ export class ListItem extends Array<ListIndex> {
         let index = new ListIndex(strs.allocString(str));
         this.push(index);
     }
+  }
+  getItemOrder(item: string): number {
+    return this.findIndex(({value}) => value.value === item);
   }
   isEqual(a: ListItem | string[]): boolean {
     if (a.length != this.length) {

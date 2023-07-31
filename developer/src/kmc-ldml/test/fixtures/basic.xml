@@ -46,6 +46,11 @@
   <transforms type="simple">
     <transformGroup>
       <transform from="^a" to="â" />
+      <transform from="a" to="\m{a}" />
+    </transformGroup>
+    <transformGroup>
+      <!-- delete that marker -->
+      <transform from="\m{a}" />
     </transformGroup>
 
     <transformGroup>
