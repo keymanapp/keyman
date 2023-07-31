@@ -100,14 +100,35 @@ export class SimpleGestureSource<HoveredItemType> {
     return this.path.coords[this.path.coords.length-1];
   }
 
+  /**
+   * Creates a 'subview' of the current SimpleGestureSource.  It will be updated as the underlying
+   * source continues to receive updates until disconnected.
+   *
+   * @param startAtEnd If `true`, the 'subview' will appear to start at the most recently-observed
+   * path coordinate.  If `false`, it will have full knowledge of the current path.
+   * @param preserveBaseItem If `true`, the 'subview' will denote its base item as the same
+   * as its source.  If `false`, the base item for the 'subview' will be set to the `item` entry
+   * from the most recently-observed path coordinate.
+   * @returns
+   */
   public constructSubview(startAtEnd: boolean, preserveBaseItem: boolean) {
     return new SimpleGestureSourceSubview(this, startAtEnd, preserveBaseItem);
   }
 
+  /**
+   * Terminates all tracking for the modeled contact point.  Passing `true` as a parameter will
+   * treat the touchpath as if it were cancelled; `false` and `undefined` will treat it as if
+   * the touchpath has completed its standard lifecycle.
+   * @param cancel
+   */
   public terminate(cancel?: boolean) {
     this.path.terminate(cancel);
   }
 
+  /**
+   * Denotes if the contact point's path either was cancelled or completed its standard
+   * lifecycle.
+   */
   public get isPathComplete(): boolean {
     return this.path.isComplete;
   }
@@ -198,6 +219,10 @@ export class SimpleGestureSourceSubview<HoveredItemType> extends SimpleGestureSo
     return this._baseSource;
   }
 
+  /**
+   * This disconnects this subview from receiving further updates from the the underlying
+   * source without causing it to be cancelled or treated as completed.
+   */
   public disconnect() {
     if(this.subviewDisconnector) {
       this.subviewDisconnector();
@@ -206,9 +231,10 @@ export class SimpleGestureSourceSubview<HoveredItemType> extends SimpleGestureSo
   }
 
   /**
-   * Will also terminate the baseSource.  If the decision has been made to actively
-   * terminate the path by a gesture matcher, this is what is actually desired, even
-   * if called on a 'subview' of it.
+   * Like `disconnect`, but this will also terminate the baseSource and prevent further
+   * updates for the true, original `SimpleGestureSource` instance.  If the gesture-model
+   * and gesture-matching algorithm has determined this should be called, full path-update
+   * termination is correct, even if called against a subview into the instance.
    */
   public terminate(cancel?: boolean) {
     this.baseSource.terminate(cancel);
