@@ -129,7 +129,7 @@ if [ $DO_UPDATE = true ]; then
     fi
 
     # Copy resources.
-    /bin/cp -Rf "$KEYMAN_ENGINE_FRAMEWORK_SRC" "$KEYMAN_ENGINE_FRAMEWORK_DST"
+    cp -Rf "$KEYMAN_ENGINE_FRAMEWORK_SRC" "$KEYMAN_ENGINE_FRAMEWORK_DST"
 fi
 
 if [ $CODE_SIGN = true ]; then
