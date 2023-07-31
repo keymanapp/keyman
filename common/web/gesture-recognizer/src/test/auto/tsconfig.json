@@ -1,0 +1,11 @@
+/*
+ * VS Code Intellisense needs this helper in order to properly use subpath imports in the
+ * test specs found under the `headless` subfolder.  Otherwise, it'll report errors while
+ * editing - even if the tests themselves actually work.
+ */
+{
+  "extends": "../../../../tsconfig.kmw-main-base.json",
+  "compilerOptions": {
+    "moduleResolution": "Node16",
+  }
+}

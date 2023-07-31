@@ -48,7 +48,7 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
   private _isComplete: boolean = false;
   private _wasCancelled?: boolean;
 
-  private _stats: CumulativePathStats;
+  private _stats: CumulativePathStats<Type>;
 
   public get stats() {
     // Is (practically) immutable, so it's safe to expose the instance directly.
@@ -75,7 +75,7 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
     instance._isComplete = true;
     instance._wasCancelled = jsonObj.wasCancelled;
 
-    let stats = instance.samples.reduce((stats: CumulativePathStats, sample) => stats.extend(sample), new CumulativePathStats());
+    let stats = instance.samples.reduce((stats: CumulativePathStats<Type>, sample) => stats.extend(sample), new CumulativePathStats<Type>());
     instance._stats = stats;
 
     return instance;

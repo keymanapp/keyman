@@ -6,7 +6,7 @@ import fs from 'fs';
 
 import { GesturePath } from '@keymanapp/gesture-recognizer';
 import { timedPromise } from '@keymanapp/web-utils';
-import { TouchpathTurtle } from '../../../../build/tools/obj/index.js';
+import { TouchpathTurtle } from '#tools';
 
 // Ensures that the resources are resolved relative to this script, not to the cwd when the test
 // runner was launched.
