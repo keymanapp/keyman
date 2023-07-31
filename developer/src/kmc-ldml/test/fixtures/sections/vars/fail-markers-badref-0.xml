@@ -13,7 +13,7 @@ This will fail because the two markers given don't exist anywhere.
   <displays>
     <!-- Not ok, nobody emits this, so this display doesn't make sense -->
     <display to="\m{doesnt_exist_1}" display="¬" />
-    <!-- OK - it si in the strings list.  Could warn that it matches no keys -->
+    <!-- OK - it is in the strings list.  Could warn that it matches no keys -->
     <display to="\m{maybe_emitted}" display="‽" />
   </displays>
 
