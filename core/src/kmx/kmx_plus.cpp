@@ -1045,7 +1045,7 @@ COMP_KMXPLUS_USET_Helper::setUset(const COMP_KMXPLUS_USET *newUset) {
       KMX_DWORD lastEnd = 0x0;
       for (KMX_DWORD r = 0; is_valid && r < e.count; r++) {
         const auto &range = ranges[e.range + r];  // already range-checked 'r' above
-        if (!Uni_IsValid(range.start) || !Uni_IsValid(range.end)) {
+        if (!Uni_IsValid(range.start, range.end)) {
           DebugLog("uset[%d][%d] not valid: [U+%04X-U+%04X]", i, r, range.start, range.end);
           is_valid = false;
           assert(is_valid);
@@ -1094,7 +1094,7 @@ bool
 USet::valid() const {
   // double check
   for (const auto &range : ranges) {
-    if (!Uni_IsValid(range.start) || !Uni_IsValid(range.end)) {
+    if (!Uni_IsValid(range.start, range.end)) {
       DebugLog("Invalid UnicodeSet (contains noncharacters): [U+%04X,U+%04X]", (int)range.start, (int)range.end);
       return false;
     }
