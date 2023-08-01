@@ -237,11 +237,8 @@ export class KmnCompiler implements UnicodeSetParser {
       return null;
     }
 
-    let malloc = this.Module?.wasmExports?.malloc || this.Module?.asm?.malloc;
+    const malloc = (this.Module.wasmExports ?? this.Module.asm)?.malloc;
 
-    if (!malloc) {
-      throw new Error(`Internal Error: missing wasmExports.malloc() / asm.malloc()`);
-    }
 
     const buf = malloc(rangeCount * 2 * this.Module.HEAPU32.BYTES_PER_ELEMENT);
     // TODO-LDML: Catch OOM
