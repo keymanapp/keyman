@@ -1,8 +1,8 @@
 # keyman-system-service
 
-A DBus system service that allows to access /dev/input/* devices
-to toggle capslock and perform other keyboard related actions when
-running under Wayland.
+A DBus system service that allows to access `/dev/input/*` devices
+to toggle capslock and perform other keyboard related actions. This is
+required when running under Wayland, but also used with X11.
 
 See <https://0pointer.net/blog/the-new-sd-bus-api-of-systemd.html>,
 <https://stackoverflow.com/a/44281937>,
