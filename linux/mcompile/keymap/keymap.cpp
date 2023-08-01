@@ -27,7 +27,7 @@ int dummytest_keymap(){
   return 0;
 }
 
-bool write_US_ToVector( v_dw_3D &vec,std::string language, const char* text) {
+int write_US_ToVector( v_dw_3D &vec,std::string language, const char* text) {
 
   // _S2 relative path !!
   std::string FullPathName = "/usr/share/X11/xkb/symbols/" + language;
@@ -35,30 +35,29 @@ bool write_US_ToVector( v_dw_3D &vec,std::string language, const char* text) {
   const char* path = FullPathName.c_str();
   FILE* fp = fopen((path), "r");
   if ( !fp) {
-    wprintf(L"could not open file!");
+    wprintf(L"ERROR: could not open file!");
     return 1;
   }
 
   // create 1D-vector of the complete line
   v_str_1D Vector_completeUS;
-  if( CreateCompleteRow_US(Vector_completeUS,fp , text, language)) {
+  if( createCompleteRow_US(Vector_completeUS,fp , text, language)) {
     wprintf(L"ERROR: can't Create complete row US \n");
     return 1;
   }
 
   // split contents of 1D Vector to 3D vector
-  if( Split_US_To_3D_Vector( vec,Vector_completeUS)) {
-    wprintf(L"ERROR: can't Split USto 3D-Vector \n");
+  if( split_US_To_3D_Vector( vec,Vector_completeUS)) {
     return 1;
   }
   wprintf(L"\n   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-  wprintf(L"   +++++++ dimensions of Vector after write_US_ToVector (languages..characters..shiftstates)\t\t %li..%li..%li\n", vec.size(), vec[0].size(),vec[0][0].size());
+  wprintf(L"   +++++++ dimensions of Vector after split_US_To_3D_Vector (languages..characters..shiftstates)\t\t %li..%li..%li\n", vec.size(), vec[0].size(),vec[0][0].size());
 
   fclose(fp);
   return 0;
 }
 
-bool  CreateCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, std::string language) {
+bool  createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, std::string language) {
   // in the Configuration file we find the appopriate paragraph between "xkb_symbol <text>" and the next xkb_symbol
   // and then copy all rows starting with "key <" to a v1D-Vector
 
@@ -96,16 +95,15 @@ bool  CreateCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, 
   }
 
   if (complete_List.size() <1) {
-    wprintf(L"ERROR: can't Create complete row US \n");
+    wprintf(L"ERROR: can't create complete row US \n");
     return 1;
   }
 
    return 0;
 }
 
-KMX_DWORD replaceNamesWithCharacterInt(std::wstring tok_wstr){
-  KMX_DWORD ValueInvalid = 32;      // _S2 do we use space, 0, FFFF for a char we cannot use ??
-  std::map<std::wstring, unsigned long int > first;
+KMX_DWORD convertNamesToValue(std::wstring tok_wstr){
+  std::map<std::wstring, KMX_DWORD > first;
 
   //initializing
   first[L"exclam"] =           33;
@@ -135,16 +133,16 @@ KMX_DWORD replaceNamesWithCharacterInt(std::wstring tok_wstr){
     return (KMX_DWORD) ( *tok_wstr.c_str() );;
   }
   else {
-		std::map<std::wstring, unsigned long int > ::iterator it;
+		std::map<std::wstring, KMX_DWORD > ::iterator it;
 		for (it = first.begin(); it != first.end(); ++it) {
 			if (it->first == tok_wstr)
 				return it->second;
 		}
   }
-  return ValueInvalid;
+  return returnIfCharInvalid;
 }
 
-bool Split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
+bool split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
   // 1: take the whole line of the 1D-Vector and remove unwanted characters.
   // 2: seperate the name e.g. key<AD06> from the shiftstates
   // 3: convert to DWORD
@@ -191,7 +189,7 @@ bool Split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
       for ( int i = 1; i< (int) tokens.size();i++) {
 
         // replace a name with a single character ( a -> a  ; equal -> = ) 
-        tokens_int = replaceNamesWithCharacterInt( wstring_from_string(tokens[i]));
+        tokens_int = convertNamesToValue( wstring_from_string(tokens[i]));
         tokens_dw.push_back(tokens_int);
       }
 
@@ -213,7 +211,7 @@ bool Split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
 }
 
 int replace_PosKey_with_Keycode(std::string  in) {
-  int out=0;
+  int out = returnIfCharInvalid;
   if      ( in == "key<TLDE>")    out = 49;   // TOASK correct ???
   else if ( in == "key<AE01>")    out = 10;
   else if ( in == "key<AE02>")    out = 11;
@@ -275,7 +273,7 @@ bool append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
   v_dw_2D Other_Vector2D = create_empty_2D(All_Vector[0].size(),All_Vector[0][0].size());
 
   if (Other_Vector2D.size()==0) {
-    wprintf(L"ERROR: create empty 2D-Vector failed");
+    wprintf(L"ERROR: can't create empty 2D-Vector");
     return 1;
   }
 
@@ -294,8 +292,8 @@ bool append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
     All_Vector[1][i][0] = All_Vector[0][i][0];
 
     // get Keyvals of this key and copy to unshifted/shifted in "other"-block[1][i][1] / block[1][i][2]
-    All_Vector[1][i][0+1] = GetKeyvalsFromKeymap(keymap,(All_Vector[1][i][0]),0);   //shift state: unshifted:0
-    All_Vector[1][i][1+1] = GetKeyvalsFromKeymap(keymap,(All_Vector[1][i][0]),1);   //shift state: shifted:1
+    All_Vector[1][i][0+1] = getKeyvalsFromKeymap(keymap,(All_Vector[1][i][0]),0);   //shift state: unshifted:0
+    All_Vector[1][i][1+1] = getKeyvalsFromKeymap(keymap,(All_Vector[1][i][0]),1);   //shift state: shifted:1
 
     //wprintf(L" Keycodes US dw        :   %d (US): -- %i (%c)  -- %i (%c) ---- (other): %i (%c)  --  %i(%c)    \n",(All_Vector[1][i][0]),All_Vector[0][i][1],All_Vector[0][i][1],All_Vector[0][i][2],All_Vector[0][i][2],All_Vector[1][i][1] ,All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
     //wprintf(L"   Keycodes ->Other dw:-:   %d (US): -- %i (%c)  -- %i (%c)   \n\n",(All_Vector[1][i][0]),All_Vector[1][i][1],All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
@@ -304,21 +302,20 @@ bool append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
 }
 
 v_dw_2D create_empty_2D( int dim_rows,int dim_shifts) {
-  KMX_DWORD empty = 32;
   v_dw_1D shifts;
-  v_dw_2D all_2D;
+  v_dw_2D Vector_2D;
 
   for ( int i=0; i< dim_rows;i++) {
     for ( int j=0; j< dim_shifts;j++) {
-      shifts.push_back(empty);
+      shifts.push_back(returnIfCharInvalid);
     }
-    all_2D.push_back(shifts);
+    Vector_2D.push_back(shifts);
     shifts.clear();
   }
-  return all_2D;
+  return Vector_2D;
 }
 
-int GetKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
+int getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
@@ -334,7 +331,7 @@ int GetKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) 
 
   out = keyvals[shift_state_pos];
 
-  //wprintf(L" GetKeyvalsFromKeymap: in %i  -- out : %i \n", (int)keycode, out);
+  //wprintf(L" getKeyvalsFromKeymap: in %i  -- out : %i \n", (int)keycode, out);
 
   // _S2 if out of range of what ( ascii??) return 0 or other value ?
   if (out > 255)

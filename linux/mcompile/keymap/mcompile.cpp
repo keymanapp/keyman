@@ -77,7 +77,7 @@ int run(int argc, std::vector<std::u16string>  str_argv, char* argv_ch[] = NULL)
     argv.push_back(cmdl_par);
   }
 
- wprintf(L"_S2 started run for char16_t*\n");
+ wprintf(L"##### started run for char16_t*\n");
 
     if(argc < 3 || (argc < 5 && u16cmp(argv[1], u"-u") != 0)) {   // I4273// I4273
      wprintf(
@@ -188,9 +188,10 @@ wprintf(L"_S2 * Up to here cross-platform xx  :-))))) **************************
 
 // Ubuntu:  Each of the 4 columns specifies a different modifier:  unmodified,  shift,   right alt (altgr),     shift+right alt(altgr)
 // we have assigned these to columns 1-4  ( column o holds the keycode)
+
 // some hold up to 8 what are those ???
-const UINT VKShiftState[] = {0, 1,  2, 3, 4, 0xFFFF};
-//const UINT VKShiftState[] = {0, 1,  2,  0xFFFF};
+//const UINT VKShiftState[] = {0, 1,  2, 3, 4, 0xFFFF};
+const UINT VKShiftState[] = {0, 1,  2,  0xFFFF};
 // _S2 shiftstate from systems-file
 
 void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, DWORD vk, UINT shift, KMX_WCHAR ch) {
@@ -220,7 +221,7 @@ KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
 }
 
 // takes capital letter of US returns cpital character of Other keyboard
-int  KMX_VKUSToVKUnderlyingLayout(v_dw_3D &All_Vector,KMX_DWORD inUS) {
+KMX_DWORD  KMX_VKUSToVKUnderlyingLayout(v_dw_3D &All_Vector,KMX_DWORD inUS) {
   // loop and find char in US; then return char of Other
   for( int i=0; i< (int)All_Vector[0].size();i++) {
     // lists entries of all_vector
@@ -265,7 +266,7 @@ bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]){
   return 0;
 }
 
-bool createVectorForBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
+bool createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
 
   std::string US_language    = "us";
   const char* text_us        = "xkb_symbols \"basic\"";
@@ -278,7 +279,7 @@ bool createVectorForBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
 
   // add contents of other keyboard to All_Vector
   if( append_other_ToVector(All_Vector,keymap)) {
-    wprintf(L"ERROR: can't append other ToVector \n");
+    wprintf(L"ERROR: can't append Other ToVector \n");
     return 1;
   }
   return 0;
@@ -301,12 +302,12 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
   //_ init gdk
   GdkKeymap *keymap;
   if(InitializeGDK(&keymap , argc,  argv) )
-      wprintf(L"ERROR: can't InitializeGDK\n");
+      wprintf(L"ERROR: can't Initialize GDK\n");
 
   // create vector
   v_dw_3D All_Vector;
-  if(createVectorForBothKeyboards(All_Vector,keymap) )
-    wprintf(L"ERROR: can't createVectorForBothKeyboardsDWORD\n");
+  if(createOneVectorFromBothKeyboards(All_Vector,keymap) )
+    wprintf(L"ERROR: can't create one vector from both keyboards\n");
 
   //test(All_Vector);
 
@@ -325,13 +326,13 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
 
       KMX_WCHAR ch = KMX_CharFromVK(All_Vector,vkUnderlying, VKShiftState[j], &DeadKey);
 
-      //_S2 mark if difference is not 32= (unshifted-shifted )
+      //_S2 mark if difference is not 32= (unshifted-shifted ) - can go later
       if (!( ((int) KMX_VKMap[i] == ch ) || ((int) KMX_VKMap[i] == (int) ch -32)    )  )
         ERROR = L" !!!";
       else
         ERROR = L" ";
 
-      wprintf(L"   dw DoConvert-read i:  %i \t(KMX_VKMap): %i (%c)  \t--->  vkUnderlying: %i (%c)    \tshiftstate: ( %i )   \t---- >  ch: %i (%c)  \t%ls  \t%ls\n" , i,(int) KMX_VKMap[i],(int)KMX_VKMap[i],  vkUnderlying,vkUnderlying, VKShiftState[j] ,  ch ,ch ,  ((int) vkUnderlying != (int) KMX_VKMap[i] ) ? L" *** ": L"", ERROR);
+      wprintf(L"   DoConvert-read i:  %i \t(KMX_VKMap): %i (%c)  \t--->  vkUnderlying: %i (%c)    \tshiftstate: ( %i )   \t---- >  ch: %i (%c)  \t%ls  \t%ls\n" , i,(int) KMX_VKMap[i],(int)KMX_VKMap[i],  vkUnderlying,vkUnderlying, VKShiftState[j] ,  ch ,ch ,  ((int) vkUnderlying != (int) KMX_VKMap[i] ) ? L" *** ": L"", ERROR);
       //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
 
       if(bDeadkeyConversion) {   // I4552
