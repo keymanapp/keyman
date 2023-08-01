@@ -8,7 +8,7 @@ import { InfrastructureMessages } from '../messages/messages.js';
 import { CompilerFileCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
 import { BaseOptions } from '../util/baseOptions.js';
 import { expandFileLists } from '../util/fileLists.js';
-import { isProject } from 'src/util/projectLoader.js';
+import { isProject } from '../util/projectLoader.js';
 
 
 function commandOptionsToCompilerOptions(options: any): CompilerOptions {
