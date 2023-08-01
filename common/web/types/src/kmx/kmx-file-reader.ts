@@ -82,6 +82,7 @@ export class KmxFileReader {
 
     result.keyboardVersion = '';
     result.isMnemonic = false;
+    result.targets = 'desktop';
 
     this.readStores(binaryKeyboard, kmx, source, result);
     this.readGroupsAndRules(binaryKeyboard, kmx, source, result);

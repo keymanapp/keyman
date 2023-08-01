@@ -105,9 +105,9 @@ export function writeMergedModelMetadataFile(
   setModelMetadata('name', options.kmpJsonData.info.name.description);
 
   let author = options.kmpJsonData.info.author;
-  setModelMetadata('authorName', author.description);
+  setModelMetadata('authorName', author?.description);
 
-  if (author.url) {
+  if (author?.url) {
     // we strip the mailto: from the .kps file for the .model_info
     let match = author.url.match(/^(mailto\:)?(.+)$/);
     /* c8 ignore next 3 */

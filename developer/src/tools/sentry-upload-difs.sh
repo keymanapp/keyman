@@ -44,6 +44,7 @@ sourcemap_paths=(
   ../bin/server
   ./kmc/build
   ./kmc-analyze/build
+  ./kmc-keyboard-info/build
   ./kmc-kmn/build
   ./kmc-ldml/build
   ./kmc-model/build
