@@ -6,7 +6,7 @@ import { InfrastructureMessages } from '../messages/messages.js';
 import { CompilerCallbacks, CompilerLogLevel } from '@keymanapp/common-types';
 import { AnalyzeOskCharacterUse, AnalyzeOskRewritePua } from '@keymanapp/kmc-analyze';
 import { BaseOptions } from '../util/baseOptions.js';
-import { runOnFiles } from '../util/projectReader.js';
+import { runOnFiles } from '../util/projectRunner.js';
 
 interface AnalysisActivityOptions /* not inheriting from CompilerBaseOptions */ {
   /**
