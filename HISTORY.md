@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 17.0.151 alpha 2023-08-01
+
+* feat(developer) marker steps (#9364)
+* feat(common): marker processing (#9365)
+* chore(linux): Don't fail on parallel builds (#9368)
+* fix(developer): fix breakage from emscripten 3.1.44 (#9375)
+* docs(core): Document how to build Core on Linux (#9328)
+
 ## 17.0.150 alpha 2023-07-31
 
 * chore(linux): Update debian changelog (#9358)
