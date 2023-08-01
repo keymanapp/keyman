@@ -237,7 +237,10 @@ export class KmnCompiler implements UnicodeSetParser {
       return null;
     }
 
-    const buf = this.Module.asm.malloc(rangeCount * 2 * this.Module.HEAPU32.BYTES_PER_ELEMENT);
+    const malloc = (this.Module.wasmExports ?? this.Module.asm)?.malloc;
+
+
+    const buf = malloc(rangeCount * 2 * this.Module.HEAPU32.BYTES_PER_ELEMENT);
     // TODO-LDML: Catch OOM
     /** return code, if positive: range count */
     const rc = this.Module.kmcmp_parseUnicodeSet(pattern, buf, rangeCount * 2);
