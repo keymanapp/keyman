@@ -35,7 +35,7 @@ int write_US_ToVector( v_dw_3D &vec,std::string language, const char* text) {
   const char* path = FullPathName.c_str();
   FILE* fp = fopen((path), "r");
   if ( !fp) {
-    wprintf(L"ERROR: could not open file!");
+    wprintf(L"ERROR: could not open file!\n");
     return 1;
   }
 
@@ -95,7 +95,7 @@ bool  createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, 
   }
 
   if (complete_List.size() <1) {
-    wprintf(L"ERROR: can't create complete row US \n");
+    wprintf(L"ERROR: can't create row from US \n");
     return 1;
   }
 
@@ -142,7 +142,7 @@ KMX_DWORD convertNamesToValue(std::wstring tok_wstr){
   return returnIfCharInvalid;
 }
 
-bool split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
+int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
   // 1: take the whole line of the 1D-Vector and remove unwanted characters.
   // 2: seperate the name e.g. key<AD06> from the shiftstates
   // 3: convert to DWORD
@@ -268,12 +268,12 @@ int replace_PosKey_with_Keycode(std::string  in) {
   return out;
 }
 
-bool append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
+int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
   // create a 2D vector all filled with "--" and push to 3D-Vector
   v_dw_2D Other_Vector2D = create_empty_2D(All_Vector[0].size(),All_Vector[0][0].size());
 
   if (Other_Vector2D.size()==0) {
-    wprintf(L"ERROR: can't create empty 2D-Vector");
+    wprintf(L"ERROR: can't create empty 2D-Vector\n");
     return 1;
   }
 
@@ -282,7 +282,7 @@ bool append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
   wprintf(L"   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
 
   if (All_Vector.size() < 2) {
-    wprintf(L"ERROR: creation of 3D-Vector failed");
+    wprintf(L"ERROR: creation of 3D-Vector failed\n");
     return 1;
   }
 
@@ -315,11 +315,11 @@ v_dw_2D create_empty_2D( int dim_rows,int dim_shifts) {
   return Vector_2D;
 }
 
-int getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
+KMX_DWORD getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
-  int out;
+  KMX_DWORD out;
 
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
@@ -329,7 +329,7 @@ int getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) 
   if (!(shift_state_pos < count))
     return 0;
 
-  out = keyvals[shift_state_pos];
+  out =(KMX_DWORD)  keyvals[shift_state_pos];
 
   //wprintf(L" getKeyvalsFromKeymap: in %i  -- out : %i \n", (int)keycode, out);
 

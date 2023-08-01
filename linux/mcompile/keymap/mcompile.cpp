@@ -266,7 +266,7 @@ bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]){
   return 0;
 }
 
-bool createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
+int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
 
   std::string US_language    = "us";
   const char* text_us        = "xkb_symbols \"basic\"";
@@ -280,7 +280,7 @@ bool createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
   // add contents of other keyboard to All_Vector
   if( append_other_ToVector(All_Vector,keymap)) {
     wprintf(L"ERROR: can't append Other ToVector \n");
-    return 1;
+    return 2;
   }
   return 0;
 }
@@ -301,13 +301,18 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
   // _S2 first version with GTK - change later to  XklGetGroupNames  und XklGetCurrentState  as Eberhard suggested
   //_ init gdk
   GdkKeymap *keymap;
-  if(InitializeGDK(&keymap , argc,  argv) )
+  if(InitializeGDK(&keymap , argc,  argv)) {
       wprintf(L"ERROR: can't Initialize GDK\n");
+      return FALSE;
+
+  }
 
   // create vector
   v_dw_3D All_Vector;
-  if(createOneVectorFromBothKeyboards(All_Vector,keymap) )
+  if(createOneVectorFromBothKeyboards(All_Vector,keymap)){
     wprintf(L"ERROR: can't create one vector from both keyboards\n");
+    return FALSE;
+  }
 
   //test(All_Vector);
 
