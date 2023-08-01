@@ -28,7 +28,15 @@ if cpp_compiler.get_id() == 'emscripten'
   # wasm-exceptions supported in Node 18+, Chrome 95+, Firefox 100+, Safari 15.2+
   flags += ['-fwasm-exceptions']
   lib_links = ['--whole-archive', '-sMODULARIZE', '-sEXPORT_ES6']
-  links += ['-fwasm-exceptions', '--bind', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\',\'wasmExports\']']
+  links += ['-fwasm-exceptions', '--bind']
+  if cpp_compiler.version().version_compare('>=3.1.44')
+    # emscripten 3.1.44 removes .asm object and so we need to export `wasmExports`
+    # #9375; https://github.com/emscripten-core/emscripten/blob/main/ChangeLog.md#3144---072523
+    links += ['-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\',\'wasmExports\']']
+  else
+    # emscripten < 3.1.44 does not include `wasmExports`
+    links += ['-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
+  endif
 endif
 
 icu = subproject('icu-for-uset', default_options: [ 'default_library=static', 'cpp_std=c++17', 'warning_level=0', 'werror=false'])
