@@ -14,6 +14,7 @@
 # Temporary build files for VC++
 **/*.FileListAbsolute.txt
 
+
 # These files are generated during build
 engine/keyman32/KEYMAN32.res
 engine/keyman64/Keyman64.res
@@ -21,6 +22,33 @@ engine/keymanx64/keymanx64.res
 engine/mcompile/Release/
 tds_file.txt
 global/delphi/cust/MessageIdentifierConsts.pas
+
+engine/keyman32/*.obj
+engine/keyman32/*.cod
+engine/keyman32/*.pdb
+engine/keyman32/exports.h
+engine/keyman32/premake.mak
+
+# /engine/keyman32-ver
+engine/keyman32-ver/keyman32-ver.def
+engine/keyman32-ver/keyman64-build-version.h
+engine/keyman32-ver/keyman-engine.pdb
+engine/keyman32-ver/MSG00001.bin
+engine/keyman32-ver/KEYMAN32-ver.res
+engine/keyman32-ver/premake.mak
+
+# /engine/keyman64
+engine/keyman64/exports.h
+engine/keyman64/MSG00001.bin
+engine/keyman64/premake.mak
+
+# /engine/keyman64-ver
+engine/keyman64-ver/premake.mak
+engine/keyman64-ver/Keyman64-ver.res
+engine/keyman64-ver/premake_version.mak
+
+# /engine/keymanx64/
+engine/keymanx64/x64
 
 # These are built from corresponding manifest.in and version.in
 **/manifest.xml

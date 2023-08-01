@@ -14,12 +14,12 @@
       BLOCK "0C0904E4"
       BEGIN
         VALUE "CompanyName", KV_COMPANY_NAME
-        VALUE "FileDescription", "Keyman Engine Processor x64 Proxy\0"
+        VALUE "FileDescription", "Keyman Engine Processor x64\0"
         VALUE "FileVersion", KV_VERSION_STRING
-        VALUE "InternalName", "KEYMAN64\0"
+        VALUE "InternalName", "KEYMAN64-VER\0"
         VALUE "LegalCopyright", KV_LEGAL_COPYRIGHT
         VALUE "LegalTrademarks", KV_LEGAL_TRADEMARKS
-        VALUE "OriginalFilename", "KEYMAN64.DLL\0"
+        VALUE "OriginalFilename", "KEYMAN64-VER.DLL\0"
         VALUE "ProductName", "Keyman Engine\0"
         VALUE "ProductVersion", KV_VERSION_STRING
         VALUE "Comments", "\0"
