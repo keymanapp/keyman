@@ -5,6 +5,7 @@ import { writeMergedModelMetadataFile } from '@keymanapp/kmc-model-info';
 import { KmpCompiler } from '@keymanapp/kmc-package';
 import { loadProject } from '../../util/projectLoader.js';
 import { InfrastructureMessages } from '../../messages/messages.js';
+import { calculateSourcePath } from '../../util/calculateSourcePath.js';
 
 export class BuildModelInfo extends BuildActivity {
   public get name(): string { return 'Lexical model metadata'; }
@@ -65,7 +66,7 @@ export class BuildModelInfo extends BuildActivity {
       {
         model_id: callbacks.path.basename(metadata.filename, KeymanFileTypes.Source.ModelInfo),
         kmpJsonData,
-        sourcePath: null, //TODO
+        sourcePath: calculateSourcePath(infile),
         modelFileName: project.resolveOutputFilePath(model, KeymanFileTypes.Source.Model, KeymanFileTypes.Binary.Model),
         kmpFileName: project.resolveOutputFilePath(kps, KeymanFileTypes.Source.Package, KeymanFileTypes.Binary.Package),
       }
