@@ -35,7 +35,7 @@ function init(): void {
   }
 }
 
-export interface KeyboardInfoOptions {
+export interface KeyboardInfoSources {
   /** The identifier for the keyboard */
   keyboard_id: string;
 
@@ -73,11 +73,11 @@ export class KeyboardInfoCompiler {
    * https://help.keyman.com/developer/cloud/keyboard_info/
    *
    * @param sourceKeyboardInfoFileName  Path for the source .keyboard_info file
-   * @param options                     Details on files from which to extract additional metadata
+   * @param sources                     Details on files from which to extract metadata
    */
   public writeMergedKeyboardInfoFile(
     sourceKeyboardInfoFileName: string,
-    options: KeyboardInfoOptions
+    sources: KeyboardInfoSources
   ): Uint8Array {
     let keyboard_info: KeyboardInfoFile = null;
 
@@ -99,7 +99,7 @@ export class KeyboardInfoCompiler {
       // TODO: this code pathway is still under development and won't yet be
       // called by kmc. Building metadata without a source .keyboard_info file
       // is on the roadmap but more data is needed in the .kps to complete this.
-      if(!options.kmpFileName) {
+      if(!sources.kmpFileName) {
         // We can't build any metadata without a .kmp file
         return null;
       }
@@ -113,8 +113,8 @@ export class KeyboardInfoCompiler {
 
     let jsFile: string = null;
 
-    if(options.keyboardFileNameJs) {
-      jsFile = this.loadJsFile(options.keyboardFileNameJs);
+    if(sources.keyboardFileNameJs) {
+      jsFile = this.loadJsFile(sources.keyboardFileNameJs);
       if(!jsFile) {
          return null;
       }
@@ -123,7 +123,7 @@ export class KeyboardInfoCompiler {
     const kmxFiles: {
       filename: string,
       data: KMX.KEYBOARD
-    }[] = this.loadKmxFiles(options.kpsFileName, options.kmpJsonData);
+    }[] = this.loadKmxFiles(sources.kpsFileName, sources.kmpJsonData);
 
     //
     // Build merged .keyboard_info file
@@ -137,11 +137,11 @@ export class KeyboardInfoCompiler {
       delete keyboard_info.isRTL;
     }
 
-    this.setField(keyboard_info, 'id', options.keyboard_id);
+    this.setField(keyboard_info, 'id', sources.keyboard_id);
 
-    this.setField(keyboard_info, 'name', options.kmpJsonData.info.name.description);
+    this.setField(keyboard_info, 'name', sources.kmpJsonData.info.name.description);
 
-    const author = options.kmpJsonData.info.author;
+    const author = sources.kmpJsonData.info.author;
     if(author && (author.description || author.url)) {
       this.setField(keyboard_info, 'authorName', author?.description);
 
@@ -163,17 +163,17 @@ export class KeyboardInfoCompiler {
     // each of the keyboards in the kmp.json file, and merge into a single array
     // of identifiers in the .keyboard_info file.
 
-    this.fillLanguages(keyboard_info, options.kmpJsonData);
+    this.fillLanguages(keyboard_info, sources.kmpJsonData);
 
     this.setField(keyboard_info, 'lastModifiedDate', (new Date).toISOString(), false);
 
-    if(options.kmpFileName) {
-      this.setField(keyboard_info, 'packageFilename', this.callbacks.path.basename(options.kmpFileName));
+    if(sources.kmpFileName) {
+      this.setField(keyboard_info, 'packageFilename', this.callbacks.path.basename(sources.kmpFileName));
 
       // Always overwrite with actual file size
-      keyboard_info.packageFileSize = this.callbacks.fileSize(options.kmpFileName);
+      keyboard_info.packageFileSize = this.callbacks.fileSize(sources.kmpFileName);
       if(keyboard_info.packageFileSize === undefined) {
-        this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileDoesNotExist({filename:options.kmpFileName}));
+        this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileDoesNotExist({filename:sources.kmpFileName}));
         return null;
       }
     } else {
@@ -182,12 +182,12 @@ export class KeyboardInfoCompiler {
       delete keyboard_info.packageFileSize;
     }
 
-    if(options.keyboardFileNameJs) {
-      this.setField(keyboard_info, 'jsFilename', this.callbacks.path.basename(options.keyboardFileNameJs));
+    if(sources.keyboardFileNameJs) {
+      this.setField(keyboard_info, 'jsFilename', this.callbacks.path.basename(sources.keyboardFileNameJs));
       // Always overwrite with actual file size
-      keyboard_info.jsFileSize = this.callbacks.fileSize(options.keyboardFileNameJs);
+      keyboard_info.jsFileSize = this.callbacks.fileSize(sources.keyboardFileNameJs);
       if(keyboard_info.jsFileSize === undefined) {
-        this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileDoesNotExist({filename:options.keyboardFileNameJs}));
+        this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileDoesNotExist({filename:sources.keyboardFileNameJs}));
         return null;
       }
     } else {
@@ -198,7 +198,7 @@ export class KeyboardInfoCompiler {
 
     const includes = new Set<KeyboardInfoFileIncludes>();
     keyboard_info.packageIncludes = [];
-    for(const file of options.kmpJsonData.files) {
+    for(const file of sources.kmpJsonData.files) {
       if(file.name.match(/\.(otf|ttf|ttc)$/)) {
         includes.add('fonts');
       } else if(file.name.match(/welcome\.htm$/)) {
@@ -212,8 +212,8 @@ export class KeyboardInfoCompiler {
     keyboard_info.packageIncludes = [...includes];
 
     // Always overwrite source data
-    if(options.kmpFileName) {
-      this.setField(keyboard_info, 'version', options.kmpJsonData.info.version.description);
+    if(sources.kmpFileName) {
+      this.setField(keyboard_info, 'version', sources.kmpJsonData.info.version.description);
     } else {
       const m = jsFile?.match(/this\.KBVER\s*=\s*(['"])([^'"]+)(\1)/);
       if(m) {
@@ -260,7 +260,7 @@ export class KeyboardInfoCompiler {
         // and if the .js is in the package, that it is mobile native as well,
         // because the targets metadata is not available in the .js.
         platforms.add('mobileWeb').add('desktopWeb');
-        if(options.kmpJsonData.files.find(file => file.name.match(/\.js$/))) {
+        if(sources.kmpJsonData.files.find(file => file.name.match(/\.js$/))) {
           platforms.add('android').add('ios');
         }
       }
@@ -290,12 +290,12 @@ export class KeyboardInfoCompiler {
       this.setField(keyboard_info, 'minKeymanVersion', minVersion, false);
     }
 
-    if(options.sourcePath) {
-      this.setField(keyboard_info, 'sourcePath', options.sourcePath);
+    if(sources.sourcePath) {
+      this.setField(keyboard_info, 'sourcePath', sources.sourcePath);
     }
 
-    if(options.helpLink) {
-      this.setField(keyboard_info, 'helpLink', options.helpLink);
+    if(sources.helpLink) {
+      this.setField(keyboard_info, 'helpLink', sources.helpLink);
     }
 
     const jsonOutput = JSON.stringify(keyboard_info, null, 2);
