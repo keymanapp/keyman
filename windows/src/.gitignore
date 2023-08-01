@@ -39,15 +39,11 @@ engine/keyman32-ver/premake.mak
 
 # /engine/keyman64
 engine/keyman64/exports.h
-engine/keyman64/keyman-debug-etwTEMP.BIN
 engine/keyman64/MSG00001.bin
 engine/keyman64/premake.mak
-engine/keyman64/keyman-debug-etw.h
-engine/keyman64/keyman-debug-etw.res
 
 # /engine/keyman64-ver
 engine/keyman64-ver/premake.mak
-engine/keyman64-ver/TODO.TXT
 engine/keyman64-ver/Keyman64-ver.res
 engine/keyman64-ver/premake_version.mak
 
