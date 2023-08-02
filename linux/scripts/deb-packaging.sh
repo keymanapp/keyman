@@ -3,6 +3,9 @@
 
 set -eu
 
+# TEST FAILING packaging
+exit 3
+
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"

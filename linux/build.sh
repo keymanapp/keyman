@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+exit 3
+
 set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
