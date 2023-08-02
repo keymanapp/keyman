@@ -61,7 +61,7 @@ class ProjectBuilder {
   async buildProjectTargets(activity: BuildActivity): Promise<boolean> {
     let result = true;
     for(let file of this.project.files) {
-      if(file.getFileType().toLowerCase() == activity.sourceExtension) {
+      if(file.fileType.toLowerCase() == activity.sourceExtension) {
         result = await this.buildTarget(file, activity) && result;
       }
     }

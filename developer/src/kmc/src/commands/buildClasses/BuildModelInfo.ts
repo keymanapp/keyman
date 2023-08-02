@@ -35,19 +35,19 @@ export class BuildModelInfo extends BuildActivity {
       return false;
     }
 
-    const metadata = project.files.find(file => file.getFileType() == KeymanFileTypes.Source.ModelInfo);
+    const metadata = project.files.find(file => file.fileType == KeymanFileTypes.Source.ModelInfo);
     if(!metadata) {
       callbacks.reportMessage(InfrastructureMessages.Error_FileTypeNotFound({ext: KeymanFileTypes.Source.ModelInfo}));
       return false;
     }
 
-    const model = project.files.find(file => file.getFileType() == KeymanFileTypes.Source.Model);
+    const model = project.files.find(file => file.fileType == KeymanFileTypes.Source.Model);
     if(!model) {
       callbacks.reportMessage(InfrastructureMessages.Error_FileTypeNotFound({ext: KeymanFileTypes.Source.Model}));
       return false;
     }
 
-    const kps = project.files.find(file => file.getFileType() == KeymanFileTypes.Source.Package);
+    const kps = project.files.find(file => file.fileType == KeymanFileTypes.Source.Package);
     if(!kps) {
       callbacks.reportMessage(InfrastructureMessages.Error_FileTypeNotFound({ext: KeymanFileTypes.Source.Package}));
       return false;

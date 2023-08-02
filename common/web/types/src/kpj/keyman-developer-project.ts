@@ -43,11 +43,11 @@ export class KeymanDeveloperProject {
   }
 
   public isKeyboardProject() {
-    return !!this.files.find(file => file.getFileType() == KeymanFileTypes.Source.KeymanKeyboard || file.getFileType() == KeymanFileTypes.Source.LdmlKeyboard);
+    return !!this.files.find(file => file.fileType == KeymanFileTypes.Source.KeymanKeyboard || file.fileType == KeymanFileTypes.Source.LdmlKeyboard);
   }
 
   public isLexicalModelProject() {
-    return !!this.files.find(file => file.getFileType() == KeymanFileTypes.Source.Model);
+    return !!this.files.find(file => file.fileType == KeymanFileTypes.Source.Model);
   }
 
   public addMetadataFile() {
@@ -127,40 +127,38 @@ export class KeymanDeveloperProjectOptions {
   }
 };
 
-export type KeymanDeveloperProjectFile = KeymanDeveloperProjectFile10 | KeymanDeveloperProjectFile20;
-
-export class KeymanDeveloperProjectFile10 {
-  readonly id: string;           // 1.0 only
-  readonly filename: string;
+export interface KeymanDeveloperProjectFile {
+  get filename(): string;
+  get fileType(): string;
   readonly filePath: string;
-  readonly fileVersion: string;  // 1.0 only
+};
+
+export class KeymanDeveloperProjectFile10 implements KeymanDeveloperProjectFile {
+  get filename(): string {
+    return this.callbacks.path.basename(this.filePath);
+  }
+  get fileType(): string {
+    return KeymanFileTypes.sourceTypeFromFilename(this.filename);
+  }
   details: KeymanDeveloperProjectFileDetail_Kmn & KeymanDeveloperProjectFileDetail_Kps; // 1.0 only
   childFiles: KeymanDeveloperProjectFile[]; // 1.0 only
-  constructor(id: string, filename: string, filePath: string, fileVersion:string) {
+
+  constructor(public readonly id: string, public readonly filePath: string, public readonly fileVersion:string, private readonly callbacks: CompilerCallbacks) {
     this.details = {};
     this.childFiles = [];
-    this.id = id;
-    this.filename = filename;
-    this.filePath = filePath;
-    this.fileVersion = fileVersion;
-    // we now ignore the fileType on load
-  }
-  getFileType() {
-    return KeymanFileTypes.sourceTypeFromFilename(this.filename);
   }
 };
 
 export type KeymanDeveloperProjectFileType20 = KeymanFileTypes.Source;
 
-export class KeymanDeveloperProjectFile20 {
-  readonly filename: string;
-  readonly filePath: string;
-  constructor(filePath: string, private callbacks: CompilerCallbacks) {
-    this.filename = this.callbacks.path.basename(filePath);
-    this.filePath = filePath;
+export class KeymanDeveloperProjectFile20 implements KeymanDeveloperProjectFile {
+  get filename(): string {
+    return this.callbacks.path.basename(this.filePath);
   }
-  getFileType() {
+  get fileType() {
     return KeymanFileTypes.sourceTypeFromFilename(this.filename);
+  }
+  constructor(public readonly filePath: string, private readonly callbacks: CompilerCallbacks) {
   }
 };
 

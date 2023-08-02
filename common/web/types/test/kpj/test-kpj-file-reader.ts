@@ -82,7 +82,7 @@ describe('kpj-file-reader', function () {
     assert.equal(f.filename, 'khmer_angkor.kmn');
     assert.equal(f.filePath, 'source/khmer_angkor.kmn');
     assert.equal(f.fileVersion, '1.3');
-    assert.equal(f.getFileType(), '.kmn');
+    assert.equal(f.fileType, '.kmn');
     assert.equal(f.details.name, 'Khmer Angkor');
     assert.equal(f.details.copyright, '© 2015-2022 SIL International');
     assert.equal(f.details.message, 'More than just a Khmer Unicode keyboard.');
@@ -94,7 +94,7 @@ describe('kpj-file-reader', function () {
     assert.equal(f.filename, 'khmer_angkor.kps');
     assert.equal(f.filePath, 'source/khmer_angkor.kps');
     assert.equal(f.fileVersion, '');
-    assert.equal(f.getFileType(), '.kps');
+    assert.equal(f.fileType, '.kps');
     assert.equal(f.details.name, 'Khmer Angkor');
     assert.isUndefined(f.details.message);
     assert.equal(f.details.copyright, '© 2015-2022 SIL International');
@@ -107,7 +107,7 @@ describe('kpj-file-reader', function () {
     assert.equal(f.filename, 'khmer_angkor.ico');
     assert.equal(f.filePath, 'source/khmer_angkor.ico');
     assert.equal(f.fileVersion, '');
-    assert.equal(f.getFileType(), '.ico');
+    assert.equal(f.fileType, '.ico');
     assert.isEmpty(f.details);
     assert.lengthOf(f.childFiles, 0);
 
@@ -117,7 +117,7 @@ describe('kpj-file-reader', function () {
     assert.equal(f.filename, 'khmer_angkor.js');
     assert.equal(f.filePath, 'source/../build/khmer_angkor.js');
     assert.equal(f.fileVersion, '');
-    assert.equal(f.getFileType(), '.js');
+    assert.equal(f.fileType, '.js');
     assert.isEmpty(f.details);
     assert.lengthOf(f.childFiles, 0);
   });

@@ -81,7 +81,7 @@ export class BuildKeyboardInfo extends BuildActivity {
 }
 
 function findProjectFile(callbacks: CompilerCallbacks, project: KeymanDeveloperProject, ext: KeymanFileTypes.Source) {
-  const file = project.files.find(file => file.getFileType() == ext);
+  const file = project.files.find(file => file.fileType == ext);
   if(!file) {
     callbacks.reportMessage(InfrastructureMessages.Error_FileTypeNotFound({ext}));
   }
