@@ -1,5 +1,22 @@
 # Keyman Version History
 
+## 17.0.152 alpha 2023-08-02
+
+* fix(developer): more wasm uset fixes (#9382)
+* docs(windows): corrected nmake cmd for certificates (#9376)
+* chore: add run-name to deb-packaging (#9386)
+* chore: try another variable for reporting (#9388)
+* chore(linux): Remove package build on Jenkins for Keyman 17 (#9380)
+* docs(linux): Add build doc for Keyman Web and Android (#9383)
+
+## 17.0.151 alpha 2023-08-01
+
+* feat(developer) marker steps (#9364)
+* feat(common): marker processing (#9365)
+* chore(linux): Don't fail on parallel builds (#9368)
+* fix(developer): fix breakage from emscripten 3.1.44 (#9375)
+* docs(core): Document how to build Core on Linux (#9328)
+
 ## 17.0.150 alpha 2023-07-31
 
 * chore(linux): Update debian changelog (#9358)
