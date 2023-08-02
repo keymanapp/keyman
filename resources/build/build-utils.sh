@@ -74,7 +74,7 @@ function findVersion() {
         VERSION_TAG=
     fi
 
-    if [ -z "${TEAMCITY_VERSION-}" -a -z "${JENKINS_HOME-}" ]; then
+    if [ -z "${TEAMCITY_VERSION-}" ]; then
         # Local dev machine, not TeamCity
         VERSION_TAG="$VERSION_TAG-local"
         VERSION_ENVIRONMENT=local

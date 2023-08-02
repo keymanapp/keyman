@@ -143,7 +143,7 @@ if [ "$action" == "commit" ]; then
   popd > /dev/null
 
   #
-  # Trigger builds for the previous version on TeamCity, Jenkins and GitHub
+  # Trigger builds for the previous version on TeamCity and GitHub
   #
 
   triggerBuilds
