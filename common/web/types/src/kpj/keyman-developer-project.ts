@@ -138,7 +138,7 @@ export class KeymanDeveloperProjectFile10 implements KeymanDeveloperProjectFile 
     return this.callbacks.path.basename(this.filePath);
   }
   get fileType(): string {
-    return KeymanFileTypes.sourceTypeFromFilename(this.filename);
+    return KeymanFileTypes.fromFilename(this.filename);
   }
   details: KeymanDeveloperProjectFileDetail_Kmn & KeymanDeveloperProjectFileDetail_Kps; // 1.0 only
   childFiles: KeymanDeveloperProjectFile[]; // 1.0 only
@@ -156,7 +156,7 @@ export class KeymanDeveloperProjectFile20 implements KeymanDeveloperProjectFile 
     return this.callbacks.path.basename(this.filePath);
   }
   get fileType() {
-    return KeymanFileTypes.sourceTypeFromFilename(this.filename);
+    return KeymanFileTypes.fromFilename(this.filename);
   }
   constructor(public readonly filePath: string, private readonly callbacks: CompilerCallbacks) {
   }
