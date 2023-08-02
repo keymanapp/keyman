@@ -14,8 +14,6 @@
 #import <Cocoa/Cocoa.h>
 #import "CoreTestStaticHelperMethods.h"
 #import "keyboardprocessor.h"
-#import "KMEngine.h"  // included for VKMap
-#import "MacVKCodes.h"
 #import "CoreAction.h"
 #import "ActionArrayOptimizer.h"
 
@@ -28,10 +26,6 @@
 ActionArrayOptimizer *optimizer;
 
 + (void)setUp {
-  // TODO: remove when VKMap is moved to CoreHelper class
-  // calling engine with nil kmx file so that static VKMap array is initialized
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:nil contextBuffer:@""];
-  
   optimizer  = [[ActionArrayOptimizer alloc] init];
 }
 

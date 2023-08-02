@@ -392,11 +392,10 @@ NSRange _previousSelRange;
     }
   }
   
-  // break from old engine implementation here:
-  // we get an array of CoreAction objects in response from engine
   return [self applyKeymanCoreActions:actions event:event client:sender];
 }
 
+/*
 -(void)applyKeymanEngineActions:(NSArray*)actions event: (NSEvent *)event in:(id) sender  {
   BOOL deleteBackPosted = NO;
   
@@ -487,6 +486,7 @@ NSRange _previousSelRange;
       }
   }
 }
+*/
 
 - (NSArray*) processEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
   NSArray* actions = nil;
@@ -611,10 +611,11 @@ NSRange _previousSelRange;
     return self.ignoreNextDeleteBackHighLevel;
 }
 
+/*
 - (BOOL)legacyHandleEvent:(NSEvent *)event client:(id)sender {
    // OSK key feedback from hardware keyboard is disabled
-    /*if (event.type == NSKeyDown)
-     [self.AppDelegate handleKeyEvent:event];*/
+  //if (event.type == NSKeyDown)
+   //  [self.AppDelegate handleKeyEvent:event];
 
     if (event.type == NSEventTypeFlagsChanged) {
         // We mark the context as out of date only for the Command keys
@@ -700,6 +701,7 @@ NSRange _previousSelRange;
     // because the selection range doesn't get updated until after we return from this method.
     return handled;
 }
+*/
 
 /*
 - (void)sendFinalTransformToClient:(id) sender for:(NSEvent *)event deleteLeft:(NSUInteger)deleteLeft textToInsert:(NSString*) strTextToInsert {
@@ -713,6 +715,7 @@ NSRange _previousSelRange;
 }
 */
 
+/*
 - (BOOL)handleDefaultKeymanEngineActions:(NSEvent*) event in:(id) sender {
     NSUInteger nc = [self.contextBuffer deleteLastNullChars];
     if (nc > 0) {
@@ -789,6 +792,7 @@ NSRange _previousSelRange;
     }
     return NO;
 }
+*/
 
 - (BOOL)deleteBack:(NSUInteger)n in:(id) client for:(NSEvent *) event {
     if ([self.AppDelegate debugMode])

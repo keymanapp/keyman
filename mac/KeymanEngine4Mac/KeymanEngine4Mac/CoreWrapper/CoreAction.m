@@ -17,7 +17,6 @@
  */
 
 #import "CoreAction.h"
-#import "KMEngine.h"  // included for Q_STR etc.
 
 @implementation CoreAction
 
@@ -137,55 +136,5 @@
   return [[NSString alloc] initWithFormat: @"%@ %@", self.typeName, charString];
 }
 
-/*
- The legacy Keyman for Mac code represents each action returned from Keyman
- Engine as an NSDictionary. CoreWrapper returns CoreAction objects. This method
- converts a CoreAction object to an array of NSDictionary objects. This allows
- us to replace the key processing code in Keyman Engine with Keyman Core and
- CoreWrapper without rewriting the Keyman Input Method code consuming the
- actions.
- */
-/*
--(NSDictionary*) legacyDictionaryActionForActionObject:(CoreAction*)action {
-  NSDictionary *actionMap = nil;
-  
-  switch (action.actionType)
-  {
-    case CharacterAction: {
-      actionMap = [[NSDictionary alloc] initWithObjectsAndKeys:action.content, Q_STR, nil];
-      break;
-    }
-    case MarkerAction: {
-      actionMap = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:1], Q_DEADKEY, nil];
-      break;
-    }
-    case AlertAction: {
-      actionMap = [[NSDictionary alloc] initWithObjectsAndKeys:@"", Q_BEEP, nil];
-      break;
-    }
-    case BackspaceAction: {
-      actionMap = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:1], Q_BACK, nil];
-      break;
-    }
-    // TODO: implement Persist Options
-    case PersistOptionAction: {
-      actionMap = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:1], Q_SAVEOPT, nil];
-      break;
-    }
-    case EmitKeystrokeAction: {
-      actionMap = [[NSDictionary alloc] initWithObjectsAndKeys:@"", Q_RETURN, nil];
-      break;
-    }
-    case EndAction: {
-      // purposely return nil for EndAction, as it is not needed by the legacy Keyman for Mac code
-      break;
-    }
-    default: {
-    }
-  }
-
-  return actionMap;
-}
-*/
 @end
 

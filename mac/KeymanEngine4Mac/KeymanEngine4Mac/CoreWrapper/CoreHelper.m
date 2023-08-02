@@ -17,13 +17,12 @@
 #import "CoreHelper.h"
 #import "CoreAction.h"
 #import "keyboardprocessor.h"
-#import "KMEngine.h"  // included for VKMap
 #import "ActionArrayOptimizer.h"
 #import "MacVKCodes.h"
+#import "WindowsVKCodes.h"
 
-// TODO: move VKMap here from KMEngine
 const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
-//uint32_t VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
+UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
 
 @interface CoreHelper()
 @property (strong, nonatomic, readonly) ActionArrayOptimizer *optimizer;
@@ -36,6 +35,7 @@ const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
   self = [super init];
   if (self) {
     _optimizer = [[ActionArrayOptimizer alloc] init];
+    [self initVirtualKeyMapping];
     }
     return self;
 }
@@ -44,39 +44,9 @@ const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
   if ((keyCode<0) || (keyCode>=VIRTUAL_KEY_ARRAY_SIZE)) {
     return 0;
   } else {
-    return VKMap[keyCode];
+    return VirtualKeyMap[keyCode];
   }
 }
-
-/*
- The legacy Keyman for Mac code represents each action returned from Keyman
- Engine as an NSDictionary. CoreWrapper returns CoreAction objects. This method
- converts an array of CoreAction objects to an array of NSDictionary objects.
- This allows us to replace the key processing code in Keyman Engine with Keyman
- Core and CoreWrapper without rewriting the Keyman Input Method code consuming
- the actions.
-
- Note that the CoreAction of type EndAction produced by Keyman Core is not
- expected by Keyman for Mac and is removed during this conversion.
- */
-/*
--(NSArray*)actionObjectArrayToLegacyActionMapArray:(NSArray*)actionArray {
-
-  // legacy code expects the map array to be optimized, so we can do that before converting to NSDictionary
-  NSArray *optimizedArray = [self.optimizer optimizeForLegacyArray:actionArray];
-  
-  NSMutableArray *mapArray = [[NSMutableArray alloc] init];
-  for (CoreAction *action in optimizedArray) {
-    NSLog(@"%@\n", action.typeName.description);
-    NSDictionary *actionMap = [action legacyDictionaryActionForActionObject:action];
-    if (actionMap) {
-      [mapArray addObject:actionMap];
-    }
-  }
-  
-  return mapArray;
-}
-*/
 
 -(NSArray*)optimizeActionArray:(NSArray*)actionArray {
   NSLog(@"unoptimized actions array: %@", actionArray);
@@ -152,84 +122,82 @@ const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
 }
 
 
-/*
 // Creates a VK map to convert Mac VK codes to Windows VK codes
-- (void)setVKMapping {
-    VKMap[MVK_A] = VK_KEY_A;                        // A
-    VKMap[MVK_S] = VK_KEY_S;                        // S
-    VKMap[MVK_D] = VK_KEY_D;                        // D
-    VKMap[MVK_F] = VK_KEY_F;                        // F
-    VKMap[MVK_H] = VK_KEY_H;                        // H
-    VKMap[MVK_G] = VK_KEY_G;                        // G
-    VKMap[MVK_Z] = VK_KEY_Z;                        // Z
-    VKMap[MVK_X] = VK_KEY_X;                        // X
-    VKMap[MVK_C] = VK_KEY_C;                        // C
-    VKMap[MVK_V] = VK_KEY_V;                        // V
+- (void)initVirtualKeyMapping {
+    VirtualKeyMap[MVK_A] = VK_KEY_A;                        // A
+    VirtualKeyMap[MVK_S] = VK_KEY_S;                        // S
+    VirtualKeyMap[MVK_D] = VK_KEY_D;                        // D
+    VirtualKeyMap[MVK_F] = VK_KEY_F;                        // F
+    VirtualKeyMap[MVK_H] = VK_KEY_H;                        // H
+    VirtualKeyMap[MVK_G] = VK_KEY_G;                        // G
+    VirtualKeyMap[MVK_Z] = VK_KEY_Z;                        // Z
+    VirtualKeyMap[MVK_X] = VK_KEY_X;                        // X
+    VirtualKeyMap[MVK_C] = VK_KEY_C;                        // C
+    VirtualKeyMap[MVK_V] = VK_KEY_V;                        // V
     //    0x0A  = nil
-    VKMap[MVK_B] = VK_KEY_B;                        // B
-    VKMap[MVK_Q] = VK_KEY_Q;                        // Q
-    VKMap[MVK_W] = VK_KEY_W;                        // W
-    VKMap[MVK_E] = VK_KEY_E;                        // E
-    VKMap[MVK_R] = VK_KEY_R;                        // R
-    VKMap[MVK_Y] = VK_KEY_Y;                        // Y
-    VKMap[MVK_T] = VK_KEY_T;                        // T
-    VKMap[MVK_1] = VK_KEY_1;                        // 1
-    VKMap[MVK_2] = VK_KEY_2;                        // 2
-    VKMap[MVK_3] = VK_KEY_3;                        // 3
-    VKMap[MVK_4] = VK_KEY_4;                        // 4
-    VKMap[MVK_6] = VK_KEY_6;                        // 6
-    VKMap[MVK_5] = VK_KEY_5;                        // 5
-    VKMap[MVK_EQUAL] = VK_EQUAL;                    // =
-    VKMap[MVK_9] = VK_KEY_9;                        // 9
-    VKMap[MVK_7] = VK_KEY_7;                        // 7
-    VKMap[MVK_MINUS] = VK_MINUS;                    // -
-    VKMap[MVK_8] = VK_KEY_8;                        // 8
-    VKMap[MVK_0] = VK_KEY_0;                        // 0
-    VKMap[MVK_RIGHT_BRACKET] = VK_RIGHT_BRACKET;    // ]
-    VKMap[MVK_O] = VK_KEY_O;                        // O
-    VKMap[MVK_U] = VK_KEY_U;                        // U
-    VKMap[MVK_LEFT_BRACKET] = VK_LEFT_BRACKET;      // [
-    VKMap[MVK_I] = VK_KEY_I;                        // I
-    VKMap[MVK_P] = VK_KEY_P;                        // P
-    VKMap[MVK_ENTER] = VK_ENTER;                    // <Enter>
-    VKMap[MVK_L] = VK_KEY_L;                        // L
-    VKMap[MVK_J] = VK_KEY_J;                        // J
-    VKMap[MVK_QUOTE] = VK_QUOTE;                    // '
-    VKMap[MVK_K] = VK_KEY_K;                        // K
-    VKMap[MVK_SEMICOLON] = VK_SEMICOLON;            // ;
-    VKMap[MVK_BACKSLASH] = VK_BACKSLASH;            // '\'
-    VKMap[MVK_COMMA] = VK_COMMA;                    // ,
-    VKMap[MVK_SLASH] = VK_SLASH;                    // '/'
-    VKMap[MVK_N] = VK_KEY_N;                        // N
-    VKMap[MVK_M] = VK_KEY_M;                        // M
-    VKMap[MVK_PERIOD] = VK_PERIOD;                  // .
-    VKMap[MVK_TAB] = VK_TAB;                        // <Tab>
-    VKMap[MVK_SPACE] = VK_SPACE;                    // <Space>
-    VKMap[MVK_GRAVE] = VK_GRAVE;                    // `
-    VKMap[MVK_BACKSPACE] = VK_BACKSPACE;            // <Backspace>
-    VKMap[MVK_OEM102] = VK_OEM_102;                 // 102nd key (ISO keyboards)
+    VirtualKeyMap[MVK_B] = VK_KEY_B;                        // B
+    VirtualKeyMap[MVK_Q] = VK_KEY_Q;                        // Q
+    VirtualKeyMap[MVK_W] = VK_KEY_W;                        // W
+    VirtualKeyMap[MVK_E] = VK_KEY_E;                        // E
+    VirtualKeyMap[MVK_R] = VK_KEY_R;                        // R
+    VirtualKeyMap[MVK_Y] = VK_KEY_Y;                        // Y
+    VirtualKeyMap[MVK_T] = VK_KEY_T;                        // T
+    VirtualKeyMap[MVK_1] = VK_KEY_1;                        // 1
+    VirtualKeyMap[MVK_2] = VK_KEY_2;                        // 2
+    VirtualKeyMap[MVK_3] = VK_KEY_3;                        // 3
+    VirtualKeyMap[MVK_4] = VK_KEY_4;                        // 4
+    VirtualKeyMap[MVK_6] = VK_KEY_6;                        // 6
+    VirtualKeyMap[MVK_5] = VK_KEY_5;                        // 5
+    VirtualKeyMap[MVK_EQUAL] = VK_EQUAL;                    // =
+    VirtualKeyMap[MVK_9] = VK_KEY_9;                        // 9
+    VirtualKeyMap[MVK_7] = VK_KEY_7;                        // 7
+    VirtualKeyMap[MVK_MINUS] = VK_MINUS;                    // -
+    VirtualKeyMap[MVK_8] = VK_KEY_8;                        // 8
+    VirtualKeyMap[MVK_0] = VK_KEY_0;                        // 0
+    VirtualKeyMap[MVK_RIGHT_BRACKET] = VK_RIGHT_BRACKET;    // ]
+    VirtualKeyMap[MVK_O] = VK_KEY_O;                        // O
+    VirtualKeyMap[MVK_U] = VK_KEY_U;                        // U
+    VirtualKeyMap[MVK_LEFT_BRACKET] = VK_LEFT_BRACKET;      // [
+    VirtualKeyMap[MVK_I] = VK_KEY_I;                        // I
+    VirtualKeyMap[MVK_P] = VK_KEY_P;                        // P
+    VirtualKeyMap[MVK_ENTER] = VK_ENTER;                    // <Enter>
+    VirtualKeyMap[MVK_L] = VK_KEY_L;                        // L
+    VirtualKeyMap[MVK_J] = VK_KEY_J;                        // J
+    VirtualKeyMap[MVK_QUOTE] = VK_QUOTE;                    // '
+    VirtualKeyMap[MVK_K] = VK_KEY_K;                        // K
+    VirtualKeyMap[MVK_SEMICOLON] = VK_SEMICOLON;            // ;
+    VirtualKeyMap[MVK_BACKSLASH] = VK_BACKSLASH;            // '\'
+    VirtualKeyMap[MVK_COMMA] = VK_COMMA;                    // ,
+    VirtualKeyMap[MVK_SLASH] = VK_SLASH;                    // '/'
+    VirtualKeyMap[MVK_N] = VK_KEY_N;                        // N
+    VirtualKeyMap[MVK_M] = VK_KEY_M;                        // M
+    VirtualKeyMap[MVK_PERIOD] = VK_PERIOD;                  // .
+    VirtualKeyMap[MVK_TAB] = VK_TAB;                        // <Tab>
+    VirtualKeyMap[MVK_SPACE] = VK_SPACE;                    // <Space>
+    VirtualKeyMap[MVK_GRAVE] = VK_GRAVE;                    // `
+    VirtualKeyMap[MVK_BACKSPACE] = VK_BACKSPACE;            // <Backspace>
+    VirtualKeyMap[MVK_OEM102] = VK_OEM_102;                 // 102nd key (ISO keyboards)
 
     // Num Pad
-    VKMap[0x41] = VK_NUMPAD_DECIMAL;                // Decimal .
-    VKMap[0x43] = VK_NUMPAD_MULTIPLY;               // Multiply *
-    VKMap[0x45] = VK_NUMPAD_ADD;                    // Add +
-    VKMap[0x47] = 0x00;                             // <Clear>      *** Undefined ***
-    VKMap[0x4B] = VK_NUMPAD_DIVIDE;                 // Divide /
-    VKMap[0x4C] = 0x00;                             // <Enter>      *** Undefined ***
-    VKMap[0x4E] = VK_NUMPAD_SUBTRACT;               // Subtract -
-    VKMap[0x51] = 0x00;                             // Equal =      *** Undefined ***
-    VKMap[0x52] = VK_NUMPAD0;                       // 0
-    VKMap[0x53] = VK_NUMPAD1;                       // 1
-    VKMap[0x54] = VK_NUMPAD2;                       // 2
-    VKMap[0x55] = VK_NUMPAD3;                       // 3
-    VKMap[0x56] = VK_NUMPAD4;                       // 4
-    VKMap[0x57] = VK_NUMPAD5;                       // 5
-    VKMap[0x58] = VK_NUMPAD6;                       // 6
-    VKMap[0x59] = VK_NUMPAD7;                       // 7
-    VKMap[0x5B] = VK_NUMPAD8;                       // 8
-    VKMap[0x5C] = VK_NUMPAD9;                       // 9
+    VirtualKeyMap[0x41] = VK_NUMPAD_DECIMAL;                // Decimal .
+    VirtualKeyMap[0x43] = VK_NUMPAD_MULTIPLY;               // Multiply *
+    VirtualKeyMap[0x45] = VK_NUMPAD_ADD;                    // Add +
+    VirtualKeyMap[0x47] = 0x00;                             // <Clear>      *** Undefined ***
+    VirtualKeyMap[0x4B] = VK_NUMPAD_DIVIDE;                 // Divide /
+    VirtualKeyMap[0x4C] = 0x00;                             // <Enter>      *** Undefined ***
+    VirtualKeyMap[0x4E] = VK_NUMPAD_SUBTRACT;               // Subtract -
+    VirtualKeyMap[0x51] = 0x00;                             // Equal =      *** Undefined ***
+    VirtualKeyMap[0x52] = VK_NUMPAD0;                       // 0
+    VirtualKeyMap[0x53] = VK_NUMPAD1;                       // 1
+    VirtualKeyMap[0x54] = VK_NUMPAD2;                       // 2
+    VirtualKeyMap[0x55] = VK_NUMPAD3;                       // 3
+    VirtualKeyMap[0x56] = VK_NUMPAD4;                       // 4
+    VirtualKeyMap[0x57] = VK_NUMPAD5;                       // 5
+    VirtualKeyMap[0x58] = VK_NUMPAD6;                       // 6
+    VirtualKeyMap[0x59] = VK_NUMPAD7;                       // 7
+    VirtualKeyMap[0x5B] = VK_NUMPAD8;                       // 8
+    VirtualKeyMap[0x5C] = VK_NUMPAD9;                       // 9
 }
-*/
 
 @end
 

@@ -12,11 +12,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern UInt32 VirtualKeyMap[0x80];
+
 @interface CoreHelper : NSObject
 -(instancetype)init;
 -(unsigned short) macVirtualKeyToWindowsVirtualKey:(unsigned short) keyCode;
 -(UInt32)macToKeymanModifier:(NSEventModifierFlags)modifiers;
--(NSArray*)actionObjectArrayToLegacyActionMapArray:(NSArray*)actionArray;
 -(NSArray*)optimizeActionArray:(NSArray*)actionArray;
 -(NSString*)utf32ValueToString:(UInt32)scalarValue;
 @end

@@ -14,7 +14,6 @@
 #import "CoreWrapper.h"
 #import "CoreTestStaticHelperMethods.h"
 #import "CoreAction.h"
-#import "KMEngine.h"  // included for VKMap
 #import "MacVKCodes.h"
 
 @interface CoreWrapperTests : XCTestCase
@@ -27,10 +26,6 @@ NSString *mockKmxFilePath = @"/a/dummy/keyboard.mock";
 CoreWrapper *mockWrapper;
 
 + (void)setUp {
-  // TODO: remove when VKMap is moved to CoreHelper class
-  // calling engine with nil kmx file so that static VKMap array is initialized
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:nil contextBuffer:@""];
-
   NSString *khmerKeyboardPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"khmer_angkor.kmx"];
 
   NSLog(@"mockKmxFilePath  = %@\n", mockKmxFilePath);

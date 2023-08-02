@@ -13,9 +13,6 @@ static BOOL debugMode = YES;
 
 BOOL isKeyMapEnabled;
 const unsigned short keyMapSize = 0x80;
-unsigned short keyMap[0x80][4];
-//unsigned short VKMap[0x80];
-//pid_t processID = 0;
 
 // Dictionary keys
 NSString *const kContextBufferKey = @"ContextBuffer";
@@ -38,7 +35,6 @@ NSString *const kKMXFileKey = @"KMXFile";
     // Insert code here to initialize your application
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(windowDidResize:) name:NSWindowDidResizeNotification object:self.window];
     [self setKMXList];
-    //[self setVKMapping];
     self.kbData = [[NSMutableDictionary alloc] initWithCapacity:0];
     NSMutableString *contextBuffer = [NSMutableString stringWithString:@""];
     [self.kbData setObject:contextBuffer forKey:kContextBufferKey];
@@ -105,6 +101,7 @@ NSString *const kKMXFileKey = @"KMXFile";
     return YES;
 }
 
+// TODO: investigate -- event handler for OSK only?
 CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
     // If key map is not enable, return the event without modifying
     if (!isKeyMapEnabled)
@@ -123,10 +120,9 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         NSArray *actions = [kme processEvent:mEvent];
         //if (debugMode)
             NSLog(@"%@", actions);
-        for (NSDictionary *action in actions) {
-            NSString *actionType = [[action allKeys] objectAtIndex:0];
-            if ([actionType isEqualToString:Q_STR]) {
-                NSString *output = [action objectForKey:actionType];
+        for (CoreAction *action in actions) {
+            if (action.isCharacter) {
+                NSString *output = action.content;
                 UniChar *outCStr = (UniChar *)[output cStringUsingEncoding:NSUTF16StringEncoding];
                 unsigned short kc = [mEvent keyCode];
                 CGEventRef kEventDown = CGEventCreateKeyboardEvent(NULL, (CGKeyCode)kc, true);
@@ -139,12 +135,10 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 CFRelease(kEventDown);
                 CFRelease(kEventUp);
             }
-            else if ([actionType isEqualToString:Q_BACK]) {
-                NSInteger n = [[action objectForKey:actionType] integerValue];
+            else if (action.isMarkerBackspace) {
+                NSInteger n = action.backspaceCount;
                 NSUInteger dk = [contextBuffer deleteLastDeadkeys];
                 n -= dk;
-                //NSUInteger dc = [contextBuffer deadCharCount];
-                //n -= dc;
                 
                 for (int i = 0; i < n; i++) {
                     CGEventRef kEventDown = CGEventCreateKeyboardEvent(NULL, (CGKeyCode)51, true);
@@ -155,19 +149,18 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                     CFRelease(kEventUp);
                 }
                 
-                [contextBuffer deleteLastNChars:n/*+dc*/];
+              [contextBuffer deleteLastNChars:n];
             }
-            else if ([actionType isEqualToString:Q_DEADKEY]) {
-                NSUInteger x = [[action objectForKey:actionType] unsignedIntegerValue];
-                [contextBuffer appendDeadkey:x];
+            else if (action.isMarker) {
+                [contextBuffer appendDeadkey:action.content];
             }
-            else if ([actionType isEqualToString:Q_NUL]) {
+            else if (action.actionType == EndAction) {
                 continue;
             }
-            else if ([actionType isEqualToString:Q_RETURN]) {
+            else if (action.actionType == EmitKeystrokeAction) {
                 return NULL;
             }
-            else if ([actionType isEqualToString:Q_BEEP]) {
+            else if (action.actionType == AlertAction) {
                 [[NSSound soundNamed:@"Tink"] play];
             }
             
