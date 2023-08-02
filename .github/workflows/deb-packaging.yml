@@ -1,4 +1,5 @@
 name: "Ubuntu packaging"
+run-name: "Ubuntu packaging - ${{ github.ref_name }} by @${{ github.actor }}"
 on:
   repository_dispatch:
     types: ['deb-release-packaging:*', 'deb-pr-packaging:*']
