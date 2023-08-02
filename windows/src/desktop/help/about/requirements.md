@@ -2,7 +2,9 @@
 title: System Requirements
 ---
 
-[Supported Windows Operating Systems](../common/os)
+## Supported Windows Operating Systems
+
+* See [What operating systems does Keyman support?](../common/os) topic.
 
 ## Resource Requirements
 
