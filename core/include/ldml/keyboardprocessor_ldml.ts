@@ -615,9 +615,9 @@ class Constants {
   }
 
   // ---- marker stuff ----
-  /** == UC_SENTINEL, first item of a  */
+  /** == kmx_file.UC_SENTINEL, always followed by `marker_code`, marker index 0x0001-0xfffe */
   readonly marker_sentinel     = 0xFFFF;
-  /** == CODE_DEADKEY */
+  /** == kmx_file.CODE_DEADKEY */
   readonly marker_code_deadkey = 0x0008;
   /** minimum usable marker index */
   readonly marker_min_index    = 0x0001;
