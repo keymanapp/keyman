@@ -43,11 +43,11 @@ export class KeymanDeveloperProject {
   }
 
   public isKeyboardProject() {
-    return !!this.files.find(file => file.fileType == KeymanFileTypes.Source.KeymanKeyboard || file.fileType == KeymanFileTypes.Source.LdmlKeyboard);
+    return !!this.files.find(file => file.getFileType() == KeymanFileTypes.Source.KeymanKeyboard || file.getFileType() == KeymanFileTypes.Source.LdmlKeyboard);
   }
 
   public isLexicalModelProject() {
-    return !!this.files.find(file => file.fileType == KeymanFileTypes.Source.Model);
+    return !!this.files.find(file => file.getFileType() == KeymanFileTypes.Source.Model);
   }
 
   public addMetadataFile() {
@@ -134,21 +134,16 @@ export class KeymanDeveloperProjectFile10 {
   readonly filename: string;
   readonly filePath: string;
   readonly fileVersion: string;  // 1.0 only
-  /**
-   * file extension of filename; warning: .model.ts is technically not the fileType because of 2 periods
-   * @deprecated use `getFileType()`
-   */
-  readonly fileType: KeymanFileTypes.Any; // 1.0 only
   details: KeymanDeveloperProjectFileDetail_Kmn & KeymanDeveloperProjectFileDetail_Kps; // 1.0 only
   childFiles: KeymanDeveloperProjectFile[]; // 1.0 only
-  constructor(id: string, filename: string, filePath: string, fileVersion:string, fileType: KeymanFileTypes.Any) {
+  constructor(id: string, filename: string, filePath: string, fileVersion:string) {
     this.details = {};
     this.childFiles = [];
     this.id = id;
     this.filename = filename;
     this.filePath = filePath;
     this.fileVersion = fileVersion;
-    this.fileType = fileType;
+    // we now ignore the fileType on load
   }
   getFileType() {
     return KeymanFileTypes.sourceTypeFromFilename(this.filename);
@@ -160,18 +155,12 @@ export type KeymanDeveloperProjectFileType20 = KeymanFileTypes.Source;
 export class KeymanDeveloperProjectFile20 {
   readonly filename: string;
   readonly filePath: string;
-  /**
-   * file extension of filename, but .model.ts is technically not the ext because of 2 periods
-   * @deprecated TODO: remove this from 2.0 or make it private
-   */
-  readonly fileType: KeymanFileTypes.Source;
   constructor(filePath: string, private callbacks: CompilerCallbacks) {
     this.filename = this.callbacks.path.basename(filePath);
     this.filePath = filePath;
-    this.fileType = KeymanFileTypes.sourceTypeFromFilename(this.filename);
   }
   getFileType() {
-    return this.fileType;
+    return KeymanFileTypes.sourceTypeFromFilename(this.filename);
   }
 };
 

@@ -90,8 +90,7 @@ export class KPJFileReader {
         sourceFile.ID || '',
         sourceFile.Filename || '',
         (sourceFile.Filepath || '').replace(/\\/g, '/'),
-        sourceFile.FileVersion || '',
-        sourceFile.FileType || ''
+        sourceFile.FileVersion || ''
       );
       if (sourceFile.Details) {
         file.details.copyright = sourceFile.Details.Copyright;
