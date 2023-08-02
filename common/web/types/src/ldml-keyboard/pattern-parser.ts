@@ -51,6 +51,10 @@ export class MarkerParser {
    * Marker sentinel as a string - U+FFFF
    */
   public static readonly SENTINEL = String.fromCodePoint(constants.marker_sentinel);
+  /**
+   * Marker code as a string - U+0008
+   */
+  public static readonly CODE_DEADKEY = String.fromCodePoint(constants.marker_code_deadkey);
 
   /** Minimum ID (trailing code unit) */
   public static readonly MIN_MARKER_INDEX = constants.marker_min_index;
@@ -83,7 +87,7 @@ export class MarkerParser {
     if (n < MarkerParser.MIN_MARKER_INDEX || n > MarkerParser.ANY_MARKER_INDEX) {
       throw RangeError(`Internal Error: marker index out of range ${n}`);
     }
-    return this.SENTINEL + String.fromCharCode(n);
+    return this.SENTINEL + this.CODE_DEADKEY + String.fromCharCode(n);
   }
 
   /** @returns all marker strings as sentinel values */

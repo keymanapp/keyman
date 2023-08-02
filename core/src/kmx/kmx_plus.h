@@ -310,6 +310,10 @@ static_assert(sizeof(struct COMP_KMXPLUS_TRAN_GROUP) == LDML_LENGTH_TRAN_GROUP, 
 static_assert(sizeof(struct COMP_KMXPLUS_TRAN_TRANSFORM) == LDML_LENGTH_TRAN_TRANSFORM, "mismatched size of tran transform");
 static_assert(sizeof(struct COMP_KMXPLUS_TRAN_REORDER) == LDML_LENGTH_TRAN_REORDER, "mismatched size of tran reorder");
 
+// assert some parallel constants
+static_assert(LDML_MARKER_SENTINEL == UC_SENTINEL, "mismatch: LDML_MARKER_SENTINEL");
+static_assert(LDML_MARKER_CODE_DEADKEY == CODE_DEADKEY, "mismatch: LDML_MARKER_CODE_DEADKEY");
+static_assert(LDML_MARKER_ANY_INDEX < UC_SENTINEL, "expected LDML_MARKER_ANY_INDEX < UC_SENTINEL");
 
 /* ------------------------------------------------------------------
  * bksp section
