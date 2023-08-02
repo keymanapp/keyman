@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { ElementParser, ElementSegment, ElementType, MarkerParser, OrderedStringList, VariableParser } from '../../src/ldml-keyboard/pattern-parser.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
-import { KMX } from '../../src/main.js';
+import { KMXFile } from '../../src/kmx/kmx.js';
 
 describe('Test of Pattern Parsers', () => {
   describe('should test MarkerParser', () => {
@@ -105,8 +105,8 @@ describe('Test of Pattern Parsers', () => {
       );
     });
     it('should match some marker constants', () => {
-      assert.equal(constants.marker_sentinel, KMX.KMXFile.UC_SENTINEL);
-      assert.equal(constants.marker_code_deadkey, KMX.KMXFile.CODE_DEADKEY);
+      assert.equal(constants.marker_sentinel, KMXFile.UC_SENTINEL);
+      assert.equal(constants.marker_code_deadkey, KMXFile.CODE_DEADKEY);
     });
   });
   describe('should test VariableParser', () => {
