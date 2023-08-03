@@ -11,38 +11,39 @@
     <name value="Marker Test" />
   </names>
 
-  <keys>
-    <!-- TODO-LDML: emitting from keys isn't working (crash!) so we will go via transform -->
-    <!-- <key id="grave" to="\m{grave}" />
-    <key id="acute" to="\m{acute}" /> -->
-
-    <!-- for now: use transorms to get to markers -->
-    <key id="grave" to="G" />
-    <key id="acute" to="A" />
-    <key id="e" to="e" />
-  </keys>
-
-  <!-- <displays>
+  <displays>
     <display to="\m{grave}" display="`" />
     <display to="\m{acute}" display="´" />
-  </displays> -->
+  </displays>
+
+  <keys>
+    <key id="grave" to="\m{grave}" />
+    <key id="acute" to="\m{acute}" />
+    <key id="caret" to="C" /> <!-- see transform -->
+    <key id="hacek" to="H" /> <!-- see transform -->
+  </keys>
 
   <layers form="us">
     <layer modifier="none" id="base">
-      <row keys="grave acute e" />
+      <row keys="grave acute caret hacek" />
+      <row keys="q w e" /> <!-- etc -->
+      <row keys="a s d" /> <!-- etc -->
+      <row keys="z x c" /> <!-- etc -->
     </layer>
   </layers>
 
-
   <transforms type="simple">
     <transformGroup>
-      <transform from="G" to="\m{grave}" />
-      <transform from="A" to="\m{acute}" />
+      <transform from="C" to="\m{caret}" />
+      <transform from="H" to="\m{hacek}" />
     </transformGroup>
     <transformGroup>
       <transform from="\m{acute}\m{acute}" to="+" />
       <transform from="e\m{acute}" to="é" />
       <transform from="e\m{grave}" to="è" />
+      <transform from="e\m{caret}" to="ê" />
+      <transform from="e\m{hacek}" to="e\u{030C}" />
+      <transform from="c\m{hacek}" to="č" />
     </transformGroup>
     <transformGroup>
       <transform from="\m{grave}" to="_" /> <!-- trailing grave becomes _ -->
