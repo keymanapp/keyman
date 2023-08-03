@@ -5,5 +5,6 @@
   ],
   "node-option": [
     "loader=ts-node/esm"
-  ]
+  ],
+  "require": ".mocharc.env.js"
 }
