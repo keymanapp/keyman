@@ -312,7 +312,7 @@ static_assert(sizeof(struct COMP_KMXPLUS_TRAN_REORDER) == LDML_LENGTH_TRAN_REORD
 
 // assert some parallel constants
 static_assert(LDML_MARKER_SENTINEL == UC_SENTINEL, "mismatch: LDML_MARKER_SENTINEL");
-static_assert(LDML_MARKER_CODE_DEADKEY == CODE_DEADKEY, "mismatch: LDML_MARKER_CODE_DEADKEY");
+static_assert(LDML_MARKER_CODE == CODE_DEADKEY, "mismatch: LDML_MARKER_CODE");
 static_assert(LDML_MARKER_ANY_INDEX < UC_SENTINEL, "expected LDML_MARKER_ANY_INDEX < UC_SENTINEL");
 
 /* ------------------------------------------------------------------

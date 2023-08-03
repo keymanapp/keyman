@@ -618,7 +618,7 @@ class Constants {
   /** == kmx_file.UC_SENTINEL, always followed by `marker_code`, marker index 0x0001-0xfffe */
   readonly marker_sentinel     = 0xFFFF;
   /** == kmx_file.CODE_DEADKEY */
-  readonly marker_code_deadkey = 0x0008;
+  readonly marker_code = 0x0008;
   /** minimum usable marker index */
   readonly marker_min_index    = 0x0001;
   /** index value referring to the 'any' marker match */
