@@ -56,7 +56,7 @@ void test_external_event(const km::kbp::path &source_file){
   // keyboard is a caps always off keyboard
 
   try_status(km_kbp_event(test_state, event, nullptr));
-  // The action to turn capslock off must be in the actions let.
+  // The action to turn capslock off must be in the actions list.
   assert(action_items(test_state, {{KM_KBP_IT_CAPSLOCK, {0,}, {0}}, {KM_KBP_IT_END}}));
 
   km_kbp_state_dispose(test_state);

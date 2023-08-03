@@ -23,7 +23,7 @@ const char *action_item_types[] = {
   "KM_KBP_IT_PERSIST_OPT", // = 5,  // The indicated option needs to be stored.
   "KM_KBP_IT_EMIT_KEYSTROKE", // = 6,  // Emit the current keystroke to the application
   "KM_KBP_IT_INVALIDATE_CONTEXT", // = 7,
-  "KM_KBP_IT_CAPSLOCK",    // = 8,
+  "KM_KBP_IT_CAPSLOCK",//     = 8, Enable or disable capsLock
 };
 
 void print_action_item(const char *title, km_kbp_action_item const & item) {
