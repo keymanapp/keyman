@@ -87,7 +87,7 @@ static BOOL processInvalidateContext(
 }
 
 static BOOL
-processCapsLock(const km_kbp_action_item* actionItem, BOOL isUp, BOOL Updateable) {
+processCapsLock(const km_kbp_action_item* actionItem, BOOL isUp, BOOL Updateable, BOOL externalEvent) {
 
   // We only want to process the Caps Lock key event once --
   // in the first pass (!Updateable).
@@ -114,7 +114,8 @@ processCapsLock(const km_kbp_action_item* actionItem, BOOL isUp, BOOL Updateable
   }
   else {
     // This case would occur for the keyboard system store setting `store(&ShiftFreesCaps) '1'`
-    if (!isUp && IsCapsLockOn()) {
+    // OR selecting a keyboard with CAPs always off rule
+    if ((!isUp && IsCapsLockOn()) || (externalEvent && IsCapsLockOn())) {
       SendDebugMessageFormat(0, sdmGlobal, 0, "processCapsLock: TURN CAPS OFF: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
@@ -160,7 +161,7 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
       continueProcessingActions = processInvalidateContext(_td->app, _td->lpActiveKeyboard->lpCoreKeyboardState);
       break;
     case KM_KBP_IT_CAPSLOCK:
-      continueProcessingActions = processCapsLock(act, !_td->state.isDown, _td->TIPFUpdateable);
+      continueProcessingActions = processCapsLock(act, !_td->state.isDown, _td->TIPFUpdateable, FALSE);
       break;
     case KM_KBP_IT_END:
       // fallthrough
@@ -198,7 +199,33 @@ ProcessActionsNonUpdatableParse(BOOL* emitKeyStroke) {
       _td->CoreProcessEventRun = FALSE; // If we emit the key stroke on this parse we don't need the second parse
       break;
     case KM_KBP_IT_CAPSLOCK:
-      continueProcessingActions = processCapsLock(act, !_td->state.isDown, _td->TIPFUpdateable);
+      continueProcessingActions = processCapsLock(act, !_td->state.isDown, _td->TIPFUpdateable, FALSE);
+      break;
+    case KM_KBP_IT_INVALIDATE_CONTEXT:
+      continueProcessingActions = processInvalidateContext(_td->app, _td->lpActiveKeyboard->lpCoreKeyboardState);
+      break;
+    }
+    if (!continueProcessingActions) {
+      return FALSE;
+    }
+  }
+  return TRUE;
+}
+
+BOOL
+ProcessActionsExternalEvent() {
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td) {
+    return FALSE;
+  }
+  // Currently the only Action handled is KM_KBP_IT_CAPSLOCK.
+  // Other actions will be added when needed.
+  BOOL continueProcessingActions = TRUE;
+  for (auto act = km_kbp_state_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, nullptr); act->type != KM_KBP_IT_END;
+       act++) {
+    switch (act->type) {
+    case KM_KBP_IT_CAPSLOCK:
+      continueProcessingActions = processCapsLock(act, !_td->state.isDown, FALSE, TRUE);
       break;
     case KM_KBP_IT_INVALIDATE_CONTEXT:
       continueProcessingActions = processInvalidateContext(_td->app, _td->lpActiveKeyboard->lpCoreKeyboardState);

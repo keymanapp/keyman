@@ -1,7 +1,7 @@
 /*
   Copyright:    © 2023 SIL International.
   Description:  Tests for external event processing for the kmx processor
-  Create Date:  15 Nov 2021
+  Create Date:  28 Jul 2023
   Authors:      Ross Cruickshank (RC)
 
 */
@@ -21,7 +21,7 @@
 
 /** This test will test the infrastructure around the external event processing
  *  The functions tested are:
- *  km_kbp_event
+ *  km_kbp_event with the event KM_KBP_EVENT_KEYBOARD_ACTIVATED
  *
  */
 
@@ -41,7 +41,6 @@ void test_external_event(const km::kbp::path &source_file){
 
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;
-  //km_kbp_keyboard_imx * kb_imx_list;
 
   km::kbp::path full_path = source_file;
 
@@ -50,18 +49,14 @@ void test_external_event(const km::kbp::path &source_file){
   // Setup state, environment
   try_status(km_kbp_state_create(test_kb, test_env_opts, &test_state));
 
-  // This is where we can set up external events to test the processing.
+  // Set up external events to test the processing.
   uint32_t event = KM_KBP_EVENT_KEYBOARD_ACTIVATED;
   // For this particular test we want to have the capslock state as on.
   // then after the km_kbp_event the caps lock should be off as the load
   // keyboard is a caps always off keyboard
-  // set caps lock state (probably with key event caps lock key)
-  // check caps lock state
-  //caps_lock_state()
-  //set_caps_lock_on(bool caps_lock_on)
+
   try_status(km_kbp_event(test_state, event, nullptr));
-  // The action to turn capslock of should exist.
-  //assert(action_items(test_state, {{KM_KBP_IT_CAPSLOCK, {0,}, {0}}, {KM_KBP_IT_END}}));
+  // The action to turn capslock off must be in the actions let.
   assert(action_items(test_state, {{KM_KBP_IT_CAPSLOCK, {0,}, {0}}, {KM_KBP_IT_END}}));
 
   km_kbp_state_dispose(test_state);

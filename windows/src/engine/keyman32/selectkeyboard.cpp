@@ -96,16 +96,18 @@ BOOL SelectKeyboard(DWORD KeymanID)
         SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SelectKeyboard: NewKeymanID: %x", _td->ActiveKeymanID);
 
         if (_td->app) _td->app->ResetContext();
-
-        // TODO: #5822 tell the core with km_kbp_event so it can reset the capslock state
-
-
         SelectApplicationIntegration();   // I4287
         if (_td->app && !_td->app->IsWindowHandled(hwnd)) _td->app->HandleWindow(hwnd);
         _td->state.windowunicode = !_td->app || _td->app->IsUnicode();
 
         ActivateDLLs(_td->lpActiveKeyboard);
 
+        if (KM_KBP_STATUS_OK !=
+            km_kbp_event(_td->lpActiveKeyboard->lpCoreKeyboardState, KM_KBP_EVENT_KEYBOARD_ACTIVATED, nullptr)) {
+          SendDebugMessageFormat(0, sdmGlobal, 0, "km_kbp_event Failed Result: %d ", FALSE);
+        } else {
+          ProcessActionsExternalEvent();
+        }
         return TRUE;
       }
       if (IsFocusedThread())
