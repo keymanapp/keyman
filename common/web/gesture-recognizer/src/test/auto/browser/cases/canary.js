@@ -64,7 +64,7 @@ describe("'Canary' checks", function() {
       fixture.cleanup();
     });
 
-    it("InputSequenceSimulator.replayTouchSample", function() {
+    it("InputSequenceSimulator.replayTouchSample", async function() {
       let playbackEngine = new InputSequenceSimulator(this.controller);
       let layout = new FixtureLayoutConfiguration("screen2", "bounds1", "full", "safe-loose");
       this.controller.layoutConfiguration = layout;
@@ -82,10 +82,14 @@ describe("'Canary' checks", function() {
       this.controller.recognizer.on('inputstart', fakeHandler)
       fireEvent();
 
+      // because of the mild optimization await when spinning up gesture-matching
+      // for a new SimpleGestureSource.
+      await Promise.resolve();
+
       assert.isTrue(fakeHandler.called, "Unit test attempt failed:  handler was not called successfully.");
     });
 
-    it("InputSequenceSimulator.replayMouseSample", function() {
+    it("InputSequenceSimulator.replayMouseSample", async function() {
       let playbackEngine = new InputSequenceSimulator(this.controller);
       let layout = new FixtureLayoutConfiguration("screen2", "bounds1", "full", "safe-loose");
       this.controller.layoutConfiguration = layout;
@@ -100,6 +104,10 @@ describe("'Canary' checks", function() {
       let fakeHandler = sinon.fake();
       this.controller.recognizer.on('inputstart', fakeHandler)
       fireEvent();
+
+      // because of the mild optimization await when spinning up gesture-matching
+      // for a new SimpleGestureSource.
+      await Promise.resolve();
 
       assert.isTrue(fakeHandler.called, "Unit test attempt failed:  handler was not called successfully.");
     });

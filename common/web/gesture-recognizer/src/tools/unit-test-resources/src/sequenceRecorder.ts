@@ -1,4 +1,4 @@
-import { ComplexGestureSource } from "@keymanapp/gesture-recognizer";
+import { SimpleGestureSource } from "@keymanapp/gesture-recognizer";
 import { HostFixtureLayoutController } from "./hostFixtureLayoutController.js";
 import { RecordedCoordSequenceSet } from "./inputRecording.js";
 
@@ -7,11 +7,11 @@ import { RecordedCoordSequenceSet } from "./inputRecording.js";
  *  verification itself.
  */
 
-type WrappedInputSequence = ComplexGestureSource<any>;
+type WrappedInputSequence = SimpleGestureSource<any>;
 
 export class SequenceRecorder {
   controller: HostFixtureLayoutController;
-  records:  {[identifier: string]: ComplexGestureSource<any>} = {};
+  records:  {[identifier: string]: SimpleGestureSource<any>} = {};
 
   /**
    * Tracks the order in which each sequence was first detected.
@@ -33,7 +33,7 @@ export class SequenceRecorder {
 
   private _attachRecognizerHooks() {
     this.controller.recognizer.on('inputstart', (wrappedSequence: WrappedInputSequence) => {
-      const id = wrappedSequence.touchpoints[0].identifier;
+      const id = wrappedSequence.identifier;
       this.records[id]  = wrappedSequence;
 
       this.startOrder.push(id);

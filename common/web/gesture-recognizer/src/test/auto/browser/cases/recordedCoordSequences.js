@@ -55,9 +55,7 @@ describe("Layer one - DOM -> InputSequence", function() {
       // **********************************
       if(isOnAndroid()) {
         for(let input of testObj.inputs) {
-          for(let touchpoint of input.touchpoints) {
-            touchpoint.isFromTouch = true;
-          }
+          input.isFromTouch = true;
         }
       }
 
@@ -77,7 +75,7 @@ describe("Layer one - DOM -> InputSequence", function() {
         // Returns just the observed, cleaned samples for a sequence object.  The recorded coordinates
         // should match perfectly.
         let seqCleaner = (input) => {
-          return input.touchpoints[0].path.coords.map(sampleCleaner);
+          return input.path.coords.map(sampleCleaner);
         };
 
         let cleanOriginalSet = testObj.inputs.map(seqCleaner);
@@ -107,7 +105,7 @@ describe("Layer one - DOM -> InputSequence", function() {
         // (Through to the nested for-loop `assert.closeTo`)
         let sampleTimeExtractor = (sample) => sample.t;
         let inputTimeExtractor = (input) => {
-          return input.touchpoints[0].path.coords.map(sampleTimeExtractor);
+          return input.path.coords.map(sampleTimeExtractor);
         }
 
         let originalTimeSet = testObj.inputs.map(inputTimeExtractor);
@@ -122,7 +120,7 @@ describe("Layer one - DOM -> InputSequence", function() {
         // The 'terminationEvent' property should match.  Any sequence that was "canceled" should still
         // cancel; that's a pretty critical detail!
         let terminationEventMapper = (seq) => {
-          return seq.touchpoints[0].path.wasCancelled;
+          return seq.path.wasCancelled;
         }
 
         expect(result.inputs.map(terminationEventMapper)).to.deep.equal(testObj.inputs.map(terminationEventMapper));

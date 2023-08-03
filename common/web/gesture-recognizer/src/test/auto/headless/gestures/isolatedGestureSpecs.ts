@@ -4,6 +4,7 @@ import specTypeDefs = gestures.specs;
 
 type GestureModel = specTypeDefs.GestureModel<string>;
 
+// Is kind of a mix of the two longpress styles.
 export const LongpressModel: GestureModel = {
   id: 'longpress',
   resolutionPriority: 0,
@@ -11,6 +12,7 @@ export const LongpressModel: GestureModel = {
   contacts: [
     {
       model: {
+        // Is the version without the up-flick shortcut.
         ...specs.MainLongpressSourceModel,
         itemPriority: 1,
         pathInheritance: 'chop'
@@ -25,6 +27,10 @@ export const LongpressModel: GestureModel = {
     next: 'subkeyselect',
     item: 'none'
   },
+  /*
+   * Note:  these actions make sense in a 'roaming-touch' context, but not when
+   * flicks are also enabled.
+   */
   rejectionActions: {
     item: {
       type: 'optional-chain',
