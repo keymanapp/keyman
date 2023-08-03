@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.153 alpha 2023-08-03
+
+* docs(windows): Update OS requirement to Windows 10 (#9381)
+* fix(web): maintenance of focus when changing keyboard via Toolbar UI (#9397)
+* chore(linux): Remove Kinetic from GHA (#9399)
+* chore(linux): Properly treat test builds with packaging GHA (#9400)
+
 ## 17.0.152 alpha 2023-08-02
 
 * fix(developer): more wasm uset fixes (#9382)
