@@ -1,7 +1,5 @@
 {
   "inputs": [
-    {
-      "touchpoints": [
         {
           "isFromTouch": false,
           "path": {
@@ -268,8 +266,7 @@
             "wasCancelled": false
           }
         }
-      ]
-    }
+
   ],
   "config": {
     "deviceStyle": "screen2",
