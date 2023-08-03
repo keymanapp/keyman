@@ -85,12 +85,25 @@ namespace kbp {
     km_kbp_keyboard_imx  * get_imx_list() const override;
 
   private:
-     /**  emit text to context and actions */
+     /** emit text to context and actions */
      static void emit_text(km_kbp_state *state, const std::u16string &str);
-     /**  emit text to context and actions */
+     /** emit text to context and actions */
      static void emit_text(km_kbp_state *state, const std::u32string &str);
-     /**  emit char to context and actions */
-     static void emit_text(km_kbp_state *state, const km_kbp_usv ch);
+     /** emit char to context and actions */
+     static void emit_text(km_kbp_state *state, km_kbp_usv ch);
+     /** emit a marker */
+     static void emit_marker(km_kbp_state *state, KMX_DWORD marker);
+
+     /**
+      * add the string+marker portion of the context to the beginning of str.
+      * Stop when a non-string and non-marker is hit.
+      * Convert markers into the UC_SENTINEL format.
+      * @return the number of context items consumed
+      */
+     static size_t context_to_string(km_kbp_state *state, std::u32string &str);
+
+     /** prepend the marker string in UC_SENTINEL format to the str */
+     static void prepend_marker(std::u32string &str, KMX_DWORD marker);
   };
 } // namespace kbp
 } // namespace km
