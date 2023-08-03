@@ -23,7 +23,7 @@ export function loadProject(infile: string, callbacks: CompilerCallbacks) {
   // infile should be the .kpj
   if(!infile.endsWith(KeymanFileTypes.Source.Project)) {
     // TODO separate error code
-    callbacks.reportMessage(InfrastructureMessages.Error_InvalidProjectFile({message: 'file should have .kpj extension'}));
+    callbacks.reportMessage(InfrastructureMessages.Error_NotAProjectFile({filename:infile}));
     return null;
   }
 

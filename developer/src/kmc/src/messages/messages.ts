@@ -68,5 +68,9 @@ export class InfrastructureMessages {
   static Error_FileTypeNotFound = (o:{ext:string}) => m(this.ERROR_FileTypeNotFound,
     `A file of type ${o.ext} was not found in the project.`);
   static ERROR_FileTypeNotFound = SevError | 0x000E;
+
+  static Error_NotAProjectFile = (o:{filename:string}) => m(this.ERROR_NotAProjectFile,
+    `File ${o.filename} must have a .kpj extension to be treated as a project.`);
+  static ERROR_NotAProjectFile = SevError | 0x000F;
 }
 
