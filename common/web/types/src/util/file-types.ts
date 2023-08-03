@@ -70,12 +70,29 @@ export type Any = string;
 
 /**
  * Gets the file type based on extension, dealing with multi-part file
+ * extensions. Does not sniff contents of file or assume file existence. Does
+ * transform upper-cased file extensions to lower-case.
+ * @param filename
+ * @returns file extension, or `""` if no extension. Note that this return value
+ *          differs from the other, more-specific fromFilename functions below,
+ *          which return `null` if a supported extension is not found.
+ */
+export function fromFilename(filename: string): Binary | Source | Any {
+  const result =
+    sourceOrBinaryTypeFromFilename(filename) ??
+    filename.match(/\.[^\.]+$/)?.[0] ??
+    "";
+  return result;
+}
+
+/**
+ * Gets the file type based on extension, dealing with multi-part file
  * extensions. Does not sniff contents of file or assume file existence.
  * Does transform upper-cased file extensions to lower-case.
  * @param filename
  * @returns file type, or `null` if not found
  */
-export function fromFilename(filename: string): Binary | Source {
+export function sourceOrBinaryTypeFromFilename(filename: string): Binary | Source {
   filename = filename.toLowerCase();
   const result =
     ALL_SOURCE.find(type => filename.endsWith(type)) ??

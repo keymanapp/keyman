@@ -88,10 +88,9 @@ export class KPJFileReader {
     for (let sourceFile of project.Files?.File) {
       let file: KeymanDeveloperProjectFile10 = new KeymanDeveloperProjectFile10(
         sourceFile.ID || '',
-        sourceFile.Filename || '',
         (sourceFile.Filepath || '').replace(/\\/g, '/'),
         sourceFile.FileVersion || '',
-        sourceFile.FileType || ''
+        this.callbacks
       );
       if (sourceFile.Details) {
         file.details.copyright = sourceFile.Details.Copyright;
