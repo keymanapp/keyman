@@ -106,7 +106,6 @@ public:
   KMX_Environment *GetEnvironment();
   KMX_Environment const *GetEnvironment() const;
   INTKEYBOARDINFO const *GetKeyboard() const;
-  /// TODO: 5822 public member process external event.
   void SetCapsLock(KMX_DWORD &modifiers, KMX_BOOL capsLockOn, KMX_BOOL force = FALSE);
 
   // Utility function

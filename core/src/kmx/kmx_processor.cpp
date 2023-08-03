@@ -112,17 +112,12 @@ kmx_processor::external_event(
 
   switch (event){
     case KM_KBP_EVENT_KEYBOARD_ACTIVATED:{
-      // reset any current actions in the queue as we have
-      // just loaded a new keyboard
+      // reset any current actions in the queue as a new keyboard
+      // has been activated
       _kmx.GetActions()->ResetQueue();
       state->actions().clear();
-      // TODO: #5822
-      // just force it if caps always off is set.
-      // We need to pass the current modifiers in from the
-      // platform if we were to check.
     KMX_DWORD dummy_modifiers = 0;
     if (_kmx.GetKeyboard()->Keyboard->dwFlags & KF_CAPSALWAYSOFF) {
-       // TODO: #5822    need to use public member to access_kmx
       _kmx.SetCapsLock(dummy_modifiers, FALSE, TRUE);
       }
     }
