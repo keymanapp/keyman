@@ -83,6 +83,14 @@ namespace kbp {
     km_kbp_keyboard_key  * get_key_list() const override;
 
     km_kbp_keyboard_imx  * get_imx_list() const override;
+
+  private:
+     /**  emit text to context and actions */
+     static void emit_text(km_kbp_state *state, const std::u16string &str);
+     /**  emit text to context and actions */
+     static void emit_text(km_kbp_state *state, const std::u32string &str);
+     /**  emit char to context and actions */
+     static void emit_text(km_kbp_state *state, const km_kbp_usv ch);
   };
 } // namespace kbp
 } // namespace km

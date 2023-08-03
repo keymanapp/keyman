@@ -193,6 +193,7 @@ ldml_processor::process_event(
     state->actions().clear();
 
     switch (vk) {
+    // Special handling for backspace VK
     case KM_KBP_VKEY_BKSP:
       {
         if (!!bksp_transforms) {
@@ -231,6 +232,7 @@ ldml_processor::process_event(
       }
       break;
     default:
+    // all other VKs
       {
         // adapted from kmx_processor.cpp
 
@@ -258,6 +260,7 @@ ldml_processor::process_event(
 
         // Look up the key
         const std::u16string str = keys.lookup(vk, modifier_state);
+
         if (str.empty()) {
           // not found, so pass the keystroke on to the Engine
           state->actions().push_invalidate_context();
@@ -265,14 +268,11 @@ ldml_processor::process_event(
           break; // ----- commit and exit
         }
         // found the correct string - push it into the context and actions
-        const std::u32string str32 = kmx::u16string_to_u32string(str);
-        for (const auto &ch : str32) {
-          state->context().push_character(ch);
-          state->actions().push_character(ch);
-        }
+        emit_text(state, str);
         // Now process transforms
         // Process the transforms
         if (!!transforms) {
+          const std::u32string str32 = kmx::u16string_to_u32string(str);
           // add the newly added char to ctxt
           ctxt.push_back(str32);
 
@@ -304,10 +304,7 @@ ldml_processor::process_event(
               ctxt.pop_back();
             }
             // Now, add in the updated text
-            for (const auto &ch : outputString) {
-              state->context().push_character(ch);
-              state->actions().push_character(ch);
-            }
+            emit_text(state, outputString);
           }
         }
       }
@@ -343,6 +340,26 @@ km_kbp_context_item * ldml_processor::get_intermediate_context() {
 
 km_kbp_status ldml_processor::validate() const {
   return _valid ? KM_KBP_STATUS_OK : KM_KBP_STATUS_INVALID_KEYBOARD;
+}
+
+void
+ldml_processor::emit_text(km_kbp_state *state, const std::u16string &str) {
+  const std::u32string str32 = kmx::u16string_to_u32string(str);
+  emit_text(state, str32);
+}
+
+void
+ldml_processor::emit_text(km_kbp_state *state, const std::u32string &str) {
+  for (const auto &ch : str) {
+    emit_text(state, ch);
+  }
+}
+
+void
+ldml_processor::emit_text(km_kbp_state *state, km_kbp_usv ch) {
+  assert(ch != UC_SENTINEL);
+  state->context().push_character(ch);
+  state->actions().push_character(ch);
 }
 
 } // namespace kbp
