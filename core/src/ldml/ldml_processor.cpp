@@ -288,11 +288,20 @@ ldml_processor::process_event(
 
           if (matchedContext > 0) {
             // Found something.
-            // Now, clear out the old context
-            for (size_t i = 0; i < matchedContext; i++) {
-              state->context().pop_back();  // Pop off last
-              auto deletedChar = ctxt[ctxt.size() - i - 1][0];
-              state->actions().push_backspace(KM_KBP_BT_CHAR, deletedChar);  // Cause prior char to be removed
+            // Now, backaspace over the old context
+            /** how much of the context we need to clear */
+            auto needToClear = matchedContext;
+            while (needToClear > 0) {
+              assert(ctxt.size() > 0);
+              // backspace (clear) the current ctxt
+              std::u32string lastString = ctxt[ctxt.size() - 1];
+              assert(lastString.size() <= needToClear); // avoid underflow
+              state->context().pop_back();
+              for (auto it = lastString.rbegin(); it < lastString.rend(); it++) {
+                state->actions().push_backspace(KM_KBP_BT_CHAR, *it);  // Cause prior char to be removed
+                needToClear--;
+              }
+              ctxt.pop_back();
             }
             // Now, add in the updated text
             for (const auto &ch : outputString) {
