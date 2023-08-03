@@ -203,9 +203,8 @@ void
 keyman_add_keyboard(gpointer data, gpointer user_data) {
   kmp_keyboard *keyboard = (kmp_keyboard *)data;
   add_keyboard_data *kb_data = (add_keyboard_data *)user_data;
-  gboolean alreadyexists     = FALSE;
 
-  for (GList *e = kb_data->engines_list; e != NULL && alreadyexists == FALSE; e = e->next) {
+  for (GList *e = kb_data->engines_list; e != NULL; e = e->next) {
     IBusEngineDesc *engine_desc = (IBusEngineDesc *)e->data;
     const gchar *version        = ibus_engine_desc_get_version(engine_desc);
     const gchar *engine_name    = ibus_engine_desc_get_name(engine_desc);
@@ -215,42 +214,40 @@ keyman_add_keyboard(gpointer data, gpointer user_data) {
     // if it's the same version
     // TODO: fix version comparison (#9593)
     if (g_strcmp0(kmx_file, keyboard->kmx_file) == 0 && g_strcmp0(version, keyboard->version) >= 0) {
-      alreadyexists = TRUE;
       g_debug("keyboard %s already exists at version %s which is newer or same as %s", kmx_file, version, keyboard->version);
+      return;
     }
   }
 
-  if (!alreadyexists) {
-    g_autofree gchar *json_file             = g_strjoin(".", keyboard->id, "json", NULL);
-    g_autoptr(keyboard_details) kbd_details = g_new0(keyboard_details, 1);
-    get_keyboard_details(kb_data->kmp_dir, json_file, kbd_details);
+  g_autofree gchar *json_file             = g_strjoin(".", keyboard->id, "json", NULL);
+  g_autoptr(keyboard_details) kbd_details = g_new0(keyboard_details, 1);
+  get_keyboard_details(kb_data->kmp_dir, json_file, kbd_details);
+  g_autofree gchar *abs_kmx = g_strjoin("/", kb_data->kmp_dir, keyboard->kmx_file, NULL);
 
-    if (keyboard->languages != NULL) {
-      for (GList *l = keyboard->languages; l != NULL; l = l->next) {
-        kmp_language *language = (kmp_language *)l->data;
-        IBusEngineDesc *engine_desc =
-            get_engine_for_language(keyboard, kb_data->info, kbd_details, kb_data->kmp_dir, language->id, language->name);
-        if (engine_desc) {
-          kb_data->engines_list = g_list_append(kb_data->engines_list, engine_desc);
-        }
+  if (keyboard->languages != NULL) {
+    for (GList *l = keyboard->languages; l != NULL; l = l->next) {
+      kmp_language *language = (kmp_language *)l->data;
+      IBusEngineDesc *engine_desc =
+          get_engine_for_language(keyboard, kb_data->info, kbd_details, kb_data->kmp_dir, language->id, language->name);
+      if (engine_desc) {
+        kb_data->engines_list = g_list_append(kb_data->engines_list, engine_desc);
       }
-    } else {
-      g_autofree gchar *abs_kmx = g_strjoin("/", kb_data->kmp_dir, keyboard->kmx_file, NULL);
-      g_message("adding engine %s", abs_kmx);
-      kb_data->engines_list = g_list_append(
-          kb_data->engines_list,
-          ibus_keyman_engine_desc_new(
-              abs_kmx,                        // kmx full path
-              keyboard->name,                 // longname
-              kbd_details->description,       // description
-              kb_data->info->copyright,       // copyright if available
-              NULL,                           // language, most are ignored by ibus except major languages
-              kbd_details->license,           // license
-              kb_data->info->author_desc,     // author name only, not email
-              keyman_get_icon_file(abs_kmx),  // icon full path
-              "us",                           // layout defaulting to us (en-US)
-              keyboard->version));
     }
+  } else {
+    g_message("adding engine %s", abs_kmx);
+    kb_data->engines_list = g_list_append(
+        kb_data->engines_list,
+        ibus_keyman_engine_desc_new(
+            abs_kmx,                        // kmx full path
+            keyboard->name,                 // longname
+            kbd_details->description,       // description
+            kb_data->info->copyright,       // copyright if available
+            NULL,                           // language, most are ignored by ibus except major languages
+            kbd_details->license,           // license
+            kb_data->info->author_desc,     // author name only, not email
+            keyman_get_icon_file(abs_kmx),  // icon full path
+            "us",                           // layout defaulting to us (en-US)
+            keyboard->version));
   }
 }
 
