@@ -61,10 +61,13 @@
 #define KEYMAN_ENVIRONMENT_OPTIONS 3
 
 // Path information for Keyman keyboard options in DConf
-#define KEYMAN_DCONF_NAME "com.keyman.options"
-#define KEYMAN_CHILD_DCONF_NAME "com.keyman.options.child"
-#define KEYMAN_DCONF_PATH "/desktop/ibus/keyman/options/"
+#define KEYMAN_DCONF_OPTIONS_NAME "com.keyman.options"
+#define KEYMAN_DCONF_OPTIONS_CHILD_NAME "com.keyman.options.child"
+// TODO: migrate to /com/keyman/options to better follow Gnome recommmendations
+// (https://docs.gtk.org/gio/class.Settings.html) (#9579)
+#define KEYMAN_DCONF_OPTIONS_PATH "/desktop/ibus/keyman/options/"
 #define KEYMAN_DCONF_OPTIONS_KEY "options"
+
 
 G_BEGIN_DECLS
 
