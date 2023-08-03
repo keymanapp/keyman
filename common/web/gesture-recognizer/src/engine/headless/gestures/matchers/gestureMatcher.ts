@@ -1,4 +1,3 @@
-import { ComplexGestureSource } from "../../complexGestureSource.js";
 import { SimpleGestureSource, SimpleGestureSourceSubview } from "../../simpleGestureSource.js";
 
 import { GestureModel, GestureResolution, GestureResolutionSpec, RejectionDefault, ResolutionItemSpec } from "../specs/gestureModel.js";
@@ -26,26 +25,26 @@ export class GestureMatcher<Type> {
   private readonly publishedPromise: ManagedPromise<MatchResult<Type>>; // unsure on the actual typing at the moment.
   private _result: MatchResult<Type>;
 
-  private baseSource: ComplexGestureSource<Type>;
+  private baseSources: SimpleGestureSource<Type>[];
 
   public get promise() {
     return this.publishedPromise.corePromise;
   }
 
-  constructor(model: GestureModel<Type>, sourceObj: ComplexGestureSource<Type> | GestureMatcher<Type>) {
+  constructor(model: GestureModel<Type>, sourceObj: SimpleGestureSource<Type> | GestureMatcher<Type>) {
     /* c8 ignore next 5 */
     if(!model || !sourceObj) {
       throw new Error("Construction of GestureMatcher requires a gesture-model spec and a source for related contact points.");
-    } else if(!model.sustainTimer && sourceObj instanceof ComplexGestureSource && sourceObj.touchpoints.length == 0) {
+    } else if(!model.sustainTimer && !(sourceObj)) {
       throw new Error("If the provided gesture-model spec lacks a sustain timer, there must be an active contact point.");
     }
 
     // We condition on ComplexGestureSource since some unit tests mock the other type without
     // instantiating the actual type.
-    const predecessor = sourceObj instanceof ComplexGestureSource<Type> ? null : sourceObj;
-    const source = predecessor ? null : (sourceObj as ComplexGestureSource<Type>);
+    const predecessor = sourceObj instanceof SimpleGestureSource<Type> ? null : sourceObj;
+    const source = predecessor ? null : (sourceObj as SimpleGestureSource<Type>);
 
-    this.baseSource = predecessor?.baseSource || source;
+    this.baseSources = predecessor?.baseSources || [source];
 
     this.predecessor = predecessor;
     this.publishedPromise = new ManagedPromise();
@@ -62,7 +61,7 @@ export class GestureMatcher<Type> {
     this.pathMatchers = [];
 
     const sourceTouchpoints: SimpleGestureSource<Type>[] = source
-      ? source.touchpoints
+      ? [ source ]
       : predecessor.pathMatchers.map((matcher) => matcher.source);
 
     let offset = 0;
@@ -264,6 +263,7 @@ export class GestureMatcher<Type> {
       }
     }
 
+    this.baseSources.push(simpleSource);
     this.addContactInternal(simpleSource.constructSubview(false, true));
   }
 
