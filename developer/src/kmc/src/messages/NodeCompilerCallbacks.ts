@@ -1,14 +1,52 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { CompilerCallbacks, CompilerSchema, CompilerEvent, compilerErrorSeverityName, CompilerPathCallbacks, CompilerFileSystemCallbacks } from '@keymanapp/common-types';
+import { InfrastructureMessages } from './messages.js';
 
 /**
  * Concrete implementation for CLI use
  */
 
+// TODO: Make a common class for all the CompilerCallbacks implementations
+
 export class NodeCompilerCallbacks implements CompilerCallbacks {
-  // TODO: REMOVE!
-  loadFile(filename: string | URL): Buffer {
+  /* NodeCompilerCallbacks */
+
+  messages: CompilerEvent[] = [];
+  silent: boolean;
+
+  constructor(silent?: boolean) {
+    this.silent = !!silent;
+  }
+
+  clear() {
+    this.messages = [];
+  }
+
+  hasMessage(code: number): boolean {
+    return this.messages.find((item) => item.code == code) === undefined ? false : true;
+  }
+
+  private verifyFilenameConsistency(originalFilename: string): void {
+    if(fs.existsSync(originalFilename)) {
+      // Note, we only check this if the file exists, because
+      // if it is not found, that will be returned as an error
+      // from loadFile anyway.
+      const filename = fs.realpathSync(originalFilename);
+      const nativeFilename = fs.realpathSync.native(filename);
+      if(filename != nativeFilename) {
+        this.reportMessage(InfrastructureMessages.Hint_FilenameHasDifferingCase({
+          reference: originalFilename,
+          filename: nativeFilename
+        }));
+      }
+    }
+  }
+
+  /* CompilerCallbacks */
+
+  loadFile(filename: string): Uint8Array {
+    this.verifyFilenameConsistency(filename);
     try {
       return fs.readFileSync(filename);
     } catch (e) {
@@ -29,6 +67,10 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   }
 
   reportMessage(event: CompilerEvent): void {
+    this.messages.push(event);
+    if(this.silent) {
+      return;
+    }
     const code = event.code.toString(16);
     if(event.line) {
       console.log(`${compilerErrorSeverityName(event.code)} ${code} [${event.line}]: ${event.message}`);
@@ -41,7 +83,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     console.debug(msg);
   }
 
-  loadSchema(schema: CompilerSchema) {
+  loadSchema(schema: CompilerSchema): Uint8Array {
     let schemaPath = new URL('../util/' + schema + '.schema.json', import.meta.url);
     return fs.readFileSync(schemaPath);
   }
@@ -51,7 +93,10 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   }
 
   resolveFilename(baseFilename: string, filename: string) {
-    const basePath = path.dirname(baseFilename);
+    const basePath =
+      baseFilename.endsWith('/') || baseFilename.endsWith('\\') ?
+      baseFilename :
+      path.dirname(baseFilename);
     // Transform separators to platform separators -- we are agnostic
     // in our use here but path prefers files may use
     // either / or \, although older kps files were always \.

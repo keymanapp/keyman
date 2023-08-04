@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import getpass
 import logging
 import os
 import re
@@ -39,7 +40,7 @@ def get_ibus_bus():
     except Exception as e:
         logging.warning("Failed get bus")
         logging.warning(e)
-    logging.warning("could not find connected IBus.Bus")
+    logging.info("could not find connected IBus.Bus")
     return None
 
 
@@ -82,12 +83,7 @@ def restart_ibus_subp():
 
 def verify_ibus_daemon(start):
     realuser = os.environ.get('SUDO_USER')
-    user = os.environ.get('USER')
-    if realuser:
-        user = realuser
-    elif not user:
-        user = os.environ.get('LOGNAME')
-
+    user = realuser or getpass.getuser()
     try:
         ps = subprocess.run(('ps', '--user', user, '-o', 's=', '-o', 'cmd'), stdout=subprocess.PIPE).stdout
         ibus_daemons = re.findall('^[^ZT] ibus-daemon .*--xim.*', ps.decode('utf-8'), re.MULTILINE)
@@ -126,8 +122,7 @@ def _start_ibus_daemon(realuser):
 
 def restart_ibus(bus=None):
     verify_ibus_daemon(False)
-    realuser = os.environ.get('SUDO_USER')
-    if realuser:
+    if realuser := os.environ.get('SUDO_USER'):
         # we have been called with `sudo`. Restart ibus for the real user.
         logging.info('restarting IBus by subprocess for user %s', realuser)
         subprocess.run(['sudo', '-u', realuser, 'ibus', 'restart'])
@@ -159,9 +154,8 @@ def bus_has_engine(bus, name):
 def get_current_engine(bus):
     try:
         contextname = bus.current_input_context()
-        ic = IBus.InputContext.get_input_context(contextname, bus.get_connection())
-        engine = ic.get_engine()
-        if engine:
+        inputContext = IBus.InputContext.get_input_context(contextname, bus.get_connection())
+        if engine := inputContext.get_engine():
             return engine.get_name()
     except Exception as e:
         logging.warning("Failed to get current engine")
@@ -171,11 +165,11 @@ def get_current_engine(bus):
 def change_to_keyboard(bus, keyboard_id):
     try:
         contextname = bus.current_input_context()
-        ic = IBus.InputContext.get_input_context(contextname, bus.get_connection())
+        inputContext = IBus.InputContext.get_input_context(contextname, bus.get_connection())
         if bus_has_engine(bus, keyboard_id) <= 0:
-            logging.warning("Could not find engine %s" % keyboard_id)
+            logging.warning(f"Could not find engine {keyboard_id}")
         else:
-            ic.set_engine(keyboard_id)
+            inputContext.set_engine(keyboard_id)
     except Exception as e:
         logging.warning("Failed to change keyboard")
         logging.warning(e)

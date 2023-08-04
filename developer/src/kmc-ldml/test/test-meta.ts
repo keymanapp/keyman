@@ -11,8 +11,8 @@ import Meta = KMXPlus.Meta;
 describe('meta', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
-  it('should compile minimal metadata', function() {
-    let meta = loadSectionFixture(MetaCompiler, 'sections/meta/minimal.xml', compilerTestCallbacks) as Meta;
+  it('should compile minimal metadata', async function() {
+    let meta = await loadSectionFixture(MetaCompiler, 'sections/meta/minimal.xml', compilerTestCallbacks) as Meta;
     assert.equal(compilerTestCallbacks.messages.length, 0);
 
     assert.isEmpty(meta.author.value);        // TODO-LDML: default author string "unknown"?
@@ -23,8 +23,8 @@ describe('meta', function () {
     assert.equal(meta.settings, KeyboardSettings.none);
   });
 
-  it('should compile maximal metadata', function() {
-    let meta = loadSectionFixture(MetaCompiler, 'sections/meta/maximal.xml', compilerTestCallbacks) as Meta;
+  it('should compile maximal metadata', async function() {
+    let meta = await loadSectionFixture(MetaCompiler, 'sections/meta/maximal.xml', compilerTestCallbacks) as Meta;
     assert.equal(compilerTestCallbacks.messages.length, 0);
 
     assert.equal(meta.author.value, 'The Keyman Team');
@@ -36,20 +36,20 @@ describe('meta', function () {
     assert.equal(meta.settings, KeyboardSettings.fallback);
   });
 
-  it('should reject invalid normalization', function() {
-    let meta = loadSectionFixture(MetaCompiler, 'sections/meta/invalid-normalization.xml', compilerTestCallbacks) as Meta;
+  it('should reject invalid normalization', async function() {
+    let meta = await loadSectionFixture(MetaCompiler, 'sections/meta/invalid-normalization.xml', compilerTestCallbacks) as Meta;
     assert.isNull(meta);
     assert.equal(compilerTestCallbacks.messages.length, 1);
     assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_InvalidNormalization({form:'NFQ'}));
   });
 
-  it('should reject invalid version', function() {
-    let meta = loadSectionFixture(MetaCompiler, 'sections/meta/invalid-version-1.0.xml', compilerTestCallbacks) as Meta;
+  it('should reject invalid version', async function() {
+    let meta = await loadSectionFixture(MetaCompiler, 'sections/meta/invalid-version-1.0.xml', compilerTestCallbacks) as Meta;
     assert.isNull(meta);
     assert.equal(compilerTestCallbacks.messages.length, 1);
     assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_InvalidVersion({version:'1.0'}));
 
-    meta = loadSectionFixture(MetaCompiler, 'sections/meta/invalid-version-v1.0.3.xml', compilerTestCallbacks) as Meta;
+    meta = await loadSectionFixture(MetaCompiler, 'sections/meta/invalid-version-v1.0.3.xml', compilerTestCallbacks) as Meta;
     assert.isNull(meta);
     assert.equal(compilerTestCallbacks.messages.length, 1);
     assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_InvalidVersion({version:'v1.0.3'}));

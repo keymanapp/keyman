@@ -1,0 +1,12 @@
+c Description: Verifies that kmcmplib can load a bitmap without file extension
+
+store(&NAME) 'k005_bitmap'
+store(&VERSION) '9.0'
+store(&BITMAP) 'k005_bitmap'
+
+begin unicode > use(main)
+
+group(main) using keys
+
++ [K_A] > 'a'
+'a' + [K_B] > 'ខ្មែរ'

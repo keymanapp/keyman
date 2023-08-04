@@ -21,8 +21,8 @@ describe('layr', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
   // reuse the keys minimal file
-  it('should compile minimal keys data', function () {
-    let layr = loadSectionFixture(LayrCompiler, 'sections/keys/minimal.xml', compilerTestCallbacks) as Layr;
+  it('should compile minimal keys data', async function () {
+    let layr = await loadSectionFixture(LayrCompiler, 'sections/keys/minimal.xml', compilerTestCallbacks) as Layr;
     assert.ok(layr);
     assert.equal(compilerTestCallbacks.messages.length, 0);
 
@@ -36,7 +36,7 @@ describe('layr', function () {
     assert.equal(layer0.rows.length, 1);
     const row0 = layer0.rows[0];
     assert.ok(row0);
-    assert.equal(row0.keys.length, 1);
+    assert.equal(row0.keys.length, 2);
 
     assert.equal(layer0.id.value, 'base');
     assert.equal(layer0.mod, constants.keys_mod_none);
@@ -90,6 +90,15 @@ describe('layr', function () {
     {
       subpath: 'sections/layr/invalid-missing-hardware.xml',
       errors: [],
+    },
+    {
+      subpath: 'sections/keys/invalid-bad-modifier.xml',
+      errors: [
+        CompilerMessages.Error_InvalidModifier({
+          layer: 'base',
+          modifier: 'altR-shift'
+        }),
+      ],
     },
     {
       subpath: 'sections/layr/invalid-multi-hardware.xml',

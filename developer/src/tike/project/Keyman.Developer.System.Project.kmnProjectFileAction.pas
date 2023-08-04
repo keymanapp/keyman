@@ -115,7 +115,7 @@ begin
   TProject.CompilerMessageFile := Self;
   options.dwSize := sizeof(COMPILER_OPTIONS);
   options.ShouldAddCompilerVersion := addVersion;
-  options.UseKmcmpLib := not useLegacyCompiler;
+  // TODO: useLegacyCompiler means we switch to kmcmpdll vs kmc
   if not SetCompilerOptions(@options, ProjectCompilerMessage) then
   begin
     Log(plsFatal, 'Unable to set compiler options', CERR_FATAL, 0);

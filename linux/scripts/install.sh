@@ -15,7 +15,7 @@ INSTALLDIR=${INSTALLDIR:-"/usr/local"}
 if [[ "${SUDOINSTALL}" != "no" ]]; then
 	if [ "$EUID" -ne 0 ]
 	then
-		echo "Please run 'make un/install' with sudo"
+		echo "Please run 'build.sh un/install' with sudo"
 	exit
 	fi
 fi
@@ -24,7 +24,7 @@ if [ -f "/usr/share/ibus/component/keyman.xml" ] && [ "${SUDOINSTALL}" == "yes" 
 	if grep -Fq "/usr/lib/ibus" /usr/share/ibus/component/keyman.xml
 	then
 		echo "component file is in ibus-keyman package version so move it"
-		echo "run 'sudo make uninstall' to put it back"
+		echo "run 'sudo build.sh uninstall' to put it back"
 		mv /usr/share/ibus/component/keyman.xml /usr/share/doc/ibus-keyman/
 	else
 		echo "component file is local one so overwrite it"
@@ -37,10 +37,10 @@ cd "$BASEDIR"
 
 cd ibus-keyman
 if [[ "${SUDOINSTALL}" == "uninstall" ]]; then
-    echo "doing make uninstall of ibus-keyman"
+    echo "doing build.sh uninstall of ibus-keyman"
     ./build.sh uninstall
 else
-    echo "doing make install of ibus-keyman"
+    echo "doing build.sh install of ibus-keyman"
     ./build.sh install
 fi
 cd "$BASEDIR"
@@ -49,20 +49,20 @@ cd keyman-config
 echo "SUDOINSTALL: ${SUDOINSTALL}"
 if [[ "${SUDOINSTALL}" == "yes" ]]; then
 	if [ ! -d build ]; then
-		echo "keyman-config must be built before it is installed. Run 'make configure' if needed then 'make'"
+		echo "keyman-config must be built before it is installed. Run 'build.sh configure build'."
 		exit 1
 	fi
 	echo "doing sudo glib-compile-schemas for keyman-config"
-	cp com.keyman.gschema.xml /usr/share/glib-2.0/schemas/
+	cp resources/com.keyman.gschema.xml /usr/share/glib-2.0/schemas/
 	glib-compile-schemas /usr/share/glib-2.0/schemas/
 	echo "doing sudo install of keyman-config"
-	make install
+	./build.sh install
 elif [[ "${SUDOINSTALL}" == "uninstall" ]]; then
 	echo "doing sudo uninstall of keyman-config"
-	make uninstall
+	./build.sh uninstall
 else
 	echo "doing /tmp install of keyman-config"
-	make install-temp
+	./build.sh install
 fi
 cd "$BASEDIR"
 

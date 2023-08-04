@@ -10,7 +10,8 @@ project('kmcmplib', 'cpp', 'c',
         default_options : ['buildtype=release',
                            'cpp_std=c++14',
                            'b_vscrt=static_from_buildtype',
-                           'default_library=static'])
+                           'default_library=static',
+                           'debug=true'])
 
 # Import our standard compiler defines; this is copied from
 # /resources/build/standard.meson.build by build.sh, because

@@ -18,10 +18,16 @@ describe('keys', function () {
         const keys = <Keys> sect;
         assert.ok(keys);
         assert.equal(compilerTestCallbacks.messages.length, 0);
-        assert.equal(keys.keys.length, 1);
+        assert.equal(keys.keys.length, 2);
         assert.equal(keys.flicks.length, 1); // there's always a 'null' flick
-        assert.equal(keys.keys[0].to.value, String.fromCodePoint(0x1FAA6));
-        assert.equal(keys.keys[0].id.value, 'grave');
+        assert.equal(keys.keys[0].to.value, 'oops');
+        assert.isFalse(keys.keys[0].to.isOneChar);
+        assert.equal(keys.keys[0].flags, constants.keys_key_flags_extend);
+        assert.equal(keys.keys[0].id.value, 'mistake');
+        assert.isTrue(keys.keys[1].to.isOneChar);
+        assert.equal(keys.keys[1].to.value, String.fromCodePoint(0x1FAA6));
+        assert.equal(keys.keys[1].flags, 0);
+        assert.equal(keys.keys[1].id.value, 'grave');
       },
     },
     {
@@ -116,11 +122,11 @@ describe('keys', function () {
 describe('keys.kmap', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
-  it('should compile minimal kmap data', function() {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/minimal.xml', compilerTestCallbacks) as Keys;
+  it('should compile minimal kmap data', async function() {
+    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/minimal.xml', compilerTestCallbacks) as Keys;
     assert.isNotNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 0);
-    assert.equal(keys.kmap.length, 1);
+    assert.equal(keys.kmap.length, 2);
   });
 
   testCompilationCases(KeysCompiler, [
@@ -217,37 +223,37 @@ describe('keys.kmap', function () {
     },
   ]);
 
-  it('should reject layouts with too many hardware rows', function() {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/invalid-hardware-too-many-rows.xml', compilerTestCallbacks) as Keys;
+  it('should reject layouts with too many hardware rows', async function() {
+    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-hardware-too-many-rows.xml', compilerTestCallbacks) as Keys;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
     assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_HardwareLayerHasTooManyRows());
   });
 
-  it('should reject layouts with too many hardware keys', function() {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/invalid-hardware-too-many-keys.xml', compilerTestCallbacks) as Keys;
+  it('should reject layouts with too many hardware keys', async function() {
+    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-hardware-too-many-keys.xml', compilerTestCallbacks) as Keys;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
     assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({row: 1, hardware: 'us', modifier: 'none'}));
   });
 
-  it('should reject layouts with undefined keys', function() {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/invalid-undefined-key.xml', compilerTestCallbacks) as Keys;
+  it('should reject layouts with undefined keys', async function() {
+    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-undefined-key.xml', compilerTestCallbacks) as Keys;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
     assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_KeyNotFoundInKeyBag({col: 1, form: 'hardware', keyId: 'foo', layer: 'base', row: 1}));
   });
-  it('should reject layouts with invalid keys', function() {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/invalid-key-missing-attrs.xml', compilerTestCallbacks) as Keys;
+  it('should reject layouts with invalid keys', async function() {
+    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-key-missing-attrs.xml', compilerTestCallbacks) as Keys;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
     assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_KeyMissingToGapOrSwitch({keyId: 'Q'}));
   });
-  it('should accept layouts with gap/switch keys', function() {
-    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/gap-switch.xml', compilerTestCallbacks) as Keys;
+  it('should accept layouts with gap/switch keys', async function() {
+    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/gap-switch.xml', compilerTestCallbacks) as Keys;
     assert.isNotNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 0);
     assert.equal(keys.keys.length, 4);

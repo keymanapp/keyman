@@ -9,8 +9,8 @@ function locate_keyboards_repo() {
     builder_die "keyboards_commit_ref.txt does not exist, run prep.sh"
   fi
 
-  if [[ ! -d "$THIS_SCRIPT_PATH/tests/fixtures" ]]; then
-    builder_die "fixtures folder does not exist, run prep.sh"
+  if [[ ! -d "$THIS_SCRIPT_PATH/tests/fixtures/keyboards-repo" ]]; then
+    builder_die "fixtures/keyboards-repo folder does not exist, run prep.sh"
   fi
 
   if [[ -z "${KEYBOARDS_ROOT+x}" ]]; then

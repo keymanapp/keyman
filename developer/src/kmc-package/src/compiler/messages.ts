@@ -110,5 +110,9 @@ export class CompilerMessages {
   static Error_PackageMustContainAModelOrAKeyboard = () => m(this.ERROR_PackageMustContainAModelOrAKeyboard,
     `Package must contain a lexical model or a keyboard.`);
   static ERROR_PackageMustContainAModelOrAKeyboard = SevError | 0x0019;
+
+  static Warn_JsKeyboardFileIsMissing = (o:{id: string}) => m(this.WARN_JsKeyboardFileIsMissing,
+    `Keyboard ${o.id} targets touch devices but corresponding ${o.id}.js file is not in the package.`);
+  static WARN_JsKeyboardFileIsMissing = SevWarn | 0x001A;
 }
 

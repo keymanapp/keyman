@@ -25,6 +25,11 @@ describe('Compiler UnicodeSet function', function() {
     assert(set.length === 1);
     assert(set.ranges[0][0] === 'a'.charCodeAt(0));
     assert(set.ranges[0][1] === 'c'.charCodeAt(0));
+    assert.deepEqual(callbacks.messages, []);
+    callbacks.clear();
+    const len2 = compiler.sizeUnicodeSet(pat);
+    assert.deepEqual(callbacks.messages, []);
+    assert.equal(len2, set.length);
   });
   it('should compile a more complex uset', async function() {
     const compiler = new KmnCompiler();
@@ -40,6 +45,11 @@ describe('Compiler UnicodeSet function', function() {
     assert.equal(set.ranges[0][1], 'A'.charCodeAt(0));
     assert.equal(set.ranges[1][0], 0x1F640);
     assert.equal(set.ranges[1][1], 0x1F640);
+    assert.deepEqual(callbacks.messages, []);
+    callbacks.clear();
+    const len2 = compiler.sizeUnicodeSet(pat);
+    assert.deepEqual(callbacks.messages, []);
+    assert.equal(len2, set.length);
   });
   it('should fail in various ways', async function() {
     const compiler = new KmnCompiler();
@@ -55,12 +65,25 @@ describe('Compiler UnicodeSet function', function() {
       '[[]': CompilerMessages.ERROR_UnicodeSetSyntaxError,
     };
     for(const [pat, expected] of Object.entries(failures)) {
-      callbacks.clear();
-      assert.notOk(compiler.parseUnicodeSet(pat, 1));
-      assert.equal(callbacks.messages.length, 1);
-      const firstMessage = callbacks.messages[0];
-      const code = firstMessage.code;
-      assert.equal(code, expected, `${compilerErrorFormatCode(code)}≠${compilerErrorFormatCode(expected)} got ${firstMessage.message} for ${pat}`);
+      {
+        // verify fails parse
+        callbacks.clear();
+        assert.notOk(compiler.parseUnicodeSet(pat, 1));
+        assert.equal(callbacks.messages.length, 1);
+        const firstMessage = callbacks.messages[0];
+        const code = firstMessage.code;
+        assert.equal(code, expected, `${compilerErrorFormatCode(code)}≠${compilerErrorFormatCode(expected)} got ${firstMessage.message} for parsing ${pat}`);
+      }
+      // skip 'out of range' because that one won't fail during sizing.
+      if (expected !== CompilerMessages.FATAL_UnicodeSetOutOfRange) {
+        // verify fails size
+        callbacks.clear();
+        assert.equal(compiler.sizeUnicodeSet(pat), -1, `sizing ${pat}`);
+        assert.equal(callbacks.messages.length, 1);
+        const firstMessage = callbacks.messages[0];
+        const code = firstMessage.code;
+        assert.equal(code, expected, `${compilerErrorFormatCode(code)}≠${compilerErrorFormatCode(expected)} got ${firstMessage.message} for sizing ${pat}`);
+      }
     }
   });
 });

@@ -39,30 +39,30 @@ if [[ ! -d "$KEYBOARDS_ROOT/.git" ]] || [[ ! -f "$KEYBOARDS_ROOT/tools/regressio
 fi
 
 if builder_start_action clean; then
-  rm -rf "$THIS_SCRIPT_PATH/fixtures"
+  rm -rf "$THIS_SCRIPT_PATH/fixtures/keyboards-repo"
   rm -f "$THIS_SCRIPT_PATH/keyboards_commit_ref.txt"
   builder_finish_action success clean
 fi
 
 if builder_start_action build; then
   # yes, remove existing fixtures before build so we don't end up with stale fixtures
-  rm -rf "$THIS_SCRIPT_PATH/fixtures"
+  rm -rf "$THIS_SCRIPT_PATH/fixtures/keyboards-repo"
 
   # record the revision of the keyboards repo
   pushd "$KEYBOARDS_ROOT" > /dev/null
   git rev-parse head > "$THIS_SCRIPT_PATH/keyboards_commit_ref.txt"
   popd > /dev/null
 
-  "$KEYBOARDS_ROOT/tools/regression.sh" --use-legacy-compiler --local "$KEYMAN_ROOT/developer/bin/" --output "$THIS_SCRIPT_PATH/fixtures/"
+  "$KEYBOARDS_ROOT/tools/regression.sh" --use-legacy-compiler --local "$KEYMAN_ROOT/developer/bin/" --output "$THIS_SCRIPT_PATH/fixtures/keyboards-repo/"
 
   cd "$THIS_SCRIPT_PATH"
 
   # We don't need visual keyboards
-  rm ./fixtures/*.kvk
+  rm ./fixtures/keyboards-repo/*.kvk
   # Nor do we need kmw outputs
-  rm ./fixtures/*.js
+  rm ./fixtures/keyboards-repo/*.js
   # Finally, we remove any keyboards over 500kb, as we won't automatically test them for now
   # TODO: consider if we want to keep those large keyboards in the future
-  find ./fixtures/ -size +500k -exec rm {} \+
+  find ./fixtures/keyboards-repo/ -size +500k -exec rm {} \+
   builder_finish_action success build
 fi

@@ -19,6 +19,7 @@ cd "$THIS_SCRIPT_PATH"
 builder_describe "Build Keyman kmc Keyboard Compiler module" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
+  "@/developer/src/kmc-kmn" \
   "@/developer/src/common/web/test-helpers" \
   "configure" \
   "build" \

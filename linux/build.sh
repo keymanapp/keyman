@@ -14,14 +14,16 @@ cd "$THIS_SCRIPT_PATH"
 
 builder_describe \
   "Build Keyman for Linux." \
-  ":engine=ibus-keyman       ibus-keyman" \
-  ":config=keyman-config     keyman-config" \
+  ":config=keyman-config             keyman-config" \
+  ":engine=ibus-keyman               ibus-keyman" \
+  ":service=keyman-system-service    keyman-system-service" \
   "clean" \
   "configure" \
   "build" \
   "test" \
   "install                   install artifacts" \
-  "uninstall                 uninstall artifacts"
+  "uninstall                 uninstall artifacts" \
+  "--no-integration+         don't run integration tests"
 
 builder_parse "$@"
 

@@ -11,8 +11,8 @@ import USVirtualKeyCodes = Constants.USVirtualKeyCodes;
 describe('vkey compiler', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
-  it('should compile minimal vkey data', function() {
-    let vkey = loadSectionFixture(VkeyCompiler, 'sections/vkey/minimal.xml', compilerTestCallbacks) as Vkey;
+  it('should compile minimal vkey data', async function() {
+    let vkey = await loadSectionFixture(VkeyCompiler, 'sections/vkey/minimal.xml', compilerTestCallbacks) as Vkey;
     assert.equal(compilerTestCallbacks.messages.length, 0);
 
     assert.equal(vkey.vkeys.length, 4);
@@ -23,37 +23,37 @@ describe('vkey compiler', function () {
     assert.deepEqual(vkey.vkeys[3], {vkey: USVirtualKeyCodes.K_Z, target: USVirtualKeyCodes.K_W});
   });
 
-  it('should hint on redundant data', function() {
-    let vkey = loadSectionFixture(VkeyCompiler, 'sections/vkey/redundant.xml', compilerTestCallbacks) as Vkey;
+  it('should hint on redundant data', async function() {
+    let vkey = await loadSectionFixture(VkeyCompiler, 'sections/vkey/redundant.xml', compilerTestCallbacks) as Vkey;
     assert.isNotNull(vkey);
     assert.equal(compilerTestCallbacks.messages.length, 1);
     assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Hint_VkeyIsRedundant({vkey: 'A'}));
   });
 
-  it('should report an info message if same target found', function() {
-    let vkey = loadSectionFixture(VkeyCompiler, 'sections/vkey/same-target.xml', compilerTestCallbacks) as Vkey;
+  it('should report an info message if same target found', async function() {
+    let vkey = await loadSectionFixture(VkeyCompiler, 'sections/vkey/same-target.xml', compilerTestCallbacks) as Vkey;
     assert.isNotNull(vkey);
     assert.equal(compilerTestCallbacks.messages.length, 1);
     assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Info_MultipleVkeysHaveSameTarget({vkey: 'Q'}));
   });
 
-  it('should error on invalid "from" vkey', function() {
-    let vkey = loadSectionFixture(VkeyCompiler, 'sections/vkey/invalid-from-vkey.xml', compilerTestCallbacks) as Vkey;
-    assert.isNull(vkey);
+  it('should hint on invalid "from" vkey', async function() {
+    let vkey = await loadSectionFixture(VkeyCompiler, 'sections/vkey/invalid-from-vkey.xml', compilerTestCallbacks) as Vkey;
+    assert.isNotNull(vkey);
     assert.equal(compilerTestCallbacks.messages.length, 2);
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_VkeyIsNotValid({vkey: 'q'}));
-    assert.deepEqual(compilerTestCallbacks.messages[1], CompilerMessages.Error_VkeyIsNotValid({vkey: 'HYFEN'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Hint_VkeyIsNotValid({vkey: 'q'}));
+    assert.deepEqual(compilerTestCallbacks.messages[1], CompilerMessages.Hint_VkeyIsNotValid({vkey: 'HYFEN'}));
   });
 
-  it('should error on invalid "to" vkey', function() {
-    let vkey = loadSectionFixture(VkeyCompiler, 'sections/vkey/invalid-to-vkey.xml', compilerTestCallbacks) as Vkey;
-    assert.isNull(vkey);
+  it('should hint on invalid "to" vkey', async function() {
+    let vkey = await loadSectionFixture(VkeyCompiler, 'sections/vkey/invalid-to-vkey.xml', compilerTestCallbacks) as Vkey;
+    assert.isNotNull(vkey);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_VkeyIsNotValid({vkey: 'A-ACUTE'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Hint_VkeyIsNotValid({vkey: 'A-ACUTE'}));
   });
 
-  it('should error on repeated vkeys', function() {
-    let vkey = loadSectionFixture(VkeyCompiler, 'sections/vkey/invalid-repeated-vkey.xml', compilerTestCallbacks) as Vkey;
+  it('should error on repeated vkeys', async function() {
+    let vkey = await loadSectionFixture(VkeyCompiler, 'sections/vkey/invalid-repeated-vkey.xml', compilerTestCallbacks) as Vkey;
     assert.isNull(vkey);
     assert.equal(compilerTestCallbacks.messages.length, 1);
     assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_VkeyIsRepeated({vkey: 'A'}));

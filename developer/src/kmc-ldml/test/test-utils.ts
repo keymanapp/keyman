@@ -1,6 +1,6 @@
 import 'mocha';
 import {assert} from 'chai';
-import { isValidEnumValue, calculateUniqueKeys, allUsedKeyIdsInLayers, translateLayerAttrToModifier, validModifier } from '../src/util/util.js';
+import { isValidEnumValue, calculateUniqueKeys, allUsedKeyIdsInLayers, translateLayerAttrToModifier, validModifier, verifyValidAndUnique } from '../src/util/util.js';
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { LDMLKeyboard } from '@keymanapp/common-types';
 
@@ -159,6 +159,68 @@ describe('test of util/util.ts', () => {
       ]) {
         assert.notOk(validModifier(str), `validModifier(${JSON.stringify(str)})`);
       }
+    });
+  });
+  describe('verifyValidAndUnique()', () => {
+    it('should pass a valid set', () => {
+      assert.ok(verifyValidAndUnique(
+        ['a', 'b', 'c'],
+        dups => assert.fail(`Dups: ${dups.join(',')}`)));
+      assert.ok(verifyValidAndUnique(
+        [],
+        dups => assert.fail(`Dups: ${dups.join(',')}`)));
+      assert.ok(verifyValidAndUnique(
+        ['a', 'b', 'c'],
+        dups => assert.fail(`Dups: ${dups.join(',')}`),
+        new Set(['a', 'b', 'c', 'd']),
+        invalids => assert.fail(`Invalid: ${invalids.join(',')}`)));
+    });
+    describe('should fail invalid valid sets', () => {
+      it('should fail a dup set', () => {
+        let dups = null;
+        assert.notOk(verifyValidAndUnique(
+          ['a', 'b', 'c', 'b'], d => (dups = d)));
+        assert.deepEqual(dups, ['b']);
+      });
+      it('should fail a highly duplicated set', () => {
+        let dups = null;
+        assert.notOk(verifyValidAndUnique(
+          ['a', 'b', 'c', 'b', 'c', 'c', 'b'], d => (dups = d)));
+        assert.deepEqual(dups, ['b', 'c']);
+      });
+      it('should fail another dup set', () => {
+        let dups = null;
+        assert.notOk(verifyValidAndUnique(
+          ['a', 'b', 'c', 'b'], d => (dups = d),
+          new Set(['a', 'b', 'c', 'd']),
+          invalids => assert.fail(`Invalid: ${invalids.join(',')}`)));
+        assert.deepEqual(dups, ['b']);
+      });
+      it('should fail a highly duplicated and invalid set', () => {
+        let dups = null;
+        let invalids = null;
+        assert.notOk(verifyValidAndUnique(
+          ['a', 'b', 'c', 'b', 'c', 'c', 'b', 'q'], d => (dups = d),
+          new Set(['a', 'b', 'c', 'd']), i => (invalids = i)));
+        assert.deepEqual(dups, ['b', 'c']);
+        assert.deepEqual(invalids, ['q']);
+      });
+      it('should fail a highly duplicated and highly invalid set', () => {
+        let dups = null;
+        let invalids = null;
+        assert.notOk(verifyValidAndUnique(
+          ['a', 'b', 'c', 'q', 'b', 'c', 'c', 'b', 'q', 'z'], d => (dups = d),
+          new Set(['a', 'b', 'c', 'd']), i => (invalids = i)));
+        assert.deepEqual(dups, ['b', 'c', 'q']);
+        assert.deepEqual(invalids, ['q', 'z']);
+      });
+      it('should fail an invalid set', () => {
+        let invalids = null;
+        assert.notOk(verifyValidAndUnique(
+          ['a', 'b', 'c', 'q', 'z'], dups => assert.fail(`Dups: ${dups.join(',')}`),
+          new Set(['a', 'b', 'c', 'd']), i => (invalids = i)));
+        assert.deepEqual(invalids, ['q', 'z']);
+      });
     });
   });
 });

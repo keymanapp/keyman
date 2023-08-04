@@ -1,46 +1,79 @@
-import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus, CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
+import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus, CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile, UnicodeSetParser } from '@keymanapp/common-types';
 import { CompilerOptions } from './compiler-options.js';
 import { CompilerMessages } from './messages.js';
-import { BkspCompiler, FinlCompiler, TranCompiler } from './tran.js';
+import { BkspCompiler, TranCompiler } from './tran.js';
 import { DispCompiler } from './disp.js';
 import { KeysCompiler } from './keys.js';
 import { LayrCompiler } from './layr.js';
 import { LocaCompiler } from './loca.js';
 import { MetaCompiler } from './meta.js';
 import { NameCompiler } from './name.js';
-import { OrdrCompiler } from './ordr.js';
 import { VkeyCompiler } from './vkey.js';
+import { VarsCompiler } from './vars.js';
+import { StrsCompiler, ElemCompiler, ListCompiler, UsetCompiler } from './empty-compiler.js';
+
 
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 import KMXPlusFile = KMXPlus.KMXPlusFile;
+import DependencySections = KMXPlus.DependencySections;
+import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
+import { KmnCompiler } from '@keymanapp/kmc-kmn';
 
-const SECTION_COMPILERS = [
+export const SECTION_COMPILERS = [
+  // These are in dependency order.
+
+  // First the former 'global' sections
+  StrsCompiler,
+  ListCompiler,
+  ElemCompiler,
+  UsetCompiler,
+  // Next, Vars, which depends on others
+  VarsCompiler,
+  // Now all others:
   BkspCompiler,
   DispCompiler,
-  FinlCompiler,
   KeysCompiler,
   LayrCompiler,
   LocaCompiler,
   MetaCompiler,
   NameCompiler,
-  OrdrCompiler,
   TranCompiler,
   VkeyCompiler,
 ];
 
 export class LdmlKeyboardCompiler {
   private readonly callbacks: CompilerCallbacks;
-  // private readonly options: CompilerOptions; // not currently used
+  private readonly options: CompilerOptions;
 
-  constructor (callbacks: CompilerCallbacks, _options?: CompilerOptions) {
-    /*
+  // uset parser
+  private usetparser?: UnicodeSetParser = undefined;
+
+  constructor (callbacks: CompilerCallbacks, options: CompilerOptions) {
     this.options = {
       debug: false,
       addCompilerVersion: true,
       ...options
     };
-    */
     this.callbacks = callbacks;
+  }
+
+  /**
+   * Construct or return a UnicodeSetParser, aka KmnCompiler
+   * @returns the held UnicodeSetParser
+   */
+  async getUsetParser() : Promise<UnicodeSetParser> {
+    if (this.usetparser === undefined) {
+      // initialize
+      const compiler = new KmnCompiler();
+      const ok = await compiler.init(this.callbacks);
+      if (ok) {
+        this.usetparser = compiler;
+      } else {
+        /* c8 ignore next 2 */
+        this.usetparser = null; // Store null on failure
+      }
+    }
+    return this.usetparser;
   }
 
   private buildSections(source: LDMLKeyboardXMLSourceFile) {
@@ -54,18 +87,21 @@ export class LdmlKeyboardCompiler {
    * @returns the source file, or null if invalid
    */
   public load(filename: string): LDMLKeyboardXMLSourceFile | null {
-    const reader = new LDMLKeyboardXMLSourceFileReader(this.callbacks);
+    const reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, this.callbacks);
+    // load the file from disk into a string
     const data = this.callbacks.loadFile(filename);
     if(!data) {
       this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to read XML file'}));
       return null;
     }
+    // parse (load) the string into an object tree
     const source = reader.load(data);
     if(!source) {
       this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to load XML file'}));
       return null;
     }
     try {
+      // validate the object tree against the .xsd schema
       if (!reader.validate(source, this.callbacks.loadSchema('ldml-keyboard'))) {
         return null;
       }
@@ -84,13 +120,14 @@ export class LdmlKeyboardCompiler {
    * @returns the source file, or null if invalid
    */
     public loadTestData(filename: string): LDMLKeyboardTestDataXMLSourceFile | null {
-      const reader = new LDMLKeyboardXMLSourceFileReader(this.callbacks);
+      const reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, this.callbacks);
       const data = this.callbacks.loadFile(filename);
       if(!data) {
         this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to read XML file'}));
         return null;
       }
       const source = reader.loadTestData(data);
+      /* c8 ignore next 4 */
       if(!source) {
         this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to load XML file'}));
         return null;
@@ -126,33 +163,52 @@ export class LdmlKeyboardCompiler {
    * @param   source  in-memory representation of LDML keyboard xml file
    * @returns         KMXPlusFile intermediate file
    */
-  public compile(source: LDMLKeyboardXMLSourceFile): KMXPlusFile {
+  public async compile(source: LDMLKeyboardXMLSourceFile): Promise<KMXPlus.KMXPlusFile> {
     const sections = this.buildSections(source);
     let passed = true;
 
     const kmx = new KMXPlusFile();
 
-    // These two sections are required by other sections
-    kmx.kmxplus.strs = new KMXPlus.Strs();
-    kmx.kmxplus.elem = new KMXPlus.Elem(kmx.kmxplus.strs);
-    kmx.kmxplus.list = new KMXPlus.List(kmx.kmxplus.strs);
-
     for(let section of sections) {
       if(!section.validate()) {
+        // TODO-LDML: coverage
         passed = false;
         // We'll keep validating other sections anyway, so we get a full set of
         // errors for the keyboard developer.
         continue;
       }
-      const sect = section.compile({strs: kmx.kmxplus.strs, elem: kmx.kmxplus.elem, list: kmx.kmxplus.list});
+      // clone
+      const globalSections : DependencySections = Object.assign({}, kmx.kmxplus);
+      // pre-initialize the usetparser
+      globalSections.usetparser = await this.getUsetParser();
+      const dependencies = section.dependencies;
+      Object.keys(constants.section).forEach((sectstr : string) => {
+        const sectid : SectionIdent = constants.section[<SectionIdent>sectstr];
+        if (dependencies.has(sectid)) {
+          /* c8 ignore next 4 */
+          if (!kmx.kmxplus[sectid]) {
+            // Internal error useful during section bring-up
+            throw new Error(`Internal error: section ${section.id} depends on uninitialized dependency ${sectid}, check ordering`);
+          }
+        } else {
+          // delete dependencies that aren't referenced
+          delete globalSections[sectid];
+        }
+      });
+      const sect = section.compile(globalSections);
 
-      /* istanbul ignore if */
+      /* c8 ignore next 7 */
       if(!sect) {
         // This should not happen -- validate() should have told us
         // if something is going to fail to compile
         this.callbacks.reportMessage(CompilerMessages.Fatal_SectionCompilerFailed({sect:section.id}));
         passed = false;
         continue;
+      }
+      /* c8 ignore next 4 */
+      if(kmx.kmxplus[section.id]) {
+        // Internal error useful during section bring-up
+        throw new Error(`Internal error: section ${section.id} would be assigned twice`);
       }
       kmx.kmxplus[section.id] = sect as any;
     }

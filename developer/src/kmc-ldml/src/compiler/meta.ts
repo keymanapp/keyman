@@ -6,7 +6,7 @@ import { CompilerMessages } from "./messages.js";
 import { SectionCompiler } from "./section-compiler.js";
 import semver from "semver";
 
-import GlobalSections = KMXPlus.GlobalSections;
+import DependencySections = KMXPlus.DependencySections;
 import Meta = KMXPlus.Meta;
 import Meta_NormalizationForm = KMXPlus.Meta_NormalizationForm;
 import KeyboardSettings = KMXPlus.KeyboardSettings;
@@ -51,7 +51,7 @@ export class MetaCompiler extends SectionCompiler {
     return true;
   }
 
-  public compile(sections: GlobalSections): Meta {
+  public compile(sections: DependencySections): Meta {
     let result = new Meta();
     result.author        = sections.strs.allocString(this.keyboard.info?.author);
     result.conform       = sections.strs.allocString(this.keyboard.conformsTo);

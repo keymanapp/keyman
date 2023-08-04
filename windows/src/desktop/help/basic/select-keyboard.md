@@ -120,4 +120,3 @@ reach the desired keyboard, then release <kbd>spacebar</kbd>.
 -   [Keyman Configuration - Keyboard Layouts Tab](config/keyboards)
 -   [How To - Download and Install a Keyman Keyboard](../start/download-and-install-keyboard)
 -   [Keyboard Task - Enable or Disable a Keyboard](enable-or-disable-keyboard)
--   [How To - Fix A Problem with an Active Keyman Keyboard Not Typing](../troubleshooting/hidden)

@@ -1,19 +1,14 @@
 {
-  "extends": "../../../../tsconfig-base.json",
+  "extends": "../../tsconfig.dom.json",
 
   "compilerOptions": {
-    "allowJs": true,
-    "inlineSources": true,
-    "module": "none",
-    "outFile": "../../../build/engine/device-detect/obj/index.js",
-    "sourceMap": true,
-    "target": "es5"
+    "baseUrl": "./",
+    "outDir": "../../../build/engine/device-detect/obj/",
+    "tsBuildInfoFile": "../../../build/engine/device-detect/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
   },
 
-  "files": [
-    "kmwdevice.ts",
-    "utils/styleConstants.ts", // goes with kmwdevice.ts
-  ],
+  "include": [ "**/*.ts" ],
 
   "references": [
     { "path": "../../../../common/web/keyman-version" },

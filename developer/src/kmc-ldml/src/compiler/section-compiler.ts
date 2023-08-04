@@ -1,5 +1,5 @@
 import { LDMLKeyboard, KMXPlus, CompilerCallbacks } from "@keymanapp/common-types";
-import { SectionIdent } from '@keymanapp/ldml-keyboard-constants';
+import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 
 /* istanbul ignore next */
 export class SectionCompiler {
@@ -11,19 +11,30 @@ export class SectionCompiler {
     this.callbacks = callbacks;
   }
 
+  /* c8 ignore next 11 */
   public get id(): SectionIdent {
-    return null;
+    throw Error(`Internal Error: id() not implemented`);
   }
 
-  public get required(): boolean {
-    return true;
-  }
-
-  public compile(sections: KMXPlus.GlobalSections): KMXPlus.Section {
-    return null;
+  public compile(sections: KMXPlus.DependencySections): KMXPlus.Section {
+    throw Error(`Internal Error: compile() not implemented`);
   }
 
   public validate(): boolean {
     return true;
+  }
+
+  /**
+   * Get the dependencies for this compiler.
+   * @returns set of dependent sections
+   */
+  public get dependencies(): Set<SectionIdent> {
+    const defaults = new Set(<SectionIdent[]>[
+      constants.section.strs,
+      constants.section.list,
+      constants.section.elem,
+      constants.section.vars,
+    ]);
+    return defaults;
   }
 }

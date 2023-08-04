@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import 'mocha';
 import { loadSchema, makePathToFixture } from '../helpers/index.js';
-import KvksFileReader, { KVKSParseError } from "../../src/kvk/kvks-file-reader.js";
+import KvksFileReader from "../../src/kvk/kvks-file-reader.js";
 import KvksFileWriter from "../../src/kvk/kvks-file-writer.js";
 import { verify_khmer_angkor } from './test-kvk-utils.js';
 import { assert } from 'chai';
@@ -16,9 +16,9 @@ describe('kvks-file-reader', function() {
     assert.doesNotThrow(() => {
       reader.validate(kvks, loadSchema('kvks'));
     });
-    const errors: KVKSParseError[] = [];
-    const vk = reader.transform(kvks, errors);
-    assert.isEmpty(errors);
+    const invalidVkeys: string[] = [];
+    const vk = reader.transform(kvks, invalidVkeys);
+    assert.isEmpty(invalidVkeys);
     verify_khmer_angkor(vk);
   });
 });
@@ -30,9 +30,9 @@ describe('kvks-file-writer', function() {
 
     const reader = new KvksFileReader();
     const kvksExpected = reader.read(input);
-    const errors: KVKSParseError[] = [];
-    const vk = reader.transform(kvksExpected, errors);
-    assert.isEmpty(errors);
+    const invalidVkeys: string[] = [];
+    const vk = reader.transform(kvksExpected, invalidVkeys);
+    assert.isEmpty(invalidVkeys);
 
     const writer = new KvksFileWriter();
     const output = writer.write(vk);

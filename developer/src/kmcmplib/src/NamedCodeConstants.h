@@ -2,6 +2,8 @@
 #ifndef NAMEDCODECONSTANTS_H
 #define NAMEDCODECONSTANTS_H
 
+#include "compfile.h"
+
 #define MAX_ENAME	128
 #define ALLOC_SIZE	256
 
@@ -23,14 +25,13 @@ namespace kmcmp{
 
 		int GetCode_IncludedCodes(const KMX_WCHAR *codename);
 		void AddCode_IncludedCodes(int n, const KMX_WCHAR *p);
-		KMX_BOOL IntLoadFile(const KMX_CHAR *filename);
 	public:
 		NamedCodeConstants();
 		~NamedCodeConstants();
 
 		void reindex();
 		void AddCode(int n, const KMX_WCHAR *p, KMX_DWORD storeIndex);
-		KMX_BOOL LoadFile(const  KMX_CHAR *filename);
+		KMX_BOOL LoadFile(PFILE_KEYBOARD fk, const KMX_WCHAR *filename);
 		int GetCode(const KMX_WCHAR *codename, KMX_DWORD *storeIndex);
 	};
 }

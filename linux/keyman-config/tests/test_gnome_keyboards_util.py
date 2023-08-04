@@ -9,14 +9,14 @@ class GnomeKeyboardsUtilTests(unittest.TestCase):
     def setUp(self):
         _reset_gnome_shell()
 
-    @patch('keyman_config.os.system')
+    @patch('os.system')
     def test_IsGnomeShell_RunningGnomeShell(self, mockSystem):
         # Setup
         mockSystem.return_value = 0
         # Execute/Verify
         self.assertEqual(is_gnome_shell(), True)
 
-    @patch('keyman_config.os.system')
+    @patch('os.system')
     def test_IsGnomeShell_NotRunningGnomeShell(self, mockSystem):
         # Setup
         mockSystem.return_value = 1

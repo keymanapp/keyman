@@ -1,8 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as kmc from '@keymanapp/kmc-ldml';
-import { CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
+import { CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboardXMLSourceFileReader } from '@keymanapp/common-types';
 import { NodeCompilerCallbacks } from '../../messages/NodeCompilerCallbacks.js';
+import { fileURLToPath } from 'url';
 
 export interface BuildTestDataOptions {
   outFile?: string;
@@ -11,7 +12,10 @@ export interface BuildTestDataOptions {
 export function buildTestData(infile: string, options: BuildTestDataOptions) {
   let compilerOptions: kmc.CompilerOptions = {
     debug: false,
-    addCompilerVersion: false
+    addCompilerVersion: false,
+    readerOptions: {
+      importsPath: fileURLToPath(LDMLKeyboardXMLSourceFileReader.defaultImportsURL)
+    }
   };
 
   let testData = loadTestData(infile, compilerOptions);

@@ -2,7 +2,7 @@ import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m
 
 const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
-// const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.KeyboardCompiler;
+// const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevFatal = CompilerErrorSeverity.Fatal | CompilerErrorNamespace.LdmlKeyboardCompiler;
 
@@ -35,9 +35,9 @@ export class CompilerMessages {
     m(this.HINT_LocaleIsNotMinimalAndClean, `Locale '${o.sourceLocale}' is not minimal or correctly formatted and should be '${o.locale}'`);
   static HINT_LocaleIsNotMinimalAndClean = SevHint | 0x0008;
 
-  static Error_VkeyIsNotValid = (o:{vkey: string}) =>
-    m(this.ERROR_VkeyIsNotValid, `Virtual key '${o.vkey}' is not found in the CLDR VKey Enum table.`);
-  static ERROR_VkeyIsNotValid = SevError | 0x0009;
+  static Hint_VkeyIsNotValid = (o:{vkey: string}) =>
+    m(this.HINT_VkeyIsNotValid, `Virtual key '${o.vkey}' is not found in the CLDR VKey Enum table.`);
+  static HINT_VkeyIsNotValid = SevHint | 0x0009;
 
   static Hint_VkeyIsRedundant = (o:{vkey: string}) =>
     m(this.HINT_VkeyIsRedundant, `Virtual key '${o.vkey}' is mapped to itself, which is redundant.`);
@@ -89,5 +89,50 @@ export class CompilerMessages {
   static Error_MissingFlicks = (o:{flicks: string, id: string}) => m(this.ERROR_MissingFlicks,
     `key id=${o.id} refers to missing flicks=${o.flicks}`);
   static ERROR_MissingFlicks = SevError | 0x0015;
+
+  static Error_DuplicateVariable = (o:{ids: string}) => m(this.ERROR_DuplicateVariable,
+      `duplicate variables: id=${o.ids}`);
+  static ERROR_DuplicateVariable = SevError | 0x0016;
+
+  // Not hit due to XML parsing
+  static Error_InvalidTransformsType = (o:{types: string[]}) =>
+  m(this.ERROR_InvalidTransformsType, `Invalid transforms types: '${o.types?.join(',')}'`);
+  static ERROR_InvalidTransformsType = SevError | 0x0018;
+
+  static Error_DuplicateTransformsType = (o:{types: string[]}) =>
+  m(this.ERROR_DuplicateTransformsType, `Duplicate transforms types: '${o.types?.join(',')}'`);
+  static ERROR_DuplicateTransformsType = SevError | 0x0019;
+
+  static Error_MixedTransformGroup = () =>
+  m(this.ERROR_MixedTransformGroup, `transformGroup cannot contain both reorder and transform elements`);
+  static ERROR_MixedTransformGroup = SevError | 0x001A;
+
+  static Error_EmptyTransformGroup = () =>
+  m(this.ERROR_EmptyTransformGroup, `transformGroup must have either reorder or transform elements`);
+  static ERROR_EmptyTransformGroup = SevError | 0x001B;
+
+  static Error_MissingStringVariable = (o:{id: string}) =>
+  m(this.ERROR_MissingStringVariable, `Reference to undefined string variable: \${${o.id}}`);
+  static ERROR_MissingStringVariable = SevError | 0x001C;
+
+  static Error_MissingSetVariable = (o:{id: string}) =>
+  m(this.ERROR_MissingSetVariable, `Reference to undefined set variable: \$[${o.id}]`);
+  static ERROR_MissingSetVariable = SevError | 0x001D;
+
+  static Error_MissingUnicodeSetVariable = (o:{id: string}) =>
+  m(this.ERROR_MissingUnicodeSetVariable, `Reference to undefined UnicodeSet variable: \$[${o.id}]`);
+  static ERROR_MissingUnicodeSetVariable = SevError | 0x001E;
+
+  static Error_NeedSpacesBetweenSetVariables = (o:{item: string}) =>
+  m(this.ERROR_NeedSpacesBetweenSetVariables, `Need spaces between set variables: ${o.item}`);
+  static ERROR_NeedSpacesBetweenSetVariables = SevError | 0x001F;
+
+  static Error_CantReferenceSetFromUnicodeSet = (o:{id: string}) =>
+  m(this.ERROR_CantReferenceSetFromUnicodeSet, `Illegal use of set variable from within UnicodeSet: \$[${o.id}]`);
+  static ERROR_CantReferenceSetFromUnicodeSet = SevError | 0x0020;
+
+  static Error_MissingMarkers = (o: { ids: string[] }) =>
+  m(this.ERROR_MissingMarkers, `Markers used for matching but not defined: ${o.ids?.join(',')}`);
+  static ERROR_MissingMarkers = SevError | 0x0021;
 }
 

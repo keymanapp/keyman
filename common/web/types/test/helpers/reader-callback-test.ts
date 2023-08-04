@@ -1,11 +1,16 @@
 import 'mocha';
 import {assert} from 'chai';
 import { loadFile, makePathToFixture, loadSchema } from '../helpers/index.js';
-import LDMLKeyboardXMLSourceFileReader from '../../src/ldml-keyboard/ldml-keyboard-xml-reader.js';
+import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions } from '../../src/ldml-keyboard/ldml-keyboard-xml-reader.js';
 import { CompilerEvent } from '../../src/util/compiler-interfaces.js';
 import { LDMLKeyboardXMLSourceFile } from '../../src/ldml-keyboard/ldml-keyboard-xml.js';
 import { LDMLKeyboardTestDataXMLSourceFile } from '../ldml-keyboard/ldml-keyboard-testdata-xml.js';
 import { TestCompilerCallbacks } from './TestCompilerCallbacks.js';
+import { fileURLToPath } from 'url';
+
+const readerOptions: LDMLKeyboardXMLSourceFileReaderOptions = {
+  importsPath: fileURLToPath(LDMLKeyboardXMLSourceFileReader.defaultImportsURL)
+};
 
 export interface CompilationCase {
   /**
@@ -71,7 +76,7 @@ export interface TestDataCase {
 export function testReaderCases(cases : CompilationCase[]) {
   // we need our own callbacks rather than using the global so messages don't get mixed
   const callbacks = new TestCompilerCallbacks();
-  const reader = new LDMLKeyboardXMLSourceFileReader(callbacks);
+  const reader = new LDMLKeyboardXMLSourceFileReader(readerOptions, callbacks);
   for (let testcase of cases) {
     const expectFailure = testcase.throws || !!(testcase.errors); // if true, we expect this to fail
     const testHeading = expectFailure ? `should fail to load: ${testcase.subpath}`:
@@ -122,7 +127,7 @@ export function testReaderCases(cases : CompilationCase[]) {
 export function testTestdataReaderCases(cases : TestDataCase[]) {
   // we need our own callbacks rather than using the global so messages don't get mixed
   const callbacks = new TestCompilerCallbacks();
-  const reader = new LDMLKeyboardXMLSourceFileReader(callbacks);
+  const reader = new LDMLKeyboardXMLSourceFileReader(readerOptions, callbacks);
   for (let testcase of cases) {
     const expectFailure = testcase.throws || !!(testcase.errors); // if true, we expect this to fail
     const testHeading = expectFailure ? `should fail to load: ${testcase.subpath}`:

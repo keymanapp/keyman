@@ -1,0 +1,19 @@
+<schemalist>
+  <schema id="com.keyman.options" path="/desktop/ibus/keyman/options/">
+    <child name="keyboard-options" schema="com.keyman.options.child"/>
+
+    <key name="error-reporting" type="b">
+        <default>true</default>
+        <summary>Automatic error reporting</summary>
+        <description>true to enable automatic reporting of errors to Sentry</description>
+    </key>
+  </schema>
+
+  <schema id="com.keyman.options.child">
+    <key name="options" type="as">
+      <default>[]</default>
+      <summary>keyboard options.htm settings</summary>
+      <description>List of strings</description>
+    </key>
+  </schema>
+</schemalist>

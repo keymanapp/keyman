@@ -21,7 +21,7 @@ cd "$BASEDIR/ibus-keyman"
 ./build.sh clean configure
 
 cd "$BASEDIR/keyman-config"
-make clean
+./build.sh clean
 
 cd keyman_config
 sed \

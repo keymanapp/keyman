@@ -2,7 +2,7 @@ import 'mocha';
 import {assert} from 'chai';
 import x_hextobin from '@keymanapp/hextobin';
 import { KvkFileWriter } from '@keymanapp/common-types';
-import {checkMessages,  compileVisualKeyboard, makePathToFixture} from './helpers/index.js';
+import {checkMessages,  compilerTestOptions,  compileVisualKeyboard, makePathToFixture} from './helpers/index.js';
 
 const hextobin = (x_hextobin as any).default;
 
@@ -17,7 +17,7 @@ describe('visual-keyboard-compiler', function() {
     const binaryFilename = makePathToFixture('basic-kvk.txt');
 
     // Compile the visual keyboard
-    const vk = compileVisualKeyboard(inputFilename, {debug: true, addCompilerVersion: false});
+    const vk = compileVisualKeyboard(inputFilename, {...compilerTestOptions, debug: true, addCompilerVersion: false});
     assert.isNotNull(vk);
 
     // Use the builder to generate the binary output file

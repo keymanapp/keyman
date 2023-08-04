@@ -199,19 +199,22 @@ class InstallKmpTests(unittest.TestCase):
         languages = [
             {'id': 'de'},
             {'id': 'esi-Latn'},
-            {'id': 'dyo'}
+            {'id': 'dyo'},
+            {'id': 'fuh-Arab'}
         ]
 
         for testcase in [
             {'given': 'de', 'expected': 'de'},
-            {'given': 'esi', 'expected': 'esi-Latn'},
-            {'given': 'esi-Latn', 'expected': 'esi-Latn'},
+            {'given': 'esi', 'expected': 'esi'},
+            {'given': 'esi-Latn', 'expected': 'esi'},
             {'given': 'es', 'expected': None},
             {'given': 'en', 'expected': None},
             {'given': None, 'expected': None},
             # #3399
-            {'given': 'dyo-latn', 'expected': 'dyo-Latn'},
-            {'given': 'dyo', 'expected': 'dyo-Latn'},
+            {'given': 'dyo-latn', 'expected': 'dyo'},
+            {'given': 'dyo', 'expected': 'dyo'},
+            {'given': 'fuh-Arab', 'expected': 'fuh-Arab'},
+            {'given': 'fuh', 'expected': None},
         ]:
             with self.subTest(data=testcase):
                 # Execute
@@ -262,13 +265,11 @@ class InstallKmpTests(unittest.TestCase):
 
     def test_InstallKmp_FutureKeymanVersion(self):
         # Setup
-        workdir = tempfile.TemporaryDirectory().name
-        os.makedirs(workdir)
-        packagedir = tempfile.TemporaryDirectory().name
-        os.makedirs(packagedir)
-        self.mockGetKeyboardDir.return_value = packagedir
-        kmpfile = self._createEmptyKmp(workdir)
-        self._createKmpJson(packagedir, ', "fileVersion": "99.0"')
+        workdir = tempfile.TemporaryDirectory()
+        packagedir = tempfile.TemporaryDirectory()
+        self.mockGetKeyboardDir.return_value = packagedir.name
+        kmpfile = self._createEmptyKmp(workdir.name)
+        self._createKmpJson(packagedir.name, ', "fileVersion": "99.0"')
 
         # Execute
         with self.assertRaises(InstallError) as context:
@@ -278,28 +279,34 @@ class InstallKmpTests(unittest.TestCase):
         self.assertTrue('foo.kmp requires Keyman 99.0 or higher' in context.exception.message)
         self.mockInstallToIbus.assert_not_called()
 
+        # Teardown
+        workdir.cleanup()
+        packagedir.cleanup()
+
     def test_InstallKmp(self):
         for testcase in [
             {'name': 'PreviousKeymanVersion', 'fileVersion': ', "fileVersion": "7.0"'},
-            {'name': 'SameKeymanVersion', 'fileVersion': ', "fileVersion": "' + __version__ + '"'},
+            {'name': 'SameKeymanVersion', 'fileVersion': f', "fileVersion": "{__version__}"'},
             {'name': 'NoFileVersion', 'fileVersion': ''}
         ]:
             with self.subTest(msg=testcase['name'], data=testcase['fileVersion']):
                 # Setup
                 self.mockInstallToIbus.reset_mock()
-                workdir = tempfile.TemporaryDirectory().name
-                os.makedirs(workdir)
-                packagedir = tempfile.TemporaryDirectory().name
-                os.makedirs(packagedir)
-                self.mockGetKeyboardDir.return_value = packagedir
-                kmpfile = self._createEmptyKmp(workdir)
-                self._createKmpJson(packagedir, testcase['fileVersion'])
+                workdir = tempfile.TemporaryDirectory()
+                packagedir = tempfile.TemporaryDirectory()
+                self.mockGetKeyboardDir.return_value = packagedir.name
+                kmpfile = self._createEmptyKmp(workdir.name)
+                self._createKmpJson(packagedir.name, testcase['fileVersion'])
 
                 # Execute
                 InstallKmp()._install_kmp(kmpfile, 'km', InstallLocation.User)
 
                 # Verify
                 self.mockInstallToIbus.assert_called_once()
+
+                # Teardown
+                workdir.cleanup()
+                packagedir.cleanup()
 
 
 if __name__ == '__main__':

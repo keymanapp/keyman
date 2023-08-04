@@ -16,8 +16,7 @@
     "/build/src/"
   ],
   "scripts": {
-    "build": "tsc -b && npm run build-cjs",
-    "build-cjs": "esbuild build/src/lexical-model-compiler.js --bundle --platform=node --external:../../node_modules/* > build/cjs-src/lexical-model-compiler.cjs",
+    "build": "tsc -b",
     "lint": "eslint .",
     "test": "npm run lint && cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha",
     "prepublishOnly": "npm run build"

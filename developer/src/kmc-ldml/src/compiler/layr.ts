@@ -5,7 +5,7 @@ import { SectionCompiler } from "./section-compiler.js";
 import { translateLayerAttrToModifier, validModifier } from '../util/util.js';
 
 
-import GlobalSections = KMXPlus.GlobalSections;
+import DependencySections = KMXPlus.DependencySections;
 import Layr = KMXPlus.Layr;
 import LayrEntry = KMXPlus.LayrEntry;
 import LayrList = KMXPlus.LayrList;
@@ -36,6 +36,8 @@ export class LayrCompiler extends SectionCompiler {
           valid = false;
           this.callbacks.reportMessage(CompilerMessages.Error_ExcessHardware({form}));
         } else if (!constants.layr_list_hardware_map.get(form)) {
+          /* c8 ignore next 4 */
+          // not reached due to XML validation
           valid = false;
           this.callbacks.reportMessage(CompilerMessages.Error_InvalidHardware({form}));
         }
@@ -57,7 +59,7 @@ export class LayrCompiler extends SectionCompiler {
     return valid;
   }
 
-  public compile(sections: GlobalSections): Layr {
+  public compile(sections: DependencySections): Layr {
     const sect = new Layr();
 
     sect.lists = this.keyboard.layers.map((layers) => {

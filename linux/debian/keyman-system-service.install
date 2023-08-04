@@ -1,0 +1,5 @@
+usr/lib/systemd/system/systemd-keyman.service
+usr/libexec/keyman-system-service
+usr/share/dbus-1/interfaces/com.keyman.SystemService1.System.xml
+usr/share/dbus-1/system-services/com.keyman.SystemService1.service
+usr/share/dbus-1/system.d/com.keyman.SystemService1.conf

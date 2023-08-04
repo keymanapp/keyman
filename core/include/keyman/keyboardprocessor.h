@@ -779,7 +779,7 @@ km_kbp_keyboard_get_key_list(km_kbp_keyboard const *keyboard,
                             km_kbp_keyboard_key **out);
 
 
-/*
+/**
 ```
 ### `km_kbp_keyboard_key_list_dispose`
 ##### Description:
@@ -794,28 +794,41 @@ returned by `km_kbp_keyboard_get_key_list`.
 KMN_API
 void km_kbp_keyboard_key_list_dispose(km_kbp_keyboard_key *key_list);
 
-
 /**
- * Returns the list of IMX libraries and function names that are referenced by
- * the keyboard. The matching dispose call needs to be called to free the memory.
+ * km_kbp_keyboard_get_imx_list:
+ *
+ * Returns: the list of IMX libraries and function names that are referenced by
+ * the keyboard.The matching dispose call needs to be called to free the memory.
  */
 KMN_API
-km_kbp_status km_kbp_keyboard_get_imx_list(km_kbp_keyboard const *keyboard, km_kbp_keyboard_imx** imx_list);
+km_kbp_status km_kbp_keyboard_get_imx_list(km_kbp_keyboard const *keyboard, km_kbp_keyboard_imx **imx_list);
 
 /**
+ * km_kbp_keyboard_imx_list_dispose:
+ *
  * Disposes of the IMX list
+ *
+ * Returns: --
  */
 KMN_API
 void km_kbp_keyboard_imx_list_dispose(km_kbp_keyboard_imx *imx_list);
 
 /**
+ * km_kbp_state_imx_register_callback:
+ *
  * Register the IMX callback endpoint for the client.
+ *
+ * Returns: --
  */
 KMN_API
 void km_kbp_state_imx_register_callback(km_kbp_state *state, km_kbp_keyboard_imx_platform imx_callback, void *callback_object);
 
 /**
+ *  km_kbp_state_imx_deregister_callback:
+ *
  * De-register IMX callback endpoint for the client.
+ *
+ * Returns: --
  */
 KMN_API
 void km_kbp_state_imx_deregister_callback(km_kbp_state *state);
@@ -1042,6 +1055,8 @@ enum km_kbp_tech_value {
 };
 
 /**
+ * km_kbp_event_flags:
+ *
  * Bit flags to be used with the event_flags parameter of km_kbp_process_event
  */
 enum km_kbp_event_flags {
@@ -1162,10 +1177,8 @@ km_kbp_event(
 );
 
 enum km_kbp_event_code {
-  /**
-   * A keyboard has been activated by the user. The processor may use this
-   * event, for example, to switch caps lock state or provide other UX.
-   */
+  // A keyboard has been activated by the user. The processor may use this
+  // event, for example, to switch caps lock state or provide other UX.
   KM_KBP_EVENT_KEYBOARD_ACTIVATED = 1,
   //future: KM_KBP_EVENT_KEYBOARD_DEACTIVATED = 2,
 };

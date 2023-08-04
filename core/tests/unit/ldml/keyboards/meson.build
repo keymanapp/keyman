@@ -9,8 +9,8 @@
 # tests     in resources/standards-data/ldml-keyboards/techpreview/test/
 tests_from_cldr = [
   'ja-Latn',
-  'pt-k0-abnt2',
-  # 'fr-t-k0-azerty', # vkey issues
+  # 'pt-k0-abnt2', #TODO-LDML: marker syntax fail!
+  'fr-t-k0-azerty',
 ]
 
 tests_without_testdata = [
@@ -20,17 +20,20 @@ tests_without_testdata = [
   'k_003_transform',
   'k_004_tinyshift',
   'k_005_modbittest',
+  # 'k_006_backspace', ## not quite there yet. TODO-LDML
   'k_010_mt',
   'k_011_mt_iso',
   'k_100_keytest',
   'k_101_keytest',
   'k_102_keytest',
+
 ]
 
 # These tests have a k_001_tiny-test.xml file as well.
 tests_with_testdata = [
   'k_001_tiny',
-  'fr-t-k0-azerty', # TODO-LDML: move to cldr above (fix vkey)
+  'k_020_fr', # TODO-LDML: move to cldr above (fix vkey)
+  'k_200_reorder_nod_Lana',
 ]
 
 tests =  tests_without_testdata

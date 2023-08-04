@@ -1,7 +1,5 @@
 import 'mocha';
-import sinon from 'sinon';
-import chai, { assert } from 'chai';
-import sinonChai from 'sinon-chai';
+import { assert } from 'chai';
 import { KmnCompiler } from '../src/main.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -9,21 +7,10 @@ import fs from 'fs';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 const __dirname = dirname(fileURLToPath(import.meta.url)).replace(/\\/g, '/');
-const baselineDir = __dirname + '/../../../../../common/test/keyboards/baseline/';
-chai.use(sinonChai);
+const keyboardsDir = __dirname + '/../../../../../common/test/keyboards/';
+const baselineDir = keyboardsDir + 'baseline/';
 
 describe('Compiler class', function() {
-  let consoleLog: any;
-
-  // TODO: do we need this?
-  beforeEach(function() {
-    consoleLog = sinon.spy(console, 'log');
-  });
-
-  afterEach(function() {
-    consoleLog.restore();
-  });
-
   it('should throw on failure', async function() {
     const compiler = new KmnCompiler();
     const callbacks : any = null; // ERROR
@@ -87,4 +74,35 @@ describe('Compiler class', function() {
       }
     }
   });
+
+  it('should compile a keyboard with visual keyboard', async function() {
+    const compiler = new KmnCompiler();
+    const callbacks = new TestCompilerCallbacks();
+    assert(await compiler.init(callbacks));
+    assert(compiler.verifyInitialized());
+
+    const fixtureDir = keyboardsDir + 'caps_lock_layer_3620/'
+    const infile = fixtureDir + 'source/caps_lock_layer_3620.kmn';
+    const kmxFixture = fixtureDir + '/binary/caps_lock_layer_3620.kmx';
+    const kvkFixture = fixtureDir + '/binary/caps_lock_layer_3620.kvk';
+
+    const resultingKmxfile = __dirname + '/caps_lock_layer_3620.kmx';
+    const resultingKvkfile = __dirname + '/caps_lock_layer_3620.kvk';
+
+    assert(compiler.run(infile, resultingKmxfile, {saveDebug: true, shouldAddCompilerVersion: false}));
+
+    assert(fs.existsSync(resultingKmxfile));
+    assert(fs.existsSync(resultingKvkfile));
+
+    const kmxData = fs.readFileSync(resultingKmxfile);
+    const kmxFixtureData = fs.readFileSync(kmxFixture);
+    assert.equal(kmxData.byteLength, kmxFixtureData.byteLength);
+    assert.deepEqual(kmxData, kmxFixtureData);
+
+    const kvkData = fs.readFileSync(resultingKvkfile);
+    const kvkFixtureData = fs.readFileSync(kvkFixture);
+    assert.equal(kvkData.byteLength, kvkFixtureData.byteLength);
+    assert.deepEqual(kvkData, kvkFixtureData);
+  });
+
 });

@@ -19,7 +19,8 @@ builder_describe \
   "test" \
   "install                   install artifacts" \
   "uninstall                 uninstall artifacts" \
-  "@/core:arch"
+  "@/core:arch" \
+  "--no-integration          don't run integration tests"
 
 builder_parse "$@"
 
@@ -59,7 +60,11 @@ fi
 
 if builder_start_action test; then
   cd "$THIS_SCRIPT_PATH/$MESON_PATH"
-  meson test --print-errorlogs $builder_verbose
+  if builder_has_option --no-integration; then
+    meson test --print-errorlogs $builder_verbose setup-src-test keymanutil-tests print-kmpdetails-test print-kmp-test bcp47-util-tests teardown-src-test
+  else
+    meson test --print-errorlogs $builder_verbose
+  fi
   builder_finish_action success test
 fi
 

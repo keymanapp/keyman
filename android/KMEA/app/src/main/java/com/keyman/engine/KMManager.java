@@ -272,9 +272,10 @@ public final class KMManager {
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
-  protected static final String KMFilename_JSEngine = "keymanandroid.js";
-  protected static final String KMFilename_JSEngine_Sourcemap = "keyman.js.map";
-  protected static final String KMFilename_JSSentry = "keyman-sentry.js";
+  protected static final String KMFilename_JSEngine = "keymanweb-webview.js";
+  protected static final String KMFilename_JSEngine_Sourcemap = "keymanweb-webview.js.map";
+  protected static final String KMFilename_JSSentry = "sentry.min.js";
+  protected static final String KMFilename_JSSentryInit = "keyman-sentry.js";
   protected static final String KMFilename_AndroidHost = "android-host.js";
   protected static final String KMFilename_KmwCss = "kmwosk.css";
   protected static final String KMFilename_KmwGlobeHintCss = "globe-hint.css";
@@ -624,8 +625,11 @@ public final class KMManager {
       return;
     }
 
-    RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
-    keyboard.setLayoutParams(params);
+    if (!isTestMode()) {
+      // Keyboard layout not needed in unit tests. #5125
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+      keyboard.setLayoutParams(params);
+    }
     keyboard.setVerticalScrollBarEnabled(false);
     keyboard.setHorizontalScrollBarEnabled(false);
     keyboard.setWebViewClient(webViewClient);
@@ -796,6 +800,7 @@ public final class KMManager {
       copyAsset(context, KMFilename_KeyboardHtml, "", true);
       copyAsset(context, KMFilename_JSEngine, "", true);
       copyAsset(context, KMFilename_JSSentry, "", true);
+      copyAsset(context, KMFilename_JSSentryInit, "", true);
       copyAsset(context, KMFilename_AndroidHost, "", true);
       if(KMManager.isDebugMode()) {
         copyAsset(context, KMFilename_JSEngine_Sourcemap, "", true);

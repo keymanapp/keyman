@@ -11,7 +11,7 @@
     "src/**/*.ts"
   ],
   "references": [
-    { "path": "../../../common/web/keyman-version/tsconfig.esm.json" },
+    { "path": "../../../common/web/keyman-version" },
     { "path": "../../../common/models/types" },
     { "path": "../../../common/web/types" },
   ]

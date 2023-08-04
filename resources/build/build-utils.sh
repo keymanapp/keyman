@@ -74,24 +74,31 @@ function findVersion() {
         VERSION_TAG=
     fi
 
-    if [ -z "${TEAMCITY_VERSION-}" -a -z "${JENKINS_HOME-}" ]; then
-        # Local dev machine, not TeamCity
+    if [ -z "${TEAMCITY_VERSION-}" ] && [ -z "${GITHUB_ACTIONS-}" ]; then
+        # Local dev machine, not TeamCity or GitHub Action
         VERSION_TAG="$VERSION_TAG-local"
         VERSION_ENVIRONMENT=local
-    else
+    elif [ -n "${TEAMCITY_PR_NUMBER-}" ]; then
         # On TeamCity: are we running a pull request build or a master/beta/stable build?
-        if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
-            VERSION_ENVIRONMENT=test
-            # Note TEAMCITY_PR_NUMBER can also be 'master', 'beta', or 'stable-x.y'
-            # This indicates we are running a Test build.
-            if [[ $TEAMCITY_PR_NUMBER =~ ^(master|beta|stable(-[0-9]+\.[0-9]+)?)$ ]]; then
-                VERSION_TAG="$VERSION_TAG-test"
-            else
-                VERSION_TAG="$VERSION_TAG-test-$TEAMCITY_PR_NUMBER"
-            fi
+        VERSION_ENVIRONMENT="test"
+        # Note TEAMCITY_PR_NUMBER can also be 'master', 'beta', or 'stable-x.y'
+        # This indicates we are running a Test build.
+        if [[ $TEAMCITY_PR_NUMBER =~ ^(master|beta|stable(-[0-9]+\.[0-9]+)?)$ ]]; then
+            VERSION_TAG="$VERSION_TAG-test"
         else
-            VERSION_ENVIRONMENT="$TIER"
+            VERSION_TAG="$VERSION_TAG-test-$TEAMCITY_PR_NUMBER"
         fi
+    elif [ -n "${GITHUB_ACTIONS-}" ] && ${GHA_TEST_BUILD-}; then
+        VERSION_ENVIRONMENT="test"
+        # Note GHA_BRANCH can be 'master', 'beta', or 'stable-x.y'
+        # This indicates we are running a Test build.
+        if [[ ${GHA_BRANCH-} =~ ^(master|beta|stable(-[0-9]+\.[0-9]+)?)$ ]]; then
+            VERSION_TAG="${VERSION_TAG}-test"
+        else
+            VERSION_TAG="${VERSION_TAG}-test-${GHA_BRANCH-unset}"
+        fi
+    else
+        VERSION_ENVIRONMENT="$TIER"
     fi
 
     VERSION_WITH_TAG="$VERSION$VERSION_TAG"
@@ -293,7 +300,7 @@ set_keyman_standard_build_path() {
 # For CI compatbility of building Keyman for Android 16.0 with OpenJDK 8,
 # this overrides JAVA_HOME for the builder script to use OpenJDK 11.
 set_java_home() {
-  if [[ ! -z {$JAVA_HOME_11+x} ]]; then
+  if [[ ! -z ${JAVA_HOME_11+x} ]]; then
     builder_echo "Setting JAVA_HOME to JAVA_HOME_11 ($JAVA_HOME_11)"
     export JAVA_HOME="${JAVA_HOME_11}"
   fi

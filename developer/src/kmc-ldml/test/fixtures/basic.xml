@@ -37,6 +37,7 @@
   </layers>
 
   <variables>
+    <string id="a" value="\m{a}"/>
     <string id="vst" value="abc"/>
     <set id="vse" value="a b c"/>
     <unicodeSet id="vus" value="[abc]"/>
@@ -45,11 +46,16 @@
   <transforms type="simple">
     <transformGroup>
       <transform from="^a" to="â" />
+      <transform from="a" to="\m{a}" />
+    </transformGroup>
+    <transformGroup>
+      <!-- delete that marker -->
+      <transform from="\m{a}" />
     </transformGroup>
 
     <transformGroup>
-      <!-- Northern Thai example from spec, lightly edited -->
-      <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
+      <!-- Northern Thai example from spec -->
+      <reorder before="\u{1A6B}" from="\u{1A60}[\u1A75-\u1A79]\u{1A45}" order="10 55 10" />
     </transformGroup>
   </transforms>
 

@@ -105,3 +105,10 @@ e = executable('test_kmx_plus', 'test_kmx_plus.cpp',
     link_args: links + tests_flags,
     objects: lib.extract_all_objects(recursive: false))
 test('test_kmx_plus', e, suite: 'ldml')
+
+t = executable('test_transforms', 'test_transforms.cpp',
+    cpp_args: defns + warns,
+    include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
+    link_args: links + tests_flags,
+    objects: lib.extract_all_objects(recursive: false))
+test('test_transforms', t, suite: 'ldml')

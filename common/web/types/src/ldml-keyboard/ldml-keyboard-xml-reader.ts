@@ -14,16 +14,20 @@ interface NameAndProps  {
   '$$'?: any; // children
 };
 
-export default class LDMLKeyboardXMLSourceFileReader {
-  callbacks: CompilerCallbacks;
+export class LDMLKeyboardXMLSourceFileReaderOptions {
+  importsPath: string;
+};
 
-  constructor(callbacks : CompilerCallbacks) {
-    this.callbacks = callbacks;
+export class LDMLKeyboardXMLSourceFileReader {
+  constructor(private options: LDMLKeyboardXMLSourceFileReaderOptions, private callbacks : CompilerCallbacks) {
   }
 
-  readImportFile(version: string, subpath: string): Buffer {
-    // TODO-LDML: sanitize input string
-    let importPath = new URL(`../import/${version}/${subpath}`, import.meta.url);
+  static get defaultImportsURL() {
+    return new URL(`../import/`, import.meta.url);
+  }
+
+  readImportFile(version: string, subpath: string): Uint8Array {
+    const importPath = this.callbacks.resolveFilename(this.options.importsPath, `${version}/${subpath}`);
     return this.callbacks.loadFile(importPath);
   }
 
@@ -201,8 +205,8 @@ export default class LDMLKeyboardXMLSourceFileReader {
   /**
    * @returns true if valid, false if invalid
    */
-  public validate(source: LDMLKeyboardXMLSourceFile | LDMLKeyboardTestDataXMLSourceFile, schemaSource: Buffer): boolean {
-    const schema = JSON.parse(schemaSource.toString('utf8'));
+  public validate(source: LDMLKeyboardXMLSourceFile | LDMLKeyboardTestDataXMLSourceFile, schemaSource: Uint8Array): boolean {
+    const schema = JSON.parse(new TextDecoder().decode(schemaSource));
     const ajv = new Ajv();
     if(!ajv.validate(schema, source)) {
       for (let err of ajv.errors) {

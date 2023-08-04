@@ -23,7 +23,7 @@
     </style>
 
     <!-- Insert uncompiled KeymanWeb source scripts -->
-    <script src="../../build/app/web/release/keymanweb.js" type="application/javascript"></script>
+    <script src="../../../../../build/publish/release/keymanweb.js" type="application/javascript"></script>
 
     <!--
       For desktop browsers, a script for the user interface must be inserted here.
@@ -32,18 +32,20 @@
       The toolbar UI is best for any page designed to support keyboards for
       a large number of languages.
     -->
-    <script src="../../build/app/web/release/kmwuitoggle.js"></script>
+    <script src="../../../../../build/publish/release/kmwuitoggle.js"></script>
 
-    <script src="../../node_modules/@keymanapp/web-sentry-manager/dist/index.js"></script>
+    <script src="../../../../../build/test-resources/sentry-bundle.min.js"></script>
+
+    <script src="../../../../../build/test-resources/sentry-manager.js"></script>
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
       var kmw=window.keyman;
       kmw.init({
-		attachType:'auto'
-        });
+        attachType:'auto'
+      });
 
-      var sentryManager = new com.keyman.KeymanSentryManager();
+      var sentryManager = new KeymanSentryManager();
       sentryManager.init();
     </script>
 

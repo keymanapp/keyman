@@ -90,8 +90,6 @@
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
 
-#include "../kmcmplib/include/kmcmplibapi.h"
-
 int xatoi(PWSTR *p);
 int atoiW(PWSTR p);
 void safe_wcsncpy(PWSTR out, PWSTR in, int cbMax);
@@ -291,31 +289,13 @@ BOOL AddCompileMessage(DWORD msg)
   return FALSE;
 }
 
-bool flag_use_new_kmcomp  = true;   // flag to switch to new kmcompx
-
 extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options) {
   if(!options || options->dwSize < sizeof(COMPILER_OPTIONS)) {
     return FALSE;
   }
 
-  flag_use_new_kmcomp = options->UseKmcmpLib;
-
-  //printf("\n---> started in SetCompilerOptions() of kmcmpdll\n");
-  if ( flag_use_new_kmcomp )
-  {
-    KMCMP_COMPILER_OPTIONS kmcmp_options = {0};
-    kmcmp_options.dwSize = sizeof(KMCMP_COMPILER_OPTIONS);
-    kmcmp_options.ShouldAddCompilerVersion = options->ShouldAddCompilerVersion;
-    return kmcmp_SetCompilerOptions(&kmcmp_options);
-  }
-  //printf("--->  stayed in SetCompilerOptions() of kmcmpdll\n");
-
   FShouldAddCompilerVersion = options->ShouldAddCompilerVersion;
   return TRUE;
-}
-
-int kmcmpMsgproc(int line, uint32_t dwMsgCode, char* szText, void* context) {
-  return static_cast<CompilerMessageProc>(context)(line, dwMsgCode, szText);
 }
 
 extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL ASaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc)   // I4865   // I4866
@@ -324,15 +304,6 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
   BOOL err;
   DWORD len;
   char str[260];
-
-  //printf("\n---> started in CompileKeyboardFile() of kmcmpdll\n");
-
-  if ( flag_use_new_kmcomp )
-  {
-    return kmcmp_CompileKeyboardFile(pszInfile, pszOutfile, ASaveDebug, ACompilerWarningsAsErrors,AWarnDeprecatedCode, kmcmpMsgproc, (void*) pMsgProc);
-  }
-
-  //printf("--->  stayed in CompileKeyboardFile() of kmcmpdll\n");
 
   FSaveDebug = ASaveDebug;
   FCompilerWarningsAsErrors = ACompilerWarningsAsErrors;   // I4865
@@ -417,15 +388,6 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PSTR pszInfile
   BOOL err;
   DWORD len;
   char str[260];
-
-  //printf("\n---> started in CompileKeyboardFileToBuffer() of kmcmpdll\n");
-  if ( flag_use_new_kmcomp )
-  {
-    return kmcmp_CompileKeyboardFileToBuffer( pszInfile, (void*) pfkBuffer,  ACompilerWarningsAsErrors,  AWarnDeprecatedCode, kmcmpMsgproc, (void*) pMsgProc, Target);
-  }
-
-  //printf("--->  stayed in CompileKeyboardFileToBuffer() of kmcmpdll\n");
-
 
   FSaveDebug = TRUE;   // I3681
   FCompilerWarningsAsErrors = ACompilerWarningsAsErrors;   // I4865

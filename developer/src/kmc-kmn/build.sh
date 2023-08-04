@@ -51,11 +51,15 @@ fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_start_action build; then
+function copy_deps() {
   mkdir -p build/src/import/kmcmplib
   mkdir -p src/import/kmcmplib
   cp ../kmcmplib/build/wasm/$BUILDER_CONFIGURATION/src/wasm-host.js ./src/import/kmcmplib/wasm-host.js
   cp ../kmcmplib/build/wasm/$BUILDER_CONFIGURATION/src/wasm-host.wasm ./build/src/import/kmcmplib/wasm-host.wasm
+}
+
+if builder_start_action build; then
+  copy_deps
   tsc --build
   builder_finish_action success build
 fi
@@ -63,6 +67,7 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action test; then
+  copy_deps
   tsc --build test/
   npm run lint
   c8 --reporter=lcov --reporter=text mocha "${builder_extra_params[@]}"

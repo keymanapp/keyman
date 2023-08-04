@@ -1,4 +1,3 @@
-
 export * as KMX from './kmx/kmx.js';
 export * as KMXPlus from './kmx/kmx-plus.js';
 export { default as KMXBuilder } from './kmx/kmx-builder.js';
@@ -14,11 +13,13 @@ export * as KvksFile from './kvk/kvk-file.js';
 
 export * as LDMLKeyboard from './ldml-keyboard/ldml-keyboard-xml.js';
 export { LDMLKeyboardTestDataXMLSourceFile } from './ldml-keyboard/ldml-keyboard-testdata-xml.js';
-export { default as LDMLKeyboardXMLSourceFileReader } from './ldml-keyboard/ldml-keyboard-xml-reader.js';
+export { UnicodeSetParser, UnicodeSet } from './ldml-keyboard/unicodeset-parser-api.js';
+export { VariableParser, MarkerParser } from './ldml-keyboard/pattern-parser.js';
+export { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions } from './ldml-keyboard/ldml-keyboard-xml-reader.js';
 
 export * as Constants from './consts/virtual-key-constants.js';
 
-export { CompilerCallbacks, CompilerSchema, CompilerEvent, CompilerErrorNamespace, CompilerErrorSeverity, CompilerPathCallbacks, CompilerFileSystemCallbacks, CompilerMessageSpec, compilerErrorSeverityName, compilerExceptionToString, compilerErrorFormatCode } from './util/compiler-interfaces.js';
+export { CompilerCallbacks, CompilerSchema, CompilerEvent, CompilerErrorNamespace, CompilerErrorSeverity, CompilerPathCallbacks, CompilerFileSystemCallbacks, CompilerMessageSpec, compilerErrorSeverityName, compilerExceptionToString, compilerErrorFormatCode, compilerEventFormat } from './util/compiler-interfaces.js';
 export { CommonTypesMessages } from './util/common-events.js';
 
 export * as TouchLayout from './keyman-touch-layout/keyman-touch-layout-file.js';

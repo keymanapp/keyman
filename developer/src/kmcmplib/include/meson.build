@@ -20,7 +20,5 @@ configure_file(
 inc = include_directories(
   '.',
   '../../common/include',
-  '../../../../common/include',
-  '../../ext/json',
-  '../../ext/json-schema-validator'
+  '../../../../common/include'
 )

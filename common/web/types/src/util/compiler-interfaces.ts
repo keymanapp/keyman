@@ -15,8 +15,13 @@ export enum CompilerErrorSeverity {
   Error =         0x300000, // Severe error where we can't continue
   Fatal =         0x400000, // OOM or should-not-happen internal problem
 
-  Severity_Mask = 0xF00000, // includes reserved bits
-  Error_Mask =    0x0FFFFF,
+  // Mask values for mapping compiler errors
+  // TODO: make this a separate enum?
+  Severity_Mask =  0x00F00000,  // includes reserved bits, 16 possible severity levels
+  Error_Mask =     0x000FFFFF,  // error | namespace
+  Namespace_Mask = 0x000FF000,  // 256 possible namespaces
+  BaseError_Mask = 0x00000FFF,  // error code, 2,048 possible error codes per namespace
+  Reserved_Mask  = 0xFF000000,  // do not use these error values at this time
 };
 
 export function compilerErrorSeverityName(code: number): string {
@@ -42,6 +47,21 @@ export function compilerErrorFormatCode(code: number): string {
   const errorCode = code & CompilerErrorSeverity.Error_Mask;
   const errorCodeString = Number(errorCode).toString(16).padStart(5,'0');
   return `${severityName}:0x${errorCodeString}`;
+}
+
+/**
+ * @param e event or array of events
+ * @returns string
+ */
+export function compilerEventFormat(e : CompilerEvent | CompilerEvent[]) : string {
+  if (!e) {
+    return "";
+  }
+  if (Array.isArray(e)) {
+    return e.map(item => compilerEventFormat(item)).join('\n');
+  }
+  const {code, message} = e;
+  return `${compilerErrorFormatCode(code)}: “${message}”`;
 }
 
 /**
@@ -109,6 +129,7 @@ export interface CompilerFileSystemCallbacks {
   readFileSync(path: string, options?: { encoding?: null; flag?: string; } | null): Uint8Array;
   readFileSync(path: string, options: { encoding: string; flag?: string; } | string): string;
   readFileSync(path: string, options?: { encoding?: string | null; flag?: string; } | string | null): string | Uint8Array;
+  writeFileSync(path: string, data: Uint8Array): void;
 
   existsSync(name: string): boolean;
 }
@@ -119,13 +140,11 @@ export interface CompilerFileSystemCallbacks {
 export interface CompilerCallbacks {
   /**
    * Attempt to load a file. Return falsy if not found.
-   * TODO: accept only string
    * TODO: never return falsy, just throw if not found?
-   * TODO: Buffer is Node-only.
    * @param baseFilename
    * @param filename
    */
-  loadFile(filename: string | URL): Buffer;
+  loadFile(filename: string): Uint8Array;
 
   get path(): CompilerPathCallbacks;
   get fs(): CompilerFileSystemCallbacks;
@@ -137,7 +156,7 @@ export interface CompilerCallbacks {
    */
   resolveFilename(baseFilename: string, filename: string): string;
 
-  loadSchema(schema: CompilerSchema): Buffer;
+  loadSchema(schema: CompilerSchema): Uint8Array;
   reportMessage(event: CompilerEvent): void;
   debug(msg: string): void;
 };

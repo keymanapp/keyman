@@ -10,8 +10,8 @@ working on ‘layr’, using ‘disp’ as a model from https://github.com/keyma
 ## Constants and Scaffolding
 
 - *Edit/Commit*: `core/include/ldml/keyboardprocessor_ldml.ts`
-    - update `SectionIdent` and keep in order
-    - update `SectionMap` and keep in order
+    - update `SectionIdent` and keep in order: `'layr' |`
+    - update `Constants.section` (near the end of the file) and keep in order: `'layr': 'layr',`
     - add a comment block in order `layr section`
         - add `length_layr` with the nonvariable length
         - add a `length_layr_*` for each subitem
@@ -50,6 +50,7 @@ working on ‘layr’, using ‘disp’ as a model from https://github.com/keyma
     - add a test case such as `developer/src/kmc-ldml/test/test-key2.ts`
 - add a compiler
     - `developer/src/kmc-ldml/compiler/key2.ts`
+    - make sure the compiler has an `id()` function returning the correct id, such as `key2`
     - link it in to `developer/src/kmc-ldml/src/compiler/compiler.ts`
         - add the import
         - add to `SECTION_COMPILERS`
@@ -66,6 +67,7 @@ working on ‘layr’, using ‘disp’ as a model from https://github.com/keyma
     - Finally, add `this.emitSection(file, this.file.COMP_PLUS_DISP, this.sect_disp);` to `compile()` — and, in order.
         - Note that some variable length parts (such as the actual text data in `strs`) are sometimes in a separate emit function. Anything that's not in the `COMP_PLUS_STRS` `r.Struct` definition needs one of these.
         - Also note that restructure will happily ignore (write zeros for) any fields where the BUILDER_* fields don't match the COMP_PLUS_* fields.
+    - Pro Tip: If you see `Error: Not a fixed size` (or have any other data generation issues), double check that the `COMP_PLUS_DISP*` entries in `kmx-plus.ts` has _exactly_ the same properties (and property names!) as the `BUILDER_DISP*` structures in your `build-disp.ts` file. Restructure will happily insert zeros on mismatches, but complains if a variable length item doesn't match.
 
 - update basic.xml and basic.txt
     - Tweak `eveloper/src/kmc-ldml/test/fixtures/basic.xml` as needed

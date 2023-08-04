@@ -4,16 +4,12 @@
 #include "unicode/uniset.h"
 #include "unicode/unistr.h"
 
-EXTERN int kmcmp_ParseUnicodeSet(
-  const char* szText,
-  uint32_t* outputBuffer,
+EXTERN int kmcmp_parseUnicodeSet(
+  const std::string text,
+  uintptr_t outputBuffer_,
   uint32_t outputBufferSize
 ) {
-  if (szText == nullptr) {
-    // null string coming in
-    return KMCMP_ERROR_SYNTAX_ERR;
-  }
-  const icu::UnicodeString str = icu::UnicodeString::fromUTF8(szText);
+  const icu::UnicodeString str = icu::UnicodeString::fromUTF8(text.c_str());
   if (str.isBogus() || str.isEmpty()) {
     // empty string
     return KMCMP_ERROR_SYNTAX_ERR;
@@ -34,12 +30,17 @@ EXTERN int kmcmp_ParseUnicodeSet(
   } else if (uset.hasStrings()) {
     // Error, strings are not allowed
     return KMCMP_ERROR_HAS_STRINGS;
-  } else if (outputBuffer == nullptr) {
+  }
+  const int32_t count = uset.getRangeCount();
+  if (outputBufferSize == 0) {
+    // pure preflight - return buffer size needed as negative
+    return count;
+  }
+  uint32_t* outputBuffer = reinterpret_cast<uint32_t*>(outputBuffer_);
+  if (outputBuffer == nullptr) {
     // fail if nullptr passed
     return KMCMP_FATAL_OUT_OF_RANGE;
   }
-
-  const int32_t count = uset.getRangeCount();
   if ((count * 2L) > outputBufferSize) {
     // output buffer too small
     return KMCMP_FATAL_OUT_OF_RANGE;

@@ -2,7 +2,7 @@ import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m
 
 const Namespace = CompilerErrorNamespace.Infrastructure;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
-// const SevHint = CompilerErrorSeverity.Hint | Namespace;
+const SevHint = CompilerErrorSeverity.Hint | Namespace;
 // const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
@@ -39,5 +39,9 @@ export class InfrastructureMessages {
   static Error_InvalidProjectFile = (o:{message:string}) => m(this.ERROR_InvalidProjectFile,
     `Project file is not valid: ${o.message}`);
   static ERROR_InvalidProjectFile = SevError | 0x0008;
+
+  static Hint_FilenameHasDifferingCase = (o:{reference:string, filename:string}) => m(this.HINT_FilenameHasDifferingCase,
+    `File ${o.filename} differs in case from reference ${o.reference}; this will fail on platforms with case-sensitive filesystems.`);
+  static HINT_FilenameHasDifferingCase = SevHint | 0x0009;
 }
 

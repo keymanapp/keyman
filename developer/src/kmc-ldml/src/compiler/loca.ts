@@ -3,7 +3,7 @@ import { LDMLKeyboard, KMXPlus } from '@keymanapp/common-types';
 import { SectionCompiler } from "./section-compiler.js";
 import { CompilerMessages } from "./messages.js";
 
-import GlobalSections = KMXPlus.GlobalSections;
+import DependencySections = KMXPlus.DependencySections;
 import Loca = KMXPlus.Loca;
 import LKKeyboard = LDMLKeyboard.LKKeyboard;
 
@@ -33,6 +33,7 @@ export class LocaCompiler extends SectionCompiler {
           this.callbacks.reportMessage(CompilerMessages.Error_InvalidLocale({tag}));
           valid = false;
         } else {
+          /* c8 ignore next 2 */
           throw e;
         }
       }
@@ -40,7 +41,7 @@ export class LocaCompiler extends SectionCompiler {
     return valid;
   }
 
-  public compile(sections: GlobalSections): Loca {
+  public compile(sections: DependencySections): Loca {
     let result = new Loca();
 
     // This also minimizes locales according to Remove Likely Subtags algorithm:

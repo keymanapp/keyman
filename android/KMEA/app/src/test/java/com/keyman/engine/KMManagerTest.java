@@ -29,13 +29,14 @@ public class KMManagerTest {
   private static final String OLD_KEYBOARDS_LIST = "old_keyboards_list.dat";
   ArrayList<HashMap<String, String>> dat_list;
 
-  @Before
-  public void loadOldKeyboardsList() throws FileNotFoundException {
+  // For some keyboard list tests, load an existing keyboard list.
+  // Can't use @Before because context is null before running tests.
+  public void loadOldKeyboardsList() {
     KMManager.initialize(ApplicationProvider.getApplicationContext(), KMManager.KeyboardType.KEYBOARD_TYPE_INAPP);
 
     File keyboards_dat = new File(TEST_RESOURCE_ROOT, OLD_KEYBOARDS_LIST);
     if (keyboards_dat == null || !keyboards_dat.exists()) {
-      throw new FileNotFoundException();
+      Assert.fail(TAG + ": keyboards list not found");
     }
     try {
       ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(keyboards_dat));
@@ -46,7 +47,6 @@ public class KMManagerTest {
     }
   }
 
-  @Ignore("Investigate ResourcesNotFoundException")
   @Test
   public void test_getTier() {
     String versionName = "14.0.248-alpha";
@@ -109,9 +109,9 @@ public class KMManagerTest {
   /*
   * This test is manually run to edit/regenerate the old keyboards list
   */
-  @Ignore
   @Test
   public void create_newKeyboardsList() {
+    loadOldKeyboardsList();
     dat_list = new ArrayList<HashMap<String, String>>();
 
     HashMap<String, String> usInfo = new HashMap<String, String>();
@@ -181,9 +181,9 @@ public class KMManagerTest {
     }
   }
 
-  @Ignore("Investigate ResourcesNotFoundException")
   @Test
   public void test_updateOldKeyboardsList() {
+    loadOldKeyboardsList();
     Assert.assertNotNull(dat_list);
 
     // Verify old keyboards list contains deprecated keyboards

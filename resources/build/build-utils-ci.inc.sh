@@ -100,18 +100,7 @@ function _builder_publish_npm_package() {
     dry_run=--dry-run
   fi
 
-  # We use --no-git-tag-version because our CI system controls version numbering
-  # and already tags releases. We also want to have the version of this match
-  # the release of Keyman Developer -- these two versions should be in sync.
-  # Because this is a large repo with multiple projects and build systems, it's
-  # better for us that individual build systems don't take too much ownership of
-  # git tagging. :)
-  npm version --allow-same-version --no-git-tag-version --no-commit-hooks "$VERSION_WITH_TAG"
-
-  # Update all @keymanapp/* [*]dependencies in package.json to the current
-  # version-with-tag, so that the published version has precise dependencies,
-  # and we don't accidentally end up with either older or newer deps here
-  _builder_npm_set_dependency_version
+  _builder_write_npm_version
 
   # Note: In either case, npm publish MUST be given --access public to publish a
   # package in the @keymanapp scope on the public npm package index.
@@ -128,18 +117,33 @@ function _builder_publish_npm_package() {
   fi
 }
 
-# Updates all @keymanapp/* [*]dependencies in package.json to the current
-# version-with-tag, so that the published version has precise dependencies, and
-# we don't accidentally end up with either older or newer deps. This overwrites
-# the local package.json, so it does need to be restored afterwards
-function _builder_npm_set_dependency_version() {
-  cat package.json | "$JQ" --arg VERSION_WITH_TAG "$VERSION_WITH_TAG" \
-    '
-      . +
-      (try { dependencies: (.dependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {}) +
-      (try { devDependencies: (.devDependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {}) +
-      (try { bundleDependencies: (.bundleDependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {}) +
-      (try { optionalDependencies: (.optionalDependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {})
-    ' > package1.json
-  mv -f package1.json package.json
+function _builder_write_npm_version() {
+  # We use --no-git-tag-version because our CI system controls version numbering
+  # and already tags releases. We also want to have the version of this match
+  # the release of Keyman Developer -- these two versions should be in sync.
+  # Because this is a large repo with multiple projects and build systems, it's
+  # better for us that individual build systems don't take too much ownership of
+  # git tagging. :)
+  if ! "$JQ" -e '.version' package.json > /dev/null; then
+    pushd "$KEYMAN_ROOT" > /dev/null
+    npm version --allow-same-version --no-git-tag-version --no-commit-hooks --workspaces "$VERSION_WITH_TAG"
+    popd > /dev/null
+  fi
+
+  # Updates all @keymanapp/* [*]dependencies in all package.jsons to the current
+  # version-with-tag, so that the published version has precise dependencies, and
+  # we don't accidentally end up with either older or newer deps. This overwrites
+  # the local package.json files, so they do need to be restored afterwards
+  find "$KEYMAN_ROOT" -name "package.json" -not -path '*/node_modules/*' -print0 | \
+    while IFS= read -r -d '' line; do
+      cat "$line" | "$JQ" --arg VERSION_WITH_TAG "$VERSION_WITH_TAG" \
+        '
+          . +
+          (try { dependencies: (.dependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {}) +
+          (try { devDependencies: (.devDependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {}) +
+          (try { bundleDependencies: (.bundleDependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {}) +
+          (try { optionalDependencies: (.optionalDependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {})
+        ' > "${line}_"
+      mv -f "${line}_" "$line"
+    done
 }

@@ -111,8 +111,8 @@ const struct CompilerError CompilerErrors[] = {
     { CERR_DuplicateStore                                , "A store with this name has already been defined."},
     { CERR_RepeatedBegin                                 , "Begin has already been set"},
 
-    { CHINT_FilenameHasDifferingCase                     , "Casing differences may fail on some platforms: "},
     { CHINT_UnreachableRule                              , "This rule will never be matched as another rule takes precedence"},
+    { CHINT_NonUnicodeFile                               , "Keyman Developer has detected that the file has ANSI encoding. Consider converting this file to UTF-8"},
 
     { CWARN_TooManyWarnings                              , "Too many warnings or errors"},
     { CWARN_OldVersion                                   , "The keyboard file is an old version"},
@@ -142,7 +142,6 @@ const struct CompilerError CompilerErrors[] = {
     { CWARN_NulNotFirstStatementInContext                , "nul must be the first statement in the context"},
     { CWARN_IfShouldBeAtStartOfContext                   , "if, platform and baselayout should be at start of context (after nul, if present)"},
     { CWARN_KeyShouldIncludeNCaps                        , "Other rules which reference this key include CAPS or NCAPS modifiers, so this rule must include NCAPS modifier to avoid inconsistent matches"},
-    { CWARN_MissingFile                                  , "The referenced file could not be found: "},
 
     { 0, nullptr }
   };
