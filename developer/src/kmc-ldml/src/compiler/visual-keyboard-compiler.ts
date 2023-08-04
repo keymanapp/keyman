@@ -40,6 +40,10 @@ export class LdmlKeyboardVisualKeyboardCompiler {
 
         let keydef = source.keyboard.keys?.key?.find(x => x.id == key);
 
+        if (!keydef) {
+          throw Error(`Internal Error: could not find key id="${key}" in layer "${layer.id || '<none>'}", row "${y}"`);
+        }
+
         vk.keys.push({
           flags: VisualKeyboard.VisualKeyboardKeyFlags.kvkkUnicode,
           shift: shift,

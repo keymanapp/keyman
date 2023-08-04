@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Note: similar to, but slightly ahead of, fr-t-k0-azerty -->
 <!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
 <keyboard locale="fr-t-k0-azerty" conformsTo="techpreview">
 	<locales>
@@ -7,11 +8,11 @@
 	<!-- 'conformsTo' gives CLDR spec conformance. Distinguishes from prior
 		keyboard formats -->
 	<!-- 'version' element is now optional -->
-	<version number="1.0.0" />
+	<version number="1.0.1" />
 	<info author="Team Keyboard" normalization="NFC" layout="AZERTY" indicator="FR" />
 	<names>
-		<name value="French Test" />
-		<name value="French Test AZERTY" />
+		<name value="French Test Updated" />
+		<name value="French Test AZERTY Updated" />
 	</names>
 
 	<settings fallback="omit" /> <!-- "hide" makes this act like a dead keyTBD -->
@@ -22,15 +23,15 @@
     <vkey from="A" to="Q" />
     <vkey from="Z" to="W" />
     <vkey from="GRAVE" to="QUOTE" /> <!-- TODO-LDML: GRAVE=BKQUOTE in ldml? -->
-    <!-- <vkey from="MINUS" to="LBRACKET" /> --> <!-- TODO-LDML: missing MINUS, LBRKT=LBRACKET in ldml? -->
+    <vkey from="MINUS" to="LBRACKET" /> <!-- TODO-LDML: missing MINUS, LBRKT=LBRACKET in ldml? -->
     <!-- i.e., OEM_3 >>> OEM_7 -->
     <vkey from="LBRACKET" to="RBRACKET" />  <!-- TODO-LDML: RBRKT=RBRACKET in ldml? -->
-    <!-- <vkey from="COLON" to="M" /> --> <!-- TODO-LDML: missing COLON-->
+    <vkey from="COLON" to="M" /> <!-- TODO-LDML: missing COLON-->
     <vkey from="QUOTE" to="GRAVE" /> <!-- TODO-LDML: GRAVE=BKQUOTE in ldml? -->
     <vkey from="M" to="COMMA" />
 		<vkey from="COMMA" to="PERIOD" />
 		<vkey from="PERIOD" to="SLASH" />
-    <!-- <vkey from="SLASH" to="EXCLAMATION" />  --> <!-- TODO-LDML: missing: EXCLAMATION -->
+    <vkey from="SLASH" to="EXCLAMATION" />  <!-- TODO-LDML: missing: EXCLAMATION -->
     <!-- i.e., OEM_2 >>> OEM_8 -->
 	</vkeys>
 

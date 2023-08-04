@@ -10,7 +10,7 @@ function can_run_wayland() {
   fi
 }
 
-function generate_kmpjson() {
+function _generate_kmpjson() {
   local TESTDIR
   TESTDIR="$1"
   pushd "$TESTDIR" > /dev/null || exit
@@ -78,7 +78,7 @@ EOF
   popd > /dev/null || exit
 }
 
-function link_test_keyboards() {
+function _link_test_keyboards() {
   KMX_TEST_DIR=$1
   TESTDIR=$2
   TESTBASEDIR=$3
@@ -93,22 +93,23 @@ function link_test_keyboards() {
   fi
 }
 
-function setup() {
-  local DISPLAY_SERVER ENV_FILE PID_FILE TOP_SRCDIR TOP_BINDIR TESTBASEDIR TESTDIR
-  DISPLAY_SERVER=$1
-  ENV_FILE=$2
-  PID_FILE=$3
+function _setup_init() {
+  local ENV_FILE PID_FILE
+  ENV_FILE=$1
+  PID_FILE=$2
 
-  TOP_SRCDIR=${G_TEST_SRCDIR:-$(realpath "$(dirname "$0")/..")}/..
-  TOP_BINDIR=${G_TEST_BUILDDIR:-$(realpath "$(dirname "$0/..")")}/..
-  TESTBASEDIR=${XDG_DATA_HOME:-$HOME/.local/share}/keyman
-  TESTDIR=${TESTBASEDIR}/test_kmx
+  if [ -z "${TOP_SRCDIR:-}" ]; then
+    TOP_SRCDIR=${G_TEST_SRCDIR:-$(realpath "$(dirname "$0")/..")}/..
+  fi
+  if [ -z "${TOP_BINDIR:-}" ]; then
+    TOP_BINDIR=${G_TEST_BUILDDIR:-$(realpath "$(dirname "$0/..")")}/..
+  fi
 
   echo > "$ENV_FILE"
 
   if [ -f "$PID_FILE" ]; then
     # kill previous instances
-    "$(dirname "$0")"/teardown-tests.sh "$PID_FILE"
+    "$(dirname "$0")"/teardown-tests.sh "$PID_FILE" || true
   fi
 
   echo > "$PID_FILE"
@@ -127,19 +128,34 @@ function setup() {
     exit 2
   fi
 
-  link_test_keyboards "${TOP_SRCDIR}/../../common/test/keyboards/baseline" "$TESTDIR" "$TESTBASEDIR"
+  export LD_LIBRARY_PATH=${COMMON_ARCH_DIR}/src:${LD_LIBRARY_PATH-}
+  echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> "$ENV_FILE"
+}
 
-  generate_kmpjson "$TESTDIR"
+function _setup_test_dbus_server() {
+  local ENV_FILE PID_FILE
+  ENV_FILE=$1
+  PID_FILE=$2
 
-  # Start test dbus server
+  # Start test dbus server. This will create `/tmp/km-test-server.env`.
   "${TOP_BINDIR}/tests/km-dbus-test-server" &> /dev/null &
   sleep 1
-  source /tmp/km-test-server.env
+
   cat /tmp/km-test-server.env >> "$ENV_FILE"
   cat /tmp/km-test-server.env >> "$PID_FILE"
   echo "${TOP_BINDIR}/tests/stop-test-server" >> "$PID_FILE"
 
-  if [ "$DISPLAY_SERVER" == "wayland" ]; then
+  source /tmp/km-test-server.env
+  echo "# DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"
+}
+
+function _setup_display_server() {
+  local DISPLAY_SERVER ENV_FILE PID_FILE
+  ENV_FILE=$1
+  PID_FILE=$2
+  DISPLAY_SERVER=$3
+
+  if [ "$DISPLAY_SERVER" == "--wayland" ]; then
     if ! can_run_wayland; then
       # support for --headless got added in mutter 40.x
       echo "ERROR: mutter doesn't support running headless. Can't run Wayland tests."
@@ -173,6 +189,12 @@ function setup() {
     export DISPLAY=:32
     echo "export DISPLAY=\"$DISPLAY\"" >> "$ENV_FILE"
   fi
+}
+
+function _setup_schema_and_gsettings() {
+  local ENV_FILE PID_FILE
+  ENV_FILE=$1
+  PID_FILE=$2
 
   # Install schema to temporary directory. This removes the build dependency on the keyman package.
   SCHEMA_DIR=$TEMP_DATA_DIR/glib-2.0/schemas
@@ -186,9 +208,6 @@ function setup() {
   cp "${TOP_SRCDIR}"/../keyman-config/resources/com.keyman.gschema.xml "$SCHEMA_DIR"/
   glib-compile-schemas "$SCHEMA_DIR"
 
-  export LD_LIBRARY_PATH=${COMMON_ARCH_DIR}/src:${LD_LIBRARY_PATH-}
-  echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> "$ENV_FILE"
-
   # Ubuntu 18.04 Bionic doesn't have ibus-memconf, and glib is not compiled with the keyfile
   # backend enabled, so we just use the default backend. Otherwise we use the keyfile
   # store which interferes less when running on a dev machine.
@@ -197,6 +216,12 @@ function setup() {
     echo "export GSETTINGS_BACKEND=\"$GSETTINGS_BACKEND\"" >> "$ENV_FILE"
     IBUS_CONFIG=--config=/usr/libexec/ibus-memconf
   fi
+}
+
+function _setup_ibus() {
+  local ENV_FILE PID_FILE
+  ENV_FILE=$1
+  PID_FILE=$2
 
   #shellcheck disable=SC2086
   ibus-daemon ${ARG_VERBOSE-} --daemonize --panel=disable --address=unix:abstract="${TEMP_DATA_DIR}/test-ibus" ${IBUS_CONFIG-} &> /tmp/ibus-daemon.log
@@ -208,11 +233,42 @@ function setup() {
 
   echo "export IBUS_ADDRESS=\"$IBUS_ADDRESS\"" >> "$ENV_FILE"
 
-  echo "# DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"
   #shellcheck disable=SC2086
   "${TOP_BINDIR}/src/ibus-engine-keyman" --testing ${ARG_VERBOSE-} &> /tmp/ibus-engine-keyman.log &
   echo "kill -9 $! || true" >> "$PID_FILE"
   sleep 1s
+
+}
+function setup() {
+  local DISPLAY_SERVER ENV_FILE PID_FILE TESTBASEDIR TESTDIR
+  DISPLAY_SERVER=$1
+  ENV_FILE=$2
+  PID_FILE=$3
+
+  _setup_init "${ENV_FILE}" "${PID_FILE}"
+
+  TESTBASEDIR=${XDG_DATA_HOME:-$HOME/.local/share}/keyman
+  TESTDIR=${TESTBASEDIR}/test_kmx
+
+  _link_test_keyboards "${TOP_SRCDIR}/../../common/test/keyboards/baseline" "$TESTDIR" "$TESTBASEDIR"
+
+  _generate_kmpjson "$TESTDIR"
+
+  _setup_test_dbus_server "${ENV_FILE}" "${PID_FILE}"
+  _setup_display_server "${ENV_FILE}" "${PID_FILE}" "${DISPLAY_SERVER}"
+  _setup_schema_and_gsettings "${ENV_FILE}" "${PID_FILE}"
+  _setup_ibus "${ENV_FILE}" "${PID_FILE}"
+}
+
+function setup_display_server_only() {
+  local DISPLAY_SERVER ENV_FILE PID_FILE TESTBASEDIR TESTDIR
+  DISPLAY_SERVER=$1
+  ENV_FILE=$2
+  PID_FILE=$3
+
+  _setup_init "${ENV_FILE}" "${PID_FILE}"
+  _setup_display_server "${ENV_FILE}" "${PID_FILE}" "${DISPLAY_SERVER}"
+  _setup_schema_and_gsettings "${ENV_FILE}" "${PID_FILE}"
 }
 
 function cleanup() {
@@ -225,5 +281,13 @@ function cleanup() {
     bash "$PID_FILE" > /dev/null 2>&1
     rm "$PID_FILE"
     echo "# Finished shutdown of processes."
+  fi
+}
+
+function exit_on_package_build() {
+  if [ -v KEYMAN_PKG_BUILD ]; then
+    # Skip setup during package builds - can't run headless and we won't
+    # run the other tests anyway
+    exit 0
   fi
 }

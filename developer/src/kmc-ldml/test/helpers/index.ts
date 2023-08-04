@@ -19,6 +19,7 @@ import DependencySections = KMXPlus.DependencySections;
 import Section = KMXPlus.Section;
 import { ElemCompiler, ListCompiler, StrsCompiler } from '../../src/compiler/empty-compiler.js';
 import { KmnCompiler } from '@keymanapp/kmc-kmn';
+import { VarsCompiler } from '../../src/compiler/vars.js';
 // import Vars = KMXPlus.Vars;
 
 /**
@@ -92,7 +93,7 @@ async function loadDepsFor(sections: DependencySections, parentCompiler: Section
   const parentId = parentCompiler.id;
   if (!dependencies) {
     // default dependencies
-    dependencies = [ StrsCompiler, ListCompiler, ElemCompiler ];
+    dependencies = [ StrsCompiler, ListCompiler, ElemCompiler, VarsCompiler ];
   }
   for (const dep of dependencies) {
     const compiler = new dep(source, callbacks);

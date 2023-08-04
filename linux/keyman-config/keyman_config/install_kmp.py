@@ -238,9 +238,9 @@ class InstallKmp():
         if not language:
             return language
 
-        language = CanonicalLanguageCodeUtils.findBestTag(language, False, True)
+        language = CanonicalLanguageCodeUtils.findBestTag(language, False, False)
         for supportedLanguage in supportedLanguages:
-            tag = CanonicalLanguageCodeUtils.findBestTag(supportedLanguage['id'], False, True)
+            tag = CanonicalLanguageCodeUtils.findBestTag(supportedLanguage['id'], False, False)
             if tag == language:
                 return tag
         return None

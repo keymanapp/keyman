@@ -1,5 +1,5 @@
 name: "Ubuntu packaging"
-run-name: "Ubuntu packaging - ${{ github.ref_name }} by @${{ github.actor }}"
+run-name: "Ubuntu packaging - ${{ github.event.client_payload.branch }} (branch ${{ github.head_ref }}), by @${{ github.actor }}"
 on:
   repository_dispatch:
     types: ['deb-release-packaging:*', 'deb-pr-packaging:*']
@@ -18,6 +18,8 @@ jobs:
       VERSION: ${{ steps.version_step.outputs.VERSION }}
       PRERELEASE_TAG: ${{ steps.prerelease_tag.outputs.PRERELEASE_TAG }}
       GIT_SHA: ${{ steps.set_status.outputs.GIT_SHA }}
+      GHA_TEST_BUILD: ${{ github.event.client_payload.isTestBuild }}
+      GHA_BRANCH: ${{ github.event.client_payload.branch }}
     steps:
     - name: Checkout
       uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c #v3.3.0
@@ -103,7 +105,10 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [focal, jammy, kinetic, lunar]
+        # Currently not building mantic until ibus version on mantic stabilizied
+        # and we can provide a patched version
+        # dist: [focal, jammy, lunar, mantic]
+        dist: [focal, jammy, lunar]
         arch: [amd64]
 
     runs-on: ubuntu-latest

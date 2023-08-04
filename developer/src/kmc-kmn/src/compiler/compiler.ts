@@ -89,12 +89,18 @@ let callbackProcIdentifier = 0;
 const
   callbackPrefix = 'kmnCompilerCallbacks_';
 
+interface MallocAndFree {
+  malloc(sz: number) : number;
+  free(p: number) : null;
+};
+
 let
   Module: any;
 
 export class KmnCompiler implements UnicodeSetParser {
   callbackID: string; // a unique numeric id added to globals with prefixed names
   callbacks: CompilerCallbacks;
+  wasmExports: MallocAndFree;
 
   constructor() {
     this.callbackID = callbackPrefix + callbackProcIdentifier.toString();
@@ -112,7 +118,7 @@ export class KmnCompiler implements UnicodeSetParser {
         return false;
       }
     }
-
+    this.wasmExports = (Module.wasmExports ?? Module.asm);
     return this.verifyInitialized();
   }
 
@@ -427,25 +433,23 @@ export class KmnCompiler implements UnicodeSetParser {
       return null;
     }
 
-    const buf = Module.asm.malloc(rangeCount * 2 * Module.HEAPU32.BYTES_PER_ELEMENT);
     // TODO-LDML: Catch OOM
-    /** return code, if positive: range count */
+    const buf = this.wasmExports.malloc(rangeCount * 2 * Module.HEAPU32.BYTES_PER_ELEMENT);
+    /** If <= 0: return code. If positive: range count */
     const rc = Module.kmcmp_parseUnicodeSet(pattern, buf, rangeCount * 2);
     if (rc >= 0) {
       const ranges = [];
       const startu = (buf / Module.HEAPU32.BYTES_PER_ELEMENT);
       for (let i = 0; i < rc; i++) {
-        const low = Module.HEAPU32[startu + (i * 2) + 0];
-        const high = Module.HEAPU32[startu + (i * 2) + 1];
-        ranges.push([low, high]);
+        const start  = Module.HEAPU32[startu + (i * 2) + 0];
+        const end    = Module.HEAPU32[startu + (i * 2) + 1];
+        ranges.push([start, end]);
       }
-      // TODO-LDML: no free??
-      // Module.asm.free(buf);
+      this.wasmExports.free(buf);
       return new UnicodeSet(pattern, ranges);
     } else {
-      // translate error
-      // TODO-LDML: no free??
-      // Module.asm.free(buf);
+      this.wasmExports.free(buf);
+      // translate error code into callback
       this.callbacks.reportMessage(getUnicodeSetError(rc));
       return null;
     }
@@ -455,6 +459,7 @@ export class KmnCompiler implements UnicodeSetParser {
       /* c8 ignore next 2 */
       return null;
     }
+    // call with rangeCount = 0 to invoke in 'preflight' mode.
     const rc = Module.kmcmp_parseUnicodeSet(pattern, 0, 0);
     if (rc >= 0) {
       return rc;

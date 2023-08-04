@@ -49,7 +49,7 @@ dpkg-source --tar-ignore=*~ --tar-ignore=.git --tar-ignore=.gitattributes \
     --tar-ignore=core/build \
     --tar-ignore=developer --tar-ignore=docs --tar-ignore=ios \
     --tar-ignore=linux/keyman-config/buildtools/build-langtags.py --tar-ignore=__pycache__ \
-    --tar-ignore=linux/help --tar-ignore=linux/Jenkinsfile \
+    --tar-ignore=linux/help \
     --tar-ignore=mac --tar-ignore=node_modules --tar-ignore=oem \
     --tar-ignore=linux/build \
     --tar-ignore=linux/builddebs \
