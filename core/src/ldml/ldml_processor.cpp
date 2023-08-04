@@ -235,51 +235,54 @@ ldml_processor::process_event(
     default:
     // all other VKs
       {
-        // adapted from kmx_processor.cpp
-
-        /** a copy of the current/changed context, for transform use */
-        std::u32string ctxtstr;
-
-        // Construct a context buffer of all the KM_KBP_BT_CHAR items
-        // Extract the context into 'ctxt' for transforms to process
-        if (!!transforms) {
-            // if no transforms, no reason to do this extraction (ctxt will remain empty)
-            (void)context_to_string(state, ctxtstr);
-        }
-
         // Look up the key
         const std::u16string str = keys.lookup(vk, modifier_state);
 
         if (str.empty()) {
-          // not found, so pass the keystroke on to the Engine
+          // no key was found, so pass the keystroke on to the Engine
           state->actions().push_invalidate_context();
           state->actions().push_emit_keystroke();
           break; // ----- commit and exit
         }
-        // found the correct string - push it into the context and actions
-        emit_text(state, str);
-        // Now process transforms
-        // Process the transforms
+
+        /**
+         * a copy of the current/changed context, for transform use.
+         *
+         */
+        std::u32string ctxtstr;
+
         if (!!transforms) {
-          const std::u32string str32 = kmx::u16string_to_u32string(str);
-          // add the newly added char to ctxt
+          (void)context_to_string(state, ctxtstr);
+        } // else, don't bother populating
+
+        // found a string - push it into the context and actions
+        // we convert it here instead of using the emit_text() overload
+        // so that we don't have to reconvert it inside the transform code.
+        const std::u32string str32 = kmx::u16string_to_u32string(str);
+        emit_text(state, str32);
+
+        // Now, process the actual transforms
+        if (!!transforms) {
+          // add the newly added char to ctxtstr
           ctxtstr.append(str32);
 
+          /** the output buffer for transforms */
           std::u32string outputString;
 
-          // check if the context matched, and if so how much (at the end)
+          // apply the transform, get how much matched (at the end)
           const size_t matchedContext = transforms->apply(ctxtstr, outputString);
 
           if (matchedContext > 0) {
-            // Found something.
-            // Now, delete some of the old context
-            /** how much of the context we need to clear */
+            // We have a match.
+
+            /** how many chars of the context we need to clear */
             auto charsToDelete = matchedContext;
-            // for now: ignore ctxtstr, just work with context
-            // TODO-LDML: assert that ctxtstr matches
+
+            /** how many context items need to be removed */
             size_t contextRemoved = 0;
             for (auto c = state->context().rbegin(); charsToDelete > 0 && c != state->context().rend(); c++, contextRemoved++) {
-              km_kbp_usv lastCtx = ctxtstr[ctxtstr.length()-1];
+              /** last char of context */
+              km_kbp_usv lastCtx = ctxtstr.back();
               uint8_t type = c->type;
               assert(type == KM_KBP_BT_CHAR || type == KM_KBP_BT_MARKER);
               if (type == KM_KBP_BT_CHAR) {
@@ -291,21 +294,28 @@ ldml_processor::process_event(
               } else if (type == KM_KBP_BT_MARKER) {
                 // it's a marker, 'worth' 3 uchars
                 assert(charsToDelete >= 3);
-                charsToDelete -= 3;
                 assert(lastCtx == c->marker); // end of list
+                charsToDelete -= 3;
+                // pop off the three-part sentinel string
                 ctxtstr.pop_back();
                 ctxtstr.pop_back();
                 ctxtstr.pop_back();
+                // push a special backsapce to delete the marker
                 state->actions().push_backspace(KM_KBP_BT_MARKER, c->marker);
               }
             }
             // now, pop the right number of context items
             for (size_t i = 0; i < contextRemoved; i++) {
+              // we don't pop during the above loop because the iterator gets confused
               state->context().pop_back();
             }
-            // Now, add in the updated text
+            // Now, add in the updated text. This will convert UC_SENTINEL, etc back to marker actions.
             emit_text(state, outputString);
+            // If we needed it further. we could update ctxtstr here:
+            //    ctxtstr.append(outputString);
+            // ... but it is no longer needed at this point.
           }
+          // else: no match
         }
       }
     }
