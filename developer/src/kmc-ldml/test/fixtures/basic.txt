@@ -257,7 +257,7 @@ block(keys)                         # struct COMP_KMXPLUS_KEYS {
   index(strNull,strHmaqtugha,2)     #   KMXPLUS_STR 'hmaqtugha'
   00 00 00 00                       #   KMXPLUS_STR switch
   0A 00 00 00                       #   KMX_DWORD width*10
-  01 00 00 00 # TODO: index(listNull,indexAe,4)         #   LIST longPress 'a e'
+  02 00 00 00 # TODO: index(listNull,indexAe,4)         #   LIST longPress 'a e'
   00 00 00 00                       #   STR longPressDefault
   00 00 00 00 # TODO: index(listNull,listNull,4)        #   LIST multiTap
   00 00 00 00                       #   flicks 0
@@ -324,21 +324,25 @@ block(layr)                         # struct COMP_KMXPLUS_LAYR {
 block(list)                         # struct COMP_KMXPLUS_LAYR_LIST {
   6c 69 73 74                       #   KMX_DWORD header.ident;   // 0000 Section name - list
   diff(list,endList)                #   KMX_DWORD header.size;    // 0004 Section length
-  02 00 00 00                       #   KMX_DWORD listCount (should be 2)
-  02 00 00 00                       #   KMX_DWORD indexCount (should be 2)
+  03 00 00 00                       #   KMX_DWORD listCount (should be 2)
+  03 00 00 00                       #   KMX_DWORD indexCount (should be 2)
   # list #0 the null list
   block(listNull)
   00 00 00 00 #index(indexNull,indexNull,2)      #   KMX_DWORD list index (0)
   00 00 00 00                       #   KMX_DWORD lists[0].count
-  # list #1 the ae list
+  block(listA)
+  00 00 00 00 # first index
+  01 00 00 00 #count
   block(listAe)
-  00 00 00 00 # index(indexAe,indexNull,2)        #   KMX_DWORD list index (also 0)
+  01 00 00 00 # index(indexAe,indexNull,2)        #   KMX_DWORD list index (also 0)
   02 00 00 00                       #   KMX_DWORD count
   block(endLists)
   # indices
   #block(indexNull)
   # No null index
   # index(strNull,strNull,2)         #   KMXPLUS_STR string index
+  block(indexA)
+  index(strNull,strA,2) # a
   block(indexAe)
   index(strNull,strA,2) #   KMXPLUS_STR a
   index(strNull,strElemBkspFrom2,2) #   KMXPLUS_STR e
@@ -401,6 +405,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strName)       sizeof(strName,2)
   diff(strs,strFromSet)     sizeof(strFromSet,2)
   diff(strs,strUSet)       sizeof(strUSet,2)
+  diff(strs,strAmarker)     sizeof(strAmarker,2)
   diff(strs,strElemTranFrom1) sizeof(strElemTranFrom1,2)
   diff(strs,strElemTranFrom1a) sizeof(strElemTranFrom1a,2)
   diff(strs,strElemTranFrom1b) sizeof(strElemTranFrom1b,2)
@@ -421,6 +426,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strTranTo)          sizeof(strTranTo,2)
   diff(strs,strKeys)       sizeof(strKeys,2)
   diff(strs,strIndicator)  sizeof(strIndicator,2)
+  diff(strs,strSentinel0001)  sizeof(strSentinel0001,2)
 
 
   # String table -- block(x) is used to store the null u16char at end of each string
@@ -433,6 +439,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strName)             54 00 65 00 73 00 74 00 4b 00 62 00 64 00   block(x) 00 00 # 'TestKbd'
   block(strFromSet)          5B 00 5C 00 75 00 31 00 41 00 37 00 35 00 2D 00 5C 00 75 00 31 00 41 00 37 00 39 00 5D 00 block(x) 00 00 # [\u1a75-\u1a79]
   block(strUSet)             5b 00 61 00 62 00 63 00 5d 00 block(x) 00 00               # '[abc]'
+  block(strAmarker)          5C 00 6D 00 7B 00 61 00 7D 00 block(x) 00 00               # '\m{a}'
   block(strElemTranFrom1)    5E 00 block(x) 00 00                                       # '^'
   block(strElemTranFrom1a)   5E 00 61 00 block(x) 00 00                                       # '^a'
   block(strElemTranFrom1b)   5E 00 65 00 block(x) 00 00                                       # '^e'
@@ -458,7 +465,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strKeys)             90 17 b6 17 block(x) 00 00                               # 'ថា'
   # <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
   block(strIndicator)        3d d8 40 de block(x) 00 00                               # '🙀'
-
+  block(strSentinel0001)     FF FF 01 00 block(x) 00 00                   # U+FFFF U+0001
 
 
 
@@ -478,10 +485,15 @@ block(tran)                         # struct COMP_KMXPLUS_TRAN {
   block(tranGroupStart)             # COMP_KMXPLUS_TRAN_GROUP
     # group 0
     00 00 00 00                       # KMX_DWORD type = transform
-    01 00 00 00                       # KMX_DWORD count
+    02 00 00 00                       # KMX_DWORD count
     diff(tranTransformStart,tranTransform0,16) # KMX_DWORD index
 
     # group 1
+    00 00 00 00                       # KMX_DWORD type = transform
+    01 00 00 00                       # KMX_DWORD count
+    diff(tranTransformStart,tranTransform2,16) # KMX_DWORD index
+
+    # group 2
     01 00 00 00                       # KMX_DWORD type = reorder
     01 00 00 00                       # KMX_DWORD count
     diff(tranReorderStart,tranReorder0,8) # KMX_DWORD index
@@ -491,6 +503,18 @@ block(tran)                         # struct COMP_KMXPLUS_TRAN {
     block(tranTransform0)
     index(strNull,strElemTranFrom1a,2)  #    KMXPLUS_STR from;
     index(strNull,strTranTo,2)        #    KMXPLUS_STR to;
+    index(strNull,strNull,2)          # mapFrom
+    index(strNull,strNull,2)          # mapTo
+
+  block(tranTransform1)
+    index(strNull,strA,2)  #    KMXPLUS_STR from; 'a'
+    index(strNull,strSentinel0001,2)        #    KMXPLUS_STR to; \m{a}
+    index(strNull,strNull,2)          # mapFrom
+    index(strNull,strNull,2)          # mapTo
+
+  block(tranTransform2)  # Next group
+    index(strNull,strSentinel0001,2)  #    KMXPLUS_STR from; (\m{a})
+    index(strNull,strNull,2)        #    KMXPLUS_STR to; (none)
     index(strNull,strNull,2)          # mapFrom
     index(strNull,strNull,2)          # mapTo
 
@@ -520,23 +544,29 @@ block(uset)
 block(vars)                         # struct COMP_KMXPLUS_VARS {
   76 61 72 73                       #   KMX_DWORD header.ident;   // 0000 Section name - vars
   diff(vars,varsEnd)                #   KMX_DWORD header.size;    // 0004 Section length
-  00 00 00 00                       #   KMX_DWORD markers - list
+  01 00 00 00                       #   KMX_DWORD markers - list 1 ['a']
   diff(varsBegin,varsEnd,16)        #   KMX_DWORD varCount
 
-  # var 0
   block(varsBegin)
+  # var 0
+  00 00 00 00                       #   KMX_DWORD type = str
+  index(strNull,strA,2)             #   KMXPLUS_STR id  'a'
+  index(strNull,strAmarker,2)       #   KMXPLUS_STR value '\m{a}'
+  00 00 00 00                       #   KMXPLUS_ELEM 
+
+  # var 1
   01 00 00 00                       #   KMX_DWORD type = set
   index(strNull,strVse,2)           #   KMXPLUS_STR id  'vse'
   index(strNull,strSet,2)           #   KMXPLUS_STR value 'a b c'
   01 00 00 00                       #   KMXPLUS_ELEM elem 'a b c' see 'elemSet'
 
-  # var 1
+  # var 2
   00 00 00 00                       #   KMX_DWORD type = string
   index(strNull,strVst,2)           #   KMXPLUS_STR id  'vst'
   index(strNull,strSet2,2)          #   KMXPLUS_STR value 'abc'
   00 00 00 00                       #   KMXPLUS_ELEM elem
 
-  # var 2
+  # var 3
   02 00 00 00                       #   KMX_DWORD type = string
   index(strNull,strVus,2)           #   KMXPLUS_STR id  'vus'
   index(strNull,strUSet,2)          #   KMXPLUS_STR value '[abc]'

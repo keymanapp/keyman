@@ -1238,6 +1238,7 @@ test_xstrlen_ignoreifopt() {
 
 void
 test_utf32() {
+  std::cout << "== " << __FUNCTION__ << std::endl;
   const KMX_DWORD u295 =     0x0127; // ħ
 
   assert(Uni_IsBMP(u295));
@@ -1270,6 +1271,7 @@ test_utf32() {
 
 void
 test_u16string_to_u32string() {
+  std::cout << "== " << __FUNCTION__ << std::endl;
   // normal cases
   {
     const std::u32string str = u16string_to_u32string(u"");
@@ -1327,6 +1329,56 @@ test_u16string_to_u32string() {
   }
 }
 
+void test_is_valid() {
+  std::cout << "== " << __FUNCTION__ << std::endl;
+  // valid
+  assert_equal(Uni_IsValid(0x0000), true);
+  assert_equal(Uni_IsValid(0x0127), true);
+  assert_equal(Uni_IsValid(U'🙀'), true);
+
+  // invalid
+  assert_equal(Uni_IsValid(0xDECAFBAD), false); // out of range
+  assert_equal(Uni_IsValid(0x566D4128), false);
+  assert_equal(Uni_IsValid(0xFFFF), false); // nonchar
+  assert_equal(Uni_IsValid(0xFFFE), false); // nonchar
+  assert_equal(Uni_IsValid(0x10FFFF), false); // nonchar
+  assert_equal(Uni_IsValid(0x10FFFE), false); // nonchar
+  assert_equal(Uni_IsValid(0x01FFFF), false); // nonchar
+  assert_equal(Uni_IsValid(0x01FFFE), false); // nonchar
+  assert_equal(Uni_IsValid(0x02FFFF), false); // nonchar
+  assert_equal(Uni_IsValid(0x02FFFE), false); // nonchar
+  assert_equal(Uni_IsValid(0xFDD1), false); // nonchar
+  assert_equal(Uni_IsValid(0xFDD0), false); // nonchar
+
+
+ // positive range test
+  assert_equal(Uni_IsValid(0x100000, 0x10FFFD), true);
+  assert_equal(Uni_IsValid(0x10, 0x20), true);
+  assert_equal(Uni_IsValid(0x100000, 0x10FFFD), true);
+
+  // all valid ranges in BMP
+  assert_equal(Uni_IsValid(0x0000, 0xD7FF), true);
+  assert_equal(Uni_IsValid(0xD800, 0xDFFF), false);
+  assert_equal(Uni_IsValid(0xE000, 0xFDCF), true);
+  assert_equal(Uni_IsValid(0xFDD0, 0xFDEF), false);
+  assert_equal(Uni_IsValid(0xFDF0, 0xFDFF), true);
+  assert_equal(Uni_IsValid(0xFDF0, 0xFFFD), true);
+
+  // negative range test
+  assert_equal(Uni_IsValid(0, 0x10FFFF), false);         // ends with nonchar
+  assert_equal(Uni_IsValid(0, 0x10FFFD), false);         // contains lots o' nonchars
+  assert_equal(Uni_IsValid(0x20, 0x10), false);          // swapped
+  assert_equal(Uni_IsValid(0xFDEF, 0xFDF0), false);      // just outside range
+  assert_equal(Uni_IsValid(0x0000, 0x010000), false);    // crosses noncharacter plane boundary and other stuff
+  assert_equal(Uni_IsValid(0x010000, 0x020000), false);  // crosses noncharacter plane boundary
+  assert_equal(Uni_IsValid(0x0000, 0xFFFF), false);      // crosses other BMP prohibited and plane boundary
+  assert_equal(Uni_IsValid(0x0000, 0xFFFD), false);      // crosses other BMP prohibited
+  assert_equal(Uni_IsValid(0x0000, 0xE000), false);      // crosses surrogate space
+  assert_equal(Uni_IsValid(0x0000, 0x20FFFF), false);      // out of bounds
+  assert_equal(Uni_IsValid(0x10FFFD, 0x20FFFF), false);      // out of bounds
+
+ }
+
 constexpr const auto help_str = u"\
 test_kmx_xstring [--color]\n\
 \n\
@@ -1349,6 +1401,7 @@ int main(int argc, char *argv []) {
   test_xstrlen_ignoreifopt();
   test_utf32();
   test_u16string_to_u32string();
+  test_is_valid();
 
   return 0;
 }

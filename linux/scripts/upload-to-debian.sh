@@ -105,7 +105,7 @@ git add debian/changelog
 git commit -m "chore(linux): Update debian changelog"
 if [ -n "$PUSH" ]; then
     $NOOP git push --force-with-lease origin chore/linux/changelog
-    $NOOP gh pr create --draft --base "$stable_branch" --title "chore(linux): Update debian changelog" --body "@keymanapp-test-bot skip"
+    $NOOP gh pr create --draft --base "${stable_branch#origin/}" --title "chore(linux): Update debian changelog" --body "@keymanapp-test-bot skip"
 fi
 
 if $ISBETA; then
@@ -118,7 +118,7 @@ git checkout -B chore/linux/cherry-pick/changelog ${CLBRANCH}
 git cherry-pick -x chore/linux/changelog
 if [ -n "$PUSH" ]; then
     $NOOP git push --force-with-lease origin chore/linux/cherry-pick/changelog
-    $NOOP gh pr create --draft --base ${CLBRANCH} --title "chore(linux): Update debian changelog 🍒" --body "@keymanapp-test-bot skip"
+    $NOOP gh pr create --draft --base ${CLBRANCH#origin/} --title "chore(linux): Update debian changelog 🍒" --body "@keymanapp-test-bot skip"
 fi
 
 builder_heading "Finishing"

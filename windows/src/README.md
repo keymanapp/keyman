@@ -59,13 +59,13 @@ will need to uninstall and reinstall.
 
 ## Certificates
 
-In order to create a release build, you will need a code signing certiicate.
+In order to create a release build, you will need a code signing certificate.
 You can use your own certificate, or you can use test certificates which are not
 globally trusted. The environment variables `SC_PFX_SHA1` and `SC_PFX_SHA256`
 can be set to custom certificate paths.
 
 The Keyman repo no longer includes test certificates.  To build your own, run
-`nmake test-certificates` from **common/windows/delphi/tools/certificates** to
+`nmake test-certificate` from **common/windows/delphi/tools/certificates** to
 build and install your own local root CA "**KeymanTestCA**" certificates. If you
 specify a password for the certificate, you'll need to set that in the
 environment variable `SC_PWD`.
