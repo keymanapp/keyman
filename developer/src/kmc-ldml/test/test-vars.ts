@@ -191,8 +191,8 @@ describe('vars', function () {
   describe('should match some marker constants', () => {
     // neither of these live here, but, common/web/types does not import ldml-keyboard-constants otherwise.
 
-    assert.equal(constants.marker_sentinel, KMX.KMXFile.UC_SENTINEL);
-    assert.equal(constants.marker_code_deadkey, KMX.KMXFile.CODE_DEADKEY);
+    assert.equal(constants.uc_sentinel, KMX.KMXFile.UC_SENTINEL);
+    assert.equal(constants.marker_code, KMX.KMXFile.CODE_DEADKEY);
   });
   describe('markers', function () {
     this.slow(500); // 0.5 sec -- json schema validation takes a while

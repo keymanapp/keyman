@@ -35,6 +35,7 @@ if(MINIFY) {
     sourcesContent: DEBUG,
     minify: true,
     keepNames: true,
+    target: 'es5',
     outfile: `build/lib/worker-main.polyfilled.min.js`
   });
 }

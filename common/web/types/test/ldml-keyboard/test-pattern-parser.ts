@@ -105,8 +105,8 @@ describe('Test of Pattern Parsers', () => {
       );
     });
     it('should match some marker constants', () => {
-      assert.equal(constants.marker_sentinel, KMXFile.UC_SENTINEL);
-      assert.equal(constants.marker_code_deadkey, KMXFile.CODE_DEADKEY);
+      assert.equal(constants.uc_sentinel, KMXFile.UC_SENTINEL);
+      assert.equal(constants.marker_code, KMXFile.CODE_DEADKEY);
     });
   });
   describe('should test VariableParser', () => {
