@@ -1,5 +1,5 @@
 import {
-  SimpleGestureSource,
+  GestureSource,
   type InputSample
 } from "@keymanapp/gesture-recognizer";
 
@@ -194,7 +194,7 @@ export class InputSequenceSimulator<HoveredItemType> {
 
       for(let index=0; index < inputs.length; index++) {
         // TODO:  does not iterate over all touchpoints.  Not that we can have more than one at present...
-        const touchpoint = SimpleGestureSource.deserialize(inputs[index], index);
+        const touchpoint = GestureSource.deserialize(inputs[index], index);
         const indexInSequence = sequenceProgress[index];
 
         if(indexInSequence == Number.MAX_VALUE) {
@@ -207,7 +207,7 @@ export class InputSequenceSimulator<HoveredItemType> {
         }
       }
 
-      const touchpoint = SimpleGestureSource.deserialize(inputs[selectedSequence], selectedSequence);
+      const touchpoint = GestureSource.deserialize(inputs[selectedSequence], selectedSequence);
       const indexInSequence = sequenceProgress[selectedSequence];
       let state: string = "move";
 

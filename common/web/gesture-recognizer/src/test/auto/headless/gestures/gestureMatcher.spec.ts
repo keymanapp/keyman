@@ -5,7 +5,7 @@ import * as PromiseStatusModule from 'promise-status-async';
 const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 import { assertingPromiseStatus as promiseStatus } from '../../../resources/assertingPromiseStatus.js';
 
-import { InputSample, SimpleGestureSource, gestures } from '@keymanapp/gesture-recognizer';
+import { InputSample, GestureSource, gestures } from '@keymanapp/gesture-recognizer';
 
 import { TouchpathTurtle } from '#tools';
 import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
@@ -92,7 +92,7 @@ function simulateComplexGestureSource<Type>(
   fakeClock: sinon.SinonFakeTimers,
   modelSpec: gestures.specs.GestureModel<Type>
   ): {
-    sources: SimpleGestureSource<Type>[],
+    sources: GestureSource<Type>[],
     modelMatcherPromise: Promise<gestures.matchers.GestureMatcher<Type>>,
     executor: () => Promise<void>
   } {
@@ -108,7 +108,7 @@ function simulateComplexGestureSource<Type>(
 
   let allPromises: Promise<void>[] = [];
 
-  let contacts: SimpleGestureSource<Type>[] = [];
+  let contacts: GestureSource<Type>[] = [];
   let modelMatcher: gestures.matchers.GestureMatcher<Type>;
   let modelMatcherPromise = new ManagedPromise<gestures.matchers.GestureMatcher<Type>>();
 
@@ -121,7 +121,7 @@ function simulateComplexGestureSource<Type>(
   // will gain their corresponding update in a Promise created later, thus coming second.
   // (If it came first, that update would be desynced with the initial sample for the new path.)
   for(let i = 0; i < sequences.length; i++) {
-    const simpleSource = new SimpleGestureSource<Type>(i, true);
+    const simpleSource = new GestureSource<Type>(i, true);
     contacts.push(simpleSource);
     let entry = sequences[i];
 
@@ -1036,7 +1036,7 @@ describe("GestureMatcher", function() {
       sources[0].path.on('invalidated', () => secondMatcher.update());
 
       timedPromise(50).then(() => {
-        const secondContact = new SimpleGestureSource<string>(5, true);
+        const secondContact = new GestureSource<string>(5, true);
         sources.push(secondContact);
         secondMatcher.addContact(secondContact);
         secondContact.update({

@@ -56,4 +56,9 @@ In case someone has to trace this history on things:
 - `TrackedPoint` is now `SimpleGestureSource`.
 - `TrackedPath`  is now `GesturePath`.
 
+## From refactor/web/gesture-source-paradigm + its followup
 
+- `ComplexGestureSource` is now fully decommissioned; it made assumptions that were overly complicating
+gesture state-machine / model-matching code.
+
+- Accordingly, `SimpleGestureSource` is now simply just `GestureSource`.  Yay on that end!

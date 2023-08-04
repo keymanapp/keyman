@@ -2,9 +2,9 @@ import { InputSample } from "./inputSample.js";
 import { SerializedGesturePath, GesturePath } from "./gesturePath.js";
 
 /**
- * Documents the expected typing of serialized versions of the `SimpleGestureSource` class.
+ * Documents the expected typing of serialized versions of the `GestureSource` class.
  */
-export type SerializedSimpleGestureSource<HoveredItemType = any> = {
+export type SerializedGestureSource<HoveredItemType = any> = {
   isFromTouch: boolean;
   path: SerializedGesturePath<HoveredItemType>;
   // identifier is not included b/c it's only needed during live processing.
@@ -29,7 +29,7 @@ export type SerializedSimpleGestureSource<HoveredItemType = any> = {
  * gestures expect multiple, hence "simple".
  *
  */
-export class SimpleGestureSource<HoveredItemType> {
+export class GestureSource<HoveredItemType> {
   /**
    * Indicates whether or not this tracked point's original source is a DOM `Touch`.
    */
@@ -48,14 +48,14 @@ export class SimpleGestureSource<HoveredItemType> {
   private static _jsonIdSeed: -1;
 
   /**
-   * Tracks the coordinates and timestamps of each update for the lifetime of this `SimpleGestureSource`.
+   * Tracks the coordinates and timestamps of each update for the lifetime of this `GestureSource`.
    */
   public get path(): GesturePath<HoveredItemType> {
     return this._path;
   }
 
   /**
-   * Constructs a new SimpleGestureSource instance for tracking updates to an active input point over time.
+   * Constructs a new GestureSource instance for tracking updates to an active input point over time.
    * @param identifier     The system identifier for the input point's events.
    * @param initialHoveredItem  The initiating event's original target element
    * @param isFromTouch    `true` if sourced from a `TouchEvent`; `false` otherwise.
@@ -67,16 +67,16 @@ export class SimpleGestureSource<HoveredItemType> {
   }
 
   /**
-   * Deserializes a SimpleGestureSource instance from its serialized-JSON form.
+   * Deserializes a GestureSource instance from its serialized-JSON form.
    * @param jsonObj  The JSON representation to deserialize.
    * @param identifier The unique identifier to assign to this instance.
    */
-  public static deserialize(jsonObj: SerializedSimpleGestureSource, identifier: number) {
+  public static deserialize(jsonObj: SerializedGestureSource, identifier: number) {
     const id = identifier !== undefined ? identifier : this._jsonIdSeed++;
     const isFromTouch = jsonObj.isFromTouch;
     const path = GesturePath.deserialize(jsonObj.path);
 
-    const instance = new SimpleGestureSource(id, isFromTouch);
+    const instance = new GestureSource(id, isFromTouch);
     instance._path = path;
     return instance;
   }
@@ -87,21 +87,21 @@ export class SimpleGestureSource<HoveredItemType> {
   }
 
   /**
-   * The first path sample (coordinate) under consideration for this `SimpleGestureSource`.
+   * The first path sample (coordinate) under consideration for this `GestureSource`.
    */
   public get baseItem(): HoveredItemType {
     return this._baseItem;
   }
 
   /**
-   * The most recent path sample (coordinate) under consideration for this `SimpleGestureSource`.
+   * The most recent path sample (coordinate) under consideration for this `GestureSource`.
    */
   public get currentSample(): InputSample<HoveredItemType> {
     return this.path.coords[this.path.coords.length-1];
   }
 
   /**
-   * Creates a 'subview' of the current SimpleGestureSource.  It will be updated as the underlying
+   * Creates a 'subview' of the current GestureSource.  It will be updated as the underlying
    * source continues to receive updates until disconnected.
    *
    * @param startAtEnd If `true`, the 'subview' will appear to start at the most recently-observed
@@ -112,7 +112,7 @@ export class SimpleGestureSource<HoveredItemType> {
    * @returns
    */
   public constructSubview(startAtEnd: boolean, preserveBaseItem: boolean) {
-    return new SimpleGestureSourceSubview(this, startAtEnd, preserveBaseItem);
+    return new GestureSourceSubview(this, startAtEnd, preserveBaseItem);
   }
 
   /**
@@ -146,8 +146,8 @@ export class SimpleGestureSource<HoveredItemType> {
    * Creates a serialization-friendly version of this instance for use by
    * `JSON.stringify`.
    */
-  toJSON(): SerializedSimpleGestureSource {
-    let jsonClone: SerializedSimpleGestureSource = {
+  toJSON(): SerializedGestureSource {
+    let jsonClone: SerializedGestureSource = {
       isFromTouch: this.isFromTouch,
       path: this.path.toJSON()
     }
@@ -156,21 +156,21 @@ export class SimpleGestureSource<HoveredItemType> {
   }
 }
 
-export class SimpleGestureSourceSubview<HoveredItemType> extends SimpleGestureSource<HoveredItemType> {
-  private _baseSource: SimpleGestureSource<HoveredItemType>
+export class GestureSourceSubview<HoveredItemType> extends GestureSource<HoveredItemType> {
+  private _baseSource: GestureSource<HoveredItemType>
   private subviewDisconnector: () => void;
 
   /**
-   * Constructs a new "Subview" into an existing SimpleGestureSource instance.  Future updates of the base
-   *  SimpleGestureSource will automatically be included until this instance's `disconnect` method is called.
+   * Constructs a new "Subview" into an existing GestureSource instance.  Future updates of the base
+   *  GestureSource will automatically be included until this instance's `disconnect` method is called.
    * @param identifier     The system identifier for the input point's events.
    * @param initialHoveredItem  The initiating event's original target element
    * @param isFromTouch    `true` if sourced from a `TouchEvent`; `false` otherwise.
    */
-  constructor(source: SimpleGestureSource<HoveredItemType>, startAtEnd: boolean, preserveBaseItem: boolean) {
+  constructor(source: GestureSource<HoveredItemType>, startAtEnd: boolean, preserveBaseItem: boolean) {
     super(source.rawIdentifier, source.isFromTouch);
 
-    const baseSource = this._baseSource = source instanceof SimpleGestureSourceSubview ? source._baseSource : source;
+    const baseSource = this._baseSource = source instanceof GestureSourceSubview ? source._baseSource : source;
 
     // Note: we don't particularly need subviews to track the actual coords aside from
     // tracking related stats data.  But... we don't have an "off-switch" for that yet.
@@ -214,7 +214,7 @@ export class SimpleGestureSourceSubview<HoveredItemType> extends SimpleGestureSo
   }
 
   /**
-   * The original SimpleGestureSource this subview is based upon.
+   * The original GestureSource this subview is based upon.
    */
   public get baseSource() {
     return this._baseSource;
@@ -233,7 +233,7 @@ export class SimpleGestureSourceSubview<HoveredItemType> extends SimpleGestureSo
 
   /**
    * Like `disconnect`, but this will also terminate the baseSource and prevent further
-   * updates for the true, original `SimpleGestureSource` instance.  If the gesture-model
+   * updates for the true, original `GestureSource` instance.  If the gesture-model
    * and gesture-matching algorithm has determined this should be called, full path-update
    * termination is correct, even if called against a subview into the instance.
    */
