@@ -350,33 +350,24 @@ ldml_processor::emit_text(km_kbp_state *state, const std::u16string &str) {
 
 void
 ldml_processor::emit_text(km_kbp_state *state, const std::u32string &str) {
-  // quick check, to see if there are any sentinels about
-  const size_t len = str.length();
-  size_t first = 0;
-  size_t prev = 0;
-  while (first < len && (first = str.find_first_of(LDML_UC_SENTINEL, first)) != std::string::npos) {
-    // emit prior prefix
-    for (size_t n = prev; n < first; n++) {
-      emit_text(state, str[n]);
+  for (auto it = str.begin(); it < str.end(); it++) {
+    const auto ch = *it;
+    // If we are at the start of a sequence:
+    if (ch == LDML_UC_SENTINEL) {
+      it++; // consume LDML_UC_SENTINEL
+      // TODO-LDML: Might assert if a malformed sequence is included- "should not happen"?
+      assert(it < str.end());
+      // verify that the next char is LDML_MARKER_CODE
+      assert(*it == LDML_MARKER_CODE);
+      it++; // consume LDML_MARKER_CODE
+      assert(it < str.end());
+      const auto marker_no = *it;
+      assert(marker_no >= LDML_MARKER_MIN_INDEX);
+      assert(marker_no <= LDML_MARKER_ANY_INDEX);
+      emit_marker(state, marker_no);
+    } else {
+      emit_text(state, ch);
     }
-
-    // there's a sentinel to deal with
-    assert((first + 3) <= len); // else we'll run off the end
-
-    assert(str[first++] == LDML_UC_SENTINEL);
-    assert(str[first++] == LDML_MARKER_CODE);
-    const auto marker_no = str[first++];
-
-    assert(marker_no >= LDML_MARKER_MIN_INDEX);
-    assert(marker_no <= LDML_MARKER_ANY_INDEX);
-
-    emit_marker(state, marker_no);
-
-    prev = first;
-  }
-  // emit the rest of the string (common case is that prev=0, entire string)
-  for (size_t n = prev; n < len; n++) {
-    emit_text(state, str[n]);
   }
 }
 
@@ -409,7 +400,7 @@ ldml_processor::context_to_string(km_kbp_state *state, std::u32string &str) {
         break;
       }
     }
-    return ctxlen; // ran off the end.
+    return ctxlen; // consumed the entire context buffer.
 }
 
 void ldml_processor::prepend_marker(std::u32string &str, KMX_DWORD marker) {
