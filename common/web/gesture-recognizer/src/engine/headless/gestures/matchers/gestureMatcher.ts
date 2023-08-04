@@ -35,7 +35,7 @@ export class GestureMatcher<Type> {
     /* c8 ignore next 5 */
     if(!model || !sourceObj) {
       throw new Error("Construction of GestureMatcher requires a gesture-model spec and a source for related contact points.");
-    } else if(!model.sustainTimer && !(sourceObj)) {
+    } else if(!model.sustainTimer && !sourceObj) {
       throw new Error("If the provided gesture-model spec lacks a sustain timer, there must be an active contact point.");
     }
 

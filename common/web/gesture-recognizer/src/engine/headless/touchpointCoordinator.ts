@@ -34,7 +34,7 @@ export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMa
     this.inputEngines.push(engine);
   }
 
-  private readonly onNewTrackedPath = async (touchpoint: SimpleGestureSource<HoveredItemType>) => {
+  private readonly onNewTrackedPath = (touchpoint: SimpleGestureSource<HoveredItemType>) => {
     this.addSimpleSourceHooks(touchpoint);
 
     // ... stuff
