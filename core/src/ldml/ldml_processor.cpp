@@ -263,7 +263,7 @@ ldml_processor::process_event(
         if (!!transforms) {
           const std::u32string str32 = kmx::u16string_to_u32string(str);
           // add the newly added char to ctxt
-          ctxtstr.insert(0, str32); // Note: may contain markers
+          ctxtstr.append(str32);
 
           std::u32string outputString;
 
@@ -279,7 +279,7 @@ ldml_processor::process_event(
             // TODO-LDML: assert that ctxtstr matches
             size_t contextRemoved = 0;
             for (auto c = state->context().rbegin(); charsToDelete > 0 && c != state->context().rend(); c++, contextRemoved++) {
-              km_kbp_usv lastCtx = *(ctxtstr.end());
+              km_kbp_usv lastCtx = ctxtstr[ctxtstr.length()-1];
               uint8_t type = c->type;
               assert(type == KM_KBP_BT_CHAR || type == KM_KBP_BT_MARKER);
               if (type == KM_KBP_BT_CHAR) {
@@ -298,7 +298,9 @@ ldml_processor::process_event(
                 ctxtstr.pop_back();
                 state->actions().push_backspace(KM_KBP_BT_MARKER, c->marker);
               }
-              // finally, pop the context
+            }
+            // now, pop the right number of context items
+            for (size_t i = 0; i < contextRemoved; i++) {
               state->context().pop_back();
             }
             // Now, add in the updated text
