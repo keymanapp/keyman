@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.154 alpha 2023-08-04
+
+* chore(common): Update crowdin GHA to trigger daily (#9410)
+* fix(web): forgot to target es5 when minifying polyfilled worker (#9409)
+* chore(common): Update history.md with 16.0 stable entries (#9419)
+
 ## 17.0.153 alpha 2023-08-03
 
 * docs(windows): Update OS requirement to Windows 10 (#9381)
