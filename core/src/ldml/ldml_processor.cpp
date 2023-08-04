@@ -354,7 +354,7 @@ ldml_processor::emit_text(km_kbp_state *state, const std::u32string &str) {
   const size_t len = str.length();
   size_t first = 0;
   size_t prev = 0;
-  while (first < len && (first = str.find_first_of(UC_SENTINEL, first)) != std::string::npos) {
+  while (first < len && (first = str.find_first_of(LDML_UC_SENTINEL, first)) != std::string::npos) {
     // emit prior prefix
     for (size_t n = prev; n < first; n++) {
       emit_text(state, str[n]);
@@ -363,8 +363,8 @@ ldml_processor::emit_text(km_kbp_state *state, const std::u32string &str) {
     // there's a sentinel to deal with
     assert((first + 3) <= len); // else we'll run off the end
 
-    assert(str[first++] == UC_SENTINEL);
-    assert(str[first++] == CODE_DEADKEY);
+    assert(str[first++] == LDML_UC_SENTINEL);
+    assert(str[first++] == LDML_MARKER_CODE);
     const auto marker_no = str[first++];
 
     assert(marker_no >= LDML_MARKER_MIN_INDEX);
@@ -382,7 +382,7 @@ ldml_processor::emit_text(km_kbp_state *state, const std::u32string &str) {
 
 void
 ldml_processor::emit_text(km_kbp_state *state, km_kbp_usv ch) {
-  assert(ch != UC_SENTINEL);
+  assert(ch != LDML_UC_SENTINEL);
   state->context().push_character(ch);
   state->actions().push_character(ch);
 }
@@ -414,8 +414,8 @@ ldml_processor::context_to_string(km_kbp_state *state, std::u32string &str) {
 
 void ldml_processor::prepend_marker(std::u32string &str, KMX_DWORD marker) {
   km_kbp_usv triple[] = {
-    UC_SENTINEL,
-    CODE_DEADKEY,
+    LDML_UC_SENTINEL,
+    LDML_MARKER_CODE,
     marker
   };
   str.insert(0, triple, 3);
