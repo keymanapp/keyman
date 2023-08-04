@@ -211,6 +211,12 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     const originalTarget = this.activeTarget; // may differ, depending on focus state.
 
     if(target == originalTarget) {
+      // A focus state may have .currentTarget as null at this stage; if the func
+      // is being called with a non-null parameter, we want this SET. #9404
+      if(originalTarget) {
+        this.currentTarget = originalTarget;
+      }
+
       /**
        * If it's already active, we should cancel early.
        *

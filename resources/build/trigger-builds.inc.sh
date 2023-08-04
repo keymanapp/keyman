@@ -17,11 +17,7 @@ function triggerBuilds() {
     eval builds='(${'bc_${bcbase}_${platform}'[@]})'
     for build in "${builds[@]}"; do
       if [[ $build == "" ]]; then continue; fi
-      if [ "${build:(-8)}" == "_Jenkins" ]; then
-        local job=${build%_Jenkins}
-        echo Triggering Jenkins build "$job" "$base" "true"
-        triggerJenkinsBuild "$job" "$base" "true"
-      elif [ "${build:(-7)}" == "_GitHub" ]; then
+      if [ "${build:(-7)}" == "_GitHub" ]; then
         local job=${build%_GitHub}
         echo Triggering GitHub action build "$job" "$base"
         triggerGitHubActionsBuild false "$job" "$base"
@@ -67,62 +63,6 @@ function triggerTeamCityBuild() {
     -H "Origin: $TEAMCITY_SERVER" \
     $TEAMCITY_SERVER/app/rest/buildQueue \
     -d "$command"
-}
-
-function triggerJenkinsBuild() {
-  local JENKINS_JOB="$1"
-  local JENKINS_BRANCH="${2:-master}"
-
-  local JENKINS_SERVER=https://jenkins.lsdev.sil.org
-
-  local FORCE=""
-  if [ "${3:-false}" == "true" ]; then
-    FORCE=", \"force\": true"
-  fi
-
-  local TAG=""
-  # This will only be true if we created and pushed a tag
-  if [ "${action:-""}" == "commit" ]; then
-    TAG=", \"tag\": \"$VERSION_GIT_TAG\", \"tag2\": \"$VERSION_GIT_TAG\""
-  fi
-
-  if [[ $JENKINS_BRANCH != stable-* ]] && [[ $JENKINS_BRANCH =~ [0-9]+ ]]; then
-    JENKINS_BRANCH="PR-${JENKINS_BRANCH}"
-  fi
-
-  local OUTPUT=$(curl --silent --write-out '\n' \
-    -X POST \
-    --header "token: $JENKINS_TOKEN" \
-    --header "Content-Type: application/json" \
-    $JENKINS_SERVER/generic-webhook-trigger/invoke \
-    --data "{ \"project\": \"$JENKINS_JOB/$JENKINS_BRANCH\", \"branch\": \"$JENKINS_BRANCH\" $TAG $FORCE }")
-
-  if echo "$OUTPUT" | grep -q "\"triggered\":true"; then
-    echo -n "     job triggered: "
-  else
-    echo "##teamcity[buildProblem description='Triggering Jenkins build failed']"
-    echo -n "     triggering failed: "
-  fi
-
-  # Strip {"jobs":{ from the beginning of OUTPUT
-  OUTPUT=${OUTPUT#\{\"jobs\":\{}
-  # Split json string to lines with one job each
-  local jobs count
-  count=0
-  IFS='|' jobs=(${OUTPUT//\},\"pipeline/\},|\"pipeline})
-  # Find job that actually got triggered (or that we should have triggered)
-  for line in "${jobs[@]}"; do
-    if [[ $line == \"$JENKINS_JOB/$JENKINS_BRANCH* ]]; then
-      echo "$line"
-      count=$((++count))
-    fi
-  done
-  if [[ $count < 1 ]]; then
-    # DEBUG
-    echo -n $OUTPUT
-
-    echo
-  fi
 }
 
 function triggerGitHubActionsBuild() {

@@ -2,26 +2,16 @@
 title: What operating systems does Keyman support?
 ---
 
-Keyman fully supports 32-bit *and* 64-bit versions of the following
+Keyman for Windows fully supports the following versions of the
 Windows operating systems:
 
--   Windows Server 2008
-
--   Windows 7
-
--   Windows 8
-
--   Windows 8.1
-
--   Windows 10
+-   Windows 10 (32-bit and 64-bit editions)
 
 -   Windows 11
 
--   Windows Server 2012 and 2012 R2
+-   Windows Server 2019 and 2022
 
-**Note:**
-Keyman works slightly differently in different versions of Windows.
-Older versions of Windows have more language limitations and need extra
-configuration. Windows Vista and later versions of Windows include added
-security measures and some configuration actions will require you to
-confirm security prompts.
+Keyman also runs on Android, iOS, Linux, macOS, and in websites. Visit https://keyman.com for more downloads.
+
+* **Note:** Keyman does not yet support Windows Insider Preview ARM64. 
+* Keyman works slightly differently in different versions of Windows. 

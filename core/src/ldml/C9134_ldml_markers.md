@@ -27,7 +27,6 @@ Markers can appear in both 'emitting' and 'matching-only' areas:
 #### Match only
 
 - `transform from=` to match markers
-- `transform after=` to match markers
 - `display to=` for matching keys which contain markers
 
 ## Theory / Encoding
