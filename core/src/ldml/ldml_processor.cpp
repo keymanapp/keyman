@@ -290,8 +290,8 @@ ldml_processor::process_event(
                 state->actions().push_backspace(KM_KBP_BT_CHAR, lastCtx);  // Cause prior char to be removed
               } else if (type == KM_KBP_BT_MARKER) {
                 // it's a marker, 'worth' 3 uchars
+                assert(charsToDelete >= 3);
                 charsToDelete -= 3;
-                assert(charsToDelete >= 0);
                 assert(lastCtx == c->marker); // end of list
                 ctxtstr.pop_back();
                 ctxtstr.pop_back();
