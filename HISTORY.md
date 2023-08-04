@@ -906,6 +906,51 @@
 * chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
 
+## 16.0.141 stable 2023-07-25
+
+* chore(mac): fix corrupt installer (#9332)
+
+## 16.0.140 stable 2023-07-21
+
+* chore(linux): Update debian changelog (#8451)
+* chore(linux): Prevent building on s390x (#8476)
+* fix(linux): Display error message for corrupt .kmp file (#8480)
+* chore(linux): Run and ignore autopkgtests on s390x (#8491)
+* chore(linux): Revert "Run and ignore autopkgtests on s390x" (#8505)
+* chore(ios): Xcode 14 upgrade (#8487)
+* fix(developer): package editor no longer loses RTL flag for LMs (#8607)
+* chore(common): use mac /usr/bin/stat rather than homebrew version (#8925)
+* chore(ios): replace fv cert (#8923)
+* fix(core): Fix compilation if hotdoc is installed :cherries: (#8929)
+* chore(linux): Move some files to keyman-config :cherries: (#8930)
+* fix(core): Fix compiling with GCC 13 (#8932)
+
+## 16.0.139 stable 2023-03-16
+
+* chore: Fail TC build if triggering Jenkins build fails (#8141)
+* chore(linux): Fix lintian warnings (#8153)
+* chore(linux): Update debian changelog (#8155)
+* chore(ios): update certificate (#8177)
+* cherrypick(windows): Fix Portuguese UI language name (#8190)
+* fix(linux): Fix autopkgtests (#8180)
+* chore(linux): Update changelog from Debian (#8191)
+* cherrypick(common): Cleanup Kannada locale (#8189)
+* fix(windows): add remove lang id uses correct kbd (#8195)
+* fix(linux): Fix autopkgtests (#8200)
+* chore(linux): Exclude autopkg tests on s390x (#8217)
+* chore(common): Update Fula strings for Sprint A17S6 (#8246)
+* chore(windows): Remove old Kannada setup strings (#8258)
+* fix(linux): Fix debian postinst script (#8295)
+* fix(developer): lm compiler handle missing line no in errors (#8445)
+
+## 16.0.138 stable 2023-02-01
+
+* chore: add new developer build trigger (#8139)
+
+## 16.0.137 stable 2023-02-01
+
+* chore(common): Release 16.0
+
 ## 16.0.136 beta 2023-01-31
 
 * chore(common): Update crowdin strings for Shuwa (Latin) (#8097)
