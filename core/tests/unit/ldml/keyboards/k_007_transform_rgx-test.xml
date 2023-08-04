@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE keyboardTest SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest.dtd">
+<keyboardTest conformsTo="techpreview">
+  <info keyboard="k_007_transform_rgx.xml" author="Team Keyboard" name="marker" />
+  <tests name="regex-tests">
+    <test name="regex-test-basic">
+      <startContext to="" />
+      <keystroke key="a" />
+      <keystroke key="grave" />
+      <keystroke key="e" />
+      <check result="e`a" />
+    </test>
+  </tests>
+</keyboardTest>
