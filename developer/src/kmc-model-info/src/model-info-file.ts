@@ -18,7 +18,7 @@ export interface ModelInfoFile {
   minKeymanVersion?: string;
   helpLink?: string;
   sourcePath?: string;
-  related?: ModelInfoFileRelated[];
+  related?: {[id:string]:ModelInfoFileRelated};
 }
 
 export interface ModelInfoFileLink {

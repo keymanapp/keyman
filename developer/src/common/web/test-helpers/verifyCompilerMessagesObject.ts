@@ -1,4 +1,4 @@
-import { CompilerErrorSeverity, compilerErrorSeverityName } from '@keymanapp/common-types';
+import { CompilerError, CompilerErrorMask } from '@keymanapp/common-types';
 import {assert, expect} from 'chai';
 
 //
@@ -56,14 +56,14 @@ export function verifyCompilerMessagesObject(source: Record<string,any>, namespa
       const o = /^(INFO|HINT|WARN|ERROR|FATAL)_([A-Za-z0-9_]+)$/.exec(key);
       expect(o).to.be.instanceOf(Array);
 
-      const mask = compilerErrorSeverityName(m[key]);
+      const mask = CompilerError.formatSeverity(m[key]).toUpperCase();
       expect(o[1]).to.equal(mask, `Mask value for ${key} does not match`);
 
-      expect(m[key] & CompilerErrorSeverity.Reserved_Mask).to.equal(0, `Constant value ${key} uses a reserved value`);
+      expect(m[key] & CompilerErrorMask.Reserved).to.equal(0, `Constant value ${key} uses a reserved value`);
 
-      const code = m[key] & CompilerErrorSeverity.Error_Mask;
+      const code = m[key] & CompilerErrorMask.Error;
       expect(codes).to.not.contain(code, `Constant value ${key} is not unique`);
-      expect(m[key] & CompilerErrorSeverity.Namespace_Mask).to.equal(namespace,
+      expect(m[key] & CompilerErrorMask.Namespace).to.equal(namespace,
         `Constant value ${key} is not in the correct namespace (0x${namespace.toString(16)})`);
       codes.push(code);
     }

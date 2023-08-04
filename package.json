@@ -22,6 +22,8 @@
     "resources/build/version",
     "core/include/ldml",
     "developer/src/common/web/test-helpers",
+    "developer/src/kmc-analyze",
+    "developer/src/kmc-keyboard-info",
     "developer/src/kmc-kmn",
     "developer/src/kmc-ldml",
     "developer/src/kmc-model",

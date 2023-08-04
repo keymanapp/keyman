@@ -21,6 +21,7 @@
 #define _COMPFILE_H
 
 #include "kmcompx.h"
+#include "kmcmplibapi.h"
 #include <kmx_file.h>
 #include <string>
 
@@ -119,16 +120,6 @@ struct FILE_VKDICTIONARY {
 };
 typedef FILE_VKDICTIONARY *PFILE_VKDICTIONARY;
 
-/**
- * Extra metadata for API consumers
- */
-struct FILE_KEYBOARD_EXTRA {
-  std::string kmnFilename; // utf-8
-  std::u16string kvksFilename;	// utf-16, original TSS_VISUALKEYBOARD value
-};
-
-typedef struct FILE_KEYBOARD_EXTRA* PFILE_KEYBOARD_EXTRA;
-
 struct FILE_KEYBOARD {
   KMX_DWORD KeyboardID;			// deprecated, unused
 
@@ -158,7 +149,7 @@ struct FILE_KEYBOARD {
   KMX_DWORD cxVKDictionary;
   PFILE_VKDICTIONARY dpVKDictionary; // temp - virtual key dictionary
 
-  PFILE_KEYBOARD_EXTRA extra;
+  KMCMP_COMPILER_RESULT_EXTRA* extra;   // extra metadata passed back from the compiler
 };
 
 typedef FILE_KEYBOARD *PFILE_KEYBOARD;

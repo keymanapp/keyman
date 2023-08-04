@@ -1,0 +1,50 @@
+[Package]
+Version=7.0
+ExecuteProgram=
+ReadMeFile=readme.htm
+[StartMenu]
+Path=Thamizha Tamil99
+Create=1
+AddUninstallEntry=1
+[StartMenuEntries]
+Using Tamil99 Keyboard="welcome.htm",""
+[Info]
+Name="Thamizha Tamil99",""
+Copyright="© 2008, 2015, 2018-2023 thamizha.com and SIL International",""
+Version="2.0.4",""
+Author="Mugunth, Umar, K. Sethu","mailto:mugunth@gmail.com"
+WebSite="http://www.thamizha.com","http://www.thamizha.com"
+[Files]
+0="File ekwtamil99uni.kvk","ekwtamil99uni.kvk",0
+1="Keyboard ?????99 | Tamil99","ekwtamil99uni.kmx",0
+2="File readme.htm","readme.htm",0
+3="File welcome.htm","welcome.htm",0
+4="File keyrenderer.js","keyrenderer.js",0
+5="File keys2.gif","keys2.gif",0
+6="File style.css","style.css",0
+7="File tr.gif","tr.gif",0
+8="Font aAvarangal","aava1.ttf",0
+9="File key-altl.gif","key-altl.gif",0
+10="File key-altr.gif","key-altr.gif",0
+11="File key-backspace.gif","key-backspace.gif",0
+12="File key-bkslash.gif","key-bkslash.gif",0
+13="File keyboardchart.htm","keyboardchart.htm",0
+14="File key-capslock.gif","key-capslock.gif",0
+15="File key-ctrll.gif","key-ctrll.gif",0
+16="File key-ctrlr.gif","key-ctrlr.gif",0
+17="File key-enter.gif","key-enter.gif",0
+18="File key-plain.gif","key-plain.gif",0
+19="File key-shift102.gif","key-shift102.gif",0
+20="File key-shiftl.gif","key-shiftl.gif",0
+21="File key-shiftr.gif","key-shiftr.gif",0
+22="File key-space.gif","key-space.gif",0
+23="File key-tab.gif","key-tab.gif",0
+24="File sri.png","sri.png",0
+25="File ekwtamil99uni.js","ekwtamil99uni.js",0
+26="Package information","kmp.inf",0
+27="Package information (JSON)","kmp.json",0
+[Keyboard0]
+Name=?????99 | Tamil99
+ID=ekwtamil99uni
+Version=2.0.4
+Language0=ta,Tamil
