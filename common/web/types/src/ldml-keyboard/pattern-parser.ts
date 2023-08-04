@@ -50,12 +50,11 @@ export class MarkerParser {
   /**
    * Marker sentinel as a string - U+FFFF
    */
-  public static readonly SENTINEL = String.fromCodePoint(constants.marker_sentinel);
-
+  public static readonly SENTINEL = String.fromCodePoint(constants.uc_sentinel);
   /**
-   * Matches all markers.
+   * Marker code as a string - U+0008
    */
-  public static readonly SENTINEL_ALL_MARKERS = this.SENTINEL + this.SENTINEL;
+  public static readonly MARKER_CODE = String.fromCodePoint(constants.marker_code);
 
   /** Minimum ID (trailing code unit) */
   public static readonly MIN_MARKER_INDEX = constants.marker_min_index;
@@ -88,7 +87,7 @@ export class MarkerParser {
     if (n < MarkerParser.MIN_MARKER_INDEX || n > MarkerParser.ANY_MARKER_INDEX) {
       throw RangeError(`Internal Error: marker index out of range ${n}`);
     }
-    return this.SENTINEL + String.fromCharCode(n);
+    return this.SENTINEL + this.MARKER_CODE + String.fromCharCode(n);
   }
 
   /** @returns all marker strings as sentinel values */
@@ -96,7 +95,7 @@ export class MarkerParser {
     if (!s) return s;
     return s.replaceAll(this.REFERENCE, (sub, arg) => {
       if (arg === MarkerParser.ANY_MARKER_ID) {
-        return MarkerParser.SENTINEL_ALL_MARKERS;
+        return MarkerParser.markerOutput(MarkerParser.ANY_MARKER_INDEX);
       }
       if (!markers) {
         throw RangeError(`Internal Error: Could not find marker \\m{${arg}} (no markers defined)`);
