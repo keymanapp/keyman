@@ -50,7 +50,7 @@ export class MarkerParser {
   /**
    * Marker sentinel as a string - U+FFFF
    */
-  public static readonly SENTINEL = String.fromCodePoint(constants.marker_sentinel);
+  public static readonly SENTINEL = String.fromCodePoint(constants.uc_sentinel);
   /**
    * Marker code as a string - U+0008
    */
