@@ -1,5 +1,5 @@
 import { constants } from '@keymanapp/ldml-keyboard-constants';
-import { LDMLKeyboard, KMXPlus, Constants } from '@keymanapp/common-types';
+import { LDMLKeyboard, KMXPlus, Constants, MarkerParser } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
 import { SectionCompiler } from "./section-compiler.js";
 
@@ -8,8 +8,18 @@ import Keys = KMXPlus.Keys;
 import ListItem = KMXPlus.ListItem;
 import KeysFlicks = KMXPlus.KeysFlicks;
 import { allUsedKeyIdsInLayers, calculateUniqueKeys, translateLayerAttrToModifier, validModifier } from '../util/util.js';
+import { MarkerTracker, MarkerUse } from './marker-tracker.js';
 
 export class KeysCompiler extends SectionCompiler {
+  static validateMarkers(
+    keyboard: LDMLKeyboard.LKKeyboard,
+    mt: MarkerTracker
+  ): boolean {
+    keyboard.keys?.key?.forEach(({ to }) =>
+      mt.add(MarkerUse.emit, MarkerParser.allReferences(to))
+    );
+    return true;
+  }
 
   public get id() {
     return constants.section.keys;
@@ -20,7 +30,7 @@ export class KeysCompiler extends SectionCompiler {
    * @returns just the non-touch layers.
    */
   public hardwareLayers() {
-    return this.keyboard.layers?.filter(({form}) => form !== 'touch');
+    return this.keyboard.layers?.filter(({ form }) => form !== "touch");
   }
 
   public validate() {
@@ -30,7 +40,7 @@ export class KeysCompiler extends SectionCompiler {
     const usedKeys = allUsedKeyIdsInLayers(this.keyboard?.layers);
     const uniqueKeys = calculateUniqueKeys([...this.keyboard.keys?.key]);
     for (let key of uniqueKeys) {
-      const {id, flicks} = key;
+      const { id, flicks } = key;
       if (!usedKeys.has(id)) {
         continue; // unused key, ignore
       }
@@ -38,10 +48,14 @@ export class KeysCompiler extends SectionCompiler {
       if (!flicks) {
         continue; // no flicks
       }
-      const flickEntry = this.keyboard.keys?.flicks?.find(x => x.id === flicks);
-      if (!flickEntry ) {
+      const flickEntry = this.keyboard.keys?.flicks?.find(
+        (x) => x.id === flicks
+      );
+      if (!flickEntry) {
         valid = false;
-        this.callbacks.reportMessage(CompilerMessages.Error_MissingFlicks({flicks, id}));
+        this.callbacks.reportMessage(
+          CompilerMessages.Error_MissingFlicks({ flicks, id })
+        );
       }
     }
 
@@ -53,8 +67,9 @@ export class KeysCompiler extends SectionCompiler {
     if (hardwareLayers.length >= 1) {
       // validate all errors
       for (let layers of hardwareLayers) {
-        for(let layer of layers.layer) {
-          valid = this.validateHardwareLayerForKmap(layers.form, layer) && valid; // note: always validate even if previously invalid results found
+        for (let layer of layers.layer) {
+          valid =
+            this.validateHardwareLayerForKmap(layers.form, layer) && valid; // note: always validate even if previously invalid results found
         }
       }
       // TODO-LDML: } else { touch?
@@ -84,11 +99,13 @@ export class KeysCompiler extends SectionCompiler {
     /* c8 ignore next 3 */
     if (hardwareLayers.length > 1) {
       // validation should have already caught this
-      throw Error(`Internal error: Expected 0 or 1 hardware layer, not ${hardwareLayers.length}`);
+      throw Error(
+        `Internal error: Expected 0 or 1 hardware layer, not ${hardwareLayers.length}`
+      );
     } else if (hardwareLayers.length === 1) {
       const theLayers = hardwareLayers[0];
       const { form } = theLayers;
-      for(let layer of theLayers.layer) {
+      for (let layer of theLayers.layer) {
         this.compileHardwareLayerToKmap(sections, layer, sect, form);
       }
     } // else: TODO-LDML do nothing if only touch layers
@@ -98,7 +115,9 @@ export class KeysCompiler extends SectionCompiler {
 
   public loadFlicks(sections: DependencySections, sect: Keys) {
     for (let lkflicks of this.keyboard.keys.flicks) {
-      let flicks: KeysFlicks = new KeysFlicks(sections.strs.allocString(lkflicks.id));
+      let flicks: KeysFlicks = new KeysFlicks(
+        sections.strs.allocString(lkflicks.id)
+      );
 
       for (let lkflick of lkflicks.flick) {
         let flags = 0;
@@ -106,10 +125,14 @@ export class KeysCompiler extends SectionCompiler {
         if (!to.isOneChar) {
           flags |= constants.keys_flick_flags_extend;
         }
-        let directions: ListItem = sections.list.allocListFromSpaces(sections.strs, lkflick.directions);
+        let directions: ListItem = sections.list.allocListFromSpaces(
+          sections.strs,
+          lkflick.directions
+        );
         flicks.flicks.push({
           directions,
           flags,
+          // TODO-LDML: markers,variables
           to,
         });
       }
@@ -132,19 +155,33 @@ export class KeysCompiler extends SectionCompiler {
       if (!!key.gap) {
         flags |= constants.keys_key_flags_gap;
       }
-      if (key.transform === 'no') {
+      if (key.transform === "no") {
         flags |= constants.keys_key_flags_notransform;
       }
       const id = sections.strs.allocString(key.id);
-      const longPress: ListItem = sections.list.allocListFromEscapedSpaces(sections.strs, key.longPress);
-      const longPressDefault = sections.strs.allocAndUnescapeString(key.longPressDefault);
-      const multiTap: ListItem = sections.list.allocListFromEscapedSpaces(sections.strs, key.multiTap);
+      const longPress: ListItem = sections.list.allocListFromEscapedSpaces(
+        sections.strs,
+        // TODO-LDML: markers,variables
+        key.longPress
+      );
+      const longPressDefault = sections.strs.allocAndUnescapeString(
+        // TODO-LDML: markers,variables
+        key.longPressDefault
+      );
+      const multiTap: ListItem = sections.list.allocListFromEscapedSpaces(
+        sections.strs,
+        // TODO-LDML: markers,variables
+        key.multiTap
+      );
       const keySwitch = sections.strs.allocString(key.switch); // 'switch' is a reserved word
-      const to = sections.strs.allocAndUnescapeString(key.to, true);
+      const toRaw = key.to;
+      // TODO-LDML: variables
+      let toCooked = sections.vars.substituteMarkerString(toRaw);
+      const to = sections.strs.allocAndUnescapeString(toCooked, true);
       if (!to.isOneChar) {
         flags |= constants.keys_key_flags_extend;
       }
-      const width = Math.ceil((key.width || 1) * 10.0);  // default, width=1
+      const width = Math.ceil((key.width || 1) * 10.0); // default, width=1
       sect.keys.push({
         flags,
         flicks,
@@ -166,12 +203,17 @@ export class KeysCompiler extends SectionCompiler {
    * @param layer
    * @returns
    */
-  private validateHardwareLayerForKmap(hardware: string, layer: LDMLKeyboard.LKLayer) {
+  private validateHardwareLayerForKmap(
+    hardware: string,
+    layer: LDMLKeyboard.LKLayer
+  ) {
     let valid = true;
 
     const { modifier } = layer;
     if (!validModifier(modifier)) {
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidModifier({ modifier, layer: layer.id }));
+      this.callbacks.reportMessage(
+        CompilerMessages.Error_InvalidModifier({ modifier, layer: layer.id })
+      );
       valid = false;
     }
 
@@ -179,21 +221,31 @@ export class KeysCompiler extends SectionCompiler {
     /* c8 ignore next 5 */
     if (!keymap) {
       // not reached due to XML validation
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidHardware({ form: hardware }));
+      this.callbacks.reportMessage(
+        CompilerMessages.Error_InvalidHardware({ form: hardware })
+      );
       valid = false;
     }
 
     const uniqueKeys = calculateUniqueKeys([...this.keyboard.keys?.key]);
     if (layer.row.length > keymap.length) {
-      this.callbacks.reportMessage(CompilerMessages.Error_HardwareLayerHasTooManyRows());
+      this.callbacks.reportMessage(
+        CompilerMessages.Error_HardwareLayerHasTooManyRows()
+      );
       valid = false;
     }
 
     for (let y = 0; y < layer.row.length && y < keymap.length; y++) {
-      const keys = layer.row[y].keys.split(' ');
+      const keys = layer.row[y].keys.split(" ");
 
       if (keys.length > keymap[y].length) {
-        this.callbacks.reportMessage(CompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({ row: y + 1, hardware, modifier }));
+        this.callbacks.reportMessage(
+          CompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({
+            row: y + 1,
+            hardware,
+            modifier,
+          })
+        );
         valid = false;
       }
 
@@ -201,14 +253,24 @@ export class KeysCompiler extends SectionCompiler {
       for (let key of keys) {
         x++;
 
-        let keydef = uniqueKeys.find(x => x.id == key);
+        let keydef = uniqueKeys.find((x) => x.id == key);
         if (!keydef) {
-          this.callbacks.reportMessage(CompilerMessages.Error_KeyNotFoundInKeyBag({ keyId: key, col: x + 1, row: y + 1, layer: layer.id, form: 'hardware' }));
+          this.callbacks.reportMessage(
+            CompilerMessages.Error_KeyNotFoundInKeyBag({
+              keyId: key,
+              col: x + 1,
+              row: y + 1,
+              layer: layer.id,
+              form: "hardware",
+            })
+          );
           valid = false;
           continue;
         }
         if (!keydef.to && !keydef.gap && !keydef.switch) {
-          this.callbacks.reportMessage(CompilerMessages.Error_KeyMissingToGapOrSwitch({ keyId: key }));
+          this.callbacks.reportMessage(
+            CompilerMessages.Error_KeyMissingToGapOrSwitch({ keyId: key })
+          );
           valid = false;
           continue;
         }
@@ -222,7 +284,7 @@ export class KeysCompiler extends SectionCompiler {
     sections: DependencySections,
     layer: LDMLKeyboard.LKLayer,
     sect: Keys,
-    hardware: string,
+    hardware: string
   ): Keys {
     const mod = translateLayerAttrToModifier(layer);
     const keymap = Constants.HardwareToKeymap.get(hardware);
@@ -231,7 +293,7 @@ export class KeysCompiler extends SectionCompiler {
     for (let row of layer.row) {
       y++;
 
-      const keys = row.keys.split(' ');
+      const keys = row.keys.split(" ");
       let x = -1;
       for (let key of keys) {
         x++;

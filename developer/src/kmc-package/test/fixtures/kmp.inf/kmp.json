@@ -1,0 +1,165 @@
+{
+  "system": {
+    "keymanDeveloperVersion": "17.0.91.0",
+    "fileVersion": "7.0"
+  },
+  "options": {
+    "readmeFile": "readme.htm"
+  },
+  "startMenu": {
+    "folder": "Thamizha Tamil99",
+    "addUninstallEntry": true,
+    "items": [
+      {
+        "name": "Using Tamil99 Keyboard",
+        "filename": "welcome.htm"
+      }
+    ]
+  },
+  "info": {
+    "name": {
+      "description": "Thamizha Tamil99"
+    },
+    "copyright": {
+      "description": "\u00A9 2008, 2015, 2018-2023 thamizha.com and SIL International"
+    },
+    "version": {
+      "description": "2.0.4"
+    },
+    "author": {
+      "description": "Mugunth, Umar, K. Sethu",
+      "url": "mailto:mugunth@gmail.com"
+    },
+    "website": {
+      "description": "http://www.thamizha.com",
+      "url": "http://www.thamizha.com"
+    }
+  },
+  "files": [
+    {
+      "name": "ekwtamil99uni.kvk",
+      "description": "File ekwtamil99uni.kvk"
+    },
+    {
+      "name": "ekwtamil99uni.kmx",
+      "description": "Keyboard \u0BA4\u0BAE\u0BBF\u0BB4\u0BCD99 | Tamil99"
+    },
+    {
+      "name": "readme.htm",
+      "description": "File readme.htm"
+    },
+    {
+      "name": "welcome.htm",
+      "description": "File welcome.htm"
+    },
+    {
+      "name": "keyrenderer.js",
+      "description": "File keyrenderer.js"
+    },
+    {
+      "name": "keys2.gif",
+      "description": "File keys2.gif"
+    },
+    {
+      "name": "style.css",
+      "description": "File style.css"
+    },
+    {
+      "name": "tr.gif",
+      "description": "File tr.gif"
+    },
+    {
+      "name": "aava1.ttf",
+      "description": "Font aAvarangal"
+    },
+    {
+      "name": "key-altl.gif",
+      "description": "File key-altl.gif"
+    },
+    {
+      "name": "key-altr.gif",
+      "description": "File key-altr.gif"
+    },
+    {
+      "name": "key-backspace.gif",
+      "description": "File key-backspace.gif"
+    },
+    {
+      "name": "key-bkslash.gif",
+      "description": "File key-bkslash.gif"
+    },
+    {
+      "name": "keyboardchart.htm",
+      "description": "File keyboardchart.htm"
+    },
+    {
+      "name": "key-capslock.gif",
+      "description": "File key-capslock.gif"
+    },
+    {
+      "name": "key-ctrll.gif",
+      "description": "File key-ctrll.gif"
+    },
+    {
+      "name": "key-ctrlr.gif",
+      "description": "File key-ctrlr.gif"
+    },
+    {
+      "name": "key-enter.gif",
+      "description": "File key-enter.gif"
+    },
+    {
+      "name": "key-plain.gif",
+      "description": "File key-plain.gif"
+    },
+    {
+      "name": "key-shift102.gif",
+      "description": "File key-shift102.gif"
+    },
+    {
+      "name": "key-shiftl.gif",
+      "description": "File key-shiftl.gif"
+    },
+    {
+      "name": "key-shiftr.gif",
+      "description": "File key-shiftr.gif"
+    },
+    {
+      "name": "key-space.gif",
+      "description": "File key-space.gif"
+    },
+    {
+      "name": "key-tab.gif",
+      "description": "File key-tab.gif"
+    },
+    {
+      "name": "sri.png",
+      "description": "File sri.png"
+    },
+    {
+      "name": "ekwtamil99uni.js",
+      "description": "File ekwtamil99uni.js"
+    },
+    {
+      "name": "kmp.inf",
+      "description": "Package information"
+    },
+    {
+      "name": "kmp.json",
+      "description": "Package information (JSON)"
+    }
+  ],
+  "keyboards": [
+    {
+      "name": "\u0BA4\u0BAE\u0BBF\u0BB4\u0BCD99 | Tamil99",
+      "id": "ekwtamil99uni",
+      "version": "2.0.4",
+      "languages": [
+        {
+          "name": "Tamil",
+          "id": "ta"
+        }
+      ]
+    }
+  ]
+}

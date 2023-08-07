@@ -13,16 +13,20 @@
   </names>
 
   <keys>
+    <!-- keys in order for 'roast' -->
     <key id="kha" to="\u{1A21}" />
     <key id="sakot" to="\u{1A60}" />
     <key id="wa" to="\u{1A45}" />
     <key id="o" to="\u{1A6B}" />
     <key id="t2" to="\u{1A76}" />
+
+    <!-- and a shortcut key for this common word -->
+    <key id="roast" to="\u{1A21}\u{1A60}\u{1A45}\u{1A6B}\u{1A76}" />
   </keys>
 
   <layers form="us">
     <layer modifier="none" id="base">
-      <row keys="gap" />
+      <row keys="roast" />
       <row keys="gap wa gap gap t2 gap gap gap o gap" />
       <row keys="gap sakot gap gap gap gap gap kha gap" />
       <row keys="gap gap gap gap gap gap gap" />

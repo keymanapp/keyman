@@ -37,19 +37,19 @@ describe('vkey compiler', function () {
     assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Info_MultipleVkeysHaveSameTarget({vkey: 'Q'}));
   });
 
-  it('should error on invalid "from" vkey', async function() {
+  it('should hint on invalid "from" vkey', async function() {
     let vkey = await loadSectionFixture(VkeyCompiler, 'sections/vkey/invalid-from-vkey.xml', compilerTestCallbacks) as Vkey;
-    assert.isNull(vkey);
+    assert.isNotNull(vkey);
     assert.equal(compilerTestCallbacks.messages.length, 2);
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_VkeyIsNotValid({vkey: 'q'}));
-    assert.deepEqual(compilerTestCallbacks.messages[1], CompilerMessages.Error_VkeyIsNotValid({vkey: 'HYFEN'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Hint_VkeyIsNotValid({vkey: 'q'}));
+    assert.deepEqual(compilerTestCallbacks.messages[1], CompilerMessages.Hint_VkeyIsNotValid({vkey: 'HYFEN'}));
   });
 
-  it('should error on invalid "to" vkey', async function() {
+  it('should hint on invalid "to" vkey', async function() {
     let vkey = await loadSectionFixture(VkeyCompiler, 'sections/vkey/invalid-to-vkey.xml', compilerTestCallbacks) as Vkey;
-    assert.isNull(vkey);
+    assert.isNotNull(vkey);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_VkeyIsNotValid({vkey: 'A-ACUTE'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Hint_VkeyIsNotValid({vkey: 'A-ACUTE'}));
   });
 
   it('should error on repeated vkeys', async function() {

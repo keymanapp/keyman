@@ -18,8 +18,7 @@ if [ -v KEYMAN_PKG_BUILD ]; then
   # ibus requires to find /var/lib/dbus/machine-id or /etc/machine-id, otherwise it fails with:
   # "Bail out! IBUS-FATAL-WARNING: Unable to load /var/lib/dbus/machine-id: Failed to open file
   # “/var/lib/dbus/machine-id”: No such file or directory"
-  echo "1..1"
-  echo "ok 1 - Integration tests # SKIP on package build"
+  echo "1..0 # SKIP on package build"
   exit 0
 fi
 

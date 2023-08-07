@@ -2,7 +2,7 @@ import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m
 
 const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
-// const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.KeyboardCompiler;
+// const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevFatal = CompilerErrorSeverity.Fatal | CompilerErrorNamespace.LdmlKeyboardCompiler;
 
@@ -35,9 +35,9 @@ export class CompilerMessages {
     m(this.HINT_LocaleIsNotMinimalAndClean, `Locale '${o.sourceLocale}' is not minimal or correctly formatted and should be '${o.locale}'`);
   static HINT_LocaleIsNotMinimalAndClean = SevHint | 0x0008;
 
-  static Error_VkeyIsNotValid = (o:{vkey: string}) =>
-    m(this.ERROR_VkeyIsNotValid, `Virtual key '${o.vkey}' is not found in the CLDR VKey Enum table.`);
-  static ERROR_VkeyIsNotValid = SevError | 0x0009;
+  static Hint_VkeyIsNotValid = (o:{vkey: string}) =>
+    m(this.HINT_VkeyIsNotValid, `Virtual key '${o.vkey}' is not found in the CLDR VKey Enum table.`);
+  static HINT_VkeyIsNotValid = SevHint | 0x0009;
 
   static Hint_VkeyIsRedundant = (o:{vkey: string}) =>
     m(this.HINT_VkeyIsRedundant, `Virtual key '${o.vkey}' is mapped to itself, which is redundant.`);
@@ -130,5 +130,9 @@ export class CompilerMessages {
   static Error_CantReferenceSetFromUnicodeSet = (o:{id: string}) =>
   m(this.ERROR_CantReferenceSetFromUnicodeSet, `Illegal use of set variable from within UnicodeSet: \$[${o.id}]`);
   static ERROR_CantReferenceSetFromUnicodeSet = SevError | 0x0020;
+
+  static Error_MissingMarkers = (o: { ids: string[] }) =>
+  m(this.ERROR_MissingMarkers, `Markers used for matching but not defined: ${o.ids?.join(',')}`);
+  static ERROR_MissingMarkers = SevError | 0x0021;
 }
 

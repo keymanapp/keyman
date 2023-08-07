@@ -1,8 +1,6 @@
-import { KmpJsonFile, CompilerCallbacks } from '@keymanapp/common-types';
+import { KmpJsonFile, CompilerCallbacks, CompilerOptions } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
 import { keymanEngineForWindowsFiles, keymanForWindowsInstallerFiles, keymanForWindowsRedistFiles } from './redist-files.js';
-
-// const SLexicalModelExtension = '.model.js';
 
 // The keyboard ID SHOULD adhere to this pattern:
 const KEYBOARD_ID_PATTERN_PACKAGE = /^[a-z_][a-z0-9_]*\.(kps|kmp)$/;
@@ -15,12 +13,12 @@ const MODEL_ID_PATTERN_PACKAGE = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a
 // const MODEL_ID_PATTERN_PROJECT = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.kpj$/;
 
 // "Content files" within the package should adhere to these pattern:
-const CONTENT_FILE_BASENAME_PATTERN = /^[a-z0-9_+.-]+$/;
-const CONTENT_FILE_EXTENSION_PATTERN = /^\.[a-z0-9_]+$/;
+const CONTENT_FILE_BASENAME_PATTERN = /^[a-z0-9_+.-]+$/i; // base names can be case insensitive
+const CONTENT_FILE_EXTENSION_PATTERN = /^(\.[a-z0-9_-]+)?$/;  // extensions should be lower-case or empty
 
 export class PackageValidation {
 
-  constructor(private callbacks: CompilerCallbacks) {
+  constructor(private callbacks: CompilerCallbacks, private options: CompilerOptions) {
   }
 
   public validate(filename: string, kmpJson: KmpJsonFile.KmpJsonFile) {
@@ -46,8 +44,12 @@ export class PackageValidation {
     let minimalTags: {[tag: string]: string} = {};
 
     if(languages.length == 0) {
-      this.callbacks.reportMessage(CompilerMessages.Error_MustHaveAtLeastOneLanguage({resourceType, id}));
-      return false;
+      if(resourceType == 'keyboard') {
+        this.callbacks.reportMessage(CompilerMessages.Warn_KeyboardShouldHaveAtLeastOneLanguage({id}));
+      } else {
+        this.callbacks.reportMessage(CompilerMessages.Error_ModelMustHaveAtLeastOneLanguage({id}));
+        return false;
+      }
     }
 
     for(let lang of languages) {
@@ -151,8 +153,10 @@ export class PackageValidation {
     const filename = this.callbacks.path.basename(file.name);
     const ext = this.callbacks.path.extname(filename);
     const base = filename.substring(0, filename.length-ext.length);
-    if(!CONTENT_FILE_BASENAME_PATTERN.test(base) || !CONTENT_FILE_EXTENSION_PATTERN.test(ext)) {
-      this.callbacks.reportMessage(CompilerMessages.Warn_FileInPackageDoesNotFollowFilenameConventions({filename}));
+    if(this.options.checkFilenameConventions) {
+      if(!CONTENT_FILE_BASENAME_PATTERN.test(base) || !CONTENT_FILE_EXTENSION_PATTERN.test(ext)) {
+        this.callbacks.reportMessage(CompilerMessages.Warn_FileInPackageDoesNotFollowFilenameConventions({filename}));
+      }
     }
 
     if(!this.checkIfContentFileIsDangerous(file)) {

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>15.0.268.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Options>
+    <ExecuteProgram></ExecuteProgram>
+    <ReadMeFile>readme.htm</ReadMeFile>
+    <MSIFileName></MSIFileName>
+    <MSIOptions></MSIOptions>
+    <FollowKeyboardVersion/>
+  </Options>
+  <StartMenu>
+    <Folder>ahom_star</Folder>
+    <AddUninstallEntry/>
+    <Items>
+      <Item>
+        <Name>(new)</Name>
+        <FileName>(Product Configuration)</FileName>
+        <Arguments>shom_star</Arguments>
+        <Icon></Icon>
+        <Location>psmelStartMenu</Location>
+      </Item>
+      <Item>
+        <Name>(new)</Name>
+        <FileName>Ahom_star.kvk</FileName>
+        <Arguments>Ahom fonts</Arguments>
+        <Icon></Icon>
+        <Location>psmelStartMenu</Location>
+      </Item>
+    </Items>
+  </StartMenu>
+  <Info>
+    <Version URL=""></Version>
+    <Name URL="">Ahom Star</Name>
+    <Copyright URL="">© 2021-2022 HemantaGogoi Ngi Mon</Copyright>
+    <Author URL="mailto:drhemanta97@gmail.com">Dr Hemanta Kumar Gogoi</Author>
+  </Info>
+  <Files>
+    <File>
+      <Name>.\build\ahom_star.kvk</Name>
+      <Description>File ahom_star.kvk</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kvk</FileType>
+    </File>
+    <File>
+      <Name>.\build\ahom_star.kmx</Name>
+      <Description>Keyboard ahom_star</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+    <File>
+      <Name>.\build\ahom_star.js</Name>
+      <Description>File ahom_star.js</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.js</FileType>
+    </File>
+    <File>
+      <Name>welcome\welcome.htm</Name>
+      <Description>File welcome.htm</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>welcome\desktop_layout_default.png</Name>
+      <Description>File desktop_layout_default.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>welcome\desktop_layout_shift.png</Name>
+      <Description>File desktop_layout_shift.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>welcome\phone_default.png</Name>
+      <Description>File phone_default.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>welcome\phone_longpress.png</Name>
+      <Description>File phone_longpress.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>welcome\phone_numeric.png</Name>
+      <Description>File phone_numeric.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>welcome\phone_shift.png</Name>
+      <Description>File phone_shift.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>readme.htm</Name>
+      <Description>File readme.htm</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>..\..\..\shared\fonts\noto\Ahom\NotoSerifAhom-Regular.ttf</Name>
+      <Description>Font Noto Serif Ahom Regular</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.ttf</FileType>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>Ahom Star</Name>
+      <ID>ahom_star</ID>
+      <Version>1.0.1</Version>
+      <OSKFont>..\..\..\shared\fonts\noto\Ahom\NotoSerifAhom-Regular.ttf</OSKFont>
+      <DisplayFont>..\..\..\shared\fonts\noto\Ahom\NotoSerifAhom-Regular.ttf</DisplayFont>
+      <Languages>
+        <Language ID="aho-Ahom">Ahom (Ahom)</Language>
+      </Languages>
+    </Keyboard>
+  </Keyboards>
+  <Strings/>
+</Package>
