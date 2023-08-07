@@ -4,7 +4,12 @@ import { VarsCompiler } from '../src/compiler/vars.js';
 import { CompilerMessages } from '../src/compiler/messages.js';
 import { CompilerMessages as KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 import { testCompilationCases } from './helpers/index.js';
-import { KMXPlus } from '@keymanapp/common-types';
+import { KMXPlus, KMX } from '@keymanapp/common-types';
+import { BASIC_DEPENDENCIES } from '../src/compiler/empty-compiler.js';
+import { constants } from '@keymanapp/ldml-keyboard-constants';
+
+// now that 'everything' depends on vars, we need an explicit dependency here
+const varsDependencies = BASIC_DEPENDENCIES.filter(c => c !== VarsCompiler);
 
 import Vars = KMXPlus.Vars;
 
@@ -182,5 +187,38 @@ describe('vars', function () {
         CompilerMessages.Error_MissingStringVariable({id: 'missingStringInSet'})
       ],
     },
-  ]);
+  ], varsDependencies);
+  describe('should match some marker constants', () => {
+    // neither of these live here, but, common/web/types does not import ldml-keyboard-constants otherwise.
+
+    assert.equal(constants.uc_sentinel, KMX.KMXFile.UC_SENTINEL);
+    assert.equal(constants.marker_code, KMX.KMXFile.CODE_DEADKEY);
+  });
+  describe('markers', function () {
+    this.slow(500); // 0.5 sec -- json schema validation takes a while
+
+    testCompilationCases(VarsCompiler, [
+      {
+        subpath: 'sections/vars/markers-maximal.xml',
+        callback(sect) {
+          const vars = <Vars> sect;
+          assert.ok(vars.markers);
+          assert.sameDeepOrderedMembers(vars.markers.toStringArray(),
+            ['m','x']);
+        },
+      },
+      {
+        subpath: 'sections/vars/fail-markers-badref-0.xml',
+        errors: [
+          CompilerMessages.Error_MissingMarkers({
+            ids: [
+              'doesnt_exist_1',
+              'doesnt_exist_2',
+              'doesnt_exist_3',
+            ]
+          }),
+        ],
+      },
+    ], varsDependencies);
+  });
 });

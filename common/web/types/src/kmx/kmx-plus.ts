@@ -6,6 +6,7 @@ import { isOneChar, toOneChar, unescapeString } from '../util/util.js';
 import { KMXFile } from './kmx.js';
 import { UnicodeSetParser, UnicodeSet } from '@keymanapp/common-types';
 import { VariableParser } from '../ldml-keyboard/pattern-parser.js';
+import { MarkerParser } from '../ldml-keyboard/pattern-parser.js';
 
 // Implementation of file structures from /core/src/ldml/C7043_ldml.md
 // Writer in kmx-builder.ts
@@ -291,6 +292,9 @@ export class Vars extends Section {
     } else {
       return v[0];
     }
+  }
+  substituteMarkerString(s : string) : string {
+    return MarkerParser.toSentinelString(s, this.markers);
   }
 };
 

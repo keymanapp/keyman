@@ -65,12 +65,25 @@ describe('Compiler UnicodeSet function', function() {
       '[[]': CompilerMessages.ERROR_UnicodeSetSyntaxError,
     };
     for(const [pat, expected] of Object.entries(failures)) {
-      callbacks.clear();
-      assert.notOk(compiler.parseUnicodeSet(pat, 1));
-      assert.equal(callbacks.messages.length, 1);
-      const firstMessage = callbacks.messages[0];
-      const code = firstMessage.code;
-      assert.equal(code, expected, `${compilerErrorFormatCode(code)}≠${compilerErrorFormatCode(expected)} got ${firstMessage.message} for ${pat}`);
+      {
+        // verify fails parse
+        callbacks.clear();
+        assert.notOk(compiler.parseUnicodeSet(pat, 1));
+        assert.equal(callbacks.messages.length, 1);
+        const firstMessage = callbacks.messages[0];
+        const code = firstMessage.code;
+        assert.equal(code, expected, `${compilerErrorFormatCode(code)}≠${compilerErrorFormatCode(expected)} got ${firstMessage.message} for parsing ${pat}`);
+      }
+      // skip 'out of range' because that one won't fail during sizing.
+      if (expected !== CompilerMessages.FATAL_UnicodeSetOutOfRange) {
+        // verify fails size
+        callbacks.clear();
+        assert.equal(compiler.sizeUnicodeSet(pat), -1, `sizing ${pat}`);
+        assert.equal(callbacks.messages.length, 1);
+        const firstMessage = callbacks.messages[0];
+        const code = firstMessage.code;
+        assert.equal(code, expected, `${compilerErrorFormatCode(code)}≠${compilerErrorFormatCode(expected)} got ${firstMessage.message} for sizing ${pat}`);
+      }
     }
   });
 });

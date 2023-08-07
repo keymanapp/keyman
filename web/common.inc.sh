@@ -22,7 +22,7 @@ function compile() {
   local COMPILE_TARGET="$1"
   local BUNDLE_FLAG="${2:-}"
 
-  tsc -b "${KEYMAN_ROOT}/web/src/$COMPILE_TARGET" -v
+  tsc -b "${KEYMAN_ROOT}/web/src/$COMPILE_TARGET"
 
   if [ -f "./build-bundler.js" ]; then
     node "./build-bundler.js" "$BUNDLE_FLAG"

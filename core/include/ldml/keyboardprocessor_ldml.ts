@@ -613,6 +613,21 @@ class Constants {
     }
     return chars.join('');
   }
+
+  // ---- marker stuff ----
+  /** == kmx_file.UC_SENTINEL, always followed by `marker_code`, marker index 0x0001-0xfffe */
+  readonly uc_sentinel         = 0xFFFF;
+  /** == kmx_file.CODE_DEADKEY */
+  readonly marker_code         = 0x0008;
+  /** minimum usable marker index */
+  readonly marker_min_index    = 0x0001;
+  /** index value referring to the 'any' marker match */
+  readonly marker_any_index    = 0xFFFE;
+  /** maximum marker index prior to the 'any' value */
+  readonly marker_max_index    = this.marker_any_index - 1;
+  /** maximum count of markers (not including 'any') */
+  readonly marker_max_count    = this.marker_max_index - this.marker_min_index;
+
 };
 
 export const constants = new Constants();

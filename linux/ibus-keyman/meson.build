@@ -13,6 +13,7 @@ ibus =           dependency('ibus-1.0',             version: '>= 1.2.0')
 gtk =            dependency('gtk+-3.0',             version: '>= 2.4')
 json_glib =      dependency('json-glib-1.0',        version: '>= 1.0')
 systemd  =       dependency('libsystemd')
+icu =            dependency('icu-i18n')
 
 core_dir = meson.current_source_dir() / '../../core'
 common_dir = meson.current_source_dir() / '../../common'

@@ -153,6 +153,7 @@ choco install git jq python ninja pandoc
 refreshenv
 # choco meson (0.55) is too old, 1.0 required:
 python -m pip install meson
+```
 
 **Environment variables**:
 * [`KEYMAN_ROOT`](#keyman_root)
