@@ -69,16 +69,24 @@ server: .virtual
     cd $(DEVELOPER_ROOT)\src\server
     $(MAKE) $(TARGET)
 
-kmc: kmc-ldml kmc-kmn kmc-model kmc-model-info kmc-package
+kmc: kmc-analyze kmc-ldml kmc-keyboard-info kmc-kmn kmc-model kmc-model-info kmc-package
     cd $(DEVELOPER_ROOT)\src\kmc
     $(MAKE) $(TARGET)
 
-kmc-ldml: .virtual
-    cd $(DEVELOPER_ROOT)\src\kmc-ldml
+kmc-analyze: .virtual
+    cd $(DEVELOPER_ROOT)\src\kmc-analyze
+    $(MAKE) $(TARGET)
+
+kmc-keyboard-info: .virtual
+    cd $(DEVELOPER_ROOT)\src\kmc-keyboard-info
     $(MAKE) $(TARGET)
 
 kmc-kmn: .virtual
     cd $(DEVELOPER_ROOT)\src\kmc-kmn
+    $(MAKE) $(TARGET)
+
+kmc-ldml: .virtual
+    cd $(DEVELOPER_ROOT)\src\kmc-ldml
     $(MAKE) $(TARGET)
 
 kmc-model: .virtual

@@ -13,6 +13,7 @@ Packages are **never** published from a developer's machine.
 * `@keymanapp/common-types` -- located at `common/web/types`
 * `@keymanapp/keyman-version` -- located at `common/web/keyman-version`
 * `@keymanapp/kmc` -- located at `developer/src/kmc`
+* `@keymanapp/kmc-keyboard-info` -- located at `developer/src/kmc-keyboard-unfo`
 * `@keymanapp/kmc-kmn` -- located at `developer/src/kmc-kmn`
 * `@keymanapp/kmc-ldml` -- located at `developer/src/kmc-ldml`
 * `@keymanapp/kmc-model` -- located at `developer/src/kmc-model`
