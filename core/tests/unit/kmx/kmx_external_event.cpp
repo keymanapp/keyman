@@ -19,10 +19,10 @@
 #include <iostream>
 #include <sstream>
 
-/** This test will test the infrastructure around the external event processing
- *  The functions tested are:
- *  km_kbp_event with the event KM_KBP_EVENT_KEYBOARD_ACTIVATED
- *
+/** 
+ * This test will test the infrastructure around the external event processing
+ * The functions tested are:
+ * - km_kbp_event with the event KM_KBP_EVENT_KEYBOARD_ACTIVATED
  */
 
 using namespace km::kbp::kmx;
@@ -33,8 +33,8 @@ km_kbp_option_item test_env_opts[] =
 };
 
 int error_args() {
-    std::cerr << "kmx: Not enough arguments." << std::endl;
-    return 1;
+  std::cerr << "kmx: Not enough arguments." << std::endl;
+  return 1;
 }
 
 void test_external_event(const km::kbp::path &source_file){

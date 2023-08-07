@@ -105,23 +105,22 @@ kmx_processor::update_option(
 
 km_kbp_status
 kmx_processor::external_event(
-      km_kbp_state* state,
-      uint32_t event,
-      void* _kmn_unused(data)
-      ) {
+  km_kbp_state* state,
+  uint32_t event,
+  void* _kmn_unused(data)
+) {
 
-  switch (event){
-    case KM_KBP_EVENT_KEYBOARD_ACTIVATED:{
+  switch (event) {
+    case KM_KBP_EVENT_KEYBOARD_ACTIVATED:
       // reset any current actions in the queue as a new keyboard
       // has been activated
       _kmx.GetActions()->ResetQueue();
       state->actions().clear();
-    KMX_DWORD dummy_modifiers = 0;
-    if (_kmx.GetKeyboard()->Keyboard->dwFlags & KF_CAPSALWAYSOFF) {
-      _kmx.SetCapsLock(dummy_modifiers, FALSE, TRUE);
+      if (_kmx.GetKeyboard()->Keyboard->dwFlags & KF_CAPSALWAYSOFF) {
+        KMX_DWORD dummy_modifiers = 0;
+        _kmx.SetCapsLock(dummy_modifiers, FALSE, TRUE);
       }
-    }
-    break;
+      break;
     default:
       return KM_KBP_STATUS_INVALID_ARGUMENT;
   }

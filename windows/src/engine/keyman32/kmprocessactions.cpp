@@ -218,7 +218,7 @@ ProcessActionsExternalEvent() {
   if (!_td) {
     return FALSE;
   }
-  // Currently the only Action handled is KM_KBP_IT_CAPSLOCK.
+  // Currently only a subset of actions are handled.
   // Other actions will be added when needed.
   BOOL continueProcessingActions = TRUE;
   for (auto act = km_kbp_state_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, nullptr); act->type != KM_KBP_IT_END;
