@@ -1,0 +1,30 @@
+{
+	"license": "mit",
+	"languages": {
+		"km": {
+			"oskFont": {
+				"family": "Khmer Busra Kbd",
+				"source": [
+					"khmer_busra_kbd.ttf"
+				]
+			},
+	  	"font": {
+				"family": "Khmer Mondulkiri",
+				"source": [
+					"Mondulkiri-R.ttf"
+				]
+			},
+			"example": {
+				"keys": "xjmEr",
+				"text": "ខ្មែរ",
+				"note": "Name of language"
+			}
+		}
+	},
+	"description": "<p>Khmer Unicode keyboard layout based on the NiDA keyboard layout. Automatically corrects many common keying errors.</p>",
+	"related": {
+		"khmer10": {
+			"deprecates": true
+		}
+	}
+}

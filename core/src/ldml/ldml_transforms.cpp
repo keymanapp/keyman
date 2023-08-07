@@ -184,11 +184,12 @@ element_list::load(const kmx::kmx_plus &kplus, kmx::KMXPLUS_ELEM id) {
   auto elements = kplus.elem->getElementList(id, elementsLength); // pointer to beginning of element list
   assert((elementsLength == 0) || (elements != nullptr)); // it could be a 0-length list
   for (size_t i = 0; i<elementsLength; i++) {
-    auto e     = elements[i];
-    auto flags = e.flags;
-    auto type  = flags & LDML_ELEM_FLAGS_TYPE;
+    auto e = elements[i];
+    KMX_DWORD flags = e.flags;
+    auto type = flags & LDML_ELEM_FLAGS_TYPE;
     if (type == LDML_ELEM_FLAGS_TYPE_CHAR) {
-      emplace_back(e.element, flags); // char
+      km_kbp_usv ch = e.element;
+      emplace_back(ch, flags); // char
     } else if (type == LDML_ELEM_FLAGS_TYPE_USET) {
       // need to load a USet
       auto u = kplus.usetHelper.getUset(e.element);
@@ -198,7 +199,7 @@ element_list::load(const kmx::kmx_plus &kplus, kmx::KMXPLUS_ELEM id) {
         assert(u.valid());
         return false;
       }
-      emplace_back(u, e.flags);
+      emplace_back(u, flags);
     } else {
       // reorders don't use 'string' element types, so we don't expect them here.
       assert((type != LDML_ELEM_FLAGS_TYPE_USET) && (type != LDML_ELEM_FLAGS_TYPE_CHAR));

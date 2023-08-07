@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 17.0.156 alpha 2023-08-07
+
+* epic: kmc-kmw KeymanWeb compiler in Typescript (#8954)
+
+## 17.0.155 alpha 2023-08-05
+
+* chore(developer): update markers per review (#9374)
+
 ## 17.0.154 alpha 2023-08-04
 
 * chore(common): Update crowdin GHA to trigger daily (#9410)
