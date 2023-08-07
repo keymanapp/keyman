@@ -8,6 +8,7 @@ import { KmpCompiler } from '@keymanapp/kmc-package';
 import { calculateSourcePath } from '../../util/calculateSourcePath.js';
 
 const HelpRoot = 'https://help.keyman.com/keyboard/';
+const LICENSE_FILENAME = 'LICENSE.md';
 
 export class BuildKeyboardInfo extends BuildActivity {
   public get name(): string { return 'Keyboard metadata'; }
@@ -21,6 +22,12 @@ export class BuildKeyboardInfo extends BuildActivity {
       // version 2.0 projects (where the .kpj file is optional).
       infile = KeymanFileTypes.replaceExtension(infile, KeymanFileTypes.Source.KeyboardInfo, KeymanFileTypes.Source.Project);
     }
+
+    if(!callbacks.fs.existsSync(infile)) {
+      // We cannot build a .keyboard_info if we don't have a repository-style project
+      return false;
+    }
+
     const project = loadProject(infile, callbacks);
     if(!project) {
       return false;
@@ -32,13 +39,7 @@ export class BuildKeyboardInfo extends BuildActivity {
       return false;
     }
 
-    if(!fs.existsSync(project.resolveInputFilePath(metadata))) {
-      // For now, if the metadata file does not exist, we won't attempt to build
-      // it. One day in the future, when source metadata files become optional,
-      // we'll need to skip this
-      return true;
-    }
-
+    const license = project.files.find(file => file.filename == LICENSE_FILENAME);
 
     const keyboard = findProjectFile(callbacks, project, KeymanFileTypes.Source.KeymanKeyboard);
     const kps = findProjectFile(callbacks, project, KeymanFileTypes.Source.Package);
@@ -58,12 +59,13 @@ export class BuildKeyboardInfo extends BuildActivity {
     const compiler = new KeyboardInfoCompiler(callbacks);
     const data = compiler.writeMergedKeyboardInfoFile(project.resolveInputFilePath(metadata), {
       keyboard_id,
-      kmpFileName:  project.resolveOutputFilePath(kps, KeymanFileTypes.Source.Package, KeymanFileTypes.Binary.Package),
+      kmpFilename:  project.resolveOutputFilePath(kps, KeymanFileTypes.Source.Package, KeymanFileTypes.Binary.Package),
       kmpJsonData,
-      kpsFileName: project.resolveInputFilePath(kps),
+      kpsFilename: project.resolveInputFilePath(kps),
       helpLink: HelpRoot + keyboard_id,
-      keyboardFileNameJs: fs.existsSync(keyboardFileNameJs) ? keyboardFileNameJs : undefined,
-      sourcePath: calculateSourcePath(infile)
+      keyboardFilenameJs: fs.existsSync(keyboardFileNameJs) ? keyboardFileNameJs : undefined,
+      sourcePath: calculateSourcePath(infile),
+      licenseFilename: license ? project.resolveInputFilePath(license) : undefined
     });
 
     if(data == null) {

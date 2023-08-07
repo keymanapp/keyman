@@ -2,7 +2,7 @@ import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m
 
 const Namespace = CompilerErrorNamespace.KeyboardInfoCompiler;
 // const SevInfo = CompilerErrorSeverity.Info | Namespace;
-// const SevHint = CompilerErrorSeverity.Hint | Namespace;
+const SevHint = CompilerErrorSeverity.Hint | Namespace;
 const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
@@ -26,5 +26,24 @@ export class KeyboardInfoCompilerMessages {
     `Invalid author email: ${o.email}`);
   static ERROR_InvalidAuthorEmail = SevError | 0x0005;
 
+  static Error_LicenseFileDoesNotExist = (o:{filename:string}) => m(this.ERROR_LicenseFileIsMissing,
+    `License file ${o.filename} does not exist.`);
+  static ERROR_LicenseFileIsMissing = SevError | 0x0006;
+
+  static Error_LicenseFileIsDamaged = (o:{filename:string}) => m(this.ERROR_LicenseFileIsDamaged,
+    `License file ${o.filename} could not be loaded or decoded.`);
+  static ERROR_LicenseFileIsDamaged = SevError | 0x0007;
+
+  static Error_LicenseIsNotValid = (o:{filename:string,message:string}) => m(this.ERROR_LicenseIsNotValid,
+    `An error was encountered parsing license file ${o.filename}: ${o.message}.`);
+  static ERROR_LicenseIsNotValid = SevError | 0x0008;
+
+  static Error_CannotBuildWithoutKmpFile = () => m(this.ERROR_CannotBuildWithoutKmpFile,
+    `Compiling the .keyboard_info file requires a .kmp file for metadata.`);
+  static ERROR_CannotBuildWithoutKmpFile = SevError | 0x0009;
+
+  static Hint_NoLicenseFound = () => m(this.HINT_NoLicenseFound,
+    `No license for the keyboard was found, marking as "Other" license. MIT license is required for publication to Keyman keyboards repository.`);
+  static HINT_NoLicenseFound = SevHint | 0x000A;
 }
 

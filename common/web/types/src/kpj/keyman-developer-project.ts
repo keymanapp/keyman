@@ -108,6 +108,11 @@ export class KeymanDeveloperProjectOptions {
   compilerWarningsAsErrors: boolean = false;
   warnDeprecatedCode: boolean = true;
   checkFilenameConventions: boolean = false;  // missing option defaults to False
+  /**
+   * Skip building .keyboard_info and .model_info files, for example in
+   * unit tests or for legacy keyboards
+   */
+  skipMetadataFiles: boolean;
   projectType: KeymanDeveloperProjectType = KeymanDeveloperProjectType.Keyboard;
   readonly version: KeymanDeveloperProjectVersion;
   constructor(version: KeymanDeveloperProjectVersion) {
@@ -116,10 +121,12 @@ export class KeymanDeveloperProjectOptions {
       case "1.0":
         this.buildPath = '';
         this.sourcePath = '';
+        this.skipMetadataFiles = true;
         break;
       case "2.0":
         this.buildPath = '$PROJECTPATH/build';
         this.sourcePath = '$PROJECTPATH/source';
+        this.skipMetadataFiles = false;
         break;
       default:
         throw new Error('Invalid version');

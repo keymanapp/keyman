@@ -1,0 +1,40 @@
+{
+  "license": "mit",
+  "languages": {
+    "km": {
+      "displayName": "Khmer",
+      "languageName": "Khmer"
+    }
+  },
+  "id": "khmer_angkor",
+  "name": "Khmer Angkor",
+  "authorName": "Makara Sok",
+  "authorEmail": "makara_sok@sil.org",
+  "lastModifiedDate": "2022-09-20T19:44:08Z",
+  "sourcePath": "release/k/khmer_angkor",
+  "version": "1.3",
+  "packageFilename": "khmer_angkor.kmp",
+  "jsFilename": "khmer_angkor.js",
+  "encodings": [
+    "unicode"
+  ],
+  "jsFileSize": 159640,
+  "packageFileSize": 4291221,
+  "packageIncludes": [
+    "visualKeyboard",
+    "welcome",
+    "fonts",
+    "documentation"
+  ],
+  "minKeymanVersion": "10.0",
+  "helpLink": "https://help.keyman.com/keyboard/khmer_angkor",
+  "platformSupport": {
+    "windows": "full",
+    "macos": "full",
+    "linux": "full",
+    "android": "full",
+    "ios": "full",
+    "desktopWeb": "full",
+    "mobileWeb": "full"
+  }
+}
