@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.157 alpha 2023-08-08
+
+* fix(linux): fix memory leaks and method name (#9413)
+
 ## 17.0.156 alpha 2023-08-07
 
 * epic: kmc-kmw KeymanWeb compiler in Typescript (#8954)
