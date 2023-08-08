@@ -247,6 +247,10 @@
           <label for='selSubKeyNextLayer'>Next Layer:</label>
           <select id='selSubKeyNextLayer'></select>
         </div>
+        <div class='toolbar-item'>
+          <label for='chkSubKeyIsDefault'>Is default:</label>
+          <input id='chkSubKeyIsDefault' type='checkbox' />
+        </div>
       </div>
 
       <!-- Subkey Controls -->
