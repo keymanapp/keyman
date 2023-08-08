@@ -3,6 +3,8 @@ import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
 import { GestureSourceSubview } from '../../../build/obj/headless/gestureSource.js';
 
 type GestureMatcher<Type> = gestures.matchers.GestureMatcher<Type>;
+type MatcherSelection<Type> = gestures.matchers.MatcherSelection<Type>;
+type MatcherSelector<Type> = gestures.matchers.MatcherSelector<Type>;
 type GestureModel<Type> = gestures.specs.GestureModel<Type>;
 
 interface SimSpecSequence<Type> {
@@ -326,6 +328,73 @@ export function simulateMultiSourceMatcherInput<Type>(
   return {
     sources,
     modelMatcherPromise: testObjPromise,
+    executor
+  };
+}
+
+type MatcherSelectorInput<Type> = {
+  sequence: (SimSpecTimer<Type> | SimSpecSequence<Type>),
+  specSet: GestureModel<Type>[]
+}[];
+
+export function simulateMultiSourceSelectorInput<Type>(
+  input: MatcherSelectorInput<Type>,
+  fakeClock: sinon.SinonFakeTimers
+): {
+  sources: GestureSource<Type>[],
+  selectionPromises: Promise<MatcherSelection<Type>>[],
+  selectorPromise: Promise<MatcherSelector<Type>>,
+  executor: () => Promise<void>
+} {
+  let inputClone = [].concat(input);
+
+  // We NEED the sequences specified to be in chronological order of their start.
+  // We'll just check if it's done properly out-of-the-gate - by sorting a clone, then comparing.
+  // We shouldn't actually mutate / correct this b/c of the returned `selectorPromises` field.
+  inputClone.sort((a, b) => {
+    if(a.sequence.type == "timer") {
+      return -1;
+    } else if(b.sequence.type == "timer") {
+      return 1;
+    } else {
+      return a.sequence.samples[0].t - b.sequence.samples[0].t
+    }
+  });
+
+  for(let i=0; i < input.length; i++) {
+    if(input[i] != inputClone[i]) {
+      throw new Error("The specified input data should be in chronological order based on its start position.");
+    }
+  }
+
+  let indexSeed = 0;
+  const selectionPromises: Promise<MatcherSelection<Type>>[] = [];
+
+  const config: SimulationConfig<MatcherSelector<Type>, Type> = {
+    construction: (source) => {
+      const selector = new gestures.matchers.MatcherSelector<Type>();
+
+      // TS can't resolve the two-typed parameter to two separate overloads of the same method, it seems.
+      selectionPromises.push(selector.matchGesture(source as any, input[indexSeed++].specSet));
+
+      return selector;
+    },
+    addSource: (obj, source) => {
+      obj.matchGesture(source, input[indexSeed++].specSet);
+    },
+    update: () => {}
+  }
+
+  const {
+    sources,
+    testObjPromise,
+    executor
+  } = simulateMultiSourceInput(config, input.map((entry) => entry.sequence), fakeClock);
+
+  return {
+    sources,
+    selectionPromises,
+    selectorPromise: testObjPromise,
     executor
   };
 }

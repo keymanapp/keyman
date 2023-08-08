@@ -82,8 +82,8 @@ export class GestureSource<HoveredItemType> {
   }
 
   public update(sample: InputSample<HoveredItemType>) {
-    this.path.extend(sample);
     this._baseItem ||= sample.item;
+    this.path.extend(sample);
   }
 
   /**
@@ -111,7 +111,7 @@ export class GestureSource<HoveredItemType> {
    * from the most recently-observed path coordinate.
    * @returns
    */
-  public constructSubview(startAtEnd: boolean, preserveBaseItem: boolean) {
+  public constructSubview(startAtEnd: boolean, preserveBaseItem: boolean): GestureSourceSubview<HoveredItemType> {
     return new GestureSourceSubview(this, startAtEnd, preserveBaseItem);
   }
 

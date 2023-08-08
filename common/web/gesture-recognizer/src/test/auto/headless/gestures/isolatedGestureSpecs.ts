@@ -45,7 +45,7 @@ export const LongpressModel: GestureModel = {
 
 export const MultitapModel: GestureModel = {
   id: 'multitap',
-  resolutionPriority: 1,
+  resolutionPriority: 2,
   itemPriority: 1,
   contacts: [
     {
@@ -75,7 +75,7 @@ export const MultitapModel: GestureModel = {
 
 export const SimpleTapModel: GestureModel = {
   id: 'simple-tap',
-  resolutionPriority: 0,
+  resolutionPriority: 1,
   itemPriority: 0,
   contacts: [
     {
@@ -91,7 +91,14 @@ export const SimpleTapModel: GestureModel = {
   ],
   resolutionAction: {
     type: 'optional-chain',
-    allowNext: 'multitap'
+    allowNext: 'multitap',
+    item: 'current'
+  },
+  rejectionActions: {
+    item: {
+      type: 'optional-chain',
+      allowNext: 'simple-tap'
+    }
   }
 }
 
