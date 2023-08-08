@@ -11,6 +11,16 @@
 #include <string>
 #include "kmx/kmx_xstring.h"
 
+#if defined(HAVE_ICU4C)
+// TODO-LDML: Needed this for some compiler warnings
+#define U_FALLTHROUGH
+#include "unicode/uniset.h"
+#include "unicode/usetiter.h"
+#include "unicode/regex.h"
+#else
+#error icu4c is required for this code
+#endif
+
 
 #ifndef assert
 #define assert(x)  // TODO-LDML

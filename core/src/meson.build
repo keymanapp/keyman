@@ -21,6 +21,27 @@ if cpp_compiler.get_id() == 'emscripten'
   defns += ['-DKMN_KBP']
 endif
 
+# ICU4C is used for repertoire tests and core implementation
+
+if target_machine.system() == 'linux'
+  # use pkg-config when targetting linux
+  pkgconfig = 'pkg-config'
+  icu_uc = dependency('icu-uc', required: true)
+  icu_i18n = dependency('icu-i18n', required: true)
+else
+  # load ICU from wrap
+  # Requires meson of about 0.57+
+  icu4c = subproject('icu-minimal', default_options: [ 'default_library=static', 'cpp_std=c++17', 'warning_level=0',
+'werror=false']) # TODO-LDML: options: static, no data (these are in the meson build files)
+  icu_uc = icu4c.get_variable('icuuc_dep')
+  icu_i18n = icu4c.get_variable('icui18n_dep')
+endif
+
+if icu_uc.found()
+  defns += '-DHAVE_ICU4C'
+endif
+
+
 kmx_files = files(
   'option.cpp',
   'keyboard.cpp',
@@ -85,11 +106,13 @@ lib = library('kmnkbp0',
   version: lib_version,
   include_directories: inc,
   pic: true,
-  install: true)
+  install: true,
+  dependencies: [icu_uc, icu_i18n],
+  )
 
 headerdirs = [ '.', 'keyman' ] # subdirectories of ${prefix}/include to add to header path
 
-kmnkbp = declare_dependency(link_with: lib, include_directories: inc)
+kmnkbp = declare_dependency(link_with: lib, include_directories: inc, dependencies: [icu_uc, icu_i18n])
 
 pkg = import('pkgconfig')
 pkg.generate(

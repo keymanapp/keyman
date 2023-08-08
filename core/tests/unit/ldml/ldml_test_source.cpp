@@ -25,7 +25,6 @@
 #include "ldml/keyboardprocessor_ldml.h"
 #include "ldml/ldml_processor.hpp"
 
-
 #include "path.hpp"
 #include "state.hpp"
 #include "utfcodec.hpp"
