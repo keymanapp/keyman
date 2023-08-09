@@ -15,11 +15,14 @@ cd "$THIS_SCRIPT_PATH"
 
 platforms=(android/ ios/ linux/ mac/ web/ windows/ developer/ core/ common/models/)
 
-builder_describe "Stats collector for Keyman PRs and issues" \
+builder_describe "Stats collector for Keyman PRs and issues
+
+* You must specify either --start-date (-d) or --start-sprint (-s).
+" \
   stats+ \
   "--start-date,-d=startDate       Start date for collecting data, yyyy-mm-dd" \
   "--start-sprint,-s=startSprint   Or, first sprint to start collecting data for" \
-  "--stable,-S=stableBranch        Branch name for previous stable release"
+  "--stable,-S=stableBranch        Branch name for previous stable release (required)"
 
 builder_parse "$@"
 
