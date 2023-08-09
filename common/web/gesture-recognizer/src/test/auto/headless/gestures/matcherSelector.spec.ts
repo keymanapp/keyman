@@ -54,7 +54,7 @@ describe("MatcherSelector", function () {
           selectorPromise,
           executor
         } = simulateSelectorInput({
-          pathSpecs: { type: 'sequence', samples: turtle.path, terminate: false },
+          pathSpecs: [{ type: 'sequence', samples: turtle.path, terminate: false }],
           specSet: [LongpressModel]
         }, this.fakeClock);
 
@@ -91,7 +91,7 @@ describe("MatcherSelector", function () {
           selectorPromise,
           executor
         } = simulateSelectorInput({
-          pathSpecs: { type: 'sequence', samples: turtle.path, terminate: false },
+          pathSpecs: [{ type: 'sequence', samples: turtle.path, terminate: false }],
           specSet: [LongpressModel, MultitapModel, SimpleTapModel]
         }, this.fakeClock);
 
@@ -129,7 +129,7 @@ describe("MatcherSelector", function () {
           selectorPromise,
           executor
         } = simulateSelectorInput({
-          pathSpecs: { type: 'sequence', samples: turtle.path, terminate: false },
+          pathSpecs: [{ type: 'sequence', samples: turtle.path, terminate: false }],
           specSet: [LongpressModel]
         }, this.fakeClock);
 
@@ -175,7 +175,7 @@ describe("MatcherSelector", function () {
           selectorPromise,
           executor
         } = simulateSelectorInput({
-          pathSpecs: { type: 'sequence', samples: turtle.path, terminate: false },
+          pathSpecs: [{ type: 'sequence', samples: turtle.path, terminate: false }],
           specSet: [LongpressModel]
         }, this.fakeClock);
 
@@ -231,7 +231,7 @@ describe("MatcherSelector", function () {
           selectorPromise,
           executor
         } = simulateSelectorInput({
-          pathSpecs: { type: 'sequence', samples: turtle.path, terminate: false },
+          pathSpecs: [{ type: 'sequence', samples: turtle.path, terminate: false }],
           // Current problem:  adding the extra models leads to rejection of all?
           specSet: [LongpressModel, MultitapModel, SimpleTapModel]
         }, this.fakeClock);
@@ -286,7 +286,7 @@ describe("MatcherSelector", function () {
           selectorPromise,
           executor
         } = simulateSelectorInput({
-          pathSpecs: { type: 'sequence', samples: turtle.path, terminate: true },
+          pathSpecs: [{ type: 'sequence', samples: turtle.path, terminate: true }],
           specSet: [LongpressModel, MultitapModel, SimpleTapModel]
         }, this.fakeClock);
 
@@ -328,7 +328,7 @@ describe("MatcherSelector", function () {
           selectorPromise,
           executor
         } = simulateSelectorInput({
-          pathSpecs: { type: 'sequence', samples: turtle.path, terminate: true },
+          pathSpecs: [{ type: 'sequence', samples: turtle.path, terminate: true }],
           specSet: [LongpressModel, MultitapModel, SimpleTapModel]
         }, this.fakeClock);
 
@@ -408,11 +408,11 @@ describe("MatcherSelector", function () {
           executor
         } = simulateSelectorInput(
           {
-            pathSpecs: {
+            pathSpecs: [{
               type: 'prior-matcher',
               matcher: predecessorMatcher,
               continuation: [{ type: 'sequence', samples: remainingPath, terminate: true }]
-            },
+            }],
             specSet: [SubkeySelectModel]
           }
         , this.fakeClock);
@@ -432,6 +432,132 @@ describe("MatcherSelector", function () {
 
         // Allow the rest of the simulation to play out; it's easy cleanup that way.
         await completion;
+      });
+    });
+  });
+
+  describe("Multi-source", function() {
+    describe("First stage", function() {
+      it("Simple tap (from second contact point during lifetime)", async function() {
+        const turtle1 = new TouchpathTurtle({
+          targetX: 1,
+          targetY: 1,
+          t: 100,
+          item: 'a'
+        });
+        turtle1.wait(100, 5);
+        turtle1.commitPending();
+
+        const {
+          sources,
+          selectionPromises,
+          selectorPromise,
+          executor
+        } = simulateSelectorInput({
+          pathSpecs: [
+            { type: 'sequence', samples: turtle1.path, terminate: false },
+            { type: 'sequence', samples: [{
+              targetX: 5,
+              targetY: 1,
+              t: 200,
+              item: 'b'
+            }], terminate: false }
+          ],
+          specSet: [LongpressModel, MultitapModel, SimpleTapModel]
+        }, this.fakeClock);
+
+        let completion = executor();
+        const selector = await selectorPromise;
+        await Promise.race([completion, selectionPromises[0]]);
+
+        // So, the terminate signal didn't complete the selection?
+        assert.equal(await promiseStatus(selectionPromises[0]), PromiseStatuses.PROMISE_RESOLVED);
+        assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
+
+        const selection = await selectionPromises[0];
+
+        assert.deepEqual(selection.result, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap' }});
+        assert.deepEqual(selection.matcher.model, SimpleTapModel);
+        assert.isTrue(sources[0].path.isComplete);
+
+        // Allow the rest of the simulation to play out; it's easy cleanup that way.
+        await completion;
+      });
+    });
+
+    describe("Later stages", function() {
+      it("Multi-tap", async function() {
+        const turtle1 = new TouchpathTurtle({
+          targetX: 1,
+          targetY: 1,
+          t: 100,
+          item: 'a'
+        });
+        turtle1.wait(100, 5);
+        turtle1.commitPending();
+
+        // Set up the prior stage's match
+        const {
+          executor: predExecutor,
+          modelMatcherPromise
+        } = simulateMultiSourceMatcherInput([
+          { type: 'sequence', samples: turtle1.path, terminate: true }
+        ], this.fakeClock, LongpressModel);
+
+        await predExecutor();
+        const predecessorMatcher = await modelMatcherPromise;
+        assert.equal(await promiseStatus(modelMatcherPromise), PromiseStatuses.PROMISE_RESOLVED);
+
+        const turtle2 = new TouchpathTurtle({
+          targetX: 2,
+          targetY: 2,
+          t: 300,
+          item: 'a'
+        });
+        turtle2.wait(100, 5);
+        turtle2.commitPending();
+
+        const {
+          sources,
+          selectionPromises,
+          selectorPromise,
+          executor
+        } = simulateSelectorInput(
+          {
+            pathSpecs: [
+              {
+                type: 'prior-matcher',
+                matcher: predecessorMatcher,
+                continuation: null  // that GestureSource is DONE, terminated.  No continues.
+              }, {
+                type: 'sequence',
+                samples: turtle2.path,
+                terminate: true
+              }
+            ],
+            specSet: [LongpressModel, MultitapModel, SimpleTapModel]
+          }
+        , this.fakeClock);
+
+        let completion = executor();
+        const selector = await selectorPromise;
+        await Promise.race([completion, selectionPromises[0]]);
+
+        assert.equal(await promiseStatus(selectionPromises[0]), PromiseStatuses.PROMISE_RESOLVED);
+        assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
+
+        const selection = await selectionPromises[0];
+
+        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: 'a', next: 'multitap' }});
+        assert.deepEqual(selection.matcher.model, MultitapModel);
+        assert.isTrue(sources[0].path.isComplete);
+
+        // Allow the rest of the simulation to play out; it's easy cleanup that way.
+        await completion;
+      });
+
+      it.skip("Single tap (on different key/item than prior tap)", function() {
+        //
       });
     });
   });

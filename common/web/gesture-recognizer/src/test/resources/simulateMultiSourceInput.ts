@@ -333,7 +333,7 @@ export function simulateMultiSourceMatcherInput<Type>(
 }
 
 type MatcherSelectorInput<Type> = {
-  pathSpecs: SimSpecSequence<Type> | SimSpecPriorMatch<Type>,
+  pathSpecs: (SimSpecSequence<Type> | SimSpecPriorMatch<Type>)[],
   specSet: GestureModel<Type>[]
 };
 
@@ -383,7 +383,8 @@ export function simulateSelectorInput<Type>(
     sources,
     testObjPromise,
     executor
-  } = simulateMultiSourceInput(config, [input.pathSpecs], fakeClock);
+    // Minor TS inference problem below (b/c arrays aren't necessarily guaranteed a first entry?)
+  } = simulateMultiSourceInput(config, input.pathSpecs as any, fakeClock);
 
   return {
     sources,
