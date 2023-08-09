@@ -8,8 +8,7 @@ const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
 export class CompilerMessages {
-  static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException,
-    `Unexpected exception: ${(o.e ?? 'unknown error').toString()}\n\nCall stack:\n${(o.e instanceof Error ? o.e.stack : (new Error()).stack)}`);
+  static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
   static FATAL_UnexpectedException = SevFatal | 0x0001;
 
   static Warn_AbsolutePath = (o:{filename: string}) => m(this.WARN_AbsolutePath, `File ${o.filename} has an absolute path, which is not portable.`);

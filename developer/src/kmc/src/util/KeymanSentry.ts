@@ -89,18 +89,34 @@ export class KeymanSentry {
     isInit = true;
   }
 
+  private static writeSentryMessage(eventId: string) {
+    process.stderr.write(`
+    This error has been automatically reported to the Keyman team.
+      Identifier:  ${eventId}
+      Application: Keyman Developer
+      Reported at: https://sentry.io/organizations/keyman/projects/keyman-developer/events/${eventId}/
+    `);
+  }
+
+  static async reportException(e: any, silent: boolean = true) {
+    if(isInit) {
+      const eventId = await Sentry.captureException(e);
+      if(!silent) {
+        this.writeSentryMessage(eventId);
+      }
+      return eventId;
+    }
+    return null;
+  }
+
   static async captureException(e: any) {
     if(isInit) {
       const eventId = Sentry.captureException(e);
       process.stderr.write(`
-Fatal error: ${(e??'').toString()}
-
-This error has been automatically reported to the Keyman team.
-  Identifier:  ${eventId}
-  Application: Keyman Developer
-  Reported at: https://sentry.io/organizations/keyman/projects/keyman-developer/events/${eventId}/
-`);
-      await Sentry.close(2000);
+      Fatal error: ${(e??'').toString()}
+      `);
+      this.writeSentryMessage(eventId);
+      this.close();
 
       // For local development, we don't want to bury the trace; we need the cast to avoid
       // TS2367 (comparison appears to be unintentional)
@@ -110,6 +126,12 @@ This error has been automatically reported to the Keyman team.
       process.exit(1);
     } else {
       throw e;
+    }
+  }
+
+  static async close() {
+    if(isInit) {
+      await Sentry.close(2000);
     }
   }
 }
