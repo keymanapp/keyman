@@ -556,8 +556,84 @@ describe("MatcherSelector", function () {
         await completion;
       });
 
-      it.skip("Single tap (on different key/item than prior tap)", function() {
-        //
+      it("Single tap (on different key/item than prior tap)", async function() {
+        const turtle1 = new TouchpathTurtle({
+          targetX: 1,
+          targetY: 1,
+          t: 100,
+          item: 'a'
+        });
+        turtle1.wait(100, 5);
+        turtle1.commitPending();
+
+        // Set up the prior stage's match
+        const {
+          executor: predExecutor,
+          modelMatcherPromise
+        } = simulateMultiSourceMatcherInput([
+          { type: 'sequence', samples: turtle1.path, terminate: true }
+        ], this.fakeClock, LongpressModel);
+
+        await predExecutor();
+        const predecessorMatcher = await modelMatcherPromise;
+        assert.equal(await promiseStatus(modelMatcherPromise), PromiseStatuses.PROMISE_RESOLVED);
+
+        const turtle2 = new TouchpathTurtle({
+          targetX: 2,
+          targetY: 2,
+          t: 300,
+          item: 'b'  // different item; the multitap should fail.
+        });
+        turtle2.wait(100, 5);
+        turtle2.commitPending();
+
+        const {
+          sources,
+          selectionPromises,
+          selectorPromise,
+          executor
+        } = simulateSelectorInput(
+          {
+            pathSpecs: [
+              {
+                type: 'prior-matcher',
+                matcher: predecessorMatcher,
+                continuation: null  // that GestureSource is DONE, terminated.  No continues.
+              }, {
+                type: 'sequence',
+                samples: turtle2.path,
+                terminate: true
+              }
+            ],
+            specSet: [LongpressModel, MultitapModel, SimpleTapModel]
+          }
+        , this.fakeClock);
+
+        let completion = executor();
+        const selector = await selectorPromise;
+        await Promise.race([completion, selectionPromises[0]]);
+
+        assert.equal(await promiseStatus(selectionPromises[0]), PromiseStatuses.PROMISE_RESOLVED);
+        assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
+
+        // Using the multi-tap leadup to attempt to find a match...
+        const selection1 = await selectionPromises[0];
+        // Sorry, nope, that gesture-stage sequence does not continue; it's over.
+        assert.deepEqual(selection1.result, {matched: false, action: { type: 'complete', item: null }});
+        assert.isTrue(sources[0].path.isComplete);
+
+        await Promise.race([completion, selectionPromises[1]]);
+        assert.equal(await promiseStatus(selectionPromises[1]), PromiseStatuses.PROMISE_RESOLVED);
+
+        // Ignoring the multi-tap leadup and starting a new gesture-stage sequence instead...
+        const selection2 = await selectionPromises[1];
+        assert.deepEqual(selection2.result, {matched: true, action: { type: 'optional-chain', item: 'b', allowNext: 'multitap' }});
+        assert.deepEqual(selection2.matcher.model, SimpleTapModel);
+        assert.isTrue(sources[0].path.isComplete);
+
+        // Allow the rest of the simulation to play out if any remaining processing is queued;
+        // it's easy cleanup that way.
+        await completion;
       });
     });
   });

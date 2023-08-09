@@ -374,7 +374,7 @@ export function simulateSelectorInput<Type>(
     },
     addSource: (obj, source) => {
       // TS can't resolve the two-typed parameter to two separate overloads of the same method, it seems.
-      obj.matchGesture(source as any, input.specSet);
+      selectionPromises.push(obj.matchGesture(source as any, input.specSet));
     },
     update: () => {}
   }

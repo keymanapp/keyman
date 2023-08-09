@@ -82,8 +82,8 @@ export class GestureSource<HoveredItemType> {
   }
 
   public update(sample: InputSample<HoveredItemType>) {
-    this._baseItem ||= sample.item;
     this.path.extend(sample);
+    this._baseItem ||= sample.item;
   }
 
   /**
