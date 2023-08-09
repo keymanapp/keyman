@@ -4,6 +4,12 @@ import Sentry from "@sentry/node";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { spawnChild } from "./spawnAwait.js";
 
+/**
+ * Maximum delay on shutdown of process to send pending events
+ * to Sentry, in msec
+ */
+const CLOSE_TIMEOUT = 2000;
+
 const cli = process.argv.join(' ');
 let isInit = false;
 
@@ -39,7 +45,7 @@ export class KeymanSentry {
       }
     } else if(cli.includes('event')) {
       const eventId = Sentry.captureMessage('Test message from -sentry-client-test-exception event');
-      await Sentry.close(2000);
+      await Sentry.close(CLOSE_TIMEOUT);
       console.log(`Captured test message with id ${eventId}`);
       process.exit(0);
     } else {

@@ -122,11 +122,11 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
 
     this.messages.push({...event});
 
-    // report fatal errors to Sentry, but don't display; note, it won't be
+    // report fatal errors to Sentry, but don't abort; note, it won't be
     // reported if user has disabled the Sentry setting
     if(CompilerError.severity(event.code) == CompilerErrorSeverity.Fatal) {
-      // this is async so returns a Promise, we'll let it resolve
-      // in its own time, and it can print its message then
+      // this is async so returns a Promise, we'll let it resolve in its own
+      // time, and it will emit a message to stderr with details at that time
       KeymanSentry.reportException(event.exceptionVar, false);
     }
 
