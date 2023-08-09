@@ -40,7 +40,7 @@ test_transforms() {
   std::cout << __FILE__ << ":" << __LINE__ << " - basic " << std::endl;
   {
     // start with one
-    transform_entry te(std::u32string(U"e^"), std::u32string(U"E"));  // keep it simple
+    transform_entry te(std::u32string(U"e\\^"), std::u32string(U"E"));  // keep it simple
     // OK now make a group do it
     transforms tr;
     transform_group st;

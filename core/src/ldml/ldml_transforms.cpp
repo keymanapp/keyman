@@ -16,7 +16,10 @@
 #define U_FALLTHROUGH
 #include "unicode/uniset.h"
 #include "unicode/usetiter.h"
+#include "unicode/unistr.h"
 #include "unicode/regex.h"
+#include "unicode/utext.h"
+#include "unicode/utypes.h"
 #else
 #error icu4c is required for this code
 #endif
@@ -408,19 +411,37 @@ transform_entry::transform_entry(const std::u32string &from, const std::u32strin
 
 size_t
 transform_entry::match(const std::u32string &input) const {
-  if (input.length() < fFrom.length()) {
-    // TODO-LDML: regex
-    // Too small, can't match.
-    return 0;
+  // TODO-LDML: simple approach, new regex every time
+  // TODO-LDML: Really? can't go from u32 to UnicodeString?
+
+  const std::u16string patstr = km::kbp::kmx::u32string_to_u16string(fFrom);
+  UErrorCode status           = U_ZERO_ERROR;
+  /* const */ icu::UnicodeString patustr = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
+  // add '$' to match to end
+  patustr.append(u'$');
+  std::unique_ptr<icu::RegexPattern> pattern(icu::RegexPattern::compile(patustr, 0, status));
+  assert(U_SUCCESS(status));
+
+  const std::u16string matchstr = km::kbp::kmx::u32string_to_u16string(input);
+  icu::UnicodeString matchustr = icu::UnicodeString(matchstr.data(), (int32_t)matchstr.length());
+  std::unique_ptr<icu::RegexMatcher> matcher(pattern->matcher(matchustr, status));
+  assert(U_SUCCESS(status));
+
+  if (!matcher->find(status)) { // i.e. matches somewhere, in this case at end of str
+    return 0; // and tear everything down
   }
-  // string at end
-  auto substr = input.substr(input.length() - fFrom.length(), fFrom.length());
-  if (substr != fFrom) {
-    // end of string doesn't match
-    return 0;
-  }
-  // match length == fFrom.length
-  return substr.length();
+
+  // TODO-LDML: this is UTF-16 len, not UTF-32 len!!
+  // auto matchLen = matcher->end64(status) - matcher->start64(status);
+  // TODO-LDML: if we had an underlying UText this would be simpler.
+  auto matchStart = matcher->start64(status);
+  auto matchEnd   = matcher->end64(status);
+  // extract..
+  const icu::UnicodeString substr = matchustr.tempSubStringBetween((int32_t)matchStart, (int32_t)matchEnd);
+  // preflight to UTF-32 to get length
+  auto matchLen = substr.toUTF32(nullptr, 0, status);
+
+  return matchLen;
 }
 
 std::u32string
