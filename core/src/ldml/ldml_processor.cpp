@@ -396,6 +396,7 @@ void ldml_processor::emit_marker(km_kbp_state *state, KMX_DWORD marker_no) {
 
 size_t
 ldml_processor::context_to_string(km_kbp_state *state, std::u32string &str) {
+    str.clear();
     auto &cp      = state->context();
     size_t ctxlen = 0; // TODO-LDML: is this needed?
     // We're only interested in as much of the context as is a KM_KBP_BT_CHAR.
@@ -411,15 +412,6 @@ ldml_processor::context_to_string(km_kbp_state *state, std::u32string &str) {
       }
     }
     return ctxlen; // consumed the entire context buffer.
-}
-
-void ldml_processor::prepend_marker(std::u32string &str, KMX_DWORD marker) {
-  km_kbp_usv triple[] = {
-    LDML_UC_SENTINEL,
-    LDML_MARKER_CODE,
-    marker
-  };
-  str.insert(0, triple, 3);
 }
 
 

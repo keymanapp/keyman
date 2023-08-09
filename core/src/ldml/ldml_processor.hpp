@@ -103,7 +103,14 @@ namespace kbp {
      static size_t context_to_string(km_kbp_state *state, std::u32string &str);
 
      /** prepend the marker string in UC_SENTINEL format to the str */
-     static void prepend_marker(std::u32string &str, KMX_DWORD marker);
+     inline static void prepend_marker(std::u32string &str, KMX_DWORD marker);
   };
+
+  void
+  ldml_processor::prepend_marker(std::u32string &str, KMX_DWORD marker) {
+     km_kbp_usv triple[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, marker};
+     str.insert(0, triple, 3);
+  }
+
 } // namespace kbp
 } // namespace km
