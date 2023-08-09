@@ -333,11 +333,11 @@ export function simulateMultiSourceMatcherInput<Type>(
 }
 
 type MatcherSelectorInput<Type> = {
-  sequence: (SimSpecTimer<Type> | SimSpecSequence<Type>),
+  pathSpecs: SimSpecSequence<Type> | SimSpecPriorMatch<Type>,
   specSet: GestureModel<Type>[]
-}[];
+};
 
-export function simulateMultiSourceSelectorInput<Type>(
+export function simulateSelectorInput<Type>(
   input: MatcherSelectorInput<Type>,
   fakeClock: sinon.SinonFakeTimers
 ): {
@@ -361,13 +361,6 @@ export function simulateMultiSourceSelectorInput<Type>(
     }
   });
 
-  for(let i=0; i < input.length; i++) {
-    if(input[i] != inputClone[i]) {
-      throw new Error("The specified input data should be in chronological order based on its start position.");
-    }
-  }
-
-  let indexSeed = 0;
   const selectionPromises: Promise<MatcherSelection<Type>>[] = [];
 
   const config: SimulationConfig<MatcherSelector<Type>, Type> = {
@@ -375,12 +368,13 @@ export function simulateMultiSourceSelectorInput<Type>(
       const selector = new gestures.matchers.MatcherSelector<Type>();
 
       // TS can't resolve the two-typed parameter to two separate overloads of the same method, it seems.
-      selectionPromises.push(selector.matchGesture(source as any, input[indexSeed++].specSet));
+      selectionPromises.push(selector.matchGesture(source as any, input.specSet));
 
       return selector;
     },
     addSource: (obj, source) => {
-      obj.matchGesture(source, input[indexSeed++].specSet);
+      // TS can't resolve the two-typed parameter to two separate overloads of the same method, it seems.
+      obj.matchGesture(source as any, input.specSet);
     },
     update: () => {}
   }
@@ -389,7 +383,7 @@ export function simulateMultiSourceSelectorInput<Type>(
     sources,
     testObjPromise,
     executor
-  } = simulateMultiSourceInput(config, input.map((entry) => entry.sequence), fakeClock);
+  } = simulateMultiSourceInput(config, [input.pathSpecs], fakeClock);
 
   return {
     sources,

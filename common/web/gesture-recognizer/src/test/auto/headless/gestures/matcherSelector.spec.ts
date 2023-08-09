@@ -5,7 +5,7 @@ import * as PromiseStatusModule from 'promise-status-async';
 const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 import { assertingPromiseStatus as promiseStatus } from '../../../resources/assertingPromiseStatus.js';
 
-import { simulateMultiSourceSelectorInput } from "../../../resources/simulateMultiSourceInput.js";
+import { simulateMultiSourceMatcherInput, simulateSelectorInput } from "../../../resources/simulateMultiSourceInput.js";
 
 import { GestureSource, gestures } from '@keymanapp/gesture-recognizer';
 
@@ -53,12 +53,10 @@ describe("MatcherSelector", function () {
           selectionPromises,
           selectorPromise,
           executor
-        } = simulateMultiSourceSelectorInput([
-          {
-            sequence: { type: 'sequence', samples: turtle.path, terminate: false },
-            specSet: [LongpressModel]
-          }
-        ], this.fakeClock);
+        } = simulateSelectorInput({
+          pathSpecs: { type: 'sequence', samples: turtle.path, terminate: false },
+          specSet: [LongpressModel]
+        }, this.fakeClock);
 
         let completion = executor();
         const selector = await selectorPromise;
@@ -92,12 +90,10 @@ describe("MatcherSelector", function () {
           selectionPromises,
           selectorPromise,
           executor
-        } = simulateMultiSourceSelectorInput([
-          {
-            sequence: { type: 'sequence', samples: turtle.path, terminate: false },
-            specSet: [LongpressModel, MultitapModel, SimpleTapModel]
-          }
-        ], this.fakeClock);
+        } = simulateSelectorInput({
+          pathSpecs: { type: 'sequence', samples: turtle.path, terminate: false },
+          specSet: [LongpressModel, MultitapModel, SimpleTapModel]
+        }, this.fakeClock);
 
         let completion = executor();
         const selector = await selectorPromise;
@@ -132,12 +128,10 @@ describe("MatcherSelector", function () {
           selectionPromises,
           selectorPromise,
           executor
-        } = simulateMultiSourceSelectorInput([
-          {
-            sequence: { type: 'sequence', samples: turtle.path, terminate: false },
-            specSet: [LongpressModel]
-          }
-        ], this.fakeClock);
+        } = simulateSelectorInput({
+          pathSpecs: { type: 'sequence', samples: turtle.path, terminate: false },
+          specSet: [LongpressModel]
+        }, this.fakeClock);
 
 
         let completion = executor();
@@ -180,12 +174,10 @@ describe("MatcherSelector", function () {
           selectionPromises,
           selectorPromise,
           executor
-        } = simulateMultiSourceSelectorInput([
-          {
-            sequence: { type: 'sequence', samples: turtle.path, terminate: false },
-            specSet: [LongpressModel]
-          }
-        ], this.fakeClock);
+        } = simulateSelectorInput({
+          pathSpecs: { type: 'sequence', samples: turtle.path, terminate: false },
+          specSet: [LongpressModel]
+        }, this.fakeClock);
 
 
         let completion = executor();
@@ -238,13 +230,11 @@ describe("MatcherSelector", function () {
           selectionPromises,
           selectorPromise,
           executor
-        } = simulateMultiSourceSelectorInput([
-          {
-            sequence: { type: 'sequence', samples: turtle.path, terminate: false },
-            // Current problem:  adding the extra models leads to rejection of all?
-            specSet: [LongpressModel, MultitapModel, SimpleTapModel]
-          }
-        ], this.fakeClock);
+        } = simulateSelectorInput({
+          pathSpecs: { type: 'sequence', samples: turtle.path, terminate: false },
+          // Current problem:  adding the extra models leads to rejection of all?
+          specSet: [LongpressModel, MultitapModel, SimpleTapModel]
+        }, this.fakeClock);
 
 
         let completion = executor();
@@ -295,12 +285,10 @@ describe("MatcherSelector", function () {
           selectionPromises,
           selectorPromise,
           executor
-        } = simulateMultiSourceSelectorInput([
-          {
-            sequence: { type: 'sequence', samples: turtle.path, terminate: true },
-            specSet: [LongpressModel, MultitapModel, SimpleTapModel]
-          }
-        ], this.fakeClock);
+        } = simulateSelectorInput({
+          pathSpecs: { type: 'sequence', samples: turtle.path, terminate: true },
+          specSet: [LongpressModel, MultitapModel, SimpleTapModel]
+        }, this.fakeClock);
 
         let completion = executor();
         const selector = await selectorPromise;
@@ -339,12 +327,10 @@ describe("MatcherSelector", function () {
           selectionPromises,
           selectorPromise,
           executor
-        } = simulateMultiSourceSelectorInput([
-          {
-            sequence: { type: 'sequence', samples: turtle.path, terminate: true },
-            specSet: [LongpressModel, MultitapModel, SimpleTapModel]
-          }
-        ], this.fakeClock);
+        } = simulateSelectorInput({
+          pathSpecs: { type: 'sequence', samples: turtle.path, terminate: true },
+          specSet: [LongpressModel, MultitapModel, SimpleTapModel]
+        }, this.fakeClock);
 
         let completion = executor();
         let resets = 0;
@@ -372,6 +358,77 @@ describe("MatcherSelector", function () {
         assert.deepEqual(selection.matcher.model, SimpleTapModel);
         assert.isTrue(sources[0].path.isComplete);
         assert.isAtLeast(resets, 1);
+
+        // Allow the rest of the simulation to play out; it's easy cleanup that way.
+        await completion;
+      });
+    });
+
+    describe("Later stages", function() {
+      it("Subkey selection", async function() {
+        const turtle = new TouchpathTurtle({
+          targetX: 1,
+          targetY: 1,
+          t: 100,
+          item: 'a'
+        });
+        turtle.wait(520, 26);
+        turtle.commitPending();
+
+        // Set up the prior stage's match
+        const {
+          executor: predExecutor,
+          modelMatcherPromise
+        } = simulateMultiSourceMatcherInput([
+          { type: 'sequence', samples: turtle.path, terminate: false }
+        ], this.fakeClock, LongpressModel);
+
+       await predExecutor();
+       const predecessorMatcher = await modelMatcherPromise;
+       assert.equal(await promiseStatus(modelMatcherPromise), PromiseStatuses.PROMISE_RESOLVED);
+
+        // Now, forward it (in some manner) to the simulation engine as part of its setup.
+
+        // Also, construct the remainder of the path.
+        const parentLength = turtle.path.length;
+
+        turtle.move(45, 5, 60, 3);
+        turtle.hoveredItem = 'b';
+        turtle.move(90, 5, 60, 3);
+        turtle.hoveredItem = 'c';
+        turtle.commitPending();
+
+        // Get the new part of the turtle's path, which has not yet been simulated.
+        const remainingPath = [].concat(turtle.path).splice(parentLength, turtle.path.length - parentLength);
+
+        const {
+          sources,
+          selectionPromises,
+          selectorPromise,
+          executor
+        } = simulateSelectorInput(
+          {
+            pathSpecs: {
+              type: 'prior-matcher',
+              matcher: predecessorMatcher,
+              continuation: [{ type: 'sequence', samples: remainingPath, terminate: true }]
+            },
+            specSet: [SubkeySelectModel]
+          }
+        , this.fakeClock);
+
+        let completion = executor();
+        const selector = await selectorPromise;
+        await Promise.race([completion, selectionPromises[0]]);
+
+        assert.equal(await promiseStatus(selectionPromises[0]), PromiseStatuses.PROMISE_RESOLVED);
+        assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
+
+        const selection = await selectionPromises[0];
+
+        assert.deepEqual(selection.result, {matched: true, action: { type: 'complete', item: 'c' }});
+        assert.deepEqual(selection.matcher.model, SubkeySelectModel);
+        assert.isTrue(sources[0].path.isComplete);
 
         // Allow the rest of the simulation to play out; it's easy cleanup that way.
         await completion;
