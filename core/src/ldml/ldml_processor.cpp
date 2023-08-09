@@ -263,7 +263,7 @@ ldml_processor::process_event(
 
         // Now, process the actual transforms
         if (!!transforms) {
-          // add the newly added char to ctxtstr
+          // add the newly added key output to ctxtstr
           ctxtstr.append(str32);
 
           /** the output buffer for transforms */
