@@ -404,7 +404,11 @@ and `width`.
 : Boolean. Defaults to `false`. If true, this will be the default key when the
   user longpresses the base key without moving their finger. Only one subkey
   should be default; if multiple subkeys have the default field set, then
-  behaviour is undefined.
+  behaviour is undefined.  Given that cancel is not the preferred default
+  action for a longpress, the user can cancel the longpress default by 
+  sliding outside the 'acceptance' area -- e.g. south of the key cap, 
+  which would then unhighlight the default and indicate visually that 
+  no output would occur when they release their finger.
 
 ## `flick` object
 
