@@ -2,7 +2,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import { CompilerCallbacks, KeymanDeveloperProject, KeymanFileTypes, KPJFileReader } from "@keymanapp/common-types";
-import { InfrastructureMessages } from "../messages/messages.js";
+import { InfrastructureMessages } from "../messages/infrastructureMessages.js";
 
 export const isProject = (filename: string): boolean =>
   fs.existsSync(filename) && (

@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { CompilerCallbacks } from "@keymanapp/common-types";
-import { InfrastructureMessages } from "../messages/messages.js";
+import { InfrastructureMessages } from "../messages/infrastructureMessages.js";
 
 /**
  * Replaces each entry starting with `@` with the content of the file, with one

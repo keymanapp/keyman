@@ -73,6 +73,7 @@ export interface TouchLayoutSubKey {
   sp?: TouchLayoutKeySp;
   pad?: TouchLayoutKeyPad;
   width?: TouchLayoutKeyWidth;
+  default?: boolean;  // Only used for longpress currently
 };
 
 export interface TouchLayoutFlick {
