@@ -31,6 +31,7 @@ kmx = executable('kmx',
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../kmx_test_source'],
     link_args: links + tests_flags,
+    dependencies: [icu_uc, icu_i18n],
     objects: [lib.extract_all_objects(recursive: false), kmx_test_source_lib.extract_all_objects(recursive: false)])
 
 tests = [
@@ -178,6 +179,7 @@ key_e = executable('key_list', ['kmx_key_list.cpp', '../emscripten_filesystem.cp
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,
+                dependencies: [icu_uc, icu_i18n],
                 objects: lib.extract_all_objects(recursive: false))
 test_kbd = 'kmx_key_list'
 
@@ -196,6 +198,7 @@ imx_e = executable('imx_list', ['kmx_imx.cpp', '../emscripten_filesystem.cpp'],
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,
+                dependencies: [icu_uc, icu_i18n],
                 objects: lib.extract_all_objects(recursive: false))
 
 test_kbd = 'kmx_imsample'

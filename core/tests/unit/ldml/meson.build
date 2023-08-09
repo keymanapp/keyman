@@ -56,7 +56,7 @@ ldml = executable('ldml',
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
     link_args: links + tests_flags,
-    dependencies: [icu_uc],
+    dependencies: [icu_uc, icu_i18n],
     # link_with: [lib],
     objects: lib.extract_all_objects(recursive: false),
     )
@@ -85,6 +85,7 @@ e = executable('test_kmx_plus', 'test_kmx_plus.cpp',
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
     link_args: links + tests_flags,
+    dependencies: [icu_uc, icu_i18n],
     objects: lib.extract_all_objects(recursive: false))
 test('test_kmx_plus', e, suite: 'ldml')
 
@@ -92,6 +93,6 @@ t = executable('test_transforms', 'test_transforms.cpp',
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
     link_args: links + tests_flags,
-    dependencies: [icu_uc],
+    dependencies: [icu_uc, icu_i18n],
     objects: lib.extract_all_objects(recursive: false))
 test('test_transforms', t, suite: 'ldml')
