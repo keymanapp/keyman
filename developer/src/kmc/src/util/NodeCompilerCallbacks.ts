@@ -6,9 +6,10 @@ import { CompilerCallbacks, CompilerEvent,
          CompilerError,
          CompilerCallbackOptions,
          CompilerFileCallbacks} from '@keymanapp/common-types';
-import { InfrastructureMessages } from '../messages/messages.js';
+import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import chalk from 'chalk';
 import supportsColor from 'supports-color';
+import { KeymanSentry } from './KeymanSentry.js';
 
 const color = chalk.default;
 const severityColors: {[value in CompilerErrorSeverity]: chalk.Chalk} = {
@@ -120,6 +121,14 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     }
 
     this.messages.push({...event});
+
+    // report fatal errors to Sentry, but don't abort; note, it won't be
+    // reported if user has disabled the Sentry setting
+    if(CompilerError.severity(event.code) == CompilerErrorSeverity.Fatal) {
+      // this is async so returns a Promise, we'll let it resolve in its own
+      // time, and it will emit a message to stderr with details at that time
+      KeymanSentry.reportException(event.exceptionVar, false);
+    }
 
     if(CompilerError.severity(event.code) < compilerLogLevelToSeverity[this.options.logLevel]) {
       // collect messages but don't print to console

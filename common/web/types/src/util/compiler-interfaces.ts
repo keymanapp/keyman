@@ -6,6 +6,11 @@ export interface CompilerEvent {
   line?: number;
   code: number;
   message: string;
+  /**
+   * an internal error occurred that should be captured with a stack trace
+   * e.g. to the Keyman sentry instance by kmc
+   */
+  exceptionVar?: any;
 };
 
 export enum CompilerErrorSeverity {
@@ -399,7 +404,13 @@ export const defaultCompilerOptions: CompilerOptions = {
  * @param message
  * @returns
  */
-export const CompilerMessageSpec = (code: number, message: string) : CompilerEvent => { return { code, message } };
+export const CompilerMessageSpec = (code: number, message: string, exceptionVar?: any) : CompilerEvent => ({
+  code,
+  message: exceptionVar
+    ? (message ?? `Unexpected exception`) + `: ${exceptionVar.toString()}\n\nCall stack:\n${(exceptionVar instanceof Error ? exceptionVar.stack : (new Error()).stack)}` :
+    message,
+  exceptionVar
+});
 
 /**
  * @deprecated use `CompilerError.exceptionToString` instead
