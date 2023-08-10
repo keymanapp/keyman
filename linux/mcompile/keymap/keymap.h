@@ -17,7 +17,6 @@
 #include "mc_kmxfile.h"
 #include "kmx_file.h"
 #include "mc_savekeyboard.h"
-#include "helpers.h"
 #include "u16.h"
 
 int dummytest_keymap();
