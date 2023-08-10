@@ -57,7 +57,7 @@ void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, KMX_UINT shift, KMX_
 
 #if defined(_WIN32) || defined(_WIN64)
   int wmain(int argc, wchar_t* argv[]) {
-    std::vector<std::u16string> str_argv_16 = convert_argvW_to_Vector_u16str( argc, argv);  
+    std::vector<std::u16string> str_argv_16 = convert_argvW_to_Vector_u16str( argc, argv);
     run(argc, str_argv_16);
 
 #else  // LINUX
@@ -68,7 +68,7 @@ void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, KMX_UINT shift, KMX_
 
 }
 
-int run(int argc, std::vector<std::u16string>  str_argv, char* argv_ch[] = NULL){
+int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
 
   // convert std::vector<std::u16string> to std::vector<const char16_t*>
   std::vector<const char16_t*> argv;
@@ -95,7 +95,7 @@ int run(int argc, std::vector<std::u16string>  str_argv, char* argv_ch[] = NULL)
 
 //-_S2 -------u option will be done later----------------------
 
- /* if(wcscmp(argv[1], L"-u") == 0) {   // I4273
+ /* if(wcscmp(argv[1], L"-u") == 0) { // I4273
     wchar_t *infile = argv[2], *outfile = argv[3];
 
     LPKEYBOARD kmxfile;
@@ -117,12 +117,12 @@ int run(int argc, std::vector<std::u16string>  str_argv, char* argv_ch[] = NULL)
   }*/
 //-----------------------------
 
-  int bDeadkeyConversion = u16cmp(argv[1], u"-d") == 0;   // I4552
+  int bDeadkeyConversion = u16cmp(argv[1], u"-d") == 0; // I4552
   int n = (bDeadkeyConversion ? 2 : 1);
 
-  char16_t* infile = (char16_t*) argv[n], *indll =  (char16_t*) argv[n+1], *kbid = (char16_t*) argv[n+2], *outfile =  (char16_t*) argv[n+3];
+  char16_t* infile = (char16_t*) argv[n], *indll = (char16_t*) argv[n+1], *kbid = (char16_t*) argv[n+2], *outfile = (char16_t*) argv[n+3];
 
-  wprintf(L"mcompile%ls \"%ls\" \"%ls\" \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d" : L"", u16fmt((const char16_t*) infile).c_str(), u16fmt((const char16_t*) indll).c_str(), u16fmt((const char16_t*) kbid).c_str(), u16fmt((const char16_t*) outfile).c_str() );  // I4174
+  wprintf(L"mcompile%ls \"%ls\" \"%ls\" \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d" : L"", u16fmt((const char16_t*) infile).c_str(), u16fmt((const char16_t*) indll).c_str(), u16fmt((const char16_t*) kbid).c_str(), u16fmt((const char16_t*) outfile).c_str() ); // I4174
 
   // 1. Load the keyman keyboard file
 
@@ -166,7 +166,7 @@ int run(int argc, std::vector<std::u16string>  str_argv, char* argv_ch[] = NULL)
 
 #else  // LINUX
 // _S2 do I need all parameters?-no
-  if(KMX_DoConvert( kmxfile,  kbid,  bDeadkeyConversion, argc, (gchar**) argv_ch)) {   // I4552F
+  if(KMX_DoConvert( kmxfile,  kbid,  bDeadkeyConversion, argc, (gchar**) argv_ch)) { // I4552F
     KMX_SaveKeyboard(kmxfile, outfile);
 }
 #endif
@@ -308,11 +308,11 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
 
   const wchar_t* ERROR = L"   ";
 
-  for (int j = 1; VKShiftState[j] != 0xFFFF; j++) {   // I4651
+  for (int j = 1; VKShiftState[j] != 0xFFFF; j++) { // I4651
   wprintf(L"\n");
 
     // Loop through each possible key on the keyboard
-    for (int i = 0;KMX_VKMap[i]; i++) {   // I4651
+    for (int i = 0;KMX_VKMap[i]; i++) { // I4651
 
       // _S2 why were those 2 functions originally not done in 1 step ??
       KMX_DWORD vkUnderlying = KMX_VKUSToVKUnderlyingLayout(All_Vector,(int) KMX_VKMap[i] );
@@ -422,10 +422,10 @@ void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, KMX_UINT shift, KMX_
 
 
 /*
-bool ImportRules(WCHAR *kbid, LPKEYBOARD kp, std::vector<DeadkeyMapping> *FDeadkeys, BOOL bDeadkeyConversion);   // I4353   // I4327
-BOOL ConvertKeyboardToUnicode(LPKEYBOARD kbd);   // I4273
+bool ImportRules(WCHAR *kbid, LPKEYBOARD kp, std::vector<DeadkeyMapping> *FDeadkeys, BOOL bDeadkeyConversion); // I4353   // I4327
+BOOL ConvertKeyboardToUnicode(LPKEYBOARD kbd); // I4273
 
-std::vector<DeadkeyMapping> FDeadkeys;   // I4353
+std::vector<DeadkeyMapping> FDeadkeys; // I4353
 
 #define KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_MCOMPILE KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE ".mcompile"
 
@@ -504,7 +504,7 @@ void AddDeadkeyRule(LPKEYBOARD kbd, WCHAR deadkey, WORD vk, UINT shift) {
   // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
   // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
   // to provide an alternate..
-  if((shift & (LCTRLFLAG|RALTFLAG)) == (LCTRLFLAG|RALTFLAG))   // I4549
+  if((shift & (LCTRLFLAG|RALTFLAG)) == (LCTRLFLAG|RALTFLAG)) // I4549
     shift &= ~LCTRLFLAG;
 
   // If the first group is not a matching-keys group, then we need to add into
@@ -1073,9 +1073,6 @@ void LogError(PWSTR fmt, ...) {
   _putws(fmtbuf);
 }
 */
-
-
-
 
 // _S2 maybe I will need that later??
 

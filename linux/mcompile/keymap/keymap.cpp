@@ -64,7 +64,6 @@ bool  createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, 
   // _S2 TODO define folder to store File in
   std::ofstream KeyboardFile("File_" + language + ".txt");
 
-  printf("Keyboard %s\n", text);
   KeyboardFile << "Keyboard" << text << "\n";
 
   if (fp) {
@@ -81,7 +80,6 @@ bool  createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, 
 
       // as long as we are in the same xkb_symbol layout block and find "key <" we push the whole line into a 1D-vector
       if ((print_OK) && (std::string(str_buf).find(key) != std::string::npos)) {
-        printf("%s", buffer);
         complete_List.push_back(buffer);
         KeyboardFile << buffer;
       }

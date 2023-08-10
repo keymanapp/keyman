@@ -7,36 +7,26 @@ Sample program that reads US basic keyboard and compares to key value group
 # Keymap
 
 TODO check if US basic is the right Keyboard to compare with
-TODO non-letter characters don't work OK yet
-TODO Umlauts don't work OK yet
+TODO deadkeys don't work yet
 TODO path for xkb/symbols as compile time option in meson
 TODO check how many/which shift states we use ( at the moment we read all shiftstate-columns of US but then use only 2 colums (non-shift + shift) then use as many colums for Other )
 TODO define folder to store File_US.txt" in and find better name
 TODO get rid of GTK functions that are deprecated and use X11 instead
 TODO retrieve name of Other keyboard and use appropriate name instead of "Other"
-TODO use/adapt TranslateKeyboard() to work on Linux/cross-platform
 TODO mcompile.cpp: open mcompile -u - option
 TODO check if I can use files from some other keyman path instead of a copy in keymap ( e.g. filesystem.h exists elsewhere)
 TODO remove kbdid and kbd for Linux
-TODO remove unneccessary testing fungctions in keymap.cpp/h
-TODO remove helpers.cpp/h
-TODO usw only wprintf check if printf is used somewhere...
-ToDo remove std::cout std::wcout
-TODO several Versions of KMX_LoadKeyboard
 TODO shiftstate-count
 TODO keymap SplitToV.cpp exchange 4 with genaerated shiftcount
 TODO check if part with surplus is neccessary
 TODO shift-statevector
-TODO meson.build do I need version of dependency??
-TODO meson remove helpers.cpp
-TODO remove mc_savekeyboard.cpp/h
-TODO remove dummytest()
-TODO see which functions I need from u16.cpp/h
-TODO see which data types I can remove from km_types.h
-TODO replace/remove old structs or move kmx_structs to the left side of file
 TODO ...
 
 //---------------------------
 TOASK is using string OK, or do we use char, wchar?
 TOASK a-z, A_Z or more keys? ...
 TOASK ado we need mcompile -u  option?
+
+./mcompile -d /Projects/keyman/keyman/linux/mcompile/keymap/mcompile_test.kmx bla.dll 0407 /Projects/keyman/keyman/linux/mcompile/keymap/mcompile_test_out.kmx
+
+./mcompile -d     /home/mcompileTest/Source/mcompile_test.kmx bla.dll 0407 /home/mcompileTest/Source_after_run_mcompile/mcompile_test_out.kmx

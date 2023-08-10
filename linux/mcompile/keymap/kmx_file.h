@@ -301,141 +301,76 @@ namespace kmx {
 #define K_MODIFIERFLAG  0x007F
 #define K_NOTMODIFIERFLAG 0xFF00   // I4548
 
-struct COMP_STORE {
-  DWORD dwSystemID;
-  DWORD dpName;
-  DWORD dpString;
-};
-
-                                  struct KMX_COMP_STORE {
-                                    KMX_DWORD dwSystemID;
-                                    KMX_DWORD dpName;
-                                    KMX_DWORD dpString;
-                                    };
-
-struct COMP_KEY {
-  WORD  Key;
-  DWORD Line;
-  DWORD ShiftFlags;
-  DWORD dpOutput;
-  DWORD dpContext;
+struct KMX_COMP_STORE {
+  KMX_DWORD dwSystemID;
+  KMX_DWORD dpName;
+  KMX_DWORD dpString;
   };
 
-                                  struct KMX_COMP_KEY {
-                                    KMX_WORD  Key;
-                                    KMX_WORD  _reserved;
-                                    KMX_DWORD Line;
-                                    KMX_DWORD ShiftFlags;
-                                    KMX_DWORD dpOutput;
-                                    KMX_DWORD dpContext;
-                                    };
-
-
-struct COMP_GROUP {
-  DWORD dpName;
-  DWORD dpKeyArray;   // [LPKEY] address of first item in key array
-  DWORD dpMatch;
-  DWORD dpNoMatch;
-  DWORD cxKeyArray;   // in array entries
-  BOOL  fUsingKeys;   // group(xx) [using keys] <-- specified or not
+struct KMX_COMP_KEY {
+  KMX_WORD  Key;
+  KMX_WORD  _reserved;
+  KMX_DWORD Line;
+  KMX_DWORD ShiftFlags;
+  KMX_DWORD dpOutput;
+  KMX_DWORD dpContext;
   };
 
-                                  struct KMX_COMP_GROUP {
-                                    KMX_DWORD dpName;
-                                    KMX_DWORD dpKeyArray;   // [LPKEY] address of first item in key array
-                                    KMX_DWORD dpMatch;
-                                    KMX_DWORD dpNoMatch;
-                                    KMX_DWORD cxKeyArray;   // in array entries
-                                    KMX_BOOL  fUsingKeys;   // group(xx) [using keys] <-- specified or not
-                                    };
 
+struct KMX_COMP_GROUP {
+  KMX_DWORD dpName;
+  KMX_DWORD dpKeyArray;   // [LPKEY] address of first item in key array
+  KMX_DWORD dpMatch;
+  KMX_DWORD dpNoMatch;
+  KMX_DWORD cxKeyArray;   // in array entries
+  KMX_BOOL  fUsingKeys;   // group(xx) [using keys] <-- specified or not
+  };
 
-struct COMP_KEYBOARD {
-  DWORD dwIdentifier;   // 0000 Keyman compiled keyboard id
+struct KMX_COMP_KEYBOARD {
+  KMX_DWORD dwIdentifier;   // 0000 Keyman compiled keyboard id
 
-  DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
+  KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
 
-  DWORD dwCheckSum;     // 0008 As stored in keyboard. DEPRECATED as of 16.0
-  DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
-  DWORD IsRegistered;   // 0010
-  DWORD version;        // 0014 keyboard version
+  KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard. DEPRECATED as of 16.0
+  KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
+  KMX_DWORD IsRegistered;   // 0010
+  KMX_DWORD version;        // 0014 keyboard version
 
-  DWORD cxStoreArray;   // 0018 in array entries
-  DWORD cxGroupArray;   // 001C in array entries
+  KMX_DWORD cxStoreArray;   // 0018 in array entries
+  KMX_DWORD cxGroupArray;   // 001C in array entries
 
-  DWORD dpStoreArray;   // 0020 [LPSTORE] address of first item in store array
-  DWORD dpGroupArray;   // 0024 [LPGROUP] address of first item in group array
+  KMX_DWORD dpStoreArray;   // 0020 [LPSTORE] address of first item in store array
+  KMX_DWORD dpGroupArray;   // 0024 [LPGROUP] address of first item in group array
 
-  DWORD StartGroup[2];  // 0028 index of starting groups [2 of them]
+  KMX_DWORD StartGroup[2];  // 0028 index of starting groups [2 of them]
 
-  DWORD dwFlags;        // 0030 Flags for the keyboard file
+  KMX_DWORD dwFlags;        // 0030 Flags for the keyboard file
 
-  DWORD dwHotKey;       // 0034 standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
+  KMX_DWORD dwHotKey;       // 0034 standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
 
-  DWORD dpBitmapOffset; // 0038 offset of the bitmaps in the file
-  DWORD dwBitmapSize;   // 003C size in bytes of the bitmaps
+  KMX_DWORD dpBitmapOffset; // 0038 offset of the bitmaps in the file
+  KMX_DWORD dwBitmapSize;   // 003C size in bytes of the bitmaps
 };
 
-                        struct KMX_COMP_KEYBOARD {
-                          KMX_DWORD dwIdentifier;   // 0000 Keyman compiled keyboard id
-
-                          KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
-
-                          KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard. DEPRECATED as of 16.0
-                          KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
-                          KMX_DWORD IsRegistered;   // 0010
-                          KMX_DWORD version;        // 0014 keyboard version
-
-                          KMX_DWORD cxStoreArray;   // 0018 in array entries
-                          KMX_DWORD cxGroupArray;   // 001C in array entries
-
-                          KMX_DWORD dpStoreArray;   // 0020 [LPSTORE] address of first item in store array
-                          KMX_DWORD dpGroupArray;   // 0024 [LPGROUP] address of first item in group array
-
-                          KMX_DWORD StartGroup[2];  // 0028 index of starting groups [2 of them]
-
-                          KMX_DWORD dwFlags;        // 0030 Flags for the keyboard file
-
-                          KMX_DWORD dwHotKey;       // 0034 standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
-
-                          KMX_DWORD dpBitmapOffset; // 0038 offset of the bitmaps in the file
-                          KMX_DWORD dwBitmapSize;   // 003C size in bytes of the bitmaps
-                        };
-
-struct COMP_KEYBOARD_KMXPLUSINFO {
-  DWORD dpKMXPlus;      // 0040 offset of KMXPlus data, <sect> header is first
-  DWORD dwKMXPlusSize;  // 0044 size in bytes of entire KMXPlus data
+struct KMX_COMP_KEYBOARD_KMXPLUSINFO {
+  KMX_DWORD dpKMXPlus;      // 0040 offset of KMXPlus data, <sect> header is first
+  KMX_DWORD dwKMXPlusSize;  // 0044 size in bytes of entire KMXPlus data
 };
-
-                      struct KMX_COMP_KEYBOARD_KMXPLUSINFO {
-                        KMX_DWORD dpKMXPlus;      // 0040 offset of KMXPlus data, <sect> header is first
-                        KMX_DWORD dwKMXPlusSize;  // 0044 size in bytes of entire KMXPlus data
-                      };
-
 
 /**
  * Only valid if comp_keyboard.dwFlags&KF_KMXPLUS
  */
 
-struct COMP_KEYBOARD_EX {
-  COMP_KEYBOARD             header;    // 0000 see COMP_KEYBOARD
-  COMP_KEYBOARD_KMXPLUSINFO kmxplus;   // 0040 see COMP_KEYBOARD_EXTRA
+
+struct KMX_COMP_KEYBOARD_EX {
+  KMX_COMP_KEYBOARD             header;    // 0000 see COMP_KEYBOARD
+  KMX_COMP_KEYBOARD_KMXPLUSINFO kmxplus;   // 0040 see COMP_KEYBOARD_EXTRA
 };
 
-        struct KMX_COMP_KEYBOARD_EX {
-          KMX_COMP_KEYBOARD             header;    // 0000 see COMP_KEYBOARD
-          KMX_COMP_KEYBOARD_KMXPLUSINFO kmxplus;   // 0040 see COMP_KEYBOARD_EXTRA
-        };
-
-typedef COMP_KEYBOARD *PCOMP_KEYBOARD;
-typedef COMP_STORE *PCOMP_STORE;
-typedef COMP_KEY *PCOMP_KEY;
-typedef COMP_GROUP *PCOMP_GROUP;
-
-            typedef KMX_COMP_KEYBOARD *PKMX_COMP_KEYBOARD;
-            typedef KMX_COMP_STORE *PKMX_COMP_STORE;
-            typedef KMX_COMP_KEY *PKMX_COMP_KEY;
-            typedef KMX_COMP_GROUP *PKMX_COMP_GROUP;
+typedef KMX_COMP_KEYBOARD *PKMX_COMP_KEYBOARD;
+typedef KMX_COMP_STORE *PKMX_COMP_STORE;
+typedef KMX_COMP_KEY *PKMX_COMP_KEY;
+typedef KMX_COMP_GROUP *PKMX_COMP_GROUP;
 
 
 extern const int CODE__SIZE[];
