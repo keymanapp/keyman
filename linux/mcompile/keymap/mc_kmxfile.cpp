@@ -3,11 +3,6 @@
 #include "filesystem.h"     // _S2 needed?
 #include <typeinfo>
 
-int dummytest_mc_kmx_file(){
-  std::cout<< " dummytest_mc_kmx_file    is available\t";
-  return 0;
-  }
-
 KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard);
 
 KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz);

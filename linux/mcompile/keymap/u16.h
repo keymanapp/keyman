@@ -2,20 +2,14 @@
 #define U16_H
 
 #include <iostream>
-
 #include <cmath>
 #include <vector>
 #include <ctype.h>
 #include <string>
 #include "km_types.h"
 
-
-int dummytest_u16();
 std::vector<std::u16string> convert_argvW_to_Vector_u16str(int argc, wchar_t* argv[]);
 std::vector<std::u16string> convert_argv_to_Vector_u16str(int argc, char* argv[]);
-
-wchar_t* wchart_from_char( char* c);
-wchar_t* wchart_from_char16( char16_t** c);
 
 std::string string_from_wstring(std::wstring const str);
 std::wstring wstring_from_string(std::string const str);

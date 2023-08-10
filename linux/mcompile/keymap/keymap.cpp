@@ -21,12 +21,6 @@ static void PrintKeymapForCode(GdkKeymap *keymap, guint keycode)
 }
 */
 
-
-int dummytest_keymap(){
-  std::wcout<< " dummytest_keymap    is available\n";
-  return 0;
-}
-
 int write_US_ToVector( v_dw_3D &vec,std::string language, const char* text) {
 
   // _S2 relative path !!
@@ -98,34 +92,33 @@ bool  createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, 
     wprintf(L"ERROR: can't create row from US \n");
     return 1;
   }
-
-   return 0;
+  return 0;
 }
 
 KMX_DWORD convertNamesToValue(std::wstring tok_wstr){
   std::map<std::wstring, KMX_DWORD > first;
 
   //initializing
-  first[L"exclam"] =           33;
-  first[L"at"] =               64;
-  first[L"numbersign"] =       35;
-  first[L"dollar"] =           36;
-  first[L"percent"] =          37;
-  first[L"dead_circumflex"] =  94;  /* _S2 ??? */
-  first[L"ampersand"] =        38;
-  first[L"asterisk"] =         42;
-  first[L"parenleft"] =        40;
-  first[L"parenright"] =       41;
+  first[L"exclam"]           =  33;
+  first[L"at"]               =  64;
+  first[L"numbersign"]       =  35;
+  first[L"dollar"]           =  36;
+  first[L"percent"]          =  37;
+  first[L"dead_circumflex"]  =  94;  /* _S2 ??? */
+  first[L"ampersand"]        =  38;
+  first[L"asterisk"]         =  42;
+  first[L"parenleft"]        =  40;
+  first[L"parenright"]       =  41;
 
-  first[L"equal"] =          VK_EQUAL;      /* BB = 187 */
-  first[L"backslash"] =      VK_BKSLASH;    /* DC = 220 */
-  first[L"bracketleft"]  =   VK_LBRKT;      /* DB = 219 */
-  first[L"bracketright"] =   VK_RBRKT;      /* DD = 221 */
-  first[L"parenright"] =     VK_COLON;      /* BA = 186 */
-  first[L"comma"] =          VK_COMMA;      /* BC = 188 */
-  first[L"period"] =         VK_PERIOD;     /* BE = 190 */
-  first[L"slash"] =          VK_SLASH;      /* BF = 191 */
-  first[L"ssharp"] =         VK_xDF;        /* DF = 223 ß  */
+  first[L"equal"]          =   VK_EQUAL;      /* BB = 187 */
+  first[L"backslash"]      =   VK_BKSLASH;    /* DC = 220 */
+  first[L"bracketleft"]    =   VK_LBRKT;      /* DB = 219 */
+  first[L"bracketright"]   =   VK_RBRKT;      /* DD = 221 */
+  first[L"parenright"]     =   VK_COLON;      /* BA = 186 */
+  first[L"comma"]          =   VK_COMMA;      /* BC = 188 */
+  first[L"period"]         =   VK_PERIOD;     /* BE = 190 */
+  first[L"slash"]          =   VK_SLASH;      /* BF = 191 */
+  first[L"ssharp"]         =   VK_xDF;        /* DF = 223 ß  */
 
  // _S2 ?? VK_SPACE,  VK_ACCENT, VK_HYPHEN, VK_QUOTE, VK_OEM_102,
 
@@ -145,7 +138,7 @@ KMX_DWORD convertNamesToValue(std::wstring tok_wstr){
 int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
   // 1: take the whole line of the 1D-Vector and remove unwanted characters.
   // 2: seperate the name e.g. key<AD06> from the shiftstates
-  // 3: convert to DWORD
+  // 3: convert to KMX_DWORD
   // 4: push Names/Shiftstates to shift_states and then shiftstates to All_US, our 3D-Vector holding all Elements
 
   std::vector<char> delim{' ', '[', ']', '}', ';', '\t', '\n'};
@@ -378,175 +371,3 @@ bool test_single(v_dw_3D &V) {
   wprintf(L"   +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
   return true;
 }
-
-
-// _S2 unused
-/*
-bool extract_difference( v_str_3D &All_Vector) {
-
-  // TODO define which Folder; find better name
-  std::ofstream Map_File("Map_US.txt");
-  std::string diff =" ";
-  std::wstring diff_w = L" ";
-
-  wprintf(L"-----------------------------------------------------------------------------------------------------------------------------------------------\n");
-  std::wcout << "Nr of " <<  "\tCharacter US"<< "\tCharacter US"<<"\t\tCharacter Other"<<"\t  Character Other"<< "\tdifference\n";
-  std::wcout << "Key: "  <<  "\t(no shift) " <<  "\t(shift) "<<  "\t\t(no shift)" <<  "\t  (shift)\n" ;
-  wprintf(L"-----------------------------------------------------------------------------------------------------------------------------------------------\n");
-
-  Map_File <<"--------------------------------------------------------------------------------------------------------------------------------------------\n";
-  Map_File << "Nr of " <<  "\tCharacter US"<< "\t  Character US"<<"\t\tCharacter Other"<<"\t  Character Other"<< "\tdifference\n";
-  Map_File << "Key: "  <<  "\t(no shift) " <<  "\t  (shift) "<<  "\t\t (no shift)" <<  "\t  (shift)\n" ;
-  Map_File <<"--------------------------------------------------------------------------------------------------------------------------------------------\n";
-
-  for ( int k=0; k<(int)All_Vector[0].size(); k++) {
-    if (All_Vector[0][k][1] == All_Vector[1][k][1]) {
-      diff =    "     ";
-      diff_w = L"     ";
-    }
-    else {
-      diff =    "*** ";
-      diff_w = L"*** ";
-    }
-
-     wprintf(L" %d\t%s\t\t%s\t\t|\t%s\t\t   %s\t\t\t%S\n", stoi(All_Vector[1][k][0]), All_Vector[0][k][1].c_str(), All_Vector[0][k][2].c_str(), All_Vector[1][k][1].c_str(), All_Vector[1][k][2].c_str(),  diff_w.c_str());  
-     Map_File  << All_Vector[0][k][0] << " \t"<<+(*(All_Vector[0][k][1].c_str()))<< "\t("<< All_Vector[0][k][1] <<")"<<std::setw(10-All_Vector[0][k][1].size())<<  +(*(All_Vector[0][k][2].c_str()))<< "\t("<< All_Vector[0][k][2] <<")"<<std::setw(18-All_Vector[0][k][2].size())<< +(*(All_Vector[1][k][1].c_str()))<< "\t("<< All_Vector[1][k][1] <<")"<<std::setw(10-All_Vector[1][k][1].size())<<   +(*(All_Vector[1][k][2].c_str()))<< "\t("<< All_Vector[1][k][2] <<")"<<std::setw(10-All_Vector[1][k][2].size())<< "\t"<<diff << "\n";
-  }
-
-  std::streampos fsize = Map_File.tellp();
-  if ( fsize <1) {
-    printf("ERROR: can't extract difference\n");
-    Map_File.close();
-    return 1;
-  }
-
-  Map_File.close();
-  return 0;
-}
-*//*
-std::string get_Other_Char_FromUS( std::string in , v_str_3D &All_Vector) {
-
-  std::wstring diff;
-  // find correct row of char in US
-  for( int i=0; i< (int) All_Vector[0].size();i++) {
-    for( int j=1; j< (int)All_Vector[0][0].size();j++) {
-
-      //std::cout << "see and compare:  "<<  "All_Vector[0]["<<i<<"]["<<j<<"] :"<< All_Vector[0][i][j].c_str() << " in: " << in<<"\n";
-      if  ( All_Vector[0][i][j] == in ) {
-        if ( All_Vector[0][i][j] != All_Vector[1][i][j])
-          diff =L" **  ";
-        wprintf(L"         US -> Other: %d   (US): %s, %s ---- (other):%s, %s    \n",stoi(All_Vector[1][i][0]),All_Vector[0][i][1].c_str(),All_Vector[0][i][2].c_str(),All_Vector[1][i][1].c_str(),All_Vector[1][i][2].c_str());  
-        return All_Vector[1][i][j] ;
-      }
-    }
-  }
-  std::cout << "US -> Other:      (" <<  in << ": no match)\n";
-  return "-";
-}
-
-std::string get_US_Char_FromOther(std::string in , v_str_3D &All_Vector) {
-
-  std::string diff;
-  // find correct row of char in other
-  for( int i=0; i< (int)All_Vector[1].size();i++) {
-    for( int j=1; j< (int)All_Vector[1][0].size();j++) {
-      if  ( All_Vector[1][i][j] == in ) {
-        if ( All_Vector[0][i][j] != All_Vector[1][i][j])
-          diff =" **  ";
-        std::cout << "Other -> US: "<<  std::setw(5)<<diff<<All_Vector[1][i][j] << std::setw(15-All_Vector[0][i][j].size())<<  All_Vector[0][i][j] <<"\n";
-        return All_Vector[0][i][j];
-        }
-      }
-    }
-    std::cout << "Other -> US:      (" <<  in << ": no match)\n";
-    return "-";
-  }
-
-std::string getKeyNrOf_USChar(std::string in , v_str_3D &All_Vector) {
-
-  // find correct row of char in US
-  for( int i=0; i< (int)All_Vector[0].size();i++) {
-    for( int j=1; j< (int)All_Vector[0][0].size();j++) {
-      if  ( All_Vector[0][i][j] == in ) {
-        std::cout << "KeyNr of US char: \t"<< All_Vector[0][i][j] << " -> " << All_Vector[0][i][0] <<"\n";
-        return All_Vector[0][i][0] ;
-      }
-    }
-  }
-  return "-";
-}
-
-std::string getKeyNrOf_OtherChar(std::string in , v_str_3D &All_Vector) {
-
-  // find correct row of char in US
-  for( int i=0; i< (int)All_Vector[1].size();i++) {
-    for( int j=1; j< (int)All_Vector[1][0].size();j++) {
-      if  ( All_Vector[1][i][j] == in ) {
-        std::cout << "KeyNr of Other char : \t"<< All_Vector[1][i][j] << " -> " << All_Vector[1][i][0] <<"\n";
-        return All_Vector[1][i][0] ;
-      }
-    }
-  }
-  return "-";
-}
-
-void test_in_out(v_str_3D &All_Vector) {
-
-std::string diff;
-  printf("-----------------------------------------------------------------------------------------------------------------------------------------------\n");
-   //checks mapping between US and other
-  std::string a = get_Other_Char_FromUS( "z", All_Vector);
-  std::string aa = get_Other_Char_FromUS( "Z", All_Vector);
-  std::string aaa = get_Other_Char_FromUS( "y", All_Vector);
-  std::string aaaa = get_Other_Char_FromUS( "Y", All_Vector);
-
-  std::string b = get_US_Char_FromOther( "z", All_Vector);
-  std::string bb = get_US_Char_FromOther( "Z", All_Vector);
-  std::string bbb = get_US_Char_FromOther( "y", All_Vector);
-  std::string bbbb = get_US_Char_FromOther( "Y", All_Vector);
-
-  std::string c = getKeyNrOf_OtherChar( "z", All_Vector);
-  std::string cc = getKeyNrOf_OtherChar( "Z", All_Vector);
-  std::string ccc = getKeyNrOf_OtherChar( "y", All_Vector);
-  std::string cccc = getKeyNrOf_OtherChar( "Y", All_Vector);
-
-  std::string d = getKeyNrOf_USChar( "z", All_Vector);
-  std::string dd = getKeyNrOf_USChar( "Z", All_Vector);
-  std::string ddd = getKeyNrOf_USChar( "y", All_Vector);
-  std::string dddd = getKeyNrOf_USChar( "Y", All_Vector);
-
-  std::cout << "get_Other_Char_FromUS z-Z-y-Y: "  << ".." << a<< ".." <<aa<< ".." <<aaa<< ".." <<aaaa<< ".." << "\n";
-  std::cout << "get_US_Char_FromOther z-Z-y-Y: "  << ".." << b<< ".." <<bb<< ".." <<bbb<< ".." <<bbbb<< ".." << "\n";
-  std::cout << "getKeyNrOf_OtherChar z-Z-y-Y: "   << ".." << c<< ".." <<cc<< ".." <<ccc<< ".." <<cccc<< ".." << "\n";
-  std::cout << "getKeyNrOf_USChar z-Z-y-Y: "      << ".." << d<< ".." <<dd<< ".." <<ddd<< ".." <<dddd<< ".." << "\n";
-
-}
-
-void print_simple_map_US(v_str_3D &All_Vector, int shiftstate) {
-
-  std::string out;
-  printf("-----------------------------------------------------------------------------------------------------------------------------------------------\n");
-  for ( int i=0; i< (int)All_Vector[0].size();i++) {
-    out =get_Other_Char_FromUS(All_Vector[0][i][shiftstate], All_Vector);
-  }
-}
-
-void print_simple_map_Other(v_str_3D &All_Vector, int shiftstate) {
-
-  std::string out;
-  printf("-----------------------------------------------------------------------------------------------------------------------------------------------\n");
-  for ( int i=0; i< (int)All_Vector[0].size();i++) {
-    out = get_US_Char_FromOther(All_Vector[0][i][shiftstate], All_Vector);
-  }
-}
-
-void test_specific_Characters(v_str_3D &All_Vector) {
-
-  printf("-----------------------------------------------------------------------------------------------------------------------------------------------\n");
-  v_str_1D in {"a", "b", "m", "w", "x", "y", "z"};
-  std::string  out;
-  for( int i=0; i< (int) in.size()-1; i++) {
-    out = get_Other_Char_FromUS(in[i], All_Vector);
-  }
-}
-*/

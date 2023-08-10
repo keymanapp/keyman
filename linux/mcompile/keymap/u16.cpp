@@ -7,12 +7,6 @@
 #include <stdarg.h>
 
 
-int dummytest_u16(){
-  std::cout<< " dummytest_u16    \tis available\t";
-  return 0;
-}
-
-
 std::vector<std::u16string> convert_argv_to_Vector_u16str(int argc, char* argv[]) {
   std::vector<std::u16string> vector_u16;
 

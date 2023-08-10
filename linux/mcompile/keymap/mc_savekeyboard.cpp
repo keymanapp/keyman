@@ -1,10 +1,5 @@
 #include "mc_savekeyboard.h"
 
-int dummytest_mc_Savekeyboard(){
-  std::cout<< " dummytest_mc_Savekeyboard    is available\t";
-  return 0;
-  }
-
   //+++++++++++++++++++++++++++++++++++++++++
 /*BOOL SaveKeyboard(LPKEYBOARD kbd, PWSTR filename) {
 	HANDLE hOutfile = CreateFile(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);

@@ -19,8 +19,6 @@
 #include "mc_savekeyboard.h"
 #include "u16.h"
 
-int dummytest_keymap();
-
 typedef std::vector<std::string> v_str_1D;
 
 typedef std::vector<KMX_DWORD> v_dw_1D;
@@ -43,11 +41,11 @@ const KMX_DWORD KMX_VKMap[] = {
   0
 };
 
-//_S2 Which character do we use?  0 or FFFF or ??
 // this is what we return when we find an invalid character
+//_S2 Which character do we use in that case?  0 or FFFF or 32 or ??
 static KMX_DWORD returnIfCharInvalid = 32;
 
-// takes a std::wstring (=contents of line symbols-file ) and returns the value of the character
+// takes a std::wstring (=contents of line symbols-file ) and returns the (int) value of the character
 KMX_DWORD convertNamesToValue(std::wstring tok_wstr);
 
 // initialize GDK
@@ -80,29 +78,5 @@ KMX_DWORD getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state
 // testing of Vector contents ( first row of US and Other)
 bool test(v_dw_3D &V);
 bool test_single(v_dw_3D &V) ;
-
-/*
-// print both sets of characters (US and OtherLanguage) to console and file for comparison
-bool extract_difference(v_str_3D &All_Vector);
-
-// get mapped key from Other (Other->US)
-std::string get_Other_Char_FromUS(std::string in, v_str_3D &All_Vector);
-// get mapped key from US->Other (US->Other)
-std::string get_US_Char_FromOther(std::string in, v_str_3D &All_Vector);
-// get KeyNr from US
-std::string getKeyNrOf_USChar(std::string in, v_str_3D &All_Vector);
-// get KeyNr from Other
-std::string getKeyNrOf_OtherChar(std::string in, v_str_3D &All_Vector);
-
-// for testing/debugging - may be deleted later
-// prints out a 1:1 mapping US->Other
-void print_simple_map_US(v_str_3D &All_Vector, int shiftstate);
-// prints out a 1:1 mapping Other->US
-void print_simple_map_Other(v_str_3D &All_Vector, int shiftstate);
-// test of above functions (character mapping US <-> Other; KeyNr <-> CHaracter)
-void test_in_out(v_str_3D &All_Vector);
-// writing out mapping of some characters: a,b,m,w,x,y,z
-void test_specific_Characters(v_str_3D &All_Vector);
-*/
 
 # endif /*KEYMAP_H*/

@@ -3,7 +3,6 @@
 #include "km_types.h"
 
 #include <iostream>
-int dummytest_mc_Savekeyboard();
 
 
 // this file is all new _S2

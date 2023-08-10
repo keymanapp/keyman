@@ -27,7 +27,6 @@
 int run(int argc, std::vector<std::u16string>  str_argv, char* argv[]);
 void KMX_LogError(const KMX_WCHART* m1, int m2 = 0);
 
-
 struct DeadkeyMapping {   // I4353
   KMX_WCHAR deadkey, dkid;
   KMX_UINT shift;

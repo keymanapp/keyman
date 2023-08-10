@@ -98,7 +98,6 @@ typedef  wchar_t KMX_UCHAR;
 
 typedef KMX_UCHAR* KMX_PUCHAR;
 
-// _S2 do we need this ?
 #define VK_SPACE    0x20
 #define VK_COLON	0xBA
 #define VK_EQUAL	0xBB
