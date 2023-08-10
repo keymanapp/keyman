@@ -245,24 +245,22 @@ ldml_processor::process_event(
           break; // ----- commit and exit
         }
 
-        /**
-         * a copy of the current/changed context, for transform use.
-         *
-         */
-        std::u32string ctxtstr;
-
-        if (!!transforms) {
-          (void)context_to_string(state, ctxtstr);
-        } // else, don't bother populating
-
         // found a string - push it into the context and actions
         // we convert it here instead of using the emit_text() overload
         // so that we don't have to reconvert it inside the transform code.
         const std::u32string str32 = kmx::u16string_to_u32string(str);
-        emit_text(state, str32);
 
-        // Now, process the actual transforms
-        if (!!transforms) {
+        if (!transforms) {
+          // No transforms: just emit the string.
+          emit_text(state, str32);
+        } else {
+          // Process transforms here
+          /**
+           * a copy of the current/changed context, for transform use.
+           *
+           */
+          std::u32string ctxtstr;
+          (void)context_to_string(state, ctxtstr);
           // add the newly added key output to ctxtstr
           ctxtstr.append(str32);
 
@@ -272,11 +270,15 @@ ldml_processor::process_event(
           // apply the transform, get how much matched (at the end)
           const size_t matchedContext = transforms->apply(ctxtstr, outputString);
 
-          if (matchedContext > 0) {
+          if (matchedContext == 0) {
+            // No match, just emit the original string
+            emit_text(state, str32);
+          } else {
             // We have a match.
 
+            ctxtstr.resize(ctxtstr.length() - str32.length());
             /** how many chars of the context we need to clear */
-            auto charsToDelete = matchedContext;
+            auto charsToDelete = matchedContext - str32.length(); /* we don't need to clear the output of the current key */
 
             /** how many context items need to be removed */
             size_t contextRemoved = 0;
@@ -314,11 +316,10 @@ ldml_processor::process_event(
             // If we needed it further. we could update ctxtstr here:
             //    ctxtstr.append(outputString);
             // ... but it is no longer needed at this point.
-          }
-          // else: no match
-        }
-      }
-    }
+          } // end of transform match
+        } // end of processing transforms
+      } // end of processing a 'normal' vk
+    } // end of switch
     // end of normal processing: commit and exit
     state->actions().commit();
   } catch (std::bad_alloc &) {
