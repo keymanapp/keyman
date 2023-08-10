@@ -77,6 +77,7 @@ export class TouchLayoutFileWriter {
       if(Object.hasOwn(key, 'text') && key.text === '') delete key.text;
       if(Object.hasOwn(key, 'id') && <string>key.id === '') delete key.id;
       if(Object.hasOwn(key, 'hint') && (<any>key).hint === '') delete (<any>key).hint;
+      if(Object.hasOwn(key, 'default') && (<any>key).default === false) delete (<any>key).default;
     };
 
     const fixupPlatform = (platform: TouchLayoutPlatform) => {

@@ -28,7 +28,7 @@ km_kbp_event(
   switch(event) {
     case KM_KBP_EVENT_KEYBOARD_ACTIVATED:
       assert(data == nullptr);
-      if(data == nullptr) {
+      if(data != nullptr) {
         return KM_KBP_STATUS_INVALID_ARGUMENT;
       }
       break;

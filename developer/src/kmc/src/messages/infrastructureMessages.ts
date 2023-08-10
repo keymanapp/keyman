@@ -8,8 +8,7 @@ const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
 export class InfrastructureMessages {
-  static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException,
-    `Unexpected exception: ${(o.e ?? 'unknown error').toString()}\n\nCall stack:\n${(o.e instanceof Error ? o.e.stack : (new Error()).stack)}`);
+  static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
   static FATAL_UnexpectedException = SevFatal | 0x0001;
 
   // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
