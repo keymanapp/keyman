@@ -23,7 +23,7 @@
 /*
  * Designated initializer
  */
--(instancetype)initWithType: (ActionType)type actionContent:(NSString*)content backspaceCount:(int)backspaceCount {
+-(instancetype)initWithType: (ActionType)type actionContent:(NSString*)content backspaceCount:(int)backspaceCount key:(NSString*)key value:(NSString*)value scope:(UInt8)scope {
   self = [super init];
   if (self) {
     self->_actionType = type;
@@ -58,6 +58,9 @@
       }
       case PersistOptionAction: {
         self->_typeName = @"Persist Option";
+        self->_key = key;
+        self->_value = value;
+        self->_scope = scope;
         break;
       }
       case EmitKeystrokeAction: {
@@ -87,21 +90,26 @@
  * should not be used.
  */
 -(instancetype)init {
-  return [self initWithType:AlertAction actionContent:@"" backspaceCount:0];
+  return [self initWithType:AlertAction actionContent:@"" backspaceCount:0 key:@"" value:@"" scope:0];
 }
 
 -(instancetype)initCharacterAction:(NSString*)content {
-  self = [self initWithType: CharacterAction actionContent:content backspaceCount:0];
+  self = [self initWithType: CharacterAction actionContent:content backspaceCount:0 key:@"" value:@"" scope:0];
   return self;
 }
 
 -(instancetype)initCharacterBackspaceAction:(NSString*)content {
-  self = [self initWithType: CharacterBackspaceAction actionContent:content backspaceCount:1];
+  self = [self initWithType: CharacterBackspaceAction actionContent:content backspaceCount:1 key:@"" value:@"" scope:0];
   return self;
 }
 
 -(instancetype)initMarkerBackspaceAction:(int)count {
-  self = [self initWithType: MarkerBackspaceAction actionContent:@"" backspaceCount:count];
+  self = [self initWithType: MarkerBackspaceAction actionContent:@"" backspaceCount:count key:@"" value:@"" scope:0];
+  return self;
+}
+
+-(instancetype)initPersistOptionAction:(NSString*)key value:(NSString*)value scope:(UInt8)scope {
+  self = [self initWithType: PersistOptionAction actionContent:@"" backspaceCount:0 key:key value:value scope:scope];
   return self;
 }
 
@@ -121,6 +129,7 @@
   return self.actionType==MarkerBackspaceAction;
 }
 
+// TODO: add new fields to description
 -(NSString *)description
 {
   NSString *charString = nil;

@@ -30,13 +30,16 @@ typedef enum {EndAction,
 @property (strong, nonatomic, readonly) NSString *typeName;
 @property (strong, nonatomic, readonly) NSString *content;
 @property (readonly) int backspaceCount;
--(instancetype)initWithType: (ActionType)type actionContent:(NSString*)content backspaceCount:(int)backspaceCount NS_DESIGNATED_INITIALIZER;
+@property (strong, nonatomic, readonly) NSString *key;
+@property (strong, nonatomic, readonly) NSString *value;
+@property (readonly) int scope;
+-(instancetype)initWithType: (ActionType)type actionContent:(NSString*)content backspaceCount:(int)backspaceCount key:(NSString*)key value:(NSString*)value scope:(UInt8)scope NS_DESIGNATED_INITIALIZER;
 //must implement the designated initializer of the superclass
 -(instancetype)init;
 -(instancetype)initCharacterAction:(NSString*)content;
 -(instancetype)initCharacterBackspaceAction:(NSString*)content;
 -(instancetype)initMarkerBackspaceAction:(int)count;
-//-(NSDictionary*) legacyDictionaryActionForActionObject:(CoreAction*)action;
+-(instancetype)initPersistOptionAction:(NSString*)key value:(NSString*)value scope:(UInt8)scope;
 -(BOOL)isCharacter;
 -(BOOL)isCharacterBackspace;
 -(BOOL)isMarker;

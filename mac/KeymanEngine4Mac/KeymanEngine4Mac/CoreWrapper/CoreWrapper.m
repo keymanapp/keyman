@@ -200,22 +200,22 @@
     switch (actionStruct->type)
     {
       case KM_KBP_IT_END: {
-        action = [[CoreAction alloc] initWithType: EndAction actionContent:@"" backspaceCount:0];
+        action = [[CoreAction alloc] initWithType: EndAction actionContent:@"" backspaceCount:0 key:@"" value:@"" scope:0];
         break;
       }
       case KM_KBP_IT_CHAR: {
         NSString *characterString = [self.coreHelper utf32ValueToString:actionStruct->character];
-        action = [[CoreAction alloc] initWithType: CharacterAction actionContent:characterString backspaceCount:0];
+        action = [[CoreAction alloc] initWithType: CharacterAction actionContent:characterString backspaceCount:0 key:@"" value:@"" scope:0];
         NSLog(@"createCoreActionForActionStruct actionStruct->character decimal: %u, hex: %X", actionStruct->character, actionStruct->character);
         NSLog(@"createCoreActionForActionStruct converted unicode string: '%@' length=%lu", characterString, characterString.length);
         break;
       }
       case KM_KBP_IT_MARKER: {
-        action = [[CoreAction alloc] initWithType: MarkerAction actionContent:@"" backspaceCount:0];
+        action = [[CoreAction alloc] initWithType: MarkerAction actionContent:@"" backspaceCount:0 key:@"" value:@"" scope:0];
         break;
       }
       case KM_KBP_IT_ALERT: {
-        action = [[CoreAction alloc] initWithType: AlertAction actionContent:@"" backspaceCount:0];
+        action = [[CoreAction alloc] initWithType: AlertAction actionContent:@"" backspaceCount:0 key:@"" value:@"" scope:0];
         break;
       }
       case KM_KBP_IT_BACK: {
@@ -235,19 +235,27 @@
         break;
       }
       case KM_KBP_IT_PERSIST_OPT: {
-        action = [[CoreAction alloc] initWithType: PersistOptionAction actionContent:@"" backspaceCount:0];
+        NSLog(@"***createCoreActionForActionStruct Persist Options encountered.");
+        km_kbp_option_item const * option = actionStruct->option;
+        km_kbp_cp const * key = option->key;
+        km_kbp_cp const * value = option->value;
+        NSString *keyString = [[NSString alloc] initWithCharacters:key length:unistrlen(key)];
+        NSString *valueString = [[NSString alloc] initWithCharacters:value length:unistrlen(value)];
+        NSLog(@"***createCoreActionForActionStruct converted Persist Options, key = %@, value = %@", keyString, valueString);
+        
+        action = [[CoreAction alloc] initPersistOptionAction:keyString value:valueString scope:option->scope];
         break;
       }
       case KM_KBP_IT_EMIT_KEYSTROKE: {
-        action = [[CoreAction alloc] initWithType: EmitKeystrokeAction actionContent:@"" backspaceCount:0];
+        action = [[CoreAction alloc] initWithType: EmitKeystrokeAction actionContent:@"" backspaceCount:0 key:@"" value:@"" scope:0];
         break;
       }
       case KM_KBP_IT_INVALIDATE_CONTEXT: {
-        action = [[CoreAction alloc] initWithType: InvalidateContextAction actionContent:@"" backspaceCount:0];
+        action = [[CoreAction alloc] initWithType: InvalidateContextAction actionContent:@"" backspaceCount:0 key:@"" value:@"" scope:0];
         break;
       }
       case KM_KBP_IT_CAPSLOCK: {
-        action = [[CoreAction alloc] initWithType: CapsLockAction actionContent:@"" backspaceCount:0];
+        action = [[CoreAction alloc] initWithType: CapsLockAction actionContent:@"" backspaceCount:0 key:@"" value:@"" scope:0];
         break;
       }
       default: {

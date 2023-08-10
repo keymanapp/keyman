@@ -419,6 +419,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         [_oskWindow.window setTitle:self.oskWindowTitle];
 }
 
+// TODO: load stores with string keys, not numbers?
 - (void)loadSavedStores {
     NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
     NSDictionary *allSavedStores = [userData dictionaryForKey:kKMSavedStoresKey];
@@ -436,30 +437,31 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     }
 }
 
-- (void)saveStore:(NSNumber *)storeKey withValue:(NSString* )value {
-    NSString *storeKeyStr = [storeKey stringValue];
+// TODO: remove number references
+- (void)saveStore:(NSString *)storeKey withValue:(NSString* )value {
+    //NSString *storeKeyStr = [storeKey stringValue];
     NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
     NSDictionary *allSavedStores = [userData dictionaryForKey:kKMSavedStoresKey];
-    NSDictionary *savedStores;
+    NSDictionary *selectedKeyboardStores;
 
     if (allSavedStores) {
-        savedStores = [allSavedStores objectForKey:_selectedKeyboard];
-    }
+      selectedKeyboardStores = [allSavedStores objectForKey:_selectedKeyboard];
+   }
 
-    if (savedStores) {
-        NSMutableDictionary *newSavedStores = [savedStores mutableCopy];
-        [newSavedStores setObject:value forKey:storeKeyStr];
-        savedStores = newSavedStores;
+    if (selectedKeyboardStores) {
+        NSMutableDictionary *newSavedStores = [selectedKeyboardStores mutableCopy];
+       [newSavedStores setObject:value forKey:storeKey];
+       selectedKeyboardStores = newSavedStores;
     } else {
-        savedStores = [[NSDictionary alloc] initWithObjectsAndKeys:value, storeKeyStr, nil];
+        selectedKeyboardStores = [[NSDictionary alloc] initWithObjectsAndKeys:value, storeKey, nil];
     }
 
     if (allSavedStores) {
         NSMutableDictionary *newAllSavedStores = [allSavedStores mutableCopy];
-        [newAllSavedStores setObject:savedStores forKey:_selectedKeyboard];
+        [newAllSavedStores setObject:selectedKeyboardStores forKey:_selectedKeyboard];
         allSavedStores = newAllSavedStores;
     } else {
-        allSavedStores = [[NSDictionary alloc] initWithObjectsAndKeys:savedStores, _selectedKeyboard, nil];
+        allSavedStores = [[NSDictionary alloc] initWithObjectsAndKeys:selectedKeyboardStores, _selectedKeyboard, nil];
     }
 
     [userData setObject:allSavedStores forKey:kKMSavedStoresKey];

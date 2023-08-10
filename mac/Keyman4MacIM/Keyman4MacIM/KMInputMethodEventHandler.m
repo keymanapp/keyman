@@ -1130,11 +1130,21 @@ NSRange _previousSelRange;
     case AlertAction:
       NSBeep();
       break;
+    case PersistOptionAction:
+      // TODO: remove number key code
+        //int keyInteger = action.key.intValue;
+        //NSNumber *keyNumber = [NSNumber numberWithInt:keyInteger];
+        //NSString *valueString = action.value;
+      if(action.key && action.value) {
+        NSLog(@"*** PersistOptionAction calling saveStore, key: %@, value: %@", action.key, action.value);
+        [self.AppDelegate saveStore:action.key withValue:action.value];
+      }
+      else {
+        NSLog(@"*** Invalid values for PersistOptionAction, not saving in UserDefaults, key: %@, value: %@", action.key, action.value);
+      }
+      break;
     case InvalidateContextAction:
       [self.cachedContext invalidateContext];
-      break;
-    case PersistOptionAction:
-      //TODO: handle this somewhere
       break;
     case CapsLockAction: {
       //TODO: handle this somewhere
