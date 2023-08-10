@@ -300,7 +300,7 @@ ldml_processor::process_event(
                 ctxtstr.pop_back();
                 ctxtstr.pop_back();
                 ctxtstr.pop_back();
-                // push a special backsapce to delete the marker
+                // push a special backspace to delete the marker
                 state->actions().push_backspace(KM_KBP_BT_MARKER, c->marker);
               }
             }
@@ -399,7 +399,6 @@ ldml_processor::context_to_string(km_kbp_state *state, std::u32string &str) {
     str.clear();
     auto &cp      = state->context();
     size_t ctxlen = 0; // TODO-LDML: is this needed?
-    // We're only interested in as much of the context as is a KM_KBP_BT_CHAR.
     uint8_t last_type = KM_KBP_BT_UNKNOWN;
     for (auto c = cp.rbegin(); c != cp.rend(); c++, ctxlen++) {
       last_type = c->type;
