@@ -8,14 +8,10 @@ export class LdmlKeyboardVisualKeyboardCompiler {
     result.header.flags = 0;
     result.header.version = 0x0600;
 
-    /* TODO-LDML: consider font, associatedKeyboard */
+    /* TODO-LDML: consider associatedKeyboard: this _must_ be set to id (aka basename sans ext) of keyboard .kmx file */
     result.header.associatedKeyboard = '';
-    result.header.ansiFont.name = 'Arial';
-    result.header.ansiFont.size = 10;
-    result.header.ansiFont.color = 0;
-    result.header.unicodeFont.name = 'Arial';
-    result.header.unicodeFont.size = 10;
-    result.header.unicodeFont.color = 0;
+    result.header.ansiFont = {...VisualKeyboard.DEFAULT_KVK_FONT};
+    result.header.unicodeFont = {...VisualKeyboard.DEFAULT_KVK_FONT};
 
     for(let layers of source.keyboard.layers) {
       for(let layer of layers.layer) {
@@ -43,6 +39,10 @@ export class LdmlKeyboardVisualKeyboardCompiler {
         x++;
 
         let keydef = source.keyboard.keys?.key?.find(x => x.id == key);
+
+        if (!keydef) {
+          throw Error(`Internal Error: could not find key id="${key}" in layer "${layer.id || '<none>'}", row "${y}"`);
+        }
 
         vk.keys.push({
           flags: VisualKeyboard.VisualKeyboardKeyFlags.kvkkUnicode,

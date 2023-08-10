@@ -2,27 +2,18 @@
 
 ## Projects
 
-- [keyman-config](../../linux/keyman-config) - km-config and some other tools to install, uninstall
-  and view information about Keyman keyboard packages.
+- [keyman-config](../../linux/keyman-config) - `km-config` and some other tools
+  to install, uninstall and view information about Keyman keyboard packages.
 - [ibus-keyman](../../linux/ibus-keyman) - IBUS integration to use .kmp Keyman keyboards
+- [keyman-system-service](../../linux/keyman-system-service) - A DBus system service
+  that allows to perform keyboard related actions when running under Wayland.
 - [core](../../core) - common keyboardprocessor library
 
 See [license information](../../linux/LICENSE.md) about licensing.
 
 ## Linux Requirements/Setup
 
-- It is helpful to be using the [packages.sil.org](http://packages.sil.org) repo
-
-- Install packages required for building and developing Keyman for Linux.
-  The list of required packages can be seen in `linux/debian/control`.
-  It is easiest to use the `mk-build-deps` tool to install the
-  dependencies:
-
-  ```bash
-  sudo apt update
-  sudo apt install devscripts equivs
-  sudo mk-build-deps --install linux/debian/control
-  ```
+See [document in ../build](../build/linux-ubuntu.md).
 
 ## Compiling from Command Line
 
@@ -61,14 +52,17 @@ for details on building Linux packages for Keyman.
 
 ## Testing
 
-### keyman-config
-
-The unit tests can be run with the following command:
+The tests can be run with the following command:
 
 ```bash
-cd linux/keyman-config
-./run-tests.sh
+linux/build.sh test
 ```
+
+To just run the unit tests without integration tests, add the
+`--no-integration` parameter.
+
+It's also possible to only run the tests for one of the subprojects. You
+can use `build.sh` in the subdirectory for that.
 
 ### ibus-keyman
 

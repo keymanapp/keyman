@@ -15,7 +15,7 @@ EXTERN bool kmcmp_CompileKeyboard(
 ) {
 
   FILE_KEYBOARD fk;
-  fk.extra = new FILE_KEYBOARD_EXTRA;
+  fk.extra = new KMCMP_COMPILER_RESULT_EXTRA;
   fk.extra->kmnFilename = pszInfile;
 
   kmcmp::FSaveDebug = options.saveDebug;   // I3681
@@ -103,7 +103,7 @@ EXTERN bool kmcmp_CompileKeyboard(
 
   result.kmx = data;
   result.kmxSize = dataSize;
-  result.kvksFilename = string_from_u16string(fk.extra->kvksFilename); // convert to UTF8
+  result.extra = *fk.extra;
 
   return TRUE;
 }

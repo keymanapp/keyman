@@ -32,7 +32,8 @@ export class SectionCompiler {
     const defaults = new Set(<SectionIdent[]>[
       constants.section.strs,
       constants.section.list,
-      constants.section.elem
+      constants.section.elem,
+      constants.section.vars,
     ]);
     return defaults;
   }

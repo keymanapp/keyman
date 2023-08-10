@@ -13,7 +13,7 @@ describe('kmx metadata compiler', function () {
     const inputFilename = makePathToFixture('basic.xml');
 
     // Compile the keyboard
-    const kmx = await compileKeyboard(inputFilename, {...compilerTestOptions, debug:true, addCompilerVersion:true});
+    const kmx = await compileKeyboard(inputFilename, {...compilerTestOptions, saveDebug:true, shouldAddCompilerVersion:true});
     checkMessages();
     assert.isNotNull(kmx);
 
@@ -48,7 +48,7 @@ describe('kmx metadata compiler', function () {
     const inputFilename = makePathToFixture('basic.xml');
 
     // Compile the keyboard
-    const kmx = await compileKeyboard(inputFilename, {...compilerTestOptions, debug:true, addCompilerVersion:false});
+    const kmx = await compileKeyboard(inputFilename, {...compilerTestOptions, saveDebug:true, shouldAddCompilerVersion:false});
     checkMessages();
     assert.isNotNull(kmx);
 

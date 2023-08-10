@@ -1,7 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
 import { TranCompiler, BkspCompiler } from '../src/compiler/tran.js';
-import { VarsCompiler } from '../src/compiler/vars.js';
 import { BASIC_DEPENDENCIES, UsetCompiler } from '../src/compiler/empty-compiler.js';
 import { CompilerMessages } from '../src/compiler/messages.js';
 import { compilerTestCallbacks, testCompilationCases } from './helpers/index.js';
@@ -10,7 +9,7 @@ import { KMXPlus } from '@keymanapp/common-types';
 import Tran = KMXPlus.Tran;// for tests…
 import Bksp = KMXPlus.Bksp;// for tests…
 import { constants } from '@keymanapp/ldml-keyboard-constants';
-const tranDependencies = [ ...BASIC_DEPENDENCIES, UsetCompiler, VarsCompiler ];
+const tranDependencies = [ ...BASIC_DEPENDENCIES, UsetCompiler ];
 const bkspDependencies = tranDependencies;
 
 describe('tran', function () {

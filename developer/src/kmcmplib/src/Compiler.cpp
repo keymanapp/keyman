@@ -96,6 +96,7 @@
 #include <xstring.h>
 #include <codecvt>
 #include <locale>
+#include <string>
 
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
@@ -140,6 +141,7 @@ KMX_BOOL IsSameToken(PKMX_WCHAR *p, KMX_WCHAR const * token);
 KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode);
 PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags);
 KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token, PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode);
+int GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store);
 
 int GetGroupNum(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 
@@ -164,6 +166,9 @@ KMX_DWORD process_set_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHA
 KMX_DWORD process_expansion(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx, int max);
 
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
+
+bool resizeStoreArray(PFILE_KEYBOARD fk);
+bool resizeKeyArray(PFILE_GROUP gp, int increment = 1);
 
 const KMX_WCHAR * LineTokens[] = {
    u"SVNBHBGMNSCCLLCMLB",  u"store",  u"VERSION ",  u"NAME ",
@@ -219,6 +224,9 @@ const KMX_WCHAR * StoreTokens[TSS__MAX + 2] = {
   SSN__PREFIX u"", // TSS_BEGIN_POSTKEYSTROKE
   SSN__PREFIX u"NEWLAYER",
   SSN__PREFIX u"OLDLAYER",
+
+  // Keyman 17.0+
+  SSN__PREFIX u"DISPLAYMAP",  // TSS_DISPLAYMAP (compile-time usage only)
   NULL
 };
 
@@ -610,7 +618,7 @@ KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   if (fk->dpGroupArray)
   {
     memcpy(gp, fk->dpGroupArray, sizeof(FILE_GROUP) * fk->cxGroupArray);
-    delete fk->dpGroupArray;
+    delete[] fk->dpGroupArray;
   }
 
   fk->dpGroupArray = gp;
@@ -727,16 +735,9 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
     if (!StoreTokens[i]) return CERR_InvalidSystemStore;
   }
 
-  sp = new FILE_STORE[fk->cxStoreArray + 1];
-  if (!sp) return CERR_CannotAllocateMemory;
-
-  if (fk->dpStoreArray)
-  {
-    memcpy(sp, fk->dpStoreArray, sizeof(FILE_STORE) * fk->cxStoreArray);
-    delete fk->dpStoreArray;
+  if(!resizeStoreArray(fk)) {
+    return CERR_CannotAllocateMemory;
   }
-
-  fk->dpStoreArray = sp;
   sp = &fk->dpStoreArray[fk->cxStoreArray];
 
   sp->line = kmcmp::currentLine;
@@ -785,19 +786,47 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   return CheckForDuplicateStore(fk, sp);
 }
 
+bool resizeStoreArray(PFILE_KEYBOARD fk) {
+  if(fk->cxStoreArray % 100 == 0) {
+    PFILE_STORE sp = new FILE_STORE[fk->cxStoreArray + 100];
+    if (!sp) return false;
+
+    if (fk->dpStoreArray)
+    {
+      memcpy(sp, fk->dpStoreArray, sizeof(FILE_STORE) * fk->cxStoreArray);
+      delete[] fk->dpStoreArray;
+    }
+
+    fk->dpStoreArray = sp;
+  }
+  return true;
+}
+
+/**
+ * reallocates the key array in increments of 100
+ */
+bool resizeKeyArray(PFILE_GROUP gp, int increment) {
+  if((gp->cxKeyArray + increment - 1) % 100 < increment) {
+    PFILE_KEY kp = new FILE_KEY[((gp->cxKeyArray + increment)/100 + 1) * 100];
+    if (!kp) return false;
+    if (gp->dpKeyArray)
+    {
+      memcpy(kp, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
+      delete[] gp->dpKeyArray;
+    }
+
+    gp->dpKeyArray = kp;
+  }
+  return true;
+}
+
 KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, const KMX_WCHAR * str, KMX_DWORD *dwStoreID)
 {
   PFILE_STORE sp;
-  sp = new FILE_STORE[fk->cxStoreArray + 1];
-  if (!sp) return CERR_CannotAllocateMemory;
-
-  if (fk->dpStoreArray)
-  {
-    memcpy(sp, fk->dpStoreArray, sizeof(FILE_STORE) * fk->cxStoreArray);
-    delete fk->dpStoreArray;
+  if(!resizeStoreArray(fk)) {
+    return CERR_CannotAllocateMemory;
   }
 
-  fk->dpStoreArray = sp;
   sp = &fk->dpStoreArray[fk->cxStoreArray];
 
   sp->line = kmcmp::currentLine;
@@ -827,16 +856,9 @@ KMX_DWORD AddDebugStore(PFILE_KEYBOARD fk, KMX_WCHAR const * str)
   KMX_WCHAR tstr[16];
   u16sprintf(tstr, _countof(tstr), L"%d", kmcmp::currentLine);  // I3481
 
-  sp = new FILE_STORE[fk->cxStoreArray + 1];
-  if (!sp) return CERR_CannotAllocateMemory;
-
-  if (fk->dpStoreArray)
-  {
-    memcpy(sp, fk->dpStoreArray, sizeof(FILE_STORE) * fk->cxStoreArray);
-    delete[] fk->dpStoreArray;
+  if(!resizeStoreArray(fk)) {
+    return CERR_CannotAllocateMemory;
   }
-
-  fk->dpStoreArray = sp;
   sp = &fk->dpStoreArray[fk->cxStoreArray];
 
   safe_wcsncpy(sp->szName, (PKMX_WCHAR) str, SZMAX_STORENAME);
@@ -1021,7 +1043,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     {
       // Store extra metadata for callers as we mutate this store during
       // compilation
-      fk->extra->kvksFilename = sp->dpString;
+      fk->extra->kvksFilename = string_from_u16string(sp->dpString);
       // Strip path from the store, leaving bare filename only
       p = sp->dpString;
 
@@ -1061,6 +1083,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
   case TSS_TARGETS:   // I4504
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyTargets);
+    fk->extra->targets = GetCompileTargetsFromTargetsStore(sp->dpString);
     break;
 
   case TSS_WINDOWSLANGUAGES:
@@ -1130,10 +1153,56 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   case TSS_OLDLAYER:
     break;
 
+  case TSS_DISPLAYMAP:
+    // This store is allowed in older versions of Keyman, as it is a
+    // compile-time only feature. Implemented only in kmc-kmn, not in
+    // the legacy compilers.
+    fk->extra->displayMapFilename = string_from_u16string(sp->dpString);
+    break;
+
   default:
     return CERR_InvalidSystemStore;
   }
   return CERR_None;
+}
+
+int GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store) {
+  // Compile to .kmx
+  const std::vector<std::u16string> KMXKeymanTargets{
+    u"windows", u"macosx", u"linux", u"desktop"
+  };
+
+  // Compile to .js
+  const std::vector<std::u16string> KMWKeymanTargets{
+    u"web", u"iphone", u"ipad", u"androidphone", u"androidtablet",
+    u"mobile", u"tablet"
+  };
+
+  const std::u16string AnyTarget = u"any";
+
+  int result = 0;
+  auto p = new KMX_WCHAR[u16len(store)+1];
+  u16cpy(p, store);
+  KMX_WCHAR* ctx;
+  auto token = u16tok(p, u" ", &ctx);
+  while(token) {
+    if(AnyTarget == token) {
+      result |= COMPILETARGETS_KMX | COMPILETARGETS_JS;
+    }
+    for(auto p: KMXKeymanTargets) {
+      if(p == token) result |= COMPILETARGETS_KMX;
+    }
+    for(auto p: KMWKeymanTargets) {
+      if(p == token) result |= COMPILETARGETS_JS;
+    }
+
+    token = u16tok(nullptr, u" ", &ctx);
+
+    // Future: consider warnings on invalid compile targets?
+  }
+  delete[] p;
+
+  return result;
 }
 
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString) {   // I4140
@@ -1411,15 +1480,10 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
     }
   }
 
-  kp = new FILE_KEY[gp->cxKeyArray + 1];
-  if (!kp) return CERR_CannotAllocateMemory;
-  if (gp->dpKeyArray)
-  {
-    memcpy(kp, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
-    delete gp->dpKeyArray;
+  if(!resizeKeyArray(gp)) {
+    return CERR_CannotAllocateMemory;
   }
 
-  gp->dpKeyArray = kp;
   kp = &gp->dpKeyArray[gp->cxKeyArray];
 
   gp->cxKeyArray++;
@@ -1529,14 +1593,13 @@ KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
    and set the keystroke to the appropriate character in the store.
   */
 
-  k = new FILE_KEY[gp->cxKeyArray + nchrs - 1];
-  if (!k) return CERR_CannotAllocateMemory;
-  memcpy(k, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
+  int offset = (int)(kpp - gp->dpKeyArray);
 
-  kpp = &k[(int)(kpp - gp->dpKeyArray)];
+  if (!resizeKeyArray(gp, nchrs)) {
+    return CERR_CannotAllocateMemory;
+  }
 
-  delete gp->dpKeyArray;
-  gp->dpKeyArray = k;
+  kpp = &gp->dpKeyArray[offset];
   gp->cxKeyArray += nchrs - 1;
 
   for (k = kpp, n = 0, pn = sp->dpString; *pn; pn = incxstr(pn), k++, n++)
@@ -1569,8 +1632,8 @@ KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
     ExpandKp_ReplaceIndex(fk, k, keyIndex, n);
   }
 
-  delete dpContext;
-  delete dpOutput;
+  delete[] dpContext;
+  delete[] dpOutput;
 
   return CERR_None;
 }
@@ -1590,7 +1653,7 @@ PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_W
 
   q++;
 
-  r = xstrchr(q, &dClose);			        // Find closing delimiter
+  r = (PKMX_WCHAR) u16chr(q, dClose);			        // Find closing delimiter
   if (!r) return NULL;
 
   if (Flags & GDS_CUTLEAD)
@@ -1603,7 +1666,7 @@ PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_W
       r--;							// Cut off following spaces
       while (iswspace(*r) && r > q) r--;
       r++;
-      *r = 0; r = xstrchr((r + 1), &dClose);
+      *r = 0; r = (PKMX_WCHAR) u16chr((r + 1), dClose);
     }
   else *r = 0;
 
@@ -3080,14 +3143,7 @@ KMX_DWORD ReadLine(KMX_BYTE* infile, int sz, int& offset, PKMX_WCHAR wstr, KMX_B
     return CERR_EndOfFile;
   }
 
-  // neccessary to add this block for using on non-windows platforms (removes all \r for platforms that use \n instead of \r\n)
-  for (p = str, n = 0; n < len; n++, p++) {
-    if (*p == L'\r')
-      *p = L' ';
-  }
 
-  // \r is still left in this block even though Linux doesn`t use \r.
-  // This is to ensure to still have a working windows-only-version
   for (p = str, n = 0; n < len; n++, p++)
   {
     if (currentQuotes != 0)
@@ -3338,7 +3394,7 @@ int GetVKCode(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   {
     PFILE_VKDICTIONARY pvk = new FILE_VKDICTIONARY[fk->cxVKDictionary + 10];
     memcpy(pvk, fk->dpVKDictionary, fk->cxVKDictionary * sizeof(FILE_VKDICTIONARY));
-    delete fk->dpVKDictionary;
+    delete[] fk->dpVKDictionary;
     fk->dpVKDictionary = pvk;
   }
   u16ncpy(fk->dpVKDictionary[fk->cxVKDictionary].szName, p, _countof(fk->dpVKDictionary[fk->cxVKDictionary].szName) );  // I3481

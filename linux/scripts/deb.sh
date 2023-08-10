@@ -11,7 +11,7 @@
 
 set -e
 
-all_distributions="focal jammy"
+all_distributions="focal jammy lunar mantic"
 distributions=""
 echo "all_distributions: ${all_distributions}"
 

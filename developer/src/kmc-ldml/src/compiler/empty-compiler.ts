@@ -1,6 +1,7 @@
 import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 import { SectionCompiler } from "./section-compiler.js";
 import { LDMLKeyboard, KMXPlus, CompilerCallbacks } from "@keymanapp/common-types";
+import { VarsCompiler } from './vars.js';
 
 /**
  * Compiler for typrs that don't actually consume input XML
@@ -69,6 +70,6 @@ export class UsetCompiler extends EmptyCompiler {
 }
 
 /**
- * For test use. The top three compilers.
+ * For test use. The top compilers.
  */
-export const BASIC_DEPENDENCIES = [ StrsCompiler, ListCompiler, ElemCompiler ];
+export const BASIC_DEPENDENCIES = [ StrsCompiler, ListCompiler, ElemCompiler, VarsCompiler ];

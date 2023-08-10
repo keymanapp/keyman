@@ -17,6 +17,14 @@ export default class KvkFileWriter {
   }
 
   private build(source: VisualKeyboard) {
+    /**
+     * The visual keyboard text color is included in .kvk files but is never
+     * defined in .kvks files. Thus, it is always written by the legacy .kvk
+     * binary writer VisualKeyboardSaverBinary.pas as TColor.clWindowText (SystemColor | 8),
+     * or in DWORD form 0xFF000008, and we maintain this value for consistency
+     * here.
+     */
+    const VISUAL_KEYBOARD_TEXT_COLOR = 0xFF000008;
     const binary: BUILDER_KVK_FILE = {
       header: {
         identifier: BUILDER_KVK_HEADER_IDENTIFIER,
@@ -24,12 +32,12 @@ export default class KvkFileWriter {
         associatedKeyboard: {len:0,str:''},
         flags: source.header.flags,
         ansiFont:{
-          color: source.header.ansiFont.color,
+          color: VISUAL_KEYBOARD_TEXT_COLOR,
           size: source.header.ansiFont.size,
           name: {len:0,str:''}
         },
         unicodeFont:{
-          color: source.header.unicodeFont.color,
+          color: VISUAL_KEYBOARD_TEXT_COLOR,
           size: source.header.unicodeFont.size,
           name: {len:0,str:''}
         },
@@ -48,7 +56,8 @@ export default class KvkFileWriter {
         vkey: sourceKey.vkey,
         shift: sourceKey.shift,
         text: { len: 0, str: '' },
-        bitmap: 0
+        bitmapSize: sourceKey.bitmap ? sourceKey.bitmap.byteLength : 0,
+        bitmapData: sourceKey.bitmap ? Array.from(sourceKey.bitmap) : []
       };
       this.setString(binaryKey.text, sourceKey.text || '');
       binary.keys.push(binaryKey);

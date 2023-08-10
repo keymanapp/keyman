@@ -40,7 +40,7 @@ test_transforms() {
   std::cout << __FILE__ << ":" << __LINE__ << " - basic " << std::endl;
   {
     // start with one
-    transform_entry te(std::u16string(u"e^"), std::u16string(u"E"));  // keep it simple
+    transform_entry te(std::u32string(U"e^"), std::u32string(U"E"));  // keep it simple
     // OK now make a group do it
     transforms tr;
     transform_group st;
@@ -51,17 +51,17 @@ test_transforms() {
 
     // see if we can match the same
     {
-      std::u16string src(u"barQ^");
+      std::u32string src(U"barQ^");
       bool res = tr.apply(src);
       zassert_equal(res, false);
-      zassert_string_equal(src, std::u16string(u"barQ^"));  // no change
+      zassert_string_equal(src, std::u32string(U"barQ^"));  // no change
     }
 
     {
-      std::u16string src(u"fooe^");
+      std::u32string src(U"fooe^");
       bool res = tr.apply(src);
       zassert_equal(res, true);
-      zassert_string_equal(src, std::u16string(u"fooE"));
+      zassert_string_equal(src, std::u32string(U"fooE"));
     }
   }
 
@@ -73,23 +73,23 @@ test_transforms() {
     // setup
     {
       transform_group st;
-      st.emplace_back(std::u16string(u"za"), std::u16string(u"c"));
-      st.emplace_back(std::u16string(u"a"), std::u16string(u"bb"));
+      st.emplace_back(std::u32string(U"za"), std::u32string(U"c"));
+      st.emplace_back(std::u32string(U"a"), std::u32string(U"bb"));
       tr.addGroup(st);
     }
     {
       transform_group st;
-      st.emplace_back(std::u16string(u"bb"), std::u16string(u"ccc"));
+      st.emplace_back(std::u32string(U"bb"), std::u32string(U"ccc"));
       tr.addGroup(st);
     }
     {
       transform_group st;
-      st.emplace_back(std::u16string(u"cc"), std::u16string(u"d"));
+      st.emplace_back(std::u32string(U"cc"), std::u32string(U"d"));
       tr.addGroup(st);
     }
     {
       transform_group st;
-      st.emplace_back(std::u16string(u"tcd"), std::u16string(u"e"));
+      st.emplace_back(std::u32string(U"tcd"), std::u32string(U"e"));
       tr.addGroup(st);
     }
 
@@ -97,31 +97,31 @@ test_transforms() {
 
     // see if we can match the same
     {
-      std::u16string src(u"ta");
+      std::u32string src(U"ta");
       bool res = tr.apply(src);
       // pipe (|) symbol shows where the 'output' is delineated
       // t|a --> t|bb --> t|ccc --> t|cd --> |e
-      zassert_string_equal(src, std::u16string(u"e"));
+      zassert_string_equal(src, std::u32string(U"e"));
       zassert_equal(res, true);
     }
     {
-      std::u16string src(u"qza");
+      std::u32string src(U"qza");
       bool res = tr.apply(src);
       // pipe (|) symbol shows where the 'output' is delineated
       // q|za -> q|c
-      zassert_string_equal(src, std::u16string(u"qc"));
+      zassert_string_equal(src, std::u32string(U"qc"));
       zassert_equal(res, true);
     }
     {
-      std::u16string src(u"qa");
+      std::u32string src(U"qa");
       bool res = tr.apply(src);
-      zassert_string_equal(src, std::u16string(u"qcd"));
+      zassert_string_equal(src, std::u32string(U"qcd"));
       zassert_equal(res, true);
     }
     {
-      std::u16string src(u"tb");
+      std::u32string src(U"tb");
       bool res = tr.apply(src);
-      zassert_string_equal(src, std::u16string(u"tb"));
+      zassert_string_equal(src, std::u32string(U"tb"));
       zassert_equal(res, false);
     }
   }
@@ -132,13 +132,13 @@ test_transforms() {
     transforms tr;
     {
       transform_group st;
-      st.emplace_back(std::u16string(u"िह"), std::u16string(u"हि"));
+      st.emplace_back(std::u32string(U"िह"), std::u32string(U"हि"));
       tr.addGroup(st);
     }
     {
-      std::u16string src(u"िह");
+      std::u32string src(U"िह");
       bool res = tr.apply(src);
-      zassert_string_equal(src, std::u16string(u"हि"));
+      zassert_string_equal(src, std::u32string(U"हि"));
       zassert_equal(res, true);
     }
   }
@@ -163,7 +163,7 @@ test_reorder_standalone() {
     const std::u32string expect = roasts[0];
     // now setup the rules
     const COMP_KMXPLUS_USET_RANGE ranges[]      = {// 0
-                                              {0x1A75, 0x1A79}};
+                                              COMP_KMXPLUS_USET_RANGE(0x1A75, 0x1A79)};
     const COMP_KMXPLUS_USET_USET usets[]        = {{0, 1, 0xFFFFFFFF}};
     const COMP_KMXPLUS_USET_USET &toneMarksUset = usets[0];
     const USet toneMarks(&ranges[toneMarksUset.range], toneMarksUset.count);
@@ -288,7 +288,7 @@ test_reorder_standalone() {
 
       // <reorder from="\u1A60" order="127" />
       element_list e0;
-      e0.emplace_back(U'\u1A6B', 127 << LDML_ELEM_FLAGS_ORDER_BITSHIFT);
+      e0.emplace_back(U'\u1A60', 127 << LDML_ELEM_FLAGS_ORDER_BITSHIFT);
       rg.list.emplace_back(e0);
 
       // <reorder from="\u1A6B" order="42" />
@@ -334,19 +334,41 @@ test_reorder_standalone() {
     std::cout << __FILE__ << ":" << __LINE__ << " - back to nod-Lana " << std::endl;
     // TODO-LDML: move this into test code perhaps
     for (size_t r = 0; r < sizeof(roasts) / sizeof(roasts[0]); r++) {
-      std::cout << __FILE__ << ":" << __LINE__ << " - trying roast #" << r << std::endl;
       const auto &roast = roasts[r];
+      std::cout << __FILE__ << ":" << __LINE__ << " - trying roast #" << r << "=" << roast << std::endl;
+      // try apply with string
+      {
+          std::cout << "- try apply(text, output)" << std::endl;
+          std::u32string text = roast;
+          std::u32string output;
+          size_t len = tr.apply(text, output);
+          if (len == 0) {
+            std::cout << " (did not apply)" << std::endl;
+          } else {
+            std::cout << " applied, matchLen= " << len << std::endl;
+            text.resize(text.size()-len); // shrink
+            text.append(output);
+            std::cout << " = " << text << std::endl;
+          }
+          zassert_string_equal(text, expect);
+      }
       // try all-at-once
       {
+        std::cout << "- try apply(text)" << std::endl;
         std::u32string text = roast;
         if (!tr.apply(text)) {
           std::cout << " (did not apply)" << std::endl;
+        } else if (text == roast) {
+          std::cout << " (suboptimal: apply returned true but made no change)" << std::endl;
+        } else {
+          std::cout << " changed to " << text;
         }
         zassert_string_equal(text, expect);
         std::cout << " matched (converting all at once)!" << std::endl;
       }
       // simulate typing this one char at a time;
       {
+        std::cout << "- try key-at-a-time" << std::endl;
         std::u32string text;
         for (auto ch = roast.begin(); ch < roast.end(); ch++) {
           // append the string
@@ -360,6 +382,24 @@ test_reorder_standalone() {
         zassert_string_equal(text, expect);
         std::cout << " matched! (converting char at a time)" << std::endl;
         std::cout << std::endl;
+      }
+    }
+    // special test
+    {
+      std::cout << __FILE__ << ":" << __LINE__ << " - special test " << std::endl;
+      const std::u32string expect = U"\u1A21\u1A60\u1A45"; // this string shouldn't mutate at all.
+      {
+        std::u32string text = expect;
+        tr.apply(text);
+        zassert_string_equal(text, expect);
+      }
+      {
+        // try submatch
+        std::u32string text = expect;
+        std::u32string output;
+        size_t len = tr.apply(text, output);
+        zassert_string_equal(output, U"");
+        assert_equal(len, 0);
       }
     }
   }

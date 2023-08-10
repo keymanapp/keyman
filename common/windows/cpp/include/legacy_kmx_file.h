@@ -415,7 +415,5 @@ typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
 
 typedef int (CALLBACK *CompilerMessageProc)(int line, DWORD dwMsgCode, LPSTR szText);
 
-//extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL FSaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc);   // I4865   // I4866
-
 #endif		// _COMPILER_H
 

@@ -5,7 +5,8 @@
     "outDir": "build/src/",
     "rootDir": "src/",
     "baseUrl": ".",
-    "allowSyntheticDefaultImports": true // for ajv
+    "allowSyntheticDefaultImports": true, // for ajv
+    "resolveJsonModule": true,
   },
   "include": [
     "src/**/*.ts"
