@@ -43,7 +43,6 @@ mcompile -d runs 4 important steps:
 //./mcompile -d /Projects/keyman/keyman/linux/mcompile/keymap/mcompile_test.kmx bla.dll 0407 /Projects/keyman/keyman/linux/mcompile/keymap/mcompile_test_out.kmx
 
 #include "mcompile.h"
-#include "helpers.h"
 
 #include </usr/include/xkbcommon/xkbcommon.h>  // _S2 do I need that???
 
@@ -67,6 +66,65 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
 #endif
 
 }
+
+
+//
+// TranslateKey
+//
+// For each key rule on the keyboard, remap its key to the
+// correct shift state and key.  Adjust the LCTRL+RALT -> RALT if necessary
+//
+void KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch) {
+
+  wprintf(L"\n     ##### KMX_TranslateKey of mcompile started #### ");
+  // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
+  // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
+  // to provide an alternate..
+  if((shift & (LCTRLFLAG|RALTFLAG)) == (LCTRLFLAG|RALTFLAG))
+    shift &= ~LCTRLFLAG;
+
+  if(key->ShiftFlags == 0 && key->Key == ch) {
+    // Key is a mnemonic key with no shift state defined.
+    // Remap the key according to the character on the key cap.
+    //LogError(L"Converted mnemonic rule on line %d, + '%c' TO + [%x K_%d]", key->Line, key->Key, shift, vk);
+    key->ShiftFlags = ISVIRTUALKEY | shift;
+    key->Key = vk;
+    wprintf(L"     1 and changed, %i (%c)  %i (%c) ", ch,ch, vk,vk);
+  } else if(key->ShiftFlags & VIRTUALCHARKEY && key->Key == ch) {
+    // Key is a virtual character key with a hard-coded shift state.
+    // Do not remap the shift state, just move the key.
+    // This will not result in 100% wonderful mappings as there could
+    // be overlap, depending on how keys are arranged on the target layout.
+    // But that is up to the designer.
+    //LogError(L"Converted mnemonic virtual char key rule on line %d, + [%x '%c'] TO + [%x K_%d]", key->Line, key->ShiftFlags, key->Key, key->ShiftFlags & ~VIRTUALCHARKEY, vk);
+    key->ShiftFlags &= ~VIRTUALCHARKEY;
+    key->Key = vk;
+    wprintf(L"     2 and changed, vk: %i (%c) --->  %i (%c) ", vk,vk, ch,ch);
+  }
+
+  wprintf(L"\n     ##### KMX_TranslateKey of mcompile ended ##### \n");
+}
+
+void KMX_TranslateGroup(LPKMX_GROUP group, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch) {
+
+  wprintf(L"\n   ##### KMX_TranslateGroup of mcompile started #####\n");
+  for(unsigned int i = 0; i < group->cxKeyArray; i++) {
+    KMX_TranslateKey(&group->dpKeyArray[i], vk, shift, ch);
+  }
+
+  wprintf(L"   ##### KMX_TranslateGroup of mcompile ended #####\n");
+}
+
+void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch) {
+  wprintf(L"\n ##### KMX_TranslateKeyboard of mcompile started #####\n");
+  for(unsigned int i = 0; i < kbd->cxGroupArray; i++) {
+    if(kbd->dpGroupArray[i].fUsingKeys) {
+      KMX_TranslateGroup(&kbd->dpGroupArray[i], vk, shift, ch);
+    }
+  }
+  wprintf(L" ##### KMX_TranslateKeyboard of mcompile ended #####\n");
+}
+
 //------ run with char16_t !! -------------------------------------------------------------------------------------------------------------------------
 int run(int argc, std::vector<std::u16string>  str_argv, char* argv_ch[] = NULL){
 
@@ -194,9 +252,6 @@ wprintf(L"_S2 * Up to here cross-platform xx  :-))))) **************************
 const UINT VKShiftState[] = {0, 1,  2,  0xFFFF};
 // _S2 shiftstate from systems-file
 
-void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, DWORD vk, UINT shift, KMX_WCHAR ch) {
-  //wprintf(L"KMX_TranslateKeyboard not implemented yet\n");
-}
 
 KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
   LPKMX_STORE sp;
@@ -287,7 +342,7 @@ int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
 
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]) {
 
-  std::wcout << "\n##### KMX_DoConvert of mcompile started #####\n";
+  wprintf(L"\n##### KMX_DoConvert of mcompile started #####\n");
   KMX_WCHAR DeadKey;
 
   if(!KMX_SetKeyboardToPositional(kbd)) return FALSE;
