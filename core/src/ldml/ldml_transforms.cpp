@@ -11,20 +11,6 @@
 #include <string>
 #include "kmx/kmx_xstring.h"
 
-#if defined(HAVE_ICU4C)
-// TODO-LDML: Needed this for some compiler warnings
-#define U_FALLTHROUGH
-#include "unicode/uniset.h"
-#include "unicode/usetiter.h"
-#include "unicode/unistr.h"
-#include "unicode/regex.h"
-#include "unicode/utext.h"
-#include "unicode/utypes.h"
-#else
-#error icu4c is required for this code
-#endif
-
-
 #ifndef assert
 #define assert(x)  // TODO-LDML
 #endif
@@ -49,7 +35,7 @@ namespace ldml {
 #define DebugTran(msg, ...)
 #endif
 
-element::element(const USet &new_u, KMX_DWORD new_flags)
+element::element(const SimpleUSet &new_u, KMX_DWORD new_flags)
     : chr(), uset(new_u), flags((new_flags & ~LDML_ELEM_FLAGS_TYPE) | LDML_ELEM_FLAGS_TYPE_USET) {
 }
 
@@ -204,7 +190,7 @@ element_list::load(const kmx::kmx_plus &kplus, kmx::KMXPLUS_ELEM id) {
       km_kbp_usv ch = e.element;
       emplace_back(ch, flags); // char
     } else if (type == LDML_ELEM_FLAGS_TYPE_USET) {
-      // need to load a USet
+      // need to load a SimpleUSet
       auto u = kplus.usetHelper.getUset(e.element);
       if (!u.valid()) {
         DebugLog("Error, invalid UnicodeSet at element %d", (int)i);
@@ -406,25 +392,36 @@ reorder_group::apply(std::u32string &str) const {
   return applied;
 }
 
+transform_entry::transform_entry(const transform_entry &other) :
+  fFrom(other.fFrom), fTo(other.fTo), fFromPattern(nullptr) {
+  if (other.fFromPattern) {
+    // clone pattern
+    fFromPattern.reset(other.fFromPattern->clone());
+  }
+}
+
 transform_entry::transform_entry(const std::u32string &from, const std::u32string &to) : fFrom(from), fTo(to) {
+  assert(!fFrom.empty()); // TODO-LDML: should not happen?
+
+  if (!fFrom.empty()) {
+    const std::u16string patstr = km::kbp::kmx::u32string_to_u16string(fFrom);
+    UErrorCode status           = U_ZERO_ERROR;
+    /* const */ icu::UnicodeString patustr = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
+    // add '$' to match to end
+    patustr.append(u'$');
+    fFromPattern.reset(icu::RegexPattern::compile(patustr, 0, status));
+    assert(U_SUCCESS(status)); // TODO-LDML: may be best to propagate status up ^^
+  }
 }
 
 size_t
 transform_entry::match(const std::u32string &input) const {
-  // TODO-LDML: simple approach, new regex every time
+  assert(fFromPattern);
   // TODO-LDML: Really? can't go from u32 to UnicodeString?
-
-  const std::u16string patstr = km::kbp::kmx::u32string_to_u16string(fFrom);
-  UErrorCode status           = U_ZERO_ERROR;
-  /* const */ icu::UnicodeString patustr = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
-  // add '$' to match to end
-  patustr.append(u'$');
-  std::unique_ptr<icu::RegexPattern> pattern(icu::RegexPattern::compile(patustr, 0, status));
-  assert(U_SUCCESS(status));
-
+  UErrorCode status = U_ZERO_ERROR;
   const std::u16string matchstr = km::kbp::kmx::u32string_to_u16string(input);
   icu::UnicodeString matchustr = icu::UnicodeString(matchstr.data(), (int32_t)matchstr.length());
-  std::unique_ptr<icu::RegexMatcher> matcher(pattern->matcher(matchustr, status));
+  std::unique_ptr<icu::RegexMatcher> matcher(fFromPattern->matcher(matchustr, status));
   assert(U_SUCCESS(status));
 
   if (!matcher->find(status)) { // i.e. matches somewhere, in this case at end of str
@@ -447,58 +444,53 @@ transform_entry::match(const std::u32string &input) const {
 std::u32string
 transform_entry::apply(const std::u32string &input, size_t matchLen) const {
   // TODO-LDML: and if you thought the previous function was suboptimal,
-  // TODO-LDML: now we're going to do it all again!
-  // TODO-LDML: simple approach, new regex every time
+  // TODO-LDML: We should cache the RegexMatcher from the previous call.
   // TODO-LDML: Really? can't go from u32 to UnicodeString?
 
-  const std::u16string patstr = km::kbp::kmx::u32string_to_u16string(fFrom);
-  UErrorCode status           = U_ZERO_ERROR;
-  /* const */ icu::UnicodeString patustr = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
-  // add '$' to match to end
-  patustr.append(u'$');
-  std::unique_ptr<icu::RegexPattern> pattern(icu::RegexPattern::compile(patustr, 0, status));
-  assert(U_SUCCESS(status));
+  assert(fFromPattern);
+  // TODO-LDML: simple approach, new regex every time
+  // TODO-LDML: Really? can't go from u32 to UnicodeString?
+  UErrorCode status = U_ZERO_ERROR;
 
   // we know the matchLen so we can slice the string…
-  const std::u16string matchstr = km::kbp::kmx::u32string_to_u16string(input.substr(input.length()-matchLen, matchLen));
-  icu::UnicodeString matchustr = icu::UnicodeString(matchstr.data(), (int32_t)matchstr.length());
-  std::unique_ptr<icu::RegexMatcher> matcher(pattern->matcher(matchustr, status));
+  // Note: the matchstr here (unlike in transform_entry::match) is sliced so that
+  // it only includes the matched portion. This way, when changed it's suitable as the
+  // output string.
+  const std::u16string matchstr = km::kbp::kmx::u32string_to_u16string(input.substr(input.length() - matchLen, matchLen));
+  icu::UnicodeString matchustr  = icu::UnicodeString(matchstr.data(), (int32_t)matchstr.length());
+  std::unique_ptr<icu::RegexMatcher> matcher(fFromPattern->matcher(matchustr, status));
   assert(U_SUCCESS(status));
-  // assert(matcher->find(status)); // it better match
+  // now, do the replace
   const std::u16string rstr = km::kbp::kmx::u32string_to_u16string(fTo);
-  icu::UnicodeString rustr = icu::UnicodeString(rstr.data(), (int32_t)rstr.length());
+  icu::UnicodeString rustr  = icu::UnicodeString(rstr.data(), (int32_t)rstr.length());
+  // This replace will apply $1, $2 etc.  TODO-LDML it will NOT handle mapFrom or mapTo.
   icu::UnicodeString output = matcher->replaceFirst(rustr, status);
   assert(U_SUCCESS(status));
 
-  // if (!matcher->find(status)) { // i.e. matches somewhere, in this case at end of str
-  //   return 0; // and tear everything down
-  // }
+  if (output.length() == 0) {
+    return std::u32string(); // special case of a zero length output (such as delete)
+  }
 
-
-
-  // // TODO-LDML: this is UTF-16 len, not UTF-32 len!!
-  // // auto matchLen = matcher->end64(status) - matcher->start64(status);
-  // // TODO-LDML: if we had an underlying UText this would be simpler.
-  // auto matchStart = matcher->start64(status);
-  // auto matchEnd   = matcher->end64(status);
-  // // extract..
-  // const icu::UnicodeString substr = matchustr.tempSubStringBetween((int32_t)matchStart, (int32_t)matchEnd);
-  // // preflight to UTF-32 to get length
-  // auto matchLen = substr.toUTF32(nullptr, 0, status);
-
-  // return matchLen;
-  assert(U_SUCCESS(status));
+  // TODO-LDML: All we are trying to do is to extract the output string. Probably too many steps.
   UErrorCode preflightStatus = U_ZERO_ERROR;
-  auto out32len = output.toUTF32(nullptr, 0, preflightStatus);
-  char32_t *s = new char32_t[out32len+1];
-  output.toUTF32((UChar32*)s, out32len+1, status);
-  std::u32string out32(s, out32len);
+  // calculate how big the buffer is
+  auto out32len              = output.toUTF32(nullptr, 0, preflightStatus); // preflightStatus will be an err, because we know the buffer overruns zero bytes
+  // allocate
+  char32_t *s                = new char32_t[out32len + 1];
+  assert(s != nullptr);
+  // convert
+  output.toUTF32((UChar32 *)s, out32len + 1, status);
   assert(U_SUCCESS(status));
+  // now, build a u32string
+  std::u32string out32(s, out32len);
+  // clean up buffer
+  delete [] s;
   return out32;
 }
 
 any_group::any_group(const transform_group &g) : type(any_group_type::transform), transform(g), reorder() {
 }
+
 any_group::any_group(const reorder_group &g) : type(any_group_type::reorder), transform(), reorder(g) {
 }
 

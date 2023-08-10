@@ -14,11 +14,23 @@
 #include <unordered_map>
 #include <utility>
 
+#if !defined(HAVE_ICU4C)
+#error icu4c is required for this code
+#endif
+
+#define U_FALLTHROUGH
+#include "unicode/utypes.h"
+#include "unicode/uniset.h"
+#include "unicode/usetiter.h"
+#include "unicode/unistr.h"
+#include "unicode/regex.h"
+#include "unicode/utext.h"
+
 namespace km {
 namespace kbp {
 namespace ldml {
 
-using km::kbp::kmx::USet;
+using km::kbp::kmx::SimpleUSet;
 
 /**
  * Type of a group
@@ -33,12 +45,11 @@ enum any_group_type {
  */
 class element {
 public:
-  /** construct from a USet */
-  element(const USet &u, KMX_DWORD flags);
+  /** construct from a SimpleUSet */
+  element(const SimpleUSet &u, KMX_DWORD flags);
   /** construct from a single char */
   element(km_kbp_usv ch, KMX_DWORD flags);
-
-  /** @returns true if a USet type */
+  /** @returns true if a SimpleUSet type */
   bool is_uset() const;
   /** @returns true if prebase bit set*/
   bool is_prebase() const;
@@ -58,7 +69,7 @@ public:
 private:
   // TODO-LDML: support multi-char strings?
   const km_kbp_usv chr;
-  const USet uset;
+  const SimpleUSet uset;
   const KMX_DWORD flags;
 };
 
@@ -67,6 +78,7 @@ private:
  */
 class transform_entry {
 public:
+  transform_entry(const transform_entry &other);
   transform_entry(
       const std::u32string &from,
       const std::u32string &to
@@ -84,8 +96,9 @@ public:
   std::u32string apply(const std::u32string &input, size_t matchLen) const;
 
 private:
-  const std::u32string fFrom;  // TODO-LDML: regex
+  const std::u32string fFrom;
   const std::u32string fTo;
+  std::unique_ptr<icu::RegexPattern> fFromPattern;
 };
 
 /**
