@@ -216,6 +216,7 @@ external_e = executable('ext_event', ['kmx_external_event.cpp', '../emscripten_f
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,
+                dependencies: [icu_uc, icu_i18n],
                 objects: lib.extract_all_objects(recursive: false))
 
 test_kbd = 'k_033___caps_always_off'
