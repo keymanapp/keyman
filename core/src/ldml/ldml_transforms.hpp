@@ -86,14 +86,12 @@ public:
   );
 
   /**
-   * @returns length if it's a match
+   * If matching, apply the match to the output string
+   * @param input input string to match
+   * @param output output string
+   * @returns length of 'input' which was matched
    */
-  size_t match(const std::u32string &input) const;
-
-  /**
-   * @returns output string
-   */
-  std::u32string apply(const std::u32string &input, size_t matchLen) const;
+  size_t apply(const std::u32string &input, std::u32string &output) const;
 
 private:
   const std::u32string fFrom;
@@ -114,12 +112,12 @@ public:
   transform_group();
 
   /**
-   * Find the first match in the group
+   * Find the first match in the group and apply it.
    * @param input input string to match
-   * @param subMatched on output, the matched length
-   * @returns alias to transform_entry or nullptr
+   * @param output output string
+   * @returns length of 'input' which was matched
    */
-  const transform_entry *match(const std::u32string &input, size_t &subMatched) const;
+  size_t apply(const std::u32string &input, std::u32string &output) const;
 };
 
 /** a single char, categorized according to reorder rules*/
@@ -241,7 +239,7 @@ public:
   size_t apply(const std::u32string &input, std::u32string &output);
 
   /**
-   * For tests - TODO-LDML only supports reorder
+   * For tests
    * @return true if str was altered
    */
   bool apply(std::u32string &str);

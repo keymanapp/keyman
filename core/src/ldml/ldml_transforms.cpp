@@ -415,9 +415,10 @@ transform_entry::transform_entry(const std::u32string &from, const std::u32strin
 }
 
 size_t
-transform_entry::match(const std::u32string &input) const {
+transform_entry::apply(const std::u32string &input, std::u32string &output) const {
   assert(fFromPattern);
   // TODO-LDML: Really? can't go from u32 to UnicodeString?
+  // TODO-LDML: Also, we could cache the u16 string at the transformGroup level or higher.
   UErrorCode status = U_ZERO_ERROR;
   const std::u16string matchstr = km::kbp::kmx::u32string_to_u16string(input);
   icu::UnicodeString matchustr = icu::UnicodeString(matchstr.data(), (int32_t)matchstr.length());
@@ -426,67 +427,56 @@ transform_entry::match(const std::u32string &input) const {
   assert(U_SUCCESS(status));
 
   if (!matcher->find(status)) { // i.e. matches somewhere, in this case at end of str
-    return 0; // and tear everything down
+    return 0; // no match
   }
 
   // TODO-LDML: this is UTF-16 len, not UTF-32 len!!
-  // auto matchLen = matcher->end64(status) - matcher->start64(status);
   // TODO-LDML: if we had an underlying UText this would be simpler.
-  auto matchStart = matcher->start64(status);
-  auto matchEnd   = matcher->end64(status);
-  // extract..
-  const icu::UnicodeString substr = matchustr.tempSubStringBetween((int32_t)matchStart, (int32_t)matchEnd);
-  // preflight to UTF-32 to get length
-  auto matchLen = substr.toUTF32(nullptr, 0, status);
-
-  return matchLen;
-}
-
-std::u32string
-transform_entry::apply(const std::u32string &input, size_t matchLen) const {
-  // TODO-LDML: and if you thought the previous function was suboptimal,
-  // TODO-LDML: We should cache the RegexMatcher from the previous call.
-  // TODO-LDML: Really? can't go from u32 to UnicodeString?
-
-  assert(fFromPattern);
-  // TODO-LDML: simple approach, create a new Matcher every time. These could be cached and reset.
-  // TODO-LDML: Really? can't go from u32 to UnicodeString?
-  UErrorCode status = U_ZERO_ERROR;
-
-  // we know the matchLen so we can slice the string…
-  // Note: the matchstr here (unlike in transform_entry::match) is sliced so that
-  // it only includes the matched portion. This way, when changed it's suitable as the
-  // output string.
-  const std::u16string matchstr = km::kbp::kmx::u32string_to_u16string(input.substr(input.length() - matchLen, matchLen));
-  icu::UnicodeString matchustr  = icu::UnicodeString(matchstr.data(), (int32_t)matchstr.length());
-  std::unique_ptr<icu::RegexMatcher> matcher(fFromPattern->matcher(matchustr, status));
+  int32_t matchStart = matcher->start(status);
+  int32_t matchEnd   = matcher->end(status);
   assert(U_SUCCESS(status));
-  // now, do the replace
+  // extract..
+  const icu::UnicodeString substr = matchustr.tempSubStringBetween(matchStart, matchEnd);
+  // preflight to UTF-32 to get length
+  UErrorCode substrStatus = U_ZERO_ERROR;
+  auto matchLen = substr.toUTF32(nullptr, 0, substrStatus);
+  assert(matchLen > 0);
+  if (matchLen == 0) {
+    return 0;
+  }
+  // Now, we have a matchLen.
+
+  // now, do the replace.
+  // Convert the fTo into u16 TODO-LDML (we could cache this?)
   const std::u16string rstr = km::kbp::kmx::u32string_to_u16string(fTo);
   icu::UnicodeString rustr  = icu::UnicodeString(rstr.data(), (int32_t)rstr.length());
   // This replace will apply $1, $2 etc.  TODO-LDML it will NOT handle mapFrom or mapTo.
-  icu::UnicodeString output = matcher->replaceFirst(rustr, status);
+  icu::UnicodeString entireOutput = matcher->replaceFirst(rustr, status);
   assert(U_SUCCESS(status));
+  // entireOutput includes all of 'input', but modified. Need to substring it.
+  icu::UnicodeString outu = entireOutput.tempSubString(matchStart);
 
-  if (output.length() == 0) {
-    return std::u32string(); // special case of a zero length output (such as delete)
+  // Special case if there's no output
+  if (outu.length() == 0) {
+    output.clear();
+  } else {
+    // TODO-LDML: All we are trying to do is to extract the output string. Probably too many steps.
+    UErrorCode preflightStatus = U_ZERO_ERROR;
+    // calculate how big the buffer is
+    auto out32len              = outu.toUTF32(nullptr, 0, preflightStatus); // preflightStatus will be an err, because we know the buffer overruns zero bytes
+    // allocate
+    char32_t *s                = new char32_t[out32len + 1];
+    assert(s != nullptr);
+    // convert
+    outu.toUTF32((UChar32 *)s, out32len + 1, status);
+    assert(U_SUCCESS(status));
+    output.assign(s, out32len);
+    // now, build a u32string
+    std::u32string out32(s, out32len);
+    // clean up buffer
+    delete [] s;
   }
-
-  // TODO-LDML: All we are trying to do is to extract the output string. Probably too many steps.
-  UErrorCode preflightStatus = U_ZERO_ERROR;
-  // calculate how big the buffer is
-  auto out32len              = output.toUTF32(nullptr, 0, preflightStatus); // preflightStatus will be an err, because we know the buffer overruns zero bytes
-  // allocate
-  char32_t *s                = new char32_t[out32len + 1];
-  assert(s != nullptr);
-  // convert
-  output.toUTF32((UChar32 *)s, out32len + 1, status);
-  assert(U_SUCCESS(status));
-  // now, build a u32string
-  std::u32string out32(s, out32len);
-  // clean up buffer
-  delete [] s;
-  return out32;
+  return matchLen;
 }
 
 any_group::any_group(const transform_group &g) : type(any_group_type::transform), transform(g), reorder() {
@@ -514,17 +504,18 @@ transform_group::transform_group() {
 /**
  * return the first transform match in this group
  */
-const transform_entry *
-transform_group::match(const std::u32string &input, size_t &subMatched) const {
+size_t
+transform_group::apply(const std::u32string &input, std::u32string &output) const {
+  size_t subMatched = 0;
   for (auto transform = begin(); (subMatched == 0) && (transform < end()); transform++) {
     // TODO-LDML: non regex implementation
     // is the match area too short?
-    subMatched = transform->match(input);
+    subMatched = transform->apply(input, output);
     if (subMatched != 0) {
-      return &(*transform);  // return alias to transform
+      return subMatched; // matched. break out.
     }
   }
-  return nullptr;
+  return 0; // no match
 }
 
 /**
@@ -577,20 +568,14 @@ transforms::apply(const std::u32string &input, std::u32string &output) {
     // TODO-LDML: reorders
     // Assume it's a non reorder group
     /** Length of match within this group*/
-    size_t subMatched = 0;
 
     // find the first match in this group (if present)
     // TODO-LDML: check if reorder
     if (group->type == any_group_type::transform) {
-      auto entry = group->transform.match(updatedInput, subMatched);
+      std::u32string subOutput;
+      size_t subMatched = group->transform.apply(updatedInput, subOutput);
 
-      if (entry != nullptr) {
-        // now apply the found transform
-
-        // update subOutput (string) and subMatched
-        // the returned string must replace the last "subMatched" chars of the string.
-        std::u32string subOutput = entry->apply(updatedInput, subMatched);
-
+      if (subMatched != 0) {
         // remove the matched part of the updatedInput
         updatedInput.resize(updatedInput.length() - subMatched);  // chop of the subMatched part at end
         updatedInput.append(subOutput);                           // subOutput could be empty such as in backspace transform
