@@ -1,7 +1,7 @@
 import { gestures } from '@keymanapp/gesture-recognizer';
-import specs = gestures.specs;
+import specTypeDefs = gestures.specs;
 
-type ContactModel = specs.ContactModel<string>;
+type ContactModel = specTypeDefs.ContactModel<string>;
 
 export const InstantRejectionModel: ContactModel = {
   itemPriority: 0,
@@ -19,6 +19,7 @@ export const InstantResolutionModel: ContactModel = {
   }
 }
 
+export const LongpressDistanceThreshold = 10;
 export const MainLongpressSourceModel: ContactModel = {
   itemChangeAction: 'reject',
   itemPriority: 0,
@@ -30,7 +31,7 @@ export const MainLongpressSourceModel: ContactModel = {
   pathModel: {
     evaluate: (path) => {
       const stats = path.stats;
-      if(stats.rawDistance > 10) {
+      if(stats.rawDistance > LongpressDistanceThreshold) {
         return 'reject';
       }
 
@@ -41,6 +42,7 @@ export const MainLongpressSourceModel: ContactModel = {
   }
 };
 
+export const LongpressFlickDistanceThreshold = 6;
 export const MainLongpressSourceModelWithShortcut: ContactModel = {
   ...MainLongpressSourceModel,
   pathModel: {
@@ -48,7 +50,7 @@ export const MainLongpressSourceModelWithShortcut: ContactModel = {
       const stats = path.stats;
 
       // Adds up-flick support!
-      if(stats.rawDistance > 5 && stats.cardinalDirection == 'n') {
+      if(stats.rawDistance > LongpressFlickDistanceThreshold && stats.cardinalDirection == 'n') {
         return 'resolve';
       }
 
@@ -83,6 +85,18 @@ export const ModipressEndModel: ContactModel = {
 export const SimpleTapModel: ContactModel = {
   itemPriority: 0,
   itemChangeAction: 'reject',
+  pathResolutionAction: 'resolve',
+  pathModel: {
+    evaluate: (path) => {
+      if(path.isComplete && !path.wasCancelled) {
+        return 'resolve';
+      }
+    }
+  }
+}
+
+export const SubkeySelectModel: ContactModel = {
+  itemPriority: 0,
   pathResolutionAction: 'resolve',
   pathModel: {
     evaluate: (path) => {
