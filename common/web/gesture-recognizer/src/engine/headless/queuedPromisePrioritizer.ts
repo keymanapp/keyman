@@ -8,33 +8,6 @@ interface SynchronizationSet {
   promise: Promise<void>
 }
 
-/*
- * This was "fun".
- *
- * Collects metadata on all near-synchronous calls to its lone public method, intended to handle
- * cases where Promise fulfillment is essentially triggered synchronously.  JS has an internal
- * "Promise queue" that ensures consistent ordering with Promise resolution and fulfillment,
- * assuming all Promises of equal priority.  Its func exists to customize their order of
- * resolution when fulfilled "synchronously", based on a supplied `priority` value.
- * - Common case: a gesture-source path ends (touchend, mouseup)
- *   - Any promises based on completing the path will need to immediately either reject or fulfill.
- *     - Depending on implementation, these will be registered on the queue synchronously.
- *       - This is _absolutely the case_ through our use of the matchers' use of the
- *         `ManagedPromise` utility class.
- *   - If certain ones should be given the chance to "resolve" first, regardless of when their
- *     Promises were initialized, the built-in Promise queue doesn't handle _that_.
- *
- * By re-deferring on an instantly-resolving Promise, we can note which calls to this method are
- * essentially synchronous.  During the corresponding await, we can construct additional call-
- * specific Promises as handles for our callers and track their priority for sorting.
- *
- * Once we reach resolution of that instantly-resolving Promise (`syncPromise`), we lock out
- * any further calls from the set to be processed; new incoming entries will fall into a later
- * set regardless of priority.  With the syncSet's recording fully completed... We may then
- * sort the known "synchronous" calls to this resolution handler in order of priority, thereby
- * enforcing our desired Promise-resolution ordering.
- */
-
 /**
  * The short version: this is a Promise "resynchronizer" that allows us to choose the order in which
  * "synchronous" promises resolve.
