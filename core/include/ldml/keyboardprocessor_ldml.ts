@@ -626,7 +626,7 @@ class Constants {
   /** maximum marker index prior to the 'any' value */
   readonly marker_max_index    = this.marker_any_index - 1;
   /** maximum count of markers (not including 'any') */
-  readonly marker_max_count    = this.marker_max_index - this.marker_min_index;
+  readonly marker_max_count    = this.marker_max_index - this.marker_min_index + 1;
 
 };
 
