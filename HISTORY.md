@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.159 alpha 2023-08-11
+
+*  (#9405)
+
 ## 17.0.158 alpha 2023-08-09
 
 * chore(linux): Disable Mantic builds on Launchpad (#9435)
