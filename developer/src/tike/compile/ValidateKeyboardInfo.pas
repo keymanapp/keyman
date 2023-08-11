@@ -1,5 +1,7 @@
 unit ValidateKeyboardInfo;
 
+// TODO: this unit is deprecated
+
 interface
 
 uses

@@ -17,13 +17,10 @@
           { "$ref": "#/definitions/KeyboardLanguageInfo" }
         ]},
         "lastModifiedDate": { "type": "string", "format": "date-time" },
-        "links": { "type": "array", "items": { "$ref": "#/definitions/KeyboardLinkInfo" } },
         "packageFilename": { "type": "string", "pattern": "\\.km[xp]$" },
         "packageFileSize": { "type": "number" },
         "jsFilename": { "type": "string", "pattern": "\\.js$" },
         "jsFileSize": { "type": "number" },
-        "documentationFilename": { "type": "string", "pattern": "\\.(rtf|html?|pdf|txt)$" },
-        "documentationFileSize": { "type": "number" },
         "isRTL": { "type": "boolean" },
         "encodings": { "type": "array", "items": { "type": "string", "enum": ["ansi", "unicode"] }, "additionalItems": false },
         "packageIncludes": { "type": "array", "items": { "type": "string", "enum": ["welcome", "documentation", "fonts", "visualKeyboard"] }, "additionalItems": false },
@@ -31,7 +28,6 @@
         "minKeymanVersion": { "type": "string", "pattern": "^\\d+\\.\\d$" },
         "helpLink": { "type": "string", "pattern": "^https://help\\.keyman\\.com/keyboard/" },
         "platformSupport": { "$ref": "#/definitions/KeyboardPlatformInfo" },
-        "legacyId": { "type": "number" },
         "sourcePath": { "type": "string", "pattern": "^(release|legacy|experimental)/.+/.+$" },
         "related": { "type": "object", "patternProperties": {
           ".": { "$ref": "#/definitions/KeyboardRelatedInfo" }
@@ -40,9 +36,7 @@
         },
         "deprecated": { "type": "boolean" }
       },
-      "required": [
-        "license", "languages"
-      ]
+      "required": [ "id", "name", "license", "languages", "lastModifiedDate", "platformSupport" ]
     },
 
     "KeyboardLanguageInfo": {
@@ -140,16 +134,6 @@
       "additionalProperties": false
     },
 
-    "KeyboardLinkInfo": {
-      "type": "object",
-      "properties": {
-        "name": { "type": "string" },
-        "url": { "type": "string" }
-      },
-      "required": ["name", "url"],
-      "additionalProperties": false
-    },
-
     "KeyboardPlatformInfo": {
       "type": "object",
       "patternProperties": {
@@ -163,8 +147,7 @@
       "type": "object",
       "properties": {
         "deprecates": { "type": "boolean" },
-        "deprecatedBy": { "type": "boolean" },
-        "note": { "type": "string" }
+        "deprecatedBy": { "type": "boolean" }
       },
       "required": [],
       "additionalProperties": false

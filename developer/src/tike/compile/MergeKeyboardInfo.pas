@@ -19,7 +19,6 @@
   # packageFileSize -- get from the size of the file
   # jsFilename -- from $keyboard_info_jsFilename
   # jsFileSize -- get from the size of the file
-  # documentationFileSize -- get from the size of the file
   # isRTL -- from .js, KRTL\s*=\s*1
   # encodings -- from .kmx (existence of .js implies unicode)
   # packageIncludes -- from kmp.inf?
@@ -727,7 +726,7 @@ begin
 end;
 
 //
-// packageFileSize, jsFileSize, documentationFileSize, all from the actual files
+// packageFileSize, jsFileSize, all from the actual files
 //
 procedure TMergeKeyboardInfo.CheckOrAddFileSizes;
   procedure DoFileSize(prefix: string);
@@ -756,7 +755,6 @@ procedure TMergeKeyboardInfo.CheckOrAddFileSizes;
 begin
   DoFileSize('js');
   DoFileSize('package');
-  DoFileSize('documentation');
 end;
 
 //
