@@ -94,10 +94,11 @@ export class TouchEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
     // Ensure the same timestamp is used for all touches being updated.
     const timestamp = performance.now();
 
-    // Do not change to `changedTouches` - we need a sample for all active touches in order
-    // to facilitate path-update synchronization for multi-touch gestures.
-    for(let i=0; i < event.touches.length; i++) {
-      const touch = event.touches.item(i);
+    // During a touch-start, only _new_ touch contact points are listed here;
+    // we shouldn't signal "input start" for any previously-existing touch points,
+    // so `.changedTouches` is the best way forward.
+    for(let i=0; i < event.changedTouches.length; i++) {
+      const touch = event.changedTouches.item(i);
       const sample = this.buildSampleFromTouch(touch, timestamp);
 
       if(!ZoneBoundaryChecker.inputStartOutOfBoundsCheck(sample, this.config)) {
@@ -118,8 +119,12 @@ export class TouchEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
     // Ensure the same timestamp is used for all touches being updated.
     const timestamp = performance.now();
 
-    for(let i=0; i < event.changedTouches.length; i++) {
-      const touch = event.changedTouches.item(i);
+    // Do not change to `changedTouches` - we need a sample for all active touches in order
+    // to facilitate path-update synchronization for multi-touch gestures.
+    //
+    // May be worth doing changedTouches _first_ though.
+    for(let i=0; i < event.touches.length; i++) {
+      const touch = event.touches.item(i);
 
       if(!this.hasActiveTouchpoint(touch.identifier)) {
         continue;
@@ -142,6 +147,8 @@ export class TouchEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
 
   onTouchEnd(event: TouchEvent) {
     let propagationActive = true;
+
+    // Only lists touch contact points that have been lifted; touchmove is raised separately if any movement occurred.
     for(let i=0; i < event.changedTouches.length; i++) {
       const touch = event.changedTouches.item(i);
 

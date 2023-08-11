@@ -28,7 +28,7 @@ import { assertSegmentSimilarity } from '../../resources/assertSegmentSimilarity
  * @param {*} jsonObj
  */
 function retrieveSubsegmentations(jsonObj) {
-  return jsonObj.inputs[0].touchpoints[0].path.segments;
+  return jsonObj.inputs[0].path.segments;
 }
 
 // ---------------------------------------

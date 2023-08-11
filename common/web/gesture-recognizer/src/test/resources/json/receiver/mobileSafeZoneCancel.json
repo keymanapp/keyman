@@ -1,36 +1,32 @@
 {
   "inputs": [
     {
-      "touchpoints": [
-        {
-          "isFromTouch": true,
-          "path": {
-            "coords": [
-              {
-                "targetX": 226,
-                "targetY": 38,
-                "t": 61290
-              },
-              {
-                "targetX": 234,
-                "targetY": 38,
-                "t": 61676
-              },
-              {
-                "targetX": 235,
-                "targetY": 37,
-                "t": 61729
-              },
-              {
-                "targetX": 237,
-                "targetY": 37,
-                "t": 61829
-              }
-            ],
-            "wasCancelled": true
+      "isFromTouch": true,
+      "path": {
+        "coords": [
+          {
+            "targetX": 226,
+            "targetY": 38,
+            "t": 61290
+          },
+          {
+            "targetX": 234,
+            "targetY": 38,
+            "t": 61676
+          },
+          {
+            "targetX": 235,
+            "targetY": 37,
+            "t": 61729
+          },
+          {
+            "targetX": 237,
+            "targetY": 37,
+            "t": 61829
           }
-        }
-      ]
+        ],
+        "wasCancelled": true
+      }
     }
   ],
   "config": {

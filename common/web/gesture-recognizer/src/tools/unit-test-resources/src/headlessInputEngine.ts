@@ -10,7 +10,7 @@ import { timedPromise } from '@keymanapp/web-utils';
 export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
   private PATH_ID_SEED = 1;
 
-  // Should generally keep a smiple, parameterless default constructor.
+  // Should generally keep a simple, parameterless default constructor.
   constructor() {
     super();
   }
@@ -57,11 +57,7 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
 
   async playbackRecording(recordedObj: RecordedCoordSequenceSet) {
     const inputPromises = recordedObj.inputs.map((recordedInput) => {
-      const pointPromises = recordedInput.touchpoints.map((recordedPoint) => {
-        return this.preparePathPlayback(recordedPoint);
-      });
-
-      return Promise.all(pointPromises);
+      return this.preparePathPlayback(recordedInput);
     });
 
     await Promise.all(inputPromises);

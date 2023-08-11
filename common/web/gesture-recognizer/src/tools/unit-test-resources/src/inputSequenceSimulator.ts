@@ -194,7 +194,7 @@ export class InputSequenceSimulator<HoveredItemType> {
 
       for(let index=0; index < inputs.length; index++) {
         // TODO:  does not iterate over all touchpoints.  Not that we can have more than one at present...
-        const touchpoint = SimpleGestureSource.deserialize(inputs[index].touchpoints[0], index);
+        const touchpoint = SimpleGestureSource.deserialize(inputs[index], index);
         const indexInSequence = sequenceProgress[index];
 
         if(indexInSequence == Number.MAX_VALUE) {
@@ -207,7 +207,7 @@ export class InputSequenceSimulator<HoveredItemType> {
         }
       }
 
-      const touchpoint = SimpleGestureSource.deserialize(inputs[selectedSequence].touchpoints[0], selectedSequence);
+      const touchpoint = SimpleGestureSource.deserialize(inputs[selectedSequence], selectedSequence);
       const indexInSequence = sequenceProgress[selectedSequence];
       let state: string = "move";
 

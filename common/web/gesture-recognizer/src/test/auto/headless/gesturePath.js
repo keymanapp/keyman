@@ -20,7 +20,7 @@ describe("GesturePath", function() {
     it('from fixture', () => {
       let testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/simple_ne_move.json`);
       let fullSerializedJSON = JSON.parse(testJSONtext);
-      let rawPathObject = fullSerializedJSON.inputs[0].touchpoints[0].path;
+      let rawPathObject = fullSerializedJSON.inputs[0].path;
 
       if(rawPathObject.segments) {
         // Left-over fixture data from before we removed subsegmentation.
