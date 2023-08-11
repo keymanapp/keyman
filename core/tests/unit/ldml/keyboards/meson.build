@@ -34,6 +34,7 @@ tests_with_testdata = [
   'k_001_tiny',
   'k_020_fr', # TODO-LDML: move to cldr above (fix vkey)
   'k_200_reorder_nod_Lana',
+  'k_210_marker',
 ]
 
 tests =  tests_without_testdata
