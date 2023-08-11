@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 17.0.159 alpha 2023-08-11
+
+*  (#9405)
+
+## 17.0.158 alpha 2023-08-09
+
+* chore(linux): Disable Mantic builds on Launchpad (#9435)
+* feat(windows): Use Keyboard Activated event API call to turn off caps lock (if required) (#9353)
+* chore: stats script parameters (#9431)
+* feat(developer): add 'default' property for longpress keys (#9432)
+* chore(developer): improve kmc sentry reporting on fatal build errors (#9441)
+
 ## 17.0.157 alpha 2023-08-08
 
 * fix(linux): fix memory leaks and method name (#9413)
