@@ -1,7 +1,7 @@
 import {
   InputEngineBase,
-  SerializedSimpleGestureSource,
-  SimpleGestureSource
+  SerializedGestureSource,
+  GestureSource
 } from '@keymanapp/gesture-recognizer';
 
 import { RecordedCoordSequenceSet } from './inputRecording.js';
@@ -15,7 +15,7 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
     super();
   }
 
-  public preparePathPlayback(recordedPoint: SerializedSimpleGestureSource) {
+  public preparePathPlayback(recordedPoint: SerializedGestureSource) {
     const originalSamples = recordedPoint.path.coords;
     const sampleCount = originalSamples.length;
 
@@ -23,7 +23,7 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
     const tailSamples = originalSamples.slice(1);
 
     const pathID = this.PATH_ID_SEED++;
-    let replayPoint = new SimpleGestureSource<Type>(pathID, recordedPoint.isFromTouch);
+    let replayPoint = new GestureSource<Type>(pathID, recordedPoint.isFromTouch);
     replayPoint.update(headSample); // is included before the point is made available.
 
     // Build promises designed to reproduce the events at the correct times.

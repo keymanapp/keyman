@@ -1,5 +1,5 @@
 import { CumulativePathStats } from "../../cumulativePathStats.js";
-import { SimpleGestureSource } from "../../simpleGestureSource.js";
+import { GestureSource } from "../../gestureSource.js";
 import { ContactModel } from "../specs/contactModel.js";
 import { ManagedPromise, TimeoutPromise } from "@keymanapp/web-utils";
 
@@ -29,7 +29,7 @@ export class PathMatcher<Type> {
   // During execution, source.path is fine... but once this matcher's role is done,
   // `source` will continue to receive edits and may even change the instance
   // underlying the `path` field.
-  public readonly source: SimpleGestureSource<Type>;
+  public readonly source: GestureSource<Type>;
 
   private readonly publishedPromise: ManagedPromise<PathMatchResult>
   private _result: PathMatchResult;
@@ -38,7 +38,7 @@ export class PathMatcher<Type> {
     return this.publishedPromise.corePromise;
   }
 
-  constructor(model: ContactModel<Type>, source: SimpleGestureSource<Type>) {
+  constructor(model: ContactModel<Type>, source: GestureSource<Type>) {
     /* c8 ignore next 3 */
     if(!model || !source) {
       throw new Error("A gesture-path source and contact-path model must be specified.");

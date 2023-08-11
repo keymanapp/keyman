@@ -1,4 +1,4 @@
-import { SimpleGestureSource, SimpleGestureSourceSubview } from "../../simpleGestureSource.js";
+import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
 
 import { GestureModel, GestureResolution, GestureResolutionSpec, RejectionDefault, ResolutionItemSpec } from "../specs/gestureModel.js";
 
@@ -25,13 +25,13 @@ export class GestureMatcher<Type> {
   private readonly publishedPromise: ManagedPromise<MatchResult<Type>>; // unsure on the actual typing at the moment.
   private _result: MatchResult<Type>;
 
-  private baseSources: SimpleGestureSource<Type>[];
+  private baseSources: GestureSource<Type>[];
 
   public get promise() {
     return this.publishedPromise.corePromise;
   }
 
-  constructor(model: GestureModel<Type>, sourceObj: SimpleGestureSource<Type> | GestureMatcher<Type>) {
+  constructor(model: GestureModel<Type>, sourceObj: GestureSource<Type> | GestureMatcher<Type>) {
     /* c8 ignore next 5 */
     if(!model || !sourceObj) {
       throw new Error("Construction of GestureMatcher requires a gesture-model spec and a source for related contact points.");
@@ -41,8 +41,8 @@ export class GestureMatcher<Type> {
 
     // We condition on ComplexGestureSource since some unit tests mock the other type without
     // instantiating the actual type.
-    const predecessor = sourceObj instanceof SimpleGestureSource<Type> ? null : sourceObj;
-    const source = predecessor ? null : (sourceObj as SimpleGestureSource<Type>);
+    const predecessor = sourceObj instanceof GestureSource<Type> ? null : sourceObj;
+    const source = predecessor ? null : (sourceObj as GestureSource<Type>);
 
     this.baseSources = predecessor?.baseSources || [source];
 
@@ -60,7 +60,7 @@ export class GestureMatcher<Type> {
 
     this.pathMatchers = [];
 
-    const sourceTouchpoints: SimpleGestureSource<Type>[] = source
+    const sourceTouchpoints: GestureSource<Type>[] = source
       ? [ source ]
       : predecessor.pathMatchers.map((matcher) => matcher.source);
 
@@ -74,7 +74,7 @@ export class GestureMatcher<Type> {
         continue;
       }
 
-      if(srcContact instanceof SimpleGestureSourceSubview) {
+      if(srcContact instanceof GestureSourceSubview) {
         srcContact.disconnect();  // prevent further updates from mangling tracked path info.
       }
       let i = touchpointIndex - offset;
@@ -88,7 +88,7 @@ export class GestureMatcher<Type> {
 
       let preserveBaseItem: boolean = false;
 
-      let contact: SimpleGestureSource<Type>;
+      let contact: GestureSource<Type>;
       switch(inheritancePattern) {
         case 'reject':
           this.finalize(false, 'path');
@@ -198,7 +198,7 @@ export class GestureMatcher<Type> {
    * If no matcher is active, but the currently-evaluating gesture has a direct ancestor, the best
    * matcher from the predecessor may be used instead.
    */
-  private get comparisonStandard(): SimpleGestureSource<Type> {
+  private get comparisonStandard(): GestureSource<Type> {
     let bestMatcher: PathMatcher<Type>;
     let highestPriority = Number.MIN_VALUE;
     for(let matcher of this.pathMatchers) {
@@ -224,8 +224,8 @@ export class GestureMatcher<Type> {
     return this.pathMatchers.length < this.model.contacts.length;
   }
 
-  // for new incoming SimpleGestureSource
-  addContact(simpleSource: SimpleGestureSource<Type>) {
+  // for new incoming GestureSource
+  addContact(simpleSource: GestureSource<Type>) {
     const existingContacts = this.pathMatchers.length;
     /* c8 ignore next 3 */
     if(!this.mayAddContact()) {
@@ -267,7 +267,7 @@ export class GestureMatcher<Type> {
     this.addContactInternal(simpleSource.constructSubview(false, true));
   }
 
-  private addContactInternal(simpleSource: SimpleGestureSource<Type>) {
+  private addContactInternal(simpleSource: GestureSource<Type>) {
     const existingContacts = this.pathMatchers.length;
 
     // The number of already-active contacts tracked for this gesture

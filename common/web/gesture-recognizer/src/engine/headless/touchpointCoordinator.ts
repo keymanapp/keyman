@@ -1,6 +1,6 @@
 import EventEmitter from "eventemitter3";
 import { InputEngineBase } from "./inputEngineBase.js";
-import { SimpleGestureSource, SimpleGestureSourceSubview } from "./simpleGestureSource.js";
+import { GestureSource, GestureSourceSubview } from "./gestureSource.js";
 
 interface EventMap<HoveredItemType> {
   /**
@@ -8,7 +8,7 @@ interface EventMap<HoveredItemType> {
    * @param input
    * @returns
    */
-  'inputstart': (input: SimpleGestureSource<HoveredItemType>) => void;
+  'inputstart': (input: GestureSource<HoveredItemType>) => void;
 }
 
 /**
@@ -22,7 +22,7 @@ interface EventMap<HoveredItemType> {
 export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMap<HoveredItemType>> {
   private inputEngines: InputEngineBase<HoveredItemType>[];
 
-  private _activeSources: SimpleGestureSource<HoveredItemType>[] = [];
+  private _activeSources: GestureSource<HoveredItemType>[] = [];
 
   public constructor() {
     super();
@@ -34,7 +34,7 @@ export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMa
     this.inputEngines.push(engine);
   }
 
-  private readonly onNewTrackedPath = (touchpoint: SimpleGestureSource<HoveredItemType>) => {
+  private readonly onNewTrackedPath = (touchpoint: GestureSource<HoveredItemType>) => {
     this.addSimpleSourceHooks(touchpoint);
 
     // ... stuff
@@ -42,7 +42,7 @@ export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMa
     this.emit('inputstart', touchpoint);
   }
 
-  private doGestureUpdate(source: SimpleGestureSource<HoveredItemType>) {
+  private doGestureUpdate(source: GestureSource<HoveredItemType>) {
     // Should probably ensure data-updates for multi-contact gestures are synchronized
     // before proceeding.  Single-contact cases are inherently synchronized, of course.
     //
@@ -54,7 +54,7 @@ export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMa
     // rather than here?
   }
 
-  private addSimpleSourceHooks(touchpoint: SimpleGestureSource<HoveredItemType>) {
+  private addSimpleSourceHooks(touchpoint: GestureSource<HoveredItemType>) {
     touchpoint.path.on('step', () => this.doGestureUpdate(touchpoint));
 
     touchpoint.path.on('invalidated', () => {
