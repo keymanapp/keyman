@@ -421,6 +421,7 @@ transform_entry::match(const std::u32string &input) const {
   UErrorCode status = U_ZERO_ERROR;
   const std::u16string matchstr = km::kbp::kmx::u32string_to_u16string(input);
   icu::UnicodeString matchustr = icu::UnicodeString(matchstr.data(), (int32_t)matchstr.length());
+  // TODO-LDML: create a new Matcher every time. These could be cached and reset.
   std::unique_ptr<icu::RegexMatcher> matcher(fFromPattern->matcher(matchustr, status));
   assert(U_SUCCESS(status));
 
@@ -448,7 +449,7 @@ transform_entry::apply(const std::u32string &input, size_t matchLen) const {
   // TODO-LDML: Really? can't go from u32 to UnicodeString?
 
   assert(fFromPattern);
-  // TODO-LDML: simple approach, new regex every time
+  // TODO-LDML: simple approach, create a new Matcher every time. These could be cached and reset.
   // TODO-LDML: Really? can't go from u32 to UnicodeString?
   UErrorCode status = U_ZERO_ERROR;
 
