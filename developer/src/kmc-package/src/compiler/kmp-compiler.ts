@@ -137,7 +137,7 @@ export class KmpCompiler {
           [],
         examples: keyboard.examples ?
           (this.arrayWrap(keyboard.examples.example) as KpsFile.KpsFileLanguageExample[]).map(
-            e => ({id: e.$.ID, keys: e.$.keys, text: e.$.text, note: e.$.note})
+            e => ({id: e.$.ID, keys: e.$.Keys, text: e.$.Text, note: e.$.Note})
           ) as KmpJsonFile.KmpJsonFileExample[] :
           undefined
       }));
