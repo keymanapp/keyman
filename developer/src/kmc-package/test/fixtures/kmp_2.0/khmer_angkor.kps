@@ -134,8 +134,8 @@ Khmer Unicode keyboard layout based on the NiDA keyboard layout. Automatically c
         <Language ID="km">Central Khmer (Khmer, Cambodia)</Language>
       </Languages>
       <Examples>
-        <Example ID="km" keys="x j m E r" text="ខ្មែរ" note="Name of language"/>
-        <Example ID="km" keys="B j r H r a C a N a c k j r k m j B u C a" text="ព្រះរាជាណាចក្រកម្ពុជា" note="'Kingdom of Cambodia'"/>
+        <Example ID="km" Keys="x j m E r" Text="ខ្មែរ" Note="Name of language"/>
+        <Example ID="km" Keys="B j r H r a C a N a c k j r k m j B u C a" Text="ព្រះរាជាណាចក្រកម្ពុជា" Note="'Kingdom of Cambodia'"/>
       </Examples>
     </Keyboard>
   </Keyboards>
