@@ -373,8 +373,6 @@ ldml_processor::emit_text(km_kbp_state *state, const std::u32string &str) {
       it++; // consume LDML_MARKER_CODE
       assert(it < str.end());
       const auto marker_no = *it;
-      assert(marker_no >= LDML_MARKER_MIN_INDEX);
-      assert(marker_no <= LDML_MARKER_ANY_INDEX);
       emit_marker(state, marker_no);
     } else {
       emit_text(state, ch);
@@ -389,10 +387,11 @@ ldml_processor::emit_text(km_kbp_state *state, km_kbp_usv ch) {
   state->actions().push_character(ch);
 }
 
-void ldml_processor::emit_marker(km_kbp_state *state, KMX_DWORD marker_no) {
-    // OK, push the marker
-    state->actions().push_marker(marker_no);
-    state->context().push_marker(marker_no);
+void
+ldml_processor::emit_marker(km_kbp_state *state, KMX_DWORD marker_no) {
+  assert(km::kbp::kmx::is_valid_marker(marker_no));
+  state->actions().push_marker(marker_no);
+  state->context().push_marker(marker_no);
 }
 
 size_t
@@ -406,6 +405,7 @@ ldml_processor::context_to_string(km_kbp_state *state, std::u32string &str) {
       if (last_type == KM_KBP_BT_CHAR) {
         str.insert(0, 1, c->character);
       } else if (last_type == KM_KBP_BT_MARKER) {
+        assert(km::kbp::kmx::is_valid_marker(c->marker));
         prepend_marker(str, c->marker);
       } else {
         break;

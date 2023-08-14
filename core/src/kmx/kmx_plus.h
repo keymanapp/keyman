@@ -319,6 +319,11 @@ static_assert(LDML_UC_SENTINEL == UC_SENTINEL, "mismatch: LDML_UC_SENTINEL");
 static_assert(LDML_MARKER_CODE == CODE_DEADKEY, "mismatch: LDML_MARKER_CODE");
 static_assert(LDML_MARKER_ANY_INDEX < UC_SENTINEL, "expected LDML_MARKER_ANY_INDEX < UC_SENTINEL");
 
+/** @returns true if a valid marker per spec */
+static inline bool is_valid_marker(KMX_DWORD marker_no) {
+  return ((marker_no == LDML_MARKER_ANY_INDEX) || (marker_no >= LDML_MARKER_MIN_INDEX && marker_no <= LDML_MARKER_MAX_INDEX));
+}
+
 /* ------------------------------------------------------------------
  * bksp section
    ------------------------------------------------------------------ */
