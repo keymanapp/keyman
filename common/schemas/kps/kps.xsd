@@ -74,6 +74,7 @@
             <xs:element minOccurs="0" maxOccurs="1" name="Copyright" type="km-info" />
             <xs:element minOccurs="0" maxOccurs="1" name="Author" type="km-info" />
             <xs:element minOccurs="0" maxOccurs="1" name="WebSite" type="km-info" />
+            <xs:element minOccurs="0" maxOccurs="1" name="Description" type="km-info" />
           </xs:all>
         </xs:complexType>
       </xs:element>
@@ -110,6 +111,7 @@
                   <xs:element minOccurs="0" maxOccurs="1" name="OSKFont" type="xs:string" />
                   <xs:element minOccurs="0" maxOccurs="1" name="DisplayFont" type="xs:string" />
                   <xs:element minOccurs="0" maxOccurs="1" name="Languages" type="km-keyboard-languages" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="Examples" type="km-keyboard-examples" />
                 </xs:all>
               </xs:complexType>
               </xs:element>
@@ -204,6 +206,19 @@
             <xs:attribute name="ID" type="xs:string" />
           </xs:extension>
         </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="km-keyboard-examples">
+  <xs:sequence>
+    <xs:element minOccurs="0" maxOccurs="unbounded" name="Example">
+      <xs:complexType>
+        <xs:attribute name="ID" type="xs:string" />
+        <xs:attribute name="Keys" type="xs:string" />
+        <xs:attribute name="Text" type="xs:string" />
+        <xs:attribute name="Note" type="xs:string" />
       </xs:complexType>
     </xs:element>
   </xs:sequence>

@@ -67,24 +67,19 @@ export class KmpCompiler {
     // Fill in additional fields
     //
 
-    let keys: [keyof KpsFile.KpsFileOptions, keyof KmpJsonFile.KmpJsonFileOptions][] = [
-      ['executeProgram','executeProgram'],
-      ['graphicFile', 'graphicFile'],
-      ['msiFileName','msiFilename'],
-      ['msiOptions', 'msiOptions'],
-      ['readMeFile', 'readmeFile']
-    ];
     if(kps.options) {
-      for (let [src,dst] of keys) {
-        if (kps.options[src]) {
-          if(dst == 'graphicFile' || dst == 'readmeFile') {
-            kmp.options[dst] = /[/\\]?([^/\\]*)$/.exec(kps.options[src])[1];
-          } else {
-            kmp.options[dst] = kps.options[src];
-          }
-        }
+      kmp.options.executeProgram = kps.options?.executeProgram || undefined;
+      if(kps.options.graphicFile) {
+        kmp.options.graphicFile = /[/\\]?([^/\\]*)$/.exec(kps.options.graphicFile)[1];
+      }
+      kmp.options.msiFilename = kps.options.msiFileName;
+      kmp.options.msiOptions = kps.options.msiOptions;
+      if(kps.options.readMeFile) {
+        kmp.options.readmeFile = /[/\\]?([^/\\]*)$/.exec(kps.options.readMeFile)[1];
       }
     }
+
+    // TODO: this.addFontMetadata();
 
     //
     // Add basic metadata
@@ -139,7 +134,12 @@ export class KmpCompiler {
         rtl:keyboard.rTL == 'True' ? true : undefined,
         languages: keyboard.languages ?
           this.kpsLanguagesToKmpLanguages(this.arrayWrap(keyboard.languages.language) as KpsFile.KpsFileLanguage[]) :
-          []
+          [],
+        examples: keyboard.examples ?
+          (this.arrayWrap(keyboard.examples.example) as KpsFile.KpsFileLanguageExample[]).map(
+            e => ({id: e.$.ID, keys: e.$.keys, text: e.$.text, note: e.$.note})
+          ) as KmpJsonFile.KmpJsonFileExample[] :
+          undefined
       }));
     }
 
@@ -237,13 +237,14 @@ export class KmpCompiler {
       ['copyright','copyright'],
       ['name','name'],
       ['version','version'],
-      ['webSite','website']
+      ['webSite','website'],
+      ['description','description'],
     ];
 
     for (let [src,dst] of keys) {
       if (info[src]) {
-        ni[dst] = {description: info[src]._ ?? (typeof info[src] == 'string' ? info[src].toString() : '')};
-        if(info[src].$ && info[src].$.URL) ni[dst].url = info[src].$.URL;
+        ni[dst] = {description: (info[src]._ ?? (typeof info[src] == 'string' ? info[src].toString() : '').trim())};
+        if(info[src].$ && info[src].$.URL) ni[dst].url = info[src].$.URL.trim();
       }
     }
 
@@ -263,8 +264,6 @@ export class KmpCompiler {
     }
     return language.map((element) => { return { name: element._, id: element.$.ID } });
   };
-
-
 
   private stripUndefined(o: any) {
     for(const key in o) {
