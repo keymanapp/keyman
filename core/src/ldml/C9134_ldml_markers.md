@@ -34,8 +34,10 @@ Markers can appear in both 'emitting' and 'matching-only' areas:
 - Keyman already uses `UC_SENTINEL` `U+FFFF` (noncharacter), with `CODE_DEADKEY` (0x0008)
 - The general proposal here is to use the sequence `U+FFFF U+0008 U+XXXX` to represent marker #XXXX (starting with `U+0001`)
 - `U+FFFF` cannot otherwise occur in text, so it is unique
-- `U+FFFF U+0008 U+FFFE` to indicate 'any marker'  corresponds to `\m{.}`
-- This scheme allows for 65,533 (0xFFFD) unique markers, from `U+FFFF U+0008 U+0001` through `U+FFFF U+0008 U+FFFD`
+- `U+FFFF U+0008 U+D7FF` to indicate 'any marker'  corresponds to `\m{.}`
+- The max marker identifier will be `0xD7FE`, with `0xD7FF` reserved to represent 'any marker' if that is needed in the text stream.
+- This scheme allows for 55,294 unique markers, from `U+FFFF U+0008 U+0001` through `U+FFFF U+0008 U+D7FE` inclusive.
+- This scheme avoids the Unicode surrogate space beginning at `U+D800` and other noncharacters.
 
 ## Terminology
 - A marker's "number" is its position in the `markers` list, starting at index 1 (U+0001) being the first element in that list.
