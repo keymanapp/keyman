@@ -94,8 +94,10 @@ export class KmpCompiler {
     //
 
     if(kps.relatedPackages) {
+      // Note: 'relationship' field is required for kmp.json but optional for .kps, only
+      // two values are supported -- deprecates or related.
       kmp.relatedPackages = (this.arrayWrap(kps.relatedPackages.relatedPackage) as KpsFile.KpsFileRelatedPackage[]).map(p =>
-        ({id: p.$.ID, relationship: p.$.Relationship || "related"})
+        ({id: p.$.ID, relationship: p.$.Relationship == 'deprecates' ? 'deprecates' : 'related'})
       );
     }
 

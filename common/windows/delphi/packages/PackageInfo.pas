@@ -2611,6 +2611,9 @@ begin
     rp := TPackageRelatedPackage.Create(Package);
     rp.ID := GetJsonValueString(ARelatedPackage,SJSON_RelatedPackage_ID);
     rp.Relationship := GetJsonValueString(ARelatedPackage, SJSON_RelatedPackage_Relationship);
+    if rp.Relationship <> 'deprecates' then
+      rp.Relationship := '';
+
     Add(rp);
   end;
 end;
@@ -2631,6 +2634,9 @@ begin
     rp := TPackageRelatedPackage.Create(Package);
     rp.ID := XmlVarToStr(ARelatedPackage.Attributes[SXML_PackageRelatedPackage_ID]);
     rp.Relationship := XmlVarToStr(ARelatedPackage.Attributes[SXML_PackageRelatedPackage_Relationship]);
+    if rp.Relationship <> 'deprecates' then
+      rp.Relationship := '';
+
     Add(rp);
   end;
 end;
@@ -2653,7 +2659,10 @@ begin
     ARelatedPackages.Add(ARelatedPackage);
 
     ARelatedPackage.AddPair(SJSON_RelatedPackage_ID, Items[i].ID);
-    ARelatedPackage.AddPair(SJSON_RelatedPackage_Relationship, Items[i].Relationship);
+    // Relationship field required for kmp.json
+    if Items[i].Relationship = ''
+      then ARelatedPackage.AddPair(SJSON_RelatedPackage_Relationship, 'related')
+      else ARelatedPackage.AddPair(SJSON_RelatedPackage_Relationship, Items[i].Relationship);
   end;
 end;
 
@@ -2668,7 +2677,9 @@ begin
     ARelatedPackage := ANode.AddChild(SXML_PackageRelatedPackage);
 
     ARelatedPackage.Attributes[SXML_PackageRelatedPackage_ID] := Items[i].ID;
-    ARelatedPackage.Attributes[SXML_PackageRelatedPackage_Relationship] := Items[i].Relationship;
+    // Relationship field optional for .kps
+    if Items[i].Relationship <> '' then
+      ARelatedPackage.Attributes[SXML_PackageRelatedPackage_Relationship] := Items[i].Relationship;
   end;
 end;
 
