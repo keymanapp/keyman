@@ -41,6 +41,7 @@ uses
   System.Generics.Collections,
   System.IniFiles,
   System.JSON,
+  System.StrUtils,
   System.Sysutils,
   Winapi.Windows,
   Xml.XMLDoc,
@@ -55,7 +56,15 @@ function GetJsonValueString(o: TJSONObject; const n: string): string;
 function GetJsonValueBool(o: TJSONObject; const n: string): Boolean;
 
 type
-  TPackageInfoEntryType = (pietName, pietVersion, pietCopyright, pietAuthor, pietWebsite, pietOther);
+  TPackageInfoEntryType = (
+    pietName,
+    pietVersion,
+    pietCopyright,
+    pietAuthor,
+    pietWebsite,
+    pietDescription,
+    pietOther
+  );
 
 const
   PackageInfo_Name      = 'Name';
@@ -63,9 +72,17 @@ const
   PackageInfo_Copyright = 'Copyright';
   PackageInfo_Author    = 'Author';
   PackageInfo_Website   = 'Website';
+  PackageInfo_Description = 'Description';
 
-  PackageInfoEntryTypeNames: array[TPackageInfoEntryType] of WideString =
-    (PackageInfo_Name, PackageInfo_Version, PackageInfo_Copyright, PackageInfo_Author, PackageInfo_Website, '');
+  PackageInfoEntryTypeNames: array[TPackageInfoEntryType] of string = (
+    PackageInfo_Name,
+    PackageInfo_Version,
+    PackageInfo_Copyright,
+    PackageInfo_Author,
+    PackageInfo_Website,
+    PackageInfo_Description,
+    ''
+  );
 
 type
   EPackageInfo = class(Exception);
@@ -282,6 +299,8 @@ type
   TPackageKeyboardList = class;
   TPackageKeyboardLanguage = class;
   TPackageKeyboardLanguageList = class;
+  TPackageKeyboardExample = class;
+  TPackageKeyboardExampleList = class;
 
   TPackageKeyboard = class(TPackageBaseObject)
   private
@@ -291,6 +310,7 @@ type
     FRTL: Boolean;
     FDisplayFont: TPackageContentFile;
     FLanguages: TPackageKeyboardLanguageList;
+    FExamples: TPackageKeyboardExampleList;
     FVersion: string;
     FMinKeymanVersion: string;
     procedure SetDisplayFont(const Value: TPackageContentFile);
@@ -308,6 +328,7 @@ type
     property RTL: Boolean read FRTL write FRTL;
     property Version: string read FVersion write FVersion;
     property Languages: TPackageKeyboardLanguageList read FLanguages;
+    property Examples: TPackageKeyboardExampleList read FExamples;
     property OSKFont: TPackageContentFile read FOSKFont write SetOSKFont;
     property DisplayFont: TPackageContentFile read FDisplayFont write SetDisplayFont;
     // The following properties are used only in memory and never streamed in or out
@@ -339,6 +360,23 @@ type
     procedure SaveXML(ARoot: IXMLNode); virtual;
     function ContainsID(const id: string): Boolean;
     function IndexOfID(const id: string): Integer;
+  end;
+
+  TPackageKeyboardExample = class(TPackageBaseObject)
+    ID: string;
+    Keys: string;
+    Text: string;
+    Note: string;
+  end;
+
+  TPackageKeyboardExampleList = class(TPackageObjectList<TPackageKeyboardExample>)
+  public
+    procedure LoadJSON(ARoot: TJSONObject); virtual;
+    procedure SaveJSON(ARoot: TJSONObject); virtual;
+    procedure LoadXML(ARoot: IXMLNode); virtual;
+    procedure SaveXML(ARoot: IXMLNode); virtual;
+    function ContainsID(const id: string): Boolean;
+    function IndexOfID(const id: string; from: Integer = 0): Integer;
   end;
 
   TPackageLexicalModel = class(TPackageBaseObject)
@@ -450,10 +488,17 @@ const
   SXML_PackageKeyboard_OSKFont = 'OSKFont';
   SXML_PackageKeyboard_DisplayFont = 'DisplayFont';
   SXML_PackageKeyboard_Languages = 'Languages';
+  SXML_PackageKeyboard_Examples = 'Examples';
 
   SXML_PackageKeyboard_Language = 'Language';
   SXML_PackageKeyboard_Language_ID = 'ID';
   SXML_PackageKeyboard_Language_Name = 'Name';
+
+  SXML_PackageKeyboard_Example = 'Example';
+  SXML_PackageKeyboard_Example_ID = 'ID';
+  SXML_PackageKeyboard_Example_Keys = 'Keys';
+  SXML_PackageKeyboard_Example_Text = 'Text';
+  SXML_PackageKeyboard_Example_Note = 'Note';
 
   SXML_PackageLexicalModels = 'LexicalModels';
   SXML_PackageLexicalModel = 'LexicalModel';
@@ -493,14 +538,22 @@ const
   SJSON_Info__Description = 'description';
   SJSON_Info__URL = 'url';
 
-  SJSON_Info_Website = 'website';
-  SJSON_Info_Version = 'version';
   SJSON_Info_Name = 'name';
+  SJSON_Info_Version = 'version';
   SJSON_Info_Copyright = 'copyright';
   SJSON_Info_Author = 'author';
+  SJSON_Info_Website = 'website';
+  SJSON_Info_Description = 'description';
 
-  SJSON_PackageInfoEntryTypeNames: array[TPackageInfoEntryType] of string =
-    (SJSON_Info_Name, SJSON_Info_Version, SJSON_Info_Copyright, SJSON_Info_Author, SJSON_Info_Website, '');
+  SJSON_PackageInfoEntryTypeNames: array[TPackageInfoEntryType] of string = (
+    SJSON_Info_Name,
+    SJSON_Info_Version,
+    SJSON_Info_Copyright,
+    SJSON_Info_Author,
+    SJSON_Info_Website,
+    SJSON_Info_Description,
+    ''
+  );
 
   SJSON_Files = 'files';
   SJSON_Files_Name = 'name';
@@ -519,6 +572,12 @@ const
   SJSON_Keyboard_Language_ID = 'id';
   SJSON_Keyboard_Language_Name = 'name';
 
+  SJSON_Keyboard_Examples = 'examples';
+  SJSON_Keyboard_Example_ID = 'id';
+  SJSON_Keyboard_Example_Keys = 'keys';
+  SJSON_Keyboard_Example_Text = 'text';
+  SJSON_Keyboard_Example_Note = 'note';
+
   SJSON_LexicalModels = 'lexicalModels';
   SJSON_LexicalModel_Name = 'name';
   SJSON_LexicalModel_ID = 'id';
@@ -527,7 +586,7 @@ const
 
 function XmlVarToStr(v: OleVariant): string;
 begin
-  Result := Trim(VarToStr(v));
+  Result := ReplaceStr(ReplaceStr(Trim(VarToStr(v)), #$D#$A, #$A), #$A, #$D#$A);
 end;
 
 {-------------------------------------------------------------------------------
@@ -1822,6 +1881,7 @@ procedure TPackageKeyboard.Assign(Source: TPackageKeyboard);
 var
   i: Integer;
   FLanguage: TPackageKeyboardLanguage;
+  FExample: TPackageKeyboardExample;
 begin
   FName := Source.Name;
   FID := Source.ID;
@@ -1842,6 +1902,16 @@ begin
     FLanguage.Name := Source.Languages[i].Name;
     FLanguages.Add(FLanguage);
   end;
+  FExamples.Clear;
+  for i := 0 to Source.Examples.Count - 1 do
+  begin
+    FExample := TPackageKeyboardExample.Create(Package);
+    FExample.ID := Source.Examples[i].ID;
+    FExample.Keys := Source.Examples[i].Keys;
+    FExample.Text := Source.Examples[i].Text;
+    FExample.Note := Source.Examples[i].Note;
+    FExamples.Add(FExample);
+  end;
 end;
 
 procedure TPackageKeyboard.SetDisplayFont(const Value: TPackageContentFile);
@@ -1861,11 +1931,13 @@ constructor TPackageKeyboard.Create(APackage: TPackage);
 begin
   inherited Create(APackage);
   FLanguages := TPackageKeyboardLanguageList.Create(APackage);
+  FExamples := TPackageKeyboardExampleList.Create(APackage);
 end;
 
 destructor TPackageKeyboard.Destroy;
 begin
   FreeAndNil(FLanguages);
+  FreeAndNil(FExamples);
   inherited Destroy;
 end;
 
@@ -1990,6 +2062,7 @@ begin
     keyboard.OSKFont := Package.Files.FromFileNameEx(GetJsonValueString(AKeyboard, SJSON_Keyboard_OSKFont));
     keyboard.DisplayFont := Package.Files.FromFileNameEx(GetJsonValueString(AKeyboard, SJSON_Keyboard_DisplayFont));
     keyboard.Languages.LoadJSON(AKeyboard);
+    keyboard.Examples.LoadJSON(AKeyboard);
     Add(keyboard);
   end;
 end;
@@ -2016,6 +2089,7 @@ begin
     keyboard.DisplayFont := Package.Files.FromFileNameEx(XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_DisplayFont]));
 
     keyboard.Languages.LoadXML(AKeyboard);
+    keyboard.Examples.LoadXML(AKeyboard);
     Add(keyboard);
   end;
 end;
@@ -2071,6 +2145,7 @@ begin
       AKeyboard.AddPair(SJSON_Keyboard_DisplayFont, Items[i].DisplayFont.RelativeFileName);
 
     Items[i].Languages.SaveJSON(AKeyboard);
+    Items[i].Examples.SaveJSON(AKeyboard);
   end;
 end;
 
@@ -2095,6 +2170,7 @@ begin
       AKeyboard.ChildNodes[SXML_PackageKeyboard_DisplayFont].NodeValue := Items[i].DisplayFont.RelativeFileName;
 
     Items[i].Languages.SaveXML(AKeyboard);
+    Items[i].Examples.SaveXML(AKeyboard);
   end;
 end;
 
@@ -2350,6 +2426,107 @@ begin
     ALanguage := ALanguages.AddChild(SXML_PackageKeyboard_Language);
     ALanguage.NodeValue := Items[j].Name;
     ALanguage.Attributes[SXML_PackageKeyboard_Language_ID] := Items[j].ID;
+  end;
+end;
+
+{ TPackageKeyboardExampleList }
+
+function TPackageKeyboardExampleList.ContainsID(const id: string): Boolean;
+begin
+  Result := IndexOfID(id) >= 0;
+end;
+
+function TPackageKeyboardExampleList.IndexOfID(const id: string;
+  from: Integer): Integer;
+var
+  i: Integer;
+begin
+  for i := from to Count - 1 do
+    if SameText(Items[i].ID, id) then
+      Exit(i);
+  Result := -1;
+end;
+
+procedure TPackageKeyboardExampleList.LoadJSON(ARoot: TJSONObject);
+var
+  j: Integer;
+  AExample: TJSONObject;
+  FExample: TPackageKeyboardExample;
+  AExamples: TJSONArray;
+begin
+  AExamples := ARoot.Values[SJSON_Keyboard_Examples] as TJSONArray;
+  if not Assigned(AExamples) then
+    Exit;
+
+  for j := 0 to AExamples.Count - 1 do
+  begin
+    AExample := AExamples.Items[j] as TJSONObject;
+
+    FExample := TPackageKeyboardExample.Create(Package);
+    FExample.ID := GetJsonValueString(AExample, SJSON_Keyboard_Example_ID);
+    FExample.Keys := GetJsonValueString(AExample, SJSON_Keyboard_Example_Keys);
+    FExample.Text := GetJsonValueString(AExample, SJSON_Keyboard_Example_Text);
+    FExample.Note := GetJsonValueString(AExample, SJSON_Keyboard_Example_Note);
+    Self.Add(FExample);
+  end;
+end;
+
+procedure TPackageKeyboardExampleList.LoadXML(ARoot: IXMLNode);
+var
+  j: Integer;
+  AExamples, AExample: IXMLNode;
+  FExample: TPackageKeyboardExample;
+begin
+  AExamples := ARoot.ChildNodes[SXML_PackageKeyboard_Examples];
+  if not Assigned(AExamples) then
+    Exit;
+
+  for j := 0 to AExamples.ChildNodes.Count - 1 do
+  begin
+    AExample := AExamples.ChildNodes[j];
+
+    FExample := TPackageKeyboardExample.Create(Package);
+    FExample.ID := VarToStr(AExample.Attributes[SXML_PackageKeyboard_Example_ID]);
+    FExample.Keys := VarToStr(AExample.Attributes[SXML_PackageKeyboard_Example_Keys]);
+    FExample.Text := VarToStr(AExample.Attributes[SXML_PackageKeyboard_Example_Text]);
+    FExample.Note := VarToStr(AExample.Attributes[SXML_PackageKeyboard_Example_Note]);
+    Self.Add(FExample);
+  end;
+end;
+
+procedure TPackageKeyboardExampleList.SaveJSON(ARoot: TJSONObject);
+var
+  AExamples: TJSONArray;
+  j: Integer;
+  AExample: TJSONObject;
+begin
+  AExamples := TJSONArray.Create;
+  ARoot.AddPair(SJSON_Keyboard_Examples, AExamples);
+  for j := 0 to Count - 1 do
+  begin
+    AExample := TJSONObject.Create;
+    AExamples.Add(AExample);
+    AExample.AddPair(SJSON_Keyboard_Example_ID, Items[j].ID);
+    AExample.AddPair(SJSON_Keyboard_Example_Keys, Items[j].Keys);
+    AExample.AddPair(SJSON_Keyboard_Example_Text, Items[j].Text);
+    AExample.AddPair(SJSON_Keyboard_Example_Note, Items[j].Note);
+  end;
+end;
+
+procedure TPackageKeyboardExampleList.SaveXML(ARoot: IXMLNode);
+var
+  AExamples: IXMLNode;
+  j: Integer;
+  AExample: IXMLNode;
+begin
+  AExamples := ARoot.AddChild(SXML_PackageKeyboard_Examples);
+  for j := 0 to Count - 1 do
+  begin
+    AExample := AExamples.AddChild(SXML_PackageKeyboard_Example);
+    AExample.Attributes[SXML_PackageKeyboard_Example_ID] := Items[j].ID;
+    AExample.Attributes[SXML_PackageKeyboard_Example_Keys] := Items[j].Keys;
+    AExample.Attributes[SXML_PackageKeyboard_Example_Text] := Items[j].Text;
+    AExample.Attributes[SXML_PackageKeyboard_Example_Note] := Items[j].Note;
   end;
 end;
 

@@ -174,6 +174,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     1FFFFFFF9FFF}
   KeyPreview = True
   OnKeyDown = FormKeyDown
+  OnResize = FormResize
   ExplicitWidth = 965
   ExplicitHeight = 622
   PixelsPerInch = 96
@@ -183,7 +184,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     Top = 0
     Width = 965
     Height = 622
-    ActivePage = pageFiles
+    ActivePage = pageKeyboards
     Align = alClient
     Images = modActionsMain.ilEditorPages
     MultiLine = True
@@ -235,7 +236,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 546
           Height = 32
           AutoSize = False
-          Caption =
+          Caption = 
             'A typical package will need keyboards, fonts, and documentation.' +
             ' You shouldn'#39't typically add source files. Also, don'#39't add any s' +
             'tandard Keyman files (such as keyman.exe) here.'
@@ -434,6 +435,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 56
           Height = 13
           Caption = 'Languages'
+          FocusControl = gridKeyboardLanguages
         end
         object lblKeyboardRTL: TLabel
           Left = 15
@@ -443,6 +445,14 @@ inherited frmPackageEditor: TfrmPackageEditor
           Anchors = [akLeft, akBottom]
           Caption = 'Is right-to-left:'
           ExplicitTop = 420
+        end
+        object lblKeyboardExamples: TLabel
+          Left = 260
+          Top = 363
+          Width = 47
+          Height = 13
+          Caption = 'Examples'
+          FocusControl = gridKeyboardExamples
         end
         object lbKeyboards: TListBox
           Left = 15
@@ -509,8 +519,8 @@ inherited frmPackageEditor: TfrmPackageEditor
           Left = 260
           Top = 144
           Width = 593
-          Height = 432
-          Anchors = [akLeft, akTop, akRight, akBottom]
+          Height = 177
+          Anchors = [akLeft, akTop, akRight]
           ColCount = 2
           DefaultRowHeight = 16
           FixedCols = 0
@@ -525,22 +535,20 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object cmdKeyboardAddLanguage: TButton
           Left = 260
-          Top = 587
+          Top = 327
           Width = 73
           Height = 25
-          Anchors = [akLeft, akBottom]
           Caption = '&Add...'
           TabOrder = 8
           OnClick = cmdKeyboardAddLanguageClick
         end
         object cmdKeyboardRemoveLanguage: TButton
           Left = 418
-          Top = 587
+          Top = 327
           Width = 72
           Height = 25
-          Anchors = [akLeft, akBottom]
           Caption = '&Remove'
-          TabOrder = 9
+          TabOrder = 10
           OnClick = cmdKeyboardRemoveLanguageClick
         end
         object editKeyboardRTL: TEdit
@@ -556,13 +564,62 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object cmdKeyboardEditLanguage: TButton
           Left = 339
-          Top = 587
+          Top = 327
+          Width = 73
+          Height = 25
+          Caption = 'Ed&it...'
+          TabOrder = 9
+          OnClick = cmdKeyboardEditLanguageClick
+        end
+        object gridKeyboardExamples: TStringGrid
+          Left = 260
+          Top = 382
+          Width = 593
+          Height = 177
+          Anchors = [akLeft, akTop, akRight, akBottom]
+          ColCount = 4
+          DefaultRowHeight = 16
+          FixedCols = 0
+          RowCount = 9
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
+          TabOrder = 11
+          OnClick = gridKeyboardExamplesClick
+          OnDblClick = gridKeyboardExamplesDblClick
+          ColWidths = (
+            78
+            64
+            64
+            64)
+        end
+        object cmdKeyboardAddExample: TButton
+          Left = 260
+          Top = 565
+          Width = 73
+          Height = 25
+          Anchors = [akLeft, akBottom]
+          Caption = 'Add...'
+          TabOrder = 12
+          OnClick = cmdKeyboardAddExampleClick
+        end
+        object cmdKeyboardEditExample: TButton
+          Left = 339
+          Top = 565
           Width = 73
           Height = 25
           Anchors = [akLeft, akBottom]
           Caption = 'Ed&it...'
-          TabOrder = 10
-          OnClick = cmdKeyboardEditLanguageClick
+          TabOrder = 13
+          OnClick = cmdKeyboardEditExampleClick
+        end
+        object cmdKeyboardRemoveExample: TButton
+          Left = 418
+          Top = 565
+          Width = 72
+          Height = 25
+          Anchors = [akLeft, akBottom]
+          Caption = '&Remove'
+          TabOrder = 14
+          OnClick = cmdKeyboardRemoveExampleClick
         end
       end
     end
@@ -845,6 +902,22 @@ inherited frmPackageEditor: TfrmPackageEditor
           Caption = 'e.g. 1.0.2'
           ExplicitLeft = 317
         end
+        object lblDescription: TLabel
+          Left = 15
+          Top = 379
+          Width = 62
+          Height = 13
+          Caption = 'Description:'
+          FocusControl = memoInfoDescription
+        end
+        object lblDescriptionMarkdown: TLabel
+          Left = 108
+          Top = 524
+          Width = 215
+          Height = 13
+          Caption = 'Markdown accepted, no embedded HTML'
+          Transparent = True
+        end
         object cbReadMe: TComboBox
           Left = 108
           Top = 116
@@ -953,6 +1026,14 @@ inherited frmPackageEditor: TfrmPackageEditor
           Caption = 'Package version follows keyboard version'
           TabOrder = 3
           OnClick = chkFollowKeyboardVersionClick
+        end
+        object memoInfoDescription: TMemo
+          Left = 108
+          Top = 376
+          Width = 499
+          Height = 145
+          TabOrder = 11
+          OnChange = memoInfoDescriptionChange
         end
       end
     end
@@ -1144,7 +1225,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Top = 48
           Width = 551
           Height = 13
-          Caption =
+          Caption = 
             'Compiling the package takes all the files you have selected and ' +
             'compresses them into a single package file.'
         end
