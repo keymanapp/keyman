@@ -6,6 +6,7 @@ export interface KmpJsonFile {
   lexicalModels?: KmpJsonFileLexicalModel[];
   startMenu?: KmpJsonFileStartMenu;
   keyboards?: KmpJsonFileKeyboard[];
+  relatedPackages?: KmpJsonRelatedPackage[];
 }
 
 export interface KmpJsonFileSystem {
@@ -103,4 +104,9 @@ export interface KmpJsonFileExample {
    * A short description of what the text means or represents
    */
   note?: string;
+}
+
+export interface KmpJsonRelatedPackage {
+  id: string;
+  relationship: "deprecates" | "related";
 }

@@ -97,6 +97,19 @@
         </xs:complexType>
       </xs:element>
 
+      <xs:element minOccurs="0" maxOccurs="1" name="RelatedPackages">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="RelatedPackage">
+              <xs:complexType>
+                <xs:attribute name="ID" type="xs:string" />
+                <!-- "deprecates" is only valid value, if not present then means "related" -->
+                <xs:attribute name="Relationship" type="km-package-relationship" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
 
       <xs:element minOccurs="0" maxOccurs="1" name="Keyboards">
         <xs:complexType>
@@ -137,6 +150,7 @@
         </xs:complexType>
       </xs:element>
 
+      <!-- Deprecated elements: we won't validate as processors ignore them -->
 
       <xs:element minOccurs="0" maxOccurs="1" name="Strings">
         <xs:complexType>
@@ -150,8 +164,6 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-
-      <!-- Deprecated elements: we won't validate as processors ignore them -->
 
       <xs:element minOccurs="0" maxOccurs="1" name="Buttons" type="km-any" />
       <xs:element minOccurs="0" maxOccurs="1" name="Registry" type="km-any" />
@@ -188,6 +200,12 @@
   <xs:restriction base="xs:integer">
     <xs:minInclusive value="0" />
     <xs:maxInclusive value="3"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="km-package-relationship">
+  <xs:restriction base="xs:string">
+    <xs:pattern value="deprecates" />
   </xs:restriction>
 </xs:simpleType>
 

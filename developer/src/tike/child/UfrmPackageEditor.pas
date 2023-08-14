@@ -215,6 +215,11 @@ type
     cmdKeyboardAddExample: TButton;
     cmdKeyboardEditExample: TButton;
     cmdKeyboardRemoveExample: TButton;
+    lblRelatedPackages: TLabel;
+    gridRelatedPackages: TStringGrid;
+    cmdAddRelatedPackage: TButton;
+    cmdEditRelatedPackage: TButton;
+    cmdRemoveRelatedPackage: TButton;
     procedure cmdCloseClick(Sender: TObject);
     procedure cmdAddFileClick(Sender: TObject);
     procedure cmdRemoveFileClick(Sender: TObject);
@@ -286,6 +291,10 @@ type
     procedure FormResize(Sender: TObject);
     procedure gridKeyboardExamplesDblClick(Sender: TObject);
     procedure gridKeyboardExamplesClick(Sender: TObject);
+    procedure gridRelatedPackagesDblClick(Sender: TObject);
+    procedure cmdAddRelatedPackageClick(Sender: TObject);
+    procedure cmdEditRelatedPackageClick(Sender: TObject);
+    procedure cmdRemoveRelatedPackageClick(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -337,6 +346,8 @@ type
     procedure ShowEditExampleForm(k: TPackageKeyboard; example: TPackageKeyboardExample);
     function SelectedKeyboardExample: TPackageKeyboardExample;
     procedure ResizeGridColumns;
+    procedure RefreshRelatedPackagesList;
+    function SelectedRelatedPackage: TPackageRelatedPackage;
 
   protected
     function GetHelpTopic: string; override;
@@ -395,6 +406,7 @@ uses
   UfrmSendURLsToEmail,
   utilexecute,
   Keyman.Developer.UI.UfrmEditLanguageExample,
+  Keyman.Developer.UI.UfrmEditRelatedPackage,
   Keyman.Developer.UI.UfrmSelectBCP47Language,
   xmldoc;
 
@@ -431,12 +443,17 @@ begin
 
     EnableControls;
 
+    gridRelatedPackages.ColWidths[0] := 240;
+    gridRelatedPackages.Cells[0, 0] := 'ID';
+    gridRelatedPackages.Cells[1, 0] := 'Relationship';
+
     UpdateStartMenuPrograms;
     UpdateReadme;
     UpdateImageFiles;
     UpdateImagePreviews;
     RefreshKeyboardList;
     RefreshLexicalModelList;
+    RefreshRelatedPackagesList;
 
     frameSource := TframeTextEditor.Create(Self);
     frameSource.Parent := pageSource;
@@ -511,6 +528,7 @@ begin
   gridKeyboardLanguages.ColWidths[1] := System.Math.Max(gridKeyboardLanguages.ClientWidth - 120 - 1, 80);
   gridLexicalModelLanguages.ColWidths[1] := System.Math.Max(gridLexicalModelLanguages.ClientWidth - 120 - 1, 80);
   gridKeyboardExamples.ColWidths[3] := System.Math.Max(gridKeyboardExamples.ClientWidth - 120 - 200 - 120 - 3, 80);
+  gridRelatedPackages.ColWidths[1] := System.Math.Max(gridRelatedPackages.ClientWidth - 240 - 1, 80);
 end;
 
 procedure TfrmPackageEditor.FormShow(Sender: TObject);
@@ -1313,6 +1331,7 @@ begin
 
     RefreshKeyboardList;
     RefreshLexicalModelList;
+    RefreshRelatedPackagesList;
 
     EnableControls;
   finally
@@ -1723,6 +1742,13 @@ begin
   editInfoVersion.Enabled := e;
   lblStep2C.Enabled := e;
   lblVersionHint.Enabled := e;
+
+  cmdAddRelatedPackage.Enabled := True;
+
+  e := gridRelatedPackages.Row > 0;
+  gridRelatedPackages.Enabled := e;
+  cmdEditRelatedPackage.Enabled := e;
+  cmdRemoveRelatedPackage.Enabled := e;
 end;
 
 procedure TfrmPackageEditor.EnableKeyboardTabControls;
@@ -2004,6 +2030,7 @@ var
 begin
   frm := TfrmEditLanguageExample.Create(Application.MainForm);
   try
+    frm.SetTitle(True);
     if frm.ShowModal = mrOk then
     begin
       example := TPackageKeyboardExample.Create(pack);
@@ -2028,6 +2055,7 @@ var
 begin
   frm := TfrmEditLanguageExample.Create(Application.MainForm);
   try
+    frm.SetTitle(False);
     frm.LanguageID := example.ID;
     frm.ExampleKeys := example.Keys;
     frm.ExampleText := example.Text;
@@ -2045,6 +2073,120 @@ begin
   finally
     frm.Free;
   end;
+end;
+
+{-------------------------------------------------------------------------------
+ - Related Packages
+ -------------------------------------------------------------------------------}
+
+procedure TfrmPackageEditor.RefreshRelatedPackagesList;
+var
+  i: Integer;
+begin
+  Inc(FSetup);
+  try
+    gridRelatedPackages.RowCount := pack.RelatedPackages.Count + 1;
+    ResizeGridColumns;
+
+    if pack.RelatedPackages.Count > 0 then
+    begin
+      gridRelatedPackages.FixedRows := 1;
+    end;
+
+    for i := 0 to pack.RelatedPackages.Count - 1 do
+    begin
+      gridRelatedPackages.Objects[0, i+1] := pack.RelatedPackages[i];
+      gridRelatedPackages.Cells[0, i+1] := pack.RelatedPackages[i].ID;
+      if pack.RelatedPackages[i].Relationship = ''
+        then gridRelatedPackages.Cells[1, i+1] := 'related' // UI string
+        else gridRelatedPackages.Cells[1, i+1] := pack.RelatedPackages[i].Relationship;
+    end;
+
+    EnableDetailsTabControls;
+  finally
+    Dec(FSetup);
+  end;
+end;
+
+function TfrmPackageEditor.SelectedRelatedPackage: TPackageRelatedPackage;
+begin
+  if gridRelatedPackages.Row = 0 then
+    Exit(nil);
+
+  Result := gridRelatedPackages.Objects[0, gridRelatedPackages.Row] as TPackageRelatedPackage;
+end;
+
+procedure TfrmPackageEditor.cmdAddRelatedPackageClick(Sender: TObject);
+var
+  rp: TPackageRelatedPackage;
+  frm: TfrmEditRelatedPackage;
+begin
+  frm := TfrmEditRelatedPackage.Create(Application.MainForm);
+  try
+    frm.SetTitle(True);
+    if frm.ShowModal = mrOk then
+    begin
+      rp := TPackageRelatedPackage.Create(pack);
+      rp.ID := frm.PackageID;
+      if frm.Deprecates
+        then rp.Relationship := S_RelatedPackage_Deprecates
+        else rp.Relationship := '';
+      pack.RelatedPackages.Add(rp);
+      RefreshRelatedPackagesList;
+      gridRelatedPackages.Row := gridRelatedPackages.RowCount - 1;
+      Modified := True;
+      EnableControls;
+    end;
+  finally
+    frm.Free;
+  end;
+end;
+
+procedure TfrmPackageEditor.cmdEditRelatedPackageClick(Sender: TObject);
+var
+  rp: TPackageRelatedPackage;
+  frm: TfrmEditRelatedPackage;
+begin
+  rp := SelectedRelatedPackage;
+  Assert(Assigned(rp));
+  frm := TfrmEditRelatedPackage.Create(Application.MainForm);
+  try
+    frm.SetTitle(False);
+    frm.PackageID := rp.ID;
+    frm.Deprecates := rp.Relationship = S_RelatedPackage_Deprecates;
+    if frm.ShowModal = mrOk then
+    begin
+      rp.ID := frm.PackageID;
+      if frm.Deprecates
+        then rp.Relationship := S_RelatedPackage_Deprecates
+        else rp.Relationship := '';
+      RefreshRelatedPackagesList;
+      Modified := True;
+      EnableControls;
+    end;
+  finally
+    frm.Free;
+  end;
+end;
+
+procedure TfrmPackageEditor.cmdRemoveRelatedPackageClick(Sender: TObject);
+var
+  rp: TPackageRelatedPackage;
+begin
+  rp := SelectedRelatedPackage;
+  Assert(Assigned(rp));
+
+  pack.RelatedPackages.Remove(rp);
+  RefreshRelatedPackagesList;
+  EnableDetailsTabControls;
+  Modified := True;
+end;
+
+procedure TfrmPackageEditor.gridRelatedPackagesDblClick(Sender: TObject);
+begin
+  inherited;
+  if SelectedRelatedPackage <> nil then
+    cmdEditRelatedPackage.Click;
 end;
 
 {-------------------------------------------------------------------------------

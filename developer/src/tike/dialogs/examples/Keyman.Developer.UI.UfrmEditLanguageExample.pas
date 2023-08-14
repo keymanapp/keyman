@@ -50,6 +50,7 @@ type
     function GetHelpTopic: string; override;
   public
     { Public declarations }
+    procedure SetTitle(IsAdding: Boolean);
     property LanguageID: string read GetLanguageID write SetLanguageID;
     property ExampleKeys: string read GetExampleKeys write SetExampleKeys;
     property ExampleText: string read GetExampleText write SetExampleText;
@@ -134,6 +135,12 @@ procedure TfrmEditLanguageExample.SetLanguageID(const Value: string);
 begin
   editLanguageID.Text := Value.Trim;
   EnableControls;
+end;
+
+procedure TfrmEditLanguageExample.SetTitle(IsAdding: Boolean);
+begin
+  if IsAdding then
+    Caption := 'Add Language Example';
 end;
 
 end.

@@ -29,6 +29,7 @@ export interface KpsFile {
   lexicalModels?: KpsFileLexicalModels;
   startMenu?: KpsFileStartMenu;
   strings?: KpsFileStrings;
+  relatedPackages?: KpsFileRelatedPackages;
 }
 
 export interface KpsFileSystem {
@@ -90,6 +91,20 @@ export interface KpsFileLanguages {
 export interface KpsFileLanguage {
   _: string;
   $: { ID: string }
+}
+
+export interface KpsFileRelatedPackages {
+  relatedPackage: KpsFileRelatedPackage | KpsFileRelatedPackage[];
+}
+
+export interface KpsFileRelatedPackage {
+  $: {
+    ID: string;
+    /**
+     * relationship between this package and the related package, "related" is default if not specified
+     */
+    Relationship?: "deprecates";
+  }
 }
 
 export interface KpsFileKeyboard {

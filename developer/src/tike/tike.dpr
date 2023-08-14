@@ -285,7 +285,8 @@ uses
   Keyman.System.FontLoadUtil in 'main\Keyman.System.FontLoadUtil.pas',
   Keyman.Developer.UI.ServerUI in 'http\Keyman.Developer.UI.ServerUI.pas',
   Keyman.Developer.System.GenerateKeyboardIcon in '..\kmconvert\Keyman.Developer.System.GenerateKeyboardIcon.pas',
-  Keyman.Developer.UI.UfrmEditLanguageExample in 'dialogs\examples\Keyman.Developer.UI.UfrmEditLanguageExample.pas' {frmEditLanguageExample};
+  Keyman.Developer.UI.UfrmEditLanguageExample in 'dialogs\examples\Keyman.Developer.UI.UfrmEditLanguageExample.pas' {frmEditLanguageExample},
+  Keyman.Developer.UI.UfrmEditRelatedPackage in 'dialogs\relatedPackages\Keyman.Developer.UI.UfrmEditRelatedPackage.pas' {frmEditRelatedPackage};
 
 {$R *.RES}
 {$R ICONS.RES}

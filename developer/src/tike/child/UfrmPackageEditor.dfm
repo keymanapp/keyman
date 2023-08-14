@@ -236,7 +236,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 546
           Height = 32
           AutoSize = False
-          Caption = 
+          Caption =
             'A typical package will need keyboards, fonts, and documentation.' +
             ' You shouldn'#39't typically add source files. Also, don'#39't add any s' +
             'tandard Keyman files (such as keyman.exe) here.'
@@ -798,7 +798,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Transparent = True
         end
         object lblKMPImageSize: TLabel
-          Left = 108
+          Left = 114
           Top = 348
           Width = 92
           Height = 13
@@ -894,13 +894,12 @@ inherited frmPackageEditor: TfrmPackageEditor
           ParentFont = False
         end
         object lblVersionHint: TLabel
-          Left = 616
+          Left = 622
           Top = 157
           Width = 46
           Height = 13
           Anchors = [akTop, akRight]
           Caption = 'e.g. 1.0.2'
-          ExplicitLeft = 317
         end
         object lblDescription: TLabel
           Left = 15
@@ -911,15 +910,23 @@ inherited frmPackageEditor: TfrmPackageEditor
           FocusControl = memoInfoDescription
         end
         object lblDescriptionMarkdown: TLabel
-          Left = 108
-          Top = 524
+          Left = 114
+          Top = 479
           Width = 215
           Height = 13
           Caption = 'Markdown accepted, no embedded HTML'
           Transparent = True
         end
+        object lblRelatedPackages: TLabel
+          Left = 16
+          Top = 515
+          Width = 93
+          Height = 13
+          Caption = 'Related packages:'
+          FocusControl = gridRelatedPackages
+        end
         object cbReadMe: TComboBox
-          Left = 108
+          Left = 114
           Top = 116
           Width = 499
           Height = 21
@@ -929,7 +936,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           OnClick = cbReadMeClick
         end
         object editInfoName: TEdit
-          Left = 108
+          Left = 114
           Top = 64
           Width = 499
           Height = 21
@@ -938,7 +945,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           OnChange = editInfoNameChange
         end
         object editInfoVersion: TEdit
-          Left = 108
+          Left = 114
           Top = 152
           Width = 499
           Height = 21
@@ -947,7 +954,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           OnChange = editInfoVersionChange
         end
         object editInfoCopyright: TEdit
-          Left = 108
+          Left = 114
           Top = 200
           Width = 499
           Height = 21
@@ -957,7 +964,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           OnChange = editInfoCopyrightChange
         end
         object editInfoAuthor: TEdit
-          Left = 108
+          Left = 114
           Top = 232
           Width = 499
           Height = 21
@@ -966,7 +973,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           OnChange = editInfoAuthorChange
         end
         object editInfoEmail: TEdit
-          Left = 108
+          Left = 114
           Top = 256
           Width = 499
           Height = 21
@@ -975,7 +982,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           OnChange = editInfoEmailChange
         end
         object editInfoWebSite: TEdit
-          Left = 108
+          Left = 114
           Top = 280
           Width = 499
           Height = 21
@@ -984,7 +991,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           OnChange = editInfoWebSiteChange
         end
         object cmdInsertCopyright: TButton
-          Left = 614
+          Left = 620
           Top = 200
           Width = 49
           Height = 21
@@ -994,7 +1001,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           OnClick = cmdInsertCopyrightClick
         end
         object cbKMPImageFile: TComboBox
-          Left = 108
+          Left = 114
           Top = 324
           Width = 499
           Height = 21
@@ -1019,7 +1026,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           end
         end
         object chkFollowKeyboardVersion: TCheckBox
-          Left = 108
+          Left = 114
           Top = 178
           Width = 237
           Height = 17
@@ -1028,12 +1035,55 @@ inherited frmPackageEditor: TfrmPackageEditor
           OnClick = chkFollowKeyboardVersionClick
         end
         object memoInfoDescription: TMemo
-          Left = 108
+          Left = 114
           Top = 376
           Width = 499
-          Height = 145
+          Height = 97
           TabOrder = 11
           OnChange = memoInfoDescriptionChange
+        end
+        object gridRelatedPackages: TStringGrid
+          Left = 114
+          Top = 512
+          Width = 415
+          Height = 89
+          ColCount = 2
+          DefaultRowHeight = 16
+          FixedCols = 0
+          RowCount = 9
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
+          TabOrder = 12
+          OnDblClick = gridRelatedPackagesDblClick
+          ColWidths = (
+            78
+            64)
+        end
+        object cmdAddRelatedPackage: TButton
+          Left = 541
+          Top = 512
+          Width = 73
+          Height = 25
+          Caption = '&Add...'
+          TabOrder = 13
+          OnClick = cmdAddRelatedPackageClick
+        end
+        object cmdEditRelatedPackage: TButton
+          Left = 540
+          Top = 544
+          Width = 73
+          Height = 25
+          Caption = 'Ed&it...'
+          TabOrder = 14
+          OnClick = cmdEditRelatedPackageClick
+        end
+        object cmdRemoveRelatedPackage: TButton
+          Left = 541
+          Top = 576
+          Width = 72
+          Height = 25
+          Caption = '&Remove'
+          TabOrder = 15
+          OnClick = cmdRemoveRelatedPackageClick
         end
       end
     end
@@ -1225,7 +1275,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Top = 48
           Width = 551
           Height = 13
-          Caption = 
+          Caption =
             'Compiling the package takes all the files you have selected and ' +
             'compresses them into a single package file.'
         end

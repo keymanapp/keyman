@@ -127,5 +127,9 @@
         }
       ]
     }
+  ],
+  "relatedPackages": [
+    { "id": "modern_khmer", "relationship": "deprecates" },
+    { "id": "khmer_nida", "relationship": "related" }
   ]
 }

@@ -123,6 +123,10 @@ Khmer Unicode keyboard layout based on the NiDA keyboard layout. Automatically c
       <FileType>.gif</FileType>
     </File>
   </Files>
+  <RelatedPackages>
+    <RelatedPackage ID="modern_khmer" Relationship="deprecates" />
+    <RelatedPackage ID="khmer_nida" />
+  </RelatedPackages>
   <Keyboards>
     <Keyboard>
       <Name>Khmer Angkor</Name>

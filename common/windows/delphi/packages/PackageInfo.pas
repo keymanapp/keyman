@@ -404,6 +404,24 @@ type
     function ItemByID(id: string): TPackageLexicalModel;
   end;
 
+  TPackageRelatedPackage = class(TPackageBaseObject)
+  private
+    FID: string;
+    FRelationship: string;
+  public
+    procedure Assign(Source: TPackageRelatedPackage); virtual;
+    property ID: string read FID write FID;
+    property Relationship: string read FRelationship write FRelationship;
+  end;
+
+  TPackageRelatedPackageList = class(TPackageObjectList<TPackageRelatedPackage>)
+    procedure Assign(Source: TPackageRelatedPackageList); virtual;
+    procedure LoadXML(ARoot: IXMLNode); virtual;
+    procedure SaveXML(ARoot: IXMLNode); virtual;
+    procedure LoadJSON(ARoot: TJSONObject); virtual;
+    procedure SaveJSON(ARoot: TJSONObject); virtual;
+  end;
+
   { TPackage }
 
   TPackage = class
@@ -428,6 +446,7 @@ type
     Info: TPackageInfoEntryList;
     Keyboards: TPackageKeyboardList;
     LexicalModels: TPackageLexicalModelList;
+    RelatedPackages: TPackageRelatedPackageList;
 
     property FileName: WideString read FFileName write FFileName;
     procedure Assign(Source: TPackage); virtual;
@@ -455,6 +474,9 @@ type
 const
   PackageStartMenuEntryLocationName: array[TPackageStartMenuEntryLocation] of WideString = ('Start Menu', 'Desktop'); //, 'Quick Launch Toolbar');
 
+const
+  S_RelatedPackage_Deprecates = 'deprecates';
+
 implementation
 
 uses
@@ -474,9 +496,6 @@ const
   SFileNotOwnedCorrectly = 'The file ''%s'' referred to is not part of the package.';
   SDisplayFontNotOwnedCorrectly = 'The display font file ''%s'' referred to is not part of the package.';
   SOSKFontNotOwnedCorrectly = 'The OSK font file ''%s'' referred to is not part of the package.';
-
-
-
 
 const
   SXML_PackageKeyboards = 'Keyboards';
@@ -506,6 +525,11 @@ const
   SXML_PackageLexicalModel_ID = 'ID';
   SXML_PackageLexicalModel_RTL = 'RTL';
   SXML_PackageLexicalModel_Languages = 'Languages';
+
+  SXML_PackageRelatedPackages = 'RelatedPackages';
+  SXML_PackageRelatedPackage = 'RelatedPackage';
+  SXML_PackageRelatedPackage_ID = 'ID';
+  SXML_PackageRelatedPackage_Relationship = 'Relationship';
 
 const
   SJSON_System = 'system';
@@ -583,6 +607,10 @@ const
   SJSON_LexicalModel_ID = 'id';
   SJSON_LexicalModel_RTL = 'rtl';
   SJSON_LexicalModel_Languages = 'languages';
+
+  SJSON_RelatedPackages = 'relatedPackages';
+  SJSON_RelatedPackage_ID = 'id';
+  SJSON_RelatedPackage_Relationship = 'relationship';
 
 function XmlVarToStr(v: OleVariant): string;
 begin
@@ -1479,6 +1507,7 @@ begin
   Info.Assign(Source.Info);
   Keyboards.Assign(Source.Keyboards);
   LexicalModels.Assign(Source.LexicalModels);
+  RelatedPackages.Assign(Source.RelatedPackages);
 end;
 
 constructor TPackage.Create;
@@ -1491,6 +1520,7 @@ begin
   if not Assigned(Info)      then Info      := TPackageInfoEntryList.Create(Self);
   if not Assigned(Keyboards) then Keyboards := TPackageKeyboardList.Create(Self);
   if not Assigned(LexicalModels) then LexicalModels := TPackageLexicalModelList.Create(Self);
+  if not Assigned(RelatedPackages) then RelatedPackages := TPackageRelatedPackageList.Create(Self);
 end;
 
 destructor TPackage.Destroy;
@@ -1501,6 +1531,7 @@ begin
   Info.Free;
   Keyboards.Free;
   LexicalModels.Free;
+  RelatedPackages.Free;
   inherited Destroy;
 end;
 
@@ -1534,6 +1565,7 @@ begin
   Options.LoadIni(ini);
   Keyboards.LoadIni(ini);
   //LexicalModels not supported in ini
+  //RelatedPackages not supported in ini
 end;
 
 procedure TPackage.LoadJSON;
@@ -1652,8 +1684,9 @@ begin
   Files.LoadJSON(ARoot);
   Options.LoadJSON(ARoot);
   Keyboards.LoadJSON(ARoot);
-  if Options.FileVersion = SKeymanVersion120 then
+  if CompareVersions(Options.FileVersion, SKeymanVersion120) >= 0 then
     LexicalModels.LoadJSON(ARoot);
+  RelatedPackages.LoadJSON(ARoot);
 end;
 
 procedure TPackage.DoLoadXML(ARoot: IXMLNode);
@@ -1672,8 +1705,9 @@ begin
   Files.LoadXML(ARoot);
   Options.LoadXML(ARoot);
   Keyboards.LoadXML(ARoot);
-  if FVersion = SKeymanVersion120 then
+  if CompareVersions(FVersion, SKeymanVersion120) >= 0 then
     LexicalModels.LoadXML(ARoot);
+  RelatedPackages.LoadXML(ARoot);
 end;
 
 procedure TPackage.DoSaveIni(ini: TIniFile);
@@ -1685,6 +1719,7 @@ begin
   Files.SaveIni(ini);
   Keyboards.SaveIni(ini);
   // Lexical models not supported in ini
+  // RelatedPackages not supported in ini
 end;
 
 procedure TPackage.FixupFileVersion;
@@ -1706,6 +1741,7 @@ begin
   Keyboards.SaveJSON(ARoot);
   if LexicalModels.Count > 0 then
     LexicalModels.SaveJSON(ARoot);
+  RelatedPackages.SaveJSON(ARoot);
 end;
 
 procedure TPackage.DoSaveXML(ARoot: IXMLNode);
@@ -1719,6 +1755,7 @@ begin
   Keyboards.SaveXML(ARoot);
   if LexicalModels.Count > 0 then
     LexicalModels.SaveXML(ARoot);
+  RelatedPackages.SaveXML(ARoot);
 end;
 
 procedure TPackage.SaveIni;
@@ -2527,6 +2564,111 @@ begin
     AExample.Attributes[SXML_PackageKeyboard_Example_Keys] := Items[j].Keys;
     AExample.Attributes[SXML_PackageKeyboard_Example_Text] := Items[j].Text;
     AExample.Attributes[SXML_PackageKeyboard_Example_Note] := Items[j].Note;
+  end;
+end;
+
+{ TPackageRelatedPackage }
+
+procedure TPackageRelatedPackage.Assign(Source: TPackageRelatedPackage);
+begin
+  FID := Source.ID;
+  FRelationship := Source.Relationship;
+end;
+
+{ TPackageRelatedPackageList }
+
+procedure TPackageRelatedPackageList.Assign(Source: TPackageRelatedPackageList);
+var
+  i: Integer;
+  rp: TPackageRelatedPackage;
+begin
+  Clear;
+  for i := 0 to Source.Count - 1 do
+  begin
+    rp := TPackageRelatedPackage.Create(Package);
+    rp.Assign(Source[i]);
+    Add(rp);
+  end;
+end;
+
+procedure TPackageRelatedPackageList.LoadJSON(ARoot: TJSONObject);
+var
+  rp: TPackageRelatedPackage;
+  i: Integer;
+  ANode: TJSONArray;
+  ARelatedPackage: TJSONObject;
+begin
+  Clear;
+
+  ANode := ARoot.Values[SJSON_RelatedPackages] as TJSONArray;
+  if not Assigned(ANode) then
+    Exit;
+
+  for i := 0 to ANode.Count - 1 do
+  begin
+    ARelatedPackage := ANode.Items[i] as TJSONObject;
+
+    rp := TPackageRelatedPackage.Create(Package);
+    rp.ID := GetJsonValueString(ARelatedPackage,SJSON_RelatedPackage_ID);
+    rp.Relationship := GetJsonValueString(ARelatedPackage, SJSON_RelatedPackage_Relationship);
+    Add(rp);
+  end;
+end;
+
+procedure TPackageRelatedPackageList.LoadXML(ARoot: IXMLNode);
+var
+  rp: TPackageRelatedPackage;
+  i: Integer;
+  ARelatedPackage, ANode: IXMLNode;
+begin
+  Clear;
+
+  ANode := ARoot.ChildNodes[SXML_PackageRelatedPackages];
+  for i := 0 to ANode.ChildNodes.Count - 1 do
+  begin
+    ARelatedPackage := ANode.ChildNodes[i];
+
+    rp := TPackageRelatedPackage.Create(Package);
+    rp.ID := XmlVarToStr(ARelatedPackage.Attributes[SXML_PackageRelatedPackage_ID]);
+    rp.Relationship := XmlVarToStr(ARelatedPackage.Attributes[SXML_PackageRelatedPackage_Relationship]);
+    Add(rp);
+  end;
+end;
+
+procedure TPackageRelatedPackageList.SaveJSON(ARoot: TJSONObject);
+var
+  i: Integer;
+  ARelatedPackage: TJSONObject;
+  ARelatedPackages: TJSONArray;
+begin
+  if Count = 0 then
+    Exit;
+
+  ARelatedPackages := TJSONArray.Create;
+  ARoot.AddPair(SJSON_RelatedPackages, ARelatedPackages);
+
+  for i := 0 to Count - 1 do
+  begin
+    ARelatedPackage := TJSONObject.Create;
+    ARelatedPackages.Add(ARelatedPackage);
+
+    ARelatedPackage.AddPair(SJSON_RelatedPackage_ID, Items[i].ID);
+    ARelatedPackage.AddPair(SJSON_RelatedPackage_Relationship, Items[i].Relationship);
+  end;
+end;
+
+procedure TPackageRelatedPackageList.SaveXML(ARoot: IXMLNode);
+var
+  i: Integer;
+  ARelatedPackage, ANode: IXMLNode;
+begin
+  ANode := ARoot.AddChild(SXML_PackageRelatedPackages);
+  for i := 0 to Count - 1 do
+  begin
+    ARelatedPackage := ANode.AddChild(SXML_PackageRelatedPackage);
+
+    ARelatedPackage.Attributes[SXML_PackageRelatedPackage_ID] := Items[i].ID;
+    ARelatedPackage.Attributes[SXML_PackageRelatedPackage_Relationship] := Items[i].Relationship;
   end;
 end;
 

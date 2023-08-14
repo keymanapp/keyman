@@ -557,6 +557,10 @@
             <Form>frmEditLanguageExample</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="dialogs\relatedPackages\Keyman.Developer.UI.UfrmEditRelatedPackage.pas">
+            <Form>frmEditRelatedPackage</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

@@ -90,6 +90,16 @@ export class KmpCompiler {
     }
 
     //
+    // Add related package metadata
+    //
+
+    if(kps.relatedPackages) {
+      kmp.relatedPackages = (this.arrayWrap(kps.relatedPackages.relatedPackage) as KpsFile.KpsFileRelatedPackage[]).map(p =>
+        ({id: p.$.ID, relationship: p.$.Relationship || "related"})
+      );
+    }
+
+    //
     // Add file metadata
     //
 
