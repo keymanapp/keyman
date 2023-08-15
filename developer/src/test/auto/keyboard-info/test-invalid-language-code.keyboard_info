@@ -1,6 +1,17 @@
 {
+    "id": "test",
+    "name": "test",
     "license": "mit",
     "languages": [
         "foooooooo=amh"
-    ]
+    ],
+    "platformSupport": {
+        "windows": "full",
+        "macos": "full",
+        "desktopWeb": "full",
+        "mobileWeb": "full",
+        "ios": "full",
+        "android": "full"
+    },
+    "lastModifiedDate": "2017-09-06"
 }
