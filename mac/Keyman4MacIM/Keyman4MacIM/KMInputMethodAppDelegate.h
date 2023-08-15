@@ -83,8 +83,8 @@ typedef struct {
 
 - (NSMenu *)menu;
 - (void)saveActiveKeyboards;
-- (void)loadSavedStores;
-- (void)saveStore:(NSString *)storeKey withValue:(NSString* )value;
+- (void)readPersistedOptions;
+- (void)writePersistedOptions:(NSString *)storeKey withValue:(NSString* )value;
 - (void)showAboutWindow;
 - (void)showOSK;
 - (void)showConfigurationWindow;

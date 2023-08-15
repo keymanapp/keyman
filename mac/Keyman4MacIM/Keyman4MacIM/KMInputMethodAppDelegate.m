@@ -28,7 +28,15 @@
 /** NSUserDefaults keys */
 NSString *const kKMSelectedKeyboardKey = @"KMSelectedKeyboardKey";
 NSString *const kKMActiveKeyboardsKey = @"KMActiveKeyboardsKey";
-NSString *const kKMSavedStoresKey = @"KMSavedStoresKey";
+/**
+  The following constant "KMSavedStoresKey" is left here for documentation
+  though we have abandoned stores written to UserDefaults with this key because
+  they used a less-reliable numeric key prior to integration with Keyman Core.
+  It is replaced by the renamed "KMPersistedOptionsKey" which directly
+  represents what it is saving.
+ */
+NSString *const kKMDeprecatedPersistedOptionsKey = @"KMSavedStoresKey";
+NSString *const kKMPersistedOptionsKey = @"KMPersistedOptionsKey";
 NSString *const kKMAlwaysShowOSKKey = @"KMAlwaysShowOSKKey";
 NSString *const kKMUseVerboseLogging = @"KMUseVerboseLogging";
 NSString *const kKMLegacyApps = @"KMLegacyApps";
@@ -419,52 +427,51 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         [_oskWindow.window setTitle:self.oskWindowTitle];
 }
 
-// TODO: load stores with string keys, not numbers?
-- (void)loadSavedStores {
+- (void)readPersistedOptions {
     NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    NSDictionary *allSavedStores = [userData dictionaryForKey:kKMSavedStoresKey];
-    if (!allSavedStores) return;
-    NSDictionary *savedStores = [allSavedStores objectForKey:_selectedKeyboard];
-    if (!savedStores) return;
+    NSDictionary *allPersistedOptions = [userData dictionaryForKey:kKMPersistedOptionsKey];
+    if (!allPersistedOptions) return;
+    NSDictionary *persistedOptionsForSelectedKeyboard = [allPersistedOptions objectForKey:_selectedKeyboard];
 
-    NSNumberFormatter *fmt = [[NSNumberFormatter alloc] init];
-    fmt.numberStyle = NSNumberFormatterDecimalStyle;
+  if (!persistedOptionsForSelectedKeyboard) {
+      NSLog(@"no persisted options found in UserDefaults for keyboard %@ ", _selectedKeyboard);
+      return;
+    }
 
-    for (NSString *key in savedStores) {
-        NSString *value = [savedStores objectForKey:key];
-        NSUInteger storeID = [[fmt numberFromString:key] unsignedIntegerValue];
-        [self.kme setStore:(DWORD)storeID withValue:value];
+  // TODO pass array instead of making repeated calls
+    for (NSString *key in persistedOptionsForSelectedKeyboard) {
+        NSString *value = [persistedOptionsForSelectedKeyboard objectForKey:key];
+        NSLog(@"persisted options found in UserDefaults for keyboard %@, key: %@, value: %@", _selectedKeyboard, key, value);
+        [self.kme setCoreOptions:key withValue:value];
     }
 }
 
-// TODO: remove number references
-- (void)saveStore:(NSString *)storeKey withValue:(NSString* )value {
-    //NSString *storeKeyStr = [storeKey stringValue];
+- (void)writePersistedOptions:(NSString *)storeKey withValue:(NSString* )value {
     NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    NSDictionary *allSavedStores = [userData dictionaryForKey:kKMSavedStoresKey];
-    NSDictionary *selectedKeyboardStores;
+    NSDictionary *allPersistedOptions = [userData dictionaryForKey:kKMPersistedOptionsKey];
+    NSDictionary *persistedOptionsForSelectedKeyboard;
 
-    if (allSavedStores) {
-      selectedKeyboardStores = [allSavedStores objectForKey:_selectedKeyboard];
-   }
+    if (allPersistedOptions) {
+      persistedOptionsForSelectedKeyboard = [allPersistedOptions objectForKey:_selectedKeyboard];
+    }
 
-    if (selectedKeyboardStores) {
-        NSMutableDictionary *newSavedStores = [selectedKeyboardStores mutableCopy];
+    if (persistedOptionsForSelectedKeyboard) {
+        NSMutableDictionary *newSavedStores = [persistedOptionsForSelectedKeyboard mutableCopy];
        [newSavedStores setObject:value forKey:storeKey];
-       selectedKeyboardStores = newSavedStores;
+       persistedOptionsForSelectedKeyboard = newSavedStores;
     } else {
-        selectedKeyboardStores = [[NSDictionary alloc] initWithObjectsAndKeys:value, storeKey, nil];
+        persistedOptionsForSelectedKeyboard = [[NSDictionary alloc] initWithObjectsAndKeys:value, storeKey, nil];
     }
 
-    if (allSavedStores) {
-        NSMutableDictionary *newAllSavedStores = [allSavedStores mutableCopy];
-        [newAllSavedStores setObject:selectedKeyboardStores forKey:_selectedKeyboard];
-        allSavedStores = newAllSavedStores;
+    if (allPersistedOptions) {
+        NSMutableDictionary *newAllSavedStores = [allPersistedOptions mutableCopy];
+        [newAllSavedStores setObject:persistedOptionsForSelectedKeyboard forKey:_selectedKeyboard];
+        allPersistedOptions = newAllSavedStores;
     } else {
-        allSavedStores = [[NSDictionary alloc] initWithObjectsAndKeys:selectedKeyboardStores, _selectedKeyboard, nil];
+        allPersistedOptions = [[NSDictionary alloc] initWithObjectsAndKeys:persistedOptionsForSelectedKeyboard, _selectedKeyboard, nil];
     }
 
-    [userData setObject:allSavedStores forKey:kKMSavedStoresKey];
+    [userData setObject:allPersistedOptions forKey:kKMPersistedOptionsKey];
     [userData synchronize];
 }
 
@@ -815,7 +822,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 [self setKvk:kvk];
                 [self setKeyboardName:[kmxInfo objectForKey:kKMKeyboardNameKey]];
                 [self setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
-                [self loadSavedStores];
+                [self readPersistedOptions];
 
                 didSetKeyboard = YES;
             }
@@ -851,7 +858,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             [self setKeyboardName:[kmxInfo objectForKey:kKMKeyboardNameKey]];
             [self setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
             [self setContextBuffer:nil];
-            [self loadSavedStores];
+            [self readPersistedOptions];
             [self setSelectedKeyboard:path];
         }
     }

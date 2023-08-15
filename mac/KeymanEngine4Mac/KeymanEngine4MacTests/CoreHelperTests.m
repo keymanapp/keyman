@@ -79,6 +79,31 @@ ActionArrayOptimizer *optimizer;
   XCTAssertEqual(keymanModifierState, 0, @"Failed conversion of Mac Help key flag from Mac to Keyman cleared modifier state.");
 }
 
+- (void)testUnicharStringConversion_optionName_matchesLiteral {
+  NSString *keyString = @"option_ligature_ew";
+  unichar const * keyUnicharString = u"option_ligature_ew";
+  
+  NSUInteger stringLength = [keyString lengthOfBytesUsingEncoding:NSUTF16StringEncoding];
+  
+  unichar const *  convertedKeyString = [CoreHelper createUnicharStringFromNSString: keyString];
+  NSData *dataFromConversion = [NSData dataWithBytes:convertedKeyString length:stringLength];
+  NSData *dataFromLiteral = [NSData dataWithBytes:keyUnicharString length:stringLength];
+  XCTAssertTrue([dataFromLiteral isEqualToData:dataFromConversion], @"Converted unichar string is not equal to literal unichar string.");
+}
+
+- (void)testUnicharStringConversion_integer_matchesLiteral {
+  NSString *keyString = @"1";
+  unichar const * keyUnicharString = u"1";
+  
+  NSUInteger stringLength = [keyString lengthOfBytesUsingEncoding:NSUTF16StringEncoding];
+  
+  unichar const *  convertedKeyString = [CoreHelper createUnicharStringFromNSString: keyString];
+  NSData *dataFromConversion = [NSData dataWithBytes:convertedKeyString length:stringLength];
+  NSData *dataFromLiteral = [NSData dataWithBytes:keyUnicharString length:stringLength];
+  XCTAssertTrue([dataFromLiteral isEqualToData:dataFromConversion], @"Converted unichar string is not equal to literal unichar string.");
+}
+
+
 /*
 - (void)testOptimize_MultipleCharacterActions_CombinedToSingleAction {
   CoreAction *characterAAction = [[CoreAction alloc] initWithType:CharacterAction actionContent:@"A" backspaceCount:0];
@@ -105,9 +130,9 @@ ActionArrayOptimizer *optimizer;
 }
 */
 - (void)testOptimize_OneBackspaceAndOneCharacterAction_RetainedWithEndActionStripped {
-  CoreAction *backspaceAction = [[CoreAction alloc] initWithType:CharacterBackspaceAction actionContent:@"" backspaceCount:1];
-  CoreAction *characterAAction = [[CoreAction alloc] initWithType:CharacterAction actionContent:@"A" backspaceCount:0];
-  CoreAction *endAction = [[CoreAction alloc] initWithType:EndAction actionContent:@"" backspaceCount:0];
+  CoreAction *backspaceAction = [[CoreAction alloc] initCharacterBackspaceAction:@""];
+  CoreAction *characterAAction = [[CoreAction alloc] initCharacterAction:@"A"];
+  CoreAction *endAction = [[CoreAction alloc] initWithType:EndAction actionContent:@"" backspaceCount:0 key:@"" value:@"" scope:0];
   NSArray *coreArray = @[backspaceAction, characterAAction, endAction];
   
   NSArray *optimizedArray = [optimizer optimize:coreArray];
@@ -117,9 +142,9 @@ ActionArrayOptimizer *optimizer;
 }
 
 - (void)testOptimize_OneCharacterAndOneBackspaceAction_CompactedToEmptyArray {
-  CoreAction *characterAAction = [[CoreAction alloc] initWithType:CharacterAction actionContent:@"A" backspaceCount:0];
-  CoreAction *backspaceAction = [[CoreAction alloc] initWithType:CharacterBackspaceAction actionContent:@"" backspaceCount:1];
-  CoreAction *endAction = [[CoreAction alloc] initWithType:EndAction actionContent:@"" backspaceCount:0];
+  CoreAction *characterAAction = [[CoreAction alloc] initCharacterAction:@"A"];
+  CoreAction *backspaceAction = [[CoreAction alloc] initCharacterBackspaceAction:@""];
+  CoreAction *endAction = [[CoreAction alloc] initWithType:EndAction actionContent:@"" backspaceCount:0 key:@"" value:@"" scope:0];
   NSArray *coreArray = @[characterAAction, backspaceAction, endAction];
   
   NSArray *optimizedArray = [optimizer optimize:coreArray];

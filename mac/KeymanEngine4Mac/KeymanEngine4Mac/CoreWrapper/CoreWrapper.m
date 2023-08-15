@@ -95,8 +95,8 @@
     km_kbp_status result = km_kbp_keyboard_get_attrs(self.keyboard, &keyboardAttributes);
 
     if (result==KM_KBP_STATUS_OK) {
-      _keyboardVersion = [NSString stringWithCharacters:keyboardAttributes->version_string length:unistrlen(keyboardAttributes->version_string)];
-      _keyboardId = [NSString stringWithCharacters:keyboardAttributes->id length:unistrlen(keyboardAttributes->id)];
+      _keyboardVersion = [NSString stringWithCharacters:keyboardAttributes->version_string length:[CoreHelper unicharStringLength:keyboardAttributes->version_string]];
+      _keyboardId = [NSString stringWithCharacters:keyboardAttributes->id length:[CoreHelper unicharStringLength:keyboardAttributes->id]];
 
       NSLog(@"keyboardVersion = %@\n, keyboardId  = %@\n", _keyboardVersion, _keyboardId);
     } else {
@@ -237,11 +237,10 @@
       case KM_KBP_IT_PERSIST_OPT: {
         NSLog(@"***createCoreActionForActionStruct Persist Options encountered.");
         km_kbp_option_item const * option = actionStruct->option;
-        km_kbp_cp const * key = option->key;
-        km_kbp_cp const * value = option->value;
-        NSString *keyString = [[NSString alloc] initWithCharacters:key length:unistrlen(key)];
-        NSString *valueString = [[NSString alloc] initWithCharacters:value length:unistrlen(value)];
-        NSLog(@"***createCoreActionForActionStruct converted Persist Options, key = %@, value = %@", keyString, valueString);
+        NSString *keyString = [CoreHelper createNSStringFromUnicharString:option->key];
+        NSString *valueString = [CoreHelper createNSStringFromUnicharString:option->value];
+        
+        NSLog(@"***createCoreActionForActionStruct converted Persist Options, key = %@, value = %@, scope = %d", keyString, valueString, option->scope);
         
         action = [[CoreAction alloc] initPersistOptionAction:keyString value:valueString scope:option->scope];
         break;
@@ -352,15 +351,42 @@
   return TRUE;
 }
 
-unsigned long long unistrlen(const unichar *chars)
-{
-    unsigned long long length = 0llu;
-    if(NULL == chars) return length;
+-(BOOL)setOptionsForCore: (NSString *) key value:(NSString *) value {
+  NSLog(@"setOptionsForCore, key = %@, value = %@", key, value);
+  
+  // array of length 2, second item is terminating null struct
+  km_kbp_option_item option[2] = {0};
+  option[0].key = [CoreHelper createUnicharStringFromNSString: key];
+  option[0].value = [CoreHelper createUnicharStringFromNSString: value];
+  option[0].scope = KM_KBP_OPT_KEYBOARD;
+  
+  km_kbp_status result = km_kbp_state_options_update(self.keyboardState, &option[0]);
+  NSLog(@"setOptionsForCore, km_kbp_state_options_update result = %d", result);
+  
+  return (result==KM_KBP_STATUS_OK);
+}
 
-    while('\0' != chars[length])
-        length++;
+-(void)readCoreOptions: (km_kbp_cp const *) key {
+  km_kbp_cp const * valueFromCore = nil;
+  km_kbp_status result =
+  km_kbp_state_option_lookup(self.keyboardState,
+                             KM_KBP_OPT_KEYBOARD,
+                             key,
+                             &valueFromCore);
+  if (result == KM_KBP_STATUS_OK) {
+    if (valueFromCore) {
+      NSLog(@"km_kbp_state_option_lookup successful, current value set in core= %@", [CoreHelper createNSStringFromUnicharString:valueFromCore]);
+    } else {
+      NSLog(@"km_kbp_state_option_lookup returned nil");
+    }
+  } else {
+    if (valueFromCore) {
+      NSLog(@"km_kbp_state_option_lookup failed, result = %d", result);
+    } else {
+      NSLog(@"km_kbp_state_option_lookup returned nil, result = %d", result);
+    }
+  }
 
-    return length;
 }
 
 @end

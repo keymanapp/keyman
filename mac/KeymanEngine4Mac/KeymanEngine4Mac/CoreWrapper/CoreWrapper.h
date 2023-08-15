@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * context;
 
 -(instancetype)initWithHelper:(CoreHelper*)helper kmxFilePath:(nullable NSString*)path;
+-(BOOL)setOptionsForCore: (NSString *) key value:(NSString *) value;
 -(void)changeKeyboardWithKmxFilePath:(NSString*)path;
 -(NSArray*)processEvent:(nonnull NSEvent *)event;
 -(NSArray*)processMacVirtualKey:(unsigned short)macKeyCode

@@ -1136,11 +1136,11 @@ NSRange _previousSelRange;
         //NSNumber *keyNumber = [NSNumber numberWithInt:keyInteger];
         //NSString *valueString = action.value;
       if(action.key && action.value) {
-        NSLog(@"*** PersistOptionAction calling saveStore, key: %@, value: %@", action.key, action.value);
-        [self.AppDelegate saveStore:action.key withValue:action.value];
+        NSLog(@"*** PersistOptionAction calling writePersistedOptions, key: %@, value: %@", action.key, action.value);
+        [self.AppDelegate writePersistedOptions:action.key withValue:action.value];
       }
       else {
-        NSLog(@"*** Invalid values for PersistOptionAction, not saving in UserDefaults, key: %@, value: %@", action.key, action.value);
+        NSLog(@"*** Invalid values for PersistOptionAction, not writing to UserDefaults, key: %@, value: %@", action.key, action.value);
       }
       break;
     case InvalidateContextAction:

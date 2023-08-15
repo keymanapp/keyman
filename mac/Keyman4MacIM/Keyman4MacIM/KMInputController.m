@@ -243,7 +243,7 @@ NSMutableArray *servers;
         [self.AppDelegate setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
         [self.AppDelegate setContextBuffer:nil];
         [self.AppDelegate setSelectedKeyboard:path];
-        [self.AppDelegate loadSavedStores];
+        [self.AppDelegate readPersistedOptions];
         if (kvk != nil && self.AppDelegate.alwaysShowOSK)
             [self.AppDelegate showOSK];
     }

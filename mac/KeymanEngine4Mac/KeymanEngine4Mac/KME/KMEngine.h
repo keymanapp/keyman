@@ -24,7 +24,7 @@
 //TODO: remove additional context methods
 - (void)setContextBuffer:(NSString *)ctxBuf;
 - (NSString *)contextBuffer;
-- (void)setStore:(DWORD)storeID withValue:(NSString *)value;
+- (void)setCoreOptions:(NSString *)key withValue:(NSString *)value;
 - (NSArray *)processEvent:(NSEvent *)event;
 - (void)setUseVerboseLogging:(BOOL)useVerboseLogging;
 

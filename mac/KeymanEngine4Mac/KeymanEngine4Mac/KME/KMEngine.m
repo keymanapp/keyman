@@ -122,11 +122,15 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     return _tmpCtxBuf;
 }
 
-- (void)setStore:(DWORD)storeID withValue:(NSString *)value {
-    KMCompStore *store = [self.kmx.store objectAtIndex:storeID];
-    KMCompStore *storeSaved = [self.kmx.storeSaved objectAtIndex:storeID];
-    store.string = [[NSString alloc] initWithString:value];
-    storeSaved.string = [[NSString alloc] initWithString:value];
+- (void)setCoreOptions:(NSString *)key withValue:(NSString *)value {
+  /*
+   KMCompStore *store = [self.kmx.store objectAtIndex:storeID];
+   KMCompStore *storeSaved = [self.kmx.storeSaved objectAtIndex:storeID];
+   store.string = [[NSString alloc] initWithString:value];
+   storeSaved.string = [[NSString alloc] initWithString:value];
+   */
+  BOOL success = [self.keymanCore setOptionsForCore:key value:value];
+  NSLog(@"setCoreOptions for key: %@, value: %@ succeeded = %@", key, value, success ? @"YES" : @"NO");
 }
 
 /*
