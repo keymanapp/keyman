@@ -20,11 +20,6 @@ export interface KmpJsonFileOptions {
   executeProgram?: string;
   msiFilename?: string;
   msiOptions?: string;
-  /**
-   * List of all font files, grouped by font family
-   * Compiler extracts font metadata from .ttf,.otf,.woff,.woff2
-   */
-  fonts?: {[family:string]: string[]};
 }
 
 export interface KmpJsonFileInfo {
