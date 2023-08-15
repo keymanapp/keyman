@@ -43,6 +43,10 @@ uconfig.set('UCONFIG_NO_FORMATTING', 1)
 uconfig.set('UCONFIG_NO_TRANSLITERATION', 1)
 uconfig.set('UCONFIG_NO_REGULAR_EXPRESSIONS', 0) # want these for transforms #7375
 uconfig.set('UCONFIG_NO_SERVICE', 1)
+uconfig.set('U_OVERRIDE_CXX_ALLOCATION', 1)
+uconfig.set('UCONFIG_NO_CONVERSION', 1)
+uconfig.set('UCONFIG_USE_WINDOWS_LCID_MAPPING_API', 0)
+
 
 
 uconfig_local = configure_file(
