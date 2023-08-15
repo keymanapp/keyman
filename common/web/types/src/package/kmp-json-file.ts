@@ -20,11 +20,6 @@ export interface KmpJsonFileOptions {
   executeProgram?: string;
   msiFilename?: string;
   msiOptions?: string;
-  /**
-   * List of all font files, grouped by font family
-   * Compiler extracts font metadata from .ttf,.otf,.woff,.woff2
-   */
-  fonts?: {[family:string]: string[]};
 }
 
 export interface KmpJsonFileInfo {
@@ -71,6 +66,14 @@ export interface KmpJsonFileKeyboard {
   rtl?: boolean;
   languages?: KmpJsonFileLanguage[];
   examples?: KmpJsonFileExample[];
+  /**
+   * array of web font alternatives for OSK. should be same font data as oskFont
+   */
+  webOskFonts?: string[];
+  /**
+   * array of web font alternatives for display. should be same font data as displayFont
+   */
+  webDisplayFonts?: string[];
 }
 
 export interface KmpJsonFileStartMenu {

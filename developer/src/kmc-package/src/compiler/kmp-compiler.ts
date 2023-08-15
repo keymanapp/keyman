@@ -79,8 +79,6 @@ export class KmpCompiler {
       }
     }
 
-    // TODO: this.addFontMetadata();
-
     //
     // Add basic metadata
     //
@@ -151,7 +149,17 @@ export class KmpCompiler {
           (this.arrayWrap(keyboard.examples.example) as KpsFile.KpsFileLanguageExample[]).map(
             e => ({id: e.$.ID, keys: e.$.Keys, text: e.$.Text, note: e.$.Note})
           ) as KmpJsonFile.KmpJsonFileExample[] :
-          undefined
+          undefined,
+        webDisplayFonts: keyboard.webDisplayFonts ?
+          (this.arrayWrap(keyboard.webDisplayFonts.font) as KpsFile.KpsFileFont[]).map(
+            e => (this.callbacks.path.basename(e.$.Filename))
+          ) :
+          undefined,
+        webOskFonts: keyboard.webOSKFonts ?
+          (this.arrayWrap(keyboard.webOSKFonts.font) as KpsFile.KpsFileFont[]).map(
+            e => (this.callbacks.path.basename(e.$.Filename))
+          ) :
+          undefined,
       }));
     }
 

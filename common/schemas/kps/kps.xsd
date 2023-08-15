@@ -125,6 +125,8 @@
                   <xs:element minOccurs="0" maxOccurs="1" name="DisplayFont" type="xs:string" />
                   <xs:element minOccurs="0" maxOccurs="1" name="Languages" type="km-keyboard-languages" />
                   <xs:element minOccurs="0" maxOccurs="1" name="Examples" type="km-keyboard-examples" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="WebOSKFonts" type="km-keyboard-fonts" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="WebDisplayFonts" type="km-keyboard-fonts" />
                 </xs:all>
               </xs:complexType>
               </xs:element>
@@ -237,6 +239,16 @@
         <xs:attribute name="Keys" type="xs:string" />
         <xs:attribute name="Text" type="xs:string" />
         <xs:attribute name="Note" type="xs:string" />
+      </xs:complexType>
+    </xs:element>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="km-keyboard-fonts">
+  <xs:sequence>
+    <xs:element minOccurs="0" maxOccurs="unbounded" name="Font">
+      <xs:complexType>
+        <xs:attribute name="Filename" type="xs:string" />
       </xs:complexType>
     </xs:element>
   </xs:sequence>

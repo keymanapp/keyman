@@ -220,6 +220,10 @@ type
     cmdAddRelatedPackage: TButton;
     cmdEditRelatedPackage: TButton;
     cmdRemoveRelatedPackage: TButton;
+    cmdKeyboardWebOSKFonts: TButton;
+    cmdKeyboardWebDisplayFonts: TButton;
+    lblWebOSKFonts: TLabel;
+    lblWebDisplayFonts: TLabel;
     procedure cmdCloseClick(Sender: TObject);
     procedure cmdAddFileClick(Sender: TObject);
     procedure cmdRemoveFileClick(Sender: TObject);
@@ -295,6 +299,8 @@ type
     procedure cmdAddRelatedPackageClick(Sender: TObject);
     procedure cmdEditRelatedPackageClick(Sender: TObject);
     procedure cmdRemoveRelatedPackageClick(Sender: TObject);
+    procedure cmdKeyboardWebOSKFontsClick(Sender: TObject);
+    procedure cmdKeyboardWebDisplayFontsClick(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -348,6 +354,7 @@ type
     procedure ResizeGridColumns;
     procedure RefreshRelatedPackagesList;
     function SelectedRelatedPackage: TPackageRelatedPackage;
+    procedure ShowEditWebFontsForm(Fonts: TPackageContentFileReferenceList);
 
   protected
     function GetHelpTopic: string; override;
@@ -406,6 +413,7 @@ uses
   UfrmSendURLsToEmail,
   utilexecute,
   Keyman.Developer.UI.UfrmEditLanguageExample,
+  Keyman.Developer.UI.UfrmEditPackageWebFonts,
   Keyman.Developer.UI.UfrmEditRelatedPackage,
   Keyman.Developer.UI.UfrmSelectBCP47Language,
   xmldoc;
@@ -1618,6 +1626,8 @@ begin
       cbKeyboardDisplayFont.ItemIndex := -1;
       gridKeyboardLanguages.RowCount := 1;
       gridKeyboardExamples.RowCount := 1;
+      lblWebOSKFonts.Caption := '';
+      lblWebDisplayFonts.Caption := '';
       EnableKeyboardTabControls;
       Exit;
     end;
@@ -1642,6 +1652,9 @@ begin
 
     FillFileList(cbKeyboardOSKFont, k.OSKFont, ftFont);
     FillFileList(cbKeyboardDisplayFont, k.DisplayFont, ftFont);
+
+    lblWebOSKFonts.Caption := k.WebOSKFonts.GetAsString;
+    lblWebDisplayFonts.Caption := k.WebDisplayFonts.GetAsString;
 
     // Languages
 
@@ -1766,6 +1779,12 @@ begin
   cbKeyboardOSKFont.Enabled := e;
   lblKeyboardDisplayFont.Enabled := e;
   cbKeyboardDisplayFont.Enabled := e;
+
+  cmdKeyboardWebOSKFonts.Enabled := e;
+  cmdKeyboardWebDisplayFonts.Enabled := e;
+  lblWebOSKFonts.Enabled := e;
+  lblWebDisplayFonts.Enabled := e;
+
   lblKeyboardLanguages.Enabled := e;
   cmdKeyboardAddLanguage.Enabled := e;
   lblKeyboardExamples.Enabled := e;
@@ -1881,6 +1900,42 @@ begin
   RefreshKeyboardLanguageList(k);
   EnableKeyboardTabControls;
   Modified := True;
+end;
+
+procedure TfrmPackageEditor.cmdKeyboardWebDisplayFontsClick(Sender: TObject);
+var
+  k: TPackageKeyboard;
+begin
+  k := SelectedKeyboard;
+  Assert(Assigned(k));
+  ShowEditWebFontsForm(k.WebDisplayFonts);
+end;
+
+procedure TfrmPackageEditor.cmdKeyboardWebOSKFontsClick(Sender: TObject);
+var
+  k: TPackageKeyboard;
+begin
+  k := SelectedKeyboard;
+  Assert(Assigned(k));
+  ShowEditWebFontsForm(k.WebOSKFonts);
+end;
+
+procedure TfrmPackageEditor.ShowEditWebFontsForm(Fonts: TPackageContentFileReferenceList);
+var
+  frm: TfrmEditPackageWebFonts;
+begin
+  frm := TfrmEditPackageWebFonts.Create(Application.MainForm);
+  try
+    frm.Files := pack.Files;
+    frm.SelectedFonts := Fonts;
+    if frm.ShowModal = mrOk then
+    begin
+      lbKeyboardsClick(lbKeyboards);
+      Modified := True;
+    end;
+  finally
+    frm.Free;
+  end;
 end;
 
 procedure TfrmPackageEditor.RefreshTargetPanels;

@@ -116,6 +116,24 @@ export interface KpsFileKeyboard {
   rTL?: string;
   languages?: KpsFileLanguages;
   examples?: KpsFileLanguageExamples;
+  /**
+   * array of web font alternatives for OSK. should be same font data as oskFont
+   */
+  webOSKFonts?: KpsFileFonts;
+  /**
+   * array of web font alternatives for display. should be same font data as displayFont
+   */
+  webDisplayFonts?: KpsFileFonts;
+}
+
+export interface KpsFileFonts {
+  font: KpsFileFont[] | KpsFileFont;
+}
+
+export interface KpsFileFont {
+  $: {
+    Filename: string;
+  }
 }
 
 export interface KpsFileKeyboards {

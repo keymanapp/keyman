@@ -139,6 +139,7 @@ type
 
   TPackageContentFile = class;
   TPackageContentFileList = class;
+  TPackageContentFileReferenceList = class;
 
   { Package Options }
 
@@ -313,12 +314,14 @@ type
     FExamples: TPackageKeyboardExampleList;
     FVersion: string;
     FMinKeymanVersion: string;
+    FWebOSKFonts: TPackageContentFileReferenceList;
+    FWebDisplayFonts: TPackageContentFileReferenceList;
     procedure SetDisplayFont(const Value: TPackageContentFile);
     procedure SetOSKFont(const Value: TPackageContentFile);
-    procedure DisplayFontRemoved(Sender: TObject;
+    procedure FontRemoved(Sender: TObject;
       EventType: TPackageNotifyEventType; var FAllow: Boolean);
-    procedure OSKFontRemoved(Sender: TObject;
-      EventType: TPackageNotifyEventType; var FAllow: Boolean);
+    procedure FontListNotify(Sender: TObject; const Item: TPackageContentFile;
+      Action: TCollectionNotification);
   public
     constructor Create(APackage: TPackage); override;
     destructor Destroy; override;
@@ -331,8 +334,21 @@ type
     property Examples: TPackageKeyboardExampleList read FExamples;
     property OSKFont: TPackageContentFile read FOSKFont write SetOSKFont;
     property DisplayFont: TPackageContentFile read FDisplayFont write SetDisplayFont;
+    property WebOSKFonts: TPackageContentFileReferenceList read FWebOSKFonts;
+    property WebDisplayFonts: TPackageContentFileReferenceList read FWebDisplayFonts;
     // The following properties are used only in memory and never streamed in or out
     property MinKeymanVersion: string read FMinKeymanVersion write FMinKeymanVersion;
+  end;
+
+  TPackageContentFileReferenceList = class(TPackageObjectList<TPackageContentFile>)
+  public
+    constructor Create(APackage: TPackage);
+    procedure Assign(Source: TPackageContentFileReferenceList); virtual;
+    procedure LoadXML(ARoot: IXMLNode); virtual;
+    procedure SaveXML(ARoot: IXMLNode); virtual;
+    procedure LoadJSON(ARoot: TJSONArray); virtual;
+    procedure SaveJSON(ARoot: TJSONArray); virtual;
+    function GetAsString: string;
   end;
 
   TPackageKeyboardList = class(TPackageObjectList<TPackageKeyboard>)
@@ -519,6 +535,11 @@ const
   SXML_PackageKeyboard_Example_Text = 'Text';
   SXML_PackageKeyboard_Example_Note = 'Note';
 
+  SXML_PackageKeyboard_WebOskFonts = 'WebOSKFonts';
+  SXML_PackageKeyboard_WebDisplayFonts = 'WebDisplayFonts';
+  SXML_PackageKeyboardFont = 'Font';
+  SXML_PackageKeyboardFont_Filename = 'Filename';
+
   SXML_PackageLexicalModels = 'LexicalModels';
   SXML_PackageLexicalModel = 'LexicalModel';
   SXML_PackageLexicalModel_Name = 'Name';
@@ -601,6 +622,9 @@ const
   SJSON_Keyboard_Example_Keys = 'keys';
   SJSON_Keyboard_Example_Text = 'text';
   SJSON_Keyboard_Example_Note = 'note';
+
+  SJSON_Keyboard_WebOSKFonts = 'webOskFonts';
+  SJSON_Keyboard_WebDisplayFonts = 'webDisplayFonts';
 
   SJSON_LexicalModels = 'lexicalModels';
   SJSON_LexicalModel_Name = 'name';
@@ -1949,18 +1973,25 @@ begin
     FExample.Note := Source.Examples[i].Note;
     FExamples.Add(FExample);
   end;
+
+  FWebOSKFonts.Clear;
+  FWebOSKFonts.Assign(Source.WebOSKFonts);
+
+  FWebDisplayFonts.Clear;
+  FWebDisplayFonts.Assign(Source.WebDisplayFonts);
 end;
 
 procedure TPackageKeyboard.SetDisplayFont(const Value: TPackageContentFile);
 begin
-  if Assigned(FDisplayFont) then FDisplayFont.RemoveNotifyObject(DisplayFontRemoved);
+  if Assigned(FDisplayFont) then
+    FDisplayFont.RemoveNotifyObject(FontRemoved);
   if not Assigned(Value) then
     FDisplayFont := nil
   else
   begin
     if Value.Package <> Package then raise EPackageInfo.CreateFmt(SDisplayFontNotOwnedCorrectly, [Value]);
     FDisplayFont := Value;
-    FDisplayFont.AddNotifyObject(DisplayFontRemoved);
+    FDisplayFont.AddNotifyObject(FontRemoved);
   end;
 end;
 
@@ -1969,38 +2000,65 @@ begin
   inherited Create(APackage);
   FLanguages := TPackageKeyboardLanguageList.Create(APackage);
   FExamples := TPackageKeyboardExampleList.Create(APackage);
+  FWebOSKFonts := TPackageContentFileReferenceList.Create(APackage);
+  FWebOSKFonts.OnNotify := FontListNotify;
+  FWebDisplayFonts := TPackageContentFileReferenceList.Create(APackage);
+  FWebDisplayFonts.OnNotify := FontListNotify;
 end;
 
 destructor TPackageKeyboard.Destroy;
 begin
+  if Assigned(FDisplayFont) then
+    FDisplayFont.RemoveNotifyObject(FontRemoved);
+  FDisplayFont := nil;
+
+  if Assigned(FOSKFont) then
+    FOSKFont.RemoveNotifyObject(FontRemoved);
+  FOSKFont := nil;
+
   FreeAndNil(FLanguages);
   FreeAndNil(FExamples);
+  FreeAndNil(FWebOSKFonts);
+  FreeAndNil(FWebDisplayFonts);
   inherited Destroy;
 end;
 
-procedure TPackageKeyboard.DisplayFontRemoved(Sender: TObject;
+procedure TPackageKeyboard.FontListNotify(Sender: TObject;
+  const Item: TPackageContentFile; Action: TCollectionNotification);
+begin
+  if Action = cnRemoved then
+    Item.RemoveNotifyObject(FontRemoved)
+  else if Action = cnAdded then
+  begin
+    Assert(Item.Package = Self.Package);
+    Item.AddNotifyObject(FontRemoved);
+  end;
+end;
+
+procedure TPackageKeyboard.FontRemoved(Sender: TObject;
   EventType: TPackageNotifyEventType; var FAllow: Boolean);
 begin
-  FDisplayFont := nil;
+  // For all EventTypes
+  if Sender = FDisplayFont then
+    FDisplayFont := nil;
+  if Sender = FOSKFont then
+    FOSKFont := nil;
+  FWebDisplayFonts.Remove(Sender as TPackageContentFile);
+  FWebOSKFonts.Remove(Sender as TPackageContentFile);
 end;
 
 procedure TPackageKeyboard.SetOSKFont(const Value: TPackageContentFile);
 begin
-  if Assigned(FOSKFont) then FOSKFont.RemoveNotifyObject(OSKFontRemoved);
+  if Assigned(FOSKFont) then
+    FOSKFont.RemoveNotifyObject(FontRemoved);
   if not Assigned(Value) then
     FOSKFont := nil
   else
   begin
     if Value.Package <> Package then raise EPackageInfo.CreateFmt(SOSKFontNotOwnedCorrectly, [Value]);
     FOSKFont := Value;
-    FOSKFont.AddNotifyObject(OSKFontRemoved);
+    FOSKFont.AddNotifyObject(FontRemoved);
   end;
-end;
-
-procedure TPackageKeyboard.OSKFontRemoved(Sender: TObject;
-  EventType: TPackageNotifyEventType; var FAllow: Boolean);
-begin
-  FOSKFont := nil;
 end;
 
 { TPackageKeyboardList }
@@ -2067,6 +2125,8 @@ begin
         keyboard.Languages.Add(FLanguage);
       end;
 
+      // web fonts not supported in ini
+
       Add(keyboard);
     end;
   finally
@@ -2078,7 +2138,7 @@ procedure TPackageKeyboardList.LoadJSON(ARoot: TJSONObject);
 var
   keyboard: TPackageKeyboard;
   i: Integer;
-  ANode: TJSONArray;
+  ASubNode, ANode: TJSONArray;
   AKeyboard: TJSONObject;
 begin
   Clear;
@@ -2100,6 +2160,15 @@ begin
     keyboard.DisplayFont := Package.Files.FromFileNameEx(GetJsonValueString(AKeyboard, SJSON_Keyboard_DisplayFont));
     keyboard.Languages.LoadJSON(AKeyboard);
     keyboard.Examples.LoadJSON(AKeyboard);
+
+    ASubNode := AKeyboard.GetValue(SJSON_Keyboard_WebOSKFonts) as TJSONArray;
+    if Assigned(ASubNode) then
+      keyboard.WebOSKFonts.LoadJSON(ASubNode);
+
+    ASubNode := AKeyboard.GetValue(SJSON_Keyboard_WebDisplayFonts) as TJSONArray;
+    if Assigned(ASubNode) then
+      keyboard.WebDisplayFonts.LoadJSON(ASubNode);
+
     Add(keyboard);
   end;
 end;
@@ -2108,7 +2177,7 @@ procedure TPackageKeyboardList.LoadXML(ARoot: IXMLNode);
 var
   keyboard: TPackageKeyboard;
   i: Integer;
-  AKeyboard, ANode: IXMLNode;
+  AKeyboard, ANode, ASubNode: IXMLNode;
 begin
   Clear;
 
@@ -2127,6 +2196,19 @@ begin
 
     keyboard.Languages.LoadXML(AKeyboard);
     keyboard.Examples.LoadXML(AKeyboard);
+
+    ASubNode := AKeyboard.ChildNodes[SXML_PackageKeyboard_WebOSKFonts];
+    if Assigned(ASubNode) then
+    begin
+      keyboard.WebOSKFonts.LoadXML(ASubNode);
+    end;
+
+    ASubNode := AKeyboard.ChildNodes[SXML_PackageKeyboard_WebDisplayFonts];
+    if Assigned(ASubNode) then
+    begin
+      keyboard.WebDisplayFonts.LoadXML(ASubNode);
+    end;
+
     Add(keyboard);
   end;
 end;
@@ -2152,6 +2234,8 @@ begin
     begin
       AIni.WriteString(FSectionName, SXML_PackageKeyboard_Language+IntToStr(j), Items[i].Languages[j].ID+','+Items[i].Languages[j].Name);
     end;
+
+    // web fonts not supported in ini
   end;
 end;
 
@@ -2159,7 +2243,7 @@ procedure TPackageKeyboardList.SaveJSON(ARoot: TJSONObject);
 var
   i: Integer;
   AKeyboard: TJSONObject;
-  AKeyboards: TJSONArray;
+  AFonts, AKeyboards: TJSONArray;
 begin
   if Count = 0 then
     Exit;
@@ -2183,13 +2267,26 @@ begin
 
     Items[i].Languages.SaveJSON(AKeyboard);
     Items[i].Examples.SaveJSON(AKeyboard);
+    if Items[i].WebOSKFonts.Count > 0 then
+    begin
+      AFonts := TJSONArray.Create;
+      Items[i].WebOSKFonts.SaveJSON(AFonts);
+      AKeyboard.AddPair(SJSON_Keyboard_WebOSKFonts, AFonts);
+    end;
+
+    if Items[i].WebDisplayFonts.Count > 0 then
+    begin
+      AFonts := TJSONArray.Create;
+      Items[i].WebDisplayFonts.SaveJSON(AFonts);
+      AKeyboard.AddPair(SJSON_Keyboard_WebDisplayFonts, AFonts);
+    end;
   end;
 end;
 
 procedure TPackageKeyboardList.SaveXML(ARoot: IXMLNode);
 var
   i: Integer;
-  AKeyboard, ANode: IXMLNode;
+  AFonts, AKeyboard, ANode: IXMLNode;
 begin
   ANode := ARoot.AddChild(SXML_PackageKeyboards);
   for i := 0 to Count - 1 do
@@ -2208,6 +2305,17 @@ begin
 
     Items[i].Languages.SaveXML(AKeyboard);
     Items[i].Examples.SaveXML(AKeyboard);
+    if Items[i].WebOSKFonts.Count > 0 then
+    begin
+      AFonts := AKeyboard.AddChild(SXML_PackageKeyboard_WebOskFonts);
+      Items[i].WebOSKFonts.SaveXML(AFonts);
+    end;
+
+    if Items[i].WebDisplayFonts.Count > 0 then
+    begin
+      AFonts := AKeyboard.AddChild(SXML_PackageKeyboard_WebDisplayFonts);
+      Items[i].WebDisplayFonts.SaveXML(AFonts);
+    end;
   end;
 end;
 
@@ -2680,6 +2788,91 @@ begin
     // Relationship field optional for .kps
     if Items[i].Relationship <> '' then
       ARelatedPackage.Attributes[SXML_PackageRelatedPackage_Relationship] := Items[i].Relationship;
+  end;
+end;
+
+{ TPackageContentFileReferenceList }
+
+procedure TPackageContentFileReferenceList.Assign(Source: TPackageContentFileReferenceList);
+var
+  i: Integer;
+  f: TPackageContentFile;
+begin
+  Clear;
+  for i := 0 to Source.Count - 1 do
+  begin
+    f := Package.Files.FromFileNameEx(Source[i].FileName);
+    if Assigned(f) then
+      Add(f);
+  end;
+end;
+
+constructor TPackageContentFileReferenceList.Create(APackage: TPackage);
+begin
+  inherited Create(APackage);
+  OwnsObjects := False;
+end;
+
+function TPackageContentFileReferenceList.GetAsString: string;
+var
+  f: TPackageContentFile;
+begin
+  Result := '';
+  for f in Self do
+  begin
+    Result := Result + ', ' + ExtractFileName(f.FileName);
+  end;
+  System.Delete(Result, 1, 2);
+end;
+
+procedure TPackageContentFileReferenceList.LoadJSON(ARoot: TJSONArray);
+var
+  i: Integer;
+  f: TPackageContentFile;
+begin
+  for i := 0 to ARoot.Count - 1 do
+  begin
+    f := Package.Files.FromFileNameEx(ARoot.Items[i].Value);
+    if Assigned(f) then
+      Add(f);
+  end;
+end;
+
+procedure TPackageContentFileReferenceList.LoadXML(ARoot: IXMLNode);
+var
+  i: Integer;
+  ANode: IXMLNode;
+  f: TPackageContentFile;
+begin
+  Clear;
+  for i := 0 to ARoot.ChildNodes.Count - 1 do
+  begin
+    ANode := ARoot.ChildNodes[i];
+    f := Package.Files.FromFileNameEx(ANode.Attributes[SXML_PackageKeyboardFont_Filename]);
+    if Assigned(f) then
+      Add(f);
+  end;
+end;
+
+procedure TPackageContentFileReferenceList.SaveJSON(ARoot: TJSONArray);
+var
+  i: Integer;
+begin
+  for i := 0 to Count - 1 do
+  begin
+    ARoot.Add(Items[i].FileName);
+  end;
+end;
+
+procedure TPackageContentFileReferenceList.SaveXML(ARoot: IXMLNode);
+var
+  i: Integer;
+  ANode: IXMLNode;
+begin
+  for i := 0 to Count - 1 do
+  begin
+    ANode := ARoot.AddChild(SXML_PackageKeyboardFont);
+    ANode.Attributes[SXML_PackageKeyboardFont_Filename] := Items[i].FileName;
   end;
 end;
 

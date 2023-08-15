@@ -49,6 +49,7 @@ const
   SHelpTopic_Context_WordlistEditor = 'context/wordlist-editor';
   SHelpTopic_Context_EditLanguageExample = 'context/edit-language-example';
   SHelpTopic_Context_EditRelatedPackage = 'context/edit-related-package';
+  SHelpTopic_Context_EditPackageWebFonts = 'context/edit-package-web-fonts';
 
   // For all .kmn language reference topics, prefix with this path:
   SHelpTopic_LanguageReference_Prefix = 'language/reference/';
