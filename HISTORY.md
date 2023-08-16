@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.161 alpha 2023-08-16
+
+*  (#9440)
+
 ## 17.0.160 alpha 2023-08-14
 
 * feat(core): limit max marker to 0xD7FF (#9448)
