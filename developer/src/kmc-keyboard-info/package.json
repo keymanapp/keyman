@@ -24,7 +24,8 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "dependencies": {
-    "@keymanapp/common-types": "*"
+    "@keymanapp/common-types": "*",
+    "@keymanapp/kmc-package": "*"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",

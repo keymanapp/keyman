@@ -69,17 +69,11 @@ export class KmpCompiler {
 
     if(kps.options) {
       kmp.options.executeProgram = kps.options?.executeProgram || undefined;
-      if(kps.options.graphicFile) {
-        kmp.options.graphicFile = /[/\\]?([^/\\]*)$/.exec(kps.options.graphicFile)[1];
-      }
-      kmp.options.msiFilename = kps.options.msiFileName;
-      kmp.options.msiOptions = kps.options.msiOptions;
-      if(kps.options.readMeFile) {
-        kmp.options.readmeFile = /[/\\]?([^/\\]*)$/.exec(kps.options.readMeFile)[1];
-      }
-      if(kps.options.licenseFile) {
-        kmp.options.licenseFile = /[/\\]?([^/\\]*)$/.exec(kps.options.licenseFile)[1];
-      }
+      kmp.options.graphicFile = kps.options.graphicFile || undefined;
+      kmp.options.msiFilename = kps.options.msiFileName || undefined;
+      kmp.options.msiOptions = kps.options.msiOptions || undefined;
+      kmp.options.readmeFile = kps.options.readMeFile || undefined;
+      kmp.options.licenseFile = kps.options.licenseFile || undefined;
     }
 
     //
@@ -361,6 +355,23 @@ export class KmpCompiler {
     if(failed) {
       return null;
     }
+
+    // Remove path data from file references in options
+
+    if(data.options.graphicFile) {
+      data.options.graphicFile = this.callbacks.path.basename(data.options.graphicFile);
+    }
+    if(data.options.readmeFile) {
+      data.options.readmeFile = this.callbacks.path.basename(data.options.readmeFile);
+    }
+    if(data.options.licenseFile) {
+      data.options.licenseFile = this.callbacks.path.basename(data.options.licenseFile);
+    }
+    if(data.options.msiFilename) {
+      data.options.msiFilename = this.callbacks.path.basename(data.options.msiFilename);
+    }
+
+    // Write kmp.json and kmp.inf
 
     zip.file(KMP_JSON_FILENAME, JSON.stringify(data, null, 2));
     if(hasKmpInf) {

@@ -2,7 +2,7 @@ import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m
 
 const Namespace = CompilerErrorNamespace.KeyboardInfoCompiler;
 // const SevInfo = CompilerErrorSeverity.Info | Namespace;
-const SevHint = CompilerErrorSeverity.Hint | Namespace;
+// const SevHint = CompilerErrorSeverity.Hint | Namespace;
 const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
@@ -42,8 +42,8 @@ export class KeyboardInfoCompilerMessages {
     `Compiling the .keyboard_info file requires a .kmp file for metadata.`);
   static ERROR_CannotBuildWithoutKmpFile = SevError | 0x0009;
 
-  static Hint_NoLicenseFound = () => m(this.HINT_NoLicenseFound,
-    `No license for the keyboard was found, marking as "Other" license. MIT license is required for publication to Keyman keyboards repository.`);
-  static HINT_NoLicenseFound = SevHint | 0x000A;
+  static Error_NoLicenseFound = () => m(this.ERROR_NoLicenseFound,
+    `No license for the keyboard was found. MIT license is required for publication to Keyman keyboards repository.`);
+  static ERROR_NoLicenseFound = SevError | 0x000A;
 }
 
