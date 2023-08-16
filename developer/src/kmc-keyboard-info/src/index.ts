@@ -104,10 +104,6 @@ export class KeyboardInfoCompiler {
         return null;
       }
       keyboard_info = {
-        // Only two fields that won't be automatically filled if file is not
-        // present
-        encodings: ['unicode'],
-        license: 'mit'
       };
     }
 
@@ -130,6 +126,10 @@ export class KeyboardInfoCompiler {
     // https://api.keyman.com/schemas/keyboard_info.schema.json
     // https://help.keyman.com/developer/cloud/keyboard_info/2.0
     //
+
+    // TODO: read LicenseFilename from .kps and verify (OR ADD TO KPS?)
+    // TODO: use mit license validation from feat/developer/compile-without-source-keyboard-info
+    keyboard_info.license = 'mit';
 
     keyboard_info.isRTL = keyboard_info.isRTL ?? !!jsFile?.match(/this\.KRTL=1/);
     if(!keyboard_info.isRTL) {
