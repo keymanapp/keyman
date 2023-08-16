@@ -58,14 +58,12 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 }
 
 -(void)loadCoreWrapperFromKmxFile:(NSString *)kmxFilePath {
-  NSLog(@"**SGS loading wrapper from kmx file: %@", kmxFilePath);
-  
   @try {
     _keymanCore = [[CoreWrapper alloc] initWithHelper:_coreHelper kmxFilePath:kmxFilePath];
-    NSLog(@"**SGS CoreWrapper id = %@", [self.keymanCore keyboardId]);
+    NSLog(@"loadCoreWrapperFromKmxFile, keyboardId = %@", [self.keymanCore keyboardId]);
   }
   @catch (NSException *exception) {
-    NSLog(@"**SGS failed to create keyboard for path '%@' with exception: %@", kmxFilePath, exception.description);
+    NSLog(@"loadCoreWrapperFromKmxFile, failed to create keyboard for path '%@' with exception: %@", kmxFilePath, exception.description);
   }
 }
 
@@ -140,14 +138,12 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
   if (!self.kmx)
       return nil;
 
-  NSLog(@"**SGS KME processEvent using CoreWrapper");
   // CoreWrapper returns an array of CoreAction objects
   NSArray *coreActions = [self.keymanCore processEvent:event];
   // TODO: make this nil assignment part of the conversion method
   if ([coreActions count] == 0) {
     return nil;
   } else {
-    NSLog(@"**SGS KME processEvent current context according to Core: %@", self.keymanCore.context);
     // update context from core
     [self.tmpCtxBuf setString:self.keymanCore.context];
     return coreActions;

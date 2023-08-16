@@ -95,9 +95,8 @@
     km_kbp_status result = km_kbp_keyboard_get_attrs(self.keyboard, &keyboardAttributes);
 
     if (result==KM_KBP_STATUS_OK) {
-      _keyboardVersion = [NSString stringWithCharacters:keyboardAttributes->version_string length:[CoreHelper unicharStringLength:keyboardAttributes->version_string]];
-      _keyboardId = [NSString stringWithCharacters:keyboardAttributes->id length:[CoreHelper unicharStringLength:keyboardAttributes->id]];
-
+      _keyboardVersion = [CoreHelper createNSStringFromUnicharString:keyboardAttributes->version_string];
+      _keyboardId = [CoreHelper createNSStringFromUnicharString:keyboardAttributes->id];
       NSLog(@"keyboardVersion = %@\n, keyboardId  = %@\n", _keyboardVersion, _keyboardId);
     } else {
       NSLog(@"km_kbp_keyboard_get_attrs() failed with result = %u\n", result );

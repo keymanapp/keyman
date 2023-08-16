@@ -490,7 +490,7 @@ NSRange _previousSelRange;
 
 - (NSArray*) processEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
   NSArray* actions = nil;
-  NSLog(@"***SGS processEventWithKeymanEngine, AppDelegate.currentModifierFlags = %lu, event.modifiers = %lu", (unsigned long)self.AppDelegate.currentModifierFlags, (unsigned long)event.modifierFlags);
+  NSLog(@"processEventWithKeymanEngine, AppDelegate.currentModifierFlags = %lu, event.modifiers = %lu", (unsigned long)self.AppDelegate.currentModifierFlags, (unsigned long)event.modifierFlags);
   if (self.AppDelegate.lowLevelEventTap != nil) {
       NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.AppDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:event.context characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
     actions = [self.kme processEvent:eventWithOriginalModifierFlags];
@@ -597,7 +597,6 @@ NSRange _previousSelRange;
 // we handle here should never be passed on to Keyman Engine for transform,
 // as it will be part of the output from the transform.
 - (BOOL)handleDeleteBackLowLevel:(NSEvent *)event {
-    NSLog(@"***SGS handleDeleteBackLowLevel");
     self.ignoreNextDeleteBackHighLevel = NO;
     if(event.keyCode == kVK_Delete && _legacyMode && [self pendingBuffer].length > 0) {
         BOOL updateEngineContext = YES;
@@ -737,7 +736,7 @@ NSRange _previousSelRange;
     unsigned short keyCode = event.keyCode;
     switch (keyCode) {
         case kVK_Delete:
-            NSLog(@"***SGS handleDefaultKeymanEngineActions kVK_Delete");
+            NSLog(@"handleDefaultKeymanEngineActions kVK_Delete");
             [self processUnhandledDeleteBack: sender updateEngineContext: &updateEngineContext];
             break;
 
@@ -757,7 +756,7 @@ NSRange _previousSelRange;
 
         case kVK_Return:
         case kVK_ANSI_KeypadEnter:
-            NSLog(@"***SGS handleDefaultKeymanEngineActions kVK_Return");
+            NSLog(@"handleDefaultKeymanEngineActions kVK_Return");
             charactersToAppend = @"\n";
             break;
 
@@ -800,8 +799,8 @@ NSRange _previousSelRange;
     NSRange selectedRange = [self getSelectionRangefromClient:client];
     NSInteger pos = selectedRange.location;
   
-    NSLog(@"***SGS delete at position %ld", (long)pos);
-    NSLog(@"***SGS _legacyMode: %s", _legacyMode?"yes":"no");
+    NSLog(@"delete at position %ld", (long)pos);
+    NSLog(@"_legacyMode: %s", _legacyMode?"yes":"no");
     if (!_legacyMode)
         [self deleteBack:n at: pos in: client];
     if (_legacyMode)
@@ -889,7 +888,7 @@ NSRange _previousSelRange;
 }
 
 - (BOOL)deleteBackLegacy:(NSUInteger)n at:(NSUInteger) pos with:(NSRange) selectedRange for:(NSEvent *) event {
-    NSLog(@"***SGS deleteBackLegacy");
+    NSLog(@"deleteBackLegacy");
    if (self.contextBuffer != nil && (pos == 0 || pos == NSNotFound)) {
         pos = self.contextBuffer.length + n;
     }
@@ -1024,7 +1023,7 @@ NSRange _previousSelRange;
 
     BOOL handled = [self handleEventWithKeymanEngine:event in: sender];
     if (event.type == NSKeyDown) {
-      NSLog(@"***SGS event, keycode: %u, characters='%@' handled by KeymanEngine: %@", event.keyCode, event.characters, handled?@"yes":@"no");
+      NSLog(@"event, keycode: %u, characters='%@' handled by KeymanEngine: %@", event.keyCode, event.characters, handled?@"yes":@"no");
     }
 
     return handled;
@@ -1033,7 +1032,7 @@ NSRange _previousSelRange;
 -(void)loadContext:(NSEvent *)event forClient:(id) client {
   NSString *contextString = nil;
   NSAttributedString *attributedString = nil;
-  NSLog(@"***SGS loadContext called.");
+  NSLog(@"loadContext called.");
 
   if ([self.cachedContext isInvalid]) {
     if (self.textCompatibility.canReadText) {
@@ -1048,7 +1047,7 @@ NSRange _previousSelRange;
       contextString = attributedString.string;
     }
     
-    NSLog(@"***SGS loadContext, new context='%@'", contextString);
+    NSLog(@"loadContext, new context='%@'", contextString);
     [self.cachedContext resetContext:contextString];
     [self.kme setCoreContext:contextString];
     }
@@ -1057,7 +1056,7 @@ NSRange _previousSelRange;
 -(void)checkClientTextCompatibility:(id) client {
   if(!self.textCompatibility) {
     _textCompatibility = [[TextCompatibilityCheck alloc]initWithClient:client applicationId:self.clientApplicationId];
-    NSLog(@"***SGS KMInputMethodHandler checkClientTextCompatibility: %@", self.textCompatibility);
+    NSLog(@"KMInputMethodHandler checkClientTextCompatibility: %@", self.textCompatibility);
   }
 }
 
@@ -1086,7 +1085,7 @@ NSRange _previousSelRange;
  */
 -(BOOL)applyKeymanCoreActions:(NSArray*)actions event: (NSEvent*)event client:(id) client {
   //TODO: remove lots of debug code
-  NSLog(@"***SGS applyKeymanCoreActions invoked, actions.count = %lu ", (unsigned long)actions.count);
+  NSLog(@"applyKeymanCoreActions invoked, actions.count = %lu ", (unsigned long)actions.count);
   NSLog(@"event = %@, client = %@, context.currentContext = %@", event, client, self.cachedContext.currentContext);
   NSString *contextBefore = [[NSString alloc] initWithString:self.cachedContext.currentContext];
   NSUInteger lengthBefore = _cachedContext.currentContext.length;
@@ -1111,7 +1110,7 @@ NSRange _previousSelRange;
   NSUInteger realLengthAfter =
       [_cachedContext.currentContext lengthOfBytesUsingEncoding:NSUTF32StringEncoding] / 4;
 
-  NSLog(@"***SGS applyActions, contextBefore = '%@', length = %lu, real length = %lu; contextAfter = '%@', length = %lu, real length = %lu", contextBefore, lengthBefore, realLengthBefore, contextAfter, lengthAfter, realLengthAfter);
+  NSLog(@"applyActions, contextBefore = '%@', length = %lu, real length = %lu; contextAfter = '%@', length = %lu, real length = %lu", contextBefore, lengthBefore, realLengthBefore, contextAfter, lengthAfter, realLengthAfter);
 
   return result.handledEvent;
 }

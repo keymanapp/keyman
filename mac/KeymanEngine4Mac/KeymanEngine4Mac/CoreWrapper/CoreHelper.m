@@ -32,25 +32,14 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
 @implementation CoreHelper
 
 +(unichar const *) createUnicharStringFromNSString:(NSString *)string {
-  NSString *stringWithNull = [string stringByAppendingString:@"\0"];
-  if ([string canBeConvertedToEncoding:NSUTF16LittleEndianStringEncoding]) {
-      NSData * data = [stringWithNull dataUsingEncoding:NSUTF16LittleEndianStringEncoding];
-      unichar const *ptr = (const unichar*)data.bytes;
-    return ptr;
-  } else {
-    NSLog(@"canBeConvertedToEncoding:NSUTF16LittleEndianStringEncoding = false");
+  NSString *nullTerminatedString = [string stringByAppendingString:@"\0"];
+  if (![nullTerminatedString canBeConvertedToEncoding:NSUTF16LittleEndianStringEncoding]) {
+    NSLog(@"createUnicharStringFromNSString, canBeConvertedToEncoding false for NSUTF16LittleEndianStringEncoding");
+    return nil;
   }
-
-  /*
-  //NSData *data = [string dataUsingEncoding:NSUTF16LittleEndianStringEncoding];
-  NSData *data = [string dataUsingEncoding:NSUTF16BigEndianStringEncoding];
-  NSLog(@"createUnicharStringFromNSString, data = %@", data);
-  unichar const *charsPtr = [data bytes];
-  for (int i=0; i<string.length; i++) {
-      NSLog(@"unichar %d:%C", i, charsPtr[i]);
-  }
-*/
-  return nil;
+  
+  NSData *data = [nullTerminatedString dataUsingEncoding:NSUTF16LittleEndianStringEncoding];
+  return (unichar const *) data.bytes;
 }
 
 +(NSString *) createNSStringFromUnicharString:(unichar const *)string {

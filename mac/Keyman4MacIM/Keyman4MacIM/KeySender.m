@@ -26,8 +26,6 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
   self = [super init];
   if (self) {
     _eventSource = CGEventSourceCreate(kCGEventSourceStatePrivate);
-    long sourceID = CGEventSourceGetSourceStateID(_eventSource);
-    NSLog(@"***SGS KeySender init, eventSource sourceID = %ld", sourceID);
   }
   return self;
 }
@@ -38,42 +36,23 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
   pid_t processId = app.processIdentifier;
   NSString *appName = app.localizedName;
 
-  NSLog(@"***SGS sendKeyDown keyCode %lu to app %@ with pid %d", (unsigned long)keyCode, appName, processId);
+  NSLog(@"sendKeyDown keyCode %lu to app %@ with pid %d", (unsigned long)keyCode, appName, processId);
 
   CGEventFlags KMEventModifierKeyman = 1 << 24;
 
   if (keyCode < 0x100) {
     CGEventRef cgevent = [event CGEvent];
-    //CGEventSourceRef source = CGEventCreateSourceFromEvent(cgevent);
-    //CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStatePrivate);
-    //CGEventSourceStateID eventSourceStateID = CGEventSourceGetSourceStateID(source);
-    //NSLog(@"***SGS send keyCode CGEventSourceStateID = %d", eventSourceStateID);
-
-//    void CGEventSetFlags(CGEventRef event, CGEventFlags flags);
-//    void CGEventSetSource(CGEventRef event, CGEventSourceRef source);
 
     // use source from event to generate new event
     CGEventSourceRef source = CGEventCreateSourceFromEvent(cgevent);
     CGEventRef keyDownEvent = CGEventCreateKeyboardEvent(source, (CGKeyCode)keyCode, true);
-    long sourceID = CGEventGetIntegerValueField(keyDownEvent, kCGEventSourceStateID);
-    NSLog(@"***SGS KeySender sendKeyDown, keyDownEvent kCGEventSourceStateID = %ld", sourceID);
-
-    CGEventSetIntegerValueField(keyDownEvent, kCGEventSourceUserData, 0xDEADC0DE);
-    long userData = CGEventGetIntegerValueField(keyDownEvent, kCGEventSourceUserData);
-    NSLog(@"***SGS KeySender sendKeyDown, keyDownEvent kCGEventSourceUserData = %lx", userData);
 
     CGEventFlags modifierFlags = CGEventGetFlags(keyDownEvent);
-    NSLog(@"***SGS sendKeyDown modifier before = %llx", modifierFlags);
     modifierFlags = modifierFlags | KMEventModifierKeyman;
     CGEventSetFlags(keyDownEvent, modifierFlags);
     modifierFlags = CGEventGetFlags(keyDownEvent);
-    NSLog(@"***SGS sendKeyDown modifier after update = %llx", modifierFlags);
 
-    //int64_t value = CGEventGetIntegerValueField(cgevent, kCGEventSourceUserData);
-    //NSLog(@"***SGS send keyCode CGEventGetIntegerValueField = %lld", value);
-    //value = 1234;
-    //CGEventSetIntegerValueField(keyDownEvent, kCGEventSourceUserData, value);
-    //NSLog(@"***SGS send keyCode new CGEventGetIntegerValueField = %lld", value);
+    // TODO: add version check
     CGEventPostToPid(processId, keyDownEvent);
     CFRelease(keyDownEvent);
 

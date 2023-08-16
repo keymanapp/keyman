@@ -79,28 +79,37 @@ ActionArrayOptimizer *optimizer;
   XCTAssertEqual(keymanModifierState, 0, @"Failed conversion of Mac Help key flag from Mac to Keyman cleared modifier state.");
 }
 
-- (void)testUnicharStringConversion_optionName_matchesLiteral {
-  NSString *keyString = @"option_ligature_ew";
+- (void)testConversionToUnicharString_optionName_matchesLiteral {
+  NSString *optionNameString = @"option_ligature_ew";
   unichar const * keyUnicharString = u"option_ligature_ew";
   
-  NSUInteger stringLength = [keyString lengthOfBytesUsingEncoding:NSUTF16StringEncoding];
+  NSUInteger stringLength = [optionNameString lengthOfBytesUsingEncoding:NSUTF16StringEncoding];
   
-  unichar const *  convertedKeyString = [CoreHelper createUnicharStringFromNSString: keyString];
-  NSData *dataFromConversion = [NSData dataWithBytes:convertedKeyString length:stringLength];
+  unichar const *  convertedString = [CoreHelper createUnicharStringFromNSString: optionNameString];
+  NSData *dataFromConversion = [NSData dataWithBytes:convertedString length:stringLength];
   NSData *dataFromLiteral = [NSData dataWithBytes:keyUnicharString length:stringLength];
   XCTAssertTrue([dataFromLiteral isEqualToData:dataFromConversion], @"Converted unichar string is not equal to literal unichar string.");
 }
 
-- (void)testUnicharStringConversion_integer_matchesLiteral {
-  NSString *keyString = @"1";
-  unichar const * keyUnicharString = u"1";
+- (void)testConversionToUnicharString_number_matchesLiteral {
+  NSString *numberString = @"1";
+  unichar const * unicharString = u"1";
   
-  NSUInteger stringLength = [keyString lengthOfBytesUsingEncoding:NSUTF16StringEncoding];
+  NSUInteger stringLength = [numberString lengthOfBytesUsingEncoding:NSUTF16StringEncoding];
   
-  unichar const *  convertedKeyString = [CoreHelper createUnicharStringFromNSString: keyString];
-  NSData *dataFromConversion = [NSData dataWithBytes:convertedKeyString length:stringLength];
-  NSData *dataFromLiteral = [NSData dataWithBytes:keyUnicharString length:stringLength];
+  unichar const *  convertedString = [CoreHelper createUnicharStringFromNSString: numberString];
+  NSData *dataFromConversion = [NSData dataWithBytes:convertedString length:stringLength];
+  NSData *dataFromLiteral = [NSData dataWithBytes:unicharString length:stringLength];
   XCTAssertTrue([dataFromLiteral isEqualToData:dataFromConversion], @"Converted unichar string is not equal to literal unichar string.");
+}
+
+- (void)testConversionFromUnicharString_optionName_matchesLiteral {
+  unichar const * unicharString = u"option_ligature_ew";
+  NSString *optionNameString = @"option_ligature_ew";
+
+  NSString *convertedString = [CoreHelper createNSStringFromUnicharString:unicharString];
+
+  XCTAssertTrue([convertedString isEqual:optionNameString], @"Converted unichar string is not equal to literal string.");
 }
 
 

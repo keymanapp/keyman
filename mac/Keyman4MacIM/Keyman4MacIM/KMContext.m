@@ -152,7 +152,7 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
   unsigned short keyCode = event.keyCode;
   switch (keyCode) {
     case kVK_Delete:
-      NSLog(@"***SGS applyUnhandledEvent kVK_Delete");
+      NSLog(@"applyUnhandledEvent kVK_Delete");
       [self deleteLastCodePoint];
       //[self processUnhandledDeleteBack: sender updateEngineContext: &updateEngineContext];
       break;
@@ -171,7 +171,7 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
     }
     case kVK_Return:
     case kVK_ANSI_KeypadEnter:
-      NSLog(@"***SGS applyUnhandledEvent kVK_Return");
+      NSLog(@"applyUnhandledEvent kVK_Return");
       [self addSubtring:@"\n"];
       break;
     default:
