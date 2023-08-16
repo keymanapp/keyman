@@ -149,6 +149,7 @@ type
     FExecuteProgram: WideString;
     FReadmeFile: TPackageContentFile;
     FGraphicFile: TPackageContentFile;
+    FLicenseFile: TPackageContentFile;
     FLoadLegacy: Boolean;
     procedure SetReadmeFile(const Value: TPackageContentFile);
     procedure SetExecuteProgram(Value: WideString);
@@ -157,6 +158,9 @@ type
     procedure GraphicRemoved(Sender: TObject;
       EventType: TPackageNotifyEventType; var FAllow: Boolean);
     procedure ReadmeRemoved(Sender: TObject;
+      EventType: TPackageNotifyEventType; var FAllow: Boolean);
+    procedure SetLicenseFile(const Value: TPackageContentFile);
+    procedure LicenseRemoved(Sender: TObject;
       EventType: TPackageNotifyEventType; var FAllow: Boolean);
   public
     constructor Create(APackage: TPackage); override;
@@ -173,6 +177,7 @@ type
     property ExecuteProgram: WideString read FExecuteProgram write SetExecuteProgram;
     property ReadmeFile: TPackageContentFile read FReadmeFile write SetReadmeFile;
     property GraphicFile: TPackageContentFile read FGraphicFile write SetGraphicFile;
+    property LicenseFile: TPackageContentFile read FLicenseFile write SetLicenseFile;
   end;
 
   { Package Information }
@@ -561,6 +566,7 @@ const
   SJSON_Options_ExecuteProgram = 'executeProgram';
   SJSON_Options_ReadMeFile = 'readmeFile';
   SJSON_Options_GraphicFile = 'graphicFile';
+  SJSON_Options_LicenseFile = 'licenseFile';
 
   SJSON_Registry = 'registry';
   SJSON_Registry_Root = 'root';
@@ -655,6 +661,9 @@ begin
   if Assigned(Source.GraphicFile)
     then GraphicFile := Package.Files.FromFileName(Source.GraphicFile.FileName)
     else GraphicFile := nil;
+  if Assigned(Source.LicenseFile)
+    then LicenseFile := Package.Files.FromFileName(Source.LicenseFile.FileName)
+    else LicenseFile := nil;
 end;
 
 constructor TPackageOptions.Create(APackage: TPackage);
@@ -668,6 +677,7 @@ destructor TPackageOptions.Destroy;
 begin
   ReadmeFile := nil;
   GraphicFile := nil;
+  LicenseFile := nil;
   inherited Destroy;
 end;
 
@@ -681,14 +691,21 @@ begin
   FGraphicFile := nil;
 end;
 
+procedure TPackageOptions.LicenseRemoved(Sender: TObject; EventType: TPackageNotifyEventType; var FAllow: Boolean);
+begin
+  FLicenseFile := nil;
+end;
+
 procedure TPackageOptions.LoadXML(ARoot: IXMLNode);
 begin
   FileVersion :=                XmlVarToStr(ARoot.ChildNodes['System'].ChildNodes['FileVersion'].NodeValue);
   ExecuteProgram :=             XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['ExecuteProgram'].NodeValue);
   ReadmeFile :=                 Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['ReadMeFile'].NodeValue));
   GraphicFile :=                Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['GraphicFile'].NodeValue));
+  LicenseFile :=                Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['LicenseFile'].NodeValue));
   if Assigned(ReadmeFile) then ReadmeFile.AddNotifyObject(ReadmeRemoved);
   if Assigned(GraphicFile) then GraphicFile.AddNotifyObject(GraphicRemoved);
+  if Assigned(LicenseFile) then LicenseFile.AddNotifyObject(LicenseRemoved);
 end;
 
 procedure TPackageOptions.SaveXML(ARoot: IXMLNode);
@@ -699,6 +716,8 @@ begin
     ARoot.ChildNodes['Options'].ChildNodes['ReadMeFile'].NodeValue := ReadmeFile.RelativeFileName;
   if Assigned(GraphicFile) then
     ARoot.ChildNodes['Options'].ChildNodes['GraphicFile'].NodeValue := GraphicFile.RelativeFileName;
+  if Assigned(LicenseFile) then
+    ARoot.ChildNodes['Options'].ChildNodes['LicenseFile'].NodeValue := LicenseFile.RelativeFileName;
 end;
 
 procedure TPackageOptions.LoadIni(AIni: TIniFile);
@@ -709,6 +728,7 @@ begin
   GraphicFile :=                Package.Files.FromFileName(AIni.ReadString('Package', 'GraphicFile', ''));
   if Assigned(ReadmeFile) then ReadmeFile.AddNotifyObject(ReadmeRemoved);
   if Assigned(GraphicFile) then GraphicFile.AddNotifyObject(GraphicRemoved);
+  // LicenseFile not supported in ini
 end;
 
 procedure TPackageOptions.LoadJSON(ARoot: TJSONObject);
@@ -722,8 +742,10 @@ begin
   ExecuteProgram :=             GetJsonValueString(FOptions, SJSON_Options_ExecuteProgram);
   ReadmeFile :=                 Package.Files.FromFileName(GetJsonValueString(FOptions, SJSON_Options_ReadMeFile));
   GraphicFile :=                Package.Files.FromFileName(GetJsonValueString(FOptions, SJSON_Options_GraphicFile));
+  LicenseFile :=                Package.Files.FromFileName(GetJsonValueString(FOptions, SJSON_Options_LicenseFile));
   if Assigned(ReadmeFile) then ReadmeFile.AddNotifyObject(ReadmeRemoved);
   if Assigned(GraphicFile) then GraphicFile.AddNotifyObject(GraphicRemoved);
+  if Assigned(LicenseFile) then LicenseFile.AddNotifyObject(LicenseRemoved);
 end;
 
 procedure TPackageOptions.SaveIni(AIni: TIniFile);
@@ -734,6 +756,7 @@ begin
     AIni.WriteString('Package', 'ReadMeFile', ReadmeFile.RelativeFileName);
   if Assigned(GraphicFile) then
     AIni.WriteString('Package', 'GraphicFile', GraphicFile.RelativeFileName);
+  // licenseFile not supported in ini
 end;
 
 procedure TPackageOptions.SaveJSON(ARoot: TJSONObject);
@@ -753,6 +776,8 @@ begin
     FOptions.AddPair(SJSON_Options_ReadMeFile, ReadmeFile.RelativeFileName);
   if Assigned(GraphicFile) then
     FOptions.AddPair(SJSON_Options_GraphicFile, GraphicFile.RelativeFileName);
+  if Assigned(LicenseFile) then
+    FOptions.AddPair(SJSON_Options_LicenseFile, LicenseFile.RelativeFileName);
 end;
 
 procedure TPackageOptions.SetExecuteProgram(Value: WideString);
@@ -777,6 +802,19 @@ begin
     if Value.Package <> Package then raise EPackageInfo.CreateFmt(SGraphicNotOwnedCorrectly, [Value]);
     FGraphicFile := Value;
     FGraphicFile.AddNotifyObject(GraphicRemoved);
+  end;
+end;
+
+procedure TPackageOptions.SetLicenseFile(const Value: TPackageContentFile);
+begin
+  if Assigned(FLicenseFile) then FLicenseFile.RemoveNotifyObject(LicenseRemoved);
+  if not Assigned(Value) then
+    FLicenseFile := nil
+  else
+  begin
+    if Value.Package <> Package then raise EPackageInfo.CreateFmt(SGraphicNotOwnedCorrectly, [Value]);
+    FLicenseFile := Value;
+    FLicenseFile.AddNotifyObject(LicenseRemoved);
   end;
 end;
 

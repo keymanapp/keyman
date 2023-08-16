@@ -77,6 +77,9 @@ export class KmpCompiler {
       if(kps.options.readMeFile) {
         kmp.options.readmeFile = /[/\\]?([^/\\]*)$/.exec(kps.options.readMeFile)[1];
       }
+      if(kps.options.licenseFile) {
+        kmp.options.licenseFile = /[/\\]?([^/\\]*)$/.exec(kps.options.licenseFile)[1];
+      }
     }
 
     //
