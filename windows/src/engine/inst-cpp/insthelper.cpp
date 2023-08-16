@@ -4,6 +4,20 @@
 #include <utility>
 #include <iostream>
 #include <msiquery.h>
+#include <knownfolders.h>
+#include <ShlObj_core.h>
+#include <security.h>
+#include <AccCtrl.h>
+
+std::wstring const SFolderKeymanRoot = L"Keyman";
+
+void convertWStringToCharPtr(_In_ std::wstring input, _Out_ char *outputString) {
+  size_t outputSize     = input.length() + 1;  // +1 for null terminator
+  outputString          = new char[outputSize];
+  size_t charsConverted = 0;
+  const wchar_t *inputW = input.c_str();
+  wcstombs_s(&charsConverted, outputString, outputSize, inputW, input.length());
+}
 
 std::string SysErrorMessage(DWORD errorCode) {
   // Declare a buffer to store the error message.
@@ -21,34 +35,57 @@ std::string SysErrorMessage(DWORD errorCode) {
   }
 }
 
-std::wstring GetFolderPath(REFGUID folderId) {
-  LPWSTR folderPath;
-  if (SUCCEEDED(SHGetKnownFolderPath(folderId, 0, NULL, &folderPath))) {
-    std::wstring path(folderPath);
-    CoTaskMemFree(folderPath);
-    return path;
-  }
-  return L"";
-}
-
 unsigned int ReportFailure(MSIHANDLE hInstall, std::string func, unsigned int code) {
   MsiSetProperty(
       hInstall, "EnginePostInstall_Error",
       (LPCWSTR)("Keyman Engine failed to set permissions on shared data in " + func + ": " + SysErrorMessage(code)));
 }
 
+void
+GrantPermissionToAllApplicationPackages(LPCTSTR lpFolderPath) {
+  SECURITY_ATTRIBUTES sa;
+  sa.nLength              = sizeof(sa);
+  sa.lpSecurityDescriptor = NULL;
+  sa.bInheritHandle       = FALSE;
+
+  TRUSTEE_W trustee;
+  trustee.TrusteeForm = TRUSTEE_IS_NAME;
+  trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
+  trustee.ptstrName   = L"ALL APPLICATION PACKAGES";
+
+  InitializeSecurityDescriptor(&sa.lpSecurityDescriptor, SECURITY_DESCRIPTOR_REVISION);
+  SetSecurityDescriptorGroup(&sa.lpSecurityDescriptor, &trustee, 0);
+
+  SetFileSecurity(lpFolderPath, DACL_SECURITY_INFORMATION, sa.lpSecurityDescriptor);
+}
+
 unsigned int EnginePostInstall(MSIHANDLE hInstall) {
   HANDLE hFile;
-  std::string Path;
+  std::wstring Path;
 
   try {
-    Path = GetFolderPath(CSIDL_COMMON_APPDATA) + SFolderKeymanRoot;
-    if (!DirectoryExists(Path)) {
-      if (!CreateDir(Path)) {
+    // Find %appdata% path
+    wchar_t appDataPath[MAX_PATH];
+    if (SHGetFolderPathW(NULL, CSIDL_APPDATA, NULL, 0, appDataPath) != S_OK) {
+      // Handle error
+      return 1;
+    }
+    std::wstring AppDataPath(appDataPath);
+
+    // Directory path
+    Path = AppDataPath + SFolderKeymanRoot;
+
+    // Create directory if it does not exist
+    struct stat dirMeta;
+    char *path;
+    convertWStringToCharPtr(Path, path);
+    if (stat(path, &dirMeta) != 0) {
+      if (!CreateDirectory(&Path[0], NULL)) {
         return ReportFailure(hInstall, "CreateDir", GetLastError());
       }
     }
 
+    // Create file
     hFile = CreateFile((LPCWSTR)Path.c_str(), READ_CONTROL | WRITE_DAC, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0);
     if (hFile == INVALID_HANDLE_VALUE) {
       return ReportFailure(hInstall, "CreateFile", GetLastError());
