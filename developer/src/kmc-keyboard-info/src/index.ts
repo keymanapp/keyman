@@ -53,7 +53,7 @@ export interface KeyboardInfoSources {
   kpsFilename: string;
 
   /** Last modification date for files in the project folder 'YYYY-MM-DDThh:mm:ssZ' */
-  lastCommitDate: string;
+  lastCommitDate?: string;
 };
 
 export class KeyboardInfoCompiler {
