@@ -23,7 +23,7 @@
       "languageName": "Khmer"
     }
   },
-  "description": "Khmer Unicode keyboard layout based on the NiDA keyboard layout. Automatically corrects many common keying errors.",
+  "description": "<p>Khmer Unicode keyboard layout based on the NiDA keyboard layout. Automatically corrects many common keying errors.</p>",
   "related": {
     "khmer10": {
       "deprecates": true

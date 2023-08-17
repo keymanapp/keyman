@@ -11,6 +11,7 @@ import { transcodeToCP1252 } from './cp1252.js';
 import { MIN_LM_FILEVERSION_KMP_JSON, PackageVersionValidator } from './package-version-validator.js';
 import { PackageKeyboardTargetValidator } from './package-keyboard-target-validator.js';
 import { PackageMetadataUpdater } from './package-metadata-updater.js';
+import { markdownToHTML } from './markdown.js';
 
 const KMP_JSON_FILENAME = 'kmp.json';
 const KMP_INF_FILENAME = 'kmp.inf';
@@ -246,26 +247,33 @@ export class KmpCompiler {
 
     // Helper functions
 
-  private kpsInfoToKmpInfo(info: KpsFile.KpsFileInfo): KmpJsonFile.KmpJsonFileInfo {
-    let ni: KmpJsonFile.KmpJsonFileInfo = {};
+  private kpsInfoToKmpInfo(kpsInfo: KpsFile.KpsFileInfo): KmpJsonFile.KmpJsonFileInfo {
+    let kmpInfo: KmpJsonFile.KmpJsonFileInfo = {};
 
-    const keys: [(keyof KpsFile.KpsFileInfo), (keyof KmpJsonFile.KmpJsonFileInfo)][] = [
-      ['author','author'],
-      ['copyright','copyright'],
-      ['name','name'],
-      ['version','version'],
-      ['webSite','website'],
-      ['description','description'],
+    const keys: [(keyof KpsFile.KpsFileInfo), (keyof KmpJsonFile.KmpJsonFileInfo), boolean][] = [
+      ['author','author',false],
+      ['copyright','copyright',false],
+      ['name','name',false],
+      ['version','version',false],
+      ['webSite','website',false],
+      ['description','description',true],
     ];
 
-    for (let [src,dst] of keys) {
-      if (info[src]) {
-        ni[dst] = {description: (info[src]._ ?? (typeof info[src] == 'string' ? info[src].toString() : '').trim())};
-        if(info[src].$ && info[src].$.URL) ni[dst].url = info[src].$.URL.trim();
+    for (let [src,dst,isMarkdown] of keys) {
+      if (kpsInfo[src]) {
+        kmpInfo[dst] = {
+          description: (kpsInfo[src]._ ?? (typeof kpsInfo[src] == 'string' ? kpsInfo[src].toString() : '')).trim()
+        };
+        if(isMarkdown) {
+          kmpInfo[dst].description = markdownToHTML(kmpInfo[dst].description, false).trim();
+        }
+        if(kpsInfo[src].$?.URL) {
+          kmpInfo[dst].url = kpsInfo[src].$.URL.trim();
+        }
       }
     }
 
-    return ni;
+    return kmpInfo;
   };
 
   private arrayWrap(a: unknown) {
