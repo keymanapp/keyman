@@ -51,6 +51,9 @@ export interface KeyboardInfoSources {
 
   /** The source package filename and relative path (.kps) */
   kpsFilename: string;
+
+  /** Last modification date for files in the project folder 'YYYY-MM-DDThh:mm:ssZ' */
+  lastCommitDate: string;
 };
 
 export class KeyboardInfoCompiler {
@@ -164,8 +167,8 @@ export class KeyboardInfoCompiler {
 
     this.fillLanguages(keyboard_info, kmpJsonData);
 
-    // TODO: use: TZ=UTC0 git log -1 --no-merges --date=format:%Y-%m-%dT%H:%M:%SZ --format=%ad
-    keyboard_info.lastModifiedDate = (new Date).toISOString();
+    // If a last commit date is not given, then just use the current time
+    keyboard_info.lastModifiedDate = sources.lastCommitDate ?? (new Date).toISOString();
 
     keyboard_info.packageFilename = this.callbacks.path.basename(sources.kmpFilename);
 
