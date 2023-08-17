@@ -173,13 +173,19 @@ block(bksp)
 block(disp)                         # struct COMP_KMXPLUS_DISP {
   64 69 73 70                       #   KMX_DWORD header.ident;   // 0000 Section name - disp
   sizeof(disp)                      #   KMX_DWORD header.size;    // 0004 Section length
-  01 00 00 00                       #   KMX_DWORD count;          // 0008 number of entries
+  02 00 00 00                       #   KMX_DWORD count;          // 0008 number of entries
   index(strNull,strElemBkspFrom2,2) #   KMX_DWORD baseCharacter   // 000C baseCharacter = 'e'
                                     # };
 
-                                    # only entry:
-  index(strNull,strA,2) #   KMX_DWORD to       // 000C baseCharacter = 'a'
+                                    # entry 0
+  index(strNull,strA,2)             #   KMX_DWORD to       // 000C baseCharacter = 'a'
+  index(strNull,strNull,2)          #   KMX_DWORD id 0
   index(strNull,strElemTranFrom1,2) #   KMX_DWORD display   // 000C baseCharacter = '^'
+
+                                    # entry 1
+  index(strNull,strNull,2)           #   KMX_DWORD to       // 000C baseCharacter = 'a'
+  index(strNull,strElemBkspFrom2,2) #   KMX_DWORD id  'e'
+  index(strNull,strElemTranFrom1b,2) #   KMX_DWORD display   '^e'
 
 
 
