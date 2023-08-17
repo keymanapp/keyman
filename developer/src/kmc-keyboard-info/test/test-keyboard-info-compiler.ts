@@ -4,7 +4,6 @@ import 'mocha';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { KeyboardInfoCompiler } from '../src/index.js';
-import { KmpCompiler } from '@keymanapp/kmc-package';
 
 const callbacks = new TestCompilerCallbacks();
 
@@ -19,18 +18,12 @@ describe('keyboard-info-compiler', function () {
     const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
     const buildKeyboardInfoFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.keyboard_info');
 
-    const kmpCompiler = new KmpCompiler(callbacks);
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
-
     const compiler = new KeyboardInfoCompiler(callbacks);
     const data = compiler.writeMergedKeyboardInfoFile({
       kmpFilename,
-      kmpJsonData,
-      keyboard_id: 'khmer_angkor',
       sourcePath: 'release/k/khmer_angkor',
       kpsFilename,
-      helpLink: 'https://help.keyman.com/keyboard/khmer_angkor',
-      keyboardFilenameJs: jsFilename,
+      jsFilename: jsFilename,
     });
     if(data == null) {
       callbacks.printMessages();
