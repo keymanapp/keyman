@@ -8,7 +8,6 @@ import { KmpCompiler } from '@keymanapp/kmc-package';
 import { calculateSourcePath } from '../../util/calculateSourcePath.js';
 
 const HelpRoot = 'https://help.keyman.com/keyboard/';
-const LICENSE_FILENAME = 'LICENSE.md';
 
 export class BuildKeyboardInfo extends BuildActivity {
   public get name(): string { return 'Keyboard metadata'; }
@@ -39,8 +38,6 @@ export class BuildKeyboardInfo extends BuildActivity {
       return false;
     }
 
-    const license = project.files.find(file => file.filename == LICENSE_FILENAME);
-
     const keyboard = findProjectFile(callbacks, project, KeymanFileTypes.Source.KeymanKeyboard);
     const kps = findProjectFile(callbacks, project, KeymanFileTypes.Source.Package);
     if(!keyboard || !kps)  {
@@ -57,15 +54,14 @@ export class BuildKeyboardInfo extends BuildActivity {
     const keyboardFileNameJs = project.resolveOutputFilePath(keyboard, KeymanFileTypes.Source.KeymanKeyboard, KeymanFileTypes.Binary.WebKeyboard);
     const keyboard_id = callbacks.path.basename(metadata.filename, KeymanFileTypes.Source.KeyboardInfo);
     const compiler = new KeyboardInfoCompiler(callbacks);
-    const data = compiler.writeMergedKeyboardInfoFile(project.resolveInputFilePath(metadata), {
+    const data = compiler.writeMergedKeyboardInfoFile({
       keyboard_id,
       kmpFilename:  project.resolveOutputFilePath(kps, KeymanFileTypes.Source.Package, KeymanFileTypes.Binary.Package),
       kmpJsonData,
       kpsFilename: project.resolveInputFilePath(kps),
       helpLink: HelpRoot + keyboard_id,
       keyboardFilenameJs: fs.existsSync(keyboardFileNameJs) ? keyboardFileNameJs : undefined,
-      sourcePath: calculateSourcePath(infile),
-      licenseFilename: license ? project.resolveInputFilePath(license) : undefined
+      sourcePath: calculateSourcePath(infile)
     });
 
     if(data == null) {
