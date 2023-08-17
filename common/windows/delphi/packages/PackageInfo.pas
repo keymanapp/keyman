@@ -514,6 +514,7 @@ const
   SPackageInfoTooNew = 'The package file is version %s.  This version can only read version '+SKeymanVersion+' and older files.';
   SReadmeNotOwnedCorrectly = 'The readme file ''%s'' referred to is not part of the package.';
   SGraphicNotOwnedCorrectly = 'The graphic file ''%s'' referred to is not part of the package.';
+  SLicenseNotOwnedCorrectly = 'The license file ''%s'' referred to is not part of the package.';
   SFileNotOwnedCorrectly = 'The file ''%s'' referred to is not part of the package.';
   SDisplayFontNotOwnedCorrectly = 'The display font file ''%s'' referred to is not part of the package.';
   SOSKFontNotOwnedCorrectly = 'The OSK font file ''%s'' referred to is not part of the package.';
@@ -812,7 +813,7 @@ begin
     FLicenseFile := nil
   else
   begin
-    if Value.Package <> Package then raise EPackageInfo.CreateFmt(SGraphicNotOwnedCorrectly, [Value]);
+    if Value.Package <> Package then raise EPackageInfo.CreateFmt(SLicenseNotOwnedCorrectly, [Value]);
     FLicenseFile := Value;
     FLicenseFile.AddNotifyObject(LicenseRemoved);
   end;
