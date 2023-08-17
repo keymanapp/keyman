@@ -23,7 +23,7 @@ describe('kpj-file-reader', function () {
     assert.equal(kpj.KeymanDeveloperProject.Options.CompilerWarningsAsErrors, 'True');
     assert.equal(kpj.KeymanDeveloperProject.Options.ProjectType, 'keyboard');
     assert.equal(kpj.KeymanDeveloperProject.Options.WarnDeprecatedCode, 'True');
-    assert.equal(kpj.KeymanDeveloperProject.Options.SkipMetadataFiles, 'True'); // because this is a 1.0 version file
+    assert.isUndefined(kpj.KeymanDeveloperProject.Options.SkipMetadataFiles); // because this is a 1.0 version file
     assert.isUndefined(kpj.KeymanDeveloperProject.Options.Version);
 
     assert.lengthOf(kpj.KeymanDeveloperProject.Files.File, 21);
