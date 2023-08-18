@@ -16,6 +16,7 @@ cpp_files = files(
     'filesystem.cpp',
     'mc_kmxfile.cpp',
     'mc_savekeyboard.cpp',
+    'mc_import_rules.cpp',
     'u16.cpp',)
 
 mcompile = executable(

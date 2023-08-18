@@ -30,13 +30,13 @@ int run(int argc, std::vector<std::u16string>  str_argv, char* argv[]);
 void KMX_LogError(const KMX_WCHART* m1, int m2 = 0);
 //void KMX_LogError(const KMX_WCHART* m1, int m2 = 0, LPKMX_KEY key =NULL);
 
-struct DeadkeyMapping {   // I4353
+struct KMX_DeadkeyMapping {   // I4353
   KMX_WCHAR deadkey, dkid;
   KMX_UINT shift;
   KMX_WORD vk;
 };
 
-extern std::vector<DeadkeyMapping> FDeadkeys;   // I4353
+extern std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;   // I4353
 
 
 //--------------------old 
