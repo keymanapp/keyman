@@ -329,43 +329,43 @@
             "key": [
               {
                 "id": "K_Q",
-                "text": "Q"
+                "text": "*Alt*"
               },
               {
                 "id": "K_W",
-                "text": "W"
+                "text": "*Ctrl*"
               },
               {
                 "id": "K_E",
-                "text": "E"
+                "text": "*Caps*"
               },
               {
                 "id": "K_R",
-                "text": "R"
+                "text": "*ABC*"
               },
               {
                 "id": "K_T",
-                "text": "T"
+                "text": "*abc*"
               },
               {
                 "id": "K_Y",
-                "text": "Y"
+                "text": "*123*"
               },
               {
                 "id": "K_U",
-                "text": "U"
+                "text": "*Symbol*"
               },
               {
                 "id": "K_I",
-                "text": "I"
+                "text": "*Currency*"
               },
               {
                 "id": "K_O",
-                "text": "O"
+                "text": "*Shifted*"
               },
               {
                 "id": "K_P",
-                "text": "P"
+                "text": "*AltGr*"
               }
             ]
           },
@@ -374,46 +374,44 @@
             "key": [
               {
                 "id": "K_A",
-                "text": "A",
+                "text": "*LAlt*",
                 "pad": 50
               },
               {
                 "id": "K_S",
-                "text": "S"
+                "text": "*RAlt*"
               },
               {
                 "id": "K_D",
-                "text": "D"
+                "text": "*LCtrl*"
               },
               {
                 "id": "K_F",
-                "text": "F"
+                "text": "*RCtrl*"
               },
               {
                 "id": "K_G",
-                "text": "G"
+                "text": "*LAltCtrl*"
               },
               {
                 "id": "K_H",
-                "text": "H"
+                "text": "*RAltCtrl*"
               },
               {
                 "id": "K_J",
-                "text": "J"
+                "text": "*LAltCtrlShift*"
               },
               {
                 "id": "K_K",
-                "text": "K"
+                "text": "*RAltCtrlShift*"
               },
               {
                 "id": "K_L",
-                "text": "L"
+                "text": "*AltShift*"
               },
               {
-                "id": "T_new_156",
-                "text": "",
-                "width": 10,
-                "sp": 10
+                "id": "T_new_232",
+                "text": "*CtrlShift*"
               }
             ]
           },
@@ -428,31 +426,31 @@
               },
               {
                 "id": "K_Z",
-                "text": "Z"
+                "text": "*AltCtrlShift*"
               },
               {
                 "id": "K_X",
-                "text": "X"
+                "text": "*LAltShift*"
               },
               {
                 "id": "K_C",
-                "text": "C"
+                "text": "*RAltShift*"
               },
               {
                 "id": "K_V",
-                "text": "V"
+                "text": "*RAltShift*"
               },
               {
                 "id": "K_B",
-                "text": "B"
+                "text": "*RCtrlShift*"
               },
               {
                 "id": "K_N",
-                "text": "N"
+                "text": "*RTLEnter*"
               },
               {
                 "id": "K_M",
-                "text": "M"
+                "text": "*LTREnter*"
               },
               {
                 "id": "K_PERIOD",
