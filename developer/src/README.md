@@ -9,6 +9,8 @@ Windows. Shared units are intended to live in common, however the following
 projects will need to be updated in the future.
 
 * buildpkg in Windows depends on various compiler units in multiple folders.
+  -- should be removed as part of 17.0.
+
 * kmbrowserhost in Windows is included as part of Keyman Developer.
 
 # Folders
