@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.162 alpha 2023-08-18
+
+*  (#9483)
+* fix(windows): allow QR share box to grow to edge of default configuration parent window (#9472)
+* chore(resources):  update CLDR to post-PRI (#9482)
+
 ## 17.0.161 alpha 2023-08-16
 
 *  (#9440)
