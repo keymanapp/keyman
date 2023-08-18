@@ -50,6 +50,10 @@ mcompile -d runs 4 important steps:
 
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]);
 
+bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp, std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327
+
+std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys; // I4353
+
 void KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch);
 void KMX_TranslateGroup(LPKMX_GROUP group, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch) ;
 void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch) ;
@@ -312,7 +316,13 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
     wprintf(L"ERROR: can't create one vector from both keyboards\n");
     return FALSE;
   }
-//test(All_Vector);
+
+  v_dw_3D complete_Vector;
+  bool writeVec_OK =  writeVectorToFile(All_Vector);
+  bool WriteFileOK =  writeFileToVector( complete_Vector,"/Projects/keyman/keyman/linux/mcompile/keymap/VectorFile.txt" );
+  bool isEqual= CompareVector_To_VectorOfFile( All_Vector, complete_Vector);
+  wprintf(L" vectors are equal: %i\n",isEqual);
+test(All_Vector);
 //--------------------------------------------------------------------------------
 
   const wchar_t* ERROR = L"   ";
@@ -334,7 +344,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
       else
         ERROR = L" ";
 
-      //printf(L"\n  DoConvert-read i:  %i \t(KMX_VKMap): %i (%c)  \t--->  vkUnderlying: %i (%c)    \tshiftstate[%i]: ( %i )   \t---- >  ch: %i (%c)  \t%ls  \t%ls\n" , i,(int) KMX_VKMap[i],(int)KMX_VKMap[i],  vkUnderlying,vkUnderlying, j, VKShiftState[j] ,  ch ,ch ,  ((int) vkUnderlying != (int) KMX_VKMap[i] ) ? L" *** ": L"", ERROR);
+    wprintf(L"  DoConvert-read i:  %i \t(KMX_VKMap): %i (%c)  \t--->  vkUnderlying: %i (%c)    \tshiftstate[%i]: ( %i )   \t---- >  ch: %i (%c)  \t%ls  \t%ls\n" , i,(int) KMX_VKMap[i],(int)KMX_VKMap[i],  vkUnderlying,vkUnderlying, j, VKShiftState[j] ,  ch ,ch ,  ((int) vkUnderlying != (int) KMX_VKMap[i] ) ? L" *** ": L"", ERROR);
       //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
       /*
       if(bDeadkeyConversion) {   // I4552
@@ -358,7 +368,7 @@ wprintf(L"\n##### KMX_ReportUnconvertedKeyboardRules of mcompile will start ####
 
   KMX_ReportUnconvertedKeyboardRules(kbd);
 /*
-  if(!ImportRules(kbid, kbd, &FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
+  if(!KMX_ImportRules(kbid, kbd, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
     return FALSE;
   }
 */
@@ -443,11 +453,11 @@ void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, KMX_UINT shift, KMX_
 void KMX_ReportUnconvertedKeyRule(LPKMX_KEY key) {
   if(key->ShiftFlags == 0) {
     //KMX_LogError(L"Did not find a match for mnemonic rule on line %d, + '%c' > ...", key->Line, key->Key);
-   wprintf(L" Sab Did not find a match for mnemonic rule on line %d, + '%c' > ...\n", key->Line, key->Key);
+   //wprintf(L" Sab Did not find a match for mnemonic rule on line %d, + '%c' > ...\n", key->Line, key->Key);
    //MX_LogError(L"Did not find a match for mnemonic rule on line %d,\n", key->Line);
   } else if(key->ShiftFlags & VIRTUALCHARKEY) {
     //KMX_LogError(L"Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...", key->Line, key->ShiftFlags, key->Key);
-    wprintf(L"SAB Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...\n", key->Line, key->ShiftFlags, key->Key);
+    //wprintf(L"SAB Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...\n", key->Line, key->ShiftFlags, key->Key);
     //KMX_LogError(L"Did not find a match for mnemonic virtual character key rule on line %d, \n", key->Line);
   }
 }
@@ -479,10 +489,8 @@ void KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
 
 
 /*
-bool ImportRules(WCHAR *kbid, LPKEYBOARD kp, std::vector<DeadkeyMapping> *FDeadkeys, BOOL bDeadkeyConversion); // I4353   // I4327
 BOOL ConvertKeyboardToUnicode(LPKEYBOARD kbd); // I4273
 
-std::vector<DeadkeyMapping> FDeadkeys; // I4353
 
 #define KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_MCOMPILE KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE ".mcompile"
 

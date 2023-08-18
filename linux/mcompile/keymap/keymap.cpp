@@ -117,8 +117,11 @@ KMX_DWORD convertNamesToValue(std::wstring tok_wstr){
   first[L"period"]         =   VK_PERIOD;     /* BE = 190 */
   first[L"slash"]          =   VK_SLASH;      /* BF = 191 */
   first[L"ssharp"]         =   VK_xDF;        /* DF = 223 ß  */
+  first[L"minus"]          =   VK_HYPHEN;     /* BD = 189  ? */
+  first[L"dead_acute"]     =   VK_ACCENT;     /* C0 = 192  ? */
+  first[L"space"]          =   VK_SPACE;      /* 20 =  32  ? */
 
- // _S2 ?? VK_SPACE,  VK_ACCENT, VK_HYPHEN, VK_QUOTE, VK_OEM_102,
+ // _S2 ?? VK_QUOTE, VK_OEM_102,
 
   if ( tok_wstr.size() == 1) {
     return (KMX_DWORD) ( *tok_wstr.c_str() );;
@@ -184,7 +187,7 @@ int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
         tokens_dw.push_back(tokens_int);
       }
 
-      //wprintf(L"  Keyval  %i:   %i (%c) --- %i (%c)  \n", tokens_dw[0],tokens_dw[1],tokens_dw[1], tokens_dw[2], tokens_dw[2]);
+      wprintf(L"  Keyval  %i:   %i (%c) --- %i (%c)  \n", tokens_dw[0],tokens_dw[1],tokens_dw[1], tokens_dw[2], tokens_dw[2]);
    
       // now push result to shift_states
       shift_states.push_back(tokens_dw);
@@ -368,4 +371,101 @@ bool test_single(v_dw_3D &V) {
   }
   wprintf(L"   +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
   return true;
+}
+
+ bool writeVectorToFile(v_dw_3D V) {
+  std::string TxtFileName  = "/Projects/keyman/keyman/linux/mcompile/keymap/VectorFile.txt" ;
+  WCHAR DeadKey;
+  std::ofstream TxTFile(TxtFileName);
+  //TxTFile << "\n kbid  <<  VKShiftState[j] <<  US VKMap[i] <<underlying <<  DE(incl Shiftstate) ch <<  DeadKey;\n";
+  //TxTFile << "\nname/Keycode  -- unshifted -- shift  -- altgr --  shift+altgr\n";
+  wprintf(L"   +++++++ dimensions of Vector after split_US_To_3D_Vector (languages..characters..shiftstates)\t\t %li..%li..%li\n", V.size(), V[0].size(),V[0][0].size());
+
+  for ( int i=0; i< V.size();i++)
+  {
+      for ( int j=0; j< V[i].size();j++)
+      {
+        for ( int k=0; k< V[i][j].size();k++)
+        {
+          TxTFile << V[i][j][k] <<"-";
+        }
+        TxTFile << "\n";
+      }
+    if( i<1)
+      TxTFile << "Language 2\n";
+  }
+  TxTFile.close();
+  return true;
+ }
+
+bool writeFileToVector(v_dw_3D& complete_Vector, const char* infile) {
+  FILE *fp;
+  char str[600];
+  std::vector<char> delim{' ', '[', ']', '}',  ';', '\t', '\n'};
+  v_str_1D complete_List;
+  v_dw_1D tokens_dw;
+  v_dw_2D shift_states;
+  int k = -1;
+
+  /* opening file for reading */
+  fp = fopen("/Projects/keyman/keyman/linux/mcompile/keymap/VectorFile.txt" , "r");
+  if(fp == NULL) {
+    perror("Error opening file");
+    return(-1);
+  }
+
+  while (fgets(str, 600, fp) != NULL) {
+    k++;
+    //puts(str);
+    complete_List.push_back(str);
+    if (strcmp(str, "Language 2\n") ==0){
+      complete_Vector.push_back(shift_states);
+      shift_states.clear();
+      continue;
+    }
+
+    // remove all unwanted char
+    for (int i = 0; i < (int)delim.size(); i++) {
+      complete_List[k].erase(remove(complete_List[k].begin(), complete_List[k].end(), delim[i]), complete_List[k].end());
+    }
+
+    // split into numbers ( delimiter -)
+    std::stringstream ss(complete_List[k]);
+    int end = complete_List[k].find("-");
+    while (end != -1) { // Loop until no delimiter is left in the string.
+      tokens_dw.push_back((DWORD)stoi(complete_List[k].substr(0, end)));
+      complete_List[k].erase(complete_List[k].begin(), complete_List[k].begin() + end + 1);
+      end = complete_List[k].find("-");
+    }
+    shift_states.push_back(tokens_dw);
+    tokens_dw.clear();
+  }
+  complete_Vector.push_back(shift_states);
+  shift_states.clear();
+
+  fclose(fp);
+  return(0);
+}
+
+bool CompareVector_To_VectorOfFile(v_dw_3D All_Vector,v_dw_3D File_Vector){
+  wprintf(L" #### CompareVector_To_VectorOfFile started: ");
+  wprintf(L" #### dimensions:  %i  %i  %i -- %i  %i  %i \n", All_Vector.size() ,All_Vector[0].size(), All_Vector[0][0].size(),File_Vector.size() ,File_Vector[0].size(), File_Vector[0][0].size());
+
+  if (!(All_Vector.size() == File_Vector.size()) )return false;
+  if (!(All_Vector[0].size() == File_Vector[0].size()))  return false;
+  if (!(All_Vector[0][0].size() == File_Vector[0][0].size())) return false;
+
+  wprintf(L" #### CompareVector_To_VectorOfFile dimensions OK \n");
+  for ( int i=0; i< All_Vector.size();i++) {
+    for ( int j=0; j< All_Vector[i].size();j++) {
+      for ( int k=0; k< All_Vector[i][j].size();k++){
+          wprintf(L" All_Vector[%i][%i][%i]: %i  File_Vector[i][j][k]\n", i,j,k, All_Vector[i][j][k], File_Vector[i][j][k]);
+          if(( All_Vector[i][j][k] == File_Vector[i][j][k])) return true;
+      }
+      return false;
+    }
+  }
+
+  wprintf(L" #### CompareVector_To_VectorOfFile ended \n");
+  return false;
 }

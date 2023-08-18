@@ -79,4 +79,9 @@ KMX_DWORD getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state
 bool test(v_dw_3D &V);
 bool test_single(v_dw_3D &V) ;
 
+
+bool writeVectorToFile(v_dw_3D V);
+bool writeFileToVector(v_dw_3D& complete_Vector, const char* infile);
+bool CompareVector_To_VectorOfFile(v_dw_3D All_Vector,v_dw_3D File_Vector);
+
 # endif /*KEYMAP_H*/
