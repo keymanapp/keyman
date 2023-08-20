@@ -10,8 +10,7 @@ ext.rootPath = '../../'
 apply from: "$rootPath/version.gradle"
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion "30.0.2"
+    compileSdkVersion 33
 
     // Don't compress kmp files so they can be copied via AssetManager
     aaptOptions {
