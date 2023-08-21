@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.163 alpha 2023-08-21
+
+* chore(web): Update keymanweb-osk.ttf to v. 3.0 (#9469)
+
 ## 17.0.162 alpha 2023-08-18
 
 *  (#9483)
