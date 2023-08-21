@@ -36,6 +36,9 @@ export default class SubkeyPopup implements RealizedGesture {
   public readonly baseKey: KeyElement;
   public readonly promise: Promise<KeyEvent>;
 
+  private initialX: number;
+  private initialY: number;
+
   // Resolves the promise that generated this SubkeyPopup.
   private resolver: (keyEvent: KeyEvent) => void;
 
@@ -269,7 +272,33 @@ export default class SubkeyPopup implements RealizedGesture {
   }
 
   updateTouch(input: InputEventCoordinate) {
-    this.currentSelection = null;
+    // For 'default' subkey handling, we want a small fudge factor.
+    if(this.initialX === undefined || this.initialY === undefined) {
+      this.initialX = input.x;
+      this.initialY = input.y;
+    }
+
+    const deltaX = this.initialX - input.x;
+    const deltaY = this.initialY - input.y;
+    const dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+    if(dist > 5) {
+      this.initialX = Number.MAX_SAFE_INTEGER; // it'll always exceed the threshold hereafter.
+      this.currentSelection = null;
+    } else {
+      // The function that calls this to perform subkey updates auto-unhighlights the active selection;
+      // make sure that highlighting is maintained if no new key was selected, but we haven't cancelled
+      // default-selection mode yet.
+      this.currentSelection.key.highlight(true);
+
+      // Even if we technically have a different subkey underneath the touchpoint, we're still in
+      // default-selection mode.  Require more movement before cancelling default-selection mode.
+      //
+      // Can occur for large subkey menus or when subkey menus are "constrained" within OSK bounds,
+      // as with the iOS app.
+      return;
+    }
+
     this.baseKey.key.highlight(false);
 
     for(let i=0; i < this.baseKey['subKeys'].length; i++) {
