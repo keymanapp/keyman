@@ -397,6 +397,7 @@ final class KMKeyboard extends WebView {
     if (action == MotionEvent.ACTION_UP) {
       // Cleanup popups. #6636
       dismissKeyPreview(0);
+      // TODO:  default subkey handling
       dismissSubKeysWindow();
     }
 
@@ -970,6 +971,7 @@ final class KMKeyboard extends WebView {
 
   @SuppressLint({"InflateParams", "ClickableViewAccessibility"})
   private void showSubKeys(Context context) {
+    // TODO:  we'll need to pre-select the default key if it exists here!
     if (subKeysList == null || subKeysWindow != null) {
       return;
     }
@@ -1060,6 +1062,7 @@ final class KMKeyboard extends WebView {
       // Helps keep things from totally breaking when the event handler triggering subkey menu
       // generation and the menu's event handler stop talking to each other.
       final ArrayList<HashMap<String, String>> subkeyList = subKeysList;
+      // NOTE:  keys are currently only executed from an actual 'click'.
       button.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -1117,6 +1120,7 @@ final class KMKeyboard extends WebView {
               break;
             }
           }
+          // TODO: Is there a default subkey?  If so, and we're still within the key-grid or similar, trigger it.
           dismissSubKeysWindow();
           return true;
         } else if (action == MotionEvent.ACTION_MOVE) {
