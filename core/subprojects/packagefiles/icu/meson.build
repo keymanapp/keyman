@@ -26,9 +26,8 @@ endif
 
 # per icudefs.mk.in:
 # "U_ATTRIBUTE_DEPRECATED is defined to hide warnings about deprecated API warnings."
-add_project_arguments('-DU_ATTRIBUTE_DEPRECATED=', '-DUCONFIG_USE_LOCAL=1', language: 'c')
-
-add_project_arguments('-DU_NOEXCEPT=', language: 'c')
+add_project_arguments('-DU_NOEXCEPT=', '-DU_ATTRIBUTE_DEPRECATED=', '-DUCONFIG_USE_LOCAL=1', language: 'c')
+add_project_arguments('-DU_NOEXCEPT=', '-DU_ATTRIBUTE_DEPRECATED=', '-DUCONFIG_USE_LOCAL=1', language: 'cpp')
 
 uconfig = configuration_data()
 
@@ -42,8 +41,12 @@ uconfig.set('UCONFIG_NO_IDNA', 1)
 uconfig.set('UCONFIG_NO_COLLATION', 1)
 uconfig.set('UCONFIG_NO_FORMATTING', 1)
 uconfig.set('UCONFIG_NO_TRANSLITERATION', 1)
-uconfig.set('UCONFIG_NO_REGULAR_EXPRESSIONS', 1) # TODO-LDML: Will probably want this for transforms #7375
+uconfig.set('UCONFIG_NO_REGULAR_EXPRESSIONS', 0) # want these for transforms #7375
 uconfig.set('UCONFIG_NO_SERVICE', 1)
+uconfig.set('U_OVERRIDE_CXX_ALLOCATION', 1)
+uconfig.set('UCONFIG_NO_CONVERSION', 1)
+uconfig.set('UCONFIG_USE_WINDOWS_LCID_MAPPING_API', 0)
+
 
 
 uconfig_local = configure_file(

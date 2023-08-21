@@ -1072,16 +1072,16 @@ COMP_KMXPLUS_USET_Helper::setUset(const COMP_KMXPLUS_USET *newUset) {
   return is_valid;
 }
 
-USet::USet(const COMP_KMXPLUS_USET_RANGE *newRange, size_t newCount)  {
+SimpleUSet::SimpleUSet(const COMP_KMXPLUS_USET_RANGE *newRange, size_t newCount)  {
   for (size_t i = 0; i < newCount; i++) {
     ranges.emplace_back(newRange[i].start, newRange[i].end);
   }
 }
 
-USet::USet() {
+SimpleUSet::SimpleUSet() {
 }
 
-bool USet::contains(km_kbp_usv ch) const {
+bool SimpleUSet::contains(km_kbp_usv ch) const {
   for (const auto &range : ranges) {
     if (range.start <= ch && range.end >= ch) {
       return true;
@@ -1091,7 +1091,7 @@ bool USet::contains(km_kbp_usv ch) const {
 }
 
 bool
-USet::valid() const {
+SimpleUSet::valid() const {
   // double check
   for (const auto &range : ranges) {
     if (!Uni_IsValid(range.start, range.end)) {
@@ -1103,7 +1103,7 @@ USet::valid() const {
 }
 
 void
-USet::dump() const {
+SimpleUSet::dump() const {
   DebugLog(" - USet size=%d", ranges.size());
   for (const auto &range : ranges) {
     if (range.start == range.end) {
@@ -1114,14 +1114,14 @@ USet::dump() const {
   }
 }
 
-USet
+SimpleUSet
 COMP_KMXPLUS_USET_Helper::getUset(KMXPLUS_USET i) const {
   if (!valid() || i >= uset->usetCount) {
     assert(false);
-    return USet(nullptr, 0); // empty set
+    return SimpleUSet(nullptr, 0); // empty set
   }
   auto &set = usets[i];
-  return USet(getRange(set.range), set.count);
+  return SimpleUSet(getRange(set.range), set.count);
 }
 
 const COMP_KMXPLUS_USET_RANGE *

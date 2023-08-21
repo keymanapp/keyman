@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Command, Option } from 'commander';
 import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
-import { InfrastructureMessages } from '../messages/messages.js';
+import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import { CompilerCallbacks, CompilerLogLevel } from '@keymanapp/common-types';
 import { AnalyzeOskCharacterUse, AnalyzeOskRewritePua } from '@keymanapp/kmc-analyze';
 import { BaseOptions } from '../util/baseOptions.js';

@@ -9,8 +9,7 @@ endif
 subdir('stubdata')
 subdir('common')
 
-# TODO-LDML: Not used now, will need for regex
-# subdir('i18n')
+subdir('i18n')
 
 ## Note: The following subdirs are not used by Keyman (at present)
 
