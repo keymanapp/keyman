@@ -235,6 +235,8 @@ export default class SubkeyPopup implements RealizedGesture {
     }
 
     if(bk) {
+      // Prevent sticky-highlighting should the default key be selected.
+      vkbd.keyPending?.key.highlight(false);
       vkbd.keyPending = bk;
       this.currentSelection = bk;
       // Subkeys never get key previews, so we can directly highlight the subkey.
