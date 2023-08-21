@@ -320,12 +320,10 @@ export class VarsItem extends Section {
 export class UnicodeSetItem extends VarsItem {
   constructor(id: string, value: string, sections: DependencySections, usetparser: UnicodeSetParser) {
     super(id, value, sections);
-    // TODO-LDML: err on max buffer size
     const needRanges = sections.usetparser.sizeUnicodeSet(value);
-    this.unicodeSet = sections.usetparser.parseUnicodeSet(value, needRanges);
-
-    // _unicodeSet may be null, indicating this is invalid.
-    // A message will have been set in that case.
+    if (needRanges >= 0) {
+      this.unicodeSet = sections.usetparser.parseUnicodeSet(value, needRanges);
+    } // otherwise: error (was recorded via callback)
   }
   unicodeSet?: UnicodeSet;
   valid() : boolean {
