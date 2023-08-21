@@ -2,6 +2,7 @@
  * Utilities for transform and marker processing
  */
 
+import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { MATCH_QUAD_ESCAPE, isOneChar, unescapeOneQuadString, unescapeString } from "../util/util.js";
 
 
@@ -20,6 +21,12 @@ function matchArray(str: string, match: RegExp) : string[] {
  * Common regex for an ID
  */
 const COMMON_ID = /^[0-9A-Za-z_]{1,32}$/;
+
+/** for use with markers, means an ordering can be determined */
+export interface OrderedStringList {
+  /** @returns the ordering of an item (0..), or -1 if not found */
+  getItemOrder(item : string) : number;
+}
 
 /**
  * Class for helping with markers
@@ -41,6 +48,24 @@ export class MarkerParser {
   public static readonly ANY_MARKER_ID = '.';
 
   /**
+   * Marker sentinel as a string - U+FFFF
+   */
+  public static readonly SENTINEL = String.fromCodePoint(constants.uc_sentinel);
+  /**
+   * Marker code as a string - U+0008
+   */
+  public static readonly MARKER_CODE = String.fromCodePoint(constants.marker_code);
+
+  /** Minimum ID (trailing code unit) */
+  public static readonly MIN_MARKER_INDEX = constants.marker_min_index;
+  /** Index meaning 'any marker' == `\m{.}` */
+  public static readonly ANY_MARKER_INDEX = constants.marker_any_index;
+  /** Maximum usable marker index */
+  public static readonly MAX_MARKER_INDEX = constants.marker_max_index;
+  /** Max count of markers */
+  public static readonly MAX_MARKER_COUNT = constants.marker_max_count;
+
+  /**
    * Pattern for matching a marker reference, OR the special marker \m{.}
    */
   public static readonly REFERENCE = /\\m{([0-9A-Za-z_]{1,32}|\.)}/g;
@@ -51,7 +76,39 @@ export class MarkerParser {
    * @returns `[]` or an array of all markers referenced
    */
   public static allReferences(str: string): string[] {
+    if (!str) {
+      return [];
+    }
     return matchArray(str, this.REFERENCE);
+  }
+
+  /** @returns string for marker #n */
+  public static markerOutput(n: number): string {
+    if (n < MarkerParser.MIN_MARKER_INDEX || n > MarkerParser.ANY_MARKER_INDEX) {
+      throw RangeError(`Internal Error: marker index out of range ${n}`);
+    }
+    return this.SENTINEL + this.MARKER_CODE + String.fromCharCode(n);
+  }
+
+  /** @returns all marker strings as sentinel values */
+  public static toSentinelString(s: string, markers?: OrderedStringList) : string {
+    if (!s) return s;
+    return s.replaceAll(this.REFERENCE, (sub, arg) => {
+      if (arg === MarkerParser.ANY_MARKER_ID) {
+        return MarkerParser.markerOutput(MarkerParser.ANY_MARKER_INDEX);
+      }
+      if (!markers) {
+        throw RangeError(`Internal Error: Could not find marker \\m{${arg}} (no markers defined)`);
+      }
+      const order = markers.getItemOrder(arg);
+      if (order === -1) {
+        throw RangeError(`Internal Error: Could not find marker \\m{${arg}}`);
+      } else if(order >= MarkerParser.MAX_MARKER_INDEX) {
+        throw RangeError(`Internal Error: marker \\m{${arg}} has out of range index ${order}`);
+      } else {
+        return MarkerParser.markerOutput(order+1);
+      }
+    });
   }
 }
 

@@ -29,10 +29,10 @@ BOOL UnloadDLLs(LPINTKEYBOARDINFO lpkbi);
 BOOL DeactivateDLLs(LPINTKEYBOARDINFO lpkbi);
 BOOL ActivateDLLs(LPINTKEYBOARDINFO lpkbi);
 
-/* Before keyman32/64 started using versioned dll names the IMX keyboard framework was written
+/* The IMX keyboard framework was written before keyman32/64 started using versioned dll names.
 Third party developers will have used the name "keyman32/64dll" so we need to honor that for these
-keyboards. We do this by having a proxy dll that forwards to the versioned keyman dll opened for this process
-We only want and need to do this if there is imx keyboard */
+keyboards. This is done by having a proxy dll that forwards to the versioned keyman dll opened for this process
+This is only needed if there is imx keyboard */
 
 BOOL IsIMWindow(HWND hwnd);
 

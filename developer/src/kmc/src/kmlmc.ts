@@ -8,7 +8,7 @@ import { Command } from 'commander';
 import { compileModel } from '@keymanapp/kmc-model';
 import { SysExits } from './util/sysexits.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
-import { NodeCompilerCallbacks } from './messages/NodeCompilerCallbacks.js';
+import { NodeCompilerCallbacks } from './util/NodeCompilerCallbacks.js';
 
 let inputFilename: string;
 const program = new Command();
@@ -28,7 +28,7 @@ if (!inputFilename) {
   exitDueToUsageError('Must provide a lexical model source file.');
 }
 
-const callbacks = new NodeCompilerCallbacks();
+const callbacks = new NodeCompilerCallbacks({logLevel: 'info'});
 
 let code = null;
 // Compile:

@@ -54,7 +54,6 @@
     <ClInclude Include="..\keyman32-ver\keyman64.h" />
     <ClInclude Include="..\keyman32-ver\keymancontrol.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\keynames.h" />
-    <ClInclude Include="..\keyman32-ver\keyman-debug-etw.h" />
     <ClInclude Include="..\keyman32-ver\keyeventsenderthread.h" />
     <ClInclude Include="..\keyman32-ver\keystate.h" />
     <ClInclude Include="..\keyman32-ver\kmprot.h" />
@@ -72,6 +71,7 @@
     <ClInclude Include="..\keyman32-ver\keymanengine.h" />
     <ClInclude Include="..\keyman32-ver\kmprocessactions.h" />
     <ClInclude Include="..\..\..\include\kmtip_guids.h" />
+    <ClInclude Include="..\keyman64\keyman-debug-etw.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Keyman64-ver.RC" />

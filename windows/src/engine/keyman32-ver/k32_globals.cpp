@@ -275,7 +275,6 @@ static char
 static wchar_t
   f_BaseKeyboardName[256] = L"",   // I4583
   f_BaseKeyboardNameAlt[64] = L"";   // I4583
-//  f_KMEngine_Rootpath[256] = L"";
 
 __declspec(align(8)) static UINT
   f_vk_prefix = 0;
@@ -389,16 +388,6 @@ BOOL Globals::InitSettings() {
     reg.CloseKey();
     SendDebugMessageFormat(0, sdmAIDefault, 0, "Globals::InitSettings - vk_prefix set in '" REGSZ_ZapVirtualKeyCode "' to %x" , f_vk_prefix);
   }
-
- // Read Keyman Root path will combine with above in the future just quickly hack in.
-  // if (reg.OpenKeyReadOnly(REGSZ_KeymanLM) &&
-  //     reg.ValueExists(REGSZ_RootPath)) {
-
-  //   if(reg.ReadString(REGSZ_RootPath, f_KMEngine_Rootpath, sizeof(f_KMEngine_Rootpath) / sizeof(f_KMEngine_Rootpath[0])))
-  //   reg.CloseKey();
-  //   SendDebugMessageFormat(0, sdmAIDefault, 0, "Globals::InitSettings - KMEngine_Rootpath is  %s" , f_KMEngine_Rootpath);
-  // }
-
   return TRUE;
 }
 

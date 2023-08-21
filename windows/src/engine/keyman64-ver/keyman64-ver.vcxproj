@@ -294,7 +294,6 @@
     <ClInclude Include="..\keyman32-ver\keyman64.h" />
     <ClInclude Include="..\keyman32-ver\keymancontrol.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\keynames.h" />
-    <ClInclude Include="..\keyman32-ver\keyman-debug-etw.h" />
     <ClInclude Include="..\keyman32-ver\keyeventsenderthread.h" />
     <ClInclude Include="..\keyman32-ver\keystate.h" />
     <ClInclude Include="..\keyman32-ver\kmprocessactions.h" />
@@ -310,6 +309,7 @@
     <ClInclude Include="..\keyman32-ver\testkeymanfunctioning.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\unicode.h" />
     <ClInclude Include="..\keyman32-ver\vkscancodes.h" />
+    <ClInclude Include="..\keyman64\keyman-debug-etw.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(KEYMAN_ROOT)\common\resources\bitmaps\arrow.bmp" />

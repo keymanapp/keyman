@@ -6,12 +6,13 @@
 
 build: version.res dirs pull-core
    $(MKVER_U) premake.in premake.mak
+	 $(MKVER_U) $(ROOT)\src\engine\keyman32-ver\keyman64-build-version.in $(ROOT)\src\engine\keyman32-ver\keyman64-build-version.h
 	 $(MKVER_U) keyman32-ver.in keyman32-ver.def
 	 $(MAKE) -fpremake.mak build
 
 clean: def-clean
-    $(MKVER_U) premake.in premake.mak
-    $(MAKE) -fpremake.mak clean
+     $(MKVER_U) premake.in premake.mak
+     $(MAKE) -fpremake.mak clean
 
 signcode:
     $(MKVER_U) premake.in premake.mak

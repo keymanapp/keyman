@@ -107,12 +107,6 @@
 
 # /engine/keyman32/
 /windows/src/engine/keyman32/Keyman32.opensdf
-/windows/src/engine/keyman32/*.obj
-/windows/src/engine/keyman32/*.cod
-/windows/src/engine/keyman32/*.pdb
-
-# /engine/keymanx64/
-/windows/src/engine/keymanx64/x64
 
 # /engine/kmcomapi/
 /windows/src/engine/kmcomapi/kmcomapi.tlb
@@ -198,3 +192,4 @@ lcov.info
 # /developer/src/test/auto/kmcomp/*.kvk
 # /developer/src/test/auto/kmcomp/*.kvk*
 # /developer/src/test/auto/kmcomp/*.txt
+

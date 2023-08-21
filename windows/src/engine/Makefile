@@ -5,9 +5,9 @@
 # ----------------------------------------------------------------------
 
 !ifdef NODELPHI
-TARGETS=keymanmc keyman32-ver keyman64-ver keymanx64 mcompile kmtip kmrefresh
+TARGETS=keymanmc keyman32 keyman32-ver keyman64 keyman64-ver keymanx64 mcompile kmtip kmrefresh
 !else
-TARGETS=keymanmc keyman32-ver kmcomapi keyman tsysinfox64 tsysinfo keyman64-ver keymanx64 mcompile inst kmtip kmrefresh
+TARGETS=keymanmc keyman32 keyman32-ver kmcomapi keyman tsysinfox64 tsysinfo keyman64 keyman64-ver keymanx64 mcompile inst kmtip kmrefresh
 !endif
 MANIFESTS=keyman tsysinfo tsysinfox64 keymanx64 mcompile
 CLEANS=clean-engine

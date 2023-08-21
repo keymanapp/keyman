@@ -1,6 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
-import { ElementParser, ElementSegment, ElementType, MarkerParser, VariableParser } from '../../src/ldml-keyboard/pattern-parser.js';
+import { ElementParser, ElementSegment, ElementType, MarkerParser, OrderedStringList, VariableParser } from '../../src/ldml-keyboard/pattern-parser.js';
+import { constants } from '@keymanapp/ldml-keyboard-constants';
+import { KMXFile } from '../../src/kmx/kmx.js';
 
 describe('Test of Pattern Parsers', () => {
   describe('should test MarkerParser', () => {
@@ -50,6 +52,61 @@ describe('Test of Pattern Parsers', () => {
       ]) {
         assert.deepEqual(MarkerParser.allReferences(str), [], `expected no markers: ${str}`);
       }
+    });
+    it('should be able to emit sentinel values', () => {
+      assert.equal(MarkerParser.markerOutput(295), '\uFFFF\u0008\u0127', 'Wrong sentinel value emitted');
+      assert.equal(MarkerParser.markerOutput(MarkerParser.ANY_MARKER_INDEX), '\uFFFF\u0008\uFFFE', 'Wrong sentinel value emitted for ffff');
+      assert.throws(() => MarkerParser.markerOutput(0)); // below MIN
+      assert.throws(() => MarkerParser.markerOutput(0x10000)); // above MAX
+    });
+    it('should be able to output sentinel strings', () => {
+      // with nothing (no markers)
+      assert.equal(
+        MarkerParser.toSentinelString(`No markers here!`),
+        `No markers here!`
+      );
+      assert.throws(() =>
+        MarkerParser.toSentinelString(`Marker \\m{sorryNoMarkers}`)
+      );
+      // with a custom class
+      class MyMarkers implements OrderedStringList {
+        getItemOrder(item: string): number {
+          const m : any = {
+            'a': 0,
+            'b': 1,
+            'c': 2,
+            'zzz': 0x2FFFFF,
+          };
+          const o = m[item];
+          if (o === undefined) return -1;
+          return o;
+        }
+      };
+      const markers = new MyMarkers();
+      assert.equal(MarkerParser.toSentinelString(
+        `No markers here!`, markers),
+        `No markers here!`
+      );
+      assert.equal(MarkerParser.toSentinelString(
+        `Give me \\m{a} and \\m{c}, or \\m{.}.`, markers),
+        `Give me \uFFFF\u0008\u0001 and \uFFFF\u0008\u0003, or \uFFFF\u0008\uFFFE.`
+      );
+      assert.throws(() =>
+        MarkerParser.toSentinelString(
+          `Want to see something funny? \\m{zzz}`, // out of range
+          markers
+        )
+      );
+      assert.throws(() =>
+        MarkerParser.toSentinelString(
+          `Want to see something sad? \\m{nothing}`, // non existent
+          markers
+        )
+      );
+    });
+    it('should match some marker constants', () => {
+      assert.equal(constants.uc_sentinel, KMXFile.UC_SENTINEL);
+      assert.equal(constants.marker_code, KMXFile.CODE_DEADKEY);
     });
   });
   describe('should test VariableParser', () => {

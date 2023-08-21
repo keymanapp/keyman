@@ -86,6 +86,9 @@ export function build_list(source_list: List, sect_strs: BUILDER_STRS): BUILDER_
  * @returns
  */
 export function build_list_index(sect_list: BUILDER_LIST, value: ListItem) : BUILDER_LIST_REF {
+  if (!value) { 
+    return 0; // empty list
+  }
   if(!(value instanceof ListItem)) {
     throw new Error('unexpected value '+ value);
   }

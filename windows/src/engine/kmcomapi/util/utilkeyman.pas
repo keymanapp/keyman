@@ -54,6 +54,8 @@ function PackageInstalled(const PackageName: string; var FIsAdmin: Boolean): Boo
 
 function GetKeyboardIconFileName(const KeyboardFileName: string): string;   // I3599
 
+function GetKeyman32Name: string;
+
 function GetKeymanInstallPath: string;
 
 function GetDefaultHKL: HKL;   // I3581   // I3619   // I3619
@@ -276,25 +278,17 @@ begin
 end;
 
 function GetKeyman32Name: string;
-var
-  Keyman32Name: string;
+
 begin
-  Keyman32Name := '';
+  Result := '';
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
     if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_Keyman32_Name) then
-        Keyman32Name := ReadString(SRegValue_Keyman32_Name);
+        Result := ReadString(SRegValue_Keyman32_Name);
   finally
     Free;
   end;
-
-  if Keyman32Name = '' then
-  begin
-    Keyman32Name := 'keyman32.dll';
-  end;
-
-  Result := Keyman32Name;
 
 end;
 
@@ -315,7 +309,7 @@ begin
   end;
   Result := IncludeTrailingPathDelimiter(RootPath);
   Keyman32Name := GetKeyman32Name;
-  if not FileExists(Result + Keyman32Name) then
+  if (Keyman32Name = '') or not FileExists(Result + Keyman32Name) then
     raise EKeymanNotInstalled.Create( 'The executable '+Keyman32Name+' could not '+
       'be found.  You should reinstall.');
 end;

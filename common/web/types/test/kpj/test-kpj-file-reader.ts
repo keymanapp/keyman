@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import 'mocha';
 import {assert} from 'chai';
-import { loadSchema, makePathToFixture } from '../helpers/index.js';
+import { makePathToFixture } from '../helpers/index.js';
 import { KPJFileReader } from "../../src/kpj/kpj-file-reader.js";
 import { KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from '../../src/kpj/keyman-developer-project.js';
 import { TestCompilerCallbacks } from '../helpers/TestCompilerCallbacks.js';
@@ -16,7 +16,7 @@ describe('kpj-file-reader', function () {
     const reader = new KPJFileReader(callbacks);
     const kpj = reader.read(input);
     assert.doesNotThrow(() => {
-      reader.validate(kpj, loadSchema('kpj'));
+      reader.validate(kpj);
     });
     assert.equal(kpj.KeymanDeveloperProject.Options.BuildPath, '$PROJECTPATH\\build');
     assert.equal(kpj.KeymanDeveloperProject.Options.CheckFilenameConventions, 'False');
@@ -75,7 +75,7 @@ describe('kpj-file-reader', function () {
     assert.isTrue(project.options.warnDeprecatedCode);
     assert.equal(project.options.version, '1.0');
 
-    assert.lengthOf(project.files, 2);
+    assert.lengthOf(project.files, 3);
 
     let f: KeymanDeveloperProjectFile10 = <KeymanDeveloperProjectFile10>project.files[0];
     assert.equal(f.id, 'id_f347675c33d2e6b1c705c787fad4941a');

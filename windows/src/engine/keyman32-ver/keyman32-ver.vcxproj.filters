@@ -210,9 +210,6 @@
     <ClInclude Include="k32_tsf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="keyman-debug-etw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="keyeventsenderthread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -241,6 +238,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\kmtip_guids.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\keyman32\keyman-debug-etw.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
