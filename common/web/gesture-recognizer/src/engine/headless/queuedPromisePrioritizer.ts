@@ -104,9 +104,9 @@ export class QueuedPromisePrioritizer {
      */
     this.currentSyncPromise = null;
 
-    // // #1 - make sure our sync set isn't deferred pending completion of a different syncSet.
-      // #2 - if we're not the highest priority here... re-defer to let the higher-priority
-      //      entries go first.
+    // #1 - make sure our sync set isn't deferred pending completion of a different syncSet.
+    // #2 - if we're not the highest priority here... re-defer to let the higher-priority
+    //      entries go first.
     while(this.setQueue[0].entries[0] != entry) {
       await syncSet.promise;
     }
@@ -119,7 +119,7 @@ export class QueuedPromisePrioritizer {
       this.setQueue.splice(0, 1);
     }
 
-    // And we're in the clear!
-    return;
+    // And we're in the clear!  We can let the function `await`ing completion of this call
+    // proceed now that we've done all necessary bookkeeping.
   }
 }
