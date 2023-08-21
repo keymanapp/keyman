@@ -71,8 +71,6 @@ export class CompilerMessages {
       return `id='${o.id}'`;
     } else if (o.to) {
       return `to='${o.to}'`;
-    } else if(o.id) {
-      return `id='${o.id}'`;
     } else {
       return '';
     }
