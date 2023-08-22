@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.164 alpha 2023-08-22
+
+* fix(common): don't crash on illegal unicodesets (#9492)
+
 ## 17.0.163 alpha 2023-08-21
 
 * chore(web): Update keymanweb-osk.ttf to v. 3.0 (#9469)
