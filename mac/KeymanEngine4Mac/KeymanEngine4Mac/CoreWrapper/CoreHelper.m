@@ -103,12 +103,22 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
     keymanModifiers |= KM_KBP_MODIFIER_CTRL;
   }
   
+  if ([self isCapsLockKey:modifiers]) {
+    keymanModifiers |= KM_KBP_MODIFIER_CAPS;
+  } else {
+    keymanModifiers |= KM_KBP_MODIFIER_NOCAPS;
+  }
+  
   NSLog(@"macToKeymanModifier result  = %u", (unsigned int)keymanModifiers);
   return keymanModifiers;
 }
 
 -(BOOL)isShiftKey:(NSEventModifierFlags) modifiers {
   return (modifiers & NSEventModifierFlagShift) == NSEventModifierFlagShift;
+}
+
+-(BOOL)isCapsLockKey:(NSEventModifierFlags) modifiers {
+  return (modifiers & NSEventModifierFlagCapsLock) == NSEventModifierFlagCapsLock;
 }
 
 -(BOOL)isLeftControlKey:(NSEventModifierFlags) modifiers {
