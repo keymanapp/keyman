@@ -391,8 +391,9 @@ static_assert(sizeof(struct COMP_KMXPLUS_VKEY) == LDML_LENGTH_VKEY, "mismatched 
    ------------------------------------------------------------------ */
 
 struct COMP_KMXPLUS_DISP_ENTRY {
-    KMX_DWORD_unaligned to;
-    KMX_DWORD_unaligned display;
+    KMXPLUS_STR to;
+    KMXPLUS_STR id;
+    KMXPLUS_STR display;
 };
 
 struct COMP_KMXPLUS_DISP {

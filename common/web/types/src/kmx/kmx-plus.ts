@@ -418,6 +418,7 @@ export class Vkey extends Section {
 // 'disp'
 export class DispItem {
   to: StrsItem;
+  id: StrsItem;
   display: StrsItem;
 };
 
@@ -669,6 +670,7 @@ export class KMXPlusFile extends KMXFile {
     // 'disp'
     this.COMP_PLUS_DISP_ITEM = new r.Struct({
       to: STR_REF,
+      id: STR_REF,
       display: STR_REF,
     });
 

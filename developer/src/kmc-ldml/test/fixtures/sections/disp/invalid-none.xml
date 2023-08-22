@@ -3,13 +3,11 @@
 <!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
 <keyboard locale="mt" conformsTo="techpreview">
   <names>
-    <name value="disp-maximal" />
+    <name value="disp-invalid" />
   </names>
 
   <displays>
-    <display id="g" display="(g)"/>
-    <display to="f" display="(f)"/> <!-- Note: in opposite lexical order, as the compiler will sort -->
-    <display to="e" display="(e)"/>
+    <display display="(f)"/> <!-- Neither to nor id -->
     <displayOptions baseCharacter="x" />
   </displays>
 </keyboard>
