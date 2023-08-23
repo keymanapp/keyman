@@ -41,8 +41,8 @@ from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-ke
 
   <transforms type="simple">
     <transformGroup>
-      <transform from="([abc])`([def])" to="$2`$1"/> <!-- flip the order:   a`e -> e`a -->
-      <transform from="($[upper])`" to="$[1:lower]"/>
+      <transform from="([abc])`([def])" to="$2`$1"/> <!-- flip the order:   a`e » e`a -->
+      <transform from="($[upper])`" to="$[1:lower]"/> <!-- Lowercase (and drop grave): A` » a -->
     </transformGroup>
   </transforms>
 </keyboard>

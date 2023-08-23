@@ -408,6 +408,7 @@ transform_entry::transform_entry(const std::u32string &from, const std::u32strin
   init();
 }
 
+// TODO-LDML: How do we return errors from here?
 transform_entry::transform_entry(
     const std::u32string &from,
     const std::u32string &to,
@@ -442,6 +443,7 @@ transform_entry::transform_entry(
     KMX_DWORD fromLength, toLength;
     auto *fromList = kplus.elem->getElementList(fromVar->elem, fromLength);
     auto *toList   = kplus.elem->getElementList(toVar->elem, toLength);
+    assert(fromLength == toLength);
     assert(fromList != nullptr);
     assert(toList   != nullptr);
 
@@ -492,14 +494,12 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
   // extract..
   const icu::UnicodeString substr = matchustr.tempSubStringBetween(matchStart, matchEnd);
   // preflight to UTF-32 to get length
-  UErrorCode substrStatus = U_ZERO_ERROR;
+  UErrorCode substrStatus = U_ZERO_ERROR; // throwaway status
+  // we need the UTF-32 matchLen for our return.
   auto matchLen = substr.toUTF32(nullptr, 0, substrStatus);
-  assert(matchLen > 0);
-  if (matchLen == 0) {
-    return 0;
-  }
-  // Now, we have a matchLen.
 
+  // should have matched something.
+  assert(matchLen > 0);
 
   // now, do the replace.
 
@@ -512,16 +512,47 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     const std::u16string rstr = km::kbp::kmx::u32string_to_u16string(fTo);
     rustr  = icu::UnicodeString(rstr.data(), (int32_t)rstr.length());
   } else {
-    // 'from' matched the set named in fMatchFrom, and 'to' the set named in fMatchTo.
-    // 1. first, we need to find the index in the source set.
-    // TODO..
+    // Set map case: mapping from/to
+
+    // we actually need the group(1) string here.
+    // this is only the content in parenthesis ()
+    icu::UnicodeString group1 = matcher->group(1, status);
+    assert(U_SUCCESS(status)); // TODO-LDML: could be a malformed from pattern
+    // now, how long is group1 in UTF-32, hmm?
+    UErrorCode preflightStatus = U_ZERO_ERROR; // throwaway status
+    auto group1Len             = group1.toUTF32(nullptr, 0, preflightStatus);
+    char32_t *s                = new char32_t[group1Len + 1];
+    assert(s != nullptr); // TODO-LDML: OOM
+    // convert
+    substr.toUTF32((UChar32 *)s, group1Len + 1, status);
+    assert(U_SUCCESS(status));
+    std::u32string match32(s, group1Len); // taken from just group1
+    // clean up buffer
+    delete [] s;
+
+    // Now we're ready to do the actual mapping.
+
+    // 1., we need to find the index in the source set.
+    auto matchIndex = findIndexFrom(match32);
+    assert(matchIndex != -1L); // TODO-LDML: not matching shouldn't happen, the regex wouldn't have matched.
+    // we already asserted on load that the from and to sets have the same cardinality.
+
+    // 2. get the target string, convert to utf-16
+    // we use the same matchIndex that was just found
+    const std::u16string rstr = km::kbp::kmx::u32string_to_u16string(fMapToList.at(matchIndex));
+
+    // 3. update the UnicodeString for replacement
+    rustr  = icu::UnicodeString(rstr.data(), (int32_t)rstr.length());
+    // and we return to the regular code flow.
   }
+  // here we replace the match output.
   icu::UnicodeString entireOutput = matcher->replaceFirst(rustr, status);
   assert(U_SUCCESS(status)); // TODO-LDML: could fail here due to bad input (syntax err)
+
   // entireOutput includes all of 'input', but modified. Need to substring it.
   icu::UnicodeString outu = entireOutput.tempSubString(matchStart);
 
-  // Special case if there's no output
+  // Special case if there's no output, save some allocs
   if (outu.length() == 0) {
     output.clear();
   } else {
@@ -542,6 +573,20 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     delete [] s;
   }
   return matchLen;
+}
+
+int32_t transform_entry::findIndexFrom(const std::u32string &match) const {
+  return findIndex(match, fMapFromList);
+}
+
+int32_t transform_entry::findIndex(const std::u32string &match, const std::deque<std::u32string> list) {
+  int32_t index = 0;
+  for(auto e = list.begin(); e < list.end(); e++, index++) {
+    if (match == *e) {
+      return index;
+    }
+  }
+  return -1; // not found
 }
 
 any_group::any_group(const transform_group &g) : type(any_group_type::transform), transform(g), reorder() {

@@ -112,10 +112,15 @@ private:
 
   const KMX_DWORD fMapFromStrId;
   const KMX_DWORD fMapToStrId;
-  std::list<std::u32string> fMapFromList;
-  std::list<std::u32string> fMapToList;
+  std::deque<std::u32string> fMapFromList;
+  std::deque<std::u32string> fMapToList;
   /** Internal function to setup pattern string */
   void init();
+  /** @returns the index of the item in the fMapFromList list, or -1 */
+  int32_t findIndexFrom(const std::u32string &match) const;
+public:
+  /** @returns the index of the item in the list, or -1 */
+  static int32_t findIndex(const std::u32string &match, const std::deque<std::u32string> list);
 };
 
 /**
