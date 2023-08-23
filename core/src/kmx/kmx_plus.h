@@ -12,6 +12,7 @@
 #include <kmx_file.h>
 #include <ldml/keyboardprocessor_ldml.h>
 #include <list>
+#include <deque>
 
 namespace km {
 namespace kbp {
@@ -47,6 +48,7 @@ struct COMP_KMXPLUS_TRAN;
 struct COMP_KMXPLUS_TRAN_GROUP;
 struct COMP_KMXPLUS_TRAN_TRANSFORM;
 struct COMP_KMXPLUS_TRAN_REORDER;
+struct COMP_KMXPLUS_STRS;
 
 struct COMP_KMXPLUS_HEADER {
   KMXPLUS_IDENT ident;       // 0000 Section name
@@ -103,6 +105,16 @@ struct COMP_KMXPLUS_ELEM_ELEMENT {
    * @return std::u16string
    */
   std::u16string get_element_string() const;
+
+  /**
+   * @brief load this[0]…this[length] as a string list
+   * @param length number of elements, including this one
+   * @return the string elements as a string array
+  */
+  std::list<std::u32string> loadAsStringList(KMX_DWORD length, const km::kbp::kmx::COMP_KMXPLUS_STRS &strs) const;
+
+  /** @return element type */
+  KMX_DWORD type() const;
 };
 
 struct COMP_KMXPLUS_ELEM_ENTRY {
@@ -341,21 +353,23 @@ struct COMP_KMXPLUS_BKSP : public COMP_KMXPLUS_TRAN {
 
 struct COMP_KMXPLUS_VARS_ITEM {
     KMX_DWORD_unaligned type;
-    KMX_DWORD_unaligned id;
-    KMX_DWORD_unaligned value;
-    KMX_DWORD_unaligned elem;
+    KMXPLUS_STR id;
+    KMXPLUS_STR value;
+    KMXPLUS_ELEM elem;
 };
 
 struct COMP_KMXPLUS_VARS {
   static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_VARS;
   COMP_KMXPLUS_HEADER header;
-  KMX_DWORD_unaligned markers;
+  KMXPLUS_LIST markers;
   KMX_DWORD_unaligned varCount;
   COMP_KMXPLUS_VARS_ITEM varEntries[];
   /**
    * @brief True if section is valid.
    */
   bool valid(KMX_DWORD length) const;
+
+  const COMP_KMXPLUS_VARS_ITEM *findByStringId(KMX_DWORD strId) const;
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_VARS) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");

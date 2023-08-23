@@ -13,6 +13,7 @@
 #include "ldml/keyboardprocessor_ldml.h"
 
 #include <assert.h>
+#include "kmx_plus.h"
 
 namespace km {
 namespace kbp {
@@ -386,11 +387,35 @@ COMP_KMXPLUS_ELEM::getElementList(KMX_DWORD elementNumber, KMX_DWORD &length) co
 
 std::u16string
 COMP_KMXPLUS_ELEM_ELEMENT::get_element_string() const {
-  assert((flags & LDML_ELEM_FLAGS_TYPE) == LDML_ELEM_FLAGS_TYPE_CHAR); // should only be called on char
+  assert(type() == LDML_ELEM_FLAGS_TYPE_CHAR); // should only be called on char
   return COMP_KMXPLUS_STRS::str_from_char(element);
 }
 
-// Note: shared with subclass COMP_KMXPLUS_BKSP
+std::list<std::u32string>
+COMP_KMXPLUS_ELEM_ELEMENT::loadAsStringList(KMX_DWORD length, const COMP_KMXPLUS_STRS &strs) const {
+  std::list<std::u32string> list;
+  for (KMX_DWORD i = 0; i<length; i++) {
+    const auto &o = this[i];
+    std::u32string str;
+    if (type() == LDML_ELEM_FLAGS_TYPE_STR) {
+      // fetch the string
+      const auto str16 = strs.get(o.element);
+      str = km::kbp::kmx::u16string_to_u32string(str16);
+    } else {
+      // single char
+      str = std::u32string(1, (km_kbp_usv)o.element);
+    }
+    list.emplace_back(str);
+  }
+  return list;
+}
+
+KMX_DWORD
+COMP_KMXPLUS_ELEM_ELEMENT::type() const {
+  return (flags & LDML_ELEM_FLAGS_TYPE);
+}
+
+  // Note: shared with subclass COMP_KMXPLUS_BKSP
 bool
 COMP_KMXPLUS_TRAN::valid(KMX_DWORD _kmn_unused(length)) const {
   if (header.size < sizeof(*this) + (sizeof(COMP_KMXPLUS_TRAN_GROUP) * groupCount) +
@@ -1247,6 +1272,19 @@ COMP_KMXPLUS_VARS::valid(KMX_DWORD _kmn_unused(length)) const {
   }
   return true;
 }
+
+const COMP_KMXPLUS_VARS_ITEM *COMP_KMXPLUS_VARS::findByStringId(KMX_DWORD strId) const {
+  if (strId == 0) {
+    return nullptr;
+  }
+  for (KMX_DWORD index = 0; index < varCount; index++) {
+    if (varEntries[index].id == strId) {
+      return &(varEntries[index]);
+    }
+  }
+  return nullptr;
+}
+
 
 
 }  // namespace kmx

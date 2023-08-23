@@ -392,18 +392,72 @@ reorder_group::apply(std::u32string &str) const {
   return applied;
 }
 
-transform_entry::transform_entry(const transform_entry &other) :
-  fFrom(other.fFrom), fTo(other.fTo), fFromPattern(nullptr) {
+transform_entry::transform_entry(const transform_entry &other)
+    : fFrom(other.fFrom), fTo(other.fTo), fFromPattern(nullptr), fMapFromStrId(other.fMapFromStrId),
+      fMapToStrId(other.fMapToStrId), fMapFromList(other.fMapFromList), fMapToList(other.fMapToList) {
   if (other.fFromPattern) {
     // clone pattern
     fFromPattern.reset(other.fFromPattern->clone());
   }
 }
 
-transform_entry::transform_entry(const std::u32string &from, const std::u32string &to) : fFrom(from), fTo(to) {
+transform_entry::transform_entry(const std::u32string &from, const std::u32string &to)
+    : fFrom(from), fTo(to), fFromPattern(nullptr), fMapFromStrId(), fMapToStrId(), fMapFromList(), fMapToList() {
   assert(!fFrom.empty()); // TODO-LDML: should not happen?
 
+  init();
+}
+
+transform_entry::transform_entry(
+    const std::u32string &from,
+    const std::u32string &to,
+    KMX_DWORD mapFrom,
+    KMX_DWORD mapTo,
+    const kmx::kmx_plus &kplus)
+    : fFrom(from), fTo(to), fFromPattern(nullptr), fMapFromStrId(mapFrom), fMapToStrId(mapTo) {
+  assert(!fFrom.empty()); // TODO-LDML: should not happen?
+  assert((fMapFromStrId == 0) == (fMapToStrId == 0));  // we have both or we have neither.
+  assert(kplus.strs != nullptr);
+  assert(kplus.vars != nullptr);
+  assert(kplus.elem != nullptr);
+  init();
+
+  // setup mapFrom
+  if (fMapFromStrId != 0) {
+    // Note: if we need the variable name it is available as follows,
+    // but isn't needed for normal processing. Could be useful for debug messages.
+    //  auto mapFrom = kplus.strs->get(fMapFromStrId);
+    //  auto mapTo   = kplus.strs->get(fMapToStrId);
+
+    // get the vars
+    auto *fromVar = kplus.vars->findByStringId(fMapFromStrId);
+    auto *toVar   = kplus.vars->findByStringId(fMapToStrId);
+    assert(fromVar != nullptr);
+    assert(toVar   != nullptr);
+
+
+    // get the element lists
+    assert(fromVar->type == LDML_VARS_ENTRY_TYPE_SET);
+    assert(toVar->type   == LDML_VARS_ENTRY_TYPE_SET);
+    KMX_DWORD fromLength, toLength;
+    auto *fromList = kplus.elem->getElementList(fromVar->elem, fromLength);
+    auto *toList   = kplus.elem->getElementList(toVar->elem, toLength);
+    assert(fromList != nullptr);
+    assert(toList   != nullptr);
+
+    // populate the deques from the lists
+    fMapFromList = fromList->loadAsStringList(fromLength, *(kplus.strs));
+    fMapToList   = toList->loadAsStringList(toLength, *(kplus.strs));
+    // did we get the expected items?
+    assert(fMapFromList.size() == fromLength);
+    assert(fMapToList.size()   == toLength);
+  }
+}
+
+void
+transform_entry::init() {
   if (!fFrom.empty()) {
+    // TODO-LDML: if we have mapFrom, may need to do other processing.
     const std::u16string patstr = km::kbp::kmx::u32string_to_u16string(fFrom);
     UErrorCode status           = U_ZERO_ERROR;
     /* const */ icu::UnicodeString patustr = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
@@ -421,7 +475,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
   // TODO-LDML: Also, we could cache the u16 string at the transformGroup level or higher.
   UErrorCode status = U_ZERO_ERROR;
   const std::u16string matchstr = km::kbp::kmx::u32string_to_u16string(input);
-  icu::UnicodeString matchustr = icu::UnicodeString(matchstr.data(), (int32_t)matchstr.length());
+  icu::UnicodeString matchustr  = icu::UnicodeString(matchstr.data(), (int32_t)matchstr.length());
   // TODO-LDML: create a new Matcher every time. These could be cached and reset.
   std::unique_ptr<icu::RegexMatcher> matcher(fFromPattern->matcher(matchustr, status));
   assert(U_SUCCESS(status));
@@ -446,11 +500,22 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
   }
   // Now, we have a matchLen.
 
+
   // now, do the replace.
-  // Convert the fTo into u16 TODO-LDML (we could cache this?)
-  const std::u16string rstr = km::kbp::kmx::u32string_to_u16string(fTo);
-  icu::UnicodeString rustr  = icu::UnicodeString(rstr.data(), (int32_t)rstr.length());
-  // This replace will apply $1, $2 etc.  TODO-LDML it will NOT handle mapFrom or mapTo.
+
+  /** this is the 'to' or other replacement string.*/
+  icu::UnicodeString rustr;
+  if (fMapFromStrId == 0) {
+    // Normal case: not a map.
+    // This replace will apply $1, $2 etc.
+    // Convert the fTo into u16 TODO-LDML (we could cache this?)
+    const std::u16string rstr = km::kbp::kmx::u32string_to_u16string(fTo);
+    rustr  = icu::UnicodeString(rstr.data(), (int32_t)rstr.length());
+  } else {
+    // 'from' matched the set named in fMatchFrom, and 'to' the set named in fMatchTo.
+    // 1. first, we need to find the index in the source set.
+    // TODO..
+  }
   icu::UnicodeString entireOutput = matcher->replaceFirst(rustr, status);
   assert(U_SUCCESS(status)); // TODO-LDML: could fail here due to bad input (syntax err)
   // entireOutput includes all of 'input', but modified. Need to substring it.
@@ -686,16 +751,7 @@ transforms::load(
         const kmx::COMP_KMXPLUS_TRAN_TRANSFORM *element = tranHelper.getTransform(group->index + itemNumber);
         const std::u32string fromStr                    = kmx::u16string_to_u32string(kplus.strs->get(element->from));
         const std::u32string toStr                      = kmx::u16string_to_u32string(kplus.strs->get(element->to));
-        std::u16string mapFrom, mapTo;
-
-        if (element->mapFrom && element->mapTo) {
-          // strings: variable name of from/to
-          // TODO-LDML: not implemented
-          mapFrom = kplus.strs->get(element->mapFrom);
-          mapTo   = kplus.strs->get(element->mapTo);
-        }
-
-        newGroup.emplace_back(fromStr, toStr /* ,mapFrom, mapTo */);  // creating a transform_entry
+        newGroup.emplace_back(fromStr, toStr, element->mapFrom, element->mapTo, kplus);  // creating a transform_entry
       }
       transforms->addGroup(newGroup);
     } else if (group->type == LDML_TRAN_GROUP_TYPE_REORDER) {

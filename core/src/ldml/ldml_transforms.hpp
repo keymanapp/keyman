@@ -13,6 +13,7 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include <list>
 
 #if !defined(HAVE_ICU4C)
 #error icu4c is required for this code
@@ -67,11 +68,16 @@ public:
   void dump() const;
 
 private:
-  // TODO-LDML: support multi-char strings?
+  // TODO-LDML: support multi-char strings? (Not needed currently)
   const km_kbp_usv chr;
   const SimpleUSet uset;
   const KMX_DWORD flags;
 };
+
+/**
+ * An ordered list of strings.
+ */
+typedef std::deque<std::u32string> string_list;
 
 /**
  * Inner element, representing <transform>
@@ -79,11 +85,17 @@ private:
 class transform_entry {
 public:
   transform_entry(const transform_entry &other);
+  /** simpler constructor for tests */
   transform_entry(
       const std::u32string &from,
       const std::u32string &to
-      /*TODO-LDML: mapFrom, mapTo*/
   );
+  transform_entry(
+      const std::u32string &from,
+      const std::u32string &to,
+      KMX_DWORD mapFrom,
+      KMX_DWORD mapTo,
+      const kmx::kmx_plus &kplus);
 
   /**
    * If matching, apply the match to the output string
@@ -97,12 +109,14 @@ private:
   const std::u32string fFrom;
   const std::u32string fTo;
   std::unique_ptr<icu::RegexPattern> fFromPattern;
-};
 
-/**
- * An ordered list of strings.
- */
-typedef std::deque<std::u32string> string_list;
+  const KMX_DWORD fMapFromStrId;
+  const KMX_DWORD fMapToStrId;
+  std::list<std::u32string> fMapFromList;
+  std::list<std::u32string> fMapToList;
+  /** Internal function to setup pattern string */
+  void init();
+};
 
 /**
  * a group of <transform> entries - a <transformGroup>
