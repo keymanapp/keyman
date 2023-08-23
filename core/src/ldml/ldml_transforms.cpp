@@ -452,7 +452,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
   icu::UnicodeString rustr  = icu::UnicodeString(rstr.data(), (int32_t)rstr.length());
   // This replace will apply $1, $2 etc.  TODO-LDML it will NOT handle mapFrom or mapTo.
   icu::UnicodeString entireOutput = matcher->replaceFirst(rustr, status);
-  assert(U_SUCCESS(status));
+  assert(U_SUCCESS(status)); // TODO-LDML: could fail here due to bad input (syntax err)
   // entireOutput includes all of 'input', but modified. Need to substring it.
   icu::UnicodeString outu = entireOutput.tempSubString(matchStart);
 
