@@ -13,7 +13,6 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
-#include <list>
 
 #if !defined(HAVE_ICU4C)
 #error icu4c is required for this code
