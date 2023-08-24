@@ -1,10 +1,11 @@
 import 'mocha';
 import { assert } from 'chai';
-import { InfrastructureMessages } from '../src/messages/messages.js';
+import { InfrastructureMessages } from '../src/messages/infrastructureMessages.js';
 import { verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { NodeCompilerCallbacks } from '../src/util/NodeCompilerCallbacks.js';
 import { CompilerErrorNamespace } from '@keymanapp/common-types';
+import { unitTestEndpoints } from '../src/commands/build.js';
 
 describe('InfrastructureMessages', function () {
   it('should have a valid InfrastructureMessages object', function() {
@@ -15,34 +16,20 @@ describe('InfrastructureMessages', function () {
   // Message tests
   //
 
-  /*
-  TODO:
+  // FATAL_UnexpectedException
 
-  let callbacks = new TestCompilerCallbacks();
-
-  async function testForMessage(context: Mocha.Context, fixture: string[], messageId?: number) {
-    context.timeout(10000);
-
-    callbacks.clear();
-
-    const builder = new BuildKmnKeyboard();
-    const path = makePathToFixture(...fixture);
-    let result = await builder.build(path, callbacks, {
-      compilerVersion: false,
-      compilerWarningsAsErrors: true,
-      debug: false,
-      warnDeprecatedCode: true,
+  it('should generate FATAL_UnexpectedException if an exception is raised', async function() {
+    const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
+    process.env.SENTRY_CLIENT_TEST_BUILD_EXCEPTION = '1';
+    await unitTestEndpoints.build(null, ncb, {});
+    delete process.env.SENTRY_CLIENT_TEST_BUILD_EXCEPTION;
+    assert.isTrue(ncb.hasMessage(InfrastructureMessages.FATAL_UnexpectedException),
+      `FATAL_UnexpectedException not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
+    assert.lengthOf(ncb.messages, 1);
+    assert.instanceOf<Error>(ncb.messages[0].exceptionVar, Error);
     });
 
-    if(messageId) {
-      assert.isTrue(callbacks.hasMessage(messageId), `messageId ${messageId.toString(16)} not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
-      assert.lengthOf(callbacks.messages, 1);
-    } else {
-      assert.lengthOf(callbacks.messages, 0, `messages should be empty, but instead got: `+JSON.stringify(callbacks.messages,null,2));
-      assert.isTrue(result);
-    }
-  }
-
+/*
   // ERROR_FileDoesNotExist
 
   it('should generate ERROR_FileDoesNotExist if a file does not exist', async function() {

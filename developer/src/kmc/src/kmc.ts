@@ -17,6 +17,10 @@ try {
   KeymanSentry.captureException(e);
 }
 
+// Ensure any messages reported to Sentry have had time to be uploaded before we
+// exit. In most cases, this will be a no-op so should not affect performance.
+await KeymanSentry.close();
+
 async function run() {
   /* Arguments */
 

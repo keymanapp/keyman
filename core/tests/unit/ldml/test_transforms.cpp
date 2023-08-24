@@ -40,7 +40,7 @@ test_transforms() {
   std::cout << __FILE__ << ":" << __LINE__ << " - basic " << std::endl;
   {
     // start with one
-    transform_entry te(std::u32string(U"e^"), std::u32string(U"E"));  // keep it simple
+    transform_entry te(std::u32string(U"e\\^"), std::u32string(U"E"));  // keep it simple
     // OK now make a group do it
     transforms tr;
     transform_group st;
@@ -166,7 +166,7 @@ test_reorder_standalone() {
                                               COMP_KMXPLUS_USET_RANGE(0x1A75, 0x1A79)};
     const COMP_KMXPLUS_USET_USET usets[]        = {{0, 1, 0xFFFFFFFF}};
     const COMP_KMXPLUS_USET_USET &toneMarksUset = usets[0];
-    const USet toneMarks(&ranges[toneMarksUset.range], toneMarksUset.count);
+    const SimpleUSet toneMarks(&ranges[toneMarksUset.range], toneMarksUset.count);
     // validate that the range [1A75, 1A79] matches
     assert_equal(toneMarks.contains(0x1A76), true);
     assert_equal(toneMarks.contains(0x1A60), false);

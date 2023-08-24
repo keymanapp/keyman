@@ -307,6 +307,19 @@ body {
   box-shadow: 0px 0px 20px rgba(100, 100, 255, 0.5);
 }
 
+.key.key-is-default {
+  border-width: 4px;
+}
+
+.key.key-is-default .id {
+  bottom: 1px;
+  right: 1px;
+}
+
+.key.key-is-default .text {
+  margin-top: -3px;
+}
+
 .row {
   clear:left;
   line-height: 1;
@@ -576,6 +589,10 @@ body:not(.text-controls-in-toolbar) input#inpSubKeyCap {
   text-align: center;
   border: solid 1px #c0c0c0;
   display: none;
+}
+
+input#chkSubKeyIsDefault {
+  margin-top: 10px;
 }
 
 .key-size {

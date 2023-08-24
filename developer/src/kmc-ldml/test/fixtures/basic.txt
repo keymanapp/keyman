@@ -552,7 +552,7 @@ block(vars)                         # struct COMP_KMXPLUS_VARS {
   00 00 00 00                       #   KMX_DWORD type = str
   index(strNull,strA,2)             #   KMXPLUS_STR id  'a'
   index(strNull,strAmarker,2)       #   KMXPLUS_STR value '\m{a}'
-  00 00 00 00                       #   KMXPLUS_ELEM 
+  00 00 00 00                       #   KMXPLUS_ELEM
 
   # var 1
   01 00 00 00                       #   KMX_DWORD type = set
