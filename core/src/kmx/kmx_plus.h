@@ -272,8 +272,8 @@ struct COMP_KMXPLUS_TRAN_GROUP {
 struct COMP_KMXPLUS_TRAN_TRANSFORM {
     KMXPLUS_STR from;
     KMXPLUS_STR to;
-    KMXPLUS_ELEM mapFrom;
-    KMXPLUS_ELEM mapTo;
+    KMXPLUS_STR mapFrom; // variable name
+    KMXPLUS_STR mapTo;   // variable name
 };
 
 struct COMP_KMXPLUS_TRAN_REORDER {

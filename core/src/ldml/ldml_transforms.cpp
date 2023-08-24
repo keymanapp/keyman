@@ -796,7 +796,9 @@ transforms::load(
         const kmx::COMP_KMXPLUS_TRAN_TRANSFORM *element = tranHelper.getTransform(group->index + itemNumber);
         const std::u32string fromStr                    = kmx::u16string_to_u32string(kplus.strs->get(element->from));
         const std::u32string toStr                      = kmx::u16string_to_u32string(kplus.strs->get(element->to));
-        newGroup.emplace_back(fromStr, toStr, element->mapFrom, element->mapTo, kplus);  // creating a transform_entry
+        KMX_DWORD mapFrom                               = element->mapFrom; // copy, because of alignment
+        KMX_DWORD mapTo                                 = element->mapTo;   // copy, because of alignment
+        newGroup.emplace_back(fromStr, toStr, mapFrom, mapTo, kplus);  // creating a transform_entry
       }
       transforms->addGroup(newGroup);
     } else if (group->type == LDML_TRAN_GROUP_TYPE_REORDER) {
