@@ -81,33 +81,44 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
   return optimizedActionArray;
 }
 
+// TODO: remove excessive debug statements above and below
 -(UInt32)macToKeymanModifier:(NSEventModifierFlags)modifiers {
   UInt32 keymanModifiers = 0;
   if ([self isShiftKey:modifiers]) {
     keymanModifiers |= KM_KBP_MODIFIER_SHIFT;
+    NSLog(@"macToKeymanModifier setting shift bit");
   }
   
   if([self isLeftOptionKey:modifiers]) {
     keymanModifiers |= KM_KBP_MODIFIER_LALT;
+    NSLog(@"macToKeymanModifier setting left alt bit");
   } else if([self isRightOptionKey:modifiers]) {
     keymanModifiers |= KM_KBP_MODIFIER_RALT;
+    NSLog(@"macToKeymanModifier setting right alt bit");
   } else if ([self isOptionKey:modifiers]) {
     keymanModifiers |= KM_KBP_MODIFIER_ALT;
+    NSLog(@"macToKeymanModifier setting alt bit");
   }
 
   if ([self isLeftControlKey:modifiers]) {
     keymanModifiers |= KM_KBP_MODIFIER_LCTRL;
+    NSLog(@"macToKeymanModifier setting left control bit");
   } else if ([self isRightControlKey:modifiers]) {
     keymanModifiers |= KM_KBP_MODIFIER_RCTRL;
+    NSLog(@"macToKeymanModifier setting right control bit");
   } else if ([self isControlKey:modifiers]) {
     keymanModifiers |= KM_KBP_MODIFIER_CTRL;
+    NSLog(@"macToKeymanModifier setting control bit");
   }
   
   if ([self isCapsLockKey:modifiers]) {
     keymanModifiers |= KM_KBP_MODIFIER_CAPS;
-  } else {
-    keymanModifiers |= KM_KBP_MODIFIER_NOCAPS;
   }
+  // setting NOCAPS in Core breaks keyboards like EuroLatin and Amharic
+  // apparently better to simply leave the CAPS bit clear
+  /*else {
+    keymanModifiers |= KM_KBP_MODIFIER_NOCAPS;
+  }*/
   
   NSLog(@"macToKeymanModifier result  = %u", (unsigned int)keymanModifiers);
   return keymanModifiers;

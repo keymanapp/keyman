@@ -114,10 +114,7 @@ NSString* _keymanDataPath = nil;
                                                    forEventClass:kInternetEventClass
                                                       andEventID:kAEGetURL];
 
-  // TODO: enable low level event tap with core?
-  // turning off for now
-  self.lowLevelEventTap = nil;
-  /*
+  // TODO: use addGlobalMonitorForEventsMatchingMask instead (since we are not modifying events)?
   self.lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap,
                                            kCGHeadInsertEventTap,
                                            kCGEventTapOptionListenOnly,
@@ -129,9 +126,10 @@ NSString* _keymanDataPath = nil;
                                            nil);
 
   if (!self.lowLevelEventTap) {
-      NSLog(@"Can't tap into low level events!");
+      NSLog(@"Unable to create lowLevelEventTap!");
   }
   else {
+      NSLog(@"Successfully created lowLevelEventTap with CGEventTapCreate.");
       CFRelease(self.lowLevelEventTap);
   }
 
@@ -142,7 +140,6 @@ NSString* _keymanDataPath = nil;
   if (self.runLoopEventSrc && runLoop) {
       CFRunLoopAddSource(runLoop,  self.runLoopEventSrc, kCFRunLoopDefaultMode);
   }
-   */
 }
 
 - (KeymanVersionInfo)versionInfo {
@@ -274,7 +271,8 @@ NSString* _keymanDataPath = nil;
     _lastServerWithOSKShowing = nil;
 }
 
-/*
+// TODO: revisit and remove what is no longer needed
+// TODO: better (less impactful) to replace with global event monitor? just monitors with no ability to modify events
 CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
     KMInputMethodAppDelegate *appDelegate = [KMInputMethodAppDelegate AppDelegate];
     if (appDelegate != nil) {
@@ -309,7 +307,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         switch (type) {
             case kCGEventFlagsChanged:
                 if (appDelegate.debugMode)
-                    NSLog(@"System Event: flags changed: %x", (int) sysEvent.modifierFlags);
+                    NSLog(@"eventTapFunction: system event kCGEventFlagsChanged to: %x", (int) sysEvent.modifierFlags);
                 appDelegate.currentModifierFlags = sysEvent.modifierFlags;
                 if (appDelegate.currentModifierFlags & NSEventModifierFlagCommand) {
                     appDelegate.contextChangingEventDetected = YES;
@@ -320,11 +318,12 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             case kCGEventLeftMouseDown:
             case kCGEventOtherMouseUp:
             case kCGEventOtherMouseDown:
+            NSLog(@"Event tap context invalidation flagged due to event: %@", event);
                 appDelegate.contextChangingEventDetected = YES;
                 break;
 
             case kCGEventKeyDown:
-                NSLog(@"*** Event tap handling key down event: %@", sysEvent.keyCode);
+            NSLog(@"Event tap handling kCGEventKeyDown for keyCode: %hu", sysEvent.keyCode);
                // Pass back delete events through to the input method event handler
                 // because some 'legacy' apps don't allow us to see back delete events
                 // that we have synthesized (and we need to see them, for serialization
@@ -385,7 +384,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         }
     }
     return event;
-}*/
+}
 
 - (NSMenu *)menu {
     return _menu;

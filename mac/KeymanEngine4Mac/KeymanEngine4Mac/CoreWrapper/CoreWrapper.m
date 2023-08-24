@@ -125,19 +125,18 @@
 }
 
 -(NSArray*)processEvent:(nonnull NSEvent *)event {
+  NSEventModifierFlags modifiers = event.modifierFlags;
+  
   // process key down events only
   if (event.type != NSEventTypeKeyDown) {
       return nil;
   }
   // do not process command keys
-  if ([event modifierFlags] & NSEventModifierFlagCommand) {
+  if (modifiers & NSEventModifierFlagCommand) {
       return nil;
   }
   
-  unsigned short macKeyCode = event.keyCode;
-  NSEventModifierFlags modifiers = event.modifierFlags;
-
-  NSArray* actions = [self processMacVirtualKey:macKeyCode
+  NSArray* actions = [self processMacVirtualKey:event.keyCode
                       withModifiers:modifiers
                         withKeyDown:YES];
   
@@ -163,7 +162,7 @@
 -(BOOL)processVirtualKey:(uint16_t)keyCode
             withModifier:(uint16_t)modifierState
              withKeyDown:(uint8_t) isKeyDown {
-  
+
   km_kbp_status result = km_kbp_process_event(self.keyboardState, keyCode, modifierState, isKeyDown, KM_KBP_EVENT_FLAG_DEFAULT);
 
   if (result!=KM_KBP_STATUS_OK) {

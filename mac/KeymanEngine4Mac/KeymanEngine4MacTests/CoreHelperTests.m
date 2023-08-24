@@ -64,6 +64,22 @@ ActionArrayOptimizer *optimizer;
   XCTAssertEqual(keymanModifierState, KM_KBP_MODIFIER_SHIFT, @"Failed conversion of shift modifier from Mac to Keyman.");
 }
 
+- (void)testModifierConversion_MacCapsLock_ReturnsKeymanCapsLock {
+  uint32_t keymanModifierState = [[CoreTestStaticHelperMethods helper] macToKeymanModifier:NSEventModifierFlagCapsLock];
+  XCTAssertEqual(keymanModifierState, KM_KBP_MODIFIER_CAPS, @"Failed conversion of caps lock modifier from Mac to Keyman.");
+}
+
+/**
+ * Not really intuitive, but we should not be setting the NOCAPS bit for Keyman Core when Caps Lock is not set.
+ * Apparently, Core knows that Caps Lock is not set because the CAPS bit is cleared.
+ */
+- (void)testModifierConversion_MacModifierWithCapsLock_ReturnsKeymanClearedNoCapsLock {
+  // use command key flag just to pick something that is not caps lock
+  uint32_t keymanModifierState = [[CoreTestStaticHelperMethods helper] macToKeymanModifier:NSEventModifierFlagCommand];
+  BOOL noCapsFlag = !(keymanModifierState & KM_KBP_MODIFIER_NOCAPS);
+  XCTAssertTrue(noCapsFlag, @"Failed modifier flag conversion for no caps lock case.");
+}
+
 - (void)testModifierConversion_MacOption_ReturnsKeymanAlt {
   uint32_t keymanModifierState = [[CoreTestStaticHelperMethods helper] macToKeymanModifier:NSEventModifierFlagOption];
   XCTAssertEqual(keymanModifierState, KM_KBP_MODIFIER_ALT, @"Failed conversion of option modifier from Mac to Keyman alt.");

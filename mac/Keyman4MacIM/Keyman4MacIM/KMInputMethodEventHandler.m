@@ -490,10 +490,10 @@ NSRange _previousSelRange;
 
 - (NSArray*) processEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
   NSArray* actions = nil;
-  NSLog(@"processEventWithKeymanEngine, AppDelegate.currentModifierFlags = %lu, event.modifiers = %lu", (unsigned long)self.AppDelegate.currentModifierFlags, (unsigned long)event.modifierFlags);
   if (self.AppDelegate.lowLevelEventTap != nil) {
       NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.AppDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:event.context characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
     actions = [self.kme processEvent:eventWithOriginalModifierFlags];
+    NSLog(@"processEventWithKeymanEngine, using AppDelegate.currentModifierFlags %lu, instead of event.modifiers = %lu", (unsigned long)self.AppDelegate.currentModifierFlags, (unsigned long)event.modifierFlags);
   }
   else {
       // Depending on the client app and the keyboard, using the passed-in event as it is should work okay.
