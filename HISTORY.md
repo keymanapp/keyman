@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 17.0.166 alpha 2023-08-24
+
+* chore(common): Update crowdin strings for French (#9505)
+
+## 17.0.165 alpha 2023-08-23
+
+* feat(core): add display=id (#9484)
+
 ## 17.0.164 alpha 2023-08-22
 
 * fix(common): don't crash on illegal unicodesets (#9492)
