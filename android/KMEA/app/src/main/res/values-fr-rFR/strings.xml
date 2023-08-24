@@ -45,7 +45,7 @@
     <!-- Context: Button label -->
     <string name="label_update" comment="Dialog button to update a resource">Mise à jour</string>
     <!-- Context: No internet for updates -->
-    <string name="no_internet_connection" comment="Internet connection missing">No internet connection</string>
+    <string name="no_internet_connection" comment="Internet connection missing">Aucune connexion internet</string>
     <!-- Context: Keyboard Updates -->
     <string name="cannot_connect" comment="Error message when network connection fails">Impossible de se connecter au serveur Keyman !</string>
     <!-- Context: Keyboard Updates -->
@@ -84,7 +84,7 @@
     <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      Erreur dans le clavier %1$s:%2$s pour la langue %3$s.</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Vérification du dictionnaire associé à télécharger</string>
-    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Cannot connect to Keyman server to check for associated dictionary to download</string>
+    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Impossible de se connecter au serveur Keyman pour chercher un dictionnaire à télécharger</string>
     <!-- Context: Model Updates -->
     <string name="confirm_download_model" comment="Confirmation to download a dictionary update">Voulez-vous télécharger la dernière version de ce dictionnaire ?</string>
     <!-- Context: No associated dictionary found -->
@@ -128,11 +128,11 @@
     <!-- Context: Model Info -->
     <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">Voulez-vous supprimer ce dictionnaire ?</string>
     <!-- Context: Model Deleted -->
-    <string name="model_deleted" comment="Notification when a dictionary is deleted">Dictionary deleted</string>
+    <string name="model_deleted" comment="Notification when a dictionary is deleted">Dictionnaire supprimé</string>
     <!-- Context: Language Settings Keyboard install strings -->
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">Clavier %1$s installé</string>
     <!-- Context: Language Settings Keyboard uninstall strings -->
-    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Keyboard deleted</string>
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Clavier supprimé</string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Activer les corrections</string>
     <!-- Context: Language Settings menu strings -->
@@ -145,7 +145,7 @@
     </plurals>
     <!-- Context: Language Settings menu substring - Check for available dictionary -->
     <string name="check_available_model" comment="Check for available dictionary">Vérifier les dictionnaires disponibles</string>
-    <string name="check_model_online" comment="Check for dictionaries online">Check for dictionaries online</string>
+    <string name="check_model_online" comment="Check for dictionaries online">Obtenir des dictionnaires en ligne</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_info_header" comment="Dictionary name">Dictionnaire : %1$s</string>
     <!-- Context: Language Settings menu strings -->
@@ -168,5 +168,5 @@
     <!-- Context: Other strings -->
     <string name="help_bubble_text">Appuyez ici pour changer de clavier</string>
     <!-- Context: anywhere -->
-    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Impossible de lancer le navigateur web</string>
 </resources>
