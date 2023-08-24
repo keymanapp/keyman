@@ -1,4 +1,4 @@
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec as m, compilerExceptionToString as exc } from "@keymanapp/common-types";
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec as m } from "@keymanapp/common-types";
 
 const Namespace = CompilerErrorNamespace.KmnCompiler;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
@@ -46,20 +46,21 @@ export const enum KmnCompilerMessageRanges {
   are reserved for kmcmplib messages.
 */
 export class CompilerMessages {
-  static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException, `Unexpected exception: ${exc(o.e)}`);
+  static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
   static FATAL_UnexpectedException = SevFatal | 0x900;
 
-  static Fatal_MissingWasmModule = (o:{e?: any}) => m(this.FATAL_MissingWasmModule, `Could not instantiate WASM compiler module or initialization failed: ${exc(o.e)}`);
+  static Fatal_MissingWasmModule = (o:{e?: any}) => m(this.FATAL_MissingWasmModule,
+    `Could not instantiate WASM compiler module or initialization failed`, o.e ?? 'unknown error');
   static FATAL_MissingWasmModule = SevFatal | 0x901;
 
   // TODO: Is this now deprecated?
-  static Fatal_UnableToSetCompilerOptions = () => m(this.FATAL_UnableToSetCompilerOptions, `Unable to set compiler options`);
+  static Fatal_UnableToSetCompilerOptions = () => m(this.FATAL_UnableToSetCompilerOptions, null, `Unable to set compiler options`);
   static FATAL_UnableToSetCompilerOptions = SevFatal | 0x902;
 
-  static Fatal_CallbacksNotSet = () => m(this.FATAL_CallbacksNotSet, `Callbacks were not set with init`);
+  static Fatal_CallbacksNotSet = () => m(this.FATAL_CallbacksNotSet, null, `Callbacks were not set with init`);
   static FATAL_CallbacksNotSet = SevFatal | 0x903;
 
-  static Fatal_UnicodeSetOutOfRange = () => m(this.FATAL_UnicodeSetOutOfRange, `UnicodeSet buffer was too small`);
+  static Fatal_UnicodeSetOutOfRange = () => m(this.FATAL_UnicodeSetOutOfRange, null, `UnicodeSet buffer was too small`);
   static FATAL_UnicodeSetOutOfRange = SevFatal | 0x904;
 
   static Error_UnicodeSetHasStrings = () => m(this.ERROR_UnicodeSetHasStrings, `UnicodeSet contains strings, not allowed`);
@@ -72,7 +73,7 @@ export class CompilerMessages {
   static ERROR_UnicodeSetSyntaxError = SevError | 0x907;
 
   static Error_InvalidKvksFile = (o:{filename: string, e: any}) => m(this.ERROR_InvalidKvksFile,
-    `Error encountered parsing ${o.filename}: ${o.e}`);
+    `Error encountered parsing ${o.filename}: ${o.e ?? 'unknown error'}`); // Note, not fatal, not reporting to Sentry
   static ERROR_InvalidKvksFile = SevError | 0x908;
 
   static Warn_InvalidVkeyInKvksFile = (o:{filename: string, invalidVkey: string}) => m(this.WARN_InvalidVkeyInKvksFile,
@@ -80,11 +81,11 @@ export class CompilerMessages {
   static WARN_InvalidVkeyInKvksFile = SevWarn | 0x909;
 
   static Error_InvalidDisplayMapFile = (o:{filename: string, e: any}) => m(this.ERROR_InvalidDisplayMapFile,
-    `Error encountered parsing display map ${o.filename}: ${o.e}`);
+    `Error encountered parsing display map ${o.filename}: ${o.e ?? 'unknown error'}`); // Note, not fatal, not reporting to Sentry
   static ERROR_InvalidDisplayMapFile = SevError | 0x90A;
 
   static Error_InvalidKvkFile = (o:{filename: string, e: any}) => m(this.ERROR_InvalidKvkFile,
-    `Error encountered loading ${o.filename}: ${o.e}`);
+    `Error encountered loading ${o.filename}: ${o.e ?? 'unknown error'}`); // Note, not fatal, not reporting to Sentry
   static ERROR_InvalidKvkFile = SevError | 0x90B;
 };
 

@@ -4,7 +4,7 @@ import { CompilerCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/
 import { writeMergedModelMetadataFile } from '@keymanapp/kmc-model-info';
 import { KmpCompiler } from '@keymanapp/kmc-package';
 import { loadProject } from '../../util/projectLoader.js';
-import { InfrastructureMessages } from '../../messages/messages.js';
+import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { calculateSourcePath } from '../../util/calculateSourcePath.js';
 
 export class BuildModelInfo extends BuildActivity {

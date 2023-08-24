@@ -1,4 +1,4 @@
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, compilerExceptionToString as exc } from "@keymanapp/common-types";
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m } from "@keymanapp/common-types";
 
 const Namespace = CompilerErrorNamespace.Analyzer;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
@@ -8,7 +8,7 @@ const SevInfo = CompilerErrorSeverity.Info | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
 export class AnalyzerMessages {
-  static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException, `Unexpected exception: ${exc(o.e)}`);
+  static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
   static FATAL_UnexpectedException = SevFatal | 0x0001;
 
   static Info_ScanningFile = (o:{type: string, name: string}) => m(this.INFO_ScanningFile,

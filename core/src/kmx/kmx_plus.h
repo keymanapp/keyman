@@ -319,6 +319,11 @@ static_assert(LDML_UC_SENTINEL == UC_SENTINEL, "mismatch: LDML_UC_SENTINEL");
 static_assert(LDML_MARKER_CODE == CODE_DEADKEY, "mismatch: LDML_MARKER_CODE");
 static_assert(LDML_MARKER_ANY_INDEX < UC_SENTINEL, "expected LDML_MARKER_ANY_INDEX < UC_SENTINEL");
 
+/** @returns true if a valid marker per spec */
+static inline bool is_valid_marker(KMX_DWORD marker_no) {
+  return ((marker_no == LDML_MARKER_ANY_INDEX) || (marker_no >= LDML_MARKER_MIN_INDEX && marker_no <= LDML_MARKER_MAX_INDEX));
+}
+
 /* ------------------------------------------------------------------
  * bksp section
    ------------------------------------------------------------------ */
@@ -694,14 +699,16 @@ struct COMP_KMXPLUS_USET_RANGE {
 };
 
 /**
- * represents one of the uset elements
+ * represents one of the uset elements.
+ * TODO-LDML: replace this with a real icu::UnicodeSet? or at least
+ * a function producing the same?
  */
-class USet {
+class SimpleUSet {
   public:
     /** construct a set over the specified range. Data is copied. */
-    USet(const COMP_KMXPLUS_USET_RANGE* newStart, size_t newCount);
+    SimpleUSet(const COMP_KMXPLUS_USET_RANGE* newStart, size_t newCount);
     /** empty set */
-    USet();
+    SimpleUSet();
     /** true if the uset contains this char */
     bool contains(km_kbp_usv ch) const;
     /** debugging */
@@ -721,7 +728,7 @@ public:
   bool setUset(const COMP_KMXPLUS_USET *newUset);
   inline bool valid() const { return is_valid; }
 
-  USet getUset(KMXPLUS_USET list) const;
+  SimpleUSet getUset(KMXPLUS_USET list) const;
   const COMP_KMXPLUS_USET_RANGE *getRange(KMX_DWORD index) const;
 
 private:

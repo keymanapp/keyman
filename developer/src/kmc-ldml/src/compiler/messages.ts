@@ -60,7 +60,7 @@ export class CompilerMessages {
   static ERROR_MustBeAtLeastOneLayerElement = SevError | 0x000E;
 
   static Fatal_SectionCompilerFailed = (o:{sect: string}) =>
-    m(this.FATAL_SectionCompilerFailed, `The compiler for '${o.sect}' failed unexpectedly.`);
+    m(this.FATAL_SectionCompilerFailed, null, `The compiler for '${o.sect}' failed unexpectedly.`);
   static FATAL_SectionCompilerFailed = SevFatal | 0x000F;
 
   static Error_DisplayIsRepeated = (o:{to: string}) =>
