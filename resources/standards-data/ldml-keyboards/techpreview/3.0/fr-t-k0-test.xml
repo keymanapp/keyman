@@ -8,7 +8,7 @@
 
 	Also NOTE: this is really a test keyboard.  CLDR-12026 will be for the real new azerty keyboard
 -->
-<keyboard locale="fr-t-k0-azerty" conformsTo="techpreview">
+<keyboard locale="fr-t-k0-test" conformsTo="techpreview">
 	<locales>
 		<locale id="br" /> <!-- example of including Breton -->
 	</locales>

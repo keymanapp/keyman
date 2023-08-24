@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE keyboard SYSTEM "../dtd/ldmlKeyboard.dtd">
+<!--
+  New French
+-->
+<keyboard locale="fr-t-k0-optimise" conformsTo="techpreview">
+	<version number="1.0.0" />
+	<info author="Team Keyboard" normalization="NFC" layout="AZERTY" indicator="FR" />
+	<names>
+		<name value="French AZERTY optimisé" />
+	</names>
+	<settings fallback="omit" />
+
+	<vkeys>
+		<vkey from="Q" to="A" />
+		<vkey from="W" to="Z" />
+		<vkey from="A" to="Q" />
+		<vkey from="Z" to="W" />
+	</vkeys>
+
+	<displays>
+    <display to="\u0300" display="${grave}" />
+    <display to="\m{acute}" display="´" />
+    <display to="\m{grave}" display="`" />
+    <display to="\m{umlaut}" display="¨" />
+    <display to="\m{caret}" display="^" />
+    <display to="\m{tilde}" display="~" />
+  </displays>
+
+	<keys>
+		<import base="cldr" path="techpreview/keys-Zyyy-punctuation.xml" />
+		<import base="cldr" path="techpreview/keys-Zyyy-currency.xml" />
+
+    <!-- deadkeys -->
+		<key id="d-acute"  to="\m{acute}"/>
+		<key id="d-grave"  to="\m{grave}"/>
+		<key id="d-umlaut" to="\m{umlaut}"/>
+		<key id="d-caret"  to="\m{caret}"/>
+		<key id="d-tilde"  to="\m{tilde}"/>
+
+    <!-- extra keys -->
+		<key id="u-grave" to="ü" />
+		<key id="e-grave" to="è" />
+		<key id="e-acute" to="é" />
+		<key id="c-cedilla" to="ç" />
+		<key id="a-acute" to="á" />
+    <key id="a-grave" to="à" />
+    <key id="e-caret" to="ê" />
+
+    <!-- extra symbols -->
+		<key id="bullet" to="•" />
+		<key id="umlaut" to="¨" />
+		<key id="super-2" to="²" longPress="₂" />
+    <key id="en-dash" to="–"/>
+    <key id="plus-minus" to="±" />
+    <key id="vulgar-half" to="½" />
+    <key id="vulgar-quarter" to="¼" />
+    <key id="ellipsis" to="…" />
+    <key id="open-apos" to="‘" />
+    <key id="close-apos" to="’" />
+    <key id="open-g" to="«" />
+    <key id="close-g" to="»" />
+
+	</keys>
+
+	<layers form="iso">
+		<layer modifier="none">
+      <row keys="at a-grave e-acute e-grave e-caret open-paren close-paren open-apos close-apos open-g close-g apos d-caret" />
+			<row keys="a z e r t y u i o p hyphen plus" />
+			<row keys="q s d f g h j k l m slash asterisk" />
+			<row keys="open-angle w x c v b n period comma colon semi-colon" />
+			<row keys="space" />
+		</layer>
+
+		<layer modifier="shift">
+			<row keys="hash 1 2 3 4 5 6 7 8 9 0 double-quote d-umlaut" />
+			<row keys="A Z E R T Y U I O P en-dash plus-minus" />
+			<row keys="Q S D F G H J K L M backslash vulgar-half" />
+			<row keys="close-angle W X C V B N question bang ellipsis equal" />
+			<row keys="space" />
+		</layer>
+	</layers>
+
+	<variables>
+    <!-- spacing accents as string variables -->
+		<string id="grave"  value="`" />
+		<string id="caret"  value="^" />
+		<string id="umlaut" value="¨" />
+		<string id="tilde"  value="~" />
+
+    <!-- sets representing vowels and accented vowels.  -->
+    <!-- There's an extra space between the lower and upper case for visual separation -->
+    <!-- but, there are only 10 items in the following four sets -->
+		<set id="vowel"       value="a e i o u  A E I O U" />
+		<set id="graveVowel"  value="à è ì ò ù  À È Ì Ò Ù" />
+		<set id="caretVowel"  value="â ê î ô û  Â Ê Î Ô Û" />
+		<set id="umlautVowel" value="ä ë ï ö ü  Ä Ë Ï Ö Ü" />
+
+    <!-- a set containing all spacing accents -->
+		<set id="spacing_accent" value="${grave} ${caret} ${umlaut} ${tilde}" />
+	</variables>
+
+	<transforms type="simple">
+		<transformGroup>
+      <!-- use sets for those that fit neatly into sets -->
+			<transform from="${grave}($[vowel])"  to="$[1:graveVowel]" />
+			<transform from="${caret}($[vowel])"  to="$[1:caretVowel]" />
+			<transform from="${umlaut}($[vowel])" to="$[1:umlautVowel]" />
+
+      <!-- y also takes umlaut (in this sample) -->
+			<transform from="${umlaut}y" to="ÿ" />
+
+      <!-- tilde is on a subset, not all vowels, + n -->
+			<transform from="${tilde}a" to="ã" />
+			<transform from="${tilde}A" to="Ã" />
+			<transform from="${tilde}n" to="ñ" />
+			<transform from="${tilde}N" to="Ñ" />
+			<transform from="${tilde}o" to="õ" />
+			<transform from="${tilde}O" to="Õ" />
+
+      <!-- accent + space = spacing accent -->
+			<transform from="($[spacing_accent]) " to="$1" />
+		</transformGroup>
+		<transformGroup>
+      <!-- this is a reorder group -->
+      <!-- nod-Lana partial example -->
+			<reorder from="\u1A60" order="127" />
+			<reorder from="\u1A6B" order="42" />
+			<reorder from="[\u1A75-\u1A79]" order="55" />
+      <!-- ... partial example ... -->
+		</transformGroup>
+	</transforms>
+</keyboard>
