@@ -406,6 +406,27 @@ test_reorder_standalone() {
   return EXIT_SUCCESS;
 }
 
+int test_map() {
+  std::cout << "== " << __FUNCTION__ << std::endl;
+
+  std::cout << __FILE__ << ":" << __LINE__ << "  transform_entry::findIndex" << std::endl;
+  {
+    std::deque<std::u32string> list;
+    assert_equal(transform_entry::findIndex(U"Does Not Exist", list), -1);
+
+    list.emplace_back(U"0th");
+    list.emplace_back(U"First");
+    list.emplace_back(U"Second");
+
+    assert_equal(transform_entry::findIndex(U"First", list), 1);
+    assert_equal(transform_entry::findIndex(U"0th", list), 0);
+    assert_equal(transform_entry::findIndex(U"Second", list), 2);
+    assert_equal(transform_entry::findIndex(U"Nowhere", list), -1);
+  }
+
+  return EXIT_SUCCESS;
+}
+
 int
 main(int argc, const char *argv[]) {
   int rc = EXIT_SUCCESS;
@@ -417,6 +438,11 @@ main(int argc, const char *argv[]) {
   if (test_reorder_standalone() != EXIT_SUCCESS) {
     rc = EXIT_FAILURE;
   }
+
+  if (test_map() != EXIT_SUCCESS) {
+    rc = EXIT_FAILURE;
+  }
+
 
   if (rc == EXIT_FAILURE) {
     std::cout << "== FAILURE" << std::endl;
