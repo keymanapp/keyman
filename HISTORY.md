@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.167 alpha 2023-08-25
+
+* feat(core): implement mapped set mapping (#9504)
+* feat(resources): add pcm keyboard (#9508)
+
 ## 17.0.166 alpha 2023-08-24
 
 * chore(common): Update crowdin strings for French (#9505)
