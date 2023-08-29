@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.168 alpha 2023-08-29
+
+* refactor(linux): Fix warning (#9513)
+
 ## 17.0.167 alpha 2023-08-25
 
 * feat(core): implement mapped set mapping (#9504)
