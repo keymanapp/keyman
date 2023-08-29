@@ -152,12 +152,12 @@ int test_uset() {
     {0x127, 0x127} // [ħ]
   };
 
-  USet u0(&r[0], 2);
+  SimpleUSet u0(&r[0], 2);
   assert_equal(u0.contains(0x62), true); // b
   assert_equal(u0.contains(0x41), false); // A
   assert_equal(u0.contains(0x127), true); // ħ
 
-  USet uempty;
+  SimpleUSet uempty;
   assert_equal(uempty.contains(0x62), false);
   assert_equal(uempty.contains(0x127), false);
 

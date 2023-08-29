@@ -165,8 +165,8 @@ export class KeysCompiler extends SectionCompiler {
         key.longPress
       );
       const longPressDefault = sections.strs.allocAndUnescapeString(
-        // TODO-LDML: markers,variables
-        key.longPressDefault
+        // TODO-LDML: variables
+        sections.vars.substituteMarkerString(key.longPressDefault),
       );
       const multiTap: ListItem = sections.list.allocListFromEscapedSpaces(
         sections.strs,

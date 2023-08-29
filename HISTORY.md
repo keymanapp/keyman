@@ -1,5 +1,70 @@
 # Keyman Version History
 
+## 17.0.167 alpha 2023-08-25
+
+* feat(core): implement mapped set mapping (#9504)
+* feat(resources): add pcm keyboard (#9508)
+
+## 17.0.166 alpha 2023-08-24
+
+* chore(common): Update crowdin strings for French (#9505)
+
+## 17.0.165 alpha 2023-08-23
+
+* feat(core): add display=id (#9484)
+
+## 17.0.164 alpha 2023-08-22
+
+* fix(common): don't crash on illegal unicodesets (#9492)
+
+## 17.0.163 alpha 2023-08-21
+
+* chore(web): Update keymanweb-osk.ttf to v. 3.0 (#9469)
+
+## 17.0.162 alpha 2023-08-18
+
+*  (#9483)
+* fix(windows): allow QR share box to grow to edge of default configuration parent window (#9472)
+* chore(resources):  update CLDR to post-PRI (#9482)
+
+## 17.0.161 alpha 2023-08-16
+
+*  (#9440)
+
+## 17.0.160 alpha 2023-08-14
+
+* feat(core): limit max marker to 0xD7FF (#9448)
+
+## 17.0.159 alpha 2023-08-11
+
+*  (#9405)
+
+## 17.0.158 alpha 2023-08-09
+
+* chore(linux): Disable Mantic builds on Launchpad (#9435)
+* feat(windows): Use Keyboard Activated event API call to turn off caps lock (if required) (#9353)
+* chore: stats script parameters (#9431)
+* feat(developer): add 'default' property for longpress keys (#9432)
+* chore(developer): improve kmc sentry reporting on fatal build errors (#9441)
+
+## 17.0.157 alpha 2023-08-08
+
+* fix(linux): fix memory leaks and method name (#9413)
+
+## 17.0.156 alpha 2023-08-07
+
+* epic: kmc-kmw KeymanWeb compiler in Typescript (#8954)
+
+## 17.0.155 alpha 2023-08-05
+
+* chore(developer): update markers per review (#9374)
+
+## 17.0.154 alpha 2023-08-04
+
+* chore(common): Update crowdin GHA to trigger daily (#9410)
+* fix(web): forgot to target es5 when minifying polyfilled worker (#9409)
+* chore(common): Update history.md with 16.0 stable entries (#9419)
+
 ## 17.0.153 alpha 2023-08-03
 
 * docs(windows): Update OS requirement to Windows 10 (#9381)
@@ -905,6 +970,51 @@
 * feat(windows): configuration UI polish (#7206)
 * chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
+
+## 16.0.141 stable 2023-07-25
+
+* chore(mac): fix corrupt installer (#9332)
+
+## 16.0.140 stable 2023-07-21
+
+* chore(linux): Update debian changelog (#8451)
+* chore(linux): Prevent building on s390x (#8476)
+* fix(linux): Display error message for corrupt .kmp file (#8480)
+* chore(linux): Run and ignore autopkgtests on s390x (#8491)
+* chore(linux): Revert "Run and ignore autopkgtests on s390x" (#8505)
+* chore(ios): Xcode 14 upgrade (#8487)
+* fix(developer): package editor no longer loses RTL flag for LMs (#8607)
+* chore(common): use mac /usr/bin/stat rather than homebrew version (#8925)
+* chore(ios): replace fv cert (#8923)
+* fix(core): Fix compilation if hotdoc is installed :cherries: (#8929)
+* chore(linux): Move some files to keyman-config :cherries: (#8930)
+* fix(core): Fix compiling with GCC 13 (#8932)
+
+## 16.0.139 stable 2023-03-16
+
+* chore: Fail TC build if triggering Jenkins build fails (#8141)
+* chore(linux): Fix lintian warnings (#8153)
+* chore(linux): Update debian changelog (#8155)
+* chore(ios): update certificate (#8177)
+* cherrypick(windows): Fix Portuguese UI language name (#8190)
+* fix(linux): Fix autopkgtests (#8180)
+* chore(linux): Update changelog from Debian (#8191)
+* cherrypick(common): Cleanup Kannada locale (#8189)
+* fix(windows): add remove lang id uses correct kbd (#8195)
+* fix(linux): Fix autopkgtests (#8200)
+* chore(linux): Exclude autopkg tests on s390x (#8217)
+* chore(common): Update Fula strings for Sprint A17S6 (#8246)
+* chore(windows): Remove old Kannada setup strings (#8258)
+* fix(linux): Fix debian postinst script (#8295)
+* fix(developer): lm compiler handle missing line no in errors (#8445)
+
+## 16.0.138 stable 2023-02-01
+
+* chore: add new developer build trigger (#8139)
+
+## 16.0.137 stable 2023-02-01
+
+* chore(common): Release 16.0
 
 ## 16.0.136 beta 2023-01-31
 

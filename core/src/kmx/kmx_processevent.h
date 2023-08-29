@@ -86,7 +86,6 @@ private:
   /* Caps Lock and modifier management */
 
   KMX_BOOL IsCapsLockOn(KMX_DWORD modifiers);
-  void SetCapsLock(KMX_DWORD &modifiers, KMX_BOOL capsLockOn, KMX_BOOL force = FALSE);
   void ResetCapsLock(KMX_DWORD &modifiers, KMX_BOOL isKeyDown);
   KMX_BOOL KeyCapsLockPress(KMX_DWORD &modifiers, KMX_BOOL isKeyDown);
   void KeyShiftPress(KMX_DWORD &modifiers, KMX_BOOL isKeyDown);
@@ -107,6 +106,7 @@ public:
   KMX_Environment *GetEnvironment();
   KMX_Environment const *GetEnvironment() const;
   INTKEYBOARDINFO const *GetKeyboard() const;
+  void SetCapsLock(KMX_DWORD &modifiers, KMX_BOOL capsLockOn, KMX_BOOL force = FALSE);
 
   // Utility function
 public:
