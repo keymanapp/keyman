@@ -62,7 +62,7 @@ export class KeyboardInfoCompiler {
   }
 
   /**
-   * Merges source .keyboard_info file with metadata from the keyboard and package source file.
+   * Builds a .keyboard_info file with metadata from the keyboard and package source file.
    * This function is intended for use within the keyboards repository. While many of the
    * parameters could be deduced from each other, they are specified here to reduce the
    * number of places the filenames are constructed.
@@ -71,7 +71,7 @@ export class KeyboardInfoCompiler {
    *
    * @param sources                     Details on files from which to extract metadata
    */
-  public writeMergedKeyboardInfoFile(
+  public writeKeyboardInfoFile(
     sources: KeyboardInfoSources
   ): Uint8Array {
 
@@ -158,7 +158,7 @@ export class KeyboardInfoCompiler {
     // description
 
     if(kmpJsonData.info.description?.description) {
-      keyboard_info.description = kmpJsonData.info.description?.description.trim();
+      keyboard_info.description = kmpJsonData.info.description.description.trim();
     }
 
     // extract the language identifiers from the language metadata arrays for

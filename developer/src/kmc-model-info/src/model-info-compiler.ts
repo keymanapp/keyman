@@ -1,5 +1,5 @@
 /**
- * Merges a source .model_info file with metadata extracted from .kps file and
+ * Builds a source .model_info file with metadata extracted from .kps file and
  * compiled files to produce a comprehensive .model_info file.
  */
 
@@ -7,6 +7,8 @@ import { minKeymanVersion } from "./min-keyman-version.js";
 import { ModelInfoFile } from "./model-info-file.js";
 import { CompilerCallbacks, KmpJsonFile } from "@keymanapp/common-types";
 import { ModelInfoCompilerMessages } from "./messages.js";
+
+const HelpRoot = 'https://help.keyman.com/model/';
 
 /* c8 ignore start */
 export class ModelInfoOptions {
@@ -28,16 +30,15 @@ export class ModelInfoOptions {
 /* c8 ignore stop */
 
 /**
- * Merges source .model_info file with metadata from the model and package source file.
+ * Builds .model_info file with metadata from the model and package source file.
  * This function is intended for use within the lexical-models repository. While many of the
  * parameters could be deduced from each other, they are specified here to reduce the
  * number of places the filenames are constructed.
  *
- * @param sourceModelInfoFileName  Path for the source .model_info file
+ * @param callbacks
  * @param options                  Details on files from which to extract additional metadata
  */
-export function writeMergedModelMetadataFile(
-    sourceModelInfoFileName: string,
+export function writeModelMetadataFile(
     callbacks: CompilerCallbacks,
     options: ModelInfoOptions
   ): Uint8Array {
@@ -58,66 +59,44 @@ export function writeMergedModelMetadataFile(
     * For full documentation, see:
     * https://help.keyman.com/developer/cloud/model_info/1.0/
     */
-  const dataInput = callbacks.loadFile(sourceModelInfoFileName);
-  if(!dataInput) {
-    callbacks.reportMessage(ModelInfoCompilerMessages.Error_FileDoesNotExist({filename: sourceModelInfoFileName}));
-    return null;
-  }
 
-  let model_info: ModelInfoFile = null;
-  try {
-    const jsonInput = new TextDecoder('utf-8', {fatal: true}).decode(dataInput);
-    model_info = JSON.parse(jsonInput);
-  } catch(e) {
-    callbacks.reportMessage(ModelInfoCompilerMessages.Error_FileIsNotValid({filename: sourceModelInfoFileName, e}));
-    return null;
-  }
+  let model_info: ModelInfoFile = {
+    languages: [],
+    license: 'mit'
+  };
 
   //
-  // Build merged .model_info file
+  // Build .model_info file -- some fields have "special" behaviours -- see below
   // https://api.keyman.com/schemas/model_info.source.json and
   // https://api.keyman.com/schemas/model_info.distribution.json
   // https://help.keyman.com/developer/cloud/model_info/1.0
   //
 
-  function setModelMetadata(field: keyof ModelInfoFile, expected: unknown, warn: boolean = true) {
-    /* c8 ignore next 4 */
-    if (model_info[field] && model_info[field] !== expected) {
-      if (warn ?? true) {
-        callbacks.reportMessage(ModelInfoCompilerMessages.Warn_MetadataFieldInconsistent({
-          field, value:model_info[field], expected
-        }));
-      }
+  // TODO: isrtl
+  // TODO: license
 
-    }
-    // TypeScript gets upset with this assignment, because it cannot deduce
-    // the exact type of model_info[field] -- there are many possibilities!
-    // So we assert that it's unknown so that TypeScript can chill.
-    (<unknown> model_info[field]) = model_info[field] || expected;
-  }
+  model_info.id = options.model_id;
+  model_info.name = options.kmpJsonData.info.name.description;
 
-  //
-  // Merge model info file -- some fields have "special" behaviours -- see below
-  //
-
-  setModelMetadata('id', options.model_id);
-
-  setModelMetadata('name', options.kmpJsonData.info.name.description);
-
-  let author = options.kmpJsonData.info.author;
-  setModelMetadata('authorName', author?.description);
+  const author = options.kmpJsonData.info.author;
+  model_info.authorName = author?.description ?? '';
 
   if (author?.url) {
     // we strip the mailto: from the .kps file for the .model_info
-    let match = author.url.match(/^(mailto\:)?(.+)$/);
+    const match = author.url.match(/^(mailto\:)?(.+)$/);
     /* c8 ignore next 3 */
     if (match === null) {
       callbacks.reportMessage(ModelInfoCompilerMessages.Error_InvalidAuthorEmail({email:author.url}));
       return null;
     }
 
-    let email = match[2];
-    setModelMetadata('authorEmail', email, false);
+    model_info.authorEmail = match[2];
+  }
+
+  // description
+
+  if(options.kmpJsonData.info.description?.description) {
+    model_info.description = options.kmpJsonData.info.description.description.trim();
   }
 
   // extract the language identifiers from the language metadata
@@ -125,37 +104,32 @@ export function writeMergedModelMetadataFile(
   // and merge into a single array of identifiers in the
   // .model_info file.
 
-  model_info.languages = model_info.languages || options.kmpJsonData.lexicalModels.reduce((a, e) => [].concat(a, e.languages.map((f) => f.id)), []);
+  model_info.languages = options.kmpJsonData.lexicalModels.reduce((a, e) => [].concat(a, e.languages.map((f) => f.id)), []);
 
-  setModelMetadata('lastModifiedDate', (new Date).toISOString());
-  setModelMetadata('packageFilename', callbacks.path.basename(options.kmpFileName));
+  // TODO: use git date
+  model_info.lastModifiedDate = (new Date).toISOString();
 
-  // Always overwrite with actual file size
+  model_info.packageFilename = callbacks.path.basename(options.kmpFileName);
   model_info.packageFileSize = callbacks.fileSize(options.kmpFileName);
   if(model_info.packageFileSize === undefined) {
     callbacks.reportMessage(ModelInfoCompilerMessages.Error_FileDoesNotExist({filename:options.kmpFileName}));
     return null;
   }
 
-  setModelMetadata('jsFilename', callbacks.path.basename(options.modelFileName));
-
-  // Always overwrite with actual file size
+  model_info.jsFilename = callbacks.path.basename(options.modelFileName);
   model_info.jsFileSize = callbacks.fileSize(options.modelFileName);
   if(model_info.jsFileSize === undefined) {
     callbacks.reportMessage(ModelInfoCompilerMessages.Error_FileDoesNotExist({filename:options.modelFileName}));
     return null;
   }
 
-  // Always overwrite source data
   model_info.packageIncludes = options.kmpJsonData.files.filter((e) => !!e.name.match(/.[ot]tf$/i)).length ? ['fonts'] : [];
-
-  setModelMetadata('version', options.kmpJsonData.info.version.description);
-
-  // The minimum Keyman version detected in the package file may be manually set higher by the developer
-  setModelMetadata('minKeymanVersion', minKeymanVersion, false);
+  model_info.version = options.kmpJsonData.info.version.description;
+  model_info.minKeymanVersion = minKeymanVersion;
+  model_info.helpLink = HelpRoot + model_info.id;
 
   if(options.sourcePath) {
-    setModelMetadata('sourcePath', options.sourcePath);
+    model_info.sourcePath = options.sourcePath;
   }
 
   const jsonOutput = JSON.stringify(model_info, null, 2);

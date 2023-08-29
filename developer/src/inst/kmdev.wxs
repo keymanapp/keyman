@@ -254,10 +254,6 @@
       </Component>
 
       <Component Directory="INSTALLDIR">
-        <File Name='kmlmi.cmd' KeyPath="yes" Source="node\kmlmi.cmd" />
-      </Component>
-
-      <Component Directory="INSTALLDIR">
         <File Name='kmlmp.cmd' KeyPath="yes" Source="node\kmlmp.cmd" />
       </Component>
 

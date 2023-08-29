@@ -9,45 +9,34 @@ import { getLastGitCommitDate } from '../../util/getLastGitCommitDate.js';
 
 export class BuildKeyboardInfo extends BuildActivity {
   public get name(): string { return 'Keyboard metadata'; }
-  public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.KeyboardInfo; }
+  public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.Project; }
   public get compiledExtension(): KeymanFileTypes.Binary { return KeymanFileTypes.Binary.KeyboardInfo; }
   public get description(): string { return 'Build a keyboard metadata file'; }
   public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
-    if(KeymanFileTypes.filenameIs(infile, KeymanFileTypes.Source.KeyboardInfo)) {
-      // We are given a .keyboard_info but need to use the project file in the
-      // same folder, so that we can find the related files. This also supports
-      // version 2.0 projects (where the .kpj file is optional).
-      infile = KeymanFileTypes.replaceExtension(infile, KeymanFileTypes.Source.KeyboardInfo, KeymanFileTypes.Source.Project);
-    }
-
-    if(!callbacks.fs.existsSync(infile)) {
-      // We cannot build a .keyboard_info if we don't have a repository-style project
-      return false;
+    if(!KeymanFileTypes.filenameIs(infile, KeymanFileTypes.Source.Project)) {
+      // Even if the project file does not exist, we use its name as our reference
+      // in order to avoid ambiguity
+      throw new Error(`BuildKeyboardInfo called with unexpected file type ${infile}`);
     }
 
     const project = loadProject(infile, callbacks);
     if(!project) {
-      return false;
-    }
-
-    const metadata = findProjectFile(callbacks, project, KeymanFileTypes.Source.KeyboardInfo);
-    if(!metadata) {
-      // Project loader should always have added a metadata file
+      // Error messages written by loadProject
       return false;
     }
 
     const keyboard = findProjectFile(callbacks, project, KeymanFileTypes.Source.KeymanKeyboard);
     const kps = findProjectFile(callbacks, project, KeymanFileTypes.Source.Package);
     if(!keyboard || !kps)  {
+      // Error messages written by findProjectFile
       return false;
     }
 
-
     const jsFilename = project.resolveOutputFilePath(keyboard, KeymanFileTypes.Source.KeymanKeyboard, KeymanFileTypes.Binary.WebKeyboard);
-    const lastCommitDate = getLastGitCommitDate(callbacks.path.dirname(project.resolveInputFilePath(metadata)));
+    const lastCommitDate = getLastGitCommitDate(project.projectPath);
 
     const compiler = new KeyboardInfoCompiler(callbacks);
-    const data = compiler.writeMergedKeyboardInfoFile({
+    const data = compiler.writeKeyboardInfoFile({
       kmpFilename:  project.resolveOutputFilePath(kps, KeymanFileTypes.Source.Package, KeymanFileTypes.Binary.Package),
       kpsFilename: project.resolveInputFilePath(kps),
       jsFilename: fs.existsSync(jsFilename) ? jsFilename : undefined,
@@ -60,8 +49,10 @@ export class BuildKeyboardInfo extends BuildActivity {
       return false;
     }
 
+    const outputFilename = project.getOutputFilePath(KeymanFileTypes.Binary.KeyboardInfo);
+
     fs.writeFileSync(
-      project.resolveOutputFilePath(metadata, KeymanFileTypes.Source.KeyboardInfo, KeymanFileTypes.Binary.KeyboardInfo),
+      outputFilename,
       data
     );
 

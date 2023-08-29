@@ -7,7 +7,6 @@ export interface ModelInfoFile {
   license: "mit";
   languages: Array<string>;
   lastModifiedDate?: string;
-  links: ModelInfoFileLink[];
   packageFilename?: string;
   packageFileSize?: number;
   jsFilename?: string;
@@ -21,13 +20,7 @@ export interface ModelInfoFile {
   related?: {[id:string]:ModelInfoFileRelated};
 }
 
-export interface ModelInfoFileLink {
-  name: string;
-  url: string;
-}
-
 export interface ModelInfoFileRelated {
   deprecates?: string;
   deprecatedBy?: string;
-  note?: string;
 }

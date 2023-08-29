@@ -41,10 +41,6 @@ Supported file types:
   * .model.ts: Keyman lexical model
   * .kps: Keyman keyboard or lexical model package
 
-The following two metadata file types are also supported:
-  * .model_info: lexical model metadata file
-  * .keyboard_info: keyboard metadata file
-
 File lists can be referenced with @filelist.txt.
 
 If no input file is supplied, kmc will build the current folder.`)

@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { CompilerCallbacks, CompilerFileCallbacks, CompilerOptions, KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanFileTypes } from '@keymanapp/common-types';
 import { BuildActivity } from './BuildActivity.js';
-import { buildActivities } from './buildActivities.js';
+import { buildActivities, buildKeyboardInfoActivity, buildModelInfoActivity } from './buildActivities.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { loadProject } from '../../util/projectLoader.js';
 
@@ -47,11 +47,17 @@ class ProjectBuilder {
         continue;
       }
 
-      if(KeymanFileTypes.filenameIsMetadata(builder.sourceExtension) && this.project.options.skipMetadataFiles) {
-        continue;
-      }
-
       if(!await this.buildProjectTargets(builder)) {
+        return false;
+      }
+    }
+
+    // Build project metadata
+    if(!this.project.options.skipMetadataFiles) {
+      if(!await (this.buildProjectTargets(
+          this.project.isKeyboardProject()
+          ? buildKeyboardInfoActivity
+          : buildModelInfoActivity))) {
         return false;
       }
     }
@@ -60,6 +66,10 @@ class ProjectBuilder {
   }
 
   async buildProjectTargets(activity: BuildActivity): Promise<boolean> {
+    if(activity.sourceExtension == KeymanFileTypes.Source.Project) {
+      return await this.buildTarget(this.project.projectFile, activity);
+    }
+
     let result = true;
     for(let file of this.project.files) {
       if(file.fileType.toLowerCase() == activity.sourceExtension) {
