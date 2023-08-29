@@ -6,6 +6,7 @@ import { KmpCompiler } from '@keymanapp/kmc-package';
 import { loadProject } from '../../util/projectLoader.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { calculateSourcePath } from '../../util/calculateSourcePath.js';
+import { getLastGitCommitDate } from 'src/util/getLastGitCommitDate.js';
 
 export class BuildModelInfo extends BuildActivity {
   public get name(): string { return 'Lexical model metadata'; }
@@ -55,6 +56,8 @@ export class BuildModelInfo extends BuildActivity {
       return false;
     }
 
+    const lastCommitDate = getLastGitCommitDate(project.projectPath);
+
     const data = writeModelMetadataFile(
       callbacks,
       {
@@ -63,6 +66,8 @@ export class BuildModelInfo extends BuildActivity {
         sourcePath: calculateSourcePath(infile),
         modelFileName: project.resolveOutputFilePath(model, KeymanFileTypes.Source.Model, KeymanFileTypes.Binary.Model),
         kmpFileName: project.resolveOutputFilePath(kps, KeymanFileTypes.Source.Package, KeymanFileTypes.Binary.Package),
+        kpsFilename: project.resolveInputFilePath(kps),
+        lastCommitDate
       }
     );
 

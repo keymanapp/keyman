@@ -4,7 +4,7 @@ export interface ModelInfoFile {
   authorName?: string;
   authorEmail?: string;
   description?: string;
-  license: "mit";
+  license?: "mit";
   languages: Array<string>;
   lastModifiedDate?: string;
   packageFilename?: string;

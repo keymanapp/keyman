@@ -32,6 +32,7 @@
     "developer/src/kmc-package",
     "developer/src/kmc",
     "developer/src/server",
+    "developer/utils",
     "common/models/*",
     "common/test/resources",
     "common/tools/*",
@@ -43,6 +44,7 @@
   "dependencies": {
     "@keymanapp/common-types": "file:common/web/types",
     "@keymanapp/developer-test-helpers": "file:developer/src/common/web/test-helpers",
+    "@keymanapp/developer-utils": "file:developer/src/common/web/utils",
     "@keymanapp/hextobin": "file:common/tools/hextobin",
     "@keymanapp/keyman-version": "file:common/web/keyman-version",
     "@keymanapp/ldml-keyboard-constants": "file:core/include/ldml"

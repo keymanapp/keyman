@@ -1,0 +1,32 @@
+{
+  "name": "@keymanapp/developer-utils",
+  "description": "Keyman Developer utilities",
+  "type": "module",
+  "exports": {
+    ".": "./build/index.js"
+  },
+  "files": [
+    "/build/"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.4.1",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.9.5",
+    "c8": "^7.12.0",
+    "chai": "^4.3.4",
+    "mocha": "^8.4.0"
+  },
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@keymanapp/common-types": "*"
+  },
+  "mocha": {
+    "spec": "build/test/**/test-*.js",
+    "require": [
+      "source-map-support/register"
+    ]
+  }
+}

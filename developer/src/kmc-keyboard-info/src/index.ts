@@ -8,7 +8,7 @@ import { KeyboardInfoFile, KeyboardInfoFileIncludes, KeyboardInfoFilePlatform } 
 import { KeymanFileTypes, CompilerCallbacks, KmpJsonFile, KmxFileReader, KMX, KeymanTargets } from "@keymanapp/common-types";
 import { KeyboardInfoCompilerMessages } from "./messages.js";
 import langtags from "./imports/langtags.js";
-import { validateMITLicense } from "./validate-mit-license.js";
+import { validateMITLicense } from "@keymanapp/developer-utils";
 import { KmpCompiler } from "@keymanapp/kmc-package";
 
 const regionNames = new Intl.DisplayNames(['en'], { type: "region" });

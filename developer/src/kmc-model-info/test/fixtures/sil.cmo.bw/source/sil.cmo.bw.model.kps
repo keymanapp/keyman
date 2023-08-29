@@ -7,6 +7,7 @@
   <Options>
     <ExecuteProgram></ExecuteProgram>
     <ReadMeFile>readme.htm</ReadMeFile>
+    <LicenseFile>..\LICENSE.md</LicenseFile>
     <MSIFileName></MSIFileName>
     <MSIOptions></MSIOptions>
   </Options>
@@ -27,6 +28,12 @@
       <Description></Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.js</FileType>
+    </File>
+    <File>
+      <Name>..\LICENSE.md</Name>
+      <Description></Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.md</FileType>
     </File>
     <File>
       <Name>welcome.htm</Name>

@@ -25,7 +25,8 @@
   },
   "dependencies": {
     "@keymanapp/common-types": "*",
-    "@keymanapp/kmc-package": "*"
+    "@keymanapp/kmc-package": "*",
+    "@keymanapp/developer-utils": "*"
   },
   "devDependencies": {
     "@types/chai": "^4.3.5",
