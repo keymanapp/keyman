@@ -870,7 +870,7 @@ describe("GestureMatcher", function() {
       sources[0].path.on('invalidated', () => secondMatcher.update());
 
       timedPromise(50).then(() => {
-        const secondContact = new GestureSource<string>(5, true);
+        const secondContact = new GestureSource<string>(5, null, true);
         sources.push(secondContact);
         secondMatcher.addContact(secondContact);
         secondContact.update({

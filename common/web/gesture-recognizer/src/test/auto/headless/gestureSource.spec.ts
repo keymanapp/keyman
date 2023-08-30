@@ -5,7 +5,7 @@ import { GestureSource, InputSample } from '@keymanapp/gesture-recognizer';
 describe("GestureSource", function() {
   describe(".constructSubview", function() {
     it("properly propagates updates", () => {
-      let source = new GestureSource<string>(0, true);
+      let source = new GestureSource<string>(0, null, true);
       let subview = source.constructSubview(true, true);
 
       assert.equal(subview.path.coords.length, 0);
@@ -20,11 +20,11 @@ describe("GestureSource", function() {
       source.update(sample);
 
       assert.equal(subview.path.coords.length, 1);
-      assert.equal(subview.currentSample, sample);
+      assert.deepEqual(subview.currentSample, sample);
     });
 
     it("propagates path termination (complete)",  () => {
-      let source = new GestureSource<string>(0, true);
+      let source = new GestureSource<string>(0, null, true);
       let subview = source.constructSubview(true, true);
       let subview2 = source.constructSubview(true, true);
 
@@ -41,7 +41,7 @@ describe("GestureSource", function() {
       subview.terminate(false);
 
       assert.equal(subview.path.coords.length, 1);
-      assert.equal(subview.currentSample, sample);
+      assert.deepEqual(subview.currentSample, sample);
       assert.equal(subview.isPathComplete, true);
       assert.equal(subview.path.wasCancelled, false);
       assert.equal(subview2.isPathComplete, true);
