@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.169 alpha 2023-08-30
+
+* fix(linux): Fix exception in km-kvk2ldml (#9523)
+
 ## 17.0.168 alpha 2023-08-29
 
 * refactor(linux): Fix warning (#9513)
