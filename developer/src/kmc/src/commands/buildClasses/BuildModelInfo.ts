@@ -1,12 +1,12 @@
 import * as fs from 'fs';
 import { BuildActivity } from './BuildActivity.js';
 import { CompilerCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
-import { writeModelMetadataFile } from '@keymanapp/kmc-model-info';
+import { ModelInfoCompiler } from '@keymanapp/kmc-model-info';
 import { KmpCompiler } from '@keymanapp/kmc-package';
 import { loadProject } from '../../util/projectLoader.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { calculateSourcePath } from '../../util/calculateSourcePath.js';
-import { getLastGitCommitDate } from 'src/util/getLastGitCommitDate.js';
+import { getLastGitCommitDate } from '../../util/getLastGitCommitDate.js';
 
 export class BuildModelInfo extends BuildActivity {
   public get name(): string { return 'Lexical model metadata'; }
@@ -57,19 +57,16 @@ export class BuildModelInfo extends BuildActivity {
     }
 
     const lastCommitDate = getLastGitCommitDate(project.projectPath);
-
-    const data = writeModelMetadataFile(
-      callbacks,
-      {
-        model_id: callbacks.path.basename(project.projectPath, KeymanFileTypes.Source.Project),
-        kmpJsonData,
-        sourcePath: calculateSourcePath(infile),
-        modelFileName: project.resolveOutputFilePath(model, KeymanFileTypes.Source.Model, KeymanFileTypes.Binary.Model),
-        kmpFileName: project.resolveOutputFilePath(kps, KeymanFileTypes.Source.Package, KeymanFileTypes.Binary.Package),
-        kpsFilename: project.resolveInputFilePath(kps),
-        lastCommitDate
-      }
-    );
+    const compiler = new ModelInfoCompiler(callbacks);
+    const data = compiler.writeModelMetadataFile({
+      model_id: callbacks.path.basename(project.projectPath, KeymanFileTypes.Source.Project),
+      kmpJsonData,
+      sourcePath: calculateSourcePath(infile),
+      modelFileName: project.resolveOutputFilePath(model, KeymanFileTypes.Source.Model, KeymanFileTypes.Binary.Model),
+      kmpFileName: project.resolveOutputFilePath(kps, KeymanFileTypes.Source.Package, KeymanFileTypes.Binary.Package),
+      kpsFilename: project.resolveInputFilePath(kps),
+      lastCommitDate
+    });
 
     if(data == null) {
       // Error messages have already been emitted by writeModelMetadataFile
