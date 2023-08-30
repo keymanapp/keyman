@@ -29,11 +29,11 @@ type SimSpec<Type> = SimSpecSequence<Type> | SimSpecPriorMatch<Type>;
 type SimInitialSpec<Type> = SimSpec<Type> | SimSpecTimer<Type>;
 
 interface MockedPredecessor<Type> {
-  comparisonStandard: {
+  primaryPath: {
     sample: InputSample<Type>,
     baseItem: Type
   },
-  pathMatchers: GestureMatcher<Type>[],
+  sources: GestureSource<Type>[],
   _result: {
     action: {
       item: Type
@@ -45,12 +45,16 @@ function mockedPredecessor<Type>(
   lastSample: InputSample<Type>,
   baseItem?: Type
 ): MockedPredecessor<Type> {
+  const mockedSrc = new GestureSource<Type>(simSourceIdSeed++, true);
+  mockedSrc.path.extend(lastSample);
+  mockedSrc.terminate(false);
+
   return {
-    comparisonStandard: {
+    primaryPath: {
       sample: lastSample,
       baseItem: baseItem ?? lastSample.item as Type
     },
-    pathMatchers: [],
+    sources: [mockedSrc],
     _result: {
       action: {
         item: baseItem ?? lastSample.item as Type
@@ -71,8 +75,7 @@ function prepareSourcesFromPriorMatcher<Type>(
   contactSpec: SimSpecPriorMatch<Type>
 ): ReturnType<typeof prepareSimContact<Type>> {
   const spec = contactSpec;
-  const existingSources = spec.matcher.pathMatchers.map((pathMatch) => {
-    const src = pathMatch.source;
+  const existingSources = spec.matcher.sources.map((src) => {
     return src instanceof GestureSourceSubview<Type> ? src.baseSource : src;
   });
 
@@ -184,7 +187,7 @@ function getSimComponentInitialTime<Type>(
   switch(componentSpec.type) {
     case 'prior-matcher':
       // All path-updates are time-synchronized - all sources would report the same timestamp.
-      return componentSpec.matcher.pathMatchers[0].source.currentSample.t;
+      return componentSpec.matcher.sources[0].currentSample.t;
     case 'timer':
       return componentSpec.lastSample.t;
     case 'sequence':
