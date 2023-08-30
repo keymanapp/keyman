@@ -128,8 +128,9 @@ export class MouseEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
     }
 
     this.preventPropagation(event);
+    const config = this.getConfigForId(this.activeIdentifier);
 
-    if(!ZoneBoundaryChecker.inputMoveCancellationCheck(sample, this.config, this.disabledSafeBounds)) {
+    if(!ZoneBoundaryChecker.inputMoveCancellationCheck(sample, config, this.disabledSafeBounds)) {
       this.onInputMove(this.activeIdentifier, sample, event.target);
     } else {
       this.onInputMoveCancel(this.activeIdentifier, sample, event.target);

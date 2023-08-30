@@ -135,9 +135,11 @@ export class TouchEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
         propagationActive = false;
       }
 
+      const config = this.getConfigForId(touch.identifier);
+
       const sample = this.buildSampleFromTouch(touch, timestamp);
 
-      if(!ZoneBoundaryChecker.inputMoveCancellationCheck(sample, this.config, this.safeBoundMaskMap[touch.identifier])) {
+      if(!ZoneBoundaryChecker.inputMoveCancellationCheck(sample, config, this.safeBoundMaskMap[touch.identifier])) {
         this.onInputMove(touch.identifier, sample, touch.target);
       } else {
         this.onInputMoveCancel(touch.identifier, sample, touch.target);
