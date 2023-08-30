@@ -69,8 +69,8 @@ You'll also have to install `emscripten` (version 3.1.44 is known to work):
 ```shell
 git clone https://github.com/emscripten-core/emsdk.git
 cd emsdk
-./emsdk install latest
-./emsdk activate latest
+./emsdk install 3.1.44
+./emsdk activate 3.1.44
 export EMSCRIPTEN_BASE=$(pwd)/upstream/emscripten
 ```
 
