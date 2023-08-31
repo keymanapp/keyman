@@ -165,7 +165,9 @@ function run_tests() {
   cleanup
 }
 
-USE_WAYLAND=1
+# WORKAROUND for 16.0: disable Wayland tests
+USE_WAYLAND=0
+# USE_WAYLAND=1
 USE_X11=1
 
 while (( $# )); do
