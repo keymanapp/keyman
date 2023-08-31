@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.170 alpha 2023-08-31
+
+* fix(common): builder_parse broke on option parameters (#9489)
+* docs(linux): Explicitly specify emscripten version (#9527)
+
 ## 17.0.169 alpha 2023-08-30
 
 * fix(linux): Fix exception in km-kvk2ldml (#9523)
