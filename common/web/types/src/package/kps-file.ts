@@ -41,6 +41,7 @@ export interface KpsFileOptions {
   followKeyboardVersion?: string;
   readMeFile?: string;
   graphicFile?: string;
+  licenseFile?: string;
   executeProgram?: string;
   msiFileName?: string;
   msiOptions?: string;

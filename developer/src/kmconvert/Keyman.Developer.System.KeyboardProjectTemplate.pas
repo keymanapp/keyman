@@ -285,6 +285,12 @@ begin
     kps.Files.Add(f);
     kps.Options.ReadmeFile := f;
 
+    // Add license
+    f := TPackageContentFile.Create(kps);
+    f.FileName := BasePath + ID + '\' + SFile_LicenseMD;
+    kps.Files.Add(f);
+    kps.Options.LicenseFile := f;
+
     // Add metadata about the keyboard
     pk := TPackageKeyboard.Create(kps);
     pk.Name := Name;

@@ -224,6 +224,8 @@ type
     cmdKeyboardWebDisplayFonts: TButton;
     lblWebOSKFonts: TLabel;
     lblWebDisplayFonts: TLabel;
+    lblLicenseFile: TLabel;
+    cbLicense: TComboBox;
     procedure cmdCloseClick(Sender: TObject);
     procedure cmdAddFileClick(Sender: TObject);
     procedure cmdRemoveFileClick(Sender: TObject);
@@ -301,6 +303,7 @@ type
     procedure cmdRemoveRelatedPackageClick(Sender: TObject);
     procedure cmdKeyboardWebOSKFontsClick(Sender: TObject);
     procedure cmdKeyboardWebDisplayFontsClick(Sender: TObject);
+    procedure cbLicenseClick(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -355,6 +358,7 @@ type
     procedure RefreshRelatedPackagesList;
     function SelectedRelatedPackage: TPackageRelatedPackage;
     procedure ShowEditWebFontsForm(Fonts: TPackageContentFileReferenceList);
+    procedure UpdateLicense;
 
   protected
     function GetHelpTopic: string; override;
@@ -457,6 +461,7 @@ begin
 
     UpdateStartMenuPrograms;
     UpdateReadme;
+    UpdateLicense;
     UpdateImageFiles;
     UpdateImagePreviews;
     RefreshKeyboardList;
@@ -787,6 +792,7 @@ begin
   lbFiles.ItemIndex := lbFiles.Items.AddObject(ExtractFileName(FileName), f);
   lbFilesClick(lbFiles);
   UpdateReadme;
+  UpdateLicense;
   UpdateImageFiles;
   UpdateStartMenuPrograms;
 
@@ -832,6 +838,7 @@ begin
     if lbFiles.Items.Count > 0 then lbFiles.ItemIndex := 0;
     lbFilesClick(lbFiles);
     UpdateReadme;
+    UpdateLicense;
     UpdateImageFiles;
     UpdateStartMenuPrograms;
 
@@ -966,6 +973,16 @@ begin
     else pack.Options.ReadmeFile := cbReadMe.Items.Objects[cbReadMe.ItemIndex] as TPackageContentFile;
   Modified := True;
 end;
+
+procedure TfrmPackageEditor.cbLicenseClick(Sender: TObject);
+begin
+  if FSetup > 0 then Exit;
+  if cbLicense.ItemIndex <= 0
+    then pack.Options.LicenseFile := nil
+    else pack.Options.LicenseFile := cbLicense.Items.Objects[cbLicense.ItemIndex] as TPackageContentFile;
+  Modified := True;
+end;
+
 
 procedure TfrmPackageEditor.editCmdLineChange(Sender: TObject);
 begin
@@ -1280,6 +1297,11 @@ begin
   FillFileList(cbReadme, pack.Options.ReadmeFile);
 end;
 
+procedure TfrmPackageEditor.UpdateLicense;
+begin
+  FillFileList(cbLicense, pack.Options.LicenseFile);
+end;
+
 procedure TfrmPackageEditor.FillFileList(combo: TComboBox; obj: TObject; FileType: TKMFileType);
 var
   i: Integer;
@@ -1310,6 +1332,7 @@ begin
 
     UpdateOutPath;
     UpdateReadme;
+    UpdateLicense;
     UpdateImageFiles;
     UpdateStartMenuPrograms;
 

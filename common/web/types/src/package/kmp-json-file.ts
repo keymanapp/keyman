@@ -17,6 +17,7 @@ export interface KmpJsonFileSystem {
 export interface KmpJsonFileOptions {
   readmeFile?: string;
   graphicFile?: string;
+  licenseFile?: string;
   executeProgram?: string;
   msiFilename?: string;
   msiOptions?: string;
