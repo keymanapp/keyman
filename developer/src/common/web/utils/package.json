@@ -1,5 +1,6 @@
 {
   "name": "@keymanapp/developer-utils",
+  "private": true,
   "description": "Keyman Developer utilities",
   "type": "module",
   "exports": {
@@ -19,7 +20,6 @@
   "scripts": {
     "build": "tsc -b"
   },
-  "license": "MIT",
   "dependencies": {
     "@keymanapp/common-types": "*"
   },

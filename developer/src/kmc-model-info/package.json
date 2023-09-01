@@ -35,6 +35,9 @@
     "@keymanapp/models-types": "*",
     "@keymanapp/developer-utils": "*"
   },
+  "bundleDependencies": [
+    "@keymanapp/developer-utils"
+  ],
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",

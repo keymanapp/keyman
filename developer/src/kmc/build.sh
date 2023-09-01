@@ -94,7 +94,6 @@ readonly PACKAGES=(
   developer/src/kmc-model
   developer/src/kmc-model-info
   developer/src/kmc-package
-  developer/src/common/web/utils
 )
 
 if builder_start_action bundle; then
