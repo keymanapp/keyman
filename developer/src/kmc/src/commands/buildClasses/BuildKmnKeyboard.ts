@@ -16,14 +16,13 @@ export class BuildKmnKeyboard extends BuildActivity {
     }
 
     // We need to resolve paths to absolute paths before calling kmc-kmn
-    let outfile = this.getOutputFilename(infile, options);
+    if(options.outFile) {
+      options.outFile = getPosixAbsolutePath(options.outFile);
+    }
 
     infile = getPosixAbsolutePath(infile);
-    outfile = getPosixAbsolutePath(outfile);
 
-    // TODO: Currently this only builds .kmn->.kmx, and targeting .js is as-yet unsupported
-    // TODO: outfile should be set in options only?
-    return compiler.run(infile, outfile, options);
+    return compiler.run(infile, options);
   }
 }
 
