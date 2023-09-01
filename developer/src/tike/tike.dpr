@@ -287,7 +287,8 @@ uses
   Keyman.Developer.System.GenerateKeyboardIcon in '..\kmconvert\Keyman.Developer.System.GenerateKeyboardIcon.pas',
   Keyman.Developer.UI.UfrmEditLanguageExample in 'dialogs\examples\Keyman.Developer.UI.UfrmEditLanguageExample.pas' {frmEditLanguageExample},
   Keyman.Developer.UI.UfrmEditRelatedPackage in 'dialogs\relatedPackages\Keyman.Developer.UI.UfrmEditRelatedPackage.pas' {frmEditRelatedPackage},
-  Keyman.Developer.UI.UfrmEditPackageWebFonts in 'dialogs\packageWebFonts\Keyman.Developer.UI.UfrmEditPackageWebFonts.pas' {frmEditPackageWebFonts};
+  Keyman.Developer.UI.UfrmEditPackageWebFonts in 'dialogs\packageWebFonts\Keyman.Developer.UI.UfrmEditPackageWebFonts.pas' {frmEditPackageWebFonts},
+  Keyman.Developer.System.KmcWrapper in 'compile\Keyman.Developer.System.KmcWrapper.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
