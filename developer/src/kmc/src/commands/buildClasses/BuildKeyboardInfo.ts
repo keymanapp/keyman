@@ -4,10 +4,7 @@ import { CompilerCallbacks, CompilerOptions, KeymanDeveloperProject, KeymanFileT
 import { KeyboardInfoCompiler } from '@keymanapp/kmc-keyboard-info';
 import { loadProject } from '../../util/projectLoader.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
-import { KmpCompiler } from '@keymanapp/kmc-package';
 import { calculateSourcePath } from '../../util/calculateSourcePath.js';
-
-const HelpRoot = 'https://help.keyman.com/keyboard/';
 
 export class BuildKeyboardInfo extends BuildActivity {
   public get name(): string { return 'Keyboard metadata'; }
@@ -44,23 +41,14 @@ export class BuildKeyboardInfo extends BuildActivity {
       return false;
     }
 
-    let kmpCompiler = new KmpCompiler(callbacks);
-    let kmpJsonData = kmpCompiler.transformKpsToKmpObject(project.resolveInputFilePath(kps));
-    if(!kmpJsonData) {
-      // Errors will have been emitted by KmpCompiler
-      return false;
-    }
 
-    const keyboardFileNameJs = project.resolveOutputFilePath(keyboard, KeymanFileTypes.Source.KeymanKeyboard, KeymanFileTypes.Binary.WebKeyboard);
-    const keyboard_id = callbacks.path.basename(metadata.filename, KeymanFileTypes.Source.KeyboardInfo);
+    const jsFilename = project.resolveOutputFilePath(keyboard, KeymanFileTypes.Source.KeymanKeyboard, KeymanFileTypes.Binary.WebKeyboard);
+
     const compiler = new KeyboardInfoCompiler(callbacks);
     const data = compiler.writeMergedKeyboardInfoFile({
-      keyboard_id,
       kmpFilename:  project.resolveOutputFilePath(kps, KeymanFileTypes.Source.Package, KeymanFileTypes.Binary.Package),
-      kmpJsonData,
       kpsFilename: project.resolveInputFilePath(kps),
-      helpLink: HelpRoot + keyboard_id,
-      keyboardFilenameJs: fs.existsSync(keyboardFileNameJs) ? keyboardFileNameJs : undefined,
+      jsFilename: fs.existsSync(jsFilename) ? jsFilename : undefined,
       sourcePath: calculateSourcePath(infile)
     });
 
