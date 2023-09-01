@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.171 alpha 2023-09-01
+
+* chore(linux): Add `clean` target to `rules` (#9531)
+
 ## 17.0.170 alpha 2023-08-31
 
 * fix(common): builder_parse broke on option parameters (#9489)
