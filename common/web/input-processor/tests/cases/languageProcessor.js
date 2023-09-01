@@ -11,6 +11,7 @@ import { Mock } from '@keymanapp/keyboard-processor';
 import { LexicalModelCompiler } from '@keymanapp/kmc-model';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 // Required initialization setup.
 global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
@@ -22,9 +23,11 @@ String.kmwEnableSupplementaryPlane(false);
 // Test the KeyboardProcessor interface.
 describe('LanguageProcessor', function() {
   let worker;
+  const callbacks = new TestCompilerCallbacks();
 
   beforeEach(function() {
     worker = LMWorker.constructInstance();
+    callbacks.clear();
   });
 
   afterEach(function() {
@@ -54,7 +57,7 @@ describe('LanguageProcessor', function() {
   });
 
   describe('.predict', function() {
-    let compiler = new LexicalModelCompiler();
+    let compiler = new LexicalModelCompiler(callbacks);
     const MODEL_ID = 'example.qaa.trivial';
 
     // ES-module mode leaves out `__dirname`, so we rebuild it using other components.

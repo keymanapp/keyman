@@ -615,16 +615,18 @@ class Constants {
   }
 
   // ---- marker stuff ----
-  /** sentinel value indicating a marker follows */
-  readonly marker_sentinel = 0xFFFF;
+  /** == kmx_file.UC_SENTINEL, always followed by `marker_code`, marker index 0x0001-0xfffe */
+  readonly uc_sentinel         = 0xFFFF;
+  /** == kmx_file.CODE_DEADKEY */
+  readonly marker_code         = 0x0008;
   /** minimum usable marker index */
-  readonly marker_min_index = 0x0001;
+  readonly marker_min_index    = 0x0001;
   /** index value referring to the 'any' marker match */
-  readonly marker_any_index = 0xFFFF;
+  readonly marker_any_index    = 0xD7FF;
   /** maximum marker index prior to the 'any' value */
-  readonly marker_max_index = this.marker_any_index - 1;
+  readonly marker_max_index    = this.marker_any_index - 1;
   /** maximum count of markers (not including 'any') */
-  readonly marker_max_count = this.marker_max_index - this.marker_min_index;
+  readonly marker_max_count    = this.marker_max_index - this.marker_min_index + 1;
 
 };
 

@@ -465,7 +465,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strKeys)             90 17 b6 17 block(x) 00 00                               # 'ថា'
   # <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
   block(strIndicator)        3d d8 40 de block(x) 00 00                               # '🙀'
-  block(strSentinel0001)     FF FF 01 00 block(x) 00 00                   # U+FFFF U+0001
+  block(strSentinel0001)     FF FF 08 00 01 00 block(x) 00 00                   # UC_SENTINEL CODE_DEADKEY U+0001
 
 
 
@@ -552,7 +552,7 @@ block(vars)                         # struct COMP_KMXPLUS_VARS {
   00 00 00 00                       #   KMX_DWORD type = str
   index(strNull,strA,2)             #   KMXPLUS_STR id  'a'
   index(strNull,strAmarker,2)       #   KMXPLUS_STR value '\m{a}'
-  00 00 00 00                       #   KMXPLUS_ELEM 
+  00 00 00 00                       #   KMXPLUS_ELEM
 
   # var 1
   01 00 00 00                       #   KMX_DWORD type = set

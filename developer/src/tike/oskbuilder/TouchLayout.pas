@@ -96,6 +96,7 @@ type
     FPad: Integer;
     FSp: Integer;
     FText: string;
+    FDefault: boolean;
     function GetSpT: TTouchKeyType;   // I4119
     procedure SetSpT(const Value: TTouchKeyType);   // I4119
   protected
@@ -113,6 +114,7 @@ type
     property NextLayer: string read FNextLayer write FNextLayer;
     property Font: string read FFont write FFont;
     property FontSize: string read FFontSize write FFontSize;
+    property Default: boolean read FDefault write FDefault;
   end;
 
   TTouchLayoutSubKeys = class(TObjectList<TTouchLayoutSubKey>)
@@ -734,6 +736,7 @@ begin
   GetValue('pad', FPad);
   GetValue('sp', FSp);
   GetValue('text', FText);
+  GetValue('default', FDefault);
 end;
 
 procedure TTouchLayoutObject.AddJSONValue(JSON: TJSONObject; const name, value: string);
@@ -760,6 +763,7 @@ begin
   if FPad <> 0 then AddJSONValue(JSON, 'pad', IntToStr(FPad));
   if FSp <> 0 then AddJSONValue(JSON, 'sp', IntToStr(FSp));
   AddJSONValue(JSON, 'text', FText);
+  if FDefault then AddJSONValue(JSON, 'default', FDefault);
 end;
 
 function TTouchLayoutSubKey.GetSpT: TTouchKeyType;   // I4119

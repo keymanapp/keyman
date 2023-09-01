@@ -1329,6 +1329,35 @@ test_u16string_to_u32string() {
   }
 }
 
+
+void
+test_u32string_to_u16string() {
+  std::cout << "== " << __FUNCTION__ << std::endl;
+  // normal cases
+  {
+    const auto str = u32string_to_u16string(U"");
+    assert_equal(str.length(), 0);
+  }
+  {
+    const auto str = u32string_to_u16string(U"e");
+    assert_equal(str.length(), 1);
+    assert_equal(str.at(0), 0x0065);
+  }
+  {
+    const auto str = u32string_to_u16string(U"🙀");
+    assert_equal(str.length(), 2);
+    assert_equal(str.at(0), 0xD83D);
+    assert_equal(str.at(1), 0xDE40);
+  }
+  {
+    const auto str = u32string_to_u16string(U"Ω🙀");
+    assert_equal(str.length(), 3);
+    assert_equal(str.at(0), u'Ω');
+    assert_equal(str.at(1), 0xD83D);
+    assert_equal(str.at(2), 0xDE40);
+  }
+}
+
 void test_is_valid() {
   std::cout << "== " << __FUNCTION__ << std::endl;
   // valid

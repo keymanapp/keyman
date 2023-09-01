@@ -25,7 +25,6 @@
 #include "ldml/keyboardprocessor_ldml.h"
 #include "ldml/ldml_processor.hpp"
 
-
 #include "path.hpp"
 #include "state.hpp"
 #include "utfcodec.hpp"
@@ -36,6 +35,7 @@
 #if defined(HAVE_ICU4C)
 // TODO-LDML: Needed this for some compiler warnings
 #define U_FALLTHROUGH
+#include "unicode/utypes.h"
 #include "unicode/uniset.h"
 #include "unicode/usetiter.h"
 #else
