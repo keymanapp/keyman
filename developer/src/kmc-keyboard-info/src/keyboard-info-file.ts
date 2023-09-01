@@ -12,13 +12,10 @@ export interface KeyboardInfoFile {
   license?: "freeware" | "shareware" | "commercial" | "mit" | "other";
   languages?: string[] | {[bcp47: string]: KeyboardInfoFileLanguage};
   lastModifiedDate?: string;
-  links?: KeyboardInfoFileLink[];
   packageFilename?: string;
   packageFileSize?: number;
   jsFilename?: string;
   jsFileSize?: number;
-  documentationFilename?: string;
-  documentationFileSize?: number;
   isRTL?: boolean;
   encodings: KeyboardInfoFileEncodings[];
   packageIncludes?: KeyboardInfoFileIncludes[];
@@ -26,21 +23,14 @@ export interface KeyboardInfoFile {
   minKeymanVersion?: string;
   helpLink?: string;
   platformSupport?: {[id in KeyboardInfoFilePlatform]?: KeyboardInfoFilePlatformSupport};
-  legacyId?: number;
   sourcePath?: string;
   related?: {[id: string]: KeyboardInfoFileRelated};
   deprecated?: boolean;
 }
 
-export interface KeyboardInfoFileLink {
-  name: string;
-  url: string;
-}
-
 export interface KeyboardInfoFileRelated {
-  deprecates?: string;
-  deprecatedBy?: string;
-  note?: string;
+  deprecates?: boolean;
+  deprecatedBy?: boolean;
 }
 
 export interface KeyboardInfoFileLanguage {

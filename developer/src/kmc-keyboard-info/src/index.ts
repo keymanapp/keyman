@@ -126,10 +126,9 @@ export class KeyboardInfoCompiler {
     }[] = this.loadKmxFiles(sources.kpsFileName, sources.kmpJsonData);
 
     //
-    // Build merged .keyboard_info file
-    // https://api.keyman.com/schemas/keyboard_info.source.json and
-    // https://api.keyman.com/schemas/keyboard_info.distribution.json
-    // https://help.keyman.com/developer/cloud/keyboard_info/1.0
+    // Build .keyboard_info file
+    // https://api.keyman.com/schemas/keyboard_info.schema.json
+    // https://help.keyman.com/developer/cloud/keyboard_info/2.0
     //
 
     keyboard_info.isRTL = keyboard_info.isRTL ?? !!jsFile?.match(/this\.KRTL=1/);

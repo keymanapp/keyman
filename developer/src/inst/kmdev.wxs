@@ -184,11 +184,7 @@
       </Component>
 
       <Component>
-        <File Name="keyboard_info.distribution.json" Source="..\..\..\common\schemas\keyboard_info\" KeyPath="yes" />
-      </Component>
-
-      <Component>
-        <File Name="keyboard_info.source.json" Source="..\..\..\common\schemas\keyboard_info\" KeyPath="yes" />
+        <File Name="keyboard_info.schema.json" Source="..\..\..\common\schemas\keyboard_info\" KeyPath="yes" />
       </Component>
 
       <!-- Data Files -->

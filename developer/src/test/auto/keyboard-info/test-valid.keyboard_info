@@ -1,4 +1,5 @@
 {
+    "id": "test-valid",
     "name": "Balochi Phonetic",
     "jsFilename": "balochi_phonetic-1.1.js",
     "packageFilename": "balochi_phonetic.kmp",
