@@ -174,6 +174,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     1FFFFFFF9FFF}
   KeyPreview = True
   OnKeyDown = FormKeyDown
+  OnResize = FormResize
   ExplicitWidth = 965
   ExplicitHeight = 622
   PixelsPerInch = 96
@@ -183,7 +184,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     Top = 0
     Width = 965
     Height = 622
-    ActivePage = pageFiles
+    ActivePage = pageKeyboards
     Align = alClient
     Images = modActionsMain.ilEditorPages
     MultiLine = True
@@ -434,6 +435,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 56
           Height = 13
           Caption = 'Languages'
+          FocusControl = gridKeyboardLanguages
         end
         object lblKeyboardRTL: TLabel
           Left = 15
@@ -443,6 +445,14 @@ inherited frmPackageEditor: TfrmPackageEditor
           Anchors = [akLeft, akBottom]
           Caption = 'Is right-to-left:'
           ExplicitTop = 420
+        end
+        object lblKeyboardExamples: TLabel
+          Left = 260
+          Top = 363
+          Width = 47
+          Height = 13
+          Caption = 'Examples'
+          FocusControl = gridKeyboardExamples
         end
         object lbKeyboards: TListBox
           Left = 15
@@ -509,8 +519,8 @@ inherited frmPackageEditor: TfrmPackageEditor
           Left = 260
           Top = 144
           Width = 593
-          Height = 432
-          Anchors = [akLeft, akTop, akRight, akBottom]
+          Height = 177
+          Anchors = [akLeft, akTop, akRight]
           ColCount = 2
           DefaultRowHeight = 16
           FixedCols = 0
@@ -525,22 +535,20 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object cmdKeyboardAddLanguage: TButton
           Left = 260
-          Top = 587
+          Top = 327
           Width = 73
           Height = 25
-          Anchors = [akLeft, akBottom]
           Caption = '&Add...'
           TabOrder = 8
           OnClick = cmdKeyboardAddLanguageClick
         end
         object cmdKeyboardRemoveLanguage: TButton
           Left = 418
-          Top = 587
+          Top = 327
           Width = 72
           Height = 25
-          Anchors = [akLeft, akBottom]
           Caption = '&Remove'
-          TabOrder = 9
+          TabOrder = 10
           OnClick = cmdKeyboardRemoveLanguageClick
         end
         object editKeyboardRTL: TEdit
@@ -556,13 +564,62 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object cmdKeyboardEditLanguage: TButton
           Left = 339
-          Top = 587
+          Top = 327
+          Width = 73
+          Height = 25
+          Caption = 'Ed&it...'
+          TabOrder = 9
+          OnClick = cmdKeyboardEditLanguageClick
+        end
+        object gridKeyboardExamples: TStringGrid
+          Left = 260
+          Top = 382
+          Width = 593
+          Height = 177
+          Anchors = [akLeft, akTop, akRight, akBottom]
+          ColCount = 4
+          DefaultRowHeight = 16
+          FixedCols = 0
+          RowCount = 9
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
+          TabOrder = 11
+          OnClick = gridKeyboardExamplesClick
+          OnDblClick = gridKeyboardExamplesDblClick
+          ColWidths = (
+            78
+            64
+            64
+            64)
+        end
+        object cmdKeyboardAddExample: TButton
+          Left = 260
+          Top = 565
+          Width = 73
+          Height = 25
+          Anchors = [akLeft, akBottom]
+          Caption = 'Add...'
+          TabOrder = 12
+          OnClick = cmdKeyboardAddExampleClick
+        end
+        object cmdKeyboardEditExample: TButton
+          Left = 339
+          Top = 565
           Width = 73
           Height = 25
           Anchors = [akLeft, akBottom]
           Caption = 'Ed&it...'
-          TabOrder = 10
-          OnClick = cmdKeyboardEditLanguageClick
+          TabOrder = 13
+          OnClick = cmdKeyboardEditExampleClick
+        end
+        object cmdKeyboardRemoveExample: TButton
+          Left = 418
+          Top = 565
+          Width = 72
+          Height = 25
+          Anchors = [akLeft, akBottom]
+          Caption = '&Remove'
+          TabOrder = 14
+          OnClick = cmdKeyboardRemoveExampleClick
         end
       end
     end
@@ -741,7 +798,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Transparent = True
         end
         object lblKMPImageSize: TLabel
-          Left = 108
+          Left = 114
           Top = 348
           Width = 92
           Height = 13
@@ -837,16 +894,39 @@ inherited frmPackageEditor: TfrmPackageEditor
           ParentFont = False
         end
         object lblVersionHint: TLabel
-          Left = 616
+          Left = 622
           Top = 157
           Width = 46
           Height = 13
           Anchors = [akTop, akRight]
           Caption = 'e.g. 1.0.2'
-          ExplicitLeft = 317
+        end
+        object lblDescription: TLabel
+          Left = 15
+          Top = 379
+          Width = 62
+          Height = 13
+          Caption = 'Description:'
+          FocusControl = memoInfoDescription
+        end
+        object lblDescriptionMarkdown: TLabel
+          Left = 114
+          Top = 479
+          Width = 215
+          Height = 13
+          Caption = 'Markdown accepted, no embedded HTML'
+          Transparent = True
+        end
+        object lblRelatedPackages: TLabel
+          Left = 16
+          Top = 515
+          Width = 93
+          Height = 13
+          Caption = 'Related packages:'
+          FocusControl = gridRelatedPackages
         end
         object cbReadMe: TComboBox
-          Left = 108
+          Left = 114
           Top = 116
           Width = 499
           Height = 21
@@ -856,7 +936,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           OnClick = cbReadMeClick
         end
         object editInfoName: TEdit
-          Left = 108
+          Left = 114
           Top = 64
           Width = 499
           Height = 21
@@ -865,7 +945,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           OnChange = editInfoNameChange
         end
         object editInfoVersion: TEdit
-          Left = 108
+          Left = 114
           Top = 152
           Width = 499
           Height = 21
@@ -874,7 +954,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           OnChange = editInfoVersionChange
         end
         object editInfoCopyright: TEdit
-          Left = 108
+          Left = 114
           Top = 200
           Width = 499
           Height = 21
@@ -884,7 +964,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           OnChange = editInfoCopyrightChange
         end
         object editInfoAuthor: TEdit
-          Left = 108
+          Left = 114
           Top = 232
           Width = 499
           Height = 21
@@ -893,7 +973,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           OnChange = editInfoAuthorChange
         end
         object editInfoEmail: TEdit
-          Left = 108
+          Left = 114
           Top = 256
           Width = 499
           Height = 21
@@ -902,7 +982,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           OnChange = editInfoEmailChange
         end
         object editInfoWebSite: TEdit
-          Left = 108
+          Left = 114
           Top = 280
           Width = 499
           Height = 21
@@ -911,7 +991,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           OnChange = editInfoWebSiteChange
         end
         object cmdInsertCopyright: TButton
-          Left = 614
+          Left = 620
           Top = 200
           Width = 49
           Height = 21
@@ -921,7 +1001,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           OnClick = cmdInsertCopyrightClick
         end
         object cbKMPImageFile: TComboBox
-          Left = 108
+          Left = 114
           Top = 324
           Width = 499
           Height = 21
@@ -946,13 +1026,64 @@ inherited frmPackageEditor: TfrmPackageEditor
           end
         end
         object chkFollowKeyboardVersion: TCheckBox
-          Left = 108
+          Left = 114
           Top = 178
           Width = 237
           Height = 17
           Caption = 'Package version follows keyboard version'
           TabOrder = 3
           OnClick = chkFollowKeyboardVersionClick
+        end
+        object memoInfoDescription: TMemo
+          Left = 114
+          Top = 376
+          Width = 499
+          Height = 97
+          TabOrder = 11
+          OnChange = memoInfoDescriptionChange
+        end
+        object gridRelatedPackages: TStringGrid
+          Left = 114
+          Top = 512
+          Width = 415
+          Height = 89
+          ColCount = 2
+          DefaultRowHeight = 16
+          FixedCols = 0
+          RowCount = 9
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
+          TabOrder = 12
+          OnDblClick = gridRelatedPackagesDblClick
+          ColWidths = (
+            78
+            64)
+        end
+        object cmdAddRelatedPackage: TButton
+          Left = 541
+          Top = 512
+          Width = 73
+          Height = 25
+          Caption = '&Add...'
+          TabOrder = 13
+          OnClick = cmdAddRelatedPackageClick
+        end
+        object cmdEditRelatedPackage: TButton
+          Left = 540
+          Top = 544
+          Width = 73
+          Height = 25
+          Caption = 'Ed&it...'
+          TabOrder = 14
+          OnClick = cmdEditRelatedPackageClick
+        end
+        object cmdRemoveRelatedPackage: TButton
+          Left = 541
+          Top = 576
+          Width = 72
+          Height = 25
+          Caption = '&Remove'
+          TabOrder = 15
+          OnClick = cmdRemoveRelatedPackageClick
         end
       end
     end

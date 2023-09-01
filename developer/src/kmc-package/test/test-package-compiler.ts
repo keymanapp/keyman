@@ -155,6 +155,34 @@ describe('KmpCompiler', function () {
     assert.deepEqual(kmpJsonActual, kmpJsonFixture);
   });
 
+  it(`should support .kps 17.0 metadata correctly`, function () {
+    callbacks.clear();
+
+    const kpsPath = makePathToFixture('kmp_2.0', 'khmer_angkor.kps');
+    const kmpJsonRefPath = makePathToFixture('kmp_2.0', 'kmp.json');
+
+    debugger;
+
+    let kmpJsonActual = kmpCompiler.transformKpsToKmpObject(kpsPath);
+    if(kmpJsonActual == null) {
+      callbacks.printMessages();
+      assert.isNotNull(kmpJsonActual);
+    }
+    let kmpJsonFixture = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
+    assert.isNotNull(kmpJsonFixture);
+
+    // Blank out system.keymanDeveloperVersion which will vary
+    kmpJsonActual.system.keymanDeveloperVersion = '-';
+    kmpJsonFixture.system.keymanDeveloperVersion = '-';
+
+    // Strip file paths to basename for the actual (this is currently part of the
+    // zip phase and not unit testable without refactoring)
+    for(const file of kmpJsonActual.files) {
+      file.name = path.basename(file.name);
+    }
+
+    assert.deepEqual(kmpJsonActual, kmpJsonFixture);
+  });
   /*
    * Testing Warnings and Errors
    */

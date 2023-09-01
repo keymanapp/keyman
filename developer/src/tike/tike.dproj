@@ -553,6 +553,14 @@
         <DCCReference Include="main\Keyman.System.FontLoadUtil.pas"/>
         <DCCReference Include="http\Keyman.Developer.UI.ServerUI.pas"/>
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.GenerateKeyboardIcon.pas"/>
+        <DCCReference Include="dialogs\examples\Keyman.Developer.UI.UfrmEditLanguageExample.pas">
+            <Form>frmEditLanguageExample</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="dialogs\relatedPackages\Keyman.Developer.UI.UfrmEditRelatedPackage.pas">
+            <Form>frmEditRelatedPackage</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
@@ -614,9 +622,9 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="bin\Win32\Debug\tike.rsm" Configuration="Debug" Class="DebugSymbols">
+                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
-                        <RemoteName>tike.rsm</RemoteName>
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -626,7 +634,13 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="tike.rsm" Configuration="Debug" Class="DebugSymbols">
+                <DeployFile LocalName="bin\Win32\Debug\tike.rsm" Configuration="Debug" Class="DebugSymbols">
+                    <Platform Name="Win32">
+                        <RemoteName>tike.rsm</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="bin\Win32\Debug\tike.rsm" Configuration="Debug" Class="DebugSymbols">
                     <Platform Name="Win32">
                         <RemoteName>tike.rsm</RemoteName>
                         <Overwrite>true</Overwrite>
@@ -635,12 +649,6 @@
                 <DeployFile LocalName="tike.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>tike.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
-                    <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
