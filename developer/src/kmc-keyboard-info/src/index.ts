@@ -152,7 +152,7 @@ export class KeyboardInfoCompiler {
     // description
 
     if(sources.kmpJsonData.info.description?.description) {
-      keyboard_info.description = markDownToHTML(sources.kmpJsonData.info.description?.description);
+      keyboard_info.description = sources.kmpJsonData.info.description?.description.trim();
     }
 
     // extract the language identifiers from the language metadata arrays for
@@ -438,10 +438,5 @@ export class KeyboardInfoCompiler {
       );
     }
   }
-
 }
 
-function markDownToHTML(markdown: string): string {
-  // TODO
-  return markdown;
-}
