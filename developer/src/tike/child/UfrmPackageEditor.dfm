@@ -236,7 +236,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 546
           Height = 32
           AutoSize = False
-          Caption =
+          Caption = 
             'A typical package will need keyboards, fonts, and documentation.' +
             ' You shouldn'#39't typically add source files. Also, don'#39't add any s' +
             'tandard Keyman files (such as keyman.exe) here.'
@@ -454,9 +454,23 @@ inherited frmPackageEditor: TfrmPackageEditor
           Caption = 'Examples'
           FocusControl = gridKeyboardExamples
         end
+        object lblWebOSKFonts: TLabel
+          Left = 600
+          Top = 76
+          Width = 87
+          Height = 13
+          Caption = 'lblWebOSKFonts'
+        end
+        object lblWebDisplayFonts: TLabel
+          Left = 600
+          Top = 103
+          Width = 103
+          Height = 13
+          Caption = 'lblWebDisplayFonts'
+        end
         object lbKeyboards: TListBox
           Left = 15
-          Top = 72
+          Top = 68
           Width = 229
           Height = 408
           Anchors = [akLeft, akTop, akBottom]
@@ -500,7 +514,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         object cbKeyboardOSKFont: TComboBox
           Left = 339
           Top = 72
-          Width = 230
+          Width = 174
           Height = 21
           Style = csDropDownList
           TabOrder = 5
@@ -509,7 +523,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         object cbKeyboardDisplayFont: TComboBox
           Left = 339
           Top = 99
-          Width = 230
+          Width = 174
           Height = 21
           Style = csDropDownList
           TabOrder = 6
@@ -620,6 +634,24 @@ inherited frmPackageEditor: TfrmPackageEditor
           Caption = '&Remove'
           TabOrder = 14
           OnClick = cmdKeyboardRemoveExampleClick
+        end
+        object cmdKeyboardWebOSKFonts: TButton
+          Left = 519
+          Top = 70
+          Width = 75
+          Height = 25
+          Caption = 'Web fonts...'
+          TabOrder = 15
+          OnClick = cmdKeyboardWebOSKFontsClick
+        end
+        object cmdKeyboardWebDisplayFonts: TButton
+          Left = 519
+          Top = 97
+          Width = 75
+          Height = 25
+          Caption = 'Web fonts...'
+          TabOrder = 16
+          OnClick = cmdKeyboardWebDisplayFontsClick
         end
       end
     end
@@ -1275,7 +1307,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Top = 48
           Width = 551
           Height = 13
-          Caption =
+          Caption = 
             'Compiling the package takes all the files you have selected and ' +
             'compresses them into a single package file.'
         end

@@ -87,6 +87,10 @@
       "description": "Font KhmerBusraKbd"
     },
     {
+      "description": "Font DejaVuSans",
+      "name": "DejaVuSans.ttf"
+    },
+    {
       "name": "splash.gif",
       "description": "File splash.gif"
     },
@@ -106,6 +110,8 @@
       "version": "1.3",
       "oskFont": "khmer_busra_kbd.ttf",
       "displayFont": "Mondulkiri-R.ttf",
+      "webOskFonts": ["khmer_busra_kbd.ttf"],
+      "webDisplayFonts": ["DejaVuSans.ttf"],
       "languages": [
         {
           "name": "Central Khmer (Khmer, Cambodia)",

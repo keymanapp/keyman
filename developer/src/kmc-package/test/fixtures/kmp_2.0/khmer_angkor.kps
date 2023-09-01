@@ -117,6 +117,12 @@ Khmer Unicode keyboard layout based on the NiDA keyboard layout. Automatically c
       <FileType>.ttf</FileType>
     </File>
     <File>
+      <Name>DejaVuSans.ttf</Name>
+      <Description>Font DejaVuSans</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.ttf</FileType>
+    </File>
+    <File>
       <Name>splash.gif</Name>
       <Description>File splash.gif</Description>
       <CopyLocation>0</CopyLocation>
@@ -141,6 +147,12 @@ Khmer Unicode keyboard layout based on the NiDA keyboard layout. Automatically c
         <Example ID="km" Keys="x j m E r" Text="ខ្មែរ" Note="Name of language"/>
         <Example ID="km" Keys="B j r H r a C a N a c k j r k m j B u C a" Text="ព្រះរាជាណាចក្រកម្ពុជា" Note="'Kingdom of Cambodia'"/>
       </Examples>
+      <WebOSKFonts>
+        <Font Filename="..\shared\fonts\khmer\busrakbd\khmer_busra_kbd.ttf"/>
+      </WebOSKFonts>
+      <WebDisplayFonts>
+        <Font Filename="DejaVuSans.ttf"/>
+      </WebDisplayFonts>
     </Keyboard>
   </Keyboards>
   <Strings/>

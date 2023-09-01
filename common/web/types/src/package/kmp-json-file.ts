@@ -66,6 +66,14 @@ export interface KmpJsonFileKeyboard {
   rtl?: boolean;
   languages?: KmpJsonFileLanguage[];
   examples?: KmpJsonFileExample[];
+  /**
+   * array of web font alternatives for OSK. should be same font data as oskFont
+   */
+  webOskFonts?: string[];
+  /**
+   * array of web font alternatives for display. should be same font data as displayFont
+   */
+  webDisplayFonts?: string[];
 }
 
 export interface KmpJsonFileStartMenu {
