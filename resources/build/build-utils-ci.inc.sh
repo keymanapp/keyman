@@ -100,7 +100,9 @@ function _builder_publish_npm_package() {
     dry_run=--dry-run
   fi
 
+  _builder_publish_cache_package_json
   _builder_write_npm_version
+  _builder_prepublish
 
   # Note: In either case, npm publish MUST be given --access public to publish a
   # package in the @keymanapp scope on the public npm package index.
@@ -141,9 +143,68 @@ function _builder_write_npm_version() {
           . +
           (try { dependencies: (.dependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {}) +
           (try { devDependencies: (.devDependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {}) +
-          (try { bundleDependencies: (.bundleDependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {}) +
           (try { optionalDependencies: (.optionalDependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {})
         ' > "${line}_"
       mv -f "${line}_" "$line"
     done
+}
+
+#
+# Due to https://github.com/npm/cli/issues/3466, we manually create all
+# bundleDependencies (__NOT__ bundledDependencies, beware typos) from
+# the target's package.json in its node_modules folder. Must run from
+# the target's folder.
+#
+function _builder_prepublish() {
+  mkdir -p node_modules/@keymanapp
+  local packages=($(cat package.json | "$JQ" --raw-output '.bundleDependencies | join(" ")'))
+  local package
+
+  # For each @keymanapp/ package, we'll do a local symlink, note that Windows
+  # mklink is internal to cmd!
+  for package in "${packages[@]}"; do
+    if [[ $package =~ ^@keymanapp/ ]]; then
+      # Creating local symlink under node_modules
+      local link_source=node_modules/$package
+
+      # lookup the link_target from top-level package.json/dependencies
+      local link_target="$(cat "$KEYMAN_ROOT/builder_package_publish.json" | jq -r .dependencies.\"$package\")"
+
+      if [[ $link_target =~ ^file: ]]; then
+        link_target="$KEYMAN_ROOT"/${link_target#file:}
+
+        builder_echo "Manually linking $link_source -> $link_target (see https://github.com/npm/cli/issues/3466)"
+        rm -rf $link_source
+        if [[ $BUILDER_OS == win ]]; then
+          link_source="$(cygpath -w "$link_source")"
+          link_target="$(cygpath -w "$link_target")"
+          cmd //c mklink //j "$link_source" "$link_target"
+        else
+          ln -sr "$link_target" "$link_source"
+        fi
+      fi
+    fi
+  done
+}
+
+#
+# We need to cache /package.json before npm version gets its sticky fingers on
+# it, because afterwards, we lose the file: paths that help us to resolve
+# dependencies easily. Part of the https://github.com/npm/cli/issues/3466
+# workaround.
+#
+function _builder_publish_cache_package_json() {
+  if [[ -f "$KEYMAN_ROOT/builder_package_publish.json" ]]; then
+    return 0
+  fi
+
+  if "$JQ" -e '.version' "$KEYMAN_ROOT/developer/src/kmc/package.json" > /dev/null; then
+    builder_die "npm version has already been run. Revert the version changes to all package.json files before re-running"
+  fi
+
+  cp  "$KEYMAN_ROOT/package.json" "$KEYMAN_ROOT/builder_package_publish.json"
+}
+
+function builder_publish_cleanup() {
+  rm -f "$KEYMAN_ROOT/builder_package_publish.json"
 }
