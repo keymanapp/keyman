@@ -37,6 +37,7 @@ function compile_schemas() {
     "$KEYMAN_ROOT/common/schemas/displaymap/displaymap.schema.json"
     "$KEYMAN_ROOT/common/schemas/keyman-touch-layout/keyman-touch-layout.spec.json"
     "$KEYMAN_ROOT/common/schemas/keyman-touch-layout/keyman-touch-layout.clean.spec.json"
+    "$KEYMAN_ROOT/common/schemas/keyboard_info/keyboard_info.schema.json"
   )
 
   rm -rf "$THIS_SCRIPT_PATH/src/schemas"

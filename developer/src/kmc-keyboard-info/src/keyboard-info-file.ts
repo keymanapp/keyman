@@ -17,7 +17,7 @@ export interface KeyboardInfoFile {
   jsFilename?: string;
   jsFileSize?: number;
   isRTL?: boolean;
-  encodings: KeyboardInfoFileEncodings[];
+  encodings?: KeyboardInfoFileEncodings[];
   packageIncludes?: KeyboardInfoFileIncludes[];
   version?: string;
   minKeymanVersion?: string;
@@ -45,8 +45,7 @@ export interface KeyboardInfoFileLanguage {
 
 export interface KeyboardInfoFileLanguageFont {
   family?: string;
-  source?: string | string[];
-  size?: string;
+  source?: string[];
 }
 
 export interface KeyboardInfoFileExample {
