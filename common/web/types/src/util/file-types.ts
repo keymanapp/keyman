@@ -147,6 +147,16 @@ export function filenameIs(filename: string, fileType: Source | Binary) {
 }
 
 /**
+ * Returns true if the file is either a .keyboard_info file or a .model_info
+ * file
+ * @param filename
+ * @returns
+ */
+export function filenameIsMetadata(filename: string) {
+  return filenameIs(filename, Source.KeyboardInfo) || filenameIs(filename, Source.ModelInfo);
+}
+
+/**
  * Replaces a filename extension with the new extension. Returns `null` if the
  * filename does not end with oldExtension.
  * @param filename

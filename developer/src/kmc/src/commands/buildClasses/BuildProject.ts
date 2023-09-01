@@ -47,13 +47,14 @@ class ProjectBuilder {
         continue;
       }
 
+      if(KeymanFileTypes.filenameIsMetadata(builder.sourceExtension) && this.project.options.skipMetadataFiles) {
+        continue;
+      }
+
       if(!await this.buildProjectTargets(builder)) {
         return false;
       }
     }
-
-    // TODO: generate .keyboard_info from .kps + etc (and support merge of
-    // $PROJECTPATH/.keyboard_info for version 1.0 projects)
 
     return true;
   }

@@ -74,9 +74,8 @@ fi
 if builder_start_action test; then
   eslint .
   tsc --build test/
-  mocha
-  # TODO: enable c8 (disabled because no coverage at present)
-  #     && c8 --reporter=lcov --reporter=text mocha
+  # TODO: increase coverage to 90%
+  c8 --reporter=lcov --reporter=text --exclude-after-remap --lines=30 mocha
   builder_finish_action success test
 fi
 

@@ -12,6 +12,7 @@
     "noImplicitAny": false,
     "paths": {
       "@keymanapp/common-types": ["../../../common/web/types/src/main"],
+      "@keymanapp/kmc-package": ["../kmc-package/source"],
     }
   },
   "include": [
@@ -20,5 +21,6 @@
   ],
   "references": [
     { "path": "../../../common/web/types" },
+    { "path": "../kmc-package/" },
   ]
 }
