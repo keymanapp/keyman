@@ -43,6 +43,7 @@ override_dh_auto_build:
 	cd linux/ibus-keyman && make
 	# keyman-config
 	cd linux/keyman-config && \
+		./version.sh && \
 		make man && \
 		sed -i -e "s/^__pkgversion__ = \"[^\"]*\"/__pkgversion__ = \"$(DEB_VERSION)\"/g" keyman_config/version.py && \
 		make compile-po
@@ -77,3 +78,11 @@ override_dh_auto_install:
 
 override_dh_missing:
 	dh_missing --fail-missing
+
+override_dh_auto_clean:
+	cd core && ./build.sh clean
+	cd linux/ibus-keyman && make distclean || true
+	rm -f linux/ibus-keyman/VERSION
+	cd linux/keyman-config && make clean
+	rm -rf .pybuild/
+	dh_auto_clean $@

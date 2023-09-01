@@ -72,6 +72,7 @@ for proj in ${extra_projects}; do
         --tar-ignore=common/resources --tar-ignore=common/schemas \
         --tar-ignore=common/test --tar-ignore=common/web --tar-ignore=common/windows \
         --tar-ignore=developer --tar-ignore=docs --tar-ignore=ios \
+        --tar-ignore=linux/keyman-config/keyman_config/version.py \
         --tar-ignore=linux/keyman-config/buildtools/build-langtags.py --tar-ignore=__pycache__ \
         --tar-ignore=linux/help --tar-ignore=linux/Jenkinsfile \
         --tar-ignore=linux/keyboardprocessor --tar-ignore=linux/legacy \
