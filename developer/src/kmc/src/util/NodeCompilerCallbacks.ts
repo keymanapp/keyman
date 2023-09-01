@@ -154,6 +154,28 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       event.filename = this.messageFilename;
     }
 
+    this.printMessage(event);
+  }
+
+  private printMessage(event: CompilerEvent) {
+    if(this.options.logFormat == 'tsv') {
+      this.printTsvMessage(event);
+    } else {
+      this.printFormattedMessage(event);
+    }
+  }
+
+  private printTsvMessage(event: CompilerEvent) {
+    process.stdout.write([
+      CompilerError.formatFilename(event.filename, {fullPath:true, forwardSlashes:false}),
+      CompilerError.formatLine(event.line),
+      CompilerError.formatSeverity(event.code),
+      CompilerError.formatCode(event.code),
+      CompilerError.formatMessage(event.message)
+    ].join('\t') + '\n');
+  }
+
+  private printFormattedMessage(event: CompilerEvent) {
     const severityColor = severityColors[CompilerError.severity(event.code)] ?? color.reset;
     const messageColor = this.messageSpecialColor(event) ?? color.reset;
     process.stdout.write(
@@ -172,7 +194,6 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       // Special case: we'll add a blank line after project builds
       process.stdout.write('\n');
     }
-
   }
 
   /**
