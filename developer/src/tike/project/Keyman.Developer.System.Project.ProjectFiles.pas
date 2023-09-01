@@ -29,8 +29,6 @@ uses
   Keyman.Developer.System.Project.ProjectFile;
 
 type
-  TProjectFileActionCompileSuccessEvent = procedure(Sender: TObject; const SourceFilename, DestFilename: string) of object;
-
   TShellProjectFile = class(TProjectFile)
   protected
     function GetRelativeOrder: Integer; override;
@@ -38,12 +36,8 @@ type
   end;
 
   TOpenableProjectFile = class(TShellProjectFile)
-  private
-    class var FOnCompileSuccess: TProjectFileActionCompileSuccessEvent;
   protected
     function GetRelativeOrder: Integer; override;
-  public
-    class property OnCompileSuccess: TProjectFileActionCompileSuccessEvent read FOnCompileSuccess write FOnCompileSuccess;
   end;
 
 implementation

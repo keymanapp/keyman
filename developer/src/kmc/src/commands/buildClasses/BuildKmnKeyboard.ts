@@ -3,6 +3,7 @@ import { platform } from 'os';
 import { KmnCompiler } from '@keymanapp/kmc-kmn';
 import { CompilerOptions, CompilerCallbacks, KeymanFileTypes } from '@keymanapp/common-types';
 import { BuildActivity } from './BuildActivity.js';
+import * as fs from 'fs';
 
 export class BuildKmnKeyboard extends BuildActivity {
   public get name(): string { return 'Keyman keyboard'; }
@@ -21,7 +22,12 @@ export class BuildKmnKeyboard extends BuildActivity {
     }
 
     infile = getPosixAbsolutePath(infile);
-
+    try {
+      fs.mkdirSync(path.dirname(options.outFile), {recursive: true});
+    } catch(e) {
+      // TODO: error
+      return false;
+    }
     return compiler.run(infile, options);
   }
 }

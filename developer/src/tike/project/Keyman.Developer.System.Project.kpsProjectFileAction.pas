@@ -39,7 +39,7 @@ var
 begin
   w := TKmcWrapper.Create;
   try
-    Result := w.Compile(Self, FileName, OutputFilename, False);
+    Result := w.Compile(Self, FileName, TargetFilename, False);
     // TODO(lowpri): FDebug flag
   finally
     w.Free;
