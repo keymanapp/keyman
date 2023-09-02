@@ -36,7 +36,6 @@ developer/:
 
 developer/compilers/:
   - developer/src/kmcomp/**
-  - developer/src/kmcmpdll/**
   - developer/src/kmc/**
   - developer/src/kmc-*/**
 

@@ -34,7 +34,7 @@ the keyman repository, for example:
         - testing
           - regression-tests
 
-Keyman Engine for Web, Keyman Developer (kmcomp, kmcmpdll, kmanalyze) must be built
+Keyman Engine for Web, Keyman Developer (kmcomp, kmanalyze) must be built
 prior to running the tests. (If not testing source versions, only kmanalyze is
 required). See the build documentation for each project for details; summary below:
 

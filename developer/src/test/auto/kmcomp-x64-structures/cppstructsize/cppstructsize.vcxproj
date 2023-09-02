@@ -159,7 +159,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="../../../../kmcmpdll/compfile.h" />
+    <ClInclude Include="../../../../kmcmplib/src/compfile.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>

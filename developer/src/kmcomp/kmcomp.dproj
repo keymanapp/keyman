@@ -183,7 +183,6 @@
         </DCCReference>
         <DCCReference Include="..\common\delphi\compiler\CompilePackageInstaller.pas"/>
         <DCCReference Include="..\tike\main\UTikeDebugMode.pas"/>
-        <DCCReference Include="..\tike\compile\CompileKeymanWeb.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboard.pas"/>
         <DCCReference Include="..\tike\compile\KeymanWebKeyCodes.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas"/>
@@ -231,7 +230,6 @@
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
         <DCCReference Include="kccompilekvk.pas"/>
-        <DCCReference Include="..\tike\compile\ValidateKeyboardInfo.pas"/>
         <DCCReference Include="..\tike\compile\MergeKeyboardInfo.pas"/>
         <DCCReference Include="..\tike\compile\JsonExtractKeyboardInfo.pas"/>
         <DCCReference Include="..\common\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas"/>

@@ -35,7 +35,6 @@ inst/kmc.wxs
 
 # /developer/TIKE/
 tike/stock.kct
-tike/kmcmpdll.dll
 
 # /developer/TIKE/redist/
 tike/redist/Addins
@@ -46,9 +45,6 @@ tike/redist/UI
 inst/*.wixpdb
 inst/download.mak
 inst/copydev.mak
-
-# /developer/kmcmpdll/
-kmcmpdll/*.lastbuildstate
 
 stock/stock.kct
 uitemplates/keyman.kct
@@ -76,7 +72,6 @@ tike/xml/kmw/resource
 
 # These files are generated during build
 tike/icons.res
-kmcmpdll/Compiler.res
 kmcomp/icons.res
 tds_file.txt
 

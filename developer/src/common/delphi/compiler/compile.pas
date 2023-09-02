@@ -32,15 +32,7 @@ interface
 
 uses
   Winapi.Windows,
-
   kmxfileconsts;
-
-const
-{$IFDEF WIN64}
-  kmcmpdll_lib = 'kmcmpdll.x64.dll';
-{$ELSE}
-  kmcmpdll_lib = 'kmcmpdll.dll';
-{$ENDIF}
 
 {$IFDEF WIN64}
 {$A16}
@@ -137,13 +129,13 @@ type
 {$ENDIF}
 
 type
-  TCompilerCallback = function( line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;  // I3310
   TCompilerCallbackW = function( line: Integer; msgcode: LongWord; const text: string): Integer; // not available to C++ in this form
 
 const
   CKF_KEYMAN = 0;
   CKF_KEYMANWEB = 1;
 
+// TODO: REMOVE THESE:
 const
   CERR_FATAL   = $00008000;
   CERR_ERROR   = $00004000;
@@ -167,176 +159,12 @@ const
   FILE_DEADKEY_SIZE = 160;
 {$ENDIF}
 
-function CompileKeyboardFile(kmnFile, kmxFile: PChar; FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback): Integer; cdecl;   // I4865   // I4866
-function CompileKeyboardFileToBuffer(kmnFile: PChar; buf: PFILE_KEYBOARD; CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback; Target: Integer): Integer; cdecl;   // I4865   // I4866
-function Compiler_Diagnostic(mode: Integer): Integer;
-procedure Compiler_Diagnostic_Console(mode: Integer);
-
-type
-  TCompilerOptions = record
-    dwSize: DWORD;
-    ShouldAddCompilerVersion: BOOL;
-  end;
-
-  COMPILER_OPTIONS = TCompilerOptions;
-  PCOMPILER_OPTIONS = ^COMPILER_OPTIONS;
-
-function SetCompilerOptions(options: PCOMPILER_OPTIONS; CallBack: TCompilerCallback): BOOL; cdecl;
-
-//
-// For unit tests, point to a known-current version of kmcmpdll.dll
-//
-var
-  FUnitTestKMCmpDllPath: string = '';
-
 implementation
 
 uses
-  System.SysUtils,
-
-  RegistryKeys,
-  RedistFiles;
-
-var
-  HKMCmpDll: THandle = 0;
-
-type
-  TCompileKeyboardFile = function (kmnFile, kmxFile: PAnsiChar; FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL;  // I3310   // I4865   // I4866
-    CallBack: TCompilerCallback): Integer; cdecl;        // TODO: K9: Convert to Unicode
-
-  TCompileKeyboardFileToBuffer = function (kmnFile: PAnsiChar; buf: PFILE_KEYBOARD;  // I3310
-    CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL;   // I4865   // I4866
-    CallBack: TCompilerCallback; Target: Integer): Integer; cdecl;         // TODO: K9: Convert to Unicode
-
-  TSetCompilerOptions = function (options: PCOMPILER_OPTIONS): BOOL; cdecl;
-
-function LoadCompiler(CallBack: TCompilerCallback = nil): Boolean;
-var
-  s: string;
-begin
-  if HKMCmpDll = 0 then
-  begin
-    s := FUnitTestKMCmpDllPath;
-    if s = '' then
-    begin
-      s := GetDebugKMCmpDllPath;
-      if (s <> '') and not FileExists(s + kmcmpdll_lib) then   // I4770
-        s := '';
-      if s = '' then
-      begin
-        try
-          s := GetDeveloperRootPath;
-        except
-          s := '';
-        end;
-        if s = '' then s := ExtractFilePath(ParamStr(0));
-      end;
-    end;
-
-    HKMCmpDll := LoadLibrary(PChar(s+kmcmpdll_lib));
-    if HKMCmpDll = 0 then
-    begin
-      if Assigned(Callback) then
-        Callback(0, $8000, PAnsiChar(AnsiString('Could not load the compiler library '+s+kmcmpdll_lib+'.  '+   // I4706
-          'Check that '+kmcmpdll_lib+' is in the program directory '+
-          'and that it is not corrupt.'#13#10+'Windows error message: '+SysErrorMessage(GetLastError))));
-      Exit(False);
-    end;
-  end;
-  Result := True;
-end;
-
-function SetCompilerOptions(options: PCOMPILER_OPTIONS; CallBack: TCompilerCallback): BOOL;
-var
-  sco: TSetCompilerOptions;
-begin
-  if not LoadCompiler(Callback) then
-    Exit(False);
-
-  @sco := GetProcAddress(HKMCmpDll, 'SetCompilerOptions');
-  if not Assigned(@sco) then
-  begin
-    Callback(0, $8000, PAnsiChar(AnsiString('Could not access the compiler.  Check that '+kmcmpdll_lib+' is in the program directory '+   // I4706
-      'and that it is not corrupt.'#13#10+'Windows error message: '+SysErrorMessage(GetLastError))));
-    Exit(False);
-  end;
-
-  Result := sco(options);
-end;
-
-function CompileKeyboardFile(kmnFile, kmxFile: PChar; FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback): Integer;   // I4865   // I4866
-var
-  ckf: TCompileKeyboardFile;
-begin
-  //Result := 0;
-
-  if not LoadCompiler(Callback) then Exit(-1);
-
-  @ckf := GetProcAddress(HKMCmpDll, 'CompileKeyboardFile');
-  if not Assigned(@ckf) then
-  begin
-    Callback(0, $8000, PAnsiChar(AnsiString('Could not access the compiler.  Check that '+kmcmpdll_lib+' is in the program directory '+   // I4706
-      'and that it is not corrupt.'#13#10+'Windows error message: '+SysErrorMessage(GetLastError))));
-    Result := -1;
-    Exit;
-  end;
-
-  Result := ckf(PAnsiChar(AnsiString(kmnFile)), PAnsiChar(AnsiString(kmxFile)), FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode, Callback);  // I3310   // I4865   // I4866
-end;
-
-function CompileKeyboardFileToBuffer(kmnFile: PChar; buf: PFILE_KEYBOARD; CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback; Target: Integer): Integer;   // I4865   // I4866
-var
-  ckf: TCompileKeyboardFileToBuffer;
-begin
-  //Result := 0;
-
-  if not LoadCompiler(Callback) then Exit(-1);
-
-  @ckf := GetProcAddress(HKMCmpDll, 'CompileKeyboardFileToBuffer');
-  if not Assigned(@ckf) then
-  begin
-    Callback(0, $8000, PAnsiChar(AnsiString('Could not access the compiler.  Check that '+kmcmpdll_lib+' is in the program directory '+   // I4706
-      'and that it is not corrupt.'#13#10+'Windows error message: '+SysErrorMessage(GetLastError))));
-    Result := -1;
-    Exit;
-  end;
-
-  Result := ckf(PAnsiChar(AnsiString(kmnFile)), buf, CompilerWarningsAsErrors, WarnDeprecatedCode, Callback, Target);  // I3310   // I4865   // I4866
-end;
-
-type
-  TKeyman_Diagnostic = procedure(mode: Integer); cdecl;
-
-function Compiler_Diagnostic(mode: Integer): Integer;
-var
-  keyman_diagnostic: TKeyman_Diagnostic;
-begin
-  if not LoadCompiler then Exit(-1);
-
-  @keyman_diagnostic := GetProcAddress(HKMCmpDll, 'Keyman_Diagnostic');
-  if Assigned(@keyman_diagnostic) then
-  begin
-    keyman_diagnostic(mode);
-    Exit(0);
-  end;
-
-  Result := 2;
-end;
-
-procedure Compiler_Diagnostic_Console(mode: Integer);
-begin
-  case compile.Compiler_Diagnostic(0) of
-    0: writeln('Should not have got here');
-    1: writeln('Test failed: could not find kmcmpdll.dll');
-    2: writeln('Test failed: could not find keyman_diagnostic in kmcmpdll.dll');
-    else writeln('This should not be possible');
-  end;
-end;
+  System.SysUtils;
 
 initialization
-  // We want to early load the compiler because we need it loaded for
-  // sentry symbolication: https://github.com/getsentry/sentry-native/issues/213
-  LoadCompiler;
   try
     Assert(sizeof(FILE_KEYBOARD) = FILE_KEYBOARD_SIZE, 'Assertion failure: sizeof(FILE_KEYBOARD) = FILE_KEYBOARD_SIZE');
     Assert(sizeof(FILE_GROUP) = FILE_GROUP_SIZE, 'Assertion failure: sizeof(FILE_GROUP) = FILE_GROUP_SIZE');
@@ -352,8 +180,4 @@ initialization
       raise;
     end;
   end;
-finalization
-  if HKMCmpDll > 0 then
-    FreeLibrary(HKMCmpDll);
-  HKMCmpDll := 0;
 end.

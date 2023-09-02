@@ -34,7 +34,6 @@ uses
   UfrmTike in '..\tike\main\UfrmTike.pas' {TikeForm: TTntForm},
   CompilePackageInstaller in '..\common\delphi\compiler\CompilePackageInstaller.pas',
   UTikeDebugMode in '..\tike\main\UTikeDebugMode.pas',
-  CompileKeymanWeb in '..\tike\compile\CompileKeymanWeb.pas',
   VisualKeyboard in '..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboard.pas',
   KeymanWebKeyCodes in '..\tike\compile\KeymanWebKeyCodes.pas',
   ExtShiftState in '..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas',
@@ -82,7 +81,6 @@ uses
   VisualKeyboardSaverBinary in '..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas',
   VisualKeyboardSaverXML in '..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverXML.pas',
   kccompilekvk in 'kccompilekvk.pas',
-  ValidateKeyboardInfo in '..\tike\compile\ValidateKeyboardInfo.pas',
   MergeKeyboardInfo in '..\tike\compile\MergeKeyboardInfo.pas',
   JsonExtractKeyboardInfo in '..\tike\compile\JsonExtractKeyboardInfo.pas',
   Keyman.System.PackageInfoRefreshKeyboards in '..\common\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas',
@@ -133,11 +131,6 @@ begin
   TKeymanSentryClient.Start(TSentryClientConsole, kscpDeveloper, LOGGER_DEVELOPER_TOOLS_KMCOMP);
   try
     try
-      if (ParamStr(1) = '-sentry-client-test-exception') and (ParamStr(2) = 'dll') then
-      begin
-        compile.Compiler_Diagnostic_Console(0);
-        Exit;
-      end;
       TKeymanSentryClient.Validate;
       Run;
     except

@@ -114,8 +114,8 @@ make-kmcomp-install-zip: copy-schemas
     cd $(DEVELOPER_ROOT)\bin
 
     $(WZZIP) -bd -bb0 $(KMCOMP_ZIP) \
-        kmcomp.exe kmcmpdll.dll \
-        kmcomp.x64.exe kmcmpdll.x64.dll \
+        kmcomp.exe \
+        kmcomp.x64.exe \
         kmconvert.exe \
         sentry.dll sentry.x64.dll \
         kmdecomp.exe \

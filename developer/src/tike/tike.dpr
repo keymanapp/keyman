@@ -89,7 +89,6 @@ uses
   utilfiletypes in '..\..\..\common\windows\delphi\general\utilfiletypes.pas',
   UfrmNewFileDetails in 'dialogs\UfrmNewFileDetails.pas' {frmNewFileDetails},
   StockFileNames in '..\..\..\common\windows\delphi\general\StockFileNames.pas',
-  CompileKeymanWeb in 'compile\CompileKeymanWeb.pas',
   KeymanWebKeyCodes in 'compile\KeymanWebKeyCodes.pas',
   utildir in '..\..\..\common\windows\delphi\general\utildir.pas',
   ADOX_TLB in '..\..\..\common\windows\delphi\tlb\ADOX_TLB.pas',

@@ -58,14 +58,11 @@ uses
   KCCompileProject,
   KCCompileKVK,
   KeymanVersion,
-  CompileKeymanWeb,
   JsonExtractKeyboardInfo,
-  ValidateKeyboardInfo,
   MergeKeyboardInfo,
   UKeymanTargets;
 
 function CompileKeyboard(FInFile, FOutFile: string; FDebug, FWarnAsError: Boolean): Boolean; forward;   // I4706
-function KCSetCompilerOptions(const FInFile: string; FShouldAddCompilerVersion: Boolean): Boolean; forward;
 //function CompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall; forward;
 procedure FixupPathSlashes(var path: string); forward;
 
@@ -291,14 +288,12 @@ begin
 
     TProjectLogConsole.Create(FSilent, FFullySilent, hOutfile, FColorMode);
 
-    KCSetCompilerOptions(FParamInfile, FShouldAddCompilerVersion);
-
     if FValidateRepoChanges then
       FError := not TValidateRepoChanges.Execute(FParamInfile, FParamOutfile)
     else if FMerging then
       FError := not TMergeKeyboardInfo.Execute(FParamSourcePath, FParamInfile, FParamInfile2, FParamOutfile, FParamHelpLink, FMergingValidateIds, FSilent, TProjectLogConsole.Instance.Log)
     else if FValidating then
-      FError := not TValidateKeyboardInfo.Execute(FParamInfile, FJsonSchemaPath, FParamDistribution, FSilent, TProjectLogConsole.Instance.Log)
+      FError := True
     else if FJsonExtract then
       FError := not TJsonExtractKeyboardInfo.Execute(FParamInfile, FParamJsonFields, FSilent, TProjectLogConsole.Instance.Log)
     else if LowerCase(ExtractFileExt(FParamInfile)) = '.kpj' then   // I4699
@@ -317,85 +312,9 @@ begin
     ExitCode := 1;
 end;
 
-function KCSetCompilerOptions(const FInFile: string; FShouldAddCompilerVersion: Boolean): Boolean;
-var
-  opt: TCompilerOptions;
-begin
-  TProjectLogConsole.Instance.Filename := FInFile;
-
-  opt.dwSize := sizeof(TCompilerOptions);
-  opt.ShouldAddCompilerVersion := FShouldAddCompilerVersion;
-
-  Result := SetCompilerOptions(@opt, @CompilerMessageW);
-
-  if not Result then
-  begin
-    TProjectLogConsole.Instance.Log(plsError, FInFile, 'Could not set compiler options', 0, 0);
-  end;
-end;
-
 function CompileKeyboard(FInFile, FOutFile: string; FDebug, FWarnAsError: Boolean): Boolean;   // I4706
-var
-  FIsJS, FIsKMX: Boolean;
-  kp: TKeyboardParser;
-  FTargets: TKeymanTargets;
 begin
-  if ExtractFileExt(FOutFile) = '.*' then
-  begin
-    // Load the input .kmn and determine if it targets .js and .kmx
-    kp := TKeyboardParser.Create;
-    try
-      kp.LoadFromFile(FInFile);
-
-      // Compile targets - copied from kmnProjectFile
-      FTargets := StringToKeymanTargets(kp.GetSystemStoreValue(ssTargets));
-      if ktAny in FTargets then FTargets := AllKeymanTargets;
-      if FTargets = [] then FTargets := [ktWindows];
-
-      FIsJS := FTargets * KMWKeymanTargets <> [];
-      FIsKMX := FTargets * KMXKeymanTargets <> [];
-    finally
-      kp.Free;
-    end;
-  end
-  else
-  begin
-    FIsJS := SameText(ExtractFileExt(FOutFile), '.js');
-    FIsKMX := not FIsJS;
-  end;
-
-  Result := True;
-
-  if FIsJS then
-  begin
-    if FOutFile = '' then FOutFile := FInFile;
-    FOutFile := ChangeFileExt(FOutFile, '.js');
-
-    with TCompileKeymanWeb.Create do
-    try
-      Result := Result and Compile(nil, FInFile, FOutFile, FDebug, @CompilerMessageW);   // I3681   // I4865   // I4866
-    finally
-      Free;
-    end;
-
-    if TProjectLogConsole.Instance.HasWarning and FWarnAsError then Result := False;   // I4706
-    if Result
-      then TProjectLogConsole.Instance.Log(plsSuccess, FInFile, 'Keyboard '+FInFile+' compiled, output saved as '+FOutFile+'.', 0, 0)
-      else TProjectLogConsole.Instance.Log(plsFailure, FInFile, 'Keyboard '+FInFile+' could not be compiled.', 0, 0);
-  end;
-
-  if Result and FIsKMX then
-  begin
-    if FOutFile = '' then FOutFile := FInFile;
-    FOutFile := ChangeFileExt(FOutFile, '.kmx');
-    Result := Result and (CompileKeyboardFile(PChar(FInFile), PChar(FOutFile), FDebug, FWarnAsError, True, @CompilerMessage) <> 0);   // I4865   // I4866
-    Result := Result and CompileVisualKeyboardFromKMX(FInFile, FOutFile);
-
-    if TProjectLogConsole.Instance.HasWarning and FWarnAsError then Result := False;   // I4706
-    if Result
-      then TProjectLogConsole.Instance.Log(plsSuccess, FInFile, 'Keyboard '+FInFile+' compiled, output saved as '+FOutFile+'.', 0, 0)
-      else TProjectLogConsole.Instance.Log(plsFailure, FInFile, 'Keyboard '+FInFile+' could not be compiled.', 0, 0);
-  end;
+  Result := False;
 end;
 
 procedure FixupPathSlashes(var path: string);

@@ -18,7 +18,7 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\kmcmpdll\compfile.h">
+    <ClInclude Include="..\..\..\..\kmcmplib\src\compfile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

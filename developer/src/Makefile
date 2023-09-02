@@ -3,9 +3,9 @@
 #
 
 !ifdef NODELPHI
-TARGETS=build-tools kmcmplib kmcmpdll kmanalyze kmdecomp server kmc
+TARGETS=build-tools kmcmplib kmanalyze kmdecomp server kmc
 !else
-TARGETS=build-tools kmcmplib kmcmpdll kmcomp kmanalyze kmconvert tike samples setup inst kmdecomp server kmc
+TARGETS=build-tools kmcmplib kmcomp kmanalyze kmconvert tike samples setup inst kmdecomp server kmc
 !endif
 
 EXCLUDEPATHDEFINES=1
@@ -33,15 +33,11 @@ kmcmplib: global-versions .virtual
     cd $(DEVELOPER_ROOT)\src\kmcmplib
     $(MAKE) $(TARGET)
 
-kmcmpdll: kmcmplib .virtual
-    cd $(DEVELOPER_ROOT)\src\kmcmpdll
-    $(MAKE) $(TARGET)
-
 kmdecomp: .virtual
     cd $(DEVELOPER_ROOT)\src\kmdecomp
     $(MAKE) $(TARGET)
 
-kmcomp: kmcmpdll
+kmcomp:
     cd $(DEVELOPER_ROOT)\src\kmcomp
     $(MAKE) $(TARGET)
 
@@ -53,7 +49,7 @@ kmconvert: .virtual
     cd $(DEVELOPER_ROOT)\src\kmconvert
     $(MAKE) $(TARGET)
 
-tike: kmcmpdll redist
+tike: redist
     cd $(DEVELOPER_ROOT)\src\tike
     $(MAKE) $(TARGET)
 
