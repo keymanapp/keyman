@@ -109,7 +109,7 @@ begin
           if not kps.Clean then Exit;
         end
         else
-          if not kps.CompilePackage(nil, False) then Exit;
+          if not kps.CompilePackage then Exit;
         Found := True;
       end;
 

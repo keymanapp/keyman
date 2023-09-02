@@ -28,7 +28,7 @@ uses
   utilsystem in '..\..\..\common\windows\delphi\general\utilsystem.pas',
   utildir in '..\..\..\common\windows\delphi\general\utildir.pas',
   utilkeyboard in '..\..\..\common\windows\delphi\keyboards\utilkeyboard.pas',
-  unicode in '..\..\..\common\windows\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\common\windows\delphi\general\Unicode.pas',
   utilhttp in '..\..\..\common\windows\delphi\general\utilhttp.pas',
   GetOsVersion in '..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   UfrmTike in '..\tike\main\UfrmTike.pas' {TikeForm: TTntForm},
@@ -116,7 +116,8 @@ uses
   Keyman.Developer.System.Project.UrlRenderer in '..\tike\project\Keyman.Developer.System.Project.UrlRenderer.pas',
   Keyman.Developer.System.ValidateRepoChanges in 'Keyman.Developer.System.ValidateRepoChanges.pas',
   Keyman.Developer.System.KeymanDeveloperPaths in '..\tike\main\Keyman.Developer.System.KeymanDeveloperPaths.pas',
-  Keyman.Developer.System.ValidateKpsFile in '..\common\delphi\compiler\Keyman.Developer.System.ValidateKpsFile.pas';
+  Keyman.Developer.System.ValidateKpsFile in '..\common\delphi\compiler\Keyman.Developer.System.ValidateKpsFile.pas',
+  Keyman.Developer.System.KmcWrapper in '..\tike\compile\Keyman.Developer.System.KmcWrapper.pas';
 
 {$R icons.RES}
 {$R version.res}
