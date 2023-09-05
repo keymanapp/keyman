@@ -88,6 +88,10 @@ def verify_ibus_daemon(start):
     elif not user:
         user = os.environ.get('LOGNAME')
 
+    if not user:
+        logging.debug('Neither SUDO_USER, USER nor LOGNAME set. Skipping ibus-daemon check.')
+        return
+
     try:
         ps = subprocess.run(('ps', '--user', user, '-o', 's=', '-o', 'cmd'), stdout=subprocess.PIPE).stdout
         ibus_daemons = re.findall('^[^ZT] ibus-daemon .*--xim.*', ps.decode('utf-8'), re.MULTILINE)
