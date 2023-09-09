@@ -1,5 +1,5 @@
 #
-# Test that struct sizes in kmcomp and kmcmplib match
+# Test that struct sizes in tike and kmcmplib match
 # for each of x86 and x64
 #
 

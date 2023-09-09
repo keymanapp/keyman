@@ -71,5 +71,9 @@ export class InfrastructureMessages {
   static Error_NotAProjectFile = (o:{filename:string}) => m(this.ERROR_NotAProjectFile,
     `File ${o.filename} must have a .kpj extension to be treated as a project.`);
   static ERROR_NotAProjectFile = SevError | 0x000F;
+
+  static Error_CannotCreateFolder = (o:{folderName:string, e: any}) => m(this.ERROR_CannotCreateFolder, null,
+    `Unable to create folder ${o.folderName}: ${o.e ?? 'unknown error'}`);
+  static ERROR_CannotCreateFolder = SevError | 0x0010;
 }
 

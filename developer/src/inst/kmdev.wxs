@@ -160,15 +160,7 @@
       </Component>
 
       <Component>
-        <File Name="kmcomp.exe" KeyPath="yes" />
-      </Component>
-
-      <Component>
         <File Name="kmconvert.exe" KeyPath="yes" />
-      </Component>
-
-      <Component>
-        <File Name="kmcomp.x64.exe" KeyPath="yes" />
       </Component>
 
       <Component>

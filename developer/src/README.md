@@ -37,11 +37,6 @@ a full node.js install.
 A keyboard source analysis and automated regression test tool. Testing for
 logical errors of a keyboard.
 
-## src/kmcomp - kmcomp.exe & kmcomp.x64.exe
-
-The main command line compiler for a keyboard. It compiles keyboards (.kmn),
-packages (.kps), and projects (.kpj).
-
 ## src/kmconvert - kmconvert.exe & kmconvert.x64.exe
 
 KMConvert converts keyboard layouts between different formats. KMConvert will

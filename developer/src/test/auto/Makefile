@@ -15,11 +15,9 @@ test:
 
 developer-tests: \
   compile-supplementary-support \
-  keyboard-info \
   keyboard-js-info \
   keyboard-package-versions \
   kmcomp \
-  kmcomp-empty-store-names \
   kmcomp-x64-structures \
   kmconvert \
   kmx-file-languages \
@@ -38,10 +36,6 @@ compile-supplementary-support: .virtual
   cd $(DEVELOPER_ROOT)\src\test\auto\compile-supplementary-support
   $(MAKE) $(TARGET)
 
-keyboard-info: .virtual
-  cd $(DEVELOPER_ROOT)\src\test\auto\keyboard-info
-  $(MAKE) $(TARGET)
-
 keyboard-js-info: .virtual
     cd $(DEVELOPER_ROOT)\src\test\auto\keyboard-js-info
     $(MAKE) $(TARGET)
@@ -57,11 +51,6 @@ keyboard-package-versions: .virtual
 kmcomp: .virtual
   cd $(DEVELOPER_ROOT)\src\test\auto\kmcomp
   $(MAKE) $(TARGET)
-
-kmcomp-empty-store-names: .virtual
-  rem TODO
-#  cd $(DEVELOPER_ROOT)\src\test\auto\kmcomp-empty-store-names
-#  $(MAKE) $(TARGET)
 
 kmcomp-x64-structures: .virtual
   cd $(DEVELOPER_ROOT)\src\test\auto\kmcomp-x64-structures

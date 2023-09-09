@@ -22,7 +22,7 @@ KEYMAN_WIX_TEMP_SERVER=$(TEMP)\keyman_wix_build\Server
 KEYMAN_WIX_KMDEV_SERVER=$(DEVELOPER_ROOT)\bin\server
 KEYMAN_DEVELOPER_TEMPLATES_ROOT=$(DEVELOPER_ROOT)\src\kmconvert\data
 
-copykmdev: makeinstaller make-kmcomp-install-zip
+copykmdev: makeinstaller make-kmc-install-zip
     -mkdir $(DEVELOPER_ROOT)\release\$Version
     copy /Y $(DEVELOPER_ROOT)\src\inst\keymandeveloper.msi $(DEVELOPER_ROOT)\release\$Version\keymandeveloper.msi
     copy /Y $(DEVELOPER_ROOT)\src\inst\keymandeveloper-$Version.exe $(DEVELOPER_ROOT)\release\$Version\keymandeveloper-$Version.exe
@@ -105,17 +105,16 @@ makeinstaller:
     $(SIGNCODE) /d "Keyman Developer" keymandeveloper-$Version.exe
 
 #
-# Zip the files we distribute as part of the standalone kmcomp distro into release\$Version\kmcomp-$Version.zip
+# Zip the files we distribute as part of the standalone kmc distro into release\$Version\kmcomp-$Version.zip
 #
 
-KMCOMP_ZIP=$(DEVELOPER_ROOT)\release\$Version\kmcomp-$Version.zip
+# TODO: rename this to keyman-developer-cli-$Version.zip
+KMC_ZIP=$(DEVELOPER_ROOT)\release\$Version\kmcomp-$Version.zip
 
-make-kmcomp-install-zip: copy-schemas
+make-kmc-install-zip: copy-schemas
     cd $(DEVELOPER_ROOT)\bin
 
-    $(WZZIP) -bd -bb0 $(KMCOMP_ZIP) \
-        kmcomp.exe \
-        kmcomp.x64.exe \
+    $(WZZIP) -bd -bb0 $(KMC_ZIP) \
         kmconvert.exe \
         sentry.dll sentry.x64.dll \
         kmdecomp.exe \

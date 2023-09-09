@@ -72,7 +72,6 @@ tike/xml/kmw/resource
 
 # These files are generated during build
 tike/icons.res
-kmcomp/icons.res
 tds_file.txt
 
 # These are built from corresponding manifest.in and version.in

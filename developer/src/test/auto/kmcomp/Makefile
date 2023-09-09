@@ -1,13 +1,13 @@
 #
-# Test that kmcomp passes various compile tests
+# Test that kmc passes various compile tests
 #
-# Uses kmcomp.exe rather than attempting to run a separate test
+# Uses kmc.exe rather than attempting to run a separate test
 #
 
 !include ..\..\..\Defines.mak
 
 test: build
-    test.bat -c "$(DEVELOPER_PROGRAM)\kmcomp.exe"
+    test.bat -c $(DEVELOPER_PROGRAM)\kmc.cmd
 
 build:
     rem Nothing to do
