@@ -86,6 +86,7 @@ def verify_ibus_daemon(start):
     user = realuser or getpass.getuser()
 
     if not user:
+        logging.debug('SUDO_USER not set and getpass.getuser() returned None. Skipping ibus-daemon check.')
         return
 
     try:
