@@ -1,5 +1,8 @@
 import { execFileSync } from 'child_process';
 
+// RFC3339 pattern, UTC
+export const expectedGitDateFormat = /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ$/;
+
 /**
  * Returns the date and time of the last commit from git for the passed in path
  * @param path   Path for which to retrieve the last commit message
@@ -37,7 +40,7 @@ export function getLastGitCommitDate(path: string): string {
 
   // We'll only return the result if it walks like a date, swims like a date,
   // and quacks like a date.
-  if (!result.match(/^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ$/)) {
+  if (!result.match(expectedGitDateFormat)) {
     return null;
   }
 
