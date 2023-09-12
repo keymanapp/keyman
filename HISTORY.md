@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.172 alpha 2023-09-12
+
+* fix(linux): Prevent exception if neither USER, LOGNAME nor SUDO_USER set (#9543)
+* chore(linux): Exclude environment.sh from build (#9553)
+
 ## 17.0.171 alpha 2023-09-01
 
 * chore(linux): Add `clean` target to `rules` (#9531)
