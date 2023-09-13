@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.173 alpha 2023-09-13
+
+* chore(common): Update to Unicode 15.1 (#9555)
+
 ## 17.0.172 alpha 2023-09-12
 
 * fix(linux): Prevent exception if neither USER, LOGNAME nor SUDO_USER set (#9543)
