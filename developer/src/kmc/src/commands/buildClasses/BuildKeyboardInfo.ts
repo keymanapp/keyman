@@ -3,7 +3,7 @@ import { BuildActivity } from './BuildActivity.js';
 import { CompilerCallbacks, CompilerOptions, KeymanDeveloperProject, KeymanFileTypes } from '@keymanapp/common-types';
 import { KeyboardInfoCompiler } from '@keymanapp/kmc-keyboard-info';
 import { loadProject } from '../../util/projectLoader.js';
-import { InfrastructureMessages } from '../../messages/messages.js';
+import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { KmpCompiler } from '@keymanapp/kmc-package';
 import { calculateSourcePath } from '../../util/calculateSourcePath.js';
 

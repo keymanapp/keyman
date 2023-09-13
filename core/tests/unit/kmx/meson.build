@@ -31,6 +31,7 @@ kmx = executable('kmx',
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../kmx_test_source'],
     link_args: links + tests_flags,
+    dependencies: [icu_uc, icu_i18n],
     objects: [lib.extract_all_objects(recursive: false), kmx_test_source_lib.extract_all_objects(recursive: false)])
 
 tests = [
@@ -178,6 +179,7 @@ key_e = executable('key_list', ['kmx_key_list.cpp', '../emscripten_filesystem.cp
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,
+                dependencies: [icu_uc, icu_i18n],
                 objects: lib.extract_all_objects(recursive: false))
 test_kbd = 'kmx_key_list'
 
@@ -196,6 +198,7 @@ imx_e = executable('imx_list', ['kmx_imx.cpp', '../emscripten_filesystem.cpp'],
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,
+                dependencies: [icu_uc, icu_i18n],
                 objects: lib.extract_all_objects(recursive: false))
 
 test_kbd = 'kmx_imsample'
@@ -208,3 +211,22 @@ kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
   command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@', '--out-file', kbd_obj]
 )
   test('imx_list', imx_e,  depends: kbd_log, args: [kbd_obj] )
+
+external_e = executable('ext_event', ['kmx_external_event.cpp', '../emscripten_filesystem.cpp'],
+                cpp_args: defns + warns,
+                include_directories: [inc, libsrc],
+                link_args: links + tests_flags,
+                dependencies: [icu_uc, icu_i18n],
+                objects: lib.extract_all_objects(recursive: false))
+
+test_kbd = 'k_033___caps_always_off'
+
+
+kbd_src = common_test_keyboards_baseline + '/' + test_kbd + '.kmn'
+kbd_obj = join_paths(meson.current_build_dir(), test_kbd) + '.kmx'
+kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
+  output: test_kbd + '.log',
+  input: kbd_src,
+  command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@', '--out-file', kbd_obj]
+)
+  test('ext_event', external_e,  depends: kbd_log, args: [kbd_obj] )

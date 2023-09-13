@@ -52,7 +52,7 @@ sources = files(
   'dayperiodrules.cpp',
   'dcfmtsym.cpp',
   'decContext.cpp',
-  'decNumber.cpp',
+  # 'decNumber.cpp',
   'decimfmt.cpp',
   'displayoptions.cpp',
   'double-conversion-bignum-dtoa.cpp',

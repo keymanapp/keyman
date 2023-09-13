@@ -55,7 +55,7 @@ describe('Test of Pattern Parsers', () => {
     });
     it('should be able to emit sentinel values', () => {
       assert.equal(MarkerParser.markerOutput(295), '\uFFFF\u0008\u0127', 'Wrong sentinel value emitted');
-      assert.equal(MarkerParser.markerOutput(MarkerParser.ANY_MARKER_INDEX), '\uFFFF\u0008\uFFFE', 'Wrong sentinel value emitted for ffff');
+      assert.equal(MarkerParser.markerOutput(MarkerParser.ANY_MARKER_INDEX), '\uFFFF\u0008\uD7FF', 'Wrong sentinel value emitted for ANY_MARKER_INDEX');
       assert.throws(() => MarkerParser.markerOutput(0)); // below MIN
       assert.throws(() => MarkerParser.markerOutput(0x10000)); // above MAX
     });
@@ -89,7 +89,7 @@ describe('Test of Pattern Parsers', () => {
       );
       assert.equal(MarkerParser.toSentinelString(
         `Give me \\m{a} and \\m{c}, or \\m{.}.`, markers),
-        `Give me \uFFFF\u0008\u0001 and \uFFFF\u0008\u0003, or \uFFFF\u0008\uFFFE.`
+        `Give me \uFFFF\u0008\u0001 and \uFFFF\u0008\u0003, or \uFFFF\u0008\uD7FF.`
       );
       assert.throws(() =>
         MarkerParser.toSentinelString(

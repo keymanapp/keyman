@@ -1,5 +1,31 @@
 # Keyman Version History
 
+## 17.0.162 alpha 2023-08-18
+
+*  (#9483)
+* fix(windows): allow QR share box to grow to edge of default configuration parent window (#9472)
+* chore(resources):  update CLDR to post-PRI (#9482)
+
+## 17.0.161 alpha 2023-08-16
+
+*  (#9440)
+
+## 17.0.160 alpha 2023-08-14
+
+* feat(core): limit max marker to 0xD7FF (#9448)
+
+## 17.0.159 alpha 2023-08-11
+
+*  (#9405)
+
+## 17.0.158 alpha 2023-08-09
+
+* chore(linux): Disable Mantic builds on Launchpad (#9435)
+* feat(windows): Use Keyboard Activated event API call to turn off caps lock (if required) (#9353)
+* chore: stats script parameters (#9431)
+* feat(developer): add 'default' property for longpress keys (#9432)
+* chore(developer): improve kmc sentry reporting on fatal build errors (#9441)
+
 ## 17.0.157 alpha 2023-08-08
 
 * fix(linux): fix memory leaks and method name (#9413)

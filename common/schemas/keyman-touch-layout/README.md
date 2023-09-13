@@ -399,6 +399,17 @@ and `width`.
 : Number. Defines the width of the key. Not currently supported for longpress
   keys. See `key` object for details.
 
+* `default`
+
+: Boolean. Defaults to `false`. If true, this will be the default key when the
+  user longpresses the base key without moving their finger. Only one subkey
+  should be default; if multiple subkeys have the default field set, then
+  behaviour is undefined.  Given that cancel is not the preferred default
+  action for a longpress, the user can cancel the longpress default by 
+  sliding outside the 'acceptance' area -- e.g. south of the key cap, 
+  which would then unhighlight the default and indicate visually that 
+  no output would occur when they release their finger.
+
 ## `flick` object
 
 A object with a set of properties that define flick keys for given directions.
@@ -444,6 +455,9 @@ output .js file, and transforms any legacy formats (such as "number in a
 string") into the appropriate spec format.
 
 # .keyman-touch-layout version history
+
+## 2023-08-08 2.1 stable
+* Add support for default on longpress (sk) keys. Aligns with Keyman 17.0.
 
 ## 2022-06-30 2.0 stable
 * Add support for flick, multitap, hint, defaultHint. Aligns with Keyman 16.0.

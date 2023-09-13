@@ -103,6 +103,30 @@ kmx_processor::update_option(
   return option(scope, key, value);
 }
 
+km_kbp_status
+kmx_processor::external_event(
+  km_kbp_state* state,
+  uint32_t event,
+  void* _kmn_unused(data)
+) {
+
+  switch (event) {
+    case KM_KBP_EVENT_KEYBOARD_ACTIVATED:
+      // reset any current actions in the queue as a new keyboard
+      // has been activated
+      _kmx.GetActions()->ResetQueue();
+      state->actions().clear();
+      if (_kmx.GetKeyboard()->Keyboard->dwFlags & KF_CAPSALWAYSOFF) {
+        KMX_DWORD dummy_modifiers = 0;
+        _kmx.SetCapsLock(dummy_modifiers, FALSE, TRUE);
+      }
+      break;
+    default:
+      return KM_KBP_STATUS_INVALID_ARGUMENT;
+  }
+  return internal_process_queued_actions(state);
+}
+
 bool
 kmx_processor::queue_action(
   km_kbp_state * state,

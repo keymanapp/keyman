@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import 'mocha';
 import { BuildProject } from '../src/commands/buildClasses/BuildProject.js';
 import { makePathToFixture } from './helpers/index.js';
-import { InfrastructureMessages } from '../src/messages/messages.js';
+import { InfrastructureMessages } from '../src/messages/infrastructureMessages.js';
 
 const callbacks = new TestCompilerCallbacks();
 
