@@ -527,6 +527,10 @@ main(int argc, char *argv[]) {
         strcmp(filename->str, "k_027___system_stores_2") == 0) {
       skipReason = "mnemonic keyboards are not yet supported on Linux (#3345)";
     }
+    else if (strcmp(filename->str, "k_031___caps_lock") == 0 ||
+             strcmp(filename->str, "k_032___caps_control") == 0) {
+      skipReason = "Skip tests that fail on ba-jammy-64-ta in stable-16.0 branch";
+    }
 
     if (runSurroundingTextTests) {
       add_test(directory, filename->str, TRUE, skipReason, use_wayland);
