@@ -6,6 +6,18 @@ import { CompilerMessages } from '../src/compiler/messages.js';
 import { compilerErrorFormatCode } from '@keymanapp/common-types';
 
 describe('Compiler UnicodeSet function', function() {
+  it('should fixup \\u1234 format escapes', function() {
+    assert.equal(KmnCompiler.fixNewPattern(`\\u{1234}`), `\\u1234`);
+    assert.equal(KmnCompiler.fixNewPattern(`\\u1234`), `\\u1234`);
+    assert.equal(KmnCompiler.fixNewPattern(`[\\u{1234}-\\u{5678}]`), `[\\u1234-\\u5678]`);
+    assert.equal(KmnCompiler.fixNewPattern(`something else`), `something else`);
+  });
+
+  it.skip('should fixup more creative \\u format escapes', function() {
+    assert.equal(KmnCompiler.fixNewPattern(`\\u{22}`), `\\u0022`); // "
+    assert.equal(KmnCompiler.fixNewPattern(`\\u{1F640}`), `\\uD83D\\uDE40`);  // TODO-LDM #9515: or something, 🙀
+  });
+
   it('should start', async function() {
     const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
