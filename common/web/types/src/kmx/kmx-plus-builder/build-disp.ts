@@ -12,6 +12,7 @@ import { BUILDER_SECTION } from './builder-section.js';
  */
 interface BUILDER_DISP_ITEM {
   to: BUILDER_STR_REF;
+  id: BUILDER_STR_REF;
   display: BUILDER_STR_REF;
 };
 
@@ -38,6 +39,7 @@ export function build_disp(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILD
   for(let item of kmxplus.disp.disps) {
     disp.items.push({
       to: build_strs_index(sect_strs, item.to),
+      id: build_strs_index(sect_strs, item.id),
       display: build_strs_index(sect_strs, item.display),
     });
   }

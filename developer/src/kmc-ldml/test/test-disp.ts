@@ -31,11 +31,13 @@ describe('disp', function () {
     assert.equal(compilerTestCallbacks.messages.length, 0);
     assert.equal(disp?.baseCharacter?.value, 'x');
     assert.ok(disp?.disps);
-    assert.equal(disp.disps.length, 2);
+    assert.equal(disp.disps.length, 3);
     assert.equal(disp.disps[0].to?.value, 'e');
     assert.equal(disp.disps[0].display?.value, '(e)');
     assert.equal(disp.disps[1].to?.value, 'f');
     assert.equal(disp.disps[1].display?.value, '(f)');
+    assert.equal(disp.disps[2].id?.value, 'g');
+    assert.equal(disp.disps[2].display?.value, '(g)');
   });
   it('should compile escaped disp', async function() {
     let disp = await loadSectionFixture(DispCompiler, 'sections/disp/escaped.xml', compilerTestCallbacks) as Disp;
@@ -60,6 +62,24 @@ describe('disp', function () {
     assert.isNull(disp);
     assert.equal(compilerTestCallbacks.messages.length, 1);
     assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_DisplayIsRepeated({to:'e'}));
+  });
+  it('should reject duplicate ids', async function() {
+    let disp = await loadSectionFixture(DispCompiler, 'sections/disp/invalid-dupid.xml', compilerTestCallbacks) as Disp;
+    assert.isNull(disp);
+    assert.equal(compilerTestCallbacks.messages.length, 1);
+    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_DisplayIsRepeated({id:'e'}));
+  });
+  it('should reject if neither to nor id', async function() {
+    let disp = await loadSectionFixture(DispCompiler, 'sections/disp/invalid-none.xml', compilerTestCallbacks) as Disp;
+    assert.isNull(disp);
+    assert.equal(compilerTestCallbacks.messages.length, 1);
+    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_DisplayNeedsToOrId({}));
+  });
+  it('should reject if both to and id', async function() {
+    let disp = await loadSectionFixture(DispCompiler, 'sections/disp/invalid-both.xml', compilerTestCallbacks) as Disp;
+    assert.isNull(disp);
+    assert.equal(compilerTestCallbacks.messages.length, 1);
+    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_DisplayNeedsToOrId({ to: 'e', id: 'e' }));
   });
 
 });

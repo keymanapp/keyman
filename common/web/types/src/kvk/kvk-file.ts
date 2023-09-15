@@ -42,7 +42,8 @@ export interface BUILDER_KVK_KEY {
   shift: number;                  // 0001, 2 bytes
   vkey: number;                   // 0003, 2 bytes
   text: BUILDER_KVK_STRING;       // 0005, variable length
-  bitmap: number; // always 0     // 4 bytes
+  bitmapSize: number;             // 4 bytes
+  bitmapData: number[];
 };
 
 export const BUILDER_KVK_KEY_Size = 9; // size of fixed elements of BUILDER_KVK_KEY
@@ -101,7 +102,8 @@ export default class KVKFile {
       shift: r.uint16le,
       vkey: r.uint16le,
       text: this.KVK_STRING,
-      bitmap: r.uint32le // always 00 00 00 00 for now
+      bitmapSize: r.uint32le,
+      bitmapData: new r.Array(r.uint8, 'bitmapSize')
     });
 
     this.KVK_HEADER = new r.Struct({

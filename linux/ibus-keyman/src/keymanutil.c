@@ -170,7 +170,7 @@ ibus_keyman_add_engines(GList * engines, GList * kmpdir_list)
             for (e=engines; e != NULL && alreadyexists == FALSE; e = e->next) {
                 IBusEngineDesc *engine_desc = (IBusEngineDesc *) e->data;
                 const gchar *version = ibus_engine_desc_get_version(engine_desc);
-                const gchar *engine_name = ibus_engine_desc_get_version(engine_desc);
+                const gchar *engine_name = ibus_engine_desc_get_name(engine_desc);
                 gchar *kmx_file = g_path_get_basename(engine_name);
                 if (g_strcmp0(kmx_file, keyboard->kmx_file) == 0  && g_strcmp0(version, keyboard->version) >= 0) {
                     alreadyexists = TRUE;

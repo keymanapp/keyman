@@ -20,6 +20,8 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "@/common/include" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
+  "@/developer/src/kmc-analyze" \
+  "@/developer/src/kmc-keyboard-info" \
   "@/developer/src/kmc-kmn" \
   "@/developer/src/kmc-ldml" \
   "@/developer/src/kmc-model" \
@@ -53,19 +55,9 @@ if builder_start_action clean; then
   builder_finish_action success clean
 fi
 
-function copy_schemas() {
-  # We need the schema file at runtime and bundled, so always copy it for all actions except `clean`
-  mkdir -p "$THIS_SCRIPT_PATH/build/src/util/"
-  cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json" "$THIS_SCRIPT_PATH/build/src/util/"
-  cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboardtest.schema.json" "$THIS_SCRIPT_PATH/build/src/util/"
-  cp "$KEYMAN_ROOT/common/schemas/kvks/kvks.schema.json" "$THIS_SCRIPT_PATH/build/src/util/"
-  cp "$KEYMAN_ROOT/common/schemas/kpj/kpj.schema.json" "$THIS_SCRIPT_PATH/build/src/util/"
-}
-
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action configure; then
-  copy_schemas
   verify_npm_setup
   builder_finish_action success configure
 fi
@@ -73,7 +65,6 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action build; then
-  copy_schemas
   npm run build
   builder_finish_action success build
 fi
@@ -81,28 +72,12 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action test; then
-  copy_schemas
-  npm test
+  eslint .
+  tsc --build test/
+  mocha
   # TODO: enable c8 (disabled because no coverage at present)
   #     && c8 --reporter=lcov --reporter=text mocha
   builder_finish_action success test
-fi
-
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_start_action bundle; then
-  copy_schemas
-
-  if ! builder_has_option --build-path; then
-    builder_finish_action "Parameter --build-path is required" bundle
-    exit 64
-  fi
-
-  mkdir -p build/cjs-src
-  npm run bundle
-  cp build/cjs-src/* "$BUILD_PATH"
-
-  builder_finish_action success bundle
 fi
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -112,12 +87,48 @@ readonly PACKAGES=(
   common/web/types
   common/models/types
   core/include/ldml
+  developer/src/kmc-analyze
+  developer/src/kmc-keyboard-info
   developer/src/kmc-kmn
   developer/src/kmc-ldml
   developer/src/kmc-model
   developer/src/kmc-model-info
   developer/src/kmc-package
 )
+
+if builder_start_action bundle; then
+  SOURCEMAP_PATHS=( "${PACKAGES[@]}" )
+  SOURCEMAP_PATHS=( "${SOURCEMAP_PATHS[@]/%//build}" )
+  SOURCEMAP_PATHS=( "${SOURCEMAP_PATHS[@]/#/../../../}" )
+  readonly SOURCEMAP_PATHS
+
+  if ! builder_has_option --build-path; then
+    builder_finish_action "Parameter --build-path is required" bundle
+    exit 64
+  fi
+
+  rm -rf build/dist
+
+  mkdir -p build/dist
+  node build-bundler.js
+
+  ./node_modules/.bin/sentry-cli sourcemaps inject \
+    --org keyman \
+    --project keyman-developer \
+    --release "$VERSION_GIT_TAG"  \
+    --ext js --ext mjs --ext ts --ext map \
+    build/ "${SOURCEMAP_PATHS[@]}"
+
+  # Manually copy over kmcmplib module
+  cp ../kmc-kmn/build/src/import/kmcmplib/wasm-host.wasm build/dist/
+
+  cp build/dist/* "$BUILD_PATH"
+
+  builder_finish_action success bundle
+fi
+
+#-------------------------------------------------------------------------------------------------------------------
+
 
 if builder_start_action publish; then
   . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
