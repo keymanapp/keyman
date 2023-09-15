@@ -22,6 +22,7 @@
   <displays>
     <!-- values chosen to reuse strings -->
     <display to="a" display="^" />
+    <display id="e" display="^e" />
     <displayOptions baseCharacter="e" />
   </displays>
 
