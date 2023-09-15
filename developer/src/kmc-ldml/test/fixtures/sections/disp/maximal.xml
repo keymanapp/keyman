@@ -7,6 +7,7 @@
   </names>
 
   <displays>
+    <display id="g" display="(g)"/>
     <display to="f" display="(f)"/> <!-- Note: in opposite lexical order, as the compiler will sort -->
     <display to="e" display="(e)"/>
     <displayOptions baseCharacter="x" />

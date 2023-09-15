@@ -120,7 +120,7 @@ class Constants {
    /**
     *  Length of each entry in the 'disp' variable part
     */
-   readonly length_disp_item = 8;
+   readonly length_disp_item = 12;
 
   /* ------------------------------------------------------------------
     * elem section
