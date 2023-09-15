@@ -59,29 +59,33 @@ ibus_disconnected_cb(IBusBus *unused_bus, gpointer unused_data) {
 }
 
 static void
-start_component(void) {
-  GList *engines, *p;
+add_single_keyboard(gpointer data, gpointer user_data) {
+  IBusEngineDesc *engine = IBUS_ENGINE_DESC(data);
+#if IBUS_CHECK_VERSION(1, 3, 99)
+  const gchar *engine_name = ibus_engine_desc_get_name(engine);
+#else
+  const gchar *engine_name = engine->name;
+#endif /* !IBUS_CHECK_VERSION(1,3,99) */
+  ibus_factory_add_engine(factory, engine_name, IBUS_TYPE_KEYMAN_ENGINE);
+}
+
+static void
+add_keyboards(IBusBus *bus, gpointer user_data) {
+  GList *engines;
   IBusComponent *component;
 
-  ibus_init();
-
-  bus = ibus_bus_new();
-  g_signal_connect(bus, "disconnected", G_CALLBACK(ibus_disconnected_cb), NULL);
+  g_message("Adding keyboards to ibus");
 
   component = ibus_keyman_get_component();
 
-  factory = ibus_factory_new(ibus_bus_get_connection(bus));
+  GDBusConnection *connection = ibus_bus_get_connection(bus);
+  factory = ibus_factory_new(connection);
+
+  g_signal_connect(bus, "disconnected", G_CALLBACK(ibus_disconnected_cb), NULL);
 
   engines = ibus_component_get_engines(component);
-  for (p = engines; p != NULL; p = p->next) {
-    IBusEngineDesc *engine = (IBusEngineDesc *)p->data;
-#if IBUS_CHECK_VERSION(1, 3, 99)
-    const gchar *engine_name = ibus_engine_desc_get_name(engine);
-#else
-    const gchar *engine_name = engine->name;
-#endif /* !IBUS_CHECK_VERSION(1,3,99) */
-    ibus_factory_add_engine(factory, engine_name, IBUS_TYPE_KEYMAN_ENGINE);
-  }
+  g_list_foreach(engines, add_single_keyboard, NULL);
+  g_list_free(engines);
 
   if (ibus) {
     ibus_bus_request_name(bus, "org.freedesktop.IBus.Keyman", 0);
@@ -91,6 +95,22 @@ start_component(void) {
 
   g_object_unref(component);
   km_service_get_default(NULL);  // initialise dbus service
+}
+
+static void
+start_component(void) {
+  g_message("Starting ibus-engine-keyman");
+
+  ibus_init();
+
+  bus = ibus_bus_new();
+
+  if (ibus_bus_is_connected(bus)) {
+    add_keyboards(bus, NULL);
+  } else {
+    g_message("Waiting for ibus-daemon to start up...");
+    g_signal_connect(bus, "connected", G_CALLBACK(add_keyboards), NULL);
+  }
 
   ibus_main();
 }
@@ -126,14 +146,19 @@ main(gint argc, gchar **argv) {
 
   if (!g_option_context_parse(context, &argc, &argv, &error)) {
     g_print("Option parsing failed: %s\n", error->message);
+    g_option_context_free(context);
     exit(-1);
   }
 
   if (xml) {
     print_engines_xml();
+    g_option_context_free(context);
     exit(0);
   }
 
   start_component();
+
+  g_option_context_free(context);
+  g_message("Exiting ibus-engine-keyman");
   return 0;
 }
