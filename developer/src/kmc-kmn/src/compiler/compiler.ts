@@ -421,10 +421,15 @@ export class KmnCompiler implements UnicodeSetParser {
     return Module.kmcmp_testSentry();
   }
 
-  /** convert `\u{1234}` to `\u1234` */
+  /** convert `\u{1234}` to `\u1234` etc */
   public static fixNewPattern(pattern: string) : string {
-    return pattern.replaceAll(/\\u\{([0-9a-fA-F]{4})\}/g, `\\u$1`);
-    // TODO-LDML: other lengths! #9515
+    pattern = pattern.replaceAll(/\\u\{([0-9a-fA-F]{6})\}/g, `\\U00$1`);
+    pattern = pattern.replaceAll(/\\u\{([0-9a-fA-F]{5})\}/g, `\\U000$1`);
+    pattern = pattern.replaceAll(/\\u\{([0-9a-fA-F]{4})\}/g, `\\u$1`);
+    pattern = pattern.replaceAll(/\\u\{([0-9a-fA-F]{3})\}/g, `\\u0$1`);
+    pattern = pattern.replaceAll(/\\u\{([0-9a-fA-F]{2})\}/g, `\\u00$1`);
+    pattern = pattern.replaceAll(/\\u\{([0-9a-fA-F]{1})\}/g, `\\u000$1`);
+    return pattern;
   }
 
   /**
