@@ -1,126 +1,42 @@
 #!/usr/bin/env bash
-# TODO: builder script plz
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-THIS_DIR="$(dirname "$THIS_SCRIPT")"
 
-display_usage() {
-  echo "usage: build.sh [build options] [targets]"
-  echo
-  echo "Build options:"
-  echo "  --debug, -d       Debug build"
-  echo "  --silent, -s      Suppress information messages"
-  echo "  --kmc path        Specify path to kmc, defaults"
-  echo "                    to developer/src/kmc/build/"
-  echo "  --zip-source      Create zip file for source of each"
-  echo "                    keyboard for artifact tests"
-  echo "  --index           Build index.html for artifact tests"
-  echo
-  echo "Targets (all unless specified):"
+cd "$THIS_SCRIPT_PATH"
 
-  for d in "$THIS_DIR/"*/; do
-    d="$(basename "$d")"
-    if [ "$d" != "invalid" && "$d" != "issue"]; then
-      echo "  $d"
-    fi
-  done
-
-  echo
-  exit 0
-}
-
-readonly KMC_LAUNCHER=node
-QUIET=false
-DEBUG=false
-INDEX=false
-ZIPSOURCE=false
-KMC="$KEYMAN_ROOT/developer/src/kmc/build/src/kmc.js"
-TARGETS=()
-
-# Parse args
-shopt -s nocasematch
-
-while [[ $# -gt 0 ]] ; do
-  key="$1"
-  case $key in
-    --help|-h|-\?)
-      display_usage
-      ;;
-    --debug|-d)
-      DEBUG=true
-      ;;
-    --silent|-s)
-      QUIET=true
-      ;;
-    --zip-source)
-      ZIPSOURCE=true
-      ;;
-    --index)
-      INDEX=true
-      ;;
-    --kmc)
-      shift
-      KMC="$1"
-      ;;
-    *)
-      TARGETS+=("$key")
-  esac
-  shift
+targets=()
+# Build list of available targets from subfolders, if none specified
+for d in */; do
+  d="$(basename "$d")"
+  if [ "$d" != "invalid" ] && [ "$d" != "issue" ]; then
+    targets+=(":$d")
+  fi
 done
 
-# Build list of available targets from subfolders, if none specified
-if [ ${#TARGETS[@]} == 0 ]; then
-  for d in "$THIS_DIR/"*/; do
-    d="$(basename "$d")"
-    if [ "$d" != "invalid" ] && [ "$d" != "issue" ]; then
-      TARGETS+=("$d")
-    fi
-  done
-fi
+KMC="$KEYMAN_ROOT/developer/src/kmc/build/src/kmc.js"
 
-if ! $QUIET; then
-  displayInfo "" \
-      "DEBUG: $DEBUG" \
-      "QUIET: $QUIET" \
-      "TARGETS: ${TARGETS[@]}" \
-      "ZIPSOURCE: $ZIPSOURCE" \
-      "INDEX: $INDEX" \
-      ""
-fi
+builder_describe "Test Keyboards" \
+  clean configure build \
+  ${targets[@]} \
+  "--index       Build index.html for artifact tests" \
+  "--zip-source  Create zip file for source of each keyboard for artifact tests" \
+  "--kmc=KMC     Specify path to kmc, defaults to developer/src/kmc/build/" \
+  "--silent,-s   Suppress information messages"
 
-zipsource() {
+builder_parse "$@"
+
+function zipsource() {
   local target="$1"
   pushd "$1" > /dev/null
   7z a -r -x!build -x"!$target.kpj.user" "${target}_source.zip" .
   popd > /dev/null
 }
 
-###
-
-d=
-ss=
-if $DEBUG; then
-  d=-d
-fi
-if $QUIET; then
-  ss="--log-level silent"
-fi
-$KMC_LAUNCHER "$KMC" build $d $ss -w "${TARGETS[@]}"
-
-for TARGET in "${TARGETS[@]}"; do
-  if $ZIPSOURCE; then
-    zipsource "$TARGET"
-  fi
-done
-
-###
-
-if $INDEX; then
-  cat << EOF > "$THIS_DIR/index.html"
+function build_index() {
+  cat << EOF > index.html
 <!DOCTYPE html>
 <html>
   <head>
@@ -132,18 +48,47 @@ if $INDEX; then
     <ul>
 EOF
 
-  for TARGET in "${TARGETS[@]}"; do
-    if $ZIPSOURCE; then
-      echo "      <li><a href='$TARGET/build/$TARGET.kmp'>$TARGET.kmp</a> (<a href='$TARGET/${TARGET}_source.zip'>source</a>)</li>" >> "$THIS_DIR/index.html"
+  for TARGET in "${targets[@]}"; do
+    if builder_has_option --zip-source; then
+      echo "      <li><a href='$TARGET/build/$TARGET.kmp'>$TARGET.kmp</a> (<a href='$TARGET/${TARGET}_source.zip'>source</a>)</li>" >> index.html
     else
-      echo "      <li><a href='$TARGET/build/$TARGET.kmp'>$TARGET.kmp</a></li>" >> "$THIS_DIR/index.html"
+      echo "      <li><a href='$TARGET/build/$TARGET.kmp'>$TARGET.kmp</a></li>" >> index.html
     fi
   done
 
-  cat << 'EOF' >> "$THIS_DIR/index.html"
+  cat << EOF >> index.html
     </ul>
   </body>
 </html>
 EOF
+}
 
-fi
+###
+
+function build() {
+  local active_targets=()
+  for TARGET in "${targets[@]}"; do
+    if builder_has_action build$TARGET; then
+      active_targets+=(${TARGET#:})
+    fi
+  done
+
+  local ss=
+  if builder_has_option --silent; then
+    ss="--log-level silent"
+  fi
+
+  node "$KMC" build $builder_debug $ss -w "${active_targets[@]}"
+
+  if builder_has_option --zip-source; then
+    for TARGET in "${active_targets[@]}"; do
+      zipsource "$TARGET"
+    done
+  fi
+
+  if builder_has_option --index; then
+    build_index
+  fi
+}
+
+builder_run_action build build
