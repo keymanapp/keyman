@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.174 alpha 2023-09-16
+
+* refactor(linux): Reformat file (#9569)
+
 ## 17.0.173 alpha 2023-09-13
 
 * chore(common): Update to Unicode 15.1 (#9555)
