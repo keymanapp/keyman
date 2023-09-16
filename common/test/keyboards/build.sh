@@ -1,24 +1,19 @@
 #!/usr/bin/env bash
-
-set -e
-set -u
-
+# TODO: builder script plz
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 THIS_DIR="$(dirname "$THIS_SCRIPT")"
 
 display_usage() {
   echo "usage: build.sh [build options] [targets]"
   echo
   echo "Build options:"
-  echo "  --clean, -c       Clean instead of build"
   echo "  --debug, -d       Debug build"
   echo "  --silent, -s      Suppress information messages"
-  echo "  --keyboard, -k    Build only keyboards (not packages)"
   echo "  --kmc path        Specify path to kmc, defaults"
   echo "                    to developer/src/kmc/build/"
   echo "  --zip-source      Create zip file for source of each"
@@ -29,7 +24,7 @@ display_usage() {
 
   for d in "$THIS_DIR/"*/; do
     d="$(basename "$d")"
-    if [ "$d" != "invalid" ]; then
+    if [ "$d" != "invalid" && "$d" != "issue"]; then
       echo "  $d"
     fi
   done
@@ -38,14 +33,12 @@ display_usage() {
   exit 0
 }
 
+readonly KMC_LAUNCHER=node
 QUIET=false
 DEBUG=false
-CLEAN=false
-KEYBOARDS_ONLY=false
-CUSTOM_KMCOMP=
 INDEX=false
 ZIPSOURCE=false
-KMCOMP="$KEYMAN_ROOT/developer/bin/kmcomp.exe"
+KMC="$KEYMAN_ROOT/developer/src/kmc/build/src/kmc.js"
 TARGETS=()
 
 # Parse args
@@ -57,17 +50,11 @@ while [[ $# -gt 0 ]] ; do
     --help|-h|-\?)
       display_usage
       ;;
-    --clean|-c)
-      CLEAN=true
-      ;;
     --debug|-d)
       DEBUG=true
       ;;
     --silent|-s)
       QUIET=true
-      ;;
-    --keyboard|-k)
-      KEYBOARDS_ONLY=true
       ;;
     --zip-source)
       ZIPSOURCE=true
@@ -75,50 +62,15 @@ while [[ $# -gt 0 ]] ; do
     --index)
       INDEX=true
       ;;
-    --kmcomp)
+    --kmc)
       shift
-      KMCOMP="$1"
-      CUSTOM_KMCOMP=true
+      KMC="$1"
       ;;
     *)
       TARGETS+=("$key")
   esac
   shift
 done
-
-# TODO: while this is intended to be cross platform, we
-# don't currently have a binary version of kmcomp available
-# during Linux and macOS builds, so that will need to be
-# manually sourced.
-KMCOMP_LAUNCHER=
-
-if ! $CUSTOM_KMCOMP; then
-  case "${OSTYPE}" in
-    "cygwin")
-      ;;
-    "msys")
-      ;;
-    "darwin"*)
-      # For Catalina (10.15) onwards, must use wine64
-      base_macos_ver=10.15
-      macos_ver=$(sw_vers -productVersion)
-      if verlt "$macos_ver" "$base_macos_ver"; then
-        KMCOMP_LAUNCHER=wine
-      else
-        # On Catalina, and later versions:
-        # wine-4.12.1 works; wine-5.0, wine-5.7 do not.
-        # retrieve these from:
-        # `brew tap gcenx/wine && brew install --cask --no-quarantine wine-crossover`
-        # may also need to `sudo spctl --master-disable`
-        KMCOMP_LAUNCHER=wine64
-        KMCOMP="$(dirname $KMCOMP)/kmcomp.x64.exe"
-      fi
-      ;;
-    *)
-      KMCOMP_LAUNCHER=wine
-      ;;
-  esac
-fi
 
 # Build list of available targets from subfolders, if none specified
 if [ ${#TARGETS[@]} == 0 ]; then
@@ -132,55 +84,13 @@ fi
 
 if ! $QUIET; then
   displayInfo "" \
-      "CLEAN: $CLEAN" \
       "DEBUG: $DEBUG" \
       "QUIET: $QUIET" \
-      "KEYBOARDS_ONLY: $KEYBOARDS_ONLY" \
       "TARGETS: ${TARGETS[@]}" \
       "ZIPSOURCE: $ZIPSOURCE" \
       "INDEX: $INDEX" \
       ""
 fi
-
-clean() {
-  local kpj="$1.kpj" ss= s=
-  if $QUIET; then
-    ss=-ss
-    s=-s
-  fi
-  pushd "$1" > /dev/null
-  if [ -f build.sh ]; then
-    ./build.sh -c $s
-  else
-    $KMCOMP_LAUNCHER "$KMCOMP" -c $ss "$kpj"
-  fi
-  popd > /dev/null
-}
-
-build() {
-  local kpj="$1.kpj" d= t= ss= target= s= k=
-  if $KEYBOARDS_ONLY; then
-    k=-k
-    t=-t
-    target="$1.kmn"
-  fi
-  if $DEBUG; then
-    d=-d
-  fi
-  if $QUIET; then
-    s=-s
-    ss=-ss
-  fi
-  # -w - treat warnings as errors, we'll force this
-  # -cfc - check filename conventions
-  pushd "$1" > /dev/null
-  if [ -f build.sh ]; then
-    ./build.sh $d $k $s
-  else
-    $KMCOMP_LAUNCHER "$KMCOMP" $d $ss -w -cfc "$kpj" $t "$target"
-  fi
-  popd > /dev/null
-}
 
 zipsource() {
   local target="$1"
@@ -191,35 +101,26 @@ zipsource() {
 
 ###
 
-for TARGET in "${TARGETS[@]}"; do
-  if $CLEAN; then
-    if ! $QUIET; then
-      echo
-      builder_heading "Cleaning target $TARGET"
-      echo
-    fi
-    clean "$TARGET"
-  else
-    if ! $QUIET; then
-      echo
-      builder_heading "Building target $TARGET"
-      echo
-    fi
-    build "$TARGET"
+d=
+ss=
+if $DEBUG; then
+  d=-d
+fi
+if $QUIET; then
+  ss="--log-level silent"
+fi
+$KMC_LAUNCHER "$KMC" build $d $ss -w "${TARGETS[@]}"
 
-    if $ZIPSOURCE; then
-      zipsource "$TARGET"
-    fi
+for TARGET in "${TARGETS[@]}"; do
+  if $ZIPSOURCE; then
+    zipsource "$TARGET"
   fi
 done
 
 ###
 
 if $INDEX; then
-  if $CLEAN; then
-    rm -f "$THIS_DIR/index.html"
-  else
-    cat << EOF > "$THIS_DIR/index.html"
+  cat << EOF > "$THIS_DIR/index.html"
 <!DOCTYPE html>
 <html>
   <head>
@@ -231,19 +132,18 @@ if $INDEX; then
     <ul>
 EOF
 
-    for TARGET in "${TARGETS[@]}"; do
-      if $ZIPSOURCE; then
-        echo "      <li><a href='$TARGET/build/$TARGET.kmp'>$TARGET.kmp</a> (<a href='$TARGET/${TARGET}_source.zip'>source</a>)</li>" >> "$THIS_DIR/index.html"
-      else
-        echo "      <li><a href='$TARGET/build/$TARGET.kmp'>$TARGET.kmp</a></li>" >> "$THIS_DIR/index.html"
-      fi
-    done
+  for TARGET in "${TARGETS[@]}"; do
+    if $ZIPSOURCE; then
+      echo "      <li><a href='$TARGET/build/$TARGET.kmp'>$TARGET.kmp</a> (<a href='$TARGET/${TARGET}_source.zip'>source</a>)</li>" >> "$THIS_DIR/index.html"
+    else
+      echo "      <li><a href='$TARGET/build/$TARGET.kmp'>$TARGET.kmp</a></li>" >> "$THIS_DIR/index.html"
+    fi
+  done
 
-    cat << 'EOF' >> "$THIS_DIR/index.html"
+  cat << 'EOF' >> "$THIS_DIR/index.html"
     </ul>
   </body>
 </html>
 EOF
-  fi
+
 fi
-exit 0
