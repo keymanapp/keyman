@@ -36,6 +36,7 @@ function zipsource() {
 }
 
 function build_index() {
+  local active_targets=($*)
   cat << EOF > index.html
 <!DOCTYPE html>
 <html>
@@ -48,7 +49,7 @@ function build_index() {
     <ul>
 EOF
 
-  for TARGET in "${targets[@]}"; do
+  for TARGET in "${active_targets[@]}"; do
     if builder_has_option --zip-source; then
       echo "      <li><a href='$TARGET/build/$TARGET.kmp'>$TARGET.kmp</a> (<a href='$TARGET/${TARGET}_source.zip'>source</a>)</li>" >> index.html
     else
@@ -87,7 +88,7 @@ function build() {
   fi
 
   if builder_has_option --index; then
-    build_index
+    build_index "${active_targets[@]}"
   fi
 }
 
