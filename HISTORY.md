@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.175 alpha 2023-09-18
+
+* chore(linux): Split startup process (#9570)
+
 ## 17.0.174 alpha 2023-09-16
 
 * refactor(linux): Reformat file (#9569)
