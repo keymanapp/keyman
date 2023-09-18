@@ -1,5 +1,31 @@
 # Keyman Version History
 
+## 17.0.173 alpha 2023-09-13
+
+* chore(common): Update to Unicode 15.1 (#9555)
+
+## 17.0.172 alpha 2023-09-12
+
+* fix(linux): Prevent exception if neither USER, LOGNAME nor SUDO_USER set (#9543)
+* chore(linux): Exclude environment.sh from build (#9553)
+
+## 17.0.171 alpha 2023-09-01
+
+* chore(linux): Add `clean` target to `rules` (#9531)
+
+## 17.0.170 alpha 2023-08-31
+
+* fix(common): builder_parse broke on option parameters (#9489)
+* docs(linux): Explicitly specify emscripten version (#9527)
+
+## 17.0.169 alpha 2023-08-30
+
+* fix(linux): Fix exception in km-kvk2ldml (#9523)
+
+## 17.0.168 alpha 2023-08-29
+
+* refactor(linux): Fix warning (#9513)
+
 ## 17.0.167 alpha 2023-08-25
 
 * feat(core): implement mapped set mapping (#9504)
