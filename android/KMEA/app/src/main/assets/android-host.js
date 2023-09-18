@@ -323,7 +323,7 @@ function showKeyboard() {
 function executePopupKey(keyID, keyText) {
   // KMW only needs keyID to process the popup key. keyText merely logged to console
   //window.console.log('executePopupKey('+keyID+'); keyText: ' + keyText);
-  keyman.executePopupKey(keyID);
+  keyman.executePopupKey(keyID, keyText);
 }
 
 // Cannot make it explicitly async / await on API 21.
