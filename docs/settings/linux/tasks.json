@@ -168,6 +168,23 @@
     },
     {
       "type": "shell",
+      "label": "ibus-keyman: report",
+      "command": "./build.sh",
+      "args": [
+        "test",
+        "report",
+        "--debug",
+        "--coverage",
+        "--no-integration"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/linux/ibus-keyman/",
+      },
+      "group": "build",
+      "detail": "create unit test coverage"
+    },
+    {
+      "type": "shell",
       "label": "keyman-config: tests",
       "command": "${workspaceFolder}/linux/keyman-config/run-tests.sh",
       "options": {

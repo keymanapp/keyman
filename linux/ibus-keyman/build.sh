@@ -19,10 +19,15 @@ builder_describe \
   "test" \
   "install                   install artifacts" \
   "uninstall                 uninstall artifacts" \
+  "report                    create coverage report" \
   "@/core:arch" \
-  "--no-integration          don't run integration tests"
+  "--no-integration          don't run integration tests" \
+  "--coverage                capture test coverage"
 
 builder_parse "$@"
+
+builder_describe_internal_dependency \
+  report:engine test:engine
 
 if builder_is_debug_build; then
   MESON_TARGET=debug
@@ -40,6 +45,12 @@ builder_describe_outputs \
   configure "${MESON_PATH}/build.ninja" \
   build "${MESON_PATH}/src/ibus-engine-keyman"
 
+if builder_has_option --coverage; then
+  MESON_COVERAGE=-Db_coverage=true
+else
+  MESON_COVERAGE=
+fi
+
 if builder_start_action clean; then
   rm -rf "$THIS_SCRIPT_PATH/../build/"
   builder_finish_action success clean
@@ -48,7 +59,7 @@ fi
 if builder_start_action configure; then
   cd "$THIS_SCRIPT_PATH"
   # shellcheck disable=SC2086
-  meson setup "$MESON_PATH" --werror --buildtype $MESON_TARGET "${builder_extra_params[@]}"
+  meson setup "$MESON_PATH" --werror --buildtype $MESON_TARGET ${MESON_COVERAGE} "${builder_extra_params[@]}"
   builder_finish_action success configure
 fi
 
@@ -78,4 +89,11 @@ if builder_start_action uninstall; then
   cd "$THIS_SCRIPT_PATH/$MESON_PATH"
   ninja uninstall
   builder_finish_action success uninstall
+fi
+
+if builder_start_action report; then
+  cd "$THIS_SCRIPT_PATH/$MESON_PATH"
+  # Note: requires lcov > 1.16 to properly work (see https://github.com/mesonbuild/meson/issues/6747)
+  ninja coverage-html
+  builder_finish_action success report
 fi
