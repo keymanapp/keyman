@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE keyboardTest SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest.dtd">
-<keyboardTest conformsTo="techpreview">
+<!DOCTYPE keyboard3Test3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest3.dtd">
+<keyboardTest3 conformsTo="techpreview">
   <info keyboard="k_210_marker.xml" author="Team Keyboard" name="marker" />
   <tests name="marker-tests">
     <test name="marker-test-basic-grave">
@@ -43,4 +43,4 @@
       <check result="é" />
     </test>
   </tests>
-</keyboardTest>
+</keyboardTest3>

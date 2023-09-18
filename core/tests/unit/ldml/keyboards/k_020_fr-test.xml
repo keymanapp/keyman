@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Note: similar to, but slightly ahead of, fr-t-k0-azerty -->
-<!DOCTYPE keyboardTest SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest.dtd">
-<keyboardTest conformsTo="techpreview">
+<!DOCTYPE keyboard3Test3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest3.dtd">
+<keyboardTest3 conformsTo="techpreview">
     <info keyboard="k_020_fr.xml" author="Team Keyboard" name="fr-test-updated" />
     <repertoire name="simple-repertoire" chars="[a b c d e \u0022]" type="simple" /> <!-- verify that these outputs are all available from simple keys on any layer, for all form factors -->
     <repertoire name="chars-repertoire" chars="[á é ó]" type="gesture" /> <!-- verify that these outputs are all available from simple or gesture keys on any layer, for touch -->
@@ -20,4 +20,4 @@
             <check result="abc\u0022...stuv" />
         </test>
     </tests>
-</keyboardTest>
+</keyboardTest3>

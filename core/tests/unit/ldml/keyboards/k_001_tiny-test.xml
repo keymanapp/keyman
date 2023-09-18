@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE keyboardTest SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest.dtd">
-<keyboardTest conformsTo="techpreview">
+<!DOCTYPE keyboard3Test3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest3.dtd">
+<keyboardTest3 conformsTo="techpreview">
   <info keyboard="k_001_tiny.xml" author="srl295" name="k_001_tiny" />
   <!-- <repertoire chars="[ħ ថា]" type="simple" name="our-little-language" /> TODO-LDML: not working yet -->
   <repertoire chars="[ħ]" type="simple" name="minus-khmer" />
@@ -13,4 +13,4 @@
       <check result="ħថាħ"/>
     </test>
   </tests>
-</keyboardTest>
+</keyboardTest3>

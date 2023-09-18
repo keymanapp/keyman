@@ -15,7 +15,7 @@ describe('ldml keyboard xml reader tests', function () {
     {
       subpath: 'invalid-structure-per-dtd.xml',
       errors: [CommonTypesMessages.Error_SchemaValidationError({
-        instancePath: '/keyboard',
+        instancePath: '/keyboard3',
         keyword: 'required',
         message: `must have required property 'names'`,
         params: 'missingProperty="names"',
@@ -24,7 +24,7 @@ describe('ldml keyboard xml reader tests', function () {
     {
       subpath: 'invalid-conforms-to.xml',
       errors: [CommonTypesMessages.Error_SchemaValidationError({
-        instancePath: '/keyboard/conformsTo',
+        instancePath: '/keyboard3/conformsTo',
         keyword: 'enum',
         message: `must be equal to one of the allowed values`,
         params: 'allowedValues="techpreview"',
@@ -33,8 +33,8 @@ describe('ldml keyboard xml reader tests', function () {
     {
       subpath: 'import-minimal.xml',
       callback: (data, source, subpath, callbacks) => {
-        assert.ok(source?.keyboard?.keys);
-        const k = pluckKeysFromKeybag(source?.keyboard?.keys.key, ['a', 'b', 'c']);
+        assert.ok(source?.keyboard3?.keys);
+        const k = pluckKeysFromKeybag(source?.keyboard3?.keys.key, ['a', 'b', 'c']);
         assert.sameDeepOrderedMembers(k, [
           {id: 'a', to: 'a'},
           {id: 'b', to: 'b'},
@@ -45,8 +45,8 @@ describe('ldml keyboard xml reader tests', function () {
     {
       subpath: 'import-minimal1.xml',
       callback: (data, source, subpath, callbacks) => {
-        assert.ok(source?.keyboard?.keys);
-        const k = pluckKeysFromKeybag(source?.keyboard?.keys.key, ['a', 'b', 'c']);
+        assert.ok(source?.keyboard3?.keys);
+        const k = pluckKeysFromKeybag(source?.keyboard3?.keys.key, ['a', 'b', 'c']);
         assert.sameDeepOrderedMembers(k, [
           {id: 'a', to: 'a'},
           {id: 'b', to: 'b'},
@@ -57,8 +57,8 @@ describe('ldml keyboard xml reader tests', function () {
     {
       subpath: 'import-minimal2.xml',
       callback: (data, source, subpath, callbacks) => {
-        assert.ok(source?.keyboard?.keys);
-        const k = pluckKeysFromKeybag(source?.keyboard?.keys.key, ['a', 'b', 'c']);
+        assert.ok(source?.keyboard3?.keys);
+        const k = pluckKeysFromKeybag(source?.keyboard3?.keys.key, ['a', 'b', 'c']);
         assert.sameDeepOrderedMembers(k, [
           {id: 'a', to: 'a'},
           {id: 'b', to: 'b'},
@@ -70,8 +70,8 @@ describe('ldml keyboard xml reader tests', function () {
     {
       subpath: 'import-symbols.xml',
       callback: (data, source, subpath, callbacks) => {
-        assert.ok(source?.keyboard?.keys);
-        const k = pluckKeysFromKeybag(source?.keyboard?.keys.key, ['a', 'b', 'c', 'zz', 'hash', 'hyphen']);
+        assert.ok(source?.keyboard3?.keys);
+        const k = pluckKeysFromKeybag(source?.keyboard3?.keys.key, ['a', 'b', 'c', 'zz', 'hash', 'hyphen']);
         assert.sameDeepOrderedMembers(k, [
           {id: 'a', to: 'a'},       // implied
           {id: 'b', to: 'b'},
