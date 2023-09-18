@@ -10,11 +10,11 @@ The CLDR Keyboard Subcommittee is currently developing major changes to the CLDR
 Please view the subcommittee page for the most recent information.
 <https://cldr.unicode.org/index/keyboard-workgroup> -->
 
-<!ELEMENT keyboard ( import*, locales?, version?, info?, names, settings?, vkeys?, displays?, keys?, forms?, layers*, variables?, transforms*, special* ) >
+<!ELEMENT keyboard3 ( import*, locales?, version?, info?, names, settings?, vkeys?, displays?, keys?, forms?, layers*, variables?, transforms*, special* ) >
     <!--@TECHPREVIEW-->
-<!ATTLIST keyboard locale CDATA #REQUIRED >
+<!ATTLIST keyboard3 locale CDATA #REQUIRED >
     <!--@MATCH:validity/bcp47-wellformed-->
-<!ATTLIST keyboard conformsTo (techpreview) #REQUIRED >
+<!ATTLIST keyboard3 conformsTo (techpreview) #REQUIRED >
     <!--@MATCH:any-->
     <!--@METADATA-->
 
