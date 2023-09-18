@@ -290,10 +290,17 @@ ibus_keyman_list_engines (void)
     return engines;
 }
 
+void
+add_engine(gpointer data, gpointer user_data) {
+  IBusEngineDesc *desc     = IBUS_ENGINE_DESC(data);
+  IBusComponent *component = IBUS_COMPONENT(user_data);
+  ibus_component_add_engine(component, desc);
+}
+
 IBusComponent *
 ibus_keyman_get_component (void)
 {
-    GList *engines, *p;
+    GList *engines;
     IBusComponent *component;
 
     component = ibus_component_new ("org.freedesktop.IBus.Keyman",
@@ -306,12 +313,9 @@ ibus_keyman_get_component (void)
                                     "ibus-keyman");
 
     engines = ibus_keyman_list_engines ();
-
-    for (p = engines; p != NULL; p = p->next) {
-        ibus_component_add_engine (component, (IBusEngineDesc *) p->data);
-    }
-
+    g_list_foreach(engines, add_engine, component);
     g_list_free (engines);
+
     return component;
 }
 
