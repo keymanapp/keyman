@@ -44,4 +44,6 @@ export function buildEmbeddedGestureConfig(device: DeviceSpec) {
       return new GlobeHint(vkbd);
     }
   }
+
+  return embeddedGestureConfig;
 };
