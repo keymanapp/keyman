@@ -35,7 +35,8 @@ mcompile -d runs 4 important steps:
 
 */
 
-// REMEMBER in this VM only run  with meson compile is possible  NOT with F5 !!!
+// REMEMBER in this VM only runing  with meson compile is possible  NOT with F5 !!!
+// in /Projects/keyman/keyman/linux/mcompile/keymap/build_mcompile
 // run with:
 //./mcompile -d in.kmx bla.dll 0407 out.kmx
 //./mcompile -d /Projects/keyman/keyman/linux/mcompile/keymap/anii.kmx bla.dll 0407 /Projects/keyman/keyman/linux/mcompile/keymap/anii_out.kmx
@@ -317,6 +318,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
     return FALSE;
   }
 
+  //_S2 this is to use a file and a vector instead of GDK-functions so debugging is easier...not needed later...
   v_dw_3D complete_Vector;
   bool writeVec_OK =  writeVectorToFile(All_Vector);
   bool WriteFileOK =  writeFileToVector( complete_Vector,"/Projects/keyman/keyman/linux/mcompile/keymap/VectorFile.txt" );

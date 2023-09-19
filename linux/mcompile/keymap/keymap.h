@@ -72,6 +72,9 @@ int append_other_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
 // create an empty 2D vector containing "--" in all fields
 v_dw_2D create_empty_2D(int dim_rows, int dim_shifts);
 
+// get Keyvals from keymap and insert into All_Vector
+bool InsertKeyvalsFromKeymap(v_dw_3D &All_Vector,GdkKeymap * keymap);
+
 // find Keyvals to fill into 2D-Vector of Other Language
 KMX_DWORD getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 
@@ -79,7 +82,10 @@ KMX_DWORD getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state
 bool test(v_dw_3D &V);
 bool test_single(v_dw_3D &V) ;
 
-
+// this is for using mcompile without gdk to be able to debug in VSCode: (can be deleted later)
+// In mcompile using gdk: Read values of keyboard with help of GDK.
+// in mcompile WITHOUT using GDK: use gdk once to read values-> store them in file Vectorfile.txt
+// Vectorfile.txt will then be used to find & append Values of OtherKeyboard to Vector
 bool writeVectorToFile(v_dw_3D V);
 bool writeFileToVector(v_dw_3D& complete_Vector, const char* infile);
 bool CompareVector_To_VectorOfFile(v_dw_3D All_Vector,v_dw_3D File_Vector);

@@ -265,7 +265,6 @@ int replace_PosKey_with_Keycode(std::string  in) {
 int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
   // create a 2D vector all filled with "--" and push to 3D-Vector
   v_dw_2D Other_Vector2D = create_empty_2D(All_Vector[0].size(),All_Vector[0][0].size());
-
   if (Other_Vector2D.size()==0) {
     wprintf(L"ERROR: can't create empty 2D-Vector\n");
     return 1;
@@ -274,14 +273,19 @@ int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
   All_Vector.push_back(Other_Vector2D);
   wprintf(L"   +++++++ dimensions of Vector after append_other_ToVector\t\t\t\t\t\t %li..%li..%li\n", All_Vector.size(), All_Vector[0].size(),All_Vector[0][0].size());
   wprintf(L"   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
-
   if (All_Vector.size() < 2) {
     wprintf(L"ERROR: creation of 3D-Vector failed\n");
     return 1;
   }
 
-  for(int i =0; i< (int) All_Vector[1].size();i++) {
+  InsertKeyvalsFromKeymap(All_Vector,keymap);
 
+  return 0;
+}
+
+bool InsertKeyvalsFromKeymap(v_dw_3D &All_Vector,GdkKeymap * keymap){
+  // get the keyvals using GDK and copy into All_Vector
+  for(int i =0; i< (int) All_Vector[1].size();i++) {
     // get key name US stored in [0][i][0] and copy to name in "other"-block[1][i][0]
     All_Vector[1][i][0] = All_Vector[0][i][0];
 
@@ -292,7 +296,6 @@ int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
     //wprintf(L" Keycodes US dw        :   %d (US): -- %i (%c)  -- %i (%c) ---- (other): %i (%c)  --  %i(%c)    \n",(All_Vector[1][i][0]),All_Vector[0][i][1],All_Vector[0][i][1],All_Vector[0][i][2],All_Vector[0][i][2],All_Vector[1][i][1] ,All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
     //wprintf(L"   Keycodes ->Other dw:-:   %d (US): -- %i (%c)  -- %i (%c)   \n\n",(All_Vector[1][i][0]),All_Vector[1][i][1],All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
   }
-  return 0;
 }
 
 v_dw_2D create_empty_2D( int dim_rows,int dim_shifts) {
