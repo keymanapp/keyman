@@ -229,56 +229,10 @@ function updateKMSelectionRange(start, end) {
 }
 
 var lastKeyTip = null;
-function oskCreateKeyPreview(x,y,w,h,t) {
-  if(lastKeyTip &&
-      lastKeyTip.t == t &&
-      lastKeyTip.x == x &&
-      lastKeyTip.y == y &&
-      lastKeyTip.w == w &&
-      lastKeyTip.h == h) {
-    return;
-    }
-  lastKeyTip = {x:x,y:y,w:w,h:h,t:t};
-
-  fragmentToggle = (fragmentToggle + 1) % 100;
-  var div = document.createElement('div');
-  div.innerHTML = t;
-  var dt = div.firstChild.nodeValue;
-  window.location.hash = 'showKeyPreview-'+fragmentToggle+'+x='+x+'+y='+y+'+w='+w+'+h='+h+'+t='+toHex(dt);
-}
-
-function oskClearKeyPreview() {
-  lastKeyTip = null;
-  fragmentToggle = (fragmentToggle + 1) % 100;
-  window.location.hash = 'dismissKeyPreview-'+fragmentToggle;
-}
 
 function signalHelpBubbleDismissal() {
   fragmentToggle = (fragmentToggle + 1) % 100;
   window.location.hash = 'helpBubbleDismissed-'+fragmentToggle;
-}
-
-function oskCreatePopup(obj,x,y) {
-  if(obj != null) {
-    var i;
-    var s = '';
-    var shift = false;
-    var keyPos = x.toString() + ',' + y.toString();
-    for(i=0; i<obj.length; i++)
-    {
-      // elementID contains the layer and coreID
-      s=s+obj[i].elementID;
-      if(obj[i].sp == 1 || obj[i].sp == 2) shift = true;
-      if(typeof(obj[i].text) != 'undefined' && obj[i].text != null && obj[i].text != '') s=s+':'+toHex(obj[i].text);
-      if(i < (obj.length -1)) s=s+';'
-    }
-    fragmentToggle=(fragmentToggle+1) % 100;
-    var hash = 'showMore-' + fragmentToggle + '+keyPos=' + keyPos + '+keys=' + s;
-    if(shift) {
-      hash = hash + '+font=' + 'SpecialOSK';
-    }
-    window.location.hash = hash;
-  }
 }
 
 function suggestionPopup(obj,custom,x,y,w,h) {
@@ -318,12 +272,6 @@ function hideKeyboard() {
 function showKeyboard() {
   // Refresh KMW OSK
   keyman.refreshOskLayout();
-}
-
-function executePopupKey(keyID, keyText) {
-  // KMW only needs keyID to process the popup key. keyText merely logged to console
-  //window.console.log('executePopupKey('+keyID+'); keyText: ' + keyText);
-  keyman.executePopupKey(keyID, keyText);
 }
 
 // Cannot make it explicitly async / await on API 21.
