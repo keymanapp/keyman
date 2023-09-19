@@ -19,9 +19,9 @@ builder_describe \
   "test" \
   "install                   install artifacts" \
   "uninstall                 uninstall artifacts" \
-  "report                    create coverage report" \
   "@/core:arch" \
   "--no-integration          don't run integration tests" \
+  "--report                  create coverage report" \
   "--coverage                capture test coverage"
 
 builder_parse "$@"
@@ -76,6 +76,10 @@ if builder_start_action test; then
   else
     meson test --print-errorlogs $builder_verbose
   fi
+  if builder_has_option --coverage; then
+    # Note: requires lcov > 1.16 to properly work (see https://github.com/mesonbuild/meson/issues/6747)
+    ninja coverage-html
+  fi
   builder_finish_action success test
 fi
 
@@ -89,11 +93,4 @@ if builder_start_action uninstall; then
   cd "$THIS_SCRIPT_PATH/$MESON_PATH"
   ninja uninstall
   builder_finish_action success uninstall
-fi
-
-if builder_start_action report; then
-  cd "$THIS_SCRIPT_PATH/$MESON_PATH"
-  # Note: requires lcov > 1.16 to properly work (see https://github.com/mesonbuild/meson/issues/6747)
-  ninja coverage-html
-  builder_finish_action success report
 fi

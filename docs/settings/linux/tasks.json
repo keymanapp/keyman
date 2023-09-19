@@ -172,7 +172,7 @@
       "command": "./build.sh",
       "args": [
         "test",
-        "report",
+        "--report",
         "--debug",
         "--coverage",
         "--no-integration"
@@ -181,7 +181,7 @@
         "cwd": "${workspaceFolder}/linux/ibus-keyman/",
       },
       "group": "build",
-      "detail": "create unit test coverage"
+      "detail": "run tests and create unit test coverage report"
     },
     {
       "type": "shell",
