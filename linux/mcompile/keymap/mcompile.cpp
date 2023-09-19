@@ -303,6 +303,8 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
   // evident for the 102nd key on UK, for example, where \ can be generated with VK_OEM_102 or AltGr+VK_QUOTE.
   // For now, we get the least shifted version, which is hopefully adequate.
 
+#if USE_GDK
+  wprintf(L"USE_GDK is 1 ****************************************** \n");
   // _S2 first version with GTK - change later to  XklGetGroupNames  und XklGetCurrentState  as Eberhard suggested
   //_ init gdk
   GdkKeymap *keymap;
@@ -310,6 +312,9 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
       wprintf(L"ERROR: can't Initialize GDK\n");
       return FALSE;
   }
+#else
+  wprintf(L"USE_GDK is 0 ****************************************** \n");
+#endif
 
   // create vector
   v_dw_3D All_Vector;

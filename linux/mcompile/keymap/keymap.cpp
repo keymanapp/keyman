@@ -277,8 +277,12 @@ int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
     wprintf(L"ERROR: creation of 3D-Vector failed\n");
     return 1;
   }
-
+#if USE_GDK
+  wprintf(L"USE_GDK is 1 ****************************************** \n");
   InsertKeyvalsFromKeymap(All_Vector,keymap);
+#else
+  wprintf(L"USE_GDK is 0 ****************************************** \n");
+#endif
 
   return 0;
 }

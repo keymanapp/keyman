@@ -3,6 +3,9 @@
 #ifndef KEYMAP_H
 #define KEYMAP_H
 
+// _S2 can go later; is for use of mcompile with GDK or with VectorFile
+#define USE_GDK 1
+
 #include <X11/XKBlib.h>
 #include <X11/Xlib.h>
 #include <gdk/gdk.h>
