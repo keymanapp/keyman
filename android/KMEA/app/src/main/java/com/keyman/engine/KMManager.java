@@ -612,11 +612,15 @@ public final class KMManager {
     if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard == null) {
       InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
       InAppKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
+      InAppKeyboard.showBanner(true);
+      InAppKeyboard.setBannerImage(InAppKeyboard.KM_BANNER_BLANK_IMAGE_PATH);
       keyboard = InAppKeyboard;
       webViewClient = InAppKeyboardWebViewClient;
     } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard == null) {
       SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
       SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
+      SystemKeyboard.showBanner(true);
+      SystemKeyboard.setBannerImage(SystemKeyboard.KM_BANNER_BLANK_IMAGE_PATH);
       keyboard = SystemKeyboard;
       webViewClient = SystemKeyboardWebViewClient;
     }
@@ -1370,7 +1374,13 @@ public final class KMManager {
     KeyboardPickerActivity.deleteLexicalModel(context, position, silenceNotification);
   }
 
-    public static boolean setBannerOptions(boolean mayPredict) {
+  /**
+   * setBannerOptions - Update KMW whether to generate predictions.
+   *                    For now, also display banner
+   * @param mayPredict - boolean whether KMW should generate predictions
+   * @return boolean - Success
+   */
+  public static boolean setBannerOptions(boolean mayPredict) {
     String url = KMString.format("setBannerOptions(%s)", mayPredict);
     if (InAppKeyboard != null) {
       InAppKeyboard.loadJavascript(url);
@@ -1378,6 +1388,26 @@ public final class KMManager {
 
     if (SystemKeyboard != null) {
       SystemKeyboard.loadJavascript(url);
+    }
+
+    // For now, always display banner
+    showBanner(true);
+    return true;
+  }
+
+  /**
+   * showBanner - Update KMW whether to display banner.
+   *              For now, always keep displaying banner
+   * @param flag - boolean whether KMW should display banner
+   * @return boolean - Success
+   */
+  public static boolean showBanner(boolean flag) {
+    if (InAppKeyboard != null) {
+      InAppKeyboard.showBanner(flag);
+    }
+
+    if (SystemKeyboard != null) {
+      SystemKeyboard.showBanner(flag);
     }
     return true;
   }
@@ -1845,9 +1875,9 @@ public final class KMManager {
 
   public static int getBannerHeight(Context context) {
     int bannerHeight = 0;
-    if (InAppKeyboard != null && InAppKeyboard.currentBanner().equals(KMKeyboard.KM_BANNER_STATE_SUGGESTION)) {
+    if (InAppKeyboard != null && !InAppKeyboard.currentBanner().equals(KMKeyboard.KM_BANNER_STATE_BLANK)) {
       bannerHeight = (int) context.getResources().getDimension(R.dimen.banner_height);
-    } else if (SystemKeyboard != null && SystemKeyboard.currentBanner().equals(KMKeyboard.KM_BANNER_STATE_SUGGESTION)) {
+    } else if (SystemKeyboard != null && !SystemKeyboard.currentBanner().equals(KMKeyboard.KM_BANNER_STATE_BLANK)) {
       bannerHeight = (int) context.getResources().getDimension(R.dimen.banner_height);
     }
     return bannerHeight;

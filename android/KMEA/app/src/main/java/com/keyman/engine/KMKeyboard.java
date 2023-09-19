@@ -88,15 +88,25 @@ final class KMKeyboard extends WebView {
    * Banner state value: "blank" - no banner available.
    */
   protected static final String KM_BANNER_STATE_BLANK = "blank";
+
+  /**
+   * Banner state value: "image" - display an image in the banner
+   */
+  protected static final String KM_BANNER_STATE_IMAGE = "image";
+
   /**
    * Banner state value: "suggestion" - dictionary suggestions are shown.
    */
   protected static final String KM_BANNER_STATE_SUGGESTION = "suggestion";
 
+  // Tiling black background generated from https://elmah.io/tools/base64-image-encoder/
+  // TODO: Replace with image/css?
+  protected static final String KM_BANNER_BLANK_IMAGE_PATH =
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAARCAIAAABM7ytaAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAVSURBVDhPYxgFo2AUjIJRQDpgYAAABT8AAcEGbxwAAAAASUVORK5CYII=";
   /**
    * Current banner state.
    */
-  protected static String currentBanner = KM_BANNER_STATE_BLANK;
+  protected static String currentBanner = KM_BANNER_STATE_IMAGE;
 
   private static String txtFont = "";
   private static String oskFont = null;
@@ -104,6 +114,10 @@ final class KMKeyboard extends WebView {
   private final String fontUndefined = "undefined";
   private GestureDetector gestureDetector;
   private static ArrayList<OnKeyboardEventListener> kbEventListeners = null;
+
+  // Stores the current image for use by the Banner
+  // when predictive text is not active
+  private String bannerImgPath;
 
   // Facilitates a 'lazy init' - we'll only check the preference when it matters,
   // rather than at construction time.
@@ -400,6 +414,9 @@ final class KMKeyboard extends WebView {
 
     int bannerHeight = KMManager.getBannerHeight(context);
     int oskHeight = KMManager.getKeyboardHeight(context);
+    if (this.bannerImgPath != null) {
+      loadJavascript(KMString.format("setBannerImage('%s')", this.bannerImgPath));
+    }
     loadJavascript(KMString.format("setBannerHeight(%d)", bannerHeight));
     loadJavascript(KMString.format("setOskWidth(%d)", newConfig.screenWidthDp));
     loadJavascript(KMString.format("setOskHeight(%d)", oskHeight));
@@ -435,7 +452,7 @@ final class KMKeyboard extends WebView {
     //reset banner state if new language has no lexical model
     if (currentBanner != null && currentBanner.equals(KM_BANNER_STATE_SUGGESTION)
         && associatedLexicalModel == null) {
-      setCurrentBanner(KMKeyboard.KM_BANNER_STATE_BLANK);
+      setCurrentBanner(KMKeyboard.KM_BANNER_STATE_IMAGE);
     }
 
     if(keyboardChanged) {
@@ -651,6 +668,19 @@ final class KMKeyboard extends WebView {
     KeyboardEventHandler.notifyListeners(kbEventListeners, keyboardType, EventType.KEYBOARD_CHANGED, currentKeyboard);
 
     return retVal;
+  }
+
+  public void showBanner(boolean flag) {
+    String jsFormat = "showBanner('%s')";
+    String jsString = KMString.format(jsFormat, flag ? "true" : "false");
+    loadJavascript(jsString);
+  }
+
+  public void setBannerImage(String path) {
+    this.bannerImgPath = path; // Save the path in case delayed initialization is needed
+    Log.d(TAG, "Banner image path: " + path);
+    String jsString = KMString.format("setBannerImage('%s')", path);
+    loadJavascript(jsString);
   }
 
   public void setChirality(boolean flag) {
