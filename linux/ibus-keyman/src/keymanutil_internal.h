@@ -33,6 +33,8 @@ IBusEngineDesc *get_engine_for_language(
     gchar *lang_id,
     gchar *lang_name);
 
+gchar** keyman_get_custom_keyboards();
+void keyman_set_custom_keyboards(gchar ** keyboards);
 void keyman_add_keyboard(gpointer data, gpointer user_data);
 void keyman_add_keyboards_from_dir(gpointer data, gpointer user_data);
 

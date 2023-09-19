@@ -30,6 +30,24 @@ _get_tst_options_key(gchar* testname) {
   return result;
 }
 
+void
+_delete_tst_kbds_key() {
+  g_autoptr(GSettings) settings = g_settings_new(KEYMAN_DCONF_ENGINE_NAME);
+  g_settings_reset(settings, KEYMAN_DCONF_KEYBOARDS_KEY);
+}
+
+void
+_set_tst_kbds_key(gchar** keyboards) {
+  g_autoptr(GSettings) settings = g_settings_new(KEYMAN_DCONF_ENGINE_NAME);
+  g_settings_set_strv(settings, KEYMAN_DCONF_KEYBOARDS_KEY, (const gchar* const*)keyboards);
+}
+
+gchar**
+_get_tst_kbds_key() {
+  g_autoptr(GSettings) settings = g_settings_new(KEYMAN_DCONF_ENGINE_NAME);
+  return g_settings_get_strv(settings, KEYMAN_DCONF_KEYBOARDS_KEY);
+}
+
 kmp_keyboard*
 _get_tst_kmp_keyboard(gchar* version, gchar** languages) {
   kmp_keyboard* keyboard = g_new0(kmp_keyboard, 1);
@@ -175,6 +193,133 @@ test_keyman_put_options_todconf__existing_key() {
 
   // Cleanup
   _delete_tst_options_key(testname);
+}
+
+//----------------------------------------------------------------------------------------------
+void
+test_keyman_set_custom_keyboards__new_key() {
+  // Initialize
+  delete_kbds_key();
+  gchar* keyboards[] = {"fr:/tmp/test/test.kmx", NULL};
+
+  // Execute
+  keyman_set_custom_keyboards(keyboards);
+
+  // Verify
+  g_auto(GStrv) result = get_kbds_key();
+  g_assert_nonnull(result);
+  g_assert_cmpstrv(result, keyboards);
+
+  // Cleanup
+  delete_kbds_key();
+}
+
+void
+test_keyman_set_custom_keyboards__overwrite_key() {
+  // Initialize
+  gchar* initialKbds[] = {"fr:/tmp/test/test.kmx", NULL};
+  set_kbds_key(initialKbds);
+
+  gchar* keyboards[] = {"fr:/tmp/test/test.kmx", "en:/tmp/foo/foo.kmx", NULL};
+
+  // Execute
+  keyman_set_custom_keyboards(keyboards);
+
+  // Verify
+  g_auto(GStrv) result = get_kbds_key();
+  g_assert_nonnull(result);
+  g_assert_cmpstrv(result, keyboards);
+
+  // Cleanup
+  delete_kbds_key();
+}
+
+void
+test_keyman_set_custom_keyboards__delete_key_NULL() {
+  // Initialize
+  gchar* initialKbds[] = {"fr:/tmp/test/test.kmx", NULL};
+  set_kbds_key(initialKbds);
+
+  // Execute
+  keyman_set_custom_keyboards(NULL);
+
+  // Verify
+  g_auto(GStrv) result = get_kbds_key();
+  gchar** expected[] = {NULL};
+  g_assert_nonnull(result);
+  g_assert_cmpstrv(result, expected);
+
+  // Cleanup
+  delete_kbds_key();
+}
+
+void
+test_keyman_set_custom_keyboards__delete_key_empty_array() {
+  // Initialize
+  gchar* initialKbds[] = {"fr:/tmp/test/test.kmx", NULL};
+  set_kbds_key(initialKbds);
+
+  gchar* keyboards[] = {NULL};
+
+  // Execute
+  keyman_set_custom_keyboards(keyboards);
+
+  // Verify
+  g_auto(GStrv) result = get_kbds_key();
+  g_assert_nonnull(result);
+  g_assert_cmpstrv(result, keyboards);
+
+  // Cleanup
+  delete_kbds_key();
+}
+
+//----------------------------------------------------------------------------------------------
+void
+test_keyman_get_custom_keyboards__value() {
+  // Initialize
+  gchar* keyboards[] = {"fr:/tmp/test/test.kmx", NULL};
+  set_kbds_key(keyboards);
+
+  // Execute
+  g_auto(GStrv) result = keyman_get_custom_keyboards();
+
+  // Verify
+  g_assert_nonnull(result);
+  g_assert_cmpstrv(result, keyboards);
+
+  // Cleanup
+  delete_kbds_key();
+}
+
+void
+test_keyman_get_custom_keyboards__no_key() {
+  // Initialize
+  delete_kbds_key();
+
+  // Execute
+  g_auto(GStrv) result = keyman_get_custom_keyboards();
+
+  // Verify
+  g_assert_null(result);
+
+  // Cleanup
+  delete_kbds_key();
+}
+
+void
+test_keyman_get_custom_keyboards__empty() {
+  // Initialize
+  gchar* keyboards[] = {NULL};
+  set_kbds_key(keyboards);
+
+  // Execute
+  g_auto(GStrv) result = keyman_get_custom_keyboards();
+
+  // Verify
+  g_assert_null(result);
+
+  // Cleanup
+  delete_kbds_key();
 }
 
 //----------------------------------------------------------------------------------------------
@@ -654,6 +799,17 @@ int main(int argc, char* argv[]) {
   g_test_add_func("/keymanutil/keyman_put_options_todconf/new_key", test_keyman_put_options_todconf__new_key);
   g_test_add_func("/keymanutil/keyman_put_options_todconf/other_keys", test_keyman_put_options_todconf__other_keys);
   g_test_add_func("/keymanutil/keyman_put_options_todconf/existing_key", test_keyman_put_options_todconf__existing_key);
+
+  g_test_add_func("/keymanutil/keyman_set_custom_keyboards/new_key", test_keyman_set_custom_keyboards__new_key);
+  g_test_add_func("/keymanutil/keyman_set_custom_keyboards/overwrite_key", test_keyman_set_custom_keyboards__overwrite_key);
+  g_test_add_func("/keymanutil/keyman_set_custom_keyboards/delete_key_NULL", test_keyman_set_custom_keyboards__delete_key_NULL);
+  g_test_add_func(
+      "/keymanutil/keyman_set_custom_keyboards/delete_key_empty_array",
+      test_keyman_set_custom_keyboards__delete_key_empty_array);
+
+  g_test_add_func("/keymanutil/keyman_get_custom_keyboards/value", test_keyman_get_custom_keyboards__value);
+  g_test_add_func("/keymanutil/keyman_get_custom_keyboards/no_key", test_keyman_get_custom_keyboards__no_key);
+  g_test_add_func("/keymanutil/keyman_get_custom_keyboards/empty", test_keyman_get_custom_keyboards__empty);
 
   g_test_add_func("/keymanutil/ibus_keyman_engine_desc_new/all_set", test_ibus_keyman_engine_desc_new__all_set);
   g_test_add_func("/keymanutil/ibus_keyman_engine_desc_new/only_description", test_ibus_keyman_engine_desc_new__only_description);

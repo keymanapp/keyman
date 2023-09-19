@@ -460,6 +460,22 @@ keyman_put_options_todconf(gchar *package_id,
     // kvp got assigned to options[x] and so gets freed when options are freed
 }
 
+gchar**
+keyman_get_custom_keyboards() {
+  g_autoptr(GSettings) settings = g_settings_new(KEYMAN_DCONF_ENGINE_NAME);
+  gchar **result      = g_settings_get_strv(settings, KEYMAN_DCONF_KEYBOARDS_KEY);
+  if (result && result[0] == NULL) {
+    g_strfreev(result);
+    return NULL;
+  }
+  return result;
+}
+
+void
+keyman_set_custom_keyboards(gchar ** keyboards) {
+  g_autoptr(GSettings) settings = g_settings_new(KEYMAN_DCONF_ENGINE_NAME);
+  g_settings_set_strv(settings, KEYMAN_DCONF_KEYBOARDS_KEY, (const gchar *const *)keyboards);
+}
 
 #ifdef DEBUG
 #include <locale.h>
