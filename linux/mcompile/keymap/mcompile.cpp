@@ -188,7 +188,8 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
 
 // comment from win-version
 // Map of all shift states that we will work with
-const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCTRLFLAG|RALTFLAG, 0xFFFF};
+//const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCTRLFLAG|RALTFLAG, 0xFFFF};
+const UINT VKShiftState[] = {0, K_SHIFTFLAG,  0xFFFF};
 
 // my comment for Lin version
 // Ubuntu:  Each of the 4 columns specifies a different modifier:  unmodified,  shift,   right alt (altgr),     shift+right alt(altgr)
@@ -235,11 +236,11 @@ KMX_DWORD  KMX_VKUSToVKUnderlyingLayout(v_dw_3D &All_Vector,KMX_DWORD inUS) {
 // takes cpital character of Other keyboard and returns character of Other keyboard with shiftstate VKShiftState[j]
 KMX_DWORD KMX_CharFromVK(v_dw_3D &All_Vector,KMX_DWORD vkUnderlying, KMX_UINT VKShiftState, KMX_WCHAR* DeadKey){
 
-KMX_UINT VKShiftState_lin;
-if (VKShiftState == 0 )      VKShiftState_lin =0;
-if (VKShiftState == 16)      VKShiftState_lin =1;
-if (VKShiftState == 9 )      VKShiftState_lin =2;
-if (VKShiftState == 25)      VKShiftState_lin =3;
+  KMX_UINT VKShiftState_lin;
+  if (VKShiftState == 0 )      VKShiftState_lin =0;
+  if (VKShiftState == 16)      VKShiftState_lin =1;
+  if (VKShiftState == 9 )      VKShiftState_lin =2;
+  if (VKShiftState == 25)      VKShiftState_lin =3;
 
   // loop and find vkUnderlying in Other; then return char with correct shiftstate
   for( int i=0; i< (int)All_Vector[1].size();i++) {
@@ -251,6 +252,7 @@ if (VKShiftState == 25)      VKShiftState_lin =3;
   return vkUnderlying;
 }
 
+#if USE_GDK
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]){
 // get keymap of keyboard layout in use
 
@@ -289,6 +291,20 @@ int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
   }
   return 0;
 }
+#endif
+
+int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector){
+  // here we copy all contents of the FILE ( US and other already available in the file) to All_Vector
+  //wprintf(L"   +++++++ dimensions of Vector in createOneVectorFromBothKeyboards 2 \t\t\t\t\t\t %li..%li..%li\n", All_Vector.size(), All_Vector.size(),All_Vector.size());
+
+  // add contents of file to All_Vector
+  if( append_other_ToVector(All_Vector)) {
+    wprintf(L"ERROR: can't append Other ToVector \n");
+    return 2;
+  }
+  //wprintf(L"   +++++++ dimensions of Vector in createOneVectorFromBothKeyboards 3 \t\t\t\t\t\t %li..%li..%li\n", All_Vector.size(), All_Vector[0].size(),All_Vector[0][0].size());
+  return 0;
+}
 
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]) {
 
@@ -312,9 +328,6 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
       wprintf(L"ERROR: can't Initialize GDK\n");
       return FALSE;
   }
-#else
-  wprintf(L"USE_GDK is 0 ****************************************** \n");
-#endif
 
   // create vector
   v_dw_3D All_Vector;
@@ -322,13 +335,23 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
     wprintf(L"ERROR: can't create one vector from both keyboards\n");
     return FALSE;
   }
+#else
+  wprintf(L"USE_GDK is 0 ****************************************** \n");
 
+  // create vector
+  v_dw_3D All_Vector;
+  if(createOneVectorFromBothKeyboards(All_Vector)){
+    wprintf(L"ERROR: can't create one vector from both keyboards\n");
+    return FALSE;
+  }
+#endif
+/*
   //_S2 this is to use a file and a vector instead of GDK-functions so debugging is easier...not needed later...
   v_dw_3D complete_Vector;
   bool writeVec_OK =  writeVectorToFile(All_Vector);
   bool WriteFileOK =  writeFileToVector( complete_Vector,"/Projects/keyman/keyman/linux/mcompile/keymap/VectorFile.txt" );
   bool isEqual= CompareVector_To_VectorOfFile( All_Vector, complete_Vector);
-  wprintf(L" vectors are equal: %i\n",isEqual);
+  wprintf(L" vectors are equal: %i\n",isEqual);*/
 test(All_Vector);
 //--------------------------------------------------------------------------------
 

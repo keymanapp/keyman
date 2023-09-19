@@ -187,7 +187,7 @@ int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
         tokens_dw.push_back(tokens_int);
       }
 
-      wprintf(L"  Keyval  %i:   %i (%c) --- %i (%c)  \n", tokens_dw[0],tokens_dw[1],tokens_dw[1], tokens_dw[2], tokens_dw[2]);
+      //wprintf(L"  Keyval  %i:   %i (%c) --- %i (%c)  \n", tokens_dw[0],tokens_dw[1],tokens_dw[1], tokens_dw[2], tokens_dw[2]);
    
       // now push result to shift_states
       shift_states.push_back(tokens_dw);
@@ -262,9 +262,18 @@ int replace_PosKey_with_Keycode(std::string  in) {
   return out;
 }
 
+int append_other_ToVector(v_dw_3D &All_Vector) {
+
+  InsertKeyvalsFromVectorFile(All_Vector);
+  return 0;
+}
+
+#if USE_GDK
+
 int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
   // create a 2D vector all filled with "--" and push to 3D-Vector
   v_dw_2D Other_Vector2D = create_empty_2D(All_Vector[0].size(),All_Vector[0][0].size());
+
   if (Other_Vector2D.size()==0) {
     wprintf(L"ERROR: can't create empty 2D-Vector\n");
     return 1;
@@ -273,17 +282,24 @@ int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
   All_Vector.push_back(Other_Vector2D);
   wprintf(L"   +++++++ dimensions of Vector after append_other_ToVector\t\t\t\t\t\t %li..%li..%li\n", All_Vector.size(), All_Vector[0].size(),All_Vector[0][0].size());
   wprintf(L"   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
+
   if (All_Vector.size() < 2) {
     wprintf(L"ERROR: creation of 3D-Vector failed\n");
     return 1;
   }
-#if USE_GDK
-  wprintf(L"USE_GDK is 1 ****************************************** \n");
-  InsertKeyvalsFromKeymap(All_Vector,keymap);
-#else
-  wprintf(L"USE_GDK is 0 ****************************************** \n");
-#endif
 
+  for(int i =0; i< (int) All_Vector[1].size();i++) {
+
+    // get key name US stored in [0][i][0] and copy to name in "other"-block[1][i][0]
+    All_Vector[1][i][0] = All_Vector[0][i][0];
+
+    // get Keyvals of this key and copy to unshifted/shifted in "other"-block[1][i][1] / block[1][i][2]
+    All_Vector[1][i][0+1] = getKeyvalsFromKeymap(keymap,(All_Vector[1][i][0]),0);   //shift state: unshifted:0
+    All_Vector[1][i][1+1] = getKeyvalsFromKeymap(keymap,(All_Vector[1][i][0]),1);   //shift state: shifted:1
+
+    //wprintf(L" Keycodes US dw        :   %d (US): -- %i (%c)  -- %i (%c) ---- (other): %i (%c)  --  %i(%c)    \n",(All_Vector[1][i][0]),All_Vector[0][i][1],All_Vector[0][i][1],All_Vector[0][i][2],All_Vector[0][i][2],All_Vector[1][i][1] ,All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
+    //wprintf(L"   Keycodes ->Other dw:-:   %d (US): -- %i (%c)  -- %i (%c)   \n\n",(All_Vector[1][i][0]),All_Vector[1][i][1],All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
+  }
   return 0;
 }
 
@@ -301,6 +317,61 @@ bool InsertKeyvalsFromKeymap(v_dw_3D &All_Vector,GdkKeymap * keymap){
     //wprintf(L"   Keycodes ->Other dw:-:   %d (US): -- %i (%c)  -- %i (%c)   \n\n",(All_Vector[1][i][0]),All_Vector[1][i][1],All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
   }
 }
+#endif
+bool InsertKeyvalsFromVectorFile(v_dw_3D &complete_Vector) {
+  std::string TxtFileName  = "/Projects/keyman/keyman/linux/mcompile/keymap/VectorFile.txt" ;
+
+  //wprintf(L"   +++++++ dimensions of Vector at beginning of writeFileToVector (languages..characters..shiftstates)\t\t %li..%li..%li\n", complete_Vector.size(), complete_Vector.size(),complete_Vector.size());
+  //wprintf(L" #### InsertKeyvalsFromVectorFile started: \n");
+
+  FILE *fp;
+  char str[600];
+  std::vector<char> delim{' ', '[', ']', '}',  ';', '\t', '\n'};
+  v_str_1D complete_List;
+  v_dw_1D tokens_dw;
+  v_dw_2D shift_states;
+  int k = -1;
+
+  /* opening file for reading */
+  fp = fopen(TxtFileName.c_str() , "r");
+  if(fp == NULL) {
+    perror("Error opening file");
+    return(-1);
+  }
+
+  while (fgets(str, 600, fp) != NULL) {
+    k++;
+    //puts(str);
+    complete_List.push_back(str);
+    if (strcmp(str, "Language 2\n") ==0){
+      complete_Vector.push_back(shift_states);
+      shift_states.clear();
+      continue;
+    }
+
+    // remove all unwanted char
+    for (int i = 0; i < (int)delim.size(); i++) {
+      complete_List[k].erase(remove(complete_List[k].begin(), complete_List[k].end(), delim[i]), complete_List[k].end());
+    }
+
+    // split into numbers ( delimiter -)
+    std::stringstream ss(complete_List[k]);
+    int end = complete_List[k].find("-");
+    while (end != -1) { // Loop until no delimiter is left in the string.
+      tokens_dw.push_back((DWORD)stoi(complete_List[k].substr(0, end)));
+      complete_List[k].erase(complete_List[k].begin(), complete_List[k].begin() + end + 1);
+      end = complete_List[k].find("-");
+    }
+    shift_states.push_back(tokens_dw);
+    tokens_dw.clear();
+  }
+  complete_Vector.push_back(shift_states);
+  shift_states.clear();
+
+  fclose(fp);
+  //wprintf(L" #### InsertKeyvalsFromVectorFile ended: \n");
+  //wprintf(L"   +++++++ dimensions of Vector at END of writeFileToVector (languages..characters..shiftstates)\t\t %li..%li..%li\n", complete_Vector.size(), complete_Vector[0].size(),complete_Vector[0][0].size());
+}
 
 v_dw_2D create_empty_2D( int dim_rows,int dim_shifts) {
   v_dw_1D shifts;
@@ -315,7 +386,7 @@ v_dw_2D create_empty_2D( int dim_rows,int dim_shifts) {
   }
   return Vector_2D;
 }
-
+#if USE_GDK
 KMX_DWORD getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
   GdkKeymapKey *maps;
   guint *keyvals;
@@ -343,7 +414,10 @@ KMX_DWORD getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state
 
   return out;
 }
+#endif
 
+
+// _S2 not needed later
 bool test(v_dw_3D &V) {
   std::string extra = "  ";
   wprintf(L"   +++++++ dimensions of whole Vector in test()\t\t\t\t\t\t\t %li..%li..%li\n", V.size(), V[0].size(),V[0][0].size());
@@ -380,7 +454,7 @@ bool test_single(v_dw_3D &V) {
   return true;
 }
 
- bool writeVectorToFile(v_dw_3D V) {
+bool writeVectorToFile(v_dw_3D V) {
   std::string TxtFileName  = "/Projects/keyman/keyman/linux/mcompile/keymap/VectorFile.txt" ;
   WCHAR DeadKey;
   std::ofstream TxTFile(TxtFileName);
@@ -406,6 +480,9 @@ bool test_single(v_dw_3D &V) {
  }
 
 bool writeFileToVector(v_dw_3D& complete_Vector, const char* infile) {
+  wprintf(L"   +++++++ dimensions of Vector at beginning of writeFileToVector (languages..characters..shiftstates)\t\t %li..%li..%li\n", complete_Vector.size(), complete_Vector.size(),complete_Vector.size());
+  wprintf(L" #### writeFileToVector started: \n");
+
   FILE *fp;
   char str[600];
   std::vector<char> delim{' ', '[', ']', '}',  ';', '\t', '\n'};
@@ -450,7 +527,10 @@ bool writeFileToVector(v_dw_3D& complete_Vector, const char* infile) {
   complete_Vector.push_back(shift_states);
   shift_states.clear();
 
+  wprintf(L" #### writeFileToVector ended: \n");
   fclose(fp);
+  wprintf(L"   +++++++ dimensions of Vector at END of writeFileToVector (languages..characters..shiftstates)\t\t %li..%li..%li\n", complete_Vector.size(), complete_Vector[0].size(),complete_Vector[0][0].size());
+
   return(0);
 }
 
@@ -466,13 +546,16 @@ bool CompareVector_To_VectorOfFile(v_dw_3D All_Vector,v_dw_3D File_Vector){
   for ( int i=0; i< All_Vector.size();i++) {
     for ( int j=0; j< All_Vector[i].size();j++) {
       for ( int k=0; k< All_Vector[i][j].size();k++){
-          wprintf(L" All_Vector[%i][%i][%i]: %i  File_Vector[i][j][k]\n", i,j,k, All_Vector[i][j][k], File_Vector[i][j][k]);
-          if(( All_Vector[i][j][k] == File_Vector[i][j][k])) return true;
+          if(( All_Vector[i][j][k] != File_Vector[i][j][k])) {
+            wprintf(L" All_Vector[%i][%i][%i]: %i  %i  File_Vector[i][j][k]\n", i,j,k, All_Vector[i][j][k], File_Vector[i][j][k]);
+            wprintf(L" DIFFERENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            return false;
+          }
       }
-      return false;
     }
   }
 
+  return true;
   wprintf(L" #### CompareVector_To_VectorOfFile ended \n");
   return false;
 }

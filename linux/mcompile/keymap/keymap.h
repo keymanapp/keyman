@@ -4,7 +4,7 @@
 #define KEYMAP_H
 
 // _S2 can go later; is for use of mcompile with GDK or with VectorFile
-#define USE_GDK 1
+#define USE_GDK 0
 
 #include <X11/XKBlib.h>
 #include <X11/Xlib.h>
@@ -23,7 +23,6 @@
 #include "u16.h"
 
 typedef std::vector<std::string> v_str_1D;
-
 typedef std::vector<KMX_DWORD> v_dw_1D;
 typedef std::vector<std::vector<KMX_DWORD> > v_dw_2D;
 typedef std::vector<std::vector<std::vector<KMX_DWORD> > > v_dw_3D;
@@ -51,11 +50,8 @@ static KMX_DWORD returnIfCharInvalid = 32;
 // takes a std::wstring (=contents of line symbols-file ) and returns the (int) value of the character
 KMX_DWORD convertNamesToValue(std::wstring tok_wstr);
 
-// initialize GDK
-bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
-
-// create a Vector with all entries of both keymaps
-int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap);
+// create a Vector with all entries of  Vector+ keymap
+int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector);
 
 // read configuration file, split and write to 3D-Vector (Data for US on [0][ ][ ]  )
 int write_US_ToVector(v_dw_3D &vec, std::string language, const char *text);
@@ -69,17 +65,33 @@ int split_US_To_3D_Vector(v_dw_3D &all_US, v_str_1D completeList);
 // replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 15 )
 int replace_PosKey_with_Keycode(std::string in);
 
-// append characters using GDK to 3D-Vector (Data for Other Language on [1][ ][ ]  )
-int append_other_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
+// append characters using VectorFile (Data for Other Language on [1][ ][ ]  )
+int append_other_ToVector(v_dw_3D &All_Vector) ;
 
 // create an empty 2D vector containing "--" in all fields
 v_dw_2D create_empty_2D(int dim_rows, int dim_shifts);
+
+// get Keyvals from VectorFile.txt and insert into All_Vector
+bool InsertKeyvalsFromVectorFile(v_dw_3D &All_Vector);
+
+#if USE_GDK
+
+// initialize GDK
+bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
+
+// create a Vector with all entries of both keymaps
+int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap);
+
+// append characters using GDK to 3D-Vector (Data for Other Language on [1][ ][ ]  )
+int append_other_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
 
 // get Keyvals from keymap and insert into All_Vector
 bool InsertKeyvalsFromKeymap(v_dw_3D &All_Vector,GdkKeymap * keymap);
 
 // find Keyvals to fill into 2D-Vector of Other Language
 KMX_DWORD getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos);
+#endif
+
 
 // testing of Vector contents ( first row of US and Other)
 bool test(v_dw_3D &V);
