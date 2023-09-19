@@ -101,6 +101,55 @@
       ],
       "type": "object"
     },
+    "form": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "scanCodes": {
+          "items": {
+            "$ref": "#/definitions/scanCodes"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "scanCodes"
+      ],
+      "type": "object"
+    },
+    "forms": {
+      "additionalProperties": false,
+      "properties": {
+        "form": {
+          "items": {
+            "$ref": "#/definitions/form"
+          },
+          "type": "array"
+        },
+        "import": {
+          "items": {
+            "$ref": "#/definitions/import"
+          },
+          "type": "array"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
     "import": {
       "additionalProperties": false,
       "properties": {
@@ -250,13 +299,6 @@
       "additionalProperties": false,
       "properties": {
         "form": {
-          "enum": [
-            "touch",
-            "us",
-            "iso",
-            "jis",
-            "abnt2"
-          ],
           "type": "string"
         },
         "import": {
@@ -386,6 +428,18 @@
       },
       "required": [
         "keys"
+      ],
+      "type": "object"
+    },
+    "scanCodes": {
+      "additionalProperties": false,
+      "properties": {
+        "codes": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "codes"
       ],
       "type": "object"
     },
@@ -635,6 +689,9 @@
         },
         "displays": {
           "$ref": "#/definitions/displays"
+        },
+        "forms": {
+          "$ref": "#/definitions/forms"
         },
         "import": {
           "items": {
