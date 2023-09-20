@@ -3,6 +3,7 @@ import { MouseEventEngine } from "./mouseEventEngine.js";
 import { Nonoptional } from "./nonoptional.js";
 import { TouchEventEngine } from "./touchEventEngine.js";
 import { TouchpointCoordinator } from "./headless/touchpointCoordinator.js";
+import { EMPTY_GESTURE_DEFS, GestureModelDefs } from "./headless/gestures/specs/index.js";
 
 export class GestureRecognizer<HoveredItemType> extends TouchpointCoordinator<HoveredItemType> {
   public readonly config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>;
@@ -11,8 +12,10 @@ export class GestureRecognizer<HoveredItemType> extends TouchpointCoordinator<Ho
   private readonly touchEngine: TouchEventEngine<HoveredItemType>;
 
   public constructor(config: GestureRecognizerConfiguration<HoveredItemType>) {
+    const preprocessedConfig = preprocessRecognizerConfig(config);
+
     super();
-    this.config = preprocessRecognizerConfig(config);
+    this.config = preprocessedConfig;
 
     this.mouseEngine = new MouseEventEngine<HoveredItemType>(this.config);
     this.touchEngine = new TouchEventEngine<HoveredItemType>(this.config);

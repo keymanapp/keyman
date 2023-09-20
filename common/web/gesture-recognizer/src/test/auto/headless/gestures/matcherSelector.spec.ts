@@ -67,7 +67,7 @@ describe("MatcherSelector", function () {
 
         const selection = await selectionPromises[0];
 
-        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: null, next: 'subkeyselect'}});
+        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: null, next: 'subkey-select'}});
         assert.deepEqual(selection.matcher.model, LongpressModel);
         assert.isFalse(sources[0].path.isComplete);
 
@@ -104,7 +104,7 @@ describe("MatcherSelector", function () {
 
         const selection = await selectionPromises[0];
 
-        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: null, next: 'subkeyselect'}});
+        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: null, next: 'subkey-select'}});
         assert.deepEqual(selection.matcher.model, LongpressModel);
         assert.isFalse(sources[0].path.isComplete);
 
@@ -199,7 +199,7 @@ describe("MatcherSelector", function () {
         assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
 
         const selection = await selectionPromises[0];
-        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: null, next: 'subkeyselect'}});
+        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: null, next: 'subkey-select'}});
         assert.deepEqual(selection.matcher.model, LongpressModel);
 
         // Original base item was 'a'; 'b' proves that a reset occurred by the point of the 'item' change.
@@ -257,7 +257,7 @@ describe("MatcherSelector", function () {
         assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
 
         const selection = await selectionPromises[0];
-        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: null, next: 'subkeyselect'}});
+        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: null, next: 'subkey-select'}});
         assert.deepEqual(selection.matcher.model, LongpressModel);
 
         // Original base item was 'a'; 'b' proves that a reset occurred by the point of the 'item' change.
@@ -479,6 +479,7 @@ describe("MatcherSelector", function () {
         assert.deepEqual(selection.result, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap' }});
         assert.deepEqual(selection.matcher.model, SimpleTapModel);
         assert.isTrue(sources[0].path.isComplete);
+        assert.isAtMost(sources[0].path.stats.duration, 101);
 
         // Allow the rest of the simulation to play out; it's easy cleanup that way.
         await completion;
@@ -502,7 +503,7 @@ describe("MatcherSelector", function () {
           modelMatcherPromise
         } = simulateMultiSourceMatcherInput([
           { type: 'sequence', samples: turtle1.path, terminate: true }
-        ], this.fakeClock, LongpressModel);
+        ], this.fakeClock, SimpleTapModel);
 
         await predExecutor();
         const predecessorMatcher = await modelMatcherPromise;
@@ -548,7 +549,7 @@ describe("MatcherSelector", function () {
 
         const selection = await selectionPromises[0];
 
-        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: 'a', next: 'multitap' }});
+        assert.deepEqual(selection.result, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap' }});
         assert.deepEqual(selection.matcher.model, MultitapModel);
         assert.isTrue(sources[0].path.isComplete);
 
@@ -572,7 +573,7 @@ describe("MatcherSelector", function () {
           modelMatcherPromise
         } = simulateMultiSourceMatcherInput([
           { type: 'sequence', samples: turtle1.path, terminate: true }
-        ], this.fakeClock, LongpressModel);
+        ], this.fakeClock, SimpleTapModel);
 
         await predExecutor();
         const predecessorMatcher = await modelMatcherPromise;
@@ -628,6 +629,90 @@ describe("MatcherSelector", function () {
         // Ignoring the multi-tap leadup and starting a new gesture-stage sequence instead...
         const selection2 = await selectionPromises[1];
         assert.deepEqual(selection2.result, {matched: true, action: { type: 'optional-chain', item: 'b', allowNext: 'multitap' }});
+        assert.deepEqual(selection2.matcher.model, SimpleTapModel);
+        assert.isTrue(sources[0].path.isComplete);
+
+        // Allow the rest of the simulation to play out if any remaining processing is queued;
+        // it's easy cleanup that way.
+        await completion;
+      });
+
+      it("Single tap (after overly-long delay from prior tap)", async function() {
+        const turtle1 = new TouchpathTurtle({
+          targetX: 1,
+          targetY: 1,
+          t: 100,
+          item: 'a'
+        });
+        turtle1.wait(100, 5);
+        turtle1.commitPending();
+
+        // Set up the prior stage's match
+        const {
+          executor: predExecutor,
+          modelMatcherPromise
+        } = simulateMultiSourceMatcherInput([
+          { type: 'sequence', samples: turtle1.path, terminate: true }
+        ], this.fakeClock, SimpleTapModel);
+
+        await predExecutor();
+        const predecessorMatcher = await modelMatcherPromise;
+        assert.equal(await promiseStatus(modelMatcherPromise), PromiseStatuses.PROMISE_RESOLVED);
+
+        const turtle2 = new TouchpathTurtle({
+          targetX: 1,
+          targetY: 1,
+          t: 1100,
+          item: 'a'  // different item; the multitap should fail.
+        });
+        turtle2.wait(100, 5);
+        turtle2.commitPending();
+
+        const {
+          sources,
+          selectionPromises,
+          selectorPromise,
+          executor
+        } = simulateSelectorInput(
+          {
+            pathSpecs: [
+              {
+                type: 'prior-matcher',
+                matcher: predecessorMatcher,
+                continuation: null  // that GestureSource is DONE, terminated.  No continues.
+              }, {
+                type: 'sequence',
+                samples: turtle2.path,
+                terminate: true
+              }
+            ],
+            specSet: [LongpressModel, MultitapModel, SimpleTapModel]
+          }
+        , this.fakeClock);
+
+        let completion = executor();
+        const selector = await selectorPromise;
+        await Promise.race([completion, selectionPromises[0]]);
+
+        assert.equal(await promiseStatus(selectionPromises[0]), PromiseStatuses.PROMISE_RESOLVED);
+        assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
+
+        // Using the multi-tap leadup to attempt to find a match...
+        const selection1 = await selectionPromises[0];
+        // Sorry, nope, that gesture-stage sequence does not continue; it's over.
+        assert.deepEqual(selection1.result, {matched: false, action: { type: 'complete', item: null }});
+        assert.isTrue(sources[0].path.isComplete);
+
+        // At this point in time, the second source hasn't yet been started; thus, there's no Promise yet to wait upon.
+        // The simplest way to move forward;  assert that it'll exist once simulation is complete & check then.
+        assert.isNotOk(selectionPromises[1]);
+        await completion;
+
+        assert.isOk(selectionPromises[1]);
+        assert.equal(await promiseStatus(selectionPromises[1]), PromiseStatuses.PROMISE_RESOLVED);
+
+        const selection2 = await selectionPromises[1];
+        assert.deepEqual(selection2.result, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap' }});
         assert.deepEqual(selection2.matcher.model, SimpleTapModel);
         assert.isTrue(sources[0].path.isComplete);
 

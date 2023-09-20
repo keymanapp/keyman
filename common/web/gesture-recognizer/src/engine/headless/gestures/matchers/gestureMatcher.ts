@@ -258,8 +258,11 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
    * 'all'... but that'd take a little extra work.
    */
   public get allSourceIds(): string[] {
-    const currentIds = this.pathMatchers.map((entry) => entry.source.identifier);
+    let currentIds = this.pathMatchers.map((entry) => entry.source.identifier);
     const predecessorIds = this.predecessor ? this.predecessor.allSourceIds : [];
+
+    // Each ID should only be listed once, regardless of source.
+    currentIds = currentIds.filter((entry) => predecessorIds.indexOf(entry) == -1);
 
     return currentIds.concat(predecessorIds);
   }

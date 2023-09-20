@@ -38,10 +38,12 @@ fi
 # END - Script parameter configuration
 
 test-headless ( ) {
+  # During debugging, "--slow 0" allows reporting the duration of ALL tests, not just the ones that run long.
+  # Can be useful... but probably shouldn't be the default.
   MOCHA_FLAGS=
 
   if [ $REPORT_STYLE == "ci" ]; then
-    MOCHA_FLAGS="--reporter mocha-teamcity-reporter"
+    MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
   fi
 
   c8 mocha --recursive $MOCHA_FLAGS ./src/test/auto/headless/

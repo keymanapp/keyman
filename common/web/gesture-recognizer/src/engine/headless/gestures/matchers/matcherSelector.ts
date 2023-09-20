@@ -37,7 +37,14 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
   private _sourceSelector: GestureSourceTracker<Type>[] = [];
   private potentialMatchers: GestureMatcher<Type>[] = [];
 
-  private readonly promisePrioritizer = new QueuedPromisePrioritizer();
+  public readonly baseGestureSetId: string;
+
+  constructor(baseSetId?: string) {
+    super();
+    this.baseGestureSetId = baseSetId || 'default';
+  }
+
+  // private readonly promisePrioritizer = new QueuedPromisePrioritizer();
 
   /**
    * Aims to match the gesture-source's path against the specified set of gesture models.  The
@@ -128,12 +135,28 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
      * In either case, time to spin up gesture models limited to new sources, that don't combine with
      * already-active ones.  This could be the first stage in a sequence or a followup to a prior stage.
      */
-    const newMatchers = gestureModelSet.map((model) => new GestureMatcher(model, source));
+    let newMatchers = gestureModelSet.map((model) => new GestureMatcher(model, source));
+
+    // If any newly-activating models are disqualified due to initial conditions, don't add them.
+    newMatchers = newMatchers.filter((matcher) => !matcher.result || matcher.result.matched !== false);
 
     for(const matcher of newMatchers) {
       matcher.promise.then(this.matcherSelectionFilter(matcher, synchronizationSet));
     }
-    this.potentialMatchers = this.potentialMatchers.concat(newMatchers);
+
+    // Were all the new potential models disqualified?  If not, add them; if so, instantly say that none
+    // could be selected.
+    if(newMatchers) {
+      this.potentialMatchers = this.potentialMatchers.concat(newMatchers);
+    } else {
+      matchPromise.resolve({
+        matcher: null,
+        result: {
+          matched: false,
+          action: null
+        }
+      });
+    }
 
     /*
      * Easiest way to ensure resolution priorities are respected:  keep 'em sorted in descending order.
@@ -149,11 +172,18 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
   }
 
   private readonly attemptSynchronousUpdate = () => {
-    const sourceCurrentTimestamps = this._sourceSelector.map((tracker) => tracker.source.isPathComplete ? null : tracker.source.currentSample.t);
+    // Determine the most recent timestamp for all active sources.  Sources no longer active should be
+    // ignored, so we filter those out of this array.
+    //
+    // We maintain them because they can be relevant for certain 'sustain' scenarios, like for a
+    // multitap following from a simple tap - referencing that base simple tap is important.
+    const legalSources = this._sourceSelector.filter((tracker) => !tracker.source.isPathComplete);
+
+    const sourceCurrentTimestamps = legalSources.map((tracker) => tracker.source.currentSample.t);
     const t = sourceCurrentTimestamps[0];
 
     // Ignore timestamps from already-terminated paths; they should not block synchronicity checks.
-    if(sourceCurrentTimestamps.find((t2) => (t2 !== null) && (t != t2))) {
+    if(sourceCurrentTimestamps.find((t2) => (t != t2))) {
       return;
     }
 
@@ -184,7 +214,7 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
 
   private matchersForSource(source: GestureSource<Type>) {
     return this.potentialMatchers.filter((matcher) => {
-      return !!matcher.sources.find((src) => src == source)
+      return !!matcher.sources.find((src) => src.identifier == source.identifier)
     });
   }
 
@@ -194,9 +224,9 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
     return async (result: MatchResult<Type>) => {
       // Note:  is only called by GestureMatcher Promises that are resolving.
 
-      // Ensure that any essentially-synchronous resolving GestureMatchers resolve in order of
-      // their specified `resolutionPriority`, with larger values first.
-      await this.promisePrioritizer.queueWithPriority(matcher.model.resolutionPriority);
+      // // Ensure that any essentially-synchronous resolving GestureMatchers resolve in order of
+      // // their specified `resolutionPriority`, with larger values first.
+      // await this.promisePrioritizer.queueWithPriority(matcher.model.resolutionPriority);
 
       /*
        * If we already had a gesture stage match, this will have already been fulfilled;
@@ -213,17 +243,12 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
       // Find ALL associated match-promises for sources matched by the matcher.
       const matchedContactIds = matcher.allSourceIds;
 
-      const _this = this;
       const sourceMetadata = matchedContactIds.map((id) => {
-        const match = this._sourceSelector.find((metadata) => metadata.source.identifier == id);
-        /* c8 ignore start */
-        if(!match) {
-          _this._sourceSelector.map(() => {});
-          throw Error(`Could not find original tracker-object for source with id ${id}`);
-        }
-        /* c8 ignore end */
-        return match;
-      });
+        // It is fine if there is no match; we build tracking only so far as the most recent
+        // predecessor for disambiguation, so the initial tap/source for a third tap of a
+        // multitap will not be accessible here.
+        return this._sourceSelector.find((metadata) => metadata.source.identifier == id);
+      }).filter((entry) => !!entry); // remove `undefined` entries, as they're irrelevant.
 
       // We have a result for this matcher; go ahead and remove it from the 'potential' list.
       const matcherIndex = this.potentialMatchers.indexOf(matcher);
@@ -275,9 +300,25 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
         // But we didn't actually MATCH a gesture.
         const replacer = (replacementModel: GestureModel<Type>) => {
           const replacementMatcher = new GestureMatcher(replacementModel, matcher);
-          replacementMatcher.promise.then(this.matcherSelectionFilter(replacementMatcher, sourceMetadata.map((entry) => entry.matchPromise)));
 
+          /* IMPORTANT: verify that the replacement model is initially valid.
+           *
+           * If the model would be 'spun up' for matching in a state where, even initially,
+           * it cannot match, cancel the replacement.  (Otherwise, we could near-instantly
+           * re-trigger further replacements that will also fail!)
+           *
+           * In particular, a multitap operation involves a state with no contact points,
+           * while a longpress would fail when the state is reached.  Longpress models
+           * will fail when in the state... and should _permanently_ fail for a
+           * GestureSequence containing a finished GestureSource once said state is reached.
+           */
+          if(replacementMatcher.result && replacementMatcher.result.matched == false) {
+            return;
+          }
+
+          replacementMatcher.promise.then(this.matcherSelectionFilter(replacementMatcher, sourceMetadata.map((entry) => entry.matchPromise)));
           this.potentialMatchers.push(replacementMatcher);
+
           this.resetSourceHooks();
         };
 

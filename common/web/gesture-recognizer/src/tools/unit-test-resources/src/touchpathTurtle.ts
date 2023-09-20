@@ -119,13 +119,18 @@ export class TouchpathTurtle<HoveredItemType> extends EventEmitter<EventMap<Hove
     }
   }
 
+  /**
+   * @param angleInDegrees   Measured clockwise from the DOM's <0, -1>.
+   * @param distance         Net pixel distance to move
+   * @param time             Total time to model for the move
+   * @param sampleCount      Total number of steps to reach the destination
+   */
   move(angleInDegrees: number, distance: number, time: number, sampleCount: number) {
     if(distance < 0 || time < 0 || sampleCount < 1) {
       // negative angles are actually fine, so we don't filter those.
       throw new Error("Invalid parameter value:  may not be negative!");
     }
 
-    // Angle is measured clockwise from the DOM's <0, -1>.
     let angle = (90 - angleInDegrees) * Math.PI / 180;
     let xDistance = Math.cos(angle) * distance;
     let yDistance = -Math.sin(angle) * distance;

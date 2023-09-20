@@ -1,5 +1,6 @@
 export { ConstructingSegment } from './headless/subsegmentation/constructingSegment.js';
 export { CumulativePathStats } from './headless/cumulativePathStats.js';
+export { GestureModelDefs } from './headless/gestures/specs/gestureModelDefs.js';
 export { GestureRecognizer } from "./gestureRecognizer.js";
 export { GestureRecognizerConfiguration } from "./configuration/gestureRecognizerConfiguration.js";
 export { InputEngineBase } from "./headless/inputEngineBase.js";
