@@ -11,10 +11,15 @@ export class GestureRecognizer<HoveredItemType> extends TouchpointCoordinator<Ho
   private readonly mouseEngine: MouseEventEngine<HoveredItemType>;
   private readonly touchEngine: TouchEventEngine<HoveredItemType>;
 
-  public constructor(config: GestureRecognizerConfiguration<HoveredItemType>) {
+  public constructor(gestureModelDefinitions: GestureModelDefs<HoveredItemType>, config: GestureRecognizerConfiguration<HoveredItemType>) {
     const preprocessedConfig = preprocessRecognizerConfig(config);
 
-    super();
+    // Possibly just a stop-gap measure... but this provides an empty gesture-spec set definition
+    // that allows testing the path-constrainment functionality without invoking gesture-processing
+    // overhead.
+    gestureModelDefinitions = gestureModelDefinitions || EMPTY_GESTURE_DEFS;
+
+    super(gestureModelDefinitions);
     this.config = preprocessedConfig;
 
     this.mouseEngine = new MouseEventEngine<HoveredItemType>(this.config);
