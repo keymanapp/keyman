@@ -10,38 +10,19 @@ export interface ResolutionItem<Type> {
   item: Type
 }
 
-export interface ResolutionSetChange {
-  type: 'setchange',
-  // 'push' - for having NEW gestures (while still active) default to a different gesture set than the default
-  //   - should probably rename (to avoid confusion with pushed configs)
-  //   - modipress:  the gesture itself is the same; it just enables an alt state for OTHER gestures
-  //   - an engine 'listener' for push signals should be useful to ensure new gestures use the alt config.
-  //   - but... how about the current sequence's behaviors in response?  (the modipress particulars w release?)
-  //   - waaaaaait.  what if this state could listen to gestures started during the state?
-  //     - so... internal state management?
-  //     - if push-state selector has no active / locked sequences - detect by checking for ref equality with selector?
-  //       - as in, the way to check for such a condition.
-  //       - so, push-state stuff ought use its own selector.  Which IS true, anyway - it may have a diff base set-id
-  //         than the standard default - that's one of two possible reasons WHY the state would exist.
-  //     - but... "sustaining" if the original, pushing sequence collapses?  How does that get handled / modeled properly
-  //       in relation to any active sequences?
-  //       - perhaps that's it?  "sustaining" - like the sustain timer supporting multitap?  But now, not from a timer.
-  //       - flag for "sustain if has active subgesture"?
-  //         - ... blend with sustainTimer?  to sustain: { timer: {}, subgesture: boolean }?
-  //         - subgesturesDeferFinalization: boolean
-  //   - ... wait a sec.  During a push, the gesture itself may still continue!!!
-  allowedSet: string,
-  next: string
+export interface ResolutionPush {
+  type: 'push',
+  allowedGestures: string[]
 }
 
 export interface ResolutionChain {
-  type: 'chain',  // TODO:  "lock"?
+  type: 'chain',
   next: string
 }
 
 // is not "locked-in"
 export interface OptionalChain {
-  type: 'optional-chain',  // TODO:  a plain 'chain'?
+  type: 'optional-chain',
   allowNext: string
 }
 
@@ -59,7 +40,7 @@ export interface RejectionDefault {
 // non-chainable rejection will 'pop' to undo any existing prior 'push' resolutions
 // in the chain.  As such, there is no need for a {type: 'pop'} variant.
 
-type ResolutionStruct = ResolutionSetChange | ResolutionChain | OptionalChain | ResolutionComplete;
+type ResolutionStruct = ResolutionPush | ResolutionChain | OptionalChain | ResolutionComplete;
 
 export type GestureResolutionSpec   = ResolutionStruct & ResolutionItemSpec;
 export type GestureResolution<Type> = (ResolutionStruct | RejectionDefault) & ResolutionItem<Type>;
