@@ -22,7 +22,7 @@ export interface ResolutionChain {
 
 // is not "locked-in"
 export interface OptionalChain {
-  type: 'optional-chain',
+  type: 'optional-chain', // With spec-shift: 'reset'?
   allowNext: string
 }
 
@@ -88,13 +88,6 @@ export interface GestureModel<Type> {
   // If there is a 'gesture stack' associated with the gesture chain, it's auto-popped
   // upon completion of the chain.  Optional-chaining can sustain the chain while the
   // potential child gesture is still a possibility.
-
-  // If we're locked-in on the gesture being matched and its detection occurs under the influence
-  // of another gesture, should that "another gesture" complete, this flag specifies if the
-  // locked-in "subgesture" should be maintained or auto-cancelled as a consequence.
-  //
-  // Default:  cancelled.
-  readonly sustainWhenNested?: boolean;
 
   // TODO:  allow function for correlating multitouch paths (like for caret-pannning)
   // But that's something we'll likely defer past 17.0.
