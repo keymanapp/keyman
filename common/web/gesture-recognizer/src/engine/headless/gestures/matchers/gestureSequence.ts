@@ -151,8 +151,8 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
 
       // Handling 'setchange' resolution actions (where one gesture enables a different gesture set for others
       // while active.  Example case: modipress.)
-      if(selection.result.action.type == 'setchange' && selection.result.action.allowedSet == this.pushedSelector?.baseGestureSetId) {
-        // do nothing; maintain the existing 'setchange' behavior
+      if(selection.result.action.type == 'chain' && selection.result.action.selectionMode == this.pushedSelector?.baseGestureSetId) {
+        // do nothing; maintain the existing 'selectionMode' behavior
       } else {
         // pop the old one, if it exists - if it matches our expectations for a current one.
         if(this.pushedSelector) {
@@ -175,8 +175,8 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
          * can then use that to trigger cancellation of the subkey-selection mode.
          */
 
-        if(selection.result.action.type == 'setchange') {
-          const targetSet = selection.result.action.allowedSet;
+        if(selection.result.action.type == 'chain') {
+          const targetSet = selection.result.action.selectionMode;
           // push the new one.
           const changedSetSelector = new MatcherSelector<Type>(targetSet);
           this.touchpointCoordinator.pushSelector(changedSetSelector);
@@ -226,7 +226,6 @@ export function modelSetForAction<Type>(
 
       return nextModels;
     case 'chain':
-    case 'setchange':
       return [getGestureModel(gestureModelDefinitions, action.next)];
     default:
       throw new Error("Unexpected case arose within `processGestureAction` method");
