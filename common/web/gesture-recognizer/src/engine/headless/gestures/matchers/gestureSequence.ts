@@ -7,7 +7,6 @@ import { GestureModel, GestureResolution } from "../specs/gestureModel.js";
 import { MatcherSelection, MatcherSelector } from "./matcherSelector.js";
 import { GestureRecognizerConfiguration, TouchpointCoordinator } from "../../../index.js";
 
-// Definitely want to use this in some way, somewhere.
 export class GestureStageReport<Type> {
   public readonly matchedId: string;
   public readonly linkType: MatchResult<Type>['action']['type'];
@@ -17,11 +16,7 @@ export class GestureStageReport<Type> {
 
   constructor(selection: MatcherSelection<Type>) {
     const { matcher, result } = selection;
-    if(matcher instanceof GestureMatcher) {
-      this.matchedId = matcher?.model.id;
-    } else {
-      this.matchedId = '(delegated)'; // TODO:  consider - replace with some sort of delegation 'id'?
-    }
+    this.matchedId = matcher?.model.id;
     this.linkType = result.action.type;
     this.item = result.action.item;
 
@@ -165,6 +160,21 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
           this.pushedSelector = null;
         }
 
+        /* Note:  we do not change the instance held by this class - it gets to maintain access
+         * to its original selector regardless.
+         *
+         * Example use-case: during subkey selection, which is the intended followup for a longpress,
+         * either...
+         *
+         * 1. No other gestures (new touch contact points) should be allowed and/or trigger interactions
+         * 2. OR such attempts should automatically cancel the subkey-selection process.
+         *
+         * For approach 1, we 'allow' an empty set of gestures, disabling all of them.
+         *
+         * For approach 2, we permit a single type of new gesture; when triggered, the gesture consumer
+         * can then use that to trigger cancellation of the subkey-selection mode.
+         */
+
         if(selection.result.action.type == 'setchange') {
           const targetSet = selection.result.action.allowedSet;
           // push the new one.
@@ -183,7 +193,7 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
       // 2.  Acts as an obvious flag / indicator of sequence completion.
       this.selector = null;
 
-      // TODO: anything else needed for finalization?
+      // Any extra finalization stuff should go here, before the event, if needed.
       this.emit('complete');
     }
   }
