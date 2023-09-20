@@ -43,8 +43,6 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
     this.baseGestureSetId = baseSetId || 'default';
   }
 
-  // private readonly promisePrioritizer = new QueuedPromisePrioritizer();
-
   /**
    * Aims to match the gesture-source's path against the specified set of gesture models.  The
    * returned Promise will resolve either when a match is found or all models have rejected the path.
@@ -222,10 +220,6 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
     // by this class instance.
     return async (result: MatchResult<Type>) => {
       // Note:  is only called by GestureMatcher Promises that are resolving.
-
-      // // Ensure that any essentially-synchronous resolving GestureMatchers resolve in order of
-      // // their specified `resolutionPriority`, with larger values first.
-      // await this.promisePrioritizer.queueWithPriority(matcher.model.resolutionPriority);
 
       /*
        * If we already had a gesture stage match, this will have already been fulfilled;

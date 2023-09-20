@@ -704,7 +704,7 @@ describe("MatcherSelector", function () {
         assert.isTrue(sources[0].path.isComplete);
 
         // At this point in time, the second source hasn't yet been started; thus, there's no Promise yet to wait upon.
-        // The simplest way to move forward;  assert that it'll exist once simulation is complete & check then.
+        // The simplest way to move forward:  assert that it'll exist once simulation is complete & check then.
         assert.isNotOk(selectionPromises[1]);
         await completion;
 
