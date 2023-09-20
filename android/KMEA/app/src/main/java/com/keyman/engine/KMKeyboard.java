@@ -363,9 +363,7 @@ final class KMKeyboard extends WebView {
     // Come to think of it, I wonder if suggestionMenuWindow was work being done to link with
     // suggestion banner longpresses - if so, it's not yet ready for proper integration...
     // and would need its own rung in this if-else ladder.
-    if (true) {
-      gestureDetector.onTouchEvent(event);
-    }
+    gestureDetector.onTouchEvent(event);
 
     if (action == MotionEvent.ACTION_UP) {
       // Cleanup popups. #6636
