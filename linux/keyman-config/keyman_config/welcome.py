@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import logging
+import os
 import webbrowser
 
 import gi
@@ -55,15 +56,23 @@ class WelcomeView(Gtk.Dialog):
     def doc_policy(self, web_view, decision, decision_type):
         logging.info("Checking policy")
         logging.debug("received policy decision request of type: {0}".format(decision_type.value_name))
-        if decision_type == WebKit2.PolicyDecisionType.NAVIGATION_ACTION or \
-                decision_type == WebKit2.PolicyDecisionType.NEW_WINDOW_ACTION:
+        if decision_type in [
+            WebKit2.PolicyDecisionType.NAVIGATION_ACTION,
+            WebKit2.PolicyDecisionType.NEW_WINDOW_ACTION,
+        ]:
             nav_action = decision.get_navigation_action()
             request = nav_action.get_request()
             uri = request.get_uri()
             logging.debug("nav request is for uri %s", uri)
-            if "welcome.htm" not in uri:
-                logging.debug("opening uri %s in webbrowser")
+            if not uri.startswith("file://"):
+                logging.debug("opening external uri %s in webbrowser", uri)
                 webbrowser.open(uri)
+                decision.ignore()
+                return True
+            elif ".htm" not in uri:
+                cmd = f'xdg-open {uri}'
+                logging.debug('opening uri in default app: %s', cmd)
+                os.system(cmd)
                 decision.ignore()
                 return True
         return False
