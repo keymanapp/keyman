@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.176 alpha 2023-09-19
+
+* chore(oem/fv/android): Update Gradle to 7.4 (#9590)
+* refactor(linux): Rename defines to clarify purpose  ️ (#9584)
+*  (#9560)
+
 ## 17.0.175 alpha 2023-09-18
 
 * chore(linux): Split startup process (#9570)
