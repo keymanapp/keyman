@@ -143,7 +143,7 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
 
     // Were all the new potential models disqualified?  If not, add them; if so, instantly say that none
     // could be selected.
-    if(newMatchers) {
+    if(newMatchers.length > 0) {
       this.potentialMatchers = this.potentialMatchers.concat(newMatchers);
     } else {
       matchPromise.resolve({
