@@ -19,7 +19,7 @@ export interface MatchResult<Type> {
   readonly action: GestureResolution<Type>
 }
 
-export interface MatchResultSpec<Type> {
+export interface MatchResultSpec {
   readonly matched: boolean,
   readonly action: GestureResolutionSpec
 }

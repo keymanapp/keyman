@@ -75,7 +75,7 @@ export default class ManagedPromise<Type> {
     return this._promise.then(onfulfilled, onrejected);
   }
 
-  catch(onrejected?: (reason: any) => PromiseLike<never>): Promise<Type> {
+  catch<TResult1>(onrejected?: (reason: any) => TResult1 | PromiseLike<TResult1>): Promise<Type | TResult1> {
     return this._promise.catch(onrejected);
   }
 

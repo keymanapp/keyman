@@ -1,6 +1,7 @@
 import EventEmitter from "eventemitter3";
 import { InputEngineBase } from "./inputEngineBase.js";
 import { GestureSource, GestureSourceSubview } from "./gestureSource.js";
+import { MatcherSelector } from "./gestures/matchers/matcherSelector.js";
 
 interface EventMap<HoveredItemType> {
   /**
@@ -21,12 +22,33 @@ interface EventMap<HoveredItemType> {
  */
 export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMap<HoveredItemType>> {
   private inputEngines: InputEngineBase<HoveredItemType>[];
+  private selectorStack: MatcherSelector<HoveredItemType>[] = [new MatcherSelector()];
 
   private _activeSources: GestureSource<HoveredItemType>[] = [];
 
   public constructor() {
     super();
     this.inputEngines = [];
+  }
+
+  public pushSelector(selector: MatcherSelector<HoveredItemType>) {
+    this.selectorStack.push(selector);
+  }
+
+  public popSelector(selector: MatcherSelector<HoveredItemType>) {
+    if(this.selectorStack.length <= 1) {
+      throw new Error("May not pop the original, base gesture selector.");
+    }
+
+    const index = this.selectorStack.indexOf(selector);
+    if(index == -1) {
+      throw new Error("This selector has not been pushed onto the 'setChange' stack.");
+    }
+    this.selectorStack.splice(index, 1);
+  }
+
+  public get currentSelector() {
+    return this.selectorStack[this.selectorStack.length-1];
   }
 
   protected addEngine(engine: InputEngineBase<HoveredItemType>) {
