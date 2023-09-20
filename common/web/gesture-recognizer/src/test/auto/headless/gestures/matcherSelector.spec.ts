@@ -150,7 +150,7 @@ describe("MatcherSelector", function () {
         const rejectionData = rejectionStub.firstCall.args as [ MatcherSelection<string>, (model: GestureModel<string>) => void ];
         assert.equal(rejectionData[0].matcher.model.id, 'longpress');
         assert.equal(rejectionData[0].result.matched, false);
-        assert.deepEqual(rejectionData[0].result.action, { type: 'optional-chain', allowNext: 'longpress', item: null});
+        assert.deepEqual(rejectionData[0].result.action, { type: 'replace', replace: 'longpress', item: null});
 
         // ... we technically already have it, but this _is_ a convenient pattern to maintain for
         // consistency among all this suite's tests.
@@ -300,7 +300,7 @@ describe("MatcherSelector", function () {
 
         const selection = await selectionPromises[0];
 
-        assert.deepEqual(selection.result, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap' }});
+        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: 'a', next: 'multitap' }});
         assert.deepEqual(selection.matcher.model, SimpleTapModel);
         assert.isTrue(sources[0].path.isComplete);
 
@@ -354,7 +354,7 @@ describe("MatcherSelector", function () {
 
         const selection = await selectionPromises[0];
 
-        assert.deepEqual(selection.result, {matched: true, action: { type: 'optional-chain', item: 'b', allowNext: 'multitap' }});
+        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: 'b', next: 'multitap' }});
         assert.deepEqual(selection.matcher.model, SimpleTapModel);
         assert.isTrue(sources[0].path.isComplete);
         assert.isAtLeast(resets, 1);
@@ -476,7 +476,7 @@ describe("MatcherSelector", function () {
 
         const selection = await selectionPromises[0];
 
-        assert.deepEqual(selection.result, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap' }});
+        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: 'a', next: 'multitap' }});
         assert.deepEqual(selection.matcher.model, SimpleTapModel);
         assert.isTrue(sources[0].path.isComplete);
         assert.isAtMost(sources[0].path.stats.duration, 101);
@@ -549,7 +549,7 @@ describe("MatcherSelector", function () {
 
         const selection = await selectionPromises[0];
 
-        assert.deepEqual(selection.result, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap' }});
+        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: 'a', next: 'multitap' }});
         assert.deepEqual(selection.matcher.model, MultitapModel);
         assert.isTrue(sources[0].path.isComplete);
 
@@ -628,7 +628,7 @@ describe("MatcherSelector", function () {
 
         // Ignoring the multi-tap leadup and starting a new gesture-stage sequence instead...
         const selection2 = await selectionPromises[1];
-        assert.deepEqual(selection2.result, {matched: true, action: { type: 'optional-chain', item: 'b', allowNext: 'multitap' }});
+        assert.deepEqual(selection2.result, {matched: true, action: { type: 'chain', item: 'b', next: 'multitap' }});
         assert.deepEqual(selection2.matcher.model, SimpleTapModel);
         assert.isTrue(sources[0].path.isComplete);
 
@@ -712,7 +712,7 @@ describe("MatcherSelector", function () {
         assert.equal(await promiseStatus(selectionPromises[1]), PromiseStatuses.PROMISE_RESOLVED);
 
         const selection2 = await selectionPromises[1];
-        assert.deepEqual(selection2.result, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap' }});
+        assert.deepEqual(selection2.result, {matched: true, action: { type: 'chain', item: 'a', next: 'multitap' }});
         assert.deepEqual(selection2.matcher.model, SimpleTapModel);
         assert.isTrue(sources[0].path.isComplete);
 

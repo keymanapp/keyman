@@ -37,14 +37,8 @@ export interface ResolutionSetChange {
 }
 
 export interface ResolutionChain {
-  type: 'chain',  // TODO:  "lock"?
+  type: 'chain',
   next: string
-}
-
-// is not "locked-in"
-export interface OptionalChain {
-  type: 'optional-chain',  // TODO:  a plain 'chain'?
-  allowNext: string
 }
 
 export interface ResolutionComplete {
@@ -55,16 +49,24 @@ export interface RejectionDefault {
   type: 'none'
 }
 
+/**
+ * Only permitted when rejecting a gesture match; certain models may specify a replacement
+ * or reset under certain conditions.
+ */
+export interface RejectionReplace {
+  type: 'replace',
+  replace: string
+}
 
 // If there is a 'gesture stack' associated with the gesture chain, it's auto-popped
 // upon completion of the chain.  So, either this resolution type or a final,
 // non-chainable rejection will 'pop' to undo any existing prior 'push' resolutions
 // in the chain.  As such, there is no need for a {type: 'pop'} variant.
 
-type ResolutionStruct = ResolutionSetChange | ResolutionChain | OptionalChain | ResolutionComplete;
+type ResolutionStruct = ResolutionSetChange | ResolutionChain | ResolutionComplete;
 
 export type GestureResolutionSpec   = ResolutionStruct & ResolutionItemSpec;
-export type GestureResolution<Type> = (ResolutionStruct | RejectionDefault) & ResolutionItem<Type>;
+export type GestureResolution<Type> = (ResolutionStruct | RejectionDefault | RejectionReplace) & ResolutionItem<Type>;
 
 export interface GestureModel<Type> {
   // Gestures may want to say "build gesture of type `id`" for a followup-gesture.
@@ -105,7 +107,7 @@ export interface GestureModel<Type> {
 
   readonly resolutionAction: GestureResolutionSpec;
 
-  readonly rejectionActions?: Partial<Record<FulfillmentCause, Omit<OptionalChain, 'item'>>>;
+  readonly rejectionActions?: Partial<Record<FulfillmentCause, RejectionReplace>>;
   // If there is a 'gesture stack' associated with the gesture chain, it's auto-popped
   // upon completion of the chain.  Optional-chaining can sustain the chain while the
   // potential child gesture is still a possibility.

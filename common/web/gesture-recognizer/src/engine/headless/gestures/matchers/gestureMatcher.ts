@@ -1,6 +1,6 @@
 import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
 
-import { GestureModel, GestureResolution, GestureResolutionSpec, RejectionDefault, ResolutionItemSpec } from "../specs/gestureModel.js";
+import { GestureModel, GestureResolution, GestureResolutionSpec, RejectionDefault, RejectionReplace, ResolutionItemSpec } from "../specs/gestureModel.js";
 
 import { ManagedPromise, TimeoutPromise } from "@keymanapp/web-utils";
 import { FulfillmentCause, PathMatcher } from "./pathMatcher.js";
@@ -135,7 +135,7 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
 
     try {
       // Determine the correct action-spec that should result from the finalization.
-      let action: GestureResolutionSpec | (RejectionDefault & ResolutionItemSpec);
+      let action: GestureResolutionSpec | ((RejectionDefault | RejectionReplace) & ResolutionItemSpec);
       if(matched) {
         // Easy peasy - resolutions only need & have the one defined action type.
         action = this.model.resolutionAction;

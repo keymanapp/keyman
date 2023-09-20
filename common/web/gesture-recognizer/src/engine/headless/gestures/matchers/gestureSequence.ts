@@ -199,8 +199,8 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
   }
 
   private readonly modelResetHandler = (selection: MatcherSelection<Type>, replaceModelWith: (model: GestureModel<Type>) => void) => {
-    if(selection.result.action.type == 'optional-chain') {
-      replaceModelWith(getGestureModel(this.gestureConfig, selection.result.action.allowNext));
+    if(selection.result.action.type == 'replace') {
+      replaceModelWith(getGestureModel(this.gestureConfig, selection.result.action.replace));
     } else {
       throw new Error("Missed a case in implementation!");
     }
@@ -216,8 +216,8 @@ export function modelSetForAction<Type>(
     case 'none':
     case 'complete':
       return [];
-    case 'optional-chain':
-      let nextModels = [getGestureModel(gestureModelDefinitions, action.allowNext)];
+    case 'replace':
+      let nextModels = [getGestureModel(gestureModelDefinitions, action.replace)];
 
       // If the resolved gesture-model was a match, it also cleared out all other model-specs;
       // we should restart them -- they're also allowed for an 'optional-chain'.
