@@ -444,13 +444,13 @@ begin
   if (FMode = fmInstallBackground) then
   begin
     /// Moving this to OnlineUpdateCheck
-  with TOnlineUpdateCheck.Create(nil, True, True) do
-  try
-    ProcessBackgroundInstall
+    with TOnlineUpdateCheck.Create(nil, True, True) do
+    try
+      ProcessBackgroundInstall
 
-  finally
-    Free;
-  end;
+    finally
+      Free;
+    end;
   end;
 
   if not FSilent or (FMode = fmUpgradeMnemonicLayout) then   // I4553
