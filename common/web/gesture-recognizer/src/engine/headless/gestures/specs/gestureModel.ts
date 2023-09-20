@@ -1,5 +1,3 @@
-import { MatchResult } from "../matchers/gestureMatcher.js";
-import { GestureSequence } from "../matchers/gestureSequence.js";
 import { FulfillmentCause } from "../matchers/pathMatcher.js";
 import { ContactModel } from "./contactModel.js";
 
@@ -12,9 +10,41 @@ export interface ResolutionItem<Type> {
   item: Type
 }
 
+/**
+ * Indicates that the matched gesture is but a component (or stage) of a
+ * multi-part gesture; there may be one or more follow-up components
+ * that will follow.
+ */
 export interface ResolutionChain {
   type: 'chain',
+  // For consideration:  string | string[];  // But we don't need the latter part for 17.0 gesture support.
+  /**
+   * The gesture ID for the next gesture component in sequence.
+   *
+   * E.g. longpress => subkey-select; that is, 'subkey-select' would be next after the 'longpress' model
+   * matches.
+   */
   next: string,
+
+  /**
+   * When specified, gesture-component selection for new GestureSources will use the specified
+   * set of models instead of the current default set for new sources.
+   *
+   * Example 1:  longpresses, when transitioning to subkey-select mode, do not allow new incoming
+   * gestures during their lifetime.  They should either cancel or block new gestures until
+   * subkey-selection is complete.
+   *
+   * Example 2:  modipress operations should prevent secondary modipresses from occurring during
+   * their lifetime.
+   *
+   * Followup gesture-models must also specify the alternate model set in order to maintain it during
+   * transition between components.  Leaving it `undefined` in a followup will fully cancel the
+   * alternate gesture-component selection mode and any gestures activated during the alternate
+   * selection mode (unless `sustainIfNested` is `true` for the processing gesture model).
+   *
+   * Changing to a different ID will do the likewise, then reactivate the alternate gesture-selection
+   * mode with the newly-specified gesture-model set target.
+   */
   selectionMode?: string
 }
 
@@ -32,6 +62,12 @@ export interface RejectionDefault {
  */
 export interface RejectionReplace {
   type: 'replace',
+
+  // For consideration:  string | string[];  // But we don't need the latter part for 17.0 gesture support.
+                                             // Is trickier here for 'replace' than for 'chain'.
+  /**
+   * The ID of a gesture model to start matching as a replacement for the gesture-model that failed to match.
+   */
   replace: string
 }
 
