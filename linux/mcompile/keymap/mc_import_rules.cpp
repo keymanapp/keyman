@@ -766,7 +766,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp, std::vector<KMX_Deadkey
       *p++ = UC_SENTINEL;
       *p++ = CODE_DEADKEY;
       *p++ = DeadKeyMap(dk->DeadCharacter(), &alDead, nDeadkey, FDeadkeys);   // I4353
-      //*p++ = nDeadkey+i;
+      // *p++ = nDeadkey+i;
       *p++ = UC_SENTINEL;
       *p++ = CODE_ANY;
       *p++ = nStoreBase + i*2 + 1;
