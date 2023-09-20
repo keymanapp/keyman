@@ -5,7 +5,6 @@ import { ManagedPromise } from "@keymanapp/web-utils";
 import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
 import { GestureMatcher, MatchResult, PredecessorMatch } from "./gestureMatcher.js";
 import { GestureModel } from "../specs/gestureModel.js";
-import { QueuedPromisePrioritizer } from "../../queuedPromisePrioritizer.js";
 
 interface GestureSourceTracker<Type> {
   source: GestureSourceSubview<Type>;
