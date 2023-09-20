@@ -26,9 +26,6 @@ builder_describe \
 
 builder_parse "$@"
 
-builder_describe_internal_dependency \
-  report:engine test:engine
-
 if builder_is_debug_build; then
   MESON_TARGET=debug
   export CPPFLAGS=-DG_MESSAGES_DEBUG
