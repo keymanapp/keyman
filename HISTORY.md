@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.177 alpha 2023-09-20
+
+* chore(linux): Add coverage action to `ibus-keyman/build.sh` (#9583)
+* docs(common): Fix documentation for `builder_describe_internal_dependency` (#9582)
+
 ## 17.0.176 alpha 2023-09-19
 
 * chore(oem/fv/android): Update Gradle to 7.4 (#9590)
