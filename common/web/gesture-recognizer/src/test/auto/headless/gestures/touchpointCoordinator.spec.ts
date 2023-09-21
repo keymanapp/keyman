@@ -577,9 +577,6 @@ describe("TouchpointCoordinator", () => {
     let index = 0;
     touchpointCoordinator.on('recognizedgesture', async (sequence) => {
       const i = index++;
-
-      // FIXME:  is occurring twice!
-      console.log(sequence);
       try {
         sequencePromises[i].resolve();
         await assertGestureSequence(sequence, completionPromise, sequenceAssertions[i]);
@@ -774,8 +771,6 @@ describe("TouchpointCoordinator", () => {
     const sequencePromise = new ManagedPromise<void>();
     const sequenceAssertionPromise = new ManagedPromise<void>();
     touchpointCoordinator.on('recognizedgesture', async (sequence) => {
-      // FIXME:  is occurring twice!
-      console.log(sequence);
       try {
         sequencePromise.resolve();
         await assertGestureSequence(sequence, completionPromise, sequenceAssertion);
