@@ -105,7 +105,7 @@ export function testReaderCases(cases : CompilationCase[]) {
           assert.includeDeepMembers(callbacks.messages, testcase.warnings, 'expected warnings to be included');
         } else if (!expectFailure) {
           // no warnings, so expect zero messages
-          assert.strictEqual(callbacks.messages.length, 0, 'expected zero messages');
+          assert.deepEqual(callbacks.messages, [], 'expected zero messages');
         }
 
         // run the user-supplied callback if any

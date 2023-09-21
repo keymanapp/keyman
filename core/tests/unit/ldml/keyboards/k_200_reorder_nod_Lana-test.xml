@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE keyboardTest SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest.dtd">
-<keyboardTest conformsTo="techpreview">
+<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest3.dtd">
+<keyboardTest3 conformsTo="techpreview">
   <info keyboard="k_200_reorder_nod_Lana.xml" author="Team Keyboard" name="nod-Lana" />
   <tests name="reorder-tests">
     <test name="roast00-orig-emit">
@@ -54,4 +54,4 @@
       <check result="\u1A21\u1A60\u1A45\u1A6B\u1A76" />
     </test>
   </tests>
-</keyboardTest>
+</keyboardTest3>

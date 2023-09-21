@@ -10,7 +10,7 @@ export class TouchLayoutCompiler {
       layer: []
     };
 
-    for(let layers of source.keyboard.layers) {
+    for(let layers of source.keyboard3.layers) {
       for(let layer of layers.layer) {
         const resultLayer = this.compileHardwareLayer(source, result, layer);
         result.desktop.layer.push(resultLayer);
@@ -41,7 +41,7 @@ export class TouchLayoutCompiler {
 
       const keys = row.keys.split(' ');
       for(let key of keys) {
-        const keydef = source.keyboard.keys?.key?.find(x => x.id == key);
+        const keydef = source.keyboard3.keys?.key?.find(x => x.id == key);
         if(keydef) {
           const fileKey: TouchLayout.TouchLayoutKey = {
             id: this.translateKeyIdentifierToTouch(keydef.id) as TouchLayout.TouchLayoutKeyId,

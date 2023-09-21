@@ -4,8 +4,8 @@
 This will fail because the two markers given don't exist anywhere.
 
 -->
-<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
+<!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="mt" conformsTo="techpreview">
   <names>
     <name value="vars-markers-badref-0" />
   </names>
@@ -40,4 +40,4 @@ This will fail because the two markers given don't exist anywhere.
       <transform from="\m{.}" />
     </transformGroup>
   </transforms>
-</keyboard>
+</keyboard3>

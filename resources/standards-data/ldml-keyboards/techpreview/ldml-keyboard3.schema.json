@@ -678,7 +678,7 @@
     }
   },
   "properties": {
-    "keyboard": {
+    "keyboard3": {
       "additionalProperties": false,
       "properties": {
         "conformsTo": {
@@ -754,8 +754,8 @@
     }
   },
   "required": [
-    "keyboard"
+    "keyboard3"
   ],
-  "title": "techpreview/dtd/ldmlKeyboard.xsd",
+  "title": "techpreview/dtd/ldmlKeyboard3.xsd",
   "type": "object"
 }
