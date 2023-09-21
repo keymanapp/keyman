@@ -53,7 +53,7 @@ type
 
   TOnlineUpdateCheckResult = (oucUnknown, oucShutDown, oucSuccess, oucNoUpdates, oucUpdatesAvailable, oucFailure, oucOffline);
 
-  TUpdateState = (idle, check, download, pending, installing, postinstall);
+  TUpdateState = (usIdle, usCheck, usDownload, usPending, usInstalling, usPostInstall);
 
   TOnlineUpdateCheckParamsPackage = record
     ID: string;
@@ -102,7 +102,7 @@ type
 
     FShowErrors: Boolean;
     FDownload: TOnlineUpdateCheckDownloadParams;
-    {
+    { TODO: make a comment clear when we are in a elevate process
       Sets the download path and then calls the DoDownloadUpdates function. If
       the user confirms the download (by clicking OK), the downloaded files are
       marked to be deleted on the next system reboot. If the user cancels the
@@ -624,7 +624,7 @@ var
   FResult: Boolean;
 begin
   s := LowerCase(ExtractFileExt(SavePath));
-  if s = '.msp' then
+  if s = '.msp' then // TODO remove as MD We can delete this because we don't distribute .msp patch files any longer (and never will, it's a fragile technology).
     FResult := TUtilExecute.Shell(0, 'msiexec.exe', '', '/qb /p "'+SavePath+'" AUTOLAUNCHPRODUCT=1')  // I3349
   else if s = '.msi' then
     FResult := TUtilExecute.Shell(0, 'msiexec.exe', '', '/qb /i "'+SavePath+'" AUTOLAUNCHPRODUCT=1')  // I3349
@@ -1036,7 +1036,7 @@ var
   fileName: String;
   fileNames: TStringDynArray;
 begin
-    // If Keyman is failed to be shutdown then it will exit
+    // If Keyman has failed to be shutdown then it will exit
     // the state will remain in background for the next time processbackgoundinstall is called.
     SavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
     GetFileNamesInDirectory(SavePath, fileNames);
@@ -1062,7 +1062,7 @@ begin
     on E:Exception do
     begin
       KL.Log(E.Message);
-      Exit;
+      Exit(False);
     end;
   end;
 end;
@@ -1306,7 +1306,7 @@ begin
     installing:
     begin
       KL.Log('ProcessBackground Install case :[ installing ]');
-      // TODO if we are in state installing we shouldn't be hear either
+      // TODO if we are in state installing we shouldn't be here either
       // So exit and let the msi installer continue.
     end;
     postinstall:
@@ -1378,6 +1378,10 @@ begin
         end
         else
           SetBackgroundState(idle);
+        // TODO look at eb suggestion to invert the IF logic if CheckResult != oucUpdatesAvailable then
+        //SetBackgroundState(idle);
+else
+  ...
       end;
 
     pending:
@@ -1385,7 +1389,7 @@ begin
     end;
     installing:
     begin
-      // TODO if we are in state installing we shouldn't be hear either
+      // TODO if we are in state installing we shouldn't be here either
       // So exit and let the msi installer continue.
     end;
     postinstall:
