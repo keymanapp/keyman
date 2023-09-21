@@ -28,7 +28,7 @@ export class KmpCompiler {
 
   public loadKpsFile(kpsFilename: string): KpsFile.KpsFile {
     // Load the KPS data from XML as JS structured data.
-    const buffer = this.callbacks.loadFile(kpsFilename, false);
+    const buffer = this.callbacks.loadFile(kpsFilename);
     if(!buffer) {
       this.callbacks.reportMessage(CompilerMessages.Error_FileDoesNotExist({filename: kpsFilename}));
       return null;
