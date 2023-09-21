@@ -223,6 +223,7 @@ type
 
     function BackgroundInstall: Boolean;
     function IsKeymanRunning: Boolean;
+    function checkUpdateSchedule : Boolean;
 
     function handleEventCheckForUpdates: Boolean;
 
@@ -1010,7 +1011,7 @@ var
 begin
   // We will use a registry flag to maintain the state of the background update
 
-  UpdateState := Idle; // do we need a unknown state ?
+  UpdateState := usIdle; // do we need a unknown state ?
   // check the registry value
   with TRegistryErrorControlled.Create do  // I2890
   try
@@ -1020,7 +1021,7 @@ begin
           UpdateState := TUpdateState(GetEnumValue(TypeInfo(TUpdateState), ReadString(SRegValue_Update_State)));
           KL.Log('CheckBackgroundState State is:[' + ReadString(SRegValue_Update_State) + ']');
         except
-          UpdateState := Idle; // do we need a unknown state ?
+          UpdateState := usIdle; // do we need a unknown state ?
         end;
     finally
       Free;
@@ -1066,6 +1067,41 @@ begin
     end;
   end;
 end;
+
+function TOnlineUpdateCheck.CheckUpdateSchedule: Boolean;
+begin
+  try
+    with TRegistryErrorControlled.Create do
+    try
+      if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
+      begin
+        if ValueExists(SRegValue_CheckForUpdates) and not ReadBool(SRegValue_CheckForUpdates) and not FForce then
+        begin
+          Result := False;
+          Exit;
+        end;
+        if ValueExists(SRegValue_LastUpdateCheckTime) and (Now - ReadDateTime(SRegValue_LastUpdateCheckTime) < 1) and not FForce then
+        begin
+          Result := False;
+          Exit;
+        end;
+        // Else Time to check for updates
+        Result := True;
+      end;
+    finally
+      Free;
+    end;
+  except
+    { we will not run the check if an error occurs reading the settings }
+    on E:Exception do
+    begin
+      Result := False;
+      FErrorMessage := E.Message;
+      Exit;
+    end;
+  end;
+end;
+
 
 function TOnlineUpdateCheck.CheckForUpdates: TOnlineUpdateCheckResult;
 var
@@ -1223,23 +1259,23 @@ begin
   UpdateState := CheckBackgroundState;
   KL.Log('ProcessBackground Install case :[ idle  ]');
   case UpdateState of
-    idle:
+    usIdle:
       begin
       // Do Nothing
       KL.Log('ProcessBackground Install case :[ idle  ]');
       end;
-    check:
+    usCheck:
       begin
         KL.Log('ProcessBackground Install case :[ check  ]');
         CheckResult := CheckForUpdates;
         if CheckResult = oucUpdatesAvailable then
         begin
-          SetBackgroundState(download);
+          SetBackgroundState(usDownload);
           // We can transition straight to download
           DownloadResult := DownloadUpdatesBackground;
           if DownloadResult then
             begin
-              SetBackgroundState(pending);
+              SetBackgroundState(usPending);
               // request install
               if IsKeymanRunning then
                 // can't install just set icon
@@ -1247,20 +1283,20 @@ begin
               else
                // start installing "handleInstall"
                begin
-                SetBackgroundState(installing);
+                SetBackgroundState(usInstalling);
                 if not BackgroundInstall then
                 // TODO // if BackgroundInstall fails then exit and handle event
                 // back to pending ( 3 times ) then after that set reovery.
                 begin
-                  SetBackgroundState(pending);
+                  SetBackgroundState(usPending);
                 end;
                end;
             end;
         end
         else
-          SetBackgroundState(idle);
+          SetBackgroundState(usIdle);
       end;
-    download:
+    usDownload:
     begin
       KL.Log('ProcessBackground Install case :[ download  ]');
       // if we have entered the state from ProcessBackground we need to
@@ -1269,27 +1305,27 @@ begin
       CheckResult := CheckForUpdates;
         if CheckResult = oucUpdatesAvailable then
         begin
-          SetBackgroundState(download);
+          SetBackgroundState(usDownload);
           // We can transition straight to download
           DownloadUpdatesBackground;
         end
         else
-          SetBackgroundState(idle);
+          SetBackgroundState(usIdle);
       // TODO
     end;
 
-    pending:
+    usPending:
     begin
       KL.Log('ProcessBackground Install case :[ pending  ]');
       // TODO  Need BackgroundInstall to return a result so we can go
       // back to idle (abort) and log the error.
 
-      SetBackgroundState(installing);
+      SetBackgroundState(usInstalling);
       if not BackgroundInstall then
       // TODO // if BackgroundInstall fails then exit and handle event
       // back to pending ( 3 times ) then after that set reovery.
       begin
-        SetBackgroundState(pending);
+        SetBackgroundState(usPending);
       end;
 
       // if BackgroundInstall fails then exit and handle event
@@ -1303,13 +1339,13 @@ begin
       // will using the msi mean this doesn't work?
 
     end;
-    installing:
+    usInstalling:
     begin
       KL.Log('ProcessBackground Install case :[ installing ]');
       // TODO if we are in state installing we shouldn't be here either
       // So exit and let the msi installer continue.
     end;
-    postinstall:
+    usPostinstall:
     begin
       KL.Log('ProcessBackground Install case :[ postinstall ]');
       // TODO Remove cached files. Do any loging updating of files etc and then set back to idle
@@ -1323,7 +1359,7 @@ begin
       end;
       // Also remove old versioned dlls if necessary. Initial tests indicate the Microsoft Installer
       // well do this.
-      SetBackgroundState(idle);
+      SetBackgroundState(usIdle);
     end;
 
   end;
@@ -1344,21 +1380,21 @@ begin
 // check the registry value
   UpdateState := CheckBackgroundState;
   case UpdateState of
-    idle:
+    usIdle:
       begin
       // Do Nothing
       end;
-    check, download:  // as the moment check and download are basically the same state
+    usCheck, usDownload:  // as the moment check and download are basically the same state
       begin
         CheckResult := CheckForUpdates;
         if CheckResult = oucUpdatesAvailable then
         begin
-          SetBackgroundState(download);
+          SetBackgroundState(usDownload);
           // We can transition straight to download
           DownloadResult := DownloadUpdatesBackground;
           if DownloadResult then
             begin
-              SetBackgroundState(pending);
+              SetBackgroundState(usPending);
               // request install
               if IsKeymanRunning then
                 // can't install just set icon
@@ -1366,33 +1402,33 @@ begin
               else
                // start installing "handleInstall"
                begin
-                SetBackgroundState(installing);
+                SetBackgroundState(usInstalling);
                 if not BackgroundInstall then
                 // TODO // if BackgroundInstall fails then exit and handle event
                 // back to pending ( 3 times ) then after that set reovery.
                 begin
-                  SetBackgroundState(pending);
+                  SetBackgroundState(usPending);
                 end;
                end;
             end;
         end
         else
-          SetBackgroundState(idle);
+          SetBackgroundState(usIdle);
         // TODO look at eb suggestion to invert the IF logic if CheckResult != oucUpdatesAvailable then
         //SetBackgroundState(idle);
-else
-  ...
+        //else
+        // ...
       end;
 
-    pending:
+    usPending:
     begin
     end;
-    installing:
+    usInstalling:
     begin
       // TODO if we are in state installing we shouldn't be here either
       // So exit and let the msi installer continue.
     end;
-    postinstall:
+    usPostinstall:
     begin
 
     end;

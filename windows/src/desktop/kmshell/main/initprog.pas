@@ -261,7 +261,7 @@ begin
       else if s = '-h'   then FMode := fmHelp
       else if s = '-t'   then FMode := fmTextEditor
       else if s = '-ouc' then FMode := fmOnlineUpdateCheck
-      else if s = '-buc' then FMode := fmBackgroundUpdateCheck
+      else if s = '-buc' then FMode := fmBackgroundUpdateCheck   // may end up not using
       else if s = '-basekeyboard' then FMode := fmBaseKeyboard   // I4169
       else if s = '-nowelcome'   then FNoWelcome := True
       else if s = '-kw' then FMode := fmKeyboardWelcome  // I2569
@@ -447,7 +447,6 @@ begin
     with TOnlineUpdateCheck.Create(nil, True, True) do
     try
       ProcessBackgroundInstall
-
     finally
       Free;
     end;
