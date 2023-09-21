@@ -86,7 +86,7 @@ function run_tests() {
   #shellcheck disable=SC2086
   "${G_TEST_BUILDDIR:-../../build/$(arch)/${CONFIG}/tests}/ibus-keyman-tests" ${ARG_K-} ${ARG_TAP-} \
     ${ARG_VERBOSE-} ${ARG_DEBUG-} ${ARG_SURROUNDING_TEXT-} ${ARG_NO_SURROUNDING_TEXT-} \
-    --directory "$TESTDIR" --"${DISPLAY_SERVER}" ${TESTFILES[@]}
+    --directory "$TESTDIR" "${DISPLAY_SERVER}" ${TESTFILES[@]}
   echo "# Finished tests."
 
   cleanup "$PID_FILE"
@@ -136,9 +136,9 @@ echo > "$PID_FILE"
 trap local_cleanup EXIT SIGINT
 
 if [ "$USE_WAYLAND" == "1" ]; then
-  ( run_tests wayland "$@" )
+  run_tests --wayland "$@"
 fi
 
 if [ "$USE_X11" == "1" ]; then
-  ( run_tests x11 "$@" )
+  run_tests --x11 "$@"
 fi
