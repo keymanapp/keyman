@@ -20,6 +20,7 @@ builder_describe \
   "install                   install artifacts" \
   "uninstall                 uninstall artifacts" \
   "@/core:arch" \
+  "@../keyman-system-service:service" \
   "--no-integration          don't run integration tests" \
   "--report                  create coverage report" \
   "--coverage                capture test coverage"
