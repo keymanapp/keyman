@@ -5,7 +5,6 @@
 
 import { Command } from 'commander';
 import { declareBuild } from './commands/build.js';
-import { declareBuildTestData } from './commands/buildTestData.js';
 import { declareAnalyze } from './commands/analyze.js';
 import { BaseOptions } from './util/baseOptions.js';
 import { KeymanSentry } from './util/KeymanSentry.js';
@@ -34,7 +33,6 @@ async function run() {
   }
 
   declareBuild(program);
-  declareBuildTestData(program);  // TODO: consider renaming this (build vs build-test-data is confusing)
   declareAnalyze(program);
 
   /* Future commands:

@@ -9,6 +9,8 @@ import { CompilerFileCallbacks, CompilerOptions, KeymanFileTypes } from '@keyman
 import { BaseOptions } from '../util/baseOptions.js';
 import { expandFileLists } from '../util/fileLists.js';
 import { isProject } from '../util/projectLoader.js';
+import { buildTestData } from './buildTestData/index.js';
+import { buildWindowsPackageInstaller } from './buildWindowsPackageInstaller/index.js';
 
 
 function commandOptionsToCompilerOptions(options: any): CompilerOptions {
@@ -30,7 +32,7 @@ function commandOptionsToCompilerOptions(options: any): CompilerOptions {
 }
 
 export function declareBuild(program: Command) {
-  BaseOptions.addAll(program
+  const command = BaseOptions.addAll(program
     .command('build [infile...]')
     .description(`Compile one or more source files or projects.`)
     .addHelpText('after', `
@@ -74,6 +76,23 @@ If no input file is supplied, kmc will build the current folder.`)
         }
       }
     });
+
+  command
+    .command('ldml-test-data')
+    .description('Convert LDML keyboard test .xml to .json')
+    .action(buildTestData);
+
+  command
+    .command('windows-package-installer <infile>')
+    .description('Build an executable installer for Windows for a Keyman package')
+    .option('--msi <msiFilename>', 'Location of keymandesktop.msi')
+    .option('--exe <exeFilename>', 'Location of setup.exe')
+    .option('--license <licenseFilename>', 'Location of license.txt')
+    .option('--title-image [titleImageFilename]', 'Location of title image')
+    .option('--app-name [applicationName]', 'Installer property: name of the application to be installed', 'Keyman')
+    .option('--start-disabled', 'Installer property: do not enable keyboards after installation completes')
+    .option('--start-with-configuration', 'Installer property: start Keyman Configuration after installation completes')
+    .action(buildWindowsPackageInstaller);
 }
 
 async function build(filename: string, parentCallbacks: NodeCompilerCallbacks, options: CompilerOptions): Promise<boolean> {

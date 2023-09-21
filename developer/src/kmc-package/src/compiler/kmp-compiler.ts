@@ -22,8 +22,13 @@ export class KmpCompiler {
   }
 
   public transformKpsToKmpObject(kpsFilename: string): KmpJsonFile.KmpJsonFile {
+    const kps = this.loadKpsFile(kpsFilename);
+    return this.transformKpsFileToKmpObject(kpsFilename, kps);
+  }
+
+  public loadKpsFile(kpsFilename: string): KpsFile.KpsFile {
     // Load the KPS data from XML as JS structured data.
-    const buffer = this.callbacks.loadFile(kpsFilename);
+    const buffer = this.callbacks.loadFile(kpsFilename, false);
     if(!buffer) {
       this.callbacks.reportMessage(CompilerMessages.Error_FileDoesNotExist({filename: kpsFilename}));
       return null;
@@ -41,7 +46,11 @@ export class KmpCompiler {
         return a;
     })();
 
-    let kps: KpsFile.KpsFile = kpsPackage.package;
+    const kps: KpsFile.KpsFile = kpsPackage.package;
+    return kps;
+  }
+
+  public transformKpsFileToKmpObject(kpsFilename: string, kps: KpsFile.KpsFile): KmpJsonFile.KmpJsonFile {
 
     //
     // To convert to kmp.json, we need to:
