@@ -65,8 +65,6 @@ int split_US_To_3D_Vector(v_dw_3D &all_US, v_str_1D completeList);
 // replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 15 )
 int replace_PosKey_with_Keycode(std::string in);
 
-// append characters using VectorFile (Data for Other Language on [1][ ][ ]  )
-int append_other_ToVector(v_dw_3D &All_Vector) ;
 
 // create an empty 2D vector containing "--" in all fields
 v_dw_2D create_empty_2D(int dim_rows, int dim_shifts);

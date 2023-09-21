@@ -23,6 +23,7 @@
 #define MCOMPILE_H
 #include <vector>
 #include "keymap.h"
+#include "helpers.h"
 
 #include "mc_kmxfile.h"
 

@@ -11,6 +11,7 @@ libxklavier = dependency('libxklavier')
 deps = [gtk, x11, xkb,libxklavier]
 
 cpp_files = files(
+    'helpers.cpp',
     'keymap.cpp',
     'mcompile.cpp',
     'filesystem.cpp',

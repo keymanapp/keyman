@@ -35,7 +35,12 @@ mcompile -d runs 4 important steps:
 
 */
 
-// REMEMBER in this VM only runing  with meson compile is possible  NOT with F5 !!!
+// REMEMBER in this VM now debugs with meson compile AND with F5 !!! ( because launch.json has configuration: "Debug with Meson")
+// To debug with VSC (F5):
+// cd to:                   /Projects/keyman/keyman/linux/mcompile/keymap/build_mcompile
+// run :                    meson compile  ( executable is created - TODO after each change !)
+// cursor in mcompile.cpp:  F5
+
 // in /Projects/keyman/keyman/linux/mcompile/keymap/build_mcompile
 // run with:
 //./mcompile -d in.kmx bla.dll 0407 out.kmx
@@ -86,6 +91,7 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
   }
 
  wprintf(L"##### started run\n");
+ test_helpers();
 
     if(argc < 3 || (argc < 5 && u16cmp(argv[1], u"-u") != 0)) {   // I4273// I4273
      wprintf(
@@ -293,18 +299,6 @@ int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
 }
 #endif
 
-int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector){
-  // here we copy all contents of the FILE ( US and other already available in the file) to All_Vector
-  //wprintf(L"   +++++++ dimensions of Vector in createOneVectorFromBothKeyboards 2 \t\t\t\t\t\t %li..%li..%li\n", All_Vector.size(), All_Vector.size(),All_Vector.size());
-
-  // add contents of file to All_Vector
-  if( append_other_ToVector(All_Vector)) {
-    wprintf(L"ERROR: can't append Other ToVector \n");
-    return 2;
-  }
-  //wprintf(L"   +++++++ dimensions of Vector in createOneVectorFromBothKeyboards 3 \t\t\t\t\t\t %li..%li..%li\n", All_Vector.size(), All_Vector[0].size(),All_Vector[0][0].size());
-  return 0;
-}
 
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]) {
 
