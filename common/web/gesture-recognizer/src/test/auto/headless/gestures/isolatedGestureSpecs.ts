@@ -25,6 +25,7 @@ export const LongpressModel: GestureModel = {
   resolutionAction: {
     type: 'chain',
     next: 'subkey-select',
+    selectionMode: 'none',
     item: 'none'
   },
   /*

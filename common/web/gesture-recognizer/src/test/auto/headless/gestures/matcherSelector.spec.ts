@@ -67,7 +67,7 @@ describe("MatcherSelector", function () {
 
         const selection = await selectionPromises[0];
 
-        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: null, next: 'subkey-select'}});
+        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: null, selectionMode: 'none', next: 'subkey-select'}});
         assert.deepEqual(selection.matcher.model, LongpressModel);
         assert.isFalse(sources[0].path.isComplete);
 
@@ -104,7 +104,7 @@ describe("MatcherSelector", function () {
 
         const selection = await selectionPromises[0];
 
-        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: null, next: 'subkey-select'}});
+        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: null, selectionMode: 'none', next: 'subkey-select'}});
         assert.deepEqual(selection.matcher.model, LongpressModel);
         assert.isFalse(sources[0].path.isComplete);
 
@@ -199,7 +199,7 @@ describe("MatcherSelector", function () {
         assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
 
         const selection = await selectionPromises[0];
-        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: null, next: 'subkey-select'}});
+        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: null, selectionMode: 'none', next: 'subkey-select'}});
         assert.deepEqual(selection.matcher.model, LongpressModel);
 
         // Original base item was 'a'; 'b' proves that a reset occurred by the point of the 'item' change.
@@ -257,7 +257,7 @@ describe("MatcherSelector", function () {
         assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
 
         const selection = await selectionPromises[0];
-        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: null, next: 'subkey-select'}});
+        assert.deepEqual(selection.result, {matched: true, action: { type: 'chain', item: null, selectionMode: 'none', next: 'subkey-select'}});
         assert.deepEqual(selection.matcher.model, LongpressModel);
 
         // Original base item was 'a'; 'b' proves that a reset occurred by the point of the 'item' change.

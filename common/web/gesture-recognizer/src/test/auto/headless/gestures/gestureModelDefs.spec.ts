@@ -23,7 +23,9 @@ const TestGestureModelDefinitions: GestureModelDefs<string> = {
   sets: {
     default: [LongpressModel.id, SimpleTapModel.id, /* TODO: add a 'starting modipress' model */],
     // TODO:  modipress: [LongpressModel.id, SimpleTapModel.id], // no nested modipressing
-    malformed: [LongpressModel.id, 'unavailable-model']
+    malformed: [LongpressModel.id, 'unavailable-model'],
+    // For subkey-select mode - no new gestures should be allowed to start.
+    none: []
   }
 }
 

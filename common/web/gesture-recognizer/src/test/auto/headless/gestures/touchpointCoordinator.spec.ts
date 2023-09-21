@@ -34,6 +34,7 @@ const TestGestureModelDefinitions: GestureModelDefs<string> = {
   sets: {
     default: [LongpressModel.id, SimpleTapModel.id, /* TODO: add a 'starting modipress' model */],
     // TODO:  modipress: [LongpressModel.id, SimpleTapModel.id], // no nested modipressing
+    none: []
   }
 }
 
@@ -125,6 +126,101 @@ describe("TouchpointCoordinator", () => {
     assert.isEmpty(touchpointCoordinator.activeGestures);
   });
 
+  it('longpress -> attempted simple-tap during subkey select', async () => {
+    const turtle1 = new TouchpathTurtle({
+      targetX: 1,
+      targetY: 1,
+      t: 100,
+      item: 'a'
+    });
+    turtle1.wait(1000, 50);
+    turtle1.move(0, 10, 100, 5);
+    turtle1.hoveredItem = 'à';
+    turtle1.move(90, 10, 100, 5);
+    turtle1.hoveredItem = 'â';
+    turtle1.commitPending();
+
+    const turtle2 = new TouchpathTurtle({
+      targetX: 101,
+      targetY: 101,
+      t: 700,
+      item: 'b'
+    });
+    turtle2.wait(40, 2);
+    turtle2.commitPending();
+
+    const emulationEngine = new HeadlessInputEngine();
+    const touchpointCoordinator = new TouchpointCoordinator(TestGestureModelDefinitions, [emulationEngine]);
+    const completionPromise = emulationEngine.playbackRecording({
+      inputs: [ {
+        path: {
+          coords: turtle1.path,
+        },
+        isFromTouch: true
+      }, {
+        path: {
+          coords: turtle2.path,
+        },
+        isFromTouch: true
+      }],
+      config: null
+    });
+
+    const sequenceAssertions: SequenceAssertion<string>[] = [
+      [
+        {
+          matchedId: 'longpress',
+          item: null,
+          linkType: 'chain',
+          sources: (sources) => {
+            // Assert single-source
+            assert.equal(sources.length, 1);
+
+            // Assert wait appropriate to the longpress threshold.  Likely won't be the full 1000 ms.
+            const pathStats = sources[0].path.stats;
+            assert.isAtLeast(pathStats.duration, LongpressModel.contacts[0].model.timer.duration - 1);
+            assert.isAtMost(pathStats.rawDistance, 0.1);
+            return;
+          }
+        },
+        {
+          matchedId: 'subkey-select',
+          item: 'â',
+          linkType: 'complete',
+          sources: (sources) => {
+            const pathStats = sources[0].path.stats;
+            assert.isAtLeast(pathStats.rawDistance, 19.9);
+            assert.isAtLeast(pathStats.duration, 1200 - LongpressModel.contacts[0].model.timer.duration - 2);
+          }
+        }
+      ],
+      [ /* there should be no simple-tap here - it should be blocked. */]
+    ];
+
+    const sequencePromise = new ManagedPromise<void>();
+    const sequenceAssertionPromise = new ManagedPromise<void>();
+    let sequenceIndex = 0;
+    touchpointCoordinator.on('recognizedgesture', async (sequence) => {
+      try {
+        sequencePromise.resolve();
+        await assertGestureSequence(sequence, completionPromise, sequenceAssertions[sequenceIndex++]);
+        sequenceAssertionPromise.resolve();
+      } catch(err) {
+        sequenceAssertionPromise.reject(err);
+      }
+    });
+
+    const runnerPromise = fakeClock.runToLastAsync();
+
+    await sequencePromise.corePromise;
+    assert.isNotEmpty(touchpointCoordinator.activeGestures);
+
+    await runnerPromise;
+
+    await sequenceAssertionPromise.corePromise;
+    assert.isEmpty(touchpointCoordinator.activeGestures);
+  });
+
   it('a single, standalone simple tap', async () => {
     const turtle = new TouchpathTurtle({
       targetX: 1,
@@ -156,7 +252,7 @@ describe("TouchpointCoordinator", () => {
       {
         matchedId: 'simple-tap',
         item: 'a',
-        linkType: 'optional-chain',
+        linkType: 'chain',
         sources: (sources) => {
           assert.equal(sources.length, 1);
           assert.isTrue(sources[0].isPathComplete);
@@ -245,42 +341,46 @@ describe("TouchpointCoordinator", () => {
      * Obviously having a separate, second sequence would be 'nice', conceptually, for consumers...
      * but I don't think it's worth prioritizing at the moment; got enough else to deal with for now.
      */
-    const sequenceAssertion: SequenceAssertion<string> = [
-      {
-        matchedId: 'simple-tap',
-        item: 'a',
-        linkType: 'optional-chain',
-        sources: (sources) => {
-          // Assert dual-source; the first tap was early-triggered because of the concurrent second tap.
-          assert.equal(sources.length, 2);
-          assert.isTrue(sources[0].isPathComplete);
-          assert.isFalse(sources[1].isPathComplete);
+    const sequenceAssertions: SequenceAssertion<string>[] = [
+      [
+        {
+          matchedId: 'simple-tap',
+          item: 'a',
+          linkType: 'chain',
+          sources: (sources) => {
+            // Assert dual-source; the first tap was early-triggered because of the concurrent second tap.
+            assert.equal(sources.length, 1);
+            assert.isTrue(sources[0].isPathComplete);
 
-          // Assert wait appropriate to the longpress threshold.  Likely won't be the full 1000 ms.
-          const pathStats = sources[0].path.stats;
-          assert.isAtMost(pathStats.duration, 21);
-          return;
+            // Assert wait appropriate to the longpress threshold.  Likely won't be the full 1000 ms.
+            const pathStats = sources[0].path.stats;
+            assert.isAtMost(pathStats.duration, 21);
+            return;
+          }
         }
-      },
-      {
-        matchedId: 'simple-tap',
-        item: 'b',
-        linkType: 'optional-chain',
-        sources: (sources) => {
-          // Assert single-source; the first tap is not under consideration for this stage.
-          assert.equal(sources.length, 1);
-          const pathStats = sources[0].path.stats;
-          assert.isAtMost(pathStats.duration, 40);
+      ], [
+        {
+          matchedId: 'simple-tap',
+          item: 'b',
+          linkType: 'chain',
+          sources: (sources) => {
+            // Assert single-source; the first tap is not under consideration for this stage.
+            assert.equal(sources.length, 1);
+            assert.isTrue(sources[0].isPathComplete);
+            const pathStats = sources[0].path.stats;
+            assert.isAtMost(pathStats.duration, 40);
+          }
         }
-      }
+      ]
     ];
 
     const sequencePromise = new ManagedPromise<void>();
     const sequenceAssertionPromise = new ManagedPromise<void>();
+    let sequenceIndex = 0;
     touchpointCoordinator.on('recognizedgesture', async (sequence) => {
       try {
         sequencePromise.resolve();
-        await assertGestureSequence(sequence, completionPromise, sequenceAssertion);
+        await assertGestureSequence(sequence, completionPromise, sequenceAssertions[sequenceIndex++]);
         sequenceAssertionPromise.resolve();
       } catch(err) {
         sequenceAssertionPromise.reject(err);
@@ -344,7 +444,7 @@ describe("TouchpointCoordinator", () => {
         {
           matchedId: 'simple-tap',
           item: 'a',
-          linkType: 'optional-chain',
+          linkType: 'chain',
           sources: (sources) => {
             assert.equal(sources.length, 1);
             assert.isTrue(sources[0].isPathComplete);
@@ -358,7 +458,7 @@ describe("TouchpointCoordinator", () => {
         {
           matchedId: 'simple-tap',
           item: 'b',
-          linkType: 'optional-chain',
+          linkType: 'chain',
           sources: (sources) => {
             assert.equal(sources.length, 1);
             assert.isTrue(sources[0].isPathComplete);
@@ -448,7 +548,7 @@ describe("TouchpointCoordinator", () => {
         {
           matchedId: 'simple-tap',
           item: 'a',
-          linkType: 'optional-chain',
+          linkType: 'chain',
           sources: (sources) => {
             assert.equal(sources.length, 1);
             assert.isTrue(sources[0].isPathComplete);
@@ -462,7 +562,7 @@ describe("TouchpointCoordinator", () => {
         {
           matchedId: 'simple-tap',
           item: 'a',
-          linkType: 'optional-chain',
+          linkType: 'chain',
           sources: (sources) => {
             assert.equal(sources.length, 1);
             assert.isTrue(sources[0].isPathComplete);
@@ -546,7 +646,7 @@ describe("TouchpointCoordinator", () => {
         {
           matchedId: 'simple-tap',
           item: 'a',
-          linkType: 'optional-chain',
+          linkType: 'chain',
           sources: (sources) => {
             assert.equal(sources.length, 1);
             assert.isTrue(sources[0].isPathComplete);
@@ -653,7 +753,7 @@ describe("TouchpointCoordinator", () => {
       {
         matchedId: 'simple-tap',
         item: 'a',
-        linkType: 'optional-chain',
+        linkType: 'chain',
         sources: (sources) => {
           assert.equal(sources.length, 1);
           assert.isTrue(sources[0].isPathComplete);
@@ -663,7 +763,7 @@ describe("TouchpointCoordinator", () => {
       {
         matchedId: 'multitap',
         item: 'a',
-        linkType: 'optional-chain',
+        linkType: 'chain',
         sources: (sources) => {
           // Assert single-source; the first tap is not under consideration for this stage.
           assert.equal(sources.length, 1);

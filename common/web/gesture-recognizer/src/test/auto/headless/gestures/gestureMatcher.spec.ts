@@ -335,7 +335,7 @@ describe("GestureMatcher", function() {
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
       assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
 
-      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'chain', item: null, next: 'subkey-select'}});
+      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'chain', item: null, selectionMode: 'none', next: 'subkey-select'}});
       assert.isFalse(sources[0].path.isComplete);
 
       // Did we resolve at the expected point in the path - once the timer duration had passed?
