@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.178 alpha 2023-09-21
+
+* fix(linux): Correctly open files linked from help page (#9601)
+* chore(linux): Fix bugs, add dependency and update documentation (#9602)
+
 ## 17.0.177 alpha 2023-09-20
 
 * chore(linux): Add coverage action to `ibus-keyman/build.sh` (#9583)
