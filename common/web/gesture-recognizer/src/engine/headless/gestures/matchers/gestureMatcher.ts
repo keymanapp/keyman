@@ -31,7 +31,13 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
   private readonly pathMatchers: PathMatcher<Type>[];
 
   public get sources(): GestureSource<Type>[] {
-    return this.pathMatchers.map((pathMatch) => pathMatch.source);
+    return this.pathMatchers.map((pathMatch, index) => {
+      if(this.model.contacts[index].resetOnResolve) {
+        return undefined;
+      } else {
+        return pathMatch.source;
+      }
+    }).filter((entry) => !!entry);
   }
 
   private readonly predecessor?: PredecessorMatch<Type>;
@@ -258,7 +264,8 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
    * 'all'... but that'd take a little extra work.
    */
   public get allSourceIds(): string[] {
-    let currentIds = this.pathMatchers.map((entry) => entry.source.identifier);
+    // Do not include any to-be-reset (thus, excluded) sources here.
+    let currentIds = this.sources.map((entry) => entry.identifier);
     const predecessorIds = this.predecessor ? this.predecessor.allSourceIds : [];
 
     // Each ID should only be listed once, regardless of source.

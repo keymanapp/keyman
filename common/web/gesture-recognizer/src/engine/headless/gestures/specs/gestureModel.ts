@@ -103,7 +103,21 @@ export interface GestureModel<Type> {
   // ordinal position.  (Same order as in the TrackedInput)
   readonly contacts: {
     model: ContactModel<Type>,
+    /**
+     * Indicates that the corresponding GestureSource should not be considered part of the
+     * Gesture sequence being matched, acting more as a separate gesture that 'triggers' a state
+     * change in the current gesture being processed.
+     */
+    resetOnResolve?: boolean,
+    /**
+     * Indicates that the corresponding GestureSource should be terminated whenever this GestureModel
+     * is successfully matched.
+     */
     endOnResolve?: boolean,
+    /**
+     * Indicates that the corresponding GestureSource should be terminated whenever this GestureModel
+     * _fails_ to match.
+     */
     endOnReject?: boolean
   }[];
 

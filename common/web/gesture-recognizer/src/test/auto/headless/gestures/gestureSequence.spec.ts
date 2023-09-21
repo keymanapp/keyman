@@ -58,12 +58,12 @@ describe("modelSetForAction", function() {
 
   it('successful simple-tap or multi-tap', () => {
     const nextModels = modelSetForAction({
-      type: 'optional-chain',
+      type: 'chain',
       item: 'a',
-      allowNext: 'multitap'
+      next: 'multitap'
     }, TestGestureModelDefinitions, 'default');
 
-    assert.sameMembers(nextModels, [SimpleTapModel, MultitapModel, LongpressModel]);
+    assert.sameMembers(nextModels, [MultitapModel]);
   });
 
   it('successful subkey-select', () => {
@@ -246,6 +246,9 @@ describe("GestureSequence", function() {
     // GestureSequence for these tests.  (Later starts fall within the domain of MatcherSelector.)
   });
 
+  // Note:  cannot do longpress-blocking of secondary gestures here, since that requires TouchpointCoordinator
+  // integration.
+
   it('a single, standalone simple tap', async () => {
     const turtle = new TouchpathTurtle({
       targetX: 1,
@@ -277,7 +280,7 @@ describe("GestureSequence", function() {
       {
         matchedId: 'simple-tap',
         item: 'a',
-        linkType: 'optional-chain',
+        linkType: 'chain',
         sources: (sources) => {
           assert.equal(sources.length, 1);
           assert.isTrue(sources[0].isPathComplete);
@@ -333,50 +336,45 @@ describe("GestureSequence", function() {
       await promise;
     });
 
-    /* The fact that the two simple-taps are treated as part of the same sequence, rather than distinct ones,
-     * is a consequence of the existing gesture-modeling infrastructure.  The second tap is what triggers
-     * "early completion" of the first tap, thus it's considered part of the same sequence at present.
-     *
-     * Rough notes toward potential mitigation / fix in the future:
-     * // - could be mitigated with a special 'flag' on the gesture-model, perhaps?
-     * //   - something to indicate "early-termination second-touchpoint should mark a sequence split-point"
-     * // - the GestureSequence class/instance does have a reference to TouchpointCoordinator; it should
-     * //     be able to use that reference to facilitate a split if/when appropriate, like here.
-     *
-     * Obviously having a separate, second sequence would be 'nice', conceptually, for consumers...
-     * but I don't think it's worth prioritizing at the moment; got enough else to deal with for now.
-     */
-    const sequenceAssertion: SequenceAssertion<string> = [
-      {
-        matchedId: 'simple-tap',
-        item: 'a',
-        linkType: 'optional-chain',
-        sources: (sources) => {
-          // Assert dual-source; the first tap was early-triggered because of the concurrent second tap.
-          assert.equal(sources.length, 2);
-          assert.isTrue(sources[0].isPathComplete);
-          assert.isFalse(sources[1].isPathComplete);
+    // The two will be treated as separate sequences.
+    const sequenceAssertions: SequenceAssertion<string>[] = [
+      [
+        {
+          matchedId: 'simple-tap',
+          item: 'a',
+          linkType: 'chain',
+          sources: (sources) => {
+            // Assert dual-source; the first tap was early-triggered because of the concurrent second tap.
+            assert.equal(sources.length, 1);
+            assert.isTrue(sources[0].isPathComplete);
+            // assert.isFalse(sources[1].isPathComplete);
 
-          // Assert wait appropriate to the longpress threshold.  Likely won't be the full 1000 ms.
-          const pathStats = sources[0].path.stats;
-          assert.isAtMost(pathStats.duration, 21);
-          return;
+            // Assert wait appropriate to the longpress threshold.  Likely won't be the full 1000 ms.
+            const pathStats = sources[0].path.stats;
+            assert.isAtMost(pathStats.duration, 21);
+            return;
+          }
         }
-      },
-      {
-        matchedId: 'simple-tap',
-        item: 'b',
-        linkType: 'optional-chain',
-        sources: (sources) => {
-          // Assert single-source; the first tap is not under consideration for this stage.
-          assert.equal(sources.length, 1);
-          const pathStats = sources[0].path.stats;
-          assert.isAtMost(pathStats.duration, 40);
+      ], [
+        {
+          // OK... this one's not happening because it's not an allowed 'next' followup.  Riiiight.
+          // Need a way for this to 'fall back' and not be included... might be best to move forward with
+          // that 'make it a separate sequence' idea given the spec shift.
+          matchedId: 'simple-tap',
+          item: 'b',
+          linkType: 'chain',
+          sources: (sources) => {
+            // Assert single-source; the first tap is not under consideration for this stage.
+            assert.equal(sources.length, 1);
+            assert.isTrue(sources[0].isPathComplete);
+            const pathStats = sources[0].path.stats;
+            assert.isAtMost(pathStats.duration, 40);
+          }
         }
-      }
+      ]
     ];
 
-    await sequenceEmulationAndAssertion(emulationEngine, completionPromise, [sequenceAssertion]);
+    await sequenceEmulationAndAssertion(emulationEngine, completionPromise, sequenceAssertions);
   });
 
   it('2 consecutive simple taps', async () => {
@@ -419,7 +417,7 @@ describe("GestureSequence", function() {
         {
           matchedId: 'simple-tap',
           item: 'a',
-          linkType: 'optional-chain',
+          linkType: 'chain',
           sources: (sources) => {
             assert.equal(sources.length, 1);
             assert.isTrue(sources[0].isPathComplete);
@@ -433,7 +431,7 @@ describe("GestureSequence", function() {
         {
           matchedId: 'simple-tap',
           item: 'b',
-          linkType: 'optional-chain',
+          linkType: 'chain',
           sources: (sources) => {
             assert.equal(sources.length, 1);
             assert.isTrue(sources[0].isPathComplete);
@@ -486,7 +484,7 @@ describe("GestureSequence", function() {
         {
           matchedId: 'simple-tap',
           item: 'a',
-          linkType: 'optional-chain',
+          linkType: 'chain',
           sources: (sources) => {
             assert.equal(sources.length, 1);
             assert.isTrue(sources[0].isPathComplete);
@@ -567,7 +565,7 @@ describe("GestureSequence", function() {
       {
         matchedId: 'simple-tap',
         item: 'a',
-        linkType: 'optional-chain',
+        linkType: 'chain',
         sources: (sources) => {
           assert.equal(sources.length, 1);
           assert.isTrue(sources[0].isPathComplete);
@@ -577,7 +575,7 @@ describe("GestureSequence", function() {
       {
         matchedId: 'multitap',
         item: 'a',
-        linkType: 'optional-chain',
+        linkType: 'chain',
         sources: (sources) => {
           // Assert single-source; the first tap is not under consideration for this stage.
           assert.equal(sources.length, 1);
