@@ -11,12 +11,14 @@
         "display": {
           "type": "string"
         },
+        "id": {
+          "type": "string"
+        },
         "to": {
           "type": "string"
         }
       },
       "required": [
-        "to",
         "display"
       ],
       "type": "object"

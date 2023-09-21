@@ -35,12 +35,23 @@ export class VarsCompiler extends SectionCompiler {
   public validate(): boolean {
     let valid = true;
 
+    valid = this.validateVars() && valid; // accumulate validity
+    valid = this.validateMarkers() && valid; // accumulate validity
+
+    return valid;
+  }
+
+  private validateVars(): boolean {
+    let valid = true;
+    const variables = this.keyboard?.variables;
+
+    if (!variables) {
+      return true; // nothing to check
+    }
+
     // Check for duplicate ids
     const allIds = new Set();
     const dups = new Set();
-    const variables = this.keyboard?.variables;
-
-    if (!variables) return valid;
 
     const allStrings = new Set();
     const allSets = new Set();
@@ -50,7 +61,7 @@ export class VarsCompiler extends SectionCompiler {
      * add an ID to check for duplicates
      * @param id id
      */
-    function addId(id : string) : void {
+    function addId(id: string): void {
       if (allIds.has(id)) {
         dups.add(id);
       } else {
@@ -59,19 +70,19 @@ export class VarsCompiler extends SectionCompiler {
     }
 
     // Strings
-    for (const {id, value} of variables?.string) {
+    for (const { id, value } of variables?.string) {
       addId(id);
       allStrings.add(id);
       const stringrefs = VariableParser.allStringReferences(value);
       for (const id2 of stringrefs) {
         if (!allStrings.has(id2)) {
           valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({id: id2}));
+          this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({ id: id2 }));
         }
       }
     }
     // Sets
-    for (const {id, value} of variables.set) {
+    for (const { id, value } of variables.set) {
       addId(id);
       allSets.add(id);
       // check for illegal references, here.
@@ -79,23 +90,23 @@ export class VarsCompiler extends SectionCompiler {
       for (const id2 of stringrefs) {
         if (!allStrings.has(id2)) {
           valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({id: id2}));
+          this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({ id: id2 }));
         }
       }
 
       // Now split into spaces.
-      const items : string[] = VariableParser.setSplitter(value);
+      const items: string[] = VariableParser.setSplitter(value);
       for (const item of items) {
         const setrefs = VariableParser.allSetReferences(item);
         if (setrefs.length > 1) {
           // this is the form $[seta]$[setb]
           valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_NeedSpacesBetweenSetVariables({item}));
+          this.callbacks.reportMessage(CompilerMessages.Error_NeedSpacesBetweenSetVariables({ item }));
         } else {
           for (const id2 of setrefs) {
             if (!allSets.has(id2)) {
               valid = false;
-              this.callbacks.reportMessage(CompilerMessages.Error_MissingSetVariable({id: id2}));
+              this.callbacks.reportMessage(CompilerMessages.Error_MissingSetVariable({ id: id2 }));
             }
           }
         }
@@ -103,14 +114,14 @@ export class VarsCompiler extends SectionCompiler {
       }
     }
     // UnicodeSets
-    for (const {id, value} of variables.unicodeSet) {
+    for (const { id, value } of variables.unicodeSet) {
       addId(id);
       allUnicodeSets.add(id);
       const stringrefs = VariableParser.allStringReferences(value);
       for (const id2 of stringrefs) {
         if (!allStrings.has(id2)) {
           valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({id: id2}));
+          this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({ id: id2 }));
         }
       }
       const setrefs = VariableParser.allSetReferences(value);
@@ -119,9 +130,9 @@ export class VarsCompiler extends SectionCompiler {
           valid = false;
           if (allSets.has(id2)) {
             // $[set] in a UnicodeSet must be another UnicodeSet.
-            this.callbacks.reportMessage(CompilerMessages.Error_CantReferenceSetFromUnicodeSet({id: id2}));
+            this.callbacks.reportMessage(CompilerMessages.Error_CantReferenceSetFromUnicodeSet({ id: id2 }));
           } else {
-            this.callbacks.reportMessage(CompilerMessages.Error_MissingUnicodeSetVariable({id: id2}));
+            this.callbacks.reportMessage(CompilerMessages.Error_MissingUnicodeSetVariable({ id: id2 }));
           }
         }
       }
@@ -134,9 +145,6 @@ export class VarsCompiler extends SectionCompiler {
       }));
       valid = false;
     }
-
-    valid = this.validateMarkers() && valid; // accumulate validity
-
     return valid;
   }
 
@@ -188,9 +196,7 @@ export class VarsCompiler extends SectionCompiler {
     const result =  new Vars();
 
     const variables = this.keyboard?.variables;
-    // we always have vars, it's depended on by other sections 
-    if (!variables) return result; // Empty vars, to simplify other sections
-
+    // we always have vars, it's depended on by other sections
     // we already know the variables do not conflict with each other
     // need to add these one by one, because they depend on each other.
     // we don't add these in completely 'natural' order because xml2js has already lost that.

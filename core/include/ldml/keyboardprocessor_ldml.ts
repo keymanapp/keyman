@@ -120,7 +120,7 @@ class Constants {
    /**
     *  Length of each entry in the 'disp' variable part
     */
-   readonly length_disp_item = 8;
+   readonly length_disp_item = 12;
 
   /* ------------------------------------------------------------------
     * elem section
@@ -622,11 +622,11 @@ class Constants {
   /** minimum usable marker index */
   readonly marker_min_index    = 0x0001;
   /** index value referring to the 'any' marker match */
-  readonly marker_any_index    = 0xFFFE;
+  readonly marker_any_index    = 0xD7FF;
   /** maximum marker index prior to the 'any' value */
   readonly marker_max_index    = this.marker_any_index - 1;
   /** maximum count of markers (not including 'any') */
-  readonly marker_max_count    = this.marker_max_index - this.marker_min_index;
+  readonly marker_max_count    = this.marker_max_index - this.marker_min_index + 1;
 
 };
 

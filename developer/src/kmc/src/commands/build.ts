@@ -4,7 +4,7 @@ import { Command } from 'commander';
 import { buildActivities } from './buildClasses/buildActivities.js';
 import { BuildProject } from './buildClasses/BuildProject.js';
 import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
-import { InfrastructureMessages } from '../messages/messages.js';
+import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import { CompilerFileCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
 import { BaseOptions } from '../util/baseOptions.js';
 import { expandFileLists } from '../util/fileLists.js';
@@ -80,13 +80,18 @@ If no input file is supplied, kmc will build the current folder.`)
 }
 
 async function build(filename: string, parentCallbacks: NodeCompilerCallbacks, options: CompilerOptions): Promise<boolean> {
-
-  if(!fs.existsSync(filename)) {
-    parentCallbacks.reportMessage(InfrastructureMessages.Error_FileDoesNotExist({filename}));
-    return false;
-  }
-
   try {
+    // TEST: allow command-line simulation of infrastructure fatal errors, and
+    // also for unit tests
+    if(process.env.SENTRY_CLIENT_TEST_BUILD_EXCEPTION == '1') {
+      throw new Error('Test exception from SENTRY_CLIENT_TEST_BUILD_EXCEPTION');
+    }
+
+    if(!fs.existsSync(filename)) {
+      parentCallbacks.reportMessage(InfrastructureMessages.Error_FileDoesNotExist({filename}));
+      return false;
+    }
+
     let builder = null;
 
     // If infile is a directory, then we treat that as a project and build it
@@ -136,3 +141,10 @@ async function build(filename: string, parentCallbacks: NodeCompilerCallbacks, o
     return false;
   }
 }
+
+/**
+ * these are exported only for unit tests, do not use
+ */
+export const unitTestEndpoints = {
+  build
+};

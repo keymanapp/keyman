@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import { CompilerCallbacks, CompilerFileCallbacks, CompilerOptions, KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanFileTypes } from '@keymanapp/common-types';
 import { BuildActivity } from './BuildActivity.js';
 import { buildActivities } from './buildActivities.js';
-import { InfrastructureMessages } from '../../messages/messages.js';
+import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { loadProject } from '../../util/projectLoader.js';
 
 export class BuildProject extends BuildActivity {

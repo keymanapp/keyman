@@ -25,7 +25,6 @@
 #include "ldml/keyboardprocessor_ldml.h"
 #include "ldml/ldml_processor.hpp"
 
-
 #include "path.hpp"
 #include "state.hpp"
 #include "utfcodec.hpp"
@@ -36,6 +35,7 @@
 #if defined(HAVE_ICU4C)
 // TODO-LDML: Needed this for some compiler warnings
 #define U_FALLTHROUGH
+#include "unicode/utypes.h"
 #include "unicode/uniset.h"
 #include "unicode/usetiter.h"
 #else
@@ -109,10 +109,16 @@ LdmlTestSource::parse_source_string(std::string const &s) {
     if (*p == '\\') {
       p++;
       km_kbp_usv v;
+      bool had_open_curly = false;
       assert(p != s.end());
       if (*p == 'u' || *p == 'U') {
         // Unicode value
         p++;
+        if (*p == '{') {
+          p++;
+          assert(p != s.end());
+          had_open_curly = true;
+        }
         size_t n;
         std::string s1 = s.substr(p - s.begin(), 8);
         v              = std::stoul(s1, &n, 16);
@@ -124,6 +130,12 @@ LdmlTestSource::parse_source_string(std::string const &s) {
         } else {
           t += km_kbp_cp(Uni_UTF32ToSurrogate1(v));
           t += km_kbp_cp(Uni_UTF32ToSurrogate2(v));
+        }
+        if (had_open_curly) {
+          p++;
+          // close what you opened
+          assert(*p == '}'); // close curly
+          assert(p != s.end());
         }
       } else if (*p == 'd') {
         // Deadkey
@@ -146,10 +158,16 @@ LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
     if (*p == '\\') {
       p++;
       km_kbp_usv v;
+      bool had_open_curly = false;
       assert(p != s.end());
       if (*p == 'u' || *p == 'U') {
         // Unicode value
         p++;
+        if (*p == '{') {
+          p++;
+          assert(p != s.end());
+          had_open_curly = true;
+        }
         size_t n;
         std::u16string s1 = s.substr(p - s.begin(), 8);
         // TODO-LDML: convert back first?
@@ -163,6 +181,12 @@ LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
         } else {
           t += km_kbp_cp(Uni_UTF32ToSurrogate1(v));
           t += km_kbp_cp(Uni_UTF32ToSurrogate2(v));
+        }
+        if (had_open_curly) {
+          p++;
+          // close what you opened
+          assert(*p == '}'); // close curly
+          assert(p != s.end());
         }
       } else if (*p == 'd') {
         // Deadkey
