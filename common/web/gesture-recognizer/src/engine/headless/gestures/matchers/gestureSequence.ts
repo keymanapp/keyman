@@ -217,14 +217,7 @@ export function modelSetForAction<Type>(
     case 'complete':
       return [];
     case 'replace':
-      let nextModels = [getGestureModel(gestureModelDefinitions, action.replace)];
-
-      // If the resolved gesture-model was a match, it also cleared out all other model-specs;
-      // we should restart them -- they're also allowed for an 'optional-chain'.
-      const defaultGestureSpecSet = getGestureModelSet(gestureModelDefinitions, activeSetId);
-      nextModels = nextModels.concat(defaultGestureSpecSet);
-
-      return nextModels;
+      return [getGestureModel(gestureModelDefinitions, action.replace)];
     case 'chain':
       return [getGestureModel(gestureModelDefinitions, action.next)];
     default:
