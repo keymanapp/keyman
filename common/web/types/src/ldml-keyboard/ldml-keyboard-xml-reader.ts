@@ -76,6 +76,12 @@ export class LDMLKeyboardXMLSourceFileReader {
         }
       }
     }
+    if(source?.keyboard3?.forms?.form) {
+      boxXmlArray(source?.keyboard3?.forms, 'form');
+      for(let form of source?.keyboard3?.forms?.form) {
+        boxXmlArray(form, 'scanCodes');
+      }
+    }
     if(source?.keyboard3?.keys?.flicks) {
       for(let flicks of source?.keyboard3?.keys?.flicks) {
         boxXmlArray(flicks, 'flick');

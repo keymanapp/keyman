@@ -121,6 +121,23 @@ describe('layr', function () {
       errors: [
         CompilerMessages.Error_MustBeAtLeastOneLayerElement(),
       ],
-    }
+    },
+    {
+      // warning on custom form
+      subpath: 'sections/layr/hint-custom-form.xml',
+      warnings: [
+        CompilerMessages.Hint_UnsupportedCustomForm({id: "us"}),
+      ],
+    },
+    {
+      // error on unknown form
+      subpath: 'sections/layr/error-custom-form.xml',
+      warnings: [
+        CompilerMessages.Hint_UnsupportedCustomForm({id: "zzz"}),
+      ],
+      errors: [CompilerMessages.Error_InvalidHardware({
+        form: 'zzz',
+      }),],
+    },
   ]);
 });

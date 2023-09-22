@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="und" conformsTo="techpreview">
+  <names>
+    <name value="layr-error-custom-form" />
+  </names>
+
+  <keys>
+    <key id="grave" to="`" />
+    <key id="one" to="1" />
+  </keys>
+  <forms>
+    <!-- warning, custom scancodes -->
+    <form id="zzz">
+      <scanCodes codes="01 02 03 04" />
+    </form>
+  </forms>
+  <layers form="zzz"> <!-- INVALID: 'zzz' is not a valid form. -->
+    <layer id="base">
+      <row keys="grave one" />
+    </layer>
+  </layers>
+</keyboard3>

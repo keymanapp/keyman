@@ -24,6 +24,7 @@ export interface LKKeyboard {
   names?: LKNames;
   settings?: LKSettings;
   keys?: LKKeys;
+  forms?: LKForms;
   displays?: LKDisplays;
   layers?: LKLayers[];
   vkeys?: LKVkeys;
@@ -192,6 +193,19 @@ export interface LKDisplay {
 export interface LKDisplays {
   display?: LKDisplay[];
   displayOptions?: LKDisplayOptions;
+};
+
+export interface LKForms {
+  form?: LKForm[];
+};
+
+export interface LKForm {
+  id?: string;
+  scanCodes?: LKScanCodes[];
+};
+
+export interface LKScanCodes {
+  codes?: string;
 };
 
 /**

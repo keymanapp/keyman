@@ -1,5 +1,5 @@
 import { constants } from '@keymanapp/ldml-keyboard-constants';
-import { KMXPlus } from '@keymanapp/common-types';
+import { KMXPlus, LDMLKeyboard } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
 import { SectionCompiler } from "./section-compiler.js";
 import { translateLayerAttrToModifier, validModifier } from '../util/util.js';
@@ -22,6 +22,12 @@ export class LayrCompiler extends SectionCompiler {
     let totalLayerCount = 0;
     let hardwareLayers = 0;
     // let touchLayers = 0;
+    this.keyboard3.forms?.form?.forEach((form) => {
+      // Just check whether it's NOT an implied import
+      if (!LDMLKeyboard.ImportStatus.isImpliedImport(form)) {
+        this.callbacks.reportMessage(CompilerMessages.Hint_UnsupportedCustomForm({id: form.id}));
+      }
+    });
     this.keyboard3.layers?.forEach((layers) => {
       const { form } = layers;
       if (form === 'touch') {

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="und" conformsTo="techpreview">
+  <names>
+    <name value="layr-hint-custom-form" />
+  </names>
+
+  <keys>
+    <key id="grave" to="`" />
+    <key id="one" to="1" />
+  </keys>
+  <forms>
+    <!-- warning, custom scancodes -->
+    <form id="us">
+      <scanCodes codes="01 02 03 04" />
+    </form>
+  </forms>
+  <layers form="us"> <!-- INVALID: 'holographic' is not a valid form. -->
+    <layer id="base">
+      <!-- beware: this is mapping ` and 1! -->
+      <row keys="grave one" />
+    </layer>
+  </layers>
+</keyboard3>
