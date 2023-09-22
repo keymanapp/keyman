@@ -25,4 +25,10 @@ bool InsertKeyvalsFromVectorFile(v_dw_3D &complete_Vector) ;
 // create a Vector with all entries of file
 int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector);
 
+
+bool writeVectorToFile(v_dw_3D V) ;
+bool writeFileToVector(v_dw_3D& complete_Vector, const char* infile);
+bool CompareVector_To_VectorOfFile(v_dw_3D All_Vector,v_dw_3D File_Vector);
+bool test_In_Out(v_dw_3D All_Vector);
+
 #endif /* HELPERS_H*/
