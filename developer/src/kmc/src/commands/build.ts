@@ -78,7 +78,7 @@ If no input file is supplied, kmc will build the current folder.`)
     });
 
   command
-    .command('ldml-test-data')
+    .command('ldml-test-data <infile>')
     .description('Convert LDML keyboard test .xml to .json')
     .action(buildTestData);
 
