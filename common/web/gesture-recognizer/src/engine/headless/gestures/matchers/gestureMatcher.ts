@@ -299,11 +299,13 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
 
     const contactSpec = this.model.contacts[existingContacts];
     const contactModel = new PathMatcher(contactSpec.model, simpleSource);
+    // Add it early, as we need it to be accessible for reference via .primaryPath stuff below.
+    this.pathMatchers.push(contactModel);
+
     let baseItem: Type = null;
-    if(existingContacts) {
-      // just use the highest-priority item source's base item and call it a day.
-      baseItem = this.primaryPath.baseItem;
-    } else if(this.predecessor && this.model.sustainTimer) {
+    // If there were no existing contacts but a predecessor exists and a sustain timer
+    // has been specified, it needs special base-item handling.
+    if(!existingContacts && this.predecessor && this.model.sustainTimer) {
       const baseItemMode = this.model.sustainTimer.baseItem ?? 'result';
 
       switch(baseItemMode) {
@@ -317,6 +319,10 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
           baseItem = this.predecessor.result.action.item;
           break;
       }
+    } else {
+      // just use the highest-priority item source's base item and call it a day.
+      // There's no need to refer to some previously-existing source for comparison.
+      baseItem = this.primaryPath.baseItem;
     }
 
     if(contactSpec.model.allowsInitialState) {
@@ -330,8 +336,6 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
     contactModel.promise.then((resolution) => {
       this.finalize(resolution.type == 'resolve', resolution.cause);
     });
-
-    this.pathMatchers.push(contactModel);
   }
 
   update() {
