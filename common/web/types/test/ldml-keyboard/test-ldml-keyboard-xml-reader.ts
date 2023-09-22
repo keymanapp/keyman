@@ -3,6 +3,7 @@ import 'mocha';
 import {assert} from 'chai';
 import { CommonTypesMessages } from '../../src/util/common-events.js';
 import { testReaderCases } from '../helpers/reader-callback-test.js';
+import { HardwareToKeymap } from '../../src/consts/virtual-key-constants.js';
 
 function pluckKeysFromKeybag(keys: LKKey[], ids: string[]) {
   return keys.filter(({id}) => ids.indexOf(id) !== -1);
@@ -138,6 +139,34 @@ describe('ldml keyboard xml reader tests', function () {
           subtag: 'names',
         }),
       ],
+    },
+  ]);
+});
+
+describe('verify scancodes', function () {
+  this.slow(500); // 0.5 sec -- json schema validation takes a while
+
+  testReaderCases([
+    {
+      // We've read this above, but we're going to test for scancodes here
+      subpath: 'import-minimal.xml',
+      callback: (data, source, subpath, callbacks) => {
+        assert.ok(source?.keyboard3?.forms?.form);
+
+        const ldmlFormIds = source?.keyboard3?.forms?.form.map(f => f.id);
+        const kmcFormIds =  Array.from(HardwareToKeymap.keys());
+
+        assert.sameDeepMembers(ldmlFormIds, kmcFormIds, "LDML and kmc form ids");
+
+        source?.keyboard3?.forms?.form.forEach((form) => {
+          const {id, scanCodes} = form;
+          const km = HardwareToKeymap.get(id);
+          assert.ok(km, `kmc's ${id}`);
+          const ldmlRowCounts = scanCodes.map(o => o.codes.split(" ").length);
+          const kmcRowCounts = km.map(o => o.length);
+          assert.deepEqual(ldmlRowCounts, kmcRowCounts, `ldml/kmc counts for form ${id}`);
+        });
+      },
     },
   ]);
 });

@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { LayrCompiler } from '../src/compiler/layr.js';
 import { CompilerMessages } from '../src/compiler/messages.js';
-import { compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
+import { compilerTestCallbacks, testCompilationCases } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 
@@ -20,30 +20,31 @@ function allKeysOk(row : LayrRow, str : string, msg? : string) {
 describe('layr', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
-  // reuse the keys minimal file
-  it('should compile minimal keys data', async function () {
-    let layr = await loadSectionFixture(LayrCompiler, 'sections/keys/minimal.xml', compilerTestCallbacks) as Layr;
-    assert.ok(layr);
-    assert.equal(compilerTestCallbacks.messages.length, 0);
-
-    assert.equal(layr.lists?.length, 1);
-    const list0 = layr.lists[0];
-    assert.ok(list0);
-    assert.equal(list0.layers.length, 1);
-    assert.equal(list0.hardware, constants.layr_list_hardware_us);
-    const layer0 = list0.layers[0];
-    assert.ok(layer0);
-    assert.equal(layer0.rows.length, 1);
-    const row0 = layer0.rows[0];
-    assert.ok(row0);
-    assert.equal(row0.keys.length, 2);
-
-    assert.equal(layer0.id.value, 'base');
-    assert.equal(layer0.mod, constants.keys_mod_none);
-    assert.equal(row0.keys[0]?.value, 'grave');
-  });
-
   testCompilationCases(LayrCompiler, [
+    {
+      subpath: 'sections/keys/minimal.xml',
+      callback(sect) {
+        const layr = <Layr> sect;
+        assert.ok(layr);
+        assert.equal(compilerTestCallbacks.messages.length, 0);
+
+        assert.equal(layr.lists?.length, 1);
+        const list0 = layr.lists[0];
+        assert.ok(list0);
+        assert.equal(list0.layers.length, 1);
+        assert.equal(list0.hardware, constants.layr_list_hardware_us);
+        const layer0 = list0.layers[0];
+        assert.ok(layer0);
+        assert.equal(layer0.rows.length, 1);
+        const row0 = layer0.rows[0];
+        assert.ok(row0);
+        assert.equal(row0.keys.length, 2);
+
+        assert.equal(layer0.id.value, 'base');
+        assert.equal(layer0.mod, constants.keys_mod_none);
+        assert.equal(row0.keys[0]?.value, 'grave');
+      },
+    },
     {
       subpath: 'sections/keys/maximal.xml',
       callback(sect) {
@@ -114,13 +115,6 @@ describe('layr', function () {
       // missing layer element
       subpath: 'sections/layr/invalid-missing-layer.xml',
       errors: [CompilerMessages.Error_MustBeAtLeastOneLayerElement()],
-    },
-    {
-      // missing layers element completely
-      subpath: 'sections/layr/invalid-missing-layer.xml',
-      errors: [
-        CompilerMessages.Error_MustBeAtLeastOneLayerElement(),
-      ],
     },
     {
       // warning on custom form
