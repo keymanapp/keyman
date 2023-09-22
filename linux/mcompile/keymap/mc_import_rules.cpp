@@ -50,13 +50,13 @@ const int ShiftStateMap[] = {
   ISVIRTUALKEY | RALTFLAG | K_SHIFTFLAG,
   0,
   0};
-    
+   */
 class DeadKey {
 private:
   WCHAR m_deadchar;
   std::vector<WCHAR> m_rgbasechar;
   std::vector<WCHAR> m_rgcombchar;
-
+/*
 public:
   DeadKey(WCHAR deadCharacter) {
     this->m_deadchar = deadCharacter;
@@ -91,9 +91,9 @@ public:
       }
     }
     return false;
-  }
+  }*/
 };
-
+/*
 
 int DeadKeyMap(int index, std::vector<DeadKey *> *deadkeys, int deadkeyBase, std::vector<DeadkeyMapping> *deadkeyMappings) {   // I4327   // I4353
   for(size_t i = 0; i < deadkeyMappings->size(); i++) {
@@ -109,15 +109,15 @@ int DeadKeyMap(int index, std::vector<DeadKey *> *deadkeys, int deadkeyBase, std
   }
   return 0xFFFF;
 }
-
+*/
 class VirtualKey {
 private:
-  HKL m_hkl;
+  KMX_HKL m_hkl;      // _S2 do I need this and is void* OK to assume?
   UINT m_vk;
   UINT m_sc;
   bool m_rgfDeadKey[10][2];
   std::wstring m_rgss[10][2];
-
+/*
 public:
   VirtualKey(HKL hkl, UINT virtualKey) {
     this->m_sc = MapVirtualKeyEx(virtualKey, 0, hkl);
@@ -315,8 +315,9 @@ public:
     }
     return true;
   }
-};
+
 */
+};
 class KMX_Loader {
 private:
   KMX_BYTE lpKeyStateNull[256];
@@ -467,30 +468,38 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp, std::vector<KMX_Deadkey
   KMX_Loader loader;
   const size_t BUF_sz= 256;
 
-  KMX_WCHAR inputHKL[12];
-  u16sprintf(inputHKL,BUF_sz ,L"%08.8x", (unsigned int) u16tol(kbid, NULL, 16));                      // _S2 wsprintf(inputHKL, L"%08.8x", (unsigned int) wcstol(kbid, NULL, 16));
-/*  
-  int cKeyboards = GetKeyboardLayoutList(0, NULL);
-  HKL *rghkl = new HKL[cKeyboards];
-  GetKeyboardLayoutList(cKeyboards, rghkl);            
-  HKL hkl = LoadKeyboardLayout(inputHKL, KLF_NOTELLSHELL);
-  if(hkl == NULL) {
-      puts("Sorry, that keyboard does not seem to be valid.");
-      delete[] rghkl;
-      return false;
-  }
-          
+                                                                                        // _S2 do I need that for Linux??
+                                                                                        KMX_WCHAR inputHKL[12];
+                                                                                        u16sprintf(inputHKL,BUF_sz ,L"%08.8x", (unsigned int) u16tol(kbid, NULL, 16));   // _S2 wsprintf(inputHKL, L"%08.8x", (unsigned int) wcstol(kbid, NULL, 16));
+
+
+                                                                                        /*
+                                                                                          // _S2 do I need that for Linux??
+                                                                                          int cKeyboards = GetKeyboardLayoutList(0, NULL);
+                                                                                          HKL *rghkl = new HKL[cKeyboards];
+                                                                                          GetKeyboardLayoutList(cKeyboards, rghkl);
+                                                                                          HKL hkl = LoadKeyboardLayout(inputHKL, KLF_NOTELLSHELL);
+                                                                                          if(hkl == NULL) {
+                                                                                              puts("Sorry, that keyboard does not seem to be valid.");
+                                                                                              delete[] rghkl;
+                                                                                              return false;
+                                                                                          }
+                                                                                          */
+
   BYTE lpKeyState[256];// = new KeysEx[256];
   std::vector<VirtualKey*> rgKey; //= new VirtualKey[256];
   std::vector<DeadKey*> alDead;
 
   rgKey.resize(256);
 
+int STOP = 0;
+/*
+  // _S2 scroll through OTHER
   // Scroll through the Scan Code (SC) values and get the valid Virtual Key (VK)
   // values in it. Then, store the SC in each valid VK so it can act as both a 
   // flag that the VK is valid, and it can store the SC value.
   for(UINT sc = 0x01; sc <= 0x7f; sc++) {
-    VirtualKey *key = new VirtualKey(sc, hkl);
+    VirtualKey *key = new VirtualKey(sc, hkl);      // _S2 get this from my Vector
     if(key->VK() != 0) {
       rgKey[key->VK()] = key;
     } else {
@@ -498,6 +507,8 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp, std::vector<KMX_Deadkey
     }
   }
 
+
+  // _S2 do I need NUMPAD + SPECIAL_SHIFT for first draft ??
   // add the special keys that do not get added from the code above
   for(UINT ke = VK_NUMPAD0; ke <= VK_NUMPAD9; ke++) {
       rgKey[ke] = new VirtualKey(hkl, ke);
@@ -544,6 +555,9 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp, std::vector<KMX_Deadkey
                   ////FillKeyState(lpKeyState, ss, (caps != 0)); //http://blogs.msdn.com/michkap/archive/2006/04/18/578557.aspx
                   loader.FillKeyState(lpKeyState, ss, (caps == 0));
                   //sbBuffer = new StringBuilder(10);
+
+
+                  // _S2 do I need ToUnicodeEx() or can I use my Vector??
                   int rc = ToUnicodeEx(rgKey[iKey]->VK(), rgKey[iKey]->SC(), lpKeyState, sbBuffer, _countof(sbBuffer), 0, hkl);
                   if(rc > 0) {
                       if(*sbBuffer == 0) {
@@ -591,6 +605,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp, std::vector<KMX_Deadkey
       }
   }
 
+  // _S2 do I need this for UNIX??
   for(int i = 0; i < cKeyboards; i++) {
     if(hkl == rghkl[i]) {
       hkl = NULL;
@@ -598,10 +613,12 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp, std::vector<KMX_Deadkey
     }
   }
 
+  // _S2 do I need this for UNIX??
   if(hkl != NULL) {
     UnloadKeyboardLayout(hkl);
   }
 
+  // _S2 do I need that for Linux??
   delete[] rghkl;
 
   //-------------------------------------------------------------

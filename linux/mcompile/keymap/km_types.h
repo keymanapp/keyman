@@ -72,6 +72,12 @@ typedef unsigned int UINT;              // _S2 needs to be removed/?
 
 typedef int        BOOL;                // _S2 needs to be removed/? or is it int32_t??
 
+                                        // in WIN:
+                                        // PVOID A pointer to any type.
+                                        // typedef PVOID HANDLE;
+                                        // typedef HANDLE HKL;
+typedef void* KMX_HKL;                  // _S2 what is the equivalent to HKL and do I need it?? I assume a void*
+
 typedef uint32_t   KMX_UINT;
 
 typedef KMX_BYTE*  PKMX_BYTE;

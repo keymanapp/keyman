@@ -339,14 +339,18 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
     return FALSE;
   }
 #endif
+//--------------------------------------------------------------------------------
 /*
   //_S2 this is to use a file and a vector instead of GDK-functions so debugging is easier...not needed later...
   v_dw_3D complete_Vector;
   bool writeVec_OK =  writeVectorToFile(All_Vector);
-  bool WriteFileOK =  writeFileToVector( complete_Vector,"/Projects/keyman/keyman/linux/mcompile/keymap/VectorFile.txt" );
+  bool WriteFileOK =  writeFileToVector( complete_Vector,"/Projects/keyman/keyman/linux/mcompile/keymap/VectorFile2.txt" );
   bool isEqual= CompareVector_To_VectorOfFile( All_Vector, complete_Vector);
   wprintf(L" vectors are equal: %i\n",isEqual);*/
 test(All_Vector);
+
+//test_In_Out(All_Vector);
+
 //--------------------------------------------------------------------------------
 
   const wchar_t* ERROR = L"   ";
@@ -370,7 +374,8 @@ test(All_Vector);
 
     wprintf(L"  DoConvert-read i:  %i \t(KMX_VKMap): %i (%c)  \t--->  vkUnderlying: %i (%c)    \tshiftstate[%i]: ( %i )   \t---- >  ch: %i (%c)  \t%ls  \t%ls\n" , i,(int) KMX_VKMap[i],(int)KMX_VKMap[i],  vkUnderlying,vkUnderlying, j, VKShiftState[j] ,  ch ,ch ,  ((int) vkUnderlying != (int) KMX_VKMap[i] ) ? L" *** ": L"", ERROR);
       //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
-      /*
+
+      /* _S2 ToDo
       if(bDeadkeyConversion) {   // I4552
         if(ch == 0xFFFF) {
           ch = DeadKey;
@@ -391,11 +396,14 @@ test(All_Vector);
 wprintf(L"\n##### KMX_ReportUnconvertedKeyboardRules of mcompile will start #####\n");
 
   KMX_ReportUnconvertedKeyboardRules(kbd);
-/*
+
+// _S2 convert mcompile Step1: use (wrong) Datatype WCHAR (=wchar_t)
+// _S2 convert mcompile Step2: use (OK) Datatype KMX_WCHAR (=char16_t)
+
   if(!KMX_ImportRules(kbid, kbd, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
     return FALSE;
   }
-*/
+/**/
 
   wprintf(L"\n##### KMX_DoConvert of mcompile ended #####\n");
   return TRUE;
