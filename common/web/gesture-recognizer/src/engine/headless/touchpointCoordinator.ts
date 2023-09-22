@@ -105,9 +105,8 @@ export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMa
 
       this.emit('recognizedgesture', gestureSequence);
 
-      // TODO: handle any related 'push' mechanics that may still be lingering.
-      // TODO:  may be wise for the sequence object to support a 'finalized' promise... or maybe just a closure?...
-      // just to ensure that push states get reversed when needed?
+      // Any related 'push' mechanics that may still be lingering are currently handled by GestureSequence
+      // during its 'completion' processing.  (See `GestureSequence.selectionHandler`.)
     });
 
     this.emit('inputstart', touchpoint);
@@ -120,7 +119,12 @@ export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMa
   private addSimpleSourceHooks(touchpoint: GestureSource<HoveredItemType>) {
 
     touchpoint.path.on('invalidated', () => {
-      // TODO: on cancellation, is there any other cleanup to be done?
+      // GestureSequence _should_ handle any other cleanup internally as fallout
+      // from the path being cancelled.
+
+      // To consider: should it specially mark if it 'completed' due to cancellation,
+      // or is that safe to infer from the tracked GestureSource(s)?
+      // Currently, we're going with the latter.
 
       // Also mark the touchpoint as no longer active.
       let i = this._activeSources.indexOf(touchpoint);

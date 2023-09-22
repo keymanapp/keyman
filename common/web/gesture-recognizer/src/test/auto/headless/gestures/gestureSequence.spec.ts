@@ -34,11 +34,11 @@ const TestGestureModelDefinitions: GestureModelDefs<string> = {
     MultitapModel,
     SimpleTapModel,
     SubkeySelectModel,
-    // TODO:  add something for a starting modipress.
+    // While modipress should be in the final set, it's not particularly testable without
+    // TouchpointCoordinator integration.
   ],
   sets: {
-    default: [LongpressModel.id, SimpleTapModel.id, /* TODO: add a 'starting modipress' model */],
-    // TODO:  modipress: [LongpressModel.id, SimpleTapModel.id], // no nested modipressing
+    default: [LongpressModel.id, SimpleTapModel.id],
   }
 }
 

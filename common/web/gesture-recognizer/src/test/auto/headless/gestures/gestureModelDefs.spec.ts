@@ -36,7 +36,11 @@ describe("Gesture model definitions", () => {
   });
 
   it('getGestureModelSet', () => {
-    assert.sameMembers([LongpressModel, SimpleTapModel], getGestureModelSet(TestGestureModelDefinitions, 'default'));
+    assert.sameMembers(getGestureModelSet(TestGestureModelDefinitions, 'default'), [LongpressModel, SimpleTapModel]);
+    // An empty set is fine; this can disable detection of new gestures in certain conditions.
+    assert.sameMembers(getGestureModelSet(TestGestureModelDefinitions, 'none'), []);
+
+    // These two, on the other hand, should always be considered errors.
     assert.throws(() => getGestureModelSet(TestGestureModelDefinitions, 'malformed'));
     assert.throws(() => getGestureModelSet(TestGestureModelDefinitions, 'unavailable-set'));
   });

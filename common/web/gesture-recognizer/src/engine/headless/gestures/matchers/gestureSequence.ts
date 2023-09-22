@@ -117,6 +117,12 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
     }) ?? [];
 
     if(selection.result.action.type == 'complete' || selection.result.action.type == 'none') {
+      if(this.pushedSelector) {
+        // TODO:  may need extra handling for 'sustain' states - like if a modipress's nested
+        // longpress is in subkey-select mode, to preserve that state instead of interrupting it.
+        this.touchpointCoordinator.popSelector(this.pushedSelector);
+      }
+
       sources.forEach((source) => {
         if(!source.isPathComplete) {
           source.terminate(selection.result.action.type == 'none');

@@ -132,3 +132,45 @@ export const SubkeySelectModel: GestureModel = {
     item: 'current'
   }
 }
+
+export const ModipressStartModel: GestureModel = {
+  id: 'modipress-start',
+  resolutionPriority: 5,
+  itemPriority: 0,
+  contacts: [
+    {
+      model: {
+        ...specs.ModipressStartModel,
+        allowsInitialState(incomingSample, comparisonSample, baseItem) {
+          const modifierKeyIds = ['shift', 'alt', 'ctrl'];
+          return modifierKeyIds.indexOf(baseItem) != -1;
+        },
+        itemChangeAction: 'reject',
+        itemPriority: 1
+      }
+    }
+  ],
+  resolutionAction: {
+    type: 'chain',
+    next: 'modipress-end',
+    selectionMode: 'modipress',
+    item: 'current' // return the modifier key ID so that we know to shift to it!
+  }
+}
+
+export const ModipressEndModel: GestureModel = {
+  id: 'modipress-end',
+  resolutionPriority: 5,
+  itemPriority: 0,
+  contacts: [
+    {
+      model: {
+        ...specs.ModipressEndModel,
+        itemChangeAction: 'reject'
+      }
+    }
+  ],
+  resolutionAction: {
+    type: 'complete'
+  }
+}
