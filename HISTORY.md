@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.179 alpha 2023-09-22
+
+* chore(resources): ldml: update to keyboard3 (#9588)
+* change(android,web) Use web-based popup key longpresses (#9591)
+
 ## 17.0.178 alpha 2023-09-21
 
 * fix(linux): Correctly open files linked from help page (#9601)
