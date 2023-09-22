@@ -3,11 +3,11 @@
  * kmc - Keyman Next Generation Compiler
  */
 
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 import { declareBuild } from './commands/build.js';
 import { declareAnalyze } from './commands/analyze.js';
-import { BaseOptions } from './util/baseOptions.js';
 import { KeymanSentry } from './util/KeymanSentry.js';
+import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 await KeymanSentry.runTestIfCLRequested();
 try {
@@ -24,9 +24,19 @@ async function run() {
   /* Arguments */
 
   const program = new Command();
-  program.description('Keyman Developer Command Line Interface');
-  BaseOptions.addVersion(program);
-  BaseOptions.addSentry(program);
+  program
+    .description('Keyman Developer Command Line Interface')
+    .configureHelp({
+      showGlobalOptions: true
+    })
+    .version(KEYMAN_VERSION.VERSION_WITH_TAG)
+
+    // This corresponds to an option tested in KeymanSentry.ts, which is
+    // searched for in process.argv, in order to avoid depending on Commander to
+    // start Sentry, and to ensure that we capture errors as early as possible
+    // in launch
+    .addOption(new Option('--no-error-reporting', 'Disable error reporting to keyman.com (overriding user settings)'))
+    .addOption(new Option('--error-reporting', 'Enable error reporting to keyman.com (overriding user settings)'));
 
   if(await KeymanSentry.isEnabled()) {
     KeymanSentry.init();

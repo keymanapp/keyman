@@ -11,6 +11,7 @@ import { expandFileLists } from '../util/fileLists.js';
 import { isProject } from '../util/projectLoader.js';
 import { buildTestData } from './buildTestData/index.js';
 import { buildWindowsPackageInstaller } from './buildWindowsPackageInstaller/index.js';
+//import { buildWindowsPackageInstaller } from './buildWindowsPackageInstaller/index.js';
 
 
 function commandOptionsToCompilerOptions(options: any): CompilerOptions {
@@ -32,31 +33,38 @@ function commandOptionsToCompilerOptions(options: any): CompilerOptions {
 }
 
 export function declareBuild(program: Command) {
-  const command = BaseOptions.addAll(program
-    .command('build [infile...]')
-    .description(`Compile one or more source files or projects.`)
-    .addHelpText('after', `
-Supported file types:
-  * folder: Keyman project in folder
-  * .kpj: Keyman project
-  * .kmn: Keyman keyboard
-  * .xml: LDML keyboard
-  * .model.ts: Keyman lexical model
-  * .kps: Keyman keyboard or lexical model package
+  const buildCommand = program
+    .command('build')
+    .option('--color', 'Force colorization for log messages')
+    .option('--no-color', 'No colorization for log messages; if both omitted, detects from console')
 
-File lists can be referenced with @filelist.txt.
-
-If no input file is supplied, kmc will build the current folder.`)
-  )
+    // These options are only used with build file but are included here so that
+    // they are visible in `kmc build --help`
     .option('-d, --debug', 'Include debug information in output')
     .option('-w, --compiler-warnings-as-errors', 'Causes warnings to fail the build; overrides project-level warnings-as-errors option')
     .option('-W, --no-compiler-warnings-as-errors', 'Warnings do not fail the build; overrides project-level warnings-as-errors option')
     .option('--no-compiler-version', 'Exclude compiler version metadata from output')
-    .option('--no-warn-deprecated-code', 'Turn off warnings for deprecated code styles')
-    .option('--color', 'Force colorization for log messages')
-    .option('--no-color', 'No colorization for log messages; if both omitted, detects from console')
-    .action(async (filenames: string[], options: any) => {
-      options = commandOptionsToCompilerOptions(options);
+    .option('--no-warn-deprecated-code', 'Turn off warnings for deprecated code styles');
+
+  BaseOptions.addAll(buildCommand);
+
+  buildCommand.command('file [infile...]', {isDefault: true})
+    .description(`Compile one or more source files or projects ('file' subcommand is default).`)
+    .addHelpText('after', `
+Supported file types:
+* folder: Keyman project in folder
+* .kpj: Keyman project
+* .kmn: Keyman keyboard
+* .xml: LDML keyboard
+* .model.ts: Keyman lexical model
+* .kps: Keyman keyboard or lexical model package
+
+File lists can be referenced with @filelist.txt.
+
+If no input file is supplied, kmc will build the current folder.`)
+
+    .action(async (filenames: string[], _options: any, commander: any) => {
+      const options = commandOptionsToCompilerOptions(commander.optsWithGlobals());
       const callbacks = new NodeCompilerCallbacks(options);
 
       if(!filenames.length) {
@@ -77,12 +85,12 @@ If no input file is supplied, kmc will build the current folder.`)
       }
     });
 
-  command
+  buildCommand
     .command('ldml-test-data <infile>')
     .description('Convert LDML keyboard test .xml to .json')
     .action(buildTestData);
 
-  command
+  buildCommand
     .command('windows-package-installer <infile>')
     .description('Build an executable installer for Windows for a Keyman package')
     .option('--msi <msiFilename>', 'Location of keymandesktop.msi')

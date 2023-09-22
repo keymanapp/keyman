@@ -14,7 +14,8 @@ interface WindowsPackageInstallerOptions extends CompilerBaseOptions {
   startWithConfiguration: boolean;
 };
 
-export async function buildWindowsPackageInstaller(infile: string, options: WindowsPackageInstallerOptions) {
+export async function buildWindowsPackageInstaller(infile: string, _options: any, commander: any) {
+  const options: WindowsPackageInstallerOptions = commander.optsWithGlobals();
   const sources: WindowsPackageInstallerSources = {
     licenseFilename: options.license,
     msiFilename: options.msi,
