@@ -75,6 +75,10 @@ class Constants {
    */
   readonly cldr_implied_keys_import = `${this.cldr_version_techpreview}/keys-Latn-implied.xml`;
   /**
+   * implied scancodes file
+   */
+  readonly cldr_implied_forms_import = `${this.cldr_version_techpreview}/scanCodes-implied.xml`;
+  /**
    * Length of a raw section header, in bytes
    */
   readonly length_header = 8;

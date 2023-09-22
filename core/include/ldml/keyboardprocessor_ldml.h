@@ -16,6 +16,7 @@
 #pragma once
 
 #define LDML_BKSP_FLAGS_ERROR 0x1
+#define LDML_CLDR_IMPLIED_FORMS_IMPORT "techpreview/scanCodes-implied.xml"
 #define LDML_CLDR_IMPLIED_KEYS_IMPORT "techpreview/keys-Latn-implied.xml"
 #define LDML_CLDR_IMPORT_BASE "cldr"
 #define LDML_CLDR_VERSION_LATEST "techpreview"

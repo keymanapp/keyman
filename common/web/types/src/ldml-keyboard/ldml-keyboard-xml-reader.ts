@@ -49,6 +49,14 @@ export class LDMLKeyboardXMLSourceFileReader {
       if (!source.keyboard3.keys.import) {
         source.keyboard3.keys.import = [];
       }
+      if (!source.keyboard3.forms) {
+        source.keyboard3.forms = {
+          form: [],
+        };
+      }
+      if (!source.keyboard3.forms.import) {
+        source.keyboard3.forms.import = [];
+      }
     }
     boxXmlArray(source?.keyboard3, 'layers');
     boxXmlArray(source?.keyboard3?.displays, 'display');
@@ -149,6 +157,14 @@ export class LDMLKeyboardXMLSourceFileReader {
       if (!this.resolveOneImport(obj, subtag, {
         base: constants.cldr_import_base,
         path: constants.cldr_implied_keys_import
+      })) {
+        return false;
+      }
+    } else if (subtag === 'forms') {
+      // <import base="cldr" path="techpreview/scanCodes-implied.xml"/>
+      if (!this.resolveOneImport(obj, subtag, {
+        base: constants.cldr_import_base,
+        path: constants.cldr_implied_forms_import
       })) {
         return false;
       }
