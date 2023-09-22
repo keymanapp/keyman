@@ -72,6 +72,16 @@ v_dw_2D create_empty_2D(int dim_rows, int dim_shifts);
 // get Keyvals from VectorFile.txt and insert into All_Vector
 bool InsertKeyvalsFromVectorFile(v_dw_3D &All_Vector);
 
+// query All_Vector
+// return the VirtualKey of the Other Keyboard for given Scancode
+KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector);
+// return the VirtualKey of the US Keyboard for given Scancode
+KMX_DWORD get_VirtualKey_US_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector);
+// return the Scancode of for given VirtualKey of Other Keyboard
+KMX_DWORD get_SC_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector);
+// return the Scancode of for given VirtualKey of Other US
+KMX_DWORD get_SC_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector);
+
 #if USE_GDK
 
 // initialize GDK

@@ -367,10 +367,10 @@ bool test(v_dw_3D &V) {
       extra = "  ";
 
     if (V[0].size()>0) {
-      //wprintf(L" row (US)   ...... %i   .. %i (%c) .. %i (%c) ..  --- ",V[0][k][0] ,  V[0][k][1] ,  V[0][k][1]  ,  V[0][k][2] ,  V[0][k][2]    ); 
-      //wprintf(L"  \n");
-      //wprintf(L"   row (Other)..... %i   .. %i (%c) .. %i (%c)  ..   %s  \n",  V[1][k][0] ,  V[1][k][1],  V[1][k][1]  ,  V[1][k][2],  V[1][k][2]  ,    extra.c_str()); 
-    //wprintf(L"  \n");
+      /*wprintf(L" row (US)   ...... SC= %i   .. %i (%c) .. %i (%c) ..  --- ",V[0][k][0] ,  V[0][k][1] ,  V[0][k][1]  ,  V[0][k][2] ,  V[0][k][2]    ); 
+      wprintf(L"  \n");
+      wprintf(L"   row (Other)..... SC= %i   .. %i (%c) .. %i (%c)  ..   %s  \n",  V[1][k][0] ,  V[1][k][1],  V[1][k][1]  ,  V[1][k][2],  V[1][k][2]  ,    extra.c_str()); 
+    wprintf(L"  \n");*/
     }
   }
   wprintf(L"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
@@ -391,108 +391,56 @@ bool test_single(v_dw_3D &V) {
   return true;
 }
 
-bool writeVectorToFile(v_dw_3D V) {
-  std::string TxtFileName  = "/Projects/keyman/keyman/linux/mcompile/keymap/VectorFile.txt" ;
-  WCHAR DeadKey;
-  std::ofstream TxTFile(TxtFileName);
-  //TxTFile << "\n kbid  <<  VKShiftState[j] <<  US VKMap[i] <<underlying <<  DE(incl Shiftstate) ch <<  DeadKey;\n";
-  //TxTFile << "\nname/Keycode  -- unshifted -- shift  -- altgr --  shift+altgr\n";
-  wprintf(L"   +++++++ dimensions of Vector after split_US_To_3D_Vector (languages..characters..shiftstates)\t\t %li..%li..%li\n", V.size(), V[0].size(),V[0][0].size());
 
-  for ( int i=0; i< V.size();i++)
-  {
-      for ( int j=0; j< V[i].size();j++)
-      {
-        for ( int k=0; k< V[i][j].size();k++)
-        {
-          TxTFile << V[i][j][k] <<"-";
-        }
-        TxTFile << "\n";
-      }
-    if( i<1)
-      TxTFile << "Language 2\n";
-  }
-  TxTFile.close();
-  return true;
- }
-
-bool writeFileToVector(v_dw_3D& complete_Vector, const char* infile) {
-  wprintf(L"   +++++++ dimensions of Vector at beginning of writeFileToVector (languages..characters..shiftstates)\t\t %li..%li..%li\n", complete_Vector.size(), complete_Vector.size(),complete_Vector.size());
-  wprintf(L" #### writeFileToVector started: \n");
-
-  FILE *fp;
-  char str[600];
-  std::vector<char> delim{' ', '[', ']', '}',  ';', '\t', '\n'};
-  v_str_1D complete_List;
-  v_dw_1D tokens_dw;
-  v_dw_2D shift_states;
-  int k = -1;
-
-  /* opening file for reading */
-  fp = fopen("/Projects/keyman/keyman/linux/mcompile/keymap/VectorFile.txt" , "r");
-  if(fp == NULL) {
-    perror("Error opening file");
-    return(-1);
-  }
-
-  while (fgets(str, 600, fp) != NULL) {
-    k++;
-    //puts(str);
-    complete_List.push_back(str);
-    if (strcmp(str, "Language 2\n") ==0){
-      complete_Vector.push_back(shift_states);
-      shift_states.clear();
-      continue;
+// query All_Vector
+// return RETURN NON SHIFTED CHAR [1]  the VirtualKey of the Other Keyboard for given Scancode
+KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
+  // find correct row of char in US
+  for( int i=0; i< (int)All_Vector[1].size()-1;i++) {
+    if  ( All_Vector[1][i][0] == SC ) {
+      wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i (%c) : %i (%c)  --- \n",SC , i,  All_Vector[1][i][0] , All_Vector[1][i][1] ,All_Vector[1][i][1] , All_Vector[1][i][2] , All_Vector[1][i][2]   ); 
+      return All_Vector[1][i][1] ;
+      //return All_Vector[1][i][2] ;    // would be shifted version
     }
-
-    // remove all unwanted char
-    for (int i = 0; i < (int)delim.size(); i++) {
-      complete_List[k].erase(remove(complete_List[k].begin(), complete_List[k].end(), delim[i]), complete_List[k].end());
-    }
-
-    // split into numbers ( delimiter -)
-    std::stringstream ss(complete_List[k]);
-    int end = complete_List[k].find("-");
-    while (end != -1) { // Loop until no delimiter is left in the string.
-      tokens_dw.push_back((DWORD)stoi(complete_List[k].substr(0, end)));
-      complete_List[k].erase(complete_List[k].begin(), complete_List[k].begin() + end + 1);
-      end = complete_List[k].find("-");
-    }
-    shift_states.push_back(tokens_dw);
-    tokens_dw.clear();
   }
-  complete_Vector.push_back(shift_states);
-  shift_states.clear();
-
-  wprintf(L" #### writeFileToVector ended: \n");
-  fclose(fp);
-  wprintf(L"   +++++++ dimensions of Vector at END of writeFileToVector (languages..characters..shiftstates)\t\t %li..%li..%li\n", complete_Vector.size(), complete_Vector[0].size(),complete_Vector[0][0].size());
-
-  return(0);
+  return 98;    //_S2 what do I return if not found??
 }
 
-bool CompareVector_To_VectorOfFile(v_dw_3D All_Vector,v_dw_3D File_Vector){
-  wprintf(L" #### CompareVector_To_VectorOfFile started: ");
-  wprintf(L" #### dimensions:  %i  %i  %i -- %i  %i  %i \n", All_Vector.size() ,All_Vector[0].size(), All_Vector[0][0].size(),File_Vector.size() ,File_Vector[0].size(), File_Vector[0][0].size());
 
-  if (!(All_Vector.size() == File_Vector.size()) )return false;
-  if (!(All_Vector[0].size() == File_Vector[0].size()))  return false;
-  if (!(All_Vector[0][0].size() == File_Vector[0][0].size())) return false;
-
-  wprintf(L" #### CompareVector_To_VectorOfFile dimensions OK \n");
-  for ( int i=0; i< All_Vector.size();i++) {
-    for ( int j=0; j< All_Vector[i].size();j++) {
-      for ( int k=0; k< All_Vector[i][j].size();k++){
-          if(( All_Vector[i][j][k] != File_Vector[i][j][k])) {
-            wprintf(L" All_Vector[%i][%i][%i]: %i  %i  File_Vector[i][j][k]\n", i,j,k, All_Vector[i][j][k], File_Vector[i][j][k]);
-            wprintf(L" DIFFERENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            return false;
-          }
-      }
+// return RETURN NON SHIFTED CHAR [1]  the VirtualKey of the US Keyboard for given Scancode
+KMX_DWORD get_VirtualKey_US_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
+  // find correct row of char in US
+  for( int i=0; i< (int)All_Vector[0].size()-1;i++) {
+    if  ( All_Vector[0][i][0] == SC ) {
+      wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i (%c) : %i (%c)  ---          ",SC , i,  All_Vector[0][i][0] , All_Vector[0][i][1] ,All_Vector[0][i][1] , All_Vector[0][i][2] , All_Vector[0][i][2]   ); 
+      return All_Vector[0][i][1] ;
+      //return All_Vector[0][i][2] ;    // would be shifted version
     }
   }
+  return 987;    //_S2 what do I return if not found??
+}
 
-  return true;
-  wprintf(L" #### CompareVector_To_VectorOfFile ended \n");
-  return false;
+
+// return the Scancode of for given VirtualKey of Other Keyboard
+KMX_DWORD get_SC_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector){
+  // find correct row of char in US
+  for( int i=0; i< (int)All_Vector[1].size()-1;i++) {
+    if  ( All_Vector[1][i][1] == VK_Other ) {
+      wprintf(L"    SC= %i   .. i= %i  .. %i:\t\t %i (%c) : %i (%c)  --- ",VK_Other , i,  All_Vector[1][i][0] , All_Vector[1][i][1] ,All_Vector[1][i][1] , All_Vector[1][i][2] , All_Vector[1][i][2]   ); 
+      return All_Vector[1][i][0] ;
+    }
+  }
+  return 9876;    //_S2 what do I return if not found??
+}
+
+// return the Scancode of for given VirtualKey of Other US
+KMX_DWORD get_SC_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector){
+  // find correct row of char in US
+  for( int i=0; i< (int)All_Vector[0].size()-1;i++) {
+    if  ( All_Vector[0][i][1] == VK_US ) {
+      wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i (%c) : %i (%c)  --- \n",VK_US , i,  All_Vector[0][i][0] , All_Vector[0][i][1] ,All_Vector[0][i][1] , All_Vector[0][i][2] , All_Vector[0][i][2]   ); 
+      return All_Vector[0][i][0] ;
+    }
+  }
+  return 98765;    //_S2 what do I return if not found??
 }
