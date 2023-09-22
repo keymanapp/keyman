@@ -13,13 +13,18 @@ TODO check how many/which shift states we use ( at the moment we read all shifts
 TODO define folder to store File_US.txt" in and find better name
 TODO get rid of GTK functions that are deprecated and use X11 instead
 TODO retrieve name of Other keyboard and use appropriate name instead of "Other"
-TODO mcompile.cpp: open mcompile -u - option
+TODO mcompile.cpp: open mcompile -u - option - do we need that?
 TODO check if I can use files from some other keyman path instead of a copy in keymap ( e.g. filesystem.h exists elsewhere)
 TODO remove kbdid and kbd for Linux
 TODO shiftstate-count
 TODO keymap SplitToV.cpp exchange 4 with genaerated shiftcount
 TODO check if part with surplus is neccessary
 TODO shift-statevector
+TODO Do I need HKL for Linux / can I just use a void* ??
+TODO typeddef of KMX_HKL - van I delete all m_hkl from classes?
+TODO define what to return when SC/VK is not found in    get_VirtualKey_Other_From_SC,...
+TODO check if passed All_Vectpor as ptr/ref not as value e.g. in KMX_CharFromVK, KMX_VKUSToVKUnderlyingLayout, KMX_ImportRules
+ToDo in get_VirtualKey_Other_From_SC:  what if we use  column 3(altgr) and 4 (shift+altgr) ??
 TODO ...
 
 //---------------------------

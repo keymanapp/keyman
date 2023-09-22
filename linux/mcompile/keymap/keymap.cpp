@@ -396,14 +396,25 @@ bool test_single(v_dw_3D &V) {
 // return RETURN NON SHIFTED CHAR [1]  the VirtualKey of the Other Keyboard for given Scancode
 KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
   // find correct row of char in US
-  for( int i=0; i< (int)All_Vector[1].size()-1;i++) {
-    if  ( All_Vector[1][i][0] == SC ) {
-      wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i (%c) : %i (%c)  --- \n",SC , i,  All_Vector[1][i][0] , All_Vector[1][i][1] ,All_Vector[1][i][1] , All_Vector[1][i][2] , All_Vector[1][i][2]   ); 
-      return All_Vector[1][i][1] ;
-      //return All_Vector[1][i][2] ;    // would be shifted version
+  for( int k=0; k< (int)All_Vector.size()-1;k++) {
+    for( int i=0; i< (int)All_Vector[1].size()-1;i++) {
+
+      // _S2 what if we use  column 3(altgr) and 4 (shift+altgr) ??
+
+      // unshifted values e.g. "q" (=113) are stored in column All_Vector[1][i][ 1 ]
+      if  ( All_Vector[k][i][0] == (SC- All_Vector[0].size() )) {
+        wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i(%c)   (%i (%c) : %i (%c) ) --- \n",SC , i,  All_Vector[k][i][0] , All_Vector[k][i][1] ,All_Vector[1][i][1],All_Vector[1][i][1],All_Vector[k][i][1] , All_Vector[k][i][2] , All_Vector[k][i][2]   ); 
+        return All_Vector[1][i][1] ;
+      }
+
+      // shifted values e.g. "Q" (=81) are stored in column All_Vector[1][i][ 2 ]
+      if  ( All_Vector[k][i][0] == SC ) {
+        wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i(%c)   (%i (%c) : %i (%c) ) --- \n",SC , i,  All_Vector[k][i][0] , All_Vector[k][i][1] ,All_Vector[1][i][2],All_Vector[1][i][2] ,All_Vector[k][i][1] , All_Vector[k][i][2] , All_Vector[k][i][2]   ); 
+        return All_Vector[1][i][2] ;
+      }
     }
   }
-  return 98;    //_S2 what do I return if not found??
+  return 0;    //_S2 what do I return if not found??
 }
 
 
@@ -413,11 +424,11 @@ KMX_DWORD get_VirtualKey_US_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
   for( int i=0; i< (int)All_Vector[0].size()-1;i++) {
     if  ( All_Vector[0][i][0] == SC ) {
       wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i (%c) : %i (%c)  ---          ",SC , i,  All_Vector[0][i][0] , All_Vector[0][i][1] ,All_Vector[0][i][1] , All_Vector[0][i][2] , All_Vector[0][i][2]   ); 
-      return All_Vector[0][i][1] ;
+      return All_Vector[0][i][1] ;      // shouldn this be [0][i][2]?
       //return All_Vector[0][i][2] ;    // would be shifted version
     }
   }
-  return 987;    //_S2 what do I return if not found??
+  return 0;    //_S2 what do I return if not found??
 }
 
 
@@ -430,7 +441,7 @@ KMX_DWORD get_SC_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector)
       return All_Vector[1][i][0] ;
     }
   }
-  return 9876;    //_S2 what do I return if not found??
+  return 0;    //_S2 what do I return if not found??
 }
 
 // return the Scancode of for given VirtualKey of Other US
@@ -442,5 +453,5 @@ KMX_DWORD get_SC_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector){
       return All_Vector[0][i][0] ;
     }
   }
-  return 98765;    //_S2 what do I return if not found??
+  return 0;    //_S2 what do I return if not found??
 }

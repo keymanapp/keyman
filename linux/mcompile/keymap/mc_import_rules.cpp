@@ -110,24 +110,36 @@ int DeadKeyMap(int index, std::vector<DeadKey *> *deadkeys, int deadkeyBase, std
   return 0xFFFF;
 }
 */
-class VirtualKey {
+class KMX_VirtualKey {
 private:
   KMX_HKL m_hkl;      // _S2 do I need this and is void* OK to assume?
   UINT m_vk;
   UINT m_sc;
   bool m_rgfDeadKey[10][2];
   std::wstring m_rgss[10][2];
-/*
+
 public:
-  VirtualKey(HKL hkl, UINT virtualKey) {
+  KMX_VirtualKey(KMX_HKL hkl, UINT KMX_virtualKey) {/*
     this->m_sc = MapVirtualKeyEx(virtualKey, 0, hkl);
     this->m_hkl = hkl;
-    this->m_vk = virtualKey;
-    memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
+    this->m_vk = KMX_virtualKey;
+    memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));*/
+  }
+  // _S2 can be deleted later
+  KMX_VirtualKey(UINT scanCode, KMX_HKL hkl) {
+    //    this->m_vk = MapVirtualKeyEx(scanCode, 1, hkl);
+    this->m_hkl = hkl;
+    this->m_sc = scanCode;
   }
 
-  VirtualKey(UINT scanCode, HKL hkl) {
-    this->m_vk = MapVirtualKeyEx(scanCode, 1, hkl);
+  KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, v_dw_3D All_Vector) {
+    // this->m_vk = MapVirtualKeyEx(scanCode, 1, hkl);  // second para= 1: MAPVK_VSC_TO_VK =1
+    //                                                  The first parameter is a scan code and is
+    //                                                  translated into a virtual-key code that does not
+    //                                                  distinguish between left- and right-hand keys.
+    //                                                  If there is no translation, the function returns 0.
+    //                                                  SC -> VK
+    this->m_vk = get_VirtualKey_Other_From_SC(scanCode, All_Vector);
     this->m_hkl = hkl;
     this->m_sc = scanCode;
   }
@@ -139,7 +151,7 @@ public:
   UINT SC() {
     return this->m_sc;
   }
-  
+/*
   std::wstring GetShiftState(ShiftState shiftState, bool capsLock) {
     return this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)];
   }
@@ -463,7 +475,8 @@ int GetMaxDeadkeyIndex(WCHAR *p) {
   return n;
 }
 */
-bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
+
+bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
  wprintf(L"\n ##### KMX_ImportRules of mc_import_rules started #####\n");
   KMX_Loader loader;
   const size_t BUF_sz= 256;
@@ -486,28 +499,31 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp, std::vector<KMX_Deadkey
                                                                                           }
                                                                                           */
 
+  KMX_HKL hkl = NULL;               //_S2 added: but can I do this?? hkl is not needed in Linux??
+
+
   BYTE lpKeyState[256];// = new KeysEx[256];
-  std::vector<VirtualKey*> rgKey; //= new VirtualKey[256];
+  std::vector<KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
   std::vector<DeadKey*> alDead;
 
   rgKey.resize(256);
 
-int STOP = 0;
-/*
   // _S2 scroll through OTHER
   // Scroll through the Scan Code (SC) values and get the valid Virtual Key (VK)
   // values in it. Then, store the SC in each valid VK so it can act as both a 
   // flag that the VK is valid, and it can store the SC value.
   for(UINT sc = 0x01; sc <= 0x7f; sc++) {
-    VirtualKey *key = new VirtualKey(sc, hkl);      // _S2 get this from my Vector
+    KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, All_Vector);      // _S2 get this from my Vector
     if(key->VK() != 0) {
       rgKey[key->VK()] = key;
     } else {
       delete key;
-    }
+    }/**/
   }
 
-
+int STOP = 0;
+/*
+_S2 use KMX_VirtualKey !!
   // _S2 do I need NUMPAD + SPECIAL_SHIFT for first draft ??
   // add the special keys that do not get added from the code above
   for(UINT ke = VK_NUMPAD0; ke <= VK_NUMPAD9; ke++) {
@@ -605,7 +621,7 @@ int STOP = 0;
       }
   }
 
-  // _S2 do I need this for UNIX??
+  // _S2 do I need this for Linux??
   for(int i = 0; i < cKeyboards; i++) {
     if(hkl == rghkl[i]) {
       hkl = NULL;
@@ -613,7 +629,7 @@ int STOP = 0;
     }
   }
 
-  // _S2 do I need this for UNIX??
+  // _S2 do I need this for Linux??
   if(hkl != NULL) {
     UnloadKeyboardLayout(hkl);
   }

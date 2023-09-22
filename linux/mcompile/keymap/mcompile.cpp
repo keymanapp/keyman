@@ -56,7 +56,7 @@ mcompile -d runs 4 important steps:
 
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]);
 
-bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp, std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327
+bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D &All_Vector,std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327
 
 std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys; // I4353
 
@@ -347,7 +347,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
   bool WriteFileOK =  writeFileToVector( complete_Vector,"/Projects/keyman/keyman/linux/mcompile/keymap/VectorFile2.txt" );
   bool isEqual= CompareVector_To_VectorOfFile( All_Vector, complete_Vector);
   wprintf(L" vectors are equal: %i\n",isEqual);*/
-test(All_Vector);
+//test(All_Vector);
 
 //test_In_Out(All_Vector);
 
@@ -400,7 +400,7 @@ wprintf(L"\n##### KMX_ReportUnconvertedKeyboardRules of mcompile will start ####
 // _S2 convert mcompile Step1: use (wrong) Datatype WCHAR (=wchar_t)
 // _S2 convert mcompile Step2: use (OK) Datatype KMX_WCHAR (=char16_t)
 
-  if(!KMX_ImportRules(kbid, kbd, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
+  if(!KMX_ImportRules(kbid, kbd, All_Vector, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
     return FALSE;
   }
 /**/
