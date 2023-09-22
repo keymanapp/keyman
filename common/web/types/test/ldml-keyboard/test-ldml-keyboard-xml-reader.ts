@@ -1,4 +1,4 @@
-import { LKKey } from './../../src/ldml-keyboard/ldml-keyboard-xml.js';
+import { LKKey, ImportStatus } from './../../src/ldml-keyboard/ldml-keyboard-xml.js';
 import 'mocha';
 import {assert} from 'chai';
 import { CommonTypesMessages } from '../../src/util/common-events.js';
@@ -40,6 +40,9 @@ describe('ldml keyboard xml reader tests', function () {
           {id: 'b', to: 'b'},
           {id: 'c', to: 'c'},
         ]);
+        // all of the keys are implied imports here
+        assert.isTrue(ImportStatus.isImpliedImport(source?.keyboard3?.keys.key.find(({id}) => id === 'a')));
+        assert.isTrue(ImportStatus.isImport(source?.keyboard3?.keys.key.find(({id}) => id === 'a')));
       },
     },
     {
@@ -81,6 +84,15 @@ describe('ldml keyboard xml reader tests', function () {
           {id: 'zz', to: 'zz'},     // new key
           {id: 'hash', to: '##'},   // override
         ]);
+        // 'a' is an implied import
+        assert.isTrue(ImportStatus.isImpliedImport(k.find(({id}) => id === 'a')));
+        assert.isTrue(ImportStatus.isImport(k.find(({id}) => id === 'a')));
+        // 'hash' is an import but not implied
+        assert.isFalse(ImportStatus.isImpliedImport(k.find(({id}) => id === 'hash')));
+        assert.isTrue(ImportStatus.isImport(k.find(({id}) => id === 'hash')));
+        // 'zz' is not imported
+        assert.isFalse(ImportStatus.isImpliedImport(k.find(({id}) => id === 'zz')));
+        assert.isFalse(ImportStatus.isImport(k.find(({id}) => id === 'zz')));
       },
     },
     {

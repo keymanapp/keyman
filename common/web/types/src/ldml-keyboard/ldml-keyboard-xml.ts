@@ -12,7 +12,7 @@ export interface LDMLKeyboardXMLSourceFile {
    * <keyboard> -- the root element.
    */
   keyboard3: LKKeyboard;
-}
+};
 
 export interface LKKeyboard {
   locale?: string;
@@ -193,3 +193,23 @@ export interface LKDisplays {
   display?: LKDisplay[];
   displayOptions?: LKDisplayOptions;
 };
+
+/**
+ * Utilities for determining the import status of items
+ */
+export class ImportStatus {
+  /** item came in via implied (spec based) import, such as keys-Latn-implied.xml */
+  static impliedImport = Symbol.for('@keymanapp:implied_import');
+  /** item came in via import */
+  static import = Symbol.for('@keymanapp:import');
+
+  /** @returns true if the object was loaded through an implied import */
+  static isImpliedImport(o : any) : boolean {
+    return o && !!o[ImportStatus.impliedImport];
+  }
+  /** @returns true if the object was loaded through an explicit import */
+  static isImport(o : any) : boolean {
+    return o && !!o[ImportStatus.import];
+  }
+};
+

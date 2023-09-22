@@ -1,5 +1,5 @@
 import * as xml2js from 'xml2js';
-import { LDMLKeyboardXMLSourceFile, LKImport } from './ldml-keyboard-xml.js';
+import { LDMLKeyboardXMLSourceFile, LKImport, ImportStatus } from './ldml-keyboard-xml.js';
 import { default as AjvModule } from 'ajv';
 const Ajv = AjvModule.default; // The actual expected Ajv type.
 import { boxXmlArray } from '../util/util.js';
@@ -157,7 +157,7 @@ export class LDMLKeyboardXMLSourceFileReader {
       if (!this.resolveOneImport(obj, subtag, {
         base: constants.cldr_import_base,
         path: constants.cldr_implied_keys_import
-      })) {
+      }, true)) {
         return false;
       }
     } else if (subtag === 'forms') {
@@ -165,7 +165,7 @@ export class LDMLKeyboardXMLSourceFileReader {
       if (!this.resolveOneImport(obj, subtag, {
         base: constants.cldr_import_base,
         path: constants.cldr_implied_forms_import
-      })) {
+      }, true)) {
         return false;
       }
     }
@@ -176,9 +176,10 @@ export class LDMLKeyboardXMLSourceFileReader {
    * @param obj the object being imported into
    * @param subtag obj's element tag, e.g. `keys`
    * @param asImport the import structure
+   * @param implied true if it is an implied import
    * @returns true on success, false on failure
    */
-  private resolveOneImport(obj: any, subtag: string, asImport: LKImport) : boolean {
+  private resolveOneImport(obj: any, subtag: string, asImport: LKImport, implied? : boolean) : boolean {
     const { base, path } = asImport;
     if (base !== constants.cldr_import_base) {
       this.callbacks.reportMessage(CommonTypesMessages.Error_ImportInvalidBase({base, path, subtag}));
@@ -205,12 +206,20 @@ export class LDMLKeyboardXMLSourceFileReader {
     // pull all children of importXml[subtag] into obj
     for (const subsubtag of Object.keys(importRootNode).reverse()) { // e.g. <key/>
       const subsubval = importRootNode[subsubtag];
+      const basePath = `${base}/${path}`;
       if (!Array.isArray(subsubval)) {
         // This is somewhat of an internal error, indicating that a non-mergeable XML file was imported
         // Not exercisable with the standard LDML imports.
         this.callbacks.reportMessage(CommonTypesMessages.Error_ImportMergeFail({base, path, subtag, subsubtag}));
         return false;
       }
+      // Mark all children as an import
+      subsubval.forEach(o => o[ImportStatus.import] = basePath);
+      if (implied) {
+        // mark all children as an implied import
+        subsubval.forEach(o => o[ImportStatus.impliedImport] = basePath);
+      }
+
       if (!obj[subsubtag]) {
         obj[subsubtag] = []; // start with empty array
       }
