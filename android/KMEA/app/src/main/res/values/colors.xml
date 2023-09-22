@@ -6,9 +6,5 @@
     <color name="popup_bg">#ff282828</color>
     <color name="popup_bg2">#ff000000</color>
     <color name="popup_border">#ff282828</color>
-    
-    <color name="key_preview_bg">#ff838383</color>
-    <color name="key_preview_bg2">#ff333333</color>
-    <color name="key_preview_border">#ff737373</color>
 
 </resources>
