@@ -25,6 +25,10 @@ export async function buildWindowsPackageInstaller(infile: string, options: Wind
     titleImageFilename: options.titleImage
   }
 
+  // Normalize case for the filename and expand the path; this avoids false
+  // positive case mismatches on input filenames and glommed paths
+  infile = fs.realpathSync.native(infile);
+
   const callbacks: CompilerCallbacks = new NodeCompilerCallbacks({...defaultCompilerOptions, ...options});
   const compiler = new WindowsPackageInstallerCompiler(callbacks);
 
