@@ -1,5 +1,5 @@
 // Defines the PUA code mapping for the various 'special' modifier/control/non-printing keys on keyboards.
-// `specialCharacters` must be kept in sync with the same variable in builder.js. See also CompileKeymanWeb.pas: CSpecialText10
+// `specialCharacters` must be kept in sync with the same variable in constants.js. See also CompileKeymanWeb.pas: CSpecialText10
 let specialCharacters = {
   '*Shift*':    8,
   '*Enter*':    5,
@@ -44,7 +44,7 @@ let specialCharacters = {
   '*ZWNJiOS*':        0x75, // The iOS version will be used by default, but the
   '*ZWNJAndroid*':    0x76, // Android platform has its own default glyph.
   // Added in Keyman 17.0.
-  // Reference: https://github.com/silnrsi/font-symchar/blob/v3.000/documentation/encoding.md
+  // Reference: https://github.com/silnrsi/font-symchar/blob/v4.000/documentation/encoding.md
   '*Sp*':             0x80, // Space
   '*NBSp*':           0x82, // No-break Space
   '*NarNBSp*':        0x83, // Narrow No-break Space
