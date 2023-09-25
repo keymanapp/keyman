@@ -45,12 +45,12 @@ interface BannerViewEventMap {
  *   * This should help to avoid wasting computational resources.
  * * It will listen to ModelManager events and automatically swap Banner
  *   instances as appropriate:
- *   * The option `persistentBanner == true` is designed to replicate current
+ *   * The option `alwaysShow == true` is designed to replicate current
  *     iOS system keyboard behavior.
  *     * When true, an `ImageBanner` will be displayed.
  *     * If false, it will be replaced with a `BlankBanner` of zero height,
  *       corresponding to our current default lack of banner.
- *   * It will not automatically set `persistentBanner == true`;
+ *   * It will not automatically set `alwaysShow == true`;
  *     this must be set by the iOS app, and only under the following conditions:
  *     * `keyman.isEmbedded == true`
  *     * `device.OS == 'ios'`
@@ -210,13 +210,13 @@ export class BannerController {
    * Sets options used to tweak the automatic `Banner`
    * control logic used by `BannerManager`.
    * @param optionSpec An object specifying one or more of the following options:
-   * * `persistentBanner` (boolean) When `true`, ensures that a `Banner`
+   * * `alwaysShow` (boolean) When `true`, ensures that a `Banner`
    *   is always displayed, even when no predictive model exists
    *   for the active language.
    *
    *   Default: `false`
    * * `imagePath` (URL string) Specifies the file path to use for an
-   *   `ImageBanner` when `persistentBanner` is `true` and no predictive model exists.
+   *   `ImageBanner` when `alwaysShow` is `true` and no predictive model exists.
    *
    *   Default: `''`.
    * * `enablePredictions` (boolean) Turns KMW predictions
@@ -243,7 +243,8 @@ export class BannerController {
 
       // If no banner instance exists yet, go with a safe, blank initialization.
       if(!this.container.banner) {
-        this.selectBanner('inactive');
+        //this.selectBanner('inactive');
+        this.setBanner('image');
       }
     }
   }
