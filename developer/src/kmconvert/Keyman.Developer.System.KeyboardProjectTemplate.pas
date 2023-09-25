@@ -35,11 +35,9 @@ type
     procedure WriteKPJ;
     procedure WriteKVKS;
     procedure WriteTouchLayout;
-    procedure WriteKeyboardInfo;
     procedure WriteIcon;
   protected
     const
-      SFileTemplate_KeyboardInfo = '%s.keyboard_info'; // in root
       SDataPath_BasicKeyboard = 'basic-keyboard\';
 
     function DataPath: string; override;
@@ -104,8 +102,6 @@ begin
   WriteKPJ;
 
   WriteRepositoryMetadata;
-
-  WriteKeyboardInfo;
 end;
 
 function TKeyboardProjectTemplate.GetIconFilename: string;
@@ -148,15 +144,6 @@ end;
 function TKeyboardProjectTemplate.HasTouchLayout: Boolean;
 begin
   Result := (TouchKeymanTargets+[ktAny]) * Targets <> [];
-end;
-
-procedure TKeyboardProjectTemplate.WriteKeyboardInfo;
-begin
-  // Write keyboardid.keyboard_info
-  Transform(
-    Format(SFileTemplate_KeyboardInfo, ['keyboard']),
-    Format(SFileTemplate_KeyboardInfo, [ID])
-  );
 end;
 
 procedure TKeyboardProjectTemplate.WriteKMN;
@@ -227,7 +214,6 @@ begin
     kpj.Files.Add(TOpenableProjectFile.Create(kpj, BasePath + ID + '\' + SFile_HistoryMD, nil));
     kpj.Files.Add(TOpenableProjectFile.Create(kpj, BasePath + ID + '\' + SFile_LicenseMD, nil));
     kpj.Files.Add(TOpenableProjectFile.Create(kpj, BasePath + ID + '\' + SFile_ReadmeMD, nil));
-    kpj.Files.Add(TOpenableProjectFile.Create(kpj, BasePath + ID + '\' + Format(SFileTemplate_KeyboardInfo, [ID]), nil));
 
     kpj.Save;
   finally
