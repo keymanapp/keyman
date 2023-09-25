@@ -102,7 +102,9 @@ final class KMKeyboard extends WebView {
   // Tiling black background generated from https://elmah.io/tools/base64-image-encoder/
   // TODO: Replace with image/css?
   protected static final String KM_BANNER_BLANK_IMAGE_PATH =
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAARCAIAAABM7ytaAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAVSURBVDhPYxgFo2AUjIJRQDpgYAAABT8AAcEGbxwAAAAASUVORK5CYII=";
+    //"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAARCAIAAABM7ytaAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAVSURBVDhPYxgFo2AUjIJRQDpgYAAABT8AAcEGbxwAAAAASUVORK5CYII=";
+    //"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAARCAYAAADDjbwNAAAABHNCSVQICAgIfAhkiAAAACNJREFUOI1j9PnP8J+BDoCJHpaMWjRq0ahFoxaNWjRqEQEAAG4mAmxMRRQ1AAAAAElFTkSuQmCC=";
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAARCAYAAADDjbwNAAAABHNCSVQICAgIfAhkiAAAACNJREFUOI1j9PnP8J+BDoCJHpaMWjRq0ahFoxaNWjRqEQEAAG4mAmxMRRQ1AAAAAElFTkSuQmCCBT8AAcEGbxwAAAAASUVORK5CYII=";
   /**
    * Current banner state.
    */
@@ -671,14 +673,19 @@ final class KMKeyboard extends WebView {
   }
 
   public void showBanner(boolean flag) {
-    String jsFormat = "showBanner('%s')";
-    String jsString = KMString.format(jsFormat, flag ? "true" : "false");
+    String jsString = KMString.format("showBanner(%b)", flag);
     loadJavascript(jsString);
   }
 
   public void setBannerImage(String path) {
     this.bannerImgPath = path; // Save the path in case delayed initialization is needed
-    Log.d(TAG, "Banner image path: " + path);
+    String logString = "";
+    if (path != null && path.contains("base64") || path.length() > 256) {
+      logString = "<base64 image>";
+    } else {
+      logString = path;
+    }
+    KMLog.LogInfo(TAG, KMString.format("Banner image path: (%s).", logString));
     String jsString = KMString.format("setBannerImage('%s')", path);
     loadJavascript(jsString);
   }

@@ -57,15 +57,23 @@ function init() {
 }
 
 function showBanner(flag) {
+  window.console.log("setOptions{'alwaysShow': " + flag + "}");
   if (keyman.osk) {
-    keyman.osk.bannerController.setOptions({'alwaysShow': flag});
+    keyman.osk.bannerController.setOptions({"alwaysShow": flag});
   }
 }
 
+// Set the path to use for the image banner
+// path - String starting with "data:image/png;base64,"
 function setBannerImage(path) {
   if (keyman.osk) {
-    keyman.osk.bannerController.setOptions({"imagePath": path});
+    keyman.osk.bannerController.setOptions({
+      "imagePath": path,
+      "alwaysShow": true});
   }
+
+  // Refresh KMW's OSK
+  keyman.refreshOskLayout();
 }
 
 function notifyHost(event, params) {

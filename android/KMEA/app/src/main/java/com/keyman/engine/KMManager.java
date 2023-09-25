@@ -612,14 +612,12 @@ public final class KMManager {
     if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard == null) {
       InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
       InAppKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
-      InAppKeyboard.showBanner(true);
       InAppKeyboard.setBannerImage(InAppKeyboard.KM_BANNER_BLANK_IMAGE_PATH);
       keyboard = InAppKeyboard;
       webViewClient = InAppKeyboardWebViewClient;
     } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard == null) {
       SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
       SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
-      SystemKeyboard.showBanner(true);
       SystemKeyboard.setBannerImage(SystemKeyboard.KM_BANNER_BLANK_IMAGE_PATH);
       keyboard = SystemKeyboard;
       webViewClient = SystemKeyboardWebViewClient;
@@ -1381,7 +1379,7 @@ public final class KMManager {
    * @return boolean - Success
    */
   public static boolean setBannerOptions(boolean mayPredict) {
-    String url = KMString.format("setBannerOptions(%s)", mayPredict);
+    String url = KMString.format("setBannerOptions(%b)", mayPredict); // TODO?
     if (InAppKeyboard != null) {
       InAppKeyboard.loadJavascript(url);
     }
@@ -1390,8 +1388,6 @@ public final class KMManager {
       SystemKeyboard.loadJavascript(url);
     }
 
-    // For now, always display banner
-    showBanner(true);
     return true;
   }
 
