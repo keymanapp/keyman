@@ -213,9 +213,9 @@ export interface LKScanCodes {
  */
 export class ImportStatus {
   /** item came in via implied (spec based) import, such as keys-Latn-implied.xml */
-  static impliedImport = Symbol.for('@keymanapp:implied_import');
+  static impliedImport = Symbol('LDML implied import');
   /** item came in via import */
-  static import = Symbol.for('@keymanapp:import');
+  static import = Symbol('LDML import');
 
   /** @returns true if the object was loaded through an implied import */
   static isImpliedImport(o : any) : boolean {
