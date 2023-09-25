@@ -26,7 +26,9 @@
   "dependencies": {
     "@keymanapp/common-types": "*",
     "@keymanapp/kmc-package": "*",
-    "@keymanapp/developer-utils": "*"
+    "@keymanapp/developer-utils": "*",
+    "ajv": "^8.11.0",
+    "ajv-formats": "^2.1.1"
   },
   "bundleDependencies": [
     "@keymanapp/developer-utils"
