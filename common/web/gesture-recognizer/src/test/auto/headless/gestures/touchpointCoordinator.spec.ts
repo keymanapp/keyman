@@ -18,6 +18,7 @@ import { assertGestureSequence, SequenceAssertion } from "../../../resources/seq
 
 import {
   LongpressModel,
+  ModipressEndModel,
   ModipressStartModel,
   MultitapModel,
   SimpleTapModel,
@@ -30,7 +31,8 @@ const TestGestureModelDefinitions: GestureModelDefs<string> = {
     MultitapModel,
     SimpleTapModel,
     SubkeySelectModel,
-    ModipressStartModel
+    ModipressStartModel,
+    ModipressEndModel
   ],
   sets: {
     default: [LongpressModel.id, SimpleTapModel.id, ModipressStartModel.id],
@@ -788,6 +790,352 @@ describe("TouchpointCoordinator", () => {
 
     await runnerPromise;
     await sequenceAssertionPromise.corePromise;
+    assert.isEmpty(touchpointCoordinator.activeGestures);
+  });
+
+  it('modipress: one simple tap before its end', async () => {
+    const turtle0 = new TouchpathTurtle({
+      targetX: 1,
+      targetY: 1,
+      t: 100,
+      item: 'shift'
+    });
+    turtle0.wait(120, 6);
+    turtle0.commitPending();
+
+    const turtle1 = new TouchpathTurtle({
+      targetX: 11,
+      targetY: 11,
+      t: 200,
+      item: 'a'
+    });
+    turtle1.wait(40, 2);
+    turtle1.commitPending();
+
+    const emulationEngine = new HeadlessInputEngine();
+    const touchpointCoordinator = new TouchpointCoordinator(TestGestureModelDefinitions, [emulationEngine]);
+    const completionPromise = emulationEngine.playbackRecording({
+      inputs: [ {
+        path: {
+          coords: turtle0.path,
+        },
+        isFromTouch: true
+      }, {
+        path: {
+          coords: turtle1.path,
+        },
+        isFromTouch: true
+      }],
+      config: null
+    }).then(async () => {
+      // Ride out the multitap timer so we can achieve full completion.
+
+      // TODO:  We should not need this timer when all is said and done; the modipress's end
+      // should auto-terminate any further gesture processing on the simple-tap sequence.
+
+      // Please request changes if this TODO remains.
+
+      let promise = timedPromise(MultitapModel.sustainTimer.duration+1).then(() => {});
+      await fakeClock.runToLastAsync();
+      await promise;
+    });
+
+    const sequenceAssertions: SequenceAssertion<string>[] = [
+      [
+        {
+          matchedId: 'modipress-start',
+          item: 'shift',
+          linkType: 'chain',
+          sources: (sources) => {
+            assert.equal(sources.length, 1);
+            assert.isFalse(sources[0].isPathComplete);
+            return;
+          }
+        }, {
+          matchedId: 'modipress-end',
+          item: null,
+          linkType: 'complete',
+          sources: (sources) => {
+            assert.equal(sources.length, 1);
+            assert.isTrue(sources[0].isPathComplete);
+            return;
+          }
+        }
+      ], [
+        {
+          matchedId: 'simple-tap',
+          item: 'a',
+          linkType: 'chain',
+          sources: (sources) => {
+            assert.equal(sources.length, 1);
+            assert.isTrue(sources[0].isPathComplete);
+            return;
+          }
+        }
+      ]
+    ];
+
+    const sequencePromises = [new ManagedPromise<void>(), new ManagedPromise<void>()];
+    const sequenceAssertionPromises = [new ManagedPromise<void>(), new ManagedPromise<void>()];
+    let sequenceIndex = 0;
+    touchpointCoordinator.on('recognizedgesture', async (sequence) => {
+      const index = sequenceIndex++;
+      try {
+        sequencePromises[index].resolve();
+        await assertGestureSequence(sequence, completionPromise, sequenceAssertions[index]);
+        sequenceAssertionPromises[index].resolve();
+      } catch(err) {
+        sequenceAssertionPromises[index].reject(err);
+      }
+    });
+
+    const runnerPromise = fakeClock.runToLastAsync();
+
+    await sequencePromises[0].corePromise;
+    assert.isNotEmpty(touchpointCoordinator.activeGestures);
+
+    await sequencePromises[1].corePromise;
+    assert.isNotEmpty(touchpointCoordinator.activeGestures);
+
+    await runnerPromise;
+
+    // index 0 should complete before index 1... when the earlier TODO is fixed.
+    await sequenceAssertionPromises[1].corePromise;
+    assert.isEmpty(touchpointCoordinator.activeGestures);
+  });
+
+  it('modipress: disallows nested modipress attempts', async () => {
+    const turtle0 = new TouchpathTurtle({
+      targetX: 1,
+      targetY: 1,
+      t: 100,
+      item: 'shift'
+    });
+    turtle0.wait(120, 6);
+    turtle0.commitPending();
+
+    const turtle1 = new TouchpathTurtle({
+      targetX: 11,
+      targetY: 11,
+      t: 200,
+      item: 'alt'
+    });
+    turtle1.wait(40, 2);
+    turtle1.commitPending();
+
+    const emulationEngine = new HeadlessInputEngine();
+    const touchpointCoordinator = new TouchpointCoordinator(TestGestureModelDefinitions, [emulationEngine]);
+    const completionPromise = emulationEngine.playbackRecording({
+      inputs: [ {
+        path: {
+          coords: turtle0.path,
+        },
+        isFromTouch: true
+      }, {
+        path: {
+          coords: turtle1.path,
+        },
+        isFromTouch: true
+      }],
+      config: null
+    }).then(async () => {
+      // Ride out the multitap timer so we can achieve full completion.
+
+      // TODO:  We should not need this timer when all is said and done; the modipress's end
+      // should auto-terminate any further gesture processing on the simple-tap sequence.
+
+      // Please request changes if this TODO remains.
+
+      let promise = timedPromise(MultitapModel.sustainTimer.duration+1).then(() => {});
+      await fakeClock.runToLastAsync();
+      await promise;
+    });
+
+    const sequenceAssertions: SequenceAssertion<string>[] = [
+      [
+        {
+          matchedId: 'modipress-start',
+          item: 'shift',
+          linkType: 'chain',
+          sources: (sources) => {
+            assert.equal(sources.length, 1);
+            assert.isFalse(sources[0].isPathComplete);
+            return;
+          }
+        }, {
+          matchedId: 'modipress-end',
+          item: null,
+          linkType: 'complete',
+          sources: (sources) => {
+            assert.equal(sources.length, 1);
+            assert.isTrue(sources[0].isPathComplete);
+            return;
+          }
+        }
+      ], [
+        /* In the test config, there's nothing preventing 'alt' from being
+         * considered a legal key for simple taps.  Because of the ongoing
+         * shift-modipress, it can't itself be modipressed... and so it
+         * shows up like this.
+         */
+        {
+          matchedId: 'simple-tap',
+          item: 'alt',
+          linkType: 'chain',
+          sources: (sources) => {
+            assert.equal(sources.length, 1);
+            assert.isTrue(sources[0].isPathComplete);
+            return;
+          }
+        }
+      ]
+    ];
+
+    const sequencePromises = [new ManagedPromise<void>(), new ManagedPromise<void>()];
+    const sequenceAssertionPromises = [new ManagedPromise<void>(), new ManagedPromise<void>()];
+    let sequenceIndex = 0;
+    touchpointCoordinator.on('recognizedgesture', async (sequence) => {
+      const index = sequenceIndex++;
+      try {
+        sequencePromises[index].resolve();
+        await assertGestureSequence(sequence, completionPromise, sequenceAssertions[index]);
+        sequenceAssertionPromises[index].resolve();
+      } catch(err) {
+        sequenceAssertionPromises[index].reject(err);
+      }
+    });
+
+    const runnerPromise = fakeClock.runToLastAsync();
+
+    await sequencePromises[0].corePromise;
+    assert.isNotEmpty(touchpointCoordinator.activeGestures);
+
+    await sequencePromises[1].corePromise;
+    assert.isNotEmpty(touchpointCoordinator.activeGestures);
+
+    await runnerPromise;
+
+    // index 0 should complete before index 1... when the earlier TODO is fixed.
+    await sequenceAssertionPromises[1].corePromise;
+    assert.isEmpty(touchpointCoordinator.activeGestures);
+  });
+
+  it('modipress: simple longpress within its duration', async () => {
+    const turtle0 = new TouchpathTurtle({
+      targetX: 1,
+      targetY: 1,
+      t: 100,
+      item: 'shift'
+    });
+    turtle0.wait(1000, 50);
+    turtle0.commitPending();
+
+    const turtle1 = new TouchpathTurtle({
+      targetX: 1,
+      targetY: 1,
+      t: 120,
+      item: 'a'
+    });
+    turtle1.wait(600, 50);
+    turtle1.move(0, 10, 100, 5);
+    turtle1.hoveredItem = 'à';
+    turtle1.move(90, 10, 100, 5);
+    turtle1.hoveredItem = 'â';
+    turtle1.commitPending();
+
+    const emulationEngine = new HeadlessInputEngine();
+    const touchpointCoordinator = new TouchpointCoordinator(TestGestureModelDefinitions, [emulationEngine]);
+    const completionPromise = emulationEngine.playbackRecording({
+      inputs: [ {
+        path: {
+          coords: turtle0.path,
+        },
+        isFromTouch: true
+      }, {
+        path: {
+          coords: turtle1.path,
+        },
+        isFromTouch: true
+      }],
+      config: null
+    });
+
+    const sequenceAssertions: SequenceAssertion<string>[] = [
+      [
+        {
+          matchedId: 'modipress-start',
+          item: 'shift',
+          linkType: 'chain',
+          sources: (sources) => {
+            assert.equal(sources.length, 1);
+            assert.isFalse(sources[0].isPathComplete);
+            return;
+          }
+        }, {
+          matchedId: 'modipress-end',
+          item: null,
+          linkType: 'complete',
+          sources: (sources) => {
+            assert.equal(sources.length, 1);
+            assert.isTrue(sources[0].isPathComplete);
+            return;
+          }
+        }
+      ], [
+        {
+          matchedId: 'longpress',
+          item: null,
+          linkType: 'chain',
+          sources: (sources) => {
+            // Assert single-source
+            assert.equal(sources.length, 1);
+
+            // Assert wait appropriate to the longpress threshold.  Likely won't be the full 1000 ms.
+            const pathStats = sources[0].path.stats;
+            assert.isAtLeast(pathStats.duration, LongpressModel.contacts[0].model.timer.duration - 1);
+            assert.isAtMost(pathStats.rawDistance, 0.1);
+            return;
+          }
+        },
+        {
+          matchedId: 'subkey-select',
+          item: 'â',
+          linkType: 'complete',
+          sources: (sources) => {
+            const pathStats = sources[0].path.stats;
+            assert.isAtLeast(pathStats.rawDistance, 19.9);
+            assert.isAtLeast(pathStats.duration, 1200 - LongpressModel.contacts[0].model.timer.duration - 2);
+          }
+        }
+      ]
+    ];
+
+    const sequencePromises = [new ManagedPromise<void>(), new ManagedPromise<void>()];
+    const sequenceAssertionPromises = [new ManagedPromise<void>(), new ManagedPromise<void>()];
+    let sequenceIndex = 0;
+    touchpointCoordinator.on('recognizedgesture', async (sequence) => {
+      const index = sequenceIndex++;
+      try {
+        sequencePromises[index].resolve();
+        await assertGestureSequence(sequence, completionPromise, sequenceAssertions[index]);
+        sequenceAssertionPromises[index].resolve();
+      } catch(err) {
+        sequenceAssertionPromises[index].reject(err);
+      }
+    });
+
+    const runnerPromise = fakeClock.runToLastAsync();
+
+    await sequencePromises[0].corePromise;
+    assert.isNotEmpty(touchpointCoordinator.activeGestures);
+
+    await sequencePromises[1].corePromise;
+    assert.isNotEmpty(touchpointCoordinator.activeGestures);
+
+    await runnerPromise;
+
+    // index 0 completes before index 1!
+    await sequenceAssertionPromises[0].corePromise;
     assert.isEmpty(touchpointCoordinator.activeGestures);
   });
 });

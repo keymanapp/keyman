@@ -171,6 +171,7 @@ export const ModipressEndModel: GestureModel = {
     }
   ],
   resolutionAction: {
-    type: 'complete'
+    type: 'complete',
+    item: 'none'
   }
 }
