@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.180 alpha 2023-09-25
+
+* fix(linux): Fix detection of unit tests (#9606)
+
 ## 17.0.179 alpha 2023-09-22
 
 * chore(resources): ldml: update to keyboard3 (#9588)
