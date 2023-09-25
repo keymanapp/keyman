@@ -34,6 +34,8 @@ function help() {
   echo "  --wayland               run tests with Wayland"
   echo "  --x11                   run tests with X11"
   echo "  --env <envfile>         Name of the file containing environment variables to use"
+  echo "  --check <pidfile>       Name of the file containing pids to check are running"
+  echo "  --cleanup <file>        Name of the file containing cleanup of processes"
   exit 0
 }
 
@@ -65,11 +67,21 @@ while (( $# )); do
     --verbose|-v) ARG_VERBOSE=--verbose;;
     --debug) ARG_DEBUG=--debug-log;;
     --env) shift ; ARG_ENV=$1 ;;
+    --check) shift; ARG_PIDS=$1 ;;
+    --cleanup) shift; ARG_CLEANUP=$1 ;;
     --) shift ; TESTFILE=$1; break ;;
     *) echo "Error: Unexpected argument \"$1\". Exiting." ; exit 4 ;;
   esac
   shift || (echo "Error: The last argument is missing a value. Exiting."; false) || exit 5
 done
+
+# shellcheck disable=SC2236
+if [ -n "${ARG_PIDS:-}" ] && [ ! -n "${ARG_CLEANUP:-}" ]; then
+  echo "Error: '--check' also requires '--cleanup'. Exiting."
+  exit 6
+fi
+
+check_processes_running "$ARG_DISPLAY_SERVER" "$ARG_ENV" "$ARG_CLEANUP" "$ARG_PIDS" >&2
 
 # shellcheck source=/dev/null
 . "$ARG_ENV"
