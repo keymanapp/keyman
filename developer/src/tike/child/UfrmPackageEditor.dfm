@@ -1134,7 +1134,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 2
           OnClick = cbLicenseClick
-          ExplicitWidth = 482
         end
       end
     end
@@ -1351,7 +1350,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           BevelOuter = bvNone
           Color = 15921906
           ParentBackground = False
-          TabOrder = 4
+          TabOrder = 3
           object lblDebugHostCaption: TLabel
             Left = 12
             Top = 70
@@ -1438,7 +1437,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Left = 15
           Top = 274
           Width = 295
-          Height = 124
+          Height = 276
           BevelOuter = bvNone
           Color = 15921906
           ParentBackground = False
@@ -1482,74 +1481,6 @@ inherited frmPackageEditor: TfrmPackageEditor
             ImageIndex = 42
             TabOrder = 1
             OnClick = cmdUninstallClick
-          end
-        end
-        object panBuildWindowsInstaller: TPanel
-          Left = 15
-          Top = 418
-          Width = 295
-          Height = 132
-          BevelOuter = bvNone
-          Color = 15921906
-          ParentBackground = False
-          TabOrder = 3
-          object Label9: TLabel
-            Left = 9
-            Top = 6
-            Width = 124
-            Height = 17
-            Caption = 'Windows Installer'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -14
-            Font.Name = 'Tahoma'
-            Font.Style = [fsBold]
-            ParentFont = False
-          end
-          object lblBootstrapMSI: TLabel
-            Left = 9
-            Top = 69
-            Width = 64
-            Height = 13
-            Caption = 'Keyman MSI:'
-            FocusControl = editBootstrapMSI
-          end
-          object lblInstallerOutputFilename: TLabel
-            Left = 9
-            Top = 37
-            Width = 82
-            Height = 13
-            Caption = 'Target filename:'
-            FocusControl = editInstallerOutputFilename
-          end
-          object editBootstrapMSI: TEdit
-            Left = 125
-            Top = 66
-            Width = 156
-            Height = 21
-            TabStop = False
-            ParentColor = True
-            ReadOnly = True
-            TabOrder = 1
-          end
-          object editInstallerOutputFilename: TEdit
-            Left = 125
-            Top = 34
-            Width = 156
-            Height = 21
-            TabStop = False
-            ParentColor = True
-            ReadOnly = True
-            TabOrder = 0
-          end
-          object cmdInstallWith: TButton
-            Left = 125
-            Top = 96
-            Width = 156
-            Height = 25
-            Caption = 'Find Keyman MSI...'
-            TabOrder = 2
-            OnClick = cmdInstallWithClick
           end
         end
         object panOpenInExplorer: TPanel
@@ -1641,22 +1572,13 @@ inherited frmPackageEditor: TfrmPackageEditor
             ReadOnly = True
             TabOrder = 0
           end
-          object cmdCompileInstaller: TButton
+          object cmdAddToProject: TButton
             Left = 148
             Top = 32
             Width = 133
             Height = 25
-            Caption = 'Compile I&nstaller'
-            TabOrder = 1
-            OnClick = cmdCompileInstallerClick
-          end
-          object cmdAddToProject: TButton
-            Left = 287
-            Top = 32
-            Width = 133
-            Height = 25
             Action = modActionsMain.actProjectAddCurrentEditorFile
-            TabOrder = 2
+            TabOrder = 1
           end
           object cmdBuildPackage: TButton
             Left = 9
@@ -1664,7 +1586,7 @@ inherited frmPackageEditor: TfrmPackageEditor
             Width = 133
             Height = 25
             Caption = 'Compile &Package'
-            TabOrder = 3
+            TabOrder = 2
             OnClick = cmdBuildPackageClick
           end
         end
@@ -1684,13 +1606,5 @@ inherited frmPackageEditor: TfrmPackageEditor
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Left = 32
     Top = 532
-  end
-  object dlgOpenProductInstaller: TOpenDialog
-    DefaultExt = 'msi'
-    Filter = 'Product Installer Files (*.msi)|*.msi|All Files (*.*)|*.*'
-    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
-    Title = 'Select Product Installer'
-    Left = 32
-    Top = 456
   end
 end

@@ -35,9 +35,7 @@ type
     function InstallPackage: Boolean;
     function UninstallPackage: Boolean;
     function CompilePackage: Boolean;
-    function CompilePackageInstaller(FSilent: Boolean): Boolean;
 
-    function GetPack: TKPSFile;
     function GetProjectFile: TkpsProjectFileAction;
     function TestPackageState(FCompiledName: string): Boolean;
   public
@@ -83,34 +81,17 @@ begin
     TestPackageOnline;
 end;
 
-function TkpsProjectFileUI.CompilePackageInstaller(FSilent: Boolean): Boolean;
-begin
-  Result := False;
-  if ProjectFile.Modified then
-    if not modActionsMain.actFileSave.Execute then Exit;
-
-  Result := ProjectFile.CompilePackageInstaller(GetPack, FSilent);
-end;
-
 function TkpsProjectFileUI.DoAction(action: TProjectFileAction; FSilent: Boolean): Boolean;
 begin
   case action of
     pfaCompile: Result := CompilePackage;
     pfaInstall: Result := InstallPackage;
     pfaUninstall: Result := UninstallPackage;
-    pfaCompileInstaller: Result := CompilePackageInstaller(FSilent);
     pfaClean: Result := ProjectFile.Clean;
     pfaTestKeymanWeb: Result := TestPackageOnline;
   else
     Result := False;
   end;
-end;
-
-function TkpsProjectFileUI.GetPack: TKPSFile;
-begin
-  if Assigned(MDIChild)
-    then with MDIChild as TfrmPackageEditor do Result := GetPack
-    else Result := nil;
 end;
 
 function TkpsProjectFileUI.GetProjectFile: TkpsProjectFileAction;
