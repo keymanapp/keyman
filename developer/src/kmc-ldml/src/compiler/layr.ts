@@ -23,9 +23,9 @@ export class LayrCompiler extends SectionCompiler {
     let hardwareLayers = 0;
     // let touchLayers = 0;
     this.keyboard3.forms?.form?.forEach((form) => {
-      // Just check whether it's NOT an implied import
       if (!LDMLKeyboard.ImportStatus.isImpliedImport(form)) {
-        this.callbacks.reportMessage(CompilerMessages.Hint_UnsupportedCustomForm({id: form.id}));
+        // If it's not an implied import, give a warning.
+        this.callbacks.reportMessage(CompilerMessages.Warn_UnsupportedCustomForm({ id: form.id }));
       }
     });
     this.keyboard3.layers?.forEach((layers) => {

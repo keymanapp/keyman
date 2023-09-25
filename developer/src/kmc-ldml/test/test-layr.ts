@@ -120,14 +120,14 @@ describe('layr', function () {
       // warning on custom form
       subpath: 'sections/layr/hint-custom-form.xml',
       warnings: [
-        CompilerMessages.Hint_UnsupportedCustomForm({id: "us"}),
+        CompilerMessages.Warn_UnsupportedCustomForm({id: "us"}),
       ],
     },
     {
       // error on unknown form
       subpath: 'sections/layr/error-custom-form.xml',
       warnings: [
-        CompilerMessages.Hint_UnsupportedCustomForm({id: "zzz"}),
+        CompilerMessages.Warn_UnsupportedCustomForm({id: "zzz"}),
       ],
       errors: [CompilerMessages.Error_InvalidHardware({
         form: 'zzz',

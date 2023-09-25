@@ -11,12 +11,12 @@
     <key id="one" to="1" />
   </keys>
   <forms>
-    <!-- warning, custom scancodes -->
+    <!-- this will emit a warning about custom scancodes -->
     <form id="us">
       <scanCodes codes="01 02 03 04" />
     </form>
   </forms>
-  <layers form="us"> <!-- INVALID: 'holographic' is not a valid form. -->
+  <layers form="us">
     <layer id="base">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="grave one" />

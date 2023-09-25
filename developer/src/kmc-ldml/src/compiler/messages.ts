@@ -2,7 +2,7 @@ import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m
 
 const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
-// const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
+const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevFatal = CompilerErrorSeverity.Fatal | CompilerErrorNamespace.LdmlKeyboardCompiler;
 
@@ -149,9 +149,9 @@ export class CompilerMessages {
   m(this.ERROR_DisplayNeedsToOrId, `display ${CompilerMessages.toOrId(o)} needs to= or id=, but not both`);
   static ERROR_DisplayNeedsToOrId = SevError | 0x0022;
 
-  static Hint_UnsupportedCustomForm = (o:{id: string}) =>
-  m(this.HINT_UnsupportedCustomForm, `Custom <form id="${o.id}"> element is not supported.`);
-  static HINT_UnsupportedCustomForm = SevHint | 0x0023;
+  static Warn_UnsupportedCustomForm = (o:{id: string}) =>
+  m(this.WARN_UnsupportedCustomForm, `Custom <form id="${o.id}"> element is ignored. Key layout may not be as expected.`);
+  static WARN_UnsupportedCustomForm = SevWarn | 0x0023;
 }
 
 
