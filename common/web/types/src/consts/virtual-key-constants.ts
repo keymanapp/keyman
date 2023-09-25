@@ -161,7 +161,7 @@ export const USVirtualKeyMap: KeyMap = [
 
 export const KSVirtualKeyMap: KeyMap = [
   // ` 1 2 3 4 5 6 7 8 9 0 - = YEN [bksp]
-  [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL, k.K_BKSLASH /* YEN */  ],
+  [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL, k.K_oE2 /* YEN */  ],
   // [tab] Q W E R T Y U I O P [ ] \
   [ k.K_Q, k.K_W, k.K_E, k.K_R, k.K_T, k.K_Y, k.K_U, k.K_I, k.K_O, k.K_P, k.K_LBRKT, k.K_RBRKT, k.k_oC1 ],
   // [caps] A S D F G H J K L ; ' [enter]
@@ -187,7 +187,7 @@ export const ISOVirtualKeyMap: KeyMap = [
 
 export const JISVirtualKeyMap: KeyMap = [
   // [Hankaku/Zenkaku] 1 2 3 4 5 6 7 8 9 0 - ^ ¥ [bksp]
-  [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL, k.K_BKSLASH /* YEN */ ],
+  [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL, k.K_oE2 /* YEN */ ],
   // [tab] Q W E R T Y U I O P @ [ [enter]
   [ k.K_Q, k.K_W, k.K_E, k.K_R, k.K_T, k.K_Y, k.K_U, k.K_I, k.K_O, k.K_P, k.K_BKQUOTE, k.K_LBRKT  ],
   // [caps] A S D F G H J K L ; : ] [enter]
