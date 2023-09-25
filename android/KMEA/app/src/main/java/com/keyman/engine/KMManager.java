@@ -1391,6 +1391,17 @@ public final class KMManager {
     return true;
   }
 
+  public static boolean setBannerImage(KeyboardType kType, String path) {
+    if (kType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      InAppKeyboard.setBannerImage(path);
+    } else if (kType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      SystemKeyboard.setBannerImage(path);
+    } else {
+      return false;
+    }
+    return true;
+  }
+
   /**
    * showBanner - Update KMW whether to display banner.
    *              For now, always keep displaying banner
