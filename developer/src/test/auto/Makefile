@@ -16,7 +16,6 @@ test:
 developer-tests: \
   compile-supplementary-support \
   keyboard-js-info \
-  keyboard-package-versions \
   kmcomp \
   kmcomp-x64-structures \
   kmconvert \
@@ -43,10 +42,6 @@ keyboard-js-info: .virtual
 kmx-file-languages: .virtual
     cd $(DEVELOPER_ROOT)\src\test\auto\kmx-file-languages
     $(MAKE) $(TARGET)
-
-keyboard-package-versions: .virtual
-  cd $(DEVELOPER_ROOT)\src\test\auto\keyboard-package-versions
-  $(MAKE) $(TARGET)
 
 kmcomp: .virtual
   cd $(DEVELOPER_ROOT)\src\test\auto\kmcomp
