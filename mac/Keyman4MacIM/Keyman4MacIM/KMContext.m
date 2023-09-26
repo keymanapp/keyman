@@ -38,13 +38,13 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
 -(instancetype)initWithString:(NSString*)initialContext {
   self = [self init];
   if (self) {
-    [_context setString:[self trimToMaximumContext:initialContext]];
+    [_context setString:[KMContext trimToMaximumContext:initialContext]];
     _invalid = NO;
   }
   return self;
 }
 
--(NSString*)trimToMaximumContext:(NSString*)initialContext {
++(NSString*)trimToMaximumContext:(NSString*)initialContext {
   NSString *maximumContext = nil;
 
   // copy up to MAXIMUM_CONTEXT_LENGTH from the end of the context
@@ -59,8 +59,9 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
 }
 
 -(void)resetContext:(NSString*)newContext {
-  [_context setString:[self trimToMaximumContext:newContext]];
+  [_context setString:[KMContext trimToMaximumContext:newContext]];
   self.invalid = NO;
+  NSLog(@"   ***CachedContext resetContext, resulting context = %@", _context);
 }
 
 -(NSString*)currentContext {
@@ -78,12 +79,14 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
 
 -(void)clearContext {
   _context.string = @"";
+  NSLog(@"   ***CachedContext clearContext, resulting context = %@", _context);
 }
 
 -(void)appendMarker {
   #define UC_NONCHARACTER             0xFFFF
   NSString *markerString = [NSString stringWithFormat:@"%C", UC_NONCHARACTER];
   [self.context appendString:markerString];
+  NSLog(@"   ***CachedContext appendMarker, resulting context = %@", _context);
 }
 
 /**
@@ -100,6 +103,7 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
     NSLog(@"KMContext deleteLastUnicodeCharacter, index = %lu, rangeOfLastCharacter = %@\n", characterIndex, NSStringFromRange(characterRange));
     [self.context deleteCharactersInRange:characterRange];
   }
+  NSLog(@"   ***CachedContext deleteLastCodePoint, resulting context = %@", _context);
 }
 
 -(void)replaceSubstring:(NSString*)newText count:(int)count {
@@ -113,10 +117,12 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
   if (newText.length > 0) {
     [self addSubtring:newText];
   }
+  NSLog(@"   ***CachedContext replaceSubstring, resulting context = %@", _context);
 }
 
 -(void)addSubtring:(NSString*)string {
   [self.context appendString:string];
+  NSLog(@"   ***CachedContext addSubtring, resulting context = %@", _context);
 }
 
 -(void)applyAction:(CoreAction*)action keyDownEvent:(nonnull NSEvent *)event {
@@ -145,6 +151,7 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
       NSLog(@"CachedContext applyAction, action not applied to context %@\n", action.typeName.description);
       break;
   }
+  NSLog(@"   ***CachedContext applyAction, resulting context = %@", _context);
 }
 
 // TODO: see handleDefaultKeymanEngineActions
@@ -189,6 +196,7 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
       }
         break;
     }
+  NSLog(@"   ***CachedContext applyUnhandledEvent, resulting context = %@", _context);
 }
 
 @end

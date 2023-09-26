@@ -39,7 +39,6 @@ NSString *const kKMDeprecatedPersistedOptionsKey = @"KMSavedStoresKey";
 NSString *const kKMPersistedOptionsKey = @"KMPersistedOptionsKey";
 NSString *const kKMAlwaysShowOSKKey = @"KMAlwaysShowOSKKey";
 NSString *const kKMUseVerboseLogging = @"KMUseVerboseLogging";
-NSString *const kKMLegacyApps = @"KMLegacyApps";
 
 NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboardDownloadCompletedNotification";
 
@@ -393,7 +392,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (KMEngine *)kme {
     if (_kme == nil) {
       //TODO: verify that initial context is correct; this is passed to core
-       _kme = [[KMEngine alloc] initWithKMX:nil contextBuffer:self.contextBuffer];
+       _kme = [[KMEngine alloc] initWithKMX:nil context:self.contextBuffer];
         [_kme setDebugMode:self.debugMode];
     }
 
@@ -528,14 +527,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         }
     }
     return _keymanDataPath;
-}
-
-/**
- * Returns the list of user-default legacy apps
- */
-- (NSArray *)legacyAppsUserDefaults {
-    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    return [userData arrayForKey:kKMLegacyApps];
 }
 
 /**
@@ -773,7 +764,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     _contextBuffer = [contextBuffer mutableCopy];
     if (_contextBuffer.length)
         [_contextBuffer replaceOccurrencesOfString:@"\0" withString:[NSString nullChar] options:0 range:NSMakeRange(0, 1)];
-    [self.kme setContextBuffer:self.contextBuffer];
+    [self.kme setCoreContext:self.contextBuffer];
 }
 
 - (void)awakeFromNib {

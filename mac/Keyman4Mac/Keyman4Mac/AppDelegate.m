@@ -116,7 +116,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     if (type == NX_KEYDOWN) {
         // Key down event
         NSEvent *mEvent = [NSEvent eventWithCGEvent:event];
-        KMEngine *kme = [[KMEngine alloc] initWithKMX:kmx contextBuffer:contextBuffer];
+        KMEngine *kme = [[KMEngine alloc] initWithKMX:kmx context:contextBuffer];
         NSArray *actions = [kme processEvent:mEvent];
         //if (debugMode)
             NSLog(@"%@", actions);

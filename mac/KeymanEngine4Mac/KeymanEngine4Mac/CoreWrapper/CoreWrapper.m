@@ -47,6 +47,9 @@
   [self setContextUsingCore:newValue];
 }
 
+-(void)clearContext {
+  [self clearContextUsingCore];
+}
 -(void)changeKeyboardWithKmxFilePath:(NSString*) path {
   if (path != nil) {
     @try {
@@ -299,19 +302,28 @@
   return immutableString;
 }
 
--(void)setContextUsingCore:(NSString*)context {
-  char const *coreString = [context cStringUsingEncoding:NSUTF8StringEncoding];
-  km_kbp_context_item *contextItemArray;
-
-  // create array of context items
-  km_kbp_status result = km_kbp_context_items_from_utf8(coreString, &contextItemArray);
-  NSLog(@"km_kbp_context_items_from_utf8, result=%i", result);
-
-  // set the context in core using the array
+-(void)clearContextUsingCore {
   km_kbp_context * coreContext =  km_kbp_state_context(self.keyboardState);
-  km_kbp_context_set(coreContext, contextItemArray);
-  // dispose
-  km_kbp_context_items_dispose(contextItemArray);
+  km_kbp_context_clear(coreContext);
+}
+
+-(void)setContextUsingCore:(NSString*)context {
+  if (context.length == 0) {
+    [self clearContextUsingCore];
+  } else {
+    char const *coreString = [context cStringUsingEncoding:NSUTF8StringEncoding];
+    km_kbp_context_item *contextItemArray;
+    
+    // create array of context items
+    km_kbp_status result = km_kbp_context_items_from_utf8(coreString, &contextItemArray);
+    NSLog(@"km_kbp_context_items_from_utf8, result=%i", result);
+    
+    // set the context in core using the array
+    km_kbp_context * coreContext =  km_kbp_state_context(self.keyboardState);
+    km_kbp_context_set(coreContext, contextItemArray);
+    // dispose
+    km_kbp_context_items_dispose(contextItemArray);
+  }
 }
 
 //TODO: create and save as static

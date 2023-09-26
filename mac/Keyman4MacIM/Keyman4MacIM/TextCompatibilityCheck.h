@@ -2,7 +2,7 @@
  * Keyman is copyright (C) SIL International. MIT License.
  * 
  * TextCompatibilityCheck.h
- * KeyTest
+ * Keyman
  * 
  * Created by Shawn Schantz on 2023-05-05.
  * 
@@ -21,7 +21,6 @@ NS_ASSUME_NONNULL_BEGIN
 -(BOOL)canInsertText;
 -(BOOL)canReplaceText;
 -(BOOL)mustBackspaceUsingEvents;
-
 @end
 
 NS_ASSUME_NONNULL_END

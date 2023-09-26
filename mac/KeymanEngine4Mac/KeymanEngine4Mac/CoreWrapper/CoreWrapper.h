@@ -16,9 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CoreWrapper : NSObject
 
-@property (strong, nonatomic, readonly) NSString * keyboardId;
-@property (strong, nonatomic, readonly) NSString * keyboardVersion;
-@property (strong, nonatomic) NSString * context;
+@property (strong, nonatomic, readonly) NSString *keyboardId;
+@property (strong, nonatomic, readonly) NSString *keyboardVersion;
+@property (strong, nonatomic) NSString *context;
 
 -(instancetype)initWithHelper:(CoreHelper*)helper kmxFilePath:(nullable NSString*)path;
 -(BOOL)setOptionsForCore: (NSString *) key value:(NSString *) value;

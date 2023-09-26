@@ -19,11 +19,16 @@
 @property (weak, nonatomic) KMXFile *kmx;
 @property (assign, nonatomic) BOOL debugMode;
 
-- (id)initWithKMX:(KMXFile *)kmx contextBuffer:(NSString *)ctxBuf;
+- (id)initWithKMX:(KMXFile *)kmx context:(NSString *)ctxBuf;
+- (NSString *)getCoreContext;
+- (void)clearCoreContext;
 - (void)setCoreContext:(NSString *)context;
+
 //TODO: remove additional context methods
+/*
 - (void)setContextBuffer:(NSString *)ctxBuf;
 - (NSString *)contextBuffer;
+ */
 - (void)setCoreOptions:(NSString *)key withValue:(NSString *)value;
 - (NSArray *)processEvent:(NSEvent *)event;
 - (void)setUseVerboseLogging:(BOOL)useVerboseLogging;

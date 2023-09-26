@@ -110,7 +110,6 @@ typedef struct {
 - (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent;
 - (KeymanVersionInfo)versionInfo;
 - (NSString *)keymanDataPath;
-- (NSArray *)legacyAppsUserDefaults;
 - (void)registerConfigurationWindow:(NSWindowController *)window;
 @end
 

@@ -59,72 +59,6 @@ NSRange _previousSelRange;
     return self;
 }
 
-/**
- * Checks if the client app requires legacy input mode, first by checking the user defaults, if they exist,
- * then, by our hard-coded list.
- */
-- (BOOL)isClientAppLegacy:(NSString *)clientAppId {
-    NSArray *legacyAppsUserDefaults = [self.AppDelegate legacyAppsUserDefaults];
-
-    BOOL result = NO;
-
-    if(legacyAppsUserDefaults != nil) {
-        result = [self isClientAppLegacy:clientAppId fromArray:legacyAppsUserDefaults];
-    }
-
-    if(!result) {
-        // TODO: Pages and Keynote (and possibly lots of other undiscovered apps that are otherwise compliant
-        // with Apple's IM framework) have a problem in that if the user selects a different font (or other
-        // formatting) and then types a sequence that causes characters to be added to the document and then
-        // subsequently replaced, the replacement causes the formatting decision to be forgotten. This can be
-        // "fixed" by treating them as legacy apps, but it causes other problems.
-        result = ([clientAppId isEqual: @"com.github.atom"] ||
-            [clientAppId isEqual: @"com.collabora.libreoffice-free"] ||
-            [clientAppId isEqual: @"org.libreoffice.script"] ||
-            [clientAppId isEqual: @"com.axosoft.gitkraken"] ||
-            [clientAppId isEqual: @"org.sil.app.builder.scripture.ScriptureAppBuilder"] ||
-            [clientAppId isEqual: @"org.sil.app.builder.reading.ReadingAppBuilder"] ||
-            [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
-            //[clientAppId isEqual: @"com.microsoft.Word"] || // 2020-11-24[mcd]: Appears to work well in Word 16.43, disable legacy by default
-            [clientAppId isEqual: @"org.openoffice.script"] ||
-            [clientAppId isEqual: @"com.adobe.illustrator"] ||
-            [clientAppId isEqual: @"com.adobe.InDesign"] ||
-            [clientAppId isEqual: @"com.adobe.Photoshop"] ||
-            [clientAppId isEqual: @"com.adobe.AfterEffects"] ||
-            [clientAppId isEqual: @"com.microsoft.VSCode"] ||
-            [clientAppId isEqual: @"com.google.Chrome"] ||
-            [clientAppId hasPrefix: @"net.java"] ||
-            [clientAppId isEqual: @"com.Keyman.test.legacyInput"]
-            /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */
-        );
-    }
-
-    return result;
-}
-
-/**
- * Checks user defaults array for a list of possible regexes to match a client app id
- */
-- (BOOL)isClientAppLegacy:(NSString *)clientAppId fromArray:(NSArray *)legacyApps {
-    for(id legacyApp in legacyApps) {
-        if(![legacyApp isKindOfClass:[NSString class]]) {
-            NSLog(@"isClientAppLegacy:fromArray: LegacyApps user defaults array should contain only strings");
-        } else {
-            NSError *error = nil;
-            NSRange range =  NSMakeRange(0, clientAppId.length);
-            
-            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern: (NSString *) legacyApp options: 0 error: &error];
-            NSArray *matchesArray = [regex matchesInString:clientAppId options:0 range:range];
-            if(matchesArray.count>0) {
-              NSLog(@"isClientAppLegacy: found match for legacy app %@: ", clientAppId);
-               return YES;
-            }
-        }
-    }
-
-    return NO;
-}
-
 // This is the public initializer.
 - (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender {
     _textCompatibility = [[TextCompatibilityCheck alloc]initWithClient:sender applicationId:clientAppId];
@@ -136,7 +70,7 @@ NSRange _previousSelRange;
     _generatedBackspaceCount = 0;
   
     
-    BOOL legacy = [self isClientAppLegacy:clientAppId];
+    //BOOL legacy = [self isClientAppLegacy:clientAppId];
 
     // In Xcode, if Keyman is the active IM and is in "debugMode" and "English plus Spanish" is 
     // the current keyboard and you type "Sentry force now", it will force a simulated crash to 
@@ -148,10 +82,12 @@ NSRange _previousSelRange;
     else
         _easterEggForSentry = nil;
 
+  //TODO: move to TextCompatibilityCheck
     // For the Atom editor, this isn't really true (the context CAN change unexpectedly), but we can't get
     // the context, so we pretend/hope it won't.
     BOOL selectionCanChangeUnexpectedly = (![clientAppId isEqual: @"com.github.atom"]);
-    return [self initWithLegacyMode:legacy clientSelectionCanChangeUnexpectedly:selectionCanChangeUnexpectedly];
+    // TODO: this equates 'legacyMode' with being forced to send events
+    return [self initWithLegacyMode:self.textCompatibility.mustBackspaceUsingEvents clientSelectionCanChangeUnexpectedly:selectionCanChangeUnexpectedly];
 }
 
 - (void)switchToLegacyMode {
@@ -967,7 +903,7 @@ NSRange _previousSelRange;
 //MARK: Core-related key processing
 // replacement handleEvent implementation for core event processing
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
-  NSLog(@"SGS handleEvent event = %@", event);
+  NSLog(@"handleEvent event = %@", event);
 
   // mouse movement requires that the context be invalidated
   
@@ -1053,13 +989,14 @@ NSRange _previousSelRange;
     }
 }
 
+/*
 -(void)checkClientTextCompatibility:(id) client {
   if(!self.textCompatibility) {
     _textCompatibility = [[TextCompatibilityCheck alloc]initWithClient:client applicationId:self.clientApplicationId];
     NSLog(@"KMInputMethodHandler checkClientTextCompatibility: %@", self.textCompatibility);
   }
 }
-
+*/
 /*
 -(BOOL)containsKeymanCoreActions:(NSArray*)actions {
   BOOL containsCoreActions = NO;
@@ -1110,7 +1047,7 @@ NSRange _previousSelRange;
   NSUInteger realLengthAfter =
       [_cachedContext.currentContext lengthOfBytesUsingEncoding:NSUTF32StringEncoding] / 4;
 
-  NSLog(@"applyActions, contextBefore = '%@', length = %lu, real length = %lu; contextAfter = '%@', length = %lu, real length = %lu", contextBefore, lengthBefore, realLengthBefore, contextAfter, lengthAfter, realLengthAfter);
+  NSLog(@"applyKeymanCoreActions, contextBefore = '%@', length = %lu, real length = %lu; contextAfter = '%@', length = %lu, real length = %lu", contextBefore, lengthBefore, realLengthBefore, contextAfter, lengthAfter, realLengthAfter);
 
   return result.handledEvent;
 }

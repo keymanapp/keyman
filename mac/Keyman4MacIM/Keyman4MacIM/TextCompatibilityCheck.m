@@ -2,7 +2,7 @@
  * Keyman is copyright (C) SIL International. MIT License.
  * 
  * TextCompatibilityCheck.m
- * KeyTest
+ * Keyman
  * 
  * Created by Shawn Schantz on 2023-05-05.
  * 
@@ -11,6 +11,8 @@
 
 #import "TextCompatibilityCheck.h"
 #import <InputMethodKit/InputMethodKit.h>
+
+NSString *const kKMLegacyApps = @"KMLegacyApps";
 
 @interface TextCompatibilityCheck()
 
@@ -21,7 +23,6 @@
 @property (readonly) BOOL hasInsertApi;
 
 @end
-
 
 @implementation TextCompatibilityCheck
 
@@ -47,20 +48,16 @@ return [NSString stringWithFormat:@"hasSelectionAPI: %d, hasReadAPI: %d, hasInse
 -(BOOL) checkSelectionApi:(id) client applicationId:(NSString *)clientAppId  {
   BOOL workingSelectionApi = NO;
 
-  // if the selector exists, then call the API and see if it returns a valid value
+  workingSelectionApi = [client respondsToSelector:@selector(selectedRange)];
   
-  if ([client respondsToSelector:@selector(selectedRange)]) {
+  /*
+  // if the selector exists, then call the API and see if it returns a valid value
+  if (workingSelectionApi) {
     NSRange selectionRange = [self.client selectedRange];
     NSLog(@"TextCompatibilityCheck checkSelectionApi, location = %lu, length = %lu", selectionRange.location, selectionRange.length);
 
     NSRange notFoundRange = NSMakeRange(NSNotFound, NSNotFound);
 
-    /*
-    if (selectionRange.location == 0) {
-      canGetSelection = NO;
-      NSLog(@"checkCanGetSelection, selectionRange.location == 0 ");
-    } else
-     */
     if (NSEqualRanges(selectionRange, notFoundRange)) {
       workingSelectionApi = YES;
       // no current selection, but API is working
@@ -69,12 +66,39 @@ return [NSString stringWithFormat:@"hasSelectionAPI: %d, hasReadAPI: %d, hasInse
       workingSelectionApi = YES;
     }
   }
-
-  // TODO: integrate with existing legacy code
+*/
+  
+  
   // if the selection API appears to work, it may still be broken
-  // getting the selection does not work for anything in the legacy app list
+  // getting the selection does not work for anything in the noncompliant app lists
   if (workingSelectionApi) {
-    BOOL isLegacy = ([clientAppId isEqual: @"com.github.atom"] ||
+    workingSelectionApi = ![self containedInNoncompliantAppLists:clientAppId];
+  }
+  
+  NSLog(@"hasWorkingSelectionApi for app %@: set to %@", clientAppId, workingSelectionApi?@"yes":@"no");
+  return workingSelectionApi;
+}
+
+/**
+ * Checks if the client app is known to be non-complian, first by checking the hard-coded non-compliant app list
+ * and then by checking the user-managed (via user defaults) non-compliant app list
+ */
+- (BOOL)containedInNoncompliantAppLists:(NSString *)clientAppId {
+  BOOL isAppNonCompliant = [self containedInHardCodedNoncompliantAppList:clientAppId];
+  if (!isAppNonCompliant) {
+    isAppNonCompliant = [self containedInUserManagedNoncompliantAppList:clientAppId];
+  }
+  
+  NSLog(@"containedInNoncompliantAppLists: for app %@: %@", clientAppId, isAppNonCompliant?@"yes":@"no");
+  return isAppNonCompliant;
+}
+
+/** Check this hard-coded list to see if the application ID is among those
+* that are known to not implement selectionRange correctly.
+*  This was formerly called the legacy app list, renamed to improve clarity.
+*/
+- (BOOL)containedInHardCodedNoncompliantAppList:(NSString *)clientAppId {
+    BOOL isAppNonCompliant = ([clientAppId isEqual: @"com.github.atom"] ||
                      [clientAppId isEqual: @"com.collabora.libreoffice-free"] ||
                      [clientAppId isEqual: @"org.libreoffice.script"] ||
                      [clientAppId isEqual: @"com.axosoft.gitkraken"] ||
@@ -93,10 +117,104 @@ return [NSString stringWithFormat:@"hasSelectionAPI: %d, hasReadAPI: %d, hasInse
                      [clientAppId isEqual: @"com.Keyman.test.legacyInput"]
                      /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */
                      );
-    workingSelectionApi = !isLegacy;
+    NSLog(@"containedInHardCodedNoncompliantAppList: for app %@: %@", clientAppId, isAppNonCompliant?@"yes":@"no");
+    return isAppNonCompliant;
   }
-  return workingSelectionApi;
+
+/**
+ * Returns the list of user-default legacy apps
+ */
+- (NSArray *)legacyAppsUserDefaults {
+    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+    return [userData arrayForKey:kKMLegacyApps];
 }
+
+/** Check this user-managed list to see if the application ID is among those
+* that are known to not implement selectionRange correctly.
+*  This was formerly called the legacy app list, renamed to improve clarity.
+*/
+- (BOOL)containedInUserManagedNoncompliantAppList:(NSString *)clientAppId {
+  BOOL isAppNonCompliant = false;
+  NSArray *legacyAppsUserDefaults = self.legacyAppsUserDefaults;
+
+  if(legacyAppsUserDefaults != nil) {
+    isAppNonCompliant = [self isClientAppLegacy:clientAppId fromArray:legacyAppsUserDefaults];
+  }
+  NSLog(@"containedInUserManagedNoncompliantAppList: for app %@: %@", clientAppId, isAppNonCompliant?@"yes":@"no");
+
+    return isAppNonCompliant;
+  }
+
+/**
+ * Checks if the client app requires legacy input mode, first by checking the user defaults, if they exist,
+ * then, by our hard-coded list.
+ */
+/*
+- (BOOL)isClientAppLegacy:(NSString *)clientAppId {
+  BOOL isAppNonCompliant = false;
+  
+    NSArray *legacyAppsUserDefaults = self.legacyAppsUserDefaults;
+
+    BOOL result = NO;
+
+    if(legacyAppsUserDefaults != nil) {
+        result = [self isClientAppLegacy:clientAppId fromArray:legacyAppsUserDefaults];
+    }
+
+    if(!result) {
+        // TODO: Pages and Keynote (and possibly lots of other undiscovered apps that are otherwise compliant
+        // with Apple's IM framework) have a problem in that if the user selects a different font (or other
+        // formatting) and then types a sequence that causes characters to be added to the document and then
+        // subsequently replaced, the replacement causes the formatting decision to be forgotten. This can be
+        // "fixed" by treating them as legacy apps, but it causes other problems.
+        result = ([clientAppId isEqual: @"com.github.atom"] ||
+            [clientAppId isEqual: @"com.collabora.libreoffice-free"] ||
+            [clientAppId isEqual: @"org.libreoffice.script"] ||
+            [clientAppId isEqual: @"com.axosoft.gitkraken"] ||
+            [clientAppId isEqual: @"org.sil.app.builder.scripture.ScriptureAppBuilder"] ||
+            [clientAppId isEqual: @"org.sil.app.builder.reading.ReadingAppBuilder"] ||
+            [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
+            //[clientAppId isEqual: @"com.microsoft.Word"] || // 2020-11-24[mcd]: Appears to work well in Word 16.43, disable legacy by default
+            [clientAppId isEqual: @"org.openoffice.script"] ||
+            [clientAppId isEqual: @"com.adobe.illustrator"] ||
+            [clientAppId isEqual: @"com.adobe.InDesign"] ||
+            [clientAppId isEqual: @"com.adobe.Photoshop"] ||
+            [clientAppId isEqual: @"com.adobe.AfterEffects"] ||
+            [clientAppId isEqual: @"com.microsoft.VSCode"] ||
+            [clientAppId isEqual: @"com.google.Chrome"] ||
+            [clientAppId hasPrefix: @"net.java"] ||
+            [clientAppId isEqual: @"com.Keyman.test.legacyInput"]
+            //||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems
+        );
+    }
+
+    return result;
+}
+*/
+
+/**
+ * Checks array for a list of possible regexes to match a client app id
+ */
+- (BOOL)isClientAppLegacy:(NSString *)clientAppId fromArray:(NSArray *)legacyApps {
+    for(id legacyApp in legacyApps) {
+        if(![legacyApp isKindOfClass:[NSString class]]) {
+            NSLog(@"isClientAppLegacy:fromArray: LegacyApps user defaults array should contain only strings");
+        } else {
+            NSError *error = nil;
+            NSRange range =  NSMakeRange(0, clientAppId.length);
+            
+            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern: (NSString *) legacyApp options: 0 error: &error];
+            NSArray *matchesArray = [regex matchesInString:clientAppId options:0 range:range];
+            if(matchesArray.count>0) {
+              NSLog(@"isClientAppLegacy: found match for legacy app %@: ", clientAppId);
+               return YES;
+            }
+        }
+    }
+
+    return NO;
+}
+
 
 -(BOOL) canGetSelection {
   return self.hasWorkingSelectionApi;

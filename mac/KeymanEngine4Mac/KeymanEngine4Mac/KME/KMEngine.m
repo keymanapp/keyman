@@ -20,7 +20,6 @@
 //DWORD VKMap[0x80];
 
 @interface KMEngine ()
-@property (strong, nonatomic) NSMutableString *tmpCtxBuf;
 @property (readonly) CoreHelper *coreHelper;
 @property (nonatomic, retain) CoreWrapper * keymanCore;
 @end
@@ -31,7 +30,7 @@ NSMutableString* _easterEggForSentry = nil;
 const NSString* kEasterEggText = @"Sentrycrash#KME";
 const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 
-- (id)initWithKMX:(KMXFile *)kmx contextBuffer:(NSString *)ctxBuf {
+- (id)initWithKMX:(KMXFile *)kmx context:(NSString *)contextString {
     self = [super init];
     if (self) {
 #ifdef DEBUG
@@ -44,14 +43,8 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
       
       if (kmx) {
         [self loadCoreWrapperFromKmxFile:self.kmx.filePath];
-        [self.keymanCore setContext:ctxBuf];
+        [self.keymanCore setContext:contextString];
       }
-
-        _tmpCtxBuf = [[NSMutableString alloc] initWithString:ctxBuf];
-        [_tmpCtxBuf removeAllNullChars];
-        if (_tmpCtxBuf.length)
-            [_tmpCtxBuf replaceOccurrencesOfString:@"\0" withString:@"" options:0 range:NSMakeRange(0, 1)];
-        //[self setVKMapping];
     }
 
     return self;
@@ -97,36 +90,15 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
         NSLog(@"KME - Turning verbose logging off");
 }
 
+- (NSString *)getCoreContext {
+  return self.keymanCore.context;
+}
+
 - (void)setCoreContext:(NSString *)context {
   [self.keymanCore setContext:context];
 }
 
-- (void)setContextBuffer:(NSString *)ctxBuf {
-    _tmpCtxBuf = [[NSMutableString alloc] initWithString:ctxBuf];
-    [_tmpCtxBuf removeAllNullChars];
-    if (_tmpCtxBuf.length)
-        [_tmpCtxBuf replaceOccurrencesOfString:@"\0" withString:@"" options:0 range:NSMakeRange(0, 1)];
-}
-
-- (NSString *)contextBuffer {
-    return [NSString stringWithString:self.tmpCtxBuf];
-}
-
-- (NSMutableString *)tmpCtxBuf {
-    if (_tmpCtxBuf == nil) {
-        _tmpCtxBuf = [[NSMutableString alloc] initWithString:@""];
-    }
-
-    return _tmpCtxBuf;
-}
-
 - (void)setCoreOptions:(NSString *)key withValue:(NSString *)value {
-  /*
-   KMCompStore *store = [self.kmx.store objectAtIndex:storeID];
-   KMCompStore *storeSaved = [self.kmx.storeSaved objectAtIndex:storeID];
-   store.string = [[NSString alloc] initWithString:value];
-   storeSaved.string = [[NSString alloc] initWithString:value];
-   */
   BOOL success = [self.keymanCore setOptionsForCore:key value:value];
   NSLog(@"setCoreOptions for key: %@, value: %@ succeeded = %@", key, value, success ? @"YES" : @"NO");
 }
@@ -144,11 +116,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
   if ([coreActions count] == 0) {
     return nil;
   } else {
-    // update context from core
-    [self.tmpCtxBuf setString:self.keymanCore.context];
     return coreActions;
-    // TODO: integrate the different contexts
-    // -- probably ignore/trash tmpCtxBuf because we update local context using actions
   }
 }
 

@@ -2,7 +2,7 @@
  * Keyman is copyright (C) SIL International. MIT License.
  * 
  * KeySender.m
- * KeyTest
+ * Keyman
  * 
  * Created by Shawn Schantz on 2023-04-17.
  * 

@@ -129,42 +129,24 @@ typedef enum {BackspacesOnly,
   switch (self.pattern) {
     case CharactersOnly:
       result = [self buildResultForCharactersOnly];
-      //handledEvent = [self applyCharacterActions:0];
       break;
-    // TODO: create separate pattern for single backspace? and for EmitKeystroke action?
     case BackspacesOnly:
       if ([self isSinglePassThroughBackspace]) {
         result = [self buildResultForSinglePassThroughBackspaceNoText];
       } else {
         result = [self buildResultForMultipleBackspacesNoText];
-        //handledEvent = [self applyIsolatedBackspaceActions:self.backspaceCount];
       }
       break;
     case BackspaceBeforeCharacter:
       result = [self buildResultForBackspacesBeforeText];
-      //handledEvent = [self applyCharacterActions:self.backspaceCount];
       break;
     case None:
       result = [self buildResultForNoCharactersOrBackspaces];
       break;
     default:
-      NSLog(@"Unimplemented pattern***");
+      NSLog(@"KMCoreActionHandler handleActions(), Unimplemented pattern***");
   }
 
-  // TODO: delete
-  /**
-  * this event is passed through and will be sent to the client
-  * but we need to update the context for it -- no, actually we don't:
-  * the context is updated for every action, and we should still get an action
-  * for a backspace, even if the event is unhandled by Core
-  * if there is a need for this, it would be while processing the Emit Keystroke action
-  */
-  /*
-  if(!result.handledEvent) {
-    [self.context applyUnhandledEvent:self.event];
-  }
-  */
-  
   return result;
 }
 
@@ -185,7 +167,7 @@ typedef enum {BackspacesOnly,
 }
 
 /**
- * For multiple backspaces with no text, new events must be generated for each backspace
+ * Multiple backspaces with no text will be handled by generating events
  */
 -(KMActionHandlerResult*)buildResultForMultipleBackspacesNoText {
   NSLog(@"buildResultForMultipleBackspacesNoText");
@@ -196,7 +178,6 @@ typedef enum {BackspacesOnly,
  * For backspaces needed before text, insert with replace is possible, but some clients do not support replace
  */
 -(KMActionHandlerResult*)buildResultForBackspacesBeforeText {
-  // TODO: make backspaces events if replacement does not work with insertText
   NSLog(@"buildResultForBackspacesBeforeText");
   return [[KMActionHandlerResult alloc] initForActions:self.actions handledEvent:YES backspaceCount:self.backspaceCount textToInsert:[self collectOutputText]];
 }
