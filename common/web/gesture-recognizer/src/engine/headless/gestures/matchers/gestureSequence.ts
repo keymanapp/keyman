@@ -82,7 +82,7 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
 
     this.stageReports = [];
     this.selector = selector;
-    this.selector.on('rejectionwithaction', (this.modelResetHandler));
+    this.selector.on('rejectionwithaction', this.modelResetHandler);
     this.gestureConfig = gestureModelDefinitions;
 
     // So that we can...
@@ -117,12 +117,6 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
     }) ?? [];
 
     if(selection.result.action.type == 'complete' || selection.result.action.type == 'none') {
-      if(this.pushedSelector) {
-        // TODO:  may need extra handling for 'sustain' states - like if a modipress's nested
-        // longpress is in subkey-select mode, to preserve that state instead of interrupting it.
-        this.touchpointCoordinator.popSelector(this.pushedSelector);
-      }
-
       sources.forEach((source) => {
         if(!source.isPathComplete) {
           source.terminate(selection.result.action.type == 'none');
@@ -130,6 +124,12 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
       });
 
       if(!selection.result.matched) {
+        if(this.pushedSelector) {
+          // The `popSelector` method is responsible for triggering cascading cancellations if
+          // there are nested GestureSequences.
+          this.touchpointCoordinator?.popSelector(this.pushedSelector);
+        }
+
         this.emit('complete');
         return;
       }
@@ -149,7 +149,22 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
     });
 
     // ... right, the gesture-definitions.
-    const nextModels = modelSetForAction(selection.result.action, this.gestureConfig, this.baseGestureSetId);
+
+    // In some automated tests, `this.touchpointCoordinator` may be `null`.
+    let selectorNotCurrent = false;
+    if(this.touchpointCoordinator) {
+      selectorNotCurrent = ![this.selector, this.pushedSelector].find((sel) => sel == this.touchpointCoordinator.currentSelector);
+    }
+    let nextModels = modelSetForAction(selection.result.action, this.gestureConfig, this.baseGestureSetId);
+    if(selectorNotCurrent) {
+      // If this sequence's selector isn't current, we're in an unrooted state; the parent, base gesture
+      // whose state we were in when the gesture began has ended.)
+      //
+      // Example:  we're a gesture that was triggered under a modipress state, but the modipress itself
+      // has ended.  Subkey selection should be allowed to continue, but not much else.
+      nextModels = nextModels.filter((model) => model.sustainWhenNested);
+    }
+
     if(nextModels.length > 0) {
       // Note:  if a 'push', that should be handled by an event listener from the main engine driver (or similar)
       const promise = this.selector.matchGesture(selection.matcher, nextModels);
@@ -162,7 +177,7 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
       } else {
         // pop the old one, if it exists - if it matches our expectations for a current one.
         if(this.pushedSelector) {
-          this.touchpointCoordinator.popSelector(this.pushedSelector);
+          this.touchpointCoordinator?.popSelector(this.pushedSelector);
           this.pushedSelector = null;
         }
 
@@ -185,12 +200,13 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
           const targetSet = selection.result.action.selectionMode;
           // push the new one.
           const changedSetSelector = new MatcherSelector<Type>(targetSet);
-          this.touchpointCoordinator.pushSelector(changedSetSelector);
+          this.pushedSelector = changedSetSelector
+          this.touchpointCoordinator?.pushSelector(changedSetSelector);
         }
       }
     } else {
       if(this.pushedSelector) {
-        this.touchpointCoordinator.popSelector(this.pushedSelector);
+        this.touchpointCoordinator?.popSelector(this.pushedSelector);
         this.pushedSelector = null;
       }
 

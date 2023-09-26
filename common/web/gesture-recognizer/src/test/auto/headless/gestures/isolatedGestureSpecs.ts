@@ -130,7 +130,8 @@ export const SubkeySelectModel: GestureModel = {
   resolutionAction: {
     type: 'complete',
     item: 'current'
-  }
+  },
+  sustainWhenNested: true
 }
 
 export const ModipressStartModel: GestureModel = {

@@ -138,6 +138,9 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
 
   public cancel() {
     this._isCancelled = true;
+    if(!this._result) {
+      this.finalize(false, 'cancelled');
+    }
   }
 
   public get isCancelled(): boolean {

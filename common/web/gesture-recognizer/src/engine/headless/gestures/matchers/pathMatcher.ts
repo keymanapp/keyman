@@ -1,9 +1,9 @@
 import { CumulativePathStats } from "../../cumulativePathStats.js";
-import { GestureSource } from "../../gestureSource.js";
+import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
 import { ContactModel } from "../specs/contactModel.js";
 import { ManagedPromise, TimeoutPromise } from "@keymanapp/web-utils";
 
-export type FulfillmentCause = 'path' | 'timer' | 'item';
+export type FulfillmentCause = 'path' | 'timer' | 'item' | 'cancelled';
 
 export interface PathMatchResolution {
   type: 'resolve',
@@ -57,6 +57,20 @@ export class PathMatcher<Type> {
       });
 
       this.timerPromise.then((result) => {
+        const trueSource = source instanceof GestureSourceSubview ? source.baseSource : source;
+        const timestamp = performance.now();
+
+        /* It's entirely possible that this will be triggered at a timestamp unaligned with the
+         * standard timing for input sampling.  It's best to ensure that the reported path
+         * duration (on path.stats) satisfies the timer threshold, so we add an artificial
+         * sample here that will enforce that desire.
+         */
+        if(!trueSource.isPathComplete && trueSource.currentSample.t != timestamp) {
+          trueSource.path.extend({
+            ...trueSource.currentSample,
+            t: timestamp
+          });
+        }
         this.finalize(result == model.timer.expectedResult, 'timer');
       });
     }
