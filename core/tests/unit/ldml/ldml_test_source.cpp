@@ -109,10 +109,16 @@ LdmlTestSource::parse_source_string(std::string const &s) {
     if (*p == '\\') {
       p++;
       km_kbp_usv v;
+      bool had_open_curly = false;
       assert(p != s.end());
       if (*p == 'u' || *p == 'U') {
         // Unicode value
         p++;
+        if (*p == '{') {
+          p++;
+          assert(p != s.end());
+          had_open_curly = true;
+        }
         size_t n;
         std::string s1 = s.substr(p - s.begin(), 8);
         v              = std::stoul(s1, &n, 16);
@@ -124,6 +130,12 @@ LdmlTestSource::parse_source_string(std::string const &s) {
         } else {
           t += km_kbp_cp(Uni_UTF32ToSurrogate1(v));
           t += km_kbp_cp(Uni_UTF32ToSurrogate2(v));
+        }
+        if (had_open_curly) {
+          p++;
+          // close what you opened
+          assert(*p == '}'); // close curly
+          assert(p != s.end());
         }
       } else if (*p == 'd') {
         // Deadkey
@@ -146,10 +158,16 @@ LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
     if (*p == '\\') {
       p++;
       km_kbp_usv v;
+      bool had_open_curly = false;
       assert(p != s.end());
       if (*p == 'u' || *p == 'U') {
         // Unicode value
         p++;
+        if (*p == '{') {
+          p++;
+          assert(p != s.end());
+          had_open_curly = true;
+        }
         size_t n;
         std::u16string s1 = s.substr(p - s.begin(), 8);
         // TODO-LDML: convert back first?
@@ -163,6 +181,12 @@ LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
         } else {
           t += km_kbp_cp(Uni_UTF32ToSurrogate1(v));
           t += km_kbp_cp(Uni_UTF32ToSurrogate2(v));
+        }
+        if (had_open_curly) {
+          p++;
+          // close what you opened
+          assert(*p == '}'); // close curly
+          assert(p != s.end());
         }
       } else if (*p == 'd') {
         // Deadkey
@@ -674,15 +698,15 @@ int LdmlJsonTestSourceFactory::load(const km::kbp::path &compiled, const km::kbp
     return __LINE__;
   }
 
-  auto conformsTo = data["/keyboardTest/conformsTo"_json_pointer].get<std::string>();
+  auto conformsTo = data["/keyboardTest3/conformsTo"_json_pointer].get<std::string>();
   assert_or_return(std::string(LDML_CLDR_VERSION_LATEST) == conformsTo);
-  auto info_keyboard = data["/keyboardTest/info/keyboard"_json_pointer].get<std::string>();
-  auto info_author = data["/keyboardTest/info/author"_json_pointer].get<std::string>();
-  auto info_name = data["/keyboardTest/info/name"_json_pointer].get<std::string>();
+  auto info_keyboard = data["/keyboardTest3/info/keyboard"_json_pointer].get<std::string>();
+  auto info_author = data["/keyboardTest3/info/author"_json_pointer].get<std::string>();
+  auto info_name = data["/keyboardTest3/info/name"_json_pointer].get<std::string>();
   // TODO-LDML: store these elsewhere?
   std::cout << "JSON: reading " << info_name << " test of " << info_keyboard << " by " << info_author << std::endl;
 
-  auto all_tests = data["/keyboardTest/tests"_json_pointer];
+  auto all_tests = data["/keyboardTest3/tests"_json_pointer];
   assert_or_return((!all_tests.empty()) && (all_tests.size() > 0));  // TODO-LDML: can be empty if repertoire only?
 
   for(auto tests : all_tests) {
@@ -700,7 +724,7 @@ int LdmlJsonTestSourceFactory::load(const km::kbp::path &compiled, const km::kbp
   }
 
 #if defined(HAVE_ICU4C)
-  auto rep_tests = data["/keyboardTest/repertoire"_json_pointer];
+  auto rep_tests = data["/keyboardTest3/repertoire"_json_pointer];
   assert_or_return((!rep_tests.empty()) && (rep_tests.size() > 0));  // TODO-LDML: can be empty if tests only?
 
   for(auto rep : rep_tests) {

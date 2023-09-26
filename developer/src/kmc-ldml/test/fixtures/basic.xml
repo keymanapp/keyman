@@ -4,8 +4,8 @@
 @@keys: [K_Q][K_W][K_Q]
 @@expected: \u0127\u1790\u17B6\u0127
 -->
-<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
+<!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="mt" conformsTo="techpreview">
   <version number="1.0.0" />
 
   <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
@@ -22,6 +22,7 @@
   <displays>
     <!-- values chosen to reuse strings -->
     <display to="a" display="^" />
+    <display id="e" display="^e" />
     <displayOptions baseCharacter="e" />
   </displays>
 
@@ -64,4 +65,4 @@
       <transform from="^e" />
     </transformGroup>
   </transforms>
-</keyboard>
+</keyboard3>

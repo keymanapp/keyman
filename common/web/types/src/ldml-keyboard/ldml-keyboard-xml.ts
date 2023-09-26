@@ -11,7 +11,7 @@ export interface LDMLKeyboardXMLSourceFile {
   /**
    * <keyboard> -- the root element.
    */
-  keyboard: LKKeyboard;
+  keyboard3: LKKeyboard;
 }
 
 export interface LKKeyboard {
@@ -186,7 +186,7 @@ export interface LKDisplayOptions {
 export interface LKDisplay {
   to?: string;
   display?: string;
-  id?: string; // TODO-LDML: This comes in a near-future CLDR update
+  id?: string;
 };
 
 export interface LKDisplays {

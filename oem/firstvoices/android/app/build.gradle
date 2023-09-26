@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'io.sentry.android.gradle'
-    id 'com.github.triplet.play' version '3.7.0-agp4.2' apply false
+    id 'com.github.triplet.play' version '3.8.1' apply false
 }
 
 ext.rootPath = '../../../../android'
@@ -121,7 +121,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.0-rc01'
     implementation 'com.google.android.material:material:1.6.0'
     api(name: 'keyman-engine', ext: 'aar')
-    implementation 'io.sentry:sentry-android:6.9.0'
+    implementation 'io.sentry:sentry-android:6.9.2'
     implementation 'androidx.preference:preference:1.2.0'
 }
 

@@ -1143,8 +1143,8 @@ _builder_define_default_internal_dep() {
 #   2: depaction:deptarget   The dependency action and target
 # Example:
 #   builder_describe_internal_dependency \
-#     mac:build mac-x86_64:build \
-#     mac:build mac-arm64:build
+#     build:mac build:mac-x86_64 \
+#     build:mac build:mac-arm64
 #
 # Note: actions and targets must be fully specified, and this _must_
 # be called before either builder_describe_outputs or builder_parse in
@@ -1183,7 +1183,21 @@ builder_parse() {
     fi
 
     if [[ $key =~ ^- ]]; then
+
+      # Expand short -o to --option in options lookup
+      if [[ ! -z ${_builder_options_short[$key]+x} ]]; then
+        key=${_builder_options_short[$key]}
+      fi
+
       exp+=($key)
+      if [[ ! -z ${_builder_options_var[$key]+x} ]]; then
+        shift
+        if [[ $# -eq 0 ]]; then
+          _builder_parameter_error "$0" parameter "$key"
+        fi
+
+        exp+=("$1")
+      fi
     else
       # Expand comma separated values
       if [[ $key =~ : ]]; then
@@ -1283,10 +1297,6 @@ _builder_parse_expanded_parameters() {
     fi
     n=$((n + 1))
 
-    # Expand short -o to --option in options lookup
-    if [[ ! -z ${_builder_options_short[$key]+x} ]]; then
-      key=${_builder_options_short[$key]}
-    fi
     _builder_item_in_array "$key" "${_builder_options[@]}" && has_option=1 || has_option=0
 
     if (( has_action )) && (( has_target )); then
@@ -1315,9 +1325,6 @@ _builder_parse_expanded_parameters() {
       _builder_chosen_options+=("$key")
       if [[ ! -z ${_builder_options_var[$key]+x} ]]; then
         shift
-        if [[ $# -eq 0 ]]; then
-          _builder_parameter_error "$0" parameter "$key"
-        fi
         # Set the variable associated with this option to the next parameter value
         # A little bit of hoop jumping here to avoid issues with cygwin paths being
         # corrupted too early in the game

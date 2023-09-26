@@ -63,8 +63,21 @@ export class CompilerMessages {
     m(this.FATAL_SectionCompilerFailed, null, `The compiler for '${o.sect}' failed unexpectedly.`);
   static FATAL_SectionCompilerFailed = SevFatal | 0x000F;
 
-  static Error_DisplayIsRepeated = (o:{to: string}) =>
-    m(this.ERROR_DisplayIsRepeated, `display to='${o.to}' has more than one display entry.`);
+  /** annotate the to= or id= entry */
+  private static toOrId(o:{to?: string, id?: string}) {
+    if (o.to && o.id) {
+      return `to='${o.to}' id='${o.id}'`;
+    } else if(o.id) {
+      return `id='${o.id}'`;
+    } else if (o.to) {
+      return `to='${o.to}'`;
+    } else {
+      return '';
+    }
+  }
+
+  static Error_DisplayIsRepeated = (o:{to?: string, id?: string}) =>
+    m(this.ERROR_DisplayIsRepeated, `display ${CompilerMessages.toOrId(o)} has more than one display entry.`);
   static ERROR_DisplayIsRepeated = SevError | 0x0010;
 
   static Error_KeyMissingToGapOrSwitch = (o:{keyId: string}) =>
@@ -77,9 +90,6 @@ export class CompilerMessages {
 
   static Error_InvalidHardware = (o:{form: string}) => m(this.ERROR_InvalidHardware,
     `layers has invalid value form=${o.form}`);
-  /**
-   * Note: may not hit this due to XML validation.
-   */
   static ERROR_InvalidHardware = SevError | 0x0013;
 
   static Error_InvalidModifier = (o:{layer: string, modifier: string}) => m(this.ERROR_InvalidModifier,
@@ -134,5 +144,10 @@ export class CompilerMessages {
   static Error_MissingMarkers = (o: { ids: string[] }) =>
   m(this.ERROR_MissingMarkers, `Markers used for matching but not defined: ${o.ids?.join(',')}`);
   static ERROR_MissingMarkers = SevError | 0x0021;
+
+  static Error_DisplayNeedsToOrId = (o:{to?: string, id?: string}) =>
+  m(this.ERROR_DisplayNeedsToOrId, `display ${CompilerMessages.toOrId(o)} needs to= or id=, but not both`);
+  static ERROR_DisplayNeedsToOrId = SevError | 0x0022;
+
 }
 
