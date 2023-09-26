@@ -5,7 +5,6 @@ import { ManagedPromise } from "@keymanapp/web-utils";
 import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
 import { GestureMatcher, MatchResult } from "./gestureMatcher.js";
 import { GestureModel } from "../specs/gestureModel.js";
-import { QueuedPromisePrioritizer } from "../../queuedPromisePrioritizer.js";
 
 interface GestureSourceTracker<Type> {
   source: GestureSourceSubview<Type>;
@@ -36,8 +35,6 @@ interface EventMap<Type> {
 export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
   private _sourceSelector: GestureSourceTracker<Type>[] = [];
   private potentialMatchers: GestureMatcher<Type>[] = [];
-
-  private readonly promisePrioritizer = new QueuedPromisePrioritizer();
 
   /**
    * Aims to match the gesture-source's path against the specified set of gesture models.  The
@@ -193,10 +190,6 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
     // by this class instance.
     return async (result: MatchResult<Type>) => {
       // Note:  is only called by GestureMatcher Promises that are resolving.
-
-      // Ensure that any essentially-synchronous resolving GestureMatchers resolve in order of
-      // their specified `resolutionPriority`, with larger values first.
-      await this.promisePrioritizer.queueWithPriority(matcher.model.resolutionPriority);
 
       /*
        * If we already had a gesture stage match, this will have already been fulfilled;
