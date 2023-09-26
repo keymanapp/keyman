@@ -26,8 +26,17 @@ builder_describe_outputs \
   build "/linux/keyman-config/keyman_config/standards/lang_tags_map.py"
 
 clean_action() {
-  rm -rf dist make_deb build keyman_config/version.py ./*.egg-info __pycache__ \
-    keyman_config/standards/lang_tags_map.py
+  rm -rf dist make_deb build ./*.egg-info keyman_config/version.py
+  find . \( -name __pycache__ -o -name keyman-config.mo \) -exec rm -rf {} +
+  rm -rf ../help/reference/km-*.md
+
+  # Don't delete this file during a package build because they are
+  # part of the source package. We can't generate it during a package
+  # build because we need to get data from the network which isn't
+  # available for package builds.
+  if [ -z "${KEYMAN_PKG_BUILD-}" ]; then
+    rm -rf keyman_config/standards/lang_tags_map.py
+  fi
 }
 
 execute_with_temp_schema() {

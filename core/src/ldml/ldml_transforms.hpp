@@ -14,11 +14,23 @@
 #include <unordered_map>
 #include <utility>
 
+#if !defined(HAVE_ICU4C)
+#error icu4c is required for this code
+#endif
+
+#define U_FALLTHROUGH
+#include "unicode/utypes.h"
+#include "unicode/uniset.h"
+#include "unicode/usetiter.h"
+#include "unicode/unistr.h"
+#include "unicode/regex.h"
+#include "unicode/utext.h"
+
 namespace km {
 namespace kbp {
 namespace ldml {
 
-using km::kbp::kmx::USet;
+using km::kbp::kmx::SimpleUSet;
 
 /**
  * Type of a group
@@ -33,12 +45,11 @@ enum any_group_type {
  */
 class element {
 public:
-  /** construct from a USet */
-  element(const USet &u, KMX_DWORD flags);
+  /** construct from a SimpleUSet */
+  element(const SimpleUSet &u, KMX_DWORD flags);
   /** construct from a single char */
   element(km_kbp_usv ch, KMX_DWORD flags);
-
-  /** @returns true if a USet type */
+  /** @returns true if a SimpleUSet type */
   bool is_uset() const;
   /** @returns true if prebase bit set*/
   bool is_prebase() const;
@@ -56,42 +67,60 @@ public:
   void dump() const;
 
 private:
-  // TODO-LDML: support multi-char strings?
+  // TODO-LDML: support multi-char strings? (Not needed currently)
   const km_kbp_usv chr;
-  const USet uset;
+  const SimpleUSet uset;
   const KMX_DWORD flags;
-};
-
-/**
- * Inner element, representing <transform>
- */
-class transform_entry {
-public:
-  transform_entry(
-      const std::u32string &from,
-      const std::u32string &to
-      /*TODO-LDML: mapFrom, mapTo*/
-  );
-
-  /**
-   * @returns length if it's a match
-   */
-  size_t match(const std::u32string &input) const;
-
-  /**
-   * @returns output string
-   */
-  std::u32string apply(const std::u32string &input, size_t matchLen) const;
-
-private:
-  const std::u32string fFrom;  // TODO-LDML: regex
-  const std::u32string fTo;
 };
 
 /**
  * An ordered list of strings.
  */
 typedef std::deque<std::u32string> string_list;
+
+/**
+ * Inner element, representing <transform>
+ */
+class transform_entry {
+public:
+  transform_entry(const transform_entry &other);
+  /** simpler constructor for tests */
+  transform_entry(
+      const std::u32string &from,
+      const std::u32string &to
+  );
+  transform_entry(
+      const std::u32string &from,
+      const std::u32string &to,
+      KMX_DWORD mapFrom,
+      KMX_DWORD mapTo,
+      const kmx::kmx_plus &kplus);
+
+  /**
+   * If matching, apply the match to the output string
+   * @param input input string to match
+   * @param output output string
+   * @returns length of 'input' which was matched
+   */
+  size_t apply(const std::u32string &input, std::u32string &output) const;
+
+private:
+  const std::u32string fFrom;
+  const std::u32string fTo;
+  std::unique_ptr<icu::RegexPattern> fFromPattern;
+
+  const KMX_DWORD fMapFromStrId;
+  const KMX_DWORD fMapToStrId;
+  std::deque<std::u32string> fMapFromList;
+  std::deque<std::u32string> fMapToList;
+  /** Internal function to setup pattern string */
+  void init();
+  /** @returns the index of the item in the fMapFromList list, or -1 */
+  int32_t findIndexFrom(const std::u32string &match) const;
+public:
+  /** @returns the index of the item in the list, or -1 */
+  static int32_t findIndex(const std::u32string &match, const std::deque<std::u32string> list);
+};
 
 /**
  * a group of <transform> entries - a <transformGroup>
@@ -101,12 +130,12 @@ public:
   transform_group();
 
   /**
-   * Find the first match in the group
+   * Find the first match in the group and apply it.
    * @param input input string to match
-   * @param subMatched on output, the matched length
-   * @returns alias to transform_entry or nullptr
+   * @param output output string
+   * @returns length of 'input' which was matched
    */
-  const transform_entry *match(const std::u32string &input, size_t &subMatched) const;
+  size_t apply(const std::u32string &input, std::u32string &output) const;
 };
 
 /** a single char, categorized according to reorder rules*/
@@ -228,7 +257,7 @@ public:
   size_t apply(const std::u32string &input, std::u32string &output);
 
   /**
-   * For tests - TODO-LDML only supports reorder
+   * For tests
    * @return true if str was altered
    */
   bool apply(std::u32string &str);

@@ -5,7 +5,7 @@ import { CompilerMessages } from '../src/compiler/messages.js';
 import { makePathToFixture } from './helpers/index.js';
 import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
 import { PackageValidation } from '../src/compiler/package-validation.js';
-import { CompilerErrorNamespace } from '@keymanapp/common-types';
+import { CompilerErrorNamespace, CompilerOptions } from '@keymanapp/common-types';
 
 const debug = false;
 const callbacks = new TestCompilerCallbacks();
@@ -20,7 +20,7 @@ describe('CompilerMessages', function () {
   // Message tests
   //
 
-  function testForMessage(context: Mocha.Context, fixture: string[], messageId?: number) {
+  function testForMessage(context: Mocha.Context, fixture: string[], messageId?: number, options?: CompilerOptions) {
     context.timeout(10000);
 
     callbacks.clear();
@@ -30,7 +30,7 @@ describe('CompilerMessages', function () {
 
     let kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
     if(kmpJson && callbacks.messages.length == 0) {
-      const validator = new PackageValidation(callbacks);
+      const validator = new PackageValidation(callbacks, options ?? {});
       validator.validate(kpsPath, kmpJson); // we'll ignore return value and rely on the messages
     }
 
@@ -122,8 +122,10 @@ describe('CompilerMessages', function () {
   // WARN_FileInPackageDoesNotFollowFilenameConventions
 
   it('should generate WARN_FileInPackageDoesNotFollowFilenameConventions if content filename has wrong conventions', async function() {
-    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions.kps'], CompilerMessages.WARN_FileInPackageDoesNotFollowFilenameConventions);
-    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions_2.kps'], CompilerMessages.WARN_FileInPackageDoesNotFollowFilenameConventions);
+    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions.kps'],
+      CompilerMessages.WARN_FileInPackageDoesNotFollowFilenameConventions, {checkFilenameConventions: true});
+    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions_2.kps'],
+      CompilerMessages.WARN_FileInPackageDoesNotFollowFilenameConventions, {checkFilenameConventions: true});
   });
 
   // ERROR_PackageNameCannotBeBlank
@@ -145,12 +147,6 @@ describe('CompilerMessages', function () {
     testForMessage(this, ['invalid', 'warn_keyboard_versions_do_not_match.kps'], CompilerMessages.WARN_KeyboardVersionsDoNotMatch);
   });
 
-  // WARN_KeyboardVersionsDoNotMatchPackageVersion
-
-  it('should generate WARN_KeyboardVersionsDoNotMatchPackageVersion if <Keyboard> version does not match package version', async function() {
-    testForMessage(this, ['invalid', 'warn_keyboard_versions_do_not_match_package_version.kps'], CompilerMessages.WARN_KeyboardVersionsDoNotMatchPackageVersion);
-  });
-
   // ERROR_LanguageTagIsNotValid
 
   it('should generate ERROR_LanguageTagIsNotValid if keyboard has an invalid language tag', async function() {
@@ -163,11 +159,11 @@ describe('CompilerMessages', function () {
     testForMessage(this, ['invalid', 'warn_language_tag_is_not_minimal.kps'], CompilerMessages.WARN_LanguageTagIsNotMinimal);
   });
 
-  // ERROR_MustHaveAtLeastOneLanguage
+  // ERROR_ModelMustHaveAtLeastOneLanguage
 
-  it('should generate ERROR_MustHaveAtLeastOneLanguage if model or keyboard has zero language tags', async function() {
-    testForMessage(this, ['invalid', 'keyman.en.error_must_have_at_least_one_language.model.kps'],
-      CompilerMessages.ERROR_MustHaveAtLeastOneLanguage);
+  it('should generate ERROR_MustHaveAtLeastOneLanguage if model has zero language tags', async function() {
+    testForMessage(this, ['invalid', 'keyman.en.error_model_must_have_at_least_one_language.model.kps'],
+      CompilerMessages.ERROR_ModelMustHaveAtLeastOneLanguage);
   });
 
   // WARN_RedistFileShouldNotBeInPackage
@@ -196,6 +192,13 @@ describe('CompilerMessages', function () {
   it('should generate WARN_JsKeyboardFileIsMissing if package is missing corresponding .js for a touch .kmx', async function() {
     testForMessage(this, ['invalid', 'warn_js_keyboard_file_is_missing.kps'],
       CompilerMessages.WARN_JsKeyboardFileIsMissing);
+  });
+
+  // WARN_KeyboardShouldHaveAtLeastOneLanguage
+
+  it('should generate WARN_KeyboardShouldHaveAtLeastOneLanguage if keyboard has zero language tags', async function() {
+    testForMessage(this, ['invalid', 'warn_keyboard_should_have_at_least_one_language.kps'],
+      CompilerMessages.WARN_KeyboardShouldHaveAtLeastOneLanguage);
   });
 
 });

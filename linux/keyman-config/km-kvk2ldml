@@ -42,14 +42,25 @@ def main():
     if args.print:
         print_kvk(kvkData, args.keys)
 
-    if args.output:
-        outputfile = args.output
-    else:
-        outputfile = name + ".ldml"
+    outputfile = args.output if args.output else f'{name}.ldml'
 
-    with open(outputfile, 'wb') as ldmlfile:
-        ldml = convert_ldml(kvkData)
-        output_ldml(ldmlfile, ldml)
+    dirname = os.path.dirname(outputfile)
+    if not os.path.isdir(dirname):
+        if os.path.exists(dirname):
+            logging.error(f'km-kvk2ldml: error, `{dirname}` exists but is not a directory')
+            sys.exit(3)
+        os.makedirs(dirname)
+
+    try:
+        with open(outputfile, 'wb') as ldmlfile:
+            ldml = convert_ldml(kvkData)
+            output_ldml(ldmlfile, ldml)
+    except PermissionError:
+        logging.error(f'km-kvk2ldml: error, permission denied writing file `{outputfile}`')
+        sys.exit(4)
+    except IsADirectoryError:
+        logging.error(f'km-kvk2ldml: error, cannot create file `{outputfile}` - it is a directory')
+        sys.exit(5)
 
 
 if __name__ == "__main__":
