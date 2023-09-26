@@ -94,7 +94,7 @@ export default class KeyboardInterface<ContextManagerType extends ContextManager
       return 1;
     }
 
-    if(!this.engine.config.deferForInitialization.hasFinalized) {
+    if(!this.engine.config.deferForInitialization.isResolved) {
       this.engine.config.deferForInitialization.then(() => this.engine.keyboardRequisitioner.cache.addStub(stub));
     } else {
       this.engine.keyboardRequisitioner.cache.addStub(stub);

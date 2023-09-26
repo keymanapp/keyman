@@ -186,7 +186,7 @@ export default class KeymanEngine<
     // The original seems to allow it.
 
     const config = this.config;
-    if(config.deferForInitialization.hasFinalized) {
+    if(config.deferForInitialization.isResolved) {
       // abort!  Maybe throw an error, too.
       return Promise.resolve();
     }
@@ -233,7 +233,7 @@ export default class KeymanEngine<
         }
       }
 
-      if(this.config.deferForInitialization.hasFinalized) {
+      if(this.config.deferForInitialization.isResolved) {
         eventRaiser();
       } else {
         this.config.deferForInitialization.then(eventRaiser);
@@ -248,7 +248,7 @@ export default class KeymanEngine<
         });
       }
 
-      if(this.config.deferForInitialization.hasFinalized) {
+      if(this.config.deferForInitialization.isResolved) {
         eventRaiser();
       } else {
         this.config.deferForInitialization.then(eventRaiser);
