@@ -398,9 +398,13 @@ For each element:
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|
 |32+|  32  | to      | str: to string                           |
-|36+|  32  | display | str: output display string               |
+|36+|  32  | id      | str: id string                           |
+|40+|  32  | display | str: output display string               |
 
-Entries are sorted in a binary codepoint sort on the `to` field.
+Either `to` or `id` must be set, not both.
+Entries with an `to` field are sorted in a binary codepoint sort on the `to` field,
+followed by entries with an `id` field set sorted in a binary codepoint sort on the `id` field.
+
 
 ### C7043.2.15 `key2`—Extended keybag
 

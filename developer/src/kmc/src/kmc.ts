@@ -3,45 +3,50 @@
  * kmc - Keyman Next Generation Compiler
  */
 
-
 import { Command } from 'commander';
-import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { declareBuild } from './commands/build.js';
 import { declareBuildTestData } from './commands/buildTestData.js';
+import { declareAnalyze } from './commands/analyze.js';
+import { BaseOptions } from './util/baseOptions.js';
+import { KeymanSentry } from './util/KeymanSentry.js';
 
-const program = new Command();
+await KeymanSentry.runTestIfCLRequested();
+try {
+  await run();
+} catch(e) {
+  KeymanSentry.captureException(e);
+}
 
-/* Arguments */
-program
-  .description('Keyman Developer Command Line Interface')
-  .version(KEYMAN_VERSION.VERSION_WITH_TAG);
+// Ensure any messages reported to Sentry have had time to be uploaded before we
+// exit. In most cases, this will be a no-op so should not affect performance.
+await KeymanSentry.close();
 
-declareBuild(program);
-declareBuildTestData(program);
+async function run() {
+  /* Arguments */
 
-/*
-program
-  .command('clean');
+  const program = new Command();
+  program.description('Keyman Developer Command Line Interface');
+  BaseOptions.addVersion(program);
+  BaseOptions.addSentry(program);
 
-program
-  .command('copy');
+  if(await KeymanSentry.isEnabled()) {
+    KeymanSentry.init();
+  }
 
-program
-  .command('rename');
+  declareBuild(program);
+  declareBuildTestData(program);  // TODO: consider renaming this (build vs build-test-data is confusing)
+  declareAnalyze(program);
 
-program
-  .command('generate');
+  /* Future commands:
+  declareClean(program);
+  declareCopy(program);
+  declareRename(program);
+  declareGenerate(program);
+  declareImport(program);
+  declareTest(program);
+  declarePublish(program);
+  */
 
-program
-  .command('import');
-
-program
-  .command('test');
-
-program
-  .command('publish');
-*/
-
-program.parseAsync(process.argv)
-  .catch(reason => console.error(reason));
-
+  await program.parseAsync(process.argv)
+    .catch(reason => console.error(reason));
+}

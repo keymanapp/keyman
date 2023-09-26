@@ -37,6 +37,7 @@ foreach t : tests
     cpp_args: local_defns + defns + warns,
     include_directories: [inc, libsrc],
     link_args: links + tests_flags,
+    dependencies: [icu_uc, icu_i18n],
     objects: lib.extract_all_objects(recursive: false))
 
   test(t[0], bin, args: ['--color', test_path])

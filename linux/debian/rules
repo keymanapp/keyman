@@ -73,3 +73,11 @@ override_dh_auto_install:
 
 override_dh_missing:
 	dh_missing --fail-missing
+
+override_dh_auto_clean:
+	core/build.sh clean
+	linux/ibus-keyman/build.sh clean
+	linux/keyman-system-service/build.sh clean
+	linux/keyman-config/build.sh clean
+	rm -rf .pybuild/
+	dh_auto_clean $@

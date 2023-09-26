@@ -26,9 +26,26 @@ name_suffix = []
 
 if cpp_compiler.get_id() == 'emscripten'
   # wasm-exceptions supported in Node 18+, Chrome 95+, Firefox 100+, Safari 15.2+
-  flags += ['-fwasm-exceptions']
-  lib_links = ['--whole-archive', '-sMODULARIZE', '-sEXPORT_ES6']
-  links += ['-fwasm-exceptions', '--bind']
+
+  # For additional (slow) sanitize, add:
+  # Additional sanitize required on both flags and links: '-fsanitize=undefined', '-fsanitize=address'
+  #sanitize = ['-fsanitize=undefined', '-fsanitize=address']
+  sanitize = []
+
+  flags += ['-fwasm-exceptions'] + sanitize
+
+  lib_links = ['--whole-archive', '-sALLOW_MEMORY_GROWTH', '-sMODULARIZE', '-sEXPORT_ES6']
+  links += [
+    # Forcing inclusion of debug symbols
+    '-g', '-Wlimited-postlink-optimizations',
+    '-fwasm-exceptions', '--bind'] + sanitize
+
+  # Alternative to sanitize is adding '-sASSERTIONS', '-sSAFE_HEAP' to lib_links:
+  # lib_links += ['-sASSERTIONS', '-sSAFE_HEAP']
+
+  # For profiling, add:
+  # lib_links += ['--profiling-funcs', '-sDEMANGLE_SUPPORT=1']
+
   if cpp_compiler.version().version_compare('>=3.1.44')
     # emscripten 3.1.44 removes .asm object and so we need to export `wasmExports`
     # #9375; https://github.com/emscripten-core/emscripten/blob/main/ChangeLog.md#3144---072523
@@ -79,11 +96,23 @@ kmcmplib = declare_dependency(link_with: lib, include_directories: inc)
 
 if cpp_compiler.get_id() == 'emscripten'
   # Build an executable
-  host = executable('wasm-host', #'wasm-host.cpp',
+  # TODO: rename wasm-host to kmcmplib.wasm
+  host = executable('wasm-host',
     cpp_args: defns,
     include_directories: inc,
     link_args: links + lib_links,
     objects: lib.extract_all_objects(),
     dependencies: icuuc_dep)
+
+  if get_option('buildtype') == 'release'
+    # Split debug symbols into separate wasm file for release builds only
+    # as the release symbols will be uploaded to sentry
+    # custom_target('kmcmplib.wasm',
+    #   depends: host,
+    #   input: host,
+    #   output: 'kmcmplib.wasm',
+    #   command: ['wasm-split', '@OUTDIR@/wasm-host.wasm', '-o', '@OUTPUT@', '--strip', '--debug-out=@OUTDIR@/kmcmplib.debug.wasm'],
+    #   build_by_default: true)
+  endif
 endif
 

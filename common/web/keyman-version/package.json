@@ -20,7 +20,7 @@
   "license": "MIT",
   "type": "module",
   "devDependencies": {
-    "@types/node": "^18.7.13",
+    "@types/node": "^20.4.1",
     "typescript": "^4.9.5"
   }
 }
