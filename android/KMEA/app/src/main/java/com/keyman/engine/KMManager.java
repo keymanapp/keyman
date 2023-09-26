@@ -2153,15 +2153,6 @@ public final class KMManager {
    * @param keyboardType KeyboardType KEYBOARD_TYPE_INAPP or KEYBOARD_TYPE_SYSTEM
    */
   public static void handleGlobeKeyAction(Context context, boolean globeKeyDown, KeyboardType keyboardType) {
-    // Clear preview and subkeys
-    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      InAppKeyboard.dismissKeyPreview(0);
-      InAppKeyboard.dismissSubKeysWindow();
-    } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      SystemKeyboard.dismissKeyPreview(0);
-      SystemKeyboard.dismissSubKeysWindow();
-    }
-
     // Update globeKeyState
     if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
       globeKeyState = globeKeyDown ? GlobeKeyState.GLOBE_KEY_STATE_DOWN : GlobeKeyState.GLOBE_KEY_STATE_UP;

@@ -30,17 +30,17 @@ override_dh_auto_configure:
 		--wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc \
 		--localstatedir=/var --libdir=lib/$(DEB_TARGET_MULTIARCH) \
 		--libexecdir=lib/$(DEB_TARGET_MULTIARCH)
-	linux/ibus-keyman/build.sh configure -- \
-		--wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc --localstatedir=/var
 	linux/keyman-system-service/build.sh configure -- \
+		--wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc --localstatedir=/var
+	linux/ibus-keyman/build.sh configure -- \
 		--wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc --localstatedir=/var
 	linux/keyman-config/build.sh configure
 
 override_dh_auto_build:
 	cp linux/keyman-config/resources/keyman.sharedmimeinfo debian/
 	core/build.sh --no-tests build:arch
-	linux/ibus-keyman/build.sh build
 	linux/keyman-system-service/build.sh build
+	linux/ibus-keyman/build.sh build
 	linux/keyman-config/build.sh build
 	cd linux/keyman-config && \
 		sed -i -e "s/^__pkgversion__ = \"[^\"]*\"/__pkgversion__ = \"$(DEB_VERSION)\"/g" keyman_config/version.py && \
@@ -49,16 +49,16 @@ override_dh_auto_build:
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 	core/build.sh --no-tests test:arch
-	linux/ibus-keyman/build.sh test
 	linux/keyman-system-service/build.sh test
+	linux/ibus-keyman/build.sh test
 	linux/keyman-config/build.sh test
 endif
 
 override_dh_auto_install:
 	install -d $(CURDIR)/debian/tmp
 	DESTDIR=$(CURDIR)/debian/tmp core/build.sh --no-tests install:arch
-	DESTDIR=$(CURDIR)/debian/tmp linux/ibus-keyman/build.sh install
 	DESTDIR=$(CURDIR)/debian/tmp linux/keyman-system-service/build.sh install
+	DESTDIR=$(CURDIR)/debian/tmp linux/ibus-keyman/build.sh install
 	# keyman-config
 	install -d $(CURDIR)/debian/keyman/usr/share/
 	cp -r linux/keyman-config/locale/ $(CURDIR)/debian/keyman/usr/share/
@@ -73,3 +73,11 @@ override_dh_auto_install:
 
 override_dh_missing:
 	dh_missing --fail-missing
+
+override_dh_auto_clean:
+	core/build.sh clean
+	linux/keyman-system-service/build.sh clean
+	linux/ibus-keyman/build.sh clean
+	linux/keyman-config/build.sh clean
+	rm -rf .pybuild/
+	dh_auto_clean $@

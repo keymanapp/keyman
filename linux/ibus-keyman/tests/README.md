@@ -6,7 +6,7 @@ are stored in `~/.config/glib-2.0/settings/keyfile`.
 
 ## Running tests
 
-The tests get run as part of building `ibus-keyman`, more specifically when running `make check`.
+The tests get run as part of building `ibus-keyman`, more specifically when running `build.sh test`.
 
 ### Run all tests
 

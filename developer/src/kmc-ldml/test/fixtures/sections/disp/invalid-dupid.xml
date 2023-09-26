@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="mt" conformsTo="techpreview">
+  <names>
+    <name value="disp-invalid" />
+  </names>
+
+  <displays>
+    <display to="f" display="(f)"/> <!-- Note: in opposite lexical order, as the compiler will sort -->
+    <display id="e" display="(e)"/>
+    <display id="e" display="(e)"/> <!-- duplicate -->
+    <displayOptions baseCharacter="x" />
+  </displays>
+</keyboard3>

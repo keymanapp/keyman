@@ -1711,10 +1711,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * @returns
    */
   startLongpress(key: KeyElement): PendingGesture {
-    if(this.config.embeddedGestureConfig.startLongpress) {
-      return this.config.embeddedGestureConfig.startLongpress(this, key);
-    }
-
     // First-level object/Promise:  will produce a subkey popup when the longpress gesture completes.
     // 'Returns' a second-level object/Promise:  resolves when a subkey is selected or is cancelled.
     let pendingLongpress = new InternalPendingLongpress(this, key);
@@ -1895,9 +1891,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    *  Create a key preview element for phone devices
    */
   createKeyTip() {
-    if(this.config.embeddedGestureConfig.createKeyTip) {
-      this.keytip = this.config.embeddedGestureConfig.createKeyTip(this);
-    } else if (this.device.formFactor == 'phone') {
+    if(this.device.formFactor == 'phone') {
       if (this.keytip == null) {
         // For now, should only be true (in production) when keyman.isEmbedded == true.
         let constrainPopup = this.isEmbedded;

@@ -11,6 +11,7 @@ tests_from_cldr = [
   'ja-Latn',
   'pt-t-k0-abnt2',
   'fr-t-k0-azerty',
+  'pcm',
 ]
 
 tests_without_testdata = [

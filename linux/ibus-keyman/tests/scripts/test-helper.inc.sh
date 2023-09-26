@@ -278,7 +278,7 @@ function cleanup() {
   if [ -f "$PID_FILE" ]; then
     echo
     echo "# Shutting down processes..."
-    bash "$PID_FILE" > /dev/null 2>&1
+    bash "$PID_FILE" # > /dev/null 2>&1
     rm "$PID_FILE"
     echo "# Finished shutdown of processes."
   fi

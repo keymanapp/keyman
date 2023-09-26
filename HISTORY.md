@@ -1,5 +1,85 @@
 # Keyman Version History
 
+## 17.0.180 alpha 2023-09-25
+
+* fix(linux): Fix detection of unit tests (#9606)
+
+## 17.0.179 alpha 2023-09-22
+
+* chore(resources): ldml: update to keyboard3 (#9588)
+* change(android,web) Use web-based popup key longpresses (#9591)
+
+## 17.0.178 alpha 2023-09-21
+
+* fix(linux): Correctly open files linked from help page (#9601)
+* chore(linux): Fix bugs, add dependency and update documentation (#9602)
+
+## 17.0.177 alpha 2023-09-20
+
+* chore(linux): Add coverage action to `ibus-keyman/build.sh` (#9583)
+* docs(common): Fix documentation for `builder_describe_internal_dependency` (#9582)
+
+## 17.0.176 alpha 2023-09-19
+
+* chore(oem/fv/android): Update Gradle to 7.4 (#9590)
+* refactor(linux): Rename defines to clarify purpose  ️ (#9584)
+*  (#9560)
+
+## 17.0.175 alpha 2023-09-18
+
+* chore(linux): Split startup process (#9570)
+
+## 17.0.174 alpha 2023-09-16
+
+* refactor(linux): Reformat file (#9569)
+
+## 17.0.173 alpha 2023-09-13
+
+* chore(common): Update to Unicode 15.1 (#9555)
+
+## 17.0.172 alpha 2023-09-12
+
+* fix(linux): Prevent exception if neither USER, LOGNAME nor SUDO_USER set (#9543)
+* chore(linux): Exclude environment.sh from build (#9553)
+
+## 17.0.171 alpha 2023-09-01
+
+* chore(linux): Add `clean` target to `rules` (#9531)
+
+## 17.0.170 alpha 2023-08-31
+
+* fix(common): builder_parse broke on option parameters (#9489)
+* docs(linux): Explicitly specify emscripten version (#9527)
+
+## 17.0.169 alpha 2023-08-30
+
+* fix(linux): Fix exception in km-kvk2ldml (#9523)
+
+## 17.0.168 alpha 2023-08-29
+
+* refactor(linux): Fix warning (#9513)
+
+## 17.0.167 alpha 2023-08-25
+
+* feat(core): implement mapped set mapping (#9504)
+* feat(resources): add pcm keyboard (#9508)
+
+## 17.0.166 alpha 2023-08-24
+
+* chore(common): Update crowdin strings for French (#9505)
+
+## 17.0.165 alpha 2023-08-23
+
+* feat(core): add display=id (#9484)
+
+## 17.0.164 alpha 2023-08-22
+
+* fix(common): don't crash on illegal unicodesets (#9492)
+
+## 17.0.163 alpha 2023-08-21
+
+* chore(web): Update keymanweb-osk.ttf to v. 3.0 (#9469)
+
 ## 17.0.162 alpha 2023-08-18
 
 *  (#9483)
