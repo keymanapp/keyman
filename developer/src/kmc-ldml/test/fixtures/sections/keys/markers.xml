@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
+<keyboard locale="mt" conformsTo="techpreview">
+  <names>
+    <name value="keys-markers" />
+  </names>
+
+  <keys>
+    <key id="ww" to="\m{w}" flicks="flickw" longPress="\m{w}" longPressDefault="\m{w}" multiTap="\m{w}" />
+    <flicks id="flickw">
+        <flick directions="nw" to="\m{w}" />
+    </flicks>
+  </keys>
+
+  <layers form="iso">
+    <layer id="base">
+      <row keys="ww" />
+    </layer>
+  </layers>
+
+  <transforms type="simple">
+    <transformGroup>
+      <transform from="\m{w}" to="W" /> <!-- to quell marker err -->
+    </transformGroup>
+  </transforms>
+</keyboard>
+
+<!-- you can have any output you want, as long as it's an W ! -->

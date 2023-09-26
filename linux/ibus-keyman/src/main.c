@@ -48,12 +48,15 @@ static const GOptionEntry entries[] =
 // Add an environment variable to see debug messages: export G_MESSAGES_DEBUG=all
 
 static void
-ibus_disconnected_cb (IBusBus  *bus,
-                      gpointer  user_data)
+ibus_disconnected_cb (IBusBus  *unused_bus,
+                      gpointer  unused_data)
 {
     g_debug ("bus disconnected");
     KeymanService *service = km_service_get_default(NULL);
     g_clear_object(&service);
+
+    g_object_unref(factory);
+    g_object_unref(bus);
 
     ibus_quit ();
 }
@@ -114,7 +117,7 @@ print_engines_xml (void)
     fprintf (stdout, "%s", output->str);
 
     g_string_free (output, TRUE);
-
+    g_object_unref(component);
 }
 
 int

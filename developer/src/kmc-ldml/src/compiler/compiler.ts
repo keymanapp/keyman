@@ -1,5 +1,5 @@
 import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus, CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile, UnicodeSetParser } from '@keymanapp/common-types';
-import { CompilerOptions } from './compiler-options.js';
+import { LdmlCompilerOptions } from './ldml-compiler-options.js';
 import { CompilerMessages } from './messages.js';
 import { BkspCompiler, TranCompiler } from './tran.js';
 import { DispCompiler } from './disp.js';
@@ -43,15 +43,13 @@ export const SECTION_COMPILERS = [
 
 export class LdmlKeyboardCompiler {
   private readonly callbacks: CompilerCallbacks;
-  private readonly options: CompilerOptions;
+  private readonly options: LdmlCompilerOptions;
 
   // uset parser
   private usetparser?: UnicodeSetParser = undefined;
 
-  constructor (callbacks: CompilerCallbacks, options: CompilerOptions) {
+  constructor (callbacks: CompilerCallbacks, options: LdmlCompilerOptions) {
     this.options = {
-      debug: false,
-      addCompilerVersion: true,
       ...options
     };
     this.callbacks = callbacks;
@@ -102,7 +100,7 @@ export class LdmlKeyboardCompiler {
     }
     try {
       // validate the object tree against the .xsd schema
-      if (!reader.validate(source, this.callbacks.loadSchema('ldml-keyboard'))) {
+      if (!reader.validate(source)) {
         return null;
       }
     } catch(e) {
@@ -135,7 +133,7 @@ export class LdmlKeyboardCompiler {
       // TODO-LDML: The unboxed data doesn't match the schema anymore. Skipping validation, for now.
 
       // try {
-      //   if (!reader.validate(source, this.callbacks.loadSchema('ldml-keyboard-test'))) {
+      //   if (!reader.validate(source)) {
       //     return null;
       //   }
       // } catch(e) {
