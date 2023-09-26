@@ -182,9 +182,133 @@ bool CompareVector_To_VectorOfFile(v_dw_3D All_Vector,v_dw_3D File_Vector){
   }
 
   return true;
-  wprintf(L" #### CompareVector_To_VectorOfFile ended \n");
-  return false;
+  wprintf(L" #### CompareVector_To_VectorOfFile ended \n");   //_S2 kommt hier nie hin
+  return false;                                               //_S2 kommt hier nie hin
 }
+
+bool CompareVector_To_VectorOfFile_RGKEY(v_dw_2D Win_Vector,v_dw_2D Lin_Vector, v_dw_2D Map_Vector){
+  wprintf(L" #### CompareVector_To_VectorOfFile started: ");
+  wprintf(L" #### dimensions:  %i  %i  -- %i  %i  \n", Win_Vector.size() ,Win_Vector[0].size(), Lin_Vector.size() ,Lin_Vector[0].size());
+  KMX_DWORD SC_Win, SC_Lin;
+  if (!(Win_Vector.size() == Lin_Vector.size()) )return false;
+  if (!(Win_Vector[0].size() == Lin_Vector[0].size()))  return false;
+
+  // loop through both vectors and compare VK ( " e.g. do both vectors contain character "Q" ? ( that is VK = 81))
+  for ( int i=0; i< Lin_Vector.size();i++) {
+
+    // for capital letters A-Z
+    if ( (i >64) && (i<91)) {
+      if( Lin_Vector[i][1] == (Win_Vector[i][1] +8  )) {
+        //wprintf(L" GOOD entry for Win/Lin_Vector[%i][0]:    Win_Vector[%i][1] (%i/ %c) <--> Lin_Vector[%i][1] (%i/ %c)\n", i, i,Win_Vector[i][0] ,Win_Vector[i][0], i,Lin_Vector[i][0],Lin_Vector[i][0]);
+        continue;
+      }
+      else
+        wprintf(L" WRONG entry for Win/Lin_Vector[%i][0]:    Win_Vector[%i][1] (%i/ %c) <--> Lin_Vector[%i][1] (%i/ %c)\n", i, i,Win_Vector[i][0] ,Win_Vector[i][0], i,Lin_Vector[i][0],Lin_Vector[i][0]);
+        return false;
+    }
+
+    /*
+    // for unshifted letters a-z
+    else if ( (i >96) && (i<123)) {
+    }
+
+    // for all other characters
+    else {
+    }
+    */
+  }
+  return true;
+  }
+
+
+/*bool CompareVector_To_VectorOfFile_RGKEY(v_dw_2D Win_Vector,v_dw_2D Lin_Vector, v_dw_2D Map_Vector){
+  wprintf(L" #### CompareVector_To_VectorOfFile started: ");
+  wprintf(L" #### dimensions:  %i  %i  -- %i  %i  \n", Win_Vector.size() ,Win_Vector[0].size(), Lin_Vector.size() ,Lin_Vector[0].size());
+  KMX_DWORD SC_Win, SC_Lin;
+  if (!(Win_Vector.size() == Lin_Vector.size()) )return false;
+  if (!(Win_Vector[0].size() == Lin_Vector[0].size()))  return false;
+
+
+// loop through both vectors and compare VK ( " e.g. do both vectors contain character "Q" ? ( that is VK = 81))
+for ( int i=0; i< Lin_Vector.size();i++) {
+    KMX_DWORD ValueOfVLin = Lin_Vector[i][0];
+    if ( ValueOfVLin == 999)
+      continue;
+
+      for ( int j=0; j< Win_Vector.size();j++) {
+         KMX_DWORD ValueOfVWin = Win_Vector[j][0];
+         if (ValueOfVWin ==ValueOfVLin) {
+            wprintf(L" same value found: %i; (Lin): %i-%i  %i--%i (Win) \n", ValueOfVLin,Lin_Vector[i][0],Lin_Vector[i][1],Win_Vector[i][1],Win_Vector[i][0] );
+
+
+            // do I find these 2 SC as a pair (in a line) in map.txt
+            SC_Win = Win_Vector[j][0];
+            SC_Lin = Lin_Vector[i][0];
+            for( int k=0; k< Map_Vector.size(); k++) {
+              if((SC_Win == Map_Vector[k][1])  && ( SC_Lin== Map_Vector[k][1]))
+                wprintf(L" ....same value found: %i; (Lin): %i-%i  %i--%i (Win) \n", ValueOfVLin,Lin_Vector[i][0],Lin_Vector[i][1],Win_Vector[i][1],Win_Vector[i][0] );
+
+                //wprintf(L"    ... That EXISTS in map \n");
+              //else
+                //wprintf(L" ... That DOES NOT EXIST in map \n");
+            }
+            continue;
+         }
+         //else
+            wprintf(L" same value NOT found: %i\n", ValueOfVLin);//
+      }
+}
+  return true;
+}*/
+
+bool write_RGKEY_FileToVector(v_dw_2D& shift_states, const char* infile) {
+  FILE *fp;
+  char str[600];
+  std::vector<char> delim{' ', '[', ']', '}',  ';', '\t', '\n'};
+  v_str_1D complete_List;
+  v_dw_1D tokens_dw;
+  int k = -1;
+
+  for ( int i =0; i< 266;i++) {
+      tokens_dw.push_back(999);
+      tokens_dw.push_back(999);
+      shift_states.push_back(tokens_dw);
+      tokens_dw.clear();
+  }
+
+  fp = fopen(infile , "r");
+
+  if(fp == NULL) {
+    perror("Error opening file");
+    return(-1);
+  }
+
+  while (fgets(str, 600, fp) != NULL) {
+    k++;
+    complete_List.push_back(str);
+
+    // remove all unwanted char
+    for (int i = 0; i < (int)delim.size(); i++) {
+      complete_List[k].erase(remove(complete_List[k].begin(), complete_List[k].end(), delim[i]), complete_List[k].end());
+    }
+
+    std::stringstream ss(complete_List[k]);
+    int dash = complete_List[k].find("-");
+    int len2 =( (complete_List[k].size())-dash-2);
+    int size_l= sizeof(complete_List[k]);
+
+    tokens_dw.push_back((DWORD)stoi(complete_List[k].substr(0, dash)));
+    tokens_dw.push_back((DWORD)stoi(complete_List[k].substr(dash+1, (len2))));
+    int posInVec = tokens_dw[0];
+
+    shift_states[posInVec]=tokens_dw;
+    tokens_dw.clear();
+  }
+  fclose(fp);
+  return(0);
+}
+
+
 
 
 bool test_In_Out(v_dw_3D All_Vector){

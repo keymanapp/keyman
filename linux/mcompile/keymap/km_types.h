@@ -119,4 +119,18 @@ typedef KMX_UCHAR* KMX_PUCHAR;
 #define VK_xDF		0xDF
 #define VK_OEM_102  0xE2  //  "<>" or "\|" on RT 102-key kbd.
 
+#define VK_NUMPAD0  0xFFB0
+#define VK_NUMPAD1  0xFFB1
+#define VK_NUMPAD2  0xFFB2
+#define VK_NUMPAD3  0xFFB3
+#define VK_NUMPAD4  0xFFB4
+#define VK_NUMPAD5  0xFFB5
+#define VK_NUMPAD6  0xFFB6
+#define VK_NUMPAD7  0xFFB7
+#define VK_NUMPAD8  0xFFB8
+#define VK_NUMPAD9  0xFFB9
+#define VK_DIVIDE   0xFFAF
+#define VK_CANCEL   0xFF1B
+#define VK_DECIMAL  0xFFAC
+
 #endif /*KM_TYPES*/

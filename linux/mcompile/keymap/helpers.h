@@ -7,6 +7,7 @@
 #include "mc_kmxfile.h"
 #include "keymap.h"
 
+
 // why again here?
 typedef std::vector<std::string> v_str_1D;
 typedef std::vector<KMX_DWORD> v_dw_1D;
@@ -30,5 +31,9 @@ bool writeVectorToFile(v_dw_3D V) ;
 bool writeFileToVector(v_dw_3D& complete_Vector, const char* infile);
 bool CompareVector_To_VectorOfFile(v_dw_3D All_Vector,v_dw_3D File_Vector);
 bool test_In_Out(v_dw_3D All_Vector);
+
+// to check if content of Vector is ok
+bool write_RGKEY_FileToVector(v_dw_2D& shift_states, const char* infile) ;
+bool CompareVector_To_VectorOfFile_RGKEY(v_dw_2D Win_Vector,v_dw_2D Lin_Vector, v_dw_2D Map_Vector);
 
 #endif /* HELPERS_H*/

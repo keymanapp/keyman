@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include "km_types.h"
 #include "mc_kmxfile.h"
-/*
+
 enum ShiftState {
     Base = 0,                    // 0
     Shft = 1,                    // 1
@@ -38,7 +38,7 @@ enum ShiftState {
     Xxxx = 8,                    // 8
     ShftXxxx = Shft | Xxxx,          // 9
 };
-
+/*
 const int ShiftStateMap[] = {
   ISVIRTUALKEY,
   ISVIRTUALKEY | K_SHIFTFLAG,
@@ -119,6 +119,7 @@ private:
   std::wstring m_rgss[10][2];
 
 public:
+// _S2 can be deleted later
   KMX_VirtualKey(KMX_HKL hkl, UINT KMX_virtualKey) {/*
     this->m_sc = MapVirtualKeyEx(virtualKey, 0, hkl);
     this->m_hkl = hkl;
@@ -132,8 +133,28 @@ public:
     this->m_sc = scanCode;
   }
 
+
+  KMX_VirtualKey(KMX_HKL hkl, UINT KMX_virtualKey, v_dw_3D All_Vector) {/*
+    this->m_sc = MapVirtualKeyEx(virtualKey, 0, hkl); // second para =0: MAPVK_VK_TO_VSC=1
+                                                        //the uCode parameter is a virtual-key code and is
+                                                        //translated into a scan code. If it is a virtual-key
+                                                        //code that does not distinguish between left- and
+                                                        //right-hand keys, the left-hand scan code is returned.
+                                                        //If there is no translation, the function returns 0.
+    this->m_hkl = hkl;
+    this->m_vk = KMX_virtualKey;
+    memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));*/
+
+
+/*
+    this->m_sc = MapVirtualKeyEx(virtualKey, 0, hkl);
+    this->m_hkl = hkl;
+    this->m_vk = KMX_virtualKey;
+    memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));*/
+  }
+
   KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, v_dw_3D All_Vector) {
-    // this->m_vk = MapVirtualKeyEx(scanCode, 1, hkl);  // second para= 1: MAPVK_VSC_TO_VK =1
+    // _S2 this->m_vk = MapVirtualKeyEx(scanCode, 1, hkl);  // second para= 1: MAPVK_VSC_TO_VK =1
     //                                                  The first parameter is a scan code and is
     //                                                  translated into a virtual-key code that does not
     //                                                  distinguish between left- and right-hand keys.
@@ -334,7 +355,7 @@ class KMX_Loader {
 private:
   KMX_BYTE lpKeyStateNull[256];
   KMX_UINT m_XxxxVk;
-/*
+
 public:
   KMX_Loader() {
     m_XxxxVk = 0;
@@ -352,7 +373,7 @@ public:
   ShiftState MaxShiftState() {
     return (Get_XxxxVk() == 0 ? ShftMenuCtrl : ShftXxxx);
   }
-
+/*
   void FillKeyState(BYTE *lpKeyState, ShiftState ss, bool fCapsLock) {
     lpKeyState[VK_SHIFT] = (((ss & Shft) != 0) ? 0x80 : 0x00);
     lpKeyState[VK_CONTROL] = (((ss & Ctrl) != 0) ? 0x80 : 0x00);
@@ -476,6 +497,23 @@ int GetMaxDeadkeyIndex(WCHAR *p) {
 }
 */
 
+
+// _S2 has to go !!
+bool  write_rgKey_ToFile(std::vector<KMX_VirtualKey*> rgKey ){
+  std::string RGKey_FileName="/Projects/keyman/keyman/linux/mcompile/keymap/rgKey_lin.txt";
+
+  std::ofstream TxTFile(RGKey_FileName);
+  for ( int i=0; i< rgKey.size();i++) {
+    if(rgKey[i] != NULL) {
+        TxTFile << rgKey[i]->VK() << "-" << rgKey[i]->SC()<< "-";
+        TxTFile << "\n";
+    }
+  }
+  TxTFile.close();
+  return true;
+}
+
+
 bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
  wprintf(L"\n ##### KMX_ImportRules of mc_import_rules started #####\n");
   KMX_Loader loader;
@@ -514,25 +552,28 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
   // flag that the VK is valid, and it can store the SC value.
   for(UINT sc = 0x01; sc <= 0x7f; sc++) {
     KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, All_Vector);      // _S2 get this from my Vector
-    if(key->VK() != 0) {
+    uint key_vk = key->VK() ;
+   if(key->VK() != 0) {
       rgKey[key->VK()] = key;
     } else {
       delete key;
-    }/**/
+    }
   }
 
-int STOP = 0;
 /*
-_S2 use KMX_VirtualKey !!
+  // _S2 do we need NUMPAD now or later?
+// _S2 use KMX_VirtualKey !!
   // _S2 do I need NUMPAD + SPECIAL_SHIFT for first draft ??
   // add the special keys that do not get added from the code above
   for(UINT ke = VK_NUMPAD0; ke <= VK_NUMPAD9; ke++) {
-      rgKey[ke] = new VirtualKey(hkl, ke);
+      rgKey[ke] = new KMX_VirtualKey(hkl, ke, All_Vector);
   }
-  rgKey[VK_DIVIDE] = new VirtualKey(hkl, VK_DIVIDE);
-  rgKey[VK_CANCEL] = new VirtualKey(hkl, VK_CANCEL);
-  rgKey[VK_DECIMAL] = new VirtualKey(hkl, VK_DECIMAL);
+  rgKey[VK_DIVIDE] = new KMX_VirtualKey(hkl, VK_DIVIDE, All_Vector);
+  rgKey[VK_CANCEL] = new KMX_VirtualKey(hkl, VK_CANCEL, All_Vector);
+  rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL, All_Vector);
+  */
 
+/*  // _S2 do we need special shift state now or later?
   // See if there is a special shift state added
   for(UINT vk = 0; vk <= VK_OEM_CLEAR; vk++) {
       UINT sc = MapVirtualKeyEx(vk, 0, hkl);
@@ -555,6 +596,8 @@ _S2 use KMX_VirtualKey !!
           }
       }
   }
+*/
+
 
   for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
       if(rgKey[iKey] != NULL) {
@@ -566,6 +609,16 @@ _S2 use KMX_VirtualKey !!
                   continue;
               }
 
+// _S2 can go later: check if all correct
+write_rgKey_ToFile(rgKey)  ;
+v_dw_2D  V_lin,V_win,V_map;
+write_RGKEY_FileToVector(V_win, "rgKey_win_first.txt");
+write_RGKEY_FileToVector(V_lin, "rgKey_lin.txt");
+//write_RGKEY_FileToVector(V_map, "map.txt");
+CompareVector_To_VectorOfFile_RGKEY( V_win, V_lin,V_map);
+
+int STOP = 0;
+/*
               for(int caps = 0; caps <= 1; caps++) {
                   loader.ClearKeyboardBuffer(VK_DECIMAL, rgKey[VK_DECIMAL]->SC(), hkl);
                   ////FillKeyState(lpKeyState, ss, (caps != 0)); //http://blogs.msdn.com/michkap/archive/2006/04/18/578557.aspx
@@ -617,10 +670,11 @@ _S2 use KMX_VirtualKey !!
                       }
                   }
               }
+*/
           }
       }
   }
-
+/*
   // _S2 do I need this for Linux??
   for(int i = 0; i < cKeyboards; i++) {
     if(hkl == rghkl[i]) {
@@ -636,12 +690,12 @@ _S2 use KMX_VirtualKey !!
 
   // _S2 do I need that for Linux??
   delete[] rghkl;
-
+*/
   //-------------------------------------------------------------
   // Now that we've collected the key data, we need to
   // translate it to kmx and append to the existing keyboard
   //-------------------------------------------------------------
-    
+/*
   int nDeadkey = 0;
 
   LPGROUP gp = new GROUP[kp->cxGroupArray+2];  // leave space for old

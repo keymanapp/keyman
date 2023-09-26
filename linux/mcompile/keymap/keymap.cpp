@@ -395,6 +395,37 @@ bool test_single(v_dw_3D &V) {
 // query All_Vector
 // return RETURN NON SHIFTED CHAR [1]  the VirtualKey of the Other Keyboard for given Scancode
 KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
+
+  // find correct row of char in US
+  for( int k=0; k< (int)All_Vector.size()-1;k++) {
+    for( int i=0; i< (int)All_Vector[1].size()-1;i++) {
+
+      // _S2 what if we use  column 3(altgr) and 4 (shift+altgr) ??
+
+      /*// unshifted values e.g. "q" (=113) are stored in column All_Vector[1][i][ 1 ]
+      if  ( All_Vector[k][i][0] == (SC- All_Vector[0].size() )) {
+        wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i(%c)   (%i (%c) : %i (%c) ) --- \n",SC , i,  All_Vector[k][i][0] , All_Vector[k][i][1] ,All_Vector[1][i][1],All_Vector[1][i][1],All_Vector[k][i][1] , All_Vector[k][i][2] , All_Vector[k][i][2]   ); 
+        return All_Vector[1][i][1] ;
+      }*/
+
+      // shifted values e.g. "Q" (=81) are stored in column All_Vector[1][i][ 2 ]
+      if  ( All_Vector[k][i][0] == SC ) {
+        wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i(%c)   (%i (%c) : %i (%c) ) --- \n",SC , i,  All_Vector[k][i][0] , All_Vector[k][i][1] ,All_Vector[1][i][2],All_Vector[1][i][2] ,All_Vector[k][i][1] , All_Vector[k][i][2] , All_Vector[k][i][2]   ); 
+        KMX_DWORD returnval= All_Vector[1][i][2];
+
+        return All_Vector[1][i][2];
+      }
+    }
+  }
+  return 0;    //_S2 what do I return if not found??
+}
+
+
+
+
+/*// query All_Vector
+// return RETURN NON SHIFTED CHAR [1]  the VirtualKey of the Other Keyboard for given Scancode
+KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
   // find correct row of char in US
   for( int k=0; k< (int)All_Vector.size()-1;k++) {
     for( int i=0; i< (int)All_Vector[1].size()-1;i++) {
@@ -415,7 +446,7 @@ KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
     }
   }
   return 0;    //_S2 what do I return if not found??
-}
+}*/
 
 
 // return RETURN NON SHIFTED CHAR [1]  the VirtualKey of the US Keyboard for given Scancode
