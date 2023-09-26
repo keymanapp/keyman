@@ -1436,9 +1436,9 @@ public final class KMManager {
    * @return status
    */
   public static boolean setBanner(KeyboardType keyboard, BannerType bannerType) {
-    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
       InAppKeyboard.setBanner(bannerType);
-    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
       SystemKeyboard.setBanner(bannerType);
     } else {
       return false;
@@ -1453,9 +1453,9 @@ public final class KMManager {
    * @return
    */
   public static boolean setBannerImage(KeyboardType keyboard, String path) {
-    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
       InAppKeyboard.setBannerImage(path);
-    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
       SystemKeyboard.setBannerImage(path);
     } else {
       return false;
