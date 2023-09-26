@@ -1,0 +1,36 @@
+{
+  "$ref": "#/definitions/displayMap",
+
+  "definitions": {
+    "displayMap": {
+      "type": "object",
+      "properties": {
+        "map": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/map"
+          }
+        }
+      }
+    },
+    "map": {
+      "type": "object",
+      "properties": {
+        "pua": { "type": "string" },
+        "str": { "type": "string" },
+        "unicode": { "type": "string" },
+        "usages": { "anyOf": [
+          { "type": "array", "items": { "$ref": "#/definitions/usage" } },
+          { "type": "array", "items": { "type": "string" } }
+        ] }
+      }
+    },
+    "usage": {
+      "type": "object",
+      "properties": {
+        "filename": { "type": "string" },
+        "count": { "type": "number" }
+      }
+    }
+  }
+}

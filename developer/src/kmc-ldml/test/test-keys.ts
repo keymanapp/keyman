@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { KeysCompiler } from '../src/compiler/keys.js';
 import { compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
-import { KMXPlus, Constants } from '@keymanapp/common-types';
+import { KMXPlus, Constants, MarkerParser } from '@keymanapp/common-types';
 import { CompilerMessages } from '../src/compiler/messages.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import Keys = KMXPlus.Keys;
@@ -114,6 +114,26 @@ describe('keys', function () {
         assert.equal((<Keys>keys).keys.length, 1);
         const [q] = (<Keys>keys).keys.filter(({ id }) => id.value === 'grave');
         assert.equal(q.to.value, String.fromCodePoint(0x1faa6));
+      },
+    },
+    {
+      subpath: 'sections/keys/markers.xml',
+      callback(sect) {
+        const keys = <Keys> sect;
+        assert.ok(keys);
+        assert.equal(compilerTestCallbacks.messages.length, 0);
+        assert.equal(keys.keys.length, 1);
+
+        const [ww] = keys.keys.filter(({ id }) => id.value === 'ww');
+        assert.ok(ww);
+        const MARKER_1 = MarkerParser.markerOutput(1);
+        assert.equal(ww.to.value, MARKER_1);
+        assert.equal(ww.longPressDefault.value, MARKER_1);
+        // TODO-LDML: assert.equal(ww.longPress[0].value.value, MARKER_1);
+        // TODO-LDML: assert.equal(ww.multiTap[0].value.value, MARKER_1);
+        const [flickw] = keys.flicks?.filter(({id}) => id.value === 'flickw');
+        assert.ok(flickw);
+        // TODO-LDML: assert.equal(flickw.flicks[0].to.value, MARKER_1);
       },
     },
   ]);

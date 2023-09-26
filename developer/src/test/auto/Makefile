@@ -26,6 +26,7 @@ developer-tests: \
   model-ts-parser \
   package-info \
   kmc \
+  kmc-keyboard-info \
   kmc-ldml \
   kmc-model \
   kmc-model-info \
@@ -85,6 +86,10 @@ package-info: .virtual
 
 kmc: .virtual
   cd $(DEVELOPER_ROOT)\src\kmc
+  $(MAKE) $(TARGET)
+
+kmc-keyboard-info: .virtual
+  cd $(DEVELOPER_ROOT)\src\kmc-keyboard-info
   $(MAKE) $(TARGET)
 
 kmc-ldml: .virtual

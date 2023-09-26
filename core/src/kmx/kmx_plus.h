@@ -12,6 +12,7 @@
 #include <kmx_file.h>
 #include <ldml/keyboardprocessor_ldml.h>
 #include <list>
+#include <deque>
 
 namespace km {
 namespace kbp {
@@ -28,25 +29,30 @@ namespace kmx {
 /**
  * Indicates an offset into the strs table (0 = zero length)
  */
-typedef KMX_DWORD KMXPLUS_STR;
+typedef KMX_DWORD_unaligned KMXPLUS_STR;
 /**
  * Indicates an offset into the list table (0 = zero length)
 */
-typedef KMX_DWORD KMXPLUS_LIST;
+typedef KMX_DWORD_unaligned KMXPLUS_LIST;
 /**
  * Indicates an offset into the elem table (0 = zero length)
 */
-typedef KMX_DWORD KMXPLUS_ELEM;
+typedef KMX_DWORD_unaligned KMXPLUS_ELEM;
+/**
+ * Indicates a 4-byte identity
+*/
+typedef KMX_DWORD_unaligned KMXPLUS_IDENT;
 
 // forward declarations
 struct COMP_KMXPLUS_TRAN;
 struct COMP_KMXPLUS_TRAN_GROUP;
 struct COMP_KMXPLUS_TRAN_TRANSFORM;
 struct COMP_KMXPLUS_TRAN_REORDER;
+struct COMP_KMXPLUS_STRS;
 
 struct COMP_KMXPLUS_HEADER {
-  KMX_DWORD ident;  // 0000 Section name
-  KMX_DWORD size;   // 0004 Section length
+  KMXPLUS_IDENT ident;       // 0000 Section name
+  KMX_DWORD_unaligned size;  // 0004 Section length
   bool valid(KMX_DWORD length) const;
 };
 
@@ -58,16 +64,16 @@ static_assert(sizeof(struct COMP_KMXPLUS_HEADER) == LDML_LENGTH_HEADER, "mismatc
    ------------------------------------------------------------------ */
 
 struct COMP_KMXPLUS_SECT_ENTRY {
-  KMX_DWORD sect;    // 0010+ Section identity
-  KMX_DWORD offset;  // 0014+ Section offset relative to dpKMXPlus of section
+  KMXPLUS_IDENT sect;          // 0010+ Section identity
+  KMX_DWORD_unaligned offset;  // 0014+ Section offset relative to dpKMXPlus of section
 };
 
 struct COMP_KMXPLUS_SECT {
-  static const KMX_DWORD IDENT = LDML_SECTIONID_SECT;
+  static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_SECT;
   COMP_KMXPLUS_HEADER header;
-  KMX_DWORD total;                     // 0008 KMXPlus entire length
-  KMX_DWORD count;                     // 000C number of section headers
-  COMP_KMXPLUS_SECT_ENTRY entries[];   // 0010 section entries
+  KMX_DWORD_unaligned total;          // 0008 KMXPlus entire length
+  KMX_DWORD_unaligned count;          // 000C number of section headers
+  COMP_KMXPLUS_SECT_ENTRY entries[];  // 0010 section entries
   /**
    * @brief Get the offset of a section, or 0
    *
@@ -91,25 +97,35 @@ static_assert(sizeof(struct COMP_KMXPLUS_SECT) % 0x4 == 0, "Structs prior to var
    ------------------------------------------------------------------ */
 
 struct COMP_KMXPLUS_ELEM_ELEMENT {
-    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
-    KMX_DWORD flags;                  // flag and order values
-    /**
-     * @brief Get the 'element' as a string, if flags&LDML_ELEM_FLAGS_TYPE = CHAR
-     *
-     * @return std::u16string
-     */
-    std::u16string get_element_string() const;
+  KMX_DWORD_unaligned element;  // str: output string or UTF-32LE codepoint
+  KMX_DWORD_unaligned flags;    // flag and order values
+  /**
+   * @brief Get the 'element' as a string, if flags&LDML_ELEM_FLAGS_TYPE = CHAR
+   *
+   * @return std::u16string
+   */
+  std::u16string get_element_string() const;
+
+  /**
+   * @brief load this[0]…this[length] as a string list
+   * @param length number of elements, including this one
+   * @return the string elements as a string array
+  */
+  std::deque<std::u32string> loadAsStringList(KMX_DWORD length, const km::kbp::kmx::COMP_KMXPLUS_STRS &strs) const;
+
+  /** @return element type */
+  KMX_DWORD type() const;
 };
 
 struct COMP_KMXPLUS_ELEM_ENTRY {
-    KMX_DWORD offset;                 // 0010+ offset from this blob
-    KMX_DWORD length;                 // 0014+ str length (ELEMENT units)
+  KMX_DWORD_unaligned offset;  // 0010+ offset from this blob
+  KMX_DWORD_unaligned length;  // 0014+ str length (ELEMENT units)
 };
 
 struct COMP_KMXPLUS_ELEM {
-  static const KMX_DWORD IDENT = LDML_SECTIONID_ELEM;
+  static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_ELEM;
   COMP_KMXPLUS_HEADER header;
-  KMX_DWORD count;                    // 0008 count of str entries
+  KMX_DWORD_unaligned count;                    // 0008 count of str entries
   COMP_KMXPLUS_ELEM_ENTRY entries[];  // 000C+ entries
 
   /**
@@ -145,9 +161,9 @@ struct COMP_KMXPLUS_LOCA_ENTRY {
 };
 
 struct COMP_KMXPLUS_LOCA {
-  static const KMX_DWORD IDENT = LDML_SECTIONID_LOCA;
+  static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_LOCA;
   COMP_KMXPLUS_HEADER header;
-  KMX_DWORD count; // 0008 number of locales
+  KMX_DWORD_unaligned count; // 0008 number of locales
   COMP_KMXPLUS_LOCA_ENTRY entries[];
   /**
    * @brief True if section is valid.
@@ -163,7 +179,7 @@ static_assert(sizeof(struct COMP_KMXPLUS_LOCA) == LDML_LENGTH_LOCA, "mismatched 
    ------------------------------------------------------------------ */
 
 struct COMP_KMXPLUS_META {
-  static const KMX_DWORD IDENT = LDML_SECTIONID_META;
+  static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_META;
   COMP_KMXPLUS_HEADER header;
   KMXPLUS_STR author;
   KMXPLUS_STR conform;
@@ -171,7 +187,7 @@ struct COMP_KMXPLUS_META {
   KMXPLUS_STR normalization;
   KMXPLUS_STR indicator;
   KMXPLUS_STR version;
-  KMX_DWORD settings;
+  KMX_DWORD_unaligned settings;
   /**
    * @brief True if section is valid.
    */
@@ -189,9 +205,9 @@ struct COMP_KMXPLUS_NAME_ENTRY {
 };
 
 struct COMP_KMXPLUS_NAME {
-  static const KMX_DWORD IDENT = LDML_SECTIONID_NAME;
+  static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_NAME;
   COMP_KMXPLUS_HEADER header;
-  KMX_DWORD count;
+  KMX_DWORD_unaligned count;
   COMP_KMXPLUS_NAME_ENTRY entries[];
   /**
    * @brief True if section is valid.
@@ -207,14 +223,14 @@ static_assert(sizeof(struct COMP_KMXPLUS_NAME) == LDML_LENGTH_NAME, "mismatched 
    ------------------------------------------------------------------ */
 
 struct COMP_KMXPLUS_STRS_ENTRY {
-    KMX_DWORD offset;                 // 0010+ offset from this blob
-    KMX_DWORD length;                 // 0014+ str length (UTF-16LE units)
+    KMX_DWORD_unaligned offset;                 // 0010+ offset from this blob
+    KMX_DWORD_unaligned length;                 // 0014+ str length (UTF-16LE units)
 };
 
 struct COMP_KMXPLUS_STRS {
-  static const KMX_DWORD IDENT = LDML_SECTIONID_STRS;
+  static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_STRS;
   COMP_KMXPLUS_HEADER header;
-  KMX_DWORD count;                    // 0008 count of str entries
+  KMX_DWORD_unaligned count;                    // 0008 count of str entries
   COMP_KMXPLUS_STRS_ENTRY entries[];  // 0010+ entries
 
   /**
@@ -248,16 +264,16 @@ static_assert(sizeof(struct COMP_KMXPLUS_STRS) == LDML_LENGTH_STRS, "mismatched 
    ------------------------------------------------------------------ */
 
 struct COMP_KMXPLUS_TRAN_GROUP {
-    KMX_DWORD type;
-    KMX_DWORD count;
-    KMX_DWORD index;
+    KMX_DWORD_unaligned type;
+    KMX_DWORD_unaligned count;
+    KMX_DWORD_unaligned index;
 };
 
 struct COMP_KMXPLUS_TRAN_TRANSFORM {
     KMXPLUS_STR from;
     KMXPLUS_STR to;
-    KMXPLUS_ELEM mapFrom;
-    KMXPLUS_ELEM mapTo;
+    KMXPLUS_STR mapFrom; // variable name
+    KMXPLUS_STR mapTo;   // variable name
 };
 
 struct COMP_KMXPLUS_TRAN_REORDER {
@@ -266,11 +282,11 @@ struct COMP_KMXPLUS_TRAN_REORDER {
 };
 
 struct COMP_KMXPLUS_TRAN {
-  static const KMX_DWORD IDENT = LDML_SECTIONID_TRAN;
+  static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_TRAN;
   COMP_KMXPLUS_HEADER header;
-  KMX_DWORD groupCount;
-  KMX_DWORD transformCount;
-  KMX_DWORD reorderCount;
+  KMX_DWORD_unaligned groupCount;
+  KMX_DWORD_unaligned transformCount;
+  KMX_DWORD_unaligned reorderCount;
   // Variable part:
   // COMP_KMXPLUS_TRAN_GROUP groups[]
   // COMP_KMXPLUS_TRAN_TRANSFORM transforms[]
@@ -310,6 +326,15 @@ static_assert(sizeof(struct COMP_KMXPLUS_TRAN_GROUP) == LDML_LENGTH_TRAN_GROUP, 
 static_assert(sizeof(struct COMP_KMXPLUS_TRAN_TRANSFORM) == LDML_LENGTH_TRAN_TRANSFORM, "mismatched size of tran transform");
 static_assert(sizeof(struct COMP_KMXPLUS_TRAN_REORDER) == LDML_LENGTH_TRAN_REORDER, "mismatched size of tran reorder");
 
+// assert some parallel constants
+static_assert(LDML_UC_SENTINEL == UC_SENTINEL, "mismatch: LDML_UC_SENTINEL");
+static_assert(LDML_MARKER_CODE == CODE_DEADKEY, "mismatch: LDML_MARKER_CODE");
+static_assert(LDML_MARKER_ANY_INDEX < UC_SENTINEL, "expected LDML_MARKER_ANY_INDEX < UC_SENTINEL");
+
+/** @returns true if a valid marker per spec */
+static inline bool is_valid_marker(KMX_DWORD marker_no) {
+  return ((marker_no == LDML_MARKER_ANY_INDEX) || (marker_no >= LDML_MARKER_MIN_INDEX && marker_no <= LDML_MARKER_MAX_INDEX));
+}
 
 /* ------------------------------------------------------------------
  * bksp section
@@ -318,7 +343,7 @@ static_assert(sizeof(struct COMP_KMXPLUS_TRAN_REORDER) == LDML_LENGTH_TRAN_REORD
 typedef COMP_KMXPLUS_TRAN_Helper COMP_KMXPLUS_BKSP_Helper;
 
 struct COMP_KMXPLUS_BKSP : public COMP_KMXPLUS_TRAN {
-  static const KMX_DWORD IDENT = LDML_SECTIONID_BKSP;
+  static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_BKSP;
 };
 
 
@@ -327,22 +352,24 @@ struct COMP_KMXPLUS_BKSP : public COMP_KMXPLUS_TRAN {
    ------------------------------------------------------------------ */
 
 struct COMP_KMXPLUS_VARS_ITEM {
-    KMX_DWORD type;
-    KMX_DWORD id;
-    KMX_DWORD value;
-    KMX_DWORD elem;
+    KMX_DWORD_unaligned type;
+    KMXPLUS_STR id;
+    KMXPLUS_STR value;
+    KMXPLUS_ELEM elem;
 };
 
 struct COMP_KMXPLUS_VARS {
-  static const KMX_DWORD IDENT = LDML_SECTIONID_VARS;
+  static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_VARS;
   COMP_KMXPLUS_HEADER header;
-  KMX_DWORD markers;
-  KMX_DWORD varCount;
+  KMXPLUS_LIST markers;
+  KMX_DWORD_unaligned varCount;
   COMP_KMXPLUS_VARS_ITEM varEntries[];
   /**
    * @brief True if section is valid.
    */
   bool valid(KMX_DWORD length) const;
+
+  const COMP_KMXPLUS_VARS_ITEM *findByStringId(KMX_DWORD strId) const;
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_VARS) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");
@@ -354,14 +381,14 @@ static_assert(sizeof(struct COMP_KMXPLUS_VARS_ITEM) == LDML_LENGTH_VARS_ITEM, "m
    ------------------------------------------------------------------ */
 
 struct COMP_KMXPLUS_VKEY_ENTRY {
-    KMX_DWORD vkey;
-    KMX_DWORD target;
+    KMX_DWORD_unaligned vkey;
+    KMX_DWORD_unaligned target;
 };
 
 struct COMP_KMXPLUS_VKEY {
-  static const KMX_DWORD IDENT = LDML_SECTIONID_VKEY;
+  static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_VKEY;
   COMP_KMXPLUS_HEADER header;
-  KMX_DWORD count;
+  KMX_DWORD_unaligned count;
   COMP_KMXPLUS_VKEY_ENTRY entries[];
   /**
    * @brief True if section is valid.
@@ -378,14 +405,15 @@ static_assert(sizeof(struct COMP_KMXPLUS_VKEY) == LDML_LENGTH_VKEY, "mismatched 
    ------------------------------------------------------------------ */
 
 struct COMP_KMXPLUS_DISP_ENTRY {
-    KMX_DWORD to;
-    KMX_DWORD display;
+    KMXPLUS_STR to;
+    KMXPLUS_STR id;
+    KMXPLUS_STR display;
 };
 
 struct COMP_KMXPLUS_DISP {
-  static const KMX_DWORD IDENT = LDML_SECTIONID_DISP;
+  static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_DISP;
   COMP_KMXPLUS_HEADER header;
-  KMX_DWORD count;
+  KMX_DWORD_unaligned count;
   KMXPLUS_STR baseCharacter;
   COMP_KMXPLUS_DISP_ENTRY entries[];
   /**
@@ -404,44 +432,44 @@ static_assert(sizeof(struct COMP_KMXPLUS_DISP) == LDML_LENGTH_DISP, "mismatched 
    ------------------------------------------------------------------ */
 
 struct COMP_KMXPLUS_LAYR_LIST {
-    KMX_DWORD hardware;
-    KMX_DWORD layer;
-    KMX_DWORD count;
-    KMX_DWORD minDeviceWidth;
+    KMX_DWORD_unaligned hardware;
+    KMX_DWORD_unaligned layer;
+    KMX_DWORD_unaligned count;
+    KMX_DWORD_unaligned minDeviceWidth;
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_LAYR_LIST) == LDML_LENGTH_LAYR_LIST, "mismatched size of COMP_KMXPLUS_LAYR_LIST");
 
 struct COMP_KMXPLUS_LAYR_ENTRY {
     KMXPLUS_STR id;
-    KMX_DWORD mod;
-    KMX_DWORD row;
-    KMX_DWORD count;
+    KMX_DWORD_unaligned mod;
+    KMX_DWORD_unaligned row;
+    KMX_DWORD_unaligned count;
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_LAYR_ENTRY) == LDML_LENGTH_LAYR_ENTRY, "mismatched size of COMP_KMXPLUS_LAYR_ENTRY");
 
 struct COMP_KMXPLUS_LAYR_ROW {
-    KMX_DWORD key;
-    KMX_DWORD count;
+    KMX_DWORD_unaligned key;
+    KMX_DWORD_unaligned count;
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_LAYR_ROW) == LDML_LENGTH_LAYR_ROW, "mismatched size of COMP_KMXPLUS_LAYR_ROW");
 
 
 struct COMP_KMXPLUS_LAYR_KEY {
-    KMX_DWORD key; // index into key2 section
+    KMX_DWORD_unaligned key; // index into key2 section
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_LAYR_KEY) == LDML_LENGTH_LAYR_KEY, "mismatched size of COMP_KMXPLUS_LAYR_KEY");
 
 struct COMP_KMXPLUS_LAYR {
-  static const KMX_DWORD IDENT = LDML_SECTIONID_LAYR;
+  static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_LAYR;
   COMP_KMXPLUS_HEADER header;
-  KMX_DWORD listCount;
-  KMX_DWORD layerCount;
-  KMX_DWORD rowCount;
-  KMX_DWORD keyCount;
+  KMX_DWORD_unaligned listCount;
+  KMX_DWORD_unaligned layerCount;
+  KMX_DWORD_unaligned rowCount;
+  KMX_DWORD_unaligned keyCount;
   // entries, rows, and keys have a dynamic offset
   // use COMP_KMXPLUS_LAYR_Helper to access.
   //
@@ -489,12 +517,12 @@ static_assert(sizeof(struct COMP_KMXPLUS_LAYR) == LDML_LENGTH_LAYR, "mismatched 
  * key2 section
    ------------------------------------------------------------------ */
 struct COMP_KMXPLUS_KEYS {
-  static const KMX_DWORD IDENT = LDML_SECTIONID_KEYS;
+  static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_KEYS;
   COMP_KMXPLUS_HEADER header;
-  KMX_DWORD keyCount;
-  KMX_DWORD flicksCount;
-  KMX_DWORD flickCount;
-  KMX_DWORD kmapCount;
+  KMX_DWORD_unaligned keyCount;
+  KMX_DWORD_unaligned flicksCount;
+  KMX_DWORD_unaligned flickCount;
+  KMX_DWORD_unaligned kmapCount;
   // see helper for: keys sub-table
   // see helper for: flick lists sub-table
   // see helper for: flick elements sub-table
@@ -508,36 +536,36 @@ struct COMP_KMXPLUS_KEYS {
 
 struct COMP_KMXPLUS_KEYS_FLICK_ELEMENT {
   KMXPLUS_LIST directions;
-  KMX_DWORD flags;
+  KMX_DWORD_unaligned flags;
   KMXPLUS_STR to; // string or codepoint
   /** get the 'to' string if a char */
   std::u16string get_to_string() const;
 };
 
 struct COMP_KMXPLUS_KEYS_FLICK_LIST {
-  KMX_DWORD count;
-  KMX_DWORD flick; // flick index
+  KMX_DWORD_unaligned count;
+  KMX_DWORD_unaligned flick; // flick index
   KMXPLUS_STR id;
 };
 
 struct COMP_KMXPLUS_KEYS_KEY {
   KMXPLUS_STR to;
-  KMX_DWORD flags;
+  KMX_DWORD_unaligned flags;
   KMXPLUS_STR id;
   KMXPLUS_STR switchId; // switch
-  KMX_DWORD width; // unit: 0.1 keys
+  KMX_DWORD_unaligned width; // unit: 0.1 keys
   KMXPLUS_LIST longPress;
   KMXPLUS_STR longPressDefault;
   KMXPLUS_LIST multiTap;
-  KMX_DWORD flicks; // index
+  KMX_DWORD_unaligned flicks; // index
 
   std::u16string get_to_string() const;
 };
 
 struct COMP_KMXPLUS_KEYS_KMAP {
-    KMX_DWORD vkey;
-    KMX_DWORD mod;
-    KMX_DWORD key;     // index into key subtable
+    KMX_DWORD_unaligned vkey;
+    KMX_DWORD_unaligned mod;
+    KMX_DWORD_unaligned key;     // index into key subtable
 };
 
 class COMP_KMXPLUS_KEYS_Helper {
@@ -591,10 +619,10 @@ static_assert(sizeof(struct COMP_KMXPLUS_KEYS) == LDML_LENGTH_KEYS, "mismatched 
  * list section
    ------------------------------------------------------------------ */
 struct COMP_KMXPLUS_LIST {
-  static const KMX_DWORD IDENT = LDML_SECTIONID_LIST;
+  static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_LIST;
   COMP_KMXPLUS_HEADER header;
-  KMX_DWORD listCount;
-  KMX_DWORD indexCount;
+  KMX_DWORD_unaligned listCount;
+  KMX_DWORD_unaligned indexCount;
   // see helper for: lists sub-table
   // see helper for: indices sub-table
 
@@ -608,14 +636,14 @@ struct COMP_KMXPLUS_LIST {
  * list.list subtable
  */
 struct COMP_KMXPLUS_LIST_ITEM {
-  KMX_DWORD index;
-  KMX_DWORD count;
+  KMX_DWORD_unaligned index;
+  KMX_DWORD_unaligned count;
 };
 
 /**
  * list.index
  */
-typedef KMX_DWORD COMP_KMXPLUS_LIST_INDEX;
+typedef KMX_DWORD_unaligned COMP_KMXPLUS_LIST_INDEX;
 
 
 class COMP_KMXPLUS_LIST_Helper {
@@ -686,14 +714,16 @@ struct COMP_KMXPLUS_USET_RANGE {
 };
 
 /**
- * represents one of the uset elements
+ * represents one of the uset elements.
+ * TODO-LDML: replace this with a real icu::UnicodeSet? or at least
+ * a function producing the same?
  */
-class USet {
+class SimpleUSet {
   public:
     /** construct a set over the specified range. Data is copied. */
-    USet(const COMP_KMXPLUS_USET_RANGE* newStart, size_t newCount);
+    SimpleUSet(const COMP_KMXPLUS_USET_RANGE* newStart, size_t newCount);
     /** empty set */
-    USet();
+    SimpleUSet();
     /** true if the uset contains this char */
     bool contains(km_kbp_usv ch) const;
     /** debugging */
@@ -713,7 +743,7 @@ public:
   bool setUset(const COMP_KMXPLUS_USET *newUset);
   inline bool valid() const { return is_valid; }
 
-  USet getUset(KMXPLUS_USET list) const;
+  SimpleUSet getUset(KMXPLUS_USET list) const;
   const COMP_KMXPLUS_USET_RANGE *getRange(KMX_DWORD index) const;
 
 private:
