@@ -87,23 +87,18 @@ final class KMKeyboard extends WebView {
   /**
    * Banner state value: "blank" - no banner available.
    */
-  protected static final String KM_BANNER_STATE_BLANK = "blank";
+  public static final String KM_BANNER_STATE_BLANK = "blank";
 
   /**
    * Banner state value: "image" - display an image in the banner
    */
-  protected static final String KM_BANNER_STATE_IMAGE = "image";
+  public static final String KM_BANNER_STATE_IMAGE = "image";
 
   /**
    * Banner state value: "suggestion" - dictionary suggestions are shown.
    */
-  protected static final String KM_BANNER_STATE_SUGGESTION = "suggestion";
+  public static final String KM_BANNER_STATE_SUGGESTION = "suggestion";
 
-  // Tiling black background generated from https://elmah.io/tools/base64-image-encoder/
-  // TODO: Replace with image/css?
-  protected static final String KM_BANNER_BLANK_IMAGE_PATH =
-    //"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAARCAIAAABM7ytaAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAVSURBVDhPYxgFo2AUjIJRQDpgYAAABT8AAcEGbxwAAAAASUVORK5CYII=";
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAARCAYAAADDjbwNAAAABHNCSVQICAgIfAhkiAAAACNJREFUOI1j9PnP8J+BDoCJHpaMWjRq0ahFoxaNWjRqEQEAAG4mAmxMRRQ1AAAAAElFTkSuQmCCBT8AAcEGbxwAAAAASUVORK5CYII=";
   /**
    * Current banner state.
    */
@@ -118,7 +113,7 @@ final class KMKeyboard extends WebView {
 
   // Stores the current image for use by the Banner
   // when predictive text is not active
-  private String bannerImgPath;
+  protected String bannerImgPath;
 
   // Facilitates a 'lazy init' - we'll only check the preference when it matters,
   // rather than at construction time.
@@ -673,6 +668,11 @@ final class KMKeyboard extends WebView {
 
   public void showBanner(boolean flag) {
     String jsString = KMString.format("showBanner(%b)", flag);
+    loadJavascript(jsString);
+  }
+
+  public void setBanner(String bannerType) {
+    String jsString = KMString.format("setBanner(%s)", bannerType);
     loadJavascript(jsString);
   }
 

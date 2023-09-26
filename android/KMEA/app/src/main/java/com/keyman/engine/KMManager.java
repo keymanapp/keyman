@@ -157,6 +157,31 @@ public final class KMManager {
     }
   };
 
+  public enum BannerType {
+    BLANK,
+    IMAGE,
+    SUGGESTION;
+
+    // Maps to enum BannerType in bannerView.ts
+    public static BannerType fromString(String mode) {
+      if (mode == null) return BLANK;
+      switch (mode) {
+        case "BLANK":
+          return BLANK;
+        case "image":
+          return IMAGE;
+        case "suggestion":
+          return SUGGESTION;
+      }
+      return BLANK;
+    }
+
+    public String toString() {
+      String modes[] = { "blank", "image", "suggestion"};
+      return modes[this.ordinal()];
+    }
+  }
+
   protected static InputMethodService IMService;
 
   private static boolean debugMode = false;
@@ -174,6 +199,19 @@ public final class KMManager {
   private static GlobeKeyState globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
 
   private static KMManager.SpacebarText spacebarText = KMManager.SpacebarText.LANGUAGE_KEYBOARD; // must match default given in kmwbase.ts
+
+  // Tiling colored background generated from https://elmah.io/tools/base64-image-encoder/
+  // TODO: Replace with image/css?
+  public static final String KM_BANNER_THEME_BLACK =
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAARCAIAAABM7ytaAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAVSURBVDhPYxgFo2AUjIJRQDpgYAAABT8AAcEGbxwAAAAASUVORK5CYII=";
+  public static final String KM_BANNER_THEME_WHITE =
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAARCAYAAADDjbwNAAAABHNCSVQICAgIfAhkiAAAACNJREFUOI1j/P///38GOgAmelgyatGoRaMWjVo0atGoRQQAAD1MBB5gNLThAAAAAElFTkSuQmCCBT8AAcEGbxwAAAAASUVORK5CYII=";
+
+  // Green banner for testing as a contrast to the Android styling.
+  // TODO: remove this after testing.
+  public static final String KM_BANNER_THEME_GREEN =
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAARCAYAAADDjbwNAAAABHNCSVQICAgIfAhkiAAAACNJREFUOI1j9PnP8J+BDoCJHpaMWjRq0ahFoxaNWjRqEQEAAG4mAmxMRRQ1AAAAAElFTkSuQmCCBT8AAcEGbxwAAAAASUVORK5CYII=";
+
 
   protected static KMKeyboard InAppKeyboard = null;
   protected static KMKeyboard SystemKeyboard = null;
@@ -612,13 +650,13 @@ public final class KMManager {
     if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard == null) {
       InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
       InAppKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
-      InAppKeyboard.setBannerImage(InAppKeyboard.KM_BANNER_BLANK_IMAGE_PATH);
+      InAppKeyboard.setBannerImage(KM_BANNER_THEME_GREEN);
       keyboard = InAppKeyboard;
       webViewClient = InAppKeyboardWebViewClient;
     } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard == null) {
       SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
       SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
-      SystemKeyboard.setBannerImage(SystemKeyboard.KM_BANNER_BLANK_IMAGE_PATH);
+      SystemKeyboard.setBannerImage(KM_BANNER_THEME_WHITE);
       keyboard = SystemKeyboard;
       webViewClient = SystemKeyboardWebViewClient;
     }
@@ -1391,10 +1429,33 @@ public final class KMManager {
     return true;
   }
 
-  public static boolean setBannerImage(KeyboardType kType, String path) {
-    if (kType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+  /**
+   * Update KMW banner type
+   * @param {KeyboardType} keyboard
+   * @param {BannerType} bannerType
+   * @return status
+   */
+  public static boolean setBanner(KeyboardType keyboard, BannerType bannerType) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      InAppKeyboard.setBanner(bannerType.toString());
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      SystemKeyboard.setBanner(bannerType.toString());
+    } else {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Set the path to use with the image banner
+   * @param {KeyboardType} keyboard
+   * @param {String} path
+   * @return
+   */
+  public static boolean setBannerImage(KeyboardType keyboard, String path) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
       InAppKeyboard.setBannerImage(path);
-    } else if (kType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       SystemKeyboard.setBannerImage(path);
     } else {
       return false;

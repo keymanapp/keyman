@@ -44,8 +44,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
   private static final String TAG = "SystemKeyboard";
 
-  private static final String BANNER_THEME_WHITE="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAARCAYAAADDjbwNAAAABHNCSVQICAgIfAhkiAAAACNJREFUOI1j/P///38GOgAmelgyatGoRaMWjVo0atGoRQQAAD1MBB5gNLThAAAAAElFTkSuQmCCBT8AAcEGbxwAAAAASUVORK5CYII=";
-
   /**
    * Main initialization of the input method component. Be sure to call
    * to super class.
@@ -73,7 +71,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsActivity.spacebarTextKey, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
     KMManager.setSpacebarText(spacebarText);
 
-    KMManager.setBannerImage(KeyboardType.KEYBOARD_TYPE_SYSTEM, BANNER_THEME_WHITE);
+    KMManager.setBannerImage(KeyboardType.KEYBOARD_TYPE_SYSTEM, KMManager.KM_BANNER_THEME_WHITE);
+    KMManager.setBanner(KeyboardType.KEYBOARD_TYPE_SYSTEM, KMManager.BannerType.IMAGE);
 
     boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsActivity.hapticFeedbackKey, false);
     KMManager.setHapticFeedback(mayHaveHapticFeedback);

@@ -63,6 +63,15 @@ function showBanner(flag) {
   }
 }
 
+// Set KMW banner to bannerType:
+// @param type 'blank' | 'image' | 'suggestion' - A plain-text string
+//             representing the type of Banner to set active.
+function setBanner(bannerType) {
+  if (keyman.osk) {
+    keyman.osk.bannerController.setBanner(bannerType);
+  }
+}
+
 // Set the path to use for the image banner
 // path - String starting with "data:image/png;base64,"
 function setBannerImage(path) {
