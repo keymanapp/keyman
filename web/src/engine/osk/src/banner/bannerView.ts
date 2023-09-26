@@ -243,8 +243,7 @@ export class BannerController {
 
       // If no banner instance exists yet, go with a safe, blank initialization.
       if(!this.container.banner) {
-        //this.selectBanner('inactive');
-        this.setBanner('image');
+        this.selectBanner('inactive');
       }
     }
   }
@@ -255,7 +254,6 @@ export class BannerController {
    *
    * @param type `'blank' | 'image' | 'suggestion'` - A plain-text string
    *        representing the type of `Banner` to set active.
-   * @param height - Optional banner height in pixels.
    */
   public setBanner(type: BannerType) {
     var banner: Banner;
