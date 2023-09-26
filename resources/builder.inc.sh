@@ -1143,8 +1143,8 @@ _builder_define_default_internal_dep() {
 #   2: depaction:deptarget   The dependency action and target
 # Example:
 #   builder_describe_internal_dependency \
-#     mac:build mac-x86_64:build \
-#     mac:build mac-arm64:build
+#     build:mac build:mac-x86_64 \
+#     build:mac build:mac-arm64
 #
 # Note: actions and targets must be fully specified, and this _must_
 # be called before either builder_describe_outputs or builder_parse in

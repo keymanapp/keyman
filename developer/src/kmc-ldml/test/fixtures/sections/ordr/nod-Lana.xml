@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="nod-Lana" conformsTo="techpreview">
+<!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="nod-Lana" conformsTo="techpreview">
   <names>
     <name value="nod-Lana Test" />
   </names>
@@ -18,4 +18,4 @@
       <reorder before="\u1A6B" from="\u1A60[\u1A75-\u1A79]\u1A45" order="10 55 10" />
     </transformGroup>
   </transforms>
-</keyboard>
+</keyboard3>

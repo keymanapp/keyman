@@ -14,10 +14,10 @@ export class VkeyCompiler extends SectionCompiler {
 
   public validate(): boolean {
     let valid = true;
-    if(this.keyboard.vkeys) {
+    if(this.keyboard3.vkeys) {
       let from: string[] = [], to: string[] = [];
 
-      this.keyboard.vkeys.vkey.forEach(vk => {
+      this.keyboard3.vkeys.vkey.forEach(vk => {
         if(LdmlVkeyNames[vk.from] === undefined) {
           // TODO-LDML: When we do #7135 this may need to change back to an error.
           this.callbacks.reportMessage(CompilerMessages.Hint_VkeyIsNotValid({vkey: vk.from}));
@@ -51,12 +51,12 @@ export class VkeyCompiler extends SectionCompiler {
 
   public compile(): Vkey {
     let result = new Vkey();
-    if(!this.keyboard.vkeys) {
+    if(!this.keyboard3.vkeys) {
       /* c8 ignore next 2 */
       return result; // not hit due to boxing
     }
 
-    result.vkeys = this.keyboard.vkeys?.vkey.map(vk => {
+    result.vkeys = this.keyboard3.vkeys?.vkey.map(vk => {
       return {
         vkey: LdmlVkeyNames[vk.from],
         target: LdmlVkeyNames[vk.to]

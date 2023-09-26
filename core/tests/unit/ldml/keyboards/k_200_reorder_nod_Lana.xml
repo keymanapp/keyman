@@ -5,8 +5,8 @@
   see https://keyman.com/keyboards/sil_boonkit
 -->
 
-<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="nod" conformsTo="techpreview">
+<!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="nod" conformsTo="techpreview">
   <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
   <names>
     <name value="nod-Lana Test" />
@@ -46,4 +46,4 @@
       <reorder before="\u1A6B" from="\u1A60[\u1A75-\u1A79]\u1A45" order="10 55 10" />
     </transformGroup>
   </transforms>
-</keyboard>
+</keyboard3>
