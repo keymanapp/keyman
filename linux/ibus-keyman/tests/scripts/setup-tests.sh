@@ -5,4 +5,4 @@ set -eu
 
 exit_on_package_build
 
-setup "$1" "$2" "$3"
+setup "$1" "$2" "$3" "$4"
