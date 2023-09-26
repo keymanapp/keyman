@@ -3,8 +3,11 @@ import {assert} from 'chai';
 import 'mocha';
 
 import { makePathToFixture, compileModelSourceCode } from './helpers/index.js';
+import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
+  const callbacks = new TestCompilerCallbacks();
+
   const MODEL_ID = 'example.qaa.trivial';
   const PATH = makePathToFixture(MODEL_ID);
 
@@ -24,7 +27,7 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
     };
 
     it('variant 1:  applyCasing prepends symbols, searchTermToKey removes them', function() {
-      let compiler = new LexicalModelCompiler;
+      let compiler = new LexicalModelCompiler(callbacks);
       let code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv'],
@@ -78,7 +81,7 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
     });
 
     it('variant 2:  applyCasing prepends symbols, searchTermToKey keeps them', function() {
-      let compiler = new LexicalModelCompiler;
+      let compiler = new LexicalModelCompiler(callbacks);
       let code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv'],
@@ -122,7 +125,7 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
     });
 
     it('variant 3:  applyCasing prepends symbols, default searchTermToKey', function() {
-      let compiler = new LexicalModelCompiler;
+      let compiler = new LexicalModelCompiler(callbacks);
       let code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv'],
@@ -162,7 +165,7 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
 
   describe('relying on default applyCasing + searchTermToKey', function() {
     it('languageUsesCasing: true', function() {
-      let compiler = new LexicalModelCompiler;
+      let compiler = new LexicalModelCompiler(callbacks);
       let code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv'],
@@ -186,7 +189,7 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
     });
 
     it('languageUsesCasing: false', function() {
-      let compiler = new LexicalModelCompiler;
+      let compiler = new LexicalModelCompiler(callbacks);
       let code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv'],
@@ -211,7 +214,7 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
     });
 
     it('languageUsesCasing: undefined', function() {
-      let compiler = new LexicalModelCompiler;
+      let compiler = new LexicalModelCompiler(callbacks);
       let code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv']

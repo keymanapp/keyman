@@ -13,6 +13,7 @@ export class DispCompiler extends SectionCompiler {
   static validateMarkers(keyboard: LDMLKeyboard.LKKeyboard, mt : MarkerTracker): boolean {
     keyboard.displays?.display?.forEach(({ to }) =>
       mt.add(MarkerUse.match, MarkerParser.allReferences(to)));
+    // no marker references in 'id'
     return true;
   }
 
@@ -24,14 +25,28 @@ export class DispCompiler extends SectionCompiler {
     let valid = true;
 
     const tos = new Set();
+    const ids = new Set();
 
     if (this.keyboard.displays?.display) {
-      for (const { to } of this.keyboard.displays?.display) {
-        if (tos.has(to)) {
-          this.callbacks.reportMessage(CompilerMessages.Error_DisplayIsRepeated({ to }));
+      for (const { to, id } of this.keyboard.displays?.display) {
+        if ((to && id) || (!to && !id)) {
+          this.callbacks.reportMessage(CompilerMessages.Error_DisplayNeedsToOrId({ to, id }));
           return false;
+        } else if (to) {
+          if (tos.has(to)) {
+            this.callbacks.reportMessage(CompilerMessages.Error_DisplayIsRepeated({ to }));
+            return false;
+          } else {
+            tos.add(to);
+          }
+        } else if (id) {
+          if (ids.has(id)) {
+            this.callbacks.reportMessage(CompilerMessages.Error_DisplayIsRepeated({ id }));
+            return false;
+          } else {
+            ids.add(id);
+          }
         }
-        tos.add(to);
       }
     }
 
@@ -49,10 +64,20 @@ export class DispCompiler extends SectionCompiler {
     // displays
     result.disps = this.keyboard.displays?.display.map(display => ({
       to: sections.strs.allocAndUnescapeString(sections.vars.substituteMarkerString(display.to)),
+      id: sections.strs.allocString(display.id), // not escaped, not substituted
       display: sections.strs.allocAndUnescapeString(display.display),
     })) || []; // TODO-LDML: need coverage for the []
 
-    result.disps.sort((a: DispItem, b: DispItem) => a.to.compareTo(b.to));
+    result.disps.sort((a: DispItem, b: DispItem) => {
+      // sort 'id' first (empty string will be lower)
+      const idDiff = a.id.compareTo(b.id);
+      if (idDiff != 0) {
+        return idDiff;
+      } else {
+        // sort by 'to'
+        return a.to.compareTo(b.to);
+      }
+    });
 
     return result;
   }

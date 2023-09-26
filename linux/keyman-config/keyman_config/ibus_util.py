@@ -84,6 +84,11 @@ def restart_ibus_subp():
 def verify_ibus_daemon(start):
     realuser = os.environ.get('SUDO_USER')
     user = realuser or getpass.getuser()
+
+    if not user:
+        logging.debug('SUDO_USER not set and getpass.getuser() returned None. Skipping ibus-daemon check.')
+        return
+
     try:
         ps = subprocess.run(('ps', '--user', user, '-o', 's=', '-o', 'cmd'), stdout=subprocess.PIPE).stdout
         ibus_daemons = re.findall('^[^ZT] ibus-daemon .*--xim.*', ps.decode('utf-8'), re.MULTILINE)

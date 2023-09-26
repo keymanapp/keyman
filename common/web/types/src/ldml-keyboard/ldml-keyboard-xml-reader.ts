@@ -7,6 +7,7 @@ import { CompilerCallbacks } from '../util/compiler-interfaces.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { CommonTypesMessages } from '../util/common-events.js';
 import { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTTests } from './ldml-keyboard-testdata-xml.js';
+import Schemas from '../schemas.js';
 
 interface NameAndProps  {
   '$'?: any; // content
@@ -205,10 +206,9 @@ export class LDMLKeyboardXMLSourceFileReader {
   /**
    * @returns true if valid, false if invalid
    */
-  public validate(source: LDMLKeyboardXMLSourceFile | LDMLKeyboardTestDataXMLSourceFile, schemaSource: Uint8Array): boolean {
-    const schema = JSON.parse(new TextDecoder().decode(schemaSource));
+  public validate(source: LDMLKeyboardXMLSourceFile | LDMLKeyboardTestDataXMLSourceFile): boolean {
     const ajv = new Ajv();
-    if(!ajv.validate(schema, source)) {
+    if(!ajv.validate(Schemas.ldmlKeyboard, source)) {
       for (let err of ajv.errors) {
         this.callbacks.reportMessage(CommonTypesMessages.Error_SchemaValidationError({
           instancePath: err.instancePath,

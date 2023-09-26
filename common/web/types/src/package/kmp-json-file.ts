@@ -6,7 +6,6 @@ export interface KmpJsonFile {
   lexicalModels?: KmpJsonFileLexicalModel[];
   startMenu?: KmpJsonFileStartMenu;
   keyboards?: KmpJsonFileKeyboard[];
-  strings?: string[];
 }
 
 export interface KmpJsonFileSystem {

@@ -94,7 +94,7 @@ export interface KpsFileKeyboard {
   version: string;
   oSKFont?: string;
   displayFont?: string;
-  rtl?: boolean;
+  rTL?: string;
   languages?: KpsFileLanguages;
 }
 
@@ -110,7 +110,7 @@ export interface KpsFileStartMenu {
 
 export interface KpsFileStartMenuItem {
   name: string;
-  filename: string;
+  fileName: string;
   arguments?: string;
   icon?: string;
   location?: string;
