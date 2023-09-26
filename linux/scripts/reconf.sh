@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -17,13 +17,14 @@ echo "Found tier ${TIER}, version ${VERSION}"
 cd ../core
 ./build.sh --no-tests clean:arch configure:arch build:arch
 
+# Building ibus-keyman will also build dependency keyman-system-service
 cd "$BASEDIR/ibus-keyman"
 ./build.sh clean configure
 
 cd "$BASEDIR/keyman-config"
 ./build.sh clean
 
-cd keyman_config
+cd "$BASEDIR/keyman-config/keyman_config"
 sed \
     -e "s/_VERSION_/${VERSION}/g" \
     -e "s/_VERSIONWITHTAG_/${VERSION_WITH_TAG}/g" \

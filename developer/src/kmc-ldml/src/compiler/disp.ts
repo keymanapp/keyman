@@ -27,8 +27,8 @@ export class DispCompiler extends SectionCompiler {
     const tos = new Set();
     const ids = new Set();
 
-    if (this.keyboard.displays?.display) {
-      for (const { to, id } of this.keyboard.displays?.display) {
+    if (this.keyboard3.displays?.display) {
+      for (const { to, id } of this.keyboard3.displays?.display) {
         if ((to && id) || (!to && !id)) {
           this.callbacks.reportMessage(CompilerMessages.Error_DisplayNeedsToOrId({ to, id }));
           return false;
@@ -57,12 +57,12 @@ export class DispCompiler extends SectionCompiler {
     let result = new Disp();
 
     // displayOptions
-    result.baseCharacter = sections.strs.allocAndUnescapeString(this.keyboard.displays?.displayOptions?.baseCharacter);
+    result.baseCharacter = sections.strs.allocAndUnescapeString(this.keyboard3.displays?.displayOptions?.baseCharacter);
 
     // TODO-LDML: substitute variables!
 
     // displays
-    result.disps = this.keyboard.displays?.display.map(display => ({
+    result.disps = this.keyboard3.displays?.display.map(display => ({
       to: sections.strs.allocAndUnescapeString(sections.vars.substituteMarkerString(display.to)),
       id: sections.strs.allocString(display.id), // not escaped, not substituted
       display: sections.strs.allocAndUnescapeString(display.display),

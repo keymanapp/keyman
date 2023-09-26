@@ -11,7 +11,7 @@ export interface LDMLKeyboardTestDataXMLSourceFile {
   /**
    * <keyboardTest> -- the root element.
    */
-  keyboardTest: LKTKeyboardTest;
+  keyboardTest3: LKTKeyboardTest;
 }
 
 export interface LKTKeyboardTest {

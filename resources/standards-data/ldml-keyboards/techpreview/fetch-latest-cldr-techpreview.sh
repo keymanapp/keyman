@@ -33,8 +33,8 @@ DATA_DIR="${KEYBOARDS_DIR}/3.0"
 TEST_DIR="${KEYBOARDS_DIR}/test"
 
 # a file to check
-CHECK_1="${DTD_DIR}/ldmlKeyboard.dtd"      # Critical, present in prior CLDR
-CHECK_2="${DTD_DIR}/ldmlKeyboardTest.dtd"  # Only in Keyboard 3.0+
+CHECK_1="${DTD_DIR}/ldmlKeyboard3.dtd"      # Critical, present in prior CLDR
+CHECK_2="${DTD_DIR}/ldmlKeyboardTest3.dtd"  # Only in Keyboard 3.0+
 
 if [[ ! -f "${CHECK_1}" ]];
 then
@@ -58,6 +58,10 @@ echo "---"
 rm -rf ./import ./3.0 ./dtd ./test
 # copy over everything
 cp -Rv "${IMPORT_DIR}" "${DATA_DIR}" "${DTD_DIR}" "${TEST_DIR}" .
+
+# delete old files, no reason to keep them
+rm -vf dtd/{ldmlKeyboard,ldmlPlatform}.{xsd,dtd}
+
 
 echo "{\"sha\": \"${GIT_SHA}\",\"description\":\"${GIT_DESCRIBE}\",\"date\":\"${NOW}\"}" | ${JQ} . | tee cldr_info.json
 echo "Updated cldr_info.json"

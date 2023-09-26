@@ -30,15 +30,15 @@ export class KeysCompiler extends SectionCompiler {
    * @returns just the non-touch layers.
    */
   public hardwareLayers() {
-    return this.keyboard.layers?.filter(({ form }) => form !== "touch");
+    return this.keyboard3.layers?.filter(({ form }) => form !== "touch");
   }
 
   public validate() {
     let valid = true;
 
     // general key-level validation here, only of used keys
-    const usedKeys = allUsedKeyIdsInLayers(this.keyboard?.layers);
-    const uniqueKeys = calculateUniqueKeys([...this.keyboard.keys?.key]);
+    const usedKeys = allUsedKeyIdsInLayers(this.keyboard3?.layers);
+    const uniqueKeys = calculateUniqueKeys([...this.keyboard3.keys?.key]);
     for (let key of uniqueKeys) {
       const { id, flicks } = key;
       if (!usedKeys.has(id)) {
@@ -48,7 +48,7 @@ export class KeysCompiler extends SectionCompiler {
       if (!flicks) {
         continue; // no flicks
       }
-      const flickEntry = this.keyboard.keys?.flicks?.find(
+      const flickEntry = this.keyboard3.keys?.flicks?.find(
         (x) => x.id === flicks
       );
       if (!flickEntry) {
@@ -80,7 +80,7 @@ export class KeysCompiler extends SectionCompiler {
 
   public compile(sections: DependencySections): Keys {
     /* c8 ignore next 4 */
-    if (!this.keyboard?.keys?.key && !this.keyboard?.keys?.flicks) {
+    if (!this.keyboard3?.keys?.key && !this.keyboard3?.keys?.flicks) {
       // short-circuit if no keys or flicks. Doesn't happen in practice due to implied import.
       return null;
     }
@@ -114,7 +114,7 @@ export class KeysCompiler extends SectionCompiler {
   }
 
   public loadFlicks(sections: DependencySections, sect: Keys) {
-    for (let lkflicks of this.keyboard.keys.flicks) {
+    for (let lkflicks of this.keyboard3.keys.flicks) {
       let flicks: KeysFlicks = new KeysFlicks(
         sections.strs.allocString(lkflicks.id)
       );
@@ -142,8 +142,8 @@ export class KeysCompiler extends SectionCompiler {
   }
 
   public loadKeys(sections: DependencySections, sect: Keys) {
-    const usedKeys = allUsedKeyIdsInLayers(this.keyboard?.layers);
-    const uniqueKeys = calculateUniqueKeys([...this.keyboard.keys?.key]);
+    const usedKeys = allUsedKeyIdsInLayers(this.keyboard3?.layers);
+    const uniqueKeys = calculateUniqueKeys([...this.keyboard3.keys?.key]);
 
     for (let key of uniqueKeys) {
       if (!usedKeys.has(key.id)) {
@@ -227,7 +227,7 @@ export class KeysCompiler extends SectionCompiler {
       valid = false;
     }
 
-    const uniqueKeys = calculateUniqueKeys([...this.keyboard.keys?.key]);
+    const uniqueKeys = calculateUniqueKeys([...this.keyboard3.keys?.key]);
     if (layer.row.length > keymap.length) {
       this.callbacks.reportMessage(
         CompilerMessages.Error_HardwareLayerHasTooManyRows()
@@ -300,7 +300,7 @@ export class KeysCompiler extends SectionCompiler {
 
         // TODO-LDML: we already validated that the key exists, above.
         // So here we only need the ID?
-        // let keydef = this.keyboard.keys?.key?.find(x => x.id == key);
+        // let keydef = this.keyboard3.keys?.key?.find(x => x.id == key);
 
         sect.kmap.push({
           vkey: keymap[y][x],
