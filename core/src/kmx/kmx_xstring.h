@@ -172,6 +172,19 @@ u16string_to_u32string(const std::u16string &source) {
   return out;
 }
 
+inline std::u16string
+u32string_to_u16string(const std::u32string &source) {
+  std::u16string out;
+  char16_single ch;
+  for (auto c : source) {
+    const auto len = Utf32CharToUtf16(c, ch);
+    for (auto i = 0; i < len; i++) {
+      out.push_back(ch.ch[i]);
+    }
+  }
+  return out;
+}
+
 inline bool Uni_IsEndOfPlaneNonCharacter(km_kbp_usv ch) {
   return (((ch) & Uni_FFFE_NONCHARACTER) == Uni_FFFE_NONCHARACTER); // matches FFFF or FFFE
 }

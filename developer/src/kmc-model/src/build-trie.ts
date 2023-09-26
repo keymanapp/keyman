@@ -1,4 +1,3 @@
-import { readFileSync } from "fs";
 import { ModelCompilerError, ModelCompilerMessageContext, ModelCompilerMessages } from "./model-compiler-errors.js";
 import { callbacks } from "./compiler-callbacks.js";
 
@@ -167,7 +166,8 @@ class WordListFromFilename {
   }
 
   *lines() {
-    let contents = readFileSync(this.name, detectEncoding(this.name));
+    const data = callbacks.loadFile(this.name);
+    const contents = new TextDecoder(detectEncoding(data)).decode(data);
     yield *enumerateLines(contents.split(NEWLINE_SEPARATOR));
   }
 }
@@ -491,18 +491,21 @@ namespace Trie {
  *
  * @param filename filename of the file to detect encoding
  */
-function detectEncoding(filename: string): 'utf8' | 'utf16le' {
-  let buffer = readFileSync(filename);
+function detectEncoding(buffer: Uint8Array): 'utf-8' | 'utf-16le' {
+  if(buffer.length < 2) {
+    return 'utf-8';
+  }
+
   // Note: BOM is U+FEFF
   // In little endian, this is 0xFF 0xFE
   if (buffer[0] == 0xFF && buffer[1] == 0xFE) {
-    return 'utf16le';
+    return 'utf-16le';
   } else if (buffer[0] == 0xFE && buffer[1] == 0xFF) {
     // Big Endian, is NOT supported because Node does not support it (???)
     // See: https://stackoverflow.com/a/14551669/6626414
     throw new ModelCompilerError(ModelCompilerMessages.Error_UTF16BEUnsupported());
   } else {
     // Assume its in UTF-8, with or without a BOM.
-    return 'utf8';
+    return 'utf-8';
   }
 }

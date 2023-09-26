@@ -2,6 +2,7 @@
 // Version 1.0 of Keyman Developer Project .kpj file
 //
 
+import { KeymanFileTypes } from '../main.js';
 import { CompilerCallbacks } from '../util/compiler-interfaces.js';
 
 export class KeymanDeveloperProject {
@@ -26,17 +27,40 @@ export class KeymanDeveloperProject {
     let files = this.callbacks.fs.readdirSync(sourcePath);
     for(let filename of files) {
       let fullPath = this.callbacks.path.join(sourcePath, filename);
-      if(filename.match(/\.xml$/i)) {
+      if(KeymanFileTypes.filenameIs(filename, KeymanFileTypes.Source.LdmlKeyboard)) {
         if(!this.callbacks.fs.readFileSync(fullPath, 'utf-8').match(/ldmlKeyboard\.dtd/)) {
           // Skip this .xml because we assume it isn't really a keyboard .xml
           continue;
         }
       }
-      if(filename.match(/\.(kmn|kps|xml|model\.ts)$/i)) {
+      if(KeymanFileTypes.sourceTypeFromFilename(filename) !== null) {
         let file = new KeymanDeveloperProjectFile20(fullPath, this.callbacks);
         this.files.push(file);
       }
     }
+
+    this.addMetadataFile();
+  }
+
+  public isKeyboardProject() {
+    return !!this.files.find(file => file.fileType == KeymanFileTypes.Source.KeymanKeyboard || file.fileType == KeymanFileTypes.Source.LdmlKeyboard);
+  }
+
+  public isLexicalModelProject() {
+    return !!this.files.find(file => file.fileType == KeymanFileTypes.Source.Model);
+  }
+
+  public addMetadataFile() {
+    const ext = this.isLexicalModelProject() ? KeymanFileTypes.Source.ModelInfo : KeymanFileTypes.Source.KeyboardInfo;
+
+    if(this.files.find(file => KeymanFileTypes.filenameIs(file.filename, ext))) {
+      return;
+    }
+
+    const infoFile =
+      this.callbacks.path.join(this.projectPath,
+      this.callbacks.path.basename(this.projectFilename, KeymanFileTypes.Source.Project) + ext);
+    this.files.push(new KeymanDeveloperProjectFile20(infoFile, this.callbacks));
   }
 
   private resolveProjectPath(p: string): string {
@@ -83,7 +107,7 @@ export class KeymanDeveloperProjectOptions {
   sourcePath: string;
   compilerWarningsAsErrors: boolean = false;
   warnDeprecatedCode: boolean = true;
-  checkFilenameConventions: boolean = true;
+  checkFilenameConventions: boolean = false;  // missing option defaults to False
   projectType: KeymanDeveloperProjectType = KeymanDeveloperProjectType.Keyboard;
   readonly version: KeymanDeveloperProjectVersion;
   constructor(version: KeymanDeveloperProjectVersion) {
@@ -103,42 +127,38 @@ export class KeymanDeveloperProjectOptions {
   }
 };
 
-export type KeymanDeveloperProjectFile = KeymanDeveloperProjectFile10 | KeymanDeveloperProjectFile20;
-
-export class KeymanDeveloperProjectFile10 {
-  readonly id: string;           // 1.0 only
-  readonly filename: string;
+export interface KeymanDeveloperProjectFile {
+  get filename(): string;
+  get fileType(): string;
   readonly filePath: string;
-  readonly fileVersion: string;  // 1.0 only
-  readonly fileType: string;     // file extension of filename, but .model.ts is technically not the ext because of 2 periods
+};
+
+export class KeymanDeveloperProjectFile10 implements KeymanDeveloperProjectFile {
+  get filename(): string {
+    return this.callbacks.path.basename(this.filePath);
+  }
+  get fileType(): string {
+    return KeymanFileTypes.fromFilename(this.filename);
+  }
   details: KeymanDeveloperProjectFileDetail_Kmn & KeymanDeveloperProjectFileDetail_Kps; // 1.0 only
   childFiles: KeymanDeveloperProjectFile[]; // 1.0 only
-  constructor(id: string, filename: string, filePath: string, fileVersion:string, fileType: string) {
+
+  constructor(public readonly id: string, public readonly filePath: string, public readonly fileVersion:string, private readonly callbacks: CompilerCallbacks) {
     this.details = {};
     this.childFiles = [];
-    this.id = id;
-    this.filename = filename;
-    this.filePath = filePath;
-    this.fileVersion = fileVersion;
-    this.fileType = fileType;
   }
 };
 
-export type KeymanDeveloperProjectFileType20 = '.model.ts' | '.kmn' | '.xml' | '.kps';
+export type KeymanDeveloperProjectFileType20 = KeymanFileTypes.Source;
 
-export class KeymanDeveloperProjectFile20 {
-  readonly filename: string;
-  readonly filePath: string;
-  readonly fileType: string; // file extension of filename, but .model.ts is technically not the ext because of 2 periods
-  constructor(filePath: string, private callbacks: CompilerCallbacks) {
-    this.filename = this.callbacks.path.basename(filePath);
-    this.filePath = filePath;
-    if(this.filename.match(/\.model\.ts$/)) {
-      // .model.ts is a bit of a hassle...
-      this.fileType = '.model.ts';
-    } else {
-      this.fileType = this.callbacks.path.extname(this.filename);
-    }
+export class KeymanDeveloperProjectFile20 implements KeymanDeveloperProjectFile {
+  get filename(): string {
+    return this.callbacks.path.basename(this.filePath);
+  }
+  get fileType() {
+    return KeymanFileTypes.fromFilename(this.filename);
+  }
+  constructor(public readonly filePath: string, private readonly callbacks: CompilerCallbacks) {
   }
 };
 

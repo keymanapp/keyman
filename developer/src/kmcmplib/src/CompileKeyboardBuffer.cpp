@@ -7,6 +7,10 @@
 #include "CompileKeyboardBuffer.h"
 #include "../../../../common/windows/cpp/include/keymanversion.h"
 
+namespace kmcmp {
+  void CopyExtraData(PFILE_KEYBOARD fk);
+};
+
 bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
 {
   PKMX_WCHAR str, p;
@@ -42,7 +46,11 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   fk->dpDeadKeyArray = NULL;
   fk->cxVKDictionary = 0;  // I3438
   fk->dpVKDictionary = NULL;  // I3438
-  fk->extra->kvksFilename = u"";
+  fk->extra->targets = COMPILETARGETS_KMX;
+  fk->extra->kvksFilename = "";
+  fk->extra->displayMapFilename = "";
+  fk->extra->stores.clear();
+  fk->extra->groups.clear();
 /*	fk->szMessage[0] = 0;
   fk->szLanguageName[0] = 0;*/
   fk->dwBitmapSize = 0;
@@ -142,7 +150,7 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
     return FALSE;
   }
 
-  delete str;
+  delete[] str;
 
   if (!kmcmp::CheckKeyboardFinalVersion(fk)) {
     return FALSE;
@@ -156,5 +164,35 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   /* Flag presence of deprecated features */
   kmcmp::CheckForDeprecatedFeatures(fk);
 
+  /* Extract extra metadata for callers */
+  kmcmp::CopyExtraData(fk);
+
   return TRUE;
+}
+
+namespace kmcmp {
+  void CopyExtraData(PFILE_KEYBOARD fk) {
+    /* Copy stores */
+    PFILE_STORE store = fk->dpStoreArray;
+    for(int i = 0; i < fk->cxStoreArray; i++, store++) {
+      KMCMP_COMPILER_RESULT_EXTRA_STORE extraStore;
+      extraStore.storeType =
+        (store->fIsStore ? STORETYPE_STORE : 0) |
+        (store->fIsReserved ? STORETYPE_RESERVED : 0) |
+        (store->fIsOption ? STORETYPE_OPTION : 0) |
+        (store->fIsDebug ? STORETYPE_DEBUG : 0) |
+        (store->fIsCall ? STORETYPE_CALL : 0);
+      extraStore.name = string_from_u16string(store->szName);
+      extraStore.line = store->line;
+      fk->extra->stores.push_back(extraStore);
+    }
+
+    PFILE_GROUP group = fk->dpGroupArray;
+    for(int i = 0; i < fk->cxGroupArray; i++, group++) {
+      KMCMP_COMPILER_RESULT_EXTRA_GROUP extraGroup;
+      extraGroup.isReadOnly = group->fReadOnly;
+      extraGroup.name = string_from_u16string(group->szName);
+      fk->extra->groups.push_back(extraGroup);
+    }
+  }
 }
