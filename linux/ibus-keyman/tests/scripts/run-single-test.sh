@@ -21,7 +21,7 @@ fi
 
 function help() {
   echo "Usage:"
-  echo "  $0 [--env <envfile>] [-k] [--tap] [--surrounding-text] [--no-surrounding-text] [--wayland|--x11] [--] TEST"
+  echo "  $0 [--env <envfile>] [-k] [--tap] [--surrounding-text] [--no-surrounding-text] [--wayland|--x11] [--check <pidfile> --cleanup <file>] [--] TEST"
   echo
   echo "Arguments:"
   echo "  --help, -h, -?          Display this help"

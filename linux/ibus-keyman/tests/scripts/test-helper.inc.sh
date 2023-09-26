@@ -203,9 +203,8 @@ function _setup_display_server() {
 }
 
 function _setup_schema_and_gsettings() {
-  local ENV_FILE CLEANUP_FILE
+  local ENV_FILE
   ENV_FILE=$1
-  CLEANUP_FILE=$2
 
   # Install schema to temporary directory. This removes the build dependency on the keyman package.
   SCHEMA_DIR=$TEMP_DATA_DIR/glib-2.0/schemas
@@ -275,7 +274,7 @@ function setup() {
 
   _setup_test_dbus_server "${ENV_FILE}" "${CLEANUP_FILE}"
   _setup_display_server "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}" "${DISPLAY_SERVER}"
-  _setup_schema_and_gsettings "${ENV_FILE}" "${CLEANUP_FILE}"
+  _setup_schema_and_gsettings "${ENV_FILE}"
   _setup_ibus "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}"
 }
 
@@ -288,7 +287,7 @@ function setup_display_server_only() {
 
   _setup_init "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}"
   _setup_display_server "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}" "${DISPLAY_SERVER}"
-  _setup_schema_and_gsettings "${ENV_FILE}" "${CLEANUP_FILE}"
+  _setup_schema_and_gsettings "${ENV_FILE}"
 }
 
 function cleanup() {
