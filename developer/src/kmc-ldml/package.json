@@ -26,18 +26,19 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "dependencies": {
-    "@keymanapp/kmc-kmn": "*",
     "@keymanapp/keyman-version": "*",
+    "@keymanapp/kmc-kmn": "*",
     "@keymanapp/ldml-keyboard-constants": "*",
     "ajv": "^8.11.0",
-    "restructure": "git+https://github.com/keymanapp/dependency-restructure.git#49d129cf0916d082a7278bb09296fb89cecfcc50",
+    "restructure": "git+https://github.com/keymanapp/dependency-restructure.git#7a188a1e26f8f36a175d95b67ffece8702363dfc",
     "semver": "^7.5.2",
     "xml2js": "git+https://github.com/keymanapp/dependency-node-xml2js#535fe732dc408d697e0f847c944cc45f0baf0829"
   },
   "devDependencies": {
+    "@keymanapp/developer-test-helpers": "*",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^10.14.6",
+    "@types/node": "^20.4.1",
     "@types/semver": "^7.3.12",
     "@types/xml2js": "^0.4.5",
     "c8": "^7.12.0",
@@ -45,8 +46,7 @@
     "chalk": "^2.4.2",
     "mocha": "^8.4.0",
     "ts-node": "^9.1.1",
-    "typescript": "^4.9.5",
-    "@keymanapp/developer-test-helpers": "*"
+    "typescript": "^4.9.5"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",

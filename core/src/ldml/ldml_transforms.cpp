@@ -11,7 +11,6 @@
 #include <string>
 #include "kmx/kmx_xstring.h"
 
-
 #ifndef assert
 #define assert(x)  // TODO-LDML
 #endif
@@ -36,7 +35,7 @@ namespace ldml {
 #define DebugTran(msg, ...)
 #endif
 
-element::element(const USet &new_u, KMX_DWORD new_flags)
+element::element(const SimpleUSet &new_u, KMX_DWORD new_flags)
     : chr(), uset(new_u), flags((new_flags & ~LDML_ELEM_FLAGS_TYPE) | LDML_ELEM_FLAGS_TYPE_USET) {
 }
 
@@ -184,13 +183,14 @@ element_list::load(const kmx::kmx_plus &kplus, kmx::KMXPLUS_ELEM id) {
   auto elements = kplus.elem->getElementList(id, elementsLength); // pointer to beginning of element list
   assert((elementsLength == 0) || (elements != nullptr)); // it could be a 0-length list
   for (size_t i = 0; i<elementsLength; i++) {
-    auto e     = elements[i];
-    auto flags = e.flags;
-    auto type  = flags & LDML_ELEM_FLAGS_TYPE;
+    auto e = elements[i];
+    KMX_DWORD flags = e.flags;
+    auto type = flags & LDML_ELEM_FLAGS_TYPE;
     if (type == LDML_ELEM_FLAGS_TYPE_CHAR) {
-      emplace_back(e.element, flags); // char
+      km_kbp_usv ch = e.element;
+      emplace_back(ch, flags); // char
     } else if (type == LDML_ELEM_FLAGS_TYPE_USET) {
-      // need to load a USet
+      // need to load a SimpleUSet
       auto u = kplus.usetHelper.getUset(e.element);
       if (!u.valid()) {
         DebugLog("Error, invalid UnicodeSet at element %d", (int)i);
@@ -198,7 +198,7 @@ element_list::load(const kmx::kmx_plus &kplus, kmx::KMXPLUS_ELEM id) {
         assert(u.valid());
         return false;
       }
-      emplace_back(u, e.flags);
+      emplace_back(u, flags);
     } else {
       // reorders don't use 'string' element types, so we don't expect them here.
       assert((type != LDML_ELEM_FLAGS_TYPE_USET) && (type != LDML_ELEM_FLAGS_TYPE_CHAR));
@@ -392,35 +392,206 @@ reorder_group::apply(std::u32string &str) const {
   return applied;
 }
 
-transform_entry::transform_entry(const std::u32string &from, const std::u32string &to) : fFrom(from), fTo(to) {
+transform_entry::transform_entry(const transform_entry &other)
+    : fFrom(other.fFrom), fTo(other.fTo), fFromPattern(nullptr), fMapFromStrId(other.fMapFromStrId),
+      fMapToStrId(other.fMapToStrId), fMapFromList(other.fMapFromList), fMapToList(other.fMapToList) {
+  if (other.fFromPattern) {
+    // clone pattern
+    fFromPattern.reset(other.fFromPattern->clone());
+  }
+}
+
+transform_entry::transform_entry(const std::u32string &from, const std::u32string &to)
+    : fFrom(from), fTo(to), fFromPattern(nullptr), fMapFromStrId(), fMapToStrId(), fMapFromList(), fMapToList() {
+  assert(!fFrom.empty()); // TODO-LDML: should not happen?
+
+  init();
+}
+
+// TODO-LDML: How do we return errors from here?
+transform_entry::transform_entry(
+    const std::u32string &from,
+    const std::u32string &to,
+    KMX_DWORD mapFrom,
+    KMX_DWORD mapTo,
+    const kmx::kmx_plus &kplus)
+    : fFrom(from), fTo(to), fFromPattern(nullptr), fMapFromStrId(mapFrom), fMapToStrId(mapTo) {
+  assert(!fFrom.empty()); // TODO-LDML: should not happen?
+  assert((fMapFromStrId == 0) == (fMapToStrId == 0));  // we have both or we have neither.
+  assert(kplus.strs != nullptr);
+  assert(kplus.vars != nullptr);
+  assert(kplus.elem != nullptr);
+  init();
+
+  // setup mapFrom
+  if (fMapFromStrId != 0) {
+    // Note: if we need the variable name it is available as follows,
+    // but isn't needed for normal processing. Could be useful for debug messages.
+    //  auto mapFrom = kplus.strs->get(fMapFromStrId);
+    //  auto mapTo   = kplus.strs->get(fMapToStrId);
+
+    // get the vars
+    auto *fromVar = kplus.vars->findByStringId(fMapFromStrId);
+    auto *toVar   = kplus.vars->findByStringId(fMapToStrId);
+    assert(fromVar != nullptr);
+    assert(toVar   != nullptr);
+
+
+    // get the element lists
+    assert(fromVar->type == LDML_VARS_ENTRY_TYPE_SET);
+    assert(toVar->type   == LDML_VARS_ENTRY_TYPE_SET);
+    KMX_DWORD fromLength, toLength;
+    auto *fromList = kplus.elem->getElementList(fromVar->elem, fromLength);
+    auto *toList   = kplus.elem->getElementList(toVar->elem, toLength);
+    assert(fromLength == toLength);
+    assert(fromList != nullptr);
+    assert(toList   != nullptr);
+
+    // populate the deques from the lists
+    fMapFromList = fromList->loadAsStringList(fromLength, *(kplus.strs));
+    fMapToList   = toList->loadAsStringList(toLength, *(kplus.strs));
+    // did we get the expected items?
+    assert(fMapFromList.size() == fromLength);
+    assert(fMapToList.size()   == toLength);
+  }
+}
+
+void
+transform_entry::init() {
+  if (!fFrom.empty()) {
+    // TODO-LDML: if we have mapFrom, may need to do other processing.
+    const std::u16string patstr = km::kbp::kmx::u32string_to_u16string(fFrom);
+    UErrorCode status           = U_ZERO_ERROR;
+    /* const */ icu::UnicodeString patustr = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
+    // add '$' to match to end
+    patustr.append(u'$');
+    fFromPattern.reset(icu::RegexPattern::compile(patustr, 0, status));
+    assert(U_SUCCESS(status)); // TODO-LDML: may be best to propagate status up ^^
+  }
 }
 
 size_t
-transform_entry::match(const std::u32string &input) const {
-  if (input.length() < fFrom.length()) {
-    // TODO-LDML: regex
-    // Too small, can't match.
-    return 0;
+transform_entry::apply(const std::u32string &input, std::u32string &output) const {
+  assert(fFromPattern);
+  // TODO-LDML: Really? can't go from u32 to UnicodeString?
+  // TODO-LDML: Also, we could cache the u16 string at the transformGroup level or higher.
+  UErrorCode status = U_ZERO_ERROR;
+  const std::u16string matchstr = km::kbp::kmx::u32string_to_u16string(input);
+  icu::UnicodeString matchustr  = icu::UnicodeString(matchstr.data(), (int32_t)matchstr.length());
+  // TODO-LDML: create a new Matcher every time. These could be cached and reset.
+  std::unique_ptr<icu::RegexMatcher> matcher(fFromPattern->matcher(matchustr, status));
+  assert(U_SUCCESS(status));
+
+  if (!matcher->find(status)) { // i.e. matches somewhere, in this case at end of str
+    return 0; // no match
   }
-  // string at end
-  auto substr = input.substr(input.length() - fFrom.length(), fFrom.length());
-  if (substr != fFrom) {
-    // end of string doesn't match
-    return 0;
+
+  // TODO-LDML: this is UTF-16 len, not UTF-32 len!!
+  // TODO-LDML: if we had an underlying UText this would be simpler.
+  int32_t matchStart = matcher->start(status);
+  int32_t matchEnd   = matcher->end(status);
+  assert(U_SUCCESS(status));
+  // extract..
+  const icu::UnicodeString substr = matchustr.tempSubStringBetween(matchStart, matchEnd);
+  // preflight to UTF-32 to get length
+  UErrorCode substrStatus = U_ZERO_ERROR; // throwaway status
+  // we need the UTF-32 matchLen for our return.
+  auto matchLen = substr.toUTF32(nullptr, 0, substrStatus);
+
+  // should have matched something.
+  assert(matchLen > 0);
+
+  // now, do the replace.
+
+  /** this is the 'to' or other replacement string.*/
+  icu::UnicodeString rustr;
+  if (fMapFromStrId == 0) {
+    // Normal case: not a map.
+    // This replace will apply $1, $2 etc.
+    // Convert the fTo into u16 TODO-LDML (we could cache this?)
+    const std::u16string rstr = km::kbp::kmx::u32string_to_u16string(fTo);
+    rustr  = icu::UnicodeString(rstr.data(), (int32_t)rstr.length());
+  } else {
+    // Set map case: mapping from/to
+
+    // we actually need the group(1) string here.
+    // this is only the content in parenthesis ()
+    icu::UnicodeString group1 = matcher->group(1, status);
+    assert(U_SUCCESS(status)); // TODO-LDML: could be a malformed from pattern
+    // now, how long is group1 in UTF-32, hmm?
+    UErrorCode preflightStatus = U_ZERO_ERROR; // throwaway status
+    auto group1Len             = group1.toUTF32(nullptr, 0, preflightStatus);
+    char32_t *s                = new char32_t[group1Len + 1];
+    assert(s != nullptr); // TODO-LDML: OOM
+    // convert
+    substr.toUTF32((UChar32 *)s, group1Len + 1, status);
+    assert(U_SUCCESS(status));
+    std::u32string match32(s, group1Len); // taken from just group1
+    // clean up buffer
+    delete [] s;
+
+    // Now we're ready to do the actual mapping.
+
+    // 1., we need to find the index in the source set.
+    auto matchIndex = findIndexFrom(match32);
+    assert(matchIndex != -1L); // TODO-LDML: not matching shouldn't happen, the regex wouldn't have matched.
+    // we already asserted on load that the from and to sets have the same cardinality.
+
+    // 2. get the target string, convert to utf-16
+    // we use the same matchIndex that was just found
+    const std::u16string rstr = km::kbp::kmx::u32string_to_u16string(fMapToList.at(matchIndex));
+
+    // 3. update the UnicodeString for replacement
+    rustr  = icu::UnicodeString(rstr.data(), (int32_t)rstr.length());
+    // and we return to the regular code flow.
   }
-  // match length == fFrom.length
-  return substr.length();
+  // here we replace the match output.
+  icu::UnicodeString entireOutput = matcher->replaceFirst(rustr, status);
+  assert(U_SUCCESS(status)); // TODO-LDML: could fail here due to bad input (syntax err)
+
+  // entireOutput includes all of 'input', but modified. Need to substring it.
+  icu::UnicodeString outu = entireOutput.tempSubString(matchStart);
+
+  // Special case if there's no output, save some allocs
+  if (outu.length() == 0) {
+    output.clear();
+  } else {
+    // TODO-LDML: All we are trying to do is to extract the output string. Probably too many steps.
+    UErrorCode preflightStatus = U_ZERO_ERROR;
+    // calculate how big the buffer is
+    auto out32len              = outu.toUTF32(nullptr, 0, preflightStatus); // preflightStatus will be an err, because we know the buffer overruns zero bytes
+    // allocate
+    char32_t *s                = new char32_t[out32len + 1];
+    assert(s != nullptr);
+    // convert
+    outu.toUTF32((UChar32 *)s, out32len + 1, status);
+    assert(U_SUCCESS(status));
+    output.assign(s, out32len);
+    // now, build a u32string
+    std::u32string out32(s, out32len);
+    // clean up buffer
+    delete [] s;
+  }
+  return matchLen;
 }
 
-std::u32string
-transform_entry::apply(const std::u32string & /*input*/, size_t /*matchLen*/) const {
-  // TODO-LDML: regex
-  // For now, we just return the 'to' string literally.
-  return fTo;
+int32_t transform_entry::findIndexFrom(const std::u32string &match) const {
+  return findIndex(match, fMapFromList);
+}
+
+int32_t transform_entry::findIndex(const std::u32string &match, const std::deque<std::u32string> list) {
+  int32_t index = 0;
+  for(auto e = list.begin(); e < list.end(); e++, index++) {
+    if (match == *e) {
+      return index;
+    }
+  }
+  return -1; // not found
 }
 
 any_group::any_group(const transform_group &g) : type(any_group_type::transform), transform(g), reorder() {
 }
+
 any_group::any_group(const reorder_group &g) : type(any_group_type::reorder), transform(), reorder(g) {
 }
 
@@ -443,17 +614,18 @@ transform_group::transform_group() {
 /**
  * return the first transform match in this group
  */
-const transform_entry *
-transform_group::match(const std::u32string &input, size_t &subMatched) const {
+size_t
+transform_group::apply(const std::u32string &input, std::u32string &output) const {
+  size_t subMatched = 0;
   for (auto transform = begin(); (subMatched == 0) && (transform < end()); transform++) {
     // TODO-LDML: non regex implementation
     // is the match area too short?
-    subMatched = transform->match(input);
+    subMatched = transform->apply(input, output);
     if (subMatched != 0) {
-      return &(*transform);  // return alias to transform
+      return subMatched; // matched. break out.
     }
   }
-  return nullptr;
+  return 0; // no match
 }
 
 /**
@@ -506,20 +678,14 @@ transforms::apply(const std::u32string &input, std::u32string &output) {
     // TODO-LDML: reorders
     // Assume it's a non reorder group
     /** Length of match within this group*/
-    size_t subMatched = 0;
 
     // find the first match in this group (if present)
     // TODO-LDML: check if reorder
     if (group->type == any_group_type::transform) {
-      auto entry = group->transform.match(updatedInput, subMatched);
+      std::u32string subOutput;
+      size_t subMatched = group->transform.apply(updatedInput, subOutput);
 
-      if (entry != nullptr) {
-        // now apply the found transform
-
-        // update subOutput (string) and subMatched
-        // the returned string must replace the last "subMatched" chars of the string.
-        std::u32string subOutput = entry->apply(updatedInput, subMatched);
-
+      if (subMatched != 0) {
         // remove the matched part of the updatedInput
         updatedInput.resize(updatedInput.length() - subMatched);  // chop of the subMatched part at end
         updatedInput.append(subOutput);                           // subOutput could be empty such as in backspace transform
@@ -630,16 +796,9 @@ transforms::load(
         const kmx::COMP_KMXPLUS_TRAN_TRANSFORM *element = tranHelper.getTransform(group->index + itemNumber);
         const std::u32string fromStr                    = kmx::u16string_to_u32string(kplus.strs->get(element->from));
         const std::u32string toStr                      = kmx::u16string_to_u32string(kplus.strs->get(element->to));
-        std::u16string mapFrom, mapTo;
-
-        if (element->mapFrom && element->mapTo) {
-          // strings: variable name of from/to
-          // TODO-LDML: not implemented
-          mapFrom = kplus.strs->get(element->mapFrom);
-          mapTo   = kplus.strs->get(element->mapTo);
-        }
-
-        newGroup.emplace_back(fromStr, toStr /* ,mapFrom, mapTo */);  // creating a transform_entry
+        KMX_DWORD mapFrom                               = element->mapFrom; // copy, because of alignment
+        KMX_DWORD mapTo                                 = element->mapTo;   // copy, because of alignment
+        newGroup.emplace_back(fromStr, toStr, mapFrom, mapTo, kplus);  // creating a transform_entry
       }
       transforms->addGroup(newGroup);
     } else if (group->type == LDML_TRAN_GROUP_TYPE_REORDER) {

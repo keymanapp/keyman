@@ -23,6 +23,7 @@ const char *action_item_types[] = {
   "KM_KBP_IT_PERSIST_OPT", // = 5,  // The indicated option needs to be stored.
   "KM_KBP_IT_EMIT_KEYSTROKE", // = 6,  // Emit the current keystroke to the application
   "KM_KBP_IT_INVALIDATE_CONTEXT", // = 7,
+  "KM_KBP_IT_CAPSLOCK",//     = 8, Enable or disable capsLock
 };
 
 void print_action_item(const char *title, km_kbp_action_item const & item) {
@@ -50,6 +51,13 @@ void print_action_item(const char *title, km_kbp_action_item const & item) {
       << "           value: " << item.option->value << std::endl
       << "           scope: " << item.option->scope << std::endl;
     break;
+  case KM_KBP_IT_CAPSLOCK:
+    std::cout << "  caps lock:  " <<
+      (item.capsLock == 0 ? "off" :
+      item.capsLock == 1 ? "on" :
+      "invalid value") << " (" <<
+      item.capsLock << ")" << std::endl;
+    break;
   }
 }
 
@@ -68,6 +76,7 @@ bool operator==(
                                                   lhs.backspace.expected_value == rhs.backspace.expected_value; break;
       case KM_KBP_IT_PERSIST_OPT:        result = *lhs.option == *rhs.option; break;
       case KM_KBP_IT_EMIT_KEYSTROKE:     break;
+      case KM_KBP_IT_CAPSLOCK:           result = lhs.capsLock == rhs.capsLock; break;
       case KM_KBP_IT_INVALIDATE_CONTEXT: break;
       default: std::cout << "unexpected type" << std::endl; return false; //
     }

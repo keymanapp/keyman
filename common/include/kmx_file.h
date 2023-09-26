@@ -7,6 +7,24 @@
 
 #include <km_types.h>
 
+/*
+  When we read .kmx files, they have no alignment guarantees, so we need to tell
+  the compiler to generate unaligned-safe code for accesses to COMP_ structure
+  members. Note we are assuming that COMP_KEYBOARD is aligned because it is
+  always the start of the file, so will be at the start of any buffer which will
+  automatically be aligned correctly.
+*/
+#ifdef __EMSCRIPTEN__
+typedef KMX_DWORD __attribute__((aligned(1))) KMX_DWORD_unaligned;
+typedef KMX_BOOL  __attribute__((aligned(1))) KMX_BOOL_unaligned;
+typedef KMX_WORD  __attribute__((aligned(1))) KMX_WORD_unaligned;
+#else
+// TODO: consider other platforms
+#define KMX_DWORD_unaligned KMX_DWORD
+#define KMX_BOOL_unaligned  KMX_BOOL
+#define KMX_WORD_unaligned  KMX_WORD
+#endif
+
 #ifdef KMN_KBP
 // TODO: move this to a common namespace keyman::common::kmx_file or similar in the future
 namespace km {
@@ -153,7 +171,13 @@ namespace kmx {
 
 #define TSS__KEYMAN_150_MAX  43
 
-#define TSS__MAX        43
+/* Keyman 17.0 system stores */
+
+#define TSS_DISPLAYMAP       44
+
+#define TSS__KEYMAN_170_MAX  44
+
+#define TSS__MAX        44
 
 /* wm_keyman_control_internal message control codes */
 
@@ -297,27 +321,27 @@ namespace kmx {
 #define K_NOTMODIFIERFLAG 0xFF00   // I4548
 
 struct COMP_STORE {
-  KMX_DWORD dwSystemID;
-  KMX_DWORD dpName;
-  KMX_DWORD dpString;
+  KMX_DWORD_unaligned dwSystemID;
+  KMX_DWORD_unaligned dpName;
+  KMX_DWORD_unaligned dpString;
   };
 
 struct COMP_KEY {
-  KMX_WORD Key;
-  KMX_WORD _reserved;
-  KMX_DWORD Line;
-  KMX_DWORD ShiftFlags;
-  KMX_DWORD dpOutput;
-  KMX_DWORD dpContext;
+  KMX_WORD_unaligned Key;
+  KMX_WORD_unaligned _reserved;
+  KMX_DWORD_unaligned Line;
+  KMX_DWORD_unaligned ShiftFlags;
+  KMX_DWORD_unaligned dpOutput;
+  KMX_DWORD_unaligned dpContext;
   };
 
 struct COMP_GROUP {
-  KMX_DWORD dpName;
-  KMX_DWORD dpKeyArray;   // [LPKEY] address of first item in key array
-  KMX_DWORD dpMatch;
-  KMX_DWORD dpNoMatch;
-  KMX_DWORD cxKeyArray;   // in array entries
-  KMX_BOOL  fUsingKeys;   // group(xx) [using keys] <-- specified or not
+  KMX_DWORD_unaligned dpName;
+  KMX_DWORD_unaligned dpKeyArray;   // [LPKEY] address of first item in key array
+  KMX_DWORD_unaligned dpMatch;
+  KMX_DWORD_unaligned dpNoMatch;
+  KMX_DWORD_unaligned cxKeyArray;   // in array entries
+  KMX_BOOL_unaligned  fUsingKeys;   // group(xx) [using keys] <-- specified or not
   };
 
 struct COMP_KEYBOARD {
