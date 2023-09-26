@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.181 alpha 2023-09-26
+
+* chore: workaround npm/cli#3466 when bundling internal deps (#9536)
+* chore(linux): Check and restart background processes (#9608)
+
 ## 17.0.180 alpha 2023-09-25
 
 * fix(linux): Fix detection of unit tests (#9606)
