@@ -27,9 +27,6 @@ export interface ContactModel<Type> {
     expectedResult: boolean;
   }
 
-  // Allows specifying use of one of the configured 'gestureItemIdentifiers'.
-  recognizerId?: string;
-
   // This field is primarly used at the `GestureMatcher` level, rather than the
   // `PathMatcher` level.
   /**
