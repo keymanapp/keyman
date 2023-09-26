@@ -1430,16 +1430,16 @@ public final class KMManager {
   }
 
   /**
-   * Update KMW banner type
+   * Update KeymanWeb banner type
    * @param {KeyboardType} keyboard
    * @param {BannerType} bannerType
    * @return status
    */
   public static boolean setBanner(KeyboardType keyboard, BannerType bannerType) {
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      InAppKeyboard.setBanner(bannerType.toString());
+      InAppKeyboard.setBanner(bannerType);
     } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      SystemKeyboard.setBanner(bannerType.toString());
+      SystemKeyboard.setBanner(bannerType);
     } else {
       return false;
     }
@@ -1943,9 +1943,9 @@ public final class KMManager {
 
   public static int getBannerHeight(Context context) {
     int bannerHeight = 0;
-    if (InAppKeyboard != null && !InAppKeyboard.currentBanner().equals(KMKeyboard.KM_BANNER_STATE_BLANK)) {
+    if (InAppKeyboard != null && InAppKeyboard.getBanner() != BannerType.BLANK) {
       bannerHeight = (int) context.getResources().getDimension(R.dimen.banner_height);
-    } else if (SystemKeyboard != null && !SystemKeyboard.currentBanner().equals(KMKeyboard.KM_BANNER_STATE_BLANK)) {
+    } else if (SystemKeyboard != null && SystemKeyboard.getBanner() != BannerType.BLANK) {
       bannerHeight = (int) context.getResources().getDimension(R.dimen.banner_height);
     }
     return bannerHeight;

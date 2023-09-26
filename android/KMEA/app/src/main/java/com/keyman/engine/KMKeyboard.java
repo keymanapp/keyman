@@ -85,24 +85,9 @@ final class KMKeyboard extends WebView {
   private static String currentKeyboard = null;
 
   /**
-   * Banner state value: "blank" - no banner available.
-   */
-  public static final String KM_BANNER_STATE_BLANK = "blank";
-
-  /**
-   * Banner state value: "image" - display an image in the banner
-   */
-  public static final String KM_BANNER_STATE_IMAGE = "image";
-
-  /**
-   * Banner state value: "suggestion" - dictionary suggestions are shown.
-   */
-  public static final String KM_BANNER_STATE_SUGGESTION = "suggestion";
-
-  /**
    * Current banner state.
    */
-  protected static String currentBanner = KM_BANNER_STATE_IMAGE;
+  protected static KMManager.BannerType currentBanner = KMManager.BannerType.IMAGE;
 
   private static String txtFont = "";
   private static String oskFont = null;
@@ -438,17 +423,11 @@ final class KMKeyboard extends WebView {
     return currentKeyboard;
   }
 
-  public static void setCurrentBanner(String banner) {
-    currentBanner = banner;
-  }
-
-  public static String currentBanner() { return currentBanner; }
-
   protected void toggleSuggestionBanner(HashMap<String, String> associatedLexicalModel, boolean keyboardChanged) {
     //reset banner state if new language has no lexical model
-    if (currentBanner != null && currentBanner.equals(KM_BANNER_STATE_SUGGESTION)
+    if (currentBanner == KMManager.BannerType.SUGGESTION
         && associatedLexicalModel == null) {
-      setCurrentBanner(KMKeyboard.KM_BANNER_STATE_IMAGE);
+      setBanner(KMManager.BannerType.IMAGE);
     }
 
     if(keyboardChanged) {
@@ -671,8 +650,12 @@ final class KMKeyboard extends WebView {
     loadJavascript(jsString);
   }
 
-  public void setBanner(String bannerType) {
-    String jsString = KMString.format("setBanner(%s)", bannerType);
+  public KMManager.BannerType getBanner() {
+    return currentBanner;
+  }
+
+  public void setBanner(KMManager.BannerType bannerType) {
+    String jsString = KMString.format("setBanner('%s')", bannerType.toString());
     loadJavascript(jsString);
   }
 

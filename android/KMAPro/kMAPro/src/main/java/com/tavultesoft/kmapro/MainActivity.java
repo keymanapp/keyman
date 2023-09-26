@@ -489,7 +489,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   @Override
   public void onKeyboardLoaded(KeyboardType keyboardType) {
-    // Do nothing
+    // KeymanWeb initializes with a blank banner, so try to override with image
+    KMManager.setBanner(keyboardType, KMManager.BannerType.IMAGE);
   }
 
   @Override

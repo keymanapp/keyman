@@ -173,8 +173,8 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
       if (KMManager.currentLexicalModel != null) {
         modelPredictionPref = prefs.getBoolean(KMManager.getLanguagePredictionPreferenceKey(KMManager.currentLexicalModel.get(KMManager.KMKey_LanguageID)), true);
       }
-      kmKeyboard.setCurrentBanner((isModelActive && modelPredictionPref) ?
-        KMKeyboard.KM_BANNER_STATE_SUGGESTION : KMKeyboard.KM_BANNER_STATE_IMAGE);
+      kmKeyboard.setBanner((isModelActive && modelPredictionPref) ?
+        KMManager.BannerType.SUGGESTION : KMManager.BannerType.IMAGE);
       RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();
       kmKeyboard.setLayoutParams(params);
     } else if (url.indexOf("suggestPopup") >= 0) {

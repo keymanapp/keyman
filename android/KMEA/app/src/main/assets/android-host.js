@@ -63,12 +63,17 @@ function showBanner(flag) {
   }
 }
 
-// Set KMW banner to bannerType:
+// If KeymanWeb banner currently blank, set to bannerType
 // @param type 'blank' | 'image' | 'suggestion' - A plain-text string
 //             representing the type of Banner to set active.
 function setBanner(bannerType) {
-  if (keyman.osk) {
-    keyman.osk.bannerController.setBanner(bannerType);
+  if (keyman.osk && keyman.osk.bannerController) {
+    window.console.log('setBanner: current KMW banner is: ' + keyman.osk.bannerController.activeType);
+    if (keyman.osk.bannerController.activeType == 'blank') {
+      keyman.osk.bannerController.setBanner(bannerType);
+    }
+  } else {
+    window.console.log('Not overriding banner');
   }
 }
 
