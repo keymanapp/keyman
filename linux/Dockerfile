@@ -40,8 +40,8 @@ RUN curl -sL https://deb.nodesource.com/setup_18.x | bash && \
 RUN cd /usr/share && \
   git clone https://github.com/emscripten-core/emsdk.git && \
   cd emsdk && \
-  ./emsdk install latest && \
-  ./emsdk activate latest && \
+  ./emsdk install 3.1.44 && \
+  ./emsdk activate 3.1.44 && \
   echo "#!/bin/bash" > /usr/bin/bashwrapper && \
   echo "export EMSCRIPTEN_BASE=/usr/share/emsdk/upstream/emscripten" >> /usr/bin/bashwrapper
 

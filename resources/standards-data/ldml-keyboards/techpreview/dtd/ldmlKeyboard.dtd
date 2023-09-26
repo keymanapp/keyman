@@ -6,17 +6,14 @@ CLDR data files are interpreted according to the LDML specification (http://unic
 -->
 <!-- Important Note:
 
-The CLDR Keyboard Workgroup is currently developing major changes to the
-CLDR keyboard specification.
-
-This DTD is a work in progress.
-
-Please see https://cldr.unicode.org/index/keyboard-workgroup for the latest information. -->
+The CLDR Keyboard Subcommittee is currently developing major changes to the CLDR keyboard specification.
+Please view the subcommittee page for the most recent information.
+<https://cldr.unicode.org/index/keyboard-workgroup> -->
 
 <!ELEMENT keyboard ( import*, locales?, version?, info?, names, settings?, vkeys?, displays?, keys?, layers*, variables?, transforms*, special* ) >
     <!--@TECHPREVIEW-->
 <!ATTLIST keyboard locale CDATA #REQUIRED >
-    <!--@MATCH:validity/bcp47-->
+    <!--@MATCH:validity/bcp47-wellformed-->
 <!ATTLIST keyboard conformsTo (techpreview) #REQUIRED >
     <!--@MATCH:any-->
     <!--@METADATA-->
@@ -33,16 +30,16 @@ Please see https://cldr.unicode.org/index/keyboard-workgroup for the latest info
 <!ELEMENT locale EMPTY >
     <!--@TECHPREVIEW-->
 <!ATTLIST locale id CDATA #REQUIRED >
-    <!--@MATCH:validity/bcp47-->
+    <!--@MATCH:validity/bcp47-wellformed-->
     <!--@VALUE-->
 
 <!ELEMENT version EMPTY >
     <!--@TECHPREVIEW-->
 <!ATTLIST version number CDATA #IMPLIED >
-    <!-- Note: post techpreview, change cldrVersion to MATCH:version -->
     <!--@MATCH:semver-->
     <!--@VALUE-->
 <!ATTLIST version cldrVersion CDATA #FIXED "techpreview" >
+    <!-- Note: post techpreview, change cldrVersion to MATCH:version -->
     <!--@MATCH:any-->
     <!--@METADATA-->
 
@@ -96,7 +93,9 @@ Please see https://cldr.unicode.org/index/keyboard-workgroup for the latest info
 
 <!ELEMENT display EMPTY >
     <!--@TECHPREVIEW-->
-<!ATTLIST display to CDATA #REQUIRED >
+<!ATTLIST display id CDATA #IMPLIED >
+    <!--@MATCH:regex/[A-Za-z0-9][A-Za-z0-9-]*-->
+<!ATTLIST display to CDATA #IMPLIED >
     <!--@MATCH:any-->
     <!--@ALLOWS_UESC-->
 <!ATTLIST display display CDATA #REQUIRED >
@@ -171,9 +170,9 @@ Please see https://cldr.unicode.org/index/keyboard-workgroup for the latest info
 <!ELEMENT layer ( row+, special* ) >
     <!--@TECHPREVIEW-->
 <!ATTLIST layer id NMTOKEN #IMPLIED >
-    <!--@MATCH:any-->
+    <!--@MATCH:regex/[A-Za-z0-9][A-Za-z0-9-]*-->
 <!ATTLIST layer modifier NMTOKENS #IMPLIED >
-    <!--@MATCH:any-->
+    <!--@MATCH:regex/(none|([A-Za-z0-9]+)( [A-Za-z0-9]+)*)-->
 
 <!ELEMENT row EMPTY >
     <!--@ORDERED-->
