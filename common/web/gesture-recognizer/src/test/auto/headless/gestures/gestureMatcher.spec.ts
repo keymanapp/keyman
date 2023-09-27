@@ -10,7 +10,7 @@ import { InputSample, GestureSource, gestures } from '@keymanapp/gesture-recogni
 import { TouchpathTurtle } from '#tools';
 import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
 
-import { simulateMultiSourceInput } from "../../../resources/simulateMultiSourceInput.js";
+import { simulateMultiSourceMatcherInput } from "../../../resources/simulateMultiSourceInput.js";
 
 import {
   LongpressModel,
@@ -76,7 +76,7 @@ describe("GestureMatcher", function() {
         sources,
         modelMatcherPromise,
         executor
-      } = simulateMultiSourceInput([
+      } = simulateMultiSourceMatcherInput([
         { type: 'sequence', samples: turtle.path, terminate: true }
       ], this.fakeClock, LongpressModel);
 
@@ -144,7 +144,7 @@ describe("GestureMatcher", function() {
         sources,
         modelMatcherPromise,
         executor
-      } = simulateMultiSourceInput([
+      } = simulateMultiSourceMatcherInput([
         { type: 'sequence', samples: turtle.path, terminate: true }
       ], this.fakeClock, LongpressModel);
 
@@ -207,7 +207,7 @@ describe("GestureMatcher", function() {
         sources,
         modelMatcherPromise,
         executor
-      } = simulateMultiSourceInput([
+      } = simulateMultiSourceMatcherInput([
         { type: 'sequence', samples: turtle.path, terminate: true }
       ], this.fakeClock, LongpressModel);
 
@@ -254,7 +254,7 @@ describe("GestureMatcher", function() {
         sources,
         modelMatcherPromise,
         executor
-      } = simulateMultiSourceInput([
+      } = simulateMultiSourceMatcherInput([
         { type: 'sequence', samples: turtle.path, terminate: true }
       ], this.fakeClock, LongpressModel);
 
@@ -324,7 +324,7 @@ describe("GestureMatcher", function() {
         sources,
         modelMatcherPromise,
         executor
-      } = simulateMultiSourceInput([
+      } = simulateMultiSourceMatcherInput([
         { type: 'sequence', samples: turtle.path, terminate: false }
       ], this.fakeClock, LongpressModel);
 
@@ -363,7 +363,7 @@ describe("GestureMatcher", function() {
         sources,
         modelMatcherPromise,
         executor
-      } = simulateMultiSourceInput([
+      } = simulateMultiSourceMatcherInput([
         { type: 'sequence', samples: turtle.path, terminate: false }
       ], this.fakeClock, LongpressModel);
 
@@ -410,7 +410,7 @@ describe("GestureMatcher", function() {
         sources,
         modelMatcherPromise,
         executor
-      } = simulateMultiSourceInput([
+      } = simulateMultiSourceMatcherInput([
         { type: 'sequence', samples: turtle.path, terminate: false }
       ], this.fakeClock, LongpressModel);
 
@@ -444,7 +444,7 @@ describe("GestureMatcher", function() {
         sources,
         modelMatcherPromise,
         executor
-      } = simulateMultiSourceInput([{type: 'sequence', samples: turtle.path, terminate: false}], this.fakeClock, MultitapModel);
+      } = simulateMultiSourceMatcherInput([{type: 'sequence', samples: turtle.path, terminate: false}], this.fakeClock, MultitapModel);
 
       await executor();
       const modelMatcher = await modelMatcherPromise;
@@ -468,7 +468,7 @@ describe("GestureMatcher", function() {
         sources,
         modelMatcherPromise,
         executor
-      } = simulateMultiSourceInput([
+      } = simulateMultiSourceMatcherInput([
         {
           type: 'timer',
           lastSample: {
@@ -497,7 +497,7 @@ describe("GestureMatcher", function() {
         sources,
         modelMatcherPromise,
         executor
-      } = simulateMultiSourceInput([
+      } = simulateMultiSourceMatcherInput([
         {
           type: 'timer',
           lastSample: {
@@ -531,7 +531,7 @@ describe("GestureMatcher", function() {
         sources,
         modelMatcherPromise,
         executor
-      } = simulateMultiSourceInput([
+      } = simulateMultiSourceMatcherInput([
         {
           type: 'timer',
           lastSample: {
@@ -567,7 +567,7 @@ describe("GestureMatcher", function() {
         sources,
         modelMatcherPromise,
         executor
-      } = simulateMultiSourceInput([
+      } = simulateMultiSourceMatcherInput([
         {
           type: 'timer',
           lastSample: {
@@ -618,7 +618,7 @@ describe("GestureMatcher", function() {
         sources,
         modelMatcherPromise,
         executor
-      } = simulateMultiSourceInput([
+      } = simulateMultiSourceMatcherInput([
         {
           type: 'timer',
           lastSample: {
@@ -667,7 +667,7 @@ describe("GestureMatcher", function() {
         sources,
         modelMatcherPromise,
         executor
-      } = simulateMultiSourceInput([{type: 'sequence', samples: turtle.path, terminate: true}], this.fakeClock, SimpleTapModel);
+      } = simulateMultiSourceMatcherInput([{type: 'sequence', samples: turtle.path, terminate: true}], this.fakeClock, SimpleTapModel);
 
       await executor();
       const modelMatcher = await modelMatcherPromise;
@@ -707,7 +707,7 @@ describe("GestureMatcher", function() {
         sources,
         modelMatcherPromise,
         executor
-      } = simulateMultiSourceInput([{
+      } = simulateMultiSourceMatcherInput([{
         type: 'sequence', samples: turtle1.path, terminate: false,
       }, {
         type: 'sequence', samples: turtle2.path, terminate: false
@@ -743,7 +743,7 @@ describe("GestureMatcher", function() {
         sources,
         modelMatcherPromise,
         executor
-      } = simulateMultiSourceInput([
+      } = simulateMultiSourceMatcherInput([
         { type: 'sequence', samples: turtle.path, terminate: true }
       ], this.fakeClock, LongpressModel);
 
@@ -792,7 +792,7 @@ describe("GestureMatcher", function() {
         sources,
         modelMatcherPromise,
         executor
-      } = simulateMultiSourceInput([
+      } = simulateMultiSourceMatcherInput([
         { type: 'sequence', samples: turtle.path, terminate: false }
       ], this.fakeClock, LongpressModel);
 
@@ -846,7 +846,7 @@ describe("GestureMatcher", function() {
         sources,
         modelMatcherPromise,
         executor
-      } = simulateMultiSourceInput([
+      } = simulateMultiSourceMatcherInput([
         { type: 'sequence', samples: turtle.path, terminate: false }
       ], this.fakeClock, LongpressModel);
 

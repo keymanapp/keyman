@@ -1,7 +1,9 @@
 import { InputSample, GestureSource, gestures } from '@keymanapp/gesture-recognizer';
 import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
+import { GestureSourceSubview } from '../../../build/obj/headless/gestureSource.js';
 
 type GestureMatcher<Type> = gestures.matchers.GestureMatcher<Type>;
+type GestureModel<Type> = gestures.specs.GestureModel<Type>;
 
 interface SimSpecSequence<Type> {
   type: 'sequence',
@@ -9,10 +11,20 @@ interface SimSpecSequence<Type> {
   terminate: boolean
 }
 
+interface SimSpecPriorMatch<Type> {
+  type: 'prior-matcher',
+  matcher: GestureMatcher<Type>,
+  continuation: SimSpecSequence<Type>[]
+}
+
 interface SimSpecTimer<Type> {
   type: 'timer',
   lastSample: InputSample<Type>
 }
+
+type SimSpec<Type> = SimSpecSequence<Type> | SimSpecPriorMatch<Type>;
+
+type SimInitialSpec<Type> = SimSpec<Type> | SimSpecTimer<Type>;
 
 interface MockedPredecessor<Type> {
   comparisonStandard: {
@@ -45,88 +57,200 @@ function mockedPredecessor<Type>(
   };
 }
 
-export function simulateMultiSourceInput<Type>(
-  sequences: (SimSpecTimer<Type> | SimSpecSequence<Type>)[],
-  fakeClock: sinon.SinonFakeTimers,
-  modelSpec: gestures.specs.GestureModel<Type>
+interface SimulationConfig<Type, SourceType> {
+  construction: (source: GestureSource<SourceType> | GestureMatcher<SourceType>) => Type;
+  addSource: (obj: Type, source: GestureSource<SourceType> | GestureMatcher<SourceType>) => void;
+  update: (obj: Type) => void;
+}
+
+let simSourceIdSeed = 0;
+
+function prepareSourcesFromPriorMatcher<Type>(
+  contactSpec: SimSpecPriorMatch<Type>
+): ReturnType<typeof prepareSimContact<Type>> {
+  const spec = contactSpec;
+  const existingSources = spec.matcher.pathMatchers.map((pathMatch) => {
+    const src = pathMatch.source;
+    return src instanceof GestureSourceSubview<Type> ? src.baseSource : src;
+  });
+
+  const sequences = spec.continuation;
+  const predecessor = spec.matcher;
+
+  return {
+    sourceSpecs: existingSources.map((src, index) => {
+      return {
+        source: src,
+        sequence: sequences ? sequences[index] : null
+      };
+    }),
+    testObjParam: Promise.resolve(predecessor),
+  };
+}
+
+function prepareSourceForTimer<Type> (
+  timerSpec: SimSpecTimer<Type>,
+  startTime: number
+): ReturnType<typeof prepareSimContact<Type>> {
+  const simpleSource = new GestureSource<Type>(simSourceIdSeed++, true);
+
+  const promise = timedPromise(startTime).then(() => {
+    // We're simulating a previously-completed contact point's path..
+    // Preserve the supposed 'last sample' from that previous contact point.
+    simpleSource.update(timerSpec.lastSample);
+    simpleSource.terminate(false);
+
+    return mockedPredecessor(timerSpec.lastSample) as any as GestureMatcher<Type>;
+  });
+
+
+  return {
+    sourceSpecs: [
+      {
+        source: simpleSource,
+        sequence: null
+      }
+    ],
+    testObjParam: promise,
+  };
+}
+
+function prepareSourceForRawSequence<Type>(
+  contactSpec: SimSpecSequence<Type>,
+  startTime: number
+): ReturnType<typeof prepareSimContact<Type>> {
+  const simpleSource = new GestureSource<Type>(simSourceIdSeed++, true);
+
+  const promise = timedPromise(startTime).then(() => {
+    if(startTime != 0) {
+      // Acceptance of new contact points requires an existing sample.
+      simpleSource.update(contactSpec.samples[0]);
+    }
+
+    return simpleSource;
+  });
+
+  const adjustedSpec = {...contactSpec};
+  adjustedSpec.samples = [].concat(contactSpec.samples);
+
+  // Acceptance of new contact points requires an existing sample.
+  // So, we've already processed the first sample; prune it and leave the rest for later.
+  //
+  // We do this early to ensure new paths appear before updates to already-existing sources
+  // occur for the same timestamp.
+  if(startTime != 0) {
+    adjustedSpec.samples.splice(0, 1);
+  }
+
+  return {
+    sourceSpecs: [
+      {
+        source: simpleSource,
+        sequence: contactSpec
+      }
+    ],
+    testObjParam: promise,
+  };
+}
+
+function prepareSimContact<Type>(
+  contactSpec: SimSpec<Type> | SimInitialSpec<Type>,
+  startTime: number
+): {
+  sourceSpecs: {
+    source: GestureSource<Type>,
+    sequence: SimSpecSequence<Type>
+  }[],
+  testObjParam: Promise<GestureMatcher<Type> | GestureSource<Type>>,
+} {
+  switch(contactSpec.type) {
+    case 'prior-matcher':
+      return prepareSourcesFromPriorMatcher(contactSpec);
+    case 'timer':
+      return prepareSourceForTimer(contactSpec, startTime);
+    case 'sequence':
+      return prepareSourceForRawSequence(contactSpec, startTime);
+    default:
+      // TS infers `contactSpec.type` to 'never' if we try to include that in the error below without the cast.
+      throw new Error(`Unexpected type specified in simulation spec for tests: ${(contactSpec as any).type}`)
+  }
+}
+
+function getSimComponentInitialTime<Type>(
+  componentSpec: (SimSpec<Type> | SimInitialSpec<Type>)
+) {
+  switch(componentSpec.type) {
+    case 'prior-matcher':
+      // All path-updates are time-synchronized - all sources would report the same timestamp.
+      return componentSpec.matcher.pathMatchers[0].source.currentSample.t;
+    case 'timer':
+      return componentSpec.lastSample.t;
+    case 'sequence':
+      return componentSpec.samples[0].t;
+  }
+}
+
+// The main simulation-driver function.
+function simulateMultiSourceInput<OutputType, Type>(
+  config: SimulationConfig<OutputType, Type>,
+  specs: [SimInitialSpec<Type>, ...Array<SimSpec<Type>>],
+  fakeClock: sinon.SinonFakeTimers
   ): {
     sources: GestureSource<Type>[],
-    modelMatcherPromise: Promise<gestures.matchers.GestureMatcher<Type>>,
+    testObjPromise: Promise<OutputType>,
     executor: () => Promise<void>
   } {
-
-  if(sequences.length == 0) {
-    return;
+  if(specs.length == 0) {
+    throw new Error("Must specify comonents for simulation");
   }
 
-  const firstEntry = sequences[0];
-  const startTimestamp = firstEntry.type == 'timer' ? firstEntry.lastSample.t : firstEntry.samples[0].t;
+  const testObjPromise = new ManagedPromise<OutputType>();
+
   // Expectation (that should probably be an assertion) - the first entry in the input should hold the
   // earliest timestamp.
+  const startTimestamp = getSimComponentInitialTime(specs[0]);
+  const processedSetup = specs.map((entry) => prepareSimContact(entry, getSimComponentInitialTime(entry) - startTimestamp));
+  processedSetup[0].testObjParam.then((param) => {
+    try {
+      const testObj = config.construction(param);
+      testObjPromise.resolve(testObj);
+    } catch(err) {
+      testObjPromise.reject(err);
+    }
+  });
+
+  for(let i=1; i < processedSetup.length; i++) {
+    const sourceToAppend = processedSetup[i].testObjParam;
+    testObjPromise.then(async (testObj) => config.addSource(testObj, await sourceToAppend));
+  }
+
+  // -------
+
+  let flattenedSpecs = processedSetup.map(
+    (entry) => entry.sourceSpecs
+  ).reduce((constructingArray, entries) => constructingArray.concat(entries), []);
+
+  const contacts = flattenedSpecs.map((entry) => entry.source);
+  const sequences = flattenedSpecs.map((entry) => entry.sequence);
 
   let allPromises: Promise<void>[] = [];
-
-  let contacts: GestureSource<Type>[] = [];
-  let modelMatcher: gestures.matchers.GestureMatcher<Type>;
-  let modelMatcherPromise = new ManagedPromise<gestures.matchers.GestureMatcher<Type>>();
-
-  // Build Promises for these first; that way, new contacts are connected before any new samples
-  // for already-existing touchpaths are observed, facilitating synchronization of coordinate
-  // sample updates.
-  //
-  // We do accept the _first_ coordinate for a sample, as this is necessary for accepting
-  // new contact points for some gesture types (such as multitap).  Previously-existing touchpaths
-  // will gain their corresponding update in a Promise created later, thus coming second.
-  // (If it came first, that update would be desynced with the initial sample for the new path.)
-  for(let i = 0; i < sequences.length; i++) {
-    const simpleSource = new GestureSource<Type>(i, true);
-    contacts.push(simpleSource);
-    let entry = sequences[i];
-
-    if(i == 0) {
-      timedPromise(0).then(() => {
-        let predecessor: GestureMatcher<Type> = null;
-        if(entry.type == 'timer') {
-          // We're simulating a previously-completed contact point's path..
-          // Preserve the supposed 'last sample' from that previous contact point.
-          simpleSource.update(entry.lastSample);
-          simpleSource.terminate(false);
-
-          predecessor = mockedPredecessor(entry.lastSample) as any as GestureMatcher<Type>;
-        }
-
-        // The final parameter mocks a previous match attempt for the same ComplexGestureSource.
-        modelMatcher = new gestures.matchers.GestureMatcher<Type>(modelSpec, predecessor || simpleSource);
-        modelMatcherPromise.resolve(modelMatcher);
-      });
-    } else {
-      if(entry.type != 'sequence') {
-        throw new Error("Only the first entry for complex gesture input simulation may be a timer.");
-      } else {
-        timedPromise(entry.samples[0].t - startTimestamp).then(() => {
-          // Acceptance of new contact points requires an existing sample.
-          simpleSource.update((entry as SimSpecSequence<Type>).samples[0]);
-          modelMatcher.addContact(simpleSource);
-        });
-      }
-    }
-  }
 
   // Now that touchpath-creation Promises are registered first, we can start adding in the updates for
   // already-existing sequences.  Any gesture-management updates based on path will check for timestamp
   // synchronization across all constituent paths / tracked contact points.  (Having the 'new contacts'
   // registered first is necessary for including them in the synchronization check.)
   for(let i = 0; i < sequences.length; i++) {
-    const sequenceSpec = sequences[i];
-    if(sequenceSpec.type != 'sequence') {
+    if(!sequences[i]) {
       continue;
     }
 
+    const sequenceSpec = sequences[i] as SimSpecSequence<Type>;
     const simpleSource = contacts[i];
 
     const sequence = sequenceSpec.samples;
     const sequencePromises = sequence.map((sample) => {
       return timedPromise(sample.t - startTimestamp).then(async () => {
+        const testObj = await testObjPromise;
         // We already committed the sample early, to facilitate new contact-point acceptance,
         // so we skip re-adding it here.  We DO allow all other update functionality to
         // proceed as normal, though.
@@ -135,7 +259,7 @@ export function simulateMultiSourceInput<Type>(
         }
 
         // Includes the synchronization check.
-        modelMatcher.update();
+        config.update(testObj);
 
         // All path updates for synchronization have Promises predating this one.
         // This ensures those are all processed before we move on to default handling of the path
@@ -145,7 +269,7 @@ export function simulateMultiSourceInput<Type>(
         if((sequenceSpec.terminate ?? true) && sample == sequence[sequence.length-1]) {
           if(!simpleSource.isPathComplete) {
             simpleSource.terminate(false);
-            modelMatcher.update();
+            config.update(testObj);
           }
         }
       });
@@ -165,7 +289,43 @@ export function simulateMultiSourceInput<Type>(
 
   return {
     sources: contacts,
-    modelMatcherPromise: modelMatcherPromise.corePromise,
+    testObjPromise: testObjPromise.corePromise,
     executor: executor
   }
+}
+
+// And now, finally, for the `export`ed functions from this script file.
+
+export function simulateMultiSourceMatcherInput<Type>(
+  sequences: [SimSpecTimer<Type> | SimSpecSequence<Type>, ...Array<SimSpecSequence<Type>>],
+  fakeClock: sinon.SinonFakeTimers,
+  modelSpec: gestures.specs.GestureModel<Type>
+): {
+    sources: GestureSource<Type>[],
+    modelMatcherPromise: Promise<gestures.matchers.GestureMatcher<Type>>,
+    executor: () => Promise<void>
+  } {
+  const config: SimulationConfig<GestureMatcher<Type>, Type> = {
+    construction: (source) => new gestures.matchers.GestureMatcher<Type>(modelSpec, source),
+    addSource: (obj, source) => {
+      if(source instanceof GestureSource<Type>) {
+        obj.addContact(source)
+      } else {
+        throw new Error("Error in internal sim-engine configuration");
+      }
+    },
+    update: (obj) => obj.update()
+  }
+
+  const {
+    sources,
+    testObjPromise,
+    executor
+  } = simulateMultiSourceInput(config, sequences, fakeClock);
+
+  return {
+    sources,
+    modelMatcherPromise: testObjPromise,
+    executor
+  };
 }
