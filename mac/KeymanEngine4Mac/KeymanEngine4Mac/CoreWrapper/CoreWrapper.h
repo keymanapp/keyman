@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic, readonly) NSString *keyboardId;
 @property (strong, nonatomic, readonly) NSString *keyboardVersion;
-@property (strong, nonatomic) NSString *context;
+//@property (strong, nonatomic) NSString *context;
 
 -(instancetype)initWithHelper:(CoreHelper*)helper kmxFilePath:(nullable NSString*)path;
 -(BOOL)setOptionsForCore: (NSString *) key value:(NSString *) value;
@@ -27,7 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 -(NSArray*)processMacVirtualKey:(unsigned short)macKeyCode
               withModifiers:(NSEventModifierFlags)modifierState
                 withKeyDown:(BOOL)isKeyDown;
--(void)setCoreContext:(NSString*)context;
+-(void)setContext:(NSString*)context;
+-(NSString*)context;
 -(void)clearCoreContext;
 -(void)dealloc;
 

@@ -39,10 +39,6 @@
   return self;
 }
 
--(NSString*)context {
-  return [self getContextAsStringUsingCore];
-}
-
 -(void)clearCoreContext {
   [self clearContextUsingCore];
 }
@@ -303,7 +299,7 @@
   km_kbp_context_clear(coreContext);
 }
 
--(void)setCoreContext:(NSString*)context {
+-(void)setContext:(NSString*)context {
   if (context.length == 0) {
     [self clearContextUsingCore];
   } else {
@@ -320,6 +316,11 @@
     // dispose
     km_kbp_context_items_dispose(contextItemArray);
   }
+}
+
+
+-(NSString*)context {
+  return [self getContextAsStringUsingCore];
 }
 
 //TODO: create and save as static
