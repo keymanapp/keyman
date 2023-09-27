@@ -5,13 +5,13 @@ import { CumulativePathStats } from "./cumulativePathStats.js";
 /**
  * Documents the expected typing of serialized versions of the `GesturePath` class.
  */
-export type SerializedGesturePath<Type> = {
-  coords: InputSample<Type>[]; // ensures type match with public class property.
+export type SerializedGesturePath<Type, StateToken> = {
+  coords: InputSample<Type, StateToken>[]; // ensures type match with public class property.
   wasCancelled?: boolean;
 }
 
-interface EventMap<Type> {
-  'step': (sample: InputSample<Type>) => void,
+interface EventMap<Type, StateToken> {
+  'step': (sample: InputSample<Type, StateToken>) => void,
   'complete': () => void,
   'invalidated': () => void
 }
@@ -42,8 +42,8 @@ interface EventMap<Type> {
  *     the most recently-preceding 'segmentation' event.
  *     - And possibly recognition Promise fulfillment.
  */
-export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
-  private samples: InputSample<Type>[] = [];
+export class GesturePath<Type, StateToken = any> extends EventEmitter<EventMap<Type, StateToken>> {
+  private samples: InputSample<Type, StateToken>[] = [];
 
   private _isComplete: boolean = false;
   private _wasCancelled?: boolean;
@@ -64,8 +64,8 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
     this._stats = new CumulativePathStats();
   }
 
-  public clone(): GesturePath<Type> {
-    const instance = new GesturePath<Type>();
+  public clone(): GesturePath<Type, StateToken> {
+    const instance = new GesturePath<Type, StateToken>();
     instance.samples = [].concat(this.samples);
     instance._isComplete = this._isComplete;
     instance._wasCancelled = this._wasCancelled;
@@ -78,10 +78,10 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
    * Deserializes a GesturePath instance from its corresponding JSON.parse() object.
    * @param jsonObj
    */
-  static deserialize<Type>(jsonObj: SerializedGesturePath<Type>): GesturePath<Type> {
-    const instance = new GesturePath<Type>();
+  static deserialize<Type, StateToken>(jsonObj: SerializedGesturePath<Type, StateToken>): GesturePath<Type, StateToken> {
+    const instance = new GesturePath<Type, StateToken>();
 
-    instance.samples = [].concat(jsonObj.coords.map((obj) => ({...obj} as InputSample<Type>)));
+    instance.samples = [].concat(jsonObj.coords.map((obj) => ({...obj} as InputSample<Type, StateToken>)));
     instance._isComplete = true;
     instance._wasCancelled = jsonObj.wasCancelled;
 
@@ -107,7 +107,7 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
    * Extends the path with a newly-observed coordinate.
    * @param sample
    */
-  extend(sample: InputSample<Type>) {
+  extend(sample: InputSample<Type, StateToken>) {
     /* c8 ignore next 3 */
     if(this._isComplete) {
       throw new Error("Invalid state:  this GesturePath has already terminated.");
@@ -149,7 +149,7 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
    * Returns all coordinate + timestamp pairings observed for the corresponding
    * touchpoint's path over its lifetime thus far.
    */
-  public get coords(): readonly InputSample<Type>[] {
+  public get coords(): readonly InputSample<Type, StateToken>[] {
     return this.samples;
   }
 
@@ -158,7 +158,7 @@ export class GesturePath<Type> extends EventEmitter<EventMap<Type>> {
    * `JSON.stringify`.
    */
   toJSON() {
-    let jsonClone: SerializedGesturePath<Type> = {
+    let jsonClone: SerializedGesturePath<Type, StateToken> = {
       // Replicate array and its entries, but with certain fields of each entry missing.
       // No .clientX, no .clientY.
       coords: [].concat(this.samples.map((obj) => ({

@@ -4,10 +4,10 @@ import { InputSample } from "./headless/inputSample.js";
 import { Nonoptional } from "./nonoptional.js";
 import { GestureSource } from "./headless/gestureSource.js";
 
-export abstract class InputEventEngine<HoveredItemType> extends InputEngineBase<HoveredItemType> {
-  protected readonly config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>;
+export abstract class InputEventEngine<HoveredItemType, StateToken> extends InputEngineBase<HoveredItemType, StateToken> {
+  protected readonly config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>;
 
-  public constructor(config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>) {
+  public constructor(config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>) {
     super();
     this.config = config;
   }
@@ -15,14 +15,15 @@ export abstract class InputEventEngine<HoveredItemType> extends InputEngineBase<
   abstract registerEventHandlers(): void;
   abstract unregisterEventHandlers(): void;
 
-  protected buildSampleFor(clientX: number, clientY: number, target: EventTarget, timestamp: number): InputSample<HoveredItemType> {
+  protected buildSampleFor(clientX: number, clientY: number, target: EventTarget, timestamp: number, stateToken: StateToken): InputSample<HoveredItemType, StateToken> {
     const targetRect = this.config.targetRoot.getBoundingClientRect();
-    const sample: InputSample<HoveredItemType> = {
+    const sample: InputSample<HoveredItemType, StateToken> = {
       clientX: clientX,
       clientY: clientY,
       targetX: clientX - targetRect.left,
       targetY: clientY - targetRect.top,
-      t: timestamp
+      t: timestamp,
+      stateToken: stateToken
     };
 
     const hoveredItem = this.config.itemIdentifier(sample, target);
@@ -31,7 +32,7 @@ export abstract class InputEventEngine<HoveredItemType> extends InputEngineBase<
     return sample;
   }
 
-  protected onInputStart(identifier: number, sample: InputSample<HoveredItemType>, target: EventTarget, isFromTouch: boolean) {
+  protected onInputStart(identifier: number, sample: InputSample<HoveredItemType, StateToken>, target: EventTarget, isFromTouch: boolean) {
     const touchpoint = new GestureSource<HoveredItemType>(identifier, this.config, isFromTouch);
     touchpoint.update(sample);
 
@@ -50,7 +51,7 @@ export abstract class InputEventEngine<HoveredItemType> extends InputEngineBase<
     this.emit('pointstart', touchpoint);
   }
 
-  protected onInputMove(identifier: number, sample: InputSample<HoveredItemType>, target: EventTarget) {
+  protected onInputMove(identifier: number, sample: InputSample<HoveredItemType, StateToken>, target: EventTarget) {
     const activePoint = this.getTouchpointWithId(identifier);
     if(!activePoint) {
       return;
@@ -59,7 +60,7 @@ export abstract class InputEventEngine<HoveredItemType> extends InputEngineBase<
     activePoint.update(sample);
   }
 
-  protected onInputMoveCancel(identifier: number, sample: InputSample<HoveredItemType>, target: EventTarget) {
+  protected onInputMoveCancel(identifier: number, sample: InputSample<HoveredItemType, StateToken>, target: EventTarget) {
     const touchpoint = this.getTouchpointWithId(identifier);
     if(!touchpoint) {
       return;
@@ -76,7 +77,7 @@ export abstract class InputEventEngine<HoveredItemType> extends InputEngineBase<
     }
 
     const lastEntry = touchpoint.path.coords[touchpoint.path.coords.length-1];
-    const sample = this.buildSampleFor(lastEntry.clientX, lastEntry.clientY, target, lastEntry.t);
+    const sample = this.buildSampleFor(lastEntry.clientX, lastEntry.clientY, target, lastEntry.t, lastEntry.stateToken);
 
     /* While an 'end' event immediately follows a 'move' if it occurred simultaneously,
      * this is decidedly _not_ the case if the touchpoint was held for a while without

@@ -4,14 +4,14 @@ import { InputSample } from "./headless/inputSample.js";
 import { Nonoptional } from "./nonoptional.js";
 import { ZoneBoundaryChecker } from "./configuration/zoneBoundaryChecker.js";
 
-export class TouchEventEngine<HoveredItemType> extends InputEventEngine<HoveredItemType> {
+export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEventEngine<HoveredItemType, StateToken> {
   private readonly _touchStart: typeof TouchEventEngine.prototype.onTouchStart;
   private readonly _touchMove:  typeof TouchEventEngine.prototype.onTouchMove;
   private readonly _touchEnd:   typeof TouchEventEngine.prototype.onTouchEnd;
 
   private safeBoundMaskMap: {[id: number]: number} = {};
 
-  public constructor(config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>) {
+  public constructor(config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>) {
     super(config);
 
     // We use this approach, rather than .bind, because _this_ version allows hook
@@ -24,15 +24,6 @@ export class TouchEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
   private get eventRoot(): HTMLElement {
     return this.config.touchEventRoot;
   }
-
-  // public static forVisualKeyboard(vkbd: VisualKeyboard) {
-  //   let config: GestureRecognizerConfiguration = {
-  //     targetRoot: vkbd.element,
-  //     eventRoot: vkbd.element,
-  //   };
-
-  //   return new TouchEventEngine(config);
-  // }
 
   // public static forPredictiveBanner(banner: SuggestionBanner, handlerRoot: SuggestionManager) {
   //   const config: GestureRecognizerConfiguration = {
@@ -79,7 +70,9 @@ export class TouchEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
   }
 
   private buildSampleFromTouch(touch: Touch, timestamp: number) {
-    return this.buildSampleFor(touch.clientX, touch.clientY, touch.target, timestamp);
+    // WILL be null for newly-starting `GestureSource`s / contact points.
+    const source = this.getTouchpointWithId(touch.identifier);
+    return this.buildSampleFor(touch.clientX, touch.clientY, touch.target, timestamp, source?.stateToken ?? this.stateToken);
   }
 
   onTouchStart(event: TouchEvent) {

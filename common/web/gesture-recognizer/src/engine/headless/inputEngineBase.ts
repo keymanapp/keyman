@@ -1,12 +1,12 @@
 import EventEmitter from "eventemitter3";
 import { GestureSource } from "./gestureSource.js";
 
-interface EventMap<HoveredItemType> {
+interface EventMap<HoveredItemType, StateToken> {
   /**
    * Indicates that a new, ongoing touchpoint or mouse interaction has begun.
    * @param input The instance that tracks all future updates over the lifetime of the touchpoint / mouse interaction.
    */
-  'pointstart': (input: GestureSource<HoveredItemType>) => void;
+  'pointstart': (input: GestureSource<HoveredItemType, StateToken>) => void;
 
   // // idea for line below: to help multitouch gestures keep touchpaths in sync, rather than updated separately
   // 'eventcomplete': () => void;
@@ -17,8 +17,10 @@ interface EventMap<HoveredItemType> {
  * gesture recognition as it is either generated (in the DOM) or replayed during automated tests
  * (headlessly).
  */
-export abstract class InputEngineBase<HoveredItemType> extends EventEmitter<EventMap<HoveredItemType>> {
+export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends EventEmitter<EventMap<HoveredItemType, StateToken>> {
   private _activeTouchpoints: GestureSource<HoveredItemType>[] = [];
+
+  public stateToken: StateToken;
 
   /**
    * @param identifier The identifier number corresponding to the input sequence.
@@ -43,11 +45,15 @@ export abstract class InputEngineBase<HoveredItemType> extends EventEmitter<Even
     return this.getTouchpointWithId(identifier).currentRecognizerConfig;
   }
 
+  protected getStateTokenForId(identifier: number) {
+    return this.getTouchpointWithId(identifier).stateToken ?? null;
+  }
+
   public dropTouchpointWithId(identifier: number) {
     this._activeTouchpoints = this._activeTouchpoints.filter((point) => point.rawIdentifier != identifier);
   }
 
-  protected addTouchpoint(touchpoint: GestureSource<HoveredItemType>) {
+  protected addTouchpoint(touchpoint: GestureSource<HoveredItemType, StateToken>) {
     this._activeTouchpoints.push(touchpoint);
   }
 }

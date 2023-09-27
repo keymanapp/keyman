@@ -24,8 +24,8 @@ interface EventMap<HoveredItemType> {
  * Of particular note: when a gesture involves multiple touchpoints - like a multitap - this class
  * is responsible for linking related touchpoints together for the detection of that gesture.
  */
-export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMap<HoveredItemType>> {
-  private inputEngines: InputEngineBase<HoveredItemType>[];
+export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends EventEmitter<EventMap<HoveredItemType>> {
+  private inputEngines: InputEngineBase<HoveredItemType, StateToken>[];
   private selectorStack: MatcherSelector<HoveredItemType>[] = [new MatcherSelector()];
 
   private gestureModelDefinitions: GestureModelDefs<HoveredItemType>;
@@ -33,7 +33,9 @@ export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMa
   private _activeSources: GestureSource<HoveredItemType>[] = [];
   private _activeGestures: GestureSequence<HoveredItemType>[] = [];
 
-  public constructor(gestureModelDefinitions: GestureModelDefs<HoveredItemType>, inputEngines?: InputEngineBase<HoveredItemType>[]) {
+  private _stateToken: StateToken;
+
+  public constructor(gestureModelDefinitions: GestureModelDefs<HoveredItemType>, inputEngines?: InputEngineBase<HoveredItemType, StateToken>[]) {
     super();
 
     this.gestureModelDefinitions = gestureModelDefinitions;
@@ -68,7 +70,7 @@ export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMa
     return this.selectorStack[this.selectorStack.length-1];
   }
 
-  protected addEngine(engine: InputEngineBase<HoveredItemType>) {
+  protected addEngine(engine: InputEngineBase<HoveredItemType, StateToken>) {
     engine.on('pointstart', this.onNewTrackedPath);
     this.inputEngines.push(engine);
   }
@@ -117,6 +119,21 @@ export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMa
 
   public get activeGestures(): GestureSequence<HoveredItemType>[] {
     return [].concat(this._activeGestures);
+  }
+
+  /**
+   * The current 'state token' to be set for newly-starting gestures for use by gesture-recognizer
+   * consumers, their item-identifier lookup functions, and their gesture model definitions.
+   *
+   * Use of this feature is intended to be strictly optional and only used in scenarios where
+   * the recognizer's consumer needs some sort of system-state to be associated with ongoing gestures.
+   */
+  public get stateToken(): StateToken {
+    return this._stateToken;
+  }
+
+  public set stateToken(token: StateToken) {
+    this._stateToken = token;
   }
 
   private addSimpleSourceHooks(touchpoint: GestureSource<HoveredItemType>) {

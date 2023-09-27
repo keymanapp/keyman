@@ -5,13 +5,13 @@ import { TouchEventEngine } from "./touchEventEngine.js";
 import { TouchpointCoordinator } from "./headless/touchpointCoordinator.js";
 import { EMPTY_GESTURE_DEFS, GestureModelDefs } from "./headless/gestures/specs/index.js";
 
-export class GestureRecognizer<HoveredItemType> extends TouchpointCoordinator<HoveredItemType> {
-  public readonly config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>;
+export class GestureRecognizer<HoveredItemType, StateToken = any> extends TouchpointCoordinator<HoveredItemType, StateToken> {
+  public readonly config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>;
 
   private readonly mouseEngine: MouseEventEngine<HoveredItemType>;
   private readonly touchEngine: TouchEventEngine<HoveredItemType>;
 
-  public constructor(gestureModelDefinitions: GestureModelDefs<HoveredItemType>, config: GestureRecognizerConfiguration<HoveredItemType>) {
+  public constructor(gestureModelDefinitions: GestureModelDefs<HoveredItemType>, config: GestureRecognizerConfiguration<HoveredItemType, StateToken>) {
     const preprocessedConfig = preprocessRecognizerConfig(config);
 
     // Possibly just a stop-gap measure... but this provides an empty gesture-spec set definition

@@ -4,7 +4,7 @@ import { InputSample } from "./headless/inputSample.js";
 import { Nonoptional } from "./nonoptional.js";
 import { ZoneBoundaryChecker } from "./configuration/zoneBoundaryChecker.js";
 
-export class MouseEventEngine<HoveredItemType> extends InputEventEngine<HoveredItemType> {
+export class MouseEventEngine<HoveredItemType, StateToken = any> extends InputEventEngine<HoveredItemType, StateToken> {
   private readonly _mouseStart: typeof MouseEventEngine.prototype.onMouseStart;
   private readonly _mouseMove:  typeof MouseEventEngine.prototype.onMouseMove;
   private readonly _mouseEnd:   typeof MouseEventEngine.prototype.onMouseEnd;
@@ -14,7 +14,7 @@ export class MouseEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
 
   private static IDENTIFIER_SEED: number;
 
-  public constructor(config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>) {
+  public constructor(config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>) {
     super(config);
 
     // We use this approach, rather than .bind, because _this_ version allows hook
@@ -39,17 +39,6 @@ export class MouseEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
   private get activeIdentifier(): number {
     return MouseEventEngine.IDENTIFIER_SEED-1;
   }
-
-  // public static forVisualKeyboard(vkbd: VisualKeyboard) {
-  //   const config: GestureRecognizerConfiguration = {
-  //     targetRoot: vkbd.element,
-  //     // document.body is the event root b/c we need to track the mouse if it leaves
-  //     // the VisualKeyboard's hierarchy.
-  //     eventRoot: document.body,
-  //   };
-
-  //   return new MouseEventEngine(config);
-  // }
 
   // public static forPredictiveBanner(banner: SuggestionBanner, handlerRoot: SuggestionManager) {
   //   const config: GestureRecognizerConfiguration = {
@@ -88,8 +77,10 @@ export class MouseEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
     }
   }
 
-  private buildSampleFromEvent(event: MouseEvent) {
-    return this.buildSampleFor(event.clientX, event.clientY, event.target, performance.now());
+  private buildSampleFromEvent(event: MouseEvent, identifier: number) {
+    // WILL be null for newly-starting `GestureSource`s / contact points.
+    const source = this.getTouchpointWithId(identifier);
+    return this.buildSampleFor(event.clientX, event.clientY, event.target, performance.now(), source?.stateToken ?? this.stateToken);
   }
 
   onMouseStart(event: MouseEvent) {
@@ -101,7 +92,8 @@ export class MouseEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
 
     this.preventPropagation(event);
 
-    const sample = this.buildSampleFromEvent(event);
+    const identifier = this.generateIdentifier();
+    const sample = this.buildSampleFromEvent(event, identifier);
 
     if(!ZoneBoundaryChecker.inputStartOutOfBoundsCheck(sample, this.config)) {
       // If we started very close to a safe zone border, remember which one(s).
@@ -109,7 +101,7 @@ export class MouseEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
       this.disabledSafeBounds = ZoneBoundaryChecker.inputStartSafeBoundProximityCheck(sample, this.config);
     }
 
-    this.onInputStart(this.generateIdentifier(), sample, event.target, false);
+    this.onInputStart(identifier, sample, event.target, false);
   }
 
   onMouseMove(event: MouseEvent) {
@@ -117,7 +109,7 @@ export class MouseEventEngine<HoveredItemType> extends InputEventEngine<HoveredI
       return;
     }
 
-    const sample = this.buildSampleFromEvent(event);
+    const sample = this.buildSampleFromEvent(event, this.activeIdentifier);
 
     if(!event.buttons) {
       if(this.hasActiveClick) {

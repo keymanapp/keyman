@@ -9,7 +9,7 @@ import { PaddedZoneSource } from "./paddedZoneSource.js";
 import { RecognitionZoneSource } from "./recognitionZoneSource.js";
 
 // For example, customization of a longpress timer's length need not be readonly.
-export interface GestureRecognizerConfiguration<HoveredItemType> {
+export interface GestureRecognizerConfiguration<HoveredItemType, StateToken = any> {
   /**
    * Specifies the element that mouse input listeners should be attached to.  If
    * not specified, `eventRoot` will be set equal to `targetRoot`.
@@ -80,17 +80,23 @@ export interface GestureRecognizerConfiguration<HoveredItemType> {
    * For applications in the DOM, simply returning `target` itself may be sufficient.
    * @param coord   The current touchpath coordinate; its .targetX and .targetY values should be
    *                interpreted as offsets from `targetRoot`.
+   *
+   *                Its `stateToken` will match the most recently set value for its corresponding
+   *                `GestureSource` if continuing one; otherwise, it'll use the one currently set
+   *                at the gesture-engine level.
    * @param target  The `EventTarget` (`Node` or `Element`) provided by the corresponding input event.
    * @returns
    */
-  readonly itemIdentifier?: (coord: Omit<InputSample<any>, 'item'>, target: EventTarget) => HoveredItemType;
+  readonly itemIdentifier?: (coord: Omit<InputSample<any, StateToken>, 'item'>, target: EventTarget) => HoveredItemType;
 }
 
-export function preprocessRecognizerConfig<HoveredItemType>(
-  config: GestureRecognizerConfiguration<HoveredItemType>
-): Nonoptional<GestureRecognizerConfiguration<HoveredItemType>> {
+export function preprocessRecognizerConfig<HoveredItemType, StateToken = any>(
+  config: GestureRecognizerConfiguration<HoveredItemType, StateToken>
+): Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>> {
   // Allows configuration pre-processing during this method.
-  let processingConfig: Mutable<Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>> = {...config} as Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>;
+  let processingConfig: Mutable<Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>> = {...config} as
+    Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>;
+
   processingConfig.mouseEventRoot = processingConfig.mouseEventRoot ?? processingConfig.targetRoot;
   processingConfig.touchEventRoot = processingConfig.touchEventRoot ?? processingConfig.targetRoot;
 
