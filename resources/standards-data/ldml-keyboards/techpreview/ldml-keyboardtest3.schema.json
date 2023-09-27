@@ -176,7 +176,7 @@
     }
   },
   "properties": {
-    "keyboardTest": {
+    "keyboardTest3": {
       "additionalProperties": false,
       "properties": {
         "conformsTo": {
@@ -214,8 +214,8 @@
     }
   },
   "required": [
-    "keyboardTest"
+    "keyboardTest3"
   ],
-  "title": "techpreview/dtd/ldmlKeyboardTest.xsd",
+  "title": "techpreview/dtd/ldmlKeyboardTest3.xsd",
   "type": "object"
 }

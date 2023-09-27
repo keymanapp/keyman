@@ -22,7 +22,7 @@ export class LayrCompiler extends SectionCompiler {
     let totalLayerCount = 0;
     let hardwareLayers = 0;
     // let touchLayers = 0;
-    this.keyboard.layers?.forEach((layers) => {
+    this.keyboard3.layers?.forEach((layers) => {
       const { form } = layers;
       if (form === 'touch') {
         // touchLayers++;
@@ -62,7 +62,7 @@ export class LayrCompiler extends SectionCompiler {
   public compile(sections: DependencySections): Layr {
     const sect = new Layr();
 
-    sect.lists = this.keyboard.layers.map((layers) => {
+    sect.lists = this.keyboard3.layers.map((layers) => {
       const hardware = constants.layr_list_hardware_map.get(layers.form);
       // Already validated in validate
       const list: LayrList = {

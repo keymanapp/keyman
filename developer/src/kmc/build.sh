@@ -133,6 +133,10 @@ fi
 if builder_start_action publish; then
   . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
+  # To ensure that we cache the top-level package.json, we must call this before
+  # the global publish
+  builder_publish_cleanup
+
   # For now, kmc will have responsibility for publishing keyman-version and
   # common-types, as well as all the other dependent modules. In the future, we
   # should probably have a top-level npm publish script that publishes all
@@ -143,14 +147,20 @@ if builder_start_action publish; then
 
   # Finally, publish kmc
   builder_publish_to_npm
+  builder_publish_cleanup
   builder_finish_action success publish
 elif builder_start_action pack; then
   . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+
+  # To ensure that we cache the top-level package.json, we must call this before
+  # the global pack
+  builder_publish_cleanup
 
   for package in "${PACKAGES[@]}"; do
     "$KEYMAN_ROOT/$package/build.sh" pack $DRY_RUN
   done
 
   builder_publish_to_pack
+  builder_publish_cleanup
   builder_finish_action success pack
 fi
