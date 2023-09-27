@@ -290,10 +290,17 @@ ibus_keyman_list_engines (void)
     return engines;
 }
 
+void
+add_engine(gpointer data, gpointer user_data) {
+  IBusEngineDesc *desc     = IBUS_ENGINE_DESC(data);
+  IBusComponent *component = IBUS_COMPONENT(user_data);
+  ibus_component_add_engine(component, desc);
+}
+
 IBusComponent *
 ibus_keyman_get_component (void)
 {
-    GList *engines, *p;
+    GList *engines;
     IBusComponent *component;
 
     component = ibus_component_new ("org.freedesktop.IBus.Keyman",
@@ -306,12 +313,9 @@ ibus_keyman_get_component (void)
                                     "ibus-keyman");
 
     engines = ibus_keyman_list_engines ();
-
-    for (p = engines; p != NULL; p = p->next) {
-        ibus_component_add_engine (component, (IBusEngineDesc *) p->data);
-    }
-
+    g_list_foreach(engines, add_engine, component);
     g_list_free (engines);
+
     return component;
 }
 
@@ -331,8 +335,8 @@ keyman_get_options_fromdconf(gchar *package_id,
     g_message("keyman_get_options_fromdconf");
 
     // Obtain keyboard options from DConf
-    gchar *path = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_PATH, package_id, keyboard_id);
-    GSettings *child_settings = g_settings_new_with_path(KEYMAN_CHILD_DCONF_NAME, path);
+    gchar *path = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_OPTIONS_PATH, package_id, keyboard_id);
+    GSettings *child_settings = g_settings_new_with_path(KEYMAN_DCONF_OPTIONS_CHILD_NAME, path);
     gchar **options = NULL;
     if (child_settings != NULL)
     {
@@ -452,8 +456,8 @@ keyman_put_options_todconf(gchar *package_id,
     }
 
     // Write to DConf
-    gchar *path = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_PATH, package_id, keyboard_id);
-    GSettings *child_settings = g_settings_new_with_path(KEYMAN_CHILD_DCONF_NAME, path);
+    gchar *path = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_OPTIONS_PATH, package_id, keyboard_id);
+    GSettings *child_settings = g_settings_new_with_path(KEYMAN_DCONF_OPTIONS_CHILD_NAME, path);
     if (child_settings != NULL)
     {
         g_message("writing keyboard options to DConf");

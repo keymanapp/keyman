@@ -13,7 +13,7 @@ export class LdmlKeyboardVisualKeyboardCompiler {
     result.header.ansiFont = {...VisualKeyboard.DEFAULT_KVK_FONT};
     result.header.unicodeFont = {...VisualKeyboard.DEFAULT_KVK_FONT};
 
-    for(let layers of source.keyboard.layers) {
+    for(let layers of source.keyboard3.layers) {
       for(let layer of layers.layer) {
         this.compileHardwareLayer(source, result, layer);
       }
@@ -38,7 +38,7 @@ export class LdmlKeyboardVisualKeyboardCompiler {
       for(let key of keys) {
         x++;
 
-        let keydef = source.keyboard.keys?.key?.find(x => x.id == key);
+        let keydef = source.keyboard3.keys?.key?.find(x => x.id == key);
 
         if (!keydef) {
           throw Error(`Internal Error: could not find key id="${key}" in layer "${layer.id || '<none>'}", row "${y}"`);

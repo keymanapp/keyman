@@ -213,8 +213,8 @@ export class GestureSourceSubview<HoveredItemType> extends GestureSource<Hovered
     let start = 0;
     let length = source.path.coords.length;
     if(source instanceof GestureSourceSubview) {
-      const expectedLength = source._baseStartIndex + source.path.coords.length;
       start = source._baseStartIndex;
+      const expectedLength = start + length;
       // Check against the full remaining length of the original source; does
       // the subview provided to us include its source's most recent point?
       const sampleCountSinceStart = source.baseSource.path.coords.length;
@@ -256,8 +256,7 @@ export class GestureSourceSubview<HoveredItemType> extends GestureSource<Hovered
 
     subpath = new GesturePath<HoveredItemType>();
     for(let i=0; i < length; i++) {
-      const index = start + i;
-      subpath.extend(translateSample(baseSource.path.coords[index]));
+      subpath.extend(translateSample(baseSource.path.coords[start + i]));
     }
 
     this._path = subpath;

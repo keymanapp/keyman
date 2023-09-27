@@ -90,9 +90,6 @@ export class CompilerMessages {
 
   static Error_InvalidHardware = (o:{form: string}) => m(this.ERROR_InvalidHardware,
     `layers has invalid value form=${o.form}`);
-  /**
-   * Note: may not hit this due to XML validation.
-   */
   static ERROR_InvalidHardware = SevError | 0x0013;
 
   static Error_InvalidModifier = (o:{layer: string, modifier: string}) => m(this.ERROR_InvalidModifier,

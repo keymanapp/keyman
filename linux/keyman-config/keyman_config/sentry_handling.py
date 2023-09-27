@@ -5,6 +5,7 @@ import logging
 import os
 import platform
 import sys
+import traceback
 from keyman_config.version import (
   __version__,
   __versionwithtag__,
@@ -47,7 +48,7 @@ class SentryErrorHandling:
             return (True, '')
 
     def is_sentry_enabled(self):
-        if 'unittest' in sys.modules.keys():
+        if self._is_unit_test():
             return (False, 'Running unit tests, not reporting to Sentry')
         elif self._get_environ_nosentry():
             return (False, 'Not reporting to Sentry because KEYMAN_NOSENTRY environment variable set')
@@ -74,6 +75,14 @@ class SentryErrorHandling:
     def _get_environ_nosentry(self):
         keyman_nosentry = os.environ.get('KEYMAN_NOSENTRY')
         return keyman_nosentry and (int(keyman_nosentry) == 1)
+
+    def _is_unit_test(self):  # sourcery skip: use-any, use-next
+        # The suggested refactorings (using any() or next()) don't work
+        # when testing on Ubuntu 20.04
+        for line in traceback.format_stack():
+            if '/unittest/' in line:
+                return True
+        return False
 
     def _handle_enabled(self, enabled):
         if enabled:

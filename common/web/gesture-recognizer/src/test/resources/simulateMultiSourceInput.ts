@@ -33,7 +33,7 @@ interface MockedPredecessor<Type> {
     sample: InputSample<Type>,
     baseItem: Type
   },
-  sources: GestureSource<Type>[], // FIX ME.
+  sources: GestureSource<Type>[],
   _result: {
     action: {
       item: Type

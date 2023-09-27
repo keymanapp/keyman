@@ -8,7 +8,6 @@ import { WebviewConfiguration, WebviewInitOptionDefaults, WebviewInitOptionSpec 
 import ContextManager from './contextManager.js';
 import PassthroughKeyboard from './passthroughKeyboard.js';
 import { buildEmbeddedGestureConfig, setupEmbeddedListeners } from './oskConfiguration.js';
-import { SubkeyDelegator } from './osk/subkeyDelegator.js';
 
 export default class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, ContextManager, PassthroughKeyboard> {
   // Ideally, we would be able to auto-detect `sourceUri`: https://stackoverflow.com/a/60244278.
@@ -93,53 +92,6 @@ export default class KeymanEngine extends KeymanEngineBase<WebviewConfiguration,
   };
 
   /**
-   * Function called by Android and iOS when a device-implemented keyboard popup
-   * is displayed or hidden.  As this is controlled by the app, we use it as a
-   * trigger for 'embedded'-mode gesture state management.
-   *
-   *  @param  {boolean}  isVisible
-   *
-   **/
-  popupVisible(isVisible) {
-    const osk = this.osk;
-    if(!osk || !osk.vkbd) {
-      return;
-    }
-
-    let gesture = osk.vkbd.subkeyGesture as SubkeyDelegator;
-    let pendingLongpress = osk.vkbd.pendingSubkey;
-
-    /*
-    * If a longpress popup was visible, but is no longer, this means that the
-    * associated longpress gesture was cancelled.  It is possible for the base
-    * key to emit if selected at this time; detection of this is managed by
-    * the `SubkeyDelegator` class.
-    */
-    if(!isVisible) {
-      if(gesture) {
-        gesture.resolve(null);
-        osk.vkbd.subkeyGesture = null;
-      } else if(pendingLongpress) {
-        pendingLongpress.cancel();
-        osk.vkbd.pendingSubkey = null;
-      }
-    }
-
-    /*
-    * If the popup was not visible, but now is, that means our previously-pending
-    * longpress is now 'realized' (complete).  The OSK relies upon this state
-    * information, which will be properly updated by `resolve`.
-    *
-    * Prominent uses of such state info helps prevent change of base key, key
-    * previews, and key output from occurring while a subkey popup remains active.
-    */
-    if(isVisible && pendingLongpress) {
-      // Fulfills the first-stage promise.
-      pendingLongpress.resolve();
-    }
-  };
-
-  /**
    *  Return position of language menu key to KeymanTouch
    *
    *  @return  {string}      comma-separated x,y,w,h of language menu key
@@ -185,47 +137,6 @@ export default class KeymanEngine extends KeymanEngineBase<WebviewConfiguration,
   hideGlobeHint() {
     this.osk?.vkbd?.globeHint?.hide(this.osk.vkbd.currentLayer.globeKey.btn);
   }
-
-  /**
-   *  Accept an external key ID (from KeymanTouch) and pass to the keyboard mapping
-   *
-   *  @param  {string}  keyName   key identifier which could contain a display layer and a "functional" layer
-   *                              e.g: 'shift-K_E+rightalt-shift'
-   **/
-  executePopupKey(keyName: string) {
-    const vkbd = this.osk?.vkbd;
-    let origArg = keyName;
-    if(!this.contextManager.activeKeyboard || !vkbd) {
-      return false;
-    }
-
-    /* Clear any pending (non-popup) key */
-    vkbd.keyPending = null;
-
-    // Changes for Build 353 to resolve KMEI popup key issues
-    keyName=keyName.replace('popup-',''); //remove popup prefix if present (unlikely)
-
-    // Regex for 'display layer'-'virtual key name'+'optional functional layer'
-    // Can't just split on '-' because some layers like ctrl-shift contain it.
-    // Virtual key name starts with T_, K_, or U_
-    // matches[1]: displayLayer (not used)
-    // matches[2]: keyId
-    // matches[3]: optional functionalLayer
-    let matches = keyName.match(/^(.+)-([TKU]_[^+]+)\+?(.+)?$/);
-    if (matches == null) {
-      return false;
-    }
-    keyName = matches[2] + (matches[3] ? '+' + matches[3] : '');
-
-    // This should be set if we're within this method... but it's best to guard against nulls here, just in case.
-    if(vkbd.subkeyGesture) {
-      let gesture = vkbd.subkeyGesture as SubkeyDelegator;
-      gesture.resolve(keyName);
-      vkbd.subkeyGesture = null;
-    } else {
-      console.warn("No base key exists for the subkey being executed: '" + origArg + "'");
-    }
-  };
 
   // Properties set by the WebView hosting page
   beepKeyboard?: () => void = null;

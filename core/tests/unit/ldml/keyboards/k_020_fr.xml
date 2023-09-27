@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Note: similar to, but slightly ahead of, fr-t-k0-azerty -->
-<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="fr-t-k0-azerty" conformsTo="techpreview">
+<!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="fr-t-k0-azerty" conformsTo="techpreview">
 	<locales>
 		<locale id="br" /> <!-- example of including Breton -->
 	</locales>
@@ -195,4 +195,4 @@
     </transformGroup>
 	</transforms>
 
-</keyboard>
+</keyboard3>
