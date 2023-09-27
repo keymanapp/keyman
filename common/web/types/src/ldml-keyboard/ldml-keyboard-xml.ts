@@ -11,7 +11,7 @@ export interface LDMLKeyboardXMLSourceFile {
   /**
    * <keyboard> -- the root element.
    */
-  keyboard: LKKeyboard;
+  keyboard3: LKKeyboard;
 }
 
 export interface LKKeyboard {

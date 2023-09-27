@@ -5,6 +5,19 @@ import { GestureModel, GestureResolution, GestureResolutionSpec, RejectionDefaul
 import { ManagedPromise, TimeoutPromise } from "@keymanapp/web-utils";
 import { FulfillmentCause, PathMatcher } from "./pathMatcher.js";
 
+/**
+ * This interface specifies the minimal data necessary for setting up gesture-selection
+ * among a set of gesture models that will conceptually follow from the most
+ * recently-matched gesture-model.  The most standard implementation of this is the
+ * `GestureMatcher` class.
+ *
+ * Up until very recently, KeymanWeb would delegate certain gestures to be handled by
+ * host apps when it was in an embedded state.  While that pattern has been dropped,
+ * the abstraction gained from reaching compatibility with it is useful.  Either way,
+ * for such scenarios, as long as fulfilled gestures can be linked to an implementation
+ * of this interface, they can be integrated into the gesture-sequence staging system -
+ * even if not matched directly by the recognizer itself.
+ */
 export interface PredecessorMatch<Type> {
   readonly sources: GestureSource<Type>[];
   readonly allSourceIds: string[];
@@ -19,7 +32,7 @@ export interface MatchResult<Type> {
   readonly action: GestureResolution<Type>
 }
 
-export interface MatchResultSpec<Type> {
+export interface MatchResultSpec {
   readonly matched: boolean,
   readonly action: GestureResolutionSpec
 }

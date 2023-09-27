@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE keyboardTest SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest.dtd">
-<keyboardTest conformsTo="techpreview">
+<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest3.dtd">
+<keyboardTest3 conformsTo="techpreview">
   <info keyboard="k_007_transform_rgx.xml" author="Team Keyboard" name="marker" />
   <tests name="regex-tests">
     <test name="regex-test-basic">
@@ -21,4 +21,4 @@
       <check result="ayy" />
     </test>
   </tests>
-</keyboardTest>
+</keyboardTest3>

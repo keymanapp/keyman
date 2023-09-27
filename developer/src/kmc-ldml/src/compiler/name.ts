@@ -13,13 +13,13 @@ export class NameCompiler extends SectionCompiler {
 
   public validate(): boolean {
     let valid = true;
-    valid = (this.keyboard.names?.name?.length ?? 0) > 0;
+    valid = (this.keyboard3.names?.name?.length ?? 0) > 0;
     return valid;
   }
 
   public compile(sections: DependencySections): Name {
     let result = new Name();
-    result.names = this.keyboard.names?.name?.map(v => sections.strs.allocString(v.value)) ?? [];
+    result.names = this.keyboard3.names?.name?.map(v => sections.strs.allocString(v.value)) ?? [];
     return result;
   }
 }
