@@ -178,6 +178,12 @@ export class BannerController {
     imagePath: ""
   }
 
+  // Default to black image banner for Android
+  public static readonly DEFAULT_ANDROID_OPTIONS: BannerOptions = {
+    alwaysShow: true,
+    imagePath: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAARCAIAAABM7ytaAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAVSURBVDhPYxgFo2AUjIJRQDpgYAAABT8AAcEGbxwAAAAASUVORK5CYII="
+  }
+
   constructor(bannerView: BannerView, hostDevice: DeviceSpec, predictionContext?: PredictionContext) {
     // Step 1 - establish the container element.  Must come before this.setOptions.
     this.hostDevice = hostDevice;
@@ -186,7 +192,9 @@ export class BannerController {
 
     // Initialize with the default options - any 'manually set' options come post-construction.
     // This will also automatically set the default banner in place.
-    this.setOptions(BannerController.DEFAULT_OPTIONS);
+    this.setOptions(
+      this.hostDevice.OS != DeviceSpec.OperatingSystem.Android ? 
+      BannerController.DEFAULT_OPTIONS : BannerController.DEFAULT_ANDROID_OPTIONS);
   }
 
   /**
