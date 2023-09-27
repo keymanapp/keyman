@@ -15,13 +15,15 @@ import {
   LayoutKey
 } from '@keymanapp/keyboard-processor';
 
+import {
+  GestureRecognizer,
+  GestureRecognizerConfiguration
+} from '@keymanapp/gesture-recognizer';
+
 import { createStyleSheet, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
 
 import GlobeHint from './globehint.interface.js';
 import InputEventCoordinate from './input/inputEventCoordinate.js';
-import InputEventEngine, { InputEventEngineConfig } from './input/event-interpreter/inputEventEngine.js';
-import MouseEventEngine from './input/event-interpreter/mouseEventEngine.js';
-import TouchEventEngine from './input/event-interpreter/touchEventEngine.js';
 import KeyboardView from './components/keyboardView.interface.js';
 import { type KeyElement, getKeyFrom } from './keyElement.js';
 import KeyTip from './keytip.interface.js';
@@ -37,6 +39,8 @@ import InternalSubkeyPopup from './input/gestures/browser/subkeyPopup.js';
 import InternalPendingLongpress from './input/gestures/browser/pendingLongpress.js';
 import InternalKeyTip from './input/gestures/browser/keytip.js';
 import CommonConfiguration from './config/commonConfiguration.js';
+
+import { modelSetForKeyboard } from './input/gestures/specsForKeyboard.js';
 
 import { getViewportScale } from './screenUtils.js';
 
@@ -97,6 +101,14 @@ interface EventMap {
 }
 
 export default class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardView {
+  /**
+   * The gesture-engine used to support user interaction with this keyboard.
+   *
+   * Note: `stateToken` should match a layer id from this.layoutKeyboard; this helps to
+   * prevent issue #7173.
+   */
+  readonly gestureEngine: GestureRecognizer<KeyElement, string>;
+
   // Legacy alias, maintaining a reference for code built against older
   // versions of KMW.
   static readonly specialCharacters = OSKKey.specialCharacters;
@@ -114,8 +126,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   private _layerId: string = "default";
   layerIndex: number = 0; // the index of the default layer
   readonly isRTL: boolean;
-
-  inputEngine: InputEventEngine;
 
   readonly isStatic: boolean = false;
   _fixedWidthScaling:  boolean = false;
@@ -198,6 +208,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       throw new Error(`Keyboard ${this.layoutKeyboard.id} does not have a layer with id ${value}`);
     } else {
       this._layerId = value;
+      this.gestureEngine.stateToken = value;
     }
 
     if(changedLayer) {
@@ -302,12 +313,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // For 'live' touch keyboards, attach touch-based event handling.
     // Needs to occur AFTER this.kbdDiv is initialized.
     if (!this.isStatic) {
-      if (this.hostDevice.touchable) {
-        this.inputEngine = this.touchInputConfiguration;
-      } else {
-        this.inputEngine = this.mouseInputConfiguration;
-      }
-      this.inputEngine.registerEventHandlers();
+      this.gestureEngine = this.constructGestureEngine();
     }
 
     Lkbd.classList.add(config.device.formFactor, 'kmw-osk-inner-frame');
@@ -326,34 +332,19 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     this.element.classList.add(kbdClassSuffix);
   }
 
-  private get mouseInputConfiguration() {
-    const config: InputEventEngineConfig = {
+  private constructGestureEngine(): GestureRecognizer<KeyElement, string> {
+    const config: GestureRecognizerConfiguration<KeyElement, string> = {
       targetRoot: this.element,
-      // document.body is the event root b/c we need to track the mouse if it leaves
-      // the VisualKeyboard's hierarchy.
-      eventRoot: document.body,
-      inputStartHandler: this.touch.bind(this),
-      inputMoveHandler: this.moveOver.bind(this),
-      inputMoveCancelHandler: this.moveCancel.bind(this),
-      inputEndHandler: this.release.bind(this),
-      coordConstrainedWithinInteractiveBounds: this.detectWithinInteractiveBounds.bind(this)
+      // document.body is the event root for mouse interactions b/c we need to track
+      // when the mouse leaves the VisualKeyboard's hierarchy.
+      mouseEventRoot: document.body,
+      // touchEventRoot:  this.element, // is the default,
+      // TODO:  properly define as a class field/method?
+      itemIdentifier: (sample, target) => {
+        return null;
+      }
     };
-
-    return new MouseEventEngine(config);
-  }
-
-  private get touchInputConfiguration() {
-    let config: InputEventEngineConfig = {
-      targetRoot: this.element,
-      eventRoot: this.element,
-      inputStartHandler: this.touch.bind(this),
-      inputMoveHandler: this.moveOver.bind(this),
-      inputMoveCancelHandler: this.moveCancel.bind(this),
-      inputEndHandler: this.release.bind(this),
-      coordConstrainedWithinInteractiveBounds: this.detectWithinInteractiveBounds.bind(this)
-    };
-
-    return new TouchEventEngine(config);
+    return new GestureRecognizer(modelSetForKeyboard(this.layoutKeyboard), config);
   }
 
   public get element(): HTMLDivElement {
@@ -1921,8 +1912,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       this.styleSheet.parentNode.removeChild(this.styleSheet);
     }
 
-    if(this.inputEngine) {
-      this.inputEngine.unregisterEventHandlers();
+    if(this.gestureEngine) {
+      this.gestureEngine.destroy();
     }
 
     if(this.deleting) {
