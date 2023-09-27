@@ -43,11 +43,7 @@
   return [self getContextAsStringUsingCore];
 }
 
--(void)setContext:(NSString*)newValue {
-  [self setContextUsingCore:newValue];
-}
-
--(void)clearContext {
+-(void)clearCoreContext {
   [self clearContextUsingCore];
 }
 -(void)changeKeyboardWithKmxFilePath:(NSString*) path {
@@ -307,7 +303,7 @@
   km_kbp_context_clear(coreContext);
 }
 
--(void)setContextUsingCore:(NSString*)context {
+-(void)setCoreContext:(NSString*)context {
   if (context.length == 0) {
     [self clearContextUsingCore];
   } else {

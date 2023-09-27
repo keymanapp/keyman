@@ -94,6 +94,10 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
   return self.keymanCore.context;
 }
 
+- (void)clearCoreContext {
+  [self.keymanCore clearCoreContext];
+}
+
 - (void)setCoreContext:(NSString *)context {
   [self.keymanCore setContext:context];
 }
