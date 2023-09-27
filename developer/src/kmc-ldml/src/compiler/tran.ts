@@ -41,7 +41,7 @@ export class TransformCompiler<T extends TransformCompilerType, TranBase extends
     const reportMessage = this.callbacks.reportMessage.bind(this.callbacks);
 
     let valid = true;
-    const transforms = this?.keyboard?.transforms;
+    const transforms = this?.keyboard3?.transforms;
     if (transforms) {
       const types : string[] = transforms.map(({type}) => type);
       if (!verifyValidAndUnique(types,
@@ -167,7 +167,7 @@ export class TransformCompiler<T extends TransformCompilerType, TranBase extends
   }
 
   public compile(sections: DependencySections): TranBase {
-    for(let t of this.keyboard.transforms) {
+    for(let t of this.keyboard3.transforms) {
       if(t.type == this.type) {
         // compile only the transforms of the correct type
         return this.compileTransforms(sections, t);
