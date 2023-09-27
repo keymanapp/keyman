@@ -3,11 +3,11 @@ import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 
 /* istanbul ignore next */
 export class SectionCompiler {
-  protected readonly keyboard: LDMLKeyboard.LKKeyboard;
+  protected readonly keyboard3: LDMLKeyboard.LKKeyboard;
   protected readonly callbacks: CompilerCallbacks;
 
   constructor(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
-    this.keyboard = source.keyboard;
+    this.keyboard3 = source.keyboard3;
     this.callbacks = callbacks;
   }
 

@@ -490,7 +490,7 @@ div.android div.kmw-keytip-cap {
 .tablet.ios #kmw-popup-keys .kmw-key{border:none;}
 .phone.ios  #kmw-popup-keys .kmw-key{border:none;}
 
-.phone.android #kmw-popup-keys {border:none; border-radius: 2px; background-color:#ccc; padding:5px 5px 0 0;}
+.phone.android #kmw-popup-keys {border:none; border-radius: 2px; background-color:#333333; padding:5px 5px 0 0;}
 .tablet.android #kmw-popup-keys {border:1px solid #eee; border-radius: 3px; background-color:#888; padding:8px 12px 4px 4px;}
 
 @media (prefers-color-scheme: dark) {

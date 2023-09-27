@@ -119,7 +119,7 @@ jobs:
         path: artifacts
 
     - name: Build
-      uses: sillsdev/gha-ubuntu-packaging@4f3a013ec28f4defc2b3d6ecb04c98815cd9de25 # v0.9
+      uses: sillsdev/gha-ubuntu-packaging@1f4b7e7eacb8c82a4d874ee2c371b9bfef7e16ea # v1.0
       with:
         dist: "${{ matrix.dist }}"
         platform: "${{ matrix.arch }}"
