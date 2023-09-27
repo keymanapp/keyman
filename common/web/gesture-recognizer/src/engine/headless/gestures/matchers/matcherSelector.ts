@@ -3,7 +3,7 @@ import EventEmitter from "eventemitter3";
 import { ManagedPromise } from "@keymanapp/web-utils";
 
 import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
-import { GestureMatcher, MatchResult } from "./gestureMatcher.js";
+import { GestureMatcher, MatchResult, PredecessorMatch } from "./gestureMatcher.js";
 import { GestureModel } from "../specs/gestureModel.js";
 
 interface GestureSourceTracker<Type> {
@@ -12,7 +12,7 @@ interface GestureSourceTracker<Type> {
 }
 
 export interface MatcherSelection<Type> {
-  matcher: GestureMatcher<Type>,
+  matcher: PredecessorMatch<Type>,
   result: MatchResult<Type>
 }
 
@@ -54,12 +54,12 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
    * @param gestureModelSet
    */
   public matchGesture(
-    priorStageMatcher: GestureMatcher<Type>,
+    priorStageMatcher: PredecessorMatch<Type>,
     gestureModelSet: GestureModel<Type>[]
   ): Promise<MatcherSelection<Type>>;
 
   public matchGesture(
-    source: GestureSource<Type> | GestureMatcher<Type>,
+    source: GestureSource<Type> | PredecessorMatch<Type>,
     gestureModelSet: GestureModel<Type>[]
   ): Promise<MatcherSelection<Type>> {
     /*
@@ -69,7 +69,7 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
     const sourceNotYetStaged = source instanceof GestureSource;
     const sources = sourceNotYetStaged
       ? [source.constructSubview(false, true)]
-      : source.pathMatchers.map((pathMatch) => pathMatch.source as GestureSourceSubview<Type>);
+      : source.sources as GestureSourceSubview<Type>[];
 
     const matchPromise = new ManagedPromise<MatcherSelection<Type>>();
 
@@ -181,7 +181,7 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
 
   private matchersForSource(source: GestureSource<Type>) {
     return this.potentialMatchers.filter((matcher) => {
-      return !!matcher.pathMatchers.find((pathMatch) => pathMatch.source == source)
+      return !!matcher.sources.find((src) => src == source)
     });
   }
 

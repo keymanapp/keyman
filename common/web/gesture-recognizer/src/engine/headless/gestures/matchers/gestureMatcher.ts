@@ -5,22 +5,49 @@ import { GestureModel, GestureResolution, GestureResolutionSpec, RejectionDefaul
 import { ManagedPromise, TimeoutPromise } from "@keymanapp/web-utils";
 import { FulfillmentCause, PathMatcher } from "./pathMatcher.js";
 
+/**
+ * This interface specifies the minimal data necessary for setting up gesture-selection
+ * among a set of gesture models that will conceptually follow from the most
+ * recently-matched gesture-model.  The most standard implementation of this is the
+ * `GestureMatcher` class.
+ *
+ * Up until very recently, KeymanWeb would delegate certain gestures to be handled by
+ * host apps when it was in an embedded state.  While that pattern has been dropped,
+ * the abstraction gained from reaching compatibility with it is useful.  Either way,
+ * for such scenarios, as long as fulfilled gestures can be linked to an implementation
+ * of this interface, they can be integrated into the gesture-sequence staging system -
+ * even if not matched directly by the recognizer itself.
+ */
+export interface PredecessorMatch<Type> {
+  readonly sources: GestureSource<Type>[];
+  readonly allSourceIds: string[];
+  readonly primaryPath: GestureSource<Type>;
+  readonly result: MatchResult<Type>;
+  readonly model?: GestureModel<Type>;
+  readonly baseItem: Type;
+}
+
 export interface MatchResult<Type> {
-  matched: boolean,
-  action: GestureResolution<Type>
+  readonly matched: boolean,
+  readonly action: GestureResolution<Type>
 }
 
 export interface MatchResultSpec {
-  matched: boolean,
-  action: GestureResolutionSpec
+  readonly matched: boolean,
+  readonly action: GestureResolutionSpec
 }
 
-export class GestureMatcher<Type> {
+export class GestureMatcher<Type> implements PredecessorMatch<Type> {
   private sustainTimerPromise?: TimeoutPromise;
   public readonly model: GestureModel<Type>;
 
-  public readonly pathMatchers: PathMatcher<Type>[];
-  private readonly predecessor?: GestureMatcher<Type>;
+  private readonly pathMatchers: PathMatcher<Type>[];
+
+  public get sources(): GestureSource<Type>[] {
+    return this.pathMatchers.map((pathMatch) => pathMatch.source);
+  }
+
+  private readonly predecessor?: PredecessorMatch<Type>;
 
   private readonly publishedPromise: ManagedPromise<MatchResult<Type>>; // unsure on the actual typing at the moment.
   private _result: MatchResult<Type>;
@@ -29,7 +56,7 @@ export class GestureMatcher<Type> {
     return this.publishedPromise.corePromise;
   }
 
-  constructor(model: GestureModel<Type>, sourceObj: GestureSource<Type> | GestureMatcher<Type>) {
+  constructor(model: GestureModel<Type>, sourceObj: GestureSource<Type> | PredecessorMatch<Type>) {
     /* c8 ignore next 5 */
     if(!model || !sourceObj) {
       throw new Error("Construction of GestureMatcher requires a gesture-model spec and a source for related contact points.");
@@ -58,7 +85,7 @@ export class GestureMatcher<Type> {
 
     const unfilteredSourceTouchpoints: GestureSource<Type>[] = source
       ? [ source ]
-      : predecessor.pathMatchers.map((matcher) => matcher.source);
+      : predecessor.sources;
 
     const sourceTouchpoints = unfilteredSourceTouchpoints.map((entry) => {
       return entry.isPathComplete ? null : entry;
@@ -167,10 +194,10 @@ export class GestureMatcher<Type> {
           resolutionItem = null;
           break;
         case 'base':
-          resolutionItem = this.comparisonStandard.baseItem;
+          resolutionItem = this.primaryPath.baseItem;
           break;
         case 'current':
-          resolutionItem = this.comparisonStandard.currentSample.item;
+          resolutionItem = this.primaryPath.currentSample.item;
           break;
       }
 
@@ -204,7 +231,7 @@ export class GestureMatcher<Type> {
    * If no matcher is active, but the currently-evaluating gesture has a direct ancestor, the best
    * matcher from the predecessor may be used instead.
    */
-  private get comparisonStandard(): GestureSource<Type> {
+  public get primaryPath(): GestureSource<Type> {
     let bestMatcher: PathMatcher<Type>;
     let highestPriority = Number.MIN_VALUE;
     for(let matcher of this.pathMatchers) {
@@ -220,18 +247,18 @@ export class GestureMatcher<Type> {
     // Here, the best answer is to use the 'comparisonPath' from the prior link; it'll contain
     // the path-samples we'd intuitively expect to use for comparison, after all.
     if(!bestMatcher && this.predecessor) {
-      return this.predecessor.comparisonStandard;
+      return this.predecessor.primaryPath;
     }
 
     return bestMatcher.source;
   }
 
   public get baseItem(): Type {
-    return this.comparisonStandard.baseItem;
+    return this.primaryPath.baseItem;
   }
 
   public get currentItem(): Type {
-    return this.comparisonStandard.currentSample.item;
+    return this.primaryPath.currentSample.item;
   }
 
   /*
@@ -268,7 +295,7 @@ export class GestureMatcher<Type> {
     let baseItem: Type = null;
     if(existingContacts) {
       // just use the highest-priority item source's base item and call it a day.
-      baseItem = this.comparisonStandard.baseItem;
+      baseItem = this.primaryPath.baseItem;
     } else if(this.predecessor && this.model.sustainTimer) {
       const baseItemMode = this.model.sustainTimer.baseItem ?? 'result';
 
@@ -277,16 +304,16 @@ export class GestureMatcher<Type> {
           baseItem = null;
           break;
         case 'base':
-          baseItem = this.predecessor.comparisonStandard.baseItem;
+          baseItem = this.predecessor.primaryPath.baseItem;
           break;
         case 'result':
-          baseItem = this.predecessor._result.action.item;
+          baseItem = this.predecessor.result.action.item;
           break;
       }
     }
 
     if(contactSpec.model.allowsInitialState) {
-      const initialStateCheck = contactSpec.model.allowsInitialState(simpleSource.currentSample, this.comparisonStandard.currentSample, baseItem);
+      const initialStateCheck = contactSpec.model.allowsInitialState(simpleSource.currentSample, this.primaryPath.currentSample, baseItem);
 
       if(!initialStateCheck) {
         this.finalize(false, 'path');
@@ -294,6 +321,10 @@ export class GestureMatcher<Type> {
     }
 
     this.addContactInternal(simpleSource.constructSubview(false, true));
+  }
+
+  public get result() {
+    return this._result;
   }
 
   private addContactInternal(simpleSource: GestureSourceSubview<Type>) {

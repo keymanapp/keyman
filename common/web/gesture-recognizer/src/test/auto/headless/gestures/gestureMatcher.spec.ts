@@ -102,26 +102,26 @@ describe("GestureMatcher", function() {
 
 
       // Because 'chopped'.
-      assert.equal(secondMatcher.pathMatchers[0].source.path.coords.length, 1);
+      assert.equal(secondMatcher.sources[0].path.coords.length, 1);
       assert.deepEqual(sources[0].currentSample, waitCompletionSample);
       // because we 'chopped' the path, we use the current sample's item as the new base.
-      assert.equal(secondMatcher.pathMatchers[0].source.baseItem, 'b');
+      assert.equal(secondMatcher.sources[0].baseItem, 'b');
       // This technically does affect what the first `modelMatcher` would see as the base item, but its Promise
       // is already fulfilled - its effects are already fully committed.
 
-      const firstMatcherStats = modelMatcher.pathMatchers[0].stats;
+      const firstMatcherStats = modelMatcher.sources[0].path.stats;
       assert.equal(firstMatcherStats.duration, MainLongpressSourceModel.timer.duration);
       assert.equal(firstMatcherStats.rawDistance, 0);
 
       // subview
-      assert.equal(secondMatcher.pathMatchers[0].source.path.stats.duration, 0);
+      assert.equal(secondMatcher.sources[0].path.stats.duration, 0);
       // original
       assert.equal(sources[0].path.stats.duration, MainLongpressSourceModel.timer.duration);
 
       await completion;
 
       assert.equal(await promiseStatus(secondMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      const secondMatcherStats = secondMatcher.pathMatchers[0].stats;
+      const secondMatcherStats = secondMatcher.sources[0].path.stats;
       assert.equal(secondMatcherStats.duration, 100);
       assert.closeTo(secondMatcherStats.netDistance, 50, 1e-6);
       assert.equal(secondMatcherStats.cardinalDirection, 'e');
@@ -170,23 +170,23 @@ describe("GestureMatcher", function() {
 
 
       // 'partial' path inheritance still drops the pre-existing path components...
-      assert.equal(secondMatcher.pathMatchers[0].source.path.coords.length, 1);
+      assert.equal(secondMatcher.sources[0].path.coords.length, 1);
       assert.deepEqual(sources[0].currentSample, waitCompletionSample);
       // ... but preserves the original base item.
       assert.equal(sources[0].baseItem, 'a');
 
       // The rest of what's below should match the assertions for the 'chop' path.
-      const firstMatcherStats = modelMatcher.pathMatchers[0].stats;
+      const firstMatcherStats = modelMatcher.sources[0].path.stats;
       assert.equal(firstMatcherStats.duration, MainLongpressSourceModel.timer.duration);
       assert.equal(firstMatcherStats.rawDistance, 0);
 
-      assert.equal(secondMatcher.pathMatchers[0].source.path.stats.duration, 0);
+      assert.equal(secondMatcher.sources[0].path.stats.duration, 0);
       assert.equal(sources[0].path.stats.duration, MainLongpressSourceModel.timer.duration);
 
       await completion;
 
       assert.equal(await promiseStatus(secondMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      const secondMatcherStats = secondMatcher.pathMatchers[0].stats;
+      const secondMatcherStats = secondMatcher.sources[0].path.stats;
       assert.equal(secondMatcherStats.duration, 100);
       assert.closeTo(secondMatcherStats.netDistance, 50, 1e-6);
       assert.equal(secondMatcherStats.cardinalDirection, 'e');
@@ -280,23 +280,23 @@ describe("GestureMatcher", function() {
 
 
       // 'full' path inheritance maintains all pre-existing path components...
-      assert.equal(secondMatcher.pathMatchers[0].source.path.coords.length, sources[0].path.coords.length);
-      assert.deepEqual(secondMatcher.pathMatchers[0].source.path.coords, sources[0].path.coords)
+      assert.equal(secondMatcher.sources[0].path.coords.length, sources[0].path.coords.length);
+      assert.deepEqual(secondMatcher.sources[0].path.coords, sources[0].path.coords)
       assert.deepEqual(sources[0].currentSample, waitCompletionSample);
       // ... and also preserves the original base item.
       assert.equal(sources[0].baseItem, 'a');
 
-      const firstMatcherStats = modelMatcher.pathMatchers[0].stats;
+      const firstMatcherStats = modelMatcher.sources[0].path.stats;
       assert.equal(firstMatcherStats.duration, MainLongpressSourceModel.timer.duration);
       assert.equal(firstMatcherStats.rawDistance, 0);
 
       assert.equal(sources[0].path.stats.duration, MainLongpressSourceModel.timer.duration);
-      assert.equal(secondMatcher.pathMatchers[0].source.path.stats.duration, sources[0].path.stats.duration);
+      assert.equal(secondMatcher.sources[0].path.stats.duration, sources[0].path.stats.duration);
 
       await completion;
 
       assert.equal(await promiseStatus(secondMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      const secondMatcherStats = secondMatcher.pathMatchers[0].stats;
+      const secondMatcherStats = secondMatcher.sources[0].path.stats;
       assert.equal(secondMatcherStats.duration, MainLongpressSourceModel.timer.duration + 100);
       assert.closeTo(secondMatcherStats.netDistance, 50, 1e-6);
       assert.equal(secondMatcherStats.cardinalDirection, 'e');
@@ -341,7 +341,7 @@ describe("GestureMatcher", function() {
       // Did we resolve at the expected point in the path - once the timer duration had passed?
       assert.isAtLeast(sources[0].currentSample.t, turtle.path[0].t + MainLongpressSourceModel.timer.duration - 1);
 
-      const finalStats = modelMatcher.pathMatchers[0].stats;
+      const finalStats = modelMatcher.sources[0].path.stats;
       assert.isAtLeast(finalStats.duration, MainLongpressSourceModel.timer.duration - 1);
       assert.equal(finalStats.rawDistance, 0)
 
@@ -679,7 +679,7 @@ describe("GestureMatcher", function() {
       assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap'}});
       assert.isTrue(sources[0].path.isComplete);
 
-      const finalStats = modelMatcher.pathMatchers[0].stats;
+      const finalStats = modelMatcher.sources[0].path.stats;
       assert.isAtLeast(finalStats.duration, 100);
       assert.equal(finalStats.rawDistance, 0)
     });
